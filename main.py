@@ -10,13 +10,14 @@ from urlparse import parse_qsl
 import xbmc
 import xbmcgui
 import xbmcplugin
+import xbmcaddon
 import requests
 
 # Get the plugin url in plugin:// notation.
 _url = sys.argv[0]
 # Get the plugin handle as an integer number.
 _handle = int(sys.argv[1])
-
+ADDON_PATH = xbmcaddon.Addon().getAddonInfo('path')
 DIALOG = xbmcgui.Dialog()
 API_KEY = xbmcplugin.getSetting(_handle, 'tmdb_apikey')
 HTTPS_API = 'https://api.themoviedb.org/3/'
@@ -229,7 +230,7 @@ CATEGORIES = {'search_movie':
 DBTYPE_DICT = {'movie': ('video', 'movie', 'movies'),
                'tv': ('video', 'tvshow', 'tvshows'),
                'person': ('', '', 'actors'),
-               'image': ('pictures', '', 'images'),
+               'image': ('pictures', '', 'actors'),
                }
 
 
@@ -316,14 +317,14 @@ def get_artwork_poster(item):
     elif item.get('file_path'):
         return IMAGEPATH + item['file_path']
     else:
-        return ''
+        return ADDON_PATH + '/icon.png'
 
 
 def get_artwork_fanart(item):
     if item.get('backdrop_path'):
         return IMAGEPATH + item['backdrop_path']
     else:
-        return ''
+        return ADDON_PATH + '/fanart.jpg'
 
 
 def concatinate_names(items, key, separator):
@@ -506,13 +507,13 @@ def construct_categories(matches, items, exclusions):
 
 def list_categories(items, dbtype, tmdb_id, title):
     xbmcplugin.setPluginCategory(_handle, '')  # Set Container.PluginCategory
-    container_content = 'tmdbinfo_' + convert_to_containercontent(dbtype)
+    container_content = convert_to_containercontent(dbtype)
     librarytype = convert_to_librarytype(dbtype)
     xbmcplugin.setContent(_handle, container_content)  # Set Container.Content()
     iteminfo = {}
     itemprops = {}
-    poster = ''
-    fanart = ''
+    poster = ADDON_PATH + '/icon.png'
+    fanart = ADDON_PATH + '/fanart.jpg'
     if tmdb_id or title:
         iteminfo, itemprops, poster, fanart = list_create_infoitem(dbtype, tmdb_id, title)
     for i in items:
