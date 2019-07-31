@@ -1,0 +1,564 @@
+# -*- coding: utf-8 -*-
+# Module: default
+# Author: jurialmunkey
+# License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
+# With thanks to Roman V. M. for original simple plugin code
+
+import sys
+from urllib import urlencode
+from urlparse import parse_qsl
+import xbmc
+import xbmcgui
+import xbmcplugin
+import requests
+
+# Get the plugin url in plugin:// notation.
+_url = sys.argv[0]
+# Get the plugin handle as an integer number.
+_handle = int(sys.argv[1])
+
+DIALOG = xbmcgui.Dialog()
+API_KEY = xbmcplugin.getSetting(_handle, 'tmdb_apikey')
+HTTPS_API = 'https://api.themoviedb.org/3/'
+LANGUAGE = '&language=en-US'
+IMAGEPATH = 'https://image.tmdb.org/t/p/original/'
+EXCLUDE = ['no_exclusions']
+DIR_MAIN = ['search_', 'popular_', 'toprated_', 'upcoming_', 'nowplaying_']
+CATEGORIES = {'search_movie':
+              {'title': 'Search Movies',
+               'item_dbtype': 'movie',
+               'request_dbtype': 'movie',
+               'request_key': 'results',
+               },
+              'search_tv':
+              {'title': 'Search Tv Shows',
+               'item_dbtype': 'tv',
+               'request_dbtype': 'tv',
+               'request_key': 'results',
+               },
+              'search_people':
+              {'title': 'Search People',
+               'item_dbtype': 'person',
+               'request_dbtype': 'person',
+               'request_key': 'results',
+               },
+              'popular_movie':
+              {'title': 'Popular Movies',
+               'item_dbtype': 'movie',
+               'request_list': 'popular',
+               'request_dbtype': 'movie',
+               'request_key': 'results',
+               },
+              'popular_tv':
+              {'title': 'Popular Tv Shows',
+               'item_dbtype': 'tv',
+               'request_list': 'popular',
+               'request_dbtype': 'tv',
+               'request_key': 'results',
+               },
+              'popular_person':
+              {'title': 'Popular People',
+               'item_dbtype': 'person',
+               'request_list': 'popular',
+               'request_dbtype': 'person',
+               'request_key': 'results',
+               },
+              'toprated_movie':
+              {'title': 'Top Rated Movies',
+               'item_dbtype': 'movie',
+               'request_list': 'top_rated',
+               'request_dbtype': 'movie',
+               'request_key': 'results',
+               },
+              'toprated_tv':
+              {'title': 'Top Rated Tv Shows',
+               'item_dbtype': 'tv',
+               'request_list': 'top_rated',
+               'request_dbtype': 'tv',
+               'request_key': 'results',
+               },
+              'upcoming_movie':
+              {'title': 'Upcoming Movies',
+               'item_dbtype': 'movie',
+               'request_list': 'upcoming',
+               'request_dbtype': 'movie',
+               'request_key': 'results',
+               },
+              'upcoming_tv':
+              {'title': 'Airing Today',
+               'item_dbtype': 'tv',
+               'request_list': 'airing_today',
+               'request_dbtype': 'tv',
+               'request_key': 'results',
+               },
+              'nowplaying_movie':
+              {'title': 'In Theatres',
+               'item_dbtype': 'movie',
+               'request_list': 'now_playing',
+               'request_dbtype': 'movie',
+               'request_key': 'results',
+               },
+              'nowplaying_tv':
+              {'title': 'Currently Airing',
+               'item_dbtype': 'tv',
+               'request_list': 'on_the_air',
+               'request_dbtype': 'tv',
+               'request_key': 'results',
+               },
+              'recommended_movie':
+              {'title': 'Recommended Movies',
+               'item_dbtype': 'movie',
+               'request_list': 'recommendations',
+               'request_dbtype': 'movie',
+               'request_key': 'results',
+               },
+              'recommended_tv':
+              {'title': 'Recommended Tv Shows',
+               'item_dbtype': 'tv',
+               'request_list': 'recommendations',
+               'request_dbtype': 'tv',
+               'request_key': 'results',
+               },
+              'similar_movie':
+              {'title': 'Similar Movies',
+               'item_dbtype': 'movie',
+               'request_list': 'similar',
+               'request_dbtype': 'movie',
+               'request_key': 'results',
+               },
+              'similar_tv':
+              {'title': 'Similar Tv Shows',
+               'item_dbtype': 'tv',
+               'request_list': 'similar',
+               'request_dbtype': 'tv',
+               'request_key': 'results',
+               },
+              'review_movie':
+              {'title': 'Reviews',
+               'item_dbtype': 'review',
+               'request_list': 'reviews',
+               'request_dbtype': 'movie',
+               'request_key': 'results',
+               },
+              'review_tv':
+              {'title': 'Reviews',
+               'item_dbtype': 'review',
+               'request_list': 'reviews',
+               'request_dbtype': 'tv',
+               'request_key': 'results',
+               },
+              'keywords_movie':
+              {'title': 'Keywords',
+               'item_dbtype': 'keyword',
+               'request_list': 'keywords',
+               'request_dbtype': 'movie',
+               'request_key': 'keywords',
+               },
+              'keywords_tv':
+              {'title': 'Keywords',
+               'item_dbtype': 'keyword',
+               'request_list': 'keywords',
+               'request_dbtype': 'tv',
+               'request_key': 'results',
+               },
+              'cast_movie':
+              {'title': 'Cast',
+               'item_dbtype': 'person',
+               'request_list': 'credits',
+               'request_dbtype': 'movie',
+               'request_key': 'cast',
+               },
+              'cast_tv':
+              {'title': 'Cast',
+               'item_dbtype': 'person',
+               'request_list': 'credits',
+               'request_dbtype': 'tv',
+               'request_key': 'cast',
+               },
+              'crew_movie':
+              {'title': 'Crew',
+               'item_dbtype': 'person',
+               'request_list': 'credits',
+               'request_dbtype': 'movie',
+               'request_key': 'crew',
+               },
+              'crew_tv':
+              {'title': 'Crew',
+               'item_dbtype': 'person',
+               'request_list': 'credits',
+               'request_dbtype': 'tv',
+               'request_key': 'crew',
+               },
+              'moviecast_person':
+              {'title': 'Movies as Cast',
+               'item_dbtype': 'movie',
+               'request_list': 'movie_credits',
+               'request_dbtype': 'person',
+               'request_key': 'cast',
+               },
+              'tvcast_person':
+              {'title': 'Tv Shows as Cast',
+               'item_dbtype': 'tv',
+               'request_list': 'tv_credits',
+               'request_dbtype': 'person',
+               'request_key': 'cast',
+               },
+              'moviecrew_person':
+              {'title': 'Movies as Crew',
+               'item_dbtype': 'movie',
+               'request_list': 'movie_credits',
+               'request_dbtype': 'person',
+               'request_key': 'crew',
+               },
+              'tvcrew_person':
+              {'title': 'Tv Shows as Crew',
+               'item_dbtype': 'tv',
+               'request_list': 'tv_credits',
+               'request_dbtype': 'person',
+               'request_key': 'crew',
+               },
+              'images_person':
+              {'title': 'Images',
+               'item_dbtype': 'image',
+               'request_list': 'images',
+               'request_dbtype': 'person',
+               'request_key': 'profiles',
+               },
+              }
+
+DBTYPE_DICT = {'movie': ('video', 'movie', 'movies'),
+               'tv': ('video', 'tvshow', 'tvshows'),
+               'person': ('', '', 'actors'),
+               'image': ('pictures', '', 'images'),
+               }
+
+
+def get_url(**kwargs):
+    return '{0}?{1}'.format(_url, urlencode(kwargs))
+
+
+def textviewer(title, text):
+    DIALOG.textviewer(str(title), str(text))
+
+
+def make_request(request):
+    xbmcgui.Window(10000).setProperty('TheMovieDb.Helper.APIRequest', request)  # DEBUGGING
+    request = requests.get(request)  # Request our data
+    if not request.status_code == requests.codes.ok:  # Error Checking
+        if request.status_code == 401:
+            invalid_apikey()
+            exit()
+        else:
+            raise ValueError(request.raise_for_status())
+    request = request.json()  # Make the request nice
+    return request
+
+
+def tmdb_api_request(tmdb_type, tmdb_list, tmdb_id):
+    if tmdb_id:
+        tmdb_id = '/' + tmdb_id
+    if tmdb_list:
+        tmdb_list = '/' + tmdb_list
+    request = HTTPS_API + tmdb_type + tmdb_id + tmdb_list + '?api_key=' + API_KEY + LANGUAGE
+    request = make_request(request)
+    return request
+
+
+def tmdb_api_search(tmdb_type, query, year):
+    request = HTTPS_API + 'search/' + tmdb_type  + '?api_key=' + API_KEY + LANGUAGE
+    if query:
+        request = request + '&query=' + query
+    if year:
+        request = request + '&year=' + year
+    request = make_request(request)
+    return request
+
+
+def convert_to_librarytype(dbtype):
+    if dbtype in DBTYPE_DICT:
+        return DBTYPE_DICT[dbtype][0]
+    else:
+        return 'video'
+
+
+def convert_to_dbtype(dbtype):
+    if dbtype in DBTYPE_DICT:
+        return DBTYPE_DICT[dbtype][1]
+    else:
+        return 'video'
+
+
+def convert_to_containercontent(dbtype):
+    if dbtype in DBTYPE_DICT:
+        return DBTYPE_DICT[dbtype][2]
+    else:
+        return ''
+
+
+def get_title(item):
+    if item.get('title'):
+        return item['title']
+    elif item.get('name'):
+        return item['name']
+    elif item.get('author'):
+        return item['author']
+    elif item.get('width') and item.get('height'):
+        return str(item['width']) + 'x' + str(item['height'])
+    else:
+        return 'N/A'
+
+
+def get_artwork_poster(item):
+    if item.get('poster_path'):
+        return IMAGEPATH + item['poster_path']
+    elif item.get('profile_path'):
+        return IMAGEPATH + item['profile_path']
+    elif item.get('file_path'):
+        return IMAGEPATH + item['file_path']
+    else:
+        return ''
+
+
+def get_artwork_fanart(item):
+    if item.get('backdrop_path'):
+        return IMAGEPATH + item['backdrop_path']
+    else:
+        return ''
+
+
+def concatinate_names(items, key, separator):
+    concat = ''
+    for i in items:
+        if i.get(key):
+            if concat:
+                concat = concat + ' ' + separator + ' ' + i.get(key)
+            else:
+                concat = i.get(key)
+    return concat
+
+
+def get_item_info(i, iteminfo):
+    if i.get('overview'):
+        iteminfo['plot'] = i['overview']
+    if i.get('vote_average'):
+        iteminfo['rating'] = i['vote_average']
+    if i.get('vote_count'):
+        iteminfo['votes'] = i['vote_count']
+    if i.get('release_date'):
+        iteminfo['premiered'] = i['release_date']
+        iteminfo['year'] = i['release_date'][:4]
+    if i.get('imdb_id'):
+        iteminfo['imdbnumber'] = i['imdb_id']
+    if i.get('runtime'):
+        iteminfo['duration'] = i['runtime'] * 60
+    if i.get('tagline'):
+        iteminfo['tagline'] = i['tagline']
+    if i.get('status'):
+        iteminfo['status'] = i['status']
+    if i.get('status'):
+        iteminfo['status'] = i['status']
+    if i.get('genres'):
+        iteminfo['genre'] = concatinate_names(i.get('genres'), 'name', '/')
+    if i.get('production_companies'):
+        iteminfo['studio'] = concatinate_names(i.get('production_companies'), 'name', '/')
+    if i.get('production_countries'):
+        iteminfo['country'] = concatinate_names(i.get('production_countries'), 'name', '/')
+    return iteminfo
+
+
+def iter_props(items, name, itemprops):
+    x = 0
+    for i in items:
+        x = x + 1
+        itemprops[name + '.' + str(x) + '.Name'] = i.get('name', '')
+        if i.get('id'):
+            itemprops[name + '.' + str(x) + '.ID'] = i.get('id', '')
+    return itemprops
+
+
+def get_item_properties(i, itemprops):
+    if i.get('genres'):
+        itemprops = iter_props(i.get('genres'), 'Genre', itemprops)
+    if i.get('production_companies'):
+        itemprops = iter_props(i.get('production_companies'), 'Studio', itemprops)
+    if i.get('production_countries'):
+        itemprops = iter_props(i.get('production_countries'), 'Country', itemprops)
+    return itemprops
+
+
+def list_create_infoitem(dbtype, tmdb_id, title):
+    if not dbtype:
+        return  # Need a type to make a request
+    elif not tmdb_id and not title:
+        return  # Need an ID or search query
+    elif not tmdb_id:
+        return  # TODO use search function to grab id
+    i = tmdb_api_request(dbtype, '', tmdb_id)
+    mediatype = convert_to_dbtype(dbtype)
+    librarytype = convert_to_librarytype(dbtype)
+    title = get_title(i)
+    list_item = xbmcgui.ListItem(label=title)
+
+    # ADD INFO
+    iteminfo = {'title': 'title', 'mediatype': mediatype}
+    iteminfo = get_item_info(i, iteminfo)
+    list_item.setInfo(librarytype, iteminfo)
+
+    # ADD PROPERTIES
+    itemprops = {'tmdb_id': tmdb_id}
+    itemprops = get_item_properties(i, itemprops)
+    list_item.setProperties(itemprops)
+
+    # ADD ARTWORK
+    poster = get_artwork_poster(i)
+    fanart = get_artwork_fanart(i)
+    list_item.setArt({'thumb': poster, 'icon': poster, 'poster': poster, 'fanart': fanart})
+
+    # ADD ITEM
+    is_folder = True
+    url = get_url(info='item', tmdb_id=i.get('id', ''), type=dbtype, title=title)
+    xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
+
+    return iteminfo, itemprops, poster, fanart
+
+
+def list_items(items, item_dbtype, request_dbtype):
+    xbmcplugin.setPluginCategory(_handle, '')  # Set Container.PluginCategory
+    container_content = convert_to_containercontent(item_dbtype)
+    mediatype = convert_to_dbtype(item_dbtype)
+    librarytype = convert_to_librarytype(item_dbtype)
+    xbmcplugin.setContent(_handle, container_content)  # Container.Content
+
+    for i in items:
+        title = get_title(i)
+        list_item = xbmcgui.ListItem(label=title)
+        iteminfo = {'title': title, 'mediatype': mediatype}
+
+        # ADD INFO
+        if item_dbtype == 'reviews':
+            if i.get('content'):
+                iteminfo['plot'] = i['content']
+        elif item_dbtype == 'movie' or item_dbtype == 'tvshow':
+            iteminfo = get_item_info(i, iteminfo)
+        list_item.setInfo(librarytype, iteminfo)
+
+        # ADD ARTWORK
+        poster = get_artwork_poster(i)
+        fanart = get_artwork_fanart(i)
+        list_item.setArt({'thumb': poster, 'icon': poster, 'poster': poster, 'fanart': fanart})
+
+        # ADD ITEM
+        is_folder = True
+        if item_dbtype == 'review':
+            url = get_url(info='textviewer', title=title, text=i['content'])
+        elif item_dbtype == 'image':
+                url = get_url(info='imageviewer', title=title, image=poster)
+        else:
+            url = get_url(info='item', tmdb_id=i.get('id', ''), type=item_dbtype, title=title)
+        xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
+
+    xbmcplugin.endOfDirectory(_handle)  # End Dir
+
+
+def list_search(params, categories):
+    # If no query specified in plugin path then prompt user
+    if params.get('query'):
+        query = params['query']
+    else:
+        query = DIALOG.input('Enter Search Query', type=xbmcgui.INPUT_ALPHANUM)
+
+    # If no year specified in plugin path then leave blank
+    if params.get('year'):
+        year = params['year']
+    else:
+        year = ''
+
+    # Check query exists and search type is valid before searching
+    if query and params['info'] in categories:
+        item = categories[params['info']]
+        items = tmdb_api_search(item['request_dbtype'], query, year)
+        items = items['results']
+        list_items(items, item['item_dbtype'], item['request_dbtype'])
+
+
+def construct_categories(matches, items, exclusions):
+    new_dictionary = {}
+    for match in matches:
+        for i in items:
+            if match in i:
+                for exclusion in exclusions:
+                    if exclusion in i:
+                        break
+                else:
+                    new_dictionary[i] = items[i]
+    return new_dictionary
+
+
+def list_categories(items, dbtype, tmdb_id, title):
+    xbmcplugin.setPluginCategory(_handle, '')  # Set Container.PluginCategory
+    container_content = convert_to_containercontent(dbtype)
+    librarytype = convert_to_librarytype(dbtype)
+    xbmcplugin.setContent(_handle, container_content)  # Set Container.Content()
+    iteminfo = {}
+    itemprops = {}
+    poster = ''
+    fanart = ''
+    if tmdb_id or title:
+        iteminfo, itemprops, poster, fanart = list_create_infoitem(dbtype, tmdb_id, title)
+    for i in items:
+        list_item = xbmcgui.ListItem(label=items[i]['title'])
+        list_item.setInfo(librarytype, iteminfo)
+        list_item.setProperties(itemprops)
+        list_item.setArt({'thumb': poster, 'icon': poster, 'poster': poster, 'fanart': fanart})
+        url = get_url(info=i, tmdb_id=tmdb_id, title=title)
+        is_folder = True
+        xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)  # Add Item
+    if not tmdb_id:
+        xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
+    xbmcplugin.endOfDirectory(_handle)  # Finish Dir
+
+
+def router(paramstring):
+    params = dict(parse_qsl(paramstring))
+    if params:
+        if params['info'] == 'item':
+            include_these = ['_' + params['type']]
+            items = construct_categories(include_these, CATEGORIES, DIR_MAIN)
+            list_categories(items, params['type'], params['tmdb_id'], params['title'])
+        elif 'textviewer' in params['info']:
+            textviewer(params['title'], params['text'])
+        elif 'imageviewer' in params['info']:
+            xbmc.executebuiltin('ShowPicture(' + params['image'] + ')')
+        elif 'search_' in params['info']:
+            list_search(params, CATEGORIES)
+        elif params['info'] in CATEGORIES:
+            category = CATEGORIES[params['info']]
+            if params.get('tmdb_id'):
+                tmdb_id = params['tmdb_id']
+            elif params.get('title'):
+                items = tmdb_api_search(category['request_dbtype'], params['title'], params.get('year'))
+                items = items['results']
+                tmdb_id = str(items[0]['id'])
+            else:
+                tmdb_id = ''
+                # raise ValueError('Missing title or tmdb_id: {0}!'.format(paramstring))
+            items = tmdb_api_request(
+                category['request_dbtype'], category['request_list'], tmdb_id)
+            list_items(items[category['request_key']], category['item_dbtype'], category['request_dbtype'])
+        else:
+            raise ValueError('Invalid paramstring: {0}!'.format(paramstring))
+    else:
+        items = construct_categories(DIR_MAIN, CATEGORIES, EXCLUDE)
+        list_categories(items, '', '', '')
+
+
+def invalid_apikey():
+    DIALOG.ok('Missing/Invalid TheMovieDb API Key',
+              'You must enter a valid TheMovieDb API key to use this add-on')
+    xbmc.executebuiltin('Addon.OpenSettings(plugin.video.themoviedb.helper)')
+
+
+if not API_KEY:
+    invalid_apikey()
+elif __name__ == '__main__':
+    router(sys.argv[2][1:])

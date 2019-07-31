@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+    <category label="128">
+        <setting label="TheMovieDb API Key" type="text" id="tmdb_apikey" />
+    </category>
+</settings>
