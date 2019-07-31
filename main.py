@@ -355,8 +355,6 @@ def get_item_info(i, iteminfo):
         iteminfo['tagline'] = i['tagline']
     if i.get('status'):
         iteminfo['status'] = i['status']
-    if i.get('status'):
-        iteminfo['status'] = i['status']
     if i.get('genres'):
         iteminfo['genre'] = concatinate_names(i.get('genres'), 'name', '/')
     if i.get('production_companies'):
