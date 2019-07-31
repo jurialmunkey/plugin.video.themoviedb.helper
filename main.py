@@ -340,6 +340,8 @@ def concatinate_names(items, key, separator):
 def get_item_info(i, iteminfo):
     if i.get('overview'):
         iteminfo['plot'] = i['overview']
+    elif i.get('biography'):
+        iteminfo['plot'] = i['biography']
     if i.get('vote_average'):
         iteminfo['rating'] = i['vote_average']
     if i.get('vote_count'):
@@ -381,6 +383,16 @@ def get_item_properties(i, itemprops):
         itemprops = iter_props(i.get('production_companies'), 'Studio', itemprops)
     if i.get('production_countries'):
         itemprops = iter_props(i.get('production_countries'), 'Country', itemprops)
+    if i.get('birthday'):
+        itemprops['birthday'] = i['birthday']
+    if i.get('deathday'):
+        itemprops['deathday'] = i['deathday']
+    if i.get('also_know_as'):
+        itemprops['aliases'] = i['also_know_as']
+    if i.get('known_for_department'):
+        itemprops['role'] = i['known_for_department']
+    if i.get('place_of_birth'):
+        itemprops['born'] = i['place_of_birth']
     return itemprops
 
 
@@ -494,7 +506,7 @@ def construct_categories(matches, items, exclusions):
 
 def list_categories(items, dbtype, tmdb_id, title):
     xbmcplugin.setPluginCategory(_handle, '')  # Set Container.PluginCategory
-    container_content = convert_to_containercontent(dbtype)
+    container_content = 'tmdbinfo_' + convert_to_containercontent(dbtype)
     librarytype = convert_to_librarytype(dbtype)
     xbmcplugin.setContent(_handle, container_content)  # Set Container.Content()
     iteminfo = {}
@@ -516,11 +528,11 @@ def list_categories(items, dbtype, tmdb_id, title):
     xbmcplugin.endOfDirectory(_handle)  # Finish Dir
 
 
-def check_tmdb_id(params, category):
+def check_tmdb_id(params, dbtype):
     if params.get('tmdb_id'):
         return params.get('tmdb_id')
     elif params.get('title'):
-        items = tmdb_api_search(category.get('request_dbtype'), params.get('title'), params.get('year'))
+        items = tmdb_api_search(dbtype, params.get('title'), params.get('year'))
         items = items.get('results')
         return str(items[0]['id'])
     else:
@@ -531,8 +543,11 @@ def router(paramstring):
     params = dict(parse_qsl(paramstring))
     if params:
         if params.get('info') == 'item':
+            if not params.get('type'):
+                raise ValueError('Invalid paramstring - ?info=item must specify type: {0}!'.format(paramstring))
             include_these = ['_' + params.get('type')]
             items = construct_categories(include_these, CATEGORIES, DIR_MAIN)
+            tmdb_id = check_tmdb_id(params, params.get('type'))
             list_categories(items, params.get('type'), params.get('tmdb_id'), params.get('title'))
         elif 'textviewer' in params.get('info'):
             textviewer(params.get('title'), params.get('text'))
@@ -542,7 +557,7 @@ def router(paramstring):
             list_search(params, CATEGORIES)
         elif params.get('info') in CATEGORIES:
             category = CATEGORIES[params.get('info')]
-            tmdb_id = check_tmdb_id(params, category)
+            tmdb_id = check_tmdb_id(params, category.get('request_dbtype'))
             items = tmdb_api_request(
                 category.get('request_dbtype'), category.get('request_list'), tmdb_id)
             list_items(items.get(category.get('request_key')), category.get('item_dbtype'), category.get('request_dbtype'))
