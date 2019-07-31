@@ -448,7 +448,7 @@ def list_items(items, item_dbtype, request_dbtype):
         # ADD ITEM
         is_folder = True
         if item_dbtype == 'review':
-            url = get_url(info='textviewer', title=title, text=i['content'])
+            url = get_url(info='textviewer', title=title, text=i.get('content'))
         elif item_dbtype == 'image':
                 url = get_url(info='imageviewer', title=title, image=poster)
         else:
@@ -472,11 +472,11 @@ def list_search(params, categories):
         year = ''
 
     # Check query exists and search type is valid before searching
-    if query and params['info'] in categories:
-        item = categories[params['info']]
-        items = tmdb_api_search(item['request_dbtype'], query, year)
-        items = items['results']
-        list_items(items, item['item_dbtype'], item['request_dbtype'])
+    if query and params.get('info') in categories:
+        item = categories.get(params.get('info'))
+        items = tmdb_api_search(item.get('request_dbtype'), query, year)
+        items = items.get('results')
+        list_items(items, item.get('item_dbtype'), item.get('request_dbtype'))
 
 
 def construct_categories(matches, items, exclusions):
