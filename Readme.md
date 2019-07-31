@@ -20,7 +20,7 @@ For better matching when using title, add  `&amp;year=$INFO[ListItem.Year]`
 
 #### Item Info
 ```
-plugin://plugin.video.themoviedb.helper/?info=item&amp;tmdb_id=8392
+plugin://plugin.video.themoviedb.helper/?info=item&amp;type=movie&amp;tmdb_id=8392
 ```
 Use this path to get rich info about a movie/tvshow.  
 Provides tmdb_id as ListItem.Property(tmdb_id)
