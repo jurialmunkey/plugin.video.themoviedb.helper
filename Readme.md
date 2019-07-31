@@ -18,21 +18,6 @@ It is preferable to pass the tmdb_id of the item to the plugin path with `&amp;t
 If you don't have tmdb_id, you can instead use `&amp;title=$INFO[ListItem.Title]`  
 For better matching when using title, add  `&amp;year=$INFO[ListItem.Year]`
 
-#### Item Info
-```
-plugin://plugin.video.themoviedb.helper/?info=item&amp;tmdb_id=8392
-```
-Use this path to get rich info about a movie/tvshow.  
-Provides tmdb_id as ListItem.Property(tmdb_id)
-
-Provides ListItem.InfoLabels
-`Title, Rating, Year, Premiered, Duration, Plot, Genre, Studio, Country`
-
-Provides ListItem.Property(property)  
-`Genre.X.Name, Country.X.Name, Studio.X.Name`
-
-Provides a list of possible plugin paths autofilled with tmdb_id to use:  
-`<content>$INFO[Container(ID).ListItemAbsolute(1).FolderPath]</content>`
 
 #### Recommended Movie/TV
 ```
