@@ -265,7 +265,7 @@ def tmdb_api_request(tmdb_type, tmdb_list, tmdb_id):
 
 
 def tmdb_api_search(tmdb_type, query, year):
-    request = HTTPS_API + 'search/' + tmdb_type  + '?api_key=' + API_KEY + LANGUAGE
+    request = HTTPS_API + 'search/' + tmdb_type + '?api_key=' + API_KEY + LANGUAGE
     if query:
         request = request + '&query=' + query
     if year:
@@ -518,33 +518,36 @@ def list_categories(items, dbtype, tmdb_id, title):
     xbmcplugin.endOfDirectory(_handle)  # Finish Dir
 
 
+def check_tmdb_id(params, category):
+    if params.get('tmdb_id'):
+        return params.get('tmdb_id')
+    elif params.get('title'):
+        items = tmdb_api_search(category.get('request_dbtype'), params.get('title'), params.get('year'))
+        items = items.get('results')
+        return str(items[0]['id'])
+    else:
+        return ''
+
+
 def router(paramstring):
     params = dict(parse_qsl(paramstring))
     if params:
-        if params['info'] == 'item':
-            include_these = ['_' + params['type']]
+        if params.get('info') == 'item':
+            include_these = ['_' + params.get('type')]
             items = construct_categories(include_these, CATEGORIES, DIR_MAIN)
-            list_categories(items, params['type'], params['tmdb_id'], params['title'])
-        elif 'textviewer' in params['info']:
-            textviewer(params['title'], params['text'])
-        elif 'imageviewer' in params['info']:
-            xbmc.executebuiltin('ShowPicture(' + params['image'] + ')')
-        elif 'search_' in params['info']:
+            list_categories(items, params.get('type'), params.get('tmdb_id'), params.get('title'))
+        elif 'textviewer' in params.get('info'):
+            textviewer(params.get('title'), params.get('text'))
+        elif 'imageviewer' in params.get('info'):
+            xbmc.executebuiltin('ShowPicture(' + params.get('image') + ')')
+        elif 'search_' in params.get('info'):
             list_search(params, CATEGORIES)
-        elif params['info'] in CATEGORIES:
-            category = CATEGORIES[params['info']]
-            if params.get('tmdb_id'):
-                tmdb_id = params['tmdb_id']
-            elif params.get('title'):
-                items = tmdb_api_search(category['request_dbtype'], params['title'], params.get('year'))
-                items = items['results']
-                tmdb_id = str(items[0]['id'])
-            else:
-                tmdb_id = ''
-                # raise ValueError('Missing title or tmdb_id: {0}!'.format(paramstring))
+        elif params.get('info') in CATEGORIES:
+            category = CATEGORIES[params.get('info')]
+            tmdb_id = check_tmdb_id(params, category)
             items = tmdb_api_request(
-                category['request_dbtype'], category['request_list'], tmdb_id)
-            list_items(items[category['request_key']], category['item_dbtype'], category['request_dbtype'])
+                category.get('request_dbtype'), category.get('request_list'), tmdb_id)
+            list_items(items.get(category.get('request_key')), category.get('item_dbtype'), category.get('request_dbtype'))
         else:
             raise ValueError('Invalid paramstring: {0}!'.format(paramstring))
     else:
