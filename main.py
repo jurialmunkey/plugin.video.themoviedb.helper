@@ -12,7 +12,6 @@ import xbmcgui
 import xbmcplugin
 import xbmcaddon
 import requests
-
 # Get the plugin url in plugin:// notation.
 _url = sys.argv[0]
 # Get the plugin handle as an integer number.
@@ -394,6 +393,10 @@ def get_item_properties(i, itemprops):
         itemprops['role'] = i['known_for_department']
     if i.get('place_of_birth'):
         itemprops['born'] = i['place_of_birth']
+    if i.get('budget'):
+        itemprops['budget'] = '${:0,.0f}'.format(i['budget'])
+    if i.get('revenue'):
+        itemprops['revenue'] = '${:0,.0f}'.format(i['revenue'])
     return itemprops
 
 
