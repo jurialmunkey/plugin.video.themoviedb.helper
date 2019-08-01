@@ -18,6 +18,8 @@ _url = sys.argv[0]
 _handle = int(sys.argv[1])
 ADDON_PATH = xbmcaddon.Addon().getAddonInfo('path')
 DIALOG = xbmcgui.Dialog()
+OMDB_API_KEY = xbmcplugin.getSetting(_handle, 'omdb_apikey')
+OMDB_HTTPS_API = 'http://www.omdbapi.com/'
 API_KEY = xbmcplugin.getSetting(_handle, 'tmdb_apikey')
 HTTPS_API = 'https://api.themoviedb.org/3'
 LANGUAGE = '&language=en-US'
@@ -279,6 +281,15 @@ def tmdb_api_request(*args, **kwargs):
     return request
 
 
+def omdb_api_request(**kwargs):
+    request = OMDB_HTTPS_API + '?apikey=' + OMDB_API_KEY
+    for key, value in kwargs.items():
+        if value:  # Don't add empty kwargs
+            request = request + '&' + key + '=' + value
+    request = make_request(request)
+    return request
+
+
 def convert_to_librarytype(dbtype):
     if dbtype in DBTYPE_DICT:
         return DBTYPE_DICT[dbtype][0]
@@ -340,6 +351,30 @@ def concatinate_names(items, key, separator):
             else:
                 concat = i.get(key)
     return concat
+
+
+def get_omdb_item_info(i, iteminfo):
+    if i.get('Rated'):
+        iteminfo['MPAA'] = 'Rated ' + i['Rated']
+    if i.get('Writer'):
+        iteminfo['Writer'] = i['Writer']
+    if i.get('Director'):
+        iteminfo['Director'] = i['Director']
+    return iteminfo
+
+
+def get_omdb_item_props(i, itemprops):
+    if i.get('Ratings'):
+        for rating in i.get('Ratings'):
+            if rating.get('Source') == 'Internet Movie Database':
+                itemprops['Rating.IMDB'] = rating.get('Value', '')[:-3]
+            elif rating.get('Source') == 'Rotten Tomatoes':
+                itemprops['Rating.RottenTomatoes'] = rating.get('Value', '')[:-1]
+            elif rating.get('Source') == 'Metacritic':
+                itemprops['Rating.Metacritic'] = rating.get('Value', '')[:-4]
+    if i.get('Awards'):
+        itemprops['Awards'] = i.get('Awards', '')
+    return itemprops
 
 
 def get_item_info(i, iteminfo):
@@ -423,11 +458,16 @@ def list_create_infoitem(dbtype, tmdb_id, title):
     # ADD INFO
     iteminfo = {'title': title, 'mediatype': mediatype}
     iteminfo = get_item_info(i, iteminfo)
+    if i.get('imdb_id') and OMDB_API_KEY:
+        omdb_info = omdb_api_request(i=i.get('imdb_id', ''))
+        iteminfo = get_omdb_item_info(omdb_info, iteminfo)
     list_item.setInfo(librarytype, iteminfo)
 
     # ADD PROPERTIES
     itemprops = {'tmdb_id': tmdb_id}
     itemprops = get_item_properties(i, itemprops)
+    if i.get('imdb_id') and OMDB_API_KEY:
+        itemprops = get_omdb_item_props(omdb_info, itemprops)
     list_item.setProperties(itemprops)
 
     # ADD ARTWORK
