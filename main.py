@@ -512,7 +512,7 @@ def list_find_by_imdb(params, categories):
         category = categories.get(params.get('info'))
         items = tmdb_api_request('find', imdb_id, external_source='imdb_id')
         items = items.get(category.get('request_key'))
-        tmdb_id = str(items[0]['id'])
+        tmdb_id = str(items[0]['id'])  # TODO: Add error checking that we got something
         title = get_title(items[0])
         include_these = ['_' + category.get('request_dbtype')]
         items = construct_categories(include_these, CATEGORIES, DIR_MAIN)
@@ -532,7 +532,7 @@ def construct_categories(matches, items, exclusions):
     return new_dictionary
 
 
-def list_categories(items, dbtype, tmdb_id, title):
+def list_categories(items, dbtype, tmdb_id, title, **kwargs):
     xbmcplugin.setPluginCategory(_handle, '')  # Set Container.PluginCategory
     container_content = convert_to_containercontent(dbtype)
     librarytype = convert_to_librarytype(dbtype)
@@ -548,7 +548,11 @@ def list_categories(items, dbtype, tmdb_id, title):
         list_item.setInfo(librarytype, iteminfo)
         list_item.setProperties(itemprops)
         list_item.setArt({'thumb': poster, 'icon': poster, 'poster': poster, 'fanart': fanart})
-        url = get_url(info=i, tmdb_id=tmdb_id, title=title)
+        keywords = {}
+        for v in [('tmdb_id', tmdb_id), ('title', title)]:
+            if v[1]:
+                keywords[v[0]] = v[1]
+        url = get_url(info=i, **keywords)
         is_folder = True
         xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)  # Add Item
     if not tmdb_id:
