@@ -19,11 +19,11 @@ _handle = int(sys.argv[1])
 ADDON_PATH = xbmcaddon.Addon().getAddonInfo('path')
 DIALOG = xbmcgui.Dialog()
 API_KEY = xbmcplugin.getSetting(_handle, 'tmdb_apikey')
-HTTPS_API = 'https://api.themoviedb.org/3/'
+HTTPS_API = 'https://api.themoviedb.org/3'
 LANGUAGE = '&language=en-US'
 IMAGEPATH = 'https://image.tmdb.org/t/p/original/'
 EXCLUDE = ['no_exclusions']
-DIR_MAIN = ['search_', 'popular_', 'toprated_', 'upcoming_', 'nowplaying_']
+DIR_MAIN = ['search_', 'popular_', 'toprated_', 'upcoming_', 'nowplaying_', 'find_']
 CATEGORIES = {'search_movie':
               {'title': 'Search Movies',
                'item_dbtype': 'movie',
@@ -41,6 +41,18 @@ CATEGORIES = {'search_movie':
                'item_dbtype': 'person',
                'request_dbtype': 'person',
                'request_key': 'results',
+               },
+              'find_movie':
+              {'title': 'Find by IMDb_ID (Movie)',
+               'item_dbtype': 'movie',
+               'request_dbtype': 'movie',
+               'request_key': 'movie_results',
+               },
+              'find_tv':
+              {'title': 'Find by IMDb_ID (Tv Show)',
+               'item_dbtype': 'tv',
+               'request_dbtype': 'tv',
+               'request_key': 'tv_results',
                },
               'popular_movie':
               {'title': 'Popular Movies',
@@ -147,20 +159,6 @@ CATEGORIES = {'search_movie':
                'request_dbtype': 'tv',
                'request_key': 'results',
                },
-              'keywords_movie':
-              {'title': 'Keywords',
-               'item_dbtype': 'keyword',
-               'request_list': 'keywords',
-               'request_dbtype': 'movie',
-               'request_key': 'keywords',
-               },
-              'keywords_tv':
-              {'title': 'Keywords',
-               'item_dbtype': 'keyword',
-               'request_list': 'keywords',
-               'request_dbtype': 'tv',
-               'request_key': 'results',
-               },
               'cast_movie':
               {'title': 'Cast',
                'item_dbtype': 'person',
@@ -188,6 +186,20 @@ CATEGORIES = {'search_movie':
                'request_list': 'credits',
                'request_dbtype': 'tv',
                'request_key': 'crew',
+               },
+              'keywords_movie':
+              {'title': 'Keywords',
+               'item_dbtype': 'keyword',
+               'request_list': 'keywords',
+               'request_dbtype': 'movie',
+               'request_key': 'keywords',
+               },
+              'keywords_tv':
+              {'title': 'Keywords',
+               'item_dbtype': 'keyword',
+               'request_list': 'keywords',
+               'request_dbtype': 'tv',
+               'request_key': 'results',
                },
               'moviecast_person':
               {'title': 'Movies as Cast',
@@ -254,22 +266,15 @@ def make_request(request):
     return request
 
 
-def tmdb_api_request(tmdb_type, tmdb_list, tmdb_id):
-    if tmdb_id:
-        tmdb_id = '/' + tmdb_id
-    if tmdb_list:
-        tmdb_list = '/' + tmdb_list
-    request = HTTPS_API + tmdb_type + tmdb_id + tmdb_list + '?api_key=' + API_KEY + LANGUAGE
-    request = make_request(request)
-    return request
-
-
-def tmdb_api_search(tmdb_type, query, year):
-    request = HTTPS_API + 'search/' + tmdb_type + '?api_key=' + API_KEY + LANGUAGE
-    if query:
-        request = request + '&query=' + query
-    if year:
-        request = request + '&year=' + year
+def tmdb_api_request(*args, **kwargs):
+    request = HTTPS_API
+    for arg in args:
+        if arg:  # Don't add empty args
+            request = request + '/' + arg
+    request = request + '?api_key=' + API_KEY + LANGUAGE
+    for key, value in kwargs.items():
+        if value:  # Don't add empty kwargs
+            request = request + '&' + key + '=' + value
     request = make_request(request)
     return request
 
@@ -407,7 +412,7 @@ def list_create_infoitem(dbtype, tmdb_id, title):
         return  # Need an ID or search query
     elif not tmdb_id:
         return  # TODO use search function to grab id
-    i = tmdb_api_request(dbtype, '', tmdb_id)
+    i = tmdb_api_request(dbtype, tmdb_id)
     mediatype = convert_to_dbtype(dbtype)
     librarytype = convert_to_librarytype(dbtype)
     title = get_title(i)
@@ -490,9 +495,28 @@ def list_search(params, categories):
     # Check query exists and search type is valid before searching
     if query and params.get('info') in categories:
         item = categories.get(params.get('info'))
-        items = tmdb_api_search(item.get('request_dbtype'), query, year)
+        items = tmdb_api_request('search', item.get('request_dbtype'), query=query, year=year)
         items = items.get('results')
         list_items(items, item.get('item_dbtype'), item.get('request_dbtype'))
+
+
+def list_find_by_imdb(params, categories):
+    # If no imdb_id specified in plugin path then prompt user
+    if params.get('imdb_id'):
+        imdb_id = params['imdb_id']
+    else:
+        imdb_id = DIALOG.input('Enter IMDB ID', type=xbmcgui.INPUT_ALPHANUM)
+
+    # Check query exists and search type is valid before searching
+    if imdb_id and params.get('info') in categories:
+        category = categories.get(params.get('info'))
+        items = tmdb_api_request('find', imdb_id, external_source='imdb_id')
+        items = items.get(category.get('request_key'))
+        tmdb_id = str(items[0]['id'])
+        title = get_title(items[0])
+        include_these = ['_' + category.get('request_dbtype')]
+        items = construct_categories(include_these, CATEGORIES, DIR_MAIN)
+        list_categories(items, category.get('request_dbtype'), tmdb_id, title)
 
 
 def construct_categories(matches, items, exclusions):
@@ -535,8 +559,12 @@ def list_categories(items, dbtype, tmdb_id, title):
 def check_tmdb_id(params, dbtype):
     if params.get('tmdb_id'):
         return params.get('tmdb_id')
+    elif params.get('imdb_id'):
+        items = tmdb_api_request('find', params.get('imdb_id'), external_source='imdb_id')
+        items = items.get('results')
+        return str(items[0]['id'])
     elif params.get('title'):
-        items = tmdb_api_search(dbtype, params.get('title'), params.get('year'))
+        items = tmdb_api_request('search', dbtype, query=params.get('title'), year=params.get('year'))
         items = items.get('results')
         return str(items[0]['id'])
     else:
@@ -559,11 +587,12 @@ def router(paramstring):
             xbmc.executebuiltin('ShowPicture(' + params.get('image') + ')')
         elif 'search_' in params.get('info'):
             list_search(params, CATEGORIES)
+        elif 'find_' in params.get('info'):
+            list_find_by_imdb(params, CATEGORIES)
         elif params.get('info') in CATEGORIES:
             category = CATEGORIES[params.get('info')]
             tmdb_id = check_tmdb_id(params, category.get('request_dbtype'))
-            items = tmdb_api_request(
-                category.get('request_dbtype'), category.get('request_list'), tmdb_id)
+            items = tmdb_api_request(category.get('request_dbtype'), tmdb_id, category.get('request_list'))
             list_items(items.get(category.get('request_key')), category.get('item_dbtype'), category.get('request_dbtype'))
         else:
             raise ValueError('Invalid paramstring: {0}!'.format(paramstring))
