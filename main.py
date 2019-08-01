@@ -347,6 +347,8 @@ def get_item_info(i, iteminfo):
         iteminfo['plot'] = i['overview']
     elif i.get('biography'):
         iteminfo['plot'] = i['biography']
+    elif i.get('content'):
+        iteminfo['plot'] = i['content']
     if i.get('vote_average'):
         iteminfo['rating'] = i['vote_average']
     if i.get('vote_count'):
@@ -419,7 +421,7 @@ def list_create_infoitem(dbtype, tmdb_id, title):
     list_item = xbmcgui.ListItem(label=title)
 
     # ADD INFO
-    iteminfo = {'title': 'title', 'mediatype': mediatype}
+    iteminfo = {'title': title, 'mediatype': mediatype}
     iteminfo = get_item_info(i, iteminfo)
     list_item.setInfo(librarytype, iteminfo)
 
@@ -441,25 +443,27 @@ def list_create_infoitem(dbtype, tmdb_id, title):
     return iteminfo, itemprops, poster, fanart
 
 
-def list_items(items, item_dbtype, request_dbtype):
+def list_items(items, **kwargs):
     xbmcplugin.setPluginCategory(_handle, '')  # Set Container.PluginCategory
-    container_content = convert_to_containercontent(item_dbtype)
-    mediatype = convert_to_dbtype(item_dbtype)
-    librarytype = convert_to_librarytype(item_dbtype)
+    dbtype = kwargs.get('type', '')
+    container_content = convert_to_containercontent(dbtype)
+    mediatype = convert_to_dbtype(dbtype)
+    librarytype = convert_to_librarytype(dbtype)
     xbmcplugin.setContent(_handle, container_content)  # Container.Content
 
     for i in items:
         title = get_title(i)
         list_item = xbmcgui.ListItem(label=title)
-        iteminfo = {'title': title, 'mediatype': mediatype}
 
         # ADD INFO
-        if item_dbtype == 'reviews':
-            if i.get('content'):
-                iteminfo['plot'] = i['content']
-        elif item_dbtype == 'movie' or item_dbtype == 'tvshow':
-            iteminfo = get_item_info(i, iteminfo)
+        iteminfo = {'title': title, 'mediatype': mediatype}
+        iteminfo = get_item_info(i, iteminfo)
         list_item.setInfo(librarytype, iteminfo)
+
+        # ADD PROPERTIES
+        itemprops = {'tmdb_id': i.get('id', '')}
+        itemprops = get_item_properties(i, itemprops)
+        list_item.setProperties(itemprops)
 
         # ADD ARTWORK
         poster = get_artwork_poster(i)
@@ -468,12 +472,12 @@ def list_items(items, item_dbtype, request_dbtype):
 
         # ADD ITEM
         is_folder = True
-        if item_dbtype == 'review':
+        if dbtype == 'review':
             url = get_url(info='textviewer', title=title, text=i.get('content'))
-        elif item_dbtype == 'image':
-                url = get_url(info='imageviewer', title=title, image=poster)
+        elif dbtype == 'image':
+                url = get_url(info='imageviewer', image=poster)
         else:
-            url = get_url(info='item', tmdb_id=i.get('id', ''), type=item_dbtype, title=title)
+            url = get_url(info='item', tmdb_id=i.get('id', ''), **kwargs)
         xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
 
     xbmcplugin.endOfDirectory(_handle)  # End Dir
@@ -487,17 +491,14 @@ def list_search(params, categories):
         query = DIALOG.input('Enter Search Query', type=xbmcgui.INPUT_ALPHANUM)
 
     # If no year specified in plugin path then leave blank
-    if params.get('year'):
-        year = params['year']
-    else:
-        year = ''
+    year = params.get('year', '')
 
     # Check query exists and search type is valid before searching
     if query and params.get('info') in categories:
-        item = categories.get(params.get('info'))
-        items = tmdb_api_request('search', item.get('request_dbtype'), query=query, year=year)
+        category = categories.get(params.get('info'))
+        items = tmdb_api_request('search', category.get('request_dbtype'), query=query, year=year)
         items = items.get('results')
-        list_items(items, item.get('item_dbtype'), item.get('request_dbtype'))
+        list_items(items, type=category.get('item_dbtype'))
 
 
 def list_find_by_imdb(params, categories):
@@ -516,7 +517,7 @@ def list_find_by_imdb(params, categories):
         title = get_title(items[0])
         include_these = ['_' + category.get('request_dbtype')]
         items = construct_categories(include_these, CATEGORIES, DIR_MAIN)
-        list_categories(items, category.get('request_dbtype'), tmdb_id, title)
+        list_categories(items, type=category.get('request_dbtype'), tmdb_id=tmdb_id, title=title)
 
 
 def construct_categories(matches, items, exclusions):
@@ -532,8 +533,11 @@ def construct_categories(matches, items, exclusions):
     return new_dictionary
 
 
-def list_categories(items, dbtype, tmdb_id, title, **kwargs):
+def list_categories(items, **kwargs):
     xbmcplugin.setPluginCategory(_handle, '')  # Set Container.PluginCategory
+    dbtype = kwargs.get('type', '')
+    tmdb_id = kwargs.get('tmdb_id', '')
+    title = kwargs.get('title', '')
     container_content = convert_to_containercontent(dbtype)
     librarytype = convert_to_librarytype(dbtype)
     xbmcplugin.setContent(_handle, container_content)  # Set Container.Content()
@@ -548,16 +552,21 @@ def list_categories(items, dbtype, tmdb_id, title, **kwargs):
         list_item.setInfo(librarytype, iteminfo)
         list_item.setProperties(itemprops)
         list_item.setArt({'thumb': poster, 'icon': poster, 'poster': poster, 'fanart': fanart})
-        keywords = {}
-        for v in [('tmdb_id', tmdb_id), ('title', title)]:
-            if v[1]:
-                keywords[v[0]] = v[1]
+        keywords = get_keywords(kwargs)
         url = get_url(info=i, **keywords)
         is_folder = True
         xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)  # Add Item
     if not tmdb_id:
         xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     xbmcplugin.endOfDirectory(_handle)  # Finish Dir
+
+
+def get_keywords(dictionary):
+    keywords = {}
+    for key, value in dictionary.items():
+        if value:
+            keywords[key] = value
+    return keywords
 
 
 def check_tmdb_id(params, dbtype):
@@ -584,7 +593,7 @@ def router(paramstring):
             include_these = ['_' + params.get('type')]
             items = construct_categories(include_these, CATEGORIES, DIR_MAIN)
             tmdb_id = check_tmdb_id(params, params.get('type'))
-            list_categories(items, params.get('type'), params.get('tmdb_id'), params.get('title'))
+            list_categories(items, type=params.get('type'), tmdb_id=params.get('tmdb_id'), title=params.get('title'))
         elif 'textviewer' in params.get('info'):
             textviewer(params.get('title'), params.get('text'))
         elif 'imageviewer' in params.get('info'):
@@ -597,12 +606,12 @@ def router(paramstring):
             category = CATEGORIES[params.get('info')]
             tmdb_id = check_tmdb_id(params, category.get('request_dbtype'))
             items = tmdb_api_request(category.get('request_dbtype'), tmdb_id, category.get('request_list'))
-            list_items(items.get(category.get('request_key')), category.get('item_dbtype'), category.get('request_dbtype'))
+            list_items(items.get(category.get('request_key')), type=category.get('item_dbtype'))
         else:
             raise ValueError('Invalid paramstring: {0}!'.format(paramstring))
     else:
         items = construct_categories(DIR_MAIN, CATEGORIES, EXCLUDE)
-        list_categories(items, '', '', '')
+        list_categories(items)
 
 
 def invalid_apikey():
