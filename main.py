@@ -283,6 +283,17 @@ class Plugin:
         list_container.create_listitems()
         list_container.finish_container()
 
+    def list_search(self):
+        """
+        plugin://plugin.video.themoviedb.helper/?info=search&query=&year=
+        Requests API search for item
+        """
+        self.params['query'] = self.params.get('query')
+        if not self.params.get('query'):
+            self.params['query'] = xbmcgui.Dialog().input('Enter Search Query', type=xbmcgui.INPUT_ALPHANUM)
+        if self.params.get('query'):
+            self.list_items()
+
     def router(self):
         """
         Router Function
