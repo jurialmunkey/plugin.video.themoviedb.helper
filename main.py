@@ -294,6 +294,23 @@ class Plugin:
         if self.params.get('query'):
             self.list_items()
 
+    def list_find(self):
+        """
+        plugin://plugin.video.themoviedb.helper/?info=find&type=&imdb_id=
+        Find details of item based on imdb_id
+        """
+        self.request_tmdb_type = self.params.get('type')
+        self.imdb_id = self.params.get('imdb_id')
+        if not self.imdb_id:
+            self.imdb_id = xbmcgui.Dialog().input('Enter IMDb ID', type=xbmcgui.INPUT_ALPHANUM)
+        if self.imdb_id:
+            request_key = CATEGORIES['find']['key'].format(self=self)
+            request_path = CATEGORIES['find']['path'].format(self=self)
+            item = lib.apis.tmdb_api_request(request_path, external_source='imdb_id')
+            item = item[request_key][0]
+            self.params['tmdb_id'] = item.get('id')
+            self.list_details()
+
     def router(self):
         """
         Router Function
@@ -304,6 +321,8 @@ class Plugin:
                 raise ValueError('Invalid paramstring - Must specify info and type: {0}!'.format(self.paramstring))
             elif self.params.get('info') == 'search':
                 self.list_search()
+            elif self.params.get('info') == 'find':
+                self.list_find()
             elif self.params.get('info') == 'details':
                 self.list_details()
             elif self.params.get('info') in CATEGORIES:

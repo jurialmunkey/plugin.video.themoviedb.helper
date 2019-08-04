@@ -132,7 +132,6 @@ CATEGORIES = {'cast':
                'name': 'Find IMDb ID ({self.plural_type})',
                'path': 'find/{self.imdb_id}',
                'key': '{self.request_tmdb_type}_results',
-               'reroute': 'details',
                },
               'popular':
               {'types': ['movie', 'tv', 'person'],
