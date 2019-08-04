@@ -206,7 +206,7 @@ class Container:
 
     def start_container(self):
         xbmcplugin.setPluginCategory(_handle, self.name)
-        container_content = self.list_type + 's' if self.list_type else ''
+        container_content = lib.utils.convert_to_kodi_type(self.list_type) + 's' if self.list_type else ''
         xbmcplugin.setContent(_handle, container_content)
 
     def finish_container(self):
@@ -325,7 +325,7 @@ class Plugin:
         list_container.request_tmdb_type = self.params.get('type')
         list_container.request_path = '{self.request_tmdb_type}/{self.request_tmdb_id}'.format(self=list_container)
         list_container.request_kwparams = lib.utils.make_kwparams(self.params)
-        list_container.list_type = lib.utils.convert_to_kodi_type(list_container.request_tmdb_type)
+        list_container.list_type = list_container.request_tmdb_type
         list_container.next_type = list_container.request_tmdb_type
         list_container.next_info = 'details'
         list_container.request_list()
@@ -350,7 +350,6 @@ class Plugin:
         list_container.request_key = list_container.category.get('key').format(self=list_container)
         list_container.request_kwparams = lib.utils.make_kwparams(self.params)
         list_container.list_type = list_container.category.get('list_type').format(self=list_container)
-        list_container.list_type = lib.utils.convert_to_kodi_type(list_container.list_type)
         list_container.next_type = list_container.category.get('next_type').format(self=list_container)
         list_container.next_info = list_container.category.get('next_info').format(self=list_container)
         list_container.request_list()
