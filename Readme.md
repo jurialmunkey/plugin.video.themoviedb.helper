@@ -53,6 +53,20 @@ Types: movie, tv, person
 Accepts: query=, year=
 
 
+## Discover
+Complex searches.  
+See https://developers.themoviedb.org/3/discover/movie-discover  
+**Examples**
+
+Movies From Year:  
+`plugin://plugin.video.themoviedb.helper?info=discover&amp;type=movie&amp;year=$INFO[ListItem.Year]`
+
+Movies From Studio:
+`plugin://plugin.video.themoviedb.helper?info=discover&amp;type=movie&amp;with_companies=$INFO[ListItem.Studio]`
+
+Movies From Genre:
+`plugin://plugin.video.themoviedb.helper?info=discover&amp;type=movie&amp;with_genres=$INFO[ListItem.Genre]`
+
 
 ## Other Possible plugin paths
 Provide the TMDb ID to the plugin for best results  
