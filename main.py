@@ -13,7 +13,7 @@ import lib.apis
 import time
 from urllib import urlencode
 from urlparse import parse_qsl
-from lib.globals import _url, _handle, _addonpath, _addonname, CATEGORIES, MAINFOLDER, IMAGEPATH, _omdb_apikey
+from lib.globals import _url, _handle, _addonpath, _addonname, CATEGORIES, MAINFOLDER, IMAGEPATH, _omdb_apikey, GENRE_IDS
 
 
 def get_url(**kwargs):
@@ -276,6 +276,33 @@ class Plugin:
         self.params = dict(parse_qsl(self.paramstring))
         self.router()
 
+    def translate_genres(self):
+        if self.params.get('with_genres'):
+            if ' / ' in self.params.get('with_genres'):
+                self.params['with_genres'] = self.params.get('with_genres').split(' / ')
+            temp_list = ''
+            for genre in self.params.get('with_genres'):
+                genre = str(GENRE_IDS.get(genre))
+                if genre:
+                    temp_list = temp_list + '%2C' + genre if temp_list else genre
+            if temp_list:
+                self.params['with_genres'] = temp_list
+
+    def translate_studios(self):
+        if self.params.get('with_companies'):
+            if ' / ' in self.params.get('with_companies'):
+                self.params['with_companies'] = self.params.get('with_companies').split(' / ')
+            temp_list = ''
+            for studio in self.params.get('with_companies'):
+                query = lib.apis.tmdb_api_request('search/company', query=studio)
+                if query and query.get('results')[0]:
+                    studio = str(query.get('results')[0].get('id'))
+                    if studio:
+                        temp_list = studio
+                        break  # Stop once we have a studio
+            if temp_list:
+                self.params['with_companies'] = temp_list
+
     def list_categories(self):
         """
         plugin://plugin.video.themoviedb.helper/
@@ -284,7 +311,7 @@ class Plugin:
         """
         list_container = Container()
         list_container.start_container()
-        list_container.create_folders(CATEGORIES, MAINFOLDER, [], '')
+        list_container.create_folders(CATEGORIES, MAINFOLDER, ['discover'], '')
         list_container.finish_container()
 
     def list_details(self):
@@ -394,6 +421,10 @@ class Plugin:
                 xbmcgui.Dialog().textviewer('$INFO[ListItem.Label]', '$INFO[ListItem.Plot]')
             elif self.params.get('info') == 'imageviewer':
                 xbmc.executebuiltin('ShowPicture(' + self.params.get('image') + ')')
+            elif self.params.get('info') == 'discover':
+                self.translate_genres()
+                self.translate_studios()
+                self.list_items()
             elif not self.params.get('info') or not self.params.get('type'):
                 raise ValueError('Invalid paramstring - Must specify info and type: {0}!'.format(self.paramstring))
             elif self.params.get('info') == 'search':
