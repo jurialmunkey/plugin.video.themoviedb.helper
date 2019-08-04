@@ -12,7 +12,49 @@ Make sure to add your TheMovieDb API key to the addon's settings.
 - Complex searches
 
 
-## Possible plugin paths
+## Get Details of an Item
+These provide detailed info about an item. Some of the properties require OMDb apikey
+
+ListItem.Labels:  
+Title, Plot, Genre, Studio, MPAA, Country, Year, Premiered, Rating, Duration
+
+ListItem.Property(property):  
+tmdb_id
+Genre.X.Name, Genre.X.ID, Studio.X.Name, Studio.X.ID, Country.X.Name, Country.X.ID
+birthday, deathday, aliases, role, born
+budget, revenue
+awards
+metacritic_rating, 
+imdb_rating, imdb_votes
+rottentomatoes_rating, rottentomatoes_image, rottentomatoes_consensus
+rottentomatoes_reviewtotal, rottentomatoes_reviewsfresh, rottentomatoes_reviewsrotten
+rottentomatoes_usermeter, rottentomatoes_userreviews
+
+
+
+#### Find details using TMDb ID
+`plugin://plugin.video.themoviedb.helper/?info=details&amp;type=movie&amp;tmdb_id=348`
+
+Types: movie, tv, person  
+Accepts: tmdb_id=
+
+
+#### Find details using IMDb ID
+`plugin://plugin.video.themoviedb.helper/?info=find&amp;type=movie&amp;imdb_id=$INFO[ListItem.IMDBNumber]`
+
+Types: movie, tv  
+Accepts: imdb_id=
+
+
+#### Find details using Title
+`plugin://plugin.video.themoviedb.helper/?info=details&amp;type=movie&amp;query=$INFO[ListItem.Title]`
+
+Types: movie, tv, person  
+Accepts: query=, year=
+
+
+
+## Other Possible plugin paths
 Provide the TMDb ID to the plugin for best results  
 Can search by IMDb ID or Title + Year if you don't have TMDb  
 Most paths require you to specify the type: movie, tv, person
@@ -104,13 +146,6 @@ Accepts: tmdb_id=
 
 Types: movie, tv, person  
 Accepts: query=, year=
-
-
-#### Find details using IMDb ID
-`plugin://plugin.video.themoviedb.helper/?info=find&amp;type=movie`
-
-Types: movie, tv  
-Accepts: imdb_id=
 
 
 #### Popular Movies / TV / People
