@@ -1,15 +1,20 @@
 import requests
 import utils
+import xbmc
 import xml.etree.ElementTree as ET
-from globals import TMDB_API, _tmdb_apikey, _language, OMDB_API, _omdb_apikey, OMDB_ARG
+from globals import TMDB_API, _tmdb_apikey, _language, OMDB_API, _omdb_apikey, OMDB_ARG, _addonname
 
 
 def make_request(request, is_json):
+    xbmc.log(_addonname + 'Requesting... ' + request, level=xbmc.LOGNOTICE)
     request = requests.get(request)  # Request our data
     if not request.status_code == requests.codes.ok:  # Error Checking
         if request.status_code == 401:
+            xbmc.log(_addonname + 'HTTP Error Code: ' + str(request.status_code), level=xbmc.LOGNOTICE)
             utils.invalid_apikey()
-        raise ValueError(request.raise_for_status())
+            exit()
+        else:
+            xbmc.log(_addonname + 'HTTP Error Code: ' + str(request.status_code), level=xbmc.LOGNOTICE)
     if is_json:
         request = request.json()  # Make the request nice
     return request

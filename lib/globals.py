@@ -121,6 +121,15 @@ CATEGORIES = {'cast':
                'next_type': 'image',
                'next_info': 'imageviewer',
                },
+              'reviews':
+              {'types': ['movie', 'tv'],
+               'name': 'Reviews',
+               'path': '{self.request_tmdb_type}/{self.request_tmdb_id}/reviews',
+               'key': 'results',
+               'list_type': '{self.request_tmdb_type}',
+               'next_type': '',
+               'next_info': 'textviewer',
+               },
               'search':
               {'types': ['movie', 'tv', 'person'],
                'name': 'Search {self.plural_type}',

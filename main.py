@@ -10,6 +10,7 @@ import xbmcgui
 import xbmcplugin
 import lib.utils
 import lib.apis
+import time
 from urllib import urlencode
 from urlparse import parse_qsl
 from lib.globals import _url, _handle, _addonpath, _addonname, CATEGORIES, MAINFOLDER, IMAGEPATH, _omdb_apikey
@@ -180,7 +181,12 @@ class ListItem:
         self.listitem.setInfo(self.library, self.infolabels)
         self.listitem.setProperties(self.infoproperties)
         self.listitem.setArt(self.infoart)
-        self.url = get_url(**kwargs)
+        if kwargs.get('info') == 'textviewer':
+            self.url = get_url(info='textviewer')
+        elif kwargs.get('info') == 'imageviewer':
+            self.url = get_url(info='imageviewer', image=self.poster)
+        else:
+            self.url = get_url(**kwargs)
         xbmcplugin.addDirectoryItem(_handle, self.url, self.listitem, self.is_folder)
 
 
@@ -369,13 +375,14 @@ class Plugin:
             request_path = 'search/' + self.params.get('type')
             request_kwparams = lib.utils.make_kwparams(self.params)
             item = lib.apis.tmdb_api_request(request_path, **request_kwparams)
-            if item and item.get('results')[0].get('id'):
+            if item and item.get('results') and isinstance(item.get('results'), list) and item.get('results')[0].get('id'):
                 self.params['tmdb_id'] = item.get('results')[0].get('id')
                 xbmc.log(_addonname + 'Found TMDb ID {0}!\n{1}'.format(self.params.get('tmdb_id'), self.paramstring), level=xbmc.LOGNOTICE)
             else:
                 xbmc.log(_addonname + 'Unable to find TMDb ID!\n{0}'.format(self.paramstring), level=xbmc.LOGNOTICE)
         else:
-            raise ValueError('Must specify either &tmdb_id= &imdb_id= &query=: {0}!'.format(self.paramstring))
+            xbmc.log(_addonname + 'Must specify either &tmdb_id= &imdb_id= &query=: {0}!'.format(self.paramstring), level=xbmc.LOGNOTICE)
+            exit()
 
     def router(self):
         """
@@ -383,7 +390,11 @@ class Plugin:
         Runs different functions depending on ?info= param
         """
         if self.params:
-            if not self.params.get('info') or not self.params.get('type'):
+            if self.params.get('info') == 'textviewer':
+                xbmcgui.Dialog().textviewer('$INFO[ListItem.Label]', '$INFO[ListItem.Plot]')
+            elif self.params.get('info') == 'imageviewer':
+                xbmc.executebuiltin('ShowPicture(' + self.params.get('image') + ')')
+            elif not self.params.get('info') or not self.params.get('type'):
                 raise ValueError('Invalid paramstring - Must specify info and type: {0}!'.format(self.paramstring))
             elif self.params.get('info') == 'search':
                 self.list_search()
@@ -402,4 +413,5 @@ class Plugin:
 
 
 if __name__ == '__main__':
+    time.sleep(.5)  # Very simple rate limiting
     Plugin()
