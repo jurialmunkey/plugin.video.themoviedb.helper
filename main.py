@@ -12,7 +12,7 @@ import lib.utils
 import lib.apis
 from urllib import urlencode
 from urlparse import parse_qsl
-from lib.globals import _url, _handle, _addonpath, _addonname, CATEGORIES, MAINFOLDER, IMAGEPATH
+from lib.globals import _url, _handle, _addonpath, _addonname, CATEGORIES, MAINFOLDER, IMAGEPATH, _omdb_apikey
 
 
 def get_url(**kwargs):
@@ -25,6 +25,7 @@ class ListItem:
         self.dbtype = ''  # ListItem.DBType
         self.library = ''  # <content target= video, music, pictures, none>
         self.tmdb_id = ''  # ListItem.Property(tmdb_id)
+        self.imdb_id = ''  # IMDb ID for item
         self.request_tmdb_type = ''  # The TMDb DBType for the Request
         self.request_tmdb_id = ''  # The TMDb ID for the Request
         self.plural_type = ''  # Plural form of category type
@@ -87,6 +88,7 @@ class ListItem:
             self.infolabels['premiered'] = request_item['release_date']
             self.infolabels['year'] = request_item['release_date'][:4]
         if request_item.get('imdb_id'):
+            self.imdb_id = request_item['imdb_id']
             self.infolabels['imdbnumber'] = request_item['imdb_id']
         if request_item.get('runtime'):
             self.infolabels['duration'] = request_item['runtime'] * 60
@@ -123,6 +125,34 @@ class ListItem:
             self.infoproperties['budget'] = '${:0,.0f}'.format(request_item['budget'])
         if request_item.get('revenue'):
             self.infoproperties['revenue'] = '${:0,.0f}'.format(request_item['revenue'])
+
+    def get_omdb_info(self, request_item):
+        if request_item.get('rated'):
+            self.infolabels['MPAA'] = 'Rated ' + request_item.get('rated')
+        if request_item.get('awards'):
+            self.infoproperties['awards'] = request_item.get('awards')
+        if request_item.get('metascore'):
+            self.infoproperties['metacritic_rating'] = request_item.get('metascore')
+        if request_item.get('imdbRating'):
+            self.infoproperties['imdb_rating'] = request_item.get('imdbRating')
+        if request_item.get('imdbVotes'):
+            self.infoproperties['imdb_votes'] = request_item.get('imdbVotes')
+        if request_item.get('tomatoMeter'):
+            self.infoproperties['rottentomatoes_rating'] = request_item.get('tomatoMeter')
+        if request_item.get('tomatoImage'):
+            self.infoproperties['rottentomatoes_image'] = request_item.get('tomatoImage')
+        if request_item.get('tomatoReviews'):
+            self.infoproperties['rottentomatoes_reviewtotal'] = request_item.get('tomatoReviews')
+        if request_item.get('tomatoFresh'):
+            self.infoproperties['rottentomatoes_reviewsfresh'] = request_item.get('tomatoFresh')
+        if request_item.get('tomatoRotten'):
+            self.infoproperties['rottentomatoes_reviewsrotten'] = request_item.get('tomatoRotten')
+        if request_item.get('tomatoConsensus'):
+            self.infoproperties['rottentomatoes_consensus'] = request_item.get('tomatoConsensus')
+        if request_item.get('tomatoUserMeter'):
+            self.infoproperties['rottentomatoes_usermeter'] = request_item.get('tomatoUserMeter')
+        if request_item.get('tomatoUserReviews'):
+            self.infoproperties['rottentomatoes_userreviews'] = request_item.get('tomatoUserReviews')
 
     def get_autofilled_info(self, item):
         self.get_poster(item)
@@ -163,6 +193,7 @@ class Container:
         self.request_path = ''  # TMDb path to request
         self.request_key = ''  # The JSON key containing our request
         self.request_kwparams = {}  # Additional kwparams to pass to request
+        self.omdb_info = {}  # OMDb info dict
         self.next_type = ''  # &type= for next action in ListItem.FolderPath
         self.next_info = ''  # ?info= for next action in ListItem.FolderPath
         self.listitems = []  # The list of items to add
@@ -195,6 +226,8 @@ class Container:
                             if self.listitems:
                                 listitem.get_autofilled_info(self.listitems[0])
                                 listitem.get_dbtypes(self.list_type)
+                            if self.omdb_info:
+                                listitem.get_omdb_info(self.omdb_info)
                             listitem.create_listitem(info=key, type=category_type, **kwargs)
 
     def create_listitems(self):
@@ -203,8 +236,16 @@ class Container:
             listitem.get_title(item)
             listitem.get_autofilled_info(item)
             listitem.get_dbtypes(self.list_type)
+            if self.omdb_info:
+                listitem.get_omdb_info(self.omdb_info)
             listitem.create_kwparams(self.next_type, self.next_info)
             listitem.create_listitem(**listitem.kwparams)
+
+    def request_omdb_info(self):
+        if _omdb_apikey and self.listitems:
+            if self.listitems[0].get('imdb_id'):
+                self.imdb_id = self.listitems[0].get('imdb_id')
+                self.omdb_info = lib.apis.omdb_api_request(i=self.imdb_id)
 
     def request_list(self):
         """
@@ -255,6 +296,7 @@ class Plugin:
         list_container.next_type = list_container.request_tmdb_type
         list_container.next_info = 'details'
         list_container.request_list()
+        list_container.request_omdb_info()
         list_container.start_container()
         list_container.create_listitems()
         list_container.create_folders(CATEGORIES, [], MAINFOLDER,

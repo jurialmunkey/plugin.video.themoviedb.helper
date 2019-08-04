@@ -9,147 +9,143 @@ Make sure to add your TheMovieDb API key to the addon's settings.
 
 ## TODO:
 - Currently in Alpha. Many things to add.
-- Person infomation
-- Better management of navigation to allow for extendedinfo window replacement
+- Complex searches
 
 
 ## Possible plugin paths
-It is preferable to pass the tmdb_id of the item to the plugin path with `&amp;tmdb_id=`.  
-If you don't have tmdb_id, you can instead use `&amp;title=$INFO[ListItem.Title]`  
-For better matching when using title, add  `&amp;year=$INFO[ListItem.Year]`
+Provide the TMDb ID to the plugin for best results  
+Can search by IMDb ID or Title + Year if you don't have TMDb  
+Most paths require you to specify the type: movie, tv, person
+Type: `&amp;type=movie`  
+TMDb ID: `&amp;tmdb_id=348`  
+IMDb ID: `&amp;imdb_id=$INFO[ListItem.IMDBNumber]`  
+Search: `&amp;query=$INFO[ListItem.Title]&amp;year=$INFO[ListItem.Year]`  
 
 
-#### Recommended Movie/TV
-```
-plugin://plugin.video.themoviedb.helper/?info=recommended_movie&amp;tmdb_id=8392
-```
+#### Cast
+`plugin://plugin.video.themoviedb.helper/?info=cast&amp;type=movie`
 
-```
-plugin://plugin.video.themoviedb.helper/?info=recommended_tv&amp;tmdb_id=8392
-```
+Types: movie, tv  
+Accepts: tmdb_id=, imdb_id=, query=, year=
 
 
-#### Similar Movie/TV
-```
-plugin://plugin.video.themoviedb.helper/?info=similar_movie&amp;tmdb_id=8392
-```
+#### Crew
+`plugin://plugin.video.themoviedb.helper/?info=crew&amp;type=movie`
 
-```
-plugin://plugin.video.themoviedb.helper/?info=similar_tv&amp;tmdb_id=8392
-```
-
-#### Cast for Movie/TV
-```
-plugin://plugin.video.themoviedb.helper/?info=cast_movie&amp;tmdb_id=8392
-```
-
-```
-plugin://plugin.video.themoviedb.helper/?info=cast_tv&amp;tmdb_id=8392
-```
-
-#### Crew for Movie/TV
-```
-plugin://plugin.video.themoviedb.helper/?info=crew_movie&amp;tmdb_id=8392
-```
-
-```
-plugin://plugin.video.themoviedb.helper/?info=crew_tv&amp;tmdb_id=8392
-```
-
-#### Reviews Movie/TV
-```
-plugin://plugin.video.themoviedb.helper/?info=review_movie&amp;tmdb_id=8392
-```
-
-```
-plugin://plugin.video.themoviedb.helper/?info=review_tv&amp;tmdb_id=8392
-```
+Types: movie, tv  
+Accepts: tmdb_id=, imdb_id=, query=, year=
 
 
-#### Keywords Movie/TV
-```
-plugin://plugin.video.themoviedb.helper/?info=keywords_movie&amp;tmdb_id=8392
-```
+#### Recommendations
+`plugin://plugin.video.themoviedb.helper/?info=recommendations&amp;type=movie`
 
-```
-plugin://plugin.video.themoviedb.helper/?info=keywords_tv&amp;tmdb_id=8392
-```
+Types: movie, tv  
+Accepts: tmdb_id=, imdb_id=, query=, year=
 
-## Plugin Paths for People
-These plugin paths search for info related to a specific person. For instance, you can find all movies starring a particular actor. The tmdb_id is the ID for the person being searched.
 
-#### Movies/TV Starring Cast Member
-```
-plugin://plugin.video.themoviedb.helper/?info=moviecast_person&amp;tmdb_id=8392
-```
+#### Similar
+`plugin://plugin.video.themoviedb.helper/?info=similar&amp;type=movie`
 
-```
-plugin://plugin.video.themoviedb.helper/?info=tvcast_person&amp;tmdb_id=8392
-```
+Types: movie, tv  
+Accepts: tmdb_id=, imdb_id=, query=, year=
 
-#### Movies/TV With Person as Crew Member
-```
-plugin://plugin.video.themoviedb.helper/?info=moviecrew_person&amp;tmdb_id=8392
-```
 
-```
-plugin://plugin.video.themoviedb.helper/?info=tvcrew_person&amp;tmdb_id=8392
-```
+#### Keywords for Movie
+`plugin://plugin.video.themoviedb.helper/?info=movie_keywords&amp;type=movie`
 
-#### Images of Person
-```
-plugin://plugin.video.themoviedb.helper/?info=images_person&amp;tmdb_id=8392
-```
+Types: movie  
+Accepts: tmdb_id=, imdb_id=, query=, year=
 
-## Standard Lists (no tmdb_id/title necessary)
 
-#### Popular Movies / TvShows / People
-```
-plugin://plugin.video.themoviedb.helper/?info=popular_movie
-```
-```
-plugin://plugin.video.themoviedb.helper/?info=popular_tv
-```
-```
-plugin://plugin.video.themoviedb.helper/?info=popular_person
-```
+#### Movies with Keyword
+`plugin://plugin.video.themoviedb.helper/?info=keyword_movies&amp;type=movie`
 
-#### Top Rated Movies / TvShows
-```
-plugin://plugin.video.themoviedb.helper/?info=toprated_movie
-```
-```
-plugin://plugin.video.themoviedb.helper/?info=toprated_tv
-```
+Types: movie  
+Accepts: tmdb_id=
+
+
+#### Movies the Cast Member Stars In
+`plugin://plugin.video.themoviedb.helper/?info=stars_in_movies&amp;type=movie`
+
+Types: movie  
+Accepts: tmdb_id=
+
+
+#### Tv Shows the Cast Member Stars In
+`plugin://plugin.video.themoviedb.helper/?info=stars_in_tvshows&amp;type=tv`
+
+Types: tv  
+Accepts: tmdb_id=
+
+
+#### Movies the Person was Crew Member on
+`plugin://plugin.video.themoviedb.helper/?info=crew_in_movies&amp;type=movie`
+
+Types: movie  
+Accepts: tmdb_id=
+
+
+#### Tv Shows the Person was Crew Member on
+`plugin://plugin.video.themoviedb.helper/?info=crew_in_tvshows&amp;type=tv`
+
+Types: tv  
+Accepts: tmdb_id=
+
+
+#### Images of the Person
+`plugin://plugin.video.themoviedb.helper/?info=images&amp;type=image`
+
+Types: image  
+Accepts: tmdb_id=
+
+
+#### Search for Items Matching Query
+`plugin://plugin.video.themoviedb.helper/?info=search&amp;type=movie`
+
+Types: movie, tv, person  
+Accepts: query=, year=
+
+
+#### Find details using IMDb ID
+`plugin://plugin.video.themoviedb.helper/?info=find&amp;type=movie`
+
+Types: movie, tv  
+Accepts: imdb_id=
+
+
+#### Popular Movies / TV / People
+`plugin://plugin.video.themoviedb.helper/?info=popular&amp;type=movie`
+
+Types: movie, tv, person  
+
+
+#### Top Rated Movies / TV
+`plugin://plugin.video.themoviedb.helper/?info=top_rated&amp;type=movie`
+
+Types: movie, tv  
+
 
 #### Upcoming Movies
-```
-plugin://plugin.video.themoviedb.helper/?info=upcoming_movie
-```
+`plugin://plugin.video.themoviedb.helper/?info=upcoming&amp;type=movie`
 
-#### TvShows Airing Today
-```
-plugin://plugin.video.themoviedb.helper/?info=upcoming_tv
-```
-
-#### In-Theatres Movies
-```
-plugin://plugin.video.themoviedb.helper/?info=nowplaying_movie
-```
+Types: movie  
 
 
-#### TvShows Airing This Week
-```
-plugin://plugin.video.themoviedb.helper/?info=nowplaying_tv
-```
+#### Airing Today TV
+`plugin://plugin.video.themoviedb.helper/?info=airing_today&amp;type=tv`
 
-## Search for Movies / TvShows / People
-```
-plugin://plugin.video.themoviedb.helper/?info=search_movie&amp;query=$INFO[ListItem.Title]&amp;year=$INFO[ListItem.Year]
-```
-```
-plugin://plugin.video.themoviedb.helper/?info=search_tv&amp;query=$INFO[ListItem.TvShowTitle]
-```
-```
-plugin://plugin.video.themoviedb.helper/?info=search_people&amp;query=$INFO[ListItem.Label]
-```
+Types: tv  
+
+
+#### In Theatres Movies
+`plugin://plugin.video.themoviedb.helper/?info=now_playing&amp;type=movie`
+
+Types: movie  
+
+
+#### Currently Airing Tv Shows
+`plugin://plugin.video.themoviedb.helper/?info=on_the_air&amp;type=tv`
+
+Types: tv  
+
+
