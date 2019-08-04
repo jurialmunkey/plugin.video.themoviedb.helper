@@ -5,13 +5,14 @@
 # With thanks to Roman V. M. for original simple plugin code
 
 import sys
+import xbmc
 import xbmcgui
 import xbmcplugin
 import lib.utils
 import lib.apis
 from urllib import urlencode
 from urlparse import parse_qsl
-from lib.globals import _url, _handle, _addonpath, CATEGORIES, MAINFOLDER, IMAGEPATH
+from lib.globals import _url, _handle, _addonpath, _addonname, CATEGORIES, MAINFOLDER, IMAGEPATH
 
 
 def get_url(**kwargs):
@@ -71,7 +72,6 @@ class ListItem:
         self.infoart['icon'] = self.poster
 
     def get_info(self, request_item):
-        self.infolabels['label'] = self.name
         self.infolabels['title'] = self.name
         if request_item.get('overview'):
             self.infolabels['plot'] = request_item['overview']
@@ -301,15 +301,39 @@ class Plugin:
         """
         self.request_tmdb_type = self.params.get('type')
         self.imdb_id = self.params.get('imdb_id')
-        if not self.imdb_id:
+        if not self.imdb_id and self.params.get('info') == 'find':
             self.imdb_id = xbmcgui.Dialog().input('Enter IMDb ID', type=xbmcgui.INPUT_ALPHANUM)
         if self.imdb_id:
             request_key = CATEGORIES['find']['key'].format(self=self)
             request_path = CATEGORIES['find']['path'].format(self=self)
             item = lib.apis.tmdb_api_request(request_path, external_source='imdb_id')
-            item = item[request_key][0]
-            self.params['tmdb_id'] = item.get('id')
-            self.list_details()
+            if item and item.get(request_key):
+                item = item.get(request_key)[0]
+                self.params['tmdb_id'] = item.get('id')
+                self.params['type'] = 'movie'
+                xbmc.log(_addonname + 'Found TMDb ID {0}!\n{1}'.format(self.params.get('tmdb_id'), self.paramstring), level=xbmc.LOGNOTICE)
+                if self.params.get('info') == 'find':
+                    self.list_details()
+
+    def check_tmdb_id(self):
+        if self.params.get('info') in MAINFOLDER:
+            return
+        elif self.params.get('tmdb_id'):
+            return
+        elif self.params.get('imdb_id'):
+            self.list_find()
+        elif self.params.get('query'):
+            xbmc.log(_addonname + 'Searching... [No TMDb ID specified]', level=xbmc.LOGNOTICE)
+            request_path = 'search/' + self.params.get('type')
+            request_kwparams = lib.utils.make_kwparams(self.params)
+            item = lib.apis.tmdb_api_request(request_path, **request_kwparams)
+            if item and item.get('results')[0].get('id'):
+                self.params['tmdb_id'] = item.get('results')[0].get('id')
+                xbmc.log(_addonname + 'Found TMDb ID {0}!\n{1}'.format(self.params.get('tmdb_id'), self.paramstring), level=xbmc.LOGNOTICE)
+            else:
+                xbmc.log(_addonname + 'Unable to find TMDb ID!\n{0}'.format(self.paramstring), level=xbmc.LOGNOTICE)
+        else:
+            raise ValueError('Must specify either &tmdb_id= &imdb_id= &query=: {0}!'.format(self.paramstring))
 
     def router(self):
         """
@@ -324,9 +348,13 @@ class Plugin:
             elif self.params.get('info') == 'find':
                 self.list_find()
             elif self.params.get('info') == 'details':
+                self.check_tmdb_id()
                 self.list_details()
             elif self.params.get('info') in CATEGORIES:
+                self.check_tmdb_id()
                 self.list_items()
+            else:
+                raise ValueError('Invalid ?info= param: {0}!'.format(self.paramstring))
         else:
             self.list_categories()
 

@@ -70,4 +70,5 @@ def merge_two_dicts(x, y):
 
 
 def make_kwparams(params):
-    return del_dict_keys(params, ['info', 'type', 'tmdb_id'])
+    tempparams = params.copy()
+    return del_dict_keys(tempparams, ['info', 'type', 'tmdb_id'])
