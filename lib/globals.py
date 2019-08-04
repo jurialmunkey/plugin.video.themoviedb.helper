@@ -24,14 +24,18 @@ CATEGORIES = {'cast':
                'name': 'Cast',
                'path': '{self.request_tmdb_type}/{self.request_tmdb_id}/credits',
                'key': 'cast',
-               'list_type': 'person',
+               'list_type': '{self.request_tmdb_type}',
+               'next_type': 'person',
+               'next_info': 'details',
                },
               'crew':
               {'types': ['movie', 'tv'],
                'name': 'Crew',
                'path': '{self.request_tmdb_type}/{self.request_tmdb_id}/credits',
                'key': 'crew',
-               'list_type': 'person',
+               'list_type': '{self.request_tmdb_type}',
+               'next_type': 'person',
+               'next_info': 'details',
                },
               'recommendations':
               {'types': ['movie', 'tv'],
@@ -39,6 +43,8 @@ CATEGORIES = {'cast':
                'path': '{self.request_tmdb_type}/{self.request_tmdb_id}/recommendations',
                'key': 'results',
                'list_type': '{self.request_tmdb_type}',
+               'next_type': '{self.request_tmdb_type}',
+               'next_info': 'details',
                },
               'similar':
               {'types': ['movie', 'tv'],
@@ -46,6 +52,8 @@ CATEGORIES = {'cast':
                'path': '{self.request_tmdb_type}/{self.request_tmdb_id}/similar',
                'key': 'results',
                'list_type': '{self.request_tmdb_type}',
+               'next_type': '{self.request_tmdb_type}',
+               'next_info': 'details',
                },
               'keywords_movie':
               {'types': ['movie'],
@@ -53,6 +61,8 @@ CATEGORIES = {'cast':
                'path': '{self.request_tmdb_type}/{self.request_tmdb_id}/keywords',
                'key': 'keywords',
                'list_type': 'keyword',
+               'next_type': '',
+               'next_info': '',
                },
               'keywords_tv':
               {'types': ['tv'],
@@ -60,6 +70,8 @@ CATEGORIES = {'cast':
                'path': '{self.request_tmdb_type}/{self.request_tmdb_id}/keywords',
                'key': 'results',
                'list_type': 'keyword',
+               'next_type': '',
+               'next_info': '',
                },
               'search':
               {'types': ['movie', 'tv', 'person'],

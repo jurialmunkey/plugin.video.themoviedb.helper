@@ -1,4 +1,3 @@
-from globals import IMAGEPATH, _addonpath
 import xbmc
 import xbmcgui
 

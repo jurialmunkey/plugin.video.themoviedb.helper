@@ -17,6 +17,7 @@ from lib.globals import _url, _handle, _addonpath, CATEGORIES, MAINFOLDER, IMAGE
 def get_url(**kwargs):
     return '{0}?{1}'.format(_url, urlencode(kwargs))
 
+
 class ListItem:
     def __init__(self):
         self.name = ''  # ListItem.Label,Title
@@ -94,11 +95,11 @@ class ListItem:
         if request_item.get('status'):
             self.infolabels['status'] = request_item['status']
         if request_item.get('genres'):
-            self.infolabels['genre'] = concatinate_names(request_item.get('genres'), 'name', '/')
+            self.infolabels['genre'] = lib.utils.concatinate_names(request_item.get('genres'), 'name', '/')
         if request_item.get('production_companies'):
-            self.infolabels['studio'] = concatinate_names(request_item.get('production_companies'), 'name', '/')
+            self.infolabels['studio'] = lib.utils.concatinate_names(request_item.get('production_companies'), 'name', '/')
         if request_item.get('production_countries'):
-            self.infolabels['country'] = concatinate_names(request_item.get('production_countries'), 'name', '/')
+            self.infolabels['country'] = lib.utils.concatinate_names(request_item.get('production_countries'), 'name', '/')
 
     def get_properties(self, request_item):
         self.infoproperties['tmdb_id'] = self.tmdb_id
@@ -122,6 +123,13 @@ class ListItem:
             self.infoproperties['budget'] = '${:0,.0f}'.format(request_item['budget'])
         if request_item.get('revenue'):
             self.infoproperties['revenue'] = '${:0,.0f}'.format(request_item['revenue'])
+
+    def get_autofilled_info(self, item):
+        self.get_poster(item)
+        self.get_fanart(item)
+        self.get_tmdb_id(item)
+        self.get_info(item)
+        self.get_properties(item)
 
     def get_dbtypes(self, tmdb_type):
         self.plural_type = lib.utils.convert_to_plural_type(tmdb_type)
@@ -157,6 +165,7 @@ class Container:
         self.request_kwparams = {}  # Additional kwparams to pass to request
         self.next_type = ''  # &type= for next action in ListItem.FolderPath
         self.next_info = ''  # ?info= for next action in ListItem.FolderPath
+        self.listitems = []  # The list of items to add
 
     def start_container(self):
         xbmcplugin.setPluginCategory(_handle, self.name)
@@ -166,27 +175,33 @@ class Container:
     def finish_container(self):
         xbmcplugin.endOfDirectory(_handle)
 
-    def create_folders(self, categories, inclusions, exclusions):
+    def create_folders(self, categories, inclusions, exclusions, dbtype, **kwargs):
         """
-        Creates the folders for the plugin base folder
+        Creates the folders for plugin base and ?info=details
+        Includes keys matching inclusions and excludes key matching exclusions
+        Constructs a folder for each type (or the specified dbtype) per each permitted key
         """
         for key, category in categories.items():
-            if key in inclusions and key not in exclusions:
-                for category_type in category.get('types'):
-                    listitem = ListItem()
-                    listitem.plural_type = lib.utils.convert_to_plural_type(category_type)
-                    listitem.name = category.get('name').format(self=listitem)
-                    listitem.create_listitem(info=key, type=category_type)
+            if not inclusions or key in inclusions:
+                if not exclusions or key not in exclusions:
+                    for category_type in category.get('types'):
+                        if not dbtype or category_type == dbtype:
+                            listitem = ListItem()
+                            listitem.request_tmdb_type = category_type
+                            listitem.plural_type = lib.utils.convert_to_plural_type(category_type)
+                            listitem.name = category.get('name').format(self=listitem)
+                            if category.get('list_type'):
+                                category_type = category.get('list_type').format(self=listitem)
+                            if self.listitems:
+                                listitem.get_autofilled_info(self.listitems[0])
+                                listitem.get_dbtypes(self.list_type)
+                            listitem.create_listitem(info=key, type=category_type, **kwargs)
 
     def create_listitems(self):
         for item in self.listitems:
             listitem = ListItem()
             listitem.get_title(item)
-            listitem.get_poster(item)
-            listitem.get_fanart(item)
-            listitem.get_tmdb_id(item)
-            listitem.get_info(item)
-            listitem.get_properties(item)
+            listitem.get_autofilled_info(item)
             listitem.get_dbtypes(self.list_type)
             listitem.create_kwparams(self.next_type, self.next_info)
             listitem.create_listitem(**listitem.kwparams)
@@ -195,11 +210,15 @@ class Container:
         """
         Makes the request to TMDb API
         Can pass kwargs as additional params
+        Checks if a certain request_key is needed and provides that key
+        Converts a single item dict to a list containing the dict for iteration purposes
         """
         if self.request_path:
             self.listitems = lib.apis.tmdb_api_request(self.request_path, **self.request_kwparams)
             if self.request_key:
                 self.listitems = self.listitems[self.request_key]
+            if self.listitems and not isinstance(self.listitems, list):
+                self.listitems = [self.listitems]
         else:
             raise ValueError('No API request path specified')
 
@@ -218,7 +237,29 @@ class Plugin:
         """
         list_container = Container()
         list_container.start_container()
-        list_container.create_folders(CATEGORIES, MAINFOLDER, [])
+        list_container.create_folders(CATEGORIES, MAINFOLDER, [], '')
+        list_container.finish_container()
+
+    def list_details(self):
+        """
+        plugin://plugin.video.themoviedb.helper/?info=details&type=&tmdb_id=
+        Makes a request from API to get details about an item
+        Lists all request lists that are compatible with item dbtype
+        """
+        list_container = Container()
+        list_container.request_tmdb_id = self.params.get('tmdb_id')
+        list_container.request_tmdb_type = self.params.get('type')
+        list_container.request_path = '{self.request_tmdb_type}/{self.request_tmdb_id}'.format(self=list_container)
+        list_container.request_kwparams = lib.utils.make_kwparams(self.params)
+        list_container.list_type = lib.utils.convert_to_kodi_type(list_container.request_tmdb_type)
+        list_container.next_type = list_container.request_tmdb_type
+        list_container.next_info = 'details'
+        list_container.request_list()
+        list_container.start_container()
+        list_container.create_listitems()
+        list_container.create_folders(CATEGORIES, [], MAINFOLDER,
+                                      list_container.request_tmdb_type,
+                                      tmdb_id=list_container.request_tmdb_id)
         list_container.finish_container()
 
     def list_items(self):
@@ -241,7 +282,6 @@ class Plugin:
         list_container.start_container()
         list_container.create_listitems()
         list_container.finish_container()
-
 
     def router(self):
         """
