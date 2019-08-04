@@ -8,9 +8,7 @@ def make_request(request):
     if not request.status_code == requests.codes.ok:  # Error Checking
         if request.status_code == 401:
             utils.invalid_apikey()
-            exit()
-        else:
-            raise ValueError(request.raise_for_status())
+        raise ValueError(request.raise_for_status())
     request = request.json()  # Make the request nice
     return request
 
