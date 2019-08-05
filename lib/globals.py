@@ -8,8 +8,10 @@ _url = sys.argv[0]
 _handle = int(sys.argv[1])
 # Get the add-on path
 _addonpath = xbmcaddon.Addon().getAddonInfo('path')
+# Addon name
+_addonname = 'plugin.video.themoviedb.helper'
 # Addon name for logging
-_addonname = '[plugin.video.themoviedb.helper]\n'
+_addonlogname = '[plugin.video.themoviedb.helper]\n'
 # Get the api keys
 _omdb_apikey = '?apikey=' + xbmcplugin.getSetting(_handle, 'omdb_apikey')
 _tmdb_apikey = '?api_key=' + xbmcplugin.getSetting(_handle, 'tmdb_apikey')

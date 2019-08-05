@@ -13,7 +13,7 @@ import lib.apis
 import time
 from urllib import urlencode
 from urlparse import parse_qsl
-from lib.globals import _url, _handle, _addonpath, _addonname, CATEGORIES, MAINFOLDER, IMAGEPATH, _omdb_apikey, GENRE_IDS
+from lib.globals import _url, _handle, _addonpath, _addonlogname, CATEGORIES, MAINFOLDER, IMAGEPATH, _omdb_apikey, GENRE_IDS
 
 
 def get_url(**kwargs):
@@ -248,10 +248,11 @@ class Container:
             listitem.create_listitem(**listitem.kwparams)
 
     def request_omdb_info(self):
-        if _omdb_apikey and self.listitems:
-            if self.listitems[0].get('imdb_id'):
-                self.imdb_id = self.listitems[0].get('imdb_id')
-                self.omdb_info = lib.apis.omdb_api_request(i=self.imdb_id)
+        if self.request_tmdb_type in ['movie', 'tv']:
+            if _omdb_apikey and self.listitems:
+                if self.listitems[0].get('imdb_id'):
+                    self.imdb_id = self.listitems[0].get('imdb_id')
+                    self.omdb_info = lib.apis.omdb_api_request(i=self.imdb_id)
 
     def request_list(self):
         """
@@ -294,7 +295,7 @@ class Plugin:
                 self.params['with_companies'] = self.params.get('with_companies').split(' / ')
             temp_list = ''
             for studio in self.params.get('with_companies'):
-                query = lib.apis.tmdb_api_request('search/company', query=studio)
+                query = lib.apis.tmdb_api_request_longcache('search/company', query=studio)
                 if query and query.get('results')[0]:
                     studio = str(query.get('results')[0].get('id'))
                     if studio:
@@ -380,12 +381,12 @@ class Plugin:
         if self.imdb_id:
             request_key = CATEGORIES['find']['key'].format(self=self)
             request_path = CATEGORIES['find']['path'].format(self=self)
-            item = lib.apis.tmdb_api_request(request_path, external_source='imdb_id')
+            item = lib.apis.tmdb_api_request_longcache(request_path, external_source='imdb_id')
             if item and item.get(request_key):
                 item = item.get(request_key)[0]
                 self.params['tmdb_id'] = item.get('id')
                 self.params['type'] = 'movie'
-                xbmc.log(_addonname + 'Found TMDb ID {0}!\n{1}'.format(self.params.get('tmdb_id'), self.paramstring), level=xbmc.LOGNOTICE)
+                xbmc.log(_addonlogname + 'Found TMDb ID {0}!\n{1}'.format(self.params.get('tmdb_id'), self.paramstring), level=xbmc.LOGNOTICE)
                 if self.params.get('info') == 'find':
                     self.list_details()
 
@@ -397,17 +398,17 @@ class Plugin:
         elif self.params.get('imdb_id'):
             self.list_find()
         elif self.params.get('query'):
-            xbmc.log(_addonname + 'Searching... [No TMDb ID specified]', level=xbmc.LOGNOTICE)
+            xbmc.log(_addonlogname + 'Searching... [No TMDb ID specified]', level=xbmc.LOGNOTICE)
             request_path = 'search/' + self.params.get('type')
             request_kwparams = lib.utils.make_kwparams(self.params)
-            item = lib.apis.tmdb_api_request(request_path, **request_kwparams)
+            item = lib.apis.tmdb_api_request_longcache(request_path, **request_kwparams)
             if item and item.get('results') and isinstance(item.get('results'), list) and item.get('results')[0].get('id'):
                 self.params['tmdb_id'] = item.get('results')[0].get('id')
-                xbmc.log(_addonname + 'Found TMDb ID {0}!\n{1}'.format(self.params.get('tmdb_id'), self.paramstring), level=xbmc.LOGNOTICE)
+                xbmc.log(_addonlogname + 'Found TMDb ID {0}!\n{1}'.format(self.params.get('tmdb_id'), self.paramstring), level=xbmc.LOGNOTICE)
             else:
-                xbmc.log(_addonname + 'Unable to find TMDb ID!\n{0}'.format(self.paramstring), level=xbmc.LOGNOTICE)
+                xbmc.log(_addonlogname + 'Unable to find TMDb ID!\n{0}'.format(self.paramstring), level=xbmc.LOGNOTICE)
         else:
-            xbmc.log(_addonname + 'Must specify either &tmdb_id= &imdb_id= &query=: {0}!'.format(self.paramstring), level=xbmc.LOGNOTICE)
+            xbmc.log(_addonlogname + 'Must specify either &tmdb_id= &imdb_id= &query=: {0}!'.format(self.paramstring), level=xbmc.LOGNOTICE)
             exit()
 
     def router(self):
@@ -443,5 +444,4 @@ class Plugin:
 
 
 if __name__ == '__main__':
-    time.sleep(.5)  # Very simple rate limiting
     Plugin()
