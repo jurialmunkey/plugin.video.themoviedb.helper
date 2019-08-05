@@ -17,15 +17,14 @@ def cache_last_used_time(func):
     def decorated(*args, **kwargs):
         cache_name = _addonname + '.last_used_time'
         cached_time = _cache.get(cache_name)
-        current_time = time.time()
-        time_diff = cached_time - current_time if cached_time else -1
+        time_diff = cached_time - time.time() if cached_time else -1
         if time_diff < 0:
-            cached_time = current_time + _waittime
-            _cache.set(cache_name, cached_time, expiration=datetime.timedelta(days=14))
+            _cache.set(cache_name, time.time() + _waittime, expiration=datetime.timedelta(days=14))
             return func(*args, **kwargs)
         else:
-            xbmc.log(_addonlogname + 'Rate Limiter Waiting ' + str(time_diff) + ' Seconds...', level=xbmc.LOGDEBUG)
+            xbmc.log(_addonlogname + 'Rate Limiter Waiting ' + str(time_diff) + ' Seconds...', level=xbmc.LOGNOTICE)
             time.sleep(time_diff)
+            _cache.set(cache_name, time.time() + _waittime, expiration=datetime.timedelta(days=14))
             return func(*args, **kwargs)
     return decorated
 
