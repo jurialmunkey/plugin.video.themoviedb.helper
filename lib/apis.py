@@ -5,8 +5,6 @@ import datetime
 import simplecache
 import xml.etree.ElementTree as ET
 from globals import TMDB_API, _tmdb_apikey, _language, OMDB_API, _omdb_apikey, OMDB_ARG, _addonlogname, _addonname
-
-
 _cache = simplecache.SimpleCache()
 
 

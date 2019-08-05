@@ -10,7 +10,6 @@ import xbmcgui
 import xbmcplugin
 import lib.utils
 import lib.apis
-import time
 from urllib import urlencode
 from urlparse import parse_qsl
 from lib.globals import _url, _handle, _addonpath, _addonlogname, CATEGORIES, MAINFOLDER, IMAGEPATH, _omdb_apikey, GENRE_IDS
