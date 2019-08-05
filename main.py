@@ -10,6 +10,7 @@ import xbmcgui
 import xbmcplugin
 import lib.utils
 import lib.apis
+from lib.apis import cache_last_used_time
 from urllib import urlencode
 from urlparse import parse_qsl
 from lib.globals import _url, _handle, _addonpath, _addonlogname, CATEGORIES, MAINFOLDER, IMAGEPATH, _omdb_apikey, GENRE_IDS
@@ -442,5 +443,10 @@ class Plugin:
             self.list_categories()
 
 
-if __name__ == '__main__':
+@cache_last_used_time
+def run_plugin():
     Plugin()
+
+
+if __name__ == '__main__':
+    run_plugin()

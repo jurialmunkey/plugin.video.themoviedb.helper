@@ -3,9 +3,31 @@ import utils
 import xbmc
 import datetime
 import simplecache
+import time
 import xml.etree.ElementTree as ET
 from globals import TMDB_API, _tmdb_apikey, _language, OMDB_API, _omdb_apikey, OMDB_ARG, _addonlogname, _addonname
 _cache = simplecache.SimpleCache()
+_waittime = 1
+
+
+def cache_last_used_time(func):
+    """
+    Simple rate limiter
+    """
+    def decorated(*args, **kwargs):
+        cache_name = _addonname + '.last_used_time'
+        cached_time = _cache.get(cache_name)
+        current_time = time.time()
+        time_diff = cached_time - current_time
+        if time_diff < 0:
+            cached_time = current_time + _waittime
+            _cache.set(cache_name, cached_time, expiration=datetime.timedelta(days=14))
+            return func(*args, **kwargs)
+        else:
+            xbmc.log(_addonlogname + 'Run after ' + str(cached_time - current_time) + ' secs', level=xbmc.LOGNOTICE)
+            time.sleep(time_diff)
+            return func(*args, **kwargs)
+    return decorated
 
 
 def use_mycache(cache_days=14, suffix=''):
