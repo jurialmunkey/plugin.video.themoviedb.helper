@@ -24,7 +24,7 @@ def cache_last_used_time(func):
             _cache.set(cache_name, cached_time, expiration=datetime.timedelta(days=14))
             return func(*args, **kwargs)
         else:
-            xbmc.log(_addonlogname + 'Rate Limiter Waiting ' + str(time_diff) + ' Seconds...', level=xbmc.LOGNOTICE)
+            xbmc.log(_addonlogname + 'Rate Limiter Waiting ' + str(time_diff) + ' Seconds...', level=xbmc.LOGDEBUG)
             time.sleep(time_diff)
             return func(*args, **kwargs)
     return decorated

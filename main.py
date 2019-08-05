@@ -398,13 +398,13 @@ class Plugin:
         elif self.params.get('imdb_id'):
             self.list_find()
         elif self.params.get('query'):
-            xbmc.log(_addonlogname + 'Searching... [No TMDb ID specified]', level=xbmc.LOGNOTICE)
+            xbmc.log(_addonlogname + 'Searching... [No TMDb ID specified]', level=xbmc.LOGDEBUG)
             request_path = 'search/' + self.params.get('type')
             request_kwparams = lib.utils.make_kwparams(self.params)
             item = lib.apis.tmdb_api_request_longcache(request_path, **request_kwparams)
             if item and item.get('results') and isinstance(item.get('results'), list) and item.get('results')[0].get('id'):
                 self.params['tmdb_id'] = item.get('results')[0].get('id')
-                xbmc.log(_addonlogname + 'Found TMDb ID {0}!\n{1}'.format(self.params.get('tmdb_id'), self.paramstring), level=xbmc.LOGNOTICE)
+                xbmc.log(_addonlogname + 'Found TMDb ID {0}!\n{1}'.format(self.params.get('tmdb_id'), self.paramstring), level=xbmc.LOGDEBUG)
             else:
                 xbmc.log(_addonlogname + 'Unable to find TMDb ID!\n{0}'.format(self.paramstring), level=xbmc.LOGNOTICE)
         else:
