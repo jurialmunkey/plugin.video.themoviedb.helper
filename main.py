@@ -112,6 +112,8 @@ class ListItem:
             self.infoproperties = lib.utils.iter_props(request_item.get('production_companies'), 'Studio', self.infoproperties)
         if request_item.get('production_countries'):
             self.infoproperties = lib.utils.iter_props(request_item.get('production_countries'), 'Country', self.infoproperties)
+        if request_item.get('biography'):
+            self.infoproperties['biography'] = request_item['biography']
         if request_item.get('birthday'):
             self.infoproperties['birthday'] = request_item['birthday']
         if request_item.get('deathday'):
