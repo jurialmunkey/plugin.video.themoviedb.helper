@@ -169,6 +169,7 @@ class ListItem:
         self.library = lib.utils.convert_to_library_type(tmdb_type)
         self.dbtype = lib.utils.convert_to_kodi_type(tmdb_type)
         self.infolabels['mediatype'] = self.dbtype
+        self.infoproperties['tmdb_type'] = tmdb_type
 
     def create_kwparams(self, next_type, next_info, **kwargs):
         self.kwparams['type'] = next_type
