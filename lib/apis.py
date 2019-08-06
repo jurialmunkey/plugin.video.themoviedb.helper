@@ -79,12 +79,13 @@ def use_mycache(cache_days=14, suffix=''):
 
 @my_rate_limiter
 def make_request(request, is_json):
+    request_type = 'OMDb' if OMDB_API in request else 'TMDb'
     kodi_log('Requesting... ' + request, 1)
     request = requests.get(request)  # Request our data
     if not request.status_code == requests.codes.ok:  # Error Checking
         if request.status_code == 401:
             kodi_log('HTTP Error Code: ' + str(request.status_code), 1)
-            utils.invalid_apikey()
+            utils.invalid_apikey(request_type)
             exit()
         else:
             kodi_log('HTTP Error Code: ' + str(request.status_code), 1)

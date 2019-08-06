@@ -52,9 +52,9 @@ def iter_props(items, name, itemprops):
     return itemprops
 
 
-def invalid_apikey():
-    xbmcgui.Dialog().ok('Missing/Invalid TheMovieDb API Key',
-                        'You must enter a valid TheMovieDb API key to use this add-on')
+def invalid_apikey(api_name='TMDb'):
+    xbmcgui.Dialog().ok('Missing/Invalid ' + api_name + ' API Key',
+                        'You must enter a valid ' + api_name + ' API key to use this add-on')
     xbmc.executebuiltin('Addon.OpenSettings(plugin.video.themoviedb.helper)')
 
 
