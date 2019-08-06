@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
     <category label="128">
-        <setting label="TheMovieDb API Key" type="text" id="tmdb_apikey" />
+        <setting label="TMDb API Key" type="text" id="tmdb_apikey" />
         <setting label="OMDb API Key" type="text" id="omdb_apikey" />
     </category>
 </settings>
