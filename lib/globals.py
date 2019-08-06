@@ -38,15 +38,7 @@ CATEGORIES = {'cast':
                'list_type': '{self.request_tmdb_type}',
                'next_type': 'person',
                'next_info': 'details',
-               },
-              'crew':
-              {'types': ['movie', 'tv'],
-               'name': 'Crew',
-               'path': '{self.request_tmdb_type}/{self.request_tmdb_id}/credits',
-               'key': 'crew',
-               'list_type': '{self.request_tmdb_type}',
-               'next_type': 'person',
-               'next_info': 'details',
+               'index': 1
                },
               'recommendations':
               {'types': ['movie', 'tv'],
@@ -56,6 +48,7 @@ CATEGORIES = {'cast':
                'list_type': '{self.request_tmdb_type}',
                'next_type': '{self.request_tmdb_type}',
                'next_info': 'details',
+               'index': 2
                },
               'similar':
               {'types': ['movie', 'tv'],
@@ -65,6 +58,17 @@ CATEGORIES = {'cast':
                'list_type': '{self.request_tmdb_type}',
                'next_type': '{self.request_tmdb_type}',
                'next_info': 'details',
+               'index': 3
+               },
+              'crew':
+              {'types': ['movie', 'tv'],
+               'name': 'Crew',
+               'path': '{self.request_tmdb_type}/{self.request_tmdb_id}/credits',
+               'key': 'crew',
+               'list_type': '{self.request_tmdb_type}',
+               'next_type': 'person',
+               'next_info': 'details',
+               'index': 4
                },
               'movie_keywords':
               {'types': ['movie'],
@@ -74,60 +78,7 @@ CATEGORIES = {'cast':
                'list_type': '{self.request_tmdb_type}',
                'next_type': 'keyword',
                'next_info': 'keyword_movies',
-               },
-              'keyword_movies':
-              {'types': ['keyword'],
-               'name': 'Keywords',
-               'path': 'keyword/{self.request_tmdb_id}/movies',
-               'key': 'results',
-               'list_type': 'movie',
-               'next_type': 'movie',
-               'next_info': 'details',
-               },
-              'stars_in_movies':
-              {'types': ['person'],
-               'name': 'Cast in Movies',
-               'path': 'person/{self.request_tmdb_id}/movie_credits',
-               'key': 'cast',
-               'list_type': 'movie',
-               'next_type': 'movie',
-               'next_info': 'details',
-               },
-              'stars_in_tvshows':
-              {'types': ['person'],
-               'name': 'Cast in Tv Shows',
-               'path': 'person/{self.request_tmdb_id}/tv_credits',
-               'key': 'cast',
-               'list_type': 'tv',
-               'next_type': 'tv',
-               'next_info': 'details',
-               },
-              'crew_in_movies':
-              {'types': ['person'],
-               'name': 'Crew in Movies',
-               'path': 'person/{self.request_tmdb_id}/movie_credits',
-               'key': 'crew',
-               'list_type': 'movie',
-               'next_type': 'movie',
-               'next_info': 'details',
-               },
-              'crew_in_tvshows':
-              {'types': ['person'],
-               'name': 'Crew in Tv Shows',
-               'path': 'person/{self.request_tmdb_id}/tv_credits',
-               'key': 'crew',
-               'list_type': 'tv',
-               'next_type': 'tv',
-               'next_info': 'details',
-               },
-              'images':
-              {'types': ['person'],
-               'name': 'Images',
-               'path': 'person/{self.request_tmdb_id}/images',
-               'key': 'profiles',
-               'list_type': 'image',
-               'next_type': 'image',
-               'next_info': 'imageviewer',
+               'index': 5
                },
               'reviews':
               {'types': ['movie', 'tv'],
@@ -137,6 +88,57 @@ CATEGORIES = {'cast':
                'list_type': '{self.request_tmdb_type}',
                'next_type': '',
                'next_info': 'textviewer',
+               'index': 6
+               },
+              'stars_in_movies':
+              {'types': ['person'],
+               'name': 'Cast in Movies',
+               'path': 'person/{self.request_tmdb_id}/movie_credits',
+               'key': 'cast',
+               'list_type': 'movie',
+               'next_type': 'movie',
+               'next_info': 'details',
+               'index': 1,
+               },
+              'stars_in_tvshows':
+              {'types': ['person'],
+               'name': 'Cast in Tv Shows',
+               'path': 'person/{self.request_tmdb_id}/tv_credits',
+               'key': 'cast',
+               'list_type': 'tv',
+               'next_type': 'tv',
+               'next_info': 'details',
+               'index': 2,
+               },
+              'crew_in_movies':
+              {'types': ['person'],
+               'name': 'Crew in Movies',
+               'path': 'person/{self.request_tmdb_id}/movie_credits',
+               'key': 'crew',
+               'list_type': 'movie',
+               'next_type': 'movie',
+               'next_info': 'details',
+               'index': 3,
+               },
+              'crew_in_tvshows':
+              {'types': ['person'],
+               'name': 'Crew in Tv Shows',
+               'path': 'person/{self.request_tmdb_id}/tv_credits',
+               'key': 'crew',
+               'list_type': 'tv',
+               'next_type': 'tv',
+               'next_info': 'details',
+               'index': 4,
+               },
+              'images':
+              {'types': ['person'],
+               'name': 'Images',
+               'path': 'person/{self.request_tmdb_id}/images',
+               'key': 'profiles',
+               'list_type': 'image',
+               'next_type': 'image',
+               'next_info': 'imageviewer',
+               'index': 5,
                },
               'search':
               {'types': ['movie', 'tv', 'person'],
@@ -146,12 +148,14 @@ CATEGORIES = {'cast':
                'list_type': '{self.request_tmdb_type}',
                'next_type': '{self.request_tmdb_type}',
                'next_info': 'details',
+               'index': 1,
                },
               'find':
               {'types': ['movie', 'tv'],
                'name': 'Find IMDb ID ({self.plural_type})',
                'path': 'find/{self.imdb_id}',
                'key': '{self.request_tmdb_type}_results',
+               'index': 2,
                },
               'popular':
               {'types': ['movie', 'tv', 'person'],
@@ -161,6 +165,7 @@ CATEGORIES = {'cast':
                'list_type': '{self.request_tmdb_type}',
                'next_type': '{self.request_tmdb_type}',
                'next_info': 'details',
+               'index': 3,
                },
               'top_rated':
               {'types': ['movie', 'tv'],
@@ -170,6 +175,7 @@ CATEGORIES = {'cast':
                'list_type': '{self.request_tmdb_type}',
                'next_type': '{self.request_tmdb_type}',
                'next_info': 'details',
+               'index': 4,
                },
               'upcoming':
               {'types': ['movie'],
@@ -179,6 +185,7 @@ CATEGORIES = {'cast':
                'list_type': '{self.request_tmdb_type}',
                'next_type': '{self.request_tmdb_type}',
                'next_info': 'details',
+               'index': 5,
                },
               'airing_today':
               {'types': ['tv'],
@@ -188,6 +195,7 @@ CATEGORIES = {'cast':
                'list_type': '{self.request_tmdb_type}',
                'next_type': '{self.request_tmdb_type}',
                'next_info': 'details',
+               'index': 6,
                },
               'now_playing':
               {'types': ['movie'],
@@ -197,6 +205,7 @@ CATEGORIES = {'cast':
                'list_type': '{self.request_tmdb_type}',
                'next_type': '{self.request_tmdb_type}',
                'next_info': 'details',
+               'index': 7,
                },
               'on_the_air':
               {'types': ['tv'],
@@ -206,6 +215,7 @@ CATEGORIES = {'cast':
                'list_type': '{self.request_tmdb_type}',
                'next_type': '{self.request_tmdb_type}',
                'next_info': 'details',
+               'index': 8,
                },
               'discover':
               {'types': ['movie', 'tv'],
@@ -215,6 +225,17 @@ CATEGORIES = {'cast':
                'list_type': '{self.request_tmdb_type}',
                'next_type': '{self.request_tmdb_type}',
                'next_info': 'details',
+               'index': 99,
+               },
+              'keyword_movies':
+              {'types': ['keyword'],
+               'name': 'Keywords',
+               'path': 'keyword/{self.request_tmdb_id}/movies',
+               'key': 'results',
+               'list_type': 'movie',
+               'next_type': 'movie',
+               'next_info': 'details',
+               'index': 99,
                },
               }
 

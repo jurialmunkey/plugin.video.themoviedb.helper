@@ -218,7 +218,7 @@ class Container:
         Includes keys matching inclusions and excludes key matching exclusions
         Constructs a folder for each type (or the specified dbtype) per each permitted key
         """
-        for key, category in categories.items():
+        for key, category in sorted(categories.items(), key=lambda keycat: keycat[1].get('index')):
             if not inclusions or key in inclusions:
                 if not exclusions or key not in exclusions:
                     for category_type in category.get('types'):
@@ -443,9 +443,5 @@ class Plugin:
             self.list_categories()
 
 
-def run_plugin():
-    Plugin()
-
-
 if __name__ == '__main__':
-    run_plugin()
+    Plugin()
