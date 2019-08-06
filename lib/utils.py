@@ -1,6 +1,14 @@
 import xbmc
 import xbmcgui
 from copy import copy
+from globals import _addonlogname
+
+
+def kodi_log(value, level=0):
+    if level == 1:
+        xbmc.log(_addonlogname + str(value), level=xbmc.LOGNOTICE)
+    else:
+        xbmc.log(_addonlogname + str(value), level=xbmc.LOGDEBUG)
 
 
 def dictify(r, root=True):

@@ -14,7 +14,13 @@ _addonname = 'plugin.video.themoviedb.helper'
 _addonlogname = '[plugin.video.themoviedb.helper]\n'
 # Get the api keys
 _omdb_apikey = '?apikey=' + xbmcplugin.getSetting(_handle, 'omdb_apikey')
-_tmdb_apikey = '?api_key=' + xbmcplugin.getSetting(_handle, 'tmdb_apikey')
+_tmdb_apikey = xbmcplugin.getSetting(_handle, 'tmdb_apikey')
+if _tmdb_apikey:
+    _waittime = 2
+    _tmdb_apikey = '?api_key=' + _tmdb_apikey
+else:
+    _waittime = 4
+    _tmdb_apikey = '?api_key=a07324c669cac4d96789197134ce272b'
 # Get the language TODO: make user setting, not hardcoded
 _language = '&language=en-US'
 # Set http paths

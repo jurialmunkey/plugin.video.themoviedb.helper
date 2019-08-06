@@ -9,11 +9,11 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 import lib.utils
+from lib.utils import kodi_log
 import lib.apis
-from lib.apis import cache_last_used_time
 from urllib import urlencode
 from urlparse import parse_qsl
-from lib.globals import _url, _handle, _addonpath, _addonlogname, CATEGORIES, MAINFOLDER, IMAGEPATH, _omdb_apikey, GENRE_IDS
+from lib.globals import _url, _handle, _addonpath, CATEGORIES, MAINFOLDER, IMAGEPATH, _omdb_apikey, GENRE_IDS
 
 
 def get_url(**kwargs):
@@ -386,7 +386,7 @@ class Plugin:
                 item = item.get(request_key)[0]
                 self.params['tmdb_id'] = item.get('id')
                 self.params['type'] = 'movie'
-                xbmc.log(_addonlogname + 'Found TMDb ID {0}!\n{1}'.format(self.params.get('tmdb_id'), self.paramstring), level=xbmc.LOGNOTICE)
+                kodi_log('Found TMDb ID {0}!\n{1}'.format(self.params.get('tmdb_id'), self.paramstring), 1)
                 if self.params.get('info') == 'find':
                     self.list_details()
 
@@ -398,17 +398,17 @@ class Plugin:
         elif self.params.get('imdb_id'):
             self.list_find()
         elif self.params.get('query'):
-            xbmc.log(_addonlogname + 'Searching... [No TMDb ID specified]', level=xbmc.LOGDEBUG)
+            kodi_log('Searching... [No TMDb ID specified]', 0)
             request_path = 'search/' + self.params.get('type')
             request_kwparams = lib.utils.make_kwparams(self.params)
             item = lib.apis.tmdb_api_request_longcache(request_path, **request_kwparams)
             if item and item.get('results') and isinstance(item.get('results'), list) and item.get('results')[0].get('id'):
                 self.params['tmdb_id'] = item.get('results')[0].get('id')
-                xbmc.log(_addonlogname + 'Found TMDb ID {0}!\n{1}'.format(self.params.get('tmdb_id'), self.paramstring), level=xbmc.LOGDEBUG)
+                kodi_log('Found TMDb ID {0}!\n{1}'.format(self.params.get('tmdb_id'), self.paramstring), 0)
             else:
-                xbmc.log(_addonlogname + 'Unable to find TMDb ID!\n{0}'.format(self.paramstring), level=xbmc.LOGNOTICE)
+                kodi_log('Unable to find TMDb ID!\n{0}'.format(self.paramstring), 1)
         else:
-            xbmc.log(_addonlogname + 'Must specify either &tmdb_id= &imdb_id= &query=: {0}!'.format(self.paramstring), level=xbmc.LOGNOTICE)
+            kodi_log('Must specify either &tmdb_id= &imdb_id= &query=: {0}!'.format(self.paramstring), 1)
             exit()
 
     def router(self):
@@ -443,7 +443,6 @@ class Plugin:
             self.list_categories()
 
 
-@cache_last_used_time
 def run_plugin():
     Plugin()
 

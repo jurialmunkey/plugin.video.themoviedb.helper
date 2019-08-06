@@ -1,31 +1,54 @@
 import requests
 import utils
-import xbmc
+from utils import kodi_log
+import xbmcgui
 import datetime
 import simplecache
 import time
 import xml.etree.ElementTree as ET
-from globals import TMDB_API, _tmdb_apikey, _language, OMDB_API, _omdb_apikey, OMDB_ARG, _addonlogname, _addonname
+from globals import TMDB_API, _tmdb_apikey, _language, OMDB_API, _omdb_apikey, OMDB_ARG, _addonname, _waittime
 _cache = simplecache.SimpleCache()
-_waittime = 1
 
 
-def cache_last_used_time(func):
+def my_rate_limiter(func):
     """
     Simple rate limiter
     """
     def decorated(*args, **kwargs):
-        cache_name = _addonname + '.last_used_time'
-        cached_time = _cache.get(cache_name)
-        time_diff = cached_time - time.time() if cached_time else -1
-        if time_diff < 0:
-            _cache.set(cache_name, time.time() + _waittime, expiration=datetime.timedelta(days=14))
-            return func(*args, **kwargs)
-        else:
-            xbmc.log(_addonlogname + 'Rate Limiter Waiting ' + str(time_diff) + ' Seconds...', level=xbmc.LOGNOTICE)
-            time.sleep(time_diff)
-            _cache.set(cache_name, time.time() + _waittime, expiration=datetime.timedelta(days=14))
-            return func(*args, **kwargs)
+        nart_time_id = _addonname + 'nart_time_id'
+        nart_lock_id = _addonname + 'nart_lock_id'
+        # Get our saved time value
+        nart_time = xbmcgui.Window(10000).getProperty(nart_time_id)
+        # If no value set to -1 to skip rate limiter
+        nart_time = float(nart_time) if nart_time else -1
+        nart_time = nart_time - time.time()
+        # Apply rate limiting if next allowed request time is still in the furture
+        if nart_time > 0:
+            nart_lock = xbmcgui.Window(10000).getProperty(nart_lock_id)
+            # If another instance is applying rate limiting then wait till it finishes
+            while nart_lock == 'True':
+                time.sleep(1)
+                nart_lock = xbmcgui.Window(10000).getProperty(nart_lock_id)
+            # Get the nart again because it might have elapsed
+            nart_time = xbmcgui.Window(10000).getProperty(nart_time_id)
+            nart_time = float(nart_time) if nart_time else -1
+            nart_time = nart_time - time.time()
+            # If nart still in the future then apply rate limiting
+            if nart_time > 0:
+                # Set the lock so another rate limiter cant run at same time
+                xbmcgui.Window(10000).setProperty(nart_lock_id, 'True')
+                while nart_time > 0:
+                    time.sleep(1)
+                    nart_time = nart_time - 1
+        # Set nart into future for next request
+        nart_time = time.time() + _waittime
+        nart_time = str(nart_time)
+        # Set the nart value
+        xbmcgui.Window(10000).setProperty(nart_time_id, nart_time)
+        # Unlock rate limiter so next instance can run
+        xbmcgui.Window(10000).setProperty(nart_lock_id, 'False')
+        # Run our function
+        return func(*args, **kwargs)
     return decorated
 
 
@@ -43,10 +66,10 @@ def use_mycache(cache_days=14, suffix=''):
                     cache_name = cache_name + '&' + key + '=' + value
             my_cache = _cache.get(cache_name)
             if my_cache:
-                xbmc.log(_addonlogname + 'CACHE REQUEST:\n' + cache_name, level=xbmc.LOGNOTICE)
+                kodi_log('CACHE REQUEST:\n' + cache_name)
                 return my_cache
             else:
-                xbmc.log(_addonlogname + 'API REQUEST:\n' + cache_name, level=xbmc.LOGNOTICE)
+                kodi_log('API REQUEST:\n' + cache_name)
                 my_objects = func(*args, **kwargs)
                 _cache.set(cache_name, my_objects, expiration=datetime.timedelta(days=cache_days))
                 return my_objects
@@ -54,16 +77,17 @@ def use_mycache(cache_days=14, suffix=''):
     return decorator
 
 
+@my_rate_limiter
 def make_request(request, is_json):
-    xbmc.log(_addonlogname + 'Requesting... ' + request, level=xbmc.LOGNOTICE)
+    kodi_log('Requesting... ' + request, 1)
     request = requests.get(request)  # Request our data
     if not request.status_code == requests.codes.ok:  # Error Checking
         if request.status_code == 401:
-            xbmc.log(_addonlogname + 'HTTP Error Code: ' + str(request.status_code), level=xbmc.LOGNOTICE)
+            kodi_log('HTTP Error Code: ' + str(request.status_code), 1)
             utils.invalid_apikey()
             exit()
         else:
-            xbmc.log(_addonlogname + 'HTTP Error Code: ' + str(request.status_code), level=xbmc.LOGNOTICE)
+            kodi_log('HTTP Error Code: ' + str(request.status_code), 1)
     if is_json:
         request = request.json()  # Make the request nice
     return request
