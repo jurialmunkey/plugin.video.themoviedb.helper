@@ -42,13 +42,13 @@ def concatinate_names(items, key, separator):
     return concat
 
 
-def iter_props(items, name, itemprops):
+def iter_props(items, property, itemprops, **kwargs):
     x = 0
     for i in items:
         x = x + 1
-        itemprops[name + '.' + str(x) + '.Name'] = i.get('name', '')
-        if i.get('id'):
-            itemprops[name + '.' + str(x) + '.ID'] = i.get('id', '')
+        for key, value in kwargs.items():
+            if i.get(value):
+                itemprops[property + '.' + str(x) + '.' + key] = i.get(value)
     return itemprops
 
 

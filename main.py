@@ -107,11 +107,11 @@ class ListItem:
     def get_properties(self, request_item):
         self.infoproperties['tmdb_id'] = self.tmdb_id
         if request_item.get('genres'):
-            self.infoproperties = lib.utils.iter_props(request_item.get('genres'), 'Genre', self.infoproperties)
+            self.infoproperties = lib.utils.iter_props(request_item.get('genres'), 'Genre', self.infoproperties, name='name', id='id')
         if request_item.get('production_companies'):
-            self.infoproperties = lib.utils.iter_props(request_item.get('production_companies'), 'Studio', self.infoproperties)
+            self.infoproperties = lib.utils.iter_props(request_item.get('production_companies'), 'Studio', self.infoproperties, name='name', id='id')
         if request_item.get('production_countries'):
-            self.infoproperties = lib.utils.iter_props(request_item.get('production_countries'), 'Country', self.infoproperties)
+            self.infoproperties = lib.utils.iter_props(request_item.get('production_countries'), 'Country', self.infoproperties, name='name', id='id')
         if request_item.get('biography'):
             self.infoproperties['biography'] = request_item['biography']
         if request_item.get('birthday'):
@@ -124,6 +124,9 @@ class ListItem:
             self.infoproperties['role'] = request_item['known_for_department']
         if request_item.get('place_of_birth'):
             self.infoproperties['born'] = request_item['place_of_birth']
+        if request_item.get('known_for'):
+            self.infoproperties['known_for'] = lib.utils.concatinate_names(request_item.get('known_for'), 'title', '/')
+            self.infoproperties = lib.utils.iter_props(request_item.get('known_for'), 'known_for', self.infoproperties, title='title', id='id', rating='vote_average', tmdb_type='media_type')
         if request_item.get('budget'):
             self.infoproperties['budget'] = '${:0,.0f}'.format(request_item['budget'])
         if request_item.get('revenue'):
