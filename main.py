@@ -126,6 +126,10 @@ class ListItem:
             self.infoproperties['role'] = request_item['known_for_department']
         if request_item.get('place_of_birth'):
             self.infoproperties['born'] = request_item['place_of_birth']
+        if request_item.get('character'):
+            self.infoproperties['character'] = request_item.get('character')
+        if request_item.get('department'):
+            self.infoproperties['department'] = request_item.get('department')
         if request_item.get('known_for'):
             self.infoproperties['known_for'] = lib.utils.concatinate_names(request_item.get('known_for'), 'title', '/')
             self.infoproperties = lib.utils.iter_props(request_item.get('known_for'), 'known_for', self.infoproperties, title='title', tmdb_id='id', rating='vote_average', tmdb_type='media_type')
@@ -167,12 +171,12 @@ class ListItem:
             if request_item.get('credits').get('cast'):
                 for item in request_item.get('credits').get('cast'):
                     if item.get('name'):
-                        my_cast_member = {}
-                        my_cast_member['name'] = item.get('name')
-                        my_cast_member['role'] = item.get('character')
-                        my_cast_member['order'] = item.get('order')
-                        my_cast_member['thumbnail'] = IMAGEPATH + item.get('profile_path') if item.get('profile_path') else ''
-                        self.cast.append(my_cast_member)
+                        cast_member = {}
+                        cast_member['name'] = item.get('name')
+                        cast_member['role'] = item.get('character')
+                        cast_member['order'] = item.get('order')
+                        cast_member['thumbnail'] = IMAGEPATH + item.get('profile_path') if item.get('profile_path') else ''
+                        self.cast.append(cast_member)
 
     def get_autofilled_info(self, item):
         self.get_poster(item)
@@ -253,7 +257,7 @@ class Container:
                                 category_type = category.get('list_type').format(self=listitem)
                             if self.listitems:
                                 listitem.get_autofilled_info(self.listitems[0])
-                                listitem.get_dbtypes(self.list_type)
+                                listitem.get_dbtypes(category_type)
                             if self.omdb_info:
                                 listitem.get_omdb_info(self.omdb_info)
                             listitem.create_listitem(info=key, type=category_type, **kwargs)

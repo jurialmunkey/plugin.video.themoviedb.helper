@@ -130,8 +130,9 @@ def omdb_api_request(*args, **kwargs):
         if value:  # Don't add empty kwargs
             request = request + '&' + key + '=' + value
     request = make_request(request, False)
-    request = ET.fromstring(request.content)
-    request = utils.dictify(request)
+    if request:
+        request = ET.fromstring(request.content)
+        request = utils.dictify(request)
     if request and request.get('root') and not request.get('root').get('response') == 'False':
         request = request.get('root').get('movie')[0]
     else:
