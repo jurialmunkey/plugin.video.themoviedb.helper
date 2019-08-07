@@ -33,6 +33,7 @@ class ListItem:
         self.kwparams = {}  # kwparams to contruct ListItem.FolderPath (plugin path call)
         self.poster = _addonpath + '/icon.png'  # Icon, Thumb, Poster
         self.fanart = _addonpath + '/fanart.jpg'  # Fanart
+        self.cast = []  # Cast list
         self.is_folder = True
         self.infolabels = {}  # The item info
         self.infoproperties = {}  # The item properties
@@ -98,11 +99,11 @@ class ListItem:
         if request_item.get('status'):
             self.infolabels['status'] = request_item['status']
         if request_item.get('genres'):
-            self.infolabels['genre'] = lib.utils.concatinate_names(request_item.get('genres'), 'name', '/')
+            self.infolabels['genre'] = lib.utils.dict_to_list(request_item.get('genres'), 'name')
         if request_item.get('production_companies'):
-            self.infolabels['studio'] = lib.utils.concatinate_names(request_item.get('production_companies'), 'name', '/')
+            self.infolabels['studio'] = lib.utils.dict_to_list(request_item.get('production_companies'), 'name')
         if request_item.get('production_countries'):
-            self.infolabels['country'] = lib.utils.concatinate_names(request_item.get('production_countries'), 'name', '/')
+            self.infolabels['country'] = lib.utils.dict_to_list(request_item.get('production_countries'), 'name')
 
     def get_properties(self, request_item):
         self.infoproperties['tmdb_id'] = self.tmdb_id
@@ -161,12 +162,25 @@ class ListItem:
         if request_item.get('tomatoUserReviews'):
             self.infoproperties['rottentomatoes_userreviews'] = request_item.get('tomatoUserReviews')
 
+    def get_cast(self, request_item):
+        if request_item.get('credits'):
+            if request_item.get('credits').get('cast'):
+                for item in request_item.get('credits').get('cast'):
+                    if item.get('name'):
+                        my_cast_member = {}
+                        my_cast_member['name'] = item.get('name')
+                        my_cast_member['role'] = item.get('character')
+                        my_cast_member['order'] = item.get('order')
+                        my_cast_member['thumbnail'] = IMAGEPATH + item.get('profile_path') if item.get('profile_path') else ''
+                        self.cast.append(my_cast_member)
+
     def get_autofilled_info(self, item):
         self.get_poster(item)
         self.get_fanart(item)
         self.get_tmdb_id(item)
         self.get_info(item)
         self.get_properties(item)
+        self.get_cast(item)
 
     def get_dbtypes(self, tmdb_type):
         self.plural_type = lib.utils.convert_to_plural_type(tmdb_type)
@@ -188,6 +202,7 @@ class ListItem:
         self.listitem.setInfo(self.library, self.infolabels)
         self.listitem.setProperties(self.infoproperties)
         self.listitem.setArt(self.infoart)
+        self.listitem.setCast(self.cast)
         if kwargs.get('info') == 'textviewer':
             self.url = get_url(info='textviewer')
         elif kwargs.get('info') == 'imageviewer':
@@ -331,6 +346,8 @@ class Plugin:
         list_container = Container()
         list_container.request_tmdb_id = self.params.get('tmdb_id')
         list_container.request_tmdb_type = self.params.get('type')
+        if self.params.get('type') in ['movie', 'tv']:
+            self.params['append_to_response'] = 'credits'
         list_container.request_path = '{self.request_tmdb_type}/{self.request_tmdb_id}'.format(self=list_container)
         list_container.request_kwparams = lib.utils.make_kwparams(self.params)
         list_container.list_type = list_container.request_tmdb_type

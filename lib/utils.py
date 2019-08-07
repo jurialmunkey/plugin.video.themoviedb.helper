@@ -52,6 +52,14 @@ def concatinate_names(items, key, separator):
     return concat
 
 
+def dict_to_list(items, key):
+    mylist = []
+    for i in items:
+        if i.get(key):
+            mylist.append(i.get(key))
+    return mylist
+
+
 def iter_props(items, property, itemprops, **kwargs):
     x = 0
     for i in items:
