@@ -1,7 +1,17 @@
 import xbmc
 import xbmcgui
+from datetime import datetime
 from copy import copy
 from globals import _addonlogname
+
+
+def age_difference(birthday, deathday=''):
+    deathday = datetime.strptime(deathday, '%Y-%m-%d') if deathday else datetime.now()
+    birthday = datetime.strptime(birthday, '%Y-%m-%d')
+    age = deathday.year - birthday.year
+    if birthday.month * 100 + birthday.day > deathday.month * 100 + deathday.day:
+        age = age - 1
+    return age
 
 
 def kodi_log(value, level=0):

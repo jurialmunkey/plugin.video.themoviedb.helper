@@ -116,6 +116,7 @@ class ListItem:
             self.infoproperties['biography'] = request_item['biography']
         if request_item.get('birthday'):
             self.infoproperties['birthday'] = request_item['birthday']
+            self.infoproperties['age'] = lib.utils.age_difference(request_item.get('birthday'), request_item.get('deathday'))
         if request_item.get('deathday'):
             self.infoproperties['deathday'] = request_item['deathday']
         if request_item.get('also_know_as'):
