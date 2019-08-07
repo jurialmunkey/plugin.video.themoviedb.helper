@@ -169,6 +169,7 @@ class ListItem:
     def get_cast(self, request_item):
         if request_item.get('credits'):
             if request_item.get('credits').get('cast'):
+                x = 1
                 for item in request_item.get('credits').get('cast'):
                     if item.get('name'):
                         cast_member = {}
@@ -176,7 +177,12 @@ class ListItem:
                         cast_member['role'] = item.get('character')
                         cast_member['order'] = item.get('order')
                         cast_member['thumbnail'] = IMAGEPATH + item.get('profile_path') if item.get('profile_path') else ''
+                        p = 'Cast.' + str(x) + '.'
+                        self.infoproperties[p + 'name'] = cast_member.get('name')
+                        self.infoproperties[p + 'role'] = cast_member.get('role')
+                        self.infoproperties[p + 'thumb'] = cast_member.get('thumbnail')
                         self.cast.append(cast_member)
+                        x = x + 1
 
     def get_autofilled_info(self, item):
         self.get_poster(item)
