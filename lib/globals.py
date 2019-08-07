@@ -15,11 +15,22 @@ _addonlogname = '[plugin.video.themoviedb.helper]\n'
 # Get the api keys
 _omdb_apikey = '?apikey=' + xbmcplugin.getSetting(_handle, 'omdb_apikey')
 _tmdb_apikey = xbmcplugin.getSetting(_handle, 'tmdb_apikey')
+# Cache days
+_cache_details_days = xbmcplugin.getSetting(_handle, 'cache_details_days')
+_cache_details_days = int(_cache_details_days)
+_cache_list_days = xbmcplugin.getSetting(_handle, 'cache_list_days')
+_cache_list_days = int(_cache_list_days)
+
+if not _cache_details_days or _cache_details_days < 14:
+    _cache_details_days = 14
+if not _cache_list_days or _cache_list_days < 1:
+    _cache_list_days = 1
+
 if _tmdb_apikey:
-    _waittime = 2
+    _waittime = 0
     _tmdb_apikey = '?api_key=' + _tmdb_apikey
 else:
-    _waittime = 4
+    _waittime = 3
     _tmdb_apikey = '?api_key=a07324c669cac4d96789197134ce272b'
 # Get the language TODO: make user setting, not hardcoded
 _language = '&language=en-US'

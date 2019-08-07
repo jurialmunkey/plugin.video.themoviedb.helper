@@ -6,7 +6,7 @@ import datetime
 import simplecache
 import time
 import xml.etree.ElementTree as ET
-from globals import TMDB_API, _tmdb_apikey, _language, OMDB_API, _omdb_apikey, OMDB_ARG, _addonname, _waittime
+from globals import TMDB_API, _tmdb_apikey, _language, OMDB_API, _omdb_apikey, OMDB_ARG, _addonname, _waittime, _cache_list_days, _cache_details_days
 _cache = simplecache.SimpleCache()
 
 
@@ -52,7 +52,7 @@ def my_rate_limiter(func):
     return decorated
 
 
-def use_mycache(cache_days=14, suffix=''):
+def use_mycache(cache_days=_cache_details_days, suffix=''):
     def decorator(func):
         def decorated(*args, **kwargs):
             cache_name = _addonname
@@ -94,7 +94,7 @@ def make_request(request, is_json):
     return request
 
 
-@use_mycache(1, 'tmdb_api')
+@use_mycache(_cache_list_days, 'tmdb_api')
 def tmdb_api_request(*args, **kwargs):
     """
     Request from TMDb API and store in cache for 24 hours
@@ -112,7 +112,7 @@ def tmdb_api_request(*args, **kwargs):
     return request
 
 
-@use_mycache(14, 'tmdb_api')
+@use_mycache(_cache_details_days, 'tmdb_api')
 def tmdb_api_request_longcache(*args, **kwargs):
     """
     Request from TMDb API and store in cache for 14 days
@@ -121,7 +121,7 @@ def tmdb_api_request_longcache(*args, **kwargs):
     return tmdb_api_request(*args, **kwargs)
 
 
-@use_mycache(14, 'omdb_api')
+@use_mycache(_cache_details_days, 'omdb_api')
 def omdb_api_request(*args, **kwargs):
     """ Request from OMDb API and store in cache for 14 days"""
     request = OMDB_API
