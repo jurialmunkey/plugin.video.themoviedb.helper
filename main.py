@@ -285,6 +285,7 @@ class Container:
         Otherwise just uses whatever the api had returned
         """
         for item in self.listitems:
+            listitem = ListItem()
             if item.get('id') and self.request_tmdb_type:
                 request_path = '{0}/{1}'.format(self.request_tmdb_type, item.get('id'))
                 kwparams = {}
@@ -294,11 +295,12 @@ class Container:
                 if detailed_info:
                     item = lib.utils.merge_two_dicts(item, detailed_info)
                     if item.get('imdb_id') and self.request_tmdb_type in ['movie', 'tv']:
-                        self.omdb_info = lib.apis.omdb_api_only_cached(i=item.get('imdb_id'))
-            listitem = ListItem()
+                        listitem.omdb_info = lib.apis.omdb_api_only_cached(i=item.get('imdb_id'))
             listitem.get_title(item)
             listitem.get_autofilled_info(item)
             listitem.get_dbtypes(self.list_type)
+            if listitem.omdb_info:
+                listitem.get_omdb_info(listitem.omdb_info)
             if self.omdb_info:
                 listitem.get_omdb_info(self.omdb_info)
             listitem.create_kwparams(self.next_type, self.next_info)
