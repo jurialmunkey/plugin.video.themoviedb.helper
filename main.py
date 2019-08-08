@@ -35,6 +35,8 @@ class ListItem:
         self.fanart = _addonpath + '/fanart.jpg'  # Fanart
         self.cast = []  # Cast list
         self.is_folder = True
+        self.detailed_info = {}  # Additional info gathered if cached detailed tmdb item
+        self.omdb_info = {}  # Additional info gathered if cached detailed omdb item
         self.infolabels = {}  # The item info
         self.infoproperties = {}  # The item properties
         self.infoart = {'thumb': self.poster,
@@ -291,9 +293,9 @@ class Container:
                 kwparams = {}
                 if self.request_tmdb_type in ['movie', 'tv']:
                     kwparams['append_to_response'] = 'credits'
-                detailed_info = lib.apis.tmdb_api_only_cached(request_path, **kwparams)
-                if detailed_info:
-                    item = lib.utils.merge_two_dicts(item, detailed_info)
+                listitem.detailed_info = lib.apis.tmdb_api_only_cached(request_path, **kwparams)
+                if listitem.detailed_info:
+                    item = lib.utils.merge_two_dicts(item, listitem.detailed_info)
                     if item.get('imdb_id') and self.request_tmdb_type in ['movie', 'tv']:
                         listitem.omdb_info = lib.apis.omdb_api_only_cached(i=item.get('imdb_id'))
             listitem.get_title(item)
