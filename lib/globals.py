@@ -13,7 +13,7 @@ _addonname = 'plugin.video.themoviedb.helper'
 # Addon name for logging
 _addonlogname = '[plugin.video.themoviedb.helper]\n'
 # Get the api keys
-_omdb_apikey = '?apikey=' + xbmcplugin.getSetting(_handle, 'omdb_apikey')
+_omdb_apikey = '?apikey=' + xbmcplugin.getSetting(_handle, 'omdb_apikey') if xbmcplugin.getSetting(_handle, 'omdb_apikey') else None
 _tmdb_apikey = xbmcplugin.getSetting(_handle, 'tmdb_apikey')
 # Cache days
 _cache_details_days = xbmcplugin.getSetting(_handle, 'cache_details_days')
