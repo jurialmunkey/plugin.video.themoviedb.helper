@@ -6,7 +6,7 @@ from globals import _addonlogname
 
 
 def age_difference(birthday, deathday=''):
-    try:
+    try:  # Added Error Checking as strptime doesn't work correctly on LibreElec
         deathday = datetime.strptime(deathday, '%Y-%m-%d') if deathday else datetime.now()
         birthday = datetime.strptime(birthday, '%Y-%m-%d')
         age = deathday.year - birthday.year
