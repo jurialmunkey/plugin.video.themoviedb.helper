@@ -52,7 +52,7 @@ def my_rate_limiter(func):
     return decorated
 
 
-def use_mycache(cache_days=_cache_details_days, suffix=''):
+def use_mycache(cache_days=_cache_details_days, suffix='', allow_api=True):
     def decorator(func):
         def decorated(*args, **kwargs):
             cache_name = _addonname
@@ -68,7 +68,7 @@ def use_mycache(cache_days=_cache_details_days, suffix=''):
             if my_cache:
                 kodi_log('CACHE REQUEST:\n' + cache_name)
                 return my_cache
-            else:
+            elif allow_api:
                 kodi_log('API REQUEST:\n' + cache_name)
                 my_objects = func(*args, **kwargs)
                 _cache.set(cache_name, my_objects, expiration=datetime.timedelta(days=cache_days))
@@ -121,6 +121,14 @@ def tmdb_api_request_longcache(*args, **kwargs):
     return tmdb_api_request(*args, **kwargs)
 
 
+@use_mycache(_cache_details_days, 'tmdb_api', False)
+def tmdb_api_only_cached(*args, **kwargs):
+    """
+    Check if look-up available in cache a return that. Otherwise return nothing
+    """
+    return None
+
+
 @use_mycache(_cache_details_days, 'omdb_api')
 def omdb_api_request(*args, **kwargs):
     """ Request from OMDb API and store in cache for 14 days"""
@@ -138,3 +146,11 @@ def omdb_api_request(*args, **kwargs):
     else:
         request = {}
     return request
+
+
+@use_mycache(_cache_details_days, 'omdb_api', False)
+def omdb_api_only_cached(*args, **kwargs):
+    """
+    Check if look-up available in cache a return that. Otherwise return nothing
+    """
+    return None

@@ -279,7 +279,22 @@ class Container:
                             listitem.create_listitem(info=key, type=category_type, **kwargs)
 
     def create_listitems(self):
+        """
+        Iterates over self.listitems for each item that should be in the list
+        Before creating the listitem, checks if we have a cached detailed item and adds that info too
+        Otherwise just uses whatever the api had returned
+        """
         for item in self.listitems:
+            if item.get('id') and self.request_tmdb_type:
+                request_path = '{0}/{1}'.format(self.request_tmdb_type, item.get('id'))
+                kwparams = {}
+                if self.request_tmdb_type in ['movie', 'tv']:
+                    kwparams['append_to_response'] = 'credits'
+                detailed_info = lib.apis.tmdb_api_only_cached(request_path, **kwparams)
+                if detailed_info:
+                    item = lib.utils.merge_two_dicts(item, detailed_info)
+                    if item.get('imdb_id') and self.request_tmdb_type in ['movie', 'tv']:
+                        self.omdb_info = lib.apis.omdb_api_only_cached(i=item.get('imdb_id'))
             listitem = ListItem()
             listitem.get_title(item)
             listitem.get_autofilled_info(item)
