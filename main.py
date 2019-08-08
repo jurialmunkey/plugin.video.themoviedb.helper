@@ -194,6 +194,10 @@ class ListItem:
                         self.infoproperties[p + 'job'] = item.get('job')
                         self.infoproperties[p + 'department'] = item.get('department')
                         self.infoproperties[p + 'thumb'] = IMAGEPATH + item.get('profile_path') if item.get('profile_path') else ''
+                        if item.get('job') == 'Director':
+                            self.infolabels.setdefault('director', []).append(item.get('name'))
+                        if item.get('department') == 'Writing':
+                            self.infolabels.setdefault('writer', []).append(item.get('name'))
                         x = x + 1
 
     def get_autofilled_info(self, item):
