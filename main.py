@@ -183,6 +183,16 @@ class ListItem:
                         self.infoproperties[p + 'thumb'] = cast_member.get('thumbnail')
                         self.cast.append(cast_member)
                         x = x + 1
+            if request_item.get('credits').get('crew'):
+                x = 1
+                for item in request_item.get('credits').get('crew'):
+                    if item.get('name'):
+                        p = 'Crew.' + str(x) + '.'
+                        self.infoproperties[p + 'name'] = item.get('name')
+                        self.infoproperties[p + 'job'] = item.get('job')
+                        self.infoproperties[p + 'department'] = item.get('department')
+                        self.infoproperties[p + 'thumb'] = IMAGEPATH + item.get('profile_path') if item.get('profile_path') else ''
+                        x = x + 1
 
     def get_autofilled_info(self, item):
         self.get_poster(item)
