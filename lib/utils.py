@@ -1,8 +1,27 @@
 import xbmc
-import xbmcgui
+# import json
 from datetime import datetime
 from copy import copy
-from globals import _addonlogname
+from globals import _addonlogname, _url
+from urllib import urlencode
+
+
+# TODO FIX THIS!
+# def jsonrpc_library(method="VideoLibrary.GetMovies"):
+#     query = {'jsonrpc': '2.0',
+#              'params': {'properties': ['title', 'imdbnumber']},
+#              'method': method,
+#              'id': 1}
+#     response = json.loads(xbmc.executeJSONRPC(json.dumps(query)))
+#     my_dict = {}
+#     for item in response.get('result', {}).get('movies', []):
+#         my_dict[item.get('title')] = {'imdb_id': item.get('imdbnumber'), 'dbid': item.get('movieid')}
+#     kodi_log(my_dict, 1)
+#     return my_dict
+
+
+def get_url(**kwargs):
+    return '{0}?{1}'.format(_url, urlencode(kwargs))
 
 
 def age_difference(birthday, deathday=''):
@@ -71,12 +90,6 @@ def iter_props(items, property, itemprops, **kwargs):
             if i.get(value):
                 itemprops[property + '.' + str(x) + '.' + key] = i.get(value)
     return itemprops
-
-
-def invalid_apikey(api_name='TMDb'):
-    xbmcgui.Dialog().ok('Missing/Invalid ' + api_name + ' API Key',
-                        'You must enter a valid ' + api_name + ' API key to use this add-on')
-    xbmc.executebuiltin('Addon.OpenSettings(plugin.video.themoviedb.helper)')
 
 
 def convert_to_plural_type(tmdb_type):

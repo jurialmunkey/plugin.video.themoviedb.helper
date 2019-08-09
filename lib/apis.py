@@ -1,6 +1,7 @@
 import requests
 import utils
 from utils import kodi_log
+import xbmc
 import xbmcgui
 import datetime
 import simplecache
@@ -8,6 +9,12 @@ import time
 import xml.etree.ElementTree as ET
 from globals import TMDB_API, _tmdb_apikey, _language, OMDB_API, _omdb_apikey, OMDB_ARG, _addonname, _waittime, _cache_list_days, _cache_details_days
 _cache = simplecache.SimpleCache()
+
+
+def invalid_apikey(api_name='TMDb'):
+    xbmcgui.Dialog().ok('Missing/Invalid ' + api_name + ' API Key',
+                        'You must enter a valid ' + api_name + ' API key to use this add-on')
+    xbmc.executebuiltin('Addon.OpenSettings(plugin.video.themoviedb.helper)')
 
 
 def my_rate_limiter(func):
@@ -85,7 +92,7 @@ def make_request(request, is_json):
     if not request.status_code == requests.codes.ok:  # Error Checking
         if request.status_code == 401:
             kodi_log('HTTP Error Code: ' + str(request.status_code), 1)
-            utils.invalid_apikey(request_type)
+            invalid_apikey(request_type)
             exit()
         else:
             kodi_log('HTTP Error Code: ' + str(request.status_code), 1)
