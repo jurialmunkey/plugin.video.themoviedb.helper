@@ -20,6 +20,7 @@ class Plugin:
             if ' / ' in self.params.get('with_genres'):
                 self.params['with_genres'] = self.params.get('with_genres').split(' / ')
             temp_list = ''
+            self.params['with_genres'] = [self.params.get('with_genres')] if isinstance(self.params.get('with_genres'), str) else self.params.get('with_genres')
             for genre in self.params.get('with_genres'):
                 genre = str(GENRE_IDS.get(genre))
                 if genre:
@@ -32,6 +33,7 @@ class Plugin:
             if ' / ' in self.params.get('with_companies'):
                 self.params['with_companies'] = self.params.get('with_companies').split(' / ')
             temp_list = ''
+            self.params['with_companies'] = [self.params.get('with_companies')] if isinstance(self.params.get('with_companies'), str) else self.params.get('with_companies')
             for studio in self.params.get('with_companies'):
                 query = apis.tmdb_api_request_longcache('search/company', query=studio)
                 if query and query.get('results')[0]:
