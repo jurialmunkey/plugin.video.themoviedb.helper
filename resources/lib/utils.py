@@ -18,7 +18,7 @@ def jsonrpc_library(method='VideoLibrary.GetMovies', dbtype='movie'):
     key_to_get = dbtype + 's'
     for item in response.get('result', {}).get(key_to_get, []):
         my_dict[item.get('title')] = {'imdb_id': item.get('imdbnumber'), 'dbid': item.get(dbid_name)}
-    kodi_log(my_dict, 1)
+    # kodi_log(my_dict, 1)
     return my_dict
 
 
