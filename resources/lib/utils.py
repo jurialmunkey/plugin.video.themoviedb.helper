@@ -6,7 +6,6 @@ from globals import _addonlogname, _url
 from urllib import urlencode
 
 
-# TODO FIX THIS!
 def jsonrpc_library(method='VideoLibrary.GetMovies', dbtype='movie'):
     query = {'jsonrpc': '2.0',
              'params': {'properties': ['title', 'imdbnumber']},

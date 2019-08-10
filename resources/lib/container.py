@@ -58,7 +58,6 @@ class Container:
         Before creating the listitem, checks if we have a cached detailed item and adds that info too
         Otherwise just uses whatever the api had returned
         """
-        # TODO FIX THIS
         if self.request_tmdb_type == 'movie':
             self.kodi_library = utils.jsonrpc_library('VideoLibrary.GetMovies', 'movie')
         elif self.request_tmdb_type == 'tv':
