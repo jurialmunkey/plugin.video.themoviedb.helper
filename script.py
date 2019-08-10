@@ -67,22 +67,20 @@ class Script:
                 self.position = self.position + 1
                 self.set_props(self.position, self.params.get('add_path'))
                 self.lock_path(self.params.get('prevent_del'))
-                self.call_window()
             elif self.params.get('del_path'):
                 if self.prevent_del:
                     self.unlock_path()
-                    self.call_window()
                 else:
                     _homewindow.clearProperty(self.prefixpath + str(self.position))
                     if self.position > 1:
                         self.position = self.position - 1
                         path = _homewindow.getProperty(self.prefixpath + str(self.position))
                         self.set_props(self.position, path)
-                        self.call_window()
                     else:
                         self.reset_props()
             elif self.params.get('reset_path'):
                 self.reset_props()
+            self.call_window()
 
 
 if __name__ == '__main__':
