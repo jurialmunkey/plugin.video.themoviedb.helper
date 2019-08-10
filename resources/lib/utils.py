@@ -69,7 +69,7 @@ def concatinate_names(items, key, separator):
     for i in items:
         if i.get(key):
             if concat:
-                concat = concat + ' ' + separator + ' ' + i.get(key)
+                concat = '{0} {1} {2}'.format(concat, separator, i.get(key))
             else:
                 concat = i.get(key)
     return concat
@@ -89,7 +89,7 @@ def iter_props(items, property, itemprops, **kwargs):
         x = x + 1
         for key, value in kwargs.items():
             if i.get(value):
-                itemprops[property + '.' + str(x) + '.' + key] = i.get(value)
+                itemprops['{0}.{1}.{2}'.format(property, x, key)] = i.get(value)
     return itemprops
 
 
@@ -99,7 +99,7 @@ def convert_to_plural_type(tmdb_type):
     elif tmdb_type == 'person':
         return 'People'
     else:
-        return tmdb_type.capitalize() + 's'
+        return '{0}s'.format(tmdb_type.capitalize())
 
 
 def convert_to_kodi_type(tmdb_type):

@@ -42,7 +42,7 @@ class ListItem:
         elif request_item.get('author'):
             self.name = request_item.get('author')
         elif request_item.get('width') and request_item.get('height'):
-            self.name = str(request_item['width']) + 'x' + str(request_item['height'])
+            self.name = '{0}x{1}'.format(request_item.get('width'), request_item.get('height'))
         else:
             self.name = 'N/A'
 
@@ -94,6 +94,8 @@ class ListItem:
             self.infolabels['studio'] = utils.dict_to_list(request_item.get('production_companies'), 'name')
         if request_item.get('production_countries'):
             self.infolabels['country'] = utils.dict_to_list(request_item.get('production_countries'), 'name')
+        if request_item.get('belongs_to_collection'):
+            self.infolabels['set'] = request_item.get('belongs_to_collection').get('name')
 
     def get_properties(self, request_item):
         self.infoproperties['tmdb_id'] = self.tmdb_id
@@ -127,6 +129,11 @@ class ListItem:
             self.infoproperties['budget'] = '${:0,.0f}'.format(request_item['budget'])
         if request_item.get('revenue'):
             self.infoproperties['revenue'] = '${:0,.0f}'.format(request_item['revenue'])
+        if request_item.get('belongs_to_collection'):
+            self.infoproperties['set.tmdb_id'] = request_item.get('belongs_to_collection').get('id')
+            self.infoproperties['set.name'] = request_item.get('belongs_to_collection').get('name')
+            self.infoproperties['set.poster'] = IMAGEPATH + request_item.get('belongs_to_collection').get('poster_path')
+            self.infoproperties['set.fanart'] = IMAGEPATH + request_item.get('belongs_to_collection').get('backdrop_path')
 
     def get_omdb_info(self, request_item):
         if request_item.get('rated'):
