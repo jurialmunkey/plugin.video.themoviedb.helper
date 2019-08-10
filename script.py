@@ -46,10 +46,8 @@ class Script:
 
     def lock_path(self, condition):
         if condition:
-            xbmc.log('Locking...', level=xbmc.LOGNOTICE)
             _homewindow.setProperty(self.prefixlock, 'True')
         else:
-            xbmc.log('Unlocking...', level=xbmc.LOGNOTICE)
             self.unlock_path()
 
     def unlock_path(self):
@@ -72,12 +70,10 @@ class Script:
                 self.call_window()
             elif self.params.get('del_path'):
                 if self.prevent_del:
-                    xbmc.log('Locked! Prevent Delete. Unlocking...', level=xbmc.LOGNOTICE)
                     self.unlock_path()
                     self.call_window()
                 else:
                     _homewindow.clearProperty(self.prefixpath + str(self.position))
-                    xbmc.log('Not Locked! Deleting...', level=xbmc.LOGNOTICE)
                     if self.position > 1:
                         self.position = self.position - 1
                         path = _homewindow.getProperty(self.prefixpath + str(self.position))
