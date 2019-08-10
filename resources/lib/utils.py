@@ -1,5 +1,5 @@
 import xbmc
-# import json
+import json
 from datetime import datetime
 from copy import copy
 from globals import _addonlogname, _url
@@ -7,17 +7,19 @@ from urllib import urlencode
 
 
 # TODO FIX THIS!
-# def jsonrpc_library(method="VideoLibrary.GetMovies"):
-#     query = {'jsonrpc': '2.0',
-#              'params': {'properties': ['title', 'imdbnumber']},
-#              'method': method,
-#              'id': 1}
-#     response = json.loads(xbmc.executeJSONRPC(json.dumps(query)))
-#     my_dict = {}
-#     for item in response.get('result', {}).get('movies', []):
-#         my_dict[item.get('title')] = {'imdb_id': item.get('imdbnumber'), 'dbid': item.get('movieid')}
-#     kodi_log(my_dict, 1)
-#     return my_dict
+def jsonrpc_library(method='VideoLibrary.GetMovies', dbtype='movie'):
+    query = {'jsonrpc': '2.0',
+             'params': {'properties': ['title', 'imdbnumber']},
+             'method': method,
+             'id': 1}
+    response = json.loads(xbmc.executeJSONRPC(json.dumps(query)))
+    my_dict = {}
+    dbid_name = dbtype + 'id'
+    key_to_get = dbtype + 's'
+    for item in response.get('result', {}).get(key_to_get, []):
+        my_dict[item.get('title')] = {'imdb_id': item.get('imdbnumber'), 'dbid': item.get(dbid_name)}
+    kodi_log(my_dict, 1)
+    return my_dict
 
 
 def get_url(**kwargs):

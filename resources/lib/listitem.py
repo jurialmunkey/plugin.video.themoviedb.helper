@@ -12,6 +12,7 @@ class ListItem:
         self.library = ''  # <content target= video, music, pictures, none>
         self.tmdb_id = ''  # ListItem.Property(tmdb_id)
         self.imdb_id = ''  # IMDb ID for item
+        self.dbid = ''  # ListItem.DBID
         self.request_tmdb_type = ''  # The TMDb DBType for the Request
         self.request_tmdb_id = ''  # The TMDb ID for the Request
         self.plural_type = ''  # Plural form of category type
@@ -63,6 +64,8 @@ class ListItem:
 
     def get_info(self, request_item):
         self.infolabels['title'] = self.name
+        if self.dbid:
+            self.infolabels['dbid'] = self.dbid
         if request_item.get('overview'):
             self.infolabels['plot'] = request_item['overview']
         elif request_item.get('biography'):

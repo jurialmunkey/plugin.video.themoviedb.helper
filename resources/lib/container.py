@@ -18,6 +18,7 @@ class Container:
         self.next_type = ''  # &type= for next action in ListItem.FolderPath
         self.next_info = ''  # ?info= for next action in ListItem.FolderPath
         self.listitems = []  # The list of items to add
+        self.kodi_library = {}  # JSON RPC Results to check DBID
 
     def start_container(self):
         xbmcplugin.setPluginCategory(_handle, self.name)
@@ -58,10 +59,10 @@ class Container:
         Otherwise just uses whatever the api had returned
         """
         # TODO FIX THIS
-        # if self.request_tmdb_type in ['movie']:
-        #     self.kodi_library = utils.jsonrpc_library()
-        #     kodi_log(self.kodi_library, 1)
-
+        if self.request_tmdb_type == 'movie':
+            self.kodi_library = utils.jsonrpc_library('VideoLibrary.GetMovies', 'movie')
+        elif self.request_tmdb_type == 'tv':
+            self.kodi_library = utils.jsonrpc_library('VideoLibrary.GetTVShows', 'tvshow')
         for item in self.listitems:
             listitem = ListItem()
             if item.get('id') and self.request_tmdb_type:
@@ -75,6 +76,8 @@ class Container:
                     if item.get('imdb_id') and self.request_tmdb_type in ['movie', 'tv']:
                         listitem.omdb_info = apis.omdb_api_only_cached(i=item.get('imdb_id'))
             listitem.get_title(item)
+            if self.kodi_library.get(listitem.name):
+                listitem.dbid = self.kodi_library.get(listitem.name).get('dbid')
             listitem.get_autofilled_info(item)
             listitem.get_dbtypes(self.list_type)
             if listitem.omdb_info:
