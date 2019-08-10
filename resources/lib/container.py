@@ -117,7 +117,7 @@ class Container:
         if self.request_path:
             self.listitems = apis.tmdb_api_request(self.request_path, **self.request_kwparams)
             if self.request_key:
-                self.listitems = self.listitems[self.request_key]
+                self.listitems = self.listitems.get(self.request_key, [])
             if self.listitems and not isinstance(self.listitems, list):
                 self.listitems = [self.listitems]
         else:
