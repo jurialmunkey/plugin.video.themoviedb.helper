@@ -64,6 +64,7 @@ class ListItem:
 
     def get_info(self, request_item):
         self.infolabels['title'] = self.name
+        self.imdb_id = request_item.get('imdb_id')
         if self.dbid:
             self.infolabels['dbid'] = self.dbid
         if request_item.get('overview'):
@@ -80,7 +81,6 @@ class ListItem:
             self.infolabels['premiered'] = request_item['release_date']
             self.infolabels['year'] = request_item['release_date'][:4]
         if request_item.get('imdb_id'):
-            self.imdb_id = request_item['imdb_id']
             self.infolabels['imdbnumber'] = request_item['imdb_id']
         if request_item.get('runtime'):
             self.infolabels['duration'] = request_item['runtime'] * 60
@@ -99,6 +99,7 @@ class ListItem:
 
     def get_properties(self, request_item):
         self.infoproperties['tmdb_id'] = self.tmdb_id
+        self.infoproperties['imdb_id'] = self.imdb_id
         if request_item.get('genres'):
             self.infoproperties = utils.iter_props(request_item.get('genres'), 'Genre', self.infoproperties, name='name', tmdb_id='id')
         if request_item.get('production_companies'):

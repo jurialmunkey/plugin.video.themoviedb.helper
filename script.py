@@ -5,6 +5,7 @@
 import sys
 import xbmc
 import xbmcgui
+import time
 _homewindow = xbmcgui.Window(10000)
 _prefixname = 'TMDbHelper.'
 
@@ -54,6 +55,8 @@ class Script:
         _homewindow.clearProperty(self.prefixlock)
 
     def call_window(self):
+        sleeper = float(self.params.get('delay', '0'))
+        time.sleep(sleeper)
         if self.params.get('call_id'):
             xbmc.executebuiltin('Dialog.Close(all, force)')
             xbmc.executebuiltin('ActivateWindow({0})'.format(self.params.get('call_id')))
