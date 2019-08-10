@@ -4,7 +4,7 @@ import utils
 import xbmc
 import xbmcgui
 from urlparse import parse_qsl
-from globals import GENRE_IDS, CATEGORIES, MAINFOLDER
+from globals import GENRE_IDS, CATEGORIES, MAINFOLDER, EXCLUSIONS
 from container import Container
 from utils import kodi_log
 
@@ -52,7 +52,7 @@ class Plugin:
         """
         list_container = Container()
         list_container.start_container()
-        list_container.create_folders(CATEGORIES, MAINFOLDER, ['discover'], '')
+        list_container.create_folders(CATEGORIES, MAINFOLDER, EXCLUSIONS, '')
         list_container.finish_container()
 
     def list_details(self):
@@ -75,7 +75,9 @@ class Plugin:
         list_container.request_omdb_info()
         list_container.start_container()
         list_container.create_listitems()
-        list_container.create_folders(CATEGORIES, [], MAINFOLDER,
+        exclusions = MAINFOLDER
+        exclusions.extend(EXCLUSIONS)
+        list_container.create_folders(CATEGORIES, [], exclusions,
                                       list_container.request_tmdb_type,
                                       tmdb_id=list_container.request_tmdb_id)
         list_container.finish_container()
@@ -134,7 +136,8 @@ class Plugin:
                 if self.params.get('info') == 'find':
                     self.list_details()
 
-    def check_tmdb_id(self):
+    def check_tmdb_id(self, request_type=None):
+        request_type = self.params.get('type') if not request_type else request_type
         if self.params.get('info') in MAINFOLDER:
             return
         elif self.params.get('tmdb_id'):
@@ -143,7 +146,7 @@ class Plugin:
             self.list_find()
         elif self.params.get('query'):
             kodi_log('Searching... [No TMDb ID specified]', 0)
-            request_path = 'search/' + self.params.get('type')
+            request_path = 'search/{0}'.format(request_type)
             request_kwparams = utils.make_kwparams(self.params)
             item = apis.tmdb_api_request_longcache(request_path, **request_kwparams)
             if item and item.get('results') and isinstance(item.get('results'), list) and item.get('results')[0].get('id'):
@@ -164,10 +167,13 @@ class Plugin:
             if self.params.get('info') == 'textviewer':
                 xbmcgui.Dialog().textviewer('$INFO[ListItem.Label]', '$INFO[ListItem.Plot]')
             elif self.params.get('info') == 'imageviewer':
-                xbmc.executebuiltin('ShowPicture(' + self.params.get('image') + ')')
+                xbmc.executebuiltin('ShowPicture({0})'.format(self.params.get('image')))
             elif self.params.get('info') == 'discover':
                 self.translate_genres()
                 self.translate_studios()
+                self.list_items()
+            elif self.params.get('info') == 'collection':
+                self.check_tmdb_id('collection')
                 self.list_items()
             elif not self.params.get('info') or not self.params.get('type'):
                 raise ValueError('Invalid paramstring - Must specify info and type: {0}!'.format(self.paramstring))

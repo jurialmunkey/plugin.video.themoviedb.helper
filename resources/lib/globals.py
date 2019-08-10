@@ -238,6 +238,16 @@ CATEGORIES = {'cast':
                'next_info': 'details',
                'index': 99,
                },
+              'collection':
+              {'types': ['movie'],
+               'name': 'In Collection',
+               'path': 'collection/{self.request_tmdb_id}',
+               'key': 'parts',
+               'list_type': '{self.request_tmdb_type}',
+               'next_type': '{self.request_tmdb_type}',
+               'next_info': 'details',
+               'index': 99,
+               },
               'keyword_movies':
               {'types': ['keyword'],
                'name': 'Keywords',
@@ -251,7 +261,9 @@ CATEGORIES = {'cast':
               }
 
 MAINFOLDER = ['search', 'find', 'popular', 'top_rated', 'upcoming', 'airing_today',
-              'now_playing', 'on_the_air', 'discover']
+              'now_playing', 'on_the_air']
+
+EXCLUSIONS = ['discover', 'collection']
 
 GENRE_IDS = {"Action": 28,
              "Adventure": 12,
