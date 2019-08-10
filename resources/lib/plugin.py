@@ -87,6 +87,8 @@ class Plugin:
         list_container.category = CATEGORIES[self.params.get('info')]
         list_container.request_tmdb_id = self.params.get('tmdb_id')
         list_container.request_tmdb_type = self.params.get('type')
+        list_container.request_filter_key = self.params.get('filter_key')
+        list_container.request_filter_value = self.params.get('filter_value')
         list_container.request_path = list_container.category.get('path').format(self=list_container)
         list_container.request_key = list_container.category.get('key').format(self=list_container)
         list_container.request_kwparams = utils.make_kwparams(self.params)
