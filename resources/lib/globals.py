@@ -30,7 +30,7 @@ if _tmdb_apikey:
     _waittime = 0
     _tmdb_apikey = '?api_key=' + _tmdb_apikey
 else:
-    _waittime = 3
+    _waittime = 1.5
     _tmdb_apikey = '?api_key=a07324c669cac4d96789197134ce272b'
 # Get the language TODO: make user setting, not hardcoded
 _language = '&language=en-US'
