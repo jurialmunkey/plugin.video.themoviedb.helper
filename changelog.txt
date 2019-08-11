@@ -1,0 +1,5 @@
+**0.1.6**
+- Don't add duplicate crew members
+- Change poster icon
+- Add ListItem.Property(job) to crew lists
+- Some clean-up

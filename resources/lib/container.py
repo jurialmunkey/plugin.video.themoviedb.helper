@@ -64,6 +64,7 @@ class Container:
             self.kodi_library = utils.jsonrpc_library('VideoLibrary.GetMovies', 'movie')
         elif self.request_tmdb_type == 'tv':
             self.kodi_library = utils.jsonrpc_library('VideoLibrary.GetTVShows', 'tvshow')
+        added_items = []
         for item in self.listitems:
             # Check if filter key is present in item
             # If key is present must match value to be included in items
@@ -89,6 +90,8 @@ class Container:
                         listitem.omdb_info = apis.omdb_api_only_cached(i=item.get('imdb_id'))
             # Get item info
             listitem.get_title(item)
+            if listitem.name in added_items:
+                continue  # Don't create duplicate items
             if self.kodi_library.get(listitem.name):
                 listitem.dbid = self.kodi_library.get(listitem.name).get('dbid')
             listitem.get_autofilled_info(item)
@@ -99,6 +102,7 @@ class Container:
                 listitem.get_omdb_info(self.omdb_info)
             listitem.create_kwparams(self.next_type, self.next_info)
             listitem.create_listitem(**listitem.kwparams)
+            added_items.append(listitem.name)
 
     def request_omdb_info(self):
         if self.request_tmdb_type in ['movie', 'tv']:

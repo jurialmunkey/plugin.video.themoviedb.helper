@@ -8,6 +8,7 @@ import xbmcplugin
 class ListItem:
     def __init__(self):
         self.name = ''  # ListItem.Label,Title
+        self.label2 = ''  # ListItem.Label2
         self.dbtype = ''  # ListItem.DBType
         self.library = ''  # <content target= video, music, pictures, none>
         self.tmdb_id = ''  # ListItem.Property(tmdb_id)
@@ -17,7 +18,7 @@ class ListItem:
         self.request_tmdb_id = ''  # The TMDb ID for the Request
         self.plural_type = ''  # Plural form of category type
         self.kwparams = {}  # kwparams to contruct ListItem.FolderPath (plugin path call)
-        self.poster = _addonpath + '/icon.png'  # Icon, Thumb, Poster
+        self.poster = _addonpath + '/resources/poster.png'  # Icon, Thumb, Poster
         self.fanart = _addonpath + '/fanart.jpg'  # Fanart
         self.cast = []  # Cast list
         self.is_folder = True
@@ -68,26 +69,27 @@ class ListItem:
         if self.dbid:
             self.infolabels['dbid'] = self.dbid
         if request_item.get('overview'):
-            self.infolabels['plot'] = request_item['overview']
+            self.infolabels['plot'] = request_item.get('overview')
         elif request_item.get('biography'):
-            self.infolabels['plot'] = request_item['biography']
+            self.infolabels['plot'] = request_item.get('biography')
         elif request_item.get('content'):
-            self.infolabels['plot'] = request_item['content']
+            self.infolabels['plot'] = request_item.get('content')
         if request_item.get('vote_average'):
-            self.infolabels['rating'] = request_item['vote_average']
+            self.infolabels['rating'] = request_item.get('vote_average')
+            self.label2 = request_item.get('vote_average')
         if request_item.get('vote_count'):
-            self.infolabels['votes'] = request_item['vote_count']
+            self.infolabels['votes'] = request_item.get('vote_count')
         if request_item.get('release_date'):
-            self.infolabels['premiered'] = request_item['release_date']
-            self.infolabels['year'] = request_item['release_date'][:4]
+            self.infolabels['premiered'] = request_item.get('release_date')
+            self.infolabels['year'] = request_item.get('release_date')[:4]
         if request_item.get('imdb_id'):
-            self.infolabels['imdbnumber'] = request_item['imdb_id']
+            self.infolabels['imdbnumber'] = request_item.get('imdb_id')
         if request_item.get('runtime'):
-            self.infolabels['duration'] = request_item['runtime'] * 60
+            self.infolabels['duration'] = request_item.get('runtime') * 60
         if request_item.get('tagline'):
-            self.infolabels['tagline'] = request_item['tagline']
+            self.infolabels['tagline'] = request_item.get('tagline')
         if request_item.get('status'):
-            self.infolabels['status'] = request_item['status']
+            self.infolabels['status'] = request_item.get('status')
         if request_item.get('genres'):
             self.infolabels['genre'] = utils.dict_to_list(request_item.get('genres'), 'name')
         if request_item.get('production_companies'):
@@ -107,29 +109,34 @@ class ListItem:
         if request_item.get('production_countries'):
             self.infoproperties = utils.iter_props(request_item.get('production_countries'), 'Country', self.infoproperties, name='name', tmdb_id='id')
         if request_item.get('biography'):
-            self.infoproperties['biography'] = request_item['biography']
+            self.infoproperties['biography'] = request_item.get('biography')
         if request_item.get('birthday'):
-            self.infoproperties['birthday'] = request_item['birthday']
+            self.infoproperties['birthday'] = request_item.get('birthday')
             self.infoproperties['age'] = utils.age_difference(request_item.get('birthday'), request_item.get('deathday'))
         if request_item.get('deathday'):
-            self.infoproperties['deathday'] = request_item['deathday']
+            self.infoproperties['deathday'] = request_item.get('deathday')
         if request_item.get('also_know_as'):
-            self.infoproperties['aliases'] = request_item['also_know_as']
+            self.infoproperties['aliases'] = request_item.get('also_know_as')
         if request_item.get('known_for_department'):
-            self.infoproperties['role'] = request_item['known_for_department']
+            self.infoproperties['role'] = request_item.get('known_for_department')
         if request_item.get('place_of_birth'):
-            self.infoproperties['born'] = request_item['place_of_birth']
+            self.infoproperties['born'] = request_item.get('place_of_birth')
         if request_item.get('character'):
             self.infoproperties['character'] = request_item.get('character')
+            self.label2 = request_item.get('character')
         if request_item.get('department'):
             self.infoproperties['department'] = request_item.get('department')
+            self.label2 = request_item.get('department')
+        if request_item.get('job'):
+            self.infoproperties['job'] = request_item.get('job')
+            self.label2 = request_item.get('job')
         if request_item.get('known_for'):
             self.infoproperties['known_for'] = utils.concatinate_names(request_item.get('known_for'), 'title', '/')
             self.infoproperties = utils.iter_props(request_item.get('known_for'), 'known_for', self.infoproperties, title='title', tmdb_id='id', rating='vote_average', tmdb_type='media_type')
         if request_item.get('budget'):
-            self.infoproperties['budget'] = '${:0,.0f}'.format(request_item['budget'])
+            self.infoproperties['budget'] = '${:0,.0f}'.format(request_item.get('budget'))
         if request_item.get('revenue'):
-            self.infoproperties['revenue'] = '${:0,.0f}'.format(request_item['revenue'])
+            self.infoproperties['revenue'] = '${:0,.0f}'.format(request_item.get('revenue'))
         if request_item.get('belongs_to_collection'):
             self.infoproperties['set.tmdb_id'] = request_item.get('belongs_to_collection').get('id')
             self.infoproperties['set.name'] = request_item.get('belongs_to_collection').get('name')
@@ -220,7 +227,9 @@ class ListItem:
                 self.kwparams[key] = value
 
     def create_listitem(self, **kwargs):
-        self.listitem = xbmcgui.ListItem(label=self.name)
+        self.listitem = xbmcgui.ListItem(label=self.name, label2=self.label2)
+        self.listitem.setUniqueIDs({'imdb': self.imdb_id, 'tmdb': self.tmdb_id})
+
         self.listitem.setInfo(self.library, self.infolabels)
         self.listitem.setProperties(self.infoproperties)
         self.listitem.setArt(self.infoart)
