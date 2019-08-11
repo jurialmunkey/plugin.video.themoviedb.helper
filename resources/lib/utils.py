@@ -6,11 +6,11 @@ from globals import _addonlogname, _url
 from urllib import urlencode
 
 
-def jsonrpc_library(method='VideoLibrary.GetMovies', dbtype='movie'):
-    query = {'jsonrpc': '2.0',
-             'params': {'properties': ['title', 'imdbnumber']},
-             'method': method,
-             'id': 1}
+def jsonrpc_library(method="VideoLibrary.GetMovies", dbtype="movie"):
+    query = {"jsonrpc": "2.0",
+             "params": {"properties": ["title", "imdbnumber"]},
+             "method": method,
+             "id": 1}
     response = json.loads(xbmc.executeJSONRPC(json.dumps(query)))
     my_dict = {}
     dbid_name = dbtype + 'id'

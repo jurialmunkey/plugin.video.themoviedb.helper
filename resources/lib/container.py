@@ -61,9 +61,9 @@ class Container:
         Otherwise just uses whatever the api had returned
         """
         if self.request_tmdb_type == 'movie':
-            self.kodi_library = utils.jsonrpc_library('VideoLibrary.GetMovies', 'movie')
+            self.kodi_library = utils.jsonrpc_library("VideoLibrary.GetMovies", "movie")
         elif self.request_tmdb_type == 'tv':
-            self.kodi_library = utils.jsonrpc_library('VideoLibrary.GetTVShows', 'tvshow')
+            self.kodi_library = utils.jsonrpc_library("VideoLibrary.GetTVShows", "tvshow")
         added_items = []
         for item in self.listitems:
             # Check if filter key is present in item
