@@ -76,7 +76,7 @@ class ListItem:
             self.infolabels['plot'] = request_item.get('content')
         if request_item.get('vote_average'):
             self.infolabels['rating'] = request_item.get('vote_average')
-            self.label2 = request_item.get('vote_average')
+            self.label2 = str(request_item.get('vote_average'))
         if request_item.get('vote_count'):
             self.infolabels['votes'] = request_item.get('vote_count')
         if request_item.get('release_date'):
