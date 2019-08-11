@@ -24,7 +24,7 @@ class Plugin:
             for genre in self.params.get('with_genres'):
                 genre = str(GENRE_IDS.get(genre))
                 if genre:
-                    temp_list = temp_list + '%2C' + genre if temp_list else genre
+                    temp_list = '{0}%2C{1}'.format(temp_list, genre) if temp_list else genre
             if temp_list:
                 self.params['with_genres'] = temp_list
 

@@ -13,10 +13,10 @@ _prefixname = 'TMDbHelper.'
 class Script:
     def __init__(self):
         self.params = {}
-        self.prefixpath = _prefixname + 'Path.'
-        self.prefixlock = _prefixname + 'Locked'
-        self.prefixcurrent = self.prefixpath + 'Current'
-        self.prefixposition = _prefixname + 'Position'
+        self.prefixpath = '{0}Path.'.format(_prefixname)
+        self.prefixlock = '{0}Locked'.format(_prefixname)
+        self.prefixcurrent = '{0}Current'.format(self.prefixpath)
+        self.prefixposition = '{0}Position'.format(_prefixname)
         self.position = _homewindow.getProperty(self.prefixposition)
         self.position = int(self.position) if self.position else 0
         self.prevent_del = _homewindow.getProperty(self.prefixlock)
@@ -37,12 +37,12 @@ class Script:
     def reset_props(self):
         _homewindow.clearProperty(self.prefixcurrent)
         _homewindow.clearProperty(self.prefixposition)
-        _homewindow.clearProperty(self.prefixpath + '0')
-        _homewindow.clearProperty(self.prefixpath + '1')
+        _homewindow.clearProperty('{0}0'.format(self.prefixpath))
+        _homewindow.clearProperty('{0}1'.format(self.prefixpath))
 
     def set_props(self, position=1, path=''):
         _homewindow.setProperty(self.prefixcurrent, path)
-        _homewindow.setProperty(self.prefixpath + str(position), path)
+        _homewindow.setProperty('{0}{1}'.format(self.prefixpath, position), path)
         _homewindow.setProperty(self.prefixposition, str(position))
 
     def lock_path(self, condition):
@@ -74,10 +74,10 @@ class Script:
                 if self.prevent_del:
                     self.unlock_path()
                 else:
-                    _homewindow.clearProperty(self.prefixpath + str(self.position))
+                    _homewindow.clearProperty('{0}{1}'.format(self.prefixpath, self.position))
                     if self.position > 1:
                         self.position = self.position - 1
-                        path = _homewindow.getProperty(self.prefixpath + str(self.position))
+                        path = _homewindow.getProperty('{0}{1}'.format(self.prefixpath, self.position))
                         self.set_props(self.position, path)
                     else:
                         self.reset_props()

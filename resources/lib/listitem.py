@@ -18,8 +18,8 @@ class ListItem:
         self.request_tmdb_id = ''  # The TMDb ID for the Request
         self.plural_type = ''  # Plural form of category type
         self.kwparams = {}  # kwparams to contruct ListItem.FolderPath (plugin path call)
-        self.poster = _addonpath + '/resources/poster.png'  # Icon, Thumb, Poster
-        self.fanart = _addonpath + '/fanart.jpg'  # Fanart
+        self.poster = '{0}/resources/poster.png'.format(_addonpath)  # Icon, Thumb, Poster
+        self.fanart = '{0}/fanart.jpg'.format(_addonpath)  # Fanart
         self.cast = []  # Cast list
         self.is_folder = True
         self.detailed_info = {}  # Additional info gathered if cached detailed tmdb item
@@ -49,16 +49,16 @@ class ListItem:
 
     def get_fanart(self, request_item):
         if request_item.get('backdrop_path'):
-            self.fanart = IMAGEPATH + request_item.get('backdrop_path')
+            self.fanart = '{0}{1}'.format(IMAGEPATH, request_item.get('backdrop_path'))
         self.infoart['fanart'] = self.fanart
 
     def get_poster(self, request_item):
         if request_item.get('poster_path'):
-            self.poster = IMAGEPATH + request_item.get('poster_path')
+            self.poster = '{0}{1}'.format(IMAGEPATH, request_item.get('poster_path'))
         elif request_item.get('profile_path'):
-            self.poster = IMAGEPATH + request_item.get('profile_path')
+            self.poster = '{0}{1}'.format(IMAGEPATH, request_item.get('profile_path'))
         elif request_item.get('file_path'):
-            self.poster = IMAGEPATH + request_item.get('file_path')
+            self.poster = '{0}{1}'.format(IMAGEPATH, request_item.get('file_path'))
         self.infoart['poster'] = self.poster
         self.infoart['thumb'] = self.poster
         self.infoart['icon'] = self.poster
@@ -140,12 +140,12 @@ class ListItem:
         if request_item.get('belongs_to_collection'):
             self.infoproperties['set.tmdb_id'] = request_item.get('belongs_to_collection').get('id')
             self.infoproperties['set.name'] = request_item.get('belongs_to_collection').get('name')
-            self.infoproperties['set.poster'] = IMAGEPATH + request_item.get('belongs_to_collection').get('poster_path')
-            self.infoproperties['set.fanart'] = IMAGEPATH + request_item.get('belongs_to_collection').get('backdrop_path')
+            self.infoproperties['set.poster'] = '{0}{1}'.format(IMAGEPATH, request_item.get('belongs_to_collection').get('poster_path'))
+            self.infoproperties['set.fanart'] = '{0}{1}'.format(IMAGEPATH, request_item.get('belongs_to_collection').get('backdrop_path'))
 
     def get_omdb_info(self, request_item):
         if request_item.get('rated'):
-            self.infolabels['MPAA'] = 'Rated ' + request_item.get('rated')
+            self.infolabels['MPAA'] = 'Rated {0}'.format(request_item.get('rated'))
         if request_item.get('awards'):
             self.infoproperties['awards'] = request_item.get('awards')
         if request_item.get('metascore'):
@@ -181,22 +181,22 @@ class ListItem:
                         cast_member['name'] = item.get('name')
                         cast_member['role'] = item.get('character')
                         cast_member['order'] = item.get('order')
-                        cast_member['thumbnail'] = IMAGEPATH + item.get('profile_path') if item.get('profile_path') else ''
-                        p = 'Cast.' + str(x) + '.'
-                        self.infoproperties[p + 'name'] = cast_member.get('name')
-                        self.infoproperties[p + 'role'] = cast_member.get('role')
-                        self.infoproperties[p + 'thumb'] = cast_member.get('thumbnail')
+                        cast_member['thumbnail'] = '{0}{1}'.format(IMAGEPATH, item.get('profile_path')) if item.get('profile_path') else ''
+                        p = 'Cast.{0}.'.format(x)
+                        self.infoproperties['{0}name'.format(p)] = cast_member.get('name')
+                        self.infoproperties['{0}role'.format(p)] = cast_member.get('role')
+                        self.infoproperties['{0}thumb'.format(p)] = cast_member.get('thumbnail')
                         self.cast.append(cast_member)
                         x = x + 1
             if request_item.get('credits').get('crew'):
                 x = 1
                 for item in request_item.get('credits').get('crew'):
                     if item.get('name'):
-                        p = 'Crew.' + str(x) + '.'
-                        self.infoproperties[p + 'name'] = item.get('name')
-                        self.infoproperties[p + 'job'] = item.get('job')
-                        self.infoproperties[p + 'department'] = item.get('department')
-                        self.infoproperties[p + 'thumb'] = IMAGEPATH + item.get('profile_path') if item.get('profile_path') else ''
+                        p = 'Crew.{0}.'.format(x)
+                        self.infoproperties['{0}name'.format(p)] = item.get('name')
+                        self.infoproperties['{0}job'.format(p)] = item.get('job')
+                        self.infoproperties['{0}department'.format(p)] = item.get('department')
+                        self.infoproperties['{0}thumb'.format(p)] = '{0}{1}'.format(IMAGEPATH, item.get('profile_path')) if item.get('profile_path') else ''
                         if item.get('job') == 'Director':
                             self.infolabels.setdefault('director', []).append(item.get('name'))
                         if item.get('department') == 'Writing':

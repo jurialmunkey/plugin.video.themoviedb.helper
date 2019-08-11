@@ -24,7 +24,7 @@ class Container:
 
     def start_container(self):
         xbmcplugin.setPluginCategory(_handle, self.name)
-        container_content = utils.convert_to_kodi_type(self.list_type) + 's' if self.list_type else ''
+        container_content = '{0}s'.format(utils.convert_to_kodi_type(self.list_type)) if self.list_type else ''
         xbmcplugin.setContent(_handle, container_content)
 
     def finish_container(self):

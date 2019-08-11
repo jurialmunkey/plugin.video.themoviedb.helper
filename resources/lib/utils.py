@@ -13,8 +13,8 @@ def jsonrpc_library(method="VideoLibrary.GetMovies", dbtype="movie"):
              "id": 1}
     response = json.loads(xbmc.executeJSONRPC(json.dumps(query)))
     my_dict = {}
-    dbid_name = dbtype + 'id'
-    key_to_get = dbtype + 's'
+    dbid_name = '{0}id'.format(dbtype)
+    key_to_get = '{0}s'.format(dbtype)
     for item in response.get('result', {}).get(key_to_get, []):
         my_dict[item.get('title')] = {'imdb_id': item.get('imdbnumber'), 'dbid': item.get(dbid_name)}
     # kodi_log(my_dict, 1)
@@ -39,9 +39,9 @@ def age_difference(birthday, deathday=''):
 
 def kodi_log(value, level=0):
     if level == 1:
-        xbmc.log(_addonlogname + str(value), level=xbmc.LOGNOTICE)
+        xbmc.log('{0}{1}'.format(_addonlogname, value), level=xbmc.LOGNOTICE)
     else:
-        xbmc.log(_addonlogname + str(value), level=xbmc.LOGDEBUG)
+        xbmc.log('{0}{1}'.format(_addonlogname, value), level=xbmc.LOGDEBUG)
 
 
 def dictify(r, root=True):
