@@ -33,7 +33,7 @@ else:
     _waittime = 1.5
     _tmdb_apikey = '?api_key=a07324c669cac4d96789197134ce272b'
 # Get the language TODO: make user setting, not hardcoded
-_language = '&language=en-US'
+_language = '&language=en-US&include_image_language=en,null'
 # Set http paths
 OMDB_API = 'http://www.omdbapi.com/'
 OMDB_ARG = '&tomatoes=True&plot=Full'
@@ -100,6 +100,26 @@ CATEGORIES = {'cast':
                'next_type': '',
                'next_info': 'textviewer',
                'index': 6
+               },
+              'posters':
+              {'types': ['movie', 'tv'],
+               'name': 'Posters',
+               'path': '{self.request_tmdb_type}/{self.request_tmdb_id}/images',
+               'key': 'posters',
+               'list_type': 'image',
+               'next_type': 'image',
+               'next_info': 'imageviewer',
+               'index': 7,
+               },
+              'fanart':
+              {'types': ['movie', 'tv'],
+               'name': 'Fanart',
+               'path': '{self.request_tmdb_type}/{self.request_tmdb_id}/images',
+               'key': 'backdrops',
+               'list_type': 'image',
+               'next_type': 'image',
+               'next_info': 'imageviewer',
+               'index': 8,
                },
               'stars_in_movies':
               {'types': ['person'],

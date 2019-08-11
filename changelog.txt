@@ -1,3 +1,7 @@
+**0.1.7**
+- More cleanup
+- Add ?info=posters and ?info=fanart
+
 **0.1.6**
 - Don't add duplicate crew members
 - Change poster icon
