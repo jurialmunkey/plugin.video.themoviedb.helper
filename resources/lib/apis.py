@@ -22,8 +22,10 @@ def my_rate_limiter(func):
     Simple rate limiter
     """
     def decorated(*args, **kwargs):
-        nart_time_id = '{0}nart_time_id'.format(_addonname)
-        nart_lock_id = '{0}nart_lock_id'.format(_addonname)
+        request = args[0]
+        request_type = 'OMDb' if OMDB_API in request else 'TMDb'
+        nart_time_id = '{0}{1}.nart_time_id'.format(_addonname, request_type)
+        nart_lock_id = '{0}{1}.nart_lock_id'.format(_addonname, request_type)
         # Get our saved time value
         nart_time = xbmcgui.Window(10000).getProperty(nart_time_id)
         # If no value set to -1 to skip rate limiter
@@ -78,7 +80,8 @@ def use_mycache(cache_days=_cache_details_days, suffix='', allow_api=True):
             elif allow_api:
                 kodi_log('API REQUEST:\n{0}'.format(cache_name))
                 my_objects = func(*args, **kwargs)
-                _cache.set(cache_name, my_objects, expiration=datetime.timedelta(days=cache_days))
+                if my_objects:
+                    _cache.set(cache_name, my_objects, expiration=datetime.timedelta(days=cache_days))
                 return my_objects
         return decorated
     return decorator
@@ -96,9 +99,11 @@ def make_request(request, is_json):
             exit()
         else:
             kodi_log('HTTP Error Code: {0}'.format(request.status_code), 1)
-    if is_json:
-        request = request.json()  # Make the request nice
-    return request
+        return {}
+    else:
+        if is_json:
+            request = request.json()  # Make the request nice
+        return request
 
 
 @use_mycache(_cache_list_days, 'tmdb_api')

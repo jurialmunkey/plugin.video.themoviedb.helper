@@ -1,5 +1,5 @@
-from globals import _addonpath, IMAGEPATH, _handle
-from utils import get_url
+from globals import _addonpath, IMAGEPATH, _handle, _mpaaprefix
+from utils import get_url, kodi_log
 import utils
 import xbmcgui
 import xbmcplugin
@@ -145,7 +145,7 @@ class ListItem:
 
     def get_omdb_info(self, request_item):
         if request_item.get('rated'):
-            self.infolabels['MPAA'] = 'Rated {0}'.format(request_item.get('rated'))
+            self.infolabels['MPAA'] = '{0}{1}'.format(_mpaaprefix, request_item.get('rated'))
         if request_item.get('awards'):
             self.infoproperties['awards'] = request_item.get('awards')
         if request_item.get('metascore'):
@@ -228,8 +228,8 @@ class ListItem:
 
     def create_listitem(self, **kwargs):
         self.listitem = xbmcgui.ListItem(label=self.name, label2=self.label2)
+        self.listitem.setLabel2(self.label2)
         self.listitem.setUniqueIDs({'imdb': self.imdb_id, 'tmdb': self.tmdb_id})
-
         self.listitem.setInfo(self.library, self.infolabels)
         self.listitem.setProperties(self.infoproperties)
         self.listitem.setArt(self.infoart)

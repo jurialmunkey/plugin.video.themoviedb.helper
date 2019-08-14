@@ -27,13 +27,16 @@ if not _cache_list_days or _cache_list_days < 1:
     _cache_list_days = 1
 
 if _tmdb_apikey:
-    _waittime = 0
+    _waittime = 0.5
     _tmdb_apikey = '?api_key={0}'.format(_tmdb_apikey)
 else:
-    _waittime = 1.5
+    _waittime = 2
     _tmdb_apikey = '?api_key=a07324c669cac4d96789197134ce272b'
 # Get the language TODO: make user setting, not hardcoded
 _language = '&language=en-US&include_image_language=en,null'
+# Get the MPAA prefix and add a space if we have a setting
+_mpaaprefix = xbmcplugin.getSetting(_handle, 'mpaa_prefix')
+_mpaaprefix = '{0} '.format(_mpaaprefix) if _mpaaprefix else ''
 # Set http paths
 OMDB_API = 'http://www.omdbapi.com/'
 OMDB_ARG = '&tomatoes=True&plot=Full'

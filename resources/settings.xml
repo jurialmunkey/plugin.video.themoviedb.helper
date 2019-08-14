@@ -5,5 +5,6 @@
         <setting label="OMDb API Key" type="text" id="omdb_apikey" />
         <setting label="Days to cache details" type="enum" id="cache_details_days" values="14|21|30|60" />
         <setting label="Days to cache lists" type="enum" id="cache_list_days" values="1|2|3|4|5|6|7|14|21|30"/>
+        <setting label="MPAA Rating Prefix" type="text" id="mpaa_prefix" default="Rated"/>
     </category>
 </settings>

@@ -1,3 +1,8 @@
+**0.1.8**
+- Fix for error when api not available
+- Add rating prefix option
+- Rate limiting on a per api basis
+
 **0.1.7**
 - More cleanup
 - Add ?info=posters and ?info=fanart
