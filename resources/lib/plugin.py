@@ -17,10 +17,8 @@ class Plugin:
 
     def translate_genres(self):
         if self.params.get('with_genres'):
-            if ' / ' in self.params.get('with_genres'):
-                self.params['with_genres'] = self.params.get('with_genres').split(' / ')
+            self.params['with_genres'] = utils.split_items(self.params.get('with_genres'))
             temp_list = ''
-            self.params['with_genres'] = [self.params.get('with_genres')] if isinstance(self.params.get('with_genres'), str) else self.params.get('with_genres')
             for genre in self.params.get('with_genres'):
                 genre = str(GENRE_IDS.get(genre))
                 if genre:
@@ -30,16 +28,13 @@ class Plugin:
 
     def translate_studios(self):
         if self.params.get('with_companies'):
-            if ' / ' in self.params.get('with_companies'):
-                self.params['with_companies'] = self.params.get('with_companies').split(' / ')
-            temp_list = ''
-            self.params['with_companies'] = [self.params.get('with_companies')] if isinstance(self.params.get('with_companies'), str) else self.params.get('with_companies')
+            self.params['with_companies'] = utils.split_items(self.params.get('with_companies'))
             for studio in self.params.get('with_companies'):
                 query = apis.tmdb_api_request_longcache('search/company', query=studio)
                 if query and query.get('results')[0]:
-                    studio = str(query.get('results')[0].get('id'))
-                    if studio:
-                        temp_list = studio
+                    studio_id = query.get('results')[0].get('id')
+                    if studio_id:
+                        temp_list = str(studio_id)
                         break  # Stop once we have a studio
             if temp_list:
                 self.params['with_companies'] = temp_list

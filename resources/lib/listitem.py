@@ -65,7 +65,7 @@ class ListItem:
 
     def get_info(self, request_item):
         self.infolabels['title'] = self.name
-        self.imdb_id = request_item.get('imdb_id')
+        self.imdb_id = request_item.get('imdb_id', '')
         if self.dbid:
             self.infolabels['dbid'] = self.dbid
         if request_item.get('overview'):

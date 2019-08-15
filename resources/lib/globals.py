@@ -27,7 +27,7 @@ if not _cache_list_days or _cache_list_days < 1:
     _cache_list_days = 1
 
 if _tmdb_apikey:
-    _waittime = 0.5
+    _waittime = 1
     _tmdb_apikey = '?api_key={0}'.format(_tmdb_apikey)
 else:
     _waittime = 2

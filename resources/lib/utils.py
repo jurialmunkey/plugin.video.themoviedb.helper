@@ -83,6 +83,14 @@ def dict_to_list(items, key):
     return mylist
 
 
+def split_items(items, separator='/'):
+    separator = ' {0} '.format(separator)
+    if separator in items:
+        items = items.split(separator)
+    items = [items] if isinstance(items, str) else items
+    return items
+
+
 def iter_props(items, property, itemprops, **kwargs):
     x = 0
     for i in items:
