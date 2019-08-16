@@ -1,17 +1,6 @@
 # TheMovieDB Helper [![License](https://img.shields.io/badge/License-GPLv3-blue)](https://github.com/jurialmunkey/plugin.video.themoviedb.helper/blob/master/LICENSE.txt)
 
 
-**REQUIRES TMDB API KEY TO WORK**
-This Kodi video plugin provides access to TheMovieDb for skinners.
-It also provides a handy TheMovieDb navigation tool.
-Make sure to add your TheMovieDb API key to the addon's settings.
-
-
-## TODO:
-- Currently in Alpha. Many things to add.
-- Complex searches
-
-
 ## Get Details of an Item
 These provide detailed info about an item. Some of the properties require OMDb apikey
 
