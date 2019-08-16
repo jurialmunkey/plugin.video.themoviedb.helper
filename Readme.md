@@ -68,6 +68,26 @@ Movies From Genre:
 `plugin://plugin.video.themoviedb.helper?info=discover&amp;type=movie&amp;with_genres=$INFO[ListItem.Genre]`
 
 
+**Additional Params for Discover**
+
+By default discover will lookup the TMDb IDs for the values in with_genres/with_countries etc.
+If you already have the TMDb IDs, you can pass those instead and skip the lookup:  
+&amp;with_id=True
+
+By default discover will provide items matching any values in with_genres/with_countries etc. 
+If you only want items that match ALL values, change the with_separator:  
+&amp;with_separator=AND
+
+Sometimes you will have multiple values separated by '/' but only want the first one. 
+e.g. You only want the first studio from ListItem.Studio  
+&amp;with_separator=NONE
+
+To pass multiple values from different places, separate them with ' / '  
+e.g. Getting movies starring first three cast members in info dialog:  
+`plugin://plugin.video.themoviedb.helper?info=discover&amp;type=movie&amp;with_cast=$INFO[Container(50).ListItemAbsolute(0).Label]$INFO[Container(50).ListItemAbsolute(1).Label, / ,]$INFO[Container(50).ListItemAbsolute(2).Label, / ,]`
+
+
+
 ## Other Possible plugin paths
 Provide the TMDb ID to the plugin for best results  
 Can search by IMDb ID or Title + Year if you don't have TMDb  

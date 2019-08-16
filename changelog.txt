@@ -1,3 +1,11 @@
+**0.1.9**
+- ?info=discover improvements
+- &amp;with_id=True when passing TMDb IDs to discover
+- &amp;with_separator=AND to only include items matching all values passed to discover
+- &amp;with_separator=NONE to only include first value passed to discover
+- &amp;with_separator=OR to include any items matching values passed to discover
+- Can now also pass without_genres, with_cast, with_crew, with_people
+
 **0.1.8**
 - Fix for error when api not available
 - Add rating prefix option

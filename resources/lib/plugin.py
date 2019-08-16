@@ -15,29 +15,43 @@ class Plugin:
         self.params = dict(parse_qsl(self.paramstring))
         self.router()
 
-    def translate_genres(self):
+    def translate_discover(self):
+        """
+        Translate with_ params into IDs for discover method
+        Get with_separator=AND|OR|NONE and concatinate IDs accordingly for url request
+        TODO: add with_id=True param to skip search and just concatinate
+        """
+        # Translate our separator into a url encoding
+        if self.params.get('with_separator'):
+            if self.params.get('with_separator') == 'AND':
+                separator = '%2C'
+            elif self.params.get('with_separator') == 'OR':
+                separator = '%7C'
+            else:
+                separator = False
+        else:
+            separator = '%2C'
+        # Check if with_id param specified and set request type accordingly
+        if self.params.get('with_id') and self.params.get('with_id') != 'False':
+            request_genres = False
+            request_companies = False
+            request_person = False
+        else:
+            request_genres = GENRE_IDS
+            request_companies = 'search/companies'
+            request_person = 'search/person'
         if self.params.get('with_genres'):
-            self.params['with_genres'] = utils.split_items(self.params.get('with_genres'))
-            temp_list = ''
-            for genre in self.params.get('with_genres'):
-                genre = str(GENRE_IDS.get(genre))
-                if genre:
-                    temp_list = '{0}%2C{1}'.format(temp_list, genre) if temp_list else genre
-            if temp_list:
-                self.params['with_genres'] = temp_list
-
-    def translate_studios(self):
+            self.params['with_genres'] = utils.translate_lookup_ids(self.params.get('with_genres'), request_genres, True, separator)
+        if self.params.get('without_genres'):
+            self.params['without_genres'] = utils.translate_lookup_ids(self.params.get('without_genres'), request_genres, True, separator)
         if self.params.get('with_companies'):
-            self.params['with_companies'] = utils.split_items(self.params.get('with_companies'))
-            for studio in self.params.get('with_companies'):
-                query = apis.tmdb_api_request_longcache('search/company', query=studio)
-                if query and query.get('results')[0]:
-                    studio_id = query.get('results')[0].get('id')
-                    if studio_id:
-                        temp_list = str(studio_id)
-                        break  # Stop once we have a studio
-            if temp_list:
-                self.params['with_companies'] = temp_list
+            self.params['with_companies'] = utils.translate_lookup_ids(self.params.get('with_companies'), request_companies, False, False)
+        if self.params.get('with_people'):
+            self.params['with_people'] = utils.translate_lookup_ids(self.params.get('with_people'), request_person, False, separator)
+        if self.params.get('with_crew'):
+            self.params['with_crew'] = utils.translate_lookup_ids(self.params.get('with_crew'), request_person, False, separator)
+        if self.params.get('with_cast'):
+            self.params['with_cast'] = utils.translate_lookup_ids(self.params.get('with_cast'), request_person, False, separator)
 
     def list_categories(self):
         """
@@ -164,8 +178,7 @@ class Plugin:
             elif self.params.get('info') == 'imageviewer':
                 xbmc.executebuiltin('ShowPicture({0})'.format(self.params.get('image')))
             elif self.params.get('info') == 'discover':
-                self.translate_genres()
-                self.translate_studios()
+                self.translate_discover()
                 self.list_items()
             elif self.params.get('info') == 'collection':
                 self.check_tmdb_id('collection')
