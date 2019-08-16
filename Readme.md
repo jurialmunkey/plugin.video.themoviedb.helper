@@ -4,23 +4,6 @@
 ## Get Details of an Item
 These provide detailed info about an item. Some of the properties require OMDb apikey
 
-ListItem.Labels:  
-Title, Plot, Genre, Studio, MPAA, Country, Year, Premiered, Rating, Duration
-
-ListItem.Property(property):  
-tmdb_id
-Genre.X.Name, Genre.X.ID, Studio.X.Name, Studio.X.ID, Country.X.Name, Country.X.ID
-birthday, deathday, aliases, role, born
-budget, revenue
-awards
-metacritic_rating, 
-imdb_rating, imdb_votes
-rottentomatoes_rating, rottentomatoes_image, rottentomatoes_consensus
-rottentomatoes_reviewtotal, rottentomatoes_reviewsfresh, rottentomatoes_reviewsrotten
-rottentomatoes_usermeter, rottentomatoes_userreviews
-
-
-
 #### Find details using TMDb ID
 `plugin://plugin.video.themoviedb.helper/?info=details&amp;type=movie&amp;tmdb_id=348`
 
@@ -42,11 +25,27 @@ Types: movie, tv, person
 Accepts: query=, year=
 
 
+#### Infolabels and properties returned
+ListItem.Labels:  
+Title, Plot, Genre, Studio, MPAA, Country, Year, Premiered, Rating, Duration
+
+ListItem.Property(property):  
+tmdb_id
+Genre.X.Name, Genre.X.ID, Studio.X.Name, Studio.X.ID, Country.X.Name, Country.X.ID
+birthday, deathday, aliases, role, born
+budget, revenue
+awards
+metacritic_rating, 
+imdb_rating, imdb_votes
+rottentomatoes_rating, rottentomatoes_image, rottentomatoes_consensus
+rottentomatoes_reviewtotal, rottentomatoes_reviewsfresh, rottentomatoes_reviewsrotten
+rottentomatoes_usermeter, rottentomatoes_userreviews
+
+
 ## Discover
 Complex searches.  
 See https://developers.themoviedb.org/3/discover/movie-discover  
-**Examples**
-
+**Examples**  
 Movies From Year:  
 `plugin://plugin.video.themoviedb.helper?info=discover&amp;type=movie&amp;year=$INFO[ListItem.Year]`
 
@@ -57,19 +56,18 @@ Movies From Genre:
 `plugin://plugin.video.themoviedb.helper?info=discover&amp;type=movie&amp;with_genres=$INFO[ListItem.Genre]`
 
 
-**Additional Params for Discover**
-
+**Additional Params for Discover**  
 By default discover will lookup the TMDb IDs for the values in with_genres/with_countries etc.
 If you already have the TMDb IDs, you can pass those instead and skip the lookup:  
-&amp;with_id=True
+`&amp;with_id=True`
 
 By default discover will provide items matching any values in with_genres/with_countries etc. 
 If you only want items that match ALL values, change the with_separator:  
-&amp;with_separator=AND
+`&amp;with_separator=AND`
 
 Sometimes you will have multiple values separated by '/' but only want the first one. 
 e.g. You only want the first studio from ListItem.Studio  
-&amp;with_separator=NONE
+`&amp;with_separator=NONE`
 
 To pass multiple values from different places, separate them with ' / '  
 e.g. Getting movies starring first three cast members in info dialog:  
