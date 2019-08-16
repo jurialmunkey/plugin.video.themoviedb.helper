@@ -78,7 +78,7 @@ e.g. Getting movies starring first three cast members in info dialog:
 ## Other Possible plugin paths
 Provide the TMDb ID to the plugin for best results  
 Can search by IMDb ID or Title + Year if you don't have TMDb  
-Most paths require you to specify the type: movie, tv, person
+Most paths require you to specify the type: movie, tv, person  
 Type: `&amp;type=movie`  
 TMDb ID: `&amp;tmdb_id=348`  
 IMDb ID: `&amp;imdb_id=$INFO[ListItem.IMDBNumber]`  
