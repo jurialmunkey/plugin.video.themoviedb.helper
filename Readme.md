@@ -49,10 +49,10 @@ See https://developers.themoviedb.org/3/discover/movie-discover
 Movies From Year:  
 `plugin://plugin.video.themoviedb.helper?info=discover&amp;type=movie&amp;year=$INFO[ListItem.Year]`
 
-Movies From Studio:
+Movies From Studio:  
 `plugin://plugin.video.themoviedb.helper?info=discover&amp;type=movie&amp;with_companies=$INFO[ListItem.Studio]`
 
-Movies From Genre:
+Movies From Genre:  
 `plugin://plugin.video.themoviedb.helper?info=discover&amp;type=movie&amp;with_genres=$INFO[ListItem.Genre]`
 
 
