@@ -1,3 +1,8 @@
+**0.2.0**
+- Add language settings
+- Add certifications based upon country
+- Add posters / fanarts for chosen country
+
 **0.1.9**
 - ?info=discover improvements
 - &amp;with_id=True when passing TMDb IDs to discover

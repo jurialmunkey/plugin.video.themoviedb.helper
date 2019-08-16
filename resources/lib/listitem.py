@@ -1,4 +1,4 @@
-from globals import _addonpath, IMAGEPATH, _handle, _mpaaprefix
+from globals import _addonpath, IMAGEPATH, _handle, _mpaaprefix, _country
 from utils import get_url, kodi_log
 import utils
 import xbmcgui
@@ -98,6 +98,12 @@ class ListItem:
             self.infolabels['country'] = utils.dict_to_list(request_item.get('production_countries'), 'name')
         if request_item.get('belongs_to_collection'):
             self.infolabels['set'] = request_item.get('belongs_to_collection').get('name')
+        if request_item.get('release_dates') and request_item.get('release_dates').get('results'):
+            for i in request_item.get('release_dates').get('results'):
+                if i.get('iso_3166_1') and i.get('iso_3166_1') == _country:
+                    if i.get('release_dates') and i.get('release_dates')[0].get('certification'):
+                        self.infolabels['MPAA'] = '{0}{1}'.format(_mpaaprefix, i.get('release_dates')[0].get('certification'))
+
 
     def get_properties(self, request_item):
         self.infoproperties['tmdb_id'] = self.tmdb_id
@@ -144,8 +150,8 @@ class ListItem:
             self.infoproperties['set.fanart'] = '{0}{1}'.format(IMAGEPATH, request_item.get('belongs_to_collection').get('backdrop_path'))
 
     def get_omdb_info(self, request_item):
-        if request_item.get('rated'):
-            self.infolabels['MPAA'] = '{0}{1}'.format(_mpaaprefix, request_item.get('rated'))
+        # if request_item.get('rated') and not self.infolabels.get('MPAA'):
+        #     self.infolabels['MPAA'] = '{0}{1}'.format(_mpaaprefix, request_item.get('rated'))
         if request_item.get('awards'):
             self.infoproperties['awards'] = request_item.get('awards')
         if request_item.get('metascore'):

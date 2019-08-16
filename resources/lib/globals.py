@@ -32,8 +32,7 @@ if _tmdb_apikey:
 else:
     _waittime = 2
     _tmdb_apikey = '?api_key=a07324c669cac4d96789197134ce272b'
-# Get the language TODO: make user setting, not hardcoded
-_language = '&language=en-US&include_image_language=en,null'
+
 # Get the MPAA prefix and add a space if we have a setting
 _mpaaprefix = xbmcplugin.getSetting(_handle, 'mpaa_prefix')
 _mpaaprefix = '{0} '.format(_mpaaprefix) if _mpaaprefix else ''
@@ -42,6 +41,24 @@ OMDB_API = 'http://www.omdbapi.com/'
 OMDB_ARG = '&tomatoes=True&plot=Full'
 TMDB_API = 'https://api.themoviedb.org/3'
 IMAGEPATH = 'https://image.tmdb.org/t/p/original/'
+
+# Languages and Country
+_language = '&language=en-US&include_image_language=en,null'
+_country = 'US'
+LANGUAGES = ['ar-AE', 'ar-SA', 'be-BY', 'bg-BG', 'bn-BD', 'ca-ES', 'ch-GU', 'cs-CZ',
+             'da-DK', 'de-AT', 'de-CH', 'de-DE', 'el-GR', 'en-AU', 'en-CA', 'en-GB',
+             'en-IE', 'en-NZ', 'en-US', 'eo-EO', 'es-ES', 'es-MX', 'et-EE', 'eu-ES',
+             'fa-IR', 'fi-FI', 'fr-CA', 'fr-FR', 'gl-ES', 'he-IL', 'hi-IN', 'hu-HU',
+             'id-ID', 'it-IT', 'ja-JP', 'ka-GE', 'kk-KZ', 'kn-IN', 'ko-KR', 'lt-LT',
+             'lv-LV', 'ml-IN', 'ms-MY', 'ms-SG', 'nb-NO', 'nl-NL', 'no-NO', 'pl-PL',
+             'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'si-LK', 'sk-SK', 'sl-SI', 'sr-RS',
+             'sv-SE', 'ta-IN', 'te-IN', 'th-TH', 'tl-PH', 'tr-TR', 'uk-UA', 'vi-VN',
+             'zh-CN', 'zh-HK', 'zh-TW', 'zu-ZA']
+_languagesetting = xbmcplugin.getSetting(_handle, 'language')
+if _languagesetting:
+    _country = LANGUAGES[int(_languagesetting)][-2:]
+    _language = '&language={0}&include_image_language={1},null'.format(LANGUAGES[int(_languagesetting)], LANGUAGES[int(_languagesetting)][:2])
+
 
 # Categories pass tmdb_id to path using .format(*args)
 CATEGORIES = {'cast':
@@ -314,3 +331,5 @@ GENRE_IDS = {"Action": 28,
              "War": 10752,
              "War & Politics": 10768,
              "Western": 37}
+
+APPEND_TO_RESPONSE = 'credits,images,release_dates'

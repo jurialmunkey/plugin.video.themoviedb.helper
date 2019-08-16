@@ -4,7 +4,7 @@ import utils
 import xbmc
 import xbmcgui
 from urlparse import parse_qsl
-from globals import GENRE_IDS, CATEGORIES, MAINFOLDER, EXCLUSIONS
+from globals import GENRE_IDS, CATEGORIES, MAINFOLDER, EXCLUSIONS, APPEND_TO_RESPONSE
 from container import Container
 from utils import kodi_log
 
@@ -74,7 +74,7 @@ class Plugin:
         list_container.request_tmdb_id = self.params.get('tmdb_id')
         list_container.request_tmdb_type = self.params.get('type')
         if self.params.get('type') in ['movie', 'tv']:
-            self.params['append_to_response'] = 'credits, images'
+            self.params['append_to_response'] = APPEND_TO_RESPONSE
         list_container.request_path = '{self.request_tmdb_type}/{self.request_tmdb_id}'.format(self=list_container)
         list_container.request_kwparams = utils.make_kwparams(self.params)
         list_container.list_type = list_container.request_tmdb_type

@@ -1,7 +1,7 @@
 import xbmcplugin
 import utils
 import apis
-from globals import _handle, _omdb_apikey
+from globals import _handle, _omdb_apikey, APPEND_TO_RESPONSE
 from listitem import ListItem
 
 
@@ -82,7 +82,7 @@ class Container:
                 request_path = '{0}/{1}'.format(self.request_tmdb_type, item.get('id'))
                 kwparams = {}
                 if self.request_tmdb_type in ['movie', 'tv']:
-                    kwparams['append_to_response'] = 'credits'
+                    kwparams['append_to_response'] = APPEND_TO_RESPONSE
                 listitem.detailed_info = apis.tmdb_api_only_cached(request_path, **kwparams)
                 if listitem.detailed_info:
                     item = utils.merge_two_dicts(item, listitem.detailed_info)
