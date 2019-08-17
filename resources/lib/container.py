@@ -139,7 +139,6 @@ class Container:
                     for item in listitems:
                         newlistitems.append(utils.merge_two_dicts(self.listitems, item))
                     listitems = newlistitems
-                utils.kodi_log(listitems, 1)
                 self.listitems = listitems
             if self.listitems and not isinstance(self.listitems, list):
                 self.listitems = [self.listitems]

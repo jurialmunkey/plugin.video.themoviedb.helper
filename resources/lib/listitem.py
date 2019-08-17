@@ -221,8 +221,10 @@ class ListItem:
             cast_list = cast_list + request_item.get('credits').get('cast') if request_item.get('credits').get('cast') else cast_list
             if cast_list:
                 x = 1
+                added_names = []
                 for item in sorted(cast_list, key=lambda k: k['order']):
-                    if item.get('name'):
+                    if item.get('name') and not item.get('name') in added_names:
+                        added_names.append(item.get('name'))  # Add name to temp list to prevent dupes
                         cast_member = {}
                         cast_member['name'] = item.get('name')
                         cast_member['role'] = item.get('character')
