@@ -57,11 +57,11 @@ Movies From Genre:
 
 
 **Additional Params for Discover**  
-By default discover will lookup the TMDb IDs for the values in with_genres/with_countries etc.
+By default discover will lookup the TMDb IDs for the values in with_genres/with_companies etc.
 If you already have the TMDb IDs, you can pass those instead and skip the lookup:  
 `&amp;with_id=True`
 
-By default discover will provide items matching any values in with_genres/with_countries etc. 
+By default discover will provide items matching any values in with_genres/with_companies etc. 
 If you only want items that match ALL values, change the with_separator:  
 `&amp;with_separator=AND`
 
