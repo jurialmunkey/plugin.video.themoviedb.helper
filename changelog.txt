@@ -1,3 +1,9 @@
+**0.2.1**
+- Rewrite some code
+- Add seasons and episodes
+- Add episode details
+- Add episode cast, crew, thumbs
+
 **0.2.0**
 - Add language settings
 - Add certifications based upon country

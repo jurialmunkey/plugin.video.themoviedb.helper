@@ -1,6 +1,5 @@
 import xbmc
 import json
-import apis
 from datetime import datetime
 from copy import copy
 from globals import _addonlogname, _url
@@ -92,34 +91,6 @@ def split_items(items, separator='/'):
     return items
 
 
-def translate_lookup_ids(items, request, lookup_dict=False, separator='%2C'):
-    if items:
-        items = split_items(items)
-        temp_list = ''
-        for item in items:
-            query = None
-            item_id = None
-            if request:  # If we don't have TMDb IDs then look them up
-                if lookup_dict:  # Check if we should be looking up in a stored dict
-                    if request.get(item):
-                        item_id = str(request.get(item))
-                else:  # Otherwise lookup IDs via a TMDb search request
-                    query = apis.tmdb_api_request_longcache(request, query=item)
-                    if query:
-                        if query.get('results') and query.get('results')[0]:
-                            item_id = query.get('results')[0].get('id')
-            else:  # Otherwise we assume that each item is a TMDb ID
-                item_id = item
-            if item_id:
-                if separator:  # If we've got a url separator then concatinate the list with it
-                    temp_list = '{0}{1}{2}'.format(temp_list, separator, item_id) if temp_list else item_id
-                else:  # If no separator, assume that we just want to use the first found ID
-                    temp_list = str(item_id)
-                    break  # Stop once we have a item
-        if temp_list:
-            return temp_list
-
-
 def iter_props(items, property, itemprops, **kwargs):
     x = 0
     for i in items:
@@ -165,4 +136,5 @@ def merge_two_dicts(x, y):
 
 def make_kwparams(params):
     tempparams = params.copy()
-    return del_dict_keys(tempparams, ['info', 'type', 'tmdb_id', 'filter_key', 'filter_value', 'with_separator', 'with_id'])
+    return del_dict_keys(tempparams, ['info', 'type', 'tmdb_id', 'filter_key', 'filter_value',
+                                      'with_separator', 'with_id', 'season', 'episode'])
