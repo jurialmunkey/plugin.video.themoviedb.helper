@@ -149,7 +149,7 @@ def convert_to_kodi_type(tmdb_type):
 
 
 def convert_to_library_type(tmdb_type):
-    if tmdb_type == 'tv' or tmdb_type == 'movie':
+    if tmdb_type == 'tv' or tmdb_type == 'movie' or tmdb_type == 'episode' or tmdb_type == 'season':
         return 'video'
     elif tmdb_type == 'image':
         return 'pictures'

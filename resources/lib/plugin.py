@@ -100,6 +100,9 @@ class Plugin:
         list_container.category = CATEGORIES[self.params.get('info')]
         list_container.request_tmdb_id = self.params.get('tmdb_id')
         list_container.request_tmdb_type = self.params.get('type')
+        if self.params.get('type') in ['movie', 'tv']:
+            self.params['append_to_response'] = APPEND_TO_RESPONSE
+        list_container.request_season = self.params.get('season')
         list_container.request_filter_key = self.params.get('filter_key')
         list_container.request_filter_value = self.params.get('filter_value')
         list_container.request_path = list_container.category.get('path').format(self=list_container)

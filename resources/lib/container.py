@@ -15,6 +15,7 @@ class Container:
         self.request_key = ''  # The JSON key containing our request
         self.request_filter_key = ''  # Filter: Combines with request_filter_value
         self.request_filter_value = ''  # Filter: Include only items with key matching this value
+        self.request_season = ''  # The season number to request for episodes
         self.request_kwparams = {}  # Additional kwparams to pass to request
         self.omdb_info = {}  # OMDb info dict
         self.next_type = ''  # &type= for next action in ListItem.FolderPath
@@ -78,20 +79,28 @@ class Container:
             # Create Item
             listitem = ListItem()
             # Get additional CACHED info
-            if item.get('id') and self.request_tmdb_type:
-                request_path = '{0}/{1}'.format(self.request_tmdb_type, item.get('id'))
-                kwparams = {}
-                if self.request_tmdb_type in ['movie', 'tv']:
-                    kwparams['append_to_response'] = APPEND_TO_RESPONSE
-                listitem.detailed_info = apis.tmdb_api_only_cached(request_path, **kwparams)
-                if listitem.detailed_info:
-                    item = utils.merge_two_dicts(item, listitem.detailed_info)
-                    if item.get('imdb_id') and self.request_tmdb_type in ['movie', 'tv']:
-                        listitem.omdb_info = apis.omdb_api_only_cached(i=item.get('imdb_id'))
+            if self.request_tmdb_type:
+                if item.get('show_id') or item.get('id'):
+                    if item.get('show_id'):
+                        my_id = item.get('show_id')
+                        my_request = 'tv'
+                    elif item.get('id'):
+                        my_id = item.get('id')
+                        my_request = self.request_tmdb_type
+                    request_path = '{0}/{1}'.format(my_request, my_id)
+                    kwparams = {}
+                    if my_request in ['movie', 'tv']:
+                        kwparams['append_to_response'] = APPEND_TO_RESPONSE
+                    listitem.detailed_info = apis.tmdb_api_only_cached(request_path, **kwparams)
+                    if listitem.detailed_info:
+                        item = utils.merge_two_dicts(listitem.detailed_info, item)
+                        if item.get('imdb_id') and my_request in ['movie', 'tv']:
+                            listitem.omdb_info = apis.omdb_api_only_cached(i=item.get('imdb_id'))
             # Get item info
             listitem.get_title(item)
             if listitem.name in added_items:
                 continue  # Don't create duplicate items
+            # Check if there is an existing item in DBID to get ListItem.DBID
             if self.kodi_library.get(listitem.name):
                 listitem.dbid = self.kodi_library.get(listitem.name).get('dbid')
             listitem.get_autofilled_info(item)
@@ -100,7 +109,10 @@ class Container:
                 listitem.get_omdb_info(listitem.omdb_info)
             if self.omdb_info:
                 listitem.get_omdb_info(self.omdb_info)
-            listitem.create_kwparams(self.next_type, self.next_info)
+            if self.request_key == 'seasons':
+                listitem.create_kwparams(self.next_type, self.next_info, tmdb_id=self.request_tmdb_id, season=listitem.infolabels.get('season', '0'))
+            else:
+                listitem.create_kwparams(self.next_type, self.next_info)
             listitem.create_listitem(**listitem.kwparams)
             added_items.append(listitem.name)
 
@@ -121,8 +133,16 @@ class Container:
         if self.request_path:
             self.listitems = apis.tmdb_api_request(self.request_path, **self.request_kwparams)
             if self.request_key:
-                self.listitems = self.listitems.get(self.request_key, [])
+                listitems = self.listitems.get(self.request_key, [])
+                if self.request_key == 'seasons':
+                    newlistitems = []
+                    for item in listitems:
+                        newlistitems.append(utils.merge_two_dicts(self.listitems, item))
+                    listitems = newlistitems
+                utils.kodi_log(listitems, 1)
+                self.listitems = listitems
             if self.listitems and not isinstance(self.listitems, list):
                 self.listitems = [self.listitems]
+
         else:
             raise ValueError('No API request path specified')

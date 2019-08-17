@@ -66,7 +66,7 @@ CATEGORIES = {'cast':
                'name': 'Cast',
                'path': '{self.request_tmdb_type}/{self.request_tmdb_id}/credits',
                'key': 'cast',
-               'list_type': '{self.request_tmdb_type}',
+               'list_type': 'person',
                'next_type': 'person',
                'next_info': 'details',
                'index': 1
@@ -96,7 +96,7 @@ CATEGORIES = {'cast':
                'name': 'Crew',
                'path': '{self.request_tmdb_type}/{self.request_tmdb_id}/credits',
                'key': 'crew',
-               'list_type': '{self.request_tmdb_type}',
+               'list_type': 'person',
                'next_type': 'person',
                'next_info': 'details',
                'index': 4
@@ -140,6 +140,16 @@ CATEGORIES = {'cast':
                'next_type': 'image',
                'next_info': 'imageviewer',
                'index': 8,
+               },
+              'seasons':
+              {'types': ['tv'],
+               'name': 'Seasons',
+               'path': '{self.request_tmdb_type}/{self.request_tmdb_id}',
+               'key': 'seasons',
+               'list_type': 'season',
+               'next_type': 'tv',
+               'next_info': 'episodes',
+               'index': 9,
                },
               'stars_in_movies':
               {'types': ['person'],
@@ -298,12 +308,22 @@ CATEGORIES = {'cast':
                'next_info': 'details',
                'index': 99,
                },
+              'episodes':
+              {'types': ['tv'],
+               'name': 'Episodes',
+               'path': 'tv/{self.request_tmdb_id}/season/{self.request_season}',
+               'key': 'episodes',
+               'list_type': 'episode',
+               'next_type': 'episode',
+               'next_info': 'details',
+               'index': 99,
+               },
               }
 
 MAINFOLDER = ['search', 'find', 'popular', 'top_rated', 'upcoming', 'airing_today',
               'now_playing', 'on_the_air']
 
-EXCLUSIONS = ['discover', 'collection']
+EXCLUSIONS = ['discover', 'collection', 'episodes']
 
 GENRE_IDS = {"Action": 28,
              "Adventure": 12,
@@ -332,4 +352,4 @@ GENRE_IDS = {"Action": 28,
              "War & Politics": 10768,
              "Western": 37}
 
-APPEND_TO_RESPONSE = 'credits,images,release_dates'
+APPEND_TO_RESPONSE = 'credits,images,release_dates,content_ratings'

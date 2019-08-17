@@ -16,9 +16,11 @@ class ListItem:
         self.dbid = ''  # ListItem.DBID
         self.request_tmdb_type = ''  # The TMDb DBType for the Request
         self.request_tmdb_id = ''  # The TMDb ID for the Request
-        self.plural_type = ''  # Plural form of category type
+        self.plural_type = ''  # Pluralised category type used to create category folders
         self.kwparams = {}  # kwparams to contruct ListItem.FolderPath (plugin path call)
-        self.poster = '{0}/resources/poster.png'.format(_addonpath)  # Icon, Thumb, Poster
+        self.poster = '{0}/resources/poster.png'.format(_addonpath)  # Poster
+        self.thumb = '{0}/resources/poster.png'.format(_addonpath)  # Thumb
+        self.icon = '{0}/resources/poster.png'.format(_addonpath)  # Icon
         self.fanart = '{0}/fanart.jpg'.format(_addonpath)  # Fanart
         self.cast = []  # Cast list
         self.is_folder = True
@@ -26,8 +28,8 @@ class ListItem:
         self.omdb_info = {}  # Additional info gathered if cached detailed omdb item
         self.infolabels = {}  # The item info
         self.infoproperties = {}  # The item properties
-        self.infoart = {'thumb': self.poster,
-                        'icon': self.poster,
+        self.infoart = {'thumb': self.thumb,
+                        'icon': self.icon,
                         'poster': self.poster,
                         'fanart': self.fanart}
 
@@ -53,15 +55,29 @@ class ListItem:
         self.infoart['fanart'] = self.fanart
 
     def get_poster(self, request_item):
+        # Get the poster
         if request_item.get('poster_path'):
             self.poster = '{0}{1}'.format(IMAGEPATH, request_item.get('poster_path'))
         elif request_item.get('profile_path'):
             self.poster = '{0}{1}'.format(IMAGEPATH, request_item.get('profile_path'))
         elif request_item.get('file_path'):
             self.poster = '{0}{1}'.format(IMAGEPATH, request_item.get('file_path'))
+        # Get the season poster for episodes
+        if request_item.get('season_number') and request_item.get('seasons'):
+            for item in request_item.get('seasons'):
+                if item.get('season_number') == request_item.get('season_number'):
+                    if item.get('poster_path'):
+                        self.poster = '{0}{1}'.format(IMAGEPATH, item.get('poster_path'))
+                    break
+        # Get the thumb still for episodes
+        if request_item.get('still_path'):
+            self.thumb = '{0}{1}'.format(IMAGEPATH, request_item.get('still_path'))
+        else:
+            self.thumb = self.poster
+        self.icon = self.poster
         self.infoart['poster'] = self.poster
-        self.infoart['thumb'] = self.poster
-        self.infoart['icon'] = self.poster
+        self.infoart['icon'] = self.icon
+        self.infoart['thumb'] = self.thumb
 
     def get_info(self, request_item):
         self.infolabels['title'] = self.name
@@ -79,9 +95,15 @@ class ListItem:
             self.label2 = str(request_item.get('vote_average'))
         if request_item.get('vote_count'):
             self.infolabels['votes'] = request_item.get('vote_count')
+        if request_item.get('first_air_date'):
+            self.infolabels['premiered'] = request_item.get('first_air_date')
+            self.infolabels['year'] = request_item.get('first_air_date')[:4]
         if request_item.get('release_date'):
             self.infolabels['premiered'] = request_item.get('release_date')
             self.infolabels['year'] = request_item.get('release_date')[:4]
+        if request_item.get('air_date'):
+            self.infolabels['premiered'] = request_item.get('air_date')
+            self.infolabels['year'] = request_item.get('air_date')[:4]
         if request_item.get('imdb_id'):
             self.infolabels['imdbnumber'] = request_item.get('imdb_id')
         if request_item.get('runtime'):
@@ -90,12 +112,24 @@ class ListItem:
             self.infolabels['tagline'] = request_item.get('tagline')
         if request_item.get('status'):
             self.infolabels['status'] = request_item.get('status')
+        if request_item.get('number_of_episodes'):
+            self.infolabels['episode'] = request_item.get('number_of_episodes')
+        if request_item.get('number_of_seasons'):
+            self.infolabels['season'] = request_item.get('number_of_seasons')
+        if request_item.get('episode_number'):
+            self.infolabels['episode'] = request_item.get('episode_number')
+        if request_item.get('season_number'):
+            self.infolabels['season'] = request_item.get('season_number')
         if request_item.get('genres'):
             self.infolabels['genre'] = utils.dict_to_list(request_item.get('genres'), 'name')
+        if request_item.get('networks'):
+            self.infolabels['studio'] = self.infolabels.setdefault('studio', []) + utils.dict_to_list(request_item.get('networks'), 'name')
         if request_item.get('production_companies'):
-            self.infolabels['studio'] = utils.dict_to_list(request_item.get('production_companies'), 'name')
+            self.infolabels['studio'] = self.infolabels.setdefault('studio', []) + utils.dict_to_list(request_item.get('production_companies'), 'name')
         if request_item.get('production_countries'):
-            self.infolabels['country'] = utils.dict_to_list(request_item.get('production_countries'), 'name')
+            self.infolabels['country'] = self.infolabels.setdefault('country', []) + utils.dict_to_list(request_item.get('production_countries'), 'name')
+        if request_item.get('origin_country'):
+            self.infolabels['country'] = self.infolabels.setdefault('country', []) + request_item.get('origin_country')
         if request_item.get('belongs_to_collection'):
             self.infolabels['set'] = request_item.get('belongs_to_collection').get('name')
         if request_item.get('release_dates') and request_item.get('release_dates').get('results'):
@@ -103,6 +137,10 @@ class ListItem:
                 if i.get('iso_3166_1') and i.get('iso_3166_1') == _country:
                     if i.get('release_dates') and i.get('release_dates')[0].get('certification'):
                         self.infolabels['MPAA'] = '{0}{1}'.format(_mpaaprefix, i.get('release_dates')[0].get('certification'))
+        if request_item.get('content_ratings') and request_item.get('content_ratings').get('results'):
+            for i in request_item.get('content_ratings').get('results'):
+                if i.get('iso_3166_1') and i.get('iso_3166_1') == _country and i.get('rating'):
+                    self.infolabels['MPAA'] = '{0}{1}'.format(_mpaaprefix, i.get('rating'))
 
 
     def get_properties(self, request_item):
@@ -150,8 +188,6 @@ class ListItem:
             self.infoproperties['set.fanart'] = '{0}{1}'.format(IMAGEPATH, request_item.get('belongs_to_collection').get('backdrop_path'))
 
     def get_omdb_info(self, request_item):
-        # if request_item.get('rated') and not self.infolabels.get('MPAA'):
-        #     self.infolabels['MPAA'] = '{0}{1}'.format(_mpaaprefix, request_item.get('rated'))
         if request_item.get('awards'):
             self.infoproperties['awards'] = request_item.get('awards')
         if request_item.get('metascore'):
@@ -178,10 +214,14 @@ class ListItem:
             self.infoproperties['rottentomatoes_userreviews'] = request_item.get('tomatoUserReviews')
 
     def get_cast(self, request_item):
-        if request_item.get('credits'):
-            if request_item.get('credits').get('cast'):
+        if request_item.get('credits') or request_item.get('guest_stars'):
+            # Cast Members
+            cast_list = []
+            cast_list = cast_list + request_item.get('guest_stars') if request_item.get('guest_stars') else cast_list
+            cast_list = cast_list + request_item.get('credits').get('cast') if request_item.get('credits').get('cast') else cast_list
+            if cast_list:
                 x = 1
-                for item in request_item.get('credits').get('cast'):
+                for item in sorted(cast_list, key=lambda k: k['order']):
                     if item.get('name'):
                         cast_member = {}
                         cast_member['name'] = item.get('name')
@@ -194,9 +234,12 @@ class ListItem:
                         self.infoproperties['{0}thumb'.format(p)] = cast_member.get('thumbnail')
                         self.cast.append(cast_member)
                         x = x + 1
-            if request_item.get('credits').get('crew'):
+            # Crew Members
+            crew_list = []
+            crew_list = crew_list + request_item.get('credits').get('crew') if request_item.get('credits').get('crew') else crew_list
+            if crew_list:
                 x = 1
-                for item in request_item.get('credits').get('crew'):
+                for item in crew_list:
                     if item.get('name'):
                         p = 'Crew.{0}.'.format(x)
                         self.infoproperties['{0}name'.format(p)] = item.get('name')
