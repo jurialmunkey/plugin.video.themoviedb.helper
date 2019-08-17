@@ -91,19 +91,21 @@ def use_mycache(cache_days=_cache_details_days, suffix='', allow_api=True):
 def make_request(request, is_json):
     request_type = 'OMDb' if OMDB_API in request else 'TMDb'
     kodi_log('Requesting... {0}'.format(request), 1)
-    request = requests.get(request)  # Request our data
-    if not request.status_code == requests.codes.ok:  # Error Checking
-        if request.status_code == 401:
-            kodi_log('HTTP Error Code: {0}'.format(request.status_code), 1)
+    results = requests.get(request)  # Request our data
+    if not results.status_code == requests.codes.ok:  # Error Checking
+        if results.status_code == 401:
+            kodi_log('HTTP Error Code: {0}'.format(results.status_code), 1)
             invalid_apikey(request_type)
             exit()
+        elif results.status_code == 404:
+            kodi_log('HTTP Error Code: {0}\n{1}'.format(results.status_code, request), 1)
         else:
-            kodi_log('HTTP Error Code: {0}'.format(request.status_code), 1)
+            kodi_log('HTTP Error Code: {0}'.format(results.status_code), 1)
         return {}
     else:
         if is_json:
-            request = request.json()  # Make the request nice
-        return request
+            results = results.json()  # Make the results nice
+        return results
 
 
 @use_mycache(_cache_list_days, 'tmdb_api')

@@ -205,7 +205,7 @@ class Container:
             request_person = False
         else:
             request_genres = GENRE_IDS
-            request_companies = 'search/companies'
+            request_companies = 'search/company'
             request_person = 'search/person'
         if self.params.get('with_genres'):
             self.params['with_genres'] = apis.translate_lookup_ids(self.params.get('with_genres'), request_genres, True, separator)
