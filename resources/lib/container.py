@@ -78,7 +78,7 @@ class Container:
             # Filter items by filter_key and filter_value params
             if self.params.get('filter_key') and self.params.get('filter_value'):
                 if item.get(self.params.get('filter_key')):
-                    if item.get(self.params.get('filter_key')) != self.request_filter_value:
+                    if item.get(self.params.get('filter_key')) != self.params.get('filter_value'):
                         continue
                 else:
                     continue
