@@ -372,4 +372,4 @@ GENRE_IDS = {"Action": 28,
              "War & Politics": 10768,
              "Western": 37}
 
-APPEND_TO_RESPONSE = 'credits,images,release_dates,content_ratings'
+APPEND_TO_RESPONSE = 'credits,images,release_dates,content_ratings,external_ids'

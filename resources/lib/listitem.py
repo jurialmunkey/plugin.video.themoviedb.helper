@@ -1,8 +1,9 @@
-from globals import _addonpath, IMAGEPATH, _handle, _mpaaprefix, _country
+from globals import _addonpath, IMAGEPATH, _handle, _mpaaprefix, _country, APPEND_TO_RESPONSE
 from utils import get_url, kodi_log
 import utils
 import xbmcgui
 import xbmcplugin
+import apis
 
 
 class ListItem:
@@ -84,6 +85,8 @@ class ListItem:
         self.imdb_id = request_item.get('imdb_id', '')
         if self.dbid:
             self.infolabels['dbid'] = self.dbid
+        if request_item.get('original_title'):
+            self.infolabels['originaltitle'] = request_item.get('original_title')
         if request_item.get('overview'):
             self.infolabels['plot'] = request_item.get('overview')
         elif request_item.get('biography'):
@@ -141,7 +144,6 @@ class ListItem:
             for i in request_item.get('content_ratings').get('results'):
                 if i.get('iso_3166_1') and i.get('iso_3166_1') == _country and i.get('rating'):
                     self.infolabels['MPAA'] = '{0}{1}'.format(_mpaaprefix, i.get('rating'))
-
 
     def get_properties(self, request_item):
         self.infoproperties['tmdb_id'] = self.tmdb_id
@@ -268,6 +270,35 @@ class ListItem:
         self.dbtype = utils.convert_to_kodi_type(tmdb_type)
         self.infolabels['mediatype'] = self.dbtype
         self.infoproperties['tmdb_type'] = tmdb_type
+
+    def get_cached_data(self, item=None, tmdb_type=None):
+        if tmdb_type and item:
+            if item.get('show_id') or item.get('id'):
+                if item.get('show_id'):
+                    my_id = item.get('show_id')
+                    my_request = 'tv'
+                elif item.get('id'):
+                    my_id = item.get('id')
+                    my_request = tmdb_type
+                request_path = '{0}/{1}'.format(my_request, my_id)
+                kwparams = {}
+                kwparams['append_to_response'] = APPEND_TO_RESPONSE
+                self.detailed_info = apis.tmdb_api_only_cached(request_path, **kwparams)
+                if self.detailed_info:
+                    item = utils.merge_two_dicts(self.detailed_info, item)
+                    if item.get('imdb_id') and my_request in ['movie', 'tv']:
+                        self.omdb_info = apis.omdb_api_only_cached(i=item.get('imdb_id'))
+
+    def get_kodi_library_dbid(self, kodi_library):
+        if kodi_library:
+            if self.imdb_id and utils.find_dict_in_list(kodi_library, 'imdb_id', self.imdb_id) != -1:
+                self.dbid = kodi_library[utils.find_dict_in_list(kodi_library, 'imdb_id', self.imdb_id)].get('dbid')
+            elif self.infolabels.get('originaltitle') and utils.find_dict_in_list(kodi_library, 'originaltitle', self.infolabels.get('originaltitle')) != -1:
+                self.dbid = kodi_library[utils.find_dict_in_list(kodi_library, 'originaltitle', self.infolabels.get('originaltitle'))].get('dbid')
+            elif self.name and utils.find_dict_in_list(kodi_library, 'title', self.name) != -1:
+                self.dbid = kodi_library[utils.find_dict_in_list(kodi_library, 'title', self.name)].get('dbid')
+        if self.dbid:
+            self.infolabels['dbid'] = self.dbid
 
     def create_kwparams(self, next_type, next_info, **kwargs):
         self.kwparams['type'] = next_type

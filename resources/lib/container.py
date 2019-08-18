@@ -29,7 +29,7 @@ class Container:
         self.next_type = ''  # &type= for next action in ListItem.FolderPath
         self.next_info = ''  # ?info= for next action in ListItem.FolderPath
         self.listitems = []  # The list of items to add
-        self.kodi_library = {}  # JSON RPC Results to check DBID
+        self.kodi_library = []  # JSON Results Movies
 
     def start_container(self):
         xbmcplugin.setPluginCategory(_handle, self.name)
@@ -69,48 +69,20 @@ class Container:
         Before creating the listitem, checks if we have a cached detailed item and adds that info too
         Otherwise just uses whatever the api had returned
         """
-        if self.request_tmdb_type == 'movie':
-            self.kodi_library = utils.jsonrpc_library("VideoLibrary.GetMovies", "movie")
-        elif self.request_tmdb_type == 'tv':
-            self.kodi_library = utils.jsonrpc_library("VideoLibrary.GetTVShows", "tvshow")
         added_items = []
+        self.kodi_library = utils.get_kodi_library(self.list_type)
         for item in self.listitems:
             # Filter items by filter_key and filter_value params
-            if self.params.get('filter_key') and self.params.get('filter_value'):
-                if item.get(self.params.get('filter_key')):
-                    if item.get(self.params.get('filter_key')) != self.params.get('filter_value'):
-                        continue
-                else:
-                    continue
-            # Create Item
+            if utils.filtered_item(item, self.params.get('filter_key'), self.params.get('filter_value')):
+                continue  # Skip items that don't match filter item[key]=value
             listitem = ListItem()
-            # Get additional CACHED info
-            if self.request_tmdb_type:
-                if item.get('show_id') or item.get('id'):
-                    if item.get('show_id'):
-                        my_id = item.get('show_id')
-                        my_request = 'tv'
-                    elif item.get('id'):
-                        my_id = item.get('id')
-                        my_request = self.request_tmdb_type
-                    request_path = '{0}/{1}'.format(my_request, my_id)
-                    kwparams = {}
-                    if my_request in ['movie', 'tv']:
-                        kwparams['append_to_response'] = APPEND_TO_RESPONSE
-                    listitem.detailed_info = apis.tmdb_api_only_cached(request_path, **kwparams)
-                    if listitem.detailed_info:
-                        item = utils.merge_two_dicts(listitem.detailed_info, item)
-                        if item.get('imdb_id') and my_request in ['movie', 'tv']:
-                            listitem.omdb_info = apis.omdb_api_only_cached(i=item.get('imdb_id'))
-            # Get item info
+            listitem.get_cached_data(item, self.request_tmdb_type)
             listitem.get_title(item)
             if listitem.name in added_items:
-                continue  # Don't create duplicate items
-            # Check if there is an existing item in DBID to get ListItem.DBID
-            if self.kodi_library.get(listitem.name):
-                listitem.dbid = self.kodi_library.get(listitem.name).get('dbid')
+                continue  # Skip duplicate items
             listitem.get_autofilled_info(item)
             listitem.get_dbtypes(self.list_type)
+            listitem.get_kodi_library_dbid(self.kodi_library)
             if listitem.omdb_info:
                 listitem.get_omdb_info(listitem.omdb_info)
             if self.omdb_info:
@@ -230,8 +202,7 @@ class Container:
         exclusions.extend(EXCLUSIONS)
         self.request_tmdb_id = self.params.get('tmdb_id')
         self.request_tmdb_type = self.params.get('type')
-        if self.params.get('type') in ['movie', 'tv', 'episode']:
-            self.params['append_to_response'] = APPEND_TO_RESPONSE
+        self.params['append_to_response'] = APPEND_TO_RESPONSE
         if self.params.get('type') in ['episode']:
             self.url_kwargs['season'] = self.params.get('season', '0')
             self.url_kwargs['episode'] = self.params.get('episode')
@@ -261,8 +232,7 @@ class Container:
         self.category = CATEGORIES[self.params.get('info')]
         self.request_tmdb_id = self.params.get('tmdb_id')
         self.request_tmdb_type = self.params.get('type')
-        if self.params.get('type') in ['movie', 'tv']:
-            self.params['append_to_response'] = APPEND_TO_RESPONSE
+        self.params['append_to_response'] = APPEND_TO_RESPONSE
         self.request_season = self.params.get('season')
         self.request_episode = self.params.get('episode')
         self.request_path = self.category.get('path').format(self=self)

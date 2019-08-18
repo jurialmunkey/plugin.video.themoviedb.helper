@@ -8,21 +8,43 @@ from urllib import urlencode
 
 def jsonrpc_library(method="VideoLibrary.GetMovies", dbtype="movie"):
     query = {"jsonrpc": "2.0",
-             "params": {"properties": ["title", "imdbnumber"]},
+             "params": {"properties": ["title", "imdbnumber", "originaltitle"]},
              "method": method,
              "id": 1}
     response = json.loads(xbmc.executeJSONRPC(json.dumps(query)))
-    my_dict = {}
+    my_list = []
     dbid_name = '{0}id'.format(dbtype)
     key_to_get = '{0}s'.format(dbtype)
     for item in response.get('result', {}).get(key_to_get, []):
-        my_dict[item.get('title')] = {'imdb_id': item.get('imdbnumber'), 'dbid': item.get(dbid_name)}
-    # kodi_log(my_dict, 1)
-    return my_dict
+        my_list.append({'imdb_id': item.get('imdbnumber'),
+                        'dbid': item.get(dbid_name),
+                        'title': item.get('title'),
+                        'originaltitle': item.get('originaltitle')})
+    return my_list
+
+
+def get_kodi_library(list_type):
+        if list_type == 'movie':
+            return jsonrpc_library("VideoLibrary.GetMovies", "movie")
+        elif list_type == 'tv':
+            return jsonrpc_library("VideoLibrary.GetTVShows", "tvshow")
 
 
 def get_url(**kwargs):
     return '{0}?{1}'.format(_url, urlencode(kwargs))
+
+
+def filtered_item(item, key, value):
+    if key and value:
+        if item.get(key):
+            if item.get(key) != value:
+                return True
+            else:
+                return False
+        else:
+            return True
+    else:
+        return False
 
 
 def age_difference(birthday, deathday=''):
@@ -83,6 +105,13 @@ def dict_to_list(items, key):
     return mylist
 
 
+def find_dict_in_list(list_of_dicts, key, value):
+    for list_index, dic in enumerate(list_of_dicts):
+        if dic.get(key) == value:
+            return list_index
+    return -1
+
+
 def split_items(items, separator='/'):
     separator = ' {0} '.format(separator)
     if separator in items:
@@ -125,7 +154,7 @@ def convert_to_library_type(tmdb_type):
     elif tmdb_type == 'image':
         return 'pictures'
     else:
-        return ''
+        return 'video'
 
 
 def merge_two_dicts(x, y):

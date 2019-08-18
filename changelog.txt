@@ -1,3 +1,7 @@
+**0.2.2**
+- Updates to DBID matching
+- Fix search/company
+
 **0.2.1**
 - Rewrite some code
 - Add seasons and episodes
