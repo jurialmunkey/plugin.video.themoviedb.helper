@@ -7,7 +7,7 @@ import datetime
 import simplecache
 import time
 import xml.etree.ElementTree as ET
-from globals import TMDB_API, _tmdb_apikey, _language, OMDB_API, _omdb_apikey, OMDB_ARG, _addonname, _waittime, _cache_list_days, _cache_details_days
+from globals import TMDB_API, _tmdb_apikey, _language, OMDB_API, _omdb_apikey, OMDB_ARG, _addonname, _waittime, _cache_list_days, _cache_details_days, APPEND_TO_RESPONSE
 _cache = simplecache.SimpleCache()
 
 
@@ -166,6 +166,26 @@ def omdb_api_only_cached(*args, **kwargs):
     Check if look-up available in cache a return that. Otherwise return nothing
     """
     return None
+
+
+def get_cached_data(item=None, tmdb_type=None):
+    if tmdb_type and item:
+        if item.get('show_id') or item.get('id'):
+            if item.get('show_id'):
+                my_id = item.get('show_id')
+                my_request = 'tv'
+            elif item.get('id'):
+                my_id = item.get('id')
+                my_request = tmdb_type
+            request_path = '{0}/{1}'.format(my_request, my_id)
+            kwparams = {}
+            kwparams['append_to_response'] = APPEND_TO_RESPONSE
+            detailed_item = tmdb_api_only_cached(request_path, **kwparams)
+            if detailed_item:
+                detailed_item = utils.merge_two_dicts(detailed_item, item)
+                return detailed_item
+            else:
+                return item
 
 
 def translate_lookup_ids(items, request, lookup_dict=False, separator='%2C'):

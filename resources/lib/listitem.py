@@ -25,8 +25,6 @@ class ListItem:
         self.fanart = '{0}/fanart.jpg'.format(_addonpath)  # Fanart
         self.cast = []  # Cast list
         self.is_folder = True
-        self.detailed_info = {}  # Additional info gathered if cached detailed tmdb item
-        self.omdb_info = {}  # Additional info gathered if cached detailed omdb item
         self.infolabels = {}  # The item info
         self.infoproperties = {}  # The item properties
         self.infoart = {'thumb': self.thumb,
@@ -273,24 +271,6 @@ class ListItem:
         self.dbtype = utils.convert_to_kodi_type(tmdb_type)
         self.infolabels['mediatype'] = self.dbtype
         self.infoproperties['tmdb_type'] = tmdb_type
-
-    def get_cached_data(self, item=None, tmdb_type=None):
-        if tmdb_type and item:
-            if item.get('show_id') or item.get('id'):
-                if item.get('show_id'):
-                    my_id = item.get('show_id')
-                    my_request = 'tv'
-                elif item.get('id'):
-                    my_id = item.get('id')
-                    my_request = tmdb_type
-                request_path = '{0}/{1}'.format(my_request, my_id)
-                kwparams = {}
-                kwparams['append_to_response'] = APPEND_TO_RESPONSE
-                self.detailed_info = apis.tmdb_api_only_cached(request_path, **kwparams)
-                if self.detailed_info:
-                    item = utils.merge_two_dicts(self.detailed_info, item)
-                    if item.get('imdb_id') and my_request in ['movie', 'tv']:
-                        self.omdb_info = apis.omdb_api_only_cached(i=item.get('imdb_id'))
 
     def get_kodi_library_dbid(self, kodi_library):
         if kodi_library:

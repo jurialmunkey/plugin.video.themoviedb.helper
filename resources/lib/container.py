@@ -74,15 +74,15 @@ class Container:
             if utils.filtered_item(item, self.params.get('filter_key'), self.params.get('filter_value')):
                 continue  # Skip items that don't match filter item[key]=value
             listitem = ListItem()
-            listitem.get_cached_data(item, self.request_tmdb_type)
+            item = apis.get_cached_data(item, self.request_tmdb_type)
             listitem.get_title(item)
             if listitem.name in added_items:
                 continue  # Skip duplicate items
             listitem.get_autofilled_info(item)
             listitem.get_dbtypes(self.list_type)
             listitem.get_kodi_library_dbid(self.kodi_library)
-            if listitem.omdb_info:
-                listitem.get_omdb_info(listitem.omdb_info)
+            if item.get('imdb_id'):
+                self.omdb_info = apis.omdb_api_only_cached(i=item.get('imdb_id'))
             if self.omdb_info:
                 listitem.get_omdb_info(self.omdb_info)
             if self.next_type == 'person':
