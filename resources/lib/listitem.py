@@ -219,8 +219,10 @@ class ListItem:
         if request_item.get('credits') or request_item.get('guest_stars'):
             # Cast Members
             cast_list = []
-            cast_list = cast_list + request_item.get('guest_stars') if request_item.get('guest_stars') else cast_list
-            cast_list = cast_list + request_item.get('credits').get('cast') if request_item.get('credits').get('cast') else cast_list
+            if request_item.get('guest_stars'):
+                cast_list = cast_list + request_item.get('guest_stars')
+            if request_item.get('credits') and request_item.get('credits').get('cast'):
+                cast_list = cast_list + request_item.get('credits').get('cast')
             if cast_list:
                 x = 1
                 added_names = []
@@ -240,7 +242,8 @@ class ListItem:
                         x = x + 1
             # Crew Members
             crew_list = []
-            crew_list = crew_list + request_item.get('credits').get('crew') if request_item.get('credits').get('crew') else crew_list
+            if request_item.get('credits') and request_item.get('credits').get('crew'):
+                crew_list = crew_list + request_item.get('credits').get('crew')
             if crew_list:
                 x = 1
                 for item in crew_list:

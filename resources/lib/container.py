@@ -54,8 +54,6 @@ class Container:
                             listitem.request_tmdb_type = category_type
                             listitem.plural_type = utils.convert_to_plural_type(category_type)
                             listitem.name = category.get('name').format(self=listitem)
-                            # if category.get('list_type'):
-                            #     category_type = category.get('list_type').format(self=listitem)
                             if self.listitems:
                                 listitem.get_autofilled_info(self.listitems[0])
                                 listitem.get_dbtypes(category_type)
