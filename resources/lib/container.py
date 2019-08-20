@@ -70,37 +70,38 @@ class Container:
         added_items = []
         self.kodi_library = utils.get_kodi_library(self.list_type)
         for item in self.listitems:
-            # Filter items by filter_key and filter_value params
-            if utils.filtered_item(item, self.params.get('filter_key'), self.params.get('filter_value')):
-                continue  # Skip items that don't match filter item[key]=value
-            listitem = ListItem()
-            item = apis.get_cached_data(item, self.request_tmdb_type)
-            listitem.get_title(item)
-            if listitem.name in added_items:
-                continue  # Skip duplicate items
-            listitem.get_autofilled_info(item)
-            listitem.get_dbtypes(self.list_type)
-            listitem.get_kodi_library_dbid(self.kodi_library)
-            if item.get('imdb_id'):
-                self.omdb_info = apis.omdb_api_only_cached(i=item.get('imdb_id'))
-            if self.omdb_info:
-                listitem.get_omdb_info(self.omdb_info)
-            if self.next_type == 'person':
-                listitem.create_kwparams(self.next_type, self.next_info)
-            else:
-                if self.request_key == 'episodes' or (self.params.get('season') and self.params.get('episode')):
-                    listitem.create_kwparams(self.next_type, self.next_info,
-                                             tmdb_id=self.request_tmdb_id,
-                                             season=self.params.get('season', '0'),
-                                             episode=listitem.infolabels.get('episode'))
-                elif self.request_key == 'seasons' or self.params.get('season'):
-                    listitem.create_kwparams(self.next_type, self.next_info,
-                                             tmdb_id=self.request_tmdb_id,
-                                             season=listitem.infolabels.get('season', '0'))
-                else:
+            if item:
+                # Filter items by filter_key and filter_value params
+                if utils.filtered_item(item, self.params.get('filter_key'), self.params.get('filter_value')):
+                    continue  # Skip items that don't match filter item[key]=value
+                listitem = ListItem()
+                item = apis.get_cached_data(item, self.request_tmdb_type)
+                listitem.get_title(item)
+                if listitem.name in added_items:
+                    continue  # Skip duplicate items
+                listitem.get_autofilled_info(item)
+                listitem.get_dbtypes(self.list_type)
+                listitem.get_kodi_library_dbid(self.kodi_library)
+                if item.get('imdb_id'):
+                    self.omdb_info = apis.omdb_api_only_cached(i=item.get('imdb_id'))
+                if self.omdb_info:
+                    listitem.get_omdb_info(self.omdb_info)
+                if self.next_type == 'person':
                     listitem.create_kwparams(self.next_type, self.next_info)
-            listitem.create_listitem(**listitem.kwparams)
-            added_items.append(listitem.name)
+                else:
+                    if self.request_key == 'episodes' or (self.params.get('season') and self.params.get('episode')):
+                        listitem.create_kwparams(self.next_type, self.next_info,
+                                                 tmdb_id=self.request_tmdb_id,
+                                                 season=self.params.get('season', '0'),
+                                                 episode=listitem.infolabels.get('episode'))
+                    elif self.request_key == 'seasons' or self.params.get('season'):
+                        listitem.create_kwparams(self.next_type, self.next_info,
+                                                 tmdb_id=self.request_tmdb_id,
+                                                 season=listitem.infolabels.get('season', '0'))
+                    else:
+                        listitem.create_kwparams(self.next_type, self.next_info)
+                listitem.create_listitem(**listitem.kwparams)
+                added_items.append(listitem.name)
 
     def request_omdb_info(self):
         if self.request_tmdb_type in ['movie', 'tv']:
