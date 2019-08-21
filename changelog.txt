@@ -1,3 +1,6 @@
+**0.2.3**
+- Add splitting for tmdb_id lookups using &query=
+
 **0.2.2**
 - Updates to DBID matching
 - Fix search/company

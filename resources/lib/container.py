@@ -140,6 +140,7 @@ class Container:
         elif self.params.get('imdb_id'):
             self.list_find()
         elif self.params.get('query'):
+            self.params['query'] = utils.split_items(self.params.get('query'))[0]
             utils.kodi_log('Searching... [No TMDb ID specified]', 0)
             request_path = 'search/{0}'.format(request_type)
             request_kwparams = utils.make_kwparams(self.params)
