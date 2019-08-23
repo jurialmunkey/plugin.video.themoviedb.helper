@@ -1,6 +1,5 @@
 import requests
 import utils
-from utils import kodi_log
 import xbmc
 import xbmcgui
 import datetime
@@ -66,19 +65,19 @@ def use_mycache(cache_days=_cache_details_days, suffix='', allow_api=True):
         def decorated(*args, **kwargs):
             cache_name = _addonname
             if suffix:
-                cache_name = '{0}/{1}'.format(cache_name, suffix)
+                cache_name = u'{0}/{1}'.format(cache_name, suffix)
             for arg in args:
                 if arg:
-                    cache_name = '{0}/{1}'.format(cache_name, arg)
+                    cache_name = u'{0}/{1}'.format(cache_name, arg)
             for key, value in kwargs.items():
                 if value:
-                    cache_name = '{0}&{1}={2}'.format(cache_name, key, value)
+                    cache_name = u'{0}&{1}={2}'.format(cache_name, key, value)
             my_cache = _cache.get(cache_name)
             if my_cache:
-                kodi_log('CACHE REQUEST:\n{0}'.format(cache_name))
+                utils.kodi_log('CACHE REQUEST:\n{0}'.format(cache_name))
                 return my_cache
             elif allow_api:
-                kodi_log('API REQUEST:\n{0}'.format(cache_name))
+                utils.kodi_log('API REQUEST:\n{0}'.format(cache_name))
                 my_objects = func(*args, **kwargs)
                 if my_objects:
                     _cache.set(cache_name, my_objects, expiration=datetime.timedelta(days=cache_days))
@@ -90,15 +89,15 @@ def use_mycache(cache_days=_cache_details_days, suffix='', allow_api=True):
 @my_rate_limiter
 def make_request(request, is_json):
     request_type = 'OMDb' if OMDB_API in request else 'TMDb'
-    kodi_log('Requesting... {0}'.format(request), 1)
+    utils.kodi_log('Requesting... {0}'.format(request), 1)
     request = requests.get(request)  # Request our data
     if not request.status_code == requests.codes.ok:  # Error Checking
         if request.status_code == 401:
-            kodi_log('HTTP Error Code: {0}'.format(request.status_code), 1)
+            utils.kodi_log('HTTP Error Code: {0}'.format(request.status_code), 1)
             invalid_apikey(request_type)
             exit()
         else:
-            kodi_log('HTTP Error Code: {0}'.format(request.status_code), 1)
+            utils.kodi_log('HTTP Error Code: {0}'.format(request.status_code), 1)
         return {}
     else:
         if is_json:

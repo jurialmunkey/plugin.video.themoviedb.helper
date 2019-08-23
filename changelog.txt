@@ -1,3 +1,6 @@
+**0.2.4**
+- Fix simplecache key name enconding as unicode not bytestring
+
 **0.2.3**
 - Add splitting for tmdb_id lookups using &query=
 
