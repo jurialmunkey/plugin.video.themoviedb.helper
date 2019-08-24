@@ -139,7 +139,7 @@ def convert_to_plural_type(tmdb_type):
         return '{0}s'.format(tmdb_type.capitalize())
 
 
-def convert_to_kodi_type(tmdb_type):
+def convert_to_listitem_type(tmdb_type):
     if tmdb_type == 'tv':
         return 'tvshow'
     elif tmdb_type == 'person':
@@ -147,11 +147,17 @@ def convert_to_kodi_type(tmdb_type):
     else:
         return tmdb_type
 
+def convert_to_container_type(tmdb_type):
+    if tmdb_type == 'tv':
+        return 'tvshows'
+    elif tmdb_type == 'person':
+        return 'actors'
+    else:
+        return '{0}s'.format(tmdb_type)
+
 
 def convert_to_library_type(tmdb_type):
-    if tmdb_type == 'tv' or tmdb_type == 'movie' or tmdb_type == 'episode' or tmdb_type == 'season':
-        return 'video'
-    elif tmdb_type == 'image':
+    if tmdb_type == 'image':
         return 'pictures'
     else:
         return 'video'
@@ -166,4 +172,4 @@ def merge_two_dicts(x, y):
 def make_kwparams(params):
     tempparams = params.copy()
     return del_dict_keys(tempparams, ['info', 'type', 'tmdb_id', 'filter_key', 'filter_value',
-                                      'with_separator', 'with_id', 'season', 'episode'])
+                                      'with_separator', 'with_id', 'season', 'episode', 'prop_id'])

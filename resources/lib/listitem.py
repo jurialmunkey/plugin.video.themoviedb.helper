@@ -268,7 +268,7 @@ class ListItem:
     def get_dbtypes(self, tmdb_type):
         self.plural_type = utils.convert_to_plural_type(tmdb_type)
         self.library = utils.convert_to_library_type(tmdb_type)
-        self.dbtype = utils.convert_to_kodi_type(tmdb_type)
+        self.dbtype = utils.convert_to_listitem_type(tmdb_type)
         self.infolabels['mediatype'] = self.dbtype
         self.infoproperties['tmdb_type'] = tmdb_type
 

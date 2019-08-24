@@ -12,6 +12,8 @@ _addonpath = xbmcaddon.Addon().getAddonInfo('path')
 _addonname = 'plugin.video.themoviedb.helper'
 # Addon name for logging
 _addonlogname = '[plugin.video.themoviedb.helper]\n'
+# Property Prefix Name
+_prefixname = 'TMDbHelper.'
 # Get the api keys
 _omdb_apikey = '?apikey={0}'.format(xbmcplugin.getSetting(_handle, 'omdb_apikey')) if xbmcplugin.getSetting(_handle, 'omdb_apikey') else None
 _tmdb_apikey = xbmcplugin.getSetting(_handle, 'tmdb_apikey')

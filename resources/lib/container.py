@@ -4,7 +4,7 @@ import xbmcgui
 import xbmc
 import utils
 import apis
-from globals import _handle, APPEND_TO_RESPONSE, _omdb_apikey, CATEGORIES, MAINFOLDER, EXCLUSIONS, GENRE_IDS
+from globals import _handle, APPEND_TO_RESPONSE, _omdb_apikey, CATEGORIES, MAINFOLDER, EXCLUSIONS, GENRE_IDS, _prefixname
 from listitem import ListItem
 from urlparse import parse_qsl
 
@@ -33,7 +33,7 @@ class Container:
 
     def start_container(self):
         xbmcplugin.setPluginCategory(_handle, self.name)
-        container_content = '{0}s'.format(utils.convert_to_kodi_type(self.list_type)) if self.list_type else ''
+        container_content = utils.convert_to_container_type(self.list_type) if self.list_type else ''
         xbmcplugin.setContent(_handle, container_content)
 
     def finish_container(self):
@@ -68,6 +68,8 @@ class Container:
         Otherwise just uses whatever the api had returned
         """
         added_items = []
+        num_dbid_items = 0
+        num_tmdb_items = 0
         self.kodi_library = utils.get_kodi_library(self.list_type)
         for item in self.listitems:
             if item:
@@ -100,8 +102,19 @@ class Container:
                                                  season=listitem.infolabels.get('season', '0'))
                     else:
                         listitem.create_kwparams(self.next_type, self.next_info)
+                if listitem.dbid:
+                    num_dbid_items = num_dbid_items + 1
+                else:
+                    num_tmdb_items = num_tmdb_items + 1
                 listitem.create_listitem(**listitem.kwparams)
                 added_items.append(listitem.name)
+        if num_dbid_items > 0 and self.params.get('prop_id'):
+            window_prop = '{0}{1}.NumDBIDItems'.format(_prefixname, self.params.get('prop_id'))
+            xbmcgui.Window(10000).setProperty(window_prop, str(num_dbid_items))
+        if num_tmdb_items > 0 and self.params.get('prop_id'):
+            window_prop = '{0}{1}.NumTMDBItems'.format(_prefixname, self.params.get('prop_id'))
+            xbmcgui.Window(10000).setProperty(window_prop, str(num_tmdb_items))
+
 
     def request_omdb_info(self):
         if self.request_tmdb_type in ['movie', 'tv']:
