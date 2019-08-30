@@ -115,7 +115,6 @@ class Container:
             window_prop = '{0}{1}.NumTMDBItems'.format(_prefixname, self.params.get('prop_id'))
             xbmcgui.Window(10000).setProperty(window_prop, str(num_tmdb_items))
 
-
     def request_omdb_info(self):
         if self.request_tmdb_type in ['movie', 'tv']:
             if _omdb_apikey and self.listitems:
