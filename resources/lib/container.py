@@ -70,9 +70,9 @@ class Container:
         num_dbid_items = 0
         num_tmdb_items = 0
         kodi_library = utils.get_kodi_library(self.list_type)
-        listitems = self.listitems[:]
-        self.listitems = []
-        for item in listitems:
+        dbiditems = []
+        tmdbitems = []
+        for item in self.listitems:
             if item:
                 # Filter items by filter_key and filter_value params
                 if utils.filtered_item(item, self.params.get('filter_key'), self.params.get('filter_value')):
@@ -87,7 +87,11 @@ class Container:
                 item = apis.get_cached_data(item, self.request_tmdb_type)
                 item['dbid'] = utils.get_kodi_dbid(item, kodi_library)
                 added_items.append(item_add_id)
-                self.listitems.append(item)
+                if item.get('dbid'):
+                    dbiditems.append(item)
+                else:
+                    tmdbitems.append(item)
+        self.listitems = dbiditems + tmdbitems  # Reset listitems with dbiditems first
         for item in self.listitems:
             if item:
                 listitem = ListItem()

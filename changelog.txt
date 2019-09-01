@@ -1,3 +1,7 @@
+**0.2.6**
+- Begin code refactor
+- DBID items to front of list
+
 **0.2.5**
 - Better DBID matching based on year as well as title
 - Add &exclude_key=&exclude_value= exclusion filter
