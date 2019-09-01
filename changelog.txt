@@ -1,5 +1,6 @@
 **0.2.5**
 - Better DBID matching based on year as well as title
+- Add &exclude_key=&exclude_value= exclusion filter
 
 **0.2.4**
 - Fix simplecache key name enconding as unicode not bytestring

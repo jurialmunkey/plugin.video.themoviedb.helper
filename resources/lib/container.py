@@ -76,6 +76,8 @@ class Container:
                 # Filter items by filter_key and filter_value params
                 if utils.filtered_item(item, self.params.get('filter_key'), self.params.get('filter_value')):
                     continue  # Skip items that don't match filter item[key]=value
+                if utils.filtered_item(item, self.params.get('exclude_key'), self.params.get('exclude_value'), True):
+                    continue  # Skip items that match exclusion item[key]=value (true flag flips return vals)
                 listitem = ListItem()
                 item = apis.get_cached_data(item, self.request_tmdb_type)
                 listitem.get_title(item)

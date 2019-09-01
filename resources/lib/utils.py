@@ -35,15 +35,16 @@ def get_url(**kwargs):
     return '{0}?{1}'.format(_url, urlencode(kwargs))
 
 
-def filtered_item(item, key, value):
+def filtered_item(item, key, value, false_val=False):
+    true_val = False if false_val else True  # Flip values if we want to exclude instead of include
     if key and value:
         if item.get(key):
-            if item.get(key) != value:
-                return True
+            if item.get(key) == value:
+                return false_val
             else:
-                return False
+                return true_val
         else:
-            return True
+            return true_val
     else:
         return False
 
@@ -175,4 +176,5 @@ def merge_two_dicts(x, y):
 def make_kwparams(params):
     tempparams = params.copy()
     return del_dict_keys(tempparams, ['info', 'type', 'tmdb_id', 'filter_key', 'filter_value',
-                                      'with_separator', 'with_id', 'season', 'episode', 'prop_id'])
+                                      'with_separator', 'with_id', 'season', 'episode', 'prop_id',
+                                      'exclude_key', 'exclude_value'])
