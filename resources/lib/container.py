@@ -81,7 +81,7 @@ class Container:
                     continue  # Skip items that match exclusion item[key]=value (true flag flips return vals)
                 item['name'] = utils.get_title(item)
                 item['year'] = utils.get_year(item)
-                item_add_id = '{0}-{1}'.format(item.get('name'), item.get('year'))
+                item_add_id = u'{0}-{1}'.format(item.get('name'), item.get('year'))
                 if item_add_id in added_items:
                     continue  # Skip duplicates
                 item = apis.get_cached_data(item, self.request_tmdb_type)
