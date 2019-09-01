@@ -8,7 +8,7 @@ from urllib import urlencode
 
 def jsonrpc_library(method="VideoLibrary.GetMovies", dbtype="movie"):
     query = {"jsonrpc": "2.0",
-             "params": {"properties": ["title", "imdbnumber", "originaltitle"]},
+             "params": {"properties": ["title", "imdbnumber", "originaltitle", "year"]},
              "method": method,
              "id": 1}
     response = json.loads(xbmc.executeJSONRPC(json.dumps(query)))
@@ -19,7 +19,8 @@ def jsonrpc_library(method="VideoLibrary.GetMovies", dbtype="movie"):
         my_list.append({'imdb_id': item.get('imdbnumber'),
                         'dbid': item.get(dbid_name),
                         'title': item.get('title'),
-                        'originaltitle': item.get('originaltitle')})
+                        'originaltitle': item.get('originaltitle'),
+                        'year': item.get('year')})
     return my_list
 
 
@@ -106,10 +107,11 @@ def dict_to_list(items, key):
 
 
 def find_dict_in_list(list_of_dicts, key, value):
+    index_list = []
     for list_index, dic in enumerate(list_of_dicts):
         if dic.get(key) == value:
-            return list_index
-    return -1
+            index_list.append(list_index)
+    return index_list
 
 
 def split_items(items, separator='/'):

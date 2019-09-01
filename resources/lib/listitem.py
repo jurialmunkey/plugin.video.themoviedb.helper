@@ -1,9 +1,7 @@
-from globals import _addonpath, IMAGEPATH, _handle, _mpaaprefix, _country, APPEND_TO_RESPONSE
-from utils import get_url, kodi_log
+from globals import _addonpath, IMAGEPATH, _handle, _mpaaprefix, _country
 import utils
 import xbmcgui
 import xbmcplugin
-import apis
 
 
 class ListItem:
@@ -274,14 +272,20 @@ class ListItem:
 
     def get_kodi_library_dbid(self, kodi_library):
         if kodi_library:
-            if self.imdb_id and utils.find_dict_in_list(kodi_library, 'imdb_id', self.imdb_id) != -1:
-                self.dbid = kodi_library[utils.find_dict_in_list(kodi_library, 'imdb_id', self.imdb_id)].get('dbid')
-            elif self.infolabels.get('originaltitle') and utils.find_dict_in_list(kodi_library, 'originaltitle', self.infolabels.get('originaltitle')) != -1:
-                self.dbid = kodi_library[utils.find_dict_in_list(kodi_library, 'originaltitle', self.infolabels.get('originaltitle'))].get('dbid')
-            elif self.name and utils.find_dict_in_list(kodi_library, 'title', self.name) != -1:
-                self.dbid = kodi_library[utils.find_dict_in_list(kodi_library, 'title', self.name)].get('dbid')
-        if self.dbid:
-            self.infolabels['dbid'] = self.dbid
+            index_list = utils.find_dict_in_list(kodi_library, 'imdb_id', self.imdb_id) if self.imdb_id else []
+            if not index_list and self.infolabels.get('originaltitle'):
+                index_list = utils.find_dict_in_list(kodi_library, 'originaltitle', self.infolabels.get('originaltitle'))
+            if not index_list and self.name:
+                index_list = utils.find_dict_in_list(kodi_library, 'title', self.name)
+            for i in index_list:
+                if self.infolabels.get('year'):
+                    if self.infolabels.get('year') in str(kodi_library[i].get('year')):
+                        self.dbid = kodi_library[i].get('dbid')
+                else:
+                    self.dbid = kodi_library[i].get('dbid')
+                if self.dbid:
+                    self.infolabels['dbid'] = self.dbid
+                    break
 
     def create_kwparams(self, next_type, next_info, **kwargs):
         self.kwparams['type'] = next_type
@@ -300,9 +304,9 @@ class ListItem:
         self.listitem.setArt(self.infoart)
         self.listitem.setCast(self.cast)
         if kwargs.get('info') == 'textviewer':
-            self.url = get_url(info='textviewer')
+            self.url = utils.get_url(info='textviewer')
         elif kwargs.get('info') == 'imageviewer':
-            self.url = get_url(info='imageviewer', image=self.poster)
+            self.url = utils.get_url(info='imageviewer', image=self.poster)
         else:
-            self.url = get_url(**kwargs)
+            self.url = utils.get_url(**kwargs)
         xbmcplugin.addDirectoryItem(_handle, self.url, self.listitem, self.is_folder)

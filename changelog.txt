@@ -1,3 +1,6 @@
+**0.2.5**
+- Better DBID matching based on year as well as title
+
 **0.2.4**
 - Fix simplecache key name enconding as unicode not bytestring
 - Add prop_id for numdbiditems/numtmdbitems e.g. Window(Home).Property(TMDBHelper.prop_id.NumDBIDItems)

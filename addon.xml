@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.themoviedb.helper"
-version="0.2.4"
+version="0.2.5"
 name="TheMovieDb Helper"
 provider-name="jurialmunkey">
 <requires>
@@ -8,10 +8,10 @@ provider-name="jurialmunkey">
   <import addon="script.module.simplecache" version="1.0.11" />
   <import addon="script.module.requests" version="2.9.1"/> 
 </requires>
-<extension point="xbmc.python.script" library="script.py" />
 <extension point="xbmc.python.pluginsource" library="plugin.py">
   <provides>video</provides>
 </extension>
+<extension point="xbmc.python.script" library="script.py" />
 <extension point="xbmc.addon.metadata">
   <summary lang="en">TheMovieDb Helper</summary>
   <description lang="en_GB">TheMovieDb Helper provides skinners a number of ways to access TheMovieDb API</description>
