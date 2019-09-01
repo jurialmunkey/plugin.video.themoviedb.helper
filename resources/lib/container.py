@@ -317,7 +317,7 @@ class Container:
                 self.check_tmdb_id('collection')
                 self.list_items()
             elif not self.params.get('info') or not self.params.get('type'):
-                raise ValueError('Invalid paramstring - Must specify info and type: {0}!'.format(self.paramstring))
+                utils.kodi_log('Invalid paramstring - Must specify info and type: {0}!'.format(self.paramstring), 1)
             elif self.params.get('info') == 'search':
                 self.list_search()
             elif self.params.get('info') == 'find':
@@ -329,6 +329,6 @@ class Container:
                 self.check_tmdb_id()
                 self.list_items()
             else:
-                raise ValueError('Invalid ?info= param: {0}!'.format(self.paramstring))
+                utils.kodi_log('Invalid ?info= param: {0}!'.format(self.paramstring), 1)
         else:
             self.list_categories()
