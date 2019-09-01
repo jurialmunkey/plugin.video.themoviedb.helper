@@ -34,18 +34,6 @@ class ListItem:
         if request_item.get('id'):
             self.tmdb_id = request_item.get('id')
 
-    def get_title(self, request_item):
-        if request_item.get('title'):
-            self.name = request_item.get('title')
-        elif request_item.get('name'):
-            self.name = request_item.get('name')
-        elif request_item.get('author'):
-            self.name = request_item.get('author')
-        elif request_item.get('width') and request_item.get('height'):
-            self.name = '{0}x{1}'.format(request_item.get('width'), request_item.get('height'))
-        else:
-            self.name = 'N/A'
-
     def get_fanart(self, request_item):
         if request_item.get('backdrop_path'):
             self.fanart = '{0}{1}'.format(IMAGEPATH, request_item.get('backdrop_path'))
@@ -269,23 +257,6 @@ class ListItem:
         self.dbtype = utils.convert_to_listitem_type(tmdb_type)
         self.infolabels['mediatype'] = self.dbtype
         self.infoproperties['tmdb_type'] = tmdb_type
-
-    def get_kodi_library_dbid(self, kodi_library):
-        if kodi_library:
-            index_list = utils.find_dict_in_list(kodi_library, 'imdb_id', self.imdb_id) if self.imdb_id else []
-            if not index_list and self.infolabels.get('originaltitle'):
-                index_list = utils.find_dict_in_list(kodi_library, 'originaltitle', self.infolabels.get('originaltitle'))
-            if not index_list and self.name:
-                index_list = utils.find_dict_in_list(kodi_library, 'title', self.name)
-            for i in index_list:
-                if self.infolabels.get('year'):
-                    if self.infolabels.get('year') in str(kodi_library[i].get('year')):
-                        self.dbid = kodi_library[i].get('dbid')
-                else:
-                    self.dbid = kodi_library[i].get('dbid')
-                if self.dbid:
-                    self.infolabels['dbid'] = self.dbid
-                    break
 
     def create_kwparams(self, next_type, next_info, **kwargs):
         self.kwparams['type'] = next_type

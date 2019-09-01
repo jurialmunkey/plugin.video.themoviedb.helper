@@ -29,7 +29,6 @@ class Container:
         self.next_type = ''  # &type= for next action in ListItem.FolderPath
         self.next_info = ''  # ?info= for next action in ListItem.FolderPath
         self.listitems = []  # The list of items to add
-        self.kodi_library = []  # JSON Results Movies
 
     def start_container(self):
         xbmcplugin.setPluginCategory(_handle, self.name)
@@ -70,22 +69,32 @@ class Container:
         added_items = []
         num_dbid_items = 0
         num_tmdb_items = 0
-        self.kodi_library = utils.get_kodi_library(self.list_type)
-        for item in self.listitems:
+        kodi_library = utils.get_kodi_library(self.list_type)
+        listitems = self.listitems[:]
+        self.listitems = []
+        for item in listitems:
             if item:
                 # Filter items by filter_key and filter_value params
                 if utils.filtered_item(item, self.params.get('filter_key'), self.params.get('filter_value')):
                     continue  # Skip items that don't match filter item[key]=value
                 if utils.filtered_item(item, self.params.get('exclude_key'), self.params.get('exclude_value'), True):
                     continue  # Skip items that match exclusion item[key]=value (true flag flips return vals)
-                listitem = ListItem()
+                item['name'] = utils.get_title(item)
+                item['year'] = utils.get_year(item)
+                item_add_id = '{0}-{1}'.format(item.get('name'), item.get('year'))
+                if item_add_id in added_items:
+                    continue  # Skip duplicates
                 item = apis.get_cached_data(item, self.request_tmdb_type)
-                listitem.get_title(item)
-                if listitem.name in added_items:
-                    continue  # Skip duplicate items
+                item['dbid'] = utils.get_kodi_dbid(item, kodi_library)
+                added_items.append(item_add_id)
+                self.listitems.append(item)
+        for item in self.listitems:
+            if item:
+                listitem = ListItem()
+                listitem.name = item.get('name')
+                listitem.dbid = item.get('dbid')
                 listitem.get_autofilled_info(item)
                 listitem.get_dbtypes(self.list_type)
-                listitem.get_kodi_library_dbid(self.kodi_library)
                 if item.get('imdb_id'):
                     self.omdb_info = apis.omdb_api_only_cached(i=item.get('imdb_id'))
                 if self.omdb_info:
@@ -109,7 +118,6 @@ class Container:
                 else:
                     num_tmdb_items = num_tmdb_items + 1
                 listitem.create_listitem(**listitem.kwparams)
-                added_items.append(listitem.name)
         if num_dbid_items > 0 and self.params.get('prop_id'):
             window_prop = '{0}{1}.NumDBIDItems'.format(_prefixname, self.params.get('prop_id'))
             xbmcgui.Window(10000).setProperty(window_prop, str(num_dbid_items))

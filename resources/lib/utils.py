@@ -24,11 +24,51 @@ def jsonrpc_library(method="VideoLibrary.GetMovies", dbtype="movie"):
     return my_list
 
 
+def get_kodi_dbid(item, kodi_library):
+    dbid = None
+    if kodi_library:
+        index_list = find_dict_in_list(kodi_library, 'imdb_id', item.get('imdb_id')) if item.get('imdb_id') else []
+        if not index_list and item.get('original_title'):
+            index_list = find_dict_in_list(kodi_library, 'originaltitle', item.get('original_title'))
+        if not index_list and item.get('name'):
+            index_list = find_dict_in_list(kodi_library, 'title', item.get('name'))
+        for i in index_list:
+            if item.get('year'):
+                if item.get('year') in str(kodi_library[i].get('year')):
+                    dbid = kodi_library[i].get('dbid')
+            else:
+                dbid = kodi_library[i].get('dbid')
+            if dbid:
+                return dbid
+
+
 def get_kodi_library(list_type):
-        if list_type == 'movie':
-            return jsonrpc_library("VideoLibrary.GetMovies", "movie")
-        elif list_type == 'tv':
-            return jsonrpc_library("VideoLibrary.GetTVShows", "tvshow")
+    if list_type == 'movie':
+        return jsonrpc_library("VideoLibrary.GetMovies", "movie")
+    elif list_type == 'tv':
+        return jsonrpc_library("VideoLibrary.GetTVShows", "tvshow")
+
+
+def get_title(request_item):
+    if request_item.get('title'):
+        return request_item.get('title')
+    elif request_item.get('name'):
+        return request_item.get('name')
+    elif request_item.get('author'):
+        return request_item.get('author')
+    elif request_item.get('width') and request_item.get('height'):
+        return '{0}x{1}'.format(request_item.get('width'), request_item.get('height'))
+    else:
+        return 'N/A'
+
+
+def get_year(request_item):
+    if request_item.get('air_date'):
+        return request_item.get('air_date')[:4]
+    if request_item.get('release_date'):
+        return request_item.get('release_date')[:4]
+    if request_item.get('first_air_date'):
+        return request_item.get('first_air_date')[:4]
 
 
 def get_url(**kwargs):
