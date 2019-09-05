@@ -67,8 +67,6 @@ class Container:
         Otherwise just uses whatever the api had returned
         """
         added_items = []
-        num_dbid_items = 0
-        num_tmdb_items = 0
         kodi_library = utils.get_kodi_library(self.list_type)
         dbiditems = []
         tmdbitems = []
@@ -117,17 +115,12 @@ class Container:
                                                  season=listitem.infolabels.get('season', '0'))
                     else:
                         listitem.create_kwparams(self.next_type, self.next_info)
-                if listitem.dbid:
-                    num_dbid_items = num_dbid_items + 1
-                else:
-                    num_tmdb_items = num_tmdb_items + 1
                 listitem.create_listitem(**listitem.kwparams)
-        if num_dbid_items > 0 and self.params.get('prop_id'):
+        if self.params.get('prop_id'):
             window_prop = '{0}{1}.NumDBIDItems'.format(_prefixname, self.params.get('prop_id'))
-            xbmcgui.Window(10000).setProperty(window_prop, str(num_dbid_items))
-        if num_tmdb_items > 0 and self.params.get('prop_id'):
+            xbmcgui.Window(10000).setProperty(window_prop, str(len(dbiditems)))
             window_prop = '{0}{1}.NumTMDBItems'.format(_prefixname, self.params.get('prop_id'))
-            xbmcgui.Window(10000).setProperty(window_prop, str(num_tmdb_items))
+            xbmcgui.Window(10000).setProperty(window_prop, str(len(tmdbitems)))
 
     def request_omdb_info(self):
         if self.request_tmdb_type in ['movie', 'tv']:

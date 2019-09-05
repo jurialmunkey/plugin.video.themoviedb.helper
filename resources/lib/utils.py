@@ -57,9 +57,9 @@ def get_title(request_item):
     elif request_item.get('author'):
         return request_item.get('author')
     elif request_item.get('width') and request_item.get('height'):
-        return '{0}x{1}'.format(request_item.get('width'), request_item.get('height'))
+        return u'{0}x{1}'.format(request_item.get('width'), request_item.get('height'))
     else:
-        return 'N/A'
+        return u'N/A'
 
 
 def get_year(request_item):

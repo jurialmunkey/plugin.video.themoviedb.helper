@@ -213,5 +213,5 @@ def translate_lookup_ids(items, request, lookup_dict=False, separator='%2C'):
                 else:  # If no separator, assume that we just want to use the first found ID
                     temp_list = str(item_id)
                     break  # Stop once we have a item
-        if temp_list:
-            return temp_list
+        temp_list = temp_list if temp_list else 'null'
+        return temp_list
