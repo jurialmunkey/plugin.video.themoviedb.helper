@@ -145,8 +145,8 @@ class ListItem:
             self.infoproperties['age'] = utils.age_difference(request_item.get('birthday'), request_item.get('deathday'))
         if request_item.get('deathday'):
             self.infoproperties['deathday'] = request_item.get('deathday')
-        if request_item.get('also_know_as'):
-            self.infoproperties['aliases'] = request_item.get('also_know_as')
+        if request_item.get('also_known_as'):
+            self.infoproperties['aliases'] = ' / '.join(request_item.get('also_known_as'))
         if request_item.get('known_for_department'):
             self.infoproperties['role'] = request_item.get('known_for_department')
         if request_item.get('place_of_birth'):
