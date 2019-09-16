@@ -74,9 +74,15 @@ class Script:
                 self.lock_path(self.params.get('prevent_del'))
             elif self.params.get('add_query') and self.params.get('type'):
                 tmdb_id = None
-                query = utils.split_items(self.params.get('add_query'))[0]
+                query_list = utils.split_items(self.params.get('add_query'))
+                query_index = 0
+                if len(query_list) > 1:
+                    query_index = xbmcgui.Dialog().select('Choose item', query_list)
                 request_path = 'search/{0}'.format(self.params.get('type'))
-                item = apis.tmdb_api_request_longcache(request_path, query=query)
+                if query_index > -1:
+                    item = apis.tmdb_api_request_longcache(request_path, query=query_list[query_index])
+                else:
+                    exit()
                 if item and item.get('results') and isinstance(item.get('results'), list) and item.get('results')[0].get('id'):
                     item_index = 0
                     if len(item.get('results')) > 1:
