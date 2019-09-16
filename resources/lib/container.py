@@ -4,9 +4,10 @@ import xbmcgui
 import xbmc
 import utils
 import apis
-from globals import _handle, APPEND_TO_RESPONSE, _omdb_apikey, CATEGORIES, MAINFOLDER, EXCLUSIONS, GENRE_IDS, _prefixname
+from globals import APPEND_TO_RESPONSE, _omdb_apikey, CATEGORIES, MAINFOLDER, EXCLUSIONS, GENRE_IDS, _prefixname
 from listitem import ListItem
 from urlparse import parse_qsl
+_handle = int(sys.argv[1])
 
 
 class Container:
@@ -58,7 +59,7 @@ class Container:
                                 listitem.get_dbtypes(category_type)
                             if self.omdb_info:
                                 listitem.get_omdb_info(self.omdb_info)
-                            listitem.create_listitem(info=key, type=category_type, **kwargs)
+                            listitem.create_listitem(_handle, info=key, type=category_type, **kwargs)
 
     def create_listitems(self):
         """
@@ -115,7 +116,7 @@ class Container:
                                                  season=listitem.infolabels.get('season', '0'))
                     else:
                         listitem.create_kwparams(self.next_type, self.next_info)
-                listitem.create_listitem(**listitem.kwparams)
+                listitem.create_listitem(_handle, **listitem.kwparams)
         if self.params.get('prop_id'):
             window_prop = '{0}{1}.NumDBIDItems'.format(_prefixname, self.params.get('prop_id'))
             xbmcgui.Window(10000).setProperty(window_prop, str(len(dbiditems)))
@@ -165,7 +166,8 @@ class Container:
             request_kwparams = utils.make_kwparams(self.params)
             item = apis.tmdb_api_request_longcache(request_path, **request_kwparams)
             if item and item.get('results') and isinstance(item.get('results'), list) and item.get('results')[0].get('id'):
-                self.params['tmdb_id'] = item.get('results')[0].get('id')
+                item_index = 0
+                self.params['tmdb_id'] = item.get('results')[item_index].get('id')
                 utils.kodi_log('Found TMDb ID {0}!\n{1}'.format(self.params.get('tmdb_id'), self.paramstring), 0)
             else:
                 utils.kodi_log('Unable to find TMDb ID!\n{0}'.format(self.paramstring), 1)

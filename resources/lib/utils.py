@@ -2,8 +2,9 @@ import xbmc
 import json
 from datetime import datetime
 from copy import copy
-from globals import _addonlogname, _url
+from globals import _addonlogname, IMAGEPATH
 from urllib import urlencode
+_url = 'plugin://plugin.video.themoviedb.helper/'
 
 
 def jsonrpc_library(method="VideoLibrary.GetMovies", dbtype="movie"):
@@ -60,6 +61,15 @@ def get_title(request_item):
         return u'{0}x{1}'.format(request_item.get('width'), request_item.get('height'))
     else:
         return u'N/A'
+
+
+def get_icon(request_item):
+    if request_item.get('poster_path'):
+        return '{0}{1}'.format(IMAGEPATH, request_item.get('poster_path'))
+    elif request_item.get('profile_path'):
+        return '{0}{1}'.format(IMAGEPATH, request_item.get('profile_path'))
+    elif request_item.get('file_path'):
+        return '{0}{1}'.format(IMAGEPATH, request_item.get('file_path'))
 
 
 def get_year(request_item):

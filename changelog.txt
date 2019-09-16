@@ -1,3 +1,6 @@
+**0.2.8**
+- Add script function "add_query=" to lookup tmdb_id and pass path to add_path for items with multiples
+
 **0.2.7**
 - Fix for no IDs found in discover
 

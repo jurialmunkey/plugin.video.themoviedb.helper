@@ -1,4 +1,4 @@
-from globals import _addonpath, IMAGEPATH, _handle, _mpaaprefix, _country
+from globals import _addonpath, IMAGEPATH, _mpaaprefix, _country
 import utils
 import xbmcgui
 import xbmcplugin
@@ -41,12 +41,7 @@ class ListItem:
 
     def get_poster(self, request_item):
         # Get the poster
-        if request_item.get('poster_path'):
-            self.poster = '{0}{1}'.format(IMAGEPATH, request_item.get('poster_path'))
-        elif request_item.get('profile_path'):
-            self.poster = '{0}{1}'.format(IMAGEPATH, request_item.get('profile_path'))
-        elif request_item.get('file_path'):
-            self.poster = '{0}{1}'.format(IMAGEPATH, request_item.get('file_path'))
+        self.poster = utils.get_icon(request_item)
         # Get the season poster for episodes
         if request_item.get('season_number') and request_item.get('seasons'):
             for item in request_item.get('seasons'):
@@ -266,7 +261,7 @@ class ListItem:
             if value:
                 self.kwparams[key] = value
 
-    def create_listitem(self, **kwargs):
+    def create_listitem(self, handle=None, **kwargs):
         self.listitem = xbmcgui.ListItem(label=self.name, label2=self.label2)
         self.listitem.setLabel2(self.label2)
         self.listitem.setUniqueIDs({'imdb': self.imdb_id, 'tmdb': self.tmdb_id})
@@ -280,4 +275,4 @@ class ListItem:
             self.url = utils.get_url(info='imageviewer', image=self.poster)
         else:
             self.url = utils.get_url(**kwargs)
-        xbmcplugin.addDirectoryItem(_handle, self.url, self.listitem, self.is_folder)
+        xbmcplugin.addDirectoryItem(handle, self.url, self.listitem, self.is_folder)

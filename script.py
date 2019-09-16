@@ -6,6 +6,8 @@ import sys
 import xbmc
 import xbmcgui
 import time
+import resources.lib.utils as utils
+import resources.lib.apis as apis
 _homewindow = xbmcgui.Window(10000)
 _prefixname = 'TMDbHelper.'
 
@@ -58,10 +60,10 @@ class Script:
         sleeper = float(self.params.get('delay', '0'))
         time.sleep(sleeper)
         if self.params.get('call_id'):
-            xbmc.executebuiltin('Dialog.Close(all, force)')
+            xbmc.executebuiltin('Dialog.Close(all)')
             xbmc.executebuiltin('ActivateWindow({0})'.format(self.params.get('call_id')))
         elif self.params.get('call_path'):
-            xbmc.executebuiltin('Dialog.Close(all, force)')
+            xbmc.executebuiltin('Dialog.Close(all)')
             xbmc.executebuiltin('ActivateWindow(videos, {0}, return)'.format(self.params.get('call_path')))
 
     def router(self):
@@ -70,6 +72,33 @@ class Script:
                 self.position = self.position + 1
                 self.set_props(self.position, self.params.get('add_path'))
                 self.lock_path(self.params.get('prevent_del'))
+            elif self.params.get('add_query') and self.params.get('type'):
+                tmdb_id = None
+                query = utils.split_items(self.params.get('add_query'))[0]
+                request_path = 'search/{0}'.format(self.params.get('type'))
+                item = apis.tmdb_api_request_longcache(request_path, query=query)
+                if item and item.get('results') and isinstance(item.get('results'), list) and item.get('results')[0].get('id'):
+                    item_index = 0
+                    if len(item.get('results')) > 1:
+                        item_list = []
+                        for i in item.get('results'):
+                            icon = utils.get_icon(i)
+                            dialog_item = xbmcgui.ListItem(utils.get_title(i))
+                            dialog_item.setArt({'icon': icon, 'thumb': icon})
+                            item_list.append(dialog_item)
+                        item_index = xbmcgui.Dialog().select('Choose item', item_list, preselect=0, useDetails=True)
+                    if item_index > -1:
+                        tmdb_id = item.get('results')[item_index].get('id')
+                    else:
+                        exit()
+                if tmdb_id:
+                    self.position = self.position + 1
+                    add_paramstring = 'plugin://plugin.video.themoviedb.helper/?info=details&amp;type={0}&amp;tmdb_id={1}'.format(self.params.get('type'), tmdb_id)
+                    self.set_props(self.position, add_paramstring)
+                    self.lock_path(self.params.get('prevent_del'))
+                else:
+                    utils.kodi_log('Unable to find TMDb ID!\nQuery: {0} Type: {1}'.format(self.params.get('add_query'), self.params.get('type')), 1)
+                    exit()
             elif self.params.get('del_path'):
                 if self.prevent_del:
                     self.unlock_path()

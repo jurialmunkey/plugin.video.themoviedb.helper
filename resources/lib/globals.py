@@ -1,11 +1,5 @@
-import sys
-import xbmcplugin
 import xbmcaddon
 
-# Get the plugin url in plugin:// notation.
-_url = sys.argv[0]
-# Get the plugin handle as an integer number.
-_handle = int(sys.argv[1])
 # Get the add-on path
 _addonpath = xbmcaddon.Addon().getAddonInfo('path')
 # Addon name
@@ -15,12 +9,12 @@ _addonlogname = '[plugin.video.themoviedb.helper]\n'
 # Property Prefix Name
 _prefixname = 'TMDbHelper.'
 # Get the api keys
-_omdb_apikey = '?apikey={0}'.format(xbmcplugin.getSetting(_handle, 'omdb_apikey')) if xbmcplugin.getSetting(_handle, 'omdb_apikey') else None
-_tmdb_apikey = xbmcplugin.getSetting(_handle, 'tmdb_apikey')
+_omdb_apikey = '?apikey={0}'.format(xbmcaddon.Addon().getSetting('omdb_apikey')) if xbmcaddon.Addon().getSetting('omdb_apikey') else None
+_tmdb_apikey = xbmcaddon.Addon().getSetting('tmdb_apikey')
 # Cache days
-_cache_details_days = xbmcplugin.getSetting(_handle, 'cache_details_days')
+_cache_details_days = xbmcaddon.Addon().getSetting('cache_details_days')
 _cache_details_days = int(_cache_details_days)
-_cache_list_days = xbmcplugin.getSetting(_handle, 'cache_list_days')
+_cache_list_days = xbmcaddon.Addon().getSetting('cache_list_days')
 _cache_list_days = int(_cache_list_days)
 
 if not _cache_details_days or _cache_details_days < 14:
@@ -36,7 +30,7 @@ else:
     _tmdb_apikey = '?api_key=a07324c669cac4d96789197134ce272b'
 
 # Get the MPAA prefix and add a space if we have a setting
-_mpaaprefix = xbmcplugin.getSetting(_handle, 'mpaa_prefix')
+_mpaaprefix = xbmcaddon.Addon().getSetting('mpaa_prefix')
 _mpaaprefix = '{0} '.format(_mpaaprefix) if _mpaaprefix else ''
 # Set http paths
 OMDB_API = 'http://www.omdbapi.com/'
@@ -56,7 +50,7 @@ LANGUAGES = ['ar-AE', 'ar-SA', 'be-BY', 'bg-BG', 'bn-BD', 'ca-ES', 'ch-GU', 'cs-
              'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'si-LK', 'sk-SK', 'sl-SI', 'sr-RS',
              'sv-SE', 'ta-IN', 'te-IN', 'th-TH', 'tl-PH', 'tr-TR', 'uk-UA', 'vi-VN',
              'zh-CN', 'zh-HK', 'zh-TW', 'zu-ZA']
-_languagesetting = xbmcplugin.getSetting(_handle, 'language')
+_languagesetting = xbmcaddon.Addon().getSetting('language')
 if _languagesetting:
     _country = LANGUAGES[int(_languagesetting)][-2:]
     _language = '&language={0}&include_image_language={1},null'.format(LANGUAGES[int(_languagesetting)], LANGUAGES[int(_languagesetting)][:2])
