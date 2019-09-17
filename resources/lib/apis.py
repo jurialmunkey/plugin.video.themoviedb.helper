@@ -10,6 +10,49 @@ from globals import TMDB_API, _tmdb_apikey, _language, OMDB_API, _omdb_apikey, O
 _cache = simplecache.SimpleCache()
 
 
+def dialog_splititems(query=None):
+    query_list = utils.split_items(query)
+    query_index = 0
+    if len(query_list) > 1:
+        query_index = xbmcgui.Dialog().select('Choose item', query_list)
+    if query_index > -1:
+        return query_list[query_index]
+    else:
+        exit()
+
+
+def dialog_searchitems(query=None, query_type=None):
+    """
+    Dialog for selecting from list of separated items e.g. ListItem.Genre
+    Will then search TMDb and return TMDb search list
+    If user chooses nothing then exits
+    """
+    user_query = dialog_splititems(query)
+    return tmdb_api_request_longcache('search/{0}'.format(query_type), query=user_query)
+
+
+def dialog_selectitems(item=None):
+    """
+    Dialog for selecting an item from list of tmdb items
+    Returns tmdb_id 
+    If user chooses nothing then exits
+    """
+    if item and item.get('results') and isinstance(item.get('results'), list) and item.get('results')[0].get('id'):
+        item_index = 0
+        if len(item.get('results')) > 1:
+            item_list = []
+            for i in item.get('results'):
+                icon = utils.get_icon(i)
+                dialog_item = xbmcgui.ListItem(utils.get_title(i))
+                dialog_item.setArt({'icon': icon, 'thumb': icon})
+                item_list.append(dialog_item)
+            item_index = xbmcgui.Dialog().select('Choose item', item_list, preselect=0, useDetails=True)
+        if item_index > -1:
+            return item.get('results')[item_index].get('id')
+        else:
+            exit()
+
+
 def invalid_apikey(api_name='TMDb'):
     xbmcgui.Dialog().ok('Missing/Invalid {0} API Key'.format(api_name),
                         'You must enter a valid {0} API key to use this add-on'.format(api_name))

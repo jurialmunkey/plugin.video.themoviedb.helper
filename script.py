@@ -73,30 +73,8 @@ class Script:
                 self.set_props(self.position, self.params.get('add_path'))
                 self.lock_path(self.params.get('prevent_del'))
             elif self.params.get('add_query') and self.params.get('type'):
-                tmdb_id = None
-                query_list = utils.split_items(self.params.get('add_query'))
-                query_index = 0
-                if len(query_list) > 1:
-                    query_index = xbmcgui.Dialog().select('Choose item', query_list)
-                request_path = 'search/{0}'.format(self.params.get('type'))
-                if query_index > -1:
-                    item = apis.tmdb_api_request_longcache(request_path, query=query_list[query_index])
-                else:
-                    exit()
-                if item and item.get('results') and isinstance(item.get('results'), list) and item.get('results')[0].get('id'):
-                    item_index = 0
-                    if len(item.get('results')) > 1:
-                        item_list = []
-                        for i in item.get('results'):
-                            icon = utils.get_icon(i)
-                            dialog_item = xbmcgui.ListItem(utils.get_title(i))
-                            dialog_item.setArt({'icon': icon, 'thumb': icon})
-                            item_list.append(dialog_item)
-                        item_index = xbmcgui.Dialog().select('Choose item', item_list, preselect=0, useDetails=True)
-                    if item_index > -1:
-                        tmdb_id = item.get('results')[item_index].get('id')
-                    else:
-                        exit()
+                item = apis.dialog_searchitems(query=self.params.get('add_query'), query_type=self.params.get('add_query'))
+                tmdb_id = apis.dialog_selectitems(item)
                 if tmdb_id:
                     self.position = self.position + 1
                     add_paramstring = 'plugin://plugin.video.themoviedb.helper/?info=details&amp;type={0}&amp;tmdb_id={1}'.format(self.params.get('type'), tmdb_id)
@@ -105,6 +83,10 @@ class Script:
                 else:
                     utils.kodi_log('Unable to find TMDb ID!\nQuery: {0} Type: {1}'.format(self.params.get('add_query'), self.params.get('type')), 1)
                     exit()
+            elif self.params.get('add_prop') and self.params.get('prop_id'):
+                item = apis.dialog_splititems(self.params.get('add_prop'))
+                prop_name = '{0}{1}'.format(_prefixname, self.params.get('prop_id'))
+                _homewindow.setProperty(prop_name, item)
             elif self.params.get('del_path'):
                 if self.prevent_del:
                     self.unlock_path()
