@@ -28,7 +28,6 @@ def dialog_searchitems(query=None, query_type=None):
     If user chooses nothing then exits
     """
     user_query = dialog_splititems(query)
-    utils.kodi_log(user_query,1)
     return tmdb_api_request_longcache('search/{0}'.format(query_type), query=user_query)
 
 
