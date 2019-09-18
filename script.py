@@ -73,7 +73,7 @@ class Script:
                 self.set_props(self.position, self.params.get('add_path'))
                 self.lock_path(self.params.get('prevent_del'))
             elif self.params.get('add_query') and self.params.get('type'):
-                item = apis.dialog_searchitems(query=self.params.get('add_query'), query_type=self.params.get('add_query'))
+                item = apis.dialog_searchitems(query=self.params.get('add_query'), query_type=self.params.get('type'))
                 tmdb_id = apis.dialog_selectitems(item)
                 if tmdb_id:
                     self.position = self.position + 1

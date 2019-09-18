@@ -1,3 +1,6 @@
+**0.3.1**
+- Hotfix for add_query
+
 **0.3.0**
 - Add script function for add_prop split select box
 - RunScript(plugin.video.themoviedb.helper,add_prop=$INFO[ListItem.Genre],prop_id=Genre)
