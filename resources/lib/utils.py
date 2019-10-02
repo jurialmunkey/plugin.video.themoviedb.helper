@@ -1,10 +1,29 @@
 import xbmc
 import json
+import xbmcgui
 from datetime import datetime
 from copy import copy
-from globals import _addonlogname, IMAGEPATH
-from urllib import urlencode
-_url = 'plugin://plugin.video.themoviedb.helper/'
+_addonlogname = '[plugin.video.themoviedb.helper]\n'
+
+
+def dialog_select_item(items=None, details=False):
+    item_list = split_items(items)
+    item_index = 0
+    if len(item_list) > 1:
+        if details:
+            detailed_item_list = []
+            for item in item_list:
+                icon = details.get_icon(item)
+                dialog_item = xbmcgui.ListItem(details.get_title(item))
+                dialog_item.setArt({'icon': icon, 'thumb': icon})
+                detailed_item_list.append(dialog_item)
+            item_index = xbmcgui.Dialog().select('Choose item', detailed_item_list, preselect=0, useDetails=True)
+        else:
+            item_index = xbmcgui.Dialog().select('Choose item', item_list)
+    if item_index > -1:
+        return item_list[item_index]
+    else:
+        exit()
 
 
 def jsonrpc_library(method="VideoLibrary.GetMovies", dbtype="movie"):
@@ -48,41 +67,6 @@ def get_kodi_library(list_type):
         return jsonrpc_library("VideoLibrary.GetMovies", "movie")
     elif list_type == 'tv':
         return jsonrpc_library("VideoLibrary.GetTVShows", "tvshow")
-
-
-def get_title(request_item):
-    if request_item.get('title'):
-        return request_item.get('title')
-    elif request_item.get('name'):
-        return request_item.get('name')
-    elif request_item.get('author'):
-        return request_item.get('author')
-    elif request_item.get('width') and request_item.get('height'):
-        return u'{0}x{1}'.format(request_item.get('width'), request_item.get('height'))
-    else:
-        return u'N/A'
-
-
-def get_icon(request_item):
-    if request_item.get('poster_path'):
-        return '{0}{1}'.format(IMAGEPATH, request_item.get('poster_path'))
-    elif request_item.get('profile_path'):
-        return '{0}{1}'.format(IMAGEPATH, request_item.get('profile_path'))
-    elif request_item.get('file_path'):
-        return '{0}{1}'.format(IMAGEPATH, request_item.get('file_path'))
-
-
-def get_year(request_item):
-    if request_item.get('air_date'):
-        return request_item.get('air_date')[:4]
-    if request_item.get('release_date'):
-        return request_item.get('release_date')[:4]
-    if request_item.get('first_air_date'):
-        return request_item.get('first_air_date')[:4]
-
-
-def get_url(**kwargs):
-    return '{0}?{1}'.format(_url, urlencode(kwargs))
 
 
 def filtered_item(item, key, value, false_val=False):
@@ -183,38 +167,11 @@ def iter_props(items, property, itemprops, **kwargs):
     return itemprops
 
 
-def convert_to_plural_type(tmdb_type):
-    if tmdb_type == 'tv':
-        return 'Tv Shows'
-    elif tmdb_type == 'person':
-        return 'People'
-    else:
-        return '{0}s'.format(tmdb_type.capitalize())
-
-
-def convert_to_listitem_type(tmdb_type):
-    if tmdb_type == 'tv':
-        return 'tvshow'
-    elif tmdb_type == 'person':
-        return 'actor'
-    else:
-        return tmdb_type
-
-
-def convert_to_container_type(tmdb_type):
-    if tmdb_type == 'tv':
-        return 'tvshows'
-    elif tmdb_type == 'person':
-        return 'actors'
-    else:
-        return '{0}s'.format(tmdb_type)
-
-
-def convert_to_library_type(tmdb_type):
-    if tmdb_type == 'image':
-        return 'pictures'
-    else:
-        return 'video'
+def del_empty_keys(d):
+    for k, v in d.items():
+        if not v:
+            del d[k]
+    return d
 
 
 def merge_two_dicts(x, y):

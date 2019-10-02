@@ -5,11 +5,23 @@
 import sys
 import xbmc
 import xbmcgui
+import xbmcaddon
 import time
 import resources.lib.utils as utils
-import resources.lib.apis as apis
+from resources.lib.globals import LANGUAGES, APPEND_TO_RESPONSE
+from resources.lib.tmdb import TMDb
 _homewindow = xbmcgui.Window(10000)
 _prefixname = 'TMDbHelper.'
+_addon = xbmcaddon.Addon()
+_addonname = 'plugin.video.themoviedb.helper'
+_dialog = xbmcgui.Dialog()
+_languagesetting = _addon.getSetting('language')
+_language = LANGUAGES[int(_languagesetting)]
+_cache_long = int(_addon.getSetting('cache_details_days'))
+_cache_short = int(_addon.getSetting('cache_list_days'))
+_tmdb_apikey = _addon.getSetting('tmdb_apikey')
+_tmdb = TMDb(api_key=_tmdb_apikey, language=_language, cache_long=_cache_long, cache_short=_cache_short,
+             append_to_response=APPEND_TO_RESPONSE, addon_name=_addonname)
 
 
 class Script:
@@ -73,8 +85,8 @@ class Script:
                 self.set_props(self.position, self.params.get('add_path'))
                 self.lock_path(self.params.get('prevent_del'))
             elif self.params.get('add_query') and self.params.get('type'):
-                item = apis.dialog_searchitems(query=self.params.get('add_query'), query_type=self.params.get('type'))
-                tmdb_id = apis.dialog_selectitems(item)
+                item = utils.dialog_select_item(self.params.get('add_query'))
+                tmdb_id = _tmdb.get_tmdb_id(self.params.get('type'), query=item, selectdialog=True)
                 if tmdb_id:
                     self.position = self.position + 1
                     add_paramstring = 'plugin://plugin.video.themoviedb.helper/?info=details&amp;type={0}&amp;tmdb_id={1}'.format(self.params.get('type'), tmdb_id)
@@ -84,7 +96,7 @@ class Script:
                     utils.kodi_log('Unable to find TMDb ID!\nQuery: {0} Type: {1}'.format(self.params.get('add_query'), self.params.get('type')), 1)
                     exit()
             elif self.params.get('add_prop') and self.params.get('prop_id'):
-                item = apis.dialog_splititems(self.params.get('add_prop'))
+                item = utils.dialog_select_item(self.params.get('add_prop'))
                 prop_name = '{0}{1}'.format(_prefixname, self.params.get('prop_id'))
                 _homewindow.setProperty(prop_name, item)
             elif self.params.get('del_path'):
