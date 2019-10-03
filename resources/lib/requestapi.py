@@ -15,7 +15,7 @@ class RequestAPI(object):
         self.req_api_url = ''
         self.req_api_key = ''
         self.req_api_name = ''
-        self.req_wait_time = 2
+        self.req_wait_time = 1
         self.cache_long = 14
         self.cache_short = 1
         self.addon_name = 'plugin.video.themoviedb.helper'
@@ -25,6 +25,14 @@ class RequestAPI(object):
                        'You must enter a valid {0} API key to use this add-on'.format(api_name))
         xbmc.executebuiltin('Addon.OpenSettings({0})'.format(self.addon_name))
 
+    def get_cache(self, cache_name):
+        return _cache.get(cache_name)
+
+    def set_cache(self, my_object, cache_name, cache_days=14):
+        if my_object and cache_name and cache_days:
+            _cache.set(cache_name, my_object, expiration=datetime.timedelta(days=cache_days))
+        return my_object
+
     def use_cache(self, func, *args, **kwargs):
         """
         Simplecache takes func with args and kwargs
@@ -33,22 +41,18 @@ class RequestAPI(object):
         cache_days = kwargs.pop('cache_days', 14)
         cache_name = kwargs.pop('cache_name', self.addon_name)
         cache_only = kwargs.pop('cache_only', False)
-        is_list = kwargs.pop('is_list', True)
-        if is_list:
-            for arg in args:
-                if arg:
-                    cache_name = u'{0}/{1}'.format(cache_name, arg)
-            for key, value in kwargs.items():
-                if value:
-                    cache_name = u'{0}&{1}={2}'.format(cache_name, key, value)
-        my_cache = _cache.get(cache_name)
+        for arg in args:
+            if arg:
+                cache_name = u'{0}/{1}'.format(cache_name, arg)
+        for key, value in kwargs.items():
+            if value:
+                cache_name = u'{0}&{1}={2}'.format(cache_name, key, value)
+        my_cache = self.get_cache(cache_name)
         if my_cache:
             return my_cache
         elif not cache_only:
-            my_objects = func(*args, **kwargs)
-            if my_objects:
-                _cache.set(cache_name, my_objects, expiration=datetime.timedelta(days=cache_days))
-            return my_objects
+            my_object = func(*args, **kwargs)
+            return self.set_cache(my_object, cache_name, cache_days)
 
     def rate_limiter(self, wait_time=None, api_name=None):
         """
@@ -96,7 +100,6 @@ class RequestAPI(object):
             if request.status_code == 401:
                 utils.kodi_log('HTTP Error Code: {0}'.format(request.status_code), 1)
                 self.invalid_apikey()
-                exit()
             else:
                 utils.kodi_log('HTTP Error Code: {0}'.format(request.status_code), 1)
             return {}
@@ -137,8 +140,7 @@ class RequestAPI(object):
         cache_days = kwargs.pop('cache_days', self.cache_long)
         cache_name = kwargs.pop('cache_name', self.addon_name)
         cache_only = kwargs.pop('cache_only', False)
-        is_list = kwargs.pop('is_list', True)
         is_json = kwargs.pop('is_json', True)
         request_url = self.get_request_url(*args, **kwargs)
-        return self.use_cache(self.get_api_request, request_url, is_list=is_list, is_json=is_json,
+        return self.use_cache(self.get_api_request, request_url, is_json=is_json,
                               cache_days=cache_days, cache_name=cache_name, cache_only=cache_only)

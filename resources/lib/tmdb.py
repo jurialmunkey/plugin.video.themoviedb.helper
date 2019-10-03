@@ -16,9 +16,10 @@ class TMDb(RequestAPI):
         self.req_api_key = '?api_key={0}'.format(api_key)
         self.req_api_name = 'TMDb'
         self.req_api_url = 'https://api.themoviedb.org/3'
-        self.req_wait_time = 2 if api_key == 'a07324c669cac4d96789197134ce272b' else 0.2
+        self.req_wait_time = 1 if api_key == 'a07324c669cac4d96789197134ce272b' else 0.2
         self.req_append = append_to_response if append_to_response else None
-        self.imagepath = 'https://image.tmdb.org/t/p/original/'
+        self.imagepath_original = 'https://image.tmdb.org/t/p/original/'
+        self.imagepath_poster = 'https://image.tmdb.org/t/p/w500/'
         self.cache_long = 14 if not cache_long or cache_long < 14 else cache_long
         self.cache_short = 1 if not cache_short or cache_short < 1 else cache_short
         self.mpaa_prefix = '{0} '.format(mpaa_prefix) if mpaa_prefix else ''
@@ -40,27 +41,27 @@ class TMDb(RequestAPI):
 
     def get_icon(self, item):
         if item.get('poster_path'):
-            return '{0}{1}'.format(self.imagepath, item.get('poster_path'))
+            return '{0}{1}'.format(self.imagepath_poster, item.get('poster_path'))
         elif item.get('profile_path'):
-            return '{0}{1}'.format(self.imagepath, item.get('profile_path'))
+            return '{0}{1}'.format(self.imagepath_poster, item.get('profile_path'))
         elif item.get('file_path'):
-            return '{0}{1}'.format(self.imagepath, item.get('file_path'))
+            return '{0}{1}'.format(self.imagepath_poster, item.get('file_path'))
 
     def get_season_poster(self, item):
         if item.get('season_number') and item.get('seasons'):
             for i in item.get('seasons'):
                 if i.get('season_number') == item.get('season_number'):
                     if i.get('poster_path'):
-                        return '{0}{1}'.format(self.imagepath, i.get('poster_path'))
+                        return '{0}{1}'.format(self.imagepath_poster, i.get('poster_path'))
                     break
 
     def get_season_thumb(self, item):
         if item.get('still_path'):
-            return '{0}{1}'.format(self.imagepath, item.get('still_path'))
+            return '{0}{1}'.format(self.imagepath_original, item.get('still_path'))
 
     def get_fanart(self, item):
         if item.get('backdrop_path'):
-            return '{0}{1}'.format(self.imagepath, item.get('backdrop_path'))
+            return '{0}{1}'.format(self.imagepath_original, item.get('backdrop_path'))
 
     def get_infolabels(self, item):
         infolabels = {}
@@ -72,12 +73,13 @@ class TMDb(RequestAPI):
         infolabels['premiered'] = item.get('air_date') or item.get('release_date') or item.get('first_air_date') or ''
         infolabels['year'] = infolabels.get('premiered')[:4]
         infolabels['imdbnumber'] = item.get('imdb_id')
-        infolabels['duration'] = item.get('runtime', 0) * 60
         infolabels['tagline'] = item.get('tagline')
         infolabels['status'] = item.get('status')
         infolabels['episode'] = item.get('episode_number') or item.get('number_of_episodes')
         infolabels['season'] = item.get('season_number') or item.get('number_of_seasons')
         infolabels['genre'] = utils.dict_to_list(item.get('genres', []), 'name')
+        if item.get('runtime'):
+            infolabels['duration'] = item.get('runtime', 0) * 60
         if item.get('belongs_to_collection'):
             infolabels['set'] = item.get('belongs_to_collection').get('name')
         if item.get('networks'):
@@ -130,8 +132,8 @@ class TMDb(RequestAPI):
         if item.get('belongs_to_collection'):
             infoproperties['set.tmdb_id'] = item.get('belongs_to_collection').get('id')
             infoproperties['set.name'] = item.get('belongs_to_collection').get('name')
-            infoproperties['set.poster'] = '{0}{1}'.format(self.imagepath, item.get('belongs_to_collection').get('poster_path'))
-            infoproperties['set.fanart'] = '{0}{1}'.format(self.imagepath, item.get('belongs_to_collection').get('backdrop_path'))
+            infoproperties['set.poster'] = '{0}{1}'.format(self.imagepath_poster, item.get('belongs_to_collection').get('poster_path'))
+            infoproperties['set.fanart'] = '{0}{1}'.format(self.imagepath_original, item.get('belongs_to_collection').get('backdrop_path'))
         return infoproperties
 
     def get_cast(self, item):
@@ -151,7 +153,7 @@ class TMDb(RequestAPI):
                         cast_member['name'] = i.get('name')
                         cast_member['role'] = i.get('character')
                         cast_member['order'] = i.get('order')
-                        cast_member['thumbnail'] = '{0}{1}'.format(self.imagepath, i.get('profile_path')) if i.get('profile_path') else ''
+                        cast_member['thumbnail'] = '{0}{1}'.format(self.imagepath_poster, i.get('profile_path')) if i.get('profile_path') else ''
                         cast.append(cast_member)
         return cast
 
@@ -175,7 +177,7 @@ class TMDb(RequestAPI):
                     infoproperties['{0}name'.format(p)] = i.get('name')
                     infoproperties['{0}job'.format(p)] = i.get('job')
                     infoproperties['{0}department'.format(p)] = i.get('department')
-                    infoproperties['{0}thumb'.format(p)] = '{0}{1}'.format(self.imagepath, i.get('profile_path')) if i.get('profile_path') else ''
+                    infoproperties['{0}thumb'.format(p)] = '{0}{1}'.format(self.imagepath_poster, i.get('profile_path')) if i.get('profile_path') else ''
                     x = x + 1
         return infoproperties
 
@@ -250,14 +252,19 @@ class TMDb(RequestAPI):
 
     def get_detailed_item(self, itemtype, tmdb_id, season=None, episode=None, cache_only=False):
         extra_request = None
-        request = self.get_request_lc(itemtype, tmdb_id, language=self.req_language, append_to_response=self.req_append, cache_only=cache_only)
-        if season and episode:
-            extra_request = self.get_request_lc('tv', tmdb_id, 'season', season, 'episode', episode, language=self.req_language, append_to_response=self.req_append, cache_only=cache_only)
-        elif season:
-            extra_request = self.get_request_lc('tv', tmdb_id, 'season', season, language=self.req_language, append_to_response=self.req_append, cache_only=cache_only)
-        if extra_request:
-            request = utils.merge_two_dicts(request, extra_request)
-        itemdict = self.get_niceitem(request) if request else {}
+        cache_name = '{0}.{1}.{2}'.format(self.addon_name, itemtype, tmdb_id)
+        cache_name = '{0}.Season{1}'.format(cache_name, season) if season else cache_name
+        cache_name = '{0}.Episode{1}'.format(cache_name, episode) if season and episode else cache_name
+        itemdict = self.get_cache(cache_name)
+        if not itemdict and not cache_only:
+            request = self.get_request_lc(itemtype, tmdb_id, language=self.req_language, append_to_response=self.req_append)
+            if season and episode:
+                extra_request = self.get_request_lc('tv', tmdb_id, 'season', season, 'episode', episode, language=self.req_language, append_to_response=self.req_append)
+            elif season:
+                extra_request = self.get_request_lc('tv', tmdb_id, 'season', season, language=self.req_language, append_to_response=self.req_append)
+            if extra_request:
+                request = utils.merge_two_dicts(request, extra_request)
+            itemdict = self.set_cache(self.get_niceitem(request), cache_name, self.cache_long) if request else {}
         return itemdict
 
     def get_tmdb_id(self, itemtype=None, imdb_id=None, query=None, year=None, selectdialog=False, longcache=False):
@@ -276,8 +283,10 @@ class TMDb(RequestAPI):
             itemindex = 0
             if selectdialog:
                 item = utils.dialog_select_item(items=request, details=self)
-                return item.get('id')
-            return request[itemindex].get('id')
+                if item:
+                    return item.get('id')
+            else:
+                return request[itemindex].get('id')
 
     def get_credits_list(self, itemtype, tmdb_id, key):
         return self.get_list(itemtype, tmdb_id, 'credits', key=key, longcache=True)

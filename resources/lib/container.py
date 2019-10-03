@@ -45,10 +45,9 @@ class Container(object):
         xbmcplugin.endOfDirectory(_handle)
 
     def get_tmdb_id(self):
-        itemtype = TMDB_LISTS.get(self.params.get('info'), {}).get('tmdb_check_id', self.params.get('type'))
-        self.params['tmdb_id'] = _tmdb.get_tmdb_id(itemtype=itemtype, imdb_id=self.params.get('imdb_id'), query=self.params.get('query'), year=self.params.get('year'))
         if not self.params.get('tmdb_id'):
-            exit()
+            itemtype = TMDB_LISTS.get(self.params.get('info'), {}).get('tmdb_check_id', self.params.get('type'))
+            self.params['tmdb_id'] = _tmdb.get_tmdb_id(itemtype=itemtype, imdb_id=self.params.get('imdb_id'), query=self.params.get('query'), year=self.params.get('year'))
 
     def textviewer(self):
         _dialog.textviewer(self.params.get('header'), self.params.get('text'))
@@ -65,50 +64,49 @@ class Container(object):
                 listitem = ListItem(label=label)
                 listitem.create_listitem(_handle, info=category_info, type=tmdb_type)
         self.finish_container()
-        exit()
 
     def list_items(self, itemlist, dbtype=None, nexttype=None, info=None, url_info=None, url_tmdb=True):
         if itemlist:
             self.start_container()
+            dbiditems = []
+            tmdbitems = []
             added_items = []
             detailed_item = None
             tv_detailed_item = None
             ratings_awards = None
-            dbiditems = []
-            tmdbitems = []
             for item in itemlist:
                 # DUPLICATE CHECKING
                 add_item = '{0}{1}'.format(item.get('label'), item.get('poster'))
                 if add_item in added_items:
                     continue
+                added_items.append(add_item)
 
                 # URL ENCODING
-                url = item.get('url') if item.get('url') else {'info': url_info}
-                url['type'] = nexttype if nexttype else self.params.get('type')
+                item['url'] = item.get('url') if item.get('url') else {'info': url_info}
+                item['url']['type'] = nexttype if nexttype else self.params.get('type')
                 if url_tmdb and item.get('tmdb_id'):
-                    url['tmdb_id'] = item.get('tmdb_id')
+                    item['url']['tmdb_id'] = item.get('tmdb_id')
 
                 # SPECIAL URL ENCODING FOR TEXT AND IMAGE VIEWERS
-                if url.get('info') == 'imageviewer':
-                    url = {'info': 'imageviewer', 'image': item.get('icon')}
-                elif url.get('info') == 'textviewer':
-                    url = {'info': 'textviewer', 'header': item.get('label'), 'text': item.get('infolabels', {}).get('plot')}
+                if item['url'].get('info') == 'imageviewer':
+                    item['url'] = {'info': 'imageviewer', 'image': item.get('icon')}
+                elif item['url'].get('info') == 'textviewer':
+                    item['url'] = {'info': 'textviewer', 'header': item.get('label'), 'text': item.get('infolabels', {}).get('plot')}
 
                 # SPECIAL TREATMENT OF SEASONS AND EPISODES
-                if self.params.get('info') in ['seasons', 'episodes'] or url.get('type') in ['season', 'episode']:
-                    url['tmdb_id'] = self.params.get('tmdb_id')
-                    url['season'] = item.get('infolabels', {}).get('season')
-                    url['episode'] = item.get('infolabels', {}).get('episode')
+                if self.params.get('info') in ['seasons', 'episodes'] or item['url'].get('type') in ['season', 'episode']:
+                    item['url']['tmdb_id'] = self.params.get('tmdb_id')
+                    item['url']['season'] = item.get('infolabels', {}).get('season')
+                    item['url']['episode'] = item.get('infolabels', {}).get('episode')
                     if not tv_detailed_item:
                         tv_detailed_item = _tmdb.get_detailed_item('tv', self.params.get('tmdb_id'), season=self.params.get('season', None))
                     if tv_detailed_item:
                         item = utils.del_empty_keys(item)
                         item = utils.merge_two_dicts(tv_detailed_item, item)
 
-                # ADD CACHED DETAILS
-                # TODO: MOVE TO TMDB MODULE
-                if url.get('type') in ['movie', 'tv']:
-                    detailed_item = _tmdb.get_detailed_item(url.get('type'), url.get('tmdb_id'), cache_only=True)
+                # ADD CACHED TMDB DETAILS
+                if item['url'].get('type') in ['movie', 'tv']:
+                    detailed_item = _tmdb.get_detailed_item(item['url'].get('type'), item['url'].get('tmdb_id'), cache_only=True)
                     if detailed_item:
                         detailed_item['infolabels'] = utils.merge_two_dicts(item.get('infolabels', {}), detailed_item.get('infolabels', {}))
                         detailed_item['infoproperties'] = utils.merge_two_dicts(item.get('infoproperties', {}), detailed_item.get('infoproperties', {}))
@@ -116,25 +114,21 @@ class Container(object):
                         item = utils.merge_two_dicts(item, detailed_item)
 
                 # ADD CACHED OMDB RATINGS AND AWARDS
-                if _omdb and url.get('type') == 'movie' and item.get('infolabels', {}).get('imdbnumber'):
+                if _omdb and item['url'].get('type') == 'movie' and item.get('infolabels', {}).get('imdbnumber'):
                     ratings_awards = _omdb.get_ratings_awards(imdb_id=item.get('infolabels', {}).get('imdbnumber'), cache_only=True)
                     if ratings_awards:
                         item['infoproperties'] = utils.merge_two_dicts(item.get('infoproperties', {}), ratings_awards)
 
                 # GET DBID
                 kodidatabase = None
-                if url.get('type') == 'movie':
+                if item['url'].get('type') == 'movie':
                     kodidatabase = _kodimoviedb
-                elif url.get('type') == 'tv':
+                elif item['url'].get('type') == 'tv':
                     kodidatabase = _koditvshowdb
                 if kodidatabase:
-                    item['dbid'] = kodidatabase.get_dbid(imdb_id=item.get('infolabels', {}).get('imdbnumber'),
-                                                         originaltitle=item.get('infolabels', {}).get('originaltitle'),
-                                                         title=item.get('infolabels', {}).get('title'),
-                                                         year=item.get('infolabels', {}).get('year'))
+                    item['dbid'] = kodidatabase.get_dbid(imdb_id=item.get('infolabels', {}).get('imdbnumber'), originaltitle=item.get('infolabels', {}).get('originaltitle'), title=item.get('infolabels', {}).get('title'), year=item.get('infolabels', {}).get('year'))
 
                 # ADD TO APPROPRIATE LIST FOR SORTING
-                added_items.append(add_item)
                 if item.get('dbid'):
                     dbiditems.append(item)
                 else:
@@ -143,7 +137,7 @@ class Container(object):
             # RECREATE ITEMLIST WITH DBIDITEMS FIRST THEN BUILD LISTITEMS
             itemlist = dbiditems + tmdbitems
             for item in itemlist:
-                item.pop('url', None)
+                url = item.pop('url', {})
                 item.setdefault('infolabels', {})['mediatype'] = dbtype if dbtype else ''
                 listitem = ListItem(library=self.library, **item)
                 listitem.create_listitem(_handle, **url)
@@ -157,22 +151,21 @@ class Container(object):
                 xbmcgui.Window(10000).setProperty(window_prop, str(len(tmdbitems)))
 
     def list_tmdb(self, *args, **kwargs):
-        category = TMDB_LISTS.get(self.params.get('info'), {})
-        path = category.get('path', '').format(**self.params)
-        kwparams = utils.make_kwparams(self.params)
-        kwparams = utils.merge_two_dicts(kwparams, kwargs)
-        kwparams.setdefault('key', category.get('key', 'results'))
-        url_info = TMDB_LISTS.get(self.params.get('info'), {}).get('url_info', 'details')
-        itemlist = _tmdb.get_list(path, *args, **kwparams)
-        itemtype = TMDB_LISTS.get(self.params.get('info'), {}).get('itemtype') or self.params.get('type') or ''
-        nexttype = TMDB_LISTS.get(self.params.get('info'), {}).get('nexttype', None)
-        self.plugincategory = category.get('name', '').format(TYPE_CONVERSION.get(itemtype, {}).get('plural', ''))
-        self.containercontent = TYPE_CONVERSION.get(itemtype, {}).get('container', '')
-        self.list_items(itemlist, dbtype=TYPE_CONVERSION.get(itemtype, {}).get('dbtype'), nexttype=nexttype, url_info=url_info)
+        if self.params.get('type'):
+            category = TMDB_LISTS.get(self.params.get('info', ''), {})
+            path = category.get('path', '').format(**self.params)
+            kwparams = utils.make_kwparams(self.params)
+            kwparams = utils.merge_two_dicts(kwparams, kwargs)
+            kwparams.setdefault('key', category.get('key', 'results'))
+            url_info = TMDB_LISTS.get(self.params.get('info'), {}).get('url_info', 'details')
+            itemlist = _tmdb.get_list(path, *args, **kwparams)
+            itemtype = TMDB_LISTS.get(self.params.get('info'), {}).get('itemtype') or self.params.get('type') or ''
+            nexttype = TMDB_LISTS.get(self.params.get('info'), {}).get('nexttype', None)
+            self.plugincategory = category.get('name', '').format(TYPE_CONVERSION.get(itemtype, {}).get('plural', ''))
+            self.containercontent = TYPE_CONVERSION.get(itemtype, {}).get('container', '')
+            self.list_items(itemlist, dbtype=TYPE_CONVERSION.get(itemtype, {}).get('dbtype'), nexttype=nexttype, url_info=url_info)
 
     def list_details(self):
-        itemlist = []
-
         # GET THE DETAILED ITEM FROM TMDb
         if self.params.get('type') == 'episode':
             itemdetails = _tmdb.get_detailed_item('tv', self.params.get('tmdb_id'), self.params.get('season'), self.params.get('episode'))
@@ -187,6 +180,7 @@ class Container(object):
 
         # SET DETAILED ITEM AS FIRST ITEM AND BUILD RELEVANT CATEGORIES
         if itemdetails:
+            itemlist = []
             itemlist.append(itemdetails)
             for category in TMDB_CATEGORIES:
                 if self.params.get('type') in TMDB_LISTS.get(category, {}).get('types'):
@@ -233,34 +227,35 @@ class Container(object):
             self.params['with_crew'] = _tmdb.get_translated_list(utils.split_items(self.params.get('with_crew')), lookup_person, separator=self.params.get('with_separator'))
 
     def router(self):
-        # BASEDIR
-        if not self.params:
-            self.list_basedir()
-
-        # TEXT/IMAGE VIEWER FUNCTION
-        if self.params.get('info') == 'textviewer':
-            self.textviewer()
-        elif self.params.get('info') == 'imageviewer':
-            self.imageviewer()
-
-        # TRANSLATE ID FUNCTIONS
+        # FILTERS AND EXCLUSIONS
         _tmdb.filter_key = self.params.get('filter_key', None)
         _tmdb.filter_value = self.params.get('filter_value', None)
         _tmdb.exclude_key = self.params.get('exclude_key', None)
         _tmdb.exclude_value = self.params.get('exclude_value', None)
-        if self.params.get('info') == 'discover':
-            self.translate_discover()
-        elif self.params.get('info') not in BASEDIR and not self.params.get('tmdb_id'):
-            self.get_tmdb_id()
 
         # ROUTER LIST FUNCTIONS
-        if self.params.get('info') == 'details':
+        if self.params.get('info') == 'discover':
+            self.translate_discover()
+            self.list_tmdb()
+        elif self.params.get('info') == 'details':
+            self.get_tmdb_id()
             self.list_details()
         elif self.params.get('info') == 'search':
             self.list_search()
         elif self.params.get('info') == 'cast':
+            self.get_tmdb_id()
             self.list_credits('cast')
         elif self.params.get('info') == 'crew':
+            self.get_tmdb_id()
             self.list_credits('crew')
-        elif self.params.get('info') in TMDB_LISTS and TMDB_LISTS.get(self.params.get('info'), {}).get('path'):
+        elif self.params.get('info') == 'textviewer':
+            self.textviewer()
+        elif self.params.get('info') == 'imageviewer':
+            self.imageviewer()
+        elif self.params.get('info') in BASEDIR:
             self.list_tmdb()
+        elif self.params.get('info') in TMDB_LISTS and TMDB_LISTS.get(self.params.get('info'), {}).get('path'):
+            self.get_tmdb_id()
+            self.list_tmdb()
+        elif not self.params:
+            self.list_basedir()

@@ -3,7 +3,17 @@ import json
 import xbmcgui
 from datetime import datetime
 from copy import copy
+from contextlib import contextmanager
 _addonlogname = '[plugin.video.themoviedb.helper]\n'
+
+
+@contextmanager
+def busy_dialog():
+    xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+    try:
+        yield
+    finally:
+        xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
 
 
 def dialog_select_item(items=None, details=False):
@@ -22,8 +32,6 @@ def dialog_select_item(items=None, details=False):
             item_index = xbmcgui.Dialog().select('Choose item', item_list)
     if item_index > -1:
         return item_list[item_index]
-    else:
-        exit()
 
 
 def jsonrpc_library(method="VideoLibrary.GetMovies", dbtype="movie"):
