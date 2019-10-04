@@ -105,3 +105,76 @@ Types: `person`
 `plugin://plugin.video.themoviedb.helper?info=collection&amp;type=movie&amp;query=$INFO[ListItem.Set]`
 
 Types: `movie`  
+
+
+## Default Lists  
+These lists are bsed upon trends such as recent releases or popularity. Only a type paramater is required.
+
+#### Popular  
+`plugin://plugin.video.themoviedb.helper?info=popular&amp;type=movie`
+
+Types: `movie` `tv` `person`  
+
+#### Top Rated  
+`plugin://plugin.video.themoviedb.helper?info=top_rated&amp;type=movie`
+
+Types: `movie` `tv`   
+
+#### Upcoming  
+`plugin://plugin.video.themoviedb.helper?info=upcoming&amp;type=movie`
+
+Types: `movie`  
+
+#### Airing Today  
+`plugin://plugin.video.themoviedb.helper?info=airing_today&amp;type=tv`
+
+Types: `tv`  
+
+#### Now Playing In Theatres  
+`plugin://plugin.video.themoviedb.helper?info=now_playing&amp;type=movie`
+
+Types: `movie`  
+
+#### Currently Airing (in the last week)  
+`plugin://plugin.video.themoviedb.helper?info=on_the_air&amp;type=tv`
+
+Types: `tv`   
+
+
+## Search  
+Provides a list of items with titles matching the search query.  
+`plugin://plugin.video.themoviedb.helper?info=search&amp;type=movie&amp;query=$INFO[ListItem.Label]`  
+
+Types: `movie` `tv` `person`
+
+## Discover  
+More complex searching for items of a specific type that much several parameters:  
+`plugin://plugin.video.themoviedb.helper?info=discover&amp;type=movie&amp;with_cast=$INFO[ListItem.Label]`  
+
+Types: `movie` `tv` 
+
+Optional Parameters:  
+`&amp;with_cast=`  Includes items that have one of the specified people as a cast member  
+`&amp;with_crew=`  Includes items that have one of the specified people as a crew member  
+`&amp;with_people=`  Includes items that have one of the specified people as a cast or crew member
+`&amp;with_companies=`  Includes items from a matching movie studio  
+`&amp;with_genres=`  Includes items with a matching genre  
+`&amp;without_genres=`  Excludes items with a matching genre  
+`&amp;with_id=True`  Use this parameter if passing a tmdb_id to the above instead of a query
+
+## Optional Parameters for ALL Lists  
+Only include items that have the specified key that matches the specified value.  
+`&amp;filter_key=KEY&amp;filter_value=VALUE`  
+
+Exclude all items that have the specified key that matches the specified value.  
+`&amp;exclude_key=KEY&amp;exclude_value=VALUE`  
+
+Example:
+`plugin://plugin.video.themoviedb.helper/?info=crew_in_movies&amp;type=person&amp;filter_key=job&amp;filter_value=Director&amp;query=$INFO[ListItem.Director]&amp;exclude_key=title&amp;exclude_value=$INFO[ListItem.Title]`  
+This plugin path will get all movies were the Director was a crew member and their job was director. The currently selected movie will be excluded from the list.
+
+
+## Detailed Item  
+`plugin://plugin.video.themoviedb.helper/?info=details&amp;type=movie&amp;query=$INFO[ListItem.Title]`  
+
+Provides additional details about the current item. 
