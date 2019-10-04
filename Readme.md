@@ -197,8 +197,44 @@ This plugin path will get all movies were the Director was a crew member and the
 
 Provides additional details about the current item. 
 
-InfoLabels:
-`ListItem.Title` `ListItem.Plot`  `ListItem.Genre`  `ListItem.Studio`  `ListItem.MPAA`  `ListItem.Country`  `ListItem.Year`  `ListItem.Premiered`  `ListItem.Rating`  `ListItem.Duration`  
+**InfoLabels**  
+`ListItem.Title`  
+`ListItem.Plot`   
+`ListItem.Genre`   
+`ListItem.Studio`   
+`ListItem.MPAA`   
+`ListItem.Country`   
+`ListItem.Year`   
+`ListItem.Premiered`  
+`ListItem.Rating`  
+`ListItem.Duration`  
 
-ListItem.Property(property):
-`ListItem.Property(tmdb_id)`  `ListItem.Property(Genre.X.Name)`  `ListItem.Property(Genre.X.ID)`  `ListItem.Property(Studio.X.Name)`  `ListItem.Property(Studio.X.ID)`  `ListItem.Property(Country.X.Name)`  `ListItem.Property(Country.X.ID)`  `ListItem.Property(birthday)`  `ListItem.Property(deathday)`  `ListItem.Property(aliases)`  `ListItem.Property(role)`  `ListItem.Property(born)`  `ListItem.Property(budget)`  `ListItem.Property(revenue)`  `ListItem.Property(awards)`  `ListItem.Property(metacritic_rating)`  `ListItem.Property(imdb_rating)`  `ListItem.Property(imdb_votes)`  `ListItem.Property(rottentomatoes_rating)`  `ListItem.Property(rottentomatoes_image)`  `ListItem.Property(rottentomatoes_consensus)`  `ListItem.Property(rottentomatoes_reviewtotal)`  `ListItem.Property(rottentomatoes_reviewsfresh)`  `ListItem.Property(rottentomatoes_reviewsrotten)`  `ListItem.Property(rottentomatoes_usermeter)`  `ListItem.Property(rottentomatoes_userreviews)`  
+**ListItem.Property(property)**  
+`ListItem.Property(tmdb_id)`  
+`ListItem.Property(Genre.X.Name)`  
+`ListItem.Property(Genre.X.ID)`  
+`ListItem.Property(Studio.X.Name)`  
+`ListItem.Property(Studio.X.ID)`  
+`ListItem.Property(Country.X.Name)`  
+`ListItem.Property(Country.X.ID)`  
+`ListItem.Property(birthday)`  
+`ListItem.Property(deathday)`  
+`ListItem.Property(aliases)`  
+`ListItem.Property(role)`  
+`ListItem.Property(born)`  
+`ListItem.Property(budget)`  
+`ListItem.Property(revenue)`  
+
+**Additional Properties if OMDb api key specified**  
+`ListItem.Property(awards)`  
+`ListItem.Property(metacritic_rating)`  
+`ListItem.Property(imdb_rating)`  
+`ListItem.Property(imdb_votes)`  
+`ListItem.Property(rottentomatoes_rating)`  
+`ListItem.Property(rottentomatoes_image)`  
+`ListItem.Property(rottentomatoes_consensus)`  
+`ListItem.Property(rottentomatoes_reviewtotal)`  
+`ListItem.Property(rottentomatoes_reviewsfresh)`  
+`ListItem.Property(rottentomatoes_reviewsrotten)`  
+`ListItem.Property(rottentomatoes_usermeter)`  
+`ListItem.Property(rottentomatoes_userreviews)`  
