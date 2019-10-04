@@ -246,7 +246,7 @@ TMDb Helper also provides several script functions to assist with making an exte
 
 Arguments:  
 `add_path=`  
-e.g. `RunScript(plugin.video.themoviedb.helper,add_path=$INFO[ListItem.FolderPath])`
+e.g. `RunScript(plugin.video.themoviedb.helper,add_path=$INFO[ListItem.FolderPath])`  
 Adds the path to `Window(Home).Property(TMDBHelper.Current)`  
 Remebers a history of all previously added paths  
 
