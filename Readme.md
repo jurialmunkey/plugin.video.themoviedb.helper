@@ -6,8 +6,8 @@ TMDbHelper provides several ways to get TMDb lists related to another item.
 All lists require a `&amp;type=` parameter to be specified. Type can be `movie` `tv` or `person`
 
 An additional parameter is required to specify the item that the list will be based upon:  
-`&amp;query=$INFO[ListItem.Title]`
-`&amp;imdb_id=$INFO[ListItem.IMDBNumber]` 
+`&amp;query=$INFO[ListItem.Title]`  
+`&amp;imdb_id=$INFO[ListItem.IMDBNumber]`  
 `&amp;tmdb_id=$INFO[ListItem.Property(tmdb_id)]`  
 
 Skinners can also specify the optional `&amp;year=` parameter to get better results when using `&amp;query=`
