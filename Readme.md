@@ -107,6 +107,8 @@ Types: `person`
 Types: `movie`  
 
 
+
+
 ## Default Lists  
 These lists are bsed upon trends such as recent releases or popularity. Only a type paramater is required.
 
@@ -141,11 +143,15 @@ Types: `movie`
 Types: `tv`   
 
 
+
+
 ## Search  
 Provides a list of items with titles matching the search query.  
 `plugin://plugin.video.themoviedb.helper?info=search&amp;type=movie&amp;query=$INFO[ListItem.Label]`  
 
 Types: `movie` `tv` `person`
+
+
 
 ## Discover  
 More complex searching for items of a specific type that much several parameters:  
@@ -160,7 +166,17 @@ Optional Parameters:
 `&amp;with_companies=`  Includes items from a matching movie studio  
 `&amp;with_genres=`  Includes items with a matching genre  
 `&amp;without_genres=`  Excludes items with a matching genre  
-`&amp;with_id=True`  Use this parameter if passing a tmdb_id to the above instead of a query
+
+
+Discover will lookup the TMDb IDs for the values in with_genres/with_companies etc. If the TMDb ID is already available, it can be used instead by specifying the with_id parameter:  
+`&amp;with_id=True`  
+
+The default discover behaviour is to provide items matching ANY of the values in with_genres/with_companies etc.To retrieve items that match ALL values, change the with_separator to AND:  
+`&amp;with_separator=AND`  
+
+If multiple values are separated by a "/" but only the first matching value is desired, then change the with_separator to NONE:  
+`&amp;with_separator=NONE`  
+
 
 ## Optional Parameters for ALL Lists  
 Only include items that have the specified key that matches the specified value.  
@@ -174,7 +190,15 @@ Example:
 This plugin path will get all movies were the Director was a crew member and their job was director. The currently selected movie will be excluded from the list.
 
 
+
+
 ## Detailed Item  
 `plugin://plugin.video.themoviedb.helper/?info=details&amp;type=movie&amp;query=$INFO[ListItem.Title]`  
 
 Provides additional details about the current item. 
+
+InfoLabels:
+`ListItem.Title` `ListItem.Plot`  `ListItem.Genre`  `ListItem.Studio`  `ListItem.MPAA`  `ListItem.Country`  `ListItem.Year`  `ListItem.Premiered`  `ListItem.Rating`  `ListItem.Duration`  
+
+ListItem.Property(property):
+`ListItem.Property(tmdb_id)`  `ListItem.Property(Genre.X.Name)`  `ListItem.Property(Genre.X.ID)`  `ListItem.Property(Studio.X.Name)`  `ListItem.Property(Studio.X.ID)`  `ListItem.Property(Country.X.Name)`  `ListItem.Property(Country.X.ID)`  `ListItem.Property(birthday)`  `ListItem.Property(deathday)`  `ListItem.Property(aliases)`  `ListItem.Property(role)`  `ListItem.Property(born)`  `ListItem.Property(budget)`  `ListItem.Property(revenue)`  `ListItem.Property(awards)`  `ListItem.Property(metacritic_rating)`  `ListItem.Property(imdb_rating)`  `ListItem.Property(imdb_votes)`  `ListItem.Property(rottentomatoes_rating)`  `ListItem.Property(rottentomatoes_image)`  `ListItem.Property(rottentomatoes_consensus)`  `ListItem.Property(rottentomatoes_reviewtotal)`  `ListItem.Property(rottentomatoes_reviewsfresh)`  `ListItem.Property(rottentomatoes_reviewsrotten)`  `ListItem.Property(rottentomatoes_usermeter)`  `ListItem.Property(rottentomatoes_userreviews)`  
