@@ -162,8 +162,8 @@ Types: `movie` `tv`
 Optional Parameters:  
 `&amp;with_cast=`  Includes items that have one of the specified people as a cast member  
 `&amp;with_crew=`  Includes items that have one of the specified people as a crew member  
-`&amp;with_people=`  Includes items that have one of the specified people as a cast or crew member
-`&amp;with_companies=`  Includes items from a matching movie studio  
+`&amp;with_people=`  Includes items that have one of the specified people as a cast or crew member  
+`&amp;with_companies=`  Includes items from a matching movie studio   
 `&amp;with_genres=`  Includes items with a matching genre  
 `&amp;without_genres=`  Excludes items with a matching genre  
 
