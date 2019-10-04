@@ -238,3 +238,43 @@ Provides additional details about the current item.
 `ListItem.Property(rottentomatoes_reviewsrotten)`  
 `ListItem.Property(rottentomatoes_usermeter)`  
 `ListItem.Property(rottentomatoes_userreviews)`  
+
+
+## Script Functions  
+TMDb Helper also provides several script functions to assist with making an extended info type experience. See Arctic Zephyr 2 for an example of implementation
+
+
+Arguments:  
+`add_path=`  
+e.g. `RunScript(plugin.video.themoviedb.helper,add_path=$INFO[ListItem.FolderPath])`
+Adds the path to `Window(Home).Property(TMDBHelper.Current)`  
+Remebers a history of all previously added paths  
+
+`del_path`  
+e.g. `RunScript(plugin.video.themoviedb.helper,del_path)`  
+Deletes the path in TMDBHelper.Current and replaces it with the previously stored path in the history  
+
+`reset_path`  
+e.g. `RunScript(plugin.video.themoviedb.helper,reset_path)`  
+Deletes the current path and wipes all history.
+
+`call_id=`  
+e.g. `RunScript(plugin.video.themoviedb.helper,add_path=$INFO[ListItem.FolderPath],call_id=1137)`  
+After completing the other actions, the script will close all dialogs and do `ActivateWindow(call_id)`  
+
+`call_path=`  
+e.g. `RunScript(plugin.video.themoviedb.helper,add_path=$INFO[ListItem.FolderPath],call_path=$INFO[ListItem.FolderPath])`  
+After completing the other actions, the script will close all dialogs and do `ActivateWindow(videos, call_path, return)`  
+
+`prevent_del`  
+e.g. `RunScript(plugin.video.themoviedb.helper,add_path=$INFO[ListItem.FolderPath],call_id=1137,prevent_del)`  
+Will set a lock that prevents `del_path` from deleting `Window(Home).Property(TMDbHelper.Current)` the first time it is called.  
+
+`add_query=` `type=`  
+e.g. `RunScript(plugin.video.themoviedb.helper,add_query=$INFO[ListItem.Writer],type=person,call_id=1137,prevent_del)`  
+Finds the TMDb ID for the specified item and adds the detailed item path for it to `Window(Home).Property(TMDbHelper.Current)`  
+If multiple "/" separated items exist in the infolabel, the user is prompted to select which item to use as the search query for the detailed item. If multiple items subsequently match the search query, the user is prompted to select the desired item from a list of possible matches.
+
+`add_prop=` `prop_id=`  
+e.g. `RunScript(plugin.video.themoviedb.helper,add_prop=$INFO[ListItem.Genre],prop_id=SelectedGenre)`  
+Prompts user to select an item from a list of items separated by "/". The selected item is then added to a window property as specified by prop_id. For instance, the above path will ask the user to select a genre from all listed genres for a movie and then will add that genre to `Window(Home).Property(TMDbHelper.SelectedGenre)`
