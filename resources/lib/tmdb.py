@@ -157,8 +157,9 @@ class TMDb(RequestAPI):
                         cast.append(cast_member)
         return cast
 
-    def get_cast_properties(self, cast, infoproperties):
+    def get_cast_properties(self, cast):
         x = 1
+        infoproperties = {}
         for cast_member in cast:
             p = 'Cast.{0}.'.format(x)
             infoproperties['{0}name'.format(p)] = cast_member.get('name')
@@ -167,7 +168,8 @@ class TMDb(RequestAPI):
             x = x + 1
         return infoproperties
 
-    def get_crew_properties(self, item, infoproperties):
+    def get_crew_properties(self, item):
+        infoproperties = {}
         if item.get('credits'):
             crew_list = item.get('credits', {}).get('crew', [])
             x = 1
@@ -181,7 +183,8 @@ class TMDb(RequestAPI):
                     x = x + 1
         return infoproperties
 
-    def get_director_writer(self, item, infolabels):
+    def get_director_writer(self, item):
+        infolabels = {}
         if item.get('credits'):
             crew_list = item.get('credits', {}).get('crew', [])
             for i in crew_list:
@@ -203,9 +206,9 @@ class TMDb(RequestAPI):
         infolabels = self.get_infolabels(item)
         infoproperties = self.get_infoproperties(item)
         cast = self.get_cast(item)
-        infolabels = self.get_director_writer(item, infolabels)
-        infoproperties = self.get_cast_properties(cast, infoproperties)
-        infoproperties = self.get_crew_properties(item, infoproperties)
+        infolabels = utils.merge_two_dicts(infolabels, self.get_director_writer(item))
+        infoproperties = utils.merge_two_dicts(infoproperties, self.get_cast_properties(cast))
+        infoproperties = utils.merge_two_dicts(infoproperties, self.get_crew_properties(item))
         imdb_id = item.get('imdb_id')
         tmdb_id = item.get('id')
         return {'label': label, 'icon': icon, 'poster': poster, 'thumb': thumb, 'fanart': fanart,
