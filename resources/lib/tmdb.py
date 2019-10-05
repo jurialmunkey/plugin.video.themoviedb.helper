@@ -45,7 +45,7 @@ class TMDb(RequestAPI):
         elif item.get('profile_path'):
             return '{0}{1}'.format(self.imagepath_poster, item.get('profile_path'))
         elif item.get('file_path'):
-            return '{0}{1}'.format(self.imagepath_poster, item.get('file_path'))
+            return '{0}{1}'.format(self.imagepath_original, item.get('file_path'))
 
     def get_season_poster(self, item):
         if item.get('season_number') and item.get('seasons'):

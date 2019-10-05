@@ -1,6 +1,7 @@
 import time
 import datetime
 import simplecache
+import xbmcaddon
 import xbmcgui
 import xbmc
 import requests
@@ -8,6 +9,7 @@ import utils
 import xml.etree.ElementTree as ET
 _cache = simplecache.SimpleCache()
 _xbmcdialog = xbmcgui.Dialog()
+_addon = xbmcaddon.Addon()
 
 
 class RequestAPI(object):
@@ -21,8 +23,8 @@ class RequestAPI(object):
         self.addon_name = 'plugin.video.themoviedb.helper'
 
     def invalid_apikey(self, api_name='TMDb'):
-        _xbmcdialog.ok('Missing/Invalid {0} API Key'.format(api_name),
-                       'You must enter a valid {0} API key to use this add-on'.format(api_name))
+        _xbmcdialog.ok('{0} {1} {2}'.format(_addon.getLocalizedString(32007), api_name, _addon.getLocalizedString(32008)),
+                       _addon.getLocalizedString(32009))
         xbmc.executebuiltin('Addon.OpenSettings({0})'.format(self.addon_name))
 
     def get_cache(self, cache_name):

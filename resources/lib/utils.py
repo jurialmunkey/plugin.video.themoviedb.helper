@@ -1,10 +1,11 @@
 import xbmc
-import json
 import xbmcgui
+import xbmcaddon
 from datetime import datetime
 from copy import copy
 from contextlib import contextmanager
 _addonlogname = '[plugin.video.themoviedb.helper]\n'
+_addon = xbmcaddon.Addon()
 
 
 @contextmanager
@@ -27,9 +28,9 @@ def dialog_select_item(items=None, details=False):
                 dialog_item = xbmcgui.ListItem(details.get_title(item))
                 dialog_item.setArt({'icon': icon, 'thumb': icon})
                 detailed_item_list.append(dialog_item)
-            item_index = xbmcgui.Dialog().select('Choose item', detailed_item_list, preselect=0, useDetails=True)
+            item_index = xbmcgui.Dialog().select(_addon.getLocalizedString(32006), detailed_item_list, preselect=0, useDetails=True)
         else:
-            item_index = xbmcgui.Dialog().select('Choose item', item_list)
+            item_index = xbmcgui.Dialog().select(_addon.getLocalizedString(32006), item_list)
     if item_index > -1:
         return item_list[item_index]
 

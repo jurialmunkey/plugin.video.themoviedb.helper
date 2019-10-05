@@ -16,274 +16,324 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-msgctxt "#30000" 
+msgctxt "#30000"
 msgid "Arabic (United Arab Emirates)"
 msgstr ""
 
-msgctxt "#30001" 
+msgctxt "#30001"
 msgid "Arabic (Saudi Arabia)"
 msgstr ""
 
-msgctxt "#30002" 
+#: /resources/settings.xml
+msgctxt "#32000"
+msgid "TMDb API Key"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32001"
+msgid "OMDb API Key"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32002"
+msgid "Days to cache details"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32003"
+msgid "Days to cache lists"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32004"
+msgid "MPAA Rating Prefix"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32005"
+msgid "Language and Country"
+msgstr ""
+
+#: /resources/lib/utils.py
+msgctxt "#32006"
+msgid "Choose item"
+msgstr ""
+
+#: /resources/lib/requestapi.py
+msgctxt "#32007"
+msgid "Missing/Invalid"
+msgstr ""
+
+#: /resources/lib/requestapi.py
+msgctxt "#32008"
+msgid "API Key"
+msgstr ""
+
+#: /resources/lib/requestapi.py
+msgctxt "#32009"
+msgid "You must enter a valid API key to use this add-on"
+msgstr ""
+
+msgctxt "#30002"
 msgid "Belarusian (Belarus)"
 msgstr ""
 
-msgctxt "#30003" 
+msgctxt "#30003"
 msgid "Bulgarian (Bulgaria)"
 msgstr ""
 
-msgctxt "#30004" 
+msgctxt "#30004"
 msgid "Bengali (Bangladesh)"
 msgstr ""
 
-msgctxt "#30005" 
+msgctxt "#30005"
 msgid "Catalan (Spain)"
 msgstr ""
 
-msgctxt "#30006" 
+msgctxt "#30006"
 msgid "Chamorro (Guam)"
 msgstr ""
 
-msgctxt "#30007" 
+msgctxt "#30007"
 msgid "Czech (Czech Republic)"
 msgstr ""
 
-msgctxt "#30008" 
+msgctxt "#30008"
 msgid "Danish (Denmark)"
 msgstr ""
 
-msgctxt "#30009" 
+msgctxt "#30009"
 msgid "German (Austria)"
 msgstr ""
 
-msgctxt "#30010" 
+msgctxt "#30010"
 msgid "German (Switzerland)"
 msgstr ""
 
-msgctxt "#30011" 
+msgctxt "#30011"
 msgid "German (Germany)"
 msgstr ""
 
-msgctxt "#30012" 
+msgctxt "#30012"
 msgid "Greek (Greece)"
 msgstr ""
 
-msgctxt "#30013" 
+msgctxt "#30013"
 msgid "English (Australia)"
 msgstr ""
 
-msgctxt "#30014" 
+msgctxt "#30014"
 msgid "English (Canada)"
 msgstr ""
 
-msgctxt "#30015" 
+msgctxt "#30015"
 msgid "English (United Kingdom)"
 msgstr ""
 
-msgctxt "#30016" 
+msgctxt "#30016"
 msgid "English (Ireland)"
 msgstr ""
 
-msgctxt "#30017" 
+msgctxt "#30017"
 msgid "English (New Zealand)"
 msgstr ""
 
-msgctxt "#30018" 
+msgctxt "#30018"
 msgid "English (United States of America)"
 msgstr ""
 
-msgctxt "#30019" 
+msgctxt "#30019"
 msgid "Esperanto (None)"
 msgstr ""
 
-msgctxt "#30020" 
+msgctxt "#30020"
 msgid "Spanish (Spain)"
 msgstr ""
 
-msgctxt "#30021" 
+msgctxt "#30021"
 msgid "Spanish (Mexico)"
 msgstr ""
 
-msgctxt "#30022" 
+msgctxt "#30022"
 msgid "Estonian (Estonia)"
 msgstr ""
 
-msgctxt "#30023" 
+msgctxt "#30023"
 msgid "Basque (Spain)"
 msgstr ""
 
-msgctxt "#30024" 
+msgctxt "#30024"
 msgid "Persian (Iran)"
 msgstr ""
 
-msgctxt "#30025" 
+msgctxt "#30025"
 msgid "Finnish (Finland)"
 msgstr ""
 
-msgctxt "#30026" 
+msgctxt "#30026"
 msgid "French (Canada)"
 msgstr ""
 
-msgctxt "#30027" 
+msgctxt "#30027"
 msgid "French (France)"
 msgstr ""
 
-msgctxt "#30028" 
+msgctxt "#30028"
 msgid "Galician (Spain)"
 msgstr ""
 
-msgctxt "#30029" 
+msgctxt "#30029"
 msgid "Hebrew (Israel)"
 msgstr ""
 
-msgctxt "#30030" 
+msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
 
-msgctxt "#30031" 
+msgctxt "#30031"
 msgid "Hungarian (Hungary)"
 msgstr ""
 
-msgctxt "#30032" 
+msgctxt "#30032"
 msgid "Indonesian (Indonesia)"
 msgstr ""
 
-msgctxt "#30033" 
+msgctxt "#30033"
 msgid "Italian (Italy)"
 msgstr ""
 
-msgctxt "#30034" 
+msgctxt "#30034"
 msgid "Japanese (Japan)"
 msgstr ""
 
-msgctxt "#30035" 
+msgctxt "#30035"
 msgid "Georgian (Georgia)"
 msgstr ""
 
-msgctxt "#30036" 
+msgctxt "#30036"
 msgid "Kazakh (Kazakhstan)"
 msgstr ""
 
-msgctxt "#30037" 
+msgctxt "#30037"
 msgid "Kannada (India)"
 msgstr ""
 
-msgctxt "#30038" 
+msgctxt "#30038"
 msgid "Korean (South Korea)"
 msgstr ""
 
-msgctxt "#30039" 
+msgctxt "#30039"
 msgid "Lithuanian (Lithuania)"
 msgstr ""
 
-msgctxt "#30040" 
+msgctxt "#30040"
 msgid "Latvian (Latvia)"
 msgstr ""
 
-msgctxt "#30041" 
+msgctxt "#30041"
 msgid "Malayalam (India)"
 msgstr ""
 
-msgctxt "#30042" 
+msgctxt "#30042"
 msgid "Malay (Malaysia)"
 msgstr ""
 
-msgctxt "#30043" 
+msgctxt "#30043"
 msgid "Malay (Singapore)"
 msgstr ""
 
-msgctxt "#30044" 
+msgctxt "#30044"
 msgid "Norwegian Bokmål (Norway)"
 msgstr ""
 
-msgctxt "#30045" 
+msgctxt "#30045"
 msgid "Dutch (Netherlands)"
 msgstr ""
 
-msgctxt "#30046" 
+msgctxt "#30046"
 msgid "Norwegian (Norway)"
 msgstr ""
 
-msgctxt "#30047" 
+msgctxt "#30047"
 msgid "Polish (Poland)"
 msgstr ""
 
-msgctxt "#30048" 
+msgctxt "#30048"
 msgid "Portuguese (Brazil)"
 msgstr ""
 
-msgctxt "#30049" 
+msgctxt "#30049"
 msgid "Portuguese (Portugal)"
 msgstr ""
 
-msgctxt "#30050" 
+msgctxt "#30050"
 msgid "Romanian (Romania)"
 msgstr ""
 
-msgctxt "#30051" 
+msgctxt "#30051"
 msgid "Russian (Russia)"
 msgstr ""
 
-msgctxt "#30052" 
+msgctxt "#30052"
 msgid "Sinhalese (Sri Lanka)"
 msgstr ""
 
-msgctxt "#30053" 
+msgctxt "#30053"
 msgid "Slovak (Slovakia)"
 msgstr ""
 
-msgctxt "#30054" 
+msgctxt "#30054"
 msgid "Slovenian (Slovenia)"
 msgstr ""
 
-msgctxt "#30055" 
+msgctxt "#30055"
 msgid "Serbian (Serbia)"
 msgstr ""
 
-msgctxt "#30056" 
+msgctxt "#30056"
 msgid "Swedish (Sweden)"
 msgstr ""
 
-msgctxt "#30057" 
+msgctxt "#30057"
 msgid "Tamil (India)"
 msgstr ""
 
-msgctxt "#30058" 
+msgctxt "#30058"
 msgid "Telugu (India)"
 msgstr ""
 
-msgctxt "#30059" 
+msgctxt "#30059"
 msgid "Thai (Thailand)"
 msgstr ""
 
-msgctxt "#30060" 
+msgctxt "#30060"
 msgid "Tagalog (Philippines)"
 msgstr ""
 
-msgctxt "#30061" 
+msgctxt "#30061"
 msgid "Turkish (Turkey)"
 msgstr ""
 
-msgctxt "#30062" 
+msgctxt "#30062"
 msgid "Ukrainian (Ukraine)"
 msgstr ""
 
-msgctxt "#30063" 
+msgctxt "#30063"
 msgid "Vietnamese (Vietnam)"
 msgstr ""
 
-msgctxt "#30064" 
+msgctxt "#30064"
 msgid "Mandarin (China)"
 msgstr ""
 
-msgctxt "#30065" 
+msgctxt "#30065"
 msgid "Mandarin (Hong Kong)"
 msgstr ""
 
-msgctxt "#30066" 
+msgctxt "#30066"
 msgid "Mandarin (Taiwan)"
 msgstr ""
 
-msgctxt "#30067" 
+msgctxt "#30067"
 msgid "Zulu (South Africa)"
 msgstr ""
