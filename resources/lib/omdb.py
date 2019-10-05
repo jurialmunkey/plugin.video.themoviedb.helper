@@ -1,5 +1,5 @@
-import utils
-from requestapi import RequestAPI
+import resources.lib.utils as utils
+from resources.lib.requestapi import RequestAPI
 
 
 class OMDb(RequestAPI):

@@ -1,7 +1,10 @@
 import xbmcgui
 import xbmcaddon
 import xbmcplugin
-from urllib import urlencode
+try:
+    from urllib.parse import urlencode  # Py3
+except ImportError:
+    from urllib import urlencode  # Py2
 _addonpath = xbmcaddon.Addon().getAddonInfo('path')
 _url = 'plugin://plugin.video.themoviedb.helper/'
 

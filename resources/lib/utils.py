@@ -134,10 +134,11 @@ def iter_props(items, property, itemprops, **kwargs):
 
 
 def del_empty_keys(d):
+    my_dict = d.copy()
     for k, v in d.items():
         if not v:
-            del d[k]
-    return d
+            del my_dict[k]
+    return my_dict
 
 
 def merge_two_dicts(x, y):

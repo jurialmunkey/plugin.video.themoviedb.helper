@@ -1,6 +1,6 @@
 import xbmc
 import json
-import utils
+import resources.lib.utils as utils
 
 
 class KodiLibrary(object):

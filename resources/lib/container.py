@@ -1,14 +1,14 @@
 import sys
-import utils
+import resources.lib.utils as utils
 import xbmc
 import xbmcgui
 import xbmcaddon
 import xbmcplugin
-from tmdb import TMDb
-from omdb import OMDb
-from kodilibrary import KodiLibrary
-from listitem import ListItem
-from globals import LANGUAGES, BASEDIR, TYPE_CONVERSION, TMDB_LISTS, TMDB_CATEGORIES, APPEND_TO_RESPONSE
+from resources.lib.tmdb import TMDb
+from resources.lib.omdb import OMDb
+from resources.lib.kodilibrary import KodiLibrary
+from resources.lib.listitem import ListItem
+from resources.lib.globals import LANGUAGES, BASEDIR, TYPE_CONVERSION, TMDB_LISTS, TMDB_CATEGORIES, APPEND_TO_RESPONSE
 try:
     from urllib.parse import parse_qsl  # Py3
 except ImportError:
@@ -79,7 +79,7 @@ class Container(object):
             ratings_awards = None
             for item in itemlist:
                 # DUPLICATE CHECKING
-                add_item = '{0}{1}'.format(item.get('label'), item.get('poster'))
+                add_item = u'{0}{1}'.format(item.get('label'), item.get('poster'))
                 if add_item in added_items:
                     continue
                 added_items.append(add_item)

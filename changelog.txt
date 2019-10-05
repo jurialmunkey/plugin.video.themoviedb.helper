@@ -1,3 +1,6 @@
+**1.0.2**
+- Python 3 compatibility work
+
 **1.0.0**
 - Ready for official repo submission
 - Add xbmc.Monitor() class for wait

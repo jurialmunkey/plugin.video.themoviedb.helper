@@ -5,7 +5,7 @@ import xbmcaddon
 import xbmcgui
 import xbmc
 import requests
-import utils
+import resources.lib.utils as utils
 import xml.etree.ElementTree as ET
 _cache = simplecache.SimpleCache()
 _xbmcdialog = xbmcgui.Dialog()
