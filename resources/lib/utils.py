@@ -34,49 +34,6 @@ def dialog_select_item(items=None, details=False):
         return item_list[item_index]
 
 
-def jsonrpc_library(method="VideoLibrary.GetMovies", dbtype="movie"):
-    query = {"jsonrpc": "2.0",
-             "params": {"properties": ["title", "imdbnumber", "originaltitle", "year"]},
-             "method": method,
-             "id": 1}
-    response = json.loads(xbmc.executeJSONRPC(json.dumps(query)))
-    my_list = []
-    dbid_name = '{0}id'.format(dbtype)
-    key_to_get = '{0}s'.format(dbtype)
-    for item in response.get('result', {}).get(key_to_get, []):
-        my_list.append({'imdb_id': item.get('imdbnumber'),
-                        'dbid': item.get(dbid_name),
-                        'title': item.get('title'),
-                        'originaltitle': item.get('originaltitle'),
-                        'year': item.get('year')})
-    return my_list
-
-
-def get_kodi_dbid(item, kodi_library):
-    dbid = None
-    if kodi_library:
-        index_list = find_dict_in_list(kodi_library, 'imdb_id', item.get('imdb_id')) if item.get('imdb_id') else []
-        if not index_list and item.get('original_title'):
-            index_list = find_dict_in_list(kodi_library, 'originaltitle', item.get('original_title'))
-        if not index_list and item.get('name'):
-            index_list = find_dict_in_list(kodi_library, 'title', item.get('name'))
-        for i in index_list:
-            if item.get('year'):
-                if item.get('year') in str(kodi_library[i].get('year')):
-                    dbid = kodi_library[i].get('dbid')
-            else:
-                dbid = kodi_library[i].get('dbid')
-            if dbid:
-                return dbid
-
-
-def get_kodi_library(list_type):
-    if list_type == 'movie':
-        return jsonrpc_library("VideoLibrary.GetMovies", "movie")
-    elif list_type == 'tv':
-        return jsonrpc_library("VideoLibrary.GetTVShows", "tvshow")
-
-
 def filtered_item(item, key, value, false_val=False):
     true_val = False if false_val else True  # Flip values if we want to exclude instead of include
     if key and value:

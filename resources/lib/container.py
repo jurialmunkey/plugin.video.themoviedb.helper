@@ -9,7 +9,10 @@ from omdb import OMDb
 from kodilibrary import KodiLibrary
 from listitem import ListItem
 from globals import LANGUAGES, BASEDIR, TYPE_CONVERSION, TMDB_LISTS, TMDB_CATEGORIES, APPEND_TO_RESPONSE
-from urlparse import parse_qsl
+try:
+    from urllib.parse import parse_qsl  # Py3
+except ImportError:
+    from urlparse import parse_qsl  # Py2
 _handle = int(sys.argv[1])
 _addon = xbmcaddon.Addon()
 _addonname = 'plugin.video.themoviedb.helper'

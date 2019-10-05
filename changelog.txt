@@ -1,3 +1,12 @@
+**1.0.0**
+- Ready for official repo submission
+- Add xbmc.Monitor() class for wait
+- Remove delay in script
+- Specify videoinfo dialog to close in script
+- Move busy dialog only when doing lookup in script
+- use urllib.parse for Py3 compatibility
+- Add abort requested monitor
+
 **0.9.1**
 - Additional updates in prep for repo sub
 

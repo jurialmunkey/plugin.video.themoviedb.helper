@@ -67,16 +67,16 @@ class RequestAPI(object):
         nart_time = nart_time - time.time()
         if nart_time > 0:  # Apply rate limiting if next allowed request time is still in the furture
             nart_lock = xbmcgui.Window(10000).getProperty(nart_lock_id)
-            while nart_lock == 'True':  # If another instance is applying rate limiting then wait till it finishes
-                time.sleep(1)
+            while not xbmc.Monitor().abortRequested() and nart_lock == 'True':  # If another instance is applying rate limiting then wait till it finishes
+                xbmc.Monitor().waitForAbort(1)
                 nart_lock = xbmcgui.Window(10000).getProperty(nart_lock_id)
             nart_time = xbmcgui.Window(10000).getProperty(nart_time_id)  # Get nart again because it might have elapsed
             nart_time = float(nart_time) if nart_time else -1
             nart_time = nart_time - time.time()
             if nart_time > 0:  # If nart still in the future then apply rate limiting
                 xbmcgui.Window(10000).setProperty(nart_lock_id, 'True')  # Set the lock to prevent concurrent limiters
-                while nart_time > 0:
-                    time.sleep(1)
+                while not xbmc.Monitor().abortRequested() and nart_time > 0:
+                    xbmc.Monitor().waitForAbort(1)
                     nart_time = nart_time - 1
         nart_time = time.time() + wait_time  # Set nart into future for next request
         nart_time = str(nart_time)

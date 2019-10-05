@@ -6,7 +6,6 @@ import sys
 import xbmc
 import xbmcgui
 import xbmcaddon
-import time
 import resources.lib.utils as utils
 from resources.lib.globals import LANGUAGES, APPEND_TO_RESPONSE
 from resources.lib.tmdb import TMDb
@@ -68,23 +67,21 @@ class Script:
         _homewindow.clearProperty(self.prefixlock)
 
     def call_window(self):
-        sleeper = float(self.params.get('delay', '0'))
-        time.sleep(sleeper)
         if self.params.get('call_id'):
-            xbmc.executebuiltin('Dialog.Close(all, force)')
+            xbmc.executebuiltin('Dialog.Close(12003)')
             xbmc.executebuiltin('ActivateWindow({0})'.format(self.params.get('call_id')))
         elif self.params.get('call_path'):
-            xbmc.executebuiltin('Dialog.Close(all, force)')
+            xbmc.executebuiltin('Dialog.Close(12003)')
             xbmc.executebuiltin('ActivateWindow(videos, {0}, return)'.format(self.params.get('call_path')))
 
     def router(self):
-        with utils.busy_dialog():
-            if self.params:
-                if self.params.get('add_path'):
-                    self.position = self.position + 1
-                    self.set_props(self.position, self.params.get('add_path'))
-                    self.lock_path(self.params.get('prevent_del'))
-                elif self.params.get('add_query') and self.params.get('type'):
+        if self.params:
+            if self.params.get('add_path'):
+                self.position = self.position + 1
+                self.set_props(self.position, self.params.get('add_path'))
+                self.lock_path(self.params.get('prevent_del'))
+            elif self.params.get('add_query') and self.params.get('type'):
+                with utils.busy_dialog():
                     item = utils.dialog_select_item(self.params.get('add_query'))
                     if not item:
                         return
@@ -97,26 +94,26 @@ class Script:
                     else:
                         utils.kodi_log('Unable to find TMDb ID!\nQuery: {0} Type: {1}'.format(self.params.get('add_query'), self.params.get('type')), 1)
                         return
-                elif self.params.get('add_prop') and self.params.get('prop_id'):
-                    item = utils.dialog_select_item(self.params.get('add_prop'))
-                    if not item:
-                        return
-                    prop_name = '{0}{1}'.format(_prefixname, self.params.get('prop_id'))
-                    _homewindow.setProperty(prop_name, item)
-                elif self.params.get('del_path'):
-                    if self.prevent_del:
-                        self.unlock_path()
+            elif self.params.get('add_prop') and self.params.get('prop_id'):
+                item = utils.dialog_select_item(self.params.get('add_prop'))
+                if not item:
+                    return
+                prop_name = '{0}{1}'.format(_prefixname, self.params.get('prop_id'))
+                _homewindow.setProperty(prop_name, item)
+            elif self.params.get('del_path'):
+                if self.prevent_del:
+                    self.unlock_path()
+                else:
+                    _homewindow.clearProperty('{0}{1}'.format(self.prefixpath, self.position))
+                    if self.position > 1:
+                        self.position = self.position - 1
+                        path = _homewindow.getProperty('{0}{1}'.format(self.prefixpath, self.position))
+                        self.set_props(self.position, path)
                     else:
-                        _homewindow.clearProperty('{0}{1}'.format(self.prefixpath, self.position))
-                        if self.position > 1:
-                            self.position = self.position - 1
-                            path = _homewindow.getProperty('{0}{1}'.format(self.prefixpath, self.position))
-                            self.set_props(self.position, path)
-                        else:
-                            self.reset_props()
-                elif self.params.get('reset_path'):
-                    self.reset_props()
-                self.call_window()
+                        self.reset_props()
+            elif self.params.get('reset_path'):
+                self.reset_props()
+            self.call_window()
 
 
 if __name__ == '__main__':
