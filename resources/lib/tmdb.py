@@ -67,6 +67,7 @@ class TMDb(RequestAPI):
         infolabels = {}
         infolabels['title'] = self.get_title(item)
         infolabels['originaltitle'] = item.get('original_title')
+        infolabels['tvshowtitle'] = item.get('tvshowtitle')
         infolabels['plot'] = item.get('overview') or item.get('biography') or item.get('content')
         infolabels['rating'] = item.get('vote_average')
         infolabels['votes'] = item.get('vote_count')
@@ -261,6 +262,8 @@ class TMDb(RequestAPI):
         itemdict = self.get_cache(cache_name)
         if not itemdict and not cache_only:
             request = self.get_request_lc(itemtype, tmdb_id, language=self.req_language, append_to_response=self.req_append)
+            if itemtype == 'tv':
+                request['tvshowtitle'] = self.get_title(request)
             if season and episode:
                 extra_request = self.get_request_lc('tv', tmdb_id, 'season', season, 'episode', episode, language=self.req_language, append_to_response=self.req_append)
             elif season:

@@ -1,3 +1,6 @@
+**1.0.3** 
+- Better merging of tvshow details with season/episode views
+
 **1.0.2**
 - Python 3 compatibility work
 

@@ -105,6 +105,10 @@ class Container(object):
                         tv_detailed_item = _tmdb.get_detailed_item('tv', self.params.get('tmdb_id'), season=self.params.get('season', None))
                     if tv_detailed_item:
                         item = utils.del_empty_keys(item)
+                        item['infolabels'] = utils.del_empty_keys(item.get('infolabels', {}))
+                        item['infoproperties'] = utils.del_empty_keys(item.get('infoproperties', {}))
+                        item['infolabels'] = utils.merge_two_dicts(tv_detailed_item.get('infolabels', {}), item.get('infolabels', {}))
+                        item['infoproperties'] = utils.merge_two_dicts(tv_detailed_item.get('infoproperties', {}), item.get('infoproperties', {}))
                         item = utils.merge_two_dicts(tv_detailed_item, item)
 
                 # ADD CACHED TMDB DETAILS
