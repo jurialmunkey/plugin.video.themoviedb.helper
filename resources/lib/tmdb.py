@@ -105,7 +105,8 @@ class TMDb(RequestAPI):
     def get_infoproperties(self, item):
         infoproperties = {}
         infoproperties['tmdb_id'] = item.get('id')
-        infoproperties['imdb_id'] = item.get('imdb_id')
+        infoproperties['imdb_id'] = item.get('imdb_id') or item.get('external_ids', {}).get('imdb_id')
+        infoproperties['tvdb_id'] = item.get('external_ids', {}).get('tvdb_id')
         infoproperties['biography'] = item.get('biography')
         infoproperties['birthday'] = item.get('birthday')
         infoproperties['age'] = utils.age_difference(item.get('birthday'), item.get('deathday'))
