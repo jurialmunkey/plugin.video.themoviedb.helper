@@ -16,6 +16,7 @@ provider-name="jurialmunkey">
   <summary lang="en_GB">TheMovieDb Helper</summary>
   <description lang="en_GB">TheMovieDb Helper provides skinners a number of ways to access TheMovieDb API</description>
   <disclaimer lang="en_GB">Provided by TheMovieDb. Please make sure you have your own API key.</disclaimer>
+  <license>GPL-3.0</license>
   <assets>
     <icon>icon.png</icon>
     <fanart>fanart.jpg</fanart>
