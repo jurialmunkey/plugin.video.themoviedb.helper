@@ -1,3 +1,9 @@
+**1.0.5**
+- Fix for python text encoding/decoding issues in both PY2 and PY3
+
+**1.0.4**
+- Kodi Official Repo
+
 **1.0.3** 
 - Better merging of tvshow details with season/episode views
 

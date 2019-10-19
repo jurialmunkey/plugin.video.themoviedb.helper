@@ -33,7 +33,7 @@ _koditvshowdb = KodiLibrary(dbtype='tvshow')
 
 class Container(object):
     def __init__(self):
-        self.paramstring = sys.argv[2][1:]
+        self.paramstring = sys.argv[2][1:] if sys.version_info.major == 3 else sys.argv[2][1:].decode("utf-8")
         self.params = dict(parse_qsl(self.paramstring))
         self.plugincategory = 'TMDb Helper'
         self.containercontent = ''
@@ -50,7 +50,10 @@ class Container(object):
     def get_tmdb_id(self):
         if not self.params.get('tmdb_id'):
             itemtype = TMDB_LISTS.get(self.params.get('info'), {}).get('tmdb_check_id', self.params.get('type'))
-            self.params['tmdb_id'] = _tmdb.get_tmdb_id(itemtype=itemtype, imdb_id=self.params.get('imdb_id'), query=self.params.get('query'), year=self.params.get('year'))
+            self.params['tmdb_id'] = _tmdb.get_tmdb_id(itemtype=itemtype,
+                                                       imdb_id=self.params.get('imdb_id'),
+                                                       query=self.params.get('query'),
+                                                       year=self.params.get('year'))
 
     def textviewer(self):
         _dialog.textviewer(self.params.get('header'), self.params.get('text'))
@@ -234,6 +237,8 @@ class Container(object):
             self.params['with_crew'] = _tmdb.get_translated_list(utils.split_items(self.params.get('with_crew')), lookup_person, separator=self.params.get('with_separator'))
 
     def router(self):
+        utils.kodi_log(u'LOAD: {0}'.format(self.paramstring), 1)
+
         # FILTERS AND EXCLUSIONS
         _tmdb.filter_key = self.params.get('filter_key', None)
         _tmdb.filter_value = self.params.get('filter_value', None)
