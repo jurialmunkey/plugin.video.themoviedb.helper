@@ -63,7 +63,7 @@ def age_difference(birthday, deathday=''):
 
 
 def kodi_log(value, level=0):
-    logvalue = u'{0}{1}'.format(_addonlogname, value) if sys.version_info.major == 3 else u'{0}{1}'.format(_addonlogname, value).encode('ascii', 'ignore')
+    logvalue = u'{0}{1}'.format(_addonlogname, value) if sys.version_info.major == 3 else u'{0}{1}'.format(_addonlogname, value).encode('utf-8', 'ignore')
     if level == 1:
         xbmc.log(logvalue, level=xbmc.LOGNOTICE)
     else:
