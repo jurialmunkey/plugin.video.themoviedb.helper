@@ -20,11 +20,12 @@ _prefixname = 'TMDbHelper.'
 _dialog = xbmcgui.Dialog()
 _languagesetting = _addon.getSettingInt('language')
 _language = LANGUAGES[_languagesetting]
+_mpaa_prefix = _addon.getSetting('mpaa_prefix')
 _cache_long = _addon.getSettingInt('cache_details_days')
 _cache_short = _addon.getSettingInt('cache_list_days')
 _tmdb_apikey = _addon.getSetting('tmdb_apikey')
 _tmdb = TMDb(api_key=_tmdb_apikey, language=_language, cache_long=_cache_long, cache_short=_cache_short,
-             append_to_response=APPEND_TO_RESPONSE, addon_name=_addonname)
+             append_to_response=APPEND_TO_RESPONSE, addon_name=_addonname, mpaa_prefix=_mpaa_prefix)
 _omdb_apikey = _addon.getSetting('omdb_apikey')
 _omdb = OMDb(api_key=_omdb_apikey, cache_long=_cache_long, cache_short=_cache_short, addon_name=_addonname) if _omdb_apikey else None
 _kodimoviedb = KodiLibrary(dbtype='movie')

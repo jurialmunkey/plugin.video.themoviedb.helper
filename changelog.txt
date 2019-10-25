@@ -1,3 +1,6 @@
+**1.0.6**
+- Fix mpaa rating prefix
+
 **1.0.5**
 - Fix for python text encoding/decoding issues in both PY2 and PY3
 
