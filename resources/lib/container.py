@@ -6,9 +6,10 @@ import xbmcaddon
 import xbmcplugin
 from resources.lib.tmdb import TMDb
 from resources.lib.omdb import OMDb
+from resources.lib.traktapi import traktAPI
 from resources.lib.kodilibrary import KodiLibrary
 from resources.lib.listitem import ListItem
-from resources.lib.globals import LANGUAGES, BASEDIR, TYPE_CONVERSION, TMDB_LISTS, TMDB_CATEGORIES, APPEND_TO_RESPONSE
+from resources.lib.globals import LANGUAGES, BASEDIR, TYPE_CONVERSION, TMDB_LISTS, TMDB_CATEGORIES, APPEND_TO_RESPONSE, TRAKT_LISTS
 try:
     from urllib.parse import parse_qsl  # Py3
 except ImportError:
@@ -62,7 +63,7 @@ class Container(object):
     def list_basedir(self):
         self.start_container()
         for category_info in BASEDIR:
-            category = TMDB_LISTS.get(category_info, {})
+            category = TMDB_LISTS.get(category_info, {}) if category_info in TMDB_LISTS else TRAKT_LISTS.get(category_info, {})
             for tmdb_type in category.get('types', []):
                 label = category.get('name', '').format(TYPE_CONVERSION.get(tmdb_type, {}).get('plural', ''))
                 listitem = ListItem(label=label)
@@ -213,6 +214,30 @@ class Container(object):
         if self.params.get('query'):
             self.list_tmdb(query=self.params.get('query'), year=self.params.get('year'))
 
+    def list_trakt(self):
+        if self.params.get('type'):
+            category = TRAKT_LISTS.get(self.params.get('info', ''), {})
+            url_info = category.get('url_info', 'details')
+            itemtype = category.get('itemtype') or self.params.get('type') or ''
+            trakt_type = 'show' if itemtype == 'tv' else 'movie'
+            path = category.get('path', '').format(type=trakt_type + 's')
+            key = category.get('key', '').format(type=trakt_type)
+            func = traktAPI().get_userlist if category.get('trakt_list') == 'user' else traktAPI().get_traktlist
+            trakt_list = func(path, itemtype + 's', key)
+            itemlist = []
+            for i in trakt_list:
+                item = None
+                if i[0] == 'imdb':
+                    item = _tmdb.get_externalid_item(itemtype, i[1], 'imdb_id')
+                if i[0] == 'tvdb':
+                    item = _tmdb.get_externalid_item(itemtype, i[1], 'tvdb_id')
+                if item:
+                    itemlist.append(item)
+            if itemlist:
+                self.plugincategory = category.get('name', '').format(TYPE_CONVERSION.get(itemtype, {}).get('plural', ''))
+                self.containercontent = TYPE_CONVERSION.get(itemtype, {}).get('container', '')
+                self.list_items(itemlist, dbtype=TYPE_CONVERSION.get(itemtype, {}).get('dbtype'), nexttype=itemtype, url_info=url_info)
+
     def translate_discover(self):
         lookup_company = 'company'
         lookup_person = 'person'
@@ -260,6 +285,8 @@ class Container(object):
             self.textviewer()
         elif self.params.get('info') == 'imageviewer':
             self.imageviewer()
+        elif self.params.get('info') in TRAKT_LISTS:
+            self.list_trakt()
         elif self.params.get('info') in BASEDIR:
             self.list_tmdb()
         elif self.params.get('info') in TMDB_LISTS and TMDB_LISTS.get(self.params.get('info'), {}).get('path'):

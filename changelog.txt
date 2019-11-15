@@ -1,3 +1,8 @@
+**1.0.7**
+- Add support for Trakt lists (More Coming Soon!)
+- Some other little tweaks and improvements
+- Reduce TMDb API rate limiting for default API key
+
 **1.0.6**
 - Fix mpaa rating prefix
 

@@ -16,7 +16,7 @@ class TMDb(RequestAPI):
         self.req_api_key = '?api_key={0}'.format(api_key)
         self.req_api_name = 'TMDb'
         self.req_api_url = 'https://api.themoviedb.org/3'
-        self.req_wait_time = 1 if api_key == 'a07324c669cac4d96789197134ce272b' else 0.2
+        self.req_wait_time = 0.2
         self.req_append = append_to_response if append_to_response else None
         self.imagepath_original = 'https://image.tmdb.org/t/p/original/'
         self.imagepath_poster = 'https://image.tmdb.org/t/p/w500/'
@@ -272,6 +272,17 @@ class TMDb(RequestAPI):
             if extra_request:
                 request = utils.merge_two_dicts(request, extra_request)
             itemdict = self.set_cache(self.get_niceitem(request), cache_name, self.cache_long) if request else {}
+        return itemdict
+
+    def get_externalid_item(self, itemtype, external_id, external_source):
+        cache_name = '{0}.find.{1}.{2}'.format(self.addon_name, external_source, external_id)
+        itemdict = self.get_cache(cache_name)
+        if not itemdict:
+            request = self.get_request_lc('find', external_id, language=self.req_language, append_to_response=self.req_append, external_source=external_source)
+            request = request.get('{0}_results'.format(itemtype), [])
+            itemdict = self.set_cache(self.get_niceitem(request[0]), cache_name, self.cache_long) if request else {}
+        if itemdict.get('tmdb_id'):
+            itemdict = self.get_detailed_item(itemtype, itemdict.get('tmdb_id'), cache_only=True) or itemdict
         return itemdict
 
     def get_tmdb_id(self, itemtype=None, imdb_id=None, query=None, year=None, selectdialog=False, longcache=False):
