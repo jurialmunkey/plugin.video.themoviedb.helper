@@ -90,8 +90,8 @@ class Container(object):
                 added_items.append(add_item)
 
                 # URL ENCODING
-                item['url'] = item.get('url') if item.get('url') else {'info': url_info}
-                item['url']['type'] = nexttype if nexttype else self.params.get('type')
+                item['url'] = item.get('url') or {'info': url_info}
+                item['url']['type'] = nexttype or self.params.get('type')
                 if url_tmdb and item.get('tmdb_id'):
                     item['url']['tmdb_id'] = item.get('tmdb_id')
 
@@ -170,9 +170,11 @@ class Container(object):
     def list_tmdb(self, *args, **kwargs):
         if self.params.get('type'):
             category = TMDB_LISTS.get(self.params.get('info', ''), {})
+            url_ext = dict(parse_qsl(TMDB_LISTS.get(self.params.get('info'), {}).get('url_ext', '').format(**self.params)))
             path = category.get('path', '').format(**self.params)
             kwparams = utils.make_kwparams(self.params)
             kwparams = utils.merge_two_dicts(kwparams, kwargs)
+            kwparams = utils.merge_two_dicts(kwparams, url_ext)
             kwparams.setdefault('key', category.get('key', 'results'))
             url_info = TMDB_LISTS.get(self.params.get('info'), {}).get('url_info', 'details')
             itemlist = _tmdb.get_list(path, *args, **kwparams)

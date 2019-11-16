@@ -1,7 +1,7 @@
 BASEDIR = [
-    'search', 'popular', 'top_rated', 'upcoming', 'airing_today', 'now_playing', 'on_the_air',
-    'trakt_watchlist', 'trakt_history', 'trakt_trending', 'trakt_popular', 'trakt_mostplayed',
-    'trakt_anticipated', 'trakt_boxoffice']
+    'search', 'popular', 'top_rated', 'upcoming', 'airing_today', 'now_playing', 'on_the_air', 'genres', 
+    'trakt_watchlist', 'trakt_history', 'trakt_trending', 'trakt_popular', 'trakt_mostplayed', 'trakt_anticipated',
+    'trakt_boxoffice']
 
 TYPE_CONVERSION = {
     'movie': {
@@ -24,6 +24,10 @@ TYPE_CONVERSION = {
         'plural': 'Images',
         'container': 'images',
         'dbtype': 'image'},
+    'genre': {
+        'plural': 'Genres',
+        'container': 'genres',
+        'dbtype': 'genre'},
     'season': {
         'plural': 'Seasons',
         'container': 'seasons',
@@ -75,6 +79,18 @@ TMDB_LISTS = {
         'name': 'Currently Airing {0}',
         'path': '{type}/on_the_air',
         'types': ['tv']},
+    'genre': {
+        'name': '{0} Genre',
+        'path': 'discover/{type}',
+        'url_ext': 'with_genres={tmdb_id}',
+        'types': ['movie', 'tv']},
+    'genres': {
+        'name': '{0} Genres',
+        'path': 'genre/{type}/list',
+        'key': 'genres',
+        'url_info': 'genre',
+        'itemtype': 'genre',
+        'types': ['movie', 'tv']},
     'cast': {
         'name': 'Cast',
         'types': ['movie', 'tv']},
