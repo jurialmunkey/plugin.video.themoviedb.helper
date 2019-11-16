@@ -1,7 +1,7 @@
 BASEDIR = [
-    'search', 'popular', 'top_rated', 'upcoming', 'airing_today', 'now_playing', 'on_the_air', 'genres', 
+    'search', 'popular', 'top_rated', 'upcoming', 'airing_today', 'now_playing', 'on_the_air', 'genres',
     'trakt_watchlist', 'trakt_history', 'trakt_trending', 'trakt_popular', 'trakt_mostplayed', 'trakt_anticipated',
-    'trakt_boxoffice']
+    'trakt_boxoffice', 'trakt_trendinglists', 'trakt_popularlists', 'trakt_likedlists', 'trakt_mylists']
 
 TYPE_CONVERSION = {
     'movie': {
@@ -224,12 +224,12 @@ TRAKT_LISTS = {
     'trakt_watchlist': {
         'name': 'Watchlist {0} (Trakt)',
         'path': 'sync/watchlist',
-        'trakt_list': 'user',
+        'trakt_list': 'sync',
         'types': ['movie', 'tv']},
     'trakt_history': {
         'name': 'Recently Watched {0} (Trakt)',
         'path': 'sync/history',
-        'trakt_list': 'user',
+        'trakt_list': 'sync',
         'types': ['movie']},
     'trakt_trending': {
         'name': 'Trending {0} (Trakt)',
@@ -254,4 +254,24 @@ TRAKT_LISTS = {
         'name': 'Top 10 Box Office {0} (Trakt)',
         'path': '{type}/boxoffice',
         'key': '{type}',
-        'types': ['movie']}}
+        'types': ['movie']},
+    'trakt_userlist': {
+        'name': 'User List (Trakt)',
+        'path': 'users/{user_slug}/lists/{list_slug}/items',
+        'types': ['movie', 'tv']},
+    'trakt_trendinglists': {
+        'name': 'Trending Lists (Trakt)',
+        'path': 'lists/trending',
+        'types': ['both']},
+    'trakt_popularlists': {
+        'name': 'Popular Lists (Trakt)',
+        'path': 'lists/popular',
+        'types': ['both']},
+    'trakt_likedlists': {
+        'name': 'Liked Lists (Trakt)',
+        'path': 'users/likes/lists',
+        'types': ['both']},
+    'trakt_mylists': {
+        'name': 'Your Lists (Trakt)',
+        'path': 'users/{user_slug}/lists',
+        'types': ['both']}}

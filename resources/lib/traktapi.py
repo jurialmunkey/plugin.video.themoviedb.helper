@@ -84,32 +84,54 @@ class traktAPI(object):
             self.auth_dialog.update(progress)
             callback(True)
 
-    def get_userlist(self, userlist, dbtype=None, key=None):
+    def get_synclist(self, synclist, dbtype=None, keylist=[]):
         with Trakt.configuration.oauth.from_response(self.authorization):
             with Trakt.configuration.http(retry=True, timeout=90):
                 if dbtype == 'movies':
-                    items = Trakt[userlist].movies()
+                    items = Trakt[synclist].movies()
                 else:
-                    items = Trakt[userlist].shows()
+                    items = Trakt[synclist].shows()
             trakt_list = utils.listify_items(items)
             itemlist = []
             for i in trakt_list:
                 itemlist.append(i.pk)
             return itemlist
 
-    def get_traktlist(self, listname, dbtype=None, key=None):
+    def get_itemlist(self, listpath, dbtype=None, keylist=['dummy']):
         with Trakt.configuration.oauth.from_response(self.authorization):
             with Trakt.configuration.http(retry=True, timeout=90):
-                response = Trakt.http.get(listname)
+                response = Trakt.http.get(listpath)
                 items = response.json()
                 itemlist = []
                 for i in items:
-                    item = None
-                    i = i.get(key) or i
-                    if i.get('ids', {}).get('imdb'):
-                        item = ('imdb', i.get('ids', {}).get('imdb'))
-                    elif i.get('ids', {}).get('tvdb'):
-                        item = ('tvdb', i.get('ids', {}).get('tvdb'))
+                    for key in keylist:
+                        item = None
+                        myitem = i.get(key) or i
+                        if myitem:
+                            tmdbtype = 'tv' if key == 'show' else 'movie'
+                            if myitem.get('ids', {}).get('imdb'):
+                                item = ('imdb', myitem.get('ids', {}).get('imdb'), tmdbtype)
+                            elif myitem.get('ids', {}).get('tvdb'):
+                                item = ('tvdb', myitem.get('ids', {}).get('tvdb'), tmdbtype)
+                            if item:
+                                itemlist.append(item)
+                return itemlist
+
+    def get_listlist(self, listpath, key=None):
+        with Trakt.configuration.oauth.from_response(self.authorization):
+            with Trakt.configuration.http(retry=True, timeout=90):
+                response = Trakt.http.get(listpath)
+                items = response.json()
+                itemlist = []
+                for i in items:
+                    item = i.get(key) or i
                     if item:
                         itemlist.append(item)
                 return itemlist
+
+    def get_usernameslug(self):
+        with Trakt.configuration.oauth.from_response(self.authorization):
+            with Trakt.configuration.http(retry=True, timeout=90):
+                response = Trakt.http.get('users/settings')
+                item = response.json()
+                return item.get('user', {}).get('ids', {}).get('slug')

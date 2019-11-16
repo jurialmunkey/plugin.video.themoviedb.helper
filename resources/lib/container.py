@@ -97,6 +97,10 @@ class Container(object):
                 if url_tmdb and item.get('tmdb_id'):
                     item['url']['tmdb_id'] = item.get('tmdb_id')
 
+                # SPECIAL URL ENCONDING FOR MIXED TYPES
+                item['url']['type'] = item.get('mixed_type') or item.get('url', {}).get('type')
+                item.pop('mixed_type', '')
+
                 # SPECIAL URL ENCODING FOR PLAYABLE ITEMS
                 if item['url'].get('info') == 'imageviewer':
                     item['is_folder'] = False
@@ -233,26 +237,56 @@ class Container(object):
     def list_trakt(self):
         if self.params.get('type'):
             category = TRAKT_LISTS.get(self.params.get('info', ''), {})
+            func = traktAPI().get_synclist if category.get('trakt_list') == 'user' else traktAPI().get_itemlist
             url_info = category.get('url_info', 'details')
-            itemtype = category.get('itemtype') or self.params.get('type') or ''
-            trakt_type = 'show' if itemtype == 'tv' else 'movie'
-            path = category.get('path', '').format(type=trakt_type + 's')
-            key = category.get('key', '').format(type=trakt_type)
-            func = traktAPI().get_userlist if category.get('trakt_list') == 'user' else traktAPI().get_traktlist
-            trakt_list = func(path, itemtype + 's', key)
+            params = self.params.copy()
+            if self.params.get('type') == 'both':
+                itemtype = ''
+                path = category.get('path', '').format(**params)
+                keylist = ['movie', 'show']
+            else:
+                itemtype = self.params.get('type', '')
+                trakt_type = 'show' if itemtype == 'tv' else 'movie'
+                params['type'] = trakt_type + 's'
+                path = category.get('path', '').format(**params)
+                keylist = [category.get('key', '').format(**params)]
+            trakt_list = func(path, itemtype + 's', keylist)
             itemlist = []
-            for i in trakt_list:
+            max_items = 10
+            for i in trakt_list[:max_items]:
                 item = None
                 if i[0] == 'imdb':
-                    item = _tmdb.get_externalid_item(itemtype, i[1], 'imdb_id')
-                if i[0] == 'tvdb':
-                    item = _tmdb.get_externalid_item(itemtype, i[1], 'tvdb_id')
+                    item = _tmdb.get_externalid_item(i[2], i[1], 'imdb_id')
+                elif i[0] == 'tvdb':
+                    item = _tmdb.get_externalid_item(i[2], i[1], 'tvdb_id')
                 if item:
+                    item['mixed_type'] = i[2]
                     itemlist.append(item)
             if itemlist:
                 self.plugincategory = category.get('name', '').format(TYPE_CONVERSION.get(itemtype, {}).get('plural', ''))
-                self.containercontent = TYPE_CONVERSION.get(itemtype, {}).get('container', '')
+                self.containercontent = TYPE_CONVERSION.get(itemtype, {}).get('container', 'movies')  # If no type set to movies for mixed
                 self.list_items(itemlist, dbtype=TYPE_CONVERSION.get(itemtype, {}).get('dbtype'), nexttype=itemtype, url_info=url_info)
+
+    def list_traktmylists(self):
+        self.params['user_slug'] = traktAPI().get_usernameslug()
+        self.list_traktuserlists()
+
+    def list_traktuserlists(self):
+        self.start_container()
+        path = TRAKT_LISTS.get(self.params.get('info'), {}).get('path', '').format(**self.params)
+        itemlist = traktAPI().get_listlist(path, 'list')
+        icon = '{0}/resources/trakt.png'.format(_addonpath)
+        for item in itemlist:
+            label = item.get('name')
+            label2 = item.get('user', {}).get('name')
+            infolabels = {}
+            infolabels['plot'] = item.get('description')
+            infolabels['rating'] = item.get('likes')
+            list_slug = item.get('ids', {}).get('slug')
+            user_slug = item.get('user', {}).get('ids', {}).get('slug')
+            listitem = ListItem(label=label, label2=label2, icon=icon, thumb=icon, poster=icon, infolabels=infolabels)
+            listitem.create_listitem(_handle, info='trakt_userlist', user_slug=user_slug, list_slug=list_slug, type=self.params.get('type'))
+        self.finish_container()
 
     def translate_discover(self):
         lookup_company = 'company'
@@ -303,6 +337,10 @@ class Container(object):
             self.imageviewer()
         elif self.params.get('info') == 'contextmenu':
             self.contextmenu()
+        elif self.params.get('info') == 'trakt_mylists':
+            self.list_traktmylists()
+        elif self.params.get('info') in ['trakt_trendinglists', 'trakt_popularlists', 'trakt_likedlists']:
+            self.list_traktuserlists()
         elif self.params.get('info') in TRAKT_LISTS:
             self.list_trakt()
         elif self.params.get('info') in BASEDIR:
