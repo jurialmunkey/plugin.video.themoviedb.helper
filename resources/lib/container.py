@@ -16,6 +16,7 @@ except ImportError:
     from urlparse import parse_qsl  # Py2
 _handle = int(sys.argv[1])
 _addon = xbmcaddon.Addon()
+_addonpath = xbmcaddon.Addon().getAddonInfo('path')
 _addonname = 'plugin.video.themoviedb.helper'
 _prefixname = 'TMDbHelper.'
 _dialog = xbmcgui.Dialog()
@@ -67,9 +68,10 @@ class Container(object):
         self.start_container()
         for category_info in BASEDIR:
             category = TMDB_LISTS.get(category_info, {}) if category_info in TMDB_LISTS else TRAKT_LISTS.get(category_info, {})
+            icon = '{0}/resources/trakt.png'.format(_addonpath) if category_info in TRAKT_LISTS else None
             for tmdb_type in category.get('types', []):
                 label = category.get('name', '').format(TYPE_CONVERSION.get(tmdb_type, {}).get('plural', ''))
-                listitem = ListItem(label=label)
+                listitem = ListItem(label=label, icon=icon, thumb=icon, poster=icon)
                 listitem.create_listitem(_handle, info=category_info, type=tmdb_type)
         self.finish_container()
 
