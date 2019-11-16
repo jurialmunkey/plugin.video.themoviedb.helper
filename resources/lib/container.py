@@ -61,9 +61,6 @@ class Container(object):
     def imageviewer(self):
         xbmc.executebuiltin('ShowPicture({0})'.format(self.params.get('image')))
 
-    def contextmenu(self):
-        xbmc.executebuiltin('Action(ContextMenu)')
-
     def list_basedir(self):
         self.start_container()
         for category_info in BASEDIR:
@@ -107,9 +104,6 @@ class Container(object):
                 elif item['url'].get('info') == 'textviewer':
                     item['is_folder'] = False
                     item['url'] = {'info': 'textviewer', 'header': item.get('label'), 'text': item.get('infolabels', {}).get('plot')}
-                elif item['url'].get('info') == 'contextmenu':
-                    item['is_folder'] = False
-                    item['url'] = {'info': 'contextmenu'}
 
                 # SPECIAL TREATMENT OF SEASONS AND EPISODES
                 if self.params.get('info') in ['seasons', 'episodes'] or item['url'].get('type') in ['season', 'episode']:
@@ -205,8 +199,6 @@ class Container(object):
         # SET DETAILED ITEM AS FIRST ITEM AND BUILD RELEVANT CATEGORIES
         if itemdetails:
             itemlist = []
-            # if self.params.get('type') in ['movie', 'episode']:
-            #     itemdetails['url'] = {'info': 'contextmenu'}
             if self.params.get('type') in ['tv']:
                 itemdetails['url'] = {'info': 'seasons'}
             itemlist.append(itemdetails)
@@ -334,8 +326,6 @@ class Container(object):
             self.textviewer()
         elif self.params.get('info') == 'imageviewer':
             self.imageviewer()
-        elif self.params.get('info') == 'contextmenu':
-            self.contextmenu()
         elif self.params.get('info') == 'trakt_mylists':
             self.list_traktmylists()
         elif self.params.get('info') in ['trakt_trendinglists', 'trakt_popularlists', 'trakt_likedlists']:
