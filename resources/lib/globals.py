@@ -1,6 +1,6 @@
 BASEDIR = [
     'search', 'popular', 'top_rated', 'upcoming', 'airing_today', 'now_playing', 'on_the_air', 'genres',
-    'trakt_watchlist', 'trakt_history', 'trakt_trending', 'trakt_popular', 'trakt_mostplayed', 'trakt_anticipated',
+    'trakt_watchlist', 'trakt_trending', 'trakt_popular', 'trakt_mostplayed', 'trakt_anticipated',
     'trakt_boxoffice', 'trakt_trendinglists', 'trakt_popularlists', 'trakt_likedlists', 'trakt_mylists']
 
 TYPE_CONVERSION = {
@@ -226,11 +226,6 @@ TRAKT_LISTS = {
         'path': 'sync/watchlist',
         'trakt_list': 'sync',
         'types': ['movie', 'tv']},
-    'trakt_history': {
-        'name': 'Recently Watched {0} (Trakt)',
-        'path': 'sync/history',
-        'trakt_list': 'sync',
-        'types': ['movie']},
     'trakt_trending': {
         'name': 'Trending {0} (Trakt)',
         'path': '{type}/trending',
