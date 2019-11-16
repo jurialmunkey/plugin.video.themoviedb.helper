@@ -18,8 +18,8 @@ class TMDb(RequestAPI):
         self.req_api_url = 'https://api.themoviedb.org/3'
         self.req_wait_time = 0.2
         self.req_append = append_to_response if append_to_response else None
-        self.imagepath_original = 'https://image.tmdb.org/t/p/original/'
-        self.imagepath_poster = 'https://image.tmdb.org/t/p/w500/'
+        self.imagepath_original = 'https://image.tmdb.org/t/p/original'
+        self.imagepath_poster = 'https://image.tmdb.org/t/p/w500'
         self.cache_long = 14 if not cache_long or cache_long < 14 else cache_long
         self.cache_short = 1 if not cache_short or cache_short < 1 else cache_short
         self.mpaa_prefix = '{0} '.format(mpaa_prefix) if mpaa_prefix else ''

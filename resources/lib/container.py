@@ -60,6 +60,9 @@ class Container(object):
     def imageviewer(self):
         xbmc.executebuiltin('ShowPicture({0})'.format(self.params.get('image')))
 
+    def contextmenu(self):
+        xbmc.executebuiltin('Action(ContextMenu)')
+
     def list_basedir(self):
         self.start_container()
         for category_info in BASEDIR:
@@ -92,11 +95,16 @@ class Container(object):
                 if url_tmdb and item.get('tmdb_id'):
                     item['url']['tmdb_id'] = item.get('tmdb_id')
 
-                # SPECIAL URL ENCODING FOR TEXT AND IMAGE VIEWERS
+                # SPECIAL URL ENCODING FOR PLAYABLE ITEMS
                 if item['url'].get('info') == 'imageviewer':
+                    item['is_folder'] = False
                     item['url'] = {'info': 'imageviewer', 'image': item.get('icon')}
                 elif item['url'].get('info') == 'textviewer':
+                    item['is_folder'] = False
                     item['url'] = {'info': 'textviewer', 'header': item.get('label'), 'text': item.get('infolabels', {}).get('plot')}
+                elif item['url'].get('info') == 'contextmenu':
+                    item['is_folder'] = False
+                    item['url'] = {'info': 'contextmenu'}
 
                 # SPECIAL TREATMENT OF SEASONS AND EPISODES
                 if self.params.get('info') in ['seasons', 'episodes'] or item['url'].get('type') in ['season', 'episode']:
@@ -190,6 +198,10 @@ class Container(object):
         # SET DETAILED ITEM AS FIRST ITEM AND BUILD RELEVANT CATEGORIES
         if itemdetails:
             itemlist = []
+            if self.params.get('type') in ['movie', 'episode']:
+                itemdetails['url'] = {'info': 'contextmenu'}
+            elif self.params.get('type') in ['tv']:
+                itemdetails['url'] = {'info': 'seasons'}
             itemlist.append(itemdetails)
             for category in TMDB_CATEGORIES:
                 if self.params.get('type') in TMDB_LISTS.get(category, {}).get('types'):
@@ -285,6 +297,8 @@ class Container(object):
             self.textviewer()
         elif self.params.get('info') == 'imageviewer':
             self.imageviewer()
+        elif self.params.get('info') == 'contextmenu':
+            self.contextmenu()
         elif self.params.get('info') in TRAKT_LISTS:
             self.list_trakt()
         elif self.params.get('info') in BASEDIR:
