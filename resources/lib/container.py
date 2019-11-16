@@ -249,7 +249,8 @@ class Container(object):
                 trakt_type = 'show' if itemtype == 'tv' else 'movie'
                 params['type'] = trakt_type + 's'
                 path = category.get('path', '').format(**params)
-                keylist = [category.get('key', '').format(**params)]
+                keylist = []
+                keylist.append(category.get('key', '').format(type=trakt_type))
             trakt_list = func(path, itemtype + 's', keylist)
             itemlist = []
             max_items = 10
