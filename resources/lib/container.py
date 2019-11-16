@@ -98,8 +98,7 @@ class Container(object):
                     item['url']['tmdb_id'] = item.get('tmdb_id')
 
                 # SPECIAL URL ENCONDING FOR MIXED TYPES
-                item['url']['type'] = item.get('mixed_type') or item.get('url', {}).get('type')
-                item.pop('mixed_type', '')
+                item['url']['type'] = item.pop('mixed_type', None) or item.get('url', {}).get('type')
 
                 # SPECIAL URL ENCODING FOR PLAYABLE ITEMS
                 if item['url'].get('info') == 'imageviewer':
@@ -206,9 +205,9 @@ class Container(object):
         # SET DETAILED ITEM AS FIRST ITEM AND BUILD RELEVANT CATEGORIES
         if itemdetails:
             itemlist = []
-            if self.params.get('type') in ['movie', 'episode']:
-                itemdetails['url'] = {'info': 'contextmenu'}
-            elif self.params.get('type') in ['tv']:
+            # if self.params.get('type') in ['movie', 'episode']:
+            #     itemdetails['url'] = {'info': 'contextmenu'}
+            if self.params.get('type') in ['tv']:
                 itemdetails['url'] = {'info': 'seasons'}
             itemlist.append(itemdetails)
             for category in TMDB_CATEGORIES:
