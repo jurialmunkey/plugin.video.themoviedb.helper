@@ -234,7 +234,6 @@ TRAKT_LISTS = {
     'trakt_trending': {
         'name': 'Trending {0} (Trakt)',
         'path': '{type}/trending',
-        'key': '{type}',
         'types': ['movie', 'tv']},
     'trakt_popular': {
         'name': 'Popular {0} (Trakt)',
@@ -243,17 +242,14 @@ TRAKT_LISTS = {
     'trakt_mostplayed': {
         'name': 'Most Played {0} (Trakt)',
         'path': '{type}/played/weekly',
-        'key': '{type}',
         'types': ['movie', 'tv']},
     'trakt_anticipated': {
         'name': 'Anticipated {0} (Trakt)',
         'path': '{type}/anticipated',
-        'key': '{type}',
         'types': ['movie', 'tv']},
     'trakt_boxoffice': {
         'name': 'Top 10 Box Office {0} (Trakt)',
         'path': '{type}/boxoffice',
-        'key': '{type}',
         'types': ['movie']},
     'trakt_userlist': {
         'name': 'User List (Trakt)',
