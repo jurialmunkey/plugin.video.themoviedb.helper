@@ -9,7 +9,7 @@ from resources.lib.omdb import OMDb
 from resources.lib.traktapi import traktAPI
 from resources.lib.kodilibrary import KodiLibrary
 from resources.lib.listitem import ListItem
-from resources.lib.globals import LANGUAGES, BASEDIR, TYPE_CONVERSION, TMDB_LISTS, TMDB_CATEGORIES, APPEND_TO_RESPONSE, TRAKT_LISTS
+from resources.lib.globals import LANGUAGES, BASEDIR, TYPE_CONVERSION, TMDB_LISTS, TMDB_CATEGORIES, APPEND_TO_RESPONSE, TRAKT_LISTS, TRAKT_LISTLISTS
 try:
     from urllib.parse import parse_qsl  # Py3
 except ImportError:
@@ -203,11 +203,14 @@ class Container(object):
                 itemdetails['url'] = {'info': 'seasons'}
             itemlist.append(itemdetails)
             for category in TMDB_CATEGORIES:
-                if self.params.get('type') in TMDB_LISTS.get(category, {}).get('types'):
+                categorylist = TMDB_LISTS.get(category) or TRAKT_LISTS.get(category) or {}
+                if self.params.get('type') in categorylist.get('types'):
                     categoryitem = itemdetails.copy()
-                    categoryitem['label'] = TMDB_LISTS.get(category, {}).get('name')
+                    categoryitem['label'] = categorylist.get('name')
                     categoryitem['url'] = categoryitem.get('url', {}).copy()
                     categoryitem['url']['info'] = category
+                    if categorylist.get('url_key') and categoryitem.get(categorylist.get('url_key')):
+                        categoryitem['url'][categorylist.get('url_key')] = categoryitem.get(categorylist.get('url_key'))
                     itemlist.append(categoryitem)
             self.plugincategory = itemdetails.get('label')
             self.containercontent = TYPE_CONVERSION.get(self.params.get('type'), {}).get('container', '')
@@ -227,20 +230,21 @@ class Container(object):
 
     def list_trakt(self):
         if self.params.get('type'):
+            _traktapi = traktAPI()
+            self.params['user_slug'] = self.params.get('user_slug') or _traktapi.get_usernameslug()
             category = TRAKT_LISTS.get(self.params.get('info', ''), {})
-            func = traktAPI().get_synclist if category.get('trakt_list') == 'user' else traktAPI().get_itemlist
+            func = _traktapi.get_synclist if category.get('trakt_list') == 'user' else _traktapi.get_itemlist
             url_info = category.get('url_info', 'details')
             params = self.params.copy()
             if self.params.get('type') == 'both':
                 itemtype = ''
-                path = category.get('path', '').format(**params)
                 keylist = ['movie', 'show']
             else:
                 itemtype = self.params.get('type', '')
                 trakt_type = 'show' if itemtype == 'tv' else 'movie'
                 params['type'] = trakt_type + 's'
-                path = category.get('path', '').format(**params)
                 keylist = [trakt_type]
+            path = category.get('path', '').format(**params)
             trakt_list = func(path, itemtype + 's', keylist)
             itemlist = []
             max_items = 10
@@ -258,14 +262,12 @@ class Container(object):
                 self.containercontent = TYPE_CONVERSION.get(itemtype, {}).get('container', 'movies')  # If no type set to movies for mixed
                 self.list_items(itemlist, dbtype=TYPE_CONVERSION.get(itemtype, {}).get('dbtype'), nexttype=itemtype, url_info=url_info)
 
-    def list_traktmylists(self):
-        self.params['user_slug'] = traktAPI().get_usernameslug()
-        self.list_traktuserlists()
-
     def list_traktuserlists(self):
+        _traktapi = traktAPI()
         self.start_container()
+        self.params['user_slug'] = self.params.get('user_slug') or _traktapi.get_usernameslug()
         path = TRAKT_LISTS.get(self.params.get('info'), {}).get('path', '').format(**self.params)
-        itemlist = traktAPI().get_listlist(path, 'list')
+        itemlist = _traktapi.get_listlist(path, 'list')
         icon = '{0}/resources/trakt.png'.format(_addonpath)
         for item in itemlist:
             label = item.get('name')
@@ -326,9 +328,7 @@ class Container(object):
             self.textviewer()
         elif self.params.get('info') == 'imageviewer':
             self.imageviewer()
-        elif self.params.get('info') == 'trakt_mylists':
-            self.list_traktmylists()
-        elif self.params.get('info') in ['trakt_trendinglists', 'trakt_popularlists', 'trakt_likedlists']:
+        elif self.params.get('info') in TRAKT_LISTLISTS:
             self.list_traktuserlists()
         elif self.params.get('info') in TRAKT_LISTS:
             self.list_trakt()

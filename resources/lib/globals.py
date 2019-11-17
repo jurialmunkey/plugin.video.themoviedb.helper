@@ -1,7 +1,8 @@
 BASEDIR = [
     'search', 'popular', 'top_rated', 'upcoming', 'airing_today', 'now_playing', 'on_the_air', 'genres',
-    'trakt_watchlist', 'trakt_trending', 'trakt_popular', 'trakt_mostplayed', 'trakt_anticipated',
-    'trakt_boxoffice', 'trakt_trendinglists', 'trakt_popularlists', 'trakt_likedlists', 'trakt_mylists']
+    'trakt_watchlist', 'trakt_history', 'trakt_recommendations', 'trakt_mostwatched', 'trakt_myairing',
+    'trakt_trending', 'trakt_popular', 'trakt_mostplayed', 'trakt_anticipated', 'trakt_boxoffice',
+    'trakt_trendinglists', 'trakt_popularlists', 'trakt_likedlists', 'trakt_mylists']
 
 TYPE_CONVERSION = {
     'movie': {
@@ -216,15 +217,29 @@ TMDB_LISTS = {
 TMDB_CATEGORIES = [
     'cast', 'recommendations', 'similar', 'crew', 'posters', 'fanart', 'movie_keywords', 'reviews',
     'stars_in_movies', 'stars_in_tvshows', 'crew_in_movies', 'crew_in_tvshows', 'images',
-    'seasons', 'episode_cast', 'episode_thumbs']
+    'seasons', 'episode_cast', 'episode_thumbs', 'trakt_inlists']
 
 APPEND_TO_RESPONSE = 'credits,images,release_dates,content_ratings,external_ids'
+
+TRAKT_LISTLISTS = ['trakt_mylists', 'trakt_trendinglists', 'trakt_popularlists', 'trakt_likedlists', 'trakt_inlists']
 
 TRAKT_LISTS = {
     'trakt_watchlist': {
         'name': 'Watchlist {0} (Trakt)',
         'path': 'sync/watchlist',
         'trakt_list': 'sync',
+        'types': ['movie', 'tv']},
+    'trakt_history': {
+        'name': 'Your Recently Watched {0} (Trakt)',
+        'path': 'users/{user_slug}/history/{type}',
+        'types': ['movie', 'tv']},
+    'trakt_mostwatched': {
+        'name': 'Your Most Watched {0} (Trakt)',
+        'path': 'users/{user_slug}/watched/{type}',
+        'types': ['movie', 'tv']},
+    'trakt_recommendations': {
+        'name': '{0} Recommended For You (Trakt)',
+        'path': 'recommendations/{type}?ignore_collected=true',
         'types': ['movie', 'tv']},
     'trakt_trending': {
         'name': 'Trending {0} (Trakt)',
@@ -265,4 +280,21 @@ TRAKT_LISTS = {
     'trakt_mylists': {
         'name': 'Your Lists (Trakt)',
         'path': 'users/{user_slug}/lists',
-        'types': ['both']}}
+        'types': ['both']},
+    'trakt_inlists': {
+        'name': 'Found in Lists (Trakt)',
+        'path': 'movies/{imdb_id}/lists',
+        'url_key': 'imdb_id',
+        'types': ['movie']},
+    'trakt_myairing': {
+        'name': 'Your {0} Airing This Week (Trakt)',
+        'path': 'calendars/my/{type}',
+        'types': ['tv']},
+    'trakt_airing': {
+        'name': 'Currently Airing {0} (Trakt)',
+        'path': 'calendars/all/{type}',
+        'types': ['tv']},
+    'trakt_premiering': {
+        'name': 'Premiering {0} (Trakt)',
+        'path': 'calendars/all/{type}/premieres',
+        'types': ['tv']}}
