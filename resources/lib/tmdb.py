@@ -114,7 +114,8 @@ class TMDb(RequestAPI):
         infoproperties['character'] = item.get('character')
         infoproperties['department'] = item.get('department')
         infoproperties['job'] = item.get('job')
-        infoproperties['role'] = item.get('known_for_department')
+        infoproperties['known_for'] = item.get('known_for_department')
+        infoproperties['role'] = item.get('character') or item.get('job') or item.get('department') or item.get('known_for_department')
         infoproperties['born'] = item.get('place_of_birth')
         if item.get('genres'):
             infoproperties = utils.iter_props(item.get('genres'), 'Genre', infoproperties, name='name', tmdb_id='id')
