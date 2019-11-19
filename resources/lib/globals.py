@@ -1,6 +1,6 @@
 BASEDIR = [
     'search', 'popular', 'top_rated', 'upcoming', 'airing_today', 'now_playing', 'on_the_air', 'genres',
-    'trakt_watchlist', 'trakt_history', 'trakt_recommendations', 'trakt_mostwatched', 'trakt_myairing',
+    'trakt_watchlist', 'trakt_history', 'trakt_recommendations', 'trakt_myairing',
     'trakt_trending', 'trakt_popular', 'trakt_mostplayed', 'trakt_anticipated', 'trakt_boxoffice',
     'trakt_trendinglists', 'trakt_popularlists', 'trakt_likedlists', 'trakt_mylists']
 
@@ -226,8 +226,7 @@ TRAKT_LISTLISTS = ['trakt_mylists', 'trakt_trendinglists', 'trakt_popularlists',
 TRAKT_LISTS = {
     'trakt_watchlist': {
         'name': 'Watchlist {0} (Trakt)',
-        'path': 'sync/watchlist',
-        'trakt_list': 'sync',
+        'path': 'users/{user_slug}/watchlist/{type}',
         'types': ['movie', 'tv']},
     'trakt_history': {
         'name': 'Your Recently Watched {0} (Trakt)',

@@ -1,11 +1,12 @@
 from trakt import Trakt
 from json import loads, dumps
 import resources.lib.utils as utils
+from resources.lib.requestapi import RequestAPI
 import xbmcgui
 import xbmcaddon
 
 
-class traktAPI(object):
+class traktAPI(RequestAPI):
     def __init__(self, force=False):
         Trakt.configuration.defaults.client(
             id='e6fde6173adf3c6af8fd1b0694b9b84d7c519cefc24482310e1de06c6abe5467',
@@ -84,54 +85,58 @@ class traktAPI(object):
             self.auth_dialog.update(progress)
             callback(True)
 
-    def get_synclist(self, synclist, dbtype=None, keylist=[]):
-        with Trakt.configuration.oauth.from_response(self.authorization):
-            with Trakt.configuration.http(retry=True, timeout=90):
-                if dbtype == 'movies':
-                    items = Trakt[synclist].movies()
-                else:
-                    items = Trakt[synclist].shows()
-            trakt_list = utils.listify_items(items)
-            itemlist = []
-            for i in trakt_list:
-                itemlist.append(i.pk)
-            return itemlist
+    def get_request_url(self, *args, **kwargs):
+        """
+        Creates a url request string:
+        """
+        request = None
+        for arg in args:
+            if arg:  # Don't add empty args
+                request = u'{0}/{1}'.format(request, arg) if request else arg
+        for key, value in kwargs.items():
+            if value:  # Don't add empty kwargs
+                sep = '?' if '?' not in request else ''
+                request = u'{0}{1}&{2}={3}'.format(request, sep, key, value)
+        return request
 
-    def get_itemlist(self, listpath, dbtype=None, keylist=['dummy']):
+    def get_response(self, *args, **kwargs):
         with Trakt.configuration.oauth.from_response(self.authorization):
             with Trakt.configuration.http(retry=True, timeout=90):
-                response = Trakt.http.get(listpath)
-                items = response.json()
-                itemlist = []
-                for i in items:
-                    for key in keylist:
-                        item = None
-                        myitem = i.get(key) or i
-                        if myitem:
-                            tmdbtype = 'tv' if key == 'show' else 'movie'
-                            if myitem.get('ids', {}).get('imdb'):
-                                item = ('imdb', myitem.get('ids', {}).get('imdb'), tmdbtype)
-                            elif myitem.get('ids', {}).get('tvdb'):
-                                item = ('tvdb', myitem.get('ids', {}).get('tvdb'), tmdbtype)
-                            if item:
-                                itemlist.append(item)
-                return itemlist
+                return Trakt.http.get(self.get_request_url(*args, **kwargs))
 
-    def get_listlist(self, listpath, key=None):
-        with Trakt.configuration.oauth.from_response(self.authorization):
-            with Trakt.configuration.http(retry=True, timeout=90):
-                response = Trakt.http.get(listpath)
-                items = response.json()
-                itemlist = []
-                for i in items:
-                    item = i.get(key) or i
+    def get_itemlist(self, *args, **kwargs):
+        keylist = kwargs.pop('keylist', ['dummy'])
+        response = self.get_response(*args, **kwargs)
+        items = response.json()
+        this_page = int(kwargs.get('page', 1))
+        last_page = int(response.headers.get('X-Pagination-Page-Count', 0))
+        next_page = ('next_page', this_page + 1, None) if this_page < last_page else False
+        itemlist = []
+        for i in items:
+            for key in keylist:
+                item = None
+                myitem = i.get(key) or i
+                if myitem:
+                    tmdbtype = 'tv' if key == 'show' else 'movie'
+                    if myitem.get('ids', {}).get('imdb'):
+                        item = ('imdb', myitem.get('ids', {}).get('imdb'), tmdbtype)
+                    elif myitem.get('ids', {}).get('tvdb'):
+                        item = ('tvdb', myitem.get('ids', {}).get('tvdb'), tmdbtype)
                     if item:
                         itemlist.append(item)
-                return itemlist
+        if next_page:
+            itemlist.append(next_page)
+        return itemlist
+
+    def get_listlist(self, request, key=None):
+        items = self.get_response(request).json()
+        itemlist = [i.get(key) or i for i in items if i.get(key) or i]
+        return itemlist
 
     def get_usernameslug(self):
-        with Trakt.configuration.oauth.from_response(self.authorization):
-            with Trakt.configuration.http(retry=True, timeout=90):
-                response = Trakt.http.get('users/settings')
-                item = response.json()
-                return item.get('user', {}).get('ids', {}).get('slug')
+        item = self.get_response('users/settings').json()
+        return item.get('user', {}).get('ids', {}).get('slug')
+
+    def get_traktslug(self, item_type, id_type, id):
+        item = self.get_response('search', id_type, id, '?' + item_type).json()
+        return item[0].get(item_type, {}).get('ids', {}).get('slug')

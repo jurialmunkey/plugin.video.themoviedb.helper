@@ -233,7 +233,6 @@ class Container(object):
             _traktapi = traktAPI()
             self.params['user_slug'] = self.params.get('user_slug') or _traktapi.get_usernameslug()
             category = TRAKT_LISTS.get(self.params.get('info', ''), {})
-            func = _traktapi.get_synclist if category.get('trakt_list') == 'user' else _traktapi.get_itemlist
             url_info = category.get('url_info', 'details')
             params = self.params.copy()
             if self.params.get('type') == 'both':
@@ -245,15 +244,17 @@ class Container(object):
                 params['type'] = trakt_type + 's'
                 keylist = [trakt_type]
             path = category.get('path', '').format(**params)
-            trakt_list = func(path, itemtype + 's', keylist)
+            trakt_list = _traktapi.get_itemlist(path, keylist=keylist, page=self.params.get('page', 1), limit=10)
             itemlist = []
-            max_items = 10
-            for i in trakt_list[:max_items]:
+            for i in trakt_list:
                 item = None
                 if i[0] == 'imdb':
                     item = _tmdb.get_externalid_item(i[2], i[1], 'imdb_id')
                 elif i[0] == 'tvdb':
                     item = _tmdb.get_externalid_item(i[2], i[1], 'tvdb_id')
+                elif i[0] == 'next_page':
+                    item = {'label': 'Next Page', 'url': self.params.copy()}
+                    item['url']['page'] = i[1]
                 if item:
                     item['mixed_type'] = i[2]
                     itemlist.append(item)
