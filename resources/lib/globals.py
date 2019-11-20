@@ -8,34 +8,42 @@ TYPE_CONVERSION = {
     'movie': {
         'plural': 'Movies',
         'container': 'movies',
+        'trakt': 'movie',
         'dbtype': 'movie'},
     'tv': {
         'plural': 'TV Shows',
         'container': 'tvshows',
+        'trakt': 'show',
         'dbtype': 'tvshow'},
     'person': {
         'plural': 'People',
         'container': 'actors',
+        'trakt': '',
         'dbtype': ''},
     'review': {
         'plural': 'Reviews',
         'container': '',
+        'trakt': '',
         'dbtype': ''},
     'image': {
         'plural': 'Images',
         'container': 'images',
+        'trakt': '',
         'dbtype': 'image'},
     'genre': {
         'plural': 'Genres',
         'container': 'genres',
+        'trakt': '',
         'dbtype': 'genre'},
     'season': {
         'plural': 'Seasons',
         'container': 'seasons',
+        'trakt': 'season',
         'dbtype': 'season'},
     'episode': {
         'plural': 'Episodes',
         'container': 'episodes',
+        'trakt': 'episode',
         'dbtype': 'episode'}}
 
 LANGUAGES = [
@@ -214,7 +222,7 @@ TMDB_LISTS = {
         'nexttype': 'episode',
         'types': ['season']}}
 
-TMDB_CATEGORIES = [
+DETAILED_CATEGORIES = [
     'cast', 'recommendations', 'similar', 'crew', 'posters', 'fanart', 'movie_keywords', 'reviews',
     'stars_in_movies', 'stars_in_tvshows', 'crew_in_movies', 'crew_in_tvshows', 'images',
     'seasons', 'episode_cast', 'episode_thumbs', 'trakt_inlists']
@@ -227,73 +235,91 @@ TRAKT_LISTS = {
     'trakt_watchlist': {
         'name': 'Watchlist {0} (Trakt)',
         'path': 'users/{user_slug}/watchlist/{type}',
+        'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_history': {
         'name': 'Your Recently Watched {0} (Trakt)',
         'path': 'users/{user_slug}/history/{type}',
+        'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_mostwatched': {
         'name': 'Your Most Watched {0} (Trakt)',
         'path': 'users/{user_slug}/watched/{type}',
+        'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_recommendations': {
         'name': '{0} Recommended For You (Trakt)',
         'path': 'recommendations/{type}?ignore_collected=true',
+        'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_trending': {
         'name': 'Trending {0} (Trakt)',
         'path': '{type}/trending',
+        'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_popular': {
         'name': 'Popular {0} (Trakt)',
         'path': '{type}/popular',
+        'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_mostplayed': {
         'name': 'Most Played {0} (Trakt)',
         'path': '{type}/played/weekly',
+        'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_anticipated': {
         'name': 'Anticipated {0} (Trakt)',
         'path': '{type}/anticipated',
+        'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_boxoffice': {
         'name': 'Top 10 Box Office {0} (Trakt)',
         'path': '{type}/boxoffice',
+        'icon': '{0}/resources/trakt.png',
         'types': ['movie']},
     'trakt_userlist': {
         'name': 'User List (Trakt)',
         'path': 'users/{user_slug}/lists/{list_slug}/items',
+        'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_trendinglists': {
         'name': 'Trending Lists (Trakt)',
         'path': 'lists/trending',
+        'icon': '{0}/resources/trakt.png',
         'types': ['both']},
     'trakt_popularlists': {
         'name': 'Popular Lists (Trakt)',
         'path': 'lists/popular',
+        'icon': '{0}/resources/trakt.png',
         'types': ['both']},
     'trakt_likedlists': {
         'name': 'Liked Lists (Trakt)',
         'path': 'users/likes/lists',
+        'icon': '{0}/resources/trakt.png',
         'types': ['both']},
     'trakt_mylists': {
         'name': 'Your Lists (Trakt)',
         'path': 'users/{user_slug}/lists',
+        'icon': '{0}/resources/trakt.png',
         'types': ['both']},
     'trakt_inlists': {
         'name': 'Found in Lists (Trakt)',
         'path': 'movies/{imdb_id}/lists',
         'url_key': 'imdb_id',
+        'icon': '{0}/resources/trakt.png',
         'types': ['movie']},
     'trakt_myairing': {
         'name': 'Your {0} Airing This Week (Trakt)',
         'path': 'calendars/my/{type}',
+        'icon': '{0}/resources/trakt.png',
         'types': ['tv']},
     'trakt_airing': {
         'name': 'Currently Airing {0} (Trakt)',
         'path': 'calendars/all/{type}',
+        'icon': '{0}/resources/trakt.png',
         'types': ['tv']},
     'trakt_premiering': {
         'name': 'Premiering {0} (Trakt)',
         'path': 'calendars/all/{type}/premieres',
+        'icon': '{0}/resources/trakt.png',
         'types': ['tv']}}
