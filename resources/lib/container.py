@@ -155,6 +155,8 @@ class Container(object):
             name = u'{0}{1}'.format(i.get('label'), i.get('poster'))
             if name in added:  # Don't add duplicate items
                 continue
+            if i.get('infolabels', {}).get('season', 1) == 0:  # Ignore Specials
+                continue
             added.append(name)
 
             i = self.url_encoding(i)
@@ -235,6 +237,24 @@ class Container(object):
         self.plugincategory = key.capitalize()
         self.containercontent = 'actors'
         self.list_items(items)
+
+    def list_traktupnext(self):
+        _traktapi = traktAPI()
+        imdb_id = _tmdb.get_item_externalid(itemtype='tv', tmdb_id=self.params.get('tmdb_id'), external_id='imdb_id')
+        trakt_items = _traktapi.get_upnext(imdb_id)
+        items = []
+        for i in trakt_items:
+            item = _tmdb.get_detailed_item(itemtype='tv', tmdb_id=self.params.get('tmdb_id'), season=i[0], episode=i[1])
+            if item:
+                items.append(item)
+        if items:
+            itemtype = 'episode'
+            self.nexttype = 'episode'
+            self.url_info = 'details'
+            self.dbtype = type_convert(itemtype, 'dbtype')
+            self.plugincategory = type_convert(itemtype, 'plural')
+            self.containercontent = type_convert(itemtype, 'container')
+            self.list_items(items)
 
     def list_traktuserlists(self):
         _traktapi = traktAPI()
@@ -327,6 +347,8 @@ class Container(object):
             self.textviewer()
         elif self.params.get('info') == 'imageviewer':
             self.imageviewer()
+        elif self.params.get('info') == 'trakt_upnext':
+            self.list_traktupnext()
         elif self.params.get('info') in TRAKT_LISTLISTS:
             self.list_traktuserlists()
         elif self.params.get('info') in TRAKT_LISTS:

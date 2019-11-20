@@ -76,8 +76,8 @@ class TMDb(RequestAPI):
         infolabels['imdbnumber'] = item.get('imdb_id')
         infolabels['tagline'] = item.get('tagline')
         infolabels['status'] = item.get('status')
-        infolabels['episode'] = item.get('episode_number') or item.get('number_of_episodes')
-        infolabels['season'] = item.get('season_number') or item.get('number_of_seasons')
+        infolabels['episode'] = item.get('episode_number') if item.get('episode_number') or item.get('episode_number') == 0 else item.get('number_of_episodes')
+        infolabels['season'] = item.get('season_number') if item.get('season_number') or item.get('season_number') == 0 else item.get('number_of_seasons')
         infolabels['genre'] = utils.dict_to_list(item.get('genres', []), 'name')
         if item.get('runtime'):
             infolabels['duration'] = item.get('runtime', 0) * 60
@@ -276,6 +276,9 @@ class TMDb(RequestAPI):
         return itemdict
 
     def get_externalid_item(self, itemtype, external_id, external_source):
+        """
+        Lookup an item using an external id such as IMDb or TVDb
+        """
         cache_name = '{0}.find.{1}.{2}'.format(self.addon_name, external_source, external_id)
         itemdict = self.get_cache(cache_name)
         if not itemdict:
@@ -285,6 +288,14 @@ class TMDb(RequestAPI):
         if itemdict.get('tmdb_id'):
             itemdict = self.get_detailed_item(itemtype, itemdict.get('tmdb_id'), cache_only=True) or itemdict
         return itemdict
+
+    def get_item_externalid(self, itemtype, tmdb_id, external_id=None):
+        """
+        Lookup external ids for an item using tmdb_id
+        """
+        request = self.get_request_lc(itemtype, tmdb_id, 'external_ids') or {}
+        request = request.get(external_id) if external_id else request
+        return request
 
     def get_tmdb_id(self, itemtype=None, imdb_id=None, query=None, year=None, selectdialog=False, longcache=False):
         func = self.get_request_lc if longcache else self.get_request_sc

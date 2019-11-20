@@ -133,6 +133,29 @@ class traktAPI(RequestAPI):
         itemlist = [i.get(key) or i for i in items if i.get(key) or i]
         return itemlist
 
+    def get_inprogress(self):
+        pass
+
+    def get_upnext(self, imdb_id):
+        request = 'shows/{0}/progress/watched'.format(imdb_id)
+        response = self.get_response(request).json()
+        reset_at = utils.convert_timestamp(response.get('reset_at')) if response.get('reset_at') else None
+        seasons = response.get('seasons', [])
+        items = []
+        for season in seasons:
+            s_num = season.get('number')
+            for episode in season.get('episodes', []):
+                item = None
+                e_num = episode.get('number')
+                if episode.get('completed'):
+                    if reset_at and utils.convert_timestamp(episode.get('last_watched_at')) < reset_at:
+                        item = (s_num, e_num)
+                else:
+                    item = (s_num, e_num)
+                if item:
+                    items.append(item)
+        return items
+
     def get_usernameslug(self):
         item = self.get_response('users/settings').json()
         return item.get('user', {}).get('ids', {}).get('slug')

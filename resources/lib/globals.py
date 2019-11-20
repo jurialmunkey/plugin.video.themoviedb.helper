@@ -225,7 +225,7 @@ TMDB_LISTS = {
 DETAILED_CATEGORIES = [
     'cast', 'recommendations', 'similar', 'crew', 'posters', 'fanart', 'movie_keywords', 'reviews',
     'stars_in_movies', 'stars_in_tvshows', 'crew_in_movies', 'crew_in_tvshows', 'images',
-    'seasons', 'episode_cast', 'episode_thumbs', 'trakt_inlists']
+    'seasons', 'trakt_upnext', 'episode_cast', 'episode_thumbs', 'trakt_inlists']
 
 APPEND_TO_RESPONSE = 'credits,images,release_dates,content_ratings,external_ids'
 
@@ -316,6 +316,12 @@ TRAKT_LISTS = {
     'trakt_airing': {
         'name': 'Currently Airing {0} (Trakt)',
         'path': 'calendars/all/{type}',
+        'icon': '{0}/resources/trakt.png',
+        'types': ['tv']},
+    'trakt_upnext': {
+        'name': 'Up Next (Trakt)',
+        'path': 'shows/{imdb_id}/progress/watched',
+        'url_key': 'imdb_id',
         'icon': '{0}/resources/trakt.png',
         'types': ['tv']},
     'trakt_premiering': {

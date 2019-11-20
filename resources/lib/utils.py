@@ -100,6 +100,14 @@ def age_difference(birthday, deathday=''):
         return
 
 
+def convert_timestamp(time_str):
+    try:
+        time_obj = datetime.strptime(time_str[:19], '%Y-%m-%dT%H:%M:%S')
+        return time_obj
+    except Exception:
+        return
+
+
 def kodi_log(value, level=0):
     logvalue = u'{0}{1}'.format(_addonlogname, value) if sys.version_info.major == 3 else u'{0}{1}'.format(_addonlogname, value).encode('utf-8', 'ignore')
     if level == 1:
