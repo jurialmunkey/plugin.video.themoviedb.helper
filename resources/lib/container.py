@@ -9,7 +9,7 @@ from resources.lib.omdb import OMDb
 from resources.lib.traktapi import traktAPI
 from resources.lib.kodilibrary import KodiLibrary
 from resources.lib.listitem import ListItem
-from resources.lib.globals import LANGUAGES, BASEDIR, TYPE_CONVERSION, TMDB_LISTS, DETAILED_CATEGORIES, APPEND_TO_RESPONSE, TRAKT_LISTS, TRAKT_LISTLISTS
+from resources.lib.globals import LANGUAGES, BASEDIR_MAIN, BASEDIR_TMDB, BASEDIR_TRAKT, BASEDIR_LISTS, TYPE_CONVERSION, TMDB_LISTS, DETAILED_CATEGORIES, APPEND_TO_RESPONSE, TRAKT_LISTS, TRAKT_LISTLISTS
 try:
     from urllib.parse import parse_qsl  # Py3
 except ImportError:
@@ -311,14 +311,16 @@ class Container(object):
         """
         Creates a listitem for each type of each category in BASEDIR
         """
+        basedir = BASEDIR_LISTS.get(self.params.get('info'), {}).get('path') or BASEDIR_MAIN
         self.start_container()
-        for i in BASEDIR:
-            cat = TMDB_LISTS.get(i) or TRAKT_LISTS.get(i) or {}
+        for i in basedir:
+            cat = BASEDIR_LISTS.get(i) or TMDB_LISTS.get(i) or TRAKT_LISTS.get(i) or {}
             icon = cat.get('icon', '').format(_addonpath)
             for t in cat.get('types', []):
                 label = cat.get('name', '').format(type_convert(t, 'plural'))
                 listitem = ListItem(label=label, icon=icon, thumb=icon, poster=icon)
-                listitem.create_listitem(_handle, info=i, type=t)
+                url = {'info': i, 'type': t} if t else {'info': i}
+                listitem.create_listitem(_handle, **url)
         self.finish_container()
 
     def router(self):
@@ -353,10 +355,12 @@ class Container(object):
             self.list_traktuserlists()
         elif self.params.get('info') in TRAKT_LISTS:
             self.list_trakt()
-        elif self.params.get('info') in BASEDIR:
+        elif self.params.get('info') in BASEDIR_TMDB:
             self.list_tmdb()
         elif self.params.get('info') in TMDB_LISTS and TMDB_LISTS.get(self.params.get('info'), {}).get('path'):
             self.get_tmdb_id()
             self.list_tmdb()
+        elif self.params.get('info') in BASEDIR_LISTS:
+            self.list_basedir()
         elif not self.params:
             self.list_basedir()

@@ -1,8 +1,11 @@
-BASEDIR = [
-    'search', 'popular', 'top_rated', 'upcoming', 'airing_today', 'now_playing', 'on_the_air', 'genres',
-    'trakt_watchlist', 'trakt_history', 'trakt_recommendations', 'trakt_myairing',
-    'trakt_trending', 'trakt_popular', 'trakt_mostplayed', 'trakt_anticipated', 'trakt_boxoffice',
-    'trakt_trendinglists', 'trakt_popularlists', 'trakt_likedlists', 'trakt_mylists']
+BASEDIR_MAIN = ['dir_tmdb', 'dir_trakt']
+
+BASEDIR_TMDB = ['search', 'popular', 'top_rated', 'upcoming', 'airing_today', 'now_playing', 'on_the_air', 'genres']
+
+BASEDIR_TRAKT = [
+    'trakt_watchlist', 'trakt_history', 'trakt_recommendations', 'trakt_myairing', 'trakt_trending',
+    'trakt_popular', 'trakt_mostplayed', 'trakt_anticipated', 'trakt_boxoffice', 'trakt_trendinglists',
+    'trakt_popularlists', 'trakt_likedlists', 'trakt_mylists']
 
 TYPE_CONVERSION = {
     'movie': {
@@ -54,6 +57,17 @@ LANGUAGES = [
     'nb-NO', 'nl-NL', 'no-NO', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'si-LK', 'sk-SK', 'sl-SI',
     'sr-RS', 'sv-SE', 'ta-IN', 'te-IN', 'th-TH', 'tl-PH', 'tr-TR', 'uk-UA', 'vi-VN', 'zh-CN', 'zh-HK',
     'zh-TW', 'zu-ZA']
+
+BASEDIR_LISTS = {
+    'dir_tmdb': {
+        'name': 'TheMovieDb',
+        'path': BASEDIR_TMDB,
+        'types': [None]},
+    'dir_trakt': {
+        'name': 'Trakt',
+        'path': BASEDIR_TRAKT,
+        'icon': '{0}/resources/trakt.png',
+        'types': [None]}}
 
 TMDB_LISTS = {
     'discover': {
@@ -233,99 +247,99 @@ TRAKT_LISTLISTS = ['trakt_mylists', 'trakt_trendinglists', 'trakt_popularlists',
 
 TRAKT_LISTS = {
     'trakt_watchlist': {
-        'name': 'Watchlist {0} (Trakt)',
+        'name': 'Watchlist {0}',
         'path': 'users/{user_slug}/watchlist/{type}',
         'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_history': {
-        'name': 'Your Recently Watched {0} (Trakt)',
+        'name': 'Your Recently Watched {0}',
         'path': 'users/{user_slug}/history/{type}',
         'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_mostwatched': {
-        'name': 'Your Most Watched {0} (Trakt)',
+        'name': 'Your Most Watched {0}',
         'path': 'users/{user_slug}/watched/{type}',
         'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_recommendations': {
-        'name': '{0} Recommended For You (Trakt)',
+        'name': '{0} Recommended For You',
         'path': 'recommendations/{type}?ignore_collected=true',
         'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_trending': {
-        'name': 'Trending {0} (Trakt)',
+        'name': 'Trending {0}',
         'path': '{type}/trending',
         'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_popular': {
-        'name': 'Popular {0} (Trakt)',
+        'name': 'Popular {0}',
         'path': '{type}/popular',
         'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_mostplayed': {
-        'name': 'Most Played {0} (Trakt)',
+        'name': 'Most Played {0}',
         'path': '{type}/played/weekly',
         'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_anticipated': {
-        'name': 'Anticipated {0} (Trakt)',
+        'name': 'Anticipated {0}',
         'path': '{type}/anticipated',
         'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_boxoffice': {
-        'name': 'Top 10 Box Office {0} (Trakt)',
+        'name': 'Top 10 Box Office {0}',
         'path': '{type}/boxoffice',
         'icon': '{0}/resources/trakt.png',
         'types': ['movie']},
     'trakt_userlist': {
-        'name': 'User List (Trakt)',
+        'name': 'User List',
         'path': 'users/{user_slug}/lists/{list_slug}/items',
         'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_trendinglists': {
-        'name': 'Trending Lists (Trakt)',
+        'name': 'Trending Lists',
         'path': 'lists/trending',
         'icon': '{0}/resources/trakt.png',
         'types': ['both']},
     'trakt_popularlists': {
-        'name': 'Popular Lists (Trakt)',
+        'name': 'Popular Lists',
         'path': 'lists/popular',
         'icon': '{0}/resources/trakt.png',
         'types': ['both']},
     'trakt_likedlists': {
-        'name': 'Liked Lists (Trakt)',
+        'name': 'Liked Lists',
         'path': 'users/likes/lists',
         'icon': '{0}/resources/trakt.png',
         'types': ['both']},
     'trakt_mylists': {
-        'name': 'Your Lists (Trakt)',
+        'name': 'Your Lists',
         'path': 'users/{user_slug}/lists',
         'icon': '{0}/resources/trakt.png',
         'types': ['both']},
     'trakt_inlists': {
-        'name': 'Found in Lists (Trakt)',
+        'name': 'Found in Lists',
         'path': 'movies/{imdb_id}/lists',
         'url_key': 'imdb_id',
         'icon': '{0}/resources/trakt.png',
         'types': ['movie']},
     'trakt_myairing': {
-        'name': 'Your {0} Airing This Week (Trakt)',
+        'name': 'Your {0} Airing This Week',
         'path': 'calendars/my/{type}',
         'icon': '{0}/resources/trakt.png',
         'types': ['tv']},
     'trakt_airing': {
-        'name': 'Currently Airing {0} (Trakt)',
+        'name': 'Currently Airing {0}',
         'path': 'calendars/all/{type}',
         'icon': '{0}/resources/trakt.png',
         'types': ['tv']},
     'trakt_upnext': {
-        'name': 'Up Next (Trakt)',
+        'name': 'Up Next',
         'path': 'shows/{imdb_id}/progress/watched',
         'url_key': 'imdb_id',
         'icon': '{0}/resources/trakt.png',
         'types': ['tv']},
     'trakt_premiering': {
-        'name': 'Premiering {0} (Trakt)',
+        'name': 'Premiering {0}',
         'path': 'calendars/all/{type}/premieres',
         'icon': '{0}/resources/trakt.png',
         'types': ['tv']}}
