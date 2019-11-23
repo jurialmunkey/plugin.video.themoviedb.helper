@@ -130,7 +130,7 @@ class traktAPI(RequestAPI):
         return items
 
     def get_listlist(self, request, key=None):
-        response = self.get_response(request).json()
+        response = self.get_response(request, limit=250).json()
         items = [i.get(key) or i for i in response if i.get(key) or i]
         return items
 
