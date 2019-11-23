@@ -35,7 +35,7 @@ _koditvshowdb = KodiLibrary(dbtype='tvshow')
 
 
 def type_convert(original, converted):
-        return TYPE_CONVERSION.get(original, {}).get(converted, '')
+    return TYPE_CONVERSION.get(original, {}).get(converted, '')
 
 
 class Container(object):
@@ -87,7 +87,7 @@ class Container(object):
 
     def url_encoding(self, item):
         url = item.get('url') or {'info': self.url_info}
-        url['type'] = item.pop('mixed_type', None) or self.nexttype or self.params.get('type')
+        url['type'] = item.get('mixed_type') or self.nexttype or self.params.get('type')
         if item.get('tmdb_id'):
             url['tmdb_id'] = item.get('tmdb_id')
         if url.get('info') == 'imageviewer':
@@ -172,6 +172,7 @@ class Container(object):
         self.start_container()
         for i in items:
             url = i.pop('url', {})
+            self.dbtype = type_convert(i.pop('mixed_type', ''), 'dbtype') or self.dbtype
             i.setdefault('infolabels', {})['mediatype'] = self.dbtype if self.dbtype and not i.get('label') == 'Next Page' else ''
             listitem = ListItem(library=self.library, **i)
             listitem.create_listitem(_handle, **url)
