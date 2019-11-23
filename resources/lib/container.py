@@ -9,7 +9,7 @@ from resources.lib.omdb import OMDb
 from resources.lib.traktapi import traktAPI
 from resources.lib.kodilibrary import KodiLibrary
 from resources.lib.listitem import ListItem
-from resources.lib.globals import LANGUAGES, BASEDIR_MAIN, BASEDIR_TMDB, BASEDIR_TRAKT, BASEDIR_LISTS, TYPE_CONVERSION, TMDB_LISTS, DETAILED_CATEGORIES, APPEND_TO_RESPONSE, TRAKT_LISTS, TRAKT_LISTLISTS
+from resources.lib.globals import LANGUAGES, BASEDIR_MAIN, BASEDIR_TMDB, BASEDIR_LISTS, TYPE_CONVERSION, TMDB_LISTS, DETAILED_CATEGORIES, APPEND_TO_RESPONSE, TRAKT_LISTS, TRAKT_LISTLISTS, TRAKT_HISTORYLISTS
 try:
     from urllib.parse import parse_qsl  # Py3
 except ImportError:
@@ -238,15 +238,29 @@ class Container(object):
         self.containercontent = 'actors'
         self.list_items(items)
 
+    def list_trakthistory(self):
+        _traktapi = traktAPI()
+        userslug = _traktapi.get_usernameslug()
+        if self.params.get('info') == 'trakt_inprogress':
+            trakt_items = _traktapi.get_inprogress(userslug, limit=10)
+        if self.params.get('info') == 'trakt_mostwatched':
+            trakt_items = _traktapi.get_mostwatched(userslug, type_convert(self.params.get('type'), 'trakt'), limit=10)
+        if self.params.get('info') == 'trakt_history':
+            trakt_items = _traktapi.get_recentlywatched(userslug, type_convert(self.params.get('type'), 'trakt'), limit=10)
+        items = [_tmdb.get_detailed_item(self.params.get('type'), i[1]) for i in trakt_items]
+        if items:
+            self.nexttype = self.params.get('type')
+            self.dbtype = type_convert(self.nexttype, 'dbtype')
+            self.url_info = 'trakt_upnext' if self.params.get('info') == 'trakt_inprogress' else 'details'
+            self.plugincategory = type_convert(self.nexttype, 'plural')
+            self.containercontent = type_convert(self.nexttype, 'container')
+            self.list_items(items)
+
     def list_traktupnext(self):
         _traktapi = traktAPI()
         imdb_id = _tmdb.get_item_externalid(itemtype='tv', tmdb_id=self.params.get('tmdb_id'), external_id='imdb_id')
         trakt_items = _traktapi.get_upnext(imdb_id)
-        items = []
-        for i in trakt_items:
-            item = _tmdb.get_detailed_item(itemtype='tv', tmdb_id=self.params.get('tmdb_id'), season=i[0], episode=i[1])
-            if item:
-                items.append(item)
+        items = [_tmdb.get_detailed_item(itemtype='tv', tmdb_id=self.params.get('tmdb_id'), season=i[0], episode=i[1]) for i in trakt_items]
         if items:
             itemtype = 'episode'
             self.nexttype = 'episode'
@@ -254,7 +268,7 @@ class Container(object):
             self.dbtype = type_convert(itemtype, 'dbtype')
             self.plugincategory = type_convert(itemtype, 'plural')
             self.containercontent = type_convert(itemtype, 'container')
-            self.list_items(items)
+            self.list_items(items[:10])
 
     def list_traktuserlists(self):
         _traktapi = traktAPI()
@@ -287,7 +301,7 @@ class Container(object):
             params['type'] = type_convert(itemtype, 'trakt') + 's'
             path = cat.get('path', '').format(**params)
             trakt_items = _traktapi.get_itemlist(path, keylist=keylist, page=self.params.get('page', 1), limit=10)
-            for i in trakt_items:
+            for i in trakt_items[:11]:
                 item = None
                 if i[0] == 'imdb':
                     item = _tmdb.get_externalid_item(i[2], i[1], 'imdb_id')
@@ -349,6 +363,8 @@ class Container(object):
             self.textviewer()
         elif self.params.get('info') == 'imageviewer':
             self.imageviewer()
+        elif self.params.get('info') in TRAKT_HISTORYLISTS:
+            self.list_trakthistory()
         elif self.params.get('info') == 'trakt_upnext':
             self.list_traktupnext()
         elif self.params.get('info') in TRAKT_LISTLISTS:

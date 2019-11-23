@@ -4,6 +4,7 @@ import resources.lib.utils as utils
 from resources.lib.requestapi import RequestAPI
 import xbmcgui
 import xbmcaddon
+import datetime
 
 
 class traktAPI(RequestAPI):
@@ -107,12 +108,12 @@ class traktAPI(RequestAPI):
     def get_itemlist(self, *args, **kwargs):
         keylist = kwargs.pop('keylist', ['dummy'])
         response = self.get_response(*args, **kwargs)
-        items = response.json()
+        itemlist = response.json()
         this_page = int(kwargs.get('page', 1))
         last_page = int(response.headers.get('X-Pagination-Page-Count', 0))
         next_page = ('next_page', this_page + 1, None) if this_page < last_page else False
-        itemlist = []
-        for i in items:
+        items = []
+        for i in itemlist:
             for key in keylist:
                 item = None
                 myitem = i.get(key) or i
@@ -123,21 +124,59 @@ class traktAPI(RequestAPI):
                     elif myitem.get('ids', {}).get('tvdb'):
                         item = ('tvdb', myitem.get('ids', {}).get('tvdb'), tmdbtype)
                     if item:
-                        itemlist.append(item)
+                        items.append(item)
         if next_page:
-            itemlist.append(next_page)
-        return itemlist
+            items.append(next_page)
+        return items
 
     def get_listlist(self, request, key=None):
-        items = self.get_response(request).json()
-        itemlist = [i.get(key) or i for i in items if i.get(key) or i]
-        return itemlist
+        response = self.get_response(request).json()
+        items = [i.get(key) or i for i in response if i.get(key) or i]
+        return items
 
-    def get_inprogress(self):
-        pass
+    def get_limitedlist(self, itemlist, itemtype, limit):
+        items = []
+        n = 0
+        for i in itemlist:
+            if limit and n >= limit:
+                break
+            item = (i.get(itemtype, {}).get('ids', {}).get('slug'), i.get(itemtype, {}).get('ids', {}).get('tmdb'))
+            if item not in items:
+                items.append(item)
+                n += 1
+        return items
 
-    def get_upnext(self, imdb_id):
-        request = 'shows/{0}/progress/watched'.format(imdb_id)
+    def get_mostwatched(self, userslug, itemtype, limit=None):
+        history = self.get_response('users', userslug, 'watched', itemtype + 's').json()
+        history = sorted(history, key=lambda i: i['plays'], reverse=True)
+        return self.get_limitedlist(history, itemtype, limit)
+
+    def get_recentlywatched(self, userslug, itemtype, limit=None):
+        start_at = datetime.date.today() - datetime.timedelta(6 * 365 / 12)
+        history = self.get_response('users', userslug, 'history', itemtype + 's', page=1, limit=200, start_at=start_at.strftime("%Y-%m-%d")).json()
+        return self.get_limitedlist(history, itemtype, limit)
+
+    def get_inprogress(self, userslug, limit=None):
+        """
+        Looks at user's most recently watched 200 episodes in last 6 months
+        Adds each unique show to list in order then checks if show has an upnext episode
+        Returns list of tmdb_ids representing shows with upnext episodes in recently watched order
+        """
+        recentshows = self.get_recentlywatched(userslug, 'show')
+        items = []
+        n = 0
+        for i in recentshows:
+            if limit and n >= limit:
+                break
+            progress = self.get_upnext(i[0], True)
+            if progress and progress.get('next_episode'):
+                utils.kodi_log(progress.get('next_episode'), 1)
+                items.append(i)
+                n += 1
+        return items
+
+    def get_upnext(self, show_id, response_only=False):
+        request = 'shows/{0}/progress/watched'.format(show_id)
         response = self.get_response(request).json()
         reset_at = utils.convert_timestamp(response.get('reset_at')) if response.get('reset_at') else None
         seasons = response.get('seasons', [])
@@ -153,8 +192,11 @@ class traktAPI(RequestAPI):
                 else:
                     item = (s_num, e_num)
                 if item:
+                    if response_only:
+                        return response
                     items.append(item)
-        return items
+        if not response_only:
+            return items
 
     def get_usernameslug(self):
         item = self.get_response('users/settings').json()

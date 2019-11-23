@@ -3,9 +3,9 @@ BASEDIR_MAIN = ['dir_tmdb', 'dir_trakt']
 BASEDIR_TMDB = ['search', 'popular', 'top_rated', 'upcoming', 'airing_today', 'now_playing', 'on_the_air', 'genres']
 
 BASEDIR_TRAKT = [
-    'trakt_watchlist', 'trakt_history', 'trakt_recommendations', 'trakt_myairing', 'trakt_trending',
-    'trakt_popular', 'trakt_mostplayed', 'trakt_anticipated', 'trakt_boxoffice', 'trakt_trendinglists',
-    'trakt_popularlists', 'trakt_likedlists', 'trakt_mylists']
+    'trakt_watchlist', 'trakt_history', 'trakt_mostwatched', 'trakt_inprogress', 'trakt_recommendations', 'trakt_myairing',
+    'trakt_trending', 'trakt_popular', 'trakt_mostplayed', 'trakt_anticipated', 'trakt_boxoffice',
+    'trakt_trendinglists', 'trakt_popularlists', 'trakt_likedlists', 'trakt_mylists']
 
 TYPE_CONVERSION = {
     'movie': {
@@ -245,6 +245,8 @@ APPEND_TO_RESPONSE = 'credits,images,release_dates,content_ratings,external_ids'
 
 TRAKT_LISTLISTS = ['trakt_mylists', 'trakt_trendinglists', 'trakt_popularlists', 'trakt_likedlists', 'trakt_inlists']
 
+TRAKT_HISTORYLISTS = ['trakt_inprogress', 'trakt_history', 'trakt_mostwatched']
+
 TRAKT_LISTS = {
     'trakt_watchlist': {
         'name': 'Watchlist {0}',
@@ -256,6 +258,10 @@ TRAKT_LISTS = {
         'path': 'users/{user_slug}/history/{type}',
         'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
+    'trakt_inprogress': {
+        'name': 'Your In-Progress {0}',
+        'icon': '{0}/resources/trakt.png',
+        'types': ['tv']},
     'trakt_mostwatched': {
         'name': 'Your Most Watched {0}',
         'path': 'users/{user_slug}/watched/{type}',
