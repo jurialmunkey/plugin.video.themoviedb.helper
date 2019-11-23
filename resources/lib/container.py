@@ -59,7 +59,7 @@ class Container(object):
         xbmcplugin.endOfDirectory(_handle)
 
     def textviewer(self):
-        _dialog.textviewer(self.params.get('header'), self.params.get('text'))
+        _dialog.textviewer(xbmc.getInfoLabel('ListItem.Label'), xbmc.getInfoLabel('ListItem.Plot'))
 
     def imageviewer(self):
         xbmc.executebuiltin('ShowPicture({0})'.format(self.params.get('image')))
@@ -95,7 +95,7 @@ class Container(object):
             url = {'info': 'imageviewer', 'image': item.get('icon')}
         if url.get('info') == 'textviewer':
             item['is_folder'] = False
-            url = {'info': 'textviewer', 'header': item.get('label'), 'text': item.get('infolabels', {}).get('plot')}
+            url = {'info': 'textviewer'}
         if self.params.get('info') in ['seasons', 'episodes'] or url.get('type') in ['season', 'episode']:
             url['tmdb_id'] = self.params.get('tmdb_id')
             url['season'] = item.get('infolabels', {}).get('season')
