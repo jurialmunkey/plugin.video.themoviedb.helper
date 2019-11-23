@@ -151,6 +151,8 @@ class Container(object):
         added = []
         dbiditems = []
         tmdbitems = []
+        mixed_movies = 0
+        mixed_tvshows = 0
         for i in items:
             name = u'{0}{1}'.format(i.get('label'), i.get('poster'))
             if name in added:  # Don't add duplicate items
@@ -163,11 +165,19 @@ class Container(object):
             i = self.get_details(i)
             i = self.get_dbid(i)
 
+            if i.get('mixed_type', '') == 'tv':
+                mixed_tvshows += 1
+            elif i.get('mixed_type', '') == 'movie':
+                mixed_movies += 1
+
             if i.get('dbid'):
                 dbiditems.append(i)
             else:
                 tmdbitems.append(i)
         items = dbiditems + tmdbitems
+
+        if self.params.get('type') == 'both':
+            self.containercontent = 'tvshows' if mixed_tvshows > mixed_movies else 'movies'
 
         self.start_container()
         for i in items:
