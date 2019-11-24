@@ -181,15 +181,6 @@ def iter_props(items, property, itemprops, **kwargs):
     return itemprops
 
 
-def listify_items(items):
-    if items and isinstance(items, dict):
-        itemlist = []
-        for k, i in items.items():
-            itemlist.append(i)
-        items = itemlist
-    return items or []
-
-
 def del_empty_keys(d):
     my_dict = d.copy()
     for k, v in d.items():
