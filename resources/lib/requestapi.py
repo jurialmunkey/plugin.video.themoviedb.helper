@@ -61,26 +61,26 @@ class RequestAPI(object):
             request = utils.dictify(request)
         return request
 
-    def get_api_request(self, request=None, is_json=True):
+    def get_api_request(self, request=None, is_json=True, postdata=None, headers=None, dictify=True):
         """
         Make the request to the API by passing a url request string
         """
-        utils.rate_limiter(addon_name=self.addon_name, wait_time=self.req_wait_time, api_name=self.req_api_name)
+        if self.req_wait_time:
+            utils.rate_limiter(addon_name=self.addon_name, wait_time=self.req_wait_time, api_name=self.req_api_name)
         utils.kodi_log(request, 0)
-        request = requests.get(request)  # Request our data
+        request = requests.post(request, data=postdata) if postdata else requests.get(request, headers=headers)  # Request our data
         if not request.status_code == requests.codes.ok:  # Error Checking
             if request.status_code == 401:
                 utils.kodi_log('HTTP Error Code: {0}'.format(request.status_code), 1)
                 self.invalid_apikey()
-            else:
+            elif not request.status_code == 400:  # Don't write 400 error to log
                 utils.kodi_log('HTTP Error Code: {0}'.format(request.status_code), 1)
             return {}
-        else:
-            if is_json:
-                request = request.json()  # Make the request nice
-            else:
-                request = self.translate_xml(request)
-            return request
+        if dictify and is_json:
+            request = request.json()  # Make the request nice
+        elif dictify:
+            request = self.translate_xml(request)
+        return request
 
     def get_request_url(self, *args, **kwargs):
         """
@@ -94,7 +94,8 @@ class RequestAPI(object):
         request = u'{0}{1}'.format(request, self.req_api_key)
         for key, value in kwargs.items():
             if value:  # Don't add empty kwargs
-                request = u'{0}&{1}={2}'.format(request, key, value)
+                sep = '?' if '?' not in request else ''
+                request = u'{0}{1}&{2}={3}'.format(request, sep, key, value)
         return request
 
     def get_request_sc(self, *args, **kwargs):

@@ -16,7 +16,7 @@ class TMDb(RequestAPI):
         self.req_api_key = '?api_key={0}'.format(api_key)
         self.req_api_name = 'TMDb'
         self.req_api_url = 'https://api.themoviedb.org/3'
-        self.req_wait_time = 0.2
+        self.req_wait_time = 0
         self.req_append = append_to_response if append_to_response else None
         self.imagepath_original = 'https://image.tmdb.org/t/p/original'
         self.imagepath_poster = 'https://image.tmdb.org/t/p/w500'
