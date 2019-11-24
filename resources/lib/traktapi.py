@@ -44,6 +44,18 @@ class traktAPI(RequestAPI):
             'Enter the code: [B]' + self.code.get('user_code') + '[/B]')
         self.poller()
 
+    def refresh_token(self):
+        postdata = {
+            'refresh_token': self.authorization.get('refresh_token'),
+            'client_id': self.client_id,
+            'client_secret': self.client_secret,
+            'redirect_uri': 'urn:ietf:wg:oauth:2.0:oob',
+            'grant_type': 'refresh_token'}
+        self.authorization = self.get_api_request('https://api.trakt.tv/oauth/token', postdata=postdata)
+        if not self.authorization or not self.authorization.get('access_token'):
+            return
+        self.on_authenticated(auth_dialog=False)
+
     def poller(self):
         if not self.on_poll():
             self.on_aborted()
@@ -59,10 +71,6 @@ class traktAPI(RequestAPI):
             self.poller()
         self.on_authenticated()
 
-    # def on_token_refreshed(self, response):
-    #     self.authorization = response
-    #     xbmcaddon.Addon().setSettingString('authorization', dumps(self.authorization))
-
     def on_aborted(self):
         """Triggered when device authentication was aborted"""
         utils.kodi_log('Trakt Authentication Aborted!', 1)
@@ -73,12 +81,13 @@ class traktAPI(RequestAPI):
         utils.kodi_log('Trakt Authentication Expired!', 1)
         self.auth_dialog.close()
 
-    def on_authenticated(self):
+    def on_authenticated(self, auth_dialog=True):
         """Triggered when device authentication has been completed"""
         utils.kodi_log('Trakt Authenticated Successfully!', 1)
         xbmcaddon.Addon().setSettingString('trakt_token', dumps(self.authorization))
         self.headers['Authorization'] = 'Bearer {0}'.format(self.authorization.get('access_token'))
-        self.auth_dialog.close()
+        if auth_dialog:
+            self.auth_dialog.close()
 
     def on_poll(self):
         """Triggered before each poll"""
@@ -88,11 +97,18 @@ class traktAPI(RequestAPI):
         else:
             self.progress += self.interval
             progress = (self.progress * 100) / self.expirein
-            self.auth_dialog.update(progress)
+            self.auth_dialog.update(int(progress))
             return True
 
     def get_response(self, *args, **kwargs):
-        return self.get_api_request(self.get_request_url(*args, **kwargs), headers=self.headers, dictify=False)
+        refreshcheck = kwargs.pop('refreshcheck', False)
+        response = self.get_api_request(self.get_request_url(*args, **kwargs), headers=self.headers, dictify=False)
+        if response.status_code == 401:
+            self.refresh_token()
+            if not refreshcheck:
+                kwargs['refreshcheck'] = True
+                self.get_response(*args, **kwargs)
+        return response
 
     def get_itemlist(self, *args, **kwargs):
         keylist = kwargs.pop('keylist', ['dummy'])
