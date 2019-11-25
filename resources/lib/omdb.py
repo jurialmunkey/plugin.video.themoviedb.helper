@@ -54,12 +54,12 @@ class OMDb(RequestAPI):
         infoproperties['imdb_votes'] = item.get('imdbVotes', None)
         infoproperties['rottentomatoes_rating'] = item.get('tomatoMeter', None)
         infoproperties['rottentomatoes_image'] = item.get('tomatoImage', None)
-        infoproperties['rottentomatoes_reviewtotal'] = item.get('tomatoReviews', None)
-        infoproperties['rottentomatoes_reviewsfresh'] = item.get('tomatoFresh', None)
-        infoproperties['rottentomatoes_reviewsrotten'] = item.get('tomatoRotten', None)
+        infoproperties['rottentomatoes_reviewtotal'] = '{:0,.0f}'.format(utils.try_parse_int(item.get('tomatoReviews'))) if item.get('tomatoReviews') else None
+        infoproperties['rottentomatoes_reviewsfresh'] = '{:0,.0f}'.format(utils.try_parse_int(item.get('tomatoFresh'))) if item.get('tomatoFresh') else None
+        infoproperties['rottentomatoes_reviewsrotten'] = '{:0,.0f}'.format(utils.try_parse_int(item.get('tomatoRotten'))) if item.get('tomatoRotten') else None
         infoproperties['rottentomatoes_consensus'] = item.get('tomatoConsensus', None)
         infoproperties['rottentomatoes_usermeter'] = item.get('tomatoUserMeter', None)
-        infoproperties['rottentomatoes_userreviews'] = item.get('tomatoUserReviews', None)
+        infoproperties['rottentomatoes_userreviews'] = '{:0,.0f}'.format(utils.try_parse_int(item.get('tomatoUserReviews'))) if item.get('tomatoUserReviews') else None
         return infoproperties
 
     def get_ratings_awards(self, imdb_id=None, title=None, year=None, cache_only=False):

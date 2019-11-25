@@ -19,6 +19,14 @@ def busy_dialog():
         xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
 
 
+def try_parse_int(string):
+    '''helper to parse int from string without erroring on empty or misformed string'''
+    try:
+        return int(string)
+    except Exception:
+        return 0
+
+
 def try_parse_float(string):
     '''helper to parse float from string without erroring on empty or misformed string'''
     try:
@@ -31,6 +39,7 @@ def rate_limiter(addon_name='plugin.video.themoviedb.helper', wait_time=None, ap
     """
     Simple rate limiter to prevent overloading APIs
     """
+    sleep_time = wait_time if wait_time and 0 < wait_time < 1 else 1
     wait_time = wait_time if wait_time else 2
     api_name = '.{0}'.format(api_name) if api_name else ''
     timestamp_id = '{0}{1}.timestamp'.format(addon_name, api_name)
@@ -48,8 +57,8 @@ def rate_limiter(addon_name='plugin.video.themoviedb.helper', wait_time=None, ap
     pre_timestamp = try_parse_float(pre_timestamp)
     cur_timestamp = pre_timestamp - time.time() + wait_time
     while not xbmc.Monitor().abortRequested() and cur_timestamp > 0:
-        xbmc.Monitor().waitForAbort(1)
-        cur_timestamp -= 1
+        xbmc.Monitor().waitForAbort(sleep_time)
+        cur_timestamp -= sleep_time
 
     # SET TIMESTAMP AND CLEAR LOCK
     xbmcgui.Window(10000).setProperty(timestamp_id, str(time.time()))
@@ -148,19 +157,11 @@ def concatinate_names(items, key, separator):
 
 
 def dict_to_list(items, key):
-    mylist = []
-    for i in items:
-        if i.get(key):
-            mylist.append(i.get(key))
-    return mylist
+    return [i.get(key) for i in items if i.get(key)]
 
 
 def find_dict_in_list(list_of_dicts, key, value):
-    index_list = []
-    for list_index, dic in enumerate(list_of_dicts):
-        if dic.get(key) == value:
-            index_list.append(list_index)
-    return index_list
+    return [list_index for list_index, dic in enumerate(list_of_dicts) if dic.get(key) == value]
 
 
 def split_items(items, separator='/'):

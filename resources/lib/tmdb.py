@@ -16,7 +16,7 @@ class TMDb(RequestAPI):
         self.req_api_key = '?api_key={0}'.format(api_key)
         self.req_api_name = 'TMDb'
         self.req_api_url = 'https://api.themoviedb.org/3'
-        self.req_wait_time = 0
+        self.req_wait_time = 0.25
         self.req_append = append_to_response if append_to_response else None
         self.imagepath_original = 'https://image.tmdb.org/t/p/original'
         self.imagepath_poster = 'https://image.tmdb.org/t/p/w500'
@@ -70,7 +70,7 @@ class TMDb(RequestAPI):
         infolabels['tvshowtitle'] = item.get('tvshowtitle')
         infolabels['plot'] = item.get('overview') or item.get('biography') or item.get('content')
         infolabels['rating'] = item.get('vote_average')
-        infolabels['votes'] = item.get('vote_count')
+        infolabels['votes'] = '{:0,.0f}'.format(item.get('vote_count')) if item.get('vote_count') else None
         infolabels['premiered'] = item.get('air_date') or item.get('release_date') or item.get('first_air_date') or ''
         infolabels['year'] = infolabels.get('premiered')[:4]
         infolabels['imdbnumber'] = item.get('imdb_id')
@@ -123,6 +123,8 @@ class TMDb(RequestAPI):
             infoproperties = utils.iter_props(item.get('production_companies'), 'Studio', infoproperties, name='name', tmdb_id='id')
         if item.get('production_countries'):
             infoproperties = utils.iter_props(item.get('production_countries'), 'Country', infoproperties, name='name', tmdb_id='id')
+        if item.get('spoken_languages'):
+            infoproperties = utils.iter_props(item.get('spoken_languages'), 'Language', infoproperties, name='name')
         if item.get('also_known_as'):
             infoproperties['aliases'] = ' / '.join(item.get('also_known_as'))
         if item.get('known_for'):
