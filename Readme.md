@@ -171,7 +171,10 @@ Optional Parameters:
 Discover will lookup the TMDb IDs for the values in with_genres/with_companies etc. If the TMDb ID is already available, it can be used instead by specifying the with_id parameter:  
 `&amp;with_id=True`  
 
-The default discover behaviour is to provide items matching ANY of the values in with_genres/with_companies etc.To retrieve items that match ALL values, change the with_separator to AND:  
+The default discover behaviour is to provide items matching ALL of the values in with_genres/with_companies etc.To retrieve items that match ANY values, change the with_separator to OR:  
+`&amp;with_separator=OR`  
+
+If you need to include the with_separator params, you can still get the default behaviour of retrieve items that match ALL values by changing the with_separator to AND:  
 `&amp;with_separator=AND`  
 
 If multiple values are separated by a "/" but only the first matching value is desired, then change the with_separator to NONE:  
