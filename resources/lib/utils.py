@@ -83,18 +83,12 @@ def dialog_select_item(items=None, details=False):
         return item_list[item_index]
 
 
-def filtered_item(item, key, value, false_val=False):
-    true_val = False if false_val else True  # Flip values if we want to exclude instead of include
+def filtered_item(item, key, value, exclude=False):
+    boolean = False if exclude else True  # Flip values if we want to exclude instead of include
     if key and value:
-        if item.get(key):
-            if item.get(key) == value:
-                return false_val
-            else:
-                return true_val
-        else:
-            return true_val
-    else:
-        return False
+        if item.get(key) and item.get(key) == value:
+            boolean = exclude
+        return boolean
 
 
 def age_difference(birthday, deathday=''):
@@ -166,9 +160,9 @@ def find_dict_in_list(list_of_dicts, key, value):
 
 def split_items(items, separator='/'):
     separator = ' {0} '.format(separator)
-    if separator in items:
+    if items and separator in items:
         items = items.split(separator)
-    items = [items] if isinstance(items, str) else items  # Make sure we return a list to prevent a string being iterated over characters
+    items = [items] if not isinstance(items, list) else items  # Make sure we return a list to prevent a string being iterated over characters
     return items
 
 

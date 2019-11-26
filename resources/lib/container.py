@@ -105,8 +105,9 @@ class Container(object):
 
     def get_tmdb_id(self):
         if not self.params.get('tmdb_id'):
+            query = utils.split_items(self.params.get('query'))[0] if self.params.get('query') else None
             itemtype = TMDB_LISTS.get(self.params.get('info'), {}).get('tmdb_check_id', self.params.get('type'))
-            self.params['tmdb_id'] = _tmdb.get_tmdb_id(itemtype=itemtype, imdb_id=self.params.get('imdb_id'), query=self.params.get('query'), year=self.params.get('year'))
+            self.params['tmdb_id'] = _tmdb.get_tmdb_id(itemtype=itemtype, imdb_id=self.params.get('imdb_id'), query=query, year=self.params.get('year'))
 
     def get_details(self, item):
         if self.params.get('info') in ['seasons', 'episodes'] or item['url'].get('type') in ['season', 'episode']:
@@ -351,9 +352,9 @@ class Container(object):
     def router(self):
         # FILTERS AND EXCLUSIONS
         _tmdb.filter_key = self.params.get('filter_key', None)
-        _tmdb.filter_value = self.params.get('filter_value', None)
+        _tmdb.filter_value = utils.split_items(self.params.get('filter_value', None))[0]
         _tmdb.exclude_key = self.params.get('exclude_key', None)
-        _tmdb.exclude_value = self.params.get('exclude_value', None)
+        _tmdb.exclude_value = utils.split_items(self.params.get('exclude_value', None))[0]
 
         # ROUTER LIST FUNCTIONS
         if self.params.get('info') == 'discover':
