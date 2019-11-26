@@ -219,7 +219,8 @@ Provides additional details about the current item.
 `ListItem.Property(Studio.X.Name)`  
 `ListItem.Property(Studio.X.ID)`  
 `ListItem.Property(Country.X.Name)`  
-`ListItem.Property(Country.X.ID)`  
+`ListItem.Property(Country.X.ID)`
+`ListItem.Property(Language.X.Name)`  
 `ListItem.Property(birthday)`  
 `ListItem.Property(deathday)`  
 `ListItem.Property(aliases)`  
@@ -241,6 +242,111 @@ Provides additional details about the current item.
 `ListItem.Property(rottentomatoes_reviewsrotten)`  
 `ListItem.Property(rottentomatoes_usermeter)`  
 `ListItem.Property(rottentomatoes_userreviews)`  
+
+
+## Trakt Lists
+TMDbHelper also provides several lists from Trakt.  
+A Trakt accound is required and must be authenticated before use.  
+All lists require a `&amp;type=` parameter to be specified. Type can be `movie` or `tv`.  
+User lists must specify the type as `both`
+
+
+#### Watchlist  
+`plugin://plugin.video.themoviedb.helper?info=trakt_watchlist&amp;type=movie`
+
+Types: `movie` `tv`  
+
+
+#### History 
+`plugin://plugin.video.themoviedb.helper?info=trakt_history&amp;type=movie`
+
+Types: `movie` `tv`  
+
+
+#### Most Watched
+`plugin://plugin.video.themoviedb.helper?info=trakt_mostwatched&amp;type=movie`
+
+Types: `movie` `tv`  
+
+
+#### In-Progress  
+`plugin://plugin.video.themoviedb.helper?info=trakt_inprogress&amp;type=tv`
+
+Types: `tv`  
+
+
+#### Recommendations  
+`plugin://plugin.video.themoviedb.helper?info=trakt_recommendations&amp;type=movie`
+
+Types: `movie` `tv`  
+
+
+#### Your Shows Airing This Week  
+`plugin://plugin.video.themoviedb.helper?info=trakt_myairing&amp;type=tv`
+
+Types: `tv`  
+
+
+#### Trending  
+`plugin://plugin.video.themoviedb.helper?info=trakt_trending&amp;type=movie`
+
+Types: `movie` `tv`  
+
+
+#### Popular (Across all Users)  
+`plugin://plugin.video.themoviedb.helper?info=trakt_popular&amp;type=movie`
+
+Types: `movie` `tv`  
+
+
+#### Most Played (Across all Users)  
+`plugin://plugin.video.themoviedb.helper?info=trakt_watchlist&amp;type=movie`
+
+Types: `movie` `tv`  
+
+
+#### Anticipated  
+`plugin://plugin.video.themoviedb.helper?info=trakt_anticipated&amp;type=movie`
+
+Types: `movie` `tv`  
+
+
+#### Top 10 Box Office This Week  
+`plugin://plugin.video.themoviedb.helper?info=trakt_boxoffice&amp;type=movie`
+
+Types: `movie` `tv`  
+
+
+#### Trending Lists  
+`plugin://plugin.video.themoviedb.helper?info=trakt_trendinglists&amp;type=both`
+
+Types: `both`  
+
+
+#### Popular Lists  
+`plugin://plugin.video.themoviedb.helper?info=trakt_popularlists&amp;type=both`
+
+Types: `both`  
+
+
+#### Liked Lists  
+`plugin://plugin.video.themoviedb.helper?info=trakt_likedlists&amp;type=both`
+
+Types: `both`  
+
+
+#### Your Lists  
+`plugin://plugin.video.themoviedb.helper?info=trakt_mylists&amp;type=both`
+
+Types: `both`  
+
+
+#### Specific List by a User  
+`plugin://plugin.video.themoviedb.helper?info=trakt_userlist&amp;type=both&amp;list_slug=get-to-the-choppa&amp;user_slug=justin`
+
+Types: `both`  
+list_slug: The trakt url slug for the list
+user_slug: The trakt url slug for the user
 
 
 ## Script Functions  
