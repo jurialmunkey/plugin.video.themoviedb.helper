@@ -308,7 +308,7 @@ class Container(object):
         # ADD A REFRESH CACHE ITEM
         refresh = details.copy()
         refresh['label'] = 'Refresh Cache'
-        refresh['url'] = refresh.get('url').copy()
+        refresh['url'] = {}
         refresh['url']['info'] = 'details'
         refresh['url']['refresh'] = 'True'
         items.append(refresh)

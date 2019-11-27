@@ -13,8 +13,8 @@ class traktAPI(RequestAPI):
         self.req_api_key = ''
         self.req_api_name = 'trakt'
         self.req_wait_time = 0
-        self.cache_long = 1
-        self.cache_short = 0.003
+        self.cache_long = 14
+        self.cache_short = 1
         self.access_token = ''
         self.addon_name = 'plugin.video.themoviedb.helper'
         self.client_id = 'e6fde6173adf3c6af8fd1b0694b9b84d7c519cefc24482310e1de06c6abe5467'
