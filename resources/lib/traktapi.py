@@ -16,6 +16,7 @@ class traktAPI(RequestAPI):
         self.cache_long = 14
         self.cache_short = 1
         self.access_token = ''
+        self.collection = {}
         self.addon_name = 'plugin.video.themoviedb.helper'
         self.client_id = 'e6fde6173adf3c6af8fd1b0694b9b84d7c519cefc24482310e1de06c6abe5467'
         self.client_secret = '15119384341d9a61c751d8d515acbc0dd801001d4ebe85d3eef9885df80ee4d9'
@@ -209,3 +210,21 @@ class traktAPI(RequestAPI):
     def get_traktslug(self, item_type, id_type, id):
         item = self.get_response('search', id_type, id, '?' + item_type).json()
         return item[0].get(item_type, {}).get('ids', {}).get('slug')
+
+    def sync_collection(self, itemtype):
+        """
+        Itemtype is movie or show
+        """
+        items = self.get_response('sync/collection', itemtype + 's').json()
+        d = {'title': {}, 'slug': {}, 'tmdb_id': {}, 'trakt_id': {}, 'imdb_id': {}}
+        for i in items:
+            if not i.get(itemtype, {}).get('ids'):
+                continue
+            d['title'].add('{0}-{1}'.format(i.get(itemtype, {}).get('title'), i.get(itemtype, {}).get('year')))
+            d['slug'].add(i.get(itemtype, {}).get('ids', {}).get('slug'))
+            d['trakt'].add(i.get(itemtype, {}).get('ids', {}).get('trakt'))
+            d['imdb'].add(i.get(itemtype, {}).get('ids', {}).get('imdb'))
+            d['tmdb'].add(i.get(itemtype, {}).get('ids', {}).get('tmdb'))
+        # TODO Cache items
+        # TODO Check if needs updating with 'sync/last_activities'
+        # TODO Set collection to self.collection

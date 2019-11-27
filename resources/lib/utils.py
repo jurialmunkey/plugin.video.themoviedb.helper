@@ -167,9 +167,9 @@ def split_items(items, separator='/'):
 
 
 def iter_props(items, property, itemprops, **kwargs):
-    x = 0
-    for i in items:
-        for key, value in kwargs.items():
+    for key, value in kwargs.items():
+        x = 0
+        for i in items:
             if i.get(value):
                 x = x + 1
                 itemprops['{0}.{1}.{2}'.format(property, x, key)] = i.get(value)

@@ -124,7 +124,7 @@ class TMDb(RequestAPI):
         if item.get('production_countries'):
             infoproperties = utils.iter_props(item.get('production_countries'), 'Country', infoproperties, name='name', tmdb_id='id')
         if item.get('spoken_languages'):
-            infoproperties = utils.iter_props(item.get('spoken_languages'), 'Language', infoproperties, name='name')
+            infoproperties = utils.iter_props(item.get('spoken_languages'), 'Language', infoproperties, name='name', iso='iso_639_1')
         if item.get('also_known_as'):
             infoproperties['aliases'] = ' / '.join(item.get('also_known_as'))
         if item.get('known_for'):
