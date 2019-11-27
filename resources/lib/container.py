@@ -271,7 +271,15 @@ class Container(object):
 
     def list_details(self):
         """ Gets detailed information about item and creates folder shortcuts to relevant list categories """
-        details = _tmdb.get_detailed_item('tv', self.params.get('tmdb_id'), self.params.get('season'), self.params.get('episode')) if self.params.get('type') == 'episode' else _tmdb.get_detailed_item(self.params.get('type'), self.params.get('tmdb_id'))
+        d_args = ('tv', self.params.get('tmdb_id'), self.params.get('season'), self.params.get('episode')) if self.params.get('type') == 'episode' else (self.params.get('type'), self.params.get('tmdb_id'))
+        if self.params.get('refresh') == 'True':
+            with utils.busy_dialog():
+                _tmdb.get_detailed_item(*d_args, refresh_cache=True)
+            xbmc.executebuiltin('Container.Refresh')
+            _dialog.ok('Cache Refresh', 'Cached details were refreshed')
+            return
+
+        details = _tmdb.get_detailed_item(*d_args)
         if not details:
             return
 
@@ -296,6 +304,14 @@ class Container(object):
                 if cat.get('url_key') and item.get(cat.get('url_key')):
                     item['url'][cat.get('url_key')] = item.get(cat.get('url_key'))
                 items.append(item)
+
+        # ADD A REFRESH CACHE ITEM
+        refresh = details.copy()
+        refresh['label'] = 'Refresh Cache'
+        refresh['url'] = refresh.get('url').copy()
+        refresh['url']['info'] = 'details'
+        refresh['url']['refresh'] = 'True'
+        items.append(refresh)
 
         # BUILD CONTAINER
         self.dbtype = type_convert(self.params.get('type'), 'dbtype')
@@ -429,7 +445,7 @@ class Container(object):
         elif self.params.get('info') == 'discover':
             self.translate_discover()
             self.list_tmdb()
-        elif self.params.get('info') == 'details':
+        elif self.params.get('info') in ['details', 'refresh']:
             self.get_tmdb_id()
             self.list_details()
         elif self.params.get('info') == 'search':

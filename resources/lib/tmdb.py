@@ -258,20 +258,20 @@ class TMDb(RequestAPI):
         else:
             return False
 
-    def get_detailed_item(self, itemtype, tmdb_id, season=None, episode=None, cache_only=False):
+    def get_detailed_item(self, itemtype, tmdb_id, season=None, episode=None, cache_only=False, refresh_cache=False):
         extra_request = None
         cache_name = '{0}.{1}.{2}'.format(self.addon_name, itemtype, tmdb_id)
         cache_name = '{0}.Season{1}'.format(cache_name, season) if season else cache_name
         cache_name = '{0}.Episode{1}'.format(cache_name, episode) if season and episode else cache_name
-        itemdict = self.get_cache(cache_name)
+        itemdict = self.get_cache(cache_name) if not refresh_cache else None
         if not itemdict and not cache_only:
-            request = self.get_request_lc(itemtype, tmdb_id, language=self.req_language, append_to_response=self.req_append)
+            request = self.get_request_lc(itemtype, tmdb_id, language=self.req_language, append_to_response=self.req_append, refresh_cache=refresh_cache)
             if itemtype == 'tv':
                 request['tvshowtitle'] = self.get_title(request)
             if season and episode:
-                extra_request = self.get_request_lc('tv', tmdb_id, 'season', season, 'episode', episode, language=self.req_language, append_to_response=self.req_append)
+                extra_request = self.get_request_lc('tv', tmdb_id, 'season', season, 'episode', episode, language=self.req_language, append_to_response=self.req_append, refresh_cache=refresh_cache)
             elif season:
-                extra_request = self.get_request_lc('tv', tmdb_id, 'season', season, language=self.req_language, append_to_response=self.req_append)
+                extra_request = self.get_request_lc('tv', tmdb_id, 'season', season, language=self.req_language, append_to_response=self.req_append, refresh_cache=refresh_cache)
             if extra_request:
                 request = utils.merge_two_dicts(request, extra_request)
             itemdict = self.set_cache(self.get_niceitem(request), cache_name, self.cache_long) if request else {}
