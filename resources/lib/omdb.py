@@ -44,6 +44,7 @@ class OMDb(RequestAPI):
         infolabels['mediatype'] = item.get('type', None)
         infolabels['imdbnumber'] = item.get('imdbID', None)
         infolabels['studio'] = item.get('Production', None)
+        infolabels = utils.del_empty_keys(infolabels, ['N/A'])
         return infolabels
 
     def get_infoproperties(self, item):
@@ -60,6 +61,7 @@ class OMDb(RequestAPI):
         infoproperties['rottentomatoes_consensus'] = item.get('tomatoConsensus', None)
         infoproperties['rottentomatoes_usermeter'] = item.get('tomatoUserMeter', None)
         infoproperties['rottentomatoes_userreviews'] = '{:0,.0f}'.format(utils.try_parse_int(item.get('tomatoUserReviews'))) if item.get('tomatoUserReviews') else None
+        infoproperties = utils.del_empty_keys(infoproperties, ['N/A'])
         return infoproperties
 
     def get_ratings_awards(self, imdb_id=None, title=None, year=None, cache_only=False):

@@ -176,10 +176,10 @@ def iter_props(items, property, itemprops, **kwargs):
     return itemprops
 
 
-def del_empty_keys(d):
+def del_empty_keys(d, values=[]):
     my_dict = d.copy()
     for k, v in d.items():
-        if not v:
+        if not v or v in values:
             del my_dict[k]
     return my_dict
 
