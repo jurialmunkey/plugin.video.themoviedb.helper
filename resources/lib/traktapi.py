@@ -16,7 +16,9 @@ class traktAPI(RequestAPI):
         self.cache_long = 14
         self.cache_short = 1
         self.access_token = ''
-        self.collection = {}
+        self.sync = {}
+        self.last_activities = None
+        self.prev_activities = None
         self.addon_name = 'plugin.video.themoviedb.helper'
         self.client_id = 'e6fde6173adf3c6af8fd1b0694b9b84d7c519cefc24482310e1de06c6abe5467'
         self.client_secret = '15119384341d9a61c751d8d515acbc0dd801001d4ebe85d3eef9885df80ee4d9'
@@ -110,6 +112,12 @@ class traktAPI(RequestAPI):
                 kwargs['refreshcheck'] = True
                 self.get_response(*args, **kwargs)
         return response
+
+    def get_response_json(self, *args, **kwargs):
+        return self.get_response(*args, **kwargs).json()
+
+    def get_request(self, *args, **kwargs):
+        return self.use_cache(self.get_response_json, *args, **kwargs)
 
     def get_itemlist(self, *args, **kwargs):
         keylist = kwargs.pop('keylist', ['dummy'])
@@ -207,24 +215,46 @@ class traktAPI(RequestAPI):
         item = self.get_response('users/settings').json()
         return item.get('user', {}).get('ids', {}).get('slug')
 
+    def get_details(self, item_type, id):
+        return self.get_response(item_type + 's', id).json()
+
     def get_traktslug(self, item_type, id_type, id):
         item = self.get_response('search', id_type, id, '?' + item_type).json()
         return item[0].get(item_type, {}).get('ids', {}).get('slug')
 
-    def sync_collection(self, itemtype):
-        """
-        Itemtype is movie or show
-        """
-        items = self.get_response('sync/collection', itemtype + 's').json()
-        d = {'title': {}, 'slug': {}, 'tmdb_id': {}, 'trakt_id': {}, 'imdb_id': {}}
-        for i in items:
-            if not i.get(itemtype, {}).get('ids'):
-                continue
-            d['title'].add('{0}-{1}'.format(i.get(itemtype, {}).get('title'), i.get(itemtype, {}).get('year')))
-            d['slug'].add(i.get(itemtype, {}).get('ids', {}).get('slug'))
-            d['trakt'].add(i.get(itemtype, {}).get('ids', {}).get('trakt'))
-            d['imdb'].add(i.get(itemtype, {}).get('ids', {}).get('imdb'))
-            d['tmdb'].add(i.get(itemtype, {}).get('ids', {}).get('tmdb'))
-        # TODO Cache items
-        # TODO Check if needs updating with 'sync/last_activities'
-        # TODO Set collection to self.collection
+    def sync_activities(self, itemtype, listtype):
+        """ Checks if itemtype.listtype has been updated since last check """
+        cache_name = '{0}.trakt.last_activities'.format(self.addon_name)
+        if not self.prev_activities and not self.last_activities:
+            self.prev_activities = self.get_cache(cache_name)
+            self.last_activities = self.set_cache(self.get_response('sync/last_activities').json(), cache_name=cache_name, cache_days=self.cache_long)
+        if not self.prev_activities or not self.last_activities:
+            return
+        if self.prev_activities.get(itemtype, {}).get(listtype) == self.last_activities.get(itemtype, {}).get(listtype):
+            return self.last_activities.get(itemtype, {}).get(listtype)
+
+    def sync_collection(self, itemtype, idtype=None, mode=None, items=None):
+        return self.do_sync('collection', 'collected_at', itemtype, idtype, mode, items)
+
+    def sync_watchlist(self, itemtype, idtype=None, mode=None, items=None):
+        return self.do_sync('watchlist', 'watchlisted_at', itemtype, idtype, mode, items)
+
+    def sync_history(self, itemtype, idtype=None, mode=None, items=None):
+        return self.do_sync('history', 'watched_at', itemtype, idtype, mode, items)
+
+    def do_sync(self, name, activity, itemtype, idtype=None, mode=None, items=None):
+        postdata = None
+        if not mode:
+            return self.get_sync(name, activity, itemtype, idtype)
+        name = name + '/remove' if mode == 'remove' else name
+        if mode == 'add' or mode == 'remove':
+            postdata = {itemtype + 's': items}
+            return self.get_api_request('{0}/sync/{1}'.format(self.req_api_url, name), headers=self.headers, postdata=postdata)
+
+    def get_sync(self, name, activity, itemtype, idtype):
+        if not self.sync.get(name):
+            cache_refresh = False if self.sync_activities(itemtype + 's', activity) else True
+            self.sync[name] = self.get_request_lc('sync/', name, itemtype + 's', cache_refresh=cache_refresh)
+        if not self.sync.get(name):
+            return
+        return {i.get(itemtype, {}).get('ids', {}).get(idtype) for i in self.sync.get(name) if i.get(itemtype, {}).get('ids', {}).get(idtype)}

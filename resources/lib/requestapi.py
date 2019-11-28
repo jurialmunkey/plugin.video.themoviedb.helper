@@ -6,6 +6,7 @@ import xbmc
 import requests
 import resources.lib.utils as utils
 import xml.etree.ElementTree as ET
+from json import dumps
 _cache = simplecache.SimpleCache()
 _xbmcdialog = xbmcgui.Dialog()
 _addon = xbmcaddon.Addon()
@@ -42,14 +43,14 @@ class RequestAPI(object):
         cache_days = kwargs.pop('cache_days', 14)
         cache_name = kwargs.pop('cache_name', self.addon_name)
         cache_only = kwargs.pop('cache_only', False)
-        refresh_cache = kwargs.pop('refresh_cache', False)
+        cache_refresh = kwargs.pop('cache_refresh', False)
         for arg in args:
             if arg:
                 cache_name = u'{0}/{1}'.format(cache_name, arg)
         for key, value in kwargs.items():
             if value:
                 cache_name = u'{0}&{1}={2}'.format(cache_name, key, value)
-        my_cache = self.get_cache(cache_name) if not refresh_cache else None
+        my_cache = self.get_cache(cache_name) if not cache_refresh else None
         if my_cache:
             return my_cache
         elif not cache_only:
@@ -68,8 +69,8 @@ class RequestAPI(object):
         """
         if self.req_wait_time:
             utils.rate_limiter(addon_name=self.addon_name, wait_time=self.req_wait_time, api_name=self.req_api_name)
-        utils.kodi_log(request, 0)
-        request = requests.post(request, data=postdata) if postdata else requests.get(request, headers=headers)  # Request our data
+        utils.kodi_log(postdata, 1)
+        request = requests.post(request, data=dumps(postdata), headers=headers) if postdata else requests.get(request, headers=headers)  # Request our data
         if not request.status_code == requests.codes.ok:  # Error Checking
             if request.status_code == 401:
                 utils.kodi_log('HTTP Error Code: {0}'.format(request.status_code), 1)
@@ -114,9 +115,9 @@ class RequestAPI(object):
         cache_days = kwargs.pop('cache_days', self.cache_long)
         cache_name = kwargs.pop('cache_name', self.addon_name)
         cache_only = kwargs.pop('cache_only', False)
-        refresh_cache = kwargs.pop('refresh_cache', False)
+        cache_refresh = kwargs.pop('cache_refresh', False)
         is_json = kwargs.pop('is_json', True)
         request_url = self.get_request_url(*args, **kwargs)
         return self.use_cache(
-            self.get_api_request, request_url, is_json=is_json, refresh_cache=refresh_cache,
+            self.get_api_request, request_url, is_json=is_json, cache_refresh=cache_refresh,
             cache_days=cache_days, cache_name=cache_name, cache_only=cache_only)

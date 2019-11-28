@@ -9,7 +9,7 @@ from resources.lib.omdb import OMDb
 from resources.lib.traktapi import traktAPI
 from resources.lib.kodilibrary import KodiLibrary
 from resources.lib.listitem import ListItem
-from resources.lib.globals import LANGUAGES, BASEDIR_MAIN, BASEDIR_TMDB, BASEDIR_LISTS, TYPE_CONVERSION, TMDB_LISTS, DETAILED_CATEGORIES, APPEND_TO_RESPONSE, TRAKT_LISTS, TRAKT_LISTLISTS, TRAKT_HISTORYLISTS
+from resources.lib.globals import LANGUAGES, BASEDIR_MAIN, BASEDIR_TMDB, BASEDIR_LISTS, TYPE_CONVERSION, TMDB_LISTS, DETAILED_CATEGORIES, APPEND_TO_RESPONSE, TRAKT_LISTS, TRAKT_LISTLISTS, TRAKT_HISTORYLISTS, TRAKT_MANAGEMENT
 try:
     from urllib.parse import parse_qsl  # Py3
 except ImportError:
@@ -269,12 +269,31 @@ class Container(object):
 
         # TODO: Add Player for Non-DBID items
 
+    def list_traktmanagement(self):
+        _traktapi = traktAPI()
+        slug = _traktapi.get_traktslug(type_convert(self.params.get('type'), 'trakt'), 'tmdb', self.params.get('tmdb_id'))
+        item = _traktapi.get_details(type_convert(self.params.get('type'), 'trakt'), slug)
+        items = [item]
+        if self.params.get('info') == 'trakt_watchlist_add':
+            _traktapi.sync_watchlist(type_convert(self.params.get('type'), 'trakt'), mode='add', items=items)
+        if self.params.get('info') == 'trakt_history_add':
+            _traktapi.sync_history(type_convert(self.params.get('type'), 'trakt'), mode='add', items=items)
+        if self.params.get('info') == 'trakt_collection_add':
+            _traktapi.sync_collection(type_convert(self.params.get('type'), 'trakt'), mode='add', items=items)
+        if self.params.get('info') == 'trakt_watchlist_remove':
+            _traktapi.sync_watchlist(type_convert(self.params.get('type'), 'trakt'), mode='remove', items=items)
+        if self.params.get('info') == 'trakt_history_remove':
+            _traktapi.sync_history(type_convert(self.params.get('type'), 'trakt'), mode='remove', items=items)
+        if self.params.get('info') == 'trakt_collection_remove':
+            _traktapi.sync_collection(type_convert(self.params.get('type'), 'trakt'), mode='remove', items=items)
+        # TODO: REFRESH TO SHOW CHANGE
+
     def list_details(self):
         """ Gets detailed information about item and creates folder shortcuts to relevant list categories """
         d_args = ('tv', self.params.get('tmdb_id'), self.params.get('season'), self.params.get('episode')) if self.params.get('type') == 'episode' else (self.params.get('type'), self.params.get('tmdb_id'))
         if self.params.get('refresh') == 'True':
             with utils.busy_dialog():
-                _tmdb.get_detailed_item(*d_args, refresh_cache=True)
+                _tmdb.get_detailed_item(*d_args, cache_refresh=True)
             xbmc.executebuiltin('Container.Refresh')
             _dialog.ok('Cache Refresh', 'Cached details were refreshed')
             return
@@ -305,12 +324,35 @@ class Container(object):
                     item['url'][cat.get('url_key')] = item.get(cat.get('url_key'))
                 items.append(item)
 
+        # ADD TRAKT ITEMS
+        if xbmcaddon.Addon().getSetting('trakt_token'):
+            _traktapi = traktAPI()
+            trakt_collection = _traktapi.sync_collection(type_convert(self.params.get('type'), 'trakt'), 'tmdb')
+            if trakt_collection:
+                boolean = 'remove' if details.get('tmdb_id') in trakt_collection else 'add'
+                item_collection = details.copy()
+                item_collection['label'] = 'Remove from Trakt Collection' if boolean == 'remove' else 'Add to Trakt Collection'
+                item_collection['url'] = {'info': 'trakt_collection_{0}'.format(boolean)}
+                items.append(item_collection)
+            trakt_watchlist = _traktapi.sync_watchlist(type_convert(self.params.get('type'), 'trakt'), 'tmdb')
+            if trakt_watchlist:
+                boolean = 'remove' if details.get('tmdb_id') in trakt_watchlist else 'add'
+                item_watchlist = details.copy()
+                item_watchlist['label'] = 'Remove from Trakt Watchlist' if boolean == 'remove' else 'Add to Trakt Watchlist'
+                item_watchlist['url'] = {'info': 'trakt_watchlist_{0}'.format(boolean)}
+                items.append(item_watchlist)
+            trakt_history = _traktapi.sync_history(type_convert(self.params.get('type'), 'trakt'), 'tmdb')
+            if trakt_history:
+                boolean = 'remove' if details.get('tmdb_id') in trakt_history else 'add'
+                item_history = details.copy()
+                item_history['label'] = 'Remove from Trakt Watched History' if boolean == 'remove' else 'Add to Trakt Watched History'
+                item_history['url'] = {'info': 'trakt_history_{0}'.format(boolean)}
+                items.append(item_history)
+
         # ADD A REFRESH CACHE ITEM
         refresh = details.copy()
         refresh['label'] = 'Refresh Cache'
-        refresh['url'] = {}
-        refresh['url']['info'] = 'details'
-        refresh['url']['refresh'] = 'True'
+        refresh['url'] = {'info': 'details', 'refresh': 'True'}
         items.append(refresh)
 
         # BUILD CONTAINER
@@ -460,6 +502,8 @@ class Container(object):
             self.textviewer()
         elif self.params.get('info') == 'imageviewer':
             self.imageviewer()
+        elif self.params.get('info') in TRAKT_MANAGEMENT:
+            self.list_traktmanagement()
         elif self.params.get('info') in TRAKT_HISTORYLISTS:
             self.list_trakthistory()
         elif self.params.get('info') == 'trakt_upnext':
