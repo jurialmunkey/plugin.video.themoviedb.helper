@@ -69,7 +69,6 @@ class RequestAPI(object):
         """
         if self.req_wait_time:
             utils.rate_limiter(addon_name=self.addon_name, wait_time=self.req_wait_time, api_name=self.req_api_name)
-        utils.kodi_log(postdata, 1)
         request = requests.post(request, data=dumps(postdata), headers=headers) if postdata else requests.get(request, headers=headers)  # Request our data
         if not request.status_code == requests.codes.ok:  # Error Checking
             if request.status_code == 401:

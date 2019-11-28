@@ -234,24 +234,19 @@ class traktAPI(RequestAPI):
             return self.last_activities.get(itemtype, {}).get(listtype)
 
     def sync_collection(self, itemtype, idtype=None, mode=None, items=None):
-        return self.do_sync('collection', 'collected_at', itemtype, idtype, mode, items)
+        return self.get_sync('collection', 'collected_at', itemtype, idtype, mode, items)
 
     def sync_watchlist(self, itemtype, idtype=None, mode=None, items=None):
-        return self.do_sync('watchlist', 'watchlisted_at', itemtype, idtype, mode, items)
+        return self.get_sync('watchlist', 'watchlisted_at', itemtype, idtype, mode, items)
 
     def sync_history(self, itemtype, idtype=None, mode=None, items=None):
-        return self.do_sync('history', 'watched_at', itemtype, idtype, mode, items)
+        return self.get_sync('history', 'watched_at', itemtype, idtype, mode, items)
 
-    def do_sync(self, name, activity, itemtype, idtype=None, mode=None, items=None):
-        postdata = None
-        if not mode:
-            return self.get_sync(name, activity, itemtype, idtype)
-        name = name + '/remove' if mode == 'remove' else name
+    def get_sync(self, name, activity, itemtype, idtype=None, mode=None, items=None):
         if mode == 'add' or mode == 'remove':
+            name = name + '/remove' if mode == 'remove' else name
             postdata = {itemtype + 's': items}
             return self.get_api_request('{0}/sync/{1}'.format(self.req_api_url, name), headers=self.headers, postdata=postdata)
-
-    def get_sync(self, name, activity, itemtype, idtype):
         if not self.sync.get(name):
             cache_refresh = False if self.sync_activities(itemtype + 's', activity) else True
             self.sync[name] = self.get_request_lc('sync/', name, itemtype + 's', cache_refresh=cache_refresh)

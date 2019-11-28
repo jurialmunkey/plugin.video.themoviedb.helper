@@ -270,23 +270,25 @@ class Container(object):
         # TODO: Add Player for Non-DBID items
 
     def list_traktmanagement(self):
-        _traktapi = traktAPI()
-        slug = _traktapi.get_traktslug(type_convert(self.params.get('type'), 'trakt'), 'tmdb', self.params.get('tmdb_id'))
-        item = _traktapi.get_details(type_convert(self.params.get('type'), 'trakt'), slug)
-        items = [item]
-        if self.params.get('info') == 'trakt_watchlist_add':
-            _traktapi.sync_watchlist(type_convert(self.params.get('type'), 'trakt'), mode='add', items=items)
-        if self.params.get('info') == 'trakt_history_add':
-            _traktapi.sync_history(type_convert(self.params.get('type'), 'trakt'), mode='add', items=items)
-        if self.params.get('info') == 'trakt_collection_add':
-            _traktapi.sync_collection(type_convert(self.params.get('type'), 'trakt'), mode='add', items=items)
-        if self.params.get('info') == 'trakt_watchlist_remove':
-            _traktapi.sync_watchlist(type_convert(self.params.get('type'), 'trakt'), mode='remove', items=items)
-        if self.params.get('info') == 'trakt_history_remove':
-            _traktapi.sync_history(type_convert(self.params.get('type'), 'trakt'), mode='remove', items=items)
-        if self.params.get('info') == 'trakt_collection_remove':
-            _traktapi.sync_collection(type_convert(self.params.get('type'), 'trakt'), mode='remove', items=items)
-        # TODO: REFRESH TO SHOW CHANGE
+        with utils.busy_dialog():
+            _traktapi = traktAPI()
+            slug = _traktapi.get_traktslug(type_convert(self.params.get('type'), 'trakt'), 'tmdb', self.params.get('tmdb_id'))
+            item = _traktapi.get_details(type_convert(self.params.get('type'), 'trakt'), slug)
+            items = [item]
+            if self.params.get('info') == 'trakt_watchlist_add':
+                _traktapi.sync_watchlist(type_convert(self.params.get('type'), 'trakt'), mode='add', items=items)
+            if self.params.get('info') == 'trakt_history_add':
+                _traktapi.sync_history(type_convert(self.params.get('type'), 'trakt'), mode='add', items=items)
+            if self.params.get('info') == 'trakt_collection_add':
+                _traktapi.sync_collection(type_convert(self.params.get('type'), 'trakt'), mode='add', items=items)
+            if self.params.get('info') == 'trakt_watchlist_remove':
+                _traktapi.sync_watchlist(type_convert(self.params.get('type'), 'trakt'), mode='remove', items=items)
+            if self.params.get('info') == 'trakt_history_remove':
+                _traktapi.sync_history(type_convert(self.params.get('type'), 'trakt'), mode='remove', items=items)
+            if self.params.get('info') == 'trakt_collection_remove':
+                _traktapi.sync_collection(type_convert(self.params.get('type'), 'trakt'), mode='remove', items=items)
+            # TODO: Check status response and add dialog
+            # TODO: Refresh listings MAYBE do details as folder!?
 
     def list_details(self):
         """ Gets detailed information about item and creates folder shortcuts to relevant list categories """
