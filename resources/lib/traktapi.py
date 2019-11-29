@@ -8,18 +8,17 @@ import datetime
 
 
 class traktAPI(RequestAPI):
-    def __init__(self, force=False):
-        self.req_api_url = 'https://api.trakt.tv/'
-        self.req_api_key = ''
-        self.req_api_name = 'trakt'
-        self.req_wait_time = 0
-        self.cache_long = 14
-        self.cache_short = 1
+    def __init__(self, force=False, cache_short=None, cache_long=None, addon_name=None):
+        super(traktAPI, self).__init__(
+            cache_short=cache_short, cache_long=cache_long, addon_name=addon_name,
+            req_api_url='https://api.trakt.tv/', req_api_name='Trakt')
         self.access_token = ''
         self.sync = {}
         self.last_activities = None
         self.prev_activities = None
-        self.addon_name = 'plugin.video.themoviedb.helper'
+        self.refreshcheck = 0
+        self.dialog_noapikey_header = '{0} {1} {2}'.format(xbmcaddon.Addon().getLocalizedString(32007), self.req_api_name, xbmcaddon.Addon().getLocalizedString(32011))
+        self.dialog_noapikey_text = xbmcaddon.Addon().getLocalizedString(32012)
         self.client_id = 'e6fde6173adf3c6af8fd1b0694b9b84d7c519cefc24482310e1de06c6abe5467'
         self.client_secret = '15119384341d9a61c751d8d515acbc0dd801001d4ebe85d3eef9885df80ee4d9'
         self.headers = {'trakt-api-version': '2', 'trakt-api-key': self.client_id, 'Content-Type': 'application/json'}
@@ -48,6 +47,8 @@ class traktAPI(RequestAPI):
         self.poller()
 
     def refresh_token(self):
+        if not self.authorization or not self.authorization.get('refresh_token'):
+            return  # TODO: DIALOG No Refresh Token Need to Authenticate
         postdata = {
             'refresh_token': self.authorization.get('refresh_token'),
             'client_id': self.client_id,
@@ -67,12 +68,13 @@ class traktAPI(RequestAPI):
             self.on_expired()
             return
         self.authorization = self.get_api_request('https://api.trakt.tv/oauth/device/token', postdata={'code': self.code.get('device_code'), 'client_id': self.client_id, 'client_secret': self.client_secret})
-        if not self.authorization:
-            xbmc.Monitor().waitForAbort(self.interval)
-            if xbmc.Monitor().abortRequested():
-                return
-            self.poller()
-        self.on_authenticated()
+        if self.authorization:
+            self.on_authenticated()
+            return
+        xbmc.Monitor().waitForAbort(self.interval)
+        if xbmc.Monitor().abortRequested():
+            return
+        self.poller()
 
     def on_aborted(self):
         """Triggered when device authentication was aborted"""
@@ -103,18 +105,20 @@ class traktAPI(RequestAPI):
             self.auth_dialog.update(int(progress))
             return True
 
-    def get_response(self, *args, **kwargs):
-        refreshcheck = kwargs.pop('refreshcheck', False)
-        response = self.get_api_request(self.get_request_url(*args, **kwargs), headers=self.headers, dictify=False)
-        if response.status_code == 401:
+    def invalid_apikey(self):
+        if self.refreshcheck == 0:
             self.refresh_token()
-            if not refreshcheck:
-                kwargs['refreshcheck'] = True
-                self.get_response(*args, **kwargs)
+        self.refreshcheck += 1
+
+    def get_response(self, *args, **kwargs):
+        response = self.get_api_request(self.get_request_url(*args, **kwargs), headers=self.headers, dictify=False)
+        if self.refreshcheck == 1:
+            self.get_response(*args, **kwargs)
         return response
 
     def get_response_json(self, *args, **kwargs):
-        return self.get_response(*args, **kwargs).json()
+        response = self.get_response(*args, **kwargs)
+        return response.json() if response else {}
 
     def get_request(self, *args, **kwargs):
         return self.use_cache(self.get_response_json, *args, **kwargs)
@@ -144,7 +148,7 @@ class traktAPI(RequestAPI):
         return items
 
     def get_listlist(self, request, key=None):
-        response = self.get_response(request, limit=250).json()
+        response = self.get_response_json(request, limit=250)
         items = [i.get(key) or i for i in response if i.get(key) or i]
         return items
 
@@ -161,13 +165,13 @@ class traktAPI(RequestAPI):
         return items
 
     def get_mostwatched(self, userslug, itemtype, limit=None):
-        history = self.get_response('users', userslug, 'watched', itemtype + 's').json()
+        history = self.get_response_json('users', userslug, 'watched', itemtype + 's')
         history = sorted(history, key=lambda i: i['plays'], reverse=True)
         return self.get_limitedlist(history, itemtype, limit)
 
     def get_recentlywatched(self, userslug, itemtype, limit=None):
         start_at = datetime.date.today() - datetime.timedelta(6 * 365 / 12)
-        history = self.get_response('users', userslug, 'history', itemtype + 's', page=1, limit=200, start_at=start_at.strftime("%Y-%m-%d")).json()
+        history = self.get_response_json('users', userslug, 'history', itemtype + 's', page=1, limit=200, start_at=start_at.strftime("%Y-%m-%d"))
         return self.get_limitedlist(history, itemtype, limit)
 
     def get_inprogress(self, userslug, limit=None):
@@ -190,7 +194,7 @@ class traktAPI(RequestAPI):
 
     def get_upnext(self, show_id, response_only=False):
         request = 'shows/{0}/progress/watched'.format(show_id)
-        response = self.get_response(request).json()
+        response = self.get_response_json(request)
         reset_at = utils.convert_timestamp(response.get('reset_at')) if response.get('reset_at') else None
         seasons = response.get('seasons', [])
         items = []
@@ -212,16 +216,16 @@ class traktAPI(RequestAPI):
             return items
 
     def get_usernameslug(self):
-        item = self.get_response('users/settings').json()
+        item = self.get_response_json('users/settings')
         return item.get('user', {}).get('ids', {}).get('slug')
 
     def get_details(self, item_type, id, season=None, episode=None):
         if not season or not episode:
-            return self.get_response(item_type + 's', id).json()
-        return self.get_response(item_type + 's', id, 'seasons', season, 'episodes', episode).json()
+            return self.get_response_json(item_type + 's', id)
+        return self.get_response_json(item_type + 's', id, 'seasons', season, 'episodes', episode)
 
     def get_traktslug(self, item_type, id_type, id):
-        item = self.get_response('search', id_type, id, '?' + item_type).json()
+        item = self.get_response_json('search', id_type, id, '?' + item_type)
         return item[0].get(item_type, {}).get('ids', {}).get('slug')
 
     def sync_activities(self, itemtype, listtype):
@@ -230,7 +234,7 @@ class traktAPI(RequestAPI):
         if not self.prev_activities:
             self.prev_activities = self.get_cache(cache_name)
         if not self.last_activities:
-            self.last_activities = self.set_cache(self.get_response('sync/last_activities').json(), cache_name=cache_name, cache_days=self.cache_long)
+            self.last_activities = self.set_cache(self.get_response_json('sync/last_activities'), cache_name=cache_name, cache_days=self.cache_long)
         if not self.prev_activities or not self.last_activities:
             return
         if self.prev_activities.get(itemtype, {}).get(listtype) == self.last_activities.get(itemtype, {}).get(listtype):
@@ -248,7 +252,7 @@ class traktAPI(RequestAPI):
     def get_sync(self, name, activity, itemtype, idtype=None, mode=None, items=None):
         if mode == 'add' or mode == 'remove':
             name = name + '/remove' if mode == 'remove' else name
-            return self.get_api_request('{0}/sync/{1}'.format(self.req_api_url, name), headers=self.headers, postdata=items)
+            return self.get_api_request('{0}/sync/{1}'.format(self.req_api_url, name), headers=self.headers, postdata=dumps(items))
         if not self.sync.get(name):
             cache_refresh = False if self.sync_activities(itemtype + 's', activity) else True
             self.sync[name] = self.get_request_lc('sync/', name, itemtype + 's', cache_refresh=cache_refresh)

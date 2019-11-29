@@ -6,25 +6,23 @@ import xbmc
 import requests
 import resources.lib.utils as utils
 import xml.etree.ElementTree as ET
-from json import dumps
 _cache = simplecache.SimpleCache()
-_xbmcdialog = xbmcgui.Dialog()
-_addon = xbmcaddon.Addon()
 
 
 class RequestAPI(object):
-    def __init__(self):
-        self.req_api_url = ''
-        self.req_api_key = ''
-        self.req_api_name = ''
-        self.req_wait_time = 1
-        self.cache_long = 14
-        self.cache_short = 1
-        self.addon_name = 'plugin.video.themoviedb.helper'
+    def __init__(self, cache_short=None, cache_long=None, addon_name=None, req_api_url=None, req_api_key=None, req_api_name=None, req_wait_time=None):
+        self.req_api_url = req_api_url or ''
+        self.req_api_key = req_api_key or ''
+        self.req_api_name = req_api_name or ''
+        self.req_wait_time = req_wait_time or 0
+        self.dialog_noapikey_header = '{0} {1} {2}'.format(xbmcaddon.Addon().getLocalizedString(32007), self.req_api_name, xbmcaddon.Addon().getLocalizedString(32008))
+        self.dialog_noapikey_text = xbmcaddon.Addon().getLocalizedString(32009)
+        self.cache_long = 14 if not cache_long or cache_long < 14 else cache_long
+        self.cache_short = 1 if not cache_short or cache_short < 1 else cache_short
+        self.addon_name = addon_name if addon_name else 'plugin.video.themoviedb.helper'
 
-    def invalid_apikey(self, api_name='TMDb'):
-        _xbmcdialog.ok('{0} {1} {2}'.format(_addon.getLocalizedString(32007), api_name, _addon.getLocalizedString(32008)),
-                       _addon.getLocalizedString(32009))
+    def invalid_apikey(self):
+        xbmcgui.Dialog().ok(self.dialog_noapikey_header, self.dialog_noapikey_text)
         xbmc.executebuiltin('Addon.OpenSettings({0})'.format(self.addon_name))
 
     def get_cache(self, cache_name):
@@ -69,14 +67,14 @@ class RequestAPI(object):
         """
         if self.req_wait_time:
             utils.rate_limiter(addon_name=self.addon_name, wait_time=self.req_wait_time, api_name=self.req_api_name)
-        request = requests.post(request, data=dumps(postdata), headers=headers) if postdata else requests.get(request, headers=headers)  # Request our data
+        request = requests.post(request, data=postdata, headers=headers) if postdata else requests.get(request, headers=headers)  # Request our data
         if not request.status_code == requests.codes.ok:  # Error Checking
             if request.status_code == 401:
                 utils.kodi_log('HTTP Error Code: {0}'.format(request.status_code), 1)
                 self.invalid_apikey()
             elif not request.status_code == 400:  # Don't write 400 error to log
                 utils.kodi_log('HTTP Error Code: {0}'.format(request.status_code), 1)
-            return {}
+            return
         if dictify and is_json:
             request = request.json()  # Make the request nice
         elif dictify:

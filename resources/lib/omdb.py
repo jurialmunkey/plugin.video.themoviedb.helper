@@ -4,13 +4,10 @@ from resources.lib.requestapi import RequestAPI
 
 class OMDb(RequestAPI):
     def __init__(self, api_key=None, cache_short=None, cache_long=None, addon_name=None):
-        self.req_api_key = '?apikey={0}'.format(api_key)
-        self.req_api_name = 'OMDb'
-        self.req_api_url = 'http://www.omdbapi.com/'
-        self.req_wait_time = 1
-        self.cache_long = 14 if not cache_long or cache_long < 14 else cache_long
-        self.cache_short = 1 if not cache_short or cache_short < 1 else cache_short
-        self.addon_name = addon_name if addon_name else 'plugin.video.themoviedb.helper'
+        super(OMDb, self).__init__(
+            cache_short=cache_short, cache_long=cache_long, addon_name=addon_name,
+            req_api_key='?apikey={0}'.format(api_key), req_api_name='OMDb',
+            req_api_url='http://www.omdbapi.com/', req_wait_time=1)
 
     def get_request_item(self, imdb_id=None, title=None, year=None, tomatoes=True, fullplot=True, cache_only=False):
         kwparams = {}

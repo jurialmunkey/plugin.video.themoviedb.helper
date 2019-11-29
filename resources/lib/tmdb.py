@@ -1,29 +1,27 @@
 import resources.lib.utils as utils
 from resources.lib.requestapi import RequestAPI
-_genreids = {"Action": 28, "Adventure": 12, "Animation": 16, "Comedy": 35, "Crime": 80, "Documentary": 99, "Drama": 18,
-             "Family": 10751, "Fantasy": 14, "History": 36, "Horror": 27, "Kids": 10762, "Music": 10402, "Mystery": 9648,
-             "News": 10763, "Reality": 10764, "Romance": 10749, "Science Fiction": 878, "Sci-Fi & Fantasy": 10765, "Soap": 10766,
-             "Talk": 10767, "TV Movie": 10770, "Thriller": 53, "War": 10752, "War & Politics": 10768, "Western": 37}
+_genreids = {
+    "Action": 28, "Adventure": 12, "Animation": 16, "Comedy": 35, "Crime": 80, "Documentary": 99, "Drama": 18,
+    "Family": 10751, "Fantasy": 14, "History": 36, "Horror": 27, "Kids": 10762, "Music": 10402, "Mystery": 9648,
+    "News": 10763, "Reality": 10764, "Romance": 10749, "Science Fiction": 878, "Sci-Fi & Fantasy": 10765, "Soap": 10766,
+    "Talk": 10767, "TV Movie": 10770, "Thriller": 53, "War": 10752, "War & Politics": 10768, "Western": 37}
 
 
 class TMDb(RequestAPI):
     def __init__(self, api_key=None, language=None, cache_long=None, cache_short=None, append_to_response=None, mpaa_prefix=None, addon_name=None, filter_key=None, filter_value=None, exclude_key=None, exclude_value=None):
+        super(TMDb, self).__init__(
+            cache_short=cache_short, cache_long=cache_long, addon_name=addon_name,
+            req_api_name='TMDb', req_api_url='https://api.themoviedb.org/3', req_wait_time=0.25)
         api_key = api_key if api_key else 'a07324c669cac4d96789197134ce272b'
         language = language if language else 'en-US'
         self.iso_language = language[:2]
         self.iso_country = language[-2:]
         self.req_language = '{0}-{1}&include_image_language={0},null'.format(self.iso_language, self.iso_country)
         self.req_api_key = '?api_key={0}'.format(api_key)
-        self.req_api_name = 'TMDb'
-        self.req_api_url = 'https://api.themoviedb.org/3'
-        self.req_wait_time = 0.25
         self.req_append = append_to_response if append_to_response else None
         self.imagepath_original = 'https://image.tmdb.org/t/p/original'
         self.imagepath_poster = 'https://image.tmdb.org/t/p/w500'
-        self.cache_long = 14 if not cache_long or cache_long < 14 else cache_long
-        self.cache_short = 1 if not cache_short or cache_short < 1 else cache_short
         self.mpaa_prefix = '{0} '.format(mpaa_prefix) if mpaa_prefix else ''
-        self.addon_name = addon_name if addon_name else 'plugin.video.themoviedb.helper'
         self.filter_key = filter_key if filter_key else None
         self.filter_value = filter_value if filter_value else None
         self.exclude_key = exclude_key if exclude_key else None

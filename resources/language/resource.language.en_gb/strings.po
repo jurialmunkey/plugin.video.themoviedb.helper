@@ -79,6 +79,16 @@ msgctxt "#32010"
 msgid "Authenticate Trakt Account..."
 msgstr ""
 
+#: /resources/lib/traktapi.py
+msgctxt "#32011"
+msgid "Token"
+msgstr ""
+
+#: /resources/lib/traktapi.py
+msgctxt "#32012"
+msgid "You must Authenticate your Trakt account to use this feature."
+msgstr ""
+
 msgctxt "#30002"
 msgid "Belarusian (Belarus)"
 msgstr ""
