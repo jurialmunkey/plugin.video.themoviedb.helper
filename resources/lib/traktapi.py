@@ -215,8 +215,10 @@ class traktAPI(RequestAPI):
         item = self.get_response('users/settings').json()
         return item.get('user', {}).get('ids', {}).get('slug')
 
-    def get_details(self, item_type, id):
-        return self.get_response(item_type + 's', id).json()
+    def get_details(self, item_type, id, season=None, episode=None):
+        if not season or not episode:
+            return self.get_response(item_type + 's', id).json()
+        return self.get_response(item_type + 's', id, 'seasons', season, 'episodes', episode).json()
 
     def get_traktslug(self, item_type, id_type, id):
         item = self.get_response('search', id_type, id, '?' + item_type).json()
@@ -246,8 +248,7 @@ class traktAPI(RequestAPI):
     def get_sync(self, name, activity, itemtype, idtype=None, mode=None, items=None):
         if mode == 'add' or mode == 'remove':
             name = name + '/remove' if mode == 'remove' else name
-            postdata = {itemtype + 's': items}
-            return self.get_api_request('{0}/sync/{1}'.format(self.req_api_url, name), headers=self.headers, postdata=postdata)
+            return self.get_api_request('{0}/sync/{1}'.format(self.req_api_url, name), headers=self.headers, postdata=items)
         if not self.sync.get(name):
             cache_refresh = False if self.sync_activities(itemtype + 's', activity) else True
             self.sync[name] = self.get_request_lc('sync/', name, itemtype + 's', cache_refresh=cache_refresh)

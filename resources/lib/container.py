@@ -275,21 +275,23 @@ class Container(object):
             return
         with utils.busy_dialog():
             _traktapi = traktAPI()
-            slug = _traktapi.get_traktslug(type_convert(self.params.get('type'), 'trakt'), 'tmdb', self.params.get('tmdb_id'))
-            item = _traktapi.get_details(type_convert(self.params.get('type'), 'trakt'), slug)
-            items = [item]
+            slug_type = 'show' if self.params.get('type') == 'episode' else type_convert(self.params.get('type'), 'trakt')
+            trakt_type = type_convert(self.params.get('type'), 'trakt')
+            slug = _traktapi.get_traktslug(slug_type, 'tmdb', self.params.get('tmdb_id'))
+            item = _traktapi.get_details(slug_type, slug, season=self.params.get('season', None), episode=self.params.get('episode', None))
+            items = {trakt_type + 's': [item]}
             if self.params.get('trakt') == 'watchlist_add':
-                _traktapi.sync_watchlist(type_convert(self.params.get('type'), 'trakt'), mode='add', items=items)
+                _traktapi.sync_watchlist(slug_type, mode='add', items=items)
             if self.params.get('trakt') == 'history_add':
-                _traktapi.sync_history(type_convert(self.params.get('type'), 'trakt'), mode='add', items=items)
+                _traktapi.sync_history(slug_type, mode='add', items=items)
             if self.params.get('trakt') == 'collection_add':
-                _traktapi.sync_collection(type_convert(self.params.get('type'), 'trakt'), mode='add', items=items)
+                _traktapi.sync_collection(slug_type, mode='add', items=items)
             if self.params.get('trakt') == 'watchlist_remove':
-                _traktapi.sync_watchlist(type_convert(self.params.get('type'), 'trakt'), mode='remove', items=items)
+                _traktapi.sync_watchlist(slug_type, mode='remove', items=items)
             if self.params.get('trakt') == 'history_remove':
-                _traktapi.sync_history(type_convert(self.params.get('type'), 'trakt'), mode='remove', items=items)
+                _traktapi.sync_history(slug_type, mode='remove', items=items)
             if self.params.get('trakt') == 'collection_remove':
-                _traktapi.sync_collection(type_convert(self.params.get('type'), 'trakt'), mode='remove', items=items)
+                _traktapi.sync_collection(slug_type, mode='remove', items=items)
             # TODO: Check status response and add dialog
         self.updatelisting = True
 
