@@ -117,6 +117,9 @@ class TMDb(RequestAPI):
         infoproperties['known_for'] = item.get('known_for_department')
         infoproperties['role'] = item.get('character') or item.get('job') or item.get('department') or item.get('known_for_department')
         infoproperties['born'] = item.get('place_of_birth')
+        if item.get('created_by'):
+            infoproperties = utils.iter_props(item.get('created_by'), 'Creator', infoproperties, name='name', tmdb_id='id')
+            infoproperties['creator'] = utils.concatinate_names(item.get('created_by'), 'name', '/')
         if item.get('genres'):
             infoproperties = utils.iter_props(item.get('genres'), 'Genre', infoproperties, name='name', tmdb_id='id')
         if item.get('production_companies'):

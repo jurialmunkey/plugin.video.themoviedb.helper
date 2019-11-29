@@ -247,9 +247,7 @@ TRAKT_LISTLISTS = ['trakt_mylists', 'trakt_trendinglists', 'trakt_popularlists',
 
 TRAKT_HISTORYLISTS = ['trakt_inprogress', 'trakt_history', 'trakt_mostwatched']
 
-TRAKT_MANAGEMENT = [
-    'trakt_collection_add', 'trakt_collection_remove', 'trakt_watchlist_add', 'trakt_watchlist_remove',
-    'trakt_history_add', 'trakt_history_remove']
+TRAKT_MANAGEMENT = ['collection_add', 'collection_remove', 'watchlist_add', 'watchlist_remove', 'history_add', 'history_remove']
 
 TRAKT_LISTS = {
     'trakt_watchlist': {

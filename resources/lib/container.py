@@ -49,6 +49,7 @@ class Container(object):
         self.plugincategory = 'TMDb Helper'
         self.containercontent = ''
         self.library = 'video'
+        self.updatelisting = False
         self.router()
 
     def start_container(self):
@@ -56,7 +57,7 @@ class Container(object):
         xbmcplugin.setContent(_handle, self.containercontent)  # Container.Content
 
     def finish_container(self):
-        xbmcplugin.endOfDirectory(_handle)
+        xbmcplugin.endOfDirectory(_handle, updateListing=self.updatelisting)
 
     def textviewer(self):
         _dialog.textviewer(xbmc.getInfoLabel('ListItem.Label'), xbmc.getInfoLabel('ListItem.Plot'))
@@ -270,25 +271,27 @@ class Container(object):
         # TODO: Add Player for Non-DBID items
 
     def list_traktmanagement(self):
+        if not self.params.get('trakt') in TRAKT_MANAGEMENT:
+            return
         with utils.busy_dialog():
             _traktapi = traktAPI()
             slug = _traktapi.get_traktslug(type_convert(self.params.get('type'), 'trakt'), 'tmdb', self.params.get('tmdb_id'))
             item = _traktapi.get_details(type_convert(self.params.get('type'), 'trakt'), slug)
             items = [item]
-            if self.params.get('info') == 'trakt_watchlist_add':
+            if self.params.get('trakt') == 'watchlist_add':
                 _traktapi.sync_watchlist(type_convert(self.params.get('type'), 'trakt'), mode='add', items=items)
-            if self.params.get('info') == 'trakt_history_add':
+            if self.params.get('trakt') == 'history_add':
                 _traktapi.sync_history(type_convert(self.params.get('type'), 'trakt'), mode='add', items=items)
-            if self.params.get('info') == 'trakt_collection_add':
+            if self.params.get('trakt') == 'collection_add':
                 _traktapi.sync_collection(type_convert(self.params.get('type'), 'trakt'), mode='add', items=items)
-            if self.params.get('info') == 'trakt_watchlist_remove':
+            if self.params.get('trakt') == 'watchlist_remove':
                 _traktapi.sync_watchlist(type_convert(self.params.get('type'), 'trakt'), mode='remove', items=items)
-            if self.params.get('info') == 'trakt_history_remove':
+            if self.params.get('trakt') == 'history_remove':
                 _traktapi.sync_history(type_convert(self.params.get('type'), 'trakt'), mode='remove', items=items)
-            if self.params.get('info') == 'trakt_collection_remove':
+            if self.params.get('trakt') == 'collection_remove':
                 _traktapi.sync_collection(type_convert(self.params.get('type'), 'trakt'), mode='remove', items=items)
             # TODO: Check status response and add dialog
-            # TODO: Refresh listings MAYBE do details as folder!?
+        self.updatelisting = True
 
     def list_details(self):
         """ Gets detailed information about item and creates folder shortcuts to relevant list categories """
@@ -298,7 +301,7 @@ class Container(object):
                 _tmdb.get_detailed_item(*d_args, cache_refresh=True)
             xbmc.executebuiltin('Container.Refresh')
             _dialog.ok('Cache Refresh', 'Cached details were refreshed')
-            return
+            self.updatelisting = True
 
         details = _tmdb.get_detailed_item(*d_args)
         if not details:
@@ -334,21 +337,21 @@ class Container(object):
                 boolean = 'remove' if details.get('tmdb_id') in trakt_collection else 'add'
                 item_collection = details.copy()
                 item_collection['label'] = 'Remove from Trakt Collection' if boolean == 'remove' else 'Add to Trakt Collection'
-                item_collection['url'] = {'info': 'trakt_collection_{0}'.format(boolean)}
+                item_collection['url'] = {'info': 'details', 'trakt': 'collection_{0}'.format(boolean)}
                 items.append(item_collection)
             trakt_watchlist = _traktapi.sync_watchlist(type_convert(self.params.get('type'), 'trakt'), 'tmdb')
             if trakt_watchlist:
                 boolean = 'remove' if details.get('tmdb_id') in trakt_watchlist else 'add'
                 item_watchlist = details.copy()
                 item_watchlist['label'] = 'Remove from Trakt Watchlist' if boolean == 'remove' else 'Add to Trakt Watchlist'
-                item_watchlist['url'] = {'info': 'trakt_watchlist_{0}'.format(boolean)}
+                item_watchlist['url'] = {'info': 'details', 'trakt': 'watchlist_{0}'.format(boolean)}
                 items.append(item_watchlist)
             trakt_history = _traktapi.sync_history(type_convert(self.params.get('type'), 'trakt'), 'tmdb')
             if trakt_history:
                 boolean = 'remove' if details.get('tmdb_id') in trakt_history else 'add'
                 item_history = details.copy()
                 item_history['label'] = 'Remove from Trakt Watched History' if boolean == 'remove' else 'Add to Trakt Watched History'
-                item_history['url'] = {'info': 'trakt_history_{0}'.format(boolean)}
+                item_history['url'] = {'info': 'details', 'trakt': 'history_{0}'.format(boolean)}
                 items.append(item_history)
 
         # ADD A REFRESH CACHE ITEM
@@ -491,6 +494,7 @@ class Container(object):
             self.list_tmdb()
         elif self.params.get('info') in ['details', 'refresh']:
             self.get_tmdb_id()
+            self.list_traktmanagement()
             self.list_details()
         elif self.params.get('info') == 'search':
             self.list_search()
@@ -503,9 +507,7 @@ class Container(object):
         elif self.params.get('info') == 'textviewer':
             self.textviewer()
         elif self.params.get('info') == 'imageviewer':
-            self.imageviewer()
-        elif self.params.get('info') in TRAKT_MANAGEMENT:
-            self.list_traktmanagement()
+            self.imageviewer()            
         elif self.params.get('info') in TRAKT_HISTORYLISTS:
             self.list_trakthistory()
         elif self.params.get('info') == 'trakt_upnext':

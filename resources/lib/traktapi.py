@@ -225,8 +225,9 @@ class traktAPI(RequestAPI):
     def sync_activities(self, itemtype, listtype):
         """ Checks if itemtype.listtype has been updated since last check """
         cache_name = '{0}.trakt.last_activities'.format(self.addon_name)
-        if not self.prev_activities and not self.last_activities:
+        if not self.prev_activities:
             self.prev_activities = self.get_cache(cache_name)
+        if not self.last_activities:
             self.last_activities = self.set_cache(self.get_response('sync/last_activities').json(), cache_name=cache_name, cache_days=self.cache_long)
         if not self.prev_activities or not self.last_activities:
             return
