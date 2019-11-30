@@ -416,8 +416,10 @@ class Container(object):
 
     def list_traktuserlists(self):
         _traktapi = traktAPI()
-        self.params['user_slug'] = self.params.get('user_slug') or _traktapi.get_usernameslug()
-        path = TRAKT_LISTS.get(self.params.get('info'), {}).get('path', '').format(**self.params)
+        path = TRAKT_LISTS.get(self.params.get('info'), {}).get('path', '')
+        if '{user_slug}' in path:
+            self.params['user_slug'] = self.params.get('user_slug') or _traktapi.get_usernameslug()
+        path = path.format(**self.params)
         items = _traktapi.get_listlist(path, 'list')
         icon = '{0}/resources/trakt.png'.format(_addonpath)
         self.start_container()
@@ -437,14 +439,15 @@ class Container(object):
         items = []
         if self.params.get('type'):
             _traktapi = traktAPI()
-            self.params['user_slug'] = self.params.get('user_slug') or _traktapi.get_usernameslug()
             cat = TRAKT_LISTS.get(self.params.get('info', ''), {})
+            if '{user_slug}' in cat.get('path', ''):
+                self.params['user_slug'] = self.params.get('user_slug') or _traktapi.get_usernameslug()
             params = self.params.copy()
             itemtype = 'movie' if self.params.get('type') == 'both' else self.params.get('type', '')
             keylist = ['movie', 'show'] if self.params.get('type') == 'both' else [type_convert(itemtype, 'trakt')]
             params['type'] = type_convert(itemtype, 'trakt') + 's'
             path = cat.get('path', '').format(**params)
-            trakt_items = _traktapi.get_itemlist(path, keylist=keylist, page=self.params.get('page', 1), limit=10)
+            trakt_items = _traktapi.get_itemlist(path, keylist=keylist, page=self.params.get('page', 1), limit=10, req_auth=cat.get('req_auth'))
             for i in trakt_items[:11]:
                 item = None
                 if i[0] == 'imdb':
@@ -509,7 +512,7 @@ class Container(object):
         elif self.params.get('info') == 'textviewer':
             self.textviewer()
         elif self.params.get('info') == 'imageviewer':
-            self.imageviewer()            
+            self.imageviewer()
         elif self.params.get('info') in TRAKT_HISTORYLISTS:
             self.list_trakthistory()
         elif self.params.get('info') == 'trakt_upnext':

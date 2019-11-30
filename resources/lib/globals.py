@@ -253,25 +253,30 @@ TRAKT_LISTS = {
     'trakt_watchlist': {
         'name': 'Watchlist {0}',
         'path': 'users/{user_slug}/watchlist/{type}',
+        'req_auth': True,
         'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_history': {
         'name': 'Your Recently Watched {0}',
         'path': 'users/{user_slug}/history/{type}',
+        'req_auth': True,
         'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_inprogress': {
         'name': 'Your In-Progress {0}',
+        'req_auth': True,
         'icon': '{0}/resources/trakt.png',
         'types': ['tv']},
     'trakt_mostwatched': {
         'name': 'Your Most Watched {0}',
         'path': 'users/{user_slug}/watched/{type}',
+        'req_auth': True,
         'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_recommendations': {
         'name': '{0} Recommended For You',
         'path': 'recommendations/{type}?ignore_collected=true',
+        'req_auth': True,
         'icon': '{0}/resources/trakt.png',
         'types': ['movie', 'tv']},
     'trakt_trending': {
@@ -317,6 +322,7 @@ TRAKT_LISTS = {
     'trakt_likedlists': {
         'name': 'Liked Lists',
         'path': 'users/likes/lists',
+        'req_auth': True,
         'icon': '{0}/resources/trakt.png',
         'types': ['both']},
     'trakt_mylists': {
@@ -333,6 +339,7 @@ TRAKT_LISTS = {
     'trakt_myairing': {
         'name': 'Your {0} Airing This Week',
         'path': 'calendars/my/{type}',
+        'req_auth': True,
         'icon': '{0}/resources/trakt.png',
         'types': ['tv']},
     'trakt_airing': {
@@ -343,6 +350,7 @@ TRAKT_LISTS = {
     'trakt_upnext': {
         'name': 'Up Next',
         'path': 'shows/{imdb_id}/progress/watched',
+        'req_auth': True,
         'url_key': 'imdb_id',
         'icon': '{0}/resources/trakt.png',
         'types': ['tv']},

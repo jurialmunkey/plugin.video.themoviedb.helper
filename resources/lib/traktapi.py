@@ -12,25 +12,37 @@ class traktAPI(RequestAPI):
         super(traktAPI, self).__init__(
             cache_short=cache_short, cache_long=cache_long, addon_name=addon_name,
             req_api_url='https://api.trakt.tv/', req_api_name='Trakt')
-        self.access_token = ''
+        self.authorization = ''
         self.sync = {}
         self.last_activities = None
         self.prev_activities = None
         self.refreshcheck = 0
+        self.attempedlogin = False
         self.dialog_noapikey_header = '{0} {1} {2}'.format(xbmcaddon.Addon().getLocalizedString(32007), self.req_api_name, xbmcaddon.Addon().getLocalizedString(32011))
         self.dialog_noapikey_text = xbmcaddon.Addon().getLocalizedString(32012)
         self.client_id = 'e6fde6173adf3c6af8fd1b0694b9b84d7c519cefc24482310e1de06c6abe5467'
         self.client_secret = '15119384341d9a61c751d8d515acbc0dd801001d4ebe85d3eef9885df80ee4d9'
         self.headers = {'trakt-api-version': '2', 'trakt-api-key': self.client_id, 'Content-Type': 'application/json'}
 
+        if force:
+            self.login()
+            return
+
+        self.authorize(login=False)
+
+    def authorize(self, login=True, force=False):
+        if self.authorization:
+            return self.authorization
         token = xbmcaddon.Addon().getSetting('trakt_token')
         token = loads(token) if token else None
-
-        if token and type(token) is dict and token.get('access_token') and not force:
+        if token and type(token) is dict and token.get('access_token'):
             self.authorization = token
             self.headers['Authorization'] = 'Bearer {0}'.format(self.authorization.get('access_token'))
-        else:
-            self.login()
+        elif login:
+            if not self.attempedlogin and xbmcgui.Dialog().yesno(self.dialog_noapikey_header, self.dialog_noapikey_text, '', '', 'Cancel', 'OK'):
+                self.login()
+            self.attempedlogin = True
+        return self.authorization
 
     def login(self):
         self.code = self.get_api_request('https://api.trakt.tv/oauth/device/code', postdata={'client_id': self.client_id})
@@ -124,13 +136,17 @@ class traktAPI(RequestAPI):
         return self.use_cache(self.get_response_json, *args, **kwargs)
 
     def get_itemlist(self, *args, **kwargs):
+        items = []
         keylist = kwargs.pop('keylist', ['dummy'])
+        if kwargs.pop('req_auth', False) and not self.authorize():
+            return items
         response = self.get_response(*args, **kwargs)
+        if not response:
+            return items
         itemlist = response.json()
         this_page = int(kwargs.get('page', 1))
         last_page = int(response.headers.get('X-Pagination-Page-Count', 0))
         next_page = ('next_page', this_page + 1, None) if this_page < last_page else False
-        items = []
         for i in itemlist:
             for key in keylist:
                 item = None
@@ -180,8 +196,10 @@ class traktAPI(RequestAPI):
         Adds each unique show to list in order then checks if show has an upnext episode
         Returns list of tmdb_ids representing shows with upnext episodes in recently watched order
         """
-        recentshows = self.get_recentlywatched(userslug, 'show')
         items = []
+        if not self.authorize():
+            return items
+        recentshows = self.get_recentlywatched(userslug, 'show')
         n = 0
         for i in recentshows:
             if limit and n >= limit:
@@ -193,11 +211,13 @@ class traktAPI(RequestAPI):
         return items
 
     def get_upnext(self, show_id, response_only=False):
+        items = []
+        if not self.authorize():
+            return items
         request = 'shows/{0}/progress/watched'.format(show_id)
         response = self.get_response_json(request)
         reset_at = utils.convert_timestamp(response.get('reset_at')) if response.get('reset_at') else None
         seasons = response.get('seasons', [])
-        items = []
         for season in seasons:
             s_num = season.get('number')
             for episode in season.get('episodes', []):
@@ -216,6 +236,8 @@ class traktAPI(RequestAPI):
             return items
 
     def get_usernameslug(self):
+        if not self.authorize():
+            return
         item = self.get_response_json('users/settings')
         return item.get('user', {}).get('ids', {}).get('slug')
 
@@ -230,6 +252,8 @@ class traktAPI(RequestAPI):
 
     def sync_activities(self, itemtype, listtype):
         """ Checks if itemtype.listtype has been updated since last check """
+        if not self.authorize():
+            return
         cache_name = '{0}.trakt.last_activities'.format(self.addon_name)
         if not self.prev_activities:
             self.prev_activities = self.get_cache(cache_name)
@@ -250,6 +274,8 @@ class traktAPI(RequestAPI):
         return self.get_sync('history', 'watched_at', itemtype, idtype, mode, items)
 
     def get_sync(self, name, activity, itemtype, idtype=None, mode=None, items=None):
+        if not self.authorize():
+            return
         if mode == 'add' or mode == 'remove':
             name = name + '/remove' if mode == 'remove' else name
             return self.get_api_request('{0}/sync/{1}'.format(self.req_api_url, name), headers=self.headers, postdata=dumps(items))
