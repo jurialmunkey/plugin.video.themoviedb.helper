@@ -9,7 +9,7 @@ from resources.lib.omdb import OMDb
 from resources.lib.traktapi import traktAPI
 from resources.lib.kodilibrary import KodiLibrary
 from resources.lib.listitem import ListItem
-from resources.lib.globals import LANGUAGES, BASEDIR_MAIN, BASEDIR_TMDB, BASEDIR_LISTS, TYPE_CONVERSION, TMDB_LISTS, DETAILED_CATEGORIES, APPEND_TO_RESPONSE, TRAKT_LISTS, TRAKT_LISTLISTS, TRAKT_HISTORYLISTS, TRAKT_MANAGEMENT
+from resources.lib.globals import LANGUAGES, BASEDIR_MAIN, BASEDIR_TMDB, BASEDIR_LISTS, TMDB_LISTS, DETAILED_CATEGORIES, APPEND_TO_RESPONSE, TRAKT_LISTS, TRAKT_LISTLISTS, TRAKT_HISTORYLISTS, TRAKT_MANAGEMENT
 try:
     from urllib.parse import parse_qsl  # Py3
 except ImportError:
@@ -30,10 +30,6 @@ _tmdb = TMDb(api_key=_tmdb_apikey, language=_language, cache_long=_cache_long, c
              append_to_response=APPEND_TO_RESPONSE, addon_name=_addonname, mpaa_prefix=_mpaa_prefix)
 _omdb_apikey = _addon.getSetting('omdb_apikey')
 _omdb = OMDb(api_key=_omdb_apikey, cache_long=_cache_long, cache_short=_cache_short, addon_name=_addonname) if _omdb_apikey else None
-
-
-def type_convert(original, converted):
-    return TYPE_CONVERSION.get(original, {}).get(converted, '')
 
 
 class Container(object):
@@ -221,7 +217,7 @@ class Container(object):
         self.start_container()
         for i in items:
             url = i.pop('url', {})
-            self.dbtype = type_convert(i.pop('mixed_type', ''), 'dbtype') or self.dbtype
+            self.dbtype = utils.type_convert(i.pop('mixed_type', ''), 'dbtype') or self.dbtype
             i.setdefault('infolabels', {})['mediatype'] = self.dbtype if self.dbtype and not i.get('label') == 'Next Page' else ''
             listitem = ListItem(library=self.library, **i)
             listitem.create_listitem(_handle, **url)
@@ -246,9 +242,9 @@ class Container(object):
             itemtype = cat.get('itemtype') or self.params.get('type') or ''
             self.url_info = cat.get('url_info', 'details')
             self.nexttype = cat.get('nexttype')
-            self.dbtype = type_convert(itemtype, 'dbtype')
-            self.plugincategory = cat.get('name', '').format(type_convert(itemtype, 'plural'))
-            self.containercontent = type_convert(itemtype, 'container')
+            self.dbtype = utils.type_convert(itemtype, 'dbtype')
+            self.plugincategory = cat.get('name', '').format(utils.type_convert(itemtype, 'plural'))
+            self.containercontent = utils.type_convert(itemtype, 'container')
             self.list_items(items)
 
     def list_play(self):
@@ -275,8 +271,8 @@ class Container(object):
             return
         with utils.busy_dialog():
             _traktapi = traktAPI()
-            slug_type = 'show' if self.params.get('type') == 'episode' else type_convert(self.params.get('type'), 'trakt')
-            trakt_type = type_convert(self.params.get('type'), 'trakt')
+            slug_type = 'show' if self.params.get('type') == 'episode' else utils.type_convert(self.params.get('type'), 'trakt')
+            trakt_type = utils.type_convert(self.params.get('type'), 'trakt')
             slug = _traktapi.get_traktslug(slug_type, 'tmdb', self.params.get('tmdb_id'))
             item = _traktapi.get_details(slug_type, slug, season=self.params.get('season', None), episode=self.params.get('episode', None))
             items = {trakt_type + 's': [item]}
@@ -334,21 +330,21 @@ class Container(object):
         # ADD TRAKT ITEMS
         if xbmcaddon.Addon().getSetting('trakt_token'):
             _traktapi = traktAPI()
-            trakt_collection = _traktapi.sync_collection(type_convert(self.params.get('type'), 'trakt'), 'tmdb')
+            trakt_collection = _traktapi.sync_collection(utils.type_convert(self.params.get('type'), 'trakt'), 'tmdb')
             if trakt_collection:
                 boolean = 'remove' if details.get('tmdb_id') in trakt_collection else 'add'
                 item_collection = details.copy()
                 item_collection['label'] = 'Remove from Trakt Collection' if boolean == 'remove' else 'Add to Trakt Collection'
                 item_collection['url'] = {'info': 'details', 'trakt': 'collection_{0}'.format(boolean)}
                 items.append(item_collection)
-            trakt_watchlist = _traktapi.sync_watchlist(type_convert(self.params.get('type'), 'trakt'), 'tmdb')
+            trakt_watchlist = _traktapi.sync_watchlist(utils.type_convert(self.params.get('type'), 'trakt'), 'tmdb')
             if trakt_watchlist:
                 boolean = 'remove' if details.get('tmdb_id') in trakt_watchlist else 'add'
                 item_watchlist = details.copy()
                 item_watchlist['label'] = 'Remove from Trakt Watchlist' if boolean == 'remove' else 'Add to Trakt Watchlist'
                 item_watchlist['url'] = {'info': 'details', 'trakt': 'watchlist_{0}'.format(boolean)}
                 items.append(item_watchlist)
-            trakt_history = _traktapi.sync_history(type_convert(self.params.get('type'), 'trakt'), 'tmdb')
+            trakt_history = _traktapi.sync_history(utils.type_convert(self.params.get('type'), 'trakt'), 'tmdb')
             if trakt_history:
                 boolean = 'remove' if details.get('tmdb_id') in trakt_history else 'add'
                 item_history = details.copy()
@@ -363,9 +359,9 @@ class Container(object):
         items.append(refresh)
 
         # BUILD CONTAINER
-        self.dbtype = type_convert(self.params.get('type'), 'dbtype')
+        self.dbtype = utils.type_convert(self.params.get('type'), 'dbtype')
         self.plugincategory = details.get('label')
-        self.containercontent = type_convert(self.params.get('type'), 'container')
+        self.containercontent = utils.type_convert(self.params.get('type'), 'container')
         self.list_items(items)
 
     def list_search(self):
@@ -388,16 +384,16 @@ class Container(object):
         if self.params.get('info') == 'trakt_inprogress':
             trakt_items = _traktapi.get_inprogress(userslug, limit=10)
         if self.params.get('info') == 'trakt_mostwatched':
-            trakt_items = _traktapi.get_mostwatched(userslug, type_convert(self.params.get('type'), 'trakt'), limit=10)
+            trakt_items = _traktapi.get_mostwatched(userslug, utils.type_convert(self.params.get('type'), 'trakt'), limit=10)
         if self.params.get('info') == 'trakt_history':
-            trakt_items = _traktapi.get_recentlywatched(userslug, type_convert(self.params.get('type'), 'trakt'), limit=10)
+            trakt_items = _traktapi.get_recentlywatched(userslug, utils.type_convert(self.params.get('type'), 'trakt'), limit=10)
         items = [_tmdb.get_detailed_item(self.params.get('type'), i[1]) for i in trakt_items]
         if items:
             self.nexttype = self.params.get('type')
-            self.dbtype = type_convert(self.nexttype, 'dbtype')
+            self.dbtype = utils.type_convert(self.nexttype, 'dbtype')
             self.url_info = 'trakt_upnext' if self.params.get('info') == 'trakt_inprogress' else 'details'
-            self.plugincategory = type_convert(self.nexttype, 'plural')
-            self.containercontent = type_convert(self.nexttype, 'container')
+            self.plugincategory = utils.type_convert(self.nexttype, 'plural')
+            self.containercontent = utils.type_convert(self.nexttype, 'container')
             self.list_items(items)
 
     def list_traktupnext(self):
@@ -409,9 +405,9 @@ class Container(object):
             itemtype = 'episode'
             self.nexttype = 'episode'
             self.url_info = 'details'
-            self.dbtype = type_convert(itemtype, 'dbtype')
-            self.plugincategory = type_convert(itemtype, 'plural')
-            self.containercontent = type_convert(itemtype, 'container')
+            self.dbtype = utils.type_convert(itemtype, 'dbtype')
+            self.plugincategory = utils.type_convert(itemtype, 'plural')
+            self.containercontent = utils.type_convert(itemtype, 'container')
             self.list_items(items[:10])
 
     def list_traktuserlists(self):
@@ -444,8 +440,8 @@ class Container(object):
                 self.params['user_slug'] = self.params.get('user_slug') or _traktapi.get_usernameslug()
             params = self.params.copy()
             itemtype = 'movie' if self.params.get('type') == 'both' else self.params.get('type', '')
-            keylist = ['movie', 'show'] if self.params.get('type') == 'both' else [type_convert(itemtype, 'trakt')]
-            params['type'] = type_convert(itemtype, 'trakt') + 's'
+            keylist = ['movie', 'show'] if self.params.get('type') == 'both' else [utils.type_convert(itemtype, 'trakt')]
+            params['type'] = utils.type_convert(itemtype, 'trakt') + 's'
             path = cat.get('path', '').format(**params)
             trakt_items = _traktapi.get_itemlist(path, keylist=keylist, page=self.params.get('page', 1), limit=10, req_auth=cat.get('req_auth'))
             for i in trakt_items[:11]:
@@ -462,10 +458,10 @@ class Container(object):
                     items.append(item)
         if items:
             self.nexttype = itemtype
-            self.dbtype = type_convert(itemtype, 'dbtype')
+            self.dbtype = utils.type_convert(itemtype, 'dbtype')
             self.url_info = cat.get('url_info', 'details')
-            self.plugincategory = cat.get('name', '').format(type_convert(itemtype, 'plural'))
-            self.containercontent = type_convert(itemtype, 'container') or 'movies'
+            self.plugincategory = cat.get('name', '').format(utils.type_convert(itemtype, 'plural'))
+            self.containercontent = utils.type_convert(itemtype, 'container') or 'movies'
             self.list_items(items)
 
     def list_basedir(self):
@@ -478,7 +474,7 @@ class Container(object):
             cat = BASEDIR_LISTS.get(i) or TMDB_LISTS.get(i) or TRAKT_LISTS.get(i) or {}
             icon = cat.get('icon', '').format(_addonpath)
             for t in cat.get('types', []):
-                label = cat.get('name', '').format(type_convert(t, 'plural'))
+                label = cat.get('name', '').format(utils.type_convert(t, 'plural'))
                 listitem = ListItem(label=label, icon=icon, thumb=icon, poster=icon)
                 url = {'info': i, 'type': t} if t else {'info': i}
                 listitem.create_listitem(_handle, **url)
