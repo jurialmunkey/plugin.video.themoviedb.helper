@@ -1,65 +1,40 @@
 import sys
-import resources.lib.utils as utils
 import xbmc
 import xbmcgui
 import xbmcaddon
 import xbmcplugin
-from resources.lib.tmdb import TMDb
-from resources.lib.omdb import OMDb
+import resources.lib.utils as utils
 from resources.lib.traktapi import traktAPI
-from resources.lib.kodilibrary import KodiLibrary
 from resources.lib.listitem import ListItem
-from resources.lib.globals import LANGUAGES, BASEDIR_MAIN, BASEDIR_TMDB, BASEDIR_LISTS, TMDB_LISTS, DETAILED_CATEGORIES, APPEND_TO_RESPONSE, TRAKT_LISTS, TRAKT_LISTLISTS, TRAKT_HISTORYLISTS, TRAKT_MANAGEMENT
+from resources.lib.player import Player
+from resources.lib.plugin import Plugin
+from resources.lib.globals import BASEDIR_MAIN, BASEDIR_TMDB, BASEDIR_LISTS, TMDB_LISTS, DETAILED_CATEGORIES, TRAKT_LISTS, TRAKT_LISTLISTS, TRAKT_HISTORYLISTS, TRAKT_MANAGEMENT
 try:
     from urllib.parse import parse_qsl  # Py3
 except ImportError:
     from urlparse import parse_qsl  # Py2
-_handle = int(sys.argv[1])
-_addon = xbmcaddon.Addon()
-_addonpath = _addon.getAddonInfo('path')
-_addonname = 'plugin.video.themoviedb.helper'
-_prefixname = 'TMDbHelper.'
-_dialog = xbmcgui.Dialog()
-_languagesetting = _addon.getSettingInt('language')
-_language = LANGUAGES[_languagesetting]
-_mpaa_prefix = _addon.getSetting('mpaa_prefix')
-_cache_long = _addon.getSettingInt('cache_details_days')
-_cache_short = _addon.getSettingInt('cache_list_days')
-_tmdb_apikey = _addon.getSetting('tmdb_apikey')
-_tmdb = TMDb(api_key=_tmdb_apikey, language=_language, cache_long=_cache_long, cache_short=_cache_short,
-             append_to_response=APPEND_TO_RESPONSE, addon_name=_addonname, mpaa_prefix=_mpaa_prefix)
-_omdb_apikey = _addon.getSetting('omdb_apikey')
-_omdb = OMDb(api_key=_omdb_apikey, cache_long=_cache_long, cache_short=_cache_short, addon_name=_addonname) if _omdb_apikey else None
 
 
-class Container(object):
+class Container(Plugin):
     def __init__(self):
+        super(Container, self).__init__()
+        self.handle = int(sys.argv[1])
         self.paramstring = sys.argv[2][1:] if sys.version_info.major == 3 else sys.argv[2][1:].decode("utf-8")
         self.params = dict(parse_qsl(self.paramstring))
         self.dbtype = None
         self.nexttype = None
         self.url_info = None
-        self.details_tv = None
-        self.kodimoviedb = None
-        self.koditvshowdb = None
         self.plugincategory = 'TMDb Helper'
         self.containercontent = ''
         self.library = 'video'
         self.updatelisting = False
-        self.router()
 
     def start_container(self):
-        xbmcplugin.setPluginCategory(_handle, self.plugincategory)  # Container.PluginCategory
-        xbmcplugin.setContent(_handle, self.containercontent)  # Container.Content
+        xbmcplugin.setPluginCategory(self.handle, self.plugincategory)  # Container.PluginCategory
+        xbmcplugin.setContent(self.handle, self.containercontent)  # Container.Content
 
     def finish_container(self):
-        xbmcplugin.endOfDirectory(_handle, updateListing=self.updatelisting)
-
-    def textviewer(self):
-        _dialog.textviewer(xbmc.getInfoLabel('ListItem.Label'), xbmc.getInfoLabel('ListItem.Plot'))
-
-    def imageviewer(self):
-        xbmc.executebuiltin('ShowPicture({0})'.format(self.params.get('image')))
+        xbmcplugin.endOfDirectory(self.handle, updateListing=self.updatelisting)
 
     def translate_discover(self):
         lookup_company = None if self.params.get('with_id') and self.params.get('with_id') != 'False' else 'company'
@@ -67,37 +42,37 @@ class Container(object):
         lookup_genre = None if self.params.get('with_id') and self.params.get('with_id') != 'False' else 'genre'
 
         if self.params.get('with_genres'):
-            self.params['with_genres'] = _tmdb.get_translated_list(
+            self.params['with_genres'] = self.tmdb.get_translated_list(
                 utils.split_items(self.params.get('with_genres')),
                 lookup_genre,
                 separator=self.params.get('with_separator'))
 
         if self.params.get('without_genres'):
-            self.params['without_genres'] = _tmdb.get_translated_list(
+            self.params['without_genres'] = self.tmdb.get_translated_list(
                 utils.split_items(self.params.get('without_genres')),
                 lookup_genre,
                 separator=self.params.get('with_separator'))
 
         if self.params.get('with_companies'):
-            self.params['with_companies'] = _tmdb.get_translated_list(
+            self.params['with_companies'] = self.tmdb.get_translated_list(
                 utils.split_items(self.params.get('with_companies')),
                 lookup_company,
                 separator='NONE')
 
         if self.params.get('with_people'):
-            self.params['with_people'] = _tmdb.get_translated_list(
+            self.params['with_people'] = self.tmdb.get_translated_list(
                 utils.split_items(self.params.get('with_people')),
                 lookup_person,
                 separator=self.params.get('with_separator'))
 
         if self.params.get('with_cast'):
-            self.params['with_cast'] = _tmdb.get_translated_list(
+            self.params['with_cast'] = self.tmdb.get_translated_list(
                 utils.split_items(self.params.get('with_cast')),
                 lookup_person,
                 separator=self.params.get('with_separator'))
 
         if self.params.get('with_crew'):
-            self.params['with_crew'] = _tmdb.get_translated_list(
+            self.params['with_crew'] = self.tmdb.get_translated_list(
                 utils.split_items(self.params.get('with_crew')),
                 lookup_person,
                 separator=self.params.get('with_separator'))
@@ -125,16 +100,10 @@ class Container(object):
         item['url'] = url
         return item
 
-    def get_tmdb_id(self):
-        if not self.params.get('tmdb_id'):
-            query = utils.split_items(self.params.get('query'))[0] if self.params.get('query') else None
-            itemtype = TMDB_LISTS.get(self.params.get('info'), {}).get('tmdb_check_id', self.params.get('type'))
-            self.params['tmdb_id'] = _tmdb.get_tmdb_id(itemtype=itemtype, imdb_id=self.params.get('imdb_id'), query=query, year=self.params.get('year'))
-
     def get_details(self, item):
         if self.params.get('info') in ['seasons', 'episodes'] or item['url'].get('type') in ['season', 'episode']:
             if not self.details_tv:
-                self.details_tv = _tmdb.get_detailed_item('tv', self.params.get('tmdb_id'), season=self.params.get('season', None))
+                self.details_tv = self.tmdb.get_detailed_item('tv', self.params.get('tmdb_id'), season=self.params.get('season', None))
 
             if self.details_tv:
                 item = utils.del_empty_keys(item)
@@ -145,7 +114,7 @@ class Container(object):
                 item = utils.merge_two_dicts(self.details_tv, item)
 
         if item['url'].get('type') in ['movie', 'tv']:
-            detailed_item = _tmdb.get_detailed_item(item['url'].get('type'), item['url'].get('tmdb_id'), cache_only=True)
+            detailed_item = self.tmdb.get_detailed_item(item['url'].get('type'), item['url'].get('tmdb_id'), cache_only=True)
             if detailed_item:
                 detailed_item['infolabels'] = utils.merge_two_dicts(item.get('infolabels', {}), detailed_item.get('infolabels', {}))
                 detailed_item['infoproperties'] = utils.merge_two_dicts(item.get('infoproperties', {}), detailed_item.get('infoproperties', {}))
@@ -155,31 +124,6 @@ class Container(object):
         if item['url'].get('type') == 'movie':
             item = self.get_omdb_ratings(item, cache_only=True)
 
-        return item
-
-    def get_omdb_ratings(self, item, cache_only=False):
-        if _omdb and item.get('infolabels', {}).get('imdbnumber'):
-            ratings_awards = _omdb.get_ratings_awards(imdb_id=item.get('infolabels', {}).get('imdbnumber'), cache_only=cache_only)
-            if ratings_awards:
-                item['infoproperties'] = utils.merge_two_dicts(item.get('infoproperties', {}), ratings_awards)
-        return item
-
-    def get_db_info(self, item, info=None, dbtype=None):
-        kodidatabase = None
-        if 'movie' in [item.get('url', {}).get('type'), dbtype]:
-            self.kodimoviedb = self.kodimoviedb or KodiLibrary(dbtype='movie')
-            kodidatabase = self.kodimoviedb
-        if 'tv' in [item.get('url', {}).get('type'), dbtype]:
-            self.koditvshowdb = self.koditvshowdb or KodiLibrary(dbtype='tvshow')
-            kodidatabase = self.koditvshowdb
-        if kodidatabase and info:
-            item[info] = kodidatabase.get_info(
-                info=info,
-                dbid=item.get('dbid'),
-                imdb_id=item.get('infolabels', {}).get('imdbnumber'),
-                originaltitle=item.get('infolabels', {}).get('originaltitle'),
-                title=item.get('infolabels', {}).get('title'),
-                year=item.get('infolabels', {}).get('year'))
         return item
 
     def list_items(self, items):
@@ -220,13 +164,13 @@ class Container(object):
             self.dbtype = utils.type_convert(i.pop('mixed_type', ''), 'dbtype') or self.dbtype
             i.setdefault('infolabels', {})['mediatype'] = self.dbtype if self.dbtype and not i.get('label') == 'Next Page' else ''
             listitem = ListItem(library=self.library, **i)
-            listitem.create_listitem(_handle, **url)
+            listitem.create_listitem(self.handle, **url)
         self.finish_container()
 
         if self.params.get('prop_id'):
-            window_prop = '{0}{1}.NumDBIDItems'.format(_prefixname, self.params.get('prop_id'))
+            window_prop = '{0}{1}.NumDBIDItems'.format(self.prefixname, self.params.get('prop_id'))
             xbmcgui.Window(10000).setProperty(window_prop, str(len(dbiditems)))
-            window_prop = '{0}{1}.NumTMDBItems'.format(_prefixname, self.params.get('prop_id'))
+            window_prop = '{0}{1}.NumTMDBItems'.format(self.prefixname, self.params.get('prop_id'))
             xbmcgui.Window(10000).setProperty(window_prop, str(len(tmdbitems)))
 
     def list_tmdb(self, *args, **kwargs):
@@ -238,7 +182,7 @@ class Container(object):
             kwparams = utils.merge_two_dicts(kwparams, kwargs)
             kwparams = utils.merge_two_dicts(kwparams, url_ext)
             kwparams.setdefault('key', cat.get('key', 'results'))
-            items = _tmdb.get_list(path, *args, **kwparams)
+            items = self.tmdb.get_list(path, *args, **kwparams)
             itemtype = cat.get('itemtype') or self.params.get('type') or ''
             self.url_info = cat.get('url_info', 'details')
             self.nexttype = cat.get('nexttype')
@@ -248,23 +192,11 @@ class Container(object):
             self.list_items(items)
 
     def list_play(self):
-        itemtype = 'tv' if self.params.get('type') == 'episode' else 'movie'
-        item = _tmdb.get_detailed_item(itemtype, self.params.get('tmdb_id'))
-        if not item:
-            return
-
-        if self.params.get('type') == 'movie':
-            item = self.get_db_info(item, 'file', dbtype='movie')
-        if self.params.get('type') == 'episode':
-            item = self.get_db_info(item, 'dbid', dbtype='tv')
-            item['file'] = KodiLibrary(dbtype='episode', tvshowid=item.get('dbid')).get_info(
-                'file', season=self.params.get('season'), episode=self.params.get('episode'))
-
-        if item.get('file'):
-            xbmc.executebuiltin('PlayMedia({0})'.format(item.get('file')))
-            return
-
-        # TODO: Add Player for Non-DBID items
+        Player().play(
+            itemtype=self.params.get('type'),
+            tmdb_id=self.params.get('tmdb_id'),
+            season=self.params.get('season'),
+            episode=self.params.get('episode'))
 
     def list_traktmanagement(self):
         if not self.params.get('trakt') in TRAKT_MANAGEMENT:
@@ -296,12 +228,12 @@ class Container(object):
         d_args = ('tv', self.params.get('tmdb_id'), self.params.get('season'), self.params.get('episode')) if self.params.get('type') == 'episode' else (self.params.get('type'), self.params.get('tmdb_id'))
         if self.params.get('refresh') == 'True':
             with utils.busy_dialog():
-                _tmdb.get_detailed_item(*d_args, cache_refresh=True)
+                self.tmdb.get_detailed_item(*d_args, cache_refresh=True)
             xbmc.executebuiltin('Container.Refresh')
-            _dialog.ok('Cache Refresh', 'Cached details were refreshed')
+            xbmcgui.Dialog().ok('Cache Refresh', 'Cached details were refreshed')
             self.updatelisting = True
 
-        details = _tmdb.get_detailed_item(*d_args)
+        details = self.tmdb.get_detailed_item(*d_args)
         if not details:
             return
 
@@ -366,17 +298,20 @@ class Container(object):
 
     def list_search(self):
         if not self.params.get('query'):
-            self.params['query'] = _dialog.input('Enter Search Query', type=xbmcgui.INPUT_ALPHANUM)
+            self.params['query'] = xbmcgui.Dialog().input('Enter Search Query', type=xbmcgui.INPUT_ALPHANUM)
         if self.params.get('query'):
             self.list_tmdb(query=self.params.get('query'), year=self.params.get('year'))
 
     def list_credits(self, key='cast'):
-        items = _tmdb.get_credits_list(self.params.get('type'), self.params.get('tmdb_id'), key)
+        items = self.tmdb.get_credits_list(self.params.get('type'), self.params.get('tmdb_id'), key)
         self.url_info = 'details'
         self.nexttype = 'person'
         self.plugincategory = key.capitalize()
         self.containercontent = 'actors'
         self.list_items(items)
+
+    def list_getid(self):
+        self.params['tmdb_id'] = self.get_tmdb_id(**self.params)
 
     def list_trakthistory(self):
         _traktapi = traktAPI()
@@ -387,7 +322,7 @@ class Container(object):
             trakt_items = _traktapi.get_mostwatched(userslug, utils.type_convert(self.params.get('type'), 'trakt'), limit=10)
         if self.params.get('info') == 'trakt_history':
             trakt_items = _traktapi.get_recentlywatched(userslug, utils.type_convert(self.params.get('type'), 'trakt'), limit=10)
-        items = [_tmdb.get_detailed_item(self.params.get('type'), i[1]) for i in trakt_items]
+        items = [self.tmdb.get_detailed_item(self.params.get('type'), i[1]) for i in trakt_items]
         if items:
             self.nexttype = self.params.get('type')
             self.dbtype = utils.type_convert(self.nexttype, 'dbtype')
@@ -398,9 +333,9 @@ class Container(object):
 
     def list_traktupnext(self):
         _traktapi = traktAPI()
-        imdb_id = _tmdb.get_item_externalid(itemtype='tv', tmdb_id=self.params.get('tmdb_id'), external_id='imdb_id')
+        imdb_id = self.tmdb.get_item_externalid(itemtype='tv', tmdb_id=self.params.get('tmdb_id'), external_id='imdb_id')
         trakt_items = _traktapi.get_upnext(imdb_id)
-        items = [_tmdb.get_detailed_item(itemtype='tv', tmdb_id=self.params.get('tmdb_id'), season=i[0], episode=i[1]) for i in trakt_items]
+        items = [self.tmdb.get_detailed_item(itemtype='tv', tmdb_id=self.params.get('tmdb_id'), season=i[0], episode=i[1]) for i in trakt_items]
         if items:
             itemtype = 'episode'
             self.nexttype = 'episode'
@@ -417,7 +352,7 @@ class Container(object):
             self.params['user_slug'] = self.params.get('user_slug') or _traktapi.get_usernameslug()
         path = path.format(**self.params)
         items = _traktapi.get_listlist(path, 'list')
-        icon = '{0}/resources/trakt.png'.format(_addonpath)
+        icon = '{0}/resources/trakt.png'.format(self.addonpath)
         self.start_container()
         for i in items:
             label = i.get('name')
@@ -428,7 +363,7 @@ class Container(object):
             list_slug = i.get('ids', {}).get('slug')
             user_slug = i.get('user', {}).get('ids', {}).get('slug')
             listitem = ListItem(label=label, label2=label2, icon=icon, thumb=icon, poster=icon, infolabels=infolabels)
-            listitem.create_listitem(_handle, info='trakt_userlist', user_slug=user_slug, list_slug=list_slug, type=self.params.get('type'))
+            listitem.create_listitem(self.handle, info='trakt_userlist', user_slug=user_slug, list_slug=list_slug, type=self.params.get('type'))
         self.finish_container()
 
     def list_trakt(self):
@@ -447,9 +382,9 @@ class Container(object):
             for i in trakt_items[:11]:
                 item = None
                 if i[0] == 'imdb':
-                    item = _tmdb.get_externalid_item(i[2], i[1], 'imdb_id')
+                    item = self.tmdb.get_externalid_item(i[2], i[1], 'imdb_id')
                 if i[0] == 'tvdb':
-                    item = _tmdb.get_externalid_item(i[2], i[1], 'tvdb_id')
+                    item = self.tmdb.get_externalid_item(i[2], i[1], 'tvdb_id')
                 if i[0] == 'next_page':
                     item = {'label': 'Next Page', 'url': self.params.copy()}
                     item['url']['page'] = i[1]
@@ -472,43 +407,44 @@ class Container(object):
         self.start_container()
         for i in basedir:
             cat = BASEDIR_LISTS.get(i) or TMDB_LISTS.get(i) or TRAKT_LISTS.get(i) or {}
-            icon = cat.get('icon', '').format(_addonpath)
+            icon = cat.get('icon', '').format(self.addonpath)
             for t in cat.get('types', []):
                 label = cat.get('name', '').format(utils.type_convert(t, 'plural'))
                 listitem = ListItem(label=label, icon=icon, thumb=icon, poster=icon)
                 url = {'info': i, 'type': t} if t else {'info': i}
-                listitem.create_listitem(_handle, **url)
+                listitem.create_listitem(self.handle, **url)
         self.finish_container()
 
     def router(self):
         # FILTERS AND EXCLUSIONS
-        _tmdb.filter_key = self.params.get('filter_key', None)
-        _tmdb.filter_value = utils.split_items(self.params.get('filter_value', None))[0]
-        _tmdb.exclude_key = self.params.get('exclude_key', None)
-        _tmdb.exclude_value = utils.split_items(self.params.get('exclude_value', None))[0]
+        self.tmdb.filter_key = self.params.get('filter_key', None)
+        self.tmdb.filter_value = utils.split_items(self.params.get('filter_value', None))[0]
+        self.tmdb.exclude_key = self.params.get('exclude_key', None)
+        self.tmdb.exclude_value = utils.split_items(self.params.get('exclude_value', None))[0]
 
         # ROUTER LIST FUNCTIONS
         if self.params.get('info') == 'play':
+            self.list_getid()
             self.list_play()
         elif self.params.get('info') == 'discover':
             self.translate_discover()
             self.list_tmdb()
         elif self.params.get('info') in ['details', 'refresh']:
-            self.get_tmdb_id()
+            self.list_getid()
             self.list_traktmanagement()
             self.list_details()
         elif self.params.get('info') == 'search':
             self.list_search()
         elif self.params.get('info') == 'cast':
-            self.get_tmdb_id()
+            self.list_getid()
             self.list_credits('cast')
         elif self.params.get('info') == 'crew':
-            self.get_tmdb_id()
+            self.list_getid()
             self.list_credits('crew')
         elif self.params.get('info') == 'textviewer':
-            self.textviewer()
+            self.textviewer(xbmc.getInfoLabel('ListItem.Label'), xbmc.getInfoLabel('ListItem.Plot'))
         elif self.params.get('info') == 'imageviewer':
-            self.imageviewer()
+            self.imageviewer(self.params.get('image'))
         elif self.params.get('info') in TRAKT_HISTORYLISTS:
             self.list_trakthistory()
         elif self.params.get('info') == 'trakt_upnext':
@@ -520,7 +456,7 @@ class Container(object):
         elif self.params.get('info') in BASEDIR_TMDB:
             self.list_tmdb()
         elif self.params.get('info') in TMDB_LISTS and TMDB_LISTS.get(self.params.get('info'), {}).get('path'):
-            self.get_tmdb_id()
+            self.list_getid()
             self.list_tmdb()
         elif self.params.get('info') in BASEDIR_LISTS:
             self.list_basedir()
