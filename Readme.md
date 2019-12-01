@@ -349,6 +349,62 @@ list_slug: The trakt url slug for the list
 user_slug: The trakt url slug for the user
 
 
+## Player Function
+`plugin://plugin.video.themoviedb.helper?info=play&amp;tmdb_id=$INFO[ListItem.Property(tmdb_id)]&amp;type=movie`
+
+Types: `movie` `episode`  
+Episode must specifiy: `&amp;season=$INFO[ListItem.Season]&amp;episode=$INFO[ListItem.Episode]`
+
+If the item is in the local library, the plugin will automatically play the local file.
+If not in the library, the plugin will pop-up a list of external players.
+
+Put player files in `userdata/addon_data/plugin.video.themoviedb.helper/players/`
+
+For an example, see the netflix player:
+https://github.com/jurialmunkey/plugin.video.themoviedb.helper/blob/master/resources/players/netflix.json
+
+- "name": label in the pop-up select dialog
+- "plugin": plugin ID which is used to check if addon is installed. 
+- "search_movie": movie plugin url passed to `ActivateWindow(videos, url, return)`
+- "search_episode": episode plugin url passed to `ActivateWindow(videos, url, return)`
+- "play_movie": movie plugin url passed to `PlayMedia(url)`
+- "play_episode": episode plugin url passed to `PlayMedia(url)`
+
+Use play_movie/episode if the url will directly play the item (will display as "Play with NAME").
+Use search_movie/episode if the url will open a search folder of items (will display as "Search NAME").
+
+Curly brace {keys} are used to format the url with the appropriate info. Keys that can be used:
+- {id}        `tmdb id | tvdb id`
+- {tmdb}      `tmdb id`
+- {imdb}      `imdb id`
+- {tvdb}      `tvdb id`
+- {trakt}     `trakt number id`
+- {slug}      `trakt slug id`
+- {name}      `title (year) | title S##E##`
+- {year}      `year only`
+- {season}    `season number`
+- {episode}   `episode number`
+- {premiered} `premiered date YYYY-MM-DD`
+- {released}  `release data YYYY-MM-DD`
+- {showname}  `tvshow title`
+- {clearname} `title | tvshow title`
+- {thumbnail} `thumb image`
+- {poster}    `poster image`
+- {fanart}    `fanart image`
+- {epid}      `tvdb episode id`
+- {epimdb}    `imdb episode id`
+- {eptmdb}    `tmdb episode id`
+- {eptrakt}   `trakt episode id`
+- {now}       `current timestamp`
+
+Special suffixes replace spaces with appropriate url formating (replace KEY with one from above)
+- {KEY_+} replaces spaces with `+`
+- {KEY_-} replaces spaces with `-`
+- {KEY_escaped} replaces spaces with `%2520`
+- {KEY_escaped+} replaces spaces with `%252B`
+
+
+
 ## Script Functions  
 TMDb Helper also provides several script functions to assist with making an extended info type experience. See Arctic Zephyr 2 for an example of implementation
 
