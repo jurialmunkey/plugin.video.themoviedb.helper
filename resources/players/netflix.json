@@ -2,5 +2,5 @@
     "name"              : "Netflix",
     "plugin"            : "plugin.video.netflix",
     "search_movie"      : "plugin://plugin.video.netflix/directory/search/search/{title}/",
-    "search_episode"    : "plugin://plugin.video.netflix/directory/search/search/{clearname}/"
+    "search_episode"    : "plugin://plugin.video.netflix/directory/search/search/{showname}/"
 }
