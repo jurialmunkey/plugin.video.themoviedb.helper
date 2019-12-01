@@ -28,7 +28,7 @@ class Player(Plugin):
         self.traktapi = traktAPI() if xbmcaddon.Addon().getSetting('trakt_token') else None
         self.itemtype, self.tmdb_id, self.season, self.episode = itemtype, tmdb_id, season, episode
         self.search_movie, self.search_episode, self.play_movie, self.play_episode = [], [], [], []
-        self.tmdbtype = 'tv' if self.itemtype == 'episode' else 'movie'
+        self.tmdbtype = 'tv' if self.itemtype == 'episode' or self.itemtype == 'tv' else 'movie'
         self.details = self.tmdb.get_detailed_item(self.tmdbtype, tmdb_id, season=season, episode=episode)
         self.item = defaultdict(lambda: '')
         self.item['imdb_id'] = self.details.get('infolabels', {}).get('imdbnumber')
@@ -51,14 +51,14 @@ class Player(Plugin):
     def build_details(self):
         self.item['id'] = self.tmdb_id
         self.item['imdb'] = self.details.get('infolabels', {}).get('imdbnumber')
-        self.item['trakt'] = None  # TODO
-        self.item['slug'] = None  # TODO
         self.item['name'] = '{0} ({1})'.format(self.item.get('title'), self.item.get('year'))
+        self.item['firstaired'] = self.details.get('infolabels', {}).get('premiered')
         self.item['premiered'] = self.details.get('infolabels', {}).get('premiered')
         self.item['released'] = self.details.get('infolabels', {}).get('premiered')
         self.item['showname'] = self.item.get('title')
         self.item['clearname'] = self.item.get('title')
         self.item['released'] = self.details.get('infolabels', {}).get('premiered')
+        self.item['thumbnail'] = self.details.get('thumb')
         self.item['poster'] = self.details.get('poster')
         self.item['fanart'] = self.details.get('fanart')
         self.item['now'] = datetime.datetime.now().strftime('%Y%m%d%H%M%S%f')
@@ -95,8 +95,8 @@ class Player(Plugin):
 
     def build_players(self):
         basedirs = [
-            'special://home/addons/plugin.video.themoviedb.helper/resources/players/',
-            'special://profile/addon_data/plugin.video.themoviedb.helper/players/']
+            'special://profile/addon_data/plugin.video.themoviedb.helper/players/',
+            'special://home/addons/plugin.video.themoviedb.helper/resources/players/']
         for basedir in basedirs:
             files = [x for x in xbmcvfs.listdir(basedir)[1] if x.endswith('.json')]
             for file in files:
@@ -140,7 +140,6 @@ class Player(Plugin):
             actions.append('{0}{1}{2}'.format(prefix, action, suffix))
         itemindex = xbmcgui.Dialog().select('Choose Action', itemlist)
         if itemindex > -1:
-            utils.kodi_log(self.item, 1)
             utils.kodi_log(actions[itemindex], 1)
             xbmc.executebuiltin(actions[itemindex])
 

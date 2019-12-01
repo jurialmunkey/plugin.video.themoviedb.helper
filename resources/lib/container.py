@@ -84,15 +84,10 @@ class Container(Plugin):
         if item.get('tmdb_id'):
             url['tmdb_id'] = item.get('tmdb_id')
 
-        if url.get('info') == 'play':
-            item['is_folder'] = False
-
         if url.get('info') == 'imageviewer':
-            item['is_folder'] = False
             url = {'info': 'imageviewer', 'image': item.get('icon')}
 
         if url.get('info') == 'textviewer':
-            item['is_folder'] = False
             url = {'info': 'textviewer'}
 
         if self.params.get('info') in ['seasons', 'episodes'] or url.get('type') in ['season', 'episode']:
@@ -164,6 +159,7 @@ class Container(Plugin):
         self.start_container()
         for i in items:
             url = i.pop('url', {})
+            i['is_folder'] = False if url.get('info') in ['play', 'textviewer', 'imageviewer'] else True
             self.dbtype = utils.type_convert(i.pop('mixed_type', ''), 'dbtype') or self.dbtype
             i.setdefault('infolabels', {})['mediatype'] = self.dbtype if self.dbtype and not i.get('label') == 'Next Page' else ''
             listitem = ListItem(library=self.library, **i)
