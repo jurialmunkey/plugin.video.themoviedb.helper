@@ -30,7 +30,7 @@ class Player(Plugin):
         self.search_movie, self.search_episode, self.play_movie, self.play_episode = [], [], [], []
         self.tmdbtype = 'tv' if self.itemtype == 'episode' or self.itemtype == 'tv' else 'movie'
         self.details = self.tmdb.get_detailed_item(self.tmdbtype, tmdb_id, season=season, episode=episode)
-        self.item = defaultdict(lambda: '')
+        self.item = defaultdict(lambda: 'noop')
         self.item['imdb_id'] = self.details.get('infolabels', {}).get('imdbnumber')
         self.item['originaltitle'] = self.details.get('infolabels', {}).get('originaltitle')
         self.item['title'] = self.details.get('infolabels', {}).get('tvshowtitle') or self.details.get('infolabels', {}).get('title')
@@ -87,7 +87,7 @@ class Player(Plugin):
 
         for k, v in self.item.items():
             v = '{0}'.format(v)
-            self.item[k] = v.replace(',', ' ')
+            self.item[k] = v.replace(',', '')
             self.item[k + '_+'] = v.replace(' ', '+')
             self.item[k + '_-'] = v.replace(' ', '-')
             self.item[k + '_escaped'] = v.replace(' ', '%2520')
