@@ -74,7 +74,7 @@ class Player(Plugin):
         if self.itemtype == 'episode':  # Do some special episode stuff
             self.item['id'] = self.item.get('tvdb')
             self.item['title'] = self.details.get('infolabels', {}).get('title')  # Set Episode Title
-            self.item['name'] = '{0} S{1:02d}E{2:02d}'.format(self.item.get('showname'), self.season, self.episode)
+            self.item['name'] = '{0} S{1:02d}E{2:02d}'.format(self.item.get('showname'), int(self.season), int(self.episode))
             self.item['season'] = self.season
             self.item['episode'] = self.episode
 
