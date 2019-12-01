@@ -30,7 +30,7 @@ class Player(Plugin):
         self.search_movie, self.search_episode, self.play_movie, self.play_episode = [], [], [], []
         self.tmdbtype = 'tv' if self.itemtype == 'episode' or self.itemtype == 'tv' else 'movie'
         self.details = self.tmdb.get_detailed_item(self.tmdbtype, tmdb_id, season=season, episode=episode)
-        self.item = defaultdict(lambda: 'noop')
+        self.item = defaultdict(lambda: '+')
         self.item['imdb_id'] = self.details.get('infolabels', {}).get('imdbnumber')
         self.item['originaltitle'] = self.details.get('infolabels', {}).get('originaltitle')
         self.item['title'] = self.details.get('infolabels', {}).get('tvshowtitle') or self.details.get('infolabels', {}).get('title')
@@ -50,6 +50,7 @@ class Player(Plugin):
 
     def build_details(self):
         self.item['id'] = self.tmdb_id
+        self.item['tmdb'] = self.tmdb_id
         self.item['imdb'] = self.details.get('infolabels', {}).get('imdbnumber')
         self.item['name'] = '{0} ({1})'.format(self.item.get('title'), self.item.get('year'))
         self.item['firstaired'] = self.details.get('infolabels', {}).get('premiered')
