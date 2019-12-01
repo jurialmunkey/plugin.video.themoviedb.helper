@@ -2,11 +2,24 @@ import xbmc
 import xbmcgui
 import xbmcvfs
 import xbmcaddon
+import datetime
 import resources.lib.utils as utils
 from json import loads
+from string import Formatter
+from collections import defaultdict
 from resources.lib.plugin import Plugin
 from resources.lib.kodilibrary import KodiLibrary
 from resources.lib.traktapi import traktAPI
+
+
+def string_format_map(fmt, d):
+    try:
+        str.format_map
+    except AttributeError:
+        parts = Formatter().parse(fmt)
+        return fmt.format(**{part[1]: d[part[1]] for part in parts})
+    else:
+        return fmt.format(**d)
 
 
 class Player(Plugin):
@@ -17,11 +30,11 @@ class Player(Plugin):
         self.search_movie, self.search_episode, self.play_movie, self.play_episode = [], [], [], []
         self.tmdbtype = 'tv' if self.itemtype == 'episode' else 'movie'
         self.details = self.tmdb.get_detailed_item(self.tmdbtype, tmdb_id, season=season, episode=episode)
-        self.item = {
-            'imdb_id': self.details.get('infolabels', {}).get('imdbnumber'),
-            'originaltitle': self.details.get('infolabels', {}).get('originaltitle'),
-            'title': self.details.get('infolabels', {}).get('tvshowtitle') or self.details.get('infolabels', {}).get('title'),
-            'year': self.details.get('infolabels', {}).get('year')}
+        self.item = defaultdict(lambda: '')
+        self.item['imdb_id'] = self.details.get('infolabels', {}).get('imdbnumber')
+        self.item['originaltitle'] = self.details.get('infolabels', {}).get('originaltitle')
+        self.item['title'] = self.details.get('infolabels', {}).get('tvshowtitle') or self.details.get('infolabels', {}).get('title')
+        self.item['year'] = self.details.get('infolabels', {}).get('year')
         self.players = {}
         self.router()
 
@@ -41,13 +54,14 @@ class Player(Plugin):
         self.item['trakt'] = None  # TODO
         self.item['slug'] = None  # TODO
         self.item['name'] = '{0} ({1})'.format(self.item.get('title'), self.item.get('year'))
+        self.item['premiered'] = self.details.get('infolabels', {}).get('premiered')
         self.item['released'] = self.details.get('infolabels', {}).get('premiered')
         self.item['showname'] = self.item.get('title')
         self.item['clearname'] = self.item.get('title')
         self.item['released'] = self.details.get('infolabels', {}).get('premiered')
         self.item['poster'] = self.details.get('poster')
         self.item['fanart'] = self.details.get('fanart')
-        self.item['plot'] = self.details.get('infolabels', {}).get('plot')
+        self.item['now'] = datetime.datetime.now().strftime('%Y%m%d%H%M%S%f')
 
         if self.traktapi:
             slug_type = utils.type_convert(self.tmdbtype, 'trakt')
@@ -71,17 +85,13 @@ class Player(Plugin):
             self.item['eptmdb'] = trakt_details.get('ids', {}).get('tmdb')
             self.item['eptrakt'] = trakt_details.get('ids', {}).get('trakt')
 
-        try:  # PY2 -> PY3 Compatibility
-            basestring
-        except NameError:
-            basestring = str
-
         for k, v in self.item.items():
-            if isinstance(v, basestring):
-                self.item[k + '_+'] = v.replace(' ', '+')
-                self.item[k + '_-'] = v.replace(' ', '-')
-                self.item[k + '_escaped'] = v.replace(' ', '%2520')
-                self.item[k + '_escaped+'] = v.replace(' ', '%252B')
+            v = '{0}'.format(v)
+            self.item[k] = v.replace(',', ' ')
+            self.item[k + '_+'] = v.replace(' ', '+')
+            self.item[k + '_-'] = v.replace(' ', '-')
+            self.item[k + '_escaped'] = v.replace(' ', '%2520')
+            self.item[k + '_escaped+'] = v.replace(' ', '%252B')
 
     def build_players(self):
         basedirs = [
@@ -113,23 +123,24 @@ class Player(Plugin):
         prefix = 'ActivateWindow(videos, ' if not xbmc.getCondVisibility('Window.IsVisible(MyVideoNav.xml)') else 'Container.Update('
         suffix = ', return)' if not xbmc.getCondVisibility('Window.IsVisible(MyVideoNav.xml)') else ')'
         for i in self.play_movie:
-            itemlist.append(xbmcgui.ListItem('Play ' + self.players.get(i, {}).get('name', '')))
-            action = self.players.get(i, {}).get('play_movie', '').format(**self.item)
+            itemlist.append(xbmcgui.ListItem('Play with ' + self.players.get(i, {}).get('name', '')))
+            action = string_format_map(self.players.get(i, {}).get('play_movie', ''), self.item)
             actions.append('PlayMedia({0})'.format(action))
         for i in self.search_movie:
             itemlist.append(xbmcgui.ListItem('Search ' + self.players.get(i, {}).get('name', '')))
-            action = self.players.get(i, {}).get('search_movie', '').format(**self.item)
+            action = string_format_map(self.players.get(i, {}).get('search_movie', ''), self.item)
             actions.append('{0}{1}{2}'.format(prefix, action, suffix))
         for i in self.play_episode:
-            itemlist.append(xbmcgui.ListItem('Play ' + self.players.get(i, {}).get('name', '')))
-            action = self.players.get(i, {}).get('play_episode', '').format(**self.item)
+            itemlist.append(xbmcgui.ListItem('Play with ' + self.players.get(i, {}).get('name', '')))
+            action = string_format_map(self.players.get(i, {}).get('play_episode', ''), self.item)
             actions.append('PlayMedia({0})'.format(action))
         for i in self.search_episode:
             itemlist.append(xbmcgui.ListItem('Search ' + self.players.get(i, {}).get('name', '')))
-            action = self.players.get(i, {}).get('search_episode', '').format(**self.item)
+            action = string_format_map(self.players.get(i, {}).get('search_episode', ''), self.item)
             actions.append('{0}{1}{2}'.format(prefix, action, suffix))
         itemindex = xbmcgui.Dialog().select('Choose Action', itemlist)
         if itemindex > -1:
+            utils.kodi_log(self.item, 1)
             utils.kodi_log(actions[itemindex], 1)
             xbmc.executebuiltin(actions[itemindex])
 
