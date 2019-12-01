@@ -58,6 +58,7 @@ class Player(Plugin):
         self.item['released'] = self.details.get('infolabels', {}).get('premiered')
         self.item['showname'] = self.item.get('title')
         self.item['clearname'] = self.item.get('title')
+        self.item['tvshowtitle'] = self.item.get('title')
         self.item['thumbnail'] = self.details.get('thumb')
         self.item['poster'] = self.details.get('poster')
         self.item['fanart'] = self.details.get('fanart')
