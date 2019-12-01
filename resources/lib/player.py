@@ -1,24 +1,148 @@
 import xbmc
+import xbmcgui
+import xbmcvfs
+import xbmcaddon
+import resources.lib.utils as utils
+from json import loads
 from resources.lib.plugin import Plugin
 from resources.lib.kodilibrary import KodiLibrary
+from resources.lib.traktapi import traktAPI
 
 
 class Player(Plugin):
-    def play(self, itemtype, tmdb_id, season=None, episode=None):
-        tmdbtype = 'tv' if itemtype == 'episode' else 'movie'
-        item = self.tmdb.get_detailed_item(tmdbtype, tmdb_id)
-        if not item:
-            return
+    def __init__(self, itemtype, tmdb_id, season=None, episode=None):
+        super(Player, self).__init__()
+        self.traktapi = traktAPI() if xbmcaddon.Addon().getSetting('trakt_token') else None
+        self.itemtype, self.tmdb_id, self.season, self.episode = itemtype, tmdb_id, season, episode
+        self.search_movie, self.search_episode, self.play_movie, self.play_episode = [], [], [], []
+        self.tmdbtype = 'tv' if self.itemtype == 'episode' else 'movie'
+        self.details = self.tmdb.get_detailed_item(self.tmdbtype, tmdb_id, season=season, episode=episode)
+        self.item = {
+            'imdb_id': self.details.get('infolabels', {}).get('imdbnumber'),
+            'originaltitle': self.details.get('infolabels', {}).get('originaltitle'),
+            'title': self.details.get('infolabels', {}).get('tvshowtitle') or self.details.get('infolabels', {}).get('title'),
+            'year': self.details.get('infolabels', {}).get('year')}
+        self.players = {}
+        self.router()
 
-        if itemtype == 'movie':
-            item = self.get_db_info(item, 'file', dbtype='movie')
-        if itemtype == 'episode':
-            item = self.get_db_info(item, 'dbid', dbtype='tv')
-            item['file'] = KodiLibrary(dbtype='episode', tvshowid=item.get('dbid')).get_info(
-                'file', season=season, episode=episode)
+    def router(self):
+        if self.details and self.itemtype == 'movie':
+            is_local = self.playmovie()
+        if self.details and self.itemtype == 'episode':
+            is_local = self.playepisode()
+        if not is_local:
+            self.build_players()
+            self.build_details()
+            self.build_selectbox()
 
-        if item.get('file'):
-            xbmc.executebuiltin('PlayMedia({0})'.format(item.get('file')))
-            return
+    def build_details(self):
+        self.item['id'] = self.tmdb_id
+        self.item['imdb'] = self.details.get('infolabels', {}).get('imdbnumber')
+        self.item['trakt'] = None  # TODO
+        self.item['slug'] = None  # TODO
+        self.item['name'] = '{0} ({1})'.format(self.item.get('title'), self.item.get('year'))
+        self.item['released'] = self.details.get('infolabels', {}).get('premiered')
+        self.item['showname'] = self.item.get('title')
+        self.item['clearname'] = self.item.get('title')
+        self.item['released'] = self.details.get('infolabels', {}).get('premiered')
+        self.item['poster'] = self.details.get('poster')
+        self.item['fanart'] = self.details.get('fanart')
+        self.item['plot'] = self.details.get('infolabels', {}).get('plot')
 
-        # TODO: Add Player for Non-DBID items
+        if self.traktapi:
+            slug_type = utils.type_convert(self.tmdbtype, 'trakt')
+            trakt_details = self.traktapi.get_details(slug_type, self.traktapi.get_traktslug(slug_type, 'tmdb', self.tmdb_id))
+            self.item['trakt'] = trakt_details.get('ids', {}).get('trakt')
+            self.item['imdb'] = trakt_details.get('ids', {}).get('imdb')
+            self.item['tvdb'] = trakt_details.get('ids', {}).get('tvdb')
+            self.item['slug'] = trakt_details.get('ids', {}).get('slug')
+
+        if self.itemtype == 'episode':  # Do some special episode stuff
+            self.item['id'] = self.item.get('tvdb')
+            self.item['title'] = self.details.get('infolabels', {}).get('title')  # Set Episode Title
+            self.item['name'] = '{0} S{1:02d}E{2:02d}'.format(self.item.get('showname'), self.season, self.episode)
+            self.item['season'] = self.season
+            self.item['episode'] = self.episode
+
+        if self.traktapi and self.itemtype == 'episode':
+            trakt_details = self.traktapi.get_details(slug_type, self.item.get('slug'), season=self.season, episode=self.episode)
+            self.item['epid'] = trakt_details.get('ids', {}).get('tvdb')
+            self.item['epimdb'] = trakt_details.get('ids', {}).get('imdb')
+            self.item['eptmdb'] = trakt_details.get('ids', {}).get('tmdb')
+            self.item['eptrakt'] = trakt_details.get('ids', {}).get('trakt')
+
+        try:  # PY2 -> PY3 Compatibility
+            basestring
+        except NameError:
+            basestring = str
+
+        for k, v in self.item.items():
+            if isinstance(v, basestring):
+                self.item[k + '_+'] = v.replace(' ', '+')
+                self.item[k + '_-'] = v.replace(' ', '-')
+                self.item[k + '_escaped'] = v.replace(' ', '%2520')
+                self.item[k + '_escaped+'] = v.replace(' ', '%252B')
+
+    def build_players(self):
+        basedirs = [
+            'special://home/addons/plugin.video.themoviedb.helper/resources/players/',
+            'special://profile/addon_data/plugin.video.themoviedb.helper/players/']
+        for basedir in basedirs:
+            files = [x for x in xbmcvfs.listdir(basedir)[1] if x.endswith('.json')]
+            for file in files:
+                f = xbmcvfs.File(basedir + file)
+                try:
+                    content = f.read()
+                    meta = loads(content) or {}
+                finally:
+                    f.close()
+                if not meta.get('plugin') or not xbmc.getCondVisibility('System.HasAddon({0})'.format(meta.get('plugin'))):
+                    continue  # Don't have plugin so skip
+                if self.tmdbtype == 'movie' and meta.get('search_movie'):
+                    self.search_movie.append(meta.get('plugin'))
+                if self.tmdbtype == 'movie' and meta.get('play_movie'):
+                    self.play_movie.append(meta.get('plugin'))
+                if self.tmdbtype == 'tv' and meta.get('search_episode'):
+                    self.search_episode.append(meta.get('plugin'))
+                if self.tmdbtype == 'tv' and meta.get('play_episode'):
+                    self.play_episode.append(meta.get('plugin'))
+                self.players[meta.get('plugin')] = meta
+
+    def build_selectbox(self):
+        itemlist, actions = [], []
+        prefix = 'ActivateWindow(videos, ' if not xbmc.getCondVisibility('Window.IsVisible(MyVideoNav.xml)') else 'Container.Update('
+        suffix = ', return)' if not xbmc.getCondVisibility('Window.IsVisible(MyVideoNav.xml)') else ')'
+        for i in self.play_movie:
+            itemlist.append(xbmcgui.ListItem('Play ' + self.players.get(i, {}).get('name', '')))
+            action = self.players.get(i, {}).get('play_movie', '').format(**self.item)
+            actions.append('PlayMedia({0})'.format(action))
+        for i in self.search_movie:
+            itemlist.append(xbmcgui.ListItem('Search ' + self.players.get(i, {}).get('name', '')))
+            action = self.players.get(i, {}).get('search_movie', '').format(**self.item)
+            actions.append('{0}{1}{2}'.format(prefix, action, suffix))
+        for i in self.play_episode:
+            itemlist.append(xbmcgui.ListItem('Play ' + self.players.get(i, {}).get('name', '')))
+            action = self.players.get(i, {}).get('play_episode', '').format(**self.item)
+            actions.append('PlayMedia({0})'.format(action))
+        for i in self.search_episode:
+            itemlist.append(xbmcgui.ListItem('Search ' + self.players.get(i, {}).get('name', '')))
+            action = self.players.get(i, {}).get('search_episode', '').format(**self.item)
+            actions.append('{0}{1}{2}'.format(prefix, action, suffix))
+        itemindex = xbmcgui.Dialog().select('Choose Action', itemlist)
+        if itemindex > -1:
+            utils.kodi_log(actions[itemindex], 1)
+            xbmc.executebuiltin(actions[itemindex])
+
+    def playfile(self, file):
+        if file:
+            xbmc.executebuiltin('PlayMedia({0})'.format(file))
+            return True
+
+    def playmovie(self):
+        if self.playfile(KodiLibrary(dbtype='movie').get_info('file', **self.item)):
+            return True
+
+    def playepisode(self):
+        dbid = KodiLibrary(dbtype='tvshow').get_info('dbid', **self.item)
+        if self.playfile(KodiLibrary(dbtype='episode', tvshowid=dbid).get_info('file', season=self.season, episode=self.episode)):
+            return True

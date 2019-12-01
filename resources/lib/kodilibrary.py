@@ -38,7 +38,7 @@ class KodiLibrary(object):
             'file': item.get('file')}
             for item in response.get('result', {}).get(key_to_get, [])]
 
-    def get_info(self, info=None, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None, season=None, episode=None):
+    def get_info(self, info, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None, season=None, episode=None):
         if not self.database or not info:
             return
         index_list = utils.find_dict_in_list(self.database, 'dbid', dbid) if dbid else []

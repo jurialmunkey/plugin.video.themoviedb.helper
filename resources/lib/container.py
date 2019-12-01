@@ -84,6 +84,9 @@ class Container(Plugin):
         if item.get('tmdb_id'):
             url['tmdb_id'] = item.get('tmdb_id')
 
+        if url.get('info') == 'play':
+            item['is_folder'] = False
+
         if url.get('info') == 'imageviewer':
             item['is_folder'] = False
             url = {'info': 'imageviewer', 'image': item.get('icon')}
@@ -192,11 +195,9 @@ class Container(Plugin):
             self.list_items(items)
 
     def list_play(self):
-        Player().play(
-            itemtype=self.params.get('type'),
-            tmdb_id=self.params.get('tmdb_id'),
-            season=self.params.get('season'),
-            episode=self.params.get('episode'))
+        Player(
+            itemtype=self.params.get('type'), tmdb_id=self.params.get('tmdb_id'),
+            season=self.params.get('season'), episode=self.params.get('episode'))
 
     def list_traktmanagement(self):
         if not self.params.get('trakt') in TRAKT_MANAGEMENT:
@@ -448,6 +449,7 @@ class Container(Plugin):
         elif self.params.get('info') in TRAKT_HISTORYLISTS:
             self.list_trakthistory()
         elif self.params.get('info') == 'trakt_upnext':
+            self.list_getid()
             self.list_traktupnext()
         elif self.params.get('info') in TRAKT_LISTLISTS:
             self.list_traktuserlists()

@@ -241,13 +241,13 @@ class traktAPI(RequestAPI):
         item = self.get_response_json('users/settings')
         return item.get('user', {}).get('ids', {}).get('slug')
 
-    def get_details(self, item_type, id, season=None, episode=None):
+    def get_details(self, item_type, id_num, season=None, episode=None):
         if not season or not episode:
-            return self.get_response_json(item_type + 's', id)
-        return self.get_response_json(item_type + 's', id, 'seasons', season, 'episodes', episode)
+            return self.get_response_json(item_type + 's', id_num)
+        return self.get_response_json(item_type + 's', id_num, 'seasons', season, 'episodes', episode)
 
-    def get_traktslug(self, item_type, id_type, id):
-        item = self.get_response_json('search', id_type, id, '?' + item_type)
+    def get_traktslug(self, item_type, id_type, id_num):
+        item = self.get_response_json('search', id_type, id_num, '?' + item_type)
         return item[0].get(item_type, {}).get('ids', {}).get('slug')
 
     def sync_activities(self, itemtype, listtype):
