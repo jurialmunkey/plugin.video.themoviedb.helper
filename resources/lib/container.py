@@ -95,6 +95,9 @@ class Container(Plugin):
             url['season'] = item.get('infolabels', {}).get('season')
             url['episode'] = item.get('infolabels', {}).get('episode')
 
+        if url.get('info') == 'details' and xbmcaddon.Addon().getSettingBool('trakt_management'):
+            url['manage'] = 'True'
+
         item['url'] = url
         return item
 
@@ -257,7 +260,7 @@ class Container(Plugin):
                 items.append(item)
 
         # ADD TRAKT ITEMS
-        if xbmcaddon.Addon().getSetting('trakt_token'):
+        if xbmcaddon.Addon().getSetting('trakt_token') and self.params.get('manage') == 'True':
             _traktapi = traktAPI()
             trakt_collection = _traktapi.sync_collection(utils.type_convert(self.params.get('type'), 'trakt'), 'tmdb')
             if trakt_collection:

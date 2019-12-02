@@ -89,6 +89,11 @@ msgctxt "#32012"
 msgid "You must Authenticate your Trakt account to use this feature."
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32013"
+msgid "Display Trakt list management options in TMDb details list"
+msgstr ""
+
 msgctxt "#30002"
 msgid "Belarusian (Belarus)"
 msgstr ""
