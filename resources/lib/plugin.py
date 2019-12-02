@@ -43,7 +43,7 @@ class Plugin(object):
             return kwargs.get('tmdb_id')
         query = utils.split_items(query)[0] if query else None
         itemtype = itemtype or TMDB_LISTS.get(kwargs.get('info'), {}).get('tmdb_check_id') or kwargs.get('type')
-        return self.tmdb.get_tmdb_id(itemtype=itemtype, imdb_id=imdb_id, query=query, year=year)
+        return self.tmdb.get_tmdb_id(itemtype=itemtype, imdb_id=imdb_id, query=query, year=year, longcache=True)
 
     def get_omdb_ratings(self, item, cache_only=False):
         if self.omdb and item.get('infolabels', {}).get('imdbnumber'):
