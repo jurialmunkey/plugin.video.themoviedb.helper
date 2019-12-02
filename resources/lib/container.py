@@ -225,6 +225,10 @@ class Container(Plugin):
 
     def list_details(self):
         """ Gets detailed information about item and creates folder shortcuts to relevant list categories """
+        if not self.params.get('tmdb_id'):
+            self.start_container()
+            self.finish_container()
+            return
         d_args = ('tv', self.params.get('tmdb_id'), self.params.get('season'), self.params.get('episode')) if self.params.get('type') == 'episode' else (self.params.get('type'), self.params.get('tmdb_id'))
         if self.params.get('refresh') == 'True':
             with utils.busy_dialog():

@@ -74,7 +74,7 @@ class RequestAPI(object):
                 self.invalid_apikey()
             elif not request.status_code == 400:  # Don't write 400 error to log
                 utils.kodi_log('HTTP Error Code: {0}'.format(request.status_code), 1)
-            return
+            return {} if dictify else None
         if dictify and is_json:
             request = request.json()  # Make the request nice
         elif dictify:
