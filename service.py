@@ -46,8 +46,10 @@ class ServiceMonitor(Plugin):
                 self.kodimonitor.waitForAbort(0.15)
 
             # clear window props
-            else:
+            elif self.setprops:
                 self.clear_properties()  # TODO: Also clear when container paths change
+
+            else:
                 self.kodimonitor.waitForAbort(1)
 
     def clear_properties(self):
@@ -56,7 +58,7 @@ class ServiceMonitor(Plugin):
                 self.home.clearProperty(u'TMDbHelper.ListItem.{0}'.format(key))
             except Exception:
                 pass
-        self.setprops = []
+        self.setprops = {}
 
     def set_property(self, key, value):
         try:
