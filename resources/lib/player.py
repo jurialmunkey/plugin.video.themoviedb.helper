@@ -1,7 +1,6 @@
 import xbmc
 import xbmcgui
 import xbmcvfs
-import xbmcaddon
 import datetime
 import resources.lib.utils as utils
 from json import loads
@@ -52,7 +51,7 @@ class Player(Plugin):
         self.item['id'] = self.tmdb_id
         self.item['tmdb'] = self.tmdb_id
         self.item['imdb'] = self.details.get('infolabels', {}).get('imdbnumber')
-        self.item['name'] = '{0} ({1})'.format(self.item.get('title'), self.item.get('year'))
+        self.item['name'] = u'{0} ({1})'.format(self.item.get('title'), self.item.get('year'))
         self.item['firstaired'] = self.details.get('infolabels', {}).get('premiered')
         self.item['premiered'] = self.details.get('infolabels', {}).get('premiered')
         self.item['released'] = self.details.get('infolabels', {}).get('premiered')
@@ -75,7 +74,7 @@ class Player(Plugin):
         if self.itemtype == 'episode':  # Do some special episode stuff
             self.item['id'] = self.item.get('tvdb')
             self.item['title'] = self.details.get('infolabels', {}).get('title')  # Set Episode Title
-            self.item['name'] = '{0} S{1:02d}E{2:02d}'.format(self.item.get('showname'), int(self.season), int(self.episode))
+            self.item['name'] = u'{0} S{1:02d}E{2:02d}'.format(self.item.get('showname'), int(self.season), int(self.episode))
             self.item['season'] = self.season
             self.item['episode'] = self.episode
 
@@ -87,7 +86,7 @@ class Player(Plugin):
             self.item['eptrakt'] = trakt_details.get('ids', {}).get('trakt')
 
         for k, v in self.item.items():
-            v = '{0}'.format(v)
+            v = u'{0}'.format(v)
             self.item[k] = v.replace(',', '')
             self.item[k + '_+'] = v.replace(' ', '+')
             self.item[k + '_-'] = v.replace(' ', '-')
@@ -107,7 +106,7 @@ class Player(Plugin):
                     meta = loads(content) or {}
                 finally:
                     f.close()
-                if not meta.get('plugin') or not xbmc.getCondVisibility('System.HasAddon({0})'.format(meta.get('plugin'))):
+                if not meta.get('plugin') or not xbmc.getCondVisibility(u'System.HasAddon({0})'.format(meta.get('plugin'))):
                     continue  # Don't have plugin so skip
                 if self.tmdbtype == 'movie' and meta.get('search_movie'):
                     self.search_movie.append(meta.get('plugin'))
@@ -126,19 +125,19 @@ class Player(Plugin):
         for i in self.play_movie:
             itemlist.append(xbmcgui.ListItem('Play with ' + self.players.get(i, {}).get('name', '')))
             action = string_format_map(self.players.get(i, {}).get('play_movie', ''), self.item)
-            actions.append('PlayMedia({0})'.format(action))
+            actions.append(u'PlayMedia({0})'.format(action))
         for i in self.search_movie:
             itemlist.append(xbmcgui.ListItem('Search ' + self.players.get(i, {}).get('name', '')))
             action = string_format_map(self.players.get(i, {}).get('search_movie', ''), self.item)
-            actions.append('{0}{1}{2}'.format(prefix, action, suffix))
+            actions.append(u'{0}{1}{2}'.format(prefix, action, suffix))
         for i in self.play_episode:
             itemlist.append(xbmcgui.ListItem('Play with ' + self.players.get(i, {}).get('name', '')))
             action = string_format_map(self.players.get(i, {}).get('play_episode', ''), self.item)
-            actions.append('PlayMedia({0})'.format(action))
+            actions.append(u'PlayMedia({0})'.format(action))
         for i in self.search_episode:
             itemlist.append(xbmcgui.ListItem('Search ' + self.players.get(i, {}).get('name', '')))
             action = string_format_map(self.players.get(i, {}).get('search_episode', ''), self.item)
-            actions.append('{0}{1}{2}'.format(prefix, action, suffix))
+            actions.append(u'{0}{1}{2}'.format(prefix, action, suffix))
         itemindex = xbmcgui.Dialog().select('Choose Action', itemlist)
         if itemindex > -1:
             utils.kodi_log(actions[itemindex], 1)
@@ -146,7 +145,7 @@ class Player(Plugin):
 
     def playfile(self, file):
         if file:
-            xbmc.executebuiltin('PlayMedia({0})'.format(file))
+            xbmc.executebuiltin(u'PlayMedia({0})'.format(file))
             return True
 
     def playmovie(self):
