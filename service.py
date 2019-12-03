@@ -102,7 +102,6 @@ class ServiceMonitor(Plugin):
             return
 
     def get_listitem(self):
-        self.clear_properties()
         self.container = self.get_container()
 
         dbtype = self.get_dbtype()
@@ -123,6 +122,8 @@ class ServiceMonitor(Plugin):
         if self.cur_item == self.pre_item:
             return  # Don't get details if we already did last time!
         self.pre_item = self.cur_item
+
+        self.clear_properties()
 
         try:
             details = self.tmdb.get_detailed_item(tmdbtype, self.get_tmdb_id(tmdbtype, imdb_id, query, year), season=season, episode=episode)
