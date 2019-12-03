@@ -123,8 +123,6 @@ class ServiceMonitor(Plugin):
             return  # Don't get details if we already did last time!
         self.pre_item = self.cur_item
 
-        self.clear_properties()
-
         try:
             details = self.tmdb.get_detailed_item(tmdbtype, self.get_tmdb_id(tmdbtype, imdb_id, query, year), season=season, episode=episode)
             details = self.get_omdb_ratings(details)
