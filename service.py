@@ -25,7 +25,7 @@ class ServiceMonitor(Plugin):
 
             self.cur_folder = '{0}{1}{2}'.format(
                 self.container,
-                xbmc.getInfoLabel('{0}Content()'.format(self.container)),
+                xbmc.getInfoLabel(self.get_dbtype()),
                 xbmc.getInfoLabel('{0}NumItems'.format(self.container)))
 
             if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.Service)"):
