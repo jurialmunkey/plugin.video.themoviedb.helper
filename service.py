@@ -102,6 +102,7 @@ class ServiceMonitor(Plugin):
             return
 
     def get_listitem(self):
+        self.clear_properties()
         self.container = self.get_container()
 
         dbtype = self.get_dbtype()
@@ -132,7 +133,6 @@ class ServiceMonitor(Plugin):
         if not details:
             return
 
-        self.clear_properties()
         self.set_properties(details)
 
 
