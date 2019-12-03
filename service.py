@@ -115,13 +115,12 @@ class ServiceMonitor(Plugin):
     def get_listitem(self):
         self.container = self.get_container()
 
+        tmdbtype = ''
         dbtype = self.get_dbtype()
         if dbtype in ['tvshows', 'seasons', 'episodes']:
             tmdbtype = 'tv'
         elif dbtype in ['movies']:
             tmdbtype = 'movie'
-        else:
-            return  # TODO: Add checks for sets etc.
 
         imdb_id = self.get_infolabel('IMDBNumber')
         query = self.get_infolabel('TvShowTitle') or self.get_infolabel('Title') or self.get_infolabel('Label')
@@ -133,6 +132,9 @@ class ServiceMonitor(Plugin):
         if self.cur_item == self.pre_item:
             return  # Don't get details if we already did last time!
         self.pre_item = self.cur_item
+
+        if not tmdbtype:
+            return
 
         try:
             details = self.tmdb.get_detailed_item(tmdbtype, self.get_tmdb_id(tmdbtype, imdb_id, query, year), season=season, episode=episode)
