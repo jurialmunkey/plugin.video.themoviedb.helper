@@ -3,14 +3,13 @@ import resources.lib.utils as utils
 from resources.lib.requestapi import RequestAPI
 import xbmc
 import xbmcgui
-import xbmcaddon
 import datetime
 
 
 class traktAPI(RequestAPI):
-    def __init__(self, force=False, cache_short=None, cache_long=None, addon_name=None):
+    def __init__(self, force=False, cache_short=None, cache_long=None):
         super(traktAPI, self).__init__(
-            cache_short=cache_short, cache_long=cache_long, addon_name=addon_name,
+            cache_short=cache_short, cache_long=cache_long,
             req_api_url='https://api.trakt.tv/', req_api_name='Trakt')
         self.authorization = ''
         self.sync = {}
@@ -18,8 +17,8 @@ class traktAPI(RequestAPI):
         self.prev_activities = None
         self.refreshcheck = 0
         self.attempedlogin = False
-        self.dialog_noapikey_header = '{0} {1} {2}'.format(xbmcaddon.Addon().getLocalizedString(32007), self.req_api_name, xbmcaddon.Addon().getLocalizedString(32011))
-        self.dialog_noapikey_text = xbmcaddon.Addon().getLocalizedString(32012)
+        self.dialog_noapikey_header = '{0} {1} {2}'.format(self.addon.getLocalizedString(32007), self.req_api_name, self.addon.getLocalizedString(32011))
+        self.dialog_noapikey_text = self.addon.getLocalizedString(32012)
         self.client_id = 'e6fde6173adf3c6af8fd1b0694b9b84d7c519cefc24482310e1de06c6abe5467'
         self.client_secret = '15119384341d9a61c751d8d515acbc0dd801001d4ebe85d3eef9885df80ee4d9'
         self.headers = {'trakt-api-version': '2', 'trakt-api-key': self.client_id, 'Content-Type': 'application/json'}
@@ -33,7 +32,7 @@ class traktAPI(RequestAPI):
     def authorize(self, login=True, force=False):
         if self.authorization:
             return self.authorization
-        token = xbmcaddon.Addon().getSetting('trakt_token')
+        token = self.addon.getSetting('trakt_token')
         token = loads(token) if token else None
         if token and type(token) is dict and token.get('access_token'):
             self.authorization = token
@@ -101,7 +100,7 @@ class traktAPI(RequestAPI):
     def on_authenticated(self, auth_dialog=True):
         """Triggered when device authentication has been completed"""
         utils.kodi_log('Trakt Authenticated Successfully!', 1)
-        xbmcaddon.Addon().setSettingString('trakt_token', dumps(self.authorization))
+        self.addon.setSettingString('trakt_token', dumps(self.authorization))
         self.headers['Authorization'] = 'Bearer {0}'.format(self.authorization.get('access_token'))
         if auth_dialog:
             self.auth_dialog.close()

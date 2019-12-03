@@ -10,16 +10,17 @@ _cache = simplecache.SimpleCache()
 
 
 class RequestAPI(object):
-    def __init__(self, cache_short=None, cache_long=None, addon_name=None, req_api_url=None, req_api_key=None, req_api_name=None, req_wait_time=None):
+    def __init__(self, cache_short=None, cache_long=None, req_api_url=None, req_api_key=None, req_api_name=None, req_wait_time=None):
         self.req_api_url = req_api_url or ''
         self.req_api_key = req_api_key or ''
         self.req_api_name = req_api_name or ''
         self.req_wait_time = req_wait_time or 0
-        self.dialog_noapikey_header = '{0} {1} {2}'.format(xbmcaddon.Addon().getLocalizedString(32007), self.req_api_name, xbmcaddon.Addon().getLocalizedString(32008))
-        self.dialog_noapikey_text = xbmcaddon.Addon().getLocalizedString(32009)
         self.cache_long = 14 if not cache_long or cache_long < 14 else cache_long
         self.cache_short = 1 if not cache_short or cache_short < 1 else cache_short
-        self.addon_name = addon_name if addon_name else 'plugin.video.themoviedb.helper'
+        self.addon_name = 'plugin.video.themoviedb.helper'
+        self.addon = xbmcaddon.Addon(self.addon_name)
+        self.dialog_noapikey_header = '{0} {1} {2}'.format(self.addon.getLocalizedString(32007), self.req_api_name, self.addon.getLocalizedString(32008))
+        self.dialog_noapikey_text = self.addon.getLocalizedString(32009)
 
     def invalid_apikey(self):
         xbmcgui.Dialog().ok(self.dialog_noapikey_header, self.dialog_noapikey_text)

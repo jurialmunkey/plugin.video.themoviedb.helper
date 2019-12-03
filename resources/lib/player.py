@@ -25,7 +25,7 @@ def string_format_map(fmt, d):
 class Player(Plugin):
     def __init__(self, itemtype, tmdb_id, season=None, episode=None):
         super(Player, self).__init__()
-        self.traktapi = traktAPI() if xbmcaddon.Addon().getSetting('trakt_token') else None
+        self.traktapi = traktAPI() if self.addon.getSetting('trakt_token') else None
         self.itemtype, self.tmdb_id, self.season, self.episode = itemtype, tmdb_id, season, episode
         self.search_movie, self.search_episode, self.play_movie, self.play_episode = [], [], [], []
         self.tmdbtype = 'tv' if self.itemtype == 'episode' or self.itemtype == 'tv' else 'movie'

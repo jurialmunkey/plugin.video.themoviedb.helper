@@ -1,7 +1,6 @@
 import sys
 import xbmc
 import xbmcgui
-import xbmcaddon
 import xbmcplugin
 import resources.lib.utils as utils
 from resources.lib.traktapi import traktAPI
@@ -95,7 +94,7 @@ class Container(Plugin):
             url['season'] = item.get('infolabels', {}).get('season')
             url['episode'] = item.get('infolabels', {}).get('episode')
 
-        if url.get('info') == 'details' and xbmcaddon.Addon().getSettingBool('trakt_management'):
+        if url.get('info') == 'details' and self.addon.getSettingBool('trakt_management'):
             url['manage'] = 'True'
 
         item['url'] = url
@@ -264,7 +263,7 @@ class Container(Plugin):
                 items.append(item)
 
         # ADD TRAKT ITEMS
-        if xbmcaddon.Addon().getSetting('trakt_token') and self.params.get('manage') == 'True':
+        if self.addon.getSetting('trakt_token') and self.params.get('manage') == 'True':
             _traktapi = traktAPI()
             trakt_collection = _traktapi.sync_collection(utils.type_convert(self.params.get('type'), 'trakt'), 'tmdb')
             if trakt_collection:

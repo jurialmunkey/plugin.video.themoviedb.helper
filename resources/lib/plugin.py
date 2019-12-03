@@ -10,27 +10,25 @@ from resources.lib.omdb import OMDb
 
 class Plugin(object):
     def __init__(self):
-        self.addonpath = xbmcaddon.Addon().getAddonInfo('path')
+        self.addon = xbmcaddon.Addon('plugin.video.themoviedb.helper')
+        self.addonpath = self.addon.getAddonInfo('path')
         self.prefixname = 'TMDbHelper.'
         self.kodimoviedb = None
         self.koditvshowdb = None
         self.details_tv = None
 
-        addonname = 'plugin.video.themoviedb.helper'
-        cache_long = xbmcaddon.Addon().getSettingInt('cache_details_days')
-        cache_short = xbmcaddon.Addon().getSettingInt('cache_list_days')
-        tmdb_apikey = xbmcaddon.Addon().getSetting('tmdb_apikey')
-        omdb_apikey = xbmcaddon.Addon().getSetting('omdb_apikey')
-        language = LANGUAGES[xbmcaddon.Addon().getSettingInt('language')]
-        mpaa_prefix = xbmcaddon.Addon().getSetting('mpaa_prefix')
+        cache_long = self.addon.getSettingInt('cache_details_days')
+        cache_short = self.addon.getSettingInt('cache_list_days')
+        tmdb_apikey = self.addon.getSetting('tmdb_apikey')
+        omdb_apikey = self.addon.getSetting('omdb_apikey')
+        language = LANGUAGES[self.addon.getSettingInt('language')]
+        mpaa_prefix = self.addon.getSetting('mpaa_prefix')
 
         self.tmdb = TMDb(
             api_key=tmdb_apikey, language=language, cache_long=cache_long, cache_short=cache_short,
-            append_to_response=APPEND_TO_RESPONSE, addon_name=addonname, mpaa_prefix=mpaa_prefix)
+            append_to_response=APPEND_TO_RESPONSE, mpaa_prefix=mpaa_prefix)
 
-        self.omdb = OMDb(
-            api_key=omdb_apikey, cache_long=cache_long, cache_short=cache_short,
-            addon_name=addonname) if omdb_apikey else None
+        self.omdb = OMDb(api_key=omdb_apikey, cache_long=cache_long, cache_short=cache_short) if omdb_apikey else None
 
     def textviewer(self, header, text):
         xbmcgui.Dialog().textviewer(header, text)

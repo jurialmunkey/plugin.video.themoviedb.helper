@@ -3,9 +3,9 @@ from resources.lib.requestapi import RequestAPI
 
 
 class OMDb(RequestAPI):
-    def __init__(self, api_key=None, cache_short=None, cache_long=None, addon_name=None):
+    def __init__(self, api_key=None, cache_short=None, cache_long=None):
         super(OMDb, self).__init__(
-            cache_short=cache_short, cache_long=cache_long, addon_name=addon_name,
+            cache_short=cache_short, cache_long=cache_long,
             req_api_key='?apikey={0}'.format(api_key), req_api_name='OMDb',
             req_api_url='http://www.omdbapi.com/', req_wait_time=1)
 

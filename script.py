@@ -12,15 +12,16 @@ from resources.lib.tmdb import TMDb
 from resources.lib.traktapi import traktAPI
 _homewindow = xbmcgui.Window(10000)
 _prefixname = 'TMDbHelper.'
-_addon = xbmcaddon.Addon()
 _addonname = 'plugin.video.themoviedb.helper'
+_addon = xbmcaddon.Addon(_addonname)
 _languagesetting = _addon.getSettingInt('language')
 _language = LANGUAGES[_languagesetting]
 _cache_long = _addon.getSettingInt('cache_details_days')
 _cache_short = _addon.getSettingInt('cache_list_days')
 _tmdb_apikey = _addon.getSetting('tmdb_apikey')
-_tmdb = TMDb(api_key=_tmdb_apikey, language=_language, cache_long=_cache_long, cache_short=_cache_short,
-             append_to_response=APPEND_TO_RESPONSE, addon_name=_addonname)
+_tmdb = TMDb(
+    api_key=_tmdb_apikey, language=_language, cache_long=_cache_long,
+    cache_short=_cache_short, append_to_response=APPEND_TO_RESPONSE)
 
 
 class Script:
