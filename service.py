@@ -11,12 +11,21 @@ class ServiceMonitor(Plugin):
         self.container = ''
         self.cur_item = 0
         self.pre_item = 1
+        self.pre_folder = None
+        self.cur_folder = None
         self.setprops = []
         self.home = xbmcgui.Window(10000)
         self.run_monitor()
 
     def run_monitor(self):
         while not self.kodimonitor.abortRequested():
+            self.container = self.get_container()
+            self.cur_folder = xbmc.getInfoLabel('FolderPath'.format(self.container))
+            if self.cur_folder != self.pre_folder:
+                self.clear_properties()
+                self.pre_folder = self.cur_folder
+                self.kodimonitor.waitForAbort(1)
+
             if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.Service)"):
                 self.kodimonitor.waitForAbort(30)
             # skip when modal dialogs are opened (e.g. textviewer in musicinfo dialog)
@@ -38,7 +47,7 @@ class ServiceMonitor(Plugin):
 
             # clear window props
             else:
-                self.clear_properties()
+                self.clear_properties()  # TODO: Also clear when container paths change
                 self.kodimonitor.waitForAbort(1)
 
     def clear_properties(self):
@@ -60,18 +69,18 @@ class ServiceMonitor(Plugin):
             if isinstance(v, list):
                 idx = 0
                 self.set_property(k, v[idx])
-                self.setprops.append(k)
+                self.setprops.add(k)
                 for i in v:
                     p = '{0}.{1}'.format(k, idx + 1)
                     self.set_property(p, v[idx])
-                    self.setprops.append(p)
+                    self.setprops.add(p)
                     idx += 1
                 continue
-            self.setprops.append(k)
+            self.setprops.add(k)
             self.set_property(k, v)
 
     def set_properties(self, item):
-        self.setprops = ['Label', 'Icon', 'Poster', 'Thumb', 'Fanart', 'tmdb_id', 'imdb_id']
+        self.setprops = {'Label', 'Icon', 'Poster', 'Thumb', 'Fanart', 'tmdb_id', 'imdb_id'}
         self.set_property('Label', item.get('label'))
         self.set_property('Icon', item.get('icon'))
         self.set_property('Poster', item.get('poster'))
