@@ -11,6 +11,7 @@ class ServiceMonitor(Plugin):
         self.container = ''
         self.cur_item = 0
         self.pre_item = 1
+        self.high_idx = 0
         self.pre_folder = None
         self.cur_folder = None
         self.setprops = []
@@ -20,14 +21,21 @@ class ServiceMonitor(Plugin):
     def run_monitor(self):
         while not self.kodimonitor.abortRequested():
             self.container = self.get_container()
-            self.cur_folder = xbmc.getInfoLabel('FolderPath'.format(self.container))
-            if self.cur_folder != self.pre_folder:
-                self.clear_properties()
-                self.pre_folder = self.cur_folder
-                self.kodimonitor.waitForAbort(1)
+
+            self.cur_folder = '{0}{1}{2}{3}'.format(
+                self.container,
+                xbmc.getInfoLabel('Window.Property(xmlfile)'),
+                xbmc.getInfoLabel('{0}FolderPath'.format(self.container)),
+                xbmc.getInfoLabel('{0}NumItems'.format(self.container)))
 
             if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.Service)"):
                 self.kodimonitor.waitForAbort(30)
+
+            elif self.cur_folder != self.pre_folder:
+                self.reset_properties()
+                self.pre_folder = self.cur_folder
+                self.kodimonitor.waitForAbort(2)
+
             # skip when modal dialogs are opened (e.g. textviewer in musicinfo dialog)
             elif xbmc.getCondVisibility(
                     "Window.IsActive(DialogSelect.xml) | Window.IsActive(progressdialog) | "
@@ -52,34 +60,73 @@ class ServiceMonitor(Plugin):
             else:
                 self.kodimonitor.waitForAbort(1)
 
+    def reset_properties(self):
+        self.setprops = {
+            'Label', 'Icon', 'Poster', 'Thumb', 'Fanart', 'tmdb_id', 'imdb_id', 'title', 'originaltitle',
+            'tvshowtitle', 'plot', 'rating', 'votes', 'premiered', 'year', 'imdbnumber', 'tagline', 'status',
+            'episode', 'season', 'genre', 'duration', 'set', 'studio', 'country', 'MPAA', 'tvdb_id', 'biography',
+            'birthday', 'age', 'deathday', 'character', 'department', 'job', 'known_for', 'role', 'born', 'creator',
+            'director', 'writer', 'aliases', 'known_for', 'budget', 'revenue',
+            'set.tmdb_id', 'set.name', 'set.poster', 'set.fanart'}
+        self.clear_properties()
+        self.clear_iterprops()
+
+    def clear_iterprops(self):
+        iterprops = {
+            'Cast': ['name', 'role', 'thumb'],
+            'Crew': ['name', 'job', 'department', 'thumb'],
+            'Creator': ['name', 'tmdb_id'],
+            'Genre': ['name', 'tmdb_id'],
+            'Studio': ['name', 'tmdb_id'],
+            'Country': ['name', 'tmdb_id'],
+            'Language': ['name', 'iso'],
+            'known_for': ['title', 'tmdb_id', 'rating', 'tmdb_type']}
+        self.high_idx = self.high_idx if self.high_idx > 10 else 10
+        for k, v in iterprops.items():
+            for n in v:
+                for i in range(self.high_idx):
+                    try:
+                        self.home.clearProperty('TMDbHelper.ListItem.{0}.{1}.{2}'.format(k, i, n))
+                    except Exception:
+                        pass
+
     def clear_properties(self):
-        for key in self.setprops:
+        for k in self.setprops:
             try:
-                self.home.clearProperty(u'TMDbHelper.ListItem.{0}'.format(key))
+                self.home.clearProperty('TMDbHelper.ListItem.{0}'.format(k))
             except Exception:
                 pass
         self.setprops = {}
 
     def set_property(self, key, value):
         try:
-            self.home.setProperty(u'TMDbHelper.ListItem.{0}'.format(key), u'{0}'.format(value))
+            self.home.setProperty('TMDbHelper.ListItem.{0}'.format(key), u'{0}'.format(value))
         except Exception as exc:
             utils.kodi_log('{0}{1}'.format(key, exc), 1)
 
     def set_iter_properties(self, dictionary):
+        if not isinstance(dictionary, dict):
+            return
         for k, v in dictionary.items():
-            if isinstance(v, list):
-                idx = 0
-                self.set_property(k, v[idx])
+            try:
+                if isinstance(v, list):
+                    idx = 0
+                    self.set_property(k, v[idx])
+                    self.setprops.add(k)
+                    for i in v:
+                        try:
+                            p = '{0}.{1}'.format(k, idx + 1)
+                            self.set_property(p, i)
+                            self.setprops.add(p)
+                            idx += 1
+                        except Exception as exc:
+                            utils.kodi_log(exc, 1)
+                    self.high_idx = idx if idx > self.high_idx else self.high_idx
+                    continue
                 self.setprops.add(k)
-                for i in v:
-                    p = '{0}.{1}'.format(k, idx + 1)
-                    self.set_property(p, v[idx])
-                    self.setprops.add(p)
-                    idx += 1
-                continue
-            self.setprops.add(k)
-            self.set_property(k, v)
+                self.set_property(k, v)
+            except Exception as exc:
+                utils.kodi_log(exc, 1)
 
     def set_properties(self, item):
         self.setprops = {'Label', 'Icon', 'Poster', 'Thumb', 'Fanart', 'tmdb_id', 'imdb_id'}
@@ -109,7 +156,8 @@ class ServiceMonitor(Plugin):
             if imdb_id and imdb_id.startswith('tt'):
                 return self.tmdb.get_tmdb_id(itemtype=itemtype, imdb_id=imdb_id)
             return self.tmdb.get_tmdb_id(itemtype=itemtype, query=query, year=year)
-        except Exception:
+        except Exception as exc:
+            utils.kodi_log(exc, 1)
             return
 
     def get_listitem(self):
@@ -139,8 +187,8 @@ class ServiceMonitor(Plugin):
         try:
             details = self.tmdb.get_detailed_item(tmdbtype, self.get_tmdb_id(tmdbtype, imdb_id, query, year), season=season, episode=episode)
             details = self.get_omdb_ratings(details)
-        except Exception:
-            return
+        except Exception as exc:
+            utils.kodi_log(exc, 1)
 
         if not details:
             return
