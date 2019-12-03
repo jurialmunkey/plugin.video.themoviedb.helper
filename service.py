@@ -8,7 +8,8 @@ class ServiceMonitor(Plugin):
     def __init__(self):
         super(ServiceMonitor, self).__init__()
         self.kodimonitor = xbmc.Monitor()
-        self.container = ''
+        self.container = 'Container.'
+        self.containeritem = 'ListItem.'
         self.cur_item = 0
         self.pre_item = 1
         self.high_idx = 0
@@ -20,12 +21,11 @@ class ServiceMonitor(Plugin):
 
     def run_monitor(self):
         while not self.kodimonitor.abortRequested():
-            self.container = self.get_container()
+            self.get_container()
 
-            self.cur_folder = '{0}{1}{2}{3}'.format(
+            self.cur_folder = '{0}{1}{2}'.format(
                 self.container,
-                xbmc.getInfoLabel('Window.Property(xmlfile)'),
-                xbmc.getInfoLabel('{0}FolderPath'.format(self.container)),
+                xbmc.getInfoLabel('{0}Content()'.format(self.container)),
                 xbmc.getInfoLabel('{0}NumItems'.format(self.container)))
 
             if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.Service)"):
@@ -49,7 +49,7 @@ class ServiceMonitor(Plugin):
 
             # media window is opened or widgetcontainer set - start listitem monitoring!
             elif xbmc.getCondVisibility(
-                    "Window.IsMedia | !String.IsEmpty(Window(Home).Property(TMDbHelper.WidgetContainer))"):
+                    "Window.IsMedia | !String.IsEmpty(Window(Home).Property(TMDbHelper.WidgetContainer)) | Window.IsVisible(movieinformation)"):
                 self.get_listitem()
                 self.kodimonitor.waitForAbort(0.15)
 
@@ -66,8 +66,10 @@ class ServiceMonitor(Plugin):
             'tvshowtitle', 'plot', 'rating', 'votes', 'premiered', 'year', 'imdbnumber', 'tagline', 'status',
             'episode', 'season', 'genre', 'duration', 'set', 'studio', 'country', 'MPAA', 'tvdb_id', 'biography',
             'birthday', 'age', 'deathday', 'character', 'department', 'job', 'known_for', 'role', 'born', 'creator',
-            'director', 'writer', 'aliases', 'known_for', 'budget', 'revenue',
-            'set.tmdb_id', 'set.name', 'set.poster', 'set.fanart'}
+            'director', 'writer', 'aliases', 'known_for', 'budget', 'revenue', 'set.tmdb_id', 'set.name', 'set.poster',
+            'set.fanart', 'awards', 'metacritic_rating', 'imdb_rating', 'imdb_votes', 'rottentomatoes_rating',
+            'rottentomatoes_image', 'rottentomatoes_reviewtotal', 'rottentomatoes_reviewsfresh', 'rottentomatoes_reviewsrotten',
+            'rottentomatoes_consensus', 'rottentomatoes_usermeter', 'rottentomatoes_userreviews'}
         self.clear_properties()
         self.clear_iterprops()
 
@@ -142,7 +144,8 @@ class ServiceMonitor(Plugin):
 
     def get_container(self):
         widgetid = utils.try_parse_int(self.home.getProperty('TMDbHelper.WidgetContainer'))
-        return 'Container({0}).'.format(widgetid) if widgetid else 'Container.'
+        self.container = 'Container({0}).'.format(widgetid) if widgetid else 'Container.'
+        self.containeritem = '{0}ListItem.'.format(self.container) if not xbmc.getCondVisibility("Window.IsVisible(movieinformation)") else 'ListItem.'
 
     def get_dbtype(self):
         dbtype = xbmc.getInfoLabel('ListItem.DBTYPE'.format(self.container))
@@ -161,7 +164,7 @@ class ServiceMonitor(Plugin):
             return
 
     def get_listitem(self):
-        self.container = self.get_container()
+        self.get_container()
 
         tmdbtype = ''
         dbtype = self.get_dbtype()
