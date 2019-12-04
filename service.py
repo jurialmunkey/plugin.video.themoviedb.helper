@@ -2,6 +2,25 @@ import xbmc
 import xbmcgui
 from resources.lib.plugin import Plugin
 import resources.lib.utils as utils
+_setmain = {'label', 'icon', 'poster', 'thumb', 'fanart', 'cast', 'tmdb_id', 'imdb_id'}
+_setinfo = {
+    'title', 'originaltitle', 'tvshowtitle', 'plot', 'rating', 'votes', 'premiered', 'year', 'imdbnumber', 'tagline',
+    'status', 'episode', 'season', 'genre', 'duration', 'set', 'studio', 'country', 'MPAA', 'director', 'writer'}
+_setprop = {
+    'tvdb_id', 'biography', 'birthday', 'age', 'deathday', 'character', 'department', 'job', 'known_for', 'role',
+    'born', 'creator', 'aliases', 'budget', 'revenue', 'set.tmdb_id', 'set.name', 'set.poster', 'set.fanart',
+    'awards', 'metacritic_rating', 'imdb_rating', 'imdb_votes', 'rottentomatoes_rating', 'rottentomatoes_image',
+    'rottentomatoes_reviewtotal', 'rottentomatoes_reviewsfresh', 'rottentomatoes_reviewsrotten',
+    'rottentomatoes_consensus', 'rottentomatoes_usermeter', 'rottentomatoes_userreviews'}
+_setiter = {
+    'Cast': ['name', 'role', 'thumb'],
+    'Crew': ['name', 'job', 'department', 'thumb'],
+    'Creator': ['name', 'tmdb_id'],
+    'Genre': ['name', 'tmdb_id'],
+    'Studio': ['name', 'tmdb_id'],
+    'Country': ['name', 'tmdb_id'],
+    'Language': ['name', 'iso'],
+    'known_for': ['title', 'tmdb_id', 'rating', 'tmdb_type']}
 
 
 class ServiceMonitor(Plugin):
@@ -15,11 +34,12 @@ class ServiceMonitor(Plugin):
         self.high_idx = 0
         self.pre_folder = None
         self.cur_folder = None
-        self.setprops = []
+        self.properties = set()
         self.home = xbmcgui.Window(10000)
         self.run_monitor()
 
     def run_monitor(self):
+        self.home.setProperty('TMDbHelper.ServiceStarted', 'True')
         while not self.kodimonitor.abortRequested():
             self.get_container()
 
@@ -54,51 +74,38 @@ class ServiceMonitor(Plugin):
                 self.kodimonitor.waitForAbort(0.15)
 
             # clear window props
-            elif self.setprops:
+            elif self.properties:
                 self.clear_properties()  # TODO: Also clear when container paths change
 
             else:
                 self.kodimonitor.waitForAbort(1)
 
     def reset_properties(self):
-        self.setprops = {
-            'Label', 'Icon', 'Poster', 'Thumb', 'Fanart', 'tmdb_id', 'imdb_id', 'title', 'originaltitle',
-            'tvshowtitle', 'plot', 'rating', 'votes', 'premiered', 'year', 'imdbnumber', 'tagline', 'status',
-            'episode', 'season', 'genre', 'duration', 'set', 'studio', 'country', 'MPAA', 'tvdb_id', 'biography',
-            'birthday', 'age', 'deathday', 'character', 'department', 'job', 'known_for', 'role', 'born', 'creator',
-            'director', 'writer', 'aliases', 'known_for', 'budget', 'revenue', 'set.tmdb_id', 'set.name', 'set.poster',
-            'set.fanart', 'awards', 'metacritic_rating', 'imdb_rating', 'imdb_votes', 'rottentomatoes_rating',
-            'rottentomatoes_image', 'rottentomatoes_reviewtotal', 'rottentomatoes_reviewsfresh', 'rottentomatoes_reviewsrotten',
-            'rottentomatoes_consensus', 'rottentomatoes_usermeter', 'rottentomatoes_userreviews'}
+        self.properties = self.properties.union(_setmain, _setinfo, _setprop)
         self.clear_properties()
         self.clear_iterprops()
 
     def clear_iterprops(self):
-        iterprops = {
-            'Cast': ['name', 'role', 'thumb'],
-            'Crew': ['name', 'job', 'department', 'thumb'],
-            'Creator': ['name', 'tmdb_id'],
-            'Genre': ['name', 'tmdb_id'],
-            'Studio': ['name', 'tmdb_id'],
-            'Country': ['name', 'tmdb_id'],
-            'Language': ['name', 'iso'],
-            'known_for': ['title', 'tmdb_id', 'rating', 'tmdb_type']}
         self.high_idx = self.high_idx if self.high_idx > 10 else 10
-        for k, v in iterprops.items():
+        for k, v in _setiter.items():
             for n in v:
                 for i in range(self.high_idx):
                     try:
                         self.home.clearProperty('TMDbHelper.ListItem.{0}.{1}.{2}'.format(k, i, n))
                     except Exception:
                         pass
+        self.high_idx = 0
+
+    def clear_property(self, key):
+        try:
+            self.home.clearProperty('TMDbHelper.ListItem.{0}'.format(key))
+        except Exception as exc:
+            utils.kodi_log('{0}{1}'.format(key, exc), 1)
 
     def clear_properties(self):
-        for k in self.setprops:
-            try:
-                self.home.clearProperty('TMDbHelper.ListItem.{0}'.format(k))
-            except Exception:
-                pass
-        self.setprops = {}
+        for k in self.properties:
+            self.clear_property(k)
+        self.properties = set()
 
     def set_property(self, key, value):
         try:
@@ -106,41 +113,60 @@ class ServiceMonitor(Plugin):
         except Exception as exc:
             utils.kodi_log('{0}{1}'.format(key, exc), 1)
 
-    def set_iter_properties(self, dictionary):
+    def set_indx_properties(self, dictionary):
         if not isinstance(dictionary, dict):
             return
-        for k, v in dictionary.items():
+        pre_name = ''
+        pre_affix = ''
+        idx = 0
+        for k, v in sorted(dictionary.items()):
+            if '.' not in k:
+                continue
             try:
+                cur_name, pos, cur_affix = k.split('.')
+                if cur_name != pre_name or cur_affix != pre_affix:  # If we've moved to next lot gotta clear higher props
+                    if self.high_idx > idx:
+                        for n in range(idx, self.high_idx):
+                            n += 1
+                            self.clear_property('{0}.{1}.{2}'.format(pre_name, n, pre_affix))
+                pre_name, pre_affix = cur_name, cur_affix
+                idx = utils.try_parse_int(pos)
+                self.high_idx = idx if idx > self.high_idx else self.high_idx
+
+                v = v or ''
+                self.properties.add(k)
+                self.set_property(k, v)
+            except Exception as exc:
+                utils.kodi_log(exc, 1)
+
+    def set_iter_properties(self, dictionary, keys):
+        if not isinstance(dictionary, dict):
+            return
+        for k in keys:
+            try:
+                v = dictionary.get(k)
+                v = v or ''
                 if isinstance(v, list):
-                    idx = 0
-                    self.set_property(k, v[idx])
-                    self.setprops.add(k)
+                    n = ''
                     for i in v:
+                        if not i:
+                            continue
                         try:
-                            p = '{0}.{1}'.format(k, idx + 1)
-                            self.set_property(p, i)
-                            self.setprops.add(p)
-                            idx += 1
+                            n = '{0} / {1}'.format(n, i) if n else i
                         except Exception as exc:
                             utils.kodi_log(exc, 1)
-                    self.high_idx = idx if idx > self.high_idx else self.high_idx
-                    continue
-                self.setprops.add(k)
+                    v = n if n else v
+                self.properties.add(k)
                 self.set_property(k, v)
             except Exception as exc:
                 utils.kodi_log(exc, 1)
 
     def set_properties(self, item):
-        self.setprops = {'Label', 'Icon', 'Poster', 'Thumb', 'Fanart', 'tmdb_id', 'imdb_id'}
-        self.set_property('Label', item.get('label'))
-        self.set_property('Icon', item.get('icon'))
-        self.set_property('Poster', item.get('poster'))
-        self.set_property('Thumb', item.get('thumb'))
-        self.set_property('Fanart', item.get('fanart'))
-        self.set_property('tmdb_id', item.get('tmdb_id'))
-        self.set_property('imdb_id', item.get('imdb_id'))
-        self.set_iter_properties(item.get('infolabels', {}))
-        self.set_iter_properties(item.get('infoproperties', {}))
+        self.set_iter_properties(item, _setmain)
+        self.set_iter_properties(item.get('infolabels', {}), _setinfo)
+        self.set_iter_properties(item.get('infoproperties', {}), _setprop)
+        self.set_indx_properties(item.get('infoproperties', {}))
+        self.home.clearProperty('TMDbHelper.IsUpdating')
 
     def get_container(self):
         widgetid = utils.try_parse_int(self.home.getProperty('TMDbHelper.WidgetContainer'))
@@ -148,11 +174,11 @@ class ServiceMonitor(Plugin):
         self.containeritem = '{0}ListItem.'.format(self.container) if not xbmc.getCondVisibility("Window.IsVisible(movieinformation)") else 'ListItem.'
 
     def get_dbtype(self):
-        dbtype = xbmc.getInfoLabel('ListItem.DBTYPE'.format(self.container))
+        dbtype = xbmc.getInfoLabel('{0}DBTYPE'.format(self.containeritem))
         return '{0}s'.format(dbtype) if dbtype else xbmc.getInfoLabel('Container.Content()') or ''
 
     def get_infolabel(self, infolabel):
-        return xbmc.getInfoLabel('{0}ListItem.{1}'.format(self.container, infolabel))
+        return xbmc.getInfoLabel('{0}{1}'.format(self.containeritem, infolabel))
 
     def get_tmdb_id(self, itemtype, imdb_id=None, query=None, year=None):
         try:
@@ -187,6 +213,8 @@ class ServiceMonitor(Plugin):
         if not tmdbtype:
             return
 
+        self.home.setProperty('TMDbHelper.IsUpdating', 'True')
+
         try:
             details = self.tmdb.get_detailed_item(tmdbtype, self.get_tmdb_id(tmdbtype, imdb_id, query, year), season=season, episode=episode)
             details = self.get_omdb_ratings(details)
@@ -194,6 +222,7 @@ class ServiceMonitor(Plugin):
             utils.kodi_log(exc, 1)
 
         if not details:
+            self.home.clearProperty('TMDbHelper.IsUpdating')
             return
 
         self.set_properties(details)
