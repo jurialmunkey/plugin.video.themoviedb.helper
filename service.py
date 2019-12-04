@@ -180,6 +180,9 @@ class ServiceMonitor(Plugin):
     def get_infolabel(self, infolabel):
         return xbmc.getInfoLabel('{0}{1}'.format(self.containeritem, infolabel))
 
+    def get_position(self):
+        return xbmc.getInfoLabel('{0}CurrentItem'.format(self.container))
+
     def get_tmdb_id(self, itemtype, imdb_id=None, query=None, year=None):
         try:
             if imdb_id and imdb_id.startswith('tt'):
@@ -198,6 +201,8 @@ class ServiceMonitor(Plugin):
             tmdbtype = 'tv'
         elif dbtype in ['movies']:
             tmdbtype = 'movie'
+        elif dbtype in ['sets']:
+            tmdbtype = 'collection'
 
         imdb_id = self.get_infolabel('IMDBNumber')
         query = self.get_infolabel('TvShowTitle') or self.get_infolabel('Title') or self.get_infolabel('Label')
