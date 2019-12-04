@@ -106,6 +106,7 @@ class ServiceMonitor(Plugin):
         for k in self.properties:
             self.clear_property(k)
         self.properties = set()
+        self.pre_item = None
 
     def set_property(self, key, value):
         try:
