@@ -120,28 +120,28 @@ class Player(Plugin):
 
     def build_selectbox(self):
         itemlist, actions = [], []
-        prefix = 'ActivateWindow(videos, ' if not xbmc.getCondVisibility('Window.IsVisible(MyVideoNav.xml)') else 'Container.Update('
-        suffix = ', return)' if not xbmc.getCondVisibility('Window.IsVisible(MyVideoNav.xml)') else ')'
+        prefix = u'ActivateWindow(videos, ' if not xbmc.getCondVisibility('Window.IsVisible(MyVideoNav.xml)') else u'Container.Update('
+        suffix = u', return)' if not xbmc.getCondVisibility('Window.IsVisible(MyVideoNav.xml)') else u')'
         for i in self.play_movie:
-            itemlist.append(xbmcgui.ListItem('Play with ' + self.players.get(i, {}).get('name', '')))
+            itemlist.append(xbmcgui.ListItem(u'Play with {0}'.format(self.players.get(i, {}).get('name', ''))))
             action = string_format_map(self.players.get(i, {}).get('play_movie', ''), self.item)
             actions.append(u'PlayMedia({0})'.format(action))
         for i in self.search_movie:
-            itemlist.append(xbmcgui.ListItem('Search ' + self.players.get(i, {}).get('name', '')))
+            itemlist.append(xbmcgui.ListItem(u'Search {0}' .format(self.players.get(i, {}).get('name', ''))))
             action = string_format_map(self.players.get(i, {}).get('search_movie', ''), self.item)
             actions.append(u'{0}{1}{2}'.format(prefix, action, suffix))
         for i in self.play_episode:
-            itemlist.append(xbmcgui.ListItem('Play with ' + self.players.get(i, {}).get('name', '')))
+            itemlist.append(xbmcgui.ListItem(u'Play with {0}'.format(self.players.get(i, {}).get('name', ''))))
             action = string_format_map(self.players.get(i, {}).get('play_episode', ''), self.item)
             actions.append(u'PlayMedia({0})'.format(action))
         for i in self.search_episode:
-            itemlist.append(xbmcgui.ListItem('Search ' + self.players.get(i, {}).get('name', '')))
+            itemlist.append(xbmcgui.ListItem(u'Search {0}'.format(self.players.get(i, {}).get('name', ''))))
             action = string_format_map(self.players.get(i, {}).get('search_episode', ''), self.item)
             actions.append(u'{0}{1}{2}'.format(prefix, action, suffix))
         itemindex = xbmcgui.Dialog().select('Choose Action', itemlist)
         if itemindex > -1:
             utils.kodi_log(actions[itemindex], 1)
-            xbmc.executebuiltin(actions[itemindex])
+            xbmc.executebuiltin(actions[itemindex].encode('utf-8'))
 
     def playfile(self, file):
         if file:
