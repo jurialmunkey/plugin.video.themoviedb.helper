@@ -42,20 +42,8 @@ class ServiceMonitor(Plugin):
     def run_monitor(self):
         self.home.setProperty('TMDbHelper.ServiceStarted', 'True')
         while not self.kodimonitor.abortRequested():
-            self.get_container()
-
-            self.cur_folder = '{0}{1}{2}'.format(
-                self.container,
-                xbmc.getInfoLabel(self.get_dbtype()),
-                xbmc.getInfoLabel('{0}NumItems'.format(self.container)))
-
             if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.Service)"):
                 self.kodimonitor.waitForAbort(30)
-
-            elif self.cur_folder != self.pre_folder:
-                self.reset_properties()
-                self.pre_folder = self.cur_folder
-                self.kodimonitor.waitForAbort(2)
 
             # skip when modal dialogs are opened (e.g. textviewer in musicinfo dialog)
             elif xbmc.getCondVisibility(
@@ -83,6 +71,13 @@ class ServiceMonitor(Plugin):
 
     def get_listitem(self):
         self.get_container()
+
+        self.cur_folder = '{0}{1}{2}'.format(
+            self.container, xbmc.getInfoLabel(self.get_dbtype()),
+            xbmc.getInfoLabel('{0}NumItems'.format(self.container)))
+        if self.cur_folder != self.pre_folder:
+            self.reset_properties()
+            self.pre_folder = self.cur_folder
 
         tmdbtype = ''
         dbtype = self.get_dbtype()
