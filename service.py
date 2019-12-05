@@ -35,6 +35,7 @@ class ServiceMonitor(Plugin):
         self.pre_folder = None
         self.cur_folder = None
         self.properties = set()
+        self.indxproperties = set()
         self.home = xbmcgui.Window(10000)
         self.run_monitor()
 
@@ -74,7 +75,7 @@ class ServiceMonitor(Plugin):
                 self.kodimonitor.waitForAbort(0.15)
 
             # clear window props
-            elif self.properties:
+            elif self.properties or self.indxproperties:
                 self.clear_properties()  # TODO: Also clear when container paths change
 
             else:
@@ -106,6 +107,9 @@ class ServiceMonitor(Plugin):
         for k in self.properties:
             self.clear_property(k)
         self.properties = set()
+        for k in self.indxproperties:
+            self.clear_property(k)
+        self.indxproperties = set()
         self.pre_item = None
 
     def set_property(self, key, value):
@@ -117,28 +121,22 @@ class ServiceMonitor(Plugin):
     def set_indx_properties(self, dictionary):
         if not isinstance(dictionary, dict):
             return
-        pre_name = ''
-        pre_affix = ''
-        idx = 0
-        for k, v in sorted(dictionary.items()):
-            if '.' not in k:
+
+        indxprops = set()
+        for k, v in dictionary.items():
+            if k in self.properties or '.' not in k:
                 continue
             try:
-                cur_name, pos, cur_affix = k.split('.')
-                if cur_name != pre_name or cur_affix != pre_affix:  # If we've moved to next lot gotta clear higher props
-                    if self.high_idx > idx:
-                        for n in range(idx, self.high_idx):
-                            n += 1
-                            self.clear_property('{0}.{1}.{2}'.format(pre_name, n, pre_affix))
-                pre_name, pre_affix = cur_name, cur_affix
-                idx = utils.try_parse_int(pos)
-                self.high_idx = idx if idx > self.high_idx else self.high_idx
-
                 v = v or ''
-                self.properties.add(k)
+                self.high_idx = max(utils.try_parse_int(k.split('.')[1]), self.high_idx)
                 self.set_property(k, v)
+                indxprops.add(k)
             except Exception as exc:
                 utils.kodi_log('k: {0} v: {1} e: {2}'.format(k, v, exc), 1)
+
+        for k in (self.indxproperties - indxprops):
+            self.clear_property(k)
+        self.indxproperties = indxprops.copy()
 
     def set_iter_properties(self, dictionary, keys):
         if not isinstance(dictionary, dict):
