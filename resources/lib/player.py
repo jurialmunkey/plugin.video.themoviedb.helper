@@ -1,3 +1,4 @@
+import sys
 import xbmc
 import xbmcgui
 import xbmcvfs
@@ -85,7 +86,7 @@ class Player(Plugin):
             self.item['eptmdb'] = trakt_details.get('ids', {}).get('tmdb')
             self.item['eptrakt'] = trakt_details.get('ids', {}).get('trakt')
 
-        for k, v in self.item.items():
+        for k, v in self.item.copy().items():
             v = u'{0}'.format(v)
             self.item[k] = v.replace(',', '')
             self.item[k + '_+'] = v.replace(' ', '+')
@@ -141,7 +142,7 @@ class Player(Plugin):
         itemindex = xbmcgui.Dialog().select('Choose Action', itemlist)
         if itemindex > -1:
             utils.kodi_log(actions[itemindex], 1)
-            xbmc.executebuiltin(actions[itemindex].encode('utf-8'))
+            xbmc.executebuiltin(actions[itemindex]) if sys.version_info.major == 3 else xbmc.executebuiltin(actions[itemindex].encode('utf-8'))
 
     def playfile(self, file):
         if file:
