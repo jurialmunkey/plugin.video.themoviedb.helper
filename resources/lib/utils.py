@@ -148,10 +148,7 @@ def concatinate_names(items, key, separator):
     concat = ''
     for i in items:
         if i.get(key):
-            if concat:
-                concat = u'{0} {1} {2}'.format(concat, separator, i.get(key))
-            else:
-                concat = i.get(key)
+            concat = u'{0} {1} {2}'.format(concat, separator, i.get(key)) if concat else i.get(key)
     return concat
 
 

@@ -81,6 +81,46 @@ class ServiceMonitor(Plugin):
             else:
                 self.kodimonitor.waitForAbort(1)
 
+    def get_listitem(self):
+        self.get_container()
+
+        tmdbtype = ''
+        dbtype = self.get_dbtype()
+        if dbtype in ['tvshows', 'seasons', 'episodes']:
+            tmdbtype = 'tv'
+        elif dbtype in ['movies']:
+            tmdbtype = 'movie'
+        elif dbtype in ['sets']:
+            tmdbtype = 'collection'
+
+        imdb_id = self.get_infolabel('IMDBNumber')
+        query = self.get_infolabel('TvShowTitle') or self.get_infolabel('Title') or self.get_infolabel('Label')
+        year = self.get_infolabel('year')
+        season = self.get_infolabel('Season') if dbtype == 'episodes' else ''
+        episode = self.get_infolabel('Episode') if dbtype == 'episodes' else ''
+
+        self.cur_item = '{0}.{1}.{2}.{3}.{4}'.format(imdb_id, query, year, season, episode)
+        if self.cur_item == self.pre_item:
+            return  # Don't get details if we already did last time!
+        self.pre_item = self.cur_item
+
+        if not tmdbtype:
+            return
+
+        self.home.setProperty('TMDbHelper.IsUpdating', 'True')
+
+        try:
+            details = self.tmdb.get_detailed_item(tmdbtype, self.get_tmdb_id(tmdbtype, imdb_id, query, year), season=season, episode=episode)
+            details = self.get_omdb_ratings(details)
+        except Exception as exc:
+            utils.kodi_log(exc, 1)
+
+        if not details:
+            self.home.clearProperty('TMDbHelper.IsUpdating')
+            return
+
+        self.set_properties(details)
+
     def reset_properties(self):
         self.properties = self.properties.union(_setmain, _setinfo, _setprop)
         self.clear_properties()
@@ -146,15 +186,10 @@ class ServiceMonitor(Plugin):
                 v = dictionary.get(k)
                 v = v or ''
                 if isinstance(v, list):
-                    n = ''
-                    for i in v:
-                        if not i:
-                            continue
-                        try:
-                            n = '{0} / {1}'.format(n, i) if n else i
-                        except Exception as exc:
-                            utils.kodi_log(exc, 1)
-                    v = n if n else v
+                    try:
+                        v = ' / '.join(v)
+                    except Exception as exc:
+                        utils.kodi_log(exc, 1)
                 self.properties.add(k)
                 self.set_property(k, v)
             except Exception as exc:
@@ -190,46 +225,6 @@ class ServiceMonitor(Plugin):
         except Exception as exc:
             utils.kodi_log(exc, 1)
             return
-
-    def get_listitem(self):
-        self.get_container()
-
-        tmdbtype = ''
-        dbtype = self.get_dbtype()
-        if dbtype in ['tvshows', 'seasons', 'episodes']:
-            tmdbtype = 'tv'
-        elif dbtype in ['movies']:
-            tmdbtype = 'movie'
-        elif dbtype in ['sets']:
-            tmdbtype = 'collection'
-
-        imdb_id = self.get_infolabel('IMDBNumber')
-        query = self.get_infolabel('TvShowTitle') or self.get_infolabel('Title') or self.get_infolabel('Label')
-        year = self.get_infolabel('year')
-        season = self.get_infolabel('Season') if dbtype == 'episodes' else ''
-        episode = self.get_infolabel('Episode') if dbtype == 'episodes' else ''
-
-        self.cur_item = '{0}.{1}.{2}.{3}.{4}'.format(imdb_id, query, year, season, episode)
-        if self.cur_item == self.pre_item:
-            return  # Don't get details if we already did last time!
-        self.pre_item = self.cur_item
-
-        if not tmdbtype:
-            return
-
-        self.home.setProperty('TMDbHelper.IsUpdating', 'True')
-
-        try:
-            details = self.tmdb.get_detailed_item(tmdbtype, self.get_tmdb_id(tmdbtype, imdb_id, query, year), season=season, episode=episode)
-            details = self.get_omdb_ratings(details)
-        except Exception as exc:
-            utils.kodi_log(exc, 1)
-
-        if not details:
-            self.home.clearProperty('TMDbHelper.IsUpdating')
-            return
-
-        self.set_properties(details)
 
 
 if __name__ == '__main__':
