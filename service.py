@@ -121,7 +121,7 @@ class ServiceMonitor(Plugin):
         pre_affix = ''
         idx = 0
         for k, v in sorted(dictionary.items()):
-            if '.' not in k:
+            if k in self.properties or '.' not in k:
                 continue
             try:
                 cur_name, pos, cur_affix = k.split('.')
@@ -138,7 +138,7 @@ class ServiceMonitor(Plugin):
                 self.properties.add(k)
                 self.set_property(k, v)
             except Exception as exc:
-                utils.kodi_log(exc, 1)
+                utils.kodi_log('k: {0} v: {1} e: {2}'.format(k, v, exc), 1)
 
     def set_iter_properties(self, dictionary, keys):
         if not isinstance(dictionary, dict):
@@ -160,7 +160,7 @@ class ServiceMonitor(Plugin):
                 self.properties.add(k)
                 self.set_property(k, v)
             except Exception as exc:
-                utils.kodi_log(exc, 1)
+                'k: {0} e: {1}'.format(k, exc)
 
     def set_properties(self, item):
         self.set_iter_properties(item, _setmain)
