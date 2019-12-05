@@ -121,7 +121,7 @@ class ServiceMonitor(Plugin):
         pre_affix = ''
         idx = 0
         for k, v in sorted(dictionary.items()):
-            if k in self.properties or '.' not in k:
+            if '.' not in k:
                 continue
             try:
                 cur_name, pos, cur_affix = k.split('.')
