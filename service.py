@@ -12,15 +12,6 @@ _setprop = {
     'awards', 'metacritic_rating', 'imdb_rating', 'imdb_votes', 'rottentomatoes_rating', 'rottentomatoes_image',
     'rottentomatoes_reviewtotal', 'rottentomatoes_reviewsfresh', 'rottentomatoes_reviewsrotten',
     'rottentomatoes_consensus', 'rottentomatoes_usermeter', 'rottentomatoes_userreviews'}
-# _setiter = {
-#     'Cast': ['name', 'role', 'thumb'],
-#     'Crew': ['name', 'job', 'department', 'thumb'],
-#     'Creator': ['name', 'tmdb_id'],
-#     'Genre': ['name', 'tmdb_id'],
-#     'Studio': ['name', 'tmdb_id'],
-#     'Country': ['name', 'tmdb_id'],
-#     'Language': ['name', 'iso'],
-#     'known_for': ['title', 'tmdb_id', 'rating', 'tmdb_type']}
 
 
 class ServiceMonitor(Plugin):
@@ -31,7 +22,6 @@ class ServiceMonitor(Plugin):
         self.containeritem = 'ListItem.'
         self.cur_item = 0
         self.pre_item = 1
-        # self.high_idx = 0
         self.pre_folder = None
         self.cur_folder = None
         self.properties = set()
@@ -72,14 +62,6 @@ class ServiceMonitor(Plugin):
     def get_listitem(self):
         self.get_container()
 
-        self.cur_folder = '{0}{1}{2}'.format(
-            self.container, xbmc.getInfoLabel(self.get_dbtype()),
-            xbmc.getInfoLabel('{0}NumItems'.format(self.container)))
-        if self.cur_folder != self.pre_folder:
-            self.clear_properties()
-            # self.reset_properties()
-            self.pre_folder = self.cur_folder
-
         dbtype = self.get_dbtype()
         imdb_id = self.get_infolabel('IMDBNumber')
         query = self.get_infolabel('TvShowTitle') or self.get_infolabel('Title') or self.get_infolabel('Label')
@@ -92,43 +74,37 @@ class ServiceMonitor(Plugin):
             return  # Don't get details if we already did last time!
         self.pre_item = self.cur_item
 
+        self.cur_folder = '{0}{1}{2}'.format(
+            self.container, xbmc.getInfoLabel(self.get_dbtype()),
+            xbmc.getInfoLabel('{0}NumItems'.format(self.container)))
+        if self.cur_folder != self.pre_folder:
+            self.clear_properties()  # Clear props if the folder changed
+            self.pre_folder = self.cur_folder
+
         if dbtype in ['tvshows', 'seasons', 'episodes']:
             tmdbtype = 'tv'
         elif dbtype in ['movies']:
             tmdbtype = 'movie'
         elif dbtype in ['sets']:
             tmdbtype = 'collection'
+        elif dbtype in ['actors', 'directors']:
+            tmdbtype = 'person'
         else:
-            tmdbtype = ''
-        if not tmdbtype:
             return
 
         self.home.setProperty('TMDbHelper.IsUpdating', 'True')
+
         try:
             details = self.tmdb.get_detailed_item(tmdbtype, self.get_tmdb_id(tmdbtype, imdb_id, query, year), season=season, episode=episode)
             details = self.get_omdb_ratings(details)
         except Exception as exc:
             utils.kodi_log(exc, 1)
+
         if not details:
             self.clear_properties()
             return
+
         self.set_properties(details)
-
-    # def reset_properties(self):
-    #     self.properties = self.properties.union(_setmain, _setinfo, _setprop)
-    #     self.clear_properties()
-    #     self.clear_iterprops()
-
-    # def clear_iterprops(self):
-    #     self.high_idx = self.high_idx if self.high_idx > 10 else 10
-    #     for k, v in _setiter.items():
-    #         for n in v:
-    #             for i in range(self.high_idx):
-    #                 try:
-    #                     self.home.clearProperty('TMDbHelper.ListItem.{0}.{1}.{2}'.format(k, i, n))
-    #                 except Exception:
-    #                     pass
-    #     self.high_idx = 0
 
     def clear_property(self, key):
         try:
@@ -157,11 +133,10 @@ class ServiceMonitor(Plugin):
 
         indxprops = set()
         for k, v in dictionary.items():
-            if k in self.properties:  # or '.' not in k:
+            if k in self.properties:
                 continue
             try:
                 v = v or ''
-                # self.high_idx = max(utils.try_parse_int(k.split('.')[1]), self.high_idx)
                 self.set_property(k, v)
                 indxprops.add(k)
             except Exception as exc:
