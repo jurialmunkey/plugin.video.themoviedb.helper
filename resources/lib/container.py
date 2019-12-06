@@ -2,12 +2,13 @@ import sys
 import xbmc
 import xbmcgui
 import xbmcplugin
+import datetime
 import resources.lib.utils as utils
 from resources.lib.traktapi import traktAPI
 from resources.lib.listitem import ListItem
 from resources.lib.player import Player
 from resources.lib.plugin import Plugin
-from resources.lib.globals import BASEDIR_MAIN, BASEDIR_TMDB, BASEDIR_LISTS, TMDB_LISTS, DETAILED_CATEGORIES, TRAKT_LISTS, TRAKT_LISTLISTS, TRAKT_HISTORYLISTS, TRAKT_MANAGEMENT
+from resources.lib.globals import BASEDIR_MAIN, BASEDIR_TMDB, BASEDIR_LISTS, TMDB_LISTS, DETAILED_CATEGORIES, TRAKT_LISTS, TRAKT_LISTLISTS, TRAKT_HISTORYLISTS, TRAKT_MANAGEMENT, TRAKT_CALENDAR
 try:
     from urllib.parse import parse_qsl  # Py3
 except ImportError:
@@ -90,7 +91,7 @@ class Container(Plugin):
             url = {'info': 'textviewer'}
 
         if self.params.get('info') in ['seasons', 'episodes'] or url.get('type') in ['season', 'episode']:
-            url['tmdb_id'] = self.params.get('tmdb_id')
+            url['tmdb_id'] = self.params.get('tmdb_id') or item.get('tmdb_id')
             url['season'] = item.get('infolabels', {}).get('season')
             url['episode'] = item.get('infolabels', {}).get('episode')
 
@@ -402,6 +403,47 @@ class Container(Plugin):
             self.containercontent = utils.type_convert(itemtype, 'container') or 'movies'
             self.list_items(items)
 
+    def list_traktcalendar_episodes(self):
+        date = datetime.datetime.today() + datetime.timedelta(days=utils.try_parse_int(self.params.get('startdate')))
+        days = utils.try_parse_int(self.params.get('days'))
+        response = traktAPI().get_calendar('shows', True, start_date=date.strftime('%Y-%m-%d'), days=days)
+        items = []
+        for i in response:
+            item = self.tmdb.get_detailed_item(
+                itemtype='tv',
+                tmdb_id=i.get('show', {}).get('ids', {}).get('tmdb'),
+                season=i.get('episode', {}).get('season'),
+                episode=i.get('episode', {}).get('number'))
+            item['tmdb_id'] = i.get('show', {}).get('ids', {}).get('tmdb')
+            items.append(item)
+        if not items:
+            return
+        itemtype = 'episode'
+        self.nexttype = 'episode'
+        self.url_info = 'details'
+        self.dbtype = utils.type_convert(itemtype, 'dbtype')
+        self.plugincategory = utils.type_convert(itemtype, 'plural')
+        self.containercontent = utils.type_convert(itemtype, 'container')
+        self.list_items(items[:10])
+
+    def list_traktcalendar(self):
+        """
+        Creates a listitem for each type of each category in BASEDIR
+        """
+        if self.params.get('type') == 'episode':
+            self.list_traktcalendar_episodes()
+            return
+        icon = '{0}/resources/trakt.png'.format(self.addonpath)
+        today = datetime.datetime.today()
+        self.start_container()
+        for i in TRAKT_CALENDAR:
+            date = today + datetime.timedelta(days=i[1])
+            label = i[0].format(date.strftime('%A'))
+            listitem = ListItem(label=label, icon=icon, thumb=icon, poster=icon)
+            url = {'info': 'trakt_calendar', 'type': 'episode', 'startdate': i[1], 'days': 1}
+            listitem.create_listitem(self.handle, **url)
+        self.finish_container()
+
     def list_basedir(self):
         """
         Creates a listitem for each type of each category in BASEDIR
@@ -453,6 +495,8 @@ class Container(Plugin):
         elif self.params.get('info') == 'trakt_upnext':
             self.list_getid()
             self.list_traktupnext()
+        elif self.params.get('info') == 'trakt_calendar':
+            self.list_traktcalendar()
         elif self.params.get('info') in TRAKT_LISTLISTS:
             self.list_traktuserlists()
         elif self.params.get('info') in TRAKT_LISTS:

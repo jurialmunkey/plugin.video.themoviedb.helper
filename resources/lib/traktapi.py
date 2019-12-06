@@ -59,7 +59,8 @@ class traktAPI(RequestAPI):
 
     def refresh_token(self):
         if not self.authorization or not self.authorization.get('refresh_token'):
-            return  # TODO: DIALOG No Refresh Token Need to Authenticate
+            self.login()
+            return
         postdata = {
             'refresh_token': self.authorization.get('refresh_token'),
             'client_id': self.client_id,
@@ -208,6 +209,10 @@ class traktAPI(RequestAPI):
                 items.append(i)
                 n += 1
         return items
+
+    def get_calendar(self, tmdbtype, user=True, start_date=None, days=None):
+        user = 'my' if user else 'all'
+        return self.get_response_json('calendars', user, tmdbtype, start_date, days)
 
     def get_upnext(self, show_id, response_only=False):
         items = []

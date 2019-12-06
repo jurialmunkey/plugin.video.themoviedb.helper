@@ -4,7 +4,7 @@ BASEDIR_TMDB = ['search', 'popular', 'top_rated', 'upcoming', 'airing_today', 'n
 
 BASEDIR_TRAKT = [
     'trakt_watchlist', 'trakt_history', 'trakt_mostwatched', 'trakt_inprogress', 'trakt_recommendations', 'trakt_myairing',
-    'trakt_trending', 'trakt_popular', 'trakt_mostplayed', 'trakt_anticipated', 'trakt_boxoffice',
+    'trakt_calendar', 'trakt_trending', 'trakt_popular', 'trakt_mostplayed', 'trakt_anticipated', 'trakt_boxoffice',
     'trakt_trendinglists', 'trakt_popularlists', 'trakt_likedlists', 'trakt_mylists']
 
 TYPE_CONVERSION = {
@@ -330,6 +330,10 @@ TRAKT_LISTS = {
         'path': 'users/{user_slug}/lists',
         'icon': '{0}/resources/trakt.png',
         'types': ['both']},
+    'trakt_calendar': {
+        'name': 'Your {0} Calendar',
+        'icon': '{0}/resources/trakt.png',
+        'types': ['tv']},
     'trakt_inlists': {
         'name': 'Found in Lists',
         'path': 'movies/{imdb_id}/lists',
@@ -359,3 +363,7 @@ TRAKT_LISTS = {
         'path': 'calendars/all/{type}/premieres',
         'icon': '{0}/resources/trakt.png',
         'types': ['tv']}}
+
+TRAKT_CALENDAR = [
+    ('Yesterday', -1), ('Today', 0), ('Tomorrow', 1),
+    ('{0}', 2), ('{0}', 3), ('{0}', 4), ('{0}', 5), ('{0}', 6)]

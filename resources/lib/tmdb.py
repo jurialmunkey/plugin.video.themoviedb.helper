@@ -204,10 +204,8 @@ class TMDb(RequestAPI):
     def get_niceitem(self, item):
         label = self.get_title(item)
         icon = self.get_icon(item)
-        poster = self.get_season_poster(item)
-        poster = poster if poster else icon
-        thumb = self.get_season_thumb(item)
-        thumb = thumb if thumb else icon
+        poster = self.get_season_poster(item) or icon
+        thumb = self.get_season_thumb(item) or ''
         fanart = self.get_fanart(item)
         infolabels = self.get_infolabels(item)
         infoproperties = self.get_infoproperties(item)
@@ -297,29 +295,28 @@ class TMDb(RequestAPI):
         Lookup external ids for an item using tmdb_id
         """
         request = self.get_request_lc(itemtype, tmdb_id, 'external_ids') or {}
-        request = request.get(external_id) if external_id else request
-        return request
+        return request.get(external_id) if external_id else request
 
     def get_tmdb_id(self, itemtype=None, imdb_id=None, query=None, year=None, selectdialog=False, longcache=False):
         func = self.get_request_lc if longcache else self.get_request_sc
+        if not itemtype:
+            return
         request = None
-        if itemtype:
-            if itemtype == 'genre' and query:
-                return _genreids.get(query, '')
-            elif imdb_id:
-                request = func('find', imdb_id, language=self.req_language, external_source='imdb_id')
-                request = request.get('{0}_results'.format(itemtype), [])
-            elif query:
-                request = func('search', itemtype, language=self.req_language, query=query, year=year)
-                request = request.get('results', [])
-        if request:
-            itemindex = 0
-            if selectdialog:
-                item = utils.dialog_select_item(items=request, details=self)
-                if item:
-                    return item.get('id')
-            else:
-                return request[itemindex].get('id')
+        if itemtype == 'genre' and query:
+            return _genreids.get(query, '')
+        elif imdb_id:
+            request = func('find', imdb_id, language=self.req_language, external_source='imdb_id')
+            request = request.get('{0}_results'.format(itemtype), [])
+        elif query:
+            request = func('search', itemtype, language=self.req_language, query=query, year=year)
+            request = request.get('results', [])
+        if not request:
+            return
+        itemindex = 0
+        if selectdialog:
+            item = utils.dialog_select_item(items=request, details=self)
+            return item.get('id') if item else None
+        return request[itemindex].get('id')
 
     def get_credits_list(self, itemtype, tmdb_id, key):
         return self.get_list(itemtype, tmdb_id, 'credits', key=key, longcache=True)

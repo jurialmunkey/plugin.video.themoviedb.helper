@@ -12,23 +12,22 @@ class ListItem:
                  cast=None, infolabels=None, infoproperties=None, poster=None, thumb=None, icon=None, fanart=None,
                  is_folder=True):
         self.addonpath = xbmcaddon.Addon('plugin.video.themoviedb.helper').getAddonInfo('path')
-        self.label = label if label else 'N/A'
-        self.label2 = label2 if label2 else ''
-        self.dbtype = dbtype if dbtype else ''  # ListItem.DBType
-        self.library = library if library else ''  # <content target= video, music, pictures, none>
-        self.tmdb_id = tmdb_id if tmdb_id else ''  # ListItem.Property(tmdb_id)
-        self.imdb_id = imdb_id if imdb_id else ''  # IMDb ID for item
-        self.poster = poster if poster else '{0}/resources/poster.png'.format(self.addonpath)
-        self.thumb = thumb if thumb else '{0}/resources/poster.png'.format(self.addonpath)
-        self.icon = icon if icon else '{0}/resources/poster.png'.format(self.addonpath)
-        self.fanart = fanart if fanart else '{0}/fanart.jpg'.format(self.addonpath)
-        self.cast = cast if cast else []  # Cast list
+        self.label = label or 'N/A'
+        self.label2 = label2 or ''
+        self.dbtype = dbtype or ''  # ListItem.DBType
+        self.library = library or ''  # <content target= video, music, pictures, none>
+        self.tmdb_id = tmdb_id or ''  # ListItem.Property(tmdb_id)
+        self.imdb_id = imdb_id or ''  # IMDb ID for item
+        self.poster = poster
+        self.thumb = thumb
+        self.icon = icon or '{0}/resources/poster.png'.format(self.addonpath)
+        self.fanart = fanart or '{0}/fanart.jpg'.format(self.addonpath)
+        self.cast = cast or []  # Cast list
         self.is_folder = is_folder
-        self.infolabels = infolabels if infolabels else {}  # ListItem.Foobar
-        self.infoproperties = infoproperties if infoproperties else {}  # ListItem.Property(Foobar)
+        self.infolabels = infolabels or {}  # ListItem.Foobar
+        self.infoproperties = infoproperties or {}  # ListItem.Property(Foobar)
         self.infoart = {'thumb': self.thumb, 'icon': self.icon, 'poster': self.poster, 'fanart': self.fanart}
-        if dbid:
-            self.infolabels['dbid'] = dbid
+        self.infolabels['dbid'] = dbid
 
     def get_url(self, **kwargs):
         url = kwargs.pop('url', 'plugin://plugin.video.themoviedb.helper/?')
