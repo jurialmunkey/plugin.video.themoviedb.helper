@@ -1,5 +1,6 @@
 import sys
 import xbmc
+import xbmcaddon
 import xbmcgui
 import xbmcvfs
 import datetime
@@ -10,6 +11,8 @@ from collections import defaultdict
 from resources.lib.plugin import Plugin
 from resources.lib.kodilibrary import KodiLibrary
 from resources.lib.traktapi import traktAPI
+_addonname = 'plugin.video.themoviedb.helper'
+_addon = xbmcaddon.Addon(_addonname)
 
 
 def string_format_map(fmt, d):
@@ -20,6 +23,25 @@ def string_format_map(fmt, d):
         return fmt.format(**{part[1]: d[part[1]] for part in parts})
     else:
         return fmt.format(**d)
+
+
+def update_players():
+    import zipfile
+    
+    _players_url = _addon.getSetting('players_url')
+    _player_path = 'special://profile/addon_data/plugin.video.themoviedb.helper/players'
+    _extract_to = xbmc.translatePath(_player_path)
+    
+    with open(_player_path + '/temp.zip', 'w') as zip:
+        response = utils.open_url(_players_url)
+        
+        if response:
+            zip.write(response.content)
+    
+    _player_zip = zipfile.ZipFile(zip,  'r')
+    
+    for item in _player_zip.infolist():
+        xbmc.log('{0}'.format(item.filename), level=xbmc.LOGNOTICE)
 
 
 class Player(Plugin):

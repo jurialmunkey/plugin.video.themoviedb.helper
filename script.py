@@ -117,6 +117,8 @@ class Script:
                         self.reset_props()
             elif self.params.get('reset_path'):
                 self.reset_props()
+            elif self.params.('update_players'):
+                xbmc.log('players updated', level=xbmc.LOGNOTICE)
             self.call_window()
 
 
