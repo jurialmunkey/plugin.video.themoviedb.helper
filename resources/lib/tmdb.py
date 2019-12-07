@@ -37,29 +37,34 @@ class TMDb(RequestAPI):
         elif item.get('width') and item.get('height'):
             return u'{0}x{1}'.format(item.get('width'), item.get('height'))
 
+    def get_imagepath(self, path_affix, poster=False):
+        if poster:
+            return '{0}{1}'.format(self.imagepath_poster, path_affix)
+        return '{0}{1}'.format(self.imagepath_original, path_affix)
+
     def get_icon(self, item):
         if item.get('poster_path'):
-            return '{0}{1}'.format(self.imagepath_poster, item.get('poster_path'))
+            return self.get_imagepath(item.get('poster_path'), poster=True)
         elif item.get('profile_path'):
-            return '{0}{1}'.format(self.imagepath_poster, item.get('profile_path'))
+            return self.get_imagepath(item.get('profile_path'), poster=True)
         elif item.get('file_path'):
-            return '{0}{1}'.format(self.imagepath_original, item.get('file_path'))
+            return self.get_imagepath(item.get('file_path'))
 
     def get_season_poster(self, item):
         if item.get('season_number') and item.get('seasons'):
             for i in item.get('seasons'):
                 if i.get('season_number') == item.get('season_number'):
                     if i.get('poster_path'):
-                        return '{0}{1}'.format(self.imagepath_poster, i.get('poster_path'))
+                        return self.get_imagepath(i.get('poster_path'), poster=True)
                     break
 
     def get_season_thumb(self, item):
         if item.get('still_path'):
-            return '{0}{1}'.format(self.imagepath_original, item.get('still_path'))
+            return self.get_imagepath(item.get('still_path'))
 
     def get_fanart(self, item):
         if item.get('backdrop_path'):
-            return '{0}{1}'.format(self.imagepath_original, item.get('backdrop_path'))
+            return self.get_imagepath(item.get('backdrop_path'))
 
     def get_infolabels(self, item):
         infolabels = {}
@@ -142,6 +147,7 @@ class TMDb(RequestAPI):
             infoproperties = utils.iter_props(item.get('genres'), 'Genre', infoproperties, name='name', tmdb_id='id')
         if item.get('production_companies'):
             infoproperties = utils.iter_props(item.get('production_companies'), 'Studio', infoproperties, name='name', tmdb_id='id')
+            infoproperties = utils.iter_props(item.get('production_companies'), 'Studio', infoproperties, icon='logo_path', func=self.get_imagepath)
         if item.get('production_countries'):
             infoproperties = utils.iter_props(item.get('production_countries'), 'Country', infoproperties, name='name', tmdb_id='id')
         if item.get('spoken_languages'):
@@ -158,8 +164,8 @@ class TMDb(RequestAPI):
         if item.get('belongs_to_collection'):
             infoproperties['set.tmdb_id'] = item.get('belongs_to_collection').get('id')
             infoproperties['set.name'] = item.get('belongs_to_collection').get('name')
-            infoproperties['set.poster'] = '{0}{1}'.format(self.imagepath_poster, item.get('belongs_to_collection').get('poster_path'))
-            infoproperties['set.fanart'] = '{0}{1}'.format(self.imagepath_original, item.get('belongs_to_collection').get('backdrop_path'))
+            infoproperties['set.poster'] = self.get_imagepath(item.get('belongs_to_collection').get('poster_path'))
+            infoproperties['set.fanart'] = self.get_imagepath(item.get('belongs_to_collection').get('backdrop_path'))
         return infoproperties
 
     def get_cast(self, item):
@@ -179,7 +185,7 @@ class TMDb(RequestAPI):
                         cast_member['name'] = i.get('name')
                         cast_member['role'] = i.get('character')
                         cast_member['order'] = i.get('order')
-                        cast_member['thumbnail'] = '{0}{1}'.format(self.imagepath_poster, i.get('profile_path')) if i.get('profile_path') else ''
+                        cast_member['thumbnail'] = self.get_imagepath(i.get('profile_path'), poster=True) if i.get('profile_path') else ''
                         cast.append(cast_member)
         return cast
 
@@ -205,7 +211,7 @@ class TMDb(RequestAPI):
                     infoproperties['{0}name'.format(p)] = i.get('name')
                     infoproperties['{0}job'.format(p)] = i.get('job')
                     infoproperties['{0}department'.format(p)] = i.get('department')
-                    infoproperties['{0}thumb'.format(p)] = '{0}{1}'.format(self.imagepath_poster, i.get('profile_path')) if i.get('profile_path') else ''
+                    infoproperties['{0}thumb'.format(p)] = self.get_imagepath(i.get('profile_path'), poster=True) if i.get('profile_path') else ''
                     x = x + 1
         return infoproperties
 
