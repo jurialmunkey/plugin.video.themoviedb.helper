@@ -173,6 +173,8 @@ def iter_props(items, property, itemprops, **kwargs):
     for k, v in kwargs.items():
         x = 0
         for i in items:
+            if x > 9:
+                break  # only add ten items
             if i.get(v):
                 x = x + 1
                 itemprops['{0}.{1}.{2}'.format(property, x, k)] = i.get(v) if not func else func(i.get(v))
