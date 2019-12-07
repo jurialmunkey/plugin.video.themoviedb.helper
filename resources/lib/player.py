@@ -35,6 +35,8 @@ class Player(Plugin):
         self.item['originaltitle'] = self.details.get('infolabels', {}).get('originaltitle')
         self.item['title'] = self.details.get('infolabels', {}).get('tvshowtitle') or self.details.get('infolabels', {}).get('title')
         self.item['year'] = self.details.get('infolabels', {}).get('year')
+        self.itemlist = []
+        self.actions = []
         self.players = {}
         self.router()
 
@@ -44,9 +46,15 @@ class Player(Plugin):
         if self.details and self.itemtype == 'episode':
             is_local = self.playepisode()
         if not is_local:
-            self.build_players()
-            self.build_details()
-            self.build_selectbox()
+            with utils.busy_dialog():
+                self.build_players()
+                self.build_details()
+                self.build_selectbox()
+        if self.itemlist:
+            itemindex = xbmcgui.Dialog().select('Choose Action', self.itemlist)
+            if itemindex > -1:
+                utils.kodi_log(self.actions[itemindex], 1)
+                xbmc.executebuiltin(self.actions[itemindex]) if sys.version_info.major == 3 else xbmc.executebuiltin(self.actions[itemindex].encode('utf-8'))
 
     def build_details(self):
         self.item['id'] = self.tmdb_id
@@ -120,29 +128,25 @@ class Player(Plugin):
                 self.players[meta.get('plugin')] = meta
 
     def build_selectbox(self):
-        itemlist, actions = [], []
+        self.itemlist, self.actions = [], []
         prefix = u'ActivateWindow(videos, ' if not xbmc.getCondVisibility('Window.IsVisible(MyVideoNav.xml)') else u'Container.Update('
         suffix = u', return)' if not xbmc.getCondVisibility('Window.IsVisible(MyVideoNav.xml)') else u')'
         for i in self.play_movie:
-            itemlist.append(xbmcgui.ListItem(u'Play with {0}'.format(self.players.get(i, {}).get('name', ''))))
+            self.itemlist.append(xbmcgui.ListItem(u'Play with {0}'.format(self.players.get(i, {}).get('name', ''))))
             action = string_format_map(self.players.get(i, {}).get('play_movie', ''), self.item)
-            actions.append(u'PlayMedia({0})'.format(action))
+            self.actions.append(u'PlayMedia({0})'.format(action))
         for i in self.search_movie:
-            itemlist.append(xbmcgui.ListItem(u'Search {0}' .format(self.players.get(i, {}).get('name', ''))))
+            self.itemlist.append(xbmcgui.ListItem(u'Search {0}' .format(self.players.get(i, {}).get('name', ''))))
             action = string_format_map(self.players.get(i, {}).get('search_movie', ''), self.item)
-            actions.append(u'{0}{1}{2}'.format(prefix, action, suffix))
+            self.actions.append(u'{0}{1}{2}'.format(prefix, action, suffix))
         for i in self.play_episode:
-            itemlist.append(xbmcgui.ListItem(u'Play with {0}'.format(self.players.get(i, {}).get('name', ''))))
+            self.itemlist.append(xbmcgui.ListItem(u'Play with {0}'.format(self.players.get(i, {}).get('name', ''))))
             action = string_format_map(self.players.get(i, {}).get('play_episode', ''), self.item)
-            actions.append(u'PlayMedia({0})'.format(action))
+            self.actions.append(u'PlayMedia({0})'.format(action))
         for i in self.search_episode:
-            itemlist.append(xbmcgui.ListItem(u'Search {0}'.format(self.players.get(i, {}).get('name', ''))))
+            self.itemlist.append(xbmcgui.ListItem(u'Search {0}'.format(self.players.get(i, {}).get('name', ''))))
             action = string_format_map(self.players.get(i, {}).get('search_episode', ''), self.item)
-            actions.append(u'{0}{1}{2}'.format(prefix, action, suffix))
-        itemindex = xbmcgui.Dialog().select('Choose Action', itemlist)
-        if itemindex > -1:
-            utils.kodi_log(actions[itemindex], 1)
-            xbmc.executebuiltin(actions[itemindex]) if sys.version_info.major == 3 else xbmc.executebuiltin(actions[itemindex].encode('utf-8'))
+            self.actions.append(u'{0}{1}{2}'.format(prefix, action, suffix))
 
     def playfile(self, file):
         if file:
