@@ -239,7 +239,7 @@ TMDB_LISTS = {
 DETAILED_CATEGORIES = [
     'cast', 'recommendations', 'similar', 'crew', 'posters', 'fanart', 'movie_keywords', 'reviews',
     'stars_in_movies', 'stars_in_tvshows', 'crew_in_movies', 'crew_in_tvshows', 'images',
-    'seasons', 'trakt_upnext', 'episode_cast', 'episode_thumbs', 'trakt_inlists']
+    'seasons', 'episode_cast', 'episode_thumbs', 'trakt_inlists']
 
 APPEND_TO_RESPONSE = 'credits,images,release_dates,content_ratings,external_ids'
 

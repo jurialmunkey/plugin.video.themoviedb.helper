@@ -28,6 +28,7 @@ class Container(Plugin):
         self.containercontent = ''
         self.library = 'video'
         self.updatelisting = False
+        self.trakt_management = self.addon.getSettingBool('trakt_management')
 
     def start_container(self):
         xbmcplugin.setPluginCategory(self.handle, self.plugincategory)  # Container.PluginCategory
@@ -84,18 +85,12 @@ class Container(Plugin):
         if item.get('tmdb_id'):
             url['tmdb_id'] = item.get('tmdb_id')
 
-        if url.get('info') == 'imageviewer':
-            url = {'info': 'imageviewer', 'image': item.get('icon')}
-
-        if url.get('info') == 'textviewer':
-            url = {'info': 'textviewer'}
-
         if self.params.get('info') in ['seasons', 'episodes'] or url.get('type') in ['season', 'episode']:
             url['tmdb_id'] = self.params.get('tmdb_id') or item.get('tmdb_id')
             url['season'] = item.get('infolabels', {}).get('season')
             url['episode'] = item.get('infolabels', {}).get('episode')
 
-        if url.get('info') == 'details' and self.addon.getSettingBool('trakt_management'):
+        if url.get('info') == 'details' and self.trakt_management:
             url['manage'] = 'True'
 
         item['url'] = url
@@ -127,12 +122,18 @@ class Container(Plugin):
 
         return item
 
-    def list_items(self, items):
-        added = []
-        dbiditems = []
-        tmdbitems = []
-        mixed_movies = 0
-        mixed_tvshows = 0
+    def list_items(self, items=None, nexttype=None, url_info=None, dbtype=None, plugincategory=None, containercontent=None):
+        if not items:
+            return
+
+        added, dbiditems, tmdbitems = [], [], []
+        mixed_movies, mixed_tvshows = 0, 0
+        self.nexttype = nexttype or self.nexttype
+        self.url_info = url_info or self.url_info
+        self.dbtype = dbtype or self.dbtype
+        self.plugincategory = plugincategory or self.plugincategory
+        self.containercontent = containercontent or self.containercontent
+
         for i in items:
             name = u'{0}{1}'.format(i.get('label'), i.get('poster'))
             if name in added:  # Don't add duplicate items
@@ -186,12 +187,11 @@ class Container(Plugin):
             kwparams.setdefault('key', cat.get('key', 'results'))
             items = self.tmdb.get_list(path, *args, **kwparams)
             itemtype = cat.get('itemtype') or self.params.get('type') or ''
-            self.url_info = cat.get('url_info', 'details')
-            self.nexttype = cat.get('nexttype')
-            self.dbtype = utils.type_convert(itemtype, 'dbtype')
-            self.plugincategory = cat.get('name', '').format(utils.type_convert(itemtype, 'plural'))
-            self.containercontent = utils.type_convert(itemtype, 'container')
-            self.list_items(items)
+            self.list_items(
+                items=items, url_info=cat.get('url_info', 'details'), nexttype=cat.get('nexttype'),
+                dbtype=utils.type_convert(itemtype, 'dbtype'),
+                plugincategory=cat.get('name', '').format(utils.type_convert(itemtype, 'plural')),
+                containercontent=utils.type_convert(itemtype, 'container'))
 
     def list_play(self):
         Player(
@@ -241,7 +241,7 @@ class Container(Plugin):
         if not details:
             return
 
-        # URL ENCODING FOR TOP ITEM
+        # URL FOR TOP ITEM
         if self.params.get('type') == 'movie':
             details = self.get_omdb_ratings(details, cache_only=False)
             details['url'] = {'info': 'play'}
@@ -295,10 +295,9 @@ class Container(Plugin):
         items.append(refresh)
 
         # BUILD CONTAINER
-        self.dbtype = utils.type_convert(self.params.get('type'), 'dbtype')
-        self.plugincategory = details.get('label')
-        self.containercontent = utils.type_convert(self.params.get('type'), 'container')
-        self.list_items(items)
+        self.list_items(
+            items=items, dbtype=utils.type_convert(self.params.get('type'), 'dbtype'),
+            plugincategory=details.get('label'), containercontent=utils.type_convert(self.params.get('type'), 'container'))
 
     def list_search(self):
         if not self.params.get('query'):
@@ -307,12 +306,9 @@ class Container(Plugin):
             self.list_tmdb(query=self.params.get('query'), year=self.params.get('year'))
 
     def list_credits(self, key='cast'):
-        items = self.tmdb.get_credits_list(self.params.get('type'), self.params.get('tmdb_id'), key)
-        self.url_info = 'details'
-        self.nexttype = 'person'
-        self.plugincategory = key.capitalize()
-        self.containercontent = 'actors'
-        self.list_items(items)
+        self.list_items(
+            items=self.tmdb.get_credits_list(self.params.get('type'), self.params.get('tmdb_id'), key),
+            url_info='details', nexttype='person', plugincategory=key.capitalize(), containercontent='actors')
 
     def list_getid(self):
         self.params['tmdb_id'] = self.get_tmdb_id(**self.params)
@@ -327,27 +323,20 @@ class Container(Plugin):
         if self.params.get('info') == 'trakt_history':
             trakt_items = _traktapi.get_recentlywatched(userslug, utils.type_convert(self.params.get('type'), 'trakt'), limit=10)
         items = [self.tmdb.get_detailed_item(self.params.get('type'), i[1]) for i in trakt_items]
-        if items:
-            self.nexttype = self.params.get('type')
-            self.dbtype = utils.type_convert(self.nexttype, 'dbtype')
-            self.url_info = 'trakt_upnext' if self.params.get('info') == 'trakt_inprogress' else 'details'
-            self.plugincategory = utils.type_convert(self.nexttype, 'plural')
-            self.containercontent = utils.type_convert(self.nexttype, 'container')
-            self.list_items(items)
+        self.list_items(
+            items=items, nexttype=self.params.get('type'), dbtype=utils.type_convert(self.nexttype, 'dbtype'),
+            url_info='trakt_upnext' if self.params.get('info') == 'trakt_inprogress' else 'details',
+            plugincategory=utils.type_convert(self.nexttype, 'plural'),
+            containercontent=utils.type_convert(self.nexttype, 'container'))
 
     def list_traktupnext(self):
         _traktapi = traktAPI()
         imdb_id = self.tmdb.get_item_externalid(itemtype='tv', tmdb_id=self.params.get('tmdb_id'), external_id='imdb_id')
         trakt_items = _traktapi.get_upnext(imdb_id)
         items = [self.tmdb.get_detailed_item(itemtype='tv', tmdb_id=self.params.get('tmdb_id'), season=i[0], episode=i[1]) for i in trakt_items]
-        if items:
-            itemtype = 'episode'
-            self.nexttype = 'episode'
-            self.url_info = 'details'
-            self.dbtype = utils.type_convert(itemtype, 'dbtype')
-            self.plugincategory = utils.type_convert(itemtype, 'plural')
-            self.containercontent = utils.type_convert(itemtype, 'container')
-            self.list_items(items[:10])
+        self.list_items(
+            items=items[:10], nexttype='episode', url_info='details', dbtype=utils.type_convert('episode', 'dbtype'),
+            plugincategory=utils.type_convert('episode', 'plural'), containercontent=utils.type_convert('episode', 'container'))
 
     def list_traktuserlists(self):
         _traktapi = traktAPI()
@@ -395,13 +384,11 @@ class Container(Plugin):
                 if item:
                     item['mixed_type'] = i[2]
                     items.append(item)
-        if items:
-            self.nexttype = itemtype
-            self.dbtype = utils.type_convert(itemtype, 'dbtype')
-            self.url_info = cat.get('url_info', 'details')
-            self.plugincategory = cat.get('name', '').format(utils.type_convert(itemtype, 'plural'))
-            self.containercontent = utils.type_convert(itemtype, 'container') or 'movies'
-            self.list_items(items)
+        self.list_items(
+            items=items, nexttype=itemtype, dbtype=utils.type_convert(itemtype, 'dbtype'),
+            url_info=cat.get('url_info', 'details'),
+            plugincategory=cat.get('name', '').format(utils.type_convert(itemtype, 'plural')),
+            containercontent=utils.type_convert(itemtype, 'container') or 'movies')
 
     def list_traktcalendar_episodes(self):
         date = datetime.datetime.today() + datetime.timedelta(days=utils.try_parse_int(self.params.get('startdate')))
@@ -416,15 +403,9 @@ class Container(Plugin):
                 episode=i.get('episode', {}).get('number'))
             item['tmdb_id'] = i.get('show', {}).get('ids', {}).get('tmdb')
             items.append(item)
-        if not items:
-            return
-        itemtype = 'episode'
-        self.nexttype = 'episode'
-        self.url_info = 'details'
-        self.dbtype = utils.type_convert(itemtype, 'dbtype')
-        self.plugincategory = utils.type_convert(itemtype, 'plural')
-        self.containercontent = utils.type_convert(itemtype, 'container')
-        self.list_items(items[:10])
+        self.list_items(
+            items=items[:10], nexttype='episode', url_info='details', dbtype=utils.type_convert('episode', 'dbtype'),
+            plugincategory=utils.type_convert('episode', 'plural'), containercontent=utils.type_convert('episode', 'container'))
 
     def list_traktcalendar(self):
         """
@@ -489,7 +470,7 @@ class Container(Plugin):
         elif self.params.get('info') == 'textviewer':
             self.textviewer(xbmc.getInfoLabel('ListItem.Label'), xbmc.getInfoLabel('ListItem.Plot'))
         elif self.params.get('info') == 'imageviewer':
-            self.imageviewer(self.params.get('image'))
+            self.imageviewer(xbmc.getInfoLabel('ListItem.Icon'))
         elif self.params.get('info') in TRAKT_HISTORYLISTS:
             self.list_trakthistory()
         elif self.params.get('info') == 'trakt_upnext':
