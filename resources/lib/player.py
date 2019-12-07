@@ -26,23 +26,51 @@ def string_format_map(fmt, d):
 
 
 def update_players():
+    from io import BytesIO
+    import os
+    import shutil
     import zipfile
     
     _players_url = _addon.getSetting('players_url')
     _player_path = 'special://profile/addon_data/plugin.video.themoviedb.helper/players'
     _extract_to = xbmc.translatePath(_player_path)
+    _temp_zip = os.path.join(_extract_to, 'temp.zip')
     
-    with open(_player_path + '/temp.zip', 'w') as zip:
-        response = utils.open_url(_players_url)
+    response = utils.open_url(_players_url)
+    
+    if response:
+        clear = xbmcgui.Dialog().yesno(_addon.getAddonInfo('name'), 'Would you like to clear existing players first?')
+    
+        if clear:
+            for filename in os.listdir(_extract_to):
+                file_path = os.path.join(_extract_to, filename)
+                try:
+                    if os.path.isfile(file_path):
+                        os.unlink(file_path)
+                    elif os.path.isdir(file_path):
+                        shutil.rmtree(file_path)
+                except:
+                    pass
+    
+        with zipfile.ZipFile(BytesIO(response.content)) as player_zip:
+            for item in [x for x in player_zip.namelist() if x.endswith('.json')]:
+                filename = os.path.basename(item)
+                if not filename:
+                    continue
+                    
+                file = player_zip.open(item)
+                target = open(os.path.join(_extract_to, filename), 'w')
+                
+                with file, target:
+                    shutil.copyfileobj(file, target)
         
-        if response:
-            zip.write(response.content)
-    
-    _player_zip = zipfile.ZipFile(zip,  'r')
-    
-    for item in _player_zip.infolist():
-        xbmc.log('{0}'.format(item.filename), level=xbmc.LOGNOTICE)
-
+        try:
+            os.remove(_temp_zip)
+        except:
+            pass
+    else:
+        xbmcgui.Dialog().ok(_addon.getAddonInfo('name'), 'The provided player URL is either invalid or inaccesible.')
+        
 
 class Player(Plugin):
     def __init__(self, itemtype, tmdb_id, season=None, episode=None):
@@ -170,7 +198,7 @@ class Player(Plugin):
             self.itemlist.append(xbmcgui.ListItem(u'Search {0}'.format(self.players.get(i, {}).get('name', ''))))
             action = string_format_map(self.players.get(i, {}).get('search_episode', ''), self.item)
             self.actions.append(u'{0}{1}{2}'.format(prefix, action, suffix))
-
+            
     def playfile(self, file):
         if file:
             xbmc.executebuiltin(u'PlayMedia({0})'.format(file))
