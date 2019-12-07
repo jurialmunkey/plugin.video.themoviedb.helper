@@ -2,7 +2,7 @@ import xbmc
 import xbmcgui
 from resources.lib.plugin import Plugin
 import resources.lib.utils as utils
-_setmain = {'label', 'icon', 'poster', 'thumb', 'fanart', 'cast', 'tmdb_id', 'imdb_id'}
+_setmain = {'label', 'icon', 'poster', 'thumb', 'fanart', 'tmdb_id', 'imdb_id'}
 _setinfo = {
     'title', 'originaltitle', 'tvshowtitle', 'plot', 'rating', 'votes', 'premiered', 'year', 'imdbnumber', 'tagline',
     'status', 'episode', 'season', 'genre', 'duration', 'set', 'studio', 'country', 'MPAA', 'director', 'writer'}
@@ -163,8 +163,20 @@ class ServiceMonitor(Plugin):
             except Exception as exc:
                 'k: {0} e: {1}'.format(k, exc)
 
+    def set_list_properties(self, items, key, prop):
+        if not isinstance(items, list):
+            return
+        try:
+            joinlist = [i.get(key) for i in items if i.get(key)]
+            joinlist = ' / '.join(joinlist)
+            self.properties.add(prop)
+            self.set_property(prop, joinlist)
+        except Exception as exc:
+            utils.kodi_log(exc, 1)
+
     def set_properties(self, item):
         self.set_iter_properties(item, _setmain)
+        self.set_list_properties(item.get('cast', []), 'name', 'cast')
         self.set_iter_properties(item.get('infolabels', {}), _setinfo)
         self.set_iter_properties(item.get('infoproperties', {}), _setprop)
         self.set_indx_properties(item.get('infoproperties', {}))
