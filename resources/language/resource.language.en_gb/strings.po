@@ -357,3 +357,18 @@ msgstr ""
 msgctxt "#32013"
 msgid "Display Trakt list management options in TMDb details list"
 msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32014"
+msgid "Player Function"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32015"
+msgid "Players URL"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32016"
+msgid "Update Players from URL"
+msgstr ""
