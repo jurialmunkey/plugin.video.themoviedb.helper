@@ -52,7 +52,7 @@ class OMDb(RequestAPI):
         infoproperties['imdb_votes'] = item.get('imdbVotes', None)
         infoproperties['rottentomatoes_rating'] = item.get('tomatoMeter', None)
         infoproperties['rottentomatoes_image'] = item.get('tomatoImage', None)
-        infoproperties['rottentomatoes_reviewtotal'] = '{:0,.0f}'.format(utils.try_parse_int(item.get('tomatoReviews'))) if item.get('tomatoReviews') else None
+        infoproperties['rottentomatoes_reviewstotal'] = '{:0,.0f}'.format(utils.try_parse_int(item.get('tomatoReviews'))) if item.get('tomatoReviews') else None
         infoproperties['rottentomatoes_reviewsfresh'] = '{:0,.0f}'.format(utils.try_parse_int(item.get('tomatoFresh'))) if item.get('tomatoFresh') else None
         infoproperties['rottentomatoes_reviewsrotten'] = '{:0,.0f}'.format(utils.try_parse_int(item.get('tomatoRotten'))) if item.get('tomatoRotten') else None
         infoproperties['rottentomatoes_consensus'] = item.get('tomatoConsensus', None)
