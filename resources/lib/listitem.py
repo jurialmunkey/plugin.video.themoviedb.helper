@@ -27,7 +27,8 @@ class ListItem:
         self.infolabels = infolabels or {}  # ListItem.Foobar
         self.infoproperties = infoproperties or {}  # ListItem.Property(Foobar)
         self.infoart = {'thumb': self.thumb, 'icon': self.icon, 'poster': self.poster, 'fanart': self.fanart}
-        self.infolabels['dbid'] = dbid
+        if dbid:
+            self.infolabels['dbid'] = dbid
 
     def get_url(self, **kwargs):
         url = kwargs.pop('url', 'plugin://plugin.video.themoviedb.helper/?')
