@@ -167,7 +167,7 @@ class ServiceMonitor(Plugin):
         if not isinstance(items, list):
             return
         try:
-            joinlist = [i.get(key) for i in items if i.get(key)]
+            joinlist = [i.get(key) for i in items[:10] if i.get(key)]
             joinlist = ' / '.join(joinlist)
             self.properties.add(prop)
             self.set_property(prop, joinlist)
