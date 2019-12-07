@@ -200,3 +200,87 @@ def make_kwparams(params):
     return del_dict_keys(tempparams, ['info', 'type', 'tmdb_id', 'filter_key', 'filter_value',
                                       'with_separator', 'with_id', 'season', 'episode', 'prop_id',
                                       'exclude_key', 'exclude_value'])
+                                      
+
+def get_keyboard(default="", heading="", hidden=False):
+    keyboard = xbmc.Keyboard(default, heading, hidden)
+    keyboard.doModal()
+    if keyboard.isConfirmed():
+        return keyboard.getText()
+    return default
+                                      
+                                      
+def _is_url(url):
+    try:  # Python 3
+        from urllib.parse import urlparse
+    except ImportError:  # Python 2
+        from urlparse import urlparse
+
+    try:
+        result = urlparse(url)
+        return all([result.scheme, result.netloc])
+    except ValueError:
+        return False
+        
+
+def _check_url(url, cred):
+    import requests
+
+    if _is_url(url):
+        try:
+            response = requests.head(url, allow_redirects=True, auth=cred)
+            
+            if response.status_code < 300:
+                xbmc.log("URL check passed for {0}: Status code [{1}]".format(url, response.status_code), level=xbmc.LOGDEBUG)
+                return True
+            elif response.status_code < 400:
+                xbmc.log("URL check redirected from {0} to {1}: Status code [{2}]".format(url, response.headers['Location'], response.status_code), level=xbmc.LOGDEBUG)
+                return _check_url(response.headers['Location'])
+            elif response.status_code == 401:
+                xbmc.log("URL requires authentication for {0}: Status code [{1}]".format(url, response.status_code), level=xbmc.LOGDEBUG)
+                return 'auth'
+            else:
+                xbmc.log("URL check failed for {0}: Status code [{1}]".format(url, response.status_code), level=xbmc.LOGDEBUG)
+                return False
+        except Exception as e:
+            xbmc.log("URL check error for {0}: [{1}]".format(url, e), level=xbmc.LOGDEBUG)
+            return False
+    else:
+        xbmc.log("URL is not of a valid schema: {0}".format(url), level=xbmc.LOGDEBUG)
+        return False
+        
+
+def open_url(url, stream=False, check=False, cred=None, count=0):
+    import requests
+
+    if not url:
+        return False
+
+    count = 0
+    
+    valid = _check_url(url, cred)
+
+    if not valid:
+        return False
+    else:
+        if check:
+            return True if valid else False
+            
+        if valid == 'auth' and not cred:
+            cred = (get_keyboard(heading='Username'), get_keyboard(heading='Password'))
+            
+        response = requests.get(url, timeout=10.000, stream=stream, auth=cred)
+
+        if response.status_code == 401:
+            retry = xbmcgui.Dialog().yesno(_addon.getAddonInfo('name'), 'Either the username or password were invalid. Would you like to try again?', yeslabel='Retry', nolabel='Cancel')
+            
+            if retry and count < 3:
+                count += 1
+                cred = (get_keyboard(heading='Username'), get_keyboard(heading='Password'))
+                
+                response = open_url(url, stream, check, cred, count)
+            else:
+                xbmcgui.Dialog().ok(_addon.getAddonInfo('name'), 'Authentication Failed.')
+                return False
+        
+        return response
