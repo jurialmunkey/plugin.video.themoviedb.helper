@@ -8,6 +8,7 @@ import xbmcgui
 import xbmcaddon
 import resources.lib.utils as utils
 from resources.lib.globals import LANGUAGES, APPEND_TO_RESPONSE
+from resources.lib import player
 from resources.lib.tmdb import TMDb
 from resources.lib.traktapi import traktAPI
 _homewindow = xbmcgui.Window(10000)
@@ -117,8 +118,8 @@ class Script:
                         self.reset_props()
             elif self.params.get('reset_path'):
                 self.reset_props()
-            elif self.params.('update_players'):
-                xbmc.log('players updated', level=xbmc.LOGNOTICE)
+            elif self.params.get('update_players'):
+                player.update_players()
             self.call_window()
 
 
