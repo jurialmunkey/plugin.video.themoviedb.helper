@@ -5,7 +5,7 @@ import resources.lib.utils as utils
 _setmain = {'label', 'icon', 'poster', 'thumb', 'fanart', 'tmdb_id', 'imdb_id'}
 _setinfo = {
     'title', 'originaltitle', 'tvshowtitle', 'plot', 'rating', 'votes', 'premiered', 'year', 'imdbnumber', 'tagline',
-    'status', 'episode', 'season', 'genre', 'duration', 'set', 'studio', 'country', 'MPAA', 'director', 'writer'}
+    'status', 'episode', 'season', 'genre', 'set', 'studio', 'country', 'MPAA', 'director', 'writer'}
 _setprop = {
     'tvdb_id', 'biography', 'birthday', 'age', 'deathday', 'character', 'department', 'job', 'known_for', 'role',
     'born', 'creator', 'aliases', 'budget', 'revenue', 'set.tmdb_id', 'set.name', 'set.poster', 'set.fanart',
@@ -174,8 +174,22 @@ class ServiceMonitor(Plugin):
         except Exception as exc:
             utils.kodi_log(exc, 1)
 
+    def set_time_properties(self, duration):
+        try:
+            minutes = duration // 60 % 60
+            hours = duration // 60 // 60
+            totalmin = duration // 60
+            self.set_property('Duration', totalmin)
+            self.set_property('Duration_H', hours)
+            self.set_property('Duration_M', minutes)
+            self.set_property('Duration_HHMM', '{0:02d}:{1:02d}'.format(hours, minutes))
+            self.properties.update(['Duration', 'Duration_H', 'Duration_M', 'Duration_HHMM'])
+        except Exception as exc:
+            utils.kodi_log(exc, 1)
+
     def set_properties(self, item):
         self.set_iter_properties(item, _setmain)
+        self.set_time_properties(item.get('infolabels', {}).get('duration', 0))
         self.set_list_properties(item.get('cast', []), 'name', 'cast')
         self.set_iter_properties(item.get('infolabels', {}), _setinfo)
         self.set_iter_properties(item.get('infoproperties', {}), _setprop)
