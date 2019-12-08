@@ -8,7 +8,7 @@ from resources.lib.traktapi import traktAPI
 from resources.lib.listitem import ListItem
 from resources.lib.player import Player
 from resources.lib.plugin import Plugin
-from resources.lib.globals import BASEDIR_MAIN, BASEDIR_TMDB, BASEDIR_LISTS, TMDB_LISTS, DETAILED_CATEGORIES, TRAKT_LISTS, TRAKT_LISTLISTS, TRAKT_HISTORYLISTS, TRAKT_MANAGEMENT, TRAKT_CALENDAR
+from resources.lib.globals import BASEDIR_MAIN, BASEDIR_PATH, DETAILED_CATEGORIES, TMDB_LISTS, TRAKT_LISTS, TRAKT_CALENDAR
 try:
     from urllib.parse import parse_qsl  # Py3
 except ImportError:
@@ -21,11 +21,13 @@ class Container(Plugin):
         self.handle = int(sys.argv[1])
         self.paramstring = sys.argv[2][1:] if sys.version_info.major == 3 else sys.argv[2][1:].decode("utf-8")
         self.params = dict(parse_qsl(self.paramstring))
-        self.dbtype = None
-        self.nexttype = None
-        self.url_info = None
+        self.item_tmdbtype = None
+        self.item_dbtype = None
+        self.url = {}
+        self.details_tv = None
         self.plugincategory = 'TMDb Helper'
         self.containercontent = ''
+        self.mixed_containercontent = ''
         self.library = 'video'
         self.updatelisting = False
         self.trakt_management = self.addon.getSettingBool('trakt_management')
@@ -78,273 +80,124 @@ class Container(Plugin):
                 lookup_person,
                 separator=self.params.get('with_separator'))
 
-    def url_encoding(self, item):
-        url = item.get('url') or {'info': self.url_info}
-        url['type'] = item.get('mixed_type') or self.nexttype or self.params.get('type')
-
-        if item.get('tmdb_id'):
-            url['tmdb_id'] = item.get('tmdb_id')
-
-        if self.params.get('info') in ['seasons', 'episodes'] or url.get('type') in ['season', 'episode']:
-            url['tmdb_id'] = self.params.get('tmdb_id') or item.get('tmdb_id')
-            url['season'] = item.get('infolabels', {}).get('season')
-            url['episode'] = item.get('infolabels', {}).get('episode')
-
-        if url.get('info') == 'details' and self.trakt_management:
-            url['manage'] = 'True'
-
-        item['url'] = url
-        return item
-
-    def get_details(self, item):
-        if self.params.get('info') in ['seasons', 'episodes'] or item['url'].get('type') in ['season', 'episode']:
-            if not self.details_tv:
-                self.details_tv = self.tmdb.get_detailed_item('tv', self.params.get('tmdb_id'), season=self.params.get('season', None))
-
-            if self.details_tv:
-                item = utils.del_empty_keys(item)
-                item['infolabels'] = utils.del_empty_keys(item.get('infolabels', {}))
-                item['infoproperties'] = utils.del_empty_keys(item.get('infoproperties', {}))
-                item['infolabels'] = utils.merge_two_dicts(self.details_tv.get('infolabels', {}), item.get('infolabels', {}))
-                item['infoproperties'] = utils.merge_two_dicts(self.details_tv.get('infoproperties', {}), item.get('infoproperties', {}))
-                item = utils.merge_two_dicts(self.details_tv, item)
-
-        if item['url'].get('type') in ['movie', 'tv']:
-            detailed_item = self.tmdb.get_detailed_item(item['url'].get('type'), item['url'].get('tmdb_id'), cache_only=True)
-            if detailed_item:
-                detailed_item['infolabels'] = utils.merge_two_dicts(item.get('infolabels', {}), detailed_item.get('infolabels', {}))
-                detailed_item['infoproperties'] = utils.merge_two_dicts(item.get('infoproperties', {}), detailed_item.get('infoproperties', {}))
-                detailed_item['label'] = item.get('label')
-                item = utils.merge_two_dicts(item, detailed_item)
-
-        if item['url'].get('type') == 'movie':
-            item = self.get_omdb_ratings(item, cache_only=True)
-
-        return item
-
-    def list_items(self, items=None, nexttype=None, url_info=None, dbtype=None, plugincategory=None, containercontent=None):
+    def get_sortedlist(self, items):
         if not items:
             return
 
-        added, dbiditems, tmdbitems = [], [], []
+        added, dbiditems, tmdbitems, lastitems, firstitems = [], [], [], [], []
         mixed_movies, mixed_tvshows = 0, 0
-        self.nexttype = nexttype or self.nexttype
-        self.url_info = url_info or self.url_info
-        self.dbtype = dbtype or self.dbtype
-        self.plugincategory = plugincategory or self.plugincategory
-        self.containercontent = containercontent or self.containercontent
+
+        if self.item_tmdbtype in ['season', 'episode']:
+            if not self.details_tv:
+                self.details_tv = self.tmdb.get_detailed_item('tv', self.params.get('tmdb_id'), season=self.params.get('season', None))
+
+        if self.item_tmdbtype == 'season' and self.details_tv:
+            item_upnext = self.details_tv.copy()
+            item_upnext['infolabels'] = self.details_tv.get('infolabels', {}).copy()
+            item_upnext['infolabels']['season'] = 'Up Next'
+            item_upnext['label'] = 'Up Next'
+            item_upnext['url'] = {'info': 'trakt_upnext', 'type': 'tv'}
+            items.append(item_upnext)
 
         for i in items:
-            name = u'{0}{1}'.format(i.get('label'), i.get('poster'))
-            if name in added:  # Don't add duplicate items
-                continue
-            if i.get('infolabels', {}).get('season', 1) == 0:  # Ignore Specials
+            name = u'{0}{1}'.format(i.get('label', ''), i.get('imdb_id') or i.get('tmdb_id') or i.get('poster'))
+            if name in added:
                 continue
             added.append(name)
-
-            i = self.url_encoding(i)
-            i = self.get_details(i)
-            i = self.get_db_info(i, 'dbid')
 
             if i.get('mixed_type', '') == 'tv':
                 mixed_tvshows += 1
             elif i.get('mixed_type', '') == 'movie':
                 mixed_movies += 1
 
-            if i.get('dbid'):
-                dbiditems.append(i)
-            else:
-                tmdbitems.append(i)
-        items = dbiditems + tmdbitems
+            if self.details_tv:
+                snum = i.get('infolabels', {}).get('season')
+                i['infolabels'] = utils.merge_two_dicts(self.details_tv.get('infolabels', {}), utils.del_empty_keys(i.get('infolabels', {})))
+                i['infoproperties'] = utils.merge_two_dicts(self.details_tv.get('infoproperties', {}), utils.del_empty_keys(i.get('infoproperties', {})))
+                i = utils.merge_two_dicts(self.details_tv, utils.del_empty_keys(i))
+                i['infolabels']['season'] = snum
 
-        if self.params.get('type') == 'both':
-            self.containercontent = 'tvshows' if mixed_tvshows > mixed_movies else 'movies'
+            i['dbid'] = self.get_db_info(i, info='dbid', tmdbtype=self.item_tmdbtype)
 
-        self.start_container()
-        for i in items:
-            url = i.pop('url', {})
-            i['is_folder'] = False if url.get('info') in ['play', 'textviewer', 'imageviewer'] else True
-            self.dbtype = utils.type_convert(i.pop('mixed_type', ''), 'dbtype') or self.dbtype
-            i.setdefault('infolabels', {})['mediatype'] = self.dbtype if self.dbtype and not i.get('label') == 'Next Page' else ''
             listitem = ListItem(library=self.library, **i)
+
+            if self.item_tmdbtype == 'season' and i.get('infolabels', {}).get('season') == 0:
+                lastitems.append(listitem)
+            elif self.item_tmdbtype == 'season' and i.get('infolabels', {}).get('season') == 'Up Next':
+                firstitems.append(listitem)
+            elif i.get('dbid'):
+                dbiditems.append(listitem)
+            else:
+                tmdbitems.append(listitem)
+
+        if mixed_movies or mixed_tvshows:
+            self.mixed_containercontent = 'tvshows' if mixed_tvshows > mixed_movies else 'movies'
+
+        return firstitems + dbiditems + tmdbitems + lastitems
+
+    def list_trakthistory(self):
+        traktapi = traktAPI()
+        userslug = traktapi.get_usernameslug()
+        if self.params.get('info') == 'trakt_inprogress':
+            trakt_items = traktapi.get_inprogress(userslug, limit=10)
+        if self.params.get('info') == 'trakt_mostwatched':
+            trakt_items = traktapi.get_mostwatched(userslug, utils.type_convert(self.params.get('type'), 'trakt'), limit=10)
+        if self.params.get('info') == 'trakt_history':
+            trakt_items = traktapi.get_recentlywatched(userslug, utils.type_convert(self.params.get('type'), 'trakt'), limit=10)
+        items = [self.tmdb.get_detailed_item(self.params.get('type'), i[1]) for i in trakt_items]
+        self.item_tmdbtype = self.params.get('type')
+        self.list_items(
+            items=items, url={
+                'info': 'trakt_upnext' if self.params.get('info') == 'trakt_inprogress' else 'details',
+                'type': self.params.get('type')})
+
+    def list_traktupnext(self):
+        traktapi = traktAPI()
+        imdb_id = self.tmdb.get_item_externalid(itemtype='tv', tmdb_id=self.params.get('tmdb_id'), external_id='imdb_id')
+        trakt_items = traktapi.get_upnext(imdb_id)
+        items = [self.tmdb.get_detailed_item(
+            itemtype='tv', tmdb_id=self.params.get('tmdb_id'), season=i[0], episode=i[1]) for i in trakt_items]
+        self.item_tmdbtype = 'episode'
+        self.list_items(items=items[:10], url_tmdb_id=self.params.get('tmdb_id'), url={'info': 'details', 'type': 'episode'})
+
+    def list_traktcalendar_episodes(self):
+        date = datetime.datetime.today() + datetime.timedelta(days=utils.try_parse_int(self.params.get('startdate')))
+        days = utils.try_parse_int(self.params.get('days'))
+        response = traktAPI().get_calendar('shows', True, start_date=date.strftime('%Y-%m-%d'), days=days)
+        items = []
+        for i in response:
+            item = self.tmdb.get_detailed_item(
+                itemtype='tv',
+                tmdb_id=i.get('show', {}).get('ids', {}).get('tmdb'),
+                season=i.get('episode', {}).get('season'),
+                episode=i.get('episode', {}).get('number'))
+            item['tmdb_id'] = i.get('show', {}).get('ids', {}).get('tmdb')
+            items.append(item)
+        self.item_tmdbtype = 'episode'
+        self.list_items(items=items[:10], url={'info': 'details', 'type': 'episode'})
+
+    def list_traktcalendar(self):
+        if self.params.get('type') == 'episode':
+            self.list_traktcalendar_episodes()
+            return
+        icon = '{0}/resources/trakt.png'.format(self.addonpath)
+        today = datetime.datetime.today()
+        self.start_container()
+        for i in TRAKT_CALENDAR:
+            date = today + datetime.timedelta(days=i[1])
+            label = i[0].format(date.strftime('%A'))
+            listitem = ListItem(label=label, icon=icon)
+            url = {'info': 'trakt_calendar', 'type': 'episode', 'startdate': i[1], 'days': 1}
             listitem.create_listitem(self.handle, **url)
         self.finish_container()
 
-        if self.params.get('prop_id'):
-            window_prop = '{0}{1}.NumDBIDItems'.format(self.prefixname, self.params.get('prop_id'))
-            xbmcgui.Window(10000).setProperty(window_prop, str(len(dbiditems)))
-            window_prop = '{0}{1}.NumTMDBItems'.format(self.prefixname, self.params.get('prop_id'))
-            xbmcgui.Window(10000).setProperty(window_prop, str(len(tmdbitems)))
-
-    def list_tmdb(self, *args, **kwargs):
-        if self.params.get('type'):
-            cat = TMDB_LISTS.get(self.params.get('info'), {})
-            url_ext = dict(parse_qsl(cat.get('url_ext', '').format(**self.params)))
-            path = cat.get('path', '').format(**self.params)
-            kwparams = utils.make_kwparams(self.params)
-            kwparams = utils.merge_two_dicts(kwparams, kwargs)
-            kwparams = utils.merge_two_dicts(kwparams, url_ext)
-            kwparams.setdefault('key', cat.get('key', 'results'))
-            items = self.tmdb.get_list(path, *args, **kwparams)
-            itemtype = cat.get('itemtype') or self.params.get('type') or ''
-            self.list_items(
-                items=items, url_info=cat.get('url_info', 'details'), nexttype=cat.get('nexttype'),
-                dbtype=utils.type_convert(itemtype, 'dbtype'),
-                plugincategory=cat.get('name', '').format(utils.type_convert(itemtype, 'plural')),
-                containercontent=utils.type_convert(itemtype, 'container'))
-
-    def list_play(self):
-        Player(
-            itemtype=self.params.get('type'), tmdb_id=self.params.get('tmdb_id'),
-            season=self.params.get('season'), episode=self.params.get('episode'))
-
-    def list_traktmanagement(self):
-        if not self.params.get('trakt') in TRAKT_MANAGEMENT:
-            return
-        with utils.busy_dialog():
-            _traktapi = traktAPI()
-            slug_type = 'show' if self.params.get('type') == 'episode' else utils.type_convert(self.params.get('type'), 'trakt')
-            trakt_type = utils.type_convert(self.params.get('type'), 'trakt')
-            slug = _traktapi.get_traktslug(slug_type, 'tmdb', self.params.get('tmdb_id'))
-            item = _traktapi.get_details(slug_type, slug, season=self.params.get('season', None), episode=self.params.get('episode', None))
-            items = {trakt_type + 's': [item]}
-            if self.params.get('trakt') == 'watchlist_add':
-                _traktapi.sync_watchlist(slug_type, mode='add', items=items)
-            if self.params.get('trakt') == 'history_add':
-                _traktapi.sync_history(slug_type, mode='add', items=items)
-            if self.params.get('trakt') == 'collection_add':
-                _traktapi.sync_collection(slug_type, mode='add', items=items)
-            if self.params.get('trakt') == 'watchlist_remove':
-                _traktapi.sync_watchlist(slug_type, mode='remove', items=items)
-            if self.params.get('trakt') == 'history_remove':
-                _traktapi.sync_history(slug_type, mode='remove', items=items)
-            if self.params.get('trakt') == 'collection_remove':
-                _traktapi.sync_collection(slug_type, mode='remove', items=items)
-            # TODO: Check status response and add dialog
-        self.updatelisting = True
-
-    def list_details(self):
-        """ Gets detailed information about item and creates folder shortcuts to relevant list categories """
-        if not self.params.get('tmdb_id'):
-            self.start_container()
-            self.finish_container()
-            return
-        d_args = ('tv', self.params.get('tmdb_id'), self.params.get('season'), self.params.get('episode')) if self.params.get('type') == 'episode' else (self.params.get('type'), self.params.get('tmdb_id'))
-        if self.params.get('refresh') == 'True':
-            with utils.busy_dialog():
-                self.tmdb.get_detailed_item(*d_args, cache_refresh=True)
-            xbmc.executebuiltin('Container.Refresh')
-            xbmcgui.Dialog().ok('Cache Refresh', 'Cached details were refreshed')
-            self.updatelisting = True
-
-        details = self.tmdb.get_detailed_item(*d_args)
-        if not details:
-            return
-
-        # URL FOR TOP ITEM
-        if self.params.get('type') == 'movie':
-            details = self.get_omdb_ratings(details, cache_only=False)
-            details['url'] = {'info': 'play'}
-        if self.params.get('type') == 'tv':
-            details['url'] = {'info': 'seasons'}
-        if self.params.get('type') == 'episode':
-            details['url'] = {'info': 'play'}
-
-        # CREATE CATEGORIES
-        items = [details]
-        for i in DETAILED_CATEGORIES:
-            cat = TMDB_LISTS.get(i) or TRAKT_LISTS.get(i) or {}
-            if self.params.get('type') in cat.get('types'):
-                item = details.copy()
-                item['label'] = cat.get('name')
-                item['url'] = cat.get('url', {}).copy()
-                item['url']['info'] = i
-                if cat.get('url_key') and item.get(cat.get('url_key')):
-                    item['url'][cat.get('url_key')] = item.get(cat.get('url_key'))
-                items.append(item)
-
-        # ADD TRAKT ITEMS
-        if self.addon.getSetting('trakt_token') and self.params.get('manage') == 'True':
-            _traktapi = traktAPI()
-            trakt_collection = _traktapi.sync_collection(utils.type_convert(self.params.get('type'), 'trakt'), 'tmdb')
-            if trakt_collection:
-                boolean = 'remove' if details.get('tmdb_id') in trakt_collection else 'add'
-                item_collection = details.copy()
-                item_collection['label'] = 'Remove from Trakt Collection' if boolean == 'remove' else 'Add to Trakt Collection'
-                item_collection['url'] = {'info': 'details', 'trakt': 'collection_{0}'.format(boolean)}
-                items.append(item_collection)
-            trakt_watchlist = _traktapi.sync_watchlist(utils.type_convert(self.params.get('type'), 'trakt'), 'tmdb')
-            if trakt_watchlist:
-                boolean = 'remove' if details.get('tmdb_id') in trakt_watchlist else 'add'
-                item_watchlist = details.copy()
-                item_watchlist['label'] = 'Remove from Trakt Watchlist' if boolean == 'remove' else 'Add to Trakt Watchlist'
-                item_watchlist['url'] = {'info': 'details', 'trakt': 'watchlist_{0}'.format(boolean)}
-                items.append(item_watchlist)
-            trakt_history = _traktapi.sync_history(utils.type_convert(self.params.get('type'), 'trakt'), 'tmdb')
-            if trakt_history:
-                boolean = 'remove' if details.get('tmdb_id') in trakt_history else 'add'
-                item_history = details.copy()
-                item_history['label'] = 'Remove from Trakt Watched History' if boolean == 'remove' else 'Add to Trakt Watched History'
-                item_history['url'] = {'info': 'details', 'trakt': 'history_{0}'.format(boolean)}
-                items.append(item_history)
-
-        # ADD A REFRESH CACHE ITEM
-        refresh = details.copy()
-        refresh['label'] = 'Refresh Cache'
-        refresh['url'] = {'info': 'details', 'refresh': 'True'}
-        items.append(refresh)
-
-        # BUILD CONTAINER
-        self.list_items(
-            items=items, dbtype=utils.type_convert(self.params.get('type'), 'dbtype'),
-            plugincategory=details.get('label'), containercontent=utils.type_convert(self.params.get('type'), 'container'))
-
-    def list_search(self):
-        if not self.params.get('query'):
-            self.params['query'] = xbmcgui.Dialog().input('Enter Search Query', type=xbmcgui.INPUT_ALPHANUM)
-        if self.params.get('query'):
-            self.list_tmdb(query=self.params.get('query'), year=self.params.get('year'))
-
-    def list_credits(self, key='cast'):
-        self.list_items(
-            items=self.tmdb.get_credits_list(self.params.get('type'), self.params.get('tmdb_id'), key),
-            url_info='details', nexttype='person', plugincategory=key.capitalize(), containercontent='actors')
-
-    def list_getid(self):
-        self.params['tmdb_id'] = self.get_tmdb_id(**self.params)
-
-    def list_trakthistory(self):
-        _traktapi = traktAPI()
-        userslug = _traktapi.get_usernameslug()
-        if self.params.get('info') == 'trakt_inprogress':
-            trakt_items = _traktapi.get_inprogress(userslug, limit=10)
-        if self.params.get('info') == 'trakt_mostwatched':
-            trakt_items = _traktapi.get_mostwatched(userslug, utils.type_convert(self.params.get('type'), 'trakt'), limit=10)
-        if self.params.get('info') == 'trakt_history':
-            trakt_items = _traktapi.get_recentlywatched(userslug, utils.type_convert(self.params.get('type'), 'trakt'), limit=10)
-        items = [self.tmdb.get_detailed_item(self.params.get('type'), i[1]) for i in trakt_items]
-        self.list_items(
-            items=items, nexttype=self.params.get('type'), dbtype=utils.type_convert(self.nexttype, 'dbtype'),
-            url_info='trakt_upnext' if self.params.get('info') == 'trakt_inprogress' else 'details',
-            plugincategory=utils.type_convert(self.nexttype, 'plural'),
-            containercontent=utils.type_convert(self.nexttype, 'container'))
-
-    def list_traktupnext(self):
-        _traktapi = traktAPI()
-        imdb_id = self.tmdb.get_item_externalid(itemtype='tv', tmdb_id=self.params.get('tmdb_id'), external_id='imdb_id')
-        trakt_items = _traktapi.get_upnext(imdb_id)
-        items = [self.tmdb.get_detailed_item(itemtype='tv', tmdb_id=self.params.get('tmdb_id'), season=i[0], episode=i[1]) for i in trakt_items]
-        self.list_items(
-            items=items[:10], nexttype='episode', url_info='details', dbtype=utils.type_convert('episode', 'dbtype'),
-            plugincategory=utils.type_convert('episode', 'plural'), containercontent=utils.type_convert('episode', 'container'))
-
     def list_traktuserlists(self):
-        _traktapi = traktAPI()
+        traktapi = traktAPI()
         path = TRAKT_LISTS.get(self.params.get('info'), {}).get('path', '')
         if '{user_slug}' in path:
-            self.params['user_slug'] = self.params.get('user_slug') or _traktapi.get_usernameslug()
+            self.params['user_slug'] = self.params.get('user_slug') or traktapi.get_usernameslug()
         path = path.format(**self.params)
-        items = _traktapi.get_listlist(path, 'list')
+        items = traktapi.get_listlist(path, 'list')
         icon = '{0}/resources/trakt.png'.format(self.addonpath)
         self.start_container()
         for i in items:
@@ -360,84 +213,202 @@ class Container(Plugin):
         self.finish_container()
 
     def list_trakt(self):
-        items = []
-        if self.params.get('type'):
-            _traktapi = traktAPI()
-            cat = TRAKT_LISTS.get(self.params.get('info', ''), {})
-            if '{user_slug}' in cat.get('path', ''):
-                self.params['user_slug'] = self.params.get('user_slug') or _traktapi.get_usernameslug()
-            params = self.params.copy()
-            itemtype = 'movie' if self.params.get('type') == 'both' else self.params.get('type', '')
-            keylist = ['movie', 'show'] if self.params.get('type') == 'both' else [utils.type_convert(itemtype, 'trakt')]
-            params['type'] = utils.type_convert(itemtype, 'trakt') + 's'
-            path = cat.get('path', '').format(**params)
-            trakt_items = _traktapi.get_itemlist(path, keylist=keylist, page=self.params.get('page', 1), limit=10, req_auth=cat.get('req_auth'))
-            for i in trakt_items[:11]:
-                item = None
-                if i[0] == 'imdb':
-                    item = self.tmdb.get_externalid_item(i[2], i[1], 'imdb_id')
-                if i[0] == 'tvdb':
-                    item = self.tmdb.get_externalid_item(i[2], i[1], 'tvdb_id')
-                if i[0] == 'next_page':
-                    item = {'label': 'Next Page', 'url': self.params.copy()}
-                    item['url']['page'] = i[1]
-                if item:
-                    item['mixed_type'] = i[2]
-                    items.append(item)
-        self.list_items(
-            items=items, nexttype=itemtype, dbtype=utils.type_convert(itemtype, 'dbtype'),
-            url_info=cat.get('url_info', 'details'),
-            plugincategory=cat.get('name', '').format(utils.type_convert(itemtype, 'plural')),
-            containercontent=utils.type_convert(itemtype, 'container') or 'movies')
-
-    def list_traktcalendar_episodes(self):
-        date = datetime.datetime.today() + datetime.timedelta(days=utils.try_parse_int(self.params.get('startdate')))
-        days = utils.try_parse_int(self.params.get('days'))
-        response = traktAPI().get_calendar('shows', True, start_date=date.strftime('%Y-%m-%d'), days=days)
-        items = []
-        for i in response:
-            item = self.tmdb.get_detailed_item(
-                itemtype='tv',
-                tmdb_id=i.get('show', {}).get('ids', {}).get('tmdb'),
-                season=i.get('episode', {}).get('season'),
-                episode=i.get('episode', {}).get('number'))
-            item['tmdb_id'] = i.get('show', {}).get('ids', {}).get('tmdb')
-            items.append(item)
-        self.list_items(
-            items=items[:10], nexttype='episode', url_info='details', dbtype=utils.type_convert('episode', 'dbtype'),
-            plugincategory=utils.type_convert('episode', 'plural'), containercontent=utils.type_convert('episode', 'container'))
-
-    def list_traktcalendar(self):
-        """
-        Creates a listitem for each type of each category in BASEDIR
-        """
-        if self.params.get('type') == 'episode':
-            self.list_traktcalendar_episodes()
+        if not self.params.get('type'):
             return
-        icon = '{0}/resources/trakt.png'.format(self.addonpath)
-        today = datetime.datetime.today()
+        traktapi = traktAPI()
+        cat = TRAKT_LISTS.get(self.params.get('info', ''), {})
+
+        if '{user_slug}' in cat.get('path', ''):
+            self.params['user_slug'] = self.params.get('user_slug') or traktapi.get_usernameslug()
+
+        self.item_tmdbtype = 'movie' if self.params.get('type') == 'both' else self.params.get('type', '')
+
+        params = self.params.copy()
+        params['type'] = utils.type_convert(self.item_tmdbtype, 'trakt') + 's'
+        response = traktapi.get_itemlist(
+            cat.get('path', '').format(**params), page=self.params.get('page', 1), limit=10, req_auth=cat.get('req_auth'),
+            keylist=['movie', 'show'] if self.params.get('type') == 'both' else [utils.type_convert(self.item_tmdbtype, 'trakt')])
+
+        items = []
+        for i in response[:11]:
+            item = None
+            if i[0] == 'imdb':
+                item = self.tmdb.get_externalid_item(i[2], i[1], 'imdb_id')
+            if i[0] == 'tvdb':
+                item = self.tmdb.get_externalid_item(i[2], i[1], 'tvdb_id')
+            if i[0] == 'next_page':
+                item = {'label': 'Next Page', 'url': self.params.copy()}
+                item['url']['page'] = i[1]
+            if item:
+                item['mixed_type'] = i[2]
+                items.append(item)
+        self.list_items(items=items, url={'info': cat.get('url_info', 'details')})
+
+    def list_traktmanagement(self):
+        if not self.params.get('trakt') in ['collection_add', 'collection_remove', 'watchlist_add', 'watchlist_remove', 'history_add', 'history_remove']:
+            return
+        with utils.busy_dialog():
+            traktapi = traktAPI()
+            slug_type = 'show' if self.params.get('type') == 'episode' else utils.type_convert(self.params.get('type'), 'trakt')
+            trakt_type = utils.type_convert(self.params.get('type'), 'trakt')
+            slug = traktapi.get_traktslug(slug_type, 'tmdb', self.params.get('tmdb_id'))
+            item = traktapi.get_details(slug_type, slug, season=self.params.get('season', None), episode=self.params.get('episode', None))
+            items = {trakt_type + 's': [item]}
+            if self.params.get('trakt') == 'watchlist_add':
+                traktapi.sync_watchlist(slug_type, mode='add', items=items)
+            if self.params.get('trakt') == 'history_add':
+                traktapi.sync_history(slug_type, mode='add', items=items)
+            if self.params.get('trakt') == 'collection_add':
+                traktapi.sync_collection(slug_type, mode='add', items=items)
+            if self.params.get('trakt') == 'watchlist_remove':
+                traktapi.sync_watchlist(slug_type, mode='remove', items=items)
+            if self.params.get('trakt') == 'history_remove':
+                traktapi.sync_history(slug_type, mode='remove', items=items)
+            if self.params.get('trakt') == 'collection_remove':
+                traktapi.sync_collection(slug_type, mode='remove', items=items)
+            # TODO: Check status response and add dialog
+        self.updatelisting = True
+
+    def list_getid(self):
+        self.params['tmdb_id'] = self.get_tmdb_id(**self.params)
+
+    def list_play(self):
+        Player(
+            itemtype=self.params.get('type'), tmdb_id=self.params.get('tmdb_id'),
+            season=self.params.get('season'), episode=self.params.get('episode'))
+
+    def list_search(self):
+        if not self.params.get('query'):
+            self.params['query'] = xbmcgui.Dialog().input('Enter Search Query', type=xbmcgui.INPUT_ALPHANUM)
+        if self.params.get('query'):
+            self.list_tmdb(query=self.params.get('query'), year=self.params.get('year'))
+
+    def list_items(self, items=None, url=None, url_tmdb_id=None):
+        items = self.get_sortedlist(items)
+        if not items:
+            return
+        self.item_dbtype = utils.type_convert(self.item_tmdbtype, 'dbtype')
+        self.containercontent = self.mixed_containercontent or utils.type_convert(self.item_tmdbtype, 'container')
         self.start_container()
-        for i in TRAKT_CALENDAR:
-            date = today + datetime.timedelta(days=i[1])
-            label = i[0].format(date.strftime('%A'))
-            listitem = ListItem(label=label, icon=icon, thumb=icon, poster=icon)
-            url = {'info': 'trakt_calendar', 'type': 'episode', 'startdate': i[1], 'days': 1}
-            listitem.create_listitem(self.handle, **url)
+        for i in items:
+            i.get_details(self.item_dbtype)
+            i.get_url(url, url_tmdb_id)
+            i.create_listitem(self.handle, **i.url)
         self.finish_container()
 
+    def list_tmdb(self, *args, **kwargs):
+        if not self.params.get('type'):
+            return
+        cat = TMDB_LISTS.get(self.params.get('info'), {})
+        kwparams = utils.merge_two_dicts(utils.make_kwparams(self.params), kwargs)
+        kwparams = utils.merge_two_dicts(kwparams, dict(parse_qsl(cat.get('url_ext', '').format(**self.params))))
+        kwparams.setdefault('key', cat.get('key'))
+        path = cat.get('path', '').format(**self.params)
+        self.item_tmdbtype = cat.get('item_tmdbtype', '').format(**self.params)
+        self.list_items(
+            items=self.tmdb.get_list(path, *args, **kwparams),
+            url_tmdb_id=cat.get('url_tmdb_id', '').format(**self.params),
+            url={
+                'info': cat.get('url_info', ''),
+                'type': cat.get('url_type', '').format(**self.params) or self.item_tmdbtype})
+
+    def list_credits(self, key='cast'):
+        self.item_tmdbtype = 'person'
+        self.plugincategory = key.capitalize()
+        self.list_items(
+            items=self.tmdb.get_credits_list(self.params.get('type'), self.params.get('tmdb_id'), key),
+            url={'info': 'details', 'type': 'person'})
+
+    def list_details(self):
+        # Build empty container if no tmdb_id
+        if not self.params.get('tmdb_id'):
+            self.start_container()
+            self.finish_container()
+            return
+
+        # Set detailed item arguments
+        if self.params.get('type') == 'episode':
+            d_args = ('tv', self.params.get('tmdb_id'), self.params.get('season'), self.params.get('episode'))
+        else:
+            d_args = (self.params.get('type'), self.params.get('tmdb_id'))
+
+        # Check if we want to refresh cache with &amp;refresh=True
+        if self.params.get('refresh') == 'True':
+            with utils.busy_dialog():
+                self.tmdb.get_detailed_item(*d_args, cache_refresh=True)
+            xbmc.executebuiltin('Container.Refresh')
+            xbmcgui.Dialog().ok('Cache Refresh', 'Cached details were refreshed')
+            self.updatelisting = True
+
+        # Get details of item and return if nothing found
+        details = self.tmdb.get_detailed_item(*d_args)
+        if not details:
+            return
+
+        # Set the url for the top item
+        if self.params.get('type') == 'movie':
+            details = self.get_omdb_ratings(details, cache_only=False)
+            details['url'] = {'info': 'play', 'type': self.params.get('type')}
+        elif self.params.get('type') == 'tv':
+            details['url'] = {'info': 'seasons', 'type': self.params.get('type')}
+        elif self.params.get('type') == 'episode':
+            details['url'] = {'info': 'play', 'type': self.params.get('type')}
+        else:
+            details['url'] = {'info': 'details', 'type': self.params.get('type')}
+
+        # Build categories
+        items = [details]
+        for i in DETAILED_CATEGORIES:
+            if self.params.get('type') in i.get('types'):
+                item = details.copy()
+                item['label'] = i.get('name')
+                item['url'] = {'info': i.get('info'), 'type': self.params.get('type')}
+                if i.get('url_key') and item.get(i.get('url_key')):
+                    item['url'][i.get('url_key')] = item.get(i.get('url_key'))
+                items.append(item)
+
+        # Add trakt management items if &amp;manage=True
+        if self.addon.getSetting('trakt_token') and self.params.get('manage') == 'True':
+            traktapi = traktAPI()
+            trakt_collection = traktapi.sync_collection(utils.type_convert(self.params.get('type'), 'trakt'), 'tmdb')
+            if trakt_collection:
+                boolean = 'remove' if details.get('tmdb_id') in trakt_collection else 'add'
+                item_collection = details.copy()
+                item_collection['label'] = 'Remove from Trakt Collection' if boolean == 'remove' else 'Add to Trakt Collection'
+                item_collection['url'] = {'info': 'details', 'trakt': 'collection_{0}'.format(boolean), 'type': self.params.get('type')}
+                items.append(item_collection)
+            trakt_watchlist = traktapi.sync_watchlist(utils.type_convert(self.params.get('type'), 'trakt'), 'tmdb')
+            if trakt_watchlist:
+                boolean = 'remove' if details.get('tmdb_id') in trakt_watchlist else 'add'
+                item_watchlist = details.copy()
+                item_watchlist['label'] = 'Remove from Trakt Watchlist' if boolean == 'remove' else 'Add to Trakt Watchlist'
+                item_watchlist['url'] = {'info': 'details', 'trakt': 'watchlist_{0}'.format(boolean), 'type': self.params.get('type')}
+                items.append(item_watchlist)
+            trakt_history = traktapi.sync_history(utils.type_convert(self.params.get('type'), 'trakt'), 'tmdb')
+            if trakt_history:
+                boolean = 'remove' if details.get('tmdb_id') in trakt_history else 'add'
+                item_history = details.copy()
+                item_history['label'] = 'Remove from Trakt Watched History' if boolean == 'remove' else 'Add to Trakt Watched History'
+                item_history['url'] = {'info': 'details', 'trakt': 'history_{0}'.format(boolean), 'type': self.params.get('type')}
+                items.append(item_history)
+
+        # Add refresh cache item
+        refresh = details.copy()
+        refresh['label'] = 'Refresh Cache'
+        refresh['url'] = {'info': 'details', 'refresh': 'True', 'type': self.params.get('type')}
+        items.append(refresh)
+
+        # Build our container
+        self.item_tmdbtype = self.params.get('type')
+        self.list_items(items=items, url_tmdb_id=self.params.get('tmdb_id'))
+
     def list_basedir(self):
-        """
-        Creates a listitem for each type of each category in BASEDIR
-        """
-        basedir = BASEDIR_LISTS.get(self.params.get('info'), {}).get('path') or BASEDIR_MAIN
+        basedir = BASEDIR_PATH.get(self.params.get('info', '')) or BASEDIR_MAIN
         self.start_container()
         for i in basedir:
-            cat = BASEDIR_LISTS.get(i) or TMDB_LISTS.get(i) or TRAKT_LISTS.get(i) or {}
-            icon = cat.get('icon', '').format(self.addonpath)
-            for t in cat.get('types', []):
-                label = cat.get('name', '').format(utils.type_convert(t, 'plural'))
-                listitem = ListItem(label=label, icon=icon, thumb=icon, poster=icon)
-                url = {'info': i, 'type': t} if t else {'info': i}
+            for t in i.get('types'):
+                url = {'info': i.get('info'), 'type': t} if t else {'info': i.get('info')}
+                listitem = ListItem(label=i.get('name').format(utils.type_convert(t, 'plural')), icon=i.get('icon', '').format(self.addonpath))
                 listitem.create_listitem(self.handle, **url)
         self.finish_container()
 
@@ -452,42 +423,35 @@ class Container(Plugin):
         if self.params.get('info') == 'play':
             self.list_getid()
             self.list_play()
-        elif self.params.get('info') == 'discover':
-            self.translate_discover()
-            self.list_tmdb()
-        elif self.params.get('info') in ['details', 'refresh']:
-            self.list_getid()
-            self.list_traktmanagement()
-            self.list_details()
-        elif self.params.get('info') == 'search':
-            self.list_search()
-        elif self.params.get('info') == 'cast':
-            self.list_getid()
-            self.list_credits('cast')
-        elif self.params.get('info') == 'crew':
-            self.list_getid()
-            self.list_credits('crew')
         elif self.params.get('info') == 'textviewer':
             self.textviewer(xbmc.getInfoLabel('ListItem.Label'), xbmc.getInfoLabel('ListItem.Plot'))
         elif self.params.get('info') == 'imageviewer':
             self.imageviewer(xbmc.getInfoLabel('ListItem.Icon'))
-        elif self.params.get('info') in TRAKT_HISTORYLISTS:
+        elif self.params.get('info') in ['details', 'refresh']:
+            self.list_getid()
+            self.list_traktmanagement()
+            self.list_details()
+        elif self.params.get('info') == 'discover':
+            self.translate_discover()
+            self.list_tmdb()
+        elif self.params.get('info') in ['cast', 'crew']:
+            self.list_getid()
+            self.list_credits(self.params.get('info'))
+        elif self.params.get('info') == 'search':
+            self.list_search()
+        elif self.params.get('info') in TMDB_LISTS:
+            self.list_getid()
+            self.list_tmdb()
+        elif self.params.get('info') in ['trakt_inprogress', 'trakt_history', 'trakt_mostwatched']:
             self.list_trakthistory()
         elif self.params.get('info') == 'trakt_upnext':
             self.list_getid()
             self.list_traktupnext()
         elif self.params.get('info') == 'trakt_calendar':
             self.list_traktcalendar()
-        elif self.params.get('info') in TRAKT_LISTLISTS:
+        elif self.params.get('info') in ['trakt_mylists', 'trakt_trendinglists', 'trakt_popularlists', 'trakt_likedlists', 'trakt_inlists']:
             self.list_traktuserlists()
         elif self.params.get('info') in TRAKT_LISTS:
             self.list_trakt()
-        elif self.params.get('info') in BASEDIR_TMDB:
-            self.list_tmdb()
-        elif self.params.get('info') in TMDB_LISTS and TMDB_LISTS.get(self.params.get('info'), {}).get('path'):
-            self.list_getid()
-            self.list_tmdb()
-        elif self.params.get('info') in BASEDIR_LISTS:
-            self.list_basedir()
-        elif not self.params:
+        elif not self.params or self.params.get('info') in BASEDIR_PATH:
             self.list_basedir()

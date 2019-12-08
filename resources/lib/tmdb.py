@@ -289,6 +289,7 @@ class TMDb(RequestAPI):
         cache_name = '{0}.Season{1}'.format(cache_name, season) if season else cache_name
         cache_name = '{0}.Episode{1}'.format(cache_name, episode) if season and episode else cache_name
         itemdict = self.get_cache(cache_name) if not cache_refresh else None
+        # itemdict = None
         if not itemdict and not cache_only:
             request = self.get_request_lc(itemtype, tmdb_id, language=self.req_language, append_to_response=self.req_append, cache_refresh=cache_refresh)
             if itemtype == 'tv':
@@ -297,9 +298,12 @@ class TMDb(RequestAPI):
                 extra_request = self.get_request_lc('tv', tmdb_id, 'season', season, 'episode', episode, language=self.req_language, append_to_response=self.req_append, cache_refresh=cache_refresh)
             elif season:
                 extra_request = self.get_request_lc('tv', tmdb_id, 'season', season, language=self.req_language, append_to_response=self.req_append, cache_refresh=cache_refresh)
+            if season and episode and not extra_request:
+                extra_request = {'episode_number': episode, 'season_number': season}
             if extra_request:
                 request = utils.merge_two_dicts(request, extra_request)
             itemdict = self.set_cache(self.get_niceitem(request), cache_name, self.cache_long) if request else {}
+            # itemdict = self.get_niceitem(request) if request else {}
         return itemdict
 
     def get_externalid_item(self, itemtype, external_id, external_source):

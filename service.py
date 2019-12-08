@@ -1,3 +1,4 @@
+import sys
 import xbmc
 import xbmcgui
 from resources.lib.plugin import Plugin
@@ -60,57 +61,60 @@ class ServiceMonitor(Plugin):
                 self.kodimonitor.waitForAbort(1)
 
     def get_listitem(self):
-        self.get_container()
-
-        dbtype = self.get_dbtype()
-        imdb_id = self.get_infolabel('IMDBNumber')
-        query = self.get_infolabel('TvShowTitle') or self.get_infolabel('Title') or self.get_infolabel('Label')
-        year = self.get_infolabel('year')
-        season = self.get_infolabel('Season') if dbtype == 'episodes' else ''
-        episode = self.get_infolabel('Episode') if dbtype == 'episodes' else ''
-
-        self.cur_item = '{0}.{1}.{2}.{3}.{4}'.format(imdb_id, query, year, season, episode)
-        if self.cur_item == self.pre_item:
-            return  # Don't get details if we already did last time!
-        self.pre_item = self.cur_item
-
-        self.cur_folder = '{0}{1}{2}'.format(
-            self.container, xbmc.getInfoLabel(self.get_dbtype()),
-            xbmc.getInfoLabel('{0}NumItems'.format(self.container)))
-        if self.cur_folder != self.pre_folder:
-            self.clear_properties()  # Clear props if the folder changed
-            self.pre_folder = self.cur_folder
-
-        if dbtype in ['tvshows', 'seasons', 'episodes']:
-            tmdbtype = 'tv'
-        elif dbtype in ['movies']:
-            tmdbtype = 'movie'
-        elif dbtype in ['sets']:
-            tmdbtype = 'collection'
-        elif dbtype in ['actors', 'directors']:
-            tmdbtype = 'person'
-        else:
-            return
-
-        self.home.setProperty('TMDbHelper.IsUpdating', 'True')
-
         try:
+            self.get_container()
+
+            dbtype = self.get_dbtype()
+            imdb_id = self.get_infolabel('IMDBNumber')
+            query = self.get_infolabel('TvShowTitle') or self.get_infolabel('Title') or self.get_infolabel('Label')
+            year = self.get_infolabel('year')
+            season = self.get_infolabel('Season') if dbtype == 'episodes' else ''
+            episode = self.get_infolabel('Episode') if dbtype == 'episodes' else ''
+            if not sys.version_info.major == 3:
+                query = query.decode('utf-8')
+
+            self.cur_item = u'{0}.{1}.{2}.{3}.{4}'.format(imdb_id, query, year, season, episode)
+            if self.cur_item == self.pre_item:
+                return  # Don't get details if we already did last time!
+            self.pre_item = self.cur_item
+
+            self.cur_folder = '{0}{1}{2}'.format(
+                self.container, xbmc.getInfoLabel(self.get_dbtype()),
+                xbmc.getInfoLabel('{0}NumItems'.format(self.container)))
+            if self.cur_folder != self.pre_folder:
+                self.clear_properties()  # Clear props if the folder changed
+                self.pre_folder = self.cur_folder
+
+            if dbtype in ['tvshows', 'seasons', 'episodes']:
+                tmdbtype = 'tv'
+            elif dbtype in ['movies']:
+                tmdbtype = 'movie'
+            elif dbtype in ['sets']:
+                tmdbtype = 'collection'
+            elif dbtype in ['actors', 'directors']:
+                tmdbtype = 'person'
+            else:
+                return
+
+            self.home.setProperty('TMDbHelper.IsUpdating', 'True')
+
             details = self.tmdb.get_detailed_item(tmdbtype, self.get_tmdb_id(tmdbtype, imdb_id, query, year), season=season, episode=episode)
             details = self.get_omdb_ratings(details)
+
+            if not details:
+                self.clear_properties()
+                return
+
+            self.set_properties(details)
+
         except Exception as exc:
-            utils.kodi_log(exc, 1)
-
-        if not details:
-            self.clear_properties()
-            return
-
-        self.set_properties(details)
+            utils.kodi_log('Func: get_listitem\n{0}'.format(exc), 1)
 
     def clear_property(self, key):
         try:
             self.home.clearProperty('TMDbHelper.ListItem.{0}'.format(key))
         except Exception as exc:
-            utils.kodi_log('{0}{1}'.format(key, exc), 1)
+            utils.kodi_log('Func: clear_property\n{0}{1}'.format(key, exc), 1)
 
     def clear_properties(self):
         for k in self.properties:
@@ -157,7 +161,7 @@ class ServiceMonitor(Plugin):
                     try:
                         v = ' / '.join(v)
                     except Exception as exc:
-                        utils.kodi_log(exc, 1)
+                        utils.kodi_log('Func: set_iter_properties - list\n{0}'.format(exc), 1)
                 self.properties.add(k)
                 self.set_property(k, v)
             except Exception as exc:
@@ -172,7 +176,7 @@ class ServiceMonitor(Plugin):
             self.properties.add(prop)
             self.set_property(prop, joinlist)
         except Exception as exc:
-            utils.kodi_log(exc, 1)
+            utils.kodi_log('Func: set_list_properties\n{0}'.format(exc), 1)
 
     def set_time_properties(self, duration):
         try:
@@ -185,7 +189,7 @@ class ServiceMonitor(Plugin):
             self.set_property('Duration_HHMM', '{0:02d}:{1:02d}'.format(hours, minutes))
             self.properties.update(['Duration', 'Duration_H', 'Duration_M', 'Duration_HHMM'])
         except Exception as exc:
-            utils.kodi_log(exc, 1)
+            'Func: set_time_properties\n{0}'.format(exc)
 
     def set_properties(self, item):
         self.set_iter_properties(item, _setmain)
@@ -217,7 +221,7 @@ class ServiceMonitor(Plugin):
                 return self.tmdb.get_tmdb_id(itemtype=itemtype, imdb_id=imdb_id)
             return self.tmdb.get_tmdb_id(itemtype=itemtype, query=query, year=year)
         except Exception as exc:
-            utils.kodi_log(exc, 1)
+            utils.kodi_log('Func: get_tmdb_id\n{0}'.format(exc), 1)
             return
 
 

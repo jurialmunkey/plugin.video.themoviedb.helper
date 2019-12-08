@@ -116,6 +116,7 @@ class RequestAPI(object):
         cache_refresh = kwargs.pop('cache_refresh', False)
         is_json = kwargs.pop('is_json', True)
         request_url = self.get_request_url(*args, **kwargs)
+        # utils.kodi_log(request_url, 1)
         return self.use_cache(
             self.get_api_request, request_url, is_json=is_json, cache_refresh=cache_refresh,
             cache_days=cache_days, cache_name=cache_name, cache_only=cache_only)

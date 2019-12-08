@@ -50,20 +50,19 @@ class Plugin(object):
                 item['infoproperties'] = utils.merge_two_dicts(item.get('infoproperties', {}), ratings_awards)
         return item
 
-    def get_db_info(self, item, info=None, dbtype=None):
+    def get_db_info(self, item, info=None, tmdbtype=None):
         kodidatabase = None
-        if 'movie' in [item.get('url', {}).get('type'), dbtype]:
+        if tmdbtype == 'movie':
             self.kodimoviedb = self.kodimoviedb or KodiLibrary(dbtype='movie')
             kodidatabase = self.kodimoviedb
-        if 'tv' in [item.get('url', {}).get('type'), dbtype]:
+        if tmdbtype == 'tv':
             self.koditvshowdb = self.koditvshowdb or KodiLibrary(dbtype='tvshow')
             kodidatabase = self.koditvshowdb
         if kodidatabase and info:
-            item[info] = kodidatabase.get_info(
+            return kodidatabase.get_info(
                 info=info,
                 dbid=item.get('dbid'),
                 imdb_id=item.get('infolabels', {}).get('imdbnumber'),
                 originaltitle=item.get('infolabels', {}).get('originaltitle'),
                 title=item.get('infolabels', {}).get('title'),
                 year=item.get('infolabels', {}).get('year'))
-        return item
