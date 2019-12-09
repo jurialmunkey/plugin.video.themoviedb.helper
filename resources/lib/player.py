@@ -46,9 +46,9 @@ def update_players():
                     if os.path.isfile(file_path):
                         os.unlink(file_path)
                     elif os.path.isdir(file_path):
-                        shutil.rmtree(file_path)
-                except:
-                    pass
+                        utils.recursive_delete_dir(file_path)
+                except Exception as e:
+                    utils.kodi_log('Could not delete file {0}: {1}'.format(file_path, str(e)))
     
         with zipfile.ZipFile(BytesIO(response.content)) as player_zip:
             for item in [x for x in player_zip.namelist() if x.endswith('.json')]:
@@ -56,16 +56,14 @@ def update_players():
                 if not filename:
                     continue
                     
-                file = player_zip.open(item)
-                target = open(os.path.join(_extract_to, filename), 'w')
-                
-                with file, target:
-                    shutil.copyfileobj(file, target)
+                _file = player_zip.open(item)
+                with open(os.path.join(_extract_to, filename), 'w') as target:
+                    target.write(_file.read())
         
         try:
             os.remove(_temp_zip)
-        except:
-            pass
+        except Exception as e:
+            utils.kodi_log('Could not delete package {0}: {1}'.format(_temp_zip, str(e)))
     else:
         xbmcgui.Dialog().ok(_addon.getAddonInfo('name'), 'The provided player URL is either invalid or inaccesible.')
         

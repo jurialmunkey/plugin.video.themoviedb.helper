@@ -202,12 +202,20 @@ def make_kwparams(params):
                                       'exclude_key', 'exclude_value'])
                                       
 
-def get_keyboard(default="", heading="", hidden=False):
-    keyboard = xbmc.Keyboard(default, heading, hidden)
-    keyboard.doModal()
-    if keyboard.isConfirmed():
-        return keyboard.getText()
-    return default
+def recursive_delete_dir(fullpath):
+    '''helper to recursively delete a directory'''
+    success = True
+    if not isinstance(fullpath, unicode):
+        fullpath = fullpath.decode("utf-8")
+    dirs, files = xbmcvfs.listdir(fullpath)
+    for file in files:
+        file = file.decode("utf-8")
+        success = xbmcvfs.delete(os.path.join(fullpath, file))
+    for directory in dirs:
+        directory = directory.decode("utf-8")
+        success = recursive_delete_dir(os.path.join(fullpath, directory))
+    success = xbmcvfs.rmdir(fullpath)
+    return success
                                       
                                       
 def _is_url(url):
