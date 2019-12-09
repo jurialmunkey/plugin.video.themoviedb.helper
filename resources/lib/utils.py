@@ -267,7 +267,7 @@ def open_url(url, stream=False, check=False, cred=None, count=0):
             return True if valid else False
             
         if valid == 'auth' and not cred:
-            cred = (get_keyboard(heading='Username'), get_keyboard(heading='Password'))
+            cred = (xbmcgui.Dialog().input(heading='Username') or '', xbmcgui.Dialog().input(heading='Password', option=xbmcgui.ALPHANUM_HIDE_INPUT) or '')
             
         response = requests.get(url, timeout=10.000, stream=stream, auth=cred)
 
@@ -276,7 +276,7 @@ def open_url(url, stream=False, check=False, cred=None, count=0):
             
             if retry and count < 3:
                 count += 1
-                cred = (get_keyboard(heading='Username'), get_keyboard(heading='Password'))
+                cred = (xbmcgui.Dialog().input(heading='Username') or '', xbmcgui.Dialog().input(heading='Password', option=xbmcgui.ALPHANUM_HIDE_INPUT) or '')
                 
                 response = open_url(url, stream, check, cred, count)
             else:
