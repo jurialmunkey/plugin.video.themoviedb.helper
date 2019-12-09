@@ -4,6 +4,9 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 import datetime
+from io import BytesIO
+import os
+import zipfile
 import resources.lib.utils as utils
 from json import loads
 from string import Formatter
@@ -26,11 +29,6 @@ def string_format_map(fmt, d):
 
 
 def update_players():
-    from io import BytesIO
-    import os
-    import shutil
-    import zipfile
-    
     _players_url = _addon.getSetting('players_url')
     _player_path = 'special://profile/addon_data/plugin.video.themoviedb.helper/players'
     _extract_to = xbmc.translatePath(_player_path)
