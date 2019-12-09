@@ -299,12 +299,15 @@ class Container(Plugin):
     def list_tmdb(self, *args, **kwargs):
         if not self.params.get('type'):
             return
+
+        # Construct request
         cat = TMDB_LISTS.get(self.params.get('info'), {})
         kwparams = utils.merge_two_dicts(utils.make_kwparams(self.params), kwargs)
         kwparams = utils.merge_two_dicts(kwparams, dict(parse_qsl(cat.get('url_ext', '').format(**self.params))))
         kwparams.setdefault('key', cat.get('key'))
         path = cat.get('path', '').format(**self.params)
         self.item_tmdbtype = cat.get('item_tmdbtype', '').format(**self.params)
+
         self.list_items(
             items=self.tmdb.get_list(path, *args, **kwparams),
             url_tmdb_id=cat.get('url_tmdb_id', '').format(**self.params),
