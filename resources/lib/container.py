@@ -92,43 +92,43 @@ class Container(Plugin):
                 self.details_tv = self.tmdb.get_detailed_item('tv', self.params.get('tmdb_id'), season=self.params.get('season', None))
 
         if self.item_tmdbtype == 'season' and self.details_tv:
-            item_upnext = self.details_tv.copy()
-            item_upnext['infolabels'] = self.details_tv.get('infolabels', {}).copy()
-            item_upnext['infolabels']['season'] = 'Up Next'
-            item_upnext['label'] = 'Up Next'
-            item_upnext['url'] = {'info': 'trakt_upnext', 'type': 'tv'}
+            item_upnext = ListItem(library=self.library, **self.details_tv)
+            item_upnext.infolabels['season'] = 'Up Next'
+            item_upnext.label = 'Up Next'
+            item_upnext.url = {'info': 'trakt_upnext', 'type': 'tv'}
             items.append(item_upnext)
 
         for i in items:
-            name = u'{0}{1}'.format(i.get('label', ''), i.get('imdb_id') or i.get('tmdb_id') or i.get('poster'))
+            name = u'{0}{1}'.format(i.label, i.imdb_id or i.tmdb_id or i.poster)
             if name in added:
                 continue
             added.append(name)
 
-            if i.get('mixed_type', '') == 'tv':
+            if i.mixed_type == 'tv':
                 mixed_tvshows += 1
-            elif i.get('mixed_type', '') == 'movie':
+            elif i.mixed_type == 'movie':
                 mixed_movies += 1
 
             if self.details_tv:
-                snum = i.get('infolabels', {}).get('season')
-                i['infolabels'] = utils.merge_two_dicts(self.details_tv.get('infolabels', {}), utils.del_empty_keys(i.get('infolabels', {})))
-                i['infoproperties'] = utils.merge_two_dicts(self.details_tv.get('infoproperties', {}), utils.del_empty_keys(i.get('infoproperties', {})))
-                i = utils.merge_two_dicts(self.details_tv, utils.del_empty_keys(i))
-                i['infolabels']['season'] = snum
+                season_num = i.infolabels.get('season')
+                i.infolabels = utils.merge_two_dicts(self.details_tv.get('infolabels', {}), utils.del_empty_keys(i.infolabels))
+                i.infoproperties = utils.merge_two_dicts(self.details_tv.get('infoproperties', {}), utils.del_empty_keys(i.infoproperties))
+                i.poster = i.poster or self.details_tv.get('poster')
+                i.fanart = i.fanart or self.details_tv.get('fanart')
+                i.infolabels['season'] = season_num
 
-            i['dbid'] = self.get_db_info(i, info='dbid', tmdbtype=self.item_tmdbtype)
+            i.dbid = self.get_db_info(
+                i, info='dbid', tmdbtype=self.item_tmdbtype, imdb_id=i.imdb_id,
+                originaltitle=i.infolabels.get('originaltitle'), title=i.infolabels.get('title'), year=i.infolabels.get('year'))
 
-            listitem = ListItem(library=self.library, **i)
-
-            if self.item_tmdbtype == 'season' and i.get('infolabels', {}).get('season') == 0:
-                lastitems.append(listitem)
-            elif self.item_tmdbtype == 'season' and i.get('infolabels', {}).get('season') == 'Up Next':
-                firstitems.append(listitem)
-            elif i.get('dbid'):
-                dbiditems.append(listitem)
+            if self.item_tmdbtype == 'season' and i.infolabels.get('season') == 0:
+                lastitems.append(i)
+            elif self.item_tmdbtype == 'season' and i.infolabels.get('season') == 'Up Next':
+                firstitems.append(i)
+            elif i.dbid:
+                dbiditems.append(i)
             else:
-                tmdbitems.append(listitem)
+                tmdbitems.append(i)
 
         if mixed_movies or mixed_tvshows:
             self.mixed_containercontent = 'tvshows' if mixed_tvshows > mixed_movies else 'movies'
@@ -144,7 +144,7 @@ class Container(Plugin):
             trakt_items = traktapi.get_mostwatched(userslug, utils.type_convert(self.params.get('type'), 'trakt'), limit=10)
         if self.params.get('info') == 'trakt_history':
             trakt_items = traktapi.get_recentlywatched(userslug, utils.type_convert(self.params.get('type'), 'trakt'), limit=10)
-        items = [self.tmdb.get_detailed_item(self.params.get('type'), i[1]) for i in trakt_items]
+        items = [ListItem(library=self.library, **self.tmdb.get_detailed_item(self.params.get('type'), i[1])) for i in trakt_items]
         self.item_tmdbtype = self.params.get('type')
         self.list_items(
             items=items, url={
@@ -155,8 +155,8 @@ class Container(Plugin):
         traktapi = traktAPI()
         imdb_id = self.tmdb.get_item_externalid(itemtype='tv', tmdb_id=self.params.get('tmdb_id'), external_id='imdb_id')
         trakt_items = traktapi.get_upnext(imdb_id)
-        items = [self.tmdb.get_detailed_item(
-            itemtype='tv', tmdb_id=self.params.get('tmdb_id'), season=i[0], episode=i[1]) for i in trakt_items]
+        items = [ListItem(library=self.library, **self.tmdb.get_detailed_item(
+            itemtype='tv', tmdb_id=self.params.get('tmdb_id'), season=i[0], episode=i[1])) for i in trakt_items]
         self.item_tmdbtype = 'episode'
         self.list_items(items=items[:10], url_tmdb_id=self.params.get('tmdb_id'), url={'info': 'details', 'type': 'episode'})
 
@@ -166,12 +166,17 @@ class Container(Plugin):
         response = traktAPI().get_calendar('shows', True, start_date=date.strftime('%Y-%m-%d'), days=days)
         items = []
         for i in response:
-            item = self.tmdb.get_detailed_item(
-                itemtype='tv',
-                tmdb_id=i.get('show', {}).get('ids', {}).get('tmdb'),
-                season=i.get('episode', {}).get('season'),
-                episode=i.get('episode', {}).get('number'))
-            item['tmdb_id'] = i.get('show', {}).get('ids', {}).get('tmdb')
+            episode = i.get('episode', {}).get('number')
+            season = i.get('episode', {}).get('season')
+            tmdb_id = i.get('show', {}).get('ids', {}).get('tmdb')
+            item = ListItem(library=self.library, **self.tmdb.get_detailed_item(
+                itemtype='tv', tmdb_id=tmdb_id, season=season, episode=episode))
+            item.tmdb_id, item.season, item.episode = tmdb_id, season, episode
+            item.infolabels['title'] = item.label = i.get('episode', {}).get('title')
+            air_date = utils.convert_timestamp(i.get('first_aired', '')) + datetime.timedelta(hours=self.utc_offset)
+            item.infolabels['premiered'] = air_date.strftime('%Y-%m-%d')
+            item.infolabels['year'] = air_date.strftime('%Y')
+            item.infoproperties['air_time'] = air_date.strftime('%I:%M %p')
             items.append(item)
         self.item_tmdbtype = 'episode'
         self.list_items(items=items[:10], url={'info': 'details', 'type': 'episode'})
@@ -181,7 +186,7 @@ class Container(Plugin):
             self.list_traktcalendar_episodes()
             return
         icon = '{0}/resources/trakt.png'.format(self.addonpath)
-        today = datetime.datetime.today()
+        today = datetime.datetime.today() + datetime.timedelta(hours=self.utc_offset)
         self.start_container()
         for i in TRAKT_CALENDAR:
             date = today + datetime.timedelta(days=i[1])
@@ -241,7 +246,7 @@ class Container(Plugin):
                 item['url']['page'] = i[1]
             if item:
                 item['mixed_type'] = i[2]
-                items.append(item)
+                items.append(ListItem(library=self.library, **item))
         self.list_items(items=items, url={'info': cat.get('url_info', 'details')})
 
     def list_traktmanagement(self):
@@ -285,13 +290,15 @@ class Container(Plugin):
 
     def list_items(self, items=None, url=None, url_tmdb_id=None):
         items = self.get_sortedlist(items)
+
         if not items:
             return
+
         self.item_dbtype = utils.type_convert(self.item_tmdbtype, 'dbtype')
         self.containercontent = self.mixed_containercontent or utils.type_convert(self.item_tmdbtype, 'container')
         self.start_container()
         for i in items:
-            i.get_details(self.item_dbtype)
+            i.get_details(self.item_dbtype, self.tmdb, self.omdb)
             i.get_url(url, url_tmdb_id)
             i.create_listitem(self.handle, **i.url)
         self.finish_container()
@@ -306,8 +313,8 @@ class Container(Plugin):
         kwparams = utils.merge_two_dicts(kwparams, dict(parse_qsl(cat.get('url_ext', '').format(**self.params))))
         kwparams.setdefault('key', cat.get('key'))
         path = cat.get('path', '').format(**self.params)
-        self.item_tmdbtype = cat.get('item_tmdbtype', '').format(**self.params)
 
+        self.item_tmdbtype = cat.get('item_tmdbtype', '').format(**self.params)
         self.list_items(
             items=self.tmdb.get_list(path, *args, **kwparams),
             url_tmdb_id=cat.get('url_tmdb_id', '').format(**self.params),
@@ -330,10 +337,9 @@ class Container(Plugin):
             return
 
         # Set detailed item arguments
-        if self.params.get('type') == 'episode':
-            d_args = ('tv', self.params.get('tmdb_id'), self.params.get('season'), self.params.get('episode'))
-        else:
-            d_args = (self.params.get('type'), self.params.get('tmdb_id'))
+        d_args = (
+            ('tv', self.params.get('tmdb_id'), self.params.get('season'), self.params.get('episode'))
+            if self.params.get('type') == 'episode' else (self.params.get('type'), self.params.get('tmdb_id')))
 
         # Check if we want to refresh cache with &amp;refresh=True
         if self.params.get('refresh') == 'True':
@@ -348,26 +354,30 @@ class Container(Plugin):
         if not details:
             return
 
-        # Set the url for the top item
+        # Merge OMDb rating details for movies
         if self.params.get('type') == 'movie':
             details = self.get_omdb_ratings(details, cache_only=False)
-            details['url'] = {'info': 'play', 'type': self.params.get('type')}
+
+        # Create first item
+        firstitem = ListItem(library=self.library, **details)
+        if self.params.get('type') == 'movie':
+            firstitem.url = {'info': 'play', 'type': self.params.get('type')}
         elif self.params.get('type') == 'tv':
-            details['url'] = {'info': 'seasons', 'type': self.params.get('type')}
+            firstitem.url = {'info': 'seasons', 'type': self.params.get('type')}
         elif self.params.get('type') == 'episode':
-            details['url'] = {'info': 'play', 'type': self.params.get('type')}
+            firstitem.url = {'info': 'play', 'type': self.params.get('type')}
         else:
-            details['url'] = {'info': 'details', 'type': self.params.get('type')}
+            firstitem.url = {'info': 'details', 'type': self.params.get('type')}
+        items = [firstitem]
 
         # Build categories
-        items = [details]
         for i in DETAILED_CATEGORIES:
             if self.params.get('type') in i.get('types'):
-                item = details.copy()
-                item['label'] = i.get('name')
-                item['url'] = {'info': i.get('info'), 'type': self.params.get('type')}
-                if i.get('url_key') and item.get(i.get('url_key')):
-                    item['url'][i.get('url_key')] = item.get(i.get('url_key'))
+                item = ListItem(library=self.library, **details)
+                item.label = i.get('name')
+                item.url = {'info': i.get('info'), 'type': self.params.get('type')}
+                if i.get('url_key') and details.get(i.get('url_key')):
+                    item.url[i.get('url_key')] = details.get(i.get('url_key'))
                 items.append(item)
 
         # Add trakt management items if &amp;manage=True
@@ -376,29 +386,29 @@ class Container(Plugin):
             trakt_collection = traktapi.sync_collection(utils.type_convert(self.params.get('type'), 'trakt'), 'tmdb')
             if trakt_collection:
                 boolean = 'remove' if details.get('tmdb_id') in trakt_collection else 'add'
-                item_collection = details.copy()
-                item_collection['label'] = 'Remove from Trakt Collection' if boolean == 'remove' else 'Add to Trakt Collection'
-                item_collection['url'] = {'info': 'details', 'trakt': 'collection_{0}'.format(boolean), 'type': self.params.get('type')}
+                item_collection = ListItem(library=self.library, **details)
+                item_collection.label = 'Remove from Trakt Collection' if boolean == 'remove' else 'Add to Trakt Collection'
+                item_collection.url = {'info': 'details', 'trakt': 'collection_{0}'.format(boolean), 'type': self.params.get('type')}
                 items.append(item_collection)
             trakt_watchlist = traktapi.sync_watchlist(utils.type_convert(self.params.get('type'), 'trakt'), 'tmdb')
             if trakt_watchlist:
                 boolean = 'remove' if details.get('tmdb_id') in trakt_watchlist else 'add'
-                item_watchlist = details.copy()
-                item_watchlist['label'] = 'Remove from Trakt Watchlist' if boolean == 'remove' else 'Add to Trakt Watchlist'
-                item_watchlist['url'] = {'info': 'details', 'trakt': 'watchlist_{0}'.format(boolean), 'type': self.params.get('type')}
+                item_watchlist = ListItem(library=self.library, **details)
+                item_watchlist.label = 'Remove from Trakt Watchlist' if boolean == 'remove' else 'Add to Trakt Watchlist'
+                item_watchlist.url = {'info': 'details', 'trakt': 'watchlist_{0}'.format(boolean), 'type': self.params.get('type')}
                 items.append(item_watchlist)
             trakt_history = traktapi.sync_history(utils.type_convert(self.params.get('type'), 'trakt'), 'tmdb')
             if trakt_history:
                 boolean = 'remove' if details.get('tmdb_id') in trakt_history else 'add'
-                item_history = details.copy()
-                item_history['label'] = 'Remove from Trakt Watched History' if boolean == 'remove' else 'Add to Trakt Watched History'
-                item_history['url'] = {'info': 'details', 'trakt': 'history_{0}'.format(boolean), 'type': self.params.get('type')}
+                item_history = ListItem(library=self.library, **details)
+                item_history.label = 'Remove from Trakt Watched History' if boolean == 'remove' else 'Add to Trakt Watched History'
+                item_history.url = {'info': 'details', 'trakt': 'history_{0}'.format(boolean), 'type': self.params.get('type')}
                 items.append(item_history)
 
         # Add refresh cache item
-        refresh = details.copy()
-        refresh['label'] = 'Refresh Cache'
-        refresh['url'] = {'info': 'details', 'refresh': 'True', 'type': self.params.get('type')}
+        refresh = ListItem(library=self.library, **details)
+        refresh.label = 'Refresh Cache'
+        refresh.url = {'info': 'details', 'refresh': 'True', 'type': self.params.get('type')}
         items.append(refresh)
 
         # Build our container

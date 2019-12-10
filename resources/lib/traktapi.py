@@ -258,7 +258,7 @@ class traktAPI(RequestAPI):
         """ Checks if itemtype.listtype has been updated since last check """
         if not self.authorize():
             return
-        cache_name = '{0}.trakt.last_activities'.format(self.addon_name)
+        cache_name = '{0}.trakt.last_activities'.format(self.cache_name)
         if not self.prev_activities:
             self.prev_activities = self.get_cache(cache_name)
         if not self.last_activities:

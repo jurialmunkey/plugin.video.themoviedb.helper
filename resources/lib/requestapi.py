@@ -17,6 +17,7 @@ class RequestAPI(object):
         self.req_wait_time = req_wait_time or 0
         self.cache_long = 14 if not cache_long or cache_long < 14 else cache_long
         self.cache_short = 1 if not cache_short or cache_short < 1 else cache_short
+        self.cache_name = 'plugin.video.themoviedb.helper'
         self.addon_name = 'plugin.video.themoviedb.helper'
         self.addon = xbmcaddon.Addon(self.addon_name)
         self.dialog_noapikey_header = '{0} {1} {2}'.format(self.addon.getLocalizedString(32007), self.req_api_name, self.addon.getLocalizedString(32008))
@@ -40,7 +41,7 @@ class RequestAPI(object):
         Returns the cached item if it exists otherwise does the function
         """
         cache_days = kwargs.pop('cache_days', 14)
-        cache_name = kwargs.pop('cache_name', self.addon_name)
+        cache_name = kwargs.pop('cache_name', self.cache_name)
         cache_only = kwargs.pop('cache_only', False)
         cache_refresh = kwargs.pop('cache_refresh', False)
         for arg in args:
@@ -67,7 +68,7 @@ class RequestAPI(object):
         Make the request to the API by passing a url request string
         """
         if self.req_wait_time:
-            utils.rate_limiter(addon_name=self.addon_name, wait_time=self.req_wait_time, api_name=self.req_api_name)
+            utils.rate_limiter(addon_name=self.cache_name, wait_time=self.req_wait_time, api_name=self.req_api_name)
         request = requests.post(request, data=postdata, headers=headers) if postdata else requests.get(request, headers=headers)  # Request our data
         if not request.status_code == requests.codes.ok:  # Error Checking
             if request.status_code == 401:
@@ -111,7 +112,7 @@ class RequestAPI(object):
     def get_request(self, *args, **kwargs):
         """ Get API request from cache (or online if no cached version) """
         cache_days = kwargs.pop('cache_days', self.cache_long)
-        cache_name = kwargs.pop('cache_name', self.addon_name)
+        cache_name = kwargs.pop('cache_name', self.cache_name)
         cache_only = kwargs.pop('cache_only', False)
         cache_refresh = kwargs.pop('cache_refresh', False)
         is_json = kwargs.pop('is_json', True)

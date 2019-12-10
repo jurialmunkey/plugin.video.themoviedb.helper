@@ -1,5 +1,6 @@
 import resources.lib.utils as utils
 from resources.lib.requestapi import RequestAPI
+from resources.lib.listitem import ListItem
 _genreids = {
     "Action": 28, "Adventure": 12, "Animation": 16, "Comedy": 35, "Crime": 80, "Documentary": 99, "Drama": 18,
     "Family": 10751, "Fantasy": 14, "History": 36, "Horror": 27, "Kids": 10762, "Music": 10402, "Mystery": 9648,
@@ -26,6 +27,7 @@ class TMDb(RequestAPI):
         self.filter_value = filter_value if filter_value else None
         self.exclude_key = exclude_key if exclude_key else None
         self.exclude_value = exclude_value if exclude_value else None
+        self.library = 'video'
 
     def get_title(self, item):
         if item.get('title'):
@@ -233,28 +235,22 @@ class TMDb(RequestAPI):
         poster = self.get_season_poster(item) or icon
         thumb = self.get_season_thumb(item) or ''
         fanart = self.get_fanart(item)
+        cast = self.get_cast(item)
         infolabels = self.get_infolabels(item)
         infoproperties = self.get_infoproperties(item)
-        cast = self.get_cast(item)
         infolabels = utils.merge_two_dicts(infolabels, self.get_director_writer(item))
         infoproperties = utils.merge_two_dicts(infoproperties, self.get_cast_properties(cast))
         infoproperties = utils.merge_two_dicts(infoproperties, self.get_crew_properties(item))
-        imdb_id = item.get('imdb_id')
-        tmdb_id = item.get('id')
-        return {'label': label, 'icon': icon, 'poster': poster, 'thumb': thumb, 'fanart': fanart,
-                'cast': cast, 'infolabels': infolabels, 'infoproperties': infoproperties,
-                'tmdb_id': tmdb_id, 'imdb_id': imdb_id}
+        return {
+            'label': label, 'icon': icon, 'poster': poster, 'thumb': thumb, 'fanart': fanart,
+            'cast': cast, 'infolabels': infolabels, 'infoproperties': infoproperties,
+            'tmdb_id': item.get('id'), 'imdb_id': item.get('imdb_id')}
 
-    def get_nicelist(self, itemlist):
-        items = []
-        for item in itemlist:
-            if utils.filtered_item(item, self.filter_key, self.filter_value):
-                continue
-            if utils.filtered_item(item, self.exclude_key, self.exclude_value, True):
-                continue
-            itemdict = self.get_niceitem(item)
-            items.append(itemdict)
-        return items
+    def get_nicelist(self, items):
+        return [
+            ListItem(library=self.library, **self.get_niceitem(i)) for i in items if
+            not utils.filtered_item(i, self.filter_key, self.filter_value) and
+            not utils.filtered_item(i, self.exclude_key, self.exclude_value, True)]
 
     def get_translated_list(self, items, itemtype=None, separator=None):
         """
@@ -285,11 +281,10 @@ class TMDb(RequestAPI):
 
     def get_detailed_item(self, itemtype, tmdb_id, season=None, episode=None, cache_only=False, cache_refresh=False):
         extra_request = None
-        cache_name = '{0}.{1}.{2}'.format(self.addon_name, itemtype, tmdb_id)
+        cache_name = '{0}.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
         cache_name = '{0}.Season{1}'.format(cache_name, season) if season else cache_name
         cache_name = '{0}.Episode{1}'.format(cache_name, episode) if season and episode else cache_name
         itemdict = self.get_cache(cache_name) if not cache_refresh else None
-        # itemdict = None
         if not itemdict and not cache_only:
             request = self.get_request_lc(itemtype, tmdb_id, language=self.req_language, append_to_response=self.req_append, cache_refresh=cache_refresh)
             if itemtype == 'tv':
@@ -303,14 +298,13 @@ class TMDb(RequestAPI):
             if extra_request:
                 request = utils.merge_two_dicts(request, extra_request)
             itemdict = self.set_cache(self.get_niceitem(request), cache_name, self.cache_long) if request else {}
-            # itemdict = self.get_niceitem(request) if request else {}
         return itemdict
 
     def get_externalid_item(self, itemtype, external_id, external_source):
         """
         Lookup an item using an external id such as IMDb or TVDb
         """
-        cache_name = '{0}.find.{1}.{2}'.format(self.addon_name, external_source, external_id)
+        cache_name = '{0}.find.{1}.{2}'.format(self.cache_name, external_source, external_id)
         itemdict = self.get_cache(cache_name)
         if not itemdict:
             request = self.get_request_lc('find', external_id, language=self.req_language, append_to_response=self.req_append, external_source=external_source)

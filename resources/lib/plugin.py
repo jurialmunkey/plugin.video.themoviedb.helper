@@ -1,6 +1,7 @@
 import xbmc
 import xbmcgui
 import xbmcaddon
+import time
 import resources.lib.utils as utils
 from resources.lib.globals import LANGUAGES, APPEND_TO_RESPONSE, TMDB_LISTS
 from resources.lib.kodilibrary import KodiLibrary
@@ -16,6 +17,8 @@ class Plugin(object):
         self.kodimoviedb = None
         self.koditvshowdb = None
         self.details_tv = None
+        self.utc_offset = -time.timezone // 3600
+        self.utc_offset += 1 if time.localtime().tm_isdst > 0 else 0
 
         cache_long = self.addon.getSettingInt('cache_details_days')
         cache_short = self.addon.getSettingInt('cache_list_days')
@@ -50,7 +53,7 @@ class Plugin(object):
                 item['infoproperties'] = utils.merge_two_dicts(item.get('infoproperties', {}), ratings_awards)
         return item
 
-    def get_db_info(self, item, info=None, tmdbtype=None):
+    def get_db_info(self, item, info=None, tmdbtype=None, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None):
         kodidatabase = None
         if tmdbtype == 'movie':
             self.kodimoviedb = self.kodimoviedb or KodiLibrary(dbtype='movie')
@@ -59,10 +62,4 @@ class Plugin(object):
             self.koditvshowdb = self.koditvshowdb or KodiLibrary(dbtype='tvshow')
             kodidatabase = self.koditvshowdb
         if kodidatabase and info:
-            return kodidatabase.get_info(
-                info=info,
-                dbid=item.get('dbid'),
-                imdb_id=item.get('infolabels', {}).get('imdbnumber'),
-                originaltitle=item.get('infolabels', {}).get('originaltitle'),
-                title=item.get('infolabels', {}).get('title'),
-                year=item.get('infolabels', {}).get('year'))
+            return kodidatabase.get_info(info=info, dbid=dbid, imdb_id=imdb_id, originaltitle=originaltitle, title=title, year=year)
