@@ -477,5 +477,5 @@ TRAKT_LISTS = {
         'item_tmdbtype': '{type}'}}
 
 TRAKT_CALENDAR = [
-    ('Yesterday', -1), ('Today', 0), ('Tomorrow', 1),
-    ('{0}', 2), ('{0}', 3), ('{0}', 4), ('{0}', 5), ('{0}', 6)]
+    ('Last Fortnight', -14, 14), ('Last Week', -7, 7), ('Yesterday', -1, 1), ('Today', 0, 1), ('Tomorrow', 1, 1),
+    ('{0}', 2, 1), ('{0}', 3, 1), ('{0}', 4, 1), ('{0}', 5, 1), ('{0}', 6, 1), ('Next Week', 0, 7)]

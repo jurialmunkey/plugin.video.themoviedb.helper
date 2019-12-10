@@ -156,16 +156,16 @@ class Container(Plugin):
         imdb_id = self.tmdb.get_item_externalid(itemtype='tv', tmdb_id=self.params.get('tmdb_id'), external_id='imdb_id')
         trakt_items = traktapi.get_upnext(imdb_id)
         items = [ListItem(library=self.library, **self.tmdb.get_detailed_item(
-            itemtype='tv', tmdb_id=self.params.get('tmdb_id'), season=i[0], episode=i[1])) for i in trakt_items]
+            itemtype='tv', tmdb_id=self.params.get('tmdb_id'), season=i[0], episode=i[1])) for i in trakt_items[:10]]
         self.item_tmdbtype = 'episode'
-        self.list_items(items=items[:10], url_tmdb_id=self.params.get('tmdb_id'), url={'info': 'details', 'type': 'episode'})
+        self.list_items(items=items, url_tmdb_id=self.params.get('tmdb_id'), url={'info': 'details', 'type': 'episode'})
 
     def list_traktcalendar_episodes(self):
         date = datetime.datetime.today() + datetime.timedelta(days=utils.try_parse_int(self.params.get('startdate')))
         days = utils.try_parse_int(self.params.get('days'))
         response = traktAPI().get_calendar('shows', True, start_date=date.strftime('%Y-%m-%d'), days=days)
         items = []
-        for i in response:
+        for i in response[-25:]:
             episode = i.get('episode', {}).get('number')
             season = i.get('episode', {}).get('season')
             tmdb_id = i.get('show', {}).get('ids', {}).get('tmdb')
@@ -179,7 +179,7 @@ class Container(Plugin):
             item.infoproperties['air_time'] = air_date.strftime('%I:%M %p')
             items.append(item)
         self.item_tmdbtype = 'episode'
-        self.list_items(items=items[:10], url={'info': 'details', 'type': 'episode'})
+        self.list_items(items=items, url={'info': 'details', 'type': 'episode'})
 
     def list_traktcalendar(self):
         if self.params.get('type') == 'episode':
@@ -192,7 +192,7 @@ class Container(Plugin):
             date = today + datetime.timedelta(days=i[1])
             label = i[0].format(date.strftime('%A'))
             listitem = ListItem(label=label, icon=icon)
-            url = {'info': 'trakt_calendar', 'type': 'episode', 'startdate': i[1], 'days': 1}
+            url = {'info': 'trakt_calendar', 'type': 'episode', 'startdate': i[1], 'days': i[2]}
             listitem.create_listitem(self.handle, **url)
         self.finish_container()
 
