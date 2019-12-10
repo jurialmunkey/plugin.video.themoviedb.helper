@@ -237,7 +237,7 @@ class traktAPI(RequestAPI):
                         return response
                     items.append(item)
         if not response_only:
-            return items
+            return items if items else [(1, 1)]
 
     def get_usernameslug(self):
         if not self.authorize():

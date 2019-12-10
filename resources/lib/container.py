@@ -91,7 +91,7 @@ class Container(Plugin):
             if not self.details_tv:
                 self.details_tv = self.tmdb.get_detailed_item('tv', self.params.get('tmdb_id'), season=self.params.get('season', None))
 
-        if self.item_tmdbtype == 'season' and self.details_tv:
+        if self.item_tmdbtype == 'season' and self.details_tv and self.addon.getSetting('trakt_token'):
             item_upnext = ListItem(library=self.library, **self.details_tv)
             item_upnext.infolabels['season'] = 'Up Next'
             item_upnext.label = 'Up Next'
@@ -114,7 +114,7 @@ class Container(Plugin):
                 i.infolabels = utils.merge_two_dicts(self.details_tv.get('infolabels', {}), utils.del_empty_keys(i.infolabels))
                 i.infoproperties = utils.merge_two_dicts(self.details_tv.get('infoproperties', {}), utils.del_empty_keys(i.infoproperties))
                 i.poster = i.poster or self.details_tv.get('poster')
-                i.fanart = i.fanart or self.details_tv.get('fanart')
+                i.fanart = i.fanart if i.fanart and i.fanart != '{0}/fanart.jpg'.format(self.addonpath) else self.details_tv.get('fanart')
                 i.infolabels['season'] = season_num
 
             i.dbid = self.get_db_info(
