@@ -29,8 +29,7 @@ class ListItem(object):
         self.is_folder = is_folder
         self.infolabels = infolabels or {}  # ListItem.Foobar
         self.infoproperties = infoproperties or {}  # ListItem.Property(Foobar)
-        if dbid:
-            self.infolabels['dbid'] = dbid
+        self.dbid = dbid
 
     def set_url(self, **kwargs):
         url = kwargs.pop('url', 'plugin://plugin.video.themoviedb.helper/?')
@@ -58,6 +57,9 @@ class ListItem(object):
 
     def get_details(self, dbtype=None, tmdb=None, omdb=None):
         self.infolabels['mediatype'] = dbtype
+
+        if self.dbid:
+            self.infolabels['dbid'] = self.dbid
 
         if not dbtype or not tmdb:
             return
