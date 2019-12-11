@@ -12,15 +12,15 @@ except ImportError:
 class ListItem(object):
     def __init__(self, label=None, label2=None, dbtype=None, library=None, tmdb_id=None, imdb_id=None, dbid=None,
                  cast=None, infolabels=None, infoproperties=None, poster=None, thumb=None, icon=None, fanart=None,
-                 mixed_type=None, url=None, is_folder=True):
+                 clearlogo=None, clearart=None, banner=None, landscape=None, mixed_type=None, url=None, is_folder=True):
         self.addonpath = xbmcaddon.Addon('plugin.video.themoviedb.helper').getAddonInfo('path')
         self.label = label or 'N/A'
         self.label2 = label2 or ''
         self.library = library or ''  # <content target= video, music, pictures, none>
         self.tmdb_id = tmdb_id or ''  # ListItem.Property(tmdb_id)
         self.imdb_id = imdb_id or ''  # IMDb ID for item
-        self.poster = poster
-        self.thumb = thumb
+        self.poster, self.thumb = poster, thumb
+        self.clearlogo, self.clearart, self.banner, self.landscape = clearlogo, clearart, banner, landscape
         self.url = url or {}
         self.mixed_type = mixed_type or ''
         self.icon = icon or '{0}/resources/poster.png'.format(self.addonpath)
@@ -55,7 +55,7 @@ class ListItem(object):
             self.url['info'] = 'play'
         self.is_folder = False if self.url.get('info') in ['play', 'textviewer', 'imageviewer'] else True
 
-    def get_details(self, dbtype=None, tmdb=None, omdb=None):
+    def get_details(self, dbtype=None, tmdb=None, omdb=None, fanarttv=None):
         self.infolabels['mediatype'] = dbtype
 
         if self.dbid:
@@ -63,6 +63,21 @@ class ListItem(object):
 
         if not dbtype or not tmdb:
             return
+
+        # Fanart TV Lookup
+        if fanarttv and dbtype == 'tvshow':
+            tvdb_id = tmdb.get_item_externalid('tv', self.tmdb_id, 'tvdb_id')
+            self.clearart = fanarttv.get_tvshow_clearart(tvdb_id)
+            self.clearlogo = fanarttv.get_tvshow_clearlogo(tvdb_id)
+            self.landscape = fanarttv.get_tvshow_landscape(tvdb_id)
+            self.banner = fanarttv.get_tvshow_banner(tvdb_id)
+            self.fanart = self.fanart or fanarttv.get_tvshow_fanart(tvdb_id)
+        elif fanarttv and dbtype == 'movie':
+            self.clearart = fanarttv.get_movie_clearart(self.tmdb_id)
+            self.clearlogo = fanarttv.get_movie_clearlogo(self.tmdb_id)
+            self.landscape = fanarttv.get_movie_landscape(self.tmdb_id)
+            self.banner = fanarttv.get_movie_banner(self.tmdb_id)
+            self.fanart = self.fanart or fanarttv.get_movie_fanart(self.tmdb_id)
 
         details = None
         if dbtype in ['movie', 'tvshow']:
@@ -89,6 +104,8 @@ class ListItem(object):
         listitem.setUniqueIDs({'imdb': self.imdb_id, 'tmdb': self.tmdb_id})
         listitem.setInfo(self.library, self.infolabels)
         listitem.setProperties(self.infoproperties)
-        listitem.setArt({'thumb': self.thumb, 'icon': self.icon, 'poster': self.poster, 'fanart': self.fanart})
+        listitem.setArt({
+            'thumb': self.thumb, 'icon': self.icon, 'poster': self.poster, 'fanart': self.fanart,
+            'clearlogo': self.clearlogo, 'clearart': self.clearart, 'landscape': self.landscape, 'banner': self.banner})
         listitem.setCast(self.cast)
         xbmcplugin.addDirectoryItem(handle, self.set_url(**kwargs), listitem, self.is_folder)

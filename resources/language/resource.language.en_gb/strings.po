@@ -97,6 +97,16 @@ msgctxt "#32017"
 msgid "Accounts / API Keys"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32018"
+msgid "Fanart.tv API Key"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32019"
+msgid "Fanart.tv Client Key"
+msgstr ""
+
 msgctxt "#30019"
 msgid "Esperanto (None)"
 msgstr ""

@@ -7,6 +7,7 @@ from resources.lib.globals import LANGUAGES, APPEND_TO_RESPONSE, TMDB_LISTS
 from resources.lib.kodilibrary import KodiLibrary
 from resources.lib.tmdb import TMDb
 from resources.lib.omdb import OMDb
+from resources.lib.fanarttv import FanartTV
 
 
 class Plugin(object):
@@ -24,6 +25,8 @@ class Plugin(object):
         cache_short = self.addon.getSettingInt('cache_list_days')
         tmdb_apikey = self.addon.getSetting('tmdb_apikey')
         omdb_apikey = self.addon.getSetting('omdb_apikey')
+        fanarttv_apikey = self.addon.getSetting('fanarttv_apikey')
+        fanarttv_clientkey = self.addon.getSetting('fanarttv_clientkey')
         language = LANGUAGES[self.addon.getSettingInt('language')]
         mpaa_prefix = self.addon.getSetting('mpaa_prefix')
 
@@ -32,6 +35,12 @@ class Plugin(object):
             append_to_response=APPEND_TO_RESPONSE, mpaa_prefix=mpaa_prefix)
 
         self.omdb = OMDb(api_key=omdb_apikey, cache_long=cache_long, cache_short=cache_short) if omdb_apikey else None
+
+        self.fanarttv = (
+            FanartTV(
+                api_key=fanarttv_apikey, client_key=fanarttv_clientkey, language=language,
+                cache_long=cache_long, cache_short=cache_short)
+            if self.addon.getSettingBool('fanarttv_lookup') else None)
 
     def textviewer(self, header, text):
         xbmcgui.Dialog().textviewer(header, text)

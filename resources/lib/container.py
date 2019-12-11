@@ -87,9 +87,16 @@ class Container(Plugin):
         added, dbiditems, tmdbitems, lastitems, firstitems = [], [], [], [], []
         mixed_movies, mixed_tvshows = 0, 0
 
-        if self.item_tmdbtype in ['season', 'episode']:
+        if self.item_tmdbtype in ['season', 'episode'] and self.params.get('tmdb_id'):
             if not self.details_tv:
                 self.details_tv = self.tmdb.get_detailed_item('tv', self.params.get('tmdb_id'), season=self.params.get('season', None))
+            if self.fanarttv and self.details_tv:
+                tvdb_id = self.tmdb.get_item_externalid('tv', self.params.get('tmdb_id'), 'tvdb_id')
+                self.details_tv['clearart'] = self.fanarttv.get_tvshow_clearart(tvdb_id)
+                self.details_tv['clearlogo'] = self.fanarttv.get_tvshow_clearlogo(tvdb_id)
+                self.details_tv['landscape'] = self.fanarttv.get_tvshow_landscape(tvdb_id)
+                self.details_tv['banner'] = self.fanarttv.get_tvshow_banner(tvdb_id)
+                self.details_tv['fanart'] = self.details_tv.get('fanart') or self.fanarttv.get_tvshow_fanart(tvdb_id)
 
         if self.item_tmdbtype == 'season' and self.details_tv and self.addon.getSetting('trakt_token'):
             item_upnext = ListItem(library=self.library, **self.details_tv)
@@ -298,7 +305,7 @@ class Container(Plugin):
         self.containercontent = self.mixed_containercontent or utils.type_convert(self.item_tmdbtype, 'container')
         self.start_container()
         for i in items:
-            i.get_details(self.item_dbtype, self.tmdb, self.omdb)
+            i.get_details(self.item_dbtype, self.tmdb, self.omdb, self.fanarttv)
             i.get_url(url, url_tmdb_id, self.params.get('widget'))
             i.create_listitem(self.handle, **i.url)
         self.finish_container()
