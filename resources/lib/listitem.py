@@ -65,19 +65,18 @@ class ListItem(object):
             return
 
         # Fanart TV Lookup
+        artwork = None
         if fanarttv and dbtype == 'tvshow':
             tvdb_id = tmdb.get_item_externalid('tv', self.tmdb_id, 'tvdb_id')
-            self.clearart = fanarttv.get_tvshow_clearart(tvdb_id)
-            self.clearlogo = fanarttv.get_tvshow_clearlogo(tvdb_id)
-            self.landscape = fanarttv.get_tvshow_landscape(tvdb_id)
-            self.banner = fanarttv.get_tvshow_banner(tvdb_id)
-            self.fanart = self.fanart or fanarttv.get_tvshow_fanart(tvdb_id)
+            artwork = fanarttv.get_tvshow_allart_lc(tvdb_id)
         elif fanarttv and dbtype == 'movie':
-            self.clearart = fanarttv.get_movie_clearart(self.tmdb_id)
-            self.clearlogo = fanarttv.get_movie_clearlogo(self.tmdb_id)
-            self.landscape = fanarttv.get_movie_landscape(self.tmdb_id)
-            self.banner = fanarttv.get_movie_banner(self.tmdb_id)
-            self.fanart = self.fanart or fanarttv.get_movie_fanart(self.tmdb_id)
+            artwork = fanarttv.get_movie_allart_lc(self.tmdb_id)
+        if artwork:
+            self.clearart = artwork.get('clearart')
+            self.clearlogo = artwork.get('clearlogo')
+            self.landscape = artwork.get('landscape')
+            self.banner = artwork.get('banner')
+            self.fanart = self.fanart or artwork.get('fanart')
 
         details = None
         if dbtype in ['movie', 'tvshow']:

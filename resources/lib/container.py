@@ -92,11 +92,12 @@ class Container(Plugin):
                 self.details_tv = self.tmdb.get_detailed_item('tv', self.params.get('tmdb_id'), season=self.params.get('season', None))
             if self.fanarttv and self.details_tv:
                 tvdb_id = self.tmdb.get_item_externalid('tv', self.params.get('tmdb_id'), 'tvdb_id')
-                self.details_tv['clearart'] = self.fanarttv.get_tvshow_clearart(tvdb_id)
-                self.details_tv['clearlogo'] = self.fanarttv.get_tvshow_clearlogo(tvdb_id)
-                self.details_tv['landscape'] = self.fanarttv.get_tvshow_landscape(tvdb_id)
-                self.details_tv['banner'] = self.fanarttv.get_tvshow_banner(tvdb_id)
-                self.details_tv['fanart'] = self.details_tv.get('fanart') or self.fanarttv.get_tvshow_fanart(tvdb_id)
+                artwork = self.fanarttv.get_tvshow_allart_lc(tvdb_id)
+                self.details_tv['clearart'] = artwork.get('clearart')
+                self.details_tv['clearlogo'] = artwork.get('clearlogo')
+                self.details_tv['landscape'] = artwork.get('landscape')
+                self.details_tv['banner'] = artwork.get('banner')
+                self.details_tv['fanart'] = self.details_tv.get('fanart') or artwork.get('fanart')
 
         if self.item_tmdbtype == 'season' and self.details_tv and self.addon.getSetting('trakt_token'):
             item_upnext = ListItem(library=self.library, **self.details_tv)
