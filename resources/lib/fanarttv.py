@@ -48,11 +48,12 @@ class FanartTV(RequestAPI):
         return best_item
 
     def get_artwork_best_lc(self, ftvid, ftvtype, artwork, *args, **kwargs):
+        cache_name = '{0}.fanarttv.best'.format(self.cache_name)
         cache_only = kwargs.pop('cache_only', False)
         cache_refresh = kwargs.pop('cache_refresh', False)
         return self.use_cache(
             self.get_artwork_best, ftvid, ftvtype, artwork, cache_days=self.cache_long,
-            cache_only=cache_only, cache_refresh=cache_refresh)
+            cache_only=cache_only, cache_refresh=cache_refresh, cache_name=cache_name)
 
     def get_movie_clearart(self, ftvid, *args, **kwargs):
         artwork = self.get_artwork_best_lc(ftvid, 'movies', 'hdmovieclearart', *args, **kwargs)
@@ -93,3 +94,40 @@ class FanartTV(RequestAPI):
 
     def get_tvshow_characterart(self, ftvid, *args, **kwargs):
         return self.get_artwork_best_lc(ftvid, 'tv', 'characterart', *args, **kwargs)
+
+    def get_tvshow_allart(self, ftvid, *args, **kwargs):
+        clearart = self.get_tvshow_clearart(ftvid, *args, **kwargs)
+        clearlogo = self.get_tvshow_clearlogo(ftvid, *args, **kwargs)
+        banner = self.get_tvshow_banner(ftvid, *args, **kwargs)
+        landscape = self.get_tvshow_landscape(ftvid, *args, **kwargs)
+        fanart = self.get_tvshow_fanart(ftvid, *args, **kwargs)
+        characterart = self.get_tvshow_characterart(ftvid, *args, **kwargs)
+        return {
+            'clearart': clearart, 'clearlogo': clearlogo, 'banner': banner,
+            'landscape': landscape, 'fanart': fanart, 'characterart': characterart}
+
+    def get_tvshow_allart_lc(self, ftvid, *args, **kwargs):
+        cache_name = '{0}.fanarttv.tvall'.format(self.cache_name)
+        cache_only = kwargs.pop('cache_only', False)
+        cache_refresh = kwargs.pop('cache_refresh', False)
+        return self.use_cache(
+            self.get_tvshow_allart, ftvid, cache_days=self.cache_long,
+            cache_only=cache_only, cache_refresh=cache_refresh, cache_name=cache_name)
+
+    def get_movie_allart(self, ftvid, *args, **kwargs):
+        clearart = self.get_movie_clearart(ftvid, *args, **kwargs)
+        clearlogo = self.get_movie_clearlogo(ftvid, *args, **kwargs)
+        banner = self.get_movie_banner(ftvid, *args, **kwargs)
+        landscape = self.get_movie_landscape(ftvid, *args, **kwargs)
+        fanart = self.get_movie_fanart(ftvid, *args, **kwargs)
+        return {
+            'clearart': clearart, 'clearlogo': clearlogo, 'banner': banner,
+            'landscape': landscape, 'fanart': fanart}
+
+    def get_movie_allart_lc(self, ftvid, *args, **kwargs):
+        cache_name = '{0}.fanarttv.movieall'.format(self.cache_name)
+        cache_only = kwargs.pop('cache_only', False)
+        cache_refresh = kwargs.pop('cache_refresh', False)
+        return self.use_cache(
+            self.get_movie_allart, ftvid, cache_days=self.cache_long,
+            cache_only=cache_only, cache_refresh=cache_refresh, cache_name=cache_name)
