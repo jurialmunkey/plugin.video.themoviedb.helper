@@ -36,7 +36,7 @@ class ListItem(object):
         url = kwargs.pop('url', 'plugin://plugin.video.themoviedb.helper/?')
         return '{0}{1}'.format(url, urlencode(kwargs))
 
-    def get_url(self, url, url_tmdb_id=None):
+    def get_url(self, url, url_tmdb_id=None, widget=None):
         self.url = self.url or url.copy()
         self.url['tmdb_id'] = self.tmdb_id = url_tmdb_id or self.tmdb_id
         if self.mixed_type:
@@ -48,6 +48,12 @@ class ListItem(object):
             self.url['season'] = self.infolabels.get('season')
         if self.infolabels.get('mediatype') == 'episode':
             self.url['episode'] = self.infolabels.get('episode')
+        if widget:
+            self.url['widget'] = widget
+        if self.url.get('widget', '').capitalize() == 'True' and self.infolabels.get('mediatype') == 'tvshow':
+            self.url['info'] = 'seasons'
+        if self.url.get('widget', '').capitalize() == 'True' and self.infolabels.get('mediatype') in ['movie', 'episode']:
+            self.url['info'] = 'play'
         self.is_folder = False if self.url.get('info') in ['play', 'textviewer', 'imageviewer'] else True
 
     def get_details(self, dbtype=None, tmdb=None, omdb=None):

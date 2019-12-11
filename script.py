@@ -75,48 +75,69 @@ class Script:
         elif self.params.get('call_path'):
             xbmc.executebuiltin('Dialog.Close(12003)')
             xbmc.executebuiltin('ActivateWindow(videos, {0}, return)'.format(self.params.get('call_path')))
+        elif self.params.get('call_update'):
+            xbmc.executebuiltin('Dialog.Close(12003)')
+            xbmc.executebuiltin('Container.Update({0})'.format(self.params.get('call_update')))
+
+    def add_path(self):
+        self.position = self.position + 1
+        self.set_props(self.position, self.params.get('add_path'))
+        self.lock_path(self.params.get('prevent_del'))
+        self.call_window()
+
+    def add_query(self):
+        with utils.busy_dialog():
+            item = utils.dialog_select_item(self.params.get('add_query'))
+            if not item:
+                return
+            tmdb_id = _tmdb.get_tmdb_id(self.params.get('type'), query=item, selectdialog=True)
+            if tmdb_id:
+                self.position = self.position + 1
+                add_paramstring = 'plugin://plugin.video.themoviedb.helper/?info=details&amp;type={0}&amp;tmdb_id={1}'.format(self.params.get('type'), tmdb_id)
+                self.set_props(self.position, add_paramstring)
+                self.lock_path(self.params.get('prevent_del'))
+            else:
+                utils.kodi_log('Unable to find TMDb ID!\nQuery: {0} Type: {1}'.format(self.params.get('add_query'), self.params.get('type')), 1)
+                return
+        self.call_window()
+
+    def add_prop(self):
+        item = utils.dialog_select_item(self.params.get('add_prop'))
+        if not item:
+            return
+        prop_name = '{0}{1}'.format(_prefixname, self.params.get('prop_id'))
+        _homewindow.setProperty(prop_name, item)
+        self.call_window()
+
+    def del_path(self):
+        if self.prevent_del:
+            self.unlock_path()
+        else:
+            _homewindow.clearProperty('{0}{1}'.format(self.prefixpath, self.position))
+            if self.position > 1:
+                self.position = self.position - 1
+                path = _homewindow.getProperty('{0}{1}'.format(self.prefixpath, self.position))
+                self.set_props(self.position, path)
+            else:
+                self.reset_props()
+        self.call_window()
 
     def router(self):
-        if self.params:
-            if self.params.get('authenticate_trakt'):
-                traktAPI(force=True)
-            elif self.params.get('add_path'):
-                self.position = self.position + 1
-                self.set_props(self.position, self.params.get('add_path'))
-                self.lock_path(self.params.get('prevent_del'))
-            elif self.params.get('add_query') and self.params.get('type'):
-                with utils.busy_dialog():
-                    item = utils.dialog_select_item(self.params.get('add_query'))
-                    if not item:
-                        return
-                    tmdb_id = _tmdb.get_tmdb_id(self.params.get('type'), query=item, selectdialog=True)
-                    if tmdb_id:
-                        self.position = self.position + 1
-                        add_paramstring = 'plugin://plugin.video.themoviedb.helper/?info=details&amp;type={0}&amp;tmdb_id={1}'.format(self.params.get('type'), tmdb_id)
-                        self.set_props(self.position, add_paramstring)
-                        self.lock_path(self.params.get('prevent_del'))
-                    else:
-                        utils.kodi_log('Unable to find TMDb ID!\nQuery: {0} Type: {1}'.format(self.params.get('add_query'), self.params.get('type')), 1)
-                        return
-            elif self.params.get('add_prop') and self.params.get('prop_id'):
-                item = utils.dialog_select_item(self.params.get('add_prop'))
-                if not item:
-                    return
-                prop_name = '{0}{1}'.format(_prefixname, self.params.get('prop_id'))
-                _homewindow.setProperty(prop_name, item)
-            elif self.params.get('del_path'):
-                if self.prevent_del:
-                    self.unlock_path()
-                else:
-                    _homewindow.clearProperty('{0}{1}'.format(self.prefixpath, self.position))
-                    if self.position > 1:
-                        self.position = self.position - 1
-                        path = _homewindow.getProperty('{0}{1}'.format(self.prefixpath, self.position))
-                        self.set_props(self.position, path)
-                    else:
-                        self.reset_props()
-            elif self.params.get('reset_path'):
-                self.reset_props()
+        if not self.params:
+            return
+        if self.params.get('authenticate_trakt'):
+            traktAPI(force=True)
+        elif self.params.get('add_path'):
+            self.add_path()
+        elif self.params.get('add_query') and self.params.get('type'):
+            self.add_query()
+        elif self.params.get('add_prop') and self.params.get('prop_id'):
+            self.add_prop()
+        elif self.params.get('del_path'):
+            self.del_path()
+        elif self.params.get('reset_path'):
+            self.reset_props()
+        else:
             self.call_window()
 
 

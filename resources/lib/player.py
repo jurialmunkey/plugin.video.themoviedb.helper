@@ -23,38 +23,39 @@ def string_format_map(fmt, d):
 
 
 class Player(Plugin):
-    def __init__(self, itemtype, tmdb_id, season=None, episode=None):
+    def __init__(self):
         super(Player, self).__init__()
         self.traktapi = traktAPI() if self.addon.getSetting('trakt_token') else None
-        self.itemtype, self.tmdb_id, self.season, self.episode = itemtype, tmdb_id, season, episode
         self.search_movie, self.search_episode, self.play_movie, self.play_episode = [], [], [], []
+        self.item = defaultdict(lambda: '+')
+        self.itemlist = []
+        self.actions = []
+        self.players = {}
+
+    def play(self, itemtype, tmdb_id, season=None, episode=None):
+        self.itemtype, self.tmdb_id, self.season, self.episode = itemtype, tmdb_id, season, episode
         self.tmdbtype = 'tv' if self.itemtype == 'episode' or self.itemtype == 'tv' else 'movie'
         self.details = self.tmdb.get_detailed_item(self.tmdbtype, tmdb_id, season=season, episode=episode)
-        self.item = defaultdict(lambda: '+')
         self.item['imdb_id'] = self.details.get('infolabels', {}).get('imdbnumber')
         self.item['originaltitle'] = self.details.get('infolabels', {}).get('originaltitle')
         self.item['title'] = self.details.get('infolabels', {}).get('tvshowtitle') or self.details.get('infolabels', {}).get('title')
         self.item['year'] = self.details.get('infolabels', {}).get('year')
-        self.itemlist = []
-        self.actions = []
-        self.players = {}
-        self.router()
-
-    def router(self):
         if self.details and self.itemtype == 'movie':
             is_local = self.playmovie()
         if self.details and self.itemtype == 'episode':
             is_local = self.playepisode()
-        if not is_local:
-            with utils.busy_dialog():
-                self.build_players()
-                self.build_details()
-                self.build_selectbox()
+        if is_local:
+            return True
+        with utils.busy_dialog():
+            self.build_players()
+            self.build_details()
+            self.build_selectbox()
         if self.itemlist:
             itemindex = xbmcgui.Dialog().select('Choose Action', self.itemlist)
             if itemindex > -1:
                 utils.kodi_log(self.actions[itemindex], 1)
                 xbmc.executebuiltin(self.actions[itemindex]) if sys.version_info.major == 3 else xbmc.executebuiltin(self.actions[itemindex].encode('utf-8'))
+                return True
 
     def build_details(self):
         self.item['id'] = self.tmdb_id
@@ -130,24 +131,23 @@ class Player(Plugin):
 
     def build_selectbox(self):
         self.itemlist, self.actions = [], []
-        prefix = u'ActivateWindow(videos, ' if not xbmc.getCondVisibility('Window.IsVisible(MyVideoNav.xml)') else u'Container.Update('
-        suffix = u', return)' if not xbmc.getCondVisibility('Window.IsVisible(MyVideoNav.xml)') else u')'
+        call = u'call_update=' if xbmc.getCondVisibility("Window.IsMedia") else u'call_path='
         for i in self.play_movie:
             self.itemlist.append(xbmcgui.ListItem(u'Play with {0}'.format(self.players.get(i, {}).get('name', ''))))
             action = string_format_map(self.players.get(i, {}).get('play_movie', ''), self.item)
-            self.actions.append(u'PlayMedia({0})'.format(action))
+            self.actions.append(u'RunPlugin({0})'.format(action))
         for i in self.search_movie:
             self.itemlist.append(xbmcgui.ListItem(u'Search {0}' .format(self.players.get(i, {}).get('name', ''))))
             action = string_format_map(self.players.get(i, {}).get('search_movie', ''), self.item)
-            self.actions.append(u'{0}{1}{2}'.format(prefix, action, suffix))
+            self.actions.append(u'RunScript(plugin.video.themoviedb.helper,{0}{1})'.format(call, action))
         for i in self.play_episode:
             self.itemlist.append(xbmcgui.ListItem(u'Play with {0}'.format(self.players.get(i, {}).get('name', ''))))
             action = string_format_map(self.players.get(i, {}).get('play_episode', ''), self.item)
-            self.actions.append(u'PlayMedia({0})'.format(action))
+            self.actions.append(u'RunPlugin({0})'.format(action))
         for i in self.search_episode:
             self.itemlist.append(xbmcgui.ListItem(u'Search {0}'.format(self.players.get(i, {}).get('name', ''))))
             action = string_format_map(self.players.get(i, {}).get('search_episode', ''), self.item)
-            self.actions.append(u'{0}{1}{2}'.format(prefix, action, suffix))
+            self.actions.append(u'RunScript(plugin.video.themoviedb.helper,{0}{1})'.format(call, action))
 
     def playfile(self, file):
         if file:

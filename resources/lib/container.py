@@ -278,7 +278,7 @@ class Container(Plugin):
         self.params['tmdb_id'] = self.get_tmdb_id(**self.params)
 
     def list_play(self):
-        Player(
+        Player().play(
             itemtype=self.params.get('type'), tmdb_id=self.params.get('tmdb_id'),
             season=self.params.get('season'), episode=self.params.get('episode'))
 
@@ -299,7 +299,7 @@ class Container(Plugin):
         self.start_container()
         for i in items:
             i.get_details(self.item_dbtype, self.tmdb, self.omdb)
-            i.get_url(url, url_tmdb_id)
+            i.get_url(url, url_tmdb_id, self.params.get('widget'))
             i.create_listitem(self.handle, **i.url)
         self.finish_container()
 
@@ -421,6 +421,8 @@ class Container(Plugin):
         for i in basedir:
             for t in i.get('types'):
                 url = {'info': i.get('info'), 'type': t} if t else {'info': i.get('info')}
+                if not xbmc.getCondVisibility("Window.IsMedia"):
+                    url['widget'] = 'True'
                 listitem = ListItem(label=i.get('name').format(utils.type_convert(t, 'plural')), icon=i.get('icon', '').format(self.addonpath))
                 listitem.create_listitem(self.handle, **url)
         self.finish_container()
