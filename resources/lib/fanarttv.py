@@ -12,29 +12,31 @@ class FanartTV(RequestAPI):
         self.language = language[:2] if language else 'en'
         self.response, self.ftvtype, self.ftvid = None, None, None
 
-    def get_artwork_request(self, ftvid=None, ftvtype=None):
+    def get_artwork_request(self, ftvid, ftvtype, *args, **kwargs):
         """
         ftvtype can be 'movies' 'tv'
         ftvid is tmdb_id|imdb_id for movies and tvdb_id for tv
         """
         if not ftvtype or not ftvid:
             return
-        self.response = self.get_request_lc(ftvtype, ftvid)
-        self.ftvtype = ftvtype
-        self.ftvid = ftvid
+        if self.ftvtype != ftvtype or self.ftvid != ftvid or not self.response:
+            self.response = self.get_request_lc(ftvtype, ftvid, *args, **kwargs)
+            self.ftvtype = ftvtype
+            self.ftvid = ftvid
         return self.response
 
-    def get_artwork_list(self, ftvid=None, ftvtype=None, artwork=None):
+    def get_artwork_list(self, ftvid, ftvtype, artwork, *args, **kwargs):
         if not artwork:
             return []
         if self.response:
-            if (self.ftvtype != ftvtype or self.ftvid != ftvid) and not self.get_artwork_request(ftvtype, ftvid):
-                return []
-        elif not ftvtype or not ftvid or not self.get_artwork_request(ftvtype, ftvid):
+            if self.ftvtype != ftvtype or self.ftvid != ftvid:
+                if not self.get_artwork_request(ftvtype, ftvid, *args, **kwargs):
+                    return []
+        elif not ftvtype or not ftvid or not self.get_artwork_request(ftvtype, ftvid, *args, **kwargs):
             return []
         return self.response.get(artwork, [])
 
-    def get_artwork_best(self, ftvid=None, ftvtype=None, artwork=None):
+    def get_artwork_best(self, ftvid, ftvtype, artwork, *args, **kwargs):
         best_like = -1
         best_item = None
         for i in self.get_artwork_list(ftvtype, ftvid, artwork):
@@ -45,42 +47,49 @@ class FanartTV(RequestAPI):
                 best_like = i.get('likes', 0)
         return best_item
 
-    def get_movie_clearart(self, ftvid=None):
-        artwork = self.get_artwork_best(ftvid, 'movies', 'hdmovieclearart')
-        return artwork or self.get_artwork_best(ftvid, 'movies', 'movieclearart')
+    def get_artwork_best_lc(self, ftvid, ftvtype, artwork, *args, **kwargs):
+        cache_only = kwargs.pop('cache_only', False)
+        cache_refresh = kwargs.pop('cache_refresh', False)
+        return self.use_cache(
+            self.get_artwork_best, ftvid, ftvtype, artwork, cache_days=self.cache_long,
+            cache_only=cache_only, cache_refresh=cache_refresh)
 
-    def get_movie_clearlogo(self, ftvid=None):
-        artwork = self.get_artwork_best(ftvid, 'movies', 'hdmovielogo')
-        return artwork or self.get_artwork_best(ftvid, 'movies', 'movielogo')
+    def get_movie_clearart(self, ftvid, *args, **kwargs):
+        artwork = self.get_artwork_best_lc(ftvid, 'movies', 'hdmovieclearart', *args, **kwargs)
+        return artwork or self.get_artwork_best_lc(ftvid, 'movies', 'movieclearart', *args, **kwargs)
 
-    def get_movie_poster(self, ftvid=None):
-        return self.get_artwork_best(ftvid, 'movies', 'movieposter')
+    def get_movie_clearlogo(self, ftvid, *args, **kwargs):
+        artwork = self.get_artwork_best_lc(ftvid, 'movies', 'hdmovielogo', *args, **kwargs)
+        return artwork or self.get_artwork_best_lc(ftvid, 'movies', 'movielogo', *args, **kwargs)
 
-    def get_movie_fanart(self, ftvid=None):
-        return self.get_artwork_best(ftvid, 'movies', 'moviebackground')
+    def get_movie_poster(self, ftvid, *args, **kwargs):
+        return self.get_artwork_best_lc(ftvid, 'movies', 'movieposter', *args, **kwargs)
 
-    def get_movie_landscape(self, ftvid=None):
-        return self.get_artwork_best(ftvid, 'movies', 'moviethumb')
+    def get_movie_fanart(self, ftvid, *args, **kwargs):
+        return self.get_artwork_best_lc(ftvid, 'movies', 'moviebackground', *args, **kwargs)
 
-    def get_movie_banner(self, ftvid=None):
-        return self.get_artwork_best(ftvid, 'movies', 'moviebanner')
+    def get_movie_landscape(self, ftvid, *args, **kwargs):
+        return self.get_artwork_best_lc(ftvid, 'movies', 'moviethumb', *args, **kwargs)
 
-    def get_tvshow_clearart(self, ftvid=None):
-        artwork = self.get_artwork_best(ftvid, 'tv', 'hdclearart')
-        return artwork or self.get_artwork_best(ftvid, 'tv', 'clearart')
+    def get_movie_banner(self, ftvid, *args, **kwargs):
+        return self.get_artwork_best_lc(ftvid, 'movies', 'moviebanner', *args, **kwargs)
 
-    def get_tvshow_clearlogo(self, ftvid=None):
-        artwork = self.get_artwork_best(ftvid, 'tv', 'hdtvlogo')
-        return artwork or self.get_artwork_best(ftvid, 'tv', 'clearlogo')
+    def get_tvshow_clearart(self, ftvid, *args, **kwargs):
+        artwork = self.get_artwork_best_lc(ftvid, 'tv', 'hdclearart', *args, **kwargs)
+        return artwork or self.get_artwork_best_lc(ftvid, 'tv', 'clearart', *args, **kwargs)
 
-    def get_tvshow_banner(self, ftvid=None):
-        return self.get_artwork_best(ftvid, 'tv', 'tvbanner')
+    def get_tvshow_clearlogo(self, ftvid, *args, **kwargs):
+        artwork = self.get_artwork_best_lc(ftvid, 'tv', 'hdtvlogo', *args, **kwargs)
+        return artwork or self.get_artwork_best_lc(ftvid, 'tv', 'clearlogo', *args, **kwargs)
 
-    def get_tvshow_landscape(self, ftvid=None):
-        return self.get_artwork_best(ftvid, 'tv', 'tvthumb')
+    def get_tvshow_banner(self, ftvid, *args, **kwargs):
+        return self.get_artwork_best_lc(ftvid, 'tv', 'tvbanner', *args, **kwargs)
 
-    def get_tvshow_fanart(self, ftvid=None):
-        return self.get_artwork_best(ftvid, 'tv', 'showbackground')
+    def get_tvshow_landscape(self, ftvid, *args, **kwargs):
+        return self.get_artwork_best_lc(ftvid, 'tv', 'tvthumb', *args, **kwargs)
 
-    def get_tvshow_characterart(self, ftvid=None):
-        return self.get_artwork_best(ftvid, 'tv', 'characterart')
+    def get_tvshow_fanart(self, ftvid, *args, **kwargs):
+        return self.get_artwork_best_lc(ftvid, 'tv', 'showbackground', *args, **kwargs)
+
+    def get_tvshow_characterart(self, ftvid, *args, **kwargs):
+        return self.get_artwork_best_lc(ftvid, 'tv', 'characterart', *args, **kwargs)
