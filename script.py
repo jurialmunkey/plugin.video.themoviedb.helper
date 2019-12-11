@@ -5,36 +5,24 @@
 import sys
 import xbmc
 import xbmcgui
-import xbmcaddon
 import resources.lib.utils as utils
-from resources.lib.globals import LANGUAGES, APPEND_TO_RESPONSE
-from resources.lib.tmdb import TMDb
+from resources.lib.downloader import Downloader
 from resources.lib.traktapi import traktAPI
-_homewindow = xbmcgui.Window(10000)
-_prefixname = 'TMDbHelper.'
-_addonname = 'plugin.video.themoviedb.helper'
-_addon = xbmcaddon.Addon(_addonname)
-_languagesetting = _addon.getSettingInt('language')
-_language = LANGUAGES[_languagesetting]
-_cache_long = _addon.getSettingInt('cache_details_days')
-_cache_short = _addon.getSettingInt('cache_list_days')
-_tmdb_apikey = _addon.getSetting('tmdb_apikey')
-_tmdb = TMDb(
-    api_key=_tmdb_apikey, language=_language, cache_long=_cache_long,
-    cache_short=_cache_short, append_to_response=APPEND_TO_RESPONSE)
+from resources.lib.plugin import Plugin
 
 
-class Script:
+class Script(Plugin):
     def __init__(self):
+        super(Script, self).__init__()
+        self.home = xbmcgui.Window(10000)
         self.params = {}
-        self.prefixpath = '{0}Path.'.format(_prefixname)
-        self.prefixlock = '{0}Locked'.format(_prefixname)
+        self.prefixpath = '{0}Path.'.format(self.prefixname)
+        self.prefixlock = '{0}Locked'.format(self.prefixname)
         self.prefixcurrent = '{0}Current'.format(self.prefixpath)
-        self.prefixposition = '{0}Position'.format(_prefixname)
-        self.position = _homewindow.getProperty(self.prefixposition)
+        self.prefixposition = '{0}Position'.format(self.prefixname)
+        self.position = self.home.getProperty(self.prefixposition)
         self.position = int(self.position) if self.position else 0
-        self.prevent_del = _homewindow.getProperty(self.prefixlock)
-        self.prevent_del = True if self.prevent_del else False
+        self.prevent_del = True if self.home.getProperty(self.prefixlock) else False
 
     def get_params(self):
         for arg in sys.argv:
@@ -49,24 +37,24 @@ class Script:
                 self.params.setdefault(arg, True)
 
     def reset_props(self):
-        _homewindow.clearProperty(self.prefixcurrent)
-        _homewindow.clearProperty(self.prefixposition)
-        _homewindow.clearProperty('{0}0'.format(self.prefixpath))
-        _homewindow.clearProperty('{0}1'.format(self.prefixpath))
+        self.home.clearProperty(self.prefixcurrent)
+        self.home.clearProperty(self.prefixposition)
+        self.home.clearProperty('{0}0'.format(self.prefixpath))
+        self.home.clearProperty('{0}1'.format(self.prefixpath))
 
     def set_props(self, position=1, path=''):
-        _homewindow.setProperty(self.prefixcurrent, path)
-        _homewindow.setProperty('{0}{1}'.format(self.prefixpath, position), path)
-        _homewindow.setProperty(self.prefixposition, str(position))
+        self.home.setProperty(self.prefixcurrent, path)
+        self.home.setProperty('{0}{1}'.format(self.prefixpath, position), path)
+        self.home.setProperty(self.prefixposition, str(position))
 
     def lock_path(self, condition):
         if condition:
-            _homewindow.setProperty(self.prefixlock, 'True')
+            self.home.setProperty(self.prefixlock, 'True')
         else:
             self.unlock_path()
 
     def unlock_path(self):
-        _homewindow.clearProperty(self.prefixlock)
+        self.home.clearProperty(self.prefixlock)
 
     def call_window(self):
         if self.params.get('call_id'):
@@ -79,6 +67,12 @@ class Script:
             xbmc.executebuiltin('Dialog.Close(12003)')
             xbmc.executebuiltin('Container.Update({0})'.format(self.params.get('call_update')))
 
+    def update_players(self):
+        downloader = Downloader(
+            extract_to='special://profile/addon_data/plugin.video.themoviedb.helper/players',
+            download_url=self.addon.getSetting('players_url'))
+        downloader.get_extracted_zip()
+
     def add_path(self):
         self.position = self.position + 1
         self.set_props(self.position, self.params.get('add_path'))
@@ -90,7 +84,7 @@ class Script:
             item = utils.dialog_select_item(self.params.get('add_query'))
             if not item:
                 return
-            tmdb_id = _tmdb.get_tmdb_id(self.params.get('type'), query=item, selectdialog=True)
+            tmdb_id = self.tmdb.get_tmdb_id(self.params.get('type'), query=item, selectdialog=True)
             if tmdb_id:
                 self.position = self.position + 1
                 add_paramstring = 'plugin://plugin.video.themoviedb.helper/?info=details&amp;type={0}&amp;tmdb_id={1}'.format(self.params.get('type'), tmdb_id)
@@ -105,18 +99,18 @@ class Script:
         item = utils.dialog_select_item(self.params.get('add_prop'))
         if not item:
             return
-        prop_name = '{0}{1}'.format(_prefixname, self.params.get('prop_id'))
-        _homewindow.setProperty(prop_name, item)
+        prop_name = '{0}{1}'.format(self.prefixname, self.params.get('prop_id'))
+        self.home.setProperty(prop_name, item)
         self.call_window()
 
     def del_path(self):
         if self.prevent_del:
             self.unlock_path()
         else:
-            _homewindow.clearProperty('{0}{1}'.format(self.prefixpath, self.position))
+            self.home.clearProperty('{0}{1}'.format(self.prefixpath, self.position))
             if self.position > 1:
                 self.position = self.position - 1
-                path = _homewindow.getProperty('{0}{1}'.format(self.prefixpath, self.position))
+                path = self.home.getProperty('{0}{1}'.format(self.prefixpath, self.position))
                 self.set_props(self.position, path)
             else:
                 self.reset_props()
@@ -127,6 +121,8 @@ class Script:
             return
         if self.params.get('authenticate_trakt'):
             traktAPI(force=True)
+        elif self.params.get('update_players'):
+            self.update_players()
         elif self.params.get('add_path'):
             self.add_path()
         elif self.params.get('add_query') and self.params.get('type'):

@@ -24,76 +24,6 @@ msgctxt "#30001"
 msgid "Arabic (Saudi Arabia)"
 msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32000"
-msgid "TMDb API Key"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32001"
-msgid "OMDb API Key"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32002"
-msgid "Days to cache details"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32003"
-msgid "Days to cache lists"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32004"
-msgid "MPAA Rating Prefix"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32005"
-msgid "Language and Country"
-msgstr ""
-
-#: /resources/lib/utils.py
-msgctxt "#32006"
-msgid "Choose item"
-msgstr ""
-
-#: /resources/lib/requestapi.py
-msgctxt "#32007"
-msgid "Missing/Invalid"
-msgstr ""
-
-#: /resources/lib/requestapi.py
-msgctxt "#32008"
-msgid "API Key"
-msgstr ""
-
-#: /resources/lib/requestapi.py
-msgctxt "#32009"
-msgid "You must enter a valid API key to use this add-on"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32010"
-msgid "Authenticate Trakt Account..."
-msgstr ""
-
-#: /resources/lib/traktapi.py
-msgctxt "#32011"
-msgid "Token"
-msgstr ""
-
-#: /resources/lib/traktapi.py
-msgctxt "#32012"
-msgid "You must Authenticate your Trakt account to use this feature."
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32013"
-msgid "Display Trakt list management options in TMDb details list"
-msgstr ""
-
 msgctxt "#30002"
 msgid "Belarusian (Belarus)"
 msgstr ""
@@ -160,6 +90,11 @@ msgstr ""
 
 msgctxt "#30018"
 msgid "English (United States of America)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32017"
+msgid "Accounts / API Keys"
 msgstr ""
 
 msgctxt "#30019"
@@ -356,4 +291,89 @@ msgstr ""
 
 msgctxt "#30067"
 msgid "Zulu (South Africa)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32000"
+msgid "TMDb API Key"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32001"
+msgid "OMDb API Key"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32002"
+msgid "Days to cache details"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32003"
+msgid "Days to cache lists"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32004"
+msgid "MPAA Rating Prefix"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32005"
+msgid "Language and Country"
+msgstr ""
+
+#: /resources/lib/utils.py
+msgctxt "#32006"
+msgid "Choose item"
+msgstr ""
+
+#: /resources/lib/requestapi.py
+msgctxt "#32007"
+msgid "Missing/Invalid"
+msgstr ""
+
+#: /resources/lib/requestapi.py
+msgctxt "#32008"
+msgid "API Key"
+msgstr ""
+
+#: /resources/lib/requestapi.py
+msgctxt "#32009"
+msgid "You must enter a valid API key to use this add-on"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32010"
+msgid "Authenticate Trakt Account..."
+msgstr ""
+
+#: /resources/lib/traktapi.py
+msgctxt "#32011"
+msgid "Token"
+msgstr ""
+
+#: /resources/lib/traktapi.py
+msgctxt "#32012"
+msgid "You must Authenticate your Trakt account to use this feature."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32013"
+msgid "Display Trakt list management options in TMDb details list"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32014"
+msgid "Players"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32015"
+msgid "Players URL"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32016"
+msgid "Update Players from URL"
 msgstr ""
