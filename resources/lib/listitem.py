@@ -49,9 +49,9 @@ class ListItem(object):
             self.url['episode'] = self.infolabels.get('episode')
         if widget:
             self.url['widget'] = widget
-        if self.url.get('widget', '').capitalize() == 'True' and self.infolabels.get('mediatype') == 'tvshow':
+        if self.url.get('widget', '').capitalize() in ['True', 'Info'] and self.infolabels.get('mediatype') == 'tvshow':
             self.url['info'] = 'seasons'
-        if self.url.get('widget', '').capitalize() == 'True' and self.infolabels.get('mediatype') in ['movie', 'episode']:
+        if self.url.get('widget', '').capitalize() in ['True', 'Info'] and self.infolabels.get('mediatype') in ['movie', 'episode']:
             self.url['info'] = 'play'
         self.is_folder = False if self.url.get('info') in ['play', 'textviewer', 'imageviewer'] else True
 
