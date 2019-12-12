@@ -12,7 +12,8 @@ class TMDb(RequestAPI):
     def __init__(self, api_key=None, language=None, cache_long=None, cache_short=None, append_to_response=None, mpaa_prefix=None, filter_key=None, filter_value=None, exclude_key=None, exclude_value=None):
         super(TMDb, self).__init__(
             cache_short=cache_short, cache_long=cache_long,
-            req_api_name='TMDb', req_api_url='https://api.themoviedb.org/3', req_wait_time=0.25)
+            req_api_name='TMDb', req_api_url='https://api.themoviedb.org/3', req_wait_time=0.25,
+            req_api_key='?api_key=a07324c669cac4d96789197134ce272b')
         api_key = api_key if api_key else 'a07324c669cac4d96789197134ce272b'
         language = language if language else 'en-US'
         self.iso_language = language[:2]

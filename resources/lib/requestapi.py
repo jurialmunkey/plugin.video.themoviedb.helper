@@ -22,8 +22,12 @@ class RequestAPI(object):
         self.addon = xbmcaddon.Addon(self.addon_name)
         self.dialog_noapikey_header = '{0} {1} {2}'.format(self.addon.getLocalizedString(32007), self.req_api_name, self.addon.getLocalizedString(32008))
         self.dialog_noapikey_text = self.addon.getLocalizedString(32009)
+        self.dialog_noapikey_check = None
 
     def invalid_apikey(self):
+        if self.dialog_noapikey_check == self.req_api_key:
+            return  # We've already asked once so don't ask again for this container
+        self.dialog_noapikey_check = self.req_api_key
         xbmcgui.Dialog().ok(self.dialog_noapikey_header, self.dialog_noapikey_text)
         xbmc.executebuiltin('Addon.OpenSettings({0})'.format(self.addon_name))
 

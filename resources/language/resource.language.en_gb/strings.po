@@ -107,6 +107,26 @@ msgctxt "#32019"
 msgid "Fanart.tv Client Key"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32020"
+msgid "Only enter if default developer api key is deactivated"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32021"
+msgid "Use fanart.tv for additional artwork (increases load times)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32022"
+msgid "Play / Open"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32023"
+msgid "Default select action in addon"
+msgstr ""
+
 msgctxt "#30019"
 msgid "Esperanto (None)"
 msgstr ""

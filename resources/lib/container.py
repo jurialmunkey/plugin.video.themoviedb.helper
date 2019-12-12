@@ -30,6 +30,7 @@ class Container(Plugin):
         self.mixed_containercontent = ''
         self.library = 'video'
         self.updatelisting = False
+        self.select_action = self.addon.getSettingInt('select_action')
         self.trakt_management = self.addon.getSettingBool('trakt_management')
 
     def start_container(self):
@@ -429,7 +430,7 @@ class Container(Plugin):
         for i in basedir:
             for t in i.get('types'):
                 url = {'info': i.get('info'), 'type': t} if t else {'info': i.get('info')}
-                if not xbmc.getCondVisibility("Window.IsMedia"):
+                if self.select_action or not xbmc.getCondVisibility("Window.IsMedia"):
                     url['widget'] = 'True'
                 listitem = ListItem(label=i.get('name').format(utils.type_convert(t, 'plural')), icon=i.get('icon', '').format(self.addonpath))
                 listitem.create_listitem(self.handle, **url)
