@@ -9,7 +9,6 @@
     <category label="$ADDON[plugin.video.themoviedb.helper 32017]">
         <setting label="$ADDON[plugin.video.themoviedb.helper 32000]" type="text" id="tmdb_apikey" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32001]" type="text" id="omdb_apikey" />
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32018]" type="text" id="fanarttv_apikey" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32019]" type="text" id="fanarttv_clientkey" />
         <setting label="Use fanart.tv for additional artwork (increases load times)" type="bool" id="fanarttv_lookup" default="false" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32010]" type="action" action="RunScript(plugin.video.themoviedb.helper, authenticate_trakt)" option="close" />
