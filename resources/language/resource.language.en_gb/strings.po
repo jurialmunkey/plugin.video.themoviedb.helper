@@ -422,3 +422,8 @@ msgstr ""
 msgctxt "#32026"
 msgid "Choose default players"
 msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32027"
+msgid "Clear default players"
+msgstr ""

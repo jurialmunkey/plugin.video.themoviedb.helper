@@ -89,6 +89,10 @@ class Script(Plugin):
             selected = tv_player.itemlist[tv_index].getLabel()
             self.addon.setSetting('default_player_episodes', selected)
 
+    def clear_defaults(self):
+        self.addon.setSetting('default_player_movies', '')
+        self.addon.setSetting('default_player_episodes', '')
+
     def add_path(self):
         self.position = self.position + 1
         self.set_props(self.position, self.params.get('add_path'))
@@ -141,6 +145,8 @@ class Script(Plugin):
             self.update_players()
         elif self.params.get('default_players'):
             self.default_players()
+        elif self.params.get('clear_defaults'):
+            self.clear_defaults()
         elif self.params.get('add_path'):
             self.add_path()
         elif self.params.get('add_query') and self.params.get('type'):
