@@ -407,3 +407,18 @@ msgstr ""
 msgctxt "#32023"
 msgid "Default select action in addon"
 msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32024"
+msgid "Default player for movies"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32025"
+msgid "Default player for episodes"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32026"
+msgid "Choose default players"
+msgstr ""
