@@ -9,6 +9,7 @@ import resources.lib.utils as utils
 from resources.lib.downloader import Downloader
 from resources.lib.traktapi import traktAPI
 from resources.lib.plugin import Plugin
+from resources.lib.player import Player
 
 
 class Script(Plugin):
@@ -74,7 +75,19 @@ class Script(Plugin):
         downloader.get_extracted_zip()
         
     def default_players(self):
-        pass
+        movies_player = Player()
+        movies_player.setup_players(tmdbtype='movie')
+        movie_index = xbmcgui.Dialog().select('Choose Default Player for Movies', movies_player.itemlist)
+        if movie_index > -1:
+            selected = movies_player.itemlist[movie_index].getLabel()
+            self.addon.setSetting('default_player_movies', selected)
+        
+        tv_player = Player()
+        tv_player.setup_players(tmdbtype='tv')
+        tv_index = xbmcgui.Dialog().select('Choose Default Player for TV Shows', tv_player.itemlist)
+        if tv_index > -1:
+            selected = tv_player.itemlist[tv_index].getLabel()
+            self.addon.setSetting('default_player_episodes', selected)
 
     def add_path(self):
         self.position = self.position + 1
