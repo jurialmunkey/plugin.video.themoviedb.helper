@@ -107,6 +107,9 @@ class Downloader(object):
         if not response:
             xbmcgui.Dialog().ok(self.addon.getAddonInfo('name'), 'The provided URL is either invalid or inaccesible.')
             return
+            
+        if not os.path.exists(self.extract_to):
+            os.makedirs(self.extract_to)
 
         if xbmcgui.Dialog().yesno(self.addon.getAddonInfo('name'), self.msg_cleardir):
             with utils.busy_dialog():
