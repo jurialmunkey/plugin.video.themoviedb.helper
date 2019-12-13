@@ -72,6 +72,9 @@ class Script(Plugin):
             extract_to='special://profile/addon_data/plugin.video.themoviedb.helper/players',
             download_url=self.addon.getSetting('players_url'))
         downloader.get_extracted_zip()
+        
+    def default_players(self):
+        pass
 
     def add_path(self):
         self.position = self.position + 1
@@ -123,6 +126,8 @@ class Script(Plugin):
             traktAPI(force=True)
         elif self.params.get('update_players'):
             self.update_players()
+        elif self.params.get('default_players'):
+            self.default_players()
         elif self.params.get('add_path'):
             self.add_path()
         elif self.params.get('add_query') and self.params.get('type'):
