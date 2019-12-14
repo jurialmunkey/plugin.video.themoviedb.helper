@@ -16,11 +16,10 @@
     </category>
     <category label="$ADDON[plugin.video.themoviedb.helper 32014]">
         <setting label="$ADDON[plugin.video.themoviedb.helper 32015]" type="text" id="players_url" default="" />
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32016]" type="action" action="RunScript(plugin.video.themoviedb.helper, update_players)" subsetting="true" option="close" enable="!eq(-1,)" />
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32026]" type="action" action="RunScript(plugin.video.themoviedb.helper, default_players)" option="close" />
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32024]" type="text" subsetting="true" id="default_player_movies" default="" enable="false" />
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32025]" type="text" subsetting="true" id="default_player_episodes" default="" enable="false" />
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32027]" type="action" action="RunScript(plugin.video.themoviedb.helper, clear_defaults)" option="close" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32016]" type="action" action="RunScript(plugin.video.themoviedb.helper, update_players)" subsetting="true" enable="!eq(-1,)" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32024]" type="action" action="RunScript(plugin.video.themoviedb.helper, set_defaultplayer=movie)" id="default_player_movies" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32025]" type="action" action="RunScript(plugin.video.themoviedb.helper, set_defaultplayer=tv)" id="default_player_episodes" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32027]" type="action" action="RunScript(plugin.video.themoviedb.helper, clear_defaultplayers)" />
     </category>
     <category label="$LOCALIZE[10039]">
         <setting label="$ADDON[plugin.video.themoviedb.helper 32020]" type="lsep"/>

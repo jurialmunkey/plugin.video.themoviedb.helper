@@ -73,23 +73,21 @@ class Script(Plugin):
             extract_to='special://profile/addon_data/plugin.video.themoviedb.helper/players',
             download_url=self.addon.getSetting('players_url'))
         downloader.get_extracted_zip()
-        
-    def default_players(self):
-        movies_player = Player()
-        movies_player.setup_players(tmdbtype='movie')
-        movie_index = xbmcgui.Dialog().select('Choose Default Player for Movies', movies_player.itemlist)
-        if movie_index > -1:
-            selected = movies_player.itemlist[movie_index].getLabel()
-            self.addon.setSetting('default_player_movies', selected)
-        
-        tv_player = Player()
-        tv_player.setup_players(tmdbtype='tv')
-        tv_index = xbmcgui.Dialog().select('Choose Default Player for TV Shows', tv_player.itemlist)
-        if tv_index > -1:
-            selected = tv_player.itemlist[tv_index].getLabel()
-            self.addon.setSetting('default_player_episodes', selected)
 
-    def clear_defaults(self):
+    def set_defaultplayer(self):
+        player = Player()
+        tmdbtype = self.params.get('set_defaultplayer')
+        setting = 'default_player_episodes' if tmdbtype == 'tv' else 'default_player_{0}s'.format(tmdbtype)
+        player.setup_players(tmdbtype=tmdbtype, clearsetting=True)
+        idx = xbmcgui.Dialog().select(
+            'Choose Default Player for {0}'.format(utils.type_convert(tmdbtype, 'plural')), player.itemlist)
+        if idx == 0:
+            self.addon.setSetting(setting, '')
+        if idx > 0:
+            selected = player.itemlist[idx].getLabel()
+            self.addon.setSetting(setting, selected)
+
+    def clear_defaultplayers(self):
         self.addon.setSetting('default_player_movies', '')
         self.addon.setSetting('default_player_episodes', '')
 
@@ -143,10 +141,10 @@ class Script(Plugin):
             traktAPI(force=True)
         elif self.params.get('update_players'):
             self.update_players()
-        elif self.params.get('default_players'):
-            self.default_players()
-        elif self.params.get('clear_defaults'):
-            self.clear_defaults()
+        elif self.params.get('set_defaultplayer'):
+            self.set_defaultplayer()
+        elif self.params.get('clear_defaultplayers'):
+            self.clear_defaultplayers()
         elif self.params.get('add_path'):
             self.add_path()
         elif self.params.get('add_query') and self.params.get('type'):

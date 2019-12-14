@@ -31,12 +31,12 @@ class Player(Plugin):
         self.itemlist = []
         self.actions = []
         self.players = {}
-        
-    def setup_players(self, tmdbtype=None, details=False):
+
+    def setup_players(self, tmdbtype=None, details=False, clearsetting=False):
         self.build_players(tmdbtype)
         if details:
             self.build_details()
-        self.build_selectbox()
+        self.build_selectbox(clearsetting)
 
     def play(self, itemtype, tmdb_id, season=None, episode=None):
         self.itemtype, self.tmdb_id, self.season, self.episode = itemtype, tmdb_id, season, episode
@@ -58,17 +58,17 @@ class Player(Plugin):
             default_player_movies = self.addon.getSetting('default_player_movies')
             default_player_episodes = self.addon.getSetting('default_player_episodes')
             itemindex = -1
-            
+
             if (self.itemtype == 'movie' and not default_player_movies) or (self.itemtype == 'episode' and not default_player_episodes):
                 itemindex = xbmcgui.Dialog().select('Choose Action', self.itemlist)
-            else:    
+            else:
                 for index in range(0, len(self.itemlist)):
                     item = self.itemlist[index]
                     label = item.getLabel()
                     if (label == default_player_movies and self.itemtype == 'movie') or (label == default_player_episodes and self.itemtype == 'episode'):
                         itemindex = index
                         break
-                
+
             if itemindex > -1:
                 action = self.actions[itemindex]
                 utils.kodi_log(action, 1)
@@ -137,9 +137,8 @@ class Player(Plugin):
                     f.close()
                 if not meta.get('plugin') or not xbmc.getCondVisibility(u'System.HasAddon({0})'.format(meta.get('plugin'))):
                     continue  # Don't have plugin so skip
-                
-                if not tmdbtype:
-                    tmdbtype = self.tmdbtype
+
+                tmdbtype = tmdbtype or self.tmdbtype
                 if tmdbtype == 'movie' and meta.get('search_movie'):
                     self.search_movie.append(meta.get('plugin'))
                 if tmdbtype == 'movie' and meta.get('play_movie'):
@@ -150,8 +149,10 @@ class Player(Plugin):
                     self.play_episode.append(meta.get('plugin'))
                 self.players[meta.get('plugin')] = meta
 
-    def build_selectbox(self):
+    def build_selectbox(self, clearsetting=False):
         self.itemlist, self.actions = [], []
+        if clearsetting:
+            self.itemlist.append(xbmcgui.ListItem('Clear Default'))
         call = u'call_update=' if xbmc.getCondVisibility("Window.IsMedia") else u'call_path='
         for i in self.play_movie:
             self.itemlist.append(xbmcgui.ListItem(u'Play with {0}'.format(self.players.get(i, {}).get('name', ''))))
