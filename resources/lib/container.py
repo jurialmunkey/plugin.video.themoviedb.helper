@@ -431,17 +431,22 @@ class Container(Plugin):
         self.list_items(items=items, url_tmdb_id=self.params.get('tmdb_id'))
 
     def list_basedir(self):
-        basedir = BASEDIR_PATH.get(self.params.get('info', '')) or BASEDIR_MAIN
+        cat = BASEDIR_PATH.get(self.params.get('info'), {})
+        basedir = cat.get('folders', [BASEDIR_MAIN])
+        types = cat.get('types', [None])
         self.start_container()
-        for i in basedir:
-            for t in i.get('types'):
-                url = {'info': i.get('info'), 'type': t} if t else {'info': i.get('info')}
-                if self.select_action == 1 or not xbmc.getCondVisibility("Window.IsMedia"):
-                    url['widget'] = 'True'
-                if self.select_action == 2 and xbmc.getCondVisibility("Window.IsMedia"):
-                    url['widget'] = 'Info'
-                listitem = ListItem(label=i.get('name').format(utils.type_convert(t, 'plural')), icon=i.get('icon', '').format(self.addonpath))
-                listitem.create_listitem(self.handle, **url)
+        for folder in basedir:
+            for i in folder:
+                for t in types:
+                    if t not in i.get('types', [None]):
+                        continue
+                    url = {'info': i.get('info'), 'type': t} if t else {'info': i.get('info')}
+                    if self.select_action == 1 or not xbmc.getCondVisibility("Window.IsMedia"):
+                        url['widget'] = 'True'
+                    if self.select_action == 2 and xbmc.getCondVisibility("Window.IsMedia"):
+                        url['widget'] = 'Info'
+                    listitem = ListItem(label=i.get('name').format(utils.type_convert(t, 'plural')), icon=i.get('icon', '').format(self.addonpath))
+                    listitem.create_listitem(self.handle, **url)
         self.finish_container()
 
     def router(self):

@@ -51,14 +51,24 @@ TYPE_CONVERSION = {
 
 BASEDIR_MAIN = [
     {
+        'info': 'dir_movie',
+        'name': 'Movies',
+        'icon': '{0}/resources/icons/tmdb/movies.png'},
+    {
+        'info': 'dir_tv',
+        'name': 'TV Shows',
+        'icon': '{0}/resources/icons/tmdb/tv.png'},
+    {
+        'info': 'dir_person',
+        'name': 'People',
+        'icon': '{0}/resources/icons/tmdb/cast.png'},
+    {
         'info': 'dir_tmdb',
         'name': 'TheMovieDb',
-        'types': [None],
         'icon': '{0}/resources/poster.png'},
     {
         'info': 'dir_trakt',
         'name': 'Trakt',
-        'types': [None],
         'icon': '{0}/resources/trakt.png'}]
 
 BASEDIR_TMDB = [
@@ -185,7 +195,22 @@ BASEDIR_TRAKT = [
         'icon': '{0}/resources/icons/trakt/mylists.png',
         'types': ['both']}]
 
-BASEDIR_PATH = {'dir_tmdb': BASEDIR_TMDB, 'dir_trakt': BASEDIR_TRAKT}
+BASEDIR_PATH = {
+    'dir_movie': {
+        'folders': [BASEDIR_TMDB, BASEDIR_TRAKT],
+        'types': ['movie', 'both']},
+    'dir_tv': {
+        'folders': [BASEDIR_TMDB, BASEDIR_TRAKT],
+        'types': ['tv', 'both']},
+    'dir_person': {
+        'folders': [BASEDIR_TMDB, BASEDIR_TRAKT],
+        'types': ['person']},
+    'dir_tmdb': {
+        'folders': [BASEDIR_TMDB],
+        'types': ['movie', 'tv', 'person', 'both']},
+    'dir_trakt': {
+        'folders': [BASEDIR_TRAKT],
+        'types': ['movie', 'tv', 'person', 'both']}}
 
 DETAILED_CATEGORIES = [
     {
