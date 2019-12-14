@@ -92,41 +92,6 @@ msgctxt "#30018"
 msgid "English (United States of America)"
 msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32017"
-msgid "Accounts / API Keys"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32018"
-msgid "Fanart.tv API Key"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32019"
-msgid "Fanart.tv Client Key"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32020"
-msgid "Only enter if default developer api key is deactivated"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32021"
-msgid "Use fanart.tv for additional artwork (increases load times)"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32022"
-msgid "Play / Open"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32023"
-msgid "Default select action in addon"
-msgstr ""
-
 msgctxt "#30019"
 msgid "Esperanto (None)"
 msgstr ""
@@ -406,4 +371,59 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32016"
 msgid "Update Players from URL"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32017"
+msgid "Accounts / API Keys"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32018"
+msgid "Fanart.tv API Key"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32019"
+msgid "Fanart.tv Client Key"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32020"
+msgid "Only enter if default developer api key is deactivated"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32021"
+msgid "Use fanart.tv for additional artwork (increases load times)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32022"
+msgid "Play / Open"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32023"
+msgid "Default select action in addon"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32024"
+msgid "Default player for movies"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32025"
+msgid "Default player for episodes"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32026"
+msgid "Choose default players"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32027"
+msgid "Clear default players"
 msgstr ""

@@ -9,6 +9,7 @@ import resources.lib.utils as utils
 from resources.lib.downloader import Downloader
 from resources.lib.traktapi import traktAPI
 from resources.lib.plugin import Plugin
+from resources.lib.player import Player
 
 
 class Script(Plugin):
@@ -73,6 +74,23 @@ class Script(Plugin):
             download_url=self.addon.getSetting('players_url'))
         downloader.get_extracted_zip()
 
+    def set_defaultplayer(self):
+        player = Player()
+        tmdbtype = self.params.get('set_defaultplayer')
+        setting = 'default_player_episodes' if tmdbtype == 'tv' else 'default_player_{0}s'.format(tmdbtype)
+        player.setup_players(tmdbtype=tmdbtype, clearsetting=True)
+        idx = xbmcgui.Dialog().select(
+            'Choose Default Player for {0}'.format(utils.type_convert(tmdbtype, 'plural')), player.itemlist)
+        if idx == 0:
+            self.addon.setSetting(setting, '')
+        if idx > 0:
+            selected = player.itemlist[idx].getLabel()
+            self.addon.setSetting(setting, selected)
+
+    def clear_defaultplayers(self):
+        self.addon.setSetting('default_player_movies', '')
+        self.addon.setSetting('default_player_episodes', '')
+
     def add_path(self):
         self.position = self.position + 1
         self.set_props(self.position, self.params.get('add_path'))
@@ -123,6 +141,10 @@ class Script(Plugin):
             traktAPI(force=True)
         elif self.params.get('update_players'):
             self.update_players()
+        elif self.params.get('set_defaultplayer'):
+            self.set_defaultplayer()
+        elif self.params.get('clear_defaultplayers'):
+            self.clear_defaultplayers()
         elif self.params.get('add_path'):
             self.add_path()
         elif self.params.get('add_query') and self.params.get('type'):
