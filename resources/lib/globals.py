@@ -107,82 +107,82 @@ BASEDIR_TRAKT = [
     {
         'info': 'trakt_watchlist',
         'name': 'Watchlist {0}',
-        'icon': '{0}/resources/trakt.png',
+        'icon': '{0}/resources/icons/trakt/watchlist.png',
         'types': ['movie', 'tv']},
     {
         'info': 'trakt_history',
         'name': 'Your Recently Watched {0}',
-        'icon': '{0}/resources/trakt.png',
+        'icon': '{0}/resources/icons/trakt/recentlywatched.png',
         'types': ['movie', 'tv']},
     {
         'info': 'trakt_mostwatched',
         'name': 'Your Most Watched {0}',
-        'icon': '{0}/resources/trakt.png',
+        'icon': '{0}/resources/icons/trakt/mostwatched.png',
         'types': ['movie', 'tv']},
     {
         'info': 'trakt_inprogress',
         'name': 'Your In-Progress {0}',
-        'icon': '{0}/resources/trakt.png',
+        'icon': '{0}/resources/icons/trakt/inprogress.png',
         'types': ['tv']},
     {
         'info': 'trakt_recommendations',
         'name': '{0} Recommended For You',
-        'icon': '{0}/resources/trakt.png',
+        'icon': '{0}/resources/icons/trakt/recommended.png',
         'types': ['movie', 'tv']},
     {
         'info': 'trakt_myairing',
         'name': 'Your {0} Airing This Week',
-        'icon': '{0}/resources/trakt.png',
+        'icon': '{0}/resources/icons/trakt/airing.png',
         'types': ['tv']},
     {
         'info': 'trakt_calendar',
         'name': 'Your {0} Calendar',
-        'icon': '{0}/resources/trakt.png',
+        'icon': '{0}/resources/icons/trakt/calendar.png',
         'types': ['tv']},
     {
         'info': 'trakt_trending',
         'name': 'Trending {0}',
-        'icon': '{0}/resources/trakt.png',
+        'icon': '{0}/resources/icons/trakt/trend.png',
         'types': ['movie', 'tv']},
     {
         'info': 'trakt_popular',
         'name': 'Popular {0}',
-        'icon': '{0}/resources/trakt.png',
+        'icon': '{0}/resources/icons/trakt/popular.png',
         'types': ['movie', 'tv']},
     {
         'info': 'trakt_mostplayed',
         'name': 'Most Played {0}',
-        'icon': '{0}/resources/trakt.png',
+        'icon': '{0}/resources/icons/trakt/mostplayed.png',
         'types': ['movie', 'tv']},
     {
         'info': 'trakt_anticipated',
         'name': 'Anticipated {0}',
-        'icon': '{0}/resources/trakt.png',
+        'icon': '{0}/resources/icons/trakt/anticipated.png',
         'types': ['movie', 'tv']},
     {
         'info': 'trakt_boxoffice',
         'name': 'Top 10 Box Office {0}',
-        'icon': '{0}/resources/trakt.png',
+        'icon': '{0}/resources/icons/trakt/boxoffice.png',
         'types': ['movie']},
     {
         'info': 'trakt_trendinglists',
         'name': 'Trending Lists',
-        'icon': '{0}/resources/trakt.png',
+        'icon': '{0}/resources/icons/trakt/trendinglist.png',
         'types': ['both']},
     {
         'info': 'trakt_popularlists',
         'name': 'Popular Lists',
-        'icon': '{0}/resources/trakt.png',
+        'icon': '{0}/resources/icons/trakt/popularlist.png',
         'types': ['both']},
     {
         'info': 'trakt_likedlists',
         'name': 'Liked Lists',
-        'icon': '{0}/resources/trakt.png',
+        'icon': '{0}/resources/icons/trakt/likedlist.png',
         'types': ['both']},
     {
         'info': 'trakt_mylists',
         'name': 'Your Lists',
-        'icon': '{0}/resources/trakt.png',
+        'icon': '{0}/resources/icons/trakt/mylists.png',
         'types': ['both']}]
 
 BASEDIR_PATH = {'dir_tmdb': BASEDIR_TMDB, 'dir_trakt': BASEDIR_TRAKT}
@@ -191,87 +191,87 @@ DETAILED_CATEGORIES = [
     {
         'info': 'cast',
         'name': 'Cast',
-        'icon': '',
+        'icon': '{0}/resources/icons/tmdb/cast.png',
         'types': ['movie', 'tv']},
     {
         'info': 'recommendations',
         'name': 'Recommended',
-        'icon': '',
+        'icon': '{0}/resources/icons/tmdb/recommended.png',
         'types': ['movie', 'tv']},
     {
         'info': 'similar',
         'name': 'Similar',
-        'icon': '',
+        'icon': '{0}/resources/icons/tmdb/similar.png',
         'types': ['movie', 'tv']},
     {
         'info': 'crew',
         'name': 'Crew',
-        'icon': '',
+        'icon': '{0}/resources/icons/tmdb/cast.png',
         'types': ['movie', 'tv']},
     {
         'info': 'posters',
         'name': 'Posters',
-        'icon': '',
+        'icon': '{0}/resources/icons/tmdb/images.png',
         'types': ['movie', 'tv']},
     {
         'info': 'fanart',
         'name': 'Fanart',
-        'icon': '',
+        'icon': '{0}/resources/icons/tmdb/images.png',
         'types': ['movie', 'tv']},
     {
         'info': 'movie_keywords',
         'name': 'Keywords',
-        'icon': '',
+        'icon': '{0}/resources/icons/tmdb/tags.png',
         'types': ['movie']},
     {
         'info': 'reviews',
         'name': 'Reviews',
-        'icon': '',
+        'icon': '{0}/resources/icons/tmdb/reviews.png',
         'types': ['movie', 'tv']},
     {
         'info': 'stars_in_movies',
         'name': 'Cast in Movies',
-        'icon': '',
+        'icon': '{0}/resources/icons/tmdb/movies.png',
         'types': ['person']},
     {
         'info': 'stars_in_tvshows',
         'name': 'Cast in TV Shows',
-        'icon': '',
+        'icon': '{0}/resources/icons/tmdb/tv.png',
         'types': ['person']},
     {
         'info': 'crew_in_movies',
         'name': 'Crew in Movies',
-        'icon': '',
+        'icon': '{0}/resources/icons/tmdb/movies.png',
         'types': ['person']},
     {
         'info': 'crew_in_tvshows',
         'name': 'Crew in TV Shows',
-        'icon': '',
+        'icon': '{0}/resources/icons/tmdb/tv.png',
         'types': ['person']},
     {
         'info': 'images',
         'name': 'Images',
-        'icon': '',
+        'icon': '{0}/resources/icons/tmdb/images.png',
         'types': ['person']},
     {
         'info': 'seasons',
         'name': 'Seasons',
-        'icon': '',
+        'icon': '{0}/resources/icons/tmdb/episodes.png',
         'types': ['tv']},
     {
         'info': 'episode_cast',
         'name': 'Cast',
-        'icon': '',
+        'icon': '{0}/resources/icons/tmdb/cast.png',
         'types': ['episode']},
     {
         'info': 'episode_thumbs',
         'name': 'Thumbs',
-        'icon': '',
+        'icon': '{0}/resources/icons/tmdb/images.png',
         'types': ['episode']},
     {
         'info': 'trakt_inlists',
         'name': 'In Trakt Lists',
-        'icon': '',
+        'icon': '{0}/resources/icons/tmdb/trakt.png',
         'url_key': 'imdb_id',
         'types': ['movie', 'tv']}]
 

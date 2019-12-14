@@ -390,6 +390,8 @@ class Container(Plugin):
                 item.url = {'info': i.get('info'), 'type': self.params.get('type')}
                 if i.get('url_key') and details.get(i.get('url_key')):
                     item.url[i.get('url_key')] = details.get(i.get('url_key'))
+                if i.get('icon'):
+                    item.poster = item.icon = i.get('icon', '').format(self.addonpath)
                 items.append(item)
 
         # Add trakt management items if &amp;manage=True
@@ -421,6 +423,7 @@ class Container(Plugin):
         refresh = ListItem(library=self.library, **details)
         refresh.label = 'Refresh Cache'
         refresh.url = {'info': 'details', 'refresh': 'True', 'type': self.params.get('type')}
+        refresh.poster = refresh.icon = '{0}/resources/icons/tmdb/refresh.png'.format(self.addonpath)
         items.append(refresh)
 
         # Build our container
