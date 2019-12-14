@@ -140,14 +140,14 @@ class Player(Plugin):
 
                 tmdbtype = tmdbtype or self.tmdbtype
                 if tmdbtype == 'movie' and meta.get('search_movie'):
-                    self.search_movie.append(meta.get('plugin'))
+                    self.search_movie.append(f)
                 if tmdbtype == 'movie' and meta.get('play_movie'):
-                    self.play_movie.append(meta.get('plugin'))
+                    self.play_movie.append(f)
                 if tmdbtype == 'tv' and meta.get('search_episode'):
-                    self.search_episode.append(meta.get('plugin'))
+                    self.search_episode.append(f)
                 if tmdbtype == 'tv' and meta.get('play_episode'):
-                    self.play_episode.append(meta.get('plugin'))
-                self.players[meta.get('plugin')] = meta
+                    self.play_episode.append(f)
+                self.players[f] = meta
 
     def build_selectbox(self, clearsetting=False):
         self.itemlist, self.actions = [], []
