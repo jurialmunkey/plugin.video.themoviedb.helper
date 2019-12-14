@@ -342,6 +342,7 @@ TMDB_LISTS = {
         'path': '{type}/{tmdb_id}/keywords',
         'key': 'keywords',
         'url_info': 'keyword_movies',
+        'url_type': 'movie',
         'item_tmdbtype': 'keyword'},
     'reviews': {
         'path': '{type}/{tmdb_id}/reviews',
