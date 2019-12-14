@@ -111,7 +111,17 @@ BASEDIR_TMDB = [
         'info': 'genres',
         'name': '{0} Genres',
         'types': ['movie', 'tv'],
-        'icon': '{0}/resources/icons/tmdb/genre.png'}]
+        'icon': '{0}/resources/icons/tmdb/genre.png'},
+    {
+        'info': 'revenue_movies',
+        'name': 'Highest Revenue {0}',
+        'types': ['movie'],
+        'icon': '{0}/resources/poster.png'},
+    {
+        'info': 'most_voted',
+        'name': 'Most Voted {0}',
+        'types': ['movie', 'tv'],
+        'icon': '{0}/resources/poster.png'}]
 
 BASEDIR_TRAKT = [
     {
@@ -437,6 +447,18 @@ TMDB_LISTS = {
         'path': 'keyword/{tmdb_id}/movies',
         'key': 'results',
         'url_info': 'details',
+        'item_tmdbtype': '{type}'},
+    'revenue_movies': {
+        'path': 'discover/{type}',
+        'key': 'results',
+        'url_info': 'details',
+        'url_ext': 'sort_by=revenue.desc',
+        'item_tmdbtype': '{type}'},
+    'most_voted': {
+        'path': 'discover/{type}',
+        'key': 'results',
+        'url_info': 'details',
+        'url_ext': 'sort_by=vote_count.desc',
         'item_tmdbtype': '{type}'},
     'episodes': {
         'path': 'tv/{tmdb_id}/season/{season}',
