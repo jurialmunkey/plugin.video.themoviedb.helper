@@ -66,42 +66,42 @@ BASEDIR_TMDB = [
         'info': 'search',
         'name': 'Search {0}',
         'types': ['movie', 'tv', 'person'],
-        'icon': '{0}/resources/poster.png'},
+        'icon': '{0}/resources/icons/tmdb/search.png'},
     {
         'info': 'popular',
         'name': 'Popular {0}',
         'types': ['movie', 'tv', 'person'],
-        'icon': '{0}/resources/poster.png'},
+        'icon': '{0}/resources/icons/tmdb/popular.png'},
     {
         'info': 'top_rated',
         'name': 'Top Rated {0}',
         'types': ['movie', 'tv'],
-        'icon': '{0}/resources/poster.png'},
+        'icon': '{0}/resources/icons/tmdb/toprated.png'},
     {
         'info': 'upcoming',
         'name': 'Upcoming {0}',
         'types': ['movie', 'tv'],
-        'icon': '{0}/resources/poster.png'},
+        'icon': '{0}/resources/icons/tmdb/upcoming.png'},
     {
         'info': 'now_playing',
         'name': 'In Theatres',
         'types': ['movie'],
-        'icon': '{0}/resources/poster.png'},
+        'icon': '{0}/resources/icons/tmdb/intheatres.png'},
     {
         'info': 'airing_today',
         'name': 'Airing Today',
         'types': ['tv'],
-        'icon': '{0}/resources/poster.png'},
+        'icon': '{0}/resources/icons/tmdb/airing.png'},
     {
         'info': 'on_the_air',
         'name': 'Currently Airing',
         'types': ['tv'],
-        'icon': '{0}/resources/poster.png'},
+        'icon': '{0}/resources/icons/tmdb/airing.png'},
     {
         'info': 'genres',
         'name': '{0} Genres',
         'types': ['movie', 'tv'],
-        'icon': '{0}/resources/poster.png'}]
+        'icon': '{0}/resources/icons/tmdb/genre.png'}]
 
 BASEDIR_TRAKT = [
     {
