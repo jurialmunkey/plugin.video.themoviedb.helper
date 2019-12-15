@@ -221,7 +221,10 @@ class Container(Plugin):
             list_slug = i.get('ids', {}).get('slug')
             user_slug = i.get('user', {}).get('ids', {}).get('slug')
             listitem = ListItem(label=label, label2=label2, icon=icon, thumb=icon, poster=icon, infolabels=infolabels)
-            listitem.create_listitem(self.handle, info='trakt_userlist', user_slug=user_slug, list_slug=list_slug, type=self.params.get('type'))
+            url = {'info': 'trakt_userlist', 'user_slug': user_slug, 'list_slug': list_slug, 'type': self.params.get('type')}
+            if self.params.get('widget'):
+                url['widget'] = self.params.get('widget')
+            listitem.create_listitem(self.handle, **url)
         self.finish_container()
 
     def list_trakt(self):
@@ -439,10 +442,14 @@ class Container(Plugin):
                     if t not in i.get('types', [None]):
                         continue
                     url = {'info': i.get('info'), 'type': t} if t else {'info': i.get('info')}
-                    if self.select_action == 1 or not xbmc.getCondVisibility("Window.IsMedia"):
+
+                    if not xbmc.getCondVisibility("Window.IsMedia"):
                         url['widget'] = 'True'
-                    if self.select_action == 2 and xbmc.getCondVisibility("Window.IsMedia"):
+                    elif self.select_action == 1:
+                        url['widget'] = 'True'
+                    elif self.select_action == 2:
                         url['widget'] = 'Info'
+
                     listitem = ListItem(label=i.get('name').format(utils.type_convert(t, 'plural')), icon=i.get('icon', '').format(self.addonpath))
                     listitem.create_listitem(self.handle, **url)
         self.finish_container()
