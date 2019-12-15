@@ -194,6 +194,8 @@ class Container(Plugin):
             label = i[0].format(date.strftime('%A'))
             listitem = ListItem(label=label, icon=icon)
             url = {'info': 'trakt_calendar', 'type': 'episode', 'startdate': i[1], 'days': i[2]}
+            if self.params.get('widget'):
+                url['widget'] = self.params.get('widget')
             listitem.create_listitem(self.handle, **url)
         self.finish_container()
 
