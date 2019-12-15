@@ -3,6 +3,7 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 import datetime
+import random
 import resources.lib.utils as utils
 from resources.lib.traktapi import traktAPI
 from resources.lib.listitem import ListItem
@@ -268,6 +269,16 @@ class Container(Plugin):
             # TODO: Check status response and add dialog
         self.updatelisting = True
 
+    def list_becauseyouwatched(self):
+        traktapi = traktAPI(tmdb=self.tmdb)
+        recentitems = traktapi.get_recentlywatched(traktapi.get_usernameslug(), self.params.get('type'), limit=10, islistitem=False)
+        recentitem = recentitems[random.randint(0, len(recentitems) - 1)]
+        if not recentitem[1]:
+            return
+        self.params['tmdb_id'] = recentitem[1]
+        self.params['info'] = 'recommendations'
+        self.list_tmdb()
+
     def list_getid(self):
         self.params['tmdb_id'] = self.get_tmdb_id(**self.params)
 
@@ -461,6 +472,8 @@ class Container(Plugin):
             self.list_credits(self.params.get('info'))
         elif self.params.get('info') == 'search':
             self.list_search()
+        elif self.params.get('info') == 'trakt_becauseyouwatched':
+            self.list_becauseyouwatched()
         elif self.params.get('info') in TMDB_LISTS:
             self.list_getid()
             self.list_tmdb()

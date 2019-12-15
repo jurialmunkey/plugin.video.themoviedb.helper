@@ -150,6 +150,11 @@ BASEDIR_TRAKT = [
         'icon': '{0}/resources/icons/trakt/recommended.png',
         'types': ['movie', 'tv']},
     {
+        'info': 'trakt_becauseyouwatched',
+        'name': '{0} Based on a Random Recently Watched Item',
+        'icon': '{0}/resources/icons/trakt/recommended.png',
+        'types': ['movie', 'tv']},
+    {
         'info': 'trakt_myairing',
         'name': 'Your {0} Airing This Week',
         'icon': '{0}/resources/icons/trakt/airing.png',
