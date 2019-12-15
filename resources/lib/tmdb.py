@@ -245,7 +245,8 @@ class TMDb(RequestAPI):
         return {
             'label': label, 'icon': icon, 'poster': poster, 'thumb': thumb, 'fanart': fanart,
             'cast': cast, 'infolabels': infolabels, 'infoproperties': infoproperties,
-            'tmdb_id': item.get('id'), 'imdb_id': item.get('imdb_id')}
+            'tmdb_id': infoproperties.get('tmdb_id'), 'imdb_id': infoproperties.get('imdb_id'),
+            'tvdb_id': infoproperties.get('tvdb_id')}
 
     def get_nicelist(self, items):
         return [
@@ -282,7 +283,7 @@ class TMDb(RequestAPI):
 
     def get_detailed_item(self, itemtype, tmdb_id, season=None, episode=None, cache_only=False, cache_refresh=False):
         extra_request = None
-        cache_name = '{0}.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
+        cache_name = '{0}.TMDb.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
         cache_name = '{0}.Season{1}'.format(cache_name, season) if season else cache_name
         cache_name = '{0}.Episode{1}'.format(cache_name, episode) if season and episode else cache_name
         itemdict = self.get_cache(cache_name) if not cache_refresh else None
@@ -348,7 +349,11 @@ class TMDb(RequestAPI):
 
     def get_list(self, *args, **kwargs):
         key = kwargs.pop('key', 'results')
+        pagination = kwargs.pop('pagination', True)
         longcache = kwargs.pop('longcache', False)
         func = self.get_request_lc if longcache else self.get_request_sc
         request = func(*args, language=self.req_language, **kwargs)
-        return self.get_nicelist(request.get(key, []))
+        items = self.get_nicelist(request.get(key, []))
+        if pagination and utils.try_parse_int(request.get('page', 0)) < utils.try_parse_int(request.get('total_pages', 0)):
+            items.append(ListItem(library=self.library, label='Next Page', nextpage=utils.try_parse_int(request.get('page', 0)) + 1))
+        return items

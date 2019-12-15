@@ -10,8 +10,8 @@ except ImportError:
 
 
 class ListItem(object):
-    def __init__(self, label=None, label2=None, dbtype=None, library=None, tmdb_id=None, imdb_id=None, dbid=None,
-                 cast=None, infolabels=None, infoproperties=None, poster=None, thumb=None, icon=None, fanart=None,
+    def __init__(self, label=None, label2=None, dbtype=None, library=None, tmdb_id=None, imdb_id=None, dbid=None, tvdb_id=None,
+                 cast=None, infolabels=None, infoproperties=None, poster=None, thumb=None, icon=None, fanart=None, nextpage=None,
                  clearlogo=None, clearart=None, banner=None, landscape=None, mixed_type=None, url=None, is_folder=True):
         self.addonpath = xbmcaddon.Addon('plugin.video.themoviedb.helper').getAddonInfo('path')
         self.label = label or 'N/A'
@@ -19,6 +19,7 @@ class ListItem(object):
         self.library = library or ''  # <content target= video, music, pictures, none>
         self.tmdb_id = tmdb_id or ''  # ListItem.Property(tmdb_id)
         self.imdb_id = imdb_id or ''  # IMDb ID for item
+        self.tvdb_id = tvdb_id or ''  # IMDb ID for item
         self.poster, self.thumb = poster, thumb
         self.clearlogo, self.clearart, self.banner, self.landscape = clearlogo, clearart, banner, landscape
         self.url = url or {}
@@ -30,6 +31,7 @@ class ListItem(object):
         self.infolabels = infolabels or {}  # ListItem.Foobar
         self.infoproperties = infoproperties or {}  # ListItem.Property(Foobar)
         self.dbid = dbid
+        self.nextpage = nextpage
 
     def set_url(self, **kwargs):
         url = kwargs.pop('url', 'plugin://plugin.video.themoviedb.helper/?')
@@ -55,35 +57,36 @@ class ListItem(object):
             self.url['info'] = 'play'
         self.is_folder = False if self.url.get('info') in ['play', 'textviewer', 'imageviewer'] else True
 
-    def get_details(self, dbtype=None, tmdb=None, omdb=None, fanarttv=None):
-        self.infolabels['mediatype'] = dbtype
-
-        if self.dbid:
-            self.infolabels['dbid'] = self.dbid
-
-        if not dbtype or not tmdb:
+    def get_extra_artwork(self, tmdb=None, fanarttv=None):
+        if not fanarttv:
             return
 
-        # Fanart TV Lookup
         artwork = None
-        if fanarttv and dbtype == 'tvshow':
-            tvdb_id = tmdb.get_item_externalid('tv', self.tmdb_id, 'tvdb_id')
-            artwork = fanarttv.get_tvshow_allart_lc(tvdb_id)
-        elif fanarttv and dbtype == 'movie':
+
+        if self.infolabels.get('mediatype') == 'tvshow' and (self.tvdb_id or tmdb):
+            self.tvdb_id = self.tvdb_id or tmdb.get_item_externalid('tv', self.tmdb_id, 'tvdb_id')
+            artwork = fanarttv.get_tvshow_allart_lc(self.tvdb_id)
+
+        elif self.infolabels.get('mediatype') == 'movie':
             artwork = fanarttv.get_movie_allart_lc(self.tmdb_id)
+
         if artwork:
-            self.clearart = artwork.get('clearart')
-            self.clearlogo = artwork.get('clearlogo')
-            self.landscape = artwork.get('landscape')
-            self.banner = artwork.get('banner')
+            self.clearart = self.clearart or artwork.get('clearart')
+            self.clearlogo = self.clearlogo or artwork.get('clearlogo')
+            self.landscape = self.landscape or artwork.get('landscape')
+            self.banner = self.banner or artwork.get('banner')
             self.fanart = self.fanart or artwork.get('fanart')
 
+    def get_tmdb_details(self, tmdb=None):
+        if not tmdb:
+            return
+
         details = None
-        if dbtype in ['movie', 'tvshow']:
-            tmdbtype = 'tv' if dbtype == 'tvshow' else 'movie'
+        if self.infolabels.get('mediatype') in ['movie', 'tvshow']:
+            tmdbtype = 'tv' if self.infolabels.get('mediatype') == 'tvshow' else 'movie'
             details = tmdb.get_detailed_item(tmdbtype, self.tmdb_id, cache_only=True)
-        if dbtype in ['season', 'episode']:
-            episode = self.infolabels.get('episode') if dbtype == 'episode' else None
+        if self.infolabels.get('mediatype') in ['season', 'episode']:
+            episode = self.infolabels.get('episode') if self.infolabels.get('mediatype') == 'episode' else None
             details = tmdb.get_detailed_item('tv', self.tmdb_id, season=self.infolabels.get('season'), episode=episode, cache_only=True)
         # # TODO: Add details for actors
 
@@ -93,9 +96,22 @@ class ListItem(object):
         self.infolabels = utils.merge_two_dicts(details.get('infolabels', {}), utils.del_empty_keys(self.infolabels))
         self.infoproperties = utils.merge_two_dicts(details.get('infoproperties', {}), utils.del_empty_keys(self.infoproperties))
 
-        if dbtype == 'movie' and omdb and self.imdb_id:
+    def get_omdb_details(self, omdb=None):
+        if omdb and self.imdb_id and self.infolabels.get('mediatype') == 'movie':
             self.infoproperties = utils.merge_two_dicts(self.infoproperties, omdb.get_ratings_awards(imdb_id=self.imdb_id, cache_only=True))
-        # TODO: Merge artwork? Maybe?
+
+    def get_details(self, dbtype=None, tmdb=None, omdb=None, fanarttv=None):
+        self.infolabels['mediatype'] = dbtype
+
+        if self.dbid:
+            self.infolabels['dbid'] = self.dbid
+
+        if not dbtype:
+            return
+
+        self.get_extra_artwork(tmdb=tmdb, fanarttv=fanarttv)
+        self.get_tmdb_details(tmdb=tmdb)
+        self.get_omdb_details(omdb=omdb)
 
     def create_listitem(self, handle=None, **kwargs):
         listitem = xbmcgui.ListItem(label=self.label, label2=self.label2)

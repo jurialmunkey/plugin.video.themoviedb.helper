@@ -73,19 +73,19 @@ class RequestAPI(object):
         """
         if self.req_wait_time:
             utils.rate_limiter(addon_name=self.cache_name, wait_time=self.req_wait_time, api_name=self.req_api_name)
-        request = requests.post(request, data=postdata, headers=headers) if postdata else requests.get(request, headers=headers)  # Request our data
-        if not request.status_code == requests.codes.ok:  # Error Checking
-            if request.status_code == 401:
-                utils.kodi_log('HTTP Error Code: {0}'.format(request.status_code), 1)
+        response = requests.post(request, data=postdata, headers=headers) if postdata else requests.get(request, headers=headers)  # Request our data
+        if not response.status_code == requests.codes.ok:  # Error Checking
+            if response.status_code == 401:
+                utils.kodi_log('HTTP Error Code: {0}'.format(response.status_code), 1)
                 self.invalid_apikey()
-            elif not request.status_code == 400:  # Don't write 400 error to log
-                utils.kodi_log('HTTP Error Code: {0}'.format(request.status_code), 1)
+            elif not response.status_code == 400:  # Don't write 400 error to log
+                utils.kodi_log('HTTP Error Code: {0}\nRequest: {1}'.format(response.status_code, request), 1)
             return {} if dictify else None
         if dictify and is_json:
-            request = request.json()  # Make the request nice
+            response = response.json()  # Make the response nice
         elif dictify:
-            request = self.translate_xml(request)
-        return request
+            response = self.translate_xml(response)
+        return response
 
     def get_request_url(self, *args, **kwargs):
         """

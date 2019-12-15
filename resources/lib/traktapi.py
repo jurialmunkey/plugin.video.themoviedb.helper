@@ -1,13 +1,15 @@
 from json import loads, dumps
 import resources.lib.utils as utils
 from resources.lib.requestapi import RequestAPI
+from resources.lib.listitem import ListItem
+import time
 import xbmc
 import xbmcgui
 import datetime
 
 
 class traktAPI(RequestAPI):
-    def __init__(self, force=False, cache_short=None, cache_long=None):
+    def __init__(self, force=False, cache_short=None, cache_long=None, tmdb=None):
         super(traktAPI, self).__init__(
             cache_short=cache_short, cache_long=cache_long,
             req_api_url='https://api.trakt.tv/', req_api_name='Trakt')
@@ -22,6 +24,10 @@ class traktAPI(RequestAPI):
         self.client_id = 'e6fde6173adf3c6af8fd1b0694b9b84d7c519cefc24482310e1de06c6abe5467'
         self.client_secret = '15119384341d9a61c751d8d515acbc0dd801001d4ebe85d3eef9885df80ee4d9'
         self.headers = {'trakt-api-version': '2', 'trakt-api-key': self.client_id, 'Content-Type': 'application/json'}
+        self.tmdb = tmdb
+        self.library = 'video'
+        self.utc_offset = -time.timezone // 3600
+        self.utc_offset += 1 if time.localtime().tm_isdst > 0 else 0
 
         if force:
             self.login()
@@ -137,58 +143,84 @@ class traktAPI(RequestAPI):
 
     def get_itemlist(self, *args, **kwargs):
         items = []
-        keylist = kwargs.pop('keylist', ['dummy'])
-        if kwargs.pop('req_auth', False) and not self.authorize():
+
+        if not self.tmdb or (kwargs.pop('req_auth', False) and not self.authorize()):
             return items
+
+        keylist = kwargs.pop('keylist', ['dummy'])
         response = self.get_response(*args, **kwargs)
+
         if not response:
             return items
+
         itemlist = response.json()
+
         this_page = int(kwargs.get('page', 1))
         last_page = int(response.headers.get('X-Pagination-Page-Count', 0))
-        next_page = ('next_page', this_page + 1, None) if this_page < last_page else False
-        for i in itemlist:
-            for key in keylist:
-                item = None
-                myitem = i.get(key) or i
-                if myitem:
-                    tmdbtype = 'tv' if key == 'show' else 'movie'
-                    if myitem.get('ids', {}).get('imdb'):
-                        item = ('imdb', myitem.get('ids', {}).get('imdb'), tmdbtype)
-                    elif myitem.get('ids', {}).get('tvdb'):
-                        item = ('tvdb', myitem.get('ids', {}).get('tvdb'), tmdbtype)
-                    if item:
-                        items.append(item)
-        if next_page:
-            items.append(next_page)
-        return items
+        next_page = this_page + 1 if this_page < last_page else False
 
-    def get_listlist(self, request, key=None):
-        response = self.get_response_json(request, limit=250)
-        items = [i.get(key) or i for i in response if i.get(key) or i]
-        return items
-
-    def get_limitedlist(self, itemlist, itemtype, limit):
-        items = []
         n = 0
+        limit = kwargs.get('limit', 0)
+        for i in itemlist:
+            if limit and not n < limit:
+                break
+
+            for key in keylist:
+                if limit and not n < limit:
+                    break
+
+                myitem = i.get(key) or i
+
+                if not myitem:
+                    continue
+
+                tmdbtype = 'tv' if key == 'show' else 'movie'
+
+                item = None
+                if myitem.get('ids', {}).get('imdb'):
+                    item = self.tmdb.get_externalid_item(tmdbtype, myitem.get('ids', {}).get('imdb'), 'imdb_id')
+                elif myitem.get('ids', {}).get('tvdb'):
+                    item = self.tmdb.get_externalid_item(tmdbtype, myitem.get('ids', {}).get('tvdb'), 'tvdb_id')
+
+                if not item:
+                    continue
+
+                item['mixed_type'] = tmdbtype
+                items.append(ListItem(library=self.library, **item))
+                n += 1
+
+        if next_page:
+            items.append(ListItem(library=self.library, label='Next Page', nextpage=next_page))
+
+        return items
+
+    def get_limitedlist(self, itemlist, tmdbtype, limit, islistitem):
+        items = []
+        if not self.tmdb or not self.authorize():
+            return items
+
+        n = 0
+        itemtype = utils.type_convert(tmdbtype, 'trakt')
         for i in itemlist:
             if limit and n >= limit:
                 break
             item = (i.get(itemtype, {}).get('ids', {}).get('slug'), i.get(itemtype, {}).get('ids', {}).get('tmdb'))
+            if islistitem:
+                item = ListItem(library=self.library, **self.tmdb.get_detailed_item(tmdbtype, item[1]))
             if item not in items:
                 items.append(item)
                 n += 1
         return items
 
-    def get_mostwatched(self, userslug, itemtype, limit=None):
-        history = self.get_response_json('users', userslug, 'watched', itemtype + 's')
+    def get_mostwatched(self, userslug, tmdbtype, limit=None, islistitem=True):
+        history = self.get_response_json('users', userslug, 'watched', utils.type_convert(tmdbtype, 'trakt') + 's')
         history = sorted(history, key=lambda i: i['plays'], reverse=True)
-        return self.get_limitedlist(history, itemtype, limit)
+        return self.get_limitedlist(history, tmdbtype, limit, islistitem)
 
-    def get_recentlywatched(self, userslug, itemtype, limit=None):
+    def get_recentlywatched(self, userslug, tmdbtype, limit=None, islistitem=True):
         start_at = datetime.date.today() - datetime.timedelta(6 * 365 / 12)
-        history = self.get_response_json('users', userslug, 'history', itemtype + 's', page=1, limit=200, start_at=start_at.strftime("%Y-%m-%d"))
-        return self.get_limitedlist(history, itemtype, limit)
+        history = self.get_response_json('users', userslug, 'history', utils.type_convert(tmdbtype, 'trakt') + 's', page=1, limit=200, start_at=start_at.strftime("%Y-%m-%d"))
+        return self.get_limitedlist(history, tmdbtype, limit, islistitem)
 
     def get_inprogress(self, userslug, limit=None):
         """
@@ -197,22 +229,46 @@ class traktAPI(RequestAPI):
         Returns list of tmdb_ids representing shows with upnext episodes in recently watched order
         """
         items = []
-        if not self.authorize():
+        if not self.tmdb or not self.authorize():
             return items
-        recentshows = self.get_recentlywatched(userslug, 'show')
+
         n = 0
-        for i in recentshows:
+        for i in self.get_recentlywatched(userslug, 'tv', islistitem=False):
             if limit and n >= limit:
                 break
             progress = self.get_upnext(i[0], True)
             if progress and progress.get('next_episode'):
-                items.append(i)
+                items.append(ListItem(library=self.library, **self.tmdb.get_detailed_item('tv', i[1])))
                 n += 1
         return items
 
     def get_calendar(self, tmdbtype, user=True, start_date=None, days=None):
         user = 'my' if user else 'all'
         return self.get_response_json('calendars', user, tmdbtype, start_date, days)
+
+    def get_calendar_episodes(self, startdate=0, days=1, limit=25):
+        items = []
+
+        if not self.tmdb or not self.authorize():
+            return items
+
+        date = datetime.datetime.today() + datetime.timedelta(days=startdate)
+        response = traktAPI().get_calendar('shows', True, start_date=date.strftime('%Y-%m-%d'), days=days)
+
+        for i in response[-limit:]:
+            episode = i.get('episode', {}).get('number')
+            season = i.get('episode', {}).get('season')
+            tmdb_id = i.get('show', {}).get('ids', {}).get('tmdb')
+            item = ListItem(library=self.library, **self.tmdb.get_detailed_item(
+                itemtype='tv', tmdb_id=tmdb_id, season=season, episode=episode))
+            item.tmdb_id, item.season, item.episode = tmdb_id, season, episode
+            item.infolabels['title'] = item.label = i.get('episode', {}).get('title')
+            air_date = utils.convert_timestamp(i.get('first_aired', '')) + datetime.timedelta(hours=self.utc_offset)
+            item.infolabels['premiered'] = air_date.strftime('%Y-%m-%d')
+            item.infolabels['year'] = air_date.strftime('%Y')
+            item.infoproperties['air_time'] = air_date.strftime('%I:%M %p')
+            items.append(item)
+        return items
 
     def get_upnext(self, show_id, response_only=False):
         items = []
@@ -238,6 +294,16 @@ class traktAPI(RequestAPI):
                     items.append(item)
         if not response_only:
             return items if items else [(1, 1)]
+
+    def get_upnext_episodes(self, tmdb_id=None, imdb_id=None, limit=10):
+        if not self.tmdb or not self.authorize() or not tmdb_id:
+            return []
+
+        if not imdb_id:
+            imdb_id = self.tmdb.get_item_externalid(itemtype='tv', tmdb_id=tmdb_id, external_id='imdb_id')
+
+        return [ListItem(library=self.library, **self.tmdb.get_detailed_item(
+            itemtype='tv', tmdb_id=tmdb_id, season=i[0], episode=i[1])) for i in self.get_upnext(imdb_id)[:limit]]
 
     def get_usernameslug(self):
         if not self.authorize():

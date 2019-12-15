@@ -1,7 +1,6 @@
 import xbmc
 import xbmcgui
 import xbmcaddon
-import time
 import resources.lib.utils as utils
 from resources.lib.globals import LANGUAGES, APPEND_TO_RESPONSE, TMDB_LISTS
 from resources.lib.kodilibrary import KodiLibrary
@@ -18,8 +17,6 @@ class Plugin(object):
         self.kodimoviedb = None
         self.koditvshowdb = None
         self.details_tv = None
-        self.utc_offset = -time.timezone // 3600
-        self.utc_offset += 1 if time.localtime().tm_isdst > 0 else 0
 
         cache_long = self.addon.getSettingInt('cache_details_days')
         cache_short = self.addon.getSettingInt('cache_list_days')

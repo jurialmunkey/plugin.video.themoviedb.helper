@@ -85,7 +85,7 @@ class Container(Plugin):
         if not items:
             return
 
-        added, dbiditems, tmdbitems, lastitems, firstitems = [], [], [], [], []
+        added, dbiditems, tmdbitems, lastitems, firstitems, nextpage = [], [], [], [], [], []
         mixed_movies, mixed_tvshows = 0, 0
 
         if self.item_tmdbtype in ['season', 'episode'] and self.params.get('tmdb_id'):
@@ -108,6 +108,13 @@ class Container(Plugin):
             items.append(item_upnext)
 
         for i in items:
+            if i.nextpage:
+                i.url = self.params.copy()
+                i.url['page'] = i.nextpage
+                i.icon = '{0}/resources/icons/tmdb/nextpage.png'.format(self.addonpath)
+                nextpage.append(i)
+                continue
+
             name = u'{0}{1}'.format(i.label, i.imdb_id or i.tmdb_id or i.poster)
             if name in added:
                 continue
@@ -142,18 +149,17 @@ class Container(Plugin):
         if mixed_movies or mixed_tvshows:
             self.mixed_containercontent = 'tvshows' if mixed_tvshows > mixed_movies else 'movies'
 
-        return firstitems + dbiditems + tmdbitems + lastitems
+        return firstitems + dbiditems + tmdbitems + lastitems + nextpage
 
     def list_trakthistory(self):
-        traktapi = traktAPI()
+        traktapi = traktAPI(tmdb=self.tmdb)
         userslug = traktapi.get_usernameslug()
         if self.params.get('info') == 'trakt_inprogress':
-            trakt_items = traktapi.get_inprogress(userslug, limit=10)
+            items = traktapi.get_inprogress(userslug, limit=10)
         if self.params.get('info') == 'trakt_mostwatched':
-            trakt_items = traktapi.get_mostwatched(userslug, utils.type_convert(self.params.get('type'), 'trakt'), limit=10)
+            items = traktapi.get_mostwatched(userslug, self.params.get('type'), limit=10)
         if self.params.get('info') == 'trakt_history':
-            trakt_items = traktapi.get_recentlywatched(userslug, utils.type_convert(self.params.get('type'), 'trakt'), limit=10)
-        items = [ListItem(library=self.library, **self.tmdb.get_detailed_item(self.params.get('type'), i[1])) for i in trakt_items]
+            items = traktapi.get_recentlywatched(userslug, self.params.get('type'), limit=10)
         self.item_tmdbtype = self.params.get('type')
         self.list_items(
             items=items, url={
@@ -161,44 +167,29 @@ class Container(Plugin):
                 'type': self.params.get('type')})
 
     def list_traktupnext(self):
-        traktapi = traktAPI()
-        imdb_id = self.tmdb.get_item_externalid(itemtype='tv', tmdb_id=self.params.get('tmdb_id'), external_id='imdb_id')
-        trakt_items = traktapi.get_upnext(imdb_id)
-        items = [ListItem(library=self.library, **self.tmdb.get_detailed_item(
-            itemtype='tv', tmdb_id=self.params.get('tmdb_id'), season=i[0], episode=i[1])) for i in trakt_items[:10]]
         self.item_tmdbtype = 'episode'
-        self.list_items(items=items, url_tmdb_id=self.params.get('tmdb_id'), url={'info': 'details', 'type': 'episode'})
+        self.list_items(
+            items=traktAPI(tmdb=self.tmdb).get_upnext_episodes(tmdb_id=self.params.get('tmdb_id')),
+            url_tmdb_id=self.params.get('tmdb_id'),
+            url={'info': 'details', 'type': 'episode'})
 
     def list_traktcalendar_episodes(self):
-        date = datetime.datetime.today() + datetime.timedelta(days=utils.try_parse_int(self.params.get('startdate')))
-        days = utils.try_parse_int(self.params.get('days'))
-        response = traktAPI().get_calendar('shows', True, start_date=date.strftime('%Y-%m-%d'), days=days)
-        items = []
-        for i in response[-25:]:
-            episode = i.get('episode', {}).get('number')
-            season = i.get('episode', {}).get('season')
-            tmdb_id = i.get('show', {}).get('ids', {}).get('tmdb')
-            item = ListItem(library=self.library, **self.tmdb.get_detailed_item(
-                itemtype='tv', tmdb_id=tmdb_id, season=season, episode=episode))
-            item.tmdb_id, item.season, item.episode = tmdb_id, season, episode
-            item.infolabels['title'] = item.label = i.get('episode', {}).get('title')
-            air_date = utils.convert_timestamp(i.get('first_aired', '')) + datetime.timedelta(hours=self.utc_offset)
-            item.infolabels['premiered'] = air_date.strftime('%Y-%m-%d')
-            item.infolabels['year'] = air_date.strftime('%Y')
-            item.infoproperties['air_time'] = air_date.strftime('%I:%M %p')
-            items.append(item)
         self.item_tmdbtype = 'episode'
-        self.list_items(items=items, url={'info': 'details', 'type': 'episode'})
+        self.list_items(
+            items=traktAPI(tmdb=self.tmdb).get_calendar_episodes(
+                days=utils.try_parse_int(self.params.get('days')),
+                startdate=utils.try_parse_int(self.params.get('startdate'))),
+            url={'info': 'details', 'type': 'episode'})
 
     def list_traktcalendar(self):
         if self.params.get('type') == 'episode':
             self.list_traktcalendar_episodes()
             return
+
         icon = '{0}/resources/trakt.png'.format(self.addonpath)
-        today = datetime.datetime.today() + datetime.timedelta(hours=self.utc_offset)
         self.start_container()
         for i in TRAKT_CALENDAR:
-            date = today + datetime.timedelta(days=i[1])
+            date = datetime.datetime.today() + datetime.timedelta(days=i[1])
             label = i[0].format(date.strftime('%A'))
             listitem = ListItem(label=label, icon=icon)
             url = {'info': 'trakt_calendar', 'type': 'episode', 'startdate': i[1], 'days': i[2]}
@@ -207,14 +198,18 @@ class Container(Plugin):
 
     def list_traktuserlists(self):
         traktapi = traktAPI()
+
         path = TRAKT_LISTS.get(self.params.get('info'), {}).get('path', '')
         if '{user_slug}' in path:
             self.params['user_slug'] = self.params.get('user_slug') or traktapi.get_usernameslug()
         path = path.format(**self.params)
-        items = traktapi.get_listlist(path, 'list')
         icon = '{0}/resources/trakt.png'.format(self.addonpath)
+
         self.start_container()
-        for i in items:
+        for i in traktapi.get_response_json(path, limit=250):
+            if not i:
+                continue
+            i = i.get('list') or i
             label = i.get('name')
             label2 = i.get('user', {}).get('name')
             infolabels = {}
@@ -229,7 +224,9 @@ class Container(Plugin):
     def list_trakt(self):
         if not self.params.get('type'):
             return
-        traktapi = traktAPI()
+
+        traktapi = traktAPI(tmdb=self.tmdb)
+
         cat = TRAKT_LISTS.get(self.params.get('info', ''), {})
 
         if '{user_slug}' in cat.get('path', ''):
@@ -239,24 +236,12 @@ class Container(Plugin):
 
         params = self.params.copy()
         params['type'] = utils.type_convert(self.item_tmdbtype, 'trakt') + 's'
-        response = traktapi.get_itemlist(
-            cat.get('path', '').format(**params), page=self.params.get('page', 1), limit=10, req_auth=cat.get('req_auth'),
-            keylist=['movie', 'show'] if self.params.get('type') == 'both' else [utils.type_convert(self.item_tmdbtype, 'trakt')])
 
-        items = []
-        for i in response[:11]:
-            item = None
-            if i[0] == 'imdb':
-                item = self.tmdb.get_externalid_item(i[2], i[1], 'imdb_id')
-            if i[0] == 'tvdb':
-                item = self.tmdb.get_externalid_item(i[2], i[1], 'tvdb_id')
-            if i[0] == 'next_page':
-                item = {'label': 'Next Page', 'url': self.params.copy()}
-                item['url']['page'] = i[1]
-            if item:
-                item['mixed_type'] = i[2]
-                items.append(ListItem(library=self.library, **item))
-        self.list_items(items=items, url={'info': cat.get('url_info', 'details')})
+        self.list_items(
+            items=traktapi.get_itemlist(
+                cat.get('path', '').format(**params), page=self.params.get('page', 1), limit=10, req_auth=cat.get('req_auth'),
+                keylist=['movie', 'show'] if self.params.get('type') == 'both' else [utils.type_convert(self.item_tmdbtype, 'trakt')]),
+            url={'info': cat.get('url_info', 'details')})
 
     def list_traktmanagement(self):
         if not self.params.get('trakt') in ['collection_add', 'collection_remove', 'watchlist_add', 'watchlist_remove', 'history_add', 'history_remove']:
