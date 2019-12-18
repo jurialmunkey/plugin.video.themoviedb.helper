@@ -96,7 +96,7 @@ class Script(Plugin):
 
     def add_path(self):
         self.position = self.position + 1
-        self.set_props(self.position, self.params.get('add_path'))
+        self.set_props(self.position, self.params.get('add_path', '').replace('info=play', 'info=details'))
         self.lock_path(self.params.get('prevent_del'))
         self.call_window()
 
