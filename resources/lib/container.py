@@ -294,8 +294,8 @@ class Container(Plugin):
         self.params['tmdb_id'] = self.get_tmdb_id(**self.params)
 
     def list_play(self):
-        if self.params.get('widget', '').capitalize() == 'Info':
-            xbmc.executebuiltin('Action(Info)')
+        if self.select_action == 2 and not self.params.get('widget', '').capitalize() == 'True':
+            xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,exec_action=Action(Info))')
             return
         Player().play(
             itemtype=self.params.get('type'), tmdb_id=self.params.get('tmdb_id'),
@@ -453,10 +453,6 @@ class Container(Plugin):
 
                     if not xbmc.getCondVisibility("Window.IsMedia"):
                         url['widget'] = 'True'
-                    elif self.select_action == 1:
-                        url['widget'] = 'True'
-                    elif self.select_action == 2:
-                        url['widget'] = 'Info'
 
                     if self.fanarttv and xbmc.getCondVisibility("Window.IsMedia"):
                         url['fanarttv'] = 'True'

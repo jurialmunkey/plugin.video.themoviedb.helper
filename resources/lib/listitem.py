@@ -15,6 +15,7 @@ class ListItem(object):
                  clearlogo=None, clearart=None, banner=None, landscape=None, mixed_type=None, url=None, is_folder=True):
         self.addon = xbmcaddon.Addon('plugin.video.themoviedb.helper')
         self.addonpath = self.addon.getAddonInfo('path')
+        self.select_action = self.addon.getSettingInt('select_action')
         self.label = label or 'N/A'
         self.label2 = label2 or ''
         self.library = library or ''  # <content target= video, music, pictures, none>
@@ -36,7 +37,7 @@ class ListItem(object):
 
     def set_url(self, **kwargs):
         url = kwargs.pop('url', 'plugin://plugin.video.themoviedb.helper/?')
-        return '{0}{1}'.format(url, urlencode(kwargs))
+        return u'{0}{1}'.format(url, urlencode(kwargs))
 
     def get_url(self, url, url_tmdb_id=None, widget=None, fanarttv=None):
         self.url = self.url or url.copy()
@@ -54,9 +55,9 @@ class ListItem(object):
             self.url['fanarttv'] = fanarttv
         if widget:
             self.url['widget'] = widget
-        if self.url.get('widget', '').capitalize() in ['True', 'Info'] and self.infolabels.get('mediatype') == 'tvshow':
+        if (self.url.get('widget', '').capitalize() == 'True' or self.select_action > 0) and self.infolabels.get('mediatype') == 'tvshow':
             self.url['info'] = 'seasons'
-        if self.url.get('widget', '').capitalize() in ['True', 'Info'] and self.infolabels.get('mediatype') in ['movie', 'episode']:
+        if (self.url.get('widget', '').capitalize() == 'True' or self.select_action > 0) and self.infolabels.get('mediatype') in ['movie', 'episode']:
             self.url['info'] = 'play'
         self.is_folder = False if self.url.get('info') in ['play', 'textviewer', 'imageviewer'] else True
 

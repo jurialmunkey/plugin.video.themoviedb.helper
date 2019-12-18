@@ -57,6 +57,9 @@ class Script(Plugin):
     def unlock_path(self):
         self.home.clearProperty(self.prefixlock)
 
+    def exec_action(self):
+        xbmc.executebuiltin(self.params.get('exec_action', ''))
+
     def call_window(self):
         if self.params.get('call_id'):
             xbmc.executebuiltin('Dialog.Close(12003)')
@@ -145,6 +148,8 @@ class Script(Plugin):
             self.set_defaultplayer()
         elif self.params.get('clear_defaultplayers'):
             self.clear_defaultplayers()
+        elif self.params.get('exec_action'):
+            self.exec_action()
         elif self.params.get('add_path'):
             self.add_path()
         elif self.params.get('add_query') and self.params.get('type'):
