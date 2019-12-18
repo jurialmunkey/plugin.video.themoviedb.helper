@@ -95,8 +95,11 @@ class Script(Plugin):
         self.addon.setSetting('default_player_episodes', '')
 
     def add_path(self):
+        url = self.params.get('add_path', '')
+        url = url.replace('info=play', 'info=details')
+        url = url.replace('info=seasons', 'info=details')
         self.position = self.position + 1
-        self.set_props(self.position, self.params.get('add_path', '').replace('info=play', 'info=details'))
+        self.set_props(self.position, url)
         self.lock_path(self.params.get('prevent_del'))
         self.call_window()
 
