@@ -181,7 +181,7 @@ class TMDb(RequestAPI):
                 cast_list = cast_list + item.get('credits').get('cast')
             if cast_list:
                 added_names = []
-                for i in sorted(cast_list, key=lambda k: k['order']):
+                for i in sorted(cast_list, key=lambda k: k.get('order')):
                     if i.get('name') and not i.get('name') in added_names:
                         added_names.append(i.get('name'))  # Add name to temp list to prevent dupes
                         cast_member = {}
