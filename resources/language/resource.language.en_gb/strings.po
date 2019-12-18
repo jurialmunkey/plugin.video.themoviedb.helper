@@ -136,6 +136,11 @@ msgctxt "#30029"
 msgid "Hebrew (Israel)"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32028"
+msgid "Use fanart.tv for widget artwork"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
@@ -390,7 +395,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32020"
-msgid "Only enter if default developer api key is deactivated"
+msgid "Only use if default api key is deactivated"
 msgstr ""
 
 #: /resources/settings.xml

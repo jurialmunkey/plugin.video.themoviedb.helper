@@ -33,6 +33,7 @@ class Container(Plugin):
         self.updatelisting = False
         self.select_action = self.addon.getSettingInt('select_action')
         self.trakt_management = self.addon.getSettingBool('trakt_management')
+        self.widget_fanarttv = self.addon.getSettingBool('widget_fanarttv_lookup')
 
     def start_container(self):
         xbmcplugin.setPluginCategory(self.handle, self.plugincategory)  # Container.PluginCategory
@@ -40,6 +41,12 @@ class Container(Plugin):
 
     def finish_container(self):
         xbmcplugin.endOfDirectory(self.handle, updateListing=self.updatelisting)
+
+    def set_url_params(self, url):
+        if self.params.get('widget'):
+            url['widget'] = self.params.get('widget')
+        if self.params.get('fanarttv'):
+            url['fanarttv'] = self.params.get('fanarttv')
 
     def translate_discover(self):
         lookup_company = None if self.params.get('with_id') and self.params.get('with_id') != 'False' else 'company'
@@ -194,8 +201,7 @@ class Container(Plugin):
             label = i[0].format(date.strftime('%A'))
             listitem = ListItem(label=label, icon=icon)
             url = {'info': 'trakt_calendar', 'type': 'episode', 'startdate': i[1], 'days': i[2]}
-            if self.params.get('widget'):
-                url['widget'] = self.params.get('widget')
+            url = self.set_url_params(url)
             listitem.create_listitem(self.handle, **url)
         self.finish_container()
 
@@ -222,8 +228,7 @@ class Container(Plugin):
             user_slug = i.get('user', {}).get('ids', {}).get('slug')
             listitem = ListItem(label=label, label2=label2, icon=icon, thumb=icon, poster=icon, infolabels=infolabels)
             url = {'info': 'trakt_userlist', 'user_slug': user_slug, 'list_slug': list_slug, 'type': self.params.get('type')}
-            if self.params.get('widget'):
-                url['widget'] = self.params.get('widget')
+            url = self.set_url_params(url)
             listitem.create_listitem(self.handle, **url)
         self.finish_container()
 
@@ -274,9 +279,10 @@ class Container(Plugin):
             # TODO: Check status response and add dialog
         self.updatelisting = True
 
-    def list_becauseyouwatched(self):
+    def list_becauseyouwatched(self, mostwatched=False):
         traktapi = traktAPI(tmdb=self.tmdb)
-        recentitems = traktapi.get_recentlywatched(traktapi.get_usernameslug(), self.params.get('type'), limit=10, islistitem=False)
+        func = traktapi.get_mostwatched if mostwatched else traktapi.get_recentlywatched
+        recentitems = func(traktapi.get_usernameslug(), self.params.get('type'), limit=5, islistitem=False)
         recentitem = recentitems[random.randint(0, len(recentitems) - 1)]
         if not recentitem[1]:
             return
@@ -311,8 +317,10 @@ class Container(Plugin):
         self.containercontent = self.mixed_containercontent or utils.type_convert(self.item_tmdbtype, 'container')
         self.start_container()
         for i in items:
-            i.get_details(self.item_dbtype, self.tmdb, self.omdb, self.fanarttv)
-            i.get_url(url, url_tmdb_id, self.params.get('widget'))
+            i.get_details(self.item_dbtype, self.tmdb, self.omdb)
+            i.get_url(url, url_tmdb_id, self.params.get('widget'), self.params.get('fanarttv'))
+            if self.params.get('fanarttv') or (self.widget_fanarttv and self.params.get('widget')):
+                i.get_extra_artwork(self.tmdb, self.fanarttv)
             i.create_listitem(self.handle, **i.url)
         self.finish_container()
 
@@ -450,6 +458,9 @@ class Container(Plugin):
                     elif self.select_action == 2:
                         url['widget'] = 'Info'
 
+                    if self.fanarttv and xbmc.getCondVisibility("Window.IsMedia"):
+                        url['fanarttv'] = 'True'
+
                     listitem = ListItem(label=i.get('name').format(utils.type_convert(t, 'plural')), icon=i.get('icon', '').format(self.addonpath))
                     listitem.create_listitem(self.handle, **url)
         self.finish_container()
@@ -483,6 +494,8 @@ class Container(Plugin):
             self.list_search()
         elif self.params.get('info') == 'trakt_becauseyouwatched':
             self.list_becauseyouwatched()
+        elif self.params.get('info') == 'trakt_becausemostwatched':
+            self.list_becauseyouwatched(mostwatched=True)
         elif self.params.get('info') in TMDB_LISTS:
             self.list_getid()
             self.list_tmdb()
