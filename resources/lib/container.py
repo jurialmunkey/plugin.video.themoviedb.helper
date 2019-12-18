@@ -99,7 +99,7 @@ class Container(Plugin):
         if self.item_tmdbtype in ['season', 'episode'] and self.params.get('tmdb_id'):
             if not self.details_tv:
                 self.details_tv = self.tmdb.get_detailed_item('tv', self.params.get('tmdb_id'), season=self.params.get('season', None))
-            if self.fanarttv and self.details_tv:
+            if self.fanarttv and self.details_tv and (self.params.get('fanarttv', '').capitalize() == 'True' or (self.widget_fanarttv and self.params.get('widget', '').capitalize() == 'True')):
                 tvdb_id = self.tmdb.get_item_externalid('tv', self.params.get('tmdb_id'), 'tvdb_id')
                 artwork = self.fanarttv.get_tvshow_allart_lc(tvdb_id)
                 self.details_tv['clearart'] = artwork.get('clearart')
@@ -319,7 +319,7 @@ class Container(Plugin):
         for i in items:
             i.get_details(self.item_dbtype, self.tmdb, self.omdb)
             i.get_url(url, url_tmdb_id, self.params.get('widget'), self.params.get('fanarttv'))
-            if self.params.get('fanarttv') or (self.widget_fanarttv and self.params.get('widget')):
+            if self.params.get('fanarttv', '').capitalize() == 'True' or (self.widget_fanarttv and self.params.get('widget', '').capitalize() == 'True'):
                 i.get_extra_artwork(self.tmdb, self.fanarttv)
             i.create_listitem(self.handle, **i.url)
         self.finish_container()
