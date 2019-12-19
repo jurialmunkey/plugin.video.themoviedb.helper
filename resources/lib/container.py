@@ -47,6 +47,7 @@ class Container(Plugin):
             url['widget'] = self.params.get('widget')
         if self.params.get('fanarttv'):
             url['fanarttv'] = self.params.get('fanarttv')
+        return url
 
     def translate_discover(self):
         lookup_company = None if self.params.get('with_id') and self.params.get('with_id') != 'False' else 'company'
