@@ -72,9 +72,14 @@ class Script(Plugin):
             xbmc.executebuiltin('Container.Update({0})'.format(self.params.get('call_update')))
 
     def update_players(self):
+        players_url = self.addon.getSettingString('players_url')
+        players_url = xbmcgui.Dialog().input('Enter URL to download players', defaultt=players_url)
+        if not xbmcgui.Dialog().yesno('Download Players', 'Download players from URL?\n[B]{0}[/B]'.format(players_url)):
+            return
+        self.addon.setSettingString('players_url', players_url)
         downloader = Downloader(
             extract_to='special://profile/addon_data/plugin.video.themoviedb.helper/players',
-            download_url=self.addon.getSetting('players_url'))
+            download_url=players_url)
         downloader.get_extracted_zip()
 
     def set_defaultplayer(self):

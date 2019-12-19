@@ -141,6 +141,31 @@ msgctxt "#32028"
 msgid "Use fanart.tv for widget artwork"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32029"
+msgid "OMDb API"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32030"
+msgid "Fanart.tv API"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32031"
+msgid "Trakt API"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32032"
+msgid "Download Players"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32033"
+msgid "Default Players"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
@@ -295,12 +320,12 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32000"
-msgid "TMDb API Key"
+msgid "TMDb API key"
 msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32001"
-msgid "OMDb API Key"
+msgid "OMDb API key"
 msgstr ""
 
 #: /resources/settings.xml
@@ -315,12 +340,12 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32004"
-msgid "MPAA Rating Prefix"
+msgid "MPAA rating prefix"
 msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32005"
-msgid "Language and Country"
+msgid "Language and country"
 msgstr ""
 
 #: /resources/lib/utils.py
@@ -345,7 +370,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32010"
-msgid "Authenticate Trakt Account..."
+msgid "Authenticate Trakt account..."
 msgstr ""
 
 #: /resources/lib/traktapi.py
@@ -355,7 +380,7 @@ msgstr ""
 
 #: /resources/lib/traktapi.py
 msgctxt "#32012"
-msgid "You must Authenticate your Trakt account to use this feature."
+msgid "You must authenticate your Trakt account to use this feature."
 msgstr ""
 
 #: /resources/settings.xml
@@ -375,7 +400,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32016"
-msgid "Update Players from URL"
+msgid "Update players from URL"
 msgstr ""
 
 #: /resources/settings.xml
@@ -385,12 +410,12 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32018"
-msgid "Fanart.tv API Key"
+msgid "Fanart.tv API key"
 msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32019"
-msgid "Fanart.tv Client Key"
+msgid "Fanart.tv client key"
 msgstr ""
 
 #: /resources/settings.xml
