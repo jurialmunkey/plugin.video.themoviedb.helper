@@ -93,6 +93,16 @@ BASEDIR_TMDB = [
         'types': ['movie', 'tv'],
         'icon': '{0}/resources/icons/tmdb/upcoming.png'},
     {
+        'info': 'trending_day',
+        'name': '{0} Trending Today',
+        'types': ['movie', 'tv', 'person'],
+        'icon': '{0}/resources/icons/tmdb/upcoming.png'},
+    {
+        'info': 'trending_week',
+        'name': '{0} Trending This Week',
+        'types': ['movie', 'tv', 'person'],
+        'icon': '{0}/resources/icons/tmdb/upcoming.png'},
+    {
         'info': 'now_playing',
         'name': 'In Theatres',
         'types': ['movie'],
@@ -338,6 +348,16 @@ TMDB_LISTS = {
         'item_tmdbtype': '{type}'},
     'upcoming': {
         'path': '{type}/upcoming',
+        'key': 'results',
+        'url_info': 'details',
+        'item_tmdbtype': '{type}'},
+    'trending_day': {
+        'path': 'trending/{type}/day',
+        'key': 'results',
+        'url_info': 'details',
+        'item_tmdbtype': '{type}'},
+    'trending_week': {
+        'path': 'trending/{type}/week',
         'key': 'results',
         'url_info': 'details',
         'item_tmdbtype': '{type}'},
