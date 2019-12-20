@@ -323,7 +323,7 @@ class Container(Plugin):
         for i in items:
             i.get_details(self.item_dbtype, self.tmdb, self.omdb)
             i.get_url(url, url_tmdb_id, self.params.get('widget'), self.params.get('fanarttv'), self.params.get('nextpage'))
-            if self.params.get('fanarttv', '').capitalize() == 'True' or (self.widget_fanarttv and self.params.get('widget', '').capitalize() == 'True'):
+            if self.params.get('fanarttv', '').capitalize() == 'True' or (self.widget_fanarttv and self.params.get('widget', '').capitalize() == 'True' and not self.params.get('fanarttv', '').capitalize() == 'False'):
                 i.get_extra_artwork(self.tmdb, self.fanarttv)
             i.create_listitem(self.handle, **i.url)
         self.finish_container()
