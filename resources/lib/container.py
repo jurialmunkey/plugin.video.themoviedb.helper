@@ -408,7 +408,7 @@ class Container(Plugin):
                 items.append(item)
 
         # Add trakt management items if &amp;manage=True
-        if self.addon.getSetting('trakt_token') and self.params.get('manage') == 'True':
+        if self.addon.getSetting('trakt_token') and self.trakt_management:
             traktapi = traktAPI()
             trakt_collection = traktapi.sync_collection(utils.type_convert(self.params.get('type'), 'trakt'), 'tmdb')
             if trakt_collection:
