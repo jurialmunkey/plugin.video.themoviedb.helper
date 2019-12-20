@@ -47,6 +47,8 @@ class Container(Plugin):
             url['widget'] = self.params.get('widget')
         if self.params.get('fanarttv'):
             url['fanarttv'] = self.params.get('fanarttv')
+        if self.params.get('nextpage'):
+            url['nextpage'] = self.params.get('nextpage')
         return url
 
     def translate_discover(self):
@@ -121,7 +123,8 @@ class Container(Plugin):
                 i.url = self.params.copy()
                 i.url['page'] = i.nextpage
                 i.icon = '{0}/resources/icons/tmdb/nextpage.png'.format(self.addonpath)
-                nextpage.append(i)
+                if self.params.get('nextpage'):
+                    nextpage.append(i)
                 continue
 
             name = u'{0}{1}'.format(i.label, i.imdb_id or i.tmdb_id or i.poster)
@@ -319,7 +322,7 @@ class Container(Plugin):
         self.start_container()
         for i in items:
             i.get_details(self.item_dbtype, self.tmdb, self.omdb)
-            i.get_url(url, url_tmdb_id, self.params.get('widget'), self.params.get('fanarttv'))
+            i.get_url(url, url_tmdb_id, self.params.get('widget'), self.params.get('fanarttv'), self.params.get('nextpage'))
             if self.params.get('fanarttv', '').capitalize() == 'True' or (self.widget_fanarttv and self.params.get('widget', '').capitalize() == 'True'):
                 i.get_extra_artwork(self.tmdb, self.fanarttv)
             i.create_listitem(self.handle, **i.url)
@@ -457,6 +460,9 @@ class Container(Plugin):
 
                     if self.fanarttv and xbmc.getCondVisibility("Window.IsMedia"):
                         url['fanarttv'] = 'True'
+
+                    if xbmc.getCondVisibility("Window.IsMedia"):
+                        url['nextpage'] = 'True'
 
                     listitem = ListItem(label=i.get('name').format(utils.type_convert(t, 'plural')), icon=i.get('icon', '').format(self.addonpath))
                     listitem.create_listitem(self.handle, **url)

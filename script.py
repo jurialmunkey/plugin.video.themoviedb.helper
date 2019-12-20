@@ -147,7 +147,9 @@ class Script(Plugin):
 
     def router(self):
         if not self.params:
-            self.params = {'call_path': 'plugin://plugin.video.themoviedb.helper/'}  # If no params assume want to run plugin
+            """ If no params assume user wants to run plugin """
+            # TODO: Maybe restart service here too?
+            self.params = {'call_path': 'plugin://plugin.video.themoviedb.helper/'}
         if self.params.get('authenticate_trakt'):
             traktAPI(force=True)
         elif self.params.get('update_players'):

@@ -39,7 +39,7 @@ class ListItem(object):
         url = kwargs.pop('url', 'plugin://plugin.video.themoviedb.helper/?')
         return u'{0}{1}'.format(url, urlencode(kwargs))
 
-    def get_url(self, url, url_tmdb_id=None, widget=None, fanarttv=None):
+    def get_url(self, url, url_tmdb_id=None, widget=None, fanarttv=None, nextpage=None):
         self.url = self.url or url.copy()
         self.url['tmdb_id'] = self.tmdb_id = url_tmdb_id or self.tmdb_id
         if self.mixed_type:
@@ -53,6 +53,8 @@ class ListItem(object):
             self.url['episode'] = self.infolabels.get('episode')
         if fanarttv:
             self.url['fanarttv'] = fanarttv
+        if nextpage:
+            self.url['nextpage'] = nextpage
         if widget:
             self.url['widget'] = widget
         if (self.url.get('widget', '').capitalize() == 'True' or self.select_action > 0) and self.infolabels.get('mediatype') == 'tvshow':
