@@ -337,13 +337,15 @@ class Container(Plugin):
 
         trakt_watched = self.get_trakt_watched()
 
+        x = 0
         self.start_container()
         for i in items:
             i.get_details(self.item_dbtype, self.tmdb, self.omdb)
             i.get_url(url, url_tmdb_id, self.params.get('widget'), self.params.get('fanarttv'), self.params.get('nextpage'))
             i.get_extra_artwork(self.tmdb, self.fanarttv) if self.exp_fanarttv() else None
-            i.get_trakt_watched(trakt_watched)
+            i.get_trakt_watched(trakt_watched) if x == 0 or self.params.get('info') != 'details' else None
             i.create_listitem(self.handle, **i.url)
+            x += 1
         self.finish_container()
 
     def list_tmdb(self, *args, **kwargs):
