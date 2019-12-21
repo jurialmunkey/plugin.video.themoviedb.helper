@@ -148,6 +148,9 @@ class TMDb(RequestAPI):
             infoproperties['creator'] = utils.concatinate_names(item.get('created_by'), 'name', '/')
         if item.get('genres'):
             infoproperties = utils.iter_props(item.get('genres'), 'Genre', infoproperties, name='name', tmdb_id='id')
+        if item.get('networks'):
+            infoproperties = utils.iter_props(item.get('networks'), 'Studio', infoproperties, name='name', tmdb_id='id')
+            infoproperties = utils.iter_props(item.get('networks'), 'Studio', infoproperties, icon='logo_path', func=self.get_imagepath)
         if item.get('production_companies'):
             infoproperties = utils.iter_props(item.get('production_companies'), 'Studio', infoproperties, name='name', tmdb_id='id')
             infoproperties = utils.iter_props(item.get('production_companies'), 'Studio', infoproperties, icon='logo_path', func=self.get_imagepath)
