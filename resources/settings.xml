@@ -25,7 +25,7 @@
     </category>
     <category label="$ADDON[plugin.video.themoviedb.helper 32014]">
         <setting label="$ADDON[plugin.video.themoviedb.helper 32032]" type="lsep"/>
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32016]" type="action" action="RunScript(plugin.video.themoviedb.helper, update_players)" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32016]" type="action" action="RunScript(plugin.video.themoviedb.helper, update_players)" id="players_url" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32033]" type="lsep"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32024]" type="action" action="RunScript(plugin.video.themoviedb.helper, set_defaultplayer=movie)" id="default_player_movies" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32025]" type="action" action="RunScript(plugin.video.themoviedb.helper, set_defaultplayer=tv)" id="default_player_episodes" />
