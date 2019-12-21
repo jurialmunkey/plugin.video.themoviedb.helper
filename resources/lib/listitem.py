@@ -11,8 +11,8 @@ except ImportError:
 
 class ListItem(object):
     def __init__(self, label=None, label2=None, dbtype=None, library=None, tmdb_id=None, imdb_id=None, dbid=None, tvdb_id=None,
-                 cast=None, infolabels=None, infoproperties=None, poster=None, thumb=None, icon=None, fanart=None, nextpage=None,
-                 clearlogo=None, clearart=None, banner=None, landscape=None, mixed_type=None, url=None, is_folder=True):
+                 cast=None, infolabels=None, infoproperties=None, poster=None, thumb=None, icon=None, fanart=None,
+                 nextpage=None, clearlogo=None, clearart=None, banner=None, landscape=None, mixed_type=None, url=None, is_folder=True):
         self.addon = xbmcaddon.Addon('plugin.video.themoviedb.helper')
         self.addonpath = self.addon.getAddonInfo('path')
         self.select_action = self.addon.getSettingInt('select_action')

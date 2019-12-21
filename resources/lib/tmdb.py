@@ -174,6 +174,18 @@ class TMDb(RequestAPI):
             infoproperties['set.fanart'] = self.get_imagepath(item.get('belongs_to_collection').get('backdrop_path'))
         return infoproperties
 
+    def get_trailer(self, item):
+        infolabels = {}
+        videos = item.get('videos', {}).get('results') or []
+        utils.kodi_log('Locating Trailers...', 1)
+        for i in videos:
+            if i.get('type', '') != 'Trailer' or i.get('site', '') != 'YouTube' or not i.get('key'):
+                continue
+            infolabels['trailer'] = 'plugin://plugin.video.youtube/play/?video_id={0}'.format(i.get('key'))
+            utils.kodi_log('Trailer Found!', 1)
+            break
+        return infolabels
+
     def get_cast(self, item):
         cast = []
         if item.get('credits') or item.get('guest_stars'):
@@ -241,8 +253,9 @@ class TMDb(RequestAPI):
         fanart = self.get_fanart(item)
         cast = self.get_cast(item)
         infolabels = self.get_infolabels(item)
-        infoproperties = self.get_infoproperties(item)
+        infolabels = utils.merge_two_dicts(infolabels, self.get_trailer(item))
         infolabels = utils.merge_two_dicts(infolabels, self.get_director_writer(item))
+        infoproperties = self.get_infoproperties(item)
         infoproperties = utils.merge_two_dicts(infoproperties, self.get_cast_properties(cast))
         infoproperties = utils.merge_two_dicts(infoproperties, self.get_crew_properties(item))
         return {

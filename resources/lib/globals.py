@@ -497,7 +497,7 @@ TMDB_LISTS = {
         'url_tmdb_id': '{tmdb_id}',
         'item_tmdbtype': 'episode'}}
 
-APPEND_TO_RESPONSE = 'credits,images,release_dates,content_ratings,external_ids'
+APPEND_TO_RESPONSE = 'credits,images,release_dates,content_ratings,external_ids,videos'
 
 TRAKT_LISTS = {
     'trakt_watchlist': {
