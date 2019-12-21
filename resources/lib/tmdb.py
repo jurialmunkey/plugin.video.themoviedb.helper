@@ -177,12 +177,10 @@ class TMDb(RequestAPI):
     def get_trailer(self, item):
         infolabels = {}
         videos = item.get('videos', {}).get('results') or []
-        utils.kodi_log('Locating Trailers...', 1)
         for i in videos:
             if i.get('type', '') != 'Trailer' or i.get('site', '') != 'YouTube' or not i.get('key'):
                 continue
             infolabels['trailer'] = 'plugin://plugin.video.youtube/play/?video_id={0}'.format(i.get('key'))
-            utils.kodi_log('Trailer Found!', 1)
             break
         return infolabels
 
