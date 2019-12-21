@@ -323,10 +323,10 @@ class Container(Plugin):
     def list_getid(self):
         self.params['tmdb_id'] = self.get_tmdb_id(**self.params)
 
+    def list_info(self):
+        xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,exec_action=Action(Info))')
+
     def list_play(self):
-        if self.addon.getSettingInt('select_action') == 2 and not self.params.get('widget', '').capitalize() == 'True':
-            xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,exec_action=Action(Info))')
-            return
         Player().play(
             itemtype=self.params.get('type'), tmdb_id=self.params.get('tmdb_id'),
             season=self.params.get('season'), episode=self.params.get('episode'))
@@ -512,6 +512,8 @@ class Container(Plugin):
         if self.params.get('info') == 'play':
             self.list_getid()
             self.list_play()
+        elif self.params.get('info') == 'info':
+            self.list_info()
         elif self.params.get('info') == 'textviewer':
             self.textviewer(xbmc.getInfoLabel('ListItem.Label'), xbmc.getInfoLabel('ListItem.Plot'))
         elif self.params.get('info') == 'imageviewer':

@@ -39,6 +39,20 @@ class ListItem(object):
         url = kwargs.pop('url', 'plugin://plugin.video.themoviedb.helper/?')
         return u'{0}{1}'.format(url, urlencode(kwargs))
 
+    def get_url_action_tvshow(self):
+        if self.url.get('widget', '').capitalize() == 'True':
+            self.url['info'] = 'seasons'
+        elif self.select_action > 0:
+            self.url['info'] = 'seasons'
+
+    def get_url_action_videos(self):
+        if self.url.get('widget', '').capitalize() == 'True':
+            self.url['info'] = 'play'
+        elif self.select_action == 1:
+            self.url['info'] = 'play'
+        elif self.select_action == 2:
+            self.url['info'] = 'info'
+
     def get_url(self, url, url_tmdb_id=None, widget=None, fanarttv=None, nextpage=None, extended=None):
         self.url = self.url or url.copy()
         self.url['tmdb_id'] = self.tmdb_id = url_tmdb_id or self.tmdb_id
@@ -57,11 +71,11 @@ class ListItem(object):
             self.url['nextpage'] = nextpage
         if widget:
             self.url['widget'] = widget
-        if not extended and (self.url.get('widget', '').capitalize() == 'True' or self.select_action > 0) and self.infolabels.get('mediatype') == 'tvshow':
-            self.url['info'] = 'seasons'
-        if not extended and (self.url.get('widget', '').capitalize() == 'True' or self.select_action > 0) and self.infolabels.get('mediatype') in ['movie', 'episode']:
-            self.url['info'] = 'play'
-        self.is_folder = False if self.url.get('info') in ['play', 'textviewer', 'imageviewer'] else True
+        if not extended and self.infolabels.get('mediatype') in ['movie', 'episode']:
+            self.get_url_action_videos()
+        if not extended and self.infolabels.get('mediatype') == 'tvshow':
+            self.get_url_action_tvshow()
+        self.is_folder = False if self.url.get('info') in ['play', 'info', 'textviewer', 'imageviewer'] else True
 
     def get_extra_artwork(self, tmdb=None, fanarttv=None):
         if not fanarttv:
