@@ -176,6 +176,8 @@ class TMDb(RequestAPI):
 
     def get_trailer(self, item):
         infolabels = {}
+        if not isinstance(item, dict):
+            return infolabels
         videos = item.get('videos', {}).get('results') or []
         for i in videos:
             if i.get('type', '') != 'Trailer' or i.get('site', '') != 'YouTube' or not i.get('key'):
@@ -194,7 +196,7 @@ class TMDb(RequestAPI):
                 cast_list = cast_list + item.get('credits').get('cast')
             if cast_list:
                 added_names = []
-                for i in sorted(cast_list, key=lambda k: k.get('order')):
+                for i in sorted(cast_list, key=lambda k: k.get('order', 0)):
                     if i.get('name') and not i.get('name') in added_names:
                         added_names.append(i.get('name'))  # Add name to temp list to prevent dupes
                         cast_member = {}
