@@ -9,7 +9,7 @@ import datetime
 
 
 class traktAPI(RequestAPI):
-    def __init__(self, force=False, cache_short=None, cache_long=None, tmdb=None):
+    def __init__(self, force=False, cache_short=None, cache_long=None, tmdb=None, login=False):
         super(traktAPI, self).__init__(
             cache_short=cache_short, cache_long=cache_long,
             req_api_url='https://api.trakt.tv/', req_api_name='Trakt')
@@ -33,9 +33,9 @@ class traktAPI(RequestAPI):
             self.login()
             return
 
-        self.authorize(login=False)
+        self.authorize(login)
 
-    def authorize(self, login=True, force=False):
+    def authorize(self, login=False):
         if self.authorization:
             return self.authorization
         token = self.addon.getSetting('trakt_token')
@@ -305,8 +305,8 @@ class traktAPI(RequestAPI):
         return [ListItem(library=self.library, **self.tmdb.get_detailed_item(
             itemtype='tv', tmdb_id=tmdb_id, season=i[0], episode=i[1])) for i in self.get_upnext(imdb_id)[:limit]]
 
-    def get_usernameslug(self):
-        if not self.authorize():
+    def get_usernameslug(self, login=False):
+        if not self.authorize(login):
             return
         item = self.get_response_json('users/settings')
         return item.get('user', {}).get('ids', {}).get('slug')
@@ -342,6 +342,9 @@ class traktAPI(RequestAPI):
 
     def sync_history(self, itemtype, idtype=None, mode=None, items=None):
         return self.get_sync('history', 'watched_at', itemtype, idtype, mode, items)
+
+    def get_watched(self, itemtype, idtype=None):
+        return self.get_sync('watched', 'watched_at', itemtype, idtype, None, None)
 
     def get_sync(self, name, activity, itemtype, idtype=None, mode=None, items=None):
         if not self.authorize():

@@ -83,6 +83,32 @@ class ListItem(object):
             self.banner = self.banner or artwork.get('banner')
             self.fanart = self.fanart or artwork.get('fanart')
 
+    def get_trakt_watched(self, trakt_watched=None):
+        if not trakt_watched:
+            return
+
+        key = 'movie' if self.infolabels.get('mediatype') == 'movie' else 'show'
+        item = utils.get_dict_in_list(trakt_watched, 'tmdb', utils.try_parse_int(self.tmdb_id), [key, 'ids'])
+        if not item:
+            return
+
+        if self.infolabels.get('mediatype') == 'episode':
+            found_ep = None
+            for s in item.get('seasons', []):
+                if s.get('number', -2) == utils.try_parse_int(self.infolabels.get('season', -1)):
+                    for ep in s.get('episodes', []):
+                        if ep.get('number', -2) == utils.try_parse_int(self.infolabels.get('episode', -1)):
+                            found_ep = item = ep
+                            break
+                    break
+            if not found_ep:
+                return
+
+        lastplayed = utils.convert_timestamp(item.get('last_watched_at'))
+        self.infolabels['lastplayed'] = lastplayed.strftime('%Y-%m-%d %H:%M:%S') if lastplayed else None
+        self.infolabels['playcount'] = item.get('plays', 0)
+        self.infolabels['overlay'] = 5 if item.get('plays') else 4
+
     def get_tmdb_details(self, tmdb=None):
         if not tmdb:
             return

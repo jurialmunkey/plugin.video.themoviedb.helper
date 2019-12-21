@@ -19,6 +19,7 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32028]" type="bool" id="widget_fanarttv_lookup" default="false" subsetting="true" enable="eq(-1,True)" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32031]" type="lsep"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32010]" type="action" action="RunScript(plugin.video.themoviedb.helper, authenticate_trakt)" option="close" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32034]" type="bool" id="trakt_watchedindicators" default="false" subsetting="true"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32013]" type="bool" id="trakt_management" default="false" subsetting="true"/>
     </category>
     <category label="$ADDON[plugin.video.themoviedb.helper 32014]">

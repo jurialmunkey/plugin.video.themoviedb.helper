@@ -166,6 +166,11 @@ msgctxt "#32033"
 msgid "Default Players"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32034"
+msgid "Get watched indicators from Trakt"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

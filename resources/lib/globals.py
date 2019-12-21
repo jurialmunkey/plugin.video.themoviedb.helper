@@ -161,7 +161,7 @@ BASEDIR_TRAKT = [
         'types': ['movie', 'tv']},
     {
         'info': 'trakt_becauseyouwatched',
-        'name': 'Based on a Recently Watched {0}',
+        'name': 'Based on Recently Watched {0}',
         'icon': '{0}/resources/icons/trakt/recommended.png',
         'types': ['movie', 'tv']},
     {
@@ -538,6 +538,7 @@ TRAKT_LISTS = {
         'item_tmdbtype': '{type}'},
     'trakt_mylists': {
         'path': 'users/{user_slug}/lists',
+        'req_auth': True,
         'item_tmdbtype': '{type}'},
     'trakt_inlists': {
         'path': 'movies/{imdb_id}/lists',
@@ -553,6 +554,8 @@ TRAKT_LISTS = {
     'trakt_premiering': {
         'path': 'calendars/all/{type}/premieres',
         'item_tmdbtype': '{type}'}}
+
+TRAKT_MANAGEMENT = ['collection_add', 'collection_remove', 'watchlist_add', 'watchlist_remove', 'history_add', 'history_remove']
 
 TRAKT_CALENDAR = [
     ('Last Fortnight', -14, 14), ('Last Week', -7, 7), ('Yesterday', -1, 1), ('Today', 0, 1), ('Tomorrow', 1, 1),

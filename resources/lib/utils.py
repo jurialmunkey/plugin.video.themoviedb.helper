@@ -160,6 +160,18 @@ def find_dict_in_list(list_of_dicts, key, value):
     return [list_index for list_index, dic in enumerate(list_of_dicts) if dic.get(key) == value]
 
 
+def get_dict_in_list(list_of_dicts, key, value, basekeys=[]):
+    for d in list_of_dicts:
+        kodi_log(key, 1)
+        if not isinstance(d, dict):
+            continue
+        base = d
+        for basekey in basekeys:
+            d = d.get(basekey, {}) if basekey else d
+        if d.get(key) == value:
+            return base
+
+
 def split_items(items, separator='/'):
     separator = ' {0} '.format(separator)
     if items and separator in items:
