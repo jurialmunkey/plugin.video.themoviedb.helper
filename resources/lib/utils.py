@@ -162,7 +162,6 @@ def find_dict_in_list(list_of_dicts, key, value):
 
 def get_dict_in_list(list_of_dicts, key, value, basekeys=[]):
     for d in list_of_dicts:
-        kodi_log(key, 1)
         if not isinstance(d, dict):
             continue
         base = d
