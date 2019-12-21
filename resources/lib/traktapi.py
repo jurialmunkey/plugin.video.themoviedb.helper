@@ -305,6 +305,28 @@ class traktAPI(RequestAPI):
         return [ListItem(library=self.library, **self.tmdb.get_detailed_item(
             itemtype='tv', tmdb_id=tmdb_id, season=i[0], episode=i[1])) for i in self.get_upnext(imdb_id)[:limit]]
 
+    def get_unwatched_progress(self, tmdb_id=None, imdb_id=None, check_sync=True):
+        if not self.tmdb or not self.authorize() or not tmdb_id:
+            return
+        if not imdb_id:
+            imdb_id = self.tmdb.get_item_externalid(itemtype='tv', tmdb_id=utils.try_parse_int(tmdb_id), external_id='imdb_id')
+        if not imdb_id:
+            return
+        cache_refresh = False if not check_sync or self.sync_activities('shows', 'watched_at') else True
+        return self.get_request_lc('shows', imdb_id, 'progress', 'watched', cache_refresh=cache_refresh)
+
+    def get_unwatched_count(self, tmdb_id=None, imdb_id=None, season=None, request=None, check_sync=True):
+        if not tmdb_id and not imdb_id and not request:
+            return -1
+
+        request = request or self.get_unwatched_progress(tmdb_id=tmdb_id, imdb_id=imdb_id, check_sync=check_sync)
+        request = utils.get_dict_in_list(request.get('seasons', []), 'number', utils.try_parse_int(season)) if season else request
+
+        if not request or not request.get('aired'):
+            return -1
+
+        return utils.try_parse_int(request.get('aired')) - utils.try_parse_int(request.get('completed', 0))
+
     def get_usernameslug(self, login=False):
         if not self.authorize(login):
             return

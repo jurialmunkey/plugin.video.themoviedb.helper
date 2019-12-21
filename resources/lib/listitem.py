@@ -83,6 +83,22 @@ class ListItem(object):
             self.banner = self.banner or artwork.get('banner')
             self.fanart = self.fanart or artwork.get('fanart')
 
+    def get_trakt_unwatched(self, trakt=None, request=None, check_sync=True):
+        if not trakt or request == -1:
+            return
+
+        season = self.infolabels.get('season') if self.infolabels.get('mediatype') == 'season' else None
+        count = trakt.get_unwatched_count(tmdb_id=utils.try_parse_int(self.tmdb_id), season=season, request=request, check_sync=check_sync)
+
+        if count == -1:
+            return
+
+        self.infoproperties['UnWatchedEpisodes'] = count
+
+        if count == 0:
+            self.infolabels['playcount'] = 1
+            self.infolabels['overlay'] = 5
+
     def get_trakt_watched(self, trakt_watched=None):
         if not trakt_watched:
             return

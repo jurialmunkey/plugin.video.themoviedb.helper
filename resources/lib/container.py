@@ -31,6 +31,7 @@ class Container(Plugin):
         self.mixed_containercontent = ''
         self.library = 'video'
         self.updatelisting = False
+        self.check_sync = False
 
     def start_container(self):
         xbmcplugin.setPluginCategory(self.handle, self.plugincategory)  # Container.PluginCategory
@@ -104,6 +105,16 @@ class Container(Plugin):
             return traktAPI().get_watched('movie')
         if self.item_dbtype == 'episode':
             return traktAPI().get_watched('show')
+
+    def get_trakt_unwatched(self):
+        if not self.addon.getSettingBool('trakt_watchedindicators') or self.item_dbtype not in ['season', 'tvshow']:
+            return -1
+        traktapi = traktAPI(tmdb=self.tmdb)
+        self.check_sync = traktapi.sync_activities('shows', 'watched_at')
+        if self.item_dbtype == 'season':
+            return traktapi.get_unwatched_progress(tmdb_id=self.params.get('tmdb_id'), imdb_id=self.params.get('imdb_id'))
+        if self.item_dbtype == 'tvshow':
+            return
 
     def get_sortedlist(self, items):
         if not items:
@@ -336,6 +347,7 @@ class Container(Plugin):
         self.containercontent = self.mixed_containercontent or utils.type_convert(self.item_tmdbtype, 'container')
 
         trakt_watched = self.get_trakt_watched()
+        trakt_unwatched = self.get_trakt_unwatched()
 
         x = 0
         self.start_container()
@@ -344,6 +356,7 @@ class Container(Plugin):
             i.get_url(url, url_tmdb_id, self.params.get('widget'), self.params.get('fanarttv'), self.params.get('nextpage'))
             i.get_extra_artwork(self.tmdb, self.fanarttv) if self.exp_fanarttv() else None
             i.get_trakt_watched(trakt_watched) if x == 0 or self.params.get('info') != 'details' else None
+            i.get_trakt_unwatched(trakt=traktAPI(tmdb=self.tmdb), request=trakt_unwatched, check_sync=self.check_sync) if x == 0 or self.params.get('info') != 'details' else None
             i.create_listitem(self.handle, **i.url)
             x += 1
         self.finish_container()
