@@ -125,6 +125,7 @@ class ListItem(object):
         if not details:
             return
 
+        self.cast = details.get('cast', [])
         self.infolabels = utils.merge_two_dicts(details.get('infolabels', {}), utils.del_empty_keys(self.infolabels))
         self.infoproperties = utils.merge_two_dicts(details.get('infoproperties', {}), utils.del_empty_keys(self.infoproperties))
 
