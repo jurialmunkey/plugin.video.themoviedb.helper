@@ -102,7 +102,6 @@ class Script(Plugin):
     def add_path(self):
         url = self.params.get('add_path', '')
         url = url.replace('info=play', 'info=details')
-        url = url.replace('info=info', 'info=details')
         url = url.replace('info=seasons', 'info=details')
         url = '{0}&{1}'.format(url, 'extended=True') if 'extended=True' not in url else url
         self.position = self.position + 1

@@ -512,8 +512,6 @@ class Container(Plugin):
         if self.params.get('info') == 'play':
             self.list_getid()
             self.list_play()
-        elif self.params.get('info') == 'info':
-            self.list_info()
         elif self.params.get('info') == 'textviewer':
             self.textviewer(xbmc.getInfoLabel('ListItem.Label'), xbmc.getInfoLabel('ListItem.Plot'))
         elif self.params.get('info') == 'imageviewer':
