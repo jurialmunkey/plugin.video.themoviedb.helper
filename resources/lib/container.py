@@ -351,7 +351,7 @@ class Container(Plugin):
         for i in items:
             i.get_details(self.item_dbtype, self.tmdb, self.omdb)
             i.get_url(url, url_tmdb_id, self.params.get('widget'), self.params.get('fanarttv'), self.params.get('nextpage'), self.params.get('extended'))
-            i.get_extra_artwork(self.tmdb, self.fanarttv) if self.exp_fanarttv() else None
+            i.get_extra_artwork(self.tmdb, self.fanarttv) if len(items) < 22 and self.exp_fanarttv() else None
             i.get_trakt_watched(trakt_watched) if x == 0 or self.params.get('info') != 'details' else None
             i.get_trakt_unwatched(trakt=traktAPI(tmdb=self.tmdb), request=trakt_unwatched, check_sync=self.check_sync) if x == 0 or self.params.get('info') != 'details' else None
             i.create_listitem(self.handle, **i.url)
