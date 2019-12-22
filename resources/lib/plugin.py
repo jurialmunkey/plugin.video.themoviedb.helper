@@ -7,6 +7,7 @@ from resources.lib.kodilibrary import KodiLibrary
 from resources.lib.tmdb import TMDb
 from resources.lib.omdb import OMDb
 from resources.lib.fanarttv import FanartTV
+from resources.lib.traktapi import traktAPI
 
 
 class Plugin(object):
@@ -57,6 +58,14 @@ class Plugin(object):
             ratings_awards = self.omdb.get_ratings_awards(imdb_id=item.get('infolabels', {}).get('imdbnumber'), cache_only=cache_only)
             if ratings_awards:
                 item['infoproperties'] = utils.merge_two_dicts(item.get('infoproperties', {}), ratings_awards)
+        return item
+
+    def get_trakt_ratings(self, item, tmdbtype=None, tmdb_id=None, season=None, episode=None):
+        imdb_id = self.tmdb.get_item_externalid(itemtype=tmdbtype, tmdb_id=tmdb_id, external_id='imdb_id')
+        if tmdbtype and imdb_id:
+            ratings = traktAPI().get_ratings(tmdbtype=tmdbtype, imdb_id=imdb_id, season=season, episode=episode)
+            if ratings:
+                item['infoproperties'] = utils.merge_two_dicts(item.get('infoproperties', {}), ratings)
         return item
 
     def get_db_info(self, item, info=None, tmdbtype=None, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None):

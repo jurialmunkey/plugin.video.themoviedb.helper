@@ -212,6 +212,18 @@ class traktAPI(RequestAPI):
                 n += 1
         return items
 
+    def get_ratings(self, tmdbtype=None, imdb_id=None, trakt_id=None, trakt_slug=None, season=None, episode=None):
+        slug = trakt_slug or trakt_id or imdb_id
+        infoproperties = {}
+        if not slug or not tmdbtype:
+            return infoproperties
+        url = 'episodes/{0}/ratings'.format(episode) if episode else 'ratings'
+        url = 'seasons/{0}/{1}'.format(season, url) if season else 'ratings'
+        response = self.get_request_lc(utils.type_convert(tmdbtype, 'trakt') + 's', slug, url)
+        infoproperties['trakt_rating'] = '{:0.1f}'.format(response.get('rating', ''))
+        infoproperties['trakt_votes'] = '{0}'.format(response.get('votes', ''))
+        return infoproperties
+
     def get_mostwatched(self, userslug, tmdbtype, limit=None, islistitem=True):
         history = self.get_response_json('users', userslug, 'watched', utils.type_convert(tmdbtype, 'trakt') + 's')
         history = sorted(history, key=lambda i: i['plays'], reverse=True)

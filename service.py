@@ -12,7 +12,7 @@ _setprop = {
     'born', 'creator', 'aliases', 'budget', 'revenue', 'set.tmdb_id', 'set.name', 'set.poster', 'set.fanart',
     'awards', 'metacritic_rating', 'imdb_rating', 'imdb_votes', 'rottentomatoes_rating', 'rottentomatoes_image',
     'rottentomatoes_reviewtotal', 'rottentomatoes_reviewsfresh', 'rottentomatoes_reviewsrotten',
-    'rottentomatoes_consensus', 'rottentomatoes_usermeter', 'rottentomatoes_userreviews'}
+    'rottentomatoes_consensus', 'rottentomatoes_usermeter', 'rottentomatoes_userreviews', 'trakt_rating', 'trakt_votes'}
 
 
 class ServiceMonitor(Plugin):
@@ -98,8 +98,12 @@ class ServiceMonitor(Plugin):
 
             self.home.setProperty('TMDbHelper.IsUpdating', 'True')
 
-            details = self.tmdb.get_detailed_item(tmdbtype, self.get_tmdb_id(tmdbtype, imdb_id, query, year), season=season, episode=episode)
-            details = self.get_omdb_ratings(details)
+            tmdb_id = self.get_tmdb_id(tmdbtype, imdb_id, query, year)
+            details = self.tmdb.get_detailed_item(tmdbtype, tmdb_id, season=season, episode=episode)
+            details = self.get_omdb_ratings(details) if dbtype == 'movies' else details
+            details = self.get_trakt_ratings(
+                details, tmdbtype=tmdbtype, tmdb_id=tmdb_id, season=season,
+                episode=episode) if dbtype in ['movies', 'tvshows', 'seasons', 'episodes'] else details
 
             if not details:
                 self.clear_properties()
