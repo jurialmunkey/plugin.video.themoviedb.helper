@@ -30,6 +30,8 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32024]" type="action" action="RunScript(plugin.video.themoviedb.helper, set_defaultplayer=movie)" id="default_player_movies" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32025]" type="action" action="RunScript(plugin.video.themoviedb.helper, set_defaultplayer=tv)" id="default_player_episodes" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32027]" type="action" action="RunScript(plugin.video.themoviedb.helper, clear_defaultplayers)" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32036]" type="lsep"/>
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32037]" type="bool" id="bundled_players" default="True" />
     </category>
     <category label="$LOCALIZE[10039]">
         <setting label="$ADDON[plugin.video.themoviedb.helper 32020]" type="lsep"/>

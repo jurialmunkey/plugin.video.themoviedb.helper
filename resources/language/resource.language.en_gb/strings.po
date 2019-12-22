@@ -176,6 +176,16 @@ msgctxt "#32035"
 msgid "Get watched episode counts for tvshows and seasons from Trakt (slow)"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32036"
+msgid "Bundled Players"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32037"
+msgid "Use bundled Netflix and YouTube players"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

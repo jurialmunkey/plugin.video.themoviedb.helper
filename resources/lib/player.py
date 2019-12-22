@@ -123,9 +123,9 @@ class Player(Plugin):
             self.item[k + '_escaped+'] = v.replace(' ', '%252B')
 
     def build_players(self, tmdbtype=None):
-        basedirs = [
-            'special://profile/addon_data/plugin.video.themoviedb.helper/players/',
-            'special://home/addons/plugin.video.themoviedb.helper/resources/players/']
+        basedirs = ['special://profile/addon_data/plugin.video.themoviedb.helper/players/']
+        if self.addon.getSettingBool('bundled_players'):
+            basedirs.append('special://home/addons/plugin.video.themoviedb.helper/resources/players/')
         for basedir in basedirs:
             files = [x for x in xbmcvfs.listdir(basedir)[1] if x.endswith('.json')]
             for file in files:
