@@ -323,9 +323,6 @@ class Container(Plugin):
     def list_getid(self):
         self.params['tmdb_id'] = self.get_tmdb_id(**self.params)
 
-    def list_info(self):
-        xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,exec_action=Action(Info))')
-
     def list_play(self):
         Player().play(
             itemtype=self.params.get('type'), tmdb_id=self.params.get('tmdb_id'),
