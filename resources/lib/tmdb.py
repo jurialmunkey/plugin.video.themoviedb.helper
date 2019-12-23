@@ -178,7 +178,8 @@ class TMDb(RequestAPI):
         infolabels = {}
         if not isinstance(item, dict):
             return infolabels
-        videos = item.get('videos', {}).get('results') or []
+        videos = item.get('videos') or {}
+        videos = videos.get('results') or []
         for i in videos:
             if i.get('type', '') != 'Trailer' or i.get('site', '') != 'YouTube' or not i.get('key'):
                 continue
