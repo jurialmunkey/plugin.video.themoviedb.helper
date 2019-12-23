@@ -45,6 +45,8 @@ class ServiceMonitor(Plugin):
             # skip when container scrolling
             elif xbmc.getCondVisibility(
                     "Container.OnScrollNext | Container.OnScrollPrevious | Container.Scrolling"):
+                if (self.properties or self.indxproperties) and self.get_cur_item() != self.pre_item:
+                    self.clear_properties()
                 self.kodimonitor.waitForAbort(1)  # Maybe clear props here too
 
             # media window is opened or widgetcontainer set - start listitem monitoring!
@@ -60,20 +62,21 @@ class ServiceMonitor(Plugin):
             else:
                 self.kodimonitor.waitForAbort(1)
 
+    def get_cur_item(self):
+        self.dbtype = self.get_dbtype()
+        self.imdb_id = self.get_infolabel('IMDBNumber')
+        self.query = self.get_infolabel('TvShowTitle') or self.get_infolabel('Title') or self.get_infolabel('Label')
+        self.year = self.get_infolabel('year')
+        self.season = self.get_infolabel('Season') if self.dbtype == 'episodes' else ''
+        self.episode = self.get_infolabel('Episode') if self.dbtype == 'episodes' else ''
+        if not sys.version_info.major == 3:
+            self.query = self.query.decode('utf-8')
+        return u'{0}.{1}.{2}.{3}.{4}'.format(self.imdb_id, self.query, self.year, self.season, self.episode)
+
     def get_listitem(self):
         try:
             self.get_container()
-
-            dbtype = self.get_dbtype()
-            imdb_id = self.get_infolabel('IMDBNumber')
-            query = self.get_infolabel('TvShowTitle') or self.get_infolabel('Title') or self.get_infolabel('Label')
-            year = self.get_infolabel('year')
-            season = self.get_infolabel('Season') if dbtype == 'episodes' else ''
-            episode = self.get_infolabel('Episode') if dbtype == 'episodes' else ''
-            if not sys.version_info.major == 3:
-                query = query.decode('utf-8')
-
-            self.cur_item = u'{0}.{1}.{2}.{3}.{4}'.format(imdb_id, query, year, season, episode)
+            self.cur_item = self.get_cur_item()
             if self.cur_item == self.pre_item:
                 return  # Don't get details if we already did last time!
             self.pre_item = self.cur_item
@@ -85,25 +88,25 @@ class ServiceMonitor(Plugin):
                 self.clear_properties()  # Clear props if the folder changed
                 self.pre_folder = self.cur_folder
 
-            if dbtype in ['tvshows', 'seasons', 'episodes']:
+            if self.dbtype in ['tvshows', 'seasons', 'episodes']:
                 tmdbtype = 'tv'
-            elif dbtype in ['movies']:
+            elif self.dbtype in ['movies']:
                 tmdbtype = 'movie'
-            elif dbtype in ['sets']:
+            elif self.dbtype in ['sets']:
                 tmdbtype = 'collection'
-            elif dbtype in ['actors', 'directors']:
+            elif self.dbtype in ['actors', 'directors']:
                 tmdbtype = 'person'
             else:
                 return
 
             self.home.setProperty('TMDbHelper.IsUpdating', 'True')
 
-            tmdb_id = self.get_tmdb_id(tmdbtype, imdb_id, query, year)
-            details = self.tmdb.get_detailed_item(tmdbtype, tmdb_id, season=season, episode=episode)
-            details = self.get_omdb_ratings(details) if dbtype == 'movies' else details
+            tmdb_id = self.get_tmdb_id(tmdbtype, self.imdb_id, self.query, self.year)
+            details = self.tmdb.get_detailed_item(tmdbtype, tmdb_id, season=self.season, episode=self.episode)
+            details = self.get_omdb_ratings(details) if self.dbtype == 'movies' else details
             details = self.get_trakt_ratings(
-                details, tmdbtype=tmdbtype, tmdb_id=tmdb_id, season=season,
-                episode=episode) if dbtype in ['movies', 'tvshows', 'seasons', 'episodes'] else details
+                details, tmdbtype=tmdbtype, tmdb_id=tmdb_id, season=self.season,
+                episode=self.episode) if self.dbtype in ['movies', 'tvshows', 'seasons', 'episodes'] else details
 
             if not details:
                 self.clear_properties()
