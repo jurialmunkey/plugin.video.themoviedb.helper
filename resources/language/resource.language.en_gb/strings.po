@@ -186,6 +186,16 @@ msgctxt "#32037"
 msgid "Use bundled Netflix and YouTube players"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32038"
+msgid "Get additional details from the local Kodi library database"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32039"
+msgid "Kodi Library DB"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

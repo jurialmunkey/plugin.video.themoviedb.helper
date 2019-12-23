@@ -68,13 +68,18 @@ class Plugin(object):
                 item['infoproperties'] = utils.merge_two_dicts(item.get('infoproperties', {}), ratings)
         return item
 
-    def get_db_info(self, item, info=None, tmdbtype=None, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None):
+    def get_db_info(self, info=None, tmdbtype=None, imdb_id=None, originaltitle=None, title=None, year=None, tvshowtitle=None, season=None, episode=None):
+        dbid = None
         kodidatabase = None
         if tmdbtype == 'movie':
-            self.kodimoviedb = self.kodimoviedb or KodiLibrary(dbtype='movie')
-            kodidatabase = self.kodimoviedb
+            kodidatabase = self.kodimoviedb = self.kodimoviedb or KodiLibrary(dbtype='movie')
         if tmdbtype == 'tv':
-            self.koditvshowdb = self.koditvshowdb or KodiLibrary(dbtype='tvshow')
-            kodidatabase = self.koditvshowdb
+            kodidatabase = self.koditvshowdb = self.koditvshowdb or KodiLibrary(dbtype='tvshow')
         if kodidatabase and info:
-            return kodidatabase.get_info(info=info, dbid=dbid, imdb_id=imdb_id, originaltitle=originaltitle, title=title, year=year)
+            return kodidatabase.get_info(info=info, imdb_id=imdb_id, originaltitle=originaltitle, title=title, year=year)
+        if tmdbtype == 'episode':
+            kodidatabase = self.koditvshowdb = self.koditvshowdb or KodiLibrary(dbtype='tvshow')
+            dbid = kodidatabase.get_info(info='dbid', imdb_id=imdb_id, title=tvshowtitle, year=year)
+            kodidatabase = KodiLibrary(dbtype='episode', tvshowid=dbid)
+        if dbid and kodidatabase and season and episode:
+            return kodidatabase.get_info('dbid', season=season, episode=episode)

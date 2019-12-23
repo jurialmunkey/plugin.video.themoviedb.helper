@@ -163,6 +163,7 @@ class Container(Plugin):
 
             if self.details_tv:
                 season_num = i.infolabels.get('season')
+                i.cast = self.details_tv.get('cast', []) + i.cast
                 i.infolabels = utils.merge_two_dicts(self.details_tv.get('infolabels', {}), utils.del_empty_keys(i.infolabels))
                 i.infoproperties = utils.merge_two_dicts(self.details_tv.get('infoproperties', {}), utils.del_empty_keys(i.infoproperties))
                 i.poster = i.poster or self.details_tv.get('poster')
@@ -170,8 +171,9 @@ class Container(Plugin):
                 i.infolabels['season'] = season_num
 
             i.dbid = self.get_db_info(
-                i, info='dbid', tmdbtype=self.item_tmdbtype, imdb_id=i.imdb_id,
-                originaltitle=i.infolabels.get('originaltitle'), title=i.infolabels.get('title'), year=i.infolabels.get('year'))
+                info='dbid', tmdbtype=self.item_tmdbtype, imdb_id=i.imdb_id,
+                originaltitle=i.infolabels.get('originaltitle'), title=i.infolabels.get('title'), year=i.infolabels.get('year'),
+                tvshowtitle=i.infolabels.get('tvshowtitle'), season=i.infolabels.get('season'), episode=i.infolabels.get('episode'))
 
             if self.item_tmdbtype == 'season' and i.infolabels.get('season') == 0:
                 lastitems.append(i)

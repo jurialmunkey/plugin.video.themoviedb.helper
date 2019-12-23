@@ -19,7 +19,7 @@ class FanartTV(RequestAPI):
         """
         if not ftvtype or not ftvid:
             return
-        if self.ftvtype != ftvtype or self.ftvid != ftvid or not self.response:
+        if self.ftvtype != ftvtype or self.ftvid != ftvid:
             self.response = self.get_request_lc(ftvtype, ftvid, *args, **kwargs)
             self.ftvtype = ftvtype
             self.ftvid = ftvid

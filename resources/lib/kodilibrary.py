@@ -3,6 +3,129 @@ import json
 import resources.lib.utils as utils
 
 
+class KodiDBItem(object):
+    def get_details(self, method=None, params=None):
+        if not method or not params:
+            return
+        query = {
+            "jsonrpc": "2.0",
+            "params": params,
+            "method": method,
+            "id": 1}
+        return json.loads(xbmc.executeJSONRPC(json.dumps(query)))
+
+    def get_item_details(self, dbid=None, method=None, key=None, properties=None):
+        if not dbid or not method or not key or not properties:
+            return {}
+        param_name = "{0}id".format(key)
+        params = {
+            param_name: utils.try_parse_int(dbid),
+            "properties": properties}
+        details = self.get_details(method, params)
+        if not details or not isinstance(details, dict):
+            return {}
+        details = details.get('result', {}).get('{0}details'.format(key))
+        # utils.kodi_log('Got Kodi DB for {0}'.format(details.get('label')), 1)
+        # utils.kodi_log(details, 1)
+        return self.get_niceitem(details)
+
+    def get_movie_details(self, dbid=None):
+        properties = [
+            "title", "genre", "year", "rating", "director", "trailer", "tagline", "plot", "plotoutline", "originaltitle",
+            "lastplayed", "playcount", "writer", "studio", "mpaa", "cast", "country", "imdbnumber", "runtime", "set",
+            "showlink", "streamdetails", "top250", "votes", "fanart", "thumbnail", "file", "sorttitle", "resume", "setid",
+            "dateadded", "tag", "art", "userrating", "ratings", "premiered", "uniqueid"]
+        return self.get_item_details(dbid=dbid, method="VideoLibrary.GetMovieDetails", key="movie", properties=properties)
+
+    def get_tvshow_details(self, dbid=None):
+        properties = [
+            "title", "genre", "year", "rating", "plot", "studio", "mpaa", "cast", "playcount", "episode", "imdbnumber",
+            "premiered", "votes", "lastplayed", "fanart", "thumbnail", "file", "originaltitle", "sorttitle", "episodeguide",
+            "season", "watchedepisodes", "dateadded", "tag", "art", "userrating", "ratings", "runtime", "uniqueid"]
+        return self.get_item_details(dbid=dbid, method="VideoLibrary.GetTVShowDetails", key="tvshow", properties=properties)
+
+    def get_episode_details(self, dbid=None):
+        properties = [
+            "title", "plot", "votes", "rating", "writer", "firstaired", "playcount", "runtime", "director", "productioncode",
+            "season", "episode", "originaltitle", "showtitle", "cast", "streamdetails", "lastplayed", "fanart", "thumbnail",
+            "file", "resume", "tvshowid", "dateadded", "uniqueid", "art", "specialsortseason", "specialsortepisode", "userrating",
+            "seasonid", "ratings"]
+        return self.get_item_details(dbid=dbid, method="VideoLibrary.GetEpisodeDetails", key="episode", properties=properties)
+
+    def get_infolabels(self, item):
+        infolabels = {}
+        infolabels['genre'] = item.get('genre', [])
+        infolabels['country'] = item.get('country', [])
+        infolabels['episode'] = item.get('episode')
+        infolabels['season'] = item.get('season')
+        infolabels['sortepisode'] = item.get('sortepisode')
+        infolabels['sortseason'] = item.get('sortseason')
+        infolabels['episodeguide'] = item.get('episodeguide')
+        infolabels['showlink'] = item.get('showlink', [])
+        infolabels['top250'] = item.get('top250')
+        infolabels['setid'] = item.get('setid')
+        infolabels['tracknumber'] = item.get('tracknumber')
+        infolabels['rating'] = item.get('rating')
+        infolabels['userrating'] = item.get('userrating')
+        infolabels['watched'] = item.get('watched')
+        infolabels['playcount'] = item.get('playcount')
+        infolabels['overlay'] = item.get('overlay')
+        infolabels['director'] = item.get('director', [])
+        infolabels['mpaa'] = item.get('mpaa')
+        infolabels['plot'] = item.get('plot')
+        infolabels['plotoutline'] = item.get('plotoutline')
+        infolabels['title'] = item.get('title')
+        infolabels['originaltitle'] = item.get('originaltitle')
+        infolabels['sorttitle'] = item.get('sorttitle')
+        infolabels['duration'] = item.get('duration')
+        infolabels['studio'] = item.get('studio', [])
+        infolabels['tagline'] = item.get('tagline')
+        infolabels['writer'] = item.get('writer', [])
+        infolabels['tvshowtitle'] = item.get('tvshowtitle')
+        infolabels['premiered'] = item.get('premiered')
+        infolabels['status'] = item.get('status')
+        infolabels['set'] = item.get('set')
+        infolabels['setoverview'] = item.get('setoverview')
+        infolabels['tag'] = item.get('tag', [])
+        infolabels['imdbnumber'] = item.get('imdbnumber')
+        infolabels['code'] = item.get('code')
+        infolabels['aired'] = item.get('aired')
+        infolabels['credits'] = item.get('credits')
+        infolabels['lastplayed'] = item.get('lastplayed')
+        infolabels['album'] = item.get('album')
+        infolabels['artist'] = item.get('artist')
+        infolabels['votes'] = item.get('votes')
+        infolabels['path'] = item.get('path')
+        infolabels['trailer'] = item.get('trailer')
+        infolabels['dateadded'] = item.get('dateadded')
+        infolabels = utils.del_empty_keys(infolabels, ['N/A', '0.0', '0'])
+        return infolabels
+
+    def get_infoproperties(self, item):
+        infoproperties = {}
+        infoproperties['metacritic_rating'] = '{0:.1f}'.format(utils.try_parse_float(item.get('ratings', {}).get('metacritic', {}).get('rating')))
+        infoproperties['imdb_rating'] = '{0:.1f}'.format(utils.try_parse_float(item.get('ratings', {}).get('imdb', {}).get('rating')))
+        infoproperties['imdb_votes'] = '{:0,.0f}'.format(utils.try_parse_float(item.get('ratings', {}).get('imdb', {}).get('votes')))
+        infoproperties['tmdb_rating'] = '{0:.1f}'.format(utils.try_parse_float(item.get('ratings', {}).get('themoviedb', {}).get('rating')))
+        infoproperties['tmdb_votes'] = '{:0,.0f}'.format(utils.try_parse_float(item.get('ratings', {}).get('themoviedb', {}).get('votes')))
+        infoproperties = utils.del_empty_keys(infoproperties, ['N/A', '0.0', '0'])
+        return infoproperties
+
+    def get_niceitem(self, item):
+        label = item.get('label') or ''
+        icon = thumb = item.get('thumbnail') or ''
+        poster = item.get('art', {}).get('poster') or ''
+        fanart = item.get('fanart') or item.get('art', {}).get('fanart') or ''
+        cast = item.get('cast', [])
+        streamdetails = item.get('streamdetails', {})
+        infolabels = self.get_infolabels(item)
+        infoproperties = self.get_infoproperties(item)
+        return {
+            'label': label, 'icon': icon, 'poster': poster, 'thumb': thumb, 'fanart': fanart,
+            'cast': cast, 'infolabels': infolabels, 'infoproperties': infoproperties,
+            'streamdetails': streamdetails}
+
+
 class KodiLibrary(object):
     def __init__(self, dbtype=None, tvshowid=None):
         if not dbtype:
