@@ -176,7 +176,7 @@ class ListItem(object):
         self.infoproperties = utils.merge_two_dicts(details.get('infoproperties', {}), utils.del_empty_keys(self.infoproperties))
         self.streamdetails = details.get('streamdetails', {})
 
-    def get_details(self, dbtype=None, tmdb=None, omdb=None):
+    def get_details(self, dbtype=None, tmdb=None, omdb=None, kodi=None):
         self.infolabels['mediatype'] = dbtype
 
         if self.dbid:
@@ -187,7 +187,7 @@ class ListItem(object):
 
         self.get_tmdb_details(tmdb=tmdb)
         self.get_omdb_details(omdb=omdb)
-        self.get_kodi_details() if self.addon.getSettingBool('local_db') else None
+        self.get_kodi_details() if self.addon.getSettingBool('local_db') or kodi else None
 
     def create_listitem(self, handle=None, **kwargs):
         listitem = xbmcgui.ListItem(label=self.label, label2=self.label2)
