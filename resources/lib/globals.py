@@ -69,7 +69,48 @@ BASEDIR_MAIN = [
     {
         'info': 'dir_trakt',
         'name': 'Trakt',
-        'icon': '{0}/resources/trakt.png'}]
+        'icon': '{0}/resources/trakt.png'},
+    {
+        'info': 'dir_random',
+        'name': 'Randomised',
+        'icon': '{0}/resources/poster.png'}]
+
+BASEDIR_RANDOM = [
+    {
+        'info': 'random_genres',
+        'name': 'Random{1}{0}{1}Genre',
+        'types': ['movie', 'tv'],
+        'icon': '{0}/resources/icons/tmdb/genre.png'},
+    {
+        'info': 'trakt_becauseyouwatched',
+        'name': 'Based on Recently Watched{1}{0}',
+        'icon': '{0}/resources/icons/trakt/recommended.png',
+        'types': ['movie', 'tv']},
+    {
+        'info': 'trakt_becausemostwatched',
+        'name': 'Based on Most Watched{1}{0}',
+        'icon': '{0}/resources/icons/trakt/recommended.png',
+        'types': ['movie', 'tv']},
+    {
+        'info': 'random_trendinglists',
+        'name': 'Random Trending List',
+        'icon': '{0}/resources/icons/trakt/trendinglist.png',
+        'types': ['both']},
+    {
+        'info': 'random_popularlists',
+        'name': 'Random Popular List',
+        'icon': '{0}/resources/icons/trakt/popularlist.png',
+        'types': ['both']},
+    {
+        'info': 'random_likedlists',
+        'name': 'Random Liked List',
+        'icon': '{0}/resources/icons/trakt/likedlist.png',
+        'types': ['both']},
+    {
+        'info': 'random_mylists',
+        'name': 'Random Your List',
+        'icon': '{0}/resources/icons/trakt/mylists.png',
+        'types': ['both']}]
 
 BASEDIR_TMDB = [
     {
@@ -240,7 +281,10 @@ BASEDIR_PATH = {
         'types': ['movie', 'tv', 'person', 'both']},
     'dir_trakt': {
         'folders': [BASEDIR_TRAKT],
-        'types': ['movie', 'tv', 'person', 'both']}}
+        'types': ['movie', 'tv', 'person', 'both']},
+    'dir_random': {
+        'folders': [BASEDIR_RANDOM],
+        'types': ['movie', 'tv', 'both']}}
 
 DETAILED_CATEGORIES = [
     {
@@ -329,6 +373,13 @@ DETAILED_CATEGORIES = [
         'icon': '{0}/resources/icons/tmdb/trakt.png',
         'url_key': 'imdb_id',
         'types': ['movie', 'tv']}]
+
+RANDOM_LISTS = {
+    'random_genres': 'genres',
+    'random_trendinglists': 'trakt_trendinglists',
+    'random_popularlists': 'trakt_popularlists',
+    'random_likedlists': 'trakt_likedlists',
+    'random_mylists': 'trakt_mylists'}
 
 TMDB_LISTS = {
     'search': {

@@ -204,7 +204,10 @@ class traktAPI(RequestAPI):
         for i in itemlist:
             if limit and n >= limit:
                 break
-            item = (i.get(itemtype, {}).get('ids', {}).get('slug'), i.get(itemtype, {}).get('ids', {}).get('tmdb'))
+            item = (
+                i.get(itemtype, {}).get('ids', {}).get('slug'),
+                i.get(itemtype, {}).get('ids', {}).get('tmdb'),
+                i.get(itemtype, {}).get('title'))
             if islistitem:
                 item = ListItem(library=self.library, **self.tmdb.get_detailed_item(tmdbtype, item[1]))
             if item not in items:

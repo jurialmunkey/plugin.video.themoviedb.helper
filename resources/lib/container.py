@@ -9,7 +9,7 @@ from resources.lib.traktapi import traktAPI
 from resources.lib.listitem import ListItem
 from resources.lib.player import Player
 from resources.lib.plugin import Plugin
-from resources.lib.globals import BASEDIR_MAIN, BASEDIR_PATH, DETAILED_CATEGORIES, TMDB_LISTS, TRAKT_LISTS, TRAKT_CALENDAR, TRAKT_MANAGEMENT
+from resources.lib.globals import BASEDIR_MAIN, BASEDIR_PATH, DETAILED_CATEGORIES, TMDB_LISTS, TRAKT_LISTS, TRAKT_CALENDAR, TRAKT_MANAGEMENT, RANDOM_LISTS
 try:
     from urllib.parse import parse_qsl  # Py3
 except ImportError:
@@ -32,12 +32,15 @@ class Container(Plugin):
         self.library = 'video'
         self.updatelisting = False
         self.check_sync = False
+        self.randomlist = []
 
     def start_container(self):
         xbmcplugin.setPluginCategory(self.handle, self.plugincategory)  # Container.PluginCategory
         xbmcplugin.setContent(self.handle, self.containercontent)  # Container.Content
 
     def finish_container(self):
+        if self.params.get('random'):
+            return
         xbmcplugin.endOfDirectory(self.handle, updateListing=self.updatelisting)
 
     def set_url_params(self, url):
@@ -258,8 +261,8 @@ class Container(Plugin):
             user_slug = i.get('user', {}).get('ids', {}).get('slug')
             listitem = ListItem(label=label, label2=label2, icon=icon, thumb=icon, poster=icon, infolabels=infolabels)
             url = {'info': 'trakt_userlist', 'user_slug': user_slug, 'list_slug': list_slug, 'type': self.params.get('type')}
-            url = self.set_url_params(url)
-            listitem.create_listitem(self.handle, **url)
+            listitem.url = self.set_url_params(url)
+            listitem.create_listitem(self.handle, **listitem.url) if not self.params.get('random') else self.randomlist.append(listitem)
         self.finish_container()
 
     def list_trakt(self):
@@ -318,6 +321,7 @@ class Container(Plugin):
         recentitem = recentitems[random.randint(0, len(recentitems) - 1)]
         if not recentitem[1]:
             return
+        self.plugincategory = recentitem[2]
         self.params['tmdb_id'] = recentitem[1]
         self.params['info'] = 'recommendations'
         self.list_tmdb()
@@ -356,7 +360,7 @@ class Container(Plugin):
             i.get_extra_artwork(self.tmdb, self.fanarttv) if len(items) < 22 and self.exp_fanarttv() else None
             i.get_trakt_watched(trakt_watched) if x == 0 or self.params.get('info') != 'details' else None
             i.get_trakt_unwatched(trakt=traktAPI(tmdb=self.tmdb), request=trakt_unwatched, check_sync=self.check_sync) if x == 0 or self.params.get('info') != 'details' else None
-            i.create_listitem(self.handle, **i.url)
+            i.create_listitem(self.handle, **i.url) if not self.params.get('random') else self.randomlist.append(i)
             x += 1
         self.finish_container()
 
@@ -475,6 +479,15 @@ class Container(Plugin):
         self.item_tmdbtype = self.params.get('type')
         self.list_items(items=items, url_tmdb_id=self.params.get('tmdb_id'))
 
+    def list_random(self):
+        self.params['info'] = RANDOM_LISTS.get(self.params.get('info'), {})
+        self.params['random'] = True
+        self.router()
+        item = self.randomlist[random.randint(0, len(self.randomlist) - 1)]
+        self.plugincategory = item.label
+        self.params = item.url
+        self.router()
+
     def list_basedir(self):
         cat = BASEDIR_PATH.get(self.params.get('info'), {})
         basedir = cat.get('folders', [BASEDIR_MAIN])
@@ -521,6 +534,8 @@ class Container(Plugin):
             self.list_getid()
             self.list_traktmanagement()
             self.list_details()
+        elif self.params.get('info') in RANDOM_LISTS:
+            self.list_random()
         elif self.params.get('info') == 'discover':
             self.translate_discover()
             self.list_tmdb()
