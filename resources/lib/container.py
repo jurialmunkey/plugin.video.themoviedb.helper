@@ -5,11 +5,12 @@ import xbmcplugin
 import datetime
 import random
 import resources.lib.utils as utils
+import resources.lib.constants as constants
 from resources.lib.traktapi import traktAPI
 from resources.lib.listitem import ListItem
 from resources.lib.player import Player
 from resources.lib.plugin import Plugin
-from resources.lib.globals import BASEDIR_MAIN, BASEDIR_PATH, DETAILED_CATEGORIES, TMDB_LISTS, TRAKT_LISTS, TRAKT_CALENDAR, TRAKT_MANAGEMENT, RANDOM_LISTS
+
 try:
     from urllib.parse import parse_qsl  # Py3
 except ImportError:
@@ -229,7 +230,7 @@ class Container(Plugin):
 
         icon = '{0}/resources/trakt.png'.format(self.addonpath)
         self.start_container()
-        for i in TRAKT_CALENDAR:
+        for i in constants.TRAKT_CALENDAR:
             date = datetime.datetime.today() + datetime.timedelta(days=i[1])
             label = i[0].format(date.strftime('%A'))
             listitem = ListItem(label=label, icon=icon)
@@ -239,7 +240,7 @@ class Container(Plugin):
         self.finish_container()
 
     def list_traktuserlists(self):
-        cat = TRAKT_LISTS.get(self.params.get('info'), {})
+        cat = constants.TRAKT_LISTS.get(self.params.get('info'), {})
         path = cat.get('path', '')
         traktapi = traktAPI(login=cat.get('req_auth', False))
         if '{user_slug}' in path:
@@ -269,7 +270,7 @@ class Container(Plugin):
         if not self.params.get('type'):
             return
 
-        cat = TRAKT_LISTS.get(self.params.get('info', ''), {})
+        cat = constants.TRAKT_LISTS.get(self.params.get('info', ''), {})
         traktapi = traktAPI(tmdb=self.tmdb, login=cat.get('req_auth', False))
 
         if '{user_slug}' in cat.get('path', ''):
@@ -287,7 +288,7 @@ class Container(Plugin):
             url={'info': cat.get('url_info', 'details')})
 
     def list_traktmanagement(self):
-        if not self.params.get('trakt') in TRAKT_MANAGEMENT:
+        if not self.params.get('trakt') in constants.TRAKT_MANAGEMENT:
             return
         with utils.busy_dialog():
             traktapi = traktAPI()
@@ -369,7 +370,7 @@ class Container(Plugin):
             return
 
         # Construct request
-        cat = TMDB_LISTS.get(self.params.get('info'), {})
+        cat = constants.TMDB_LISTS.get(self.params.get('info'), {})
         kwparams = utils.merge_two_dicts(utils.make_kwparams(self.params), kwargs)
         kwparams = utils.merge_two_dicts(kwparams, dict(parse_qsl(cat.get('url_ext', '').format(**self.params))))
         kwparams.setdefault('key', cat.get('key'))
@@ -432,7 +433,7 @@ class Container(Plugin):
         items = [firstitem]
 
         # Build categories
-        for i in DETAILED_CATEGORIES:
+        for i in constants.DETAILED_CATEGORIES:
             if self.params.get('type') in i.get('types'):
                 item = ListItem(library=self.library, **details)
                 item.label = i.get('name')
@@ -480,7 +481,7 @@ class Container(Plugin):
         self.list_items(items=items, url_tmdb_id=self.params.get('tmdb_id'))
 
     def list_random(self):
-        self.params['info'] = RANDOM_LISTS.get(self.params.get('info'), {})
+        self.params['info'] = constants.RANDOM_LISTS.get(self.params.get('info'), {})
         self.params['random'] = True
         self.router()
         item = self.randomlist[random.randint(0, len(self.randomlist) - 1)]
@@ -489,8 +490,8 @@ class Container(Plugin):
         self.router()
 
     def list_basedir(self):
-        cat = BASEDIR_PATH.get(self.params.get('info'), {})
-        basedir = cat.get('folders', [BASEDIR_MAIN])
+        cat = constants.BASEDIR_PATH.get(self.params.get('info'), {})
+        basedir = cat.get('folders', [constants.BASEDIR_MAIN])
         types = cat.get('types', [None])
         self.start_container()
         for folder in basedir:
@@ -534,7 +535,7 @@ class Container(Plugin):
             self.list_getid()
             self.list_traktmanagement()
             self.list_details()
-        elif self.params.get('info') in RANDOM_LISTS:
+        elif self.params.get('info') in constants.RANDOM_LISTS:
             self.list_random()
         elif self.params.get('info') == 'discover':
             self.translate_discover()
@@ -548,19 +549,19 @@ class Container(Plugin):
             self.list_becauseyouwatched()
         elif self.params.get('info') == 'trakt_becausemostwatched':
             self.list_becauseyouwatched(mostwatched=True)
-        elif self.params.get('info') in TMDB_LISTS:
+        elif self.params.get('info') in constants.TMDB_LISTS:
             self.list_getid()
             self.list_tmdb()
-        elif self.params.get('info') in ['trakt_inprogress', 'trakt_history', 'trakt_mostwatched']:
+        elif self.params.get('info') in constants.TRAKT_HISTORY:
             self.list_trakthistory()
         elif self.params.get('info') == 'trakt_upnext':
             self.list_getid()
             self.list_traktupnext()
         elif self.params.get('info') == 'trakt_calendar':
             self.list_traktcalendar()
-        elif self.params.get('info') in ['trakt_mylists', 'trakt_trendinglists', 'trakt_popularlists', 'trakt_likedlists', 'trakt_inlists']:
+        elif self.params.get('info') in constants.TRAKT_USERLISTS:
             self.list_traktuserlists()
-        elif self.params.get('info') in TRAKT_LISTS:
+        elif self.params.get('info') in constants.TRAKT_LISTS:
             self.list_trakt()
-        elif not self.params or self.params.get('info') in BASEDIR_PATH:
+        elif not self.params or self.params.get('info') in constants.BASEDIR_PATH:
             self.list_basedir()

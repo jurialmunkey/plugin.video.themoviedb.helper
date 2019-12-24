@@ -2,7 +2,7 @@ import xbmc
 import xbmcgui
 import xbmcaddon
 import resources.lib.utils as utils
-from resources.lib.globals import LANGUAGES, APPEND_TO_RESPONSE, TMDB_LISTS
+from resources.lib.constants import LANGUAGES, APPEND_TO_RESPONSE, TMDB_LISTS
 from resources.lib.kodilibrary import KodiLibrary
 from resources.lib.tmdb import TMDb
 from resources.lib.omdb import OMDb
