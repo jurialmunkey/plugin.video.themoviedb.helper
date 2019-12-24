@@ -27,7 +27,7 @@ class KodiDBItem(object):
         details = details.get('result', {}).get('{0}details'.format(key))
         # utils.kodi_log('Got Kodi DB for {0}'.format(details.get('label')), 1)
         # utils.kodi_log(details, 1)
-        return self.get_niceitem(details)
+        return self.get_niceitem(details, key)
 
     def get_movie_details(self, dbid=None):
         properties = [
@@ -52,7 +52,7 @@ class KodiDBItem(object):
             "seasonid", "ratings"]
         return self.get_item_details(dbid=dbid, method="VideoLibrary.GetEpisodeDetails", key="episode", properties=properties)
 
-    def get_infolabels(self, item):
+    def get_infolabels(self, item, key):
         infolabels = {}
         infolabels['genre'] = item.get('genre', [])
         infolabels['country'] = item.get('country', [])
@@ -68,7 +68,7 @@ class KodiDBItem(object):
         infolabels['rating'] = item.get('rating')
         infolabels['userrating'] = item.get('userrating')
         infolabels['watched'] = item.get('watched')
-        infolabels['playcount'] = item.get('playcount')
+        infolabels['playcount'] = utils.try_parse_int(item.get('playcount'))
         infolabels['overlay'] = item.get('overlay')
         infolabels['director'] = item.get('director', [])
         infolabels['mpaa'] = item.get('mpaa')
@@ -93,16 +93,18 @@ class KodiDBItem(object):
         infolabels['credits'] = item.get('credits')
         infolabels['lastplayed'] = item.get('lastplayed')
         infolabels['album'] = item.get('album')
-        infolabels['artist'] = item.get('artist')
+        infolabels['artist'] = item.get('artist', [])
         infolabels['votes'] = item.get('votes')
         infolabels['path'] = item.get('path')
         infolabels['trailer'] = item.get('trailer')
         infolabels['dateadded'] = item.get('dateadded')
+        infolabels['overlay'] = 5 if utils.try_parse_int(item.get('playcount')) > 0 and key in ['movie', 'episode'] else 4
         infolabels = utils.del_empty_keys(infolabels, ['N/A', '0.0', '0'])
         return infolabels
 
     def get_infoproperties(self, item):
         infoproperties = {}
+        infoproperties['watchedepisodes'] = item.get('watchedepisodes')
         infoproperties['metacritic_rating'] = '{0:.1f}'.format(utils.try_parse_float(item.get('ratings', {}).get('metacritic', {}).get('rating')))
         infoproperties['imdb_rating'] = '{0:.1f}'.format(utils.try_parse_float(item.get('ratings', {}).get('imdb', {}).get('rating')))
         infoproperties['imdb_votes'] = '{:0,.0f}'.format(utils.try_parse_float(item.get('ratings', {}).get('imdb', {}).get('votes')))
@@ -111,14 +113,14 @@ class KodiDBItem(object):
         infoproperties = utils.del_empty_keys(infoproperties, ['N/A', '0.0', '0'])
         return infoproperties
 
-    def get_niceitem(self, item):
+    def get_niceitem(self, item, key):
         label = item.get('label') or ''
         icon = thumb = item.get('thumbnail') or ''
         poster = item.get('art', {}).get('poster') or ''
         fanart = item.get('fanart') or item.get('art', {}).get('fanart') or ''
         cast = item.get('cast', [])
         streamdetails = item.get('streamdetails', {})
-        infolabels = self.get_infolabels(item)
+        infolabels = self.get_infolabels(item, key)
         infoproperties = self.get_infoproperties(item)
         return {
             'label': label, 'icon': icon, 'poster': poster, 'thumb': thumb, 'fanart': fanart,

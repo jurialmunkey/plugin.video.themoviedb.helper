@@ -189,6 +189,9 @@ class ListItem(object):
         self.get_omdb_details(omdb=omdb)
         self.get_kodi_details() if self.addon.getSettingBool('local_db') or kodi else None
 
+        if self.infolabels.get('mediatype') == 'tvshow':
+            self.infoproperties['unwatchedepisodes'] = utils.try_parse_int(self.infolabels.get('episode')) - utils.try_parse_int(self.infoproperties.get('watchedepisodes'))
+
     def create_listitem(self, handle=None, **kwargs):
         listitem = xbmcgui.ListItem(label=self.label, label2=self.label2)
         listitem.setLabel2(self.label2)
