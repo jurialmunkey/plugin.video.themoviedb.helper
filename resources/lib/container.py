@@ -281,10 +281,12 @@ class Container(Plugin):
         params = self.params.copy()
         params['type'] = utils.type_convert(self.item_tmdbtype, 'trakt') + 's'
 
+        (limit, rnd_list) = (50, 10) if self.params.pop('random', False) else (10, None)
+
         self.list_items(
             items=traktapi.get_itemlist(
-                cat.get('path', '').format(**params), page=self.params.get('page', 1), limit=10, req_auth=cat.get('req_auth'),
-                keylist=['movie', 'show'] if self.params.get('type') == 'both' else [utils.type_convert(self.item_tmdbtype, 'trakt')]),
+                cat.get('path', '').format(**params), page=self.params.get('page', 1), limit=limit, rnd_list=rnd_list, req_auth=cat.get('req_auth'),
+                key_list=['movie', 'show'] if self.params.get('type') == 'both' else [utils.type_convert(self.item_tmdbtype, 'trakt')]),
             url={'info': cat.get('url_info', 'details')})
 
     def list_traktmanagement(self):
@@ -480,6 +482,11 @@ class Container(Plugin):
         self.item_tmdbtype = self.params.get('type')
         self.list_items(items=items, url_tmdb_id=self.params.get('tmdb_id'))
 
+    def list_traktrandom(self):
+        self.params['info'] = constants.RANDOM_TRAKT.get(self.params.get('info'), {})
+        self.params['random'] = True
+        self.router()
+
     def list_random(self):
         self.params['info'] = constants.RANDOM_LISTS.get(self.params.get('info'), {})
         self.params['random'] = True
@@ -537,6 +544,8 @@ class Container(Plugin):
             self.list_details()
         elif self.params.get('info') in constants.RANDOM_LISTS:
             self.list_random()
+        elif self.params.get('info') in constants.RANDOM_TRAKT:
+            self.list_traktrandom()
         elif self.params.get('info') == 'discover':
             self.translate_discover()
             self.list_tmdb()

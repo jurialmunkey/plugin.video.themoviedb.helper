@@ -92,6 +92,26 @@ BASEDIR_RANDOM = [
         'icon': '{0}/resources/icons/trakt/recommended.png',
         'types': ['movie', 'tv']},
     {
+        'info': 'random_trending',
+        'name': 'Random Trending{1}{0}',
+        'icon': '{0}/resources/icons/trakt/trend.png',
+        'types': ['movie', 'tv']},
+    {
+        'info': 'random_popular',
+        'name': 'Random Popular{1}{0}',
+        'icon': '{0}/resources/icons/trakt/popular.png',
+        'types': ['movie', 'tv']},
+    {
+        'info': 'random_mostplayed',
+        'name': 'Random Most Played{1}{0}',
+        'icon': '{0}/resources/icons/trakt/mostplayed.png',
+        'types': ['movie', 'tv']},
+    {
+        'info': 'random_anticipated',
+        'name': 'Random Anticipated{1}{0}',
+        'icon': '{0}/resources/icons/trakt/anticipated.png',
+        'types': ['movie', 'tv']},
+    {
         'info': 'random_trendinglists',
         'name': 'Random Trending List',
         'icon': '{0}/resources/icons/trakt/trendinglist.png',
@@ -380,6 +400,12 @@ RANDOM_LISTS = {
     'random_popularlists': 'trakt_popularlists',
     'random_likedlists': 'trakt_likedlists',
     'random_mylists': 'trakt_mylists'}
+
+RANDOM_TRAKT = {
+    'random_trending': 'trakt_trending',
+    'random_popular': 'trakt_popular',
+    'random_mostplayed': 'trakt_mostplayed',
+    'random_anticipated': 'trakt_anticipated'}
 
 TMDB_LISTS = {
     'search': {

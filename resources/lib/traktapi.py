@@ -4,6 +4,7 @@ from resources.lib.requestapi import RequestAPI
 from resources.lib.listitem import ListItem
 import time
 import xbmc
+import random
 import xbmcgui
 import datetime
 
@@ -147,7 +148,8 @@ class traktAPI(RequestAPI):
         if not self.tmdb or (kwargs.pop('req_auth', False) and not self.authorize()):
             return items
 
-        keylist = kwargs.pop('keylist', ['dummy'])
+        key_list = kwargs.pop('key_list', ['dummy'])
+        rnd_list = kwargs.pop('rnd_list', 0)
         response = self.get_response(*args, **kwargs)
 
         if not response:
@@ -157,7 +159,11 @@ class traktAPI(RequestAPI):
 
         this_page = int(kwargs.get('page', 1))
         last_page = int(response.headers.get('X-Pagination-Page-Count', 0))
-        next_page = this_page + 1 if this_page < last_page else False
+        next_page = this_page + 1 if this_page < last_page and not rnd_list else False
+
+        if rnd_list:
+            rnd_list = random.sample(range(len(itemlist) - 1), rnd_list)
+            itemlist = [itemlist[i] for i in rnd_list]
 
         n = 0
         limit = kwargs.get('limit', 0)
@@ -165,7 +171,7 @@ class traktAPI(RequestAPI):
             if limit and not n < limit:
                 break
 
-            for key in keylist:
+            for key in key_list:
                 if limit and not n < limit:
                     break
 
