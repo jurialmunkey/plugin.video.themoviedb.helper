@@ -179,6 +179,8 @@ class Container(Plugin):
                 originaltitle=i.infolabels.get('originaltitle'), title=i.infolabels.get('title'), year=i.infolabels.get('year'),
                 tvshowtitle=i.infolabels.get('tvshowtitle'), season=i.infolabels.get('season'), episode=i.infolabels.get('episode'))
 
+            i.infoproperties['widget'] = self.plugincategory
+
             if self.item_tmdbtype == 'season' and i.infolabels.get('season') == 0:
                 lastitems.append(i)
             elif self.item_tmdbtype == 'season' and i.infolabels.get('season') == 'Up Next':
