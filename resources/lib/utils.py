@@ -109,10 +109,16 @@ def age_difference(birthday, deathday=''):
 
 
 def convert_timestamp(time_str):
+    time_str = time_str[:19]
+    time_fmt = "%Y-%m-%dT%H:%M:%S"
     try:
-        time_obj = datetime.strptime(time_str[:19], '%Y-%m-%dT%H:%M:%S')
+        time_obj = datetime.strptime(time_str, time_fmt)
         return time_obj
-    except Exception:
+    except TypeError:
+        time_obj = datetime(*(time.strptime(time_str, time_fmt)[0:6]))
+        return time_obj
+    except Exception as exc:
+        kodi_log(exc, 1)
         return
 
 
