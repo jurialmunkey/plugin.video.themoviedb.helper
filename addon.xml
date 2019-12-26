@@ -11,7 +11,7 @@ provider-name="jurialmunkey">
 <extension point="xbmc.python.pluginsource" library="plugin.py">
   <provides>video</provides>
 </extension>
-<extension point="xbmc.service" start="login" library="service.py" />
+<extension point="xbmc.service" library="service.py" />
 <extension point="xbmc.python.script" library="script.py" />
 <extension point="kodi.context.item">
   <menu id="kodi.core.main">
