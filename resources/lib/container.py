@@ -141,8 +141,8 @@ class Container(Plugin):
 
         if self.item_tmdbtype == 'season' and self.details_tv:
             item_upnext = ListItem(library=self.library, **self.details_tv)
-            item_upnext.infolabels['season'] = 'Up Next'
-            item_upnext.label = 'Up Next'
+            item_upnext.infolabels['season'] = self.addon.getLocalizedString(32043)
+            item_upnext.label = self.addon.getLocalizedString(32043)
             item_upnext.url = {'info': 'trakt_upnext', 'type': 'tv'}
             items.append(item_upnext)
 
@@ -183,7 +183,7 @@ class Container(Plugin):
 
             if self.item_tmdbtype == 'season' and i.infolabels.get('season') == 0:
                 lastitems.append(i)
-            elif self.item_tmdbtype == 'season' and i.infolabels.get('season') == 'Up Next':
+            elif self.item_tmdbtype == 'season' and i.infolabels.get('season') == self.addon.getLocalizedString(32043):
                 firstitems.append(i)
             elif i.dbid:
                 dbiditems.append(i)
@@ -341,7 +341,7 @@ class Container(Plugin):
 
     def list_search(self):
         if not self.params.get('query'):
-            self.params['query'] = xbmcgui.Dialog().input('Enter Search Query', type=xbmcgui.INPUT_ALPHANUM)
+            self.params['query'] = xbmcgui.Dialog().input(self.addon.getLocalizedString(32044), type=xbmcgui.INPUT_ALPHANUM)
         if self.params.get('query'):
             self.list_tmdb(query=self.params.get('query'), year=self.params.get('year'))
 
@@ -412,7 +412,7 @@ class Container(Plugin):
             with utils.busy_dialog():
                 self.tmdb.get_detailed_item(*d_args, cache_refresh=True)
             xbmc.executebuiltin('Container.Refresh')
-            xbmcgui.Dialog().ok('Cache Refresh', 'Cached details were refreshed')
+            xbmcgui.Dialog().ok(self.addon.getLocalizedString(32045), self.addon.getLocalizedString(32046))
             self.updatelisting = True
 
         # Get details of item and return if nothing found
@@ -455,27 +455,27 @@ class Container(Plugin):
             if trakt_collection:
                 boolean = 'remove' if details.get('tmdb_id') in trakt_collection else 'add'
                 item_collection = ListItem(library=self.library, **details)
-                item_collection.label = 'Remove from Trakt Collection' if boolean == 'remove' else 'Add to Trakt Collection'
+                item_collection.label = self.addon.getLocalizedString(32047) if boolean == 'remove' else self.addon.getLocalizedString(32048)
                 item_collection.url = {'info': 'details', 'trakt': 'collection_{0}'.format(boolean), 'type': self.params.get('type')}
                 items.append(item_collection)
             trakt_watchlist = traktapi.sync_watchlist(utils.type_convert(self.params.get('type'), 'trakt'), 'tmdb')
             if trakt_watchlist:
                 boolean = 'remove' if details.get('tmdb_id') in trakt_watchlist else 'add'
                 item_watchlist = ListItem(library=self.library, **details)
-                item_watchlist.label = 'Remove from Trakt Watchlist' if boolean == 'remove' else 'Add to Trakt Watchlist'
+                item_watchlist.label = self.addon.getLocalizedString(32049) if boolean == 'remove' else self.addon.getLocalizedString(32050)
                 item_watchlist.url = {'info': 'details', 'trakt': 'watchlist_{0}'.format(boolean), 'type': self.params.get('type')}
                 items.append(item_watchlist)
             trakt_history = traktapi.sync_history(utils.type_convert(self.params.get('type'), 'trakt'), 'tmdb')
             if trakt_history:
                 boolean = 'remove' if details.get('tmdb_id') in trakt_history else 'add'
                 item_history = ListItem(library=self.library, **details)
-                item_history.label = 'Remove from Trakt Watched History' if boolean == 'remove' else 'Add to Trakt Watched History'
+                item_history.label = self.addon.getLocalizedString(32051) if boolean == 'remove' else self.addon.getLocalizedString(32052)
                 item_history.url = {'info': 'details', 'trakt': 'history_{0}'.format(boolean), 'type': self.params.get('type')}
                 items.append(item_history)
 
         # Add refresh cache item
         refresh = ListItem(library=self.library, **details)
-        refresh.label = 'Refresh Cache'
+        refresh.label = self.addon.getLocalizedString(32053)
         refresh.url = {'info': 'details', 'refresh': 'True', 'type': self.params.get('type')}
         refresh.poster = refresh.icon = '{0}/resources/icons/tmdb/refresh.png'.format(self.addonpath)
         items.append(refresh)

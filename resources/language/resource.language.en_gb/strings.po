@@ -196,6 +196,76 @@ msgctxt "#32039"
 msgid "Kodi Library DB"
 msgstr ""
 
+#: /resources/lib/player.py
+msgctxt "#32040"
+msgid "Item not found."
+msgstr ""
+
+#: /resources/lib/player.py
+msgctxt "#32041"
+msgid "The plugin returned no results."
+msgstr ""
+
+#: /resources/lib/player.py
+msgctxt "#32042"
+msgid "Choose Action"
+msgstr ""
+
+#: /resources/lib/container.py
+msgctxt "#32043"
+msgid "Up Next"
+msgstr ""
+
+#: /resources/lib/container.py
+msgctxt "#32044"
+msgid "Enter Search Query"
+msgstr ""
+
+#: /resources/lib/container.py
+msgctxt "#32045"
+msgid "Cache Refresh"
+msgstr ""
+
+#: /resources/lib/container.py
+msgctxt "#32046"
+msgid "Cached details were refreshed"
+msgstr ""
+
+#: /resources/lib/container.py
+msgctxt "#32047"
+msgid "Remove from Trakt Collection"
+msgstr ""
+
+#: /resources/lib/container.py
+msgctxt "#32048"
+msgid "Add to Trakt Collection"
+msgstr ""
+
+#: /resources/lib/container.py
+msgctxt "#32049"
+msgid "Remove from Trakt Watchlist"
+msgstr ""
+
+#: /resources/lib/container.py
+msgctxt "#32050"
+msgid "Add to Trakt Watchlist"
+msgstr ""
+
+#: /resources/lib/container.py
+msgctxt "#32051"
+msgid "Remove from Trakt Watched History"
+msgstr ""
+
+#: /resources/lib/container.py
+msgctxt "#32052"
+msgid "Add to Trakt Watched History"
+msgstr ""
+
+#: /resources/lib/container.py
+msgctxt "#32053"
+msgid "Refresh Cache"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

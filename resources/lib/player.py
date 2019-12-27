@@ -2,7 +2,6 @@ import sys
 import xbmc
 import xbmcgui
 import xbmcvfs
-# import xbmcplugin
 import datetime
 import resources.lib.utils as utils
 from json import loads
@@ -11,7 +10,6 @@ from collections import defaultdict
 from resources.lib.plugin import Plugin
 from resources.lib.kodilibrary import KodiLibrary
 from resources.lib.traktapi import traktAPI
-# from resources.lib.listitem import ListItem
 
 
 def string_format_map(fmt, d):
@@ -45,7 +43,7 @@ class Player(Plugin):
         default_player_movies = self.addon.getSetting('default_player_movies')
         default_player_episodes = self.addon.getSetting('default_player_episodes')
         if force_dialog or (self.itemtype == 'movie' and not default_player_movies) or (self.itemtype == 'episode' and not default_player_episodes):
-            return xbmcgui.Dialog().select('Choose Action', self.itemlist)
+            return xbmcgui.Dialog().select(self.addon.getLocalizedString(32042), self.itemlist)
         itemindex = -1
         with utils.busy_dialog():
             for index in range(0, len(self.itemlist)):
@@ -87,17 +85,12 @@ class Player(Plugin):
                             player = (resolve_url, f.get('file'))
                             break  # Item matches all our criteria so let's move onto our next action
                     else:
-                        xbmcgui.Dialog().ok(self.itemlist[itemindex].getLabel(), 'Item not found.\n\nThe plugin returned no results.')
+                        xbmcgui.Dialog().ok(self.itemlist[itemindex].getLabel(), self.addon.getLocalizedString(32040), self.addon.getLocalizedString(32041))
                         return self.play_external(force_dialog=True)
 
         if player and player[1]:
             call = 'call_player=' if player[0] else self.call
             action = string_format_map(player[1], self.item)
-            # listitem = ListItem(library='video', **self.details).set_listitem(path=action)
-            # if resolve_url:
-            #     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
-            #     return True
-            # xbmcplugin.setResolvedUrl(int(sys.argv[1]), False, listitem)
             action = u'RunScript(plugin.video.themoviedb.helper,{0}{1})'.format(call, action)
             xbmc.executebuiltin(action) if sys.version_info.major == 3 else xbmc.executebuiltin(action.encode('utf-8'))
             return True
