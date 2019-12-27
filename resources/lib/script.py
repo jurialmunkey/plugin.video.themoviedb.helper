@@ -67,6 +67,9 @@ class Script(Plugin):
         elif self.params.get('call_update'):
             xbmc.executebuiltin('Dialog.Close(12003)')
             xbmc.executebuiltin('Container.Update({0})'.format(self.params.get('call_update')))
+        elif self.params.get('call_player'):
+            xbmc.executebuiltin('Dialog.Close(12003)')
+            xbmc.executebuiltin('PlayMedia({0})'.format(self.params.get('call_player')))
 
     def update_players(self):
         players_url = self.addon.getSettingString('players_url')

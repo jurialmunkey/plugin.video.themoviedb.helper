@@ -2,7 +2,7 @@ import xbmcgui
 import xbmcaddon
 import xbmcplugin
 import resources.lib.utils as utils
-from resources.lib.kodilibrary import KodiDBItem
+from resources.lib.kodilibrary import KodiLibrary
 
 try:
     from urllib.parse import urlencode  # Py3
@@ -158,11 +158,11 @@ class ListItem(object):
 
         details = {}
         if self.infolabels.get('mediatype') == 'movie':
-            details = KodiDBItem().get_movie_details(self.dbid)
+            details = KodiLibrary().get_movie_details(self.dbid)
         if self.infolabels.get('mediatype') == 'tvshow':
-            details = KodiDBItem().get_tvshow_details(self.dbid)
+            details = KodiLibrary().get_tvshow_details(self.dbid)
         if self.infolabels.get('mediatype') == 'episode':
-            details = KodiDBItem().get_episode_details(self.dbid)
+            details = KodiLibrary().get_episode_details(self.dbid)
 
         if not details:
             return

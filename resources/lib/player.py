@@ -31,6 +31,7 @@ class Player(Plugin):
         self.itemlist = []
         self.actions = []
         self.players = {}
+        self.call = u'call_update=' if xbmc.getCondVisibility("Window.IsMedia") else u'call_path='
 
     def setup_players(self, tmdbtype=None, details=False, clearsetting=False):
         self.build_players(tmdbtype)
@@ -52,8 +53,10 @@ class Player(Plugin):
             is_local = self.playepisode()
         if is_local:
             return True
+
         with utils.busy_dialog():
             self.setup_players(details=True)
+
         if self.itemlist:
             default_player_movies = self.addon.getSetting('default_player_movies')
             default_player_episodes = self.addon.getSetting('default_player_episodes')
@@ -70,10 +73,41 @@ class Player(Plugin):
                         break
 
             if itemindex > -1:
-                action = self.actions[itemindex]
-                utils.kodi_log(action, 1)
-                xbmc.executebuiltin(action) if sys.version_info.major == 3 else xbmc.executebuiltin(action.encode('utf-8'))
-                return True
+                player = self.actions[itemindex]
+                if not player or not player[1]:
+                    return False
+
+                if isinstance(player[1], list):
+                    actionlist = player[1]
+                    player = (False, actionlist[0])
+                    with utils.busy_dialog():
+                        for d in actionlist[1:]:
+                            if player[0]:
+                                break  # Playable item found so let's break loop and play it
+                            folder = KodiLibrary().get_directory(string_format_map(player[1], self.item))
+                            x = 0
+                            for f in folder:
+                                x += 1
+                                for k, v in d.items():
+                                    if k == 'position':
+                                        if utils.try_parse_int(string_format_map(v, self.item)) != x:
+                                            break  # Not the item position we want so let's move on to next item
+                                    elif not f.get(k) or string_format_map(v, self.item) not in u'{}'.format(f.get(k, '')):
+                                        break  # Item's key value doesn't match value we are looking for so move onto next item
+                                else:
+                                    boolean = True if f.get('filetype') == 'file' else False
+                                    player = (boolean, f.get('file'))
+                                    break  # Item matches all our criteria so let's move onto our next action
+                            else:
+                                xbmcgui.Dialog().ok(self.itemlist[itemindex].getLabel(), 'Item not found.\n\nThe plugin returned no results.')
+                                return False  # Item not in our folder so let's return False
+
+                if player and player[1]:
+                    call = 'call_player=' if player[0] else self.call
+                    action = string_format_map(player[1], self.item)
+                    action = u'RunScript(plugin.video.themoviedb.helper,{0}{1})'.format(call, action)
+                    xbmc.executebuiltin(action) if sys.version_info.major == 3 else xbmc.executebuiltin(action.encode('utf-8'))
+                    return True
 
     def build_details(self):
         self.item['id'] = self.tmdb_id
@@ -153,23 +187,18 @@ class Player(Plugin):
         self.itemlist, self.actions = [], []
         if clearsetting:
             self.itemlist.append(xbmcgui.ListItem('Clear Default'))
-        call = u'call_update=' if xbmc.getCondVisibility("Window.IsMedia") else u'call_path='
         for i in self.play_movie:
             self.itemlist.append(xbmcgui.ListItem(u'Play with {0}'.format(self.players.get(i, {}).get('name', ''))))
-            action = string_format_map(self.players.get(i, {}).get('play_movie', ''), self.item)
-            self.actions.append(u'RunPlugin({0})'.format(action))
+            self.actions.append((True, self.players.get(i, {}).get('play_movie', '')))
         for i in self.search_movie:
             self.itemlist.append(xbmcgui.ListItem(u'Search {0}' .format(self.players.get(i, {}).get('name', ''))))
-            action = string_format_map(self.players.get(i, {}).get('search_movie', ''), self.item)
-            self.actions.append(u'RunScript(plugin.video.themoviedb.helper,{0}{1})'.format(call, action))
+            self.actions.append((False, self.players.get(i, {}).get('search_movie', '')))
         for i in self.play_episode:
             self.itemlist.append(xbmcgui.ListItem(u'Play with {0}'.format(self.players.get(i, {}).get('name', ''))))
-            action = string_format_map(self.players.get(i, {}).get('play_episode', ''), self.item)
-            self.actions.append(u'RunPlugin({0})'.format(action))
+            self.actions.append((True, self.players.get(i, {}).get('play_episode', '')))
         for i in self.search_episode:
             self.itemlist.append(xbmcgui.ListItem(u'Search {0}'.format(self.players.get(i, {}).get('name', ''))))
-            action = string_format_map(self.players.get(i, {}).get('search_episode', ''), self.item)
-            self.actions.append(u'RunScript(plugin.video.themoviedb.helper,{0}{1})'.format(call, action))
+            self.actions.append((False, self.players.get(i, {}).get('search_episode', '')))
 
     def playfile(self, file):
         if file:
