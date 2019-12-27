@@ -195,18 +195,18 @@ class Player(Plugin):
     def build_selectbox(self, clearsetting=False):
         self.itemlist, self.actions = [], []
         if clearsetting:
-            self.itemlist.append(xbmcgui.ListItem('Clear Default'))
+            self.itemlist.append(xbmcgui.ListItem(xbmc.getLocalizedString(13403)))  # Clear Default
         for i in self.play_movie:
-            self.itemlist.append(xbmcgui.ListItem(u'Play with {0}'.format(self.players.get(i, {}).get('name', ''))))
+            self.itemlist.append(xbmcgui.ListItem(u'{0} {1}'.format(self.addon.getLocalizedString(32061), self.players.get(i, {}).get('name', ''))))
             self.actions.append((True, self.players.get(i, {}).get('play_movie', '')))
         for i in self.search_movie:
-            self.itemlist.append(xbmcgui.ListItem(u'Search {0}' .format(self.players.get(i, {}).get('name', ''))))
+            self.itemlist.append(xbmcgui.ListItem(u'{0} {1}' .format(xbmc.getLocalizedString(137), self.players.get(i, {}).get('name', ''))))
             self.actions.append((False, self.players.get(i, {}).get('search_movie', '')))
         for i in self.play_episode:
-            self.itemlist.append(xbmcgui.ListItem(u'Play with {0}'.format(self.players.get(i, {}).get('name', ''))))
+            self.itemlist.append(xbmcgui.ListItem(u'{0} {1}'.format(self.addon.getLocalizedString(32061), self.players.get(i, {}).get('name', ''))))
             self.actions.append((True, self.players.get(i, {}).get('play_episode', '')))
         for i in self.search_episode:
-            self.itemlist.append(xbmcgui.ListItem(u'Search {0}'.format(self.players.get(i, {}).get('name', ''))))
+            self.itemlist.append(xbmcgui.ListItem(u'{0} {1}'.format(xbmc.getLocalizedString(137), self.players.get(i, {}).get('name', ''))))
             self.actions.append((False, self.players.get(i, {}).get('search_episode', '')))
 
     def playfile(self, file):

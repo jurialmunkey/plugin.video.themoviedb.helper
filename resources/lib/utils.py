@@ -8,7 +8,7 @@ from copy import copy
 from contextlib import contextmanager
 from resources.lib.constants import TYPE_CONVERSION
 _addonlogname = '[plugin.video.themoviedb.helper]\n'
-_addon = xbmcaddon.Addon('plugin.video.themoviedb.helper')
+_addon = xbmcaddon.Addon()
 
 
 @contextmanager

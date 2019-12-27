@@ -15,10 +15,10 @@ except ImportError:  # Python 2
 
 class Downloader(object):
     def __init__(self, download_url=None, extract_to=None):
-        self.addon = xbmcaddon.Addon('plugin.video.themoviedb.helper')
+        self.addon = xbmcaddon.Addon()
         self.download_url = download_url
         self.extract_to = xbmc.translatePath(extract_to)
-        self.msg_cleardir = 'Would you like to clear existing players first?'
+        self.msg_cleardir = self.addon.getLocalizedString(32054)
 
     def recursive_delete_dir(self, fullpath):
         '''helper to recursively delete a directory'''
@@ -75,15 +75,15 @@ class Downloader(object):
         if check:
             return True
         if valid == 'auth' and not cred:
-            cred = (xbmcgui.Dialog().input(heading='Username') or '', xbmcgui.Dialog().input(heading='Password', option=xbmcgui.ALPHANUM_HIDE_INPUT) or '')
+            cred = (xbmcgui.Dialog().input(heading=xbmc.getLocalizedString(1014)) or '', xbmcgui.Dialog().input(heading=xbmc.getLocalizedString(733), option=xbmcgui.ALPHANUM_HIDE_INPUT) or '')
 
         response = requests.get(url, timeout=10.000, stream=stream, auth=cred)
         if response.status_code == 401:
-            if count > 2 or not xbmcgui.Dialog().yesno(self.addon.getAddonInfo('name'), 'Either the username or password were invalid. Would you like to try again?', yeslabel='Retry', nolabel='Cancel'):
-                xbmcgui.Dialog().ok(self.addon.getAddonInfo('name'), 'Authentication Failed.')
+            if count > 2 or not xbmcgui.Dialog().yesno(self.addon.getAddonInfo('name'), self.addon.getLocalizedString(32056), yeslabel=self.addon.getLocalizedString(32057), nolabel=xbmc.getLocalizedString(222)):
+                xbmcgui.Dialog().ok(self.addon.getAddonInfo('name'), self.addon.getLocalizedString(32055))
                 return False
             count += 1
-            cred = (xbmcgui.Dialog().input(heading='Username') or '', xbmcgui.Dialog().input(heading='Password', option=xbmcgui.ALPHANUM_HIDE_INPUT) or '')
+            cred = (xbmcgui.Dialog().input(heading=xbmc.getLocalizedString(1014)) or '', xbmcgui.Dialog().input(heading=xbmc.getLocalizedString(733), option=xbmcgui.ALPHANUM_HIDE_INPUT) or '')
             response = self.open_url(url, stream, check, cred, count)
         return response
 
@@ -105,9 +105,9 @@ class Downloader(object):
         with utils.busy_dialog():
             response = self.open_url(self.download_url)
         if not response:
-            xbmcgui.Dialog().ok(self.addon.getAddonInfo('name'), 'The provided URL is either invalid or inaccesible.')
+            xbmcgui.Dialog().ok(self.addon.getAddonInfo('name'), self.addon.getLocalizedString(32058))
             return
-            
+
         if not os.path.exists(self.extract_to):
             os.makedirs(self.extract_to)
 
@@ -135,4 +135,4 @@ class Downloader(object):
                 utils.kodi_log('Could not delete package {0}: {1}'.format(_tempzip, str(e)))
 
         if num_files:
-            xbmcgui.Dialog().ok(self.addon.getAddonInfo('name'), 'Success!\n\n{0} files extracted.'.format(num_files))
+            xbmcgui.Dialog().ok(self.addon.getAddonInfo('name'), '{0}\n\n{1} {2}.'.format(self.addon.getLocalizedString(32059), num_files, self.addon.getLocalizedString(32060)))

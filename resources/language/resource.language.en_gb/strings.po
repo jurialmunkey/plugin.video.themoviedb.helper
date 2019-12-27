@@ -266,6 +266,66 @@ msgctxt "#32053"
 msgid "Refresh Cache"
 msgstr ""
 
+#: /resources/lib/downloader.py
+msgctxt "#32054"
+msgid "Would you like to clear existing players first?"
+msgstr ""
+
+#: /resources/lib/downloader.py
+msgctxt "#32055"
+msgid "Authentication Failed."
+msgstr ""
+
+#: /resources/lib/downloader.py
+msgctxt "#32056"
+msgid "Either the username or password were invalid. Would you like to try again?"
+msgstr ""
+
+#: /resources/lib/downloader.py
+msgctxt "#32057"
+msgid "Retry"
+msgstr ""
+
+#: /resources/lib/downloader.py
+msgctxt "#32058"
+msgid "The provided URL is either invalid or inaccesible."
+msgstr ""
+
+#: /resources/lib/downloader.py
+msgctxt "#32059"
+msgid "Success!"
+msgstr ""
+
+#: /resources/lib/downloader.py
+msgctxt "#32060"
+msgid "files extracted"
+msgstr ""
+
+#: /resources/lib/player.py
+msgctxt "#32061"
+msgid "Play with"
+msgstr ""
+
+#: /resources/lib/context.py
+msgctxt "#32062"
+msgid "Successfully Added TMDb ID {0} to {1}"
+msgstr ""
+
+#: /resources/lib/context.py
+msgctxt "#32063"
+msgid "Successfully Removed TMDb ID {0} from {1}"
+msgstr ""
+
+#: /resources/lib/context.py
+msgctxt "#32064"
+msgid "Do you wish to remove {0} from your Trakt {1}?\n\nTMDb {2} ID {3}"
+msgstr ""
+
+#: /resources/lib/context.py
+msgctxt "#32065"
+msgid "Do you wish to add {0} to your Trakt {1}?\n\nTMDb {2} ID {3}"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

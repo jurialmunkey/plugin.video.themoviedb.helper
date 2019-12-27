@@ -1,5 +1,6 @@
 import sys
 import xbmc
+import xbmcaddon
 import xbmcgui
 from resources.lib.traktapi import traktAPI
 import resources.lib.utils as utils
@@ -26,7 +27,7 @@ def action(action):
         boolean = 'remove' if int(tmdb_id) in trakt_ids else 'add'
 
     dialog_header = 'Trakt {0}'.format(action.capitalize())
-    dialog_text = 'Do you wish to add {0} to your Trakt {1}?\n\nTMDb {2} ID {3}' if boolean == 'add' else 'Do you wish to remove {0} from your Trakt {1}?\n\nTMDb {2} ID {3}'
+    dialog_text = xbmcaddon.Addon().getLocalizedString(32065) if boolean == 'add' else xbmcaddon.Addon().getLocalizedString(32064)
     dialog_text = dialog_text.format(label, action.capitalize(), dbtype.capitalize(), tmdb_id)
     if not xbmcgui.Dialog().yesno(dialog_header, dialog_text):
         return
@@ -42,7 +43,7 @@ def action(action):
         func(slug_type, mode=boolean, items=items)
 
     dialog_header = 'Trakt {0}'.format(action.capitalize())
-    dialog_text = 'Successfully Added TMDb ID {0} to {1}' if boolean == 'add' else 'Successfully Removed TMDb ID {0} from {1}'
+    dialog_text = xbmcaddon.Addon().getLocalizedString(32062) if boolean == 'add' else xbmcaddon.Addon().getLocalizedString(32063)
     dialog_text = dialog_text.format(tmdb_id, action.capitalize())
     xbmcgui.Dialog().ok(dialog_header, dialog_text)
     xbmc.executebuiltin('Container.Refresh')
