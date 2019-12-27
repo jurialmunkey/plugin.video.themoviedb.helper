@@ -2,6 +2,7 @@ import sys
 import xbmc
 import xbmcgui
 import xbmcvfs
+# import xbmcplugin
 import datetime
 import resources.lib.utils as utils
 from json import loads
@@ -10,6 +11,7 @@ from collections import defaultdict
 from resources.lib.plugin import Plugin
 from resources.lib.kodilibrary import KodiLibrary
 from resources.lib.traktapi import traktAPI
+# from resources.lib.listitem import ListItem
 
 
 def string_format_map(fmt, d):
@@ -55,42 +57,50 @@ class Player(Plugin):
     def play_external(self, force_dialog=False):
         itemindex = self.get_itemindex(force_dialog=force_dialog)
 
-        if itemindex > -1:
-            player = self.actions[itemindex]
-            if not player or not player[1]:
-                return False
+        if not itemindex > -1:
+            return False
 
-            if isinstance(player[1], list):
-                actionlist = player[1]
-                player = (False, actionlist[0])
-                with utils.busy_dialog():
-                    for d in actionlist[1:]:
-                        if player[0]:
-                            break  # Playable item found so let's break loop and play it
-                        folder = KodiLibrary().get_directory(string_format_map(player[1], self.item))
-                        x = 0
-                        for f in folder:
-                            x += 1
-                            for k, v in d.items():
-                                if k == 'position':
-                                    if utils.try_parse_int(string_format_map(v, self.item)) != x:
-                                        break  # Not the item position we want so let's move on to next item
-                                elif not f.get(k) or string_format_map(v, self.item) not in u'{}'.format(f.get(k, '')):
-                                    break  # Item's key value doesn't match value we are looking for so move onto next item
-                            else:
-                                boolean = True if f.get('filetype') == 'file' else False
-                                player = (boolean, f.get('file'))
-                                break  # Item matches all our criteria so let's move onto our next action
+        player = self.actions[itemindex]
+        if not player or not player[1]:
+            return False
+
+        resolve_url = False
+        if isinstance(player[1], list):
+            actionlist = player[1]
+            player = (False, actionlist[0])
+            with utils.busy_dialog():
+                for d in actionlist[1:]:
+                    if player[0]:
+                        break  # Playable item found so let's break loop and play it
+                    folder = KodiLibrary().get_directory(string_format_map(player[1], self.item))
+                    x = 0
+                    for f in folder:
+                        x += 1
+                        for k, v in d.items():
+                            if k == 'position':
+                                if utils.try_parse_int(string_format_map(v, self.item)) != x:
+                                    break  # Not the item position we want so let's move on to next item
+                            elif not f.get(k) or string_format_map(v, self.item) not in u'{}'.format(f.get(k, '')):
+                                break  # Item's key value doesn't match value we are looking for so move onto next item
                         else:
-                            xbmcgui.Dialog().ok(self.itemlist[itemindex].getLabel(), 'Item not found.\n\nThe plugin returned no results.')
-                            return self.play_external(force_dialog=True)
+                            resolve_url = True if f.get('filetype') == 'file' else False
+                            player = (resolve_url, f.get('file'))
+                            break  # Item matches all our criteria so let's move onto our next action
+                    else:
+                        xbmcgui.Dialog().ok(self.itemlist[itemindex].getLabel(), 'Item not found.\n\nThe plugin returned no results.')
+                        return self.play_external(force_dialog=True)
 
-            if player and player[1]:
-                call = 'call_player=' if player[0] else self.call
-                action = string_format_map(player[1], self.item)
-                action = u'RunScript(plugin.video.themoviedb.helper,{0}{1})'.format(call, action)
-                xbmc.executebuiltin(action) if sys.version_info.major == 3 else xbmc.executebuiltin(action.encode('utf-8'))
-                return True
+        if player and player[1]:
+            call = 'call_player=' if player[0] else self.call
+            action = string_format_map(player[1], self.item)
+            # listitem = ListItem(library='video', **self.details).set_listitem(path=action)
+            # if resolve_url:
+            #     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
+            #     return True
+            # xbmcplugin.setResolvedUrl(int(sys.argv[1]), False, listitem)
+            action = u'RunScript(plugin.video.themoviedb.helper,{0}{1})'.format(call, action)
+            xbmc.executebuiltin(action) if sys.version_info.major == 3 else xbmc.executebuiltin(action.encode('utf-8'))
+            return True
 
     def play(self, itemtype, tmdb_id, season=None, episode=None):
         self.itemtype, self.tmdb_id, self.season, self.episode = itemtype, tmdb_id, season, episode

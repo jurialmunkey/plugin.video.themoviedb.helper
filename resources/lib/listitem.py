@@ -65,6 +65,7 @@ class ListItem(object):
             elif self.infolabels.get('mediatype') == 'tvshow':
                 self.url['info'] = 'seasons'
         self.is_folder = False if self.url.get('info') in ['play', 'textviewer', 'imageviewer'] else True
+        # self.infoproperties['isPlayable'] = 'True' if self.url.get('info') in ['play', 'textviewer', 'imageviewer'] else 'False'
 
     def get_extra_artwork(self, tmdb=None, fanarttv=None):
         if not fanarttv:
@@ -192,8 +193,8 @@ class ListItem(object):
         if self.infolabels.get('mediatype') == 'tvshow':
             self.infoproperties['unwatchedepisodes'] = utils.try_parse_int(self.infolabels.get('episode')) - utils.try_parse_int(self.infoproperties.get('watchedepisodes'))
 
-    def create_listitem(self, handle=None, **kwargs):
-        listitem = xbmcgui.ListItem(label=self.label, label2=self.label2)
+    def set_listitem(self, path=None):
+        listitem = xbmcgui.ListItem(label=self.label, label2=self.label2, path=path)
         listitem.setLabel2(self.label2)
         listitem.setUniqueIDs({'imdb': self.imdb_id, 'tmdb': self.tmdb_id})
         listitem.setInfo(self.library, self.infolabels)
@@ -212,4 +213,7 @@ class ListItem(object):
                         continue
                     listitem.addStreamInfo(k, i)
 
-        xbmcplugin.addDirectoryItem(handle, self.set_url(**kwargs), listitem, self.is_folder)
+        return listitem
+
+    def create_listitem(self, handle=None, **kwargs):
+        xbmcplugin.addDirectoryItem(handle, self.set_url(**kwargs), self.set_listitem(), self.is_folder)
