@@ -1,6 +1,7 @@
 {
     "name"              : "Netflix",
     "plugin"            : "plugin.video.netflix",
+    "priority"          : 500,
     "play_movie"        : [
                             "plugin://plugin.video.netflix/directory/search/search/{title}/",
                             {"title": "{title}", "year": "{year}"}
