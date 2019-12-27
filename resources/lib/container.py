@@ -8,7 +8,6 @@ import resources.lib.utils as utils
 import resources.lib.constants as constants
 from resources.lib.traktapi import traktAPI
 from resources.lib.listitem import ListItem
-from resources.lib.player import Player
 from resources.lib.plugin import Plugin
 
 try:
@@ -335,9 +334,15 @@ class Container(Plugin):
         self.params['tmdb_id'] = self.get_tmdb_id(**self.params)
 
     def list_play(self):
-        Player().play(
-            itemtype=self.params.get('type'), tmdb_id=self.params.get('tmdb_id'),
-            season=self.params.get('season'), episode=self.params.get('episode'))
+        if not self.params.get('type') or not self.params.get('tmdb_id'):
+            return
+        season, episode = self.params.get('season'), self.params.get('episode')
+        command = 'RunScript(plugin.video.themoviedb.helper,play={0},tmdb_id={1}{{0}})'.format(self.params.get('type'), self.params.get('tmdb_id'))
+        command = command.format(',season={0},episode={1}'.format(season, episode) if season and episode else '')
+        xbmc.executebuiltin(command)
+        # Player().play(
+        #     itemtype=self.params.get('type'), tmdb_id=self.params.get('tmdb_id'),
+        #     season=self.params.get('season'), episode=self.params.get('episode'))
 
     def list_search(self):
         if not self.params.get('query'):

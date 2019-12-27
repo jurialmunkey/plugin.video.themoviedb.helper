@@ -10,6 +10,7 @@ from collections import defaultdict
 from resources.lib.plugin import Plugin
 from resources.lib.kodilibrary import KodiLibrary
 from resources.lib.traktapi import traktAPI
+from resources.lib.listitem import ListItem
 
 
 def string_format_map(fmt, d):
@@ -31,7 +32,6 @@ class Player(Plugin):
         self.itemlist = []
         self.actions = []
         self.players = {}
-        self.call = u'call_update=' if xbmc.getCondVisibility("Window.IsMedia") else u'call_path='
 
     def setup_players(self, tmdbtype=None, details=False, clearsetting=False):
         self.build_players(tmdbtype)
@@ -89,9 +89,12 @@ class Player(Plugin):
                         return self.play_external(force_dialog=True)
 
         if player and player[1]:
-            call = 'call_player=' if player[0] else self.call
+            xbmc.executebuiltin('Dialog.Close(12003)')
             action = string_format_map(player[1], self.item)
-            action = u'RunScript(plugin.video.themoviedb.helper,{0}{1})'.format(call, action)
+            if player[0]:
+                xbmc.Player().play(action, ListItem(library='video', **self.details).set_listitem())
+                return True
+            action = u'Container.Update({0})'.format(action) if xbmc.getCondVisibility("Window.IsMedia") else u'ActivateWindow(videos,{0},return)'.format(action)
             xbmc.executebuiltin(action) if sys.version_info.major == 3 else xbmc.executebuiltin(action.encode('utf-8'))
             return True
 
