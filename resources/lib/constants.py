@@ -216,6 +216,11 @@ BASEDIR_TRAKT = [
         'icon': '{0}/resources/icons/trakt/inprogress.png',
         'types': ['tv']},
     {
+        'info': 'trakt_nextepisodes',
+        'name': 'Your Next Episodes',
+        'icon': '{0}/resources/icons/trakt/inprogress.png',
+        'types': ['tv']},
+    {
         'info': 'trakt_recommendations',
         'name': '{0}{1}Recommended For You',
         'icon': '{0}/resources/icons/trakt/recommended.png',
@@ -636,7 +641,7 @@ TRAKT_MANAGEMENT = ['collection_add', 'collection_remove', 'watchlist_add', 'wat
 
 TRAKT_USERLISTS = ['trakt_mylists', 'trakt_trendinglists', 'trakt_popularlists', 'trakt_likedlists', 'trakt_inlists']
 
-TRAKT_HISTORY = ['trakt_inprogress', 'trakt_history', 'trakt_mostwatched']
+TRAKT_HISTORY = ['trakt_nextepisodes', 'trakt_inprogress', 'trakt_history', 'trakt_mostwatched']
 
 TRAKT_CALENDAR = [
     ('Last Fortnight', -14, 14), ('Last Week', -7, 7), ('Yesterday', -1, 1), ('Today', 0, 1), ('Tomorrow', 1, 1),

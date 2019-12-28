@@ -9,7 +9,7 @@ from string import Formatter
 from collections import defaultdict
 from resources.lib.plugin import Plugin
 from resources.lib.kodilibrary import KodiLibrary
-from resources.lib.traktapi import traktAPI
+from resources.lib.traktapi import TraktAPI
 from resources.lib.listitem import ListItem
 
 
@@ -26,7 +26,7 @@ def string_format_map(fmt, d):
 class Player(Plugin):
     def __init__(self):
         super(Player, self).__init__()
-        self.traktapi = traktAPI()
+        self.traktapi = TraktAPI()
         self.search_movie, self.search_episode, self.play_movie, self.play_episode = [], [], [], []
         self.item = defaultdict(lambda: '+')
         self.itemlist = []

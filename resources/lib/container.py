@@ -6,7 +6,7 @@ import datetime
 import random
 import resources.lib.utils as utils
 import resources.lib.constants as constants
-from resources.lib.traktapi import traktAPI
+from resources.lib.traktapi import TraktAPI
 from resources.lib.listitem import ListItem
 from resources.lib.plugin import Plugin
 
@@ -105,14 +105,14 @@ class Container(Plugin):
         if not self.addon.getSettingBool('trakt_watchedindicators'):
             return
         if self.item_dbtype == 'movie':
-            return traktAPI().get_watched('movie')
+            return TraktAPI().get_watched('movie')
         if self.item_dbtype == 'episode':
-            return traktAPI().get_watched('show')
+            return TraktAPI().get_watched('show')
 
     def get_trakt_unwatched(self):
         if not self.addon.getSettingBool('trakt_unwatchedcounts') or not self.addon.getSettingBool('trakt_watchedindicators') or self.item_dbtype not in ['season', 'tvshow']:
             return -1
-        traktapi = traktAPI(tmdb=self.tmdb)
+        traktapi = TraktAPI(tmdb=self.tmdb)
         self.check_sync = traktapi.sync_activities('shows', 'watched_at')
         if self.item_dbtype == 'season':
             return traktapi.get_unwatched_progress(tmdb_id=self.params.get('tmdb_id'), imdb_id=self.params.get('imdb_id'))
@@ -195,15 +195,18 @@ class Container(Plugin):
         return firstitems + dbiditems + tmdbitems + lastitems + nextpage
 
     def list_trakthistory(self):
-        traktapi = traktAPI(tmdb=self.tmdb)
+        traktapi = TraktAPI(tmdb=self.tmdb)
         userslug = traktapi.get_usernameslug(login=True)
-        if self.params.get('info') == 'trakt_inprogress':
-            items = traktapi.get_inprogress(userslug, limit=10)
-        if self.params.get('info') == 'trakt_mostwatched':
-            items = traktapi.get_mostwatched(userslug, self.params.get('type'), limit=10)
-        if self.params.get('info') == 'trakt_history':
-            items = traktapi.get_recentlywatched(userslug, self.params.get('type'), limit=10)
         self.item_tmdbtype = self.params.get('type')
+        if self.params.get('info') == 'trakt_nextepisodes':
+            items = traktapi.get_inprogress(userslug, limit=10, episodes=True)
+            self.item_tmdbtype = 'episode'
+        elif self.params.get('info') == 'trakt_inprogress':
+            items = traktapi.get_inprogress(userslug, limit=10)
+        elif self.params.get('info') == 'trakt_mostwatched':
+            items = traktapi.get_mostwatched(userslug, self.params.get('type'), limit=10)
+        elif self.params.get('info') == 'trakt_history':
+            items = traktapi.get_recentlywatched(userslug, self.params.get('type'), limit=10)
         self.list_items(
             items=items, url={
                 'info': 'trakt_upnext' if self.params.get('info') == 'trakt_inprogress' else 'details',
@@ -212,14 +215,14 @@ class Container(Plugin):
     def list_traktupnext(self):
         self.item_tmdbtype = 'episode'
         self.list_items(
-            items=traktAPI(tmdb=self.tmdb).get_upnext_episodes(tmdb_id=self.params.get('tmdb_id')),
+            items=TraktAPI(tmdb=self.tmdb).get_upnext_episodes(tmdb_id=self.params.get('tmdb_id')),
             url_tmdb_id=self.params.get('tmdb_id'),
             url={'info': 'details', 'type': 'episode'})
 
     def list_traktcalendar_episodes(self):
         self.item_tmdbtype = 'episode'
         self.list_items(
-            items=traktAPI(tmdb=self.tmdb, login=True).get_calendar_episodes(
+            items=TraktAPI(tmdb=self.tmdb, login=True).get_calendar_episodes(
                 days=utils.try_parse_int(self.params.get('days')),
                 startdate=utils.try_parse_int(self.params.get('startdate'))),
             url={'info': 'details', 'type': 'episode'})
@@ -243,7 +246,7 @@ class Container(Plugin):
     def list_traktuserlists(self):
         cat = constants.TRAKT_LISTS.get(self.params.get('info'), {})
         path = cat.get('path', '')
-        traktapi = traktAPI(login=cat.get('req_auth', False))
+        traktapi = TraktAPI(login=cat.get('req_auth', False))
         if '{user_slug}' in path:
             self.params['user_slug'] = self.params.get('user_slug') or traktapi.get_usernameslug()
         path = path.format(**self.params)
@@ -272,7 +275,7 @@ class Container(Plugin):
             return
 
         cat = constants.TRAKT_LISTS.get(self.params.get('info', ''), {})
-        traktapi = traktAPI(tmdb=self.tmdb, login=cat.get('req_auth', False))
+        traktapi = TraktAPI(tmdb=self.tmdb, login=cat.get('req_auth', False))
 
         if '{user_slug}' in cat.get('path', ''):
             self.params['user_slug'] = self.params.get('user_slug') or traktapi.get_usernameslug(login=True)
@@ -294,7 +297,7 @@ class Container(Plugin):
         if not self.params.get('trakt') in constants.TRAKT_MANAGEMENT:
             return
         with utils.busy_dialog():
-            traktapi = traktAPI()
+            traktapi = TraktAPI()
             slug_type = 'show' if self.params.get('type') == 'episode' else utils.type_convert(self.params.get('type'), 'trakt')
             trakt_type = utils.type_convert(self.params.get('type'), 'trakt')
             slug = traktapi.get_traktslug(slug_type, 'tmdb', self.params.get('tmdb_id'))
@@ -316,7 +319,7 @@ class Container(Plugin):
         self.updatelisting = True
 
     def list_becauseyouwatched(self, mostwatched=False):
-        traktapi = traktAPI(tmdb=self.tmdb, login=True)
+        traktapi = TraktAPI(tmdb=self.tmdb, login=True)
         userslug = traktapi.get_usernameslug()
         if not userslug:
             return
@@ -340,9 +343,6 @@ class Container(Plugin):
         command = 'RunScript(plugin.video.themoviedb.helper,play={0},tmdb_id={1}{{0}})'.format(self.params.get('type'), self.params.get('tmdb_id'))
         command = command.format(',season={0},episode={1}'.format(season, episode) if season and episode else '')
         xbmc.executebuiltin(command)
-        # Player().play(
-        #     itemtype=self.params.get('type'), tmdb_id=self.params.get('tmdb_id'),
-        #     season=self.params.get('season'), episode=self.params.get('episode'))
 
     def list_search(self):
         if not self.params.get('query'):
@@ -369,7 +369,7 @@ class Container(Plugin):
             i.get_url(url, url_tmdb_id, self.params.get('widget'), self.params.get('fanarttv'), self.params.get('nextpage'), self.params.get('extended'))
             i.get_extra_artwork(self.tmdb, self.fanarttv) if len(items) < 22 and self.exp_fanarttv() else None
             i.get_trakt_watched(trakt_watched) if x == 0 or self.params.get('info') != 'details' else None
-            i.get_trakt_unwatched(trakt=traktAPI(tmdb=self.tmdb), request=trakt_unwatched, check_sync=self.check_sync) if x == 0 or self.params.get('info') != 'details' else None
+            i.get_trakt_unwatched(trakt=TraktAPI(tmdb=self.tmdb), request=trakt_unwatched, check_sync=self.check_sync) if x == 0 or self.params.get('info') != 'details' else None
             i.create_listitem(self.handle, **i.url) if not self.params.get('random') else self.randomlist.append(i)
             x += 1
         self.finish_container()
@@ -455,7 +455,7 @@ class Container(Plugin):
 
         # Add trakt management items if &amp;manage=True
         if self.addon.getSettingBool('trakt_management'):
-            traktapi = traktAPI()
+            traktapi = TraktAPI()
             trakt_collection = traktapi.sync_collection(utils.type_convert(self.params.get('type'), 'trakt'), 'tmdb')
             if trakt_collection:
                 boolean = 'remove' if details.get('tmdb_id') in trakt_collection else 'add'

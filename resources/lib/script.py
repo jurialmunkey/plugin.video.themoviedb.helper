@@ -7,7 +7,7 @@ import xbmc
 import xbmcgui
 import resources.lib.utils as utils
 from resources.lib.downloader import Downloader
-from resources.lib.traktapi import traktAPI
+from resources.lib.traktapi import TraktAPI
 from resources.lib.plugin import Plugin
 from resources.lib.player import Player
 
@@ -159,7 +159,7 @@ class Script(Plugin):
             # TODO: Maybe restart service here too?
             self.params = {'call_path': 'plugin://plugin.video.themoviedb.helper/'}
         if self.params.get('authenticate_trakt'):
-            traktAPI(force=True)
+            TraktAPI(force=True)
         elif self.params.get('update_players'):
             self.update_players()
         elif self.params.get('set_defaultplayer'):

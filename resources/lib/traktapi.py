@@ -9,9 +9,9 @@ import xbmcgui
 import datetime
 
 
-class traktAPI(RequestAPI):
+class TraktAPI(RequestAPI):
     def __init__(self, force=False, cache_short=None, cache_long=None, tmdb=None, login=False):
-        super(traktAPI, self).__init__(
+        super(TraktAPI, self).__init__(
             cache_short=cache_short, cache_long=cache_long,
             req_api_url='https://api.trakt.tv/', req_api_name='Trakt')
         self.authorization = ''
@@ -238,14 +238,14 @@ class traktAPI(RequestAPI):
         history = sorted(history, key=lambda i: i['plays'], reverse=True)
         return self.get_limitedlist(history, tmdbtype, limit, islistitem)
 
-    def get_recentlywatched(self, userslug, tmdbtype, limit=None, islistitem=True):
-        start_at = datetime.date.today() - datetime.timedelta(6 * 365 / 12)
+    def get_recentlywatched(self, userslug, tmdbtype, limit=None, islistitem=True, months=6):
+        start_at = datetime.date.today() - datetime.timedelta(months * 365 / 12)
         history = self.get_response_json('users', userslug, 'history', utils.type_convert(tmdbtype, 'trakt') + 's', page=1, limit=200, start_at=start_at.strftime("%Y-%m-%d"))
         return self.get_limitedlist(history, tmdbtype, limit, islistitem)
 
-    def get_inprogress(self, userslug, limit=None):
+    def get_inprogress(self, userslug, limit=None, episodes=False):
         """
-        Looks at user's most recently watched 200 episodes in last 6 months
+        Looks at user's most recently watched 200 episodes in last 3 years
         Adds each unique show to list in order then checks if show has an upnext episode
         Returns list of tmdb_ids representing shows with upnext episodes in recently watched order
         """
@@ -254,12 +254,14 @@ class traktAPI(RequestAPI):
             return items
 
         n = 0
-        for i in self.get_recentlywatched(userslug, 'tv', islistitem=False):
+        for i in self.get_recentlywatched(userslug, 'tv', islistitem=False, months=36):
             if limit and n >= limit:
                 break
             progress = self.get_upnext(i[0], True)
             if progress and progress.get('next_episode'):
-                items.append(ListItem(library=self.library, **self.tmdb.get_detailed_item('tv', i[1])))
+                season = progress.get('next_episode', {}).get('season') if episodes else None
+                episode = progress.get('next_episode', {}).get('number') if episodes else None
+                items.append(ListItem(library=self.library, **self.tmdb.get_detailed_item('tv', i[1], season=season, episode=episode)))
                 n += 1
         return items
 
@@ -274,7 +276,7 @@ class traktAPI(RequestAPI):
             return items
 
         date = datetime.datetime.today() + datetime.timedelta(days=startdate)
-        response = traktAPI().get_calendar('shows', True, start_date=date.strftime('%Y-%m-%d'), days=days)
+        response = TraktAPI().get_calendar('shows', True, start_date=date.strftime('%Y-%m-%d'), days=days)
 
         for i in response[-limit:]:
             episode = i.get('episode', {}).get('number')

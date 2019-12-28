@@ -2,12 +2,12 @@ import sys
 import xbmc
 import xbmcaddon
 import xbmcgui
-from resources.lib.traktapi import traktAPI
+from resources.lib.traktapi import TraktAPI
 import resources.lib.utils as utils
 
 
 def action(action):
-    _traktapi = traktAPI()
+    _traktapi = TraktAPI()
 
     if action == 'history':
         func = _traktapi.sync_history
