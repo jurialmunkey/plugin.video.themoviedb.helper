@@ -354,6 +354,7 @@ class TMDb(RequestAPI):
             request = func('find', tvdb_id, language=self.req_language, external_source='tvdb_id')
             request = request.get('{0}_results'.format(itemtype), [])
         elif query:
+            query = query.split(' (', 1)[0]  # Scrub added (Year) or other cruft in parentheses () added by Addons or TVDb
             request = func('search', itemtype, language=self.req_language, query=query, year=year)
             request = request.get('results', [])
         if not request:
