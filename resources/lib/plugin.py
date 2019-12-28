@@ -46,12 +46,12 @@ class Plugin(object):
     def imageviewer(self, image):
         xbmc.executebuiltin('ShowPicture({0})'.format(image))
 
-    def get_tmdb_id(self, query=None, itemtype=None, imdb_id=None, year=None, **kwargs):
+    def get_tmdb_id(self, query=None, itemtype=None, imdb_id=None, tvdb_id=None, year=None, **kwargs):
         if kwargs.get('tmdb_id'):
             return kwargs.get('tmdb_id')
         query = utils.split_items(query)[0] if query else None
         itemtype = itemtype or TMDB_LISTS.get(kwargs.get('info'), {}).get('tmdb_check_id') or kwargs.get('type')
-        return self.tmdb.get_tmdb_id(itemtype=itemtype, imdb_id=imdb_id, query=query, year=year, longcache=True)
+        return self.tmdb.get_tmdb_id(itemtype=itemtype, imdb_id=imdb_id, tvdb_id=tvdb_id, query=query, year=year, longcache=True)
 
     def get_omdb_ratings(self, item, cache_only=False):
         if self.omdb and item.get('infolabels', {}).get('imdbnumber'):

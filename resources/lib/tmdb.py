@@ -340,7 +340,7 @@ class TMDb(RequestAPI):
         request = self.get_request_lc(itemtype, tmdb_id, 'external_ids') or {}
         return request.get(external_id) if external_id else request
 
-    def get_tmdb_id(self, itemtype=None, imdb_id=None, query=None, year=None, selectdialog=False, longcache=False):
+    def get_tmdb_id(self, itemtype=None, imdb_id=None, tvdb_id=None, query=None, year=None, selectdialog=False, longcache=False):
         func = self.get_request_lc if longcache else self.get_request_sc
         if not itemtype:
             return
@@ -349,6 +349,9 @@ class TMDb(RequestAPI):
             return _genreids.get(query, '')
         elif imdb_id:
             request = func('find', imdb_id, language=self.req_language, external_source='imdb_id')
+            request = request.get('{0}_results'.format(itemtype), [])
+        elif tvdb_id:
+            request = func('find', tvdb_id, language=self.req_language, external_source='tvdb_id')
             request = request.get('{0}_results'.format(itemtype), [])
         elif query:
             request = func('search', itemtype, language=self.req_language, query=query, year=year)
