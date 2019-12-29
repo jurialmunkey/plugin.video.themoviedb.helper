@@ -106,6 +106,7 @@ class Player(Plugin):
         self.item['originaltitle'] = self.details.get('infolabels', {}).get('originaltitle')
         self.item['title'] = self.details.get('infolabels', {}).get('tvshowtitle') or self.details.get('infolabels', {}).get('title')
         self.item['year'] = self.details.get('infolabels', {}).get('year')
+        is_local = False
         if self.details and self.itemtype == 'movie':
             is_local = self.playmovie()
         if self.details and self.itemtype == 'episode':

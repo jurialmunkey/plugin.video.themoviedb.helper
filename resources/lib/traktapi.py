@@ -261,7 +261,9 @@ class TraktAPI(RequestAPI):
             if progress and progress.get('next_episode'):
                 season = progress.get('next_episode', {}).get('season') if episodes else None
                 episode = progress.get('next_episode', {}).get('number') if episodes else None
-                items.append(ListItem(library=self.library, **self.tmdb.get_detailed_item('tv', i[1], season=season, episode=episode)))
+                item = self.tmdb.get_detailed_item('tv', i[1], season=season, episode=episode)
+                item['tmdb_id'] = i[1]
+                items.append(ListItem(library=self.library, **item))
                 n += 1
         return items
 

@@ -210,7 +210,7 @@ class Container(Plugin):
         self.list_items(
             items=items, url={
                 'info': 'trakt_upnext' if self.params.get('info') == 'trakt_inprogress' else 'details',
-                'type': self.params.get('type')})
+                'type': self.item_tmdbtype})
 
     def list_traktupnext(self):
         self.item_tmdbtype = 'episode'
