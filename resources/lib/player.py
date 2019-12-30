@@ -43,35 +43,35 @@ class Player(Plugin):
         default_player_movies = self.addon.getSetting('default_player_movies')
         default_player_episodes = self.addon.getSetting('default_player_episodes')
         if force_dialog or (self.itemtype == 'movie' and not default_player_movies) or (self.itemtype == 'episode' and not default_player_episodes):
-            utils.kodi_log('Player -- User Asked to Select Player', 2)
+            utils.kodi_log('Player -- Asked user to select player', 2)
             return xbmcgui.Dialog().select(self.addon.getLocalizedString(32042), self.itemlist)
         itemindex = -1
         with utils.busy_dialog():
             for index in range(0, len(self.itemlist)):
                 label = self.itemlist[index].getLabel()
                 if (label == default_player_movies and self.itemtype == 'movie') or (label == default_player_episodes and self.itemtype == 'episode'):
-                    utils.kodi_log('Player -- Attempting to Play With Default Player:\n{0}'.format(label), 2)
+                    utils.kodi_log('Player -- Attempting to play with default player:\n{0}'.format(label), 2)
                     return index
         return itemindex
 
     def play_external(self, force_dialog=False):
-        utils.kodi_log('Player -- Attempting to Play External', 2)
+        utils.kodi_log('Player -- Attempting to play external', 2)
         itemindex = self.get_itemindex(force_dialog=force_dialog)
 
         if not itemindex > -1:
-            utils.kodi_log('Player -- User Canceled or Default Player Not Found', 2)
+            utils.kodi_log('Player -- User cancelled or default player not found', 2)
             return False
 
         player = self.actions[itemindex]
         if not player or not player[1]:
-            utils.kodi_log('Player -- Selected Player Not Configured Correctly', 2)
+            utils.kodi_log('Player -- Selected player incorrectly configured', 2)
             return False
 
         resolve_url = False
         if isinstance(player[1], list):
             actionlist = player[1]
             player = (False, actionlist[0])
-            utils.kodi_log('Player -- Action List:\n{0} {1}'.format(player, actionlist), 2)
+            utils.kodi_log('Player -- Action list for selected player:\n{0}'.format(actionlist), 2)
             with utils.busy_dialog():
                 for d in actionlist[1:]:
                     if player[0]:
@@ -96,15 +96,15 @@ class Player(Plugin):
                         return self.play_external(force_dialog=True)
 
         if player and player[1]:
-            utils.kodi_log('Player -- Attempting to Play Item', 2)
+            utils.kodi_log('Player -- Attempting to play item', 2)
             xbmc.executebuiltin('Dialog.Close(12003)')
             action = string_format_map(player[1], self.item)
             if player[0]:
-                utils.kodi_log('Player -- Playing Found Item:\n{0}'.format(action), 2)
+                utils.kodi_log('Player -- Playing found item:\n{0}'.format(action), 2)
                 xbmc.Player().play(action, ListItem(library='video', **self.details).set_listitem())
                 return action
             action = u'Container.Update({0})'.format(action) if xbmc.getCondVisibility("Window.IsMedia") else u'ActivateWindow(videos,{0},return)'.format(action)
-            utils.kodi_log('Player -- Search Action:\n{0}'.format(action), 2)
+            utils.kodi_log('Player -- Search action:\n{0}'.format(action), 2)
             xbmc.executebuiltin(action) if sys.version_info.major == 3 else xbmc.executebuiltin(action.encode('utf-8'))
             return action
 
@@ -122,20 +122,19 @@ class Player(Plugin):
         if self.details and self.itemtype == 'episode':
             is_local = self.playepisode()
         if is_local:
-            utils.kodi_log('Player -- Playing Local Item:\n{0}'.format(is_local), 2)
+            utils.kodi_log('Player -- Playing local item:\n{0}'.format(is_local), 2)
             return is_local
 
         with utils.busy_dialog():
             self.setup_players(details=True)
 
         if not self.itemlist:
-            utils.kodi_log('Player -- No Players to Display!', 2)
+            utils.kodi_log('Player -- No players to display!', 2)
             return False
 
         return self.play_external()
 
     def build_details(self):
-        utils.kodi_log('Player -- Building Details:\n{0}'.format(self.tmdb_id), 2)
         self.item['id'] = self.tmdb_id
         self.item['tmdb'] = self.tmdb_id
         self.item['imdb'] = self.details.get('infolabels', {}).get('imdbnumber')
@@ -189,27 +188,29 @@ class Player(Plugin):
         for basedir in basedirs:
             files = [x for x in xbmcvfs.listdir(basedir)[1] if x.endswith('.json')]
             for file in files:
-                f = xbmcvfs.File(basedir + file)
+                vfs_file = xbmcvfs.File(basedir + file)
                 try:
-                    content = f.read()
+                    content = vfs_file.read()
                     meta = loads(content) or {}
                 finally:
-                    f.close()
+                    vfs_file.close()
                 if not meta.get('plugin') or not xbmc.getCondVisibility(u'System.HasAddon({0})'.format(meta.get('plugin'))):
+                    utils.kodi_log('Player -- {0}\nPlugin {1} not found! Skipping...'.format(file, meta.get('plugin', 'undefined')), 2)
                     continue  # Don't have plugin so skip
 
+                utils.kodi_log('Player -- Adding players...\n{0}'.format(file), 2)
                 tmdbtype = tmdbtype or self.tmdbtype
                 priority = utils.try_parse_int(meta.get('priority')) or 1000
                 if tmdbtype == 'movie' and meta.get('search_movie'):
-                    self.search_movie.append((f, priority))
+                    self.search_movie.append((vfs_file, priority))
                 if tmdbtype == 'movie' and meta.get('play_movie'):
-                    self.play_movie.append((f, priority))
+                    self.play_movie.append((vfs_file, priority))
                 if tmdbtype == 'tv' and meta.get('search_episode'):
-                    self.search_episode.append((f, priority))
+                    self.search_episode.append((vfs_file, priority))
                 if tmdbtype == 'tv' and meta.get('play_episode'):
-                    self.play_episode.append((f, priority))
-                self.players[f] = meta
-        utils.kodi_log('Player -- Built Players!\n{0}'.format(self.players), 2)
+                    self.play_episode.append((vfs_file, priority))
+                self.players[vfs_file] = meta
+        utils.kodi_log('Player -- {0} players built'.format(len(self.players)), 2)
 
     def build_selectbox(self, clearsetting=False):
         self.itemlist, self.actions = [], []
@@ -227,7 +228,7 @@ class Player(Plugin):
         for i in sorted(self.search_episode, key=lambda x: x[1]):
             self.itemlist.append(xbmcgui.ListItem(u'{0} {1}'.format(xbmc.getLocalizedString(137), self.players.get(i[0], {}).get('name', ''))))
             self.actions.append((False, self.players.get(i[0], {}).get('search_episode', '')))
-        utils.kodi_log('Player -- Built Select Box:\n{0}'.format(self.actions), 2)
+        utils.kodi_log('Player -- Select box built with {0} actions'.format(len(self.actions)), 2)
 
     def playfile(self, file):
         if file:

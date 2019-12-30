@@ -58,7 +58,7 @@ class Script(Plugin):
         self.home.clearProperty(self.prefixlock)
 
     def play(self):
-        utils.kodi_log('Script Play -- Attempting to Play Item:\n{0}'.format(self.params), 2)
+        utils.kodi_log('Script -- Attempting to play item:\n{0}'.format(self.params), 2)
         if not self.params.get('play') or not self.params.get('tmdb_id'):
             return
         Player().play(
