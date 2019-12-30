@@ -110,7 +110,7 @@ class Player(Plugin):
 
     def play(self, itemtype, tmdb_id, season=None, episode=None):
         self.itemtype, self.tmdb_id, self.season, self.episode = itemtype, tmdb_id, season, episode
-        self.tmdbtype = 'tv' if self.itemtype == 'episode' or self.itemtype == 'tv' else 'movie'
+        self.tmdbtype = 'tv' if self.itemtype in ['episode', 'tv'] else 'movie'
         self.details = self.tmdb.get_detailed_item(self.tmdbtype, tmdb_id, season=season, episode=episode)
         self.item['imdb_id'] = self.details.get('infolabels', {}).get('imdbnumber')
         self.item['originaltitle'] = self.details.get('infolabels', {}).get('originaltitle')
@@ -118,8 +118,10 @@ class Player(Plugin):
         self.item['year'] = self.details.get('infolabels', {}).get('year')
         is_local = False
         if self.details and self.itemtype == 'movie':
+            utils.kodi_log('Player -- Searching KodiDb for local movie', 2)
             is_local = self.playmovie()
         if self.details and self.itemtype == 'episode':
+            utils.kodi_log('Player -- Searching KodiDb for local episode', 2)
             is_local = self.playepisode()
         if is_local:
             utils.kodi_log('Player -- Playing local item:\n{0}'.format(is_local), 2)

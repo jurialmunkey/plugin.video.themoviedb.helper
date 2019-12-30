@@ -49,21 +49,30 @@ class KodiLibrary(object):
     def get_info(self, info, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None, season=None, episode=None):
         if not self.database or not info:
             return
+        utils.kodi_log(u'KodiLibrary -- Searching KodiDb for {0}'.format(info), 2)
         index_list = utils.find_dict_in_list(self.database, 'dbid', dbid) if dbid else []
         if not index_list and season:
             index_list = utils.find_dict_in_list(self.database, 'season', utils.try_parse_int(season))
+            utils.kodi_log(u'KodiLibrary -- Searching KodiDb for Season: {0}\nIndices: {1}'.format(season, index_list), 2)
         if not index_list and imdb_id:
             index_list = utils.find_dict_in_list(self.database, 'imdb_id', imdb_id)
+            utils.kodi_log(u'KodiLibrary -- Searching KodiDb for IMDb ID: {0}\nIndices: {1}'.format(imdb_id, index_list), 2)
         if not index_list and originaltitle:
             index_list = utils.find_dict_in_list(self.database, 'originaltitle', originaltitle)
+            utils.kodi_log(u'KodiLibrary -- Searching KodiDb for OriginalTitle: {0}\nIndices: {1}'.format(originaltitle, index_list), 2)
         if not index_list and title:
             index_list = utils.find_dict_in_list(self.database, 'title', title)
+            utils.kodi_log(u'KodiLibrary -- Searching KodiDb for Title: {0}\nIndices: {1}'.format(title, index_list), 2)
         for i in index_list:
+            utils.kodi_log(u'KodiLibrary -- Searching KodiDb for Match...\nChecking Item: {0}'.format(self.database[i]), 2)
             if season and episode:
                 if utils.try_parse_int(episode) == self.database[i].get('episode'):
+                    utils.kodi_log(u'KodiLibrary -- Found Match!\nItem: {0}  Key: {1}  Value: {2}'.format(self.database[i], info, self.database[i].get(info)), 2)
                     return self.database[i].get(info)
             elif not year or year in str(self.database[i].get('year')):
+                utils.kodi_log(u'KodiLibrary -- Found Match!\nItem: {0}  Key: {1}  Value: {2}'.format(self.database[i], info, self.database[i].get(info)), 2)
                 return self.database[i].get(info)
+        utils.kodi_log(u'KodiLibrary -- Failed to Find Match for {0}'.format(info), 2)
 
     def get_infolabels(self, item, key):
         infolabels = {}
