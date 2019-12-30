@@ -254,15 +254,19 @@ class TraktAPI(RequestAPI):
             return items
 
         n = 0
+        utils.kodi_log('Getting In-Progress For Trakt User {0}'.format(userslug), 2)
         for i in self.get_recentlywatched(userslug, 'tv', islistitem=False, months=36):
             if limit and n >= limit:
                 break
+            utils.kodi_log('In-Progress -- Searching Next Episode For:\n{0}'.format(i), 2)
             progress = self.get_upnext(i[0], True)
             if progress and progress.get('next_episode'):
+                utils.kodi_log('In-Progress -- Found Next Episode:\n{0}'.format(progress.get('next_episode')), 2)
                 season = progress.get('next_episode', {}).get('season') if episodes else None
                 episode = progress.get('next_episode', {}).get('number') if episodes else None
                 item = self.tmdb.get_detailed_item('tv', i[1], season=season, episode=episode)
                 item['tmdb_id'] = i[1]
+                utils.kodi_log('In-Progress -- Got Next Episode Details:\n{0}'.format(item), 2)
                 items.append(ListItem(library=self.library, **item))
                 n += 1
         return items

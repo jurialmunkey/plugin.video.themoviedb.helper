@@ -318,12 +318,23 @@ msgstr ""
 
 #: /resources/lib/context.py
 msgctxt "#32064"
-msgid "Do you wish to remove {0} from your Trakt {1}?\n\nTMDb {2} ID {3}"
+msgid ""
+"Do you wish to remove {0} from your Trakt {1}?\n"
+"\n"
+"TMDb {2} ID {3}"
 msgstr ""
 
 #: /resources/lib/context.py
 msgctxt "#32065"
-msgid "Do you wish to add {0} to your Trakt {1}?\n\nTMDb {2} ID {3}"
+msgid ""
+"Do you wish to add {0} to your Trakt {1}?\n"
+"\n"
+"TMDb {2} ID {3}"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32066"
+msgid "Debug logging"
 msgstr ""
 
 msgctxt "#30030"

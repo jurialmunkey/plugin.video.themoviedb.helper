@@ -36,6 +36,8 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32037]" type="bool" id="bundled_players" default="True" />
     </category>
     <category label="$LOCALIZE[10039]">
+        <setting label="$LOCALIZE[14260]" type="lsep"/>
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32066]" type="bool" id="debug_logging" default="False" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32020]" type="lsep"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32000]" type="text" id="tmdb_apikey" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32018]" type="text" id="fanarttv_apikey" />

@@ -9,6 +9,7 @@ from contextlib import contextmanager
 from resources.lib.constants import TYPE_CONVERSION
 _addonlogname = '[plugin.video.themoviedb.helper]\n'
 _addon = xbmcaddon.Addon()
+_debuglogging = _addon.getSettingBool('debug_logging')
 
 
 @contextmanager
@@ -124,7 +125,9 @@ def convert_timestamp(time_str):
 
 def kodi_log(value, level=0):
     logvalue = u'{0}{1}'.format(_addonlogname, value) if sys.version_info.major == 3 else u'{0}{1}'.format(_addonlogname, value).encode('utf-8', 'ignore')
-    if level == 1:
+    if level == 2 and _debuglogging:
+        xbmc.log(logvalue, level=xbmc.LOGNOTICE)
+    elif level == 1:
         xbmc.log(logvalue, level=xbmc.LOGNOTICE)
     else:
         xbmc.log(logvalue, level=xbmc.LOGDEBUG)
