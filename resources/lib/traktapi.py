@@ -284,6 +284,9 @@ class TraktAPI(RequestAPI):
         date = datetime.datetime.today() + datetime.timedelta(days=startdate)
         response = TraktAPI().get_calendar('shows', True, start_date=date.strftime('%Y-%m-%d'), days=days)
 
+        if not response:
+            return items
+
         for i in response[-limit:]:
             episode = i.get('episode', {}).get('number')
             season = i.get('episode', {}).get('season')
