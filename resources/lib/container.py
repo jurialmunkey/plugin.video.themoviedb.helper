@@ -498,7 +498,12 @@ class Container(Plugin):
         self.params['info'] = constants.RANDOM_LISTS.get(self.params.get('info'), {})
         self.params['random'] = True
         self.router()
-        item = self.randomlist[random.randint(0, len(self.randomlist) - 1)]
+        if not self.randomlist:
+            return
+        index = 0
+        if len(self.randomlist) > 1:
+            index = random.randint(0, len(self.randomlist) - 1)
+        item = self.randomlist[index]
         self.plugincategory = item.label
         self.params = item.url
         self.router()
