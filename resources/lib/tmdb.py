@@ -215,23 +215,55 @@ class TMDb(RequestAPI):
             p = 'Cast.{0}.'.format(x)
             infoproperties['{0}name'.format(p)] = cast_member.get('name')
             infoproperties['{0}role'.format(p)] = cast_member.get('role')
+            infoproperties['{0}character'.format(p)] = cast_member.get('role')
             infoproperties['{0}thumb'.format(p)] = cast_member.get('thumbnail')
             x = x + 1
+        return infoproperties
+
+    def set_crew_properties(self, infoproperties, item, pos, prop):
+        p = '{0}.{1}.'.format(prop, pos)
+        infoproperties['{0}name'.format(p)] = item.get('name')
+        infoproperties['{0}role'.format(p)] = item.get('job')
+        infoproperties['{0}job'.format(p)] = item.get('job')
+        infoproperties['{0}department'.format(p)] = item.get('department')
+        infoproperties['{0}thumb'.format(p)] = self.get_imagepath(item.get('profile_path'), poster=True) if item.get('profile_path') else ''
         return infoproperties
 
     def get_crew_properties(self, item):
         infoproperties = {}
         if item.get('credits'):
             crew_list = item.get('credits', {}).get('crew', [])
-            x = 1
+            x, x_director, x_producer, x_sound, x_art, x_camera, x_editor, x_screenplay, x_writer = 1, 1, 1, 1, 1, 1, 1, 1, 1
             for i in crew_list:
                 if i.get('name'):
-                    p = 'Crew.{0}.'.format(x)
-                    infoproperties['{0}name'.format(p)] = i.get('name')
-                    infoproperties['{0}job'.format(p)] = i.get('job')
-                    infoproperties['{0}department'.format(p)] = i.get('department')
-                    infoproperties['{0}thumb'.format(p)] = self.get_imagepath(i.get('profile_path'), poster=True) if i.get('profile_path') else ''
-                    x = x + 1
+                    infoproperties = self.set_crew_properties(infoproperties, i, x, 'Crew')
+                    x += 1
+                    if i.get('job') == 'Screenplay':
+                        infoproperties = self.set_crew_properties(infoproperties, i, x_screenplay, 'Screenplay')
+                        infoproperties = self.set_crew_properties(infoproperties, i, x_writer, 'Writer')
+                        x_screenplay += 1
+                        x_writer += 1
+                    elif i.get('department') == 'Directing':
+                        infoproperties = self.set_crew_properties(infoproperties, i, x_director, 'Director')
+                        x_director += 1
+                    elif i.get('department') == 'Writing':
+                        infoproperties = self.set_crew_properties(infoproperties, i, x_writer, 'Writer')
+                        x_writer += 1
+                    elif i.get('department') == 'Production':
+                        infoproperties = self.set_crew_properties(infoproperties, i, x_producer, 'Producer')
+                        x_producer += 1
+                    elif i.get('department') == 'Sound':
+                        infoproperties = self.set_crew_properties(infoproperties, i, x_sound, 'Sound_Department')
+                        x_sound += 1
+                    elif i.get('department') == 'Art':
+                        infoproperties = self.set_crew_properties(infoproperties, i, x_art, 'Art_Department')
+                        x_art += 1
+                    elif i.get('department') == 'Camera':
+                        infoproperties = self.set_crew_properties(infoproperties, i, x_camera, 'Photography')
+                        x_camera += 1
+                    elif i.get('department') == 'Editing':
+                        infoproperties = self.set_crew_properties(infoproperties, i, x_editor, 'Editor')
+                        x_editor += 1
         return infoproperties
 
     def get_director_writer(self, item):
@@ -300,7 +332,7 @@ class TMDb(RequestAPI):
 
     def get_detailed_item(self, itemtype, tmdb_id, season=None, episode=None, cache_only=False, cache_refresh=False):
         extra_request = None
-        cache_name = '{0}.TMDb.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
+        cache_name = '{0}.TMDb.v216.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
         cache_name = '{0}.Season{1}'.format(cache_name, season) if season else cache_name
         cache_name = '{0}.Episode{1}'.format(cache_name, episode) if season and episode else cache_name
         itemdict = self.get_cache(cache_name) if not cache_refresh else None
