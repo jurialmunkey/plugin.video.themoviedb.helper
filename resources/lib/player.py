@@ -238,8 +238,10 @@ class Player(Plugin):
             return file
 
     def playmovie(self):
-        return self.playfile(KodiLibrary(dbtype='movie').get_info('file', **self.item))
+        fuzzy_match = self.addon.getSettingBool('fuzzymatch_movie')
+        return self.playfile(KodiLibrary(dbtype='movie').get_info('file', fuzzy_match=fuzzy_match, **self.item))
 
     def playepisode(self):
-        dbid = KodiLibrary(dbtype='tvshow').get_info('dbid', **self.item)
+        fuzzy_match = self.addon.getSettingBool('fuzzymatch_tv')
+        dbid = KodiLibrary(dbtype='tvshow').get_info('dbid', fuzzy_match=fuzzy_match, **self.item)
         return self.playfile(KodiLibrary(dbtype='episode', tvshowid=dbid).get_info('file', season=self.season, episode=self.episode))

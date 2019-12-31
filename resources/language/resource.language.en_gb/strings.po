@@ -337,6 +337,21 @@ msgctxt "#32066"
 msgid "Debug logging"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32067"
+msgid "Fuzzy local library matching"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32068"
+msgid "Allow fuzzy matches (ignore year) for movies"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32069"
+msgid "Allow fuzzy matches (ignore year) for tvshows"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

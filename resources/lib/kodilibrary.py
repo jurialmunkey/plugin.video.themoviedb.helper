@@ -5,6 +5,7 @@ import resources.lib.utils as utils
 
 class KodiLibrary(object):
     def __init__(self, dbtype=None, tvshowid=None):
+        self.dbtype = None
         self.get_database(dbtype, tvshowid)
 
     def get_jsonrpc(self, method=None, params=None):
@@ -34,6 +35,7 @@ class KodiLibrary(object):
         dbid_name = '{0}id'.format(dbtype)
         key_to_get = '{0}s'.format(dbtype)
         response = self.get_jsonrpc(method, params)
+        self.dbtype = dbtype
         self.database = [{
             'imdb_id': item.get('imdbnumber'),
             'dbid': item.get(dbid_name),
@@ -46,7 +48,7 @@ class KodiLibrary(object):
             'file': item.get('file')}
             for item in response.get('result', {}).get(key_to_get, [])]
 
-    def get_info(self, info, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None, season=None, episode=None):
+    def get_info(self, info, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None, season=None, episode=None, fuzzy_match=False):
         if not self.database or not info:
             return
         utils.kodi_log(u'KodiLibrary -- Searching KodiDb for {0}'.format(info), 2)
@@ -72,6 +74,11 @@ class KodiLibrary(object):
             elif not year or year in str(self.database[i].get('year')):
                 utils.kodi_log(u'KodiLibrary -- Found Match!\nItem: {0}  Key: {1}  Value: {2}'.format(self.database[i], info, self.database[i].get(info)), 2)
                 return self.database[i].get(info)
+        if index_list and fuzzy_match and year and not season and not episode:
+            """ Fuzzy Match """
+            i = index_list[0]
+            utils.kodi_log(u'KodiLibrary -- Found Match!\nItem: {0}  Key: {1}  Value: {2}'.format(self.database[i], info, self.database[i].get(info)), 2)
+            return self.database[i].get(info)
         utils.kodi_log(u'KodiLibrary -- Failed to Find Match for {0}'.format(info), 2)
 
     def get_infolabels(self, item, key):

@@ -145,6 +145,7 @@ class TMDb(RequestAPI):
             infoproperties['next_aired.thumb'] = self.get_season_thumb(i)
         if item.get('created_by'):
             infoproperties = utils.iter_props(item.get('created_by'), 'Creator', infoproperties, name='name', tmdb_id='id')
+            infoproperties = utils.iter_props(item.get('created_by'), 'Creator', infoproperties, thumb='profile_path', func=self.get_imagepath)
             infoproperties['creator'] = utils.concatinate_names(item.get('created_by'), 'name', '/')
         if item.get('genres'):
             infoproperties = utils.iter_props(item.get('genres'), 'Genre', infoproperties, name='name', tmdb_id='id')
@@ -332,7 +333,7 @@ class TMDb(RequestAPI):
 
     def get_detailed_item(self, itemtype, tmdb_id, season=None, episode=None, cache_only=False, cache_refresh=False):
         extra_request = None
-        cache_name = '{0}.TMDb.v216.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
+        cache_name = '{0}.TMDb.v218.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
         cache_name = '{0}.Season{1}'.format(cache_name, season) if season else cache_name
         cache_name = '{0}.Episode{1}'.format(cache_name, episode) if season and episode else cache_name
         itemdict = self.get_cache(cache_name) if not cache_refresh else None
