@@ -33,6 +33,8 @@ class Container(Plugin):
         self.updatelisting = False
         self.check_sync = False
         self.randomlist = []
+        self.numitems_dbid = 0
+        self.numitems_tmdb = 0
 
     def start_container(self):
         xbmcplugin.setPluginCategory(self.handle, self.plugincategory)  # Container.PluginCategory
@@ -192,8 +194,10 @@ class Container(Plugin):
         if mixed_movies or mixed_tvshows:
             self.mixed_containercontent = 'tvshows' if mixed_tvshows > mixed_movies else 'movies'
 
-        xbmcplugin.setProperty(self.handle, 'NumItems.DBID', str(len(dbiditems)))
-        xbmcplugin.setProperty(self.handle, 'NumItems.TMDB', str(len(tmdbitems)))
+        self.numitems_dbid = len(dbiditems) or 0
+        self.numitems_tmdb = len(tmdbitems) or 0
+        xbmcplugin.setProperty(self.handle, 'NumItems.DBID', str(self.numitems_dbid))
+        xbmcplugin.setProperty(self.handle, 'NumItems.TMDB', str(self.numitems_tmdb))
 
         return firstitems + dbiditems + tmdbitems + lastitems + nextpage
 
@@ -368,6 +372,8 @@ class Container(Plugin):
         x = 0
         self.start_container()
         for i in items:
+            i.infoproperties['numitems.dbid'] = self.numitems_dbid
+            i.infoproperties['numitems.tmdb'] = self.numitems_tmdb
             i.get_details(self.item_dbtype, self.tmdb, self.omdb, self.params.get('localdb'))
             i.get_url(url, url_tmdb_id, self.params.get('widget'), self.params.get('fanarttv'), self.params.get('nextpage'), self.params.get('extended'))
             i.get_extra_artwork(self.tmdb, self.fanarttv) if len(items) < 22 and self.exp_fanarttv() else None
