@@ -192,6 +192,9 @@ class Container(Plugin):
         if mixed_movies or mixed_tvshows:
             self.mixed_containercontent = 'tvshows' if mixed_tvshows > mixed_movies else 'movies'
 
+        xbmcplugin.setProperty(self.handle, 'NumItems.DBID', str(len(dbiditems)))
+        xbmcplugin.setProperty(self.handle, 'NumItems.TMDB', str(len(tmdbitems)))
+
         return firstitems + dbiditems + tmdbitems + lastitems + nextpage
 
     def list_trakthistory(self):
