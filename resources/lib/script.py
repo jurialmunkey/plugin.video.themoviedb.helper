@@ -65,19 +65,18 @@ class Script(Plugin):
             itemtype=self.params.get('play'), tmdb_id=self.params.get('tmdb_id'),
             season=self.params.get('season'), episode=self.params.get('episode'))
 
+    def call_auto(self):
+        pass
+
     def call_window(self):
-        if self.params.get('call_id'):
-            xbmc.executebuiltin('Dialog.Close(12003)')
+        if self.params.get('call_auto'):
+            self.call_auto()
+        elif self.params.get('call_id'):
             xbmc.executebuiltin('ActivateWindow({0})'.format(self.params.get('call_id')))
         elif self.params.get('call_path'):
-            xbmc.executebuiltin('Dialog.Close(12003)')
             xbmc.executebuiltin('ActivateWindow(videos, {0}, return)'.format(self.params.get('call_path')))
         elif self.params.get('call_update'):
-            xbmc.executebuiltin('Dialog.Close(12003)')
             xbmc.executebuiltin('Container.Update({0})'.format(self.params.get('call_update')))
-        elif self.params.get('call_player'):
-            xbmc.executebuiltin('Dialog.Close(12003)')
-            xbmc.executebuiltin('PlayMedia({0})'.format(self.params.get('call_player')))
 
     def update_players(self):
         players_url = self.addon.getSettingString('players_url')
