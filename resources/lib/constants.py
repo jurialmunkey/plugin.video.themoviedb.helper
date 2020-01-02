@@ -22,7 +22,7 @@ TYPE_CONVERSION = {
         'plural': 'People',
         'container': 'actors',
         'trakt': '',
-        'dbtype': ''},
+        'dbtype': 'video'},
     'review': {
         'plural': 'Reviews',
         'container': '',
