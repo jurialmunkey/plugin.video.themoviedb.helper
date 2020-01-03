@@ -123,6 +123,8 @@ class TMDb(RequestAPI):
         infoproperties['known_for'] = item.get('known_for_department')
         infoproperties['role'] = item.get('character') or item.get('job') or item.get('department') or item.get('known_for_department')
         infoproperties['born'] = item.get('place_of_birth')
+        infoproperties['tmdb_rating'] = item.get('vote_average')
+        infoproperties['tmdb_votes'] = '{:0,.0f}'.format(item.get('vote_count')) if item.get('vote_count') else None
         if item.get('last_episode_to_air'):
             i = item.get('last_episode_to_air', {})
             infoproperties['last_aired'] = i.get('air_date')
@@ -173,6 +175,36 @@ class TMDb(RequestAPI):
             infoproperties['set.name'] = item.get('belongs_to_collection').get('name')
             infoproperties['set.poster'] = self.get_imagepath(item.get('belongs_to_collection').get('poster_path'))
             infoproperties['set.fanart'] = self.get_imagepath(item.get('belongs_to_collection').get('backdrop_path'))
+        if item.get('parts'):
+            p = 0
+            year_l = 9999
+            year_h = 0
+            ratings = []
+            votes = 0
+            for i in item.get('parts', []):
+                p += 1
+                infoproperties['set.{}.title'.format(p)] = i.get('title', '')
+                infoproperties['set.{}.tmdb_id'.format(p)] = i.get('id', '')
+                infoproperties['set.{}.originaltitle'.format(p)] = i.get('original_title', '')
+                infoproperties['set.{}.plot'.format(p)] = i.get('overview', '')
+                infoproperties['set.{}.premiered'.format(p)] = i.get('release_date', '')
+                infoproperties['set.{}.year'.format(p)] = i.get('release_date', '')[:4]
+                infoproperties['set.{}.rating'.format(p)] = i.get('vote_average', '')
+                infoproperties['set.{}.votes'.format(p)] = i.get('vote_count', '')
+                infoproperties['set.{}.poster'.format(p)] = self.get_imagepath(i.get('poster_path', ''), True)
+                infoproperties['set.{}.fanart'.format(p)] = self.get_imagepath(i.get('backdrop_path', ''))
+                year_l = min(utils.try_parse_int(i.get('release_date', '')[:4]), year_l)
+                year_h = max(utils.try_parse_int(i.get('release_date', '')[:4]), year_h)
+                ratings.append(i.get('vote_average', '')) if i.get('vote_average') else None
+                votes += utils.try_parse_int(i.get('vote_count', 0))
+            year_l = year_l if year_l != 9999 else None
+            year_h = year_h if year_h else None
+            infoproperties['set.year.first'] = year_l or ''
+            infoproperties['set.year.last'] = year_h or ''
+            infoproperties['set.years'] = '{0} - {1}'.format(year_l, year_h) if year_l and year_h else ''
+            infoproperties['set.rating'] = infoproperties['tmdb_rating'] = '{:0,.1f}'.format(sum(ratings) / len(ratings)) if len(ratings) else ''
+            infoproperties['set.votes'] = infoproperties['tmdb_votes'] = '{:0,.0f}'.format(votes) if votes else ''
+            infoproperties['set.numitems'] = p or ''
         return infoproperties
 
     def get_trailer(self, item):
@@ -333,7 +365,7 @@ class TMDb(RequestAPI):
 
     def get_detailed_item(self, itemtype, tmdb_id, season=None, episode=None, cache_only=False, cache_refresh=False):
         extra_request = None
-        cache_name = '{0}.TMDb.v218.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
+        cache_name = '{0}.TMDb.v221b.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
         cache_name = '{0}.Season{1}'.format(cache_name, season) if season else cache_name
         cache_name = '{0}.Episode{1}'.format(cache_name, episode) if season and episode else cache_name
         itemdict = self.get_cache(cache_name) if not cache_refresh else None
