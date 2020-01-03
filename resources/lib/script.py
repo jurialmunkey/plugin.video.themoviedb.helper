@@ -69,7 +69,7 @@ class Script(Plugin):
     def unlock_path(self):
         self.home.clearProperty(self.prefixlock)
 
-    def wait_for_id(self, to_close=False, window_id=None, poll=1):
+    def wait_for_id(self, to_close=False, window_id=None, call_id=None, poll=1):
         """
         Waits for matching ID to open before continuing
         Set to_close flag to wait for matching ID to close instead
@@ -77,10 +77,14 @@ class Script(Plugin):
         """
         if not window_id:
             return
+        is_instance = False if call_id and not xbmc.getCondVisibility("Window.IsVisible({})".format(call_id)) else True
         is_visible = xbmc.getCondVisibility("Window.IsVisible({})".format(window_id))
-        while not self.monitor.abortRequested() and ((to_close and is_visible) or (not to_close and not is_visible)):
+        while not self.monitor.abortRequested() and is_instance and ((to_close and is_visible) or (not to_close and not is_visible)):
             self.monitor.waitForAbort(poll)
+            is_instance = False if call_id and not xbmc.getCondVisibility("Window.IsVisible({})".format(call_id)) else True
             is_visible = xbmc.getCondVisibility("Window.IsVisible({})".format(window_id))
+        if not is_instance:
+            self.call_reset()  # No longer running so let's do the nuclear option
 
     def wait_for_lock(self, poll=1):
         """ Waits for lock to be set before continuing """
@@ -134,9 +138,9 @@ class Script(Plugin):
 
         # Open info dialog
         window.setFocus(controllist)
-        dialog_id = ID_VIDEOINFO
+        xbmc.executebuiltin('SetFocus(9999,0,absolute)')
         xbmc.executebuiltin('Action(Info)')
-        self.wait_for_id(window_id=dialog_id)
+        self.wait_for_id(window_id=ID_VIDEOINFO, call_id=call_id)
 
         # Wait for action
         func = None
@@ -144,7 +148,7 @@ class Script(Plugin):
             current_path = self.home.getProperty(self.prefixcurrent)
             if not xbmc.getCondVisibility("Window.IsVisible({})".format(call_id)):
                 func = self.call_reset  # User closed out everything so let's do the nuclear option
-            elif not xbmc.getCondVisibility("Window.IsVisible({})".format(dialog_id)):
+            elif not xbmc.getCondVisibility("Window.IsVisible({})".format(ID_VIDEOINFO)):
                 func = self.call_previous  # Dialog closed so we should delete the path and call loopback
             elif self.added_path != current_path:
                 self.added_path = current_path
@@ -156,7 +160,6 @@ class Script(Plugin):
     def call_reset(self):
         self.reset_props()
         self.home.clearProperty(self.prefixinstance)
-        # TODO: Make sure we kill old instances?!
 
     def call_previous(self):
         self.prev_path()
