@@ -164,7 +164,10 @@ class Script(Plugin):
         if not close_id:
             return
         close_id = close_id + 10000 if close_id < 10000 else close_id
-        xbmcgui.Window(close_id).close()
+        try:
+            xbmcgui.Window(close_id).close()
+        except Exception as exc:
+            utils.kodi_log(exc, 1)
 
     def call_reset(self):
         self.reset_props()
