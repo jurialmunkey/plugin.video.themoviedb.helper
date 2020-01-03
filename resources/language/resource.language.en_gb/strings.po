@@ -352,6 +352,16 @@ msgctxt "#32069"
 msgid "Allow fuzzy matches (ignore year) for tvshows"
 msgstr ""
 
+#: /resources/lib/tmdb.py
+msgctxt "#32070"
+msgid "Male"
+msgstr ""
+
+#: /resources/lib/tmdb.py
+msgctxt "#32071"
+msgid "Female"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

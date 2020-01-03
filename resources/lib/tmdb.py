@@ -125,6 +125,8 @@ class TMDb(RequestAPI):
         infoproperties['born'] = item.get('place_of_birth')
         infoproperties['tmdb_rating'] = item.get('vote_average')
         infoproperties['tmdb_votes'] = '{:0,.0f}'.format(item.get('vote_count')) if item.get('vote_count') else None
+        if item.get('gender'):
+            infoproperties['gender'] = self.addon.getLocalizedString(32070) if item.get('gender') == 2 else self.addon.getLocalizedString(32071)
         if item.get('last_episode_to_air'):
             i = item.get('last_episode_to_air', {})
             infoproperties['last_aired'] = i.get('air_date')
@@ -365,7 +367,7 @@ class TMDb(RequestAPI):
 
     def get_detailed_item(self, itemtype, tmdb_id, season=None, episode=None, cache_only=False, cache_refresh=False):
         extra_request = None
-        cache_name = '{0}.TMDb.v221b.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
+        cache_name = '{0}.TMDb.v222.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
         cache_name = '{0}.Season{1}'.format(cache_name, season) if season else cache_name
         cache_name = '{0}.Episode{1}'.format(cache_name, episode) if season and episode else cache_name
         itemdict = self.get_cache(cache_name) if not cache_refresh else None
