@@ -157,6 +157,15 @@ class Script(Plugin):
         self.first_run = False
         func()
 
+    def close_dialog(self):
+        self.reset_props()
+        xbmc.executebuiltin('Dialog.Close({})'.format(ID_VIDEOINFO))
+        close_id = utils.try_parse_int(self.params.get('close_dialog'))
+        if not close_id:
+            return
+        close_id = close_id + 10000 if close_id < 10000 else close_id
+        xbmcgui.Window(close_id).close()
+
     def call_reset(self):
         self.reset_props()
         self.home.clearProperty(self.prefixinstance)
@@ -311,6 +320,8 @@ class Script(Plugin):
             self.add_prop()
         elif self.params.get('del_path'):
             self.del_path()
+        elif self.params.get('close_dialog'):
+            self.close_dialog()
         elif self.params.get('reset_path'):
             self.reset_props()
         elif self.params.get('play'):
