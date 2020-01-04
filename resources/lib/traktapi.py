@@ -229,8 +229,8 @@ class TraktAPI(RequestAPI):
         url = 'episodes/{0}/ratings'.format(episode) if episode else 'ratings'
         url = 'seasons/{0}/{1}'.format(season, url) if season else 'ratings'
         response = self.get_request_lc(utils.type_convert(tmdbtype, 'trakt') + 's', slug, url)
-        infoproperties['trakt_rating'] = '{:0.1f}'.format(response.get('rating', ''))
-        infoproperties['trakt_votes'] = '{0}'.format(response.get('votes', ''))
+        infoproperties['trakt_rating'] = '{:0.1f}'.format(response.get('rating')) if response.get('rating') else ''
+        infoproperties['trakt_votes'] = '{:0,.0f}'.format(response.get('votes')) if response.get('votes') else ''
         return infoproperties
 
     def get_mostwatched(self, userslug, tmdbtype, limit=None, islistitem=True):

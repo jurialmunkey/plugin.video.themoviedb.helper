@@ -21,6 +21,7 @@ class ServiceMonitor(Plugin):
         self.kodimonitor = xbmc.Monitor()
         self.container = 'Container.'
         self.containeritem = 'ListItem.'
+        self.exit = False
         self.cur_item = 0
         self.pre_item = 1
         self.pre_folder = None
@@ -32,8 +33,11 @@ class ServiceMonitor(Plugin):
 
     def run_monitor(self):
         self.home.setProperty('TMDbHelper.ServiceStarted', 'True')
-        while not self.kodimonitor.abortRequested():
-            if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.Service)"):
+        while not self.kodimonitor.abortRequested() and not self.exit:
+            if self.home.getProperty('TMDbHelper.ServiceStop'):
+                self.exit = True
+
+            elif xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.Service)"):
                 self.kodimonitor.waitForAbort(30)
 
             # skip when modal dialogs are opened (e.g. textviewer in musicinfo dialog)
@@ -61,6 +65,14 @@ class ServiceMonitor(Plugin):
 
             else:
                 self.kodimonitor.waitForAbort(1)
+
+        # Some clean-up once service exits
+        self.exit_monitor()
+
+    def exit_monitor(self):
+        self.clear_properties()
+        self.home.clearProperty('TMDbHelper.ServiceStarted')
+        self.home.clearProperty('TMDbHelper.ServiceStop')
 
     def get_cur_item(self):
         self.dbtype = self.get_dbtype()

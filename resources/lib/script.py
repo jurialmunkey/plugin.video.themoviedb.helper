@@ -5,11 +5,13 @@
 import sys
 import xbmc
 import xbmcgui
+import threading
 import resources.lib.utils as utils
 from resources.lib.downloader import Downloader
 from resources.lib.traktapi import TraktAPI
 from resources.lib.plugin import Plugin
 from resources.lib.player import Player
+from resources.lib.service import ServiceMonitor
 
 
 ID_VIDEOINFO = 12003
@@ -69,78 +71,118 @@ class Script(Plugin):
     def unlock_path(self):
         self.home.clearProperty(self.prefixlock)
 
-    def wait_for_id(self, to_close=False, window_id=None, call_id=None, poll=1):
+    def get_instance(self, call_id=None):
+        return False if call_id and not xbmc.getCondVisibility("Window.IsVisible({})".format(call_id)) else True
+
+    def wait_for_property(self, property, value=None, setproperty=False, poll=1, timeout=10):
+        """
+        Waits until property matches value. None value waits for property to be cleared.
+        Will set property to value if setproperty flag is set. None value clears property.
+        Returns True when successful.
+        """
+        if setproperty and value:
+            self.home.setProperty(property, value)
+        elif setproperty and not value:
+            self.home.clearProperty(property)
+
+        t = 0
+        is_property = True if (
+            (not value and not self.home.getProperty(property)) or
+            (value and self.home.getProperty(property) == value)) else False
+
+        while not self.monitor.abortRequested() and t < timeout and not is_property:
+            self.monitor.waitForAbort(poll)
+            is_property = True if (
+                (not value and not self.home.getProperty(property)) or
+                (value and self.home.getProperty(property) == value)) else False
+            t += poll
+
+        return is_property
+
+    def wait_for_id(self, to_close=False, window_id=None, call_id=None, poll=1, timeout=30):
         """
         Waits for matching ID to open before continuing
         Set to_close flag to wait for matching ID to close instead
+        Returns True if successful.
 
         """
         if not window_id:
-            return
-        is_instance = False if call_id and not xbmc.getCondVisibility("Window.IsVisible({})".format(call_id)) else True
+            return True
+
+        t = 0
+        is_instance = self.get_instance(call_id)
         is_visible = xbmc.getCondVisibility("Window.IsVisible({})".format(window_id))
-        while not self.monitor.abortRequested() and is_instance and ((to_close and is_visible) or (not to_close and not is_visible)):
+
+        while (
+                not self.monitor.abortRequested() and t < timeout and is_instance and
+                ((to_close and is_visible) or (not to_close and not is_visible))):
             self.monitor.waitForAbort(poll)
-            is_instance = False if call_id and not xbmc.getCondVisibility("Window.IsVisible({})".format(call_id)) else True
+            is_instance = self.get_instance(call_id)
             is_visible = xbmc.getCondVisibility("Window.IsVisible({})".format(window_id))
-        if not is_instance:
-            self.call_reset()  # No longer running so let's do the nuclear option
+            t += poll
 
-    def wait_for_lock(self, poll=1):
-        """ Waits for lock to be set before continuing """
-        self.home.setProperty(self.prefixlock, 'True')
-        is_locked = True if self.home.getProperty(self.prefixlock) == 'True' else False
-        while not self.monitor.abortRequested() and not is_locked:
-            self.monitor.waitForAbort(poll)
-            is_locked = True if self.home.getProperty(self.prefixlock) == 'True' else False
+        return True if is_instance and t < timeout else False
 
-    def wait_for_update(self, poll=1):
+    def wait_for_update(self, call_id=None, poll=1, timeout=60):
+        """
+        Wait for container to update.
+        Returns True if successful
+        """
+        is_instance = self.get_instance(call_id)
         is_updating = xbmc.getCondVisibility("Container(9999).IsUpdating")
         num_items = utils.try_parse_int(xbmc.getInfoLabel("Container(9999).NumItems"))
-        while not self.monitor.abortRequested() and (is_updating or not num_items):
+
+        t = 0
+        while not self.monitor.abortRequested() and t < timeout and is_instance and (is_updating or not num_items):
             self.monitor.waitForAbort(poll)
+            is_instance = self.get_instance(call_id)
             is_updating = xbmc.getCondVisibility("Container(9999).IsUpdating")
             num_items = utils.try_parse_int(xbmc.getInfoLabel("Container(9999).NumItems"))
+            t += poll
+
+        return True if is_instance and t < timeout else False
 
     def call_service(self):
         call_id = utils.try_parse_int(self.params.get('call_auto'))
         kodi_id = call_id + 10000 if call_id < 10000 else call_id  # Convert to Kodi ID in 10000 range
+        my_call_id = None if self.first_run else call_id
 
         # Close info dialogs if still open
         if xbmc.getCondVisibility('Window.IsVisible({})'.format(ID_VIDEOINFO)):
             xbmc.executebuiltin('Dialog.Close({})'.format(ID_VIDEOINFO))
-            self.wait_for_id(to_close=True, window_id=ID_VIDEOINFO)
+            if not self.wait_for_id(to_close=True, window_id=ID_VIDEOINFO, call_id=my_call_id):
+                return self.call_reset()  # Clear and exit if timeout or user closed base window
 
         # If we're at 0 then close and exit
         if self.get_position() == 0:
             xbmc.executebuiltin('Action(Back)')
-            # xbmcgui.Window(kodi_id).close()
-            self.call_reset()
-            return
+            return self.call_reset()  # Clear and exit
 
         # Open our call_id window if first run
         if self.first_run:
             xbmc.executebuiltin('ActivateWindow({})'.format(call_id))
-            self.wait_for_id(window_id=call_id, poll=0.5)
+            if not self.wait_for_id(window_id=call_id, poll=0.5):
+                return self.call_reset()  # Clear and exit if timeout
         window = xbmcgui.Window(kodi_id)
 
         # Check that list 9999 exists
         controllist = window.getControl(9999)
         if not controllist:
             utils.kodi_log('SKIN ERROR!\nList control 9999 not available in Window {0}'.format(call_id), 1)
-            self.call_reset()
-            return
+            return self.call_reset()  # Clear and exit if timeout or user closed base window
         controllist.reset()
 
         # Wait until container updates
         self.monitor.waitForAbort(1)
-        self.wait_for_update()
+        if not self.wait_for_update(call_id=call_id):
+            return self.call_reset()  # Clear and exit if timeout or user closed base window
 
         # Open info dialog
         window.setFocus(controllist)
         xbmc.executebuiltin('SetFocus(9999,0,absolute)')
         xbmc.executebuiltin('Action(Info)')
-        self.wait_for_id(window_id=ID_VIDEOINFO, call_id=call_id)
+        if not self.wait_for_id(window_id=ID_VIDEOINFO, call_id=call_id):
+            return self.call_reset()  # Clear and exit if timeout or user closed base window
 
         # Wait for action
         func = None
@@ -302,6 +344,13 @@ class Script(Plugin):
         self.addon.setSetting('default_player_movies', '')
         self.addon.setSetting('default_player_episodes', '')
 
+    def restart_service(self):
+        if self.home.getProperty('TMDbHelper.ServiceStarted') == 'True':
+            self.wait_for_property('TMDbHelper.ServiceStop', value='True', setproperty=True)  # Stop service
+        self.wait_for_property('TMDbHelper.ServiceStop', value=None)  # Wait until Service clears property
+        t = threading.Thread(target=ServiceMonitor)
+        t.start()  # Start our service monitor thread
+
     def router(self):
         if not self.params:
             """ If no params assume user wants to run plugin """
@@ -329,5 +378,7 @@ class Script(Plugin):
             self.reset_props()
         elif self.params.get('play'):
             self.play()
+        elif self.params.get('restart_service'):
+            self.restart_service()
         else:
             self.call_window()
