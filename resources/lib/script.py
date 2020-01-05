@@ -262,7 +262,8 @@ class Script(Plugin):
 
     def add_query(self):
         with utils.busy_dialog():
-            item = utils.dialog_select_item(self.params.get('add_query'))
+            query = utils.try_decode_string(self.params.get('add_query', ''))
+            item = utils.dialog_select_item(query)
             if not item:
                 return
             tmdb_id = self.tmdb.get_tmdb_id(self.params.get('type'), query=item, selectdialog=True)

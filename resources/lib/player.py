@@ -105,7 +105,7 @@ class Player(Plugin):
                 return action
             action = u'Container.Update({0})'.format(action) if xbmc.getCondVisibility("Window.IsMedia") else u'ActivateWindow(videos,{0},return)'.format(action)
             utils.kodi_log('Player -- Search action:\n{0}'.format(action), 2)
-            xbmc.executebuiltin(action) if sys.version_info.major == 3 else xbmc.executebuiltin(action.encode('utf-8'))
+            xbmc.executebuiltin(utils.try_decode_string(action))
             return action
 
     def play(self, itemtype, tmdb_id, season=None, episode=None):

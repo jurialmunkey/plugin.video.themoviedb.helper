@@ -81,8 +81,7 @@ class ServiceMonitor(Plugin):
         self.year = self.get_infolabel('year')
         self.season = self.get_infolabel('Season') if self.dbtype == 'episodes' else ''
         self.episode = self.get_infolabel('Episode') if self.dbtype == 'episodes' else ''
-        if not sys.version_info.major == 3:
-            self.query = self.query.decode('utf-8')
+        self.query = utils.try_decode_string(self.query)
         return u'{0}.{1}.{2}.{3}.{4}'.format(self.imdb_id, self.query, self.year, self.season, self.episode)
 
     def get_listitem(self):

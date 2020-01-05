@@ -20,7 +20,7 @@ class Container(Plugin):
     def __init__(self):
         super(Container, self).__init__()
         self.handle = int(sys.argv[1])
-        self.paramstring = sys.argv[2][1:] if sys.version_info.major == 3 else sys.argv[2][1:].decode("utf-8")
+        self.paramstring = utils.try_decode_string(sys.argv[2][1:])
         self.params = dict(parse_qsl(self.paramstring))
         self.item_tmdbtype = None
         self.item_dbtype = None

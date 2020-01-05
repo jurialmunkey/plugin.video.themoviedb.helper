@@ -41,6 +41,13 @@ def try_parse_float(string):
         return 0
 
 
+def try_decode_string(string, encoding='utf-8'):
+    """helper to decode strings for PY 2 """
+    if sys.version_info.major == 3:
+        return string
+    return string.decode(encoding)
+
+
 def rate_limiter(addon_name='plugin.video.themoviedb.helper', wait_time=None, api_name=None):
     """
     Simple rate limiter to prevent overloading APIs
