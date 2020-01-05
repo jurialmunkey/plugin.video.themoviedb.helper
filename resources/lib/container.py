@@ -228,7 +228,7 @@ class Container(Plugin):
 
     def list_userdiscover_open(self):
         tmdbtype = self.params.get('type')
-        self.params = {'info': 'discover', 'type': tmdbtype}
+        params = {'info': 'discover', 'type': tmdbtype}
         items = constants.USER_DISCOVER_LISTITEMS
         items += constants.USER_DISCOVER_LISTITEMS_MOVIES if tmdbtype == 'movie' else constants.USER_DISCOVER_LISTITEMS_TVSHOWS
         for i in items:
@@ -236,23 +236,21 @@ class Container(Plugin):
             v = self.get_userdiscover_prop(k)
             if not k or not v:
                 continue
-            self.params[k] = v
-        self.router()
+            params[k] = v
+        return params
 
     def list_userdiscover(self):
         method = self.params.get('method')
 
         # Route Methods
         clearprops = True
-        if method == 'open':
-            return self.list_userdiscover_open()
-        elif method == 'sort_by':
+        if method == 'sort_by':
             sort_methods = constants.USER_DISCOVER_SORTBY_MOVIES if self.params.get('type') == 'movie' else constants.USER_DISCOVER_SORTBY_TVSHOWS
             sort_method = xbmcgui.Dialog().select('sort_by', sort_methods)
             new_prop = self.get_userdiscover_prop('sort_by', sort_methods[sort_method]) if sort_method > -1 else None
             self.updatelisting = True
             clearprops = False
-        elif method == 'clear':
+        elif method in ['clear', 'open']:
             self.updatelisting = True
         elif method:
             defaultt = self.get_userdiscover_prop(method)
@@ -289,8 +287,9 @@ class Container(Plugin):
             i.label = i.label.format(utils.type_convert(self.params.get('type'), 'plural'))
             i.url['type'] = self.params.get('type')
 
-            # Get/Clear Method Properties
-            if clearprops:
+            if i.url.get('method') == 'open':
+                i.url = self.list_userdiscover_open()
+            elif clearprops:
                 self.get_userdiscover_prop(i.url.get('method'), clear=True)
             else:
                 append = new_prop if method == i.url.get('method') else self.get_userdiscover_prop(i.url.get('method'))
