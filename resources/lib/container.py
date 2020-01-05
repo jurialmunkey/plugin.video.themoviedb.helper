@@ -63,6 +63,7 @@ class Container(Plugin):
             return True
 
     def translate_discover(self):
+        lookup_keyword = None if self.params.get('with_id') and self.params.get('with_id') != 'False' else 'keyword'
         lookup_company = None if self.params.get('with_id') and self.params.get('with_id') != 'False' else 'company'
         lookup_person = None if self.params.get('with_id') and self.params.get('with_id') != 'False' else 'person'
         lookup_genre = None if self.params.get('with_id') and self.params.get('with_id') != 'False' else 'genre'
@@ -77,6 +78,18 @@ class Container(Plugin):
             self.params['without_genres'] = self.tmdb.get_translated_list(
                 utils.split_items(self.params.get('without_genres')),
                 lookup_genre,
+                separator=self.params.get('with_separator'))
+
+        if self.params.get('with_keywords'):
+            self.params['with_keywords'] = self.tmdb.get_translated_list(
+                utils.split_items(self.params.get('with_keywords')),
+                lookup_keyword,
+                separator=self.params.get('with_separator'))
+
+        if self.params.get('without_keywords'):
+            self.params['without_keywords'] = self.tmdb.get_translated_list(
+                utils.split_items(self.params.get('without_keywords')),
+                lookup_keyword,
                 separator=self.params.get('with_separator'))
 
         if self.params.get('with_companies'):
