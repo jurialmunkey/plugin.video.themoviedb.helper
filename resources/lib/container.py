@@ -201,6 +201,92 @@ class Container(Plugin):
 
         return firstitems + dbiditems + tmdbitems + lastitems + nextpage
 
+    def get_userdiscover_prop(self, method, setvalue=None, clear=False):
+        prefix = 'TMDbHelper.UserDiscover'
+        window = xbmcgui.Window(xbmcgui.getCurrentWindowId())
+        p_name = '{0}.{1}'.format(prefix, method)
+        if clear:
+            window.clearProperty(p_name)
+            return
+        elif setvalue:
+            window.setProperty(p_name, setvalue)
+            return setvalue
+        return window.getProperty(p_name)
+
+    def list_userdiscover_open(self):
+        tmdbtype = self.params.get('type')
+        self.params = {'info': 'discover', 'type': tmdbtype}
+        items = constants.USER_DISCOVER_LISTITEMS
+        items += constants.USER_DISCOVER_LISTITEMS_MOVIES if tmdbtype == 'movie' else constants.USER_DISCOVER_LISTITEMS_TVSHOWS
+        for i in items:
+            k = i.get('url', {}).get('method')
+            v = self.get_userdiscover_prop(k)
+            if not k or not v:
+                continue
+            self.params[k] = v
+        self.router()
+
+    def list_userdiscover(self):
+        method = self.params.get('method')
+
+        # Route Methods
+        clearprops = True
+        if method == 'open':
+            return self.list_userdiscover_open()
+        elif method == 'sort_by':
+            sort_methods = constants.USER_DISCOVER_SORTBY_MOVIES if self.params.get('type') == 'movie' else constants.USER_DISCOVER_SORTBY_TVSHOWS
+            sort_method = xbmcgui.Dialog().select('sort_by', sort_methods)
+            new_prop = self.get_userdiscover_prop('sort_by', sort_methods[sort_method]) if sort_method > -1 else None
+            self.updatelisting = True
+            clearprops = False
+        elif method == 'clear':
+            self.updatelisting = True
+        elif method:
+            defaultt = self.get_userdiscover_prop(method)
+            inputtype = xbmcgui.INPUT_ALPHANUM
+            if '_year' in method or 'vote_' in method or '_runtime' in method or method == 'year':
+                inputtype = xbmcgui.INPUT_NUMERIC
+            elif '_date' in method:
+                inputtype = xbmcgui.INPUT_DATE
+                if defaultt and '-' in defaultt:
+                    dt_split = defaultt.split('-', 2)
+                    defaultt = '{}/{}/{}'.format(dt_split[2], dt_split[1], dt_split[0])
+            if method == 'with_separator':
+                choice = xbmcgui.Dialog().yesno('Set value for with_separator parameter', 'Multiple values for with_ and without_ parameters can be specified by separating the values with a slash \" / \". By default, the discover endpoint will only return items matching ALL values. To find items that match ANY of the values, change the with_separator.', nolabel='Match ALL Values', yeslabel='Match ANY Value')
+                new_prop = 'OR' if choice else None
+            elif method == 'with_id':
+                choice = xbmcgui.Dialog().yesno('Set value for with_id parameter', 'Have you specified TMDb IDs for with_ and without_ parameters? By default, the discover method will attempt to translate any text values in with_ and without_ parameters into the corresponding TMDb IDs. Better results can be achieved by specifying the TMDb IDs directly.', nolabel='Text Values', yeslabel='TMDb IDs')
+                new_prop = 'True' if choice else None
+            else:
+                new_prop = xbmcgui.Dialog().input(method, defaultt=defaultt, type=inputtype)
+            if inputtype == xbmcgui.INPUT_DATE and new_prop:
+                p_split = new_prop.split('/', 2)
+                new_prop = '{:04d}-{:02d}-{:02d}'.format(utils.try_parse_int(p_split[2]), utils.try_parse_int(p_split[1]), utils.try_parse_int(p_split[0]))
+            self.get_userdiscover_prop(method, new_prop) if new_prop else self.get_userdiscover_prop(method, clear=True)
+            self.updatelisting = True
+            clearprops = False
+
+        # Build Container
+        self.containercontent = 'files'
+        self.start_container()
+        items = constants.USER_DISCOVER_LISTITEMS
+        items += constants.USER_DISCOVER_LISTITEMS_MOVIES if self.params.get('type') == 'movie' else constants.USER_DISCOVER_LISTITEMS_TVSHOWS
+        for i in items:
+            i = ListItem(library=self.library, **i)
+            i.label = i.label.format(utils.type_convert(self.params.get('type'), 'plural'))
+            i.url['type'] = self.params.get('type')
+
+            # Get/Clear Method Properties
+            if clearprops:
+                self.get_userdiscover_prop(i.url.get('method'), clear=True)
+            else:
+                append = new_prop if method == i.url.get('method') else self.get_userdiscover_prop(i.url.get('method'))
+                i.label = '{0}: {1}'.format(i.label, append) if append else i.label
+
+            # Create ListItems
+            i.create_listitem(self.handle, **i.url)
+        self.finish_container()
+
     def list_trakthistory(self):
         traktapi = TraktAPI(tmdb=self.tmdb)
         userslug = traktapi.get_usernameslug(login=True)
@@ -567,6 +653,8 @@ class Container(Plugin):
             self.list_random()
         elif self.params.get('info') in constants.RANDOM_TRAKT:
             self.list_traktrandom()
+        elif self.params.get('info') == 'user_discover':
+            self.list_userdiscover()
         elif self.params.get('info') == 'discover':
             self.translate_discover()
             self.list_tmdb()

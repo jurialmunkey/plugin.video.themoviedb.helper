@@ -63,74 +63,21 @@ BASEDIR_MAIN = [
         'name': 'People',
         'icon': '{0}/resources/icons/tmdb/cast.png'},
     {
+        'info': 'dir_random',
+        'name': 'Randomised',
+        'icon': '{0}/resources/poster.png'},
+    {
+        'info': 'dir_discover',
+        'name': 'Discover',
+        'icon': '{0}/resources/poster.png'},
+    {
         'info': 'dir_tmdb',
         'name': 'TheMovieDb',
         'icon': '{0}/resources/poster.png'},
     {
         'info': 'dir_trakt',
         'name': 'Trakt',
-        'icon': '{0}/resources/trakt.png'},
-    {
-        'info': 'dir_random',
-        'name': 'Randomised',
-        'icon': '{0}/resources/poster.png'}]
-
-BASEDIR_RANDOM = [
-    {
-        'info': 'random_genres',
-        'name': 'Random{1}{0}{1}Genre',
-        'types': ['movie', 'tv'],
-        'icon': '{0}/resources/icons/tmdb/genre.png'},
-    {
-        'info': 'trakt_becauseyouwatched',
-        'name': 'Based on Recently Watched{1}{0}',
-        'icon': '{0}/resources/icons/trakt/recommended.png',
-        'types': ['movie', 'tv']},
-    {
-        'info': 'trakt_becausemostwatched',
-        'name': 'Based on Most Watched{1}{0}',
-        'icon': '{0}/resources/icons/trakt/recommended.png',
-        'types': ['movie', 'tv']},
-    {
-        'info': 'random_trending',
-        'name': 'Random Trending{1}{0}',
-        'icon': '{0}/resources/icons/trakt/trend.png',
-        'types': ['movie', 'tv']},
-    {
-        'info': 'random_popular',
-        'name': 'Random Popular{1}{0}',
-        'icon': '{0}/resources/icons/trakt/popular.png',
-        'types': ['movie', 'tv']},
-    {
-        'info': 'random_mostplayed',
-        'name': 'Random Most Played{1}{0}',
-        'icon': '{0}/resources/icons/trakt/mostplayed.png',
-        'types': ['movie', 'tv']},
-    {
-        'info': 'random_anticipated',
-        'name': 'Random Anticipated{1}{0}',
-        'icon': '{0}/resources/icons/trakt/anticipated.png',
-        'types': ['movie', 'tv']},
-    {
-        'info': 'random_trendinglists',
-        'name': 'Random Trending List',
-        'icon': '{0}/resources/icons/trakt/trendinglist.png',
-        'types': ['both']},
-    {
-        'info': 'random_popularlists',
-        'name': 'Random Popular List',
-        'icon': '{0}/resources/icons/trakt/popularlist.png',
-        'types': ['both']},
-    {
-        'info': 'random_likedlists',
-        'name': 'Random Liked List',
-        'icon': '{0}/resources/icons/trakt/likedlist.png',
-        'types': ['both']},
-    {
-        'info': 'random_mylists',
-        'name': 'Random Your List',
-        'icon': '{0}/resources/icons/trakt/mylists.png',
-        'types': ['both']}]
+        'icon': '{0}/resources/trakt.png'}]
 
 BASEDIR_TMDB = [
     {
@@ -291,6 +238,70 @@ BASEDIR_TRAKT = [
         'icon': '{0}/resources/icons/trakt/mylists.png',
         'types': ['both']}]
 
+BASEDIR_RANDOM = [
+    {
+        'info': 'random_genres',
+        'name': 'Random{1}{0}{1}Genre',
+        'types': ['movie', 'tv'],
+        'icon': '{0}/resources/icons/tmdb/genre.png'},
+    {
+        'info': 'trakt_becauseyouwatched',
+        'name': 'Based on Recently Watched{1}{0}',
+        'icon': '{0}/resources/icons/trakt/recommended.png',
+        'types': ['movie', 'tv']},
+    {
+        'info': 'trakt_becausemostwatched',
+        'name': 'Based on Most Watched{1}{0}',
+        'icon': '{0}/resources/icons/trakt/recommended.png',
+        'types': ['movie', 'tv']},
+    {
+        'info': 'random_trending',
+        'name': 'Random Trending{1}{0}',
+        'icon': '{0}/resources/icons/trakt/trend.png',
+        'types': ['movie', 'tv']},
+    {
+        'info': 'random_popular',
+        'name': 'Random Popular{1}{0}',
+        'icon': '{0}/resources/icons/trakt/popular.png',
+        'types': ['movie', 'tv']},
+    {
+        'info': 'random_mostplayed',
+        'name': 'Random Most Played{1}{0}',
+        'icon': '{0}/resources/icons/trakt/mostplayed.png',
+        'types': ['movie', 'tv']},
+    {
+        'info': 'random_anticipated',
+        'name': 'Random Anticipated{1}{0}',
+        'icon': '{0}/resources/icons/trakt/anticipated.png',
+        'types': ['movie', 'tv']},
+    {
+        'info': 'random_trendinglists',
+        'name': 'Random Trending List',
+        'icon': '{0}/resources/icons/trakt/trendinglist.png',
+        'types': ['both']},
+    {
+        'info': 'random_popularlists',
+        'name': 'Random Popular List',
+        'icon': '{0}/resources/icons/trakt/popularlist.png',
+        'types': ['both']},
+    {
+        'info': 'random_likedlists',
+        'name': 'Random Liked List',
+        'icon': '{0}/resources/icons/trakt/likedlist.png',
+        'types': ['both']},
+    {
+        'info': 'random_mylists',
+        'name': 'Random Your List',
+        'icon': '{0}/resources/icons/trakt/mylists.png',
+        'types': ['both']}]
+
+BASEDIR_DISCOVER = [
+    {
+        'info': 'user_discover',
+        'name': 'Discover{1}{0}',
+        'types': ['movie', 'tv'],
+        'icon': '{0}/resources/icons/tmdb/search.png'}]
+
 BASEDIR_PATH = {
     'dir_movie': {
         'folders': [BASEDIR_TMDB, BASEDIR_TRAKT],
@@ -309,6 +320,9 @@ BASEDIR_PATH = {
         'types': ['movie', 'tv', 'person', 'both']},
     'dir_random': {
         'folders': [BASEDIR_RANDOM],
+        'types': ['movie', 'tv', 'both']},
+    'dir_discover': {
+        'folders': [BASEDIR_DISCOVER],
         'types': ['movie', 'tv', 'both']}}
 
 DETAILED_CATEGORIES = [
@@ -646,3 +660,49 @@ TRAKT_HISTORY = ['trakt_nextepisodes', 'trakt_inprogress', 'trakt_history', 'tra
 TRAKT_CALENDAR = [
     ('Last Fortnight', -14, 14), ('Last Week', -7, 7), ('Yesterday', -1, 1), ('Today', 0, 1), ('Tomorrow', 1, 1),
     ('{0}', 2, 1), ('{0}', 3, 1), ('{0}', 4, 1), ('{0}', 5, 1), ('{0}', 6, 1), ('Next Week', 0, 7)]
+
+USER_DISCOVER_LISTITEMS = [
+    {'label': 'Discover {0} w/ Below Settings', 'url': {'info': 'user_discover', 'method': 'open'}},
+    {'label': 'Clear Settings', 'url': {'info': 'user_discover', 'method': 'clear'}},
+    {'label': 'Sort Method', 'url': {'info': 'user_discover', 'method': 'sort_by'}},
+    {'label': 'Separator Method', 'url': {'info': 'user_discover', 'method': 'with_separator'}},
+    {'label': 'Use IDs for Parameters', 'url': {'info': 'user_discover', 'method': 'with_id'}},
+    {'label': 'Vote Count ( > or = )', 'url': {'info': 'user_discover', 'method': 'vote_count.gte'}},
+    {'label': 'Vote Count ( < or = )', 'url': {'info': 'user_discover', 'method': 'vote_count.lte'}},
+    {'label': 'Vote Average ( > or = )', 'url': {'info': 'user_discover', 'method': 'vote_average.gte'}},
+    {'label': 'Vote Average ( < or = )', 'url': {'info': 'user_discover', 'method': 'vote_average.lte'}},
+    {'label': 'With Genres', 'url': {'info': 'user_discover', 'method': 'with_genres'}},
+    {'label': 'Without Genres', 'url': {'info': 'user_discover', 'method': 'without_genres'}},
+    {'label': 'With Companies', 'url': {'info': 'user_discover', 'method': 'with_companies'}},
+    {'label': 'With Keywords', 'url': {'info': 'user_discover', 'method': 'with_keywords'}},
+    {'label': 'Without Keywords', 'url': {'info': 'user_discover', 'method': 'without_keywords'}},
+    {'label': 'Runtime (Minutes) ( > or = )', 'url': {'info': 'user_discover', 'method': 'with_runtime.gte'}},
+    {'label': 'Runtime (Minutes) ( < or = )', 'url': {'info': 'user_discover', 'method': 'with_runtime.lte'}}]
+
+USER_DISCOVER_LISTITEMS_MOVIES = [
+    {'label': 'Primary Release Year', 'url': {'info': 'user_discover', 'method': 'primary_release_year'}},
+    {'label': 'Primary Release Date ( > or = )', 'url': {'info': 'user_discover', 'method': 'primary_release_date.gte'}},
+    {'label': 'Primary Release Date ( < or = )', 'url': {'info': 'user_discover', 'method': 'primary_release_date.lte'}},
+    {'label': 'Release Date ( > or = )', 'url': {'info': 'user_discover', 'method': 'release_date.gte'}},
+    {'label': 'Release Date ( < or = )', 'url': {'info': 'user_discover', 'method': 'release_date.lte'}},
+    {'label': 'Release Type', 'url': {'info': 'user_discover', 'method': 'release_type'}},
+    {'label': 'Year', 'url': {'info': 'user_discover', 'method': 'year'}},
+    {'label': 'With Cast', 'url': {'info': 'user_discover', 'method': 'with_cast'}},
+    {'label': 'With Crew', 'url': {'info': 'user_discover', 'method': 'with_crew'}},
+    {'label': 'With People', 'url': {'info': 'user_discover', 'method': 'with_people'}}]
+
+USER_DISCOVER_LISTITEMS_TVSHOWS = [
+    {'label': 'Air Date ( > or = )', 'url': {'info': 'user_discover', 'method': 'air_date.gte'}},
+    {'label': 'Air Date ( < or = )', 'url': {'info': 'user_discover', 'method': 'air_date.lte'}},
+    {'label': 'First Air Date ( > or = )', 'url': {'info': 'user_discover', 'method': 'first_air_date.gte'}},
+    {'label': 'First Air Date ( < or = )', 'url': {'info': 'user_discover', 'method': 'first_air_date.lte'}},
+    {'label': 'First Air Year', 'url': {'info': 'user_discover', 'method': 'first_air_date_year'}},
+    {'label': 'With Networks', 'url': {'info': 'user_discover', 'method': 'with_networks'}}]
+
+USER_DISCOVER_SORTBY_MOVIES = [
+    'popularity.asc', 'popularity.desc', 'release_date.asc', 'release_date.desc', 'revenue.asc', 'revenue.desc',
+    'primary_release_date.asc', 'primary_release_date.desc', 'original_title.asc', 'original_title.desc',
+    'vote_average.asc', 'vote_average.desc', 'vote_count.asc', 'vote_count.desc']
+
+USER_DISCOVER_SORTBY_TVSHOWS = [
+    'vote_average.desc', 'vote_average.asc', 'first_air_date.desc', 'first_air_date.asc', 'popularity.desc', 'popularity.asc']
