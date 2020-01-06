@@ -48,6 +48,13 @@ def try_decode_string(string, encoding='utf-8'):
     return string.decode(encoding)
 
 
+def try_encode_string(string, encoding='utf-8'):
+    """helper to encode strings for PY 2 """
+    if sys.version_info.major == 3:
+        return string
+    return string.encode(encoding)
+
+
 def rate_limiter(addon_name='plugin.video.themoviedb.helper', wait_time=None, api_name=None):
     """
     Simple rate limiter to prevent overloading APIs

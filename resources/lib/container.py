@@ -262,6 +262,7 @@ class Container(Plugin):
             if xbmcgui.Dialog().yesno('No Value Added', 'TMDb ID for {} not found or none selected.\nDo you want to add another value?'.format(new_label)):
                 self.add_userdiscover_method_property(header, tmdbtype, usedetails)
             return
+        new_value = (utils.try_encode_string(new_value[0]), new_value[1])
         self.new_property_label = '{0} / {1}'.format(self.new_property_label, new_value[0]) if self.new_property_label else new_value[0]
         self.new_property_value = '{0} / {1}'.format(self.new_property_value, new_value[1]) if self.new_property_value else '{}'.format(new_value[1])
         if xbmcgui.Dialog().yesno('Added {}'.format(new_value[0]), 'Items: {}\nDo you want to add another value?'.format(self.new_property_label)):
