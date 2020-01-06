@@ -172,9 +172,17 @@ class TMDb(RequestAPI):
             infoproperties['budget'] = '${:0,.0f}'.format(item.get('budget'))
         if item.get('revenue'):
             infoproperties['revenue'] = '${:0,.0f}'.format(item.get('revenue'))
-        if item.get('combined_credits'):
-            infoproperties['numitems.tmdb.cast'] = len(item.get('combined_credits', {}).get('cast', [])) or 0
-            infoproperties['numitems.tmdb.crew'] = len(item.get('combined_credits', {}).get('crew', [])) or 0
+        if item.get('movie_credits'):
+            infoproperties['numitems.tmdb.moviescast'] = len(item.get('movie_credits', {}).get('cast', [])) or 0
+            infoproperties['numitems.tmdb.moviescrew'] = len(item.get('movie_credits', {}).get('crew', [])) or 0
+            infoproperties['numitems.tmdb.movies'] = infoproperties.get('numitems.tmdb.moviecast') + infoproperties.get('numitems.tmdb.moviecrew')
+        if item.get('tv_credits'):
+            infoproperties['numitems.tmdb.tvshowscast'] = len(item.get('tv_credits', {}).get('cast', [])) or 0
+            infoproperties['numitems.tmdb.tvshowscrew'] = len(item.get('tv_credits', {}).get('crew', [])) or 0
+            infoproperties['numitems.tmdb.tvshows'] = infoproperties.get('numitems.tmdb.tvshowscast') + infoproperties.get('numitems.tmdb.tvshowscrew')
+        if item.get('movie_credits') and item.get('tv_credits'):
+            infoproperties['numitems.tmdb.cast'] = infoproperties.get('numitems.tmdb.moviescast') + infoproperties.get('numitems.tmdb.tvshowscast')
+            infoproperties['numitems.tmdb.crew'] = infoproperties.get('numitems.tmdb.moviescrew') + infoproperties.get('numitems.tmdb.tvshowscrew')
             infoproperties['numitems.tmdb'] = infoproperties.get('numitems.tmdb.cast') + infoproperties.get('numitems.tmdb.crew')
         if item.get('belongs_to_collection'):
             infoproperties['set.tmdb_id'] = item.get('belongs_to_collection').get('id')
