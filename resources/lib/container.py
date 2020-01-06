@@ -350,7 +350,7 @@ class Container(Plugin):
         return '{0}: {1}'.format(label, append_label) if append_label else label
 
     def list_userdiscover(self):
-        self.updatelisting = True if self.params.get('method') else False
+        # self.updatelisting = True if self.params.get('method') else False
         self.new_property_label = self.new_property_value = None
 
         # Route Method
@@ -370,14 +370,23 @@ class Container(Plugin):
             self.get_userdiscover_prop(self.params.get('method'), 'Label', clearproperty=True)
 
         # Build Container
-        self.containercontent = 'files'
-        self.start_container()
+        # self.containercontent = 'files'
+        # self.start_container()
+        listitems = []
+        dialogitems = []
         for i in self.get_userdiscover_listitems():
             i = ListItem(library=self.library, **i)
             i.url = self.get_userdiscover_url(i.url, i.label)
             i.label = self.get_userdiscover_label(i.label, i.url.get('method'))
-            i.create_listitem(self.handle, **i.url)
-        self.finish_container()
+            listitems.append(i)
+            dialogitems.append(i.set_listitem())
+            # i.create_listitem(self.handle, **i.url)
+        # self.finish_container()
+        idx = xbmcgui.Dialog().select('Discover', dialogitems)
+        if idx == -1:
+            return
+        self.params = listitems[idx].url
+        self.router()
 
     def list_trakthistory(self):
         traktapi = TraktAPI(tmdb=self.tmdb)
