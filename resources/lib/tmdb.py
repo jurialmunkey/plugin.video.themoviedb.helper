@@ -175,7 +175,7 @@ class TMDb(RequestAPI):
         if item.get('combined_credits'):
             infoproperties['numitems.tmdb.cast'] = len(item.get('combined_credits', {}).get('cast', [])) or 0
             infoproperties['numitems.tmdb.crew'] = len(item.get('combined_credits', {}).get('crew', [])) or 0
-            infoproperties['numitems.tmdb.total'] = infoproperties.get('numitems.tmdb.cast') + infoproperties.get('numitems.tmdb.crew')
+            infoproperties['numitems.tmdb'] = infoproperties.get('numitems.tmdb.cast') + infoproperties.get('numitems.tmdb.crew')
         if item.get('belongs_to_collection'):
             infoproperties['set.tmdb_id'] = item.get('belongs_to_collection').get('id')
             infoproperties['set.name'] = item.get('belongs_to_collection').get('name')
