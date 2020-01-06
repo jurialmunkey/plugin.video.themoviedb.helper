@@ -214,88 +214,167 @@ class Container(Plugin):
 
         return firstitems + dbiditems + tmdbitems + lastitems + nextpage
 
-    def get_userdiscover_prop(self, method, setvalue=None, clear=False):
-        prefix = 'TMDbHelper.UserDiscover'
-        window = xbmcgui.Window(xbmcgui.getCurrentWindowId())
-        p_name = '{0}.{1}'.format(prefix, method)
-        if clear:
-            window.clearProperty(p_name)
-            return
-        elif setvalue:
-            window.setProperty(p_name, setvalue)
-            return setvalue
-        return window.getProperty(p_name)
+    def get_userdiscover_listitems(self):
+        if self.params.get('type') == 'movie':
+            return constants.USER_DISCOVER_LISTITEMS_MOVIES
+        return constants.USER_DISCOVER_LISTITEMS_TVSHOWS
 
-    def list_userdiscover_open(self):
-        tmdbtype = self.params.get('type')
-        params = {'info': 'discover', 'type': tmdbtype}
-        items = constants.USER_DISCOVER_LISTITEMS
-        items += constants.USER_DISCOVER_LISTITEMS_MOVIES if tmdbtype == 'movie' else constants.USER_DISCOVER_LISTITEMS_TVSHOWS
-        for i in items:
+    def get_userdiscover_sortmethods(self):
+        if self.params.get('type') == 'movie':
+            return constants.USER_DISCOVER_SORTBY_MOVIES
+        return constants.USER_DISCOVER_SORTBY_TVSHOWS
+
+    def get_userdiscover_prop(self, name, prefix=None, **kwargs):
+        prefix = 'TMDbHelper.UserDiscover.{}'.format(prefix) if prefix else 'TMDbHelper.UserDiscover'
+        return utils.get_property(name, prefix=prefix, **kwargs)
+
+    def get_userdiscover_folderpath_url(self):
+        url = {'info': 'discover', 'type': self.params.get('type'), 'with_id': 'True'}
+        for i in self.get_userdiscover_listitems():
             k = i.get('url', {}).get('method')
             v = self.get_userdiscover_prop(k)
             if not k or not v:
                 continue
-            params[k] = v
-        return params
+            url[k] = v
+        return url
 
-    def list_userdiscover(self):
+    def get_userdiscover_url(self, url, label=None):
+        if url.get('method') == 'open':
+            return self.get_userdiscover_folderpath_url()
+        if label:
+            url['label'] = label
+        url['type'] = self.params.get('type')
+        return url
+
+    def clear_userdiscover_properties(self):
+        for i in self.get_userdiscover_listitems():
+            name = i.get('url', {}).get('method')
+            self.get_userdiscover_prop(name, clearproperty=True)
+            self.get_userdiscover_prop(name, 'Label', clearproperty=True)
+
+    def add_userdiscover_method_property(self, header, tmdbtype, usedetails):
+        new_label = xbmcgui.Dialog().input(header)
+        if not new_label:
+            return
+        new_value = self.tmdb.get_tmdb_id(
+            tmdbtype, query=new_label, selectdialog=True, longcache=True, usedetails=usedetails, returntuple=True)
+        if not new_value:
+            if xbmcgui.Dialog().yesno('No Value Added', 'TMDb ID for {} not found or none selected.\nDo you want to add another value?'.format(new_label)):
+                self.add_userdiscover_method_property(header, tmdbtype, usedetails)
+            return
+        self.new_property_label = '{0} / {1}'.format(self.new_property_label, new_value[0]) if self.new_property_label else new_value[0]
+        self.new_property_value = '{0} / {1}'.format(self.new_property_value, new_value[1]) if self.new_property_value else '{}'.format(new_value[1])
+        if xbmcgui.Dialog().yesno('Added {}'.format(new_value[0]), 'Items: {}\nDo you want to add another value?'.format(self.new_property_label)):
+            self.add_userdiscover_method_property(header, tmdbtype, usedetails)
+
+    def set_userdiscover_separator_property(self):
+        choice = xbmcgui.Dialog().yesno(
+            'Set Match Method',
+            'Choose matching method for parameters with multiple values.',
+            yeslabel='Match ANY Value', nolabel='Match ALL Values')
+        self.new_property_value = 'OR' if choice else 'AND'
+        self.new_property_label = 'ANY' if choice else 'ALL'
+
+    def set_userdiscover_genre_property(self):
+        genres_list = self.tmdb.get_request_lc('genre', self.params.get('type'), 'list')
+        if not genres_list:
+            return
+        genres_list = genres_list.get('genres', [])
+        dialog_list = [i.get('name') for i in genres_list]
+        select_list = xbmcgui.Dialog().multiselect('Select Genres', dialog_list)
+        if not select_list:
+            return
+        for i in select_list:
+            label = genres_list[i].get('name')
+            value = genres_list[i].get('id')
+            if not value:
+                continue
+            self.new_property_label = '{0} / {1}'.format(self.new_property_label, label) if self.new_property_label else label
+            self.new_property_value = '{0} / {1}'.format(self.new_property_value, value) if self.new_property_value else '{}'.format(value)
+
+    def set_userdiscover_method_property(self):
         method = self.params.get('method')
 
-        # Route Methods
-        clearprops = True
-        if method == 'sort_by':
-            sort_methods = constants.USER_DISCOVER_SORTBY_MOVIES if self.params.get('type') == 'movie' else constants.USER_DISCOVER_SORTBY_TVSHOWS
-            sort_method = xbmcgui.Dialog().select('sort_by', sort_methods)
-            new_prop = self.get_userdiscover_prop('sort_by', sort_methods[sort_method]) if sort_method > -1 else None
-            self.updatelisting = True
-            clearprops = False
-        elif method in ['clear', 'open']:
-            self.updatelisting = True
-        elif method:
-            defaultt = self.get_userdiscover_prop(method)
-            inputtype = xbmcgui.INPUT_ALPHANUM
-            if '_year' in method or 'vote_' in method or '_runtime' in method or method == 'year':
-                inputtype = xbmcgui.INPUT_NUMERIC
-            elif '_date' in method:
-                inputtype = xbmcgui.INPUT_DATE
-                if defaultt and '-' in defaultt:
-                    dt_split = defaultt.split('-', 2)
-                    defaultt = '{}/{}/{}'.format(dt_split[2], dt_split[1], dt_split[0])
-            if method == 'with_separator':
-                choice = xbmcgui.Dialog().yesno('Set value for with_separator parameter', 'Multiple values for with_ and without_ parameters can be specified by separating the values with a slash \" / \". By default, the discover endpoint will only return items matching ALL values. To find items that match ANY of the values, change the with_separator.', nolabel='Match ALL Values', yeslabel='Match ANY Value')
-                new_prop = 'OR' if choice else None
-            elif method == 'with_id':
-                choice = xbmcgui.Dialog().yesno('Set value for with_id parameter', 'Have you specified TMDb IDs for with_ and without_ parameters? By default, the discover method will attempt to translate any text values in with_ and without_ parameters into the corresponding TMDb IDs. Better results can be achieved by specifying the TMDb IDs directly.', nolabel='Text Values', yeslabel='TMDb IDs')
-                new_prop = 'True' if choice else None
-            else:
-                new_prop = xbmcgui.Dialog().input(method, defaultt=defaultt, type=inputtype)
-            if inputtype == xbmcgui.INPUT_DATE and new_prop:
-                p_split = new_prop.split('/', 2)
-                new_prop = '{:04d}-{:02d}-{:02d}'.format(utils.try_parse_int(p_split[2]), utils.try_parse_int(p_split[1]), utils.try_parse_int(p_split[0]))
-            self.get_userdiscover_prop(method, new_prop) if new_prop else self.get_userdiscover_prop(method, clear=True)
-            self.updatelisting = True
-            clearprops = False
+        # Set Input Method
+        affix = ''
+        header = 'Search for '
+        usedetails = False
+        label = self.params.get('label')
+        tmdbtype = self.params.get('type')
+        inputtype = xbmcgui.INPUT_ALPHANUM
+        if any(i in method for i in ['year', 'vote_', '_runtime']):
+            header = 'Enter '
+            inputtype = xbmcgui.INPUT_NUMERIC
+        elif '_date' in method:
+            header = 'Enter '
+            affix = ' YYYY-MM-DD'
+        elif '_genres' in method:
+            label = 'Genre'
+            tmdbtype = 'genre'
+        elif '_companies' in method:
+            label = 'Company'
+            tmdbtype = 'company'
+        elif '_networks' in method:
+            label = 'Network'
+            tmdbtype = 'company'
+        elif '_keywords' in method:
+            label = 'Keyword'
+            tmdbtype = 'keyword'
+        elif any(i in method for i in ['_cast', '_crew', '_people']):
+            label = 'Person'
+            tmdbtype = 'person'
+            usedetails = True
+        header = '{0}{1}{2}'.format(header, label, affix)
+        defaultt = self.get_userdiscover_prop(method) or None
+
+        # Route Method
+        if method == 'with_separator':
+            self.set_userdiscover_separator_property()
+        elif '_genres' in method:
+            self.set_userdiscover_genre_property()
+        elif 'with_runtime' not in method and any(i in method for i in ['with_', 'without_']):
+            self.add_userdiscover_method_property(header, tmdbtype, usedetails)
+        else:
+            self.new_property_label = self.new_property_value = xbmcgui.Dialog().input(
+                header, type=inputtype, defaultt=defaultt)
+
+    def set_userdiscover_sortby_property(self):
+        sort_method_list = self.get_userdiscover_sortmethods()
+        sort_method = xbmcgui.Dialog().select('Select Sort Method', sort_method_list)
+        self.new_property_label = self.new_property_value = sort_method_list[sort_method] if sort_method > -1 else None
+
+    def get_userdiscover_label(self, label, method):
+        append_label = self.new_property_label if self.params.get('method') == method else self.get_userdiscover_prop(method, 'Label')
+        label = label.format(utils.type_convert(self.params.get('type'), 'plural'))
+        return '{0}: {1}'.format(label, append_label) if append_label else label
+
+    def list_userdiscover(self):
+        self.updatelisting = True if self.params.get('method') else False
+        self.new_property_label = self.new_property_value = None
+
+        # Route Method
+        if not self.params.get('method') or self.params.get('method') == 'clear':
+            self.clear_userdiscover_properties()
+        elif self.params.get('method') == 'sort_by':
+            self.set_userdiscover_sortby_property()
+        else:
+            self.set_userdiscover_method_property()
+
+        # Set / Clear Property
+        if self.new_property_value:
+            self.get_userdiscover_prop(self.params.get('method'), setproperty=self.new_property_value)
+            self.get_userdiscover_prop(self.params.get('method'), 'Label', setproperty=self.new_property_label)
+        else:
+            self.get_userdiscover_prop(self.params.get('method'), clearproperty=True)
+            self.get_userdiscover_prop(self.params.get('method'), 'Label', clearproperty=True)
 
         # Build Container
         self.containercontent = 'files'
         self.start_container()
-        items = constants.USER_DISCOVER_LISTITEMS
-        items += constants.USER_DISCOVER_LISTITEMS_MOVIES if self.params.get('type') == 'movie' else constants.USER_DISCOVER_LISTITEMS_TVSHOWS
-        for i in items:
+        for i in self.get_userdiscover_listitems():
             i = ListItem(library=self.library, **i)
-            i.label = i.label.format(utils.type_convert(self.params.get('type'), 'plural'))
-            i.url['type'] = self.params.get('type')
-
-            if i.url.get('method') == 'open':
-                i.url = self.list_userdiscover_open()
-            elif clearprops:
-                self.get_userdiscover_prop(i.url.get('method'), clear=True)
-            else:
-                append = new_prop if method == i.url.get('method') else self.get_userdiscover_prop(i.url.get('method'))
-                i.label = '{0}: {1}'.format(i.label, append) if append else i.label
-
-            # Create ListItems
+            i.url = self.get_userdiscover_url(i.url, i.label)
+            i.label = self.get_userdiscover_label(i.label, i.url.get('method'))
             i.create_listitem(self.handle, **i.url)
         self.finish_container()
 

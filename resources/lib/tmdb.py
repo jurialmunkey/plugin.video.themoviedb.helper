@@ -407,7 +407,7 @@ class TMDb(RequestAPI):
         request = self.get_request_lc(itemtype, tmdb_id, 'external_ids') or {}
         return request.get(external_id) if external_id else request
 
-    def get_tmdb_id(self, itemtype=None, imdb_id=None, tvdb_id=None, query=None, year=None, selectdialog=False, longcache=False):
+    def get_tmdb_id(self, itemtype=None, imdb_id=None, tvdb_id=None, query=None, year=None, selectdialog=False, usedetails=True, longcache=False, returntuple=False):
         func = self.get_request_lc if longcache else self.get_request_sc
         if not itemtype:
             return
@@ -428,7 +428,9 @@ class TMDb(RequestAPI):
             return
         itemindex = 0
         if selectdialog:
-            item = utils.dialog_select_item(items=request, details=self)
+            item = utils.dialog_select_item(items=request, details=self, usedetails=usedetails)
+            if returntuple:
+                return (self.get_title(item), item.get('id')) if item else None
             return item.get('id') if item else None
         return request[itemindex].get('id')
 

@@ -78,7 +78,19 @@ def rate_limiter(addon_name='plugin.video.themoviedb.helper', wait_time=None, ap
     xbmcgui.Window(10000).clearProperty(lock_id)
 
 
-def dialog_select_item(items=None, details=False):
+def get_property(name, setproperty=None, clearproperty=False, prefix=None, window_id=None):
+        window = xbmcgui.Window(window_id) if window_id else xbmcgui.Window(xbmcgui.getCurrentWindowId())
+        name = '{0}.{1}'.format(prefix, name) if prefix else name
+        if clearproperty:
+            window.clearProperty(name)
+            return
+        elif setproperty:
+            window.setProperty(name, setproperty)
+            return setproperty
+        return window.getProperty(name)
+
+
+def dialog_select_item(items=None, details=False, usedetails=True):
     item_list = split_items(items)
     item_index = 0
     if len(item_list) > 1:
@@ -89,7 +101,7 @@ def dialog_select_item(items=None, details=False):
                 dialog_item = xbmcgui.ListItem(details.get_title(item))
                 dialog_item.setArt({'icon': icon, 'thumb': icon})
                 detailed_item_list.append(dialog_item)
-            item_index = xbmcgui.Dialog().select(_addon.getLocalizedString(32006), detailed_item_list, preselect=0, useDetails=True)
+            item_index = xbmcgui.Dialog().select(_addon.getLocalizedString(32006), detailed_item_list, preselect=0, useDetails=usedetails)
         else:
             item_index = xbmcgui.Dialog().select(_addon.getLocalizedString(32006), item_list)
     if item_index > -1:

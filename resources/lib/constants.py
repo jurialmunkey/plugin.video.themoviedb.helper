@@ -661,43 +661,43 @@ TRAKT_CALENDAR = [
     ('Last Fortnight', -14, 14), ('Last Week', -7, 7), ('Yesterday', -1, 1), ('Today', 0, 1), ('Tomorrow', 1, 1),
     ('{0}', 2, 1), ('{0}', 3, 1), ('{0}', 4, 1), ('{0}', 5, 1), ('{0}', 6, 1), ('Next Week', 0, 7)]
 
-USER_DISCOVER_LISTITEMS = [
+USER_DISCOVER_LISTITEMS_START = [
     {'label': 'Discover {0} w/ Below Settings', 'url': {'info': 'user_discover', 'method': 'open'}},
-    {'label': 'Clear Settings', 'url': {'info': 'user_discover', 'method': 'clear'}},
+    {'label': 'Match Method', 'url': {'info': 'user_discover', 'method': 'with_separator'}},
     {'label': 'Sort Method', 'url': {'info': 'user_discover', 'method': 'sort_by'}},
-    {'label': 'Separator Method', 'url': {'info': 'user_discover', 'method': 'with_separator'}},
-    {'label': 'Use IDs for Parameters', 'url': {'info': 'user_discover', 'method': 'with_id'}},
-    {'label': 'Vote Count ( > or = )', 'url': {'info': 'user_discover', 'method': 'vote_count.gte'}},
-    {'label': 'Vote Count ( < or = )', 'url': {'info': 'user_discover', 'method': 'vote_count.lte'}},
-    {'label': 'Vote Average ( > or = )', 'url': {'info': 'user_discover', 'method': 'vote_average.gte'}},
-    {'label': 'Vote Average ( < or = )', 'url': {'info': 'user_discover', 'method': 'vote_average.lte'}},
+    {'label': 'Clear Settings', 'url': {'info': 'user_discover', 'method': 'clear'}},
     {'label': 'With Genres', 'url': {'info': 'user_discover', 'method': 'with_genres'}},
     {'label': 'Without Genres', 'url': {'info': 'user_discover', 'method': 'without_genres'}},
     {'label': 'With Companies', 'url': {'info': 'user_discover', 'method': 'with_companies'}},
     {'label': 'With Keywords', 'url': {'info': 'user_discover', 'method': 'with_keywords'}},
-    {'label': 'Without Keywords', 'url': {'info': 'user_discover', 'method': 'without_keywords'}},
+    {'label': 'Without Keywords', 'url': {'info': 'user_discover', 'method': 'without_keywords'}}]
+
+USER_DISCOVER_LISTITEMS_FINISH = [
+    {'label': 'Vote Count ( > or = )', 'url': {'info': 'user_discover', 'method': 'vote_count.gte'}},
+    {'label': 'Vote Count ( < or = )', 'url': {'info': 'user_discover', 'method': 'vote_count.lte'}},
+    {'label': 'Vote Average ( > or = )', 'url': {'info': 'user_discover', 'method': 'vote_average.gte'}},
+    {'label': 'Vote Average ( < or = )', 'url': {'info': 'user_discover', 'method': 'vote_average.lte'}},
     {'label': 'Runtime (Minutes) ( > or = )', 'url': {'info': 'user_discover', 'method': 'with_runtime.gte'}},
     {'label': 'Runtime (Minutes) ( < or = )', 'url': {'info': 'user_discover', 'method': 'with_runtime.lte'}}]
 
-USER_DISCOVER_LISTITEMS_MOVIES = [
+USER_DISCOVER_LISTITEMS_MOVIES = USER_DISCOVER_LISTITEMS_START + [
+    {'label': 'With Cast', 'url': {'info': 'user_discover', 'method': 'with_cast'}},
+    {'label': 'With Crew', 'url': {'info': 'user_discover', 'method': 'with_crew'}},
+    {'label': 'With People', 'url': {'info': 'user_discover', 'method': 'with_people'}},
     {'label': 'Primary Release Year', 'url': {'info': 'user_discover', 'method': 'primary_release_year'}},
     {'label': 'Primary Release Date ( > or = )', 'url': {'info': 'user_discover', 'method': 'primary_release_date.gte'}},
     {'label': 'Primary Release Date ( < or = )', 'url': {'info': 'user_discover', 'method': 'primary_release_date.lte'}},
     {'label': 'Release Date ( > or = )', 'url': {'info': 'user_discover', 'method': 'release_date.gte'}},
     {'label': 'Release Date ( < or = )', 'url': {'info': 'user_discover', 'method': 'release_date.lte'}},
-    {'label': 'Release Type', 'url': {'info': 'user_discover', 'method': 'release_type'}},
-    {'label': 'Year', 'url': {'info': 'user_discover', 'method': 'year'}},
-    {'label': 'With Cast', 'url': {'info': 'user_discover', 'method': 'with_cast'}},
-    {'label': 'With Crew', 'url': {'info': 'user_discover', 'method': 'with_crew'}},
-    {'label': 'With People', 'url': {'info': 'user_discover', 'method': 'with_people'}}]
+    {'label': 'Release Type', 'url': {'info': 'user_discover', 'method': 'release_type'}}] + USER_DISCOVER_LISTITEMS_FINISH
 
-USER_DISCOVER_LISTITEMS_TVSHOWS = [
+USER_DISCOVER_LISTITEMS_TVSHOWS = USER_DISCOVER_LISTITEMS_START + [
+    {'label': 'With Networks', 'url': {'info': 'user_discover', 'method': 'with_networks'}},
     {'label': 'Air Date ( > or = )', 'url': {'info': 'user_discover', 'method': 'air_date.gte'}},
     {'label': 'Air Date ( < or = )', 'url': {'info': 'user_discover', 'method': 'air_date.lte'}},
     {'label': 'First Air Date ( > or = )', 'url': {'info': 'user_discover', 'method': 'first_air_date.gte'}},
     {'label': 'First Air Date ( < or = )', 'url': {'info': 'user_discover', 'method': 'first_air_date.lte'}},
-    {'label': 'First Air Year', 'url': {'info': 'user_discover', 'method': 'first_air_date_year'}},
-    {'label': 'With Networks', 'url': {'info': 'user_discover', 'method': 'with_networks'}}]
+    {'label': 'First Air Year', 'url': {'info': 'user_discover', 'method': 'first_air_date_year'}}] + USER_DISCOVER_LISTITEMS_FINISH
 
 USER_DISCOVER_SORTBY_MOVIES = [
     'popularity.asc', 'popularity.desc', 'release_date.asc', 'release_date.desc', 'revenue.asc', 'revenue.desc',
