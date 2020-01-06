@@ -11,6 +11,7 @@ from resources.lib.downloader import Downloader
 from resources.lib.traktapi import TraktAPI
 from resources.lib.plugin import Plugin
 from resources.lib.player import Player
+from resources.lib.kodilibrary import KodiLibrary
 from resources.lib.service import ServiceMonitor
 
 
@@ -176,6 +177,18 @@ class Script(Plugin):
         self.monitor.waitForAbort(1)
         if not self.wait_for_update(call_id=call_id):
             return self.call_reset()  # Clear and exit if timeout or user closed base window
+
+        # Set DBID Items Property
+        if 'type=person' in self.added_path:
+            person_name = xbmc.getInfoLabel('Container(9999).ListItemAbsolute(0).Label')
+            moviedb_numitems = KodiLibrary().get_num_credits('movie', person_name)
+            tvshowdb_numitems = KodiLibrary().get_num_credits('tvshow', person_name)
+            episodedb_numitems = KodiLibrary().get_num_credits('episode', person_name)
+            totaldb_numitems = utils.try_parse_int(moviedb_numitems) + utils.try_parse_int(tvshowdb_numitems) + utils.try_parse_int(episodedb_numitems)
+            self.home.setProperty('{}.NumItems.DBID.Movies'.format(self.prefixcurrent), str(moviedb_numitems))
+            self.home.setProperty('{}.NumItems.DBID.TvShows'.format(self.prefixcurrent), str(tvshowdb_numitems))
+            self.home.setProperty('{}.NumItems.DBID.Episodes'.format(self.prefixcurrent), str(episodedb_numitems))
+            self.home.setProperty('{}.NumItems.DBID'.format(self.prefixcurrent), str(totaldb_numitems))
 
         # Open info dialog
         window.setFocus(controllist)

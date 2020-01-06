@@ -48,6 +48,46 @@ class KodiLibrary(object):
             'file': item.get('file')}
             for item in response.get('result', {}).get(key_to_get, [])]
 
+    def get_library(self, dbtype=None, properties=None, filterr=None):
+        if dbtype == "movie":
+            method = "VideoLibrary.GetMovies"
+        elif dbtype == "tvshow":
+            method = "VideoLibrary.GetTVShows"
+        elif dbtype == "episode":
+            method = "VideoLibrary.GetEpisodes"
+        else:
+            return
+
+        params = {"properties": properties or ["title"]}
+        if filterr:
+            params['filter'] = filterr
+
+        response = self.get_jsonrpc(method, params)
+        return response.get('result')
+
+    def get_num_credits(self, dbtype, person):
+        if dbtype == 'movie':
+            filterr = {
+                "or": [
+                    {"field": "actor", "operator": "contains", "value": person},
+                    {"field": "director", "operator": "contains", "value": person},
+                    {"field": "writers", "operator": "contains", "value": person}]}
+        elif dbtype == 'tvshow':
+            filterr = {
+                "or": [
+                    {"field": "actor", "operator": "contains", "value": person},
+                    {"field": "director", "operator": "contains", "value": person}]}
+        elif dbtype == 'episode':
+            filterr = {
+                "or": [
+                    {"field": "actor", "operator": "contains", "value": person},
+                    {"field": "director", "operator": "contains", "value": person},
+                    {"field": "writers", "operator": "contains", "value": person}]}
+        else:
+            return
+        response = self.get_library(dbtype, filterr=filterr)
+        return response.get('limits', {}).get('total', 0) if response else 0
+
     def get_info(self, info, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None, season=None, episode=None, fuzzy_match=False):
         if not self.database or not info:
             return
