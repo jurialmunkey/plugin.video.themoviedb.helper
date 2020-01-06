@@ -46,6 +46,13 @@ class Plugin(object):
     def imageviewer(self, image):
         xbmc.executebuiltin('ShowPicture({0})'.format(image))
 
+    def get_kodi_person_stats(self, item):
+        if item.get('infolabels', {}).get('title'):
+            statistics = KodiLibrary().get_person_stats(item.get('infolabels', {}).get('title'))
+            if statistics:
+                item['infoproperties'] = utils.merge_two_dicts(item.get('infoproperties', {}), statistics)
+        return item
+
     def get_tmdb_id(self, query=None, itemtype=None, imdb_id=None, tvdb_id=None, year=None, **kwargs):
         if kwargs.get('tmdb_id'):
             return kwargs.get('tmdb_id')

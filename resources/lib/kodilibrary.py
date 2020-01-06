@@ -88,6 +88,17 @@ class KodiLibrary(object):
         response = self.get_library(dbtype, filterr=filterr)
         return response.get('limits', {}).get('total', 0) if response else 0
 
+    def get_person_stats(self, person):
+        infoproperties = {}
+        infoproperties['numitems.dbid.movies'] = self.get_num_credits('movie', person)
+        infoproperties['numitems.dbid.tvshows'] = self.get_num_credits('tvshow', person)
+        infoproperties['numitems.dbid.episodes'] = self.get_num_credits('episode', person)
+        infoproperties['numitems.dbid'] = (
+            utils.try_parse_int(infoproperties.get('numitems.dbid.movies')) +
+            utils.try_parse_int(infoproperties.get('numitems.dbid.tvshows')) +
+            utils.try_parse_int(infoproperties.get('numitems.dbid.episodes')))
+        return infoproperties
+
     def get_info(self, info, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None, season=None, episode=None, fuzzy_match=False):
         if not self.database or not info:
             return

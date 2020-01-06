@@ -625,6 +625,10 @@ class Container(Plugin):
         if self.params.get('type') == 'movie':
             details = self.get_omdb_ratings(details, cache_only=False)
 
+        # Merge library stats for person
+        if self.params.get('type') == 'person':
+            details = self.get_kodi_person_stats(details)
+
         # Create first item
         firstitem = ListItem(library=self.library, **details)
         if self.params.get('type') == 'movie':
