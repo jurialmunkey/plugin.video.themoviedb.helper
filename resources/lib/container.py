@@ -214,10 +214,11 @@ class Container(Plugin):
 
         return firstitems + dbiditems + tmdbitems + lastitems + nextpage
 
-    def get_userdiscover_listitems(self):
+    def get_userdiscover_listitems(self, basedir=False):
+        basedir = constants.USER_DISCOVER_LISTITEMS_BASEDIR if basedir else []
         if self.params.get('type') == 'movie':
-            return constants.USER_DISCOVER_LISTITEMS_MOVIES
-        return constants.USER_DISCOVER_LISTITEMS_TVSHOWS
+            return basedir + constants.USER_DISCOVER_LISTITEMS_MOVIES
+        return basedir + constants.USER_DISCOVER_LISTITEMS_TVSHOWS
 
     def get_userdiscover_sortmethods(self):
         if self.params.get('type') == 'movie':
@@ -230,7 +231,7 @@ class Container(Plugin):
 
     def get_userdiscover_folderpath_url(self):
         url = {'info': 'discover', 'type': self.params.get('type'), 'with_id': 'True'}
-        for i in self.get_userdiscover_listitems():
+        for i in self.get_userdiscover_listitems(basedir=True):
             k = i.get('url', {}).get('method')
             v = self.get_userdiscover_prop(k)
             if not k or not v:
@@ -247,7 +248,7 @@ class Container(Plugin):
         return url
 
     def clear_userdiscover_properties(self):
-        for i in self.get_userdiscover_listitems():
+        for i in self.get_userdiscover_listitems(basedir=True):
             name = i.get('url', {}).get('method')
             self.get_userdiscover_prop(name, clearproperty=True)
             self.get_userdiscover_prop(name, 'Label', clearproperty=True)
@@ -344,13 +345,40 @@ class Container(Plugin):
         sort_method = xbmcgui.Dialog().select('Select Sort Method', sort_method_list)
         self.new_property_label = self.new_property_value = sort_method_list[sort_method] if sort_method > -1 else None
 
+    def get_userdiscover_affix(self, method):
+        if self.params.get('method') == method:
+            return self.new_property_label
+        return self.get_userdiscover_prop(method, 'Label')
+
     def get_userdiscover_label(self, label, method):
-        append_label = self.new_property_label if self.params.get('method') == method else self.get_userdiscover_prop(method, 'Label')
+        append_label = self.get_userdiscover_affix(method)
         label = label.format(utils.type_convert(self.params.get('type'), 'plural'))
         return '{0}: {1}'.format(label, append_label) if append_label else label
 
+    def list_userdiscover_build(self, items, skipnull=False):
+        for i in items:
+            i = ListItem(library=self.library, **i)
+            i.url = self.get_userdiscover_url(i.url, i.label)
+            i.label = self.get_userdiscover_label(i.label, i.url.get('method'))
+            i.create_listitem(self.handle, **i.url) if not skipnull or self.get_userdiscover_affix(i.url.get('method')) else None
+
+    def list_userdiscover_dialog(self):
+        urls = []
+        dialogitems = []
+        for i in self.get_userdiscover_listitems():
+            i = ListItem(library=self.library, **i)
+            i.url = self.get_userdiscover_url(i.url, i.label)
+            i.label = self.get_userdiscover_label(i.label, i.url.get('method'))
+            urls.append(i.url)
+            dialogitems.append(i.set_listitem())
+        idx = xbmcgui.Dialog().select('Add Rule', dialogitems)
+        if idx == -1:
+            return
+        self.params = urls[idx]
+        self.router()
+
     def list_userdiscover(self):
-        # self.updatelisting = True if self.params.get('method') else False
+        self.updatelisting = True if self.params.get('method') else False
         self.new_property_label = self.new_property_value = None
 
         # Route Method
@@ -358,6 +386,8 @@ class Container(Plugin):
             self.clear_userdiscover_properties()
         elif self.params.get('method') == 'sort_by':
             self.set_userdiscover_sortby_property()
+        elif self.params.get('method') == 'add_rule':
+            return self.list_userdiscover_dialog()
         else:
             self.set_userdiscover_method_property()
 
@@ -370,23 +400,12 @@ class Container(Plugin):
             self.get_userdiscover_prop(self.params.get('method'), 'Label', clearproperty=True)
 
         # Build Container
-        # self.containercontent = 'files'
-        # self.start_container()
-        listitems = []
-        dialogitems = []
-        for i in self.get_userdiscover_listitems():
-            i = ListItem(library=self.library, **i)
-            i.url = self.get_userdiscover_url(i.url, i.label)
-            i.label = self.get_userdiscover_label(i.label, i.url.get('method'))
-            listitems.append(i)
-            dialogitems.append(i.set_listitem())
-            # i.create_listitem(self.handle, **i.url)
-        # self.finish_container()
-        idx = xbmcgui.Dialog().select('Discover', dialogitems)
-        if idx == -1:
-            return
-        self.params = listitems[idx].url
-        self.router()
+        self.containercontent = 'files'
+        self.start_container()
+        self.list_userdiscover_build(constants.USER_DISCOVER_LISTITEMS_BASEDIR)
+        self.list_userdiscover_build(self.get_userdiscover_listitems(basedir=False), skipnull=True)
+        self.list_userdiscover_build(constants.USER_DISCOVER_LISTITEMS_ADDRULE)
+        self.finish_container()
 
     def list_trakthistory(self):
         traktapi = TraktAPI(tmdb=self.tmdb)

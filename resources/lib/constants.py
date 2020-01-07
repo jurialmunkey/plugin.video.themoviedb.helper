@@ -661,11 +661,16 @@ TRAKT_CALENDAR = [
     ('Last Fortnight', -14, 14), ('Last Week', -7, 7), ('Yesterday', -1, 1), ('Today', 0, 1), ('Tomorrow', 1, 1),
     ('{0}', 2, 1), ('{0}', 3, 1), ('{0}', 4, 1), ('{0}', 5, 1), ('{0}', 6, 1), ('Next Week', 0, 7)]
 
-USER_DISCOVER_LISTITEMS_START = [
+USER_DISCOVER_LISTITEMS_BASEDIR = [
     {'label': 'Discover {0} w/ Below Settings', 'url': {'info': 'user_discover', 'method': 'open'}},
     {'label': 'Match Method', 'url': {'info': 'user_discover', 'method': 'with_separator'}},
-    {'label': 'Sort Method', 'url': {'info': 'user_discover', 'method': 'sort_by'}},
+    {'label': 'Sort Method', 'url': {'info': 'user_discover', 'method': 'sort_by'}}]
+
+USER_DISCOVER_LISTITEMS_ADDRULE = [
     {'label': 'Clear Settings', 'url': {'info': 'user_discover', 'method': 'clear'}},
+    {'label': 'Add Rule...', 'url': {'info': 'user_discover', 'method': 'add_rule'}}]
+
+USER_DISCOVER_LISTITEMS_START = [
     {'label': 'With Genres', 'url': {'info': 'user_discover', 'method': 'with_genres'}},
     {'label': 'Without Genres', 'url': {'info': 'user_discover', 'method': 'without_genres'}},
     {'label': 'With Companies', 'url': {'info': 'user_discover', 'method': 'with_companies'}},
