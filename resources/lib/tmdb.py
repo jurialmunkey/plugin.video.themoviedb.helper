@@ -183,7 +183,7 @@ class TMDb(RequestAPI):
         if item.get('movie_credits') or item.get('tv_credits'):
             infoproperties['numitems.tmdb.cast'] = utils.try_parse_int(infoproperties.get('numitems.tmdb.moviescast')) + utils.try_parse_int(infoproperties.get('numitems.tmdb.tvshowscast'))
             infoproperties['numitems.tmdb.crew'] = utils.try_parse_int(infoproperties.get('numitems.tmdb.moviescrew')) + utils.try_parse_int(infoproperties.get('numitems.tmdb.tvshowscrew'))
-            infoproperties['numitems.tmdb'] = utils.try_parse_int(infoproperties.get('numitems.tmdb.cast')) + utils.try_parse_int(infoproperties.get('numitems.tmdb.crew'))
+            infoproperties['numitems.tmdb.total'] = utils.try_parse_int(infoproperties.get('numitems.tmdb.cast')) + utils.try_parse_int(infoproperties.get('numitems.tmdb.crew'))
         if item.get('belongs_to_collection'):
             infoproperties['set.tmdb_id'] = item.get('belongs_to_collection').get('id')
             infoproperties['set.name'] = item.get('belongs_to_collection').get('name')

@@ -93,7 +93,7 @@ class KodiLibrary(object):
         infoproperties['numitems.dbid.movies'] = self.get_num_credits('movie', person)
         infoproperties['numitems.dbid.tvshows'] = self.get_num_credits('tvshow', person)
         infoproperties['numitems.dbid.episodes'] = self.get_num_credits('episode', person)
-        infoproperties['numitems.dbid'] = (
+        infoproperties['numitems.dbid.total'] = (
             utils.try_parse_int(infoproperties.get('numitems.dbid.movies')) +
             utils.try_parse_int(infoproperties.get('numitems.dbid.tvshows')) +
             utils.try_parse_int(infoproperties.get('numitems.dbid.episodes')))
