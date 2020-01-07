@@ -175,15 +175,15 @@ class TMDb(RequestAPI):
         if item.get('movie_credits'):
             infoproperties['numitems.tmdb.moviescast'] = len(item.get('movie_credits', {}).get('cast', [])) or 0
             infoproperties['numitems.tmdb.moviescrew'] = len(item.get('movie_credits', {}).get('crew', [])) or 0
-            infoproperties['numitems.tmdb.movies'] = infoproperties.get('numitems.tmdb.moviecast') + infoproperties.get('numitems.tmdb.moviecrew')
+            infoproperties['numitems.tmdb.movies'] = utils.try_parse_int(infoproperties.get('numitems.tmdb.moviecast')) + utils.try_parse_int(infoproperties.get('numitems.tmdb.moviecrew'))
         if item.get('tv_credits'):
             infoproperties['numitems.tmdb.tvshowscast'] = len(item.get('tv_credits', {}).get('cast', [])) or 0
             infoproperties['numitems.tmdb.tvshowscrew'] = len(item.get('tv_credits', {}).get('crew', [])) or 0
-            infoproperties['numitems.tmdb.tvshows'] = infoproperties.get('numitems.tmdb.tvshowscast') + infoproperties.get('numitems.tmdb.tvshowscrew')
+            infoproperties['numitems.tmdb.tvshows'] = utils.try_parse_int(infoproperties.get('numitems.tmdb.tvshowscast')) + utils.try_parse_int(infoproperties.get('numitems.tmdb.tvshowscrew'))
         if item.get('movie_credits') and item.get('tv_credits'):
-            infoproperties['numitems.tmdb.cast'] = infoproperties.get('numitems.tmdb.moviescast') + infoproperties.get('numitems.tmdb.tvshowscast')
-            infoproperties['numitems.tmdb.crew'] = infoproperties.get('numitems.tmdb.moviescrew') + infoproperties.get('numitems.tmdb.tvshowscrew')
-            infoproperties['numitems.tmdb'] = infoproperties.get('numitems.tmdb.cast') + infoproperties.get('numitems.tmdb.crew')
+            infoproperties['numitems.tmdb.cast'] = utils.try_parse_int(infoproperties.get('numitems.tmdb.moviescast')) + utils.try_parse_int(infoproperties.get('numitems.tmdb.tvshowscast'))
+            infoproperties['numitems.tmdb.crew'] = utils.try_parse_int(infoproperties.get('numitems.tmdb.moviescrew')) + utils.try_parse_int(infoproperties.get('numitems.tmdb.tvshowscrew'))
+            infoproperties['numitems.tmdb'] = utils.try_parse_int(infoproperties.get('numitems.tmdb.cast')) + utils.try_parse_int(infoproperties.get('numitems.tmdb.crew'))
         if item.get('belongs_to_collection'):
             infoproperties['set.tmdb_id'] = item.get('belongs_to_collection').get('id')
             infoproperties['set.name'] = item.get('belongs_to_collection').get('name')
