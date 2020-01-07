@@ -254,11 +254,13 @@ class Container(Plugin):
             self.get_userdiscover_prop(name, 'Label', clearproperty=True)
 
     def add_userdiscover_method_property(self, header, tmdbtype, usedetails, old_label=None, old_value=None):
-        if old_label and old_value and not xbmcgui.Dialog().yesno(
-                '{} Exists'.format(tmdbtype.capitalize()),
-                'A value has already been set for this parameter:', old_label,
-                'Do you wish to clear the existing items first before adding additional items?',
-                yeslabel='Clear Items', nolabel='Add Items'):
+        if old_label and old_value:
+            if xbmcgui.Dialog().yesno(
+                    '{} Exists'.format(tmdbtype.capitalize()),
+                    'A value has already been set for this parameter:', old_label,
+                    'Do you wish to clear the existing items or add more?',
+                    yeslabel='Clear Items', nolabel='Add Items'):
+                return
             self.new_property_label = old_label
             self.new_property_value = old_value
 
