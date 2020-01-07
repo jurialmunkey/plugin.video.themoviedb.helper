@@ -180,7 +180,7 @@ class TMDb(RequestAPI):
             infoproperties['numitems.tmdb.tvshowscast'] = len(item.get('tv_credits', {}).get('cast', [])) or 0
             infoproperties['numitems.tmdb.tvshowscrew'] = len(item.get('tv_credits', {}).get('crew', [])) or 0
             infoproperties['numitems.tmdb.tvshows'] = utils.try_parse_int(infoproperties.get('numitems.tmdb.tvshowscast')) + utils.try_parse_int(infoproperties.get('numitems.tmdb.tvshowscrew'))
-        if item.get('movie_credits') and item.get('tv_credits'):
+        if item.get('movie_credits') or item.get('tv_credits'):
             infoproperties['numitems.tmdb.cast'] = utils.try_parse_int(infoproperties.get('numitems.tmdb.moviescast')) + utils.try_parse_int(infoproperties.get('numitems.tmdb.tvshowscast'))
             infoproperties['numitems.tmdb.crew'] = utils.try_parse_int(infoproperties.get('numitems.tmdb.moviescrew')) + utils.try_parse_int(infoproperties.get('numitems.tmdb.tvshowscrew'))
             infoproperties['numitems.tmdb'] = utils.try_parse_int(infoproperties.get('numitems.tmdb.cast')) + utils.try_parse_int(infoproperties.get('numitems.tmdb.crew'))
@@ -379,7 +379,7 @@ class TMDb(RequestAPI):
 
     def get_detailed_item(self, itemtype, tmdb_id, season=None, episode=None, cache_only=False, cache_refresh=False):
         extra_request = None
-        cache_name = '{0}.TMDb.v222.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
+        cache_name = '{0}.TMDb.v2_2_10.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
         cache_name = '{0}.Season{1}'.format(cache_name, season) if season else cache_name
         cache_name = '{0}.Episode{1}'.format(cache_name, episode) if season and episode else cache_name
         itemdict = self.get_cache(cache_name) if not cache_refresh else None
