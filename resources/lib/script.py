@@ -11,7 +11,6 @@ from resources.lib.downloader import Downloader
 from resources.lib.traktapi import TraktAPI
 from resources.lib.plugin import Plugin
 from resources.lib.player import Player
-from resources.lib.kodilibrary import KodiLibrary
 from resources.lib.service import ServiceMonitor
 
 
@@ -27,6 +26,7 @@ class Script(Plugin):
         self.added_path = None
         self.prefixpath = '{0}Path.'.format(self.prefixname)
         self.prefixlock = '{0}Locked'.format(self.prefixname)
+        self.prefixquery = '{0}Query'.format(self.prefixname)
         self.prefixcurrent = '{0}Current'.format(self.prefixpath)
         self.prefixposition = '{0}Position'.format(self.prefixname)
         self.prefixinstance = '{0}Instance'.format(self.prefixname)
@@ -256,6 +256,8 @@ class Script(Plugin):
         url = url.replace('info=play', 'info=details')
         url = url.replace('info=seasons', 'info=details')
         url = '{0}&{1}'.format(url, 'extended=True') if 'extended=True' not in url else url
+        if url == self.home.getProperty(self.prefixcurrent):
+            return  # Already added so let's quit as user probably clicked twice
         self.position = self.get_position() + 1
         self.set_props(self.position, url)
         self.lock_path(self.params.get('prevent_del'))
@@ -268,14 +270,15 @@ class Script(Plugin):
             if not item:
                 return
             tmdb_id = self.tmdb.get_tmdb_id(self.params.get('type'), query=item, selectdialog=True)
-            if tmdb_id:
-                self.position = self.get_position() + 1
-                url = 'plugin://plugin.video.themoviedb.helper/?info=details&amp;type={0}&amp;tmdb_id={1}'.format(self.params.get('type'), tmdb_id)
-                self.set_props(self.position, url)
-                self.lock_path(self.params.get('prevent_del'))
-            else:
+            if not tmdb_id:
                 utils.kodi_log('Unable to find TMDb ID!\nQuery: {0} Type: {1}'.format(self.params.get('add_query'), self.params.get('type')), 1)
                 return
+            url = 'plugin://plugin.video.themoviedb.helper/?info=details&amp;type={0}&amp;tmdb_id={1}'.format(self.params.get('type'), tmdb_id)
+            if url == self.home.getProperty(self.prefixcurrent):
+                return  # Already added so let's quit as user probably clicked twice
+            self.position = self.get_position() + 1
+            self.set_props(self.position, url)
+            self.lock_path(self.params.get('prevent_del'))
         self.call_auto()
 
     def add_prop(self):
