@@ -253,20 +253,30 @@ class Container(Plugin):
             self.get_userdiscover_prop(name, clearproperty=True)
             self.get_userdiscover_prop(name, 'Label', clearproperty=True)
 
-    def add_userdiscover_method_property(self, header, tmdbtype, usedetails):
+    def add_userdiscover_method_property(self, header, tmdbtype, usedetails, old_label=None, old_value=None):
+        if old_label and old_value and not xbmcgui.Dialog().yesno(
+                '{} Exists'.format(tmdbtype.capitalize()),
+                'A value has already been set for this parameter:', old_label,
+                'Do you wish to clear the existing items first before adding additional items?',
+                yeslabel='Clear Items', nolabel='Add Items'):
+            self.new_property_label = old_label
+            self.new_property_value = old_value
+
         new_label = xbmcgui.Dialog().input(header)
         if not new_label:
             return
+
         new_value = self.tmdb.get_tmdb_id(
             tmdbtype, query=new_label, selectdialog=True, longcache=True, usedetails=usedetails, returntuple=True)
         if not new_value:
             if xbmcgui.Dialog().yesno('No Value Added', 'TMDb ID for {} not found or none selected.\nDo you want to add another value?'.format(new_label)):
                 self.add_userdiscover_method_property(header, tmdbtype, usedetails)
             return
+
         new_value = (utils.try_encode_string(new_value[0]), new_value[1])
         self.new_property_label = '{0} / {1}'.format(self.new_property_label, new_value[0]) if self.new_property_label else new_value[0]
         self.new_property_value = '{0} / {1}'.format(self.new_property_value, new_value[1]) if self.new_property_value else '{}'.format(new_value[1])
-        if xbmcgui.Dialog().yesno('Added {}'.format(new_value[0]), 'Items: {}\nDo you want to add another value?'.format(self.new_property_label)):
+        if xbmcgui.Dialog().yesno('Added {}'.format(new_value[0]), '{}\nDo you want to add another value?'.format(self.new_property_label)):
             self.add_userdiscover_method_property(header, tmdbtype, usedetails)
 
     def set_userdiscover_separator_property(self):
@@ -327,7 +337,8 @@ class Container(Plugin):
             tmdbtype = 'person'
             usedetails = True
         header = '{0}{1}{2}'.format(header, label, affix)
-        defaultt = self.get_userdiscover_prop(method) or None
+        old_value = self.get_userdiscover_prop(method) or None
+        old_label = self.get_userdiscover_prop(method, 'Label') or None
 
         # Route Method
         if method == 'with_separator':
@@ -335,10 +346,10 @@ class Container(Plugin):
         elif '_genres' in method:
             self.set_userdiscover_genre_property()
         elif 'with_runtime' not in method and any(i in method for i in ['with_', 'without_']):
-            self.add_userdiscover_method_property(header, tmdbtype, usedetails)
+            self.add_userdiscover_method_property(header, tmdbtype, usedetails, old_label=old_label, old_value=old_value)
         else:
             self.new_property_label = self.new_property_value = xbmcgui.Dialog().input(
-                header, type=inputtype, defaultt=defaultt)
+                header, type=inputtype, defaultt=old_value)
 
     def set_userdiscover_sortby_property(self):
         sort_method_list = self.get_userdiscover_sortmethods()
