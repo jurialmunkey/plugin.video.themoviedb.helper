@@ -204,14 +204,15 @@ class Script(Plugin):
         self.reset_props()
         xbmc.executebuiltin('Dialog.Close({})'.format(ID_VIDEOINFO))
         close_id = utils.try_parse_int(self.params.get('close_dialog'))
-        if close_id:
+        if close_id and xbmc.getCondVisibility('Window.IsVisible({})'.format(close_id)):
             close_id = close_id + 10000 if close_id < 10000 else close_id
             try:
                 xbmcgui.Window(close_id).close()
             except Exception as exc:
                 utils.kodi_log(exc, 1)
-        if self.params.get('sendclick'):
-            xbmc.executebuiltin('SendClick({})'.format(self.params.get('sendclick')))
+        if self.params.get('playmedia'):
+            xbmc.executebuiltin('PlayMedia({})'.format(self.params.get('playmedia')))
+        self.call_window()
 
     def call_reset(self):
         self.reset_props()
