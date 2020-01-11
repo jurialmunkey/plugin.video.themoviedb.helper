@@ -1,4 +1,3 @@
-import sys
 import xbmc
 import xbmcgui
 from resources.lib.plugin import Plugin
@@ -225,6 +224,7 @@ class ServiceMonitor(Plugin):
 
     def get_dbtype(self):
         dbtype = xbmc.getInfoLabel('{0}DBTYPE'.format(self.containeritem))
+        dbtype = 'actor' if dbtype == 'video' and 'type=person' in xbmc.getInfoLabel('{0}FolderPath'.format(self.containeritem)) else dbtype
         return '{0}s'.format(dbtype) if dbtype else xbmc.getInfoLabel('Container.Content()') or ''
 
     def get_infolabel(self, infolabel):
