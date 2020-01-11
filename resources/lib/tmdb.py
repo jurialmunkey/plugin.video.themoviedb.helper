@@ -378,6 +378,8 @@ class TMDb(RequestAPI):
             return False
 
     def get_detailed_item(self, itemtype, tmdb_id, season=None, episode=None, cache_only=False, cache_refresh=False):
+        if not itemtype or not tmdb_id:
+            return {}
         extra_request = None
         cache_name = '{0}.TMDb.v2_2_10.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
         cache_name = '{0}.Season{1}'.format(cache_name, season) if season else cache_name
@@ -402,6 +404,8 @@ class TMDb(RequestAPI):
         """
         Lookup an item using an external id such as IMDb or TVDb
         """
+        if not itemtype or not external_id or not external_source:
+            return {}
         cache_name = '{0}.find.{1}.{2}'.format(self.cache_name, external_source, external_id)
         itemdict = self.get_cache(cache_name)
         if not itemdict:
@@ -416,6 +420,8 @@ class TMDb(RequestAPI):
         """
         Lookup external ids for an item using tmdb_id
         """
+        if not itemtype or not tmdb_id:
+            return {}
         request = self.get_request_lc(itemtype, tmdb_id, 'external_ids') or {}
         return request.get(external_id) if external_id else request
 
