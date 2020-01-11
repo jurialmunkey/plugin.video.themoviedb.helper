@@ -113,10 +113,10 @@ class ServiceMonitor(Plugin):
 
             tmdb_id = self.get_tmdb_id(tmdbtype, self.imdb_id, self.query, self.year)
             details = self.tmdb.get_detailed_item(tmdbtype, tmdb_id, season=self.season, episode=self.episode)
-            details = self.get_omdb_ratings(details) if self.dbtype == 'movies' else details
+            details = self.get_kodi_person_stats(details) if tmdbtype == 'person' else details
+            details = self.get_omdb_ratings(details) if tmdbtype == 'movie' else details
             details = self.get_trakt_ratings(
-                details, tmdbtype=tmdbtype, tmdb_id=tmdb_id, season=self.season,
-                episode=self.episode) if self.dbtype in ['movies', 'tvshows', 'seasons', 'episodes'] else details
+                details, tmdbtype, tmdb_id, self.season, self.episode) if tmdbtype in ['movie', 'tv'] else details
 
             if not details:
                 self.clear_properties()
