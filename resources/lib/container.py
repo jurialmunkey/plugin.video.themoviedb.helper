@@ -316,7 +316,7 @@ class Container(Plugin):
         label = self.params.get('label')
         tmdbtype = self.params.get('type')
         inputtype = xbmcgui.INPUT_ALPHANUM
-        if any(i in method for i in ['year', 'vote_', '_runtime']):
+        if any(i in method for i in ['year', 'vote_', '_runtime', '_networks']):
             header = 'Enter '
             inputtype = xbmcgui.INPUT_NUMERIC
         elif '_date' in method:
@@ -347,7 +347,7 @@ class Container(Plugin):
             self.set_userdiscover_separator_property()
         elif '_genres' in method:
             self.set_userdiscover_genre_property()
-        elif 'with_runtime' not in method and any(i in method for i in ['with_', 'without_']):
+        elif 'with_runtime' not in method and 'with_networks' not in method and any(i in method for i in ['with_', 'without_']):
             self.add_userdiscover_method_property(header, tmdbtype, usedetails, old_label=old_label, old_value=old_value)
         else:
             self.new_property_label = self.new_property_value = xbmcgui.Dialog().input(
