@@ -75,6 +75,33 @@ class Plugin(object):
                 item['infoproperties'] = utils.merge_two_dicts(item.get('infoproperties', {}), ratings)
         return item
 
+    def get_fanarttv_artwork(self, item, tmdbtype=None, tmdb_id=None, tvdb_id=None):
+        if not self.fanarttv or tmdbtype not in ['movie', 'tv']:
+            return item
+
+        artwork, lookup_id, func = None, None, None
+
+        if tmdbtype == 'tv':
+            lookup_id = tvdb_id or item.get('tvdb_id')
+            func = self.fanarttv.get_tvshow_allart_lc
+        elif tmdbtype == 'movie':
+            lookup_id = tmdb_id or item.get('tmdb_id')
+            func = self.fanarttv.get_movie_allart_lc
+
+        if not lookup_id or not func:
+            return item
+
+        artwork = func(lookup_id)
+
+        if artwork:
+            item['discart'] = item.get('discart') or artwork.get('discart') or ''
+            item['clearart'] = item.get('clearart') or artwork.get('clearart') or ''
+            item['clearlogo'] = item.get('clearlogo') or artwork.get('clearlogo') or ''
+            item['landscape'] = item.get('landscape') or artwork.get('landscape') or ''
+            item['banner'] = item.get('banner') or artwork.get('banner') or ''
+            item['fanart'] = item.get('fanart') or artwork.get('fanart') or ''
+        return item
+
     def get_db_info(self, info=None, tmdbtype=None, imdb_id=None, originaltitle=None, title=None, year=None, tvshowtitle=None, season=None, episode=None):
         dbid = None
         kodidatabase = None

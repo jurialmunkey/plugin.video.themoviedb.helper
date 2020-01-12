@@ -72,6 +72,9 @@ class FanartTV(RequestAPI):
     def get_movie_landscape(self, ftvid, *args, **kwargs):
         return self.get_artwork_best_lc(ftvid, 'movies', 'moviethumb', *args, **kwargs)
 
+    def get_movie_discart(self, ftvid, *args, **kwargs):
+        return self.get_artwork_best_lc(ftvid, 'movies', 'moviedisc', *args, **kwargs)
+
     def get_movie_banner(self, ftvid, *args, **kwargs):
         return self.get_artwork_best_lc(ftvid, 'movies', 'moviebanner', *args, **kwargs)
 
@@ -115,6 +118,7 @@ class FanartTV(RequestAPI):
             cache_only=cache_only, cache_refresh=cache_refresh, cache_name=cache_name)
 
     def get_movie_allart(self, ftvid, *args, **kwargs):
+        discart = self.get_movie_discart(ftvid, *args, **kwargs)
         clearart = self.get_movie_clearart(ftvid, *args, **kwargs)
         clearlogo = self.get_movie_clearlogo(ftvid, *args, **kwargs)
         banner = self.get_movie_banner(ftvid, *args, **kwargs)
@@ -122,7 +126,7 @@ class FanartTV(RequestAPI):
         fanart = self.get_movie_fanart(ftvid, *args, **kwargs)
         return {
             'clearart': clearart, 'clearlogo': clearlogo, 'banner': banner,
-            'landscape': landscape, 'fanart': fanart}
+            'discart': discart, 'landscape': landscape, 'fanart': fanart}
 
     def get_movie_allart_lc(self, ftvid, *args, **kwargs):
         cache_name = '{0}.fanarttv.movieall'.format(self.cache_name)

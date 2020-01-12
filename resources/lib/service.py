@@ -2,7 +2,9 @@ import xbmc
 import xbmcgui
 from resources.lib.plugin import Plugin
 import resources.lib.utils as utils
-_setmain = {'label', 'icon', 'poster', 'thumb', 'fanart', 'tmdb_id', 'imdb_id'}
+_setmain = {
+    'label', 'icon', 'poster', 'thumb', 'fanart', 'discart', 'clearart', 'clearlogo', 'landscape', 'banner',
+    'tmdb_id', 'imdb_id'}
 _setinfo = {
     'title', 'originaltitle', 'tvshowtitle', 'plot', 'rating', 'votes', 'premiered', 'year', 'imdbnumber', 'tagline',
     'status', 'episode', 'season', 'genre', 'set', 'studio', 'country', 'MPAA', 'director', 'writer', 'trailer'}
@@ -115,6 +117,7 @@ class ServiceMonitor(Plugin):
             details = self.tmdb.get_detailed_item(tmdbtype, tmdb_id, season=self.season, episode=self.episode)
             details = self.get_kodi_person_stats(details) if tmdbtype == 'person' else details
             details = self.get_omdb_ratings(details) if tmdbtype == 'movie' else details
+            details = self.get_fanarttv_artwork(details, tmdbtype)
             details = self.get_trakt_ratings(
                 details, tmdbtype, tmdb_id, self.season, self.episode) if tmdbtype in ['movie', 'tv'] else details
 
