@@ -97,6 +97,7 @@ class KodiLibrary(object):
             utils.try_parse_int(infoproperties.get('numitems.dbid.movies')) +
             utils.try_parse_int(infoproperties.get('numitems.dbid.tvshows')) +
             utils.try_parse_int(infoproperties.get('numitems.dbid.episodes')))
+        infoproperties = utils.del_empty_keys(infoproperties, ['N/A', '0.0', '0'])
         return infoproperties
 
     def get_info(self, info, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None, season=None, episode=None, fuzzy_match=False):

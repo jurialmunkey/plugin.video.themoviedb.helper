@@ -182,8 +182,8 @@ class Container(Plugin):
             if self.details_tv:
                 season_num = i.infolabels.get('season')
                 i.cast = self.details_tv.get('cast', []) + i.cast
-                i.infolabels = utils.merge_two_dicts(self.details_tv.get('infolabels', {}), utils.del_empty_keys(i.infolabels))
-                i.infoproperties = utils.merge_two_dicts(self.details_tv.get('infoproperties', {}), utils.del_empty_keys(i.infoproperties))
+                i.infolabels = utils.merge_two_dicts(self.details_tv.get('infolabels', {}), i.infolabels)
+                i.infoproperties = utils.merge_two_dicts(self.details_tv.get('infoproperties', {}), i.infoproperties)
                 i.poster = i.poster or self.details_tv.get('poster')
                 i.fanart = i.fanart if i.fanart and i.fanart != '{0}/fanart.jpg'.format(self.addonpath) else self.details_tv.get('fanart')
                 i.infolabels['season'] = season_num

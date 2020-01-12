@@ -146,8 +146,8 @@ class ListItem(object):
             return
 
         self.cast = details.get('cast', [])
-        self.infolabels = utils.merge_two_dicts(details.get('infolabels', {}), utils.del_empty_keys(self.infolabels))
-        self.infoproperties = utils.merge_two_dicts(details.get('infoproperties', {}), utils.del_empty_keys(self.infoproperties))
+        self.infolabels = utils.merge_two_dicts(details.get('infolabels', {}), self.infolabels)
+        self.infoproperties = utils.merge_two_dicts(details.get('infoproperties', {}), self.infoproperties)
 
     def get_omdb_details(self, omdb=None):
         if omdb and self.imdb_id and self.infolabels.get('mediatype') == 'movie':
@@ -173,8 +173,8 @@ class ListItem(object):
         self.poster = self.poster or details.get('poster', '')
         self.fanart = self.fanart or details.get('fanart', '')
         self.cast = self.cast or details.get('cast', [])
-        self.infolabels = utils.merge_two_dicts(details.get('infolabels', {}), utils.del_empty_keys(self.infolabels))
-        self.infoproperties = utils.merge_two_dicts(details.get('infoproperties', {}), utils.del_empty_keys(self.infoproperties))
+        self.infolabels = utils.merge_two_dicts(details.get('infolabels', {}), self.infolabels)
+        self.infoproperties = utils.merge_two_dicts(details.get('infoproperties', {}), self.infoproperties)
         self.streamdetails = details.get('streamdetails', {})
 
     def get_details(self, dbtype=None, tmdb=None, omdb=None, kodi=None):

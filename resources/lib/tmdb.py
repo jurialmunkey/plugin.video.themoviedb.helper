@@ -335,9 +335,11 @@ class TMDb(RequestAPI):
         infolabels = self.get_infolabels(item)
         infolabels = utils.merge_two_dicts(infolabels, self.get_trailer(item))
         infolabels = utils.merge_two_dicts(infolabels, self.get_director_writer(item))
+        infolabels = utils.del_empty_keys(infolabels, ['N/A', '0.0', '0'])
         infoproperties = self.get_infoproperties(item)
         infoproperties = utils.merge_two_dicts(infoproperties, self.get_cast_properties(cast))
         infoproperties = utils.merge_two_dicts(infoproperties, self.get_crew_properties(item))
+        infoproperties = utils.del_empty_keys(infoproperties, ['N/A', '0.0', '0'])
         return {
             'label': label, 'icon': icon, 'poster': poster, 'thumb': thumb, 'fanart': fanart,
             'cast': cast, 'infolabels': infolabels, 'infoproperties': infoproperties,
@@ -381,7 +383,7 @@ class TMDb(RequestAPI):
         if not itemtype or not tmdb_id:
             return {}
         extra_request = None
-        cache_name = '{0}.TMDb.v2_2_10.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
+        cache_name = '{0}.TMDb.v2_2_18.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
         cache_name = '{0}.Season{1}'.format(cache_name, season) if season else cache_name
         cache_name = '{0}.Episode{1}'.format(cache_name, episode) if season and episode else cache_name
         itemdict = self.get_cache(cache_name) if not cache_refresh else None
