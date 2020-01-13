@@ -120,7 +120,6 @@ class TMDb(RequestAPI):
         infoproperties['character'] = item.get('character')
         infoproperties['department'] = item.get('department')
         infoproperties['job'] = item.get('job')
-        infoproperties['known_for'] = item.get('known_for_department')
         infoproperties['role'] = item.get('character') or item.get('job') or item.get('department') or item.get('known_for_department')
         infoproperties['born'] = item.get('place_of_birth')
         infoproperties['tmdb_rating'] = item.get('vote_average')
