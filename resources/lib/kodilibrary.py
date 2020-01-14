@@ -199,14 +199,18 @@ class KodiLibrary(object):
         icon = thumb = item.get('thumbnail') or ''
         poster = item.get('art', {}).get('poster') or ''
         fanart = item.get('fanart') or item.get('art', {}).get('fanart') or ''
+        landscape = item.get('art', {}).get('landscape') or ''
+        clearlogo = item.get('art', {}).get('clearlogo') or ''
+        clearart = item.get('art', {}).get('clearart') or ''
+        discart = item.get('art', {}).get('discart') or ''
         cast = item.get('cast', [])
         streamdetails = item.get('streamdetails', {})
         infolabels = self.get_infolabels(item, key)
         infoproperties = self.get_infoproperties(item)
         return {
-            'label': label, 'icon': icon, 'poster': poster, 'thumb': thumb, 'fanart': fanart,
-            'cast': cast, 'infolabels': infolabels, 'infoproperties': infoproperties,
-            'streamdetails': streamdetails}
+            'label': label, 'icon': icon, 'poster': poster, 'thumb': thumb, 'fanart': fanart, 'landscape': landscape,
+            'clearlogo': clearlogo, 'clearart': clearart, 'discart': discart, 'cast': cast, 'infolabels': infolabels,
+            'infoproperties': infoproperties, 'streamdetails': streamdetails}
 
     def get_item_details(self, dbid=None, method=None, key=None, properties=None):
         if not dbid or not method or not key or not properties:

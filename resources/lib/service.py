@@ -56,7 +56,8 @@ class ServiceMonitor(Plugin):
 
             # media window is opened or widgetcontainer set - start listitem monitoring!
             elif xbmc.getCondVisibility(
-                    "Window.IsMedia | !String.IsEmpty(Window(Home).Property(TMDbHelper.WidgetContainer)) | Window.IsVisible(movieinformation)"):
+                    "Window.IsMedia | Window.IsVisible(MyPVRChannels.xml) | Window.IsVisible(MyPVRGuide.xml) | Window.IsVisible(DialogPVRInfo.xml) | "
+                    "!String.IsEmpty(Window(Home).Property(TMDbHelper.WidgetContainer)) | Window.IsVisible(movieinformation)"):
                 self.get_listitem()
                 self.kodimonitor.waitForAbort(0.15)
 
@@ -223,11 +224,13 @@ class ServiceMonitor(Plugin):
     def get_container(self):
         widgetid = utils.try_parse_int(self.home.getProperty('TMDbHelper.WidgetContainer'))
         self.container = 'Container({0}).'.format(widgetid) if widgetid else 'Container.'
-        self.containeritem = '{0}ListItem.'.format(self.container) if not xbmc.getCondVisibility("Window.IsVisible(movieinformation)") else 'ListItem.'
+        self.containeritem = '{0}ListItem.'.format(self.container) if not xbmc.getCondVisibility("Window.IsVisible(DialogPVRInfo.xml) | Window.IsVisible(movieinformation)") else 'ListItem.'
 
     def get_dbtype(self):
         dbtype = xbmc.getInfoLabel('{0}DBTYPE'.format(self.containeritem))
         dbtype = 'actor' if dbtype == 'video' and 'type=person' in xbmc.getInfoLabel('{0}FolderPath'.format(self.containeritem)) else dbtype
+        if xbmc.getCondVisibility("Window.IsVisible(DialogPVRInfo.xml) | Window.IsVisible(MyPVRChannels.xml) | Window.IsVisible(MyPVRGuide.xml)"):
+            dbtype = 'tvshow'
         return '{0}s'.format(dbtype) if dbtype else xbmc.getInfoLabel('Container.Content()') or ''
 
     def get_infolabel(self, infolabel):
