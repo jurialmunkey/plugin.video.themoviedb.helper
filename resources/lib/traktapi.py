@@ -402,7 +402,7 @@ class TraktAPI(RequestAPI):
 
     def get_sync(self, name, activity, itemtype, idtype=None, mode=None, items=None):
         if not self.authorize():
-            return
+            return {}
         if mode == 'add' or mode == 'remove':
             name = name + '/remove' if mode == 'remove' else name
             return self.get_api_request('{0}/sync/{1}'.format(self.req_api_url, name), headers=self.headers, postdata=dumps(items))
@@ -410,7 +410,7 @@ class TraktAPI(RequestAPI):
             cache_refresh = False if self.sync_activities(itemtype + 's', activity) else True
             self.sync[name] = self.get_request_lc('sync/', name, itemtype + 's', cache_refresh=cache_refresh)
         if not self.sync.get(name):
-            return
+            return {}
         if idtype:
             return {i.get(itemtype, {}).get('ids', {}).get(idtype) for i in self.sync.get(name) if i.get(itemtype, {}).get('ids', {}).get(idtype)}
         return self.sync.get(name)
