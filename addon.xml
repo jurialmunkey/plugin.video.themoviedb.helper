@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.themoviedb.helper"
-version="2.2.20"
+version="2.2.21"
 name="TheMovieDb Helper"
 provider-name="jurialmunkey">
 <requires>
@@ -43,6 +43,6 @@ provider-name="jurialmunkey">
     <screenshot>resources/screenshot-01.jpg</screenshot>
     <screenshot>resources/screenshot-02.jpg</screenshot>
   </assets>
-  <news>2.2.20 - Add option to hide unaired episodes/movies. Format unaired episode/movie labels to red italic[CR]2.2.19 - Additional artwork types from kodilibrary[CR]2.2.18 - Cleanup and clear some empty keys[CR]2.2.17 - Add person kodidb stats to service monitor[CR]2.2.16 - Fix service monitor for people[CR]2.2.14/5 - playmedia param for close dialog[CR]2.2.13 - Extra checks to prevent double adding[CR]2.2.11 - Add Rule improvements to Discover[CR]2.2.10 - Move stats to infoproperties[CR]2.2.9 - DB Stats for Person[CR]2.2.8 - Use select dialog instead of container for discover method[CR]2.2.7 - Add discover select boxes[CR]2.2.6 - Fix for unicode error in add_query params[CR]2.2.5 - Expose discover method for users[CR]2.2.4 - Cleanup for window manager service monitor[CR]2.2.3 - Add close dialog option[CR]2.2.2 - Add Gender Field[CR]2.2.1 - Additional Sets Properties[CR]2.2.0 - Call Auto method for handling extendedinfo experience</news>
+  <news>2.2.21 - Improvements to In-Progress[CR]2.2.20 - Add option to hide unaired episodes/movies. Format unaired episode/movie labels to red italic[CR]2.2.19 - Additional artwork types from kodilibrary[CR]2.2.18 - Cleanup and clear some empty keys[CR]2.2.17 - Add person kodidb stats to service monitor[CR]2.2.16 - Fix service monitor for people[CR]2.2.14/5 - playmedia param for close dialog[CR]2.2.13 - Extra checks to prevent double adding[CR]2.2.11 - Add Rule improvements to Discover[CR]2.2.10 - Move stats to infoproperties[CR]2.2.9 - DB Stats for Person[CR]2.2.8 - Use select dialog instead of container for discover method[CR]2.2.7 - Add discover select boxes[CR]2.2.6 - Fix for unicode error in add_query params[CR]2.2.5 - Expose discover method for users[CR]2.2.4 - Cleanup for window manager service monitor[CR]2.2.3 - Add close dialog option[CR]2.2.2 - Add Gender Field[CR]2.2.1 - Additional Sets Properties[CR]2.2.0 - Call Auto method for handling extendedinfo experience</news>
 </extension>
 </addon>

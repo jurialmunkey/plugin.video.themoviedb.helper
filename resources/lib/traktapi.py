@@ -233,10 +233,16 @@ class TraktAPI(RequestAPI):
         infoproperties['trakt_votes'] = '{:0,.0f}'.format(response.get('votes')) if response.get('votes') else ''
         return infoproperties
 
-    def get_mostwatched(self, userslug, tmdbtype, limit=None, islistitem=True):
-        history = self.get_response_json('users', userslug, 'watched', utils.type_convert(tmdbtype, 'trakt') + 's')
+    def get_mostwatched(self, userslug, tmdbtype, limit=None, islistitem=True, onlyshows=False):
+        extended = 'noseasons' if onlyshows else None
+        history = self.get_response_json('users', userslug, 'watched', utils.type_convert(tmdbtype, 'trakt') + 's', extended=extended)
         history = sorted(history, key=lambda i: i['plays'], reverse=True)
         return self.get_limitedlist(history, tmdbtype, limit, islistitem)
+
+    def get_recentlywatched_shows(self, userslug, limit=None, islistitem=True):
+        history = self.get_response_json('users', userslug, 'watched', 'shows', extended='noseasons')
+        history = sorted(history, key=lambda i: i['last_watched_at'], reverse=True)
+        return self.get_limitedlist(history, 'tv', limit, islistitem)
 
     def get_recentlywatched(self, userslug, tmdbtype, limit=None, islistitem=True, months=6):
         start_at = datetime.date.today() - datetime.timedelta(months * 365 / 12)
@@ -245,7 +251,8 @@ class TraktAPI(RequestAPI):
 
     def get_inprogress(self, userslug, limit=None, episodes=False):
         """
-        Looks at user's most recently watched 200 episodes in last 3 years
+        UPDATED: Now looks at all shows sorted by recently watched
+        OLD VERSION: Looked at user's most recently watched 200 episodes in last 3 years
         Adds each unique show to list in order then checks if show has an upnext episode
         Returns list of tmdb_ids representing shows with upnext episodes in recently watched order
         """
@@ -255,7 +262,8 @@ class TraktAPI(RequestAPI):
 
         n = 0
         utils.kodi_log('Getting In-Progress For Trakt User {0}'.format(userslug), 2)
-        for i in self.get_recentlywatched(userslug, 'tv', islistitem=False, months=36):
+        # for i in self.get_recentlywatched(userslug, 'tv', islistitem=False, months=36):
+        for i in self.get_recentlywatched_shows(userslug, islistitem=False):
             if limit and n >= limit:
                 break
             utils.kodi_log('In-Progress -- Searching Next Episode For:\n{0}'.format(i), 2)
