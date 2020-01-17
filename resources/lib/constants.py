@@ -98,7 +98,7 @@ BASEDIR_TMDB = [
     {
         'info': 'upcoming',
         'name': 'Upcoming{1}{0}',
-        'types': ['movie', 'tv'],
+        'types': ['movie'],
         'icon': '{0}/resources/icons/tmdb/upcoming.png'},
     {
         'info': 'trending_day',

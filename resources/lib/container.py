@@ -188,6 +188,14 @@ class Container(Plugin):
                 i.fanart = i.fanart if i.fanart and i.fanart != '{0}/fanart.jpg'.format(self.addonpath) else self.details_tv.get('fanart')
                 i.infolabels['season'] = season_num
 
+            if i.infolabels.get('premiered'):
+                if self.params.get('info') in ['details', 'seasons', 'trakt_calendar', 'trakt_myairing', 'trakt_anticipated']:
+                    pass  # Don't format label for plugin methods specifically about the future or details/seasons
+                elif datetime.datetime.strptime(i.infolabels.get('premiered'), '%Y-%m-%d') > datetime.datetime.now():
+                    i.label = '[COLOR=ffcc0000][I]{}[/I][/COLOR]'.format(i.label)
+                    if self.addon.getSettingBool('hide_unaired'):
+                        continue  # Don't add if option enabled to hide
+
             i.dbid = self.get_db_info(
                 info='dbid', tmdbtype=self.item_tmdbtype, imdb_id=i.imdb_id,
                 originaltitle=i.infolabels.get('originaltitle'), title=i.infolabels.get('title'), year=i.infolabels.get('year'),

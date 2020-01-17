@@ -11,6 +11,8 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32023]" type="enum" id="select_action" lvalues="1024|32022" default="0" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32039]" type="lsep"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32038]" type="bool" id="local_db" default="false" />
+        <setting label="Unaired Items" type="lsep"/>
+        <setting label="Hide unaired movies/episodes" type="bool" id="hide_unaired" default="false" />
     </category>
     <category label="$ADDON[plugin.video.themoviedb.helper 32017]">
         <setting label="$ADDON[plugin.video.themoviedb.helper 32029]" type="lsep"/>
