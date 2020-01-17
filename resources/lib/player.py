@@ -1,4 +1,3 @@
-import sys
 import xbmc
 import xbmcgui
 import xbmcvfs
@@ -233,7 +232,7 @@ class Player(Plugin):
         utils.kodi_log('Player -- Select box built with {0} actions'.format(len(self.actions)), 2)
 
     def playfile(self, file):
-        if file:
+        if file and file[-5:] != '.strm':
             xbmc.executebuiltin(u'PlayMedia({0})'.format(file))
             return file
 
