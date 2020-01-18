@@ -1,9 +1,113 @@
 import sys
 import xbmc
+import xbmcvfs
 import xbmcaddon
 import xbmcgui
 from resources.lib.traktapi import TraktAPI
+from resources.lib.kodilibrary import KodiLibrary
 import resources.lib.utils as utils
+
+
+def library_cleancontent_replacer(content, old, new):
+    content = content.replace(old, new)
+    return library_cleancontent_replacer(content, old, new) if old in content else content
+
+
+def library_cleancontent(content, details='info=play'):
+    content = content.replace('info=details', details)
+    content = content.replace('fanarttv=True', '')
+    content = content.replace('widget=True', '')
+    content = content.replace('localdb=True', '')
+    content = content.replace('nextpage=True', '')
+    content = library_cleancontent_replacer(content, '&amp;', '&')
+    content = library_cleancontent_replacer(content, '&&', '&')
+    content = library_cleancontent_replacer(content, '?&', '?')
+    return content
+
+
+def library_createfile(filename, content, *args):
+    """
+    Create the file and folder structure: filename=.strm file, content= content of file.
+    *args = folders to create.
+    """
+    path = ''
+    content = library_cleancontent(content)
+    for folder in args:
+        path = '{}/{}'.format(path, folder) if path else folder
+    if not path:
+        return utils.kodi_log('ADD LIBRARY -- No path specified!', 1)
+    if not content:
+        return utils.kodi_log('ADD LIBRARY -- No content specified!', 1)
+    if not filename:
+        return utils.kodi_log('ADD LIBRARY -- No filename specified!', 1)
+    if not xbmcvfs.exists(path) and not xbmcvfs.mkdirs(path):
+        return utils.kodi_log('ADD LIBRARY -- Failed to create path:\n{}'.format(path), 1)
+    filename = '{}.strm'.format(filename)
+    filepath = '{}/{}'.format(path, filename)
+    f = xbmcvfs.File(filepath, 'w')
+    f.write(str(content))
+    f.close()
+    utils.kodi_log('ADD LIBRARY -- Successfully added:\n{}\n{}'.format(filepath, content), 1)
+
+
+def library():
+    with utils.busy_dialog():
+        title = sys.listitem.getVideoInfoTag().getTitle()
+        dbtype = sys.listitem.getVideoInfoTag().getMediaType()
+        basedir = 'special://profile/addon_data/plugin.video.themoviedb.helper/'
+        basedir_movie = 'movies'
+        basedir_tv = 'tvshows'
+
+        # Setup our folders and file names
+        if dbtype == 'movie':
+            folder = '{} ({})'.format(title, sys.listitem.getVideoInfoTag().getYear())
+            movie_name = '{} ({})'.format(title, sys.listitem.getVideoInfoTag().getYear())
+            library_createfile(movie_name, sys.listitem.getPath(), basedir, basedir_movie, folder)
+
+        elif dbtype == 'episode':
+            folder = sys.listitem.getVideoInfoTag().getTVShowTitle()
+            season_name = 'Season {}'.format(sys.listitem.getVideoInfoTag().getSeason())
+            episode_name = 'S{:02d}E{:02d} - {}'.format(
+                utils.try_parse_int(sys.listitem.getVideoInfoTag().getSeason()),
+                utils.try_parse_int(sys.listitem.getVideoInfoTag().getEpisode()),
+                title)
+            library_createfile(episode_name, sys.listitem.getPath(), basedir, basedir_tv, folder, season_name)
+
+        elif dbtype == 'tvshow':
+            folder = sys.listitem.getVideoInfoTag().getTVShowTitle()
+            seasons = library_cleancontent(sys.listitem.getPath(), details='info=seasons')
+            seasons = KodiLibrary().get_directory(seasons)
+            for season in seasons:
+                if not season.get('season'):
+                    continue  # Skip special seasons S00
+                season_name = 'Season {}'.format(season.get('season'))
+                episodes = KodiLibrary().get_directory(season.get('file'))
+                for episode in episodes:
+                    if not episode.get('episode'):
+                        continue  # Skip special episodes E00
+                    episode_path = library_cleancontent(episode.get('file'))
+                    episode_name = 'S{:02d}E{:02d} - {}'.format(
+                        utils.try_parse_int(episode.get('season')),
+                        utils.try_parse_int(episode.get('episode')),
+                        episode.get('title'))
+                    library_createfile(episode_name, episode_path, basedir, basedir_tv, folder, season_name)
+
+        elif dbtype == 'season':
+            folder = sys.listitem.getVideoInfoTag().getTVShowTitle()
+            episodes = KodiLibrary().get_directory(sys.listitem.getPath())
+            season_name = 'Season {}'.format(sys.listitem.getVideoInfoTag().getSeason())
+            for episode in episodes:
+                if not episode.get('episode'):
+                    continue  # Skip special episodes E00
+                episode_path = library_cleancontent(episode.get('file'))
+                episode_name = 'S{:02d}E{:02d} - {}'.format(
+                    utils.try_parse_int(episode.get('season')),
+                    utils.try_parse_int(episode.get('episode')),
+                    episode.get('title'))
+                library_createfile(episode_name, episode_path, basedir, basedir_tv, folder, season_name)
+
+        else:
+            return
 
 
 def action(action):
@@ -15,6 +119,8 @@ def action(action):
         func = _traktapi.sync_collection
     elif action == 'watchlist':
         func = _traktapi.sync_watchlist
+    elif action == 'library':
+        return library()
     else:
         return
 
