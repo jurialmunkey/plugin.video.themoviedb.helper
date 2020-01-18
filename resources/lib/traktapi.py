@@ -382,6 +382,24 @@ class TraktAPI(RequestAPI):
         item = self.get_response_json('search', id_type, id_num, '?' + item_type)
         return item[0].get(item_type, {}).get('ids', {}).get('slug')
 
+    def get_collection(self, tmdbtype, page=1, limit=20):
+        items = []
+        if not self.tmdb or not self.authorize():
+            return items
+        collection = self.sync_collection(utils.type_convert(tmdbtype, 'trakt'))
+        collection = sorted(collection, key=lambda i: i[utils.type_convert(tmdbtype, 'trakt')]['title'], reverse=False)
+        start_at = limit * (page - 1)
+        end_at = start_at + limit
+        for i in collection[start_at:end_at]:
+            i = i.get(utils.type_convert(tmdbtype, 'trakt'))
+            i_tmdb = i.get('ids', {}).get('tmdb', '')
+            item = ListItem(library=self.library, **self.tmdb.get_detailed_item(tmdbtype, i_tmdb))
+            if item and item.label != 'N/A':
+                items.append(item)
+        if items and collection[end_at:]:  # If there's more items add the next page item
+            items.append(ListItem(library=self.library, label='Next Page', nextpage=page + 1))
+        return items
+
     def sync_activities(self, itemtype, listtype):
         """ Checks if itemtype.listtype has been updated since last check """
         if not self.authorize():

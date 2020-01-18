@@ -504,6 +504,14 @@ class Container(Plugin):
             listitem.create_listitem(self.handle, **listitem.url) if not self.params.get('random') else self.randomlist.append(listitem)
         self.finish_container()
 
+    def list_traktcollection(self):
+        items = []
+        if self.params.get('type') in ['movie', 'tv']:
+            items = TraktAPI(tmdb=self.tmdb, login=True).get_collection(
+                self.params.get('type'), utils.try_parse_int(self.params.get('page', 1)))
+        self.item_tmdbtype = self.params.get('type')
+        self.list_items(items, url=self.params)
+
     def list_trakt(self):
         if not self.params.get('type'):
             return
@@ -822,6 +830,8 @@ class Container(Plugin):
             self.list_traktupnext()
         elif self.params.get('info') == 'trakt_calendar':
             self.list_traktcalendar()
+        elif self.params.get('info') == 'trakt_collection':
+            self.list_traktcollection()
         elif self.params.get('info') in constants.TRAKT_USERLISTS:
             self.list_traktuserlists()
         elif self.params.get('info') in constants.TRAKT_LISTS:

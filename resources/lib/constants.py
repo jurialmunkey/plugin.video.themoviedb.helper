@@ -143,8 +143,13 @@ BASEDIR_TMDB = [
 
 BASEDIR_TRAKT = [
     {
+        'info': 'trakt_collection',
+        'name': '{0}{1}Collection',
+        'icon': '{0}/resources/icons/trakt/watchlist.png',
+        'types': ['movie', 'tv']},
+    {
         'info': 'trakt_watchlist',
-        'name': 'Watchlist{1}{0}',
+        'name': '{0}{1}Watchlist',
         'icon': '{0}/resources/icons/trakt/watchlist.png',
         'types': ['movie', 'tv']},
     {
