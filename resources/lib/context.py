@@ -25,11 +25,12 @@ def library_cleancontent(content, details='info=play'):
     return content
 
 
-def library_createfile(filename, content, *args):
+def library_createfile(filename, content, *args, **kwargs):
     """
     Create the file and folder structure: filename=.strm file, content= content of file.
     *args = folders to create.
     """
+    file_ext = kwargs.pop('file_ext', 'strm')
     path = 'special://profile/addon_data/plugin.video.themoviedb.helper'
     content = library_cleancontent(content)
     for folder in args:
@@ -43,12 +44,18 @@ def library_createfile(filename, content, *args):
         return utils.kodi_log('ADD LIBRARY -- No filename specified!', 1)
     if not xbmcvfs.exists(path) and not xbmcvfs.mkdirs(path):
         return utils.kodi_log('ADD LIBRARY -- Failed to create path:\n{}'.format(path), 1)
-    filename = '{}.strm'.format(utils.validify_filename(filename))
+    filename = '{}.{}'.format(utils.validify_filename(filename), file_ext)
     filepath = '{}/{}'.format(path, filename)
     f = xbmcvfs.File(filepath, 'w')
     f.write(str(content))
     f.close()
     utils.kodi_log('ADD LIBRARY -- Successfully added:\n{}\n{}'.format(filepath, content), 1)
+
+
+def library_create_nfo(tmdbtype, tmdb_id, *args):
+    filename = 'movie' if tmdbtype == 'movie' else 'tvshow'
+    content = 'https://www.themoviedb.org/{}/{}'.format(tmdbtype, tmdb_id)
+    library_createfile(filename, content, file_ext='nfo', *args)
 
 
 def library():
@@ -63,6 +70,7 @@ def library():
             folder = '{} ({})'.format(title, sys.listitem.getVideoInfoTag().getYear())
             movie_name = '{} ({})'.format(title, sys.listitem.getVideoInfoTag().getYear())
             library_createfile(movie_name, sys.listitem.getPath(), basedir_movie, folder)
+            library_create_nfo('movie', sys.listitem.getProperty('tmdb_id'), basedir_movie, folder)
 
         elif dbtype == 'episode':
             folder = sys.listitem.getVideoInfoTag().getTVShowTitle()
@@ -77,6 +85,7 @@ def library():
             folder = sys.listitem.getVideoInfoTag().getTVShowTitle() or title
             seasons = library_cleancontent(sys.listitem.getPath(), details='info=seasons')
             seasons = KodiLibrary().get_directory(seasons)
+            library_create_nfo('tv', sys.listitem.getProperty('tmdb_id'), basedir_tv, folder)
             for season in seasons:
                 if not season.get('season'):
                     continue  # Skip special seasons S00
