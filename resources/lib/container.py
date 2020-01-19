@@ -584,11 +584,33 @@ class Container(Plugin):
         self.params['tmdb_id'] = self.get_tmdb_id(**self.params)
 
     def list_play(self):
-        if not self.params.get('type') or not self.params.get('tmdb_id'):
+	    tmdb_id = ''
+	    if self.params.get('query') and self.params.get('type') == 'episode':
+		    tmdb_id = self.tmdb.get_tmdb_id(itemtype='tv', query=self.params.get('query'))
+
+	    if self.params.get('query') and self.params.get('type') == 'movie':
+		    movie_title = self.params.get('query')
+		    movie_year = self.params.get('year')
+		    tmdb_id = self.tmdb.get_tmdb_id(itemtype='movie', query=self.params.get('query'))
+
+	    if self.params.get('tvdb_id') and self.params.get('type') == 'episode':
+		    tvdb_id = self.params.get('tvdb_id')
+		    tmdb_id = self.tmdb.get_tmdb_id(itemtype='tv', tvdb_id=tvdb_id)
+
+	    if tmdb_id <> '' and self.params.get('type') == 'episode':
+		    pass
+        elif not self.params.get('type') or not self.params.get('tmdb_id'):
             return
         season, episode = self.params.get('season'), self.params.get('episode')
-        command = 'RunScript(plugin.video.themoviedb.helper,play={0},tmdb_id={1}{{0}})'.format(self.params.get('type'), self.params.get('tmdb_id'))
+        
+        if self.params.get('tvdb_id') or self.params.get('query') and self.params.get('type') == 'episode':
+		    command = 'RunScript(plugin.video.themoviedb.helper,play={0},tmdb_id={1}{{0}})'.format(self.params.get('type'), tmdb_id)
+		    self.details_tv = self.tmdb.get_detailed_item('tv', tmdb_id, season=season, episode=episode)	
+	    else:
+	        command = 'RunScript(plugin.video.themoviedb.helper,play={0},tmdb_id={1}{{0}})'.format(self.params.get('type'), self.params.get('tmdb_id'))
+		self.details_tv = self.tmdb.get_detailed_item('tv', self.params.get('tmdb_id'), season=season, episode=episode)
         command = command.format(',season={0},episode={1}'.format(season, episode) if season and episode else '')
+	
         xbmc.executebuiltin(command)
 
     def list_search(self):
