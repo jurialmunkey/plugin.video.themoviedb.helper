@@ -30,9 +30,10 @@ def library_createfile(filename, content, *args):
     Create the file and folder structure: filename=.strm file, content= content of file.
     *args = folders to create.
     """
-    path = ''
+    path = 'special://profile/addon_data/plugin.video.themoviedb.helper'
     content = library_cleancontent(content)
     for folder in args:
+        folder = utils.validify_filename(folder)
         path = '{}/{}'.format(path, folder) if path else folder
     if not path:
         return utils.kodi_log('ADD LIBRARY -- No path specified!', 1)
@@ -42,7 +43,7 @@ def library_createfile(filename, content, *args):
         return utils.kodi_log('ADD LIBRARY -- No filename specified!', 1)
     if not xbmcvfs.exists(path) and not xbmcvfs.mkdirs(path):
         return utils.kodi_log('ADD LIBRARY -- Failed to create path:\n{}'.format(path), 1)
-    filename = '{}.strm'.format(filename)
+    filename = '{}.strm'.format(utils.validify_filename(filename))
     filepath = '{}/{}'.format(path, filename)
     f = xbmcvfs.File(filepath, 'w')
     f.write(str(content))
@@ -52,9 +53,8 @@ def library_createfile(filename, content, *args):
 
 def library():
     with utils.busy_dialog():
-        title = sys.listitem.getVideoInfoTag().getTitle()
+        title = utils.validify_filename(sys.listitem.getVideoInfoTag().getTitle())
         dbtype = sys.listitem.getVideoInfoTag().getMediaType()
-        basedir = 'special://profile/addon_data/plugin.video.themoviedb.helper/'
         basedir_movie = 'movies'
         basedir_tv = 'tvshows'
 
@@ -62,7 +62,7 @@ def library():
         if dbtype == 'movie':
             folder = '{} ({})'.format(title, sys.listitem.getVideoInfoTag().getYear())
             movie_name = '{} ({})'.format(title, sys.listitem.getVideoInfoTag().getYear())
-            library_createfile(movie_name, sys.listitem.getPath(), basedir, basedir_movie, folder)
+            library_createfile(movie_name, sys.listitem.getPath(), basedir_movie, folder)
 
         elif dbtype == 'episode':
             folder = sys.listitem.getVideoInfoTag().getTVShowTitle()
@@ -71,10 +71,10 @@ def library():
                 utils.try_parse_int(sys.listitem.getVideoInfoTag().getSeason()),
                 utils.try_parse_int(sys.listitem.getVideoInfoTag().getEpisode()),
                 title)
-            library_createfile(episode_name, sys.listitem.getPath(), basedir, basedir_tv, folder, season_name)
+            library_createfile(episode_name, sys.listitem.getPath(), basedir_tv, folder, season_name)
 
         elif dbtype == 'tvshow':
-            folder = sys.listitem.getVideoInfoTag().getTVShowTitle()
+            folder = sys.listitem.getVideoInfoTag().getTVShowTitle() or title
             seasons = library_cleancontent(sys.listitem.getPath(), details='info=seasons')
             seasons = KodiLibrary().get_directory(seasons)
             for season in seasons:
@@ -89,8 +89,8 @@ def library():
                     episode_name = 'S{:02d}E{:02d} - {}'.format(
                         utils.try_parse_int(episode.get('season')),
                         utils.try_parse_int(episode.get('episode')),
-                        episode.get('title'))
-                    library_createfile(episode_name, episode_path, basedir, basedir_tv, folder, season_name)
+                        utils.validify_filename(episode.get('title')))
+                    library_createfile(episode_name, episode_path, basedir_tv, folder, season_name)
 
         elif dbtype == 'season':
             folder = sys.listitem.getVideoInfoTag().getTVShowTitle()
@@ -103,8 +103,8 @@ def library():
                 episode_name = 'S{:02d}E{:02d} - {}'.format(
                     utils.try_parse_int(episode.get('season')),
                     utils.try_parse_int(episode.get('episode')),
-                    episode.get('title'))
-                library_createfile(episode_name, episode_path, basedir, basedir_tv, folder, season_name)
+                    utils.validify_filename(episode.get('title')))
+                library_createfile(episode_name, episode_path, basedir_tv, folder, season_name)
 
         else:
             return

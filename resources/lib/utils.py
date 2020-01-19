@@ -3,10 +3,11 @@ import time
 import xbmc
 import xbmcgui
 import xbmcaddon
+import unicodedata
 from datetime import datetime
 from copy import copy
 from contextlib import contextmanager
-from resources.lib.constants import TYPE_CONVERSION
+from resources.lib.constants import TYPE_CONVERSION, VALID_FILECHARS
 _addonlogname = '[plugin.video.themoviedb.helper]\n'
 _addon = xbmcaddon.Addon()
 _debuglogging = _addon.getSettingBool('debug_logging')
@@ -19,6 +20,18 @@ def busy_dialog():
         yield
     finally:
         xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
+
+
+def validify_filename(filename):
+    try:
+        filename = unicode(filename, 'utf-8')
+    except NameError:  # unicode is a default on python 3
+        pass
+    except TypeError:  # already unicode
+        pass
+    filename = str(unicodedata.normalize('NFD', filename).encode('ascii', 'ignore').decode("utf-8"))
+    filename = ''.join(c for c in filename if c in VALID_FILECHARS)
+    return filename
 
 
 def type_convert(original, converted):
