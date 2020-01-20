@@ -232,9 +232,17 @@ class Player(Plugin):
         utils.kodi_log('Player -- Select box built with {0} actions'.format(len(self.actions)), 2)
 
     def playfile(self, file):
-        if file and file[-5:] != '.strm':
-            xbmc.executebuiltin(u'PlayMedia({0})'.format(file))
-            return file
+        if not file:
+            return
+        if file.endswith('.strm'):
+            f = xbmcvfs.File(file)
+            contents = f.read()
+            f.close()
+            if contents.startswith('plugin://plugin.video.themoviedb.helper'):
+                utils.kodi_log('PLAYER -- Skipping local TMDbHelper .strm file:\n{}\n{}'.format(file, contents), 1)
+                return
+        xbmc.executebuiltin(u'PlayMedia({0})'.format(file))
+        return file
 
     def playmovie(self):
         fuzzy_match = self.addon.getSettingBool('fuzzymatch_movie')
