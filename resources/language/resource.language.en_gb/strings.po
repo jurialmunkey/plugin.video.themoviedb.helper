@@ -362,6 +362,31 @@ msgctxt "#32071"
 msgid "Female"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32072"
+msgid "Unaired Items"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32073"
+msgid "Hide unaired movies/episodes"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32074"
+msgid "Library Integration"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32075"
+msgid "TV"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32076"
+msgid "Update library after adding items"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
