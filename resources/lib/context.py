@@ -28,7 +28,6 @@ def library_cleancontent(content, details='info=play'):
 
 def library_createpath(path):
     if xbmcvfs.exists(path):
-        utils.kodi_log('ADD LIBRARY -- Path exists:\n{}'.format(path), 1)
         return path
     if xbmcvfs.mkdirs(path):
         utils.kodi_log('ADD LIBRARY -- Created path:\n{}'.format(path), 1)
