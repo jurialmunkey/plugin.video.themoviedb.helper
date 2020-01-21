@@ -21,6 +21,8 @@
         <setting label="$LOCALIZE[342]" type="folder" id="movies_library" source="" option="writeable" default="special://profile/addon_data/plugin.video.themoviedb.helper/movies/"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32075]" type="folder" id="tvshows_library" source="" option="writeable" default="special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32076]" type="bool" id="auto_update" default="true" />
+        <setting label="$LOCALIZE[10039]" type="lsep"/>
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32077]" type="bool" id="ignore_folderchecking" default="false" />
     </category>
     <category label="$ADDON[plugin.video.themoviedb.helper 32017]">
         <setting label="$ADDON[plugin.video.themoviedb.helper 32029]" type="lsep"/>

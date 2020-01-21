@@ -26,18 +26,16 @@ def library_cleancontent(content, details='info=play'):
     return content
 
 
-def library_createpath(path, attempts=1):
-    msgtxt = 'ADD LIBRARY -- Created path on attempt {}:\n{}'.format(attempts, path)
+def library_createpath(path):
     if xbmcvfs.exists(path):
-        utils.kodi_log(msgtxt, 1)
+        utils.kodi_log('ADD LIBRARY -- Path exists:\n{}'.format(path), 1)
         return path
     if xbmcvfs.mkdirs(path):
-        utils.kodi_log(msgtxt, 1)
+        utils.kodi_log('ADD LIBRARY -- Created path:\n{}'.format(path), 1)
         return path
-    if attempts > 2:
-        return
-    xbmc.Monitor().waitForAbort(1)
-    library_createpath(path, attempts + 1)
+    if _addon.getSettingBool('ignore_folderchecking'):
+        utils.kodi_log('ADD LIBRARY -- xbmcvfs reports folder does NOT exist:\n{}\nIGNORING ERROR: User set folder checking to ignore'.format(path), 1)
+        return path
 
 
 def library_createfile(filename, content, *args, **kwargs):
@@ -59,7 +57,12 @@ def library_createfile(filename, content, *args, **kwargs):
     if not filename:
         return utils.kodi_log('ADD LIBRARY -- No filename specified!', 1)
     if not library_createpath(path):
-        return utils.kodi_log('ADD LIBRARY -- Failed to create path:\n{}'.format(path), 1)
+        xbmcgui.Dialog().ok(
+            'Add to Library',
+            'XBMCVFS reports unable to create path [B]{}[/B]'.format(path),
+            'If error persists and the folders are created correctly, '
+            'please disable folder path creation checking in TMDBHelper settings.')
+        return utils.kodi_log('ADD LIBRARY -- XBMCVFS unable to create path:\n{}'.format(path), 1)
     filepath = '{}{}.{}'.format(path, utils.validify_filename(filename), file_ext)
     f = xbmcvfs.File(filepath, 'w')
     f.write(str(content))

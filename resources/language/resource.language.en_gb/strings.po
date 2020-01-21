@@ -387,6 +387,11 @@ msgctxt "#32076"
 msgid "Update library after adding items"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32077"
+msgid "Ignore folder creation checks"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
