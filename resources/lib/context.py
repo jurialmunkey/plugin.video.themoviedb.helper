@@ -170,7 +170,7 @@ def action(action):
         return
 
     with utils.busy_dialog():
-        trakt_type = utils.type_convert(dbtype, 'trakt')
+        trakt_type = utils.type_convert(tmdb_type, 'trakt')
         slug_type = 'show' if dbtype == 'episode' else trakt_type
         slug = _traktapi.get_traktslug(slug_type, 'tmdb', tmdb_id)
         season = sys.listitem.getVideoInfoTag().getSeason() if dbtype == 'episode' else None
