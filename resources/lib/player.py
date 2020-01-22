@@ -42,72 +42,72 @@ class Player(Plugin):
         default_player_movies = self.addon.getSetting('default_player_movies')
         default_player_episodes = self.addon.getSetting('default_player_episodes')
         if force_dialog or (self.itemtype == 'movie' and not default_player_movies) or (self.itemtype == 'episode' and not default_player_episodes):
-            utils.kodi_log('Player -- Asked user to select player', 2)
             return xbmcgui.Dialog().select(self.addon.getLocalizedString(32042), self.itemlist)
         itemindex = -1
         with utils.busy_dialog():
             for index in range(0, len(self.itemlist)):
                 label = self.itemlist[index].getLabel()
                 if (label == default_player_movies and self.itemtype == 'movie') or (label == default_player_episodes and self.itemtype == 'episode'):
-                    utils.kodi_log('Player -- Attempting to play with default player:\n{0}'.format(label), 2)
                     return index
         return itemindex
 
     def play_external(self, force_dialog=False):
-        utils.kodi_log('Player -- Attempting to play external', 2)
         itemindex = self.get_itemindex(force_dialog=force_dialog)
 
+        # User cancelled dialog
         if not itemindex > -1:
-            utils.kodi_log('Player -- User cancelled or default player not found', 2)
             return False
 
         player = self.actions[itemindex]
         if not player or not player[1]:
-            utils.kodi_log('Player -- Selected player incorrectly configured', 2)
             return False
 
+        # External player has list of actions so let's iterate through them to find our item
         resolve_url = False
         if isinstance(player[1], list):
             actionlist = player[1]
             player = (False, actionlist[0])
-            utils.kodi_log('Player -- Action list for selected player:\n{0}'.format(actionlist), 2)
             with utils.busy_dialog():
                 for d in actionlist[1:]:
                     if player[0]:
-                        break  # Playable item found so let's break loop and play it
-                    folder = KodiLibrary().get_directory(string_format_map(player[1], self.item))
+                        break  # Playable item was found in last action so let's break and play it
+                    folder = KodiLibrary().get_directory(string_format_map(player[1], self.item))  # Get the next folder from the plugin
                     x = 0
-                    for f in folder:
-                        x += 1
-                        for k, v in d.items():
-                            if k == 'position':
-                                if utils.try_parse_int(string_format_map(v, self.item)) != x:
-                                    break  # Not the item position we want so let's move on to next item
-                            elif not f.get(k) or string_format_map(v, self.item) not in u'{}'.format(f.get(k, '')):
-                                break  # Item's key value doesn't match value we are looking for so move onto next item
-                        else:
-                            resolve_url = True if f.get('filetype') == 'file' else False
-                            player = (resolve_url, f.get('file'))
-                            break  # Item matches all our criteria so let's move onto our next action
+                    for f in folder:  # Iterate through plugin folder looking for a matching item
+                        x += 1  # Keep an index for position matching
+                        for k, v in d.items():  # Iterate through our key (infolabel) / value (infolabel must match) pairs of our action
+                            if k == 'position':  # We're looking for an item position not an infolabel
+                                if utils.try_parse_int(string_format_map(v, self.item)) != x:  # Format our position value
+                                    break  # Not the item position we want so let's go to next item in folder
+                            elif not f.get(k) or string_format_map(v, self.item) not in u'{}'.format(f.get(k, '')):  # Format our value and check if it matches the infolabel key
+                                break  # Item's key value doesn't match value we are looking for so let's got to next item in folder
+                        else:  # Item matched our criteria so let's open it up
+                            resolve_url = True if f.get('filetype') == 'file' else False  # Set true for files so we can play
+                            player = (resolve_url, f.get('file'))  # Get ListItem.FolderPath for item
+                            break  # Move onto next action (either open next folder or play file)
                     else:
-                        utils.kodi_log('Player -- Failed to {0}'.format(self.itemlist[itemindex].getLabel()), 2)
-                        xbmcgui.Dialog().ok(self.itemlist[itemindex].getLabel(), self.addon.getLocalizedString(32040), self.addon.getLocalizedString(32041))
-                        return self.play_external(force_dialog=True)
+                        xbmcgui.Dialog().notification(self.itemlist[itemindex].getLabel(), self.addon.getLocalizedString(32040))
+                        del self.actions[itemindex]  # Item not found so remove the player's action list
+                        del self.itemlist[itemindex]  # Item not found so remove the player's select dialog entry
+                        return self.play_external(force_dialog=True)  # Ask user to select a different player
 
+        # Play/Search found item
         if player and player[1]:
-            utils.kodi_log('Player -- Attempting to play item', 2)
-            xbmc.executebuiltin('Dialog.Close(12003)')
             action = string_format_map(player[1], self.item)
-            if player[0]:
-                utils.kodi_log('Player -- Playing found item:\n{0}'.format(action), 2)
+            if player[0]:  # Action is play so let's play the item and return
                 xbmc.Player().play(action, ListItem(library='video', **self.details).set_listitem())
                 return action
+            # Action is search so let's load the plugin path
             action = u'Container.Update({0})'.format(action) if xbmc.getCondVisibility("Window.IsMedia") else u'ActivateWindow(videos,{0},return)'.format(action)
-            utils.kodi_log('Player -- Search action:\n{0}'.format(action), 2)
             xbmc.executebuiltin(utils.try_decode_string(action))
             return action
 
     def play(self, itemtype, tmdb_id, season=None, episode=None):
+        """ Entry point for player method """
+        if not tmdb_id or not itemtype:
+            return
+
+        # Get the details for the item
         self.itemtype, self.tmdb_id, self.season, self.episode = itemtype, tmdb_id, season, episode
         self.tmdbtype = 'tv' if self.itemtype in ['episode', 'tv'] else 'movie'
         self.details = self.tmdb.get_detailed_item(self.tmdbtype, tmdb_id, season=season, episode=episode)
@@ -115,22 +115,20 @@ class Player(Plugin):
         self.item['originaltitle'] = self.details.get('infolabels', {}).get('originaltitle')
         self.item['title'] = self.details.get('infolabels', {}).get('tvshowtitle') or self.details.get('infolabels', {}).get('title')
         self.item['year'] = self.details.get('infolabels', {}).get('year')
+
+        # Attempt to play local file first
         is_local = False
         if self.details and self.itemtype == 'movie':
-            utils.kodi_log('Player -- Searching KodiDb for local movie', 2)
             is_local = self.playmovie()
         if self.details and self.itemtype == 'episode':
-            utils.kodi_log('Player -- Searching KodiDb for local episode', 2)
             is_local = self.playepisode()
         if is_local:
-            utils.kodi_log('Player -- Playing local item:\n{0}'.format(is_local), 2)
             return is_local
 
         with utils.busy_dialog():
             self.setup_players(details=True)
 
         if not self.itemlist:
-            utils.kodi_log('Player -- No players to display!', 2)
             return False
 
         return self.play_external()
@@ -196,10 +194,8 @@ class Player(Plugin):
                 finally:
                     vfs_file.close()
                 if not meta.get('plugin') or not xbmc.getCondVisibility(u'System.HasAddon({0})'.format(meta.get('plugin'))):
-                    utils.kodi_log('Player -- {0}\nPlugin {1} not found! Skipping...'.format(file, meta.get('plugin', 'undefined')), 2)
                     continue  # Don't have plugin so skip
 
-                utils.kodi_log('Player -- Adding players...\n{0}'.format(file), 2)
                 tmdbtype = tmdbtype or self.tmdbtype
                 priority = utils.try_parse_int(meta.get('priority')) or 1000
                 if tmdbtype == 'movie' and meta.get('search_movie'):
@@ -211,7 +207,6 @@ class Player(Plugin):
                 if tmdbtype == 'tv' and meta.get('play_episode'):
                     self.play_episode.append((vfs_file, priority))
                 self.players[vfs_file] = meta
-        utils.kodi_log('Player -- {0} players built'.format(len(self.players)), 2)
 
     def build_selectbox(self, clearsetting=False):
         self.itemlist, self.actions = [], []
@@ -229,7 +224,6 @@ class Player(Plugin):
         for i in sorted(self.search_episode, key=lambda x: x[1]):
             self.itemlist.append(xbmcgui.ListItem(u'{0} {1}'.format(xbmc.getLocalizedString(137), self.players.get(i[0], {}).get('name', ''))))
             self.actions.append((False, self.players.get(i[0], {}).get('search_episode', '')))
-        utils.kodi_log('Player -- Select box built with {0} actions'.format(len(self.actions)), 2)
 
     def playfile(self, file):
         if not file:
@@ -239,7 +233,6 @@ class Player(Plugin):
             contents = f.read()
             f.close()
             if contents.startswith('plugin://plugin.video.themoviedb.helper'):
-                utils.kodi_log('PLAYER -- Skipping local TMDbHelper .strm file:\n{}\n{}'.format(file, contents), 1)
                 return
         xbmc.executebuiltin(u'PlayMedia({0})'.format(file))
         return file
