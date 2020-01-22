@@ -515,7 +515,7 @@ class Container(Plugin):
             items = TraktAPI(tmdb=self.tmdb, login=True).get_collection(
                 self.params.get('type'), utils.try_parse_int(self.params.get('page', 1)))
         self.item_tmdbtype = self.params.get('type')
-        self.list_items(items, url=self.params)
+        self.list_items(items, url={'info': 'details', 'type': self.item_tmdbtype})
 
     def list_trakt(self):
         if not self.params.get('type'):
@@ -601,6 +601,11 @@ class Container(Plugin):
             self.list_tmdb(query=self.params.get('query'), year=self.params.get('year'))
 
     def list_items(self, items=None, url=None, url_tmdb_id=None):
+        """ 
+        Sort listitems and then display 
+        url= for listitem base folderpath url params
+        url_tmdb_id= for listitem tmdb_id used in url
+        """
         items = self.get_sortedlist(items)
 
         if not items:
