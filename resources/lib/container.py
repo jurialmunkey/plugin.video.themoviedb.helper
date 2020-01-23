@@ -592,6 +592,7 @@ class Container(Plugin):
         season, episode = self.params.get('season'), self.params.get('episode')
         command = 'RunScript(plugin.video.themoviedb.helper,play={0},tmdb_id={1}{{0}})'.format(self.params.get('type'), self.params.get('tmdb_id'))
         command = command.format(',season={0},episode={1}'.format(season, episode) if season and episode else '')
+        self.finish_container()
         xbmc.executebuiltin(command)
 
     def list_search(self):
@@ -601,7 +602,7 @@ class Container(Plugin):
             self.list_tmdb(query=self.params.get('query'), year=self.params.get('year'))
 
     def list_items(self, items=None, url=None, url_tmdb_id=None):
-        """ 
+        """
         Sort listitems and then display 
         url= for listitem base folderpath url params
         url_tmdb_id= for listitem tmdb_id used in url
