@@ -3,13 +3,13 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 import datetime
+import _strptime  # Workaround for import lock bug in Py2
 import random
 import resources.lib.utils as utils
 import resources.lib.constants as constants
 from resources.lib.traktapi import TraktAPI
 from resources.lib.listitem import ListItem
 from resources.lib.plugin import Plugin
-
 try:
     from urllib.parse import parse_qsl  # Py3
 except ImportError:

@@ -4,7 +4,8 @@ import xbmc
 import xbmcgui
 import xbmcaddon
 import unicodedata
-from datetime import datetime
+import datetime
+import _strptime  # Workaround for import lock bug in Py2
 from copy import copy
 from contextlib import contextmanager
 from resources.lib.constants import TYPE_CONVERSION, VALID_FILECHARS
@@ -138,8 +139,8 @@ def filtered_item(item, key, value, exclude=False):
 
 def age_difference(birthday, deathday=''):
     try:  # Added Error Checking as strptime doesn't work correctly on LibreElec
-        deathday = datetime.strptime(deathday, '%Y-%m-%d') if deathday else datetime.now()
-        birthday = datetime.strptime(birthday, '%Y-%m-%d')
+        deathday = datetime.datetime.strptime(deathday, '%Y-%m-%d') if deathday else datetime.datetime.now()
+        birthday = datetime.datetime.strptime(birthday, '%Y-%m-%d')
         age = deathday.year - birthday.year
         if birthday.month * 100 + birthday.day > deathday.month * 100 + deathday.day:
             age = age - 1
@@ -152,10 +153,10 @@ def convert_timestamp(time_str):
     time_str = time_str[:19]
     time_fmt = "%Y-%m-%dT%H:%M:%S"
     try:
-        time_obj = datetime.strptime(time_str, time_fmt)
+        time_obj = datetime.datetime.strptime(time_str, time_fmt)
         return time_obj
     except TypeError:
-        time_obj = datetime(*(time.strptime(time_str, time_fmt)[0:6]))
+        time_obj = datetime.datetime(*(time.strptime(time_str, time_fmt)[0:6]))
         return time_obj
     except Exception as exc:
         kodi_log(exc, 1)
