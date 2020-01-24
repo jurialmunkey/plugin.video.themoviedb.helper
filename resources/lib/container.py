@@ -3,7 +3,6 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 import datetime
-import _strptime  # Workaround for import lock bug in Py2
 import random
 import resources.lib.utils as utils
 import resources.lib.constants as constants
@@ -193,7 +192,7 @@ class Container(Plugin):
                 # Don't format label for plugin methods specifically about the future or details/seasons
                 if self.params.get('info') not in ['details', 'seasons', 'trakt_calendar', 'trakt_myairing', 'trakt_anticipated']:
                     try:
-                        if datetime.datetime.strptime(i.infolabels.get('premiered'), '%Y-%m-%d') > datetime.datetime.now():
+                        if datetime.datetime.strptime(i.infolabels.get('premiered'), "%Y-%m-%d") > datetime.datetime.now():
                             i.label = '[COLOR=ffcc0000][I]{}[/I][/COLOR]'.format(i.label)
                             # Don't add if option enabled to hide
                             if self.addon.getSettingBool('hide_unaired'):
@@ -603,7 +602,7 @@ class Container(Plugin):
 
     def list_items(self, items=None, url=None, url_tmdb_id=None):
         """
-        Sort listitems and then display 
+        Sort listitems and then display
         url= for listitem base folderpath url params
         url_tmdb_id= for listitem tmdb_id used in url
         """

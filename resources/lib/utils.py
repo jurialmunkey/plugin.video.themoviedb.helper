@@ -5,7 +5,6 @@ import xbmcgui
 import xbmcaddon
 import unicodedata
 import datetime
-import _strptime  # Workaround for import lock bug in Py2
 from copy import copy
 from contextlib import contextmanager
 from resources.lib.constants import TYPE_CONVERSION, VALID_FILECHARS
