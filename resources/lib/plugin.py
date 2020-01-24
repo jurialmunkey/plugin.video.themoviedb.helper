@@ -21,12 +21,12 @@ class Plugin(object):
 
         cache_long = self.addon.getSettingInt('cache_details_days')
         cache_short = self.addon.getSettingInt('cache_list_days')
-        tmdb_apikey = self.addon.getSetting('tmdb_apikey')
-        omdb_apikey = self.addon.getSetting('omdb_apikey')
-        fanarttv_apikey = self.addon.getSetting('fanarttv_apikey')
-        fanarttv_clientkey = self.addon.getSetting('fanarttv_clientkey')
+        tmdb_apikey = self.addon.getSettingString('tmdb_apikey')
+        omdb_apikey = self.addon.getSettingString('omdb_apikey')
+        fanarttv_apikey = self.addon.getSettingString('fanarttv_apikey')
+        fanarttv_clientkey = self.addon.getSettingString('fanarttv_clientkey')
         language = LANGUAGES[self.addon.getSettingInt('language')]
-        mpaa_prefix = self.addon.getSetting('mpaa_prefix')
+        mpaa_prefix = self.addon.getSettingString('mpaa_prefix')
 
         self.tmdb = TMDb(
             api_key=tmdb_apikey, language=language, cache_long=cache_long, cache_short=cache_short,

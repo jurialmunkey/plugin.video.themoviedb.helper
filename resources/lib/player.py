@@ -39,8 +39,8 @@ class Player(Plugin):
         self.build_selectbox(clearsetting)
 
     def get_itemindex(self, force_dialog=False):
-        default_player_movies = self.addon.getSetting('default_player_movies')
-        default_player_episodes = self.addon.getSetting('default_player_episodes')
+        default_player_movies = self.addon.getSettingString('default_player_movies')
+        default_player_episodes = self.addon.getSettingString('default_player_episodes')
         if force_dialog or (self.itemtype == 'movie' and not default_player_movies) or (self.itemtype == 'episode' and not default_player_episodes):
             return xbmcgui.Dialog().select(self.addon.getLocalizedString(32042), self.itemlist)
         itemindex = -1

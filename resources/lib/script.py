@@ -342,14 +342,14 @@ class Script(Plugin):
         idx = xbmcgui.Dialog().select(
             'Choose Default Player for {0}'.format(utils.type_convert(tmdbtype, 'plural')), player.itemlist)
         if idx == 0:
-            self.addon.setSetting(setting, '')
+            self.addon.setSettingString(setting, '')
         if idx > 0:
             selected = player.itemlist[idx].getLabel()
-            self.addon.setSetting(setting, selected)
+            self.addon.setSettingString(setting, selected)
 
     def clear_defaultplayers(self):
-        self.addon.setSetting('default_player_movies', '')
-        self.addon.setSetting('default_player_episodes', '')
+        self.addon.setSettingString('default_player_movies', '')
+        self.addon.setSettingString('default_player_episodes', '')
 
     def restart_service(self):
         if self.home.getProperty('TMDbHelper.ServiceStarted') == 'True':

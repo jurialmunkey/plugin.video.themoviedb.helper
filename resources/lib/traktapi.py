@@ -39,7 +39,7 @@ class TraktAPI(RequestAPI):
     def authorize(self, login=False):
         if self.authorization:
             return self.authorization
-        token = self.addon.getSetting('trakt_token')
+        token = self.addon.getSettingString('trakt_token')
         token = loads(token) if token else None
         if token and type(token) is dict and token.get('access_token'):
             self.authorization = token

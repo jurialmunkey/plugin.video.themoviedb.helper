@@ -79,8 +79,8 @@ def library():
     with utils.busy_dialog():
         title = utils.validify_filename(sys.listitem.getVideoInfoTag().getTitle())
         dbtype = sys.listitem.getVideoInfoTag().getMediaType()
-        basedir_movie = _addon.getSetting('movies_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/movies/'
-        basedir_tv = _addon.getSetting('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
+        basedir_movie = _addon.getSettingString('movies_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/movies/'
+        basedir_tv = _addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
         auto_update = _addon.getSettingBool('auto_update') or False
 
         # Setup our folders and file names
