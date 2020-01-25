@@ -621,6 +621,7 @@ class Container(Plugin):
         x = 0
         self.start_container()
         for i in items:
+            i.label2 = i.infoproperties.get('role') or i.label2
             i.infoproperties['numitems.dbid'] = self.numitems_dbid
             i.infoproperties['numitems.tmdb'] = self.numitems_tmdb
             i.get_details(self.item_dbtype, self.tmdb, self.omdb, self.params.get('localdb'))
