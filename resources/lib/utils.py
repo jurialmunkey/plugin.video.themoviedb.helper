@@ -11,7 +11,6 @@ from resources.lib.constants import TYPE_CONVERSION, VALID_FILECHARS
 _addonlogname = '[plugin.video.themoviedb.helper]\n'
 _addon = xbmcaddon.Addon()
 _debuglogging = _addon.getSettingBool('debug_logging')
-_throwaway = time.strptime("2001-01-01", "%Y-%m-%d")  # Throwaway to deal with PY2 _strptime import bug
 
 
 @contextmanager
@@ -266,3 +265,9 @@ def make_kwparams(params):
     return del_dict_keys(tempparams, ['info', 'type', 'tmdb_id', 'filter_key', 'filter_value',
                                       'with_separator', 'with_id', 'season', 'episode', 'prop_id',
                                       'exclude_key', 'exclude_value'])
+
+
+try:
+    _throwaway = time.strptime("2001-01-01", "%Y-%m-%d")  # Throwaway to deal with PY2 _strptime import bug
+except Exception as e:
+    kodi_log(e, 1)
