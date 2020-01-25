@@ -269,5 +269,5 @@ def make_kwparams(params):
 
 try:
     _throwaway = time.strptime("2001-01-01", "%Y-%m-%d")  # Throwaway to deal with PY2 _strptime import bug
-except Exception as e:
-    kodi_log(e, 1)
+except Exception as exc:
+    kodi_log(exc, 1)
