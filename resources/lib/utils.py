@@ -11,6 +11,7 @@ from resources.lib.constants import TYPE_CONVERSION, VALID_FILECHARS
 _addonlogname = '[plugin.video.themoviedb.helper]\n'
 _addon = xbmcaddon.Addon()
 _debuglogging = _addon.getSettingBool('debug_logging')
+_throwaway = datetime.datetime.strptime('20010101', '%Y%m%d')  # Throwaway to deal with PY2 _strptime import bug
 
 
 @contextmanager

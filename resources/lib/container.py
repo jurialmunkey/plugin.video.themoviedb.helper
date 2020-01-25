@@ -13,6 +13,7 @@ try:
     from urllib.parse import parse_qsl  # Py3
 except ImportError:
     from urlparse import parse_qsl  # Py2
+_throwaway = datetime.datetime.strptime('20010101', '%Y%m%d')  # Throwaway to deal with PY2 _strptime import bug
 
 
 class Container(Plugin):
