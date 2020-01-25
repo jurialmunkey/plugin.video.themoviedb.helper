@@ -73,7 +73,11 @@ class RequestAPI(object):
         """
         if self.req_wait_time:
             utils.rate_limiter(addon_name=self.cache_name, wait_time=self.req_wait_time, api_name=self.req_api_name)
-        response = requests.post(request, data=postdata, headers=headers) if postdata else requests.get(request, headers=headers)  # Request our data
+        try:
+            response = requests.post(request, data=postdata, headers=headers) if postdata else requests.get(request, headers=headers)  # Request our data
+        except ConnectionError as err:
+            utils.kodi_log('ConnectionError: {}'.format(err), 1)
+            return {} if dictify else None
         if not response.status_code == requests.codes.ok:  # Error Checking
             if response.status_code == 401:
                 utils.kodi_log('HTTP Error Code: {0}'.format(response.status_code), 1)
