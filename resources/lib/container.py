@@ -13,7 +13,6 @@ try:
     from urllib.parse import parse_qsl  # Py3
 except ImportError:
     from urlparse import parse_qsl  # Py2
-_throwaway = datetime.datetime.strptime('20010101', '%Y%m%d')  # Throwaway to deal with PY2 _strptime import bug
 
 
 class Container(Plugin):
@@ -193,7 +192,7 @@ class Container(Plugin):
                 # Don't format label for plugin methods specifically about the future or details/seasons
                 if self.params.get('info') not in ['details', 'seasons', 'trakt_calendar', 'trakt_myairing', 'trakt_anticipated']:
                     try:
-                        if datetime.datetime.strptime(i.infolabels.get('premiered'), "%Y-%m-%d") > datetime.datetime.now():
+                        if utils.convert_timestamp(i.infolabels.get('premiered'), "%Y-%m-%d", 10) > datetime.datetime.now():
                             i.label = '[COLOR=ffcc0000][I]{}[/I][/COLOR]'.format(i.label)
                             # Don't add if option enabled to hide
                             if self.addon.getSettingBool('hide_unaired'):
