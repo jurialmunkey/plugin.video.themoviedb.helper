@@ -34,6 +34,7 @@ class Container(Plugin):
         self.randomlist = []
         self.numitems_dbid = 0
         self.numitems_tmdb = 0
+        self.trakt_limit = 20 if self.addon.getSettingBool('trakt_extendlimit') else 10
 
     def start_container(self):
         xbmcplugin.setPluginCategory(self.handle, self.plugincategory)  # Container.PluginCategory
@@ -437,14 +438,14 @@ class Container(Plugin):
         userslug = traktapi.get_usernameslug(login=True)
         self.item_tmdbtype = self.params.get('type')
         if self.params.get('info') == 'trakt_nextepisodes':
-            items = traktapi.get_inprogress(userslug, limit=10, episodes=True)
+            items = traktapi.get_inprogress(userslug, limit=self.trakt_limit, episodes=True)
             self.item_tmdbtype = 'episode'
         elif self.params.get('info') == 'trakt_inprogress':
-            items = traktapi.get_inprogress(userslug, limit=10)
+            items = traktapi.get_inprogress(userslug, limit=self.trakt_limit)
         elif self.params.get('info') == 'trakt_mostwatched':
-            items = traktapi.get_mostwatched(userslug, self.params.get('type'), limit=10)
+            items = traktapi.get_mostwatched(userslug, self.params.get('type'), limit=self.trakt_limit)
         elif self.params.get('info') == 'trakt_history':
-            items = traktapi.get_recentlywatched(userslug, self.params.get('type'), limit=10)
+            items = traktapi.get_recentlywatched(userslug, self.params.get('type'), limit=self.trakt_limit)
         self.list_items(
             items=items, url={
                 'info': 'trakt_upnext' if self.params.get('info') == 'trakt_inprogress' else 'details',
@@ -531,7 +532,7 @@ class Container(Plugin):
         params = self.params.copy()
         params['type'] = utils.type_convert(self.item_tmdbtype, 'trakt') + 's'
 
-        (limit, rnd_list) = (50, 10) if self.params.pop('random', False) else (10, None)
+        (limit, rnd_list) = (50, self.trakt_limit) if self.params.pop('random', False) else (self.trakt_limit, None)
 
         self.list_items(
             items=traktapi.get_itemlist(

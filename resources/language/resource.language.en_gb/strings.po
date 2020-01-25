@@ -392,6 +392,11 @@ msgctxt "#32077"
 msgid "Ignore folder creation checks"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32078"
+msgid "Expand Trakt list limit to 20 items"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

@@ -35,6 +35,7 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32010]" type="action" action="RunScript(plugin.video.themoviedb.helper, authenticate_trakt)" option="close" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32034]" type="bool" id="trakt_watchedindicators" default="false" subsetting="true"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32035]" type="bool" id="trakt_unwatchedcounts" default="false" subsetting="true" enable="eq(-1,True)"/>
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32078]" type="bool" id="trakt_extendlimit" default="false" subsetting="true"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32013]" type="bool" id="trakt_management" default="false" subsetting="true"/>
     </category>
     <category label="$ADDON[plugin.video.themoviedb.helper 32014]">        
