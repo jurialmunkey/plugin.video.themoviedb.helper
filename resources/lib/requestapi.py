@@ -75,7 +75,7 @@ class RequestAPI(object):
             utils.rate_limiter(addon_name=self.cache_name, wait_time=self.req_wait_time, api_name=self.req_api_name)
         try:
             response = requests.post(request, data=postdata, headers=headers) if postdata else requests.get(request, headers=headers)  # Request our data
-        except ConnectionError as err:
+        except Exception as err:
             utils.kodi_log('ConnectionError: {}'.format(err), 1)
             return {} if dictify else None
         if not response.status_code == requests.codes.ok:  # Error Checking
