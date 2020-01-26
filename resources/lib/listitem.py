@@ -49,7 +49,7 @@ class ListItem(object):
             self.url['type'] = self.mixed_type
             self.infolabels['mediatype'] = utils.type_convert(self.mixed_type, 'dbtype')
         if self.label == 'Next Page':
-            self.infolabels['mediatype'] = ''
+            self.infolabels.pop('mediatype', None)
         if self.infolabels.get('mediatype') in ['season', 'episode']:
             self.url['season'] = self.infolabels.get('season')
         if self.infolabels.get('mediatype') == 'episode':
