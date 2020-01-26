@@ -598,7 +598,7 @@ class Container(Plugin):
         season, episode = self.params.get('season'), self.params.get('episode')
         command = 'RunScript(plugin.video.themoviedb.helper,play={0},tmdb_id={1}{{0}})'.format(self.params.get('type'), self.params.get('tmdb_id'))
         command = command.format(',season={0},episode={1}'.format(season, episode) if season and episode else '')
-        xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
+        # xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
         xbmc.executebuiltin(command)
 
     def list_search(self):
