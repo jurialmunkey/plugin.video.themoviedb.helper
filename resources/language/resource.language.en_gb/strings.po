@@ -173,7 +173,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32035"
-msgid "Get watched episode counts for tvshows and seasons from Trakt (slow)"
+msgid "Get unwatched episode counts for tvshows and seasons from Trakt (slow)"
 msgstr ""
 
 #: /resources/settings.xml
