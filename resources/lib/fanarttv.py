@@ -95,6 +95,9 @@ class FanartTV(RequestAPI):
     def get_tvshow_fanart(self, ftvid, *args, **kwargs):
         return self.get_artwork_best_lc(ftvid, 'tv', 'showbackground', *args, **kwargs)
 
+    def get_tvshow_poster(self, ftvid, *args, **kwargs):
+        return self.get_artwork_best_lc(ftvid, 'tv', 'tvposter', *args, **kwargs)
+
     def get_tvshow_characterart(self, ftvid, *args, **kwargs):
         return self.get_artwork_best_lc(ftvid, 'tv', 'characterart', *args, **kwargs)
 
@@ -104,10 +107,11 @@ class FanartTV(RequestAPI):
         banner = self.get_tvshow_banner(ftvid, *args, **kwargs)
         landscape = self.get_tvshow_landscape(ftvid, *args, **kwargs)
         fanart = self.get_tvshow_fanart(ftvid, *args, **kwargs)
+        poster = self.get_tvshow_poster(ftvid, *args, **kwargs)
         characterart = self.get_tvshow_characterart(ftvid, *args, **kwargs)
         return {
-            'clearart': clearart, 'clearlogo': clearlogo, 'banner': banner,
-            'landscape': landscape, 'fanart': fanart, 'characterart': characterart}
+            'clearart': clearart, 'clearlogo': clearlogo, 'banner': banner, 'landscape': landscape,
+            'fanart': fanart, 'characterart': characterart, 'poster': poster}
 
     def get_tvshow_allart_lc(self, ftvid, *args, **kwargs):
         cache_name = '{0}.fanarttv.tvall'.format(self.cache_name)
@@ -124,9 +128,10 @@ class FanartTV(RequestAPI):
         banner = self.get_movie_banner(ftvid, *args, **kwargs)
         landscape = self.get_movie_landscape(ftvid, *args, **kwargs)
         fanart = self.get_movie_fanart(ftvid, *args, **kwargs)
+        poster = self.get_movie_poster(ftvid, *args, **kwargs)
         return {
-            'clearart': clearart, 'clearlogo': clearlogo, 'banner': banner,
-            'discart': discart, 'landscape': landscape, 'fanart': fanart}
+            'clearart': clearart, 'clearlogo': clearlogo, 'banner': banner, 'discart': discart,
+            'landscape': landscape, 'fanart': fanart, 'poster': poster}
 
     def get_movie_allart_lc(self, ftvid, *args, **kwargs):
         cache_name = '{0}.fanarttv.movieall'.format(self.cache_name)

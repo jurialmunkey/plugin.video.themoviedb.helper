@@ -147,6 +147,7 @@ class Container(Plugin):
             if self.fanarttv and self.details_tv and self.exp_fanarttv():
                 tvdb_id = self.tmdb.get_item_externalid('tv', self.params.get('tmdb_id'), 'tvdb_id')
                 artwork = self.fanarttv.get_tvshow_allart_lc(tvdb_id)
+                self.details_tv['poster'] = artwork.get('poster')
                 self.details_tv['clearart'] = artwork.get('clearart')
                 self.details_tv['clearlogo'] = artwork.get('clearlogo')
                 self.details_tv['landscape'] = artwork.get('landscape')
@@ -186,6 +187,11 @@ class Container(Plugin):
                 i.infoproperties = utils.merge_two_dicts(self.details_tv.get('infoproperties', {}), i.infoproperties)
                 i.poster = i.poster or self.details_tv.get('poster')
                 i.fanart = i.fanart if i.fanart and i.fanart != '{0}/fanart.jpg'.format(self.addonpath) else self.details_tv.get('fanart')
+                i.tvshow_clearart = i.tvshow_clearart or self.details_tv.get('clearart')
+                i.tvshow_clearlogo = i.tvshow_clearlogo or self.details_tv.get('clearlogo')
+                i.tvshow_landscape = i.tvshow_landscape or self.details_tv.get('landscape')
+                i.tvshow_banner = i.tvshow_banner or self.details_tv.get('banner')
+                i.tvshow_poster = self.details_tv.get('poster') or i.poster
                 i.infolabels['season'] = season_num
 
             # Format label For Future Eps/Movies

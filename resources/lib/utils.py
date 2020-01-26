@@ -68,6 +68,18 @@ def try_encode_string(string, encoding='utf-8'):
     return string.encode(encoding)
 
 
+def get_timestamp(timestamp=None):
+    if not timestamp:
+        return
+    if time.time() > timestamp:
+        return
+    return timestamp
+
+
+def set_timestamp(wait_time=60):
+    return time.time() + wait_time
+
+
 def rate_limiter(addon_name='plugin.video.themoviedb.helper', wait_time=None, api_name=None):
     """
     Simple rate limiter to prevent overloading APIs
