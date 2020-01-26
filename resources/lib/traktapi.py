@@ -355,7 +355,7 @@ class TraktAPI(RequestAPI):
         cache_refresh = False if not check_sync or self.sync_activities('shows', 'watched_at') else True
         return self.get_request_lc('shows', imdb_id, 'progress', 'watched', cache_refresh=cache_refresh)
 
-    def get_unwatched_count(self, tmdb_id=None, imdb_id=None, season=None, request=None, check_sync=True):
+    def get_unwatched_count(self, tmdb_id=None, imdb_id=None, season=None, request=None, check_sync=True, only_inprogress=True):
         if not tmdb_id and not imdb_id and not request:
             return -1
 
@@ -363,6 +363,9 @@ class TraktAPI(RequestAPI):
         request = utils.get_dict_in_list(request.get('seasons', []), 'number', utils.try_parse_int(season)) if season else request
 
         if not request or not request.get('aired'):
+            return -1
+
+        if not utils.try_parse_int(request.get('completed', 0)):
             return -1
 
         return utils.try_parse_int(request.get('aired')) - utils.try_parse_int(request.get('completed', 0))

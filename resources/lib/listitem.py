@@ -198,7 +198,12 @@ class ListItem(object):
         self.get_omdb_details(omdb=omdb)
         self.get_kodi_details() if self.addon.getSettingBool('local_db') or kodi else None
 
-        if self.infolabels.get('mediatype') == 'tvshow':
+        if (
+                (
+                    not self.addon.getSettingBool('trakt_unwatchedcounts') or
+                    not self.addon.getSettingBool('trakt_watchedindicators')) and
+                self.infolabels.get('mediatype') == 'tvshow' and
+                utils.try_parse_int(self.infoproperties.get('watchedepisodes', 0)) > 0):
             self.infoproperties['unwatchedepisodes'] = utils.try_parse_int(self.infolabels.get('episode')) - utils.try_parse_int(self.infoproperties.get('watchedepisodes'))
 
     def set_listitem(self, path=None):
