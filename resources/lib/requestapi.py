@@ -82,7 +82,7 @@ class RequestAPI(object):
         except Exception as err:
             self.req_connect_err = utils.set_timestamp()
             xbmcgui.Window(10000).setProperty(self.req_connect_err_prop, str(self.req_connect_err))
-            utils.kodi_log('ConnectionError: {}'.format(err), 1)
+            utils.kodi_log('ConnectionError: {}\nSuppressing retries for 1 minute'.format(err), 1)
             return {} if dictify else None
         if not response.status_code == requests.codes.ok:  # Error Checking
             if response.status_code == 401:
@@ -91,7 +91,7 @@ class RequestAPI(object):
             elif response.status_code == 500:
                 self.req_connect_err = utils.set_timestamp()
                 xbmcgui.Window(10000).setProperty(self.req_connect_err_prop, str(self.req_connect_err))
-                utils.kodi_log('HTTP Error Code: {0}\nRequest: {1}'.format(response.status_code, request), 1)
+                utils.kodi_log('HTTP Error Code: {0}\nRequest: {1}\nSuppressing retries for 1 minute'.format(response.status_code, request), 1)
             elif not response.status_code == 400:  # Don't write 400 error to log
                 utils.kodi_log('HTTP Error Code: {0}\nRequest: {1}'.format(response.status_code, request), 1)
             return {} if dictify else None
