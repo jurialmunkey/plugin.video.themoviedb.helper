@@ -56,7 +56,6 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32020]" type="lsep"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32000]" type="text" id="tmdb_apikey" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32018]" type="text" id="fanarttv_apikey" />
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32079]" type="lsep"/>
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32011]" type="text" id="trakt_token" default="" visible="true"/>
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32011]" type="text" id="trakt_token" default="" visible="false"/>
     </category>
 </settings>
