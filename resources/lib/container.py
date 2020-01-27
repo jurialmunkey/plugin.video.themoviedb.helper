@@ -43,6 +43,10 @@ class Container(Plugin):
     def finish_container(self):
         if self.params.get('random'):
             return
+        xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_UNSORTED)
+        xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_TITLE_IGNORE_THE)
+        xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_LASTPLAYED)
+        xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_PLAYCOUNT)
         xbmcplugin.endOfDirectory(self.handle, updateListing=self.updatelisting)
 
     def set_url_params(self, url):
