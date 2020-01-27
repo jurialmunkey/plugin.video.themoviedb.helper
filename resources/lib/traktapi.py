@@ -202,6 +202,7 @@ class TraktAPI(RequestAPI):
 
     def get_limitedlist(self, itemlist, tmdbtype, limit, islistitem):
         items = []
+        added_items = []
         if not self.tmdb or not self.authorize():
             return items
 
@@ -216,8 +217,9 @@ class TraktAPI(RequestAPI):
                 i.get(itemtype, {}).get('title'))
             if islistitem:
                 item = ListItem(library=self.library, **self.tmdb.get_detailed_item(tmdbtype, item[1]))
-            if item not in items:
+            if item.tmdb_id and item.tmdb_id not in added_items:
                 items.append(item)
+                added_items.append(item.tmdb_id)
                 n += 1
         return items
 
