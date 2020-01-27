@@ -215,12 +215,16 @@ class TraktAPI(RequestAPI):
                 i.get(itemtype, {}).get('ids', {}).get('slug'),
                 i.get(itemtype, {}).get('ids', {}).get('tmdb'),
                 i.get(itemtype, {}).get('title'))
+
+            if item in added_items:
+                continue
+
+            added_items.append(item)
             if islistitem:
                 item = ListItem(library=self.library, **self.tmdb.get_detailed_item(tmdbtype, item[1]))
-            if item.tmdb_id and item.tmdb_id not in added_items:
-                items.append(item)
-                added_items.append(item.tmdb_id)
-                n += 1
+            items.append(item)
+            n += 1
+
         return items
 
     def get_ratings(self, tmdbtype=None, imdb_id=None, trakt_id=None, trakt_slug=None, season=None, episode=None):
