@@ -8,8 +8,9 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32023]" type="enum" id="select_action" lvalues="1024|32022" default="0" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32039]" type="lsep"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32038]" type="bool" id="local_db" default="false" />
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32072]" type="lsep"/>
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32080]" type="lsep"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32073]" type="bool" id="hide_unaired" default="false" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32081]" type="bool" id="widgets_nextpage" default="false" />
     </category>
     <category label="$LOCALIZE[439]">
         <setting label="$LOCALIZE[439]" type="lsep"/>

@@ -402,6 +402,16 @@ msgctxt "#32079"
 msgid "System Use Only"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32080"
+msgid "Other"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32081"
+msgid "Show next page item on widgets (requires skin reload)"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
