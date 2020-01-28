@@ -554,6 +554,9 @@ class Container(Plugin):
 
         (limit, rnd_list) = (50, self.trakt_limit) if self.params.pop('random', False) else (self.trakt_limit, None)
 
+        if self.params.get('info') == 'trakt_watchlist':
+            params['sortmethod'] = self.addon.getSettingString('trakt_watchlistsort')
+
         self.list_items(
             items=traktapi.get_itemlist(
                 cat.get('path', '').format(**params), page=self.params.get('page', 1), limit=limit, rnd_list=rnd_list, req_auth=cat.get('req_auth'),

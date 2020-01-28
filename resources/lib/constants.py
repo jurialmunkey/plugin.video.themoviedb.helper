@@ -604,7 +604,7 @@ APPEND_TO_RESPONSE = 'credits,images,release_dates,content_ratings,external_ids,
 
 TRAKT_LISTS = {
     'trakt_watchlist': {
-        'path': 'users/{user_slug}/watchlist/{type}',
+        'path': 'users/{user_slug}/watchlist/{type}/{sortmethod}',
         'req_auth': True,
         'item_tmdbtype': '{type}'},
     'trakt_recommendations': {

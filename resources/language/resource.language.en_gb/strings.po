@@ -412,6 +412,16 @@ msgctxt "#32081"
 msgid "Show next page item on widgets (requires skin reload)"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32082"
+msgid "Watchlist sort method"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32083"
+msgid "Accounts"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
@@ -651,7 +661,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32017"
-msgid "Accounts / API Keys"
+msgid "API Keys"
 msgstr ""
 
 #: /resources/settings.xml
