@@ -118,7 +118,7 @@ class FanartTV(RequestAPI):
         cache_only = kwargs.pop('cache_only', False)
         cache_refresh = kwargs.pop('cache_refresh', False)
         return self.use_cache(
-            self.get_tvshow_allart, ftvid, cache_days=self.cache_long,
+            self.get_tvshow_allart, ftvid, cache_days=self.cache_short,
             cache_only=cache_only, cache_refresh=cache_refresh, cache_name=cache_name)
 
     def get_movie_allart(self, ftvid, *args, **kwargs):
@@ -138,5 +138,5 @@ class FanartTV(RequestAPI):
         cache_only = kwargs.pop('cache_only', False)
         cache_refresh = kwargs.pop('cache_refresh', False)
         return self.use_cache(
-            self.get_movie_allart, ftvid, cache_days=self.cache_long,
+            self.get_movie_allart, ftvid, cache_days=self.cache_short,
             cache_only=cache_only, cache_refresh=cache_refresh, cache_name=cache_name)
