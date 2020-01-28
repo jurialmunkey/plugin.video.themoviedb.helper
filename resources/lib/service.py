@@ -86,13 +86,17 @@ class ServiceMonitor(Plugin):
         self.query = utils.try_decode_string(self.query)
         return u'{0}.{1}.{2}.{3}.{4}'.format(self.imdb_id, self.query, self.year, self.season, self.episode)
 
+    def is_same_item(self):
+        self.cur_item = self.get_cur_item()
+        if self.cur_item == self.pre_item:
+            return self.cur_item
+        self.pre_item = self.cur_item
+
     def get_listitem(self):
         try:
             self.get_container()
-            self.cur_item = self.get_cur_item()
-            if self.cur_item == self.pre_item:
-                return  # Don't get details if we already did last time!
-            self.pre_item = self.cur_item
+            if self.is_same_item():
+                return  # Current item was the previous item so no need to do a look-up
 
             self.cur_folder = '{0}{1}{2}'.format(
                 self.container, xbmc.getInfoLabel(self.get_dbtype()),
@@ -122,8 +126,8 @@ class ServiceMonitor(Plugin):
             details = self.get_trakt_ratings(
                 details, tmdbtype, tmdb_id, self.season, self.episode) if tmdbtype in ['movie', 'tv'] else details
 
-            if not details:
-                self.clear_properties()
+            if not details or not self.is_same_item():
+                self.clear_properties()  # No details or the item changed so let's clear everything
                 return
 
             self.set_properties(details)
