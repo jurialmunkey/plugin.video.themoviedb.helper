@@ -138,6 +138,21 @@ class Container(Plugin):
         if self.item_dbtype == 'tvshow':
             return
 
+    def get_details_tv(self, tmdb_id=None, season=None, artwork_only=False, cache_only=False):
+        if not tmdb_id:
+            return
+        if not self.details_tv:
+            self.details_tv = {} if artwork_only else self.tmdb.get_detailed_item('tv', tmdb_id, season=season, cache_only=cache_only) or {}
+        if self.fanarttv and self.exp_fanarttv():
+            tvdb_id = self.tmdb.get_item_externalid('tv', tmdb_id, 'tvdb_id')
+            artwork = self.fanarttv.get_tvshow_allart_lc(tvdb_id)
+            self.details_tv['poster'] = artwork.get('poster')
+            self.details_tv['clearart'] = artwork.get('clearart')
+            self.details_tv['clearlogo'] = artwork.get('clearlogo')
+            self.details_tv['landscape'] = artwork.get('landscape')
+            self.details_tv['banner'] = artwork.get('banner')
+            self.details_tv['fanart'] = self.details_tv.get('fanart') or artwork.get('fanart')
+
     def get_sortedlist(self, items):
         if not items:
             return
@@ -146,17 +161,7 @@ class Container(Plugin):
         mixed_movies, mixed_tvshows = 0, 0
 
         if self.item_tmdbtype in ['season', 'episode'] and self.params.get('tmdb_id'):
-            if not self.details_tv:
-                self.details_tv = self.tmdb.get_detailed_item('tv', self.params.get('tmdb_id'), season=self.params.get('season', None))
-            if self.fanarttv and self.details_tv and self.exp_fanarttv():
-                tvdb_id = self.tmdb.get_item_externalid('tv', self.params.get('tmdb_id'), 'tvdb_id')
-                artwork = self.fanarttv.get_tvshow_allart_lc(tvdb_id)
-                self.details_tv['poster'] = artwork.get('poster')
-                self.details_tv['clearart'] = artwork.get('clearart')
-                self.details_tv['clearlogo'] = artwork.get('clearlogo')
-                self.details_tv['landscape'] = artwork.get('landscape')
-                self.details_tv['banner'] = artwork.get('banner')
-                self.details_tv['fanart'] = self.details_tv.get('fanart') or artwork.get('fanart')
+            self.get_details_tv(self.params.get('tmdb_id'), season=self.params.get('season', None))
 
         if self.item_tmdbtype == 'season' and self.details_tv:
             item_upnext = ListItem(library=self.library, **self.details_tv)
@@ -183,6 +188,11 @@ class Container(Plugin):
                 mixed_tvshows += 1
             elif i.mixed_type == 'movie':
                 mixed_movies += 1
+
+            # Special Look-up for Episode Widgets
+            if self.params.get('info') in ['trakt_calendar', 'trakt_nextepisodes']:
+                self.details_tv = None
+                self.get_details_tv(i.tmdb_id or self.get_tmdb_id(query=i.infolabels.get('tvshowtitle'), itemtype='tv'), artwork_only=True)
 
             if self.details_tv:
                 season_num = i.infolabels.get('season')
