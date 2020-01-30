@@ -208,20 +208,24 @@ class Container(Plugin):
                 i.tvshow_poster = self.details_tv.get('poster') or i.poster
                 i.infolabels['season'] = season_num
 
-            # Format label For Future Eps/Movies
-            if i.infolabels.get('premiered'):
-                # Don't format label for plugin methods specifically about the future or details/seasons
-                if self.params.get('info') not in ['details', 'seasons', 'trakt_calendar', 'trakt_myairing', 'trakt_anticipated']:
-                    try:
-                        if utils.convert_timestamp(i.infolabels.get('premiered'), "%Y-%m-%d", 10) > datetime.datetime.now():
-                            i.label = '[COLOR=ffcc0000][I]{}[/I][/COLOR]'.format(i.label)
-                            # Don't add if option enabled to hide
-                            if self.addon.getSettingBool('hide_unaired_episodes') and self.item_tmdbtype in ['tv', 'episode']:
-                                continue
-                            if self.addon.getSettingBool('hide_unaired_movies') and self.item_tmdbtype in ['movie']:
-                                continue
-                    except Exception as exc:
-                        utils.kodi_log('Error: {}'.format(exc), 1)
+            # Format episode labels
+            if self.item_tmdbtype == 'episode' and i.infolabels.get('season') and i.infolabels.get('episode'):
+                i.label = u'{:02d}. {}'.format(utils.try_parse_int(i.infolabels.get('episode')), i.label)
+                if self.params.get('info') in ['trakt_calendar', 'trakt_nextepisodes', 'trakt_upnext']:
+                    i.label = u'{}x{}'.format(utils.try_parse_int(i.infolabels.get('season')), i.label)
+
+            # Format label for future eps/movies but not plugin methods specifically about the future or details/seasons
+            if i.infolabels.get('premiered') and self.params.get('info') not in ['details', 'seasons', 'trakt_calendar', 'trakt_myairing', 'trakt_anticipated']:
+                try:
+                    if utils.convert_timestamp(i.infolabels.get('premiered'), "%Y-%m-%d", 10) > datetime.datetime.now():
+                        i.label = '[COLOR=ffcc0000][I]{}[/I][/COLOR]'.format(i.label)
+                        # Don't add if option enabled to hide
+                        if self.addon.getSettingBool('hide_unaired_episodes') and self.item_tmdbtype in ['tv', 'episode']:
+                            continue
+                        if self.addon.getSettingBool('hide_unaired_movies') and self.item_tmdbtype in ['movie']:
+                            continue
+                except Exception as exc:
+                    utils.kodi_log('Error: {}'.format(exc), 1)
 
             i.dbid = self.get_db_info(
                 info='dbid', tmdbtype=self.item_tmdbtype, imdb_id=i.imdb_id,
