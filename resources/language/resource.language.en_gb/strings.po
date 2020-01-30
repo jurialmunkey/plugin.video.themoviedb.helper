@@ -369,7 +369,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32073"
-msgid "Hide unaired movies/episodes"
+msgid "Hide unaired movies"
 msgstr ""
 
 #: /resources/settings.xml
@@ -420,6 +420,11 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32083"
 msgid "Accounts"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32084"
+msgid "Hide unaired episodes"
 msgstr ""
 
 msgctxt "#30030"

@@ -216,7 +216,9 @@ class Container(Plugin):
                         if utils.convert_timestamp(i.infolabels.get('premiered'), "%Y-%m-%d", 10) > datetime.datetime.now():
                             i.label = '[COLOR=ffcc0000][I]{}[/I][/COLOR]'.format(i.label)
                             # Don't add if option enabled to hide
-                            if self.addon.getSettingBool('hide_unaired'):
+                            if self.addon.getSettingBool('hide_unaired_episodes') and self.item_tmdbtype in ['tv', 'episode']:
+                                continue
+                            if self.addon.getSettingBool('hide_unaired_movies') and self.item_tmdbtype in ['movie']:
                                 continue
                     except Exception as exc:
                         utils.kodi_log('Error: {}'.format(exc), 1)
