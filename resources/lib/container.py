@@ -211,7 +211,7 @@ class Container(Plugin):
             # Format episode labels
             if self.item_tmdbtype == 'episode' and i.infolabels.get('season') and i.infolabels.get('episode'):
                 i.label = u'{:02d}. {}'.format(utils.try_parse_int(i.infolabels.get('episode')), i.label)
-                if self.params.get('info') in ['trakt_calendar', 'trakt_nextepisodes', 'trakt_upnext']:
+                if self.params.get('info') in ['trakt_calendar', 'trakt_nextepisodes', 'trakt_upnext'] or self.addon.getSettingBool('flatten_seasons'):
                     i.label = u'{}x{}'.format(utils.try_parse_int(i.infolabels.get('season')), i.label)
 
             # Format label for future eps/movies but not plugin methods specifically about the future or details/seasons
@@ -689,6 +689,21 @@ class Container(Plugin):
             items=self.tmdb.get_credits_list(self.params.get('type'), self.params.get('tmdb_id'), key),
             url={'info': 'details', 'type': 'person'})
 
+    def list_flatseasons(self):
+        items = []
+        basepath = 'tv/{}'.format(self.params.get('tmdb_id'))
+        seasons = self.tmdb.get_list(basepath, key='seasons', pagination=False)
+        for season in seasons:
+            if not season.infolabels.get('season'):
+                continue
+            path = '{}/season/{}'.format(basepath, season.infolabels.get('season'))
+            episodes = self.tmdb.get_list(path, key='episodes', pagination=False)
+            items = items + [i for i in episodes]
+        self.item_tmdbtype = 'episode'
+        self.list_items(
+            items=items, url_tmdb_id=self.params.get('tmdb_id'),
+            url={'info': 'details', 'type': 'episode'})
+
     def list_details(self):
         # Build empty container if no tmdb_id
         if not self.params.get('tmdb_id'):
@@ -727,7 +742,7 @@ class Container(Plugin):
         if self.params.get('type') == 'movie':
             firstitem.url = {'info': 'play', 'type': self.params.get('type')}
         elif self.params.get('type') == 'tv':
-            firstitem.url = {'info': 'seasons', 'type': self.params.get('type')}
+            firstitem.url = {'info': 'flatseasons', 'type': 'episode'} if self.addon.getSettingBool('flatten_seasons') else {'info': 'seasons', 'type': self.params.get('type')}
         elif self.params.get('type') == 'episode':
             firstitem.url = {'info': 'play', 'type': self.params.get('type')}
         else:
@@ -847,6 +862,9 @@ class Container(Plugin):
             self.list_getid()
             self.list_traktmanagement()
             self.list_details()
+        elif self.params.get('info') == 'flatseasons':
+            self.list_getid()
+            self.list_flatseasons()
         elif self.params.get('info') in constants.RANDOM_LISTS:
             self.list_random()
         elif self.params.get('info') in constants.RANDOM_TRAKT:

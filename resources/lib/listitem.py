@@ -67,6 +67,9 @@ class ListItem(object):
                 self.url['info'] = 'play'
             elif self.infolabels.get('mediatype') == 'tvshow':
                 self.url['info'] = 'seasons'
+                if self.addon.getSettingBool('flatten_seasons'):
+                    self.url['info'] = 'flatseasons'
+                    self.url['type'] = 'episode'
         self.is_folder = False if self.url.get('info') in ['play', 'textviewer', 'imageviewer'] else True
         # self.infoproperties['isPlayable'] = 'True' if self.url.get('info') in ['play', 'textviewer', 'imageviewer'] else 'False'
 

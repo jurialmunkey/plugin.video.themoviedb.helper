@@ -427,6 +427,11 @@ msgctxt "#32084"
 msgid "Hide unaired episodes"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32085"
+msgid "Flatten seasons"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
