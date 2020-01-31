@@ -54,6 +54,7 @@ class ListItem(object):
             self.infolabels.pop('mediatype', None)
         if self.infolabels.get('mediatype') in ['season', 'episode']:
             self.url['season'] = self.infolabels.get('season')
+            self.infoproperties['tvshow.tmdb_id'] = self.url.get('tmdb_id')
         if self.infolabels.get('mediatype') == 'episode':
             self.url['episode'] = self.infolabels.get('episode')
         if fanarttv:

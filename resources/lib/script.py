@@ -5,8 +5,10 @@
 import sys
 import xbmc
 import xbmcgui
+import xbmcvfs
 import threading
 import resources.lib.utils as utils
+import resources.lib.context as context
 from resources.lib.downloader import Downloader
 from resources.lib.traktapi import TraktAPI
 from resources.lib.plugin import Plugin
@@ -351,6 +353,39 @@ class Script(Plugin):
         self.addon.setSettingString('default_player_movies', '')
         self.addon.setSettingString('default_player_episodes', '')
 
+    def library_autoupdate(self):
+        utils.kodi_log('UPDATING TV SHOWS LIBRARY', 1)
+        basedir_tv = self.addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
+        for f in xbmcvfs.listdir(basedir_tv)[0]:
+            try:
+                folder = basedir_tv + f + '/'
+                # Get nfo file
+                nfo = None
+                for x in xbmcvfs.listdir(folder)[1]:
+                    if x.endswith('.nfo'):
+                        nfo = x
+                if not nfo:
+                    continue
+
+                # Read nfo file
+                vfs_file = xbmcvfs.File(folder + nfo)
+                content = ''
+                try:
+                    content = vfs_file.read()
+                finally:
+                    vfs_file.close()
+                tmdb_id = content.replace('https://www.themoviedb.org/tv/', '')
+                if not tmdb_id:
+                    continue
+
+                # Get the tvshow
+                url = 'plugin://plugin.video.themoviedb.helper/?info=seasons&tmdb_id={}&type=tv'.format(tmdb_id)
+                context.library_addtvshow(basedir=basedir_tv, folder=f, url=url, tmdb_id=tmdb_id)
+            except Exception as exc:
+                utils.kodi_log('LIBRARY AUTO UPDATE ERROR:\n{}'.format(exc))
+        if self.addon.getSettingBool('auto_update'):
+            xbmc.executebuiltin('UpdateLibrary(video, {})'.format(basedir_tv))
+
     def restart_service(self):
         if self.home.getProperty('TMDbHelper.ServiceStarted') == 'True':
             self.wait_for_property('TMDbHelper.ServiceStop', value='True', setproperty=True)  # Stop service
@@ -371,6 +406,8 @@ class Script(Plugin):
             self.set_defaultplayer()
         elif self.params.get('clear_defaultplayers'):
             self.clear_defaultplayers()
+        elif self.params.get('library_autoupdate'):
+            self.library_autoupdate()
         elif self.params.get('add_path'):
             self.add_path()
         elif self.params.get('add_query') and self.params.get('type'):

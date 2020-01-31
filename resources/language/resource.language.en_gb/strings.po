@@ -432,6 +432,11 @@ msgctxt "#32085"
 msgid "Flatten seasons"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32086"
+msgid "Auto-update TvShows for new/missing episodes on startup"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

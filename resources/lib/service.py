@@ -34,6 +34,10 @@ class ServiceMonitor(Plugin):
 
     def run_monitor(self):
         self.home.setProperty('TMDbHelper.ServiceStarted', 'True')
+
+        if self.addon.getSettingBool('library_autoupdate'):
+            xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,library_autoupdate)')
+
         while not self.kodimonitor.abortRequested() and not self.exit:
             if self.home.getProperty('TMDbHelper.ServiceStop'):
                 self.exit = True
