@@ -23,6 +23,7 @@ def library_cleancontent(content, details='info=play'):
     content = library_cleancontent_replacer(content, '&amp;', '&')
     content = library_cleancontent_replacer(content, '&&', '&')
     content = library_cleancontent_replacer(content, '?&', '?')
+    content = content + '&islocal=True'
     return content
 
 
