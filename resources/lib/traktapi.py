@@ -48,6 +48,8 @@ class TraktAPI(RequestAPI):
             if not self.attempedlogin and xbmcgui.Dialog().yesno(self.dialog_noapikey_header, self.dialog_noapikey_text, '', '', 'Cancel', 'OK'):
                 self.login()
             self.attempedlogin = True
+        if self.authorization:
+            xbmcgui.Window(10000).setProperty('TMDbHelper.TraktIsAuth', 'True')
         return self.authorization
 
     def login(self):

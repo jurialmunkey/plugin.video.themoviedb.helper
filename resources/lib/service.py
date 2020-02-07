@@ -38,6 +38,9 @@ class ServiceMonitor(Plugin):
         if self.addon.getSettingBool('library_autoupdate'):
             xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,library_autoupdate)')
 
+        if self.addon.getSettingString('trakt_token'):
+            self.home.setProperty('TMDbHelper.TraktIsAuth', 'True')
+
         while not self.kodimonitor.abortRequested() and not self.exit:
             if self.home.getProperty('TMDbHelper.ServiceStop'):
                 self.exit = True
