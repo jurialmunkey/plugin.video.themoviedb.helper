@@ -389,7 +389,8 @@ class TraktAPI(RequestAPI):
 
     def get_traktslug(self, item_type, id_type, id_num):
         item = self.get_response_json('search', id_type, id_num, '?' + item_type)
-        return item[0].get(item_type, {}).get('ids', {}).get('slug')
+        for entry in [x for x in item if item_type in x]:
+            return entry.get(item_type, {}).get('ids', {}).get('slug')
 
     def get_collection(self, tmdbtype, page=1, limit=20):
         items = []
