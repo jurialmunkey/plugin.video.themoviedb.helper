@@ -390,9 +390,10 @@ class TraktAPI(RequestAPI):
         return self.get_response_json(item_type + 's', id_num, 'seasons', season, 'episodes', episode)
 
     def get_traktslug(self, item_type, id_type, id_num):
-        item = self.get_response_json('search', id_type, id_num, '?' + item_type)
-        for entry in [x for x in item if item_type in x]:
-            return entry.get(item_type, {}).get('ids', {}).get('slug')
+        items = self.get_response_json('search', id_type, id_num, type=item_type)
+        for i in items:
+            if str(i.get(item_type, {}).get('ids', {}).get(id_type)) == str(id_num):
+                return i.get(item_type, {}).get('ids', {}).get('slug')
 
     def get_collection(self, tmdbtype, page=1, limit=20):
         items = []
