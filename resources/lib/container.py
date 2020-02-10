@@ -592,6 +592,11 @@ class Container(Plugin):
             if self.params.get('trakt') == 'collection_remove':
                 traktapi.sync_collection(slug_type, mode='remove', items=items)
             # TODO: Check status response and add dialog
+        dialog_action = self.params.get('trakt').replace('_add', '').replace('_remove', '')
+        dialog_header = 'Trakt {0}'.format(dialog_action.capitalize())
+        dialog_text = self.addon.getLocalizedString(32062) if '_add' in self.params.get('trakt') else self.addon.getLocalizedString(32063)
+        dialog_text = dialog_text.format(self.params.get('tmdb_id'), dialog_action.capitalize())
+        xbmcgui.Dialog().ok(dialog_header, dialog_text)
         self.updatelisting = True
 
     def list_becauseyouwatched(self, mostwatched=False):
