@@ -665,6 +665,10 @@ class Container(Plugin):
             self.params['query'] = self.set_searchhistory(
                 query=xbmcgui.Dialog().input(self.addon.getLocalizedString(32044), type=xbmcgui.INPUT_ALPHANUM),
                 itemtype=self.params.get('type'))
+        elif self.params.get('history').lower() == 'true':  # Param to force history save
+            self.set_searchhistory(query=self.params.get('query'), itemtype=self.params.get('type'))
+
+        # Call the list with the query
         if self.params.get('query'):
             self.list_tmdb(query=self.params.get('query'), year=self.params.get('year'))
 
