@@ -85,6 +85,8 @@ class TMDb(RequestAPI):
         infolabels['episode'] = item.get('episode_number') if item.get('episode_number') or item.get('episode_number') == 0 else item.get('number_of_episodes')
         infolabels['season'] = item.get('season_number') if item.get('season_number') or item.get('season_number') == 0 else item.get('number_of_seasons')
         infolabels['genre'] = utils.dict_to_list(item.get('genres', []), 'name')
+        if item.get('site') == 'YouTube' and item.get('key'):
+            infolabels['path'] = 'plugin://plugin.video.youtube/play/?video_id={0}'.format(item.get('key'))
         if item.get('runtime'):
             infolabels['duration'] = item.get('runtime', 0) * 60
         if item.get('belongs_to_collection'):

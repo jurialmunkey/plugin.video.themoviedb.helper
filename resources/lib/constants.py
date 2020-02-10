@@ -49,7 +49,12 @@ TYPE_CONVERSION = {
         'plural': 'Episodes',
         'container': 'episodes',
         'trakt': 'episode',
-        'dbtype': 'episode'}}
+        'dbtype': 'episode'},
+    'video': {
+        'plural': 'Videos',
+        'container': 'videos',
+        'trakt': '',
+        'dbtype': 'video'}}
 
 BASEDIR_MAIN = [
     {
@@ -414,6 +419,11 @@ DETAILED_CATEGORIES = [
         'icon': '{0}/resources/icons/tmdb/images.png',
         'types': ['episode']},
     {
+        'info': 'videos',
+        'name': 'Videos',
+        'icon': '{0}/resources/icons/tmdb/movies.png',
+        'types': ['movie', 'tv', 'episode']},
+    {
         'info': 'trakt_inlists',
         'name': 'In Trakt Lists',
         'icon': '{0}/resources/icons/tmdb/trakt.png',
@@ -565,6 +575,11 @@ TMDB_LISTS = {
         'key': 'crew',
         'url_info': 'details',
         'item_tmdbtype': 'tv'},
+    'videos': {
+        'path': '{type}/{tmdb_id}/videos',
+        'key': 'results',
+        'url_info': 'details',
+        'item_tmdbtype': 'video'},
     'images': {
         'path': 'person/{tmdb_id}/images',
         'key': 'profiles',

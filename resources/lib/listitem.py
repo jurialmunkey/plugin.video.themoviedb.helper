@@ -71,7 +71,10 @@ class ListItem(object):
                 if self.addon.getSettingBool('flatten_seasons'):
                     self.url['info'] = 'flatseasons'
                     self.url['type'] = 'episode'
-        self.is_folder = False if self.url.get('info') in ['play', 'textviewer', 'imageviewer'] else True
+        # Set video paths to url
+        if self.infolabels.get('mediatype') == 'video' and self.infolabels.get('path'):
+            self.url = {'url': self.infolabels.get('path')}
+        self.is_folder = False if self.url.get('info') in ['play', 'textviewer', 'imageviewer'] or self.url.get('url') else True
         # self.infoproperties['isPlayable'] = 'True' if self.url.get('info') in ['play', 'textviewer', 'imageviewer'] else 'False'
 
     def get_extra_artwork(self, tmdb=None, fanarttv=None):
