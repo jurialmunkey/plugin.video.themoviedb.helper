@@ -4,15 +4,17 @@ import xbmcgui
 import xbmcplugin
 import datetime
 import random
+import simplecache
 import resources.lib.utils as utils
 import resources.lib.constants as constants
 from resources.lib.traktapi import TraktAPI
 from resources.lib.listitem import ListItem
 from resources.lib.plugin import Plugin
 try:
-    from urllib.parse import parse_qsl  # Py3
+    from urllib.parse import parse_qsl, urlencode  # Py3
 except ImportError:
     from urlparse import parse_qsl  # Py2
+    from urllib import urlencode
 
 
 class Container(Plugin):
@@ -630,11 +632,81 @@ class Container(Plugin):
         if self.params.get('islocal'):
             xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
 
+    def get_searchhistory(self, itemtype=None, cache=None):
+        if not itemtype:
+            return []
+        if not cache:
+            cache = simplecache.SimpleCache()
+        cache_name = 'plugin.video.themoviedb.helper.search.history.{}'.format(itemtype)
+        return cache.get(cache_name) or []
+
+    def set_searchhistory(self, query=None, itemtype=None, cache=None, cache_days=120, clearcache=False):
+        if not clearcache and not query:
+            return
+        if not itemtype:
+            return query
+        if not cache:
+            cache = simplecache.SimpleCache()
+        cache_name = 'plugin.video.themoviedb.helper.search.history.{}'.format(itemtype)
+        search_history = []
+        if not clearcache:
+            search_history = self.get_searchhistory(itemtype, cache=cache)
+            search_history.append(query)
+        utils.kodi_log(search_history, 1)
+        cache.set(cache_name, search_history, expiration=datetime.timedelta(days=cache_days))
+        return query
+
     def list_search(self):
         if not self.params.get('query'):
-            self.params['query'] = xbmcgui.Dialog().input(self.addon.getLocalizedString(32044), type=xbmcgui.INPUT_ALPHANUM)
+            self.params['query'] = self.set_searchhistory(
+                query=xbmcgui.Dialog().input(self.addon.getLocalizedString(32044), type=xbmcgui.INPUT_ALPHANUM),
+                itemtype=self.params.get('type'))
         if self.params.get('query'):
             self.list_tmdb(query=self.params.get('query'), year=self.params.get('year'))
+
+    def list_searchdir(self):
+        # Clear the cache if asked
+        container_url = None
+        if self.params.get('clearcache'):
+            self.updatelisting = True
+            self.params.pop('clearcache', '')
+            self.set_searchhistory(itemtype=self.params.get('type'), clearcache=True)
+            container_url = 'plugin://plugin.video.themoviedb.helper/?'
+            container_url = u'{0}{1}'.format(container_url, urlencode(self.params))
+
+        self.start_container()
+        # Set our icon
+        icon = '{0}/resources/icons/tmdb/search.png'.format(self.addonpath)
+
+        # Re-use our current params
+        url = self.params.copy()
+        url['info'] = 'search'
+
+        # Create first search item
+        listitem = ListItem(label='Search {}'.format(utils.type_convert(self.params.get('type'), 'plural')), icon=icon)
+        listitem.create_listitem(self.handle, **url)
+
+        # Create cached history searches
+        history = self.get_searchhistory(self.params.get('type'))
+        for query in history:
+            url['query'] = query  # Add query as param so we search it
+            listitem = ListItem(label=query, icon=icon)
+            listitem.create_listitem(self.handle, **url)
+
+        # Create clear cache item if history exists
+        if history:
+            url['info'] = 'dir_search'
+            url['clearcache'] = 'True'
+            url.pop('query', '')
+            listitem = ListItem(label='Clear Search History', icon=icon)
+            listitem.create_listitem(self.handle, **url)
+
+        # Finish container
+        self.finish_container()
+
+        # If we cleared cache we need to update the container and replace the path so we don't keep clearing cache
+        if container_url:
+            xbmc.executebuiltin('Container.Update({}, replace)'.format(container_url))
 
     def list_items(self, items=None, url=None, url_tmdb_id=None):
         """
@@ -887,6 +959,8 @@ class Container(Plugin):
             self.list_credits(self.params.get('info'))
         elif self.params.get('info') == 'search':
             self.list_search()
+        elif self.params.get('info') == 'dir_search':
+            self.list_searchdir()
         elif self.params.get('info') == 'trakt_becauseyouwatched':
             self.list_becauseyouwatched()
         elif self.params.get('info') == 'trakt_becausemostwatched':

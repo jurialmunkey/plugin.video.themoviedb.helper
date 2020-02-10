@@ -88,7 +88,7 @@ BASEDIR_MAIN = [
 
 BASEDIR_TMDB = [
     {
-        'info': 'search',
+        'info': 'dir_search',
         'name': 'Search{1}{0}',
         'types': ['movie', 'tv', 'person'],
         'icon': '{0}/resources/icons/tmdb/search.png'},
