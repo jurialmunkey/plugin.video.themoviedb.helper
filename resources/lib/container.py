@@ -742,7 +742,10 @@ class Container(Plugin):
         if self.params.get('type') == 'movie':
             firstitem.url = {'info': 'play', 'type': self.params.get('type')}
         elif self.params.get('type') == 'tv':
-            firstitem.url = {'info': 'flatseasons', 'type': 'episode'} if self.addon.getSettingBool('flatten_seasons') else {'info': 'seasons', 'type': self.params.get('type')}
+            if self.addon.getSettingBool('flatten_seasons'):
+                firstitem.url = {'info': 'flatseasons', 'type': 'episode'}
+            else:
+                firstitem.url = {'info': 'seasons', 'type': self.params.get('type')}
         elif self.params.get('type') == 'episode':
             firstitem.url = {'info': 'play', 'type': self.params.get('type')}
         else:
