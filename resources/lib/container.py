@@ -651,6 +651,10 @@ class Container(Plugin):
         search_history = []
         if not clearcache:
             search_history = self.get_searchhistory(itemtype, cache=cache)
+            if query in search_history:
+                search_history.remove(query)  # Remove query if in history because we want it to be first in list
+            if len(search_history) > 9:
+                search_history.pop(0)
             search_history.append(query)
         utils.kodi_log(search_history, 1)
         cache.set(cache_name, search_history, expiration=datetime.timedelta(days=cache_days))
@@ -688,6 +692,7 @@ class Container(Plugin):
 
         # Create cached history searches
         history = self.get_searchhistory(self.params.get('type'))
+        history.reverse()
         for query in history:
             url['query'] = query  # Add query as param so we search it
             listitem = ListItem(label=query, icon=icon)
