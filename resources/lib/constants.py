@@ -716,7 +716,7 @@ USER_DISCOVER_LISTITEMS_MOVIES = USER_DISCOVER_LISTITEMS_START + [
     {'label': 'Primary Release Date ( < or = )', 'url': {'info': 'user_discover', 'method': 'primary_release_date.lte'}},
     {'label': 'Release Date ( > or = )', 'url': {'info': 'user_discover', 'method': 'release_date.gte'}},
     {'label': 'Release Date ( < or = )', 'url': {'info': 'user_discover', 'method': 'release_date.lte'}},
-    {'label': 'Release Type', 'url': {'info': 'user_discover', 'method': 'release_type'}}] + USER_DISCOVER_LISTITEMS_FINISH
+    {'label': 'Release Type', 'url': {'info': 'user_discover', 'method': 'with_release_type'}}] + USER_DISCOVER_LISTITEMS_FINISH
 
 USER_DISCOVER_LISTITEMS_TVSHOWS = USER_DISCOVER_LISTITEMS_START + [
     {'label': 'With Networks', 'url': {'info': 'user_discover', 'method': 'with_networks'}},
