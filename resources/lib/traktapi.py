@@ -427,26 +427,27 @@ class TraktAPI(RequestAPI):
         if self.prev_activities.get(itemtype, {}).get(listtype) == self.last_activities.get(itemtype, {}).get(listtype):
             return self.last_activities.get(itemtype, {}).get(listtype)
 
-    def sync_collection(self, itemtype, idtype=None, mode=None, items=None):
-        return self.get_sync('collection', 'collected_at', itemtype, idtype, mode, items)
+    def sync_collection(self, itemtype, idtype=None, mode=None, items=None, cache_refresh=False):
+        return self.get_sync('collection', 'collected_at', itemtype, idtype, mode, items, cache_refresh)
 
-    def sync_watchlist(self, itemtype, idtype=None, mode=None, items=None):
-        return self.get_sync('watchlist', 'watchlisted_at', itemtype, idtype, mode, items)
+    def sync_watchlist(self, itemtype, idtype=None, mode=None, items=None, cache_refresh=False):
+        return self.get_sync('watchlist', 'watchlisted_at', itemtype, idtype, mode, items, cache_refresh)
 
-    def sync_history(self, itemtype, idtype=None, mode=None, items=None):
-        return self.get_sync('history', 'watched_at', itemtype, idtype, mode, items)
+    def sync_history(self, itemtype, idtype=None, mode=None, items=None, cache_refresh=False):
+        return self.get_sync('history', 'watched_at', itemtype, idtype, mode, items, cache_refresh)
 
     def get_watched(self, itemtype, idtype=None):
-        return self.get_sync('watched', 'watched_at', itemtype, idtype, None, None)
+        return self.get_sync('watched', 'watched_at', itemtype, idtype)
 
-    def get_sync(self, name, activity, itemtype, idtype=None, mode=None, items=None):
+    def get_sync(self, name, activity, itemtype, idtype=None, mode=None, items=None, cache_refresh=False):
         if not self.authorize():
             return {}
         if mode == 'add' or mode == 'remove':
             name = name + '/remove' if mode == 'remove' else name
             return self.get_api_request('{0}/sync/{1}'.format(self.req_api_url, name), headers=self.headers, postdata=dumps(items))
         if not self.sync.get(name):
-            cache_refresh = False if self.sync_activities(itemtype + 's', activity) else True
+            if not cache_refresh:
+                cache_refresh = False if self.sync_activities(itemtype + 's', activity) else True
             self.sync[name] = self.get_request_lc('sync/', name, itemtype + 's', cache_refresh=cache_refresh)
         if not self.sync.get(name):
             return {}

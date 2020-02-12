@@ -400,7 +400,8 @@ class Script(Plugin):
         context.action(
             action=self.params.get('sync_trakt'), tmdb_id=self.params.get('tmdb_id'),
             tmdb_type=self.params.get('type'), label=self.params.get('query'),
-            season=self.params.get('season'), episode=self.params.get('episode'))
+            season=self.params.get('season'), episode=self.params.get('episode'),
+            cache_refresh=self.params.get('cache_refresh'))
 
     def router(self):
         if not self.params:
