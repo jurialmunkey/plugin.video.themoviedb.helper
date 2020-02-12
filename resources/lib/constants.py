@@ -741,3 +741,7 @@ USER_DISCOVER_RELEASETYPES = [
     {'name': 'Digital', 'id': 4},
     {'name': 'Physical', 'id': 5},
     {'name': 'TV', 'id': 6}]
+
+USER_DISCOVER_RELATIVEDATES = [
+    'primary_release_date.gte', 'primary_release_date.lte', 'release_date.gte', 'release_date.lte',
+    'air_date.gte', 'air_date.lte', 'first_air_date.gte', 'first_air_date.lte']

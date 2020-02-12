@@ -128,6 +128,20 @@ class Container(Plugin):
                 None,
                 separator='OR')
 
+        # Translate relative dates based upon today's date
+        for i in constants.USER_DISCOVER_RELATIVEDATES:
+            datecode = self.params.get(i, '')
+            datecode = datecode.lower()
+            if not datecode or all(x not in datecode for x in ['t-', 't+']):
+                continue  # No value or not a relative date so skip
+            elif 't-' in datecode:
+                days = utils.try_parse_int(datecode.replace('t-', ''))
+                date = datetime.datetime.now() - datetime.timedelta(days=days)
+            elif 't+' in datecode:
+                days = utils.try_parse_int(datecode.replace('t+', ''))
+                date = datetime.datetime.now() + datetime.timedelta(days=days)
+            self.params[i] = date.strftime("%Y-%m-%d")
+
     def get_trakt_watched(self):
         if not self.addon.getSettingBool('trakt_watchedindicators'):
             return
@@ -373,7 +387,7 @@ class Container(Plugin):
             inputtype = xbmcgui.INPUT_NUMERIC
         elif '_date' in method:
             header = 'Enter '
-            affix = ' YYYY-MM-DD'
+            affix = ' YYYY-MM-DD\nAlso accepts X days relative from today in the format T-X or T+X (e.g. T-10 is ten days ago)'
         elif '_genres' in method:
             label = 'Genre'
             tmdbtype = 'genre'
