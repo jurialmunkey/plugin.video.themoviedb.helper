@@ -122,6 +122,12 @@ class Container(Plugin):
                 lookup_person,
                 separator=self.params.get('with_separator'))
 
+        if self.params.get('with_release_type'):
+            self.params['with_release_type'] = self.tmdb.get_translated_list(
+                utils.split_items(self.params.get('with_release_type')),
+                None,
+                separator='OR')
+
     def get_trakt_watched(self):
         if not self.addon.getSettingBool('trakt_watchedindicators'):
             return
@@ -330,22 +336,27 @@ class Container(Plugin):
         self.new_property_value = 'OR' if choice else 'AND'
         self.new_property_label = 'ANY' if choice else 'ALL'
 
-    def set_userdiscover_genre_property(self):
-        genres_list = self.tmdb.get_request_lc('genre', self.params.get('type'), 'list')
-        if not genres_list:
+    def set_userdiscover_selectlist_properties(self, data_list=None, header='Select Items'):
+        if not data_list:
             return
-        genres_list = genres_list.get('genres', [])
-        dialog_list = [i.get('name') for i in genres_list]
-        select_list = xbmcgui.Dialog().multiselect('Select Genres', dialog_list)
+        dialog_list = [i.get('name') for i in data_list]
+        select_list = xbmcgui.Dialog().multiselect(header, dialog_list)
         if not select_list:
             return
         for i in select_list:
-            label = genres_list[i].get('name')
-            value = genres_list[i].get('id')
+            label = data_list[i].get('name')
+            value = data_list[i].get('id')
             if not value:
                 continue
             self.new_property_label = '{0} / {1}'.format(self.new_property_label, label) if self.new_property_label else label
             self.new_property_value = '{0} / {1}'.format(self.new_property_value, value) if self.new_property_value else '{}'.format(value)
+
+    def set_userdiscover_genre_property(self):
+        data_list = self.tmdb.get_request_lc('genre', self.params.get('type'), 'list')
+        if not data_list:
+            return
+        data_list = data_list.get('genres', [])
+        self.set_userdiscover_selectlist_properties(data_list, header='Select Genres')
 
     def set_userdiscover_method_property(self):
         method = self.params.get('method')
@@ -357,7 +368,7 @@ class Container(Plugin):
         label = self.params.get('label')
         tmdbtype = self.params.get('type')
         inputtype = xbmcgui.INPUT_ALPHANUM
-        if any(i in method for i in ['year', 'vote_', '_runtime', '_networks', 'with_release_type']):
+        if any(i in method for i in ['year', 'vote_', '_runtime', '_networks']):
             header = 'Enter '
             inputtype = xbmcgui.INPUT_NUMERIC
         elif '_date' in method:
@@ -388,7 +399,9 @@ class Container(Plugin):
             self.set_userdiscover_separator_property()
         elif '_genres' in method:
             self.set_userdiscover_genre_property()
-        elif 'with_runtime' not in method and 'with_networks' not in method and 'with_release_type' not in method and any(i in method for i in ['with_', 'without_']):
+        elif 'with_release_type' in method:
+            self.set_userdiscover_selectlist_properties(constants.USER_DISCOVER_RELEASETYPES, header='Select Release Types')
+        elif 'with_runtime' not in method and 'with_networks' not in method and any(i in method for i in ['with_', 'without_']):
             self.add_userdiscover_method_property(header, tmdbtype, usedetails, old_label=old_label, old_value=old_value)
         else:
             self.new_property_label = self.new_property_value = xbmcgui.Dialog().input(

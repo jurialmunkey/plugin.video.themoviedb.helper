@@ -733,3 +733,11 @@ USER_DISCOVER_SORTBY_MOVIES = [
 
 USER_DISCOVER_SORTBY_TVSHOWS = [
     'vote_average.desc', 'vote_average.asc', 'first_air_date.desc', 'first_air_date.asc', 'popularity.desc', 'popularity.asc']
+
+USER_DISCOVER_RELEASETYPES = [
+    {'name': 'Premiere', 'id': 1},
+    {'name': 'Theatrical (limited)', 'id': 2},
+    {'name': 'Theatrical', 'id': 3},
+    {'name': 'Digital', 'id': 4},
+    {'name': 'Physical', 'id': 5},
+    {'name': 'TV', 'id': 6}]
