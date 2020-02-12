@@ -152,7 +152,7 @@ def library():
             return
 
 
-def action(action, tmdb_id=None, tmdb_type=None, season=None, episode=None, label=None):
+def action(action, tmdb_id=None, tmdb_type=None, season=None, episode=None, label=None, cache_refresh=False):
     _traktapi = TraktAPI()
 
     if action == 'history':
@@ -179,7 +179,7 @@ def action(action, tmdb_id=None, tmdb_type=None, season=None, episode=None, labe
             season = sys.listitem.getVideoInfoTag().getSeason() if dbtype == 'episode' else None
             episode = sys.listitem.getVideoInfoTag().getEpisode() if dbtype == 'episode' else None
         tmdb_type = 'movie' if dbtype == 'movie' else 'tv'
-        trakt_ids = func(utils.type_convert(tmdb_type, 'trakt'), 'tmdb')
+        trakt_ids = func(utils.type_convert(tmdb_type, 'trakt'), 'tmdb', cache_refresh=cache_refresh)
         boolean = 'remove' if int(tmdb_id) in trakt_ids else 'add'
 
     dialog_header = 'Trakt {0}'.format(action.capitalize())
