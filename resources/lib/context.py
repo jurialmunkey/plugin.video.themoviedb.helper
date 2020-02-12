@@ -152,7 +152,7 @@ def library():
             return
 
 
-def action(action):
+def action(action, tmdb_id=None, tmdb_type=None, season=None, episode=None, label=None):
     _traktapi = TraktAPI()
 
     if action == 'history':
@@ -167,9 +167,17 @@ def action(action):
         return
 
     with utils.busy_dialog():
-        label = sys.listitem.getLabel()
-        dbtype = sys.listitem.getVideoInfoTag().getMediaType()
-        tmdb_id = sys.listitem.getProperty('tmdb_id')
+        if tmdb_type == 'episode' and (not season or not episode):
+            return
+        elif tmdb_id and tmdb_type:
+            dbtype = utils.type_convert(tmdb_type, 'dbtype')
+            label = label or 'this {}'.format(utils.type_convert(tmdb_type, 'trakt'))
+        else:
+            label = sys.listitem.getLabel()
+            dbtype = sys.listitem.getVideoInfoTag().getMediaType()
+            tmdb_id = sys.listitem.getProperty('tmdb_id')
+            season = sys.listitem.getVideoInfoTag().getSeason() if dbtype == 'episode' else None
+            episode = sys.listitem.getVideoInfoTag().getEpisode() if dbtype == 'episode' else None
         tmdb_type = 'movie' if dbtype == 'movie' else 'tv'
         trakt_ids = func(utils.type_convert(tmdb_type, 'trakt'), 'tmdb')
         boolean = 'remove' if int(tmdb_id) in trakt_ids else 'add'
@@ -184,8 +192,6 @@ def action(action):
         trakt_type = utils.type_convert(tmdb_type, 'trakt')
         slug_type = 'show' if dbtype == 'episode' else trakt_type
         slug = _traktapi.get_traktslug(slug_type, 'tmdb', tmdb_id)
-        season = sys.listitem.getVideoInfoTag().getSeason() if dbtype == 'episode' else None
-        episode = sys.listitem.getVideoInfoTag().getEpisode() if dbtype == 'episode' else None
         item = _traktapi.get_details(slug_type, slug, season=season, episode=episode)
         items = {trakt_type + 's': [item]}
         func(slug_type, mode=boolean, items=items)

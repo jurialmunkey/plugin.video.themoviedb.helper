@@ -617,8 +617,9 @@ class Container(Plugin):
         self.list_tmdb()
 
     def list_getid(self):
-        params = self.params.copy()
+        params = self.params
         if self.params.get('info') == 'play' and self.params.get('type') == 'episode':
+            params = self.params.copy()
             params['type'] = 'tv'
         self.params['tmdb_id'] = self.get_tmdb_id(**params)
 
