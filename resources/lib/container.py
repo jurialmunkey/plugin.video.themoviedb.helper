@@ -350,13 +350,16 @@ class Container(Plugin):
         self.new_property_value = 'OR' if choice else 'AND'
         self.new_property_label = 'ANY' if choice else 'ALL'
 
-    def set_userdiscover_selectlist_properties(self, data_list=None, header='Select Items'):
+    def set_userdiscover_selectlist_properties(self, data_list=None, header='Select Items', multiselect=True):
         if not data_list:
             return
+        func = xbmcgui.Dialog().multiselect if multiselect else xbmcgui.Dialog().select
         dialog_list = [i.get('name') for i in data_list]
-        select_list = xbmcgui.Dialog().multiselect(header, dialog_list)
+        select_list = func(header, dialog_list)
         if not select_list:
             return
+        if not multiselect:
+            select_list = [select_list]
         for i in select_list:
             label = data_list[i].get('name')
             value = data_list[i].get('id')
@@ -415,6 +418,8 @@ class Container(Plugin):
             self.set_userdiscover_genre_property()
         elif 'with_release_type' in method:
             self.set_userdiscover_selectlist_properties(constants.USER_DISCOVER_RELEASETYPES, header='Select Release Types')
+        elif 'region' in method:
+            self.set_userdiscover_selectlist_properties(constants.USER_DISCOVER_REGIONS, header='Select Region for Release', multiselect=False)
         elif 'with_runtime' not in method and 'with_networks' not in method and any(i in method for i in ['with_', 'without_']):
             self.add_userdiscover_method_property(header, tmdbtype, usedetails, old_label=old_label, old_value=old_value)
         else:
