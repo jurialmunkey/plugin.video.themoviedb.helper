@@ -144,6 +144,19 @@ class TraktAPI(RequestAPI):
     def get_request(self, *args, **kwargs):
         return self.use_cache(self.get_response_json, *args, **kwargs)
 
+    def get_itemlist_sorted(self, path):
+        response = self.get_response(path)
+        items = response.json()
+        return sorted(items, key=lambda i: i['listed_at'], reverse=True)
+
+    def get_itemlist_sortedcached(self, path, page=1, limit=10):
+        cache_name = self.cache_name + '.trakt.sortedlist'
+        items = self.use_cache(self.get_itemlist_sorted, path, cache_name=cache_name, cache_days=0.125)
+        index_z = page * limit
+        index_a = index_z - limit
+        index_z = len(items) if len(items) < index_z else index_z
+        return {'items': items[index_a:index_z], 'pagecount': -(-len(items) // limit)}
+
     def get_itemlist(self, *args, **kwargs):
         items = []
 
@@ -152,15 +165,23 @@ class TraktAPI(RequestAPI):
 
         key_list = kwargs.pop('key_list', ['dummy'])
         rnd_list = kwargs.pop('rnd_list', 0)
-        response = self.get_response(*args, **kwargs)
-
-        if not response:
-            return items
-
-        itemlist = response.json()
 
         this_page = int(kwargs.get('page', 1))
-        last_page = int(response.headers.get('X-Pagination-Page-Count', 0))
+        limit = kwargs.get('limit', 0)
+
+        if '/lists/' in args[0]:  # Check if userlist and apply special sorting TODO: Use less hacky approach
+            response = self.get_itemlist_sortedcached(args[0], page=this_page, limit=limit)
+            itemlist = response.get('items')
+            if not itemlist:
+                return items
+            last_page = response.get('pagecount')
+        else:
+            response = self.get_response(*args, **kwargs)
+            if not response:
+                return items
+            itemlist = response.json()
+            last_page = int(response.headers.get('X-Pagination-Page-Count', 0))
+
         next_page = this_page + 1 if this_page < last_page and not rnd_list else False
 
         if rnd_list:
@@ -168,7 +189,6 @@ class TraktAPI(RequestAPI):
             itemlist = [itemlist[i] for i in rnd_list]
 
         n = 0
-        limit = kwargs.get('limit', 0)
         for i in itemlist:
             if limit and not n < limit:
                 break
@@ -203,8 +223,7 @@ class TraktAPI(RequestAPI):
         return items
 
     def get_limitedlist(self, itemlist, tmdbtype, limit, islistitem):
-        items = []
-        added_items = []
+        items, added_items = [], []
         if not self.tmdb or not self.authorize():
             return items
 
