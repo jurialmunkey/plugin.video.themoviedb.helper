@@ -592,15 +592,18 @@ class Container(Plugin):
         params = self.params.copy()
         params['type'] = utils.type_convert(self.item_tmdbtype, 'trakt') + 's'
 
-        (limit, rnd_list) = (50, self.trakt_limit) if self.params.pop('random', False) else (self.trakt_limit, None)
+        rnd_list = self.trakt_limit if self.params.pop('random', False) else None
+        key_list = ['movie', 'show'] if self.params.get('type') == 'both' else [utils.type_convert(self.item_tmdbtype, 'trakt')]
+        usr_list = True if self.params.get('info') == 'trakt_userlist' else False
+        limit = 50 if rnd_list else self.trakt_limit
 
         if self.params.get('info') == 'trakt_watchlist':
             params['sortmethod'] = self.addon.getSettingString('trakt_watchlistsort')
 
         self.list_items(
             items=traktapi.get_itemlist(
-                cat.get('path', '').format(**params), page=self.params.get('page', 1), limit=limit, rnd_list=rnd_list, req_auth=cat.get('req_auth'),
-                key_list=['movie', 'show'] if self.params.get('type') == 'both' else [utils.type_convert(self.item_tmdbtype, 'trakt')]),
+                cat.get('path', '').format(**params), page=self.params.get('page', 1), limit=limit,
+                rnd_list=rnd_list, req_auth=cat.get('req_auth'), usr_list=usr_list, key_list=key_list),
             url={'info': cat.get('url_info', 'details')})
 
     def list_traktmanagement(self):

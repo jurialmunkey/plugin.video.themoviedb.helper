@@ -144,14 +144,16 @@ class TraktAPI(RequestAPI):
     def get_request(self, *args, **kwargs):
         return self.use_cache(self.get_response_json, *args, **kwargs)
 
-    def get_itemlist_sorted(self, path):
-        response = self.get_response(path)
+    def get_itemlist_sorted(self, *args, **kwargs):
+        response = self.get_response(*args)
         items = response.json()
         return sorted(items, key=lambda i: i['listed_at'], reverse=True)
 
-    def get_itemlist_sortedcached(self, path, page=1, limit=10):
-        cache_name = self.cache_name + '.trakt.sortedlist'
-        items = self.use_cache(self.get_itemlist_sorted, path, cache_name=cache_name, cache_days=0.125)
+    def get_itemlist_sortedcached(self, *args, **kwargs):
+        page = kwargs.pop('page', 1)
+        limit = kwargs.pop('limit', 10)
+        kwparams = {'cache_name': self.cache_name + '.trakt.sortedlist', 'cache_days': 0.125}
+        items = self.use_cache(self.get_itemlist_sorted, *args, **kwparams)
         index_z = page * limit
         index_a = index_z - limit
         index_z = len(items) if len(items) < index_z else index_z
@@ -165,12 +167,14 @@ class TraktAPI(RequestAPI):
 
         key_list = kwargs.pop('key_list', ['dummy'])
         rnd_list = kwargs.pop('rnd_list', 0)
+        usr_list = kwargs.pop('usr_list', False)
 
         this_page = int(kwargs.get('page', 1))
         limit = kwargs.get('limit', 0)
 
-        if '/lists/' in args[0]:  # Check if userlist and apply special sorting TODO: Use less hacky approach
-            response = self.get_itemlist_sortedcached(args[0], page=this_page, limit=limit)
+        if usr_list:  # Check if userlist and apply special sorting
+            kwparams = {'page': this_page, 'limit': limit}
+            response = self.get_itemlist_sortedcached(*args, **kwparams)
             itemlist = response.get('items')
             if not itemlist:
                 return items
