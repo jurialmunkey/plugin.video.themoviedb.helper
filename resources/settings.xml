@@ -61,5 +61,6 @@
         <!-- <setting label="$ADDON[plugin.video.themoviedb.helper 32000]" type="text" id="tmdb_apikey"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32018]" type="text" id="fanarttv_apikey"/> -->
         <setting label="$ADDON[plugin.video.themoviedb.helper 32011]" type="text" id="trakt_token" default="" visible="false"/>
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32011]" type="text" id="last_refresh" default="" visible="false"/>
     </category>
 </settings>

@@ -9,6 +9,7 @@ import resources.lib.utils as utils
 import resources.lib.constants as constants
 from resources.lib.traktapi import TraktAPI
 from resources.lib.listitem import ListItem
+from resources.lib.kodilibrary import KodiLibrary
 from resources.lib.plugin import Plugin
 try:
     from urllib.parse import parse_qsl, urlencode  # Py3
@@ -751,13 +752,13 @@ class Container(Plugin):
         if container_url:
             xbmc.executebuiltin('Container.Update({}, replace)'.format(container_url))
 
-    def list_items(self, items=None, url=None, url_tmdb_id=None):
+    def list_items(self, items=None, url=None, url_tmdb_id=None, get_sortedlist=True):
         """
         Sort listitems and then display
         url= for listitem base folderpath url params
         url_tmdb_id= for listitem tmdb_id used in url
         """
-        items = self.get_sortedlist(items)
+        items = self.get_sortedlist(items) if get_sortedlist else items
 
         if not items:
             return
@@ -823,6 +824,31 @@ class Container(Plugin):
         self.list_items(
             items=items, url_tmdb_id=self.params.get('tmdb_id'),
             url={'info': 'details', 'type': 'episode'})
+
+    def list_librarynextaired(self):
+        cache_refresh = False
+
+        # Get last refresh time and refresh details if a two days have passed
+        last_refresh = self.addon.getSettingString('last_refresh')
+        last_refresh = utils.convert_timestamp(last_refresh, time_fmt='%Y-%m-%d', time_lim=8) if last_refresh else None
+        if not last_refresh or last_refresh < datetime.datetime.now() - datetime.timedelta(days=2):
+            self.addon.setSettingString('last_refresh', datetime.datetime.now().strftime('%Y-%m-%d'))
+            cache_refresh = True
+
+        # Get our library tv items and convert to tmdb_ids and then get details and convert to list of listitems
+        detaileditems = [ListItem(library=self.library, **self.tmdb.get_detailed_item(
+            itemtype='tv', cache_refresh=cache_refresh,
+            tmdb_id=self.get_tmdb_id(itemtype='tv', query=i.get('title'), year=i.get('year'))))
+            for i in KodiLibrary(dbtype='tvshow').database]
+
+        # Get sorted list and only next_aired items TODO: Maybe a date range limit?
+        items = [i for i in sorted(
+            detaileditems, key=lambda i: i.infoproperties.get('next_aired'), reverse=False)
+            if i.infoproperties.get('next_aired')]
+
+        # Create our list
+        self.item_tmdbtype = 'tv'
+        self.list_items(items=items, url={'info': 'details', 'type': 'tv'})
 
     def list_details(self):
         # Build empty container if no tmdb_id
@@ -1004,6 +1030,8 @@ class Container(Plugin):
             self.list_search()
         elif self.params.get('info') == 'dir_search':
             self.list_searchdir()
+        elif self.params.get('info') == 'library_nextaired':
+            self.list_librarynextaired()
         elif self.params.get('info') == 'trakt_becauseyouwatched':
             self.list_becauseyouwatched()
         elif self.params.get('info') == 'trakt_becausemostwatched':
