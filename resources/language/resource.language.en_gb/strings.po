@@ -626,7 +626,7 @@ msgstr ""
 
 #: /resources/lib/requestapi.py
 msgctxt "#32007"
-msgid "Missing/Invalid"
+msgid "Unauthorised 401 Error"
 msgstr ""
 
 #: /resources/lib/requestapi.py
@@ -636,7 +636,7 @@ msgstr ""
 
 #: /resources/lib/requestapi.py
 msgctxt "#32009"
-msgid "You must enter a valid API key to use this add-on"
+msgid "API returned 401 unauthorised error. If you have entered an API key for this service$COMMA please check that it is correct. If this error relates to TMDb API$COMMA please post a debug log to [B]https://github.com/jurialmunkey/plugin.video.themoviedb.helper/issues[/B]"
 msgstr ""
 
 #: /resources/settings.xml
