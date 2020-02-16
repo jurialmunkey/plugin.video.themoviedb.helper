@@ -29,7 +29,7 @@ provider-name="jurialmunkey">
     </item>
     <item library="context-library.py">
       <label>Add to Kodi Library</label>
-      <visible>String.StartsWith(ListItem.path,plugin://plugin.video.themoviedb.helper/) + !String.IsEmpty(Window(Home).Property(TMDbHelper.TraktIsAuth)) + !String.IsEmpty(ListItem.Property(tmdb_id)) + [String.IsEqual(ListItem.dbtype,episode) | String.IsEqual(ListItem.dbtype,movie) | String.IsEqual(ListItem.dbtype,tvshow) | String.IsEqual(ListItem.dbtype,season)]</visible>
+      <visible>String.StartsWith(ListItem.path,plugin://plugin.video.themoviedb.helper/) + !String.IsEmpty(ListItem.Property(tmdb_id)) + [String.IsEqual(ListItem.dbtype,episode) | String.IsEqual(ListItem.dbtype,movie) | String.IsEqual(ListItem.dbtype,tvshow) | String.IsEqual(ListItem.dbtype,season)]</visible>
     </item>
   </menu>
 </extension>
