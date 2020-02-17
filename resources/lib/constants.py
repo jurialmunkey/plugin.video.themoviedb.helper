@@ -12,6 +12,8 @@ LANGUAGES = [
     'sr-RS', 'sv-SE', 'ta-IN', 'te-IN', 'th-TH', 'tl-PH', 'tr-TR', 'uk-UA', 'vi-VN', 'zh-CN', 'zh-HK',
     'zh-TW', 'zu-ZA']
 
+NO_LABEL_FORMATTING = ['details', 'seasons', 'trakt_calendar', 'trakt_myairing', 'trakt_anticipated', 'library_nextaired']
+
 TYPE_CONVERSION = {
     'movie': {
         'plural': 'Movies',

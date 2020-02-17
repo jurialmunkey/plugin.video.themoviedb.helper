@@ -238,7 +238,7 @@ class Container(Plugin):
                     i.label = u'{}x{}'.format(utils.try_parse_int(i.infolabels.get('season')), i.label)
 
             # Format label for future eps/movies but not plugin methods specifically about the future or details/seasons
-            if i.infolabels.get('premiered') and self.params.get('info') not in ['details', 'seasons', 'trakt_calendar', 'trakt_myairing', 'trakt_anticipated']:
+            if i.infolabels.get('premiered') and self.params.get('info') not in constants.NO_LABEL_FORMATTING:
                 try:
                     if utils.convert_timestamp(i.infolabels.get('premiered'), "%Y-%m-%d", 10) > datetime.datetime.now():
                         i.label = '[COLOR=ffcc0000][I]{}[/I][/COLOR]'.format(i.label)
@@ -842,13 +842,23 @@ class Container(Plugin):
             for i in KodiLibrary(dbtype='tvshow').database]
 
         # Get sorted list and only next_aired items TODO: Maybe a date range limit?
-        items = [i for i in sorted(
-            detaileditems, key=lambda i: i.infoproperties.get('next_aired'), reverse=False)
-            if i.infoproperties.get('next_aired')]
+        items = []
+        for i in sorted(detaileditems, key=lambda i: i.infoproperties.get('next_aired'), reverse=False):
+            if not i.infoproperties.get('next_aired'):
+                continue
+            i.infolabels['tvshowtitle'] = i.infolabels.get('title')
+            i.label = i.infolabels['title'] = i.infoproperties.get('next_aired.name')
+            i.infolabels['episode'] = i.infoproperties.get('next_aired.episode')
+            i.infolabels['season'] = i.infoproperties.get('next_aired.season')
+            i.infolabels['plot'] = i.infoproperties.get('next_aired.plot')
+            i.thumb = i.infoproperties.get('next_aired.thumb')
+            i.label2 = i.infolabels['premiered'] = i.infoproperties.get('next_aired')
+            i.infolabels['year'] = i.infolabels.get('premiered')[:4]
+            items.append(i)
 
         # Create our list
-        self.item_tmdbtype = 'tv'
-        self.list_items(items=items, url={'info': 'details', 'type': 'tv'})
+        self.item_tmdbtype = 'episode'
+        self.list_items(items=items, url={'info': 'details', 'type': 'episode'})
 
     def list_details(self):
         # Build empty container if no tmdb_id
