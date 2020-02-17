@@ -98,6 +98,24 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None):
             library_createfile(episode_name, episode_path, folder, season_name, basedir=basedir)
 
 
+def play():
+    with utils.busy_dialog():
+        tmdb_id, season, episode = None, None, None
+        dbtype = sys.listitem.getVideoInfoTag().getMediaType()
+
+        if dbtype == 'episode':
+            tmdb_id = sys.listitem.getProperty('tvshow.tmdb_id')
+            season = sys.listitem.getVideoInfoTag().getSeason()
+            episode = sys.listitem.getVideoInfoTag().getEpisode()
+            xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,play={},tmdb_id={},season={},episode={},force_dialog=True)'.format(
+                dbtype, tmdb_id, season, episode))
+
+        elif dbtype == 'movie':
+            tmdb_id = sys.listitem.getProperty('tmdb_id')
+            xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,play={},tmdb_id={},force_dialog=True)'.format(
+                dbtype, tmdb_id))
+
+
 def library():
     with utils.busy_dialog():
         title = utils.validify_filename(sys.listitem.getVideoInfoTag().getTitle())
@@ -163,6 +181,8 @@ def action(action, tmdb_id=None, tmdb_type=None, season=None, episode=None, labe
         func = _traktapi.sync_watchlist
     elif action == 'library':
         return library()
+    elif action == 'play':
+        return play()
     else:
         return
 

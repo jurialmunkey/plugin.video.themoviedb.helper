@@ -102,7 +102,7 @@ class Player(Plugin):
             xbmc.executebuiltin(utils.try_decode_string(action))
             return action
 
-    def play(self, itemtype, tmdb_id, season=None, episode=None):
+    def play(self, itemtype, tmdb_id, season=None, episode=None, force_dialog=False):
         """ Entry point for player method """
         if not tmdb_id or not itemtype:
             return
@@ -131,7 +131,7 @@ class Player(Plugin):
         if not self.itemlist:
             return False
 
-        return self.play_external()
+        return self.play_external(force_dialog=force_dialog)
 
     def build_details(self):
         self.item['id'] = self.tmdb_id

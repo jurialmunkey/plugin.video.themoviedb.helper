@@ -323,7 +323,8 @@ class Script(Plugin):
             return
         Player().play(
             itemtype=self.params.get('play'), tmdb_id=self.params.get('tmdb_id'),
-            season=self.params.get('season'), episode=self.params.get('episode'))
+            season=self.params.get('season'), episode=self.params.get('episode'),
+            force_dialog=self.params.get('force_dialog'))
 
     def update_players(self):
         players_url = self.addon.getSettingString('players_url')
