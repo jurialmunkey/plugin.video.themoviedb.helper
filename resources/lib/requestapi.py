@@ -86,7 +86,7 @@ class RequestAPI(object):
             return {} if dictify else None
         if not response.status_code == requests.codes.ok:  # Error Checking
             if response.status_code == 401:
-                utils.kodi_log('HTTP Error Code: {0}'.format(response.status_code), 1)
+                utils.kodi_log('HTTP Error Code: {0}\nRequest: {1}\nPostdata: {2}\nHeaders: {3}\nResponse: {4}'.format(response.status_code, request, postdata, headers, response), 1)
                 self.invalid_apikey()
             elif response.status_code == 500:
                 self.req_connect_err = utils.set_timestamp()
