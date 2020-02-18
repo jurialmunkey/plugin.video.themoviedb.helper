@@ -84,7 +84,7 @@ class RequestAPI(object):
             xbmcgui.Window(10000).setProperty(self.req_connect_err_prop, str(self.req_connect_err))
             utils.kodi_log('ConnectionError: {}\nSuppressing retries for 1 minute'.format(err), 1)
             return {} if dictify else None
-        if not response.status_code == requests.codes.ok and utils.try_parse_int(response.status_code) > 400:  # Error Checking
+        if not response.status_code == requests.codes.ok and utils.try_parse_int(response.status_code) >= 400:  # Error Checking
             if response.status_code == 401:
                 utils.kodi_log('HTTP Error Code: {0}\nRequest: {1}\nPostdata: {2}\nHeaders: {3}\nResponse: {4}'.format(response.status_code, request, postdata, headers, response), 1)
                 self.invalid_apikey()
