@@ -571,9 +571,10 @@ class Container(Plugin):
                 i.infoproperties.get('next_aired.season'), i.infoproperties.get('next_aired.episode'))
             if traktdetails and traktdetails.get('first_aired'):
                 air_date = utils.convert_timestamp(traktdetails.get('first_aired'), utc_convert=True)
-                i.infolabels['premiered'] = air_date.strftime('%Y-%m-%d')
+                i.infolabels['premiered'] = i.infoproperties['air_date'] = air_date.strftime('%Y-%m-%d')
                 i.infolabels['year'] = air_date.strftime('%Y')
                 i.infoproperties['air_time'] = air_date.strftime('%I:%M %p')
+                i.infoproperties['air_day'] = air_date.strftime('%A')
 
             items.append(i)
 
