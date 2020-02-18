@@ -293,6 +293,7 @@ class Container(Plugin):
 
     def get_userdiscover_folderpath_url(self):
         url = {'info': 'discover', 'type': self.params.get('type'), 'with_id': 'True'}
+        url = self.set_url_params(url)
         for i in self.get_userdiscover_listitems(basedir=True):
             k = i.get('url', {}).get('method')
             v = self.get_userdiscover_prop(k)
@@ -307,6 +308,7 @@ class Container(Plugin):
         if label:
             url['label'] = label
         url['type'] = self.params.get('type')
+        url = self.set_url_params(url)
         return url
 
     def clear_userdiscover_properties(self):
