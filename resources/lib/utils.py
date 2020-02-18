@@ -177,13 +177,21 @@ def convert_timestamp(time_str, time_fmt="%Y-%m-%dT%H:%M:%S", time_lim=19):
         return
 
 
-def date_to_format(time_str, str_fmt="%A", time_fmt="%Y-%m-%d", time_lim=8):
+def date_to_format(time_str, str_fmt="%A", time_fmt="%Y-%m-%d", time_lim=10):
     if not time_str:
         return
     time_obj = convert_timestamp(time_str, time_fmt, time_lim)
     if not time_obj:
         return
     return time_obj.strftime(str_fmt)
+
+
+def date_in_range(date_str, days=1, startdate=0, date_fmt="%Y-%m-%d", date_lim=10):
+    date_a = datetime.datetime.today() + datetime.timedelta(days=startdate)
+    date_z = date_a + datetime.timedelta(days=days)
+    mydate = convert_timestamp(date_str, date_fmt, date_lim)
+    if mydate >= date_a and mydate < date_z:
+        return date_str
 
 
 def kodi_log(value, level=0):

@@ -529,18 +529,61 @@ class Container(Plugin):
                 startdate=utils.try_parse_int(self.params.get('startdate'))),
             url={'info': 'details', 'type': 'episode'})
 
-    def list_traktcalendar(self):
+    def list_librarycalendar_episodes(self):
+        cache_refresh = False
+
+        # Get last refresh time and refresh details if a two days have passed
+        last_refresh = self.addon.getSettingString('last_refresh')
+        last_refresh = utils.convert_timestamp(last_refresh, time_fmt='%Y-%m-%d', time_lim=10) if last_refresh else None
+        if not last_refresh or last_refresh < datetime.datetime.now() - datetime.timedelta(days=2):
+            self.addon.setSettingString('last_refresh', datetime.datetime.now().strftime('%Y-%m-%d'))
+            cache_refresh = True
+
+        # Get our library tv items and convert to tmdb_ids and then get details and convert to list of listitems
+        detaileditems = [ListItem(library=self.library, **self.tmdb.get_detailed_item(
+            itemtype='tv', cache_refresh=cache_refresh,
+            tmdb_id=self.get_tmdb_id(itemtype='tv', query=i.get('title'), year=i.get('year'))))
+            for i in KodiLibrary(dbtype='tvshow').database]
+
+        # Get sorted list and only next_aired items TODO: Maybe a date range limit?
+        items = []
+        for i in sorted(detaileditems, key=lambda i: i.infoproperties.get('next_aired'), reverse=False):
+            if not i.infoproperties.get('next_aired'):
+                continue
+            if self.params.get('days') or self.params.get('startdate'):
+                if not utils.date_in_range(
+                        date_str=i.infoproperties.get('next_aired'),
+                        days=utils.try_parse_int(self.params.get('days', 1)),
+                        startdate=utils.try_parse_int(self.params.get('startdate', 0))):
+                    continue
+            i.infolabels['tvshowtitle'] = i.infolabels.get('title')
+            i.label = i.infolabels['title'] = i.infoproperties.get('next_aired.name')
+            i.infolabels['episode'] = i.infoproperties.get('next_aired.episode')
+            i.infolabels['season'] = i.infoproperties.get('next_aired.season')
+            i.infolabels['plot'] = i.infoproperties.get('next_aired.plot')
+            i.thumb = i.infoproperties.get('next_aired.thumb')
+            i.label2 = i.infolabels['premiered'] = i.infoproperties.get('next_aired')
+            i.infolabels['year'] = i.infolabels.get('premiered')[:4]
+            items.append(i)
+
+        # Create our list
+        self.item_tmdbtype = 'episode'
+        self.list_items(items=items, url={'info': 'details', 'type': 'episode'})
+
+    def list_calendar(self, trakt=False):
         if self.params.get('type') == 'episode':
-            self.list_traktcalendar_episodes()
+            self.list_traktcalendar_episodes() if trakt else self.list_librarycalendar_episodes()
             return
 
         icon = '{0}/resources/trakt.png'.format(self.addonpath)
+        calendar = constants.TRAKT_CALENDAR if trakt else constants.LIBRARY_CALENDAR
+        info = 'trakt_calendar' if trakt else 'library_nextaired'
         self.start_container()
-        for i in constants.TRAKT_CALENDAR:
+        for i in calendar:
             date = datetime.datetime.today() + datetime.timedelta(days=i[1])
             label = i[0].format(date.strftime('%A'))
             listitem = ListItem(label=label, icon=icon)
-            url = {'info': 'trakt_calendar', 'type': 'episode', 'startdate': i[1], 'days': i[2]}
+            url = {'info': info, 'type': 'episode', 'startdate': i[1], 'days': i[2]}
             url = self.set_url_params(url)
             listitem.create_listitem(self.handle, **url)
         self.finish_container()
@@ -827,41 +870,6 @@ class Container(Plugin):
             items=items, url_tmdb_id=self.params.get('tmdb_id'),
             url={'info': 'details', 'type': 'episode'})
 
-    def list_librarynextaired(self):
-        cache_refresh = False
-
-        # Get last refresh time and refresh details if a two days have passed
-        last_refresh = self.addon.getSettingString('last_refresh')
-        last_refresh = utils.convert_timestamp(last_refresh, time_fmt='%Y-%m-%d', time_lim=8) if last_refresh else None
-        if not last_refresh or last_refresh < datetime.datetime.now() - datetime.timedelta(days=2):
-            self.addon.setSettingString('last_refresh', datetime.datetime.now().strftime('%Y-%m-%d'))
-            cache_refresh = True
-
-        # Get our library tv items and convert to tmdb_ids and then get details and convert to list of listitems
-        detaileditems = [ListItem(library=self.library, **self.tmdb.get_detailed_item(
-            itemtype='tv', cache_refresh=cache_refresh,
-            tmdb_id=self.get_tmdb_id(itemtype='tv', query=i.get('title'), year=i.get('year'))))
-            for i in KodiLibrary(dbtype='tvshow').database]
-
-        # Get sorted list and only next_aired items TODO: Maybe a date range limit?
-        items = []
-        for i in sorted(detaileditems, key=lambda i: i.infoproperties.get('next_aired'), reverse=False):
-            if not i.infoproperties.get('next_aired'):
-                continue
-            i.infolabels['tvshowtitle'] = i.infolabels.get('title')
-            i.label = i.infolabels['title'] = i.infoproperties.get('next_aired.name')
-            i.infolabels['episode'] = i.infoproperties.get('next_aired.episode')
-            i.infolabels['season'] = i.infoproperties.get('next_aired.season')
-            i.infolabels['plot'] = i.infoproperties.get('next_aired.plot')
-            i.thumb = i.infoproperties.get('next_aired.thumb')
-            i.label2 = i.infolabels['premiered'] = i.infoproperties.get('next_aired')
-            i.infolabels['year'] = i.infolabels.get('premiered')[:4]
-            items.append(i)
-
-        # Create our list
-        self.item_tmdbtype = 'episode'
-        self.list_items(items=items, url={'info': 'details', 'type': 'episode'})
-
     def list_details(self):
         # Build empty container if no tmdb_id
         if not self.params.get('tmdb_id'):
@@ -1043,7 +1051,7 @@ class Container(Plugin):
         elif self.params.get('info') == 'dir_search':
             self.list_searchdir()
         elif self.params.get('info') == 'library_nextaired':
-            self.list_librarynextaired()
+            self.list_calendar(trakt=False)
         elif self.params.get('info') == 'trakt_becauseyouwatched':
             self.list_becauseyouwatched()
         elif self.params.get('info') == 'trakt_becausemostwatched':
@@ -1057,7 +1065,7 @@ class Container(Plugin):
             self.list_getid()
             self.list_traktupnext()
         elif self.params.get('info') == 'trakt_calendar':
-            self.list_traktcalendar()
+            self.list_calendar(trakt=True)
         elif self.params.get('info') == 'trakt_collection':
             self.list_traktcollection()
         elif self.params.get('info') in constants.TRAKT_USERLISTS:

@@ -689,9 +689,15 @@ TRAKT_USERLISTS = ['trakt_mylists', 'trakt_trendinglists', 'trakt_popularlists',
 
 TRAKT_HISTORY = ['trakt_nextepisodes', 'trakt_inprogress', 'trakt_history', 'trakt_mostwatched']
 
+MAIN_CALENDAR = [
+    ('Today', 0, 1), ('Tomorrow', 1, 1), ('{0}', 2, 1), ('{0}', 3, 1), ('{0}', 4, 1), ('{0}', 5, 1), ('{0}', 6, 1)]
+
 TRAKT_CALENDAR = [
-    ('Last Fortnight', -14, 14), ('Last Week', -7, 7), ('Yesterday', -1, 1), ('Today', 0, 1), ('Tomorrow', 1, 1),
-    ('{0}', 2, 1), ('{0}', 3, 1), ('{0}', 4, 1), ('{0}', 5, 1), ('{0}', 6, 1), ('Next Week', 0, 7)]
+    ('Last Fortnight', -14, 14), ('Last Week', -7, 7), ('Yesterday', -1, 1)] + MAIN_CALENDAR + [('Next Week', 0, 7)]
+
+LIBRARY_CALENDAR = [('All Items', 0, 365)] + MAIN_CALENDAR + [
+    ('{0}', 7, 1), ('{0}', 8, 1), ('{0}', 9, 1), ('{0}', 10, 1), ('{0}', 11, 1), ('{0}', 12, 1), ('{0}', 13, 1),
+    ('Next Week', 0, 7), ('Next Fornight', 0, 14)]
 
 USER_DISCOVER_LISTITEMS_BASEDIR = [
     {'label': 'Discover {0} w/ Below Settings', 'url': {'info': 'user_discover', 'method': 'open'}},
