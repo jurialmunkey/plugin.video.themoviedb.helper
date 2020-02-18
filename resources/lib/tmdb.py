@@ -131,6 +131,7 @@ class TMDb(RequestAPI):
         if item.get('last_episode_to_air'):
             i = item.get('last_episode_to_air', {})
             infoproperties['last_aired'] = i.get('air_date')
+            infoproperties['last_aired.day'] = utils.date_to_format(i.get('air_date'), "%A")
             infoproperties['last_aired.episode'] = i.get('episode_number')
             infoproperties['last_aired.name'] = i.get('name')
             infoproperties['last_aired.tmdb_id'] = i.get('id')
@@ -142,6 +143,7 @@ class TMDb(RequestAPI):
         if item.get('next_episode_to_air'):
             i = item.get('next_episode_to_air', {})
             infoproperties['next_aired'] = i.get('air_date')
+            infoproperties['next_aired.day'] = utils.date_to_format(i.get('air_date'), "%A")
             infoproperties['next_aired.episode'] = i.get('episode_number')
             infoproperties['next_aired.name'] = i.get('name')
             infoproperties['next_aired.tmdb_id'] = i.get('id')
@@ -384,7 +386,7 @@ class TMDb(RequestAPI):
         if not itemtype or not tmdb_id:
             return {}
         extra_request = None
-        cache_name = '{0}.TMDb.v2_2_18.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
+        cache_name = '{0}.TMDb.v2_2_67.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
         cache_name = '{0}.Season{1}'.format(cache_name, season) if season else cache_name
         cache_name = '{0}.Episode{1}'.format(cache_name, episode) if season and episode else cache_name
         itemdict = self.get_cache(cache_name) if not cache_refresh else None

@@ -177,6 +177,15 @@ def convert_timestamp(time_str, time_fmt="%Y-%m-%dT%H:%M:%S", time_lim=19):
         return
 
 
+def date_to_format(time_str, str_fmt="%A", time_fmt="%Y-%m-%dT%H:%M:%S", time_lim=19):
+    if not time_str:
+        return
+    time_obj = convert_timestamp(time_str, time_fmt, time_lim)
+    if not time_obj:
+        return
+    return time_obj.strftime(str_fmt)
+
+
 def kodi_log(value, level=0):
     logvalue = u'{0}{1}'.format(_addonlogname, value) if sys.version_info.major == 3 else u'{0}{1}'.format(_addonlogname, value).encode('utf-8', 'ignore')
     if level == 2 and _debuglogging:
