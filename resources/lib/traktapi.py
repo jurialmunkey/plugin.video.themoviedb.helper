@@ -27,8 +27,6 @@ class TraktAPI(RequestAPI):
         self.headers = {'trakt-api-version': '2', 'trakt-api-key': self.client_id, 'Content-Type': 'application/json'}
         self.tmdb = tmdb
         self.library = 'video'
-        self.utc_offset = -time.timezone // 3600
-        self.utc_offset += 1 if time.localtime().tm_isdst > 0 else 0
 
         if force:
             self.login()
@@ -334,7 +332,7 @@ class TraktAPI(RequestAPI):
                 itemtype='tv', tmdb_id=tmdb_id, season=season, episode=episode))
             item.tmdb_id, item.season, item.episode = tmdb_id, season, episode
             item.infolabels['title'] = item.label = i.get('episode', {}).get('title')
-            air_date = utils.convert_timestamp(i.get('first_aired', '')) + datetime.timedelta(hours=self.utc_offset)
+            air_date = utils.convert_timestamp(i.get('first_aired', ''), utc_convert=True)
             item.infolabels['premiered'] = air_date.strftime('%Y-%m-%d')
             item.infolabels['year'] = air_date.strftime('%Y')
             item.infoproperties['air_time'] = air_date.strftime('%I:%M %p')
@@ -409,8 +407,8 @@ class TraktAPI(RequestAPI):
 
     def get_details(self, item_type, id_num, season=None, episode=None):
         if not season or not episode:
-            return self.get_response_json(item_type + 's', id_num)
-        return self.get_response_json(item_type + 's', id_num, 'seasons', season, 'episodes', episode)
+            return self.get_response_json(item_type + 's', id_num, extended='full')
+        return self.get_response_json(item_type + 's', id_num, 'seasons', season, 'episodes', episode, extended='full')
 
     def get_traktslug(self, item_type, id_type, id_num):
         items = self.get_response_json('search', id_type, id_num, type=item_type)

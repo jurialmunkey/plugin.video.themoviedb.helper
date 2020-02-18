@@ -160,14 +160,20 @@ def age_difference(birthday, deathday=''):
         return
 
 
-def convert_timestamp(time_str, time_fmt="%Y-%m-%dT%H:%M:%S", time_lim=19):
+def convert_timestamp(time_str, time_fmt="%Y-%m-%dT%H:%M:%S", time_lim=19, utc_convert=False):
     time_str = time_str[:time_lim] if time_lim else time_str
+    utc_offset = 0
+    if utc_convert:
+        utc_offset = -time.timezone // 3600
+        utc_offset += 1 if time.localtime().tm_isdst > 0 else 0
     try:
         time_obj = datetime.datetime.strptime(time_str, time_fmt)
+        time_obj = time_obj + datetime.timedelta(hours=utc_offset)
         return time_obj
     except TypeError:
         try:
             time_obj = datetime.datetime(*(time.strptime(time_str, time_fmt)[0:6]))
+            time_obj = time_obj + datetime.timedelta(hours=utc_offset)
             return time_obj
         except Exception as exc:
             kodi_log(exc, 1)
@@ -177,19 +183,21 @@ def convert_timestamp(time_str, time_fmt="%Y-%m-%dT%H:%M:%S", time_lim=19):
         return
 
 
-def date_to_format(time_str, str_fmt="%A", time_fmt="%Y-%m-%d", time_lim=10):
+def date_to_format(time_str, str_fmt="%A", time_fmt="%Y-%m-%d", time_lim=10, utc_convert=False):
     if not time_str:
         return
-    time_obj = convert_timestamp(time_str, time_fmt, time_lim)
+    time_obj = convert_timestamp(time_str, time_fmt, time_lim, utc_convert=utc_convert)
     if not time_obj:
         return
     return time_obj.strftime(str_fmt)
 
 
-def date_in_range(date_str, days=1, startdate=0, date_fmt="%Y-%m-%d", date_lim=10):
+def date_in_range(date_str, days=1, startdate=0, date_fmt="%Y-%m-%d", date_lim=10, utc_convert=False):
     date_a = datetime.datetime.today() + datetime.timedelta(days=startdate)
     date_z = date_a + datetime.timedelta(days=days)
-    mydate = convert_timestamp(date_str, date_fmt, date_lim)
+    mydate = convert_timestamp(date_str, date_fmt, date_lim, utc_convert=utc_convert)
+    if not mydate or not date_a or not date_z:
+        return
     if mydate >= date_a and mydate < date_z:
         return date_str
 

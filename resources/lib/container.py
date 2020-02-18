@@ -564,6 +564,17 @@ class Container(Plugin):
             i.thumb = i.infoproperties.get('next_aired.thumb')
             i.label2 = i.infolabels['premiered'] = i.infoproperties.get('next_aired')
             i.infolabels['year'] = i.infolabels.get('premiered')[:4]
+
+            # Get some air time info from trakt and convert utc
+            traktdetails = TraktAPI().get_details(
+                'show', i.infoproperties.get('imdb_id'),
+                i.infoproperties.get('next_aired.season'), i.infoproperties.get('next_aired.episode'))
+            if traktdetails and traktdetails.get('first_aired'):
+                air_date = utils.convert_timestamp(traktdetails.get('first_aired'), utc_convert=True)
+                i.infolabels['premiered'] = air_date.strftime('%Y-%m-%d')
+                i.infolabels['year'] = air_date.strftime('%Y')
+                i.infoproperties['air_time'] = air_date.strftime('%I:%M %p')
+
             items.append(i)
 
         # Create our list
