@@ -76,6 +76,11 @@ def get_timestamp(timestamp=None):
     return timestamp
 
 
+def get_region_date(date_obj, region='dateshort', del_fmt=':%S'):
+    date_fmt = xbmc.getRegion(region).replace(del_fmt, '')
+    return date_obj.strftime(date_fmt)
+
+
 def set_timestamp(wait_time=60):
     return time.time() + wait_time
 
