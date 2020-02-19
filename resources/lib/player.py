@@ -243,5 +243,6 @@ class Player(Plugin):
 
     def playepisode(self):
         fuzzy_match = self.addon.getSettingBool('fuzzymatch_tv')
+        fuzzy_match = True  # TODO: Get tvshow year to match against but for now force fuzzy match
         dbid = KodiLibrary(dbtype='tvshow').get_info('dbid', fuzzy_match=fuzzy_match, **self.item)
         return self.playfile(KodiLibrary(dbtype='episode', tvshowid=dbid).get_info('file', season=self.season, episode=self.episode))
