@@ -2,7 +2,6 @@ from json import loads, dumps
 import resources.lib.utils as utils
 from resources.lib.requestapi import RequestAPI
 from resources.lib.listitem import ListItem
-import time
 import xbmc
 import random
 import xbmcgui
@@ -469,7 +468,7 @@ class TraktAPI(RequestAPI):
         if not self.sync.get(name):
             if not cache_refresh:
                 cache_refresh = False if self.sync_activities(itemtype + 's', activity) else True
-            self.sync[name] = self.get_request_lc('sync/', name, itemtype + 's', cache_refresh=cache_refresh)
+            self.sync[name] = self.get_request_lc('sync', name, itemtype + 's', cache_refresh=cache_refresh)
         if not self.sync.get(name):
             return {}
         if idtype:
