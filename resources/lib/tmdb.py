@@ -13,13 +13,13 @@ class TMDb(RequestAPI):
         super(TMDb, self).__init__(
             cache_short=cache_short, cache_long=cache_long,
             req_api_name='TMDb', req_api_url='https://api.themoviedb.org/3', req_wait_time=0.25,
-            req_api_key='?api_key=a07324c669cac4d96789197134ce272b')
+            req_api_key='api_key=a07324c669cac4d96789197134ce272b')
         api_key = api_key if api_key else 'a07324c669cac4d96789197134ce272b'
         language = language if language else 'en-US'
         self.iso_language = language[:2]
         self.iso_country = language[-2:]
         self.req_language = '{0}-{1}&include_image_language={0},null'.format(self.iso_language, self.iso_country)
-        self.req_api_key = '?api_key={0}'.format(api_key)
+        self.req_api_key = 'api_key={0}'.format(api_key)
         self.req_append = append_to_response if append_to_response else None
         self.imagepath_original = 'https://image.tmdb.org/t/p/original'
         self.imagepath_poster = 'https://image.tmdb.org/t/p/w500'

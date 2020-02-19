@@ -6,7 +6,7 @@ class OMDb(RequestAPI):
     def __init__(self, api_key=None, cache_short=None, cache_long=None):
         super(OMDb, self).__init__(
             cache_short=cache_short, cache_long=cache_long,
-            req_api_key='?apikey={0}'.format(api_key), req_api_name='OMDb',
+            req_api_key='apikey={0}'.format(api_key), req_api_name='OMDb',
             req_api_url='http://www.omdbapi.com/', req_wait_time=1)
 
     def get_request_item(self, imdb_id=None, title=None, year=None, tomatoes=True, fullplot=True, cache_only=False):

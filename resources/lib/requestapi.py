@@ -110,7 +110,8 @@ class RequestAPI(object):
         for arg in args:
             if arg:  # Don't add empty args
                 request = u'{0}/{1}'.format(request, arg)
-        request = u'{0}{1}'.format(request, self.req_api_key)
+        sep = '?' if '?' not in request else '&'
+        request = u'{0}{1}{2}'.format(request, sep, self.req_api_key)
         for key, value in kwargs.items():
             if value:  # Don't add empty kwargs
                 sep = '?' if '?' not in request else ''

@@ -6,8 +6,8 @@ class FanartTV(RequestAPI):
         super(FanartTV, self).__init__(
             cache_short=cache_short, cache_long=cache_long,
             req_api_name='FanartTV', req_api_url='http://webservice.fanart.tv/v3', req_wait_time=0,
-            req_api_key='?api_key=fcca59bee130b70db37ee43e63f8d6c1')
-        self.req_api_key = '?api_key={0}'.format(api_key) if api_key else self.req_api_key
+            req_api_key='api_key=fcca59bee130b70db37ee43e63f8d6c1')
+        self.req_api_key = 'api_key={0}'.format(api_key) if api_key else self.req_api_key
         self.req_api_key = '{0}&client_key={1}'.format(self.req_api_key, client_key) if client_key else self.req_api_key
         self.language = language[:2] if language else 'en'
         self.response, self.ftvtype, self.ftvid = None, None, None
