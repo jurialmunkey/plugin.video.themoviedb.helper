@@ -554,7 +554,8 @@ class Container(Plugin):
                 if not utils.date_in_range(
                         date_str=i.infoproperties.get('next_aired'),
                         days=utils.try_parse_int(self.params.get('days', 1)),
-                        startdate=utils.try_parse_int(self.params.get('startdate', 0))):
+                        startdate=utils.try_parse_int(self.params.get('startdate', 0)) - 1,
+                        utc_convert=True):
                     continue
             i.infolabels['tvshowtitle'] = i.infolabels.get('title')
             i.label = i.infolabels['title'] = i.infoproperties.get('next_aired.name')
