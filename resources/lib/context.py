@@ -98,6 +98,15 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None):
             library_createfile(episode_name, episode_path, folder, season_name, basedir=basedir)
 
 
+def browse():
+    tmdb_id = sys.listitem.getProperty('tvshow.tmdb_id')
+    path = 'plugin://plugin.video.themoviedb.helper/'
+    path = path + '?info=seasons&type=tv&nextpage=True&tmdb_id={}'.format(tmdb_id)
+    path = path + '&fanarttv=True' if _addon.getSettingBool('fanarttv_lookup') else path
+    command = 'Container.Update({})' if xbmc.getCondVisibility("Window.IsMedia") else 'ActivateWindow(videos,{},return)'
+    xbmc.executebuiltin(command.format(path))
+
+
 def play():
     with utils.busy_dialog():
         tmdb_id, season, episode = None, None, None
@@ -183,6 +192,8 @@ def action(action, tmdb_id=None, tmdb_type=None, season=None, episode=None, labe
         return library()
     elif action == 'play':
         return play()
+    elif action == 'open':
+        return browse()
     else:
         return
 
