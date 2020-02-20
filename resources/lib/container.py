@@ -567,7 +567,7 @@ class Container(Plugin):
             self.list_traktcalendar_episodes() if trakt else self.list_librarycalendar_episodes()
             return
 
-        icon = '{0}/resources/trakt.png'.format(self.addonpath) if trakt else '{0}/resources/tmdb/airing.png'.format(self.addonpath)
+        icon = '{0}/resources/trakt.png'.format(self.addonpath) if trakt else '{0}/resources/icons/tmdb/airing.png'.format(self.addonpath)
         calendar = constants.TRAKT_CALENDAR if trakt else constants.LIBRARY_CALENDAR
         info = 'trakt_calendar' if trakt else 'library_nextaired'
         self.start_container()
