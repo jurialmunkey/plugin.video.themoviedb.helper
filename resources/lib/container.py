@@ -704,7 +704,10 @@ class Container(Plugin):
         command = command.format(',season={0},episode={1}'.format(season, episode) if season and episode else '')
         xbmc.executebuiltin(command)
         if self.params.get('islocal'):
-            xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
+            if self.addon.getSettingBool('strm_method_resolvedurl'):
+                xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
+            else:
+                xbmcplugin.endOfDirectory(self.handle, updateListing=False, cacheToDisc=False)
 
     def get_searchhistory(self, itemtype=None, cache=None):
         if not itemtype:

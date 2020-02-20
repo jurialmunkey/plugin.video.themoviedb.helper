@@ -437,6 +437,11 @@ msgctxt "#32086"
 msgid "Auto-update TvShows for new/missing episodes on startup"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32087"
+msgid "Use resolvedURL method for suppressing strm next playlist error"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
