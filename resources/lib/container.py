@@ -530,55 +530,37 @@ class Container(Plugin):
             url={'info': 'details', 'type': 'episode'})
 
     def list_librarycalendar_episodes(self):
-        cache_refresh = False
+        # cache_refresh = False
 
         # Get last refresh time and refresh details if a two days have passed
-        last_refresh = self.addon.getSettingString('last_refresh')
-        last_refresh = utils.convert_timestamp(last_refresh, time_fmt='%Y-%m-%d', time_lim=10) if last_refresh else None
-        if not last_refresh or last_refresh < datetime.datetime.now() - datetime.timedelta(days=2):
-            self.addon.setSettingString('last_refresh', datetime.datetime.now().strftime('%Y-%m-%d'))
-            cache_refresh = True
+        # last_refresh = self.addon.getSettingString('last_refresh')
+        # last_refresh = utils.convert_timestamp(last_refresh, time_fmt='%Y-%m-%d', time_lim=10) if last_refresh else None
+        # if not last_refresh or last_refresh < datetime.datetime.now() - datetime.timedelta(days=2):
+        #     self.addon.setSettingString('last_refresh', datetime.datetime.now().strftime('%Y-%m-%d'))
+        #     cache_refresh = True
 
-        # Get our library tv items and convert to tmdb_ids and then get details and convert to list of listitems
-        detaileditems = [ListItem(library=self.library, **self.tmdb.get_detailed_item(
-            itemtype='tv', cache_refresh=cache_refresh,
-            tmdb_id=self.get_tmdb_id(itemtype='tv', query=i.get('title'), year=i.get('year'))))
-            for i in KodiLibrary(dbtype='tvshow').database]
+        kodidb = KodiLibrary(dbtype='tvshow')
 
-        # Get sorted list and only next_aired items TODO: Maybe a date range limit?
+        trakt = TraktAPI()
+        traktitems = [
+            i for i in trakt.get_airingshows(
+                start_date=utils.try_parse_int(self.params.get('startdate', 0)),
+                days=utils.try_parse_int(self.params.get('days', 1)))
+            if kodidb.get_info('dbid', title=i.get('show', {}).get('title'), year=str(i.get('show', {}).get('year')))]
+
         items = []
-        for i in sorted(detaileditems, key=lambda i: i.infoproperties.get('next_aired'), reverse=False):
-            if not i.infoproperties.get('next_aired'):
-                continue
-            if self.params.get('days') or self.params.get('startdate'):
-                if not utils.date_in_range(
-                        date_str=i.infoproperties.get('next_aired'),
-                        days=utils.try_parse_int(self.params.get('days', 1)),
-                        startdate=utils.try_parse_int(self.params.get('startdate', 0)) - 1,
-                        utc_convert=True):
-                    continue
-            i.infolabels['tvshowtitle'] = i.infolabels.get('title')
-            i.label = i.infolabels['title'] = i.infoproperties.get('next_aired.name')
-            i.infolabels['episode'] = i.infoproperties.get('next_aired.episode')
-            i.infolabels['season'] = i.infoproperties.get('next_aired.season')
-            i.infolabels['plot'] = i.infoproperties.get('next_aired.plot')
-            i.thumb = i.infoproperties.get('next_aired.thumb')
-            i.label2 = i.infolabels['premiered'] = i.infoproperties.get('next_aired')
-            i.infolabels['year'] = i.infolabels.get('premiered')[:4]
-
-            # Get some air time info from trakt and convert utc
-            traktdetails = TraktAPI().get_details(
-                'show', i.infoproperties.get('imdb_id'),
-                i.infoproperties.get('next_aired.season'), i.infoproperties.get('next_aired.episode'))
-            if traktdetails and traktdetails.get('first_aired'):
-                air_date = utils.convert_timestamp(traktdetails.get('first_aired'), utc_convert=True)
-                i.infolabels['premiered'] = air_date.strftime('%Y-%m-%d')
-                i.infolabels['year'] = air_date.strftime('%Y')
-                i.infoproperties['air_date'] = utils.get_region_date(air_date, 'datelong')
-                i.infoproperties['air_time'] = utils.get_region_date(air_date, 'time')
-                i.infoproperties['air_day'] = air_date.strftime('%A')
-
-            items.append(i)
+        for i in traktitems:
+            li = ListItem(library=self.library, **self.tmdb.get_detailed_item(
+                itemtype='tv', tmdb_id=i.get('show', {}).get('ids', {}).get('tmdb'),
+                season=i.get('episode', {}).get('season'),
+                episode=i.get('episode', {}).get('number')))
+            air_date = utils.convert_timestamp(i.get('first_aired'), utc_convert=True)
+            li.infolabels['premiered'] = air_date.strftime('%Y-%m-%d')
+            li.infolabels['year'] = air_date.strftime('%Y')
+            li.infoproperties['air_date'] = utils.get_region_date(air_date, 'datelong')
+            li.infoproperties['air_time'] = utils.get_region_date(air_date, 'time')
+            li.infoproperties['air_day'] = air_date.strftime('%A')
+            items.append(li)
 
         # Create our list
         self.item_tmdbtype = 'episode'

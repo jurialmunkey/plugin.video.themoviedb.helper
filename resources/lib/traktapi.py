@@ -307,6 +307,10 @@ class TraktAPI(RequestAPI):
                 n += 1
         return items
 
+    def get_airingshows(self, start_date=0, days=1):
+        start_date = datetime.datetime.today() + datetime.timedelta(days=start_date)
+        return self.get_response_json('calendars', 'all', 'shows', start_date.strftime('%Y-%m-%d'), days)
+
     def get_calendar(self, tmdbtype, user=True, start_date=None, days=None):
         user = 'my' if user else 'all'
         return self.get_response_json('calendars', user, tmdbtype, start_date, days)
