@@ -530,26 +530,22 @@ class Container(Plugin):
             url={'info': 'details', 'type': 'episode'})
 
     def list_librarycalendar_episodes(self):
-        # cache_refresh = False
-
-        # Get last refresh time and refresh details if a two days have passed
-        # last_refresh = self.addon.getSettingString('last_refresh')
-        # last_refresh = utils.convert_timestamp(last_refresh, time_fmt='%Y-%m-%d', time_lim=10) if last_refresh else None
-        # if not last_refresh or last_refresh < datetime.datetime.now() - datetime.timedelta(days=2):
-        #     self.addon.setSettingString('last_refresh', datetime.datetime.now().strftime('%Y-%m-%d'))
-        #     cache_refresh = True
-
         kodidb = KodiLibrary(dbtype='tvshow')
 
         trakt = TraktAPI()
         traktitems = [
             i for i in trakt.get_airingshows(
-                start_date=utils.try_parse_int(self.params.get('startdate', 0)),
-                days=utils.try_parse_int(self.params.get('days', 1)))
+                start_date=utils.try_parse_int(self.params.get('startdate', 0)) - 1,
+                days=utils.try_parse_int(self.params.get('days', 1)) + 1)
             if kodidb.get_info('dbid', title=i.get('show', {}).get('title'), year=str(i.get('show', {}).get('year')))]
 
         items = []
         for i in traktitems:
+            if not utils.date_in_range(
+                    i.get('first_aired'),
+                    start_date=utils.try_parse_int(self.params.get('startdate', 0)) - 1,
+                    days=utils.try_parse_int(self.params.get('days', 1))):
+                continue
             li = ListItem(library=self.library, **self.tmdb.get_detailed_item(
                 itemtype='tv', tmdb_id=i.get('show', {}).get('ids', {}).get('tmdb'),
                 season=i.get('episode', {}).get('season'),
