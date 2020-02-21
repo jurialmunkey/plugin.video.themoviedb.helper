@@ -81,9 +81,9 @@ class Player(Plugin):
                         d_items = []
                         for f in folder:  # Create our list of items
                             if f.get('season') and f.get('episode'):
-                                li = u'{}x{}. {}'.format(f.get('season'), f.get('episode'), f.get('title'))
+                                li = u'{}x{}. {}'.format(f.get('season'), f.get('episode'), f.get('label'))
                             else:
-                                li = u'{} ({})'.format(f.get('title'), f.get('year'))
+                                li = u'{} ({})'.format(f.get('label'), f.get('year'))
                             d_items.append(li)
                         idx = xbmcgui.Dialog().select('Select Item to Play', d_items)
                         if idx > -1:  # If user didn't exit dialog get the item
