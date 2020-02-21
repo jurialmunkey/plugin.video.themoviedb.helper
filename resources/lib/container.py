@@ -542,8 +542,8 @@ class Container(Plugin):
         items = []
         for i in traktitems:
             if not utils.date_in_range(
-                    i.get('first_aired'),
-                    start_date=utils.try_parse_int(self.params.get('startdate', 0)) - 1,
+                    i.get('first_aired'), utc_convert=True,
+                    start_date=utils.try_parse_int(self.params.get('startdate', 0)),
                     days=utils.try_parse_int(self.params.get('days', 1))):
                 continue
             li = ListItem(library=self.library, **self.tmdb.get_detailed_item(

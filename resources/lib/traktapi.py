@@ -308,7 +308,7 @@ class TraktAPI(RequestAPI):
         return items
 
     def get_airingshows(self, start_date=0, days=1):
-        start_date = datetime.datetime.today() + datetime.timedelta(days=start_date)
+        start_date = datetime.date.today() + datetime.timedelta(days=start_date)
         return self.get_response_json('calendars', 'all', 'shows', start_date.strftime('%Y-%m-%d'), days)
 
     def get_calendar(self, tmdbtype, user=True, start_date=None, days=None):
@@ -321,7 +321,7 @@ class TraktAPI(RequestAPI):
         if not self.tmdb or not self.authorize():
             return items
 
-        date = datetime.datetime.today() + datetime.timedelta(days=startdate)
+        date = datetime.date.today() + datetime.timedelta(days=startdate)
         response = TraktAPI().get_calendar('shows', True, start_date=date.strftime('%Y-%m-%d'), days=days)
 
         if not response:

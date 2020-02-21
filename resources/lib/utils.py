@@ -198,9 +198,9 @@ def date_to_format(time_str, str_fmt="%A", time_fmt="%Y-%m-%d", time_lim=10, utc
 
 
 def date_in_range(date_str, days=1, start_date=0, date_fmt="%Y-%m-%dT%H:%M:%S", date_lim=19, utc_convert=False):
-    date_a = datetime.datetime.today() + datetime.timedelta(days=start_date)
+    date_a = datetime.date.today() + datetime.timedelta(days=start_date)
     date_z = date_a + datetime.timedelta(days=days)
-    mydate = convert_timestamp(date_str, date_fmt, date_lim, utc_convert=utc_convert)
+    mydate = convert_timestamp(date_str, date_fmt, date_lim, utc_convert=utc_convert).date()
     if not mydate or not date_a or not date_z:
         return
     if mydate >= date_a and mydate < date_z:
