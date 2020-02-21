@@ -712,11 +712,10 @@ class Container(Plugin):
                 xbmc.Monitor().waitForAbort(1)
                 resolvedurl = xbmcgui.Window(10000).getProperty('TMDbHelper.Player.ResolvedUrl')
                 timeout -= 1
-            xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
-            # if self.addon.getSettingBool('strm_method_resolvedurl'):
-            #     xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
-            # else:
-            #     xbmcplugin.endOfDirectory(self.handle, updateListing=False, cacheToDisc=False)
+            if self.addon.getSettingBool('strm_method_resolvedurl'):
+                xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
+            else:
+                xbmcplugin.endOfDirectory(self.handle, updateListing=False, cacheToDisc=False)
         xbmcgui.Window(10000).clearProperty('TMDbHelper.Player.ResolvedUrl')
 
     def get_searchhistory(self, itemtype=None, cache=None):
