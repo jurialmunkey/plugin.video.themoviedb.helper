@@ -545,6 +545,9 @@ class Container(Plugin):
                     i.get('first_aired'), utc_convert=True,
                     start_date=utils.try_parse_int(self.params.get('startdate', 0)),
                     days=utils.try_parse_int(self.params.get('days', 1))):
+                utils.kodi_log('Next Aired Library: Not in Range\n{} - {}x{}. {}'.format(
+                    i.get('show', {}).get('title'), i.get('episode', {}).get('season'),
+                    i.get('episode', {}).get('number'), i.get('episode', {}).get('title')), 1)
                 continue
             li = ListItem(library=self.library, **self.tmdb.get_detailed_item(
                 itemtype='tv', tmdb_id=i.get('show', {}).get('ids', {}).get('tmdb'),
