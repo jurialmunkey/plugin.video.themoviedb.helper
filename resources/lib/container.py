@@ -702,12 +702,22 @@ class Container(Plugin):
         season, episode = self.params.get('season'), self.params.get('episode')
         command = 'RunScript(plugin.video.themoviedb.helper,play={0},tmdb_id={1}{{0}})'.format(self.params.get('type'), self.params.get('tmdb_id'))
         command = command.format(',season={0},episode={1}'.format(season, episode) if season and episode else '')
+        xbmcgui.Window(10000).clearProperty('TMDbHelper.Player.ResolvedUrl')
         xbmc.executebuiltin(command)
+
         if self.params.get('islocal'):
-            if self.addon.getSettingBool('strm_method_resolvedurl'):
-                xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
-            else:
-                xbmcplugin.endOfDirectory(self.handle, updateListing=False, cacheToDisc=False)
+            timeout = 20
+            resolvedurl = False
+            while not xbmc.Monitor().abortRequested() and not resolvedurl and timeout > 0:
+                xbmc.Monitor().waitForAbort(1)
+                resolvedurl = xbmcgui.Window(10000).getProperty('TMDbHelper.Player.ResolvedUrl')
+                timeout -= 1
+            xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
+            # if self.addon.getSettingBool('strm_method_resolvedurl'):
+            #     xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
+            # else:
+            #     xbmcplugin.endOfDirectory(self.handle, updateListing=False, cacheToDisc=False)
+        xbmcgui.Window(10000).clearProperty('TMDbHelper.Player.ResolvedUrl')
 
     def get_searchhistory(self, itemtype=None, cache=None):
         if not itemtype:
