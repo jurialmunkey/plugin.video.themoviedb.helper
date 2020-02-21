@@ -325,7 +325,7 @@ class Script(Plugin):
             itemtype=self.params.get('play'), tmdb_id=self.params.get('tmdb_id'),
             season=self.params.get('season'), episode=self.params.get('episode'),
             force_dialog=self.params.get('force_dialog'))
-        self.home.setProperty('TMDbHelper.Player.ResolvedUrl', 'True')
+        self.home.clearProperty('TMDbHelper.Player.ResolvedUrl')  # Clear our lock property
 
     def update_players(self):
         players_url = self.addon.getSettingString('players_url')
