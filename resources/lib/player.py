@@ -76,6 +76,23 @@ class Player(Plugin):
                     if player[0]:
                         break  # Playable item was found in last action so let's break and play it
                     folder = KodiLibrary().get_directory(string_format_map(player[1], self.item))  # Get the next folder from the plugin
+
+                    if d.get('dialog'):  # Special option to show dialog of items to select from
+                        d_items = []
+                        for f in folder:  # Create our list of items
+                            if f.get('season') and f.get('episode'):
+                                li = u'{}x{}. {}'.format(f.get('season'), f.get('episode'), f.get('title'))
+                            else:
+                                li = u'{} ({})'.format(f.get('title'), f.get('year'))
+                            d_items.append(li)
+                        idx = xbmcgui.Dialog().select('Select Item to Play', d_items)
+                        if idx > -1:  # If user didn't exit dialog get the item
+                            resolve_url = True if folder[idx].get('filetype') == 'file' else False  # Set true for files so we can play
+                            player = (resolve_url, folder[idx].get('file'))  # Set the folder path to open/play
+                        else:
+                            player = None
+                        break  # Move onto next action
+
                     x = 0
                     for f in folder:  # Iterate through plugin folder looking for a matching item
                         x += 1  # Keep an index for position matching
