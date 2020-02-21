@@ -562,7 +562,6 @@ class Container(Plugin):
             li.infoproperties['air_date'] = utils.get_region_date(air_date, 'datelong')
             li.infoproperties['air_time'] = utils.get_region_date(air_date, 'time')
             li.infoproperties['air_day'] = air_date.strftime('%A')
-            utils.kodi_log('Next Aired Library: Adding Item\n{}'.format(li.label), 1)
             items.append(li)
 
         # Create our list
