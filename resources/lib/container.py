@@ -545,10 +545,13 @@ class Container(Plugin):
                     i.get('first_aired'), utc_convert=True,
                     start_date=utils.try_parse_int(self.params.get('startdate', 0)),
                     days=utils.try_parse_int(self.params.get('days', 1))):
-                utils.kodi_log('Next Aired Library: Not in Range\n{} - {}x{}. {}'.format(
-                    i.get('show', {}).get('title'), i.get('episode', {}).get('season'),
+                utils.kodi_log('Next Aired Library: Not in Range\n{}\n{} - {}x{}. {}'.format(
+                    i.get('first_aired'), i.get('show', {}).get('title'), i.get('episode', {}).get('season'),
                     i.get('episode', {}).get('number'), i.get('episode', {}).get('title')), 1)
                 continue
+            utils.kodi_log('Next Aired Library: Item in Range\n{}\n{} - {}x{}. {}'.format(
+                i.get('first_aired'), i.get('show', {}).get('title'), i.get('episode', {}).get('season'),
+                i.get('episode', {}).get('number'), i.get('episode', {}).get('title')), 1)
             li = ListItem(library=self.library, **self.tmdb.get_detailed_item(
                 itemtype='tv', tmdb_id=i.get('show', {}).get('ids', {}).get('tmdb'),
                 season=i.get('episode', {}).get('season'),
@@ -559,6 +562,7 @@ class Container(Plugin):
             li.infoproperties['air_date'] = utils.get_region_date(air_date, 'datelong')
             li.infoproperties['air_time'] = utils.get_region_date(air_date, 'time')
             li.infoproperties['air_day'] = air_date.strftime('%A')
+            utils.kodi_log('Next Aired Library: Adding Item\n{}'.format(li.label), 1)
             items.append(li)
 
         # Create our list
