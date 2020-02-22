@@ -138,6 +138,11 @@ BASEDIR_TMDB = [
         'types': ['tv'],
         'icon': '{0}/resources/icons/tmdb/airing.png'},
     {
+        'info': 'library_nextaired',
+        'name': 'Next Aired Library',
+        'types': ['tv'],
+        'icon': '{0}/resources/icons/tmdb/airing.png'},
+    {
         'info': 'genres',
         'name': '{0}{1}Genres',
         'types': ['movie', 'tv'],
@@ -151,11 +156,6 @@ BASEDIR_TMDB = [
         'info': 'most_voted',
         'name': 'Most Voted{1}{0}',
         'types': ['movie', 'tv'],
-        'icon': '{0}/resources/poster.png'},
-    {
-        'info': 'library_nextaired',
-        'name': 'Next Aired Library{1}{0}',
-        'types': ['tv'],
         'icon': '{0}/resources/poster.png'}]
 
 BASEDIR_TRAKT = [
@@ -697,8 +697,8 @@ TRAKT_CALENDAR = [
 
 LIBRARY_CALENDAR = [
     ('Last Fortnight', -14, 14), ('Last Week', -7, 7), ('Yesterday', -1, 1)] + MAIN_CALENDAR + [
-    ('Next {0}', 7, 1), ('Next {0}', 8, 1), ('Next {0}', 9, 1), ('Next {0}', 10, 1), ('Next {0}', 11, 1),
-    ('Next {0}', 12, 1), ('Next {0}', 13, 1), ('Next Week', 0, 7), ('Next Fornight', 0, 14), ('Next Month', 0, 31)]
+    ('Next Week', 0, 7), ('Next Fornight', 0, 14), ('Next {0}', 7, 1), ('Next {0}', 8, 1), ('Next {0}', 9, 1),
+    ('Next {0}', 10, 1), ('Next {0}', 11, 1), ('Next {0}', 12, 1), ('Next {0}', 13, 1), ('All Items', 0, 365)]
 
 USER_DISCOVER_LISTITEMS_BASEDIR = [
     {'label': 'Discover {0} w/ Below Settings', 'url': {'info': 'user_discover', 'method': 'open'}},
