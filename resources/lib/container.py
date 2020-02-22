@@ -700,6 +700,8 @@ class Container(Plugin):
         for k, v in self.params.items():
             lock = '{}.{}={}'.format(lock, k, v) if lock else '{}={}'.format(k, v)
         cur_lock = xbmcgui.Window(10000).getProperty('TMDbHelper.Player.ResolvedUrl')
+        if self.params.get('islocal'):  # setResolvedUrl for local files
+            xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
         if cur_lock == lock:
             return cur_lock
         xbmcgui.Window(10000).setProperty('TMDbHelper.Player.ResolvedUrl', lock)
@@ -707,20 +709,11 @@ class Container(Plugin):
     def list_play(self):
         if not self.params.get('type') or not self.params.get('tmdb_id'):
             return
-
-        # Call player
         season, episode = self.params.get('season', ''), self.params.get('episode', '')
         command = 'play={0},tmdb_id={1}{{0}}'.format(self.params.get('type'), self.params.get('tmdb_id'))
         command = command.format(',season={0},episode={1}'.format(season, episode) if season and episode else '')
         command = 'RunScript(plugin.video.themoviedb.helper,{})'.format(command)
         xbmc.executebuiltin(command)
-
-        # setResolvedUrl for local files
-        if self.params.get('islocal'):
-            if self.addon.getSettingBool('strm_method_resolvedurl'):
-                xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
-            else:
-                xbmcplugin.endOfDirectory(self.handle, updateListing=False, cacheToDisc=False)
 
     def get_searchhistory(self, itemtype=None, cache=None):
         if not itemtype:

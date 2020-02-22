@@ -48,11 +48,10 @@ class Player(Plugin):
         if force_dialog or (self.itemtype == 'movie' and not default_player_movies) or (self.itemtype == 'episode' and not default_player_episodes):
             return xbmcgui.Dialog().select(self.addon.getLocalizedString(32042), self.itemlist)
         itemindex = -1
-        with utils.busy_dialog():
-            for index in range(0, len(self.itemlist)):
-                label = self.itemlist[index].getLabel()
-                if (label == default_player_movies and self.itemtype == 'movie') or (label == default_player_episodes and self.itemtype == 'episode'):
-                    return index
+        for index in range(0, len(self.itemlist)):
+            label = self.itemlist[index].getLabel()
+            if (label == default_player_movies and self.itemtype == 'movie') or (label == default_player_episodes and self.itemtype == 'episode'):
+                return index
         return itemindex
 
     def play_external(self, force_dialog=False):
@@ -71,46 +70,45 @@ class Player(Plugin):
         if isinstance(player[1], list):
             actionlist = player[1]
             player = (False, actionlist[0])
-            with utils.busy_dialog():
-                for d in actionlist[1:]:
-                    if player[0]:
-                        break  # Playable item was found in last action so let's break and play it
-                    folder = KodiLibrary().get_directory(string_format_map(player[1], self.item))  # Get the next folder from the plugin
+            for d in actionlist[1:]:
+                if player[0]:
+                    break  # Playable item was found in last action so let's break and play it
+                folder = KodiLibrary().get_directory(string_format_map(player[1], self.item))  # Get the next folder from the plugin
 
-                    if d.get('dialog'):  # Special option to show dialog of items to select from
-                        d_items = []
-                        for f in folder:  # Create our list of items
-                            if f.get('season') and f.get('episode'):
-                                li = u'{}x{}. {}'.format(f.get('season'), f.get('episode'), f.get('label'))
-                            else:
-                                li = u'{} ({})'.format(f.get('label'), f.get('year'))
-                            d_items.append(li)
-                        idx = xbmcgui.Dialog().select('Select Item to Play', d_items)
-                        if idx > -1:  # If user didn't exit dialog get the item
-                            resolve_url = True if folder[idx].get('filetype') == 'file' else False  # Set true for files so we can play
-                            player = (resolve_url, folder[idx].get('file'))  # Set the folder path to open/play
+                if d.get('dialog'):  # Special option to show dialog of items to select from
+                    d_items = []
+                    for f in folder:  # Create our list of items
+                        if f.get('season') and f.get('episode'):
+                            li = u'{}x{}. {}'.format(f.get('season'), f.get('episode'), f.get('label'))
                         else:
-                            player = None
-                        break  # Move onto next action
-
-                    x = 0
-                    for f in folder:  # Iterate through plugin folder looking for a matching item
-                        x += 1  # Keep an index for position matching
-                        for k, v in d.items():  # Iterate through our key (infolabel) / value (infolabel must match) pairs of our action
-                            if k == 'position':  # We're looking for an item position not an infolabel
-                                if utils.try_parse_int(string_format_map(v, self.item)) != x:  # Format our position value
-                                    break  # Not the item position we want so let's go to next item in folder
-                            elif not f.get(k) or string_format_map(v, self.item) not in u'{}'.format(f.get(k, '')):  # Format our value and check if it matches the infolabel key
-                                break  # Item's key value doesn't match value we are looking for so let's got to next item in folder
-                        else:  # Item matched our criteria so let's open it up
-                            resolve_url = True if f.get('filetype') == 'file' else False  # Set true for files so we can play
-                            player = (resolve_url, f.get('file'))  # Get ListItem.FolderPath for item
-                            break  # Move onto next action (either open next folder or play file)
+                            li = u'{} ({})'.format(f.get('label'), f.get('year'))
+                        d_items.append(li)
+                    idx = xbmcgui.Dialog().select('Select Item to Play', d_items)
+                    if idx > -1:  # If user didn't exit dialog get the item
+                        resolve_url = True if folder[idx].get('filetype') == 'file' else False  # Set true for files so we can play
+                        player = (resolve_url, folder[idx].get('file'))  # Set the folder path to open/play
                     else:
-                        xbmcgui.Dialog().notification(self.itemlist[itemindex].getLabel(), self.addon.getLocalizedString(32040))
-                        del self.actions[itemindex]  # Item not found so remove the player's action list
-                        del self.itemlist[itemindex]  # Item not found so remove the player's select dialog entry
-                        return self.play_external(force_dialog=True)  # Ask user to select a different player
+                        player = None
+                    break  # Move onto next action
+
+                x = 0
+                for f in folder:  # Iterate through plugin folder looking for a matching item
+                    x += 1  # Keep an index for position matching
+                    for k, v in d.items():  # Iterate through our key (infolabel) / value (infolabel must match) pairs of our action
+                        if k == 'position':  # We're looking for an item position not an infolabel
+                            if utils.try_parse_int(string_format_map(v, self.item)) != x:  # Format our position value
+                                break  # Not the item position we want so let's go to next item in folder
+                        elif not f.get(k) or string_format_map(v, self.item) not in u'{}'.format(f.get(k, '')):  # Format our value and check if it matches the infolabel key
+                            break  # Item's key value doesn't match value we are looking for so let's got to next item in folder
+                    else:  # Item matched our criteria so let's open it up
+                        resolve_url = True if f.get('filetype') == 'file' else False  # Set true for files so we can play
+                        player = (resolve_url, f.get('file'))  # Get ListItem.FolderPath for item
+                        break  # Move onto next action (either open next folder or play file)
+                else:
+                    xbmcgui.Dialog().notification(self.itemlist[itemindex].getLabel(), self.addon.getLocalizedString(32040))
+                    del self.actions[itemindex]  # Item not found so remove the player's action list
+                    del self.itemlist[itemindex]  # Item not found so remove the player's select dialog entry
+                    return self.play_external(force_dialog=True)  # Ask user to select a different player
 
         # Play/Search found item
         if player and player[1]:
@@ -146,8 +144,7 @@ class Player(Plugin):
         if is_local:
             return is_local
 
-        with utils.busy_dialog():
-            self.setup_players(details=True)
+        self.setup_players(details=True)
 
         if not self.itemlist:
             return False
