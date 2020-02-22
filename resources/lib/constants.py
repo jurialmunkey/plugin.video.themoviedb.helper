@@ -206,12 +206,12 @@ BASEDIR_TRAKT = [
         'types': ['movie', 'tv']},
     {
         'info': 'trakt_myairing',
-        'name': 'Your{1}{0}{1}Airing This Week',
+        'name': 'Your {0}{1}Airing This Week',
         'icon': '{0}/resources/icons/trakt/airing.png',
         'types': ['tv']},
     {
         'info': 'trakt_calendar',
-        'name': 'Your{1}{0}{1}Calendar',
+        'name': 'Your {0}{1}Calendar',
         'icon': '{0}/resources/icons/trakt/calendar.png',
         'types': ['tv']},
     {
@@ -263,7 +263,7 @@ BASEDIR_TRAKT = [
 BASEDIR_RANDOM = [
     {
         'info': 'random_genres',
-        'name': 'Random{1}{0}{1}Genre',
+        'name': 'Random {0}{1}Genre',
         'types': ['movie', 'tv'],
         'icon': '{0}/resources/icons/tmdb/genre.png'},
     {
