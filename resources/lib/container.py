@@ -532,6 +532,8 @@ class Container(Plugin):
     def list_librarycalendar_episodes(self):
         kodidb = KodiLibrary(dbtype='tvshow')
 
+        # Get calendar items from Trakt and check if matching show in kodi library
+        # Widened calendar date range by 24hrs each side to accomodate timezone conversion as Trakt is UTC 00:00
         trakt = TraktAPI()
         traktitems = [
             i for i in trakt.get_airingshows(
@@ -545,20 +547,36 @@ class Container(Plugin):
                     i.get('first_aired'), utc_convert=True,
                     start_date=utils.try_parse_int(self.params.get('startdate', 0)),
                     days=utils.try_parse_int(self.params.get('days', 1))):
-                utils.kodi_log('Next Aired Library: Not in Range\n{}\n{} - {}x{}. {}'.format(
-                    i.get('first_aired'), i.get('show', {}).get('title'), i.get('episode', {}).get('season'),
-                    i.get('episode', {}).get('number'), i.get('episode', {}).get('title')), 1)
-                continue
+                continue  # Don't add items that aren't in our timezone converted range
+
+            # Check Trakt has a TMDb ID for the show and look-up the item if it doesn't
+            if not i.get('show', {}).get('ids', {}).get('tmdb'):
+                i['show']['ids']['tmdb'] = self.get_tmdb_id(
+                    itemtype='tv', query=i.get('show', {}).get('title'),
+                    imdb_id=i.get('show', {}).get('ids', {}).get('imdb'),
+                    tvdb_id=i.get('show', {}).get('ids', {}).get('tvdb'))
+
+            # Create our list item
             li = ListItem(library=self.library, **self.tmdb.get_detailed_item(
                 itemtype='tv', tmdb_id=i.get('show', {}).get('ids', {}).get('tmdb'),
                 season=i.get('episode', {}).get('season'),
                 episode=i.get('episode', {}).get('number')))
+
+            # Create our airing properties
             air_date = utils.convert_timestamp(i.get('first_aired'), utc_convert=True)
             li.infolabels['premiered'] = air_date.strftime('%Y-%m-%d')
             li.infolabels['year'] = air_date.strftime('%Y')
             li.infoproperties['air_date'] = utils.get_region_date(air_date, 'datelong')
             li.infoproperties['air_time'] = utils.get_region_date(air_date, 'time')
             li.infoproperties['air_day'] = air_date.strftime('%A')
+
+            # Do some fallback properties in-case TMDb doesn't have info
+            li.infolabels['title'] = li.label = i.get('episode', {}).get('title')
+            li.infolabels['episode'] = i.get('episode', {}).get('number')
+            li.infolabels['season'] = i.get('episode', {}).get('season')
+            li.infolabels['tvshowtitle'] = i.get('show', {}).get('title')
+
+            # Add our item
             items.append(li)
 
         # Create our list
