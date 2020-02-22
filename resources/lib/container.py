@@ -535,9 +535,9 @@ class Container(Plugin):
         trakt = TraktAPI()
         traktitems = [
             i for i in trakt.get_airingshows(
-                start_date=utils.try_parse_int(self.params.get('startdate', 0)) - 2,
-                days=utils.try_parse_int(self.params.get('days', 1)) + 4)
-            if kodidb.get_info('dbid', title=i.get('show', {}).get('title'), year=str(i.get('show', {}).get('year')))]
+                start_date=utils.try_parse_int(self.params.get('startdate', 0)) - 1,
+                days=utils.try_parse_int(self.params.get('days', 1)) + 2)
+            if kodidb.get_info('dbid', title=i.get('show', {}).get('title'))]
 
         items = []
         for i in traktitems:
@@ -549,9 +549,6 @@ class Container(Plugin):
                     i.get('first_aired'), i.get('show', {}).get('title'), i.get('episode', {}).get('season'),
                     i.get('episode', {}).get('number'), i.get('episode', {}).get('title')), 1)
                 continue
-            utils.kodi_log('Next Aired Library: Item in Range\n{}\n{} - {}x{}. {}'.format(
-                i.get('first_aired'), i.get('show', {}).get('title'), i.get('episode', {}).get('season'),
-                i.get('episode', {}).get('number'), i.get('episode', {}).get('title')), 1)
             li = ListItem(library=self.library, **self.tmdb.get_detailed_item(
                 itemtype='tv', tmdb_id=i.get('show', {}).get('ids', {}).get('tmdb'),
                 season=i.get('episode', {}).get('season'),
