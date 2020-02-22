@@ -535,8 +535,8 @@ class Container(Plugin):
         trakt = TraktAPI()
         traktitems = [
             i for i in trakt.get_airingshows(
-                start_date=utils.try_parse_int(self.params.get('startdate', 0)) - 1,
-                days=utils.try_parse_int(self.params.get('days', 1)) + 2)
+                start_date=utils.try_parse_int(self.params.get('startdate', 0)) - 2,
+                days=utils.try_parse_int(self.params.get('days', 1)) + 4)
             if kodidb.get_info('dbid', title=i.get('show', {}).get('title'), year=str(i.get('show', {}).get('year')))]
 
         items = []
