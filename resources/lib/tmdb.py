@@ -384,6 +384,7 @@ class TMDb(RequestAPI):
 
     def get_detailed_item(self, itemtype, tmdb_id, season=None, episode=None, cache_only=False, cache_refresh=False):
         if not itemtype or not tmdb_id:
+            utils.kodi_log('TMDb Get Details: No Item Type or TMDb ID!\n{} {} {} {}'.format(itemtype, tmdb_id, season, episode), 1)
             return {}
         extra_request = None
         cache_name = '{0}.TMDb.v2_2_67.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
@@ -403,6 +404,7 @@ class TMDb(RequestAPI):
             if extra_request:
                 request = utils.merge_two_dicts(request, extra_request)
             itemdict = self.set_cache(self.get_niceitem(request), cache_name, self.cache_long) if request else {}
+            utils.kodi_log('TMDb Get Details: No Item Found!\n{} {} {} {}'.format(itemtype, tmdb_id, season, episode), 1) if not request else None
         return itemdict
 
     def get_externalid_item(self, itemtype, external_id, external_source):
