@@ -197,7 +197,7 @@ class Player(Plugin):
             self.item[k + '_-'] = v.replace(' ', '-')
             self.item[k + '_escaped'] = v.replace(' ', '%2520')
             self.item[k + '_escaped+'] = v.replace(' ', '%252B')
-            self.item[k + '_url'] = quote_plus(v)
+            self.item[k + '_url'] = quote_plus(utils.try_encode_string(v))
 
     def build_players(self, tmdbtype=None):
         basedirs = ['special://profile/addon_data/plugin.video.themoviedb.helper/players/']
