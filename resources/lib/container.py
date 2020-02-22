@@ -232,7 +232,8 @@ class Container(Plugin):
                 i.infolabels['season'] = season_num
 
             # Format episode labels
-            if self.item_tmdbtype == 'episode' and i.infolabels.get('season') and i.infolabels.get('episode'):
+            if (not self.params.get('info') == 'details' and self.item_tmdbtype == 'episode' and
+                    i.infolabels.get('season') and i.infolabels.get('episode')):
                 i.label = u'{:02d}. {}'.format(utils.try_parse_int(i.infolabels.get('episode')), i.label)
                 if self.params.get('info') in ['trakt_calendar', 'trakt_nextepisodes', 'trakt_upnext'] or self.addon.getSettingBool('flatten_seasons'):
                     i.label = u'{}x{}'.format(utils.try_parse_int(i.infolabels.get('season')), i.label)
