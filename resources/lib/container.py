@@ -186,7 +186,7 @@ class Container(Plugin):
         if self.item_tmdbtype in ['season', 'episode'] and self.params.get('tmdb_id'):
             self.get_details_tv(self.params.get('tmdb_id'), season=self.params.get('season', None))
 
-        if self.item_tmdbtype == 'season' and self.details_tv:
+        if self.item_tmdbtype == 'season' and self.details_tv and not self.addon.getSettingBool('hide_special_seasons'):
             item_upnext = ListItem(library=self.library, **self.details_tv)
             item_upnext.infolabels['season'] = self.addon.getLocalizedString(32043)
             item_upnext.label = self.addon.getLocalizedString(32043)
@@ -258,8 +258,9 @@ class Container(Plugin):
 
             i.infoproperties['widget'] = self.plugincategory
 
-            if self.item_tmdbtype == 'season' and i.infolabels.get('season') == 0:
-                lastitems.append(i)
+            if self.item_tmdbtype == 'season' and not i.infolabels.get('season'):
+                if not self.addon.getSettingBool('hide_special_seasons'):  # Don't add specials if user set to hide
+                    lastitems.append(i)  # Put special season last
             elif self.item_tmdbtype == 'season' and i.infolabels.get('season') == self.addon.getLocalizedString(32043):
                 firstitems.append(i)
             elif i.dbid:
