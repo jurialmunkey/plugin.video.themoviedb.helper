@@ -392,6 +392,10 @@ class TraktAPI(RequestAPI):
             return -1
 
         request = request or self.get_unwatched_progress(tmdb_id=tmdb_id, imdb_id=imdb_id, check_sync=check_sync)
+
+        if not request:
+            return -1
+
         request = utils.get_dict_in_list(request.get('seasons', []), 'number', utils.try_parse_int(season)) if season else request
 
         if not request or not request.get('aired'):
