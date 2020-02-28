@@ -524,6 +524,8 @@ class Container(Plugin):
             url={'info': 'details', 'type': 'episode'})
 
     def list_traktcalendar_episodes(self):
+        date = datetime.datetime.today() + datetime.timedelta(days=utils.try_parse_int(self.params.get('startdate', 0)))
+        self.plugincategory = date.strftime('%A')  # For Trakt Calendar Custom Window
         self.item_tmdbtype = 'episode'
         self.list_items(
             items=TraktAPI(tmdb=self.tmdb, login=True).get_calendar_episodes(
@@ -580,6 +582,10 @@ class Container(Plugin):
 
             # Add our item
             items.append(li)
+
+        # Today's date to plugin category
+        date = datetime.datetime.today() + datetime.timedelta(days=utils.try_parse_int(self.params.get('startdate', 0)))
+        self.plugincategory = date.strftime('%A')
 
         # Create our list
         self.item_tmdbtype = 'episode'
@@ -726,11 +732,14 @@ class Container(Plugin):
         if self.params.get('islocal'):  # setResolvedUrl for local files
             xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
         if cur_lock == lock:
+            utils.kodi_log('Container -- Play IsLocked:\n{0}'.format(self.params), 1)
             return cur_lock
         xbmcgui.Window(10000).setProperty('TMDbHelper.Player.ResolvedUrl', lock)
 
     def list_play(self):
+        utils.kodi_log('Container -- Attempting to Play Item...:\n{0}'.format(self.params), 1)
         if not self.params.get('type') or not self.params.get('tmdb_id'):
+            utils.kodi_log('Container -- Play No Type or TMDb_ID:\n{0}'.format(self.params), 1)
             return
         season, episode = self.params.get('season', ''), self.params.get('episode', '')
         command = 'play={0},tmdb_id={1}{{0}}'.format(self.params.get('type'), self.params.get('tmdb_id'))
