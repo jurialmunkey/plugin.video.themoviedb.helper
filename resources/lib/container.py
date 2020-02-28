@@ -729,8 +729,6 @@ class Container(Plugin):
         for k, v in self.params.items():
             lock = '{}.{}={}'.format(lock, k, v) if lock else '{}={}'.format(k, v)
         cur_lock = xbmcgui.Window(10000).getProperty('TMDbHelper.Player.ResolvedUrl')
-        if self.params.get('islocal'):  # setResolvedUrl for local files
-            xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
         if cur_lock == lock:
             utils.kodi_log('Container -- Play IsLocked:\n{0}'.format(self.params), 1)
             return cur_lock
@@ -738,14 +736,33 @@ class Container(Plugin):
 
     def list_play(self):
         utils.kodi_log('Container -- Attempting to Play Item...:\n{0}'.format(self.params), 1)
+        """
+        Kodi does 5x retries to resolve url but we don't use this method so we need to catch it
+        Instead we just give a blank resolved url if a strm file or do nothing if not
+        Otherwise Kodi re-triggers the start of the play function causing a slow down
+        Should be fixed in Kodi Kore for Matrix so won't need this hack anymore
+        """
+        if self.play_islocked():
+            if self.params.get('islocal'):
+                xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
+            return
+
+        # Check we have a TMDb ID and do nothing if we can't get one
+        self.list_getid()
         if not self.params.get('type') or not self.params.get('tmdb_id'):
             utils.kodi_log('Container -- Play No Type or TMDb_ID:\n{0}'.format(self.params), 1)
             return
+
+        # Build our player script command and run it
         season, episode = self.params.get('season', ''), self.params.get('episode', '')
         command = 'play={0},tmdb_id={1}{{0}}'.format(self.params.get('type'), self.params.get('tmdb_id'))
         command = command.format(',season={0},episode={1}'.format(season, episode) if season and episode else '')
         command = 'RunScript(plugin.video.themoviedb.helper,{})'.format(command)
         xbmc.executebuiltin(command)
+
+        # Resolve to empty url if using a strm file because Kodi always expects resolvedurl in library
+        if self.params.get('islocal'):
+            xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
 
     def get_searchhistory(self, itemtype=None, cache=None):
         if not itemtype:
@@ -1053,8 +1070,7 @@ class Container(Plugin):
         self.tmdb.exclude_value = utils.split_items(self.params.get('exclude_value', None))[0]
 
         # ROUTER LIST FUNCTIONS
-        if self.params.get('info') == 'play' and not self.play_islocked():
-            self.list_getid()
+        if self.params.get('info') == 'play':
             self.list_play()
         elif self.params.get('info') == 'textviewer':
             self.textviewer(xbmc.getInfoLabel('ListItem.Label'), xbmc.getInfoLabel('ListItem.Plot'))
