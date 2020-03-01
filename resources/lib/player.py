@@ -71,6 +71,10 @@ class Player(Plugin):
             actionlist = player[1]
             player = (False, actionlist[0])
             for d in actionlist[1:]:
+                if d.get('no_folder'):
+                    resolve_url = True
+                    player = (resolve_url, actionlist[0])
+
                 if player[0]:
                     break  # Playable item was found in last action so let's break and play it
                 folder = KodiLibrary().get_directory(string_format_map(player[1], self.item))  # Get the next folder from the plugin
