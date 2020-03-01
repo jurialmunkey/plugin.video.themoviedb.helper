@@ -83,13 +83,15 @@ class Player(Plugin):
                         else:
                             li = u'{} ({})'.format(f.get('label'), f.get('year'))
                         d_items.append(li)
-                    idx = xbmcgui.Dialog().select('Select Item to Play', d_items)
-                    if idx > -1:  # If user didn't exit dialog get the item
-                        resolve_url = True if folder[idx].get('filetype') == 'file' else False  # Set true for files so we can play
-                        player = (resolve_url, folder[idx].get('file'))  # Set the folder path to open/play
-                    else:
-                        player = None
-                    break  # Move onto next action
+                    if d_items:
+                        idx = xbmcgui.Dialog().select('Select Item to Play', d_items)
+                        if idx > -1:  # If user didn't exit dialog get the item
+                            resolve_url = True if folder[idx].get('filetype') == 'file' else False  # Set true for files so we can play
+                            player = (resolve_url, folder[idx].get('file'))  # Set the folder path to open/play
+                            break  # Move onto next action
+                        else:
+                            folder = []
+                            player = None
 
                 x = 0
                 for f in folder:  # Iterate through plugin folder looking for a matching item
