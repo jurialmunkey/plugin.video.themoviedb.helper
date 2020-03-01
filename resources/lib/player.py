@@ -54,7 +54,12 @@ class Player(Plugin):
                 return index
         return itemindex
 
-    def play_external(self, force_dialog=False):
+    def play_external(self, force_dialog=False, itemindex=-1):
+        if itemindex > -1:  # Previous iteration didn't find an item to play so remove it and retry
+            xbmcgui.Dialog().notification(self.itemlist[itemindex].getLabel(), self.addon.getLocalizedString(32040))
+            del self.actions[itemindex]  # Item not found so remove the player's action list
+            del self.itemlist[itemindex]  # Item not found so remove the player's select dialog entry
+
         itemindex = self.get_itemindex(force_dialog=force_dialog)
 
         # User cancelled dialog
@@ -92,8 +97,7 @@ class Player(Plugin):
                             player = (resolve_url, folder[idx].get('file'))  # Set the folder path to open/play
                             break  # Move onto next action
                         else:
-                            folder = []
-                            player = None
+                            return self.play_external(force_dialog=True, itemindex=itemindex)  # Ask user to select a different player
 
                 x = 0
                 for f in folder:  # Iterate through plugin folder looking for a matching item
@@ -109,10 +113,7 @@ class Player(Plugin):
                         player = (resolve_url, f.get('file'))  # Get ListItem.FolderPath for item
                         break  # Move onto next action (either open next folder or play file)
                 else:
-                    xbmcgui.Dialog().notification(self.itemlist[itemindex].getLabel(), self.addon.getLocalizedString(32040))
-                    del self.actions[itemindex]  # Item not found so remove the player's action list
-                    del self.itemlist[itemindex]  # Item not found so remove the player's select dialog entry
-                    return self.play_external(force_dialog=True)  # Ask user to select a different player
+                    return self.play_external(force_dialog=True, itemindex=itemindex)  # Ask user to select a different player
 
         # Play/Search found item
         if player and player[1]:
