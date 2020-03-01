@@ -84,7 +84,9 @@ class Player(Plugin):
                             li = u'{} ({})'.format(f.get('label'), f.get('year'))
                         d_items.append(li)
                     if d_items:
-                        idx = xbmcgui.Dialog().select('Select Item to Play', d_items)
+                        idx = 0
+                        if d.get('dialog', '').lower() != 'auto' or len(d_items) != 1:
+                            idx = xbmcgui.Dialog().select('Select Item to Play', d_items)
                         if idx > -1:  # If user didn't exit dialog get the item
                             resolve_url = True if folder[idx].get('filetype') == 'file' else False  # Set true for files so we can play
                             player = (resolve_url, folder[idx].get('file'))  # Set the folder path to open/play
