@@ -34,6 +34,7 @@ class Container(Plugin):
         self.library = 'video'
         self.updatelisting = False
         self.check_sync = False
+        self.dbid_sorting = False
         self.randomlist = []
         self.numitems_dbid = 0
         self.numitems_tmdb = 0
@@ -263,7 +264,7 @@ class Container(Plugin):
                     lastitems.append(i)  # Put special season last
             elif self.item_tmdbtype == 'season' and i.infolabels.get('season') == self.addon.getLocalizedString(32043):
                 firstitems.append(i)
-            elif i.dbid:
+            elif i.dbid and self.dbid_sorting:
                 dbiditems.append(i)
             else:
                 tmdbitems.append(i)
@@ -847,13 +848,13 @@ class Container(Plugin):
         if container_url:
             xbmc.executebuiltin('Container.Update({}, replace)'.format(container_url))
 
-    def list_items(self, items=None, url=None, url_tmdb_id=None, get_sortedlist=True):
+    def list_items(self, items=None, url=None, url_tmdb_id=None):
         """
         Sort listitems and then display
         url= for listitem base folderpath url params
         url_tmdb_id= for listitem tmdb_id used in url
         """
-        items = self.get_sortedlist(items) if get_sortedlist else items
+        items = self.get_sortedlist(items)
 
         if not items:
             return
@@ -890,6 +891,7 @@ class Container(Plugin):
         kwparams.setdefault('key', cat.get('key'))
         path = cat.get('path', '').format(**self.params)
 
+        self.dbid_sorting = cat.get('dbid_sorting', False)
         self.item_tmdbtype = cat.get('item_tmdbtype', '').format(**self.params)
         self.list_items(
             items=self.tmdb.get_list(path, *args, **kwparams),

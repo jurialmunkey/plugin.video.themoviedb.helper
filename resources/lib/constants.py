@@ -509,28 +509,33 @@ TMDB_LISTS = {
         'path': 'discover/{type}',
         'key': 'results',
         'url_info': 'details',
+        'dbid_sorting': True,
         'item_tmdbtype': '{type}'},
     'genre': {
         'path': 'discover/{type}',
         'key': 'results',
         'url_info': 'details',
         'url_ext': 'with_genres={tmdb_id}',
+        'dbid_sorting': True,
         'item_tmdbtype': '{type}'},
     'recommendations': {
         'path': '{type}/{tmdb_id}/recommendations',
         'key': 'results',
         'url_info': 'details',
+        'dbid_sorting': True,
         'item_tmdbtype': '{type}'},
     'similar': {
         'path': '{type}/{tmdb_id}/similar',
         'key': 'results',
         'url_info': 'details',
+        'dbid_sorting': True,
         'item_tmdbtype': '{type}'},
     'movie_keywords': {
         'path': '{type}/{tmdb_id}/keywords',
         'key': 'keywords',
         'url_info': 'keyword_movies',
         'url_type': 'movie',
+        'dbid_sorting': True,
         'item_tmdbtype': 'keyword'},
     'reviews': {
         'path': '{type}/{tmdb_id}/reviews',
@@ -569,21 +574,25 @@ TMDB_LISTS = {
         'path': 'person/{tmdb_id}/movie_credits',
         'key': 'cast',
         'url_info': 'details',
+        'dbid_sorting': True,
         'item_tmdbtype': 'movie'},
     'stars_in_tvshows': {
         'path': 'person/{tmdb_id}/tv_credits',
         'key': 'cast',
         'url_info': 'details',
+        'dbid_sorting': True,
         'item_tmdbtype': 'tv'},
     'crew_in_movies': {
         'path': 'person/{tmdb_id}/movie_credits',
         'key': 'crew',
         'url_info': 'details',
+        'dbid_sorting': True,
         'item_tmdbtype': 'movie'},
     'crew_in_tvshows': {
         'path': 'person/{tmdb_id}/tv_credits',
         'key': 'crew',
         'url_info': 'details',
+        'dbid_sorting': True,
         'item_tmdbtype': 'tv'},
     'videos': {
         'path': '{type}/{tmdb_id}/videos',
@@ -605,6 +614,7 @@ TMDB_LISTS = {
         'path': 'keyword/{tmdb_id}/movies',
         'key': 'results',
         'url_info': 'details',
+        'dbid_sorting': True,
         'item_tmdbtype': '{type}'},
     'revenue_movies': {
         'path': 'discover/{type}',
