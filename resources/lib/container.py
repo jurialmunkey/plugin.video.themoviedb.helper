@@ -575,6 +575,8 @@ class Container(Plugin):
             li.infoproperties['air_date'] = utils.get_region_date(air_date, 'datelong')
             li.infoproperties['air_time'] = utils.get_region_date(air_date, 'time')
             li.infoproperties['air_day'] = air_date.strftime('%A')
+            li.infoproperties['air_day_short'] = air_date.strftime('%a')
+            li.infoproperties['air_date_short'] = air_date.strftime('%d %b')
 
             # Do some fallback properties in-case TMDb doesn't have info
             li.infolabels['title'] = li.label = i.get('episode', {}).get('title')
