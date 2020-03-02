@@ -566,6 +566,7 @@ class Container(Plugin):
                 itemtype='tv', tmdb_id=i.get('show', {}).get('ids', {}).get('tmdb'),
                 season=i.get('episode', {}).get('season'),
                 episode=i.get('episode', {}).get('number')))
+            li.tmdb_id = i.get('show', {}).get('ids', {}).get('tmdb')  # Set TVSHOW ID
 
             # Create our airing properties
             air_date = utils.convert_timestamp(i.get('first_aired'), utc_convert=True)
