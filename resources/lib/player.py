@@ -92,12 +92,13 @@ class Player(Plugin):
                         idx = 0
                         if d.get('dialog', '').lower() != 'auto' or len(d_items) != 1:
                             idx = xbmcgui.Dialog().select('Select Item to Play', d_items)
-                        if idx > -1:  # If user didn't exit dialog get the item
-                            resolve_url = True if folder[idx].get('filetype') == 'file' else False  # Set true for files so we can play
-                            player = (resolve_url, folder[idx].get('file'))  # Set the folder path to open/play
-                            break  # Move onto next action
-                        else:
-                            return self.play_external(force_dialog=True, itemindex=itemindex)  # Ask user to select a different player
+                        if idx == -1:  # If user didn't exit dialog get the item
+                            return  # Exit if user cancelled dialog
+                        resolve_url = True if folder[idx].get('filetype') == 'file' else False  # Set true for files so we can play
+                        player = (resolve_url, folder[idx].get('file'))  # Set the folder path to open/play
+                        break  # Move onto next action
+                    else:  # Ask user to select a different player if no items in dialog
+                        return self.play_external(force_dialog=True, itemindex=itemindex)
 
                 x = 0
                 for f in folder:  # Iterate through plugin folder looking for a matching item
