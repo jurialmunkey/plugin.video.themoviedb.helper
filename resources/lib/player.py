@@ -32,9 +32,8 @@ class Player(Plugin):
         self.traktapi = TraktAPI()
         self.search_movie, self.search_episode, self.play_movie, self.play_episode = [], [], [], []
         self.item = defaultdict(lambda: '+')
-        self.itemlist = []
-        self.actions = []
-        self.players = {}
+        self.itemlist, self.actions, self.players = [], [], {}
+        self.is_local = None
 
     def setup_players(self, tmdbtype=None, details=False, clearsetting=False):
         self.build_players(tmdbtype)
@@ -47,12 +46,14 @@ class Player(Plugin):
         default_player_episodes = self.addon.getSettingString('default_player_episodes')
         if force_dialog or (self.itemtype == 'movie' and not default_player_movies) or (self.itemtype == 'episode' and not default_player_episodes):
             return xbmcgui.Dialog().select(self.addon.getLocalizedString(32042), self.itemlist)
-        itemindex = -1
-        for index in range(0, len(self.itemlist)):
-            label = self.itemlist[index].getLabel()
-            if (label == default_player_movies and self.itemtype == 'movie') or (label == default_player_episodes and self.itemtype == 'episode'):
-                return index
-        return itemindex
+        for i in range(0, len(self.itemlist)):
+            label = self.itemlist[i].getLabel()
+            if (
+                    (label == default_player_movies and self.itemtype == 'movie') or
+                    (label == default_player_episodes and self.itemtype == 'episode') or
+                    (label == u'{0} {1}'.format(self.addon.getLocalizedString(32061), 'Kodi'))):
+                return i  # Play local or with default player if found
+        return -1
 
     def play_external(self, force_dialog=False, itemindex=-1):
         if itemindex > -1:  # Previous iteration didn't find an item to play so remove it and retry
@@ -141,14 +142,12 @@ class Player(Plugin):
         self.item['title'] = self.details.get('infolabels', {}).get('tvshowtitle') or self.details.get('infolabels', {}).get('title')
         self.item['year'] = self.details.get('infolabels', {}).get('year')
 
-        # Attempt to play local file first
-        is_local = False
+        # Check if we have a local file
+        # TODO: Add option to auto play local
         if self.details and self.itemtype == 'movie':
-            is_local = self.playmovie()
+            self.is_local = self.localmovie()
         if self.details and self.itemtype == 'episode':
-            is_local = self.playepisode()
-        if is_local:
-            return is_local
+            self.is_local = self.localepisode()
 
         self.setup_players(details=True)
 
@@ -237,6 +236,9 @@ class Player(Plugin):
         self.itemlist, self.actions = [], []
         if clearsetting:
             self.itemlist.append(xbmcgui.ListItem(xbmc.getLocalizedString(13403)))  # Clear Default
+        if self.is_local:
+            self.itemlist.append(xbmcgui.ListItem(u'{0} {1}'.format(self.addon.getLocalizedString(32061), 'Kodi')))
+            self.actions.append((True, self.is_local))
         for i in sorted(self.play_movie, key=lambda x: x[1]):
             self.itemlist.append(xbmcgui.ListItem(u'{0} {1}'.format(self.addon.getLocalizedString(32061), self.players.get(i[0], {}).get('name', ''))))
             self.actions.append((True, self.players.get(i[0], {}).get('play_movie', '')))
@@ -250,7 +252,7 @@ class Player(Plugin):
             self.itemlist.append(xbmcgui.ListItem(u'{0} {1}'.format(xbmc.getLocalizedString(137), self.players.get(i[0], {}).get('name', ''))))
             self.actions.append((False, self.players.get(i[0], {}).get('search_episode', '')))
 
-    def playfile(self, file):
+    def localfile(self, file):
         if not file:
             return
         if file.endswith('.strm'):
@@ -259,15 +261,14 @@ class Player(Plugin):
             f.close()
             if contents.startswith('plugin://plugin.video.themoviedb.helper'):
                 return
-        xbmc.executebuiltin(u'PlayMedia({0})'.format(file))
         return file
 
-    def playmovie(self):
+    def localmovie(self):
         fuzzy_match = self.addon.getSettingBool('fuzzymatch_movie')
-        return self.playfile(KodiLibrary(dbtype='movie').get_info('file', fuzzy_match=fuzzy_match, **self.item))
+        return self.localfile(KodiLibrary(dbtype='movie').get_info('file', fuzzy_match=fuzzy_match, **self.item))
 
-    def playepisode(self):
+    def localepisode(self):
         fuzzy_match = self.addon.getSettingBool('fuzzymatch_tv')
         fuzzy_match = True  # TODO: Get tvshow year to match against but for now force fuzzy match
         dbid = KodiLibrary(dbtype='tvshow').get_info('dbid', fuzzy_match=fuzzy_match, **self.item)
-        return self.playfile(KodiLibrary(dbtype='episode', tvshowid=dbid).get_info('file', season=self.season, episode=self.episode))
+        return self.localfile(KodiLibrary(dbtype='episode', tvshowid=dbid).get_info('file', season=self.season, episode=self.episode))
