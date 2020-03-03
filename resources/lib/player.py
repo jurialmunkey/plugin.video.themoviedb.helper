@@ -41,7 +41,7 @@ class Player(Plugin):
             self.build_details()
         self.build_selectbox(clearsetting)
 
-    def get_itemindex(self, force_dialog=False):
+    def get_playerindex(self, force_dialog=False):
         default_player_movies = self.addon.getSettingString('default_player_movies')
         default_player_episodes = self.addon.getSettingString('default_player_episodes')
         if force_dialog or (self.itemtype == 'movie' and not default_player_movies) or (self.itemtype == 'episode' and not default_player_episodes):
@@ -55,19 +55,19 @@ class Player(Plugin):
                 return i  # Play local or with default player if found
         return -1
 
-    def play_external(self, force_dialog=False, itemindex=-1):
-        if itemindex > -1:  # Previous iteration didn't find an item to play so remove it and retry
-            xbmcgui.Dialog().notification(self.itemlist[itemindex].getLabel(), self.addon.getLocalizedString(32040))
-            del self.actions[itemindex]  # Item not found so remove the player's action list
-            del self.itemlist[itemindex]  # Item not found so remove the player's select dialog entry
+    def play_external(self, force_dialog=False, playerindex=-1):
+        if playerindex > -1:  # Previous iteration didn't find an item to play so remove it and retry
+            xbmcgui.Dialog().notification(self.itemlist[playerindex].getLabel(), self.addon.getLocalizedString(32040))
+            del self.actions[playerindex]  # Item not found so remove the player's action list
+            del self.itemlist[playerindex]  # Item not found so remove the player's select dialog entry
 
-        itemindex = self.get_itemindex(force_dialog=force_dialog)
+        playerindex = self.get_playerindex(force_dialog=force_dialog)
 
         # User cancelled dialog
-        if not itemindex > -1:
+        if not playerindex > -1:
             return False
 
-        player = self.actions[itemindex]
+        player = self.actions[playerindex]
         if not player or not player[1]:
             return False
 
@@ -84,22 +84,23 @@ class Player(Plugin):
                 if d.get('dialog'):  # Special option to show dialog of items to select from
                     d_items = []
                     for f in folder:  # Create our list of items
-                        if f.get('season') and f.get('episode'):
+                        if utils.try_parse_int(f.get('season', 0)) > 0 and utils.try_parse_int(f.get('episode', 0)) > 0:
                             li = u'{}x{}. {}'.format(f.get('season'), f.get('episode'), f.get('label'))
                         else:
                             li = u'{} ({})'.format(f.get('label'), f.get('year'))
-                        d_items.append(li)
+                        if f.get('label') and f.get('label') != 'None':
+                            d_items.append(li)
                     if d_items:
                         idx = 0
                         if d.get('dialog', '').lower() != 'auto' or len(d_items) != 1:
                             idx = xbmcgui.Dialog().select('Select Item to Play', d_items)
-                        if idx == -1:  # If user didn't exit dialog get the item
-                            return  # Exit if user cancelled dialog
+                        if idx == -1:  # User exited the dialog so return and do nothing
+                            return
                         resolve_url = True if folder[idx].get('filetype') == 'file' else False  # Set true for files so we can play
                         player = (resolve_url, folder[idx].get('file'))  # Set the folder path to open/play
                         break  # Move onto next action
                     else:  # Ask user to select a different player if no items in dialog
-                        return self.play_external(force_dialog=True, itemindex=itemindex)
+                        return self.play_external(force_dialog=True, playerindex=playerindex)
 
                 x = 0
                 for f in folder:  # Iterate through plugin folder looking for a matching item
@@ -115,7 +116,7 @@ class Player(Plugin):
                         player = (resolve_url, f.get('file'))  # Get ListItem.FolderPath for item
                         break  # Move onto next action (either open next folder or play file)
                 else:
-                    return self.play_external(force_dialog=True, itemindex=itemindex)  # Ask user to select a different player
+                    return self.play_external(force_dialog=True, playerindex=playerindex)  # Ask user to select a different player
 
         # Play/Search found item
         if player and player[1]:
