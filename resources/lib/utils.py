@@ -165,6 +165,15 @@ def age_difference(birthday, deathday=''):
         return
 
 
+def iterate_extraart(artworklist, artworkdict={}):
+    idx = len(artworkdict) + 1
+    for art in artworklist:
+        ef_name = 'fanart{}'.format(idx)
+        artworkdict[ef_name] = art
+        idx += 1
+    return artworkdict
+
+
 def convert_timestamp(time_str, time_fmt="%Y-%m-%dT%H:%M:%S", time_lim=19, utc_convert=False):
     time_str = time_str[:time_lim] if time_lim else time_str
     utc_offset = 0

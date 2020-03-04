@@ -13,7 +13,7 @@ except ImportError:
 class ListItem(object):
     def __init__(self, label=None, label2=None, dbtype=None, library=None, tmdb_id=None, imdb_id=None, dbid=None, tvdb_id=None,
                  cast=None, infolabels=None, infoproperties=None, poster=None, thumb=None, icon=None, fanart=None, nextpage=None,
-                 streamdetails=None, clearlogo=None, clearart=None, banner=None, landscape=None, discart=None,
+                 streamdetails=None, clearlogo=None, clearart=None, banner=None, landscape=None, discart=None, extrafanart=None,
                  tvshow_clearlogo=None, tvshow_clearart=None, tvshow_banner=None, tvshow_landscape=None, tvshow_poster=None,
                  mixed_type=None, url=None, is_folder=True):
         self.addon = xbmcaddon.Addon()
@@ -39,6 +39,7 @@ class ListItem(object):
         self.infoproperties = infoproperties or {}  # ListItem.Property(Foobar)
         self.dbid = dbid
         self.nextpage = nextpage
+        self.extrafanart = extrafanart or {}
 
     def set_url(self, **kwargs):
         url = kwargs.pop('url', 'plugin://plugin.video.themoviedb.helper/?')
@@ -97,6 +98,7 @@ class ListItem(object):
             self.landscape = self.landscape or artwork.get('landscape')
             self.banner = self.banner or artwork.get('banner')
             self.fanart = self.fanart or artwork.get('fanart')
+            self.extrafanart = utils.iterate_extraart(artwork.get('extrafanart', []), self.extrafanart)
 
     def get_trakt_unwatched(self, trakt=None, request=None, check_sync=True):
         if not trakt or request == -1:
@@ -219,12 +221,12 @@ class ListItem(object):
         listitem.setUniqueIDs({'imdb': self.imdb_id, 'tmdb': self.tmdb_id})
         listitem.setInfo(self.library, self.infolabels)
         listitem.setProperties(self.infoproperties)
-        listitem.setArt({
+        listitem.setArt(utils.merge_two_dicts({
             'thumb': self.thumb, 'icon': self.icon, 'poster': self.poster, 'fanart': self.fanart, 'discart': self.discart,
             'clearlogo': self.clearlogo, 'clearart': self.clearart, 'landscape': self.landscape, 'banner': self.banner,
             'tvshow.poster': self.tvshow_poster, 'tvshow.clearlogo': self.tvshow_clearlogo,
             'tvshow.clearart': self.tvshow_clearart, 'tvshow.landscape': self.tvshow_landscape,
-            'tvshow.banner': self.tvshow_banner})
+            'tvshow.banner': self.tvshow_banner}, self.extrafanart))
         listitem.setCast(self.cast)
 
         if self.streamdetails:
