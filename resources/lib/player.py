@@ -121,12 +121,13 @@ class Player(Plugin):
         # Play/Search found item
         if player and player[1]:
             action = string_format_map(player[1], self.item)
-            if player[0]:  # Action is play so let's play the item and return
+            if player[0] and action.endswith('.strm'):  # Action is play and is a strm so PlayMedia
+                xbmc.executebuiltin(utils.try_decode_string(u'PlayMedia({0})'.format(action)))
+            elif player[0]:  # Action is play and not a strm so play with player
                 xbmc.Player().play(action, ListItem(library='video', **self.details).set_listitem())
-                return action
-            # Action is search so let's load the plugin path
-            action = u'Container.Update({0})'.format(action) if xbmc.getCondVisibility("Window.IsMedia") else u'ActivateWindow(videos,{0},return)'.format(action)
-            xbmc.executebuiltin(utils.try_decode_string(action))
+            else:
+                action = u'Container.Update({0})'.format(action) if xbmc.getCondVisibility("Window.IsMedia") else u'ActivateWindow(videos,{0},return)'.format(action)
+                xbmc.executebuiltin(utils.try_decode_string(action))
             return action
 
     def play(self, itemtype, tmdb_id, season=None, episode=None, force_dialog=False):
