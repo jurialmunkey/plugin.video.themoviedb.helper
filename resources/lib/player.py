@@ -234,6 +234,13 @@ class Player(Plugin):
                     self.play_episode.append((vfs_file, priority))
                 self.players[vfs_file] = meta
 
+    def build_playeraction(self, player, action, isplay, prefix):
+        for i in player.get('assert', {}).get(action, []):
+            if not self.item.get(i):
+                return  # missing / empty asserted value so don't build that player
+        self.itemlist.append(xbmcgui.ListItem(u'{0} {1}'.format(prefix, player.get('name', ''))))
+        self.actions.append((isplay, player.get(action, '')))
+
     def build_selectbox(self, clearsetting=False):
         self.itemlist, self.actions = [], []
         if clearsetting:
@@ -242,17 +249,13 @@ class Player(Plugin):
             self.itemlist.append(xbmcgui.ListItem(u'{0} {1}'.format(self.addon.getLocalizedString(32061), 'Kodi')))
             self.actions.append((True, self.is_local))
         for i in sorted(self.play_movie, key=lambda x: x[1]):
-            self.itemlist.append(xbmcgui.ListItem(u'{0} {1}'.format(self.addon.getLocalizedString(32061), self.players.get(i[0], {}).get('name', ''))))
-            self.actions.append((True, self.players.get(i[0], {}).get('play_movie', '')))
+            self.build_playeraction(self.players.get(i[0], {}), 'play_movie', True, self.addon.getLocalizedString(32061))
         for i in sorted(self.search_movie, key=lambda x: x[1]):
-            self.itemlist.append(xbmcgui.ListItem(u'{0} {1}' .format(xbmc.getLocalizedString(137), self.players.get(i[0], {}).get('name', ''))))
-            self.actions.append((False, self.players.get(i[0], {}).get('search_movie', '')))
+            self.build_playeraction(self.players.get(i[0], {}), 'search_movie', False, xbmc.getLocalizedString(137))
         for i in sorted(self.play_episode, key=lambda x: x[1]):
-            self.itemlist.append(xbmcgui.ListItem(u'{0} {1}'.format(self.addon.getLocalizedString(32061), self.players.get(i[0], {}).get('name', ''))))
-            self.actions.append((True, self.players.get(i[0], {}).get('play_episode', '')))
+            self.build_playeraction(self.players.get(i[0], {}), 'play_episode', True, self.addon.getLocalizedString(32061))
         for i in sorted(self.search_episode, key=lambda x: x[1]):
-            self.itemlist.append(xbmcgui.ListItem(u'{0} {1}'.format(xbmc.getLocalizedString(137), self.players.get(i[0], {}).get('name', ''))))
-            self.actions.append((False, self.players.get(i[0], {}).get('search_episode', '')))
+            self.build_playeraction(self.players.get(i[0], {}), 'search_episode', False, xbmc.getLocalizedString(137))
 
     def localfile(self, file):
         if not file:
