@@ -35,11 +35,11 @@ class Player(Plugin):
         self.itemlist, self.actions, self.players = [], [], {}
         self.is_local = None
 
-    def setup_players(self, tmdbtype=None, details=False, clearsetting=False):
+    def setup_players(self, tmdbtype=None, details=False, clearsetting=False, assertplayers=True):
         self.build_players(tmdbtype)
         if details:
             self.build_details()
-        self.build_selectbox(clearsetting)
+        self.build_selectbox(clearsetting, assertplayers)
 
     def get_playerindex(self, force_dialog=False):
         default_player_movies = self.addon.getSettingString('default_player_movies')
@@ -249,16 +249,20 @@ class Player(Plugin):
                     self.play_episode.append((vfs_file, priority))
                 self.players[vfs_file] = meta
 
-    def build_playeraction(self, player, action, isplay, prefix):
-        for i in player.get('assert', {}).get(action, []):
-            if not i.startswith('!') and not self.item.get(i):
-                return  # missing / empty asserted value so don't build that player
-            elif i.startswith('!') and self.item.get(i[1:]):
-                return  # inverted assert - has value but we don't want it so don't build that player
+    def build_playeraction(self, player, action, isplay, prefix, assertplayers=True):
+        if assertplayers:
+            for i in player.get('assert', {}).get(action, []):
+                utils.kodi_log('{}: {}'.format(i, self.item.get(i)), 1)
+                if i.startswith('!'):
+                    if self.item.get(i[1:]) or self.item.get(i[1:]) != 'None':
+                        return  # inverted assert - has value but we don't want it so don't build that player
+                else:
+                    if not self.item.get(i) or self.item.get(i) == 'None':
+                        return  # missing / empty asserted value so don't build that player
         self.itemlist.append(xbmcgui.ListItem(u'{0} {1}'.format(prefix, player.get('name', ''))))
         self.actions.append((isplay, player.get(action, '')))
 
-    def build_selectbox(self, clearsetting=False):
+    def build_selectbox(self, clearsetting=False, assertplayers=True):
         self.itemlist, self.actions = [], []
         if clearsetting:
             self.itemlist.append(xbmcgui.ListItem(xbmc.getLocalizedString(13403)))  # Clear Default
@@ -266,13 +270,13 @@ class Player(Plugin):
             self.itemlist.append(xbmcgui.ListItem(u'{0} {1}'.format(self.addon.getLocalizedString(32061), 'Kodi')))
             self.actions.append((True, self.is_local))
         for i in sorted(self.play_movie, key=lambda x: x[1]):
-            self.build_playeraction(self.players.get(i[0], {}), 'play_movie', True, self.addon.getLocalizedString(32061))
+            self.build_playeraction(self.players.get(i[0], {}), 'play_movie', True, self.addon.getLocalizedString(32061), assertplayers=assertplayers)
         for i in sorted(self.search_movie, key=lambda x: x[1]):
-            self.build_playeraction(self.players.get(i[0], {}), 'search_movie', False, xbmc.getLocalizedString(137))
+            self.build_playeraction(self.players.get(i[0], {}), 'search_movie', False, xbmc.getLocalizedString(137), assertplayers=assertplayers)
         for i in sorted(self.play_episode, key=lambda x: x[1]):
-            self.build_playeraction(self.players.get(i[0], {}), 'play_episode', True, self.addon.getLocalizedString(32061))
+            self.build_playeraction(self.players.get(i[0], {}), 'play_episode', True, self.addon.getLocalizedString(32061), assertplayers=assertplayers)
         for i in sorted(self.search_episode, key=lambda x: x[1]):
-            self.build_playeraction(self.players.get(i[0], {}), 'search_episode', False, xbmc.getLocalizedString(137))
+            self.build_playeraction(self.players.get(i[0], {}), 'search_episode', False, xbmc.getLocalizedString(137), assertplayers=assertplayers)
 
     def localfile(self, file):
         if not file:

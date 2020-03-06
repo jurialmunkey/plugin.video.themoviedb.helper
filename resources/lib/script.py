@@ -343,7 +343,7 @@ class Script(Plugin):
         player = Player()
         tmdbtype = self.params.get('set_defaultplayer')
         setting = 'default_player_episodes' if tmdbtype == 'tv' else 'default_player_{0}s'.format(tmdbtype)
-        player.setup_players(tmdbtype=tmdbtype, clearsetting=True)
+        player.setup_players(tmdbtype=tmdbtype, clearsetting=True, assertplayers=False)
         idx = xbmcgui.Dialog().select(
             'Choose Default Player for {0}'.format(utils.type_convert(tmdbtype, 'plural')), player.itemlist)
         if idx == 0:
