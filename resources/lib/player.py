@@ -84,23 +84,31 @@ class Player(Plugin):
                 if d.get('dialog'):  # Special option to show dialog of items to select from
                     d_items = []
                     for f in folder:  # Create our list of items
-                        if utils.try_parse_int(f.get('season', 0)) > 0 and utils.try_parse_int(f.get('episode', 0)) > 0:
-                            li = u'{}x{}. {}'.format(f.get('season'), f.get('episode'), f.get('label'))
-                        else:
-                            li = u'{} ({})'.format(f.get('label'), f.get('year'))
+                        if not f.get('label') or f.get('label') == 'None':
+                            continue
+                        lb_list = []
+                        if f.get('year'):
+                            lb_list.append(u'Year: {}'.format(f.get('year')))
+                        if utils.try_parse_int(f.get('season', 0)) > 0:
+                            lb_list.append(u'Season: {}'.format(f.get('season')))
+                        if utils.try_parse_int(f.get('episode', 0)) > 0:
+                            lb_list.append(u'Episode: {}'.format(f.get('episode')))
                         if f.get('streamdetails'):
-                            sd = f.get('streamdetails', {}).get('video', [{}]) or [{}]
-                            sd = sd[0]
-                            if sd.get('codec'):
-                                li = u'{} {}'.format(li, sd.get('codec'))
-                            if sd.get('width') or sd.get('height'):
-                                li = u'{} {}x{}'.format(li, sd.get('width'), sd.get('height'))
-                        if f.get('label') and f.get('label') != 'None':
-                            d_items.append(li)
+                            sdv = f.get('streamdetails', {}).get('video', [{}]) or [{}]
+                            sda = f.get('streamdetails', {}).get('audio', [{}]) or [{}]
+                            sdv, sda = sdv[0], sda[0]
+                            if sdv.get('codec'):
+                                lb_list.append(u'Codec: {}'.format(sdv.get('codec', '').upper()))
+                            if sdv.get('width') or sdv.get('height'):
+                                lb_list.append(u'Resolution: {}x{}'.format(sdv.get('width'), sdv.get('height')))
+                            if sdv.get('duration'):
+                                lb_list.append(u'Duration: {} mins'.format(utils.try_parse_int(sdv.get('duration', 0)) // 60))
+                        label_b = ' | '.join(lb_list) if lb_list else ''
+                        d_items.append(ListItem(label=f.get('label'), label2=label_b, icon=f.get('thumbnail')).set_listitem())
                     if d_items:
                         idx = 0
                         if d.get('dialog', '').lower() != 'auto' or len(d_items) != 1:
-                            idx = xbmcgui.Dialog().select('Select Item to Play', d_items)
+                            idx = xbmcgui.Dialog().select('Select Item', d_items, useDetails=True)
                         if idx == -1:  # User exited the dialog so return and do nothing
                             return
                         resolve_url = True if folder[idx].get('filetype') == 'file' else False  # Set true for files so we can play
