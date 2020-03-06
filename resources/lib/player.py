@@ -88,6 +88,13 @@ class Player(Plugin):
                             li = u'{}x{}. {}'.format(f.get('season'), f.get('episode'), f.get('label'))
                         else:
                             li = u'{} ({})'.format(f.get('label'), f.get('year'))
+                        if f.get('streamdetails'):
+                            sd = f.get('streamdetails', {}).get('video', [{}]) or [{}]
+                            sd = sd[0]
+                            if sd.get('codec'):
+                                li = u'{} {}'.format(li, sd.get('codec'))
+                            if sd.get('width') or sd.get('height'):
+                                li = u'{} {}x{}'.format(li, sd.get('width'), sd.get('height'))
                         if f.get('label') and f.get('label') != 'None':
                             d_items.append(li)
                     if d_items:

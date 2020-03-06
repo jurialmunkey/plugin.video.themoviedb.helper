@@ -254,7 +254,7 @@ class KodiLibrary(object):
             "directory": url,
             "media": "files",
             "properties": [
-                "title", "year", "originaltitle", "imdbnumber", "premiered",
+                "title", "year", "originaltitle", "imdbnumber", "premiered", "streamdetails",
                 "firstaired", "season", "episode", "showtitle", "file", "tvshowid"]}
         response = self.get_jsonrpc(method, params)
         return response.get('result', {}).get('files', [{}]) or [{}]
