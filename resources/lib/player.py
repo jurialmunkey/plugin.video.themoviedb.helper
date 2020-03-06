@@ -243,8 +243,10 @@ class Player(Plugin):
 
     def build_playeraction(self, player, action, isplay, prefix):
         for i in player.get('assert', {}).get(action, []):
-            if not self.item.get(i):
+            if not i.startswith('!') and not self.item.get(i):
                 return  # missing / empty asserted value so don't build that player
+            elif i.startswith('!') and self.item.get(i[1:]):
+                return  # inverted assert - has value but we don't want it so don't build that player
         self.itemlist.append(xbmcgui.ListItem(u'{0} {1}'.format(prefix, player.get('name', ''))))
         self.actions.append((isplay, player.get(action, '')))
 
