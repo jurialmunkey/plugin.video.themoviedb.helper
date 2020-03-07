@@ -53,6 +53,8 @@ class Player(Plugin):
                     (label == default_player_episodes and self.itemtype == 'episode') or
                     (label == u'{0} {1}'.format(self.addon.getLocalizedString(32061), 'Kodi'))):
                 return i  # Play local or with default player if found
+        if (self.itemtype == 'movie' and default_player_movies) or (self.itemtype == 'episode' and default_player_episodes):
+            return xbmcgui.Dialog().select(self.addon.getLocalizedString(32042), self.itemlist)  # Default not available so show dialog choice
         return -1
 
     def play_external(self, force_dialog=False, playerindex=-1):
@@ -267,7 +269,7 @@ class Player(Plugin):
         if assertplayers:
             for i in player.get('assert', {}).get(action, []):
                 if i.startswith('!'):
-                    if self.item.get(i[1:]) or self.item.get(i[1:]) != 'None':
+                    if self.item.get(i[1:]) and self.item.get(i[1:]) != 'None':
                         return  # inverted assert - has value but we don't want it so don't build that player
                 else:
                     if not self.item.get(i) or self.item.get(i) == 'None':
