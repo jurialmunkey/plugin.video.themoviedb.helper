@@ -159,6 +159,7 @@ class ListItem(object):
             return
 
         self.cast = details.get('cast', [])
+        self.imdb_id = self.imdb_id or details.get('infolabels', {}).get('imdbnumber')
         self.infolabels = utils.merge_two_dicts(details.get('infolabels', {}), self.infolabels)
         self.infoproperties = utils.merge_two_dicts(details.get('infoproperties', {}), self.infoproperties)
 
