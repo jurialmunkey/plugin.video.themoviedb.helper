@@ -18,6 +18,7 @@ class Plugin(object):
         self.kodimoviedb = None
         self.koditvshowdb = None
         self.details_tv = None
+        self.imdb_top250 = None
 
         cache_long = self.addon.getSettingInt('cache_details_days')
         cache_short = self.addon.getSettingInt('cache_list_days')
@@ -75,6 +76,15 @@ class Plugin(object):
             ratings = TraktAPI().get_ratings(tmdbtype=tmdbtype, imdb_id=imdb_id, season=season, episode=episode)
             if ratings:
                 item['infoproperties'] = utils.merge_two_dicts(item.get('infoproperties', {}), ratings)
+        return item
+
+    def get_top250_rank(self, item):
+        if not self.imdb_top250:
+            self.imdb_top250 = [i.get('movie', {}).get('ids', {}).get('tmdb') for i in TraktAPI().get_imdb_top250()]
+        try:
+            item['infolabels']['top250'] = self.imdb_top250.index(item.get('infoproperties', {}).get('tmdb_id')) + 1
+        except Exception:
+            pass
         return item
 
     def get_fanarttv_artwork(self, item, tmdbtype=None, tmdb_id=None, tvdb_id=None):

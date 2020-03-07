@@ -197,7 +197,6 @@ class Container(Plugin):
             items.append(item_upnext)
 
         for i in items:
-
             # Add NextPage Item to End of List
             if i.nextpage:
                 i.url = self.params.copy()
@@ -965,9 +964,10 @@ class Container(Plugin):
         if not details:
             return
 
-        # Merge OMDb rating details for movies
+        # Merge OMDb rating details and top250 for movies
         if self.params.get('type') == 'movie':
             details = self.get_omdb_ratings(details, cache_only=False)
+            details = self.get_top250_rank(details)
 
         # Merge library stats for person
         if self.params.get('type') == 'person':

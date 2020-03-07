@@ -146,6 +146,14 @@ class TraktAPI(RequestAPI):
         items = response.json()
         return sorted(items, key=lambda i: i['listed_at'], reverse=True)
 
+    def get_itemlist_ranked(self, *args, **kwargs):
+        response = self.get_response(*args)
+        items = response.json()
+        return sorted(items, key=lambda i: i['rank'], reverse=False)
+
+    def get_imdb_top250(self):
+        return self.use_cache(self.get_itemlist_ranked, 'users', 'nielsz', 'lists', 'active-imdb-top-250', 'items')
+
     def get_itemlist_sortedcached(self, *args, **kwargs):
         page = kwargs.pop('page', 1)
         limit = kwargs.pop('limit', 10)
