@@ -85,6 +85,17 @@ def set_timestamp(wait_time=60):
     return time.time() + wait_time
 
 
+def normalise_filesize(filesize):
+    filesize = try_parse_int(filesize)
+    i_flt = 1024.0
+    i_str = ['B', 'KB', 'MB', 'GB', 'TB']
+    for i in i_str:
+        if filesize < i_flt:
+            return '{:.2f} {}'.format(filesize, i)
+        filesize = filesize / i_flt
+    return '{:.2f} {}'.format(filesize, 'PB')
+
+
 def rate_limiter(addon_name='plugin.video.themoviedb.helper', wait_time=None, api_name=None):
     """
     Simple rate limiter to prevent overloading APIs

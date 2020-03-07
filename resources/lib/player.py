@@ -32,7 +32,7 @@ class Player(Plugin):
         self.traktapi = TraktAPI()
         self.search_movie, self.search_episode, self.play_movie, self.play_episode = [], [], [], []
         self.item = defaultdict(lambda: '+')
-        self.itemlist, self.actions, self.players = [], [], {}
+        self.itemlist, self.actions, self.players, self.identifierlist, self.fallbacklist = [], [], {}, [], []
         self.is_local = None
 
     def setup_players(self, tmdbtype=None, details=False, clearsetting=False, assertplayers=True):
@@ -56,12 +56,17 @@ class Player(Plugin):
         return -1
 
     def play_external(self, force_dialog=False, playerindex=-1):
+        fallbackidentifier = None
         if playerindex > -1:  # Previous iteration didn't find an item to play so remove it and retry
             xbmcgui.Dialog().notification(self.itemlist[playerindex].getLabel(), self.addon.getLocalizedString(32040))
+            if self.fallbacklist[playerindex] and self.fallbacklist[playerindex] in self.identifierlist:
+                fallbackidentifier = self.fallbacklist[playerindex]
             del self.actions[playerindex]  # Item not found so remove the player's action list
             del self.itemlist[playerindex]  # Item not found so remove the player's select dialog entry
+            del self.identifierlist[playerindex]  # Item not found so remove the player's index
+            del self.fallbacklist[playerindex]  # Item not found so remove the player's index
 
-        playerindex = self.get_playerindex(force_dialog=force_dialog)
+        playerindex = self.identifierlist.index(fallbackidentifier) if fallbackidentifier else self.get_playerindex(force_dialog=force_dialog)
 
         # User cancelled dialog
         if not playerindex > -1:
@@ -87,24 +92,32 @@ class Player(Plugin):
                         if not f.get('label') or f.get('label') == 'None':
                             continue
                         lb_list = []
-                        if f.get('year'):
-                            lb_list.append(u'Year: {}'.format(f.get('year')))
-                        if utils.try_parse_int(f.get('season', 0)) > 0:
-                            lb_list.append(u'Season: {}'.format(f.get('season')))
-                        if utils.try_parse_int(f.get('episode', 0)) > 0:
-                            lb_list.append(u'Episode: {}'.format(f.get('episode')))
+                        label_a = f.get('label')
+                        if f.get('year') and f.get('year') != 1601:
+                            label_a = u'{} ({})'.format(label_a, f.get('year'))
+                        if utils.try_parse_int(f.get('season', 0)) > 0 and utils.try_parse_int(f.get('episode', 0)) > 0:
+                            label_a = u'{}x{}. {}'.format(f.get('season'), f.get('episode'), label_a)
                         if f.get('streamdetails'):
-                            sdv = f.get('streamdetails', {}).get('video', [{}]) or [{}]
-                            sda = f.get('streamdetails', {}).get('audio', [{}]) or [{}]
-                            sdv, sda = sdv[0], sda[0]
-                            if sdv.get('codec'):
-                                lb_list.append(u'Codec: {}'.format(sdv.get('codec', '').upper()))
+                            sdv_list = f.get('streamdetails', {}).get('video', [{}]) or [{}]
+                            sda_list = f.get('streamdetails', {}).get('audio', [{}]) or [{}]
+                            sdv, sda = sdv_list[0], sda_list[0]
                             if sdv.get('width') or sdv.get('height'):
-                                lb_list.append(u'Resolution: {}x{}'.format(sdv.get('width'), sdv.get('height')))
+                                lb_list.append(u'{}x{}'.format(sdv.get('width'), sdv.get('height')))
+                            if sdv.get('codec'):
+                                lb_list.append(u'{}'.format(sdv.get('codec', '').upper()))
+                            if sda.get('codec'):
+                                lb_list.append(u'{}'.format(sda.get('codec', '').upper()))
+                            if sda.get('channels'):
+                                lb_list.append(u'{} CH'.format(sda.get('channels', '')))
+                            for i in sda_list:
+                                if i.get('language'):
+                                    lb_list.append(u'{}'.format(i.get('language', '').upper()))
                             if sdv.get('duration'):
-                                lb_list.append(u'Duration: {} mins'.format(utils.try_parse_int(sdv.get('duration', 0)) // 60))
+                                lb_list.append(u'{} mins'.format(utils.try_parse_int(sdv.get('duration', 0)) // 60))
+                        if f.get('size'):
+                            lb_list.append(u'{}'.format(utils.normalise_filesize(f.get('size', 0))))
                         label_b = ' | '.join(lb_list) if lb_list else ''
-                        d_items.append(ListItem(label=f.get('label'), label2=label_b, icon=f.get('thumbnail')).set_listitem())
+                        d_items.append(ListItem(label=label_a, label2=label_b, icon=f.get('thumbnail')).set_listitem())
                     if d_items:
                         idx = 0
                         if d.get('dialog', '').lower() != 'auto' or len(d_items) != 1:
@@ -240,43 +253,51 @@ class Player(Plugin):
                 tmdbtype = tmdbtype or self.tmdbtype
                 priority = utils.try_parse_int(meta.get('priority')) or 1000
                 if tmdbtype == 'movie' and meta.get('search_movie'):
-                    self.search_movie.append((vfs_file, priority))
+                    self.search_movie.append((file, priority))
                 if tmdbtype == 'movie' and meta.get('play_movie'):
-                    self.play_movie.append((vfs_file, priority))
+                    self.play_movie.append((file, priority))
                 if tmdbtype == 'tv' and meta.get('search_episode'):
-                    self.search_episode.append((vfs_file, priority))
+                    self.search_episode.append((file, priority))
                 if tmdbtype == 'tv' and meta.get('play_episode'):
-                    self.play_episode.append((vfs_file, priority))
-                self.players[vfs_file] = meta
+                    self.play_episode.append((file, priority))
+                self.players[file] = meta
 
-    def build_playeraction(self, player, action, isplay, prefix, assertplayers=True):
+    def build_playeraction(self, playerfile, action, isplay, prefix, fallback=None, assertplayers=True):
+        player = self.players.get(playerfile, {})
         if assertplayers:
             for i in player.get('assert', {}).get(action, []):
-                utils.kodi_log('{}: {}'.format(i, self.item.get(i)), 1)
                 if i.startswith('!'):
                     if self.item.get(i[1:]) or self.item.get(i[1:]) != 'None':
                         return  # inverted assert - has value but we don't want it so don't build that player
                 else:
                     if not self.item.get(i) or self.item.get(i) == 'None':
                         return  # missing / empty asserted value so don't build that player
-        self.itemlist.append(xbmcgui.ListItem(u'{0} {1}'.format(prefix, player.get('name', ''))))
-        self.actions.append((isplay, player.get(action, '')))
+        self.append_playeraction(
+            label=u'{0} {1}'.format(prefix, player.get('name', '')),
+            action=player.get(action, ''), isplay=isplay,
+            fallback=player.get('fallback', {}).get(action, ''),
+            identifier='{} {}'.format(playerfile, action))
+
+    def append_playeraction(self, label, action, isplay=True, identifier='', fallback=''):
+        self.itemlist.append(xbmcgui.ListItem(label))
+        self.actions.append((isplay, action))
+        self.identifierlist.append(identifier)
+        self.fallbacklist.append(fallback)
 
     def build_selectbox(self, clearsetting=False, assertplayers=True):
         self.itemlist, self.actions = [], []
         if clearsetting:
             self.itemlist.append(xbmcgui.ListItem(xbmc.getLocalizedString(13403)))  # Clear Default
         if self.is_local:
-            self.itemlist.append(xbmcgui.ListItem(u'{0} {1}'.format(self.addon.getLocalizedString(32061), 'Kodi')))
-            self.actions.append((True, self.is_local))
+            self.append_playeraction(u'{0} {1}'.format(self.addon.getLocalizedString(32061), 'Kodi'), self.is_local, identifier='play_kodi')
         for i in sorted(self.play_movie, key=lambda x: x[1]):
-            self.build_playeraction(self.players.get(i[0], {}), 'play_movie', True, self.addon.getLocalizedString(32061), assertplayers=assertplayers)
+            self.build_playeraction(i[0], 'play_movie', True, self.addon.getLocalizedString(32061), assertplayers=assertplayers)
         for i in sorted(self.search_movie, key=lambda x: x[1]):
-            self.build_playeraction(self.players.get(i[0], {}), 'search_movie', False, xbmc.getLocalizedString(137), assertplayers=assertplayers)
+            self.build_playeraction(i[0], 'search_movie', False, xbmc.getLocalizedString(137), assertplayers=assertplayers)
         for i in sorted(self.play_episode, key=lambda x: x[1]):
-            self.build_playeraction(self.players.get(i[0], {}), 'play_episode', True, self.addon.getLocalizedString(32061), assertplayers=assertplayers)
+            self.build_playeraction(i[0], 'play_episode', True, self.addon.getLocalizedString(32061), assertplayers=assertplayers)
         for i in sorted(self.search_episode, key=lambda x: x[1]):
-            self.build_playeraction(self.players.get(i[0], {}), 'search_episode', False, xbmc.getLocalizedString(137), assertplayers=assertplayers)
+            self.build_playeraction(i[0], 'search_episode', False, xbmc.getLocalizedString(137), assertplayers=assertplayers)
 
     def localfile(self, file):
         if not file:
