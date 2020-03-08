@@ -32,8 +32,13 @@ class Player(Plugin):
         self.traktapi = TraktAPI()
         self.search_movie, self.search_episode, self.play_movie, self.play_episode = [], [], [], []
         self.item = defaultdict(lambda: '+')
-        self.itemlist, self.actions, self.players, self.identifierlist, self.fallbacklist = [], [], {}, [], []
+        self.itemlist, self.actions, self.players, self.identifierlist = [], [], {}, []
         self.is_local = None
+        self.dp_movies = self.addon.getSettingString('default_player_movies')
+        self.dp_episodes = self.addon.getSettingString('default_player_episodes')
+        self.dp_movies_id = None
+        self.dp_episodes_id = None
+        self.fallbacks = {}
 
     def setup_players(self, tmdbtype=None, details=False, clearsetting=False, assertplayers=True):
         self.build_players(tmdbtype)
@@ -41,34 +46,44 @@ class Player(Plugin):
             self.build_details()
         self.build_selectbox(clearsetting, assertplayers)
 
+    def get_fallback(self, dp_file, dp_action):
+        fallback = self.players.get(dp_file, {}).get('fallback', {}).get(dp_action)
+        if not fallback:  # No fallback so prompt dialog
+            return xbmcgui.Dialog().select(self.addon.getLocalizedString(32042), self.itemlist)
+        if fallback in self.identifierlist:  # Found a fallback in list so play that
+            return self.identifierlist.index(fallback)
+        fb_file, fb_action = fallback.split()
+        return self.get_fallback(fb_file, fb_action)  # Fallback not in list so let's check fallback's fallback
+
     def get_playerindex(self, force_dialog=False):
-        default_player_movies = self.addon.getSettingString('default_player_movies')
-        default_player_episodes = self.addon.getSettingString('default_player_episodes')
-        if force_dialog or (self.itemtype == 'movie' and not default_player_movies) or (self.itemtype == 'episode' and not default_player_episodes):
+        if force_dialog or (self.itemtype == 'movie' and not self.dp_movies) or (self.itemtype == 'episode' and not self.dp_episodes):
             return xbmcgui.Dialog().select(self.addon.getLocalizedString(32042), self.itemlist)
         for i in range(0, len(self.itemlist)):
             label = self.itemlist[i].getLabel()
             if (
-                    (label == default_player_movies and self.itemtype == 'movie') or
-                    (label == default_player_episodes and self.itemtype == 'episode') or
+                    (label == self.dp_movies and self.itemtype == 'movie') or
+                    (label == self.dp_episodes and self.itemtype == 'episode') or
                     (label == u'{0} {1}'.format(self.addon.getLocalizedString(32061), 'Kodi'))):
                 return i  # Play local or with default player if found
-        if (self.itemtype == 'movie' and default_player_movies) or (self.itemtype == 'episode' and default_player_episodes):
-            return xbmcgui.Dialog().select(self.addon.getLocalizedString(32042), self.itemlist)  # Default not available so show dialog choice
+
+        # Check for fallbacks
+        if self.itemtype == 'movie' and self.dp_movies_id:
+            dp_file, dp_action = self.dp_movies_id.split()
+            return self.get_fallback(dp_file, dp_action)
+        if self.itemtype == 'episode' and self.dp_episodes_id:
+            dp_file, dp_action = self.dp_episodes_id.split()
+            return self.get_fallback(dp_file, dp_action)
+
         return -1
 
     def play_external(self, force_dialog=False, playerindex=-1):
-        fallbackidentifier = None
         if playerindex > -1:  # Previous iteration didn't find an item to play so remove it and retry
             xbmcgui.Dialog().notification(self.itemlist[playerindex].getLabel(), self.addon.getLocalizedString(32040))
-            if self.fallbacklist[playerindex] and self.fallbacklist[playerindex] in self.identifierlist:
-                fallbackidentifier = self.fallbacklist[playerindex]
             del self.actions[playerindex]  # Item not found so remove the player's action list
             del self.itemlist[playerindex]  # Item not found so remove the player's select dialog entry
             del self.identifierlist[playerindex]  # Item not found so remove the player's index
-            del self.fallbacklist[playerindex]  # Item not found so remove the player's index
 
-        playerindex = self.identifierlist.index(fallbackidentifier) if fallbackidentifier else self.get_playerindex(force_dialog=force_dialog)
+        playerindex = self.get_playerindex(force_dialog=force_dialog)
 
         # User cancelled dialog
         if not playerindex > -1:
@@ -130,7 +145,7 @@ class Player(Plugin):
                         player = (resolve_url, folder[idx].get('file'))  # Set the folder path to open/play
                         break  # Move onto next action
                     else:  # Ask user to select a different player if no items in dialog
-                        return self.play_external(force_dialog=True, playerindex=playerindex)
+                        return self.play_external(force_dialog=force_dialog, playerindex=playerindex)
 
                 x = 0
                 for f in folder:  # Iterate through plugin folder looking for a matching item
@@ -146,7 +161,7 @@ class Player(Plugin):
                         player = (resolve_url, f.get('file'))  # Get ListItem.FolderPath for item
                         break  # Move onto next action (either open next folder or play file)
                 else:
-                    return self.play_external(force_dialog=True, playerindex=playerindex)  # Ask user to select a different player
+                    return self.play_external(force_dialog=force_dialog, playerindex=playerindex)  # Ask user to select a different player
 
         # Play/Search found item
         if player and player[1]:
@@ -249,6 +264,8 @@ class Player(Plugin):
                     meta = loads(content) or {}
                 finally:
                     vfs_file.close()
+
+                self.players[file] = meta
                 if not meta.get('plugin') or not xbmc.getCondVisibility(u'System.HasAddon({0})'.format(meta.get('plugin'))):
                     continue  # Don't have plugin so skip
 
@@ -262,10 +279,20 @@ class Player(Plugin):
                     self.search_episode.append((file, priority))
                 if tmdbtype == 'tv' and meta.get('play_episode'):
                     self.play_episode.append((file, priority))
-                self.players[file] = meta
 
-    def build_playeraction(self, playerfile, action, isplay, prefix, fallback=None, assertplayers=True):
+    def build_playeraction(self, playerfile, action, assertplayers=True):
         player = self.players.get(playerfile, {})
+        isplay = True if action.startswith('play_') else False
+        prefix = self.addon.getLocalizedString(32061) if action.startswith('play_') else xbmc.getLocalizedString(137)
+        label = u'{0} {1}'.format(prefix, player.get('name', ''))
+
+        # Check if matches default player and set default player id
+        if label == self.dp_movies:
+            self.dp_movies_id = '{} {}'.format(playerfile, action)
+        if label == self.dp_episodes:
+            self.dp_episodes_id = '{} {}'.format(playerfile, action)
+
+        # Check that asserted values exist
         if assertplayers:
             for i in player.get('assert', {}).get(action, []):
                 if i.startswith('!'):
@@ -274,17 +301,16 @@ class Player(Plugin):
                 else:
                     if not self.item.get(i) or self.item.get(i) == 'None':
                         return  # missing / empty asserted value so don't build that player
+
+        # Add player action to list for dialog
         self.append_playeraction(
-            label=u'{0} {1}'.format(prefix, player.get('name', '')),
-            action=player.get(action, ''), isplay=isplay,
-            fallback=player.get('fallback', {}).get(action, ''),
+            label=label, action=player.get(action, ''), isplay=isplay,
             identifier='{} {}'.format(playerfile, action))
 
-    def append_playeraction(self, label, action, isplay=True, identifier='', fallback=''):
+    def append_playeraction(self, label, action, isplay=True, identifier=''):
         self.itemlist.append(xbmcgui.ListItem(label))
         self.actions.append((isplay, action))
         self.identifierlist.append(identifier)
-        self.fallbacklist.append(fallback)
 
     def build_selectbox(self, clearsetting=False, assertplayers=True):
         self.itemlist, self.actions = [], []
@@ -293,13 +319,13 @@ class Player(Plugin):
         if self.is_local:
             self.append_playeraction(u'{0} {1}'.format(self.addon.getLocalizedString(32061), 'Kodi'), self.is_local, identifier='play_kodi')
         for i in sorted(self.play_movie, key=lambda x: x[1]):
-            self.build_playeraction(i[0], 'play_movie', True, self.addon.getLocalizedString(32061), assertplayers=assertplayers)
+            self.build_playeraction(i[0], 'play_movie', assertplayers=assertplayers)
         for i in sorted(self.search_movie, key=lambda x: x[1]):
-            self.build_playeraction(i[0], 'search_movie', False, xbmc.getLocalizedString(137), assertplayers=assertplayers)
+            self.build_playeraction(i[0], 'search_movie', assertplayers=assertplayers)
         for i in sorted(self.play_episode, key=lambda x: x[1]):
-            self.build_playeraction(i[0], 'play_episode', True, self.addon.getLocalizedString(32061), assertplayers=assertplayers)
+            self.build_playeraction(i[0], 'play_episode', assertplayers=assertplayers)
         for i in sorted(self.search_episode, key=lambda x: x[1]):
-            self.build_playeraction(i[0], 'search_episode', False, xbmc.getLocalizedString(137), assertplayers=assertplayers)
+            self.build_playeraction(i[0], 'search_episode', assertplayers=assertplayers)
 
     def localfile(self, file):
         if not file:
