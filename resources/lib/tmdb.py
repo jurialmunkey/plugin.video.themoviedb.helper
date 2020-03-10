@@ -102,12 +102,16 @@ class TMDb(RequestAPI):
         if item.get('release_dates') and item.get('release_dates').get('results'):
             for i in item.get('release_dates').get('results'):
                 if i.get('iso_3166_1') and i.get('iso_3166_1') == self.iso_country:
-                    if i.get('release_dates') and i.get('release_dates')[0].get('certification'):
-                        infolabels['MPAA'] = '{0}{1}'.format(self.mpaa_prefix, i.get('release_dates')[0].get('certification'))
+                    for i in sorted(i.get('release_dates', []), key=lambda k: k.get('type')):
+                        if i.get('certification'):
+                            infolabels['MPAA'] = '{0}{1}'.format(self.mpaa_prefix, i.get('certification'))
+                            break
+                    break
         if item.get('content_ratings') and item.get('content_ratings').get('results'):
             for i in item.get('content_ratings').get('results'):
                 if i.get('iso_3166_1') and i.get('iso_3166_1') == self.iso_country and i.get('rating'):
                     infolabels['MPAA'] = '{0}{1}'.format(self.mpaa_prefix, i.get('rating'))
+                    break
         return infolabels
 
     def get_infoproperties(self, item):
@@ -390,7 +394,7 @@ class TMDb(RequestAPI):
             utils.kodi_log('TMDb Get Details: No Item Type or TMDb ID!\n{} {} {} {}'.format(itemtype, tmdb_id, season, episode), 2)
             return {}
         extra_request = None
-        cache_name = '{0}.TMDb.v2_2_80.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
+        cache_name = '{0}.TMDb.v2_2_81.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
         cache_name = '{0}.Season{1}'.format(cache_name, season) if season else cache_name
         cache_name = '{0}.Episode{1}'.format(cache_name, episode) if season and episode else cache_name
         itemdict = self.get_cache(cache_name) if not cache_refresh else None

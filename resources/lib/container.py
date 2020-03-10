@@ -806,7 +806,6 @@ class Container(Plugin):
             if len(search_history) > 9:
                 search_history.pop(0)
             search_history.append(query)
-        utils.kodi_log(search_history, 1)
         cache.set(cache_name, search_history, expiration=datetime.timedelta(days=cache_days))
         return query
 
