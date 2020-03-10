@@ -94,7 +94,7 @@ class Plugin(object):
         artwork, lookup_id, func = None, None, None
 
         if tmdbtype == 'tv':
-            lookup_id = tvdb_id or item.get('tvdb_id')
+            lookup_id = tvdb_id or item.get('infoproperties', {}).get('tvshow.tvdb_id') or item.get('tvdb_id')
             func = self.fanarttv.get_tvshow_allart_lc
         elif tmdbtype == 'movie':
             lookup_id = tmdb_id or item.get('tmdb_id')

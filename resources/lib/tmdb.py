@@ -115,6 +115,9 @@ class TMDb(RequestAPI):
         infoproperties['tmdb_id'] = item.get('id')
         infoproperties['imdb_id'] = item.get('imdb_id') or item.get('external_ids', {}).get('imdb_id')
         infoproperties['tvdb_id'] = item.get('external_ids', {}).get('tvdb_id')
+        infoproperties['tvshow.tmdb_id'] = item.get('tvshow.tmdb_id')
+        infoproperties['tvshow.imdb_id'] = item.get('tvshow.imdb_id')
+        infoproperties['tvshow.tvdb_id'] = item.get('tvshow.tvdb_id')
         infoproperties['biography'] = item.get('biography')
         infoproperties['birthday'] = item.get('birthday')
         infoproperties['age'] = utils.age_difference(item.get('birthday'), item.get('deathday'))
@@ -387,7 +390,7 @@ class TMDb(RequestAPI):
             utils.kodi_log('TMDb Get Details: No Item Type or TMDb ID!\n{} {} {} {}'.format(itemtype, tmdb_id, season, episode), 2)
             return {}
         extra_request = None
-        cache_name = '{0}.TMDb.v2_2_67.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
+        cache_name = '{0}.TMDb.v2_2_80.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
         cache_name = '{0}.Season{1}'.format(cache_name, season) if season else cache_name
         cache_name = '{0}.Episode{1}'.format(cache_name, episode) if season and episode else cache_name
         itemdict = self.get_cache(cache_name) if not cache_refresh else None
@@ -402,6 +405,9 @@ class TMDb(RequestAPI):
             if season and episode and not extra_request:
                 extra_request = {'episode_number': episode, 'season_number': season}
             if extra_request:
+                extra_request['tvshow.tmdb_id'] = request.get('id')
+                extra_request['tvshow.imdb_id'] = request.get('imdb_id') or request.get('external_ids', {}).get('imdb_id')
+                extra_request['tvshow.tvdb_id'] = request.get('external_ids', {}).get('tvdb_id')
                 request = utils.merge_two_dicts(request, extra_request)
             itemdict = self.set_cache(self.get_niceitem(request), cache_name, self.cache_long) if request else {}
             utils.kodi_log('TMDb Get Details: No Item Found!\n{} {} {} {}'.format(itemtype, tmdb_id, season, episode), 2) if not request else None
