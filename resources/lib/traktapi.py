@@ -317,11 +317,33 @@ class TraktAPI(RequestAPI):
 
     def get_airingshows(self, start_date=0, days=1):
         start_date = datetime.date.today() + datetime.timedelta(days=start_date)
-        return self.get_response_json('calendars', 'all', 'shows', start_date.strftime('%Y-%m-%d'), days)
+        return self.get_response_json('calendars', 'all', 'shows', start_date.strftime('%Y-%m-%d'), days, extended='full')
 
     def get_calendar(self, tmdbtype, user=True, start_date=None, days=None):
         user = 'my' if user else 'all'
-        return self.get_response_json('calendars', user, tmdbtype, start_date, days)
+        return self.get_response_json('calendars', user, tmdbtype, start_date, days, extended='full')
+
+    def get_calendar_properties(self, item, i):
+        # Create our airing properties
+        air_date = utils.convert_timestamp(i.get('first_aired'), utc_convert=True)
+        item.infolabels['premiered'] = air_date.strftime('%Y-%m-%d')
+        item.infolabels['year'] = air_date.strftime('%Y')
+        item.infoproperties['air_date'] = utils.get_region_date(air_date, 'datelong')
+        item.infoproperties['air_time'] = utils.get_region_date(air_date, 'time')
+        item.infoproperties['air_day'] = air_date.strftime('%A')
+        item.infoproperties['air_day_short'] = air_date.strftime('%a')
+        item.infoproperties['air_date_short'] = air_date.strftime('%d %b')
+
+        # Do some fallback properties in-case TMDb doesn't have info
+        item.infolabels['title'] = item.label = i.get('episode', {}).get('title')
+        item.infolabels['episode'] = item.infolabels.get('episode') or i.get('episode', {}).get('number')
+        item.infolabels['season'] = item.infolabels.get('season') or i.get('episode', {}).get('season')
+        item.infolabels['tvshowtitle'] = i.get('show', {}).get('title')
+        item.infolabels['duration'] = item.infolabels.get('duration') or utils.try_parse_int(i.get('episode', {}).get('runtime', 0)) * 60
+        item.infolabels['plot'] = item.infolabels.get('plot') or i.get('episode', {}).get('overview')
+        item.infolabels['mpaa'] = item.infolabels.get('mpaa') or i.get('show', {}).get('certification')
+
+        return item
 
     def get_calendar_episodes(self, startdate=0, days=1, limit=25):
         items = []
@@ -330,7 +352,7 @@ class TraktAPI(RequestAPI):
             return items
 
         date = datetime.date.today() + datetime.timedelta(days=startdate)
-        response = TraktAPI().get_calendar('shows', True, start_date=date.strftime('%Y-%m-%d'), days=days)
+        response = self.get_calendar('shows', True, start_date=date.strftime('%Y-%m-%d'), days=days)
 
         if not response:
             return items
@@ -342,11 +364,7 @@ class TraktAPI(RequestAPI):
             item = ListItem(library=self.library, **self.tmdb.get_detailed_item(
                 itemtype='tv', tmdb_id=tmdb_id, season=season, episode=episode))
             item.tmdb_id, item.season, item.episode = tmdb_id, season, episode
-            item.infolabels['title'] = item.label = i.get('episode', {}).get('title')
-            air_date = utils.convert_timestamp(i.get('first_aired', ''), utc_convert=True)
-            item.infolabels['premiered'] = air_date.strftime('%Y-%m-%d')
-            item.infolabels['year'] = air_date.strftime('%Y')
-            item.infoproperties['air_time'] = air_date.strftime('%I:%M %p')
+            item = self.get_calendar_properties(item, i)
             items.append(item)
         return items
 

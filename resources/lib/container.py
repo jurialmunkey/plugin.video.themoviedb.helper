@@ -582,24 +582,8 @@ class Container(Plugin):
                 episode=i.get('episode', {}).get('number')))
             li.tmdb_id = i.get('show', {}).get('ids', {}).get('tmdb')  # Set TVSHOW ID
 
-            # Create our airing properties
-            air_date = utils.convert_timestamp(i.get('first_aired'), utc_convert=True)
-            li.infolabels['premiered'] = air_date.strftime('%Y-%m-%d')
-            li.infolabels['year'] = air_date.strftime('%Y')
-            li.infoproperties['air_date'] = utils.get_region_date(air_date, 'datelong')
-            li.infoproperties['air_time'] = utils.get_region_date(air_date, 'time')
-            li.infoproperties['air_day'] = air_date.strftime('%A')
-            li.infoproperties['air_day_short'] = air_date.strftime('%a')
-            li.infoproperties['air_date_short'] = air_date.strftime('%d %b')
-
-            # Do some fallback properties in-case TMDb doesn't have info
-            li.infolabels['title'] = li.label = i.get('episode', {}).get('title')
-            li.infolabels['episode'] = i.get('episode', {}).get('number')
-            li.infolabels['season'] = i.get('episode', {}).get('season')
-            li.infolabels['tvshowtitle'] = i.get('show', {}).get('title')
-
-            # Add our item
-            items.append(li)
+            # Get some additional properties and add our item
+            items.append(trakt.get_calendar_properties(li, i))
 
         # Today's date to plugin category
         date = datetime.datetime.today() + datetime.timedelta(days=utils.try_parse_int(self.params.get('startdate', 0)))

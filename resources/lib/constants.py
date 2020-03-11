@@ -709,8 +709,8 @@ TRAKT_CALENDAR = [
 
 LIBRARY_CALENDAR = [
     ('Last Fortnight', -14, 14), ('Last Week', -7, 7), ('Yesterday', -1, 1)] + MAIN_CALENDAR + [
-    ('Next Week', 0, 7), ('Next Fornight', 0, 14), ('Next {0}', 7, 1), ('Next {0}', 8, 1), ('Next {0}', 9, 1),
-    ('Next {0}', 10, 1), ('Next {0}', 11, 1), ('Next {0}', 12, 1), ('Next {0}', 13, 1), ('All Items', 0, 365)]
+    ('Next {0}', 7, 1), ('Next {0}', 8, 1), ('Next {0}', 9, 1), ('Next {0}', 10, 1), ('Next {0}', 11, 1),
+    ('Next {0}', 12, 1), ('Next {0}', 13, 1), ('This Week', 0, 7), ('This Fornight', 0, 14), ('All Items', 0, 365)]
 
 USER_DISCOVER_LISTITEMS_BASEDIR = [
     {'label': 'Discover {0} w/ Below Settings', 'url': {'info': 'user_discover', 'method': 'open'}},
