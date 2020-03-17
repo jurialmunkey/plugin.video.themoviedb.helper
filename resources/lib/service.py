@@ -111,6 +111,9 @@ class ServiceMonitor(Plugin):
             if self.cur_folder != self.pre_folder:
                 self.clear_properties()  # Clear props if the folder changed
                 self.pre_folder = self.cur_folder
+            if self.get_infolabel('Label') == '..':
+                self.clear_properties()
+                return  # Parent folder so clear properties and don't do look-up
 
             if self.dbtype in ['tvshows', 'seasons', 'episodes']:
                 tmdbtype = 'tv'
