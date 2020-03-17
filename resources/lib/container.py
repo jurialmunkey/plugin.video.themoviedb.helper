@@ -892,6 +892,7 @@ class Container(Plugin):
         kwparams.setdefault('key', cat.get('key'))
         path = cat.get('path', '').format(**self.params)
 
+        self.plugincategory = self.params.get('plugincategory') or self.plugincategory
         self.dbid_sorting = cat.get('dbid_sorting', False)
         self.item_tmdbtype = cat.get('item_tmdbtype', '').format(**self.params)
         self.list_items(
