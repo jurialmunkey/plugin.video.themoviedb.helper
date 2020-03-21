@@ -386,6 +386,7 @@ class Script(Plugin):
                 finally:
                     vfs_file.close()
                 tmdb_id = content.replace('https://www.themoviedb.org/tv/', '')
+                tmdb_id = tmdb_id.replace('&islocal=True', '')
                 if not tmdb_id:
                     continue
 
