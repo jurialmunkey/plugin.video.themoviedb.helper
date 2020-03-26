@@ -467,6 +467,11 @@ msgctxt "#32092"
 msgid "Widgets"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32093"
+msgid "Next episodes sort method"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

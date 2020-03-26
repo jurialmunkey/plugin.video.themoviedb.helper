@@ -305,6 +305,10 @@ class TraktAPI(RequestAPI):
             # utils.kodi_log('In-Progress -- Searching Next Episode For:\n{0}'.format(i), 2)
             progress = self.get_upnext(i[0], True)
             if progress and progress.get('next_episode'):
+                if (episodes and
+                        progress.get('next_episode', {}).get('season') == 1 and
+                        progress.get('next_episode', {}).get('number') == 1):
+                    continue
                 # utils.kodi_log('In-Progress -- Found Next Episode:\n{0}'.format(progress.get('next_episode')), 2)
                 season = progress.get('next_episode', {}).get('season') if episodes else None
                 episode = progress.get('next_episode', {}).get('number') if episodes else None
@@ -313,7 +317,7 @@ class TraktAPI(RequestAPI):
                 # utils.kodi_log('In-Progress -- Got Next Episode Details:\n{0}'.format(item), 2)
                 items.append(ListItem(library=self.library, **item))
                 n += 1
-        return sorted(items, key=lambda i: i.infolabels.get('premiered'), reverse=True) if episodes else items
+        return sorted(items, key=lambda i: i.infolabels.get('premiered'), reverse=True) if episodes and self.addon.getSettingString('trakt_nextepisodesort') == 'airdate' else items
 
     def get_airingshows(self, start_date=0, days=1):
         start_date = datetime.date.today() + datetime.timedelta(days=start_date)
