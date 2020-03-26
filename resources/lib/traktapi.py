@@ -313,7 +313,7 @@ class TraktAPI(RequestAPI):
                 # utils.kodi_log('In-Progress -- Got Next Episode Details:\n{0}'.format(item), 2)
                 items.append(ListItem(library=self.library, **item))
                 n += 1
-        return items
+        return sorted(items, key=lambda i: i.infolabels.get('premiered'), reverse=True) if episodes else items
 
     def get_airingshows(self, start_date=0, days=1):
         start_date = datetime.date.today() + datetime.timedelta(days=start_date)
