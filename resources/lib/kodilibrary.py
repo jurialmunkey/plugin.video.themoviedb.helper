@@ -16,7 +16,12 @@ class KodiLibrary(object):
             "params": params,
             "method": method,
             "id": 1}
-        return json.loads(xbmc.executeJSONRPC(json.dumps(query)))
+        try:
+            response = json.loads(xbmc.executeJSONRPC(json.dumps(query)))
+        except Exception as exc:
+            utils.kodi_log('TMDbHelper - JSONRPC Error:\n{}'.format(exc), 1)
+            response = {}
+        return response
 
     def get_database(self, dbtype=None, tvshowid=None):
         if not dbtype:
