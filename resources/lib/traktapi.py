@@ -152,7 +152,7 @@ class TraktAPI(RequestAPI):
         elif response.headers.get('X-Sort-By') == 'title':
             return sorted(items, key=lambda i: i.get(i.get('type'), {}).get('title'), reverse=reverse)
         elif response.headers.get('X-Sort-By') == 'released':
-            return sorted(items, key=lambda i: i.get(i.get('type'), {}).get('released'), reverse=reverse)
+            return sorted(items, key=lambda i: i.get(i.get('type'), {}).get('first_aired') if i.get('type') == 'show' else i.get(i.get('type'), {}).get('released'), reverse=reverse)
         elif response.headers.get('X-Sort-By') == 'runtime':
             return sorted(items, key=lambda i: i.get(i.get('type'), {}).get('runtime'), reverse=reverse)
         elif response.headers.get('X-Sort-By') == 'popularity':
