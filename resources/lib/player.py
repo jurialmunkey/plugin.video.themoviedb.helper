@@ -57,7 +57,15 @@ class Player(Plugin):
 
     def get_playerindex(self, force_dialog=False):
         if force_dialog or (self.itemtype == 'movie' and not self.dp_movies) or (self.itemtype == 'episode' and not self.dp_episodes):
-            return xbmcgui.Dialog().select(self.addon.getLocalizedString(32042), self.itemlist)
+            idx = xbmcgui.Dialog().select(self.addon.getLocalizedString(32042), self.itemlist)  # Ask user to select player
+            if self.itemtype == 'movie':
+                self.dp_movies = self.itemlist[idx].getLabel()
+                self.dp_movies_id = self.identifierlist[idx]
+            elif self.itemtype == 'episode':
+                self.dp_episodes = self.itemlist[idx].getLabel()
+                self.dp_episodes_id = self.identifierlist[idx]
+            return idx
+
         for i in range(0, len(self.itemlist)):
             label = self.itemlist[i].getLabel()
             if (
