@@ -872,6 +872,8 @@ class Container(Plugin):
             i.infoproperties['numitems.dbid'] = self.numitems_dbid
             i.infoproperties['numitems.tmdb'] = self.numitems_tmdb
             i.infoproperties['dbtype'] = self.item_dbtype
+            i.infoproperties['container.info'] = self.params.get('info', '')
+            i.infoproperties['container.type'] = self.params.get('type', '')
             i.get_details(self.item_dbtype, self.tmdb, self.omdb, self.params.get('localdb'))
             i.get_url(url, url_tmdb_id, self.params.get('widget'), self.params.get('fanarttv'), self.params.get('nextpage'), self.params.get('extended'))
             i.get_extra_artwork(self.tmdb, self.fanarttv) if len(items) < 22 and self.exp_fanarttv() else None
