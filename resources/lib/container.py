@@ -609,6 +609,8 @@ class Container(Plugin):
             url = {'info': info, 'type': 'episode', 'startdate': i[1], 'days': i[2]}
             url = self.set_url_params(url)
             listitem.create_listitem(self.handle, **url)
+            listitem.infoproperties['container.info'] = self.params.get('info', '')
+            listitem.infoproperties['container.type'] = self.params.get('type', '')
         self.finish_container()
 
     def list_traktuserlists(self):
@@ -635,6 +637,8 @@ class Container(Plugin):
             listitem = ListItem(label=label, label2=label2, icon=icon, thumb=icon, poster=icon, infolabels=infolabels)
             url = {'info': 'trakt_userlist', 'user_slug': user_slug, 'list_slug': list_slug, 'type': self.params.get('type')}
             listitem.url = self.set_url_params(url)
+            listitem.infoproperties['container.info'] = self.params.get('info', '')
+            listitem.infoproperties['container.type'] = self.params.get('type', '')
             listitem.create_listitem(self.handle, **listitem.url) if not self.params.get('random') else self.randomlist.append(listitem)
         self.finish_container()
 
@@ -823,6 +827,8 @@ class Container(Plugin):
 
         # Create first search item
         listitem = ListItem(label='Search {}'.format(utils.type_convert(self.params.get('type'), 'plural')), icon=icon)
+        listitem.infoproperties['container.info'] = self.params.get('info', '')
+        listitem.infoproperties['container.type'] = self.params.get('type', '')
         listitem.create_listitem(self.handle, **url)
 
         # Create cached history searches
@@ -831,6 +837,8 @@ class Container(Plugin):
         for query in history:
             url['query'] = query  # Add query as param so we search it
             listitem = ListItem(label=query, icon=icon)
+            listitem.infoproperties['container.info'] = self.params.get('info', '')
+            listitem.infoproperties['container.type'] = self.params.get('type', '')
             listitem.create_listitem(self.handle, **url)
 
         # Create clear cache item if history exists
@@ -839,6 +847,8 @@ class Container(Plugin):
             url['clearcache'] = 'True'
             url.pop('query', '')
             listitem = ListItem(label='Clear Search History', icon=icon)
+            listitem.infoproperties['container.info'] = self.params.get('info', '')
+            listitem.infoproperties['container.type'] = self.params.get('type', '')
             listitem.create_listitem(self.handle, **url)
 
         # Finish container
@@ -1066,6 +1076,8 @@ class Container(Plugin):
                     label = i.get('name').format('', '') if self.params.get('info') in ['dir_movie', 'dir_tv', 'dir_person'] else i.get('name').format(utils.type_convert(t, 'plural'), ' ')
 
                     listitem = ListItem(label=label, icon=i.get('icon', '').format(self.addonpath))
+                    listitem.infoproperties['container.info'] = self.params.get('info', '')
+                    listitem.infoproperties['container.type'] = self.params.get('type', '')
                     listitem.create_listitem(self.handle, **url)
         self.finish_container()
 
