@@ -47,6 +47,10 @@ class Container(Plugin):
     def finish_container(self):
         if self.params.get('random'):
             return
+        for k, v in self.params.items():
+            if not k or not v:
+                continue
+            xbmcplugin.setProperty(self.handle, 'Param.{}'.format(k), str(v))  # Set params to container properties
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_UNSORTED)
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_TITLE_IGNORE_THE)
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_LASTPLAYED)
