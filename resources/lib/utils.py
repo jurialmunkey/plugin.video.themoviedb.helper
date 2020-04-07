@@ -1,3 +1,4 @@
+import re
 import sys
 import time
 import xbmc
@@ -66,6 +67,14 @@ def try_encode_string(string, encoding='utf-8'):
     if sys.version_info.major == 3:
         return string
     return string.encode(encoding)
+
+
+def get_between_strings(string, startswith='', endswith=''):
+    exp = startswith + '(.+?)' + endswith
+    try:
+        return re.search(exp, string).group(1)
+    except AttributeError:
+        return ''
 
 
 def get_timestamp(timestamp=None):
