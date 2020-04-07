@@ -608,9 +608,11 @@ class Container(Plugin):
             listitem = ListItem(label=label, icon=icon)
             url = {'info': info, 'type': 'episode', 'startdate': i[1], 'days': i[2]}
             url = self.set_url_params(url)
-            listitem.create_listitem(self.handle, **url)
             listitem.infoproperties['container.info'] = self.params.get('info', '')
             listitem.infoproperties['container.type'] = self.params.get('type', '')
+            listitem.infoproperties['item.info'] = url.get('info', '')
+            listitem.infoproperties['item.type'] = url.get('type', '')
+            listitem.create_listitem(self.handle, **url)
         self.finish_container()
 
     def list_traktuserlists(self):
@@ -639,6 +641,8 @@ class Container(Plugin):
             listitem.url = self.set_url_params(url)
             listitem.infoproperties['container.info'] = self.params.get('info', '')
             listitem.infoproperties['container.type'] = self.params.get('type', '')
+            listitem.infoproperties['item.info'] = listitem.url.get('info', '')
+            listitem.infoproperties['item.type'] = listitem.url.get('type', '')
             listitem.create_listitem(self.handle, **listitem.url) if not self.params.get('random') else self.randomlist.append(listitem)
         self.finish_container()
 
@@ -829,6 +833,8 @@ class Container(Plugin):
         listitem = ListItem(label='Search {}'.format(utils.type_convert(self.params.get('type'), 'plural')), icon=icon)
         listitem.infoproperties['container.info'] = self.params.get('info', '')
         listitem.infoproperties['container.type'] = self.params.get('type', '')
+        listitem.infoproperties['item.info'] = url.get('info', '')
+        listitem.infoproperties['item.type'] = url.get('type', '')
         listitem.create_listitem(self.handle, **url)
 
         # Create cached history searches
@@ -839,6 +845,8 @@ class Container(Plugin):
             listitem = ListItem(label=query, icon=icon)
             listitem.infoproperties['container.info'] = self.params.get('info', '')
             listitem.infoproperties['container.type'] = self.params.get('type', '')
+            listitem.infoproperties['item.info'] = url.get('info', '')
+            listitem.infoproperties['item.type'] = url.get('type', '')
             listitem.create_listitem(self.handle, **url)
 
         # Create clear cache item if history exists
@@ -849,6 +857,8 @@ class Container(Plugin):
             listitem = ListItem(label='Clear Search History', icon=icon)
             listitem.infoproperties['container.info'] = self.params.get('info', '')
             listitem.infoproperties['container.type'] = self.params.get('type', '')
+            listitem.infoproperties['item.info'] = url.get('info', '')
+            listitem.infoproperties['item.type'] = url.get('type', '')
             listitem.create_listitem(self.handle, **url)
 
         # Finish container
@@ -889,6 +899,8 @@ class Container(Plugin):
             i.get_extra_artwork(self.tmdb, self.fanarttv) if len(items) < 22 and self.exp_fanarttv() else None
             i.get_trakt_watched(trakt_watched) if x == 0 or self.params.get('info') != 'details' else None
             i.get_trakt_unwatched(trakt=TraktAPI(tmdb=self.tmdb), request=trakt_unwatched, check_sync=self.check_sync) if x == 0 or self.params.get('info') != 'details' else None
+            i.infoproperties['item.info'] = i.url.get('info', '')
+            i.infoproperties['item.type'] = i.url.get('type', '')
             i.create_listitem(self.handle, **i.url) if not self.params.get('random') else self.randomlist.append(i)
             x += 1
         self.finish_container()
@@ -1078,6 +1090,8 @@ class Container(Plugin):
                     listitem = ListItem(label=label, icon=i.get('icon', '').format(self.addonpath))
                     listitem.infoproperties['container.info'] = self.params.get('info', '')
                     listitem.infoproperties['container.type'] = self.params.get('type', '')
+                    listitem.infoproperties['item.info'] = url.get('info', '')
+                    listitem.infoproperties['item.type'] = url.get('type', '')
                     listitem.create_listitem(self.handle, **url)
         self.finish_container()
 
