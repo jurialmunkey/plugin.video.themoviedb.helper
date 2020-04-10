@@ -115,7 +115,7 @@ class Plugin(object):
             item['extrafanart'] = item.get('extrafanart') or utils.iterate_extraart(artwork.get('extrafanart', [])) or ''
         return item
 
-    def get_db_info(self, info=None, tmdbtype=None, imdb_id=None, originaltitle=None, title=None, year=None, tvshowtitle=None, season=None, episode=None):
+    def get_db_info(self, info=None, tmdbtype=None, imdb_id=None, originaltitle=None, title=None, year=None, tvshowtitle=None, season=None, episode=None, tmdb_id=None, tvdb_id=None):
         dbid = None
         kodidatabase = None
         if tmdbtype == 'movie':
@@ -123,10 +123,10 @@ class Plugin(object):
         if tmdbtype == 'tv':
             kodidatabase = self.koditvshowdb = self.koditvshowdb or KodiLibrary(dbtype='tvshow')
         if kodidatabase and info:
-            return kodidatabase.get_info(info=info, imdb_id=imdb_id, originaltitle=originaltitle, title=title, year=year)
+            return kodidatabase.get_info(info=info, imdb_id=imdb_id, tmdb_id=tmdb_id, tvdb_id=tvdb_id, originaltitle=originaltitle, title=title, year=year)
         if tmdbtype == 'episode':
             kodidatabase = self.koditvshowdb = self.koditvshowdb or KodiLibrary(dbtype='tvshow')
-            dbid = kodidatabase.get_info(info='dbid', imdb_id=imdb_id, title=tvshowtitle, year=year)
+            dbid = kodidatabase.get_info(info='dbid', imdb_id=imdb_id, tmdb_id=tmdb_id, tvdb_id=tvdb_id, title=tvshowtitle, year=year)
             kodidatabase = KodiLibrary(dbtype='episode', tvshowid=dbid)
         if dbid and kodidatabase and season and episode:
             return kodidatabase.get_info('dbid', season=season, episode=episode)

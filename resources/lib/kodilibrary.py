@@ -28,10 +28,10 @@ class KodiLibrary(object):
             return
         if dbtype == "movie":
             method = "VideoLibrary.GetMovies"
-            params = {"properties": ["title", "imdbnumber", "originaltitle", "year", "file"]}
+            params = {"properties": ["title", "imdbnumber", "originaltitle", "uniqueid", "year", "file"]}
         if dbtype == "tvshow":
             method = "VideoLibrary.GetTVShows"
-            params = {"properties": ["title", "imdbnumber", "originaltitle", "year"]}
+            params = {"properties": ["title", "imdbnumber", "originaltitle", "uniqueid", "year"]}
         if dbtype == "episode":
             method = "VideoLibrary.GetEpisodes"
             params = {
@@ -42,7 +42,9 @@ class KodiLibrary(object):
         response = self.get_jsonrpc(method, params)
         self.dbtype = dbtype
         self.database = [{
-            'imdb_id': item.get('imdbnumber'),
+            'imdb_id': item.get('uniqueid', {}).get('imdb'),
+            'tmdb_id': item.get('uniqueid', {}).get('tmdb'),
+            'tvdb_id': item.get('uniqueid', {}).get('tvdb'),
             'dbid': item.get(dbid_name),
             'title': item.get('title'),
             'originaltitle': item.get('originaltitle'),
@@ -105,7 +107,7 @@ class KodiLibrary(object):
         infoproperties = utils.del_empty_keys(infoproperties, ['N/A', '0.0', '0'])
         return infoproperties
 
-    def get_info(self, info, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None, season=None, episode=None, fuzzy_match=False):
+    def get_info(self, info, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None, season=None, episode=None, fuzzy_match=False, tmdb_id=None, tvdb_id=None):
         if not self.database or not info:
             return
         utils.kodi_log(u'KodiLibrary -- Searching KodiDb for {0}'.format(info), 2)
@@ -116,6 +118,12 @@ class KodiLibrary(object):
         if not index_list and imdb_id:
             index_list = utils.find_dict_in_list(self.database, 'imdb_id', imdb_id)
             utils.kodi_log(u'KodiLibrary -- Searching KodiDb for IMDb ID: {0}\nIndices: {1}'.format(imdb_id, index_list), 2)
+        if not index_list and tmdb_id:
+            index_list = utils.find_dict_in_list(self.database, 'tmdb_id', str(tmdb_id))
+            utils.kodi_log(u'KodiLibrary -- Searching KodiDb for TMDB ID: {0}\nIndices: {1}'.format(tmdb_id, index_list), 2)
+        if not index_list and tvdb_id:
+            index_list = utils.find_dict_in_list(self.database, 'tvdb_id', str(tvdb_id))
+            utils.kodi_log(u'KodiLibrary -- Searching KodiDb for TVDB ID: {0}\nIndices: {1}'.format(tvdb_id, index_list), 2)
         if not index_list and originaltitle:
             index_list = utils.find_dict_in_list(self.database, 'originaltitle', originaltitle)
             utils.kodi_log(u'KodiLibrary -- Searching KodiDb for OriginalTitle: {0}\nIndices: {1}'.format(originaltitle, index_list), 2)

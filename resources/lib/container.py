@@ -267,6 +267,8 @@ class Container(Plugin):
                 info='dbid',
                 tmdbtype=self.item_tmdbtype,
                 imdb_id=i.imdb_id,
+                tmdb_id=i.infoproperties.get('tvshow.tmdb_id') or i.infoproperties.get('tmdb_id'),
+                tvdb_id=i.infoproperties.get('tvshow.tvdb_id') or i.infoproperties.get('tvdb_id'),
                 originaltitle=i.infolabels.get('originaltitle'),
                 title=i.infolabels.get('title'),
                 year=i.infolabels.get('year'),
@@ -562,7 +564,12 @@ class Container(Plugin):
             i for i in trakt.get_airingshows(
                 start_date=utils.try_parse_int(self.params.get('startdate', 0)) - 1,
                 days=utils.try_parse_int(self.params.get('days', 1)) + 2)
-            if kodidb.get_info('dbid', title=i.get('show', {}).get('title'))]
+            if kodidb.get_info(
+                'dbid',
+                tmdb_id=i.get('show', {}).get('ids', {}).get('tmdb'),
+                tvdb_id=i.get('show', {}).get('ids', {}).get('tvdb'),
+                imdb_id=i.get('show', {}).get('ids', {}).get('imdb'),
+                title=i.get('show', {}).get('title'))]
 
         items = []
         for i in traktitems:
