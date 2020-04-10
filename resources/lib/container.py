@@ -50,7 +50,7 @@ class Container(Plugin):
         for k, v in self.params.items():
             if not k or not v:
                 continue
-            xbmcplugin.setProperty(self.handle, 'Param.{}'.format(k), str(v))  # Set params to container properties
+            xbmcplugin.setProperty(self.handle, u'Param.{}'.format(k), u'{}'.format(v))  # Set params to container properties
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_UNSORTED)
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_TITLE_IGNORE_THE)
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_LASTPLAYED)
