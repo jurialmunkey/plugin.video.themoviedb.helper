@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.themoviedb.helper"
-version="2.4.0"
+version="2.4.1"
 name="TheMovieDb Helper"
 provider-name="jurialmunkey">
 <requires>
@@ -56,6 +56,6 @@ provider-name="jurialmunkey">
     <screenshot>resources/screenshot-01.jpg</screenshot>
     <screenshot>resources/screenshot-02.jpg</screenshot>
   </assets>
-  <news>2.4.0 - Add context menu option to add complete Trakt user list to library[CR]2.3.6 - Better ID matching for calendar and lists[CR]2.3.5 - Remove TMDb Rate Limiter since API has now removed rate limits[CR]2.3.4 - Fix encoding error[CR]2.3.3 - Add params to Container.Property(Param.{})[CR]2.3.2 - Add ListItem.Property(item.info) and ListItem.Property(item.type) [CR] 2.3.1 - Add ListItem.Property(container.info) and ListItem.Property(container.type)[CR]2.3.0 - New Awards properties</news>
+  <news>2.4.1 - Add quote encoded method in addition to quote_plus for player[CR]2.4.0 - Add context menu option to add complete Trakt user list to library[CR]2.3.6 - Better ID matching for calendar and lists[CR]2.3.5 - Remove TMDb Rate Limiter since API has now removed rate limits[CR]2.3.4 - Fix encoding error[CR]2.3.3 - Add params to Container.Property(Param.{})[CR]2.3.2 - Add ListItem.Property(item.info) and ListItem.Property(item.type) [CR] 2.3.1 - Add ListItem.Property(container.info) and ListItem.Property(container.type)[CR]2.3.0 - New Awards properties</news>
 </extension>
 </addon>

@@ -11,9 +11,9 @@ from resources.lib.kodilibrary import KodiLibrary
 from resources.lib.traktapi import TraktAPI
 from resources.lib.listitem import ListItem
 try:
-    from urllib.parse import quote_plus  # Py3
+    from urllib.parse import quote_plus, quote  # Py3
 except ImportError:
-    from urllib import quote_plus  # Py2
+    from urllib import quote_plus, quote  # Py2
 
 
 def string_format_map(fmt, d):
@@ -257,7 +257,8 @@ class Player(Plugin):
             self.item[k + '_-'] = v.replace(' ', '-')
             self.item[k + '_escaped'] = v.replace(' ', '%2520')
             self.item[k + '_escaped+'] = v.replace(' ', '%252B')
-            self.item[k + '_url'] = quote_plus(utils.try_encode_string(v))
+            self.item[k + '_url'] = quote(utils.try_encode_string(v))
+            self.item[k + '_url+'] = quote_plus(utils.try_encode_string(v))
 
     def build_players(self, tmdbtype=None):
         basedirs = ['special://profile/addon_data/plugin.video.themoviedb.helper/players/']
