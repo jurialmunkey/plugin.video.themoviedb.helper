@@ -134,44 +134,48 @@ def library_userlist():
         if not request:
             return
 
+    i_count = 0
+    i_total = len(request)
     d_head = 'Add Trakt list to Kodi library'
     d_body = 'Do you wish to add this Trakt list to your Kodi library?'
     d_body += '\n[B]{}[/B] by user [B]{}[/B]'.format(list_slug, user_slug)
-    d_body += '\n\n[B][COLOR=red]WARNING[/COLOR][/B] ' if len(request) > 20 else '\n\n'
-    d_body += 'This list contains [B]{}[/B] items.'.format(len(request))
+    d_body += '\n\n[B][COLOR=red]WARNING[/COLOR][/B] ' if i_total > 20 else '\n\n'
+    d_body += 'This list contains [B]{}[/B] items.'.format(i_total)
     if not xbmcgui.Dialog().yesno(d_head, d_body):
         return
 
-    xbmcgui.Dialog().notification('TMDbHelper', 'Adding items to library...')
-    with utils.busy_dialog():
-        basedir_movie = _addon.getSettingString('movies_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/movies/'
-        basedir_tv = _addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
-        auto_update = _addon.getSettingBool('auto_update') or False
+    p_dialog = xbmcgui.DialogProgressBG()
+    p_dialog.create('TMDbHelper', 'Adding items to library...')
+    basedir_movie = _addon.getSettingString('movies_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/movies/'
+    basedir_tv = _addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
+    auto_update = _addon.getSettingBool('auto_update') or False
 
-        for i in request:
-            i_type = i.get('type')
-            if i_type not in ['movie', 'show']:
-                continue  # Only get movies or tvshows
+    for i in request:
+        i_count += 1
+        i_type = i.get('type')
+        if i_type not in ['movie', 'show']:
+            continue  # Only get movies or tvshows
 
-            item = i.get(i_type, {})
-            tmdb_id = item.get('ids', {}).get('tmdb')
-            if not tmdb_id:
-                continue  # Don't bother if there isn't a tmdb_id as lookup is too expensive for long lists
+        item = i.get(i_type, {})
+        tmdb_id = item.get('ids', {}).get('tmdb')
+        if not tmdb_id:
+            continue  # Don't bother if there isn't a tmdb_id as lookup is too expensive for long lists
 
-            if i_type == 'movie':  # Add any movies
-                content = 'plugin://plugin.video.themoviedb.helper/?info=play&tmdb_id={}&type=movie'.format(tmdb_id)
-                folder = u'{} ({})'.format(item.get('title'), item.get('year'))
-                movie_name = u'{} ({})'.format(item.get('title'), item.get('year'))
-                xbmcgui.Dialog().notification('TMDbHelper', u'Adding {} to library...'.format(movie_name))
-                library_createfile(movie_name, content, folder, basedir=basedir_movie)
-                library_create_nfo('movie', tmdb_id, folder, basedir=basedir_movie)
+        if i_type == 'movie':  # Add any movies
+            content = 'plugin://plugin.video.themoviedb.helper/?info=play&tmdb_id={}&type=movie'.format(tmdb_id)
+            folder = u'{} ({})'.format(item.get('title'), item.get('year'))
+            movie_name = u'{} ({})'.format(item.get('title'), item.get('year'))
+            p_dialog.update(i_total // i_count, message=u'Adding {} to library...'.format(movie_name))
+            library_createfile(movie_name, content, folder, basedir=basedir_movie)
+            library_create_nfo('movie', tmdb_id, folder, basedir=basedir_movie)
 
-            if i_type == 'show':  # Add whole tvshows
-                content = 'plugin://plugin.video.themoviedb.helper/?info=seasons&nextpage=True&tmdb_id={}&type=tv'.format(tmdb_id)
-                folder = u'{}'.format(item.get('title'))
-                xbmcgui.Dialog().notification('TMDbHelper', u'Adding {} to library...'.format(item.get('title')))
-                library_addtvshow(basedir=basedir_tv, folder=folder, url=content, tmdb_id=tmdb_id)
+        if i_type == 'show':  # Add whole tvshows
+            content = 'plugin://plugin.video.themoviedb.helper/?info=seasons&nextpage=True&tmdb_id={}&type=tv'.format(tmdb_id)
+            folder = u'{}'.format(item.get('title'))
+            p_dialog.update(i_total // i_count, message=u'Adding {} to library...'.format(item.get('title')))
+            library_addtvshow(basedir=basedir_tv, folder=folder, url=content, tmdb_id=tmdb_id)
 
+    p_dialog.close()
     xbmc.executebuiltin('UpdateLibrary(video)') if auto_update else None
 
 
