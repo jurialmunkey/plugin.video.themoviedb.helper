@@ -125,6 +125,56 @@ def play():
                 dbtype, tmdb_id))
 
 
+def library_userlist():
+    list_slug = sys.listitem.getProperty('Item.list_slug')
+    user_slug = sys.listitem.getProperty('Item.user_slug')
+
+    with utils.busy_dialog():
+        request = TraktAPI().get_response_json('users', user_slug, 'lists', list_slug, 'items')
+        if not request:
+            return
+
+    d_head = 'Add Trakt list to Kodi library'
+    d_body = 'Do you wish to add this Trakt list to your Kodi library?'
+    d_body += '\n[B]{}[/B] by user [B]{}[/B]'.format(list_slug, user_slug)
+    d_body += '\n\n[B][COLOR=red]WARNING[/COLOR][/B] ' if len(request) > 20 else '\n\n'
+    d_body += 'This list contains [B]{}[/B] items.'.format(len(request))
+    if not xbmcgui.Dialog().yesno(d_head, d_body):
+        return
+
+    xbmcgui.Dialog().notification('TMDbHelper', 'Adding items to library...')
+    with utils.busy_dialog():
+        basedir_movie = _addon.getSettingString('movies_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/movies/'
+        basedir_tv = _addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
+        auto_update = _addon.getSettingBool('auto_update') or False
+
+        for i in request:
+            i_type = i.get('type')
+            if i_type not in ['movie', 'show']:
+                continue  # Only get movies or tvshows
+
+            item = i.get(i_type, {})
+            tmdb_id = item.get('ids', {}).get('tmdb')
+            if not tmdb_id:
+                continue  # Don't bother if there isn't a tmdb_id as lookup is too expensive for long lists
+
+            if i_type == 'movie':  # Add any movies
+                content = 'plugin://plugin.video.themoviedb.helper/?info=play&tmdb_id={}&type=movie'.format(tmdb_id)
+                folder = '{} ({})'.format(item.get('title'), item.get('year'))
+                movie_name = '{} ({})'.format(item.get('title'), item.get('year'))
+                xbmcgui.Dialog().notification('TMDbHelper', 'Adding {} to library...'.format(movie_name))
+                library_createfile(movie_name, content, folder, basedir=basedir_movie)
+                library_create_nfo('movie', tmdb_id, folder, basedir=basedir_movie)
+
+            if i_type == 'show':  # Add whole tvshows
+                content = 'plugin://plugin.video.themoviedb.helper/?info=seasons&nextpage=True&tmdb_id={}&type=tv'.format(tmdb_id)
+                folder = item.get('title')
+                xbmcgui.Dialog().notification('TMDbHelper', 'Adding {} to library...'.format(item.get('title')))
+                library_addtvshow(basedir=basedir_tv, folder=folder, url=content, tmdb_id=tmdb_id)
+
+    xbmc.executebuiltin('UpdateLibrary(video)') if auto_update else None
+
+
 def library():
     with utils.busy_dialog():
         title = utils.validify_filename(sys.listitem.getVideoInfoTag().getTitle())
@@ -188,6 +238,8 @@ def action(action, tmdb_id=None, tmdb_type=None, season=None, episode=None, labe
         func = _traktapi.sync_collection
     elif action == 'watchlist':
         func = _traktapi.sync_watchlist
+    elif action == 'library_userlist':
+        return library_userlist()
     elif action == 'library':
         return library()
     elif action == 'play':

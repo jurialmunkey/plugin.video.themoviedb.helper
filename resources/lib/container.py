@@ -619,10 +619,8 @@ class Container(Plugin):
             listitem = ListItem(label=label, icon=icon)
             url = {'info': info, 'type': 'episode', 'startdate': i[1], 'days': i[2]}
             url = self.set_url_params(url)
-            listitem.infoproperties['container.info'] = self.params.get('info', '')
-            listitem.infoproperties['container.type'] = self.params.get('type', '')
-            listitem.infoproperties['item.info'] = url.get('info', '')
-            listitem.infoproperties['item.type'] = url.get('type', '')
+            listitem.set_url_props(self.params, 'container')
+            listitem.set_url_props(url, 'item')
             listitem.create_listitem(self.handle, **url)
         self.finish_container()
 
@@ -650,10 +648,8 @@ class Container(Plugin):
             listitem = ListItem(label=label, label2=label2, icon=icon, thumb=icon, poster=icon, infolabels=infolabels)
             url = {'info': 'trakt_userlist', 'user_slug': user_slug, 'list_slug': list_slug, 'type': self.params.get('type')}
             listitem.url = self.set_url_params(url)
-            listitem.infoproperties['container.info'] = self.params.get('info', '')
-            listitem.infoproperties['container.type'] = self.params.get('type', '')
-            listitem.infoproperties['item.info'] = listitem.url.get('info', '')
-            listitem.infoproperties['item.type'] = listitem.url.get('type', '')
+            listitem.set_url_props(self.params, 'container')
+            listitem.set_url_props(listitem.url, 'item')
             listitem.create_listitem(self.handle, **listitem.url) if not self.params.get('random') else self.randomlist.append(listitem)
         self.finish_container()
 
@@ -842,10 +838,8 @@ class Container(Plugin):
 
         # Create first search item
         listitem = ListItem(label='Search {}'.format(utils.type_convert(self.params.get('type'), 'plural')), icon=icon)
-        listitem.infoproperties['container.info'] = self.params.get('info', '')
-        listitem.infoproperties['container.type'] = self.params.get('type', '')
-        listitem.infoproperties['item.info'] = url.get('info', '')
-        listitem.infoproperties['item.type'] = url.get('type', '')
+        listitem.set_url_props(self.params, 'container')
+        listitem.set_url_props(url, 'item')
         listitem.create_listitem(self.handle, **url)
 
         # Create cached history searches
@@ -854,10 +848,8 @@ class Container(Plugin):
         for query in history:
             url['query'] = query  # Add query as param so we search it
             listitem = ListItem(label=query, icon=icon)
-            listitem.infoproperties['container.info'] = self.params.get('info', '')
-            listitem.infoproperties['container.type'] = self.params.get('type', '')
-            listitem.infoproperties['item.info'] = url.get('info', '')
-            listitem.infoproperties['item.type'] = url.get('type', '')
+            listitem.set_url_props(self.params, 'container')
+            listitem.set_url_props(url, 'item')
             listitem.create_listitem(self.handle, **url)
 
         # Create clear cache item if history exists
@@ -866,10 +858,8 @@ class Container(Plugin):
             url['clearcache'] = 'True'
             url.pop('query', '')
             listitem = ListItem(label='Clear Search History', icon=icon)
-            listitem.infoproperties['container.info'] = self.params.get('info', '')
-            listitem.infoproperties['container.type'] = self.params.get('type', '')
-            listitem.infoproperties['item.info'] = url.get('info', '')
-            listitem.infoproperties['item.type'] = url.get('type', '')
+            listitem.set_url_props(self.params, 'container')
+            listitem.set_url_props(url, 'item')
             listitem.create_listitem(self.handle, **url)
 
         # Finish container
@@ -903,15 +893,13 @@ class Container(Plugin):
             i.infoproperties['numitems.dbid'] = self.numitems_dbid
             i.infoproperties['numitems.tmdb'] = self.numitems_tmdb
             i.infoproperties['dbtype'] = self.item_dbtype
-            i.infoproperties['container.info'] = self.params.get('info', '')
-            i.infoproperties['container.type'] = self.params.get('type', '')
             i.get_details(self.item_dbtype, self.tmdb, self.omdb, self.params.get('localdb'))
             i.get_url(url, url_tmdb_id, self.params.get('widget'), self.params.get('fanarttv'), self.params.get('nextpage'), self.params.get('extended'))
             i.get_extra_artwork(self.tmdb, self.fanarttv) if len(items) < 22 and self.exp_fanarttv() else None
             i.get_trakt_watched(trakt_watched) if x == 0 or self.params.get('info') != 'details' else None
             i.get_trakt_unwatched(trakt=TraktAPI(tmdb=self.tmdb), request=trakt_unwatched, check_sync=self.check_sync) if x == 0 or self.params.get('info') != 'details' else None
-            i.infoproperties['item.info'] = i.url.get('info', '')
-            i.infoproperties['item.type'] = i.url.get('type', '')
+            i.set_url_props(self.params, 'container')
+            i.set_url_props(i.url, 'item')
             i.create_listitem(self.handle, **i.url) if not self.params.get('random') else self.randomlist.append(i)
             x += 1
         self.finish_container()
@@ -1099,10 +1087,8 @@ class Container(Plugin):
                     label = i.get('name').format('', '') if self.params.get('info') in ['dir_movie', 'dir_tv', 'dir_person'] else i.get('name').format(utils.type_convert(t, 'plural'), ' ')
 
                     listitem = ListItem(label=label, icon=i.get('icon', '').format(self.addonpath))
-                    listitem.infoproperties['container.info'] = self.params.get('info', '')
-                    listitem.infoproperties['container.type'] = self.params.get('type', '')
-                    listitem.infoproperties['item.info'] = url.get('info', '')
-                    listitem.infoproperties['item.type'] = url.get('type', '')
+                    listitem.set_url_props(self.params, 'container')
+                    listitem.set_url_props(url, 'item')
                     listitem.create_listitem(self.handle, **url)
         self.finish_container()
 

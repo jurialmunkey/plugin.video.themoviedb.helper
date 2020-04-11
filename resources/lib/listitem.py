@@ -216,6 +216,12 @@ class ListItem(object):
                 utils.try_parse_int(self.infoproperties.get('watchedepisodes', 0)) > 0):
             self.infoproperties['unwatchedepisodes'] = utils.try_parse_int(self.infolabels.get('episode')) - utils.try_parse_int(self.infoproperties.get('watchedepisodes'))
 
+    def set_url_props(self, url, prefix='Item'):
+        for k, v in url.items():
+            if not k or not v:
+                continue
+            self.infoproperties[u'{}.{}'.format(prefix, k)] = u'{}'.format(v)
+
     def set_listitem(self, path=None):
         listitem = xbmcgui.ListItem(label=self.label, label2=self.label2, path=path)
         listitem.setLabel2(self.label2)
