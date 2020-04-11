@@ -160,16 +160,16 @@ def library_userlist():
 
             if i_type == 'movie':  # Add any movies
                 content = 'plugin://plugin.video.themoviedb.helper/?info=play&tmdb_id={}&type=movie'.format(tmdb_id)
-                folder = '{} ({})'.format(item.get('title'), item.get('year'))
-                movie_name = '{} ({})'.format(item.get('title'), item.get('year'))
-                xbmcgui.Dialog().notification('TMDbHelper', 'Adding {} to library...'.format(movie_name))
+                folder = u'{} ({})'.format(item.get('title'), item.get('year'))
+                movie_name = u'{} ({})'.format(item.get('title'), item.get('year'))
+                xbmcgui.Dialog().notification('TMDbHelper', u'Adding {} to library...'.format(movie_name))
                 library_createfile(movie_name, content, folder, basedir=basedir_movie)
                 library_create_nfo('movie', tmdb_id, folder, basedir=basedir_movie)
 
             if i_type == 'show':  # Add whole tvshows
                 content = 'plugin://plugin.video.themoviedb.helper/?info=seasons&nextpage=True&tmdb_id={}&type=tv'.format(tmdb_id)
-                folder = item.get('title')
-                xbmcgui.Dialog().notification('TMDbHelper', 'Adding {} to library...'.format(item.get('title')))
+                folder = u'{}'.format(item.get('title'))
+                xbmcgui.Dialog().notification('TMDbHelper', u'Adding {} to library...'.format(item.get('title')))
                 library_addtvshow(basedir=basedir_tv, folder=folder, url=content, tmdb_id=tmdb_id)
 
     xbmc.executebuiltin('UpdateLibrary(video)') if auto_update else None
@@ -267,7 +267,7 @@ def action(action, tmdb_id=None, tmdb_type=None, season=None, episode=None, labe
 
     dialog_header = 'Trakt {0}'.format(action.capitalize())
     dialog_text = xbmcaddon.Addon().getLocalizedString(32065) if boolean == 'add' else xbmcaddon.Addon().getLocalizedString(32064)
-    dialog_text = dialog_text.format(label, action.capitalize(), tmdb_type, tmdb_id)
+    dialog_text = dialog_text.format(utils.try_decode_string(label), action.capitalize(), tmdb_type, tmdb_id)
     dialog_text = dialog_text + ' Season: {}  Episode: {}'.format(season, episode) if dbtype == 'episode' else dialog_text
     if not xbmcgui.Dialog().yesno(dialog_header, dialog_text):
         return
