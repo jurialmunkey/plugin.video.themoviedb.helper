@@ -34,6 +34,7 @@ class Player(Plugin):
         self.item = defaultdict(lambda: '+')
         self.itemlist, self.actions, self.players, self.identifierlist = [], [], {}, []
         self.is_local = None
+        self.dp_local = self.addon.getSettingBool('default_player_local')
         self.dp_movies = self.addon.getSettingString('default_player_movies')
         self.dp_episodes = self.addon.getSettingString('default_player_episodes')
         self.dp_movies_id = None
@@ -71,7 +72,7 @@ class Player(Plugin):
             if (
                     (label == self.dp_movies and self.itemtype == 'movie') or
                     (label == self.dp_episodes and self.itemtype == 'episode') or
-                    (label == u'{0} {1}'.format(self.addon.getLocalizedString(32061), 'Kodi'))):
+                    (label == u'{0} {1}'.format(self.addon.getLocalizedString(32061), 'Kodi') and self.dp_local)):
                 return i  # Play local or with default player if found
 
         # Check for fallbacks

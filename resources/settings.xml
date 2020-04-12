@@ -48,11 +48,12 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32078]" type="bool" id="trakt_extendlimit" default="false" subsetting="true"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32013]" type="bool" id="trakt_management" default="false" subsetting="true"/>
     </category>
-    <category label="$ADDON[plugin.video.themoviedb.helper 32014]">        
+    <category label="$ADDON[plugin.video.themoviedb.helper 32014]">
         <setting label="$ADDON[plugin.video.themoviedb.helper 32033]" type="lsep"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32024]" type="action" action="RunScript(plugin.video.themoviedb.helper, set_defaultplayer=movie)" id="default_player_movies" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32025]" type="action" action="RunScript(plugin.video.themoviedb.helper, set_defaultplayer=tv)" id="default_player_episodes" />
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32027]" type="action" action="RunScript(plugin.video.themoviedb.helper, clear_defaultplayers)" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32027]" type="action" action="RunScript(plugin.video.themoviedb.helper, clear_defaultplayers)" visible="false"/>
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32094]" type="bool" id="default_player_local" default="True" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32036]" type="lsep"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32037]" type="bool" id="bundled_players" default="True" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32016]" type="action" action="RunScript(plugin.video.themoviedb.helper, update_players)" id="players_url" />

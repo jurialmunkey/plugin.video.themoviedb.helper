@@ -472,6 +472,11 @@ msgctxt "#32093"
 msgid "Next episodes sort method"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32094"
+msgid "Prioritise local files"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
