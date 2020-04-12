@@ -3,10 +3,12 @@ import xbmc
 import xbmcvfs
 import xbmcaddon
 import xbmcgui
+from resources.lib.plugin import Plugin
 from resources.lib.traktapi import TraktAPI
 from resources.lib.kodilibrary import KodiLibrary
 import resources.lib.utils as utils
 _addon = xbmcaddon.Addon('plugin.video.themoviedb.helper')
+_plugin = Plugin()
 
 
 def library_cleancontent_replacer(content, old, new):
@@ -76,7 +78,7 @@ def library_create_nfo(tmdbtype, tmdb_id, *args, **kwargs):
     library_createfile(filename, content, file_ext='nfo', *args, **kwargs)
 
 
-def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None):
+def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id=None, imdb_id=None, p_dialog=None):
     if not basedir or not folder or not url:
         return
     seasons = library_cleancontent(url, details='info=seasons')
@@ -87,14 +89,24 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None):
             continue  # Skip special seasons S00
         season_name = 'Season {}'.format(season.get('season'))
         episodes = KodiLibrary().get_directory(season.get('file'))
+        i_count = 0
+        i_total = len(episodes)
         for episode in episodes:
+            i_count += 1
             if not episode.get('episode'):
                 continue  # Skip special episodes E00
-            episode_path = library_cleancontent(episode.get('file'))
+            s_num = episode.get('season')
+            e_num = episode.get('episode')
             episode_name = 'S{:02d}E{:02d} - {}'.format(
-                utils.try_parse_int(episode.get('season')),
-                utils.try_parse_int(episode.get('episode')),
+                utils.try_parse_int(s_num),
+                utils.try_parse_int(e_num),
                 utils.validify_filename(episode.get('title')))
+            if _plugin.get_db_info(info='dbid', tmdbtype='episode', imdb_id=imdb_id, tmdb_id=tmdb_id, season=s_num, episode=e_num):
+                utils.kodi_log(u'Trakt List Add to Library\nFound {} - {} in library. Skipping...'.format(episode.get('showtitle'), episode_name))
+                p_dialog.update((i_count * 100) // i_total, message=u'Found {} in library. Skipping...'.format(episode_name)) if p_dialog else None
+                continue  # Skip added items
+            p_dialog.update((i_count * 100) // i_total, message=u'Adding {} to library...'.format(episode_name)) if p_dialog else None
+            episode_path = library_cleancontent(episode.get('file'))
             library_createfile(episode_name, episode_path, folder, season_name, basedir=basedir)
 
 
@@ -158,6 +170,8 @@ def library_userlist():
 
         item = i.get(i_type, {})
         tmdb_id = item.get('ids', {}).get('tmdb')
+        imdb_id = item.get('ids', {}).get('imdb')
+        tvdb_id = item.get('ids', {}).get('tvdb')
         if not tmdb_id:
             continue  # Don't bother if there isn't a tmdb_id as lookup is too expensive for long lists
 
@@ -165,15 +179,20 @@ def library_userlist():
             content = 'plugin://plugin.video.themoviedb.helper/?info=play&tmdb_id={}&type=movie'.format(tmdb_id)
             folder = u'{} ({})'.format(item.get('title'), item.get('year'))
             movie_name = u'{} ({})'.format(item.get('title'), item.get('year'))
-            p_dialog.update(i_total // i_count, message=u'Adding {} to library...'.format(movie_name))
+            if _plugin.get_db_info(info='dbid', tmdbtype='movie', imdb_id=imdb_id, tmdb_id=tmdb_id):
+                p_dialog.update((i_count * 100) // i_total, message=u'Found {} in library. Skipping...'.format(movie_name))
+                utils.kodi_log(u'Trakt List Add to Library\nFound {} in library. Skipping...'.format(movie_name), 0)
+                continue
+            p_dialog.update((i_count * 100) // i_total, message=u'Adding {} to library...'.format(movie_name))
+            utils.kodi_log(u'Adding {} to library...'.format(movie_name), 0)
             library_createfile(movie_name, content, folder, basedir=basedir_movie)
             library_create_nfo('movie', tmdb_id, folder, basedir=basedir_movie)
 
         if i_type == 'show':  # Add whole tvshows
             content = 'plugin://plugin.video.themoviedb.helper/?info=seasons&nextpage=True&tmdb_id={}&type=tv'.format(tmdb_id)
             folder = u'{}'.format(item.get('title'))
-            p_dialog.update(i_total // i_count, message=u'Adding {} to library...'.format(item.get('title')))
-            library_addtvshow(basedir=basedir_tv, folder=folder, url=content, tmdb_id=tmdb_id)
+            p_dialog.update((i_count * 100) // i_total, message=u'Adding {} to library...'.format(item.get('title')))
+            library_addtvshow(basedir=basedir_tv, folder=folder, url=content, tmdb_id=tmdb_id, imdb_id=imdb_id, tvdb_id=tvdb_id, p_dialog=p_dialog)
 
     p_dialog.close()
     xbmc.executebuiltin('UpdateLibrary(video)') if auto_update else None
