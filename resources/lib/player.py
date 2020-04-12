@@ -1,3 +1,4 @@
+import re
 import xbmc
 import xbmcgui
 import xbmcvfs
@@ -163,7 +164,7 @@ class Player(Plugin):
                         if k == 'position':  # We're looking for an item position not an infolabel
                             if utils.try_parse_int(string_format_map(v, self.item)) != x:  # Format our position value
                                 break  # Not the item position we want so let's go to next item in folder
-                        elif not f.get(k) or string_format_map(v, self.item) not in u'{}'.format(f.get(k, '')):  # Format our value and check if it matches the infolabel key
+                        elif not f.get(k) or not re.match(string_format_map(v, self.item), u'{}'.format(f.get(k, ''))):  # Format our value and check if it regex matches the infolabel key
                             break  # Item's key value doesn't match value we are looking for so let's got to next item in folder
                     else:  # Item matched our criteria so let's open it up
                         resolve_url = True if f.get('filetype') == 'file' else False  # Set true for files so we can play
