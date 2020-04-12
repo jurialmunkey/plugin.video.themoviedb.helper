@@ -23,8 +23,8 @@
     </category>
     <category label="$LOCALIZE[14022]">
         <setting label="$ADDON[plugin.video.themoviedb.helper 32074]" type="lsep"/>
-        <setting label="$LOCALIZE[342]" type="folder" id="movies_library" source="" option="writeable" default="special://profile/addon_data/plugin.video.themoviedb.helper/movies/"/>
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32075]" type="folder" id="tvshows_library" source="" option="writeable" default="special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/"/>
+        <setting label="$LOCALIZE[342]" type="folder" id="movies_library" source="video" option="writeable" default="special://profile/addon_data/plugin.video.themoviedb.helper/movies/"/>
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32075]" type="folder" id="tvshows_library" source="video" option="writeable" default="special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32076]" type="bool" id="auto_update" default="true" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32086]" type="bool" id="library_autoupdate" default="false" />
         <setting label="$LOCALIZE[10039]" type="lsep"/>
