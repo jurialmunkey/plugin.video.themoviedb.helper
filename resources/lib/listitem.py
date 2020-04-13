@@ -230,7 +230,10 @@ class ListItem(object):
         for k, v in url.items():
             if not k or not v:
                 continue
-            self.infoproperties[utils.try_decode_string('{}.{}'.format(prefix, k))] = utils.try_decode_string('{}'.format(v))
+            try:
+                self.infoproperties[u'{}.{}'.format(prefix, k)] = u'{}'.format(v)
+            except Exception as exc:
+                utils.kodi_log(u'Error: {}\nUnable to set Item.{} to {}'.format(exc, k, v), 1)
 
     def set_listitem(self, path=None):
         listitem = xbmcgui.ListItem(label=self.label, label2=self.label2, path=path)
