@@ -19,7 +19,7 @@ class TraktAPI(RequestAPI):
         self.prev_activities = None
         self.refreshcheck = 0
         self.attempedlogin = False
-        self.dialog_noapikey_header = '{0} {1} {2}'.format(self.addon.getLocalizedString(32007), self.req_api_name, self.addon.getLocalizedString(32011))
+        self.dialog_noapikey_header = u'{0} {1} {2}'.format(self.addon.getLocalizedString(32007), self.req_api_name, self.addon.getLocalizedString(32011))
         self.dialog_noapikey_text = self.addon.getLocalizedString(32012)
         self.client_id = 'e6fde6173adf3c6af8fd1b0694b9b84d7c519cefc24482310e1de06c6abe5467'
         self.client_secret = '15119384341d9a61c751d8d515acbc0dd801001d4ebe85d3eef9885df80ee4d9'

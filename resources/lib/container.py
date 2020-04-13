@@ -349,7 +349,7 @@ class Container(Plugin):
     def add_userdiscover_method_property(self, header, tmdbtype, usedetails, old_label=None, old_value=None):
         if old_label and old_value:
             if xbmcgui.Dialog().yesno(
-                    '{} {}'.format(tmdbtype.capitalize(), self.addon.getLocalizedString(32098)),
+                    u'{} {}'.format(tmdbtype.capitalize(), self.addon.getLocalizedString(32098)),
                     self.addon.getLocalizedString(32099) + ':', old_label,
                     self.addon.getLocalizedString(32100),
                     yeslabel=self.addon.getLocalizedString(32101), nolabel=self.addon.getLocalizedString(32102)):
@@ -371,7 +371,7 @@ class Container(Plugin):
         new_value = (utils.try_encode_string(new_value[0]), new_value[1])
         self.new_property_label = '{0} / {1}'.format(self.new_property_label, new_value[0]) if self.new_property_label else new_value[0]
         self.new_property_value = '{0} / {1}'.format(self.new_property_value, new_value[1]) if self.new_property_value else '{}'.format(new_value[1])
-        if xbmcgui.Dialog().yesno('{} {}'.format(self.addon.getLocalizedString(32106), new_value[0]), '{}\n{}'.format(self.new_property_label, self.addon.getLocalizedString(32105))):
+        if xbmcgui.Dialog().yesno(u'{} {}'.format(self.addon.getLocalizedString(32106), new_value[0]), u'{}\n{}'.format(self.new_property_label, self.addon.getLocalizedString(32105))):
             self.add_userdiscover_method_property(header, tmdbtype, usedetails)
 
     def set_userdiscover_separator_property(self):
