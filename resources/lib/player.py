@@ -194,7 +194,9 @@ class Player(Plugin):
         self.itemtype, self.tmdb_id, self.season, self.episode = itemtype, tmdb_id, season, episode
         self.tmdbtype = 'tv' if self.itemtype in ['episode', 'tv'] else 'movie'
         self.details = self.tmdb.get_detailed_item(self.tmdbtype, tmdb_id, season=season, episode=episode)
-        self.item['imdb_id'] = self.details.get('infolabels', {}).get('imdbnumber')
+        self.item['tmdb_id'] = self.tmdb_id
+        self.item['imdb_id'] = self.details.get('infoproperties', {}).get('tvshow.imdb_id') or self.details.get('infoproperties', {}).get('imdb_id')
+        self.item['tvdb_id'] = self.details.get('infoproperties', {}).get('tvshow.tvdb_id') or self.details.get('infoproperties', {}).get('tvdb_id')
         self.item['originaltitle'] = self.details.get('infolabels', {}).get('originaltitle')
         self.item['title'] = self.details.get('infolabels', {}).get('tvshowtitle') or self.details.get('infolabels', {}).get('title')
         self.item['year'] = self.details.get('infolabels', {}).get('year')
@@ -351,11 +353,10 @@ class Player(Plugin):
         return file
 
     def localmovie(self):
-        fuzzy_match = self.addon.getSettingBool('fuzzymatch_movie')
-        return self.localfile(KodiLibrary(dbtype='movie').get_info('file', fuzzy_match=fuzzy_match, **self.item))
+        # fuzzy_match = self.addon.getSettingBool('fuzzymatch_movie')
+        return self.localfile(KodiLibrary(dbtype='movie').get_info('file', fuzzy_match=False, **self.item))
 
     def localepisode(self):
-        fuzzy_match = self.addon.getSettingBool('fuzzymatch_tv')
-        fuzzy_match = True  # TODO: Get tvshow year to match against but for now force fuzzy match
-        dbid = KodiLibrary(dbtype='tvshow').get_info('dbid', fuzzy_match=fuzzy_match, **self.item)
+        # fuzzy_match = self.addon.getSettingBool('fuzzymatch_tv')
+        dbid = KodiLibrary(dbtype='tvshow').get_info('dbid', fuzzy_match=False, **self.item)
         return self.localfile(KodiLibrary(dbtype='episode', tvshowid=dbid).get_info('file', season=self.season, episode=self.episode))
