@@ -85,6 +85,7 @@ class ServiceMonitor(Plugin):
 
     def get_cur_item(self):
         self.dbtype = self.get_dbtype()
+        self.dbid = self.get_infolabel('DBID')
         self.imdb_id = self.get_infolabel('IMDBNumber')
         self.query = self.get_infolabel('TvShowTitle') or self.get_infolabel('Title') or self.get_infolabel('Label')
         self.year = self.get_infolabel('year')
@@ -134,6 +135,7 @@ class ServiceMonitor(Plugin):
             details = self.get_omdb_ratings(details) if tmdbtype == 'movie' else details
             details = self.get_top250_rank(details) if tmdbtype == 'movie' else details
             details = self.get_fanarttv_artwork(details, tmdbtype)
+            details = self.get_kodi_artwork(details, self.dbtype, self.dbid) if self.addon.getSettingBool('local_db') else details
             details = self.get_trakt_ratings(
                 details, tmdbtype, tmdb_id, self.season, self.episode) if tmdbtype in ['movie', 'tv'] else details
 

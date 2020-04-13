@@ -87,6 +87,32 @@ class Plugin(object):
             pass
         return item
 
+    def get_kodi_artwork(self, item, dbtype=None, dbid=None):
+        if not dbid:
+            return item
+
+        details = {}
+        if dbtype == 'movies':
+            details = KodiLibrary().get_movie_details(dbid)
+        elif dbtype == 'tvshows':
+            details = KodiLibrary().get_tvshow_details(dbid)
+        elif dbtype == 'episodes':
+            details = KodiLibrary().get_episode_details(dbid)
+
+        if not details:
+            return item
+
+        item['icon'] = details.get('icon') or item.get('icon') or ''
+        item['thumb'] = details.get('thumb') or item.get('thumb') or ''
+        item['poster'] = details.get('poster') or item.get('poster') or ''
+        item['fanart'] = details.get('fanart') or item.get('fanart') or ''
+        item['landscape'] = details.get('landscape') or item.get('landscape') or ''
+        item['clearart'] = details.get('clearart') or item.get('clearart') or ''
+        item['clearlogo'] = details.get('clearlogo') or item.get('clearlogo') or ''
+        item['discart'] = details.get('discart') or item.get('discart') or ''
+
+        return item
+
     def get_fanarttv_artwork(self, item, tmdbtype=None, tmdb_id=None, tvdb_id=None):
         if not self.fanarttv or tmdbtype not in ['movie', 'tv']:
             return item
