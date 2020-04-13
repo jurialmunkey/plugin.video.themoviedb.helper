@@ -562,7 +562,7 @@ class Container(Plugin):
             url={'info': 'details', 'type': 'episode'})
 
     def list_librarycalendar_episodes(self):
-        kodidb = KodiLibrary(dbtype='tvshow')
+        kodidb = KodiLibrary(dbtype='tvshow', attempt_reconnect=True)
 
         # Get calendar items from Trakt and check if matching show in kodi library
         # Widened calendar date range by 24hrs each side to accomodate timezone conversion as Trakt is UTC 00:00
