@@ -22,7 +22,7 @@ class RequestAPI(object):
         self.cache_name = 'plugin.video.themoviedb.helper'
         self.addon_name = 'plugin.video.themoviedb.helper'
         self.addon = xbmcaddon.Addon(self.addon_name)
-        self.dialog_noapikey_header = '{0} - {1}'.format(self.addon.getLocalizedString(32007), self.req_api_name)
+        self.dialog_noapikey_header = u'{0} - {1}'.format(self.addon.getLocalizedString(32007), self.req_api_name)
         self.dialog_noapikey_text = self.addon.getLocalizedString(32009)
         self.dialog_noapikey_check = None
 
