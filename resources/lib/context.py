@@ -61,10 +61,9 @@ def library_createfile(filename, content, *args, **kwargs):
         return utils.kodi_log('ADD LIBRARY -- No filename specified!', 2)
     if not library_createpath(path):
         xbmcgui.Dialog().ok(
-            'Add to Library',
-            'XBMCVFS reports unable to create path [B]{}[/B]'.format(path),
-            'If error persists and the folders are created correctly, '
-            'please disable folder path creation checking in TMDBHelper settings.')
+            xbmc.getLocalizedString(20444),
+            _addon.getLocalizedString(32122) + ' [B]{}[/B]'.format(path),
+            _addon.getLocalizedString(32123))
         return utils.kodi_log(u'ADD LIBRARY -- XBMCVFS unable to create path:\n{}'.format(path), 2)
     filepath = '{}{}.{}'.format(path, utils.validify_filename(filename), file_ext)
     f = xbmcvfs.File(filepath, 'w')
@@ -91,7 +90,7 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id
         s_count += 1
         if not season.get('season'):
             continue  # Skip special seasons S00
-        season_name = 'Season {}'.format(season.get('season'))
+        season_name = '{} {}'.format(xbmc.getLocalizedString(20373), season.get('season'))
         p_dialog.update((s_count * 100) // s_total, message=u'Adding {} - {} to library...'.format(season.get('showtitle'), season_name)) if p_dialog else None
         episodes = KodiLibrary().get_directory(season.get('file'))
         i_count = 0
@@ -153,11 +152,11 @@ def library_userlist():
 
     i_count = 0
     i_total = len(request)
-    d_head = 'Add Trakt list to Kodi library'
-    d_body = 'Do you wish to add this Trakt list to your Kodi library?'
-    d_body += '\n[B]{}[/B] by user [B]{}[/B]'.format(list_slug, user_slug)
-    d_body += '\n\n[B][COLOR=red]WARNING[/COLOR][/B] ' if i_total > 20 else '\n\n'
-    d_body += 'This list contains [B]{}[/B] items.'.format(i_total)
+    d_head = _addon.getLocalizedString(32125)
+    d_body = _addon.getLocalizedString(32126)
+    d_body += '\n[B]{}[/B] {} [B]{}[/B]'.format(list_slug, _addon.getLocalizedString(32127), user_slug)
+    d_body += '\n\n[B][COLOR=red]{}[/COLOR][/B] '.format(xbmc.getLocalizedString(14117)) if i_total > 20 else '\n\n'
+    d_body += '{} [B]{}[/B] {}.'.format(_addon.getLocalizedString(32128), i_total, _addon.getLocalizedString(32129))
     if not xbmcgui.Dialog().yesno(d_head, d_body):
         return
 

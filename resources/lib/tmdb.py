@@ -1,3 +1,4 @@
+import xbmc
 import resources.lib.utils as utils
 from resources.lib.requestapi import RequestAPI
 from resources.lib.listitem import ListItem
@@ -483,5 +484,5 @@ class TMDb(RequestAPI):
         request = func(*args, language=self.req_language, **kwargs)
         items = self.get_nicelist(request.get(key, []))
         if pagination and utils.try_parse_int(request.get('page', 0)) < utils.try_parse_int(request.get('total_pages', 0)):
-            items.append(ListItem(library=self.library, label='Next Page', nextpage=utils.try_parse_int(request.get('page', 0)) + 1))
+            items.append(ListItem(library=self.library, label=xbmc.getLocalizedString(33078), nextpage=utils.try_parse_int(request.get('page', 0)) + 1))
         return items

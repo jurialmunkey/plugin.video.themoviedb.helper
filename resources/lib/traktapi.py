@@ -58,9 +58,9 @@ class TraktAPI(RequestAPI):
         self.expirein = self.code.get('expires_in', 0)
         self.auth_dialog = xbmcgui.DialogProgress()
         self.auth_dialog.create(
-            'Trakt Authentication',
-            'Go to [B]https://trakt.tv/activate[/B]',
-            'Enter the code: [B]' + self.code.get('user_code') + '[/B]')
+            self.addon.getLocalizedString(32097),
+            self.addon.getLocalizedString(32096),
+            self.addon.getLocalizedString(32095) + ': [B]' + self.code.get('user_code') + '[/B]')
         self.poller()
 
     def refresh_token(self):
@@ -247,7 +247,7 @@ class TraktAPI(RequestAPI):
                 n += 1
 
         if next_page:
-            items.append(ListItem(library=self.library, label='Next Page', nextpage=next_page))
+            items.append(ListItem(library=self.library, label=xbmc.getLocalizedString(33078), nextpage=next_page))
 
         return items
 
@@ -488,7 +488,7 @@ class TraktAPI(RequestAPI):
             if item and item.label != 'N/A':
                 items.append(item)
         if items and collection[end_at:]:  # If there's more items add the next page item
-            items.append(ListItem(library=self.library, label='Next Page', nextpage=page + 1))
+            items.append(ListItem(library=self.library, label=xbmc.getLocalizedString(33078), nextpage=page + 1))
         return items
 
     def sync_activities(self, itemtype, listtype):
