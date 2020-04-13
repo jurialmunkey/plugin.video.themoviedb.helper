@@ -329,12 +329,11 @@ class Script(Plugin):
         utils.kodi_log(u'Script -- Attempting to play item:\n{0}'.format(self.params), 2)
         if not self.params.get('play') or not self.params.get('tmdb_id'):
             return
-        with utils.busy_dialog():
-            Player().play(
-                itemtype=self.params.get('play'), tmdb_id=self.params.get('tmdb_id'),
-                season=self.params.get('season'), episode=self.params.get('episode'),
-                force_dialog=self.params.get('force_dialog'))
-            self.home.clearProperty('TMDbHelper.Player.ResolvedUrl')  # Clear our lock property
+        Player().play(
+            itemtype=self.params.get('play'), tmdb_id=self.params.get('tmdb_id'),
+            season=self.params.get('season'), episode=self.params.get('episode'),
+            force_dialog=self.params.get('force_dialog'))
+        self.home.clearProperty('TMDbHelper.Player.ResolvedUrl')  # Clear our lock property
 
     def update_players(self):
         players_url = self.addon.getSettingString('players_url')
