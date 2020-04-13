@@ -33,10 +33,10 @@ def library_createpath(path):
     if xbmcvfs.exists(path):
         return path
     if xbmcvfs.mkdirs(path):
-        utils.kodi_log('ADD LIBRARY -- Created path:\n{}'.format(path), 2)
+        utils.kodi_log(u'ADD LIBRARY -- Created path:\n{}'.format(path), 2)
         return path
     if _addon.getSettingBool('ignore_folderchecking'):
-        utils.kodi_log('ADD LIBRARY -- xbmcvfs reports folder does NOT exist:\n{}\nIGNORING ERROR: User set folder checking to ignore'.format(path), 2)
+        utils.kodi_log(u'ADD LIBRARY -- xbmcvfs reports folder does NOT exist:\n{}\nIGNORING ERROR: User set folder checking to ignore'.format(path), 2)
         return path
 
 
@@ -50,15 +50,15 @@ def library_createfile(filename, content, *args, **kwargs):
     path = kwargs.pop('basedir', '')
     path = path.replace('\\', '/')
     if not path:
-        return utils.kodi_log('ADD LIBRARY -- No basedir specified!', 2)
+        return utils.kodi_log(u'ADD LIBRARY -- No basedir specified!', 2)
     content = library_cleancontent(content) if clean_url else content
     for folder in args:
         folder = utils.validify_filename(folder)
         path = '{}{}/'.format(path, folder)
     if not content:
-        return utils.kodi_log('ADD LIBRARY -- No content specified!', 2)
+        return utils.kodi_log(u'ADD LIBRARY -- No content specified!', 2)
     if not filename:
-        return utils.kodi_log('ADD LIBRARY -- No filename specified!', 2)
+        return utils.kodi_log(u'ADD LIBRARY -- No filename specified!', 2)
     if not library_createpath(path):
         xbmcgui.Dialog().ok(
             xbmc.getLocalizedString(20444),

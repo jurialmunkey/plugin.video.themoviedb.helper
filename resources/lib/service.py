@@ -146,13 +146,13 @@ class ServiceMonitor(Plugin):
             self.set_properties(details)
 
         except Exception as exc:
-            utils.kodi_log('Func: get_listitem\n{0}'.format(exc), 1)
+            utils.kodi_log(u'Func: get_listitem\n{0}'.format(exc), 1)
 
     def clear_property(self, key):
         try:
             self.home.clearProperty('TMDbHelper.ListItem.{0}'.format(key))
         except Exception as exc:
-            utils.kodi_log('Func: clear_property\n{0}{1}'.format(key, exc), 1)
+            utils.kodi_log(u'Func: clear_property\n{0}{1}'.format(key, exc), 1)
 
     def clear_properties(self):
         for k in self.properties:
@@ -167,7 +167,7 @@ class ServiceMonitor(Plugin):
         try:
             self.home.setProperty('TMDbHelper.ListItem.{0}'.format(key), u'{0}'.format(value))
         except Exception as exc:
-            utils.kodi_log('{0}{1}'.format(key, exc), 1)
+            utils.kodi_log(u'{0}{1}'.format(key, exc), 1)
 
     def set_indx_properties(self, dictionary):
         if not isinstance(dictionary, dict):
@@ -182,7 +182,7 @@ class ServiceMonitor(Plugin):
                 self.set_property(k, v)
                 indxprops.add(k)
             except Exception as exc:
-                utils.kodi_log('k: {0} v: {1} e: {2}'.format(k, v, exc), 1)
+                utils.kodi_log(u'k: {0} v: {1} e: {2}'.format(k, v, exc), 1)
 
         for k in (self.indxproperties - indxprops):
             self.clear_property(k)
@@ -199,7 +199,7 @@ class ServiceMonitor(Plugin):
                     try:
                         v = ' / '.join(v)
                     except Exception as exc:
-                        utils.kodi_log('Func: set_iter_properties - list\n{0}'.format(exc), 1)
+                        utils.kodi_log(u'Func: set_iter_properties - list\n{0}'.format(exc), 1)
                 self.properties.add(k)
                 self.set_property(k, v)
             except Exception as exc:
@@ -214,7 +214,7 @@ class ServiceMonitor(Plugin):
             self.properties.add(prop)
             self.set_property(prop, joinlist)
         except Exception as exc:
-            utils.kodi_log('Func: set_list_properties\n{0}'.format(exc), 1)
+            utils.kodi_log(u'Func: set_list_properties\n{0}'.format(exc), 1)
 
     def set_time_properties(self, duration):
         try:
@@ -265,5 +265,5 @@ class ServiceMonitor(Plugin):
                 return self.tmdb.get_tmdb_id(itemtype=itemtype, imdb_id=imdb_id)
             return self.tmdb.get_tmdb_id(itemtype=itemtype, query=query, year=year)
         except Exception as exc:
-            utils.kodi_log('Func: get_tmdb_id\n{0}'.format(exc), 1)
+            utils.kodi_log(u'Func: get_tmdb_id\n{0}'.format(exc), 1)
             return

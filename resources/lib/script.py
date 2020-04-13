@@ -171,7 +171,7 @@ class Script(Plugin):
         # Check that list 9999 exists
         controllist = window.getControl(9999)
         if not controllist:
-            utils.kodi_log('SKIN ERROR!\nList control 9999 not available in Window {0}'.format(call_id), 1)
+            utils.kodi_log(u'SKIN ERROR!\nList control 9999 not available in Window {0}'.format(call_id), 1)
             return self.call_reset()  # Clear and exit if timeout or user closed base window
         controllist.reset()
 
@@ -283,7 +283,7 @@ class Script(Plugin):
                 return
             tmdb_id = self.tmdb.get_tmdb_id(self.params.get('type'), query=item, selectdialog=True)
             if not tmdb_id:
-                utils.kodi_log('Unable to find TMDb ID!\nQuery: {0} Type: {1}'.format(self.params.get('add_query'), self.params.get('type')), 1)
+                utils.kodi_log(u'Unable to find TMDb ID!\nQuery: {0} Type: {1}'.format(self.params.get('add_query'), self.params.get('type')), 1)
                 return
             url = 'plugin://plugin.video.themoviedb.helper/?info=details&amp;type={0}&amp;tmdb_id={1}'.format(self.params.get('type'), tmdb_id)
             if url == self.home.getProperty(self.prefixcurrent):
@@ -326,7 +326,7 @@ class Script(Plugin):
         self.call_window()
 
     def play(self):
-        utils.kodi_log('Script -- Attempting to play item:\n{0}'.format(self.params), 2)
+        utils.kodi_log(u'Script -- Attempting to play item:\n{0}'.format(self.params), 2)
         if not self.params.get('play') or not self.params.get('tmdb_id'):
             return
         with utils.busy_dialog():
@@ -365,7 +365,7 @@ class Script(Plugin):
         self.addon.setSettingString('default_player_episodes', '')
 
     def library_autoupdate(self):
-        utils.kodi_log('UPDATING TV SHOWS LIBRARY', 1)
+        utils.kodi_log(u'UPDATING TV SHOWS LIBRARY', 1)
         basedir_tv = self.addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
         for f in xbmcvfs.listdir(basedir_tv)[0]:
             try:
@@ -394,7 +394,7 @@ class Script(Plugin):
                 url = 'plugin://plugin.video.themoviedb.helper/?info=seasons&tmdb_id={}&type=tv'.format(tmdb_id)
                 context.library_addtvshow(basedir=basedir_tv, folder=f, url=url, tmdb_id=tmdb_id)
             except Exception as exc:
-                utils.kodi_log('LIBRARY AUTO UPDATE ERROR:\n{}'.format(exc))
+                utils.kodi_log(u'LIBRARY AUTO UPDATE ERROR:\n{}'.format(exc))
         if self.addon.getSettingBool('auto_update'):
             xbmc.executebuiltin('UpdateLibrary(video, {})'.format(basedir_tv))
 

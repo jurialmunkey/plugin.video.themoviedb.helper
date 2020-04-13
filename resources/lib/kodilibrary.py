@@ -19,9 +19,9 @@ class KodiLibrary(object):
             monitor.waitForAbort(1)
             self.get_database(dbtype, tvshowid)
             retries += 1
-            utils.kodi_log('Unable to retrive {} KodiDB!\nAttempting to Reconnect - Attempt {}'.format(dbtype, retries), 1)
+            utils.kodi_log(u'Unable to retrive {} KodiDB!\nAttempting to Reconnect - Attempt {}'.format(dbtype, retries), 1)
         if not self.database:
-            utils.kodi_log('Getting KodiDB {} FAILED!'.format(dbtype), 1)
+            utils.kodi_log(u'Getting KodiDB {} FAILED!'.format(dbtype), 1)
 
     def get_jsonrpc(self, method=None, params=None):
         if not method or not params:
@@ -34,7 +34,7 @@ class KodiLibrary(object):
         try:
             response = json.loads(xbmc.executeJSONRPC(json.dumps(query)))
         except Exception as exc:
-            utils.kodi_log('TMDbHelper - JSONRPC Error:\n{}'.format(exc), 1)
+            utils.kodi_log(u'TMDbHelper - JSONRPC Error:\n{}'.format(exc), 1)
             response = {}
         return response
 

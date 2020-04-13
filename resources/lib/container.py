@@ -263,7 +263,7 @@ class Container(Plugin):
                         if self.addon.getSettingBool('hide_unaired_movies') and self.item_tmdbtype in ['movie']:
                             continue
                 except Exception as exc:
-                    utils.kodi_log('Error: {}'.format(exc), 1)
+                    utils.kodi_log(u'Error: {}'.format(exc), 1)
 
             # Get DBID From Library
             i.dbid = self.get_db_info(
@@ -753,12 +753,12 @@ class Container(Plugin):
             lock = '{}.{}={}'.format(lock, k, v) if lock else '{}={}'.format(k, v)
         cur_lock = xbmcgui.Window(10000).getProperty('TMDbHelper.Player.ResolvedUrl')
         if cur_lock == lock:
-            utils.kodi_log('Container -- Play IsLocked:\n{0}'.format(self.params), 1)
+            utils.kodi_log(u'Container -- Play IsLocked:\n{0}'.format(self.params), 1)
             return cur_lock
         xbmcgui.Window(10000).setProperty('TMDbHelper.Player.ResolvedUrl', lock)
 
     def list_play(self):
-        utils.kodi_log('Container -- Attempting to Play Item...:\n{0}'.format(self.params), 1)
+        utils.kodi_log(u'Container -- Attempting to Play Item...:\n{0}'.format(self.params), 1)
         """
         Kodi does 5x retries to resolve url but we don't use this method so we need to catch it
         Instead we just give a blank resolved url if a strm file or do nothing if not
@@ -773,7 +773,7 @@ class Container(Plugin):
         # Check we have a TMDb ID and do nothing if we can't get one
         self.list_getid()
         if not self.params.get('type') or not self.params.get('tmdb_id'):
-            utils.kodi_log('Container -- Play No Type or TMDb_ID:\n{0}'.format(self.params), 1)
+            utils.kodi_log(u'Container -- Play No Type or TMDb_ID:\n{0}'.format(self.params), 1)
             return
 
         # Build our player script command and run it

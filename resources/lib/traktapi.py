@@ -96,17 +96,17 @@ class TraktAPI(RequestAPI):
 
     def on_aborted(self):
         """Triggered when device authentication was aborted"""
-        utils.kodi_log('Trakt Authentication Aborted!', 1)
+        utils.kodi_log(u'Trakt Authentication Aborted!', 1)
         self.auth_dialog.close()
 
     def on_expired(self):
         """Triggered when the device authentication code has expired"""
-        utils.kodi_log('Trakt Authentication Expired!', 1)
+        utils.kodi_log(u'Trakt Authentication Expired!', 1)
         self.auth_dialog.close()
 
     def on_authenticated(self, auth_dialog=True):
         """Triggered when device authentication has been completed"""
-        utils.kodi_log('Trakt Authenticated Successfully!', 1)
+        utils.kodi_log(u'Trakt Authenticated Successfully!', 1)
         self.addon.setSettingString('trakt_token', dumps(self.authorization))
         self.headers['Authorization'] = 'Bearer {0}'.format(self.authorization.get('access_token'))
         if auth_dialog:
@@ -317,24 +317,24 @@ class TraktAPI(RequestAPI):
             return items
 
         n = 0
-        # utils.kodi_log('Getting In-Progress For Trakt User {0}'.format(userslug), 2)
+        # utils.kodi_log(u'Getting In-Progress For Trakt User {0}'.format(userslug), 2)
         # for i in self.get_recentlywatched(userslug, 'tv', islistitem=False, months=36):
         for i in self.get_recentlywatched_shows(userslug, islistitem=False):
             if limit and n >= limit:
                 break
-            # utils.kodi_log('In-Progress -- Searching Next Episode For:\n{0}'.format(i), 2)
+            # utils.kodi_log(u'In-Progress -- Searching Next Episode For:\n{0}'.format(i), 2)
             progress = self.get_upnext(i[0], True)
             if progress and progress.get('next_episode'):
                 if (episodes and
                         progress.get('next_episode', {}).get('season') == 1 and
                         progress.get('next_episode', {}).get('number') == 1):
                     continue
-                # utils.kodi_log('In-Progress -- Found Next Episode:\n{0}'.format(progress.get('next_episode')), 2)
+                # utils.kodi_log(u'In-Progress -- Found Next Episode:\n{0}'.format(progress.get('next_episode')), 2)
                 season = progress.get('next_episode', {}).get('season') if episodes else None
                 episode = progress.get('next_episode', {}).get('number') if episodes else None
                 item = self.tmdb.get_detailed_item('tv', i[1], season=season, episode=episode)
                 item['tmdb_id'] = i[1]
-                # utils.kodi_log('In-Progress -- Got Next Episode Details:\n{0}'.format(item), 2)
+                # utils.kodi_log(u'In-Progress -- Got Next Episode Details:\n{0}'.format(item), 2)
                 items.append(ListItem(library=self.library, **item))
                 n += 1
         return sorted(items, key=lambda i: i.infolabels.get('premiered'), reverse=True) if episodes and self.addon.getSettingString('trakt_nextepisodesort') == 'airdate' else items
