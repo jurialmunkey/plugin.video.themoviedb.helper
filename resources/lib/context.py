@@ -46,11 +46,12 @@ def library_createfile(filename, content, *args, **kwargs):
     *args = folders to create.
     """
     file_ext = kwargs.pop('file_ext', 'strm')
+    clean_url = kwargs.pop('clean_url', True)
     path = kwargs.pop('basedir', '')
     path = path.replace('\\', '/')
     if not path:
         return utils.kodi_log('ADD LIBRARY -- No basedir specified!', 2)
-    content = library_cleancontent(content)
+    content = library_cleancontent(content) if clean_url else content
     for folder in args:
         folder = utils.validify_filename(folder)
         path = '{}{}/'.format(path, folder)
@@ -64,12 +65,12 @@ def library_createfile(filename, content, *args, **kwargs):
             'XBMCVFS reports unable to create path [B]{}[/B]'.format(path),
             'If error persists and the folders are created correctly, '
             'please disable folder path creation checking in TMDBHelper settings.')
-        return utils.kodi_log('ADD LIBRARY -- XBMCVFS unable to create path:\n{}'.format(path), 2)
+        return utils.kodi_log(u'ADD LIBRARY -- XBMCVFS unable to create path:\n{}'.format(path), 2)
     filepath = '{}{}.{}'.format(path, utils.validify_filename(filename), file_ext)
     f = xbmcvfs.File(filepath, 'w')
-    f.write(str(content))
+    f.write(utils.try_encode_string(content))
     f.close()
-    utils.kodi_log('ADD LIBRARY -- Successfully added:\n{}\n{}'.format(filepath, content), 2)
+    utils.kodi_log(u'ADD LIBRARY -- Successfully added:\n{}\n{}'.format(filepath, content), 2)
 
 
 def library_create_nfo(tmdbtype, tmdb_id, *args, **kwargs):
@@ -84,10 +85,14 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id
     seasons = library_cleancontent(url, details='info=seasons')
     seasons = KodiLibrary().get_directory(seasons)
     library_create_nfo('tv', tmdb_id, folder, basedir=basedir)
+    s_count = 0
+    s_total = len(seasons)
     for season in seasons:
+        s_count += 1
         if not season.get('season'):
             continue  # Skip special seasons S00
         season_name = 'Season {}'.format(season.get('season'))
+        p_dialog.update((s_count * 100) // s_total, message=u'Adding {} - {} to library...'.format(season.get('showtitle'), season_name)) if p_dialog else None
         episodes = KodiLibrary().get_directory(season.get('file'))
         i_count = 0
         i_total = len(episodes)
@@ -161,6 +166,8 @@ def library_userlist():
     basedir_movie = _addon.getSettingString('movies_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/movies/'
     basedir_tv = _addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
     auto_update = _addon.getSettingBool('auto_update') or False
+    all_movies = []
+    all_tvshows = []
 
     for i in request:
         i_count += 1
@@ -176,6 +183,7 @@ def library_userlist():
             continue  # Don't bother if there isn't a tmdb_id as lookup is too expensive for long lists
 
         if i_type == 'movie':  # Add any movies
+            all_movies.append(item.get('title'))
             content = 'plugin://plugin.video.themoviedb.helper/?info=play&tmdb_id={}&type=movie'.format(tmdb_id)
             folder = u'{} ({})'.format(item.get('title'), item.get('year'))
             movie_name = u'{} ({})'.format(item.get('title'), item.get('year'))
@@ -189,13 +197,32 @@ def library_userlist():
             library_create_nfo('movie', tmdb_id, folder, basedir=basedir_movie)
 
         if i_type == 'show':  # Add whole tvshows
+            all_tvshows.append(item.get('title'))
             content = 'plugin://plugin.video.themoviedb.helper/?info=seasons&nextpage=True&tmdb_id={}&type=tv'.format(tmdb_id)
             folder = u'{}'.format(item.get('title'))
             p_dialog.update((i_count * 100) // i_total, message=u'Adding {} to library...'.format(item.get('title')))
             library_addtvshow(basedir=basedir_tv, folder=folder, url=content, tmdb_id=tmdb_id, imdb_id=imdb_id, tvdb_id=tvdb_id, p_dialog=p_dialog)
 
     p_dialog.close()
+    create_playlist(all_movies, 'movies', user_slug, list_slug) if all_movies else None
+    create_playlist(all_tvshows, 'tvshows', user_slug, list_slug) if all_tvshows else None
     xbmc.executebuiltin('UpdateLibrary(video)') if auto_update else None
+
+
+def create_playlist(items, dbtype, user_slug, list_slug):
+    """
+    Creates a smart playlist from a list of titles
+    """
+    filename = '{}-{}-{}'.format(user_slug, list_slug, dbtype)
+    filepath = 'special://profile/playlists/video/'
+    fcontent = u'<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>'
+    fcontent += u'\n<smartplaylist type="{}">'.format(dbtype)
+    fcontent += u'\n    <name>{} by {} ({})</name>'.format(list_slug, user_slug, dbtype)
+    fcontent += u'\n    <match>any</match>'
+    for i in items:
+        fcontent += u'\n    <rule field="title" operator="is"><value>{}</value></rule>'.format(i)
+    fcontent += u'\n</smartplaylist>'
+    library_createfile(filename, fcontent, basedir=filepath, file_ext='xsp', clean_url=False)
 
 
 def library():
