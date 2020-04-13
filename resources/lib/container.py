@@ -264,17 +264,20 @@ class Container(Plugin):
 
             # Get DBID From Library
             i.dbid = self.get_db_info(
-                info='dbid',
-                tmdbtype=self.item_tmdbtype,
-                imdb_id=i.imdb_id,
+                info='dbid', tmdbtype=self.item_tmdbtype,
+                imdb_id=i.infoproperties.get('tvshow.imdb_id') or i.infoproperties.get('imdb_id'),
                 tmdb_id=i.infoproperties.get('tvshow.tmdb_id') or i.infoproperties.get('tmdb_id'),
                 tvdb_id=i.infoproperties.get('tvshow.tvdb_id') or i.infoproperties.get('tvdb_id'),
-                originaltitle=i.infolabels.get('originaltitle'),
-                title=i.infolabels.get('title'),
-                year=i.infolabels.get('year'),
-                tvshowtitle=i.infolabels.get('tvshowtitle'),
                 season=i.infolabels.get('season'),
                 episode=i.infolabels.get('episode'))
+
+            # Get TVSHOW DBID for episodes / seasons
+            if self.item_tmdbtype in ['season', 'episode']:
+                i.tvshow_dbid = self.get_db_info(
+                    info='dbid', tmdbtype='tv',
+                    imdb_id=i.infoproperties.get('tvshow.imdb_id'),
+                    tmdb_id=i.infoproperties.get('tvshow.tmdb_id'),
+                    tvdb_id=i.infoproperties.get('tvshow.tvdb_id'))
 
             # Special Property Because Plugin Category not Available in Widgets
             i.infoproperties['widget'] = self.plugincategory
@@ -568,8 +571,7 @@ class Container(Plugin):
                 'dbid',
                 tmdb_id=i.get('show', {}).get('ids', {}).get('tmdb'),
                 tvdb_id=i.get('show', {}).get('ids', {}).get('tvdb'),
-                imdb_id=i.get('show', {}).get('ids', {}).get('imdb'),
-                title=i.get('show', {}).get('title'))]
+                imdb_id=i.get('show', {}).get('ids', {}).get('imdb'))]
 
         items = []
         for i in traktitems:

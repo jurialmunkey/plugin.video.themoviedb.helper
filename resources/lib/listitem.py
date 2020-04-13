@@ -15,7 +15,7 @@ class ListItem(object):
                  cast=None, infolabels=None, infoproperties=None, poster=None, thumb=None, icon=None, fanart=None, nextpage=None,
                  streamdetails=None, clearlogo=None, clearart=None, banner=None, landscape=None, discart=None, extrafanart=None,
                  tvshow_clearlogo=None, tvshow_clearart=None, tvshow_banner=None, tvshow_landscape=None, tvshow_poster=None,
-                 mixed_type=None, url=None, is_folder=True):
+                 tvshow_dbid=None, mixed_type=None, url=None, is_folder=True):
         self.addon = xbmcaddon.Addon()
         self.addonpath = self.addon.getAddonInfo('path')
         self.select_action = self.addon.getSettingInt('select_action')
@@ -38,6 +38,7 @@ class ListItem(object):
         self.infolabels = infolabels or {}  # ListItem.Foobar
         self.infoproperties = infoproperties or {}  # ListItem.Property(Foobar)
         self.dbid = dbid
+        self.tvshow_dbid = tvshow_dbid
         self.nextpage = nextpage
         self.extrafanart = extrafanart or {}
 
@@ -168,16 +169,25 @@ class ListItem(object):
             self.infoproperties = utils.merge_two_dicts(self.infoproperties, omdb.get_ratings_awards(imdb_id=self.imdb_id, cache_only=True))
 
     def get_kodi_details(self):
-        if not self.dbid:
+        if not self.dbid and not self.tvshow_dbid:
             return
 
         details = {}
-        if self.infolabels.get('mediatype') == 'movie':
+        tvshow_details = {}
+        if self.infolabels.get('mediatype') == 'movie' and self.dbid:
             details = KodiLibrary().get_movie_details(self.dbid)
-        if self.infolabels.get('mediatype') == 'tvshow':
+        elif self.infolabels.get('mediatype') == 'tvshow' and self.dbid:
             details = KodiLibrary().get_tvshow_details(self.dbid)
-        if self.infolabels.get('mediatype') == 'episode':
-            details = KodiLibrary().get_episode_details(self.dbid)
+        elif self.infolabels.get('mediatype') == 'episode':
+            details = KodiLibrary().get_episode_details(self.dbid) if self.dbid else {}
+            tvshow_details = KodiLibrary().get_tvshow_details(self.tvshow_dbid) if self.tvshow_dbid else {}
+
+        if tvshow_details:
+            self.tvshow_poster = tvshow_details.get('poster') or self.tvshow_poster
+            self.tvshow_fanart = tvshow_details.get('fanart') or self.tvshow_fanart
+            self.tvshow_landscape = tvshow_details.get('landscape') or self.tvshow_landscape
+            self.tvshow_clearart = tvshow_details.get('clearart') or self.tvshow_clearart
+            self.tvshow_clearlogo = tvshow_details.get('clearlogo') or self.tvshow_clearlogo
 
         if not details:
             return
