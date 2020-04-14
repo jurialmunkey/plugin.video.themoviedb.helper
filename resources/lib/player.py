@@ -200,9 +200,9 @@ class Player(Plugin):
             self.item['tmdb_id'] = self.tmdb_id
             self.item['imdb_id'] = self.details.get('infoproperties', {}).get('tvshow.imdb_id') or self.details.get('infoproperties', {}).get('imdb_id')
             self.item['tvdb_id'] = self.details.get('infoproperties', {}).get('tvshow.tvdb_id') or self.details.get('infoproperties', {}).get('tvdb_id')
-            self.item['originaltitle'] = self.details.get('infolabels', {}).get('originaltitle')
-            self.item['title'] = self.details.get('infolabels', {}).get('tvshowtitle') or self.details.get('infolabels', {}).get('title')
-            self.item['year'] = self.details.get('infolabels', {}).get('year')
+            # self.item['originaltitle'] = self.details.get('infolabels', {}).get('originaltitle')
+            # self.item['title'] = self.details.get('infolabels', {}).get('tvshowtitle') or self.details.get('infolabels', {}).get('title')
+            # self.item['year'] = self.details.get('infolabels', {}).get('year')
 
             # Check if we have a local file
             # TODO: Add option to auto play local

@@ -234,7 +234,7 @@ class ListItem(object):
             try:
                 self.infoproperties[u'{}.{}'.format(prefix, utils.try_decode_string(k))] = u'{}'.format(utils.try_decode_string(v))
             except Exception as exc:
-                utils.kodi_log(u'ERROR in ListItem set_url_props', 1)
+                utils.kodi_log(u'ERROR in ListItem set_url_props\nk:{} v:{}'.format(utils.try_decode_string(k), utils.try_decode_string(v)), 1)
                 utils.kodi_log(exc, 1)
 
     def set_listitem(self, path=None):
