@@ -17,6 +17,7 @@ def library_cleancontent_replacer(content, old, new):
 
 
 def library_cleancontent(content, details='info=play'):
+    content = content.replace('info=flatseasons', details)
     content = content.replace('info=details', details)
     content = content.replace('fanarttv=True', '')
     content = content.replace('widget=True', '')
@@ -81,7 +82,8 @@ def library_create_nfo(tmdbtype, tmdb_id, *args, **kwargs):
 def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id=None, imdb_id=None, p_dialog=None):
     if not basedir or not folder or not url:
         return
-    seasons = library_cleancontent(url, details='info=seasons')
+    seasons = library_cleancontent_replacer(url, 'type=episode', 'type=tv')
+    seasons = library_cleancontent(seasons, details='info=seasons')
     seasons = KodiLibrary().get_directory(seasons)
     library_create_nfo('tv', tmdb_id, folder, basedir=basedir)
     s_count = 0
@@ -92,7 +94,9 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id
             continue  # Skip special seasons S00
         season_name = '{} {}'.format(xbmc.getLocalizedString(20373), season.get('season'))
         p_dialog.update((s_count * 100) // s_total, message=u'Adding {} - {} to library...'.format(season.get('showtitle'), season_name)) if p_dialog else None
-        episodes = KodiLibrary().get_directory(season.get('file'))
+        episodes = library_cleancontent_replacer(season.get('file'), 'type=episode', 'type=season')
+        episodes = library_cleancontent(episodes, details='info=episodes')
+        episodes = KodiLibrary().get_directory(episodes)
         i_count = 0
         i_total = len(episodes)
         for episode in episodes:
