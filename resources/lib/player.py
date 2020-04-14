@@ -200,9 +200,9 @@ class Player(Plugin):
             self.item['tmdb_id'] = self.tmdb_id
             self.item['imdb_id'] = self.details.get('infoproperties', {}).get('tvshow.imdb_id') or self.details.get('infoproperties', {}).get('imdb_id')
             self.item['tvdb_id'] = self.details.get('infoproperties', {}).get('tvshow.tvdb_id') or self.details.get('infoproperties', {}).get('tvdb_id')
-            # self.item['originaltitle'] = self.details.get('infolabels', {}).get('originaltitle')
-            # self.item['title'] = self.details.get('infolabels', {}).get('tvshowtitle') or self.details.get('infolabels', {}).get('title')
-            # self.item['year'] = self.details.get('infolabels', {}).get('year')
+            self.item['originaltitle'] = self.details.get('infolabels', {}).get('originaltitle')
+            self.item['title'] = self.details.get('infolabels', {}).get('tvshowtitle') or self.details.get('infolabels', {}).get('title')
+            self.item['year'] = self.details.get('infolabels', {}).get('year')
 
             # Check if we have a local file
             # TODO: Add option to auto play local
@@ -357,9 +357,17 @@ class Player(Plugin):
 
     def localmovie(self):
         # fuzzy_match = self.addon.getSettingBool('fuzzymatch_movie')
-        return self.localfile(KodiLibrary(dbtype='movie').get_info('file', fuzzy_match=False, **self.item))
+        return self.localfile(KodiLibrary(dbtype='movie').get_info(
+            'file', fuzzy_match=False,
+            tmdb_id=self.item.get('tmdb_id'),
+            imdb_id=self.item.get('imdb_id')))
 
     def localepisode(self):
         # fuzzy_match = self.addon.getSettingBool('fuzzymatch_tv')
-        dbid = KodiLibrary(dbtype='tvshow').get_info('dbid', fuzzy_match=False, **self.item)
-        return self.localfile(KodiLibrary(dbtype='episode', tvshowid=dbid).get_info('file', season=self.season, episode=self.episode))
+        dbid = KodiLibrary(dbtype='tvshow').get_info(
+            'dbid', fuzzy_match=False,
+            tmdb_id=self.item.get('tmdb_id'),
+            tvdb_id=self.item.get('tvdb_id'),
+            imdb_id=self.item.get('imdb_id'))
+        return self.localfile(KodiLibrary(dbtype='episode', tvshowid=dbid).get_info(
+            'file', season=self.season, episode=self.episode))
