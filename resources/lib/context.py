@@ -51,26 +51,31 @@ def library_createfile(filename, content, *args, **kwargs):
     path = kwargs.pop('basedir', '')
     path = path.replace('\\', '/')
     if not path:
-        return utils.kodi_log(u'ADD LIBRARY -- No basedir specified!', 2)
+        utils.kodi_log(u'ADD LIBRARY -- No basedir specified!', 2)
+        return
     content = library_cleancontent(content) if clean_url else content
     for folder in args:
         folder = utils.validify_filename(folder)
         path = '{}{}/'.format(path, folder)
     if not content:
-        return utils.kodi_log(u'ADD LIBRARY -- No content specified!', 2)
+        utils.kodi_log(u'ADD LIBRARY -- No content specified!', 2)
+        return
     if not filename:
-        return utils.kodi_log(u'ADD LIBRARY -- No filename specified!', 2)
+        utils.kodi_log(u'ADD LIBRARY -- No filename specified!', 2)
+        return
     if not library_createpath(path):
         xbmcgui.Dialog().ok(
             xbmc.getLocalizedString(20444),
             _addon.getLocalizedString(32122) + ' [B]{}[/B]'.format(path),
             _addon.getLocalizedString(32123))
-        return utils.kodi_log(u'ADD LIBRARY -- XBMCVFS unable to create path:\n{}'.format(path), 2)
+        utils.kodi_log(u'ADD LIBRARY -- XBMCVFS unable to create path:\n{}'.format(path), 2)
+        return
     filepath = '{}{}.{}'.format(path, utils.validify_filename(filename), file_ext)
     f = xbmcvfs.File(filepath, 'w')
     f.write(utils.try_encode_string(content))
     f.close()
     utils.kodi_log(u'ADD LIBRARY -- Successfully added:\n{}\n{}'.format(filepath, content), 2)
+    return filepath
 
 
 def library_create_nfo(tmdbtype, tmdb_id, *args, **kwargs):
@@ -186,21 +191,24 @@ def library_userlist():
             continue  # Don't bother if there isn't a tmdb_id as lookup is too expensive for long lists
 
         if i_type == 'movie':  # Add any movies
-            all_movies.append(item.get('title'))
+            # all_movies.append(('title', item.get('title')))
             content = 'plugin://plugin.video.themoviedb.helper/?info=play&tmdb_id={}&type=movie'.format(tmdb_id)
             folder = u'{} ({})'.format(item.get('title'), item.get('year'))
             movie_name = u'{} ({})'.format(item.get('title'), item.get('year'))
-            if _plugin.get_db_info(info='dbid', tmdbtype='movie', imdb_id=imdb_id, tmdb_id=tmdb_id):
+            db_file = _plugin.get_db_info(info='file', tmdbtype='movie', imdb_id=imdb_id, tmdb_id=tmdb_id)
+            if db_file:
+                all_movies.append(('filename', db_file.replace('\\', '/').split('/')[-1]))
                 p_dialog.update((i_count * 100) // i_total, message=u'Found {} in library. Skipping...'.format(movie_name))
                 utils.kodi_log(u'Trakt List Add to Library\nFound {} in library. Skipping...'.format(movie_name), 0)
                 continue
             p_dialog.update((i_count * 100) // i_total, message=u'Adding {} to library...'.format(movie_name))
             utils.kodi_log(u'Adding {} to library...'.format(movie_name), 0)
-            library_createfile(movie_name, content, folder, basedir=basedir_movie)
+            db_file = library_createfile(movie_name, content, folder, basedir=basedir_movie)
             library_create_nfo('movie', tmdb_id, folder, basedir=basedir_movie)
+            all_movies.append(('filename', db_file.split('/')[-1]))
 
         if i_type == 'show':  # Add whole tvshows
-            all_tvshows.append(item.get('title'))
+            all_tvshows.append(('title', item.get('title')))
             content = 'plugin://plugin.video.themoviedb.helper/?info=seasons&nextpage=True&tmdb_id={}&type=tv'.format(tmdb_id)
             folder = u'{}'.format(item.get('title'))
             p_dialog.update((i_count * 100) // i_total, message=u'Adding {} to library...'.format(item.get('title')))
@@ -223,7 +231,7 @@ def create_playlist(items, dbtype, user_slug, list_slug):
     fcontent += u'\n    <name>{} by {} ({})</name>'.format(list_slug, user_slug, dbtype)
     fcontent += u'\n    <match>any</match>'
     for i in items:
-        fcontent += u'\n    <rule field="title" operator="is"><value>{}</value></rule>'.format(i)
+        fcontent += u'\n    <rule field="{}" operator="is"><value>{}</value></rule>'.format(i[0], i[1])
     fcontent += u'\n</smartplaylist>'
     library_createfile(filename, fcontent, basedir=filepath, file_ext='xsp', clean_url=False)
 
