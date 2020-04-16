@@ -150,9 +150,9 @@ def play():
                 dbtype, tmdb_id))
 
 
-def library_userlist():
-    list_slug = sys.listitem.getProperty('Item.list_slug')
-    user_slug = sys.listitem.getProperty('Item.user_slug')
+def library_userlist(user_slug=None, list_slug=None, confirmation_dialog=True):
+    user_slug = user_slug or sys.listitem.getProperty('Item.user_slug')
+    list_slug = list_slug or sys.listitem.getProperty('Item.list_slug')
 
     with utils.busy_dialog():
         request = TraktAPI().get_response_json('users', user_slug, 'lists', list_slug, 'items')
@@ -161,13 +161,15 @@ def library_userlist():
 
     i_count = 0
     i_total = len(request)
-    d_head = _addon.getLocalizedString(32125)
-    d_body = _addon.getLocalizedString(32126)
-    d_body += '\n[B]{}[/B] {} [B]{}[/B]'.format(list_slug, _addon.getLocalizedString(32127), user_slug)
-    d_body += '\n\n[B][COLOR=red]{}[/COLOR][/B] '.format(xbmc.getLocalizedString(14117)) if i_total > 20 else '\n\n'
-    d_body += '{} [B]{}[/B] {}.'.format(_addon.getLocalizedString(32128), i_total, _addon.getLocalizedString(32129))
-    if not xbmcgui.Dialog().yesno(d_head, d_body):
-        return
+
+    if confirmation_dialog:
+        d_head = _addon.getLocalizedString(32125)
+        d_body = _addon.getLocalizedString(32126)
+        d_body += '\n[B]{}[/B] {} [B]{}[/B]'.format(list_slug, _addon.getLocalizedString(32127), user_slug)
+        d_body += '\n\n[B][COLOR=red]{}[/COLOR][/B] '.format(xbmc.getLocalizedString(14117)) if i_total > 20 else '\n\n'
+        d_body += '{} [B]{}[/B] {}.'.format(_addon.getLocalizedString(32128), i_total, _addon.getLocalizedString(32129))
+        if not xbmcgui.Dialog().yesno(d_head, d_body):
+            return
 
     p_dialog = xbmcgui.DialogProgressBG()
     p_dialog.create('TMDbHelper', 'Adding items to library...')

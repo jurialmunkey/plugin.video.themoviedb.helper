@@ -539,10 +539,6 @@ class TraktAPI(RequestAPI):
             return
 
         user_lists = self.get_response_json('users', user_slug, 'lists')  # Get the user's lists
-        if not user_lists:
-            utils.kodi_log('TRAKT ADD TO LIST - Failed to retrieve user lists')
-            return
-
         user_list_labels = [i.get('name') for i in user_lists]  # Build select dialog to choose list
         user_list_labels.append('Create new list...')
         user_choice = xbmcgui.Dialog().select("Add {} to List".format(item.get('title')), user_list_labels)  # Choose the list

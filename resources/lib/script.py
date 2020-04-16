@@ -363,9 +363,31 @@ class Script(Plugin):
         self.addon.setSettingString('default_player_movies', '')
         self.addon.setSettingString('default_player_episodes', '')
 
-    def library_autoupdate(self):
+    def monitor_userlist(self):
+        with utils.busy_dialog():
+            user_slug = TraktAPI().get_usernameslug()  # Get the user's slug
+            user_lists = TraktAPI().get_response_json('users', user_slug, 'lists')  # Get the user's lists
+            if not user_lists:
+                return
+            user_list_labels = [i.get('name') for i in user_lists]  # Build select dialog to choose list
+        user_choice = xbmcgui.Dialog().select(self.addon.getLocalizedString(32133), user_list_labels)  # Choose the list
+        if user_choice == -1:  # User cancelled
+            return
+        user_list = user_lists[user_choice].get('ids', {}).get('slug')
+        if not user_list:
+            return
+        self.addon.setSettingString('monitor_userlist', user_list)
+        if xbmcgui.Dialog().yesno(xbmc.getLocalizedString(653), self.addon.getLocalizedString(32132)):
+            self.library_autoupdate(list_slug=user_list, user_slug=user_slug)
+
+    def library_autoupdate(self, list_slug=None, user_slug=None):
         utils.kodi_log(u'UPDATING TV SHOWS LIBRARY', 1)
         basedir_tv = self.addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
+        list_slug = list_slug or self.addon.getSettingString('monitor_userlist')
+        if list_slug:
+            user_slug = user_slug or TraktAPI().get_usernameslug()
+            if user_slug:
+                context.library_userlist(user_slug=user_slug, list_slug=list_slug, confirmation_dialog=False)
         for f in xbmcvfs.listdir(basedir_tv)[0]:
             try:
                 folder = basedir_tv + f + '/'
@@ -421,6 +443,8 @@ class Script(Plugin):
             self.params = {'call_path': 'plugin://plugin.video.themoviedb.helper/'}
         if self.params.get('authenticate_trakt'):
             TraktAPI(force=True)
+        elif self.params.get('monitor_userlist'):
+            self.monitor_userlist()
         elif self.params.get('update_players'):
             self.update_players()
         elif self.params.get('set_defaultplayer'):

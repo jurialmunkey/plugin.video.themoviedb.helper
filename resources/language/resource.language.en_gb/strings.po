@@ -434,7 +434,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32086"
-msgid "Auto-update TvShows for new/missing episodes on startup"
+msgid "Auto-update library and add new/missing episodes"
 msgstr ""
 
 #: /resources/settings.xml
@@ -650,6 +650,31 @@ msgstr ""
 #: /resources/lib/context.py
 msgctxt "#32129"
 msgid "items"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32130"
+msgid "Update every X minutes"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32131"
+msgid "Trakt list to monitor for updates"
+msgstr ""
+
+#: /resources/lib/script.py
+msgctxt "#32132"
+msgid "Do you wish to update the library using this Trakt list now?"
+msgstr ""
+
+#: /resources/lib/script.py
+msgctxt "#32133"
+msgid "Select List"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32134"
+msgid "User slug"
 msgstr ""
 
 msgctxt "#30030"

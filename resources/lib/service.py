@@ -1,5 +1,6 @@
 import xbmc
 import xbmcgui
+from threading import Thread
 from resources.lib.plugin import Plugin
 import resources.lib.utils as utils
 _setmain = {
@@ -16,6 +17,20 @@ _setprop = {
     'rottentomatoes_consensus', 'rottentomatoes_usermeter', 'rottentomatoes_userreviews', 'trakt_rating', 'trakt_votes'}
 
 
+class CronJob(Thread):
+    def __init__(self, poll_time=120):
+        Thread.__init__(self)
+        self.kodimonitor = xbmc.Monitor()
+        self.exit = False
+        self.poll_time = 60 * poll_time
+
+    def run(self):
+        while not self.kodimonitor.abortRequested() and not self.exit and self.poll_time:
+            if self.addon.getSettingBool('library_autoupdate'):
+                xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,library_autoupdate)')
+            self.kodimonitor.waitForAbort(self.poll_time)
+
+
 class ServiceMonitor(Plugin):
     def __init__(self):
         super(ServiceMonitor, self).__init__()
@@ -30,19 +45,21 @@ class ServiceMonitor(Plugin):
         self.properties = set()
         self.indxproperties = set()
         self.home = xbmcgui.Window(10000)
+        self.cron_job = CronJob(self.addon.getSettingInt('library_autoupdate_interval'))
+        self.cron_job.setName('Cron Thread')
         self.run_monitor()
 
     def run_monitor(self):
         self.home.setProperty('TMDbHelper.ServiceStarted', 'True')
 
-        if self.addon.getSettingBool('library_autoupdate'):
-            xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,library_autoupdate)')
-
         if self.addon.getSettingString('trakt_token'):
             self.home.setProperty('TMDbHelper.TraktIsAuth', 'True')
 
+        self.cron_job.start()
+
         while not self.kodimonitor.abortRequested() and not self.exit:
             if self.home.getProperty('TMDbHelper.ServiceStop'):
+                self.cron_job.exit = True
                 self.exit = True
 
             elif xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.Service)"):
