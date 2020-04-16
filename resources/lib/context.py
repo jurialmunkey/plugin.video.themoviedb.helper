@@ -290,6 +290,23 @@ def library():
             return
 
 
+def add_to_userlist():
+    dbtype = sys.listitem.getVideoInfoTag().getMediaType()
+    tmdb_id = sys.listitem.getProperty('tvshow.tmdb_id')
+    imdb_id = sys.listitem.getUniqueID('imdb')
+    tvdb_id = None
+    if not dbtype == 'episode':
+        tmdb_id = sys.listitem.getProperty('tmdb_id') or sys.listitem.getUniqueID('tmdb')
+        tvdb_id = sys.listitem.getUniqueID('tvdb')
+    if dbtype == 'movie':
+        item_type = 'movie'
+    elif dbtype in ['tvshow', 'season', 'episode']:
+        item_type = 'show'
+    else:  # Not the right type of item so lets exit
+        return
+    TraktAPI().add_to_userlist(item_type, tmdb_id=tmdb_id, tvdb_id=tvdb_id, imdb_id=imdb_id)
+
+
 def action(action, tmdb_id=None, tmdb_type=None, season=None, episode=None, label=None, cache_refresh=False):
     _traktapi = TraktAPI()
 
@@ -299,6 +316,8 @@ def action(action, tmdb_id=None, tmdb_type=None, season=None, episode=None, labe
         func = _traktapi.sync_collection
     elif action == 'watchlist':
         func = _traktapi.sync_watchlist
+    elif action == 'add_to_userlist':
+        return add_to_userlist()
     elif action == 'library_userlist':
         return library_userlist()
     elif action == 'library':

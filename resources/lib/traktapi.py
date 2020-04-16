@@ -491,6 +491,78 @@ class TraktAPI(RequestAPI):
             items.append(ListItem(library=self.library, label=xbmc.getLocalizedString(33078), nextpage=page + 1))
         return items
 
+    def get_item_idlookup(self, item_type, tmdb_id=None, tvdb_id=None, imdb_id=None):
+        if not tmdb_id and not tvdb_id and not imdb_id:
+            return
+        item = None
+        if tmdb_id:
+            item = self.get_request('search', 'tmdb', tmdb_id, type=item_type)
+        if not item and tvdb_id:
+            item = self.get_request('search', 'tvdb', tvdb_id, type=item_type)
+        if not item and imdb_id:
+            item = self.get_request('search', 'imdb', imdb_id, type=item_type)
+        if not item:
+            return
+        for i in item:
+            if i.get('type') == item_type:
+                return i.get(item_type)
+
+    def create_userlist(self, user_slug=None, list_name=None, login=True):
+        if not self.authorize(login):  # Method needs authorisation
+            utils.kodi_log('TRAKT CREATE USERLIST - User not authorized')
+            return
+        user_slug = user_slug or self.get_usernameslug()
+        if not user_slug:
+            utils.kodi_log('TRAKT CREATE USERLIST - Unable to retrieve user_slug')
+            return
+        list_name = list_name or xbmcgui.Dialog().input('Enter List Name')
+        if not list_name:
+            utils.kodi_log('TRAKT CREATE USERLIST - No list name entered')
+            return
+        user_list = self.get_api_request('{}/users/{}/lists'.format(self.req_api_url, user_slug), headers=self.headers, postdata=dumps({"name": list_name}))
+        if user_list:
+            return user_list.get('ids', {}).get('slug')
+
+    def add_to_userlist(self, item_type, tmdb_id=None, tvdb_id=None, imdb_id=None, login=True):
+        utils.kodi_log('Adding {} {} {} {} to User List'.format(item_type, tmdb_id, tvdb_id, imdb_id))
+        if not self.authorize(login):  # Method needs authorisation
+            return
+
+        user_slug = self.get_usernameslug()  # Get the user's slug
+        if not user_slug:
+            utils.kodi_log('TRAKT ADD TO LIST - Failed to retrieve user_slug')
+            return
+
+        item = self.get_item_idlookup(item_type, tmdb_id=tmdb_id, tvdb_id=tvdb_id, imdb_id=imdb_id)  # Lookup item
+        if not item:
+            utils.kodi_log('TRAKT ADD TO LIST - Failed to retrieve item details')
+            return
+
+        user_lists = self.get_response_json('users', user_slug, 'lists')  # Get the user's lists
+        if not user_lists:
+            utils.kodi_log('TRAKT ADD TO LIST - Failed to retrieve user lists')
+            return
+
+        user_list_labels = [i.get('name') for i in user_lists]  # Build select dialog to choose list
+        user_list_labels.append('Create new list...')
+        user_choice = xbmcgui.Dialog().select("Add {} to List".format(item.get('title')), user_list_labels)  # Choose the list
+        if user_choice == -1:  # User cancelled
+            utils.kodi_log('TRAKT ADD TO LIST - User Cancelled')
+            return
+
+        user_list = self.create_userlist(user_slug) if user_list_labels[user_choice] == 'Create new list...' else user_lists[user_choice].get('ids', {}).get('slug')
+        if not user_list:
+            utils.kodi_log('TRAKT ADD TO LIST - Failed to retrieve list_slug')
+            return
+
+        items = {item_type + 's': [item]}  # Create postdata for adding item
+        if self.get_api_request('{}/users/{}/lists/{}/items'.format(self.req_api_url, user_slug, user_list), headers=self.headers, postdata=dumps(items)):
+            utils.kodi_log('TRAKT ADD TO LIST - Successfully added {} {} to {} list.'.format(item_type, item.get('title'), user_list))
+            xbmcgui.Dialog().ok('Add to Trakt List', 'Successfully added {} {} to {} list.'.format(item_type, item.get('title'), user_list))
+            return item
+        utils.kodi_log('TRAKT ADD TO LIST - Failed to add {} {} to {} list.'.format(item_type, item.get('title'), user_list))
+        xbmcgui.Dialog().ok('Add to Trakt List', 'Failed to add {} {} to {} list.'.format(item_type, item.get('title'), user_list))
+
     def sync_activities(self, itemtype, listtype):
         """ Checks if itemtype.listtype has been updated since last check """
         if not self.authorize():
