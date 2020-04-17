@@ -49,6 +49,9 @@ class Plugin(object):
     def imageviewer(self, image):
         xbmc.executebuiltin('ShowPicture({0})'.format(image))
 
+    def get_trakt_usernameslug(self, login=False):
+        return TraktAPI().get_usernameslug(login=login)
+
     def get_kodi_person_stats(self, item):
         if item.get('infolabels', {}).get('title'):
             statistics = KodiLibrary().get_person_stats(item.get('infolabels', {}).get('title'))

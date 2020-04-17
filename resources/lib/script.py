@@ -370,8 +370,12 @@ class Script(Plugin):
             if not user_lists:
                 return
             user_list_labels = [i.get('name') for i in user_lists]  # Build select dialog to choose list
+            user_list_labels.append(xbmc.getLocalizedString(231))
         user_choice = xbmcgui.Dialog().select(self.addon.getLocalizedString(32133), user_list_labels)  # Choose the list
         if user_choice == -1:  # User cancelled
+            return
+        elif user_list_labels[user_choice] == xbmc.getLocalizedString(231):  # User opted to clear setting
+            self.addon.setSettingString('monitor_userlist', '')
             return
         user_list = user_lists[user_choice].get('ids', {}).get('slug')
         if not user_list:

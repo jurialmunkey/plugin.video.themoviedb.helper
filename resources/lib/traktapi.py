@@ -177,7 +177,8 @@ class TraktAPI(RequestAPI):
     def get_itemlist_sortedcached(self, *args, **kwargs):
         page = kwargs.pop('page', 1)
         limit = kwargs.pop('limit', 10)
-        kwparams = {'cache_name': self.cache_name + '.trakt.sortedlist.v2', 'cache_days': 0.125}
+        cache_refresh = True if page == 1 else False
+        kwparams = {'cache_name': self.cache_name + '.trakt.sortedlist.v3', 'cache_days': 0.125, 'cache_refresh': cache_refresh}
         items = self.use_cache(self.get_itemlist_sorted, *args, **kwparams)
         index_z = page * limit
         index_a = index_z - limit
@@ -460,7 +461,10 @@ class TraktAPI(RequestAPI):
         if not self.authorize(login):
             return
         item = self.get_response_json('users/settings')
-        return item.get('user', {}).get('ids', {}).get('slug')
+        user_slug = item.get('user', {}).get('ids', {}).get('slug')
+        if user_slug:
+            xbmcgui.Window(10000).setProperty('TMDbHelper.TraktUserSlug', user_slug)  # Set a Window Property to Compare
+            return user_slug
 
     def get_details(self, item_type, id_num, season=None, episode=None):
         if not season or not episode:
@@ -523,41 +527,52 @@ class TraktAPI(RequestAPI):
         if user_list:
             return user_list.get('ids', {}).get('slug')
 
-    def add_to_userlist(self, item_type, tmdb_id=None, tvdb_id=None, imdb_id=None, login=True):
+    def sync_userlist(self, item_type, tmdb_id=None, tvdb_id=None, imdb_id=None, login=True, remove_item=False, user_list=None):
         utils.kodi_log('Adding {} {} {} {} to User List'.format(item_type, tmdb_id, tvdb_id, imdb_id))
         if not self.authorize(login):  # Method needs authorisation
             return
 
         user_slug = self.get_usernameslug()  # Get the user's slug
         if not user_slug:
-            utils.kodi_log('TRAKT ADD TO LIST - Failed to retrieve user_slug')
+            utils.kodi_log('TRAKT SYNC LIST - Failed to retrieve user_slug')
             return
 
         item = self.get_item_idlookup(item_type, tmdb_id=tmdb_id, tvdb_id=tvdb_id, imdb_id=imdb_id)  # Lookup item
         if not item:
-            utils.kodi_log('TRAKT ADD TO LIST - Failed to retrieve item details')
+            utils.kodi_log('TRAKT SYNC LIST - Failed to retrieve item details')
             return
 
-        user_lists = self.get_response_json('users', user_slug, 'lists')  # Get the user's lists
-        user_list_labels = [i.get('name') for i in user_lists]  # Build select dialog to choose list
-        user_list_labels.append('Create new list...')
-        user_choice = xbmcgui.Dialog().select("Add {} to List".format(item.get('title')), user_list_labels)  # Choose the list
-        if user_choice == -1:  # User cancelled
-            utils.kodi_log('TRAKT ADD TO LIST - User Cancelled')
-            return
-
-        user_list = self.create_userlist(user_slug) if user_list_labels[user_choice] == 'Create new list...' else user_lists[user_choice].get('ids', {}).get('slug')
         if not user_list:
-            utils.kodi_log('TRAKT ADD TO LIST - Failed to retrieve list_slug')
-            return
+            user_lists = self.get_response_json('users', user_slug, 'lists')  # Get the user's lists
+            user_list_labels = [i.get('name') for i in user_lists]  # Build select dialog to choose list
+            user_list_labels.append(self.addon.getLocalizedString(32141)) if not remove_item else None  # Add create new list item
+            addremove = xbmc.getLocalizedString(1210) if remove_item else xbmc.getLocalizedString(15019)
+            user_choice = xbmcgui.Dialog().select("{} {}".format(addremove, item.get('title')), user_list_labels)  # Choose the list
+            if user_choice == -1:  # User cancelled
+                utils.kodi_log('TRAKT SYNC LIST - User Cancelled')
+                return
+            if user_list_labels[user_choice] == self.addon.getLocalizedString(32141):
+                user_list = self.create_userlist(user_slug)
+            else:
+                user_list = user_lists[user_choice].get('ids', {}).get('slug')
+            if not user_list:
+                utils.kodi_log('TRAKT SYNC LIST - Failed to retrieve list_slug')
+                return
 
         items = {item_type + 's': [item]}  # Create postdata for adding item
-        if self.get_api_request('{}/users/{}/lists/{}/items'.format(self.req_api_url, user_slug, user_list), headers=self.headers, postdata=dumps(items)):
-            utils.kodi_log('TRAKT ADD TO LIST - Successfully added {} {} to {} list.'.format(item_type, item.get('title'), user_list))
-            xbmcgui.Dialog().ok('Add to Trakt List', 'Successfully added {} {} to {} list.'.format(item_type, item.get('title'), user_list))
+        url = '{}/users/{}/lists/{}/items'.format(self.req_api_url, user_slug, user_list)
+        url += '/remove' if remove_item else ''
+        msg_head = self.addon.getLocalizedString(32139) if remove_item else self.addon.getLocalizedString(32140)
+        if self.get_api_request(url, headers=self.headers, postdata=dumps(items)):
+            msg_body = self.addon.getLocalizedString(32135) if remove_item else self.addon.getLocalizedString(32136)
+            msg_body = msg_body.format(item_type, item.get('title'), user_list)
+            utils.kodi_log('TRAKT SYNC LIST - ' + msg_body)
+            xbmcgui.Dialog().ok(msg_head, msg_body)  # Notify user that item added/removed successfully
             return item
-        utils.kodi_log('TRAKT ADD TO LIST - Failed to add {} {} to {} list.'.format(item_type, item.get('title'), user_list))
-        xbmcgui.Dialog().ok('Add to Trakt List', 'Failed to add {} {} to {} list.'.format(item_type, item.get('title'), user_list))
+        msg_body = self.addon.getLocalizedString(32137) if remove_item else self.addon.getLocalizedString(32138)
+        msg_body = msg_body.format(item_type, item.get('title'), user_list)
+        utils.kodi_log('TRAKT SYNC LIST - ' + msg_body)
+        xbmcgui.Dialog().ok(msg_head, msg_body)  # Notify user that we failed to add/remove item
 
     def sync_activities(self, itemtype, listtype):
         """ Checks if itemtype.listtype has been updated since last check """

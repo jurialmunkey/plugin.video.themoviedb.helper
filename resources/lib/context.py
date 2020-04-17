@@ -292,8 +292,9 @@ def library():
             return
 
 
-def add_to_userlist():
+def sync_userlist(remove_item=False):
     dbtype = sys.listitem.getVideoInfoTag().getMediaType()
+    user_list = sys.listitem.getProperty('container.list_slug') if remove_item else None
     tmdb_id = sys.listitem.getProperty('tvshow.tmdb_id')
     imdb_id = sys.listitem.getUniqueID('imdb')
     tvdb_id = None
@@ -306,7 +307,8 @@ def add_to_userlist():
         item_type = 'show'
     else:  # Not the right type of item so lets exit
         return
-    TraktAPI().add_to_userlist(item_type, tmdb_id=tmdb_id, tvdb_id=tvdb_id, imdb_id=imdb_id)
+    TraktAPI().sync_userlist(item_type, tmdb_id=tmdb_id, tvdb_id=tvdb_id, imdb_id=imdb_id, remove_item=remove_item, user_list=user_list)
+    xbmc.executebuiltin('Container.Refresh')
 
 
 def action(action, tmdb_id=None, tmdb_type=None, season=None, episode=None, label=None, cache_refresh=False):
@@ -319,7 +321,9 @@ def action(action, tmdb_id=None, tmdb_type=None, season=None, episode=None, labe
     elif action == 'watchlist':
         func = _traktapi.sync_watchlist
     elif action == 'add_to_userlist':
-        return add_to_userlist()
+        return sync_userlist()
+    elif action == 'remove_from_userlist':
+        return sync_userlist(remove_item=True)
     elif action == 'library_userlist':
         return library_userlist()
     elif action == 'library':

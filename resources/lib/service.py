@@ -54,6 +54,7 @@ class ServiceMonitor(Plugin):
 
         if self.addon.getSettingString('trakt_token'):
             self.home.setProperty('TMDbHelper.TraktIsAuth', 'True')
+            self.get_trakt_usernameslug()
 
         self.cron_job.start()
 

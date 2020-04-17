@@ -654,12 +654,12 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32130"
-msgid "Update every X minutes"
+msgid "Auto-update library every X hours"
 msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32131"
-msgid "Trakt list to monitor for updates"
+msgid "Auto-update library from Trakt list"
 msgstr ""
 
 #: /resources/lib/script.py
@@ -675,6 +675,41 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32134"
 msgid "User slug"
+msgstr ""
+
+#: /resources/lib/traktapi.py
+msgctxt "#32135"
+msgid "Successfully removed {} {} from {} list."
+msgstr ""
+
+#: /resources/lib/traktapi.py
+msgctxt "#32136"
+msgid "Successfully added {} {} to {} list."
+msgstr ""
+
+#: /resources/lib/traktapi.py
+msgctxt "#32137"
+msgid "Failed to remove {} {} from {} list."
+msgstr ""
+
+#: /resources/lib/traktapi.py
+msgctxt "#32138"
+msgid "Failed to add {} {} to {} list."
+msgstr ""
+
+#: /resources/lib/traktapi.py
+msgctxt "#32139"
+msgid "Remove from Trakt list"
+msgstr ""
+
+#: /resources/lib/traktapi.py
+msgctxt "#32140"
+msgid "Add to Trakt list"
+msgstr ""
+
+#: /resources/lib/traktapi.py
+msgctxt "#32141"
+msgid "Create new list..."
 msgstr ""
 
 msgctxt "#30030"
