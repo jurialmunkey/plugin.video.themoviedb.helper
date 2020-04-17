@@ -209,6 +209,7 @@ class Container(Plugin):
                 i.url = self.params.copy()
                 i.url['page'] = i.nextpage
                 i.icon = '{0}/resources/icons/tmdb/nextpage.png'.format(self.addonpath)
+                i.infoproperties['SpecialSort'] = 'bottom'
                 if self.params.get('nextpage') or (self.params.get('widget') and self.addon.getSettingBool('widgets_nextpage')):
                     nextpage.append(i)
                 continue
