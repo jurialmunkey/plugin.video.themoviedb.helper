@@ -28,7 +28,8 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32076]" type="bool" id="auto_update" default="true" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32086]" type="bool" id="library_autoupdate" default="false" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32130]" subsetting="true" type="slider" id="library_autoupdate_interval" default="2" range="1,12" option="int" />
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32131]" subsetting="true" type="action" action="RunScript(plugin.video.themoviedb.helper,monitor_userlist)" id="monitor_userlist" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32131]" subsetting="true" type="action" action="RunScript(plugin.video.themoviedb.helper,monitor_userlist=monitor_userlist)" id="monitor_userlist" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32131]" subsetting="true" type="action" action="RunScript(plugin.video.themoviedb.helper,monitor_userlist=monitor_userlist_2)" id="monitor_userlist_2" visible="!eq(-1,)|!eq(0,)" />
         <setting label="$LOCALIZE[10039]" type="lsep"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32077]" type="bool" id="ignore_folderchecking" default="false" />
     </category>

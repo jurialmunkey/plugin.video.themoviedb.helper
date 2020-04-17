@@ -364,6 +364,7 @@ class Script(Plugin):
         self.addon.setSettingString('default_player_episodes', '')
 
     def monitor_userlist(self):
+        monitor_userlist = self.params.get('monitor_userlist')
         with utils.busy_dialog():
             user_slug = TraktAPI().get_usernameslug()  # Get the user's slug
             user_lists = TraktAPI().get_response_json('users', user_slug, 'lists')  # Get the user's lists
@@ -375,12 +376,12 @@ class Script(Plugin):
         if user_choice == -1:  # User cancelled
             return
         elif user_list_labels[user_choice] == xbmc.getLocalizedString(231):  # User opted to clear setting
-            self.addon.setSettingString('monitor_userlist', '')
+            self.addon.setSettingString(monitor_userlist, '')
             return
         user_list = user_lists[user_choice].get('ids', {}).get('slug')
         if not user_list:
             return
-        self.addon.setSettingString('monitor_userlist', user_list)
+        self.addon.setSettingString(monitor_userlist, user_list)
         if xbmcgui.Dialog().yesno(xbmc.getLocalizedString(653), self.addon.getLocalizedString(32132)):
             self.library_autoupdate(list_slug=user_list, user_slug=user_slug)
 
@@ -392,6 +393,9 @@ class Script(Plugin):
             user_slug = user_slug or TraktAPI().get_usernameslug()
             if user_slug:
                 context.library_userlist(user_slug=user_slug, list_slug=list_slug, confirmation_dialog=False)
+            list_slug_2 = self.addon.getSettingString('monitor_userlist_2')
+            if list_slug_2 and list_slug_2 != list_slug:
+                context.library_userlist(user_slug=user_slug, list_slug=list_slug_2, confirmation_dialog=False)
         for f in xbmcvfs.listdir(basedir_tv)[0]:
             try:
                 folder = basedir_tv + f + '/'
