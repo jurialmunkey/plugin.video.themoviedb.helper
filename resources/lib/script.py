@@ -440,6 +440,12 @@ class Script(Plugin):
             season=self.params.get('season'), episode=self.params.get('episode'),
             cache_refresh=self.params.get('cache_refresh'))
 
+    def split_value(self):
+        idx = 0
+        for i in self.params.get('split_value', '').split(self.params.get('separator', ' / ')):
+            self.home.setProperty('{}.{}'.format(self.params.get('property', 'TMDbHelper.Split'), idx), i)
+            idx += 1
+
     def router(self):
         if not self.params:
             """ If no params assume user wants to run plugin """
@@ -447,6 +453,8 @@ class Script(Plugin):
             self.params = {'call_path': 'plugin://plugin.video.themoviedb.helper/'}
         if self.params.get('authenticate_trakt'):
             TraktAPI(force=True)
+        elif self.params.get('split_value'):
+            self.split_value()
         elif self.params.get('monitor_userlist'):
             self.monitor_userlist()
         elif self.params.get('update_players'):
