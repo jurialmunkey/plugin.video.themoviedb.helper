@@ -1,5 +1,6 @@
 import xbmc
 import xbmcgui
+import xbmcaddon
 from threading import Thread
 from resources.lib.plugin import Plugin
 import resources.lib.utils as utils
@@ -23,6 +24,7 @@ class CronJob(Thread):
         self.kodimonitor = xbmc.Monitor()
         self.exit = False
         self.poll_time = 60 * poll_time
+        self.addon = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
     def run(self):
         while not self.kodimonitor.abortRequested() and not self.exit and self.poll_time:
