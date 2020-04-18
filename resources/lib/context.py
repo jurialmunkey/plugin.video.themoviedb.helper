@@ -150,7 +150,7 @@ def play():
                 dbtype, tmdb_id))
 
 
-def library_userlist(user_slug=None, list_slug=None, confirmation_dialog=True):
+def library_userlist(user_slug=None, list_slug=None, confirmation_dialog=True, allow_update=True):
     user_slug = user_slug or sys.listitem.getProperty('Item.user_slug')
     list_slug = list_slug or sys.listitem.getProperty('Item.list_slug')
 
@@ -175,7 +175,6 @@ def library_userlist(user_slug=None, list_slug=None, confirmation_dialog=True):
     p_dialog.create('TMDbHelper', 'Adding items to library...')
     basedir_movie = _addon.getSettingString('movies_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/movies/'
     basedir_tv = _addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
-    auto_update = _addon.getSettingBool('auto_update') or False
     all_movies = []
     all_tvshows = []
 
@@ -219,7 +218,8 @@ def library_userlist(user_slug=None, list_slug=None, confirmation_dialog=True):
     p_dialog.close()
     create_playlist(all_movies, 'movies', user_slug, list_slug) if all_movies else None
     create_playlist(all_tvshows, 'tvshows', user_slug, list_slug) if all_tvshows else None
-    xbmc.executebuiltin('UpdateLibrary(video)') if auto_update else None
+    if allow_update and _addon.getSettingBool('auto_update'):
+        xbmc.executebuiltin('UpdateLibrary(video)')
 
 
 def create_playlist(items, dbtype, user_slug, list_slug):

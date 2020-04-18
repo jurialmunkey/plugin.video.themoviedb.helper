@@ -392,10 +392,10 @@ class Script(Plugin):
         if list_slug:
             user_slug = user_slug or TraktAPI().get_usernameslug()
             if user_slug:
-                context.library_userlist(user_slug=user_slug, list_slug=list_slug, confirmation_dialog=False)
+                context.library_userlist(user_slug=user_slug, list_slug=list_slug, confirmation_dialog=False, allow_update=False)
             list_slug_2 = self.addon.getSettingString('monitor_userlist_2')
             if list_slug_2 and list_slug_2 != list_slug:
-                context.library_userlist(user_slug=user_slug, list_slug=list_slug_2, confirmation_dialog=False)
+                context.library_userlist(user_slug=user_slug, list_slug=list_slug_2, confirmation_dialog=False, allow_update=False)
         for f in xbmcvfs.listdir(basedir_tv)[0]:
             try:
                 folder = basedir_tv + f + '/'
@@ -425,7 +425,7 @@ class Script(Plugin):
             except Exception as exc:
                 utils.kodi_log(u'LIBRARY AUTO UPDATE ERROR:\n{}'.format(exc))
         if self.addon.getSettingBool('auto_update'):
-            xbmc.executebuiltin('UpdateLibrary(video, {})'.format(basedir_tv))
+            xbmc.executebuiltin('UpdateLibrary(video)')
 
     def restart_service(self):
         if self.home.getProperty('TMDbHelper.ServiceStarted') == 'True':
