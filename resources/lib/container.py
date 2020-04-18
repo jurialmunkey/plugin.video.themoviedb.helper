@@ -535,14 +535,14 @@ class Container(Plugin):
             items = traktapi.get_inprogress(userslug, limit=self.trakt_limit, episodes=True)
             self.item_tmdbtype = 'episode'
         elif self.params.get('info') == 'trakt_inprogress':
-            items = traktapi.get_inprogress(userslug, limit=self.trakt_limit)
+            items = traktapi.get_inprogress_movies(limit=self.trakt_limit) if self.params.get('type') == 'movie' else traktapi.get_inprogress(userslug, limit=self.trakt_limit)
         elif self.params.get('info') == 'trakt_mostwatched':
             items = traktapi.get_mostwatched(userslug, self.params.get('type'), limit=self.trakt_limit)
         elif self.params.get('info') == 'trakt_history':
             items = traktapi.get_recentlywatched(userslug, self.params.get('type'), limit=self.trakt_limit)
         self.list_items(
             items=items, url={
-                'info': 'trakt_upnext' if self.params.get('info') == 'trakt_inprogress' else 'details',
+                'info': 'trakt_upnext' if self.params.get('info') == 'trakt_inprogress' and self.params.get('type') != 'movie' else 'details',
                 'type': self.item_tmdbtype})
 
     def list_traktupnext(self):

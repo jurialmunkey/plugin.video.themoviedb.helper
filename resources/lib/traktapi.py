@@ -296,6 +296,11 @@ class TraktAPI(RequestAPI):
         history = sorted(history, key=lambda i: i['plays'], reverse=True)
         return self.get_limitedlist(history, tmdbtype, limit, islistitem)
 
+    def get_inprogress_movies(self, limit=None, islistitem=True):
+        history = self.get_response_json('sync', 'playback', 'movies', extended='noseasons')
+        history = sorted(history, key=lambda i: i['paused_at'], reverse=True)
+        return self.get_limitedlist(history, 'movie', limit, islistitem)
+
     def get_recentlywatched_shows(self, userslug, limit=None, islistitem=True):
         history = self.get_response_json('users', userslug, 'watched', 'shows', extended='noseasons')
         history = sorted(history, key=lambda i: i['last_watched_at'], reverse=True)

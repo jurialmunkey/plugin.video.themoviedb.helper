@@ -185,7 +185,7 @@ BASEDIR_TRAKT = [
         'info': 'trakt_inprogress',
         'name': 'Your In-Progress{1}{0}',
         'icon': '{0}/resources/icons/trakt/inprogress.png',
-        'types': ['tv']},
+        'types': ['movie', 'tv']},
     {
         'info': 'trakt_nextepisodes',
         'name': 'Your Next Episodes',
