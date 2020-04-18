@@ -19,11 +19,11 @@ _setprop = {
 
 
 class CronJob(Thread):
-    def __init__(self, poll_time=120):
+    def __init__(self, poll_time=2):
         Thread.__init__(self)
         self.kodimonitor = xbmc.Monitor()
         self.exit = False
-        self.poll_time = 60 * poll_time
+        self.poll_time = 3600 * poll_time
         self.addon = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
     def run(self):
