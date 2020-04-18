@@ -257,7 +257,11 @@ class Player(Plugin):
             self.item['eptmdb'] = self.details.get('infoproperties', {}).get('tmdb_id') or trakt_details.get('ids', {}).get('tmdb')
             self.item['eptrakt'] = trakt_details.get('ids', {}).get('trakt')
 
+        utils.kodi_log(u'Player Details - Item:\n{}'.format(self.item), 2)
+
         for k, v in self.item.copy().items():
+            if k not in ['name', 'showname', 'clearname', 'tvshowtitle', 'title', 'thumbnail', 'poster', 'fanart', 'originaltitle']:
+                continue
             v = u'{0}'.format(v)
             self.item[k] = v.replace(',', '')
             self.item[k + '_+'] = v.replace(' ', '+')
@@ -266,9 +270,6 @@ class Player(Plugin):
             self.item[k + '_escaped+'] = quote(quote_plus(utils.try_encode_string(v)))
             self.item[k + '_url'] = quote(utils.try_encode_string(v))
             self.item[k + '_url+'] = quote_plus(utils.try_encode_string(v))
-
-        utils.kodi_log(u'Player Details - Trakt:\n{}'.format(trakt_details), 2)
-        utils.kodi_log(u'Player Details - Item:\n{}'.format(self.item), 2)
 
     def build_players(self, tmdbtype=None):
         basedirs = ['special://profile/addon_data/plugin.video.themoviedb.helper/players/']
