@@ -239,8 +239,8 @@ class Player(Plugin):
             slug_type = utils.type_convert(self.tmdbtype, 'trakt')
             trakt_details = self.traktapi.get_details(slug_type, self.traktapi.get_traktslug(slug_type, 'tmdb', self.tmdb_id))
             self.item['trakt'] = trakt_details.get('ids', {}).get('trakt')
-            self.item['imdb'] = trakt_details.get('ids', {}).get('imdb')
-            self.item['tvdb'] = trakt_details.get('ids', {}).get('tvdb')
+            self.item['imdb'] = self.details.get('infoproperties', {}).get('tvshow.imdb_id') or trakt_details.get('ids', {}).get('imdb')
+            self.item['tvdb'] = self.details.get('infoproperties', {}).get('tvshow.tvdb_id') or trakt_details.get('ids', {}).get('tvdb')
             self.item['slug'] = trakt_details.get('ids', {}).get('slug')
 
         if self.itemtype == 'episode':  # Do some special episode stuff
@@ -252,9 +252,9 @@ class Player(Plugin):
 
         if self.traktapi and self.itemtype == 'episode':
             trakt_details = self.traktapi.get_details(slug_type, self.item.get('slug'), season=self.season, episode=self.episode)
-            self.item['epid'] = trakt_details.get('ids', {}).get('tvdb')
+            self.item['epid'] = self.details.get('infoproperties', {}).get('tvdb_id') or trakt_details.get('ids', {}).get('tvdb')
             self.item['epimdb'] = trakt_details.get('ids', {}).get('imdb')
-            self.item['eptmdb'] = trakt_details.get('ids', {}).get('tmdb')
+            self.item['eptmdb'] = self.details.get('infoproperties', {}).get('tmdb_id') or trakt_details.get('ids', {}).get('tmdb')
             self.item['eptrakt'] = trakt_details.get('ids', {}).get('trakt')
 
         for k, v in self.item.copy().items():
