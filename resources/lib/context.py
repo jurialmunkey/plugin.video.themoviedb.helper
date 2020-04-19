@@ -311,6 +311,23 @@ def sync_userlist(remove_item=False):
     xbmc.executebuiltin('Container.Refresh')
 
 
+def refresh_item():
+    dbtype = sys.listitem.getVideoInfoTag().getMediaType()
+    if dbtype == 'episode':
+        d_args = (
+            'tv', sys.listitem.getProperty('tvshow.tmdb_id'),
+            sys.listitem.getVideoInfoTag().getSeason(),
+            sys.listitem.getVideoInfoTag().getEpisode())
+    elif dbtype == 'tvshow':
+        d_args = ('tv', sys.listitem.getProperty('tmdb_id'))
+    elif dbtype == 'movie':
+        d_args = ('movie', sys.listitem.getProperty('tmdb_id'))
+    else:
+        return
+    _plugin.tmdb.get_detailed_item(*d_args, cache_refresh=True)
+    xbmc.executebuiltin('Container.Refresh')
+
+
 def action(action, tmdb_id=None, tmdb_type=None, season=None, episode=None, label=None):
     _traktapi = TraktAPI()
 
@@ -328,6 +345,8 @@ def action(action, tmdb_id=None, tmdb_type=None, season=None, episode=None, labe
         return library_userlist()
     elif action == 'library':
         return library()
+    elif action == 'refresh_item':
+        return refresh_item()
     elif action == 'play':
         return play()
     elif action == 'open':
