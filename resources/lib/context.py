@@ -324,7 +324,9 @@ def refresh_item():
         d_args = ('movie', sys.listitem.getProperty('tmdb_id'))
     else:
         return
-    _plugin.tmdb.get_detailed_item(*d_args, cache_refresh=True)
+    details = _plugin.tmdb.get_detailed_item(*d_args, cache_refresh=True)
+    if details:
+        xbmcgui.Dialog().ok(_addon.getLocalizedString(32144), _addon.getLocalizedString(32143).format(details.get('label')))
     xbmc.executebuiltin('Container.Refresh')
 
 

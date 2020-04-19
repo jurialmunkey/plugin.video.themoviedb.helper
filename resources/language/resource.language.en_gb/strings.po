@@ -717,6 +717,16 @@ msgctxt "#32142"
 msgid "Hide watched items on widgets"
 msgstr ""
 
+#: /resources/lib/context.py
+msgctxt "#32143"
+msgid "Cached details for {} successfully refreshed!"
+msgstr ""
+
+#: /resources/lib/context.py
+msgctxt "#32144"
+msgid "Refresh TheMovieDb Details"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
