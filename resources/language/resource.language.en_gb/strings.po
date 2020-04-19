@@ -712,6 +712,11 @@ msgctxt "#32141"
 msgid "Create new list..."
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32142"
+msgid "Hide watched items on widgets"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

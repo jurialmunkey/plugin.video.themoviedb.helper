@@ -892,6 +892,7 @@ class Container(Plugin):
 
         trakt_watched = self.get_trakt_watched()
         trakt_unwatched = self.get_trakt_unwatched()
+        hidewatched = self.addon.getSettingBool('widgets_hidewatched') if self.params.get('widget', '').capitalize() == 'True' else False
 
         x = 0
         self.start_container()
@@ -907,8 +908,9 @@ class Container(Plugin):
             i.get_trakt_unwatched(trakt=TraktAPI(tmdb=self.tmdb), request=trakt_unwatched, check_sync=self.check_sync) if x == 0 or self.params.get('info') != 'details' else None
             i.set_url_props(self.params, 'container')
             i.set_url_props(i.url, 'item')
-            i.create_listitem(self.handle, **i.url) if not self.params.get('random') else self.randomlist.append(i)
-            x += 1
+            if not hidewatched or self.params.get('info') == 'details' or i.infolabels.get('overlay', 4) != 5:
+                i.create_listitem(self.handle, **i.url) if not self.params.get('random') else self.randomlist.append(i)
+                x += 1
         self.finish_container()
 
     def list_tmdb(self, *args, **kwargs):

@@ -20,6 +20,7 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32085]" type="bool" id="flatten_seasons" default="false" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32092]" type="lsep"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32081]" type="bool" id="widgets_nextpage" default="false" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32142]" type="bool" id="widgets_hidewatched" default="false" />
     </category>
     <category label="$LOCALIZE[14022]">
         <setting label="$ADDON[plugin.video.themoviedb.helper 32074]" type="lsep"/>
