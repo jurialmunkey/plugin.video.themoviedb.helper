@@ -441,8 +441,7 @@ class Script(Plugin):
         context.action(
             action=self.params.get('sync_trakt'), tmdb_id=self.params.get('tmdb_id'),
             tmdb_type=self.params.get('type'), label=self.params.get('query'),
-            season=self.params.get('season'), episode=self.params.get('episode'),
-            cache_refresh=self.params.get('cache_refresh'))
+            season=self.params.get('season'), episode=self.params.get('episode'))
 
     def split_value(self):
         idx = 0
