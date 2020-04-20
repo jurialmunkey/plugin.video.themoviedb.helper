@@ -11,11 +11,13 @@ _setinfo = {
     'title', 'originaltitle', 'tvshowtitle', 'plot', 'rating', 'votes', 'premiered', 'year', 'imdbnumber', 'tagline',
     'status', 'episode', 'season', 'genre', 'set', 'studio', 'country', 'MPAA', 'director', 'writer', 'trailer', 'top250'}
 _setprop = {
-    'tvdb_id', 'biography', 'birthday', 'age', 'deathday', 'character', 'department', 'job', 'known_for', 'role',
-    'born', 'creator', 'aliases', 'budget', 'revenue', 'set.tmdb_id', 'set.name', 'set.poster', 'set.fanart',
+    'tvdb_id', 'tvshow.tvdb_id', 'tvshow.tmdb_id', 'tvshow.imdb_id', 'biography', 'birthday', 'age', 'deathday',
+    'character', 'department', 'job', 'known_for', 'role', 'born', 'creator', 'aliases', 'budget', 'revenue',
+    'set.tmdb_id', 'set.name', 'set.poster', 'set.fanart',
     'awards', 'metacritic_rating', 'imdb_rating', 'imdb_votes', 'rottentomatoes_rating', 'rottentomatoes_image',
     'rottentomatoes_reviewtotal', 'rottentomatoes_reviewsfresh', 'rottentomatoes_reviewsrotten',
-    'rottentomatoes_consensus', 'rottentomatoes_usermeter', 'rottentomatoes_userreviews', 'trakt_rating', 'trakt_votes'}
+    'rottentomatoes_consensus', 'rottentomatoes_usermeter', 'rottentomatoes_userreviews', 'trakt_rating', 'trakt_votes',
+    'oscar_wins', 'oscar_nominations', 'award_wins', 'award_nominations', 'tmdb_rating', 'tmdb_votes'}
 
 
 class CronJob(Thread):
@@ -86,7 +88,7 @@ class ServiceMonitor(Plugin):
                     "Window.IsMedia | Window.IsVisible(MyPVRChannels.xml) | Window.IsVisible(MyPVRGuide.xml) | Window.IsVisible(DialogPVRInfo.xml) | "
                     "!String.IsEmpty(Window(Home).Property(TMDbHelper.WidgetContainer)) | Window.IsVisible(movieinformation)"):
                 self.get_listitem()
-                self.kodimonitor.waitForAbort(0.15)
+                self.kodimonitor.waitForAbort(0.3)
 
             # clear window props
             elif self.properties or self.indxproperties:
@@ -151,13 +153,14 @@ class ServiceMonitor(Plugin):
 
             tmdb_id = self.get_tmdb_id(tmdbtype, self.imdb_id, self.query, self.year if tmdbtype == 'movie' else None)
             details = self.tmdb.get_detailed_item(tmdbtype, tmdb_id, season=self.season, episode=self.episode)
-            details = self.get_kodi_person_stats(details) if tmdbtype == 'person' else details
+            if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisablePersonStats)"):
+                details = self.get_kodi_person_stats(details) if tmdbtype == 'person' else details
             details = self.get_omdb_ratings(details) if tmdbtype == 'movie' else details
             details = self.get_top250_rank(details) if tmdbtype == 'movie' else details
-            details = self.get_fanarttv_artwork(details, tmdbtype)
-            details = self.get_kodi_artwork(details, self.dbtype, self.dbid) if self.addon.getSettingBool('local_db') else details
-            details = self.get_trakt_ratings(
-                details, tmdbtype, tmdb_id, self.season, self.episode) if tmdbtype in ['movie', 'tv'] else details
+            details = self.get_trakt_ratings(details, tmdbtype, tmdb_id, self.season, self.episode) if tmdbtype in ['movie', 'tv'] else details
+            if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
+                details = self.get_fanarttv_artwork(details, tmdbtype)
+                details = self.get_kodi_artwork(details, self.dbtype, self.dbid) if self.addon.getSettingBool('local_db') else details
 
             if not details or not self.is_same_item():
                 self.clear_properties()  # No details or the item changed so let's clear everything
@@ -213,8 +216,7 @@ class ServiceMonitor(Plugin):
             return
         for k in keys:
             try:
-                v = dictionary.get(k)
-                v = v or ''
+                v = dictionary.get(k, '')
                 if isinstance(v, list):
                     try:
                         v = ' / '.join(v)
@@ -251,11 +253,12 @@ class ServiceMonitor(Plugin):
 
     def set_properties(self, item):
         self.set_iter_properties(item, _setmain)
-        self.set_time_properties(item.get('infolabels', {}).get('duration', 0))
-        self.set_list_properties(item.get('cast', []), 'name', 'cast')
         self.set_iter_properties(item.get('infolabels', {}), _setinfo)
         self.set_iter_properties(item.get('infoproperties', {}), _setprop)
-        self.set_indx_properties(item.get('infoproperties', {}))
+        self.set_time_properties(item.get('infolabels', {}).get('duration', 0))
+        self.set_list_properties(item.get('cast', []), 'name', 'cast')
+        if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableExtendedProperties)"):
+            self.set_indx_properties(item.get('infoproperties', {}))
         self.home.clearProperty('TMDbHelper.IsUpdating')
 
     def get_container(self):
