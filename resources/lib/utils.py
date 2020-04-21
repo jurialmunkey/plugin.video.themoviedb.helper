@@ -244,7 +244,11 @@ def date_in_range(date_str, days=1, start_date=0, date_fmt="%Y-%m-%dT%H:%M:%S", 
 
 def kodi_log(value, level=0):
     try:
-        logvalue = u'{0}{1}'.format(_addonlogname, value) if sys.version_info.major == 3 else u'{0}{1}'.format(_addonlogname, value).encode('utf-8', 'ignore')
+        if isinstance(value, bytes):
+            value = value.decode('utf-8')
+        logvalue = u'{0}{1}'.format(_addonlogname, value)
+        if sys.version_info < (3, 0):
+            logvalue = logvalue.encode('utf-8', 'ignore')
         if level == 2 and _debuglogging:
             xbmc.log(logvalue, level=xbmc.LOGNOTICE)
         elif level == 1:

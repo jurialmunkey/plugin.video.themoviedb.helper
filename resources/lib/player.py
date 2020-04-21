@@ -51,10 +51,13 @@ class Player(Plugin):
     def get_fallback(self, dp_file, dp_action):
         fallback = self.players.get(dp_file, {}).get('fallback', {}).get(dp_action)
         if not fallback:  # No fallback so prompt dialog
+            utils.kodi_log(u'Player -- {} {}\nFallback not set!'.format(dp_file, dp_action), 2)
             return xbmcgui.Dialog().select(self.addon.getLocalizedString(32042), self.itemlist)
         if fallback in self.identifierlist:  # Found a fallback in list so play that
+            utils.kodi_log(u'Player -- {} {}\nFallback found: {}'.format(dp_file, dp_action, fallback), 2)
             return self.identifierlist.index(fallback)
         fb_file, fb_action = fallback.split()
+        utils.kodi_log(u'Player -- {} {}\nFallback NOT found!\n{}'.format(dp_file, dp_action, fallback), 2)
         return self.get_fallback(fb_file, fb_action)  # Fallback not in list so let's check fallback's fallback
 
     def get_playerindex(self, force_dialog=False):
@@ -63,9 +66,11 @@ class Player(Plugin):
             if self.itemtype == 'movie':
                 self.dp_movies = self.itemlist[idx].getLabel()
                 self.dp_movies_id = self.identifierlist[idx]
+                utils.kodi_log(u'Player -- User selected {}\n{}'.format(self.dp_movies, self.dp_movies_id), 2)
             elif self.itemtype == 'episode':
                 self.dp_episodes = self.itemlist[idx].getLabel()
                 self.dp_episodes_id = self.identifierlist[idx]
+                utils.kodi_log(u'Player -- User selected {}\n{}'.format(self.dp_episodes, self.dp_episodes_id), 2)
             return idx
 
         for i in range(0, len(self.itemlist)):
@@ -74,9 +79,11 @@ class Player(Plugin):
                     (label == self.dp_movies and self.itemtype == 'movie') or
                     (label == self.dp_episodes and self.itemtype == 'episode') or
                     (label == u'{0} {1}'.format(self.addon.getLocalizedString(32061), 'Kodi') and self.dp_local)):
+                utils.kodi_log(u'Player -- Attempting to Play with Default Player:\n {}'.format(label), 2)
                 return i  # Play local or with default player if found
 
         # Check for fallbacks
+        utils.kodi_log(u'Player -- Checking for Fallbacks', 2)
         if self.itemtype == 'movie' and self.dp_movies_id:
             dp_file, dp_action = self.dp_movies_id.split()
             return self.get_fallback(dp_file, dp_action)
@@ -97,10 +104,12 @@ class Player(Plugin):
 
         # User cancelled dialog
         if not playerindex > -1:
+            utils.kodi_log(u'Player -- User cancelled', 2)
             return False
 
         player = self.actions[playerindex]
         if not player or not player[1]:
+            utils.kodi_log(u'Player -- Player not found!', 2)
             return False
 
         # External player has list of actions so let's iterate through them to find our item
@@ -160,6 +169,7 @@ class Player(Plugin):
                         return self.play_external(force_dialog=force_dialog, playerindex=playerindex)
 
                 x = 0
+                utils.kodi_log('Player -- Retrieved Folder\n{}'.format(string_format_map(player[1], self.item)), 2)
                 for f in folder:  # Iterate through plugin folder looking for a matching item
                     x += 1  # Keep an index for position matching
                     for k, v in d.items():  # Iterate through our key (infolabel) / value (infolabel must match) pairs of our action
@@ -169,21 +179,26 @@ class Player(Plugin):
                         elif not f.get(k) or not re.match(string_format_map(v, self.item), u'{}'.format(f.get(k, ''))):  # Format our value and check if it regex matches the infolabel key
                             break  # Item's key value doesn't match value we are looking for so let's got to next item in folder
                     else:  # Item matched our criteria so let's open it up
+                        utils.kodi_log('Player -- Found Match!\n{}'.format(f), 2)
                         resolve_url = True if f.get('filetype') == 'file' else False  # Set true for files so we can play
                         player = (resolve_url, f.get('file'))  # Get ListItem.FolderPath for item
                         break  # Move onto next action (either open next folder or play file)
                 else:
+                    utils.kodi_log('Player -- Failed to find match!\n{}'.format(d), 2)
                     return self.play_external(force_dialog=force_dialog, playerindex=playerindex)  # Ask user to select a different player
 
         # Play/Search found item
         if player and player[1]:
             action = string_format_map(player[1], self.item)
             if player[0] and action.endswith('.strm'):  # Action is play and is a strm so PlayMedia
+                utils.kodi_log(u'Player -- Found strm.\nAttempting PLAYMEDIA({})'.format(action), 2)
                 xbmc.executebuiltin(utils.try_decode_string(u'PlayMedia({0})'.format(action)))
             elif player[0]:  # Action is play and not a strm so play with player
+                utils.kodi_log(u'Player -- Found file.\nAttempting to PLAY: {}'.format(action), 2)
                 xbmc.Player().play(action, ListItem(library='video', **self.details).set_listitem())
             else:
                 action = u'Container.Update({0})'.format(action) if xbmc.getCondVisibility("Window.IsMedia") else u'ActivateWindow(videos,{0},return)'.format(action)
+                utils.kodi_log(u'Player -- Found folder.\nAttempting to OPEN: {}'.format(action), 2)
                 xbmc.executebuiltin(utils.try_decode_string(action))
             return action
 
@@ -346,6 +361,8 @@ class Player(Plugin):
             self.build_playeraction(i[0], 'play_episode', assertplayers=assertplayers)
         for i in sorted(self.search_episode, key=lambda x: x[1]):
             self.build_playeraction(i[0], 'search_episode', assertplayers=assertplayers)
+        utils.kodi_log(u'Player -- Built {} Players!\n{}'.format(
+            len(self.itemlist), self.identifierlist), 2)
 
     def localfile(self, file):
         if not file:
