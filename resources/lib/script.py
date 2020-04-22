@@ -7,6 +7,7 @@ import xbmc
 import xbmcgui
 import xbmcvfs
 import threading
+from json import loads
 import resources.lib.utils as utils
 import resources.lib.context as context
 from resources.lib.downloader import Downloader
@@ -449,6 +450,51 @@ class Script(Plugin):
             self.home.setProperty('{}.{}'.format(self.params.get('property', 'TMDbHelper.Split'), idx), i)
             idx += 1
 
+    def make_variables(self):
+        try:
+            vfs_file = xbmcvfs.File('special://skin/shortcuts/tmdbhelper-variables.json')
+            content = vfs_file.read()
+            meta = loads(content) or []
+        finally:
+            vfs_file.close()
+
+        if not meta:
+            return
+
+        txt = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<includes>'
+        for variable in meta:
+            v_name = variable.get('name')
+            values = variable.get('values')
+            if not v_name or not values:
+                continue  # Skip items without names or values to make
+            containers = variable.get('containers', [])
+            containers.append('')
+            listitems = variable.get('listitems', [])
+            listitems.append('')
+            for container in containers:
+                for listitem in listitems:
+                    txt += '\n    <variable name=\"{}'.format(v_name)
+                    txt += '_C{}'.format(container) if container else ''
+                    txt += '_{}'.format(listitem) if listitem else ''
+                    txt += '\">'
+                    for value in values:
+                        for k, v in value.items():
+                            if not k or not v:
+                                continue
+                            li_name = 'Container({}).ListItem'.format(container) if container else 'ListItem'
+                            li_name += '({})'.format(listitem) if listitem else ''
+                            cond = k.format(listitem=li_name)
+                            valu = v.format(listitem=li_name)
+                            txt += '\n        <value condition=\"{}\">{}</value>'.format(cond, valu)
+                        txt += '\n    </variable>'
+        txt += '\n</includes>'
+
+        filepath = 'special://skin/{}/script-tmdbhelper-includes.xml'.format(self.params.get('make_variables'))
+        f = xbmcvfs.File(filepath, 'w')
+        f.write(utils.try_encode_string(txt))
+        f.close()
+        xbmc.executebuiltin('ReloadSkin()')
+
     def router(self):
         if not self.params:
             """ If no params assume user wants to run plugin """
@@ -458,6 +504,8 @@ class Script(Plugin):
             TraktAPI(force=True)
         elif self.params.get('split_value'):
             self.split_value()
+        elif self.params.get('make_variables'):
+            self.make_variables()
         elif self.params.get('monitor_userlist'):
             self.monitor_userlist()
         elif self.params.get('update_players'):
