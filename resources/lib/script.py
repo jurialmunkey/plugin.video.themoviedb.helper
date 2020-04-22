@@ -451,17 +451,18 @@ class Script(Plugin):
             idx += 1
 
     def make_variables(self):
-        if not self.params.get('force_build'):  # Allow overriding over built check
-            skin_version = xbmc.getInfoLabel('System.AddonVersion({})'.format(xbmc.getSkinDir()))
-            last_version = xbmc.getInfoLabel('Skin.String(TMDbHelper.Variables)')
-            if last_version and skin_version and last_version == skin_version:
-                return  # Already updated
         try:
             vfs_file = xbmcvfs.File('special://skin/shortcuts/tmdbhelper-variables.json')
             content = vfs_file.read()
             meta = loads(content) or []
         finally:
             vfs_file.close()
+
+        if not self.params.get('force_build'):  # Allow overriding over built check
+            this_version = len(content)
+            last_version = utils.try_parse_int(xbmc.getInfoLabel('Skin.String(TMDbHelper.Variables)'))
+            if this_version and last_version and this_version == last_version:
+                return  # Already updated
 
         if not meta:
             return
@@ -474,7 +475,9 @@ class Script(Plugin):
                 continue  # Skip items without names or values to make
             containers = variable.get('containers', [])
             containers.append('')
-            listitems = variable.get('listitems', [])
+            li_a = variable.get('listitems', {}).get('start', 0)
+            li_z = variable.get('listitems', {}).get('end')
+            listitems = [i for i in range(li_a, li_z)] if li_z else []
             listitems.append('')
             for container in containers:
                 for listitem in listitems:
@@ -504,7 +507,7 @@ class Script(Plugin):
         f.write(utils.try_encode_string(txt))
         f.close()
         xbmc.executebuiltin('ReloadSkin()')
-        xbmc.executebuiltin('Skin.SetString(TMDbHelper.Variables,{})'.format(skin_version))
+        xbmc.executebuiltin('Skin.SetString(TMDbHelper.Variables,{})'.format(len(content)))
 
     def router(self):
         if not self.params:
