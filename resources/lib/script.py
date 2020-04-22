@@ -499,7 +499,7 @@ class Script(Plugin):
                             cond = k.format(**f_dict)
                             valu = v.format(**f_dict)
                             txt += '\n        <value condition=\"{}\">{}</value>'.format(cond, valu)
-                        txt += '\n    </variable>'
+                    txt += '\n    </variable>'
         txt += '\n</includes>'
 
         filepath = 'special://skin/{}/script-tmdbhelper-includes.xml'.format(self.params.get('make_variables'))
