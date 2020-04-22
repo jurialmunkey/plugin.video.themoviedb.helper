@@ -2,10 +2,12 @@ import re
 import sys
 import time
 import xbmc
+import xbmcvfs
 import xbmcgui
 import xbmcaddon
 import unicodedata
 import datetime
+import hashlib
 from copy import copy
 from contextlib import contextmanager
 from resources.lib.constants import TYPE_CONVERSION, VALID_FILECHARS
@@ -33,6 +35,21 @@ def validify_filename(filename):
     filename = str(unicodedata.normalize('NFD', filename).encode('ascii', 'ignore').decode("utf-8"))
     filename = ''.join(c for c in filename if c in VALID_FILECHARS)
     return filename
+
+
+def makepath(path):
+        if xbmcvfs.exists(path):
+            return xbmc.translatePath(path)
+        xbmcvfs.mkdirs(path)
+        return xbmc.translatePath(path)
+
+
+def md5hash(value):
+    if sys.version_info.major != 3:
+        return hashlib.md5(str(value)).hexdigest()
+
+    value = str(value).encode()
+    return hashlib.md5(value).hexdigest()
 
 
 def type_convert(original, converted):

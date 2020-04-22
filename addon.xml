@@ -7,6 +7,7 @@ provider-name="jurialmunkey">
   <import addon="xbmc.python" version="2.26.0"/>
   <import addon="script.module.simplecache" version="1.0.11" />
   <import addon="script.module.requests" version="2.9.1"/>
+  <import addon="script.module.pil" version="1.1.7"/>
 </requires>
 <extension point="xbmc.python.pluginsource" library="plugin.py">
   <provides>video</provides>

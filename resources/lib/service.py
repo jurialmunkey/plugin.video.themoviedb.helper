@@ -1,9 +1,16 @@
+import os
 import xbmc
+import xbmcvfs
 import xbmcgui
 import xbmcaddon
 from threading import Thread
+from PIL import ImageFilter, Image
 from resources.lib.plugin import Plugin
 import resources.lib.utils as utils
+try:
+    import urllib2 as urllib
+except ImportError:
+    import urllib.request as urllib
 _setmain = {
     'label', 'icon', 'poster', 'thumb', 'fanart', 'discart', 'clearart', 'clearlogo', 'landscape', 'banner',
     'tmdb_id', 'imdb_id'}
@@ -33,6 +40,95 @@ class CronJob(Thread):
             if self.addon.getSettingBool('library_autoupdate'):
                 xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,library_autoupdate)')
             self.kodimonitor.waitForAbort(self.poll_time)
+
+
+class BlurImage(Thread):
+    def __init__(self, artwork=None):
+        Thread.__init__(self)
+        self.radius = 20
+        self.addon_path = utils.makepath('special://profile/addon_data/plugin.video.themoviedb.helper/blur/')
+        self.home = xbmcgui.Window(10000)
+        self.image = artwork
+
+    def run(self):
+        if not self.image:
+            self.home.clearProperty('TMDbHelper.ListItem.BlurImage')
+            return
+        filename = '{}{}.png'.format(utils.md5hash(self.image), self.radius)
+        blurname = self.blur(self.image, filename)
+        self.home.setProperty('TMDbHelper.ListItem.BlurImage', blurname)
+
+    def blur(self, source, filename):
+        destination = self.addon_path + filename
+        try:
+            if xbmcvfs.exists(destination):
+                os.utime(destination, None)
+            else:
+                img = self.openimage(source, self.addon_path, filename)
+                img.thumbnail((256, 256))
+                img = img.convert('RGB')
+                img = img.filter(ImageFilter.GaussianBlur(self.radius))
+                img.save(destination)
+
+            return destination
+
+        except Exception:
+            return ''
+
+    def openimage(self, image, targetpath, filename):
+        """ Open image helper with thanks to sualfred """
+        # some paths require unquoting to get a valid cached thumb hash
+        cached_image_path = urllib.unquote(image.replace('image://', ''))
+        if cached_image_path.endswith('/'):
+            cached_image_path = cached_image_path[:-1]
+
+        cached_files = []
+        for path in [xbmc.getCacheThumbName(cached_image_path), xbmc.getCacheThumbName(image)]:
+            cached_files.append(os.path.join('special://profile/Thumbnails/', path[0], path[:-4] + '.jpg'))
+            cached_files.append(os.path.join('special://profile/Thumbnails/', path[0], path[:-4] + '.png'))
+            cached_files.append(os.path.join('special://profile/Thumbnails/Video/', path[0], path))
+
+        for i in range(1, 4):
+            try:
+                ''' Try to get cached image at first
+                '''
+                for cache in cached_files:
+                    if xbmcvfs.exists(cache):
+                        try:
+                            img = Image.open(xbmc.translatePath(cache))
+                            return img
+
+                        except Exception as error:
+                            utils.kodi_log('Image error: Could not open cached image --> %s' % error, 2)
+
+                ''' Skin images will be tried to be accessed directly. For all other ones
+                    the source will be copied to the addon_data folder to get access.
+                '''
+                if xbmc.skinHasImage(image):
+                    if not image.startswith('special://skin'):
+                        image = os.path.join('special://skin/media/', image)
+
+                    try:  # in case image is packed in textures.xbt
+                        img = Image.open(xbmc.translatePath(image))
+                        return img
+
+                    except Exception:
+                        return ''
+
+                else:
+                    targetfile = os.path.join(targetpath, filename)
+                    if not xbmcvfs.exists(targetfile):
+                        xbmcvfs.copy(image, targetfile)
+
+                    img = Image.open(targetfile)
+                    return img
+
+            except Exception as error:
+                utils.kodi_log('Image error: Could not get image for %s (try %d) -> %s' % (image, i, error), 2)
+                xbmc.sleep(500)
+                pass
+
+        return ''
 
 
 class ServiceMonitor(Plugin):
@@ -122,6 +218,23 @@ class ServiceMonitor(Plugin):
             return self.cur_item
         self.pre_item = self.cur_item
 
+    def get_artwork(self, source=''):
+        source = source or self.home.getProperty('TMDbHelper.Blur.SourceImage')
+        source = source.lower()
+        infolabels = ['Art(thumb)', 'Icon']
+        if source == 'poster':
+            infolabels = ['Art(tvshow.poster)', 'Art(poster)', 'Art(thumb)', 'Icon']
+        elif source == 'fanart':
+            infolabels = ['Art(fanart)', 'Art(thumb)', 'Icon']
+        elif source == 'landscape':
+            infolabels = ['Art(landscape)', 'Art(fanart)', 'Art(thumb)', 'Icon']
+        fallback = self.home.getProperty('TMDbHelper.Blur.Fallback')
+        for i in infolabels:
+            artwork = self.get_infolabel(i)
+            if artwork:
+                return artwork
+        return fallback
+
     def get_listitem(self):
         try:
             self.get_container()
@@ -137,6 +250,11 @@ class ServiceMonitor(Plugin):
             if self.get_infolabel('Label') == '..':
                 self.clear_properties()
                 return  # Parent folder so clear properties and don't do look-up
+
+            # Blur Image
+            self.blur_img = BlurImage(artwork=self.get_artwork())
+            self.blur_img.setName('blur_img')
+            self.blur_img.start()
 
             if self.dbtype in ['tvshows', 'seasons', 'episodes']:
                 tmdbtype = 'tv'
