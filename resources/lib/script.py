@@ -483,7 +483,7 @@ class Script(Plugin):
                 for listitem in listitems:
                     txt += '\n    <variable name=\"{}'.format(v_name)
                     txt += '_C{}'.format(container) if container else ''
-                    txt += '_{}'.format(listitem) if listitem else ''
+                    txt += '_{}'.format(listitem) if listitem or listitem == 0 else ''
                     txt += '\">'
                     for value in values:
                         for k, v in value.items():
