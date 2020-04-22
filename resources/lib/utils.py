@@ -344,6 +344,17 @@ def merge_two_dicts(x, y):
     return z
 
 
+def merge_two_dicts_deep(x, y):
+    """ Deep merge y keys into copy of x """
+    z = x.copy()
+    for k, v in y.items():
+        if isinstance(v, dict):
+            merge_two_dicts_deep(z.setdefault(k, {}), v)
+        elif v:
+            z[k] = v
+    return z
+
+
 def make_kwparams(params):
     tempparams = params.copy()
     return del_dict_keys(tempparams, ['info', 'type', 'tmdb_id', 'filter_key', 'filter_value',

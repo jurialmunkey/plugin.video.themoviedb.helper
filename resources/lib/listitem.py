@@ -244,7 +244,7 @@ class ListItem(object):
         listitem.setInfo(self.library, self.infolabels)
         listitem.setProperties(self.infoproperties)
         listitem.setArt(utils.merge_two_dicts({
-            'thumb': self.thumb, 'icon': self.icon, 'poster': self.poster, 'fanart': self.fanart, 'discart': self.discart,
+            'thumb': self.thumb or self.icon, 'icon': self.icon, 'poster': self.poster, 'fanart': self.fanart, 'discart': self.discart,
             'clearlogo': self.clearlogo, 'clearart': self.clearart, 'landscape': self.landscape, 'banner': self.banner,
             'tvshow.poster': self.tvshow_poster, 'tvshow.clearlogo': self.tvshow_clearlogo,
             'tvshow.clearart': self.tvshow_clearart, 'tvshow.landscape': self.tvshow_landscape,
