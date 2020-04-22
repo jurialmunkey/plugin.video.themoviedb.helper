@@ -483,8 +483,13 @@ class Script(Plugin):
                                 continue
                             li_name = 'Container({}).ListItem'.format(container) if container else 'ListItem'
                             li_name += '({})'.format(listitem) if listitem else ''
-                            cond = k.format(listitem=li_name)
-                            valu = v.format(listitem=li_name)
+                            f_dict = {
+                                'listitem': li_name,
+                                'listitemabsolute': li_name.replace('ListItem(', 'ListItemAbsolute('),
+                                'listitemnowrap': li_name.replace('ListItem(', 'ListItemNoWrap('),
+                                'listitemposition': li_name.replace('ListItem(', 'ListItemPosition(')}
+                            cond = k.format(**f_dict)
+                            valu = v.format(**f_dict)
                             txt += '\n        <value condition=\"{}\">{}</value>'.format(cond, valu)
                         txt += '\n    </variable>'
         txt += '\n</includes>'
