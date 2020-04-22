@@ -451,6 +451,11 @@ class Script(Plugin):
             idx += 1
 
     def make_variables(self):
+        if not self.params.get('force_build'):  # Allow overriding over built check
+            skin_version = xbmc.getInfoLabel('System.AddonVersion({})'.format(xbmc.getSkinDir()))
+            last_version = xbmc.getInfoLabel('Skin.String(TMDbHelper.Variables)')
+            if last_version and skin_version and last_version == skin_version:
+                return  # Already updated
         try:
             vfs_file = xbmcvfs.File('special://skin/shortcuts/tmdbhelper-variables.json')
             content = vfs_file.read()
@@ -499,6 +504,7 @@ class Script(Plugin):
         f.write(utils.try_encode_string(txt))
         f.close()
         xbmc.executebuiltin('ReloadSkin()')
+        xbmc.executebuiltin('Skin.SetString(TMDbHelper.Variables,{})'.format(skin_version))
 
     def router(self):
         if not self.params:
