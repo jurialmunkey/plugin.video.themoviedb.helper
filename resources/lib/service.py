@@ -12,15 +12,17 @@ try:
 except ImportError:
     import urllib.request as urllib
 _setmain = {
-    'label', 'icon', 'poster', 'thumb', 'fanart', 'discart', 'clearart', 'clearlogo', 'landscape', 'banner',
-    'tmdb_id', 'imdb_id'}
+    'label', 'tmdb_id', 'imdb_id'}
+_setmain_artwork = {
+    'icon', 'poster', 'thumb', 'fanart', 'discart', 'clearart', 'clearlogo', 'landscape', 'banner'}
 _setinfo = {
     'title', 'originaltitle', 'tvshowtitle', 'plot', 'rating', 'votes', 'premiered', 'year', 'imdbnumber', 'tagline',
     'status', 'episode', 'season', 'genre', 'set', 'studio', 'country', 'MPAA', 'director', 'writer', 'trailer', 'top250'}
 _setprop = {
     'tvdb_id', 'tvshow.tvdb_id', 'tvshow.tmdb_id', 'tvshow.imdb_id', 'biography', 'birthday', 'age', 'deathday',
     'character', 'department', 'job', 'known_for', 'role', 'born', 'creator', 'aliases', 'budget', 'revenue',
-    'set.tmdb_id', 'set.name', 'set.poster', 'set.fanart',
+    'set.tmdb_id', 'set.name', 'set.poster', 'set.fanart'}
+_setprop_ratings = {
     'awards', 'metacritic_rating', 'imdb_rating', 'imdb_votes', 'rottentomatoes_rating', 'rottentomatoes_image',
     'rottentomatoes_reviewtotal', 'rottentomatoes_reviewsfresh', 'rottentomatoes_reviewsrotten',
     'rottentomatoes_consensus', 'rottentomatoes_usermeter', 'rottentomatoes_userreviews', 'trakt_rating', 'trakt_votes',
@@ -212,22 +214,24 @@ class ServiceMonitor(Plugin):
         self.query = utils.try_decode_string(self.query)
         return u'{0}.{1}.{2}.{3}.{4}'.format(self.imdb_id, self.query, self.year, self.season, self.episode)
 
-    def is_same_item(self):
+    def is_same_item(self, update=True, pre_item=None):
+        pre_item = pre_item or self.pre_item
         self.cur_item = self.get_cur_item()
-        if self.cur_item == self.pre_item:
+        if self.cur_item == pre_item:
             return self.cur_item
-        self.pre_item = self.cur_item
+        if update:
+            self.pre_item = self.cur_item
 
     def get_artwork(self, source=''):
         source = source or self.home.getProperty('TMDbHelper.Blur.SourceImage')
         source = source.lower()
-        infolabels = ['Art(thumb)', 'Icon']
+        infolabels = ['Art(thumb)']
         if source == 'poster':
-            infolabels = ['Art(tvshow.poster)', 'Art(poster)', 'Art(thumb)', 'Icon']
+            infolabels = ['Art(tvshow.poster)', 'Art(poster)', 'Art(thumb)']
         elif source == 'fanart':
-            infolabels = ['Art(fanart)', 'Art(thumb)', 'Icon']
+            infolabels = ['Art(fanart)', 'Art(thumb)']
         elif source == 'landscape':
-            infolabels = ['Art(landscape)', 'Art(fanart)', 'Art(thumb)', 'Icon']
+            infolabels = ['Art(landscape)', 'Art(fanart)', 'Art(thumb)']
         fallback = self.home.getProperty('TMDbHelper.Blur.Fallback')
         for i in infolabels:
             artwork = self.get_infolabel(i)
@@ -272,29 +276,65 @@ class ServiceMonitor(Plugin):
 
             tmdb_id = self.get_tmdb_id(tmdbtype, self.imdb_id, self.query, self.year if tmdbtype == 'movie' else None)
             details = self.tmdb.get_detailed_item(tmdbtype, tmdb_id, season=self.season, episode=self.episode)
-            if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisablePersonStats)"):
-                details = self.get_kodi_person_stats(details) if tmdbtype == 'person' else details
-            details = self.get_omdb_ratings(details) if tmdbtype == 'movie' else details
-            details = self.get_top250_rank(details) if tmdbtype == 'movie' else details
-            details = self.get_trakt_ratings(details, tmdbtype, tmdb_id, self.season, self.episode) if tmdbtype in ['movie', 'tv'] else details
-            if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
-                details = self.get_fanarttv_artwork(details, tmdbtype)
-                details = self.get_kodi_artwork(details, self.dbtype, self.dbid) if self.addon.getSettingBool('local_db') else details
 
             if not details or not self.is_same_item():
                 self.clear_properties()  # No details or the item changed so let's clear everything
                 return
+
+            if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisablePersonStats)"):
+                details = self.get_kodi_person_stats(details) if tmdbtype == 'person' else details
+
+            if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"):
+                thread_ratings = Thread(target=self.process_ratings, args=[details, tmdbtype, tmdb_id])
+                thread_ratings.start()
+
+            if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
+                thread_artwork = Thread(target=self.process_artwork, args=[details, tmdbtype])
+                thread_artwork.start()
 
             self.set_properties(details)
 
         except Exception as exc:
             utils.kodi_log(u'Func: get_listitem\n{0}'.format(exc), 1)
 
+    def process_ratings(self, details, tmdbtype, tmdb_id):
+        try:
+            if tmdbtype not in ['movie', 'tv']:
+                return
+            pre_item = self.pre_item
+            details = self.get_omdb_ratings(details) if tmdbtype == 'movie' else details
+            details = self.get_top250_rank(details) if tmdbtype == 'movie' else details
+            details = self.get_trakt_ratings(details, tmdbtype, tmdb_id, self.season, self.episode) if tmdbtype in ['movie', 'tv'] else details
+            if not self.is_same_item(update=False, pre_item=pre_item):
+                self.clear_property_list(_setprop_ratings)
+                return
+            self.set_iter_properties(details.get('infoproperties', {}), _setprop_ratings)
+        except Exception as exc:
+            utils.kodi_log(u'Func: process_ratings\n{}'.format(exc), 1)
+
+    def process_artwork(self, details, tmdbtype):
+        try:
+            if self.dbtype not in ['movies', 'tvshows', 'episodes'] and tmdbtype not in ['movie', 'tv']:
+                return
+            pre_item = self.pre_item
+            details = self.get_fanarttv_artwork(details, tmdbtype)
+            details = self.get_kodi_artwork(details, self.dbtype, self.dbid) if self.addon.getSettingBool('local_db') else details
+            if not self.is_same_item(update=False, pre_item=pre_item):
+                self.clear_property_list(_setmain_artwork)
+                return
+            self.set_iter_properties(details, _setmain_artwork)
+        except Exception as exc:
+            utils.kodi_log(u'Func: process_ratings\n{}'.format(exc), 1)
+
     def clear_property(self, key):
         try:
             self.home.clearProperty('TMDbHelper.ListItem.{0}'.format(key))
         except Exception as exc:
             utils.kodi_log(u'Func: clear_property\n{0}{1}'.format(key, exc), 1)
+
+    def clear_property_list(self, properties):
+        for k in properties:
+            self.clear_property(k)
 
     def clear_properties(self):
         for k in self.properties:
@@ -317,7 +357,7 @@ class ServiceMonitor(Plugin):
 
         indxprops = set()
         for k, v in dictionary.items():
-            if k in self.properties:
+            if k in self.properties or k in _setprop_ratings or k in _setmain_artwork:
                 continue
             try:
                 v = v or ''

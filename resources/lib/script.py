@@ -477,7 +477,7 @@ class Script(Plugin):
             containers.append('')
             li_a = variable.get('listitems', {}).get('start', 0)
             li_z = variable.get('listitems', {}).get('end')
-            listitems = [i for i in range(li_a, li_z)] if li_z else []
+            listitems = [i for i in range(li_a, int(li_z) + 1)] if li_z else []
             listitems.append('')
             for container in containers:
                 for listitem in listitems:
