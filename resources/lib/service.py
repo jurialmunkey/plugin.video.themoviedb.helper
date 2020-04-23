@@ -274,6 +274,9 @@ class ServiceMonitor(Plugin):
 
             self.home.setProperty('TMDbHelper.IsUpdating', 'True')
 
+            self.clear_property_list(_setprop_ratings)
+            self.clear_property_list(_setmain_artwork)
+
             tmdb_id = self.get_tmdb_id(tmdbtype, self.imdb_id, self.query, self.year if tmdbtype == 'movie' else None)
             details = self.tmdb.get_detailed_item(tmdbtype, tmdb_id, season=self.season, episode=self.episode)
 
@@ -299,7 +302,6 @@ class ServiceMonitor(Plugin):
 
     def process_ratings(self, details, tmdbtype, tmdb_id):
         try:
-            self.clear_property_list(_setprop_ratings)
             if tmdbtype not in ['movie', 'tv']:
                 return
             pre_item = self.pre_item
@@ -314,7 +316,6 @@ class ServiceMonitor(Plugin):
 
     def process_artwork(self, details, tmdbtype):
         try:
-            self.clear_property_list(_setmain_artwork)
             if self.dbtype not in ['movies', 'tvshows', 'episodes'] and tmdbtype not in ['movie', 'tv']:
                 return
             pre_item = self.pre_item
