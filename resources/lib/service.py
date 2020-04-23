@@ -299,6 +299,7 @@ class ServiceMonitor(Plugin):
 
     def process_ratings(self, details, tmdbtype, tmdb_id):
         try:
+            self.clear_property_list(_setprop_ratings)
             if tmdbtype not in ['movie', 'tv']:
                 return
             pre_item = self.pre_item
@@ -306,7 +307,6 @@ class ServiceMonitor(Plugin):
             details = self.get_top250_rank(details) if tmdbtype == 'movie' else details
             details = self.get_trakt_ratings(details, tmdbtype, tmdb_id, self.season, self.episode) if tmdbtype in ['movie', 'tv'] else details
             if not self.is_same_item(update=False, pre_item=pre_item):
-                self.clear_property_list(_setprop_ratings)
                 return
             self.set_iter_properties(details.get('infoproperties', {}), _setprop_ratings)
         except Exception as exc:
@@ -314,13 +314,13 @@ class ServiceMonitor(Plugin):
 
     def process_artwork(self, details, tmdbtype):
         try:
+            self.clear_property_list(_setmain_artwork)
             if self.dbtype not in ['movies', 'tvshows', 'episodes'] and tmdbtype not in ['movie', 'tv']:
                 return
             pre_item = self.pre_item
             details = self.get_fanarttv_artwork(details, tmdbtype)
             details = self.get_kodi_artwork(details, self.dbtype, self.dbid) if self.addon.getSettingBool('local_db') else details
             if not self.is_same_item(update=False, pre_item=pre_item):
-                self.clear_property_list(_setmain_artwork)
                 return
             self.set_iter_properties(details, _setmain_artwork)
         except Exception as exc:
