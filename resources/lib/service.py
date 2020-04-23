@@ -252,9 +252,10 @@ class ServiceMonitor(Plugin):
                 return  # Parent folder so clear properties and don't do look-up
 
             # Blur Image
-            self.blur_img = BlurImage(artwork=self.get_artwork())
-            self.blur_img.setName('blur_img')
-            self.blur_img.start()
+            if xbmc.getCondVisibility("Skin.HasSetting(TMDbHelper.EnableBlur)"):
+                self.blur_img = BlurImage(artwork=self.get_artwork())
+                self.blur_img.setName('blur_img')
+                self.blur_img.start()
 
             if self.dbtype in ['tvshows', 'seasons', 'episodes']:
                 tmdbtype = 'tv'
