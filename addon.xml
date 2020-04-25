@@ -17,45 +17,45 @@ provider-name="jurialmunkey">
 <extension point="kodi.context.item">
   <menu id="kodi.core.main">
     <menu>
-      <label>TMDbHelper Options</label>
+      <label>$ADDON[plugin.video.themoviedb.helper 32145]</label>
       <item library="context-play.py">
-        <label>Play Using</label>
+        <label>$ADDON[plugin.video.themoviedb.helper 32146]</label>
         <visible>[String.IsEqual(ListItem.dbtype,episode) + !String.IsEmpty(ListItem.Property(tvshow.tmdb_id)) + !String.IsEmpty(ListItem.Season) + !String.IsEmpty(ListItem.Episode)] | [String.IsEqual(ListItem.dbtype,movie) + !String.IsEmpty(ListItem.Property(tmdb_id))] </visible>
       </item>
       <item library="context-open.py">
-        <label>Browse Seasons</label>
+        <label>$ADDON[plugin.video.themoviedb.helper 32147]</label>
         <visible>String.IsEqual(ListItem.dbtype,episode) + !String.IsEmpty(ListItem.Property(tvshow.tmdb_id))</visible>
       </item>
       <item library="context-watchlist.py">
-        <label>Add/Remove from Trakt Watchlist</label>
+        <label>$ADDON[plugin.video.themoviedb.helper 32148]</label>
         <visible>!String.IsEmpty(ListItem.Property(Container.Info)) + !String.IsEmpty(Window(Home).Property(TMDbHelper.TraktIsAuth)) + !String.IsEmpty(ListItem.Property(tmdb_id)) + [String.IsEqual(ListItem.dbtype,episode) | String.IsEqual(ListItem.dbtype,movie) | String.IsEqual(ListItem.dbtype,tvshow)]</visible>
       </item>
       <item library="context-history.py">
-        <label>Add/Remove from Trakt History</label>
+        <label>$ADDON[plugin.video.themoviedb.helper 32149]</label>
         <visible>!String.IsEmpty(ListItem.Property(Container.Info)) + !String.IsEmpty(Window(Home).Property(TMDbHelper.TraktIsAuth)) + !String.IsEmpty(ListItem.Property(tmdb_id)) + [String.IsEqual(ListItem.dbtype,episode) | String.IsEqual(ListItem.dbtype,movie) | String.IsEqual(ListItem.dbtype,tvshow)]</visible>
       </item>
       <item library="context-collection.py">
-        <label>Add/Remove from Trakt Collection</label>
+        <label>$ADDON[plugin.video.themoviedb.helper 32150]</label>
         <visible>!String.IsEmpty(ListItem.Property(Container.Info)) + !String.IsEmpty(Window(Home).Property(TMDbHelper.TraktIsAuth)) + !String.IsEmpty(ListItem.Property(tmdb_id)) + [String.IsEqual(ListItem.dbtype,episode) | String.IsEqual(ListItem.dbtype,movie) | String.IsEqual(ListItem.dbtype,tvshow)]</visible>
       </item>
       <item library="context-library.py">
-        <label>Add to Kodi Library</label>
+        <label>$ADDON[plugin.video.themoviedb.helper 32151]</label>
         <visible>!String.IsEmpty(ListItem.Property(Container.Info)) + !String.IsEmpty(ListItem.Property(tmdb_id)) + [String.IsEqual(ListItem.dbtype,episode) | String.IsEqual(ListItem.dbtype,movie) | String.IsEqual(ListItem.dbtype,tvshow) | String.IsEqual(ListItem.dbtype,season)]</visible>
       </item>
       <item library="context-library-userlist.py">
-        <label>Add to Kodi Library</label>
+        <label>$ADDON[plugin.video.themoviedb.helper 32151]</label>
         <visible>!String.IsEmpty(ListItem.Property(Container.Info)) + String.IsEqual(ListItem.Property(Item.Info),trakt_userlist)</visible>
       </item>
       <item library="context-addtouserlist.py">
-        <label>Add to Trakt List</label>
+        <label>$ADDON[plugin.video.themoviedb.helper 32140]</label>
         <visible>!String.IsEmpty(Window(Home).Property(TMDbHelper.TraktIsAuth)) + [String.IsEqual(ListItem.dbtype,episode) | String.IsEqual(ListItem.dbtype,movie) | String.IsEqual(ListItem.dbtype,tvshow)] + [!String.IsEmpty(ListItem.Property(tmdb_id)) | !String.IsEmpty(ListItem.DBID)]</visible>
       </item>
       <item library="context-removefromuserlist.py">
-        <label>Remove from list</label>
+        <label>$ADDON[plugin.video.themoviedb.helper 32152]</label>
         <visible>!String.IsEmpty(Window(Home).Property(TMDbHelper.TraktIsAuth)) + !String.IsEmpty(Window(Home).Property(TMDbHelper.TraktUserSlug)) + !String.IsEmpty(ListItem.Property(Container.User_Slug)) + !String.IsEmpty(ListItem.Property(Container.List_Slug)) + String.IsEqual(Window(Home).Property(TMDbHelper.TraktUserSlug),ListItem.Property(Container.User_Slug))</visible>
       </item>
       <item library="context-refresh-item.py">
-        <label>Refresh cached details</label>
+        <label>$ADDON[plugin.video.themoviedb.helper 32153]</label>
         <visible>!String.IsEmpty(ListItem.Property(Container.Info)) + !String.IsEmpty(ListItem.Property(tmdb_id)) + [String.IsEqual(ListItem.dbtype,episode) | String.IsEqual(ListItem.dbtype,movie) | String.IsEqual(ListItem.dbtype,tvshow)]</visible>
       </item>
     </menu>
@@ -72,6 +72,5 @@ provider-name="jurialmunkey">
     <screenshot>resources/screenshot-01.jpg</screenshot>
     <screenshot>resources/screenshot-02.jpg</screenshot>
   </assets>
-  <news>2.4.36 - Fixes for service monitor stop clearing some props[CR]2.4.35 - Split variable constructor into own script[CR]2.4.34 - Threaded service monitor[CR]2.4.33 - Service monitor blur function[CR]2.4.31/2 - Variable constructor[CR]2.4.30 - Fix issue with setting artwork when no thumb set[CR]2.4.29 - Some logging[CR]2.4.28 - Allow disabling some parts of service monitor[CR]2.4.27 - Improvements to upnext and activity caching. Fixes for episode context menu items[CR]2.4.26 - Option to hide watched in widget[CR]2.4.23/4 - Autoup Fixes[CR]2.4.22 - Fix Cron Job[CR]2.4.21 - Add in-progress movies section[CR]2.4.20 - Special sort for Next Page item[CR]2.4.19 - Add second list to monitor[CR]2.4.18 - Add simple split value function[CR]2.4.17 - Remove from list context option and other various improvements to list management[CR]2.4.16 - Trakt list monitor[CR]2.4.15 - Add to Trakt User List context menu option[CR]2.4.13/14 - Fixes[CR]2.4.12 - Fix busy spinner[CR]2.4.11 - Logging unicode fixes[CR]2.4.10 - Fix for KodiDB not being ready on startup[CR]2.4.9 - Generate smart playlist when adding trakt list to library[CR]2.4.8 - Better DBID matching and artwork for next aired[CR]2.4.7 - Better ID matching (remove need for fuzzy matches)[CR]2.4.6 - Allow regex matching[CR]2.4.5 - Change folder path selector to filemanager source[CR]2.4.4 - Check that items aren't in library before adding[CR]2.4.3 - Add prioritise local files option[CR]2.4.2 - Switch to using extendedprogressbar for trakt list adding[CR]2.4.1 - Add quote encoded method in addition to quote_plus for player[CR]2.4.0 - Add context menu option to add complete Trakt user list to library[CR]2.3.6 - Better ID matching for calendar and lists[CR]2.3.5 - Remove TMDb Rate Limiter since API has now removed rate limits[CR]2.3.4 - Fix encoding error[CR]2.3.3 - Add params to Container.Property(Param.{})[CR]2.3.2 - Add ListItem.Property(item.info) and ListItem.Property(item.type) [CR] 2.3.1 - Add ListItem.Property(container.info) and ListItem.Property(container.type)[CR]2.3.0 - New Awards properties</news>
 </extension>
 </addon>
