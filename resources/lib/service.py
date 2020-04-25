@@ -71,6 +71,7 @@ class BlurImage(Thread):
                 img = img.convert('RGB')
                 img = img.filter(ImageFilter.GaussianBlur(self.radius))
                 img.save(destination)
+                img.close()
 
             return destination
 

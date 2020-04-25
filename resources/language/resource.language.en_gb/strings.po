@@ -727,6 +727,51 @@ msgctxt "#32144"
 msgid "Refresh TheMovieDb Details"
 msgstr ""
 
+#: /addon.xml
+msgctxt "#32145"
+msgid "TMDbHelper Options"
+msgstr ""
+
+#: /addon.xml
+msgctxt "#32146"
+msgid "Play Using"
+msgstr ""
+
+#: /addon.xml
+msgctxt "#32147"
+msgid "Browse Seasons"
+msgstr ""
+
+#: /addon.xml
+msgctxt "#32148"
+msgid "Add/Remove from Trakt Watchlist"
+msgstr ""
+
+#: /addon.xml
+msgctxt "#32149"
+msgid "Add/Remove from Trakt History"
+msgstr ""
+
+#: /addon.xml
+msgctxt "#32150"
+msgid "Add/Remove from Trakt Collection"
+msgstr ""
+
+#: /addon.xml
+msgctxt "#32151"
+msgid "Add to Kodi Library"
+msgstr ""
+
+#: /addon.xml
+msgctxt "#32152"
+msgid "Remove from list"
+msgstr ""
+
+#: /addon.xml
+msgctxt "#32153"
+msgid "Refresh cached details"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
