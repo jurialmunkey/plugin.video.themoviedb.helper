@@ -171,14 +171,15 @@ class ServiceMonitor(Plugin):
             # skip when modal dialogs are opened (e.g. textviewer in musicinfo dialog)
             elif xbmc.getCondVisibility(
                     "Window.IsActive(DialogSelect.xml) | Window.IsActive(progressdialog) | "
-                    "Window.IsActive(contextmenu) | Window.IsActive(busydialog)"):
+                    "Window.IsActive(contextmenu) | Window.IsActive(busydialog) | Window.IsActive(shutdownmenu)"):
                 self.kodimonitor.waitForAbort(2)
 
             # skip when container scrolling
             elif xbmc.getCondVisibility(
                     "Container.OnScrollNext | Container.OnScrollPrevious | Container.Scrolling"):
                 if (self.properties or self.indxproperties) and self.get_cur_item() != self.pre_item:
-                    self.clear_properties()
+                    ignorekeys = _setmain_artwork if self.dbtype in ['episodes', 'seasons'] else None
+                    self.clear_properties(ignorekeys=ignorekeys)
                 self.kodimonitor.waitForAbort(1)  # Maybe clear props here too
 
             # media window is opened or widgetcontainer set - start listitem monitoring!
@@ -246,7 +247,7 @@ class ServiceMonitor(Plugin):
                 return  # Current item was the previous item so no need to do a look-up
 
             self.cur_folder = '{0}{1}{2}'.format(
-                self.container, xbmc.getInfoLabel(self.get_dbtype()),
+                self.container, self.get_dbtype(),
                 xbmc.getInfoLabel('{0}NumItems'.format(self.container)))
             if self.cur_folder != self.pre_folder:
                 self.clear_properties()  # Clear props if the folder changed
@@ -274,14 +275,24 @@ class ServiceMonitor(Plugin):
 
             self.home.setProperty('TMDbHelper.IsUpdating', 'True')
 
+            if self.dbtype not in ['episodes', 'seasons']:
+                self.clear_property_list(_setmain_artwork)
             self.clear_property_list(_setprop_ratings)
-            self.clear_property_list(_setmain_artwork)
 
             tmdb_id = self.get_tmdb_id(tmdbtype, self.imdb_id, self.query, self.year if tmdbtype == 'movie' else None)
             details = self.tmdb.get_detailed_item(tmdbtype, tmdb_id, season=self.season, episode=self.episode)
 
-            if not details or not self.is_same_item():
-                self.clear_properties()  # No details or the item changed so let's clear everything
+            if not details:
+                self.clear_properties()  # No details so lets clear everything
+                return
+
+            if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
+                thread_artwork = Thread(target=self.process_artwork, args=[details, tmdbtype])
+                thread_artwork.start()
+
+            if not self.is_same_item():
+                ignorekeys = _setmain_artwork if self.dbtype in ['episodes', 'seasons'] else None
+                self.clear_properties(ignorekeys=ignorekeys)  # Item changed so clear everything
                 return
 
             if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisablePersonStats)"):
@@ -290,10 +301,6 @@ class ServiceMonitor(Plugin):
             if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"):
                 thread_ratings = Thread(target=self.process_ratings, args=[details, tmdbtype, tmdb_id])
                 thread_ratings.start()
-
-            if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
-                thread_artwork = Thread(target=self.process_artwork, args=[details, tmdbtype])
-                thread_artwork.start()
 
             self.set_properties(details)
 
@@ -337,8 +344,9 @@ class ServiceMonitor(Plugin):
         for k in properties:
             self.clear_property(k)
 
-    def clear_properties(self):
-        for k in self.properties:
+    def clear_properties(self, ignorekeys=None):
+        ignorekeys = ignorekeys or set()
+        for k in self.properties - ignorekeys:
             self.clear_property(k)
         self.properties = set()
         for k in self.indxproperties:
@@ -431,7 +439,7 @@ class ServiceMonitor(Plugin):
 
     def get_dbtype(self):
         dbtype = xbmc.getInfoLabel('{0}DBTYPE'.format(self.containeritem))
-        dbtype = 'actor' if dbtype == 'video' and 'type=person' in xbmc.getInfoLabel('{0}FolderPath'.format(self.containeritem)) else dbtype
+        dbtype = 'actor' if dbtype == 'video' and xbmc.getInfoLabel('{0}Property(Container.Type)'.format(self.containeritem)) == 'person' else dbtype
         if xbmc.getCondVisibility("Window.IsVisible(DialogPVRInfo.xml) | Window.IsVisible(MyPVRChannels.xml) | Window.IsVisible(MyPVRGuide.xml)"):
             dbtype = 'tvshow'
         return '{0}s'.format(dbtype) if dbtype else xbmc.getInfoLabel('Container.Content()') or ''
