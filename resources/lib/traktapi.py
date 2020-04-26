@@ -382,13 +382,22 @@ class TraktAPI(RequestAPI):
         if not self.tmdb or not self.authorize():
             return items
 
-        date = datetime.date.today() + datetime.timedelta(days=startdate)
-        response = self.get_calendar('shows', True, start_date=date.strftime('%Y-%m-%d'), days=days)
+        mod_date = startdate - 1
+        mod_days = days + 2  # Broaden date range in case utc conversion bumps into different day
+        date = datetime.date.today() + datetime.timedelta(days=mod_date)
+        response = self.get_calendar('shows', True, start_date=date.strftime('%Y-%m-%d'), days=mod_days)
 
         if not response:
             return items
 
-        for i in response[-limit:]:
+        traktitems = reversed(response) if startdate < -1 else response  # Reverse items for date ranges in past
+
+        count = 0
+        for i in traktitems:
+            if not utils.date_in_range(i.get('first_aired'), utc_convert=True, start_date=startdate, days=days):
+                continue  # Don't add items that aren't in our timezone converted range
+            if count >= limit:
+                break  # Only add the limit
             episode = i.get('episode', {}).get('number')
             season = i.get('episode', {}).get('season')
             tmdb_id = i.get('show', {}).get('ids', {}).get('tmdb')
@@ -397,6 +406,7 @@ class TraktAPI(RequestAPI):
             item.tmdb_id, item.season, item.episode = tmdb_id, season, episode
             item = self.get_calendar_properties(item, i)
             items.append(item)
+            count += 1
         return items
 
     def get_upnext_cache_refresh(self, show_id, last_updated):
