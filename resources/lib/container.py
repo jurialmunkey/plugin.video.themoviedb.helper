@@ -558,8 +558,8 @@ class Container(Plugin):
         self.item_tmdbtype = 'episode'
         self.list_items(
             items=TraktAPI(tmdb=self.tmdb, login=True).get_calendar_episodes(
-                days=utils.try_parse_int(self.params.get('days')),
-                startdate=utils.try_parse_int(self.params.get('startdate'))),
+                days=utils.try_parse_int(self.params.get('days', 1)),
+                startdate=utils.try_parse_int(self.params.get('startdate', 0))),
             url={'info': 'details', 'type': 'episode'})
 
     def list_librarycalendar_episodes(self):
