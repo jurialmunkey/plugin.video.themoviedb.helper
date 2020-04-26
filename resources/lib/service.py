@@ -234,6 +234,8 @@ class ServiceMonitor(Plugin):
             infolabels = ['Art(fanart)', 'Art(thumb)']
         elif source == 'landscape':
             infolabels = ['Art(landscape)', 'Art(fanart)', 'Art(thumb)']
+        elif source and source != 'thumb':
+            infolabels = source.split("|")
         fallback = self.home.getProperty('TMDbHelper.Blur.Fallback')
         for i in infolabels:
             artwork = self.get_infolabel(i)
