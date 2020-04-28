@@ -727,9 +727,10 @@ class Container(Plugin):
         xbmcgui.Dialog().ok(dialog_header, dialog_text)
         self.updatelisting = True
 
-    def list_complete(self, limit=20):
+    def list_complete(self):
         self.item_tmdbtype = self.params.get('type')
 
+        limit = 20
         daily_list_type = None
         if self.item_tmdbtype == 'movie':
             daily_list_type = 'movie'
@@ -741,10 +742,13 @@ class Container(Plugin):
             daily_list_type = 'collection'
         elif self.item_tmdbtype == 'network':
             daily_list_type = 'tv_network'
+            limit = 250
         elif self.item_tmdbtype == 'keyword':
             daily_list_type = 'keyword'
+            limit = 250
         elif self.item_tmdbtype == 'studio':
             daily_list_type = 'production_company'
+            limit = 250
         if not daily_list_type:
             return
         daily_list = self.tmdb.get_daily_list(daily_list_type)
@@ -755,9 +759,19 @@ class Container(Plugin):
         for i in daily_list[pos_a:pos_z]:
             if not i.get('id'):
                 continue
-            item = ListItem(library=self.library, **self.tmdb.get_detailed_item(self.item_tmdbtype, i.get('id')))
+
+            if self.item_tmdbtype in ['keyword', 'network', 'studio']:
+                details = {}
+                details['label'] = i.get('name')
+                details['tmdb_id'] = i.get('id')
+            else:
+                details = self.tmdb.get_detailed_item(self.item_tmdbtype, i.get('id'))
+
+            item = ListItem(library=self.library, **details)
+
             if not item:
                 continue
+
             items.append(item)
         if not items:
             return
@@ -769,6 +783,12 @@ class Container(Plugin):
 
         if self.item_tmdbtype == 'collection':
             url = {'info': 'collection', 'type': 'movie'}
+        elif self.item_tmdbtype == 'keyword':
+            url = {'info': 'keyword_movies', 'type': 'movie'}
+        elif self.item_tmdbtype == 'studio':
+            url = {'info': 'discover', 'type': 'movie', 'with_companies': '{tmdb_id}', 'with_id': True}
+        elif self.item_tmdbtype == 'network':
+            url = {'info': 'discover', 'type': 'tv', 'with_networks': '{tmdb_id}', 'with_id': True}
         else:
             url = {'info': 'details', 'type': self.item_tmdbtype}
 
@@ -1142,7 +1162,13 @@ class Container(Plugin):
                     if xbmc.getCondVisibility("Window.IsMedia"):
                         url['nextpage'] = 'True'
 
-                    label = i.get('name').format('', '') if self.params.get('info') in ['dir_movie', 'dir_tv', 'dir_person'] else i.get('name').format(utils.type_convert(t, 'plural'), ' ')
+                    # Format label of items
+                    if i.get('info') == 'all_items':  # Special format info=all_items even if in specific type category
+                        label = i.get('name').format(utils.type_convert(t, 'plural'), ' ')
+                    elif self.params.get('info') in ['dir_movie', 'dir_tv', 'dir_person']:
+                        label = i.get('name').format('', '')
+                    else:
+                        label = i.get('name').format(utils.type_convert(t, 'plural'), ' ')
 
                     listitem = ListItem(label=label, icon=i.get('icon', '').format(self.addonpath))
                     listitem.set_url_props(self.params, 'container')
@@ -1193,7 +1219,7 @@ class Container(Plugin):
             self.list_becauseyouwatched()
         elif self.params.get('info') == 'trakt_becausemostwatched':
             self.list_becauseyouwatched(mostwatched=True)
-        elif self.params.get('info') == 'complete_list':
+        elif self.params.get('info') == 'all_items':
             self.list_complete()
         elif self.params.get('info') in constants.TMDB_LISTS:
             self.list_getid()

@@ -42,6 +42,21 @@ TYPE_CONVERSION = {
         'container': '',
         'trakt': '',
         'dbtype': ''},
+    'keyword': {
+        'plural': 'Keywords',
+        'container': '',
+        'trakt': '',
+        'dbtype': ''},
+    'network': {
+        'plural': 'TV Networks',
+        'container': '',
+        'trakt': '',
+        'dbtype': ''},
+    'studio': {
+        'plural': 'Movie Studios',
+        'container': '',
+        'trakt': '',
+        'dbtype': ''},
     'image': {
         'plural': 'Images',
         'container': 'images',
@@ -165,9 +180,9 @@ BASEDIR_TMDB = [
         'types': ['movie', 'tv'],
         'icon': '{0}/resources/poster.png'},
     {
-        'info': 'complete_list',
+        'info': 'all_items',
         'name': 'All{1}{0}',
-        'types': ['movie', 'tv', 'person', 'collection'],
+        'types': ['movie', 'tv', 'person', 'collection', 'keyword', 'network', 'studio'],
         'icon': '{0}/resources/poster.png'}]
 
 BASEDIR_TRAKT = [
@@ -339,16 +354,16 @@ BASEDIR_DISCOVER = [
 BASEDIR_PATH = {
     'dir_movie': {
         'folders': [BASEDIR_TMDB, BASEDIR_TRAKT],
-        'types': ['movie', 'both']},
+        'types': ['movie', 'both', 'collection', 'studio', 'keyword']},
     'dir_tv': {
         'folders': [BASEDIR_TMDB, BASEDIR_TRAKT],
-        'types': ['tv', 'both']},
+        'types': ['tv', 'both', 'network']},
     'dir_person': {
         'folders': [BASEDIR_TMDB, BASEDIR_TRAKT],
         'types': ['person']},
     'dir_tmdb': {
         'folders': [BASEDIR_TMDB],
-        'types': ['movie', 'tv', 'person', 'both', 'collection']},
+        'types': ['movie', 'tv', 'person', 'both', 'collection', 'keyword', 'network', 'studio']},
     'dir_trakt': {
         'folders': [BASEDIR_TRAKT],
         'types': ['movie', 'tv', 'person', 'both']},

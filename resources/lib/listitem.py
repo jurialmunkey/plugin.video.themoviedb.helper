@@ -50,6 +50,10 @@ class ListItem(object):
     def get_url(self, url, url_tmdb_id=None, widget=None, fanarttv=None, nextpage=None, extended=None):
         self.url = self.url or url.copy()
         self.url['tmdb_id'] = self.tmdb_id = url_tmdb_id or self.tmdb_id or self.url.get('tmdb_id')
+        if self.url.get('info') == 'discover':  # Special handling of discover url to pass tmdb_id
+            for k, v in self.url.items():
+                if isinstance(v, str):
+                    self.url[k] = v.format(tmdb_id=self.url.get('tmdb_id'))
         if self.mixed_type:
             self.url['type'] = self.mixed_type
             self.infolabels['mediatype'] = utils.type_convert(self.mixed_type, 'dbtype')
