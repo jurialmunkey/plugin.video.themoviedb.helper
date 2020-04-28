@@ -5,6 +5,7 @@ import xbmcvfs
 import xbmcgui
 import requests
 import zipfile
+import gzip
 import resources.lib.utils as utils
 from io import BytesIO
 try:  # Python 3
@@ -97,6 +98,20 @@ class Downloader(object):
                     self.recursive_delete_dir(file_path)
             except Exception as e:
                 utils.kodi_log(u'Could not delete file {0}: {1}'.format(file_path, str(e)))
+
+    def get_gzip_text(self):
+        if not self.download_url:
+            return
+
+        with utils.busy_dialog():
+            response = self.open_url(self.download_url)
+        if not response:
+            xbmcgui.Dialog().ok(self.addon.getAddonInfo('name'), self.addon.getLocalizedString(32058))
+            return
+
+        with gzip.GzipFile(fileobj=BytesIO(response.content)) as downloaded_gzip:
+            content = downloaded_gzip.read()
+        return content
 
     def get_extracted_zip(self):
         if not self.download_url or not self.extract_to:

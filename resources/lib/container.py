@@ -727,6 +727,55 @@ class Container(Plugin):
         xbmcgui.Dialog().ok(dialog_header, dialog_text)
         self.updatelisting = True
 
+    def list_complete(self, limit=20):
+        self.item_tmdbtype = self.params.get('type')
+
+        daily_list_type = None
+        if self.item_tmdbtype == 'movie':
+            daily_list_type = 'movie'
+        elif self.item_tmdbtype == 'tv':
+            daily_list_type = 'tv_series'
+        elif self.item_tmdbtype == 'person':
+            daily_list_type = 'person'
+        elif self.item_tmdbtype == 'collection':
+            daily_list_type = 'collection'
+        elif self.item_tmdbtype == 'network':
+            daily_list_type = 'tv_network'
+        elif self.item_tmdbtype == 'keyword':
+            daily_list_type = 'keyword'
+        elif self.item_tmdbtype == 'studio':
+            daily_list_type = 'production_company'
+        if not daily_list_type:
+            return
+        daily_list = self.tmdb.get_daily_list(daily_list_type)
+
+        items = []
+        pos_z = utils.try_parse_int(self.params.get('page', 1)) * limit
+        pos_a = pos_z - limit
+        for i in daily_list[pos_a:pos_z]:
+            if not i.get('id'):
+                continue
+            item = ListItem(library=self.library, **self.tmdb.get_detailed_item(self.item_tmdbtype, i.get('id')))
+            if not item:
+                continue
+            items.append(item)
+        if not items:
+            return
+
+        if len(daily_list) > pos_z:  # Long list so paginate
+            items.append(ListItem(
+                library=self.library, label=xbmc.getLocalizedString(33078),
+                nextpage=utils.try_parse_int(self.params.get('page', 1)) + 1))
+
+        if self.item_tmdbtype == 'collection':
+            url = {'info': 'collection', 'type': 'movie'}
+        else:
+            url = {'info': 'details', 'type': self.item_tmdbtype}
+
+        self.plugincategory = self.params.get('plugincategory') or self.plugincategory
+        self.dbid_sorting = False
+        self.list_items(items=items, url=url)
+
     def list_becauseyouwatched(self, mostwatched=False):
         traktapi = TraktAPI(tmdb=self.tmdb, login=True)
         userslug = traktapi.get_usernameslug()
@@ -1144,6 +1193,8 @@ class Container(Plugin):
             self.list_becauseyouwatched()
         elif self.params.get('info') == 'trakt_becausemostwatched':
             self.list_becauseyouwatched(mostwatched=True)
+        elif self.params.get('info') == 'complete_list':
+            self.list_complete()
         elif self.params.get('info') in constants.TMDB_LISTS:
             self.list_getid()
             self.list_tmdb()
