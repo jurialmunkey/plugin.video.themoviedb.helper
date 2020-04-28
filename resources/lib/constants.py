@@ -32,6 +32,11 @@ TYPE_CONVERSION = {
         'container': 'actors',
         'trakt': '',
         'dbtype': 'video'},
+    'collection': {
+        'plural': 'Collections',
+        'container': 'sets',
+        'trakt': '',
+        'dbtype': 'set'},
     'review': {
         'plural': 'Reviews',
         'container': '',
@@ -158,6 +163,11 @@ BASEDIR_TMDB = [
         'info': 'most_voted',
         'name': 'Most Voted{1}{0}',
         'types': ['movie', 'tv'],
+        'icon': '{0}/resources/poster.png'},
+    {
+        'info': 'complete_list',
+        'name': 'All{1}{0}',
+        'types': ['movie', 'tv', 'person', 'collection'],
         'icon': '{0}/resources/poster.png'}]
 
 BASEDIR_TRAKT = [
@@ -338,7 +348,7 @@ BASEDIR_PATH = {
         'types': ['person']},
     'dir_tmdb': {
         'folders': [BASEDIR_TMDB],
-        'types': ['movie', 'tv', 'person', 'both']},
+        'types': ['movie', 'tv', 'person', 'both', 'collection']},
     'dir_trakt': {
         'folders': [BASEDIR_TRAKT],
         'types': ['movie', 'tv', 'person', 'both']},
