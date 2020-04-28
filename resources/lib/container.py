@@ -727,6 +727,30 @@ class Container(Plugin):
         xbmcgui.Dialog().ok(dialog_header, dialog_text)
         self.updatelisting = True
 
+    def list_downloader(self, limit=20):
+        items = []
+        tmdbtype = 'collection'
+        pos_z = utils.try_parse_int(self.params.get('page', 1)) * limit
+        pos_a = pos_z - limit
+        daily_list = self.tmdb.get_daily_list('collection')
+        for i in daily_list[pos_a:pos_z]:
+            if not i.get('id'):
+                continue
+            item = ListItem(library=self.library, **self.tmdb.get_detailed_item(tmdbtype, i.get('id')))
+            if not item:
+                continue
+            items.append(item)
+        if not items:
+            return
+        if len(daily_list) > pos_z:  # Long list so paginate
+            items.append(ListItem(
+                library=self.library, label=xbmc.getLocalizedString(33078),
+                nextpage=utils.try_parse_int(self.params.get('page', 1)) + 1))
+        self.plugincategory = self.params.get('plugincategory') or self.plugincategory
+        self.dbid_sorting = False
+        self.item_tmdbtype = tmdbtype
+        self.list_items(items=items, url={'info': 'details', 'type': self.item_tmdbtype})
+
     def list_becauseyouwatched(self, mostwatched=False):
         traktapi = TraktAPI(tmdb=self.tmdb, login=True)
         userslug = traktapi.get_usernameslug()
@@ -1144,6 +1168,8 @@ class Container(Plugin):
             self.list_becauseyouwatched()
         elif self.params.get('info') == 'trakt_becausemostwatched':
             self.list_becauseyouwatched(mostwatched=True)
+        elif self.params.get('info') == 'download_list':
+            self.list_downloader()
         elif self.params.get('info') in constants.TMDB_LISTS:
             self.list_getid()
             self.list_tmdb()

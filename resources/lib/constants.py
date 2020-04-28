@@ -158,6 +158,11 @@ BASEDIR_TMDB = [
         'info': 'most_voted',
         'name': 'Most Voted{1}{0}',
         'types': ['movie', 'tv'],
+        'icon': '{0}/resources/poster.png'},
+    {
+        'info': 'download_list',
+        'name': 'All{1}{0}',
+        'types': ['movie', 'tv', 'person'],
         'icon': '{0}/resources/poster.png'}]
 
 BASEDIR_TRAKT = [
