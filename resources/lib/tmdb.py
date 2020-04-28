@@ -393,18 +393,19 @@ class TMDb(RequestAPI):
         else:
             return False
 
-    def get_downloaded_list(self, export_list=None):
+    def get_downloaded_list(self, export_list=None, sorting=False):
         if not export_list:
             return
         date = datetime.datetime.now() - datetime.timedelta(days=2)
         download_url = 'https://files.tmdb.org/p/exports/{}_ids_{}.json.gz'.format(export_list, date.strftime("%m_%d_%Y"))
-        return [loads(i) for i in Downloader(download_url=download_url).get_gzip_text().splitlines()]
+        raw_list = [loads(i) for i in Downloader(download_url=download_url).get_gzip_text().splitlines()]
+        return sorted(raw_list, key=lambda k: k.get('name', '')) if sorting else raw_list
 
-    def get_daily_list(self, export_list=None):
+    def get_daily_list(self, export_list=None, sorting=False):
         if not export_list:
             return
-        cache_name = u'{}.TMDb.Downloader.v3'.format(self.cache_name)
-        return self.use_cache(self.get_downloaded_list, cache_name=cache_name, cache_days=self.cache_long, export_list=export_list)
+        cache_name = u'{}.TMDb.Downloader.v4'.format(self.cache_name)
+        return self.use_cache(self.get_downloaded_list, cache_name=cache_name, cache_days=self.cache_long, export_list=export_list, sorting=sorting)
 
     def get_detailed_item(self, itemtype, tmdb_id, season=None, episode=None, cache_only=False, cache_refresh=False):
         if not itemtype or not tmdb_id:

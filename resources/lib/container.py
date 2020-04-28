@@ -732,6 +732,7 @@ class Container(Plugin):
 
         limit = 20
         daily_list_type = None
+        sorting = False
         if self.item_tmdbtype == 'movie':
             daily_list_type = 'movie'
         elif self.item_tmdbtype == 'tv':
@@ -742,16 +743,19 @@ class Container(Plugin):
             daily_list_type = 'collection'
         elif self.item_tmdbtype == 'network':
             daily_list_type = 'tv_network'
+            sorting = True
             limit = 250
         elif self.item_tmdbtype == 'keyword':
             daily_list_type = 'keyword'
+            sorting = True
             limit = 250
         elif self.item_tmdbtype == 'studio':
             daily_list_type = 'production_company'
+            sorting = True
             limit = 250
         if not daily_list_type:
             return
-        daily_list = self.tmdb.get_daily_list(daily_list_type)
+        daily_list = self.tmdb.get_daily_list(export_list=daily_list_type, sorting=False)
 
         items = []
         pos_z = utils.try_parse_int(self.params.get('page', 1)) * limit
@@ -773,8 +777,11 @@ class Container(Plugin):
                 continue
 
             items.append(item)
+
         if not items:
             return
+
+        items = sorted(items, key=lambda k: k.label) if sorting else items
 
         if len(daily_list) > pos_z:  # Long list so paginate
             items.append(ListItem(
