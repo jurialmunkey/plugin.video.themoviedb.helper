@@ -397,9 +397,7 @@ class TMDb(RequestAPI):
         if not export_list:
             return
         date = datetime.datetime.now() - datetime.timedelta(days=2)
-        date_str = date.strftime("%m_%d_%Y")
-        download_url = 'https://files.tmdb.org/p/exports/{}_ids_{}.json.gz'.format(export_list, date_str)
-        utils.kodi_log(download_url, 1)
+        download_url = 'https://files.tmdb.org/p/exports/{}_ids_{}.json.gz'.format(export_list, date.strftime("%m_%d_%Y"))
         return [loads(i) for i in Downloader(download_url=download_url).get_gzip_text().splitlines()]
 
     def get_daily_list(self, export_list=None):
