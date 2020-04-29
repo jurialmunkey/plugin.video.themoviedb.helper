@@ -5,11 +5,6 @@ import xbmcplugin
 import resources.lib.utils as utils
 from resources.lib.kodilibrary import KodiLibrary
 
-try:
-    from urllib.parse import urlencode  # Py3
-except ImportError:
-    from urllib import urlencode  # Py2
-
 
 class ListItem(object):
     def __init__(self, label=None, label2=None, dbtype=None, library=None, tmdb_id=None, imdb_id=None, dbid=None, tvdb_id=None,
@@ -44,8 +39,8 @@ class ListItem(object):
         self.extrafanart = extrafanart or {}
 
     def set_url(self, **kwargs):
-        url = kwargs.pop('url', 'plugin://plugin.video.themoviedb.helper/?')
-        return u'{0}{1}'.format(url, urlencode(kwargs))
+        url = kwargs.pop('url', u'plugin://plugin.video.themoviedb.helper/?')
+        return u'{0}{1}'.format(url, utils.urlencode_params(kwargs))
 
     def get_url(self, url, url_tmdb_id=None, widget=None, fanarttv=None, nextpage=None, extended=None):
         self.url = self.url or url.copy()

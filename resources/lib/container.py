@@ -11,11 +11,6 @@ from resources.lib.traktapi import TraktAPI
 from resources.lib.listitem import ListItem
 from resources.lib.kodilibrary import KodiLibrary
 from resources.lib.plugin import Plugin
-try:
-    from urllib.parse import parse_qsl, urlencode  # Py3
-except ImportError:
-    from urlparse import parse_qsl  # Py2
-    from urllib import urlencode
 
 
 class Container(Plugin):
@@ -23,7 +18,7 @@ class Container(Plugin):
         super(Container, self).__init__()
         self.handle = int(sys.argv[1])
         self.paramstring = utils.try_decode_string(sys.argv[2][1:])
-        self.params = dict(parse_qsl(self.paramstring))
+        self.params = utils.parse_paramstring(sys.argv[2][1:])
         self.item_tmdbtype = None
         self.item_dbtype = None
         self.url = {}
@@ -358,7 +353,7 @@ class Container(Plugin):
             self.new_property_label = old_label
             self.new_property_value = old_value
 
-        new_label = xbmcgui.Dialog().input(header)
+        new_label = utils.try_decode_string(xbmcgui.Dialog().input(header))
         if not new_label:
             return
 
@@ -457,8 +452,8 @@ class Container(Plugin):
         elif 'with_runtime' not in method and 'with_networks' not in method and any(i in method for i in ['with_', 'without_']):
             self.add_userdiscover_method_property(header, tmdbtype, usedetails, old_label=old_label, old_value=old_value)
         else:
-            self.new_property_label = self.new_property_value = xbmcgui.Dialog().input(
-                header, type=inputtype, defaultt=old_value)
+            self.new_property_label = self.new_property_value = utils.try_decode_string(
+                xbmcgui.Dialog().input(header, type=inputtype, defaultt=old_value))
 
     def set_userdiscover_sortby_property(self):
         sort_method_list = self.get_userdiscover_sortmethods()
@@ -894,7 +889,7 @@ class Container(Plugin):
     def list_search(self):
         if not self.params.get('query'):
             self.params['query'] = self.set_searchhistory(
-                query=xbmcgui.Dialog().input(self.addon.getLocalizedString(32044), type=xbmcgui.INPUT_ALPHANUM),
+                query=utils.try_decode_string(xbmcgui.Dialog().input(self.addon.getLocalizedString(32044), type=xbmcgui.INPUT_ALPHANUM)),
                 itemtype=self.params.get('type'))
         elif self.params.get('history', '').lower() == 'true':  # Param to force history save
             self.set_searchhistory(query=self.params.get('query'), itemtype=self.params.get('type'))
@@ -909,7 +904,7 @@ class Container(Plugin):
             self.params.pop('clearcache', '')
             self.set_searchhistory(itemtype=self.params.get('type'), clearcache=True)
             container_url = 'plugin://plugin.video.themoviedb.helper/?'
-            container_url = u'{0}{1}'.format(container_url, urlencode(self.params))
+            container_url = u'{0}{1}'.format(container_url, utils.urlencode_params(self.params))
 
         self.start_container()
         # Set our icon
@@ -996,7 +991,7 @@ class Container(Plugin):
         # Construct request
         cat = constants.TMDB_LISTS.get(self.params.get('info'), {})
         kwparams = utils.merge_two_dicts(utils.make_kwparams(self.params), kwargs)
-        kwparams = utils.merge_two_dicts(kwparams, dict(parse_qsl(cat.get('url_ext', '').format(**self.params))))
+        kwparams = utils.merge_two_dicts(kwparams, utils.parse_paramstring(cat.get('url_ext', '').format(**self.params)))
         kwparams.setdefault('key', cat.get('key'))
         path = cat.get('path', '').format(**self.params)
 
