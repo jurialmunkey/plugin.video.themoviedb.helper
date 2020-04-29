@@ -95,12 +95,12 @@ def try_parse_float(string):
         return 0
 
 
-def try_decode_string(string, encoding='utf-8'):
+def try_decode_string(string, encoding='utf-8', errors=None):
     """helper to decode strings for PY 2 """
     if sys.version_info.major == 3:
         return string
     try:
-        return string.decode(encoding)
+        return string.decode(encoding, errors) if errors else string.decode(encoding)
     except Exception:
         return string
 

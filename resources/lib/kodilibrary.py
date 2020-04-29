@@ -32,7 +32,8 @@ class KodiLibrary(object):
             "method": method,
             "id": 1}
         try:
-            response = json.loads(utils.try_decode_string(xbmc.executeJSONRPC(json.dumps(query))))
+            jrpc = xbmc.executeJSONRPC(json.dumps(query))
+            response = json.loads(utils.try_decode_string(jrpc, errors='ignore'))
         except Exception as exc:
             utils.kodi_log(u'TMDbHelper - JSONRPC Error:\n{}'.format(exc), 1)
             response = {}
