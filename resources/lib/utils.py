@@ -11,6 +11,10 @@ import hashlib
 from copy import copy
 from contextlib import contextmanager
 from resources.lib.constants import TYPE_CONVERSION, VALID_FILECHARS
+try:
+    from urllib.parse import urlencode, unquote_plus  # Py3
+except ImportError:
+    from urllib import urlencode, unquote_plus
 _addonlogname = '[plugin.video.themoviedb.helper]\n'
 _addon = xbmcaddon.Addon()
 _debuglogging = _addon.getSettingBool('debug_logging')
@@ -54,6 +58,25 @@ def md5hash(value):
 
 def type_convert(original, converted):
     return TYPE_CONVERSION.get(original, {}).get(converted, '')
+
+
+def parse_paramstring(paramstring):
+    """ helper to assist with difference in urllib modules in PY2/3 """
+    params = {}
+    for param in paramstring.split('&'):
+        if '=' not in param:
+            continue
+        k, v = param.split('=')
+        params[try_decode_string(unquote_plus(k))] = try_decode_string(unquote_plus(v))
+    return params
+
+
+def urlencode_params(kwparams):
+    """ helper to assist with difference in urllib modules in PY2/3 """
+    params = {}
+    for k, v in kwparams.items():
+        params[try_encode_string(k)] = try_encode_string(v)
+    return urlencode(params)
 
 
 def try_parse_int(string):
