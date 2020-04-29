@@ -11,7 +11,7 @@ class ListItem(object):
                  cast=None, infolabels=None, infoproperties=None, poster=None, thumb=None, icon=None, fanart=None, nextpage=None,
                  streamdetails=None, clearlogo=None, clearart=None, banner=None, landscape=None, discart=None, extrafanart=None,
                  tvshow_clearlogo=None, tvshow_clearart=None, tvshow_banner=None, tvshow_landscape=None, tvshow_poster=None,
-                 tvshow_dbid=None, mixed_type=None, url=None, is_folder=True):
+                 tvshow_fanart=None, tvshow_dbid=None, mixed_type=None, url=None, is_folder=True):
         self.addon = xbmcaddon.Addon()
         self.addonpath = self.addon.getAddonInfo('path')
         self.select_action = self.addon.getSettingInt('select_action')
@@ -23,7 +23,7 @@ class ListItem(object):
         self.tvdb_id = tvdb_id or ''  # IMDb ID for item
         self.poster, self.thumb = poster, thumb
         self.clearlogo, self.clearart, self.banner, self.landscape, self.discart = clearlogo, clearart, banner, landscape, discart
-        self.tvshow_clearlogo, self.tvshow_clearart, self.tvshow_banner, self.tvshow_landscape, self.tvshow_poster = tvshow_clearlogo, tvshow_clearart, tvshow_banner, tvshow_landscape, tvshow_poster
+        self.tvshow_clearlogo, self.tvshow_clearart, self.tvshow_banner, self.tvshow_landscape, self.tvshow_poster, self.tvshow_fanart = tvshow_clearlogo, tvshow_clearart, tvshow_banner, tvshow_landscape, tvshow_poster, tvshow_fanart
         self.url = url or {}
         self.mixed_type = mixed_type or ''
         self.streamdetails = streamdetails or {}
@@ -245,7 +245,7 @@ class ListItem(object):
         listitem.setArt(utils.merge_two_dicts({
             'thumb': self.thumb or self.icon, 'icon': self.icon, 'poster': self.poster, 'fanart': self.fanart, 'discart': self.discart,
             'clearlogo': self.clearlogo, 'clearart': self.clearart, 'landscape': self.landscape, 'banner': self.banner,
-            'tvshow.poster': self.tvshow_poster, 'tvshow.clearlogo': self.tvshow_clearlogo,
+            'tvshow.poster': self.tvshow_poster, 'tvshow.fanart': self.tvshow_fanart, 'tvshow.clearlogo': self.tvshow_clearlogo,
             'tvshow.clearart': self.tvshow_clearart, 'tvshow.landscape': self.tvshow_landscape,
             'tvshow.banner': self.tvshow_banner}, self.extrafanart))
         listitem.setCast(self.cast)
