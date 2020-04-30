@@ -193,6 +193,7 @@ class ListItem(object):
             return
 
         self.icon = details.get('icon') or self.icon
+        self.thumb = details.get('thumb') or self.thumb
         self.poster = details.get('poster') or self.poster
         self.fanart = details.get('fanart') or self.fanart
         self.landscape = details.get('landscape') or self.landscape
@@ -242,7 +243,7 @@ class ListItem(object):
         listitem.setInfo(self.library, self.infolabels)
         listitem.setProperties(self.infoproperties)
         listitem.setArt(utils.merge_two_dicts({
-            'thumb': self.thumb or self.fanart or self.icon, 'icon': self.icon, 'poster': self.poster, 'fanart': self.fanart, 'discart': self.discart,
+            'thumb': self.thumb or self.icon or self.fanart, 'icon': self.icon, 'poster': self.poster, 'fanart': self.fanart, 'discart': self.discart,
             'clearlogo': self.clearlogo, 'clearart': self.clearart, 'landscape': self.landscape, 'banner': self.banner,
             'tvshow.poster': self.tvshow_poster, 'tvshow.fanart': self.tvshow_fanart, 'tvshow.clearlogo': self.tvshow_clearlogo,
             'tvshow.clearart': self.tvshow_clearart, 'tvshow.landscape': self.tvshow_landscape,
