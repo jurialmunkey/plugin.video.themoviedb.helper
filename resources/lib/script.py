@@ -290,7 +290,7 @@ class Script(Plugin):
             if not tmdb_id:
                 utils.kodi_log(u'Unable to find TMDb ID!\nQuery: {0} Type: {1}'.format(self.params.get('add_query'), self.params.get('type')), 1)
                 return
-            url = 'plugin://plugin.video.themoviedb.helper/?info=details&amp;type={0}&amp;tmdb_id={1}'.format(self.params.get('type'), tmdb_id)
+            url = 'plugin://plugin.video.themoviedb.helper/?info=details&type={0}&tmdb_id={1}'.format(self.params.get('type'), tmdb_id)
             if url == self.home.getProperty(self.prefixcurrent):
                 return  # Already added so let's quit as user probably clicked twice
             self.position = self.get_position() + 1
