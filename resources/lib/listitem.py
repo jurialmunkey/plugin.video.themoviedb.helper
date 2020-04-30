@@ -193,7 +193,6 @@ class ListItem(object):
             return
 
         self.icon = details.get('icon') or self.icon
-        self.thumb = details.get('thumb') or self.thumb
         self.poster = details.get('poster') or self.poster
         self.fanart = details.get('fanart') or self.fanart
         self.landscape = details.get('landscape') or self.landscape
