@@ -213,7 +213,8 @@ class KodiLibrary(object):
 
     def get_niceitem(self, item, key):
         label = item.get('label') or ''
-        icon = thumb = item.get('thumbnail') or ''
+        icon = item.get('thumbnail') or ''
+        thumb = item.get('art', {}).get('thumb') or ''
         poster = item.get('art', {}).get('poster') or ''
         fanart = item.get('fanart') or item.get('art', {}).get('fanart') or ''
         landscape = item.get('art', {}).get('landscape') or ''
