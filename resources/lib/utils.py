@@ -63,6 +63,7 @@ def type_convert(original, converted):
 def parse_paramstring(paramstring):
     """ helper to assist with difference in urllib modules in PY2/3 """
     params = {}
+    paramstring = paramstring.replace('&amp;', '&')  # Just in case xml string
     for param in paramstring.split('&'):
         if '=' not in param:
             continue
