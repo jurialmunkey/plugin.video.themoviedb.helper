@@ -28,7 +28,7 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32075]" type="folder" id="tvshows_library" source="video" option="writeable" default="special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32076]" type="bool" id="auto_update" default="true" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32086]" type="bool" id="library_autoupdate" default="false" />
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32130]" subsetting="true" type="slider" id="library_autoupdate_interval" default="2" range="1,12" option="int" enable="eq(-1,True)" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32130]" subsetting="true" type="slider" id="library_autoupdate_interval" default="12" range="3,3,48" option="int" enable="eq(-1,True)" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32131]" subsetting="true" type="action" action="RunScript(plugin.video.themoviedb.helper,monitor_userlist=monitor_userlist)" id="monitor_userlist"  enable="eq(-2,True)"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32131]" subsetting="true" type="action" action="RunScript(plugin.video.themoviedb.helper,monitor_userlist=monitor_userlist_2)" id="monitor_userlist_2" visible="!eq(-1,)|!eq(0,)"  enable="eq(-3,True)"/>
         <setting label="$LOCALIZE[10039]" type="lsep"/>
