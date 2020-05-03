@@ -150,14 +150,18 @@ def play():
                 dbtype, tmdb_id))
 
 
-def library_userlist(user_slug=None, list_slug=None, confirmation_dialog=True, allow_update=True):
+def library_userlist(user_slug=None, list_slug=None, confirmation_dialog=True, allow_update=True, busy_dialog=True):
     user_slug = user_slug or sys.listitem.getProperty('Item.user_slug')
     list_slug = list_slug or sys.listitem.getProperty('Item.list_slug')
 
-    with utils.busy_dialog():
+    if busy_dialog:
+        with utils.busy_dialog():
+            request = TraktAPI().get_response_json('users', user_slug, 'lists', list_slug, 'items')
+    else:
         request = TraktAPI().get_response_json('users', user_slug, 'lists', list_slug, 'items')
-        if not request:
-            return
+
+    if not request:
+        return
 
     i_count = 0
     i_total = len(request)
@@ -171,8 +175,8 @@ def library_userlist(user_slug=None, list_slug=None, confirmation_dialog=True, a
         if not xbmcgui.Dialog().yesno(d_head, d_body):
             return
 
-    p_dialog = xbmcgui.DialogProgressBG()
-    p_dialog.create('TMDbHelper', 'Adding items to library...')
+    p_dialog = xbmcgui.DialogProgressBG() if busy_dialog else None
+    p_dialog.create('TMDbHelper', 'Adding items to library...') if p_dialog else None
     basedir_movie = _addon.getSettingString('movies_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/movies/'
     basedir_tv = _addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
     all_movies = []
@@ -199,10 +203,10 @@ def library_userlist(user_slug=None, list_slug=None, confirmation_dialog=True, a
             db_file = _plugin.get_db_info(info='file', tmdbtype='movie', imdb_id=imdb_id, tmdb_id=tmdb_id)
             if db_file:
                 all_movies.append(('filename', db_file.replace('\\', '/').split('/')[-1]))
-                p_dialog.update((i_count * 100) // i_total, message=u'Found {} in library. Skipping...'.format(movie_name))
+                p_dialog.update((i_count * 100) // i_total, message=u'Found {} in library. Skipping...'.format(movie_name)) if p_dialog else None
                 utils.kodi_log(u'Trakt List Add to Library\nFound {} in library. Skipping...'.format(movie_name), 0)
                 continue
-            p_dialog.update((i_count * 100) // i_total, message=u'Adding {} to library...'.format(movie_name))
+            p_dialog.update((i_count * 100) // i_total, message=u'Adding {} to library...'.format(movie_name)) if p_dialog else None
             utils.kodi_log(u'Adding {} to library...'.format(movie_name), 0)
             db_file = library_createfile(movie_name, content, folder, basedir=basedir_movie)
             library_create_nfo('movie', tmdb_id, folder, basedir=basedir_movie)
@@ -212,10 +216,10 @@ def library_userlist(user_slug=None, list_slug=None, confirmation_dialog=True, a
             all_tvshows.append(('title', item.get('title')))
             content = 'plugin://plugin.video.themoviedb.helper/?info=seasons&nextpage=True&tmdb_id={}&type=tv'.format(tmdb_id)
             folder = u'{}'.format(item.get('title'))
-            p_dialog.update((i_count * 100) // i_total, message=u'Adding {} to library...'.format(item.get('title')))
+            p_dialog.update((i_count * 100) // i_total, message=u'Adding {} to library...'.format(item.get('title'))) if p_dialog else None
             library_addtvshow(basedir=basedir_tv, folder=folder, url=content, tmdb_id=tmdb_id, imdb_id=imdb_id, tvdb_id=tvdb_id, p_dialog=p_dialog)
 
-    p_dialog.close()
+    p_dialog.close() if p_dialog else None
     create_playlist(all_movies, 'movies', user_slug, list_slug) if all_movies else None
     create_playlist(all_tvshows, 'tvshows', user_slug, list_slug) if all_tvshows else None
     if allow_update and _addon.getSettingBool('auto_update'):
