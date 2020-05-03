@@ -95,14 +95,14 @@ class Script(Plugin):
 
         t = 0
         is_property = True if (
-            (not value and not self.home.getProperty(property)) or
-            (value and self.home.getProperty(property) == value)) else False
+            (not value and not self.home.getProperty(property))
+            or (value and self.home.getProperty(property) == value)) else False
 
         while not self.monitor.abortRequested() and t < timeout and not is_property:
             self.monitor.waitForAbort(poll)
             is_property = True if (
-                (not value and not self.home.getProperty(property)) or
-                (value and self.home.getProperty(property) == value)) else False
+                (not value and not self.home.getProperty(property))
+                or (value and self.home.getProperty(property) == value)) else False
             t += poll
 
         return is_property
@@ -122,8 +122,8 @@ class Script(Plugin):
         is_visible = xbmc.getCondVisibility("Window.IsVisible({})".format(window_id))
 
         while (
-                not self.monitor.abortRequested() and t < timeout and is_instance and
-                ((to_close and is_visible) or (not to_close and not is_visible))):
+                not self.monitor.abortRequested() and t < timeout and is_instance
+                and ((to_close and is_visible) or (not to_close and not is_visible))):
             self.monitor.waitForAbort(poll)
             is_instance = self.get_instance(call_id)
             is_visible = xbmc.getCondVisibility("Window.IsVisible({})".format(window_id))
@@ -392,15 +392,16 @@ class Script(Plugin):
 
     def library_autoupdate(self, list_slug=None, user_slug=None):
         utils.kodi_log(u'UPDATING TV SHOWS LIBRARY', 1)
+        xbmcgui.Dialog().notification('TMDbHelper', 'Auto-Updating Library...')
         basedir_tv = self.addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
         list_slug = list_slug or self.addon.getSettingString('monitor_userlist')
         if list_slug:
             user_slug = user_slug or TraktAPI().get_usernameslug()
             if user_slug:
-                context.library_userlist(user_slug=user_slug, list_slug=list_slug, confirmation_dialog=False, allow_update=False)
+                context.library_userlist(user_slug=user_slug, list_slug=list_slug, confirmation_dialog=False, allow_update=False, busy_dialog=False)
             list_slug_2 = self.addon.getSettingString('monitor_userlist_2')
             if list_slug_2 and list_slug_2 != list_slug:
-                context.library_userlist(user_slug=user_slug, list_slug=list_slug_2, confirmation_dialog=False, allow_update=False)
+                context.library_userlist(user_slug=user_slug, list_slug=list_slug_2, confirmation_dialog=False, allow_update=False, busy_dialog=False)
         for f in xbmcvfs.listdir(basedir_tv)[0]:
             try:
                 folder = basedir_tv + f + '/'

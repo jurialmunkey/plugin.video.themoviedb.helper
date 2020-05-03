@@ -30,7 +30,7 @@ _setprop_ratings = {
 
 
 class CronJob(Thread):
-    def __init__(self, poll_time=2):
+    def __init__(self, poll_time=6):
         Thread.__init__(self)
         self.kodimonitor = xbmc.Monitor()
         self.exit = False
