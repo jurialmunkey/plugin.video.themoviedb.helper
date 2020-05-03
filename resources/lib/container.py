@@ -242,11 +242,11 @@ class Container(Plugin):
                 i.infolabels['season'] = season_num
 
             # Format Episode Labels
-            if (not self.params.get('info') == 'details' and self.item_tmdbtype == 'episode' and
-                    i.infolabels.get('season') and i.infolabels.get('episode')):
-                i.label = u'{:02d}. {}'.format(utils.try_parse_int(i.infolabels.get('episode')), i.label)
-                if self.params.get('info') in constants.EPISODE_WIDGETS or self.addon.getSettingBool('flatten_seasons'):
-                    i.label = u'{}x{}'.format(utils.try_parse_int(i.infolabels.get('season')), i.label)
+            if not self.params.get('info') == 'details' and self.item_tmdbtype == 'episode':
+                if i.infolabels.get('season') and i.infolabels.get('episode'):
+                    i.label = u'{:02d}. {}'.format(utils.try_parse_int(i.infolabels.get('episode')), i.label)
+                    if self.params.get('info') in constants.EPISODE_WIDGETS or self.addon.getSettingBool('flatten_seasons'):
+                        i.label = u'{}x{}'.format(utils.try_parse_int(i.infolabels.get('season')), i.label)
 
             # Format label for future eps/movies but not plugin methods specifically about the future or details/seasons
             if i.infolabels.get('premiered') and self.params.get('info') not in constants.NO_LABEL_FORMATTING:
@@ -887,6 +887,8 @@ class Container(Plugin):
         return query
 
     def list_search(self):
+        self.updatelisting = True if self.params.pop('updatelisting', False) else False
+        org_query = self.params.get('query')
         if not self.params.get('query'):
             self.params['query'] = self.set_searchhistory(
                 query=utils.try_decode_string(xbmcgui.Dialog().input(self.addon.getLocalizedString(32044), type=xbmcgui.INPUT_ALPHANUM)),
@@ -895,6 +897,10 @@ class Container(Plugin):
             self.set_searchhistory(query=self.params.get('query'), itemtype=self.params.get('type'))
         if self.params.get('query'):
             self.list_tmdb(query=self.params.get('query'), year=self.params.get('year'))
+            if not org_query:
+                self.params['updatelisting'] = 'True'
+                container_url = u'plugin://plugin.video.themoviedb.helper/?{}'.format(utils.urlencode_params(self.params))
+                xbmc.executebuiltin('Container.Update({})'.format(container_url))
 
     def list_searchdir(self):
         # Clear the cache if asked
