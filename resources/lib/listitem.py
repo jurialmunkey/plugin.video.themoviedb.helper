@@ -219,10 +219,10 @@ class ListItem(object):
 
         if (
                 (
-                    not self.addon.getSettingBool('trakt_unwatchedcounts') or
-                    not self.addon.getSettingBool('trakt_watchedindicators')) and
-                self.infolabels.get('mediatype') == 'tvshow' and
-                utils.try_parse_int(self.infoproperties.get('watchedepisodes', 0)) > 0):
+                    not self.addon.getSettingBool('trakt_unwatchedcounts')
+                    or not self.addon.getSettingBool('trakt_watchedindicators'))
+                and self.infolabels.get('mediatype') == 'tvshow'
+                and utils.try_parse_int(self.infoproperties.get('watchedepisodes', 0)) > 0):
             self.infoproperties['unwatchedepisodes'] = utils.try_parse_int(self.infolabels.get('episode')) - utils.try_parse_int(self.infoproperties.get('watchedepisodes'))
 
     def set_url_props(self, url, prefix='Item'):
@@ -261,4 +261,5 @@ class ListItem(object):
         return listitem
 
     def create_listitem(self, handle=None, **kwargs):
-        xbmcplugin.addDirectoryItem(handle, self.set_url(**kwargs), self.set_listitem(), self.is_folder)
+        self.infolabels['path'] = self.set_url(**kwargs)
+        xbmcplugin.addDirectoryItem(handle, self.infolabels.get('path'), self.set_listitem(), self.is_folder)

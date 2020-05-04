@@ -332,9 +332,9 @@ class TraktAPI(RequestAPI):
             # utils.kodi_log(u'In-Progress -- Searching Next Episode For:\n{0}'.format(i), 1)
             progress = self.get_upnext(i[0], True, last_updated=last_updated)
             if progress and progress.get('next_episode'):
-                if (episodes and
-                        progress.get('next_episode', {}).get('season') == 1 and
-                        progress.get('next_episode', {}).get('number') == 1):
+                if (episodes
+                        and progress.get('next_episode', {}).get('season') == 1
+                        and progress.get('next_episode', {}).get('number') == 1):
                     continue
                 # utils.kodi_log(u'In-Progress -- Found Next Episode:\n{0}'.format(progress.get('next_episode')), 2)
                 season = progress.get('next_episode', {}).get('season') if episodes else None
