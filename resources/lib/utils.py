@@ -42,10 +42,10 @@ def validify_filename(filename):
 
 
 def makepath(path):
-        if xbmcvfs.exists(path):
-            return xbmc.translatePath(path)
-        xbmcvfs.mkdirs(path)
+    if xbmcvfs.exists(path):
         return xbmc.translatePath(path)
+    xbmcvfs.mkdirs(path)
+    return xbmc.translatePath(path)
 
 
 def md5hash(value):
@@ -183,15 +183,15 @@ def rate_limiter(addon_name='plugin.video.themoviedb.helper', wait_time=None, ap
 
 
 def get_property(name, setproperty=None, clearproperty=False, prefix=None, window_id=None):
-        window = xbmcgui.Window(window_id) if window_id else xbmcgui.Window(xbmcgui.getCurrentWindowId())
-        name = '{0}.{1}'.format(prefix, name) if prefix else name
-        if clearproperty:
-            window.clearProperty(name)
-            return
-        elif setproperty:
-            window.setProperty(name, setproperty)
-            return setproperty
-        return window.getProperty(name)
+    window = xbmcgui.Window(window_id) if window_id else xbmcgui.Window(xbmcgui.getCurrentWindowId())
+    name = '{0}.{1}'.format(prefix, name) if prefix else name
+    if clearproperty:
+        window.clearProperty(name)
+        return
+    elif setproperty:
+        window.setProperty(name, setproperty)
+        return setproperty
+    return window.getProperty(name)
 
 
 def dialog_select_item(items=None, details=False, usedetails=True):

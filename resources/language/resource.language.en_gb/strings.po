@@ -654,7 +654,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32130"
-msgid "Auto-update library every X hours"
+msgid "Auto-update library at time"
 msgstr ""
 
 #: /resources/settings.xml
@@ -770,6 +770,11 @@ msgstr ""
 #: /addon.xml
 msgctxt "#32153"
 msgid "Refresh cached details"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32154"
+msgid "Update library now"
 msgstr ""
 
 msgctxt "#30030"
