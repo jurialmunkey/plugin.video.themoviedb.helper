@@ -3,6 +3,7 @@ import xbmc
 import xbmcvfs
 import xbmcgui
 import xbmcaddon
+import datetime
 from threading import Thread
 from PIL import ImageFilter, Image
 from resources.lib.plugin import Plugin
@@ -30,17 +31,27 @@ _setprop_ratings = {
 
 
 class CronJob(Thread):
-    def __init__(self, poll_time=6):
+    def __init__(self, update_time='02:00'):
         Thread.__init__(self)
         self.kodimonitor = xbmc.Monitor()
         self.exit = False
-        self.poll_time = 3600 * poll_time
+        self.poll_time = 1800
         self.addon = xbmcaddon.Addon('plugin.video.themoviedb.helper')
+        self.update_time = update_time
 
     def run(self):
+        self.kodimonitor.waitForAbort(60)  # Delay start-up to give time for datetime python module
+        self.nexttime = utils.convert_timestamp(self.update_time, time_fmt="%H:%M", time_lim=5)
+        self.lasttime = xbmc.getInfoLabel('Skin.String(TMDbHelper.AutoUpdate.LastTime)')
+        if self.lasttime and utils.convert_timestamp(self.lasttime) > self.nexttime:
+            self.nexttime += datetime.timedelta(hours=24)  # Already updated so set for tomorrow
+
         while not self.kodimonitor.abortRequested() and not self.exit and self.poll_time:
             if self.addon.getSettingBool('library_autoupdate'):
-                xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,library_autoupdate)')
+                if datetime.datetime.now() > self.nexttime:
+                    xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,library_autoupdate)')
+                    xbmc.executebuiltin('Skin.SetString(TMDbHelper.AutoUpdate.LastTime,{})'.format(self.nexttime.strftime("%Y-%m-%dT%H:%M:%S")))
+                    self.nexttime += datetime.timedelta(hours=24)  # Set next update for tomorrow
             self.kodimonitor.waitForAbort(self.poll_time)
 
 
@@ -148,7 +159,7 @@ class ServiceMonitor(Plugin):
         self.properties = set()
         self.indxproperties = set()
         self.home = xbmcgui.Window(10000)
-        self.cron_job = CronJob(self.addon.getSettingInt('library_autoupdate_interval'))
+        self.cron_job = CronJob(self.addon.getSettingString('library_autoupdate_time'))
         self.cron_job.setName('Cron Thread')
         self.run_monitor()
 
