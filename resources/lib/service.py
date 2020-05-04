@@ -40,7 +40,7 @@ class CronJob(Thread):
         self.update_time = update_time
 
     def run(self):
-        self.kodimonitor.waitForAbort(60)  # Delay start-up to give time for datetime python module
+        self.kodimonitor.waitForAbort(450)  # Delay start-up to give time for datetime python module
         self.nexttime = utils.convert_timestamp(self.update_time, time_fmt="%H:%M", time_lim=5)
         self.lasttime = xbmc.getInfoLabel('Skin.String(TMDbHelper.AutoUpdate.LastTime)')
         if self.lasttime and utils.convert_timestamp(self.lasttime) > self.nexttime:
