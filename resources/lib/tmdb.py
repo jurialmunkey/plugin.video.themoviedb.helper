@@ -363,8 +363,8 @@ class TMDb(RequestAPI):
     def get_nicelist(self, items):
         return [
             ListItem(library=self.library, **self.get_niceitem(i)) for i in items if
-            not utils.filtered_item(i, self.filter_key, self.filter_value) and
-            not utils.filtered_item(i, self.exclude_key, self.exclude_value, True)]
+            not utils.filtered_item(i, self.filter_key, self.filter_value)
+            and not utils.filtered_item(i, self.exclude_key, self.exclude_value, True)]
 
     def get_translated_list(self, items, itemtype=None, separator=None):
         """
