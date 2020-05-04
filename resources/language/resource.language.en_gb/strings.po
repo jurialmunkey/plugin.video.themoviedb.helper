@@ -734,12 +734,12 @@ msgstr ""
 
 #: /addon.xml
 msgctxt "#32146"
-msgid "Play Using"
+msgid "Play using (TMDbHelper)"
 msgstr ""
 
 #: /addon.xml
 msgctxt "#32147"
-msgid "Browse Seasons"
+msgid "Browse seasons (TMDbHelper)"
 msgstr ""
 
 #: /addon.xml
