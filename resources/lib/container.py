@@ -272,7 +272,7 @@ class Container(Plugin):
 
             # Get TVSHOW DBID for episodes / seasons
             if self.item_tmdbtype in ['season', 'episode']:
-                i.tvshow_dbid = self.get_db_info(
+                i.infoproperties['tvshow.dbid'] = i.tvshow_dbid = self.get_db_info(
                     info='dbid', tmdbtype='tv',
                     imdb_id=i.infoproperties.get('tvshow.imdb_id'),
                     tmdb_id=i.infoproperties.get('tvshow.tmdb_id'),
