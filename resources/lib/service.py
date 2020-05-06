@@ -31,26 +31,27 @@ _setprop_ratings = {
 
 
 class CronJob(Thread):
-    def __init__(self, update_time='02:00'):
+    def __init__(self, update_hour=0):
         Thread.__init__(self)
         self.kodimonitor = xbmc.Monitor()
         self.exit = False
-        self.poll_time = 1800
+        self.poll_time = 1800  # Poll every 30 mins since we don't need to get exact time for update
         self.addon = xbmcaddon.Addon('plugin.video.themoviedb.helper')
-        self.update_time = update_time
+        self.update_hour = utils.try_parse_int(update_hour)
 
     def run(self):
         self.kodimonitor.waitForAbort(450)  # Delay start-up to give time for datetime python module
-        self.nexttime = utils.convert_timestamp(self.update_time, time_fmt="%H:%M", time_lim=5)
-        self.lasttime = xbmc.getInfoLabel('Skin.String(TMDbHelper.AutoUpdate.LastTime)')
-        if self.lasttime and utils.convert_timestamp(self.lasttime) > self.nexttime:
-            self.nexttime += datetime.timedelta(hours=24)  # Already updated so set for tomorrow
+        self.nexttime = datetime.datetime.combine(datetime.datetime.today(), datetime.time(self.update_hour))  # Get today at hour
+        self.lasttime = xbmc.getInfoLabel('Skin.String(TMDbHelper.AutoUpdate.LastTime)')  # Get last update
+        self.lasttime = utils.convert_timestamp(self.lasttime) if self.lasttime else None
+        if self.lasttime and self.lasttime > self.nexttime:
+            self.nexttime += datetime.timedelta(hours=24)  # Already updated today so set for tomorrow
 
         while not self.kodimonitor.abortRequested() and not self.exit and self.poll_time:
             if self.addon.getSettingBool('library_autoupdate'):
-                if datetime.datetime.now() > self.nexttime:
+                if datetime.datetime.now() > self.nexttime:  # Scheduled time has past so lets update
                     xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,library_autoupdate)')
-                    xbmc.executebuiltin('Skin.SetString(TMDbHelper.AutoUpdate.LastTime,{})'.format(self.nexttime.strftime("%Y-%m-%dT%H:%M:%S")))
+                    xbmc.executebuiltin('Skin.SetString(TMDbHelper.AutoUpdate.LastTime,{})'.format(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")))
                     self.nexttime += datetime.timedelta(hours=24)  # Set next update for tomorrow
             self.kodimonitor.waitForAbort(self.poll_time)
 
@@ -159,7 +160,7 @@ class ServiceMonitor(Plugin):
         self.properties = set()
         self.indxproperties = set()
         self.home = xbmcgui.Window(10000)
-        self.cron_job = CronJob(self.addon.getSettingString('library_autoupdate_time'))
+        self.cron_job = CronJob(self.addon.getSettingInt('library_autoupdate_hour'))
         self.cron_job.setName('Cron Thread')
         self.run_monitor()
 
