@@ -290,6 +290,21 @@ class TraktAPI(RequestAPI):
         infoproperties['trakt_votes'] = '{:0,.0f}'.format(response.get('votes')) if response.get('votes') else ''
         return infoproperties
 
+    def get_hiddenitems(self, itemtype, progress_watched=True, progress_collected=True, calendar=True, idtype='slug'):
+        hidden_items = set()
+        if not self.authorize() or not itemtype or not idtype:
+            return hidden_items
+        if progress_watched:
+            response = self.get_response_json('users', 'hidden', 'progress_watched', type=itemtype)
+            hidden_items |= {i.get(itemtype, {}).get('ids', {}).get(idtype) for i in response}
+        if progress_collected:
+            response = self.get_response_json('users', 'hidden', 'progress_collected', type=itemtype)
+            hidden_items |= {i.get(itemtype, {}).get('ids', {}).get(idtype) for i in response}
+        if calendar:
+            response = self.get_response_json('users', 'hidden', 'calendar', type=itemtype)
+            hidden_items |= {i.get(itemtype, {}).get('ids', {}).get(idtype) for i in response}
+        return hidden_items
+
     def get_mostwatched(self, userslug, tmdbtype, limit=None, islistitem=True, onlyshows=False):
         extended = 'noseasons' if onlyshows else None
         history = self.get_response_json('users', userslug, 'watched', utils.type_convert(tmdbtype, 'trakt') + 's', extended=extended)
@@ -326,9 +341,12 @@ class TraktAPI(RequestAPI):
         # utils.kodi_log(u'Getting In-Progress For Trakt User {0}'.format(userslug), 2)
         last_updated = self.get_response_json('sync/last_activities')
         last_updated = last_updated.get('episodes', {}).get('watched_at') if last_updated else None
+        hidden_shows = self.get_hiddenitems('show')
         for i in self.get_recentlywatched_shows(userslug, islistitem=False):
             if limit and n >= limit:
-                break
+                break  # Got limit so stop
+            if i[0] in hidden_shows:
+                continue  # Show is hidden so don't get it
             # utils.kodi_log(u'In-Progress -- Searching Next Episode For:\n{0}'.format(i), 1)
             progress = self.get_upnext(i[0], True, last_updated=last_updated)
             if progress and progress.get('next_episode'):

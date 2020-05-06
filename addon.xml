@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.themoviedb.helper"
-version="2.4.54"
+version="2.4.55"
 name="TheMovieDb Helper"
 provider-name="jurialmunkey">
 <requires>
@@ -72,6 +72,6 @@ provider-name="jurialmunkey">
     <screenshot>resources/screenshot-01.jpg</screenshot>
     <screenshot>resources/screenshot-02.jpg</screenshot>
   </assets>
-  <news>2.4.54 - Fixes for scheduled updates</news>
+  <news>2.4.55 - Hide hidden shows[CR]2.4.54 - Fixes for scheduled updates</news>
 </extension>
 </addon>
