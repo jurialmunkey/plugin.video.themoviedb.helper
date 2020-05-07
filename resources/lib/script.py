@@ -42,6 +42,7 @@ class Script(Plugin):
                 arg_split = arg.split('=', 1)
                 if arg_split[0] and arg_split[1]:
                     key, value = arg_split
+                    value = value.strip('\'').strip('\"')
                     self.params.setdefault(key, value)
             else:
                 self.params.setdefault(arg, True)
