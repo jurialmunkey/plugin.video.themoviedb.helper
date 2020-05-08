@@ -219,7 +219,7 @@ class Script(Plugin):
             except Exception as exc:
                 utils.kodi_log(exc, 1)
         if self.params.get('playmedia'):
-            xbmc.executebuiltin('PlayMedia({})'.format(self.params.get('playmedia')))
+            xbmc.executebuiltin('PlayMedia(\"{}\")'.format(self.params.get('playmedia')))
         self.call_window()
 
     def call_reset(self, openinfo=False):
