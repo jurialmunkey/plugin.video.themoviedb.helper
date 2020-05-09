@@ -594,6 +594,9 @@ class Container(Plugin):
                 season=i.get('episode', {}).get('season'),
                 episode=i.get('episode', {}).get('number')))
             li.tmdb_id = i.get('show', {}).get('ids', {}).get('tmdb')  # Set TVSHOW ID
+            li.infoproperties['tvshow.imdb_id'] = i.get('show', {}).get('ids', {}).get('imdb') or li.infoproperties.get('tvshow.imdb_id')
+            li.infoproperties['tvshow.tmdb_id'] = i.get('show', {}).get('ids', {}).get('tmdb') or li.infoproperties.get('tvshow.tmdb_id')
+            li.infoproperties['tvshow.tvdb_id'] = i.get('show', {}).get('ids', {}).get('tvdb') or li.infoproperties.get('tvshow.tvdb_id')
 
             # Get some additional properties and add our item
             items.append(trakt.get_calendar_properties(li, i))
