@@ -42,7 +42,7 @@ class FanartTV(RequestAPI):
         for i in self.get_artwork_list(ftvtype, ftvid, artwork):
             if i.get('lang', '') == self.language:
                 return i.get('url', '')
-            elif i.get('likes', 0) > best_like:
+            elif (i.get('lang', '') == 'en' or not i.get('lang')) and i.get('likes', 0) > best_like:
                 best_item = i.get('url', '')
                 best_like = i.get('likes', 0)
         return best_item
@@ -52,8 +52,8 @@ class FanartTV(RequestAPI):
 
     def get_artwork_lc(self, getbest, ftvid, ftvtype, artwork, *args, **kwargs):
         func = self.get_artwork_best if getbest else self.get_artwork_all
-        cache_name = '{0}.fanarttv.best' if getbest else '{0}.fanarttv.all'
-        cache_name = cache_name.format(self.cache_name)
+        cache_name = '{0}.fanarttv.v2.{lang}.best' if getbest else '{0}.fanarttv.v2.all'
+        cache_name = cache_name.format(self.cache_name, lang=self.language)
         cache_only = kwargs.pop('cache_only', False)
         cache_refresh = kwargs.pop('cache_refresh', False)
         return self.use_cache(
@@ -126,7 +126,7 @@ class FanartTV(RequestAPI):
             'fanart': fanart, 'characterart': characterart, 'poster': poster, 'extrafanart': extrafanart}
 
     def get_tvshow_allart_lc(self, ftvid, *args, **kwargs):
-        cache_name = '{0}.fanarttv.v2_2_76.tvall'.format(self.cache_name)
+        cache_name = '{0}.fanarttv.v2_4_60.tvall'.format(self.cache_name)
         cache_only = kwargs.pop('cache_only', False)
         cache_refresh = kwargs.pop('cache_refresh', False)
         return self.use_cache(
@@ -147,7 +147,7 @@ class FanartTV(RequestAPI):
             'landscape': landscape, 'fanart': fanart, 'poster': poster, 'extrafanart': extrafanart}
 
     def get_movie_allart_lc(self, ftvid, *args, **kwargs):
-        cache_name = '{0}.fanarttv.v2_2_76.movieall'.format(self.cache_name)
+        cache_name = '{0}.fanarttv.v2_4_60.movieall'.format(self.cache_name)
         cache_only = kwargs.pop('cache_only', False)
         cache_refresh = kwargs.pop('cache_refresh', False)
         return self.use_cache(

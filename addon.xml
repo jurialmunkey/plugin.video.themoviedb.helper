@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.themoviedb.helper"
-version="2.4.60"
+version="2.4.61"
 name="TheMovieDb Helper"
 provider-name="jurialmunkey">
 <requires>
@@ -72,6 +72,6 @@ provider-name="jurialmunkey">
     <screenshot>resources/screenshot-01.jpg</screenshot>
     <screenshot>resources/screenshot-02.jpg</screenshot>
   </assets>
-  <news>2.4.60 - Fix add to library trailing fullstop[CR]2.4.59 - Fixes for Next Aired library items with weird ID issues</news>
+  <news>2.4.61 - Only fallback to english artwork if no artwork in main language[CR]2.4.60 - Fix add to library trailing fullstop[CR]2.4.59 - Fixes for Next Aired library items with weird ID issues</news>
 </extension>
 </addon>
