@@ -38,6 +38,7 @@ def validify_filename(filename):
         pass
     filename = str(unicodedata.normalize('NFD', filename).encode('ascii', 'ignore').decode("utf-8"))
     filename = ''.join(c for c in filename if c in VALID_FILECHARS)
+    filename = filename[:-1] if filename.endswith('.') else filename
     return filename
 
 
