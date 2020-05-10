@@ -37,11 +37,11 @@ class CronJob(Thread):
         self.exit = False
         self.poll_time = 1800  # Poll every 30 mins since we don't need to get exact time for update
         self.addon = xbmcaddon.Addon('plugin.video.themoviedb.helper')
-        self.update_hour = utils.try_parse_int(update_hour)
+        self.update_hour = update_hour
 
     def run(self):
         self.kodimonitor.waitForAbort(450)  # Delay start-up to give time for datetime python module
-        self.nexttime = datetime.datetime.combine(datetime.datetime.today(), datetime.time(self.update_hour))  # Get today at hour
+        self.nexttime = datetime.datetime.combine(datetime.datetime.today(), datetime.time(utils.try_parse_int(self.update_hour)))  # Get today at hour
         self.lasttime = xbmc.getInfoLabel('Skin.String(TMDbHelper.AutoUpdate.LastTime)')  # Get last update
         self.lasttime = utils.convert_timestamp(self.lasttime) if self.lasttime else None
         if self.lasttime and self.lasttime > self.nexttime:
