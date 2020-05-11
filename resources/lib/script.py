@@ -460,6 +460,12 @@ class Script(Plugin):
             self.home.setProperty('{}.{}'.format(self.params.get('property', 'TMDbHelper.Split'), idx), i)
             idx += 1
 
+    def kodi_setting(self):
+        method = "Settings.GetSettingValue"
+        params = {"setting": self.params.get('kodi_setting')}
+        response = utils.get_jsonrpc(method, params)
+        self.home.setProperty(self.params.get('property', 'TMDbHelper.KodiSetting'), u'{}'.format(response.get('result', {}).get('value', '')))
+
     def router(self):
         if not self.params:
             """ If no params assume user wants to run plugin """
@@ -469,6 +475,8 @@ class Script(Plugin):
             TraktAPI(force=True)
         elif self.params.get('split_value'):
             self.split_value()
+        elif self.params.get('kodi_setting'):
+            self.kodi_setting()
         elif self.params.get('blur_image'):
             self.blur_image()
         elif self.params.get('monitor_userlist'):
