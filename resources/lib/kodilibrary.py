@@ -1,5 +1,4 @@
 import xbmc
-import json
 import resources.lib.utils as utils
 
 
@@ -23,22 +22,6 @@ class KodiLibrary(object):
         if not self.database:
             utils.kodi_log(u'Getting KodiDB {} FAILED!'.format(dbtype), 1)
 
-    def get_jsonrpc(self, method=None, params=None):
-        if not method or not params:
-            return {}
-        query = {
-            "jsonrpc": "2.0",
-            "params": params,
-            "method": method,
-            "id": 1}
-        try:
-            jrpc = xbmc.executeJSONRPC(json.dumps(query))
-            response = json.loads(utils.try_decode_string(jrpc, errors='ignore'))
-        except Exception as exc:
-            utils.kodi_log(u'TMDbHelper - JSONRPC Error:\n{}'.format(exc), 1)
-            response = {}
-        return response
-
     def get_database(self, dbtype=None, tvshowid=None):
         if not dbtype:
             return
@@ -55,7 +38,7 @@ class KodiLibrary(object):
                 "properties": ["title", "showtitle", "season", "episode", "file"]}
         dbid_name = '{0}id'.format(dbtype)
         key_to_get = '{0}s'.format(dbtype)
-        response = self.get_jsonrpc(method, params)
+        response = utils.get_jsonrpc(method, params)
         self.dbtype = dbtype
         self.database = [{
             'imdb_id': item.get('uniqueid', {}).get('imdb'),
@@ -85,7 +68,7 @@ class KodiLibrary(object):
         if filterr:
             params['filter'] = filterr
 
-        response = self.get_jsonrpc(method, params)
+        response = utils.get_jsonrpc(method, params)
         return response.get('result')
 
     def get_num_credits(self, dbtype, person):
@@ -237,7 +220,7 @@ class KodiLibrary(object):
         params = {
             param_name: utils.try_parse_int(dbid),
             "properties": properties}
-        details = self.get_jsonrpc(method, params)
+        details = utils.get_jsonrpc(method, params)
         if not details or not isinstance(details, dict):
             return {}
         details = details.get('result', {}).get('{0}details'.format(key))
@@ -274,5 +257,5 @@ class KodiLibrary(object):
             "properties": [
                 "title", "year", "originaltitle", "imdbnumber", "premiered", "streamdetails", "size",
                 "firstaired", "season", "episode", "showtitle", "file", "tvshowid", "thumbnail"]}
-        response = self.get_jsonrpc(method, params)
+        response = utils.get_jsonrpc(method, params)
         return response.get('result', {}).get('files', [{}]) or [{}]
