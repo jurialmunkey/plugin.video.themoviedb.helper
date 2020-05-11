@@ -606,6 +606,7 @@ class Container(Plugin):
         self.plugincategory = date.strftime('%A')
 
         # Create our list
+        self.params['linklibrary'] = self.addon.getSettingBool('nextaired_linklibrary')
         self.item_tmdbtype = 'episode'
         self.list_items(items=items, url={'info': 'details', 'type': 'episode'})
 
@@ -982,7 +983,9 @@ class Container(Plugin):
             i.infoproperties['numitems.tmdb'] = self.numitems_tmdb
             i.infoproperties['dbtype'] = self.item_dbtype
             i.get_details(self.item_dbtype, self.tmdb, self.omdb, self.params.get('localdb'))
-            i.get_url(url, url_tmdb_id, self.params.get('widget'), self.params.get('fanarttv'), self.params.get('nextpage'), self.params.get('extended'))
+            i.get_url(
+                url, url_tmdb_id=url_tmdb_id, widget=self.params.get('widget'), fanarttv=self.params.get('fanarttv'),
+                nextpage=self.params.get('nextpage'), extended=self.params.get('extended'), linklibrary=self.params.get('linklibrary'))
             i.get_extra_artwork(self.tmdb, self.fanarttv) if len(items) < 22 and self.exp_fanarttv() else None
             i.get_trakt_watched(trakt_watched) if x == 0 or self.params.get('info') != 'details' else None
             i.get_trakt_unwatched(trakt=TraktAPI(tmdb=self.tmdb), request=trakt_unwatched, check_sync=self.check_sync) if x == 0 or self.params.get('info') != 'details' else None

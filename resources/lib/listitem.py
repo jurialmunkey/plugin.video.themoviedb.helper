@@ -42,7 +42,7 @@ class ListItem(object):
         url = kwargs.pop('url', u'plugin://plugin.video.themoviedb.helper/?')
         return u'{0}{1}'.format(url, utils.urlencode_params(kwargs))
 
-    def get_url(self, url, url_tmdb_id=None, widget=None, fanarttv=None, nextpage=None, extended=None):
+    def get_url(self, url, url_tmdb_id=None, widget=None, fanarttv=None, nextpage=None, extended=None, linklibrary=False):
         self.url = self.url or url.copy()
         self.url['tmdb_id'] = self.tmdb_id = url_tmdb_id or self.tmdb_id or self.url.get('tmdb_id')
         if self.url.get('info') == 'discover':  # Special handling of discover url to pass tmdb_id
@@ -73,11 +73,18 @@ class ListItem(object):
                 if self.addon.getSettingBool('flatten_seasons'):
                     self.url['info'] = 'flatseasons'
                     self.url['type'] = 'episode'
+
+        # Link library for Next Aired
+        if linklibrary and self.infolabels.get('mediatype') == 'episode' and self.tvshow_dbid:
+            self.url = {'url': 'videodb://tvshows/titles/{}/'.format(self.tvshow_dbid)}
+
+        # Only set as folder if not playable
+        self.is_folder = False if self.url.get('info') in ['play', 'textviewer', 'imageviewer'] else True
+
         # Set video paths to url
         if self.infolabels.get('mediatype') == 'video' and self.infolabels.get('path'):
             self.url = {'url': self.infolabels.get('path')}
-        self.is_folder = False if self.url.get('info') in ['play', 'textviewer', 'imageviewer'] or self.url.get('url') else True
-        # self.infoproperties['isPlayable'] = 'True' if self.url.get('info') in ['play', 'textviewer', 'imageviewer'] else 'False'
+            self.is_folder = False
 
     def get_extra_artwork(self, tmdb=None, fanarttv=None):
         if not fanarttv:
