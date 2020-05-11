@@ -777,6 +777,16 @@ msgctxt "#32154"
 msgid "Update library now"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32155"
+msgid "Next Aired (Library)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32156"
+msgid "Next aired library calendar links to local tvshow"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
