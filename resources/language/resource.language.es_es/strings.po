@@ -1041,7 +1041,7 @@ msgstr "Clave API de Fanart.tv"
 #: /resources/settings.xml
 msgctxt "#32019"
 msgid "Fanart.tv client key"
-msgstr "Clave cliente de Fanart.tv"
+msgstr "Clave de cliente Fanart.tv"
 
 #: /resources/settings.xml
 msgctxt "#32020"
