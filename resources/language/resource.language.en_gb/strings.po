@@ -183,7 +183,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32037"
-msgid "Use bundled Netflix and YouTube players"
+msgid "Use bundled players"
 msgstr ""
 
 #: /resources/settings.xml
