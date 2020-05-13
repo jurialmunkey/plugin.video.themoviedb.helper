@@ -84,9 +84,36 @@ def library_create_nfo(tmdbtype, tmdb_id, *args, **kwargs):
     library_createfile(filename, content, file_ext='nfo', *args, **kwargs)
 
 
+def library_getnfo_tmdbid(basedir=None, folder=None):
+    tmdb_id = None
+    folder_list = xbmcvfs.listdir(basedir)[0]
+    if folder in folder_list:
+        nfo_folder = basedir + folder + '/'
+        nfo = None
+        for x in xbmcvfs.listdir(nfo_folder)[1]:
+            if x.endswith('.nfo'):
+                nfo = x
+        if nfo:
+            vfs_file = xbmcvfs.File(nfo_folder + nfo)
+            content = ''
+            try:
+                content = vfs_file.read()
+            finally:
+                vfs_file.close()
+            tmdb_id = content.replace('https://www.themoviedb.org/tv/', '')
+            tmdb_id = tmdb_id.replace('&islocal=True', '')
+    return tmdb_id
+
+
 def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id=None, imdb_id=None, p_dialog=None):
     if not basedir or not folder or not url:
         return
+
+    # Check correct folder
+    nfo_tmdbid = library_getnfo_tmdbid(basedir, folder)
+    if nfo_tmdbid and utils.try_parse_int(nfo_tmdbid) != utils.try_parse_int(tmdb_id):
+        folder += ' (TMDB {})'.format(tmdb_id)
+
     seasons = library_cleancontent_replacer(url, 'type=episode', 'type=tv')  # Clean-up flatseasons
     seasons = library_cleancontent(seasons, details='info=seasons')
     seasons = KodiLibrary().get_directory(seasons)
