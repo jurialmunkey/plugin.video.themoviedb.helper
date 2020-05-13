@@ -787,6 +787,11 @@ msgctxt "#32156"
 msgid "Next aired library calendar links to local tvshow"
 msgstr ""
 
+#: /resources/lib/context.py
+msgctxt "#32157"
+msgid "Unable to find TMDb ID for item."
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
