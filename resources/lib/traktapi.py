@@ -549,7 +549,7 @@ class TraktAPI(RequestAPI):
             items.append(ListItem(library=self.library, label=xbmc.getLocalizedString(33078), nextpage=page + 1))
         return items
 
-    def get_item_idlookup(self, item_type, tmdb_id=None, tvdb_id=None, imdb_id=None):
+    def get_item_idlookup(self, item_type, tmdb_id=None, tvdb_id=None, imdb_id=None, parent=False):
         if not tmdb_id and not tvdb_id and not imdb_id:
             return
         item = None
@@ -563,7 +563,7 @@ class TraktAPI(RequestAPI):
             return
         for i in item:
             if i.get('type') == item_type:
-                return i.get(item_type)
+                return i if parent else i.get(item_type)
 
     def create_userlist(self, user_slug=None, list_name=None, login=True):
         if not self.authorize(login):  # Method needs authorisation

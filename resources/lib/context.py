@@ -134,6 +134,7 @@ def browse():
 
 def play():
     with utils.busy_dialog():
+        suffix = 'force_dialog=True'
         tmdb_id, season, episode = None, None, None
         dbtype = sys.listitem.getVideoInfoTag().getMediaType()
 
@@ -141,13 +142,27 @@ def play():
             tmdb_id = sys.listitem.getProperty('tvshow.tmdb_id')
             season = sys.listitem.getVideoInfoTag().getSeason()
             episode = sys.listitem.getVideoInfoTag().getEpisode()
-            xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,play={},tmdb_id={},season={},episode={},force_dialog=True)'.format(
-                dbtype, tmdb_id, season, episode))
+            suffix += ',season={},episode={}'.format(season, episode)
 
         elif dbtype == 'movie':
-            tmdb_id = sys.listitem.getProperty('tmdb_id')
-            xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,play={},tmdb_id={},force_dialog=True)'.format(
-                dbtype, tmdb_id))
+            tmdb_id = sys.listitem.getProperty('tmdb_id') or sys.listitem.getUniqueID('tmdb')
+
+        # Try to lookup ID if we don't have it
+        if not tmdb_id and dbtype == 'episode':
+            id_details = TraktAPI().get_item_idlookup(
+                'episode', parent=True, tvdb_id=sys.listitem.getUniqueID('tvdb'),
+                tmdb_id=sys.listitem.getUniqueID('tmdb'), imdb_id=sys.listitem.getUniqueID('imdb'))
+            tmdb_id = id_details.get('show', {}).get('ids', {}).get('tmdb')
+
+        elif not tmdb_id and dbtype == 'movie':
+            tmdb_id = Plugin().get_tmdb_id(
+                itemtype='movie', imdb_id=sys.listitem.getUniqueID('imdb'),
+                query=sys.listitem.getVideoInfoTag().getTitle(), year=sys.listitem.getVideoInfoTag().getYear())
+
+        if not tmdb_id or not dbtype:
+            return xbmcgui.Dialog().ok('TheMovieDb Helper', _addon.getLocalizedString(32157))
+
+        xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,play={},tmdb_id={},{})'.format(dbtype, tmdb_id, suffix))
 
 
 def library_userlist(user_slug=None, list_slug=None, confirmation_dialog=True, allow_update=True, busy_dialog=True):
