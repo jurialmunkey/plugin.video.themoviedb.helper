@@ -792,6 +792,11 @@ msgctxt "#32157"
 msgid "Unable to find TMDb ID for item."
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32158"
+msgid "Automatically use player if only one available"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
