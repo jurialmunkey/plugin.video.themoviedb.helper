@@ -62,6 +62,9 @@ class Player(Plugin):
         return self.get_fallback(fb_file, fb_action)  # Fallback not in list so let's check fallback's fallback
 
     def get_playerindex(self, force_dialog=False):
+        if not self.itemlist:
+            return -1  # No players left so cancel
+
         if force_dialog or (self.itemtype == 'movie' and not self.dp_movies) or (self.itemtype == 'episode' and not self.dp_episodes):
             idx = xbmcgui.Dialog().select(self.addon.getLocalizedString(32042), self.itemlist)  # Ask user to select player
             if self.itemtype == 'movie':
