@@ -35,6 +35,7 @@ class Player(Plugin):
         self.item = defaultdict(lambda: '+')
         self.itemlist, self.actions, self.players, self.identifierlist = [], [], {}, []
         self.is_local = None
+        self.autoplay_single = self.addon.getSettingBool('autoplay_single')
         self.dp_local = self.addon.getSettingBool('default_player_local')
         self.dp_movies = self.addon.getSettingString('default_player_movies')
         self.dp_episodes = self.addon.getSettingString('default_player_episodes')
@@ -100,7 +101,7 @@ class Player(Plugin):
             del self.itemlist[playerindex]  # Item not found so remove the player's select dialog entry
             del self.identifierlist[playerindex]  # Item not found so remove the player's index
 
-        playerindex = self.get_playerindex(force_dialog=force_dialog)
+        playerindex = 0 if len(self.itemlist) == 1 and self.autoplay_single else self.get_playerindex(force_dialog=force_dialog)
 
         # User cancelled dialog
         if not playerindex > -1:
