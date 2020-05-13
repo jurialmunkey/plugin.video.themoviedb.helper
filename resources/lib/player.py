@@ -76,9 +76,9 @@ class Player(Plugin):
         for i in range(0, len(self.itemlist)):
             label = self.itemlist[i].getLabel()
             if (
-                    (label == self.dp_movies and self.itemtype == 'movie') or
-                    (label == self.dp_episodes and self.itemtype == 'episode') or
-                    (label == u'{0} {1}'.format(self.addon.getLocalizedString(32061), 'Kodi') and self.dp_local)):
+                    (label == self.dp_movies and self.itemtype == 'movie')
+                    or (label == self.dp_episodes and self.itemtype == 'episode')
+                    or (label == u'{0} {1}'.format(self.addon.getLocalizedString(32061), 'Kodi') and self.dp_local)):
                 utils.kodi_log(u'Player -- Attempting to Play with Default Player:\n {}'.format(label), 2)
                 return i  # Play local or with default player if found
 
@@ -190,8 +190,8 @@ class Player(Plugin):
         # Play/Search found item
         if player and player[1]:
             action = string_format_map(player[1], self.item)
-            if player[0] and action.endswith('.strm'):  # Action is play and is a strm so PlayMedia
-                utils.kodi_log(u'Player -- Found strm.\nAttempting PLAYMEDIA({})'.format(action), 2)
+            if player[0] and (action.endswith('.strm') or self.identifierlist[playerindex] == 'play_kodi'):  # Action is play and is a strm/local so PlayMedia
+                utils.kodi_log(u'Player -- Found strm or local.\nAttempting PLAYMEDIA({})'.format(action), 1)
                 xbmc.executebuiltin(utils.try_decode_string(u'PlayMedia({0})'.format(action)))
             elif player[0]:  # Action is play and not a strm so play with player
                 utils.kodi_log(u'Player -- Found file.\nAttempting to PLAY: {}'.format(action), 2)
