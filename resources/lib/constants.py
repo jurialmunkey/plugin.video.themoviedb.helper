@@ -14,6 +14,10 @@ LANGUAGES = [
 
 NO_LABEL_FORMATTING = ['details', 'seasons', 'trakt_calendar', 'trakt_myairing', 'trakt_anticipated', 'library_nextaired']
 
+PLAYER_URLENCODE = [
+    'name', 'showname', 'clearname', 'tvshowtitle', 'title', 'thumbnail', 'poster', 'fanart',
+    'originaltitle', 'plot', 'cast', 'actors']
+
 EPISODE_WIDGETS = ['trakt_calendar', 'trakt_nextepisodes', 'library_nextaired', 'trakt_upnext']
 
 TYPE_CONVERSION = {

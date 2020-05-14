@@ -4,6 +4,7 @@ import xbmcgui
 import xbmcvfs
 import datetime
 import resources.lib.utils as utils
+import resources.lib.constants as constants
 from json import loads
 from string import Formatter
 from collections import defaultdict
@@ -242,13 +243,10 @@ class Player(Plugin):
         self.item['tmdb'] = self.tmdb_id
         self.item['imdb'] = self.details.get('infolabels', {}).get('imdbnumber')
         self.item['name'] = u'{0} ({1})'.format(self.item.get('title'), self.item.get('year'))
-        self.item['firstaired'] = self.details.get('infolabels', {}).get('premiered')
-        self.item['premiered'] = self.details.get('infolabels', {}).get('premiered')
-        self.item['released'] = self.details.get('infolabels', {}).get('premiered')
-        self.item['showname'] = self.item.get('title')
-        self.item['clearname'] = self.item.get('title')
-        self.item['tvshowtitle'] = self.item.get('title')
-        self.item['title'] = self.item.get('title')
+        self.item['premiered'] = self.item['firstaired'] = self.item['released'] = self.details.get('infolabels', {}).get('premiered')
+        self.item['plot'] = self.details.get('infolabels', {}).get('plot')
+        self.item['cast'] = self.item['actors'] = " / ".join([i.get('name') for i in self.details.get('cast', []) if i.get('name')])
+        self.item['showname'] = self.item['clearname'] = self.item['tvshowtitle'] = self.item['title'] = self.item.get('title')
         self.item['thumbnail'] = self.details.get('thumb')
         self.item['poster'] = self.details.get('poster')
         self.item['fanart'] = self.details.get('fanart')
@@ -279,7 +277,7 @@ class Player(Plugin):
         utils.kodi_log(u'Player Details - Item:\n{}'.format(self.item), 2)
 
         for k, v in self.item.copy().items():
-            if k not in ['name', 'showname', 'clearname', 'tvshowtitle', 'title', 'thumbnail', 'poster', 'fanart', 'originaltitle']:
+            if k not in constants.PLAYER_URLENCODE:
                 continue
             v = u'{0}'.format(v)
             self.item[k] = v.replace(',', '')
