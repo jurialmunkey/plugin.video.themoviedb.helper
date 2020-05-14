@@ -797,6 +797,11 @@ msgctxt "#32158"
 msgid "Automatically use player if only one available"
 msgstr ""
 
+#: /resources/lib/container.py
+msgctxt "#32159"
+msgid "Select Original Language"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
