@@ -449,6 +449,8 @@ class Container(Plugin):
             self.set_userdiscover_selectlist_properties(constants.USER_DISCOVER_RELEASETYPES, header=self.addon.getLocalizedString(32119))
         elif 'region' in method:
             self.set_userdiscover_selectlist_properties(constants.USER_DISCOVER_REGIONS, header=self.addon.getLocalizedString(32120), multiselect=False)
+        elif 'with_original_language' in method:
+            self.set_userdiscover_selectlist_properties(constants.USER_DISCOVER_LANGUAGES, header=self.addon.getLocalizedString(32159), multiselect=False)
         elif 'with_runtime' not in method and 'with_networks' not in method and any(i in method for i in ['with_', 'without_']):
             self.add_userdiscover_method_property(header, tmdbtype, usedetails, old_label=old_label, old_value=old_value)
         else:

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.themoviedb.helper"
-version="2.4.70"
+version="2.4.71"
 name="TheMovieDb Helper"
 provider-name="jurialmunkey">
 <requires>
@@ -75,6 +75,6 @@ provider-name="jurialmunkey">
     <screenshot>resources/screenshot-01.jpg</screenshot>
     <screenshot>resources/screenshot-02.jpg</screenshot>
   </assets>
-  <news>2.4.68 - Fix resume for local files[CR]2.4.67 - Fix dupe tvshows added to library[CR]2.4.66 - Allow play using context for any item</news>
+  <news>2.4.71 - Add with_original_language to discover GUI</news>
 </extension>
 </addon>
