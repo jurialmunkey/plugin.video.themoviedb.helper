@@ -46,23 +46,24 @@ def library_createfile(filename, content, *args, **kwargs):
     Create the file and folder structure: filename=.strm file, content= content of file.
     *args = folders to create.
     """
-    file_ext = kwargs.pop('file_ext', 'strm')
-    clean_url = kwargs.pop('clean_url', True)
-    path = kwargs.pop('basedir', '')
-    path = path.replace('\\', '/')
+    path = kwargs.get('basedir', '').replace('\\', '/')  # Convert MS-DOS style paths to UNIX style
+
     if not path:
         utils.kodi_log(u'ADD LIBRARY -- No basedir specified!', 2)
         return
-    content = library_cleancontent(content) if clean_url else content
     for folder in args:
         folder = utils.validify_filename(folder)
         path = '{}{}/'.format(path, folder)
+
+    content = library_cleancontent(content) if kwargs.get('clean_url', True) else content
+
     if not content:
         utils.kodi_log(u'ADD LIBRARY -- No content specified!', 2)
         return
     if not filename:
         utils.kodi_log(u'ADD LIBRARY -- No filename specified!', 2)
         return
+
     if not library_createpath(path):
         xbmcgui.Dialog().ok(
             xbmc.getLocalizedString(20444),
@@ -70,10 +71,12 @@ def library_createfile(filename, content, *args, **kwargs):
             _addon.getLocalizedString(32123))
         utils.kodi_log(u'ADD LIBRARY -- XBMCVFS unable to create path:\n{}'.format(path), 2)
         return
-    filepath = '{}{}.{}'.format(path, utils.validify_filename(filename), file_ext)
+
+    filepath = '{}{}.{}'.format(path, utils.validify_filename(filename), kwargs.get('file_ext', 'strm'))
     f = xbmcvfs.File(filepath, 'w')
     f.write(utils.try_encode_string(content))
     f.close()
+
     utils.kodi_log(u'ADD LIBRARY -- Successfully added:\n{}\n{}'.format(filepath, content), 2)
     return filepath
 
@@ -109,10 +112,9 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id
     if not basedir or not folder or not url:
         return
 
-    # Check correct folder
-    nfo_tmdbid = library_getnfo_tmdbid(basedir, folder)
+    nfo_tmdbid = library_getnfo_tmdbid(basedir, folder)  # Check the nfo file in the folder to make sure it matches the TMDB ID
     if nfo_tmdbid and utils.try_parse_int(nfo_tmdbid) != utils.try_parse_int(tmdb_id):
-        folder += ' (TMDB {})'.format(tmdb_id)
+        folder += ' (TMDB {})'.format(tmdb_id)  # If different tvshow with same name exists create new folder with TMDB ID added
 
     seasons = library_cleancontent_replacer(url, 'type=episode', 'type=tv')  # Clean-up flatseasons
     seasons = library_cleancontent(seasons, details='info=seasons')
