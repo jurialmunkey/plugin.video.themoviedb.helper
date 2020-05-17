@@ -46,23 +46,24 @@ def library_createfile(filename, content, *args, **kwargs):
     Create the file and folder structure: filename=.strm file, content= content of file.
     *args = folders to create.
     """
-    file_ext = kwargs.pop('file_ext', 'strm')
-    clean_url = kwargs.pop('clean_url', True)
-    path = kwargs.pop('basedir', '')
-    path = path.replace('\\', '/')
+    path = kwargs.get('basedir', '').replace('\\', '/')  # Convert MS-DOS style paths to UNIX style
+
     if not path:
         utils.kodi_log(u'ADD LIBRARY -- No basedir specified!', 2)
         return
-    content = library_cleancontent(content) if clean_url else content
     for folder in args:
         folder = utils.validify_filename(folder)
         path = '{}{}/'.format(path, folder)
+
+    content = library_cleancontent(content) if kwargs.get('clean_url', True) else content
+
     if not content:
         utils.kodi_log(u'ADD LIBRARY -- No content specified!', 2)
         return
     if not filename:
         utils.kodi_log(u'ADD LIBRARY -- No filename specified!', 2)
         return
+
     if not library_createpath(path):
         xbmcgui.Dialog().ok(
             xbmc.getLocalizedString(20444),
@@ -70,10 +71,12 @@ def library_createfile(filename, content, *args, **kwargs):
             _addon.getLocalizedString(32123))
         utils.kodi_log(u'ADD LIBRARY -- XBMCVFS unable to create path:\n{}'.format(path), 2)
         return
-    filepath = '{}{}.{}'.format(path, utils.validify_filename(filename), file_ext)
+
+    filepath = '{}{}.{}'.format(path, utils.validify_filename(filename), kwargs.get('file_ext', 'strm'))
     f = xbmcvfs.File(filepath, 'w')
     f.write(utils.try_encode_string(content))
     f.close()
+
     utils.kodi_log(u'ADD LIBRARY -- Successfully added:\n{}\n{}'.format(filepath, content), 2)
     return filepath
 
@@ -85,6 +88,7 @@ def library_create_nfo(tmdbtype, tmdb_id, *args, **kwargs):
 
 
 def library_getnfo_tmdbid(basedir=None, folder=None):
+    """ Checks .nfo file and returns TMDB ID it contains """
     tmdb_id = None
     folder_list = xbmcvfs.listdir(basedir)[0]
     if folder in folder_list:
@@ -109,44 +113,48 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id
     if not basedir or not folder or not url:
         return
 
-    # Check correct folder
-    nfo_tmdbid = library_getnfo_tmdbid(basedir, folder)
+    nfo_tmdbid = library_getnfo_tmdbid(basedir, folder)  # Check the nfo file in the folder to make sure it matches the TMDB ID
     if nfo_tmdbid and utils.try_parse_int(nfo_tmdbid) != utils.try_parse_int(tmdb_id):
-        folder += ' (TMDB {})'.format(tmdb_id)
+        folder += ' (TMDB {})'.format(tmdb_id)  # If different tvshow with same name exists create new folder with TMDB ID added
 
-    seasons = library_cleancontent_replacer(url, 'type=episode', 'type=tv')  # Clean-up flatseasons
-    seasons = library_cleancontent(seasons, details='info=seasons')
-    seasons = KodiLibrary().get_directory(seasons)
-    library_create_nfo('tv', tmdb_id, folder, basedir=basedir)
-    s_count = 0
-    s_total = len(seasons)
+    details_tvshow = _plugin.tmdb.get_request_sc('tv', tmdb_id)  # Get base tv show
+    if not details_tvshow:
+        return
+
+    library_create_nfo('tv', tmdb_id, folder, basedir=basedir)  # Create .nfo for tvshow
+    seasons = [i.get('season_number') for i in details_tvshow.get('seasons', []) if i.get('season_number', 0) != 0]  # Don't get specials
+
+    s_count, s_total = 0, len(seasons)  # Used to update p_dialog progress
     for season in seasons:
         s_count += 1
-        if not season.get('season'):
-            continue  # Skip special seasons S00
-        season_name = '{} {}'.format(xbmc.getLocalizedString(20373), season.get('season'))
-        p_dialog.update((s_count * 100) // s_total, message=u'Adding {} - {} to library...'.format(season.get('showtitle'), season_name)) if p_dialog else None
-        episodes = library_cleancontent_replacer(season.get('file'), 'type=episode', 'type=season')  # Clean to prevent flatseasons
-        episodes = library_cleancontent(episodes, details='info=episodes')
-        episodes = KodiLibrary().get_directory(episodes)
-        i_count = 0
-        i_total = len(episodes)
+        season_name = '{} {}'.format(xbmc.getLocalizedString(20373), season)  # This was a dumb idea to localise season name - too late now
+
+        if p_dialog:  # Update our progress dialog
+            p_dialog_val = (s_count * 100) // s_total
+            p_dialog_msg = u'Adding {} - {} to library...'.format(details_tvshow.get('original_name'), season_name)
+            p_dialog.update(p_dialog_val, message=p_dialog_msg)
+
+        details_season = _plugin.tmdb.get_request_sc('tv', tmdb_id, 'season', season)  # Get season
+        if not details_season:
+            return
+        episodes = [i for i in details_season.get('episodes', []) if i.get('episode_number', 0) != 0]  # Only get non-special seasons
+
+        e_count, e_total = 0, len(episodes)  # Used to update p_dialog progress
         for episode in episodes:
-            i_count += 1
-            if not episode.get('episode'):
-                continue  # Skip special episodes E00
-            s_num = episode.get('season')
-            e_num = episode.get('episode')
+            e_count += 1
             episode_name = 'S{:02d}E{:02d} - {}'.format(
-                utils.try_parse_int(s_num),
-                utils.try_parse_int(e_num),
-                utils.validify_filename(episode.get('title')))
-            if _plugin.get_db_info(info='dbid', tmdbtype='episode', imdb_id=imdb_id, tmdb_id=tmdb_id, season=s_num, episode=e_num):
-                utils.kodi_log(u'Trakt List Add to Library\nFound {} - {} in library. Skipping...'.format(episode.get('showtitle'), episode_name))
-                p_dialog.update((i_count * 100) // i_total, message=u'Found {} in library. Skipping...'.format(episode_name)) if p_dialog else None
-                continue  # Skip added items
-            p_dialog.update((i_count * 100) // i_total, message=u'Adding {} to library...'.format(episode_name)) if p_dialog else None
-            episode_path = library_cleancontent(episode.get('file'))
+                utils.try_parse_int(season), utils.try_parse_int(episode.get('episode_number')),
+                utils.validify_filename(episode.get('name')))
+
+            # Check if item has already been added
+            if _plugin.get_db_info(info='dbid', tmdbtype='episode', imdb_id=imdb_id, tmdb_id=tmdb_id, season=season, episode=episode.get('episode_number')):
+                utils.kodi_log(u'Add to Library\nFound {} - {} in library. Skipping...'.format(episode.get('showtitle'), episode_name))
+                p_dialog.update((e_count * 100) // e_total, message=u'Found {} in library. Skipping...'.format(episode_name)) if p_dialog else None
+                continue
+
+            p_dialog.update((e_count * 100) // e_total, message=u'Adding {} to library...'.format(episode_name)) if p_dialog else None
+            episode_path = 'plugin://plugin.video.themoviedb.helper/?info=play&type=episode&islocal=True'
+            episode_path += '&tmdb_id{}&season={}&episode={}'.format(tmdb_id, season, episode.get('episode_number'))
             library_createfile(episode_name, episode_path, folder, season_name, basedir=basedir)
 
 

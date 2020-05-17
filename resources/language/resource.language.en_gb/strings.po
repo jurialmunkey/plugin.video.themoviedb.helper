@@ -802,6 +802,11 @@ msgctxt "#32159"
 msgid "Select Original Language"
 msgstr ""
 
+#: /resources/lib/context.py
+msgctxt "#32160"
+msgid "Adding {} - {} to library..."
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
