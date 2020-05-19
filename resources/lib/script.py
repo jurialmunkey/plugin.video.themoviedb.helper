@@ -370,40 +370,60 @@ class Script(Plugin):
         self.addon.setSettingString('default_player_episodes', '')
 
     def monitor_userlist(self):
-        monitor_userlist = self.params.get('monitor_userlist')
         with utils.busy_dialog():
             user_slug = TraktAPI().get_usernameslug()  # Get the user's slug
             user_lists = TraktAPI().get_response_json('users', user_slug, 'lists')  # Get the user's lists
+
             if not user_lists:
                 return
-            user_list_labels = [i.get('name') for i in user_lists]  # Build select dialog to choose list
-            user_list_labels.append(xbmc.getLocalizedString(231))
-        user_choice = xbmcgui.Dialog().select(self.addon.getLocalizedString(32133), user_list_labels)  # Choose the list
-        if user_choice == -1:  # User cancelled
+
+            monitor_userlist = self.addon.getSettingString('monitor_userlist') or ''
+            monitor_userlist = monitor_userlist.split(' | ')
+            user_list_labels, preselect = [], []
+            for idx, i in enumerate(user_lists):
+                user_list_labels.append(i.get('name'))
+                preselect.append(idx) if i.get('ids', {}).get('slug') in monitor_userlist else None
+
+        user_choice = xbmcgui.Dialog().multiselect(self.addon.getLocalizedString(32133), user_list_labels, preselect=preselect)  # Choose the list
+
+        if not user_choice:  # User cancelled
             return
-        elif user_list_labels[user_choice] == xbmc.getLocalizedString(231):  # User opted to clear setting
-            self.addon.setSettingString(monitor_userlist, '')
-            return
-        user_list = user_lists[user_choice].get('ids', {}).get('slug')
+
+        user_list = ''
+        for i in user_choice:
+            user_list += ' | ' if user_list else ''
+            user_list += user_lists[i].get('ids', {}).get('slug')
+
         if not user_list:
             return
-        self.addon.setSettingString(monitor_userlist, user_list)
+
+        self.addon.setSettingString('monitor_userlist', user_list)
+
         if xbmcgui.Dialog().yesno(xbmc.getLocalizedString(653), self.addon.getLocalizedString(32132)):
             self.library_autoupdate(list_slug=user_list, user_slug=user_slug)
+
+    def library_userlist(self):
+        user_slug = self.params.get('user_slug') or TraktAPI().get_usernameslug()  # Get the user's slug
+        list_slug = self.params.get('library_userlist')
+        if user_slug and list_slug:
+            context.library_userlist(
+                user_slug=user_slug, list_slug=list_slug,
+                confirmation_dialog=False, allow_update=True, busy_dialog=False)
 
     def library_autoupdate(self, list_slug=None, user_slug=None):
         busy_dialog = True if self.params.get('busy_dialog') else False
         utils.kodi_log(u'UPDATING TV SHOWS LIBRARY', 1)
         xbmcgui.Dialog().notification('TMDbHelper', 'Auto-Updating Library...')
         basedir_tv = self.addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
-        list_slug = list_slug or self.addon.getSettingString('monitor_userlist')
-        if list_slug:
-            user_slug = user_slug or TraktAPI().get_usernameslug()
-            if user_slug:
-                context.library_userlist(user_slug=user_slug, list_slug=list_slug, confirmation_dialog=False, allow_update=False, busy_dialog=busy_dialog)
-            list_slug_2 = self.addon.getSettingString('monitor_userlist_2')
-            if list_slug_2 and list_slug_2 != list_slug:
-                context.library_userlist(user_slug=user_slug, list_slug=list_slug_2, confirmation_dialog=False, allow_update=False, busy_dialog=busy_dialog)
+
+        list_slug = list_slug or self.addon.getSettingString('monitor_userlist') or ''
+        user_slug = user_slug or TraktAPI().get_usernameslug()
+        if user_slug and list_slug:
+            for i in list_slug.split(' | '):
+                context.library_userlist(
+                    user_slug=user_slug, list_slug=i, confirmation_dialog=False,
+                    allow_update=False, busy_dialog=busy_dialog)
+
         p_dialog = xbmcgui.DialogProgressBG() if busy_dialog else None
         p_dialog.create('TMDbHelper', 'Adding items to library...') if p_dialog else None
         for f in xbmcvfs.listdir(basedir_tv)[0]:
@@ -481,6 +501,8 @@ class Script(Plugin):
             self.blur_image()
         elif self.params.get('monitor_userlist'):
             self.monitor_userlist()
+        elif self.params.get('library_userlist'):
+            self.library_userlist()
         elif self.params.get('update_players'):
             self.update_players()
         elif self.params.get('set_defaultplayer'):

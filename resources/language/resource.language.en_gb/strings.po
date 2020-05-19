@@ -659,17 +659,17 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32131"
-msgid "Auto-update library from Trakt list"
+msgid "Auto-update library from Trakt list(s)"
 msgstr ""
 
 #: /resources/lib/script.py
 msgctxt "#32132"
-msgid "Do you wish to update the library using this Trakt list now?"
+msgid "Do you wish to update the library from the Trakt list(s) now?"
 msgstr ""
 
 #: /resources/lib/script.py
 msgctxt "#32133"
-msgid "Select List"
+msgid "Select List(s)"
 msgstr ""
 
 #: /resources/settings.xml
@@ -805,6 +805,11 @@ msgstr ""
 #: /resources/lib/context.py
 msgctxt "#32160"
 msgid "Adding {} - {} to library..."
+msgstr ""
+
+#: /resources/lib/traktapi.py
+msgctxt "#32161"
+msgid "Do you wish to update the library with this list now?"
 msgstr ""
 
 msgctxt "#30030"
