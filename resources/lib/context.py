@@ -127,7 +127,7 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id
     s_count, s_total = 0, len(seasons)  # Used to update p_dialog progress
     for season in seasons:
         s_count += 1
-        season_name = '{} {}'.format(xbmc.getLocalizedString(20373), season)  # This was a dumb idea to localise season name - too late now
+        season_name = u'Season {}'.format(season)  # Originally made a bad choice here to localise season name but reverted that now
 
         if p_dialog:  # Update our progress dialog
             p_dialog_val = (s_count * 100) // s_total
