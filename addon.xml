@@ -69,6 +69,8 @@ provider-name="jurialmunkey">
   <disclaimer lang="en_GB">Provided by TheMovieDb and Trakt.</disclaimer>
   <disclaimer lang="es_ES">Proporcionado por TheMovieDb y Trakt</disclaimer>
   <license>GPL-3.0-or-later</license>
+  <website>https://github.com/jurialmunkey/plugin.video.themoviedb.helper</website>
+  <forum>https://forum.kodi.tv/showthread.php?tid=345847</forum>
   <assets>
     <icon>icon.png</icon>
     <fanart>fanart.jpg</fanart>
