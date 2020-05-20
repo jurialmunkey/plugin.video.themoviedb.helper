@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.themoviedb.helper"
-version="2.4.74"
+version="2.4.75"
 name="TheMovieDb Helper"
 provider-name="jurialmunkey">
 <requires>
