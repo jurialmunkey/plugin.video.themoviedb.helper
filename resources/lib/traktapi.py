@@ -618,13 +618,11 @@ class TraktAPI(RequestAPI):
         url += '/remove' if remove_item else ''
         msg_head = self.addon.getLocalizedString(32139) if remove_item else self.addon.getLocalizedString(32140)
         if self.get_api_request(url, headers=self.headers, postdata=dumps(items)):
-            monitor_userlist = self.addon.getSettingString('monitor_userlist') or ''
-            monitor_userlist = monitor_userlist.split(' | ')
             msg_body = self.addon.getLocalizedString(32135) if remove_item else self.addon.getLocalizedString(32136)
             msg_body = msg_body.format(item_type, item.get('title'), user_list)
             utils.kodi_log('TRAKT SYNC LIST - ' + msg_body)
 
-            if not remove_item and user_list in monitor_userlist:
+            if not remove_item and self.addon.getSettingBool('auto_update'):
                 msg_body += '\n\n' + self.addon.getLocalizedString(32161)  # List is a monitored list so ask if want to update library
                 if xbmcgui.Dialog().yesno(msg_head, msg_body):  # Check if user wants to update library with list
                     xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,library_userlist={},user_slug={})'.format(user_list, user_slug))
