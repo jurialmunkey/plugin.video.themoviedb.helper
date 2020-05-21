@@ -82,7 +82,7 @@ class ListItem(object):
         self.is_folder = False if self.url.get('info') in ['play', 'textviewer', 'imageviewer'] else True
 
         # Set video paths to url
-        if self.infolabels.get('mediatype') == 'video' and self.infolabels.get('path'):
+        if self.infolabels.get('mediatype') == 'video' and self.infolabels.get('path') and self.url.get('info') == 'details':
             self.url = {'url': self.infolabels.get('path')}
             self.is_folder = False
 
