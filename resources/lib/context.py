@@ -154,7 +154,7 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id
 
             p_dialog.update((e_count * 100) // e_total, message=u'Adding {} to library...'.format(episode_name)) if p_dialog else None
             episode_path = 'plugin://plugin.video.themoviedb.helper/?info=play&type=episode&islocal=True'
-            episode_path += '&tmdb_id{}&season={}&episode={}'.format(tmdb_id, season, episode.get('episode_number'))
+            episode_path += '&tmdb_id={}&season={}&episode={}'.format(tmdb_id, season, episode.get('episode_number'))
             library_createfile(episode_name, episode_path, folder, season_name, basedir=basedir)
 
 
