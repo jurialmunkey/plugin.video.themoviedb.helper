@@ -3,6 +3,7 @@ import xbmc
 import xbmcvfs
 import xbmcaddon
 import xbmcgui
+import datetime
 from resources.lib.plugin import Plugin
 from resources.lib.traktapi import TraktAPI
 from resources.lib.kodilibrary import KodiLibrary
@@ -145,6 +146,12 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id
             episode_name = 'S{:02d}E{:02d} - {}'.format(
                 utils.try_parse_int(season), utils.try_parse_int(episode.get('episode_number')),
                 utils.validify_filename(episode.get('name')))
+
+            # Skip future episodes
+            if _addon.getSettingBool('hide_unaired_episodes'):
+                if not episode.get('air_date') or utils.convert_timestamp(episode.get('air_date'), "%Y-%m-%d", 10) > datetime.datetime.now():
+                    p_dialog.update((e_count * 100) // e_total, message=u'{} not aired yet. Skipping...'.format(episode_name)) if p_dialog else None
+                    continue
 
             # Check if item has already been added
             if _plugin.get_db_info(info='dbid', tmdbtype='episode', imdb_id=imdb_id, tmdb_id=tmdb_id, season=season, episode=episode.get('episode_number')):

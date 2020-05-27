@@ -37,6 +37,7 @@ class ListItem(object):
         self.tvshow_dbid = tvshow_dbid
         self.nextpage = nextpage
         self.extrafanart = extrafanart or {}
+        self.local_path = ''
 
     def set_url(self, **kwargs):
         url = kwargs.pop('url', u'plugin://plugin.video.themoviedb.helper/?')
@@ -78,12 +79,12 @@ class ListItem(object):
         if linklibrary and self.infolabels.get('mediatype') == 'episode' and self.tvshow_dbid:
             self.url = {'url': 'videodb://tvshows/titles/{}/'.format(self.tvshow_dbid)}
 
-        # Only set as folder if not playable
-        self.is_folder = False if self.url.get('info') in ['play', 'textviewer', 'imageviewer'] else True
-
         # Set video paths to url
+        self.is_folder = True
         if self.infolabels.get('mediatype') == 'video' and self.infolabels.get('path') and self.url.get('info') == 'details':
             self.url = {'url': self.infolabels.get('path')}
+            self.is_folder = False
+        if self.url.get('info') in ['play', 'textviewer', 'imageviewer']:
             self.is_folder = False
 
     def get_extra_artwork(self, tmdb=None, fanarttv=None):
@@ -199,6 +200,7 @@ class ListItem(object):
         if not details:
             return
 
+        self.local_path = details.get('path')
         self.icon = details.get('icon') or self.icon
         self.poster = details.get('poster') or self.poster
         self.fanart = details.get('fanart') or self.fanart

@@ -474,7 +474,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32094"
-msgid "Prioritise local files"
+msgid "Prioritise local files over default player"
 msgstr ""
 
 #: /resources/lib/traktapi.py
@@ -810,6 +810,11 @@ msgstr ""
 #: /resources/lib/traktapi.py
 msgctxt "#32161"
 msgid "Do you wish to update the library with this list now?"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32162"
+msgid "Automatically play local files"
 msgstr ""
 
 msgctxt "#30030"

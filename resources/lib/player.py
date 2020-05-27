@@ -66,7 +66,9 @@ class Player(Plugin):
         if not self.itemlist:
             return -1  # No players left so cancel
 
-        if force_dialog or (self.itemtype == 'movie' and not self.dp_movies) or (self.itemtype == 'episode' and not self.dp_episodes):
+        if (force_dialog
+                or (self.itemtype == 'movie' and not self.dp_movies and (not self.is_local or not self.dp_local))
+                or (self.itemtype == 'episode' and not self.dp_episodes and (not self.is_local or not self.dp_local))):
             idx = xbmcgui.Dialog().select(self.addon.getLocalizedString(32042), self.itemlist)  # Ask user to select player
             if self.itemtype == 'movie':
                 self.dp_movies = self.itemlist[idx].getLabel()
