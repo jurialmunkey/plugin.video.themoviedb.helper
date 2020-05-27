@@ -100,9 +100,9 @@ class KodiLibrary(object):
         infoproperties['numitems.dbid.tvshows'] = self.get_num_credits('tvshow', person)
         infoproperties['numitems.dbid.episodes'] = self.get_num_credits('episode', person)
         infoproperties['numitems.dbid.total'] = (
-            utils.try_parse_int(infoproperties.get('numitems.dbid.movies')) +
-            utils.try_parse_int(infoproperties.get('numitems.dbid.tvshows')) +
-            utils.try_parse_int(infoproperties.get('numitems.dbid.episodes')))
+            utils.try_parse_int(infoproperties.get('numitems.dbid.movies'))
+            + utils.try_parse_int(infoproperties.get('numitems.dbid.tvshows'))
+            + utils.try_parse_int(infoproperties.get('numitems.dbid.episodes')))
         infoproperties = utils.del_empty_keys(infoproperties, ['N/A', '0.0', '0'])
         return infoproperties
 
@@ -176,7 +176,7 @@ class KodiLibrary(object):
         infolabels['album'] = item.get('album')
         infolabels['artist'] = item.get('artist', [])
         infolabels['votes'] = item.get('votes')
-        infolabels['path'] = item.get('path')
+        infolabels['path'] = item.get('file')
         infolabels['trailer'] = item.get('trailer')
         infolabels['dateadded'] = item.get('dateadded')
         infolabels['overlay'] = 5 if utils.try_parse_int(item.get('playcount')) > 0 and key in ['movie', 'episode'] else 4
@@ -205,13 +205,14 @@ class KodiLibrary(object):
         clearart = item.get('art', {}).get('clearart') or ''
         discart = item.get('art', {}).get('discart') or ''
         cast = item.get('cast', [])
+        path = item.get('file') or ''
         streamdetails = item.get('streamdetails', {})
         infolabels = self.get_infolabels(item, key)
         infoproperties = self.get_infoproperties(item)
         return {
             'label': label, 'icon': icon, 'poster': poster, 'thumb': thumb, 'fanart': fanart, 'landscape': landscape,
             'clearlogo': clearlogo, 'clearart': clearart, 'discart': discart, 'cast': cast, 'infolabels': infolabels,
-            'infoproperties': infoproperties, 'streamdetails': streamdetails}
+            'infoproperties': infoproperties, 'streamdetails': streamdetails, 'path': path}
 
     def get_item_details(self, dbid=None, method=None, key=None, properties=None):
         if not dbid or not method or not key or not properties:
