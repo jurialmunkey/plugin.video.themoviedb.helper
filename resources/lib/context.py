@@ -166,6 +166,24 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id
 
 
 def browse():
+    
+    info = sys.listitem.getVideoInfoTag()
+    type = info.getMediaType()
+    title = info.getTVShowTitle()   
+
+    params = utils.parse_paramstring(sys.argv[0])
+    type = 'tv'
+    season = info.getSeason() 
+#   xbmc.log(str(season)+str(title)+'===>TMDBHelper', level=xbmc.LOGNOTICE)
+    tmdb_id_no = Plugin().get_tmdb_id(query=title, itemtype='tv')
+    xbmc.log(str(tmdb_id_no)+'===>TMDBHelper', level=xbmc.LOGNOTICE)
+#    if type == 'episode' or type == 'tv':
+#   	params['type'] = 'tv'
+#	    tmdb_id_no = Plugin().get_tmdb_id(**params)
+
+    tmdb_id = sys.listitem.getProperty('tvshow.tmdb_id')
+    if tmdb_id == '' or tmdb_id == None:
+	tmdb_id = tmdb_id_no
     tmdb_id = sys.listitem.getProperty('tvshow.tmdb_id')
     path = 'plugin://plugin.video.themoviedb.helper/'
     path = path + '?info=seasons&type=tv&nextpage=True&tmdb_id={}'.format(tmdb_id)
