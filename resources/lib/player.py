@@ -262,7 +262,7 @@ class Player(Plugin):
             self.item['tvdb'] = self.details.get('infoproperties', {}).get('tvshow.tvdb_id') or trakt_details.get('ids', {}).get('tvdb')
             self.item['slug'] = trakt_details.get('ids', {}).get('slug')
 
-	    from resources.lib.fanarttv import FanartTV            
+	from resources.lib.fanarttv import FanartTV            
         if self.itemtype == 'episode':  # Do some special episode stuff
             self.item['plot'] = self.details.get('infolabels', {}).get('plot')
             self.item['id'] = self.item.get('tvdb')
@@ -270,22 +270,22 @@ class Player(Plugin):
             self.item['name'] = u'{0} S{1:02d}E{2:02d}'.format(self.item.get('showname'), int(utils.try_parse_int(self.season)), int(utils.try_parse_int(self.episode)))
             self.item['season'] = self.season
             self.item['episode'] = self.episode
-	        artwork = FanartTV.get_tvshow_allart(self.fanarttv, self.item['tvdb'])
+	    artwork = FanartTV.get_tvshow_allart(self.fanarttv, self.item['tvdb'])
     	    self.item['banner'] = artwork.get('banner')
     	    self.item['landscape'] =artwork.get('landscape')
-	        self.item['fanart'] = artwork.get('fanart')
-	        self.item['poster'] = artwork.get('poster')
+	    self.item['fanart'] = artwork.get('fanart')
+	    self.item['poster'] = artwork.get('poster')
     	    self.item['clearlogo'] = artwork.get('clearlogo')
-	        self.item['clearart'] = artwork.get('clearart')
-	    else:
-	        self.item['plot'] = self.details.get('infolabels', {}).get('plot')
-	        artwork = FanartTV.get_movie_allart(self.fanarttv, self.tmdb_id)
+	    self.item['clearart'] = artwork.get('clearart')
+        else:
+	    self.item['plot'] = self.details.get('infolabels', {}).get('plot')
+	    artwork = FanartTV.get_movie_allart(self.fanarttv, self.tmdb_id)
     	    self.item['banner'] = artwork.get('banner')
-	        self.item['landscape'] =artwork.get('landscape')
-	        self.item['fanart'] = artwork.get('fanart')
-	        self.item['poster'] = artwork.get('poster')
-	        self.item['clearlogo'] = artwork.get('clearlogo')
-	        self.item['clearart'] = artwork.get('clearart')
+	    self.item['landscape'] =artwork.get('landscape')
+	    self.item['fanart'] = artwork.get('fanart')
+	    self.item['poster'] = artwork.get('poster')
+	    self.item['clearlogo'] = artwork.get('clearlogo')
+	    self.item['clearart'] = artwork.get('clearart')
 
 
         if self.traktapi and self.itemtype == 'episode':
