@@ -602,8 +602,8 @@ class TraktAPI(RequestAPI):
 
                 for e in s['episodes']:
                         url = "plugin://plugin.video.themoviedb.helper?info=play&amp;type=episode&amp;tmdb_id=" + str(i['show']['ids']['tmdb']) + "&amp;season=" + str(s['number']) + "&amp;episode=" + str(e['number'])
-			            if str(i['show']['ids']['tmdb']) == 'None':
-				            url = 'plugin://plugin.video.themoviedb.helper?info=play&amp;query=' + str(i['show']['title']) + '&amp;type=episode&amp;season=' + str(s['number']) + '&amp;episode=' + str(e['number'])
+			if str(i['show']['ids']['tmdb']) == 'None':
+			    url = 'plugin://plugin.video.themoviedb.helper?info=play&amp;query=' + str(i['show']['title']) + '&amp;type=episode&amp;season=' + str(s['number']) + '&amp;episode=' + str(e['number'])
 #                           url = "plugin://plugin.video.openmeta/tv/play/" +str(i['show']['ids']['tvdb']) +"/" + str(s['number']) + "/" + str(e['number'])
 #                           url = "plugin://plugin.video.openmeta/play_stream/info?type=episode&amp;tmdb_id=" + str(i['show']['ids']['tmdb']) + "&amp;season=" + str(s['number']) + "&amp;episode=" + str(e['number'])
 #                           url = 'plugin://plugin.video.themoviedb.helper?info=stream&amp;tmdb_id=' + str(i['show']['ids']['tmdb']) + '&amp;type=episode&amp;season=' + str(s['number']) + '&amp;episode=' + str(e['number'])
