@@ -552,7 +552,7 @@ class TraktAPI(RequestAPI):
 
 
     def get_collection_tv(self, tmdbtype, page=1):
-	    date = datetime.date.today() - datetime.timedelta(days = 1)
+	date = datetime.date.today() - datetime.timedelta(days = 1)
         calendar_eps = self.get_calendar('shows', True, start_date=date.strftime('%Y-%m-%d'), days=7)
 
         xbmc.log('START_SYNC_TRAKT_COLLECTION===>TMDB HELPER', level=xbmc.LOGNOTICE)
