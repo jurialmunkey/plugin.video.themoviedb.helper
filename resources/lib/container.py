@@ -1272,48 +1272,48 @@ class Container(Plugin):
             
         elif self.params.get('info') == 'play4' or self.params.get('info') == 'play':
 #url = plugin://plugin.video.themoviedb.helper?info=play4&amp;type=episode&amp;tmdb_id=95&amp;season=1&amp;episode=1
-	        lock = self.paramstring
-        	cur_lock = xbmcgui.Window(10000).getProperty('TMDbHelper.Player.ResolvedUrl')
+	    lock = self.paramstring
+      	    cur_lock = xbmcgui.Window(10000).getProperty('TMDbHelper.Player.ResolvedUrl')
 
-	        playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
-	        playlist.clear()
+	    playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+	    playlist.clear()
 #           current_position = playlist.getposition()
 #           xbmc.log(str(playlist.size())+' duration ===SERVICE_NEXT_PLAYLIST', level=xbmc.LOGNOTICE)
 
-#   		xbmc.log(str(xbmcgui.getCurrentWindowDialogId())+'===>TMDBHelper', level=xbmc.LOGNOTICE)
-#	    	xbmc.log(str(cur_lock)+'===>TMDBHelper', level=xbmc.LOGNOTICE)
+#   	    xbmc.log(str(xbmcgui.getCurrentWindowDialogId())+'===>TMDBHelper', level=xbmc.LOGNOTICE)
+#	    xbmc.log(str(cur_lock)+'===>TMDBHelper', level=xbmc.LOGNOTICE)
 
-		    if cur_lock == 'true':
-#			    xbmc.log('cur_lock Exists Exiting '+'===>TMDBHelper', level=xbmc.LOGNOTICE)
-			    xbmcplugin.endOfDirectory(self.handle, updateListing=False, cacheToDisc=False)
-#		        xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
-			    exit()
+	    if cur_lock == 'true':
+#	        xbmc.log('cur_lock Exists Exiting '+'===>TMDBHelper', level=xbmc.LOGNOTICE)
+	        xbmcplugin.endOfDirectory(self.handle, updateListing=False, cacheToDisc=False)
+#	        xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
+	        exit()
 		
-		    xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+	    xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
 
-		    type = self.params.get('type')
-		    episode = self.params.get('episode')
-		    season = self.params.get('season')
-		    year = self.params.get('year')
+	    type = self.params.get('type')
+	    episode = self.params.get('episode')
+	    season = self.params.get('season')
+	    year = self.params.get('year')
 
-		    params = self.params
-	      	if type == 'episode' or type == 'tv':
-        		params = self.params.copy()
-	        	params['type'] = 'tv'
-	        tmdb_id_no = self.get_tmdb_id(**params)
+	    params = self.params
+	    if type == 'episode' or type == 'tv':
+        	params = self.params.copy()
+	       	params['type'] = 'tv'
+	    tmdb_id_no = self.get_tmdb_id(**params)
 	
-		    if not cur_lock == 'true':
-			    from resources.lib.player import Player
-#   			xbmcgui.Window(10000).setProperty('TMDbHelper.Player.ResolvedUrl', lock)
-	    		xbmcgui.Window(10000).setProperty('TMDbHelper.Player.ResolvedUrl', 'true')
-		    	xbmc.log('setProperty '+ str(lock) +'||===>TMDBHelper', level=xbmc.LOGNOTICE)
-			    xbmcplugin.endOfDirectory(self.handle, updateListing=False, cacheToDisc=False)
-			    if type == 'episode' or type == 'tv':
-				    action = Player().play(itemtype='episode', tmdb_id=tmdb_id_no, season=season, episode=episode)
-			    if type == 'movie':
-				    action = Player().play(itemtype='movie', tmdb_id=tmdb_id_no)
+	    if not cur_lock == 'true':
+		from resources.lib.player import Player
+#   		xbmcgui.Window(10000).setProperty('TMDbHelper.Player.ResolvedUrl', lock)
+	    	xbmcgui.Window(10000).setProperty('TMDbHelper.Player.ResolvedUrl', 'true')
+		xbmc.log('setProperty '+ str(lock) +'||===>TMDBHelper', level=xbmc.LOGNOTICE)
+		xbmcplugin.endOfDirectory(self.handle, updateListing=False, cacheToDisc=False)
+		if type == 'episode' or type == 'tv':
+		    action = Player().play(itemtype='episode', tmdb_id=tmdb_id_no, season=season, episode=episode)
+		if type == 'movie':
+		    action = Player().play(itemtype='movie', tmdb_id=tmdb_id_no)
 
-#		        xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
-    			xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
-	    		xbmc.sleep(5000)
-		    	xbmcgui.Window(10000).clearProperty('TMDbHelper.Player.ResolvedUrl')  # Clear our lock property
+#		xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
+    		xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
+	    	xbmc.sleep(5000)
+		xbmcgui.Window(10000).clearProperty('TMDbHelper.Player.ResolvedUrl')  # Clear our lock property
