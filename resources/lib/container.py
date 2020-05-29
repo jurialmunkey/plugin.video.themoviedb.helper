@@ -1265,7 +1265,7 @@ class Container(Plugin):
         elif self.params.get('info') == 'unlock':
 #   		xbmcgui.Window(10000).setProperty('TMDbHelper.Player.ResolvedUrl', 'false')
 	    	xbmc.log('UNLOCK '+'===>TMDBHelper', level=xbmc.LOGNOTICE)
-		    xbmcgui.Window(10000).clearProperty('TMDbHelper.Player.ResolvedUrl')
+		xbmcgui.Window(10000).clearProperty('TMDbHelper.Player.ResolvedUrl')
         
         elif self.params.get('info') == 'trakt_collection_tv':
             items = TraktAPI(tmdb='tv', login=True).get_collection_tv('tv', utils.try_parse_int(self.params.get('page', 1)))
