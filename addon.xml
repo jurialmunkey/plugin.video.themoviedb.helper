@@ -22,7 +22,7 @@ provider-name="jurialmunkey">
     </item>
     <item library="context-open.py">
       <label>$ADDON[plugin.video.themoviedb.helper 32147]</label>
-      <visible>String.IsEqual(ListItem.dbtype,episode) + !String.IsEmpty(ListItem.Property(tvshow.tmdb_id))</visible>
+      <visible>String.IsEqual(ListItem.dbtype,tvshow) | String.IsEqual(ListItem.dbtype,episode)</visible>
     </item>
     <menu>
       <label>$ADDON[plugin.video.themoviedb.helper 32145]</label>
