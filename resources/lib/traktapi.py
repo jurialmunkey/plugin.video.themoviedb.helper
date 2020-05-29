@@ -574,9 +574,9 @@ class TraktAPI(RequestAPI):
         for i in collection:
 
             nfo = 'https://thetvdb.com/?tab=series&id=' + str(i['show']['ids']['tvdb'])
-	        if str(i['show']['ids']['tmdb']) == 'None':
+	    if str(i['show']['ids']['tmdb']) == 'None':
 		        nfo = 'https://thetvdb.com/?tab=series&id=' + str(i['show']['ids']['tvdb'])
-	        else:
+	    else:
 		        nfo = 'https://www.themoviedb.org/tv/' + str(i['show']['ids']['tmdb'])
             nfo_path = file_path + '/' + str(i['show']['ids']['tvdb']) + '/' + 'tvshow.nfo'        
 
