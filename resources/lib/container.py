@@ -1176,7 +1176,7 @@ class Container(Plugin):
                     if not xbmc.getCondVisibility("Window.IsMedia"):
                         url['widget'] = 'True'
 
-                    if self.fanarttv and xbmc.getCondVisibility("Window.IsMedia"):
+                    if self.addon.getSettingBool('fanarttv_lookup') and xbmc.getCondVisibility("Window.IsMedia"):
                         url['fanarttv'] = 'True'
 
                     if xbmc.getCondVisibility("Window.IsMedia"):
