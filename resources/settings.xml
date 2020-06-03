@@ -42,7 +42,8 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32030]" type="lsep"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32019]" type="text" id="fanarttv_clientkey" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32021]" type="bool" id="fanarttv_lookup" default="false" subsetting="true" />
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32028]" type="bool" id="widget_fanarttv_lookup" default="false" subsetting="true" enable="eq(-1,True)" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32028]" type="bool" id="widget_fanarttv_lookup" default="false" subsetting="true" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32163]" type="bool" id="service_fanarttv_lookup" default="false" subsetting="true" />
     </category>
     <category label="$ADDON[plugin.video.themoviedb.helper 32083]">
         <setting label="$ADDON[plugin.video.themoviedb.helper 32031]" type="lsep"/>
