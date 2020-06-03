@@ -37,11 +37,9 @@ class Plugin(object):
 
         self.omdb = OMDb(api_key=omdb_apikey, cache_long=cache_long, cache_short=cache_short) if omdb_apikey else None
 
-        self.fanarttv = (
-            FanartTV(
-                api_key=fanarttv_apikey, client_key=fanarttv_clientkey, language=language,
-                cache_long=cache_long, cache_short=cache_short)
-            if self.addon.getSettingBool('fanarttv_lookup') else None)
+        self.fanarttv = FanartTV(
+            api_key=fanarttv_apikey, client_key=fanarttv_clientkey, language=language,
+            cache_long=cache_long, cache_short=cache_short)
 
     def textviewer(self, header, text):
         xbmcgui.Dialog().textviewer(header, text)
