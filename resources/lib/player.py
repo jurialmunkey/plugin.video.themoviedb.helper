@@ -369,8 +369,17 @@ class Player(Plugin):
                     vfs_file.close()
 
                 self.players[file] = meta
-                if not meta.get('plugin') or not xbmc.getCondVisibility(u'System.HasAddon({0})'.format(meta.get('plugin'))):
-                    continue  # Don't have plugin so skip
+                plugin = meta.get('plugin')
+                missing = False
+                if plugin:
+                    if isinstance(plugin, list):
+                        for p in plugin:
+                            if not xbmc.getCondVisibility(u'System.HasAddon({0})'.format(p)):
+                                missing = True
+                        if missing:
+                            continue  # Don't have plugin so skip
+                    elif not xbmc.getCondVisibility(u'System.HasAddon({0})'.format(plugin)):
+                        continue  # Don't have plugin so skip
 
                 tmdbtype = tmdbtype or self.tmdbtype
                 priority = utils.try_parse_int(meta.get('priority')) or 1000
