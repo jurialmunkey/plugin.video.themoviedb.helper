@@ -7,6 +7,7 @@ import resources.lib.utils as utils
 import resources.lib.constants as constants
 from json import loads
 from string import Formatter
+from threading import Thread
 from collections import defaultdict
 from resources.lib.plugin import Plugin
 from resources.lib.kodilibrary import KodiLibrary
@@ -26,6 +27,24 @@ def string_format_map(fmt, d):
         return fmt.format(**{part[1]: d[part[1]] for part in parts})
     else:
         return fmt.format(**d)
+
+
+class KeyboardInputter(Thread):
+    def __init__(self, text=None, timeout=300):
+        Thread.__init__(self)
+        self.text = text
+        self.exit = False
+        self.poll = 0.5
+        self.timeout = timeout
+        self.kodimonitor = xbmc.Monitor()
+
+    def run(self):
+        while not self.kodimonitor.abortRequested() and not self.exit and self.timeout > 0:
+            self.kodimonitor.waitForAbort(self.poll)
+            self.timeout -= self.poll
+            if xbmc.getCondVisibility("Window.IsVisible(DialogKeyboard.xml)"):
+                utils.get_jsonrpc("Input.SendText", {"text": self.text, "done": True})
+                self.exit = True
 
 
 class Player(Plugin):
@@ -100,99 +119,144 @@ class Player(Plugin):
 
         return -1
 
-    def play_external(self, force_dialog=False, playerindex=-1):
+    def player_getnewindex(self, playerindex=-1, force_dialog=False):
         if playerindex > -1:  # Previous iteration didn't find an item to play so remove it and retry
             xbmcgui.Dialog().notification(self.itemlist[playerindex].getLabel(), self.addon.getLocalizedString(32040))
             del self.actions[playerindex]  # Item not found so remove the player's action list
             del self.itemlist[playerindex]  # Item not found so remove the player's select dialog entry
             del self.identifierlist[playerindex]  # Item not found so remove the player's index
-
         playerindex = 0 if len(self.itemlist) == 1 and self.autoplay_single else self.get_playerindex(force_dialog=force_dialog)
+        return playerindex
+
+    def player_dialogselect(self, folder, auto=False):
+        d_items = []
+        for f in folder:
+
+            # Skip items without labels as probably not worth playing
+            if not f.get('label') or f.get('label') == 'None':
+                continue
+
+            # Get the label of the item
+            label_a = f.get('label')
+
+            # Add year to our label if exists and not special value of 1601
+            if f.get('year') and f.get('year') != 1601:
+                label_a = u'{} ({})'.format(label_a, f.get('year'))
+
+            # Add season and episode numbers to label
+            if utils.try_parse_int(f.get('season', 0)) > 0 and utils.try_parse_int(f.get('episode', 0)) > 0:
+                label_a = u'{}x{}. {}'.format(f.get('season'), f.get('episode'), label_a)
+
+            # Add various stream details to ListItem.Label2 (aka label_b)
+            label_b_list = []
+            if f.get('streamdetails'):
+                sdv_list = f.get('streamdetails', {}).get('video', [{}]) or [{}]
+                sda_list = f.get('streamdetails', {}).get('audio', [{}]) or [{}]
+                sdv, sda = sdv_list[0], sda_list[0]
+                if sdv.get('width') or sdv.get('height'):
+                    label_b_list.append(u'{}x{}'.format(sdv.get('width'), sdv.get('height')))
+                if sdv.get('codec'):
+                    label_b_list.append(u'{}'.format(sdv.get('codec', '').upper()))
+                if sda.get('codec'):
+                    label_b_list.append(u'{}'.format(sda.get('codec', '').upper()))
+                if sda.get('channels'):
+                    label_b_list.append(u'{} CH'.format(sda.get('channels', '')))
+                for i in sda_list:
+                    if i.get('language'):
+                        label_b_list.append(u'{}'.format(i.get('language', '').upper()))
+                if sdv.get('duration'):
+                    label_b_list.append(u'{} mins'.format(utils.try_parse_int(sdv.get('duration', 0)) // 60))
+            if f.get('size'):
+                label_b_list.append(u'{}'.format(utils.normalise_filesize(f.get('size', 0))))
+            label_b = ' | '.join(label_b_list) if label_b_list else ''
+
+            # Add item to select dialog list
+            d_items.append(ListItem(label=label_a, label2=label_b, icon=f.get('thumbnail')).set_listitem())
+
+        if not d_items:
+            return -1  # No items so ask user to select new player
+
+        # If autoselect enabled and only 1 item choose that otherwise ask user to choose
+        idx = 0 if auto and len(d_items) == 1 else xbmcgui.Dialog().select('Select Item', d_items, useDetails=True)
+
+        if idx == -1:
+            return  # User exited the dialog so return nothing
+
+        resolve_url = True if folder[idx].get('filetype') == 'file' else False  # Set true for files so we can play
+        return (resolve_url, folder[idx].get('file'))  # Return the player
+
+    def player_applyrules(self, folder, action):
+        for x, f in enumerate(folder):
+            for k, v in action.items():  # Iterate through our key (infolabel) / value (infolabel must match) pairs of our action
+                if k == 'position':  # We're looking for an item position not an infolabel
+                    if utils.try_parse_int(string_format_map(v, self.item)) != x + 1:  # Format our position value and add one since people are dumb and don't know that arrays start at 0
+                        break  # Not the item position we want so let's go to next item in folder
+                elif not f.get(k) or not re.match(string_format_map(v, self.item), u'{}'.format(f.get(k, ''))):  # Format our value and check if it regex matches the infolabel key
+                    break  # Item's key value doesn't match value we are looking for so let's got to next item in folder
+            else:  # Item matched our criteria so let's return it
+                utils.kodi_log('Player -- Found Match!\n{}'.format(f), 2)
+                resolve_url = True if f.get('filetype') == 'file' else False  # Set true for files so we can play
+                return (resolve_url, f.get('file'))  # Get ListItem.FolderPath for item and return as player
+        utils.kodi_log('Player -- Failed to find match!\n{}'.format(action), 2)
+        return -1  # Got through the entire folder without a match so ask user to select new player
+
+    def player_resolveurl(self, player=None):
+        if not player or not player[1] or not isinstance(player[1], list):
+            return player  # No player configured or not a list of actions so return
+
+        keyboard_input = None
+        player_resolve = False  # Player has actions so hasn't resolved yet
+        player_actions = player[1]
+        player = (player_resolve, player_actions[0])
+
+        for action in player_actions[1:]:
+
+            # If playable item was found in last action then let's break and play it
+            if player[0]:
+                break
+
+            # Start thread with keyboard inputter if needed
+            if action.get('keyboard'):
+                keyboard_input = KeyboardInputter(text=string_format_map(action.get('keyboard', ''), self.item))
+                keyboard_input.setName('keyboard_input')
+                keyboard_input.start()
+                continue  # Go to next action
+
+            # Get the next folder from the plugin
+            with utils.busy_dialog():
+                folder = KodiLibrary().get_directory(string_format_map(player[1], self.item))
+
+            # Kill our keyboard inputter thread
+            if keyboard_input:
+                keyboard_input.exit = True
+                keyboard_input = None
+
+            # Special option to show dialog of items to select from
+            if action.get('dialog'):
+                auto = True if action.get('dialog', '').lower() == 'auto' else False
+                return self.player_dialogselect(folder, auto=auto)
+
+            utils.kodi_log('Player -- Retrieved Folder\n{}'.format(string_format_map(player[1], self.item)), 2)
+
+            # Iterate through plugin folder looking for item that matches rules
+            player = self.player_applyrules(folder, action) or player
+
+        return player
+
+    def play_external(self, playerindex=-1, force_dialog=False):
+        playerindex = self.player_getnewindex(playerindex, force_dialog=force_dialog)
 
         # User cancelled dialog
         if not playerindex > -1:
             utils.kodi_log(u'Player -- User cancelled', 2)
             return False
 
-        player = self.actions[playerindex]
-        if not player or not player[1]:
-            utils.kodi_log(u'Player -- Player not found!', 2)
-            return False
+        # Run through player actions
+        player = self.player_resolveurl(self.actions[playerindex])
 
-        # External player has list of actions so let's iterate through them to find our item
-        resolve_url = False
-        if isinstance(player[1], list):
-            actionlist = player[1]
-            player = (False, actionlist[0])
-            for d in actionlist[1:]:
-                if player[0]:
-                    break  # Playable item was found in last action so let's break and play it
-
-                with utils.busy_dialog():
-                    folder = KodiLibrary().get_directory(string_format_map(player[1], self.item))  # Get the next folder from the plugin
-
-                if d.get('dialog'):  # Special option to show dialog of items to select from
-                    d_items = []
-                    for f in folder:  # Create our list of items
-                        if not f.get('label') or f.get('label') == 'None':
-                            continue
-                        lb_list = []
-                        label_a = f.get('label')
-                        if f.get('year') and f.get('year') != 1601:
-                            label_a = u'{} ({})'.format(label_a, f.get('year'))
-                        if utils.try_parse_int(f.get('season', 0)) > 0 and utils.try_parse_int(f.get('episode', 0)) > 0:
-                            label_a = u'{}x{}. {}'.format(f.get('season'), f.get('episode'), label_a)
-                        if f.get('streamdetails'):
-                            sdv_list = f.get('streamdetails', {}).get('video', [{}]) or [{}]
-                            sda_list = f.get('streamdetails', {}).get('audio', [{}]) or [{}]
-                            sdv, sda = sdv_list[0], sda_list[0]
-                            if sdv.get('width') or sdv.get('height'):
-                                lb_list.append(u'{}x{}'.format(sdv.get('width'), sdv.get('height')))
-                            if sdv.get('codec'):
-                                lb_list.append(u'{}'.format(sdv.get('codec', '').upper()))
-                            if sda.get('codec'):
-                                lb_list.append(u'{}'.format(sda.get('codec', '').upper()))
-                            if sda.get('channels'):
-                                lb_list.append(u'{} CH'.format(sda.get('channels', '')))
-                            for i in sda_list:
-                                if i.get('language'):
-                                    lb_list.append(u'{}'.format(i.get('language', '').upper()))
-                            if sdv.get('duration'):
-                                lb_list.append(u'{} mins'.format(utils.try_parse_int(sdv.get('duration', 0)) // 60))
-                        if f.get('size'):
-                            lb_list.append(u'{}'.format(utils.normalise_filesize(f.get('size', 0))))
-                        label_b = ' | '.join(lb_list) if lb_list else ''
-                        d_items.append(ListItem(label=label_a, label2=label_b, icon=f.get('thumbnail')).set_listitem())
-                    if d_items:
-                        idx = 0
-                        if d.get('dialog', '').lower() != 'auto' or len(d_items) != 1:
-                            idx = xbmcgui.Dialog().select('Select Item', d_items, useDetails=True)
-                        if idx == -1:  # User exited the dialog so return and do nothing
-                            return
-                        resolve_url = True if folder[idx].get('filetype') == 'file' else False  # Set true for files so we can play
-                        player = (resolve_url, folder[idx].get('file'))  # Set the folder path to open/play
-                        break  # Move onto next action
-                    else:  # Ask user to select a different player if no items in dialog
-                        return self.play_external(force_dialog=force_dialog, playerindex=playerindex)
-
-                x = 0
-                utils.kodi_log('Player -- Retrieved Folder\n{}'.format(string_format_map(player[1], self.item)), 2)
-                for f in folder:  # Iterate through plugin folder looking for a matching item
-                    x += 1  # Keep an index for position matching
-                    for k, v in d.items():  # Iterate through our key (infolabel) / value (infolabel must match) pairs of our action
-                        if k == 'position':  # We're looking for an item position not an infolabel
-                            if utils.try_parse_int(string_format_map(v, self.item)) != x:  # Format our position value
-                                break  # Not the item position we want so let's go to next item in folder
-                        elif not f.get(k) or not re.match(string_format_map(v, self.item), u'{}'.format(f.get(k, ''))):  # Format our value and check if it regex matches the infolabel key
-                            break  # Item's key value doesn't match value we are looking for so let's got to next item in folder
-                    else:  # Item matched our criteria so let's open it up
-                        utils.kodi_log('Player -- Found Match!\n{}'.format(f), 2)
-                        resolve_url = True if f.get('filetype') == 'file' else False  # Set true for files so we can play
-                        player = (resolve_url, f.get('file'))  # Get ListItem.FolderPath for item
-                        break  # Move onto next action (either open next folder or play file)
-                else:
-                    utils.kodi_log('Player -- Failed to find match!\n{}'.format(d), 2)
-                    return self.play_external(force_dialog=force_dialog, playerindex=playerindex)  # Ask user to select a different player
+        # Previous player failed so ask user to select a new one
+        if player == -1:
+            return self.play_external(playerindex, force_dialog=force_dialog)
 
         # Play/Search found item
         if player and player[1]:

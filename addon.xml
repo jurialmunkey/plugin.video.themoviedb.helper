@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.themoviedb.helper"
-version="2.4.80"
+version="2.4.81"
 name="TheMovieDb Helper"
 provider-name="jurialmunkey">
 <requires>
@@ -77,6 +77,6 @@ provider-name="jurialmunkey">
     <screenshot>resources/screenshot-01.jpg</screenshot>
     <screenshot>resources/screenshot-02.jpg</screenshot>
   </assets>
-  <news>Split fanart.tv options into individual choices for widget, plugin and service monitor</news>
+  <news>Allow keyboard input in players</news>
 </extension>
 </addon>
