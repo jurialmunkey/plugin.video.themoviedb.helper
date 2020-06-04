@@ -369,28 +369,23 @@ class Player(Plugin):
                     vfs_file.close()
 
                 self.players[file] = meta
-                plugin = meta.get('plugin')
-                missing = False
-                if plugin:
-                    if isinstance(plugin, list):
-                        for p in plugin:
-                            if not xbmc.getCondVisibility(u'System.HasAddon({0})'.format(p)):
-                                missing = True
-                        if missing:
-                            continue  # Don't have plugin so skip
-                    elif not xbmc.getCondVisibility(u'System.HasAddon({0})'.format(plugin)):
-                        continue  # Don't have plugin so skip
 
-                tmdbtype = tmdbtype or self.tmdbtype
-                priority = utils.try_parse_int(meta.get('priority')) or 1000
-                if tmdbtype == 'movie' and meta.get('search_movie'):
-                    self.search_movie.append((file, priority))
-                if tmdbtype == 'movie' and meta.get('play_movie'):
-                    self.play_movie.append((file, priority))
-                if tmdbtype == 'tv' and meta.get('search_episode'):
-                    self.search_episode.append((file, priority))
-                if tmdbtype == 'tv' and meta.get('play_episode'):
-                    self.play_episode.append((file, priority))
+                plugins = meta.get('plugin') or 'plugin.undefined'  # Give dummy name to undefined plugins so that they fail the check
+                plugins = plugins if isinstance(plugins, list) else [plugins]  # Listify for simplicity of code
+                for plugin in plugins:
+                    if not xbmc.getCondVisibility(u'System.HasAddon({0})'.format(plugin)):
+                        break  # System doesn't have a required plugin so skip this player
+                else:  # If the system has all the listed addons then build the player
+                    tmdbtype = tmdbtype or self.tmdbtype
+                    priority = utils.try_parse_int(meta.get('priority')) or 1000
+                    if tmdbtype == 'movie' and meta.get('search_movie'):
+                        self.search_movie.append((file, priority))
+                    if tmdbtype == 'movie' and meta.get('play_movie'):
+                        self.play_movie.append((file, priority))
+                    if tmdbtype == 'tv' and meta.get('search_episode'):
+                        self.search_episode.append((file, priority))
+                    if tmdbtype == 'tv' and meta.get('play_episode'):
+                        self.play_episode.append((file, priority))
 
     def build_playeraction(self, playerfile, action, assertplayers=True):
         player = self.players.get(playerfile, {})
