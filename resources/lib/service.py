@@ -341,7 +341,7 @@ class ServiceMonitor(Plugin):
             if self.dbtype not in ['movies', 'tvshows', 'episodes'] and tmdbtype not in ['movie', 'tv']:
                 return
             pre_item = self.pre_item
-            details = self.get_fanarttv_artwork(details, tmdbtype) if self.addon.getSettingBool('fanarttv_lookup') else details
+            details = self.get_fanarttv_artwork(details, tmdbtype) if self.addon.getSettingBool('service_fanarttv_lookup') else details
             details = self.get_kodi_artwork(details, self.dbtype, self.dbid) if self.addon.getSettingBool('local_db') else details
             if not self.is_same_item(update=False, pre_item=pre_item):
                 return
