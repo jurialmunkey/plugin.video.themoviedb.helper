@@ -29,6 +29,24 @@ def string_format_map(fmt, d):
         return fmt.format(**d)
 
 
+class KeyboardInputter(Thread):
+    def __init__(self, text=None, timeout=300):
+        Thread.__init__(self)
+        self.text = text
+        self.exit = False
+        self.poll = 0.5
+        self.timeout = timeout
+        self.kodimonitor = xbmc.Monitor()
+
+    def run(self):
+        while not self.kodimonitor.abortRequested() and not self.exit and self.timeout > 0:
+            self.kodimonitor.waitForAbort(self.poll)
+            self.timeout -= self.poll
+            if xbmc.getCondVisibility("Window.IsVisible(DialogKeyboard.xml)"):
+                utils.get_jsonrpc("Input.SendText", {"text": self.text, "done": True})
+                self.exit = True
+
+
 class Player(Plugin):
     def __init__(self):
         super(Player, self).__init__()
@@ -186,6 +204,7 @@ class Player(Plugin):
         if not player or not player[1] or not isinstance(player[1], list):
             return player  # No player configured or not a list of actions so return
 
+        keyboard_input = None
         player_resolve = False  # Player has actions so hasn't resolved yet
         player_actions = player[1]
         player = (player_resolve, player_actions[0])
@@ -196,9 +215,21 @@ class Player(Plugin):
             if player[0]:
                 break
 
+            # Start thread with keyboard inputter if needed
+            if action.get('keyboard'):
+                keyboard_input = KeyboardInputter(text=string_format_map(action.get('keyboard', ''), self.item))
+                keyboard_input.setName('keyboard_input')
+                keyboard_input.start()
+                continue  # Go to next action
+
             # Get the next folder from the plugin
             with utils.busy_dialog():
                 folder = KodiLibrary().get_directory(string_format_map(player[1], self.item))
+
+            # Kill our keyboard inputter thread
+            if keyboard_input:
+                keyboard_input.exit = True
+                keyboard_input = None
 
             # Special option to show dialog of items to select from
             if action.get('dialog'):
