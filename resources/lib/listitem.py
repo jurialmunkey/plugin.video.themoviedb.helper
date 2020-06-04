@@ -270,5 +270,7 @@ class ListItem(object):
         return listitem
 
     def create_listitem(self, handle=None, **kwargs):
+        if not self.infolabels.get('mediatype'):
+            self.infolabels.pop('mediatype', None)
         self.infolabels['path'] = self.set_url(**kwargs)
         xbmcplugin.addDirectoryItem(handle, self.infolabels.get('path'), self.set_listitem(), self.is_folder)
