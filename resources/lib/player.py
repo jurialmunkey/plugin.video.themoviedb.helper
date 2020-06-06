@@ -241,6 +241,9 @@ class Player(Plugin):
             # Iterate through plugin folder looking for item that matches rules
             player = self.player_applyrules(folder, action) or player
 
+            if player == -1:
+                break
+
         return player
 
     def play_external(self, playerindex=-1, force_dialog=False):
