@@ -653,19 +653,19 @@ class TraktAPI(RequestAPI):
 #		    xbmc.log(str(file_path + '/' + str(n['show']['ids']['tvdb']) + '/Season ' + str(n['episode']['season'])) + '===>TMDB HELPER', level=xbmc.LOGNOTICE)
 	            os.mkdir(file_path + '/' + str(n['show']['ids']['tvdb']) + '/Season ' + str(n['episode']['season']))
 		
-		    url = "plugin://plugin.video.themoviedb.helper?info=play&amp;type=episode&amp;tmdb_id=" + str(n['show']['ids']['tmdb']) + "&amp;season=" + str(n['episode']['season']) + "&amp;episode=" + str(n['episode']['number'])
-		    if str(n['show']['ids']['tmdb']) == 'None':
+		url = "plugin://plugin.video.themoviedb.helper?info=play&amp;type=episode&amp;tmdb_id=" + str(n['show']['ids']['tmdb']) + "&amp;season=" + str(n['episode']['season']) + "&amp;episode=" + str(n['episode']['number'])
+		if str(n['show']['ids']['tmdb']) == 'None':
 			url = 'plugin://plugin.video.themoviedb.helper?info=play&amp;query=' + str(n['show']['title']) + '&amp;type=episode&amp;season=' + str(n['episode']['season']) + '&amp;episode=' + str(n['episode']['number'])
-		    	file_name = str(n['show']['title']) +' - S' + format(n['episode']['season'], '02d') + 'E' + format(n['episode']['number'], '02d') + '.strm'
-                    for c in r'[]/\;,><&*:%=+@!#^()|?^':
-                    	file_name = file_name.replace(c,'')
+		file_name = str(n['show']['title']) +' - S' + format(n['episode']['season'], '02d') + 'E' + format(n['episode']['number'], '02d') + '.strm'
+                for c in r'[]/\;,><&*:%=+@!#^()|?^':
+                    file_name = file_name.replace(c,'')
 
-		    strm_path = file_path + '/' + str(n['show']['ids']['tvdb']) + '/Season ' + str(n['episode']['season']) + '/' + file_name
-		    if not os.path.exists(strm_path):
-#			xbmc.log(str(strm_path) + '===>TMDB HELPER', level=xbmc.LOGNOTICE)
-	                file = open(strm_path, 'w') 
-	                file.write(url) 
-	                file.close()
+		strm_path = file_path + '/' + str(n['show']['ids']['tvdb']) + '/Season ' + str(n['episode']['season']) + '/' + file_name
+		if not os.path.exists(strm_path):
+#		    xbmc.log(str(strm_path) + '===>TMDB HELPER', level=xbmc.LOGNOTICE)
+	            file = open(strm_path, 'w') 
+	            file.write(url) 
+	            file.close()
 
 
 #       xbmc.executebuiltin('UpdateLibrary(video, {})'.format(basedir_tv))
