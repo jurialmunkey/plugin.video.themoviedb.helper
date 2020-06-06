@@ -225,6 +225,8 @@ class Player(Plugin):
             # Get the next folder from the plugin
             with utils.busy_dialog():
                 folder = KodiLibrary().get_directory(string_format_map(player[1], self.item))
+            # utils.kodi_log('JSON RPC Files.GetDirectory\n' + string_format_map(player[1], self.item), 1)
+            # utils.kodi_log(folder, 1)
 
             # Kill our keyboard inputter thread
             if keyboard_input:
