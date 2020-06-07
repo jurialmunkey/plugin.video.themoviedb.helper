@@ -103,6 +103,8 @@ class Plugin(object):
         if not details:
             return item
 
+        details = utils.del_empty_keys(details, ['None', 'N/A'])
+
         item['icon'] = details.get('icon') or item.get('icon') or ''
         item['thumb'] = details.get('thumb') or item.get('thumb') or ''
         item['poster'] = details.get('poster') or item.get('poster') or ''
@@ -130,7 +132,7 @@ class Plugin(object):
         if not lookup_id or not func:
             return item
 
-        artwork = func(lookup_id)
+        artwork = utils.del_empty_keys(func(lookup_id), ['None', 'N/A'])
 
         if artwork:
             item['discart'] = item.get('discart') or artwork.get('discart') or ''
@@ -140,6 +142,7 @@ class Plugin(object):
             item['banner'] = item.get('banner') or artwork.get('banner') or ''
             item['fanart'] = item.get('fanart') or artwork.get('fanart') or ''
             item['extrafanart'] = item.get('extrafanart') or utils.iterate_extraart(artwork.get('extrafanart', [])) or ''
+
         return item
 
     def get_db_info(self, info=None, tmdbtype=None, imdb_id=None, originaltitle=None, title=None, year=None, tvshowtitle=None, season=None, episode=None, tmdb_id=None, tvdb_id=None):
