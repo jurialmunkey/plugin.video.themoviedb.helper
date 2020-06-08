@@ -103,8 +103,6 @@ class Plugin(object):
         if not details:
             return item
 
-        details = utils.del_empty_keys(details, ['None', 'N/A'])
-
         item['icon'] = details.get('icon') or item.get('icon') or ''
         item['thumb'] = details.get('thumb') or item.get('thumb') or ''
         item['poster'] = details.get('poster') or item.get('poster') or ''
@@ -131,8 +129,6 @@ class Plugin(object):
 
         if not lookup_id or not func:
             return item
-
-        artwork = utils.del_empty_keys(func(lookup_id), ['None', 'N/A'])
 
         if artwork:
             item['discart'] = item.get('discart') or artwork.get('discart') or ''
