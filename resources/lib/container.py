@@ -860,8 +860,9 @@ class Container(Plugin):
 
         # Build our player script command and run it
         season, episode = self.params.get('season', ''), self.params.get('episode', '')
-        command = 'play={0},tmdb_id={1}{{0}}'.format(self.params.get('type'), self.params.get('tmdb_id'))
-        command = command.format(',season={0},episode={1}'.format(season, episode) if season and episode else '')
+        command = 'islocal' if self.params.get('islocal') else ''
+        command = '{},play={},tmdb_id={}'.format(command, self.params.get('type'), self.params.get('tmdb_id'))
+        command = '{},season={0},episode={1}'.format(command, season, episode) if season and episode else command
         command = 'RunScript(plugin.video.themoviedb.helper,{})'.format(command)
         xbmc.executebuiltin(command)
 
