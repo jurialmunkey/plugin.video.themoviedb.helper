@@ -5,7 +5,7 @@ import xbmcvfs
 import datetime
 import resources.lib.utils as utils
 import resources.lib.constants as constants
-from json import loads
+from json import loads, dumps
 from string import Formatter
 from threading import Thread
 from collections import defaultdict
@@ -62,6 +62,7 @@ class Player(Plugin):
         self.dp_movies_id = None
         self.dp_episodes_id = None
         self.fallbacks = {}
+        self.playerstring = None
 
     def setup_players(self, tmdbtype=None, details=False, clearsetting=False, assertplayers=True):
         self.build_players(tmdbtype)
@@ -272,6 +273,7 @@ class Player(Plugin):
             elif player[0]:  # Action is play and not a strm so play with player
                 utils.kodi_log(u'Player -- Found file.\nAttempting to PLAY: {}'.format(action), 2)
                 xbmc.Player().play(action, ListItem(library='video', **self.details).set_listitem())
+                xbmcgui.Window(10000).setProperty('TMDbHelper.PlayerInfoString', self.playerstring) if self.playerstring else None
             else:
                 action = u'Container.Update({0})'.format(action) if xbmc.getCondVisibility("Window.IsMedia") else u'ActivateWindow(videos,{0},return)'.format(action)
                 utils.kodi_log(u'Player -- Found folder.\nAttempting to OPEN: {}'.format(action), 2)
@@ -282,6 +284,8 @@ class Player(Plugin):
         """ Entry point for player method """
         if not tmdb_id or not itemtype:
             return
+
+        xbmcgui.Window(10000).clearProperty('TMDbHelper.PlayerInfoString')
 
         with utils.busy_dialog():
             # Get the details for the item
@@ -306,6 +310,11 @@ class Player(Plugin):
 
         if not self.itemlist:
             return False
+
+        if kodi_db:
+            self.playerstring = dumps({
+                'tmdbtype': self.tmdbtype, 'season': season, 'episode': episode, 'tmdb_id': self.tmdb_id,
+                'tvdb_id': self.item.get('tvdb_id'), 'imdb_id': self.item.get('imdb_id')})
 
         return self.play_external(force_dialog=force_dialog)
 
