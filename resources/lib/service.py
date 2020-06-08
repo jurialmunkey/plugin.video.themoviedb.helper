@@ -371,7 +371,10 @@ class ServiceMonitor(Plugin):
 
     def set_property(self, key, value):
         try:
-            self.home.setProperty('TMDbHelper.ListItem.{0}'.format(key), u'{0}'.format(value))
+            if value is None:
+                self.home.clearProperty('TMDbHelper.ListItem.{0}'.format(key))
+            else:
+                self.home.setProperty('TMDbHelper.ListItem.{0}'.format(key), u'{0}'.format(value))
         except Exception as exc:
             utils.kodi_log(u'{0}{1}'.format(key, exc), 1)
 
