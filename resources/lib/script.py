@@ -331,14 +331,14 @@ class Script(Plugin):
         self.prev_path()
         self.call_window()
 
-    def play(self):
+    def player_play(self):
         utils.kodi_log(u'Script -- Attempting to play item:\n{0}'.format(self.params), 2)
         if not self.params.get('play') or not self.params.get('tmdb_id'):
             return
         Player().play(
             itemtype=self.params.get('play'), tmdb_id=self.params.get('tmdb_id'),
             season=self.params.get('season'), episode=self.params.get('episode'),
-            force_dialog=self.params.get('force_dialog'))
+            force_dialog=self.params.get('force_dialog'), kodi_db=self.params.get('islocal'))
         self.home.clearProperty('TMDbHelper.Player.ResolvedUrl')  # Clear our lock property
 
     def update_players(self):
@@ -526,7 +526,7 @@ class Script(Plugin):
         elif self.params.get('reset_path'):
             self.reset_props()
         elif self.params.get('play'):
-            self.play()
+            self.player_play()
         elif self.params.get('restart_service'):
             self.restart_service()
         else:
