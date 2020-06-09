@@ -313,7 +313,8 @@ class Player(Plugin):
 
         if kodi_db:
             self.playerstring = dumps({
-                'tmdbtype': self.tmdbtype, 'season': season, 'episode': episode, 'tmdb_id': self.tmdb_id,
+                'tmdbtype': 'episode' if itemtype in ['episode', 'tv'] else 'movie',
+                'season': season, 'episode': episode, 'tmdb_id': self.tmdb_id,
                 'tvdb_id': self.item.get('tvdb_id'), 'imdb_id': self.item.get('imdb_id')})
 
         return self.play_external(force_dialog=force_dialog)

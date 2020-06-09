@@ -4,6 +4,7 @@ import xbmcvfs
 import xbmcgui
 import xbmcaddon
 import datetime
+from json import loads
 from threading import Thread
 from PIL import ImageFilter, Image
 from resources.lib.plugin import Plugin
@@ -273,16 +274,39 @@ class PlayerMonitor(xbmc.Player, CommonMonitorFunctions):
         self.get_playingitem()
 
     def onPlayBackEnded(self):
-        self.clear_properties()
+        self.set_dbidwatched()
+        self.reset_properties()
 
     def onPlayBackStopped(self):
-        self.clear_properties()
+        self.set_dbidwatched()
+        self.reset_properties()
+
+    def set_dbidwatched(self):
+        return  # DO NOTHING FOR NOW
+        if not self.playerstring:
+            return
+        dbid = self.get_db_info(info='dbid', **self.playerstring)
+        if not dbid:
+            return
+        if self.playerstring.get('tmdbtype') == 'episode':
+            method = "VideoLibrary.SetEpisodeDetails"
+            params = {"episodeid": dbid, "playcount": 1}
+            utils.get_jsonrpc(method=method, params=params)
+        elif self.playerstring.get('tmdbtype') == 'movie':
+            method = "VideoLibrary.SetMovieDetails"
+            params = {"movieid": dbid, "playcount": 1}
+            utils.get_jsonrpc(method=method, params=params)
+        self.playerstring = None
 
     def get_playingitem(self):
         if not self.isPlayingVideo():
             return  # Not a video so don't get info
         if self.getVideoInfoTag().getMediaType() not in ['movie', 'episode']:
             return  # Not a movie or episode so don't get info TODO Maybe get PVR details also?
+
+        self.playerstring = _homewindow.getProperty('TMDbHelper.PlayerInfoString')
+        self.playerstring = loads(self.playerstring) if self.playerstring else None
+
         self.totaltime = self.getTotalTime()
         self.dbtype = self.getVideoInfoTag().getMediaType()
         self.dbid = self.getVideoInfoTag().getDbId()
