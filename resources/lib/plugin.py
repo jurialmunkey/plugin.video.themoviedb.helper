@@ -130,6 +130,8 @@ class Plugin(object):
         if not lookup_id or not func:
             return item
 
+        artwork = func(lookup_id)
+
         if artwork:
             item['discart'] = item.get('discart') or artwork.get('discart') or ''
             item['clearart'] = item.get('clearart') or artwork.get('clearart') or ''
