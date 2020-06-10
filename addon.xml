@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.themoviedb.helper"
-version="3.0.2"
+version="3.1.0"
 name="TheMovieDb Helper"
 provider-name="jurialmunkey">
 <requires>
@@ -77,6 +77,6 @@ provider-name="jurialmunkey">
     <screenshot>resources/screenshot-01.jpg</screenshot>
     <screenshot>resources/screenshot-02.jpg</screenshot>
   </assets>
-  <news>Add details ratings and artwork lookups for videoplayer</news>
+  <news>Library strm mark as watched</news>
 </extension>
 </addon>
