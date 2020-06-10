@@ -272,8 +272,8 @@ class Player(Plugin):
                 xbmc.executebuiltin(utils.try_decode_string(u'PlayMedia({0})'.format(action)))
             elif player[0]:  # Action is play and not a strm so play with player
                 utils.kodi_log(u'Player -- Found file.\nAttempting to PLAY: {}'.format(action), 2)
-                xbmc.Player().play(action, ListItem(library='video', **self.details).set_listitem())
                 xbmcgui.Window(10000).setProperty('TMDbHelper.PlayerInfoString', self.playerstring) if self.playerstring else None
+                xbmc.Player().play(action, ListItem(library='video', **self.details).set_listitem())
             else:
                 action = u'Container.Update({0})'.format(action) if xbmc.getCondVisibility("Window.IsMedia") else u'ActivateWindow(videos,{0},return)'.format(action)
                 utils.kodi_log(u'Player -- Found folder.\nAttempting to OPEN: {}'.format(action), 2)

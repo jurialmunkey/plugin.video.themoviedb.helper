@@ -267,10 +267,12 @@ class PlayerMonitor(xbmc.Player, CommonMonitorFunctions):
         self.property_basename = 'TMDbHelper.Player'
         self.properties = set()
         self.indxproperties = set()
+        self.playerstring = None
+        self.exit = False
+        self.reset_properties()
 
     def onAVStarted(self):
-        self.properties = set()
-        self.indxproperties = set()
+        self.reset_properties()
         self.get_playingitem()
 
     def onPlayBackEnded(self):
@@ -281,29 +283,41 @@ class PlayerMonitor(xbmc.Player, CommonMonitorFunctions):
         self.set_dbidwatched()
         self.reset_properties()
 
-    def set_dbidwatched(self):
-        return  # DO NOTHING FOR NOW
-        if not self.playerstring:
+    def set_dbidwatched_rpc(self, dbid=None, dbtype=None):
+        if not dbid or not dbtype:
             return
+        method = "VideoLibrary.Get{}Details".format(dbtype.capitalize())
+        params = {"{}id".format(dbtype): dbid, "properties": ["playcount"]}
+        json_info = utils.get_jsonrpc(method=method, params=params)
+        playcount = json_info.get('result', {}).get('{}details'.format(dbtype), {}).get('playcount', 0)
+        playcount = utils.try_parse_int(playcount) + 1
+        method = "VideoLibrary.Set{}Details".format(dbtype.capitalize())
+        params = {"{}id".format(dbtype): dbid, "playcount": playcount}
+        return utils.get_jsonrpc(method=method, params=params)
+
+    def set_dbidwatched(self):
+        if not self.playerstring or not self.playerstring.get('tmdb_id'):
+            return
+        if not self.currenttime or not self.totaltime:
+            return  # No time set so skip
+        if '{}'.format(self.playerstring.get('tmdb_id')) != '{}'.format(self.details.get('tmdb_id')):
+            return  # Item in the player doesn't match so don't mark as watched
         dbid = self.get_db_info(info='dbid', **self.playerstring)
         if not dbid:
             return
+        progress = ((self.currenttime / self.totaltime) * 100)
+        if progress < 75:
+            return  # Only update if progress is 75% or more
         if self.playerstring.get('tmdbtype') == 'episode':
-            method = "VideoLibrary.SetEpisodeDetails"
-            params = {"episodeid": dbid, "playcount": 1}
-            utils.get_jsonrpc(method=method, params=params)
+            self.set_dbidwatched_rpc(dbid=dbid, dbtype='episode')
         elif self.playerstring.get('tmdbtype') == 'movie':
-            method = "VideoLibrary.SetMovieDetails"
-            params = {"movieid": dbid, "playcount": 1}
-            utils.get_jsonrpc(method=method, params=params)
-        self.playerstring = None
+            self.set_dbidwatched_rpc(dbid=dbid, dbtype='movie')
 
     def get_playingitem(self):
         if not self.isPlayingVideo():
             return  # Not a video so don't get info
         if self.getVideoInfoTag().getMediaType() not in ['movie', 'episode']:
             return  # Not a movie or episode so don't get info TODO Maybe get PVR details also?
-
         self.playerstring = _homewindow.getProperty('TMDbHelper.PlayerInfoString')
         self.playerstring = loads(self.playerstring) if self.playerstring else None
 
@@ -317,31 +331,32 @@ class PlayerMonitor(xbmc.Player, CommonMonitorFunctions):
         self.episode = self.getVideoInfoTag().getEpisode() if self.dbtype == 'episodes' else None
         self.query = utils.try_decode_string(self.query)
 
-        tmdbtype = 'movie' if self.dbtype == 'movie' else 'tv'
-        tmdb_id = self.get_tmdb_id(tmdbtype, self.imdb_id, self.query, self.year)
-        details = self.tmdb.get_detailed_item(tmdbtype, tmdb_id, season=self.season, episode=self.episode)
+        self.tmdbtype = 'movie' if self.dbtype == 'movie' else 'tv'
+        self.tmdb_id = self.get_tmdb_id(self.tmdbtype, self.imdb_id, self.query, self.year)
+        self.details = self.tmdb.get_detailed_item(self.tmdbtype, self.tmdb_id, season=self.season, episode=self.episode)
 
-        if not details:
-            return self.reset_properties()  # No details so lets clear everything
+        if not self.details:
+            return self.reset_properties()  # No self.details so lets clear everything
 
         if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"):
-            details = self.get_omdb_ratings(details) if tmdbtype == 'movie' else details
-            details = self.get_top250_rank(details) if tmdbtype == 'movie' else details
-            details = self.get_trakt_ratings(details, tmdbtype, tmdb_id, self.season, self.episode) if tmdbtype in ['movie', 'tv'] else details
-            self.set_iter_properties(details.get('infoproperties', {}), _setprop_ratings)
+            self.details = self.get_omdb_ratings(self.details) if self.tmdbtype == 'movie' else self.details
+            self.details = self.get_top250_rank(self.details) if self.tmdbtype == 'movie' else self.details
+            self.details = self.get_trakt_ratings(self.details, self.tmdbtype, self.tmdb_id, self.season, self.episode) if self.tmdbtype in ['movie', 'tv'] else self.details
+            self.set_iter_properties(self.details.get('infoproperties', {}), _setprop_ratings)
 
         if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
-            details = self.get_fanarttv_artwork(details, tmdbtype) if self.addon.getSettingBool('service_fanarttv_lookup') else details
-            details = self.get_kodi_artwork(details, self.dbtype, self.dbid) if self.addon.getSettingBool('local_db') else details
-            self.set_iter_properties(details, _setmain_artwork)
+            self.details = self.get_fanarttv_artwork(self.details, self.tmdbtype) if self.addon.getSettingBool('service_fanarttv_lookup') else self.details
+            self.details = self.get_kodi_artwork(self.details, self.dbtype, self.dbid) if self.addon.getSettingBool('local_db') else self.details
+            self.set_iter_properties(self.details, _setmain_artwork)
 
-        self.set_properties(details)
+        self.set_properties(self.details)
 
     def reset_properties(self):
         self.clear_properties()
         self.properties = set()
         self.indxproperties = set()
         self.totaltime = 0
+        self.currenttime = 0
         self.dbtype = None
         self.imdb_id = None
         self.query = None
@@ -349,6 +364,9 @@ class PlayerMonitor(xbmc.Player, CommonMonitorFunctions):
         self.season = None
         self.episode = None
         self.dbid = None
+        self.tmdb_id = None
+        self.details = {}
+        self.tmdbtype = None
 
 
 class ServiceMonitor(CommonMonitorFunctions):
@@ -384,11 +402,19 @@ class ServiceMonitor(CommonMonitorFunctions):
                 self.cron_job.exit = True
                 self.exit = True
 
-            elif xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.Service)"):
+            # Sit idle in a holding pattern if the skin doesn't need the service monitor yet
+            elif xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.Service) | System.ScreenSaverActive"):
                 self.kodimonitor.waitForAbort(30)
 
-            elif not self.playermonitor and xbmc.getCondVisibility("Skin.HasSetting(TMDbHelper.Service)"):
+            # Startup our playmonitor if we haven't already
+            elif not self.playermonitor:
                 self.playermonitor = PlayerMonitor()
+                self.kodimonitor.waitForAbort(1)
+
+            # If we're in fullscreen video then we should update the playermonitor time
+            elif xbmc.getCondVisibility("Window.IsVisible(fullscreenvideo)") and self.playermonitor.isPlayingVideo():
+                self.playermonitor.currenttime = self.playermonitor.getTime()
+                self.kodimonitor.waitForAbort(1)
 
             # skip when modal dialogs are opened (e.g. textviewer in musicinfo dialog)
             elif xbmc.getCondVisibility(
@@ -402,7 +428,7 @@ class ServiceMonitor(CommonMonitorFunctions):
                 if (self.properties or self.indxproperties) and self.get_cur_item() != self.pre_item:
                     ignorekeys = _setmain_artwork if self.dbtype in ['episodes', 'seasons'] else None
                     self.clear_properties(ignorekeys=ignorekeys)
-                self.kodimonitor.waitForAbort(1)  # Maybe clear props here too
+                self.kodimonitor.waitForAbort(1)
 
             # media window is opened or widgetcontainer set - start listitem monitoring!
             elif xbmc.getCondVisibility(
@@ -415,6 +441,7 @@ class ServiceMonitor(CommonMonitorFunctions):
             elif self.properties or self.indxproperties:
                 self.clear_properties()
 
+            # Otherwise just sit here and wait
             else:
                 self.kodimonitor.waitForAbort(1)
 
@@ -422,6 +449,7 @@ class ServiceMonitor(CommonMonitorFunctions):
         self.exit_monitor()
 
     def exit_monitor(self):
+        self.playermonitor.exit = True
         del self.playermonitor
         self.clear_properties()
         _homewindow.clearProperty('TMDbHelper.ServiceStarted')
