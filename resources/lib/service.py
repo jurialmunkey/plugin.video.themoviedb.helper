@@ -402,10 +402,6 @@ class ServiceMonitor(CommonMonitorFunctions):
                 self.cron_job.exit = True
                 self.exit = True
 
-            # Sit idle in a holding pattern if the skin doesn't need the service monitor yet
-            elif xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.Service) | System.ScreenSaverActive"):
-                self.kodimonitor.waitForAbort(30)
-
             # Startup our playmonitor if we haven't already
             elif not self.playermonitor:
                 self.playermonitor = PlayerMonitor()
@@ -415,6 +411,10 @@ class ServiceMonitor(CommonMonitorFunctions):
             elif xbmc.getCondVisibility("Window.IsVisible(fullscreenvideo)") and self.playermonitor.isPlayingVideo():
                 self.playermonitor.currenttime = self.playermonitor.getTime()
                 self.kodimonitor.waitForAbort(1)
+
+            # Sit idle in a holding pattern if the skin doesn't need the service monitor yet
+            elif xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.Service) | System.ScreenSaverActive"):
+                self.kodimonitor.waitForAbort(30)
 
             # skip when modal dialogs are opened (e.g. textviewer in musicinfo dialog)
             elif xbmc.getCondVisibility(
