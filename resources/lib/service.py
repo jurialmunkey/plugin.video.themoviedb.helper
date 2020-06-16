@@ -339,7 +339,7 @@ class PlayerMonitor(xbmc.Player, CommonMonitorFunctions):
             return self.reset_properties()  # No self.details so lets clear everything
 
         if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"):
-            self.details = self.get_omdb_ratings(self.details) if self.tmdbtype == 'movie' else self.details
+            self.details = self.get_omdb_ratings(self.details)
             self.details = self.get_top250_rank(self.details) if self.tmdbtype == 'movie' else self.details
             self.details = self.get_trakt_ratings(self.details, self.tmdbtype, self.tmdb_id, self.season, self.episode) if self.tmdbtype in ['movie', 'tv'] else self.details
             self.set_iter_properties(self.details.get('infoproperties', {}), _setprop_ratings)
@@ -565,7 +565,7 @@ class ServiceMonitor(CommonMonitorFunctions):
             if tmdbtype not in ['movie', 'tv']:
                 return
             pre_item = self.pre_item
-            details = self.get_omdb_ratings(details) if tmdbtype == 'movie' else details
+            details = self.get_omdb_ratings(details)
             details = self.get_top250_rank(details) if tmdbtype == 'movie' else details
             details = self.get_trakt_ratings(details, tmdbtype, tmdb_id, self.season, self.episode) if tmdbtype in ['movie', 'tv'] else details
             if not self.is_same_item(update=False, pre_item=pre_item):

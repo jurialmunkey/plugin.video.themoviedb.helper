@@ -65,8 +65,13 @@ class Plugin(object):
         return self.tmdb.get_tmdb_id(itemtype=itemtype, imdb_id=imdb_id, tvdb_id=tvdb_id, query=query, year=year, longcache=True)
 
     def get_omdb_ratings(self, item, cache_only=False):
-        if self.omdb and item.get('infolabels', {}).get('imdbnumber'):
-            ratings_awards = self.omdb.get_ratings_awards(imdb_id=item.get('infolabels', {}).get('imdbnumber'), cache_only=cache_only)
+        imdb_id = item.get('infolabels', {}).get('imdbnumber')
+        if not imdb_id or not imdb_id.startswith('tt'):
+            imdb_id = item.get('infoproperties', {}).get('imdb_id')
+        if not imdb_id or not imdb_id.startswith('tt'):
+            imdb_id = item.get('infoproperties', {}).get('tvshow.imdb_id')
+        if self.omdb and imdb_id:
+            ratings_awards = self.omdb.get_ratings_awards(imdb_id=imdb_id, cache_only=cache_only)
             if ratings_awards:
                 item['infoproperties'] = utils.merge_two_dicts(item.get('infoproperties', {}), ratings_awards)
         return item
