@@ -47,6 +47,8 @@ class OMDb(RequestAPI):
     def get_infoproperties(self, item):
         infoproperties = {}
         infoproperties['awards'] = item.get('awards', None)
+        infoproperties['goldenglobe_wins'] = utils.get_between_strings(item.get('awards', ''), 'Won ', ' Golden Globe')
+        infoproperties['goldenglobe_nominations'] = utils.get_between_strings(item.get('awards', ''), 'Nominated for ', ' Golden Globe')
         infoproperties['oscar_wins'] = utils.get_between_strings(item.get('awards', ''), 'Won ', ' Oscar')
         infoproperties['oscar_nominations'] = utils.get_between_strings(item.get('awards', ''), 'Nominated for ', ' Oscar')
         infoproperties['award_wins'] = utils.get_between_strings(item.get('awards', ''), '. Another ', ' wins') or utils.get_between_strings(item.get('awards', ''), '', ' wins')
