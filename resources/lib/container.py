@@ -1071,9 +1071,12 @@ class Container(Plugin):
         if not details:
             return
 
-        # Merge OMDb rating details and top250 for movies
-        if self.params.get('type') == 'movie':
+        # Merge OMDb rating details
+        if self.params.get('type') in ['movie', 'episode', 'tv', 'season']:
             details = self.get_omdb_ratings(details, cache_only=False)
+
+        # Get TOP250 ranking for movies
+        if self.params.get('type') == 'movie':
             details = self.get_top250_rank(details)
 
         # Merge library stats for person
