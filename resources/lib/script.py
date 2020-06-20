@@ -13,7 +13,7 @@ from resources.lib.downloader import Downloader
 from resources.lib.traktapi import TraktAPI
 from resources.lib.plugin import Plugin
 from resources.lib.player import Player
-from resources.lib.service import ServiceMonitor, BlurImage
+from resources.lib.service import ServiceMonitor, ImageFunctions
 
 
 ID_VIDEOINFO = 12003
@@ -76,9 +76,14 @@ class Script(Plugin):
         self.home.clearProperty(self.prefixlock)
 
     def blur_image(self):
-        blur_img = BlurImage(artwork=self.params.get('blur_image'))
+        blur_img = ImageFunctions(method='blur', artwork=self.params.get('blur_image'))
         blur_img.setName('blur_img')
         blur_img.start()
+
+    def image_colors(self):
+        image_colors = ImageFunctions(method='colors', artwork=self.params.get('image_colors'))
+        image_colors.setName('image_colors')
+        image_colors.start()
 
     def get_instance(self, call_id=None):
         return False if call_id and not xbmc.getCondVisibility("Window.IsVisible({})".format(call_id)) else True
@@ -499,6 +504,8 @@ class Script(Plugin):
             self.kodi_setting()
         elif self.params.get('blur_image'):
             self.blur_image()
+        elif self.params.get('image_colors'):
+            self.image_colors()
         elif self.params.get('monitor_userlist'):
             self.monitor_userlist()
         elif self.params.get('library_userlist'):
