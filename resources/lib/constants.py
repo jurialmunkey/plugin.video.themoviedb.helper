@@ -65,7 +65,7 @@ TYPE_CONVERSION = {
         'plural': 'Images',
         'container': 'images',
         'trakt': '',
-        'dbtype': 'image'},
+        'dbtype': ''},
     'genre': {
         'plural': 'Genres',
         'container': 'genres',

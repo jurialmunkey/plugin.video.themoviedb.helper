@@ -82,10 +82,10 @@ def urlencode_params(kwparams):
     return urlencode(params)
 
 
-def try_parse_int(string):
+def try_parse_int(string, base=None):
     '''helper to parse int from string without erroring on empty or misformed string'''
     try:
-        return int(string)
+        return int(string, base) if base else int(string)
     except Exception:
         return 0
 

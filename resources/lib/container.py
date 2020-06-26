@@ -861,8 +861,9 @@ class Container(Plugin):
 
         # Build our player script command and run it
         season, episode = self.params.get('season', ''), self.params.get('episode', '')
-        command = 'play={0},tmdb_id={1}{{0}}'.format(self.params.get('type'), self.params.get('tmdb_id'))
-        command = command.format(',season={0},episode={1}'.format(season, episode) if season and episode else '')
+        command = 'islocal' if self.params.get('islocal') else ''
+        command = '{},play={},tmdb_id={}'.format(command, self.params.get('type'), self.params.get('tmdb_id'))
+        command = '{},season={},episode={}'.format(command, season, episode) if season and episode else command
         command = 'RunScript(plugin.video.themoviedb.helper,{})'.format(command)
         xbmc.executebuiltin(command)
 
@@ -1072,9 +1073,12 @@ class Container(Plugin):
         if not details:
             return
 
-        # Merge OMDb rating details and top250 for movies
-        if self.params.get('type') == 'movie':
+        # Merge OMDb rating details
+        if self.params.get('type') in ['movie', 'episode', 'tv', 'season']:
             details = self.get_omdb_ratings(details, cache_only=False)
+
+        # Get TOP250 ranking for movies
+        if self.params.get('type') == 'movie':
             details = self.get_top250_rank(details)
 
         # Merge library stats for person

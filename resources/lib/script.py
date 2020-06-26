@@ -13,7 +13,7 @@ from resources.lib.downloader import Downloader
 from resources.lib.traktapi import TraktAPI
 from resources.lib.plugin import Plugin
 from resources.lib.player import Player
-from resources.lib.service import ServiceMonitor, BlurImage
+from resources.lib.service import ServiceMonitor, ImageFunctions
 
 
 ID_VIDEOINFO = 12003
@@ -76,9 +76,14 @@ class Script(Plugin):
         self.home.clearProperty(self.prefixlock)
 
     def blur_image(self):
-        blur_img = BlurImage(artwork=self.params.get('blur_image'))
+        blur_img = ImageFunctions(method='blur', artwork=self.params.get('blur_image'))
         blur_img.setName('blur_img')
         blur_img.start()
+
+    def image_colors(self):
+        image_colors = ImageFunctions(method='colors', artwork=self.params.get('image_colors'))
+        image_colors.setName('image_colors')
+        image_colors.start()
 
     def get_instance(self, call_id=None):
         return False if call_id and not xbmc.getCondVisibility("Window.IsVisible({})".format(call_id)) else True
@@ -331,14 +336,14 @@ class Script(Plugin):
         self.prev_path()
         self.call_window()
 
-    def play(self):
+    def player_play(self):
         utils.kodi_log(u'Script -- Attempting to play item:\n{0}'.format(self.params), 2)
         if not self.params.get('play') or not self.params.get('tmdb_id'):
             return
         Player().play(
             itemtype=self.params.get('play'), tmdb_id=self.params.get('tmdb_id'),
             season=self.params.get('season'), episode=self.params.get('episode'),
-            force_dialog=self.params.get('force_dialog'))
+            force_dialog=self.params.get('force_dialog'), kodi_db=self.params.get('islocal'))
         self.home.clearProperty('TMDbHelper.Player.ResolvedUrl')  # Clear our lock property
 
     def update_players(self):
@@ -499,6 +504,8 @@ class Script(Plugin):
             self.kodi_setting()
         elif self.params.get('blur_image'):
             self.blur_image()
+        elif self.params.get('image_colors'):
+            self.image_colors()
         elif self.params.get('monitor_userlist'):
             self.monitor_userlist()
         elif self.params.get('library_userlist'):
@@ -526,7 +533,7 @@ class Script(Plugin):
         elif self.params.get('reset_path'):
             self.reset_props()
         elif self.params.get('play'):
-            self.play()
+            self.player_play()
         elif self.params.get('restart_service'):
             self.restart_service()
         else:

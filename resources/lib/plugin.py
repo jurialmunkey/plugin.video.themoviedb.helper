@@ -65,8 +65,13 @@ class Plugin(object):
         return self.tmdb.get_tmdb_id(itemtype=itemtype, imdb_id=imdb_id, tvdb_id=tvdb_id, query=query, year=year, longcache=True)
 
     def get_omdb_ratings(self, item, cache_only=False):
-        if self.omdb and item.get('infolabels', {}).get('imdbnumber'):
-            ratings_awards = self.omdb.get_ratings_awards(imdb_id=item.get('infolabels', {}).get('imdbnumber'), cache_only=cache_only)
+        imdb_id = item.get('infolabels', {}).get('imdbnumber')
+        if not imdb_id or not imdb_id.startswith('tt'):
+            imdb_id = item.get('infoproperties', {}).get('imdb_id')
+        if not imdb_id or not imdb_id.startswith('tt'):
+            imdb_id = item.get('infoproperties', {}).get('tvshow.imdb_id')
+        if self.omdb and imdb_id:
+            ratings_awards = self.omdb.get_ratings_awards(imdb_id=imdb_id, cache_only=cache_only)
             if ratings_awards:
                 item['infoproperties'] = utils.merge_two_dicts(item.get('infoproperties', {}), ratings_awards)
         return item
@@ -140,6 +145,7 @@ class Plugin(object):
             item['banner'] = item.get('banner') or artwork.get('banner') or ''
             item['fanart'] = item.get('fanart') or artwork.get('fanart') or ''
             item['extrafanart'] = item.get('extrafanart') or utils.iterate_extraart(artwork.get('extrafanart', [])) or ''
+
         return item
 
     def get_db_info(self, info=None, tmdbtype=None, imdb_id=None, originaltitle=None, title=None, year=None, tvshowtitle=None, season=None, episode=None, tmdb_id=None, tvdb_id=None):
