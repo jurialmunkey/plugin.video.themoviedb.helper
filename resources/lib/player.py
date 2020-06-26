@@ -269,7 +269,7 @@ class Player(Plugin):
             action = string_format_map(player[1], self.item)
             if player[0] and (action.endswith('.strm') or self.identifierlist[playerindex] == 'play_kodi'):  # Action is play and is a strm/local so PlayMedia
                 utils.kodi_log(u'Player -- Found strm or local.\nAttempting PLAYMEDIA({})'.format(action), 1)
-                xbmc.executebuiltin(utils.try_decode_string(u'PlayMedia({0})'.format(action)))
+                xbmc.executebuiltin(utils.try_decode_string(u'PlayMedia(\'\"{0}\"\')'.format(action)))
             elif player[0]:  # Action is play and not a strm so play with player
                 utils.kodi_log(u'Player -- Found file.\nAttempting to PLAY: {}'.format(action), 2)
                 xbmcgui.Window(10000).setProperty('TMDbHelper.PlayerInfoString', self.playerstring) if self.playerstring else None
