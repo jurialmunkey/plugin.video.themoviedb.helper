@@ -277,7 +277,7 @@ class Player(Plugin):
             else:
                 action = u'Container.Update({0})'.format(action) if xbmc.getCondVisibility("Window.IsMedia") else u'ActivateWindow(videos,{0},return)'.format(action)
                 utils.kodi_log(u'Player -- Found folder.\nAttempting to OPEN: {}'.format(action), 2)
-                xbmc.executebuiltin(utils.try_decode_string(action))
+                xbmc.executebuiltin(utils.try_encode_string(utils.try_decode_string(action)))
             return action
 
     def play(self, itemtype, tmdb_id, season=None, episode=None, force_dialog=False, kodi_db=False):
