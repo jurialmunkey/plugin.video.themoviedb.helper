@@ -254,9 +254,10 @@ class Container(Plugin):
                         i.label = u'{}x{}'.format(utils.try_parse_int(i.infolabels.get('season')), i.label)
 
             # Format label for future eps/movies but not plugin methods specifically about the future or details/seasons
-            if i.infolabels.get('premiered') and self.params.get('info') not in constants.NO_LABEL_FORMATTING:
+            if self.params.get('info') not in constants.NO_LABEL_FORMATTING and self.item_tmdbtype in ['episode', 'movie', 'tv']:
                 try:
-                    if utils.convert_timestamp(i.infolabels.get('premiered'), "%Y-%m-%d", 10) > datetime.datetime.now():
+                    if (not i.infolabels.get('premiered')
+                            or utils.convert_timestamp(i.infolabels.get('premiered'), "%Y-%m-%d", 10) > datetime.datetime.now()):
                         i.label = '[COLOR=ffcc0000][I]{}[/I][/COLOR]'.format(i.label)
                         # Don't add if option enabled to hide
                         if self.addon.getSettingBool('hide_unaired_episodes') and self.item_tmdbtype in ['tv', 'episode']:
