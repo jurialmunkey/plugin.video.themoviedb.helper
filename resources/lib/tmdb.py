@@ -91,8 +91,10 @@ class TMDb(RequestAPI):
         infolabels['genre'] = utils.dict_to_list(item.get('genres', []), 'name')
         if item.get('site') == 'YouTube' and item.get('key'):
             infolabels['path'] = 'plugin://plugin.video.youtube/play/?video_id={0}'.format(item.get('key'))
+        if item.get('episode_run_time'):
+            infolabels['duration'] = utils.try_parse_int(item.get('episode_run_time', [0])[0]) * 60
         if item.get('runtime'):
-            infolabels['duration'] = item.get('runtime', 0) * 60
+            infolabels['duration'] = utils.try_parse_int(item.get('runtime', 0)) * 60
         if item.get('belongs_to_collection'):
             infolabels['set'] = item.get('belongs_to_collection').get('name')
         if item.get('networks'):
@@ -412,7 +414,7 @@ class TMDb(RequestAPI):
             utils.kodi_log(u'TMDb Get Details: No Item Type or TMDb ID!\n{} {} {} {}'.format(itemtype, tmdb_id, season, episode), 2)
             return {}
         extra_request = None
-        cache_name = '{0}.TMDb.v2_2_82.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
+        cache_name = '{0}.TMDb.v3_1_7.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
         cache_name = '{0}.Season{1}'.format(cache_name, season) if season else cache_name
         cache_name = '{0}.Episode{1}'.format(cache_name, episode) if season and episode else cache_name
         itemdict = self.get_cache(cache_name) if not cache_refresh else None
