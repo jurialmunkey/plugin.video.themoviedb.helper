@@ -15,6 +15,8 @@ class ListItem(object):
         self.addon = xbmcaddon.Addon()
         self.addonpath = self.addon.getAddonInfo('path')
         self.select_action = self.addon.getSettingInt('select_action')
+        self.fallback_icon = '{0}/resources/poster.png'.format(self.addonpath)
+        self.fallback_fanart = '{0}/fanart.jpg'.format(self.addonpath)
         self.label = label or 'N/A'
         self.label2 = label2 or ''
         self.library = library or ''  # <content target= video, music, pictures, none>
@@ -27,8 +29,8 @@ class ListItem(object):
         self.url = url or {}
         self.mixed_type = mixed_type or ''
         self.streamdetails = streamdetails or {}
-        self.icon = icon or '{0}/resources/poster.png'.format(self.addonpath)
-        self.fanart = fanart or '{0}/fanart.jpg'.format(self.addonpath)
+        self.icon = icon
+        self.fanart = fanart
         self.cast = cast or []  # Cast list
         self.is_folder = is_folder
         self.infolabels = infolabels or {}  # ListItem.Foobar
@@ -251,11 +253,14 @@ class ListItem(object):
         listitem.setInfo(self.library, self.infolabels)
         listitem.setProperties(self.infoproperties)
         listitem.setArt(utils.merge_two_dicts({
-            'thumb': self.thumb or self.icon or self.fanart, 'icon': self.icon, 'poster': self.poster, 'fanart': self.fanart, 'discart': self.discart,
-            'clearlogo': self.clearlogo, 'clearart': self.clearart, 'landscape': self.landscape, 'banner': self.banner,
-            'tvshow.poster': self.tvshow_poster, 'tvshow.fanart': self.tvshow_fanart, 'tvshow.clearlogo': self.tvshow_clearlogo,
-            'tvshow.clearart': self.tvshow_clearart, 'tvshow.landscape': self.tvshow_landscape,
-            'tvshow.banner': self.tvshow_banner}, self.extrafanart))
+            'thumb': self.thumb or self.icon or self.fanart or self.fallback_icon, 'icon': self.icon or self.fallback_icon,
+            'fanart': self.fanart or self.tvshow_fanart or self.fallback_fanart, 'tvshow.fanart': self.tvshow_fanart,
+            'poster': self.poster or self.tvshow_poster, 'tvshow.poster': self.tvshow_poster,
+            'landscape': self.landscape or self.tvshow_landscape, 'tvshow.landscape': self.tvshow_landscape,
+            'banner': self.banner or self.tvshow_banner, 'tvshow.banner': self.tvshow_banner,
+            'clearlogo': self.clearlogo or self.tvshow_clearlogo, 'tvshow.clearlogo': self.tvshow_clearlogo,
+            'clearart': self.clearart or self.tvshow_clearart, 'tvshow.clearart': self.tvshow_clearart,
+            'discart': self.discart}, self.extrafanart))
         listitem.setCast(self.cast)
 
         if self.streamdetails:
