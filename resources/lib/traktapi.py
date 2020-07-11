@@ -59,7 +59,7 @@ class TraktAPI(RequestAPI):
         self.auth_dialog = xbmcgui.DialogProgress()
         self.auth_dialog.create(
             self.addon.getLocalizedString(32097),
-            self.addon.getLocalizedString(32096),
+            self.addon.getLocalizedString(32096) + '\n' +
             self.addon.getLocalizedString(32095) + ': [B]' + self.code.get('user_code') + '[/B]')
         self.poller()
 
