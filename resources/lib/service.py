@@ -127,6 +127,10 @@ class ImageFunctions(Thread):
             self.func = self.blur
             self.save_path = utils.makepath(self.save_path.format('blur'))
             self.save_prop = 'TMDbHelper.ListItem.BlurImage'
+        elif method == 'crop':
+            self.func = self.crop
+            self.save_path = utils.makepath(self.save_path.format('crop'))
+            self.save_prop = 'TMDbHelper.ListItem.CropImage'
         elif method == 'desaturate':
             self.func = self.desaturate
             self.save_path = utils.makepath(self.save_path.format('desaturate'))
@@ -146,6 +150,23 @@ class ImageFunctions(Thread):
 
     def clamp(self, x):
         return max(0, min(x, 255))
+
+    def crop(self, source):
+        filename = 'cropped-{}.png'.format(utils.md5hash(source))
+        destination = self.save_path + filename
+        try:
+            if xbmcvfs.exists(destination):
+                os.utime(destination, None)
+            else:
+                img = _openimage(source, self.save_path, filename)
+                img = img.crop(img.convert('RGBa').getbbox())
+                img.save(destination)
+                img.close()
+
+            return destination
+
+        except Exception:
+            return ''
 
     def blur(self, source, radius=20):
         filename = '{}{}.png'.format(utils.md5hash(source), radius)
@@ -753,6 +774,13 @@ class ServiceMonitor(CommonMonitorFunctions):
             if not self.is_same_item(update=False, pre_item=pre_item):
                 return
             self.set_iter_properties(details, _setmain_artwork)
+
+            # Crop Image
+            if details.get('clearlogo') and xbmc.getCondVisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"):
+                self.crop_img = ImageFunctions(method='crop', artwork=details.get('clearlogo'))
+                self.crop_img.setName('crop_img')
+                self.crop_img.start()
+
         except Exception as exc:
             utils.kodi_log(u'Func: process_ratings\n{}'.format(exc), 1)
 
