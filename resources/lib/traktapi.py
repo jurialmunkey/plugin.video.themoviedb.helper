@@ -429,19 +429,19 @@ class TraktAPI(RequestAPI):
 
     def get_upnext_cache_refresh(self, show_id, last_updated):
         if not last_updated:  # No last Trakt update date so refresh cache
-            # utils.kodi_log(u'Up Next {} Episodes:\nNo last Trakt update date. Refreshing cache...'.format(show_id), 1)
             return True  # Refresh cache
 
+        ts_last = utils.convert_timestamp(last_updated)
+        if not ts_last:
+            return True  # Timestamp doesn't convert so refresh cache
+
         cache_name = '{0}.trakt.show.{1}.last_updated'.format(self.cache_name, show_id)
-        prev_updated = self.get_cache(cache_name)
-        if not prev_updated:  # No previous update date so refresh cache
-            # utils.kodi_log(u'Up Next {} Episodes:\nNo previous update date. Refreshing cache...'.format(show_id), 1)
+        ts_prev = utils.convert_timestamp(self.get_cache(cache_name))
+        if not ts_prev:  # No previous update date or cant convert save value to timestamp so refresh
             return self.set_cache(last_updated, cache_name)  # Set the cache date and refresh cache
 
-        if utils.convert_timestamp(prev_updated) < utils.convert_timestamp(last_updated):  # Changes on Trakt since previous update date so refresh cache
-            # utils.kodi_log(u'Up Next {} Episodes:\nChanges on Trakt since previous update date. Refreshing cache...'.format(show_id), 1)
+        if ts_prev < ts_last:  # Changes on Trakt since previous update date so refresh cache
             return self.set_cache(last_updated, cache_name)  # Set the cache date and refresh cache
-        # utils.kodi_log(u'Up Next {} Episodes:\nRetrieving cached details...'.format(show_id), 1)
 
     def get_upnext(self, show_id, response_only=False, last_updated=None):
         items = []
