@@ -143,7 +143,8 @@ class TMDb(RequestAPI):
             infoproperties['gender'] = self.addon.getLocalizedString(32070) if item.get('gender') == 2 else self.addon.getLocalizedString(32071)
         if item.get('last_episode_to_air'):
             i = item.get('last_episode_to_air', {})
-            infoproperties['last_aired'] = i.get('air_date')
+            infoproperties['last_aired'] = utils.date_to_format(i.get('air_date'), xbmc.getRegion('dateshort'))
+            infoproperties['last_aired.long'] = utils.date_to_format(i.get('air_date'), xbmc.getRegion('datelong'))
             infoproperties['last_aired.day'] = utils.date_to_format(i.get('air_date'), "%A")
             infoproperties['last_aired.episode'] = i.get('episode_number')
             infoproperties['last_aired.name'] = i.get('name')
@@ -155,7 +156,8 @@ class TMDb(RequestAPI):
             infoproperties['last_aired.thumb'] = self.get_season_thumb(i)
         if item.get('next_episode_to_air'):
             i = item.get('next_episode_to_air', {})
-            infoproperties['next_aired'] = i.get('air_date')
+            infoproperties['next_aired'] = utils.date_to_format(i.get('air_date'), xbmc.getRegion('dateshort'))
+            infoproperties['next_aired.long'] = utils.date_to_format(i.get('air_date'), xbmc.getRegion('datelong'))
             infoproperties['next_aired.day'] = utils.date_to_format(i.get('air_date'), "%A")
             infoproperties['next_aired.episode'] = i.get('episode_number')
             infoproperties['next_aired.name'] = i.get('name')
@@ -414,7 +416,7 @@ class TMDb(RequestAPI):
             utils.kodi_log(u'TMDb Get Details: No Item Type or TMDb ID!\n{} {} {} {}'.format(itemtype, tmdb_id, season, episode), 2)
             return {}
         extra_request = None
-        cache_name = '{0}.TMDb.v3_1_7.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
+        cache_name = '{0}.TMDb.v3_1_8.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
         cache_name = '{0}.Season{1}'.format(cache_name, season) if season else cache_name
         cache_name = '{0}.Episode{1}'.format(cache_name, episode) if season and episode else cache_name
         itemdict = self.get_cache(cache_name) if not cache_refresh else None
