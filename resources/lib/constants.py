@@ -748,6 +748,7 @@ USER_DISCOVER_LISTITEMS_BASEDIR = [
 
 USER_DISCOVER_LISTITEMS_ADDRULE = [
     {'label': 'Clear Settings', 'url': {'info': 'user_discover', 'method': 'clear'}},
+    {'label': 'Save Settings', 'url': {'info': 'user_discover', 'method': 'save'}},
     {'label': 'Add Rule...', 'url': {'info': 'user_discover', 'method': 'add_rule'}}]
 
 USER_DISCOVER_LISTITEMS_START = [
