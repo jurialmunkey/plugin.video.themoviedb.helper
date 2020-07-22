@@ -1008,7 +1008,8 @@ class Container(Plugin):
         # Create clear cache item if history exists
         if history:
             url['info'] = 'dir_search'
-            self.list_clearhistory(url=url.pop('query', ''), icon=icon)
+            url.pop('query', '')
+            self.list_clearhistory(url=url, icon=icon)
 
         # Finish container
         self.finish_container()
