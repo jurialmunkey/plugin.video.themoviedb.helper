@@ -244,6 +244,8 @@ def iterate_extraart(artworklist, artworkdict={}):
 
 
 def convert_timestamp(time_str, time_fmt="%Y-%m-%dT%H:%M:%S", time_lim=19, utc_convert=False):
+    if not time_str:
+        return
     time_str = time_str[:time_lim] if time_lim else time_str
     utc_offset = 0
     if utc_convert:
