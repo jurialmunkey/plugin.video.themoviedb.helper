@@ -729,6 +729,9 @@ class ServiceMonitor(CommonMonitorFunctions):
                 self.clear_properties()  # No details so lets clear everything
                 return
 
+            if tmdbtype == 'tv' and details.get('infoproperties'):  # Update tvshow next aired info with 24hr refresh
+                details['infoproperties'].update(self.tmdb.get_tvshow_nextaired(tmdb_id))
+
             if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
                 thread_artwork = Thread(target=self.process_artwork, args=[details, tmdbtype])
                 thread_artwork.start()
