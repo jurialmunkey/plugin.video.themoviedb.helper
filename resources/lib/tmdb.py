@@ -436,11 +436,11 @@ class TMDb(RequestAPI):
                 request['tvshowtitle'] = self.get_title(request)
 
             if season and episode:
-                extra_request = func(
+                extra_request = self.get_request_lc(
                     'tv', tmdb_id, 'season', season, 'episode', episode,
                     language=self.req_language, append_to_response=self.req_append, cache_refresh=cache_refresh)
             elif season:
-                extra_request = func(
+                extra_request = self.get_request_lc(
                     'tv', tmdb_id, 'season', season,
                     language=self.req_language, append_to_response=self.req_append, cache_refresh=cache_refresh)
 
