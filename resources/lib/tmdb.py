@@ -415,28 +415,47 @@ class TMDb(RequestAPI):
         if not itemtype or not tmdb_id:
             utils.kodi_log(u'TMDb Get Details: No Item Type or TMDb ID!\n{} {} {} {}'.format(itemtype, tmdb_id, season, episode), 2)
             return {}
+
         extra_request = None
-        cache_name = '{0}.TMDb.v3_1_8.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
+        cache_name = '{0}.TMDb.v3_2_3.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
         cache_name = '{0}.Season{1}'.format(cache_name, season) if season else cache_name
         cache_name = '{0}.Episode{1}'.format(cache_name, episode) if season and episode else cache_name
         itemdict = self.get_cache(cache_name) if not cache_refresh else None
+
         if not itemdict and not cache_only:
-            request = self.get_request_lc(itemtype, tmdb_id, language=self.req_language, append_to_response=self.req_append, cache_refresh=cache_refresh)
+            if itemtype == 'tv':  # Use shorter 3-day cache for tv to update next aired data
+                func = self.get_request_mc
+                cache_duration = self.cache_medium
+            else:
+                func = self.get_request_lc
+                cache_duration = self.cache_long
+
+            request = func(itemtype, tmdb_id, language=self.req_language, append_to_response=self.req_append, cache_refresh=cache_refresh)
+
             if itemtype == 'tv':
                 request['tvshowtitle'] = self.get_title(request)
+
             if season and episode:
-                extra_request = self.get_request_lc('tv', tmdb_id, 'season', season, 'episode', episode, language=self.req_language, append_to_response=self.req_append, cache_refresh=cache_refresh)
+                extra_request = func(
+                    'tv', tmdb_id, 'season', season, 'episode', episode,
+                    language=self.req_language, append_to_response=self.req_append, cache_refresh=cache_refresh)
             elif season:
-                extra_request = self.get_request_lc('tv', tmdb_id, 'season', season, language=self.req_language, append_to_response=self.req_append, cache_refresh=cache_refresh)
+                extra_request = func(
+                    'tv', tmdb_id, 'season', season,
+                    language=self.req_language, append_to_response=self.req_append, cache_refresh=cache_refresh)
+
             if season and episode and not extra_request:
                 extra_request = {'episode_number': episode, 'season_number': season}
+
             if extra_request:
                 extra_request['tvshow.tmdb_id'] = request.get('id')
                 extra_request['tvshow.imdb_id'] = request.get('imdb_id') or request.get('external_ids', {}).get('imdb_id')
                 extra_request['tvshow.tvdb_id'] = request.get('external_ids', {}).get('tvdb_id')
                 request = utils.merge_two_dicts(request, extra_request)
-            itemdict = self.set_cache(self.get_niceitem(request), cache_name, self.cache_long) if request else {}
+
+            itemdict = self.set_cache(self.get_niceitem(request), cache_name, cache_duration) if request else {}
             utils.kodi_log(u'TMDb Get Details: No Item Found!\n{} {} {} {}'.format(itemtype, tmdb_id, season, episode), 2) if not request else None
+
         return itemdict
 
     def get_externalid_item(self, itemtype, external_id, external_source):
