@@ -524,7 +524,7 @@ msgstr ""
 
 #: /resources/lib/container.py
 msgctxt "#32104"
-msgid "TMDb ID for {} not found or none selected.\\nDo you want to add another value?"
+msgid "TMDb ID for {} not found or none selected.\nDo you want to add another value?"
 msgstr ""
 
 #: /resources/lib/container.py
