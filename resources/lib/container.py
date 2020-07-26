@@ -4,7 +4,6 @@ import xbmcgui
 import xbmcplugin
 import datetime
 import random
-import simplecache
 import resources.lib.utils as utils
 import resources.lib.constants as constants
 from resources.lib.traktapi import TraktAPI
@@ -512,7 +511,13 @@ class Container(Plugin):
         url.pop('nextpage', None)
         url.pop('fanarttv', None)
 
-        item = utils.set_searchhistory(query={'name': url_name, 'url': url}, itemtype='discover', maxentries=None)
+        labels = {}
+        for k, v in url.items():
+            label = utils.get_property(k, prefix='TMDbHelper.UserDiscover.Label')
+            if label:
+                labels[k] = label
+
+        item = utils.set_searchhistory(query={'name': url_name, 'url': url, 'labels': labels}, itemtype='discover', maxentries=None)
         if not item:
             return
         xbmcgui.Dialog().ok(item.get('name'), 'Successfully saved {}.\nSaved list will appear in parent discover folder.'.format(item.get('name')))
@@ -530,6 +535,8 @@ class Container(Plugin):
             self.save_userdiscover()
         elif self.params.get('method') == 'add_rule':
             return self.list_userdiscover_dialog()
+        elif self.params.get('method') == 'edit':
+            self.updatelisting = False
         else:
             self.set_userdiscover_method_property()
 
@@ -939,6 +946,7 @@ class Container(Plugin):
             listitem.set_url_props(self.params, 'container')
             listitem.set_url_props(item.get('url'), 'item')
             listitem.set_contextmenu([
+                ('Edit', 'RunScript(plugin.video.themoviedb.helper,discover_edit={})'.format(-1 - idx)),
                 ('Rename', 'RunScript(plugin.video.themoviedb.helper,discover_rename={})'.format(-1 - idx)),
                 ('Delete', 'RunScript(plugin.video.themoviedb.helper,discover_delete={})'.format(-1 - idx))])  # Need to reverse idx because oldest entries are cached at earliest index
             listitem.create_listitem(self.handle, **self.set_url_params(item.get('url')))
