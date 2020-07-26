@@ -491,6 +491,28 @@ class Script(Plugin):
         response = utils.get_jsonrpc(method, params)
         self.home.setProperty(self.params.get('property', 'TMDbHelper.KodiSetting'), u'{}'.format(response.get('result', {}).get('value', '')))
 
+    def discover_modify(self, method=None):
+        if not method:
+            return
+
+        idx = utils.try_parse_int(self.params.get(method))
+        item = utils.get_searchhistory('discover')[idx]
+
+        if not isinstance(item, dict):
+            return
+
+        elif method == 'discover_delete':
+            utils.set_searchhistory(itemtype='discover', replace=idx)
+
+        elif method == 'discover_rename':
+            name = xbmcgui.Dialog().input('Enter New Name', defaultt=item.get('name'))
+            if not name:
+                return
+            item['name'] = name
+            utils.set_searchhistory(itemtype='discover', replace=idx, query=item)
+
+        xbmc.executebuiltin('Container.Refresh')
+
     def router(self):
         if not self.params:
             """ If no params assume user wants to run plugin """
@@ -500,6 +522,10 @@ class Script(Plugin):
             TraktAPI(force=True)
         elif self.params.get('split_value'):
             self.split_value()
+        elif self.params.get('discover_rename'):
+            self.discover_modify('discover_rename')
+        elif self.params.get('discover_delete'):
+            self.discover_modify('discover_delete')
         elif self.params.get('kodi_setting'):
             self.kodi_setting()
         elif self.params.get('blur_image'):

@@ -512,7 +512,7 @@ class Container(Plugin):
         url.pop('nextpage', None)
         url.pop('fanarttv', None)
 
-        item = self.set_searchhistory(query={'name': url_name, 'url': url}, itemtype='discover', maxentries=None)
+        item = utils.set_searchhistory(query={'name': url_name, 'url': url}, itemtype='discover', maxentries=None)
         if not item:
             return
         xbmcgui.Dialog().ok(item.get('name'), 'Successfully saved {}.\nSaved list will appear in parent discover folder.'.format(item.get('name')))
@@ -891,42 +891,15 @@ class Container(Plugin):
         if self.params.get('islocal'):
             xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
 
-    def get_searchhistory(self, itemtype=None, cache=None):
-        if not itemtype:
-            return []
-        if not cache:
-            cache = simplecache.SimpleCache()
-        cache_name = 'plugin.video.themoviedb.helper.search.history.{}'.format(itemtype)
-        return cache.get(cache_name) or []
-
-    def set_searchhistory(self, query=None, itemtype=None, cache=None, cache_days=120, clearcache=False, maxentries=9):
-        if not clearcache and not query:
-            return
-        if not itemtype:
-            return query
-        if not cache:
-            cache = simplecache.SimpleCache()
-        cache_name = 'plugin.video.themoviedb.helper.search.history.{}'.format(itemtype)
-        search_history = []
-        if not clearcache:
-            search_history = self.get_searchhistory(itemtype, cache=cache)
-            if query in search_history:
-                search_history.remove(query)  # Remove query if in history because we want it to be first in list
-            if maxentries and len(search_history) > maxentries:
-                search_history.pop(0)  # Remove the oldest query if we hit our max so we don't accumulate months worth of queries
-            search_history.append(query)
-        cache.set(cache_name, search_history, expiration=datetime.timedelta(days=cache_days))
-        return query
-
     def list_search(self):
         self.updatelisting = True if self.params.pop('updatelisting', False) else False
         org_query = self.params.get('query')
         if not self.params.get('query'):
-            self.params['query'] = self.set_searchhistory(
+            self.params['query'] = utils.set_searchhistory(
                 query=utils.try_decode_string(xbmcgui.Dialog().input(self.addon.getLocalizedString(32044), type=xbmcgui.INPUT_ALPHANUM)),
                 itemtype=self.params.get('type'))
         elif self.params.get('history', '').lower() == 'true':  # Param to force history save
-            self.set_searchhistory(query=self.params.get('query'), itemtype=self.params.get('type'))
+            utils.set_searchhistory(query=self.params.get('query'), itemtype=self.params.get('type'))
         if self.params.get('query'):
             self.list_tmdb(query=self.params.get('query'), year=self.params.get('year'))
             if not org_query:
@@ -943,28 +916,31 @@ class Container(Plugin):
         listitem.set_url_props(url, 'item')
         listitem.create_listitem(self.handle, **url)
 
-    def list_clearcache(self, itemtype, maxentries=9):
+    def list_clearcache(self, itemtype):
         if self.params.get('clearcache'):
             self.updatelisting = True
             self.params.pop('clearcache', '')
-            self.set_searchhistory(itemtype=itemtype, clearcache=True, maxentries=maxentries)
+            utils.set_searchhistory(itemtype=itemtype, clearcache=True)
             container_url = 'plugin://plugin.video.themoviedb.helper/?'
             return u'{0}{1}'.format(container_url, utils.urlencode_params(self.params))
 
     def list_discoverdir(self):
         # Check if asked to clear the cache
-        container_url = self.list_clearcache(itemtype='discover', maxentries=None)
+        container_url = self.list_clearcache(itemtype='discover')
         icon = '{0}/resources/icons/tmdb/search.png'.format(self.addonpath)
 
         self.list_basedir(finish=False)  # Construct the basic categories but don't finish the container so we can add our history
 
         # Create discover history from saved items
-        history = self.get_searchhistory('discover')
+        history = utils.get_searchhistory('discover')
         history.reverse()
-        for item in history:
+        for idx, item in enumerate(history):
             listitem = ListItem(label=item.get('name'), icon=icon)
             listitem.set_url_props(self.params, 'container')
             listitem.set_url_props(item.get('url'), 'item')
+            listitem.set_contextmenu([
+                ('Rename', 'RunScript(plugin.video.themoviedb.helper,discover_rename={})'.format(-1 - idx)),
+                ('Delete', 'RunScript(plugin.video.themoviedb.helper,discover_delete={})'.format(-1 - idx))])  # Need to reverse idx because oldest entries are cached at earliest index
             listitem.create_listitem(self.handle, **self.set_url_params(item.get('url')))
 
         # Create clear cache item if history exists
@@ -996,7 +972,7 @@ class Container(Plugin):
         listitem.create_listitem(self.handle, **url)
 
         # Create cached history searches
-        history = self.get_searchhistory(self.params.get('type'))
+        history = utils.get_searchhistory(self.params.get('type'))
         history.reverse()
         for query in history:
             url['query'] = query  # Add query as param so we search it
