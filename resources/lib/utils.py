@@ -9,6 +9,7 @@ import unicodedata
 import datetime
 import hashlib
 import json
+import simplecache
 from copy import copy
 from contextlib import contextmanager
 from resources.lib.constants import TYPE_CONVERSION, VALID_FILECHARS
@@ -415,6 +416,51 @@ def merge_two_dicts_deep(x, y):
         elif v:
             z[k] = v
     return z
+
+
+def get_searchhistory(itemtype=None, cache=None):
+    if not itemtype:
+        return []
+    if not cache:
+        cache = simplecache.SimpleCache()
+    cache_name = 'plugin.video.themoviedb.helper.search.history.{}'.format(itemtype)
+    return cache.get(cache_name) or []
+
+
+def set_searchhistory(query=None, itemtype=None, cache=None, cache_days=120, clearcache=False, maxentries=9, replace=False):
+    if not itemtype:
+        return
+    if not cache:
+        cache = simplecache.SimpleCache()
+    cache_name = 'plugin.video.themoviedb.helper.search.history.{}'.format(itemtype)
+    search_history = []
+
+    if not clearcache:
+        search_history = get_searchhistory(itemtype, cache=cache)
+
+        if replace is False and query:
+            if query in search_history:  # Remove query if in history because we want it to be first in list
+                search_history.remove(query)
+            if maxentries and len(search_history) > maxentries:
+                search_history.pop(0)  # Remove the oldest query if we hit our max so we don't accumulate months worth of queries
+            search_history.append(query)
+
+        elif replace is not False:
+            if not isinstance(replace, int) and replace in search_history:
+                replace = search_history.index(replace)  # If not an integer assume we've been given an actual entry to replace
+            if not isinstance(replace, int):
+                return  # If we can't find an index dont update cache to prevent unintended modification NOTE: Not sure if want a way to append instead if replacement item not found
+            try:  # Use a try block to catch index out of range errors
+                if query:
+                    search_history[replace] = query
+                else:
+                    search_history.pop(replace)
+            except Exception as exc:
+                kodi_log(exc, 1)
+                return  # Dont update cache if modifying the search history failed
+
+    cache.set(cache_name, search_history, expiration=datetime.timedelta(days=cache_days))
+    return query
 
 
 def make_kwparams(params):
