@@ -554,10 +554,6 @@ class Script(Plugin):
 
         xbmc.executebuiltin('Container.Refresh')
 
-    def testing(self):
-        basedir_tv = self.addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
-        xbmcgui.Dialog().ok('testing', str(len(xbmcvfs.listdir(basedir_tv)[0])))
-
     def router(self):
         if not self.params:
             """ If no params assume user wants to run plugin """
@@ -609,7 +605,5 @@ class Script(Plugin):
             self.player_play()
         elif self.params.get('restart_service'):
             self.restart_service()
-        elif self.params.get('testing'):
-            self.testing()
         else:
             self.call_window()
