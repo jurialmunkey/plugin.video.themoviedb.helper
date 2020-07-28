@@ -524,7 +524,9 @@ msgstr ""
 
 #: /resources/lib/container.py
 msgctxt "#32104"
-msgid "TMDb ID for {} not found or none selected.\nDo you want to add another value?"
+msgid ""
+"TMDb ID for {} not found or none selected.\n"
+"Do you want to add another value?"
 msgstr ""
 
 #: /resources/lib/container.py
@@ -820,6 +822,16 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32163"
 msgid "Use fanart.tv for service monitor artwork"
+msgstr ""
+
+#: /resources/lib/context.py
+msgctxt "#32164"
+msgid "\n\nAdding Trakt lists to library is limited to [B]250[/B] TV Shows and [B]2500[/B] Movies per list.\nThis limit is set to ensure that the APIs providing data for free are respected."
+msgstr ""
+
+#: /resources/lib/context.py
+msgctxt "#32165"
+msgid "List length exceeds limits. Skipping..."
 msgstr ""
 
 msgctxt "#30030"
