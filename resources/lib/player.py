@@ -347,6 +347,8 @@ class Player(Plugin):
             self.item['name'] = u'{0} S{1:02d}E{2:02d}'.format(self.item.get('showname'), int(utils.try_parse_int(self.season)), int(utils.try_parse_int(self.episode)))
             self.item['season'] = self.season
             self.item['episode'] = self.episode
+            self.item['showpremiered'] = self.details.get('infoproperties', {}).get('tvshow.premiered')
+            self.item['showyear'] = self.details.get('infoproperties', {}).get('tvshow.year')
 
         if self.traktapi and self.itemtype == 'episode':
             trakt_details = self.traktapi.get_details(slug_type, self.item.get('slug'), season=self.season, episode=self.episode)
