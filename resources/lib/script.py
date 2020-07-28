@@ -14,6 +14,7 @@ from resources.lib.traktapi import TraktAPI
 from resources.lib.plugin import Plugin
 from resources.lib.player import Player
 from resources.lib.service import ServiceMonitor, ImageFunctions
+from resources.lib.constants import LIBRARY_ADD_LIMIT_TVSHOWS
 
 
 ID_VIDEOINFO = 12003
@@ -416,11 +417,13 @@ class Script(Plugin):
                 confirmation_dialog=False, allow_update=True, busy_dialog=False)
 
     def library_autoupdate(self, list_slug=None, user_slug=None):
-        busy_dialog = True if self.params.get('busy_dialog') else False
         utils.kodi_log(u'UPDATING TV SHOWS LIBRARY', 1)
         xbmcgui.Dialog().notification('TMDbHelper', 'Auto-Updating Library...')
+
+        busy_dialog = True if self.params.get('busy_dialog') else False
         basedir_tv = self.addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
 
+        # Update library from Trakt lists
         list_slug = list_slug or self.addon.getSettingString('monitor_userlist') or ''
         user_slug = user_slug or TraktAPI().get_usernameslug()
         if user_slug and list_slug:
@@ -429,37 +432,52 @@ class Script(Plugin):
                     user_slug=user_slug, list_slug=i, confirmation_dialog=False,
                     allow_update=False, busy_dialog=busy_dialog)
 
+        # Create our extended progress bg dialog
         p_dialog = xbmcgui.DialogProgressBG() if busy_dialog else None
         p_dialog.create('TMDbHelper', 'Adding items to library...') if p_dialog else None
-        for f in xbmcvfs.listdir(basedir_tv)[0]:
+
+        # Get TMDb IDs from .nfo files in the basedir
+        nfos = []
+        listdir = xbmcvfs.listdir(basedir_tv)[0]
+        for f in listdir:
             try:
                 folder = basedir_tv + f + '/'
-                # Get nfo file
-                nfo = None
-                for x in xbmcvfs.listdir(folder)[1]:
-                    if x.endswith('.nfo'):
-                        nfo = x
-                if not nfo:
+
+                # Get files ending with .nfo in folder
+                nfo_list = utils.get_files_in_folder(folder, regex=r".*\.nfo$")
+                if not nfo_list:
                     continue
 
-                # Read nfo file
-                vfs_file = xbmcvfs.File(folder + nfo)
-                content = ''
-                try:
-                    content = vfs_file.read()
-                finally:
-                    vfs_file.close()
-                tmdb_id = content.replace('https://www.themoviedb.org/tv/', '')
-                tmdb_id = tmdb_id.replace('&islocal=True', '')
-                if not tmdb_id:
-                    continue
+                # Check our nfo files for TMDb ID
+                for nfo in nfo_list:
+                    content = utils.read_file(folder + nfo)  # Get contents of .nfo file
+                    tmdb_id = content.replace('https://www.themoviedb.org/tv/', '')  # Clean content to retrieve tmdb_id
+                    tmdb_id = tmdb_id.replace('&islocal=True', '')
+                    if tmdb_id:
+                        nfos.append({'tmdb_id': tmdb_id, 'folder': f})
+                        break
 
-                # Get the tvshow
-                url = 'plugin://plugin.video.themoviedb.helper/?info=seasons&tmdb_id={}&type=tv'.format(tmdb_id)
-                context.library_addtvshow(basedir=basedir_tv, folder=f, url=url, tmdb_id=tmdb_id, p_dialog=p_dialog)
             except Exception as exc:
                 utils.kodi_log(u'LIBRARY AUTO UPDATE ERROR:\n{}'.format(exc))
-        p_dialog.close() if p_dialog else None
+
+        """
+        IMPORTANT: Do NOT change limits.
+        Increasing the set limits puts the future of TMDbHelper at risk.
+        Please respect the APIs that provide this data for free.
+        """
+        if len(nfo) > LIBRARY_ADD_LIMIT_TVSHOWS:
+            utils.kodi_log(u'NOTICE: TV Library exceeds 250 shows - SKIPPING EPISODE UPDATE.', 1)
+            xbmcgui.Dialog().notification('TMDbHelper', 'Skipping episode auto-update...')
+            nfos = []
+        for nfo in nfos:
+            if not nfo.get('f') or not nfo.get('tmdb_id'):
+                continue
+            url = 'plugin://plugin.video.themoviedb.helper/?info=seasons&tmdb_id={}&type=tv'.format(nfo.get('tmdb_id'))
+            context.library_addtvshow(basedir=basedir_tv, folder=nfo.get('f'), url=url, tmdb_id=tmdb_id, p_dialog=p_dialog)
+
+        if p_dialog:
+            p_dialog.close()
+
         if self.addon.getSettingBool('auto_update'):
             xbmc.executebuiltin('UpdateLibrary(video)')
 
@@ -536,6 +554,10 @@ class Script(Plugin):
 
         xbmc.executebuiltin('Container.Refresh')
 
+    def testing(self):
+        basedir_tv = self.addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
+        xbmcgui.Dialog().ok('testing', str(len(xbmcvfs.listdir(basedir_tv)[0])))
+
     def router(self):
         if not self.params:
             """ If no params assume user wants to run plugin """
@@ -587,5 +609,7 @@ class Script(Plugin):
             self.player_play()
         elif self.params.get('restart_service'):
             self.restart_service()
+        elif self.params.get('testing'):
+            self.testing()
         else:
             self.call_window()
