@@ -155,6 +155,20 @@ def normalise_filesize(filesize):
     return '{:.2f} {}'.format(filesize, 'PB')
 
 
+def get_files_in_folder(folder, regex):
+    return [x for x in xbmcvfs.listdir(folder)[1] if re.match(regex, x)]
+
+
+def read_file(filepath):
+    vfs_file = xbmcvfs.File(filepath)
+    content = ''
+    try:
+        content = vfs_file.read()
+    finally:
+        vfs_file.close()
+    return content
+
+
 def rate_limiter(addon_name='plugin.video.themoviedb.helper', wait_time=None, api_name=None):
     """
     Simple rate limiter to prevent overloading APIs

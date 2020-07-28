@@ -7,6 +7,7 @@ import datetime
 from resources.lib.plugin import Plugin
 from resources.lib.traktapi import TraktAPI
 from resources.lib.kodilibrary import KodiLibrary
+from resources.lib.constants import LIBRARY_ADD_LIMIT_TVSHOWS, LIBRARY_ADD_LIMIT_MOVIES
 import resources.lib.utils as utils
 _addon = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 _plugin = Plugin()
@@ -230,6 +231,34 @@ def library_userlist(user_slug=None, list_slug=None, confirmation_dialog=True, a
         d_body += '\n\n[B][COLOR=red]{}[/COLOR][/B] '.format(xbmc.getLocalizedString(14117)) if i_total > 20 else '\n\n'
         d_body += '{} [B]{}[/B] {}.'.format(_addon.getLocalizedString(32128), i_total, _addon.getLocalizedString(32129))
         if not xbmcgui.Dialog().yesno(d_head, d_body):
+            return
+
+    """
+    IMPORTANT: Do not change limits.
+    Increasing limits puts the future of TMDbHelper at risk.
+    Please respect the APIs that provide this data for free.
+    """
+    if i_total > LIBRARY_ADD_LIMIT_TVSHOWS:
+        i_total_shows = 0
+        i_total_films = 0
+        for i in request:
+            if i.get('type') == 'show':
+                i_total_shows += 1
+            elif i.get('type') == 'movie':
+                i_total_films += 1
+        if i_total_shows > LIBRARY_ADD_LIMIT_TVSHOWS or i_total_films > LIBRARY_ADD_LIMIT_MOVIES:
+            xbmcgui.Dialog().notification('TMDbHelper', _addon.getLocalizedString(32165))
+            if confirmation_dialog:
+                d_head = _addon.getLocalizedString(32125)
+                d_body = '[B]{}[/B] {} [B]{}[/B]'.format(list_slug, _addon.getLocalizedString(32127), user_slug)
+                d_body += '\n\n[B][COLOR=red]{}[/COLOR][/B] '.format(xbmc.getLocalizedString(14117))
+                d_body += _addon.getLocalizedString(32128)
+                if i_total_shows > LIBRARY_ADD_LIMIT_TVSHOWS:
+                    d_body += ' [B]{}[/B] {}'.format(i_total_shows, xbmc.getLocalizedString(20343))
+                if i_total_films > LIBRARY_ADD_LIMIT_MOVIES:
+                    d_body += ' [B]{}[/B] {}'.format(i_total_films, xbmc.getLocalizedString(20342))
+                d_body += _addon.getLocalizedString(32164)
+                xbmcgui.Dialog().ok(d_head, d_body)
             return
 
     p_dialog = xbmcgui.DialogProgressBG() if busy_dialog else None
