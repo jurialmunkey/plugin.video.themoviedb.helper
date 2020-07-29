@@ -440,35 +440,20 @@ class Script(Plugin):
         nfos = []
         listdir = xbmcvfs.listdir(basedir_tv)[0]
         for f in listdir:
-            try:
-                folder = basedir_tv + f + '/'
-
-                # Get files ending with .nfo in folder
-                nfo_list = utils.get_files_in_folder(folder, regex=r".*\.nfo$")
-                if not nfo_list:
-                    continue
-
-                # Check our nfo files for TMDb ID
-                for nfo in nfo_list:
-                    content = utils.read_file(folder + nfo)  # Get contents of .nfo file
-                    tmdb_id = content.replace('https://www.themoviedb.org/tv/', '')  # Clean content to retrieve tmdb_id
-                    tmdb_id = tmdb_id.replace('&islocal=True', '')
-                    if tmdb_id:
-                        nfos.append({'tmdb_id': tmdb_id, 'folder': f})
-                        break
-
-            except Exception as exc:
-                utils.kodi_log(u'LIBRARY AUTO UPDATE ERROR:\n{}'.format(exc))
+            tmdb_id = utils.get_tmdbid_nfo(basedir_tv, f)
+            if tmdb_id:
+                nfos.append({'tmdb_id': tmdb_id, 'folder': f})
 
         """
         IMPORTANT: Do NOT change limits.
         Increasing the set limits puts the future of TMDbHelper at risk.
         Please respect the APIs that provide this data for free.
         """
-        if len(nfo) > LIBRARY_ADD_LIMIT_TVSHOWS:
+        if len(nfos) > LIBRARY_ADD_LIMIT_TVSHOWS:
             utils.kodi_log(u'NOTICE: TV Library exceeds 250 shows - SKIPPING EPISODE UPDATE.', 1)
             xbmcgui.Dialog().notification('TMDbHelper', 'Skipping episode auto-update...')
             nfos = []
+
         for nfo in nfos:
             if not nfo.get('folder') or not nfo.get('tmdb_id'):
                 continue
