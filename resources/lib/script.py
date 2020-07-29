@@ -458,7 +458,7 @@ class Script(Plugin):
             if not nfo.get('folder') or not nfo.get('tmdb_id'):
                 continue
             url = 'plugin://plugin.video.themoviedb.helper/?info=seasons&tmdb_id={}&type=tv'.format(nfo.get('tmdb_id'))
-            context.library_addtvshow(basedir=basedir_tv, folder=nfo.get('folder'), url=url, tmdb_id=tmdb_id, p_dialog=p_dialog)
+            context.library_addtvshow(basedir=basedir_tv, folder=nfo.get('folder'), url=url, tmdb_id=nfo.get('tmdb_id'), p_dialog=p_dialog)
 
         if p_dialog:
             p_dialog.close()
