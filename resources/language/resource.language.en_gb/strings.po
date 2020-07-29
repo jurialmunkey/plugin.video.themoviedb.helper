@@ -826,12 +826,26 @@ msgstr ""
 
 #: /resources/lib/context.py
 msgctxt "#32164"
-msgid "\n\nAdding Trakt lists to library is limited to [B]250[/B] TV Shows and [B]2500[/B] Movies per list.\nThis limit is set to ensure that the APIs providing data for free are respected."
+msgid ""
+"\n"
+"\n"
+"Adding Trakt lists to library is limited to [B]{}[/B] TV Shows and [B]{}}[/B] Movies per list.\n"
+"This limit is set to ensure that the APIs providing data for free are respected."
 msgstr ""
 
 #: /resources/lib/context.py
 msgctxt "#32165"
 msgid "List length exceeds limits. Skipping..."
+msgstr ""
+
+#: /resources/lib/context.py
+msgctxt "#32166"
+msgid "Adding items to library..."
+msgstr ""
+
+#: /resources/lib/context.py
+msgctxt "#32167"
+msgid "Updating"
 msgstr ""
 
 msgctxt "#30030"

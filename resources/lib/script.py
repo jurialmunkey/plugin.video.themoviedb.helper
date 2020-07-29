@@ -418,7 +418,7 @@ class Script(Plugin):
 
     def library_autoupdate(self, list_slug=None, user_slug=None):
         utils.kodi_log(u'UPDATING TV SHOWS LIBRARY', 1)
-        xbmcgui.Dialog().notification('TMDbHelper', 'Auto-Updating Library...')
+        xbmcgui.Dialog().notification('TMDbHelper', u'{}...'.format(self.addon.getLocalizedString(32167)))
 
         busy_dialog = True if self.params.get('busy_dialog') else False
         basedir_tv = self.addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
@@ -434,7 +434,7 @@ class Script(Plugin):
 
         # Create our extended progress bg dialog
         p_dialog = xbmcgui.DialogProgressBG() if busy_dialog else None
-        p_dialog.create('TMDbHelper', 'Adding items to library...') if p_dialog else None
+        p_dialog.create('TMDbHelper', u'{}...'.format(self.addon.getLocalizedString(32167))) if p_dialog else None
 
         # Get TMDb IDs from .nfo files in the basedir
         nfos = []
@@ -444,19 +444,13 @@ class Script(Plugin):
             if tmdb_id:
                 nfos.append({'tmdb_id': tmdb_id, 'folder': f})
 
-        """
-        IMPORTANT: Do NOT change limits.
-        Increasing the set limits puts the future of TMDbHelper at risk.
-        Please respect the APIs that provide this data for free.
-        """
-        if len(nfos) > LIBRARY_ADD_LIMIT_TVSHOWS:
-            utils.kodi_log(u'NOTICE: TV Library exceeds 250 shows - SKIPPING EPISODE UPDATE.', 1)
-            xbmcgui.Dialog().notification('TMDbHelper', 'Skipping episode auto-update...')
-            nfos = []
-
-        for nfo in nfos:
+        for n_count, nfo in enumerate(nfos):
             if not nfo.get('folder') or not nfo.get('tmdb_id'):
                 continue
+            if p_dialog:
+                p_dialog_val = ((n_count + 1) * 100) // len(nfos)
+                p_dialog_msg = u'{} {}...'.format(self.addon.getLocalizedString(32167), nfo.get('folder'))
+                p_dialog.update(p_dialog_val, message=p_dialog_msg)
             url = 'plugin://plugin.video.themoviedb.helper/?info=seasons&tmdb_id={}&type=tv'.format(nfo.get('tmdb_id'))
             context.library_addtvshow(basedir=basedir_tv, folder=nfo.get('folder'), url=url, tmdb_id=nfo.get('tmdb_id'), p_dialog=p_dialog)
 
