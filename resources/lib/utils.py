@@ -169,6 +169,27 @@ def read_file(filepath):
     return content
 
 
+def get_tmdbid_nfo(basedir, foldername, tmdbtype='tv'):
+    try:
+        folder = basedir + foldername + '/'
+
+        # Get files ending with .nfo in folder
+        nfo_list = get_files_in_folder(folder, regex=r".*\.nfo$")
+        if not nfo_list:
+            continue
+
+        # Check our nfo files for TMDb ID
+        for nfo in nfo_list:
+            content = read_file(folder + nfo)  # Get contents of .nfo file
+            tmdb_id = content.replace('https://www.themoviedb.org/{}/'.format(tmdbtype), '')  # Clean content to retrieve tmdb_id
+            tmdb_id = tmdb_id.replace('&islocal=True', '')
+            if tmdb_id:
+                return tmdb_id
+
+    except Exception as exc:
+        kodi_log(u'ERROR GETTING TMDBID FROM NFO:\n{}'.format(exc))
+
+
 def rate_limiter(addon_name='plugin.video.themoviedb.helper', wait_time=None, api_name=None):
     """
     Simple rate limiter to prevent overloading APIs

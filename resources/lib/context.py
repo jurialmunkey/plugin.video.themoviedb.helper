@@ -89,33 +89,11 @@ def library_create_nfo(tmdbtype, tmdb_id, *args, **kwargs):
     library_createfile(filename, content, file_ext='nfo', *args, **kwargs)
 
 
-def library_getnfo_tmdbid(basedir=None, folder=None):
-    """ Checks .nfo file and returns TMDB ID it contains """
-    tmdb_id = None
-    folder_list = xbmcvfs.listdir(basedir)[0]
-    if folder in folder_list:
-        nfo_folder = basedir + folder + '/'
-        nfo = None
-        for x in xbmcvfs.listdir(nfo_folder)[1]:
-            if x.endswith('.nfo'):
-                nfo = x
-        if nfo:
-            vfs_file = xbmcvfs.File(nfo_folder + nfo)
-            content = ''
-            try:
-                content = vfs_file.read()
-            finally:
-                vfs_file.close()
-            tmdb_id = content.replace('https://www.themoviedb.org/tv/', '')
-            tmdb_id = tmdb_id.replace('&islocal=True', '')
-    return tmdb_id
-
-
 def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id=None, imdb_id=None, p_dialog=None):
     if not basedir or not folder or not url:
         return
 
-    nfo_tmdbid = library_getnfo_tmdbid(basedir, folder)  # Check the nfo file in the folder to make sure it matches the TMDB ID
+    nfo_tmdbid = utils.get_tmdbid_nfo(basedir, folder) if folder in xbmcvfs.listdir(basedir)[0] else None  # Check the nfo file in the folder to make sure it matches the TMDB ID
     if nfo_tmdbid and utils.try_parse_int(nfo_tmdbid) != utils.try_parse_int(tmdb_id):
         folder += ' (TMDB {})'.format(tmdb_id)  # If different tvshow with same name exists create new folder with TMDB ID added
 
