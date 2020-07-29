@@ -175,8 +175,6 @@ def get_tmdbid_nfo(basedir, foldername, tmdbtype='tv'):
 
         # Get files ending with .nfo in folder
         nfo_list = get_files_in_folder(folder, regex=r".*\.nfo$")
-        if not nfo_list:
-            continue
 
         # Check our nfo files for TMDb ID
         for nfo in nfo_list:
