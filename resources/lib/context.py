@@ -126,28 +126,52 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id
 
     # Set the next check date for this show
     next_aired = details_tvshow.get('next_episode_to_air', {})
-    last_aired = details_tvshow.get('last_episode_to_air', {})
     if next_aired and next_aired.get('air_date'):
-        my_history['next_check'] = next_aired.get('air_date')
-        my_history['log_msg'] = '\nShow had next aired date'
-    elif last_aired and last_aired.get('air_date'):
+        next_aired_dt = utils.convert_timestamp(next_aired.get('air_date'), "%Y-%m-%d", 10)
+        if next_aired_dt > datetime.datetime.today():
+            if next_aired_dt < (datetime.datetime.today() + datetime.timedelta(days=7)):
+                my_history['next_check'] = next_aired.get('air_date')
+                my_history['log_msg'] = '\nShow had next aired date this week'
+                # Check again on the next aired date
+            elif next_aired_dt < (datetime.datetime.today() + datetime.timedelta(days=30)):
+                my_next_check = datetime.datetime.today() + datetime.timedelta(days=7)
+                my_history['next_check'] = my_next_check.strftime('%Y-%m-%d')
+                my_history['log_msg'] = '\nShow has next aired date this month'
+                # Check again in a week just to be safe in case air date changes
+            else:
+                my_next_check = datetime.datetime.today() + datetime.timedelta(days=30)
+                my_history['next_check'] = my_next_check.strftime('%Y-%m-%d')
+                my_history['log_msg'] = '\nShow has next aired date in more than a month'
+                # Check again in a month just to be safe in case air date changes
+        else:
+            next_aired = None  # Next aired was in the past for some reason so dont use that date
+
+    last_aired = details_tvshow.get('last_episode_to_air', {})
+    if not next_aired and last_aired and last_aired.get('air_date'):
         last_aired_dt = utils.convert_timestamp(last_aired.get('air_date'), "%Y-%m-%d", 10)
         if last_aired_dt > (datetime.datetime.today() - datetime.timedelta(days=30)):
+            my_next_check = datetime.datetime.today() + datetime.timedelta(days=1)
+            my_history['next_check'] = my_next_check.strftime('%Y-%m-%d')
             my_history['log_msg'] = '\nShow aired in last month but no next aired date'
-            next_check_days = 1  # Possibly currently airing so check again next time
+            # Show might be currently airing but just hasnt updated next date yet so check again tomorrow
         elif last_aired_dt > (datetime.datetime.today() - datetime.timedelta(days=90)):
             my_history['log_msg'] = '\nShow aired in last quarter but not in last month'
-            next_check_days = 7  # Might be on mid-season break so check again next week
+            my_next_check = datetime.datetime.today() + datetime.timedelta(days=7)
+            my_history['next_check'] = my_next_check.strftime('%Y-%m-%d')
+            # Show might be on a mid-season break so check again in a week for a return date
         elif details_tvshow.get('status') in ['Canceled', 'Ended']:
             my_history['log_msg'] = '\nShow was canceled or ended'
-            next_check_days = 30  # Check again in a month just to be safe
+            my_next_check = datetime.datetime.today() + datetime.timedelta(days=30)
+            my_history['next_check'] = my_next_check.strftime('%Y-%m-%d')
+            # Show was canceled so check again in a month just to be safe
         else:
             my_history['log_msg'] = '\nShow last aired more than 3 months ago and no next aired date set'
-            next_check_days = 7  # Check again next week to see if it has restarted
-        my_next_check = datetime.datetime.today() + datetime.timedelta(days=next_check_days)
-        my_history['next_check'] = my_next_check.strftime('%Y-%m-%d')
+            my_next_check = datetime.datetime.today() + datetime.timedelta(days=7)
+            my_history['next_check'] = my_next_check.strftime('%Y-%m-%d')
+            # Show hasnt aired in a while so check every week for a return date
 
-    # Get the episode lists
+    prev_added_eps = cache_info.get(tmdb_id, {}).get('episodes') or []
+    prev_skipped_eps = cache_info.get(tmdb_id, {}).get('skipped') or []
     for s_count, season in enumerate(seasons):
         season_name = u'Season {}'.format(season)
 
@@ -156,6 +180,8 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id
             p_dialog_val = ((s_count + 1) * 100) // len(seasons)
             p_dialog_msg = u'{} {} - {}...'.format(_addon.getLocalizedString(32167), details_tvshow.get('original_name'), season_name)
             p_dialog.update(p_dialog_val, message=p_dialog_msg)
+
+        # TODO: Only check most recent seasons not ones weve already added
 
         # Get all episodes in the season except specials
         details_season = _plugin.tmdb.get_request_sc('tv', tmdb_id, 'season', season)
@@ -169,6 +195,11 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id
                 utils.validify_filename(episode.get('name')))
 
             my_history['episodes'].append(episode_name)
+
+            # Skip episodes we added in the past
+            if episode_name in prev_added_eps:
+                if episode_name not in prev_skipped_eps:
+                    continue
 
             # Skip future episodes
             if _addon.getSettingBool('hide_unaired_episodes'):
