@@ -7,6 +7,7 @@ import xbmc
 import xbmcgui
 import xbmcvfs
 import threading
+import simplecache
 import resources.lib.utils as utils
 import resources.lib.context as context
 from resources.lib.downloader import Downloader
@@ -14,7 +15,6 @@ from resources.lib.traktapi import TraktAPI
 from resources.lib.plugin import Plugin
 from resources.lib.player import Player
 from resources.lib.service import ServiceMonitor, ImageFunctions
-from resources.lib.constants import LIBRARY_ADD_LIMIT_TVSHOWS
 
 
 ID_VIDEOINFO = 12003
@@ -436,6 +436,9 @@ class Script(Plugin):
         p_dialog = xbmcgui.DialogProgressBG() if busy_dialog else None
         p_dialog.create('TMDbHelper', u'{}...'.format(self.addon.getLocalizedString(32167))) if p_dialog else None
 
+        # Create the cache object now so that library addtvshow method doesnt need to constantly init it
+        cache = simplecache.SimpleCache()
+
         # Get TMDb IDs from .nfo files in the basedir
         nfos = []
         listdir = xbmcvfs.listdir(basedir_tv)[0]
@@ -452,7 +455,7 @@ class Script(Plugin):
                 p_dialog_msg = u'{} {}...'.format(self.addon.getLocalizedString(32167), nfo.get('folder'))
                 p_dialog.update(p_dialog_val, message=p_dialog_msg)
             url = 'plugin://plugin.video.themoviedb.helper/?info=seasons&tmdb_id={}&type=tv'.format(nfo.get('tmdb_id'))
-            context.library_addtvshow(basedir=basedir_tv, folder=nfo.get('folder'), url=url, tmdb_id=nfo.get('tmdb_id'), p_dialog=p_dialog)
+            context.library_addtvshow(basedir=basedir_tv, folder=nfo.get('folder'), url=url, tmdb_id=nfo.get('tmdb_id'), p_dialog=p_dialog, force=self.params.get('force', False), cache=cache)
 
         if p_dialog:
             p_dialog.close()

@@ -12,6 +12,7 @@ from resources.lib.constants import LIBRARY_ADD_LIMIT_TVSHOWS, LIBRARY_ADD_LIMIT
 import resources.lib.utils as utils
 _addon = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 _plugin = Plugin()
+_debuglogging = _addon.getSettingBool('debug_logging')
 
 
 def library_cleancontent_replacer(content, old, new):
@@ -90,39 +91,54 @@ def library_create_nfo(tmdbtype, tmdb_id, *args, **kwargs):
     library_createfile(filename, content, file_ext='nfo', *args, **kwargs)
 
 
-def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id=None, imdb_id=None, p_dialog=None, cache=None):
-    if not basedir or not folder or not url:
+def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id=None, imdb_id=None, p_dialog=None, cache=None, force=False):
+    if not basedir or not folder or not url or not tmdb_id:
         return
 
     # Get our cached info
-    cache = cache or simplecache.SimpleCache()
-    cache_name = 'plugin.video.themoviedb.helper.library_autoupdate_tv'
-    cache_info = cache.get(cache_name) or {}
+    if not cache:
+        cache = simplecache.SimpleCache()
+    cache_name = 'plugin.video.themoviedb.helper.library_autoupdate_tv.{}'.format(tmdb_id)
+    cache_info = {} if force else cache.get(cache_name) or {}
+    cache_version = 5
 
     # If there's already a folder for a different show with the same name then create a separate folder
     nfo_id = utils.get_tmdbid_nfo(basedir, folder) if folder in xbmcvfs.listdir(basedir)[0] else None
     if nfo_id and utils.try_parse_int(nfo_id) != utils.try_parse_int(tmdb_id):
         folder += ' (TMDB {})'.format(tmdb_id)
 
+    # Only use cache info if version matches
+    if not cache_info.get('version') or cache_info.get('version') != cache_version:
+        cache_info = {}
+
     # If there is a next check value and it hasn't elapsed then skip the update
     next_check = cache_info.get(tmdb_id, {}).get('next_check')
-    log_msg = cache_info.get(tmdb_id, {}).get('log_msg') or ''
     if next_check and utils.convert_timestamp(next_check, "%Y-%m-%d", 10) > datetime.datetime.today():
-        utils.kodi_log(u'Skipping updating TMDB ID {} - Next update {}{}'.format(tmdb_id, next_check, log_msg))
+        if _debuglogging:
+            log_msg = cache_info.get(tmdb_id, {}).get('log_msg') or ''
+            utils.kodi_log(u'Skipping updating {} (TMDB {})\nNext update {}{}'.format(
+                cache_info.get(tmdb_id, {}).get('name'), tmdb_id, next_check, log_msg), 2)
         return
 
     # Get all seasons in the tvshow except specials
     details_tvshow = _plugin.tmdb.get_request_sc('tv', tmdb_id)
     if not details_tvshow:
         return
-    seasons = [i.get('season_number') for i in details_tvshow.get('seasons', []) if i.get('season_number', 0) != 0]
 
     # Create the .nfo file in the folder
     library_create_nfo('tv', tmdb_id, folder, basedir=basedir)
 
     # Construct our cache object
     today_date = datetime.datetime.today().strftime('%Y-%m-%d')
-    my_history = {'skipped': [], 'episodes': [], 'next_check': today_date, 'last_check': today_date, 'log_msg': ''}
+    my_history = {
+        'version': cache_version,
+        'name': details_tvshow.get('name', ''),
+        'skipped': [],
+        'episodes': [],
+        'latest_season': 0,
+        'next_check': today_date,
+        'last_check': today_date,
+        'log_msg': ''}
 
     # Set the next check date for this show
     next_aired = details_tvshow.get('next_episode_to_air', {})
@@ -172,26 +188,42 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id
 
     prev_added_eps = cache_info.get(tmdb_id, {}).get('episodes') or []
     prev_skipped_eps = cache_info.get(tmdb_id, {}).get('skipped') or []
+
+    seasons = details_tvshow.get('seasons', [])
+    s_total = len(seasons)
     for s_count, season in enumerate(seasons):
-        season_name = u'Season {}'.format(season)
+        # Skip special seasons
+        if season.get('season_number', 0) == 0:
+            if _debuglogging:
+                utils.kodi_log(u'{} (TMDB {})\nSpecial Season. Skipping...'.format(details_tvshow.get('name'), tmdb_id), 2)
+            s_total -= 1
+            continue
+
+        season_name = u'Season {}'.format(season.get('season_number'))
 
         # Update our progress dialog
         if p_dialog:
-            p_dialog_val = ((s_count + 1) * 100) // len(seasons)
+            p_dialog_val = ((s_count + 1) * 100) // s_total
             p_dialog_msg = u'{} {} - {}...'.format(_addon.getLocalizedString(32167), details_tvshow.get('original_name'), season_name)
             p_dialog.update(p_dialog_val, message=p_dialog_msg)
 
-        # TODO: Only check most recent seasons not ones weve already added
+        # If weve scanned before we only want to scan the most recent seasons (that have already started airing)
+        latest_season = utils.try_parse_int(cache_info.get('latest_season', 0))
+        if utils.try_parse_int(season.get('season_number', 0)) < latest_season:
+            if _debuglogging:
+                utils.kodi_log(u'{} (TMDB {})\nPreviously Added {}. Skipping...'.format(details_tvshow.get('name'), tmdb_id, season_name), 2)
+            continue
 
         # Get all episodes in the season except specials
-        details_season = _plugin.tmdb.get_request_sc('tv', tmdb_id, 'season', season)
+        details_season = _plugin.tmdb.get_request_sc('tv', tmdb_id, 'season', season.get('season_number'))
         if not details_season:
+            utils.kodi_log(u'{} (TMDB {})\nNo details found for {}. Skipping...'.format(details_tvshow.get('name'), tmdb_id, season_name))
             return
         episodes = [i for i in details_season.get('episodes', []) if i.get('episode_number', 0) != 0]  # Only get non-special seasons
-
+        skipped_eps, future_eps, library_eps = [], [], []
         for e_count, episode in enumerate(episodes):
             episode_name = 'S{:02d}E{:02d} - {}'.format(
-                utils.try_parse_int(season), utils.try_parse_int(episode.get('episode_number')),
+                utils.try_parse_int(season.get('season_number')), utils.try_parse_int(episode.get('episode_number')),
                 utils.validify_filename(episode.get('name')))
 
             my_history['episodes'].append(episode_name)
@@ -199,18 +231,23 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id
             # Skip episodes we added in the past
             if episode_name in prev_added_eps:
                 if episode_name not in prev_skipped_eps:
+                    if _debuglogging:
+                        skipped_eps.append(episode_name)
                     continue
 
             # Skip future episodes
             if _addon.getSettingBool('hide_unaired_episodes'):
                 air_date = utils.convert_timestamp(episode.get('air_date'), "%Y-%m-%d", 10)
                 if not air_date or air_date > datetime.datetime.now():
+                    if _debuglogging:
+                        future_eps.append(episode_name)
                     my_history['skipped'].append(episode_name)
                     continue
 
             # Check if item has already been added
-            if _plugin.get_db_info(info='dbid', tmdbtype='episode', imdb_id=imdb_id, tmdb_id=tmdb_id, season=season, episode=episode.get('episode_number')):
-                utils.kodi_log(u'Found {} - {} in library. Skipping...'.format(episode.get('showtitle'), episode_name))
+            if _plugin.get_db_info(info='dbid', tmdbtype='episode', imdb_id=imdb_id, tmdb_id=tmdb_id, season=season.get('season_number'), episode=episode.get('episode_number')):
+                if _debuglogging:
+                    library_eps.append(episode_name)
                 continue
 
             # Update progress dialog
@@ -222,9 +259,25 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id
             episode_path += '&tmdb_id={}&season={}&episode={}'.format(tmdb_id, season, episode.get('episode_number'))
             library_createfile(episode_name, episode_path, folder, season_name, basedir=basedir)
 
+        # Some logging of what we did
+        if _debuglogging:
+            klog_msg = u'{} (TMDB {}) - {} - Done!'.format(details_tvshow.get('name'), tmdb_id, season_name)
+            if skipped_eps:
+                klog_msg += u'\nSkipped Previously Added Episodes:\n{}'.format(skipped_eps)
+            if library_eps:
+                klog_msg += u'\nSkipped Episodes in Library:\n{}'.format(library_eps)
+            if future_eps:
+                klog_msg += u'\nSkipped Unaired Episodes:\n{}'.format(future_eps)
+            utils.kodi_log(klog_msg, 2)
+
+        # Store a season value of where we got up to
+        if len(episodes) > 2:
+            air_date = utils.convert_timestamp(season.get('air_date'), "%Y-%m-%d", 10)
+            if air_date and air_date < datetime.datetime.now():  # Make sure the season has actually aired!
+                my_history['latest_season'] = utils.try_parse_int(season.get('season_number'))
+
     # Store details about what we did into the cache
-    cache_info[tmdb_id] = my_history
-    cache.set(cache_name, cache_info, expiration=datetime.timedelta(days=120))
+    cache.set(cache_name, my_history, expiration=datetime.timedelta(days=120))
 
 
 def browse():
@@ -296,7 +349,6 @@ def library_userlist(user_slug=None, list_slug=None, confirmation_dialog=True, a
 
     """
     IMPORTANT: Do not change limits.
-    Increasing limits puts the future of TMDbHelper at risk.
     Please respect the APIs that provide this data for free.
     """
     if i_total > LIBRARY_ADD_LIMIT_TVSHOWS:
@@ -328,6 +380,9 @@ def library_userlist(user_slug=None, list_slug=None, confirmation_dialog=True, a
     basedir_tv = _addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
     all_movies = []
     all_tvshows = []
+
+    # Create the cache object now so that library addtvshow method doesnt need to constantly init it
+    cache = simplecache.SimpleCache()
 
     for i in request:
         i_count += 1
@@ -363,11 +418,14 @@ def library_userlist(user_slug=None, list_slug=None, confirmation_dialog=True, a
             content = 'plugin://plugin.video.themoviedb.helper/?info=seasons&nextpage=True&tmdb_id={}&type=tv'.format(tmdb_id)
             folder = u'{}'.format(item.get('title'))
             p_dialog.update((i_count * 100) // i_total, message=u'Adding {} to library...'.format(item.get('title'))) if p_dialog else None
-            library_addtvshow(basedir=basedir_tv, folder=folder, url=content, tmdb_id=tmdb_id, imdb_id=imdb_id, tvdb_id=tvdb_id, p_dialog=p_dialog)
+            library_addtvshow(basedir=basedir_tv, folder=folder, url=content, tmdb_id=tmdb_id, imdb_id=imdb_id, tvdb_id=tvdb_id, p_dialog=p_dialog, cache=cache)
 
-    p_dialog.close() if p_dialog else None
-    create_playlist(all_movies, 'movies', user_slug, list_slug) if all_movies else None
-    create_playlist(all_tvshows, 'tvshows', user_slug, list_slug) if all_tvshows else None
+    if p_dialog:
+        p_dialog.close()
+    if all_movies:
+        create_playlist(all_movies, 'movies', user_slug, list_slug)
+    if all_tvshows:
+        create_playlist(all_tvshows, 'tvshows', user_slug, list_slug)
     if allow_update and _addon.getSettingBool('auto_update'):
         xbmc.executebuiltin('UpdateLibrary(video)')
 
@@ -419,7 +477,7 @@ def library():
             folder = sys.listitem.getVideoInfoTag().getTVShowTitle() or title
             library_addtvshow(
                 basedir=basedir_tv, folder=folder, url=sys.listitem.getPath(),
-                tmdb_id=sys.listitem.getProperty('tmdb_id'))
+                tmdb_id=sys.listitem.getProperty('tmdb_id'), force=True)  # If we manually add a show force add it
             xbmc.executebuiltin('UpdateLibrary(video)') if auto_update else None
 
         elif dbtype == 'season':
