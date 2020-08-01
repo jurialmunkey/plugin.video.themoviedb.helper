@@ -100,7 +100,7 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id
         cache = simplecache.SimpleCache()
     cache_name = 'plugin.video.themoviedb.helper.library_autoupdate_tv.{}'.format(tmdb_id)
     cache_info = {} if force else cache.get(cache_name) or {}
-    cache_version = 5
+    cache_version = 6
 
     # If there's already a folder for a different show with the same name then create a separate folder
     nfo_id = utils.get_tmdbid_nfo(basedir, folder) if folder in xbmcvfs.listdir(basedir)[0] else None
@@ -256,7 +256,7 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id
 
             # Create our .strm file for the episode
             episode_path = 'plugin://plugin.video.themoviedb.helper/?info=play&type=episode&islocal=True'
-            episode_path += '&tmdb_id={}&season={}&episode={}'.format(tmdb_id, season, episode.get('episode_number'))
+            episode_path += '&tmdb_id={}&season={}&episode={}'.format(tmdb_id, season.get('season_number', 0), episode.get('episode_number'))
             library_createfile(episode_name, episode_path, folder, season_name, basedir=basedir)
 
         # Some logging of what we did
