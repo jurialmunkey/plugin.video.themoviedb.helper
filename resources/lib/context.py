@@ -322,7 +322,7 @@ def play():
         xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,play={},tmdb_id={},{})'.format(dbtype, tmdb_id, suffix))
 
 
-def library_userlist(user_slug=None, list_slug=None, confirmation_dialog=True, allow_update=True, busy_dialog=True):
+def library_userlist(user_slug=None, list_slug=None, confirmation_dialog=True, allow_update=True, busy_dialog=True, force=False):
     user_slug = user_slug or sys.listitem.getProperty('Item.user_slug')
     list_slug = list_slug or sys.listitem.getProperty('Item.list_slug')
 
@@ -418,7 +418,7 @@ def library_userlist(user_slug=None, list_slug=None, confirmation_dialog=True, a
             content = 'plugin://plugin.video.themoviedb.helper/?info=seasons&nextpage=True&tmdb_id={}&type=tv'.format(tmdb_id)
             folder = u'{}'.format(item.get('title'))
             p_dialog.update((i_count * 100) // i_total, message=u'Adding {} to library...'.format(item.get('title'))) if p_dialog else None
-            library_addtvshow(basedir=basedir_tv, folder=folder, url=content, tmdb_id=tmdb_id, imdb_id=imdb_id, tvdb_id=tvdb_id, p_dialog=p_dialog, cache=cache)
+            library_addtvshow(basedir=basedir_tv, folder=folder, url=content, tmdb_id=tmdb_id, imdb_id=imdb_id, tvdb_id=tvdb_id, p_dialog=p_dialog, cache=cache, force=force)
 
     if p_dialog:
         p_dialog.close()
@@ -552,7 +552,7 @@ def action(action, tmdb_id=None, tmdb_type=None, season=None, episode=None, labe
     elif action == 'remove_from_userlist':
         return sync_userlist(remove_item=True)
     elif action == 'library_userlist':
-        return library_userlist()
+        return library_userlist(force=True)
     elif action == 'library':
         return library()
     elif action == 'refresh_item':
