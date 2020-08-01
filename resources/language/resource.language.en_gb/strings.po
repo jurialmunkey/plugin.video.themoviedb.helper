@@ -848,6 +848,11 @@ msgctxt "#32167"
 msgid "Updating"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32169"
+msgid "Logout of Trakt account..."
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

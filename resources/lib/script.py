@@ -543,6 +543,8 @@ class Script(Plugin):
             self.params = {'call_path': 'plugin://plugin.video.themoviedb.helper/'}
         if self.params.get('authenticate_trakt'):
             TraktAPI(force=True)
+        elif self.params.get('revoke_trakt'):
+            TraktAPI().logout()
         elif self.params.get('split_value'):
             self.split_value()
         elif self.params.get('discover_rename'):

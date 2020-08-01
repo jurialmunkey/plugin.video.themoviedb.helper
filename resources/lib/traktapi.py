@@ -36,9 +36,8 @@ class TraktAPI(RequestAPI):
     def authorize(self, login=False):
         if self.authorization:
             return self.authorization
-        token = self.addon.getSettingString('trakt_token')
-        token = loads(token) if token else None
-        if token and type(token) is dict and token.get('access_token'):
+        token = self.get_stored_token()
+        if token.get('access_token'):
             self.authorization = token
             self.headers['Authorization'] = 'Bearer {0}'.format(self.authorization.get('access_token'))
         elif login:
@@ -48,6 +47,35 @@ class TraktAPI(RequestAPI):
         if self.authorization:
             xbmcgui.Window(10000).setProperty('TMDbHelper.TraktIsAuth', 'True')
         return self.authorization
+
+    def get_stored_token(self):
+        try:
+            token = loads(self.addon.getSettingString('trakt_token')) or {}
+        except Exception as exc:
+            token = {}
+            utils.kodi_log(exc, 1)
+        return token
+
+    def logout(self):
+        token = self.get_stored_token()
+
+        if not xbmcgui.Dialog().yesno('Trakt user account logout', 'Do you wish to logout of your Trakt account?'):
+            return
+
+        if token:
+            response = self.get_api_request('https://api.trakt.tv/oauth/revoke', dictify=False, postdata={
+                'token': token.get('access_token', ''),
+                'client_id': self.client_id,
+                'client_secret': self.client_secret})
+            if response and response.status_code == 200:
+                msg = 'Successfully logged out of Trakt user account'
+                self.addon.setSettingString('trakt_token', '')
+            else:
+                msg = 'Logout failed!'
+        else:
+            msg = 'Trakt access token not found'
+
+        xbmcgui.Dialog().ok('Trakt user account logout', msg)
 
     def login(self):
         self.code = self.get_api_request('https://api.trakt.tv/oauth/device/code', postdata={'client_id': self.client_id})
