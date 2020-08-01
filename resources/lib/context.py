@@ -100,7 +100,7 @@ def library_addtvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id
         cache = simplecache.SimpleCache()
     cache_name = 'plugin.video.themoviedb.helper.library_autoupdate_tv.{}'.format(tmdb_id)
     cache_info = {} if force else cache.get(cache_name) or {}
-    cache_version = 6
+    cache_version = 7
 
     # If there's already a folder for a different show with the same name then create a separate folder
     nfo_id = utils.get_tmdbid_nfo(basedir, folder) if folder in xbmcvfs.listdir(basedir)[0] else None
