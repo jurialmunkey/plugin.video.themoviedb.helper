@@ -7,9 +7,9 @@ import xbmc
 import xbmcgui
 import xbmcvfs
 import threading
-import simplecache
 import resources.lib.utils as utils
 import resources.lib.context as context
+import resources.lib.libraryupdate as libraryupdate
 from resources.lib.downloader import Downloader
 from resources.lib.traktapi import TraktAPI
 from resources.lib.plugin import Plugin
@@ -412,7 +412,7 @@ class Script(Plugin):
         user_slug = self.params.get('user_slug') or TraktAPI().get_usernameslug()  # Get the user's slug
         list_slug = self.params.get('library_userlist')
         if user_slug and list_slug:
-            context.library_userlist(
+            libraryupdate.add_userlist(
                 user_slug=user_slug, list_slug=list_slug,
                 confirmation_dialog=False, allow_update=True, busy_dialog=False)
 
@@ -428,16 +428,13 @@ class Script(Plugin):
         user_slug = user_slug or TraktAPI().get_usernameslug()
         if user_slug and list_slug:
             for i in list_slug.split(' | '):
-                context.library_userlist(
+                libraryupdate.add_userlist(
                     user_slug=user_slug, list_slug=i, confirmation_dialog=False,
-                    allow_update=False, busy_dialog=busy_dialog)
+                    allow_update=False, busy_dialog=busy_dialog, force=self.params.get('force', False))
 
         # Create our extended progress bg dialog
         p_dialog = xbmcgui.DialogProgressBG() if busy_dialog else None
         p_dialog.create('TMDbHelper', u'{}...'.format(self.addon.getLocalizedString(32167))) if p_dialog else None
-
-        # Create the cache object now so that library addtvshow method doesnt need to constantly init it
-        cache = simplecache.SimpleCache()
 
         # Get TMDb IDs from .nfo files in the basedir
         nfos = []
@@ -455,7 +452,7 @@ class Script(Plugin):
                 p_dialog_msg = u'{} {}...'.format(self.addon.getLocalizedString(32167), nfo.get('folder'))
                 p_dialog.update(p_dialog_val, message=p_dialog_msg)
             url = 'plugin://plugin.video.themoviedb.helper/?info=seasons&tmdb_id={}&type=tv'.format(nfo.get('tmdb_id'))
-            context.library_addtvshow(basedir=basedir_tv, folder=nfo.get('folder'), url=url, tmdb_id=nfo.get('tmdb_id'), p_dialog=p_dialog, force=self.params.get('force', False), cache=cache)
+            libraryupdate.add_tvshow(basedir=basedir_tv, folder=nfo.get('folder'), url=url, tmdb_id=nfo.get('tmdb_id'), p_dialog=p_dialog)
 
         if p_dialog:
             p_dialog.close()
