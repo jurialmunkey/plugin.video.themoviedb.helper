@@ -363,13 +363,14 @@ class Player(Plugin):
             if k not in constants.PLAYER_URLENCODE:
                 continue
             v = u'{0}'.format(v)
-            self.item[k] = v.replace(',', '')
-            self.item[k + '_+'] = v.replace(' ', '+')
-            self.item[k + '_-'] = v.replace(' ', '-')
-            self.item[k + '_escaped'] = quote(quote(utils.try_encode_string(v)))
-            self.item[k + '_escaped+'] = quote(quote_plus(utils.try_encode_string(v)))
-            self.item[k + '_url'] = quote(utils.try_encode_string(v))
-            self.item[k + '_url+'] = quote_plus(utils.try_encode_string(v))
+            for key, value in {k: v, '{}_meta'.format(k): dumps(v)}.items():
+                self.item[key] = value.replace(',', '')
+                self.item[key + '_+'] = value.replace(',', '').replace(' ', '+')
+                self.item[key + '_-'] = value.replace(',', '').replace(' ', '-')
+                self.item[key + '_escaped'] = quote(quote(utils.try_encode_string(value)))
+                self.item[key + '_escaped+'] = quote(quote_plus(utils.try_encode_string(value)))
+                self.item[key + '_url'] = quote(utils.try_encode_string(value))
+                self.item[key + '_url+'] = quote_plus(utils.try_encode_string(value))
 
     def build_players(self, tmdbtype=None):
         basedirs = ['special://profile/addon_data/plugin.video.themoviedb.helper/players/']
