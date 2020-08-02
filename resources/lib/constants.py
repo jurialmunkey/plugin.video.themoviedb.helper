@@ -745,7 +745,7 @@ LIBRARY_CALENDAR = [
 IMPORTANT: Do not change the limits set below.
 Please respect the APIs that provide this data for free.
 """
-LIBRARY_ADD_LIMIT_TVSHOWS = 500
+LIBRARY_ADD_LIMIT_TVSHOWS = 1000
 LIBRARY_ADD_LIMIT_MOVIES = 2500
 
 USER_DISCOVER_LISTITEMS_BASEDIR = [
