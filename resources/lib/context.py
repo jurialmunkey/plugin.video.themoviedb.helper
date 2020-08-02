@@ -159,7 +159,7 @@ def action(action, tmdb_id=None, tmdb_type=None, season=None, episode=None, labe
     elif action == 'remove_from_userlist':
         return sync_userlist(remove_item=True)
     elif action == 'library_userlist':
-        return libraryupdate.add_userlist()
+        return libraryupdate.add_userlist(force=True)
     elif action == 'library':
         return library()
     elif action == 'refresh_item':
