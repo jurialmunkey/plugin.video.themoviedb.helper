@@ -36,9 +36,8 @@ class TraktAPI(RequestAPI):
     def authorize(self, login=False):
         if self.authorization:
             return self.authorization
-        token = self.addon.getSettingString('trakt_token')
-        token = loads(token) if token else None
-        if token and type(token) is dict and token.get('access_token'):
+        token = self.get_stored_token()
+        if token.get('access_token'):
             self.authorization = token
             self.headers['Authorization'] = 'Bearer {0}'.format(self.authorization.get('access_token'))
         elif login:
@@ -48,6 +47,35 @@ class TraktAPI(RequestAPI):
         if self.authorization:
             xbmcgui.Window(10000).setProperty('TMDbHelper.TraktIsAuth', 'True')
         return self.authorization
+
+    def get_stored_token(self):
+        try:
+            token = loads(self.addon.getSettingString('trakt_token')) or {}
+        except Exception as exc:
+            token = {}
+            utils.kodi_log(exc, 1)
+        return token
+
+    def logout(self):
+        token = self.get_stored_token()
+
+        if not xbmcgui.Dialog().yesno('Trakt user account logout', 'Do you wish to logout of your Trakt account?'):
+            return
+
+        if token:
+            response = self.get_api_request('https://api.trakt.tv/oauth/revoke', dictify=False, postdata={
+                'token': token.get('access_token', ''),
+                'client_id': self.client_id,
+                'client_secret': self.client_secret})
+            if response and response.status_code == 200:
+                msg = 'Successfully logged out of Trakt user account'
+                self.addon.setSettingString('trakt_token', '')
+            else:
+                msg = 'Logout failed!'
+        else:
+            msg = 'Trakt access token not found'
+
+        xbmcgui.Dialog().ok('Trakt user account logout', msg)
 
     def login(self):
         self.code = self.get_api_request('https://api.trakt.tv/oauth/device/code', postdata={'client_id': self.client_id})
@@ -429,19 +457,19 @@ class TraktAPI(RequestAPI):
 
     def get_upnext_cache_refresh(self, show_id, last_updated):
         if not last_updated:  # No last Trakt update date so refresh cache
-            # utils.kodi_log(u'Up Next {} Episodes:\nNo last Trakt update date. Refreshing cache...'.format(show_id), 1)
             return True  # Refresh cache
 
+        ts_last = utils.convert_timestamp(last_updated)
+        if not ts_last:
+            return True  # Timestamp doesn't convert so refresh cache
+
         cache_name = '{0}.trakt.show.{1}.last_updated'.format(self.cache_name, show_id)
-        prev_updated = self.get_cache(cache_name)
-        if not prev_updated:  # No previous update date so refresh cache
-            # utils.kodi_log(u'Up Next {} Episodes:\nNo previous update date. Refreshing cache...'.format(show_id), 1)
+        ts_prev = utils.convert_timestamp(self.get_cache(cache_name))
+        if not ts_prev:  # No previous update date or cant convert save value to timestamp so refresh
             return self.set_cache(last_updated, cache_name)  # Set the cache date and refresh cache
 
-        if utils.convert_timestamp(prev_updated) < utils.convert_timestamp(last_updated):  # Changes on Trakt since previous update date so refresh cache
-            # utils.kodi_log(u'Up Next {} Episodes:\nChanges on Trakt since previous update date. Refreshing cache...'.format(show_id), 1)
+        if ts_prev < ts_last:  # Changes on Trakt since previous update date so refresh cache
             return self.set_cache(last_updated, cache_name)  # Set the cache date and refresh cache
-        # utils.kodi_log(u'Up Next {} Episodes:\nRetrieving cached details...'.format(show_id), 1)
 
     def get_upnext(self, show_id, response_only=False, last_updated=None):
         items = []

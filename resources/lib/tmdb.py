@@ -73,6 +73,36 @@ class TMDb(RequestAPI):
         if item.get('backdrop_path'):
             return self.get_imagepath(item.get('backdrop_path'))
 
+    def get_airdates(self, item):
+        if not item:
+            return
+        infoproperties = {}
+        if item.get('last_episode_to_air'):
+            i = item.get('last_episode_to_air', {})
+            infoproperties['last_aired'] = utils.date_to_format(i.get('air_date'), xbmc.getRegion('dateshort'))
+            infoproperties['last_aired.long'] = utils.date_to_format(i.get('air_date'), xbmc.getRegion('datelong'))
+            infoproperties['last_aired.day'] = utils.date_to_format(i.get('air_date'), "%A")
+            infoproperties['last_aired.episode'] = i.get('episode_number')
+            infoproperties['last_aired.name'] = i.get('name')
+            infoproperties['last_aired.tmdb_id'] = i.get('id')
+            infoproperties['last_aired.plot'] = i.get('overview')
+            infoproperties['last_aired.season'] = i.get('season_number')
+            infoproperties['last_aired.rating'] = '{:0,.1f}'.format(utils.try_parse_float(i.get('vote_average')))
+            infoproperties['last_aired.votes'] = i.get('vote_count')
+            infoproperties['last_aired.thumb'] = self.get_season_thumb(i)
+        if item.get('next_episode_to_air'):
+            i = item.get('next_episode_to_air', {})
+            infoproperties['next_aired'] = utils.date_to_format(i.get('air_date'), xbmc.getRegion('dateshort'))
+            infoproperties['next_aired.long'] = utils.date_to_format(i.get('air_date'), xbmc.getRegion('datelong'))
+            infoproperties['next_aired.day'] = utils.date_to_format(i.get('air_date'), "%A")
+            infoproperties['next_aired.episode'] = i.get('episode_number')
+            infoproperties['next_aired.name'] = i.get('name')
+            infoproperties['next_aired.tmdb_id'] = i.get('id')
+            infoproperties['next_aired.plot'] = i.get('overview')
+            infoproperties['next_aired.season'] = i.get('season_number')
+            infoproperties['next_aired.thumb'] = self.get_season_thumb(i)
+        return infoproperties
+
     def get_infolabels(self, item):
         infolabels = {}
         infolabels['title'] = self.get_title(item)
@@ -128,6 +158,8 @@ class TMDb(RequestAPI):
         infoproperties['tvshow.tmdb_id'] = item.get('tvshow.tmdb_id')
         infoproperties['tvshow.imdb_id'] = item.get('tvshow.imdb_id')
         infoproperties['tvshow.tvdb_id'] = item.get('tvshow.tvdb_id')
+        infoproperties['tvshow.premiered'] = item.get('tvshow.premiered') or ''
+        infoproperties['tvshow.year'] = infoproperties.get('tvshow.premiered')[:4]
         infoproperties['biography'] = item.get('biography')
         infoproperties['birthday'] = item.get('birthday')
         infoproperties['age'] = utils.age_difference(item.get('birthday'), item.get('deathday'))
@@ -141,28 +173,7 @@ class TMDb(RequestAPI):
         infoproperties['tmdb_votes'] = '{:0,.0f}'.format(item.get('vote_count')) if item.get('vote_count') else None
         if item.get('gender'):
             infoproperties['gender'] = self.addon.getLocalizedString(32070) if item.get('gender') == 2 else self.addon.getLocalizedString(32071)
-        if item.get('last_episode_to_air'):
-            i = item.get('last_episode_to_air', {})
-            infoproperties['last_aired'] = i.get('air_date')
-            infoproperties['last_aired.day'] = utils.date_to_format(i.get('air_date'), "%A")
-            infoproperties['last_aired.episode'] = i.get('episode_number')
-            infoproperties['last_aired.name'] = i.get('name')
-            infoproperties['last_aired.tmdb_id'] = i.get('id')
-            infoproperties['last_aired.plot'] = i.get('overview')
-            infoproperties['last_aired.season'] = i.get('season_number')
-            infoproperties['last_aired.rating'] = '{:0,.1f}'.format(utils.try_parse_float(i.get('vote_average')))
-            infoproperties['last_aired.votes'] = i.get('vote_count')
-            infoproperties['last_aired.thumb'] = self.get_season_thumb(i)
-        if item.get('next_episode_to_air'):
-            i = item.get('next_episode_to_air', {})
-            infoproperties['next_aired'] = i.get('air_date')
-            infoproperties['next_aired.day'] = utils.date_to_format(i.get('air_date'), "%A")
-            infoproperties['next_aired.episode'] = i.get('episode_number')
-            infoproperties['next_aired.name'] = i.get('name')
-            infoproperties['next_aired.tmdb_id'] = i.get('id')
-            infoproperties['next_aired.plot'] = i.get('overview')
-            infoproperties['next_aired.season'] = i.get('season_number')
-            infoproperties['next_aired.thumb'] = self.get_season_thumb(i)
+        infoproperties.update(self.get_airdates(item))
         if item.get('created_by'):
             infoproperties = utils.iter_props(item.get('created_by'), 'Creator', infoproperties, name='name', tmdb_id='id')
             infoproperties = utils.iter_props(item.get('created_by'), 'Creator', infoproperties, thumb='profile_path', func=self.get_imagepath)
@@ -413,28 +424,52 @@ class TMDb(RequestAPI):
         if not itemtype or not tmdb_id:
             utils.kodi_log(u'TMDb Get Details: No Item Type or TMDb ID!\n{} {} {} {}'.format(itemtype, tmdb_id, season, episode), 2)
             return {}
+
         extra_request = None
-        cache_name = '{0}.TMDb.v3_1_7.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
+        cache_name = '{0}.TMDb.v3_2_9.{1}.{2}'.format(self.cache_name, itemtype, tmdb_id)
         cache_name = '{0}.Season{1}'.format(cache_name, season) if season else cache_name
         cache_name = '{0}.Episode{1}'.format(cache_name, episode) if season and episode else cache_name
         itemdict = self.get_cache(cache_name) if not cache_refresh else None
+
         if not itemdict and not cache_only:
             request = self.get_request_lc(itemtype, tmdb_id, language=self.req_language, append_to_response=self.req_append, cache_refresh=cache_refresh)
+
             if itemtype == 'tv':
                 request['tvshowtitle'] = self.get_title(request)
+
             if season and episode:
-                extra_request = self.get_request_lc('tv', tmdb_id, 'season', season, 'episode', episode, language=self.req_language, append_to_response=self.req_append, cache_refresh=cache_refresh)
+                extra_request = self.get_request_lc(
+                    'tv', tmdb_id, 'season', season, 'episode', episode,
+                    language=self.req_language, append_to_response=self.req_append, cache_refresh=cache_refresh)
             elif season:
-                extra_request = self.get_request_lc('tv', tmdb_id, 'season', season, language=self.req_language, append_to_response=self.req_append, cache_refresh=cache_refresh)
+                extra_request = self.get_request_lc(
+                    'tv', tmdb_id, 'season', season,
+                    language=self.req_language, append_to_response=self.req_append, cache_refresh=cache_refresh)
+
             if season and episode and not extra_request:
                 extra_request = {'episode_number': episode, 'season_number': season}
+
             if extra_request:
                 extra_request['tvshow.tmdb_id'] = request.get('id')
                 extra_request['tvshow.imdb_id'] = request.get('imdb_id') or request.get('external_ids', {}).get('imdb_id')
                 extra_request['tvshow.tvdb_id'] = request.get('external_ids', {}).get('tvdb_id')
+                extra_request['tvshow.premiered'] = request.get('first_air_date') or ''
                 request = utils.merge_two_dicts(request, extra_request)
+
             itemdict = self.set_cache(self.get_niceitem(request), cache_name, self.cache_long) if request else {}
             utils.kodi_log(u'TMDb Get Details: No Item Found!\n{} {} {} {}'.format(itemtype, tmdb_id, season, episode), 2) if not request else None
+
+        return itemdict
+
+    def get_tvshow_nextaired(self, tmdb_id):
+        """ Get updated next aired data for tvshows using 24hr cache """
+        if not tmdb_id:
+            return {}
+        cache_name = '{0}.NextAired.{1}'.format(self.cache_name, tmdb_id)
+        itemdict = self.get_cache(cache_name)
+        if not itemdict:
+            request = self.get_request('tv', tmdb_id, language=self.req_language, cache_days=1)
+            itemdict = self.set_cache(self.get_airdates(request), cache_name, cache_days=1) if request else {}
         return itemdict
 
     def get_externalid_item(self, itemtype, external_id, external_source):

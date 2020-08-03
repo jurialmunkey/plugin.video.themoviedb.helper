@@ -9,6 +9,7 @@ import unicodedata
 import datetime
 import hashlib
 import json
+import simplecache
 from copy import copy
 from contextlib import contextmanager
 from resources.lib.constants import TYPE_CONVERSION, VALID_FILECHARS
@@ -46,8 +47,11 @@ def validify_filename(filename):
 def makepath(path):
     if xbmcvfs.exists(path):
         return xbmc.translatePath(path)
-    xbmcvfs.mkdirs(path)
-    return xbmc.translatePath(path)
+    if xbmcvfs.mkdirs(path):
+        return xbmc.translatePath(path)
+    if _addon.getSettingBool('ignore_folderchecking'):
+        kodi_log(u'Ignored xbmcvfs folder check error\n{}'.format(path), 2)
+        return xbmc.translatePath(path)
 
 
 def md5hash(value):
@@ -154,6 +158,39 @@ def normalise_filesize(filesize):
     return '{:.2f} {}'.format(filesize, 'PB')
 
 
+def get_files_in_folder(folder, regex):
+    return [x for x in xbmcvfs.listdir(folder)[1] if re.match(regex, x)]
+
+
+def read_file(filepath):
+    vfs_file = xbmcvfs.File(filepath)
+    content = ''
+    try:
+        content = vfs_file.read()
+    finally:
+        vfs_file.close()
+    return content
+
+
+def get_tmdbid_nfo(basedir, foldername, tmdbtype='tv'):
+    try:
+        folder = basedir + foldername + '/'
+
+        # Get files ending with .nfo in folder
+        nfo_list = get_files_in_folder(folder, regex=r".*\.nfo$")
+
+        # Check our nfo files for TMDb ID
+        for nfo in nfo_list:
+            content = read_file(folder + nfo)  # Get contents of .nfo file
+            tmdb_id = content.replace('https://www.themoviedb.org/{}/'.format(tmdbtype), '')  # Clean content to retrieve tmdb_id
+            tmdb_id = tmdb_id.replace('&islocal=True', '')
+            if tmdb_id:
+                return tmdb_id
+
+    except Exception as exc:
+        kodi_log(u'ERROR GETTING TMDBID FROM NFO:\n{}'.format(exc))
+
+
 def rate_limiter(addon_name='plugin.video.themoviedb.helper', wait_time=None, api_name=None):
     """
     Simple rate limiter to prevent overloading APIs
@@ -244,6 +281,8 @@ def iterate_extraart(artworklist, artworkdict={}):
 
 
 def convert_timestamp(time_str, time_fmt="%Y-%m-%dT%H:%M:%S", time_lim=19, utc_convert=False):
+    if not time_str:
+        return
     time_str = time_str[:time_lim] if time_lim else time_str
     utc_offset = 0
     if utc_convert:
@@ -413,6 +452,51 @@ def merge_two_dicts_deep(x, y):
         elif v:
             z[k] = v
     return z
+
+
+def get_searchhistory(itemtype=None, cache=None):
+    if not itemtype:
+        return []
+    if not cache:
+        cache = simplecache.SimpleCache()
+    cache_name = 'plugin.video.themoviedb.helper.search.history.{}'.format(itemtype)
+    return cache.get(cache_name) or []
+
+
+def set_searchhistory(query=None, itemtype=None, cache=None, cache_days=120, clearcache=False, maxentries=9, replace=False):
+    if not itemtype:
+        return
+    if not cache:
+        cache = simplecache.SimpleCache()
+    cache_name = 'plugin.video.themoviedb.helper.search.history.{}'.format(itemtype)
+    search_history = []
+
+    if not clearcache:
+        search_history = get_searchhistory(itemtype, cache=cache)
+
+        if replace is False and query:
+            if query in search_history:  # Remove query if in history because we want it to be first in list
+                search_history.remove(query)
+            if maxentries and len(search_history) > maxentries:
+                search_history.pop(0)  # Remove the oldest query if we hit our max so we don't accumulate months worth of queries
+            search_history.append(query)
+
+        elif replace is not False:
+            if not isinstance(replace, int) and replace in search_history:
+                replace = search_history.index(replace)  # If not an integer assume we've been given an actual entry to replace
+            if not isinstance(replace, int):
+                return  # If we can't find an index dont update cache to prevent unintended modification NOTE: Not sure if want a way to append instead if replacement item not found
+            try:  # Use a try block to catch index out of range errors
+                if query:
+                    search_history[replace] = query
+                else:
+                    search_history.pop(replace)
+            except Exception as exc:
+                kodi_log(exc, 1)
+                return  # Dont update cache if modifying the search history failed
+
+    cache.set(cache_name, search_history, expiration=datetime.timedelta(days=cache_days))
+    return query
 
 
 def make_kwparams(params):

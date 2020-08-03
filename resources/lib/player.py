@@ -270,16 +270,10 @@ class Player(Plugin):
             if player[0] and (action.endswith('.strm') or self.identifierlist[playerindex] == 'play_kodi'):  # Action is play and is a strm/local so PlayMedia
                 utils.kodi_log(u'Player -- Found strm or local.\nAttempting PLAYMEDIA({})'.format(action), 1)
                 xbmc.executebuiltin(utils.try_decode_string(u'PlayMedia(\"{0}\")'.format(action)))
-            elif player[0] and action.find('realizer') < 0:  # Action is play and not a strm so play with player
+            elif player[0]:  # Action is play and not a strm so play with player
                 utils.kodi_log(u'Player -- Found file.\nAttempting to PLAY: {}'.format(action), 2)
                 xbmcgui.Window(10000).setProperty('TMDbHelper.PlayerInfoString', self.playerstring) if self.playerstring else None
                 xbmc.Player().play(action, ListItem(library='video', **self.details).set_listitem())
-            elif player[0] and action.find('realizer') > 0:
-		import xbmcgui
-		xbmcgui.Window(10000).setProperty('REALIZER.ResolvedUrl', 'true')
-		action = action.encode('ascii',errors='ignore').replace(',+','')
-		xbmc.executebuiltin('PlayMedia(%s,isdir)' % action)
-#		xbmc.log(str(action)+'===>TMDB_PLAYER3', level=xbmc.LOGNOTICE)
             else:
                 action = u'Container.Update({0})'.format(action) if xbmc.getCondVisibility("Window.IsMedia") else u'ActivateWindow(videos,{0},return)'.format(action)
                 utils.kodi_log(u'Player -- Found folder.\nAttempting to OPEN: {}'.format(action), 2)
@@ -347,31 +341,14 @@ class Player(Plugin):
             self.item['tvdb'] = self.details.get('infoproperties', {}).get('tvshow.tvdb_id') or trakt_details.get('ids', {}).get('tvdb')
             self.item['slug'] = trakt_details.get('ids', {}).get('slug')
 
-	from resources.lib.fanarttv import FanartTV            
         if self.itemtype == 'episode':  # Do some special episode stuff
-            self.item['plot'] = self.details.get('infolabels', {}).get('plot')
             self.item['id'] = self.item.get('tvdb')
             self.item['title'] = self.details.get('infolabels', {}).get('title')  # Set Episode Title
             self.item['name'] = u'{0} S{1:02d}E{2:02d}'.format(self.item.get('showname'), int(utils.try_parse_int(self.season)), int(utils.try_parse_int(self.episode)))
             self.item['season'] = self.season
             self.item['episode'] = self.episode
-	    artwork = FanartTV.get_tvshow_allart(self.fanarttv, self.item['tvdb'])
-    	    self.item['banner'] = artwork.get('banner')
-    	    self.item['landscape'] =artwork.get('landscape')
-	    self.item['fanart'] = artwork.get('fanart')
-	    self.item['poster'] = artwork.get('poster')
-    	    self.item['clearlogo'] = artwork.get('clearlogo')
-	    self.item['clearart'] = artwork.get('clearart')
-        else:
-	    self.item['plot'] = self.details.get('infolabels', {}).get('plot')
-	    artwork = FanartTV.get_movie_allart(self.fanarttv, self.tmdb_id)
-    	    self.item['banner'] = artwork.get('banner')
-	    self.item['landscape'] =artwork.get('landscape')
-	    self.item['fanart'] = artwork.get('fanart')
-	    self.item['poster'] = artwork.get('poster')
-	    self.item['clearlogo'] = artwork.get('clearlogo')
-	    self.item['clearart'] = artwork.get('clearart')
-
+            self.item['showpremiered'] = self.details.get('infoproperties', {}).get('tvshow.premiered')
+            self.item['showyear'] = self.details.get('infoproperties', {}).get('tvshow.year')
 
         if self.traktapi and self.itemtype == 'episode':
             trakt_details = self.traktapi.get_details(slug_type, self.item.get('slug'), season=self.season, episode=self.episode)
@@ -386,13 +363,14 @@ class Player(Plugin):
             if k not in constants.PLAYER_URLENCODE:
                 continue
             v = u'{0}'.format(v)
-            self.item[k] = v.replace(',', '')
-            self.item[k + '_+'] = v.replace(' ', '+')
-            self.item[k + '_-'] = v.replace(' ', '-')
-            self.item[k + '_escaped'] = quote(quote(utils.try_encode_string(v)))
-            self.item[k + '_escaped+'] = quote(quote_plus(utils.try_encode_string(v)))
-            self.item[k + '_url'] = quote(utils.try_encode_string(v))
-            self.item[k + '_url+'] = quote_plus(utils.try_encode_string(v))
+            for key, value in {k: v, '{}_meta'.format(k): dumps(v)}.items():
+                self.item[key] = value.replace(',', '')
+                self.item[key + '_+'] = value.replace(',', '').replace(' ', '+')
+                self.item[key + '_-'] = value.replace(',', '').replace(' ', '-')
+                self.item[key + '_escaped'] = quote(quote(utils.try_encode_string(value)))
+                self.item[key + '_escaped+'] = quote(quote_plus(utils.try_encode_string(value)))
+                self.item[key + '_url'] = quote(utils.try_encode_string(value))
+                self.item[key + '_url+'] = quote_plus(utils.try_encode_string(value))
 
     def build_players(self, tmdbtype=None):
         basedirs = ['special://profile/addon_data/plugin.video.themoviedb.helper/players/']

@@ -4,7 +4,6 @@ import xbmcgui
 import xbmcplugin
 import datetime
 import random
-import simplecache
 import resources.lib.utils as utils
 import resources.lib.constants as constants
 from resources.lib.traktapi import TraktAPI
@@ -322,8 +321,8 @@ class Container(Plugin):
         prefix = 'TMDbHelper.UserDiscover.{}'.format(prefix) if prefix else 'TMDbHelper.UserDiscover'
         return utils.get_property(name, prefix=prefix, **kwargs)
 
-    def get_userdiscover_folderpath_url(self):
-        url = {'info': 'discover', 'type': self.params.get('type'), 'with_id': 'True'}
+    def get_userdiscover_folderpath_url(self, info='discover'):
+        url = {'info': info, 'type': self.params.get('type'), 'with_id': 'True'}
         url = self.set_url_params(url)
         for i in self.get_userdiscover_listitems(basedir=True):
             k = i.get('url', {}).get('method')
@@ -500,17 +499,45 @@ class Container(Plugin):
         self.params = urls[idx]
         self.router()
 
+    def save_userdiscover(self):
+        url = self.get_userdiscover_folderpath_url()
+        if not url:
+            return
+        url_name = xbmcgui.Dialog().input('Enter a Name to Save Settings As')
+        if not url_name:
+            return
+
+        # Clean up some added params
+        url.pop('widget', None)
+        url.pop('nextpage', None)
+        url.pop('fanarttv', None)
+
+        labels = {}
+        for k, v in url.items():
+            label = utils.get_property(k, prefix='TMDbHelper.UserDiscover.Label')
+            if label:
+                labels[k] = label
+
+        item = utils.set_searchhistory(query={'name': url_name, 'url': url, 'labels': labels}, itemtype='discover', maxentries=None)
+        if not item:
+            return
+        xbmcgui.Dialog().ok(item.get('name'), 'Successfully saved {}.\nSaved list will appear in parent discover folder.'.format(item.get('name')))
+
     def list_userdiscover(self):
         self.updatelisting = True if self.params.get('method') else False
         self.new_property_label = self.new_property_value = None
 
-        # Route Method
+        # Routing for discover onclick actions
         if not self.params.get('method') or self.params.get('method') == 'clear':
             self.clear_userdiscover_properties()
         elif self.params.get('method') == 'sort_by':
             self.set_userdiscover_sortby_property()
+        elif self.params.get('method') == 'save':
+            self.save_userdiscover()
         elif self.params.get('method') == 'add_rule':
             return self.list_userdiscover_dialog()
+        elif self.params.get('method') == 'edit':
+            self.updatelisting = False
         else:
             self.set_userdiscover_method_property()
 
@@ -522,7 +549,7 @@ class Container(Plugin):
             self.get_userdiscover_prop(self.params.get('method'), clearproperty=True)
             self.get_userdiscover_prop(self.params.get('method'), 'Label', clearproperty=True)
 
-        # Build Container
+        # Update the container to reflect changes made by user
         self.containercontent = 'files'
         self.start_container()
         self.list_userdiscover_build(constants.USER_DISCOVER_LISTITEMS_BASEDIR)
@@ -872,42 +899,15 @@ class Container(Plugin):
         if self.params.get('islocal'):
             xbmcplugin.setResolvedUrl(self.handle, True, ListItem().set_listitem())
 
-    def get_searchhistory(self, itemtype=None, cache=None):
-        if not itemtype:
-            return []
-        if not cache:
-            cache = simplecache.SimpleCache()
-        cache_name = 'plugin.video.themoviedb.helper.search.history.{}'.format(itemtype)
-        return cache.get(cache_name) or []
-
-    def set_searchhistory(self, query=None, itemtype=None, cache=None, cache_days=120, clearcache=False):
-        if not clearcache and not query:
-            return
-        if not itemtype:
-            return query
-        if not cache:
-            cache = simplecache.SimpleCache()
-        cache_name = 'plugin.video.themoviedb.helper.search.history.{}'.format(itemtype)
-        search_history = []
-        if not clearcache:
-            search_history = self.get_searchhistory(itemtype, cache=cache)
-            if query in search_history:
-                search_history.remove(query)  # Remove query if in history because we want it to be first in list
-            if len(search_history) > 9:
-                search_history.pop(0)
-            search_history.append(query)
-        cache.set(cache_name, search_history, expiration=datetime.timedelta(days=cache_days))
-        return query
-
     def list_search(self):
         self.updatelisting = True if self.params.pop('updatelisting', False) else False
         org_query = self.params.get('query')
         if not self.params.get('query'):
-            self.params['query'] = self.set_searchhistory(
+            self.params['query'] = utils.set_searchhistory(
                 query=utils.try_decode_string(xbmcgui.Dialog().input(self.addon.getLocalizedString(32044), type=xbmcgui.INPUT_ALPHANUM)),
                 itemtype=self.params.get('type'))
         elif self.params.get('history', '').lower() == 'true':  # Param to force history save
-            self.set_searchhistory(query=self.params.get('query'), itemtype=self.params.get('type'))
+            utils.set_searchhistory(query=self.params.get('query'), itemtype=self.params.get('type'))
         if self.params.get('query'):
             self.list_tmdb(query=self.params.get('query'), year=self.params.get('year'))
             if not org_query:
@@ -915,32 +915,73 @@ class Container(Plugin):
                 container_url = u'plugin://plugin.video.themoviedb.helper/?{}'.format(utils.urlencode_params(self.params))
                 xbmc.executebuiltin('Container.Update({})'.format(container_url))
 
-    def list_searchdir(self):
-        # Clear the cache if asked
-        container_url = None
+    def list_clearhistory(self, url=None, icon=''):
+        if not url:
+            return
+        url['clearcache'] = 'True'
+        listitem = ListItem(label=self.addon.getLocalizedString(32121), icon=icon)
+        listitem.set_url_props(self.params, 'container')
+        listitem.set_url_props(url, 'item')
+        listitem.create_listitem(self.handle, **url)
+
+    def list_clearcache(self, itemtype):
         if self.params.get('clearcache'):
             self.updatelisting = True
             self.params.pop('clearcache', '')
-            self.set_searchhistory(itemtype=self.params.get('type'), clearcache=True)
+            utils.set_searchhistory(itemtype=itemtype, clearcache=True)
             container_url = 'plugin://plugin.video.themoviedb.helper/?'
-            container_url = u'{0}{1}'.format(container_url, utils.urlencode_params(self.params))
+            return u'{0}{1}'.format(container_url, utils.urlencode_params(self.params))
+
+    def list_discoverdir(self):
+        # Check if asked to clear the cache
+        container_url = self.list_clearcache(itemtype='discover')
+        icon = '{0}/resources/icons/tmdb/search.png'.format(self.addonpath)
+
+        self.list_basedir(finish=False)  # Construct the basic categories but don't finish the container so we can add our history
+
+        # Create discover history from saved items
+        history = utils.get_searchhistory('discover')
+        history.reverse()
+        for idx, item in enumerate(history):
+            listitem = ListItem(label=item.get('name'), icon=icon)
+            listitem.set_url_props(self.params, 'container')
+            listitem.set_url_props(item.get('url'), 'item')
+            listitem.set_contextmenu([
+                ('Edit', 'RunScript(plugin.video.themoviedb.helper,discover_edit={})'.format(-1 - idx)),
+                ('Rename', 'RunScript(plugin.video.themoviedb.helper,discover_rename={})'.format(-1 - idx)),
+                ('Delete', 'RunScript(plugin.video.themoviedb.helper,discover_delete={})'.format(-1 - idx))])  # Need to reverse idx because oldest entries are cached at earliest index
+            listitem.create_listitem(self.handle, **self.set_url_params(item.get('url')))
+
+        # Create clear cache item if history exists
+        if history:
+            self.list_clearhistory(url=self.params.copy(), icon=icon)
+
+        # Finish container
+        self.finish_container()
+
+        # If we cleared cache we need to update the container and replace the path so we don't keep clearing cache
+        if container_url:
+            xbmc.executebuiltin('Container.Update({}, replace)'.format(container_url))
+
+    def list_searchdir(self):
+        # Check if asked to clear the cache
+        container_url = self.list_clearcache(itemtype=self.params.get('type'))
+        icon = '{0}/resources/icons/tmdb/search.png'.format(self.addonpath)
 
         self.start_container()
-        # Set our icon
-        icon = '{0}/resources/icons/tmdb/search.png'.format(self.addonpath)
 
         # Re-use our current params
         url = self.params.copy()
         url['info'] = 'search'
 
         # Create first search item
-        listitem = ListItem(label='Search {}'.format(utils.type_convert(self.params.get('type'), 'plural')), icon=icon)
+        listitem = ListItem(label='{} {}'.format('Search', utils.type_convert(self.params.get('type'), 'plural')), icon=icon)
         listitem.set_url_props(self.params, 'container')
         listitem.set_url_props(url, 'item')
         listitem.create_listitem(self.handle, **url)
 
         # Create cached history searches
-        history = self.get_searchhistory(self.params.get('type'))
+        history = utils.get_searchhistory(self.params.get('type'))
         history.reverse()
         for query in history:
             url['query'] = query  # Add query as param so we search it
@@ -952,12 +993,8 @@ class Container(Plugin):
         # Create clear cache item if history exists
         if history:
             url['info'] = 'dir_search'
-            url['clearcache'] = 'True'
             url.pop('query', '')
-            listitem = ListItem(label=self.addon.getLocalizedString(32121), icon=icon)
-            listitem.set_url_props(self.params, 'container')
-            listitem.set_url_props(url, 'item')
-            listitem.create_listitem(self.handle, **url)
+            self.list_clearhistory(url=url, icon=icon)
 
         # Finish container
         self.finish_container()
@@ -1168,7 +1205,7 @@ class Container(Plugin):
         self.params = item.url
         self.router()
 
-    def list_basedir(self):
+    def list_basedir(self, finish=True):
         cat = constants.BASEDIR_PATH.get(self.params.get('info'), {})
         basedir = cat.get('folders', [constants.BASEDIR_MAIN])
         types = cat.get('types', [None])
@@ -1201,7 +1238,8 @@ class Container(Plugin):
                     listitem.set_url_props(self.params, 'container')
                     listitem.set_url_props(url, 'item')
                     listitem.create_listitem(self.handle, **url)
-        self.finish_container()
+        if finish:
+            self.finish_container()
 
     def router(self):
         # FILTERS AND EXCLUSIONS
@@ -1240,6 +1278,8 @@ class Container(Plugin):
             self.list_search()
         elif self.params.get('info') == 'dir_search':
             self.list_searchdir()
+        elif self.params.get('info') == 'dir_discover':
+            self.list_discoverdir()
         elif self.params.get('info') == 'library_nextaired':
             self.list_calendar(trakt=False)
         elif self.params.get('info') == 'trakt_becauseyouwatched':
