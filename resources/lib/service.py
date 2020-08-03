@@ -586,7 +586,7 @@ class ServiceMonitor(CommonMonitorFunctions):
                 self.kodimonitor.waitForAbort(1)
 
             # Sit idle in a holding pattern if the skin doesn't need the service monitor yet
-            elif xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.Service) | System.ScreenSaverActive"):
+            elif xbmc.getCondVisibility("System.ScreenSaverActive | [!Skin.HasSetting(TMDbHelper.Service) + !Skin.HasSetting(TMDbHelper.EnableBlur) + !Skin.HasSetting(TMDbHelper.EnableDesaturate) + !Skin.HasSetting(TMDbHelper.EnableColors)]"):
                 self.kodimonitor.waitForAbort(30)
 
             # skip when modal dialogs are opened (e.g. textviewer in musicinfo dialog)
@@ -705,6 +705,10 @@ class ServiceMonitor(CommonMonitorFunctions):
                 self.colors_img.setName('colors_img')
                 self.colors_img.start()
 
+            # Allow early exit to only do image manipulations
+            if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.Service)"):
+                return
+
             if self.dbtype in ['tvshows', 'seasons', 'episodes']:
                 tmdbtype = 'tv'
             elif self.dbtype in ['movies']:
@@ -728,6 +732,9 @@ class ServiceMonitor(CommonMonitorFunctions):
             if not details:
                 self.clear_properties()  # No details so lets clear everything
                 return
+
+            if tmdbtype == 'tv' and details.get('infoproperties'):  # Update tvshow next aired info with 24hr refresh
+                details['infoproperties'].update(self.tmdb.get_tvshow_nextaired(tmdb_id))
 
             if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
                 thread_artwork = Thread(target=self.process_artwork, args=[details, tmdbtype])

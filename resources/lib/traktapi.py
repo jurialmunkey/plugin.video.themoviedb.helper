@@ -36,9 +36,8 @@ class TraktAPI(RequestAPI):
     def authorize(self, login=False):
         if self.authorization:
             return self.authorization
-        token = self.addon.getSettingString('trakt_token')
-        token = loads(token) if token else None
-        if token and type(token) is dict and token.get('access_token'):
+        token = self.get_stored_token()
+        if token.get('access_token'):
             self.authorization = token
             self.headers['Authorization'] = 'Bearer {0}'.format(self.authorization.get('access_token'))
         elif login:
@@ -48,6 +47,35 @@ class TraktAPI(RequestAPI):
         if self.authorization:
             xbmcgui.Window(10000).setProperty('TMDbHelper.TraktIsAuth', 'True')
         return self.authorization
+
+    def get_stored_token(self):
+        try:
+            token = loads(self.addon.getSettingString('trakt_token')) or {}
+        except Exception as exc:
+            token = {}
+            utils.kodi_log(exc, 1)
+        return token
+
+    def logout(self):
+        token = self.get_stored_token()
+
+        if not xbmcgui.Dialog().yesno('Trakt user account logout', 'Do you wish to logout of your Trakt account?'):
+            return
+
+        if token:
+            response = self.get_api_request('https://api.trakt.tv/oauth/revoke', dictify=False, postdata={
+                'token': token.get('access_token', ''),
+                'client_id': self.client_id,
+                'client_secret': self.client_secret})
+            if response and response.status_code == 200:
+                msg = 'Successfully logged out of Trakt user account'
+                self.addon.setSettingString('trakt_token', '')
+            else:
+                msg = 'Logout failed!'
+        else:
+            msg = 'Trakt access token not found'
+
+        xbmcgui.Dialog().ok('Trakt user account logout', msg)
 
     def login(self):
         self.code = self.get_api_request('https://api.trakt.tv/oauth/device/code', postdata={'client_id': self.client_id})
@@ -429,19 +457,19 @@ class TraktAPI(RequestAPI):
 
     def get_upnext_cache_refresh(self, show_id, last_updated):
         if not last_updated:  # No last Trakt update date so refresh cache
-            # utils.kodi_log(u'Up Next {} Episodes:\nNo last Trakt update date. Refreshing cache...'.format(show_id), 1)
             return True  # Refresh cache
 
+        ts_last = utils.convert_timestamp(last_updated)
+        if not ts_last:
+            return True  # Timestamp doesn't convert so refresh cache
+
         cache_name = '{0}.trakt.show.{1}.last_updated'.format(self.cache_name, show_id)
-        prev_updated = self.get_cache(cache_name)
-        if not prev_updated:  # No previous update date so refresh cache
-            # utils.kodi_log(u'Up Next {} Episodes:\nNo previous update date. Refreshing cache...'.format(show_id), 1)
+        ts_prev = utils.convert_timestamp(self.get_cache(cache_name))
+        if not ts_prev:  # No previous update date or cant convert save value to timestamp so refresh
             return self.set_cache(last_updated, cache_name)  # Set the cache date and refresh cache
 
-        if utils.convert_timestamp(prev_updated) < utils.convert_timestamp(last_updated):  # Changes on Trakt since previous update date so refresh cache
-            # utils.kodi_log(u'Up Next {} Episodes:\nChanges on Trakt since previous update date. Refreshing cache...'.format(show_id), 1)
+        if ts_prev < ts_last:  # Changes on Trakt since previous update date so refresh cache
             return self.set_cache(last_updated, cache_name)  # Set the cache date and refresh cache
-        # utils.kodi_log(u'Up Next {} Episodes:\nRetrieving cached details...'.format(show_id), 1)
 
     def get_upnext(self, show_id, response_only=False, last_updated=None):
         items = []
@@ -548,6 +576,152 @@ class TraktAPI(RequestAPI):
         if items and collection[end_at:]:  # If there's more items add the next page item
             items.append(ListItem(library=self.library, label=xbmc.getLocalizedString(33078), nextpage=page + 1))
         return items
+    
+    def get_collection_tv(self, tmdbtype, page=1):
+        date = datetime.date.today() - datetime.timedelta(days = -1)
+        calendar_eps = self.get_calendar('shows', True, start_date=date.strftime('%Y-%m-%d'), days=7)
+
+        xbmc.log('START_SYNC_TRAKT_COLLECTION===>TMDB HELPER', level=xbmc.LOGNOTICE)
+        import xbmcaddon
+        import os
+        __addon__ = xbmcaddon.Addon()
+        __addonid__ = __addon__.getAddonInfo('id')
+#        basedir_tv = __addon__.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
+#        file_path = str(xbmc.translatePath('special://userdata/addon_data/'))+str(__addonid__) + '/TVShows'
+
+        basedir_tv = '/home/osmc/.kodi/userdata/addon_data/plugin.video.openmeta/TVShows'
+        file_path = '/home/osmc/.kodi/userdata/addon_data/plugin.video.openmeta/TVShows'
+        if not os.path.exists(file_path):
+            os.mkdir(file_path)
+
+        collection = self.sync_collection(utils.type_convert(tmdbtype, 'trakt'))
+#        collection = self.sync_collection(utils.type_convert(tmdbtype, 'trakt'), idtype=None, mode=None, items=None, cache_refresh=True)
+        collection = sorted(collection, key=lambda i: i[utils.type_convert(tmdbtype, 'trakt')]['title'], reverse=False)
+        for i in collection:
+
+            nfo = 'https://thetvdb.com/?tab=series&id=' + str(i['show']['ids']['tvdb'])
+            if str(i['show']['ids']['tmdb']) == 'None':
+                nfo = 'https://thetvdb.com/?tab=series&id=' + str(i['show']['ids']['tvdb'])
+            else:
+                nfo = 'https://www.themoviedb.org/tv/' + str(i['show']['ids']['tmdb'])
+            nfo_path = file_path + '/' + str(i['show']['ids']['tvdb']) + '/' + 'tvshow.nfo'
+
+            if not os.path.exists(file_path + '/' + str(i['show']['ids']['tvdb'])):
+                os.mkdir(file_path + '/' + str(i['show']['ids']['tvdb']))
+
+            if not os.path.exists(nfo_path):
+                file = open(nfo_path, 'w')
+                file.write(nfo)
+                file.close()
+
+#OVERWRITE NFO
+#            if os.path.exists(nfo_path):
+#                file = open(nfo_path, 'w')
+#                file.write(nfo)
+#                file.close()
+
+#            xbmc.log(str(nfo)+'||'+str(i['show']['ids']['tvdb'])+'||'+str(i['show']['title'])+'||===>TMDB HELPER', level=xbmc.LOGNOTICE)
+
+            for s in i['seasons']:
+                if not os.path.exists(file_path + '/' + str(i['show']['ids']['tvdb']) + '/Season ' + str(s['number'])):
+                    os.mkdir(file_path + '/' + str(i['show']['ids']['tvdb']) + '/Season ' + str(s['number']))
+
+                for e in s['episodes']:
+                    url = "plugin://plugin.video.themoviedb.helper?info=play&amp;type=episode&amp;tmdb_id=" + str(i['show']['ids']['tmdb']) + "&amp;season=" + str(s['number']) + "&amp;episode=" + str(e['number'])
+                    if str(i['show']['ids']['tmdb']) == 'None':
+                        url = 'plugin://plugin.video.themoviedb.helper?info=play&amp;query=' + str(i['show']['title']) + '&amp;type=episode&amp;season=' + str(s['number']) + '&amp;episode=' + str(e['number'])
+#                           url = "plugin://plugin.video.openmeta/tv/play/" +str(i['show']['ids']['tvdb']) +"/" + str(s['number']) + "/" + str(e['number'])
+#                           url = "plugin://plugin.video.openmeta/play_stream/info?type=episode&amp;tmdb_id=" + str(i['show']['ids']['tmdb']) + "&amp;season=" + str(s['number']) + "&amp;episode=" + str(e['number'])
+#                           url = 'plugin://plugin.video.themoviedb.helper?info=stream&amp;tmdb_id=' + str(i['show']['ids']['tmdb']) + '&amp;type=episode&amp;season=' + str(s['number']) + '&amp;episode=' + str(e['number'])
+#                           url = 'plugin://plugin.video.themoviedb.helper?info=play&amp;query=' + str(i['show']['title']) + '&amp;type=episode&amp;season=' + str(s['number']) + '&amp;episode=' + str(e['number'])
+                    file_name = str(i['show']['title']) +' - S' + format(s['number'], '02d') + 'E' + format(e['number'], '02d') + '.strm'
+
+                    for c in r'[]/\;,><&*:%=+@!#^()|?^':
+                        file_name = file_name.replace(c,'')
+
+                    strm_path = file_path + '/' + str(i['show']['ids']['tvdb']) + '/Season ' + str(s['number']) + '/' + file_name
+#Overwrite existing strm files.
+#                        file = open(strm_path, 'w')
+#                        file.write(url)
+#                        file.close()
+                    if not os.path.exists(strm_path):
+                        file = open(strm_path, 'w')
+                        file.write(url)
+                        file.close()
+
+        add_calendar = 1
+        import urllib
+        for n in calendar_eps:
+#           xbmc.log(str(n['show']['title']) + '===>TMDB HELPER', level=xbmc.LOGNOTICE)
+#           xbmc.log('TMDB='+str(n['show']['ids']['tmdb']) +'_TVDB=' + str(n['show']['ids']['tvdb'])+ '===>TMDB HELPER', level=xbmc.LOGNOTICE)
+#           xbmc.log('S_'+str(n['episode']['season']) +'_E_' + str(n['episode']['number'])+ '===>TMDB HELPER', level=xbmc.LOGNOTICE)
+
+#           if i['show']['ids']['tmdb'] == n['show']['ids']['tmdb'] or i['show']['ids']['tvdb'] == n['show']['ids']['tvdb']:
+#Shows can be hidden on the trakt calendar, current config will add all new episodes which show up on calendar so hide any shows not in collection
+#required to add episodes before they appear in Trakt Collection, hide on calendar any shows you dont want to see auto added.
+            if add_calendar == 1:
+                if str(i['show']['ids']['tmdb']) == 'None':
+                    nfo = 'https://thetvdb.com/?tab=series&id=' + str(n['show']['ids']['tvdb'])
+                else:
+                    nfo = 'https://www.themoviedb.org/tv/' + str(n['show']['ids']['tmdb'])
+                nfo_path = file_path + '/' + str(n['show']['ids']['tvdb']) + '/' + 'tvshow.nfo'
+
+                if not os.path.exists(file_path + '/' + str(n['show']['ids']['tvdb'])):
+                    xbmc.log(str(file_path + '/' + str(n['show']['ids']['tvdb'])) + '===>TMDB HELPER', level=xbmc.LOGNOTICE)
+                    os.mkdir(file_path + '/' + str(n['show']['ids']['tvdb']))
+
+                if not os.path.exists(nfo_path):
+#                   xbmc.log(str(nfo_path) + '===>TMDB HELPER', level=xbmc.LOGNOTICE)
+                    file = open(nfo_path, 'w')
+                    file.write(nfo)
+                    file.close()
+
+                if not os.path.exists(file_path + '/' + str(n['show']['ids']['tvdb']) + '/Season ' + str(n['episode']['season'])):
+#                   xbmc.log(str(file_path + '/' + str(n['show']['ids']['tvdb']) + '/Season ' + str(n['episode']['season'])) + '===>TMDB HELPER', level=xbmc.LOGNOTICE)
+                    os.mkdir(file_path + '/' + str(n['show']['ids']['tvdb']) + '/Season ' + str(n['episode']['season']))
+
+                url = "plugin://plugin.video.themoviedb.helper?info=play&amp;type=episode&amp;tmdb_id=" + str(n['show']['ids']['tmdb']) + "&amp;season=" + str(n['episode']['season']) + "&amp;episode=" + str(n['episode']['number'])
+                if str(n['show']['ids']['tmdb']) == 'None':
+                    url = 'plugin://plugin.video.themoviedb.helper?info=play&amp;query=' + str(n['show']['title']) + '&amp;type=episode&amp;season=' + str(n['episode']['season']) + '&amp;episode=' + str(n['episode']['number'])
+                file_name = str(n['show']['title']) +' - S' + format(n['episode']['season'], '02d') + 'E' + format(n['episode']['number'], '02d') + '.strm'
+                thumb_file_name = str(n['show']['title']) +' - S' + format(n['episode']['season'], '02d') + 'E' + format(n['episode']['number'], '02d') + '-thumb.jpg'
+                for c in r'[]/\;,><&*:%=+@!#^()|?^':
+                    file_name = file_name.replace(c,'')
+                    thumb_file_name = thumb_file_name.replace(c,'')
+
+                strm_path = file_path + '/' + str(n['show']['ids']['tvdb']) + '/Season ' + str(n['episode']['season']) + '/' + file_name
+                thumb_path = file_path + '/' + str(n['show']['ids']['tvdb']) + '/Season ' + str(n['episode']['season']) + '/' + thumb_file_name
+#               xbmc.log(str(strm_path) + '===>TMDB HELPER', level=xbmc.LOGNOTICE)
+                if not os.path.exists(strm_path):
+#                   xbmc.log(str(strm_path) + '===>TMDB HELPER', level=xbmc.LOGNOTICE)
+                    file = open(strm_path, 'w')
+                    file.write(url)
+                    file.close()
+
+                if not os.path.exists(thumb_path):
+                    tvdb_url = str('https://api.thetvdb.com/series/' + str(n['show']['ids']['tvdb']) + '/episodes/query?airedSeason=' + str(n['episode']['season']) + '&airedEpisode=' + str(n['episode']['number']))
+                    request = self.get_api_request(tvdb_url, is_json='True')
+                    try:
+                        thumbnail_image = 'https://thetvdb.com/banners/' + request['data'][0]['filename']
+                    except:
+                        thumbnail_image = 'https://thetvdb.com/banners/'
+                    if thumbnail_image <> 'https://thetvdb.com/banners/':
+                        urllib.urlretrieve(thumbnail_image, thumb_path)
+                        xbmc.log('WRITE_IMAGE '+str(thumbnail_image)+' to '+str(thumb_path)+'===>TMDB HELPER', level=xbmc.LOGNOTICE)
+
+#               if os.path.exists(thumb_path):
+#                   tvdb_url = str('https://api.thetvdb.com/series/' + str(n['show']['ids']['tvdb']) + '/episodes/query?airedSeason=' + str(n['episode']['season']) + '&airedEpisode=' + str(n['episode']['number']))
+#                   request = self.get_api_request(tvdb_url, is_json='True')
+#                   try:
+#                           thumbnail_image = 'https://thetvdb.com/banners/' + request['data'][0]['filename']
+#                   except:
+#                           thumbnail_image = 'https://thetvdb.com/banners/'
+#                   if thumbnail_image <> 'https://thetvdb.com/banners/':
+#                       urllib.urlretrieve(thumbnail_image, thumb_path)
+#                       xbmc.log('WRITE_IMAGE '+str(thumbnail_image)+' to '+str(thumb_path)+'===>TMDB HELPER', level=xbmc.LOGNOTICE)
+
+#       xbmc.executebuiltin('UpdateLibrary(video, {})'.format(basedir_tv))
+        xbmc.log('END_SYNC_TRAKT_COLLECTION===>TMDB HELPER', level=xbmc.LOGNOTICE)
 
     
     def get_item_idlookup(self, item_type, tmdb_id=None, tvdb_id=None, imdb_id=None, parent=False):

@@ -9,6 +9,7 @@ import xbmcvfs
 import threading
 import resources.lib.utils as utils
 import resources.lib.context as context
+import resources.lib.libraryupdate as libraryupdate
 from resources.lib.downloader import Downloader
 from resources.lib.traktapi import TraktAPI
 from resources.lib.plugin import Plugin
@@ -411,55 +412,51 @@ class Script(Plugin):
         user_slug = self.params.get('user_slug') or TraktAPI().get_usernameslug()  # Get the user's slug
         list_slug = self.params.get('library_userlist')
         if user_slug and list_slug:
-            context.library_userlist(
+            libraryupdate.add_userlist(
                 user_slug=user_slug, list_slug=list_slug,
                 confirmation_dialog=False, allow_update=True, busy_dialog=False)
 
     def library_autoupdate(self, list_slug=None, user_slug=None):
-        busy_dialog = True if self.params.get('busy_dialog') else False
         utils.kodi_log(u'UPDATING TV SHOWS LIBRARY', 1)
-        xbmcgui.Dialog().notification('TMDbHelper', 'Auto-Updating Library...')
+        xbmcgui.Dialog().notification('TMDbHelper', u'{}...'.format(self.addon.getLocalizedString(32167)))
+
+        busy_dialog = True if self.params.get('busy_dialog') else False
         basedir_tv = self.addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
 
+        # Update library from Trakt lists
         list_slug = list_slug or self.addon.getSettingString('monitor_userlist') or ''
         user_slug = user_slug or TraktAPI().get_usernameslug()
         if user_slug and list_slug:
             for i in list_slug.split(' | '):
-                context.library_userlist(
+                libraryupdate.add_userlist(
                     user_slug=user_slug, list_slug=i, confirmation_dialog=False,
-                    allow_update=False, busy_dialog=busy_dialog)
+                    allow_update=False, busy_dialog=busy_dialog, force=self.params.get('force', False))
 
+        # Create our extended progress bg dialog
         p_dialog = xbmcgui.DialogProgressBG() if busy_dialog else None
-        p_dialog.create('TMDbHelper', 'Adding items to library...') if p_dialog else None
-        for f in xbmcvfs.listdir(basedir_tv)[0]:
-            try:
-                folder = basedir_tv + f + '/'
-                # Get nfo file
-                nfo = None
-                for x in xbmcvfs.listdir(folder)[1]:
-                    if x.endswith('.nfo'):
-                        nfo = x
-                if not nfo:
-                    continue
+        p_dialog.create('TMDbHelper', u'{}...'.format(self.addon.getLocalizedString(32167))) if p_dialog else None
 
-                # Read nfo file
-                vfs_file = xbmcvfs.File(folder + nfo)
-                content = ''
-                try:
-                    content = vfs_file.read()
-                finally:
-                    vfs_file.close()
-                tmdb_id = content.replace('https://www.themoviedb.org/tv/', '')
-                tmdb_id = tmdb_id.replace('&islocal=True', '')
-                if not tmdb_id:
-                    continue
+        # Get TMDb IDs from .nfo files in the basedir
+        nfos = []
+        listdir = xbmcvfs.listdir(basedir_tv)[0]
+        for f in listdir:
+            tmdb_id = utils.get_tmdbid_nfo(basedir_tv, f)
+            if tmdb_id:
+                nfos.append({'tmdb_id': tmdb_id, 'folder': f})
 
-                # Get the tvshow
-                url = 'plugin://plugin.video.themoviedb.helper/?info=seasons&tmdb_id={}&type=tv'.format(tmdb_id)
-                context.library_addtvshow(basedir=basedir_tv, folder=f, url=url, tmdb_id=tmdb_id, p_dialog=p_dialog)
-            except Exception as exc:
-                utils.kodi_log(u'LIBRARY AUTO UPDATE ERROR:\n{}'.format(exc))
-        p_dialog.close() if p_dialog else None
+        for n_count, nfo in enumerate(nfos):
+            if not nfo.get('folder') or not nfo.get('tmdb_id'):
+                continue
+            if p_dialog:
+                p_dialog_val = ((n_count + 1) * 100) // len(nfos)
+                p_dialog_msg = u'{} {}...'.format(self.addon.getLocalizedString(32167), nfo.get('folder'))
+                p_dialog.update(p_dialog_val, message=p_dialog_msg)
+            url = 'plugin://plugin.video.themoviedb.helper/?info=seasons&tmdb_id={}&type=tv'.format(nfo.get('tmdb_id'))
+            libraryupdate.add_tvshow(basedir=basedir_tv, folder=nfo.get('folder'), url=url, tmdb_id=nfo.get('tmdb_id'), p_dialog=p_dialog)
+
+        if p_dialog:
+            p_dialog.close()
+
         if self.addon.getSettingBool('auto_update'):
             xbmc.executebuiltin('UpdateLibrary(video)')
 
@@ -491,6 +488,51 @@ class Script(Plugin):
         response = utils.get_jsonrpc(method, params)
         self.home.setProperty(self.params.get('property', 'TMDbHelper.KodiSetting'), u'{}'.format(response.get('result', {}).get('value', '')))
 
+    def discover_modify(self, method=None):
+        if not method:
+            return
+
+        idx = utils.try_parse_int(self.params.get(method))
+        item = utils.get_searchhistory('discover')[idx]
+
+        if not isinstance(item, dict):
+            return
+
+        elif method == 'discover_delete':
+            utils.set_searchhistory(itemtype='discover', replace=idx)
+
+        elif method == 'discover_rename':
+            name = xbmcgui.Dialog().input('Enter New Name', defaultt=item.get('name'))
+            if not name:
+                return
+            item['name'] = name
+            utils.set_searchhistory(itemtype='discover', replace=idx, query=item)
+
+        elif method == 'discover_edit':
+            url = item.get('url', {})
+
+            for k, v in url.items():
+                if k in ['info', 'type']:
+                    continue
+                utils.get_property(k, prefix='TMDbHelper.UserDiscover', setproperty=v)
+                utils.get_property(k, prefix='TMDbHelper.UserDiscover.Label', setproperty=item.get('labels', {}).get(k, v))
+
+            new_url = {'info': 'user_discover', 'type': url.get('type', ''), 'method': 'edit'}
+
+            # Some standard url formatting stuff
+            if not xbmc.getCondVisibility("Window.IsMedia"):
+                new_url['widget'] = 'True'
+            if self.addon.getSettingBool('fanarttv_lookup') and xbmc.getCondVisibility("Window.IsMedia"):
+                new_url['fanarttv'] = 'True'
+            if xbmc.getCondVisibility("Window.IsMedia"):
+                new_url['nextpage'] = 'True'
+
+            url_string = u'{0}{1}'.format(u'plugin://plugin.video.themoviedb.helper/?', utils.urlencode_params(new_url))
+            xbmc.executebuiltin('Container.Update({})'.format(url_string))
+            return  # Dont refresh container since we updated it instead
+
+        xbmc.executebuiltin('Container.Refresh')
+
     def router(self):
         if not self.params:
             """ If no params assume user wants to run plugin """
@@ -498,8 +540,16 @@ class Script(Plugin):
             self.params = {'call_path': 'plugin://plugin.video.themoviedb.helper/'}
         if self.params.get('authenticate_trakt'):
             TraktAPI(force=True)
+        elif self.params.get('revoke_trakt'):
+            TraktAPI().logout()
         elif self.params.get('split_value'):
             self.split_value()
+        elif self.params.get('discover_rename'):
+            self.discover_modify('discover_rename')
+        elif self.params.get('discover_delete'):
+            self.discover_modify('discover_delete')
+        elif self.params.get('discover_edit'):
+            self.discover_modify('discover_edit')
         elif self.params.get('kodi_setting'):
             self.kodi_setting()
         elif self.params.get('blur_image'):

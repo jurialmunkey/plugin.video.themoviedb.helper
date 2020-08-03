@@ -11,7 +11,7 @@ class ListItem(object):
                  cast=None, infolabels=None, infoproperties=None, poster=None, thumb=None, icon=None, fanart=None, nextpage=None,
                  streamdetails=None, clearlogo=None, clearart=None, banner=None, landscape=None, discart=None, extrafanart=None,
                  tvshow_clearlogo=None, tvshow_clearart=None, tvshow_banner=None, tvshow_landscape=None, tvshow_poster=None,
-                 tvshow_fanart=None, tvshow_dbid=None, mixed_type=None, url=None, is_folder=True):
+                 tvshow_fanart=None, tvshow_dbid=None, contextmenu=None, mixed_type=None, url=None, is_folder=True):
         self.addon = xbmcaddon.Addon()
         self.addonpath = self.addon.getAddonInfo('path')
         self.select_action = self.addon.getSettingInt('select_action')
@@ -40,6 +40,7 @@ class ListItem(object):
         self.nextpage = nextpage
         self.extrafanart = extrafanart or {}
         self.local_path = ''
+        self.contextmenu = contextmenu or []
 
     def set_url(self, **kwargs):
         url = kwargs.pop('url', u'plugin://plugin.video.themoviedb.helper/?')
@@ -246,6 +247,14 @@ class ListItem(object):
                 utils.kodi_log(u'ERROR in ListItem set_url_props\nk:{} v:{}'.format(utils.try_decode_string(k), utils.try_decode_string(v)), 1)
                 utils.kodi_log(exc, 1)
 
+    def set_contextmenu(self, contextmenu, extend=True):
+        if not contextmenu or not isinstance(contextmenu, list):
+            return
+        if not extend:
+            self.contextmenu = []
+        self.contextmenu.extend(contextmenu)
+        return self.contextmenu
+
     def set_listitem(self, path=None):
         listitem = xbmcgui.ListItem(label=self.label, label2=self.label2, path=path)
         listitem.setLabel2(self.label2)
@@ -262,6 +271,7 @@ class ListItem(object):
             'clearart': self.clearart or self.tvshow_clearart, 'tvshow.clearart': self.tvshow_clearart,
             'discart': self.discart}, self.extrafanart))
         listitem.setCast(self.cast)
+        listitem.addContextMenuItems(self.contextmenu)
 
         if self.streamdetails:
             for k, v in self.streamdetails.items():

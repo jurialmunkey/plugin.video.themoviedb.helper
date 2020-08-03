@@ -32,7 +32,7 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32086]" type="bool" id="library_autoupdate" default="false" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32130]" subsetting="true" type="enum" values="$HOURS" id="library_autoupdate_hour" enable="eq(-1,True)" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32131]" subsetting="true" type="action" action="RunScript(plugin.video.themoviedb.helper,monitor_userlist)" id="monitor_userlist"  enable="eq(-2,True)"/>
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32154]" subsetting="true" type="action" action="RunScript(plugin.video.themoviedb.helper,library_autoupdate,busy_dialog)" enable="eq(-3,True)"/>
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32154]" subsetting="true" type="action" action="RunScript(plugin.video.themoviedb.helper,library_autoupdate,busy_dialog,force)" enable="eq(-3,True)"/>
         <setting label="$LOCALIZE[10039]" type="lsep"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32077]" type="bool" id="ignore_folderchecking" default="false" />
     </category>
@@ -47,7 +47,9 @@
     </category>
     <category label="$ADDON[plugin.video.themoviedb.helper 32083]">
         <setting label="$ADDON[plugin.video.themoviedb.helper 32031]" type="lsep"/>
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32010]" type="action" action="RunScript(plugin.video.themoviedb.helper, authenticate_trakt)" option="close" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32010]" type="action" action="RunScript(plugin.video.themoviedb.helper,authenticate_trakt)" option="close" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32011]" type="text" id="trakt_token" default="" visible="False"/>
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32169]" type="action" visible="!eq(-1,)" action="RunScript(plugin.video.themoviedb.helper,revoke_trakt)" option="close" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32082]" type="labelenum" id="trakt_watchlistsort" values="rank|added|released|title" default="rank" subsetting="true"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32093]" type="labelenum" id="trakt_nextepisodesort" values="airdate|recentlywatched" default="airdate" subsetting="true"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32034]" type="bool" id="trakt_watchedindicators" default="false" subsetting="true"/>
@@ -75,7 +77,6 @@
         <!-- <setting label="$ADDON[plugin.video.themoviedb.helper 32000]" type="text" id="tmdb_apikey"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32018]" type="text" id="fanarttv_apikey"/> -->
         <setting label="$ADDON[plugin.video.themoviedb.helper 32087]" type="bool" id="strm_method_resolvedurl" default="False" visible="False"/>
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32011]" type="text" id="trakt_token" default="" visible="False"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32011]" type="text" id="last_refresh" default="" visible="False"/>
     </category>
 </settings>
