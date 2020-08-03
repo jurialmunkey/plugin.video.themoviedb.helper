@@ -270,10 +270,16 @@ class Player(Plugin):
             if player[0] and (action.endswith('.strm') or self.identifierlist[playerindex] == 'play_kodi'):  # Action is play and is a strm/local so PlayMedia
                 utils.kodi_log(u'Player -- Found strm or local.\nAttempting PLAYMEDIA({})'.format(action), 1)
                 xbmc.executebuiltin(utils.try_decode_string(u'PlayMedia(\"{0}\")'.format(action)))
-            elif player[0]:  # Action is play and not a strm so play with player
+            elif player[0] and action.find('realizer') < 0:  # Action is play and not a strm so play with player
                 utils.kodi_log(u'Player -- Found file.\nAttempting to PLAY: {}'.format(action), 2)
                 xbmcgui.Window(10000).setProperty('TMDbHelper.PlayerInfoString', self.playerstring) if self.playerstring else None
                 xbmc.Player().play(action, ListItem(library='video', **self.details).set_listitem())
+            elif player[0] and action.find('realizer') > 0:
+		import xbmcgui
+		xbmcgui.Window(10000).setProperty('REALIZER.ResolvedUrl', 'true')
+		action = action.encode('ascii',errors='ignore').replace(',+','')
+		xbmc.executebuiltin('PlayMedia(%s,isdir)' % action)
+#		xbmc.log(str(action)+'===>TMDB_PLAYER3', level=xbmc.LOGNOTICE)
             else:
                 action = u'Container.Update({0})'.format(action) if xbmc.getCondVisibility("Window.IsMedia") else u'ActivateWindow(videos,{0},return)'.format(action)
                 utils.kodi_log(u'Player -- Found folder.\nAttempting to OPEN: {}'.format(action), 2)
