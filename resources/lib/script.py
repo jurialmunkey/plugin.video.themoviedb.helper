@@ -466,6 +466,8 @@ class Script(Plugin):
         if p_dialog:
             p_dialog.close()
 
+        self.addon.setSettingString('last_autoupdate', 'Last updated {}'.format(utils.get_currentdatetime()))
+
         if self.addon.getSettingBool('auto_update'):
             xbmc.executebuiltin('UpdateLibrary(video)')
 

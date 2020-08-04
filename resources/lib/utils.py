@@ -130,6 +130,10 @@ def get_between_strings(string, startswith='', endswith=''):
         return ''
 
 
+def get_currentdatetime(str_fmt='%Y-%m-%d %H:%M'):
+    return datetime.datetime.now().strftime(str_fmt)
+
+
 def get_timestamp(timestamp=None):
     if not timestamp:
         return
