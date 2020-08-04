@@ -13,6 +13,8 @@ _addon = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 _plugin = Plugin()
 _debuglogging = _addon.getSettingBool('debug_logging')
 _cache = simplecache.SimpleCache()
+_basedir_movie = _addon.getSettingString('movies_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/movies/'
+_basedir_tv = _addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
 
 
 def replace_content(content, old, new):
@@ -267,10 +269,45 @@ def add_tvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id=None, 
     _cache.set(cache_name, my_history, expiration=datetime.timedelta(days=120))
 
 
-def add_userlist(user_slug=None, list_slug=None, confirmation_dialog=True, allow_update=True, busy_dialog=True, force=False):
-    user_slug = user_slug or sys.listitem.getProperty('Item.user_slug')
-    list_slug = list_slug or sys.listitem.getProperty('Item.list_slug')
+def check_limits(request):
+    """
+    IMPORTANT: Do not change limits.
+    Please respect the APIs that provide this data for free.
+    """
+    if len(request) <= min(LIBRARY_ADD_LIMIT_TVSHOWS, LIBRARY_ADD_LIMIT_MOVIES):
+        return
 
+    i_total_shows = 0
+    i_total_films = 0
+    for i in request:
+        if i.get('type') == 'show':
+            i_total_shows += 1
+        elif i.get('type') == 'movie':
+            i_total_films += 1
+
+    if i_total_shows <= LIBRARY_ADD_LIMIT_TVSHOWS and i_total_films <= LIBRARY_ADD_LIMIT_MOVIES:
+        return
+
+    return {'shows': i_total_shows, 'movies': i_total_films}
+
+
+def add_movie(tmdb_id, imdb_id=None, title='', year=''):
+    content = 'plugin://plugin.video.themoviedb.helper/?info=play&tmdb_id={}&type=movie'.format(tmdb_id)
+    folder = u'{} ({})'.format(title, year)
+    db_file = _plugin.get_db_info(info='file', tmdbtype='movie', imdb_id=imdb_id, tmdb_id=tmdb_id)
+
+    if not db_file:
+        log_msg = u'Adding {} to library...'.format(folder)
+        db_file = create_file(folder, content, folder, basedir=_basedir_movie)
+        create_nfo('movie', tmdb_id, folder, basedir=_basedir_movie)
+    else:
+        log_msg = u'Found {} in library.'.format(folder)
+
+    utils.kodi_log(log_msg)
+    return ('filename', db_file.replace('\\', '/').split('/')[-1])
+
+
+def get_userlist(user_slug=None, list_slug=None, confirm=True, busy_dialog=True):
     if busy_dialog:
         with utils.busy_dialog():
             request = TraktAPI().get_response_json('users', user_slug, 'lists', list_slug, 'items')
@@ -280,87 +317,74 @@ def add_userlist(user_slug=None, list_slug=None, confirmation_dialog=True, allow
     if not request:
         return
 
-    i_count = 0
-    i_total = len(request)
-
-    if confirmation_dialog:
+    if confirm:
         d_head = _addon.getLocalizedString(32125)
-        d_body = _addon.getLocalizedString(32126)
-        d_body += '\n[B]{}[/B] {} [B]{}[/B]'.format(list_slug, _addon.getLocalizedString(32127), user_slug)
-        d_body += '\n\n[B][COLOR=red]{}[/COLOR][/B] '.format(xbmc.getLocalizedString(14117)) if i_total > 20 else '\n\n'
-        d_body += '{} [B]{}[/B] {}.'.format(_addon.getLocalizedString(32128), i_total, _addon.getLocalizedString(32129))
-        if not xbmcgui.Dialog().yesno(d_head, d_body):
+        i_check_limits = check_limits(request)
+        if i_check_limits:
+            # List over limit so inform user that it is too large to add
+            d_body = [
+                _addon.getLocalizedString(32168).format(list_slug, user_slug),
+                _addon.getLocalizedString(32170).format(i_check_limits.get('shows'), i_check_limits.get('movies')),
+                '',
+                _addon.getLocalizedString(32164).format(LIBRARY_ADD_LIMIT_TVSHOWS, LIBRARY_ADD_LIMIT_MOVIES)]
+            xbmcgui.Dialog().ok(d_head, '\n'.join(d_body))
             return
+        elif confirm != 2:  # Set confirm param to 2 to only check limits
+            # List is within limits so ask for confirmation before adding it
+            d_body = [
+                _addon.getLocalizedString(32168).format(list_slug, user_slug),
+                _addon.getLocalizedString(32171).format(len(request)) if len(request) > 20 else '',
+                '',
+                _addon.getLocalizedString(32126)]
+            if not xbmcgui.Dialog().yesno(d_head, '\n'.join(d_body)):
+                return
 
-    """
-    IMPORTANT: Do not change limits.
-    Please respect the APIs that provide this data for free.
-    """
-    if i_total > LIBRARY_ADD_LIMIT_TVSHOWS:
-        i_total_shows = 0
-        i_total_films = 0
-        for i in request:
-            if i.get('type') == 'show':
-                i_total_shows += 1
-            elif i.get('type') == 'movie':
-                i_total_films += 1
-        if i_total_shows > LIBRARY_ADD_LIMIT_TVSHOWS or i_total_films > LIBRARY_ADD_LIMIT_MOVIES:
-            xbmcgui.Dialog().notification('TMDbHelper', _addon.getLocalizedString(32165))
-            if confirmation_dialog:
-                d_head = _addon.getLocalizedString(32125)
-                d_body = '[B]{}[/B] {} [B]{}[/B]'.format(list_slug, _addon.getLocalizedString(32127), user_slug)
-                d_body += '\n\n[B][COLOR=red]{}[/COLOR][/B] '.format(xbmc.getLocalizedString(14117))
-                d_body += _addon.getLocalizedString(32128)
-                if i_total_shows > LIBRARY_ADD_LIMIT_TVSHOWS:
-                    d_body += ' [B]{}[/B] {}'.format(i_total_shows, xbmc.getLocalizedString(20343))
-                if i_total_films > LIBRARY_ADD_LIMIT_MOVIES:
-                    d_body += ' [B]{}[/B] {}'.format(i_total_films, xbmc.getLocalizedString(20342))
-                d_body += _addon.getLocalizedString(32164).format(LIBRARY_ADD_LIMIT_TVSHOWS, LIBRARY_ADD_LIMIT_MOVIES)
-                xbmcgui.Dialog().ok(d_head, d_body)
-            return
+    return request
+
+
+def add_userlist(user_slug=None, list_slug=None, confirm=True, allow_update=True, busy_dialog=True, force=False):
+    user_slug = user_slug or sys.listitem.getProperty('Item.user_slug')
+    list_slug = list_slug or sys.listitem.getProperty('Item.list_slug')
+
+    request = get_userlist(user_slug=user_slug, list_slug=list_slug, confirm=confirm, busy_dialog=busy_dialog)
+
+    i_total = len(request)
 
     p_dialog = xbmcgui.DialogProgressBG() if busy_dialog else None
     p_dialog.create('TMDbHelper', _addon.getLocalizedString(32166)) if p_dialog else None
-    basedir_movie = _addon.getSettingString('movies_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/movies/'
-    basedir_tv = _addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
+
     all_movies = []
     all_tvshows = []
 
-    for i in request:
-        i_count += 1
+    for i_count, i in enumerate(request):
         i_type = i.get('type')
         if i_type not in ['movie', 'show']:
-            continue  # Only get movies or tvshows
+            continue
 
         item = i.get(i_type, {})
         tmdb_id = item.get('ids', {}).get('tmdb')
         imdb_id = item.get('ids', {}).get('imdb')
         tvdb_id = item.get('ids', {}).get('tvdb')
-        if not tmdb_id:
-            continue  # Don't bother if there isn't a tmdb_id as lookup is too expensive for long lists
 
-        if i_type == 'movie':  # Add any movies
-            content = 'plugin://plugin.video.themoviedb.helper/?info=play&tmdb_id={}&type=movie'.format(tmdb_id)
-            folder = u'{} ({})'.format(item.get('title'), item.get('year'))
-            movie_name = u'{} ({})'.format(item.get('title'), item.get('year'))
-            db_file = _plugin.get_db_info(info='file', tmdbtype='movie', imdb_id=imdb_id, tmdb_id=tmdb_id)
-            if db_file:
-                all_movies.append(('filename', db_file.replace('\\', '/').split('/')[-1]))
-                p_dialog.update((i_count * 100) // i_total, message=u'Found {} in library. Skipping...'.format(movie_name)) if p_dialog else None
-                utils.kodi_log(u'Trakt List Add to Library\nFound {} in library. Skipping...'.format(movie_name), 0)
-                continue
-            p_dialog.update((i_count * 100) // i_total, message=u'Adding {} to library...'.format(movie_name)) if p_dialog else None
-            utils.kodi_log(u'Adding {} to library...'.format(movie_name), 0)
-            db_file = create_file(movie_name, content, folder, basedir=basedir_movie)
-            create_nfo('movie', tmdb_id, folder, basedir=basedir_movie)
-            all_movies.append(('filename', db_file.split('/')[-1]))
+        if not tmdb_id:  # Extra request for ID lookup is too expensive so skip
+            continue
 
-        if i_type == 'show':  # Add whole tvshows
-            all_tvshows.append(('title', item.get('title')))
-            content = 'plugin://plugin.video.themoviedb.helper/?info=seasons&nextpage=True&tmdb_id={}&type=tv'.format(tmdb_id)
-            folder = u'{}'.format(item.get('title'))
-            p_dialog.update((i_count * 100) // i_total, message=u'Adding {} to library...'.format(item.get('title'))) if p_dialog else None
-            add_tvshow(basedir=basedir_tv, folder=folder, url=content, tmdb_id=tmdb_id, imdb_id=imdb_id, tvdb_id=tvdb_id, p_dialog=p_dialog, force=force)
+        if p_dialog:
+            p_dialog.update(
+                ((i_count + 1) * 100) // i_total,
+                message=u'Adding {} ({})...'.format(item.get('title'), item.get('year')))
+
+        if i_type == 'movie':
+            playlist_item = add_movie(tmdb_id=tmdb_id, imdb_id=imdb_id, title=item.get('title'), year=item.get('year'))
+            all_movies.append(playlist_item)
+
+        if i_type == 'show':
+            playlist_item = ('title', item.get('title'))
+            all_tvshows.append(playlist_item)
+            add_tvshow(
+                basedir=_basedir_tv, folder=u'{}'.format(item.get('title')),
+                url='plugin://plugin.video.themoviedb.helper/?info=seasons&nextpage=True&tmdb_id={}&type=tv'.format(tmdb_id),
+                tmdb_id=tmdb_id, imdb_id=imdb_id, tvdb_id=tvdb_id, p_dialog=p_dialog, force=force)
 
     if p_dialog:
         p_dialog.close()

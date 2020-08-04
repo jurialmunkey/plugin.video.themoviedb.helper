@@ -378,7 +378,8 @@ class Script(Plugin):
     def monitor_userlist(self):
         with utils.busy_dialog():
             user_slug = TraktAPI().get_usernameslug()  # Get the user's slug
-            user_lists = TraktAPI().get_response_json('users', user_slug, 'lists')  # Get the user's lists
+            user_lists = TraktAPI().get_response_json('users', user_slug, 'lists') or []  # Get the user's custom lists
+            user_lists += [i.get('list') for i in TraktAPI().get_response_json('users', 'likes', 'lists') if i.get('type') == 'list']  # Get the user's liked lists
 
             if not user_lists:
                 return
@@ -390,20 +391,26 @@ class Script(Plugin):
                 user_list_labels.append(i.get('name'))
                 preselect.append(idx) if i.get('ids', {}).get('slug') in monitor_userlist else None
 
-        user_choice = xbmcgui.Dialog().multiselect(self.addon.getLocalizedString(32133), user_list_labels, preselect=preselect)  # Choose the list
-
+        # Choose lists
+        user_choice = xbmcgui.Dialog().multiselect(self.addon.getLocalizedString(32133), user_list_labels, preselect=preselect)
         if not user_choice:  # User cancelled
             return
 
-        user_list = ''
+        # Check lists are within limits before adding
+        selected_slugs, selected_lists = [], []
         for i in user_choice:
-            user_list += ' | ' if user_list else ''
-            user_list += user_lists[i].get('ids', {}).get('slug')
-
-        if not user_list:
+            i_slug = user_lists[i].get('user', {}).get('ids', {}).get('slug')
+            i_list = user_lists[i].get('ids', {}).get('slug')
+            if libraryupdate.get_userlist(user_slug=i_slug, list_slug=i_list, confirm=2):  # Set confirm(2) to only check within limits
+                selected_lists.append(i_list)
+                selected_slugs.append(i_slug)
+        user_list = ' | '.join(selected_lists)
+        user_slug = ' | '.join(selected_slugs)
+        if not user_list or not user_slug:
             return
 
         self.addon.setSettingString('monitor_userlist', user_list)
+        self.addon.setSettingString('monitor_userslug', user_slug)
 
         if xbmcgui.Dialog().yesno(xbmc.getLocalizedString(653), self.addon.getLocalizedString(32132)):
             self.library_autoupdate(list_slug=user_list, user_slug=user_slug)
@@ -414,7 +421,7 @@ class Script(Plugin):
         if user_slug and list_slug:
             libraryupdate.add_userlist(
                 user_slug=user_slug, list_slug=list_slug,
-                confirmation_dialog=False, allow_update=True, busy_dialog=False)
+                confirm=False, allow_update=True, busy_dialog=False)
 
     def library_autoupdate(self, list_slug=None, user_slug=None):
         utils.kodi_log(u'UPDATING TV SHOWS LIBRARY', 1)
@@ -424,12 +431,15 @@ class Script(Plugin):
         basedir_tv = self.addon.getSettingString('tvshows_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
 
         # Update library from Trakt lists
+        user_name = TraktAPI().get_usernameslug()
         list_slug = list_slug or self.addon.getSettingString('monitor_userlist') or ''
-        user_slug = user_slug or TraktAPI().get_usernameslug()
-        if user_slug and list_slug:
-            for i in list_slug.split(' | '):
+        user_slug = user_slug or self.addon.getSettingString('monitor_userslug') or ''
+        if list_slug:
+            list_slugs = list_slug.split(' | ')
+            user_slugs = user_slug.split(' | ') if user_slug else [user_name for i in list_slugs]  # List comprehension in else condition for backwards compatibility. Previous versions didnt store user slugs because could only be the main user.
+            for idx, i in enumerate(list_slugs):
                 libraryupdate.add_userlist(
-                    user_slug=user_slug, list_slug=i, confirmation_dialog=False,
+                    user_slug=user_slugs[idx], list_slug=i, confirm=False,
                     allow_update=False, busy_dialog=busy_dialog, force=self.params.get('force', False))
 
         # Create our extended progress bg dialog
@@ -438,8 +448,7 @@ class Script(Plugin):
 
         # Get TMDb IDs from .nfo files in the basedir
         nfos = []
-        listdir = xbmcvfs.listdir(basedir_tv)[0]
-        for f in listdir:
+        for f in xbmcvfs.listdir(basedir_tv)[0]:
             tmdb_id = utils.get_tmdbid_nfo(basedir_tv, f)
             if tmdb_id:
                 nfos.append({'tmdb_id': tmdb_id, 'folder': f})
@@ -456,6 +465,8 @@ class Script(Plugin):
 
         if p_dialog:
             p_dialog.close()
+
+        self.addon.setSettingString('last_autoupdate', 'Last updated {}'.format(utils.get_currentdatetime()))
 
         if self.addon.getSettingBool('auto_update'):
             xbmc.executebuiltin('UpdateLibrary(video)')

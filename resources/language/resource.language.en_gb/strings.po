@@ -827,9 +827,7 @@ msgstr ""
 #: /resources/lib/context.py
 msgctxt "#32164"
 msgid ""
-"\n"
-"\n"
-"Adding Trakt lists to library is limited to [B]{}[/B] TV Shows and [B]{}}[/B] Movies per list.\n"
+"Adding Trakt lists to library is limited to [B]{}[/B] TV Shows and [B]{}[/B] Movies per list.\n"
 "This limit is set to ensure that the APIs providing data for free are respected."
 msgstr ""
 
@@ -848,9 +846,24 @@ msgctxt "#32167"
 msgid "Updating"
 msgstr ""
 
+#: /resources/lib/libraryupdate.py
+msgctxt "#32168"
+msgid "[B]{}[/B] by user [B]{}[/B]"
+msgstr ""
+
 #: /resources/settings.xml
 msgctxt "#32169"
 msgid "Logout of Trakt account..."
+msgstr ""
+
+#: /resources/lib/libraryupdate.py
+msgctxt "#32170"
+msgid "[B][COLOR=red]Warning[/COLOR][/B] This list contains [B]{}[/B] TV Shows and [B]{}[/B] Movies"
+msgstr ""
+
+#: /resources/lib/libraryupdate.py
+msgctxt "#32171"
+msgid "[B][COLOR=red]Warning[/COLOR][/B] This list contains {} items"
 msgstr ""
 
 msgctxt "#30030"
