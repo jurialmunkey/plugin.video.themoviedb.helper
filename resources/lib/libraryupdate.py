@@ -372,6 +372,7 @@ def add_userlist(user_slug=None, list_slug=None, confirm=True, allow_update=True
         tvdb_id = item.get('ids', {}).get('tvdb')
 
         if not tmdb_id:  # Extra request for ID lookup is too expensive so skip
+            utils.kodi_log(u'{} ({}) - Missing TMDb ID! Skipping...'.format(item.get('title'), item.get('year')), 2)
             continue
 
         if p_dialog:
