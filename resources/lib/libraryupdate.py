@@ -110,7 +110,7 @@ def add_tvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id=None, 
         return
 
     # Get all seasons in the tvshow except specials
-    details_tvshow = _plugin.tmdb.get_request('tv', tmdb_id, cache_days=0.25, append_to_response='external_ids')
+    details_tvshow = _plugin.tmdb.get_request('tv', tmdb_id, cache_refresh=True, append_to_response='external_ids')
     if not details_tvshow:
         return
 
@@ -208,7 +208,7 @@ def add_tvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id=None, 
             continue
 
         # Get all episodes in the season except specials
-        details_season = _plugin.tmdb.get_request('tv', tmdb_id, 'season', season.get('season_number'), cache_days=0.25)
+        details_season = _plugin.tmdb.get_request('tv', tmdb_id, 'season', season.get('season_number'), cache_refresh=True)
         if not details_season:
             utils.kodi_log(u'{} (TMDB {})\nNo details found for {}. Skipping...'.format(details_tvshow.get('name'), tmdb_id, season_name))
             return
