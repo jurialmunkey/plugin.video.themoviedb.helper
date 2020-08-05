@@ -101,18 +101,22 @@ def add_tvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id=None, 
         cache_info = {}
 
     # If there is a next check value and it hasn't elapsed then skip the update
-    next_check = cache_info.get(tmdb_id, {}).get('next_check')
+    next_check = cache_info.get('next_check')
     if next_check and utils.convert_timestamp(next_check, "%Y-%m-%d", 10) > datetime.datetime.today():
         if _debuglogging:
-            log_msg = cache_info.get(tmdb_id, {}).get('log_msg') or ''
+            log_msg = cache_info.get('log_msg') or ''
             utils.kodi_log(u'Skipping updating {} (TMDB {})\nNext update {}{}'.format(
-                cache_info.get(tmdb_id, {}).get('name'), tmdb_id, next_check, log_msg), 2)
+                cache_info.get('name'), tmdb_id, next_check, log_msg), 2)
         return
 
     # Get all seasons in the tvshow except specials
-    details_tvshow = _plugin.tmdb.get_request_sc('tv', tmdb_id)
+    details_tvshow = _plugin.tmdb.get_request('tv', tmdb_id, cache_days=0.25, append_to_response='external_ids')
     if not details_tvshow:
         return
+
+    # Update IDs from detailed info
+    tvdb_id = details_tvshow.get('external_ids', {}).get('tvdb_id') or tvdb_id
+    imdb_id = details_tvshow.get('external_ids', {}).get('imdb_id') or imdb_id
 
     # Create the .nfo file in the folder
     create_nfo('tv', tmdb_id, folder, basedir=basedir)
@@ -175,8 +179,8 @@ def add_tvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id=None, 
             my_history['next_check'] = my_next_check.strftime('%Y-%m-%d')
             # Show hasnt aired in a while so check every week for a return date
 
-    prev_added_eps = cache_info.get(tmdb_id, {}).get('episodes') or []
-    prev_skipped_eps = cache_info.get(tmdb_id, {}).get('skipped') or []
+    prev_added_eps = cache_info.get('episodes') or []
+    prev_skipped_eps = cache_info.get('skipped') or []
 
     seasons = details_tvshow.get('seasons', [])
     s_total = len(seasons)
@@ -204,7 +208,7 @@ def add_tvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id=None, 
             continue
 
         # Get all episodes in the season except specials
-        details_season = _plugin.tmdb.get_request_sc('tv', tmdb_id, 'season', season.get('season_number'))
+        details_season = _plugin.tmdb.get_request('tv', tmdb_id, 'season', season.get('season_number'), cache_days=0.25)
         if not details_season:
             utils.kodi_log(u'{} (TMDB {})\nNo details found for {}. Skipping...'.format(details_tvshow.get('name'), tmdb_id, season_name))
             return
@@ -234,7 +238,7 @@ def add_tvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id=None, 
                     continue
 
             # Check if item has already been added
-            if _plugin.get_db_info(info='dbid', tmdbtype='episode', imdb_id=imdb_id, tmdb_id=tmdb_id, season=season.get('season_number'), episode=episode.get('episode_number')):
+            if _plugin.get_db_info(info='dbid', tmdbtype='episode', imdb_id=imdb_id, tmdb_id=tmdb_id, tvdb_id=tvdb_id, season=season.get('season_number'), episode=episode.get('episode_number')):
                 if _debuglogging:
                     library_eps.append(episode_name)
                 continue
@@ -269,10 +273,11 @@ def add_tvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id=None, 
     _cache.set(cache_name, my_history, expiration=datetime.timedelta(days=120))
 
 
-def check_limits(request):
+def check_overlimit(request):
     """
     IMPORTANT: Do not change limits.
     Please respect the APIs that provide this data for free.
+    Returns None if NOT overlimit. Otherwise returns dict containing totals in request.
     """
     if len(request) <= min(LIBRARY_ADD_LIMIT_TVSHOWS, LIBRARY_ADD_LIMIT_MOVIES):
         return
@@ -319,7 +324,7 @@ def get_userlist(user_slug=None, list_slug=None, confirm=True, busy_dialog=True)
 
     if confirm:
         d_head = _addon.getLocalizedString(32125)
-        i_check_limits = check_limits(request)
+        i_check_limits = check_overlimit(request)
         if i_check_limits:
             # List over limit so inform user that it is too large to add
             d_body = [
