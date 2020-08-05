@@ -110,7 +110,7 @@ def add_tvshow(basedir=None, folder=None, url=None, tmdb_id=None, tvdb_id=None, 
         return
 
     # Get all seasons in the tvshow except specials
-    details_tvshow = _plugin.tmdb.get_request('tv', tmdb_id, cache_refresh=True, append_to_response='external_ids')
+    details_tvshow = _plugin.tmdb.get_request('tv', tmdb_id, cache_days=1, append_to_response='external_ids')
     if not details_tvshow:
         return
 
