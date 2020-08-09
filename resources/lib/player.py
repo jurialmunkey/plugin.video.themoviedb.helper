@@ -379,12 +379,7 @@ class Player(Plugin):
         for basedir in basedirs:
             files = [x for x in xbmcvfs.listdir(basedir)[1] if x.endswith('.json')]
             for file in files:
-                vfs_file = xbmcvfs.File(basedir + file)
-                try:
-                    content = vfs_file.read()
-                    meta = loads(content) or {}
-                finally:
-                    vfs_file.close()
+                meta = loads(utils.read_file(basedir + file)) or {}
 
                 self.players[file] = meta
 

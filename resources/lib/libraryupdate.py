@@ -408,11 +408,11 @@ def create_playlist(items, dbtype, user_slug, list_slug):
     """
     filename = '{}-{}-{}'.format(user_slug, list_slug, dbtype)
     filepath = 'special://profile/playlists/video/'
-    fcontent = u'<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>'
-    fcontent += u'\n<smartplaylist type="{}">'.format(dbtype)
-    fcontent += u'\n    <name>{} by {} ({})</name>'.format(list_slug, user_slug, dbtype)
-    fcontent += u'\n    <match>any</match>'
+    fcontent = [u'<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>']
+    fcontent.append(u'<smartplaylist type="{}">'.format(dbtype))
+    fcontent.append(u'    <name>{} by {} ({})</name>'.format(list_slug, user_slug, dbtype))
+    fcontent.append(u'    <match>any</match>')
     for i in items:
-        fcontent += u'\n    <rule field="{}" operator="is"><value>{}</value></rule>'.format(i[0], i[1])
-    fcontent += u'\n</smartplaylist>'
-    create_file(filename, fcontent, basedir=filepath, file_ext='xsp', clean_url=False)
+        fcontent.append(u'    <rule field="{}" operator="is"><value>{}</value></rule>'.format(i[0], i[1]))
+    fcontent.append(u'</smartplaylist>')
+    create_file(filename, '\n'.join(fcontent), basedir=filepath, file_ext='xsp', clean_url=False)

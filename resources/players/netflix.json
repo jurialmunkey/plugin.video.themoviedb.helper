@@ -9,15 +9,23 @@
                             "search_episode":   ["showname"]
                           },
     "play_movie"        : [
-                            "plugin://plugin.video.netflix/directory/search/search/{title}/",
+                            "plugin://plugin.video.netflix/directory/search/search/add/",
+                            {"keyboard": "{title}"},
                             {"title": "{title}", "year": "{year}"}
                           ],
     "play_episode"      : [
-                            "plugin://plugin.video.netflix/directory/search/search/{showname}/",
+                            "plugin://plugin.video.netflix/directory/search/search/add/",
+                            {"keyboard": "{showname}"},
                             {"title": "{showname}"},
                             {"season": "{season}"},
                             {"season": "{season}", "episode": "{episode}"}
                           ],
-    "search_movie"      : "plugin://plugin.video.netflix/directory/search/search/{title}/",
-    "search_episode"    : "plugin://plugin.video.netflix/directory/search/search/{showname}/"
+    "search_movie"      : [
+                            "plugin://plugin.video.netflix/directory/search/search/add/",
+                            {"keyboard": "{title}"}
+                          ],
+    "search_episode"    : [
+                            "plugin://plugin.video.netflix/directory/search/search/add/",
+                            {"keyboard": "{showname}"}
+                          ]
 }
