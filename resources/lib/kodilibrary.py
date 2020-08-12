@@ -129,7 +129,7 @@ class KodiLibrary(object):
             if season and episode:
                 if utils.try_parse_int(episode) == self.database[i].get('episode'):
                     return self.database[i].get(info)
-            elif not yearcheck or str(yearcheck) in str(self.database[i].get('year')):
+            elif not yearcheck or yearcheck in str(self.database[i].get('year')):
                 return self.database[i].get(info)
         if index_list and fuzzy_match and not season and not episode:
             """ Fuzzy Match """
