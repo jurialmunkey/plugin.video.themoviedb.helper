@@ -268,6 +268,10 @@ class Container(Plugin):
             # Get DBID From Library
             i.dbid = self.get_db_info(
                 info='dbid', tmdbtype=self.item_tmdbtype,
+                title=i.infolabels.get('title'),
+                tvshowtitle=i.infolabels.get('tvshowtitle'),
+                originaltitle=i.infolabels.get('originaltitle'),
+                year=i.infoproperties.get('tvshow.year') or i.infolabels.get('year'),
                 imdb_id=i.infoproperties.get('tvshow.imdb_id') or i.infoproperties.get('imdb_id'),
                 tmdb_id=i.infoproperties.get('tvshow.tmdb_id') or i.infoproperties.get('tmdb_id'),
                 tvdb_id=i.infoproperties.get('tvshow.tvdb_id') or i.infoproperties.get('tvdb_id'),
