@@ -119,8 +119,8 @@ class KodiLibrary(object):
             index_list = utils.find_dict_in_list(self.database, 'tmdb_id', str(tmdb_id))
         if not index_list and tvdb_id:
             index_list = utils.find_dict_in_list(self.database, 'tvdb_id', str(tvdb_id))
-        if not index_list and year:
-            yearcheck = str(year)
+        if not index_list:
+            yearcheck = str(year) or 'dummynull'  # Also use year if matching by title to be certain we have correct item. Dummy value for True value that will always fail comparison check.
         if not index_list and originaltitle:
             index_list = utils.find_dict_in_list(self.database, 'originaltitle', originaltitle)
         if not index_list and title:
