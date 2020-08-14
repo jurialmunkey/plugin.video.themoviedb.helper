@@ -109,6 +109,7 @@ class KodiLibrary(object):
     def get_info(self, info, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None, season=None, episode=None, fuzzy_match=False, tmdb_id=None, tvdb_id=None):
         if not self.database or not info:
             return
+        yearcheck = False
         index_list = utils.find_dict_in_list(self.database, 'dbid', dbid) if dbid else []
         if not index_list and season:
             index_list = utils.find_dict_in_list(self.database, 'season', utils.try_parse_int(season))
@@ -118,6 +119,8 @@ class KodiLibrary(object):
             index_list = utils.find_dict_in_list(self.database, 'tmdb_id', str(tmdb_id))
         if not index_list and tvdb_id:
             index_list = utils.find_dict_in_list(self.database, 'tvdb_id', str(tvdb_id))
+        if not index_list:
+            yearcheck = str(year) or 'dummynull'  # Also use year if matching by title to be certain we have correct item. Dummy value for True value that will always fail comparison check.
         if not index_list and originaltitle:
             index_list = utils.find_dict_in_list(self.database, 'originaltitle', originaltitle)
         if not index_list and title:
@@ -126,9 +129,9 @@ class KodiLibrary(object):
             if season and episode:
                 if utils.try_parse_int(episode) == self.database[i].get('episode'):
                     return self.database[i].get(info)
-            elif not year or year in str(self.database[i].get('year')):
+            elif not yearcheck or yearcheck in str(self.database[i].get('year')):
                 return self.database[i].get(info)
-        if index_list and fuzzy_match and year and not season and not episode:
+        if index_list and fuzzy_match and not season and not episode:
             """ Fuzzy Match """
             i = index_list[0]
             return self.database[i].get(info)
