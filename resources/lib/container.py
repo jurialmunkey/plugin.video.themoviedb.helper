@@ -49,7 +49,7 @@ class Container(Plugin):
             except Exception as exc:
                 utils.kodi_log(u'Error: {}\nUnable to set Param.{} to {}'.format(exc, k, v), 1)
 
-        if self.item_dbtype in ['movie', 'tvshow', 'episode']:
+        if self.item_dbtype in ['movie', 'tvshow'] or (self.item_dbtype == 'episode' and self.addon.getSettingBool('hide_unaired_episodes')):  # Only add sort methods for episodes if hiding unaired episodes because otherwise Kodi will strip label formatting
             xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_UNSORTED)
             xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_EPISODE) if self.item_dbtype == 'episode' else None
             xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_TITLE_IGNORE_THE)
