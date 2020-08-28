@@ -159,8 +159,8 @@ class Container(Plugin):
             return TraktAPI().get_watched('show')
 
     def get_trakt_unwatched(self):
-        if not self.addon.getSettingBool('trakt_unwatchedcounts') or not self.addon.getSettingBool('trakt_watchedindicators') or self.item_dbtype not in ['season', 'tvshow']:
-            return -1
+#        if not self.addon.getSettingBool('trakt_unwatchedcounts') or not self.addon.getSettingBool('trakt_watchedindicators') or self.item_dbtype not in ['season', 'tvshow']:
+#            return -1
         traktapi = TraktAPI(tmdb=self.tmdb)
         self.check_sync = traktapi.sync_activities('shows', 'watched_at')
         if self.item_dbtype == 'season':
@@ -278,6 +278,8 @@ class Container(Plugin):
                 tvdb_id=i.infoproperties.get('tvshow.tvdb_id') or i.infoproperties.get('tvdb_id'),
                 season=i.infolabels.get('season'),
                 episode=i.infolabels.get('episode'))
+	    i.infolabels['dbid'] = i.dbid
+#	    xbmc.log(str(i.dbid)+'===>TRAKT_SCROBBLE_TITLE____service.next_playlist2', level=xbmc.LOGNOTICE)	
 
             # Get TVSHOW DBID for episodes / seasons
             if self.item_tmdbtype in ['season', 'episode']:
@@ -286,6 +288,8 @@ class Container(Plugin):
                     imdb_id=i.infoproperties.get('tvshow.imdb_id'),
                     tmdb_id=i.infoproperties.get('tvshow.tmdb_id'),
                     tvdb_id=i.infoproperties.get('tvshow.tvdb_id'))
+		i.infolabels['tvshow_dbid'] = i.tvshow_dbid
+#	        xbmc.log(str(i.tvshow_dbid)+'===>TRAKT_SCROBBLE_TITLE____service.next_playlist2', level=xbmc.LOGNOTICE)	
 
             # Special Property Because Plugin Category not Available in Widgets
             i.infoproperties['widget'] = self.plugincategory
@@ -1028,6 +1032,7 @@ class Container(Plugin):
         x = 0
         self.start_container()
         for i in items:
+#	    xbmc.log(str(i.infolabels)+'===>TRAKT_SCROBBLE_TITLE____service.next_playlist2', level=xbmc.LOGNOTICE)	
             i.label2 = i.infoproperties.get('role') or i.label2
             i.infoproperties['numitems.dbid'] = self.numitems_dbid
             i.infoproperties['numitems.tmdb'] = self.numitems_tmdb
