@@ -172,6 +172,11 @@ class TraktAPI(RequestAPI):
     def get_itemlist_sorted(self, *args, **kwargs):
         response = self.get_response(*args, extended='full')
         items = response.json()
+        try: 
+		    items = sorted(items, key=lambda i: i['listed_at'], reverse=True)
+		    return items
+	    except: items = items
+#	    xbmc.log(str(items)+'===>TRAKT_LIST', level=xbmc.LOGNOTICE)
         reverse = True if response.headers.get('X-Sort-How') == 'desc' else False
         if response.headers.get('X-Sort-By') == 'rank':
             return sorted(items, key=lambda i: i.get('rank'), reverse=reverse)
