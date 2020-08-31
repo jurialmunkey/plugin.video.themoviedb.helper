@@ -529,7 +529,8 @@ class TMDb(RequestAPI):
                 if not i.get('first_air_date'):
                     continue
                 if utils.try_parse_int(i.get('first_air_date', '9999')[:4]) <= utils.try_parse_int(epyear):
-                    return i.get('id')
+                    if query in [i.get('name'), i.get('original_name')]:
+                        return i.get('id')
         return request[0].get('id')
 
     def get_credits_list(self, itemtype, tmdb_id, key):
