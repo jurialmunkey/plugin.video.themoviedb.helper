@@ -730,7 +730,7 @@ class ServiceMonitor(CommonMonitorFunctions):
             tmdb_id = self.get_tmdb_id(
                 tmdbtype, self.imdb_id, self.query,
                 self.year if tmdbtype == 'movie' else None,
-                self.year if tmdbtype != 'movie' else None)
+                self.year if tmdbtype == 'tv' else None)
             details = self.tmdb.get_detailed_item(tmdbtype, tmdb_id, season=self.season, episode=self.episode)
 
             if not details:
