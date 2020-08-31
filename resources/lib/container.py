@@ -279,6 +279,7 @@ class Container(Plugin):
                 season=i.infolabels.get('season'),
                 episode=i.infolabels.get('episode'))
 	    i.infolabels['dbid'] = i.dbid
+	    i.infolabels['IMDBNumber'] = i.tmdb_id
 #	    xbmc.log(str(i.dbid)+'===>TRAKT_SCROBBLE_TITLE____service.next_playlist2', level=xbmc.LOGNOTICE)	
 
             # Get TVSHOW DBID for episodes / seasons
@@ -289,6 +290,7 @@ class Container(Plugin):
                     tmdb_id=i.infoproperties.get('tvshow.tmdb_id'),
                     tvdb_id=i.infoproperties.get('tvshow.tvdb_id'))
 		i.infolabels['tvshow_dbid'] = i.tvshow_dbid
+		i.infolabels['IMDBNumber'] = i.tmdb_id
 #	        xbmc.log(str(i.tvshow_dbid)+'===>TRAKT_SCROBBLE_TITLE____service.next_playlist2', level=xbmc.LOGNOTICE)	
 
             # Special Property Because Plugin Category not Available in Widgets
