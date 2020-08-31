@@ -497,7 +497,7 @@ class TMDb(RequestAPI):
         request = self.get_request_lc(itemtype, tmdb_id, 'external_ids') or {}
         return request.get(external_id) if external_id else request
 
-    def get_tmdb_id(self, itemtype=None, imdb_id=None, tvdb_id=None, query=None, year=None, selectdialog=False, usedetails=True, longcache=False, returntuple=False):
+    def get_tmdb_id(self, itemtype=None, imdb_id=None, tvdb_id=None, query=None, year=None, selectdialog=False, usedetails=True, longcache=False, returntuple=False, epyear=None):
         func = self.get_request_lc if longcache else self.get_request_sc
         if not itemtype:
             return
@@ -519,13 +519,18 @@ class TMDb(RequestAPI):
             request = request.get('results', [])
         if not request:
             return
-        itemindex = 0
         if selectdialog:
             item = utils.dialog_select_item(items=request, details=self, usedetails=usedetails)
             if returntuple:
                 return (self.get_title(item), item.get('id')) if item else None
             return item.get('id') if item else None
-        return request[itemindex].get('id')
+        if itemtype == 'tv' and epyear and len(request) > 1:
+            for i in sorted(request, key=lambda k: k.get('first_air_date', ''), reverse=True):
+                if not i.get('first_air_date'):
+                    continue
+                if utils.try_parse_int(i.get('first_air_date', '9999')[:4]) <= utils.try_parse_int(epyear):
+                    return i.get('id')
+        return request[0].get('id')
 
     def get_credits_list(self, itemtype, tmdb_id, key):
         return self.get_list(itemtype, tmdb_id, 'credits', key=key, longcache=True)
