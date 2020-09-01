@@ -403,11 +403,11 @@ class CommonMonitorFunctions(Plugin):
             self.set_indx_properties(item.get('infoproperties', {}))
         _homewindow.clearProperty('TMDbHelper.IsUpdating')
 
-    def get_tmdb_id(self, itemtype, imdb_id=None, query=None, year=None):
+    def get_tmdb_id(self, itemtype, imdb_id=None, query=None, year=None, epyear=None):
         try:
             if imdb_id and imdb_id.startswith('tt'):
                 return self.tmdb.get_tmdb_id(itemtype=itemtype, imdb_id=imdb_id)
-            return self.tmdb.get_tmdb_id(itemtype=itemtype, query=query, year=year)
+            return self.tmdb.get_tmdb_id(itemtype=itemtype, query=query, year=year, epyear=epyear)
         except Exception as exc:
             utils.kodi_log(u'Func: get_tmdb_id\n{0}'.format(exc), 1)
             return
@@ -500,12 +500,13 @@ class PlayerMonitor(xbmc.Player, CommonMonitorFunctions):
         self.imdb_id = self.getVideoInfoTag().getIMDBNumber()
         self.query = self.getVideoInfoTag().getTVShowTitle() if self.dbtype == 'episode' else self.getVideoInfoTag().getTitle()
         self.year = self.getVideoInfoTag().getYear() if self.dbtype == 'movie' else None
+        self.epyear = self.getVideoInfoTag().getYear() if self.dbtype == 'episodes' else None
         self.season = self.getVideoInfoTag().getSeason() if self.dbtype == 'episodes' else None
         self.episode = self.getVideoInfoTag().getEpisode() if self.dbtype == 'episodes' else None
         self.query = utils.try_decode_string(self.query)
 
         self.tmdbtype = 'movie' if self.dbtype == 'movie' else 'tv'
-        self.tmdb_id = self.get_tmdb_id(self.tmdbtype, self.imdb_id, self.query, self.year)
+        self.tmdb_id = self.get_tmdb_id(self.tmdbtype, self.imdb_id, self.query, self.year, self.epyear)
         self.details = self.tmdb.get_detailed_item(self.tmdbtype, self.tmdb_id, season=self.season, episode=self.episode)
 
         if not self.details:
@@ -726,7 +727,10 @@ class ServiceMonitor(CommonMonitorFunctions):
                 self.clear_property_list(_setmain_artwork)
             self.clear_property_list(_setprop_ratings)
 
-            tmdb_id = self.get_tmdb_id(tmdbtype, self.imdb_id, self.query, self.year if tmdbtype == 'movie' else None)
+            tmdb_id = self.get_tmdb_id(
+                tmdbtype, self.imdb_id, self.query,
+                self.year if tmdbtype == 'movie' else None,
+                self.year if tmdbtype == 'tv' else None)
             details = self.tmdb.get_detailed_item(tmdbtype, tmdb_id, season=self.season, episode=self.episode)
 
             if not details:

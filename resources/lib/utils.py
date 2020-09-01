@@ -346,13 +346,14 @@ def kodi_log(value, level=0):
 
 
 def get_jsonrpc(method=None, params=None):
-    if not method or not params:
+    if not method:
         return {}
     query = {
         "jsonrpc": "2.0",
-        "params": params,
         "method": method,
         "id": 1}
+    if params:
+        query["params"] = params
     try:
         jrpc = xbmc.executeJSONRPC(json.dumps(query))
         response = json.loads(try_decode_string(jrpc, errors='ignore'))

@@ -10,11 +10,13 @@
                           },
     "play_movie"        : [
                             "plugin://plugin.video.netflix/directory/search/search/add/",
+                            {"keyboard": "Select"},
                             {"keyboard": "{title}"},
                             {"title": "{title}", "year": "{year}"}
                           ],
     "play_episode"      : [
                             "plugin://plugin.video.netflix/directory/search/search/add/",
+                            {"keyboard": "Select"},
                             {"keyboard": "{showname}"},
                             {"title": "{showname}"},
                             {"season": "{season}"},
@@ -22,10 +24,12 @@
                           ],
     "search_movie"      : [
                             "plugin://plugin.video.netflix/directory/search/search/add/",
+                            {"keyboard": "Select"},
                             {"keyboard": "{title}"}
                           ],
     "search_episode"    : [
                             "plugin://plugin.video.netflix/directory/search/search/add/",
+                            {"keyboard": "Select"},
                             {"keyboard": "{showname}"}
                           ]
 }

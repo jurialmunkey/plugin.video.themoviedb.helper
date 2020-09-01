@@ -30,9 +30,10 @@ def string_format_map(fmt, d):
 
 
 class KeyboardInputter(Thread):
-    def __init__(self, text=None, timeout=300):
+    def __init__(self, action=None, text=None, timeout=300):
         Thread.__init__(self)
         self.text = text
+        self.action = action
         self.exit = False
         self.poll = 0.5
         self.timeout = timeout
@@ -42,8 +43,11 @@ class KeyboardInputter(Thread):
         while not self.kodimonitor.abortRequested() and not self.exit and self.timeout > 0:
             self.kodimonitor.waitForAbort(self.poll)
             self.timeout -= self.poll
-            if xbmc.getCondVisibility("Window.IsVisible(DialogKeyboard.xml)"):
+            if self.text and xbmc.getCondVisibility("Window.IsVisible(DialogKeyboard.xml)"):
                 utils.get_jsonrpc("Input.SendText", {"text": self.text, "done": True})
+                self.exit = True
+            elif self.action and xbmc.getCondVisibility("Window.IsVisible(DialogSelect.xml) | Window.IsVisible(DialogConfirm.xml)"):
+                utils.get_jsonrpc(self.action)
                 self.exit = True
 
 
@@ -218,7 +222,10 @@ class Player(Plugin):
 
             # Start thread with keyboard inputter if needed
             if action.get('keyboard'):
-                keyboard_input = KeyboardInputter(text=string_format_map(action.get('keyboard', ''), self.item))
+                if action.get('keyboard') in ['Up', 'Down', 'Left', 'Right', 'Select']:
+                    keyboard_input = KeyboardInputter(action="Input.{}".format(action.get('keyboard')))
+                else:
+                    keyboard_input = KeyboardInputter(text=string_format_map(action.get('keyboard', ''), self.item))
                 keyboard_input.setName('keyboard_input')
                 keyboard_input.start()
                 continue  # Go to next action
