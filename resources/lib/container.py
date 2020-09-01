@@ -279,8 +279,22 @@ class Container(Plugin):
                 season=i.infolabels.get('season'),
                 episode=i.infolabels.get('episode'))
 	    i.infolabels['dbid'] = i.dbid
-	    i.infolabels['IMDBNumber'] = i.tmdb_id
-#	    xbmc.log(str(i.dbid)+'===>TRAKT_SCROBBLE_TITLE____service.next_playlist2', level=xbmc.LOGNOTICE)	
+	    if self.item_tmdbtype not in ['movie']:
+		    i.infolabels['IMDBNumber'] = i.tmdb_id
+		    if self.item_tmdbtype == 'tv':
+			try: TVShowTitle = i.infolabels['TVShowTitle']
+			except: i.infolabels['TVShowTitle'] = i.infolabels['title']
+			try: OriginalTitle = i.infolabels['OriginalTitle'] 
+			except: i.infolabels['OriginalTitle'] = i.infolabels['title']
+#		    xbmc.log(str(i.infolabels) +'||self.options===>SKIN.HELPER.Widgets', level=xbmc.LOGNOTICE)		
+#		    xbmc.log(str(i.infoproperties) +'||self.options===>SKIN.HELPER.Widgets', level=xbmc.LOGNOTICE)		
+#		    xbmc.log(str(self.details_tv) +'||self.options===>SKIN.HELPER.Widgets', level=xbmc.LOGNOTICE)
+	    else:
+		    i.infolabels['IMDBNumber'] = i.imdb_id
+		    if i.imdb_id == None or i.imdb_id == '':
+			i.infolabels['IMDBNumber'] = i.tmdb_id
+	
+#	    xbmc.log(str(i.dbid)+'===>TRAKT_SCROBBLE_TITLE____service.next_playlist2', level=xbmc.LOGNOTICE)		
 
             # Get TVSHOW DBID for episodes / seasons
             if self.item_tmdbtype in ['season', 'episode']:
