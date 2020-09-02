@@ -106,8 +106,7 @@ class Player(Plugin):
 
         for i in range(0, len(self.itemlist)):
             label = self.itemlist[i].getLabel()
-            if (
-                    (label == self.dp_movies and self.itemtype == 'movie')
+            if ((label == self.dp_movies and self.itemtype == 'movie')
                     or (label == self.dp_episodes and self.itemtype == 'episode')
                     or (label == u'{0} {1}'.format(self.addon.getLocalizedString(32061), 'Kodi') and self.dp_local)):
                 utils.kodi_log(u'Player -- Attempting to Play with Default Player:\n {}'.format(label), 2)
@@ -210,9 +209,8 @@ class Player(Plugin):
             return player  # No player configured or not a list of actions so return
 
         keyboard_input = None
-        player_resolve = False  # Player has actions so hasn't resolved yet
         player_actions = player[1]
-        player = (player_resolve, player_actions[0])
+        player = (False, player_actions[0])  # player tuple is: isPlayable flag; path URI to call.
 
         for action in player_actions[1:]:
 
@@ -233,8 +231,6 @@ class Player(Plugin):
             # Get the next folder from the plugin
             with utils.busy_dialog():
                 folder = KodiLibrary().get_directory(string_format_map(player[1], self.item))
-            # utils.kodi_log('JSON RPC Files.GetDirectory\n' + string_format_map(player[1], self.item), 1)
-            # utils.kodi_log(folder, 1)
 
             # Kill our keyboard inputter thread
             if keyboard_input:
