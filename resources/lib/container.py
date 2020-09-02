@@ -161,6 +161,8 @@ class Container(Plugin):
     def get_trakt_unwatched(self):
 #        if not self.addon.getSettingBool('trakt_unwatchedcounts') or not self.addon.getSettingBool('trakt_watchedindicators') or self.item_dbtype not in ['season', 'tvshow']:
 #            return -1
+	if self.item_dbtype in ['movie']:
+	    return -1
         traktapi = TraktAPI(tmdb=self.tmdb)
         self.check_sync = traktapi.sync_activities('shows', 'watched_at')
         if self.item_dbtype == 'season':
