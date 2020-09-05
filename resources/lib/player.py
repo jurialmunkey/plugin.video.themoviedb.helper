@@ -37,11 +37,10 @@ class KeyboardInputter(Thread):
         self.exit = False
         self.poll = 0.5
         self.timeout = timeout
-        self.kodimonitor = xbmc.Monitor()
 
     def run(self):
-        while not self.kodimonitor.abortRequested() and not self.exit and self.timeout > 0:
-            self.kodimonitor.waitForAbort(self.poll)
+        while not xbmc.Monitor().abortRequested() and not self.exit and self.timeout > 0:
+            xbmc.Monitor().waitForAbort(self.poll)
             self.timeout -= self.poll
             if self.text and xbmc.getCondVisibility("Window.IsVisible(DialogKeyboard.xml)"):
                 utils.get_jsonrpc("Input.SendText", {"text": self.text, "done": True})
