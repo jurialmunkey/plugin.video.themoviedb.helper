@@ -102,7 +102,6 @@ class CronJob(Thread):
         xbmc.Monitor().waitForAbort(120)
         if self.addon.getSettingString('trakt_token'):
             _homewindow.setProperty('TMDbHelper.TraktIsAuth', 'True')
-            self.get_trakt_usernameslug()
         xbmc.Monitor().waitForAbort(540)  # Wait a bit before updating
         self.nexttime = datetime.datetime.combine(datetime.datetime.today(), datetime.time(utils.try_parse_int(self.update_hour)))  # Get today at hour
         self.lasttime = xbmc.getInfoLabel('Skin.String(TMDbHelper.AutoUpdate.LastTime)')  # Get last update
