@@ -694,6 +694,15 @@ class Container(Plugin):
             listitem.url = self.set_url_params(url)
             listitem.set_url_props(self.params, 'container')
             listitem.set_url_props(listitem.url, 'item')
+            contexturl = listitem.set_url(**listitem.url)
+            listitem.set_contextmenu([
+                ('Browse sorted by title', 'Container.Update({}{})'.format(contexturl, '&sortmethod=title&sortdirection=asce')),
+                ('Browse sorted by added', 'Container.Update({}{})'.format(contexturl, '&sortmethod=rank&sortdirection=desc')),
+                ('Browse sorted by released', 'Container.Update({}{})'.format(contexturl, '&sortmethod=released&sortdirection=desc')),
+                ('Browse sorted by rating', 'Container.Update({}{})'.format(contexturl, '&sortmethod=percentage&sortdirection=desc')),
+                ('Browse sorted by votes', 'Container.Update({}{})'.format(contexturl, '&sortmethod=votes&sortdirection=desc')),
+                ('Browse sorted by popularity', 'Container.Update({}{})'.format(contexturl, '&sortmethod=popularity&sortdirection=desc')),
+                ('Browse sorted by random', 'Container.Update({}{})'.format(contexturl, '&sortmethod=random'))])
             listitem.create_listitem(self.handle, **listitem.url) if not self.params.get('random') else self.randomlist.append(listitem)
         self.finish_container()
 
@@ -731,7 +740,8 @@ class Container(Plugin):
         self.list_items(
             items=traktapi.get_itemlist(
                 cat.get('path', '').format(**params), page=self.params.get('page', 1), limit=limit,
-                rnd_list=rnd_list, req_auth=cat.get('req_auth'), usr_list=usr_list, key_list=key_list),
+                rnd_list=rnd_list, req_auth=cat.get('req_auth'), usr_list=usr_list, key_list=key_list,
+                sortmethod=params.get('sortmethod'), sortdirection=params.get('sortdirection')),
             url={'info': cat.get('url_info', 'details')})
 
     def list_traktmanagement(self):
