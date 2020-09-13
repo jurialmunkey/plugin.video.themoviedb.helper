@@ -141,6 +141,12 @@ class ImageFunctions(Thread):
             self.func = self.colors
             self.save_path = utils.makepath(self.save_path.format('colors'))
             self.save_prop = 'TMDbHelper.ListItem.Colors'
+            self.colors_lum = xbmc.getInfoLabel('Skin.String(TMDbHelper.Colors.Luminance)')
+            self.colors_lum = utils.try_parse_float(self.colors_lum) if self.colors_lum else None
+            self.colors_sat = xbmc.getInfoLabel('Skin.String(TMDbHelper.Colors.Saturation)')
+            self.colors_sat = utils.try_parse_float(self.colors_sat) if self.colors_sat else None
+            self.colors_cmp = xbmc.getInfoLabel('Skin.String(TMDbHelper.Colors.CompShift)')
+            self.colors_cmp = utils.try_parse_float(self.colors_cmp) if self.colors_cmp else None
 
     def run(self):
         if not self.save_prop or not self.func:
@@ -215,11 +221,12 @@ class ImageFunctions(Thread):
             rgb_list[channel] = self.clamp(sum(values) / len(values))
         return rgb_list
 
-    def get_compcolor(self, r, g, b, shift=0.33):
+    def get_compcolor(self, r, g, b):
         """
         Changes hue of color by shift value (percentage float)
         Takes RGB as 0:255 values and returns RGB as 0:255 values
         """
+        shift = self.colors_cmp or 0.33
         hls_tuple = colorsys.rgb_to_hls(r / 255.0, g / 255.0, b / 255.0)
         rgb_tuple = colorsys.hls_to_rgb(abs(hls_tuple[0] - shift), hls_tuple[1], hls_tuple[2])
         return self.rgb_to_int(*rgb_tuple)
@@ -227,8 +234,8 @@ class ImageFunctions(Thread):
     def get_color_lumsat(self, r, g, b):
         hls_tuple = colorsys.rgb_to_hls(r / 255.0, g / 255.0, b / 255.0)
         hue = hls_tuple[0]
-        lum = utils.try_parse_float(xbmc.getInfoLabel('Skin.String(TMDbHelper.Colors.Luminance)')) or hls_tuple[1]
-        sat = utils.try_parse_float(xbmc.getInfoLabel('Skin.String(TMDbHelper.Colors.Saturation)')) or hls_tuple[2]
+        lum = self.colors_lum or hls_tuple[1]
+        sat = self.colors_sat or hls_tuple[2]
         return self.rgb_to_int(*colorsys.hls_to_rgb(hue, lum, sat))
 
     def rgb_to_int(self, r, g, b):
