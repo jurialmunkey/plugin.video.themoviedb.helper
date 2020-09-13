@@ -147,6 +147,8 @@ class ImageFunctions(Thread):
             self.colors_sat = utils.try_parse_float(self.colors_sat) if self.colors_sat else None
             self.colors_cmp = xbmc.getInfoLabel('Skin.String(TMDbHelper.Colors.CompShift)')
             self.colors_cmp = utils.try_parse_float(self.colors_cmp) if self.colors_cmp else None
+            self.colors_hue = xbmc.getInfoLabel('Skin.String(TMDbHelper.Colors.MainShift)')
+            self.colors_hue = utils.try_parse_float(self.colors_hue) if self.colors_hue else None
 
     def run(self):
         if not self.save_prop or not self.func:
@@ -212,7 +214,7 @@ class ImageFunctions(Thread):
         except Exception:
             return ''
 
-    def get_maincolor(self, img):
+    def get_avg_color(self, img):
         """Returns main color of image as list of rgb values 0:255"""
         rgb_list = [None, None, None]
         for channel in range(3):
@@ -221,15 +223,20 @@ class ImageFunctions(Thread):
             rgb_list[channel] = self.clamp(sum(values) / len(values))
         return rgb_list
 
-    def get_compcolor(self, r, g, b):
+    def get_shiftcolor(self, r, g, b, shift=0):
         """
         Changes hue of color by shift value (percentage float)
         Takes RGB as 0:255 values and returns RGB as 0:255 values
         """
-        shift = self.colors_cmp or 0.33
         hls_tuple = colorsys.rgb_to_hls(r / 255.0, g / 255.0, b / 255.0)
         rgb_tuple = colorsys.hls_to_rgb(abs(hls_tuple[0] - shift), hls_tuple[1], hls_tuple[2])
         return self.rgb_to_int(*rgb_tuple)
+
+    def get_compcolor(self, r, g, b):
+        return self.get_shiftcolor(r, g, b, self.colors_cmp or 0.33)
+
+    def get_maincolor(self, r, g, b):
+        return self.get_shiftcolor(r, g, b, self.colors_hue or 0)
 
     def get_color_lumsat(self, r, g, b):
         hls_tuple = colorsys.rgb_to_hls(r / 255.0, g / 255.0, b / 255.0)
@@ -294,9 +301,10 @@ class ImageFunctions(Thread):
                 img = img.convert('RGB')
                 img.save(destination)
 
-            maincolor_rgb = self.get_maincolor(img)
+            avg_rgb = self.get_avg_color(img)
+            maincolor_rgb = self.get_maincolor(*avg_rgb)
             maincolor_hex = self.rgb_to_hex(*self.get_color_lumsat(*maincolor_rgb))
-            compcolor_rgb = self.get_compcolor(*maincolor_rgb)
+            compcolor_rgb = self.get_compcolor(*avg_rgb)
             compcolor_hex = self.rgb_to_hex(*self.get_color_lumsat(*compcolor_rgb))
 
             maincolor_propname = self.save_prop + '.Main'
