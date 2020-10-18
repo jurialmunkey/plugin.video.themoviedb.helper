@@ -46,12 +46,12 @@ def validify_filename(filename):
 
 def makepath(path):
     if xbmcvfs.exists(path):
-        return xbmc.translatePath(path)
+        return xbmcvfs.translatePath(path)
     if xbmcvfs.mkdirs(path):
-        return xbmc.translatePath(path)
+        return xbmcvfs.translatePath(path)
     if _addon.getSettingBool('ignore_folderchecking'):
         kodi_log(u'Ignored xbmcvfs folder check error\n{}'.format(path), 2)
-        return xbmc.translatePath(path)
+        return xbmcvfs.translatePath(path)
 
 
 def md5hash(value):
