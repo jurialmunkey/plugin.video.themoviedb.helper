@@ -126,6 +126,8 @@ class ListItem(object):
             kodi_log(u'Error: {}'.format(exc), 1)
 
     def _context_item_get_ftv_artwork(self):
+        if self.infolabels.get('mediatype') not in ['movie', 'tvshow']:
+            return []
         ftv_id, ftv_type = self.get_ftv_id(), self.get_ftv_type()
         if not ftv_type or not ftv_id:
             return []
@@ -135,7 +137,18 @@ class ListItem(object):
         tmdb_id, tmdb_type = self.get_tmdb_id(), self.get_tmdb_type()
         if not tmdb_type or not tmdb_id:
             return []
-        return [('tmdbhelper.context.refresh', dumps({'tmdb_type': tmdb_type, 'tmdb_id': tmdb_id}))]
+        if self.infolabels.get('mediatype') in ['movie', 'tvshow']:
+            return [('tmdbhelper.context.refresh', dumps({
+                'tmdb_type': tmdb_type, 'tmdb_id': tmdb_id}))]
+        if self.infolabels.get('mediatype') == 'season' and self.infolabels.get('season'):
+            return [('tmdbhelper.context.refresh', dumps({
+                'tmdb_type': tmdb_type, 'tmdb_id': tmdb_id,
+                'season': self.infolabels['season']}))]
+        if self.infolabels.get('mediatype') == 'episode' and self.infolabels.get('season') and self.infolabels.get('episode'):
+            return [('tmdbhelper.context.refresh', dumps({
+                'tmdb_type': tmdb_type, 'tmdb_id': tmdb_id,
+                'season': self.infolabels['season'], 'episode': self.infolabels['episode']}))]
+        return []
 
     def _context_item_related_lists(self):
         tmdb_id, tmdb_type = self.get_tmdb_id(), self.get_tmdb_type()
