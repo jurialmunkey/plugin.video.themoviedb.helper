@@ -1,6 +1,7 @@
 {
     "name"          : "UPnP",
     "plugin"        : "xbmc.core",
+    "icon"          : "{}/resources/icons/other/upnp.png",
     "priority"      : 10000,
     "play_movie"    : [
                         "upnp://",
