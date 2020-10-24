@@ -391,10 +391,10 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         However, is playable is forced for strm so set a dummy file and stop it immediately
         TMDbHelper sets an islocal flag in its strm files so we can determine what called play
         """
-        if kwargs.get('islocal', False):
-            xbmcplugin.setResolvedUrl(self.handle, True, ListItem(
-                path='{}/resources/dummy.mp4'.format(ADDONPATH)).get_listitem())
-            xbmc.executebuiltin('Action(Stop)')
+        # if kwargs.get('islocal', False):
+        xbmcplugin.setResolvedUrl(self.handle, True, ListItem(
+            path='{}/resources/dummy.mp4'.format(ADDONPATH)).get_listitem())
+        xbmc.executebuiltin('Action(Stop)')
 
         if not kwargs.get('tmdb_id'):
             kwargs['tmdb_id'] = self.tmdb_api.get_tmdb_id(**kwargs)

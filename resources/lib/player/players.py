@@ -4,14 +4,13 @@ import xbmc
 import xbmcgui
 import xbmcaddon
 import datetime
-from resources.lib.helpers.rpc import get_jsonrpc, get_directory
+from resources.lib.helpers.rpc import get_jsonrpc, get_directory, KodiLibrary
 from resources.lib.helpers.constants import PLAYERS_URLENCODE, PLAYERS_BASEDIR_BUNDLED, PLAYERS_BASEDIR_USER
 from resources.lib.helpers.window import get_property
 from resources.lib.tmdb.api import TMDb
 from resources.lib.trakt.api import TraktAPI
 from resources.lib.items.listitem import ListItem
-from resources.lib.helpers.plugin import ADDON, PLUGINPATH, ADDONPATH, viewitems
-from resources.lib.helpers.rpc import KodiLibrary
+from resources.lib.helpers.plugin import ADDON, PLUGINPATH, ADDONPATH, viewitems, kodi_log
 from resources.lib.helpers.parser import try_int, try_decode, try_encode
 from resources.lib.helpers.setutils import del_empty_keys
 from resources.lib.helpers.fileutils import get_files_in_folder, read_file, normalise_filesize
@@ -36,6 +35,20 @@ def string_format_map(fmt, d):
         return fmt.format(**{part[1]: d[part[1]] for part in parts})
     else:
         return fmt.format(**d)
+
+
+def add_to_queue(episodes, clear_playlist=False, play_next=False):
+    if not episodes:
+        return
+    playlist = xbmc.PlayList(1)
+    if clear_playlist:
+        playlist.clear()
+    for i in episodes:
+        li = ListItem(**i)
+        li.set_params_reroute()
+        playlist.add(li.get_url(), li.get_listitem())
+    if play_next:
+        xbmc.Player().play(playlist)
 
 
 class KeyboardInputter(Thread):

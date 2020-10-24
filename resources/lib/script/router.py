@@ -18,7 +18,7 @@ from resources.lib.script.sync import SyncItem
 from resources.lib.helpers.decorators import busy_dialog
 from resources.lib.helpers.parser import encode_url
 from resources.lib.window.manager import WindowManager
-from resources.lib.player.players import Players
+from resources.lib.player.players import Players, add_to_queue
 from resources.lib.monitor.images import ImageFunctions
 
 
@@ -30,6 +30,18 @@ def play_external(**kwargs):
     if not kwargs.get('tmdb_id'):
         kwargs['tmdb_id'] = TMDb().get_tmdb_id(**kwargs)
     Players(**kwargs).play()
+
+
+def play_season(**kwargs):
+    with busy_dialog():
+        if not kwargs.get('tmdb_id'):
+            kwargs['tmdb_type'] = 'tv'
+            kwargs['tmdb_id'] = TMDb().get_tmdb_id(**kwargs)
+        if not kwargs['tmdb_id']:
+            return
+        add_to_queue(
+            TMDb().get_episode_list(tmdb_id=kwargs['tmdb_id'], season=kwargs['play_season']),
+            clear_playlist=True, play_next=True)
 
 
 def split_value(split_value, separator=None, **kwargs):
@@ -235,6 +247,8 @@ class Script(object):
             return library_update(**self.params)
         if any(x in WM_PARAMS for x in self.params):
             return WindowManager(**self.params).router()
+        if self.params.get('play_season'):
+            return play_season(**self.params)
         if self.params.get('play'):
             return play_external(**self.params)
         if self.params.get('restart_service'):
