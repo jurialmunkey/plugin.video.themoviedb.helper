@@ -1,7 +1,7 @@
 {
     "name"              : "BiNGE",
     "plugin"            : "slyguy.binge",
-    "priority"          : 500,
+    "priority"          : 100,
     "assert"            : {
                             "play_movie":       ["title", "year"],
                             "play_episode":     ["showname", "season", "episode"],

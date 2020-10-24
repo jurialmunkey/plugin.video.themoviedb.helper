@@ -1,0 +1,527 @@
+import xbmc
+from resources.lib.helpers.plugin import get_mpaa_prefix, get_language, viewitems, ADDON
+from resources.lib.helpers.parser import try_int, try_float
+from resources.lib.helpers.setutils import iter_props, dict_to_list, get_params
+from resources.lib.helpers.timedate import format_date
+from resources.lib.helpers.constants import IMAGEPATH_ORIGINAL, IMAGEPATH_POSTER, TMDB_GENRE_IDS
+from resources.lib.helpers.mapping import UPDATE_BASEKEY, _ItemMapper, get_empty_item
+
+
+def get_imagepath_poster(v):
+    return '{}{}'.format(IMAGEPATH_POSTER, v)
+
+
+def get_imagepath_fanart(v):
+    return '{}{}'.format(IMAGEPATH_ORIGINAL, v)
+
+
+def get_runtime(v, *args, **kwargs):
+    if isinstance(v, list):
+        v = v[0]
+    return try_int(v) * 60
+
+
+def get_credits(v):
+    infolabels = {}
+    infolabels['director'] = [
+        i['name'] for i in v.get('crew', []) if i.get('name') and i.get('job') == 'Director']
+    infolabels['writer'] = [
+        i['name'] for i in v.get('crew', []) if i.get('name') and i.get('department') == 'Writing']
+    return infolabels
+
+
+def get_collection(v):
+    infoproperties = {}
+    infoproperties['set.tmdb_id'] = v.get('id')
+    infoproperties['set.name'] = v.get('name')
+    infoproperties['set.poster'] = get_imagepath_poster(v.get('poster_path'))
+    infoproperties['set.fanart'] = get_imagepath_fanart(v.get('backdrop_path'))
+    return infoproperties
+
+
+def get_collection_properties(v):
+    ratings = []
+    infoproperties = {}
+    year_l, year_h, votes = 9999, 0, 0
+    for p, i in enumerate(v):
+        infoproperties['set.{}.title'.format(p)] = i.get('title', '')
+        infoproperties['set.{}.tmdb_id'.format(p)] = i.get('id', '')
+        infoproperties['set.{}.originaltitle'.format(p)] = i.get('original_title', '')
+        infoproperties['set.{}.plot'.format(p)] = i.get('overview', '')
+        infoproperties['set.{}.premiered'.format(p)] = i.get('release_date', '')
+        infoproperties['set.{}.year'.format(p)] = i.get('release_date', '')[:4]
+        infoproperties['set.{}.rating'.format(p)] = '{:0,.1f}'.format(try_float(i.get('vote_average')))
+        infoproperties['set.{}.votes'.format(p)] = i.get('vote_count', '')
+        infoproperties['set.{}.poster'.format(p)] = get_imagepath_poster(i.get('poster_path', ''))
+        infoproperties['set.{}.fanart'.format(p)] = get_imagepath_fanart(i.get('backdrop_path', ''))
+        year_l = min(try_int(i.get('release_date', '')[:4]), year_l)
+        year_h = max(try_int(i.get('release_date', '')[:4]), year_h)
+        if i.get('vote_average'):
+            ratings.append(i['vote_average'])
+        votes += try_int(i.get('vote_count', 0))
+    if year_l == 9999:
+        year_l = None
+    if year_l:
+        infoproperties['set.year.first'] = year_l
+    if year_h:
+        infoproperties['set.year.last'] = year_h
+    if year_l and year_h:
+        infoproperties['set.years'] = '{0} - {1}'.format(year_l, year_h)
+    if len(ratings):
+        infoproperties['set.rating'] = infoproperties['tmdb_rating'] = '{:0,.1f}'.format(sum(ratings) / len(ratings))
+    if votes:
+        infoproperties['set.votes'] = infoproperties['tmdb_votes'] = '{:0,.0f}'.format(votes)
+    infoproperties['set.numitems'] = p
+    return infoproperties
+
+
+def get_mpaa_rating(v, mpaa_prefix, iso_country, certification=True):
+    for i in v or []:
+        if not i.get('iso_3166_1') or i.get('iso_3166_1') != iso_country:
+            continue
+        if not certification:
+            if i.get('rating'):
+                return u'{}{}'.format(mpaa_prefix, i['rating'])
+            continue
+        for i in sorted(i.get('release_dates', []), key=lambda k: k.get('type')):
+            if i.get('certification'):
+                return u'{}{}'.format(mpaa_prefix, i['certification'])
+
+
+def get_iter_props(v, base_name, *args, **kwargs):
+    infoproperties = {}
+    if kwargs.get('basic_keys'):
+        infoproperties = iter_props(
+            v, base_name, infoproperties, **kwargs['basic_keys'])
+    if kwargs.get('image_keys'):
+        infoproperties = iter_props(
+            v, base_name, infoproperties, func=get_imagepath_poster, **kwargs['image_keys'])
+    return infoproperties
+
+
+def get_trailer(v):
+    if not isinstance(v, dict):
+        return
+    for i in v.get('results') or []:
+        if i.get('type', '') != 'Trailer' or i.get('site', '') != 'YouTube' or not i.get('key'):
+            continue
+        return 'plugin://plugin.video.youtube/play/?video_id={0}'.format(i.get('key'))
+
+
+def _get_genre_by_id(genre_id):
+    for k, v in viewitems(TMDB_GENRE_IDS):
+        if v == try_int(genre_id):
+            return k
+
+
+def get_genres_by_id(v):
+    genre_ids = v or []
+    return [_get_genre_by_id(genre_id) for genre_id in genre_ids if _get_genre_by_id(genre_id)]
+
+
+def get_external_ids(v):
+    unique_ids = {}
+    if v.get('imdb_id'):
+        unique_ids['imdb'] = v['imdb_id']
+    if v.get('tvdb_id'):
+        unique_ids['tvdb'] = v['tvdb_id']
+    if v.get('id'):
+        unique_ids['tmdb'] = v['id']
+    return unique_ids
+
+
+def get_episode_to_air(v, name):
+    i = v or {}
+    infoproperties = {}
+    infoproperties['{}'.format(name)] = format_date(i.get('air_date'), xbmc.getRegion('dateshort'))
+    infoproperties['{}.long'.format(name)] = format_date(i.get('air_date'), xbmc.getRegion('datelong'))
+    infoproperties['{}.day'.format(name)] = format_date(i.get('air_date'), "%A")
+    infoproperties['{}.episode'.format(name)] = i.get('episode_number')
+    infoproperties['{}.name'.format(name)] = i.get('name')
+    infoproperties['{}.tmdb_id'.format(name)] = i.get('id')
+    infoproperties['{}.plot'.format(name)] = i.get('overview')
+    infoproperties['{}.season'.format(name)] = i.get('season_number')
+    infoproperties['{}.rating'.format(name)] = '{:0,.1f}'.format(try_float(i.get('vote_average')))
+    infoproperties['{}.votes'.format(name)] = i.get('vote_count')
+    infoproperties['{}.thumb'.format(name)] = get_imagepath_poster(i.get('still_path'))
+    return infoproperties
+
+
+def get_cast(item):
+    cast_list = []
+    if item.get('credits', {}).get('cast'):
+        cast_list += item['credits']['cast']
+    if item.get('guest_stars'):
+        cast_list += item['guest_stars']
+    if not cast_list:
+        return cast_list
+
+    cast = []
+    cast_item = None
+    for i in sorted(cast_list, key=lambda k: k.get('order', 0)):
+        # Only add previous cast member if not current cast member
+        # Otherwise join the character roles together into the one item
+        if cast_item:
+            if cast_item.get('name') != i.get('name'):
+                cast.append(cast_item)
+                cast_item = None
+            elif i.get('character'):
+                cast_item['role'] = u'{} / {}'.format(cast_item['role'], i['character'])
+        # Only construct new cast member if not the same as previous cast member
+        if not cast_item:
+            cast_item = {
+                'name': i.get('name'),
+                'role': i.get('character'),
+                'order': i.get('order')}
+            if i.get('profile_path'):
+                cast_item['thumbnail'] = get_imagepath_poster(i['profile_path'])
+    # Add left-over cast member after finishing for loop
+    if cast_item:
+        cast.append(cast_item)
+    return cast
+
+
+def set_crew_properties(i, x, prefix):
+    infoproperties = {}
+    p = '{}.{}.'.format(prefix, x)
+    if i.get('name'):
+        infoproperties['{}name'.format(p)] = i['name']
+    if i.get('job'):
+        infoproperties['{}role'.format(p)] = infoproperties['{}job'.format(p)] = i['job']
+    if i.get('character'):
+        infoproperties['{}role'.format(p)] = infoproperties['{}character'.format(p)] = i['character']
+    if i.get('department'):
+        infoproperties['{}department'.format(p)] = i['department']
+    if i.get('profile_path'):
+        infoproperties['{}thumb'.format(p)] = get_imagepath_poster(i['profile_path'])
+    return infoproperties
+
+
+def get_crew_properties(v):
+    infoproperties = {}
+    department_map = {
+        'Directing': {'name': 'director', 'x': 0},
+        'Writing': {'name': 'writer', 'x': 0},
+        'Production': {'name': 'producer', 'x': 0},
+        'Sound': {'name': 'sound_department', 'x': 0},
+        'Art': {'name': 'art_department', 'x': 0},
+        'Camera': {'name': 'photography', 'x': 0},
+        'Editing': {'name': 'editor', 'x': 0}}
+    x = 0
+    for i in v:
+        if not i.get('name'):
+            continue
+        x += 1
+        infoproperties.update(set_crew_properties(i, x, 'Crew'))
+        if i.get('deparment') not in department_map:
+            continue
+        dm = department_map[i['department']]
+        dm['x'] += 1
+        infoproperties.update(set_crew_properties(i, dm['x'], dm['name']))
+    return infoproperties
+
+
+class ItemMapper(_ItemMapper):
+    def __init__(self, language=None, mpaa_prefix=None):
+        self.language = language or get_language()
+        self.mpaa_prefix = mpaa_prefix or get_mpaa_prefix()
+        self.iso_language = language[:2]
+        self.iso_country = language[-2:]
+        """ Mapping dictionary
+        keys:       list of tuples containing parent and child key to add value. [('parent', 'child')]
+                    parent keys: art, unique_ids, infolabels, infoproperties, params
+                    use UPDATE_BASEKEY for child key to update parent with a dict
+        func:       function to call to manipulate values (omit to skip and pass value directly)
+        (kw)args:   list/dict of args/kwargs to pass to func.
+                    func is also always passed v as first argument
+        type:       int, float, str - convert v to type using try_type(v, type)
+        extend:     set True to add to existing list - leave blank to overwrite exiting list
+        subkeys:    list of sub keys to get for v - i.e. v.get(subkeys[0], {}).get(subkeys[1]) etc.
+                    note that getting subkeys sticks for entire loop so do other ops on base first if needed
+
+        use standard_map for direct one-to-one mapping of v onto single property tuple
+        """
+        self.advanced_map = {
+            'poster_path': [{
+                'keys': [('art', 'poster')],
+                'func': get_imagepath_poster
+            }],
+            'profile_path': [{
+                'keys': [('art', 'poster')],
+                'func': get_imagepath_poster
+            }],
+            'file_path': [{
+                'keys': [('art', 'poster')],
+                'func': get_imagepath_fanart
+            }],
+            'still_path': [{
+                'keys': [('art', 'thumb')],
+                'func': get_imagepath_fanart
+            }],
+            'backdrop_path': [{
+                'keys': [('art', 'fanart')],
+                'func': get_imagepath_fanart
+            }],
+            'content_ratings': [{
+                'keys': [('infolabels', 'mpaa')],
+                'subkeys': ['results'],
+                'func': get_mpaa_rating,
+                'args': [self.mpaa_prefix, self.iso_country, False]
+            }],
+            'release_dates': [{
+                'keys': [('infolabels', 'mpaa')],
+                'subkeys': ['results'],
+                'func': get_mpaa_rating,
+                'args': [self.mpaa_prefix, self.iso_country, True]
+            }],
+            'release_date': [{
+                'keys': [('infolabels', 'premiered')]}, {
+                'keys': [('infolabels', 'year')],
+                'func': lambda v: v[0:4]
+            }],
+            'first_air_date': [{
+                'keys': [('infolabels', 'premiered')]}, {
+                'keys': [('infolabels', 'year')],
+                'func': lambda v: v[0:4]
+            }],
+            'air_date': [{
+                'keys': [('infolabels', 'premiered')]}, {
+                'keys': [('infolabels', 'year')],
+                'func': lambda v: v[0:4]
+            }],
+            'genre_ids': [{
+                'keys': [('infolabels', 'genre')],
+                'func': get_genres_by_id
+            }],
+            'videos': [{
+                'keys': [('infolabels', 'trailer')],
+                'func': get_trailer
+            }],
+            'popularity': [{
+                'keys': [('infoproperties', 'popularity')],
+                'type': str
+            }],
+            'vote_count': [{
+                'keys': [('infolabels', 'votes'), ('infoproperties', 'tmdb_votes')],
+                'type': float,
+                'func': lambda v: '{:0,.0f}'.format(v)
+            }],
+            'vote_average': [{
+                'keys': [('infolabels', 'rating'), ('infoproperties', 'tmdb_rating')],
+                'type': float,
+                'func': lambda v: '{:.1f}'.format(v)
+            }],
+            'budget': [{
+                'keys': [('infoproperties', 'budget')],
+                'type': float,
+                'func': lambda v: '${:0,.0f}'.format(v)
+            }],
+            'revenue': [{
+                'keys': [('infoproperties', 'revenue')],
+                'type': float,
+                'func': lambda v: '${:0,.0f}'.format(v)
+            }],
+            'spoken_languages': [{
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'func': iter_props,
+                'args': ['language'],
+                'kwargs': {'name': 'name', 'iso': 'iso_639_1'}
+            }],
+            'keywords': [{
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'subkeys': ['keywords'],
+                'func': iter_props,
+                'args': ['keyword'],
+                'kwargs': {'name': 'name', 'tmdb_id': 'id'}
+            }],
+            'reviews': [{
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'subkeys': ['results'],
+                'func': iter_props,
+                'args': ['review'],
+                'kwargs': {'content': 'content', 'author': 'author', 'tmdb_id': 'id'}
+            }],
+            'created_by': [{
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'func': get_iter_props,
+                'args': ['creator'],
+                'kwargs': {
+                    'basic_keys': {'name': 'name', 'tmdb_id': 'id'},
+                    'image_keys': {'thumb': 'profile_path'}}}, {
+                # ---
+                'keys': [('infoproperties', 'creator')],
+                'func': lambda v: ' / '.join([x['name'] for x in v or [] if x.get('name')])
+            }],
+            'also_known_as': [{
+                'keys': [('infoproperties', 'aliases')],
+                'func': lambda v: ' / '.join([x for x in v or [] if x])
+            }],
+            'known_for': [{
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'func': iter_props,
+                'args': ['known_for'],
+                'kwargs': {'title': 'title', 'tmdb_id': 'id', 'rating': 'vote_average', 'tmdb_type': 'media_type'}}, {
+                # ---
+                'keys': [('infoproperties', 'known_for')],
+                'func': lambda v: ' / '.join([x['title'] for x in v or [] if x.get('title')])
+            }],
+            'external_ids': [{
+                'keys': [('unique_ids', UPDATE_BASEKEY)],
+                'func': get_external_ids
+            }],
+            'credits': [{
+                'keys': [('infolabels', UPDATE_BASEKEY)],
+                'func': get_credits}, {
+                # ---
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'subkeys': ['crew'],
+                'func': get_crew_properties
+            }],
+            'parts': [{
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'func': get_collection_properties
+            }],
+            'movie_credits': [{
+                'keys': [('infoproperties', 'numitems.tmdb.movies.cast')],
+                'func': lambda v: len(v.get('cast') or [])}, {
+                # ---
+                'keys': [('infoproperties', 'numitems.tmdb.movies.crew')],
+                'func': lambda v: len(v.get('crew') or [])}, {
+                # ---
+                'keys': [('infoproperties', 'numitems.tmdb.movies.total')],
+                'func': lambda v: len(v.get('cast') or []) + len(v.get('crew') or [])
+
+            }],
+            'tv_credits': [{
+                'keys': [('infoproperties', 'numitems.tmdb.tvshows.cast')],
+                'func': lambda v: len(v.get('cast') or [])}, {
+                # ---
+                'keys': [('infoproperties', 'numitems.tmdb.tvshows.crew')],
+                'func': lambda v: len(v.get('crew') or [])}, {
+                # ---
+                'keys': [('infoproperties', 'numitems.tmdb.tvshows.total')],
+                'func': lambda v: len(v.get('cast') or []) + len(v.get('crew') or [])
+
+            }],
+            'belongs_to_collection': [{
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'func': get_collection}, {
+                # ---
+                'keys': [('infolabels', 'set')],
+                'subkeys': ['name']
+            }],
+            'episode_run_time': [{
+                'keys': [('infolabels', 'duration')],
+                'func': get_runtime
+            }],
+            'genres': [{
+                'keys': [('infolabels', 'genre')],
+                'func': dict_to_list,
+                'args': ['name']}, {
+                # ---
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'func': iter_props,
+                'args': ['genre'],
+                'kwargs': {'name': 'name', 'tmdb_id': 'id'}
+            }],
+            'production_countries': [{
+                'keys': [('infolabels', 'country')],
+                'extend': True,
+                'func': dict_to_list,
+                'args': ['name']}, {
+                # ---
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'func': iter_props,
+                'args': ['country'],
+                'kwargs': {'name': 'name', 'tmdb_id': 'id'}
+            }],
+            'networks': [{
+                'keys': [('infolabels', 'studio')],
+                'extend': True,
+                'func': dict_to_list,
+                'args': ['name']}, {
+                # ---
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'func': get_iter_props,
+                'args': ['studio'],
+                'kwargs': {
+                    'basic_keys': {'name': 'name', 'tmdb_id': 'id'},
+                    'image_keys': {'icon': 'logo_path'}}
+            }],
+            'production_companies': [{
+                'keys': [('infolabels', 'studio')],
+                'extend': True,
+                'func': dict_to_list,
+                'args': ['name']}, {
+                # ---
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'func': get_iter_props,
+                'args': ['studio'],
+                'kwargs': {
+                    'basic_keys': {'name': 'name', 'tmdb_id': 'id'},
+                    'image_keys': {'icon': 'logo_path'}}
+            }],
+            'last_episode_to_air': [{
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'func': get_episode_to_air,
+                'args': ['last_aired']
+            }],
+            'next_episode_to_air': [{
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'func': get_episode_to_air,
+                'args': ['next_aired']
+            }],
+            'imdb_id': [{
+                'keys': [('infolabels', 'imdbnumber'), ('unique_ids', 'imdb')]
+            }],
+            'character': [{
+                'keys': [('infoproperties', 'role'), ('infoproperties', 'character'), ('label2', None)]
+            }],
+            'job': [{
+                'keys': [('infoproperties', 'role'), ('infoproperties', 'job'), ('label2', None)]
+            }],
+            'biography': [{
+                'keys': [('infoproperties', 'biography'), ('infolabels', 'plot')]
+            }],
+            'gender': [{
+                'keys': [('infoproperties', 'gender')],
+                'func': lambda v, d: d.get(v),
+                'args': [{
+                    1: ADDON.getLocalizedString(32071),
+                    2: ADDON.getLocalizedString(32070)}]
+            }]
+        }
+        self.standard_map = {
+            'overview': ('infolabels', 'plot'),
+            'content': ('infolabels', 'plot'),
+            'tagline': ('infolabels', 'tagline'),
+            'id': ('unique_ids', 'tmdb'),
+            'original_title': ('infolabels', 'originaltitle'),
+            'original_name': ('infolabels', 'originaltitle'),
+            'title': ('infolabels', 'title'),
+            'name': ('infolabels', 'title'),
+            'author': ('infolabels', 'title'),
+            'origin_country': ('infolabels', 'country'),
+            'status': ('infolabels', 'status'),
+            'season_number': ('infolabels', 'season'),
+            'episode_number': ('infolabels', 'episode'),
+            'season_count': ('infolabels', 'season'),
+            'episode_count': ('infolabels', 'episode'),
+            'department': ('infoproperties', 'department'),
+            'place_of_birth': ('infoproperties', 'born'),
+            'birthday': ('infoproperties', 'birthday'),
+            'deathday': ('infoproperties', 'deathday'),
+            'width': ('infoproperties', 'width'),
+            'height': ('infoproperties', 'height'),
+            'aspect_ratio': ('infoproperties', 'aspect_ratio')
+        }
+
+    def get_info(self, info_item, tmdb_type, base_item=None, **kwargs):
+        item = get_empty_item()
+        item = self.map_item(item, info_item)
+        item = self.add_base(item, base_item, tmdb_type)
+        item = self.finalise(item, tmdb_type)
+        item['cast'] = base_item['cast'] if base_item else []
+        item['cast'] += get_cast(info_item)
+        item['params'] = get_params(info_item, tmdb_type, params=item.get('params', {}), **kwargs)
+        return item
