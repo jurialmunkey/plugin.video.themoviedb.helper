@@ -197,7 +197,7 @@ class TMDb(RequestAPI):
             upnext_item = self.mapper.get_info({
                 'title': ADDON.getLocalizedString(32043)}, 'season', base_item, tmdb_id=tmdb_id, definition={
                     'info': 'trakt_upnext', 'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}'})
-            upnext_item['art']['thumb'] = upnext_item['art']['poster'] = '{}/resources/icons/trakt/upnext.png'.format(ADDONPATH)
+            upnext_item['art']['thumb'] = upnext_item['art']['poster'] = '{}/resources/icons/trakt/up-next.png'.format(ADDONPATH)
             items_end.append(upnext_item)
         return items + items_end
 
