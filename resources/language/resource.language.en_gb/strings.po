@@ -1624,6 +1624,11 @@ msgctxt "#32321"
 msgid "liked"
 msgstr ""
 
+#: /addon.xml
+msgctxt "#32322"
+msgid "Select player"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
