@@ -586,11 +586,9 @@ def get_basedir_details(tmdb_type, tmdb_id, season=None, episode=None, detailed_
 
     basedir_items = []
     if tmdb_type == 'movie':
-        base_item['params']['info'] = 'play'
         base_item['infolabels']['mediatype'] = 'movie'
         basedir_items = _build_basedir('movie', _get_basedir_details())
     elif tmdb_type == 'tv' and season is not None and episode is not None:
-        base_item['params']['info'] = 'play'
         base_item['params']['season'] = season
         base_item['params']['episode'] = episode
         base_item['infolabels']['mediatype'] = 'episode'
