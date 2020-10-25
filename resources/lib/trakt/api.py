@@ -536,6 +536,8 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
     @use_simple_cache(cache_days=cache.CACHE_SHORT)
     def get_ratings(self, trakt_type, imdb_id=None, trakt_id=None, slug_id=None, season=None, episode=None):
         slug = slug_id or trakt_id or imdb_id
+        if not slug:
+            return
         if episode and season:
             url = 'shows/{}/seasons/{}/episodes/{}/ratings'.format(slug, season, episode)
         elif season:

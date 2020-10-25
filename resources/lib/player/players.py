@@ -3,6 +3,7 @@ import sys
 import xbmc
 import xbmcgui
 import xbmcaddon
+import xbmcplugin
 import datetime
 from resources.lib.helpers.rpc import get_jsonrpc, get_directory, KodiLibrary
 from resources.lib.helpers.constants import PLAYERS_URLENCODE, PLAYERS_BASEDIR_BUNDLED, PLAYERS_BASEDIR_USER
@@ -10,7 +11,7 @@ from resources.lib.helpers.window import get_property
 from resources.lib.tmdb.api import TMDb
 from resources.lib.trakt.api import TraktAPI
 from resources.lib.items.listitem import ListItem
-from resources.lib.helpers.plugin import ADDON, PLUGINPATH, ADDONPATH, viewitems, kodi_log
+from resources.lib.helpers.plugin import ADDON, PLUGINPATH, ADDONPATH, viewitems, format_folderpath, kodi_log
 from resources.lib.helpers.parser import try_int, try_decode, try_encode
 from resources.lib.helpers.setutils import del_empty_keys
 from resources.lib.helpers.fileutils import get_files_in_folder, read_file, normalise_filesize
@@ -49,6 +50,21 @@ def add_to_queue(episodes, clear_playlist=False, play_next=False):
         playlist.add(li.get_url(), li.get_listitem())
     if play_next:
         xbmc.Player().play(playlist)
+
+
+def resolve_to_dummy(handle=None):
+    """
+    Kodi does 5x retries to resolve url if isPlayable property is set
+    Since our external players might not return resolvable files we don't use this method
+    Instead we pass url to xbmc.Player() or PlayMedia() or ActivateWindow() depending on context
+    However, is playable is forced for strm so set a dummy file and stop it immediately
+    TMDbHelper sets an islocal flag in its strm files so we can determine what called play
+    """
+    if handle is None:
+        return
+    xbmcplugin.setResolvedUrl(handle, True, ListItem(
+        path='{}/resources/dummy.mp4'.format(ADDONPATH)).get_listitem())
+    xbmc.executebuiltin('Action(Stop)')
 
 
 class KeyboardInputter(Thread):
@@ -525,7 +541,7 @@ class Players(object):
             xbmc.executebuiltin(reset_focus)
             xbmc.Monitor().waitForAbort(0.5)
 
-    def play(self, folder_path=None, reset_focus=None):
+    def play(self, folder_path=None, reset_focus=None, handle=None):
         # Get some info about current container for container update hack
         if not folder_path:
             folder_path = xbmc.getInfoLabel("Container.FolderPath")
@@ -534,7 +550,17 @@ class Players(object):
             current_pos = xbmc.getInfoLabel("Container({}).CurrentItem".format(containerid))
             reset_focus = 'SetFocus({},{},absolute)'.format(containerid, try_int(current_pos) - 1)
 
-        # Get the resoved path
+        """ setResolvedUrl to dummy file and stop its playback immediately if given a handle
+        setResolvedUrl not possible because we don't know if the external plugin endpoint will resolve:
+            (1) no params available (afaik) to check isPlayable flag via JSON-RPC Files.GetDirectory method;
+            (2) unable to confirm if external plugin did successfully resolve until after calling callback;
+            (3) some player methods need to open folders or run commands rather than resolve to playable items;
+            (4) can only determine player method used after plugin callback because selected via user input.
+        """
+        if handle:
+            resolve_to_dummy(handle)
+
+        # Get the resolved path
         listitem = self.get_resolved_path()
         path = listitem.getPath()
         is_folder = True if listitem.getProperty('is_folder') == 'true' else False
@@ -550,24 +576,27 @@ class Players(object):
         if not path or path == PLUGINPATH:
             return
 
-        # Strm files need to play with PlayMedia() to resolve properly
-        # Send to xbmc.Player() over PlayMedia() for urls so we can merge our listitem details
-        # Using setResolvedUrl directly isn't possible because external addon might need to resolve itself first
-        # Also some addons don't resolve using isPlayable and run a command instead or need to open folder
         action = None
-        if not is_folder and path.endswith('.strm'):
-            action = u'PlayMedia(\"{0}\")'.format(path)
-        elif is_folder and xbmc.getCondVisibility("Window.IsMedia"):
-            action = u'Container.Update({0})'.format(path)
-        elif is_folder:
-            action = u'ActivateWindow(videos,{0},return)'.format(path)
-        # elif not is_folder:  # Uncomment to send url to PlayMedia rather than xbmc.Player()
-        #     action = u'PlayMedia(\"{0}\")'.format(path)
 
+        # Configure folder path command to use Container.Update or ActivateWindow depending on context
+        if is_folder:
+            action = format_folderpath(path)
+
+        # If the file we found is a .strm we need to PlayMedia() so that it can resolve separately
+        elif path.endswith('.strm'):
+            action = u'PlayMedia(\"{}\")'.format(path)
+
+        # Set our playerstring for player monitor to update kodi watched status
         if not is_folder and self.playerstring:
             get_property('PlayerInfoString', set_property=self.playerstring)
 
+        # Kodi launches busy dialog on home screen that needs to be told to close
+        # Otherwise the busy dialog will prevent window activation for folder path
+        xbmc.executebuiltin('Dialog.Close(busydialog)')
+
+        # Call as builtin for opening folder or playing strm via PlayMedia()
         if action:
-            xbmc.executebuiltin(try_encode(try_decode(action)))
-        elif not is_folder:
-            xbmc.Player().play(path, listitem)
+            return xbmc.executebuiltin(try_encode(try_decode(action)))
+
+        # Send playable urls to xbmc.Player() not PlayMedia() so we can play as detailed listitem.
+        xbmc.Player().play(path, listitem)
