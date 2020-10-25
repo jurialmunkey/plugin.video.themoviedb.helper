@@ -12,7 +12,8 @@ def get_empty_item():
         'infolabels': {},
         'infoproperties': {},
         'unique_ids': {},
-        'params': {}}
+        'params': {},
+        'context_menu': []}
 
 
 def set_show(item, base_item=None):

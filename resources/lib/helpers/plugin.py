@@ -22,6 +22,14 @@ _addonlogname = '[plugin.video.themoviedb.helper]\n'
 _debuglogging = ADDON.getSettingBool('debug_logging')
 
 
+def format_folderpath(path, content='videos', affix='return'):
+    if not path:
+        return
+    if xbmc.getCondVisibility("Window.IsMedia"):
+        return u'Container.Update({})'.format(path)
+    return u'ActivateWindow({},{},{})'.format(content, path, affix)
+
+
 def reconfigure_legacy_params(**kwargs):
     if 'type' in kwargs:
         kwargs['tmdb_type'] = kwargs.pop('type')

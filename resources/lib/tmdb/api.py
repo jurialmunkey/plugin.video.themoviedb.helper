@@ -1,3 +1,4 @@
+import xbmc
 import xbmcgui
 import datetime
 import resources.lib.helpers.cache as cache
@@ -190,6 +191,12 @@ class TMDb(RequestAPI):
         items, items_end = [], []
         for i in request.get('seasons', []):
             item = self.mapper.get_info(i, 'season', base_item, definition=TMDB_PARAMS_SEASONS, tmdb_id=tmdb_id)
+            # TODO: Fix play all
+            # Might be issue with resolving to dummy file that resets playlist to 1
+            # item['context_menu'] += [(
+            #     xbmc.getLocalizedString(22083),
+            #     'RunScript(plugin.video.themoviedb.helper,play_season={},tmdb_id={})'.format(
+            #         item['infolabels']['season'], tmdb_id))]
             items.append(item) if i.get('season_number') != 0 else items_end.append(item)
         if hide_specials:
             return items

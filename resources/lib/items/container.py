@@ -384,24 +384,10 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             xbmc.executebuiltin('Container.Refresh')
 
     def play_external(self, **kwargs):
-        """
-        Kodi does 5x retries to resolve url if isPlayable property is set
-        Since our external players might not return resolvable files we don't use this method
-        Instead we pass url to xbmc.Player() or PlayMedia() or ActivateWindow() depending on context
-        However, is playable is forced for strm so set a dummy file and stop it immediately
-        TMDbHelper sets an islocal flag in its strm files so we can determine what called play
-        """
-        if kwargs.get('islocal', False):
-            xbmcplugin.setResolvedUrl(self.handle, True, ListItem(
-                path='{}/resources/dummy.mp4'.format(ADDONPATH)).get_listitem())
-            xbmc.executebuiltin('Action(Stop)')
-
         if not kwargs.get('tmdb_id'):
             kwargs['tmdb_id'] = self.tmdb_api.get_tmdb_id(**kwargs)
-
         kodi_log(['Attempting to play:\n', kwargs], 1)
-
-        Players(**kwargs).play()
+        Players(**kwargs).play(handle=self.handle if kwargs.get('islocal') else None)
 
     def context_related(self, **kwargs):
         if not kwargs.get('tmdb_id'):
