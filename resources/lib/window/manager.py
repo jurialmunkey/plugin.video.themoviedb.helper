@@ -12,6 +12,7 @@ PREFIX_CURRENT = 'Path.Current'
 PREFIX_ADDPATH = 'Path.To.Add'
 PREFIX_POSITION = 'Position'
 PREFIX_INSTANCE = 'Instance'
+PREFIX_COMMAND = 'Command'
 ID_VIDEOINFO = 12003
 CONTAINER_ID = 9999
 
@@ -37,19 +38,25 @@ class _EventLoop():
             return
 
         # Clear our properties
-        window.get_property(PREFIX_INSTANCE, clear_property=True)
         self.reset_properties()
 
-        # Close video info dialog and base window
+        # Close video info dialog
         if window.is_visible(ID_VIDEOINFO):
             window.close(ID_VIDEOINFO)
+            window.wait_until_active(ID_VIDEOINFO, invert=True, poll=0.1)
+
+        # Close base window
         if window.is_visible(self.window_id):
             xbmc.executebuiltin('Action(Back)')
+            window.wait_until_active(self.window_id, invert=True, poll=0.1)
 
         # If we don't have the return param then try to re-open original info
         if self.return_info and not self.params.get('return'):
-            if window.wait_until_active(self.window_id, invert=True, poll=0.1):
+            if window.wait_until_active(self.window_id, invert=True, poll=0.1, timeout=1):
                 xbmc.executebuiltin('Action(Info)')
+
+        # Clear our instance property because we left
+        window.get_property(PREFIX_INSTANCE, clear_property=True)
 
     def _on_add(self):
         self.position += 1
@@ -125,6 +132,10 @@ class _EventLoop():
             if window.get_property(PREFIX_ADDPATH):
                 self._on_add()
 
+            # Exit called so let's exit
+            elif window.get_property(PREFIX_COMMAND) == 'exit':
+                self._call_exit()
+
             # Path changed so let's update
             elif self.current_path != self.added_path:
                 self._on_change()
@@ -148,8 +159,10 @@ class _EventLoop():
 
 class WindowManager(_EventLoop):
     def __init__(self, **kwargs):
-        self.window_id = try_int(kwargs['call_auto']) if kwargs.get('call_auto') else None
-        self.kodi_id = self.window_id + 10000 if self.window_id < 10000 else self.window_id
+        self.window_id = None
+        if kwargs.get('call_auto'):
+            self.window_id = try_int(kwargs['call_auto'])
+            self.kodi_id = self.window_id + 10000 if self.window_id < 10000 else self.window_id
         self.position = 0
         self.added_path = None
         self.current_path = None
@@ -163,6 +176,7 @@ class WindowManager(_EventLoop):
         self.position = 0
         self.added_path = None
         self.current_path = None
+        window.get_property(PREFIX_COMMAND, clear_property=True)
         window.get_property(PREFIX_CURRENT, clear_property=True)
         window.get_property(PREFIX_POSITION, clear_property=True)
         window.get_property('{}0'.format(PREFIX_PATH), clear_property=True)
@@ -209,16 +223,16 @@ class WindowManager(_EventLoop):
         url = url.format(tmdb_type, tmdb_id)
         return self.add_path(url)
 
-    def reset_path(self):
+    def close_dialog(self):
+        window.wait_for_property(PREFIX_COMMAND, 'exit', True)
+        window.wait_for_property(PREFIX_INSTANCE, None)
         self._call_exit()
         self._on_exit()
-
-    def close_dialog(self):
-        self.reset_path()
-        if self.params.get('playmedia'):
-            xbmc.executebuiltin('PlayMedia(\"{}\")'.format(self.params['playmedia']))
+        self.call_window()
 
     def call_window(self):
+        if self.params.get('playmedia'):
+            return xbmc.executebuiltin('PlayMedia(\"{}\")'.format(self.params['playmedia']))
         if self.params.get('call_id'):
             return xbmc.executebuiltin('ActivateWindow({})'.format(self.params['call_id']))
         if self.params.get('call_path'):
@@ -231,10 +245,6 @@ class WindowManager(_EventLoop):
             return self.add_path(self.params['add_path'])
         if self.params.get('add_query') and self.params.get('tmdb_type'):
             return self.add_query(self.params['add_query'], self.params['tmdb_type'])
-
-        if self.params.get('close_dialog'):
-            self.close_dialog()
-        if self.params.get('reset_path'):
-            self.reset_path()
-
+        if self.params.get('close_dialog') or self.params.get('reset_path'):
+            return self.close_dialog()
         self.call_window()
