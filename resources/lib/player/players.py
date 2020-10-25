@@ -97,6 +97,7 @@ class Players(object):
             self.dialog_players = self._get_players_for_dialog(tmdb_type)
             self.playerstring = self._get_playerstring(tmdb_type, tmdb_id, season, episode)
             self.default_player = ADDON.getSettingString('default_player_movies') if tmdb_type == 'movie' else ADDON.getSettingString('default_player_episodes')
+            self.ignore_default = kwargs.get('ignore_default') or False
 
     def _get_playerstring(self, tmdb_type, tmdb_id, season=None, episode=None):
         if not self.details:
@@ -481,6 +482,8 @@ class Players(object):
 
     def get_default_player(self):
         """ Returns default player """
+        if self.ignore_default:
+            return
         # Check local first if we have the setting
         if ADDON.getSettingBool('default_player_local') and self.dialog_players[0].get('is_local'):
             player = self.dialog_players[0]
