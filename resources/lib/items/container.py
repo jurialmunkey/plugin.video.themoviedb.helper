@@ -9,7 +9,7 @@ from resources.lib.items.listitem import ListItem
 from resources.lib.tmdb.api import TMDb
 from resources.lib.trakt.api import TraktAPI
 from resources.lib.fanarttv.api import FanartTV
-from resources.lib.player.players import Players
+from resources.lib.player.players import Players, resolve_to_dummy
 from resources.lib.helpers.plugin import ADDON, kodi_log, viewitems
 from resources.lib.items.basedir import BaseDirLists
 from resources.lib.tmdb.lists import TMDbLists
@@ -384,10 +384,28 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             xbmc.executebuiltin('Container.Refresh')
 
     def play_external(self, **kwargs):
+        """ setResolvedUrl to dummy file and stop its playback immediately if given a handle
+        setResolvedUrl not possible because we don't know if the external plugin endpoint will resolve:
+            (1) no params available (afaik) to check isPlayable flag via JSON-RPC Files.GetDirectory method;
+            (2) unable to confirm if external plugin did successfully resolve until after calling callback;
+            (3) some player methods need to open folders or return commands rather than resolve to playable items;
+            (4) can only determine player method used after plugin callback because selected via user input.
+        """
+        if kwargs.get('islocal'):
+            resolve_to_dummy(self.handle)
+
+        """ Old Method calls Players directly but causes crashes in some skins
         if not kwargs.get('tmdb_id'):
             kwargs['tmdb_id'] = self.tmdb_api.get_tmdb_id(**kwargs)
+        Players(**kwargs).play()
+        """
+
         kodi_log(['Attempting to play:\n', kwargs], 1)
-        Players(**kwargs).play(handle=self.handle if kwargs.get('islocal') else None)
+        kwargs['play'] = kwargs.pop('tmdb_type', None)
+        path = 'plugin.video.themoviedb.helper'
+        for k, v in viewitems(kwargs):
+            path = u'{},{}={}'.format(path, k, v) if v else path
+        xbmc.executebuiltin(u'RunScript({})'.format(path))
 
     def context_related(self, **kwargs):
         if not kwargs.get('tmdb_id'):
