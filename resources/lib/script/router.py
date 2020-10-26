@@ -16,7 +16,7 @@ from resources.lib.helpers.plugin import ADDON, reconfigure_legacy_params, viewi
 from resources.lib.helpers.rpc import get_jsonrpc
 from resources.lib.script.sync import SyncItem
 from resources.lib.helpers.decorators import busy_dialog
-from resources.lib.helpers.parser import encode_url
+from resources.lib.helpers.parser import encode_url, try_decode
 from resources.lib.window.manager import WindowManager
 from resources.lib.player.players import Players, add_to_queue
 from resources.lib.monitor.images import ImageFunctions
@@ -199,7 +199,7 @@ class Script(object):
             elif '=' in arg:
                 arg_split = arg.split('=', 1)
                 if arg_split[0] and arg_split[1]:
-                    key, value = arg_split
+                    key, value = try_decode(arg_split[0]), try_decode(arg_split[1])
                     value = value.strip('\'').strip('\"')
                     params.setdefault(key, value)
             else:
