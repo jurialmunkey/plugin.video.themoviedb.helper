@@ -9,7 +9,7 @@ from resources.lib.items.listitem import ListItem
 from resources.lib.tmdb.api import TMDb
 from resources.lib.trakt.api import TraktAPI
 from resources.lib.fanarttv.api import FanartTV
-from resources.lib.player.players import Players, resolve_to_dummy
+from resources.lib.player.players import resolve_to_dummy
 from resources.lib.helpers.plugin import ADDON, kodi_log, viewitems
 from resources.lib.items.basedir import BaseDirLists
 from resources.lib.tmdb.lists import TMDbLists

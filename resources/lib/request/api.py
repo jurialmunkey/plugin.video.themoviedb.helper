@@ -108,12 +108,13 @@ class RequestAPI(object):
             # Don't write 400 Bad Request error to log
             # 401 == OAuth / API key required
             elif try_int(response.status_code) > 400:
+                headers.pop('Authorization', None)
                 kodi_log([
                     u'HTTP Error Code: {}'.format(response.status_code),
-                    u'\nRequest: {}'.format(request),
-                    u'\nPostdata: {}'.format(postdata),
-                    u'\nHeaders: {}'.format(headers),
-                    u'\nResponse: {}'.format(response)], 1)
+                    u'\nRequest: {}'.format(request.replace(self.req_api_key, '') if request else None),
+                    u'\nPostdata: {}'.format(postdata) if postdata else '',
+                    u'\nHeaders: {}'.format(headers) if headers else '',
+                    u'\nResponse: {}'.format(response) if response else ''], 1)
             return
 
         # Return our response
