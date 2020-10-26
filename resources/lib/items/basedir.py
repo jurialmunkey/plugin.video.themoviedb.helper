@@ -10,7 +10,8 @@ def _build_basedir(item_type=None, basedir=None):
     items = []
     space = '' if item_type else ' '  # If only one type spaces are not needed for label because we dont add type name
     for i in basedir:
-        for i_type in i.get('types', []):
+        sorting = i.pop('sorting', False)
+        for i_type in i.pop('types', []):
             if item_type and item_type != i_type:
                 continue
             plural = '' if item_type else convert_type(i_type, TYPE_PLURAL)  # Dont add type name to label if only one type
@@ -18,9 +19,8 @@ def _build_basedir(item_type=None, basedir=None):
             item['label'] = i.get('label', '').format(space=space, item_type=plural)
             item['params'] = i.get('params', {}).copy()
             item['params']['tmdb_type'] = i_type
-            if i.pop('sorting', False):
+            if sorting:
                 item.setdefault('infoproperties', {})['tmdbhelper.context.sorting'] = dumps(item['params'])
-            item.pop('types', None)
             items.append(item)
     return items
 
@@ -583,6 +583,7 @@ def get_basedir_details(tmdb_type, tmdb_id, season=None, episode=None, detailed_
     base_item['path'] = PLUGINPATH
     base_item['params']['tmdb_id'] = tmdb_id
     base_item['params']['tmdb_type'] = tmdb_type
+    base_item['params']['info'] = 'details'
 
     basedir_items = []
     if tmdb_type == 'movie':
@@ -603,11 +604,8 @@ def get_basedir_details(tmdb_type, tmdb_id, season=None, episode=None, detailed_
         base_item['infolabels']['mediatype'] = 'tvshow'
         basedir_items = _build_basedir('tv', _get_basedir_details())
     elif tmdb_type == 'person':
-        base_item['params']['info'] = 'details'
         base_item['infolabels']['mediatype'] = 'video'
         basedir_items = _build_basedir('person', _get_basedir_details())
-    else:
-        base_item['params']['info'] = 'details'
 
     items = [merge_two_items(base_item, i) for i in basedir_items if i]
 
