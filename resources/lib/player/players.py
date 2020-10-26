@@ -544,7 +544,7 @@ class Players(object):
             xbmc.executebuiltin(reset_focus)
             xbmc.Monitor().waitForAbort(0.5)
 
-    def play(self, folder_path=None, reset_focus=None, handle=None):
+    def play(self, folder_path=None, reset_focus=None):
         # Get some info about current container for container update hack
         if not folder_path:
             folder_path = xbmc.getInfoLabel("Container.FolderPath")
@@ -552,16 +552,6 @@ class Players(object):
             containerid = xbmc.getInfoLabel("System.CurrentControlID")
             current_pos = xbmc.getInfoLabel("Container({}).CurrentItem".format(containerid))
             reset_focus = 'SetFocus({},{},absolute)'.format(containerid, try_int(current_pos) - 1)
-
-        """ setResolvedUrl to dummy file and stop its playback immediately if given a handle
-        setResolvedUrl not possible because we don't know if the external plugin endpoint will resolve:
-            (1) no params available (afaik) to check isPlayable flag via JSON-RPC Files.GetDirectory method;
-            (2) unable to confirm if external plugin did successfully resolve until after calling callback;
-            (3) some player methods need to open folders or run commands rather than resolve to playable items;
-            (4) can only determine player method used after plugin callback because selected via user input.
-        """
-        if handle:
-            resolve_to_dummy(handle)
 
         # Get the resolved path
         listitem = self.get_resolved_path()
@@ -584,7 +574,6 @@ class Players(object):
         # Configure folder path command to use Container.Update or ActivateWindow depending on context
         if is_folder:
             action = format_folderpath(path)
-
         # If the file we found is a .strm we need to PlayMedia() so that it can resolve separately
         elif path.endswith('.strm'):
             action = u'PlayMedia(\"{}\")'.format(path)
@@ -599,7 +588,10 @@ class Players(object):
 
         # Call as builtin for opening folder or playing strm via PlayMedia()
         if action:
-            return xbmc.executebuiltin(try_encode(try_decode(action)))
+            xbmc.executebuiltin(try_encode(try_decode(action)))
+            kodi_log(['Finished executing player\n', action], 1)
+            return
 
         # Send playable urls to xbmc.Player() not PlayMedia() so we can play as detailed listitem.
         xbmc.Player().play(path, listitem)
+        kodi_log(['Finished executing Player().Play\n', path], 1)
