@@ -221,7 +221,6 @@ class _TraktProgress():
         user = 'my' if user else 'all'
         return self.get_response_json('calendars', user, trakt_type, start_date, days, extended='full')
 
-    @is_authorized
     @use_simple_cache(cache_days=cache.CACHE_SHORT)
     def get_calendar_episodes(self, startdate=0, days=1, user=True):
         # Broaden date range in case utc conversion bumps into different day
