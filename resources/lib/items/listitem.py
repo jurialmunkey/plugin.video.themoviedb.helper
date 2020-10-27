@@ -154,6 +154,17 @@ class ListItem(object):
             params['episode'] = self.infolabels.get('episode')
         return [('tmdbhelper.context.related', dumps(params))]
 
+    def _context_item_add_to_library(self):
+        tmdb_id, tmdb_type = self.get_tmdb_id(), self.get_tmdb_type()
+        if not tmdb_type or not tmdb_id or tmdb_type not in ['movie', 'tv']:
+            return []
+        params = {'tmdb_type': tmdb_type, 'tmdb_id': tmdb_id, 'imdb_id': self.unique_ids.get('imdb')}
+        if tmdb_type == 'movie':
+            params['folder'] = u'{} ({})'.format(self.infolabels.get('title', ''), self.infolabels.get('year', ''))
+        elif tmdb_type == 'tv':
+            params['folder'] = u'{}'.format(self.infolabels.get('title', ''))
+        return [('tmdbhelper.context.addlibrary', dumps(params))]
+
     def _context_item_trakt_sync(self):
         tmdb_id, trakt_type = self.get_tmdb_id(), self.get_trakt_type()
         if not trakt_type or not tmdb_id:
@@ -172,6 +183,7 @@ class ListItem(object):
         context_items += self._context_item_get_ftv_artwork()
         context_items += self._context_item_refresh_details()
         context_items += self._context_item_trakt_sync()
+        context_items += self._context_item_add_to_library()
         for k, v in context_items:
             self.infoproperties[k] = v
 

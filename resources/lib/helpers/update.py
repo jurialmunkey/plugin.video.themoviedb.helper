@@ -118,9 +118,22 @@ def create_playlist(items, dbtype, user_slug, list_slug):
     create_file(filename, '\n'.join(fcontent), basedir=filepath, file_ext='xsp', clean_url=False)
 
 
-def add_movie(tmdb_id, imdb_id=None, title='', year='', kodi_db=None):
+def add_to_library(tmdb_type=None, folder=None, tmdb_id=None, imdb_id=None, **kwargs):
+    if not tmdb_type or not folder or not tmdb_id:
+        return
+    with busy_dialog():
+        if tmdb_type == 'movie':
+            add_movie(folder, tmdb_id, imdb_id)
+        elif tmdb_type == 'tv':
+            add_tvshow(folder, tmdb_id, imdb_id)
+    if ADDON.getSettingBool('auto_update'):
+        xbmc.executebuiltin('UpdateLibrary(video)')
+
+
+def add_movie(folder=None, tmdb_id=None, imdb_id=None, kodi_db=None):
+    if not folder or not tmdb_id:
+        return
     content = 'plugin://plugin.video.themoviedb.helper/?info=play&tmdb_id={}&tmdb_type=movie'.format(tmdb_id)
-    folder = u'{} ({})'.format(title, year)
     kodi_db = kodi_db or rpc.get_kodi_library('movie')
     db_file = kodi_db.get_info(info='file', imdb_id=imdb_id, tmdb_id=tmdb_id)
 
@@ -135,8 +148,8 @@ def add_movie(tmdb_id, imdb_id=None, title='', year='', kodi_db=None):
     return ('filename', db_file.replace('\\', '/').split('/')[-1])
 
 
-def add_tvshow(basedir=None, folder=None, tmdb_id=None, tvdb_id=None, imdb_id=None, p_dialog=None, force=False, kodi_db=None):
-    if not basedir or not folder or not tmdb_id:
+def add_tvshow(folder=None, tmdb_id=None, tvdb_id=None, imdb_id=None, kodi_db=None, p_dialog=None, force=False):
+    if not folder or not tmdb_id:
         return
 
     # Get our cached info
@@ -145,7 +158,7 @@ def add_tvshow(basedir=None, folder=None, tmdb_id=None, tvdb_id=None, imdb_id=No
     cache_version = 1
 
     # If there's already a folder for a different show with the same name then create a separate folder
-    nfo_id = get_tmdb_id_nfo(basedir, folder) if folder in xbmcvfs.listdir(basedir)[0] else None
+    nfo_id = get_tmdb_id_nfo(BASEDIR_TV, folder) if folder in xbmcvfs.listdir(BASEDIR_TV)[0] else None
     if nfo_id and try_int(nfo_id) != try_int(tmdb_id):
         folder += ' (TMDB {})'.format(tmdb_id)
 
@@ -173,7 +186,7 @@ def add_tvshow(basedir=None, folder=None, tmdb_id=None, tvdb_id=None, imdb_id=No
     imdb_id = details_tvshow.get('external_ids', {}).get('imdb_id') or imdb_id
 
     # Create the .nfo file in the folder
-    create_nfo('tv', tmdb_id, folder, basedir=basedir)
+    create_nfo('tv', tmdb_id, folder, basedir=BASEDIR_TV)
 
     # Construct our cache object
     today_date = get_todays_date()
@@ -308,7 +321,7 @@ def add_tvshow(basedir=None, folder=None, tmdb_id=None, tvdb_id=None, imdb_id=No
             episode_path = 'plugin://plugin.video.themoviedb.helper/?info=play&tmdb_type=tv&islocal=True'
             episode_path = '{}&tmdb_id={}&season={}&episode={}'.format(
                 episode_path, tmdb_id, season.get('season_number', 0), episode.get('episode_number'))
-            create_file(episode_name, episode_path, folder, season_name, basedir=basedir)
+            create_file(episode_name, episode_path, folder, season_name, basedir=BASEDIR_TV)
 
         # Some logging of what we did
         if DEBUG_LOGGING:
@@ -393,14 +406,14 @@ def add_userlist(user_slug=None, list_slug=None, confirm=True, allow_update=True
                 message=u'Adding {} ({})...'.format(item.get('title'), item.get('year')))
 
         if i_type == 'movie':
-            playlist_item = add_movie(tmdb_id=tmdb_id, imdb_id=imdb_id, title=item.get('title'), year=item.get('year'))
+            playlist_item = add_movie(
+                folder=u'{} ({})'.format(item.get('title'), item.get('year')), tmdb_id=tmdb_id, imdb_id=imdb_id)
             all_movies.append(playlist_item)
 
         if i_type == 'show':
             playlist_item = ('title', item.get('title'))
             all_tvshows.append(playlist_item)
             add_tvshow(
-                basedir=BASEDIR_TV,
                 folder=u'{}'.format(item.get('title')),
                 tmdb_id=tmdb_id, imdb_id=imdb_id, tvdb_id=tvdb_id, p_dialog=p_dialog, force=force)
 
@@ -487,7 +500,7 @@ def library_autoupdate(list_slugs=None, user_slugs=None, busy_spinner=False, for
             p_dialog_val = ((x + 1) * 100) // len(nfos)
             p_dialog_msg = u'{} {}...'.format(ADDON.getLocalizedString(32167), i['folder'])
             p_dialog.update(p_dialog_val, message=p_dialog_msg)
-        add_tvshow(basedir=BASEDIR_TV, folder=i['folder'], tmdb_id=i['tmdb_id'], p_dialog=p_dialog)
+        add_tvshow(folder=i['folder'], tmdb_id=i['tmdb_id'], p_dialog=p_dialog)
     p_dialog.close() if p_dialog else None
 
     # Set last update string and then update library if setting is on
