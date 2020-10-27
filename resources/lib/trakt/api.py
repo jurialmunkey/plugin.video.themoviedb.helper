@@ -288,7 +288,7 @@ class _TraktSync():
 
     @use_activity_cache('shows', 'watchlisted_at', cache.CACHE_LONG, pickle_object=False)
     def get_sync_watchlist_shows(self, trakt_type, id_type=None):
-        return self._get_sync('sync/watchlist/shows', 'shows', id_type=id_type)
+        return self._get_sync('sync/watchlist/shows', 'show', id_type=id_type)
 
     @use_activity_cache('movies', 'recommendations_at', cache.CACHE_LONG, pickle_object=False)
     def get_sync_recommendations_movies(self, trakt_type, id_type=None):
@@ -296,7 +296,7 @@ class _TraktSync():
 
     @use_activity_cache('shows', 'recommendations_at', cache.CACHE_LONG, pickle_object=False)
     def get_sync_recommendations_shows(self, trakt_type, id_type=None):
-        return self._get_sync('sync/recommendations/shows', 'shows', id_type=id_type)
+        return self._get_sync('sync/recommendations/shows', 'show', id_type=id_type)
 
     def get_sync(self, sync_type, trakt_type, id_type=None):
         if sync_type == 'watched':
