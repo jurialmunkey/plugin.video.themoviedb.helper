@@ -5,6 +5,7 @@ from resources.lib.helpers.constants import TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS,
 from resources.lib.helpers.plugin import ADDON, viewitems
 from resources.lib.helpers.parser import try_int
 from resources.lib.helpers.mapping import get_empty_item
+from resources.lib.helpers.timedate import get_calendar_name
 from resources.lib.trakt.api import get_sort_methods
 
 
@@ -150,6 +151,7 @@ class TraktLists():
         self.tmdb_cache_only = False
         self.library = 'video'
         self.container_content = 'episodes'
+        self.plugin_category = get_calendar_name(startdate=try_int(startdate), days=try_int(days))
         return items
 
     def list_upnext(self, info, tmdb_type, tmdb_id, page=None, **kwargs):
