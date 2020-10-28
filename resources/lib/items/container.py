@@ -16,6 +16,7 @@ from resources.lib.tmdb.lists import TMDbLists
 from resources.lib.trakt.lists import TraktLists
 from resources.lib.tmdb.search import SearchLists
 from resources.lib.tmdb.discover import UserDiscoverLists
+from resources.lib.helpers.mapping import set_show, get_empty_item
 from resources.lib.helpers.parser import try_decode, parse_paramstring, try_int
 from resources.lib.helpers.setutils import split_items, random_from_list, merge_two_dicts
 
@@ -250,15 +251,15 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         if li.infolabels.get('mediatype') == 'tvshow':
             return get_tvshow_details(dbid)
         if li.infolabels.get('mediatype') == 'season':
-            return self.get_kodi_tvchild_details(
+            return set_show(self.get_kodi_tvchild_details(
                 tvshowid=dbid,
                 season=li.infolabels.get('season'),
-                is_season=True)
+                is_season=True) or get_empty_item(), get_tvshow_details(dbid))
         if li.infolabels.get('mediatype') == 'episode':
-            return self.get_kodi_tvchild_details(
+            return set_show(self.get_kodi_tvchild_details(
                 tvshowid=dbid,
                 season=li.infolabels.get('season'),
-                episode=li.infolabels.get('episode'))
+                episode=li.infolabels.get('episode')) or get_empty_item(), get_tvshow_details(dbid))
 
     def get_kodi_tvchild_details(self, tvshowid, season=None, episode=None, is_season=False):
         if not tvshowid or not season or (not episode and not is_season):

@@ -181,16 +181,16 @@ def _get_niceitem(item, key, dbid):
         'cast': item.get('cast') or [],
         'stream_details': item.get('streamdetails') or {},
         'infolabels': _get_infolabels(item, key, dbid),
-        'infoproperties': _get_infoproperties(item)}
+        'infoproperties': _get_infoproperties(item),
+        'unique_ids': item.get('uniqueid') or {}}
     return del_empty_keys(nice_item)
 
 
 def _get_item_details(dbid=None, method=None, key=None, properties=None):
     if not dbid or not method or not key or not properties:
         return {}
-    param_name = "{0}id".format(key)
     params = {
-        param_name: try_int(dbid),
+        "{0}id".format(key): try_int(dbid),
         "properties": properties}
     details = get_jsonrpc(method, params)
     if not details or not isinstance(details, dict):

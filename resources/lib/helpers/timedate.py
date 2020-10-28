@@ -1,7 +1,7 @@
 import xbmc
 import time
 import datetime
-from resources.lib.helpers.plugin import kodi_log
+from resources.lib.helpers.plugin import kodi_log, ADDON
 
 
 def get_timestamp(timestamp=None):
@@ -55,11 +55,39 @@ def get_current_date_time(str_fmt='%Y-%m-%d %H:%M'):
     return datetime.datetime.now().strftime(str_fmt)
 
 
-def get_todays_date(days=0):
+def get_todays_date(days=0, str_fmt='%Y-%m-%d'):
     date_obj = datetime.datetime.today()
     if days:
         date_obj + datetime.timedelta(days=days)
-    return date_obj.strftime('%Y-%m-%d')
+    return date_obj.strftime(str_fmt)
+
+
+def get_calendar_name(startdate=0, days=1):
+    if days == 1:
+        if startdate == -1:
+            return ADDON.getLocalizedString(32282)  # Yesterday
+        if startdate == 0:
+            return xbmc.getLocalizedString(33006)  # Today
+        if startdate == 1:
+            return xbmc.getLocalizedString(33007)  # Tomorrow
+        return get_todays_date(days=startdate, str_fmt="%A")
+    if days == 7:
+        if startdate == 0:
+            return ADDON.getLocalizedString(32284)  # This Week
+        if startdate == -7:
+            return ADDON.getLocalizedString(32281)  # Last Week
+        return
+    if days == 14:
+        if startdate == 0:
+            return ADDON.getLocalizedString(32285)  # This Fortnight
+        if startdate == -14:
+            return ADDON.getLocalizedString(32280)  # Last Fortnight
+        return
+    if days == 30:
+        if startdate == 0:
+            return ADDON.getLocalizedString(32326)  # This Month
+        if startdate == -30:
+            return ADDON.getLocalizedString(32327)  # Last Month
 
 
 def convert_timestamp(time_str, time_fmt="%Y-%m-%dT%H:%M:%S", time_lim=19, utc_convert=False):

@@ -1410,7 +1410,7 @@ msgstr ""
 
 #: /resources/lib/basedir.py
 msgctxt "#32280"
-msgid "Last Fornight"
+msgid "Last Fortnight"
 msgstr ""
 
 #: /resources/lib/basedir.py
@@ -1632,6 +1632,16 @@ msgstr ""
 #: /resources/lib/helpers/update.py
 msgctxt "#32323"
 msgid "Item added to library"
+msgstr ""
+
+#: /resources/lib/helpers/timedate.py
+msgctxt "#32326"
+msgid "This Month"
+msgstr ""
+
+#: /resources/lib/helpers/timedate.py
+msgctxt "#32327"
+msgid "Last Month"
 msgstr ""
 
 msgctxt "#30030"
