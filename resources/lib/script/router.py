@@ -12,7 +12,7 @@ from resources.lib.items.basedir import get_basedir_details
 from resources.lib.fanarttv.api import FanartTV
 from resources.lib.tmdb.api import TMDb
 from resources.lib.trakt.api import TraktAPI, get_sort_methods
-from resources.lib.helpers.plugin import ADDON, reconfigure_legacy_params, viewitems, kodi_log
+from resources.lib.helpers.plugin import ADDON, reconfigure_legacy_params, viewitems, kodi_log, format_folderpath
 from resources.lib.helpers.rpc import get_jsonrpc
 from resources.lib.script.sync import SyncItem
 from resources.lib.helpers.decorators import busy_dialog
@@ -105,15 +105,10 @@ def related_lists(tmdb_id=None, tmdb_type=None, season=None, episode=None, conta
     item['params']['tmdb_type'] = tmdb_type
     if not container_update:
         return item
-    if item['params']['info'] == 'play':
-        path = 'PlayMedia({})'
-    elif item['params']['info'] in ['posters', 'fanart']:
-        path = 'ActivateWindow(pictures,{},return)'
-    elif xbmc.getCondVisibility("Window.IsMedia"):
-        path = 'Container.Update({})'
-    else:
-        path = 'ActivateWindow(videos,{},return)'
-    path = path.format(encode_url(path=item.get('path'), **item.get('params')))
+    path = format_folderpath(
+        path=encode_url(path=item.get('path'), **item.get('params')),
+        info=item['params']['info'],
+        content='pictures' if item['params']['info'] in ['posters', 'fanart'] else 'videos')
     xbmc.executebuiltin(path)
 
 
@@ -207,11 +202,7 @@ def sort_list(**kwargs):
         return
     for k, v in viewitems(sort_methods[x]['params']):
         kwargs[k] = v
-    if xbmc.getCondVisibility("Window.IsMedia"):
-        command = 'Container.Update({})'
-    else:
-        command = 'ActivateWindow(videos,{},return)'
-    xbmc.executebuiltin(command.format(encode_url(**kwargs)))
+    xbmc.executebuiltin(format_folderpath(encode_url(**kwargs)))
 
 
 class Script(object):
