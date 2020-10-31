@@ -8,7 +8,7 @@ from resources.lib.helpers.fileutils import read_file, dumps_to_file, delete_fil
 from resources.lib.helpers.parser import try_int
 from resources.lib.items.listitem import ListItem
 from resources.lib.helpers.decorators import busy_dialog
-from json import loads
+from json import loads, dumps
 
 
 def get_players_from_file():
@@ -41,7 +41,12 @@ def _get_dialog_players(players):
         for k, v in sorted(viewitems(players), key=lambda i: try_int(i[1].get('priority')) or PLAYERS_PRIORITY)]
 
 
-def configure_players(**kwargs):
+def _get_player_methods(player):
+    methods = ['play_movie', 'play_episode', 'search_movie', 'search_episode']
+    return [i for i in methods if i in player and player[i]]
+
+
+def configure_players(*args, **kwargs):
     ConfigurePlayers().configure_players()
 
 
@@ -59,7 +64,7 @@ class _ConfigurePlayer():
             'disabled: {}'.format(self.player.get('disabled', 'false').lower()),
             'priority: {}'.format(self.player.get('priority') or PLAYERS_PRIORITY),
             'is_resolvable: {}'.format(self.player.get('is_resolvable', 'select')),
-            '',  # TODO: Fallbacks will go here
+            'fallback: {}'.format(dumps(self.player.get('fallback'))),
             ADDON.getLocalizedString(32330),
             xbmc.getLocalizedString(190)]
 
@@ -79,7 +84,7 @@ class _ConfigurePlayer():
     def set_priority(self):
         priority = '{}'.format(self.player.get('priority') or PLAYERS_PRIORITY)  # Input numeric takes str for some reason?!
         priority = xbmcgui.Dialog().input(
-            'Enter New Priority for {}'.format(self.filename),
+            ADDON.getLocalizedString(32344).format(self.filename),
             defaultt=priority, type=xbmcgui.INPUT_NUMERIC)
         priority = try_int(priority)
         if not priority:
@@ -102,6 +107,44 @@ class _ConfigurePlayer():
             is_resolvable = 'false'
         self.player['is_resolvable'] = is_resolvable
 
+    def _get_method_type(self, method):
+        for i in ['movie', 'episode']:
+            if i in method:
+                return i
+
+    def get_fallback_method(self, player, filename, og_method):
+        """ Get the available methods for the player and ask user to select one """
+        mt = self._get_method_type(og_method)
+        methods = [
+            '{} {}'.format(filename, i) for i in _get_player_methods(player) if mt in i
+            and (filename != self.filename or i != og_method)]  # Avoid adding same fallback method as original
+        if not methods:
+            return
+        x = xbmcgui.Dialog().select(ADDON.getLocalizedString(32341), methods)
+        if x == -1:
+            return
+        return methods[x]
+
+    def get_fallback_player(self, og_method=None):
+        # Get players from files and ask user to select one
+        players = ConfigurePlayers()
+        filename = players.select_player(ADDON.getLocalizedString(32343).format(self.filename, og_method))
+        player = players.players.get(filename)
+        if player and filename:
+            return self.get_fallback_method(player, filename, og_method)
+
+    def set_fallbacks(self):
+        # Get the methods that the player supports and ask user to select which they want to set
+        methods = _get_player_methods(self.player)
+        x = xbmcgui.Dialog().select(ADDON.getLocalizedString(32342).format(self.filename), [
+            '{}: {}'.format(i, self.player.get('fallback', {}).get(i, 'null')) for i in methods])
+        if x == -1:
+            return
+        fallback = self.get_fallback_player(methods[x])
+        if fallback:
+            self.player.setdefault('fallback', {})[methods[x]] = fallback
+        return self.set_fallbacks()
+
     def configure(self):
         """
         Returns player or -1 if reset to default (i.e. delete configured player)
@@ -118,7 +161,7 @@ class _ConfigurePlayer():
         elif x == 3:
             self.set_resolvable()
         elif x == 4:
-            pass  # Add fallbacks here
+            self.set_fallbacks()
         elif x == 5:
             return -1
         elif x == 6:
@@ -128,11 +171,12 @@ class _ConfigurePlayer():
 
 class ConfigurePlayers():
     def __init__(self):
-        self.players = get_players_from_file()
-        self.dialog_players = _get_dialog_players(self.players)
+        with busy_dialog():
+            self.players = get_players_from_file()
+            self.dialog_players = _get_dialog_players(self.players)
 
-    def select_player(self):
-        x = xbmcgui.Dialog().select(ADDON.getLocalizedString(32328), self.dialog_players, useDetails=True)
+    def select_player(self, header=ADDON.getLocalizedString(32328)):
+        x = xbmcgui.Dialog().select(header, self.dialog_players, useDetails=True)
         if x == -1:
             return
         return self.dialog_players[x].getLabel2()  # Filename is saved in label2
