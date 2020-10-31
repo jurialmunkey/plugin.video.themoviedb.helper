@@ -82,13 +82,18 @@ def get_tmdb_id_nfo(basedir, foldername, tmdb_type='tv'):
         kodi_log(u'ERROR GETTING TMDBID FROM NFO:\n{}'.format(exc))
 
 
-def dumps_to_file(data, folder, filename, indent=2):
-    with open(os.path.join(_get_write_path(folder), filename), 'w') as file:
+def delete_file(folder, filename, join_addon_data=True):
+    fullpath = os.path.join(_get_write_path(folder, join_addon_data), filename)
+    xbmcvfs.delete(fullpath)
+
+
+def dumps_to_file(data, folder, filename, indent=2, join_addon_data=True):
+    with open(os.path.join(_get_write_path(folder, join_addon_data), filename), 'w') as file:
         json.dump(data, file, indent=indent)
 
 
-def _get_write_path(folder):
-    main_dir = os.path.join(xbmcvfs.translatePath(ADDONDATA), folder)
+def _get_write_path(folder, join_addon_data=True):
+    main_dir = os.path.join(xbmcvfs.translatePath(ADDONDATA), folder) if join_addon_data else xbmcvfs.translatePath(folder)
     if not os.path.exists(main_dir):
         os.makedirs(main_dir)
     return main_dir

@@ -107,7 +107,7 @@ class TraktLists():
         if not watched_items:
             return
         item = watched_items[random.randint(0, len(watched_items) - 1)]
-        self.plugin_category = '{} {}'.format(ADDON.getLocalizedString(32288), item.get('label'))
+        self.plugin_category = u'{} {}'.format(ADDON.getLocalizedString(32288), item.get('label'))
         return self.list_tmdb(
             info='recommendations',
             tmdb_type=item.get('params', {}).get('tmdb_type'),

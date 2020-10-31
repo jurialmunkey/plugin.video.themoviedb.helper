@@ -242,6 +242,7 @@ class ListItem(object):
             elif self.infolabels.get('mediatype') in ['movie', 'episode', 'video']:
                 self.params['info'] = 'play'
                 self.is_folder = False
+                self.infoproperties['isPlayable'] = 'true'
                 self.infoproperties['tmdbhelper.context.playusing'] = '{}&ignore_default=true'.format(self.get_url())
             elif self.infolabels.get('mediatype') == 'tvshow':
                 self.params['info'] = 'flatseasons' if flatten_seasons else 'seasons'

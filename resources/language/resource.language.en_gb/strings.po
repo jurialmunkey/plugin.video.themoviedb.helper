@@ -1400,7 +1400,7 @@ msgstr ""
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32278"
-msgid "Enter Network IDs separated with \\\" / \\\""
+msgid "Enter Network IDs separated with \" / \""
 msgstr ""
 
 #: /resources/lib/userdiscover.py
@@ -1634,6 +1634,19 @@ msgctxt "#32323"
 msgid "Item added to library"
 msgstr ""
 
+#: /resources/lib/player/players.py
+msgctxt "#32324"
+msgid "Select Play Method"
+msgstr ""
+
+#: /resources/lib/player/players.py
+msgctxt "#32325"
+msgid ""
+"This player is missing the \"is_resolvable\" flag. setResolvedUrl is preferred but may not work with all players. PlayMedia should only be used if you experience difficulties using setResolvedUrl with this player.\n"
+"\n"
+"This dialog can be skipped by configuring a player resolve method in TMDbHelper settings."
+msgstr ""
+
 #: /resources/lib/helpers/timedate.py
 msgctxt "#32326"
 msgid "This Month"
@@ -1642,6 +1655,78 @@ msgstr ""
 #: /resources/lib/helpers/timedate.py
 msgctxt "#32327"
 msgid "Last Month"
+msgstr ""
+
+#: /resources/lib/player/configure.py
+msgctxt "#32328"
+msgid "Select Player to Configure"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32329"
+msgid "Configure players"
+msgstr ""
+
+#: /resources/lib/player/configure.py
+msgctxt "#32330"
+msgid "Reset to Defaults"
+msgstr ""
+
+#: /resources/lib/player/configure.py
+msgctxt "#32331"
+msgid "Enter New Name for {}"
+msgstr ""
+
+#: /resources/lib/player/configure.py
+msgctxt "#32332"
+msgid "Choose resolve method for player"
+msgstr ""
+
+#: /resources/lib/player/configure.py
+msgctxt "#32333"
+msgid "User Choice"
+msgstr ""
+
+#: /resources/lib/player/configure.py
+msgctxt "#32334"
+msgid "Reset player to defaults?"
+msgstr ""
+
+#: /resources/lib/player/configure.py
+msgctxt "#32335"
+msgid ""
+"Do you wish to reset the [B]{}[/B] player file back to its original unmodified state on disk?\n"
+"\n"
+"[B]WARNING:[/B] This action cannot be undone."
+msgstr ""
+
+#: /resources/lib/player/configure.py
+msgctxt "#32336"
+msgid "Save your changes?"
+msgstr ""
+
+#: /resources/lib/player/configure.py
+msgctxt "#32337"
+msgid ""
+"The [B]{}[/B] player file has changed.\n"
+"Do you wish to save your changes?\n"
+"\n"
+"If you close without saving, your changes will be lost."
+msgstr ""
+
+#: /resources/lib/player/configure.py
+msgctxt "#32338"
+msgid "Close without Saving"
+msgstr ""
+
+#: /resources/lib/player/configure.py
+msgctxt "#32339"
+msgid "{} playback URL resolve method"
+msgstr ""
+
+#: /resources/lib/player/configure.py
+msgctxt "#32340"
+msgid "Please note that setResolvedUrl is Kodi\'s preferred method for resolving playback URLs. The PlayMedia method should only be used if you experience difficulties using setResolvedUrl with this particular player.\n\nAre you sure you want to set this player\'s' resolve method to PlayMedia?"
 msgstr ""
 
 msgctxt "#30030"
