@@ -53,8 +53,8 @@ def resolve_to_dummy(handle=None):
             not xbmc_monitor.abortRequested()
             and (not xbmc_player.isPlaying() or not xbmc_player.getPlayingFile().endswith('dummy.mp4'))
             and timeout > 0):
-        xbmc_monitor.waitForAbort(0.1)
-        timeout -= 0.1
+        xbmc_monitor.waitForAbort(1)
+        timeout -= 1
     xbmc.Player().stop()
     if timeout <= 0:
         kodi_log(['lib.player.players - resolving dummy file timeout\n', path], 1)
