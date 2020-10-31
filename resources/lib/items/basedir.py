@@ -34,8 +34,24 @@ def _get_basedir_list(item_type=None, trakt=False, tmdb=False):
     return _build_basedir(item_type, basedir)
 
 
+def _get_play_item():
+    return [
+        {
+            'label': xbmc.getLocalizedString(208),
+            'params': {'info': 'play'},
+            'path': PLUGINPATH,
+            'art': {'thumb': '{}/resources/poster.png'.format(ADDONPATH)},
+            'types': ['movie', 'episode']}]
+
+
 def _get_basedir_details():
     return [
+        {
+            'label': xbmc.getLocalizedString(33054),
+            'params': {'info': 'seasons'},
+            'path': PLUGINPATH,
+            'art': {'thumb': '{}/resources/icons/tmdb/episodes.png'.format(ADDONPATH)},
+            'types': ['tv']},
         {
             'label': xbmc.getLocalizedString(206),
             'params': {'info': 'cast'},
@@ -43,35 +59,41 @@ def _get_basedir_details():
             'art': {'thumb': '{}/resources/icons/tmdb/cast.png'.format(ADDONPATH)},
             'types': ['movie', 'tv']},
         {
+            'label': xbmc.getLocalizedString(206),
+            'params': {'info': 'episode_cast'},
+            'path': PLUGINPATH,
+            'art': {'thumb': '{}/resources/icons/tmdb/cast.png'.format(ADDONPATH)},
+            'types': ['episode']},
+        {
             'label': ADDON.getLocalizedString(32223),
             'params': {'info': 'recommendations'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/tmdb/recommended.png'.format(ADDONPATH)},
-            'types': ['movie', 'tv']},
+            'types': ['movie', 'tv', 'episode']},
         {
             'label': ADDON.getLocalizedString(32224),
             'params': {'info': 'similar'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/tmdb/similar.png'.format(ADDONPATH)},
-            'types': ['movie', 'tv']},
+            'types': ['movie', 'tv', 'episode']},
         {
             'label': ADDON.getLocalizedString(32225),
             'params': {'info': 'crew'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/tmdb/cast.png'.format(ADDONPATH)},
-            'types': ['movie', 'tv']},
+            'types': ['movie', 'tv', 'episode']},
         {
             'label': ADDON.getLocalizedString(32226),
             'params': {'info': 'posters'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/tmdb/images.png'.format(ADDONPATH)},
-            'types': ['movie', 'tv']},
+            'types': ['movie', 'tv', 'episode']},
         {
             'label': xbmc.getLocalizedString(20445),
             'params': {'info': 'fanart'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/tmdb/images.png'.format(ADDONPATH)},
-            'types': ['movie', 'tv']},
+            'types': ['movie', 'tv', 'episode']},
         {
             'label': xbmc.getLocalizedString(21861),
             'params': {'info': 'movie_keywords'},
@@ -83,7 +105,7 @@ def _get_basedir_details():
             'params': {'info': 'reviews'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/tmdb/reviews.png'.format(ADDONPATH)},
-            'types': ['movie', 'tv']},
+            'types': ['movie', 'tv', 'episode']},
         {
             'label': ADDON.getLocalizedString(32227),
             'params': {'info': 'stars_in_movies'},
@@ -114,18 +136,6 @@ def _get_basedir_details():
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/tmdb/images.png'.format(ADDONPATH)},
             'types': ['person']},
-        {
-            'label': xbmc.getLocalizedString(33054),
-            'params': {'info': 'seasons'},
-            'path': PLUGINPATH,
-            'art': {'thumb': '{}/resources/icons/tmdb/episodes.png'.format(ADDONPATH)},
-            'types': ['tv']},
-        {
-            'label': xbmc.getLocalizedString(206),
-            'params': {'info': 'episode_cast'},
-            'path': PLUGINPATH,
-            'art': {'thumb': '{}/resources/icons/tmdb/cast.png'.format(ADDONPATH)},
-            'types': ['episode']},
         {
             'label': ADDON.getLocalizedString(32231),
             'params': {'info': 'episode_thumbs'},
@@ -576,7 +586,7 @@ def _get_basedir_calendar(info=None):
     return items
 
 
-def get_basedir_details(tmdb_type, tmdb_id, season=None, episode=None, detailed_item=None):
+def get_basedir_details(tmdb_type, tmdb_id, season=None, episode=None, detailed_item=None, include_play=False):
     base_item = detailed_item or {}
     base_item.setdefault('params', {})
     base_item.setdefault('infolabels', {})
@@ -588,12 +598,14 @@ def get_basedir_details(tmdb_type, tmdb_id, season=None, episode=None, detailed_
     basedir_items = []
     if tmdb_type == 'movie':
         base_item['infolabels']['mediatype'] = 'movie'
-        basedir_items = _build_basedir('movie', _get_basedir_details())
+        basedir_items = _build_basedir('movie', _get_play_item()) if include_play else []
+        basedir_items += _build_basedir('movie', _get_basedir_details())
     elif tmdb_type == 'tv' and season is not None and episode is not None:
         base_item['params']['season'] = season
         base_item['params']['episode'] = episode
         base_item['infolabels']['mediatype'] = 'episode'
-        basedir_items = _build_basedir('episode', _get_basedir_details())
+        basedir_items = _build_basedir('episode', _get_play_item()) if include_play else []
+        basedir_items += _build_basedir('tv', _get_basedir_details())
     elif tmdb_type == 'tv' and season is not None:
         base_item['params']['info'] = 'episodes'
         base_item['params']['season'] = season
