@@ -55,7 +55,7 @@ class CommonMonitorFunctions(object):
             else:
                 get_property(key, set_property=u'{0}'.format(value))
         except Exception as exc:
-            kodi_log(u'{}{}'.format(key, exc), 1)
+            kodi_log(u'set_property: {}{}'.format(key, exc), 1)
 
     def set_iter_properties(self, dictionary, keys):
         if not isinstance(dictionary, dict):

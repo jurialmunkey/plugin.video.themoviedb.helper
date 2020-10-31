@@ -212,7 +212,7 @@ class TMDb(RequestAPI):
         request = self.get_request_sc('tv/{}/season/{}'.format(tmdb_id, season))
         if not request:
             return []
-        base_item = self.get_details('tv', tmdb_id, season)
+        base_item = self.get_details('tv', tmdb_id)
         return [
             self.mapper.get_info(i, 'episode', base_item, definition=TMDB_PARAMS_EPISODES, tmdb_id=tmdb_id)
             for i in request.get('episodes', [])]
