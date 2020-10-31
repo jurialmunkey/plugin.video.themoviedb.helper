@@ -240,12 +240,19 @@ class ListItem(object):
                 self.params = {}
                 self.is_folder = True
             elif self.infolabels.get('mediatype') in ['movie', 'episode', 'video']:
-                self.params['info'] = 'play'
+                if not ADDON.getSettingInt('default_select'):
+                    self.params['info'] = 'play'
+                    self.infoproperties['isPlayable'] = 'true'
+                else:
+                    self.params['info'] = 'related'
                 self.is_folder = False
-                self.infoproperties['isPlayable'] = 'true'
                 self.infoproperties['tmdbhelper.context.playusing'] = '{}&ignore_default=true'.format(self.get_url())
             elif self.infolabels.get('mediatype') == 'tvshow':
-                self.params['info'] = 'flatseasons' if flatten_seasons else 'seasons'
+                if not ADDON.getSettingInt('default_select'):
+                    self.params['info'] = 'flatseasons' if flatten_seasons else 'seasons'
+                else:
+                    self.params['info'] = 'related'
+                    self.is_folder = False
             elif self.infolabels.get('mediatype') == 'season':
                 self.params['info'] = 'episodes'
             elif self.infolabels.get('mediatype') == 'set':

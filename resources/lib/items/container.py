@@ -394,7 +394,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         if not kwargs.get('tmdb_id'):
             kwargs['tmdb_id'] = self.tmdb_api.get_tmdb_id(**kwargs)
         kwargs['container_update'] = True
-        related_lists(**kwargs)
+        related_lists(include_play=True, **kwargs)
 
     def router(self):
         if self.params.get('info') == 'play':

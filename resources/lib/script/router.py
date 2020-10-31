@@ -88,10 +88,10 @@ def manage_artwork(ftv_id=None, ftv_type=None, **kwargs):
     FanartTV().manage_artwork(ftv_id, ftv_type)
 
 
-def related_lists(tmdb_id=None, tmdb_type=None, season=None, episode=None, container_update=True, **kwargs):
+def related_lists(tmdb_id=None, tmdb_type=None, season=None, episode=None, container_update=True, include_play=False, **kwargs):
     if not tmdb_id or not tmdb_type:
         return
-    items = get_basedir_details(tmdb_type=tmdb_type, tmdb_id=tmdb_id)
+    items = get_basedir_details(tmdb_type=tmdb_type, tmdb_id=tmdb_id, season=season, episode=episode, include_play=include_play)
     if not items or len(items) <= 1:
         return
     choice = xbmcgui.Dialog().contextmenu([i.get('label') for i in items])
@@ -105,7 +105,9 @@ def related_lists(tmdb_id=None, tmdb_type=None, season=None, episode=None, conta
     item['params']['tmdb_type'] = tmdb_type
     if not container_update:
         return item
-    if item['params']['info'] in ['posters', 'fanart']:
+    if item['params']['info'] == 'play':
+        path = 'PlayMedia({})'
+    elif item['params']['info'] in ['posters', 'fanart']:
         path = 'ActivateWindow(pictures,{},return)'
     elif xbmc.getCondVisibility("Window.IsMedia"):
         path = 'Container.Update({})'
