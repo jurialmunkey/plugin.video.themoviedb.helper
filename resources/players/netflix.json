@@ -2,6 +2,7 @@
     "name"              : "Netflix",
     "plugin"            : "plugin.video.netflix",
     "priority"          : 100,
+    "is_resolvable"     : "true",
     "assert"            : {
                             "play_movie":       ["title", "year"],
                             "play_episode":     ["showname", "season", "episode"],

@@ -1,6 +1,7 @@
 {
     "name"              : "YouTube",
     "plugin"            : "plugin.video.youtube",
+    "is_resolvable"     : "true",
     "play_movie"        : [
                             "plugin://plugin.video.youtube/search/?q={name_url}&search_type=notvalid",
                             {"title": "(?i){title}"}

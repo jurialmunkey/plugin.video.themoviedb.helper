@@ -4,26 +4,18 @@ import xbmc
 import xbmcgui
 import xbmcaddon
 import xbmcplugin
-import datetime
-from resources.lib.helpers.rpc import get_jsonrpc, get_directory, KodiLibrary
-from resources.lib.helpers.constants import PLAYERS_URLENCODE, PLAYERS_BASEDIR_BUNDLED, PLAYERS_BASEDIR_USER
+from resources.lib.helpers.rpc import get_directory, KodiLibrary
 from resources.lib.helpers.window import get_property
-from resources.lib.tmdb.api import TMDb
-from resources.lib.trakt.api import TraktAPI
 from resources.lib.items.listitem import ListItem
 from resources.lib.helpers.plugin import ADDON, PLUGINPATH, ADDONPATH, viewitems, format_folderpath, kodi_log
 from resources.lib.helpers.parser import try_int, try_decode, try_encode
-from resources.lib.helpers.setutils import del_empty_keys
-from resources.lib.helpers.fileutils import get_files_in_folder, read_file, normalise_filesize
+from resources.lib.helpers.fileutils import read_file, normalise_filesize
 from resources.lib.helpers.decorators import busy_dialog
-from json import loads, dumps
+from resources.lib.player.details import get_item_details, get_detailed_item, get_playerstring
+from resources.lib.player.inputter import KeyboardInputter
+from resources.lib.player.configure import get_players_from_file
+from resources.lib.helpers.constants import PLAYERS_PRIORITY
 from string import Formatter
-from collections import defaultdict
-from threading import Thread
-try:
-    from urllib.parse import quote_plus, quote  # Py3
-except ImportError:
-    from urllib import quote_plus, quote  # Py2
 if sys.version_info[0] >= 3:
     unicode = str  # In Py3 str is now unicode
 
@@ -38,80 +30,64 @@ def string_format_map(fmt, d):
         return fmt.format(**d)
 
 
-def add_to_queue(episodes, clear_playlist=False, play_next=False):
-    if not episodes:
-        return
-    playlist = xbmc.PlayList(1)
-    if clear_playlist:
-        playlist.clear()
-    for i in episodes:
-        li = ListItem(**i)
-        li.set_params_reroute()
-        playlist.add(li.get_url(), li.get_listitem())
-    if play_next:
-        xbmc.Player().play(playlist)
-
-
 def resolve_to_dummy(handle=None):
     """
-    Kodi does 5x retries to resolve url if isPlayable property is set
-    Since our external players might not return resolvable files we don't use this method
-    Instead we pass url to xbmc.Player() or PlayMedia() or ActivateWindow() depending on context
-    However, is playable is forced for strm so set a dummy file and stop it immediately
-    TMDbHelper sets an islocal flag in its strm files so we can determine what called play
+    Kodi does 5x retries to resolve url if isPlayable property is set - strm files force this property.
+    However, external plugins might not resolve directly to URL and instead might require PlayMedia.
+    Also, if external plugin endpoint is a folder we need to do ActivateWindow/Container.Update instead.
+    Passing False to setResolvedUrl doesn't work correctly and the retry is triggered anyway.
+    In these instances we use a hack to avoid the retry by first resolving to a dummy file instead.
     """
     if handle is None:
         return
-    xbmcplugin.setResolvedUrl(handle, True, ListItem(
-        path='{}/resources/dummy.mp4'.format(ADDONPATH)).get_listitem())
-    xbmc.executebuiltin('Action(Stop)')
 
+    # Set our dummy resolved url
+    path = '{}/resources/dummy.mp4'.format(ADDONPATH)
+    kodi_log(['lib.player.players - attempt to resolve dummy file\n', path], 1)
+    xbmcplugin.setResolvedUrl(handle, True, ListItem(path=path).get_listitem())
+    xbmc_monitor, xbmc_player = xbmc.Monitor(), xbmc.Player()
 
-class KeyboardInputter(Thread):
-    def __init__(self, action=None, text=None, timeout=300):
-        Thread.__init__(self)
-        self.text = text
-        self.action = action
-        self.exit = False
-        self.poll = 0.5
-        self.timeout = timeout
+    # Wait till our file plays before stopping it
+    timeout = 5
+    while (
+            not xbmc_monitor.abortRequested()
+            and (not xbmc_player.isPlaying() or not xbmc_player.getPlayingFile().endswith('dummy.mp4'))
+            and timeout > 0):
+        xbmc_monitor.waitForAbort(0.1)
+        timeout -= 0.1
+    xbmc.Player().stop()
+    if timeout <= 0:
+        kodi_log(['lib.player.players - resolving dummy file timeout\n', path], 1)
+        return -1
 
-    def run(self):
-        while not xbmc.Monitor().abortRequested() and not self.exit and self.timeout > 0:
-            xbmc.Monitor().waitForAbort(self.poll)
-            self.timeout -= self.poll
-            if self.text and xbmc.getCondVisibility("Window.IsVisible(DialogKeyboard.xml)"):
-                get_jsonrpc("Input.SendText", {"text": self.text, "done": True})
-                self.exit = True
-            elif self.action and xbmc.getCondVisibility("Window.IsVisible(DialogSelect.xml) | Window.IsVisible(DialogConfirm.xml)"):
-                get_jsonrpc(self.action)
-                self.exit = True
+    # Wait till our file stops playing before continuing
+    timeout = 5
+    while (
+            not xbmc_monitor.abortRequested()
+            and xbmc_player.isPlaying()
+            and timeout > 0):
+        xbmc_monitor.waitForAbort(0.1)
+        timeout -= 0.1
+    if timeout <= 0:
+        kodi_log(['lib.player.players - stopping dummy file timeout\n', path], 1)
+        return -1
+
+    # Clean-up
+    del xbmc_monitor
+    del xbmc_player
+    kodi_log(['lib.player.players -- successfully resolved dummy file\n', path], 1)
 
 
 class Players(object):
-    def __init__(self, tmdb_type, tmdb_id=None, season=None, episode=None, **kwargs):
+    def __init__(self, tmdb_type, tmdb_id=None, season=None, episode=None, ignore_default=False, **kwargs):
         with busy_dialog():
-            self.players = self._get_players_from_file()
-            self.details = self._get_item_details(tmdb_type, tmdb_id, season, episode)
-            self.item = self._get_detailed_item(tmdb_type, tmdb_id, season, episode) or {}
+            self.players = get_players_from_file()
+            self.details = get_item_details(tmdb_type, tmdb_id, season, episode)
+            self.item = get_detailed_item(tmdb_type, tmdb_id, season, episode, details=self.details) or {}
+            self.playerstring = get_playerstring(tmdb_type, tmdb_id, season, episode, details=self.details)
             self.dialog_players = self._get_players_for_dialog(tmdb_type)
-            self.playerstring = self._get_playerstring(tmdb_type, tmdb_id, season, episode)
             self.default_player = ADDON.getSettingString('default_player_movies') if tmdb_type == 'movie' else ADDON.getSettingString('default_player_episodes')
-            self.ignore_default = kwargs.get('ignore_default') or False
-
-    def _get_playerstring(self, tmdb_type, tmdb_id, season=None, episode=None):
-        if not self.details:
-            return None
-        playerstring = {}
-        playerstring['tmdb_type'] = 'episode' if tmdb_type in ['episode', 'tv'] else 'movie'
-        playerstring['tmdb_id'] = tmdb_id
-        playerstring['imdb_id'] = self.details.unique_ids.get('imdb')
-        if tmdb_type in ['episode', 'tv']:
-            playerstring['imdb_id'] = self.details.unique_ids.get('tvshow.imdb')
-            playerstring['tvdb_id'] = self.details.unique_ids.get('tvshow.tvdb')
-            playerstring['season'] = season
-            playerstring['episode'] = episode
-        return dumps(del_empty_keys(playerstring))
+            self.ignore_default = ignore_default
 
     def _check_assert(self, keys=[]):
         if not self.item:
@@ -136,6 +112,7 @@ class Players(object):
         return {
             'file': file, 'mode': mode,
             'is_folder': is_folder,
+            'is_resolvable': value.get('is_resolvable'),
             'name': '{} {}'.format(name, value.get('name')),
             'plugin_name': value.get('plugin'),
             'plugin_icon': value.get('icon', '').format(ADDONPATH) or xbmcaddon.Addon(value.get('plugin', '')).getAddonInfo('icon'),
@@ -183,7 +160,9 @@ class Players(object):
             return []
         dialog_play = self._get_local_item(tmdb_type)
         dialog_search = []
-        for k, v in sorted(viewitems(self.players), key=lambda i: try_int(i[1].get('priority')) or 1000):
+        for k, v in sorted(viewitems(self.players), key=lambda i: try_int(i[1].get('priority')) or PLAYERS_PRIORITY):
+            if v.get('disabled', '').lower() == 'true':
+                continue  # Skip disabled players
             if tmdb_type == 'movie':
                 if v.get('play_movie') and self._check_assert(v.get('assert', {}).get('play_movie', [])):
                     dialog_play.append(self._get_built_player(file=k, mode='play_movie', value=v))
@@ -195,136 +174,6 @@ class Players(object):
                 if v.get('search_episode') and self._check_assert(v.get('assert', {}).get('search_episode', [])):
                     dialog_search.append(self._get_built_player(file=k, mode='search_episode', value=v))
         return dialog_play + dialog_search
-
-    def _get_players_from_file(self):
-        players = {}
-        basedirs = [PLAYERS_BASEDIR_USER]
-        if ADDON.getSettingBool('bundled_players'):
-            basedirs += [PLAYERS_BASEDIR_BUNDLED]
-        for basedir in basedirs:
-            files = get_files_in_folder(basedir, r'.*\.json')
-            for file in files:
-                meta = loads(read_file(basedir + file)) or {}
-                plugins = meta.get('plugin') or 'plugin.undefined'  # Give dummy name to undefined plugins so that they fail the check
-                plugins = plugins if isinstance(plugins, list) else [plugins]  # Listify for simplicity of code
-                for i in plugins:
-                    if not xbmc.getCondVisibility(u'System.HasAddon({0})'.format(i)):
-                        break  # System doesn't have a required plugin so skip this player
-                else:
-                    players[file] = meta
-        return players
-
-    def get_external_ids(self, li, season=None, episode=None):
-        trakt_api = TraktAPI()
-        unique_id, trakt_type = None, None
-        if li.infolabels.get('mediatype') == 'movie':
-            unique_id = li.unique_ids.get('tmdb')
-            trakt_type = 'movie'
-        elif li.infolabels.get('mediatype') == 'tvshow':
-            unique_id = li.unique_ids.get('tmdb')
-            trakt_type = 'show'
-        elif li.infolabels.get('mediatype') in ['season', 'episode']:
-            unique_id = li.unique_ids.get('tvshow.tmdb')
-            trakt_type = 'show'
-        if not unique_id or not trakt_type:
-            return
-        trakt_slug = trakt_api.get_id(id_type='tmdb', unique_id=unique_id, trakt_type=trakt_type, output_type='slug')
-        if not trakt_slug:
-            return
-        details = trakt_api.get_details(trakt_type, trakt_slug, extended=None)
-        if not details:
-            return
-        if li.infolabels.get('mediatype') in ['movie', 'tvshow', 'season']:
-            return {
-                'unique_ids': {
-                    'tmdb': unique_id,
-                    'tvdb': details.get('ids', {}).get('tvdb'),
-                    'imdb': details.get('ids', {}).get('imdb'),
-                    'slug': details.get('ids', {}).get('slug'),
-                    'trakt': details.get('ids', {}).get('trakt')}}
-        episode_details = trakt_api.get_details(
-            trakt_type, trakt_slug,
-            season=season or li.infolabels.get('season'),
-            episode=episode or li.infolabels.get('episode'),
-            extended=None)
-        if episode_details:
-            return {
-                'unique_ids': {
-                    'tvshow.tmdb': unique_id,
-                    'tvshow.tvdb': details.get('ids', {}).get('tvdb'),
-                    'tvshow.imdb': details.get('ids', {}).get('imdb'),
-                    'tvshow.slug': details.get('ids', {}).get('slug'),
-                    'tvshow.trakt': details.get('ids', {}).get('trakt'),
-                    'tvdb': episode_details.get('ids', {}).get('tvdb'),
-                    'tmdb': episode_details.get('ids', {}).get('tmdb'),
-                    'imdb': episode_details.get('ids', {}).get('imdb'),
-                    'slug': episode_details.get('ids', {}).get('slug'),
-                    'trakt': episode_details.get('ids', {}).get('trakt')}}
-
-    def _get_item_details(self, tmdb_type, tmdb_id, season=None, episode=None):
-        details = TMDb().get_details(tmdb_type, tmdb_id, season, episode)
-        if not details:
-            return None
-        details = ListItem(**details)
-        details.infolabels['mediatype'] == 'movie' if tmdb_type == 'movie' else 'episode'
-        details.set_details(details=self.get_external_ids(details, season=season, episode=episode))
-        return details
-
-    def _get_detailed_item(self, tmdb_type, tmdb_id, season=None, episode=None):
-        details = self.details or self._get_item_details(tmdb_type, tmdb_id, season, episode)
-        if not details:
-            return None
-        item = defaultdict(lambda: '+')
-        item['id'] = item['tmdb'] = tmdb_id
-        item['imdb'] = details.unique_ids.get('imdb')
-        item['tvdb'] = details.unique_ids.get('tvdb')
-        item['trakt'] = details.unique_ids.get('trakt')
-        item['slug'] = details.unique_ids.get('slug')
-        item['season'] = season
-        item['episode'] = episode
-        item['originaltitle'] = details.infolabels.get('originaltitle')
-        item['title'] = details.infolabels.get('tvshowtitle') or details.infolabels.get('title')
-        item['showname'] = item['clearname'] = item['tvshowtitle'] = item.get('title')
-        item['year'] = details.infolabels.get('year')
-        item['name'] = u'{} ({})'.format(item.get('title'), item.get('year'))
-        item['premiered'] = item['firstaired'] = item['released'] = details.infolabels.get('premiered')
-        item['plot'] = details.infolabels.get('plot')
-        item['cast'] = item['actors'] = " / ".join([i.get('name') for i in details.cast if i.get('name')])
-        item['thumbnail'] = details.art.get('thumb')
-        item['poster'] = details.art.get('poster')
-        item['fanart'] = details.art.get('fanart')
-        item['now'] = datetime.datetime.now().strftime('%Y%m%d%H%M%S%f')
-
-        if tmdb_type == 'tv' and season is not None and episode is not None:
-            item['id'] = item['epid'] = item['eptvdb'] = item.get('tvdb')
-            item['title'] = details.infolabels.get('title')  # Set Episode Title
-            item['name'] = u'{0} S{1:02d}E{2:02d}'.format(item.get('showname'), try_int(season), try_int(episode))
-            item['season'] = season
-            item['episode'] = episode
-            item['showpremiered'] = details.infoproperties.get('tvshow.premiered')
-            item['showyear'] = details.infoproperties.get('tvshow.year')
-            item['eptmdb'] = details.unique_ids.get('tmdb')
-            item['epimdb'] = details.unique_ids.get('imdb')
-            item['eptrakt'] = details.unique_ids.get('trakt')
-            item['epslug'] = details.unique_ids.get('slug')
-            item['tmdb'] = details.unique_ids.get('tvshow.tmdb')
-            item['imdb'] = details.unique_ids.get('tvshow.imdb')
-            item['trakt'] = details.unique_ids.get('tvshow.trakt')
-            item['slug'] = details.unique_ids.get('tvshow.slug')
-
-        for k, v in viewitems(item.copy()):
-            if k not in PLAYERS_URLENCODE:
-                continue
-            v = u'{0}'.format(v)
-            for key, value in viewitems({k: v, '{}_meta'.format(k): dumps(v)}):
-                item[key] = value.replace(',', '')
-                item[key + '_+'] = value.replace(',', '').replace(' ', '+')
-                item[key + '_-'] = value.replace(',', '').replace(' ', '-')
-                item[key + '_escaped'] = quote(quote(try_encode(value)))
-                item[key + '_escaped+'] = quote(quote_plus(try_encode(value)))
-                item[key + '_url'] = quote(try_encode(value))
-                item[key + '_url+'] = quote_plus(try_encode(value))
-        return item
 
     def select_player(self, detailed=True, clear_player=False):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
@@ -512,17 +361,24 @@ class Players(object):
                 del self.dialog_players[player['idx']]  # Remove out player so we don't re-ask user for it
             fallback = self._get_player_fallback(player['fallback']) if player.get('fallback') else None
             return self._get_resolved_path(fallback)
-        return path
+        if path and isinstance(path, tuple):
+            return {
+                'url': path[0],
+                'is_folder': 'true' if path[1] else 'false',
+                'isPlayable': 'false' if path[1] else 'true',
+                'is_resolvable': player['is_resolvable'] if player.get('is_resolvable') else 'select',
+                'player_name': player.get('name')}
 
     def get_resolved_path(self, return_listitem=True):
         if not self.item:
             return
         get_property('PlayerInfoString', clear_property=True)
-        path = self._get_resolved_path(allow_default=True)
+        path = self._get_resolved_path(allow_default=True) or {}
         if return_listitem:
-            self.details.path = path[0] if path else None
             self.details.params = {}
-            self.details.infoproperties['is_folder'] = 'false' if path and not path[1] else 'true'
+            self.details.path = path.pop('url', None)
+            for k, v in viewitems(path):
+                self.details.infoproperties[k] = v
             path = self.details.get_listitem()
         return path
 
@@ -531,7 +387,11 @@ class Players(object):
         Some plugins use container.update after search results to rewrite path history
         This is a quick hack to rewrite the path back to our original path before updating
         """
-        if not folder_path or xbmc.getInfoLabel("Container.FolderPath") == folder_path:
+        if not folder_path:
+            return
+        xbmc.Monitor().waitForAbort(2)
+        container_folderpath = xbmc.getInfoLabel("Container.FolderPath")
+        if container_folderpath == folder_path:
             return
         xbmc.executebuiltin('Container.Update({},replace)'.format(folder_path))
         if not reset_focus:
@@ -544,7 +404,7 @@ class Players(object):
             xbmc.executebuiltin(reset_focus)
             xbmc.Monitor().waitForAbort(0.5)
 
-    def play(self, folder_path=None, reset_focus=None):
+    def play(self, folder_path=None, reset_focus=None, handle=None):
         # Get some info about current container for container update hack
         if not folder_path:
             folder_path = xbmc.getInfoLabel("Container.FolderPath")
@@ -557,26 +417,27 @@ class Players(object):
         listitem = self.get_resolved_path()
         path = listitem.getPath()
         is_folder = True if listitem.getProperty('is_folder') == 'true' else False
-
-        # Wait a moment because sometimes Kodi crashes if we call the plugin to play too quickly!!!
-        with busy_dialog():
-            xbmc.Monitor().waitForAbort(1)
+        is_resolvable = listitem.getProperty('is_resolvable')
 
         # Reset folder hack
         self._update_listing_hack(folder_path=folder_path, reset_focus=reset_focus)
 
         # Check we have an actual path to open
         if not path or path == PLUGINPATH:
+            # if handle and handle != -1:
+            #     resolve_to_dummy(handle)
             return
 
         action = None
-
-        # Configure folder path command to use Container.Update or ActivateWindow depending on context
         if is_folder:
             action = format_folderpath(path)
-        # If the file we found is a .strm we need to PlayMedia() so that it can resolve separately
-        elif path.endswith('.strm'):
-            action = u'PlayMedia(\"{}\")'.format(path)
+        elif path.endswith('.strm') or not handle or is_resolvable == 'false':
+            action = u'RunScript(plugin.video.themoviedb.helper,play_media={})'.format(path)
+        elif is_resolvable == 'select' and not xbmcgui.Dialog().yesno(
+                '{} - {}'.format(listitem.getProperty('player_name'), ADDON.getLocalizedString(32324)),
+                ADDON.getLocalizedString(32325),
+                yeslabel='PlayMedia', nolabel='setResolvedUrl'):
+            action = u'RunScript(plugin.video.themoviedb.helper,play_media={})'.format(path)
 
         # Set our playerstring for player monitor to update kodi watched status
         if not is_folder and self.playerstring:
@@ -588,10 +449,15 @@ class Players(object):
 
         # Call as builtin for opening folder or playing strm via PlayMedia()
         if action:
+            resolve_to_dummy(handle)  # If we're calling external we need to resolve to dummy
             xbmc.executebuiltin(try_encode(try_decode(action)))
-            kodi_log(['Finished executing player\n', action], 1)
+            kodi_log(['lib.player - finished executing action\n', action], 1)
             return
 
+        # Else resolve to file directly
+        xbmcplugin.setResolvedUrl(handle, True, listitem)
+        kodi_log(['lib.player - finished resolving path to url\n', path], 1)
+
         # Send playable urls to xbmc.Player() not PlayMedia() so we can play as detailed listitem.
-        xbmc.Player().play(path, listitem)
-        kodi_log(['Finished executing Player().Play\n', path], 1)
+        # xbmc.Player().play(path, listitem)
+        # kodi_log(['Finished executing Player().Play\n', path], 1)

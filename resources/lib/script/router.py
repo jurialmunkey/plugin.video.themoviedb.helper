@@ -12,36 +12,58 @@ from resources.lib.items.basedir import get_basedir_details
 from resources.lib.fanarttv.api import FanartTV
 from resources.lib.tmdb.api import TMDb
 from resources.lib.trakt.api import TraktAPI, get_sort_methods
-from resources.lib.helpers.plugin import ADDON, reconfigure_legacy_params, viewitems
+from resources.lib.helpers.plugin import ADDON, reconfigure_legacy_params, viewitems, kodi_log
 from resources.lib.helpers.rpc import get_jsonrpc
 from resources.lib.script.sync import SyncItem
 from resources.lib.helpers.decorators import busy_dialog
 from resources.lib.helpers.parser import encode_url, try_decode
 from resources.lib.window.manager import WindowManager
-from resources.lib.player.players import Players, add_to_queue
+from resources.lib.player.players import Players
+from resources.lib.player.configure import configure_players
 from resources.lib.monitor.images import ImageFunctions
 
 
 WM_PARAMS = ['add_path', 'add_query', 'close_dialog', 'reset_path', 'call_id', 'call_path', 'call_update']
 
 
+def play_media(**kwargs):
+    with busy_dialog():
+        kodi_log(['lib.script.router - attempting to play\n', kwargs.get('play_media')], 1)
+        xbmc.executebuiltin(u'PlayMedia({})'.format(kwargs.get('play_media')))
+
+
 def play_external(**kwargs):
     kwargs['tmdb_type'] = kwargs.get('play')
     if not kwargs.get('tmdb_id'):
         kwargs['tmdb_id'] = TMDb().get_tmdb_id(**kwargs)
+    kodi_log(['lib.script.router - attempting to play\n', kwargs], 1)
     Players(**kwargs).play()
 
 
-def play_season(**kwargs):
-    with busy_dialog():
-        if not kwargs.get('tmdb_id'):
-            kwargs['tmdb_type'] = 'tv'
-            kwargs['tmdb_id'] = TMDb().get_tmdb_id(**kwargs)
-        if not kwargs['tmdb_id']:
-            return
-        add_to_queue(
-            TMDb().get_episode_list(tmdb_id=kwargs['tmdb_id'], season=kwargs['play_season']),
-            clear_playlist=True, play_next=True)
+# def add_to_queue(episodes, clear_playlist=False, play_next=False):
+#     if not episodes:
+#         return
+#     playlist = xbmc.PlayList(1)
+#     if clear_playlist:
+#         playlist.clear()
+#     for i in episodes:
+#         li = ListItem(**i)
+#         li.set_params_reroute()
+#         playlist.add(li.get_url(), li.get_listitem())
+#     if play_next:
+#         xbmc.Player().play(playlist)
+
+
+# def play_season(**kwargs):
+#     with busy_dialog():
+#         if not kwargs.get('tmdb_id'):
+#             kwargs['tmdb_type'] = 'tv'
+#             kwargs['tmdb_id'] = TMDb().get_tmdb_id(**kwargs)
+#         if not kwargs['tmdb_id']:
+#             return
+#         add_to_queue(
+#             TMDb().get_episode_list(tmdb_id=kwargs['tmdb_id'], season=kwargs['play_season']),
+#             clear_playlist=True, play_next=True)
 
 
 def split_value(split_value, separator=None, **kwargs):
@@ -243,12 +265,16 @@ class Script(object):
             return update_players()
         if self.params.get('set_defaultplayer'):
             return set_defaultplayer(**self.params)
+        if self.params.get('configure_players'):
+            return configure_players(**self.params)
         if self.params.get('library_autoupdate'):
             return library_update(**self.params)
         if any(x in WM_PARAMS for x in self.params):
             return WindowManager(**self.params).router()
-        if self.params.get('play_season'):
-            return play_season(**self.params)
+        # if self.params.get('play_season'):
+        #     return play_season(**self.params)
+        if self.params.get('play_media'):
+            return play_media(**self.params)
         if self.params.get('play'):
             return play_external(**self.params)
         if self.params.get('restart_service'):
