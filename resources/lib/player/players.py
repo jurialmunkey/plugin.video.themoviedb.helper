@@ -433,7 +433,7 @@ class Players(object):
             action = format_folderpath(path)
         elif path.endswith('.strm') or not handle or is_resolvable == 'false':
             action = u'RunScript(plugin.video.themoviedb.helper,play_media={})'.format(path)
-        elif is_resolvable == 'select' and not xbmcgui.Dialog().yesno(
+        elif is_resolvable == 'select' and xbmcgui.Dialog().yesno(
                 '{} - {}'.format(listitem.getProperty('player_name'), ADDON.getLocalizedString(32324)),
                 ADDON.getLocalizedString(32325),
                 yeslabel='PlayMedia', nolabel='setResolvedUrl'):
