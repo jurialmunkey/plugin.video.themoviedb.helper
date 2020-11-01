@@ -15,7 +15,7 @@ class SearchLists():
 
     def list_searchdir(self, tmdb_type, **kwargs):
         base_item = {
-            'label': '{} {}'.format(xbmc.getLocalizedString(137), convert_type(tmdb_type, 'plural')),
+            'label': u'{} {}'.format(xbmc.getLocalizedString(137), convert_type(tmdb_type, 'plural')),
             'art': {'thumb': '{}/resources/icons/tmdb/search.png'.format(ADDONPATH)},
             'infoproperties': {'specialsort': 'top'},
             'params': merge_two_dicts(kwargs, {'info': 'search', 'tmdb_type': tmdb_type})}

@@ -25,17 +25,11 @@ class ServiceMonitor(object):
         self.xbmc_monitor = xbmc.Monitor()
 
     def _on_listitem(self):
-        try:
-            self.listitem_monitor.get_listitem()
-        except Exception as exc:
-            kodi_log(u'_on_listitem\n{} {}'.format(Exception, exc), 1)
+        self.listitem_monitor.get_listitem()
         self.xbmc_monitor.waitForAbort(0.3)
 
     def _on_scroll(self):
-        try:
-            self.listitem_monitor.clear_on_scroll()
-        except Exception as exc:
-            kodi_log(u'_on_scroll\n{}'.format(Exception, exc), 1)
+        self.listitem_monitor.clear_on_scroll()
         self.xbmc_monitor.waitForAbort(1)
 
     def _on_fullscreen(self):
@@ -54,11 +48,8 @@ class ServiceMonitor(object):
         IF we've got properties to clear lets clear them and then jump back in the loop
         Otherwise we should sit for a second so we aren't constantly polling
         """
-        try:
-            if self.listitem_monitor.properties or self.listitem_monitor.index_properties:
-                return self.listitem_monitor.clear_properties()
-        except Exception as exc:
-            kodi_log(u'_on_clear\n{}'.format(Exception, exc), 1)
+        if self.listitem_monitor.properties or self.listitem_monitor.index_properties:
+            return self.listitem_monitor.clear_properties()
         self.xbmc_monitor.waitForAbort(1)
 
     def _on_exit(self):

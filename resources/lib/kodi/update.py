@@ -172,8 +172,8 @@ def add_tvshow(folder=None, tmdb_id=None, tvdb_id=None, imdb_id=None, kodi_db=No
         if DEBUG_LOGGING:
             log_msg = cache_info.get('log_msg') or ''
             kodi_log([
-                'Skipping updating', cache_info.get('name'), 'TMDB_id', tmdb_id, '\n',
-                'Next update', next_check, log_msg], 2)
+                'Skipping updating ', cache_info.get('name'), ' TMDB_id ', tmdb_id, '\n',
+                'Next update ', next_check, ' ', log_msg], 2)
         return
 
     # Get all seasons in the tvshow except specials
