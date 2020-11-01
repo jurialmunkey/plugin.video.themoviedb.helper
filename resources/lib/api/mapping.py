@@ -49,6 +49,9 @@ class _ItemMapper(object):
             # Skip empty objects
             if not pv and pv is not 0:
                 continue
+            # Skip blacklist values
+            if pv in self.blacklist:
+                continue
             # Simple mapping is quicker so do that first if we can
             if k in sm:
                 item[sm[k][0]][sm[k][1]] = pv
