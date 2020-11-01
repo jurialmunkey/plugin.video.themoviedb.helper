@@ -12,7 +12,7 @@ from resources.lib.container.basedir import get_basedir_details
 from resources.lib.fanarttv.api import FanartTV
 from resources.lib.tmdb.api import TMDb
 from resources.lib.trakt.api import TraktAPI, get_sort_methods
-from resources.lib.addon.plugin import ADDON, reconfigure_legacy_params, viewitems, kodi_log, format_folderpath
+from resources.lib.addon.plugin import ADDON, reconfigure_legacy_params, viewitems, kodi_log, format_folderpath, convert_type
 from resources.lib.kodi.rpc import get_jsonrpc
 from resources.lib.script.sync import SyncItem
 from resources.lib.addon.decorators import busy_dialog
@@ -26,16 +26,47 @@ from resources.lib.monitor.images import ImageFunctions
 WM_PARAMS = ['add_path', 'add_query', 'close_dialog', 'reset_path', 'call_id', 'call_path', 'call_update']
 
 
+# Get TMDb ID decorator
+def get_tmdb_id(func):
+    def wrapper(*args, **kwargs):
+        with busy_dialog():
+            if not kwargs.get('tmdb_id'):
+                kwargs['tmdb_id'] = TMDb().get_tmdb_id(**kwargs)
+        return func(*args, **kwargs)
+    return wrapper
+
+
+def map_kwargs(mapping={}):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            for k, v in viewitems(mapping):
+                if k in kwargs:
+                    kwargs[v] = kwargs.pop(k, None)
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
+def is_in_kwargs(mapping={}):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            for k, v in viewitems(mapping):
+                if kwargs.get(k) not in v:
+                    return
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
 def play_media(**kwargs):
     with busy_dialog():
         kodi_log(['lib.script.router - attempting to play\n', kwargs.get('play_media')], 1)
         xbmc.executebuiltin(u'PlayMedia({})'.format(kwargs.get('play_media')))
 
 
+@map_kwargs({'play': 'tmdb_type'})
+@get_tmdb_id
 def play_external(**kwargs):
-    kwargs['tmdb_type'] = kwargs.get('play')
-    if not kwargs.get('tmdb_id'):
-        kwargs['tmdb_id'] = TMDb().get_tmdb_id(**kwargs)
     kodi_log(['lib.script.router - attempting to play\n', kwargs], 1)
     Players(**kwargs).play()
 
@@ -73,15 +104,15 @@ def split_value(split_value, separator=None, **kwargs):
         get_property(name, set_property=i, prefix=-1)
 
 
-def sync_item(trakt_type, unique_id, season=None, episode=None, id_type=None, **kwargs):
-    SyncItem(trakt_type, unique_id, season, episode, id_type).sync()
-
-
-def sync_trakt(tmdb_id, **kwargs):
-    if kwargs.get('tmdb_type') not in ['movie', 'tv'] or not tmdb_id:
-        return
-    trakt_type = 'show' if kwargs.get('tmdb_type') == 'tv' else 'movie'
-    sync_item(trakt_type, tmdb_id, id_type='tmdb')
+@is_in_kwargs({'tmdb_type': ['movie', 'tv']})
+@get_tmdb_id
+def sync_trakt(**kwargs):
+    SyncItem(
+        trakt_type=convert_type(kwargs['tmdb_type'], 'trakt', season=kwargs.get('season'), episode=kwargs.get('episode')),
+        unique_id=kwargs['tmdb_id'],
+        season=kwargs.get('season'),
+        episode=kwargs.get('episode'),
+        id_type='tmdb').sync()
 
 
 def manage_artwork(ftv_id=None, ftv_type=None, **kwargs):
@@ -234,8 +265,6 @@ class Script(object):
             return split_value(**self.params)
         if self.params.get('kodi_setting'):
             return kodi_setting(**self.params)
-        if self.params.get('sync_item'):
-            return sync_item(**self.params)
         if self.params.get('sync_trakt'):
             return sync_trakt(**self.params)
         if self.params.get('manage_artwork'):
