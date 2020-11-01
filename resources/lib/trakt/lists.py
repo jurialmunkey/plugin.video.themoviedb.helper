@@ -4,7 +4,7 @@ from resources.lib.addon.plugin import convert_type
 from resources.lib.addon.constants import TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, TRAKT_LIST_OF_LISTS
 from resources.lib.addon.plugin import ADDON, viewitems
 from resources.lib.addon.parser import try_int
-from resources.lib.container.mapping import get_empty_item
+from resources.lib.api.mapping import get_empty_item
 from resources.lib.addon.timedate import get_calendar_name
 from resources.lib.trakt.api import get_sort_methods
 

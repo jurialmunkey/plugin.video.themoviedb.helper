@@ -16,7 +16,7 @@ from resources.lib.tmdb.lists import TMDbLists
 from resources.lib.trakt.lists import TraktLists
 from resources.lib.tmdb.search import SearchLists
 from resources.lib.tmdb.discover import UserDiscoverLists
-from resources.lib.container.mapping import set_show, get_empty_item
+from resources.lib.api.mapping import set_show, get_empty_item
 from resources.lib.addon.parser import try_decode, parse_paramstring, try_int
 from resources.lib.addon.setutils import split_items, random_from_list, merge_two_dicts
 # from resources.lib.addon.decorators import busy_dialog

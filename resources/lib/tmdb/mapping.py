@@ -1,10 +1,10 @@
 import xbmc
-from resources.lib.addon.plugin import get_mpaa_prefix, get_language, viewitems, ADDON
+from resources.lib.addon.plugin import get_mpaa_prefix, get_language, viewitems, convert_type, ADDON
 from resources.lib.addon.parser import try_int, try_float
 from resources.lib.addon.setutils import iter_props, dict_to_list, get_params
-from resources.lib.addon.timedate import format_date
+from resources.lib.addon.timedate import format_date, age_difference
 from resources.lib.addon.constants import IMAGEPATH_ORIGINAL, IMAGEPATH_POSTER, TMDB_GENRE_IDS
-from resources.lib.container.mapping import UPDATE_BASEKEY, _ItemMapper, get_empty_item
+from resources.lib.api.mapping import UPDATE_BASEKEY, _ItemMapper, get_empty_item
 
 
 def get_imagepath_poster(v):
@@ -515,6 +515,36 @@ class ItemMapper(_ItemMapper):
             'height': ('infoproperties', 'height'),
             'aspect_ratio': ('infoproperties', 'aspect_ratio')
         }
+
+    def finalise_image(self, item):
+        item['infolabels']['title'] = '{}x{}'.format(
+            item['infoproperties'].get('width'),
+            item['infoproperties'].get('height'))
+        item['params'] = -1
+        item['path'] = item['art'].get('thumb') or item['art'].get('poster') or item['art'].get('fanart')
+        item['is_folder'] = False
+        item['library'] = 'pictures'
+        return item
+
+    def finalise_person(self, item):
+        if item['infoproperties'].get('birthday'):
+            item['infoproperties']['age'] = age_difference(
+                item['infoproperties']['birthday'],
+                item['infoproperties'].get('deathday'))
+        return item
+
+    def finalise(self, item, tmdb_type):
+        if tmdb_type == 'image':
+            item = self.finalise_image(item)
+        elif tmdb_type == 'person':
+            item = self.finalise_person(item)
+        item['label'] = item['infolabels'].get('title')
+        item['infoproperties']['tmdb_type'] = tmdb_type
+        item['infolabels']['mediatype'] = item['infoproperties']['dbtype'] = convert_type(tmdb_type, 'dbtype')
+        item['art']['thumb'] = item['art'].get('thumb') or item['art'].get('poster')
+        for k, v in viewitems(item['unique_ids']):
+            item['infoproperties']['{}_id'.format(k)] = v
+        return item
 
     def get_info(self, info_item, tmdb_type, base_item=None, **kwargs):
         item = get_empty_item()
