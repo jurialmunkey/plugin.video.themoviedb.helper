@@ -1,3 +1,4 @@
+import re
 import sys
 from resources.lib.addon.plugin import PLUGINPATH, viewitems
 try:
@@ -83,3 +84,11 @@ def encode_url(path=None, **kwargs):
     path = path or PLUGINPATH
     paramstring = '?{}'.format(urlencode_params(**kwargs)) if kwargs else ''
     return '{}{}'.format(path, paramstring)
+
+
+def get_between_strings(string, startswith='', endswith=''):
+    exp = startswith + '(.+?)' + endswith
+    try:
+        return re.search(exp, string).group(1)
+    except AttributeError:
+        return ''

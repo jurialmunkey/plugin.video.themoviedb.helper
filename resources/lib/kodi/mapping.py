@@ -4,6 +4,7 @@ from resources.lib.api.mapping import _ItemMapper, get_empty_item
 class ItemMapper(_ItemMapper):
     def __init__(self, key=None):
         self.key = key
+        self.blacklist = []
         """ Mapping dictionary
         keys:       list of tuples containing parent and child key to add value. [('parent', 'child')]
                     parent keys: art, unique_ids, infolabels, infoproperties, params

@@ -227,6 +227,7 @@ class ItemMapper(_ItemMapper):
         self.mpaa_prefix = mpaa_prefix or get_mpaa_prefix()
         self.iso_language = language[:2]
         self.iso_country = language[-2:]
+        self.blacklist = []
         """ Mapping dictionary
         keys:       list of tuples containing parent and child key to add value. [('parent', 'child')]
                     parent keys: art, unique_ids, infolabels, infoproperties, params
