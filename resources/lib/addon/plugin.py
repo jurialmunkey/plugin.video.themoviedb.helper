@@ -6,6 +6,7 @@ import xbmc
 import xbmcaddon
 import hashlib
 from resources.lib.addon.constants import LANGUAGES
+from resources.lib.addon.parser import try_decode
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
@@ -59,7 +60,7 @@ def kodi_log(value, level=0):
         if isinstance(value, list):
             v = ''
             for i in value:
-                v = u'{} {}'.format(v, i) if v else u'{}'.format(i)
+                v = u'{}{}'.format(v, i) if v else u'{}'.format(i)
             value = v
         if isinstance(value, bytes):
             value = value.decode('utf-8')
@@ -84,8 +85,8 @@ def get_language():
 
 def get_mpaa_prefix():
     if ADDON.getSettingString('mpaa_prefix'):
-        return '{} '.format(ADDON.getSettingString('mpaa_prefix'))
-    return ''
+        return u'{} '.format(try_decode(ADDON.getSettingString('mpaa_prefix')))
+    return u''
 
 
 def convert_media_type(media_type, output='tmdb', parent_type=False, strip_plural=False):

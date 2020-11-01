@@ -415,7 +415,7 @@ class Players(object):
 
         # Get the resolved path
         listitem = self.get_resolved_path()
-        path = listitem.getPath()
+        path = try_decode(listitem.getPath())
         is_folder = True if listitem.getProperty('is_folder') == 'true' else False
         is_resolvable = listitem.getProperty('is_resolvable')
 
@@ -424,8 +424,6 @@ class Players(object):
 
         # Check we have an actual path to open
         if not path or path == PLUGINPATH:
-            # if handle and handle != -1:
-            #     resolve_to_dummy(handle)
             return
 
         action = None
@@ -450,7 +448,7 @@ class Players(object):
         # Call as builtin for opening folder or playing strm via PlayMedia()
         if action:
             resolve_to_dummy(handle)  # If we're calling external we need to resolve to dummy
-            xbmc.executebuiltin(try_encode(try_decode(action)))
+            xbmc.executebuiltin(try_encode(action))
             kodi_log(['lib.player - finished executing action\n', action], 1)
             return
 

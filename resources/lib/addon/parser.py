@@ -1,10 +1,12 @@
 import re
 import sys
-from resources.lib.addon.plugin import PLUGINPATH, viewitems
 try:
     from urllib.parse import urlencode, unquote_plus  # Py3
 except ImportError:
     from urllib import urlencode, unquote_plus
+
+
+PLUGINPATH = u'plugin://plugin.video.themoviedb.helper/'
 
 
 def try_int(string, base=None, fallback=0):
@@ -75,7 +77,7 @@ def parse_paramstring(paramstring):
 def urlencode_params(*args, **kwargs):
     """ helper to assist with difference in urllib modules in PY2/3 """
     params = dict()
-    for k, v in viewitems(kwargs):
+    for k, v in kwargs.items():  # TODO: Switch to viewitems and remove viewitems from plugin and put in this module
         params[try_encode(k)] = try_encode(v)
     return urlencode(params)
 

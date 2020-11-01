@@ -3,8 +3,9 @@ import resources.lib.kodi.rpc as rpc
 from resources.lib.addon.window import get_property
 from resources.lib.monitor.common import CommonMonitorFunctions, SETMAIN_ARTWORK, SETPROP_RATINGS
 from resources.lib.monitor.images import ImageFunctions
-from resources.lib.addon.plugin import ADDON, kodi_log, convert_media_type
+from resources.lib.addon.plugin import ADDON, convert_media_type
 from resources.lib.addon.parser import try_decode
+from resources.lib.addon.decorators import try_except_log
 from threading import Thread
 
 
@@ -115,6 +116,7 @@ class ListItemMonitor(CommonMonitorFunctions):
     def get_cur_folder(self):
         return (self.container, xbmc.getInfoLabel('Container.Content()'), self.get_numitems())
 
+    @try_except_log('lib.monitor.listitem.is_same_folder')
     def is_same_folder(self, update=True):
         self.cur_folder = self.get_cur_folder()
         if self.cur_folder == self.pre_folder:
@@ -122,45 +124,41 @@ class ListItemMonitor(CommonMonitorFunctions):
         if update:
             self.pre_folder = self.cur_folder
 
+    @try_except_log('lib.monitor.listitem.process_artwork')
     def process_artwork(self, details, tmdb_type):
-        try:
-            self.clear_property_list(SETMAIN_ARTWORK)
-            if self.dbtype not in ['movies', 'tvshows', 'episodes']:
-                if tmdb_type not in ['movie', 'tv']:
-                    return
-            if ADDON.getSettingBool('service_fanarttv_lookup'):
-                details = self.get_fanarttv_artwork(details, tmdb_type)
-            if not self.is_same_item():
-                return
-            self.set_iter_properties(details.get('art', {}), SETMAIN_ARTWORK)
-
-            # Crop Image
-            if details.get('clearlogo'):
-                if xbmc.getCondVisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"):
-                    self.crop_img = ImageFunctions(method='crop', artwork=details.get('clearlogo'))
-                    self.crop_img.setName('crop_img')
-                    self.crop_img.start()
-
-        except Exception as exc:
-            kodi_log(u'Func: process_artwork\n{}'.format(exc), 1)
-
-    def process_ratings(self, details, tmdb_type, tmdb_id):
-        try:
+        self.clear_property_list(SETMAIN_ARTWORK)
+        if self.dbtype not in ['movies', 'tvshows', 'episodes']:
             if tmdb_type not in ['movie', 'tv']:
                 return
-            details = self.get_omdb_ratings(details)
-            if tmdb_type == 'movie':
-                details = self.get_imdb_top250_rank(details)
-            if tmdb_type in ['movie', 'tv']:
-                details = self.get_trakt_ratings(
-                    details, 'movie' if tmdb_type == 'movie' else 'show',
-                    season=self.season, episode=self.episode)
-            if not self.is_same_item():
-                return
-            self.set_iter_properties(details.get('infoproperties', {}), SETPROP_RATINGS)
-        except Exception as exc:
-            kodi_log(u'Func: process_ratings\n{}'.format(exc), 1)
+        if ADDON.getSettingBool('service_fanarttv_lookup'):
+            details = self.get_fanarttv_artwork(details, tmdb_type)
+        if not self.is_same_item():
+            return
+        self.set_iter_properties(details.get('art', {}), SETMAIN_ARTWORK)
 
+        # Crop Image
+        if details.get('clearlogo'):
+            if xbmc.getCondVisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"):
+                self.crop_img = ImageFunctions(method='crop', artwork=details.get('clearlogo'))
+                self.crop_img.setName('crop_img')
+                self.crop_img.start()
+
+    @try_except_log('lib.monitor.listitem.process_ratings')
+    def process_ratings(self, details, tmdb_type, tmdb_id):
+        if tmdb_type not in ['movie', 'tv']:
+            return
+        details = self.get_omdb_ratings(details)
+        if tmdb_type == 'movie':
+            details = self.get_imdb_top250_rank(details)
+        if tmdb_type in ['movie', 'tv']:
+            details = self.get_trakt_ratings(
+                details, 'movie' if tmdb_type == 'movie' else 'show',
+                season=self.season, episode=self.episode)
+        if not self.is_same_item():
+            return
+        self.set_iter_properties(details.get('infoproperties', {}), SETPROP_RATINGS)
+
+    @try_except_log('lib.monitor.listitem.clear_on_scroll')
     def clear_on_scroll(self):
         if not self.properties and not self.index_properties:
             return
@@ -171,6 +169,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             ignore_keys = SETMAIN_ARTWORK
         self.clear_properties(ignore_keys=ignore_keys)
 
+    @try_except_log('lib.monitor.listitem.get_artwork')
     def get_artwork(self, source='', fallback=''):
         source = source.lower()
         infolabels = ['Art(thumb)']
@@ -188,6 +187,7 @@ class ListItemMonitor(CommonMonitorFunctions):
                 return artwork
         return fallback
 
+    @try_except_log('lib.monitor.listitem.get_listitem')
     def get_listitem(self):
         self.get_container()
 
