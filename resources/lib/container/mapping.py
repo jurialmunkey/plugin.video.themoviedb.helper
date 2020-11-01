@@ -1,5 +1,5 @@
 from resources.lib.addon.parser import try_type
-from resources.lib.addon.plugin import viewitems, convert_type, TYPE_DB
+from resources.lib.addon.plugin import viewitems, convert_type
 from resources.lib.addon.timedate import age_difference
 
 UPDATE_BASEKEY = 1
@@ -65,7 +65,7 @@ class _ItemMapper(object):
             item = self.finalise_person(item)
         item['label'] = item['infolabels'].get('title')
         item['infoproperties']['tmdb_type'] = tmdb_type
-        item['infolabels']['mediatype'] = item['infoproperties']['dbtype'] = convert_type(tmdb_type, TYPE_DB)
+        item['infolabels']['mediatype'] = item['infoproperties']['dbtype'] = convert_type(tmdb_type, 'dbtype')
         item['art']['thumb'] = item['art'].get('thumb') or item['art'].get('poster')
         for k, v in viewitems(item['unique_ids']):
             item['infoproperties']['{}_id'.format(k)] = v

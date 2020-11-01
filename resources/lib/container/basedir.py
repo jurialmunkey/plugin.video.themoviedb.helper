@@ -1,6 +1,6 @@
 import xbmc
 import datetime
-from resources.lib.addon.plugin import PLUGINPATH, ADDONPATH, ADDON, convert_type, TYPE_PLURAL
+from resources.lib.addon.plugin import PLUGINPATH, ADDONPATH, ADDON, convert_type
 from resources.lib.addon.setutils import merge_two_items
 from json import dumps
 
@@ -14,7 +14,7 @@ def _build_basedir(item_type=None, basedir=None):
         for i_type in i.pop('types', []):
             if item_type and item_type != i_type:
                 continue
-            plural = '' if item_type else convert_type(i_type, TYPE_PLURAL)  # Dont add type name to label if only one type
+            plural = '' if item_type else convert_type(i_type, 'plural')  # Dont add type name to label if only one type
             item = i.copy()
             item['label'] = i.get('label', '').format(space=space, item_type=plural)
             item['params'] = i.get('params', {}).copy()

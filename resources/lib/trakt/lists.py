@@ -1,6 +1,6 @@
 import random
 from resources.lib.kodi.rpc import get_kodi_library
-from resources.lib.addon.plugin import convert_type, TYPE_LIBRARY, TYPE_TRAKT, TYPE_CONTAINER
+from resources.lib.addon.plugin import convert_type
 from resources.lib.addon.constants import TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, TRAKT_LIST_OF_LISTS
 from resources.lib.addon.plugin import ADDON, viewitems
 from resources.lib.addon.parser import try_int
@@ -13,7 +13,7 @@ class TraktLists():
     def list_trakt(self, info, tmdb_type, page=None, randomise=False, **kwargs):
         info_model = TRAKT_BASIC_LISTS.get(info)
         info_tmdb_type = info_model.get('tmdb_type') or tmdb_type
-        trakt_type = convert_type(tmdb_type, TYPE_TRAKT)
+        trakt_type = convert_type(tmdb_type, 'trakt')
         items = self.trakt_api.get_basic_list(
             path=info_model.get('path', '').format(trakt_type=trakt_type, **kwargs),
             trakt_type=trakt_type,
@@ -26,8 +26,8 @@ class TraktLists():
             randomise=randomise)
         self.tmdb_cache_only = False
         self.kodi_db = self.get_kodi_database(info_tmdb_type)
-        self.library = convert_type(info_tmdb_type, TYPE_LIBRARY)
-        self.container_content = convert_type(info_tmdb_type, TYPE_CONTAINER)
+        self.library = convert_type(info_tmdb_type, 'library')
+        self.container_content = convert_type(info_tmdb_type, 'container')
         return items
 
     def list_sync(self, info, tmdb_type, page=None, **kwargs):
@@ -35,15 +35,15 @@ class TraktLists():
         info_tmdb_type = info_model.get('tmdb_type') or tmdb_type
         items = self.trakt_api.get_sync_list(
             sync_type=info_model.get('sync_type', ''),
-            trakt_type=convert_type(tmdb_type, TYPE_TRAKT),
+            trakt_type=convert_type(tmdb_type, 'trakt'),
             page=page,
             params=info_model.get('params'),
             sort_by=kwargs.get('sort_by', None) or info_model.get('sort_by', None),
             sort_how=kwargs.get('sort_how', None) or info_model.get('sort_how', None))
         self.tmdb_cache_only = False
         self.kodi_db = self.get_kodi_database(info_tmdb_type)
-        self.library = convert_type(info_tmdb_type, TYPE_LIBRARY)
-        self.container_content = convert_type(info_tmdb_type, TYPE_CONTAINER)
+        self.library = convert_type(info_tmdb_type, 'library')
+        self.container_content = convert_type(info_tmdb_type, 'container')
         return items
 
     def list_lists(self, info, page=None, **kwargs):
@@ -94,7 +94,7 @@ class TraktLists():
         return response.get('items', []) + response.get('next_page', [])
 
     def list_becauseyouwatched(self, info, tmdb_type, page=None, **kwargs):
-        trakt_type = convert_type(tmdb_type, TYPE_TRAKT)
+        trakt_type = convert_type(tmdb_type, 'trakt')
         watched_items = self.trakt_api.get_sync_list(
             sync_type='watched',
             trakt_type=trakt_type,
@@ -124,8 +124,8 @@ class TraktLists():
                 'tmdb_id': '{tmdb_id}'})
         self.tmdb_cache_only = False
         self.kodi_db = self.get_kodi_database(tmdb_type)
-        self.library = convert_type(tmdb_type, TYPE_LIBRARY)
-        self.container_content = convert_type(tmdb_type, TYPE_CONTAINER)
+        self.library = convert_type(tmdb_type, 'library')
+        self.container_content = convert_type(tmdb_type, 'container')
         return items
 
     def list_nextepisodes(self, info, tmdb_type, page=None, **kwargs):

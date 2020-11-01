@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import re
 import sys
 import xbmc
 import xbmcaddon
@@ -11,12 +12,6 @@ ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 ADDONPATH = ADDON.getAddonInfo('path')
 PLUGINPATH = u'plugin://plugin.video.themoviedb.helper/'
 ADDONDATA = 'special://profile/addon_data/plugin.video.themoviedb.helper/'
-
-TYPE_PLURAL = 1
-TYPE_CONTAINER = 2
-TYPE_TRAKT = 3
-TYPE_DB = 4
-TYPE_LIBRARY = 5
 
 _addonlogname = '[plugin.video.themoviedb.helper]\n'
 _debuglogging = ADDON.getSettingBool('debug_logging')
@@ -93,23 +88,56 @@ def get_mpaa_prefix():
     return ''
 
 
-def convert_trakt_type(trakt_type):
-    if trakt_type == 'movie':
-        return 'movie'
-    elif trakt_type == 'show':
-        return 'tv'
-    elif trakt_type == 'season':
-        return 'season'
-    elif trakt_type == 'episode':
-        return 'episode'
-    elif trakt_type == 'person':
-        return 'person'
+def convert_media_type(media_type, output='tmdb', parent_type=False, strip_plural=False):
+    if strip_plural:  # Strip trailing "s" from container_content to convert to media_type
+        media_type = re.sub('s$', '', media_type)
+    if output == 'tmdb':
+        if media_type == 'movie':
+            return 'movie'
+        if media_type == 'tvshow':
+            return 'tv'
+        if media_type == 'season':
+            return 'season' if not parent_type else 'tv'
+        if media_type == 'episode':
+            return 'episode' if not parent_type else 'tv'
+        if media_type in ['actor', 'director']:
+            return 'person'
+        if media_type == 'sets':
+            return 'collection'
+    elif output == 'trakt':
+        if media_type == 'movie':
+            return 'movie'
+        if media_type == 'tvshow':
+            return 'show'
+        if media_type == 'season':
+            return 'season' if not parent_type else 'show'
+        if media_type == 'episode':
+            return 'episode' if not parent_type else 'show'
+    elif output == 'ftv':
+        if media_type == 'movie':
+            return 'movies'
+        if media_type in ['tvshow', 'season', 'episode']:
+            return 'tv'
+
+
+def convert_trakt_type(trakt_type, output='tmdb'):
+    if output == 'tmdb':
+        if trakt_type == 'movie':
+            return 'movie'
+        elif trakt_type == 'show':
+            return 'tv'
+        elif trakt_type == 'season':
+            return 'season'
+        elif trakt_type == 'episode':
+            return 'episode'
+        elif trakt_type == 'person':
+            return 'person'
 
 
 def convert_type(tmdb_type, output, season=None, episode=None):
     if tmdb_type == 'tv' and season is not None:
         tmdb_type == 'episode' if episode is not None else 'season'
-    if output == TYPE_PLURAL:
+    if output == 'plural':
         if tmdb_type == 'movie':
             return xbmc.getLocalizedString(342)
         elif tmdb_type == 'tv':
@@ -136,7 +164,7 @@ def convert_type(tmdb_type, output, season=None, episode=None):
             return xbmc.getLocalizedString(20360)
         elif tmdb_type == 'video':
             return xbmc.getLocalizedString(10025)
-    elif output == TYPE_CONTAINER:
+    elif output == 'container':
         if tmdb_type == 'movie':
             return 'movies'
         elif tmdb_type == 'tv':
@@ -159,7 +187,7 @@ def convert_type(tmdb_type, output, season=None, episode=None):
             return 'episodes'
         elif tmdb_type == 'video':
             return 'videos'
-    elif output == TYPE_TRAKT:
+    elif output == 'trakt':
         if tmdb_type == 'movie':
             return 'movie'
         elif tmdb_type == 'tv':
@@ -168,7 +196,7 @@ def convert_type(tmdb_type, output, season=None, episode=None):
             return 'season'
         elif tmdb_type == 'episode':
             return 'episode'
-    elif output == TYPE_DB:
+    elif output == 'dbtype':
         if tmdb_type == 'movie':
             return 'movie'
         elif tmdb_type == 'tv':
@@ -189,7 +217,7 @@ def convert_type(tmdb_type, output, season=None, episode=None):
             return 'episode'
         elif tmdb_type == 'video':
             return 'video'
-    elif output == TYPE_LIBRARY:
+    elif output == 'library':
         if tmdb_type == 'image':
             return 'pictures'
         else:

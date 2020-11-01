@@ -1,5 +1,5 @@
 from resources.lib.addon.constants import TMDB_BASIC_LISTS
-from resources.lib.addon.plugin import ADDON, TYPE_LIBRARY, TYPE_CONTAINER, convert_type
+from resources.lib.addon.plugin import ADDON, convert_type
 
 
 class TMDbLists():
@@ -14,40 +14,40 @@ class TMDbLists():
             params=info_model.get('params'),
             page=page)
         self.kodi_db = self.get_kodi_database(info_tmdb_type)
-        self.library = convert_type(info_tmdb_type, TYPE_LIBRARY)
-        self.container_content = convert_type(info_tmdb_type, TYPE_CONTAINER)
+        self.library = convert_type(info_tmdb_type, 'library')
+        self.container_content = convert_type(info_tmdb_type, 'container')
         return items
 
     def list_flatseasons(self, tmdb_id, **kwargs):
         items = self.tmdb_api.get_flatseasons_list(tmdb_id)
         self.kodi_db = self.get_kodi_database('tv')
-        self.container_content = convert_type('episode', TYPE_CONTAINER)
+        self.container_content = convert_type('episode', 'container')
         return items
 
     def list_seasons(self, tmdb_id, **kwargs):
         items = self.tmdb_api.get_season_list(tmdb_id, hide_specials=ADDON.getSettingBool('hide_special_seasons'))
-        self.container_content = convert_type('season', TYPE_CONTAINER)
+        self.container_content = convert_type('season', 'container')
         return items
 
     def list_episodes(self, tmdb_id, season, **kwargs):
         items = self.tmdb_api.get_episode_list(tmdb_id, season)
         self.kodi_db = self.get_kodi_database('tv')
-        self.container_content = convert_type('episode', TYPE_CONTAINER)
+        self.container_content = convert_type('episode', 'container')
         return items
 
     def list_cast(self, tmdb_id, tmdb_type, season=None, episode=None, **kwargs):
         items = self.tmdb_api.get_cast_list(tmdb_id, tmdb_type, season=season, episode=episode)
-        self.container_content = convert_type('person', TYPE_CONTAINER)
+        self.container_content = convert_type('person', 'container')
         return items
 
     def list_crew(self, tmdb_id, tmdb_type, season=None, episode=None, **kwargs):
         items = self.tmdb_api.get_cast_list(tmdb_id, tmdb_type, season=season, episode=episode, keys=['crew'])
-        self.container_content = convert_type('person', TYPE_CONTAINER)
+        self.container_content = convert_type('person', 'container')
         return items
 
     def list_all_items(self, tmdb_type, page=None, **kwargs):
         items = self.tmdb_api.get_all_items_list(tmdb_type, page=page)
         self.kodi_db = self.get_kodi_database(tmdb_type)
-        self.library = convert_type(tmdb_type, TYPE_LIBRARY)
-        self.container_content = convert_type(tmdb_type, TYPE_CONTAINER)
+        self.library = convert_type(tmdb_type, 'library')
+        self.container_content = convert_type(tmdb_type, 'container')
         return items

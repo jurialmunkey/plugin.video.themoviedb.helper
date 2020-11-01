@@ -5,10 +5,9 @@ import xbmc
 import xbmcgui
 import datetime
 from resources.lib.addon.cache import set_search_history, get_search_history
-from resources.lib.addon.plugin import TYPE_CONTAINER, TYPE_LIBRARY, TYPE_PLURAL, convert_type
 from resources.lib.addon.window import get_property
 from resources.lib.tmdb.api import TMDb
-from resources.lib.addon.plugin import ADDONPATH, ADDON, PLUGINPATH, viewitems
+from resources.lib.addon.plugin import ADDONPATH, ADDON, PLUGINPATH, viewitems, convert_type
 from resources.lib.addon.parser import try_int, try_decode, encode_url
 from resources.lib.addon.setutils import merge_two_dicts, split_items
 
@@ -489,7 +488,7 @@ def _get_release_types():
 def _get_basedir_top(tmdb_type):
     return [
         {
-            'label': ADDON.getLocalizedString(32238).format(convert_type(tmdb_type, TYPE_PLURAL)),
+            'label': ADDON.getLocalizedString(32238).format(convert_type(tmdb_type, 'plural')),
             'art': {'thumb': '{}/resources/poster.png'.format(ADDONPATH)},
             'params': {'info': 'user_discover', 'tmdb_type': tmdb_type, 'method': 'open'}},
         {
@@ -863,8 +862,8 @@ class UserDiscoverLists():
         kwargs.pop('info', None)
         items = TMDb().get_discover_list(tmdb_type, **_translate_discover_params(tmdb_type, kwargs))
         self.kodi_db = self.get_kodi_database(tmdb_type)
-        self.library = convert_type(tmdb_type, TYPE_LIBRARY)
-        self.container_content = convert_type(tmdb_type, TYPE_CONTAINER)
+        self.library = convert_type(tmdb_type, 'library')
+        self.container_content = convert_type(tmdb_type, 'container')
         return items
 
     def list_discoverdir_router(self, **kwargs):
@@ -906,7 +905,7 @@ class UserDiscoverLists():
         artwork = {'thumb': '{}/resources/poster.png'.format(ADDONPATH)}
         for i in ['movie', 'tv']:
             item = {
-                'label': '{} {}'.format(ADDON.getLocalizedString(32174), convert_type(i, TYPE_PLURAL)),
+                'label': '{} {}'.format(ADDON.getLocalizedString(32174), convert_type(i, 'plural')),
                 'params': merge_two_dicts(params, {'tmdb_type': i}),
                 'infoproperties': {'specialsort': 'top'},
                 'art': artwork}
