@@ -1,7 +1,7 @@
 import xbmc
 import xbmcgui
 from resources.lib.addon.constants import ACCEPTED_MEDIATYPES
-from resources.lib.addon.plugin import ADDON, ADDONPATH, PLUGINPATH, kodi_log, viewitems
+from resources.lib.addon.plugin import ADDON, ADDONPATH, PLUGINPATH, kodi_log, viewitems, convert_media_type
 from resources.lib.addon.parser import try_int, encode_url
 from resources.lib.addon.timedate import is_future_timestamp
 from resources.lib.addon.setutils import merge_two_dicts
@@ -71,28 +71,15 @@ class ListItem(object):
         return self.art
 
     def get_trakt_type(self):
-        if self.infolabels.get('mediatype') == 'movie':
-            return 'movie'
-        if self.infolabels.get('mediatype') == 'tvshow':
-            return 'show'
-        if self.infolabels.get('mediatype') == 'season':
-            return 'season'
-        if self.infolabels.get('mediatype') == 'episode':
-            return 'episode'
+        return convert_media_type(self.infolabels.get('mediatype'), 'trakt')
 
     def get_tmdb_type(self):
-        if self.infolabels.get('mediatype') == 'movie':
-            return 'movie'
-        if self.infolabels.get('mediatype') in ['tvshow', 'season', 'episode']:
-            return 'tv'
         if self.infoproperties.get('tmdb_type') == 'person':
             return 'person'
+        return convert_media_type(self.infolabels.get('mediatype'), 'tmdb', parent_type=True)
 
     def get_ftv_type(self):
-        if self.infolabels.get('mediatype') == 'movie':
-            return 'movies'
-        if self.infolabels.get('mediatype') in ['tvshow', 'season', 'episode']:
-            return 'tv'
+        return convert_media_type(self.infolabels.get('mediatype'), 'ftv')
 
     def get_ftv_id(self):
         if self.infolabels.get('mediatype') == 'movie':

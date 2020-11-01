@@ -3,7 +3,7 @@ import xbmc
 import xbmcplugin
 from resources.lib.addon.constants import NO_LABEL_FORMATTING, RANDOMISED_TRAKT, RANDOMISED_LISTS, TRAKT_LIST_OF_LISTS, TMDB_BASIC_LISTS, TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS
 from resources.lib.kodi.rpc import get_kodi_library, get_movie_details, get_tvshow_details, get_episode_details, get_season_details
-from resources.lib.addon.plugin import convert_type, TYPE_CONTAINER, reconfigure_legacy_params
+from resources.lib.addon.plugin import convert_type, reconfigure_legacy_params
 from resources.lib.script.router import related_lists
 from resources.lib.container.listitem import ListItem
 from resources.lib.tmdb.api import TMDb
@@ -16,7 +16,7 @@ from resources.lib.tmdb.lists import TMDbLists
 from resources.lib.trakt.lists import TraktLists
 from resources.lib.tmdb.search import SearchLists
 from resources.lib.tmdb.discover import UserDiscoverLists
-from resources.lib.container.mapping import set_show, get_empty_item
+from resources.lib.api.mapping import set_show, get_empty_item
 from resources.lib.addon.parser import try_decode, parse_paramstring, try_int
 from resources.lib.addon.setutils import split_items, random_from_list, merge_two_dicts
 # from resources.lib.addon.decorators import busy_dialog
@@ -278,10 +278,10 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
 
     def get_container_content(self, tmdb_type, season=None, episode=None):
         if tmdb_type == 'tv' and season and episode:
-            return convert_type('episode', TYPE_CONTAINER)
+            return convert_type('episode', 'container')
         elif tmdb_type == 'tv' and season:
-            return convert_type('season', TYPE_CONTAINER)
-        return convert_type(tmdb_type, TYPE_CONTAINER)
+            return convert_type('season', 'container')
+        return convert_type(tmdb_type, 'container')
 
     def list_randomised_trakt(self, **kwargs):
         kwargs['info'] = RANDOMISED_TRAKT.get(kwargs.get('info'))

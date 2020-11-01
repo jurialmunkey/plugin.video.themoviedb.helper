@@ -1,6 +1,5 @@
 import random
-import resources.lib.addon.plugin as plugin
-from resources.lib.addon.plugin import PLUGINPATH, viewitems
+from resources.lib.addon.plugin import PLUGINPATH, viewitems, convert_type, convert_trakt_type
 from resources.lib.addon.setutils import del_empty_keys, get_params
 
 
@@ -51,7 +50,7 @@ def _get_item_infolabels(item, item_type=None, infolabels=None, show=None):
     infolabels = infolabels or {}
     infolabels['title'] = _get_item_title(item)
     infolabels['year'] = item.get('year')
-    infolabels['mediatype'] = plugin.convert_type(plugin.convert_trakt_type(item_type), plugin.TYPE_DB)
+    infolabels['mediatype'] = convert_type(convert_trakt_type(item_type), 'dbtype')
     if show:
         infolabels['tvshowtitle'] = show.get('title') or ''
     if item_type == 'episode':
@@ -64,7 +63,7 @@ def _get_item_infolabels(item, item_type=None, infolabels=None, show=None):
 
 def _get_item_infoproperties(item, item_type=None, infoproperties=None, show=None):
     infoproperties = infoproperties or {}
-    infoproperties['tmdb_type'] = plugin.convert_trakt_type(item_type)
+    infoproperties['tmdb_type'] = convert_trakt_type(item_type)
     return del_empty_keys(infoproperties)
 
 
@@ -93,7 +92,7 @@ def _get_item_info(item, item_type=None, base_item=None, check_tmdb_id=True, par
     base_item['infoproperties'] = _get_item_infoproperties(item_info, item_type=item_type, infoproperties=base_item.get('infoproperties', {}), show=show_item)
     base_item['unique_ids'] = _get_item_unique_ids(item_info, unique_ids=base_item.get('unique_ids', {}), show=show_item)
     base_item['params'] = get_params(
-        item_info, plugin.convert_trakt_type(item_type),
+        item_info, convert_trakt_type(item_type),
         tmdb_id=base_item.get('unique_ids', {}).get('tmdb'),
         params=base_item.get('params', {}),
         definition=params_def)

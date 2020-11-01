@@ -3,7 +3,7 @@ import resources.lib.kodi.rpc as rpc
 from resources.lib.addon.window import get_property
 from resources.lib.monitor.common import CommonMonitorFunctions, SETMAIN_ARTWORK, SETPROP_RATINGS
 from resources.lib.monitor.images import ImageFunctions
-from resources.lib.addon.plugin import ADDON, kodi_log
+from resources.lib.addon.plugin import ADDON, kodi_log, convert_media_type
 from resources.lib.addon.parser import try_decode
 from threading import Thread
 
@@ -84,15 +84,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         return '{0}s'.format(dbtype) if dbtype else ''
 
     def get_tmdb_type(self, dbtype=None):
-        dbtype = dbtype or self.dbtype
-        if dbtype in ['tvshows', 'seasons', 'episodes']:
-            return 'tv'
-        if dbtype == 'movies':
-            return 'movie'
-        if dbtype == 'sets':
-            return 'collection'
-        if dbtype in ['actors', 'directors']:
-            return 'person'
+        return convert_media_type(dbtype or self.dbtype, 'tmdb', strip_plural=True)
 
     def set_cur_item(self):
         self.dbtype = self.get_dbtype()

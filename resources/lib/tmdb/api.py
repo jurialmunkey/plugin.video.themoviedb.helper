@@ -3,7 +3,7 @@ import datetime
 import resources.lib.addon.cache as cache
 from resources.lib.tmdb.mapping import ItemMapper, get_episode_to_air
 from resources.lib.api.request import RequestAPI
-from resources.lib.addon.plugin import viewitems, ADDON, get_mpaa_prefix, get_language, convert_type, TYPE_DB, ADDONPATH
+from resources.lib.addon.plugin import viewitems, ADDON, get_mpaa_prefix, get_language, convert_type, ADDONPATH
 from resources.lib.files.downloader import Downloader
 from resources.lib.container.listitem import ListItem
 from resources.lib.addon.constants import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES
@@ -283,7 +283,7 @@ class TMDb(RequestAPI):
         limit = TMDB_ALL_ITEMS_LISTS.get(tmdb_type, {}).get('limit', 20)
         pos_z = try_int(page, fallback=1) * limit
         pos_a = pos_z - limit
-        dbtype = convert_type(tmdb_type, TYPE_DB)
+        dbtype = convert_type(tmdb_type, 'dbtype')
         for i in daily_list[pos_a:pos_z]:
             if not i.get('id'):
                 continue

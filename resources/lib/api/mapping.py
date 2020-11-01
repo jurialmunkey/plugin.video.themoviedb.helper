@@ -1,6 +1,5 @@
 from resources.lib.addon.parser import try_type
-from resources.lib.addon.plugin import viewitems, convert_type, TYPE_DB
-from resources.lib.addon.timedate import age_difference
+from resources.lib.addon.plugin import viewitems
 
 UPDATE_BASEKEY = 1
 
@@ -40,36 +39,6 @@ class _ItemMapper(object):
                     continue
                 item[d][k] = v
         return set_show(item, base_item) if tmdb_type in ['season', 'episode', 'tv'] else item
-
-    def finalise_image(self, item):
-        item['infolabels']['title'] = '{}x{}'.format(
-            item['infoproperties'].get('width'),
-            item['infoproperties'].get('height'))
-        item['params'] = -1
-        item['path'] = item['art'].get('thumb') or item['art'].get('poster') or item['art'].get('fanart')
-        item['is_folder'] = False
-        item['library'] = 'pictures'
-        return item
-
-    def finalise_person(self, item):
-        if item['infoproperties'].get('birthday'):
-            item['infoproperties']['age'] = age_difference(
-                item['infoproperties']['birthday'],
-                item['infoproperties'].get('deathday'))
-        return item
-
-    def finalise(self, item, tmdb_type):
-        if tmdb_type == 'image':
-            item = self.finalise_image(item)
-        elif tmdb_type == 'person':
-            item = self.finalise_person(item)
-        item['label'] = item['infolabels'].get('title')
-        item['infoproperties']['tmdb_type'] = tmdb_type
-        item['infolabels']['mediatype'] = item['infoproperties']['dbtype'] = convert_type(tmdb_type, TYPE_DB)
-        item['art']['thumb'] = item['art'].get('thumb') or item['art'].get('poster')
-        for k, v in viewitems(item['unique_ids']):
-            item['infoproperties']['{}_id'.format(k)] = v
-        return item
 
     def map_item(self, item, i):
         sm = self.standard_map or {}

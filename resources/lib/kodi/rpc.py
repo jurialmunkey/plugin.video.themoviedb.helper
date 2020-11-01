@@ -1,8 +1,9 @@
 import xbmc
 import json
 from resources.lib.addon.plugin import kodi_log
-from resources.lib.addon.parser import try_int, try_float, try_decode
-from resources.lib.addon.setutils import find_dict_in_list, del_empty_keys
+from resources.lib.addon.parser import try_int, try_decode
+from resources.lib.addon.setutils import find_dict_in_list
+from resources.lib.kodi.mapping import ItemMapper
 
 
 def get_jsonrpc(method=None, params=None):
@@ -112,80 +113,6 @@ def get_directory(url):
     return response.get('result', {}).get('files', [{}]) or [{}]
 
 
-def _get_infolabels(item, key, dbid):
-    infolabels = {}
-    infolabels['dbid'] = dbid
-    infolabels['genre'] = item.get('genre') or []
-    infolabels['country'] = item.get('country') or []
-    infolabels['episode'] = item.get('episode')
-    infolabels['season'] = item.get('season')
-    infolabels['sortepisode'] = item.get('sortepisode')
-    infolabels['sortseason'] = item.get('sortseason')
-    infolabels['episodeguide'] = item.get('episodeguide')
-    infolabels['showlink'] = item.get('showlink') or []
-    infolabels['top250'] = item.get('top250')
-    infolabels['setid'] = item.get('setid')
-    infolabels['tracknumber'] = item.get('tracknumber')
-    infolabels['rating'] = item.get('rating')
-    infolabels['userrating'] = item.get('userrating')
-    infolabels['playcount'] = try_int(item.get('playcount'))
-    infolabels['overlay'] = item.get('overlay')
-    infolabels['director'] = item.get('director') or []
-    infolabels['mpaa'] = item.get('mpaa')
-    infolabels['plot'] = item.get('plot')
-    infolabels['plotoutline'] = item.get('plotoutline')
-    infolabels['title'] = item.get('title')
-    infolabels['originaltitle'] = item.get('originaltitle')
-    infolabels['sorttitle'] = item.get('sorttitle')
-    infolabels['duration'] = item.get('duration')
-    infolabels['studio'] = item.get('studio') or []
-    infolabels['tagline'] = item.get('tagline')
-    infolabels['writer'] = item.get('writer') or []
-    infolabels['tvshowtitle'] = item.get('tvshowtitle')
-    infolabels['premiered'] = item.get('premiered')
-    infolabels['year'] = item.get('premiered', '')[:4]
-    infolabels['status'] = item.get('status')
-    infolabels['set'] = item.get('set')
-    infolabels['setoverview'] = item.get('setoverview')
-    infolabels['tag'] = item.get('tag') or []
-    infolabels['imdbnumber'] = item.get('imdbnumber')
-    infolabels['code'] = item.get('code')
-    infolabels['aired'] = item.get('aired')
-    infolabels['credits'] = item.get('credits')
-    infolabels['lastplayed'] = item.get('lastplayed')
-    infolabels['album'] = item.get('album')
-    infolabels['artist'] = item.get('artist') or []
-    infolabels['votes'] = item.get('votes')
-    infolabels['path'] = item.get('file')
-    infolabels['trailer'] = item.get('trailer')
-    infolabels['dateadded'] = item.get('dateadded')
-    infolabels['overlay'] = 5 if try_int(item.get('playcount')) > 0 and key in ['movie', 'episode'] else 4
-    return del_empty_keys(infolabels)
-
-
-def _get_infoproperties(item):
-    infoproperties = {}
-    infoproperties['watchedepisodes'] = item.get('watchedepisodes')
-    infoproperties['metacritic_rating'] = '{0:.1f}'.format(try_float(item.get('ratings', {}).get('metacritic', {}).get('rating')))
-    infoproperties['imdb_rating'] = '{0:.1f}'.format(try_float(item.get('ratings', {}).get('imdb', {}).get('rating')))
-    infoproperties['imdb_votes'] = '{:0,.0f}'.format(try_float(item.get('ratings', {}).get('imdb', {}).get('votes')))
-    infoproperties['tmdb_rating'] = '{0:.1f}'.format(try_float(item.get('ratings', {}).get('themoviedb', {}).get('rating')))
-    infoproperties['tmdb_votes'] = '{:0,.0f}'.format(try_float(item.get('ratings', {}).get('themoviedb', {}).get('votes')))
-    return del_empty_keys(infoproperties)
-
-
-def _get_niceitem(item, key, dbid):
-    nice_item = {
-        'label': item.get('label') or '',
-        'art': item.get('art') or {},
-        'cast': item.get('cast') or [],
-        'stream_details': item.get('streamdetails') or {},
-        'infolabels': _get_infolabels(item, key, dbid),
-        'infoproperties': _get_infoproperties(item),
-        'unique_ids': item.get('uniqueid') or {}}
-    return del_empty_keys(nice_item)
-
-
 def _get_item_details(dbid=None, method=None, key=None, properties=None):
     if not dbid or not method or not key or not properties:
         return {}
@@ -197,7 +124,8 @@ def _get_item_details(dbid=None, method=None, key=None, properties=None):
         return {}
     details = details.get('result', {}).get('{0}details'.format(key))
     if details:
-        return _get_niceitem(details, key, dbid)
+        details['dbid'] = dbid
+        return ItemMapper(key=key).get_info(details)
 
 
 def get_movie_details(dbid=None):
@@ -241,14 +169,14 @@ class KodiLibrary(object):
     def get_database(self, dbtype, tvshowid=None, attempt_reconnect=False):
         retries = 5 if attempt_reconnect else 1
         while not xbmc.Monitor().abortRequested() and retries > 0:
-            database = self.get_kodi_db(dbtype, tvshowid)
+            database = self._get_kodi_db(dbtype, tvshowid)
             if database:
                 return database
             xbmc.Monitor().waitForAbort(1)
             retries -= 1
         kodi_log(u'Getting KodiDB {} FAILED!'.format(dbtype), 1)
 
-    def get_kodi_db(self, dbtype=None, tvshowid=None):
+    def _get_kodi_db(self, dbtype=None, tvshowid=None):
         if not dbtype:
             return
         if dbtype == "movie":

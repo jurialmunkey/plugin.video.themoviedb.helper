@@ -1,8 +1,7 @@
 import xbmc
 import xbmcgui
 import resources.lib.addon.cache as cache
-import resources.lib.addon.plugin as plugin
-from resources.lib.addon.plugin import ADDONPATH, ADDON, PLUGINPATH
+from resources.lib.addon.plugin import ADDONPATH, ADDON, PLUGINPATH, convert_type
 from resources.lib.addon.parser import try_decode, urlencode_params
 from resources.lib.addon.setutils import merge_two_dicts
 
@@ -16,7 +15,7 @@ class SearchLists():
 
     def list_searchdir(self, tmdb_type, **kwargs):
         base_item = {
-            'label': '{} {}'.format(xbmc.getLocalizedString(137), plugin.convert_type(tmdb_type, plugin.TYPE_PLURAL)),
+            'label': '{} {}'.format(xbmc.getLocalizedString(137), convert_type(tmdb_type, 'plural')),
             'art': {'thumb': '{}/resources/icons/tmdb/search.png'.format(ADDONPATH)},
             'infoproperties': {'specialsort': 'top'},
             'params': merge_two_dicts(kwargs, {'info': 'search', 'tmdb_type': tmdb_type})}
@@ -63,7 +62,7 @@ class SearchLists():
             # Prevents onback from re-prompting for user input by re-writing path
 
         self.update_listing = True if update_listing else False
-        self.container_content = plugin.convert_type(tmdb_type, plugin.TYPE_CONTAINER)
+        self.container_content = convert_type(tmdb_type, 'container')
         self.kodi_db = self.get_kodi_database(tmdb_type)
 
         return items
