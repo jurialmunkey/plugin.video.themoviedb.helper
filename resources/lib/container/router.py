@@ -386,6 +386,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             xbmc.executebuiltin('Container.Refresh')
 
     def play_external(self, **kwargs):
+        kodi_log(['lib.container.router - Attempting to play item\n', kwargs], 1)
         if not kwargs.get('tmdb_id'):
             kwargs['tmdb_id'] = self.tmdb_api.get_tmdb_id(**kwargs)
         Players(**kwargs).play(handle=self.handle if self.handle != -1 else None)
