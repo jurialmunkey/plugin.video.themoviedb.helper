@@ -181,7 +181,9 @@ class CommonMonitorFunctions(object):
             imdb_id = item.get('unique_ids', {}).get('tvshow.imdb')
         if not imdb_id:
             return item
-        return self.omdb_api.get_ratings_awards(imdb_id=imdb_id, cache_only=cache_only, base_item=item)
+        ratings = self.omdb_api.get_ratings_awards(imdb_id=imdb_id, cache_only=cache_only)
+        item['infoproperties'] = merge_two_dicts(item.get('infoproperties', {}), ratings.get('infoproperties', {}))
+        return item
 
     def clear_properties(self, ignore_keys=None):
         ignore_keys = ignore_keys or set()
