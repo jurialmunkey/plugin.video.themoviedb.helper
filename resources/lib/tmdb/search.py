@@ -1,10 +1,10 @@
 import xbmc
 import xbmcgui
-import resources.lib.helpers.cache as cache
-import resources.lib.helpers.plugin as plugin
-from resources.lib.helpers.plugin import ADDONPATH, ADDON, PLUGINPATH
-from resources.lib.helpers.parser import try_decode, urlencode_params
-from resources.lib.helpers.setutils import merge_two_dicts
+import resources.lib.addon.cache as cache
+import resources.lib.addon.plugin as plugin
+from resources.lib.addon.plugin import ADDONPATH, ADDON, PLUGINPATH
+from resources.lib.addon.parser import try_decode, urlencode_params
+from resources.lib.addon.setutils import merge_two_dicts
 
 
 class SearchLists():

@@ -1,5 +1,5 @@
-import resources.lib.helpers.cache as cache
-from resources.lib.helpers.fileutils import set_pickle, get_pickle
+import resources.lib.addon.cache as cache
+from resources.lib.files.utils import set_pickle, get_pickle
 
 
 def is_authorized(func):

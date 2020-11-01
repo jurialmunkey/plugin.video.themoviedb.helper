@@ -1,11 +1,11 @@
 import datetime
-from resources.lib.helpers.constants import PLAYERS_URLENCODE
+from resources.lib.addon.constants import PLAYERS_URLENCODE
 from resources.lib.tmdb.api import TMDb
 from resources.lib.trakt.api import TraktAPI
-from resources.lib.items.listitem import ListItem
-from resources.lib.helpers.plugin import viewitems
-from resources.lib.helpers.parser import try_int, try_encode
-from resources.lib.helpers.setutils import del_empty_keys
+from resources.lib.container.listitem import ListItem
+from resources.lib.addon.plugin import viewitems
+from resources.lib.addon.parser import try_int, try_encode
+from resources.lib.addon.setutils import del_empty_keys
 from json import dumps
 from collections import defaultdict
 try:

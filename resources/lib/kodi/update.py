@@ -1,15 +1,15 @@
 import xbmc
 import xbmcgui
 import xbmcvfs
-import resources.lib.helpers.rpc as rpc
-import resources.lib.helpers.cache as cache
-from resources.lib.helpers.timedate import is_future_timestamp, get_todays_date, get_current_date_time
-from resources.lib.helpers.decorators import busy_dialog
+import resources.lib.kodi.rpc as rpc
+import resources.lib.addon.cache as cache
+from resources.lib.addon.timedate import is_future_timestamp, get_todays_date, get_current_date_time
+from resources.lib.addon.decorators import busy_dialog
 from resources.lib.tmdb.api import TMDb
 from resources.lib.trakt.api import TraktAPI
-from resources.lib.helpers.plugin import kodi_log, ADDON
-from resources.lib.helpers.parser import try_int
-from resources.lib.helpers.fileutils import validify_filename, make_path, write_to_file, get_tmdb_id_nfo
+from resources.lib.addon.plugin import kodi_log, ADDON
+from resources.lib.addon.parser import try_int
+from resources.lib.files.utils import validify_filename, make_path, write_to_file, get_tmdb_id_nfo
 
 
 BASEDIR_MOVIE = ADDON.getSettingString('movies_library') or 'special://profile/addon_data/plugin.video.themoviedb.helper/movies/'

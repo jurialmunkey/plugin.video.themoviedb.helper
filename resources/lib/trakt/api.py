@@ -1,19 +1,19 @@
 import xbmc
 import xbmcgui
 import random
-import resources.lib.helpers.cache as cache
-import resources.lib.items.pages as pages
-from resources.lib.helpers.window import get_property
-from resources.lib.helpers.cache import use_simple_cache
+import resources.lib.addon.cache as cache
+import resources.lib.container.pages as pages
+from resources.lib.addon.window import get_property
+from resources.lib.addon.cache import use_simple_cache
 from json import loads, dumps
-from resources.lib.request.api import RequestAPI
-from resources.lib.helpers.plugin import ADDON, kodi_log, viewitems
-from resources.lib.items.pages import PaginatedItems
+from resources.lib.api.request import RequestAPI
+from resources.lib.addon.plugin import ADDON, kodi_log, viewitems
+from resources.lib.container.pages import PaginatedItems
 from resources.lib.trakt.items import TraktItems
 from resources.lib.trakt.decorators import is_authorized, use_activity_cache
 from resources.lib.trakt.progress import _TraktProgress
-from resources.lib.helpers.parser import try_int
-# from resources.lib.helpers.decorators import timer_report
+from resources.lib.addon.parser import try_int
+# from resources.lib.addon.decorators import timer_report
 
 API_URL = 'https://api.trakt.tv/'
 CLIENT_ID = 'e6fde6173adf3c6af8fd1b0694b9b84d7c519cefc24482310e1de06c6abe5467'

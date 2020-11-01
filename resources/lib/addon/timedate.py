@@ -1,7 +1,7 @@
 import xbmc
 import time
 import datetime
-from resources.lib.helpers.plugin import kodi_log, ADDON
+from resources.lib.addon.plugin import kodi_log, ADDON
 
 
 def get_timestamp(timestamp=None):

@@ -1,5 +1,5 @@
 import sys
-from resources.lib.helpers.plugin import PLUGINPATH, viewitems
+from resources.lib.addon.plugin import PLUGINPATH, viewitems
 try:
     from urllib.parse import urlencode, unquote_plus  # Py3
 except ImportError:

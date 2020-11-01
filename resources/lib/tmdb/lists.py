@@ -1,5 +1,5 @@
-from resources.lib.helpers.constants import TMDB_BASIC_LISTS
-from resources.lib.helpers.plugin import ADDON, TYPE_LIBRARY, TYPE_CONTAINER, convert_type
+from resources.lib.addon.constants import TMDB_BASIC_LISTS
+from resources.lib.addon.plugin import ADDON, TYPE_LIBRARY, TYPE_CONTAINER, convert_type
 
 
 class TMDbLists():

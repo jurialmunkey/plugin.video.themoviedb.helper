@@ -1,12 +1,12 @@
 import xbmc
-from resources.lib.helpers.window import get_property
+from resources.lib.addon.window import get_property
 from resources.lib.tmdb.api import TMDb
 from resources.lib.omdb.api import OMDb
 from resources.lib.trakt.api import TraktAPI
 from resources.lib.fanarttv.api import FanartTV
-from resources.lib.helpers.plugin import ADDON, kodi_log, viewitems
-from resources.lib.helpers.parser import try_int
-from resources.lib.helpers.setutils import merge_two_dicts
+from resources.lib.addon.plugin import ADDON, kodi_log, viewitems
+from resources.lib.addon.parser import try_int
+from resources.lib.addon.setutils import merge_two_dicts
 
 SETMAIN = {
     'label', 'tmdb_id', 'imdb_id'}

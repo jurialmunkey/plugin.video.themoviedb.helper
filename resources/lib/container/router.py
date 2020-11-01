@@ -1,25 +1,25 @@
 import sys
 import xbmc
 import xbmcplugin
-from resources.lib.helpers.constants import NO_LABEL_FORMATTING, RANDOMISED_TRAKT, RANDOMISED_LISTS, TRAKT_LIST_OF_LISTS, TMDB_BASIC_LISTS, TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS
-from resources.lib.helpers.rpc import get_kodi_library, get_movie_details, get_tvshow_details, get_episode_details, get_season_details
-from resources.lib.helpers.plugin import convert_type, TYPE_CONTAINER, reconfigure_legacy_params
+from resources.lib.addon.constants import NO_LABEL_FORMATTING, RANDOMISED_TRAKT, RANDOMISED_LISTS, TRAKT_LIST_OF_LISTS, TMDB_BASIC_LISTS, TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS
+from resources.lib.kodi.rpc import get_kodi_library, get_movie_details, get_tvshow_details, get_episode_details, get_season_details
+from resources.lib.addon.plugin import convert_type, TYPE_CONTAINER, reconfigure_legacy_params
 from resources.lib.script.router import related_lists
-from resources.lib.items.listitem import ListItem
+from resources.lib.container.listitem import ListItem
 from resources.lib.tmdb.api import TMDb
 from resources.lib.trakt.api import TraktAPI
 from resources.lib.fanarttv.api import FanartTV
 from resources.lib.player.players import Players
-from resources.lib.helpers.plugin import ADDON, kodi_log, viewitems
-from resources.lib.items.basedir import BaseDirLists
+from resources.lib.addon.plugin import ADDON, kodi_log, viewitems
+from resources.lib.container.basedir import BaseDirLists
 from resources.lib.tmdb.lists import TMDbLists
 from resources.lib.trakt.lists import TraktLists
 from resources.lib.tmdb.search import SearchLists
 from resources.lib.tmdb.discover import UserDiscoverLists
-from resources.lib.helpers.mapping import set_show, get_empty_item
-from resources.lib.helpers.parser import try_decode, parse_paramstring, try_int
-from resources.lib.helpers.setutils import split_items, random_from_list, merge_two_dicts
-# from resources.lib.helpers.decorators import busy_dialog
+from resources.lib.container.mapping import set_show, get_empty_item
+from resources.lib.addon.parser import try_decode, parse_paramstring, try_int
+from resources.lib.addon.setutils import split_items, random_from_list, merge_two_dicts
+# from resources.lib.addon.decorators import busy_dialog
 
 
 """ Container methods:

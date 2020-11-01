@@ -1,10 +1,10 @@
 import xbmc
-from resources.lib.helpers.plugin import get_mpaa_prefix, get_language, viewitems, ADDON
-from resources.lib.helpers.parser import try_int, try_float
-from resources.lib.helpers.setutils import iter_props, dict_to_list, get_params
-from resources.lib.helpers.timedate import format_date
-from resources.lib.helpers.constants import IMAGEPATH_ORIGINAL, IMAGEPATH_POSTER, TMDB_GENRE_IDS
-from resources.lib.helpers.mapping import UPDATE_BASEKEY, _ItemMapper, get_empty_item
+from resources.lib.addon.plugin import get_mpaa_prefix, get_language, viewitems, ADDON
+from resources.lib.addon.parser import try_int, try_float
+from resources.lib.addon.setutils import iter_props, dict_to_list, get_params
+from resources.lib.addon.timedate import format_date
+from resources.lib.addon.constants import IMAGEPATH_ORIGINAL, IMAGEPATH_POSTER, TMDB_GENRE_IDS
+from resources.lib.container.mapping import UPDATE_BASEKEY, _ItemMapper, get_empty_item
 
 
 def get_imagepath_poster(v):

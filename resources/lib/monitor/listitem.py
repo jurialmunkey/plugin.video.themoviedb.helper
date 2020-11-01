@@ -1,10 +1,10 @@
 import xbmc
-import resources.lib.helpers.rpc as rpc
-from resources.lib.helpers.window import get_property
+import resources.lib.kodi.rpc as rpc
+from resources.lib.addon.window import get_property
 from resources.lib.monitor.common import CommonMonitorFunctions, SETMAIN_ARTWORK, SETPROP_RATINGS
 from resources.lib.monitor.images import ImageFunctions
-from resources.lib.helpers.plugin import ADDON, kodi_log
-from resources.lib.helpers.parser import try_decode
+from resources.lib.addon.plugin import ADDON, kodi_log
+from resources.lib.addon.parser import try_decode
 from threading import Thread
 
 

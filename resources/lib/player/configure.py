@@ -1,13 +1,13 @@
 import xbmc
 import xbmcgui
 import xbmcaddon
-from resources.lib.helpers.constants import PLAYERS_BASEDIR_BUNDLED, PLAYERS_BASEDIR_USER, PLAYERS_BASEDIR_SAVE, PLAYERS_PRIORITY
-from resources.lib.helpers.fileutils import get_files_in_folder
-from resources.lib.helpers.plugin import ADDON, ADDONPATH, viewitems
-from resources.lib.helpers.fileutils import read_file, dumps_to_file, delete_file
-from resources.lib.helpers.parser import try_int
-from resources.lib.items.listitem import ListItem
-from resources.lib.helpers.decorators import busy_dialog
+from resources.lib.addon.constants import PLAYERS_BASEDIR_BUNDLED, PLAYERS_BASEDIR_USER, PLAYERS_BASEDIR_SAVE, PLAYERS_PRIORITY
+from resources.lib.files.utils import get_files_in_folder
+from resources.lib.addon.plugin import ADDON, ADDONPATH, viewitems
+from resources.lib.files.utils import read_file, dumps_to_file, delete_file
+from resources.lib.addon.parser import try_int
+from resources.lib.container.listitem import ListItem
+from resources.lib.addon.decorators import busy_dialog
 from json import loads, dumps
 
 

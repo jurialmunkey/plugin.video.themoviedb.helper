@@ -1,7 +1,7 @@
 import random
-import resources.lib.helpers.plugin as plugin
-from resources.lib.helpers.plugin import PLUGINPATH, viewitems
-from resources.lib.helpers.setutils import del_empty_keys, get_params
+import resources.lib.addon.plugin as plugin
+from resources.lib.addon.plugin import PLUGINPATH, viewitems
+from resources.lib.addon.setutils import del_empty_keys, get_params
 
 
 def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):

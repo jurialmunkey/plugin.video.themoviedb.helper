@@ -4,7 +4,7 @@ import sys
 import xbmc
 import xbmcaddon
 import hashlib
-from resources.lib.helpers.constants import LANGUAGES
+from resources.lib.addon.constants import LANGUAGES
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')

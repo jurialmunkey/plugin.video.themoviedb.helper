@@ -4,13 +4,13 @@
 import xbmc
 import xbmcgui
 import datetime
-from resources.lib.helpers.cache import set_search_history, get_search_history
-from resources.lib.helpers.plugin import TYPE_CONTAINER, TYPE_LIBRARY, TYPE_PLURAL, convert_type
-from resources.lib.helpers.window import get_property
+from resources.lib.addon.cache import set_search_history, get_search_history
+from resources.lib.addon.plugin import TYPE_CONTAINER, TYPE_LIBRARY, TYPE_PLURAL, convert_type
+from resources.lib.addon.window import get_property
 from resources.lib.tmdb.api import TMDb
-from resources.lib.helpers.plugin import ADDONPATH, ADDON, PLUGINPATH, viewitems
-from resources.lib.helpers.parser import try_int, try_decode, encode_url
-from resources.lib.helpers.setutils import merge_two_dicts, split_items
+from resources.lib.addon.plugin import ADDONPATH, ADDON, PLUGINPATH, viewitems
+from resources.lib.addon.parser import try_int, try_decode, encode_url
+from resources.lib.addon.setutils import merge_two_dicts, split_items
 
 
 RELATIVE_DATES = [

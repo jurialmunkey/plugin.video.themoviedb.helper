@@ -1,7 +1,7 @@
 import xbmc
 import datetime
-from resources.lib.helpers.plugin import PLUGINPATH, ADDONPATH, ADDON, convert_type, TYPE_PLURAL
-from resources.lib.helpers.setutils import merge_two_items
+from resources.lib.addon.plugin import PLUGINPATH, ADDONPATH, ADDON, convert_type, TYPE_PLURAL
+from resources.lib.addon.setutils import merge_two_items
 from json import dumps
 
 
