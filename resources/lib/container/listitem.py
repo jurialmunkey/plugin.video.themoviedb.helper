@@ -276,7 +276,8 @@ class ListItem(object):
     def get_listitem(self):
         if self.infolabels.get('mediatype') not in ACCEPTED_MEDIATYPES:
             self.infolabels.pop('mediatype', None)
-        listitem = xbmcgui.ListItem(label=self.label, label2=self.label2, path=self.get_url())
+        self.infolabels['path'] = self.get_url()
+        listitem = xbmcgui.ListItem(label=self.label, label2=self.label2, path=self.infolabels['path'])
         listitem.setLabel2(self.label2)
         listitem.setInfo(self.library, self.infolabels)
         listitem.setArt(self.set_art_fallbacks())
