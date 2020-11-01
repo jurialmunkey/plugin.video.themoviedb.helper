@@ -150,10 +150,9 @@ class ListItemMonitor(CommonMonitorFunctions):
         details = self.get_omdb_ratings(details)
         if tmdb_type == 'movie':
             details = self.get_imdb_top250_rank(details)
-        if tmdb_type in ['movie', 'tv']:
-            details = self.get_trakt_ratings(
-                details, 'movie' if tmdb_type == 'movie' else 'show',
-                season=self.season, episode=self.episode)
+        details = self.get_trakt_ratings(
+            details, 'movie' if tmdb_type == 'movie' else 'show',
+            season=self.season, episode=self.episode)
         if not self.is_same_item():
             return
         self.set_iter_properties(details.get('infoproperties', {}), SETPROP_RATINGS)
