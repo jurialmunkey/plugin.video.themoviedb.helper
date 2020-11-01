@@ -85,7 +85,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         return '{0}s'.format(dbtype) if dbtype else ''
 
     def get_tmdb_type(self, dbtype=None):
-        return convert_media_type(dbtype or self.dbtype, 'tmdb', strip_plural=True)
+        return convert_media_type(dbtype or self.dbtype, 'tmdb', strip_plural=True, parent_type=True)
 
     def set_cur_item(self):
         self.dbtype = self.get_dbtype()
