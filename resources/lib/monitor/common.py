@@ -17,9 +17,9 @@ SETINFO = {
     'imdbnumber', 'tagline', 'status', 'episode', 'season', 'genre', 'set', 'studio', 'country',
     'MPAA', 'director', 'writer', 'trailer', 'top250'}
 SETPROP = {
-    'tvdb_id', 'tvshow.tvdb_id', 'tvshow.tmdb_id', 'tvshow.imdb_id', 'biography', 'birthday', 'age',
-    'deathday', 'character', 'department', 'job', 'known_for', 'role', 'born', 'creator', 'aliases',
-    'budget', 'revenue', 'set.tmdb_id', 'set.name', 'set.poster', 'set.fanart'}
+    'tmdb_id', 'imdb_id', 'tvdb_id', 'tvshow.tvdb_id', 'tvshow.tmdb_id', 'tvshow.imdb_id',
+    'biography', 'birthday', 'age', 'deathday', 'character', 'department', 'job', 'known_for', 'role', 'born',
+    'creator', 'aliases', 'budget', 'revenue', 'set.tmdb_id', 'set.name', 'set.poster', 'set.fanart'}
 SETPROP_RATINGS = {
     'awards', 'metacritic_rating', 'imdb_rating', 'imdb_votes', 'rottentomatoes_rating',
     'rottentomatoes_image', 'rottentomatoes_reviewtotal', 'rottentomatoes_reviewsfresh',
