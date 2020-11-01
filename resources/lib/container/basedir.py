@@ -159,82 +159,82 @@ def _get_basedir_details():
 def _get_basedir_random():
     return [
         {
-            'label': '{} {{item_type}}{{space}}{}'.format(
+            'label': u'{} {{item_type}}{{space}}{}'.format(
                 xbmc.getLocalizedString(590), xbmc.getLocalizedString(515)),
             'types': ['movie', 'tv'],
             'params': {'info': 'random_genres'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/tmdb/genre.png'.format(ADDONPATH)}},
         {
-            'label': '{} {{item_type}}{{space}}{}'.format(
+            'label': u'{} {{item_type}}{{space}}{}'.format(
                 xbmc.getLocalizedString(590), ADDON.getLocalizedString(32117)),
             'types': ['movie'],
             'params': {'info': 'random_keyword'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/poster.png'.format(ADDONPATH)}},
         {
-            'label': '{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32199)),
+            'label': u'{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32199)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_becauseyouwatched'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/recommended.png'.format(ADDONPATH)}},
         {
-            'label': '{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32200)),
+            'label': u'{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32200)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_becausemostwatched'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/recommended.png'.format(ADDONPATH)}},
         {
-            'label': '{} {}{{space}}{{item_type}}'.format(
+            'label': u'{} {}{{space}}{{item_type}}'.format(
                 xbmc.getLocalizedString(590), ADDON.getLocalizedString(32204)),
             'types': ['movie', 'tv'],
             'params': {'info': 'random_trending'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/trend.png'.format(ADDONPATH)}},
         {
-            'label': '{} {}{{space}}{{item_type}}'.format(
+            'label': u'{} {}{{space}}{{item_type}}'.format(
                 xbmc.getLocalizedString(590), ADDON.getLocalizedString(32175)),
             'types': ['movie', 'tv'],
             'params': {'info': 'random_popular'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/popular.png'.format(ADDONPATH)}},
         {
-            'label': '{} {}{{space}}{{item_type}}'.format(
+            'label': u'{} {}{{space}}{{item_type}}'.format(
                 xbmc.getLocalizedString(590), ADDON.getLocalizedString(32205)),
             'types': ['movie', 'tv'],
             'params': {'info': 'random_mostplayed'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/mostplayed.png'.format(ADDONPATH)}},
         {
-            'label': '{} {}{{space}}{{item_type}}'.format(
+            'label': u'{} {}{{space}}{{item_type}}'.format(
                 xbmc.getLocalizedString(590), ADDON.getLocalizedString(32206)),
             'types': ['movie', 'tv'],
             'params': {'info': 'random_anticipated'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/anticipated.png'.format(ADDONPATH)}},
         {
-            'label': '{} {}{{space}}{{item_type}}'.format(
+            'label': u'{} {}{{space}}{{item_type}}'.format(
                 xbmc.getLocalizedString(590), ADDON.getLocalizedString(32300)),
             'types': ['both'],
             'params': {'info': 'random_trendinglists'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/trendinglist.png'.format(ADDONPATH)}},
         {
-            'label': '{} {}{{space}}{{item_type}}'.format(
+            'label': u'{} {}{{space}}{{item_type}}'.format(
                 xbmc.getLocalizedString(590), ADDON.getLocalizedString(32301)),
             'types': ['both'],
             'params': {'info': 'random_popularlists'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/popularlist.png'.format(ADDONPATH)}},
         {
-            'label': '{} {}{{space}}{{item_type}}'.format(
+            'label': u'{} {}{{space}}{{item_type}}'.format(
                 xbmc.getLocalizedString(590), ADDON.getLocalizedString(32302)),
             'types': ['both'],
             'params': {'info': 'random_likedlists'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/likedlist.png'.format(ADDONPATH)}},
         {
-            'label': '{} {}{{space}}{{item_type}}'.format(
+            'label': u'{} {}{{space}}{{item_type}}'.format(
                 xbmc.getLocalizedString(590), ADDON.getLocalizedString(32303)),
             'types': ['both'],
             'params': {'info': 'random_mylists'},
@@ -246,33 +246,33 @@ def _get_basedir_random():
 def _get_basedir_trakt():
     return [
         {
-            'label': '{{item_type}}{{space}}{}'.format(ADDON.getLocalizedString(32192)),
+            'label': u'{{item_type}}{{space}}{}'.format(ADDON.getLocalizedString(32192)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_collection'},
             'path': PLUGINPATH,
             'sorting': True,
             'art': {'thumb': '{}/resources/icons/trakt/watchlist.png'.format(ADDONPATH)}},
         {
-            'label': '{{item_type}}{{space}}{}'.format(ADDON.getLocalizedString(32193)),
+            'label': u'{{item_type}}{{space}}{}'.format(ADDON.getLocalizedString(32193)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_watchlist'},
             'path': PLUGINPATH,
             'sorting': True,
             'art': {'thumb': '{}/resources/icons/trakt/watchlist.png'.format(ADDONPATH)}},
         {
-            'label': '{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32194)),
+            'label': u'{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32194)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_history'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/recentlywatched.png'.format(ADDONPATH)}},
         {
-            'label': '{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32195)),
+            'label': u'{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32195)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_mostwatched'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/mostwatched.png'.format(ADDONPATH)}},
         {
-            'label': '{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32196)),
+            'label': u'{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32196)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_inprogress'},
             'path': PLUGINPATH,
@@ -285,61 +285,61 @@ def _get_basedir_trakt():
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/inprogress.png'.format(ADDONPATH)}},
         {
-            'label': '{{item_type}}{{space}}{}'.format(ADDON.getLocalizedString(32198)),
+            'label': u'{{item_type}}{{space}}{}'.format(ADDON.getLocalizedString(32198)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_recommendations'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/recommended.png'.format(ADDONPATH)}},
         {
-            'label': '{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32199)),
+            'label': u'{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32199)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_becauseyouwatched'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/recommended.png'.format(ADDONPATH)}},
         {
-            'label': '{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32200)),
+            'label': u'{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32200)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_becausemostwatched'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/recommended.png'.format(ADDONPATH)}},
         {
-            'label': '{} {{item_type}}{{space}}{}'.format(ADDON.getLocalizedString(32201), ADDON.getLocalizedString(32202)),
+            'label': u'{} {{item_type}}{{space}}{}'.format(ADDON.getLocalizedString(32201), ADDON.getLocalizedString(32202)),
             'types': ['tv'],
             'params': {'info': 'trakt_myairing'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/airing.png'.format(ADDONPATH)}},
         {
-            'label': '{} {{item_type}}{{space}}{}'.format(ADDON.getLocalizedString(32201), ADDON.getLocalizedString(32203)),
+            'label': u'{} {{item_type}}{{space}}{}'.format(ADDON.getLocalizedString(32201), ADDON.getLocalizedString(32203)),
             'types': ['tv'],
             'params': {'info': 'dir_calendar_trakt'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/calendar.png'.format(ADDONPATH)}},
         {
-            'label': '{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32204)),
+            'label': u'{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32204)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_trending'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/trend.png'.format(ADDONPATH)}},
         {
-            'label': '{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32175)),
+            'label': u'{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32175)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_popular'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/popular.png'.format(ADDONPATH)}},
         {
-            'label': '{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32205)),
+            'label': u'{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32205)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_mostplayed'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/mostplayed.png'.format(ADDONPATH)}},
         {
-            'label': '{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32206)),
+            'label': u'{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32206)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_anticipated'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/trakt/anticipated.png'.format(ADDONPATH)}},
         {
-            'label': '{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32207)),
+            'label': u'{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32207)),
             'types': ['movie'],
             'params': {'info': 'trakt_boxoffice'},
             'path': PLUGINPATH,
@@ -373,37 +373,37 @@ def _get_basedir_trakt():
 def _get_basedir_tmdb():
     return [
         {
-            'label': '{}{{space}}{{item_type}}'.format(xbmc.getLocalizedString(137)),
+            'label': u'{}{{space}}{{item_type}}'.format(xbmc.getLocalizedString(137)),
             'types': ['movie', 'tv', 'person'],
             'params': {'info': 'dir_search'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/tmdb/search.png'.format(ADDONPATH)}},
         {
-            'label': '{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32175)),
+            'label': u'{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32175)),
             'types': ['movie', 'tv', 'person'],
             'params': {'info': 'popular'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/tmdb/popular.png'.format(ADDONPATH)}},
         {
-            'label': '{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32176)),
+            'label': u'{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32176)),
             'types': ['movie', 'tv'],
             'params': {'info': 'top_rated'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/tmdb/toprated.png'.format(ADDONPATH)}},
         {
-            'label': '{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32177)),
+            'label': u'{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32177)),
             'types': ['movie'],
             'params': {'info': 'upcoming'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/tmdb/upcoming.png'.format(ADDONPATH)}},
         {
-            'label': '{{item_type}}{{space}}{}'.format(ADDON.getLocalizedString(32178)),
+            'label': u'{{item_type}}{{space}}{}'.format(ADDON.getLocalizedString(32178)),
             'types': ['movie', 'tv', 'person'],
             'params': {'info': 'trending_day'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/tmdb/upcoming.png'.format(ADDONPATH)}},
         {
-            'label': '{{item_type}}{{space}}{}'.format(ADDON.getLocalizedString(32179)),
+            'label': u'{{item_type}}{{space}}{}'.format(ADDON.getLocalizedString(32179)),
             'types': ['movie', 'tv', 'person'],
             'params': {'info': 'trending_week'},
             'path': PLUGINPATH,
@@ -433,25 +433,25 @@ def _get_basedir_tmdb():
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/tmdb/airing.png'.format(ADDONPATH)}},
         {
-            'label': '{{item_type}}{{space}}{}'.format(xbmc.getLocalizedString(135)),
+            'label': u'{{item_type}}{{space}}{}'.format(xbmc.getLocalizedString(135)),
             'types': ['movie', 'tv'],
             'params': {'info': 'genres'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/tmdb/genre.png'.format(ADDONPATH)}},
         {
-            'label': '{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32184)),
+            'label': u'{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32184)),
             'types': ['movie'],
             'params': {'info': 'revenue_movies'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/poster.png'.format(ADDONPATH)}},
         {
-            'label': '{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32185)),
+            'label': u'{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32185)),
             'types': ['movie', 'tv'],
             'params': {'info': 'most_voted'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/poster.png'.format(ADDONPATH)}},
         {
-            'label': '{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32186)),
+            'label': u'{}{{space}}{{item_type}}'.format(ADDON.getLocalizedString(32186)),
             'types': ['collection', 'keyword', 'network', 'studio'],
             'params': {'info': 'all_items'},
             'path': PLUGINPATH,
@@ -486,12 +486,12 @@ def _get_basedir_main():
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/poster.png'.format(ADDONPATH)}},
         {
-            'label': 'TheMovieDb',
+            'label': u'TheMovieDb',
             'params': {'info': 'dir_tmdb'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/poster.png'.format(ADDONPATH)}},
         {
-            'label': 'Trakt',
+            'label': u'Trakt',
             'params': {'info': 'dir_trakt'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/trakt.png'.format(ADDONPATH)}}]
@@ -530,31 +530,31 @@ def _get_basedir_calendar_items():
             'info_types': ['trakt_calendar', 'library_nextaired'],
             'art': {'thumb': '{}/resources/poster.png'.format(ADDONPATH)}},
         {
-            'label': '{weekday}',
+            'label': u'{weekday}',
             'params': {'startdate': 2, 'days': 1},
             'path': PLUGINPATH,
             'info_types': ['trakt_calendar', 'library_nextaired'],
             'art': {'thumb': '{}/resources/poster.png'.format(ADDONPATH)}},
         {
-            'label': '{weekday}',
+            'label': u'{weekday}',
             'params': {'startdate': 3, 'days': 1},
             'path': PLUGINPATH,
             'info_types': ['trakt_calendar', 'library_nextaired'],
             'art': {'thumb': '{}/resources/poster.png'.format(ADDONPATH)}},
         {
-            'label': '{weekday}',
+            'label': u'{weekday}',
             'params': {'startdate': 4, 'days': 1},
             'path': PLUGINPATH,
             'info_types': ['trakt_calendar', 'library_nextaired'],
             'art': {'thumb': '{}/resources/poster.png'.format(ADDONPATH)}},
         {
-            'label': '{weekday}',
+            'label': u'{weekday}',
             'params': {'startdate': 5, 'days': 1},
             'path': PLUGINPATH,
             'info_types': ['trakt_calendar', 'library_nextaired'],
             'art': {'thumb': '{}/resources/poster.png'.format(ADDONPATH)}},
         {
-            'label': '{weekday}',
+            'label': u'{weekday}',
             'params': {'startdate': 6, 'days': 1},
             'path': PLUGINPATH,
             'info_types': ['trakt_calendar', 'library_nextaired'],

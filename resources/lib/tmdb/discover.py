@@ -504,7 +504,7 @@ def _get_basedir_top(tmdb_type):
 def _get_basedir_end(tmdb_type):
     return [
         {
-            'label': 'Add rule',
+            'label': ADDON.getLocalizedString(32277),
             'art': {'thumb': '{}/resources/poster.png'.format(ADDONPATH)},
             'params': {'info': 'user_discover', 'tmdb_type': tmdb_type, 'method': 'add_rule'}},
         {
@@ -905,7 +905,7 @@ class UserDiscoverLists():
         artwork = {'thumb': '{}/resources/poster.png'.format(ADDONPATH)}
         for i in ['movie', 'tv']:
             item = {
-                'label': '{} {}'.format(ADDON.getLocalizedString(32174), convert_type(i, 'plural')),
+                'label': u'{} {}'.format(ADDON.getLocalizedString(32174), convert_type(i, 'plural')),
                 'params': merge_two_dicts(params, {'tmdb_type': i}),
                 'infoproperties': {'specialsort': 'top'},
                 'art': artwork}
