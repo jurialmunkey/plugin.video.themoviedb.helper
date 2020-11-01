@@ -4,10 +4,10 @@
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 import xbmc
 import xbmcgui
-from resources.lib.helpers.decorators import busy_dialog
-from resources.lib.helpers.parser import try_int
+from resources.lib.addon.decorators import busy_dialog
+from resources.lib.addon.parser import try_int
 from resources.lib.trakt.api import TraktAPI
-from resources.lib.helpers.plugin import ADDON
+from resources.lib.addon.plugin import ADDON
 
 
 def _sync_item_methods():

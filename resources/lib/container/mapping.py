@@ -1,6 +1,6 @@
-from resources.lib.helpers.parser import try_type
-from resources.lib.helpers.plugin import viewitems, convert_type, TYPE_DB
-from resources.lib.helpers.timedate import age_difference
+from resources.lib.addon.parser import try_type
+from resources.lib.addon.plugin import viewitems, convert_type, TYPE_DB
+from resources.lib.addon.timedate import age_difference
 
 UPDATE_BASEKEY = 1
 

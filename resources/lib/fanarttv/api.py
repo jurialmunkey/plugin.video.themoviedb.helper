@@ -1,12 +1,12 @@
 import xbmc
 import xbmcgui
-import resources.lib.helpers.cache as cache
-from resources.lib.request.api import RequestAPI
-from resources.lib.items.listitem import ListItem
-from resources.lib.helpers.plugin import ADDON, viewitems, get_language
-from resources.lib.helpers.setutils import del_empty_keys
-from resources.lib.helpers.decorators import busy_dialog
-# from resources.lib.helpers.decorators import timer_report
+import resources.lib.addon.cache as cache
+from resources.lib.api.request import RequestAPI
+from resources.lib.container.listitem import ListItem
+from resources.lib.addon.plugin import ADDON, viewitems, get_language
+from resources.lib.addon.setutils import del_empty_keys
+from resources.lib.addon.decorators import busy_dialog
+# from resources.lib.addon.decorators import timer_report
 
 
 API_URL = 'http://webservice.fanart.tv/v3'

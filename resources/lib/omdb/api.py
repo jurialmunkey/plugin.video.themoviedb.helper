@@ -1,8 +1,8 @@
 import re
-from resources.lib.request.api import RequestAPI
-from resources.lib.helpers.plugin import ADDON
-from resources.lib.helpers.parser import try_int
-from resources.lib.helpers.setutils import del_empty_keys
+from resources.lib.api.request import RequestAPI
+from resources.lib.addon.plugin import ADDON
+from resources.lib.addon.parser import try_int
+from resources.lib.addon.setutils import del_empty_keys
 
 
 def get_between_strings(string, startswith='', endswith=''):

@@ -7,10 +7,10 @@ import xbmcgui
 import xbmcvfs
 import datetime
 import unicodedata
-from resources.lib.helpers.parser import try_int, try_encode
-from resources.lib.helpers.plugin import ADDON, ADDONDATA, kodi_log
-from resources.lib.helpers.constants import VALID_FILECHARS
-from resources.lib.helpers.timedate import is_future_timestamp
+from resources.lib.addon.parser import try_int, try_encode
+from resources.lib.addon.plugin import ADDON, ADDONDATA, kodi_log
+from resources.lib.addon.constants import VALID_FILECHARS
+from resources.lib.addon.timedate import is_future_timestamp
 try:
     import cPickle as _pickle
 except ImportError:

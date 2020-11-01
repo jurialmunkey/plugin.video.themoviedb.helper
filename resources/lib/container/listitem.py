@@ -1,12 +1,12 @@
 import xbmc
 import xbmcgui
-from resources.lib.helpers.constants import ACCEPTED_MEDIATYPES
-from resources.lib.helpers.plugin import ADDON, ADDONPATH, PLUGINPATH, kodi_log, viewitems
-from resources.lib.helpers.parser import try_int, encode_url
-from resources.lib.helpers.timedate import is_future_timestamp
-from resources.lib.helpers.setutils import merge_two_dicts
+from resources.lib.addon.constants import ACCEPTED_MEDIATYPES
+from resources.lib.addon.plugin import ADDON, ADDONPATH, PLUGINPATH, kodi_log, viewitems
+from resources.lib.addon.parser import try_int, encode_url
+from resources.lib.addon.timedate import is_future_timestamp
+from resources.lib.addon.setutils import merge_two_dicts
 from json import dumps
-# from resources.lib.helpers.decorators import timer_report
+# from resources.lib.addon.decorators import timer_report
 
 
 """ ListItem methods:

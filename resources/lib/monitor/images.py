@@ -2,10 +2,10 @@ import os
 import xbmc
 import xbmcvfs
 import colorsys
-from resources.lib.helpers.window import get_property
-from resources.lib.helpers.plugin import kodi_log, md5hash
-from resources.lib.helpers.parser import try_int, try_float
-from resources.lib.helpers.fileutils import make_path
+from resources.lib.addon.window import get_property
+from resources.lib.addon.plugin import kodi_log, md5hash
+from resources.lib.addon.parser import try_int, try_float
+from resources.lib.files.utils import make_path
 from threading import Thread
 from PIL import ImageFilter, Image  # TODO: Try Import in-case no PIL and don't use funcs
 try:

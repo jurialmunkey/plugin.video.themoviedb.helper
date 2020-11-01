@@ -4,7 +4,7 @@ import sys
 import xbmc
 import xbmcaddon
 import hashlib
-from resources.lib.helpers.constants import LANGUAGES
+from resources.lib.addon.constants import LANGUAGES
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
@@ -22,9 +22,11 @@ _addonlogname = '[plugin.video.themoviedb.helper]\n'
 _debuglogging = ADDON.getSettingBool('debug_logging')
 
 
-def format_folderpath(path, content='videos', affix='return'):
+def format_folderpath(path, content='videos', affix='return', info=None):
     if not path:
         return
+    if info == 'play':
+        return u'PlayMedia({})'.format(path)
     if xbmc.getCondVisibility("Window.IsMedia"):
         return u'Container.Update({})'.format(path)
     return u'ActivateWindow({},{},{})'.format(content, path, affix)

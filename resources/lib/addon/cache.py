@@ -1,8 +1,8 @@
 import sys
 import datetime
 import simplecache
-from resources.lib.helpers.plugin import kodi_log
-from resources.lib.helpers.fileutils import get_pickle_name
+from resources.lib.addon.plugin import kodi_log
+from resources.lib.files.utils import get_pickle_name
 if sys.version_info[0] >= 3:
     unicode = str  # In Py3 str is now unicode
 _cache = simplecache.SimpleCache()

@@ -1,9 +1,9 @@
 import xbmc
 import xbmcgui
-import resources.lib.helpers.window as window
-from resources.lib.helpers.parser import try_int, try_decode
-from resources.lib.helpers.plugin import kodi_log, ADDON
-from resources.lib.helpers.decorators import busy_dialog
+import resources.lib.addon.window as window
+from resources.lib.addon.parser import try_int, try_decode
+from resources.lib.addon.plugin import kodi_log, ADDON
+from resources.lib.addon.decorators import busy_dialog
 from resources.lib.tmdb.api import TMDb
 
 PREFIX_PATH = 'Path.'

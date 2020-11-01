@@ -1,9 +1,9 @@
 import xbmc
-import resources.lib.helpers.rpc as rpc
-from resources.lib.helpers.window import get_property
+import resources.lib.kodi.rpc as rpc
+from resources.lib.addon.window import get_property
 from resources.lib.monitor.common import CommonMonitorFunctions, SETPROP_RATINGS, SETMAIN_ARTWORK
-from resources.lib.helpers.parser import try_decode
-from resources.lib.helpers.plugin import ADDON
+from resources.lib.addon.parser import try_decode
+from resources.lib.addon.plugin import ADDON
 from json import loads
 
 

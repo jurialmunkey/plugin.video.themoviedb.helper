@@ -1,17 +1,16 @@
-import xbmc
 import xbmcgui
 import datetime
-import resources.lib.helpers.cache as cache
+import resources.lib.addon.cache as cache
 from resources.lib.tmdb.mapping import ItemMapper, get_episode_to_air
-from resources.lib.request.api import RequestAPI
-from resources.lib.helpers.plugin import viewitems, ADDON, get_mpaa_prefix, get_language, convert_type, TYPE_DB, ADDONPATH
-from resources.lib.helpers.downloader import Downloader
-from resources.lib.items.listitem import ListItem
-from resources.lib.helpers.constants import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES
-from resources.lib.helpers.parser import try_int
-from resources.lib.helpers.fileutils import use_pickle
-from resources.lib.helpers.constants import TMDB_GENRE_IDS
-from resources.lib.helpers.window import get_property
+from resources.lib.api.request import RequestAPI
+from resources.lib.addon.plugin import viewitems, ADDON, get_mpaa_prefix, get_language, convert_type, TYPE_DB, ADDONPATH
+from resources.lib.files.downloader import Downloader
+from resources.lib.container.listitem import ListItem
+from resources.lib.addon.constants import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES
+from resources.lib.addon.parser import try_int
+from resources.lib.files.utils import use_pickle
+from resources.lib.addon.constants import TMDB_GENRE_IDS
+from resources.lib.addon.window import get_property
 from json import loads
 
 

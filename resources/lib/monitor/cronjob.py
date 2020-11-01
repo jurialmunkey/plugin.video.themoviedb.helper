@@ -1,9 +1,9 @@
 import xbmc
 import datetime
-from resources.lib.helpers.parser import try_int
+from resources.lib.addon.parser import try_int
 from threading import Thread
-from resources.lib.helpers.plugin import ADDON
-from resources.lib.helpers.timedate import convert_timestamp
+from resources.lib.addon.plugin import ADDON
+from resources.lib.addon.timedate import convert_timestamp
 
 
 class CronJobMonitor(Thread):

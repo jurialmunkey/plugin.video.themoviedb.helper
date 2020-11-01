@@ -4,17 +4,17 @@ import xbmc
 import xbmcgui
 import xbmcaddon
 import xbmcplugin
-from resources.lib.helpers.rpc import get_directory, KodiLibrary
-from resources.lib.helpers.window import get_property
-from resources.lib.items.listitem import ListItem
-from resources.lib.helpers.plugin import ADDON, PLUGINPATH, ADDONPATH, viewitems, format_folderpath, kodi_log
-from resources.lib.helpers.parser import try_int, try_decode, try_encode
-from resources.lib.helpers.fileutils import read_file, normalise_filesize
-from resources.lib.helpers.decorators import busy_dialog
+from resources.lib.kodi.rpc import get_directory, KodiLibrary
+from resources.lib.addon.window import get_property
+from resources.lib.container.listitem import ListItem
+from resources.lib.addon.plugin import ADDON, PLUGINPATH, ADDONPATH, viewitems, format_folderpath, kodi_log
+from resources.lib.addon.parser import try_int, try_decode, try_encode
+from resources.lib.files.utils import read_file, normalise_filesize
+from resources.lib.addon.decorators import busy_dialog
 from resources.lib.player.details import get_item_details, get_detailed_item, get_playerstring
 from resources.lib.player.inputter import KeyboardInputter
 from resources.lib.player.configure import get_players_from_file
-from resources.lib.helpers.constants import PLAYERS_PRIORITY
+from resources.lib.addon.constants import PLAYERS_PRIORITY
 from string import Formatter
 if sys.version_info[0] >= 3:
     unicode = str  # In Py3 str is now unicode

@@ -1,13 +1,13 @@
 import datetime
-import resources.lib.helpers.cache as cache
-from resources.lib.helpers.cache import use_simple_cache
-from resources.lib.items.pages import PaginatedItems
+import resources.lib.addon.cache as cache
+from resources.lib.addon.cache import use_simple_cache
+from resources.lib.container.pages import PaginatedItems
 from resources.lib.trakt.items import TraktItems
 from resources.lib.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache
-from resources.lib.helpers.parser import try_int
-from resources.lib.helpers.timedate import convert_timestamp, date_in_range, get_region_date
-from resources.lib.helpers.plugin import viewitems
-# from resources.lib.helpers.decorators import timer_report
+from resources.lib.addon.parser import try_int
+from resources.lib.addon.timedate import convert_timestamp, date_in_range, get_region_date
+from resources.lib.addon.plugin import viewitems
+# from resources.lib.addon.decorators import timer_report
 
 
 class _TraktProgress():

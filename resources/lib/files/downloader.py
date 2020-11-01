@@ -6,8 +6,8 @@ import xbmcgui
 import requests
 import zipfile
 import gzip
-from resources.lib.helpers.plugin import ADDON, kodi_log
-from resources.lib.helpers.decorators import busy_dialog
+from resources.lib.addon.plugin import ADDON, kodi_log
+from resources.lib.addon.decorators import busy_dialog
 from io import BytesIO
 try:  # Python 3
     from urllib.parse import urlparse

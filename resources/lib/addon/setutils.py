@@ -1,6 +1,5 @@
 import random
-from resources.lib.helpers.plugin import viewitems
-# from resources.lib.helpers.decorators import timer_report
+from resources.lib.addon.plugin import viewitems
 
 
 def random_from_list(items, remove_next_page=True):

@@ -1,8 +1,8 @@
 import xbmc
 import json
-from resources.lib.helpers.plugin import kodi_log
-from resources.lib.helpers.parser import try_int, try_float, try_decode
-from resources.lib.helpers.setutils import find_dict_in_list, del_empty_keys
+from resources.lib.addon.plugin import kodi_log
+from resources.lib.addon.parser import try_int, try_float, try_decode
+from resources.lib.addon.setutils import find_dict_in_list, del_empty_keys
 
 
 def get_jsonrpc(method=None, params=None):

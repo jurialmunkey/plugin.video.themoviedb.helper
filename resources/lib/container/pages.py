@@ -1,4 +1,4 @@
-from resources.lib.helpers.parser import try_int
+from resources.lib.addon.parser import try_int
 
 
 def get_next_page(response_headers=None):

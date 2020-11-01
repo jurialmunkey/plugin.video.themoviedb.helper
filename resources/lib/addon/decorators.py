@@ -1,7 +1,7 @@
 import xbmc
 from contextlib import contextmanager
-from resources.lib.helpers.plugin import kodi_log
-from resources.lib.helpers.cache import format_name
+from resources.lib.addon.plugin import kodi_log
+from resources.lib.addon.cache import format_name
 from timeit import default_timer as timer
 
 
