@@ -127,6 +127,7 @@ class Players(object):
             'name': '{} Kodi'.format(ADDON.getLocalizedString(32061)),
             'is_folder': False,
             'is_local': True,
+            'is_resolvable': "true",
             'plugin_name': 'xbmc.core',
             'plugin_icon': '{}/resources/icons/other/kodi.png'.format(ADDONPATH),
             'actions': file}]
