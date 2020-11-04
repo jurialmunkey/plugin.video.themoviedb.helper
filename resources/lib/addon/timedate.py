@@ -58,7 +58,7 @@ def get_current_date_time(str_fmt='%Y-%m-%d %H:%M'):
 def get_todays_date(days=0, str_fmt='%Y-%m-%d'):
     date_obj = datetime.datetime.today()
     if days:
-        date_obj + datetime.timedelta(days=days)
+        date_obj += datetime.timedelta(days=days)
     return date_obj.strftime(str_fmt)
 
 
