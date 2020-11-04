@@ -282,11 +282,12 @@ class _TraktProgress():
         return items
 
     def get_calendar_episodes_list(self, startdate=0, days=1, user=True, kodi_db=None, page=1, limit=20):
-        cache_name = 'trakt.calendar.episodes.{}.{}.{}.{}'.format(startdate, days, user, kodi_db is not None)
-        response_items = cache.use_cache(
-            self._get_calendar_episodes_list, startdate, days, user, kodi_db,
-            cache_name=cache_name,
-            cache_days=1)
+        # cache_name = 'trakt.calendar.episodes.{}.{}.{}.{}'.format(startdate, days, user, kodi_db is not None)
+        # response_items = cache.use_cache(
+        #     self._get_calendar_episodes_list, startdate, days, user, kodi_db,
+        #     cache_name=cache_name,
+        #     cache_days=1)
+        response_items = self._get_calendar_episodes_list(startdate, days, user, kodi_db)
         response = PaginatedItems(response_items, page=page, limit=limit)
         if response and response.items:
             return response.items + response.next_page
