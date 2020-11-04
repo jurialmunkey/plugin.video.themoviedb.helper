@@ -415,6 +415,10 @@ class ItemMapper(_ItemMapper):
                 'keys': [('infolabels', 'duration')],
                 'func': get_runtime
             }],
+            'runtime': [{
+                'keys': [('infolabels', 'duration')],
+                'func': get_runtime
+            }],
             'genres': [{
                 'keys': [('infolabels', 'genre')],
                 'func': dict_to_list,
