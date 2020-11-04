@@ -103,7 +103,7 @@ def convert_media_type(media_type, output='tmdb', parent_type=False, strip_plura
             return 'episode' if not parent_type else 'tv'
         if media_type in ['actor', 'director']:
             return 'person'
-        if media_type == 'sets':
+        if media_type == 'set':
             return 'collection'
     elif output == 'trakt':
         if media_type == 'movie':
