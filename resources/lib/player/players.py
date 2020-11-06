@@ -113,7 +113,7 @@ class Players(object):
             'file': file, 'mode': mode,
             'is_folder': is_folder,
             'is_resolvable': value.get('is_resolvable'),
-            'name': '{} {}'.format(name, value.get('name')),
+            'name': u'{} {}'.format(name, value.get('name')),
             'plugin_name': value.get('plugin'),
             'plugin_icon': value.get('icon', '').format(ADDONPATH) or xbmcaddon.Addon(value.get('plugin', '')).getAddonInfo('icon'),
             'fallback': value.get('fallback', {}).get(mode),
