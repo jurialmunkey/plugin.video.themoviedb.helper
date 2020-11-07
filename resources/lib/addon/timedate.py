@@ -2,6 +2,7 @@ import xbmc
 import time
 import datetime
 from resources.lib.addon.plugin import kodi_log, ADDON
+from resources.lib.addon.decorators import try_except_log
 
 
 def get_timestamp(timestamp=None):
@@ -25,6 +26,7 @@ def format_date(time_str, str_fmt="%A", time_fmt="%Y-%m-%d", time_lim=10, utc_co
     return time_obj.strftime(str_fmt)
 
 
+@try_except_log('lib.timedate - date_in_range', notification=False)
 def date_in_range(date_str, days=1, start_date=0, date_fmt="%Y-%m-%dT%H:%M:%S", date_lim=19, utc_convert=False):
     date_a = datetime.date.today() + datetime.timedelta(days=start_date)
     date_z = date_a + datetime.timedelta(days=days)

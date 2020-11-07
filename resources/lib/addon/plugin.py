@@ -7,6 +7,8 @@ import xbmcaddon
 import hashlib
 from resources.lib.addon.constants import LANGUAGES
 from resources.lib.addon.parser import try_decode
+if sys.version_info[0] >= 3:
+    unicode = str  # In Py3 str is now unicode
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
@@ -16,6 +18,20 @@ ADDONDATA = 'special://profile/addon_data/plugin.video.themoviedb.helper/'
 
 _addonlogname = '[plugin.video.themoviedb.helper]\n'
 _debuglogging = ADDON.getSettingBool('debug_logging')
+
+
+def format_name(cache_name, *args, **kwargs):
+    # Define a type whitelist to avoiding adding non-basic types like classes to cache name
+    permitted_types = [unicode, int, float, str, bool]
+    for arg in args:
+        if type(arg) not in permitted_types:
+            continue
+        cache_name = u'{}/{}'.format(cache_name, arg) if cache_name else u'{}'.format(arg)
+    for key, value in sorted(kwargs.items()):
+        if type(value) not in permitted_types:
+            continue
+        cache_name = u'{}&{}={}'.format(cache_name, key, value) if cache_name else u'{}={}'.format(key, value)
+    return cache_name
 
 
 def format_folderpath(path, content='videos', affix='return', info=None):
