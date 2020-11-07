@@ -1,7 +1,7 @@
 import xbmc
 import xbmcgui
 import resources.lib.addon.window as window
-from resources.lib.addon.parser import try_int, try_decode
+from resources.lib.addon.parser import try_int, try_decode, try_encode
 from resources.lib.addon.plugin import kodi_log, ADDON
 from resources.lib.addon.decorators import busy_dialog
 from resources.lib.tmdb.api import TMDb
@@ -232,13 +232,13 @@ class WindowManager(_EventLoop):
 
     def call_window(self):
         if self.params.get('playmedia'):
-            return xbmc.executebuiltin('PlayMedia(\"{}\")'.format(self.params['playmedia']))
+            return xbmc.executebuiltin('PlayMedia(\"{}\")'.format(try_encode(self.params['playmedia'])))
         if self.params.get('call_id'):
             return xbmc.executebuiltin('ActivateWindow({})'.format(self.params['call_id']))
         if self.params.get('call_path'):
-            return xbmc.executebuiltin('ActivateWindow(videos, {}, return)'.format(self.params['call_path']))
+            return xbmc.executebuiltin('ActivateWindow(videos, {}, return)'.format(try_encode(self.params['call_path'])))
         if self.params.get('call_update'):
-            return xbmc.executebuiltin('Container.Update({})'.format(self.params['call_update']))
+            return xbmc.executebuiltin('Container.Update({})'.format(try_encode(self.params['call_update'])))
 
     def router(self):
         if self.params.get('add_path'):
