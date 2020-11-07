@@ -1,20 +1,19 @@
 import xbmc
 import xbmcgui
 from contextlib import contextmanager
-from resources.lib.addon.plugin import kodi_log
-from resources.lib.addon.cache import format_name
+from resources.lib.addon.plugin import kodi_log, format_name
 from timeit import default_timer as timer
 
 
-def try_except_log(log_msg):
+def try_except_log(log_msg, notification=True):
     def decorator(func):
         def wrapper(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
             except Exception as exc:
-                xbmcgui.Dialog().notification(
-                    'TheMovieDb Helper {}'.format(xbmc.getLocalizedString(257)),
-                    xbmc.getLocalizedString(2104))
+                if notification:
+                    head = 'TheMovieDb Helper {}'.format(xbmc.getLocalizedString(257))
+                    xbmcgui.Dialog().notification(head, xbmc.getLocalizedString(2104))
                 msg = 'Error Type: {0}\nError Contents: {1!r}'
                 msg = msg.format(type(exc).__name__, exc.args)
                 kodi_log([log_msg, '\n', msg], 1)

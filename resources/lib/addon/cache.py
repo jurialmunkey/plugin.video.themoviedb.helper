@@ -1,29 +1,12 @@
-import sys
 import datetime
 import simplecache
-from resources.lib.addon.plugin import kodi_log
+from resources.lib.addon.plugin import kodi_log, format_name
 from resources.lib.files.utils import get_pickle_name
-if sys.version_info[0] >= 3:
-    unicode = str  # In Py3 str is now unicode
 _cache = simplecache.SimpleCache()
 _cache_name = 'TMDbHelper_v4.0.2'
 CACHE_LONG = 14
 CACHE_SHORT = 1
 CACHE_EXTENDED = 90
-
-
-def format_name(cache_name, *args, **kwargs):
-    # Define a type whitelist to avoiding adding non-basic types like classes to cache name
-    permitted_types = [unicode, int, float, str, bool]
-    for arg in args:
-        if type(arg) not in permitted_types:
-            continue
-        cache_name = u'{}/{}'.format(cache_name, arg) if cache_name else u'{}'.format(arg)
-    for key, value in sorted(kwargs.items()):
-        if type(value) not in permitted_types:
-            continue
-        cache_name = u'{}&{}={}'.format(cache_name, key, value) if cache_name else u'{}={}'.format(key, value)
-    return cache_name
 
 
 def use_simple_cache(cache_days=None):
