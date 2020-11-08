@@ -1642,14 +1642,9 @@ msgstr ""
 #: /resources/lib/player/players.py
 msgctxt "#32325"
 msgid ""
-"Configuration for player is missing \"is_resolvable\" flag. Please select resolve method."
-"setResolvedUrl is the preferred method and generally should work for any player addon that plays files directly, "
-"uses inputstream adapative, or only prompts to select bitrate/quality (e.g. Netflix, Prime, HBO, Disney\+, Youtube). "
-"PlayMedia should be used for any player addon which first runs a script to scrape sources or otherwise "
-"does not work correctly using the setResolvedUrl method."
+"Configuration for player is missing \"is_resolvable\" flag. Please select resolve method.setResolvedUrl is the preferred method and generally should work for any player addon that plays files directly, uses inputstream adapative, or only prompts to select bitrate/quality (e.g. Netflix, Prime, HBO, Disney\\+, Youtube). PlayMedia should be used for any player addon which first runs a script to scrape sources or otherwise does not work correctly using the setResolvedUrl method.\n"
 "\n"
-"\n"
-"To override this dialog, set a resolve method for the player in TMDbHelper\'s player settings configuration dialog."
+"To override this dialog, set a resolve method for the player in TMDbHelper\\'s player settings configuration dialog."
 msgstr ""
 
 #: /resources/lib/helpers/timedate.py
@@ -1755,6 +1750,11 @@ msgstr ""
 #: /resources/lib/player/configure.py
 msgctxt "#32344"
 msgid "Enter New Priority for {}"
+msgstr ""
+
+#: /resources/lib/tmdb/api.py
+msgctxt "#32345"
+msgid "Episode groups"
 msgstr ""
 
 msgctxt "#30030"
