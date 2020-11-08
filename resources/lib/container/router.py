@@ -351,6 +351,12 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             return self.list_flatseasons(**kwargs)
         if info == 'episodes':
             return self.list_episodes(**kwargs)
+        if info == 'episode_groups':
+            return self.list_episode_groups(**kwargs)
+        if info == 'episode_group_seasons':
+            return self.list_episode_group_seasons(**kwargs)
+        if info == 'episode_group_episodes':
+            return self.list_episode_group_episodes(**kwargs)
         if info == 'cast':
             return self.list_cast(**kwargs)
         if info == 'crew':

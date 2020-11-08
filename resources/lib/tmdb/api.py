@@ -182,6 +182,38 @@ class TMDb(RequestAPI):
             j for i in request['seasons'] for j in self.get_episode_list(tmdb_id, i['season_number'])
             if i.get('season_number')]
 
+    def get_episode_group_episodes_list(self, tmdb_id, group_id, position):
+        request = self.get_request_sc('tv/episode_group/{}'.format(group_id))
+        if not request or not request.get('groups'):
+            return []
+        base_item = self.get_details('tv', tmdb_id)
+        eps_group = request.get('groups', [])[try_int(position)] or {}
+        return [
+            self.mapper.get_info(i, 'episode', base_item, definition=TMDB_PARAMS_EPISODES, tmdb_id=tmdb_id)
+            for i in eps_group.get('episodes', [])]
+
+    def get_episode_group_seasons_list(self, tmdb_id, group_id):
+        request = self.get_request_sc('tv/episode_group/{}'.format(group_id))
+        if not request or not request.get('groups'):
+            return []
+        base_item = self.get_details('tv', tmdb_id)
+        items = [
+            self.mapper.get_info(i, 'season', base_item, tmdb_id=tmdb_id, definition={
+                'info': 'episode_group_episodes', 'tmdb_type': 'tv', 'tmdb_id': tmdb_id, 'group_id': group_id, 'position': str(x)})
+            for x, i in enumerate(request.get('groups', []))]
+        return items
+
+    def get_episode_groups_list(self, tmdb_id):
+        request = self.get_request_sc('tv/{}/episode_groups'.format(tmdb_id))
+        if not request or not request.get('results'):
+            return []
+        base_item = self.get_details('tv', tmdb_id)
+        items = [
+            self.mapper.get_info(i, 'tv', base_item, tmdb_id=tmdb_id, definition={
+                'info': 'episode_group_seasons', 'tmdb_type': 'tv', 'tmdb_id': tmdb_id, 'group_id': '{id}'})
+            for i in request.get('results', [])]
+        return items
+
     def get_season_list(self, tmdb_id, hide_specials=False):
         request = self.get_request_sc('tv/{}'.format(tmdb_id))
         if not request:

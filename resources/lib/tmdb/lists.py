@@ -18,6 +18,21 @@ class TMDbLists():
         self.container_content = convert_type(info_tmdb_type, 'container')
         return items
 
+    def list_episode_group_episodes(self, tmdb_id, group_id, position, **kwargs):
+        items = self.tmdb_api.get_episode_group_episodes_list(tmdb_id, group_id, position)
+        self.container_content = convert_type('episode', 'container')
+        return items
+
+    def list_episode_group_seasons(self, tmdb_id, group_id, **kwargs):
+        items = self.tmdb_api.get_episode_group_seasons_list(tmdb_id, group_id)
+        self.container_content = convert_type('season', 'container')
+        return items
+
+    def list_episode_groups(self, tmdb_id, **kwargs):
+        items = self.tmdb_api.get_episode_groups_list(tmdb_id)
+        self.container_content = convert_type('tv', 'container')
+        return items
+
     def list_flatseasons(self, tmdb_id, **kwargs):
         items = self.tmdb_api.get_flatseasons_list(tmdb_id)
         self.kodi_db = self.get_kodi_database('tv')
