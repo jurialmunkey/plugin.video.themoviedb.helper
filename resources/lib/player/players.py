@@ -394,7 +394,7 @@ class Players(object):
         container_folderpath = xbmc.getInfoLabel("Container.FolderPath")
         if container_folderpath == folder_path:
             return
-        xbmc.executebuiltin('Container.Update({},replace)'.format(folder_path))
+        xbmc.executebuiltin(try_encode(u'Container.Update({},replace)'.format(folder_path)))
         if not reset_focus:
             return
         with busy_dialog():
