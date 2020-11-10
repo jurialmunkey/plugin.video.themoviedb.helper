@@ -34,11 +34,11 @@ def format_name(cache_name, *args, **kwargs):
     return cache_name
 
 
-def format_folderpath(path, content='videos', affix='return', info=None):
+def format_folderpath(path, content='videos', affix='return', info=None, play='PlayMedia'):
     if not path:
         return
     if info == 'play':
-        return u'PlayMedia({})'.format(path)
+        return u'{}({})'.format(play, path)
     if xbmc.getCondVisibility("Window.IsMedia"):
         return u'Container.Update({})'.format(path)
     return u'ActivateWindow({},{},{})'.format(content, path, affix)
