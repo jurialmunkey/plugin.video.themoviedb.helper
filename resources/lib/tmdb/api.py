@@ -231,10 +231,17 @@ class TMDb(RequestAPI):
             items.append(item) if i.get('season_number') != 0 else items_end.append(item)
         if hide_specials:
             return items
+        egroups = self.get_request_sc('tv/{}/episode_groups'.format(tmdb_id))
+        if egroups and egroups.get('results'):
+            egroup_item = self.mapper.get_info({
+                'title': ADDON.getLocalizedString(32345)}, 'season', base_item, tmdb_id=tmdb_id, definition={
+                    'info': 'episode_groups', 'tmdb_type': 'tv', 'tmdb_id': tmdb_id})
+            egroup_item['art']['thumb'] = egroup_item['art']['poster'] = '{}/resources/icons/trakt/groupings.png'.format(ADDONPATH)
+            items_end.append(egroup_item)
         if get_property('TraktIsAuth') == 'True':
             upnext_item = self.mapper.get_info({
                 'title': ADDON.getLocalizedString(32043)}, 'season', base_item, tmdb_id=tmdb_id, definition={
-                    'info': 'trakt_upnext', 'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}'})
+                    'info': 'trakt_upnext', 'tmdb_type': 'tv', 'tmdb_id': tmdb_id})
             upnext_item['art']['thumb'] = upnext_item['art']['poster'] = '{}/resources/icons/trakt/up-next.png'.format(ADDONPATH)
             items_end.append(upnext_item)
         return items + items_end
