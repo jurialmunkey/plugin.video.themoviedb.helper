@@ -138,7 +138,7 @@ def related_lists(tmdb_id=None, tmdb_type=None, season=None, episode=None, conta
         return item
     path = format_folderpath(
         path=encode_url(path=item.get('path'), **item.get('params')),
-        info=item['params']['info'], play='RunPlugin',
+        info=item['params']['info'], play='RunPlugin',  # Use RunPlugin to avoid window manager info dialog crash with Browse method
         content='pictures' if item['params']['info'] in ['posters', 'fanart'] else 'videos')
     xbmc.executebuiltin(try_encode(path))
 
