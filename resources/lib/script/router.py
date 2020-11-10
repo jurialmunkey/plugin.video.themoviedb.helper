@@ -16,7 +16,7 @@ from resources.lib.addon.plugin import ADDON, reconfigure_legacy_params, viewite
 from resources.lib.kodi.rpc import get_jsonrpc
 from resources.lib.script.sync import SyncItem
 from resources.lib.addon.decorators import busy_dialog
-from resources.lib.addon.parser import encode_url, try_decode
+from resources.lib.addon.parser import encode_url, try_encode, try_decode
 from resources.lib.window.manager import WindowManager
 from resources.lib.player.players import Players
 from resources.lib.player.configure import configure_players
@@ -61,7 +61,7 @@ def is_in_kwargs(mapping={}):
 def play_media(**kwargs):
     with busy_dialog():
         kodi_log(['lib.script.router - attempting to play\n', kwargs.get('play_media')], 1)
-        xbmc.executebuiltin(u'PlayMedia({})'.format(kwargs.get('play_media')))
+        xbmc.executebuiltin(try_encode(u'PlayMedia({})'.format(kwargs.get('play_media'))))
 
 
 @map_kwargs({'play': 'tmdb_type'})
@@ -140,7 +140,7 @@ def related_lists(tmdb_id=None, tmdb_type=None, season=None, episode=None, conta
         path=encode_url(path=item.get('path'), **item.get('params')),
         info=item['params']['info'],
         content='pictures' if item['params']['info'] in ['posters', 'fanart'] else 'videos')
-    xbmc.executebuiltin(path)
+    xbmc.executebuiltin(try_encode(path))
 
 
 def update_players():
@@ -233,7 +233,7 @@ def sort_list(**kwargs):
         return
     for k, v in viewitems(sort_methods[x]['params']):
         kwargs[k] = v
-    xbmc.executebuiltin(format_folderpath(encode_url(**kwargs)))
+    xbmc.executebuiltin(try_encode(format_folderpath(encode_url(**kwargs))))
 
 
 class Script(object):

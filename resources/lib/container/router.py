@@ -17,7 +17,7 @@ from resources.lib.trakt.lists import TraktLists
 from resources.lib.tmdb.search import SearchLists
 from resources.lib.tmdb.discover import UserDiscoverLists
 from resources.lib.api.mapping import set_show, get_empty_item
-from resources.lib.addon.parser import try_decode, parse_paramstring, try_int
+from resources.lib.addon.parser import try_encode, try_decode, parse_paramstring, try_int
 from resources.lib.addon.setutils import split_items, random_from_list, merge_two_dicts
 # from resources.lib.addon.decorators import busy_dialog
 
@@ -387,7 +387,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             container_content=self.container_content)
         self.set_params_to_container(**self.params)
         if self.container_update:
-            xbmc.executebuiltin('Container.Update({})'.format(self.container_update))
+            xbmc.executebuiltin(try_encode(u'Container.Update({})'.format(self.container_update)))
         if self.container_refresh:
             xbmc.executebuiltin('Container.Refresh')
 

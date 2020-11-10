@@ -232,13 +232,13 @@ class WindowManager(_EventLoop):
 
     def call_window(self):
         if self.params.get('playmedia'):
-            return xbmc.executebuiltin('PlayMedia(\"{}\")'.format(try_encode(self.params['playmedia'])))
+            return xbmc.executebuiltin(try_encode(u'PlayMedia(\"{}\")'.format(self.params['playmedia'])))
         if self.params.get('call_id'):
             return xbmc.executebuiltin('ActivateWindow({})'.format(self.params['call_id']))
         if self.params.get('call_path'):
-            return xbmc.executebuiltin('ActivateWindow(videos, {}, return)'.format(try_encode(self.params['call_path'])))
+            return xbmc.executebuiltin(try_encode(u'ActivateWindow(videos, {}, return)'.format(self.params['call_path'])))
         if self.params.get('call_update'):
-            return xbmc.executebuiltin('Container.Update({})'.format(try_encode(self.params['call_update'])))
+            return xbmc.executebuiltin(try_encode(u'Container.Update({})'.format(self.params['call_update'])))
 
     def router(self):
         if self.params.get('add_path'):
