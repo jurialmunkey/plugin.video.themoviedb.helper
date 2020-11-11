@@ -4,7 +4,7 @@ import xbmc
 import xbmcgui
 import xbmcaddon
 import xbmcplugin
-from resources.lib.kodi.rpc import get_directory, KodiLibrary
+from resources.lib.kodi.rpc import get_directory, KodiLibrary, get_movie_details
 from resources.lib.addon.window import get_property
 from resources.lib.container.listitem import ListItem
 from resources.lib.addon.plugin import ADDON, PLUGINPATH, ADDONPATH, viewitems, format_folderpath, kodi_log
@@ -143,10 +143,15 @@ class Players(object):
         return file
 
     def _get_local_movie(self):
-        return self._get_local_file(KodiLibrary(dbtype='movie').get_info(
-            'file', fuzzy_match=False,
+        dbid = KodiLibrary(dbtype='movie').get_info(
+            'dbid', fuzzy_match=False,
             tmdb_id=self.item.get('tmdb'),
-            imdb_id=self.item.get('imdb')))
+            imdb_id=self.item.get('imdb'))
+        if not dbid:
+            return
+        if self.details:  # Add dbid to details to update our local progress.
+            self.details.infolabels['dbid'] = dbid
+        return self._get_local_file(KodiLibrary(dbtype='movie').get_info('file', fuzzy_match=False, dbid=dbid))
 
     def _get_local_episode(self):
         dbid = KodiLibrary(dbtype='tvshow').get_info(
