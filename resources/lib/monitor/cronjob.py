@@ -4,7 +4,6 @@ from resources.lib.addon.parser import try_int
 from threading import Thread
 from resources.lib.addon.plugin import ADDON
 from resources.lib.addon.timedate import convert_timestamp
-datetime.datetime.strptime('20110101', '%Y%m%d')  # Import lock fix
 
 
 class CronJobMonitor(Thread):
