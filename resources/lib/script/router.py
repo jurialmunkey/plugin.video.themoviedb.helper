@@ -64,6 +64,12 @@ def play_media(**kwargs):
         xbmc.executebuiltin(try_encode(u'PlayMedia({})'.format(kwargs.get('play_media'))))
 
 
+def run_plugin(**kwargs):
+    with busy_dialog():
+        kodi_log(['lib.script.router - attempting to play\n', kwargs.get('run_plugin')], 1)
+        xbmc.executebuiltin(try_encode(u'RunPlugin({})'.format(kwargs.get('run_plugin'))))
+
+
 @map_kwargs({'play': 'tmdb_type'})
 @get_tmdb_id
 def play_external(**kwargs):
@@ -297,6 +303,8 @@ class Script(object):
         #     return play_season(**self.params)
         if self.params.get('play_media'):
             return play_media(**self.params)
+        if self.params.get('run_plugin'):
+            return run_plugin(**self.params)
         if self.params.get('play'):
             return play_external(**self.params)
         if self.params.get('restart_service'):

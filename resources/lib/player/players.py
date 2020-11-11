@@ -406,6 +406,21 @@ class Players(object):
             xbmc.executebuiltin(reset_focus)
             xbmc.Monitor().waitForAbort(0.5)
 
+    def configure_action(self, listitem, handle=None):
+        path = try_decode(listitem.getPath())
+        if listitem.getProperty('is_folder') == 'true':
+            return format_folderpath(path)
+        action = 'run_plugin' if path.startswith('plugin://') else 'play_media'
+        action = u'RunScript(plugin.video.themoviedb.helper,{}={})'.format(action, path)
+        if path.endswith('.strm'):
+            return action
+        if not handle or listitem.getProperty('is_resolvable') == 'false':
+            return action
+        if listitem.getProperty('is_resolvable') == 'select' and xbmcgui.Dialog().yesno(
+                '{} - {}'.format(listitem.getProperty('player_name'), ADDON.getLocalizedString(32324)),
+                ADDON.getLocalizedString(32325), yeslabel='PlayMedia', nolabel='setResolvedUrl'):
+            return action
+
     def play(self, folder_path=None, reset_focus=None, handle=None):
         # Get some info about current container for container update hack
         if not folder_path:
@@ -417,30 +432,18 @@ class Players(object):
 
         # Get the resolved path
         listitem = self.get_resolved_path()
-        path = try_decode(listitem.getPath())
-        is_folder = True if listitem.getProperty('is_folder') == 'true' else False
-        is_resolvable = listitem.getProperty('is_resolvable')
 
         # Reset folder hack
         self._update_listing_hack(folder_path=folder_path, reset_focus=reset_focus)
 
         # Check we have an actual path to open
-        if not path or path == PLUGINPATH:
+        if not try_decode(listitem.getPath()) or try_decode(listitem.getPath()) == PLUGINPATH:
             return
 
-        action = None
-        if is_folder:
-            action = format_folderpath(path)
-        elif path.endswith('.strm') or not handle or is_resolvable == 'false':
-            action = u'RunScript(plugin.video.themoviedb.helper,play_media={})'.format(path)
-        elif is_resolvable == 'select' and xbmcgui.Dialog().yesno(
-                '{} - {}'.format(listitem.getProperty('player_name'), ADDON.getLocalizedString(32324)),
-                ADDON.getLocalizedString(32325),
-                yeslabel='PlayMedia', nolabel='setResolvedUrl'):
-            action = u'RunScript(plugin.video.themoviedb.helper,play_media={})'.format(path)
+        action = self.configure_action(listitem, handle)
 
         # Set our playerstring for player monitor to update kodi watched status
-        if not is_folder and self.playerstring:
+        if not listitem.getProperty('is_folder') == 'true' and self.playerstring:
             get_property('PlayerInfoString', set_property=self.playerstring)
 
         # Kodi launches busy dialog on home screen that needs to be told to close
@@ -456,7 +459,7 @@ class Players(object):
 
         # Else resolve to file directly
         xbmcplugin.setResolvedUrl(handle, True, listitem)
-        kodi_log(['lib.player - finished resolving path to url\n', path], 1)
+        kodi_log(['lib.player - finished resolving path to url\n', try_decode(listitem.getPath())], 1)
 
         # Send playable urls to xbmc.Player() not PlayMedia() so we can play as detailed listitem.
         # xbmc.Player().play(path, listitem)
