@@ -111,6 +111,7 @@ def get_detailed_item(tmdb_type, tmdb_id, season=None, episode=None, details=Non
         item['epslug'] = details.unique_ids.get('slug')
         item['tmdb'] = details.unique_ids.get('tvshow.tmdb')
         item['imdb'] = details.unique_ids.get('tvshow.imdb')
+        item['tvdb'] = details.unique_ids.get('tvshow.tvdb')
         item['trakt'] = details.unique_ids.get('tvshow.trakt')
         item['slug'] = details.unique_ids.get('tvshow.slug')
 
