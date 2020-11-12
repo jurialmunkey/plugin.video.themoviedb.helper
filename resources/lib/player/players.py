@@ -30,6 +30,21 @@ def string_format_map(fmt, d):
         return fmt.format(**d)
 
 
+def wait_for_player(to_start=None, timeout=5, poll=0.25):
+    xbmc_monitor, xbmc_player = xbmc.Monitor(), xbmc.Player()
+    while (
+            not xbmc_monitor.abortRequested()
+            and timeout > 0
+            and (
+                (to_start and (not xbmc_player.isPlaying() or not xbmc_player.getPlayingFile().endswith(to_start)))
+                or (not to_start and xbmc_player.isPlaying()))):
+        xbmc_monitor.waitForAbort(poll)
+        timeout -= poll
+    del xbmc_monitor
+    del xbmc_player
+    return timeout
+
+
 def resolve_to_dummy(handle=None):
     """
     Kodi does 5x retries to resolve url if isPlayable property is set - strm files force this property.
@@ -38,6 +53,7 @@ def resolve_to_dummy(handle=None):
     Passing False to setResolvedUrl doesn't work correctly and the retry is triggered anyway.
     In these instances we use a hack to avoid the retry by first resolving to a dummy file instead.
     """
+    # If we don't have a handle there's nothing to resolve
     if handle is None:
         return
 
@@ -45,37 +61,21 @@ def resolve_to_dummy(handle=None):
     path = '{}/resources/dummy.mp4'.format(ADDONPATH)
     kodi_log(['lib.player.players - attempt to resolve dummy file\n', path], 1)
     xbmcplugin.setResolvedUrl(handle, True, ListItem(path=path).get_listitem())
-    xbmc_monitor, xbmc_player = xbmc.Monitor(), xbmc.Player()
 
     # Wait till our file plays before stopping it
-    timeout = 5
-    poll = 0.25
-    while (
-            not xbmc_monitor.abortRequested()
-            and (not xbmc_player.isPlaying() or not xbmc_player.getPlayingFile().endswith('dummy.mp4'))
-            and timeout > 0):
-        xbmc_monitor.waitForAbort(poll)
-        timeout -= poll
-    xbmc.Player().stop()
-    if timeout <= 0:
+    if wait_for_player(to_start='dummy.mp4') <= 0:
         kodi_log(['lib.player.players - resolving dummy file timeout\n', path], 1)
         return -1
 
-    # Wait till our file stops playing before continuing
-    timeout = 5
-    while (
-            not xbmc_monitor.abortRequested()
-            and xbmc_player.isPlaying()
-            and timeout > 0):
-        xbmc_monitor.waitForAbort(poll)
-        timeout -= poll
-    if timeout <= 0:
+    # Stop our dummy file
+    xbmc.Player().stop()
+
+    # Wait for our file to stop before continuing
+    if wait_for_player() <= 0:
         kodi_log(['lib.player.players - stopping dummy file timeout\n', path], 1)
         return -1
 
-    # Clean-up
-    del xbmc_monitor
-    del xbmc_player
+    # Success
     kodi_log(['lib.player.players -- successfully resolved dummy file\n', path], 1)
 
 
@@ -371,6 +371,7 @@ class Players(object):
         if path and isinstance(path, tuple):
             return {
                 'url': path[0],
+                'is_local': 'true' if player.get('is_local', False) else 'false',
                 'is_folder': 'true' if path[1] else 'false',
                 'isPlayable': 'false' if path[1] else 'true',
                 'is_resolvable': player['is_resolvable'] if player.get('is_resolvable') else 'select',
@@ -466,6 +467,10 @@ class Players(object):
         xbmcplugin.setResolvedUrl(handle, True, listitem)
         kodi_log(['lib.player - finished resolving path to url\n', try_decode(listitem.getPath())], 1)
 
-        # Send playable urls to xbmc.Player() not PlayMedia() so we can play as detailed listitem.
-        # xbmc.Player().play(path, listitem)
-        # kodi_log(['Finished executing Player().Play\n', path], 1)
+        # Re-send local files to player due to "bug" (or maybe "feature") of setResolvedUrl
+        # Because setResolvedURL doesn't set id/type (sets None, "unknown" instead) to player for plugins
+        # If id/type not set to Player.GetItem things like Trakt don't work correctly.
+        # Looking for better solution than this hack.
+        if ADDON.getSettingBool('trakt_localhack') and listitem.getProperty('is_local') == 'true':
+            xbmc.Player().play(try_decode(listitem.getPath()), listitem)
+            kodi_log(['Finished executing Player().Play\n', try_decode(listitem.getPath())], 1)
