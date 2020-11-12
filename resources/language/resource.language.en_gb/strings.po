@@ -1642,14 +1642,11 @@ msgstr ""
 #: /resources/lib/player/players.py
 msgctxt "#32325"
 msgid ""
-"Configuration for player is missing \"is_resolvable\" flag. Please select resolve method."
-"\n\n"
-"setResolvedUrl is the preferred method and generally should work for any player addon that plays files directly, "
-"uses inputstream adapative, or only prompts to select bitrate/quality. PlayMedia should be used for any "
-"player addon which first runs a script to scrape sources or otherwise does not work correctly "
-"using the setResolvedUrl method."
-"\n\n"
-"To override this dialog, set a resolve method for the player in TMDbHelper\'s player settings configuration dialog."
+"Configuration for player is missing \"is_resolvable\" flag. Please select resolve method.\n"
+"\n"
+"setResolvedUrl is the preferred method and generally should work for any player addon that plays files directly, uses inputstream adapative, or only prompts to select bitrate/quality. PlayMedia should be used for any player addon which first runs a script to scrape sources or otherwise does not work correctly using the setResolvedUrl method.\n"
+"\n"
+"To override this dialog, set a resolve method for the player in TMDbHelper\\'s player settings configuration dialog."
 msgstr ""
 
 #: /resources/lib/helpers/timedate.py
@@ -1732,9 +1729,9 @@ msgstr ""
 #: /resources/lib/player/configure.py
 msgctxt "#32340"
 msgid ""
-"Please note that setResolvedUrl is Kodi\'s preferred method for resolving playback URLs. The PlayMedia method should only be used if you experience difficulties using setResolvedUrl with this particular player.\n"
+"Please note that setResolvedUrl is Kodi\\'s preferred method for resolving playback URLs. The PlayMedia method should only be used if you experience difficulties using setResolvedUrl with this particular player.\n"
 "\n"
-"Are you sure you want to set this player\'s' resolve method to PlayMedia?"
+"Are you sure you want to set this player\\'s' resolve method to PlayMedia?"
 msgstr ""
 
 #: /resources/lib/player/configure.py
@@ -1760,6 +1757,11 @@ msgstr ""
 #: /resources/lib/tmdb/api.py
 msgctxt "#32345"
 msgid "Episode groups"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32346"
+msgid "Use hack to get Kodi Trakt addon to scrobble local files"
 msgstr ""
 
 msgctxt "#30030"
