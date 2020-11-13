@@ -27,6 +27,7 @@ def get_players_from_file():
                 if not xbmc.getCondVisibility(u'System.HasAddon({0})'.format(i)):
                     break  # System doesn't have a required plugin so skip this player
             else:
+                meta['plugin'] = plugins[0]
                 players[try_decode(file)] = meta
     return players
 
