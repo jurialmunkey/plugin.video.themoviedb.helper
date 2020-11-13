@@ -4,7 +4,7 @@ import xbmc
 import xbmcgui
 import xbmcaddon
 import xbmcplugin
-from resources.lib.kodi.rpc import get_directory, KodiLibrary, get_movie_details
+from resources.lib.kodi.rpc import get_directory, KodiLibrary
 from resources.lib.addon.window import get_property
 from resources.lib.container.listitem import ListItem
 from resources.lib.addon.plugin import ADDON, PLUGINPATH, ADDONPATH, viewitems, format_folderpath, kodi_log
