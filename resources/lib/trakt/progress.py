@@ -6,7 +6,7 @@ from resources.lib.trakt.items import TraktItems
 from resources.lib.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.timedate import convert_timestamp, date_in_range, get_region_date
-from resources.lib.addon.plugin import viewitems
+from resources.lib.addon.plugin import viewitems, kodi_log
 # from resources.lib.addon.decorators import timer_report
 
 
@@ -19,9 +19,7 @@ class _TraktProgress():
             return response.items
         return response.items + response.next_page
 
-    # Activity cache not needed here because already do it for subroutines
     @is_authorized
-    # @use_activity_cache('episodes', 'watched_at', cache_days=cache.CACHE_SHORT)
     def _get_inprogress_shows(self):
         response = self.get_sync('watched', 'show')
         response = TraktItems(response).sort_items('watched', 'desc')
@@ -126,9 +124,7 @@ class _TraktProgress():
         response = PaginatedItems(response['items'], page=page, limit=10)
         return response.items + response.next_page
 
-    # Activity cache not needed here because already do it for subroutines
     @is_authorized
-    # @use_activity_cache('episodes', 'watched_at', cache_days=cache.CACHE_SHORT)
     def _get_upnext_episodes_list(self, sort_by_premiered=False):
         shows = self._get_inprogress_shows() or []
         items = [j for j in (self.get_upnext_episodes(
