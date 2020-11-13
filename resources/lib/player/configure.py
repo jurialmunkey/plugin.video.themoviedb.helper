@@ -53,7 +53,7 @@ def configure_players(*args, **kwargs):
 class _ConfigurePlayer():
     def __init__(self, player, filename):
         self.player = player
-        self.filename = filename
+        self.filename = try_decode(filename)
 
     def get_player_settings(self):
         if not self.player:
@@ -203,7 +203,7 @@ class ConfigurePlayers():
             dumps_to_file(player, PLAYERS_BASEDIR_SAVE, filename, indent=4, join_addon_data=False)  # Write out file
 
     def configure_players(self):
-        filename = self.select_player()
+        filename = try_decode(self.select_player())
         if not filename:
             return
         player = self.players[filename].copy()
