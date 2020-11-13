@@ -232,6 +232,15 @@ def library_update(**kwargs):
         force=kwargs.get('force', False))
 
 
+def log_request(**kwargs):
+    request = None
+    if kwargs.get('log_request') == 'trakt':
+        request = TraktAPI().get_response_json(kwargs.get('url'))
+    elif kwargs.get('log_request') == 'tmdb':
+        request = TMDb().get_response_json(kwargs.get('url'))
+    kodi_log([kwargs.get('log_request'), '\n', kwargs.get('url'), '\n', request], 1)
+
+
 def sort_list(**kwargs):
     sort_methods = get_sort_methods()
     x = xbmcgui.Dialog().contextmenu([i['name'] for i in sort_methods])
@@ -305,6 +314,8 @@ class Script(object):
             return play_media(**self.params)
         if self.params.get('run_plugin'):
             return run_plugin(**self.params)
+        if self.params.get('log_request'):
+            return log_request(**self.params)
         if self.params.get('play'):
             return play_external(**self.params)
         if self.params.get('restart_service'):
