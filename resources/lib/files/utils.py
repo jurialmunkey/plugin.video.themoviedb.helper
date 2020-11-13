@@ -88,8 +88,10 @@ def delete_file(folder, filename, join_addon_data=True):
 
 
 def dumps_to_file(data, folder, filename, indent=2, join_addon_data=True):
-    with open(os.path.join(_get_write_path(folder, join_addon_data), filename), 'w') as file:
+    path = os.path.join(_get_write_path(folder, join_addon_data), filename)
+    with open(path, 'w') as file:
         json.dump(data, file, indent=indent)
+    return path
 
 
 def _get_write_path(folder, join_addon_data=True):
