@@ -5,8 +5,10 @@
 import sys
 import xbmc
 import xbmcgui
+from json import dumps
 from resources.lib.kodi.update import add_userlist, monitor_userlist, library_autoupdate
 from resources.lib.files.downloader import Downloader
+from resources.lib.files.utils import dumps_to_file, validify_filename
 from resources.lib.addon.window import get_property
 from resources.lib.container.basedir import get_basedir_details
 from resources.lib.fanarttv.api import FanartTV
@@ -233,12 +235,25 @@ def library_update(**kwargs):
 
 
 def log_request(**kwargs):
-    request = None
-    if kwargs.get('log_request') == 'trakt':
-        request = TraktAPI().get_response_json(kwargs.get('url'))
-    elif kwargs.get('log_request') == 'tmdb':
-        request = TMDb().get_response_json(kwargs.get('url'))
-    kodi_log([kwargs.get('log_request'), '\n', kwargs.get('url'), '\n', request], 1)
+    with busy_dialog():
+        kwargs['response'] = None
+        if not kwargs.get('url'):
+            kwargs['url'] = xbmcgui.Dialog().input('URL')
+        if not kwargs['url']:
+            return
+        if kwargs.get('log_request').lower() == 'trakt':
+            kwargs['response'] = TraktAPI().get_response_json(kwargs['url'])
+        else:
+            kwargs['response'] = TMDb().get_response_json(kwargs['url'])
+        if not kwargs['response']:
+            xbmcgui.Dialog().ok(kwargs['log_request'].capitalize(), u'{}\nNo Response!'.format(kwargs['url']))
+            return
+        filename = validify_filename('{}_{}.json'.format(kwargs['log_request'], kwargs['url']))
+        dumps_to_file(kwargs, 'log_request', filename)
+        xbmcgui.Dialog().ok(kwargs['log_request'].capitalize(), u'[B]{}[/B]\n\n{}\n{}\n{}'.format(
+            kwargs['url'], xbmc.translatePath('special://profile/addon_data/'),
+            'plugin.video.themoviedb.helper/log_request', filename))
+        xbmcgui.Dialog().textviewer(filename, dumps(kwargs['response'], indent=2))
 
 
 def sort_list(**kwargs):

@@ -65,5 +65,7 @@
     <category label="$LOCALIZE[10039]">
         <setting label="$LOCALIZE[14260]" type="lsep"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32066]" type="bool" id="debug_logging" default="False" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32347]" type="action" action="RunScript(plugin.video.themoviedb.helper, log_request=trakt)" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32348]" type="action" action="RunScript(plugin.video.themoviedb.helper, log_request=tmdb)" />
     </category>
 </settings>
