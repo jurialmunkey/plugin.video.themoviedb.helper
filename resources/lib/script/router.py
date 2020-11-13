@@ -7,6 +7,7 @@ import xbmc
 import xbmcgui
 from resources.lib.kodi.update import add_userlist, monitor_userlist, library_autoupdate
 from resources.lib.files.downloader import Downloader
+from resources.lib.files.utils import dumps_to_file, validify_filename
 from resources.lib.addon.window import get_property
 from resources.lib.container.basedir import get_basedir_details
 from resources.lib.fanarttv.api import FanartTV
@@ -233,12 +234,15 @@ def library_update(**kwargs):
 
 
 def log_request(**kwargs):
-    request = None
+    kwargs['response'] = None
     if kwargs.get('log_request') == 'trakt':
-        request = TraktAPI().get_response_json(kwargs.get('url'))
+        kwargs['response'] = TraktAPI().get_response_json(kwargs.get('url'))
     elif kwargs.get('log_request') == 'tmdb':
-        request = TMDb().get_response_json(kwargs.get('url'))
-    kodi_log([kwargs.get('log_request'), '\n', kwargs.get('url'), '\n', request], 1)
+        kwargs['response'] = TMDb().get_response_json(kwargs.get('url'))
+    if not kwargs['response']:
+        return
+    dumps_to_file(kwargs, 'log_request', validify_filename('{}_{}.json'.format(
+        kwargs.get('log_request'), kwargs.get('url'))))
 
 
 def sort_list(**kwargs):

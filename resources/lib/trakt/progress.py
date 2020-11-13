@@ -6,7 +6,7 @@ from resources.lib.trakt.items import TraktItems
 from resources.lib.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.timedate import convert_timestamp, date_in_range, get_region_date
-from resources.lib.addon.plugin import viewitems, kodi_log
+from resources.lib.addon.plugin import viewitems
 # from resources.lib.addon.decorators import timer_report
 
 
