@@ -29,6 +29,13 @@ ARTWORK_TYPES = {
         'banner': ['tvbanner']}}
 
 
+def add_extra_art(source, output={}):
+    if not source:
+        return output
+    output.update({'fanart{}'.format(x): i['url'] for x, i in enumerate(source, 1) if i.get('url')})
+    return output
+
+
 class FanartTV(RequestAPI):
     def __init__(
             self,
@@ -148,25 +155,25 @@ class FanartTV(RequestAPI):
 
     def get_tv_all_artwork(self, ftv_id):
         if self.get_artwork_request(ftv_id, 'tv'):  # Check we can get the request first so we don't re-ask eight times if it 404s
-            return del_empty_keys({
+            return add_extra_art(self.get_tv_fanart(ftv_id, get_list=True), del_empty_keys({
                 'clearart': self.get_tv_clearart(ftv_id),
                 'clearlogo': self.get_tv_clearlogo(ftv_id),
                 'banner': self.get_tv_banner(ftv_id),
                 'landscape': self.get_tv_landscape(ftv_id),
                 'fanart': self.get_tv_fanart(ftv_id),
                 'characterart': self.get_tv_characterart(ftv_id),
-                'poster': self.get_tv_poster(ftv_id)})
+                'poster': self.get_tv_poster(ftv_id)}))
 
     def get_movies_all_artwork(self, ftv_id):
         if self.get_artwork_request(ftv_id, 'movies'):  # Check we can get the request first so we don't re-ask eight times if it 404s
-            return del_empty_keys({
+            return add_extra_art(self.get_movies_fanart(ftv_id, get_list=True), del_empty_keys({
                 'clearart': self.get_movies_clearart(ftv_id),
                 'clearlogo': self.get_movies_clearlogo(ftv_id),
                 'banner': self.get_movies_banner(ftv_id),
                 'landscape': self.get_movies_landscape(ftv_id),
                 'fanart': self.get_movies_fanart(ftv_id),
                 'poster': self.get_movies_poster(ftv_id),
-                'discart': self.get_movies_discart(ftv_id)})
+                'discart': self.get_movies_discart(ftv_id)}))
 
     def get_all_artwork(self, ftv_id, ftv_type):
         if ftv_type == 'movies':
