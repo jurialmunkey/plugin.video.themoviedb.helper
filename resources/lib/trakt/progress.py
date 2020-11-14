@@ -89,13 +89,13 @@ class _TraktProgress():
         if not trakt_type or not id_type:
             return hidden_items
         if progress_watched:
-            response = self.get_response_json('users', 'hidden', 'progress_watched', type=trakt_type)
+            response = self.get_response_json('users', 'hidden', 'progress_watched', type=trakt_type, limit=4095)
             hidden_items |= {i.get(trakt_type, {}).get('ids', {}).get(id_type) for i in response}
         if progress_collected:
-            response = self.get_response_json('users', 'hidden', 'progress_collected', type=trakt_type)
+            response = self.get_response_json('users', 'hidden', 'progress_collected', type=trakt_type, limit=4095)
             hidden_items |= {i.get(trakt_type, {}).get('ids', {}).get(id_type) for i in response}
         if calendar:
-            response = self.get_response_json('users', 'hidden', 'calendar', type=trakt_type)
+            response = self.get_response_json('users', 'hidden', 'calendar', type=trakt_type, limit=4095)
             hidden_items |= {i.get(trakt_type, {}).get('ids', {}).get(id_type) for i in response}
         return hidden_items
 

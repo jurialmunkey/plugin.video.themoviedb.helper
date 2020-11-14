@@ -1774,6 +1774,16 @@ msgctxt "#32348"
 msgid "Log output of TMDb request"
 msgstr ""
 
+#: /resources/lib/kodi/library.py
+msgctxt "#32349"
+msgid "Creating movies playlist"
+msgstr ""
+
+#: /resources/lib/kodi/library.py
+msgctxt "#32350"
+msgid "Creating tvshows playlist"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
