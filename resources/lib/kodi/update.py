@@ -99,7 +99,9 @@ def create_file(filename, content, *args, **kwargs):
 def create_nfo(tmdb_type, tmdb_id, *args, **kwargs):
     filename = 'movie' if tmdb_type == 'movie' else 'tvshow'
     content = 'https://www.themoviedb.org/{}/{}'.format(tmdb_type, tmdb_id)
-    create_file(filename, content, file_ext='nfo', *args, **kwargs)
+    kwargs['file_ext'] = 'nfo'
+    kwargs['clean_url'] = False
+    create_file(filename, content, *args, **kwargs)
 
 
 def create_playlist(items, dbtype, user_slug, list_slug):
@@ -121,11 +123,13 @@ def create_playlist(items, dbtype, user_slug, list_slug):
 def add_to_library(tmdb_type=None, folder=None, tmdb_id=None, imdb_id=None, **kwargs):
     if not tmdb_type or not folder or not tmdb_id:
         return
-    with busy_dialog():
-        if tmdb_type == 'movie':
-            add_movie(folder, tmdb_id, imdb_id)
-        elif tmdb_type == 'tv':
-            add_tvshow(folder, tmdb_id, imdb_id)
+    if tmdb_type == 'movie':
+        add_movie(folder, tmdb_id, imdb_id)
+    elif tmdb_type == 'tv':
+        p_dialog = xbmcgui.DialogProgressBG()
+        p_dialog.create('TMDbHelper', ADDON.getLocalizedString(32166))
+        add_tvshow(folder, tmdb_id, imdb_id, p_dialog=p_dialog, force=True)
+        p_dialog.close()
     if ADDON.getSettingBool('auto_update'):
         xbmc.executebuiltin('UpdateLibrary(video)')
 
@@ -263,7 +267,7 @@ def add_tvshow(folder=None, tmdb_id=None, tvdb_id=None, imdb_id=None, kodi_db=No
         if p_dialog:
             p_dialog_val = ((s_count + 1) * 100) // s_total
             p_dialog_msg = u'{} {} - {}...'.format(
-                ADDON.getLocalizedString(32167), details_tvshow.get('original_name'), season_name)
+                ADDON.getLocalizedString(32167), details_tvshow.get('name'), season_name)
             p_dialog.update(p_dialog_val, message=p_dialog_msg)
 
         # If weve scanned before we only want to scan the most recent seasons (that have already started airing)
