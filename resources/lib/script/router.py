@@ -313,8 +313,8 @@ class Script(object):
             from resources.lib.monitor.service import restart_service_monitor
             return restart_service_monitor()
 
-        routes_available = set(self.routing_table.viewkeys())
-        params_given = set(self.params.viewkeys())
+        routes_available = set(self.routing_table.keys())
+        params_given = set(self.params.keys())
         route_taken = set.intersection(routes_available, params_given).pop()
         kodi_log(['lib.script.router.Script - route_taken\t', route_taken], 0)
         return self.routing_table[route_taken](**self.params)
