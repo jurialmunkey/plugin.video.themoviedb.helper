@@ -268,73 +268,53 @@ def sort_list(**kwargs):
 
 
 class Script(object):
-    def get_params(self):
-        params = {}
-        for arg in sys.argv:
-            if arg == 'script.py':
-                pass
-            elif '=' in arg:
-                arg_split = arg.split('=', 1)
-                if arg_split[0] and arg_split[1]:
-                    key, value = try_decode(arg_split[0]), try_decode(arg_split[1])
-                    value = value.strip('\'').strip('\"')
-                    params.setdefault(key, value)
+    def __init__(self):
+        self.params = {}
+        for arg in [try_decode(arg) for arg in sys.argv[1:]]:
+            if '=' in arg:
+                key, value = arg.split('=', 1)
+                self.params[key] = value.strip('\'').strip('"') if value else True
             else:
-                params.setdefault(arg, True)
-        return params
+                self.params[arg] = True
+        self.params = reconfigure_legacy_params(**self.params)
+
+    routing_table = {
+        'authenticate_trakt': lambda **kwargs: TraktAPI(force=True),
+        'revoke_trakt': lambda **kwargs: TraktAPI().logout(),
+        'split_value': lambda **kwargs: split_value(**kwargs),
+        'kodi_setting': lambda **kwargs: kodi_setting(**kwargs),
+        'sync_trakt': lambda **kwargs : sync_trakt(**kwargs),
+        'manage_artwork': lambda **kwargs : manage_artwork(**kwargs),
+        'refresh_details': lambda **kwargs : refresh_details(**kwargs),
+        'related_lists': lambda **kwargs : related_lists(**kwargs),
+        'user_list': lambda **kwargs : user_list(**kwargs),
+        'like_list': lambda **kwargs : like_list(**kwargs),
+        'blur_image': lambda **kwargs : blur_image(**kwargs),
+        'image_colors': lambda **kwargs : image_colors(**kwargs),
+        'monitor_userlist': lambda **kwargs : monitor_userlist(),
+        'update_players': lambda **kwargs : update_players(),
+        'set_defaultplayer': lambda **kwargs : set_defaultplayer(**kwargs),
+        'configure_players': lambda **kwargs : configure_players(**kwargs),
+        'library_autoupdate': lambda **kwargs : library_update(**kwargs),
+        # 'play_season': lambda **kwargs : play_season(**kwargs),
+        'play_media': lambda **kwargs : play_media(**kwargs),
+        'run_plugin': lambda **kwargs : run_plugin(**kwargs),
+        'log_request': lambda **kwargs : log_request(**kwargs),
+        'play': lambda **kwargs : play_external(**kwargs)
+    }
+    for func in WM_PARAMS:
+        routing_table[func] = lambda **kwargs : WindowManager(**kwargs).router()
 
     def router(self):
-        self.params = self.get_params()
         if not self.params:
             return
-        self.params = reconfigure_legacy_params(**self.params)
-        if self.params.get('authenticate_trakt'):
-            return TraktAPI(force=True)
-        if self.params.get('revoke_trakt'):
-            return TraktAPI().logout()
-        if self.params.get('split_value'):
-            return split_value(**self.params)
-        if self.params.get('kodi_setting'):
-            return kodi_setting(**self.params)
-        if self.params.get('sync_trakt'):
-            return sync_trakt(**self.params)
-        if self.params.get('manage_artwork'):
-            return manage_artwork(**self.params)
-        if self.params.get('refresh_details'):
-            return refresh_details(**self.params)
-        if self.params.get('related_lists'):
-            return related_lists(**self.params)
-        if self.params.get('user_list'):
-            return user_list(**self.params)
-        if self.params.get('like_list'):
-            return like_list(**self.params)
-        if self.params.get('blur_image'):
-            return blur_image(**self.params)
-        if self.params.get('image_colors'):
-            return image_colors(**self.params)
-        if self.params.get('monitor_userlist'):
-            return monitor_userlist()
-        if self.params.get('update_players'):
-            return update_players()
-        if self.params.get('set_defaultplayer'):
-            return set_defaultplayer(**self.params)
-        if self.params.get('configure_players'):
-            return configure_players(**self.params)
-        if self.params.get('library_autoupdate'):
-            return library_update(**self.params)
-        if any(x in WM_PARAMS for x in self.params):
-            return WindowManager(**self.params).router()
-        # if self.params.get('play_season'):
-        #     return play_season(**self.params)
-        if self.params.get('play_media'):
-            return play_media(**self.params)
-        if self.params.get('run_plugin'):
-            return run_plugin(**self.params)
-        if self.params.get('log_request'):
-            return log_request(**self.params)
-        if self.params.get('play'):
-            return play_external(**self.params)
         if self.params.get('restart_service'):
             # Only do the import here because this function only for debugging purposes
             from resources.lib.monitor.service import restart_service_monitor
             return restart_service_monitor()
+
+        routes_available = set(self.routing_table.keys())
+        params_given = set(self.params.keys())
+        route_taken = set.intersection(routes_available, params_given).pop()
+        kodi_log(['lib.script.router.Script - route_taken\t', route_taken], 0)
+        return self.routing_table[route_taken](**self.params)
