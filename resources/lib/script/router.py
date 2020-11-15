@@ -283,27 +283,27 @@ class Script(object):
         'revoke_trakt': lambda **kwargs: TraktAPI().logout(),
         'split_value': lambda **kwargs: split_value(**kwargs),
         'kodi_setting': lambda **kwargs: kodi_setting(**kwargs),
-        'sync_trakt': lambda **kwargs : sync_trakt(**kwargs),
-        'manage_artwork': lambda **kwargs : manage_artwork(**kwargs),
-        'refresh_details': lambda **kwargs : refresh_details(**kwargs),
-        'related_lists': lambda **kwargs : related_lists(**kwargs),
-        'user_list': lambda **kwargs : user_list(**kwargs),
-        'like_list': lambda **kwargs : like_list(**kwargs),
-        'blur_image': lambda **kwargs : blur_image(**kwargs),
-        'image_colors': lambda **kwargs : image_colors(**kwargs),
-        'monitor_userlist': lambda **kwargs : monitor_userlist(),
-        'update_players': lambda **kwargs : update_players(),
-        'set_defaultplayer': lambda **kwargs : set_defaultplayer(**kwargs),
-        'configure_players': lambda **kwargs : configure_players(**kwargs),
-        'library_autoupdate': lambda **kwargs : library_update(**kwargs),
-        # 'play_season': lambda **kwargs : play_season(**kwargs),
-        'play_media': lambda **kwargs : play_media(**kwargs),
-        'run_plugin': lambda **kwargs : run_plugin(**kwargs),
-        'log_request': lambda **kwargs : log_request(**kwargs),
-        'play': lambda **kwargs : play_external(**kwargs)
+        'sync_trakt': lambda **kwargs: sync_trakt(**kwargs),
+        'manage_artwork': lambda **kwargs: manage_artwork(**kwargs),
+        'refresh_details': lambda **kwargs: refresh_details(**kwargs),
+        'related_lists': lambda **kwargs: related_lists(**kwargs),
+        'user_list': lambda **kwargs: user_list(**kwargs),
+        'like_list': lambda **kwargs: like_list(**kwargs),
+        'blur_image': lambda **kwargs: blur_image(**kwargs),
+        'image_colors': lambda **kwargs: image_colors(**kwargs),
+        'monitor_userlist': lambda **kwargs: monitor_userlist(),
+        'update_players': lambda **kwargs: update_players(),
+        'set_defaultplayer': lambda **kwargs: set_defaultplayer(**kwargs),
+        'configure_players': lambda **kwargs: configure_players(**kwargs),
+        'library_autoupdate': lambda **kwargs: library_update(**kwargs),
+        # 'play_season': lambda **kwargs: play_season(**kwargs),
+        'play_media': lambda **kwargs: play_media(**kwargs),
+        'run_plugin': lambda **kwargs: run_plugin(**kwargs),
+        'log_request': lambda **kwargs: log_request(**kwargs),
+        'play': lambda **kwargs: play_external(**kwargs)
     }
     for func in WM_PARAMS:
-        routing_table[func] = lambda **kwargs : WindowManager(**kwargs).router()
+        routing_table[func] = lambda **kwargs: WindowManager(**kwargs).router()
 
     def router(self):
         if not self.params:
