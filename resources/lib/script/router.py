@@ -6,19 +6,20 @@ import sys
 import xbmc
 import xbmcgui
 from json import dumps
-from resources.lib.kodi.update import add_userlist, monitor_userlist, library_autoupdate
+from resources.lib.kodi.library import add_to_library
+from resources.lib.kodi.userlist import monitor_userlist, library_autoupdate
+from resources.lib.kodi.rpc import get_jsonrpc
 from resources.lib.files.downloader import Downloader
 from resources.lib.files.utils import dumps_to_file, validify_filename
 from resources.lib.addon.window import get_property
+from resources.lib.addon.plugin import ADDON, reconfigure_legacy_params, viewitems, kodi_log, format_folderpath, convert_type
+from resources.lib.addon.decorators import busy_dialog
+from resources.lib.addon.parser import encode_url, try_encode, try_decode
 from resources.lib.container.basedir import get_basedir_details
 from resources.lib.fanarttv.api import FanartTV
 from resources.lib.tmdb.api import TMDb
 from resources.lib.trakt.api import TraktAPI, get_sort_methods
-from resources.lib.addon.plugin import ADDON, reconfigure_legacy_params, viewitems, kodi_log, format_folderpath, convert_type
-from resources.lib.kodi.rpc import get_jsonrpc
 from resources.lib.script.sync import SyncItem
-from resources.lib.addon.decorators import busy_dialog
-from resources.lib.addon.parser import encode_url, try_encode, try_decode
 from resources.lib.window.manager import WindowManager
 from resources.lib.player.players import Players
 from resources.lib.player.configure import configure_players
@@ -189,7 +190,7 @@ def user_list(user_list, user_slug=None, **kwargs):
     user_slug = user_slug or 'me'
     if not user_slug or not user_list:
         return
-    add_userlist(user_slug=user_slug, list_slug=user_list, confirm=True, allow_update=True, busy_spinner=True)
+    add_to_library(info='trakt', user_slug=user_slug, list_slug=user_list, confirm=True, allow_update=True, busy_spinner=True)
 
 
 def like_list(like_list, user_slug=None, delete=False, **kwargs):

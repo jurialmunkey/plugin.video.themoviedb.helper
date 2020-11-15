@@ -162,11 +162,11 @@ def get_episode_details(dbid=None):
 
 
 class KodiLibrary(object):
-    def __init__(self, dbtype=None, tvshowid=None, attempt_reconnect=False):
+    def __init__(self, dbtype=None, tvshowid=None, attempt_reconnect=False, logging=True):
         self.dbtype = dbtype
         self.database = self.get_database(dbtype, tvshowid, attempt_reconnect)
 
-    def get_database(self, dbtype, tvshowid=None, attempt_reconnect=False):
+    def get_database(self, dbtype, tvshowid=None, attempt_reconnect=False, logging=True):
         retries = 5 if attempt_reconnect else 1
         while not xbmc.Monitor().abortRequested() and retries > 0:
             database = self._get_kodi_db(dbtype, tvshowid)
@@ -174,7 +174,8 @@ class KodiLibrary(object):
                 return database
             xbmc.Monitor().waitForAbort(1)
             retries -= 1
-        kodi_log(u'Getting KodiDB {} FAILED!'.format(dbtype), 1)
+        if logging:
+            kodi_log(u'Getting KodiDB {} FAILED!'.format(dbtype), 1)
 
     def _get_kodi_db(self, dbtype=None, tvshowid=None):
         if not dbtype:

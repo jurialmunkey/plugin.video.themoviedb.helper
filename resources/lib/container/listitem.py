@@ -9,25 +9,6 @@ from json import dumps
 # from resources.lib.addon.decorators import timer_report
 
 
-""" ListItem methods:
-_set_as_next_page   : Internal method to set next page item
-set_art_fallbacks   : Set a default fallback thumb and fanart if not already set
-get_trakt_type      : Gets Trakt type based on ListItem.DBType
-get_tmdb_type       : Gets TMDb type based on ListItem.DBType
-get_ftv_type        : Gets Fanart.tv type based on ListItem.DBType
-get_ftv_id          : Gets the correct unique ID needed for Fanart.tv lookups based on ListItem.DBType
-get_tmdb_id         : Gets the correct TMDb  (tmdb or tvshow.tmdb) for TMDb lookups based on ListItem.DBType
-is_unaired          : Checks if the premiered date is in the future and formats label if it is
-set_context_menu    : Sets default context menu items (related, trakt, artwork, refresh)
-set_playcount       : Sets passed playcount value appropriately based on ListItem.DBType
-set_params_reroute  : Sets rerouted params based on certain conditions
-set_episode_label   : Sets the episode label to match Kodi default of "1x01. Title"
-set_uids_to_info    : Sets all the unique id values to ListItem.Property(uid) for skin access
-get_url             : Encodes the listitem params into a Kodi plugin paramstring URI
-get_listitem        : Creates and returns an xbmcgui.ListItem object from the info dicts
-"""
-
-
 class ListItem(object):
     def __init__(
             self, label=None, label2=None, path=None, library=None, is_folder=True, params=None, next_page=None,
@@ -141,16 +122,11 @@ class ListItem(object):
             params['episode'] = self.infolabels.get('episode')
         return [('tmdbhelper.context.related', dumps(params))]
 
-    def _context_item_add_to_library(self):
+    def _context_item_add_to_library(self):  # TODO Add individual Seasons / Episodes
         tmdb_id, tmdb_type = self.get_tmdb_id(), self.get_tmdb_type()
         if not tmdb_type or not tmdb_id or tmdb_type not in ['movie', 'tv']:
             return []
-        params = {'tmdb_type': tmdb_type, 'tmdb_id': tmdb_id, 'imdb_id': self.unique_ids.get('imdb')}
-        if tmdb_type == 'movie':
-            params['folder'] = u'{} ({})'.format(self.infolabels.get('title', ''), self.infolabels.get('year', ''))
-        elif tmdb_type == 'tv':
-            params['folder'] = u'{}'.format(self.infolabels.get('title', ''))
-        return [('tmdbhelper.context.addlibrary', dumps(params))]
+        return [('tmdbhelper.context.addlibrary', dumps({'info': tmdb_type, 'tmdb_id': tmdb_id, 'force': True}))]
 
     def _context_item_trakt_sync(self):
         tmdb_id, trakt_type = self.get_tmdb_id(), self.get_trakt_type()
