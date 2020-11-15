@@ -70,7 +70,7 @@ def parse_paramstring(paramstring):
         if '=' not in param:
             continue
         k, v = param.split('=')
-        params[try_decode(unquote_plus(k))] = try_decode(unquote_plus(v))
+        params[unquote_plus(k)] = unquote_plus(v)
     return params
 
 
