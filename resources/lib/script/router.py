@@ -274,7 +274,7 @@ class Script(object):
                 key, value = arg.split('=', 1)
                 self.params[key] = value.strip('\'').strip('"') if value else True
             else:
-                self.params[key] = True
+                self.params[arg] = True
         self.params = reconfigure_legacy_params(**self.params)
 
     routing_table = {
