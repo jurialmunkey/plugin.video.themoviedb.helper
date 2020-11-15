@@ -22,35 +22,6 @@ from resources.lib.addon.setutils import split_items, random_from_list, merge_tw
 # from resources.lib.addon.decorators import busy_dialog
 
 
-""" Container methods:
-pagination_is_allowed   : Checks if pagination is allowed based upon settings and URI params
-ftv_is_cache_only       : Checks if additional artwork should be looked-up on fanarttv
-add_items               : Converts a list of item dicts into listitems and adds to container
-set_params_to_container : Set the URI params to container properties for access via skin
-finish_container        : Set plugin category, container content and end directory
-item_is_excluded        : Checks if item should be included/excluded based on filter/exclusion key/values
-get_tmdb_details        : Gets details about the listitem from TMDb API
-                          Non-cached look-ups triggered by self.tmdb_cache_only=False passed to add_items method
-get_ftv_artwork         : Gets artwork for the listitem from fanart.tv api
-                          Non-cached look-ups triggered by ftv_is_cache_only() dependent on settings
-get_playcount_from_trakt: Gets the relevant playcount/unaired/aired etc. values from Trakt API
-                          Look-ups are dependent on settings
-get_kodi_database       : Gets the kodi db details via JSON-RPC
-get_kodi_parent_dbid    : Gets the kodi dbid for the parent item (e.g. tvshow dbid for episodes)
-get_kodi_details        : Gets the kodi db details for the listitem
-get_kodi_tvchild_details: Gets the details for a tvshow child item (e.g. episode details)
-get_container_content   : Converts the TMDb type into a valid Kodi container content type
-list_randomised_trakt   : Gets randomised items from a Trakt list
-list_randomised         : Gets randomised lists
-get_tmdb_id             : Converts a query in the params to a TMDb ID
-get_items               : Routing function to get the items for the container based on params
-get_directory           : Routing function to get items, add them and finish container based on params
-play_external           : Send path to external players for playing
-context_related         : Pop-up list of various related list options (replaced detailed item section)
-router                  : Entry point router
-"""
-
-
 def filtered_item(item, key, value, exclude=False):
     boolean = False if exclude else True  # Flip values if we want to exclude instead of include
     if key and value and item.get(key) == value:
