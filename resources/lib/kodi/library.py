@@ -193,7 +193,7 @@ class LibraryAdder():
 
     def _add_episode(self, episode, season, folder):
         number = episode.get('episode_number')
-        filename = u'S{:02d}E{:02d} - {}'.format(try_int(season), try_int(number), validify_filename(episode.get('name')))
+        filename = validify_filename(u'S{:02d}E{:02d} - {}'.format(try_int(season), try_int(number), episode.get('name')))
         self.tv._cache.my_history['episodes'].append(filename)
 
         # Skip episodes we added in the past
