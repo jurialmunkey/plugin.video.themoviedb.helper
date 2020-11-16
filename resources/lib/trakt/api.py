@@ -123,6 +123,7 @@ class _TraktLists():
                 i = i.get('list', {})
             elif not i.get('name'):
                 continue
+
             item = {}
             item['label'] = i.get('name')
             item['infolabels'] = {'plot': i.get('description')}
@@ -137,17 +138,28 @@ class _TraktLists():
                 'slug': i.get('ids', {}).get('slug'),
                 'user': i.get('user', {}).get('ids', {}).get('slug')}
             item['infoproperties']['tmdbhelper.context.sorting'] = dumps(item['params'])
+
+            # Add library context menu
             item['context_menu'] = [(
                 xbmc.getLocalizedString(20444), 'Runscript(plugin.video.themoviedb.helper,{})'.format(
                     'user_list={list_slug},user_slug={user_slug}'.format(**item['params'])))]
-            if delete_like:
+
+            # Unlike list context menu
+            if path.startswith('users/likes'):
                 item['context_menu'] += [(
                     ADDON.getLocalizedString(32319), 'Runscript(plugin.video.themoviedb.helper,{},delete)'.format(
                         'like_list={list_slug},user_slug={user_slug}'.format(**item['params'])))]
-            elif like_list:
+
+            # Like list context menu
+            elif path.startswith('lists/'):
                 item['context_menu'] += [(
                     ADDON.getLocalizedString(32315), 'Runscript(plugin.video.themoviedb.helper,{})'.format(
                         'like_list={list_slug},user_slug={user_slug}'.format(**item['params'])))]
+
+            # Owner of list so set param to allow deleting later
+            else:
+                item['params']['owner'] = 'true'
+
             items.append(item)
         if not next_page:
             return items
