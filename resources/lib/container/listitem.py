@@ -5,11 +5,30 @@ from resources.lib.addon.plugin import ADDON, ADDONPATH, PLUGINPATH, kodi_log, v
 from resources.lib.addon.parser import try_int, encode_url
 from resources.lib.addon.timedate import is_future_timestamp
 from resources.lib.addon.setutils import merge_two_dicts
-from json import dumps
+from resources.lib.container.context import ContextMenu
 # from resources.lib.addon.decorators import timer_report
 
 
-class ListItem(object):
+def ListItem(*args, **kwargs):
+    """ Factory to build ListItem object """
+    factory = {
+        'none': _ListItem,
+        'movie': _Movie,
+        'tvshow': _Tvshow,
+        'season': _Season,
+        'episode': _Episode,
+        'video': _Video,
+        'set': _Collection,
+        'person': _Person}
+    mediatype = kwargs.get('infolabels', {}).get('mediatype')
+    if kwargs.get('infoproperties', {}).get('tmdb_type') == 'person':
+        mediatype = 'person'
+    if mediatype not in factory:
+        mediatype = 'none'
+    return factory[mediatype](*args, **kwargs)
+
+
+class _ListItem(object):
     def __init__(
             self, label=None, label2=None, path=None, library=None, is_folder=True, params=None, next_page=None,
             parent_params=None, infolabels=None, infoproperties=None, art=None, cast=None,
@@ -55,117 +74,27 @@ class ListItem(object):
         return convert_media_type(self.infolabels.get('mediatype'), 'trakt')
 
     def get_tmdb_type(self):
-        if self.infoproperties.get('tmdb_type') == 'person':
-            return 'person'
         return convert_media_type(self.infolabels.get('mediatype'), 'tmdb', parent_type=True)
 
     def get_ftv_type(self):
         return convert_media_type(self.infolabels.get('mediatype'), 'ftv')
 
     def get_ftv_id(self):
-        if self.infolabels.get('mediatype') == 'movie':
-            return self.unique_ids.get('tmdb')
-        if self.infolabels.get('mediatype') == 'tvshow':
-            return self.unique_ids.get('tvdb')
-        if self.infolabels.get('mediatype') in ['season', 'episode']:
-            return self.unique_ids.get('tvshow.tvdb')
+        return None
 
     def get_tmdb_id(self):
-        if self.infolabels.get('mediatype') in ['season', 'episode']:
-            return self.unique_ids.get('tvshow.tmdb')
         return self.unique_ids.get('tmdb')
 
-    def is_unaired(self, format_label=u'[COLOR=ffcc0000][I]{}[/I][/COLOR]', check_hide_settings=True):
-        if not self.infolabels.get('mediatype') in ['movie', 'tvshow', 'season', 'episode']:
-            return
-        try:
-            if is_future_timestamp(self.infolabels.get('premiered'), "%Y-%m-%d", 10):
-                if format_label:
-                    self.label = format_label.format(self.label)
-                if not check_hide_settings:
-                    return True
-                elif self.infolabels.get('mediatype') == 'movie':
-                    if ADDON.getSettingBool('hide_unaired_movies'):
-                        return True
-                elif self.infolabels.get('mediatype') in ['tv', 'season', 'episode']:
-                    if ADDON.getSettingBool('hide_unaired_episodes'):
-                        return True
-        except Exception as exc:
-            kodi_log(u'Error: {}'.format(exc), 1)
-
-    def _context_item_get_ftv_artwork(self):
-        if self.infolabels.get('mediatype') not in ['movie', 'tvshow']:
-            return []
-        ftv_id, ftv_type = self.get_ftv_id(), self.get_ftv_type()
-        if not ftv_type or not ftv_id:
-            return []
-        return [('tmdbhelper.context.artwork', dumps({'ftv_type': ftv_type, 'ftv_id': ftv_id}))]
-
-    def _context_item_refresh_details(self):
-        tmdb_id, tmdb_type = self.get_tmdb_id(), self.get_tmdb_type()
-        if not tmdb_type or not tmdb_id:
-            return []
-        params = {'tmdb_type': tmdb_type, 'tmdb_id': tmdb_id}
-        if self.infolabels.get('mediatype') in ['season', 'episode']:
-            params['season'] = self.infolabels.get('season', 0)
-        if self.infolabels.get('mediatype') == 'episode':
-            params['episode'] = self.infolabels.get('episode', 0)
-        return [('tmdbhelper.context.refresh', dumps(params))]
-
-    def _context_item_related_lists(self):
-        tmdb_id, tmdb_type = self.get_tmdb_id(), self.get_tmdb_type()
-        if not tmdb_type or not tmdb_id:
-            return []
-        params = {'tmdb_type': tmdb_type, 'tmdb_id': tmdb_id}
-        if self.infolabels.get('mediatype') == 'episode':
-            params['season'] = self.infolabels.get('season')
-            params['episode'] = self.infolabels.get('episode')
-        return [('tmdbhelper.context.related', dumps(params))]
-
-    def _context_item_add_to_library(self):  # TODO Add individual Seasons / Episodes
-        tmdb_id, tmdb_type = self.get_tmdb_id(), self.get_tmdb_type()
-        if not tmdb_type or not tmdb_id or tmdb_type not in ['movie', 'tv']:
-            return []
-        return [('tmdbhelper.context.addlibrary', dumps({'info': tmdb_type, 'tmdb_id': tmdb_id, 'force': True}))]
-
-    def _context_item_trakt_sync(self):
-        tmdb_id, trakt_type = self.get_tmdb_id(), self.get_trakt_type()
-        if not trakt_type or not tmdb_id:
-            return []
-        params = {'trakt_type': trakt_type, 'unique_id': tmdb_id, 'id_type': 'tmdb'}
-        if self.infolabels.get('mediatype') == 'season':
-            return []  # Seasons disabled for now as difficult to manage properly TODO: FIX IT!
-        if self.infolabels.get('mediatype') == 'episode':
-            params['season'] = self.infolabels.get('season')
-            params['episode'] = self.infolabels.get('episode')
-        return [('tmdbhelper.context.trakt', dumps(params))]
+    def is_unaired(self, format_label=None, check_hide_settings=True):
+        return
 
     def set_context_menu(self):
-        context_items = []
-        context_items += self._context_item_related_lists()
-        context_items += self._context_item_get_ftv_artwork()
-        context_items += self._context_item_refresh_details()
-        context_items += self._context_item_trakt_sync()
-        context_items += self._context_item_add_to_library()
-        for k, v in context_items:
+        for k, v in ContextMenu(self).get():
             self.infoproperties[k] = v
 
     def set_playcount(self, playcount):
-        playcount = try_int(playcount)
-        if self.infolabels.get('mediatype') in ['movie', 'episode']:
-            if playcount:
-                self.infolabels['playcount'] = playcount
-                self.infolabels['overlay'] = 5
-        elif self.infolabels.get('mediatype') in ['tvshow', 'season']:
-            if try_int(self.infolabels.get('episode')):
-                self.infoproperties['watchedepisodes'] = playcount
-                self.infoproperties['totalepisodes'] = try_int(self.infolabels.get('episode'))
-                self.infoproperties['unwatchedepisodes'] = self.infoproperties.get('totalepisodes') - try_int(self.infoproperties.get('watchedepisodes'))
-                if playcount and not self.infoproperties.get('unwatchedepisodes'):
-                    self.infolabels['playcount'] = playcount
-                    self.infolabels['overlay'] = 5
+        return
 
-    # @timer_report('set_details')
     def set_details(self, details=None, reverse=False):
         if not details:
             return
@@ -177,58 +106,23 @@ class ListItem(object):
         self.cast = self.cast or details.get('cast', [])
 
     def set_params_reroute(self, ftv_forced_lookup=False, flatten_seasons=False):
-        # Do some special stuff for skin shortcuts window like set widget pararm and provide sorting methods
         if xbmc.getCondVisibility("Window.IsVisible(script-skinshortcuts.xml)"):
-            self.params['widget'] = 'true'
-            if self.infoproperties.get('tmdbhelper.context.sorting'):
+            self.params['widget'] = 'true'  # When set from skin shortcuts add widget param
+            if self.infoproperties.get('tmdbhelper.context.sorting'):  # Reroute sortable lists to display options in skinshortcuts
                 self.params['parent_info'] = self.params['info']
                 self.params['info'] = 'trakt_sortby'
 
-        # If parent list had fanarttv param we should carry this with us onto following pages
-        if ftv_forced_lookup:
+        if ftv_forced_lookup:  # Take fanarttv param from parent list with us onto subsequent pages
             self.params['fanarttv'] = ftv_forced_lookup
 
-        # Reconfigure various details sections to point to the correct places
-        if self.params.get('info') == 'details':
-            if self.infoproperties.get('tmdb_type') == 'person':
-                self.params['info'] = 'related'
-                self.params['tmdb_type'] = 'person'
-                self.params['tmdb_id'] = self.unique_ids.get('tmdb')
-                self.is_folder = False
-            elif (self.parent_params.get('info') == 'library_nextaired'
-                    and self.infolabels.get('mediatype') == 'episode'
-                    and ADDON.getSettingBool('nextaired_linklibrary')
-                    and self.infoproperties.get('tvshow.dbid')):
-                self.path = 'videodb://tvshows/titles/{}/'.format(self.infoproperties['tvshow.dbid'])
-                self.params = {}
-                self.is_folder = True
-            elif self.infolabels.get('mediatype') in ['movie', 'episode', 'video']:
-                if not ADDON.getSettingInt('default_select'):
-                    self.params['info'] = 'play'
-                    self.infoproperties['isPlayable'] = 'true'
-                else:
-                    self.params['info'] = 'related'
-                self.is_folder = False
-                self.infoproperties['tmdbhelper.context.playusing'] = '{}&ignore_default=true'.format(self.get_url())
-            elif self.infolabels.get('mediatype') == 'tvshow':
-                if not ADDON.getSettingInt('default_select'):
-                    self.params['info'] = 'flatseasons' if flatten_seasons else 'seasons'
-                else:
-                    self.params['info'] = 'related'
-                    self.is_folder = False
-            elif self.infolabels.get('mediatype') == 'season':
-                self.params['info'] = 'episodes'
-            elif self.infolabels.get('mediatype') == 'set':
-                self.params['info'] = 'collection'
+        if self.params.get('info') == 'details':  # Reconfigure details item into play/browse etc.
+            self._set_params_reroute_details(flatten_seasons)
 
-    def set_episode_label(self, format_label=u'{season}x{episode:0>2}. {label}'):
-        if not self.infolabels.get('mediatype') == 'episode':
-            return
-        season = try_int(self.infolabels.get('season', 0))
-        episode = try_int(self.infolabels.get('episode', 0))
-        if not season or not episode:
-            return
-        self.label = format_label.format(season=season, episode=episode, label=self.infolabels.get('title', ''))
+    def _set_params_reroute_details(self, flatten_seasons):
+        return
+
+    def set_episode_label(self, format_label=None):
+        return
 
     def set_uids_to_info(self):
         for k, v in viewitems(self.unique_ids):
@@ -264,13 +158,146 @@ class ListItem(object):
         listitem.setCast(self.cast)
         listitem.addContextMenuItems(self.context_menu)
 
-        if self.stream_details:
-            for k, v in viewitems(self.stream_details):
-                if not k or not v:
+        if not self.stream_details:
+            return listitem
+        for k, v in viewitems(self.stream_details):
+            if not k or not v:
+                continue
+            for i in v:
+                if not i:
                     continue
-                for i in v:
-                    if not i:
-                        continue
-                    listitem.addStreamInfo(k, i)
-
+                listitem.addStreamInfo(k, i)
         return listitem
+
+
+class _Person(_ListItem):
+    def _set_params_reroute_details(self, flatten_seasons):
+        self.params['info'] = 'related'
+        self.params['tmdb_type'] = 'person'
+        self.params['tmdb_id'] = self.unique_ids.get('tmdb')
+        self.is_folder = False
+
+    def get_tmdb_type(self):
+        return 'person'
+
+
+class _Collection(_ListItem):
+    def _set_params_reroute_details(self, flatten_seasons):
+        self.params['info'] = 'collection'
+
+
+class _Video(_ListItem):
+    def is_unaired(self, format_label=u'[COLOR=ffcc0000][I]{}[/I][/COLOR]', check_hide_settings=True):
+        try:
+            if not is_future_timestamp(self.infolabels.get('premiered'), "%Y-%m-%d", 10):
+                return
+            if format_label:
+                self.label = format_label.format(self.label)
+        except Exception as exc:
+            kodi_log(u'Error: {}'.format(exc), 1)
+        if not check_hide_settings:
+            return True
+        return self.unaired_bool()
+
+    def _set_params_reroute_default(self):
+        if not ADDON.getSettingInt('default_select'):
+            self.params['info'] = 'play'
+            self.infoproperties['isPlayable'] = 'true'
+        else:
+            self.params['info'] = 'related'
+        self.is_folder = False
+        self.infoproperties['tmdbhelper.context.playusing'] = '{}&ignore_default=true'.format(self.get_url())
+
+    def _set_params_reroute_details(self, flatten_seasons):
+        self._set_params_reroute_default()
+
+
+class _Movie(_Video):
+    def get_ftv_id(self):
+        return self.unique_ids.get('tmdb')
+
+    def set_playcount(self, playcount):
+        playcount = try_int(playcount)
+        if not playcount:
+            return
+        self.infolabels['playcount'] = playcount
+        self.infolabels['overlay'] = 5
+
+    def unaired_bool(self):
+        if ADDON.getSettingBool('hide_unaired_movies'):
+            return True
+
+    def _set_params_reroute_details(self, flatten_seasons):
+        self._set_params_reroute_default()
+
+
+class _Tvshow(_Video):
+    def get_ftv_id(self):
+        return self.unique_ids.get('tvdb')
+
+    def set_playcount(self, playcount):
+        playcount = try_int(playcount)
+        if not try_int(self.infolabels.get('episode')):
+            return
+        ip, il = self.infoproperties, self.infolabels
+        ip['watchedepisodes'] = playcount
+        ip['totalepisodes'] = try_int(il.get('episode'))
+        ip['unwatchedepisodes'] = ip.get('totalepisodes') - try_int(ip.get('watchedepisodes'))
+        if not playcount or ip.get('unwatchedepisodes'):
+            return
+        il['playcount'] = playcount
+        il['overlay'] = 5
+
+    def unaired_bool(self):
+        if ADDON.getSettingBool('hide_unaired_episodes'):
+            return True
+
+    def _set_params_reroute_details(self, flatten_seasons):
+        if ADDON.getSettingInt('default_select'):
+            self.params['info'] = 'related'
+            self.is_folder = False
+            return
+        self.params['info'] = 'flatseasons' if flatten_seasons else 'seasons'
+
+
+class _Season(_Tvshow):
+    def get_ftv_id(self):
+        return self.unique_ids.get('tvdb')
+
+    def get_tmdb_id(self):
+        return self.unique_ids.get('tvshow.tmdb')
+
+    def _set_params_reroute_details(self, flatten_seasons):
+        self.params['info'] = 'episodes'
+
+
+class _Episode(_Tvshow):
+    def get_ftv_id(self):
+        return self.unique_ids.get('tvshow.tvdb')
+
+    def get_tmdb_id(self):
+        return self.unique_ids.get('tvshow.tmdb')
+
+    def set_playcount(self, playcount):
+        playcount = try_int(playcount)
+        if not playcount:
+            return
+        self.infolabels['playcount'] = playcount
+        self.infolabels['overlay'] = 5
+
+    def _set_params_reroute_details(self, flatten_seasons):
+        if (self.parent_params.get('info') == 'library_nextaired'
+                and ADDON.getSettingBool('nextaired_linklibrary')
+                and self.infoproperties.get('tvshow.dbid')):
+            self.path = 'videodb://tvshows/titles/{}/'.format(self.infoproperties['tvshow.dbid'])
+            self.params = {}
+            self.is_folder = True
+            return
+        self._set_params_reroute_default()
+
+    def set_episode_label(self, format_label=u'{season}x{episode:0>2}. {label}'):
+        season = try_int(self.infolabels.get('season', 0))
+        episode = try_int(self.infolabels.get('episode', 0))
+        if not season or not episode:
+            return
+        self.label = format_label.format(season=season, episode=episode, label=self.infolabels.get('title', ''))
