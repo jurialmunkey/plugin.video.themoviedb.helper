@@ -105,12 +105,16 @@ class _ListItem(object):
         self.unique_ids = merge_two_dicts(details.get('unique_ids', {}), self.unique_ids, reverse=reverse)
         self.cast = self.cast or details.get('cast', [])
 
+    def _set_params_reroute_skinshortcuts(self):
+        self.params['widget'] = 'true'
+        # Reroute sortable lists to display options in skinshortcuts
+        if self.infoproperties.get('tmdbhelper.context.sorting'):
+            self.params['parent_info'] = self.params['info']
+            self.params['info'] = 'trakt_sortby'
+
     def set_params_reroute(self, ftv_forced_lookup=False, flatten_seasons=False):
         if xbmc.getCondVisibility("Window.IsVisible(script-skinshortcuts.xml)"):
-            self.params['widget'] = 'true'  # When set from skin shortcuts add widget param
-            if self.infoproperties.get('tmdbhelper.context.sorting'):  # Reroute sortable lists to display options in skinshortcuts
-                self.params['parent_info'] = self.params['info']
-                self.params['info'] = 'trakt_sortby'
+            self._set_params_reroute_skinshortcuts()
 
         if ftv_forced_lookup:  # Take fanarttv param from parent list with us onto subsequent pages
             self.params['fanarttv'] = ftv_forced_lookup
@@ -119,10 +123,10 @@ class _ListItem(object):
             self._set_params_reroute_details(flatten_seasons)
 
     def _set_params_reroute_details(self, flatten_seasons):
-        return
+        return  # Done in child class
 
     def set_episode_label(self, format_label=None):
-        return
+        return  # Done in child class
 
     def set_uids_to_info(self):
         for k, v in viewitems(self.unique_ids):
