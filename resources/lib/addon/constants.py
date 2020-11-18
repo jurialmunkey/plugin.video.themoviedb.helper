@@ -209,7 +209,8 @@ TMDB_BASIC_LISTS = {
         'path': 'person/{tmdb_id}/movie_credits',
         'key': 'crew',
         'dbid_sorting': True,
-        'tmdb_type': 'movie'
+        'tmdb_type': 'movie',
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'crew_in_tvshows': {
         'path': 'person/{tmdb_id}/tv_credits',
