@@ -95,74 +95,115 @@ TMDB_ALL_ITEMS_LISTS = {
     }
 }
 
+RANDOMISED_LISTS_ROUTE = {
+    'lambda': lambda func, **kwargs: func(**kwargs),
+    'getattr': 'list_randomised'}
 RANDOMISED_LISTS = {
-    'random_genres': {'info': 'genres'},
-    'random_keyword': {'info': 'all_items', 'tmdb_type': 'keyword'},
-    'random_trendinglists': {'info': 'trakt_trendinglists'},
-    'random_popularlists': {'info': 'trakt_popularlists'},
-    'random_likedlists': {'info': 'trakt_likedlists'},
-    'random_mylists': {'info': 'trakt_mylists'}}
+    'random_genres': {
+        'params': {'info': 'genres'},
+        'route': RANDOMISED_LISTS_ROUTE},
+    'random_keyword': {
+        'params': {'info': 'all_items', 'tmdb_type': 'keyword'},
+        'route': RANDOMISED_LISTS_ROUTE},
+    'random_trendinglists': {
+        'params': {'info': 'trakt_trendinglists'},
+        'route': RANDOMISED_LISTS_ROUTE},
+    'random_popularlists': {
+        'params': {'info': 'trakt_popularlists'},
+        'route': RANDOMISED_LISTS_ROUTE},
+    'random_likedlists': {
+        'params': {'info': 'trakt_likedlists'},
+        'route': RANDOMISED_LISTS_ROUTE},
+    'random_mylists': {
+        'params': {'info': 'trakt_mylists'},
+        'route': RANDOMISED_LISTS_ROUTE}}
 
+RANDOMISED_TRAKT_ROUTE = {
+    'lambda': lambda func, **kwargs: func(**kwargs),
+    'getattr': 'list_randomised_trakt'}
 RANDOMISED_TRAKT = {
-    'random_trending': 'trakt_trending',
-    'random_popular': 'trakt_popular',
-    'random_mostplayed': 'trakt_mostplayed',
-    'random_anticipated': 'trakt_anticipated'}
+    'random_trending': {
+        'info': 'trakt_trending',
+        'route': RANDOMISED_TRAKT_ROUTE},
+    'random_popular': {
+        'info': 'trakt_popular',
+        'route': RANDOMISED_TRAKT_ROUTE},
+    'random_mostplayed': {
+        'info': 'trakt_mostplayed',
+        'route': RANDOMISED_TRAKT_ROUTE},
+    'random_anticipated': {
+        'info': 'trakt_anticipated',
+        'route': RANDOMISED_TRAKT_ROUTE}}
 
+TMDB_BASIC_LISTS_ROUTE = {
+    'lambda': lambda func, **kwargs: func(**kwargs),
+    'getattr': 'list_tmdb'}
 TMDB_BASIC_LISTS = {
     'popular': {
         'path': '{tmdb_type}/popular',
-        'key': 'results'
+        'key': 'results',
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'top_rated': {
         'path': '{tmdb_type}/top_rated',
-        'key': 'results'
+        'key': 'results',
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'upcoming': {
         'path': '{tmdb_type}/upcoming',
-        'key': 'results'
+        'key': 'results',
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'trending_day': {
         'path': 'trending/{tmdb_type}/day',
-        'key': 'results'
+        'key': 'results',
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'trending_week': {
         'path': 'trending/{tmdb_type}/week',
-        'key': 'results'
+        'key': 'results',
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'now_playing': {
         'path': '{tmdb_type}/now_playing',
-        'key': 'results'
+        'key': 'results',
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'airing_today': {
         'path': '{tmdb_type}/airing_today',
-        'key': 'results'
+        'key': 'results',
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'on_the_air': {
         'path': '{tmdb_type}/on_the_air',
-        'key': 'results'
+        'key': 'results',
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'recommendations': {
         'path': '{tmdb_type}/{tmdb_id}/recommendations',
         'key': 'results',
-        'dbid_sorting': True
+        'dbid_sorting': True,
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'similar': {
         'path': '{tmdb_type}/{tmdb_id}/similar',
         'key': 'results',
-        'dbid_sorting': True
+        'dbid_sorting': True,
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'stars_in_movies': {
         'path': 'person/{tmdb_id}/movie_credits',
         'key': 'cast',
         'tmdb_type': 'movie',
-        'dbid_sorting': True
+        'dbid_sorting': True,
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'stars_in_tvshows': {
         'path': 'person/{tmdb_id}/tv_credits',
         'key': 'cast',
         'dbid_sorting': True,
-        'tmdb_type': 'tv'
+        'tmdb_type': 'tv',
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'crew_in_movies': {
         'path': 'person/{tmdb_id}/movie_credits',
@@ -174,44 +215,53 @@ TMDB_BASIC_LISTS = {
         'path': 'person/{tmdb_id}/tv_credits',
         'key': 'crew',
         'dbid_sorting': True,
-        'tmdb_type': 'tv'
+        'tmdb_type': 'tv',
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'images': {
         'path': 'person/{tmdb_id}/images',
         'key': 'profiles',
-        'tmdb_type': 'image'
+        'tmdb_type': 'image',
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'videos': {
         'path': '{tmdb_type}/{tmdb_id}/videos',
         'key': 'results',
-        'tmdb_type': 'video'
+        'tmdb_type': 'video',
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'posters': {
         'path': '{tmdb_type}/{tmdb_id}/images',
         'key': 'posters',
-        'tmdb_type': 'image'
+        'tmdb_type': 'image',
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'fanart': {
         'path': '{tmdb_type}/{tmdb_id}/images',
         'key': 'backdrops',
-        'tmdb_type': 'image'
+        'tmdb_type': 'image',
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'reviews': {
         'path': '{tmdb_type}/{tmdb_id}/reviews',
-        'key': 'results'
+        'key': 'results',
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'revenue_movies': {
         'path': 'discover/{tmdb_type}?sort_by=revenue.desc',
-        'key': 'results'
+        'key': 'results',
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'most_voted': {
         'path': 'discover/{tmdb_type}?sort_by=vote_count.desc',
-        'key': 'results'
+        'key': 'results',
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'collection': {
         'path': 'collection/{tmdb_id}',
         'key': 'parts',
-        'tmdb_type': 'movie'
+        'tmdb_type': 'movie',
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'movie_keywords': {
         'path': 'movie/{tmdb_id}/keywords',
@@ -222,7 +272,8 @@ TMDB_BASIC_LISTS = {
             'tmdb_type': 'movie',
             'with_keywords': '{tmdb_id}',
             'with_id': 'True'
-        }
+        },
+        'route': TMDB_BASIC_LISTS_ROUTE
     },
     'genres': {
         'path': 'genre/{tmdb_type}/list',
@@ -233,78 +284,104 @@ TMDB_BASIC_LISTS = {
             'tmdb_type': '{base_tmdb_type}',
             'with_genres': '{tmdb_id}',
             'with_id': 'True'
-        }
+        },
+        'route': TMDB_BASIC_LISTS_ROUTE
     }
 }
 
 
+TRAKT_BASIC_LISTS_ROUTE = {
+    'lambda': lambda func, **kwargs: func(**kwargs),
+    'getattr': 'list_trakt'}
 TRAKT_BASIC_LISTS = {
     'trakt_trending': {
         'path': '{trakt_type}s/trending',
+        'route': TRAKT_BASIC_LISTS_ROUTE
     },
     'trakt_popular': {
-        'path': '{trakt_type}s/popular'
+        'path': '{trakt_type}s/popular',
+        'route': TRAKT_BASIC_LISTS_ROUTE
     },
     'trakt_mostplayed': {
         'path': '{trakt_type}s/played/weekly',
+        'route': TRAKT_BASIC_LISTS_ROUTE
     },
     'trakt_anticipated': {
         'path': '{trakt_type}s/anticipated',
+        'route': TRAKT_BASIC_LISTS_ROUTE
     },
     'trakt_boxoffice': {
         'path': '{trakt_type}s/boxoffice',
+        'route': TRAKT_BASIC_LISTS_ROUTE
     },
     'trakt_recommendations': {
         'path': 'recommendations/{trakt_type}s?ignore_collected=true',
-        'authorize': True
+        'authorize': True,
+        'route': TRAKT_BASIC_LISTS_ROUTE
     },
     'trakt_myairing': {
         'path': 'calendars/my/{trakt_type}s',
-        'authorize': True
+        'authorize': True,
+        'route': TRAKT_BASIC_LISTS_ROUTE
     }
 }
 
 
+TRAKT_SYNC_LISTS_ROUTE = {
+    'lambda': lambda func, **kwargs: func(**kwargs),
+    'getattr': 'list_sync'}
 TRAKT_SYNC_LISTS = {
     'trakt_collection': {
         'sync_type': 'collection',
         'sort_by': 'title',
-        'sort_how': 'asc'
+        'sort_how': 'asc',
+        'route': TRAKT_SYNC_LISTS_ROUTE
     },
     'trakt_watchlist': {
         'sync_type': 'watchlist',
         'use_show_activity': True,
-        'sort_by': 'unsorted'
+        'sort_by': 'unsorted',
+        'route': TRAKT_SYNC_LISTS_ROUTE
     },
     'trakt_history': {
         'sync_type': 'watched',
         'sort_by': 'watched',
-        'sort_how': 'desc'
+        'sort_how': 'desc',
+        'route': TRAKT_SYNC_LISTS_ROUTE
     },
     'trakt_mostwatched': {
         'sync_type': 'watched',
         'sort_by': 'plays',
-        'sort_how': 'desc'
+        'sort_how': 'desc',
+        'route': TRAKT_SYNC_LISTS_ROUTE
     },
     'trakt_inprogress': {
         'sync_type': 'playback',
         'sort_by': 'paused',
-        'sort_how': 'desc'
+        'sort_how': 'desc',
+        'route': TRAKT_SYNC_LISTS_ROUTE
     }
 }
 
 
+TRAKT_LIST_OF_LISTS_ROUTE = {
+    'lambda': lambda func, **kwargs: func(**kwargs),
+    'getattr': 'list_lists'}
 TRAKT_LIST_OF_LISTS = {
     'trakt_trendinglists': {
-        'path': 'lists/trending'},
+        'path': 'lists/trending',
+        'route': TRAKT_LIST_OF_LISTS_ROUTE},
     'trakt_popularlists': {
-        'path': 'lists/popular'},
+        'path': 'lists/popular',
+        'route': TRAKT_LIST_OF_LISTS_ROUTE},
     'trakt_likedlists': {
         'path': 'users/likes/lists',
-        'authorize': True},
+        'authorize': True,
+        'route': TRAKT_LIST_OF_LISTS_ROUTE},
     'trakt_mylists': {
         'path': 'users/me/lists',
-        'authorize': True}
+        'authorize': True,
+        'route': TRAKT_LIST_OF_LISTS_ROUTE}
 }
 
 CONTEXT_MENU_ITEMS = {
@@ -331,4 +408,86 @@ CONTEXT_MENU_ITEMS = {
         'episode': {'trakt_type': '{trakt_type}', 'unique_id': '{tmdb_id}', 'id_type': 'tmdb', 'season': '{season}', 'episode': '{episode}'},
         'other': {'trakt_type': '{trakt_type}', 'unique_id': '{tmdb_id}', 'id_type': 'tmdb'}
     }
+}
+
+ROUTE_NO_ID = {
+    'pass': {'route': {
+        'lambda': lambda func, **kwargs: None,
+        'getattr': '_noop'}},
+    'dir_search': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_searchdir_router'}},
+    'search': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_search'}},
+    'user_discover': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_userdiscover'}},
+    'dir_discover': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_discoverdir_router'}},
+    'discover': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_discover'}},
+    'all_items': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_all_items'}},
+    'trakt_userlist': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_userlist'}},
+    'trakt_becauseyouwatched': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_becauseyouwatched'}},
+    'trakt_becausemostwatched': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_becauseyouwatched'}},
+    'trakt_inprogress': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_inprogress'}},
+    'trakt_nextepisodes': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_nextepisodes'}},
+    'trakt_calendar': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_trakt_calendar'}},
+    'library_nextaired': {'route': {
+        'lambda': lambda func, **kwargs: func(library=True, **kwargs),
+        'getattr': 'list_trakt_calendar'}},
+    'trakt_sortby': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_trakt_sortby'}},
+}
+
+
+ROUTE_TMDB_ID = {
+    'details': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_details'}},
+    'seasons': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_seasons'}},
+    'flatseasons': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_flatseasons'}},
+    'episodes': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_episodes'}},
+    'episode_groups': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_episode_groups'}},
+    'episode_group_seasons': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_episode_group_seasons'}},
+    'episode_group_episodes': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_episode_group_episodes'}},
+    'cast': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_cast'}},
+    'crew': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_crew'}},
+    'trakt_upnext': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_upnext'}},
 }
