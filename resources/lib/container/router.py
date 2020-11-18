@@ -276,30 +276,37 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
     def _noop(self):
         return None
 
+    def _get_items(self, func, **kwargs):
+        return func['lambda'](getattr(self, func['getattr']), **kwargs)
+
     def get_items(self, **kwargs):
         info = kwargs.get('info')
 
+        # Check routes that don't require ID lookups first
         route = ROUTE_NO_ID
         route.update(TRAKT_LIST_OF_LISTS)
         route.update(RANDOMISED_LISTS)
         route.update(RANDOMISED_TRAKT)
-        lookup_tmdb = False
 
-        if info not in route:
-            route = ROUTE_TMDB_ID
-            route.update(TMDB_BASIC_LISTS)
-            route.update(TRAKT_BASIC_LISTS)
-            route.update(TRAKT_SYNC_LISTS)
-            lookup_tmdb = True
+        # Early exit if we have a route
+        if info in route:
+            return self._get_items(route[info]['route'], **kwargs)
 
+        # Check routes that require ID lookups second
+        route = ROUTE_TMDB_ID
+        route.update(TMDB_BASIC_LISTS)
+        route.update(TRAKT_BASIC_LISTS)
+        route.update(TRAKT_SYNC_LISTS)
+
+        # Early exit to basedir if no route found
         if info not in route:
             return self.list_basedir(info)
 
-        if lookup_tmdb and not kwargs.get('tmdb_id'):
+        # Lookup up our TMDb ID
+        if not kwargs.get('tmdb_id'):
             kwargs['tmdb_id'] = self.get_tmdb_id(**kwargs)
 
-        func = route[info]['route']
-        return func['lambda'](getattr(self, func['getattr']), **kwargs)
+        return self._get_items(route[info]['route'], **kwargs)
 
     def get_directory(self):
         items = self.get_items(**self.params)
