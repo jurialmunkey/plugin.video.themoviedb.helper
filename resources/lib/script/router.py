@@ -26,9 +26,6 @@ from resources.lib.player.configure import configure_players
 from resources.lib.monitor.images import ImageFunctions
 
 
-WM_PARAMS = ['add_path', 'add_query', 'close_dialog', 'reset_path', 'call_id', 'call_path', 'call_update']
-
-
 # Get TMDb ID decorator
 def get_tmdb_id(func):
     def wrapper(*args, **kwargs):
@@ -300,10 +297,15 @@ class Script(object):
         'play_media': lambda **kwargs: play_media(**kwargs),
         'run_plugin': lambda **kwargs: run_plugin(**kwargs),
         'log_request': lambda **kwargs: log_request(**kwargs),
-        'play': lambda **kwargs: play_external(**kwargs)
+        'play': lambda **kwargs: play_external(**kwargs),
+        'add_path': lambda **kwargs: WindowManager(**kwargs).router(),
+        'add_query': lambda **kwargs: WindowManager(**kwargs).router(),
+        'close_dialog': lambda **kwargs: WindowManager(**kwargs).router(),
+        'reset_path': lambda **kwargs: WindowManager(**kwargs).router(),
+        'call_id': lambda **kwargs: WindowManager(**kwargs).router(),
+        'call_path': lambda **kwargs: WindowManager(**kwargs).router(),
+        'call_update': lambda **kwargs: WindowManager(**kwargs).router()
     }
-    for func in WM_PARAMS:
-        routing_table[func] = lambda **kwargs: WindowManager(**kwargs).router()
 
     def router(self):
         if not self.params:
