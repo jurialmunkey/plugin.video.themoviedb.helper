@@ -417,10 +417,8 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         self.interval = self.code.get('interval', 5)
         self.expires_in = self.code.get('expires_in', 0)
         self.auth_dialog = xbmcgui.DialogProgress()
-        self.auth_dialog.create(
-            ADDON.getLocalizedString(32097),
-            ADDON.getLocalizedString(32096),
-            ADDON.getLocalizedString(32095) + ': [B]' + self.code.get('user_code') + '[/B]')
+        self.auth_dialog.create(ADDON.getLocalizedString(32097), '{}\n{}: [B]{}[/B]'.format(
+            ADDON.getLocalizedString(32096), ADDON.getLocalizedString(32095), self.code.get('user_code')))
         self.poller()
 
     def refresh_token(self):
