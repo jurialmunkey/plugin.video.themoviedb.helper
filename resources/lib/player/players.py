@@ -11,7 +11,7 @@ from resources.lib.addon.plugin import ADDON, PLUGINPATH, ADDONPATH, viewitems, 
 from resources.lib.addon.parser import try_int, try_decode, try_encode
 from resources.lib.files.utils import read_file, normalise_filesize
 from resources.lib.addon.decorators import busy_dialog
-from resources.lib.player.details import get_item_details, get_detailed_item, get_playerstring
+from resources.lib.player.details import get_item_details, get_detailed_item, get_playerstring, get_language_details
 from resources.lib.player.inputter import KeyboardInputter
 from resources.lib.player.configure import get_players_from_file
 from resources.lib.addon.constants import PLAYERS_PRIORITY
@@ -89,6 +89,7 @@ class Players(object):
             self.dialog_players = self._get_players_for_dialog(tmdb_type)
             self.default_player = ADDON.getSettingString('default_player_movies') if tmdb_type == 'movie' else ADDON.getSettingString('default_player_episodes')
             self.ignore_default = ignore_default
+            self.tmdb_type, self.tmdb_id, self.season, self.episode = tmdb_type, tmdb_id, season, episode
 
     def _check_assert(self, keys=[]):
         if not self.item:
@@ -114,6 +115,7 @@ class Players(object):
             'file': file, 'mode': mode,
             'is_folder': is_folder,
             'is_resolvable': value.get('is_resolvable'),
+            'language': value.get('language'),
             'name': u'{} {}'.format(name, value.get('name')),
             'plugin_name': value.get('plugin'),
             'plugin_icon': value.get('icon', '').format(ADDONPATH) or xbmcaddon.Addon(value.get('plugin', '')).getAddonInfo('icon'),
@@ -362,6 +364,10 @@ class Players(object):
         player = player or self.select_player()
         if not player:
             return
+        if player.get('language'):
+            self.item = get_language_details(
+                self.item, self.tmdb_type, self.tmdb_id, self.season, self.episode,
+                player['language'], self.item.get('year'))
         path = self._get_path_from_player(player)
         if not path:
             if player.get('idx') is not None:
