@@ -35,7 +35,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.paramstring = try_decode(sys.argv[2][1:])
         self.params = parse_paramstring(self.paramstring)
         self.parent_params = self.params
-        self.container_path = '{}?{}'.format(sys.argv[0], self.paramstring)
+        # self.container_path = '{}?{}'.format(sys.argv[0], self.paramstring)
         self.update_listing = False
         self.plugin_category = ''
         self.container_content = ''
