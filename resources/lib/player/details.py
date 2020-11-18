@@ -65,11 +65,74 @@ def get_external_ids(li, season=None, episode=None):
 def get_item_details(tmdb_type, tmdb_id, season=None, episode=None):
     details = TMDb().get_details(tmdb_type, tmdb_id, season, episode)
     if not details:
-        return None
+        return
     details = ListItem(**details)
     details.infolabels['mediatype'] == 'movie' if tmdb_type == 'movie' else 'episode'
     details.set_details(details=get_external_ids(details, season=season, episode=episode))
     return details
+
+
+def _get_language_details(tmdb_type, tmdb_id, season=None, episode=None, language=None):
+    details = TMDb().get_request_lc(tmdb_type, tmdb_id, 'translations')
+    if not details or not details.get('translations'):
+        return
+
+    item = {}
+    for i in details['translations']:
+        if i.get('iso_639_1') == language:
+            item['title'] = i.get('data', {}).get('title') or i.get('data', {}).get('name')
+            item['plot'] = i.get('data', {}).get('overview')
+            return item
+
+
+def _get_language_item(tmdb_type, tmdb_id, season=None, episode=None, language=None, year=None):
+    item = _get_language_details(tmdb_type, tmdb_id, language=language)
+    if not item:
+        return
+
+    item['showname'] = item['clearname'] = item['tvshowtitle'] = item.get('title')
+    item['name'] = u'{} ({})'.format(item['title'], year) if item.get('title') and year else None
+    if season is None or episode is None:
+        return item
+
+    episode = _get_language_details(tmdb_type, tmdb_id, season, episode, language=language)
+    if not episode:
+        return item
+
+    item['title'] = episode.get('title')
+    item['plot'] = episode.get('plot') or item.get('plot')
+    item['name'] = u'{0} S{1:02d}E{2:02d}'.format(item['showname'], try_int(season), try_int(episode)) if item.get('showname') else None
+    return item
+
+
+def get_language_details(base, tmdb_type, tmdb_id, season=None, episode=None, language=None, year=None):
+    if not language:
+        return base
+    item = _get_language_item(tmdb_type, tmdb_id, season, episode, language, year)
+    if not item:
+        return base
+    item = {k: v or base.get(k) for k, v in viewitems(item)}  # Fallback to default key in base if translation is empty
+    item = _url_encode_item(item)
+    for k, v in viewitems(item):
+        base['{}_{}'.format(language, k)] = v
+    return _url_encode_item(base)
+
+
+def _url_encode_item(item, base=None):
+    base = base or item.copy()
+    for k, v in viewitems(base):
+        if k not in PLAYERS_URLENCODE:
+            continue
+        v = u'{0}'.format(v)
+        for key, value in viewitems({k: v, '{}_meta'.format(k): dumps(v)}):
+            item[key] = value.replace(',', '')
+            item[key + '_+'] = value.replace(',', '').replace(' ', '+')
+            item[key + '_-'] = value.replace(',', '').replace(' ', '-')
+            item[key + '_escaped'] = quote(quote(try_encode(value)))
+            item[key + '_escaped+'] = quote(quote_plus(try_encode(value)))
+            item[key + '_url'] = quote(try_encode(value))
+            item[key + '_url+'] = quote_plus(try_encode(value))
+    return item
 
 
 def get_detailed_item(tmdb_type, tmdb_id, season=None, episode=None, details=None):
@@ -115,19 +178,7 @@ def get_detailed_item(tmdb_type, tmdb_id, season=None, episode=None, details=Non
         item['trakt'] = details.unique_ids.get('tvshow.trakt')
         item['slug'] = details.unique_ids.get('tvshow.slug')
 
-    for k, v in viewitems(item.copy()):
-        if k not in PLAYERS_URLENCODE:
-            continue
-        v = u'{0}'.format(v)
-        for key, value in viewitems({k: v, '{}_meta'.format(k): dumps(v)}):
-            item[key] = value.replace(',', '')
-            item[key + '_+'] = value.replace(',', '').replace(' ', '+')
-            item[key + '_-'] = value.replace(',', '').replace(' ', '-')
-            item[key + '_escaped'] = quote(quote(try_encode(value)))
-            item[key + '_escaped+'] = quote(quote_plus(try_encode(value)))
-            item[key + '_url'] = quote(try_encode(value))
-            item[key + '_url+'] = quote_plus(try_encode(value))
-    return item
+    return _url_encode_item(item)
 
 
 def get_playerstring(tmdb_type, tmdb_id, season=None, episode=None, details=None):
