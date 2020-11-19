@@ -119,7 +119,7 @@ class LibraryAdder():
 
         return func(tmdb_id, force=force)
 
-    def add_movie(self, tmdb_id=None, force=False, **kwargs):
+    def add_movie(self, tmdb_id=None, **kwargs):
         if not tmdb_id:
             return
 
@@ -130,8 +130,8 @@ class LibraryAdder():
         imdb_id = details.get('external_ids', {}).get('imdb_id')
         name = u'{} ({})'.format(details['title'], details['release_date'][:4]) if details.get('release_date') else details['title']
 
-        # Only add strm if not in library or force flag is set
-        file = self.kodi_db_movies.get_info(info='file', imdb_id=imdb_id, tmdb_id=tmdb_id) if not force else None
+        # Only add strm if not in library
+        file = self.kodi_db_movies.get_info(info='file', imdb_id=imdb_id, tmdb_id=tmdb_id)
         if not file:
             file = create_file(STRM_MOVIE.format(tmdb_id), name, name, basedir=BASEDIR_MOVIE)
             create_nfo('movie', tmdb_id, name, basedir=BASEDIR_MOVIE)
