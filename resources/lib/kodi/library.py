@@ -25,7 +25,7 @@ def add_to_library(info, busy_spinner=True, library_adder=None, finished=True, *
     elif info == 'trakt' and kwargs.get('list_slug'):
         library_adder.add_userlist(**kwargs)
     elif info == 'update':
-        library_adder.update_tvshows()
+        library_adder.update_tvshows(**kwargs)
     if not finished:
         return library_adder
     library_adder._finish()
@@ -60,7 +60,7 @@ class LibraryAdder():
         if self.p_dialog:
             self.p_dialog.update((((count + 1) * 100) // total), **kwargs)
 
-    def update_tvshows(self):
+    def update_tvshows(self, force=False, **kwargs):
         nfos = []
 
         # Get TMDb IDs from nfo files in folder
@@ -73,12 +73,12 @@ class LibraryAdder():
         nfos_total = len(nfos)
         for x, i in enumerate(nfos):
             self._update(x, nfos_total, message=u'{} {}...'.format(ADDON.getLocalizedString(32167), i['folder']))
-            self.add_tvshow(tmdb_id=i['tmdb_id'])
+            self.add_tvshow(tmdb_id=i['tmdb_id'], force=force)
 
         # Update last updated stamp
         ADDON.setSettingString('last_autoupdate', 'Last updated {}'.format(get_current_date_time()))
 
-    def add_userlist(self, user_slug=None, list_slug=None, confirm=True, **kwargs):
+    def add_userlist(self, user_slug=None, list_slug=None, confirm=True, force=False, **kwargs):
         request = get_userlist(user_slug=user_slug, list_slug=list_slug, confirm=confirm, busy_spinner=self.p_dialog)
         if not request:
             return
@@ -87,7 +87,7 @@ class LibraryAdder():
 
         for x, i in enumerate(request):
             self._update(x, i_total, message=u'Updating {}...'.format(i.get(i.get('type'), {}).get('title')))
-            playlist_rule = self._add_userlist_item(i)
+            playlist_rule = self._add_userlist_item(i, force=force)
             if not playlist_rule:
                 continue
             i_added[i.get('type')].append(playlist_rule)
@@ -99,7 +99,7 @@ class LibraryAdder():
             self._update(2, 3, message=ADDON.getLocalizedString(32350))
             create_playlist(i_added['show'], 'tvshows', user_slug, list_slug)
 
-    def _add_userlist_item(self, i):
+    def _add_userlist_item(self, i, force=False):
         i_type = i.get('type')
         if i_type == 'movie':
             func = self.add_movie
@@ -117,7 +117,7 @@ class LibraryAdder():
                 'skipped item in Trakt user list with missing TMDb ID')
             return
 
-        return func(tmdb_id)
+        return func(tmdb_id, force=force)
 
     def add_movie(self, tmdb_id=None, force=False, **kwargs):
         if not tmdb_id:
@@ -207,9 +207,9 @@ class LibraryAdder():
             return
 
         # Check if item has already been added
-        dbid = self.tv.get_episode_dbid(season, number)
-        if dbid:
-            self._log._add('tv', self.tv.tmdb_id, 'found in library', season=season, episode=number, dbid=dbid)
+        file = self.tv.get_episode_db_info(season, number, info='file')
+        if file:
+            self._log._add('tv', self.tv.tmdb_id, 'found in library', season=season, episode=number, path=file)
             return
 
         # Add our strm file
@@ -241,11 +241,11 @@ class _TVShow():
         self.dbid = kodi_db.get_info(info='dbid', imdb_id=self.imdb_id, tmdb_id=self.tmdb_id, tvdb_id=self.tvdb_id)
         return self.dbid
 
-    def get_episode_dbid(self, season, episode):
+    def get_episode_db_info(self, season, episode, info='dbid'):
         if not self.dbid:
             return
         return rpc.KodiLibrary(dbtype='episode', tvshowid=self.dbid, logging=False).get_info(
-            info='dbid', season=season, episode=episode)
+            info=info, season=season, episode=episode)
 
     def get_seasons(self):
         self.seasons = self.details.get('seasons', [])

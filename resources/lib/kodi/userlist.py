@@ -67,4 +67,4 @@ def library_autoupdate(list_slugs=None, user_slugs=None, busy_spinner=False, for
             busy_spinner=busy_spinner, force=force, library_adder=library_adder, finished=False)
 
     # Update library from nfos
-    add_to_library(info='update', library_adder=library_adder, finished=True)
+    add_to_library(info='update', busy_spinner=busy_spinner, library_adder=library_adder, finished=True, force=force)
