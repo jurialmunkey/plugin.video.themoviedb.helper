@@ -1,11 +1,10 @@
-import datetime
 import resources.lib.addon.cache as cache
 from resources.lib.addon.cache import use_simple_cache
 from resources.lib.container.pages import PaginatedItems
 from resources.lib.trakt.items import TraktItems
 from resources.lib.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache
 from resources.lib.addon.parser import try_int
-from resources.lib.addon.timedate import convert_timestamp, date_in_range, get_region_date
+from resources.lib.addon.timedate import convert_timestamp, date_in_range, get_region_date, get_datetime_today, get_timedelta
 from resources.lib.addon.plugin import viewitems
 # from resources.lib.addon.decorators import timer_report
 
@@ -222,7 +221,7 @@ class _TraktProgress():
         # Broaden date range in case utc conversion bumps into different day
         mod_date = try_int(startdate) - 1
         mod_days = try_int(days) + 2
-        date = datetime.date.today() + datetime.timedelta(days=mod_date)
+        date = get_datetime_today() + get_timedelta(days=mod_date)
         return self.get_calendar('shows', user, start_date=date.strftime('%Y-%m-%d'), days=mod_days)
 
     def _get_calendar_episodes_list(self, startdate=0, days=1, user=True, kodi_db=None):

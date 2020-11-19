@@ -1,8 +1,28 @@
+import datetime
 import xbmc
 import time
-import datetime
 from resources.lib.addon.plugin import kodi_log, ADDON
 from resources.lib.addon.decorators import try_except_log
+
+
+def get_datetime_combine(*args, **kwargs):
+    return datetime.datetime.combine(*args, **kwargs)
+
+
+def get_datetime_time(*args, **kwargs):
+    return datetime.time(*args, **kwargs)
+
+
+def get_datetime_now():
+    return datetime.datetime.now()
+
+
+def get_datetime_today():
+    return datetime.datetime.today()
+
+
+def get_timedelta(*args, **kwargs):
+    return datetime.timedelta(*args, **kwargs)
 
 
 def get_timestamp(timestamp=None):

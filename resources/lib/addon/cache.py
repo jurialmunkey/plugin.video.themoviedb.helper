@@ -1,7 +1,7 @@
-import datetime
 import simplecache
 from resources.lib.addon.plugin import kodi_log, format_name
 from resources.lib.files.utils import get_pickle_name
+from resources.lib.addon.timedate import get_timedelta
 _cache = simplecache.SimpleCache()
 _cache_name = 'TMDbHelper_v4.0.2'
 CACHE_LONG = 14
@@ -29,11 +29,11 @@ def get_cache(cache_name):
 def set_cache(my_object, cache_name, cache_days=14, force=False, fallback=None):
     cache_name = get_pickle_name(cache_name or '')
     if my_object and cache_name and cache_days:
-        _cache.set('{}.{}'.format(_cache_name, cache_name), my_object, expiration=datetime.timedelta(days=cache_days))
+        _cache.set('{}.{}'.format(_cache_name, cache_name), my_object, expiration=get_timedelta(days=cache_days))
     elif force:
         my_object = my_object or fallback
         cache_days = force if isinstance(force, int) else cache_days
-        _cache.set('{}.{}'.format(_cache_name, cache_name), my_object, expiration=datetime.timedelta(days=cache_days))
+        _cache.set('{}.{}'.format(_cache_name, cache_name), my_object, expiration=get_timedelta(days=cache_days))
     return my_object
 
 

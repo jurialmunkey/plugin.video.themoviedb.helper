@@ -1,4 +1,4 @@
-import datetime
+from resources.lib.addon.timedate import get_datetime_now
 from resources.lib.addon.constants import PLAYERS_URLENCODE
 from resources.lib.tmdb.api import TMDb
 from resources.lib.trakt.api import TraktAPI
@@ -158,7 +158,7 @@ def get_detailed_item(tmdb_type, tmdb_id, season=None, episode=None, details=Non
     item['thumbnail'] = details.art.get('thumb')
     item['poster'] = details.art.get('poster')
     item['fanart'] = details.art.get('fanart')
-    item['now'] = datetime.datetime.now().strftime('%Y%m%d%H%M%S%f')
+    item['now'] = get_datetime_now().strftime('%Y%m%d%H%M%S%f')
 
     if tmdb_type == 'tv' and season is not None and episode is not None:
         item['id'] = item['epid'] = item['eptvdb'] = item.get('tvdb')

@@ -5,8 +5,8 @@ import xbmc
 import json
 import xbmcgui
 import xbmcvfs
-import datetime
 import unicodedata
+from resources.lib.addon.timedate import get_timedelta, get_datetime_now
 from resources.lib.addon.parser import try_int, try_encode
 from resources.lib.addon.plugin import ADDON, ADDONDATA, kodi_log
 from resources.lib.addon.constants import VALID_FILECHARS
@@ -129,7 +129,7 @@ def set_pickle(my_object, cache_name, cache_days=14):
     cache_name = get_pickle_name(cache_name)
     if not cache_name:
         return
-    timestamp = datetime.datetime.now() + datetime.timedelta(days=cache_days)
+    timestamp = get_datetime_now() + get_timedelta(days=cache_days)
     cache_obj = {'my_object': my_object, 'expires': timestamp.strftime("%Y-%m-%dT%H:%M:%S")}
     with open(os.path.join(_get_write_path('pickle'), cache_name), 'wb') as file:
         _pickle.dump(cache_obj, file)
