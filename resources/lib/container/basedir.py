@@ -1,5 +1,5 @@
 import xbmc
-import datetime
+from resources.lib.addon.timedate import get_timedelta, get_datetime_today
 from resources.lib.addon.plugin import PLUGINPATH, ADDONPATH, ADDON, convert_type
 from resources.lib.addon.setutils import merge_two_items
 from json import dumps
@@ -581,11 +581,11 @@ def _get_basedir_calendar_items():
 
 def _get_basedir_calendar(info=None):
     items = []
-    today = datetime.datetime.today()
+    today = get_datetime_today()
     for i in _get_basedir_calendar_items():
         if info not in i['info_types']:
             continue
-        date = today + datetime.timedelta(days=i.get('params', {}).get('startdate', 0))
+        date = today + get_timedelta(days=i.get('params', {}).get('startdate', 0))
         i['label'] = i['label'].format(weekday=date.strftime('%A'))
         i['params']['info'] = info
         items.append(i)

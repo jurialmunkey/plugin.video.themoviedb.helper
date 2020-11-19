@@ -1,9 +1,8 @@
 import xbmc
-import datetime
 from resources.lib.addon.parser import try_int
 from threading import Thread
 from resources.lib.addon.plugin import ADDON
-from resources.lib.addon.timedate import convert_timestamp
+from resources.lib.addon.timedate import convert_timestamp, get_datetime_now, get_timedelta, get_datetime_today, get_datetime_time, get_datetime_combine
 
 
 class CronJobMonitor(Thread):
@@ -20,18 +19,18 @@ class CronJobMonitor(Thread):
             del self.xbmc_monitor
             return
 
-        self.next_time = datetime.datetime.combine(datetime.datetime.today(), datetime.time(try_int(self.update_hour)))  # Get today at hour
+        self.next_time = get_datetime_combine(get_datetime_today(), get_datetime_time(try_int(self.update_hour)))  # Get today at hour
         self.last_time = xbmc.getInfoLabel('Skin.String(TMDbHelper.AutoUpdate.LastTime)')  # Get last update
         self.last_time = convert_timestamp(self.last_time) if self.last_time else None
         if self.last_time and self.last_time > self.next_time:
-            self.next_time += datetime.timedelta(hours=24)  # Already updated today so set for tomorrow
+            self.next_time += get_timedelta(hours=24)  # Already updated today so set for tomorrow
 
         while not self.xbmc_monitor.abortRequested() and not self.exit and self.poll_time:
             if ADDON.getSettingBool('library_autoupdate'):
-                if datetime.datetime.now() > self.next_time:  # Scheduled time has past so lets update
+                if get_datetime_now() > self.next_time:  # Scheduled time has past so lets update
                     xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,library_autoupdate)')
-                    xbmc.executebuiltin('Skin.SetString(TMDbHelper.AutoUpdate.LastTime,{})'.format(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")))
-                    self.next_time += datetime.timedelta(hours=24)  # Set next update for tomorrow
+                    xbmc.executebuiltin('Skin.SetString(TMDbHelper.AutoUpdate.LastTime,{})'.format(get_datetime_now().strftime("%Y-%m-%dT%H:%M:%S")))
+                    self.next_time += get_timedelta(hours=24)  # Set next update for tomorrow
             self.xbmc_monitor.waitForAbort(self.poll_time)
 
         del self.xbmc_monitor

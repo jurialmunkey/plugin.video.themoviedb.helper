@@ -1,5 +1,4 @@
 import xbmcgui
-import datetime
 import resources.lib.addon.cache as cache
 from resources.lib.tmdb.mapping import ItemMapper, get_episode_to_air
 from resources.lib.api.request import RequestAPI
@@ -11,6 +10,7 @@ from resources.lib.addon.parser import try_int
 from resources.lib.files.utils import use_pickle
 from resources.lib.addon.constants import TMDB_GENRE_IDS
 from resources.lib.addon.window import get_property
+from resources.lib.addon.timedate import get_datetime_now, get_timedelta
 from json import loads
 
 
@@ -301,7 +301,7 @@ class TMDb(RequestAPI):
     def get_daily_list(self, export_list, sorting=None, reverse=False):
         if not export_list:
             return
-        datestamp = datetime.datetime.now() - datetime.timedelta(days=2)
+        datestamp = get_datetime_now() - get_timedelta(days=2)
         datestamp = datestamp.strftime("%m_%d_%Y")
         # Pickle results rather than cache due to being such a large list
         return use_pickle(

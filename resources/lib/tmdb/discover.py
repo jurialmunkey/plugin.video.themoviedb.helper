@@ -3,7 +3,7 @@
 
 import xbmc
 import xbmcgui
-import datetime
+from resources.lib.addon.timedate import get_datetime_now, get_timedelta
 from resources.lib.addon.cache import set_search_history, get_search_history
 from resources.lib.addon.window import get_property
 from resources.lib.tmdb.api import TMDb
@@ -848,10 +848,10 @@ def _translate_discover_params(tmdb_type, params):
             continue  # No value or not a relative date so skip
         elif 't-' in datecode:
             days = try_int(datecode.replace('t-', ''))
-            date = datetime.datetime.now() - datetime.timedelta(days=days)
+            date = get_datetime_now() - get_timedelta(days=days)
         elif 't+' in datecode:
             days = try_int(datecode.replace('t+', ''))
-            date = datetime.datetime.now() + datetime.timedelta(days=days)
+            date = get_datetime_now() + get_timedelta(days=days)
         params[i] = date.strftime("%Y-%m-%d")
 
     return params
