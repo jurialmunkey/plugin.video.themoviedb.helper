@@ -422,7 +422,8 @@ class Players(object):
         path = try_decode(listitem.getPath())
         if listitem.getProperty('is_folder') == 'true':
             return format_folderpath(path)
-        action = 'run_plugin' if path.startswith('plugin://') else 'play_media'
+        # action = 'run_plugin' if path.startswith('plugin://') else 'play_media'
+        action = 'play_media'
         action = u'RunScript(plugin.video.themoviedb.helper,{}={})'.format(action, path)
         if path.endswith('.strm'):
             return action
