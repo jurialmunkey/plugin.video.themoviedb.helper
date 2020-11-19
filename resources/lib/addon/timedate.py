@@ -1,3 +1,4 @@
+import _strptime
 import datetime
 import xbmc
 import time

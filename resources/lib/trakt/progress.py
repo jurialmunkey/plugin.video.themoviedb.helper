@@ -5,7 +5,7 @@ from resources.lib.trakt.items import TraktItems
 from resources.lib.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.timedate import convert_timestamp, date_in_range, get_region_date, get_datetime_today, get_timedelta
-from resources.lib.addon.plugin import viewitems, kodi_log
+from resources.lib.addon.plugin import viewitems
 from resources.lib.api.mapping import get_empty_item
 # from resources.lib.addon.decorators import timer_report
 
@@ -270,9 +270,6 @@ class _TraktProgress():
     def _get_calendar_episodes_list(self, startdate=0, days=1, user=True, kodi_db=None):
         # Get response
         response = self.get_calendar_episodes(startdate=startdate, days=days, user=user)
-        kodi_log([
-            'get_calendar_episodes', ' startdate=', startdate, ' days=', days, ' user=', user,
-            '\n', 'kodi_db=', 'True' if kodi_db else 'False', ' response=', len(response)], 1)
         if not response:
             return
         # Reverse items for date ranges in past
@@ -282,7 +279,6 @@ class _TraktProgress():
 
     def get_calendar_episodes_list(self, startdate=0, days=1, user=True, kodi_db=None, page=1, limit=20):
         response_items = self._get_calendar_episodes_list(startdate, days, user, kodi_db)
-        kodi_log(['get_calendar_episodes', ' response_items=', len(response_items)], 1)
         response = PaginatedItems(response_items, page=page, limit=limit)
         if response and response.items:
             return response.items + response.next_page
