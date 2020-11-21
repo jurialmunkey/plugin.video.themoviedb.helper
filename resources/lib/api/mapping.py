@@ -38,7 +38,9 @@ class _ItemMapper(object):
                 if not v or item[d].get(k):
                     continue
                 item[d][k] = v
-        return set_show(item, base_item) if tmdb_type in ['season', 'episode', 'tv'] else item
+        if tmdb_type in ['season', 'episode', 'tv']:
+            return set_show(item, base_item)
+        return item
 
     def map_item(self, item, i):
         sm = self.standard_map or {}
