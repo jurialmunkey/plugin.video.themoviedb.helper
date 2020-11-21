@@ -543,6 +543,8 @@ class ItemMapper(_ItemMapper):
             item = self.finalise_image(item)
         elif tmdb_type == 'person':
             item = self.finalise_person(item)
+        elif tmdb_type == 'tv' and not item['infolabels'].get('tvshowtitle'):
+            item['infolabels']['tvshowtitle'] = item['infolabels'].get('title')
         item['label'] = item['infolabels'].get('title')
         item['infoproperties']['tmdb_type'] = tmdb_type
         item['infolabels']['mediatype'] = item['infoproperties']['dbtype'] = convert_type(tmdb_type, 'dbtype')

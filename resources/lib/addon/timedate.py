@@ -1,3 +1,4 @@
+import _strptime
 import datetime
 import xbmc
 import time
@@ -49,10 +50,15 @@ def format_date(time_str, str_fmt="%A", time_fmt="%Y-%m-%d", time_lim=10, utc_co
 @try_except_log('lib.timedate - date_in_range', notification=False)
 def date_in_range(date_str, days=1, start_date=0, date_fmt="%Y-%m-%dT%H:%M:%S", date_lim=19, utc_convert=False):
     date_a = datetime.date.today() + datetime.timedelta(days=start_date)
-    date_z = date_a + datetime.timedelta(days=days)
-    mydate = convert_timestamp(date_str, date_fmt, date_lim, utc_convert=utc_convert).date()
-    if not mydate or not date_a or not date_z:
+    if not date_a:
         return
+    date_z = date_a + datetime.timedelta(days=days)
+    if not date_z:
+        return
+    mydate = convert_timestamp(date_str, date_fmt, date_lim, utc_convert=utc_convert)
+    if not mydate:
+        return
+    mydate = mydate.date()
     if mydate >= date_a and mydate < date_z:
         return date_str
 
