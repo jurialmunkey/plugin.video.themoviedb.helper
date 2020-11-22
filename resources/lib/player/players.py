@@ -8,9 +8,8 @@ from resources.lib.kodi.rpc import get_directory, KodiLibrary
 from resources.lib.addon.window import get_property
 from resources.lib.container.listitem import ListItem
 from resources.lib.addon.plugin import ADDON, PLUGINPATH, ADDONPATH, viewitems, format_folderpath, kodi_log
-from resources.lib.addon.parser import try_int, try_decode, try_encode
+from resources.lib.addon.parser import try_int, try_decode, try_encode, try_float
 from resources.lib.files.utils import read_file, normalise_filesize
-from resources.lib.addon.decorators import busy_dialog
 from resources.lib.player.details import get_item_details, get_detailed_item, get_playerstring, get_language_details
 from resources.lib.player.inputter import KeyboardInputter
 from resources.lib.player.configure import get_players_from_file
@@ -30,7 +29,7 @@ def string_format_map(fmt, d):
         return fmt.format(**d)
 
 
-def wait_for_player(to_start=None, timeout=5, poll=0.25):
+def wait_for_player(to_start=None, timeout=5, poll=0.25, stop_after=0):
     xbmc_monitor, xbmc_player = xbmc.Monitor(), xbmc.Player()
     while (
             not xbmc_monitor.abortRequested()
@@ -40,12 +39,20 @@ def wait_for_player(to_start=None, timeout=5, poll=0.25):
                 or (not to_start and xbmc_player.isPlaying()))):
         xbmc_monitor.waitForAbort(poll)
         timeout -= poll
+
+    # Wait to stop file
+    if timeout > 0 and to_start and stop_after:
+        xbmc_monitor.waitForAbort(stop_after)
+        if xbmc_player.isPlaying() and xbmc_player.getPlayingFile().endswith(to_start):
+            xbmc_player.stop()
+
+    # Clean up
     del xbmc_monitor
     del xbmc_player
     return timeout
 
 
-def resolve_to_dummy(handle=None):
+def resolve_to_dummy(handle=None, stop_after=1):
     """
     Kodi does 5x retries to resolve url if isPlayable property is set - strm files force this property.
     However, external plugins might not resolve directly to URL and instead might require PlayMedia.
@@ -62,13 +69,10 @@ def resolve_to_dummy(handle=None):
     kodi_log(['lib.player.players - attempt to resolve dummy file\n', path], 1)
     xbmcplugin.setResolvedUrl(handle, True, ListItem(path=path).get_listitem())
 
-    # Wait till our file plays before stopping it
-    if wait_for_player(to_start='dummy.mp4') <= 0:
+    # Wait till our file plays and then stop after setting duration
+    if wait_for_player(to_start='dummy.mp4', stop_after=stop_after) <= 0:
         kodi_log(['lib.player.players - resolving dummy file timeout\n', path], 1)
         return -1
-
-    # Stop our dummy file
-    xbmc.Player().stop()
 
     # Wait for our file to stop before continuing
     if wait_for_player() <= 0:
@@ -81,15 +85,15 @@ def resolve_to_dummy(handle=None):
 
 class Players(object):
     def __init__(self, tmdb_type, tmdb_id=None, season=None, episode=None, ignore_default=False, **kwargs):
-        with busy_dialog():
-            self.players = get_players_from_file()
-            self.details = get_item_details(tmdb_type, tmdb_id, season, episode)
-            self.item = get_detailed_item(tmdb_type, tmdb_id, season, episode, details=self.details) or {}
-            self.playerstring = get_playerstring(tmdb_type, tmdb_id, season, episode, details=self.details)
-            self.dialog_players = self._get_players_for_dialog(tmdb_type)
-            self.default_player = ADDON.getSettingString('default_player_movies') if tmdb_type == 'movie' else ADDON.getSettingString('default_player_episodes')
-            self.ignore_default = ignore_default
-            self.tmdb_type, self.tmdb_id, self.season, self.episode = tmdb_type, tmdb_id, season, episode
+        self.players = get_players_from_file()
+        self.details = get_item_details(tmdb_type, tmdb_id, season, episode)
+        self.item = get_detailed_item(tmdb_type, tmdb_id, season, episode, details=self.details) or {}
+        self.playerstring = get_playerstring(tmdb_type, tmdb_id, season, episode, details=self.details)
+        self.dialog_players = self._get_players_for_dialog(tmdb_type)
+        self.default_player = ADDON.getSettingString('default_player_movies') if tmdb_type == 'movie' else ADDON.getSettingString('default_player_episodes')
+        self.ignore_default = ignore_default
+        self.tmdb_type, self.tmdb_id, self.season, self.episode = tmdb_type, tmdb_id, season, episode
+        self.dummy_duration = try_float(ADDON.getSettingString('dummy_duration')) or 1.0
 
     def _check_assert(self, keys=[]):
         if not self.item:
@@ -307,8 +311,7 @@ class Players(object):
                 continue  # Go to next action
 
             # Get the next folder from the plugin
-            with busy_dialog():
-                folder = get_directory(string_format_map(path[0], self.item))
+            folder = get_directory(string_format_map(path[0], self.item))
 
             # Kill our keyboard inputter thread
             if keyboard_input:
@@ -410,29 +413,27 @@ class Players(object):
         xbmc.executebuiltin(try_encode(u'Container.Update({},replace)'.format(folder_path)))
         if not reset_focus:
             return
-        with busy_dialog():
-            timeout = 20
-            while not xbmc.Monitor().abortRequested() and xbmc.getInfoLabel("Container.FolderPath") != folder_path and timeout > 0:
-                xbmc.Monitor().waitForAbort(0.25)
-                timeout -= 1
-            xbmc.executebuiltin(reset_focus)
-            xbmc.Monitor().waitForAbort(0.5)
+        timeout = 20
+        while not xbmc.Monitor().abortRequested() and xbmc.getInfoLabel("Container.FolderPath") != folder_path and timeout > 0:
+            xbmc.Monitor().waitForAbort(0.25)
+            timeout -= 1
+        xbmc.executebuiltin(reset_focus)
+        xbmc.Monitor().waitForAbort(0.5)
 
     def configure_action(self, listitem, handle=None):
         path = try_decode(listitem.getPath())
         if listitem.getProperty('is_folder') == 'true':
             return format_folderpath(path)
-        # action = 'run_plugin' if path.startswith('plugin://') else 'play_media'
-        action = 'play_media'
-        action = u'RunScript(plugin.video.themoviedb.helper,{}={})'.format(action, path)
         if path.endswith('.strm'):
-            return action
+            return path
         if not handle or listitem.getProperty('is_resolvable') == 'false':
-            return action
-        if listitem.getProperty('is_resolvable') == 'select' and xbmcgui.Dialog().yesno(
-                '{} - {}'.format(listitem.getProperty('player_name'), ADDON.getLocalizedString(32324)),
-                ADDON.getLocalizedString(32325), yeslabel='PlayMedia', nolabel='setResolvedUrl'):
-            return action
+            return path
+        if listitem.getProperty('is_resolvable') == 'select' and not xbmcgui.Dialog().yesno(
+                '{} - {}'.format(listitem.getProperty('player_name'), ADDON.getLocalizedString(32353)),
+                ADDON.getLocalizedString(32354),
+                yeslabel=u"{} (setResolvedURL)".format(xbmc.getLocalizedString(107)),
+                nolabel=u"{} (PlayMedia)".format(xbmc.getLocalizedString(106))):
+            return path
 
     def play(self, folder_path=None, reset_focus=None, handle=None):
         # Get some info about current container for container update hack
@@ -455,22 +456,29 @@ class Players(object):
 
         action = self.configure_action(listitem, handle)
 
-        # Set our playerstring for player monitor to update kodi watched status
-        if not listitem.getProperty('is_folder') == 'true' and self.playerstring:
-            get_property('PlayerInfoString', set_property=self.playerstring)
-
         # Kodi launches busy dialog on home screen that needs to be told to close
         # Otherwise the busy dialog will prevent window activation for folder path
         xbmc.executebuiltin('Dialog.Close(busydialog)')
 
-        # Call as builtin for opening folder or playing strm via PlayMedia()
-        if action:
-            resolve_to_dummy(handle)  # If we're calling external we need to resolve to dummy
+        # If a folder we need to resolve to dummy and then open folder
+        if listitem.getProperty('is_folder') == 'true':
+            resolve_to_dummy(handle, self.dummy_duration)
             xbmc.executebuiltin(try_encode(action))
             kodi_log(['lib.player - finished executing action\n', action], 1)
             return
 
-        # Else resolve to file directly
+        # Set our playerstring for player monitor to update kodi watched status
+        if self.playerstring:
+            get_property('PlayerInfoString', set_property=self.playerstring)
+
+        # If PlayMedia method chosen re-route to Player()
+        if action:
+            resolve_to_dummy(handle, self.dummy_duration)  # If we're calling external we need to resolve to dummy
+            xbmc.Player().play(action, listitem)
+            kodi_log(['lib.player - playing path with xbmc.Player()\n', try_decode(listitem.getPath())], 1)
+            return
+
+        # Otherwise we have a url we can resolve to
         xbmcplugin.setResolvedUrl(handle, True, listitem)
         kodi_log(['lib.player - finished resolving path to url\n', try_decode(listitem.getPath())], 1)
 

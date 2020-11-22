@@ -67,5 +67,7 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32066]" type="bool" id="debug_logging" default="False" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32347]" type="action" action="RunScript(plugin.video.themoviedb.helper, log_request=trakt)" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32348]" type="action" action="RunScript(plugin.video.themoviedb.helper, log_request=tmdb)" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32351]" type="lsep"/>
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32352]" type="labelenum" id="dummy_duration" values="0.1|0.25|0.5|1.0|2.0|3.0|4.0|5.0" default="1.0"/>
     </category>
 </settings>
