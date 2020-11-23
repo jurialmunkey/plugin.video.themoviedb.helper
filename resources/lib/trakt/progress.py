@@ -219,7 +219,7 @@ class _TraktProgress():
         user = 'my' if user else 'all'
         return self.get_response_json('calendars', user, trakt_type, start_date, days, extended='full')
 
-    @use_simple_cache(cache_days=cache.CACHE_SHORT)
+    @use_simple_cache(cache_days=0.25)
     def get_calendar_episodes(self, startdate=0, days=1, user=True):
         # Broaden date range in case utc conversion bumps into different day
         mod_date = try_int(startdate) - 1
@@ -269,6 +269,7 @@ class _TraktProgress():
             return False
         return True
 
+    @use_simple_cache(cache_days=0.25)
     def _get_calendar_episodes_list(self, startdate=0, days=1, user=True, kodi_db=None):
         # Get response
         response = self.get_calendar_episodes(startdate=startdate, days=days, user=user)
