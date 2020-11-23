@@ -482,13 +482,18 @@ def _get_basedir_main():
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/tmdb/cast.png'.format(ADDONPATH)}},
         {
-            'label': ADDON.getLocalizedString(32173),
-            'params': {'info': 'dir_random'},
+            'label': xbmc.getLocalizedString(137),
+            'params': {'info': 'dir_multisearch'},
             'path': PLUGINPATH,
-            'art': {'thumb': '{}/resources/poster.png'.format(ADDONPATH)}},
+            'art': {'thumb': '{}/resources/icons/tmdb/search.png'.format(ADDONPATH)}},
         {
             'label': ADDON.getLocalizedString(32174),
             'params': {'info': 'dir_discover'},
+            'path': PLUGINPATH,
+            'art': {'thumb': '{}/resources/poster.png'.format(ADDONPATH)}},
+        {
+            'label': ADDON.getLocalizedString(32173),
+            'params': {'info': 'dir_random'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/poster.png'.format(ADDONPATH)}},
         {

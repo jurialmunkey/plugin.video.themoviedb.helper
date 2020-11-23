@@ -418,6 +418,9 @@ ROUTE_NO_ID = {
     'dir_search': {'route': {
         'lambda': lambda func, **kwargs: func(**kwargs),
         'getattr': 'list_searchdir_router'}},
+    'dir_multisearch': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_multisearchdir_router'}},
     'search': {'route': {
         'lambda': lambda func, **kwargs: func(**kwargs),
         'getattr': 'list_search'}},
