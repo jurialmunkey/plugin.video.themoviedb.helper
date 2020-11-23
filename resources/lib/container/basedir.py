@@ -482,13 +482,18 @@ def _get_basedir_main():
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/icons/tmdb/cast.png'.format(ADDONPATH)}},
         {
-            'label': ADDON.getLocalizedString(32173),
-            'params': {'info': 'dir_random'},
+            'label': xbmc.getLocalizedString(137),
+            'params': {'info': 'dir_multisearch'},
             'path': PLUGINPATH,
-            'art': {'thumb': '{}/resources/poster.png'.format(ADDONPATH)}},
+            'art': {'thumb': '{}/resources/icons/tmdb/search.png'.format(ADDONPATH)}},
         {
             'label': ADDON.getLocalizedString(32174),
             'params': {'info': 'dir_discover'},
+            'path': PLUGINPATH,
+            'art': {'thumb': '{}/resources/poster.png'.format(ADDONPATH)}},
+        {
+            'label': ADDON.getLocalizedString(32173),
+            'params': {'info': 'dir_random'},
             'path': PLUGINPATH,
             'art': {'thumb': '{}/resources/poster.png'.format(ADDONPATH)}},
         {
@@ -634,24 +639,18 @@ def get_basedir_details(tmdb_type, tmdb_id, season=None, episode=None, detailed_
 
 class BaseDirLists():
     def list_basedir(self, info=None):
-        if not info:
-            return _get_basedir_main()
-        if info == 'dir_movie':
-            return _get_basedir_list('movie', tmdb=True, trakt=True)
-        if info == 'dir_tv':
-            return _get_basedir_list('tv', tmdb=True, trakt=True)
-        if info == 'dir_person':
-            return _get_basedir_list('person', tmdb=True, trakt=True)
-        if info == 'dir_tmdb':
-            return _get_basedir_list(None, tmdb=True)
-        if info == 'dir_trakt':
-            return _get_basedir_list(None, trakt=True)
-        if info == 'dir_random':
-            return _build_basedir(None, _get_basedir_random())
-        if info == 'dir_calendar_trakt':
-            return _get_basedir_calendar(info='trakt_calendar')
-        if info == 'dir_calendar_library':
-            return _get_basedir_calendar(info='library_nextaired')
+        route = {
+            'dir_movie': lambda: _get_basedir_list('movie', tmdb=True, trakt=True),
+            'dir_tv': lambda: _get_basedir_list('tv', tmdb=True, trakt=True),
+            'dir_person': lambda: _get_basedir_list('person', tmdb=True, trakt=True),
+            'dir_tmdb': lambda: _get_basedir_list(None, tmdb=True),
+            'dir_trakt': lambda: _get_basedir_list(None, trakt=True),
+            'dir_random': lambda: _build_basedir(None, _get_basedir_random()),
+            'dir_calendar_trakt': lambda: _get_basedir_calendar(info='trakt_calendar'),
+            'dir_calendar_library': lambda: _get_basedir_calendar(info='library_nextaired')
+        }
+        func = route.get(info) or _get_basedir_main
+        return func()
 
     def list_details(self, tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
         base_item = self.tmdb_api.get_details(tmdb_type, tmdb_id, season, episode)

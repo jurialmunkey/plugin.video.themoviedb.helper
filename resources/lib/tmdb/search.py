@@ -6,14 +6,42 @@ from resources.lib.addon.parser import try_decode, urlencode_params
 from resources.lib.addon.setutils import merge_two_dicts
 
 
+MULTISEARCH_TYPES = ['movie', 'tv', 'person']
+
+
+def get_zippered_list(lists):
+    max_len = 0
+    for i in lists:
+        max_len = max(max_len, len(i))
+    return [i[x] for x in range(max_len) for i in lists if x < len(i)]
+
+
 class SearchLists():
+    def list_multisearchdir_router(self, **kwargs):
+        if kwargs.get('clear_cache') != 'True':
+            return self._list_multisearchdir(**kwargs)
+        for tmdb_type in MULTISEARCH_TYPES:
+            cache.set_search_history(tmdb_type, clear_cache=True)
+        self.container_refresh = True
+
+    def _list_multisearchdir(self, **kwargs):
+        lists = [self.list_searchdir(i, clear_cache_item=False, append_type=True) for i in MULTISEARCH_TYPES]
+        items = get_zippered_list(lists)
+        if len(items) > 3:
+            items.append({
+                'label': ADDON.getLocalizedString(32121),
+                'art': {'thumb': '{}/resources/icons/tmdb/search.png'.format(ADDONPATH)},
+                'infoproperties': {'specialsort': 'bottom'},
+                'params': {'info': 'dir_multisearch', 'clear_cache': 'True'}})
+        return items
+
     def list_searchdir_router(self, tmdb_type, **kwargs):
         if kwargs.get('clear_cache') != 'True':
             return self.list_searchdir(tmdb_type, **kwargs)
         cache.set_search_history(tmdb_type, clear_cache=True)
         self.container_refresh = True
 
-    def list_searchdir(self, tmdb_type, **kwargs):
+    def list_searchdir(self, tmdb_type, clear_cache_item=True, append_type=False, **kwargs):
         base_item = {
             'label': u'{} {}'.format(xbmc.getLocalizedString(137), convert_type(tmdb_type, 'plural')),
             'art': {'thumb': '{}/resources/icons/tmdb/search.png'.format(ADDONPATH)},
@@ -26,14 +54,15 @@ class SearchLists():
         history.reverse()
         for i in history:
             item = {
-                'label': i,
+                'label': '{} ({})'.format(i, tmdb_type) if append_type else i,
                 'art': base_item.get('art'),
                 'params': merge_two_dicts(base_item.get('params', {}), {'query': i})}
             items.append(item)
-        if history:
+        if history and clear_cache_item:
             item = {
                 'label': ADDON.getLocalizedString(32121),
                 'art': base_item.get('art'),
+                'infoproperties': {'specialsort': 'bottom'},
                 'params': merge_two_dicts(base_item.get('params', {}), {'info': 'dir_search', 'clear_cache': 'True'})}
             items.append(item)
         return items
