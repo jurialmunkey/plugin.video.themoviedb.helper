@@ -13,13 +13,13 @@
                             "plugin://plugin.video.netflix/directory/search/search/add/",
                             {"keyboard": "Select"},
                             {"keyboard": "{title}"},
-                            {"title": ".*{title}.*", "year": "{year}"}
+                            {"title": "(?i).*{title}.*", "year": "{year}"}
                           ],
     "play_episode"      : [
                             "plugin://plugin.video.netflix/directory/search/search/add/",
                             {"keyboard": "Select"},
                             {"keyboard": "{showname}"},
-                            {"title": ".*{showname}.*"},
+                            {"title": "(?i).*{showname}.*"},
                             {"season": "{season}"},
                             {"season": "{season}", "episode": "{episode}"}
                           ],

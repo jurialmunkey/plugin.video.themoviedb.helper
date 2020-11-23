@@ -118,10 +118,13 @@ class TraktLists():
         if tmdb_type != 'tv':
             return self.list_sync(info, tmdb_type, page, **kwargs)
         items = self.trakt_api.get_inprogress_shows_list(
-            page=page, params={
+            page=page,
+            params={
                 'info': 'trakt_upnext',
                 'tmdb_type': 'tv',
-                'tmdb_id': '{tmdb_id}'})
+                'tmdb_id': '{tmdb_id}'},
+            sort_by=kwargs.get('sort_by', None),
+            sort_how=kwargs.get('sort_how', None))
         self.tmdb_cache_only = False
         self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = convert_type(tmdb_type, 'library')

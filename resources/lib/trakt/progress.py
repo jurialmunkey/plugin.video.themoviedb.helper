@@ -12,14 +12,15 @@ from resources.lib.api.mapping import get_empty_item
 
 class _TraktProgress():
     @is_authorized
-    def get_inprogress_shows_list(self, page=1, limit=20, params=None, next_page=True):
-        response = TraktItems(self._get_inprogress_shows(), trakt_type='show').build_items(params_def=params)
+    def get_inprogress_shows_list(self, page=1, limit=20, params=None, next_page=True, sort_by=None, sort_how=None):
+        response = self._get_upnext_episodes_list(sort_by_premiered=True) if sort_by == 'year' else self._get_inprogress_shows()
+        response = TraktItems(response, trakt_type='show').build_items(
+            params_def=params, sort_by=sort_by if sort_by != 'year' else 'unsorted', sort_how=sort_how)
         response = PaginatedItems(response['items'], page=page, limit=limit)
         if not next_page:
             return response.items
         return response.items + response.next_page
 
-    @is_authorized
     def _get_inprogress_shows(self):
         response = self.get_sync('watched', 'show')
         response = TraktItems(response).sort_items('watched', 'desc')
@@ -41,8 +42,9 @@ class _TraktProgress():
             self.get_episodes_watchcount, slug, 'slug', tvshow=item, count_progress=True,
             cache_name='TraktAPI.get_episodes_watchcount.response.slug.{}.True'.format(slug),
             sync_info=item)
-        if aired_episodes > watch_episodes:
-            return item
+        if aired_episodes <= watch_episodes:
+            return
+        return item
 
     @is_authorized
     @use_activity_cache('episodes', 'watched_at', cache_days=cache.CACHE_LONG)
