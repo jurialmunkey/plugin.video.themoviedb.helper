@@ -27,7 +27,7 @@ class SearchLists():
     def _list_multisearchdir(self, **kwargs):
         lists = [self.list_searchdir(i, clear_cache_item=False, append_type=True) for i in MULTISEARCH_TYPES]
         items = get_zippered_list(lists)
-        if len(items) > 3:
+        if len(items) > len(MULTISEARCH_TYPES):  # We have search results so need clear cache item
             items.append({
                 'label': ADDON.getLocalizedString(32121),
                 'art': {'thumb': '{}/resources/icons/tmdb/search.png'.format(ADDONPATH)},
