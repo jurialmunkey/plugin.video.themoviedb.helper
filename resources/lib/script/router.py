@@ -18,7 +18,7 @@ from resources.lib.container.basedir import get_basedir_details
 from resources.lib.fanarttv.api import FanartTV
 from resources.lib.tmdb.api import TMDb
 from resources.lib.trakt.api import TraktAPI, get_sort_methods
-from resources.lib.script.sync import SyncItem
+from resources.lib.script.sync import sync_trakt_item
 from resources.lib.window.manager import WindowManager
 from resources.lib.player.players import Players
 from resources.lib.player.configure import configure_players
@@ -112,12 +112,12 @@ def split_value(split_value, separator=None, **kwargs):
 @is_in_kwargs({'tmdb_type': ['movie', 'tv']})
 @get_tmdb_id
 def sync_trakt(**kwargs):
-    SyncItem(
+    sync_trakt_item(
         trakt_type=convert_type(kwargs['tmdb_type'], 'trakt', season=kwargs.get('season'), episode=kwargs.get('episode')),
         unique_id=kwargs['tmdb_id'],
         season=kwargs.get('season'),
         episode=kwargs.get('episode'),
-        id_type='tmdb').sync()
+        id_type='tmdb')
 
 
 def manage_artwork(ftv_id=None, ftv_type=None, **kwargs):

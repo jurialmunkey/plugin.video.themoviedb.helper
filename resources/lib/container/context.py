@@ -36,7 +36,7 @@ class ContextMenu():
                 value = v.format(**self.info)
             except AttributeError:
                 value = v
-            if value is None:
+            if value in ['None', '', None]:
                 return  # Don't create a context item if we don't have a formatter value
             item[k] = value
         return item

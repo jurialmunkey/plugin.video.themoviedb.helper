@@ -1646,7 +1646,7 @@ msgid ""
 "\n"
 "setResolvedUrl is the preferred method and generally should work for any player addon that plays files directly, uses inputstream adapative, or only prompts to select bitrate/quality. PlayMedia should be used for any player addon which first runs a script to scrape sources or otherwise does not work correctly using the setResolvedUrl method.\n"
 "\n"
-"To override this dialog, set a resolve method for the player in TMDbHelper\'s player settings configuration dialog."
+"To override this dialog, set a resolve method for the player in TMDbHelper\\'s player settings configuration dialog."
 msgstr ""
 
 #: /resources/lib/helpers/timedate.py
@@ -1729,9 +1729,9 @@ msgstr ""
 #: /resources/lib/player/configure.py
 msgctxt "#32340"
 msgid ""
-"Please note that setResolvedUrl is Kodi\'s preferred method for resolving playback URLs. The PlayMedia method should only be used if you experience difficulties using setResolvedUrl with this particular player.\n"
+"Please note that setResolvedUrl is Kodi\\'s preferred method for resolving playback URLs. The PlayMedia method should only be used if you experience difficulties using setResolvedUrl with this particular player.\n"
 "\n"
-"Are you sure you want to set this player\'s resolve method to PlayMedia?"
+"Are you sure you want to set this player\\'s resolve method to PlayMedia?"
 msgstr ""
 
 #: /resources/lib/player/configure.py
@@ -1801,7 +1801,15 @@ msgstr ""
 
 #: /resources/lib/player/players.py
 msgctxt "#32354"
-msgid "Does this player resolve directly to a single playable file?\n\nSelect \"Yes\" for any player that plays directly from single source. Select \"No\" for players that scrape multiple sources or otherwise do not work with the setResolvedURL method."
+msgid ""
+"Does this player resolve directly to a single playable file?\n"
+"\n"
+"Select \"Yes\" for any player that plays directly from single source. Select \"No\" for players that scrape multiple sources or otherwise do not work with the setResolvedURL method."
+msgstr ""
+
+#: /resources/lib/script/sync.py
+msgctxt "#32355"
+msgid "Remove from user list"
 msgstr ""
 
 msgctxt "#30030"
