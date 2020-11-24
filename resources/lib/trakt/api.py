@@ -184,10 +184,7 @@ class _TraktLists():
 
 class _TraktSync():
     def get_sync_item(self, trakt_type, unique_id, id_type, season=None, episode=None):
-        """
-        methods = history watchlist collection recommendations
-        trakt_type = movie, show, season, episode
-        """
+        """ Gets an item configured for syncing as postdata """
         if not unique_id or not id_type or not trakt_type:
             return
         base_trakt_type = 'show' if trakt_type in ['season', 'episode'] else trakt_type
@@ -197,13 +194,13 @@ class _TraktSync():
             return
         return self.get_details(base_trakt_type, unique_id, season=season, episode=episode, extended=None)
 
-    def add_list_item(self, list_slug, trakt_type, unique_id, id_type, season=None, episode=None, user_slug=None):
+    def add_list_item(self, list_slug, trakt_type, unique_id, id_type, season=None, episode=None, user_slug=None, remove=False):
         item = self.get_sync_item(trakt_type, unique_id, id_type, season, episode)
         if not item:
             return
         user_slug = user_slug or 'me'
         return self.post_response(
-            'users', user_slug, 'lists', list_slug, 'items',
+            'users', user_slug, 'lists', list_slug, 'items/remove' if remove else 'items',
             postdata={'{}s'.format(trakt_type): [item]})
 
     def sync_item(self, method, trakt_type, unique_id, id_type, season=None, episode=None):
