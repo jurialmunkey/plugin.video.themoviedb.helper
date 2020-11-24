@@ -1819,7 +1819,7 @@ msgstr ""
 
 #: /resources/lib/script/router.py
 msgctxt "#32357"
-msgid "Are you sure you want to delete [B]{}[/B]?\\n\\nThis action cannot be undone."
+msgid "Are you sure you want to delete [B]{}[/B]?\n\nThis action cannot be undone."
 msgstr ""
 
 #: /resources/lib/script/router.py
