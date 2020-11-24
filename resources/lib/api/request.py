@@ -71,6 +71,8 @@ class RequestAPI(object):
         try:
             if method == 'delete':
                 return requests.delete(request, headers=headers, timeout=self.timeout)
+            if method == 'put':
+                return requests.put(request, data=postdata, headers=headers, timeout=self.timeout)
             if postdata or method == 'post':  # If pass postdata assume we want to post
                 return requests.post(request, data=postdata, headers=headers, timeout=self.timeout)
             return requests.get(request, headers=headers, timeout=self.timeout)

@@ -159,6 +159,12 @@ class _TraktLists():
             # Owner of list so set param to allow deleting later
             else:
                 item['params']['owner'] = 'true'
+                item['context_menu'] += [(
+                    xbmc.getLocalizedString(118), 'Runscript(plugin.video.themoviedb.helper,{})'.format(
+                        'rename_list={list_slug}'.format(**item['params'])))]
+                item['context_menu'] += [(
+                    xbmc.getLocalizedString(117), 'Runscript(plugin.video.themoviedb.helper,{})'.format(
+                        'delete_list={list_slug}'.format(**item['params'])))]
 
             items.append(item)
         if not next_page:
@@ -490,11 +496,12 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
 
     def post_response(self, *args, **kwargs):
         postdata = kwargs.pop('postdata', None)
+        response_method = kwargs.pop('response_method', 'post')
         return self.get_simple_api_request(
             self.get_request_url(*args, **kwargs),
             headers=self.headers,
             postdata=dumps(postdata) if postdata else None,
-            method='post')
+            method=response_method)
 
     def get_response(self, *args, **kwargs):
         return self.get_api_request(self.get_request_url(*args, **kwargs), headers=self.headers)

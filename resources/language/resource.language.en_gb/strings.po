@@ -1812,6 +1812,26 @@ msgctxt "#32355"
 msgid "Remove from user list"
 msgstr ""
 
+#: /resources/lib/script/sync.py
+msgctxt "#32356"
+msgid "Enter new list name"
+msgstr ""
+
+#: /resources/lib/script/router.py
+msgctxt "#32357"
+msgid "Are you sure you want to delete [B]{}[/B]?\\n\\nThis action cannot be undone."
+msgstr ""
+
+#: /resources/lib/script/router.py
+msgctxt "#32358"
+msgid "Delete user list"
+msgstr ""
+
+#: /resources/lib/script/router.py
+msgctxt "#32359"
+msgid "Enter new name"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
