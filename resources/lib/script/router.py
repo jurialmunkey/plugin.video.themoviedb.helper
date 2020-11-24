@@ -69,6 +69,11 @@ def run_plugin(**kwargs):
         xbmc.executebuiltin(try_encode(u'RunPlugin({})'.format(kwargs.get('run_plugin'))))
 
 
+def container_refresh():
+    xbmc.executebuiltin('Container.Refresh')
+    xbmc.executebuiltin('UpdateLibrary(video,/fake/path/to/force/refresh/on/home)')
+
+
 @map_kwargs({'play': 'tmdb_type'})
 @get_tmdb_id
 def play_external(**kwargs):
@@ -169,8 +174,7 @@ def refresh_details(tmdb_id=None, tmdb_type=None, season=None, episode=None, **k
         details = TMDb().get_details(tmdb_type, tmdb_id, season, episode, cache_refresh=True)
     if details:
         xbmcgui.Dialog().ok('TMDbHelper', ADDON.getLocalizedString(32234).format(tmdb_type, tmdb_id))
-        xbmc.executebuiltin('Container.Refresh')
-        xbmc.executebuiltin('UpdateLibrary(video,/fake/path/to/force/refresh/on/home)')
+        container_refresh()
 
 
 def kodi_setting(kodi_setting, **kwargs):
@@ -189,6 +193,21 @@ def user_list(user_list, user_slug=None, **kwargs):
     add_to_library(info='trakt', user_slug=user_slug, list_slug=user_list, confirm=True, allow_update=True, busy_spinner=True)
 
 
+def delete_list(delete_list, **kwargs):
+    if not xbmcgui.Dialog().yesno(ADDON.getLocalizedString(32358), ADDON.getLocalizedString(32357).format(delete_list)):
+        return
+    TraktAPI().delete_response('users/me/lists', delete_list)
+    container_refresh()
+
+
+def rename_list(rename_list, **kwargs):
+    name = xbmcgui.Dialog().input(ADDON.getLocalizedString(32359))
+    if not name:
+        return
+    TraktAPI().post_response('users/me/lists', rename_list, postdata={'name': name}, response_method='put')
+    container_refresh()
+
+
 def like_list(like_list, user_slug=None, delete=False, **kwargs):
     user_slug = user_slug or 'me'
     if not user_slug or not like_list:
@@ -196,8 +215,7 @@ def like_list(like_list, user_slug=None, delete=False, **kwargs):
     TraktAPI().like_userlist(user_slug=user_slug, list_slug=like_list, confirmation=True, delete=delete)
     if not delete:
         return
-    xbmc.executebuiltin('Container.Refresh')
-    xbmc.executebuiltin('UpdateLibrary(video,/fake/path/to/force/refresh/on/home)')
+    container_refresh()
 
 
 def set_defaultplayer(**kwargs):
@@ -285,6 +303,8 @@ class Script(object):
         'related_lists': lambda **kwargs: related_lists(**kwargs),
         'user_list': lambda **kwargs: user_list(**kwargs),
         'like_list': lambda **kwargs: like_list(**kwargs),
+        'delete_list': lambda **kwargs: delete_list(**kwargs),
+        'rename_list': lambda **kwargs: rename_list(**kwargs),
         'blur_image': lambda **kwargs: blur_image(**kwargs),
         'image_colors': lambda **kwargs: image_colors(**kwargs),
         'monitor_userlist': lambda **kwargs: monitor_userlist(),
