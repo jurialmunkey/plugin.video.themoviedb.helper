@@ -1,5 +1,6 @@
 import xbmc
 import xbmcgui
+import traceback
 from contextlib import contextmanager
 from resources.lib.addon.plugin import kodi_log, format_name
 from timeit import default_timer as timer
@@ -16,7 +17,7 @@ def try_except_log(log_msg, notification=True):
                     xbmcgui.Dialog().notification(head, xbmc.getLocalizedString(2104))
                 msg = 'Error Type: {0}\nError Contents: {1!r}'
                 msg = msg.format(type(exc).__name__, exc.args)
-                kodi_log([log_msg, '\n', msg], 1)
+                kodi_log([log_msg, '\n', msg, '\n'] + traceback.format_tb(exc.__traceback__), 1)
         return wrapper
     return decorator
 
