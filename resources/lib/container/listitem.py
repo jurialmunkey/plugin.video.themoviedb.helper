@@ -19,6 +19,8 @@ def ListItem(*args, **kwargs):
         'episode': _Episode,
         'video': _Video,
         'set': _Collection,
+        'studio': _Studio,
+        'keyword': _Keyword,
         'person': _Person}
     mediatype = kwargs.get('infolabels', {}).get('mediatype')
     if kwargs.get('infoproperties', {}).get('tmdb_type') == 'person':
@@ -172,6 +174,24 @@ class _ListItem(object):
                     continue
                 listitem.addStreamInfo(k, i)
         return listitem
+
+
+class _Keyword(_ListItem):
+    def _set_params_reroute_details(self, flatten_seasons):
+        self.params['info'] = 'discover'
+        self.params['tmdb_type'] = 'movie'
+        self.params['with_keywords'] = self.unique_ids.get('tmdb')
+        self.params['with_id'] = 'True'
+        self.is_folder = True
+
+
+class _Studio(_ListItem):
+    def _set_params_reroute_details(self, flatten_seasons):
+        self.params['info'] = 'discover'
+        self.params['tmdb_type'] = 'movie'
+        self.params['with_companies'] = self.unique_ids.get('tmdb')
+        self.params['with_id'] = 'True'
+        self.is_folder = True
 
 
 class _Person(_ListItem):

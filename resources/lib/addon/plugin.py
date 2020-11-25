@@ -127,9 +127,10 @@ CONVERSION_TABLE = {
         'person': {'plural': lambda: ADDON.getLocalizedString(32172), 'container': 'actors', 'dbtype': 'video'},  # Actors needs video type for info dialog
         'collection': {'plural': lambda: ADDON.getLocalizedString(32187), 'container': 'sets', 'dbtype': 'set'},
         'review': {'plural': lambda: ADDON.getLocalizedString(32188)},
-        'keyword': {'plural': lambda: xbmc.getLocalizedString(21861)},
+        'keyword': {'plural': lambda: xbmc.getLocalizedString(21861), 'dbtype': 'keyword'},
         'network': {'plural': lambda: ADDON.getLocalizedString(32189), 'container': 'studios', 'dbtype': 'studio'},
         'studio': {'plural': lambda: ADDON.getLocalizedString(32190), 'container': 'studios', 'dbtype': 'studio'},
+        'company': {'plural': lambda: ADDON.getLocalizedString(32360), 'container': 'studios', 'dbtype': 'studio'},
         'image': {'plural': lambda: ADDON.getLocalizedString(32191), 'container': 'images'},
         'genre': {'plural': lambda: xbmc.getLocalizedString(135), 'container': 'genres', 'dbtype': 'genre'},
         'season': {'plural': lambda: xbmc.getLocalizedString(33054), 'container': 'seasons', 'trakt': 'season', 'dbtype': 'season'},
