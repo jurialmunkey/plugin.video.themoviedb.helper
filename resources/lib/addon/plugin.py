@@ -106,187 +106,42 @@ def get_mpaa_prefix():
 
 CONVERSION_TABLE = {
     'media': {
-        'movie': {
-            'tmdb': {
-                'type': 'movie'},
-            'trakt': {
-                'type': 'movie'},
-            'ftv': {
-                'type': 'movies'}
-        },
-        'tvshow': {
-            'tmdb': {
-                'type': 'tv'},
-            'trakt': {
-                'type': 'show'},
-            'ftv': {
-                'type': 'tv'}
-        },
-        'season': {
-            'tmdb': {
-                'type': 'season'},
-            'trakt': {
-                'type': 'season'},
-            'ftv': {
-                'type': 'tv'}
-        },
-        'episode': {
-            'tmdb': {
-                'type': 'episode'},
-            'trakt': {
-                'type': 'episode'},
-            'ftv': {
-                'type': 'tv'}
-        },
-        'actor': {
-            'tmdb': {
-                'type': 'person'}
-        },
-        'director': {
-            'tmdb': {
-                'type': 'person'}
-        },
-        'set': {
-            'tmdb': {
-                'type': 'collection'}
-        }
+        'movie': {'tmdb': 'movie', 'trakt': 'movie', 'ftv': 'movies'},
+        'tvshow': {'tmdb': 'tv', 'trakt': 'show', 'ftv': 'tv'},
+        'season': {'tmdb': 'season', 'trakt': 'season', 'ftv': 'tv'},
+        'episode': {'tmdb': 'episode', 'trakt': 'episode', 'ftv': 'tv'},
+        'actor': {'tmdb': 'person'},
+        'director': {'tmdb': 'person'},
+        'set': {'tmdb': 'collection'}
     },
     'trakt': {
-        'movie': {
-            'tmdb': {
-                'type': 'movie'}
-        },
-        'show': {
-            'tmdb': {
-                'type': 'tv'}
-        },
-        'season': {
-            'tmdb': {
-                'type': 'season'}
-        },
-        'episode': {
-            'tmdb': {
-                'type': 'episode'}
-        },
-        'person': {
-            'tmdb': {
-                'type': 'person'}
-        }
+        'movie': {'tmdb': 'movie'},
+        'show': {'tmdb': 'tv'},
+        'season': {'tmdb': 'season'},
+        'episode': {'tmdb': 'episode'},
+        'person': {'tmdb': 'person'}
     },
     'tmdb': {
-        'movie': {
-            'plural': {
-                'func': xbmc.getLocalizedString, 'args': [342]},
-            'container': {
-                'type': 'movies'},
-            'trakt': {
-                'type': 'movie'},
-            'dbtype': {
-                'type': 'movie'}
-        },
-        'tv': {
-            'plural': {
-                'func': xbmc.getLocalizedString, 'args': [20343]},
-            'container': {
-                'type': 'tvshows'},
-            'trakt': {
-                'type': 'show'},
-            'dbtype': {
-                'type': 'tvshow'}
-        },
-        'person': {
-            'plural': {
-                'func': ADDON.getLocalizedString, 'args': [32172]},
-            'container': {
-                'type': 'actors'},
-            'dbtype': {
-                'type': 'video'}  # Needs to be video for info dialog as actors not accepted
-        },
-        'collection': {
-            'plural': {
-                'func': ADDON.getLocalizedString, 'args': [32187]},
-            'container': {
-                'type': 'sets'},
-            'dbtype': {
-                'type': 'set'}
-        },
-        'review': {
-            'plural': {
-                'func': ADDON.getLocalizedString, 'args': [32188]}
-        },
-        'keyword': {
-            'plural': {
-                'func': xbmc.getLocalizedString, 'args': [21861]}
-        },
-        'network': {
-            'plural': {
-                'func': ADDON.getLocalizedString, 'args': [32189]},
-            'container': {
-                'type': 'studios'},
-            'dbtype': {
-                'type': 'studio'}
-        },
-        'studio': {
-            'plural': {
-                'func': ADDON.getLocalizedString, 'args': [32190]},
-            'container': {
-                'type': 'studios'},
-            'dbtype': {
-                'type': 'studio'}
-        },
-        'image': {
-            'plural': {
-                'func': ADDON.getLocalizedString, 'args': [32191]},
-            'container': {
-                'type': 'images'}
-        },
-        'genre': {
-            'plural': {
-                'func': xbmc.getLocalizedString, 'args': [135]},
-            'container': {
-                'type': 'genres'},
-            'dbtype': {
-                'type': 'genre'}
-        },
-        'season': {
-            'plural': {
-                'func': xbmc.getLocalizedString, 'args': [33054]},
-            'container': {
-                'type': 'seasons'},
-            'trakt': {
-                'type': 'season'},
-            'dbtype': {
-                'type': 'season'}
-        },
-        'episode': {
-            'plural': {
-                'func': xbmc.getLocalizedString, 'args': [20360]},
-            'container': {
-                'type': 'episodes'},
-            'trakt': {
-                'type': 'episode'},
-            'dbtype': {
-                'type': 'episode'}
-        },
-        'video': {
-            'plural': {
-                'func': xbmc.getLocalizedString, 'args': [10025]},
-            'container': {
-                'type': 'videos'},
-            'dbtype': {
-                'type': 'video'}
-        },
+        'movie': {'plural': lambda: xbmc.getLocalizedString(342), 'container': 'movies', 'trakt': 'movie', 'dbtype': 'movie'},
+        'tv': {'plural': lambda: xbmc.getLocalizedString(20343), 'container': 'tvshows', 'trakt': 'show', 'dbtype': 'tvshow'},
+        'person': {'plural': lambda: ADDON.getLocalizedString(32172), 'container': 'actors', 'dbtype': 'video'},  # Actors needs video type for info dialog
+        'collection': {'plural': lambda: ADDON.getLocalizedString(32187), 'container': 'sets', 'dbtype': 'set'},
+        'review': {'plural': lambda: ADDON.getLocalizedString(32188)},
+        'keyword': {'plural': lambda: xbmc.getLocalizedString(21861)},
+        'network': {'plural': lambda: ADDON.getLocalizedString(32189), 'container': 'studios', 'dbtype': 'studio'},
+        'studio': {'plural': lambda: ADDON.getLocalizedString(32190), 'container': 'studios', 'dbtype': 'studio'},
+        'image': {'plural': lambda: ADDON.getLocalizedString(32191), 'container': 'images'},
+        'genre': {'plural': lambda: xbmc.getLocalizedString(135), 'container': 'genres', 'dbtype': 'genre'},
+        'season': {'plural': lambda: xbmc.getLocalizedString(33054), 'container': 'seasons', 'trakt': 'season', 'dbtype': 'season'},
+        'episode': {'plural': lambda: xbmc.getLocalizedString(20360), 'container': 'episodes', 'trakt': 'episode', 'dbtype': 'episode'},
+        'video': {'plural': lambda: xbmc.getLocalizedString(10025), 'container': 'videos', 'dbtype': 'video'}
     }
 }
 
 
 def _convert_types(base, key, output):
-    info = CONVERSION_TABLE.get(base, {}).get(key, {}).get(output, {})
-    if 'type' in info:
-        return info['type']
-    if 'func' in info:
-        return info['func'](*info.get('args', []))
-    return ''
+    info = CONVERSION_TABLE.get(base, {}).get(key, {}).get(output) or ''
+    return info() if callable(info) else info
 
 
 def convert_media_type(media_type, output='tmdb', parent_type=False, strip_plural=False):
