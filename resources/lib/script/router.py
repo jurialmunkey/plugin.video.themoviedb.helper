@@ -129,6 +129,7 @@ def manage_artwork(ftv_id=None, ftv_type=None, **kwargs):
     FanartTV().manage_artwork(ftv_id, ftv_type)
 
 
+@get_tmdb_id
 def related_lists(tmdb_id=None, tmdb_type=None, season=None, episode=None, container_update=True, include_play=False, **kwargs):
     if not tmdb_id or not tmdb_type:
         return
@@ -167,6 +168,7 @@ def update_players():
     downloader.get_extracted_zip()
 
 
+@get_tmdb_id
 def refresh_details(tmdb_id=None, tmdb_type=None, season=None, episode=None, **kwargs):
     if not tmdb_id or not tmdb_type:
         return
