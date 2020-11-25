@@ -6,7 +6,7 @@ from resources.lib.addon.parser import try_decode, urlencode_params
 from resources.lib.addon.setutils import merge_two_dicts
 
 
-MULTISEARCH_TYPES = ['movie', 'tv', 'person']
+MULTISEARCH_TYPES = ['movie', 'tv', 'person', 'collection', 'company', 'keyword']
 
 
 def get_zippered_list(lists):
