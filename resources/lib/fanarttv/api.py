@@ -6,6 +6,7 @@ from resources.lib.container.listitem import ListItem
 from resources.lib.addon.plugin import ADDON, viewitems, get_language
 from resources.lib.addon.setutils import del_empty_keys
 from resources.lib.addon.decorators import busy_dialog
+from resources.lib.addon.parser import try_int
 # from resources.lib.addon.decorators import timer_report
 
 
@@ -91,7 +92,7 @@ class FanartTV(RequestAPI):
         for i in artwork:
             if i.get('lang', '') == self.language:
                 return i.get('url', '')
-            if (i.get('lang', '') == 'en' or not i.get('lang')) and i.get('likes', 0) > best_like:
+            if (i.get('lang', '') == 'en' or not i.get('lang')) and try_int(i.get('likes', 0)) > try_int(best_like):
                 best_item = i.get('url', '')
                 best_like = i.get('likes', 0)
         return best_item
