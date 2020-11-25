@@ -387,7 +387,7 @@ TRAKT_LIST_OF_LISTS = {
 
 CONTEXT_MENU_ITEMS = {
     'tmdbhelper.context.artwork': {
-        'movie': {'ftv_type': 'movie', 'ftv_id': '{ftv_id}'},
+        'movie': {'ftv_type': 'movies', 'ftv_id': '{ftv_id}'},
         'tvshow': {'ftv_type': 'tv', 'ftv_id': '{ftv_id}'}
     },
     'tmdbhelper.context.refresh': {

@@ -23,6 +23,7 @@ from resources.lib.window.manager import WindowManager
 from resources.lib.player.players import Players
 from resources.lib.player.configure import configure_players
 from resources.lib.monitor.images import ImageFunctions
+from resources.lib.container.listitem import ListItem
 
 
 # Get TMDb ID decorator
@@ -125,7 +126,20 @@ def sync_trakt(**kwargs):
         id_type='tmdb')
 
 
+def _get_ftv_id(**kwargs):
+    details = refresh_details(confirm=False, **kwargs)
+    if not details:
+        return
+    return ListItem(**details).get_ftv_id()
+
+
 def manage_artwork(ftv_id=None, ftv_type=None, **kwargs):
+    if not ftv_type:
+        return
+    if not ftv_id:
+        ftv_id = _get_ftv_id(**kwargs)
+    if not ftv_id:
+        return
     FanartTV().manage_artwork(ftv_id, ftv_type)
 
 
@@ -169,14 +183,15 @@ def update_players():
 
 
 @get_tmdb_id
-def refresh_details(tmdb_id=None, tmdb_type=None, season=None, episode=None, **kwargs):
+def refresh_details(tmdb_id=None, tmdb_type=None, season=None, episode=None, confirm=True, **kwargs):
     if not tmdb_id or not tmdb_type:
         return
     with busy_dialog():
         details = TMDb().get_details(tmdb_type, tmdb_id, season, episode, cache_refresh=True)
-    if details:
+    if details and confirm:
         xbmcgui.Dialog().ok('TMDbHelper', ADDON.getLocalizedString(32234).format(tmdb_type, tmdb_id))
         container_refresh()
+    return details
 
 
 def kodi_setting(kodi_setting, **kwargs):
