@@ -78,7 +78,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             return False
         return True
 
-    def add_items(self, items=None, pagination=True, parent_params=None, kodi_db=None, tmdb_cache_only=True):
+    def add_items(self, items=None, pagination=True, parent_params=None, property_params=None, kodi_db=None, tmdb_cache_only=True):
         if not items:
             return
         check_is_aired = parent_params.get('info') not in NO_LABEL_FORMATTING
@@ -101,6 +101,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
             li.set_params_reroute(self.ftv_forced_lookup, self.flatten_seasons)  # Reroute details to proper end point
             li.set_params_to_info(self.plugin_category)  # Set path params to properties for use in skins
+            li.infoproperties.update(property_params or {})
             xbmcplugin.addDirectoryItem(
                 handle=self.handle,
                 url=li.get_url(),
@@ -108,13 +109,18 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
                 isFolder=li.is_folder)
 
     def set_params_to_container(self, **kwargs):
+        params = {}
         for k, v in viewitems(kwargs):
             if not k or not v:
                 continue
             try:
-                xbmcplugin.setProperty(self.handle, u'Param.{}'.format(k), u'{}'.format(v))  # Set params to container properties
+                k = u'Param.{}'.format(k)
+                v = u'{}'.format(v)
+                params[k] = v
+                xbmcplugin.setProperty(self.handle, k, v)  # Set params to container properties
             except Exception as exc:
-                kodi_log(u'Error: {}\nUnable to set Param.{} to {}'.format(exc, k, v), 1)
+                kodi_log(u'Error: {}\nUnable to set param {} to {}'.format(exc, k, v), 1)
+        return params
 
     def finish_container(self, update_listing=False, plugin_category='', container_content=''):
         xbmcplugin.setPluginCategory(self.handle, plugin_category)  # Container.PluginCategory
@@ -315,13 +321,13 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             items,
             pagination=self.pagination,
             parent_params=self.parent_params,
+            property_params=self.set_params_to_container(**self.params),
             kodi_db=self.kodi_db,
             tmdb_cache_only=self.tmdb_cache_only)
         self.finish_container(
             update_listing=self.update_listing,
             plugin_category=self.plugin_category,
             container_content=self.container_content)
-        self.set_params_to_container(**self.params)
         if self.container_update:
             xbmc.executebuiltin(try_encode(u'Container.Update({})'.format(self.container_update)))
         if self.container_refresh:
