@@ -55,7 +55,7 @@ class SyncItem():
         return choices
 
     def _user_list_check(self):
-        if xbmc.getInfoLabel("Container.Property(param.owner)") == 'true':
+        if xbmc.getInfoLabel("ListItem.Property(param.owner)") == 'true':
             return [{'name': ADDON.getLocalizedString(32355), 'method': 'userlist', 'remove': True}]
         return [{'name': ADDON.getLocalizedString(32298), 'method': 'userlist'}]
 
@@ -87,7 +87,7 @@ class SyncItem():
         return list_sync[x].get('params', {}).get('list_slug')
 
     def _sync_userlist(self, remove=False, **kwargs):
-        list_slug = xbmc.getInfoLabel("Container.Property(param.list_slug)") if remove else self._sync_userlist_getlist()
+        list_slug = xbmc.getInfoLabel("ListItem.Property(param.list_slug)") if remove else self._sync_userlist_getlist()
         if not list_slug:
             return
         with busy_dialog():
