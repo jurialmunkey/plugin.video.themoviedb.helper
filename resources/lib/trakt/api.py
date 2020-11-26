@@ -23,19 +23,19 @@ CLIENT_SECRET = '15119384341d9a61c751d8d515acbc0dd801001d4ebe85d3eef9885df80ee4d
 def get_sort_methods():
     return [
         {
-            'name': '{}: {}'.format(ADDON.getLocalizedString(32287), ADDON.getLocalizedString(32286)),
+            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), ADDON.getLocalizedString(32286)),
             'params': {'sort_by': 'rank', 'sort_how': 'asc'}},
         {
-            'name': '{}: {}'.format(ADDON.getLocalizedString(32287), ADDON.getLocalizedString(32106)),
+            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), ADDON.getLocalizedString(32106)),
             'params': {'sort_by': 'added', 'sort_how': 'desc'}},
         {
-            'name': '{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(369)),
+            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(369)),
             'params': {'sort_by': 'title', 'sort_how': 'asc'}},
         {
-            'name': '{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(345)),
+            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(345)),
             'params': {'sort_by': 'year', 'sort_how': 'desc'}},
         {
-            'name': '{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(590)),
+            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(590)),
             'params': {'sort_by': 'random'}}]
 
 
