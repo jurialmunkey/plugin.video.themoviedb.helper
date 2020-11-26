@@ -78,7 +78,7 @@ class _TraktLists():
                 return items
             return response['items'] + pages.get_next_page(response['headers'])
 
-    def get_custom_list(self, list_slug, user_slug=None, page=1, limit=20, params=None, authorize=False, sort_by=None, sort_how=None, extended=None):
+    def get_custom_list(self, list_slug, user_slug=None, page=1, limit=20, params=None, authorize=False, sort_by=None, sort_how=None, extended=None, owner=False):
         if authorize and not self.authorize():
             return
         path = 'users/{}/lists/{}/items'.format(user_slug or 'me', list_slug)
