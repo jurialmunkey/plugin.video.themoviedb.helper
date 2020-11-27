@@ -16,7 +16,7 @@ def get_property(name, set_property=None, clear_property=False, window_id=None, 
     if clear_property:
         window.clearProperty(name)
         return
-    elif set_property:
+    elif set_property is not None:
         window.setProperty(name, u'{}'.format(set_property))
         return set_property
     if is_type == int:

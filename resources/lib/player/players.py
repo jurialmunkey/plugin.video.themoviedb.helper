@@ -305,7 +305,8 @@ class Players(object):
                 if action.get('keyboard') in ['Up', 'Down', 'Left', 'Right', 'Select']:
                     keyboard_input = KeyboardInputter(action="Input.{}".format(action.get('keyboard')))
                 else:
-                    keyboard_input = KeyboardInputter(text=string_format_map(action.get('keyboard', ''), self.item))
+                    text = string_format_map(action.get('keyboard', ''), self.item)
+                    keyboard_input = KeyboardInputter(text=text[::-1] if action.get('direction') == 'rtl' else text)
                 keyboard_input.setName('keyboard_input')
                 keyboard_input.start()
                 continue  # Go to next action

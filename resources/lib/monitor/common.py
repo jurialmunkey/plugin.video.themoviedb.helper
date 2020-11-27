@@ -59,10 +59,10 @@ class CommonMonitorFunctions(object):
 
     def set_iter_properties(self, dictionary, keys):
         if not isinstance(dictionary, dict):
-            return
+            dictionary = {}
         for k in keys:
             try:
-                v = dictionary.get(k, '')
+                v = dictionary.get(k, None)
                 if isinstance(v, list):
                     try:
                         v = ' / '.join(v)
