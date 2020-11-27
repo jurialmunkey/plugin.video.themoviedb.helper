@@ -171,15 +171,12 @@ class ListItemMonitor(CommonMonitorFunctions):
     @try_except_log('lib.monitor.listitem.get_artwork')
     def get_artwork(self, source='', fallback=''):
         source = source.lower()
-        infolabels = ['Art(thumb)']
-        if source == 'poster':
-            infolabels = ['Art(tvshow.poster)', 'Art(poster)', 'Art(thumb)']
-        elif source == 'fanart':
-            infolabels = ['Art(fanart)', 'Art(thumb)']
-        elif source == 'landscape':
-            infolabels = ['Art(landscape)', 'Art(fanart)', 'Art(thumb)']
-        elif source and source != 'thumb':
-            infolabels = source.split("|")
+        lookup = {
+            'poster': ['Art(tvshow.poster)', 'Art(poster)', 'Art(thumb)'],
+            'fanart': ['Art(fanart)', 'Art(thumb)'],
+            'landscape': ['Art(landscape)', 'Art(fanart)', 'Art(thumb)'],
+            'thumb': ['Art(thumb)']}
+        infolabels = lookup.get(source, source.split("|") if source else lookup.get('thumb'))
         for i in infolabels:
             artwork = self.get_infolabel(i)
             if artwork:
