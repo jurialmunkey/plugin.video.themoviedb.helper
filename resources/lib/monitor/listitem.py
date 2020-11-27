@@ -64,12 +64,10 @@ class ListItemMonitor(CommonMonitorFunctions):
     def get_season(self):
         if self.dbtype == 'episodes':
             return self.get_infolabel('Season')
-        return ''
 
     def get_episode(self):
         if self.dbtype == 'episodes':
             return self.get_infolabel('Episode')
-        return ''
 
     def get_dbtype(self):
         if self.get_infolabel('Property(tmdb_type)') == 'person':
@@ -237,6 +235,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         # Need a TMDb type to do a details look-up so exit if we don't have one
         tmdb_type = self.get_tmdb_type()
         if not tmdb_type:
+            self.clear_properties()
             return get_property('IsUpdating', clear_property=True)
 
         # Immediately clear some properties like ratings and artwork
