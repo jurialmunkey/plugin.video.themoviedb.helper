@@ -3,12 +3,16 @@ import xbmc
 import xbmcvfs
 import colorsys
 from resources.lib.addon.window import get_property
-from resources.lib.addon.plugin import kodi_log, md5hash
+from resources.lib.addon.plugin import kodi_log, kodi_traceback, md5hash
 from resources.lib.addon.parser import try_int, try_float
 from resources.lib.files.utils import make_path
 from threading import Thread
-from PIL import ImageFilter, Image  # TODO: Try Import in-case no PIL and don't use funcs
-try:
+try:  # Try import PIL due to some systems using incompatible local versions of numpy
+    from PIL import ImageFilter, Image
+except Exception as exc:
+    kodi_traceback(exc, 'lib.monitor.images - PIL import error!', notiication=False)
+    ImageFilter, Image = None, None
+try:  # Try import urllib for PY2/3 compatibility
     import urllib2 as urllib
 except ImportError:
     import urllib.request as urllib
@@ -77,6 +81,8 @@ class ImageFunctions(Thread):
         self.func = None
         self.save_prop = None
         self.save_path = 'special://profile/addon_data/plugin.video.themoviedb.helper/{}/'
+        if not ImageFilter:
+            return
         if method == 'blur':
             self.func = self.blur
             self.save_path = make_path(self.save_path.format('blur'))

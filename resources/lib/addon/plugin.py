@@ -2,8 +2,10 @@
 import re
 import sys
 import xbmc
+import xbmcgui
 import xbmcaddon
 import hashlib
+import traceback
 from resources.lib.addon.constants import LANGUAGES
 from resources.lib.addon.parser import try_decode
 if sys.version_info[0] >= 3:
@@ -90,6 +92,16 @@ def kodi_log(value, level=0):
             xbmc.log(logvalue, level=xbmc.LOGDEBUG)
     except Exception as exc:
         xbmc.log(u'Logging Error: {}'.format(exc), level=xbmc.LOGINFO)
+
+
+def kodi_traceback(exception, log_msg=None, notification=True):
+    if notification:
+        head = 'TheMovieDb Helper {}'.format(xbmc.getLocalizedString(257))
+        xbmcgui.Dialog().notification(head, xbmc.getLocalizedString(2104))
+    msg = 'Error Type: {0}\nError Contents: {1!r}'
+    msg = msg.format(type(exception).__name__, exception.args)
+    msg = [log_msg, '\n', msg, '\n'] if log_msg else [msg, '\n']
+    kodi_log(msg + traceback.format_tb(exception.__traceback__), 1)
 
 
 def get_language():
