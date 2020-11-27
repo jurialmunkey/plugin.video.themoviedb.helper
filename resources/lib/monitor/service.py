@@ -1,6 +1,6 @@
 import xbmc
 from resources.lib.addon.window import get_property, wait_for_property
-from resources.lib.addon.plugin import ADDON, kodi_log
+from resources.lib.addon.plugin import ADDON
 from resources.lib.monitor.cronjob import CronJobMonitor
 from resources.lib.monitor.listitem import ListItemMonitor
 from resources.lib.monitor.player import PlayerMonitor
