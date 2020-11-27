@@ -10,7 +10,7 @@ from threading import Thread
 try:  # Try import PIL due to some systems using incompatible local versions of numpy
     from PIL import ImageFilter, Image
 except Exception as exc:
-    kodi_traceback(exc, 'lib.monitor.images - PIL import error!', notiication=False)
+    kodi_traceback(exc, 'lib.monitor.images - PIL import error!', notification=False)
     ImageFilter, Image = None, None
 try:  # Try import urllib for PY2/3 compatibility
     import urllib2 as urllib
