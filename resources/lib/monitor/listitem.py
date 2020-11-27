@@ -1,5 +1,5 @@
 import xbmc
-import resources.lib.kodi.rpc as rpc
+from resources.lib.kodi.rpc import get_person_stats
 from resources.lib.addon.window import get_property
 from resources.lib.monitor.common import CommonMonitorFunctions, SETMAIN_ARTWORK, SETPROP_RATINGS
 from resources.lib.monitor.images import ImageFunctions
@@ -64,12 +64,10 @@ class ListItemMonitor(CommonMonitorFunctions):
     def get_season(self):
         if self.dbtype == 'episodes':
             return self.get_infolabel('Season')
-        return ''
 
     def get_episode(self):
         if self.dbtype == 'episodes':
             return self.get_infolabel('Episode')
-        return ''
 
     def get_dbtype(self):
         if self.get_infolabel('Property(tmdb_type)') == 'person':
@@ -171,15 +169,12 @@ class ListItemMonitor(CommonMonitorFunctions):
     @try_except_log('lib.monitor.listitem.get_artwork')
     def get_artwork(self, source='', fallback=''):
         source = source.lower()
-        infolabels = ['Art(thumb)']
-        if source == 'poster':
-            infolabels = ['Art(tvshow.poster)', 'Art(poster)', 'Art(thumb)']
-        elif source == 'fanart':
-            infolabels = ['Art(fanart)', 'Art(thumb)']
-        elif source == 'landscape':
-            infolabels = ['Art(landscape)', 'Art(fanart)', 'Art(thumb)']
-        elif source and source != 'thumb':
-            infolabels = source.split("|")
+        lookup = {
+            'poster': ['Art(tvshow.poster)', 'Art(poster)', 'Art(thumb)'],
+            'fanart': ['Art(fanart)', 'Art(thumb)'],
+            'landscape': ['Art(landscape)', 'Art(fanart)', 'Art(thumb)'],
+            'thumb': ['Art(thumb)']}
+        infolabels = lookup.get(source, source.split("|") if source else lookup.get('thumb'))
         for i in infolabels:
             artwork = self.get_infolabel(i)
             if artwork:
@@ -240,6 +235,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         # Need a TMDb type to do a details look-up so exit if we don't have one
         tmdb_type = self.get_tmdb_type()
         if not tmdb_type:
+            self.clear_properties()
             return get_property('IsUpdating', clear_property=True)
 
         # Immediately clear some properties like ratings and artwork
@@ -279,7 +275,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         if tmdb_type == 'person' and details.get('infolabels', {}).get('title'):
             if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisablePersonStats)"):
                 details.setdefault('infoproperties', {}).update(
-                    rpc.get_person_stats(details['infolabels']['title']) or {})
+                    get_person_stats(details['infolabels']['title']) or {})
 
         # Get our item ratings
         if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"):
