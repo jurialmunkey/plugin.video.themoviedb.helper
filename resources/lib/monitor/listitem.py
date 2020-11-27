@@ -1,5 +1,5 @@
 import xbmc
-import resources.lib.kodi.rpc as rpc
+from resources.lib.kodi.rpc import get_person_stats
 from resources.lib.addon.window import get_property
 from resources.lib.monitor.common import CommonMonitorFunctions, SETMAIN_ARTWORK, SETPROP_RATINGS
 from resources.lib.monitor.images import ImageFunctions
@@ -276,7 +276,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         if tmdb_type == 'person' and details.get('infolabels', {}).get('title'):
             if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisablePersonStats)"):
                 details.setdefault('infoproperties', {}).update(
-                    rpc.get_person_stats(details['infolabels']['title']) or {})
+                    get_person_stats(details['infolabels']['title']) or {})
 
         # Get our item ratings
         if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"):
