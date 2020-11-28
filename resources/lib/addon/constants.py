@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 VALID_FILECHARS = "-_.() abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 ACCEPTED_MEDIATYPES = [
