@@ -22,13 +22,13 @@ _debuglogging = ADDON.getSettingBool('debug_logging')
 
 def format_name(cache_name, *args, **kwargs):
     # Define a type whitelist to avoiding adding non-basic types like classes to cache name
-    permitted_types = [unicode, int, float, str, bool]
+    permitted_types = (unicode, int, float, str, bool, bytes)
     for arg in args:
-        if type(arg) not in permitted_types:
+        if not isinstance(arg, permitted_types):
             continue
         cache_name = u'{}/{}'.format(cache_name, arg) if cache_name else u'{}'.format(arg)
     for key, value in sorted(kwargs.items()):
-        if type(value) not in permitted_types:
+        if not isinstance(value, permitted_types):
             continue
         cache_name = u'{}&{}={}'.format(cache_name, key, value) if cache_name else u'{}={}'.format(key, value)
     return cache_name

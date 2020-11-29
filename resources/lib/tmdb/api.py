@@ -47,11 +47,14 @@ class TMDb(RequestAPI):
             return False
 
     def get_tmdb_id(self, tmdb_type=None, imdb_id=None, tvdb_id=None, query=None, year=None, episode_year=None, raw_data=False, **kwargs):
+        if not tmdb_type:
+            return
         kwargs['cache_days'] = cache.CACHE_SHORT
-        kwargs['cache_name'] = 'TMDb.get_tmdb_id'
+        kwargs['cache_name'] = 'TMDb.get_tmdb_id.v2'
         kwargs['cache_combine_name'] = True
         return cache.use_cache(
-            self._get_tmdb_id, tmdb_type, imdb_id, tvdb_id, query, year, episode_year, raw_data, **kwargs)
+            self._get_tmdb_id, tmdb_type=tmdb_type, imdb_id=imdb_id, tvdb_id=tvdb_id, query=query, year=year,
+            episode_year=episode_year, raw_data=raw_data, **kwargs)
 
     def _get_tmdb_id(self, tmdb_type, imdb_id, tvdb_id, query, year, episode_year, raw_data, **kwargs):
         func = self.get_request_sc
