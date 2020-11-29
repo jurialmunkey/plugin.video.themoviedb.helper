@@ -51,6 +51,18 @@ def timer_report(func_name):
     return decorator
 
 
+@contextmanager
+def timer_func(timer_name):
+    timer_a = timer()
+    try:
+        yield
+    finally:
+        timer_z = timer()
+        total_time = timer_z - timer_a
+        if total_time > 0.05:
+            kodi_log('{}\n{:.3f} sec'.format(timer_name, total_time), 1)
+
+
 def log_output(func_name):
     def decorator(func):
         def wrapper(self, *args, **kwargs):
