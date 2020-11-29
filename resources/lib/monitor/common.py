@@ -132,7 +132,6 @@ class CommonMonitorFunctions(object):
             return self.tmdb_api.get_tmdb_id(tmdb_type=tmdb_type, query=query, year=year, episode_year=episode_year)
         except Exception as exc:
             kodi_log(u'Func: get_tmdb_id\n{0}'.format(exc), 1)
-            return
 
     def get_fanarttv_artwork(self, item, tmdb_type=None, tmdb_id=None, tvdb_id=None):
         if not self.fanarttv or tmdb_type not in ['movie', 'tv']:
