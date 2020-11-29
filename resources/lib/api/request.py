@@ -1,5 +1,4 @@
 import xbmcgui
-import requests
 import xml.etree.ElementTree as ET
 import resources.lib.addon.cache as cache
 from resources.lib.addon.window import get_property
@@ -8,6 +7,18 @@ from resources.lib.addon.parser import try_int
 from resources.lib.addon.timedate import get_timestamp, set_timestamp
 from copy import copy
 from json import loads, dumps
+
+
+requests = None  # Requests module is slow to import so lazy import via decorator instead
+
+
+def lazyimport_requests(func):
+    def wrapper(*args, **kwargs):
+        global requests
+        if requests is None:
+            import requests
+        return func(*args, **kwargs)
+    return wrapper
 
 
 def dictify(r, root=True):
@@ -67,6 +78,7 @@ class RequestAPI(object):
             ADDON.getLocalizedString(32308).format(self.req_api_name),
             ADDON.getLocalizedString(32307))
 
+    @lazyimport_requests
     def get_simple_api_request(self, request=None, postdata=None, headers=None, method=None):
         try:
             if method == 'delete':
@@ -83,6 +95,7 @@ class RequestAPI(object):
         except Exception as err:
             kodi_log(u'RequestError: {}'.format(err), 1)
 
+    @lazyimport_requests
     def get_api_request(self, request=None, postdata=None, headers=None):
         """
         Make the request to the API by passing a url request string

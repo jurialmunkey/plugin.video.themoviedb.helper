@@ -3,7 +3,6 @@ import sys
 import xbmc
 import xbmcvfs
 import xbmcgui
-import requests
 import zipfile
 import gzip
 from resources.lib.addon.plugin import ADDON, kodi_log
@@ -15,6 +14,18 @@ except ImportError:  # Python 2
     from urlparse import urlparse
 if sys.version_info[0] >= 3:
     unicode = str  # In Py3 str is now unicode
+
+
+requests = None  # Requests module is slow to import so lazy import via decorator instead
+
+
+def lazyimport_requests(func):
+    def wrapper(*args, **kwargs):
+        global requests
+        if requests is None:
+            import requests
+        return func(*args, **kwargs)
+    return wrapper
 
 
 class Downloader(object):
@@ -45,6 +56,7 @@ class Downloader(object):
         except ValueError:
             return False
 
+    @lazyimport_requests
     def check_url(self, url, cred):
         if not self.is_url(url):
             kodi_log("URL is not of a valid schema: {0}".format(url), 1)
@@ -67,6 +79,7 @@ class Downloader(object):
             kodi_log("URL check error for {0}: [{1}]".format(url, e), 1)
             return False
 
+    @lazyimport_requests
     def open_url(self, url, stream=False, check=False, cred=None, count=0):
         if not url:
             return False
