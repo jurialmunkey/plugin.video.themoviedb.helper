@@ -99,6 +99,33 @@ def get_iter_props(v, base_name, *args, **kwargs):
     return infoproperties
 
 
+def get_providers(v):
+    infoproperties = {}
+    infoproperties['provider.link'] = v.pop('link', None)
+    newlist = (
+        dict(i, **{'key': key}) for key, value in viewitems(v) if isinstance(value, list)
+        for i in value if isinstance(i, dict))
+    added = []
+    added_append = added.append
+    for i in sorted(newlist, key=lambda k: k.get('display_priority', 1000)):
+        if not i.get('provider_name'):
+            continue
+        # If provider already added just update type
+        if i['provider_name'] in added:
+            idx = 'provider.{}.type'.format(added.index(i['provider_name']) + 1)
+            infoproperties[idx] = u'{} / {}'.format(infoproperties.get(idx), i.get('key'))
+            continue
+        # Add item provider
+        x = len(added) + 1
+        infoproperties.update({
+            'provider.{}.id'.format(x): i.get('provider_id'),
+            'provider.{}.type'.format(x): i.get('key'),
+            'provider.{}.name'.format(x): i['provider_name'],
+            'provider.{}.icon'.format(x): get_imagepath_poster(i.get('logo_path'))})
+        added_append(i['provider_name'])
+    return infoproperties
+
+
 def get_trailer(v):
     if not isinstance(v, dict):
         return
@@ -465,6 +492,11 @@ class ItemMapper(_ItemMapper):
                 'kwargs': {
                     'basic_keys': {'name': 'name', 'tmdb_id': 'id'},
                     'image_keys': {'icon': 'logo_path'}}
+            }],
+            'watch/providers': [{
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'subkeys': ['results', self.iso_country],
+                'func': get_providers
             }],
             'last_episode_to_air': [{
                 'keys': [('infoproperties', UPDATE_BASEKEY)],
