@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import re
 import sys
 import xbmc
@@ -104,14 +103,14 @@ def kodi_traceback(exception, log_msg=None, notification=True):
     kodi_log(msg + traceback.format_tb(exception.__traceback__), 1)
 
 
-def kodi_traceback(exception, log_msg=None, notification=True):
+def kodi_traceback(exception, log_msg=None, notification=True, log_level=1):
     if notification:
         head = 'TheMovieDb Helper {}'.format(xbmc.getLocalizedString(257))
         xbmcgui.Dialog().notification(head, xbmc.getLocalizedString(2104))
     msg = 'Error Type: {0}\nError Contents: {1!r}'
     msg = msg.format(type(exception).__name__, exception.args)
     msg = [log_msg, '\n', msg, '\n'] if log_msg else [msg, '\n']
-    kodi_log(msg + traceback.format_tb(exception.__traceback__), 1)
+    kodi_log(msg + traceback.format_tb(exception.__traceback__), log_level)
 
 
 def get_language():
