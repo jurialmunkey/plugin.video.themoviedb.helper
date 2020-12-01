@@ -1,10 +1,10 @@
 import random
 import xbmcgui
 from resources.lib.kodi.rpc import get_kodi_library
-from resources.lib.addon.plugin import convert_type
+from resources.lib.addon.plugin import convert_type, PLUGINPATH
 from resources.lib.addon.constants import TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, TRAKT_LIST_OF_LISTS
 from resources.lib.addon.plugin import ADDON, viewitems
-from resources.lib.addon.parser import try_int
+from resources.lib.addon.parser import try_int, encode_url
 from resources.lib.api.mapping import get_empty_item
 from resources.lib.addon.timedate import get_calendar_name
 from resources.lib.trakt.api import get_sort_methods
@@ -56,10 +56,12 @@ class TraktLists():
         self.library = 'video'
         return items
 
-    def list_trakt_searchlists(self, query=None, **kwargs):
-        query = query or xbmcgui.Dialog().input(ADDON.getLocalizedString(32044))
+    def list_lists_search(self, query=None, **kwargs):
         if not query:
-            return
+            kwargs['query'] = query = xbmcgui.Dialog().input(ADDON.getLocalizedString(32044))
+            if not kwargs['query']:
+                return
+            self.container_update = '{},replace'.format(encode_url(PLUGINPATH, **kwargs))
         items = self.trakt_api.get_list_of_lists(path='search/list?query={}'.format(query))
         self.library = 'video'
         return items
