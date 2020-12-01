@@ -1840,6 +1840,11 @@ msgctxt "#32360"
 msgid "Companies"
 msgstr ""
 
+#: /resources/lib/container/basedir.py
+msgctxt "#32361"
+msgid "Search Lists"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

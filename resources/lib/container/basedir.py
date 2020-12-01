@@ -373,7 +373,13 @@ def _get_basedir_trakt():
             'types': ['both'],
             'params': {'info': 'trakt_mylists'},
             'path': PLUGINPATH,
-            'art': {'thumb': '{}/resources/icons/trakt/mylists.png'.format(ADDONPATH)}}]
+            'art': {'thumb': '{}/resources/icons/trakt/mylists.png'.format(ADDONPATH)}},
+        {
+            'label': ADDON.getLocalizedString(32361),
+            'types': ['both'],
+            'params': {'info': 'trakt_searchlists'},
+            'path': PLUGINPATH,
+            'art': {'thumb': '{}/resources/icons/trakt/mylist.png'.format(ADDONPATH)}}]
 
 
 def _get_basedir_tmdb():

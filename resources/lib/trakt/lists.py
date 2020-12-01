@@ -1,4 +1,5 @@
 import random
+import xbmcgui
 from resources.lib.kodi.rpc import get_kodi_library
 from resources.lib.addon.plugin import convert_type
 from resources.lib.addon.constants import TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, TRAKT_LIST_OF_LISTS
@@ -52,6 +53,14 @@ class TraktLists():
             path=info_model.get('path', '').format(**kwargs),
             page=page,
             authorize=info_model.get('authorize', False))
+        self.library = 'video'
+        return items
+
+    def list_trakt_searchlists(self, query=None, **kwargs):
+        query = query or xbmcgui.Dialog().input(ADDON.getLocalizedString(32044))
+        if not query:
+            return
+        items = self.trakt_api.get_list_of_lists(path='search/list?query={}'.format(query))
         self.library = 'video'
         return items
 
