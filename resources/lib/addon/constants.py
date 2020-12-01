@@ -460,7 +460,7 @@ ROUTE_NO_ID = {
         'getattr': 'list_trakt_sortby'}},
     'trakt_searchlists': {'route': {
         'lambda': lambda func, **kwargs: func(**kwargs),
-        'getattr': 'list_trakt_searchlists'}},
+        'getattr': 'list_lists_search'}},
 }
 
 
