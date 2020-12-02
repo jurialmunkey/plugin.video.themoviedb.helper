@@ -145,12 +145,14 @@ class LibraryAdder():
     def add_tvshow(self, tmdb_id=None, force=False, **kwargs):
         self.tv = _TVShow(tmdb_id, force)
 
+        # Return playlist rule if we don't need to check show this time
+        if self._log._add('tv', tmdb_id, self.tv._cache.get_next_check()):
+            return ('title', self.tv._cache.cache_info.get('name'))
+
         if not self.tv.get_details():
             return  # Skip if no details found on TMDb
         if not self.tv.get_name():
             return  # Skip if we don't have a folder name for some reason
-        if self._log._add('tv', tmdb_id, self.tv._cache.get_next_check()):
-            return ('title', self.tv.details.get('name'))  # Early return if timestamp for next check still in future
 
         self.tv.get_dbid()
         self.tv.make_nfo()
