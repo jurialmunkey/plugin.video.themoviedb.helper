@@ -7,7 +7,7 @@ from resources.lib.omdb.mapping import ItemMapper
 class OMDb(RequestAPI):
     def __init__(self, api_key=ADDON.getSettingString('omdb_apikey')):
         super(OMDb, self).__init__(
-            req_api_key='apikey={0}'.format(api_key),
+            req_api_key=u'apikey={0}'.format(api_key),
             req_api_name='OMDb',
             req_api_url='http://www.omdbapi.com/')
 

@@ -30,7 +30,7 @@ class SearchLists():
         if len(items) > len(MULTISEARCH_TYPES):  # We have search results so need clear cache item
             items.append({
                 'label': ADDON.getLocalizedString(32121),
-                'art': {'thumb': '{}/resources/icons/tmdb/search.png'.format(ADDONPATH)},
+                'art': {'thumb': u'{}/resources/icons/tmdb/search.png'.format(ADDONPATH)},
                 'infoproperties': {'specialsort': 'bottom'},
                 'params': {'info': 'dir_multisearch', 'clear_cache': 'True'}})
         return items
@@ -44,7 +44,7 @@ class SearchLists():
     def list_searchdir(self, tmdb_type, clear_cache_item=True, append_type=False, **kwargs):
         base_item = {
             'label': u'{} {}'.format(xbmc.getLocalizedString(137), convert_type(tmdb_type, 'plural')),
-            'art': {'thumb': '{}/resources/icons/tmdb/search.png'.format(ADDONPATH)},
+            'art': {'thumb': u'{}/resources/icons/tmdb/search.png'.format(ADDONPATH)},
             'infoproperties': {'specialsort': 'top'},
             'params': merge_two_dicts(kwargs, {'info': 'search', 'tmdb_type': tmdb_type})}
         items = []
@@ -54,7 +54,7 @@ class SearchLists():
         history.reverse()
         for i in history:
             item = {
-                'label': '{} ({})'.format(i, tmdb_type) if append_type else i,
+                'label': u'{} ({})'.format(i, tmdb_type) if append_type else i,
                 'art': base_item.get('art'),
                 'params': merge_two_dicts(base_item.get('params', {}), {'query': i})}
             items.append(item)
@@ -86,7 +86,7 @@ class SearchLists():
             params = merge_two_dicts(kwargs, {
                 'info': 'search', 'tmdb_type': tmdb_type, 'page': page, 'query': query,
                 'update_listing': 'True'})
-            self.container_update = '{}?{}'.format(PLUGINPATH, urlencode_params(**params))
+            self.container_update = u'{}?{}'.format(PLUGINPATH, urlencode_params(**params))
             # Trigger container update using new path with query after adding items
             # Prevents onback from re-prompting for user input by re-writing path
 

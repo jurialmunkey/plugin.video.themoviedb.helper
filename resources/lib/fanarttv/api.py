@@ -33,7 +33,7 @@ ARTWORK_TYPES = {
 def add_extra_art(source, output={}):
     if not source:
         return output
-    output.update({'fanart{}'.format(x): i['url'] for x, i in enumerate(source, 1) if i.get('url')})
+    output.update({u'fanart{}'.format(x): i['url'] for x, i in enumerate(source, 1) if i.get('url')})
     return output
 
 
@@ -48,9 +48,9 @@ class FanartTV(RequestAPI):
         super(FanartTV, self).__init__(
             req_api_name='FanartTV',
             req_api_url=API_URL,
-            req_api_key='api_key={}'.format(api_key))
-        self.req_api_key = 'api_key={0}'.format(api_key) if api_key else self.req_api_key
-        self.req_api_key = '{0}&client_key={1}'.format(self.req_api_key, client_key) if client_key else self.req_api_key
+            req_api_key=u'api_key={}'.format(api_key))
+        self.req_api_key = u'api_key={0}'.format(api_key) if api_key else self.req_api_key
+        self.req_api_key = u'{0}&client_key={1}'.format(self.req_api_key, client_key) if client_key else self.req_api_key
         self.language = language[:2] if language else 'en'
         self.cache_only = cache_only
         self.cache_refresh = cache_refresh
@@ -81,7 +81,7 @@ class FanartTV(RequestAPI):
     def get_artwork_type(self, ftv_id, ftv_type, artwork_type):
         return cache.use_cache(
             self._get_artwork_type, ftv_id, ftv_type, artwork_type,
-            cache_name='fanart_tv.type.{}.{}.{}.{}'.format(self.language, ftv_id, ftv_type, artwork_type),
+            cache_name=u'fanart_tv.type.{}.{}.{}.{}'.format(self.language, ftv_id, ftv_type, artwork_type),
             cache_only=self.cache_only,
             cache_refresh=self.cache_refresh)
 
@@ -100,7 +100,7 @@ class FanartTV(RequestAPI):
     def get_best_artwork(self, ftv_id, ftv_type, artwork_type):
         return cache.use_cache(
             self._get_best_artwork, ftv_id, ftv_type, artwork_type,
-            cache_name='fanart_tv.best.{}.{}.{}.{}'.format(self.language, ftv_id, ftv_type, artwork_type),
+            cache_name=u'fanart_tv.best.{}.{}.{}.{}'.format(self.language, ftv_id, ftv_type, artwork_type),
             cache_only=self.cache_only,
             cache_refresh=self.cache_refresh)
 
@@ -269,7 +269,7 @@ class FanartTV(RequestAPI):
         for i in ARTWORK_TYPES.get(ftv_type, {}).get(artwork_type, []):
             success = cache.set_cache(
                 artwork_items[choice].get('url'),
-                cache_name='fanart_tv.best.{}.{}.{}.{}'.format(self.language, ftv_id, ftv_type, i),
+                cache_name=u'fanart_tv.best.{}.{}.{}.{}'.format(self.language, ftv_id, ftv_type, i),
                 cache_days=10000)
         if success and container_refresh:
             xbmc.executebuiltin('Container.Refresh')

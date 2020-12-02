@@ -46,9 +46,9 @@ class RequestAPI(object):
         self.req_api_url = req_api_url or ''
         self.req_api_key = req_api_key or ''
         self.req_api_name = req_api_name or ''
-        self.req_connect_err_prop = 'ConnectionError.{}'.format(self.req_api_name)
+        self.req_connect_err_prop = u'ConnectionError.{}'.format(self.req_api_name)
         self.req_connect_err = get_property(self.req_connect_err_prop, is_type=float) or 0
-        self.req_500_err_prop = '500Error.{}'.format(self.req_api_name)
+        self.req_500_err_prop = u'500Error.{}'.format(self.req_api_name)
         self.req_500_err = get_property(self.req_500_err_prop)
         self.req_500_err = loads(self.req_500_err) if self.req_500_err else {}
         self.headers = None

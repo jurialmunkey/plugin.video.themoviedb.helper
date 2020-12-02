@@ -61,8 +61,8 @@ class TraktLists():
             kwargs['query'] = query = xbmcgui.Dialog().input(ADDON.getLocalizedString(32044))
             if not kwargs['query']:
                 return
-            self.container_update = '{},replace'.format(encode_url(PLUGINPATH, **kwargs))
-        items = self.trakt_api.get_list_of_lists(path='search/list?query={}'.format(query))
+            self.container_update = u'{},replace'.format(encode_url(PLUGINPATH, **kwargs))
+        items = self.trakt_api.get_list_of_lists(path=u'search/list?query={}'.format(query))
         self.library = 'video'
         return items
 

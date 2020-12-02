@@ -9,7 +9,7 @@ import unicodedata
 from resources.lib.addon.timedate import get_timedelta, get_datetime_now
 from resources.lib.addon.parser import try_int, try_encode
 from resources.lib.addon.plugin import ADDON, ADDONDATA, kodi_log
-from resources.lib.addon.constants import VALID_FILECHARS
+from resources.lib.addon.constants import ALPHANUM_CHARS, INVALID_FILECHARS
 from resources.lib.addon.timedate import is_future_timestamp
 try:
     import cPickle as _pickle
@@ -19,17 +19,16 @@ if sys.version_info[0] >= 3:
     unicode = str  # In Py3 str is now unicode
 
 
-def validify_filename(filename):
+def validify_filename(filename, alphanum=False):
     try:
         filename = unicode(filename, 'utf-8')
     except NameError:  # unicode is a default on python 3
         pass
     except TypeError:  # already unicode
         pass
-    filename = str(unicodedata.normalize('NFD', filename).encode('ascii', 'ignore').decode("utf-8"))
-    filename = ''.join(c for c in filename if c in VALID_FILECHARS)
-    filename = filename[:-1] if filename.endswith('.') else filename
-    return filename
+    filename = unicodedata.normalize('NFD', filename)
+    filename = u''.join([c for c in filename if (not alphanum or c in ALPHANUM_CHARS) and c not in INVALID_FILECHARS])
+    return filename.strip('.')
 
 
 def normalise_filesize(filesize):
@@ -38,9 +37,9 @@ def normalise_filesize(filesize):
     i_str = ['B', 'KB', 'MB', 'GB', 'TB']
     for i in i_str:
         if filesize < i_flt:
-            return '{:.2f} {}'.format(filesize, i)
+            return u'{:.2f} {}'.format(filesize, i)
         filesize = filesize / i_flt
-    return '{:.2f} {}'.format(filesize, 'PB')
+    return u'{:.2f} {}'.format(filesize, 'PB')
 
 
 def get_files_in_folder(folder, regex):
@@ -73,8 +72,8 @@ def get_tmdb_id_nfo(basedir, foldername, tmdb_type='tv'):
         # Check our nfo files for TMDb ID
         for nfo in nfo_list:
             content = read_file(folder + nfo)  # Get contents of .nfo file
-            tmdb_id = content.replace('https://www.themoviedb.org/{}/'.format(tmdb_type), '')  # Clean content to retrieve tmdb_id
-            tmdb_id = tmdb_id.replace('&islocal=True', '')
+            tmdb_id = content.replace(u'https://www.themoviedb.org/{}/'.format(tmdb_type), '')  # Clean content to retrieve tmdb_id
+            tmdb_id = tmdb_id.replace(u'&islocal=True', '')
             if tmdb_id:
                 return tmdb_id
 
@@ -113,14 +112,14 @@ def make_path(path, warn_dialog=False):
     if not warn_dialog:
         return
     xbmcgui.Dialog().ok(
-        'XBMCVFS', '{} [B]{}[/B]\n{}'.format(
+        'XBMCVFS', u'{} [B]{}[/B]\n{}'.format(
             ADDON.getLocalizedString(32122), path, ADDON.getLocalizedString(32123)))
 
 
-def get_pickle_name(cache_name):
+def get_pickle_name(cache_name, alphanum=False):
     cache_name = cache_name or ''
     cache_name = cache_name.replace('\\', '_').replace('/', '_').replace('.', '_').replace('?', '_').replace('&', '_').replace('=', '_').replace('__', '_')
-    return validify_filename(cache_name).rstrip('_')
+    return validify_filename(cache_name, alphanum=alphanum).rstrip('_')
 
 
 def set_pickle(my_object, cache_name, cache_days=14):

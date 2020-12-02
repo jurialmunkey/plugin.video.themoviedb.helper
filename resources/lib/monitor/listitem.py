@@ -12,7 +12,7 @@ from threading import Thread
 def get_container():
     widget_id = get_property('WidgetContainer', is_type=int)
     if widget_id:
-        return 'Container({0}).'.format(widget_id)
+        return u'Container({0}).'.format(widget_id)
     return 'Container.'
 
 
@@ -22,7 +22,7 @@ def get_container_item(container=None):
             "Window.IsVisible(movieinformation)] + "
             "!Skin.HasSetting(TMDbHelper.ForceWidgetContainer)"):
         return 'ListItem.'
-    return '{}ListItem.'.format(container or get_container())
+    return u'{}ListItem.'.format(container or get_container())
 
 
 class ListItemMonitor(CommonMonitorFunctions):
@@ -39,13 +39,13 @@ class ListItemMonitor(CommonMonitorFunctions):
         self.container_item = get_container_item(self.container)
 
     def get_infolabel(self, infolabel):
-        return xbmc.getInfoLabel('{}{}'.format(self.container_item, infolabel))
+        return xbmc.getInfoLabel(u'{}{}'.format(self.container_item, infolabel))
 
     def get_position(self):
-        return xbmc.getInfoLabel('{}CurrentItem'.format(self.container))
+        return xbmc.getInfoLabel(u'{}CurrentItem'.format(self.container))
 
     def get_numitems(self):
-        return xbmc.getInfoLabel('{}NumItems'.format(self.container))
+        return xbmc.getInfoLabel(u'{}NumItems'.format(self.container))
 
     def get_imdb_id(self):
         imdb_id = self.get_infolabel('IMDBNumber') or ''
@@ -80,7 +80,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         dbtype = self.get_infolabel('dbtype')
         if not dbtype and self.container == 'Container.':
             return xbmc.getInfoLabel('Container.Content()') or ''
-        return '{0}s'.format(dbtype) if dbtype else ''
+        return u'{0}s'.format(dbtype) if dbtype else ''
 
     def get_tmdb_type(self, dbtype=None):
         return convert_media_type(dbtype or self.dbtype, 'tmdb', strip_plural=True, parent_type=True)

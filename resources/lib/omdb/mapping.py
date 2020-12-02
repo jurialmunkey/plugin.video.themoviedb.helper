@@ -44,22 +44,22 @@ class ItemMapper(_ItemMapper):
             'tomatoReviews': [{
                 'keys': [('infoproperties', 'rottentomatoes_reviewstotal')],
                 'type': float,
-                'func': lambda v: '{:0,.0f}'.format(v)
+                'func': lambda v: u'{:0,.0f}'.format(v)
             }],
             'tomatoFresh': [{
                 'keys': [('infoproperties', 'rottentomatoes_reviewsfresh')],
                 'type': float,
-                'func': lambda v: '{:0,.0f}'.format(v)
+                'func': lambda v: u'{:0,.0f}'.format(v)
             }],
             'tomatoRotten': [{
                 'keys': [('infoproperties', 'rottentomatoes_reviewsrotten')],
                 'type': float,
-                'func': lambda v: '{:0,.0f}'.format(v)
+                'func': lambda v: u'{:0,.0f}'.format(v)
             }],
             'tomatoUserReviews': [{
                 'keys': [('infoproperties', 'rottentomatoes_userreviews')],
                 'type': float,
-                'func': lambda v: '{:0,.0f}'.format(v)
+                'func': lambda v: u'{:0,.0f}'.format(v)
             }]
         }
         self.standard_map = {

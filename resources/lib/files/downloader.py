@@ -59,24 +59,24 @@ class Downloader(object):
     @lazyimport_requests
     def check_url(self, url, cred):
         if not self.is_url(url):
-            kodi_log("URL is not of a valid schema: {0}".format(url), 1)
+            kodi_log(u"URL is not of a valid schema: {0}".format(url), 1)
             return False
         try:
             response = requests.head(url, allow_redirects=True, auth=cred)
             if response.status_code < 300:
-                kodi_log("URL check passed for {0}: Status code [{1}]".format(url, response.status_code), 1)
+                kodi_log(u"URL check passed for {0}: Status code [{1}]".format(url, response.status_code), 1)
                 return True
             elif response.status_code < 400:
-                kodi_log("URL check redirected from {0} to {1}: Status code [{2}]".format(url, response.headers['Location'], response.status_code), 1)
+                kodi_log(u"URL check redirected from {0} to {1}: Status code [{2}]".format(url, response.headers['Location'], response.status_code), 1)
                 return self.check_url(response.headers['Location'])
             elif response.status_code == 401:
-                kodi_log("URL requires authentication for {0}: Status code [{1}]".format(url, response.status_code), 1)
+                kodi_log(u"URL requires authentication for {0}: Status code [{1}]".format(url, response.status_code), 1)
                 return 'auth'
             else:
-                kodi_log("URL check failed for {0}: Status code [{1}]".format(url, response.status_code), 1)
+                kodi_log(u"URL check failed for {0}: Status code [{1}]".format(url, response.status_code), 1)
                 return False
         except Exception as e:
-            kodi_log("URL check error for {0}: [{1}]".format(url, e), 1)
+            kodi_log(u"URL check error for {0}: [{1}]".format(url, e), 1)
             return False
 
     @lazyimport_requests
@@ -165,4 +165,4 @@ class Downloader(object):
                 kodi_log(u'Could not delete package {0}: {1}'.format(_tempzip, str(e)))
 
         if num_files:
-            xbmcgui.Dialog().ok(ADDON.getAddonInfo('name'), '{0}\n\n{1} {2}.'.format(ADDON.getLocalizedString(32059), num_files, ADDON.getLocalizedString(32060)))
+            xbmcgui.Dialog().ok(ADDON.getAddonInfo('name'), u'{0}\n\n{1} {2}.'.format(ADDON.getLocalizedString(32059), num_files, ADDON.getLocalizedString(32060)))

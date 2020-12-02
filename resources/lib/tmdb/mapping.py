@@ -8,11 +8,11 @@ from resources.lib.api.mapping import UPDATE_BASEKEY, _ItemMapper, get_empty_ite
 
 
 def get_imagepath_poster(v):
-    return '{}{}'.format(IMAGEPATH_POSTER, v)
+    return u'{}{}'.format(IMAGEPATH_POSTER, v)
 
 
 def get_imagepath_fanart(v):
-    return '{}{}'.format(IMAGEPATH_ORIGINAL, v)
+    return u'{}{}'.format(IMAGEPATH_ORIGINAL, v)
 
 
 def get_runtime(v, *args, **kwargs):
@@ -44,16 +44,16 @@ def get_collection_properties(v):
     infoproperties = {}
     year_l, year_h, votes = 9999, 0, 0
     for p, i in enumerate(v):
-        infoproperties['set.{}.title'.format(p)] = i.get('title', '')
-        infoproperties['set.{}.tmdb_id'.format(p)] = i.get('id', '')
-        infoproperties['set.{}.originaltitle'.format(p)] = i.get('original_title', '')
-        infoproperties['set.{}.plot'.format(p)] = i.get('overview', '')
-        infoproperties['set.{}.premiered'.format(p)] = i.get('release_date', '')
-        infoproperties['set.{}.year'.format(p)] = i.get('release_date', '')[:4]
-        infoproperties['set.{}.rating'.format(p)] = '{:0,.1f}'.format(try_float(i.get('vote_average')))
-        infoproperties['set.{}.votes'.format(p)] = i.get('vote_count', '')
-        infoproperties['set.{}.poster'.format(p)] = get_imagepath_poster(i.get('poster_path', ''))
-        infoproperties['set.{}.fanart'.format(p)] = get_imagepath_fanart(i.get('backdrop_path', ''))
+        infoproperties[u'set.{}.title'.format(p)] = i.get('title', '')
+        infoproperties[u'set.{}.tmdb_id'.format(p)] = i.get('id', '')
+        infoproperties[u'set.{}.originaltitle'.format(p)] = i.get('original_title', '')
+        infoproperties[u'set.{}.plot'.format(p)] = i.get('overview', '')
+        infoproperties[u'set.{}.premiered'.format(p)] = i.get('release_date', '')
+        infoproperties[u'set.{}.year'.format(p)] = i.get('release_date', '')[:4]
+        infoproperties[u'set.{}.rating'.format(p)] = u'{:0,.1f}'.format(try_float(i.get('vote_average')))
+        infoproperties[u'set.{}.votes'.format(p)] = i.get('vote_count', '')
+        infoproperties[u'set.{}.poster'.format(p)] = get_imagepath_poster(i.get('poster_path', ''))
+        infoproperties[u'set.{}.fanart'.format(p)] = get_imagepath_fanart(i.get('backdrop_path', ''))
         year_l = min(try_int(i.get('release_date', '')[:4]), year_l)
         year_h = max(try_int(i.get('release_date', '')[:4]), year_h)
         if i.get('vote_average'):
@@ -66,11 +66,11 @@ def get_collection_properties(v):
     if year_h:
         infoproperties['set.year.last'] = year_h
     if year_l and year_h:
-        infoproperties['set.years'] = '{0} - {1}'.format(year_l, year_h)
+        infoproperties['set.years'] = u'{0} - {1}'.format(year_l, year_h)
     if len(ratings):
-        infoproperties['set.rating'] = infoproperties['tmdb_rating'] = '{:0,.1f}'.format(sum(ratings) / len(ratings))
+        infoproperties['set.rating'] = infoproperties['tmdb_rating'] = u'{:0,.1f}'.format(sum(ratings) / len(ratings))
     if votes:
-        infoproperties['set.votes'] = infoproperties['tmdb_votes'] = '{:0,.0f}'.format(votes)
+        infoproperties['set.votes'] = infoproperties['tmdb_votes'] = u'{:0,.0f}'.format(votes)
     infoproperties['set.numitems'] = p
     return infoproperties
 
@@ -112,16 +112,16 @@ def get_providers(v):
             continue
         # If provider already added just update type
         if i['provider_name'] in added:
-            idx = 'provider.{}.type'.format(added.index(i['provider_name']) + 1)
+            idx = u'provider.{}.type'.format(added.index(i['provider_name']) + 1)
             infoproperties[idx] = u'{} / {}'.format(infoproperties.get(idx), i.get('key'))
             continue
         # Add item provider
         x = len(added) + 1
         infoproperties.update({
-            'provider.{}.id'.format(x): i.get('provider_id'),
-            'provider.{}.type'.format(x): i.get('key'),
-            'provider.{}.name'.format(x): i['provider_name'],
-            'provider.{}.icon'.format(x): get_imagepath_poster(i.get('logo_path'))})
+            u'provider.{}.id'.format(x): i.get('provider_id'),
+            u'provider.{}.type'.format(x): i.get('key'),
+            u'provider.{}.name'.format(x): i['provider_name'],
+            u'provider.{}.icon'.format(x): get_imagepath_poster(i.get('logo_path'))})
         added_append(i['provider_name'])
     return infoproperties
 
@@ -132,7 +132,7 @@ def get_trailer(v):
     for i in v.get('results') or []:
         if i.get('type', '') != 'Trailer' or i.get('site', '') != 'YouTube' or not i.get('key'):
             continue
-        return 'plugin://plugin.video.youtube/play/?video_id={0}'.format(i.get('key'))
+        return u'plugin://plugin.video.youtube/play/?video_id={0}'.format(i.get('key'))
 
 
 def _get_genre_by_id(genre_id):
@@ -160,17 +160,17 @@ def get_external_ids(v):
 def get_episode_to_air(v, name):
     i = v or {}
     infoproperties = {}
-    infoproperties['{}'.format(name)] = format_date(i.get('air_date'), xbmc.getRegion('dateshort'))
-    infoproperties['{}.long'.format(name)] = format_date(i.get('air_date'), xbmc.getRegion('datelong'))
-    infoproperties['{}.day'.format(name)] = format_date(i.get('air_date'), "%A")
-    infoproperties['{}.episode'.format(name)] = i.get('episode_number')
-    infoproperties['{}.name'.format(name)] = i.get('name')
-    infoproperties['{}.tmdb_id'.format(name)] = i.get('id')
-    infoproperties['{}.plot'.format(name)] = i.get('overview')
-    infoproperties['{}.season'.format(name)] = i.get('season_number')
-    infoproperties['{}.rating'.format(name)] = '{:0,.1f}'.format(try_float(i.get('vote_average')))
-    infoproperties['{}.votes'.format(name)] = i.get('vote_count')
-    infoproperties['{}.thumb'.format(name)] = get_imagepath_poster(i.get('still_path'))
+    infoproperties[u'{}'.format(name)] = format_date(i.get('air_date'), xbmc.getRegion('dateshort'))
+    infoproperties[u'{}.long'.format(name)] = format_date(i.get('air_date'), xbmc.getRegion('datelong'))
+    infoproperties[u'{}.day'.format(name)] = format_date(i.get('air_date'), "%A")
+    infoproperties[u'{}.episode'.format(name)] = i.get('episode_number')
+    infoproperties[u'{}.name'.format(name)] = i.get('name')
+    infoproperties[u'{}.tmdb_id'.format(name)] = i.get('id')
+    infoproperties[u'{}.plot'.format(name)] = i.get('overview')
+    infoproperties[u'{}.season'.format(name)] = i.get('season_number')
+    infoproperties[u'{}.rating'.format(name)] = u'{:0,.1f}'.format(try_float(i.get('vote_average')))
+    infoproperties[u'{}.votes'.format(name)] = i.get('vote_count')
+    infoproperties[u'{}.thumb'.format(name)] = get_imagepath_poster(i.get('still_path'))
     return infoproperties
 
 
@@ -210,17 +210,17 @@ def get_cast(item):
 
 def set_crew_properties(i, x, prefix):
     infoproperties = {}
-    p = '{}.{}.'.format(prefix, x)
+    p = u'{}.{}.'.format(prefix, x)
     if i.get('name'):
-        infoproperties['{}name'.format(p)] = i['name']
+        infoproperties[u'{}name'.format(p)] = i['name']
     if i.get('job'):
-        infoproperties['{}role'.format(p)] = infoproperties['{}job'.format(p)] = i['job']
+        infoproperties[u'{}role'.format(p)] = infoproperties[u'{}job'.format(p)] = i['job']
     if i.get('character'):
-        infoproperties['{}role'.format(p)] = infoproperties['{}character'.format(p)] = i['character']
+        infoproperties[u'{}role'.format(p)] = infoproperties[u'{}character'.format(p)] = i['character']
     if i.get('department'):
-        infoproperties['{}department'.format(p)] = i['department']
+        infoproperties[u'{}department'.format(p)] = i['department']
     if i.get('profile_path'):
-        infoproperties['{}thumb'.format(p)] = get_imagepath_poster(i['profile_path'])
+        infoproperties[u'{}thumb'.format(p)] = get_imagepath_poster(i['profile_path'])
     return infoproperties
 
 
@@ -332,22 +332,22 @@ class ItemMapper(_ItemMapper):
             'vote_count': [{
                 'keys': [('infolabels', 'votes'), ('infoproperties', 'tmdb_votes')],
                 'type': float,
-                'func': lambda v: '{:0,.0f}'.format(v)
+                'func': lambda v: u'{:0,.0f}'.format(v)
             }],
             'vote_average': [{
                 'keys': [('infolabels', 'rating'), ('infoproperties', 'tmdb_rating')],
                 'type': float,
-                'func': lambda v: '{:.1f}'.format(v)
+                'func': lambda v: u'{:.1f}'.format(v)
             }],
             'budget': [{
                 'keys': [('infoproperties', 'budget')],
                 'type': float,
-                'func': lambda v: '${:0,.0f}'.format(v)
+                'func': lambda v: u'${:0,.0f}'.format(v)
             }],
             'revenue': [{
                 'keys': [('infoproperties', 'revenue')],
                 'type': float,
-                'func': lambda v: '${:0,.0f}'.format(v)
+                'func': lambda v: u'${:0,.0f}'.format(v)
             }],
             'spoken_languages': [{
                 'keys': [('infoproperties', UPDATE_BASEKEY)],
@@ -554,7 +554,7 @@ class ItemMapper(_ItemMapper):
         }
 
     def finalise_image(self, item):
-        item['infolabels']['title'] = '{}x{}'.format(
+        item['infolabels']['title'] = u'{}x{}'.format(
             item['infoproperties'].get('width'),
             item['infoproperties'].get('height'))
         item['params'] = -1
@@ -582,7 +582,7 @@ class ItemMapper(_ItemMapper):
         item['infolabels']['mediatype'] = item['infoproperties']['dbtype'] = convert_type(tmdb_type, 'dbtype')
         item['art']['thumb'] = item['art'].get('thumb') or item['art'].get('poster')
         for k, v in viewitems(item['unique_ids']):
-            item['infoproperties']['{}_id'.format(k)] = v
+            item['infoproperties'][u'{}_id'.format(k)] = v
         return item
 
     def get_info(self, info_item, tmdb_type, base_item=None, **kwargs):

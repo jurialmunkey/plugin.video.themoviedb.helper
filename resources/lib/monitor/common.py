@@ -4,9 +4,11 @@ from resources.lib.tmdb.api import TMDb
 from resources.lib.omdb.api import OMDb
 from resources.lib.trakt.api import TraktAPI
 from resources.lib.fanarttv.api import FanartTV
-from resources.lib.addon.plugin import ADDON, kodi_log, viewitems
+from resources.lib.addon.plugin import ADDON, viewitems, kodi_traceback
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.setutils import merge_two_dicts
+from resources.lib.addon.decorators import try_except_log
+
 
 SETMAIN = {
     'label', 'tmdb_id', 'imdb_id'}
@@ -40,22 +42,18 @@ class CommonMonitorFunctions(object):
         self.imdb_top250 = {}
         self.property_prefix = 'ListItem'
 
+    @try_except_log('lib.monitor.common clear_property')
     def clear_property(self, key):
-        key = '{}.{}'.format(self.property_prefix, key)
-        try:
-            get_property(key, clear_property=True)
-        except Exception as exc:
-            kodi_log(['Func: clear_property\n', key, exc], 1)
+        key = u'{}.{}'.format(self.property_prefix, key)
+        get_property(key, clear_property=True)
 
+    @try_except_log('lib.monitor.common set_property')
     def set_property(self, key, value):
-        key = '{}.{}'.format(self.property_prefix, key)
-        try:
-            if value is None:
-                get_property(key, clear_property=True)
-            else:
-                get_property(key, set_property=u'{0}'.format(value))
-        except Exception as exc:
-            kodi_log(u'set_property: {}{}'.format(key, exc), 1)
+        key = u'{}.{}'.format(self.property_prefix, key)
+        if value is None:
+            get_property(key, clear_property=True)
+        else:
+            get_property(key, set_property=u'{0}'.format(value))
 
     def set_iter_properties(self, dictionary, keys):
         if not isinstance(dictionary, dict):
@@ -67,11 +65,11 @@ class CommonMonitorFunctions(object):
                     try:
                         v = ' / '.join(v)
                     except Exception as exc:
-                        kodi_log(u'Func: set_iter_properties - list\n{0}'.format(exc), 1)
+                        kodi_traceback(exc, u'\nlib.monitor.common set_iter_properties\nk: {} v: {}'.format(k, v))
                 self.properties.add(k)
                 self.set_property(k, v)
             except Exception as exc:
-                'k: {} e: {}'.format(k, exc)
+                kodi_traceback(exc, u'\nlib.monitor.common set_iter_properties\nk: {}'.format(k))
 
     def set_indexed_properties(self, dictionary):
         if not isinstance(dictionary, dict):
@@ -86,35 +84,31 @@ class CommonMonitorFunctions(object):
                 self.set_property(k, v)
                 index_properties.add(k)
             except Exception as exc:
-                kodi_log(u'k: {0} v: {1} e: {2}'.format(k, v, exc), 1)
+                kodi_traceback(exc, u'\nlib.monitor.common set_indexed_properties\nk: {} v: {}'.format(k, v))
 
         for k in (self.index_properties - index_properties):
             self.clear_property(k)
         self.index_properties = index_properties.copy()
 
+    @try_except_log('lib.monitor.common set_list_properties')
     def set_list_properties(self, items, key, prop):
         if not isinstance(items, list):
             return
-        try:
-            joinlist = [i[key] for i in items[:10] if i.get(key)]
-            joinlist = ' / '.join(joinlist)
-            self.properties.add(prop)
-            self.set_property(prop, joinlist)
-        except Exception as exc:
-            kodi_log(u'Func: set_list_properties\n{0}'.format(exc), 1)
+        joinlist = [i[key] for i in items[:10] if i.get(key)]
+        joinlist = ' / '.join(joinlist)
+        self.properties.add(prop)
+        self.set_property(prop, joinlist)
 
+    @try_except_log('lib.monitor.common set_time_properties')
     def set_time_properties(self, duration):
-        try:
-            minutes = duration // 60 % 60
-            hours = duration // 60 // 60
-            totalmin = duration // 60
-            self.set_property('Duration', totalmin)
-            self.set_property('Duration_H', hours)
-            self.set_property('Duration_M', minutes)
-            self.set_property('Duration_HHMM', '{0:02d}:{1:02d}'.format(hours, minutes))
-            self.properties.update(['Duration', 'Duration_H', 'Duration_M', 'Duration_HHMM'])
-        except Exception as exc:
-            'Func: set_time_properties\n{0}'.format(exc)
+        minutes = duration // 60 % 60
+        hours = duration // 60 // 60
+        totalmin = duration // 60
+        self.set_property('Duration', totalmin)
+        self.set_property('Duration_H', hours)
+        self.set_property('Duration_M', minutes)
+        self.set_property('Duration_HHMM', u'{0:02d}:{1:02d}'.format(hours, minutes))
+        self.properties.update(['Duration', 'Duration_H', 'Duration_M', 'Duration_HHMM'])
 
     def set_properties(self, item):
         self.set_iter_properties(item, SETMAIN)
@@ -125,13 +119,11 @@ class CommonMonitorFunctions(object):
         if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableExtendedProperties)"):
             self.set_indexed_properties(item.get('infoproperties', {}))
 
+    @try_except_log('lib.monitor.common get_tmdb_id')
     def get_tmdb_id(self, tmdb_type, imdb_id=None, query=None, year=None, episode_year=None):
-        try:
-            if imdb_id and imdb_id.startswith('tt'):
-                return self.tmdb_api.get_tmdb_id(tmdb_type=tmdb_type, imdb_id=imdb_id)
-            return self.tmdb_api.get_tmdb_id(tmdb_type=tmdb_type, query=query, year=year, episode_year=episode_year)
-        except Exception as exc:
-            kodi_log(u'Func: get_tmdb_id\n{0}'.format(exc), 1)
+        if imdb_id and imdb_id.startswith('tt'):
+            return self.tmdb_api.get_tmdb_id(tmdb_type=tmdb_type, imdb_id=imdb_id)
+        return self.tmdb_api.get_tmdb_id(tmdb_type=tmdb_type, query=query, year=year, episode_year=episode_year)
 
     def get_fanarttv_artwork(self, item, tmdb_type=None, tmdb_id=None, tvdb_id=None):
         if not self.fanarttv or tmdb_type not in ['movie', 'tv']:

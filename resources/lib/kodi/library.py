@@ -76,7 +76,7 @@ class LibraryAdder():
             self.add_tvshow(tmdb_id=i['tmdb_id'], force=force)
 
         # Update last updated stamp
-        ADDON.setSettingString('last_autoupdate', 'Last updated {}'.format(get_current_date_time()))
+        ADDON.setSettingString('last_autoupdate', u'Last updated {}'.format(get_current_date_time()))
 
     def add_userlist(self, user_slug=None, list_slug=None, confirm=True, force=False, **kwargs):
         request = get_userlist(user_slug=user_slug, list_slug=list_slug, confirm=confirm, busy_spinner=self.p_dialog)
