@@ -90,14 +90,14 @@ def get_person_stats(person):
 def set_watched(dbid=None, dbtype=None, plays=1):
     if not dbid or not dbtype:
         return
-    db_key = "{}id".format(dbtype)
+    db_key = u"{}id".format(dbtype)
     json_info = get_jsonrpc(
-        method="VideoLibrary.Get{}Details".format(dbtype.capitalize()),
+        method=u"VideoLibrary.Get{}Details".format(dbtype.capitalize()),
         params={db_key: dbid, "properties": ["playcount"]})
     playcount = json_info.get('result', {}).get('{}details'.format(dbtype), {}).get('playcount', 0)
     playcount = try_int(playcount) + plays
     return get_jsonrpc(
-        method="VideoLibrary.Set{}Details".format(dbtype.capitalize()),
+        method=u"VideoLibrary.Set{}Details".format(dbtype.capitalize()),
         params={db_key: dbid, "playcount": playcount})
 
 
@@ -117,12 +117,12 @@ def _get_item_details(dbid=None, method=None, key=None, properties=None):
     if not dbid or not method or not key or not properties:
         return {}
     params = {
-        "{0}id".format(key): try_int(dbid),
+        u"{0}id".format(key): try_int(dbid),
         "properties": properties}
     details = get_jsonrpc(method, params)
     if not details or not isinstance(details, dict):
         return {}
-    details = details.get('result', {}).get('{0}details'.format(key))
+    details = details.get('result', {}).get(u'{0}details'.format(key))
     if details:
         details['dbid'] = dbid
         return ItemMapper(key=key).get_info(details)
@@ -192,8 +192,8 @@ class KodiLibrary(object):
         if dbtype == "episode":
             method = "VideoLibrary.GetEpisodes"
             params = {"tvshowid": tvshowid, "properties": ["title", "showtitle", "season", "episode", "file"]}
-        dbid_name = '{0}id'.format(dbtype)
-        key_to_get = '{0}s'.format(dbtype)
+        dbid_name = u'{0}id'.format(dbtype)
+        key_to_get = u'{0}s'.format(dbtype)
         response = get_jsonrpc(method, params)
         return [{
             'imdb_id': item.get('uniqueid', {}).get('imdb'),

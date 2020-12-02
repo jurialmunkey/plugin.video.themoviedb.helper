@@ -56,8 +56,8 @@ class _ListItem(object):
         if not next_page:
             return
         self.label = xbmc.getLocalizedString(33078)
-        self.art['thumb'] = '{}/resources/icons/tmdb/nextpage.png'.format(ADDONPATH)
-        self.art['landscape'] = '{}/resources/icons/tmdb/nextpage_wide.png'.format(ADDONPATH)
+        self.art['thumb'] = u'{}/resources/icons/tmdb/nextpage.png'.format(ADDONPATH)
+        self.art['landscape'] = u'{}/resources/icons/tmdb/nextpage_wide.png'.format(ADDONPATH)
         self.infoproperties['specialsort'] = 'bottom'
         self.params = self.parent_params.copy()
         self.params['page'] = next_page
@@ -67,9 +67,9 @@ class _ListItem(object):
 
     def set_art_fallbacks(self):
         if not self.art.get('thumb'):
-            self.art['thumb'] = '{}/resources/poster.png'.format(ADDONPATH)
+            self.art['thumb'] = u'{}/resources/poster.png'.format(ADDONPATH)
         if not self.art.get('fanart'):
-            self.art['fanart'] = '{}/fanart.jpg'.format(ADDONPATH)
+            self.art['fanart'] = u'{}/fanart.jpg'.format(ADDONPATH)
         return self.art
 
     def get_trakt_type(self):
@@ -134,13 +134,13 @@ class _ListItem(object):
         for k, v in viewitems(self.unique_ids):
             if not v:
                 continue
-            self.infoproperties['{}_id'.format(k)] = v
+            self.infoproperties[u'{}_id'.format(k)] = v
 
     def set_params_to_info(self, widget=None):
         for k, v in viewitems(self.params):
             if not k or not v:
                 continue
-            self.infoproperties['item.{}'.format(k)] = v
+            self.infoproperties[u'item.{}'.format(k)] = v
         if self.params.get('tmdb_type'):
             self.infoproperties['item.type'] = self.params['tmdb_type']
         if widget:
@@ -230,7 +230,7 @@ class _Video(_ListItem):
         else:
             self.params['info'] = 'related'
         self.is_folder = False
-        self.infoproperties['tmdbhelper.context.playusing'] = '{}&ignore_default=true'.format(self.get_url())
+        self.infoproperties['tmdbhelper.context.playusing'] = u'{}&ignore_default=true'.format(self.get_url())
 
     def _set_params_reroute_details(self, flatten_seasons):
         self._set_params_reroute_default()
@@ -313,7 +313,7 @@ class _Episode(_Tvshow):
         if (self.parent_params.get('info') == 'library_nextaired'
                 and ADDON.getSettingBool('nextaired_linklibrary')
                 and self.infoproperties.get('tvshow.dbid')):
-            self.path = 'videodb://tvshows/titles/{}/'.format(self.infoproperties['tvshow.dbid'])
+            self.path = u'videodb://tvshows/titles/{}/'.format(self.infoproperties['tvshow.dbid'])
             self.params = {}
             self.is_folder = True
             return

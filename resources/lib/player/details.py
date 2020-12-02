@@ -114,7 +114,7 @@ def get_language_details(base, tmdb_type, tmdb_id, season=None, episode=None, la
     item = {k: v or base.get(k) for k, v in viewitems(item)}  # Fallback to default key in base if translation is empty
     item = _url_encode_item(item)
     for k, v in viewitems(item):
-        base['{}_{}'.format(language, k)] = v
+        base[u'{}_{}'.format(language, k)] = v
     return _url_encode_item(base)
 
 
@@ -124,7 +124,7 @@ def _url_encode_item(item, base=None):
         if k not in PLAYERS_URLENCODE:
             continue
         v = u'{0}'.format(v)
-        for key, value in viewitems({k: v, '{}_meta'.format(k): dumps(v)}):
+        for key, value in viewitems({k: v, u'{}_meta'.format(k): dumps(v)}):
             item[key] = value.replace(',', '')
             item[key + '_+'] = value.replace(',', '').replace(' ', '+')
             item[key + '_-'] = value.replace(',', '').replace(' ', '-')

@@ -40,7 +40,7 @@ class _TraktProgress():
             return
         watch_episodes = use_lastupdated_cache(
             self.get_episodes_watchcount, slug, 'slug', tvshow=item, count_progress=True,
-            cache_name='TraktAPI.get_episodes_watchcount.response.slug.{}.True'.format(slug),
+            cache_name=u'TraktAPI.get_episodes_watchcount.response.slug.{}.True'.format(slug),
             sync_info=item)
         if aired_episodes <= watch_episodes:
             return
@@ -150,7 +150,7 @@ class _TraktProgress():
         return use_lastupdated_cache(
             self.get_response_json, 'shows', slug, 'progress/watched',
             sync_info=self.get_sync('watched', 'show', 'slug').get(slug),
-            cache_name='TraktAPI.get_show_progress.response.{}'.format(slug))
+            cache_name=u'TraktAPI.get_show_progress.response.{}'.format(slug))
 
     @is_authorized
     def get_upnext_episodes(self, slug, show, get_single_episode=False):
@@ -248,7 +248,7 @@ class _TraktProgress():
             'air_day': air_date.strftime('%A'),
             'air_day_short': air_date.strftime('%a'),
             'air_date_short': air_date.strftime('%d %b')}
-        item['unique_ids'] = {'tvshow.{}'.format(k): v for k, v in viewitems(i.get('show', {}).get('ids', {}))}
+        item['unique_ids'] = {u'tvshow.{}'.format(k): v for k, v in viewitems(i.get('show', {}).get('ids', {}))}
         item['params'] = {
             'info': 'details',
             'tmdb_type': 'tv',

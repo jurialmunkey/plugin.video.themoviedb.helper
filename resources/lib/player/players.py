@@ -65,7 +65,7 @@ def resolve_to_dummy(handle=None, stop_after=1):
         return
 
     # Set our dummy resolved url
-    path = '{}/resources/dummy.mp4'.format(ADDONPATH)
+    path = u'{}/resources/dummy.mp4'.format(ADDONPATH)
     kodi_log(['lib.player.players - attempt to resolve dummy file\n', path], 1)
     xbmcplugin.setResolvedUrl(handle, True, ListItem(path=path).get_listitem())
 
@@ -131,12 +131,12 @@ class Players(object):
         if not file:
             return []
         return [{
-            'name': '{} Kodi'.format(ADDON.getLocalizedString(32061)),
+            'name': u'{} Kodi'.format(ADDON.getLocalizedString(32061)),
             'is_folder': False,
             'is_local': True,
             'is_resolvable': "true",
             'plugin_name': 'xbmc.core',
-            'plugin_icon': '{}/resources/icons/other/kodi.png'.format(ADDONPATH),
+            'plugin_icon': u'{}/resources/icons/other/kodi.png'.format(ADDONPATH),
             'actions': file}]
 
     def _get_local_file(self, file):
@@ -193,11 +193,11 @@ class Players(object):
         dialog_players = [] if not clear_player else [{
             'name': ADDON.getLocalizedString(32311),
             'plugin_name': 'plugin.video.themoviedb.helper',
-            'plugin_icon': '{}/resources/icons/other/kodi.png'.format(ADDONPATH)}]
+            'plugin_icon': u'{}/resources/icons/other/kodi.png'.format(ADDONPATH)}]
         dialog_players += self.dialog_players
         players = [ListItem(
             label=i.get('name'),
-            label2='{} v{}'.format(i.get('plugin_name'), xbmcaddon.Addon(i.get('plugin_name', '')).getAddonInfo('version')),
+            label2=u'{} v{}'.format(i.get('plugin_name'), xbmcaddon.Addon(i.get('plugin_name', '')).getAddonInfo('version')),
             art={'thumb': i.get('plugin_icon')}).get_listitem() for i in dialog_players]
         x = xbmcgui.Dialog().select(ADDON.getLocalizedString(32042), players, useDetails=detailed)
         if x == -1:

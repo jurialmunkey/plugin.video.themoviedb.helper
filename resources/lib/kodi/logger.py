@@ -26,5 +26,5 @@ class _LibraryLogger():
         return log_msg
 
     def _out(self):  # TODO: Check logging value
-        filename = '{}.json'.format(get_todays_date(str_fmt='%Y-%m-%d-%H%M%S'))
+        filename = u'{}.json'.format(get_todays_date(str_fmt='%Y-%m-%d-%H%M%S'))
         dumps_to_file(self.logging, 'log_library', filename)

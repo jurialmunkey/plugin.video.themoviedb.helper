@@ -84,7 +84,7 @@ def urlencode_params(*args, **kwargs):
 
 def encode_url(path=None, **kwargs):
     path = path or PLUGINPATH
-    paramstring = '?{}'.format(urlencode_params(**kwargs)) if kwargs else ''
+    paramstring = u'?{}'.format(urlencode_params(**kwargs)) if kwargs else ''
     return u'{}{}'.format(path, paramstring)
 
 

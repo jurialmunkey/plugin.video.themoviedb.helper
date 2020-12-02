@@ -113,7 +113,7 @@ class ImageFunctions(Thread):
         return max(0, min(x, 255))
 
     def crop(self, source):
-        filename = 'cropped-{}.png'.format(md5hash(source))
+        filename = u'cropped-{}.png'.format(md5hash(source))
         destination = self.save_path + filename
         try:
             if xbmcvfs.exists(destination):
@@ -130,7 +130,7 @@ class ImageFunctions(Thread):
             return ''
 
     def blur(self, source, radius=20):
-        filename = '{}{}.png'.format(md5hash(source), radius)
+        filename = u'{}{}.png'.format(md5hash(source), radius)
         destination = self.save_path + filename
         try:
             if xbmcvfs.exists(destination):
@@ -149,7 +149,7 @@ class ImageFunctions(Thread):
             return ''
 
     def desaturate(self, source):
-        filename = '{}.png'.format(md5hash(source))
+        filename = u'{}.png'.format(md5hash(source))
         destination = self.save_path + filename
         try:
             if xbmcvfs.exists(destination):
@@ -194,7 +194,7 @@ class ImageFunctions(Thread):
         return [try_int(self.clamp(i * 255)) for i in [r, g, b]]
 
     def rgb_to_hex(self, r, g, b):
-        return 'FF{:02x}{:02x}{:02x}'.format(r, g, b)
+        return u'FF{:02x}{:02x}{:02x}'.format(r, g, b)
 
     def hex_to_rgb(self, colorhex):
         r = try_int(colorhex[2:4], 16)
@@ -233,7 +233,7 @@ class ImageFunctions(Thread):
         return end_hex
 
     def colors(self, source):
-        filename = '{}.png'.format(md5hash(source))
+        filename = u'{}.png'.format(md5hash(source))
         destination = self.save_path + filename
 
         try:

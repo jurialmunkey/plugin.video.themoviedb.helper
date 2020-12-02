@@ -71,7 +71,7 @@ def create_file(content, filename, *args, **kwargs):
         return
     for folder in args:
         folder = validify_filename(folder)
-        path = '{}{}/'.format(path, folder)
+        path = u'{}{}/'.format(path, folder)
 
     # Validify content of file
     if kwargs.get('clean_url', True):
@@ -86,23 +86,23 @@ def create_file(content, filename, *args, **kwargs):
         return
 
     # Write out our file
-    filepath = '{}{}.{}'.format(path, validify_filename(filename), kwargs.get('file_ext', 'strm'))
+    filepath = u'{}{}.{}'.format(path, validify_filename(filename), kwargs.get('file_ext', 'strm'))
     write_to_file(filepath, content)
     kodi_log(['ADD LIBRARY -- Successfully added:\n', filepath, '\n', content], 2)
     return filepath
 
 
 def create_nfo(tmdb_type, tmdb_id, *args, **kwargs):
-    filename = 'movie' if tmdb_type == 'movie' else 'tvshow'
-    content = 'https://www.themoviedb.org/{}/{}'.format(tmdb_type, tmdb_id)
+    filename = u'movie' if tmdb_type == 'movie' else u'tvshow'
+    content = u'https://www.themoviedb.org/{}/{}'.format(tmdb_type, tmdb_id)
     kwargs['file_ext'], kwargs['clean_url'] = 'nfo', False
     create_file(content, filename, *args, **kwargs)
 
 
 def create_playlist(items, dbtype, user_slug, list_slug):
     """ Creates a smart playlist from a list of titles """
-    filename = '{}-{}-{}'.format(user_slug, list_slug, dbtype)
-    filepath = 'special://profile/playlists/video/'
+    filename = u'{}-{}-{}'.format(user_slug, list_slug, dbtype)
+    filepath = u'special://profile/playlists/video/'
     fcontent = [u'<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>']
     fcontent.append(u'<smartplaylist type="{}">'.format(dbtype))
     fcontent.append(u'    <name>{} by {} ({})</name>'.format(list_slug, user_slug, dbtype))
@@ -110,13 +110,13 @@ def create_playlist(items, dbtype, user_slug, list_slug):
     for i in items:
         fcontent.append(u'    <rule field="{}" operator="is"><value>{}</value></rule>'.format(i[0], i[1]))
     fcontent.append(u'</smartplaylist>')
-    create_file('\n'.join(fcontent), filename, basedir=filepath, file_ext='xsp', clean_url=False)
+    create_file(u'\n'.join(fcontent), filename, basedir=filepath, file_ext='xsp', clean_url=False)
 
 
 def get_unique_folder(name, tmdb_id, basedir):
     nfo_id = get_tmdb_id_nfo(basedir, name) if name in xbmcvfs.listdir(basedir)[0] else None
     if nfo_id and try_int(nfo_id) != try_int(tmdb_id):
-        name += ' (TMDB {})'.format(tmdb_id)
+        name += u' (TMDB {})'.format(tmdb_id)
     return name
 
 

@@ -23,7 +23,7 @@ def _configure_path(path):
     path = path.replace('info=related', 'info=details')
     # TODO: Check if we still need this "extended=True" param
     if 'extended=True' not in path:
-        path = '{}&{}'.format(path, 'extended=True')
+        path = u'{}&{}'.format(path, 'extended=True')
     return path
 
 
@@ -65,7 +65,7 @@ class _EventLoop():
 
     def _on_back(self):
         # Get current position and clear it
-        name = '{}{}'.format(PREFIX_PATH, self.position)
+        name = u'{}{}'.format(PREFIX_PATH, self.position)
         window.wait_for_property(name, None, True)
 
         # If it was first position then let's exit
@@ -74,7 +74,7 @@ class _EventLoop():
 
         # Otherwise set previous position to current position
         self.position -= 1
-        name = '{}{}'.format(PREFIX_PATH, self.position)
+        name = u'{}{}'.format(PREFIX_PATH, self.position)
         self.set_properties(self.position, window.get_property(name))
 
     def _on_change(self):
@@ -115,7 +115,7 @@ class _EventLoop():
 
         # Open the info dialog
         base_window.setFocus(control_list)
-        xbmc.executebuiltin('SetFocus({},0,absolute)'.format(CONTAINER_ID))
+        xbmc.executebuiltin(u'SetFocus({},0,absolute)'.format(CONTAINER_ID))
         xbmc.executebuiltin('Action(Info)')
         if not window.wait_until_active(ID_VIDEOINFO, self.window_id):
             return self._call_exit()
@@ -179,14 +179,14 @@ class WindowManager(_EventLoop):
         window.get_property(PREFIX_COMMAND, clear_property=True)
         window.get_property(PREFIX_CURRENT, clear_property=True)
         window.get_property(PREFIX_POSITION, clear_property=True)
-        window.get_property('{}0'.format(PREFIX_PATH), clear_property=True)
-        window.get_property('{}1'.format(PREFIX_PATH), clear_property=True)
+        window.get_property(u'{}0'.format(PREFIX_PATH), clear_property=True)
+        window.get_property(u'{}1'.format(PREFIX_PATH), clear_property=True)
 
     def set_properties(self, position=1, path=None):
         self.position = position
         self.added_path = path or ''
         window.get_property(PREFIX_CURRENT, set_property=path)
-        window.get_property('{}{}'.format(PREFIX_PATH, position), set_property=path)
+        window.get_property(u'{}{}'.format(PREFIX_PATH, position), set_property=path)
         window.get_property(PREFIX_POSITION, set_property=position)
 
     def call_auto(self):
@@ -234,7 +234,7 @@ class WindowManager(_EventLoop):
         if self.params.get('playmedia'):
             return xbmc.executebuiltin(try_encode(u'PlayMedia(\"{}\")'.format(self.params['playmedia'])))
         if self.params.get('call_id'):
-            return xbmc.executebuiltin('ActivateWindow({})'.format(self.params['call_id']))
+            return xbmc.executebuiltin(u'ActivateWindow({})'.format(self.params['call_id']))
         if self.params.get('call_path'):
             return xbmc.executebuiltin(try_encode(u'ActivateWindow(videos, {}, return)'.format(self.params['call_path'])))
         if self.params.get('call_update'):

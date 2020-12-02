@@ -81,7 +81,7 @@ class _TraktLists():
     def get_custom_list(self, list_slug, user_slug=None, page=1, limit=20, params=None, authorize=False, sort_by=None, sort_how=None, extended=None):
         if authorize and not self.authorize():
             return
-        path = 'users/{}/lists/{}/items'.format(user_slug or 'me', list_slug)
+        path = u'users/{}/lists/{}/items'.format(user_slug or 'me', list_slug)
         # Refresh cache on first page for user list because it might've changed
         cache_refresh = True if try_int(page, fallback=1) == 1 else False
         sorted_items = self.get_sorted_list(
@@ -141,30 +141,30 @@ class _TraktLists():
 
             # Add library context menu
             item['context_menu'] = [(
-                xbmc.getLocalizedString(20444), 'Runscript(plugin.video.themoviedb.helper,{})'.format(
-                    'user_list={list_slug},user_slug={user_slug}'.format(**item['params'])))]
+                xbmc.getLocalizedString(20444), u'Runscript(plugin.video.themoviedb.helper,{})'.format(
+                    u'user_list={list_slug},user_slug={user_slug}'.format(**item['params'])))]
 
             # Unlike list context menu
             if path.startswith('users/likes'):
                 item['context_menu'] += [(
-                    ADDON.getLocalizedString(32319), 'Runscript(plugin.video.themoviedb.helper,{},delete)'.format(
-                        'like_list={list_slug},user_slug={user_slug}'.format(**item['params'])))]
+                    ADDON.getLocalizedString(32319), u'Runscript(plugin.video.themoviedb.helper,{},delete)'.format(
+                        u'like_list={list_slug},user_slug={user_slug}'.format(**item['params'])))]
 
             # Like list context menu
             elif path.startswith('lists/'):
                 item['context_menu'] += [(
-                    ADDON.getLocalizedString(32315), 'Runscript(plugin.video.themoviedb.helper,{})'.format(
-                        'like_list={list_slug},user_slug={user_slug}'.format(**item['params'])))]
+                    ADDON.getLocalizedString(32315), u'Runscript(plugin.video.themoviedb.helper,{})'.format(
+                        u'like_list={list_slug},user_slug={user_slug}'.format(**item['params'])))]
 
             # Owner of list so set param to allow deleting later
             else:
                 item['params']['owner'] = 'true'
                 item['context_menu'] += [(
-                    xbmc.getLocalizedString(118), 'Runscript(plugin.video.themoviedb.helper,{})'.format(
-                        'rename_list={list_slug}'.format(**item['params'])))]
+                    xbmc.getLocalizedString(118), u'Runscript(plugin.video.themoviedb.helper,{})'.format(
+                        u'rename_list={list_slug}'.format(**item['params'])))]
                 item['context_menu'] += [(
-                    xbmc.getLocalizedString(117), 'Runscript(plugin.video.themoviedb.helper,{})'.format(
-                        'delete_list={list_slug}'.format(**item['params'])))]
+                    xbmc.getLocalizedString(117), u'Runscript(plugin.video.themoviedb.helper,{})'.format(
+                        u'delete_list={list_slug}'.format(**item['params'])))]
 
             items.append(item)
         if not next_page:
@@ -207,7 +207,7 @@ class _TraktSync():
         user_slug = user_slug or 'me'
         return self.post_response(
             'users', user_slug, 'lists', list_slug, 'items/remove' if remove else 'items',
-            postdata={'{}s'.format(trakt_type): [item]})
+            postdata={u'{}s'.format(trakt_type): [item]})
 
     def sync_item(self, method, trakt_type, unique_id, id_type, season=None, episode=None):
         """
@@ -217,7 +217,7 @@ class _TraktSync():
         item = self.get_sync_item(trakt_type, unique_id, id_type, season, episode)
         if not item:
             return
-        return self.post_response('sync', method, postdata={'{}s'.format(trakt_type): [item]})
+        return self.post_response('sync', method, postdata={u'{}s'.format(trakt_type): [item]})
 
     def _get_activity_timestamp(self, activities, activity_type=None, activity_key=None):
         if not activities:
@@ -238,7 +238,7 @@ class _TraktSync():
     @use_activity_cache(cache_days=cache.CACHE_SHORT, pickle_object=False)
     def _get_sync_response(self, path, extended=None):
         """ Quick sub-cache routine to avoid recalling full sync list if we also want to quicklist it """
-        sync_name = 'sync_response.{}.{}'.format(path, extended)
+        sync_name = u'sync_response.{}.{}'.format(path, extended)
         self.sync[sync_name] = self.sync.get(sync_name) or self.get_response_json(path, extended=extended)
         return self.sync[sync_name]
 
@@ -326,7 +326,7 @@ class _TraktSync():
             func = self.get_sync_recommendations_movies if trakt_type == 'movie' else self.get_sync_recommendations_shows
         else:
             return
-        sync_name = '{}.{}.{}'.format(sync_type, trakt_type, id_type)
+        sync_name = u'{}.{}.{}'.format(sync_type, trakt_type, id_type)
         self.sync[sync_name] = self.sync.get(sync_name) or func(trakt_type, id_type)
         return self.sync[sync_name] or {}
 
@@ -355,7 +355,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         token = self.get_stored_token()
         if token.get('access_token'):
             self.authorization = token
-            self.headers['Authorization'] = 'Bearer {0}'.format(self.authorization.get('access_token'))
+            self.headers['Authorization'] = u'Bearer {0}'.format(self.authorization.get('access_token'))
 
         # No saved credentials and user trying to use a feature that requires authorization so ask them to login
         elif login:
@@ -420,7 +420,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         self.interval = self.code.get('interval', 5)
         self.expires_in = self.code.get('expires_in', 0)
         self.auth_dialog = xbmcgui.DialogProgress()
-        self.auth_dialog.create(ADDON.getLocalizedString(32097), '{}\n{}: [B]{}[/B]'.format(
+        self.auth_dialog.create(ADDON.getLocalizedString(32097), u'{}\n{}: [B]{}[/B]'.format(
             ADDON.getLocalizedString(32096), ADDON.getLocalizedString(32095), self.code.get('user_code')))
         self.poller()
 
@@ -473,7 +473,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         """Triggered when device authentication has been completed"""
         kodi_log(u'Trakt authenticated successfully!', 1)
         ADDON.setSettingString('trakt_token', dumps(self.authorization))
-        self.headers['Authorization'] = 'Bearer {0}'.format(self.authorization.get('access_token'))
+        self.headers['Authorization'] = u'Bearer {0}'.format(self.authorization.get('access_token'))
         if auth_dialog:
             self.auth_dialog.close()
 
@@ -519,7 +519,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         for i in response:
             if i.get('type') != trakt_type:
                 continue
-            if '{}'.format(i.get(trakt_type, {}).get('ids', {}).get(id_type)) != '{}'.format(unique_id):
+            if u'{}'.format(i.get(trakt_type, {}).get('ids', {}).get(id_type)) != u'{}'.format(unique_id):
                 continue
             if not output_type:
                 return i.get(trakt_type, {}).get('ids', {})
@@ -532,7 +532,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         """
         return cache.use_cache(
             self._get_id, unique_id, id_type, trakt_type=trakt_type, output_type=output_type,
-            cache_name='trakt_get_id.{}.{}.{}.{}'.format(id_type, unique_id, trakt_type, output_type),
+            cache_name=u'trakt_get_id.{}.{}.{}.{}'.format(id_type, unique_id, trakt_type, output_type),
             cache_days=cache.CACHE_LONG)
 
     def get_details(self, trakt_type, id_num, season=None, episode=None, extended='full'):
@@ -553,14 +553,14 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         if not slug:
             return
         if episode and season:
-            url = 'shows/{}/seasons/{}/episodes/{}/ratings'.format(slug, season, episode)
+            url = u'shows/{}/seasons/{}/episodes/{}/ratings'.format(slug, season, episode)
         elif season:
-            url = 'shows/{}/seasons/{}/ratings'.format(slug, season)
+            url = u'shows/{}/seasons/{}/ratings'.format(slug, season)
         else:
-            url = '{}s/{}/ratings'.format(trakt_type, slug)
+            url = u'{}s/{}/ratings'.format(trakt_type, slug)
         response = self.get_response_json(url)
         if not response:
             return
         return {
-            'trakt_rating': '{:0.1f}'.format(response.get('rating') or 0.0),
-            'trakt_votes': '{:0.1f}'.format(response.get('votes') or 0.0)}
+            'trakt_rating': u'{:0.1f}'.format(response.get('rating') or 0.0),
+            'trakt_votes': u'{:0.1f}'.format(response.get('votes') or 0.0)}

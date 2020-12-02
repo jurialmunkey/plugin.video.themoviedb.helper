@@ -111,7 +111,7 @@ def play_external(**kwargs):
 def split_value(split_value, separator=None, **kwargs):
     split_value = split_value or ''
     for x, i in enumerate(split_value.split(separator or ' / ')):
-        name = '{}.{}'.format(kwargs.get('property') or 'TMDbHelper.Split', x)
+        name = u'{}.{}'.format(kwargs.get('property') or 'TMDbHelper.Split', x)
         get_property(name, set_property=i, prefix=-1)
 
 
@@ -280,7 +280,7 @@ def log_request(**kwargs):
         if not kwargs['response']:
             xbmcgui.Dialog().ok(kwargs['log_request'].capitalize(), u'{}\nNo Response!'.format(kwargs['url']))
             return
-        filename = validify_filename('{}_{}.json'.format(kwargs['log_request'], kwargs['url']))
+        filename = validify_filename(u'{}_{}.json'.format(kwargs['log_request'], kwargs['url']))
         dumps_to_file(kwargs, 'log_request', filename)
         xbmcgui.Dialog().ok(kwargs['log_request'].capitalize(), u'[B]{}[/B]\n\n{}\n{}\n{}'.format(
             kwargs['url'], xbmc.translatePath('special://profile/addon_data/'),

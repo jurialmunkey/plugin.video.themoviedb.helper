@@ -12,7 +12,7 @@ class _TVShowCache():
 
     def __init__(self, tmdb_id, force=False):
         self.cache_version = 3
-        self.cache_name = 'library_autoupdate_tv.{}'.format(tmdb_id)
+        self.cache_name = u'library_autoupdate_tv.{}'.format(tmdb_id)
         self.cache_info = {} if force else cache.get_cache(self.cache_name) or {}
         # Only use cache info if version matches
         if not self.cache_info.get('version') or self.cache_info.get('version') != self.cache_version:

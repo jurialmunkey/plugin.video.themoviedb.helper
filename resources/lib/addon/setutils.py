@@ -70,7 +70,7 @@ def iter_props(items, property_name, infoproperties=None, func=None, **kwargs):
         return infoproperties
     for x, i in enumerate(items, start=1):
         for k, v in viewitems(kwargs):
-            infoproperties['{}.{}.{}'.format(property_name, x, k)] = func(i.get(v)) if func else i.get(v)
+            infoproperties[u'{}.{}.{}'.format(property_name, x, k)] = func(i.get(v)) if func else i.get(v)
         if x >= 10:
             break
     return infoproperties
@@ -88,7 +88,7 @@ def get_params(item, tmdb_type, tmdb_id=None, params=None, definition=None, base
 
 
 def split_items(items, separator='/'):
-    separator = ' {} '.format(separator)
+    separator = u' {} '.format(separator)
     if items and separator in items:
         items = items.split(separator)
     items = [items] if not isinstance(items, list) else items  # Make sure we return a list to prevent a string being iterated over characters

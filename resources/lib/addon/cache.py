@@ -2,8 +2,9 @@ import simplecache
 from resources.lib.addon.plugin import kodi_log, format_name
 from resources.lib.files.utils import get_pickle_name
 from resources.lib.addon.timedate import get_timedelta
+from resources.lib.addon.decorators import try_except_log
 _cache = simplecache.SimpleCache()
-_cache_name = 'TMDbHelper_v4.0.2'
+CACHE_NAME = 'TMDbHelper_v4.0.84'
 CACHE_LONG = 14
 CACHE_SHORT = 1
 CACHE_EXTENDED = 90
@@ -14,29 +15,32 @@ def use_simple_cache(cache_days=None):
         def wrapper(*args, **kwargs):
             kwargs['cache_days'] = cache_days or kwargs.get('cache_days', None)
             kwargs['cache_combine_name'] = True
-            kwargs['cache_name'] = '{}.'.format(func.__name__)
-            kwargs['cache_name'] = '{}.{}'.format(args[0].__class__.__name__, kwargs['cache_name'])
+            kwargs['cache_name'] = u'{}.'.format(func.__name__)
+            kwargs['cache_name'] = u'{}.{}'.format(args[0].__class__.__name__, kwargs['cache_name'])
             return use_cache(func, *args, **kwargs)
         return wrapper
     return decorator
 
 
+@try_except_log('lib.addon.cache get_cache')
 def get_cache(cache_name):
     cache_name = get_pickle_name(cache_name or '')
-    return _cache.get('{}.{}'.format(_cache_name, cache_name))
+    return _cache.get(u'{}.{}'.format(CACHE_NAME, cache_name))
 
 
+@try_except_log('lib.addon.cache set_cache')
 def set_cache(my_object, cache_name, cache_days=14, force=False, fallback=None):
     cache_name = get_pickle_name(cache_name or '')
     if my_object and cache_name and cache_days:
-        _cache.set('{}.{}'.format(_cache_name, cache_name), my_object, expiration=get_timedelta(days=cache_days))
+        _cache.set(u'{}.{}'.format(CACHE_NAME, cache_name), my_object, expiration=get_timedelta(days=cache_days))
     elif force:
         my_object = my_object or fallback
         cache_days = force if isinstance(force, int) else cache_days
-        _cache.set('{}.{}'.format(_cache_name, cache_name), my_object, expiration=get_timedelta(days=cache_days))
+        _cache.set(u'{}.{}'.format(CACHE_NAME, cache_name), my_object, expiration=get_timedelta(days=cache_days))
     return my_object
 
 
+@try_except_log('lib.addon.cache use_cache')
 def use_cache(func, *args, **kwargs):
     """
     Simplecache takes func with args and kwargs
@@ -65,7 +69,7 @@ def use_cache(func, *args, **kwargs):
 def get_search_history(tmdb_type=None):
     if not tmdb_type:
         return []
-    cache_name = 'search.history.{}'.format(tmdb_type)
+    cache_name = u'search.history.{}'.format(tmdb_type)
     return get_cache(cache_name) or []
 
 
@@ -101,7 +105,7 @@ def _replace_search_history(tmdb_type=None, query=None, replace=None, **kwargs):
 def set_search_history(tmdb_type=None, query=None, cache_days=120, clear_cache=False, max_entries=9, replace=False):
     if not tmdb_type:
         return
-    cache_name = 'search.history.{}'.format(tmdb_type)
+    cache_name = u'search.history.{}'.format(tmdb_type)
     if not clear_cache:
         func = _add_search_history if replace is False else _replace_search_history
         search_history = func(tmdb_type=tmdb_type, query=query, max_entries=max_entries, replace=replace)

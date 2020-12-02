@@ -63,7 +63,7 @@ class SyncItem():
         if self.season is not None and (not allow_episodes or not self.episode):
             return
         if self.trakt_api.is_sync(self.trakt_type, self.unique_id, self.season, self.episode, self.id_type, sync_type):
-            return {'name': name_remove, 'method': '{}/remove'.format(method)}
+            return {'name': name_remove, 'method': u'{}/remove'.format(method)}
         return {'name': name_add, 'method': method}
 
     def _sync_userlist_addlist(self):
@@ -99,7 +99,7 @@ class SyncItem():
         trakt_type = 'show' if self.trakt_type in ['season', 'episode'] else self.trakt_type
         with busy_dialog():
             slug = self.trakt_api.get_id(self.unique_id, self.id_type, trakt_type, 'slug')
-            comments = self.trakt_api.get_response_json('{}s'.format(trakt_type), slug, 'comments', limit=50) or []
+            comments = self.trakt_api.get_response_json(u'{}s'.format(trakt_type), slug, 'comments', limit=50) or []
             itemlist = [i.get('comment', '').replace('\n', ' ') for i in comments]
         return self._choose_comment(itemlist, comments)
 
