@@ -64,6 +64,11 @@ def viewitems(obj, **kwargs):
     return func(**kwargs)
 
 
+def set_kwargattr(obj, kwargs):
+    for k, v in viewitems(kwargs):
+        setattr(obj, k, v)
+
+
 def md5hash(value):
     if sys.version_info.major != 3:
         return hashlib.md5(str(value)).hexdigest()
