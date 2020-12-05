@@ -6,7 +6,9 @@ import xbmcgui
 from resources.lib.addon.decorators import busy_dialog
 from resources.lib.addon.parser import try_int
 from resources.lib.trakt.api import TraktAPI
-from resources.lib.addon.plugin import ADDON, set_kwargattr
+from resources.lib.addon.plugin import ADDON, set_kwargattr, convert_trakt_type
+from resources.lib.kodi.userlist import get_monitor_userlists
+from resources.lib.kodi.library import add_to_library
 
 
 def _menu_items():
@@ -72,7 +74,7 @@ class _Menu():
         """ Ask user to select item from menu and do the appropriate sync action """
         if not self.menu:
             self.build_menu()
-        return self._sync(self._select())
+        return self.sync(self._select())
 
     def _select(self):
         """ Ask user to select menu item """
@@ -83,7 +85,7 @@ class _Menu():
             return
         return self.menu[x]
 
-    def _sync(self, item, notification=True):
+    def sync(self, item, notification=True):
         """ Run sync for selected menu item and notify user of outcome """
         if not item:
             return
@@ -139,18 +141,23 @@ class _UserList():
         return self
 
     def _addlist(self):
-        """ Create a new Trakt list and return list slug if successful """
+        """ Create a new Trakt list and returns tuple of list and user slug """
         name = xbmcgui.Dialog().input(ADDON.getLocalizedString(32356))
         if not name:
             return
         response = self._trakt.post_response('users/me/lists', postdata={'name': name})
         if not response or not response.json():
             return
-        return response.json().get('ids', {}).get('slug')
+        return (
+            response.json().get('ids', {}).get('slug'),
+            response.json().get('user', {}).get('ids', {}).get('slug'))
 
     def _getlist(self, get_currentlist=False):
+        """ Get an existing Trakt list and returns tuple of list and user slug """
         if get_currentlist:
-            return xbmc.getInfoLabel("ListItem.Property(param.list_slug)")
+            return (
+                xbmc.getInfoLabel("ListItem.Property(param.list_slug)"),
+                xbmc.getInfoLabel("ListItem.Property(param.user_slug)"))
         with busy_dialog():
             list_sync = self._trakt.get_list_of_lists('users/me/lists') or []
             list_sync.append({'label': ADDON.getLocalizedString(32299)})
@@ -159,17 +166,31 @@ class _UserList():
             return
         if list_sync[x].get('label') == ADDON.getLocalizedString(32299):
             return self._addlist()
-        return list_sync[x].get('params', {}).get('list_slug')
+        return (
+            list_sync[x].get('params', {}).get('list_slug'),
+            list_sync[x].get('params', {}).get('user_slug'))
+
+    def _addlibrary(self, tmdb_type, tmdb_id, slug=None, confirm=True):
+        """ Add item to library
+        Pass optional slug tuple (list, user) to check if in monitored lists
+        """
+        if slug and slug not in get_monitor_userlists():
+            return
+        if confirm and not xbmcgui.Dialog().yesno(xbmc.getLocalizedString(20444), ADDON.getLocalizedString(32362)):
+            return
+        add_to_library(tmdb_type, tmdb_id=tmdb_id)
 
     def sync(self):
         """ Entry point """
-        list_slug = self._getlist(get_currentlist=self.remove)
-        if not list_slug:
+        slug = self._getlist(get_currentlist=self.remove)
+        if not slug:
             return
         with busy_dialog():
             self._sync = self._trakt.add_list_item(
-                list_slug, self._item.trakt_type, self._item.unique_id, self._item.id_type,
+                slug[0], self._item.trakt_type, self._item.unique_id, self._item.id_type,
                 season=self._item.season, episode=self._item.episode, remove=self.remove)
+        if self._sync and self._sync.status_code in [200, 201, 204] and self._item.id_type == 'tmdb':
+            self._addlibrary(convert_trakt_type(self._item.trakt_type), self._item.unique_id, slug=slug)
         return self._sync
 
 
