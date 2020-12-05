@@ -7,7 +7,7 @@ from resources.lib.kodi.library import add_to_library
 from resources.lib.kodi.update import get_userlist
 
 
-def _get_monitor_userlists(list_slugs=None, user_slugs=None):
+def get_monitor_userlists(list_slugs=None, user_slugs=None):
     saved_lists = list_slugs or ADDON.getSettingString('monitor_userlist') or ''
     saved_users = user_slugs or ADDON.getSettingString('monitor_userslug') or ''
     saved_lists = saved_lists.split(' | ') or []
@@ -21,7 +21,7 @@ def monitor_userlist():
         user_lists = []
         user_lists += TraktAPI().get_list_of_lists('users/me/lists', authorize=True, next_page=False) or []
         user_lists += TraktAPI().get_list_of_lists('users/likes/lists', authorize=True, next_page=False) or []
-        saved_lists = _get_monitor_userlists()
+        saved_lists = get_monitor_userlists()
         dialog_list = [i['label'] for i in user_lists]
         preselected = [
             x for x, i in enumerate(user_lists)
@@ -60,7 +60,7 @@ def library_autoupdate(list_slugs=None, user_slugs=None, busy_spinner=False, for
 
     # Update library from Trakt lists
     library_adder = None
-    user_lists = _get_monitor_userlists(list_slugs, user_slugs)
+    user_lists = get_monitor_userlists(list_slugs, user_slugs)
     for list_slug, user_slug in user_lists:
         library_adder = add_to_library(
             info='trakt', user_slug=user_slug, list_slug=list_slug, confirm=False, allow_update=False,

@@ -1845,6 +1845,11 @@ msgctxt "#32361"
 msgid "Search Lists"
 msgstr ""
 
+#: /resources/lib/script/sync.py
+msgctxt "#32362"
+msgid "Do you want to add this item to the library now?"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
