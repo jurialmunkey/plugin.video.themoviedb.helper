@@ -122,7 +122,11 @@ def get_unique_folder(name, tmdb_id, basedir):
 
 def get_userlist(user_slug=None, list_slug=None, confirm=True, busy_spinner=True):
     with busy_dialog(is_enabled=busy_spinner):
-        request = TraktAPI().get_response_json('users', user_slug, 'lists', list_slug, 'items')
+        if list_slug.startswith('watchlist'):
+            path = ['users', user_slug, list_slug]
+        else:
+            path = ['users', user_slug, 'lists', list_slug, 'items']
+        request = TraktAPI().get_response_json(*path)
     if not request:
         return
     if confirm:

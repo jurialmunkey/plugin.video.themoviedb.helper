@@ -260,8 +260,21 @@ def _get_basedir_trakt():
             'art': {'thumb': u'{}/resources/icons/trakt/watchlist.png'.format(ADDONPATH)}},
         {
             'label': u'{{item_type}}{{space}}{}'.format(ADDON.getLocalizedString(32193)),
-            'types': ['movie', 'tv'],
+            'types': ['movie'],
             'params': {'info': 'trakt_watchlist'},
+            'context_menu': [(
+                xbmc.getLocalizedString(20444),
+                u'Runscript(plugin.video.themoviedb.helper,user_list=watchlist/movies)')],
+            'path': PLUGINPATH,
+            'sorting': True,
+            'art': {'thumb': u'{}/resources/icons/trakt/watchlist.png'.format(ADDONPATH)}},
+        {  # Separate TV Watchlist entry for context menu purposes
+            'label': u'{{item_type}}{{space}}{}'.format(ADDON.getLocalizedString(32193)),
+            'types': ['tv'],
+            'params': {'info': 'trakt_watchlist'},
+            'context_menu': [(
+                xbmc.getLocalizedString(20444),
+                u'Runscript(plugin.video.themoviedb.helper,user_list=watchlist/shows)')],
             'path': PLUGINPATH,
             'sorting': True,
             'art': {'thumb': u'{}/resources/icons/trakt/watchlist.png'.format(ADDONPATH)}},
