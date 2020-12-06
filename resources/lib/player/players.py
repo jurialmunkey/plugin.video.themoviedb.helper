@@ -14,6 +14,7 @@ from resources.lib.player.details import get_item_details, get_detailed_item, ge
 from resources.lib.player.inputter import KeyboardInputter
 from resources.lib.player.configure import get_players_from_file
 from resources.lib.addon.constants import PLAYERS_PRIORITY
+from resources.lib.addon.decorators import busy_dialog
 from string import Formatter
 if sys.version_info[0] >= 3:
     unicode = str  # In Py3 str is now unicode
@@ -52,7 +53,7 @@ def wait_for_player(to_start=None, timeout=5, poll=0.25, stop_after=0):
     return timeout
 
 
-def resolve_to_dummy(handle=None, stop_after=1):
+def resolve_to_dummy(handle=None, stop_after=1, delay_wait=0):
     """
     Kodi does 5x retries to resolve url if isPlayable property is set - strm files force this property.
     However, external plugins might not resolve directly to URL and instead might require PlayMedia.
@@ -79,6 +80,11 @@ def resolve_to_dummy(handle=None, stop_after=1):
         kodi_log(['lib.player.players - stopping dummy file timeout\n', path], 1)
         return -1
 
+    # Added delay
+    if delay_wait:
+        with busy_dialog():
+            xbmc.Monitor().waitForAbort(delay_wait)
+
     # Success
     kodi_log(['lib.player.players -- successfully resolved dummy file\n', path], 1)
 
@@ -94,6 +100,8 @@ class Players(object):
         self.ignore_default = ignore_default
         self.tmdb_type, self.tmdb_id, self.season, self.episode = tmdb_type, tmdb_id, season, episode
         self.dummy_duration = try_float(ADDON.getSettingString('dummy_duration')) or 1.0
+        self.dummy_delay = try_float(ADDON.getSettingString('dummy_delay'))
+        self.force_xbmcplayer = ADDON.getSettingBool('force_xbmcplayer')
 
     def _check_assert(self, keys=[]):
         if not self.item:
@@ -463,7 +471,7 @@ class Players(object):
 
         # If a folder we need to resolve to dummy and then open folder
         if listitem.getProperty('is_folder') == 'true':
-            resolve_to_dummy(handle, self.dummy_duration)
+            resolve_to_dummy(handle, self.dummy_duration, self.dummy_delay)
             xbmc.executebuiltin(try_encode(action))
             kodi_log(['lib.player - finished executing action\n', action], 1)
             return
@@ -472,11 +480,13 @@ class Players(object):
         if self.playerstring:
             get_property('PlayerInfoString', set_property=self.playerstring)
 
-        # If PlayMedia method chosen re-route to Player()
+        # If PlayMedia method chosen re-route to Player() unless expert settings on
         if action:
-            resolve_to_dummy(handle, self.dummy_duration)  # If we're calling external we need to resolve to dummy
-            xbmc.Player().play(action, listitem)
-            kodi_log(['lib.player - playing path with xbmc.Player()\n', try_decode(listitem.getPath())], 1)
+            resolve_to_dummy(handle, self.dummy_duration, self.dummy_delay)  # If we're calling external we need to resolve to dummy
+            xbmc.Player().play(action, listitem) if self.force_xbmcplayer else xbmc.executebuiltin(u'PlayMedia({})'.format(action))
+            kodi_log([
+                'lib.player - playing path with {}\n'.format('xbmc.Player()' if self.force_xbmcplayer else 'PlayMedia'),
+                try_decode(listitem.getPath())], 1)
             return
 
         # Otherwise we have a url we can resolve to
@@ -488,5 +498,7 @@ class Players(object):
         # If id/type not set to Player.GetItem things like Trakt don't work correctly.
         # Looking for better solution than this hack.
         if ADDON.getSettingBool('trakt_localhack') and listitem.getProperty('is_local') == 'true':
-            xbmc.Player().play(try_decode(listitem.getPath()), listitem)
-            kodi_log(['Finished executing Player().Play\n', try_decode(listitem.getPath())], 1)
+            xbmc.Player().play(try_decode(listitem.getPath()), listitem) if self.force_xbmcplayer else xbmc.executebuiltin(u'PlayMedia({})'.format(try_decode(listitem.getPath())))
+            kodi_log([
+                'Finished executing {}\n'.format('xbmc.Player()' if self.force_xbmcplayer else 'PlayMedia'),
+                try_decode(listitem.getPath())], 1)

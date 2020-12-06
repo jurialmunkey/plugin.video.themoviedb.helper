@@ -1850,6 +1850,16 @@ msgctxt "#32362"
 msgid "Do you want to add this item to the library now?"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32363"
+msgid "Delay before playing after dummy resolves (seconds)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32364"
+msgid "Reroute PlayMedia to call xbmc.Player() directly"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
