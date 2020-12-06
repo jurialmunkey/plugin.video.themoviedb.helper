@@ -18,7 +18,11 @@ def get_monitor_userlists(list_slugs=None, user_slugs=None):
 def monitor_userlist():
     # Build list choices
     with busy_dialog():
-        user_lists = []
+        user_lists = [
+            {'label': '{} {}'.format(ADDON.getLocalizedString(32193), xbmc.getLocalizedString(20342)),
+                'params': {'user_slug': 'me', 'list_slug': 'watchlist/movies'}},
+            {'label': '{} {}'.format(ADDON.getLocalizedString(32193), xbmc.getLocalizedString(20343)),
+                'params': {'user_slug': 'me', 'list_slug': 'watchlist/shows'}}]
         user_lists += TraktAPI().get_list_of_lists('users/me/lists', authorize=True, next_page=False) or []
         user_lists += TraktAPI().get_list_of_lists('users/likes/lists', authorize=True, next_page=False) or []
         saved_lists = get_monitor_userlists()
