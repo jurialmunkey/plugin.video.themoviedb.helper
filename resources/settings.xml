@@ -69,5 +69,7 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32348]" type="action" action="RunScript(plugin.video.themoviedb.helper, log_request=tmdb)" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32351]" type="lsep"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32352]" type="labelenum" id="dummy_duration" values="0.1|0.25|0.5|1.0|2.0|3.0|4.0|5.0" default="1.0"/>
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32363]" type="labelenum" id="dummy_delay" values="0.0|0.25|0.5|1.0|1.5|2.0|2.5|3.0" default="0.0"/>
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32364]" type="bool" id="force_xbmcplayer" default="True"/>
     </category>
 </settings>
