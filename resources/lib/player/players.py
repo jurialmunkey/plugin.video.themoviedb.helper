@@ -81,9 +81,8 @@ def resolve_to_dummy(handle=None, stop_after=1, delay_wait=0):
         return -1
 
     # Added delay
-    if delay_wait:
-        with busy_dialog():
-            xbmc.Monitor().waitForAbort(delay_wait)
+    with busy_dialog(False if delay_wait < 1 else True):
+        xbmc.Monitor().waitForAbort(delay_wait)
 
     # Success
     kodi_log(['lib.player.players -- successfully resolved dummy file\n', path], 1)
@@ -100,7 +99,7 @@ class Players(object):
         self.ignore_default = ignore_default
         self.tmdb_type, self.tmdb_id, self.season, self.episode = tmdb_type, tmdb_id, season, episode
         self.dummy_duration = try_float(ADDON.getSettingString('dummy_duration')) or 1.0
-        self.dummy_delay = try_float(ADDON.getSettingString('dummy_delay'))
+        self.dummy_delay = try_float(ADDON.getSettingString('dummy_delay')) or 1.0
         self.force_xbmcplayer = ADDON.getSettingBool('force_xbmcplayer')
 
     def _check_assert(self, keys=[]):
