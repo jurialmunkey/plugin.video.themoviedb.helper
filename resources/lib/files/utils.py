@@ -100,6 +100,17 @@ def _get_write_path(folder, join_addon_data=True):
     return main_dir
 
 
+def _del_file(folder, filename):
+    file = os.path.join(folder, filename)
+    os.remove(file)
+
+
+def del_old_files(folder, limit=1):
+    folder = _get_write_path(folder, True)
+    for filename in sorted(os.listdir(folder))[:-limit]:
+        _del_file(folder, filename)
+
+
 def make_path(path, warn_dialog=False):
     if xbmcvfs.exists(path):
         return xbmcvfs.translatePath(path)
@@ -122,7 +133,7 @@ def get_pickle_name(cache_name, alphanum=False):
     return validify_filename(cache_name, alphanum=alphanum).rstrip('_')
 
 
-def set_pickle(my_object, cache_name, cache_days=14):
+def set_pickle(my_object, cache_name, cache_days=14, json_dump=False):
     if not my_object:
         return
     cache_name = get_pickle_name(cache_name)
@@ -130,18 +141,18 @@ def set_pickle(my_object, cache_name, cache_days=14):
         return
     timestamp = get_datetime_now() + get_timedelta(days=cache_days)
     cache_obj = {'my_object': my_object, 'expires': timestamp.strftime("%Y-%m-%dT%H:%M:%S")}
-    with open(os.path.join(_get_write_path('pickle'), cache_name), 'wb') as file:
-        _pickle.dump(cache_obj, file)
+    with open(os.path.join(_get_write_path('pickle'), cache_name), 'w' if json_dump else 'wb') as file:
+        json.dump(cache_obj, file, indent=4) if json_dump else _pickle.dump(cache_obj, file)
     return my_object
 
 
-def get_pickle(cache_name):
+def get_pickle(cache_name, json_dump=False):
     cache_name = get_pickle_name(cache_name)
     if not cache_name:
         return
     try:
-        with open(os.path.join(_get_write_path('pickle'), cache_name), 'rb') as file:
-            cache_obj = _pickle.load(file)
+        with open(os.path.join(_get_write_path('pickle'), cache_name), 'r' if json_dump else 'rb') as file:
+            cache_obj = json.load(file) if json_dump else _pickle.load(file)
     except IOError:
         cache_obj = None
     if cache_obj and is_future_timestamp(cache_obj.get('expires', '')):
