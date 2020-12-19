@@ -59,9 +59,22 @@ class _TraktLists():
         return TraktItems(response.json(), headers=response.headers, trakt_type=trakt_type).configure_items()
 
     @is_authorized
+    def get_mixed_list(self, path, trakt_types=[], limit=20, extended=None, authorize=False):
+        """ Returns a randomised simple list which combines movies and shows
+        path uses {trakt_type} as format substitution for trakt_type in trakt_types
+        """
+        items = []
+        for trakt_type in trakt_types:
+            response = self.get_simple_list(
+                path.format(trakt_type=trakt_type), extended=extended, page=1, limit=50, trakt_type=trakt_type) or {}
+            items += response.get('items') or []
+        if items:
+            return random.sample(items, 20)
+
+    @is_authorized
     def get_basic_list(self, path, trakt_type, page=1, limit=20, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, randomise=False):
         # TODO: Add argument to check whether to refresh on first page (e.g. for user lists)
-        # Also: Think about whether need to do it for standard response
+        # Also: Think about whether need to do it for standard respons
         cache_refresh = True if try_int(page, fallback=1) == 1 else False
         if randomise:
             response = self.get_simple_list(
@@ -73,8 +86,8 @@ class _TraktLists():
             response = self.get_simple_list(
                 path, extended=extended, page=page, limit=limit, trakt_type=trakt_type)
         if response:
-            if randomise and len(response['items']) > 20:
-                items = random.sample(response['items'], 20)
+            if randomise and len(response['items']) > limit:
+                items = random.sample(response['items'], limit)
                 return items
             return response['items'] + pages.get_next_page(response['headers'])
 

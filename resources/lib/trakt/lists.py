@@ -12,6 +12,8 @@ from resources.lib.trakt.api import get_sort_methods
 
 class TraktLists():
     def list_trakt(self, info, tmdb_type, page=None, randomise=False, **kwargs):
+        if tmdb_type == 'both':
+            return self.list_mixed(info)
         info_model = TRAKT_BASIC_LISTS.get(info)
         info_tmdb_type = info_model.get('tmdb_type') or tmdb_type
         trakt_type = convert_type(tmdb_type, 'trakt')
@@ -29,6 +31,18 @@ class TraktLists():
         self.kodi_db = self.get_kodi_database(info_tmdb_type)
         self.library = convert_type(info_tmdb_type, 'library')
         self.container_content = convert_type(info_tmdb_type, 'container')
+        return items
+
+    def list_mixed(self, info, **kwargs):
+        info_model = TRAKT_BASIC_LISTS.get(info)
+        items = self.trakt_api.get_mixed_list(
+            path=info_model.get('path', ''),
+            trakt_types=['movie', 'show'],
+            authorize=info_model.get('authorize', False),
+            extended=info_model.get('extended', None))
+        self.tmdb_cache_only = False
+        self.library = 'video'
+        self.container_content = 'movies'
         return items
 
     def list_sync(self, info, tmdb_type, page=None, **kwargs):
