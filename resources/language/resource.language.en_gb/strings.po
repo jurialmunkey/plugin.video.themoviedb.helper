@@ -1860,6 +1860,11 @@ msgctxt "#32364"
 msgid "Reroute PlayMedia to call xbmc.Player() directly"
 msgstr ""
 
+#: /resources/lib/addon/plugin.py
+msgctxt "#32365"
+msgid "Combined"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

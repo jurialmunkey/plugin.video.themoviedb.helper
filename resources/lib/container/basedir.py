@@ -193,28 +193,28 @@ def _get_basedir_random():
         {
             'label': u'{} {}{{space}}{{item_type}}'.format(
                 xbmc.getLocalizedString(590), ADDON.getLocalizedString(32204)),
-            'types': ['movie', 'tv'],
+            'types': ['movie', 'tv', 'both'],
             'params': {'info': 'random_trending'},
             'path': PLUGINPATH,
             'art': {'thumb': u'{}/resources/icons/trakt/trend.png'.format(ADDONPATH)}},
         {
             'label': u'{} {}{{space}}{{item_type}}'.format(
                 xbmc.getLocalizedString(590), ADDON.getLocalizedString(32175)),
-            'types': ['movie', 'tv'],
+            'types': ['movie', 'tv', 'both'],
             'params': {'info': 'random_popular'},
             'path': PLUGINPATH,
             'art': {'thumb': u'{}/resources/icons/trakt/popular.png'.format(ADDONPATH)}},
         {
             'label': u'{} {}{{space}}{{item_type}}'.format(
                 xbmc.getLocalizedString(590), ADDON.getLocalizedString(32205)),
-            'types': ['movie', 'tv'],
+            'types': ['movie', 'tv', 'both'],
             'params': {'info': 'random_mostplayed'},
             'path': PLUGINPATH,
             'art': {'thumb': u'{}/resources/icons/trakt/mostplayed.png'.format(ADDONPATH)}},
         {
             'label': u'{} {}{{space}}{{item_type}}'.format(
                 xbmc.getLocalizedString(590), ADDON.getLocalizedString(32206)),
-            'types': ['movie', 'tv'],
+            'types': ['movie', 'tv', 'both'],
             'params': {'info': 'random_anticipated'},
             'path': PLUGINPATH,
             'art': {'thumb': u'{}/resources/icons/trakt/anticipated.png'.format(ADDONPATH)}},

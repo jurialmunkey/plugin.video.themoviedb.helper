@@ -164,7 +164,8 @@ CONVERSION_TABLE = {
         'genre': {'plural': lambda: xbmc.getLocalizedString(135), 'container': 'genres', 'dbtype': 'genre'},
         'season': {'plural': lambda: xbmc.getLocalizedString(33054), 'container': 'seasons', 'trakt': 'season', 'dbtype': 'season'},
         'episode': {'plural': lambda: xbmc.getLocalizedString(20360), 'container': 'episodes', 'trakt': 'episode', 'dbtype': 'episode'},
-        'video': {'plural': lambda: xbmc.getLocalizedString(10025), 'container': 'videos', 'dbtype': 'video'}
+        'video': {'plural': lambda: xbmc.getLocalizedString(10025), 'container': 'videos', 'dbtype': 'video'},
+        'both': {'plural': lambda: ADDON.getLocalizedString(32365), 'trakt': 'both'}
     }
 }
 
