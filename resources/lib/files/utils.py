@@ -100,6 +100,17 @@ def _get_write_path(folder, join_addon_data=True):
     return main_dir
 
 
+def _del_file(folder, filename):
+    file = os.path.join(folder, filename)
+    os.remove(file)
+
+
+def del_old_files(folder, limit=1):
+    folder = _get_write_path(folder, True)
+    for filename in sorted(os.listdir(folder))[:-limit]:
+        _del_file(folder, filename)
+
+
 def make_path(path, warn_dialog=False):
     if xbmcvfs.exists(path):
         return xbmc.translatePath(path)

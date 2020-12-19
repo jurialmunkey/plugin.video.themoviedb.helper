@@ -52,6 +52,7 @@ class LibraryAdder():
         if self.p_dialog:
             self.p_dialog.close()
         if self.debug_logging:
+            self._log._clean()  # Clean up old log files first
             self._log._out()
         if update and self.auto_update:
             xbmc.executebuiltin('UpdateLibrary(video)')
