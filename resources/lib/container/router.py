@@ -1,6 +1,7 @@
 import sys
 import xbmc
 import xbmcplugin
+from threading import Thread
 from resources.lib.addon.constants import NO_LABEL_FORMATTING, RANDOMISED_TRAKT, RANDOMISED_LISTS, TRAKT_LIST_OF_LISTS, TMDB_BASIC_LISTS, TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, ROUTE_NO_ID, ROUTE_TMDB_ID
 from resources.lib.kodi.rpc import get_kodi_library, get_movie_details, get_tvshow_details, get_episode_details, get_season_details
 from resources.lib.addon.plugin import convert_type, reconfigure_legacy_params
@@ -78,30 +79,47 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             return False
         return True
 
+    def _add_item(self, x, i, pagination, parent_params, property_params, kodi_db, tmdb_cache_only):
+        if not pagination and 'next_page' in i:
+            return
+        if self.item_is_excluded(i):
+            return
+        li = ListItem(parent_params=parent_params, **i)
+        li.set_details(details=self.get_tmdb_details(li, cache_only=tmdb_cache_only))  # Quick because only get cached
+        li.set_episode_label()
+        if self.check_is_aired and li.is_unaired():
+            return
+        li.set_details(details=self.get_ftv_artwork(li), reverse=True)  # Slow when not cache only
+        li.set_details(details=self.get_kodi_details(li), reverse=True)  # Quick because local db
+        li.set_playcount(playcount=self.get_playcount_from_trakt(li))  # Quick because of agressive caching of Trakt object and pre-emptive dict comprehension
+        if self.hide_watched and try_int(li.infolabels.get('playcount')) != 0:
+            return
+        li.set_context_menu()  # Set the context menu items
+        li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
+        li.set_params_reroute(self.ftv_forced_lookup, self.flatten_seasons)  # Reroute details to proper end point
+        li.set_params_to_info(self.plugin_category)  # Set path params to properties for use in skins
+        li.infoproperties.update(property_params or {})
+        self.items_queue[x] = li
+
     def add_items(self, items=None, pagination=True, parent_params=None, property_params=None, kodi_db=None, tmdb_cache_only=True):
         if not items:
             return
-        check_is_aired = parent_params.get('info') not in NO_LABEL_FORMATTING
-        for i in items:
-            if not pagination and 'next_page' in i:
+        self.check_is_aired = parent_params.get('info') not in NO_LABEL_FORMATTING
+
+        # Build empty queue and thread pool
+        self.items_queue, pool = [None] * len(items), [None] * len(items)
+
+        # Start threads
+        for x, i in enumerate(items):
+            pool[x] = Thread(target=self._add_item, args=[x, i, pagination, parent_params, property_params, kodi_db, tmdb_cache_only])
+            pool[x].start()
+
+        # Wait to join threads in pool first before adding item to directory
+        for x, i in enumerate(pool):
+            i.join()
+            li = self.items_queue[x]
+            if not li:
                 continue
-            if self.item_is_excluded(i):
-                continue
-            li = ListItem(parent_params=parent_params, **i)
-            li.set_details(details=self.get_tmdb_details(li, cache_only=tmdb_cache_only))  # Quick because only get cached
-            li.set_episode_label()
-            if check_is_aired and li.is_unaired():
-                continue
-            li.set_details(details=self.get_ftv_artwork(li), reverse=True)  # Slow when not cache only
-            li.set_details(details=self.get_kodi_details(li), reverse=True)  # Quick because local db
-            li.set_playcount(playcount=self.get_playcount_from_trakt(li))  # Quick because of agressive caching of Trakt object and pre-emptive dict comprehension
-            if self.hide_watched and try_int(li.infolabels.get('playcount')) != 0:
-                continue
-            li.set_context_menu()  # Set the context menu items
-            li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
-            li.set_params_reroute(self.ftv_forced_lookup, self.flatten_seasons)  # Reroute details to proper end point
-            li.set_params_to_info(self.plugin_category)  # Set path params to properties for use in skins
-            li.infoproperties.update(property_params or {})
             xbmcplugin.addDirectoryItem(
                 handle=self.handle,
                 url=li.get_url(),
