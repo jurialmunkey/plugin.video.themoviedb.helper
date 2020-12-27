@@ -85,10 +85,6 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         if self.check_is_aired and li.is_unaired():
             return
         li.set_details(details=self.get_ftv_artwork(li), reverse=True)  # Slow when not cache only
-        li.set_details(details=self.get_kodi_details(li), reverse=True)  # Quick because local db
-        li.set_playcount(playcount=self.get_playcount_from_trakt(li))  # Quick because of agressive caching of Trakt object and pre-emptive dict comprehension
-        if self.hide_watched and try_int(li.infolabels.get('playcount')) != 0:
-            return
         self.items_queue[x] = li
 
     def add_items(self, items=None, pagination=True, parent_params=None, property_params=None, kodi_db=None, tmdb_cache_only=True):
@@ -117,6 +113,15 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             li = self.items_queue[x]
             if not li:
                 continue
+            li.set_details(details=self.get_kodi_details(li), reverse=True)  # Quick because local db
+            li.set_playcount(playcount=self.get_playcount_from_trakt(li))  # Quick because of agressive caching of Trakt object and pre-emptive dict comprehension
+            if self.hide_watched and try_int(li.infolabels.get('playcount')) != 0:
+                continue
+            li.set_context_menu()  # Set the context menu items
+            li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
+            li.set_params_reroute(self.ftv_forced_lookup, self.flatten_seasons)  # Reroute details to proper end point
+            li.set_params_to_info(self.plugin_category)  # Set path params to properties for use in skins
+            li.infoproperties.update(property_params or {})
             xbmcplugin.addDirectoryItem(
                 handle=self.handle,
                 url=li.get_url(),
