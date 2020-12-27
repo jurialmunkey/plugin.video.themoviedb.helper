@@ -291,6 +291,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         if not item:
             return
         self.plugin_category = item.get('label')
+        self.parent_params = item.get('params', {})
         return self.get_items(**item.get('params', {}))
 
     def get_tmdb_id(self, info, **kwargs):
