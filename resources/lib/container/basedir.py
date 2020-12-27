@@ -221,28 +221,28 @@ def _get_basedir_random():
         {
             'label': u'{} {}{{space}}{{item_type}}'.format(
                 xbmc.getLocalizedString(590), ADDON.getLocalizedString(32300)),
-            'types': ['both'],
+            'types': ['list'],
             'params': {'info': 'random_trendinglists'},
             'path': PLUGINPATH,
             'art': {'thumb': u'{}/resources/icons/trakt/trendinglist.png'.format(ADDONPATH)}},
         {
             'label': u'{} {}{{space}}{{item_type}}'.format(
                 xbmc.getLocalizedString(590), ADDON.getLocalizedString(32301)),
-            'types': ['both'],
+            'types': ['list'],
             'params': {'info': 'random_popularlists'},
             'path': PLUGINPATH,
             'art': {'thumb': u'{}/resources/icons/trakt/popularlist.png'.format(ADDONPATH)}},
         {
             'label': u'{} {}{{space}}{{item_type}}'.format(
                 xbmc.getLocalizedString(590), ADDON.getLocalizedString(32302)),
-            'types': ['both'],
+            'types': ['list'],
             'params': {'info': 'random_likedlists'},
             'path': PLUGINPATH,
             'art': {'thumb': u'{}/resources/icons/trakt/likedlist.png'.format(ADDONPATH)}},
         {
             'label': u'{} {}{{space}}{{item_type}}'.format(
                 xbmc.getLocalizedString(590), ADDON.getLocalizedString(32303)),
-            'types': ['both'],
+            'types': ['list'],
             'params': {'info': 'random_mylists'},
             'path': PLUGINPATH,
             'art': {'thumb': u'{}/resources/icons/trakt/mylists.png'.format(ADDONPATH)}}
