@@ -111,6 +111,8 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
 
         # Wait to join threads in pool first before adding item to directory
         for x, i in enumerate(pool):
+            if not i:
+                continue
             i.join()
             li = self.items_queue[x]
             if not li:
