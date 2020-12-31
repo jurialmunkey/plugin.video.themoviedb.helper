@@ -13,6 +13,7 @@ from resources.lib.trakt.items import TraktItems
 from resources.lib.trakt.decorators import is_authorized, use_activity_cache
 from resources.lib.trakt.progress import _TraktProgress
 from resources.lib.addon.parser import try_int
+from resources.lib.addon.timedate import set_timestamp, get_timestamp
 # from resources.lib.addon.decorators import timer_report
 
 API_URL = 'https://api.trakt.tv/'
@@ -382,17 +383,18 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
 
         # First time authorization in this session so let's confirm
         if self.authorization and get_property('TraktIsAuth') != 'True':
-            # Check if we can get a response from user account
-            kodi_log('Checking Trakt authorization', 1)
-            response = self.get_simple_api_request('https://api.trakt.tv/sync/last_activities', headers=self.headers)
-            # 401 is unauthorized error code so let's try refreshing the token
-            if not response or response.status_code == 401:
-                kodi_log('Trakt unauthorized!', 1)
-                self.authorization = self.refresh_token()
-            # Authorization confirmed so let's set a window property for future reference in this session
-            if self.authorization:
-                kodi_log('Trakt user account authorized', 1)
-                get_property('TraktIsAuth', 'True')
+            if not get_timestamp(get_property('TraktRefreshTimeStamp', is_type=float) or 0):
+                # Check if we can get a response from user account
+                kodi_log('Checking Trakt authorization', 2)
+                response = self.get_simple_api_request('https://api.trakt.tv/sync/last_activities', headers=self.headers)
+                # 401 is unauthorized error code so let's try refreshing the token
+                if not response or response.status_code == 401:
+                    kodi_log('Trakt unauthorized!', 2)
+                    self.authorization = self.refresh_token()
+                # Authorization confirmed so let's set a window property for future reference in this session
+                if self.authorization:
+                    kodi_log('Trakt user account authorized', 1)
+                    get_property('TraktIsAuth', 'True')
 
         return self.authorization
 
@@ -438,7 +440,16 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         self.poller()
 
     def refresh_token(self):
-        kodi_log('Attempting to refresh Trakt token', 1)
+        # Check we haven't attempted too many refresh attempts
+        refresh_attempts = try_int(get_property('TraktRefreshAttempts')) + 1
+        if refresh_attempts > 5:
+            kodi_log('Trakt Unauthorised!\nExceeded refresh_token attempt limit\nSuppressing retries for 10 minutes', 1)
+            get_property('TraktRefreshTimeStamp', set_timestamp(600))
+            get_property('TraktRefreshAttempts', 0)  # Reset refresh attempts
+            return
+        get_property('TraktRefreshAttempts', refresh_attempts)
+
+        kodi_log('Attempting to refresh Trakt token', 2)
         if not self.authorization or not self.authorization.get('refresh_token'):
             kodi_log('Trakt refresh token not found!', 1)
             return
@@ -450,7 +461,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
             'grant_type': 'refresh_token'}
         self.authorization = self.get_api_request_json('https://api.trakt.tv/oauth/token', postdata=postdata)
         if not self.authorization or not self.authorization.get('access_token'):
-            kodi_log('Failed to refresh Trakt token!', 1)
+            kodi_log('Failed to refresh Trakt token!', 2)
             return
         self.on_authenticated(auth_dialog=False)
         kodi_log('Trakt token refreshed', 1)
