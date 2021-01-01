@@ -33,6 +33,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         self.cur_folder = None
         self.pre_folder = None
         self.property_prefix = 'ListItem'
+        self._last_blur_fallback = False
 
     def get_container(self):
         self.container = get_container()
@@ -98,7 +99,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         return (
             self.get_infolabel('dbtype'),
             self.get_infolabel('dbid'),
-            self.get_infolabel('imdb'),
+            self.get_infolabel('IMDBNumber'),
             self.get_infolabel('label'),
             self.get_infolabel('year'),
             self.get_infolabel('season'),
@@ -181,6 +182,19 @@ class ListItemMonitor(CommonMonitorFunctions):
                 return artwork
         return fallback
 
+    @try_except_log('lib.monitor.listitem.blur_fallback')
+    def blur_fallback(self):
+        if self._last_blur_fallback:
+            return
+        fallback = get_property('Blur.Fallback')
+        if not fallback:
+            return
+        if xbmc.getCondVisibility("Skin.HasSetting(TMDbHelper.EnableBlur)"):
+            self.blur_img = ImageFunctions(method='blur', artwork=fallback)
+            self.blur_img.setName('blur_img')
+            self.blur_img.start()
+            self._last_blur_fallback = True
+
     @try_except_log('lib.monitor.listitem.get_listitem')
     def get_listitem(self):
         self.get_container()
@@ -211,6 +225,7 @@ class ListItemMonitor(CommonMonitorFunctions):
                 fallback=get_property('Blur.Fallback')))
             self.blur_img.setName('blur_img')
             self.blur_img.start()
+            self._last_blur_fallback = False
 
         # Desaturate Image
         if xbmc.getCondVisibility("Skin.HasSetting(TMDbHelper.EnableDesaturate)"):
