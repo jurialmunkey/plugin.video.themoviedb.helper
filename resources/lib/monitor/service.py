@@ -50,6 +50,7 @@ class ServiceMonitor(object):
         """
         if self.listitem_monitor.properties or self.listitem_monitor.index_properties:
             return self.listitem_monitor.clear_properties()
+        self.listitem_monitor.blur_fallback()
         self.xbmc_monitor.waitForAbort(1)
 
     def _on_exit(self):
