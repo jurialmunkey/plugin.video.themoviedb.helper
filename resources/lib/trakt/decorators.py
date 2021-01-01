@@ -1,4 +1,3 @@
-import resources.lib.addon.cache as cache
 from resources.lib.files.utils import set_pickle, get_pickle
 from resources.lib.addon.plugin import format_name
 
@@ -11,7 +10,7 @@ def is_authorized(func):
     return wrapper
 
 
-def use_lastupdated_cache(func, *args, **kwargs):
+def use_lastupdated_cache(cache, func, *args, **kwargs):
     """
     Not a decorator. Function to check sync_info last_updated_at to decide if cache or refresh
     sync_info=self.get_sync('watched', 'show', 'slug').get(slug)
@@ -50,8 +49,8 @@ def use_activity_cache(activity_type=None, activity_key=None, cache_days=None, p
                 return
 
             # Setup getter/setter cache funcs
-            func_get = get_pickle if pickle_object else cache.get_cache
-            func_set = set_pickle if pickle_object else cache.set_cache
+            func_get = get_pickle if pickle_object else self._cache.get_cache
+            func_set = set_pickle if pickle_object else self._cache.set_cache
 
             # Set cache_name
             cache_name = u'{}.'.format(func.__name__)

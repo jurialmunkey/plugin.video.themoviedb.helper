@@ -1,5 +1,3 @@
-import resources.lib.addon.cache as cache
-from resources.lib.addon.cache import use_simple_cache
 from resources.lib.container.pages import PaginatedItems
 from resources.lib.trakt.items import TraktItems
 from resources.lib.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache
@@ -7,7 +5,7 @@ from resources.lib.addon.parser import try_int
 from resources.lib.addon.timedate import convert_timestamp, date_in_range, get_region_date, get_datetime_today, get_timedelta
 from resources.lib.addon.plugin import viewitems
 from resources.lib.api.mapping import get_empty_item
-# from resources.lib.addon.decorators import timer_report
+from resources.lib.addon.cache import CACHE_SHORT, CACHE_LONG, use_simple_cache
 
 
 class _TraktProgress():
@@ -39,7 +37,7 @@ class _TraktProgress():
         if not aired_episodes:
             return
         watch_episodes = use_lastupdated_cache(
-            self.get_episodes_watchcount, slug, 'slug', tvshow=item, count_progress=True,
+            self._cache, self.get_episodes_watchcount, slug, 'slug', tvshow=item, count_progress=True,
             cache_name=u'TraktAPI.get_episodes_watchcount.response.slug.{}.True'.format(slug),
             sync_info=item)
         if aired_episodes <= watch_episodes:
@@ -47,7 +45,7 @@ class _TraktProgress():
         return item
 
     @is_authorized
-    @use_activity_cache('episodes', 'watched_at', cache_days=cache.CACHE_LONG)
+    @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_LONG)
     def get_episodes_watchcount(
             self, unique_id, id_type, season=None, exclude_specials=True,
             tvshow=None, count_progress=False):
@@ -82,7 +80,7 @@ class _TraktProgress():
         return count
 
     @is_authorized
-    @use_activity_cache(cache_days=cache.CACHE_LONG)
+    @use_activity_cache(cache_days=CACHE_LONG)
     def get_hiddenitems(
             self, trakt_type, progress_watched=True, progress_collected=True,
             calendar=True, id_type='slug'):
@@ -102,7 +100,7 @@ class _TraktProgress():
         return hidden_items
 
     @is_authorized
-    # @use_activity_cache('episodes', 'watched_at', cache_days=cache.CACHE_SHORT)
+    # @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_SHORT)
     def get_upnext_list(self, unique_id, id_type=None, page=1):
         """ Gets the next episodes for a show that user should watch next """
         if id_type != 'slug':
@@ -143,12 +141,12 @@ class _TraktProgress():
         return items
 
     @is_authorized
-    @use_activity_cache('episodes', 'watched_at', cache_days=cache.CACHE_SHORT)
+    @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_SHORT)
     def get_show_progress(self, slug):
         if not slug:
             return
         return use_lastupdated_cache(
-            self.get_response_json, 'shows', slug, 'progress/watched',
+            self._cache, self.get_response_json, 'shows', slug, 'progress/watched',
             sync_info=self.get_sync('watched', 'show', 'slug').get(slug),
             cache_name=u'TraktAPI.get_show_progress.response.{}'.format(slug))
 
@@ -182,12 +180,12 @@ class _TraktProgress():
             or (reset_at and convert_timestamp(episode.get('last_watched_at')) < reset_at)]
 
     @is_authorized
-    # @use_activity_cache('movies', 'watched_at', cache_days=cache.CACHE_LONG)
+    # @use_activity_cache('movies', 'watched_at', cache_days=CACHE_LONG)
     def get_movie_playcount(self, unique_id, id_type):
         return self.get_sync('watched', 'movie', id_type).get(unique_id, {}).get('plays')
 
     @is_authorized
-    @use_activity_cache('episodes', 'watched_at', cache_days=cache.CACHE_LONG)
+    @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_LONG)
     def get_episode_playcount(self, unique_id, id_type, season, episode):
         season = try_int(season, fallback=-2)  # Make fallback -2 to prevent matching on 0
         episode = try_int(episode, fallback=-2)  # Make fallback -2 to prevent matching on 0
@@ -199,7 +197,7 @@ class _TraktProgress():
                     return j.get('plays', 1)
 
     @is_authorized
-    @use_activity_cache('episodes', 'watched_at', cache_days=cache.CACHE_SHORT)
+    @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_SHORT)
     def get_episodes_airedcount(self, unique_id, id_type, season=None):
         """ Gets the number of aired episodes for a tvshow """
         if season is not None:
@@ -207,7 +205,7 @@ class _TraktProgress():
         return self.get_sync('watched', 'show', id_type).get(unique_id, {}).get('show', {}).get('aired_episodes')
 
     @is_authorized
-    @use_activity_cache('episodes', 'watched_at', cache_days=cache.CACHE_SHORT)
+    @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_SHORT)
     def get_season_episodes_airedcount(self, unique_id, id_type, season):
         season = try_int(season, fallback=-2)
         slug = self.get_id(unique_id, id_type, trakt_type='show', output_type='slug')

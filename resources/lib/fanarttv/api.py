@@ -1,6 +1,6 @@
 import xbmc
 import xbmcgui
-import resources.lib.addon.cache as cache
+from resources.lib.addon.cache import CACHE_EXTENDED
 from resources.lib.api.request import RequestAPI
 from resources.lib.container.listitem import ListItem
 from resources.lib.addon.plugin import ADDON, viewitems, get_language
@@ -54,6 +54,7 @@ class FanartTV(RequestAPI):
         self.language = language[:2] if language else 'en'
         self.cache_only = cache_only
         self.cache_refresh = cache_refresh
+        self.req_strip.append(('&client_key={}'.format(client_key), ''))
 
     def get_artwork_request(self, ftv_id, ftv_type):
         """
@@ -66,7 +67,7 @@ class FanartTV(RequestAPI):
             ftv_type, ftv_id,
             cache_force=7,  # Force the cache to save a dummy dict for 7 days so that we don't bother requesting 404s multiple times
             cache_fallback={'dummy': None},
-            cache_days=cache.CACHE_EXTENDED,
+            cache_days=CACHE_EXTENDED,
             cache_only=self.cache_only,
             cache_refresh=self.cache_refresh)
 
@@ -79,9 +80,9 @@ class FanartTV(RequestAPI):
         return response.get(artwork_type) or []
 
     def get_artwork_type(self, ftv_id, ftv_type, artwork_type):
-        return cache.use_cache(
+        return self._cache.use_cache(
             self._get_artwork_type, ftv_id, ftv_type, artwork_type,
-            cache_name=u'fanart_tv.type.{}.{}.{}.{}'.format(self.language, ftv_id, ftv_type, artwork_type),
+            cache_name=u'FanartTV.type.{}.{}.{}.{}'.format(self.language, ftv_id, ftv_type, artwork_type),
             cache_only=self.cache_only,
             cache_refresh=self.cache_refresh)
 
@@ -98,9 +99,9 @@ class FanartTV(RequestAPI):
         return best_item
 
     def get_best_artwork(self, ftv_id, ftv_type, artwork_type):
-        return cache.use_cache(
+        return self._cache.use_cache(
             self._get_best_artwork, ftv_id, ftv_type, artwork_type,
-            cache_name=u'fanart_tv.best.{}.{}.{}.{}'.format(self.language, ftv_id, ftv_type, artwork_type),
+            cache_name=u'FanartTV.best.{}.{}.{}.{}'.format(self.language, ftv_id, ftv_type, artwork_type),
             cache_only=self.cache_only,
             cache_refresh=self.cache_refresh)
 
@@ -267,9 +268,9 @@ class FanartTV(RequestAPI):
         # Cache our choice as the best artwork forever since it was selected manually
         # Some types have have HD and SD variants so set cache for both
         for i in ARTWORK_TYPES.get(ftv_type, {}).get(artwork_type, []):
-            success = cache.set_cache(
+            success = self._cache.set_cache(
                 artwork_items[choice].get('url'),
-                cache_name=u'fanart_tv.best.{}.{}.{}.{}'.format(self.language, ftv_id, ftv_type, i),
+                cache_name=u'FanartTV.best.{}.{}.{}.{}'.format(self.language, ftv_id, ftv_type, i),
                 cache_days=10000)
         if success and container_refresh:
             xbmc.executebuiltin('Container.Refresh')

@@ -1,10 +1,8 @@
 import xbmc
 import xbmcgui
 import random
-import resources.lib.addon.cache as cache
 import resources.lib.container.pages as pages
 from resources.lib.addon.window import get_property
-from resources.lib.addon.cache import use_simple_cache
 from json import loads, dumps
 from resources.lib.api.request import RequestAPI
 from resources.lib.addon.plugin import ADDON, kodi_log, viewitems
@@ -13,8 +11,9 @@ from resources.lib.trakt.items import TraktItems
 from resources.lib.trakt.decorators import is_authorized, use_activity_cache
 from resources.lib.trakt.progress import _TraktProgress
 from resources.lib.addon.parser import try_int
+from resources.lib.addon.cache import CACHE_SHORT, CACHE_LONG, use_simple_cache
 from resources.lib.addon.timedate import set_timestamp, get_timestamp
-# from resources.lib.addon.decorators import timer_report
+
 
 API_URL = 'https://api.trakt.tv/'
 CLIENT_ID = 'e6fde6173adf3c6af8fd1b0694b9b84d7c519cefc24482310e1de06c6abe5467'
@@ -41,7 +40,7 @@ def get_sort_methods():
 
 
 class _TraktLists():
-    @use_simple_cache(cache_days=cache.CACHE_SHORT)
+    @use_simple_cache(cache_days=CACHE_SHORT)
     def get_sorted_list(self, path, sort_by=None, sort_how=None, extended=None, trakt_type=None, permitted_types=None, cache_refresh=False):
         response = self.get_response(path, extended=extended, limit=4095)
         if not response:
@@ -51,7 +50,7 @@ class _TraktLists():
             sort_how=sort_how or response.headers.get('X-Sort-How'),
             permitted_types=permitted_types)
 
-    @use_simple_cache(cache_days=cache.CACHE_SHORT)
+    @use_simple_cache(cache_days=CACHE_SHORT)
     def get_simple_list(self, *args, **kwargs):
         trakt_type = kwargs.pop('trakt_type', None)
         response = self.get_response(*args, **kwargs)
@@ -111,7 +110,7 @@ class _TraktLists():
             'persons': sorted_items.get('persons', []),
             'next_page': paginated_items.next_page}
 
-    @use_activity_cache(cache_days=cache.CACHE_SHORT)
+    @use_activity_cache(cache_days=CACHE_SHORT)
     def _get_sync_list(self, sync_type, trakt_type, sort_by=None, sort_how=None):
         return TraktItems(
             items=self.get_sync(sync_type, trakt_type),
@@ -249,7 +248,7 @@ class _TraktSync():
             self.last_activities = self.get_response_json('sync/last_activities')
         return self._get_activity_timestamp(self.last_activities, activity_type=activity_type, activity_key=activity_key)
 
-    @use_activity_cache(cache_days=cache.CACHE_SHORT, pickle_object=False)
+    @use_activity_cache(cache_days=CACHE_SHORT, pickle_object=False)
     def _get_sync_response(self, path, extended=None):
         """ Quick sub-cache routine to avoid recalling full sync list if we also want to quicklist it """
         sync_name = u'sync_response.{}.{}'.format(path, extended)
@@ -286,44 +285,44 @@ class _TraktSync():
                         if episode == j.get('number'):
                             return True
 
-    @use_activity_cache('movies', 'watched_at', cache.CACHE_LONG, pickle_object=False)
+    @use_activity_cache('movies', 'watched_at', CACHE_LONG, pickle_object=False)
     def get_sync_watched_movies(self, trakt_type, id_type=None):
         return self._get_sync('sync/watched/movies', 'movie', id_type=id_type)
 
     # Watched shows sync uses short cache as needed for progress checks and new episodes might air tomorrow
-    @use_activity_cache('episodes', 'watched_at', cache.CACHE_SHORT, pickle_object=False)
+    @use_activity_cache('episodes', 'watched_at', CACHE_SHORT, pickle_object=False)
     def get_sync_watched_shows(self, trakt_type, id_type=None):
         return self._get_sync('sync/watched/shows', 'show', id_type=id_type, extended='full')
 
-    @use_activity_cache('movies', 'collected_at', cache.CACHE_LONG, pickle_object=False)
+    @use_activity_cache('movies', 'collected_at', CACHE_LONG, pickle_object=False)
     def get_sync_collection_movies(self, trakt_type, id_type=None):
         return self._get_sync('sync/collection/movies', 'movie', id_type=id_type)
 
-    @use_activity_cache('episodes', 'collected_at', cache.CACHE_LONG, pickle_object=False)
+    @use_activity_cache('episodes', 'collected_at', CACHE_LONG, pickle_object=False)
     def get_sync_collection_shows(self, trakt_type, id_type=None):
         return self._get_sync('sync/collection/shows', trakt_type, id_type=id_type)
 
-    @use_activity_cache('movies', 'watched_at', cache.CACHE_LONG, pickle_object=False)
+    @use_activity_cache('movies', 'watched_at', CACHE_LONG, pickle_object=False)
     def get_sync_playback_movies(self, trakt_type, id_type=None):
         return self._get_sync('sync/playback/movies', 'movie', id_type=id_type)
 
-    @use_activity_cache('episodes', 'watched_at', cache.CACHE_LONG, pickle_object=False)
+    @use_activity_cache('episodes', 'watched_at', CACHE_LONG, pickle_object=False)
     def get_sync_playback_shows(self, trakt_type, id_type=None):
         return self._get_sync('sync/playback/episodes', trakt_type, id_type=id_type)
 
-    @use_activity_cache('movies', 'watchlisted_at', cache.CACHE_LONG, pickle_object=False)
+    @use_activity_cache('movies', 'watchlisted_at', CACHE_LONG, pickle_object=False)
     def get_sync_watchlist_movies(self, trakt_type, id_type=None):
         return self._get_sync('sync/watchlist/movies', 'movie', id_type=id_type)
 
-    @use_activity_cache('shows', 'watchlisted_at', cache.CACHE_LONG, pickle_object=False)
+    @use_activity_cache('shows', 'watchlisted_at', CACHE_LONG, pickle_object=False)
     def get_sync_watchlist_shows(self, trakt_type, id_type=None):
         return self._get_sync('sync/watchlist/shows', 'show', id_type=id_type)
 
-    @use_activity_cache('movies', 'recommendations_at', cache.CACHE_LONG, pickle_object=False)
+    @use_activity_cache('movies', 'recommendations_at', CACHE_LONG, pickle_object=False)
     def get_sync_recommendations_movies(self, trakt_type, id_type=None):
         return self._get_sync('sync/recommendations/movies', 'movie', id_type=id_type)
 
-    @use_activity_cache('shows', 'recommendations_at', cache.CACHE_LONG, pickle_object=False)
+    @use_activity_cache('shows', 'recommendations_at', CACHE_LONG, pickle_object=False)
     def get_sync_recommendations_shows(self, trakt_type, id_type=None):
         return self._get_sync('sync/recommendations/shows', 'show', id_type=id_type)
 
@@ -347,7 +346,7 @@ class _TraktSync():
 
 class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
     def __init__(self, force=False):
-        super(TraktAPI, self).__init__(req_api_url=API_URL, req_api_name='Trakt')
+        super(TraktAPI, self).__init__(req_api_url=API_URL, req_api_name='TraktAPI')
         self.authorization = ''
         self.attempted_login = False
         self.dialog_noapikey_header = u'{0} {1} {2}'.format(ADDON.getLocalizedString(32007), self.req_api_name, ADDON.getLocalizedString(32011))
@@ -554,24 +553,24 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         trakt_type: movie, show, episode, person, list
         output_type: trakt, slug, imdb, tmdb, tvdb
         """
-        return cache.use_cache(
+        return _cache.use_cache(
             self._get_id, unique_id, id_type, trakt_type=trakt_type, output_type=output_type,
             cache_name=u'trakt_get_id.{}.{}.{}.{}'.format(id_type, unique_id, trakt_type, output_type),
-            cache_days=cache.CACHE_LONG)
+            cache_days=CACHE_LONG)
 
     def get_details(self, trakt_type, id_num, season=None, episode=None, extended='full'):
         if not season or not episode:
             return self.get_request_lc(trakt_type + 's', id_num, extended=extended)
         return self.get_request_lc(trakt_type + 's', id_num, 'seasons', season, 'episodes', episode, extended=extended)
 
-    @use_simple_cache(cache_days=cache.CACHE_SHORT)
+    @use_simple_cache(cache_days=CACHE_SHORT)
     def get_imdb_top250(self, id_type=None):
         path = 'users/justin/lists/imdb-top-rated-movies/items'
         response = self.get_response(path, limit=4095)
         sorted_items = TraktItems(response.json() if response else []).sort_items('rank', 'asc') or []
         return [i['movie']['ids'][id_type] for i in sorted_items]
 
-    @use_simple_cache(cache_days=cache.CACHE_SHORT)
+    @use_simple_cache(cache_days=CACHE_SHORT)
     def get_ratings(self, trakt_type, imdb_id=None, trakt_id=None, slug_id=None, season=None, episode=None):
         slug = slug_id or trakt_id or imdb_id
         if not slug:
