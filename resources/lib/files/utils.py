@@ -81,19 +81,22 @@ def get_tmdb_id_nfo(basedir, foldername, tmdb_type='tv'):
         kodi_log(u'ERROR GETTING TMDBID FROM NFO:\n{}'.format(exc))
 
 
+def get_file_path(folder, filename, join_addon_data=True):
+    return os.path.join(get_write_path(folder, join_addon_data), filename)
+
+
 def delete_file(folder, filename, join_addon_data=True):
-    fullpath = os.path.join(_get_write_path(folder, join_addon_data), filename)
-    xbmcvfs.delete(fullpath)
+    xbmcvfs.delete(get_file_path(folder, filename, join_addon_data))
 
 
 def dumps_to_file(data, folder, filename, indent=2, join_addon_data=True):
-    path = os.path.join(_get_write_path(folder, join_addon_data), filename)
+    path = os.path.join(get_write_path(folder, join_addon_data), filename)
     with open(path, 'w') as file:
         json.dump(data, file, indent=indent)
     return path
 
 
-def _get_write_path(folder, join_addon_data=True):
+def get_write_path(folder, join_addon_data=True):
     main_dir = os.path.join(xbmcvfs.translatePath(ADDONDATA), folder) if join_addon_data else xbmcvfs.translatePath(folder)
     if not os.path.exists(main_dir):
         os.makedirs(main_dir)
@@ -106,7 +109,7 @@ def _del_file(folder, filename):
 
 
 def del_old_files(folder, limit=1):
-    folder = _get_write_path(folder, True)
+    folder = get_write_path(folder, True)
     for filename in sorted(os.listdir(folder))[:-limit]:
         _del_file(folder, filename)
 
@@ -141,7 +144,7 @@ def set_pickle(my_object, cache_name, cache_days=14, json_dump=False):
         return
     timestamp = get_datetime_now() + get_timedelta(days=cache_days)
     cache_obj = {'my_object': my_object, 'expires': timestamp.strftime("%Y-%m-%dT%H:%M:%S")}
-    with open(os.path.join(_get_write_path('pickle'), cache_name), 'w' if json_dump else 'wb') as file:
+    with open(os.path.join(get_write_path('pickle'), cache_name), 'w' if json_dump else 'wb') as file:
         json.dump(cache_obj, file, indent=4) if json_dump else _pickle.dump(cache_obj, file)
     return my_object
 
@@ -151,7 +154,7 @@ def get_pickle(cache_name, json_dump=False):
     if not cache_name:
         return
     try:
-        with open(os.path.join(_get_write_path('pickle'), cache_name), 'r' if json_dump else 'rb') as file:
+        with open(os.path.join(get_write_path('pickle'), cache_name), 'r' if json_dump else 'rb') as file:
             cache_obj = json.load(file) if json_dump else _pickle.load(file)
     except IOError:
         cache_obj = None

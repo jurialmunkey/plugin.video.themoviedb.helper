@@ -1,6 +1,6 @@
 import xbmcgui
 import xml.etree.ElementTree as ET
-import resources.lib.addon.cache as cache
+from resources.lib.addon.cache import BasicCache, CACHE_SHORT, CACHE_LONG
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import kodi_log, ADDON
 from resources.lib.addon.parser import try_int
@@ -51,8 +51,10 @@ class RequestAPI(object):
         self.req_500_err_prop = u'500Error.{}'.format(self.req_api_name)
         self.req_500_err = get_property(self.req_500_err_prop)
         self.req_500_err = loads(self.req_500_err) if self.req_500_err else {}
+        self.req_strip = [(self.req_api_url, self.req_api_name), (self.req_api_key, ''), ('is_xml=False', ''), ('is_xml=True', '')]
         self.headers = None
         self.timeout = timeout or 10
+        self._cache = BasicCache(filename='{}.db'.format(req_api_name or 'requests'))
 
     def get_api_request_json(self, request=None, postdata=None, headers=None, is_xml=False):
         request = self.get_api_request(request=request, postdata=postdata, headers=headers)
@@ -154,12 +156,12 @@ class RequestAPI(object):
 
     def get_request_sc(self, *args, **kwargs):
         """ Get API request using the short cache """
-        kwargs['cache_days'] = cache.CACHE_SHORT
+        kwargs['cache_days'] = CACHE_SHORT
         return self.get_request(*args, **kwargs)
 
     def get_request_lc(self, *args, **kwargs):
         """ Get API request using the long cache """
-        kwargs['cache_days'] = cache.CACHE_LONG
+        kwargs['cache_days'] = CACHE_LONG
         return self.get_request(*args, **kwargs)
 
     def get_request(self, *args, **kwargs):
@@ -171,11 +173,12 @@ class RequestAPI(object):
         cache_fallback = kwargs.pop('cache_fallback', False)  # Object to force cache if no object retrieved.
         cache_refresh = kwargs.pop('cache_refresh', False)  # Ignore cached timestamps and retrieve new object.
         cache_combine_name = kwargs.pop('cache_combine_name', False)  # Combine given cache_name with auto naming via args/kwargs
+        cache_strip = self.req_strip + kwargs.pop('cache_strip', [])  # Strip out api key and url from cache name
         headers = kwargs.pop('headers', None) or self.headers  # Optional override to default headers.
         postdata = kwargs.pop('postdata', None)  # Postdata if need to POST to a RESTful API.
         is_xml = kwargs.pop('is_xml', False)  # Response needs translating from XML to dict
         request_url = self.get_request_url(*args, **kwargs)
-        return cache.use_cache(
+        return self._cache.use_cache(
             self.get_api_request_json, request_url,
             headers=headers,
             postdata=postdata,
@@ -186,4 +189,5 @@ class RequestAPI(object):
             cache_only=cache_only,
             cache_force=cache_force,
             cache_fallback=cache_fallback,
-            cache_combine_name=cache_combine_name)
+            cache_combine_name=cache_combine_name,
+            cache_strip=cache_strip)

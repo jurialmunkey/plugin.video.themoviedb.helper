@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.themoviedb.helper"
-version="4.1.5"
+version="4.2.0"
 name="TheMovieDb Helper"
 provider-name="jurialmunkey">
 <requires>
   <import addon="xbmc.python" version="3.0.0"/>
-  <import addon="script.module.simplecache" version="1.0.11" />
   <import addon="script.module.requests" version="2.9.1"/>
   <import addon="script.module.pil" version="1.1.7"/>
 </requires>

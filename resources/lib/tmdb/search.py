@@ -1,6 +1,6 @@
 import xbmc
 import xbmcgui
-import resources.lib.addon.cache as cache
+from resources.lib.addon.cache import set_search_history, get_search_history
 from resources.lib.addon.plugin import ADDONPATH, ADDON, PLUGINPATH, convert_type
 from resources.lib.addon.parser import try_decode, urlencode_params
 from resources.lib.addon.setutils import merge_two_dicts
@@ -21,7 +21,7 @@ class SearchLists():
         if kwargs.get('clear_cache') != 'True':
             return self._list_multisearchdir(**kwargs)
         for tmdb_type in MULTISEARCH_TYPES:
-            cache.set_search_history(tmdb_type, clear_cache=True)
+            set_search_history(tmdb_type, clear_cache=True)
         self.container_refresh = True
 
     def _list_multisearchdir(self, **kwargs):
@@ -38,7 +38,7 @@ class SearchLists():
     def list_searchdir_router(self, tmdb_type, **kwargs):
         if kwargs.get('clear_cache') != 'True':
             return self.list_searchdir(tmdb_type, **kwargs)
-        cache.set_search_history(tmdb_type, clear_cache=True)
+        set_search_history(tmdb_type, clear_cache=True)
         self.container_refresh = True
 
     def list_searchdir(self, tmdb_type, clear_cache_item=True, append_type=False, **kwargs):
@@ -50,7 +50,7 @@ class SearchLists():
         items = []
         items.append(base_item)
 
-        history = cache.get_search_history(tmdb_type)
+        history = get_search_history(tmdb_type)
         history.reverse()
         for i in history:
             item = {
@@ -69,7 +69,7 @@ class SearchLists():
 
     def list_search(self, tmdb_type, query=None, update_listing=False, page=None, **kwargs):
         original_query = query
-        query = query or cache.set_search_history(
+        query = query or set_search_history(
             query=try_decode(xbmcgui.Dialog().input(ADDON.getLocalizedString(32044), type=xbmcgui.INPUT_ALPHANUM)),
             tmdb_type=tmdb_type)
 

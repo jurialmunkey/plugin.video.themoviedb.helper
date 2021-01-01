@@ -1,5 +1,5 @@
 import xbmcgui
-import resources.lib.addon.cache as cache
+from resources.lib.addon.cache import CACHE_SHORT, CACHE_LONG
 from resources.lib.tmdb.mapping import ItemMapper, get_episode_to_air
 from resources.lib.api.request import RequestAPI
 from resources.lib.addon.plugin import viewitems, ADDON, get_mpaa_prefix, get_language, convert_type, ADDONPATH
@@ -34,6 +34,7 @@ class TMDb(RequestAPI):
         self.req_language = u'{0}-{1}&include_image_language={0},null'.format(self.iso_language, self.iso_country)
         self.mpaa_prefix = mpaa_prefix
         self.append_to_response = APPEND_TO_RESPONSE
+        self.req_strip += [(self.append_to_response, ''), (self.req_language, self.iso_language)]
         self.mapper = ItemMapper(self.language, self.mpaa_prefix)
 
     def get_url_separator(self, separator=None):
@@ -49,10 +50,10 @@ class TMDb(RequestAPI):
     def get_tmdb_id(self, tmdb_type=None, imdb_id=None, tvdb_id=None, query=None, year=None, episode_year=None, raw_data=False, **kwargs):
         if not tmdb_type:
             return
-        kwargs['cache_days'] = cache.CACHE_SHORT
+        kwargs['cache_days'] = CACHE_SHORT
         kwargs['cache_name'] = 'TMDb.get_tmdb_id.v2'
         kwargs['cache_combine_name'] = True
-        return cache.use_cache(
+        return self._cache.use_cache(
             self._get_tmdb_id, tmdb_type=tmdb_type, imdb_id=imdb_id, tvdb_id=tvdb_id, query=query, year=year,
             episode_year=episode_year, raw_data=raw_data, **kwargs)
 
@@ -122,10 +123,10 @@ class TMDb(RequestAPI):
 
     def get_tvshow_nextaired(self, tmdb_id):
         """ Get updated next aired data for tvshows using 24hr cache """
-        return cache.use_cache(
+        return self._cache.use_cache(
             self._get_tvshow_nextaired, tmdb_id,
             cache_name=u'TMDb.get_tvshow_nextaired.{}'.format(tmdb_id),
-            cache_days=cache.CACHE_SHORT)
+            cache_days=CACHE_SHORT)
 
     def _get_tvshow_nextaired(self, tmdb_id):
         if not tmdb_id:
@@ -150,10 +151,10 @@ class TMDb(RequestAPI):
             tmdb_type, tmdb_id, *path_affix, append_to_response=self.append_to_response) or {}
 
     def get_details(self, tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
-        kwargs['cache_days'] = cache.CACHE_LONG
+        kwargs['cache_days'] = CACHE_LONG
         kwargs['cache_name'] = 'TMDb.get_details.v2'
         kwargs['cache_combine_name'] = True
-        return cache.use_cache(self._get_details, tmdb_type, tmdb_id, season, episode, **kwargs)
+        return self._cache.use_cache(self._get_details, tmdb_type, tmdb_id, season, episode, **kwargs)
 
     def _get_details(self, tmdb_type, tmdb_id, season, episode, **kwargs):
         if not tmdb_id or not tmdb_type:
@@ -385,14 +386,14 @@ class TMDb(RequestAPI):
 
     def get_request_sc(self, *args, **kwargs):
         """ Get API request using the short cache """
-        kwargs['cache_days'] = cache.CACHE_SHORT
+        kwargs['cache_days'] = CACHE_SHORT
         kwargs['region'] = self.iso_country
         kwargs['language'] = self.req_language
         return self.get_request(*args, **kwargs)
 
     def get_request_lc(self, *args, **kwargs):
         """ Get API request using the long cache """
-        kwargs['cache_days'] = cache.CACHE_LONG
+        kwargs['cache_days'] = CACHE_LONG
         kwargs['region'] = self.iso_country
         kwargs['language'] = self.req_language
         return self.get_request(*args, **kwargs)
