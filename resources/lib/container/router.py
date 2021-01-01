@@ -82,9 +82,6 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
     def _add_item(self, x, li, tmdb_cache_only):
         cache_only = True if tmdb_cache_only and not self.ftv_api else False
         li.set_details(details=self.get_tmdb_details(li, cache_only=cache_only))  # Quick because only get cached
-        li.set_episode_label()
-        if self.check_is_aired and li.is_unaired():
-            return
         li.set_details(details=self.get_ftv_artwork(li), reverse=True)  # Slow when not cache only
         self.items_queue[x] = li
 
@@ -114,6 +111,9 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             li = self.items_queue[x]
             if not li:
                 continue
+            li.set_episode_label()
+            if self.check_is_aired and li.is_unaired():
+                return
             li.set_details(details=self.get_kodi_details(li), reverse=True)  # Quick because local db
             li.set_playcount(playcount=self.get_playcount_from_trakt(li))  # Quick because of agressive caching of Trakt object and pre-emptive dict comprehension
             if self.hide_watched and try_int(li.infolabels.get('playcount')) != 0:
