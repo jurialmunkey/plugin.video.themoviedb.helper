@@ -97,7 +97,7 @@ class _TraktProgress():
         if calendar:
             response = self.get_response_json('users', 'hidden', 'calendar', type=trakt_type, limit=4095)
             hidden_items |= {i.get(trakt_type, {}).get('ids', {}).get(id_type) for i in response}
-        return hidden_items
+        return list(hidden_items)
 
     @is_authorized
     # @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_SHORT)
