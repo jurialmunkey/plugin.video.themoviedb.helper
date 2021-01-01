@@ -80,7 +80,8 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         return True
 
     def _add_item(self, x, li, tmdb_cache_only):
-        li.set_details(details=self.get_tmdb_details(li, cache_only=tmdb_cache_only))  # Quick because only get cached
+        cache_only = True if tmdb_cache_only and not self.ftv_api else False
+        li.set_details(details=self.get_tmdb_details(li, cache_only=cache_only))  # Quick because only get cached
         li.set_episode_label()
         if self.check_is_aired and li.is_unaired():
             return

@@ -227,20 +227,20 @@ def set_crew_properties(i, x, prefix):
 def get_crew_properties(v):
     infoproperties = {}
     department_map = {
-        'Directing': {'name': 'director', 'x': 0},
-        'Writing': {'name': 'writer', 'x': 0},
-        'Production': {'name': 'producer', 'x': 0},
-        'Sound': {'name': 'sound_department', 'x': 0},
-        'Art': {'name': 'art_department', 'x': 0},
-        'Camera': {'name': 'photography', 'x': 0},
-        'Editing': {'name': 'editor', 'x': 0}}
+        u'Directing': {'name': 'director', 'x': 0},
+        u'Writing': {'name': 'writer', 'x': 0},
+        u'Production': {'name': 'producer', 'x': 0},
+        u'Sound': {'name': 'sound_department', 'x': 0},
+        u'Art': {'name': 'art_department', 'x': 0},
+        u'Camera': {'name': 'photography', 'x': 0},
+        u'Editing': {'name': 'editor', 'x': 0}}
     x = 0
     for i in v:
         if not i.get('name'):
             continue
         x += 1
         infoproperties.update(set_crew_properties(i, x, 'Crew'))
-        if i.get('deparment') not in department_map:
+        if i.get('department') not in department_map:
             continue
         dm = department_map[i['department']]
         dm['x'] += 1
