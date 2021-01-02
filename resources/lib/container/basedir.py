@@ -5,24 +5,25 @@ from resources.lib.addon.setutils import merge_two_items
 from json import dumps
 
 
+def _build_basedir_item(i, t, space):
+    item = i.copy()
+    item['label'] = item['label'].format(space=space, item_type=convert_type(t, 'plural') if space else '')
+    item['params'] = i.get('params', {}).copy()
+    item['params']['tmdb_type'] = t
+    if item.pop('sorting', False):
+        item.setdefault('infoproperties', {})['tmdbhelper.context.sorting'] = dumps(item['params'])
+    item.pop('types', None)
+    return item
+
+
 def _build_basedir(item_type=None, basedir=None):
-    basedir = basedir or []
-    items = []
-    space = '' if item_type else ' '  # If only one type spaces are not needed for label because we dont add type name
-    for i in basedir:
-        sorting = i.pop('sorting', False)
-        for i_type in i.pop('types', []):
-            if item_type and item_type != i_type:
-                continue
-            plural = '' if item_type else convert_type(i_type, 'plural')  # Dont add type name to label if only one type
-            item = i.copy()
-            item['label'] = i.get('label', '').format(space=space, item_type=plural)
-            item['params'] = i.get('params', {}).copy()
-            item['params']['tmdb_type'] = i_type
-            if sorting:
-                item.setdefault('infoproperties', {})['tmdbhelper.context.sorting'] = dumps(item['params'])
-            items.append(item)
-    return items
+    if not basedir:
+        return []
+    space = '' if item_type else ' '  # Type not added to label when single type so dont need spaces
+    return [
+        _build_basedir_item(i, t, space)
+        for i in basedir for t in i.get('types', [])
+        if not item_type or item_type == t]
 
 
 def _get_basedir_list(item_type=None, trakt=False, tmdb=False):
@@ -487,41 +488,49 @@ def _get_basedir_main():
     return [
         {
             'label': xbmc.getLocalizedString(342),
+            'types': [None],
             'params': {'info': 'dir_movie'},
             'path': PLUGINPATH,
             'art': {'thumb': u'{}/resources/icons/tmdb/movies.png'.format(ADDONPATH)}},
         {
             'label': xbmc.getLocalizedString(20343),
+            'types': [None],
             'params': {'info': 'dir_tv'},
             'path': PLUGINPATH,
             'art': {'thumb': u'{}/resources/icons/tmdb/tv.png'.format(ADDONPATH)}},
         {
             'label': ADDON.getLocalizedString(32172),
+            'types': [None],
             'params': {'info': 'dir_person'},
             'path': PLUGINPATH,
             'art': {'thumb': u'{}/resources/icons/tmdb/cast.png'.format(ADDONPATH)}},
         {
             'label': xbmc.getLocalizedString(137),
+            'types': [None],
             'params': {'info': 'dir_multisearch'},
             'path': PLUGINPATH,
             'art': {'thumb': u'{}/resources/icons/tmdb/search.png'.format(ADDONPATH)}},
         {
             'label': ADDON.getLocalizedString(32174),
+            'types': [None],
             'params': {'info': 'dir_discover'},
             'path': PLUGINPATH,
             'art': {'thumb': u'{}/resources/poster.png'.format(ADDONPATH)}},
         {
             'label': ADDON.getLocalizedString(32173),
+            'types': [None],
             'params': {'info': 'dir_random'},
             'path': PLUGINPATH,
             'art': {'thumb': u'{}/resources/poster.png'.format(ADDONPATH)}},
         {
             'label': u'TheMovieDb',
+            'types': [None],
             'params': {'info': 'dir_tmdb'},
             'path': PLUGINPATH,
             'art': {'thumb': u'{}/resources/poster.png'.format(ADDONPATH)}},
         {
             'label': u'Trakt',
+            'types': [None],
             'params': {'info': 'dir_trakt'},
             'path': PLUGINPATH,
             'art': {'thumb': u'{}/resources/trakt.png'.format(ADDONPATH)}}]
@@ -668,7 +677,7 @@ class BaseDirLists():
             'dir_calendar_trakt': lambda: _get_basedir_calendar(info='trakt_calendar'),
             'dir_calendar_library': lambda: _get_basedir_calendar(info='library_nextaired')
         }
-        func = route.get(info) or _get_basedir_main
+        func = route.get(info, lambda: _build_basedir(None, _get_basedir_main()))
         return func()
 
     def list_details(self, tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
