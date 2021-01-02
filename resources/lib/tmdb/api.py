@@ -261,7 +261,6 @@ class TMDb(RequestAPI):
 
     def get_cast_list(self, tmdb_id, tmdb_type, season=None, episode=None, keys=['cast', 'guest_stars']):
         items = []
-        prev_item = {}
         if season is not None and episode is not None:
             affix = u'season/{}/episode/{}'.format(season, episode)
         elif season is not None:
@@ -270,29 +269,33 @@ class TMDb(RequestAPI):
             affix = None
         response = self.get_request_lc(tmdb_type, tmdb_id, affix, 'credits')
         if not response:
-            return items
-        # Avoid re-adding the same cast/crew member if multiple roles
-        # Instead merge infoproperties (ie roles / jobs / departments etc) together and make one item
-        prev_item = None
+            return []
+
+        # Join guest stars list etc
         cast_list = []
         for key in keys:
             cast_list += response.get(key) or []
-        for i in cast_list:
-            this_item = self.mapper.get_info(i, 'person')
-            if prev_item and prev_item.get('label') != this_item.get('label'):
-                items.append(prev_item)
-            elif prev_item:
-                infoproperties = prev_item.get('infoproperties', {})
-                for k, v in viewitems(this_item.get('infoproperties', {})):
-                    if not v:
-                        continue
-                    if not infoproperties.get(k):
-                        infoproperties[k] = v
-                    elif infoproperties.get(k) != v:
-                        infoproperties[k] = u'{} / {}'.format(infoproperties[k], v)
-                this_item['infoproperties'] = infoproperties
-            prev_item = this_item
-        items.append(prev_item) if prev_item else None
+
+        # Add items
+        item_ids = []
+        for i in sorted(cast_list, key=lambda k: k.get('order', 1000)):
+            if not i.get('id'):
+                continue
+            # Avoid re-adding people that have multiple roles listed
+            if i['id'] not in item_ids:
+                item_ids.append(i['id'])
+                items.append(self.mapper.get_info(i, 'person'))
+                continue
+            # Instead merge their roles back into the original entry
+            x = item_ids.index(i['id'])
+            p = items[x].get('infoproperties', {})
+            for k, v in viewitems(self.mapper.get_info(i, 'person').get('infoproperties', {})):
+                if not v:
+                    continue
+                if not p.get(k):
+                    p[k] = v
+                elif p[k] != v:
+                    p[k] = u'{} / {}'.format(p[k], v)
         return items
 
     def _get_downloaded_list(self, export_list, sorting=None, reverse=False, datestamp=None):
