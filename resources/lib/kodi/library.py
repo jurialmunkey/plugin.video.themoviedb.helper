@@ -2,7 +2,7 @@ import xbmc
 import xbmcgui
 import xbmcvfs
 import resources.lib.kodi.rpc as rpc
-from resources.lib.addon.parser import try_int
+from resources.lib.addon.parser import try_int, try_decode
 from resources.lib.addon.plugin import ADDON
 from resources.lib.files.utils import validify_filename, get_tmdb_id_nfo
 from resources.lib.kodi.logger import _LibraryLogger
@@ -73,7 +73,7 @@ class LibraryAdder():
         # Update each show in folder
         nfos_total = len(nfos)
         for x, i in enumerate(nfos):
-            self._update(x, nfos_total, message=u'{} {}...'.format(ADDON.getLocalizedString(32167), i['folder']))
+            self._update(x, nfos_total, message=u'{} {}...'.format(ADDON.getLocalizedString(32167), try_decode(i['folder'])))
             self.add_tvshow(tmdb_id=i['tmdb_id'], force=force)
 
         # Update last updated stamp
