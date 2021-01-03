@@ -43,10 +43,13 @@ class LibraryAdder():
         self.hide_unaired = ADDON.getSettingBool('hide_unaired_episodes')
         # self.debug_logging = ADDON.getSettingBool('debug_logging')
         self.debug_logging = True
+        self.clean_library = False
 
     def _start(self):
         if self.p_dialog:
             self.p_dialog.create('TMDbHelper', ADDON.getLocalizedString(32166))
+        if not ADDON.getSettingBool('legacy_conversion'):
+            self.legacy_conversion()
 
     def _finish(self, update=True):
         if self.p_dialog:
@@ -54,6 +57,8 @@ class LibraryAdder():
         if self.debug_logging:
             self._log._clean()  # Clean up old log files first
             self._log._out()
+        if self.clean_library:
+            xbmc.executebuiltin('CleanLibrary(video)')
         if update and self.auto_update:
             xbmc.executebuiltin('UpdateLibrary(video)')
 
@@ -61,14 +66,48 @@ class LibraryAdder():
         if self.p_dialog:
             self.p_dialog.update((((count + 1) * 100) // total), **kwargs)
 
-    def update_tvshows(self, force=False, **kwargs):
+    def get_tv_folder_nfos(self):
         nfos = []
-
-        # Get TMDb IDs from nfo files in folder
         nfos_append = nfos.append  # For speed since we can't do a list comp easily here
         for f in xbmcvfs.listdir(BASEDIR_TV)[0]:
             tmdb_id = get_tmdb_id_nfo(BASEDIR_TV, f)
             nfos_append({'tmdb_id': tmdb_id, 'folder': f}) if tmdb_id else None
+        return nfos
+
+    def _legacy_conversion(self, folder, tmdb_id):
+        # Get details
+        details = TMDb().get_request_sc('tv', tmdb_id, append_to_response='external_ids')
+        if not details or not details.get('first_air_date'):
+            return  # Skip shows without details/year
+
+        # Get new name and compare to old name
+        name = u'{} ({})'.format(details.get('name'), details['first_air_date'][:4])
+        if folder == name:
+            return  # Skip if already converted
+
+        # Convert name
+        basedir = BASEDIR_TV.replace('\\', '/')
+        old_folder = u'{}{}/'.format(basedir, validify_filename(folder))
+        new_folder = u'{}{}/'.format(basedir, validify_filename(name))
+        xbmcvfs.rename(old_folder, new_folder)
+
+    def legacy_conversion(self, confirm=True):
+        """ Converts old style tvshow folders without years so that they have years """
+        nfos = self.get_tv_folder_nfos()
+
+        # Update each show in folder
+        nfos_total = len(nfos)
+        for x, i in enumerate(nfos):
+            folder, tmdb_id = try_decode(i['folder']), i['tmdb_id']
+            self._update(x, nfos_total, message=u'{} {}...'.format(ADDON.getLocalizedString(32167), folder))
+            self._legacy_conversion(folder, tmdb_id)
+
+        # Mark as complete and set to clean library
+        ADDON.setSettingBool('legacy_conversion', True)
+        self.clean_library = True
+
+    def update_tvshows(self, force=False, **kwargs):
+        nfos = self.get_tv_folder_nfos()
 
         # Update each show in folder
         nfos_total = len(nfos)
@@ -237,7 +276,10 @@ class _TVShow():
         return self.details
 
     def get_name(self):
-        self.name = get_unique_folder(self.details.get('name'), self.tmdb_id, BASEDIR_TV)
+        name = u'{}{}'.format(
+            self.details.get('name'),
+            u' ({})'.format(self.details['first_air_date'][:4]) if self.details.get('first_air_date') else '')
+        self.name = get_unique_folder(name, self.tmdb_id, BASEDIR_TV)
         return self.name
 
     def get_dbid(self, kodi_db=None):
