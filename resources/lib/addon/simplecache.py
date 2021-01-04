@@ -4,7 +4,7 @@
 """ Modification of marcelveldt's simplecache plugin
 Code cleanup
 - Removal of json methods
-- Switch to using ast.literal_eval for safety
+- TODO: Switch to using ast.literal_eval for safety
 - Leia/Matrix Python-2/3 cross-compatibility
 - Allow setting folder and filename of DB
 """
@@ -16,7 +16,7 @@ import datetime
 import time
 import sqlite3
 from functools import reduce
-from ast import literal_eval
+# from ast import literal_eval
 from contextlib import contextmanager
 from resources.lib.addon.parser import try_encode
 from resources.lib.addon.plugin import kodi_log
@@ -99,7 +99,7 @@ class SimpleCache(object):
         lastexecuted = self._win.getProperty("{}.clean.lastexecuted".format(self._sc_name))
         if not lastexecuted:
             self._win.setProperty("{}.clean.lastexecuted".format(self._sc_name), repr(tuple(cur_time.timetuple()[:6])))
-        elif (datetime.datetime(*literal_eval(lastexecuted)) + datetime.timedelta(hours=self._auto_clean_interval)) < cur_time:
+        elif (datetime.datetime(*eval(lastexecuted)) + datetime.timedelta(hours=self._auto_clean_interval)) < cur_time:
             self._do_cleanup()
 
     def _get_mem_cache(self, endpoint, checksum, cur_time):
@@ -111,7 +111,7 @@ class SimpleCache(object):
         cachedata = self._win.getProperty(try_encode(endpoint))
         if not cachedata:
             return
-        cachedata = literal_eval(cachedata)
+        cachedata = eval(cachedata)
         if not cachedata or cachedata[0] <= cur_time:
             return
         if not checksum or checksum == cachedata[2]:
@@ -137,7 +137,7 @@ class SimpleCache(object):
         if not cache_data or cache_data[0] <= cur_time:
             return
         if not checksum or checksum == cache_data[2]:
-            result = literal_eval(cache_data[1])
+            result = eval(cache_data[1])
             self._set_mem_cache(endpoint, checksum, cache_data[0], result)
         return result
 
