@@ -113,7 +113,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
                 continue
             li.set_episode_label()
             if self.check_is_aired and li.is_unaired():
-                return
+                continue
             li.set_details(details=self.get_kodi_details(li), reverse=True)  # Quick because local db
             li.set_playcount(playcount=self.get_playcount_from_trakt(li))  # Quick because of agressive caching of Trakt object and pre-emptive dict comprehension
             if self.hide_watched and try_int(li.infolabels.get('playcount')) != 0:
