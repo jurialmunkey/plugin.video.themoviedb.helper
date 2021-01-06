@@ -39,7 +39,7 @@ class SimpleCache(object):
         self._win = xbmcgui.Window(10000)
         self._monitor = xbmc.Monitor()
         self._db_file = get_file_path(folder, filename)
-        self._sc_name = '{}_{}_simplecache'.format(folder, filename)
+        self._sc_name = u'{}_{}_simplecache'.format(folder, filename)
         self._mem_only = mem_only
         self.check_cleanup()
         kodi_log("CACHE: Initialized")
@@ -84,7 +84,7 @@ class SimpleCache(object):
         '''
             set data in cache
         '''
-        with self.busy_tasks('set.{}'.format(endpoint)):
+        with self.busy_tasks(u'set.{}'.format(endpoint)):
             checksum = self._get_checksum(checksum)
             expires = self._get_timestamp(datetime.datetime.now() + expiration)
             self._set_mem_cache(endpoint, checksum, expires, data)
@@ -96,9 +96,9 @@ class SimpleCache(object):
         if self._mem_only:
             return
         cur_time = datetime.datetime.now()
-        lastexecuted = self._win.getProperty("{}.clean.lastexecuted".format(self._sc_name))
+        lastexecuted = self._win.getProperty(u"{}.clean.lastexecuted".format(self._sc_name))
         if not lastexecuted:
-            self._win.setProperty("{}.clean.lastexecuted".format(self._sc_name), repr(tuple(cur_time.timetuple()[:6])))
+            self._win.setProperty(u"{}.clean.lastexecuted".format(self._sc_name), repr(tuple(cur_time.timetuple()[:6])))
         elif (datetime.datetime(*eval(lastexecuted)) + datetime.timedelta(hours=self._auto_clean_interval)) < cur_time:
             self._do_cleanup()
 
@@ -155,9 +155,9 @@ class SimpleCache(object):
             cur_time = datetime.datetime.now()
             cur_timestamp = self._get_timestamp(cur_time)
             kodi_log("CACHE: Running cleanup...")
-            if self._win.getProperty("{}.cleanbusy".format(self._sc_name)):
+            if self._win.getProperty(u"{}.cleanbusy".format(self._sc_name)):
                 return
-            self._win.setProperty("{}.cleanbusy".format(self._sc_name), "busy")
+            self._win.setProperty(u"{}.cleanbusy".format(self._sc_name), "busy")
 
             query = "SELECT id, expires FROM simplecache"
             for cache_data in self._execute_sql(query).fetchall():
@@ -171,14 +171,14 @@ class SimpleCache(object):
                 if cache_expires < cur_timestamp:
                     query = 'DELETE FROM simplecache WHERE id = ?'
                     self._execute_sql(query, (cache_id,))
-                    kodi_log("CACHE: delete from db {}".format(cache_id))
+                    kodi_log(u"CACHE: delete from db {}".format(cache_id))
 
             # compact db
             self._execute_sql("VACUUM")
 
         # Washup
-        self._win.setProperty("{}.clean.lastexecuted".format(self._sc_name), repr(cur_time))
-        self._win.clearProperty("{}.cleanbusy".format(self._sc_name))
+        self._win.setProperty(u"{}.clean.lastexecuted".format(self._sc_name), repr(cur_time))
+        self._win.clearProperty(u"{}.cleanbusy".format(self._sc_name))
         kodi_log("CACHE: Auto cleanup done")
 
     def _get_database(self):
@@ -198,7 +198,7 @@ class SimpleCache(object):
                     id TEXT UNIQUE, expires INTEGER, data TEXT, checksum INTEGER)""")
                 return connection
             except Exception as error:
-                kodi_log("CACHE: Exception while initializing _database: {}".format(error), 1)
+                kodi_log(u"CACHE: Exception while initializing _database: {}".format(error), 1)
                 self.close()
                 return None
 
@@ -229,7 +229,7 @@ class SimpleCache(object):
                         break
                 except Exception:
                     break
-            kodi_log("CACHE: _database ERROR ! -- {}".format(error), 1)
+            kodi_log(u"CACHE: _database ERROR ! -- {}".format(error), 1)
         return None
 
     @staticmethod
@@ -242,7 +242,7 @@ class SimpleCache(object):
         if not stringinput and not self.global_checksum:
             return 0
         if self.global_checksum:
-            stringinput = "{}-{}".format(self.global_checksum, stringinput)
+            stringinput = u"{}-{}".format(self.global_checksum, stringinput)
         else:
             stringinput = str(stringinput)
         return reduce(lambda x, y: x + y, map(ord, stringinput))
