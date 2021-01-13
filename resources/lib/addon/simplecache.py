@@ -4,7 +4,7 @@
 """ Modification of marcelveldt's simplecache plugin
 Code cleanup
 - Removal of json methods
-- TODO: Switch to using ast.literal_eval for safety
+- TODO: Switch to using ast.literal_eval for safety or ultrajson for speed
 - Leia/Matrix Python-2/3 cross-compatibility
 - Allow setting folder and filename of DB
 """
@@ -177,7 +177,7 @@ class SimpleCache(object):
             self._execute_sql("VACUUM")
 
         # Washup
-        self._win.setProperty(u"{}.clean.lastexecuted".format(self._sc_name), repr(cur_time))
+        self._win.setProperty(u"{}.clean.lastexecuted".format(self._sc_name), repr(tuple(cur_time.timetuple()[:6])))
         self._win.clearProperty(u"{}.cleanbusy".format(self._sc_name))
         kodi_log("CACHE: Auto cleanup done")
 
