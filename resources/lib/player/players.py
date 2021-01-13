@@ -153,6 +153,7 @@ class Players(object):
             contents = read_file(file)
             if contents.startswith('plugin://plugin.video.themoviedb.helper'):
                 return
+            return contents
         return file
 
     def _get_local_movie(self):
@@ -432,8 +433,6 @@ class Players(object):
         path = try_decode(listitem.getPath())
         if listitem.getProperty('is_folder') == 'true':
             return format_folderpath(path)
-        if path.endswith('.strm'):
-            return path
         if not handle or listitem.getProperty('is_resolvable') == 'false':
             return path
         if listitem.getProperty('is_resolvable') == 'select' and not xbmcgui.Dialog().yesno(
