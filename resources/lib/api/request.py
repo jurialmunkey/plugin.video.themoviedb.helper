@@ -110,7 +110,7 @@ class RequestAPI(object):
 
         # Get response
         response = self.get_simple_api_request(request, postdata, headers)
-        if not response and not response.status_code:
+        if response is None or not response.status_code:
             return
 
         # Some error checking
