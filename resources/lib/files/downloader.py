@@ -154,7 +154,7 @@ class Downloader(object):
                         continue
 
                     _file = downloaded_zip.open(item)
-                    with open(os.path.join(self.extract_to, filename), 'w') as target:
+                    with open(os.path.join(self.extract_to, filename), 'wb') as target:
                         target.write(_file.read())
                         num_files += 1
 
