@@ -60,6 +60,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.exclude_value = split_items(self.params.pop('exclude_value', None))[0]
         self.pagination = self.pagination_is_allowed()
         self.params = reconfigure_legacy_params(**self.params)
+        self.thumb_override = 0
 
     def pagination_is_allowed(self):
         if self.params.pop('nextpage', '').lower() == 'false':
@@ -121,6 +122,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
                 continue
             li.set_context_menu()  # Set the context menu items
             li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
+            li.set_thumb_to_art(self.thumb_override == 2) if self.thumb_override else None
             li.set_params_reroute(self.ftv_forced_lookup, self.flatten_seasons)  # Reroute details to proper end point
             li.set_params_to_info(self.plugin_category)  # Set path params to properties for use in skins
             li.infoproperties.update(property_params or {})

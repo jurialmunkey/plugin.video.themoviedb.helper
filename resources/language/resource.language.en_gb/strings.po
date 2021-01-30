@@ -1870,6 +1870,26 @@ msgctxt "#32366"
 msgid "Hide items without airdates"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32367"
+msgid "Local Information"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32368"
+msgid "Next Aired / Next Episodes"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32370"
+msgid "Landscape"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32371"
+msgid "Preferred artwork for thumbs"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

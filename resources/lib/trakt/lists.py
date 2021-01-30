@@ -169,6 +169,7 @@ class TraktLists():
         # self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = 'video'
         self.container_content = 'episodes'
+        self.thumb_override = ADDON.getSettingInt('calendar_art')
         return items
 
     def list_trakt_calendar(self, info, startdate, days, page=None, library=False, **kwargs):
@@ -184,6 +185,7 @@ class TraktLists():
         self.library = 'video'
         self.container_content = 'episodes'
         self.plugin_category = get_calendar_name(startdate=try_int(startdate), days=try_int(days))
+        self.thumb_override = ADDON.getSettingInt('calendar_art')
         return items
 
     def list_upnext(self, info, tmdb_type, tmdb_id, page=None, **kwargs):
