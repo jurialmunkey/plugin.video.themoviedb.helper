@@ -1881,13 +1881,23 @@ msgid "Next Aired / Next Episodes"
 msgstr ""
 
 #: /resources/settings.xml
+msgctxt "#32369"
+msgid "thumbs"
+msgstr ""
+
+#: /resources/settings.xml
 msgctxt "#32370"
-msgid "Landscape"
+msgid "landscape"
 msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32371"
 msgid "Preferred artwork for thumbs"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32372"
+msgid "fanart"
 msgstr ""
 
 msgctxt "#30030"
