@@ -15,6 +15,7 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32090]" type="lsep"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32073]" type="bool" id="hide_unaired_movies" default="false" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32084]" type="bool" id="hide_unaired_episodes" default="false" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32366]" type="bool" id="nodate_is_unaired" default="true" enable="eq(-1,True)|eq(-2,True)"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32091]" type="bool" id="hide_special_seasons" default="false" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32085]" type="bool" id="flatten_seasons" default="false" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32092]" type="lsep"/>

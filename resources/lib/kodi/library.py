@@ -8,7 +8,7 @@ from resources.lib.files.utils import validify_filename, get_tmdb_id_nfo
 from resources.lib.kodi.logger import _LibraryLogger
 from resources.lib.kodi.update import BASEDIR_MOVIE, BASEDIR_TV, STRM_MOVIE, STRM_EPISODE, create_file, create_nfo, get_unique_folder, get_userlist, create_playlist
 from resources.lib.kodi.cacher import _TVShowCache
-from resources.lib.addon.timedate import is_future_timestamp, get_current_date_time
+from resources.lib.addon.timedate import is_unaired_timestamp, get_current_date_time
 from resources.lib.tmdb.api import TMDb
 
 
@@ -41,6 +41,7 @@ class LibraryAdder():
         self._log = _LibraryLogger()
         self.tv = None
         self.hide_unaired = ADDON.getSettingBool('hide_unaired_episodes')
+        self.hide_nodate = ADDON.getSettingBool('nodate_is_unaired')
         # self.debug_logging = ADDON.getSettingBool('debug_logging')
         self.debug_logging = True
         self.clean_library = False
@@ -231,7 +232,7 @@ class LibraryAdder():
             self._update(x, self.tv.e_total)
 
         # Store a season value of where we got up to
-        if self.tv.e_total > 2 and season.get('air_date') and not is_future_timestamp(season.get('air_date'), "%Y-%m-%d", 10):
+        if self.tv.e_total > 2 and season.get('air_date') and not is_unaired_timestamp(season.get('air_date'), self.hide_nodate):
             self.tv._cache.my_history['latest_season'] = try_int(number)
 
     def _add_episode(self, episode, season, folder):
@@ -244,7 +245,7 @@ class LibraryAdder():
             return
 
         # Skip future episodes
-        if self.hide_unaired and is_future_timestamp(episode.get('air_date'), "%Y-%m-%d", 10):
+        if self.hide_unaired and is_unaired_timestamp(episode.get('air_date'), self.hide_nodate):
             self.tv._cache.my_history['skipped'].append(filename)
             self._log._add('tv', self.tv.tmdb_id, 'unaired episode', season=season, episode=number, air_date=episode.get('air_date'))
             return

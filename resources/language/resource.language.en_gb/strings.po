@@ -1865,6 +1865,11 @@ msgctxt "#32365"
 msgid "Combined"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32366"
+msgid "Hide items without airdates"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

@@ -88,7 +88,8 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
     def add_items(self, items=None, pagination=True, parent_params=None, property_params=None, kodi_db=None, tmdb_cache_only=True):
         if not items:
             return
-        self.check_is_aired = parent_params.get('info') not in NO_LABEL_FORMATTING
+        check_is_aired = parent_params.get('info') not in NO_LABEL_FORMATTING
+        hide_nodate = ADDON.getSettingBool('nodate_is_unaired')
 
         # Build empty queue and thread pool
         self.items_queue, pool = [None] * len(items), [None] * len(items)
@@ -112,7 +113,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             if not li:
                 continue
             li.set_episode_label()
-            if self.check_is_aired and li.is_unaired():
+            if check_is_aired and li.is_unaired(no_date=hide_nodate):
                 continue
             li.set_details(details=self.get_kodi_details(li), reverse=True)  # Quick because local db
             li.set_playcount(playcount=self.get_playcount_from_trakt(li))  # Quick because of agressive caching of Trakt object and pre-emptive dict comprehension

@@ -79,6 +79,13 @@ def is_future_timestamp(time_str, time_fmt="%Y-%m-%dT%H:%M:%S", time_lim=19, utc
         return time_str
 
 
+def is_unaired_timestamp(date_str, no_date=True):
+    """ Checks if premiered date is unaired. If no date passed returns no_date boolean """
+    if date_str:
+        return is_future_timestamp(date_str, "%Y-%m-%d", 10)
+    return no_date
+
+
 def get_current_date_time(str_fmt='%Y-%m-%d %H:%M'):
     return datetime.datetime.now().strftime(str_fmt)
 
