@@ -72,6 +72,21 @@ class _ListItem(object):
             self.art['fanart'] = u'{}/fanart.jpg'.format(ADDONPATH)
         return self.art
 
+    def set_thumb_to_art(self, prefer_landscape=False):
+        if prefer_landscape:
+            if self.art.get('landscape'):
+                self.art['thumb'] = self.art['landscape']
+                return self.art['landscape']
+            if self.art.get('tvshow.landscape'):
+                self.art['thumb'] = self.art['tvshow.landscape']
+                return self.art['tvshow.landscape']
+        if self.art.get('fanart'):
+            self.art['thumb'] = self.art['fanart']
+            return self.art['fanart']
+        if self.art.get('tvshow.fanart'):
+            self.art['thumb'] = self.art['tvshow.fanart']
+            return self.art['tvshow.fanart']
+
     def get_trakt_type(self):
         return convert_media_type(self.infolabels.get('mediatype'), 'trakt')
 
