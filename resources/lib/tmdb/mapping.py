@@ -588,7 +588,7 @@ class ItemMapper(_ItemMapper):
     def get_info(self, info_item, tmdb_type, base_item=None, **kwargs):
         item = get_empty_item()
         item = self.map_item(item, info_item)
-        item = self.add_base(item, base_item, tmdb_type)
+        item = self.add_base(item, base_item, tmdb_type, key_blacklist=['year', 'premiered'])
         item = self.finalise(item, tmdb_type)
         item['cast'] = base_item['cast'] if base_item else []
         item['cast'] += get_cast(info_item)

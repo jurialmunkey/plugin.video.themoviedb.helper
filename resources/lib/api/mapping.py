@@ -30,12 +30,14 @@ def set_show(item, base_item=None):
 
 
 class _ItemMapper(object):
-    def add_base(self, item, base_item=None, tmdb_type=None):
+    def add_base(self, item, base_item=None, tmdb_type=None, key_blacklist=[]):
         if not base_item:
             return item
         for d in ['infolabels', 'infoproperties', 'art']:
             for k, v in viewitems(base_item.get(d, {})):
                 if not v or item[d].get(k):
+                    continue
+                if k in key_blacklist:
                     continue
                 item[d][k] = v
         if tmdb_type in ['season', 'episode', 'tv']:
