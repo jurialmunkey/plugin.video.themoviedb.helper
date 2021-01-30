@@ -24,7 +24,7 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32142]" type="bool" id="widgets_hidewatched" default="false" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32368]" type="lsep"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32156]" type="bool" id="nextaired_linklibrary" default="true" />
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32371]" type="enum" id="calendar_art" lvalues="32231|20445|32370" default="0" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32371]" type="enum" id="calendar_art" lvalues="32369|32372|32370" default="0" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32093]" type="labelenum" id="trakt_nextepisodesort" values="airdate|recentlywatched" default="airdate"/>
     </category>
     <category label="$LOCALIZE[14022]">
