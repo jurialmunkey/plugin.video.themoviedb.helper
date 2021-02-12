@@ -1900,6 +1900,11 @@ msgctxt "#32372"
 msgid "fanart"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32373"
+msgid "Restrict dummy setResolvedUrl method to library strm"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

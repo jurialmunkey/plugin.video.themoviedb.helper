@@ -89,7 +89,7 @@ def resolve_to_dummy(handle=None, stop_after=1, delay_wait=0):
 
 
 class Players(object):
-    def __init__(self, tmdb_type, tmdb_id=None, season=None, episode=None, ignore_default=False, **kwargs):
+    def __init__(self, tmdb_type, tmdb_id=None, season=None, episode=None, ignore_default=False, islocal=False, **kwargs):
         self.players = get_players_from_file()
         self.details = get_item_details(tmdb_type, tmdb_id, season, episode)
         self.item = get_detailed_item(tmdb_type, tmdb_id, season, episode, details=self.details) or {}
@@ -101,6 +101,7 @@ class Players(object):
         self.dummy_duration = try_float(ADDON.getSettingString('dummy_duration')) or 1.0
         self.dummy_delay = try_float(ADDON.getSettingString('dummy_delay')) or 1.0
         self.force_xbmcplayer = ADDON.getSettingBool('force_xbmcplayer')
+        self.is_strm = islocal
 
     def _check_assert(self, keys=[]):
         if not self.item:
@@ -469,7 +470,8 @@ class Players(object):
 
         # If a folder we need to resolve to dummy and then open folder
         if listitem.getProperty('is_folder') == 'true':
-            resolve_to_dummy(handle, self.dummy_duration, self.dummy_delay)
+            if self.is_strm or not ADDON.getSettingBool('only_resolve_strm'):
+                resolve_to_dummy(handle, self.dummy_duration, self.dummy_delay)
             xbmc.executebuiltin(try_encode(action))
             kodi_log(['lib.player - finished executing action\n', action], 1)
             return
@@ -480,7 +482,8 @@ class Players(object):
 
         # If PlayMedia method chosen re-route to Player() unless expert settings on
         if action:
-            resolve_to_dummy(handle, self.dummy_duration, self.dummy_delay)  # If we're calling external we need to resolve to dummy
+            if self.is_strm or not ADDON.getSettingBool('only_resolve_strm'):
+                resolve_to_dummy(handle, self.dummy_duration, self.dummy_delay)  # If we're calling external we need to resolve to dummy
             xbmc.Player().play(action, listitem) if self.force_xbmcplayer else xbmc.executebuiltin(u'PlayMedia({})'.format(action))
             kodi_log([
                 'lib.player - playing path with {}\n'.format('xbmc.Player()' if self.force_xbmcplayer else 'PlayMedia'),
