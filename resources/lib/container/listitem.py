@@ -241,7 +241,8 @@ class _Video(_ListItem):
     def _set_params_reroute_default(self):
         if not ADDON.getSettingInt('default_select'):
             self.params['info'] = 'play'
-            self.infoproperties['isPlayable'] = 'true'
+            if not ADDON.getSettingBool('only_resolve_strm'):
+                self.infoproperties['isPlayable'] = 'true'
         else:
             self.params['info'] = 'related'
         self.is_folder = False

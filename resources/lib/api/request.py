@@ -46,6 +46,8 @@ class RequestAPI(object):
         self.req_api_url = req_api_url or ''
         self.req_api_key = req_api_key or ''
         self.req_api_name = req_api_name or ''
+        self.req_timeout_err_prop = u'TimeOutError.{}'.format(self.req_api_name)
+        self.req_timeout_err = get_property(self.req_timeout_err_prop, is_type=float) or 0
         self.req_connect_err_prop = u'ConnectionError.{}'.format(self.req_api_name)
         self.req_connect_err = get_property(self.req_connect_err_prop, is_type=float) or 0
         self.req_500_err_prop = u'500Error.{}'.format(self.req_api_name)
@@ -80,6 +82,13 @@ class RequestAPI(object):
             ADDON.getLocalizedString(32308).format(self.req_api_name),
             ADDON.getLocalizedString(32307))
 
+    def timeout_error(self, err):
+        """ Log timeout error - if two in one minute set connection error """
+        if get_timestamp(self.req_timeout_err):
+            self.connection_error(err)
+        self.req_timeout_err = set_timestamp()
+        get_property(self.req_timeout_err_prop, self.req_timeout_err)
+
     @lazyimport_requests
     def get_simple_api_request(self, request=None, postdata=None, headers=None, method=None):
         try:
@@ -93,7 +102,7 @@ class RequestAPI(object):
         except requests.exceptions.ConnectionError as errc:
             self.connection_error(errc)
         except requests.exceptions.Timeout as errt:
-            self.connection_error(errt)
+            self.timeout_error(errt)
         except Exception as err:
             kodi_log(u'RequestError: {}'.format(err), 1)
 
