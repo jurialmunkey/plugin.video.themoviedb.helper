@@ -16,7 +16,7 @@ def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
     elif sort_by == 'paused':
         return sorted(items, key=lambda i: i.get('paused_at'), reverse=reverse)
     elif sort_by == 'added':
-        return sorted(items, key=lambda i: i.get('listed_at'), reverse=reverse)
+        return sorted(items, key=lambda i: i.get('listed_at', 0), reverse=reverse)
     elif sort_by == 'title':
         return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('title'), reverse=reverse)
     elif sort_by == 'year':
