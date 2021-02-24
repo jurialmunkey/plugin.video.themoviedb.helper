@@ -156,7 +156,7 @@ class CommonMonitorFunctions(object):
         if not self.imdb_top250:
             self.imdb_top250 = self.trakt_api.get_imdb_top250(id_type='tmdb')
         try:
-            item['infolabels']['top250'] = self.imdb_top250.index(
+            item['infoproperties']['top250'] = item['infolabels']['top250'] = self.imdb_top250.index(
                 try_int(item.get('unique_ids', {}).get('tmdb'))) + 1
         except Exception:
             pass
