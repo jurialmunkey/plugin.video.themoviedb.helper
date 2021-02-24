@@ -8,35 +8,35 @@ def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
     if sort_by == 'unsorted':
         return items
     elif sort_by == 'rank':
-        return sorted(items, key=lambda i: i.get('rank'), reverse=reverse)
+        return sorted(items, key=lambda i: i.get('rank', 0), reverse=reverse)
     elif sort_by == 'plays':
-        return sorted(items, key=lambda i: i.get('plays'), reverse=reverse)
+        return sorted(items, key=lambda i: i.get('plays', 0), reverse=reverse)
     elif sort_by == 'watched':
-        return sorted(items, key=lambda i: i.get('last_watched_at'), reverse=reverse)
+        return sorted(items, key=lambda i: i.get('last_watched_at', 0), reverse=reverse)
     elif sort_by == 'paused':
-        return sorted(items, key=lambda i: i.get('paused_at'), reverse=reverse)
+        return sorted(items, key=lambda i: i.get('paused_at', 0), reverse=reverse)
     elif sort_by == 'added':
         return sorted(items, key=lambda i: i.get('listed_at', 0), reverse=reverse)
     elif sort_by == 'title':
-        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('title'), reverse=reverse)
+        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('title', 0), reverse=reverse)
     elif sort_by == 'year':
-        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('year'), reverse=reverse)
+        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('year', 0), reverse=reverse)
     elif sort_by == 'released':
         return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('first_aired')
                       if (trakt_type or i.get('type')) in ['show', 'episode']
-                      else i.get(trakt_type or i.get('type'), {}).get('released'), reverse=reverse)
+                      else i.get(trakt_type or i.get('type'), {}).get('released', 0), reverse=reverse)
     elif sort_by == 'runtime':
-        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('runtime'), reverse=reverse)
+        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('runtime', 0), reverse=reverse)
     elif sort_by == 'popularity':
-        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('comment_count'), reverse=reverse)
+        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('comment_count', 0), reverse=reverse)
     elif sort_by == 'percentage':
-        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('rating'), reverse=reverse)
+        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('rating', 0), reverse=reverse)
     elif sort_by == 'votes':
-        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('votes'), reverse=reverse)
+        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('votes', 0), reverse=reverse)
     elif sort_by == 'random':
         random.shuffle(items)
         return items
-    return sorted(items, key=lambda i: i.get('listed_at'), reverse=True)
+    return sorted(items, key=lambda i: i.get('listed_at', 0), reverse=True)
 
 
 def _get_item_title(item):
