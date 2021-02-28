@@ -3,15 +3,14 @@ import xbmc
 import xbmcvfs
 import colorsys
 from resources.lib.addon.window import get_property
-from resources.lib.addon.plugin import kodi_log, kodi_traceback, md5hash
+from resources.lib.addon.plugin import kodi_log, md5hash
 from resources.lib.addon.parser import try_int, try_float
 from resources.lib.files.utils import make_path
 from threading import Thread
 try:  # Try import PIL due to some systems using incompatible local versions of numpy
     from PIL import ImageFilter, Image
 except Exception as exc:
-    kodi_log('lib.monitor.images - PIL import error!', 1)
-    kodi_traceback(exc, 'lib.monitor.images - PIL import error!', notification=False, log_level=2)
+    kodi_log(['lib.monitor.images - PIL import error!\n', exc], 1)
     ImageFilter, Image = None, None
 try:  # Try import urllib for PY2/3 compatibility
     import urllib2 as urllib
