@@ -8,7 +8,7 @@
                           ],
     "play_episode"      : [
                             "plugin://plugin.video.youtube/search/?q={name_url}&search_type=notvalid",
-                            {"title": "(?i).*{showname}.*S.*{season}E.*{episode}|(?i).*S.*{season}E.*{episode}.*{showname}|(?i).*{showname}.*{title}"}
+                            {"dialog": "True"}
                           ],
     "search_movie"      : "plugin://plugin.video.youtube/search/?q={name_url}&search_type=notvalid",
     "search_episode"    : "plugin://plugin.video.youtube/search/?q={name_url}&search_type=notvalid"
