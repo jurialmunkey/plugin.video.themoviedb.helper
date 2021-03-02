@@ -39,7 +39,7 @@ class _TraktProgress():
         watch_episodes = use_lastupdated_cache(
             self._cache, self.get_episodes_watchcount, slug, 'slug', tvshow=item, count_progress=True,
             cache_name=u'TraktAPI.get_episodes_watchcount.response.slug.{}.True'.format(slug),
-            sync_info=item)
+            sync_info=item) or 0
         if aired_episodes <= watch_episodes:
             return
         return item
