@@ -126,6 +126,8 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             li.set_params_reroute(self.ftv_forced_lookup, self.flatten_seasons)  # Reroute details to proper end point
             li.set_params_to_info(self.plugin_category)  # Set path params to properties for use in skins
             li.infoproperties.update(property_params or {})
+            if self.thumb_override:
+                li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb otherwise Kodi overrides after item is created
             xbmcplugin.addDirectoryItem(
                 handle=self.handle,
                 url=li.get_url(),
