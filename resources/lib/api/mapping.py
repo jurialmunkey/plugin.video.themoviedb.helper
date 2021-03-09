@@ -51,7 +51,7 @@ class _ItemMapper(object):
         # Iterate over item retrieved from api list
         for k, pv in viewitems(i):
             # Skip empty objects
-            if not pv and pv is not 0:
+            if not pv and pv != 0:
                 continue
             # Skip blacklist values
             if pv in self.blacklist:
@@ -85,7 +85,7 @@ class _ItemMapper(object):
                 if 'func' in d:
                     v = d['func'](v, *d.get('args', []), **d.get('kwargs', {}))
                 # Check not empty
-                if not v and v is not 0:
+                if not v and v != 0:
                     continue
                 # Map value onto item dict parent/child keys
                 for p, c in d['keys']:
