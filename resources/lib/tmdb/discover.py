@@ -6,8 +6,8 @@ from resources.lib.addon.timedate import get_datetime_now, get_timedelta
 from resources.lib.addon.cache import set_search_history, get_search_history
 from resources.lib.addon.window import get_property
 from resources.lib.tmdb.api import TMDb
-from resources.lib.addon.plugin import ADDONPATH, ADDON, PLUGINPATH, viewitems, convert_type
-from resources.lib.addon.parser import try_int, try_decode, encode_url
+from resources.lib.addon.plugin import ADDONPATH, ADDON, PLUGINPATH, convert_type
+from resources.lib.addon.parser import try_int, encode_url
 from resources.lib.addon.setutils import merge_two_dicts, split_items
 
 
@@ -615,7 +615,7 @@ def _confirm_add(method):
 def _get_query(tmdb_type, method, query=None, header=None, use_details=False):
     item = TMDb().get_tmdb_id_from_query(
         tmdb_type=tmdb_type,
-        query=query or try_decode(xbmcgui.Dialog().input(header)),
+        query=query or xbmcgui.Dialog().input(header),
         header=header or u'{} {}'.format(ADDON.getLocalizedString(32276), tmdb_type),
         use_details=use_details,
         get_listitem=True)
@@ -712,14 +712,14 @@ def _get_separator():
 
 
 def _get_numeric(method, header=None):
-    value = try_decode(xbmcgui.Dialog().input(
-        header, type=xbmcgui.INPUT_NUMERIC, defaultt=_win_prop(method)))
+    value = xbmcgui.Dialog().input(
+        header, type=xbmcgui.INPUT_NUMERIC, defaultt=_win_prop(method))
     return {'value': value, 'label': value, 'method': method}
 
 
 def _get_keyboard(method, header=None):
-    value = try_decode(xbmcgui.Dialog().input(
-        header, defaultt=_win_prop(method)))
+    value = xbmcgui.Dialog().input(
+        header, defaultt=_win_prop(method))
     return {'value': value, 'label': value, 'method': method}
 
 
@@ -735,7 +735,7 @@ def _edit_rules(idx=-1):
         return
     _win_prop('save_index', set_property=u'{}'.format(len(history) - 1 - idx))
     _win_prop('save_label', set_property=u'{}'.format(item.get('label')))
-    for k, v in viewitems(item.get('params', {})):
+    for k, v in item.get('params', {}).items():
         if k in ['info', 'tmdb_type']:
             continue
         _win_prop(k, set_property=v)

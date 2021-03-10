@@ -1,5 +1,4 @@
 import random
-from resources.lib.addon.plugin import viewitems
 
 
 def random_from_list(items, remove_next_page=True):
@@ -23,7 +22,7 @@ def _quick_copy(v):
 
 
 def quick_copy(d):
-    return {k: _quick_copy(v) for k, v in viewitems(d)}
+    return {k: _quick_copy(v) for k, v in d.items()}
 
 
 def merge_two_dicts(x, y, reverse=False, deep=False):
@@ -33,7 +32,7 @@ def merge_two_dicts(x, y, reverse=False, deep=False):
     if not deep:   # modifies z with y's keys and values
         z.update(yy)
         return z
-    for k, v in viewitems(yy):
+    for k, v in yy.items():
         if isinstance(v, dict):
             merge_two_dicts(z.setdefault(k, {}), v, reverse=reverse, deep=True)
         elif v:
@@ -57,7 +56,7 @@ def merge_two_items(base_item, item):
 # @timer_report('del_empty_keys')
 def del_empty_keys(d, values=[]):
     values += [None, '']
-    return {k: v for k, v in viewitems(d) if v not in values}
+    return {k: v for k, v in d.items() if v not in values}
 
 
 def find_dict_in_list(list_of_dicts, key, value):
@@ -69,7 +68,7 @@ def iter_props(items, property_name, infoproperties=None, func=None, **kwargs):
     if not items or not isinstance(items, list):
         return infoproperties
     for x, i in enumerate(items, start=1):
-        for k, v in viewitems(kwargs):
+        for k, v in kwargs.items():
             infoproperties[u'{}.{}.{}'.format(property_name, x, k)] = func(i.get(v)) if func else i.get(v)
         if x >= 10:
             break
@@ -82,7 +81,7 @@ def get_params(item, tmdb_type, tmdb_id=None, params=None, definition=None, base
     if params == -1:
         return {}
     definition = definition or {'info': 'details', 'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'}
-    for k, v in viewitems(definition):
+    for k, v in definition.items():
         params[k] = v.format(tmdb_type=tmdb_type, tmdb_id=tmdb_id, base_tmdb_type=base_tmdb_type, **item)
     return del_empty_keys(params)  # TODO: Is this necessary??!
 

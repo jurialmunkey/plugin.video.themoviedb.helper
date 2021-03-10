@@ -2,7 +2,7 @@ import xbmcgui
 from resources.lib.addon.cache import CACHE_SHORT, CACHE_LONG
 from resources.lib.tmdb.mapping import ItemMapper, get_episode_to_air
 from resources.lib.api.request import RequestAPI
-from resources.lib.addon.plugin import viewitems, ADDON, get_mpaa_prefix, get_language, convert_type, ADDONPATH
+from resources.lib.addon.plugin import ADDON, get_mpaa_prefix, get_language, convert_type, ADDONPATH
 from resources.lib.files.downloader import Downloader
 from resources.lib.container.listitem import ListItem
 from resources.lib.addon.constants import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES
@@ -289,7 +289,7 @@ class TMDb(RequestAPI):
             # Instead merge their roles back into the original entry
             x = item_ids.index(i['id'])
             p = items[x].get('infoproperties', {})
-            for k, v in viewitems(self.mapper.get_info(i, 'person').get('infoproperties', {})):
+            for k, v in self.mapper.get_info(i, 'person').get('infoproperties', {}).items():
                 if not v:
                     continue
                 if not p.get(k):
@@ -344,7 +344,7 @@ class TMDb(RequestAPI):
                 item = self.get_details(tmdb_type, i.get('id'))
             if not item:
                 continue
-            for k, v in viewitems(param):
+            for k, v in param.items():
                 item['params'][k] = v.format(tmdb_id=i.get('id'))
             items.append(item)
         if not items:
@@ -372,7 +372,7 @@ class TMDb(RequestAPI):
 
     def get_discover_list(self, tmdb_type, **kwargs):
         # TODO: Check what regions etc we need to have
-        for k, v in viewitems(kwargs):
+        for k, v in kwargs.items():
             if k in ['with_id', 'with_separator', 'page', 'limit', 'nextpage', 'widget', 'fanarttv']:
                 continue
             if k and v:

@@ -3,7 +3,7 @@ import xbmcgui
 from resources.lib.kodi.rpc import get_kodi_library
 from resources.lib.addon.plugin import convert_type, PLUGINPATH
 from resources.lib.addon.constants import TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, TRAKT_LIST_OF_LISTS
-from resources.lib.addon.plugin import ADDON, viewitems
+from resources.lib.addon.plugin import ADDON
 from resources.lib.addon.parser import try_int, encode_url
 from resources.lib.api.mapping import get_empty_item
 from resources.lib.addon.timedate import get_calendar_name
@@ -84,7 +84,7 @@ class TraktLists():
         item = get_empty_item()
         item['label'] = item['infolabels']['title'] = i['name']
         item['params'] = params
-        for k, v in viewitems(i['params']):
+        for k, v in i['params'].items():
             item['params'][k] = v
         return item
 

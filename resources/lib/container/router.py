@@ -11,14 +11,14 @@ from resources.lib.tmdb.api import TMDb
 from resources.lib.trakt.api import TraktAPI
 from resources.lib.fanarttv.api import FanartTV
 from resources.lib.player.players import Players
-from resources.lib.addon.plugin import ADDON, kodi_log, viewitems
+from resources.lib.addon.plugin import ADDON, kodi_log
 from resources.lib.container.basedir import BaseDirLists
 from resources.lib.tmdb.lists import TMDbLists
 from resources.lib.trakt.lists import TraktLists
 from resources.lib.tmdb.search import SearchLists
 from resources.lib.tmdb.discover import UserDiscoverLists
 from resources.lib.api.mapping import set_show, get_empty_item
-from resources.lib.addon.parser import try_encode, try_decode, parse_paramstring, try_int
+from resources.lib.addon.parser import parse_paramstring, try_int
 from resources.lib.addon.setutils import split_items, random_from_list, merge_two_dicts
 
 
@@ -32,7 +32,7 @@ def filtered_item(item, key, value, exclude=False):
 class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLists):
     def __init__(self):
         self.handle = int(sys.argv[1])
-        self.paramstring = try_decode(sys.argv[2][1:])
+        self.paramstring = sys.argv[2][1:]
         self.params = parse_paramstring(self.paramstring)
         self.parent_params = self.params
         # self.container_path = u'{}?{}'.format(sys.argv[0], self.paramstring)
@@ -136,7 +136,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
 
     def set_params_to_container(self, **kwargs):
         params = {}
-        for k, v in viewitems(kwargs):
+        for k, v in kwargs.items():
             if not k or not v:
                 continue
             try:
@@ -186,7 +186,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         if not artwork:
             return
         if li.infolabels.get('mediatype') in ['season', 'episode']:
-            artwork = {u'tvshow.{}'.format(k): v for k, v in viewitems(artwork) if v}
+            artwork = {u'tvshow.{}'.format(k): v for k, v in artwork.items() if v}
         return {'art': artwork}
 
     def get_playcount_from_trakt(self, li):
@@ -356,7 +356,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             plugin_category=self.plugin_category,
             container_content=self.container_content)
         if self.container_update:
-            xbmc.executebuiltin(try_encode(u'Container.Update({})'.format(self.container_update)))
+            xbmc.executebuiltin(u'Container.Update({})'.format(self.container_update))
         if self.container_refresh:
             xbmc.executebuiltin('Container.Refresh')
 

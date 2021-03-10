@@ -7,10 +7,7 @@ from resources.lib.addon.plugin import kodi_log, md5hash
 from resources.lib.addon.parser import try_int, try_float
 from resources.lib.files.utils import make_path
 from threading import Thread
-try:  # Try import urllib for PY2/3 compatibility
-    import urllib2 as urllib
-except ImportError:
-    import urllib.request as urllib
+import urllib.request as urllib
 
 # PIL causes issues (via numpy) on Linux systems using python versions higher than 3.8.5
 # Lazy import PIL to avoid using it unless user requires ImageFunctions

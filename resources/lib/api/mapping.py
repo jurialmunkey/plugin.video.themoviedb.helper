@@ -1,5 +1,4 @@
 from resources.lib.addon.parser import try_type
-from resources.lib.addon.plugin import viewitems
 
 UPDATE_BASEKEY = 1
 
@@ -19,11 +18,11 @@ def set_show(item, base_item=None):
     if not base_item:
         return item
     item['art'].update(
-        {'tvshow.{}'.format(k): v for k, v in viewitems(base_item.get('art', {}))})
+        {'tvshow.{}'.format(k): v for k, v in base_item.get('art', {}).items()})
     item['unique_ids'].update(
-        {'tvshow.{}'.format(k): v for k, v in viewitems(base_item.get('unique_ids', {}))})
+        {'tvshow.{}'.format(k): v for k, v in base_item.get('unique_ids', {}).items()})
     item['infoproperties'].update(
-        {'tvshow.{}'.format(k): v for k, v in viewitems(base_item.get('infolabels', {})) if type(v) not in [dict, list, tuple]})
+        {'tvshow.{}'.format(k): v for k, v in base_item.get('infolabels', {}).items() if type(v) not in [dict, list, tuple]})
     item['infolabels']['tvshowtitle'] = base_item['infolabels'].get('title')
     item['unique_ids']['tmdb'] = item['unique_ids'].get('tvshow.tmdb')
     return item
@@ -34,7 +33,7 @@ class _ItemMapper(object):
         if not base_item:
             return item
         for d in ['infolabels', 'infoproperties', 'art']:
-            for k, v in viewitems(base_item.get(d, {})):
+            for k, v in base_item.get(d, {}).items():
                 if not v or item[d].get(k):
                     continue
                 if k in key_blacklist:
@@ -49,7 +48,7 @@ class _ItemMapper(object):
         am = self.advanced_map or {}
 
         # Iterate over item retrieved from api list
-        for k, pv in viewitems(i):
+        for k, pv in i.items():
             # Skip empty objects
             if not pv and pv != 0:
                 continue

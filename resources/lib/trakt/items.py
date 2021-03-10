@@ -1,5 +1,5 @@
 import random
-from resources.lib.addon.plugin import PLUGINPATH, viewitems, convert_type, convert_trakt_type
+from resources.lib.addon.plugin import PLUGINPATH, convert_type, convert_trakt_type
 from resources.lib.addon.setutils import del_empty_keys, get_params
 
 
@@ -70,7 +70,7 @@ def _get_item_infoproperties(item, item_type=None, infoproperties=None, show=Non
 def _get_item_unique_ids(item, unique_ids=None, prefix=None, show=None):
     prefix = prefix or ''
     unique_ids = unique_ids or {}
-    for k, v in viewitems(item.get('ids', {})):
+    for k, v in item.get('ids', {}).items():
         unique_ids[u'{}{}'.format(prefix, k)] = v
     if show:
         unique_ids = _get_item_unique_ids(show, unique_ids, prefix='tvshow.')

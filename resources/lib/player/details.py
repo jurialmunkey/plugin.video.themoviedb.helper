@@ -3,15 +3,11 @@ from resources.lib.addon.constants import PLAYERS_URLENCODE
 from resources.lib.tmdb.api import TMDb
 from resources.lib.trakt.api import TraktAPI
 from resources.lib.container.listitem import ListItem
-from resources.lib.addon.plugin import viewitems
-from resources.lib.addon.parser import try_int, try_encode
+from resources.lib.addon.parser import try_int
 from resources.lib.addon.setutils import del_empty_keys
 from json import dumps
 from collections import defaultdict
-try:
-    from urllib.parse import quote_plus, quote  # Py3
-except ImportError:
-    from urllib import quote_plus, quote  # Py2
+from urllib.parse import quote_plus, quote
 
 
 def get_external_ids(li, season=None, episode=None):
@@ -111,27 +107,28 @@ def get_language_details(base, tmdb_type, tmdb_id, season=None, episode=None, la
     item = _get_language_item(tmdb_type, tmdb_id, season, episode, language, year)
     if not item:
         return base
-    item = {k: v or base.get(k) for k, v in viewitems(item)}  # Fallback to default key in base if translation is empty
+    item = {k: v or base.get(k) for k, v in item.items()}  # Fallback to default key in base if translation is empty
     item = _url_encode_item(item)
-    for k, v in viewitems(item):
+    for k, v in item.items():
         base[u'{}_{}'.format(language, k)] = v
     return _url_encode_item(base)
 
 
 def _url_encode_item(item, base=None):
     base = base or item.copy()
-    for k, v in viewitems(base):
+    for k, v in base.items():
         if k not in PLAYERS_URLENCODE:
             continue
         v = u'{0}'.format(v)
-        for key, value in viewitems({k: v, u'{}_meta'.format(k): dumps(v)}):
+        d = {k: v, u'{}_meta'.format(k): dumps(v)}
+        for key, value in d.items():
             item[key] = value.replace(',', '')
             item[key + '_+'] = value.replace(',', '').replace(' ', '+')
             item[key + '_-'] = value.replace(',', '').replace(' ', '-')
-            item[key + '_escaped'] = quote(quote(try_encode(value)))
-            item[key + '_escaped+'] = quote(quote_plus(try_encode(value)))
-            item[key + '_url'] = quote(try_encode(value))
-            item[key + '_url+'] = quote_plus(try_encode(value))
+            item[key + '_escaped'] = quote(quote(value))
+            item[key + '_escaped+'] = quote(quote_plus(value))
+            item[key + '_url'] = quote(value)
+            item[key + '_url+'] = quote_plus(value)
     return item
 
 

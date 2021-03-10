@@ -1,5 +1,5 @@
 import xbmc
-from resources.lib.addon.plugin import get_mpaa_prefix, get_language, viewitems, convert_type, ADDON
+from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type, ADDON
 from resources.lib.addon.parser import try_int, try_float
 from resources.lib.addon.setutils import iter_props, dict_to_list, get_params
 from resources.lib.addon.timedate import format_date, age_difference
@@ -103,7 +103,7 @@ def get_providers(v):
     infoproperties = {}
     infoproperties['provider.link'] = v.pop('link', None)
     newlist = (
-        dict(i, **{'key': key}) for key, value in viewitems(v) if isinstance(value, list)
+        dict(i, **{'key': key}) for key, value in v.items() if isinstance(value, list)
         for i in value if isinstance(i, dict))
     added = []
     added_append = added.append
@@ -136,7 +136,7 @@ def get_trailer(v):
 
 
 def _get_genre_by_id(genre_id):
-    for k, v in viewitems(TMDB_GENRE_IDS):
+    for k, v in TMDB_GENRE_IDS.items():
         if v == try_int(genre_id):
             return k
 
@@ -581,7 +581,7 @@ class ItemMapper(_ItemMapper):
         item['infoproperties']['tmdb_type'] = tmdb_type
         item['infolabels']['mediatype'] = item['infoproperties']['dbtype'] = convert_type(tmdb_type, 'dbtype')
         item['art']['thumb'] = item['art'].get('thumb') or item['art'].get('poster')
-        for k, v in viewitems(item['unique_ids']):
+        for k, v in item['unique_ids'].items():
             item['infoproperties'][u'{}_id'.format(k)] = v
         return item
 

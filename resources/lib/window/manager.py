@@ -1,7 +1,7 @@
 import xbmc
 import xbmcgui
 import resources.lib.addon.window as window
-from resources.lib.addon.parser import try_int, try_decode, try_encode
+from resources.lib.addon.parser import try_int
 from resources.lib.addon.plugin import kodi_log, ADDON
 from resources.lib.addon.decorators import busy_dialog
 from resources.lib.tmdb.api import TMDb
@@ -214,7 +214,6 @@ class WindowManager(_EventLoop):
 
     def add_query(self, query, tmdb_type):
         with busy_dialog():
-            query = try_decode(query)
             tmdb_id = TMDb().get_tmdb_id_from_query(tmdb_type, query, header=query, use_details=True, auto_single=True)
         if not tmdb_id:
             xbmcgui.Dialog().notification('TMDbHelper', ADDON.getLocalizedString(32310).format(query))
@@ -232,13 +231,13 @@ class WindowManager(_EventLoop):
 
     def call_window(self):
         if self.params.get('playmedia'):
-            return xbmc.executebuiltin(try_encode(u'PlayMedia(\"{}\")'.format(self.params['playmedia'])))
+            return xbmc.executebuiltin(u'PlayMedia(\"{}\")'.format(self.params['playmedia']))
         if self.params.get('call_id'):
             return xbmc.executebuiltin(u'ActivateWindow({})'.format(self.params['call_id']))
         if self.params.get('call_path'):
-            return xbmc.executebuiltin(try_encode(u'ActivateWindow(videos, {}, return)'.format(self.params['call_path'])))
+            return xbmc.executebuiltin(u'ActivateWindow(videos, {}, return)'.format(self.params['call_path']))
         if self.params.get('call_update'):
-            return xbmc.executebuiltin(try_encode(u'Container.Update({})'.format(self.params['call_update'])))
+            return xbmc.executebuiltin(u'Container.Update({})'.format(self.params['call_update']))
 
     def router(self):
         if self.params.get('add_path'):

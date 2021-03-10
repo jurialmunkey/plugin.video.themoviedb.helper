@@ -4,7 +4,6 @@ from resources.lib.addon.window import get_property
 from resources.lib.monitor.common import CommonMonitorFunctions, SETMAIN_ARTWORK, SETPROP_RATINGS
 from resources.lib.monitor.images import ImageFunctions
 from resources.lib.addon.plugin import ADDON, convert_media_type
-from resources.lib.addon.parser import try_decode
 from resources.lib.addon.decorators import try_except_log
 from threading import Thread
 
@@ -56,11 +55,11 @@ class ListItemMonitor(CommonMonitorFunctions):
 
     def get_query(self):
         if self.get_infolabel('TvShowTitle'):
-            return try_decode(self.get_infolabel('TvShowTitle'))
+            return self.get_infolabel('TvShowTitle')
         if self.get_infolabel('Title'):
-            return try_decode(self.get_infolabel('Title'))
+            return self.get_infolabel('Title')
         if self.get_infolabel('Label'):
-            return try_decode(self.get_infolabel('Label'))
+            return self.get_infolabel('Label')
 
     def get_season(self):
         if self.dbtype == 'episodes':

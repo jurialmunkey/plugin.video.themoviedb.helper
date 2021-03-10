@@ -1,7 +1,7 @@
 import xbmc
 import xbmcgui
 from resources.lib.addon.constants import ACCEPTED_MEDIATYPES
-from resources.lib.addon.plugin import ADDON, ADDONPATH, PLUGINPATH, kodi_log, viewitems, convert_media_type
+from resources.lib.addon.plugin import ADDON, ADDONPATH, PLUGINPATH, kodi_log, convert_media_type
 from resources.lib.addon.parser import try_int, encode_url
 from resources.lib.addon.timedate import is_unaired_timestamp
 from resources.lib.addon.setutils import merge_two_dicts
@@ -146,13 +146,13 @@ class _ListItem(object):
         return  # Done in child class
 
     def set_uids_to_info(self):
-        for k, v in viewitems(self.unique_ids):
+        for k, v in self.unique_ids.items():
             if not v:
                 continue
             self.infoproperties[u'{}_id'.format(k)] = v
 
     def set_params_to_info(self, widget=None):
-        for k, v in viewitems(self.params):
+        for k, v in self.params.items():
             if not k or not v:
                 continue
             self.infoproperties[u'item.{}'.format(k)] = v
@@ -181,7 +181,7 @@ class _ListItem(object):
 
         if not self.stream_details:
             return listitem
-        for k, v in viewitems(self.stream_details):
+        for k, v in self.stream_details.items():
             if not k or not v:
                 continue
             for i in v:

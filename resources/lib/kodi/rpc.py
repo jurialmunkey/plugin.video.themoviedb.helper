@@ -1,7 +1,7 @@
 import xbmc
 import json
 from resources.lib.addon.plugin import kodi_log
-from resources.lib.addon.parser import try_int, try_decode
+from resources.lib.addon.parser import try_int
 from resources.lib.addon.setutils import find_dict_in_list
 from resources.lib.kodi.mapping import ItemMapper
 
@@ -17,7 +17,7 @@ def get_jsonrpc(method=None, params=None):
         query["params"] = params
     try:
         jrpc = xbmc.executeJSONRPC(json.dumps(query))
-        response = json.loads(try_decode(jrpc, errors='ignore'))
+        response = json.loads(jrpc, errors='ignore')
     except Exception as exc:
         kodi_log(u'TMDbHelper - JSONRPC Error:\n{}'.format(exc), 1)
         response = {}

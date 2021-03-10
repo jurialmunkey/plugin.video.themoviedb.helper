@@ -2,7 +2,6 @@ import xbmc
 import resources.lib.kodi.rpc as rpc
 from resources.lib.addon.window import get_property
 from resources.lib.monitor.common import CommonMonitorFunctions, SETPROP_RATINGS, SETMAIN_ARTWORK
-from resources.lib.addon.parser import try_decode
 from resources.lib.addon.plugin import ADDON
 from json import loads
 
@@ -61,7 +60,6 @@ class PlayerMonitor(xbmc.Player, CommonMonitorFunctions):
         self.epyear = self.getVideoInfoTag().getYear() if self.dbtype == 'episodes' else None
         self.season = self.getVideoInfoTag().getSeason() if self.dbtype == 'episodes' else None
         self.episode = self.getVideoInfoTag().getEpisode() if self.dbtype == 'episodes' else None
-        self.query = try_decode(self.query)
 
         self.tmdb_type = 'movie' if self.dbtype == 'movie' else 'tv'
         self.tmdb_id = self.get_tmdb_id(self.tmdb_type, self.imdb_id, self.query, self.year, self.epyear)

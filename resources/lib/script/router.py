@@ -11,9 +11,9 @@ from resources.lib.kodi.rpc import get_jsonrpc
 from resources.lib.files.downloader import Downloader
 from resources.lib.files.utils import dumps_to_file, validify_filename
 from resources.lib.addon.window import get_property
-from resources.lib.addon.plugin import ADDON, reconfigure_legacy_params, viewitems, kodi_log, format_folderpath, convert_type
+from resources.lib.addon.plugin import ADDON, reconfigure_legacy_params, kodi_log, format_folderpath, convert_type
 from resources.lib.addon.decorators import busy_dialog
-from resources.lib.addon.parser import encode_url, try_encode, try_decode
+from resources.lib.addon.parser import encode_url
 from resources.lib.container.basedir import get_basedir_details
 from resources.lib.fanarttv.api import FanartTV
 from resources.lib.tmdb.api import TMDb
@@ -39,7 +39,7 @@ def get_tmdb_id(func):
 def map_kwargs(mapping={}):
     def decorator(func):
         def wrapper(*args, **kwargs):
-            for k, v in viewitems(mapping):
+            for k, v in mapping.items():
                 if k in kwargs:
                     kwargs[v] = kwargs.pop(k, None)
             return func(*args, **kwargs)
@@ -50,7 +50,7 @@ def map_kwargs(mapping={}):
 def is_in_kwargs(mapping={}):
     def decorator(func):
         def wrapper(*args, **kwargs):
-            for k, v in viewitems(mapping):
+            for k, v in mapping.items():
                 if kwargs.get(k) not in v:
                     return
             return func(*args, **kwargs)
@@ -61,13 +61,13 @@ def is_in_kwargs(mapping={}):
 def play_media(**kwargs):
     with busy_dialog():
         kodi_log(['lib.script.router - attempting to play\n', kwargs.get('play_media')], 1)
-        xbmc.executebuiltin(try_encode(u'PlayMedia({})'.format(kwargs.get('play_media'))))
+        xbmc.executebuiltin(u'PlayMedia({})'.format(kwargs.get('play_media')))
 
 
 def run_plugin(**kwargs):
     with busy_dialog():
         kodi_log(['lib.script.router - attempting to play\n', kwargs.get('run_plugin')], 1)
-        xbmc.executebuiltin(try_encode(u'RunPlugin({})'.format(kwargs.get('run_plugin'))))
+        xbmc.executebuiltin(u'RunPlugin({})'.format(kwargs.get('run_plugin')))
 
 
 def container_refresh():
@@ -165,7 +165,7 @@ def related_lists(tmdb_id=None, tmdb_type=None, season=None, episode=None, conta
         path=encode_url(path=item.get('path'), **item.get('params')),
         info=item['params']['info'], play='RunPlugin',  # Use RunPlugin to avoid window manager info dialog crash with Browse method
         content='pictures' if item['params']['info'] in ['posters', 'fanart'] else 'videos')
-    xbmc.executebuiltin(try_encode(path))
+    xbmc.executebuiltin(path)
 
 
 def update_players():
@@ -293,15 +293,15 @@ def sort_list(**kwargs):
     x = xbmcgui.Dialog().contextmenu([i['name'] for i in sort_methods])
     if x == -1:
         return
-    for k, v in viewitems(sort_methods[x]['params']):
+    for k, v in sort_methods[x]['params'].items():
         kwargs[k] = v
-    xbmc.executebuiltin(try_encode(format_folderpath(encode_url(**kwargs))))
+    xbmc.executebuiltin(format_folderpath(encode_url(**kwargs)))
 
 
 class Script(object):
     def __init__(self):
         self.params = {}
-        for arg in [try_decode(arg) for arg in sys.argv[1:]]:
+        for arg in sys.argv[1:]:
             if '=' in arg:
                 key, value = arg.split('=', 1)
                 self.params[key] = value.strip('\'').strip('"') if value else True

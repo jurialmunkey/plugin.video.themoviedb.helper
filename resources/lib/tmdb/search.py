@@ -2,8 +2,8 @@ import xbmc
 import xbmcgui
 from resources.lib.addon.cache import set_search_history, get_search_history
 from resources.lib.addon.plugin import ADDONPATH, ADDON, PLUGINPATH, convert_type
-from resources.lib.addon.parser import try_decode, urlencode_params
 from resources.lib.addon.setutils import merge_two_dicts
+from urllib.parse import urlencode
 
 
 MULTISEARCH_TYPES = ['movie', 'tv', 'person', 'collection', 'company', 'keyword']
@@ -70,7 +70,7 @@ class SearchLists():
     def list_search(self, tmdb_type, query=None, update_listing=False, page=None, **kwargs):
         original_query = query
         query = query or set_search_history(
-            query=try_decode(xbmcgui.Dialog().input(ADDON.getLocalizedString(32044), type=xbmcgui.INPUT_ALPHANUM)),
+            query=xbmcgui.Dialog().input(ADDON.getLocalizedString(32044), type=xbmcgui.INPUT_ALPHANUM),
             tmdb_type=tmdb_type)
 
         if not query:
@@ -86,7 +86,7 @@ class SearchLists():
             params = merge_two_dicts(kwargs, {
                 'info': 'search', 'tmdb_type': tmdb_type, 'page': page, 'query': query,
                 'update_listing': 'True'})
-            self.container_update = u'{}?{}'.format(PLUGINPATH, urlencode_params(**params))
+            self.container_update = u'{}?{}'.format(PLUGINPATH, urlencode(params))
             # Trigger container update using new path with query after adding items
             # Prevents onback from re-prompting for user input by re-writing path
 

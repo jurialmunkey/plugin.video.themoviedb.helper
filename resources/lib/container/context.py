@@ -1,5 +1,4 @@
 from json import dumps
-from resources.lib.addon.plugin import viewitems
 from resources.lib.addon.constants import CONTEXT_MENU_ITEMS
 
 
@@ -24,14 +23,14 @@ class ContextMenu():
     def get(self, context=None):
         context = context or CONTEXT_MENU_ITEMS
         return [(name, dumps(item)) for name, item in (
-            (name, self._build_item(mediatypes)) for name, mediatypes in viewitems(context)) if item]
+            (name, self._build_item(mediatypes)) for name, mediatypes in context.items()) if item]
 
     def _build_item(self, mediatypes):
         params_def = mediatypes.get(self.mediatype, mediatypes.get('other'))
         if not params_def:
             return
         item = {}
-        for k, v in viewitems(params_def):
+        for k, v in params_def.items():
             try:  # Need to try accept in case hard-coded int/bool etc.
                 value = v.format(**self.info)
             except AttributeError:

@@ -5,7 +5,7 @@ import resources.lib.container.pages as pages
 from resources.lib.addon.window import get_property
 from json import loads, dumps
 from resources.lib.api.request import RequestAPI
-from resources.lib.addon.plugin import ADDON, kodi_log, viewitems
+from resources.lib.addon.plugin import ADDON, kodi_log
 from resources.lib.container.pages import PaginatedItems
 from resources.lib.trakt.items import TraktItems
 from resources.lib.trakt.decorators import is_authorized, use_activity_cache
@@ -140,7 +140,7 @@ class _TraktLists():
             item = {}
             item['label'] = i.get('name')
             item['infolabels'] = {'plot': i.get('description')}
-            item['infoproperties'] = {k: v for k, v in viewitems(i) if v and type(v) not in [list, dict]}
+            item['infoproperties'] = {k: v for k, v in i.items() if v and type(v) not in [list, dict]}
             item['art'] = {}
             item['params'] = {
                 'info': 'trakt_userlist',

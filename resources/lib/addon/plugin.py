@@ -1,14 +1,10 @@
 import re
-import sys
 import xbmc
 import xbmcgui
 import xbmcaddon
 import hashlib
 import traceback
 from resources.lib.addon.constants import LANGUAGES
-from resources.lib.addon.parser import try_decode
-if sys.version_info[0] >= 3:
-    unicode = str  # In Py3 str is now unicode
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
@@ -22,7 +18,7 @@ _debuglogging = ADDON.getSettingBool('debug_logging')
 
 def format_name(cache_name, *args, **kwargs):
     # Define a type whitelist to avoiding adding non-basic types like classes to cache name
-    permitted_types = (unicode, int, float, str, bool, bytes)
+    permitted_types = (int, float, str, bool, bytes)
     for arg in args:
         if not isinstance(arg, permitted_types):
             continue
@@ -52,26 +48,12 @@ def reconfigure_legacy_params(**kwargs):
     return kwargs
 
 
-def viewitems(obj, **kwargs):
-    """  from future
-    Function for iterating over dictionary items with the same set-like
-    behaviour on Py2.7 as on Py3.
-
-    Passes kwargs to method."""
-    func = getattr(obj, "viewitems", None)
-    if not func:
-        func = obj.items
-    return func(**kwargs)
-
-
 def set_kwargattr(obj, kwargs):
-    for k, v in viewitems(kwargs):
+    for k, v in kwargs.items():
         setattr(obj, k, v)
 
 
 def md5hash(value):
-    if sys.version_info.major != 3:
-        return hashlib.md5(str(value)).hexdigest()
     value = str(value).encode()
     return hashlib.md5(value).hexdigest()
 
@@ -86,8 +68,6 @@ def kodi_log(value, level=0):
         if isinstance(value, bytes):
             value = value.decode('utf-8')
         logvalue = u'{0}{1}'.format(_addonlogname, value)
-        if sys.version_info < (3, 0):
-            logvalue = logvalue.encode('utf-8', 'ignore')
         if level == 2 and _debuglogging:
             xbmc.log(logvalue, level=xbmc.LOGINFO)
         elif level == 1:
@@ -119,7 +99,7 @@ def get_language():
 
 def get_mpaa_prefix():
     if ADDON.getSettingString('mpaa_prefix'):
-        return u'{} '.format(try_decode(ADDON.getSettingString('mpaa_prefix')))
+        return u'{} '.format(ADDON.getSettingString('mpaa_prefix'))
     return u''
 
 

@@ -1,5 +1,4 @@
 import os
-import sys
 import xbmc
 import xbmcvfs
 import xbmcgui
@@ -8,13 +7,7 @@ import gzip
 from resources.lib.addon.plugin import ADDON, kodi_log
 from resources.lib.addon.decorators import busy_dialog
 from io import BytesIO
-try:  # Python 3
-    from urllib.parse import urlparse
-except ImportError:  # Python 2
-    from urlparse import urlparse
-if sys.version_info[0] >= 3:
-    unicode = str  # In Py3 str is now unicode
-
+from urllib.parse import urlparse
 
 requests = None  # Requests module is slow to import so lazy import via decorator instead
 
@@ -37,7 +30,7 @@ class Downloader(object):
     def recursive_delete_dir(self, fullpath):
         '''helper to recursively delete a directory'''
         success = True
-        if not isinstance(fullpath, unicode):
+        if not isinstance(fullpath, str):
             fullpath = fullpath.decode("utf-8")
         dirs, files = xbmcvfs.listdir(fullpath)
         for file in files:

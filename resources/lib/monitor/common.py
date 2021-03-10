@@ -4,8 +4,8 @@ from resources.lib.tmdb.api import TMDb
 from resources.lib.omdb.api import OMDb
 from resources.lib.trakt.api import TraktAPI
 from resources.lib.fanarttv.api import FanartTV
-from resources.lib.addon.plugin import ADDON, viewitems, kodi_traceback
-from resources.lib.addon.parser import try_int, try_decode
+from resources.lib.addon.plugin import ADDON, kodi_traceback
+from resources.lib.addon.parser import try_int
 from resources.lib.addon.setutils import merge_two_dicts
 from resources.lib.addon.decorators import try_except_log
 
@@ -53,7 +53,7 @@ class CommonMonitorFunctions(object):
         if value is None:
             get_property(key, clear_property=True)
         else:
-            get_property(key, set_property=u'{0}'.format(try_decode(value)))
+            get_property(key, set_property=u'{0}'.format(value))
 
     def set_iter_properties(self, dictionary, keys):
         if not isinstance(dictionary, dict):
@@ -76,7 +76,7 @@ class CommonMonitorFunctions(object):
             return
 
         index_properties = set()
-        for k, v in viewitems(dictionary):
+        for k, v in dictionary.items():
             if k in self.properties or k in SETPROP_RATINGS or k in SETMAIN_ARTWORK:
                 continue
             try:

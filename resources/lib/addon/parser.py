@@ -1,10 +1,5 @@
 import re
-import sys
-try:
-    from urllib.parse import urlencode, unquote_plus  # Py3
-except ImportError:
-    from urllib import urlencode, unquote_plus
-
+from urllib.parse import urlencode, unquote_plus
 
 PLUGINPATH = u'plugin://plugin.video.themoviedb.helper/'
 
@@ -42,28 +37,8 @@ def try_type(value, output=None):
         return try_float(value)
 
 
-def try_decode(string, encoding='utf-8', errors=None):
-    """helper to decode strings for PY 2 """
-    if sys.version_info.major == 3:
-        return string
-    try:
-        return string.decode(encoding, errors) if errors else string.decode(encoding)
-    except Exception:
-        return string
-
-
-def try_encode(string, encoding='utf-8'):
-    """helper to encode strings for PY 2 """
-    if sys.version_info.major == 3:
-        return string
-    try:
-        return string.encode(encoding)
-    except Exception:
-        return string
-
-
 def parse_paramstring(paramstring):
-    """ helper to assist with difference in urllib modules in PY2/3 """
+    """ helper to assist to standardise urllib parsing """
     params = dict()
     paramstring = paramstring.replace('&amp;', '&')  # Just in case xml string
     for param in paramstring.split('&'):
@@ -74,17 +49,9 @@ def parse_paramstring(paramstring):
     return params
 
 
-def urlencode_params(*args, **kwargs):
-    """ helper to assist with difference in urllib modules in PY2/3 """
-    params = dict()
-    for k, v in kwargs.items():  # TODO: Switch to viewitems and remove viewitems from plugin and put in this module
-        params[try_encode(k)] = try_encode(v)
-    return urlencode(params)
-
-
 def encode_url(path=None, **kwargs):
     path = path or PLUGINPATH
-    paramstring = u'?{}'.format(urlencode_params(**kwargs)) if kwargs else ''
+    paramstring = u'?{}'.format(urlencode(kwargs)) if kwargs else ''
     return u'{}{}'.format(path, paramstring)
 
 

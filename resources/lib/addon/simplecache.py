@@ -18,7 +18,6 @@ import sqlite3
 from functools import reduce
 # from ast import literal_eval
 from contextlib import contextmanager
-from resources.lib.addon.parser import try_encode
 from resources.lib.addon.plugin import kodi_log
 from resources.lib.files.utils import get_file_path
 
@@ -108,7 +107,7 @@ class SimpleCache(object):
             we use window properties because we need to be stateless
         '''
         endpoint = u'{}_{}'.format(self._sc_name, endpoint)  # Append name of cache since we can change it now
-        cachedata = self._win.getProperty(try_encode(endpoint))
+        cachedata = self._win.getProperty(endpoint)
         if not cachedata:
             return
         cachedata = eval(cachedata)
@@ -124,7 +123,7 @@ class SimpleCache(object):
         '''
         endpoint = u'{}_{}'.format(self._sc_name, endpoint)  # Append name of cache since we can change it now
         cachedata = (expires, data, checksum)
-        self._win.setProperty(try_encode(endpoint), try_encode(repr(cachedata)))
+        self._win.setProperty(endpoint, repr(cachedata))
 
     def _get_db_cache(self, endpoint, checksum, cur_time):
         '''get cache data from sqllite _database'''
@@ -166,7 +165,7 @@ class SimpleCache(object):
                 if self._exit or self._monitor.abortRequested():
                     return
                 # always cleanup all memory objects on each interval
-                self._win.clearProperty(try_encode(cache_id))
+                self._win.clearProperty(cache_id)
                 # clean up db cache object only if expired
                 if cache_expires < cur_timestamp:
                     query = 'DELETE FROM simplecache WHERE id = ?'

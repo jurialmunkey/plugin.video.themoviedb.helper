@@ -1,13 +1,11 @@
 import re
 import os
-import sys
-import xbmc
 import json
 import xbmcgui
 import xbmcvfs
 import unicodedata
 from resources.lib.addon.timedate import get_timedelta, get_datetime_now
-from resources.lib.addon.parser import try_int, try_encode
+from resources.lib.addon.parser import try_int
 from resources.lib.addon.plugin import ADDON, ADDONDATA, kodi_log
 from resources.lib.addon.constants import ALPHANUM_CHARS, INVALID_FILECHARS
 from resources.lib.addon.timedate import is_future_timestamp
@@ -15,17 +13,9 @@ try:
     import cPickle as _pickle
 except ImportError:
     import pickle as _pickle  # Newer versions of Py3 just use pickle
-if sys.version_info[0] >= 3:
-    unicode = str  # In Py3 str is now unicode
 
 
 def validify_filename(filename, alphanum=False):
-    try:
-        filename = unicode(filename, 'utf-8')
-    except NameError:  # unicode is a default on python 3
-        pass
-    except TypeError:  # already unicode
-        pass
     filename = unicodedata.normalize('NFD', filename)
     filename = u''.join([c for c in filename if (not alphanum or c in ALPHANUM_CHARS) and c not in INVALID_FILECHARS])
     return filename.strip('.')
@@ -58,7 +48,7 @@ def read_file(filepath):
 
 def write_to_file(filepath, content):
     f = xbmcvfs.File(filepath, 'w')
-    f.write(try_encode(content))
+    f.write(content)
     f.close()
 
 

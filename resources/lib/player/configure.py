@@ -3,9 +3,9 @@ import xbmcgui
 import xbmcaddon
 from resources.lib.addon.constants import PLAYERS_BASEDIR_BUNDLED, PLAYERS_BASEDIR_USER, PLAYERS_BASEDIR_SAVE, PLAYERS_PRIORITY
 from resources.lib.files.utils import get_files_in_folder
-from resources.lib.addon.plugin import ADDON, ADDONPATH, viewitems
+from resources.lib.addon.plugin import ADDON, ADDONPATH
 from resources.lib.files.utils import read_file, dumps_to_file, delete_file
-from resources.lib.addon.parser import try_int, try_decode
+from resources.lib.addon.parser import try_int
 from resources.lib.container.listitem import ListItem
 from resources.lib.addon.decorators import busy_dialog
 from json import loads, dumps
@@ -28,7 +28,7 @@ def get_players_from_file():
                     break  # System doesn't have a required plugin so skip this player
             else:
                 meta['plugin'] = plugins[0]
-                players[try_decode(file)] = meta
+                players[file] = meta
     return players
 
 
@@ -39,7 +39,7 @@ def _get_dialog_players(players):
             art={
                 'thumb': v.get('icon', '').format(ADDONPATH)
                 or xbmcaddon.Addon(v.get('plugin', '')).getAddonInfo('icon')}).get_listitem()
-        for k, v in sorted(viewitems(players), key=lambda i: try_int(i[1].get('priority')) or PLAYERS_PRIORITY)]
+        for k, v in sorted(players.items(), key=lambda i: try_int(i[1].get('priority')) or PLAYERS_PRIORITY)]
 
 
 def _get_player_methods(player):
@@ -54,7 +54,7 @@ def configure_players(*args, **kwargs):
 class _ConfigurePlayer():
     def __init__(self, player, filename):
         self.player = player
-        self.filename = try_decode(filename)
+        self.filename = filename
 
     def get_player_settings(self):
         if not self.player:
@@ -204,10 +204,10 @@ class ConfigurePlayers():
             dumps_to_file(player, PLAYERS_BASEDIR_SAVE, filename, indent=4, join_addon_data=False)  # Write out file
 
     def configure_players(self):
-        filename = try_decode(self.select_player())
+        filename = self.select_player()
         if not filename:
             return
-        player = self.players[try_decode(filename)].copy()
+        player = self.players[filename].copy()
         player = _ConfigurePlayer(player, filename=filename).configure()
         if player == -1:  # Reset player (i.e. delete player file)
             self.delete_player(filename)

@@ -1,5 +1,4 @@
 import re
-import sys
 import xbmc
 import xbmcgui
 import xbmcaddon
@@ -7,8 +6,8 @@ import xbmcplugin
 from resources.lib.kodi.rpc import get_directory, KodiLibrary
 from resources.lib.addon.window import get_property
 from resources.lib.container.listitem import ListItem
-from resources.lib.addon.plugin import ADDON, PLUGINPATH, ADDONPATH, viewitems, format_folderpath, kodi_log
-from resources.lib.addon.parser import try_int, try_decode, try_encode, try_float
+from resources.lib.addon.plugin import ADDON, PLUGINPATH, ADDONPATH, format_folderpath, kodi_log
+from resources.lib.addon.parser import try_int, try_float
 from resources.lib.files.utils import read_file, normalise_filesize
 from resources.lib.player.details import get_item_details, get_detailed_item, get_playerstring, get_language_details
 from resources.lib.player.inputter import KeyboardInputter
@@ -16,8 +15,6 @@ from resources.lib.player.configure import get_players_from_file
 from resources.lib.addon.constants import PLAYERS_PRIORITY
 from resources.lib.addon.decorators import busy_dialog
 from string import Formatter
-if sys.version_info[0] >= 3:
-    unicode = str  # In Py3 str is now unicode
 
 
 def string_format_map(fmt, d):
@@ -182,7 +179,7 @@ class Players(object):
             return []
         dialog_play = self._get_local_item(tmdb_type)
         dialog_search = []
-        for k, v in sorted(viewitems(self.players), key=lambda i: try_int(i[1].get('priority')) or PLAYERS_PRIORITY):
+        for k, v in sorted(self.players.items(), key=lambda i: try_int(i[1].get('priority')) or PLAYERS_PRIORITY):
             if v.get('disabled', '').lower() == 'true':
                 continue  # Skip disabled players
             if tmdb_type == 'movie':
@@ -232,7 +229,7 @@ class Players(object):
     def _get_path_from_rules(self, folder, action):
         """ Returns tuple of (path, is_folder) """
         for x, f in enumerate(folder):
-            for k, v in viewitems(action):  # Iterate through our key (infolabel) / value (infolabel must match) pairs of our action
+            for k, v in action.items():  # Iterate through our key (infolabel) / value (infolabel must match) pairs of our action
                 if k == 'position':  # We're looking for an item position not an infolabel
                     if try_int(string_format_map(v, self.item)) != x + 1:  # Format our position value and add one since people are dumb and don't know that arrays start at 0
                         break  # Not the item position we want so let's go to next item in folder
@@ -348,7 +345,7 @@ class Players(object):
             return
         if isinstance(actions, list):
             return self._get_path_from_actions(actions)
-        if isinstance(actions, unicode) or isinstance(actions, str):
+        if isinstance(actions, str):
             return (string_format_map(actions, self.item), player.get('is_folder', False))  # Single path so return it formatted
 
     def get_default_player(self):
@@ -404,7 +401,7 @@ class Players(object):
         if return_listitem:
             self.details.params = {}
             self.details.path = path.pop('url', None)
-            for k, v in viewitems(path):
+            for k, v in path.items():
                 self.details.infoproperties[k] = v
             path = self.details.get_listitem()
         return path
@@ -420,7 +417,7 @@ class Players(object):
         container_folderpath = xbmc.getInfoLabel("Container.FolderPath")
         if container_folderpath == folder_path:
             return
-        xbmc.executebuiltin(try_encode(u'Container.Update({},replace)'.format(folder_path)))
+        xbmc.executebuiltin(u'Container.Update({},replace)'.format(folder_path))
         if not reset_focus:
             return
         timeout = 20
@@ -431,7 +428,7 @@ class Players(object):
         xbmc.Monitor().waitForAbort(0.5)
 
     def configure_action(self, listitem, handle=None):
-        path = try_decode(listitem.getPath())
+        path = listitem.getPath()
         if listitem.getProperty('is_folder') == 'true':
             return format_folderpath(path)
         if not handle or listitem.getProperty('is_resolvable') == 'false':
@@ -459,7 +456,7 @@ class Players(object):
         self._update_listing_hack(folder_path=folder_path, reset_focus=reset_focus)
 
         # Check we have an actual path to open
-        if not try_decode(listitem.getPath()) or try_decode(listitem.getPath()) == PLUGINPATH:
+        if not listitem.getPath() or listitem.getPath() == PLUGINPATH:
             return
 
         action = self.configure_action(listitem, handle)
@@ -472,7 +469,7 @@ class Players(object):
         if listitem.getProperty('is_folder') == 'true':
             if self.is_strm or not ADDON.getSettingBool('only_resolve_strm'):
                 resolve_to_dummy(handle, self.dummy_duration, self.dummy_delay)
-            xbmc.executebuiltin(try_encode(action))
+            xbmc.executebuiltin(action)
             kodi_log(['lib.player - finished executing action\n', action], 1)
             return
 
@@ -487,19 +484,19 @@ class Players(object):
             xbmc.Player().play(action, listitem) if self.force_xbmcplayer else xbmc.executebuiltin(u'PlayMedia({})'.format(action))
             kodi_log([
                 'lib.player - playing path with {}\n'.format('xbmc.Player()' if self.force_xbmcplayer else 'PlayMedia'),
-                try_decode(listitem.getPath())], 1)
+                listitem.getPath()], 1)
             return
 
         # Otherwise we have a url we can resolve to
         xbmcplugin.setResolvedUrl(handle, True, listitem)
-        kodi_log(['lib.player - finished resolving path to url\n', try_decode(listitem.getPath())], 1)
+        kodi_log(['lib.player - finished resolving path to url\n', listitem.getPath()], 1)
 
         # Re-send local files to player due to "bug" (or maybe "feature") of setResolvedUrl
         # Because setResolvedURL doesn't set id/type (sets None, "unknown" instead) to player for plugins
         # If id/type not set to Player.GetItem things like Trakt don't work correctly.
         # Looking for better solution than this hack.
         if ADDON.getSettingBool('trakt_localhack') and listitem.getProperty('is_local') == 'true':
-            xbmc.Player().play(try_decode(listitem.getPath()), listitem) if self.force_xbmcplayer else xbmc.executebuiltin(u'PlayMedia({})'.format(try_decode(listitem.getPath())))
+            xbmc.Player().play(listitem.getPath(), listitem) if self.force_xbmcplayer else xbmc.executebuiltin(u'PlayMedia({})'.format(listitem.getPath()))
             kodi_log([
                 'Finished executing {}\n'.format('xbmc.Player()' if self.force_xbmcplayer else 'PlayMedia'),
-                try_decode(listitem.getPath())], 1)
+                listitem.getPath()], 1)

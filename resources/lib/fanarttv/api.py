@@ -3,7 +3,7 @@ import xbmcgui
 from resources.lib.addon.cache import CACHE_EXTENDED
 from resources.lib.api.request import RequestAPI
 from resources.lib.container.listitem import ListItem
-from resources.lib.addon.plugin import ADDON, viewitems, get_language
+from resources.lib.addon.plugin import ADDON, get_language
 from resources.lib.addon.setutils import del_empty_keys
 from resources.lib.addon.decorators import busy_dialog
 from resources.lib.addon.parser import try_int
@@ -191,7 +191,7 @@ class FanartTV(RequestAPI):
             xbmcgui.Dialog().ok('FanartTV', ADDON.getLocalizedString(32217).format(ftv_type, ftv_id))
         if ok_dialog and artwork:
             xbmcgui.Dialog().ok('FanartTV', ADDON.getLocalizedString(32218).format(
-                ftv_type, ftv_id, ', '.join([k.capitalize() for k, v in viewitems(artwork) if v])))
+                ftv_type, ftv_id, ', '.join([k.capitalize() for k, v in artwork.items() if v])))
         if artwork and container_refresh:
             xbmc.executebuiltin('Container.Refresh')
             xbmc.executebuiltin('UpdateLibrary(video,/fake/path/to/force/refresh/on/home)')

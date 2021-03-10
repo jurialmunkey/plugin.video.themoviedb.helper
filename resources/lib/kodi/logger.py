@@ -1,4 +1,3 @@
-from resources.lib.addon.plugin import viewitems
 from resources.lib.files.utils import dumps_to_file, del_old_files
 from resources.lib.addon.timedate import get_todays_date
 
@@ -19,7 +18,7 @@ class _LibraryLogger():
         if episode is not None:
             to_update = self.logging[key][tmdb_id]['seasons'][season].setdefault('episodes', {})
             to_update = self.logging[key][tmdb_id]['seasons'][season]['episodes'].setdefault(episode, {})
-        for k, v in viewitems(kwargs):
+        for k, v in kwargs.items():
             to_update[k] = v
 
     def _add(self, key, tmdb_id, log_msg, season=None, episode=None, **kwargs):
