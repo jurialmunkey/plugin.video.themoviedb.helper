@@ -17,7 +17,7 @@ def get_jsonrpc(method=None, params=None):
         query["params"] = params
     try:
         jrpc = xbmc.executeJSONRPC(json.dumps(query))
-        response = json.loads(jrpc, errors='ignore')
+        response = json.loads(jrpc)
     except Exception as exc:
         kodi_log(u'TMDbHelper - JSONRPC Error:\n{}'.format(exc), 1)
         response = {}
