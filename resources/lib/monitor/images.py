@@ -7,15 +7,30 @@ from resources.lib.addon.plugin import kodi_log, md5hash
 from resources.lib.addon.parser import try_int, try_float
 from resources.lib.files.utils import make_path
 from threading import Thread
-try:  # Try import PIL due to some systems using incompatible local versions of numpy
-    from PIL import ImageFilter, Image
-except Exception as exc:
-    kodi_log(['lib.monitor.images - PIL import error!\n', exc], 1)
-    ImageFilter, Image = None, None
 try:  # Try import urllib for PY2/3 compatibility
     import urllib2 as urllib
 except ImportError:
     import urllib.request as urllib
+
+# PIL causes issues (via numpy) on Linux systems using python versions higher than 3.8.5
+# Lazy import PIL to avoid using it unless user requires ImageFunctions
+ImageFilter, Image = None, None
+
+
+def lazyimport_pil(func):
+    def wrapper(*args, **kwargs):
+        global ImageFilter
+        if ImageFilter is None:
+            from PIL import ImageFilter
+        return func(*args, **kwargs)
+    return wrapper
+
+
+def _imageopen(image):
+    global Image
+    if Image is None:
+        from PIL import Image
+    return Image.open(image)
 
 
 def _openimage(image, targetpath, filename):
@@ -38,7 +53,7 @@ def _openimage(image, targetpath, filename):
             for cache in cached_files:
                 if xbmcvfs.exists(cache):
                     try:
-                        img = Image.open(xbmcvfs.translatePath(cache))
+                        img = _imageopen(xbmcvfs.translatePath(cache))
                         return img
 
                     except Exception as error:
@@ -52,7 +67,7 @@ def _openimage(image, targetpath, filename):
                     image = os.path.join('special://skin/media/', image)
 
                 try:  # in case image is packed in textures.xbt
-                    img = Image.open(xbmcvfs.translatePath(image))
+                    img = _imageopen(xbmcvfs.translatePath(image))
                     return img
 
                 except Exception:
@@ -63,7 +78,7 @@ def _openimage(image, targetpath, filename):
                 if not xbmcvfs.exists(targetfile):
                     xbmcvfs.copy(image, targetfile)
 
-                img = Image.open(targetfile)
+                img = _imageopen(targetfile)
                 return img
 
         except Exception as error:
@@ -81,8 +96,6 @@ class ImageFunctions(Thread):
         self.func = None
         self.save_prop = None
         self.save_path = 'special://profile/addon_data/plugin.video.themoviedb.helper/{}/'
-        if not ImageFilter:
-            return
         if method == 'blur':
             self.func = self.blur
             self.save_path = make_path(self.save_path.format('blur'))
@@ -128,6 +141,7 @@ class ImageFunctions(Thread):
         except Exception:
             return ''
 
+    @lazyimport_pil
     def blur(self, source, radius=20):
         filename = u'{}{}.png'.format(md5hash(source), radius)
         destination = self.save_path + filename
@@ -231,6 +245,7 @@ class ImageFunctions(Thread):
         get_property(propname, set_property=end_hex)
         return end_hex
 
+    @lazyimport_pil
     def colors(self, source):
         filename = u'{}.png'.format(md5hash(source))
         destination = self.save_path + filename
@@ -238,7 +253,7 @@ class ImageFunctions(Thread):
         try:
             if xbmcvfs.exists(destination):
                 os.utime(destination, None)
-                img = Image.open(xbmcvfs.translatePath(destination))
+                img = _imageopen(xbmcvfs.translatePath(destination))
             else:
                 img = _openimage(source, self.save_path, filename)
                 img.thumbnail((256, 256))
