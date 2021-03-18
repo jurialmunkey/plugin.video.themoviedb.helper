@@ -1587,7 +1587,7 @@ msgstr "Nie znaleziono identyfikatora serwisu TMDb dla {}!"
 #: /resources/lib/player/players.py
 msgctxt "#32311"
 msgid "Clear default player"
-msgstr "Wyczyść domyślny Player"
+msgstr "Wyczyść domyślny Player wtyczek"
 
 #: /resources/lib/helpers/update.py
 msgctxt "#32312"
@@ -1597,7 +1597,7 @@ msgstr "Wybierz listy"
 #: /resources/lib/script/router.py
 msgctxt "#32313"
 msgid "Enter URL to download players"
-msgstr "Wpisz adres URL, aby pobrać Player-y"
+msgstr "Wpisz adres URL, aby pobrać Player-y wtyczek"
 
 #: /resources/lib/script/router.py
 msgctxt "#32314"
@@ -1605,7 +1605,7 @@ msgid ""
 "Download players from URL?\n"
 "[B]{}[/B]"
 msgstr ""
-"Pobrać Player-y z adresu URL?\n"
+"Pobrać Player-y dla wtyczek z adresu URL?\n"
 "[B]{}[/B]"
 
 #: /resources/lib/trakt/api.py
@@ -1646,7 +1646,7 @@ msgstr "polubione"
 #: /addon.xml
 msgctxt "#32322"
 msgid "Select player"
-msgstr "Wybierz Player"
+msgstr "Wybierz Player wtyczek"
 
 #: /resources/lib/helpers/update.py
 msgctxt "#32323"
@@ -1669,7 +1669,7 @@ msgid ""
 msgstr ""
 "Brak konfiguracji flagi dla odtwarzacza \"is_resolvable\" Prosze wybrać metodę 'resolve'\n"
 "\n"
-"setResolvedUrl jest metodą preferowaną i generalnie powinna działać dla każdego dodatku do odtwarzania, który odtwarza pliki bezpośrednio, używa funkcji adaptacji strumienia wejściowego lub tylko monituje wybieranie szybkości transmisji / jakości. PlayMedia powinno być używane dla każdego dodatku do odtwarzania, który jako pierwszy uruchamia skrypt do pobierania źródeł lub w inny sposób lub nie działa poprawnie przy użyciu metody setResolvedUrl.\n"
+"setResolvedUrl jest metodą preferowaną i generalnie powinna działać dla każdego dodatku do odtwarzania, który odtwarza pliki bezpośrednio, używa funkcji adaptacji strumienia wejściowego lub tylko monituje wybieranie szybkości transmisji/jakości. PlayMedia powinno być używane dla każdego dodatku do odtwarzania, który jako pierwszy uruchamia skrypt do pobierania źródeł lub w inny sposób lub nie działa poprawnie przy użyciu metody setResolvedUrl.\n"
 "\n"
 "Aby zmienić to okno dialogowe, ustaw metodę rozwiązywania dla Player-a w oknie dialogowym konfiguracji ustawień odtwarzacza TMDbHelper."
 
@@ -1686,12 +1686,12 @@ msgstr "W zeszłym miesiącu"
 #: /resources/lib/player/configure.py
 msgctxt "#32328"
 msgid "Select Player to Configure"
-msgstr "Wybierz Player do skonfigurowania"
+msgstr "Wybierz Player wtyczek do skonfigurowania"
 
 #: /resources/settings.xml
 msgctxt "#32329"
 msgid "Configure players"
-msgstr "Konfiguruj Player"
+msgstr "Konfiguruj Player wtyczek"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32330"
@@ -1706,7 +1706,7 @@ msgstr "Wprowadź nową nazwę dla {}"
 #: /resources/lib/player/configure.py
 msgctxt "#32332"
 msgid "Choose resolve method for player"
-msgstr "Wybierz metodę 'resolve' dla Player-a"
+msgstr "Wybierz metodę 'resolve' dla Player-a wtyczek"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32333"
@@ -1725,7 +1725,7 @@ msgid ""
 "\n"
 "[B]WARNING:[/B] This action cannot be undone."
 msgstr ""
-"Czy chcesz zresetować [B]{}[/B] Player plik z powrotem do oryginalnego niezmodyfikowanego stanu na dysku?\n"
+"Czy chcesz zresetować plik [B]{}[/B] Player z powrotem do oryginalnego niezmodyfikowanego stanu na dysku?\n"
 "\n"
 "[B]UWAGA:[/B] Tej czynności nie można cofnąć."
 
@@ -1764,6 +1764,9 @@ msgid ""
 "\n"
 "Are you sure you want to set this player's resolve method to PlayMedia?"
 msgstr ""
+"Pamiętaj, że metoda setResolvedUrl jest preferowaną przez Kodi metodą rozpoznawania adresów URL dla odtwarzania. Metoda PlayMedia powinna być używana tylko w przypadku problemów z używaniem setResolvedUrl w tym konkretnym odtwarzaczu.\n"
+"\n"
+"Czy na pewno chcesz ustawić metodę rozwiązywania tego odtwarzacza na PlayMedia?"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32341"
@@ -1798,12 +1801,12 @@ msgstr "Użyj sztuczki, aby pobrać dodatek Kodi Trakt do scrobblowania plików 
 #: /resources/settings.xml
 msgctxt "#32347"
 msgid "Log output of Trakt request"
-msgstr "Log wyjście żądania Trakt"
+msgstr "Log wyjście żądania serwisu Trakt"
 
 #: /resources/settings.xml
 msgctxt "#32348"
 msgid "Log output of TMDb request"
-msgstr "Wyjście dziennika żądania TMDb"
+msgstr "Wyjście dziennika żądania serwisu TMDb"
 
 #: /resources/lib/kodi/library.py
 msgctxt "#32349"
@@ -1837,9 +1840,9 @@ msgid ""
 "\n"
 "Select \"Yes\" for any player that plays directly from single source. Select \"No\" for players that scrape multiple sources or otherwise do not work with the setResolvedURL method."
 msgstr ""
-"Czy ten Player odtwarza bezpośrednio jako pojedynczy plik, który można odtworzyć?\n"
+"Czy ten Player wtyczek odtwarza bezpośrednio jako pojedynczy plik, który można odtworzyć?\n"
 "\n"
-"Wybierz „Tak” dla dowolnego Player-a, który odtwarza bezpośrednio z jednego źródła. Wybierz \ "Nie \" dla Player-ów, które pobierają wiele źródeł lub w inny sposób nie działają z metodą setResolvedURL."
+"Wybierz \"Tak\" dla dowolnego Player-a wtyczek, który odtwarza bezpośrednio z jednego źródła. Wybierz \"Nie\" dla Player-ów wtyczek, które pobierają wiele źródeł lub w inny sposób lub nie działają z domyślną metodą setResolvedURL."
 
 #: /resources/lib/script/sync.py
 msgctxt "#32355"
@@ -1865,7 +1868,7 @@ msgstr ""
 #: /resources/lib/script/router.py
 msgctxt "#32358"
 msgid "Delete user list"
-msgstr "Usuń listę użytkowników"
+msgstr "Usuń listę użytkownika"
 
 #: /resources/lib/script/router.py
 msgctxt "#32359"
@@ -1895,7 +1898,7 @@ msgstr "Opóźnienie przed rozpoczęciem odtwarzania po 'dummy resolves' (w seku
 #: /resources/settings.xml
 msgctxt "#32364"
 msgid "Reroute PlayMedia to call xbmc.Player() directly"
-msgstr "Przekieruj PlayMedia, aby bezpośrednio wywołać xbmc.Player ()"
+msgstr "Przekieruj PlayMedia, aby bezpośrednio wywołać xbmc.Player()"
 
 #: /resources/lib/addon/plugin.py
 msgctxt "#32365"
@@ -1925,7 +1928,7 @@ msgstr "miniaturki"
 #: /resources/settings.xml
 msgctxt "#32370"
 msgid "landscape"
-msgstr "krajobraz"
+msgstr "krajobraz tła"
 
 #: /resources/settings.xml
 msgctxt "#32371"
@@ -1935,7 +1938,7 @@ msgstr "Preferowana grafika na miniaturek"
 #: /resources/settings.xml
 msgctxt "#32372"
 msgid "fanart"
-msgstr "grafika"
+msgstr "grafika tła"
 
 #: /resources/settings.xml
 msgctxt "#32373"
@@ -2097,12 +2100,12 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32000"
 msgid "TMDb API key"
-msgstr "Klucz API dla TMDb"
+msgstr "Klucz API dla serwisu TMDb"
 
 #: /resources/settings.xml
 msgctxt "#32001"
 msgid "OMDb API key"
-msgstr "Klucz API dla OMDb"
+msgstr "Klucz API dla serwisu OMDb"
 
 #: /resources/settings.xml
 msgctxt "#32002"
@@ -2157,7 +2160,7 @@ msgstr "Token"
 #: /resources/lib/traktapi.py
 msgctxt "#32012"
 msgid "You must authenticate your Trakt account to use this feature."
-msgstr "Aby korzystać z tej funkcji, musisz uwierzytelnić swoje konto Trakt."
+msgstr "Aby korzystać z tej funkcji, musisz uwierzytelnić swoje konto w serwisie Trakt."
 
 #: /resources/settings.xml
 msgctxt "#32013"
@@ -2167,17 +2170,17 @@ msgstr "Wyświetl opcje zarządzania listą Trakt na liście szczegółów TMDb"
 #: /resources/settings.xml
 msgctxt "#32014"
 msgid "Players"
-msgstr "Player-y"
+msgstr "Player-y wtyczek"
 
 #: /resources/settings.xml
 msgctxt "#32015"
 msgid "Players URL"
-msgstr "URL dla Player-ów"
+msgstr "URL dla Player-ów wtyczek"
 
 #: /resources/settings.xml
 msgctxt "#32016"
 msgid "Update players from URL"
-msgstr "Zaktualizuj Player-y z adresu URL"
+msgstr "Zaktualizuj Player-y wtyczek z adresu URL"
 
 #: /resources/settings.xml
 msgctxt "#32017"
@@ -2187,12 +2190,12 @@ msgstr "Klucze API"
 #: /resources/settings.xml
 msgctxt "#32018"
 msgid "Fanart.tv API key"
-msgstr "Klucz API Fanart.tv"
+msgstr "Klucz API serwisu Fanart.tv"
 
 #: /resources/settings.xml
 msgctxt "#32019"
 msgid "Fanart.tv client key"
-msgstr "Klucz klienta Fanart.tv"
+msgstr "Klucz klienta serwisu Fanart.tv"
 
 #: /resources/settings.xml
 msgctxt "#32020"
@@ -2202,7 +2205,7 @@ msgstr "Używaj tylko wtedy, gdy domyślny klucz API jest dezaktywowany"
 #: /resources/settings.xml
 msgctxt "#32021"
 msgid "Use fanart.tv for plugin artwork (increases load times)"
-msgstr "Użyj fanart.tv do grafiki wtyczki (wydłuża czas ładowania)"
+msgstr "Użyj serwisu Fanart.tv do grafiki wtyczki (wydłuża czas ładowania)"
 
 #: /resources/settings.xml
 msgctxt "#32022"
@@ -2217,19 +2220,19 @@ msgstr "Wybierz domyślną czynność w dodatku"
 #: /resources/settings.xml
 msgctxt "#32024"
 msgid "Default player for movies"
-msgstr "Domyślny Player dla filmów"
+msgstr "Domyślny Player wtyczek dla filmów"
 
 #: /resources/settings.xml
 msgctxt "#32025"
 msgid "Default player for episodes"
-msgstr "Domyślny Player dla seriali"
+msgstr "Domyślny Player wtyczek dla seriali"
 
 #: /resources/settings.xml
 msgctxt "#32026"
 msgid "Choose default players"
-msgstr "Wybierz domyślne Player-y dla odtwarzania"
+msgstr "Wybierz domyślne Player-y wtyczek dla odtwarzania"
 
 #: /resources/settings.xml
 msgctxt "#32027"
 msgid "Clear default players"
-msgstr "Wyczyść domyślne Player-y"
+msgstr "Wyczyść domyślne Player-y wtyczek"
