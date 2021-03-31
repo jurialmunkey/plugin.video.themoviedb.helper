@@ -900,12 +900,12 @@ msgstr "Popularne"
 #: /resources/lib/plugin.py
 msgctxt "#32176"
 msgid "Top Rated"
-msgstr "Njlepiej oceniane"
+msgstr "Najlepiej oceniane"
 
 #: /resources/lib/plugin.py
 msgctxt "#32177"
 msgid "Upcoming"
-msgstr "Ndchodzące"
+msgstr "Nadchodzące"
 
 #: /resources/lib/plugin.py
 msgctxt "#32178"
