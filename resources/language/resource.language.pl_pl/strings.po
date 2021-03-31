@@ -1905,6 +1905,21 @@ msgctxt "#32365"
 msgid "Combined"
 msgstr "Połaczony"
 
+#: /resources/lib/player/players.py
+msgctxt "#32374"
+msgid "Constructing Players"
+msgstr "Tworzę Player-y"
+
+#: /resources/lib/player/players.py
+msgctxt "#32375"
+msgid "Retrieving Item Details"
+msgstr "Pobieram szczegóły pozycji "
+
+#: /resources/lib/player/players.py
+msgctxt "#32376"
+msgid "Building Player Dialog"
+msgstr "Tworzę okno dialogowe Player-a"
+
 #: /resources/settings.xml
 msgctxt "#32366"
 msgid "Hide items without airdates"
