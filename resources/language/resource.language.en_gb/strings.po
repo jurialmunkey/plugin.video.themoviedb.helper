@@ -1905,6 +1905,21 @@ msgctxt "#32373"
 msgid "Restrict dummy setResolvedUrl method to library strm"
 msgstr ""
 
+#: /resources/lib/player/players.py
+msgctxt "#32374"
+msgid "Constructing Players"
+msgstr ""
+
+#: /resources/lib/player/players.py
+msgctxt "#32375"
+msgid "Retrieving Item Details"
+msgstr ""
+
+#: /resources/lib/player/players.py
+msgctxt "#32376"
+msgid "Building Player Dialog"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
