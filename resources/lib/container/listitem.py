@@ -105,6 +105,9 @@ class _ListItem(object):
     def is_unaired(self, format_label=None, check_hide_settings=True, no_date=True):
         return
 
+    def unaired_bool(self):
+        return False
+
     def set_context_menu(self):
         for k, v in ContextMenu(self).get():
             self.infoproperties[k] = v
