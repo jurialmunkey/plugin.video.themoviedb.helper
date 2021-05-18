@@ -89,7 +89,10 @@ def dumps_to_file(data, folder, filename, indent=2, join_addon_data=True):
 def get_write_path(folder, join_addon_data=True):
     main_dir = os.path.join(xbmcvfs.translatePath(ADDONDATA), folder) if join_addon_data else xbmcvfs.translatePath(folder)
     if not os.path.exists(main_dir):
-        os.makedirs(main_dir)
+        try:  # Try makedir to avoid race conditions
+            os.makedirs(main_dir)
+        except FileExistsError:
+            pass
     return main_dir
 
 
