@@ -473,9 +473,12 @@ class ItemMapper(_ItemMapper):
                 'func': dict_to_list,
                 'args': ['name']}, {
                 # ---
+                'keys': [('infoproperties', 'network')],
+                'func': lambda v: ' / '.join([x['name'] for x in v or [] if x.get('name')])}, {
+                # ---
                 'keys': [('infoproperties', UPDATE_BASEKEY)],
                 'func': get_iter_props,
-                'args': ['studio'],
+                'args': ['network'],
                 'kwargs': {
                     'basic_keys': {'name': 'name', 'tmdb_id': 'id'},
                     'image_keys': {'icon': 'logo_path'}}
