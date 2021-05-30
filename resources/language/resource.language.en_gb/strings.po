@@ -1920,6 +1920,11 @@ msgctxt "#32376"
 msgid "Building Player Dialog"
 msgstr ""
 
+#: /resources/lib/trakt/api.py
+msgctxt "#32377"
+msgid "Playcount"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

@@ -32,11 +32,17 @@ def get_sort_methods():
             'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(369)),
             'params': {'sort_by': 'title', 'sort_how': 'asc'}},
         {
+            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(16102)),
+            'params': {'sort_by': 'watched', 'sort_how': 'desc', 'extended': 'sync'}},
+        {
             'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(563)),
             'params': {'sort_by': 'percentage', 'sort_how': 'desc', 'extended': 'full'}},
         {
             'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(345)),
             'params': {'sort_by': 'year', 'sort_how': 'desc'}},
+        {
+            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), ADDON.getLocalizedString(32377)),
+            'params': {'sort_by': 'plays', 'sort_how': 'desc', 'extended': 'sync'}},
         {
             'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), ADDON.getLocalizedString(32242)),
             'params': {'sort_by': 'released', 'sort_how': 'desc', 'extended': 'full'}},
@@ -55,12 +61,20 @@ def get_sort_methods():
 
 
 class _TraktLists():
+    def _merge_sync_sort(self, items):
+        """ Get sync dict sorted by slugs then merge slug into list """
+        sync = {}
+        sync.update(self.get_sync('watched', 'show', 'slug'))
+        sync.update(self.get_sync('watched', 'movie', 'slug'))
+        return [dict(i, **sync.get(i.get(i.get('type'), {}).get('ids', {}).get('slug'), {})) for i in items]
+
     @use_simple_cache(cache_days=CACHE_SHORT)
     def get_sorted_list(self, path, sort_by=None, sort_how=None, extended=None, trakt_type=None, permitted_types=None, cache_refresh=False):
         response = self.get_response(path, extended=extended, limit=4095)
         if not response:
             return
-        return TraktItems(response.json(), headers=response.headers).build_items(
+        items = self._merge_sync_sort(response.json()) if extended == 'sync' else response.json()
+        return TraktItems(items, headers=response.headers).build_items(
             sort_by=sort_by or response.headers.get('X-Sort-By'),
             sort_how=sort_how or response.headers.get('X-Sort-How'),
             permitted_types=permitted_types)
