@@ -82,7 +82,7 @@ class TraktLists():
 
     def _list_trakt_sortby_item(self, i, params):
         item = get_empty_item()
-        item['label'] = item['infolabels']['title'] = i['name']
+        item['label'] = item['infolabels']['title'] = '{}[CR]{}'.format(params.get('list_name'), i['name'])
         item['params'] = params
         for k, v in i['params'].items():
             item['params'][k] = v

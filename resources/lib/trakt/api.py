@@ -144,6 +144,7 @@ class _TraktLists():
             item['art'] = {}
             item['params'] = {
                 'info': 'trakt_userlist',
+                'list_name': i.get('name'),
                 'list_slug': i.get('ids', {}).get('slug'),
                 'user_slug': i.get('user', {}).get('ids', {}).get('slug')}
             item['unique_ids'] = {

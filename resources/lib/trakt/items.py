@@ -18,7 +18,7 @@ def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
     elif sort_by == 'added':
         return sorted(items, key=lambda i: i.get('listed_at', 0), reverse=reverse)
     elif sort_by == 'title':
-        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('title', 0), reverse=reverse)
+        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('title', ''), reverse=reverse)
     elif sort_by == 'year':
         return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('year', 0), reverse=reverse)
     elif sort_by == 'released':
