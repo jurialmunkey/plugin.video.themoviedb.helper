@@ -32,8 +32,23 @@ def get_sort_methods():
             'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(369)),
             'params': {'sort_by': 'title', 'sort_how': 'asc'}},
         {
+            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(563)),
+            'params': {'sort_by': 'percentage', 'sort_how': 'desc', 'extended': 'full'}},
+        {
             'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(345)),
             'params': {'sort_by': 'year', 'sort_how': 'desc'}},
+        {
+            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), ADDON.getLocalizedString(32242)),
+            'params': {'sort_by': 'released', 'sort_how': 'desc', 'extended': 'full'}},
+        {
+            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(2050)),
+            'params': {'sort_by': 'runtime', 'sort_how': 'desc', 'extended': 'full'}},
+        {
+            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(205)),
+            'params': {'sort_by': 'votes', 'sort_how': 'desc', 'extended': 'full'}},
+        {
+            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), ADDON.getLocalizedString(32175)),
+            'params': {'sort_by': 'popularity', 'sort_how': 'desc', 'extended': 'full'}},
         {
             'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(590)),
             'params': {'sort_by': 'random'}}]

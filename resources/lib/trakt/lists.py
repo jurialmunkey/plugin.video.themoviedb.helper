@@ -101,6 +101,7 @@ class TraktLists():
             user_slug=user_slug,
             sort_by=kwargs.get('sort_by', None),
             sort_how=kwargs.get('sort_how', None),
+            extended=kwargs.get('extended', None),
             authorize=False if user_slug else True)
         if not response:
             return []
