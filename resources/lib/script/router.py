@@ -289,7 +289,7 @@ def log_request(**kwargs):
 
 
 def sort_list(**kwargs):
-    sort_methods = get_sort_methods()
+    sort_methods = get_sort_methods() if kwargs['info'] == 'trakt_userlist' else get_sort_methods(True)
     x = xbmcgui.Dialog().contextmenu([i['name'] for i in sort_methods])
     if x == -1:
         return

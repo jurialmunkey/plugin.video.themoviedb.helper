@@ -20,8 +20,8 @@ CLIENT_ID = 'e6fde6173adf3c6af8fd1b0694b9b84d7c519cefc24482310e1de06c6abe5467'
 CLIENT_SECRET = '15119384341d9a61c751d8d515acbc0dd801001d4ebe85d3eef9885df80ee4d9'
 
 
-def get_sort_methods():
-    return [
+def get_sort_methods(default_only=False):
+    items = [
         {
             'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), ADDON.getLocalizedString(32286)),
             'params': {'sort_by': 'rank', 'sort_how': 'asc'}},
@@ -58,7 +58,9 @@ def get_sort_methods():
         {
             'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(590)),
             'params': {'sort_by': 'random'}}]
-
+    if default_only:
+        return [i for i in items if i['params']['sort_by'] in ['rank', 'added', 'title', 'year', 'random']]
+    return items
 
 class _TraktLists():
     def _merge_sync_sort(self, items):

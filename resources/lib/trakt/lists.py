@@ -90,7 +90,8 @@ class TraktLists():
 
     def list_trakt_sortby(self, info, **kwargs):
         kwargs['info'] = kwargs.pop('parent_info', None)
-        items = [self._list_trakt_sortby_item(i, kwargs.copy()) for i in get_sort_methods()]
+        items = get_sort_methods() if kwargs['info'] == 'trakt_userlist' else get_sort_methods(True)
+        items = [self._list_trakt_sortby_item(i, kwargs.copy()) for i in items]
         self.library = 'video'
         return items
 

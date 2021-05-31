@@ -12,6 +12,7 @@ def _build_basedir_item(i, t, space):
     item['params']['tmdb_type'] = t
     if item.pop('sorting', False):
         item.setdefault('infoproperties', {})['tmdbhelper.context.sorting'] = dumps(item['params'])
+        item['params']['list_name'] = item['label']
     item.pop('types', None)
     return item
 
