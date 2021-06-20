@@ -40,7 +40,7 @@ class TMDbLists():
         return items
 
     def list_seasons(self, tmdb_id, **kwargs):
-        items = self.tmdb_api.get_season_list(tmdb_id, hide_specials=ADDON.getSettingBool('hide_special_seasons'))
+        items = self.tmdb_api.get_season_list(tmdb_id, special_folders=ADDON.getSettingInt('special_folders'))
         self.container_content = convert_type('season', 'container')
         return items
 

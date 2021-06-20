@@ -218,7 +218,11 @@ class TMDb(RequestAPI):
             for i in request.get('results', [])]
         return items
 
-    def get_season_list(self, tmdb_id, hide_specials=False):
+    def get_season_list(self, tmdb_id, special_folders=0):
+        """
+        special_folders: int binary to hide:
+        001 (1) = Hide Specials, 010 (2) = Hide Up Next, 100 (4) = Hide Groups
+        """
         request = self.get_request_sc(u'tv/{}'.format(tmdb_id))
         if not request:
             return []
@@ -232,22 +236,29 @@ class TMDb(RequestAPI):
             #     xbmc.getLocalizedString(22083),
             #     'RunScript(plugin.video.themoviedb.helper,play_season={},tmdb_id={})'.format(
             #         item['infolabels']['season'], tmdb_id))]
-            items.append(item) if i.get('season_number') != 0 else items_end.append(item)
-        if hide_specials:
-            return items
-        egroups = self.get_request_sc(u'tv/{}/episode_groups'.format(tmdb_id))
-        if egroups and egroups.get('results'):
-            egroup_item = self.mapper.get_info({
-                'title': ADDON.getLocalizedString(32345)}, 'season', base_item, tmdb_id=tmdb_id, definition={
-                    'info': 'episode_groups', 'tmdb_type': 'tv', 'tmdb_id': tmdb_id})
-            egroup_item['art']['thumb'] = egroup_item['art']['poster'] = u'{}/resources/icons/trakt/groupings.png'.format(ADDONPATH)
-            items_end.append(egroup_item)
-        if get_property('TraktIsAuth') == 'True':
-            upnext_item = self.mapper.get_info({
-                'title': ADDON.getLocalizedString(32043)}, 'season', base_item, tmdb_id=tmdb_id, definition={
-                    'info': 'trakt_upnext', 'tmdb_type': 'tv', 'tmdb_id': tmdb_id})
-            upnext_item['art']['thumb'] = upnext_item['art']['poster'] = u'{}/resources/icons/trakt/up-next.png'.format(ADDONPATH)
-            items_end.append(upnext_item)
+            if i.get('season_number') != 0:
+                items.append(item)
+            elif ((special_folders >> 0) & 1) == 0:  # on bit in 0 pos hides specials
+                items_end.append(item)
+
+        # Episode Groups
+        if ((special_folders >> 2) & 1) == 0:  # on bit in 2 pos hides episode groups
+            egroups = self.get_request_sc(u'tv/{}/episode_groups'.format(tmdb_id))
+            if egroups and egroups.get('results'):
+                egroup_item = self.mapper.get_info({
+                    'title': ADDON.getLocalizedString(32345)}, 'season', base_item, tmdb_id=tmdb_id, definition={
+                        'info': 'episode_groups', 'tmdb_type': 'tv', 'tmdb_id': tmdb_id})
+                egroup_item['art']['thumb'] = egroup_item['art']['poster'] = u'{}/resources/icons/trakt/groupings.png'.format(ADDONPATH)
+                items_end.append(egroup_item)
+
+        # Up Next
+        if ((special_folders >> 1) & 1) == 0:  # on bit in 1 pos hides up next
+            if get_property('TraktIsAuth') == 'True':
+                upnext_item = self.mapper.get_info({
+                    'title': ADDON.getLocalizedString(32043)}, 'season', base_item, tmdb_id=tmdb_id, definition={
+                        'info': 'trakt_upnext', 'tmdb_type': 'tv', 'tmdb_id': tmdb_id})
+                upnext_item['art']['thumb'] = upnext_item['art']['poster'] = u'{}/resources/icons/trakt/up-next.png'.format(ADDONPATH)
+                items_end.append(upnext_item)
         return items + items_end
 
     def get_episode_list(self, tmdb_id, season):
