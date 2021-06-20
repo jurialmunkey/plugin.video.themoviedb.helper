@@ -163,6 +163,7 @@ def get_episode_to_air(v, name):
     infoproperties[u'{}'.format(name)] = format_date(i.get('air_date'), xbmc.getRegion('dateshort'))
     infoproperties[u'{}.long'.format(name)] = format_date(i.get('air_date'), xbmc.getRegion('datelong'))
     infoproperties[u'{}.day'.format(name)] = format_date(i.get('air_date'), "%A")
+    infoproperties[u'{}.year'.format(name)] = format_date(i.get('air_date'), "%Y")
     infoproperties[u'{}.episode'.format(name)] = i.get('episode_number')
     infoproperties[u'{}.name'.format(name)] = i.get('name')
     infoproperties[u'{}.tmdb_id'.format(name)] = i.get('id')
