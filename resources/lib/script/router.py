@@ -3,6 +3,7 @@
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 import sys
 import xbmc
+import xbmcvfs
 import xbmcgui
 from json import dumps
 from resources.lib.kodi.library import add_to_library
@@ -283,7 +284,7 @@ def log_request(**kwargs):
         filename = validify_filename(u'{}_{}.json'.format(kwargs['log_request'], kwargs['url']))
         dumps_to_file(kwargs, 'log_request', filename)
         xbmcgui.Dialog().ok(kwargs['log_request'].capitalize(), u'[B]{}[/B]\n\n{}\n{}\n{}'.format(
-            kwargs['url'], xbmc.translatePath('special://profile/addon_data/'),
+            kwargs['url'], xbmcvfs.translatePath('special://profile/addon_data/'),
             'plugin.video.themoviedb.helper/log_request', filename))
         xbmcgui.Dialog().textviewer(filename, dumps(kwargs['response'], indent=2))
 
