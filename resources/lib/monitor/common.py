@@ -28,7 +28,7 @@ SETPROP_RATINGS = {
     'rottentomatoes_reviewsrotten', 'rottentomatoes_consensus', 'rottentomatoes_usermeter',
     'rottentomatoes_userreviews', 'trakt_rating', 'trakt_votes', 'goldenglobe_wins',
     'goldenglobe_nominations', 'oscar_wins', 'oscar_nominations', 'award_wins', 'award_nominations',
-    'tmdb_rating', 'tmdb_votes', 'top250'}
+    'emmy_wins', 'emmy_nominations', 'tmdb_rating', 'tmdb_votes', 'top250'}
 
 
 class CommonMonitorFunctions(object):
