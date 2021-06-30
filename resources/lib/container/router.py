@@ -80,17 +80,22 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             return False
         return True
 
-    def _add_item(self, x, li, tmdb_cache_only):
-        cache_only = True if tmdb_cache_only and not self.ftv_api else False
-        li.set_details(details=self.get_tmdb_details(li, cache_only=cache_only))  # Quick because only get cached
-        li.set_details(details=self.get_ftv_artwork(li), reverse=True)  # Slow when not cache only
+    def _add_item(self, x, li, cache_only=True, ftv_art=None):
+        li.set_details(details=self.get_tmdb_details(li, cache_only=cache_only))
+        li.set_details(details=ftv_art or self.get_ftv_artwork(li), reverse=True)
         self.items_queue[x] = li
 
-    def add_items(self, items=None, pagination=True, parent_params=None, property_params=None, kodi_db=None, tmdb_cache_only=True):
+    def add_items(self, items=None, pagination=True, parent_params=None, property_params=None, kodi_db=None, cache_only=True):
         if not items:
             return
         check_is_aired = parent_params.get('info') not in NO_LABEL_FORMATTING
         hide_nodate = ADDON.getSettingBool('nodate_is_unaired')
+
+        # Pre-game details and artwork cache for seasons/episodes before threading to avoid multiple API calls
+        ftv_art = None
+        if parent_params.get('info') in ['seasons', 'episodes', 'episode_groups', 'trakt_upnext']:
+            details = self.tmdb_api.get_details('tv', parent_params.get('tmdb_id'), parent_params.get('season', 0), cache_only=cache_only)
+            ftv_art = self.get_ftv_artwork(ListItem(parent_params=parent_params, **details))
 
         # Build empty queue and thread pool
         self.items_queue, pool = [None] * len(items), [None] * len(items)
@@ -102,7 +107,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             if self.item_is_excluded(i):
                 continue
             li = ListItem(parent_params=parent_params, **i)
-            pool[x] = Thread(target=self._add_item, args=[x, li, tmdb_cache_only])
+            pool[x] = Thread(target=self._add_item, args=[x, li, cache_only, ftv_art])
             pool[x].start()
 
         # Wait to join threads in pool first before adding item to directory
@@ -350,7 +355,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             parent_params=self.parent_params,
             property_params=self.set_params_to_container(**self.params),
             kodi_db=self.kodi_db,
-            tmdb_cache_only=self.tmdb_cache_only)
+            cache_only=self.tmdb_cache_only if not self.ftv_api else False)
         self.finish_container(
             update_listing=self.update_listing,
             plugin_category=self.plugin_category,
