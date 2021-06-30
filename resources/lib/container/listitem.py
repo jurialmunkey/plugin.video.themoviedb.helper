@@ -305,7 +305,7 @@ class _Tvshow(_Video):
 
 class _Season(_Tvshow):
     def get_ftv_id(self):
-        return self.unique_ids.get('tvdb')
+        return self.unique_ids.get('tvshow.tvdb')
 
     def get_tmdb_id(self):
         return self.unique_ids.get('tvshow.tmdb')

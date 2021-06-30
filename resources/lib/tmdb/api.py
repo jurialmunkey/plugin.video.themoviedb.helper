@@ -164,7 +164,7 @@ class TMDb(RequestAPI):
         info_item = self._get_details_request(tmdb_type, tmdb_id)
         base_item = self.mapper.get_info(info_item, tmdb_type)
 
-        if tmdb_type != 'tv' or not season:
+        if tmdb_type != 'tv' or season is None:
             return base_item
 
         # If we're getting season/episode details we need to add them to the base tv details

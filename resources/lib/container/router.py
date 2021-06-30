@@ -175,7 +175,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         return self.tmdb_api.get_details(
             li.get_tmdb_type(),
             li.unique_ids.get('tvshow.tmdb') if li.infolabels.get('mediatype') in ['season', 'episode'] else li.unique_ids.get('tmdb'),
-            li.infolabels.get('season') if li.infolabels.get('mediatype') in ['season', 'episode'] else None,
+            li.infolabels.get('season', 0) if li.infolabels.get('mediatype') in ['season', 'episode'] else None,
             li.infolabels.get('episode') if li.infolabels.get('mediatype') == 'episode' else None,
             cache_only=cache_only)
 
