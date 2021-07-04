@@ -305,7 +305,7 @@ class Script(object):
         for arg in sys.argv[1:]:
             if '=' in arg:
                 key, value = arg.split('=', 1)
-                self.params[key] = value.strip('\'').strip('"') if value else True
+                self.params[key] = value.strip('\'').strip('"') if value else None
             else:
                 self.params[arg] = True
         self.params = reconfigure_legacy_params(**self.params)
