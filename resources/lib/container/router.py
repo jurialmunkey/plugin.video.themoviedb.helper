@@ -83,6 +83,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
     def _add_item(self, x, li, cache_only=True, ftv_art=None):
         li.set_details(details=self.get_tmdb_details(li, cache_only=cache_only))
         li.set_details(details=ftv_art or self.get_ftv_artwork(li), reverse=True)
+        li.infoproperties['cast'] = " / ".join([i['name'] for i in li.cast if i.get('name')])
         self.items_queue[x] = li
 
     def add_items(self, items=None, pagination=True, parent_params=None, property_params=None, kodi_db=None, cache_only=True):
