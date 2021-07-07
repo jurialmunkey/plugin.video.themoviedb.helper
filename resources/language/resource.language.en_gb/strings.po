@@ -1965,6 +1965,26 @@ msgctxt "#32385"
 msgid "Hide All"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32386"
+msgid "Delete Cache"
+msgstr ""
+
+#: /resources/lib/script/router.py
+msgctxt "#32387"
+msgid "Delete {} Cache"
+msgstr ""
+
+#: /resources/lib/script/router.py
+msgctxt "#32388"
+msgid "Are you sure you want to delete the {} cache? This action cannot be undone.\n\nTMDbHelper performs regular automatic cache management and cleaning. You should only delete the cache manually in cases of persistent cache related errors."
+msgstr ""
+
+#: /resources/lib/script/router.py
+msgctxt "#32389"
+msgid "Cache deleted!"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

@@ -145,7 +145,27 @@ class SimpleCache(object):
         query = "INSERT OR REPLACE INTO simplecache( id, expires, data, checksum) VALUES (?, ?, ?, ?)"
         self._execute_sql(query, (endpoint, expires, repr(data), checksum))
 
-    def _do_cleanup(self):
+    def _do_delete(self):
+        '''perform cleanup task'''
+        if self._exit or self._monitor.abortRequested():
+            return
+
+        with self.busy_tasks(__name__):
+            cur_time = datetime.datetime.now()
+            kodi_log("CACHE: Deleting {}...".format(self._sc_name))
+
+            self._win.setProperty(u"{}.cleanbusy".format(self._sc_name), "busy")
+
+            query = 'DELETE FROM simplecache'
+            self._execute_sql(query)
+            self._execute_sql("VACUUM")
+
+        # Washup
+        self._win.setProperty(u"{}.clean.lastexecuted".format(self._sc_name), repr(tuple(cur_time.timetuple()[:6])))
+        self._win.clearProperty(u"{}.cleanbusy".format(self._sc_name))
+        kodi_log("CACHE: Delete {} done".format(self._sc_name))
+
+    def _do_cleanup(self, force=False):
         '''perform cleanup task'''
         if self._exit or self._monitor.abortRequested():
             return
@@ -167,7 +187,7 @@ class SimpleCache(object):
                 # always cleanup all memory objects on each interval
                 self._win.clearProperty(cache_id)
                 # clean up db cache object only if expired
-                if cache_expires < cur_timestamp:
+                if force or cache_expires < cur_timestamp:
                     query = 'DELETE FROM simplecache WHERE id = ?'
                     self._execute_sql(query, (cache_id,))
                     kodi_log(u"CACHE: delete from db {}".format(cache_id))

@@ -19,6 +19,7 @@ from resources.lib.container.basedir import get_basedir_details
 from resources.lib.fanarttv.api import FanartTV
 from resources.lib.tmdb.api import TMDb
 from resources.lib.trakt.api import TraktAPI, get_sort_methods
+from resources.lib.omdb.api import OMDb
 from resources.lib.script.sync import sync_trakt_item
 from resources.lib.window.manager import WindowManager
 from resources.lib.player.players import Players
@@ -74,6 +75,28 @@ def run_plugin(**kwargs):
 def container_refresh():
     xbmc.executebuiltin('Container.Refresh')
     xbmc.executebuiltin('UpdateLibrary(video,/fake/path/to/force/refresh/on/home)')
+
+
+def delete_cache(delete_cache, **kwargs):
+    d = {
+        'TMDb': lambda: TMDb(),
+        'Trakt': lambda: TraktAPI(),
+        'FanartTV': lambda: FanartTV(),
+        'OMDb': lambda: OMDb()}
+    if delete_cache == 'select':
+        m = [i for i in d]
+        x = xbmcgui.Dialog().contextmenu([ADDON.getLocalizedString(32387).format(i) for i in m])
+        if x == -1:
+            return
+        delete_cache = m[x]
+    z = d.get(delete_cache)
+    if not z:
+        return
+    if not xbmcgui.Dialog().yesno(ADDON.getLocalizedString(32387).format(delete_cache), ADDON.getLocalizedString(32388).format(delete_cache)):
+        return
+    with busy_dialog():
+        z()._cache.ret_cache()._do_delete()
+    xbmcgui.Dialog().ok(ADDON.getLocalizedString(32387).format(delete_cache), ADDON.getLocalizedString(32389))
 
 
 @map_kwargs({'play': 'tmdb_type'})
@@ -334,6 +357,7 @@ class Script(object):
         'play_media': lambda **kwargs: play_media(**kwargs),
         'run_plugin': lambda **kwargs: run_plugin(**kwargs),
         'log_request': lambda **kwargs: log_request(**kwargs),
+        'delete_cache': lambda **kwargs: delete_cache(**kwargs),
         'play': lambda **kwargs: play_external(**kwargs),
         'add_path': lambda **kwargs: WindowManager(**kwargs).router(),
         'add_query': lambda **kwargs: WindowManager(**kwargs).router(),
