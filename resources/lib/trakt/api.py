@@ -618,4 +618,4 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
             return
         return {
             'trakt_rating': u'{:0.1f}'.format(response.get('rating') or 0.0),
-            'trakt_votes': u'{:0.1f}'.format(response.get('votes') or 0.0)}
+            'trakt_votes': u'{:0,.0f}'.format(response.get('votes') or 0.0)}
