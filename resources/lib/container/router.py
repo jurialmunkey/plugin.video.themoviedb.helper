@@ -83,7 +83,6 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
     def _add_item(self, x, li, cache_only=True, ftv_art=None):
         li.set_details(details=self.get_tmdb_details(li, cache_only=cache_only))
         li.set_details(details=ftv_art or self.get_ftv_artwork(li), reverse=True)
-        li.infoproperties['cast'] = " / ".join([i['name'] for i in li.cast if i.get('name')])
         self.items_queue[x] = li
 
     def add_items(self, items=None, pagination=True, parent_params=None, property_params=None, kodi_db=None, cache_only=True):
@@ -126,6 +125,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             li.set_playcount(playcount=self.get_playcount_from_trakt(li))  # Quick because of agressive caching of Trakt object and pre-emptive dict comprehension
             if self.hide_watched and try_int(li.infolabels.get('playcount')) != 0:
                 continue
+            li.set_cast()
             li.set_context_menu()  # Set the context menu items
             li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
             li.set_thumb_to_art(self.thumb_override == 2) if self.thumb_override else None

@@ -115,6 +115,21 @@ class _ListItem(object):
     def set_playcount(self, playcount):
         return
 
+    def set_cast(self):
+        if not self.cast:
+            return
+        x = 0
+        cast_names = []
+        for i in self.cast:
+            if not i.get('name'):
+                continue
+            x += 1
+            p = u'{}.{}.'.format('Cast', x)
+            for j in [('name', 'Name'), ('role', 'Role'), ('thumbnail', 'Thumb')]:
+                self.infoproperties[u'{}{}'.format(p, j[1])] = i.get(j[0], '')
+            cast_names.append(i['name'])
+        self.infoproperties['cast'] = " / ".join(cast_names)
+
     def set_details(self, details=None, reverse=False):
         if not details:
             return
