@@ -200,7 +200,7 @@ class Players(object):
                     dialog_search.append(self._get_built_player(file=k, mode='search_episode', value=v))
         return dialog_play + dialog_search
 
-    def select_player(self, detailed=True, clear_player=False):
+    def select_player(self, detailed=True, clear_player=False, header=ADDON.getLocalizedString(32042)):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
         dialog_players = [] if not clear_player else [{
             'name': ADDON.getLocalizedString(32311),
@@ -211,7 +211,7 @@ class Players(object):
             label=i.get('name'),
             label2=u'{} v{}'.format(i.get('plugin_name'), xbmcaddon.Addon(i.get('plugin_name', '')).getAddonInfo('version')),
             art={'thumb': i.get('plugin_icon')}).get_listitem() for i in dialog_players]
-        x = xbmcgui.Dialog().select(ADDON.getLocalizedString(32042), players, useDetails=detailed)
+        x = xbmcgui.Dialog().select(header, players, useDetails=detailed)
         if x == -1:
             return {}
         player = dialog_players[x]
@@ -377,9 +377,15 @@ class Players(object):
     def _get_resolved_path(self, player=None, allow_default=False):
         if not player and allow_default:
             player = self.get_default_player()
-        player = player or self.select_player()
+
         if not player:
-            return
+            header = self.item.get('name') or ADDON.getLocalizedString(32042)
+            if self.item.get('episode') and self.item.get('title'):
+                header = u'{} - {}'.format(header, self.item['title'])
+            player = self.select_player(header=header)
+            if not player:
+                return
+
         if player.get('language'):
             self.item = get_language_details(
                 self.item, self.tmdb_type, self.tmdb_id, self.season, self.episode,
