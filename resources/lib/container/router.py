@@ -10,6 +10,7 @@ from resources.lib.container.listitem import ListItem
 from resources.lib.tmdb.api import TMDb
 from resources.lib.trakt.api import TraktAPI
 from resources.lib.fanarttv.api import FanartTV
+from resources.lib.omdb.api import OMDb
 from resources.lib.player.players import Players
 from resources.lib.addon.plugin import ADDON, kodi_log
 from resources.lib.container.basedir import BaseDirLists
@@ -54,6 +55,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.flatten_seasons = ADDON.getSettingBool('flatten_seasons')
         self.ftv_forced_lookup = self.params.pop('fanarttv', '').lower()
         self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only())
+        self.omdb_api = OMDb() if ADDON.getSettingString('omdb_apikey') else None
         self.filter_key = self.params.pop('filter_key', None)
         self.filter_value = split_items(self.params.pop('filter_value', None))[0]
         self.exclude_key = self.params.pop('exclude_key', None)

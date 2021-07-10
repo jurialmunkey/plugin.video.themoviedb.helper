@@ -683,6 +683,7 @@ class BaseDirLists():
 
     def list_details(self, tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
         base_item = self.tmdb_api.get_details(tmdb_type, tmdb_id, season, episode)
+        base_item = self.omdb_api.get_item_ratings(base_item) if self.omdb_api else base_item
         items = get_basedir_details(tmdb_type, tmdb_id, season, episode, base_item)
         self.container_content = self.get_container_content(tmdb_type, season, episode)
         return items

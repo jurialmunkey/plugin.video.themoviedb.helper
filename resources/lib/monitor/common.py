@@ -165,16 +165,7 @@ class CommonMonitorFunctions(object):
     def get_omdb_ratings(self, item, cache_only=False):
         if not self.omdb_api:
             return item
-        imdb_id = item.get('infolabels', {}).get('imdbnumber')
-        if not imdb_id or not imdb_id.startswith('tt'):
-            imdb_id = item.get('unique_ids', {}).get('imdb')
-        if not imdb_id or not imdb_id.startswith('tt'):
-            imdb_id = item.get('unique_ids', {}).get('tvshow.imdb')
-        if not imdb_id:
-            return item
-        ratings = self.omdb_api.get_ratings_awards(imdb_id=imdb_id, cache_only=cache_only)
-        item['infoproperties'] = merge_two_dicts(item.get('infoproperties', {}), ratings.get('infoproperties', {}))
-        return item
+        return self.omdb_api.get_item_ratings(item, cache_only=cache_only)
 
     def clear_properties(self, ignore_keys=None):
         ignore_keys = ignore_keys or set()
