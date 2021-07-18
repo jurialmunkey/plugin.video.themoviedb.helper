@@ -168,6 +168,9 @@ class CommonMonitorFunctions(object):
         return self.omdb_api.get_item_ratings(item, cache_only=cache_only)
 
     def clear_properties(self, ignore_keys=None):
+        if not ignore_keys:
+            self.cur_item = 0
+            self.pre_item = 1
         ignore_keys = ignore_keys or set()
         for k in self.properties - ignore_keys:
             self.clear_property(k)
