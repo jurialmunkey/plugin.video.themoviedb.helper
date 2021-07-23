@@ -1977,12 +1977,20 @@ msgstr ""
 
 #: /resources/lib/script/router.py
 msgctxt "#32388"
-msgid "Are you sure you want to delete the {} cache? This action cannot be undone.\n\nTMDbHelper performs regular automatic cache management and cleaning. You should only delete the cache manually in cases of persistent cache related errors."
+msgid ""
+"Are you sure you want to delete the {} cache? This action cannot be undone.\n"
+"\n"
+"TMDbHelper performs regular automatic cache management and cleaning. You should only delete the cache manually in cases of persistent cache related errors."
 msgstr ""
 
 #: /resources/lib/script/router.py
 msgctxt "#32389"
 msgid "Cache deleted!"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32390"
+msgid "Use alternative .nfo filename to avoid externally managed .nfo conflicts"
 msgstr ""
 
 msgctxt "#30030"
