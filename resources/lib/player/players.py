@@ -336,6 +336,14 @@ class Players(object):
                 auto = True if action.get('dialog', '').lower() == 'auto' else False
                 return self._player_dialog_select(folder, auto=auto)
 
+            # Special early return condition (useful to check for episodes in flattened miniseries)
+            # Returns path early if pattern matches, otherwise ignores step and continues onto next
+            if action.pop('return', None):
+                return_path = self._get_path_from_rules(folder, action)
+                if return_path:
+                    return return_path
+                continue
+
             # Apply the rules for the current action and grab the path
             path = self._get_path_from_rules(folder, action)
             if not path:
