@@ -256,6 +256,7 @@ class Players(object):
 
             # Get the label of the item
             label_a = f.get('label')
+            label_b_list = []
 
             # Add year to our label if exists and not special value of 1601
             if f.get('year') and f.get('year') != 1601:
@@ -263,10 +264,12 @@ class Players(object):
 
             # Add season and episode numbers to label
             if try_int(f.get('season', 0)) > 0 and try_int(f.get('episode', 0)) > 0:
-                label_a = u'{}x{}. {}'.format(f.get('season'), f.get('episode'), label_a)
+                if f.get('filetype') == 'file':  # If file assume is an episode so add to main label
+                    label_a = u'{}x{}. {}'.format(f['season'], f['episode'], label_a)
+                else:  # If folder assume is tvshow or season so add episode count to label2
+                    label_b_list.append(u'{} {}'.format(f['episode'], xbmc.getLocalizedString(20360)))
 
             # Add various stream details to ListItem.Label2 (aka label_b)
-            label_b_list = []
             if f.get('streamdetails'):
                 sdv_list = f.get('streamdetails', {}).get('video', [{}]) or [{}]
                 sda_list = f.get('streamdetails', {}).get('audio', [{}]) or [{}]
@@ -305,19 +308,18 @@ class Players(object):
 
     def _get_path_from_actions(self, actions, is_folder=True):
         """ Returns tuple of (path, is_folder) """
+        is_dialog = None
         keyboard_input = None
         path = (actions[0], is_folder)
+        if not is_folder:
+            return path
         for action in actions[1:]:
-            # Check if we've got a playable item already
-            if not is_folder:
-                return path
-
             # Start thread with keyboard inputter if needed
             if action.get('keyboard'):
-                if action.get('keyboard') in ['Up', 'Down', 'Left', 'Right', 'Select']:
+                if action['keyboard'] in ['Up', 'Down', 'Left', 'Right', 'Select']:
                     keyboard_input = KeyboardInputter(action="Input.{}".format(action.get('keyboard')))
                 else:
-                    text = string_format_map(action.get('keyboard', ''), self.item)
+                    text = string_format_map(action['keyboard'], self.item)
                     keyboard_input = KeyboardInputter(text=text[::-1] if action.get('direction') == 'rtl' else text)
                 keyboard_input.setName('keyboard_input')
                 keyboard_input.start()
@@ -331,23 +333,37 @@ class Players(object):
                 keyboard_input.exit = True
                 keyboard_input = None
 
-            # Special option to show dialog of items to select
-            if action.get('dialog'):
-                auto = True if action.get('dialog', '').lower() == 'auto' else False
-                return self._player_dialog_select(folder, auto=auto)
+            # Pop special actions
+            is_return = action.pop('return', None)
+            is_dialog = action.pop('dialog', None)
 
-            # Special early return condition (useful to check for episodes in flattened miniseries)
-            # Returns path early if pattern matches, otherwise ignores step and continues onto next
-            if action.pop('return', None):
-                return_path = self._get_path_from_rules(folder, action)
-                if return_path:
-                    return return_path
+            # Get next path if there's still actions left
+            next_path = self._get_path_from_rules(folder, action) if action else None
+
+            # Special action to fallback to select dialog if match is not found directly
+            if is_dialog and not next_path:
+                next_path = self._player_dialog_select(folder, auto=is_dialog.lower() == 'auto')
+
+            # Early return flag ignores a step failure and instead continues onto trying next step
+            if is_return and not next_path:
                 continue
 
-            # Apply the rules for the current action and grab the path
-            path = self._get_path_from_rules(folder, action)
-            if not path:
+            # No next path and no special flags means that player failed
+            if not next_path:
                 return
+
+            # File is playable and user manually selected or early return flag set
+            # Useful for early exit to play episodes in flattened miniseries instead of opening season folder
+            if not next_path[1] and (is_dialog or is_return):
+                return next_path
+
+            # Set next path to path for next action
+            path = next_path
+
+        # If dialog repeat flag set then repeat action over until find playable or user cancels
+        if path and is_dialog == 'repeat':
+            return self._get_path_from_actions([path[0], {'dialog': 'repeat'}], path[1])
+
         return path
 
     def _get_path_from_player(self, player=None):
