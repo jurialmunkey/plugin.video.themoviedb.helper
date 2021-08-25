@@ -1549,7 +1549,7 @@ msgstr ""
 
 #: /resources/lib/request/api.py
 msgctxt "#32307"
-msgid "Suppressing retries for 1 minute"
+msgid "Suppressing retries for {} seconds"
 msgstr ""
 
 #: /resources/lib/request/api.py

@@ -1550,8 +1550,8 @@ msgstr "Nessun commento trovato!"
 
 #: /resources/lib/request/api.py
 msgctxt "#32307"
-msgid "Suppressing retries for 1 minute"
-msgstr "Soppressione dei tentativi per 1 minuto"
+msgid "Suppressing retries for {} seconds"
+msgstr "Soppressione dei tentativi per {} secondi"
 
 #: /resources/lib/request/api.py
 msgctxt "#32308"
