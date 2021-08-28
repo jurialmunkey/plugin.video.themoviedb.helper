@@ -45,7 +45,7 @@ PLAYERS_BASEDIR_SAVE = 'special://profile/addon_data/plugin.video.themoviedb.hel
 PLAYERS_BASEDIR_BUNDLED = 'special://home/addons/plugin.video.themoviedb.helper/resources/players/'
 PLAYERS_PRIORITY = 1000
 
-NO_LABEL_FORMATTING = ['details', 'upcoming', 'trakt_calendar', 'trakt_myairing', 'trakt_anticipated', 'library_nextaired']
+NO_LABEL_FORMATTING = ['details', 'upcoming', 'trakt_calendar', 'trakt_myairing', 'trakt_anticipated', 'library_nextaired', 'videos']
 
 TMDB_ALL_ITEMS_LISTS = {
     'movie': {
@@ -222,12 +222,6 @@ TMDB_BASIC_LISTS = {
         'path': 'person/{tmdb_id}/images',
         'key': 'profiles',
         'tmdb_type': 'image',
-        'route': TMDB_BASIC_LISTS_ROUTE
-    },
-    'videos': {
-        'path': '{tmdb_type}/{tmdb_id}/videos',
-        'key': 'results',
-        'tmdb_type': 'video',
         'route': TMDB_BASIC_LISTS_ROUTE
     },
     'posters': {
@@ -496,4 +490,7 @@ ROUTE_TMDB_ID = {
     'trakt_upnext': {'route': {
         'lambda': lambda func, **kwargs: func(**kwargs),
         'getattr': 'list_upnext'}},
+    'videos': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_videos'}},
 }

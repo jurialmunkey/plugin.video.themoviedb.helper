@@ -60,6 +60,11 @@ class TMDbLists():
         self.container_content = convert_type('person', 'container')
         return items
 
+    def list_videos(self, tmdb_id, tmdb_type, season=None, episode=None, **kwargs):
+        items = self.tmdb_api.get_videos(tmdb_id, tmdb_type, season, episode)
+        self.container_content = convert_type('video', 'container')
+        return items
+
     def list_all_items(self, tmdb_type, page=None, **kwargs):
         items = self.tmdb_api.get_all_items_list(tmdb_type, page=page)
         self.kodi_db = self.get_kodi_database(tmdb_type)
