@@ -249,7 +249,8 @@ class TMDb(RequestAPI):
             if i.get('site') != 'YouTube' or not i.get('key'):
                 continue
             item = self.mapper.get_info(i, 'video', base_item, tmdb_id=tmdb_id)
-            item['path'] = u'plugin://plugin.video.youtube/play/?video_id={0}'.format(i['key'])
+            item['art']['thumb'] = 'https://img.youtube.com/vi/{}/0.jpg'.format(i['key'])
+            item['path'] = u'plugin://plugin.video.youtube/play/?video_id={}'.format(i['key'])
             item['is_folder'] = False
             items.append(item)
         return items
