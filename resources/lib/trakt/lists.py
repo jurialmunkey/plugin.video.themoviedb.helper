@@ -148,7 +148,6 @@ class TraktLists():
             'tmdb_type': item.get('params', {}).get('tmdb_type'),
             'tmdb_id': item.get('params', {}).get('tmdb_id')}
         self.plugin_category = u'{} {}'.format(ADDON.getLocalizedString(32288), item.get('label'))
-        self.kodi_db = self.get_kodi_database(item.get('params', {}).get('tmdb_type'))
         return self.list_tmdb(
             info='recommendations',
             tmdb_type=item.get('params', {}).get('tmdb_type'),
