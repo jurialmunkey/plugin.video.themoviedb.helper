@@ -43,6 +43,7 @@ class TraktLists():
         self.tmdb_cache_only = False
         self.library = 'video'
         self.container_content = 'movies'
+        self.kodi_db = self.get_kodi_database('both')
         return items
 
     def list_sync(self, info, tmdb_type, page=None, **kwargs):
@@ -118,6 +119,14 @@ class TraktLists():
             self.container_content = 'tvshows'
         elif lengths.index(max(lengths)) == 2:
             self.container_content = 'actors'
+
+        if lengths[0] and lengths[1]:
+            self.kodi_db = self.get_kodi_database('both')
+        elif lengths[0]:
+            self.kodi_db = self.get_kodi_database('movie')
+        elif lengths[1]:
+            self.kodi_db = self.get_kodi_database('tvshow')
+
         return response.get('items', []) + response.get('next_page', [])
 
     def list_becauseyouwatched(self, info, tmdb_type, page=None, **kwargs):
@@ -139,6 +148,7 @@ class TraktLists():
             'tmdb_type': item.get('params', {}).get('tmdb_type'),
             'tmdb_id': item.get('params', {}).get('tmdb_id')}
         self.plugin_category = u'{} {}'.format(ADDON.getLocalizedString(32288), item.get('label'))
+        self.kodi_db = self.get_kodi_database(item.get('params', {}).get('tmdb_type'))
         return self.list_tmdb(
             info='recommendations',
             tmdb_type=item.get('params', {}).get('tmdb_type'),
