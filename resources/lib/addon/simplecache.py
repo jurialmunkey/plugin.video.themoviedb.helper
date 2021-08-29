@@ -12,7 +12,6 @@ Code cleanup
 import xbmcvfs
 import xbmcgui
 import xbmc
-import datetime
 import time
 import sqlite3
 from functools import reduce
@@ -20,6 +19,7 @@ from functools import reduce
 from contextlib import contextmanager
 from resources.lib.addon.plugin import kodi_log
 from resources.lib.files.utils import get_file_path
+from resources.lib.addon.timedate import get_timedelta, get_datetime_now, get_datetime_datetime
 
 
 class SimpleCache(object):
@@ -73,19 +73,19 @@ class SimpleCache(object):
             checkum: optional argument to check if the checksum in the cacheobject matches the checkum provided
         '''
         checksum = self._get_checksum(checksum)
-        cur_time = self._get_timestamp(datetime.datetime.now())
+        cur_time = self._get_timestamp(get_datetime_now())
         result = self._get_mem_cache(endpoint, checksum, cur_time)  # Try from memory first
         if result is not None or self._mem_only:
             return result
         return self._get_db_cache(endpoint, checksum, cur_time)  # Fallback to checking database if not in memory
 
-    def set(self, endpoint, data, checksum="", expiration=datetime.timedelta(days=30)):
+    def set(self, endpoint, data, checksum="", cache_days=30):
         '''
             set data in cache
         '''
         with self.busy_tasks(u'set.{}'.format(endpoint)):
             checksum = self._get_checksum(checksum)
-            expires = self._get_timestamp(datetime.datetime.now() + expiration)
+            expires = self._get_timestamp(get_datetime_now() + get_timedelta(days=cache_days))
             self._set_mem_cache(endpoint, checksum, expires, data)
             if not self._mem_only:
                 self._set_db_cache(endpoint, checksum, expires, data)
@@ -94,11 +94,11 @@ class SimpleCache(object):
         '''check if cleanup is needed - public method, may be called by calling addon'''
         if self._mem_only:
             return
-        cur_time = datetime.datetime.now()
+        cur_time = get_datetime_now()
         lastexecuted = self._win.getProperty(u"{}.clean.lastexecuted".format(self._sc_name))
         if not lastexecuted:
             self._win.setProperty(u"{}.clean.lastexecuted".format(self._sc_name), repr(tuple(cur_time.timetuple()[:6])))
-        elif (datetime.datetime(*eval(lastexecuted)) + datetime.timedelta(hours=self._auto_clean_interval)) < cur_time:
+        elif (get_datetime_datetime(*eval(lastexecuted)) + get_timedelta(hours=self._auto_clean_interval)) < cur_time:
             self._do_cleanup()
 
     def _get_mem_cache(self, endpoint, checksum, cur_time):
@@ -151,7 +151,7 @@ class SimpleCache(object):
             return
 
         with self.busy_tasks(__name__):
-            cur_time = datetime.datetime.now()
+            cur_time = get_datetime_now()
             kodi_log("CACHE: Deleting {}...".format(self._sc_name))
 
             self._win.setProperty(u"{}.cleanbusy".format(self._sc_name), "busy")
@@ -171,7 +171,7 @@ class SimpleCache(object):
             return
 
         with self.busy_tasks(__name__):
-            cur_time = datetime.datetime.now()
+            cur_time = get_datetime_now()
             cur_timestamp = self._get_timestamp(cur_time)
             kodi_log("CACHE: Running cleanup...")
             if self._win.getProperty(u"{}.cleanbusy".format(self._sc_name)):
@@ -254,7 +254,10 @@ class SimpleCache(object):
     @staticmethod
     def _get_timestamp(date_time):
         '''Converts a datetime object to unix timestamp'''
-        return int(time.mktime(date_time.timetuple()))
+        try:
+            return int(time.mktime(date_time.timetuple()))
+        except OverflowError:
+            return 2145916800  # Y2038 bug in time.mktime on 32bit float systems. Use 2038 Jan 1 UTC for db timestamp instead.
 
     def _get_checksum(self, stringinput):
         '''get int checksum from string'''
