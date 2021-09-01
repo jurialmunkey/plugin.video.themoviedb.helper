@@ -347,7 +347,8 @@ class Players(object):
                 next_path = self._player_dialog_select(folder, auto=is_dialog.lower() == 'auto')
 
             # Early return flag ignores a step failure and instead continues onto trying next step
-            if is_return and not next_path:
+            # Check against next_path[1] also to make sure we aren't trying to play a folder
+            if is_return and (not next_path or next_path[1]):
                 continue
 
             # No next path and no special flags means that player failed
