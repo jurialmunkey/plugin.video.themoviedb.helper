@@ -280,7 +280,7 @@ class _TraktSync():
             self.last_activities = self.get_response_json('sync/last_activities')
         return self._get_activity_timestamp(self.last_activities, activity_type=activity_type, activity_key=activity_key)
 
-    @use_activity_cache(cache_days=CACHE_SHORT, pickle_object=False)
+    @use_activity_cache(cache_days=CACHE_SHORT, pickle_object=False, allow_fallback=True)
     def _get_sync_response(self, path, extended=None):
         """ Quick sub-cache routine to avoid recalling full sync list if we also want to quicklist it """
         sync_name = u'sync_response.{}.{}'.format(path, extended)
@@ -378,7 +378,7 @@ class _TraktSync():
 
 class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
     def __init__(self, force=False):
-        super(TraktAPI, self).__init__(req_api_url=API_URL, req_api_name='TraktAPI')
+        super(TraktAPI, self).__init__(req_api_url=API_URL, req_api_name='TraktAPI', timeout=20)
         self.authorization = ''
         self.attempted_login = False
         self.dialog_noapikey_header = u'{0} {1} {2}'.format(ADDON.getLocalizedString(32007), self.req_api_name, ADDON.getLocalizedString(32011))

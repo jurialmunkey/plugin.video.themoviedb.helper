@@ -1549,7 +1549,7 @@ msgstr ""
 
 #: /resources/lib/request/api.py
 msgctxt "#32307"
-msgid "Suppressing retries for 1 minute"
+msgid "Suppressing retries for {} seconds"
 msgstr ""
 
 #: /resources/lib/request/api.py
@@ -1991,6 +1991,26 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32390"
 msgid "Use alternative .nfo filename to avoid externally managed .nfo conflicts"
+msgstr ""
+
+#: /resources/lib/script/router.py
+msgctxt "#32391"
+msgid "Select update type"
+msgstr ""
+
+#: /resources/lib/script/router.py
+msgctxt "#32392"
+msgid "Use [B]Quick Update[/B] to check for new items.\n\nUse [B]Forced Update[/B] to ignore previously cached update details and recheck all items. Forced updates should only be used when cleaning and rebuilding the Kodi library."
+msgstr ""
+
+#: /resources/lib/script/router.py
+msgctxt "#32393"
+msgid "Forced Update"
+msgstr ""
+
+#: /resources/lib/script/router.py
+msgctxt "#32394"
+msgid "Quick Update"
 msgstr ""
 
 msgctxt "#30030"

@@ -218,6 +218,43 @@ class TMDb(RequestAPI):
             for i in request.get('results', [])]
         return items
 
+    def _get_videos(self, tmdb_id, tmdb_type, season=None, episode=None):
+        path = u'{}/{}'.format(tmdb_type, tmdb_id)
+        if season is not None:
+            path = u'{}/season/{}'.format(path, season)
+        if episode is not None:
+            path = u'{}/episode/{}'.format(path, episode)
+        request = self.get_request_sc(u'{}/videos'.format(path)) or {}
+        return request.get('results') or []
+
+    def get_videos(self, tmdb_id, tmdb_type, season=None, episode=None):
+        results = self._get_videos(tmdb_id, tmdb_type, season, episode)
+        if episode is not None:  # Also get season videos
+            results = results + self._get_videos(tmdb_id, tmdb_type, season)
+        if season is not None:  # Also get base show videos
+            results = results + self._get_videos(tmdb_id, tmdb_type)
+        if not results:
+            return []
+
+        # Grab base item details and pop any details that aren't relevant to the video
+        base_item = self.get_details(tmdb_type, tmdb_id, season, episode)
+        base_item['infolabels'].pop('duration', None)
+        base_item['infolabels'].pop('season', None)
+        base_item['infolabels'].pop('episode', None)
+
+        # Only list YouTube videos because Kodi install might not have browser and needs to play via plugin
+        # Not sure if TMDb provides videos from other sites anymore but check just in case
+        items = []
+        for i in results:
+            if i.get('site') != 'YouTube' or not i.get('key'):
+                continue
+            item = self.mapper.get_info(i, 'video', base_item, tmdb_id=tmdb_id)
+            item['art']['thumb'] = 'https://img.youtube.com/vi/{}/0.jpg'.format(i['key'])
+            item['path'] = u'plugin://plugin.video.youtube/play/?video_id={}'.format(i['key'])
+            item['is_folder'] = False
+            items.append(item)
+        return items
+
     def get_season_list(self, tmdb_id, special_folders=0):
         """
         special_folders: int binary to hide:

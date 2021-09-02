@@ -88,6 +88,7 @@ def resolve_to_dummy(handle=None, stop_after=1, delay_wait=0):
 class Players(object):
     def __init__(self, tmdb_type, tmdb_id=None, season=None, episode=None, ignore_default=False, islocal=False, **kwargs):
         with ProgressDialog('TMDbHelper', u'{}...'.format(ADDON.getLocalizedString(32374)), total=3) as _p_dialog:
+            self.api_language = None
             self.players = get_players_from_file()
 
             _p_dialog.update(u'{}...'.format(ADDON.getLocalizedString(32375)))
@@ -130,6 +131,7 @@ class Players(object):
             'file': file, 'mode': mode,
             'is_folder': is_folder,
             'is_resolvable': value.get('is_resolvable'),
+            'api_language': value.get('api_language'),
             'language': value.get('language'),
             'name': u'{} {}'.format(name, value.get('name')),
             'plugin_name': value.get('plugin'),
@@ -345,7 +347,8 @@ class Players(object):
                 next_path = self._player_dialog_select(folder, auto=is_dialog.lower() == 'auto')
 
             # Early return flag ignores a step failure and instead continues onto trying next step
-            if is_return and not next_path:
+            # Check against next_path[1] also to make sure we aren't trying to play a folder
+            if is_return and (not next_path or next_path[1]):
                 continue
 
             # No next path and no special flags means that player failed
@@ -402,6 +405,7 @@ class Players(object):
         if not player and allow_default:
             player = self.get_default_player()
 
+        # If we dont have a player from fallback then ask user to select one
         if not player:
             header = self.item.get('name') or ADDON.getLocalizedString(32042)
             if self.item.get('episode') and self.item.get('title'):
@@ -410,10 +414,19 @@ class Players(object):
             if not player:
                 return
 
+        # Allow players to override language settings
+        # Compare against self.api_language to check if another player changed language previously
+        if player.get('api_language', None) != self.api_language:
+            self.api_language = player.get('api_language', None)
+            self.details = get_item_details(self.tmdb_type, self.tmdb_id, self.season, self.episode, language=self.api_language)
+            self.item = get_detailed_item(self.tmdb_type, self.tmdb_id, self.season, self.episode, details=self.details) or {}
+
+        # Allow for a separate translation language to add "{de_title}" keys ("de" is iso language code)
         if player.get('language'):
             self.item = get_language_details(
                 self.item, self.tmdb_type, self.tmdb_id, self.season, self.episode,
                 player['language'], self.item.get('year'))
+
         path = self._get_path_from_player(player)
         if not path:
             if player.get('idx') is not None:

@@ -43,6 +43,7 @@ class TraktLists():
         self.tmdb_cache_only = False
         self.library = 'video'
         self.container_content = 'movies'
+        self.kodi_db = self.get_kodi_database('both')
         return items
 
     def list_sync(self, info, tmdb_type, page=None, **kwargs):
@@ -118,6 +119,14 @@ class TraktLists():
             self.container_content = 'tvshows'
         elif lengths.index(max(lengths)) == 2:
             self.container_content = 'actors'
+
+        if lengths[0] and lengths[1]:
+            self.kodi_db = self.get_kodi_database('both')
+        elif lengths[0]:
+            self.kodi_db = self.get_kodi_database('movie')
+        elif lengths[1]:
+            self.kodi_db = self.get_kodi_database('tvshow')
+
         return response.get('items', []) + response.get('next_page', [])
 
     def list_becauseyouwatched(self, info, tmdb_type, page=None, **kwargs):

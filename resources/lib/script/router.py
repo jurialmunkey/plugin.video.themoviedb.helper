@@ -283,6 +283,15 @@ def image_colors(image_colors=None, **kwargs):
 
 
 def library_update(**kwargs):
+    if kwargs.get('force') == 'select':
+        choice = xbmcgui.Dialog().yesno(
+            ADDON.getLocalizedString(32391),
+            ADDON.getLocalizedString(32392),
+            yeslabel=ADDON.getLocalizedString(32393),
+            nolabel=ADDON.getLocalizedString(32394))
+        if choice == -1:
+            return
+        kwargs['force'] = True if choice else False
     library_autoupdate(
         list_slugs=kwargs.get('list_slug', None),
         user_slugs=kwargs.get('user_slug', None),
