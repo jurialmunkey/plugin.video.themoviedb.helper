@@ -127,7 +127,6 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             li.set_playcount(playcount=self.get_playcount_from_trakt(li))  # Quick because of agressive caching of Trakt object and pre-emptive dict comprehension
             if self.hide_watched and try_int(li.infolabels.get('playcount')) != 0:
                 continue
-            li.set_cast()
             li.set_context_menu()  # Set the context menu items
             li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
             li.set_thumb_to_art(self.thumb_override == 2) if self.thumb_override else None
