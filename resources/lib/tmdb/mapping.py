@@ -1,5 +1,5 @@
 import xbmc
-from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type, ADDON, kodi_log
+from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type, ADDON
 from resources.lib.addon.parser import try_int, try_float
 from resources.lib.addon.setutils import iter_props, dict_to_list, get_params
 from resources.lib.addon.timedate import format_date, age_difference
