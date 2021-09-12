@@ -278,7 +278,7 @@ class _Tvshow(_Video):
     def get_ftv_id(self):
         return self.unique_ids.get('tvdb')
 
-    def set_playcount(self, playcount):
+    def _set_playcount(self, playcount):
         playcount = try_int(playcount)
         if not try_int(self.infolabels.get('episode')):
             return
@@ -290,6 +290,10 @@ class _Tvshow(_Video):
             return
         il['playcount'] = playcount
         il['overlay'] = 5
+
+    def set_playcount(self, playcount):
+        self._set_playcount(playcount)
+        self.infoproperties['totalseasons'] = try_int(self.infolabels.get('season'))
 
     def unaired_bool(self):
         if ADDON.getSettingBool('hide_unaired_episodes'):
@@ -312,6 +316,9 @@ class _Season(_Tvshow):
 
     def _set_params_reroute_details(self, flatten_seasons):
         self.params['info'] = 'episodes'
+
+    def set_playcount(self, playcount):
+        self._set_playcount(playcount)
 
 
 class _Episode(_Tvshow):
