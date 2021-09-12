@@ -4,5 +4,4 @@ See [TMDbHelper Wiki](https://github.com/jurialmunkey/plugin.video.themoviedb.he
 
 Kodi Versions:
 
-- [Leia](https://github.com/jurialmunkey/plugin.video.themoviedb.helper/tree/leia)
 - [Matrix](https://github.com/jurialmunkey/plugin.video.themoviedb.helper/tree/matrix)
