@@ -24,7 +24,7 @@ def get_players_from_file():
             plugins = meta.get('plugin') or 'plugin.undefined'  # Give dummy name to undefined plugins so that they fail the check
             plugins = plugins if isinstance(plugins, list) else [plugins]  # Listify for simplicity of code
             for i in plugins:
-                if not xbmc.getCondVisibility(u'System.HasAddon({0})'.format(i)):
+                if not xbmc.getCondVisibility(u'System.AddonIsEnabled({0})'.format(i)):
                     break  # System doesn't have a required plugin so skip this player
             else:
                 meta['plugin'] = plugins[0]
