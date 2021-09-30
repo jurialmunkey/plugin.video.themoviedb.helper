@@ -558,6 +558,7 @@ class ItemMapper(_ItemMapper):
             'number_of_seasons': ('infolabels', 'season'),
             'number_of_episodes': ('infolabels', 'episode'),
             'department': ('infoproperties', 'department'),
+            'known_for_department': ('infoproperties', 'department'),
             'place_of_birth': ('infoproperties', 'born'),
             'birthday': ('infoproperties', 'birthday'),
             'deathday': ('infoproperties', 'deathday'),
