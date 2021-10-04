@@ -97,6 +97,7 @@ class ImageFunctions(Thread):
             self.func = self.blur
             self.save_path = make_path(self.save_path.format('blur'))
             self.save_prop = 'ListItem.BlurImage'
+            self.radius = try_int(xbmc.getInfoLabel('Skin.String(TMDbHelper.Blur.Radius)')) or 20
         elif method == 'crop':
             self.func = self.crop
             self.save_path = make_path(self.save_path.format('crop'))
@@ -139,8 +140,8 @@ class ImageFunctions(Thread):
             return ''
 
     @lazyimport_pil
-    def blur(self, source, radius=20):
-        filename = u'{}{}.png'.format(md5hash(source), radius)
+    def blur(self, source):
+        filename = u'{}{}.png'.format(md5hash(source), self.radius)
         destination = self.save_path + filename
         try:
             if xbmcvfs.exists(destination):
@@ -149,7 +150,7 @@ class ImageFunctions(Thread):
                 img = _openimage(source, self.save_path, filename)
                 img.thumbnail((256, 256))
                 img = img.convert('RGB')
-                img = img.filter(ImageFilter.GaussianBlur(radius))
+                img = img.filter(ImageFilter.GaussianBlur(self.radius))
                 img.save(destination)
                 img.close()
 

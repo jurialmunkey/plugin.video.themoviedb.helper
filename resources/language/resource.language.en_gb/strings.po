@@ -2000,7 +2000,10 @@ msgstr ""
 
 #: /resources/lib/script/router.py
 msgctxt "#32392"
-msgid "Use [B]Quick Update[/B] to check for new items.\n\nUse [B]Forced Update[/B] to ignore previously cached update details and recheck all items. Forced updates should only be used when cleaning and rebuilding the Kodi library."
+msgid ""
+"Use [B]Quick Update[/B] to check for new items.\n"
+"\n"
+"Use [B]Forced Update[/B] to ignore previously cached update details and recheck all items. Forced updates should only be used when cleaning and rebuilding the Kodi library."
 msgstr ""
 
 #: /resources/lib/script/router.py
@@ -2011,6 +2014,31 @@ msgstr ""
 #: /resources/lib/script/router.py
 msgctxt "#32394"
 msgid "Quick Update"
+msgstr ""
+
+#: /addon.xml
+msgctxt "#32395"
+msgid "TMDbHelper Refresh Blur"
+msgstr ""
+
+#: /resources/lib/script/router.py
+msgctxt "#32396"
+msgid "Blur image window property empty"
+msgstr ""
+
+#: /resources/lib/script/router.py
+msgctxt "#32397"
+msgid "Texture cache entry missing for blurred image"
+msgstr ""
+
+#: /resources/lib/script/router.py
+msgctxt "#32398"
+msgid "Deleted Cached Images"
+msgstr ""
+
+#: /resources/lib/script/router.py
+msgctxt "#32399"
+msgid "Failed to delete file!\\n{}"
 msgstr ""
 
 msgctxt "#30030"

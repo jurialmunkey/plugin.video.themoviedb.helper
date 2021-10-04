@@ -331,6 +331,27 @@ def sort_list(**kwargs):
     xbmc.executebuiltin(format_folderpath(encode_url(**kwargs)))
 
 
+def recache_image(recache_image, **kwargs):
+    import sqlite3
+    blur_img = get_property(recache_image)
+    image_db = sqlite3.connect(xbmcvfs.translatePath('special://database/Textures13.db'), timeout=30, isolation_level=None)
+    cached_i = image_db.execute("SELECT cachedurl FROM texture WHERE url = ?", (blur_img,)).fetchone()
+    if not blur_img:
+        xbmcgui.Dialog().ok('TMDbHelper Error', ADDON.getLocalizedString(32396))
+        return
+    if not cached_i:
+        xbmcgui.Dialog().ok('TMDbHelper Error', ADDON.getLocalizedString(32397))
+        return
+    filepath = xbmcvfs.translatePath('special://thumbnails/{}'.format(cached_i[0]))
+    if not xbmcvfs.delete(blur_img):
+        xbmcgui.Dialog().ok('TMDbHelper Error', ADDON.getLocalizedString(32399).format(blur_img))
+    if not xbmcvfs.delete(filepath):
+        xbmcgui.Dialog().ok('TMDbHelper Error', ADDON.getLocalizedString(32399).format(filepath))
+        return
+    image_db.execute("DELETE FROM texture WHERE url = ?", (blur_img,))
+    xbmcgui.Dialog().ok(ADDON.getLocalizedString(32398), '{}\n{}'.format(blur_img, filepath))
+
+
 class Script(object):
     def __init__(self):
         self.params = {}
@@ -362,6 +383,7 @@ class Script(object):
         'set_defaultplayer': lambda **kwargs: set_defaultplayer(**kwargs),
         'configure_players': lambda **kwargs: configure_players(**kwargs),
         'library_autoupdate': lambda **kwargs: library_update(**kwargs),
+        'recache_image': lambda **kwargs: recache_image(**kwargs),
         # 'play_season': lambda **kwargs: play_season(**kwargs),
         'play_media': lambda **kwargs: play_media(**kwargs),
         'run_plugin': lambda **kwargs: run_plugin(**kwargs),
