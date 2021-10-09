@@ -94,6 +94,8 @@ class TMDb(RequestAPI):
         if not query or not tmdb_type:
             return
         response = self.get_tmdb_id(tmdb_type, query=query, raw_data=True)
+        if not response:
+            return
         items = [ListItem(**self.mapper.get_info(i, tmdb_type)).get_listitem() for i in response]
         if not items:
             return

@@ -212,7 +212,13 @@ class WindowManager(_EventLoop):
         window.wait_for_property(PREFIX_ADDPATH, path, True)
         self.call_auto()
 
-    def add_query(self, query, tmdb_type):
+    def add_query(self, query, tmdb_type, separator=' / '):
+        if separator and separator in query:
+            split_str = query.split(separator)
+            x = xbmcgui.Dialog().select(ADDON.getLocalizedString(32236), split_str)
+            if x == -1:
+                return
+            query = split_str[x]
         with busy_dialog():
             tmdb_id = TMDb().get_tmdb_id_from_query(tmdb_type, query, header=query, use_details=True, auto_single=True)
         if not tmdb_id:
