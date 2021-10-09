@@ -66,8 +66,8 @@ class _ListItem(object):
         self.is_folder = True
 
     def set_art_fallbacks(self):
-        if not self.art.get('thumb'):
-            self.art['thumb'] = u'{}/resources/poster.png'.format(ADDONPATH)
+        if not self.art.get('poster'):
+            self.art['poster'] = u'{}/resources/poster.png'.format(ADDONPATH)
         if not self.art.get('fanart'):
             self.art['fanart'] = u'{}/fanart.jpg'.format(ADDONPATH)
         return self.art

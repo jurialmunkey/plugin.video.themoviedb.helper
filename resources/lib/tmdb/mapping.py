@@ -594,7 +594,6 @@ class ItemMapper(_ItemMapper):
         item['label'] = item['infolabels'].get('title')
         item['infoproperties']['tmdb_type'] = tmdb_type
         item['infolabels']['mediatype'] = item['infoproperties']['dbtype'] = convert_type(tmdb_type, 'dbtype')
-        item['art']['thumb'] = item['art'].get('thumb') or item['art'].get('poster')
         for k, v in item['unique_ids'].items():
             item['infoproperties'][u'{}_id'.format(k)] = v
         return item
