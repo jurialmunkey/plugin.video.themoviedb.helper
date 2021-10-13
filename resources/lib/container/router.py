@@ -38,7 +38,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.parent_params = self.params
         # self.container_path = u'{}?{}'.format(sys.argv[0], self.paramstring)
         self.update_listing = False
-        self.plugin_category = ''
+        self.plugin_category = self.params.get('plugin_category', '')
         self.container_content = ''
         self.container_update = None
         self.container_refresh = False
@@ -135,6 +135,8 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             li.infoproperties.update(property_params or {})
             if self.thumb_override:
                 li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb otherwise Kodi overrides after item is created
+            if li.is_folder:
+                li.params['plugin_category'] = li.label
             xbmcplugin.addDirectoryItem(
                 handle=self.handle,
                 url=li.get_url(),
