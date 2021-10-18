@@ -2,9 +2,9 @@
     "name"              : "IMDb Trailers",
     "plugin"            : "plugin.video.imdb.trailers",
     "priority"          : 500,
+    "is_resolvable"     : "true",
     "play_movie"        : [
-                            "plugin://plugin.video.imdb.trailers/?action=search",
-                            {"keyboard": "{title}"},
+                            "plugin://plugin.video.imdb.trailers/?action=search_word&keyword={title}",
                             {"title": "{title}"}
                           ]
 }
