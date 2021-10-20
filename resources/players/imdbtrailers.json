@@ -4,7 +4,7 @@
     "priority"          : 500,
     "is_resolvable"     : "true",
     "play_movie"        : [
-                            "plugin://plugin.video.imdb.trailers/?action=search_word&keyword={title}",
+                            "plugin://plugin.video.imdb.trailers/?action=search_word&keyword={title_escaped}",
                             {"title": "{title}"}
                           ]
 }
