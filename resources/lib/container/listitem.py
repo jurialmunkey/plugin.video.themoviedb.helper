@@ -70,6 +70,8 @@ class _ListItem(object):
             self.art['poster'] = u'{}/resources/poster.png'.format(ADDONPATH)
         if not self.art.get('fanart'):
             self.art['fanart'] = u'{}/fanart.jpg'.format(ADDONPATH)
+        if not self.art.get('icon'):
+            self.art['icon'] = self.art['poster']
         return self.art
 
     def set_thumb_to_art(self, prefer_landscape=False):
