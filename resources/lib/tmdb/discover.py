@@ -488,15 +488,15 @@ def _get_basedir_top(tmdb_type):
     return [
         {
             'label': ADDON.getLocalizedString(32238).format(convert_type(tmdb_type, 'plural')),
-            'art': {'thumb': u'{}/resources/poster.png'.format(ADDONPATH)},
+            'art': {'icon': u'{}/resources/poster.png'.format(ADDONPATH)},
             'params': {'info': 'user_discover', 'tmdb_type': tmdb_type, 'method': 'open'}},
         {
             'label': ADDON.getLocalizedString(32239),
-            'art': {'thumb': u'{}/resources/poster.png'.format(ADDONPATH)},
+            'art': {'icon': u'{}/resources/poster.png'.format(ADDONPATH)},
             'params': {'info': 'user_discover', 'tmdb_type': tmdb_type, 'method': 'with_separator'}},
         {
             'label': ADDON.getLocalizedString(32240),
-            'art': {'thumb': u'{}/resources/poster.png'.format(ADDONPATH)},
+            'art': {'icon': u'{}/resources/poster.png'.format(ADDONPATH)},
             'params': {'info': 'user_discover', 'tmdb_type': tmdb_type, 'method': 'sort_by'}}]
 
 
@@ -504,15 +504,15 @@ def _get_basedir_end(tmdb_type):
     return [
         {
             'label': ADDON.getLocalizedString(32277),
-            'art': {'thumb': u'{}/resources/poster.png'.format(ADDONPATH)},
+            'art': {'icon': u'{}/resources/poster.png'.format(ADDONPATH)},
             'params': {'info': 'user_discover', 'tmdb_type': tmdb_type, 'method': 'add_rule'}},
         {
             'label': xbmc.getLocalizedString(192),
-            'art': {'thumb': u'{}/resources/poster.png'.format(ADDONPATH)},
+            'art': {'icon': u'{}/resources/poster.png'.format(ADDONPATH)},
             'params': {'info': 'user_discover', 'tmdb_type': tmdb_type, 'method': 'clear'}},
         {
             'label': xbmc.getLocalizedString(190),
-            'art': {'thumb': u'{}/resources/poster.png'.format(ADDONPATH)},
+            'art': {'icon': u'{}/resources/poster.png'.format(ADDONPATH)},
             'params': {'info': 'user_discover', 'tmdb_type': tmdb_type, 'method': 'save'}}]
 
 
@@ -901,7 +901,7 @@ class UserDiscoverLists():
     def list_discoverdir(self, **kwargs):
         items = []
         params = merge_two_dicts(kwargs, {'info': 'user_discover'})
-        artwork = {'thumb': u'{}/resources/poster.png'.format(ADDONPATH)}
+        artwork = {'icon': u'{}/resources/poster.png'.format(ADDONPATH)}
         for i in ['movie', 'tv']:
             item = {
                 'label': u'{} {}'.format(ADDON.getLocalizedString(32174), convert_type(i, 'plural')),

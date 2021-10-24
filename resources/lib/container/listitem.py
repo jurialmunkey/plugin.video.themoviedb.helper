@@ -56,7 +56,7 @@ class _ListItem(object):
         if not next_page:
             return
         self.label = xbmc.getLocalizedString(33078)
-        self.art['thumb'] = u'{}/resources/icons/tmdb/nextpage.png'.format(ADDONPATH)
+        self.art['icon'] = u'{}/resources/icons/tmdb/nextpage.png'.format(ADDONPATH)
         self.art['landscape'] = u'{}/resources/icons/tmdb/nextpage_wide.png'.format(ADDONPATH)
         self.infoproperties['specialsort'] = 'bottom'
         self.params = self.parent_params.copy()
@@ -67,7 +67,7 @@ class _ListItem(object):
 
     def set_art_fallbacks(self):
         if not self.art.get('poster'):
-            self.art['poster'] = u'{}/resources/poster.png'.format(ADDONPATH)
+            self.art['poster'] = self.art.get('icon') or u'{}/resources/poster.png'.format(ADDONPATH)
         if not self.art.get('fanart'):
             self.art['fanart'] = u'{}/fanart.jpg'.format(ADDONPATH)
         if not self.art.get('icon'):
