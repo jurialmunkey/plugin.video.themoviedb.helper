@@ -56,10 +56,10 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.ftv_forced_lookup = self.params.pop('fanarttv', '').lower()
         self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only())
         self.omdb_api = OMDb() if ADDON.getSettingString('omdb_apikey') else None
-        self.filter_key = self.params.pop('filter_key', None)
-        self.filter_value = split_items(self.params.pop('filter_value', None))[0]
-        self.exclude_key = self.params.pop('exclude_key', None)
-        self.exclude_value = split_items(self.params.pop('exclude_value', None))[0]
+        self.filter_key = self.params.get('filter_key', None)
+        self.filter_value = split_items(self.params.get('filter_value', None))[0]
+        self.exclude_key = self.params.get('exclude_key', None)
+        self.exclude_value = split_items(self.params.get('exclude_value', None))[0]
         self.pagination = self.pagination_is_allowed()
         self.params = reconfigure_legacy_params(**self.params)
         self.thumb_override = 0
@@ -136,7 +136,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             if self.thumb_override:
                 li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb otherwise Kodi overrides after item is created
             if li.is_folder:
-                li.params['plugin_category'] = li.label
+                li.params['plugin_category'] = self.plugin_category if li.params.get('page') else li.label
             xbmcplugin.addDirectoryItem(
                 handle=self.handle,
                 url=li.get_url(),
