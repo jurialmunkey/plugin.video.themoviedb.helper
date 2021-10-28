@@ -24,10 +24,10 @@ def get_external_ids(li, season=None, episode=None):
         trakt_type = 'show'
     if not unique_id or not trakt_type:
         return
-    trakt_slug = trakt_api.get_id(id_type='tmdb', unique_id=unique_id, trakt_type=trakt_type, output_type='slug')
-    if not trakt_slug:
+    trakt_id = trakt_api.get_id(id_type='tmdb', unique_id=unique_id, trakt_type=trakt_type, output_type='trakt')
+    if not trakt_id:
         return
-    details = trakt_api.get_details(trakt_type, trakt_slug, extended=None)
+    details = trakt_api.get_details(trakt_type, trakt_id, extended=None)
     if not details:
         return
     if li.infolabels.get('mediatype') in ['movie', 'tvshow', 'season']:
