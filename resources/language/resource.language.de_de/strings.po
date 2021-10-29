@@ -1954,7 +1954,7 @@ msgstr "Abspieler erstellen"
 #: /resources/lib/player/players.py
 msgctxt "#32375"
 msgid "Retrieving Item Details"
-msgstr "Abrufen von Edetails"
+msgstr "Abrufen von Details"
 
 #: /resources/lib/player/players.py
 msgctxt "#32376"
