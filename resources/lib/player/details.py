@@ -39,7 +39,7 @@ def get_external_ids(li, season=None, episode=None):
                 'slug': details.get('ids', {}).get('slug'),
                 'trakt': details.get('ids', {}).get('trakt')}}
     episode_details = trakt_api.get_details(
-        trakt_type, trakt_slug,
+        trakt_type, trakt_id,
         season=season or li.infolabels.get('season'),
         episode=episode or li.infolabels.get('episode'),
         extended=None)
