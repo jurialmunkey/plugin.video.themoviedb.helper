@@ -2018,7 +2018,7 @@ msgstr ""
 
 #: /addon.xml
 msgctxt "#32395"
-msgid "TMDbHelper Refresh Blur"
+msgid "Refresh Blur"
 msgstr ""
 
 #: /resources/lib/script/router.py

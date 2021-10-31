@@ -333,22 +333,22 @@ def sort_list(**kwargs):
 
 def recache_image(recache_image, **kwargs):
     import sqlite3
-    blur_img = get_property(recache_image)
+    blur_img = get_property(recache_image, clear_property=True)
     image_db = sqlite3.connect(xbmcvfs.translatePath('special://database/Textures13.db'), timeout=30, isolation_level=None)
-    cached_i = image_db.execute("SELECT cachedurl FROM texture WHERE url = ?", (blur_img,)).fetchone()
     if not blur_img:
         xbmcgui.Dialog().ok('TMDbHelper Error', ADDON.getLocalizedString(32396))
         return
+    cached_i = image_db.execute("SELECT cachedurl FROM texture WHERE url = ?", (blur_img,)).fetchone()
     if not cached_i:
         xbmcgui.Dialog().ok('TMDbHelper Error', ADDON.getLocalizedString(32397))
         return
+    image_db.execute("DELETE FROM texture WHERE url = ?", (blur_img,))
     filepath = xbmcvfs.translatePath('special://thumbnails/{}'.format(cached_i[0]))
     if not xbmcvfs.delete(blur_img):
         xbmcgui.Dialog().ok('TMDbHelper Error', ADDON.getLocalizedString(32399).format(blur_img))
     if not xbmcvfs.delete(filepath):
         xbmcgui.Dialog().ok('TMDbHelper Error', ADDON.getLocalizedString(32399).format(filepath))
         return
-    image_db.execute("DELETE FROM texture WHERE url = ?", (blur_img,))
     xbmcgui.Dialog().ok(ADDON.getLocalizedString(32398), '{}\n{}'.format(blur_img, filepath))
 
 
