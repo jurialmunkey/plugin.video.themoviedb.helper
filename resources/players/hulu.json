@@ -19,10 +19,6 @@
                             {"title": "Season {season}"},
                             {"season": "{season}", "episode": "{episode}"}
                           ],
-    "search_movie"      : [
-                            "plugin://slyguy.hulu/?_=search&query={title_url}"
-                          ],
-    "search_episode"    : [
-                            "plugin://slyguy.hulu/?_=search&query={showname_url}"
-                          ]
+    "search_movie"      : "plugin://slyguy.hulu/?_=search&query={title_url}",
+    "search_episode"    : "plugin://slyguy.hulu/?_=search&query={showname_url}"
 }
