@@ -135,9 +135,9 @@ class ListItemMonitor(CommonMonitorFunctions):
         self.set_iter_properties(details.get('art', {}), SETMAIN_ARTWORK)
 
         # Crop Image
-        if details.get('clearlogo'):
+        if details.get('art', {}).get('clearlogo'):
             if xbmc.getCondVisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"):
-                self.crop_img = ImageFunctions(method='crop', artwork=details.get('clearlogo'))
+                self.crop_img = ImageFunctions(method='crop', artwork=details.get('art', {}).get('clearlogo'))
                 self.crop_img.setName('crop_img')
                 self.crop_img.start()
 
