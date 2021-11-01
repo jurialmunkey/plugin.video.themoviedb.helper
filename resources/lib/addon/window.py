@@ -1,6 +1,6 @@
 import xbmc
 import xbmcgui
-from resources.lib.addon.parser import try_type
+from resources.lib.addon.parser import try_type, try_int
 
 
 def get_property(name, set_property=None, clear_property=False, window_id=None, prefix=None, is_type=None):
