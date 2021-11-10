@@ -189,6 +189,7 @@ def related_lists(tmdb_id=None, tmdb_type=None, season=None, episode=None, conta
         path=encode_url(path=item.get('path'), **item.get('params')),
         info=item['params']['info'], play='RunPlugin',  # Use RunPlugin to avoid window manager info dialog crash with Browse method
         content='pictures' if item['params']['info'] in ['posters', 'fanart'] else 'videos')
+    xbmc.executebuiltin('Dialog.Close(busydialog)')  # Kill modals because prevents ActivateWindow
     xbmc.executebuiltin(path)
 
 
