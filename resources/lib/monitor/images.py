@@ -114,14 +114,16 @@ class ImageFunctions(Thread):
     def run(self):
         if not self.save_prop or not self.func:
             return
-        if not self.image:
+        output = self.func(self.image) if self.image else None
+        if not output:
             get_property(self.save_prop, clear_property=True)
             return
-        get_property(self.save_prop, self.func(self.image))
+        get_property(self.save_prop, output)
 
     def clamp(self, x):
         return max(0, min(x, 255))
 
+    @lazyimport_pil
     def crop(self, source):
         filename = u'cropped-{}.png'.format(md5hash(source))
         destination = self.save_path + filename
@@ -159,6 +161,7 @@ class ImageFunctions(Thread):
         except Exception:
             return ''
 
+    @lazyimport_pil
     def desaturate(self, source):
         filename = u'{}.png'.format(md5hash(source))
         destination = self.save_path + filename
