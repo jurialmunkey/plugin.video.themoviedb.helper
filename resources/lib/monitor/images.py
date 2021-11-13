@@ -91,12 +91,14 @@ class ImageFunctions(Thread):
         Thread.__init__(self)
         self.image = artwork
         self.func = None
+        self.save_orig = False
         self.save_prop = None
         self.save_path = 'special://profile/addon_data/plugin.video.themoviedb.helper/{}/'
         if method == 'blur':
             self.func = self.blur
             self.save_path = make_path(self.save_path.format('blur'))
             self.save_prop = 'ListItem.BlurImage'
+            self.save_orig = True
             self.radius = try_int(xbmc.getInfoLabel('Skin.String(TMDbHelper.Blur.Radius)')) or 20
         elif method == 'crop':
             self.func = self.crop
@@ -106,6 +108,7 @@ class ImageFunctions(Thread):
             self.func = self.desaturate
             self.save_path = make_path(self.save_path.format('desaturate'))
             self.save_prop = 'ListItem.DesaturateImage'
+            self.save_orig = True
         elif method == 'colors':
             self.func = self.colors
             self.save_path = make_path(self.save_path.format('colors'))
@@ -117,8 +120,10 @@ class ImageFunctions(Thread):
         output = self.func(self.image) if self.image else None
         if not output:
             get_property(self.save_prop, clear_property=True)
+            get_property('{}.Original'.format(self.save_prop), clear_property=True) if self.save_orig else None
             return
         get_property(self.save_prop, output)
+        get_property('{}.Original'.format(self.save_prop), self.image) if self.save_orig else None
 
     def clamp(self, x):
         return max(0, min(x, 255))
