@@ -8,6 +8,7 @@ from resources.lib.addon.plugin import ADDON, kodi_traceback
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.setutils import merge_two_dicts
 from resources.lib.addon.decorators import try_except_log
+from resources.lib.addon.timedate import convert_timestamp, get_region_date
 
 
 SETMAIN = {
@@ -110,11 +111,22 @@ class CommonMonitorFunctions(object):
         self.set_property('Duration_HHMM', u'{0:02d}:{1:02d}'.format(hours, minutes))
         self.properties.update(['Duration', 'Duration_H', 'Duration_M', 'Duration_HHMM'])
 
+    @try_except_log('lib.monitor.common set_date_properties')
+    def set_date_properties(self, premiered):
+        date_obj = convert_timestamp(premiered, time_fmt="%Y-%m-%d", time_lim=10)
+        if not date_obj:
+            return
+        self.set_property('Premiered', get_region_date(date_obj, 'dateshort'))
+        self.set_property('Premiered_Long', get_region_date(date_obj, 'datelong'))
+        self.set_property('Premiered_Custom', date_obj.strftime(xbmc.getInfoLabel('Skin.String(TMDbHelper.Date.Format)') or '%d %b %Y'))
+        self.properties.update(['Premiered', 'Premiered_Long', 'Premiered_Custom'])
+
     def set_properties(self, item):
         self.set_iter_properties(item, SETMAIN)
         self.set_iter_properties(item.get('infolabels', {}), SETINFO)
         self.set_iter_properties(item.get('infoproperties', {}), SETPROP)
         self.set_time_properties(item.get('infolabels', {}).get('duration', 0))
+        self.set_date_properties(item.get('infolabels', {}).get('premiered'))
         self.set_list_properties(item.get('cast', []), 'name', 'cast')
         if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableExtendedProperties)"):
             self.set_indexed_properties(item.get('infoproperties', {}))
