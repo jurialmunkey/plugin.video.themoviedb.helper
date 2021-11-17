@@ -1,4 +1,3 @@
-import xbmc
 from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type, ADDON
 from resources.lib.addon.parser import try_int, try_float
 from resources.lib.addon.setutils import iter_props, dict_to_list, get_params
@@ -160,8 +159,8 @@ def get_external_ids(v):
 def get_episode_to_air(v, name):
     i = v or {}
     infoproperties = {}
-    infoproperties[u'{}'.format(name)] = format_date(i.get('air_date'), xbmc.getRegion('dateshort'))
-    infoproperties[u'{}.long'.format(name)] = format_date(i.get('air_date'), xbmc.getRegion('datelong'))
+    infoproperties[u'{}'.format(name)] = format_date(i.get('air_date'), region_fmt='dateshort')
+    infoproperties[u'{}.long'.format(name)] = format_date(i.get('air_date'), region_fmt='datelong')
     infoproperties[u'{}.day'.format(name)] = format_date(i.get('air_date'), "%A")
     infoproperties[u'{}.year'.format(name)] = format_date(i.get('air_date'), "%Y")
     infoproperties[u'{}.episode'.format(name)] = i.get('episode_number')
