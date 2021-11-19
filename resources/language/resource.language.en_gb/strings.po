@@ -2041,6 +2041,11 @@ msgctxt "#32399"
 msgid "Failed to delete file!\\n{}"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32400"
+msgid "Play local Kodi library files"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
