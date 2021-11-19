@@ -299,7 +299,7 @@ class Players(object):
             d_items.append(ListItem(label=label_a, label2=label_b, art={'thumb': f.get('thumbnail')}).get_listitem())
 
         if not d_items:
-            return -1  # No items so ask user to select new player
+            return  # No items so ask user to select new player
 
         # If autoselect enabled and only 1 item choose that otherwise ask user to choose
         idx = 0 if auto and len(d_items) == 1 else xbmcgui.Dialog().select(ADDON.getLocalizedString(32236), d_items, useDetails=True)
