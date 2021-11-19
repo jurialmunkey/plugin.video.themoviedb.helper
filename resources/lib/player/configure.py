@@ -9,6 +9,7 @@ from resources.lib.addon.parser import try_int
 from resources.lib.container.listitem import ListItem
 from resources.lib.addon.decorators import busy_dialog
 from json import loads, dumps
+from copy import deepcopy
 
 
 def get_players_from_file():
@@ -207,7 +208,7 @@ class ConfigurePlayers():
         filename = self.select_player()
         if not filename:
             return
-        player = self.players[filename].copy()
+        player = deepcopy(self.players[filename])
         player = _ConfigurePlayer(player, filename=filename).configure()
         if player == -1:  # Reset player (i.e. delete player file)
             self.delete_player(filename)
