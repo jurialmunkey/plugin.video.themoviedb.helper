@@ -30,7 +30,7 @@ class SearchLists():
         if len(items) > len(MULTISEARCH_TYPES):  # We have search results so need clear cache item
             items.append({
                 'label': ADDON.getLocalizedString(32121),
-                'art': {'thumb': u'{}/resources/icons/tmdb/search.png'.format(ADDONPATH)},
+                'art': {'thumb': u'{}/resources/icons/themoviedb/search.png'.format(ADDONPATH)},
                 'infoproperties': {'specialsort': 'bottom'},
                 'params': {'info': 'dir_multisearch', 'clear_cache': 'True'}})
         return items
@@ -44,7 +44,7 @@ class SearchLists():
     def list_searchdir(self, tmdb_type, clear_cache_item=True, append_type=False, **kwargs):
         base_item = {
             'label': u'{} {}'.format(xbmc.getLocalizedString(137), convert_type(tmdb_type, 'plural')),
-            'art': {'thumb': u'{}/resources/icons/tmdb/search.png'.format(ADDONPATH)},
+            'art': {'thumb': u'{}/resources/icons/themoviedb/search.png'.format(ADDONPATH)},
             'infoproperties': {'specialsort': 'top'},
             'params': merge_two_dicts(kwargs, {'info': 'search', 'tmdb_type': tmdb_type})}
         items = []
