@@ -953,6 +953,7 @@ class UserDiscoverLists():
         basedir_items += _get_basedir_add(tmdb_type)
         basedir_items += _get_basedir_end(tmdb_type)
 
+        self.plugin_category = 'Discover'
         self.update_listing = True if method and method != 'edit' else False
         self.container_content = 'files'
 

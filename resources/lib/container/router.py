@@ -25,7 +25,7 @@ from resources.lib.addon.setutils import split_items, random_from_list, merge_tw
 
 def filtered_item(item, key, value, exclude=False):
     boolean = False if exclude else True  # Flip values if we want to exclude instead of include
-    if key and value and item.get(key) == value:
+    if key and value and item.get(key) and str(value).lower() in str(item.get(key)).lower():
         boolean = exclude
     return boolean
 
@@ -38,7 +38,8 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.parent_params = self.params
         # self.container_path = u'{}?{}'.format(sys.argv[0], self.paramstring)
         self.update_listing = False
-        self.plugin_category = self.params.get('plugin_category', '')
+        self.parent_plugin_category = self.params.get('plugin_category', '')
+        self.plugin_category = ''
         self.container_content = ''
         self.container_update = None
         self.container_refresh = False
@@ -136,7 +137,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             if self.thumb_override:
                 li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb otherwise Kodi overrides after item is created
             if li.is_folder:
-                li.params['plugin_category'] = self.plugin_category if li.params.get('page') else li.label
+                li.params['plugin_category'] = self.parent_plugin_category if li.params.get('page') else self.plugin_category or li.label
             xbmcplugin.addDirectoryItem(
                 handle=self.handle,
                 url=li.get_url(),
