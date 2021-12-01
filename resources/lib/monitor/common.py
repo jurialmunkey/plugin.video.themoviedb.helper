@@ -14,7 +14,7 @@ from resources.lib.addon.timedate import convert_timestamp, get_region_date
 SETMAIN = {
     'label', 'tmdb_id', 'imdb_id'}
 SETMAIN_ARTWORK = {
-    'icon', 'poster', 'thumb', 'fanart', 'discart', 'clearart', 'clearlogo', 'landscape', 'banner'}
+    'icon', 'poster', 'thumb', 'fanart', 'discart', 'clearart', 'clearlogo', 'landscape', 'banner', 'keyart'}
 SETINFO = {
     'title', 'originaltitle', 'tvshowtitle', 'plot', 'rating', 'votes', 'premiered', 'year',
     'imdbnumber', 'tagline', 'status', 'episode', 'season', 'genre', 'set', 'studio', 'country',
@@ -142,13 +142,15 @@ class CommonMonitorFunctions(object):
             return item
         lookup_id = None
         if tmdb_type == 'tv':
+            ftv_type = 'tv'
             lookup_id = tvdb_id or item.get('unique_ids', {}).get('tvshow.tvdb') or item.get('unique_ids', {}).get('tvdb')
-            func = self.fanarttv.get_tv_all_artwork
+            func = self.fanarttv.get_all_artwork
         elif tmdb_type == 'movie':
+            ftv_type = 'movies'
             lookup_id = tmdb_id or item.get('unique_ids', {}).get('tmdb')
-            func = self.fanarttv.get_movies_all_artwork
+            func = self.fanarttv.get_all_artwork
         if lookup_id:
-            item['art'] = merge_two_dicts(item.get('art', {}), func(lookup_id))
+            item['art'] = merge_two_dicts(item.get('art', {}), func(lookup_id, ftv_type))
         return item
 
     def get_trakt_ratings(self, item, trakt_type, season=None, episode=None):
