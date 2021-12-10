@@ -1,14 +1,18 @@
 import xbmc
+import xbmcaddon
 from resources.lib.addon.window import get_property
 from resources.lib.tmdb.api import TMDb
 from resources.lib.omdb.api import OMDb
 from resources.lib.trakt.api import TraktAPI
 from resources.lib.fanarttv.api import FanartTV
-from resources.lib.addon.plugin import ADDON, kodi_traceback
+from resources.lib.addon.plugin import kodi_traceback
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.setutils import merge_two_dicts
 from resources.lib.addon.decorators import try_except_log
 from resources.lib.addon.timedate import convert_timestamp, get_region_date
+
+
+ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 SETMAIN = {

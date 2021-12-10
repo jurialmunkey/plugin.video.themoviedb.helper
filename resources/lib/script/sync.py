@@ -3,12 +3,16 @@
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 import xbmc
 import xbmcgui
+import xbmcaddon
 from resources.lib.addon.decorators import busy_dialog
 from resources.lib.addon.parser import try_int
 from resources.lib.trakt.api import TraktAPI
-from resources.lib.addon.plugin import ADDON, set_kwargattr, convert_trakt_type
+from resources.lib.addon.plugin import set_kwargattr, convert_trakt_type
 from resources.lib.kodi.userlist import get_monitor_userlists
 from resources.lib.kodi.library import add_to_library
+
+
+ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 def _menu_items():

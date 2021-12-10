@@ -1,12 +1,17 @@
 import xbmc
 import xbmcgui
+import xbmcaddon
 from resources.lib.addon.constants import ACCEPTED_MEDIATYPES
-from resources.lib.addon.plugin import ADDON, ADDONPATH, PLUGINPATH, kodi_log, convert_media_type
+from resources.lib.addon.plugin import PLUGINPATH, kodi_log, convert_media_type
 from resources.lib.addon.parser import try_int, encode_url
 from resources.lib.addon.timedate import is_unaired_timestamp
 from resources.lib.addon.setutils import merge_two_dicts
 from resources.lib.container.context import ContextMenu
 # from resources.lib.addon.decorators import timer_report
+
+
+ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
+ADDONPATH = ADDON.getAddonInfo('path')
 
 
 def ListItem(*args, **kwargs):

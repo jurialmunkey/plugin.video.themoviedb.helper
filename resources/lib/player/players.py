@@ -6,7 +6,7 @@ import xbmcplugin
 from resources.lib.kodi.rpc import get_directory, KodiLibrary
 from resources.lib.addon.window import get_property
 from resources.lib.container.listitem import ListItem
-from resources.lib.addon.plugin import ADDON, PLUGINPATH, ADDONPATH, format_folderpath, kodi_log
+from resources.lib.addon.plugin import PLUGINPATH, format_folderpath, kodi_log
 from resources.lib.addon.parser import try_int, try_float
 from resources.lib.files.utils import read_file, normalise_filesize
 from resources.lib.player.details import get_item_details, get_detailed_item, get_playerstring, get_language_details
@@ -15,6 +15,10 @@ from resources.lib.player.configure import get_players_from_file
 from resources.lib.addon.constants import PLAYERS_PRIORITY
 from resources.lib.addon.decorators import busy_dialog, ProgressDialog
 from string import Formatter
+
+
+ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
+ADDONPATH = ADDON.getAddonInfo('path')
 
 
 def string_format_map(fmt, d):

@@ -1,11 +1,12 @@
 import xbmc
 import xbmcgui
 import random
+import xbmcaddon
 import resources.lib.container.pages as pages
 from resources.lib.addon.window import get_property
 from json import loads, dumps
 from resources.lib.api.request import RequestAPI
-from resources.lib.addon.plugin import ADDON, kodi_log
+from resources.lib.addon.plugin import kodi_log
 from resources.lib.container.pages import PaginatedItems
 from resources.lib.trakt.items import TraktItems
 from resources.lib.trakt.decorators import is_authorized, use_activity_cache
@@ -18,6 +19,8 @@ from resources.lib.addon.timedate import set_timestamp, get_timestamp
 API_URL = 'https://api.trakt.tv/'
 CLIENT_ID = 'e6fde6173adf3c6af8fd1b0694b9b84d7c519cefc24482310e1de06c6abe5467'
 CLIENT_SECRET = '15119384341d9a61c751d8d515acbc0dd801001d4ebe85d3eef9885df80ee4d9'
+
+ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 def get_sort_methods(default_only=False):

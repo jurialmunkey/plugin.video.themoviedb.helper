@@ -1,10 +1,14 @@
 import xbmc
 import xbmcgui
+import xbmcaddon
 from resources.lib.addon.cache import set_search_history, get_search_history
-from resources.lib.addon.plugin import ADDONPATH, ADDON, PLUGINPATH, convert_type
+from resources.lib.addon.plugin import PLUGINPATH, convert_type
 from resources.lib.addon.setutils import merge_two_dicts
 from urllib.parse import urlencode
 
+
+ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
+ADDONPATH = ADDON.getAddonInfo('path')
 
 MULTISEARCH_TYPES = ['movie', 'tv', 'person', 'collection', 'company', 'keyword']
 

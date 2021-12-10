@@ -1,5 +1,9 @@
+import xbmcaddon
 from resources.lib.addon.constants import TMDB_BASIC_LISTS
-from resources.lib.addon.plugin import ADDON, convert_type
+from resources.lib.addon.plugin import convert_type
+
+
+ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 class TMDbLists():

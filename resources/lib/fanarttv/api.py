@@ -1,13 +1,17 @@
 import xbmc
 import xbmcgui
+import xbmcaddon
 from resources.lib.addon.cache import CACHE_EXTENDED
 from resources.lib.api.request import RequestAPI
 from resources.lib.container.listitem import ListItem
-from resources.lib.addon.plugin import ADDON, get_language
+from resources.lib.addon.plugin import get_language
 from resources.lib.addon.setutils import del_empty_keys
 from resources.lib.addon.decorators import busy_dialog
 from resources.lib.addon.parser import try_int
 # from resources.lib.addon.decorators import timer_report
+
+
+ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 API_URL = 'http://webservice.fanart.tv/v3'

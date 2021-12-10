@@ -3,13 +3,16 @@ import xbmcgui
 import xbmcaddon
 from resources.lib.addon.constants import PLAYERS_BASEDIR_BUNDLED, PLAYERS_BASEDIR_USER, PLAYERS_BASEDIR_SAVE, PLAYERS_PRIORITY
 from resources.lib.files.utils import get_files_in_folder
-from resources.lib.addon.plugin import ADDON, ADDONPATH
 from resources.lib.files.utils import read_file, dumps_to_file, delete_file
 from resources.lib.addon.parser import try_int
 from resources.lib.container.listitem import ListItem
 from resources.lib.addon.decorators import busy_dialog
 from json import loads, dumps
 from copy import deepcopy
+
+
+ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
+ADDONPATH = ADDON.getAddonInfo('path')
 
 
 def get_players_from_file():

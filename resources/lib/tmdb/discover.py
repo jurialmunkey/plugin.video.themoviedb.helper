@@ -2,13 +2,18 @@
 
 import xbmc
 import xbmcgui
+import xbmcaddon
 from resources.lib.addon.timedate import get_datetime_now, get_timedelta
 from resources.lib.addon.cache import set_search_history, get_search_history
 from resources.lib.addon.window import get_property
 from resources.lib.tmdb.api import TMDb
-from resources.lib.addon.plugin import ADDONPATH, ADDON, PLUGINPATH, convert_type
+from resources.lib.addon.plugin import PLUGINPATH, convert_type
 from resources.lib.addon.parser import try_int, encode_url
 from resources.lib.addon.setutils import merge_two_dicts, split_items
+
+
+ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
+ADDONPATH = ADDON.getAddonInfo('path')
 
 
 RELATIVE_DATES = [
