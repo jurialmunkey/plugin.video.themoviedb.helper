@@ -59,13 +59,7 @@ def _get_basedir_details():
             'params': {'info': 'cast'},
             'path': PLUGINPATH,
             'art': {'icon': u'{}/resources/icons/themoviedb/cast.png'.format(ADDONPATH)},
-            'types': ['movie', 'tv']},
-        {
-            'label': xbmc.getLocalizedString(206),
-            'params': {'info': 'episode_cast'},
-            'path': PLUGINPATH,
-            'art': {'icon': u'{}/resources/icons/themoviedb/cast.png'.format(ADDONPATH)},
-            'types': ['episode']},
+            'types': ['movie', 'tv', 'episode']},
         {
             'label': ADDON.getLocalizedString(32223),
             'params': {'info': 'recommendations'},
