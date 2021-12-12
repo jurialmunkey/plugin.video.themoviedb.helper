@@ -104,6 +104,7 @@ class ImageFunctions(Thread):
             self.func = self.crop
             self.save_path = make_path(self.save_path.format('crop'))
             self.save_prop = 'ListItem.CropImage'
+            self.save_orig = True
         elif method == 'desaturate':
             self.func = self.desaturate
             self.save_path = make_path(self.save_path.format('desaturate'))

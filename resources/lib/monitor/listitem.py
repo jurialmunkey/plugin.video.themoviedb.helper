@@ -140,7 +140,9 @@ class ListItemMonitor(CommonMonitorFunctions):
 
         # Crop Image
         if xbmc.getCondVisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"):
-            self.crop_img = ImageFunctions(method='crop', artwork=details.get('art', {}).get('clearlogo'))
+            self.crop_img = ImageFunctions(method='crop', artwork=self.get_artwork(
+                source="Art(tvshow.clearlogo)|Art(clearlogo)",
+                fallback=details.get('art', {}).get('clearlogo')))
             self.crop_img.setName('crop_img')
             self.crop_img.start()
 
