@@ -90,7 +90,8 @@ class ServiceMonitor(object):
                     "Window.IsActive(progressdialog) | "
                     "Window.IsActive(contextmenu) | "
                     "Window.IsActive(busydialog) | "
-                    "Window.IsActive(shutdownmenu)"):
+                    "Window.IsActive(shutdownmenu) | "
+                    "!String.IsEmpty(Window.Property(TMDbHelper.ServicePause))"):
                 self._on_modal()
 
             # skip when container scrolling
