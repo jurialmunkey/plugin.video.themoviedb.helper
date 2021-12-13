@@ -1,6 +1,7 @@
 import random
 from resources.lib.addon.plugin import PLUGINPATH, convert_type, convert_trakt_type
 from resources.lib.addon.setutils import del_empty_keys, get_params
+from resources.lib.addon.parser import try_int, try_str
 
 
 def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
@@ -20,11 +21,11 @@ def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
     elif sort_by == 'title':
         return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('title', ''), reverse=reverse)
     elif sort_by == 'year':
-        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('year', 0), reverse=reverse)
+        return sorted(items, key=lambda i: try_int(i.get(trakt_type or i.get('type'), {}).get('year', 0)), reverse=reverse)
     elif sort_by == 'released':
-        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('first_aired', '')
+        return sorted(items, key=lambda i: try_str(i.get(trakt_type or i.get('type'), {}).get('first_aired', ''))
                       if (trakt_type or i.get('type')) in ['show', 'episode']
-                      else i.get(trakt_type or i.get('type'), {}).get('released', ''), reverse=reverse)
+                      else try_str(i.get(trakt_type or i.get('type'), {}).get('released', '')), reverse=reverse)
     elif sort_by == 'runtime':
         return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('runtime', 0), reverse=reverse)
     elif sort_by == 'popularity':
