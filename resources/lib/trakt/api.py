@@ -78,6 +78,7 @@ class _TraktLists():
         return [dict(i, **sync.get(i.get(i.get('type'), {}).get('ids', {}).get('slug'), {})) for i in items]
 
     def _filter_inprogress(self, items):
+        """ Filter list so that it only returns inprogress shows """
         inprogress = self._get_inprogress_shows() or []
         inprogress = [i['show']['ids']['slug'] for i in inprogress if i.get('show', {}).get('ids', {}).get('slug')]
         if not inprogress:

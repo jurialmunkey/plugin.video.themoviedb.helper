@@ -139,12 +139,15 @@ class _ListItem(object):
             self.params['parent_info'] = self.params['info']
             self.params['info'] = 'trakt_sortby'
 
-    def set_params_reroute(self, ftv_forced_lookup=False, flatten_seasons=False):
+    def set_params_reroute(self, ftv_forced_lookup=False, flatten_seasons=False, extended=None):
         if xbmc.getCondVisibility("Window.IsVisible(script-skinshortcuts.xml)"):
             self._set_params_reroute_skinshortcuts()
 
         if ftv_forced_lookup:  # Take fanarttv param from parent list with us onto subsequent pages
             self.params['fanarttv'] = ftv_forced_lookup
+
+        if extended == 'inprogress':  # Reroute for extended sorting of trakt list by inprogress to open up next folder
+            self.params['info'] = 'trakt_upnext'
 
         if self.params.get('info') == 'details':  # Reconfigure details item into play/browse etc.
             self._set_params_reroute_details(flatten_seasons)
