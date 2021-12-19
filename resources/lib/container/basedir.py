@@ -53,7 +53,7 @@ def _get_basedir_details():
             'params': {'info': 'seasons'},
             'path': PLUGINPATH,
             'art': {'icon': u'{}/resources/icons/themoviedb/episodes.png'.format(ADDONPATH)},
-            'types': ['tv']},
+            'types': ['tv', 'episode']},
         {
             'label': xbmc.getLocalizedString(206),
             'params': {'info': 'cast'},
@@ -639,7 +639,7 @@ def get_basedir_details(tmdb_type, tmdb_id, season=None, episode=None, detailed_
         base_item['params']['episode'] = episode
         base_item['infolabels']['mediatype'] = 'episode'
         basedir_items = _build_basedir('episode', _get_play_item()) if include_play else []
-        basedir_items += _build_basedir('tv', _get_basedir_details())
+        basedir_items += _build_basedir('episode', _get_basedir_details())
     elif tmdb_type == 'tv' and season is not None:
         base_item['params']['info'] = 'episodes'
         base_item['params']['season'] = season

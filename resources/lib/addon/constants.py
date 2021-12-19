@@ -236,6 +236,12 @@ TMDB_BASIC_LISTS = {
         'tmdb_type': 'image',
         'route': TMDB_BASIC_LISTS_ROUTE
     },
+    'episode_thumbs': {
+        'path': 'tv/{tmdb_id}/season/{season}/episode/{episode}/images',
+        'key': 'stills',
+        'tmdb_type': 'image',
+        'route': TMDB_BASIC_LISTS_ROUTE
+    },
     'reviews': {
         'path': '{tmdb_type}/{tmdb_id}/reviews',
         'key': 'results',
