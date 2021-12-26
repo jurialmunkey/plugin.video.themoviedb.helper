@@ -20,7 +20,7 @@ ADDONPATH = ADDON.getAddonInfo('path')
 
 
 API_URL = 'https://api.themoviedb.org/3'
-APPEND_TO_RESPONSE = 'credits,release_dates,content_ratings,external_ids,movie_credits,tv_credits,keywords,reviews,videos,watch/providers'
+APPEND_TO_RESPONSE = 'credits,images,release_dates,content_ratings,external_ids,movie_credits,tv_credits,keywords,reviews,videos,watch/providers'
 
 
 class TMDb(RequestAPI):
@@ -159,7 +159,7 @@ class TMDb(RequestAPI):
 
     def get_details(self, tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
         kwargs['cache_days'] = CACHE_LONG
-        kwargs['cache_name'] = 'TMDb.get_details.v4_4_7.{}'.format(self.language)
+        kwargs['cache_name'] = 'TMDb.get_details.v4_4_39.{}'.format(self.language)
         kwargs['cache_combine_name'] = True
         return self._cache.use_cache(self._get_details, tmdb_type, tmdb_id, season, episode, **kwargs)
 

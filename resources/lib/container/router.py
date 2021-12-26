@@ -49,7 +49,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.kodi_db = None
         self.kodi_db_tv = {}
         self.library = None
-        self.tmdb_cache_only = True
+        self.tmdb_cache_only = False if ADDON.getSettingBool('tmdb_details') else True
         self.tmdb_api = TMDb()
         self.trakt_watchedindicators = ADDON.getSettingBool('trakt_watchedindicators')
         self.trakt_api = TraktAPI()

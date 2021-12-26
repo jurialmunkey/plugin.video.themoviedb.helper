@@ -2046,6 +2046,16 @@ msgctxt "#32400"
 msgid "Play local Kodi library files"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32401"
+msgid "TMDb detailed information"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32402"
+msgid "Get additional details and artwork from TMDb"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

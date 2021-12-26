@@ -156,6 +156,22 @@ def get_external_ids(v):
     return unique_ids
 
 
+def get_extra_art(v):
+    """ Get additional artwork types from artwork list
+    Fanart with language is treated as landscape because it will have text
+    TODO: Add extra fanart
+    """
+    artwork = {}
+    landscape = [i for i in v['backdrops'] if i.get('iso_639_1') and i.get('aspect_ratio') == 1.778] if v.get('backdrops') else None
+    if landscape:
+        landscape_item = sorted(landscape, key=lambda i: i.get('vote_average', 0), reverse=True)[0]
+        artwork['landscape'] = get_imagepath_fanart(landscape_item.get('file_path'))
+    if v.get('logos'):
+        clearlogo_item = sorted(v['logos'], key=lambda i: i.get('vote_average', 0), reverse=True)[0]
+        artwork['clearlogo'] = get_imagepath_fanart(clearlogo_item.get('file_path'))
+    return artwork
+
+
 def get_episode_to_air(v, name):
     i = v or {}
     infoproperties = {}
@@ -403,6 +419,10 @@ class ItemMapper(_ItemMapper):
             'external_ids': [{
                 'keys': [('unique_ids', UPDATE_BASEKEY)],
                 'func': get_external_ids
+            }],
+            'images': [{
+                'keys': [('art', UPDATE_BASEKEY)],
+                'func': get_extra_art
             }],
             'credits': [{
                 'keys': [('infolabels', UPDATE_BASEKEY)],
