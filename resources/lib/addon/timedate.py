@@ -2,8 +2,12 @@ import _strptime
 import datetime
 import xbmc
 import time
-from resources.lib.addon.plugin import kodi_log, ADDON
+import xbmcaddon
+from resources.lib.addon.plugin import kodi_log
 from resources.lib.addon.decorators import try_except_log
+
+
+ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 def get_datetime_combine(*args, **kwargs):

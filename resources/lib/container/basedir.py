@@ -1,8 +1,13 @@
 import xbmc
+import xbmcaddon
 from resources.lib.addon.timedate import get_timedelta, get_datetime_today
-from resources.lib.addon.plugin import PLUGINPATH, ADDONPATH, ADDON, convert_type
+from resources.lib.addon.plugin import PLUGINPATH, convert_type
 from resources.lib.addon.setutils import merge_two_items
 from json import dumps
+
+
+ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
+ADDONPATH = ADDON.getAddonInfo('path')
 
 
 def _build_basedir_item(i, t, space):

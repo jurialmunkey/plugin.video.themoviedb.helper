@@ -1,8 +1,9 @@
 import xbmc
 import xbmcgui
+import xbmcaddon
 import resources.lib.addon.window as window
 from resources.lib.addon.parser import try_int
-from resources.lib.addon.plugin import kodi_log, ADDON
+from resources.lib.addon.plugin import kodi_log
 from resources.lib.addon.decorators import busy_dialog
 from resources.lib.tmdb.api import TMDb
 
@@ -15,6 +16,9 @@ PREFIX_INSTANCE = 'Instance'
 PREFIX_COMMAND = 'Command'
 ID_VIDEOINFO = 12003
 CONTAINER_ID = 9999
+
+
+ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 def _configure_path(path):
