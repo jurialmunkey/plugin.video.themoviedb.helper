@@ -1,9 +1,13 @@
-from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type, ADDON
+import xbmcaddon
+from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type
 from resources.lib.addon.parser import try_int, try_float
 from resources.lib.addon.setutils import iter_props, dict_to_list, get_params
 from resources.lib.addon.timedate import format_date, age_difference
 from resources.lib.addon.constants import IMAGEPATH_ORIGINAL, IMAGEPATH_POSTER, TMDB_GENRE_IDS
 from resources.lib.api.mapping import UPDATE_BASEKEY, _ItemMapper, get_empty_item
+
+
+ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 def get_imagepath_poster(v):
@@ -162,13 +166,17 @@ def get_extra_art(v):
     TODO: Add extra fanart
     """
     artwork = {}
+
     landscape = [i for i in v['backdrops'] if i.get('iso_639_1') and i.get('aspect_ratio') == 1.778] if v.get('backdrops') else None
     if landscape:
         landscape_item = sorted(landscape, key=lambda i: i.get('vote_average', 0), reverse=True)[0]
         artwork['landscape'] = get_imagepath_fanart(landscape_item.get('file_path'))
-    if v.get('logos'):
-        clearlogo_item = sorted(v['logos'], key=lambda i: i.get('vote_average', 0), reverse=True)[0]
+
+    clearlogo = [i for i in v['logos'] if not i.get('file_path', '').endswith('.svg')] if v.get('logos') else None
+    if clearlogo:
+        clearlogo_item = sorted(clearlogo, key=lambda i: i.get('vote_average', 0), reverse=True)[0]
         artwork['clearlogo'] = get_imagepath_fanart(clearlogo_item.get('file_path'))
+
     return artwork
 
 
