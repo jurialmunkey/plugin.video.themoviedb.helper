@@ -172,7 +172,7 @@ def get_extra_art(v):
         landscape_item = sorted(landscape, key=lambda i: i.get('vote_average', 0), reverse=True)[0]
         artwork['landscape'] = get_imagepath_fanart(landscape_item.get('file_path'))
 
-    clearlogo = [i for i in v['logos'] if not i.get('file_path', '').endswith('.svg')] if v.get('logos') else None
+    clearlogo = [i for i in v['logos'] if i.get('file_path', '')[-4:] != '.svg'] if v.get('logos') else None
     if clearlogo:
         clearlogo_item = sorted(clearlogo, key=lambda i: i.get('vote_average', 0), reverse=True)[0]
         artwork['clearlogo'] = get_imagepath_fanart(clearlogo_item.get('file_path'))
