@@ -14,7 +14,7 @@ from resources.lib.player.inputter import KeyboardInputter
 from resources.lib.player.configure import get_players_from_file
 from resources.lib.addon.constants import PLAYERS_PRIORITY
 from resources.lib.addon.decorators import busy_dialog, ProgressDialog
-from string import Formatter
+# from string import Formatter  # Only needed for Py2 legacy string formatting of defaultdict
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
@@ -22,6 +22,10 @@ ADDONPATH = ADDON.getAddonInfo('path')
 
 
 def string_format_map(fmt, d):
+    """ Py 2/3 cross-compatibility to return defaultdict formatted string
+    No longer needed after support for Py2 was dropped
+
+    Old code for legacy
     try:
         str.format_map
     except AttributeError:
@@ -29,6 +33,8 @@ def string_format_map(fmt, d):
         return fmt.format(**{part[1]: d[part[1]] for part in parts})
     else:
         return fmt.format(**d)
+    """
+    return fmt.format_map(d)  # NOTE: .format(**d) works in Py3.5 but not Py3.7+ so use format_map(d) instead
 
 
 def wait_for_player(to_start=None, timeout=5, poll=0.25, stop_after=0):

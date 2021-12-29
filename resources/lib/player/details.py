@@ -138,7 +138,7 @@ def get_detailed_item(tmdb_type, tmdb_id, season=None, episode=None, details=Non
     details = details or get_item_details(tmdb_type, tmdb_id, season, episode)
     if not details:
         return None
-    item = defaultdict(lambda: '+')
+    item = defaultdict(lambda: '_')
     item['id'] = item['tmdb'] = tmdb_id
     item['imdb'] = details.unique_ids.get('imdb')
     item['tvdb'] = details.unique_ids.get('tvdb')
