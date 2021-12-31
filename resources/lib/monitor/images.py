@@ -71,7 +71,7 @@ def _openimage(image, targetpath, filename):
                     return ''
 
             else:
-                targetfile = os.path.join(targetpath, filename)
+                targetfile = os.path.join(targetpath, 'temp_{}'.format(filename))  # Use temp file to avoid Kodi writing early
                 if not xbmcvfs.exists(targetfile):
                     xbmcvfs.copy(image, targetfile)
 
@@ -84,6 +84,18 @@ def _openimage(image, targetpath, filename):
             pass
 
     return ''
+
+
+def _saveimage(image, targetfile):
+    """ Save image object to disk
+    Uses flush() and os.fsync() to ensure file is written to disk before continuing
+    Used to prevent Kodi from attempting to cache the image before writing is complete
+    """
+    f = open(targetfile, 'wb')
+    image.save(f, 'PNG')
+    f.flush()
+    os.fsync(f)
+    f.close()
 
 
 class ImageFunctions(Thread):
@@ -132,14 +144,14 @@ class ImageFunctions(Thread):
     @lazyimport_pil
     def crop(self, source):
         filename = u'cropped-{}.png'.format(md5hash(source))
-        destination = self.save_path + filename
+        destination = os.path.join(self.save_path, filename)
         try:
             if xbmcvfs.exists(destination):
                 os.utime(destination, None)
             else:
                 img = _openimage(source, self.save_path, filename)
                 img = img.crop(img.convert('RGBa').getbbox())
-                img.save(destination)
+                _saveimage(img, destination)
                 img.close()
 
             return destination
@@ -159,7 +171,7 @@ class ImageFunctions(Thread):
                 img.thumbnail((256, 256))
                 img = img.convert('RGB')
                 img = img.filter(ImageFilter.GaussianBlur(self.radius))
-                img.save(destination)
+                _saveimage(img, destination)
                 img.close()
 
             return destination
@@ -177,7 +189,7 @@ class ImageFunctions(Thread):
             else:
                 img = _openimage(source, self.save_path, filename)
                 img = img.convert('LA')
-                img.save(destination)
+                _saveimage(img, destination)
                 img.close()
 
             return destination
@@ -265,7 +277,7 @@ class ImageFunctions(Thread):
                 img = _openimage(source, self.save_path, filename)
                 img.thumbnail((256, 256))
                 img = img.convert('RGB')
-                img.save(destination)
+                _saveimage(img, destination)
 
             maincolor_rgb = self.get_maincolor(img)
             maincolor_hex = self.rgb_to_hex(*self.get_color_lumsat(*maincolor_rgb))
