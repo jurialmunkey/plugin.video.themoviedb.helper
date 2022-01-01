@@ -1,3 +1,4 @@
+import xbmcaddon
 from resources.lib.container.pages import PaginatedItems
 from resources.lib.trakt.items import TraktItems
 from resources.lib.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache
@@ -5,6 +6,9 @@ from resources.lib.addon.parser import try_int
 from resources.lib.addon.timedate import convert_timestamp, date_in_range, get_region_date, get_datetime_today, get_timedelta
 from resources.lib.api.mapping import get_empty_item
 from resources.lib.addon.cache import CACHE_SHORT, CACHE_LONG, use_simple_cache
+
+
+ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 class _TraktProgress():
@@ -266,19 +270,81 @@ class _TraktProgress():
             return False
         return True
 
+    def _get_stacked_item(self, next_item, last_item):
+        # If the next item is the same show then we stack the details onto the last item and add it next iteration
+        ip = last_item['infoproperties']
+
+        # First time setup
+        if not ip.get('stacked_count'):
+            ti = last_item['infolabels']['title']
+            se = '{season}x{episode:0>2}'.format(season=try_int(
+                last_item['infolabels']['season']), episode=try_int(last_item['infolabels']['episode']))
+            ep = '{episode}. {label}'.format(episode=se, label=ti)
+            ip['stacked_count'] = 1
+            ip['stacked_labels'] = ep
+            ip['stacked_titles'] = ti
+            ip['stacked_episodes'] = se
+            ip['stacked_first'] = '{season}x{episode:0>2}'.format(
+                season=try_int(last_item['infolabels'].get('season')),
+                episode=try_int(last_item['infolabels'].get('episode')))
+            ip['no_label_formatting'] = True
+            last_item['params'].pop('episode', None)
+            last_item['params']['info'] = 'episodes'
+            last_item['is_folder'] = True
+
+        # Stacked Setup
+        ti = next_item['infolabels']['title']
+        se = '{season}x{episode:0>2}'.format(season=try_int(
+            next_item['infolabels']['season']), episode=try_int(next_item['infolabels']['episode']))
+        ep = '{episode}. {label}'.format(episode=se, label=ti)
+        ip['stacked_count'] = ip.get('stacked_count', 1) + 1
+        ip['stacked_labels'] = '{}, {}'.format(ip['stacked_labels'], ep)
+        ip['stacked_titles'] = '{}, {}'.format(ip['stacked_titles'], ti)
+        ip['stacked_episodes'] = '{}, {}'.format(ip['stacked_episodes'], se)
+        ip['stacked_last'] = se
+        last_item['label'] = '{first_ep}-{final_ep}. {ep_count}'.format(
+            ep_count=ADDON.getLocalizedString(32403).format(ip['stacked_count']),
+            first_ep=ip['stacked_first'],
+            final_ep=ip['stacked_last'])
+        return last_item
+
+    def _stack_calendar_episodes(self, episode_list, flipped):
+        items = []
+        last_item = None
+        for i in reversed(episode_list) if flipped else episode_list:
+            if not last_item:
+                last_item = i
+                continue
+
+            # If the next item is a different show or day then we stop stacking and add the item
+            if (
+                    last_item['infolabels']['tvshowtitle'] != i['infolabels']['tvshowtitle']
+                    or last_item['infolabels']['premiered'] != i['infolabels']['premiered']
+            ):
+                items.append(last_item)
+                last_item = i
+                continue
+
+            last_item = self._get_stacked_item(i, last_item)
+
+        else:  # The last item in the list won't be added in the for loop so do an extra action at the end to add it
+            if last_item:
+                items.append(last_item)
+        return items[::-1] if flipped else items
+
     @use_simple_cache(cache_days=0.25)
-    def _get_calendar_episodes_list(self, startdate=0, days=1, user=True, kodi_db=None):
+    def _get_calendar_episodes_list(self, startdate=0, days=1, user=True, kodi_db=None, stack=True):
         # Get response
         response = self.get_calendar_episodes(startdate=startdate, days=days, user=user)
         if not response:
             return
         # Reverse items for date ranges in past
         traktitems = reversed(response) if startdate < -1 else response
-        return [self._get_calendar_episode_item(i) for i in traktitems if self._get_calendar_episode_item_bool(
-            i, kodi_db, user, startdate, days)]
+        items = [self._get_calendar_episode_item(i) for i in traktitems if self._get_calendar_episode_item_bool(i, kodi_db, user, startdate, days)]
+        return self._stack_calendar_episodes(items, flipped=startdate < -1) if stack else items
 
     def get_calendar_episodes_list(self, startdate=0, days=1, user=True, kodi_db=None, page=1, limit=20):
-        response_items = self._get_calendar_episodes_list(startdate, days, user, kodi_db)
+        response_items = self._get_calendar_episodes_list(startdate, days, user, kodi_db, stack=ADDON.getSettingBool('calendar_flatten'))
         response = PaginatedItems(response_items, page=page, limit=limit)
         if response and response.items:
             return response.items + response.next_page

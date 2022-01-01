@@ -2056,6 +2056,16 @@ msgctxt "#32402"
 msgid "Get additional details and artwork from TMDb"
 msgstr ""
 
+#: /resources/lib/trakt/progress.py
+msgctxt "#32403"
+msgid "Airing {} Episodes"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32404"
+msgid "Flatten tvshows with multiple episodes airing same day"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
