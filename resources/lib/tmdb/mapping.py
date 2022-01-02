@@ -46,7 +46,7 @@ def get_collection_properties(v):
     ratings = []
     infoproperties = {}
     year_l, year_h, votes = 9999, 0, 0
-    for p, i in enumerate(v):
+    for p, i in enumerate(v, start=1):
         infoproperties[u'set.{}.title'.format(p)] = i.get('title', '')
         infoproperties[u'set.{}.tmdb_id'.format(p)] = i.get('id', '')
         infoproperties[u'set.{}.originaltitle'.format(p)] = i.get('original_title', '')
