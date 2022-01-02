@@ -249,6 +249,9 @@ class _TraktProgress():
             'air_day': air_date.strftime('%A'),
             'air_day_short': air_date.strftime('%a'),
             'air_date_short': air_date.strftime('%d %b')}
+        days_to_air = (air_date.date() - get_datetime_today().date()).days
+        dtaproperty = 'days_from_aired' if days_to_air < 0 else 'days_until_aired'
+        item['infoproperties'][dtaproperty] = str(abs(days_to_air))
         item['unique_ids'] = {u'tvshow.{}'.format(k): v for k, v in i.get('show', {}).get('ids', {}).items()}
         item['params'] = {
             'info': 'details',
