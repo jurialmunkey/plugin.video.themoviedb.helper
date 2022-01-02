@@ -129,10 +129,7 @@ class ListItemMonitor(CommonMonitorFunctions):
     @try_except_log('lib.monitor.listitem.process_artwork')
     def process_artwork(self, details, tmdb_type):
         self.clear_property_list(SETMAIN_ARTWORK)
-        if self.dbtype not in ['movies', 'tvshows', 'episodes']:
-            if tmdb_type not in ['movie', 'tv']:
-                return
-        if ADDON.getSettingBool('service_fanarttv_lookup'):
+        if tmdb_type in ['movie', 'tv'] and ADDON.getSettingBool('service_fanarttv_lookup'):
             details = self.get_fanarttv_artwork(details, tmdb_type)
         if not self.is_same_item():
             return
