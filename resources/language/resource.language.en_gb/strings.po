@@ -2066,6 +2066,11 @@ msgctxt "#32404"
 msgid "Flatten tvshows with multiple episodes airing same day"
 msgstr ""
 
+#: /resources/lib/addon/constants.py
+msgctxt "#32405"
+msgid "Your TV Shows Airing This Week"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

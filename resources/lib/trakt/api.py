@@ -200,7 +200,8 @@ class _TraktLists():
                 'info': 'trakt_userlist',
                 'list_name': i.get('name'),
                 'list_slug': i.get('ids', {}).get('slug'),
-                'user_slug': i.get('user', {}).get('ids', {}).get('slug')}
+                'user_slug': i.get('user', {}).get('ids', {}).get('slug'),
+                'plugin_category': i.get('name')}
             item['unique_ids'] = {
                 'trakt': i.get('ids', {}).get('trakt'),
                 'slug': i.get('ids', {}).get('slug'),

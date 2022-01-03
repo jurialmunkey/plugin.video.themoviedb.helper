@@ -41,7 +41,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.params = parse_paramstring(self.paramstring)
         self.parent_params = self.params
         self.update_listing = False
-        self.plugin_category = self.params.get('plugin_category', '') if self.params.get('page') else ''
+        self.plugin_category = ''
         self.container_content = ''
         self.container_update = None
         self.container_refresh = False
@@ -139,7 +139,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             if self.thumb_override:
                 li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb otherwise Kodi overrides after item is created
             if li.is_folder and li.params.get('page'):
-                li.params['plugin_category'] = self.params.get('plugin_category', '')
+                li.params['plugin_category'] = self.plugin_category
             xbmcplugin.addDirectoryItem(
                 handle=self.handle,
                 url=li.get_url(),
@@ -308,7 +308,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         item = random_from_list(self.get_items(**params))
         if not item:
             return
-        self.plugin_category = item.get('label')
+        self.plugin_category = '[CAPITALIZE]{}[/CAPITALIZE]'.format(item.get('label'))
         self.parent_params = item.get('params', {})
         return self.get_items(**item.get('params', {}))
 
@@ -356,6 +356,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         items = self.get_items(**self.params)
         if not items:
             return
+        self.plugin_category = self.params.get('plugin_category') or self.plugin_category
         self.add_items(
             items,
             pagination=self.pagination,

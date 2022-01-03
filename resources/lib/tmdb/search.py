@@ -22,6 +22,7 @@ def get_zippered_list(lists):
 
 class SearchLists():
     def list_multisearchdir_router(self, **kwargs):
+        self.plugin_category = xbmc.getLocalizedString(137)
         if kwargs.get('clear_cache') != 'True':
             return self._list_multisearchdir(**kwargs)
         for tmdb_type in MULTISEARCH_TYPES:
@@ -40,6 +41,7 @@ class SearchLists():
         return items
 
     def list_searchdir_router(self, tmdb_type, **kwargs):
+        self.plugin_category = xbmc.getLocalizedString(137)
         if kwargs.get('clear_cache') != 'True':
             return self.list_searchdir(tmdb_type, **kwargs)
         set_search_history(tmdb_type, clear_cache=True)
@@ -100,5 +102,6 @@ class SearchLists():
         self.update_listing = True if update_listing else False
         self.container_content = convert_type(tmdb_type, 'container')
         self.kodi_db = self.get_kodi_database(tmdb_type)
+        self.plugin_category = '[CAPITALIZE]{} - {} ({})[/CAPITALIZE]'.format(xbmc.getLocalizedString(137), query, tmdb_type)
 
         return items

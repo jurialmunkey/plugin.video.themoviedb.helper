@@ -400,7 +400,7 @@ class TMDb(RequestAPI):
             if not item:
                 continue
             for k, v in param.items():
-                item['params'][k] = v.format(tmdb_id=i.get('id'))
+                item['params'][k] = v.format(tmdb_id=i.get('id'), label=i.get('name'))
             items.append(item)
         if not items:
             return []

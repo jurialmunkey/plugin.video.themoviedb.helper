@@ -2,7 +2,7 @@ import random
 import xbmcgui
 import xbmcaddon
 from resources.lib.kodi.rpc import get_kodi_library
-from resources.lib.addon.plugin import convert_type, PLUGINPATH
+from resources.lib.addon.plugin import convert_type, PLUGINPATH, get_plugin_category
 from resources.lib.addon.constants import TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, TRAKT_LIST_OF_LISTS
 from resources.lib.addon.parser import try_int, encode_url
 from resources.lib.api.mapping import get_empty_item
@@ -34,6 +34,7 @@ class TraktLists():
         self.kodi_db = self.get_kodi_database(info_tmdb_type)
         self.library = convert_type(info_tmdb_type, 'library')
         self.container_content = convert_type(info_tmdb_type, 'container')
+        self.plugin_category = get_plugin_category(info_model, convert_type(info_tmdb_type, 'plural'))
         return items
 
     def list_mixed(self, info, **kwargs):
@@ -63,6 +64,7 @@ class TraktLists():
         self.kodi_db = self.get_kodi_database(info_tmdb_type)
         self.library = convert_type(info_tmdb_type, 'library')
         self.container_content = convert_type(info_tmdb_type, 'container')
+        self.plugin_category = get_plugin_category(info_model, convert_type(info_tmdb_type, 'plural'))
         return items
 
     def list_lists(self, info, page=None, **kwargs):
@@ -72,6 +74,7 @@ class TraktLists():
             page=page,
             authorize=info_model.get('authorize', False))
         self.library = 'video'
+        self.plugin_category = get_plugin_category(info_model)
         return items
 
     def list_lists_search(self, query=None, **kwargs):
@@ -150,7 +153,7 @@ class TraktLists():
             'info': 'recommendations',
             'tmdb_type': item.get('params', {}).get('tmdb_type'),
             'tmdb_id': item.get('params', {}).get('tmdb_id')}
-        self.plugin_category = u'{} {}'.format(ADDON.getLocalizedString(32288), item.get('label'))
+        self.params['plugin_category'] = u'{} {}'.format(ADDON.getLocalizedString(32288), item.get('label'))
         return self.list_tmdb(
             info='recommendations',
             tmdb_type=item.get('params', {}).get('tmdb_type'),
@@ -172,6 +175,7 @@ class TraktLists():
         self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = convert_type(tmdb_type, 'library')
         self.container_content = convert_type(tmdb_type, 'container')
+        self.plugin_category = '{} {}'.format(ADDON.getLocalizedString(32196), convert_type(tmdb_type, 'plural'))
         return items
 
     def list_nextepisodes(self, info, tmdb_type, page=None, **kwargs):
@@ -184,6 +188,7 @@ class TraktLists():
         self.library = 'video'
         self.container_content = 'episodes'
         self.thumb_override = ADDON.getSettingInt('calendar_art')
+        self.plugin_category = ADDON.getLocalizedString(32197)
         return items
 
     def list_trakt_calendar(self, info, startdate, days, page=None, library=False, **kwargs):
@@ -213,4 +218,5 @@ class TraktLists():
         self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = 'video'
         self.container_content = 'episodes'
+        self.plugin_category = ADDON.getLocalizedString(32043)
         return items
