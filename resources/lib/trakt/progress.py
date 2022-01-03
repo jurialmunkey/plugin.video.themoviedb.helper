@@ -1,3 +1,4 @@
+import xbmc
 import xbmcaddon
 from resources.lib.container.pages import PaginatedItems
 from resources.lib.trakt.items import TraktItems
@@ -290,6 +291,8 @@ class _TraktProgress():
             ip['stacked_first'] = '{season}x{episode:0>2}'.format(
                 season=try_int(last_item['infolabels'].get('season')),
                 episode=try_int(last_item['infolabels'].get('episode')))
+            ip['stacked_first_episode'] = last_item['infolabels']['episode']
+            ip['stacked_first_season'] = last_item['infolabels']['season']
             ip['no_label_formatting'] = True
             last_item['params'].pop('episode', None)
             last_item['params']['info'] = 'episodes'
@@ -305,8 +308,10 @@ class _TraktProgress():
         ip['stacked_titles'] = '{}, {}'.format(ip['stacked_titles'], ti)
         ip['stacked_episodes'] = '{}, {}'.format(ip['stacked_episodes'], se)
         ip['stacked_last'] = se
+        ip['stacked_last_episode'] = next_item['infolabels']['episode']
+        ip['stacked_last_season'] = next_item['infolabels']['season']
         last_item['label'] = '{first_ep}-{final_ep}. {ep_count}'.format(
-            ep_count=ADDON.getLocalizedString(32403).format(ip['stacked_count']),
+            ep_count='{} {}'.format(ip['stacked_count'], xbmc.getLocalizedString(20360)),
             first_ep=ip['stacked_first'],
             final_ep=ip['stacked_last'])
         return last_item
