@@ -348,7 +348,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
 
         # Lookup up our TMDb ID
         if not kwargs.get('tmdb_id'):
-            kwargs['tmdb_id'] = self.get_tmdb_id(**kwargs)
+            self.parent_params['tmdb_id'] = self.params['tmdb_id'] = kwargs['tmdb_id'] = self.get_tmdb_id(**kwargs)
 
         return self._get_items(route[info]['route'], **kwargs)
 
