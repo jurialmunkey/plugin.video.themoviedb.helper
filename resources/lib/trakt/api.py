@@ -165,13 +165,13 @@ class _TraktLists():
             'next_page': paginated_items.next_page}
 
     @use_activity_cache(cache_days=CACHE_SHORT)
-    def _get_sync_list(self, sync_type, trakt_type, sort_by=None, sort_how=None):
-        return TraktItems(
-            items=self.get_sync(sync_type, trakt_type),
-            trakt_type=trakt_type).build_items(sort_by, sort_how)
+    def _get_sync_list(self, sync_type, trakt_type, sort_by=None, sort_how=None, decorator_cache_refresh=False):
+        func = TraktItems(items=self.get_sync(sync_type, trakt_type), trakt_type=trakt_type).build_items
+        return func(sort_by, sort_how)
 
     def get_sync_list(self, sync_type, trakt_type, page=1, limit=20, params=None, sort_by=None, sort_how=None, next_page=True):
-        response = self._get_sync_list(sync_type, trakt_type, sort_by=sort_by, sort_how=sort_how)
+        cache_refresh = True if try_int(page, fallback=1) == 1 else False
+        response = self._get_sync_list(sync_type, trakt_type, sort_by=sort_by, sort_how=sort_how, decorator_cache_refresh=cache_refresh)
         if not response:
             return
         response = PaginatedItems(items=response['items'], page=page, limit=limit)
@@ -180,8 +180,6 @@ class _TraktLists():
     @is_authorized
     def get_list_of_lists(self, path, page=1, limit=250, authorize=False, next_page=True):
         response = self.get_response(path, page=page, limit=limit)
-        like_list = True if path.startswith('lists/') else False
-        delete_like = True if path.startswith('users/likes') else False
         if not response:
             return
         items = []
