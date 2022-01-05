@@ -102,6 +102,6 @@ class SearchLists():
         self.update_listing = True if update_listing else False
         self.container_content = convert_type(tmdb_type, 'container')
         self.kodi_db = self.get_kodi_database(tmdb_type)
-        self.plugin_category = '[CAPITALIZE]{} - {} ({})[/CAPITALIZE]'.format(xbmc.getLocalizedString(137), query, tmdb_type)
+        self.plugin_category = '{} - {} ({})'.format(xbmc.getLocalizedString(137), query, tmdb_type)
 
         return items

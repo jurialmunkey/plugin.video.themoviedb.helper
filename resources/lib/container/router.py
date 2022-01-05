@@ -308,7 +308,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         item = random_from_list(self.get_items(**params))
         if not item:
             return
-        self.plugin_category = '[CAPITALIZE]{}[/CAPITALIZE]'.format(item.get('label'))
+        self.plugin_category = '{}'.format(item.get('label'))
         self.parent_params = item.get('params', {})
         return self.get_items(**item.get('params', {}))
 
