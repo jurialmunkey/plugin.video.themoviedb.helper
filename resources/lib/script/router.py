@@ -15,7 +15,7 @@ from resources.lib.files.utils import dumps_to_file, validify_filename
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import reconfigure_legacy_params, kodi_log, format_folderpath, convert_type
 from resources.lib.addon.decorators import busy_dialog
-from resources.lib.addon.parser import encode_url
+from resources.lib.addon.parser import encode_url, try_int
 from resources.lib.container.basedir import get_basedir_details
 from resources.lib.fanarttv.api import FanartTV
 from resources.lib.tmdb.api import TMDb
@@ -232,6 +232,55 @@ def kodi_setting(kodi_setting, **kwargs):
         set_property=u'{}'.format(response.get('result', {}).get('value', '')))
 
 
+def _player_audiostream_items(items, prop='', schema=[]):
+    prev_prop = '{}.Total'.format(prop)
+    items_len = len(items)
+    items_max = max(items_len, try_int(get_property(prev_prop)))
+    if not items_max:
+        return
+    x = 0
+    for x in range(0, items_max):
+        for i in schema:
+            i_prop = '{}.{}.{}'.format(prop, x + 1, i)
+            detail = items[x].get(i) if x < items_len else None
+            get_property(i_prop, set_property=detail, clear_property=detail is None)
+    get_property(prev_prop, set_property=x + 1)
+
+
+def get_player_audiostreams(**kwargs):
+    method = "Player.GetProperties"
+    params = {"playerid": 1, "properties": ["subtitles", "audiostreams", "currentsubtitle", "currentaudiostream"]}
+    response = get_jsonrpc(method, params) or {}
+    response = response.get('result') or {}
+
+    # Subtitles Properties
+    _player_audiostream_items(
+        items=response.get('subtitles', []), prop='Player.Subtitles',
+        schema=['index', 'isdefault', 'isforced', 'isimpaired', 'language', 'name'])
+    get_property('Player.Subtitles.CurrentIndex', set_property=response.get('currentsubtitle').get('index', 0))
+
+    # AudioStreams Properties
+    _player_audiostream_items(
+        items=response.get('audiostreams', []), prop='Player.AudioStreams',
+        schema=['bitrate', 'channels', 'codec', 'index', 'isdefault', 'isimpaired',
+                'isoriginal', 'language', 'name', 'samplerate'])
+    get_property('Player.AudioStreams.CurrentIndex', set_property=response.get('currentaudiostream').get('index', 0))
+
+
+def set_player_subtitle(set_player_subtitle, **kwargs):
+    method = "Player.SetSubtitle"
+    params = {"playerid": 1, "subtitle": try_int(set_player_subtitle), "enable": True}
+    get_jsonrpc(method, params)
+    get_property('Player.Subtitles.CurrentIndex', set_property=try_int(set_player_subtitle))
+
+
+def set_player_audiostream(set_player_audiostream, **kwargs):
+    method = "Player.SetAudioStream"
+    params = {"playerid": 1, "stream": try_int(set_player_audiostream)}
+    get_jsonrpc(method, params)
+    get_property('Player.AudioStreams.CurrentIndex', set_property=try_int(set_player_audiostream))
+
+
 def user_list(user_list, user_slug=None, **kwargs):
     user_slug = user_slug or 'me'
     if not user_slug or not user_list:
@@ -373,6 +422,9 @@ class Script(object):
         'revoke_trakt': lambda **kwargs: TraktAPI().logout(),
         'split_value': lambda **kwargs: split_value(**kwargs),
         'kodi_setting': lambda **kwargs: kodi_setting(**kwargs),
+        'get_player_audiostreams': lambda **kwargs: get_player_audiostreams(**kwargs),
+        'set_player_subtitle': lambda **kwargs: set_player_subtitle(**kwargs),
+        'set_player_audiostream': lambda **kwargs: set_player_audiostream(**kwargs),
         'sync_trakt': lambda **kwargs: sync_trakt(**kwargs),
         'manage_artwork': lambda **kwargs: manage_artwork(**kwargs),
         'refresh_details': lambda **kwargs: refresh_details(**kwargs),
