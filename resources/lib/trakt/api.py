@@ -120,10 +120,10 @@ class _TraktLists():
         items = []
         for trakt_type in trakt_types:
             response = self.get_simple_list(
-                path.format(trakt_type=trakt_type), extended=extended, page=1, limit=50, trakt_type=trakt_type) or {}
+                path.format(trakt_type=trakt_type), extended=extended, page=1, limit=limit * 2, trakt_type=trakt_type) or {}
             items += response.get('items') or []
         if items:
-            return random.sample(items, 20)
+            return random.sample(items, limit)
 
     @is_authorized
     def get_basic_list(self, path, trakt_type, page=1, limit=20, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, randomise=False):
@@ -132,7 +132,7 @@ class _TraktLists():
         cache_refresh = True if try_int(page, fallback=1) == 1 else False
         if randomise:
             response = self.get_simple_list(
-                path, extended=extended, page=1, limit=50, trakt_type=trakt_type)
+                path, extended=extended, page=1, limit=limit * 2, trakt_type=trakt_type)
         elif sort_by is not None:  # Sorted list manually paginated because need to sort first
             response = self.get_sorted_list(path, sort_by, sort_how, extended, cache_refresh=cache_refresh)
             response = PaginatedItems(items=response['items'], page=page, limit=limit).get_dict()
@@ -169,7 +169,8 @@ class _TraktLists():
         func = TraktItems(items=self.get_sync(sync_type, trakt_type), trakt_type=trakt_type).build_items
         return func(sort_by, sort_how)
 
-    def get_sync_list(self, sync_type, trakt_type, page=1, limit=20, params=None, sort_by=None, sort_how=None, next_page=True):
+    def get_sync_list(self, sync_type, trakt_type, page=1, limit=None, params=None, sort_by=None, sort_how=None, next_page=True):
+        limit = limit or self.item_limit
         cache_refresh = True if try_int(page, fallback=1) == 1 else False
         response = self._get_sync_list(sync_type, trakt_type, sort_by=sort_by, sort_how=sort_how, decorator_cache_refresh=cache_refresh)
         if not response:
@@ -411,6 +412,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         self.last_activities = {}
         self.sync_activities = {}
         self.sync = {}
+        self.item_limit = 83 if ADDON.getSettingBool('trakt_expandedlimit') else 20  # 84 (83+NextPage) has common factors 4,6,7,8 suitable for wall views
         self.login() if force else self.authorize()
 
     def authorize(self, login=False):

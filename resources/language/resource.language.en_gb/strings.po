@@ -393,11 +393,6 @@ msgid "Ignore folder creation checks"
 msgstr ""
 
 #: /resources/settings.xml
-msgctxt "#32078"
-msgid "Expand Trakt list limit to 20 items"
-msgstr ""
-
-#: /resources/settings.xml
 msgctxt "#32079"
 msgid "System Use Only"
 msgstr ""
@@ -2054,6 +2049,11 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32402"
 msgid "Get additional details and artwork from TMDb"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32403"
+msgid "Increase synced lists items per page (increases load times)"
 msgstr ""
 
 #: /resources/settings.xml

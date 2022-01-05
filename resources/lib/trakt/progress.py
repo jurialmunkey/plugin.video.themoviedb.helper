@@ -14,7 +14,8 @@ ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 class _TraktProgress():
     @is_authorized
-    def get_inprogress_shows_list(self, page=1, limit=20, params=None, next_page=True, sort_by=None, sort_how=None):
+    def get_inprogress_shows_list(self, page=1, limit=None, params=None, next_page=True, sort_by=None, sort_how=None):
+        limit = limit or self.item_limit
         response = self._get_upnext_episodes_list(sort_by_premiered=True) if sort_by == 'year' else self._get_inprogress_shows()
         response = TraktItems(response, trakt_type='show').build_items(
             params_def=params, sort_by=sort_by if sort_by != 'year' else 'unsorted', sort_how=sort_how)
@@ -105,8 +106,9 @@ class _TraktProgress():
 
     @is_authorized
     # @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_SHORT)
-    def get_upnext_list(self, unique_id, id_type=None, page=1):
+    def get_upnext_list(self, unique_id, id_type=None, page=1, limit=None):
         """ Gets the next episodes for a show that user should watch next """
+        limit = limit or self.item_limit
         if id_type != 'slug':
             unique_id = self.get_id(unique_id, id_type, 'show', output_type='slug')
         if unique_id:
@@ -115,17 +117,18 @@ class _TraktProgress():
             response = TraktItems(response, trakt_type='episode').configure_items(params_def={
                 'info': 'details', 'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}',
                 'season': '{season}', 'episode': '{number}'})
-            response = PaginatedItems(response['items'], page=page, limit=10)
+            response = PaginatedItems(response['items'], page=page, limit=limit)
             return response.items + response.next_page
 
     @is_authorized
-    def get_upnext_episodes_list(self, page=1, sort_by_premiered=False):
+    def get_upnext_episodes_list(self, page=1, sort_by_premiered=False, limit=None):
         """ Gets a list of episodes for in-progress shows that user should watch next """
+        limit = limit or self.item_limit
         response = self._get_upnext_episodes_list(sort_by_premiered=sort_by_premiered)
         response = TraktItems(response, trakt_type='episode').configure_items(params_def={
             'info': 'details', 'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}',
             'season': '{season}', 'episode': '{number}'})
-        response = PaginatedItems(response['items'], page=page, limit=10)
+        response = PaginatedItems(response['items'], page=page, limit=limit)
         return response.items + response.next_page
 
     @is_authorized
@@ -184,7 +187,6 @@ class _TraktProgress():
             or (reset_at and convert_timestamp(episode.get('last_watched_at')) < reset_at)]
 
     @is_authorized
-    # @use_activity_cache('movies', 'watched_at', cache_days=CACHE_LONG)
     def get_movie_playcount(self, unique_id, id_type):
         return self.get_sync('watched', 'movie', id_type).get(unique_id, {}).get('plays')
 
@@ -351,7 +353,8 @@ class _TraktProgress():
         items = [self._get_calendar_episode_item(i) for i in traktitems if self._get_calendar_episode_item_bool(i, kodi_db, user, startdate, days)]
         return self._stack_calendar_episodes(items, flipped=startdate < -1) if stack else items
 
-    def get_calendar_episodes_list(self, startdate=0, days=1, user=True, kodi_db=None, page=1, limit=20):
+    def get_calendar_episodes_list(self, startdate=0, days=1, user=True, kodi_db=None, page=1, limit=None):
+        limit = limit or self.item_limit
         response_items = self._get_calendar_episodes_list(startdate, days, user, kodi_db, stack=ADDON.getSettingBool('calendar_flatten'))
         response = PaginatedItems(response_items, page=page, limit=limit)
         if response and response.items:
