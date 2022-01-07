@@ -139,9 +139,12 @@ class _ListItem(object):
             self.params['parent_info'] = self.params['info']
             self.params['info'] = 'trakt_sortby'
 
-    def set_params_reroute(self, ftv_forced_lookup=False, flatten_seasons=False, extended=None):
+    def set_params_reroute(self, ftv_forced_lookup=False, flatten_seasons=False, extended=None, cache_only=False):
         if xbmc.getCondVisibility("Window.IsVisible(script-skinshortcuts.xml)"):
             self._set_params_reroute_skinshortcuts()
+
+        if cache_only:  # Take cacheony param from parent list with us onto subsequent pages
+            self.params['cacheonly'] = cache_only
 
         if ftv_forced_lookup:  # Take fanarttv param from parent list with us onto subsequent pages
             self.params['fanarttv'] = ftv_forced_lookup

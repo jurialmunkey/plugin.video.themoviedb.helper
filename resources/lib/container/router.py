@@ -49,16 +49,17 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.kodi_db = None
         self.kodi_db_tv = {}
         self.library = None
-        self.tmdb_cache_only = False if ADDON.getSettingBool('tmdb_details') else True
         self.tmdb_api = TMDb()
-        self.trakt_watchedindicators = ADDON.getSettingBool('trakt_watchedindicators')
         self.trakt_api = TraktAPI()
-        self.is_widget = True if self.params.pop('widget', '').lower() == 'true' else False
+        self.omdb_api = OMDb() if ADDON.getSettingString('omdb_apikey') else None
+        self.is_widget = self.params.pop('widget', '').lower() == 'true'
         self.hide_watched = ADDON.getSettingBool('widgets_hidewatched') if self.is_widget else False
         self.flatten_seasons = ADDON.getSettingBool('flatten_seasons')
+        self.trakt_watchedindicators = ADDON.getSettingBool('trakt_watchedindicators')
+        self.cache_only = self.params.pop('cacheonly', '').lower()
         self.ftv_forced_lookup = self.params.pop('fanarttv', '').lower()
-        self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only())
-        self.omdb_api = OMDb() if ADDON.getSettingString('omdb_apikey') else None
+        self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only())  # Set after ftv_forced_lookup, is_widget, cache_only
+        self.tmdb_cache_only = self.tmdb_is_cache_only()  # Set after ftv_api, cache_only
         self.filter_key = self.params.get('filter_key', None)
         self.filter_value = split_items(self.params.get('filter_value', None))[0]
         self.exclude_key = self.params.get('exclude_key', None)
@@ -75,6 +76,8 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         return True
 
     def ftv_is_cache_only(self):
+        if self.cache_only == 'true':
+            return True
         if self.ftv_forced_lookup == 'true':
             return False
         if self.ftv_forced_lookup == 'false':
@@ -82,6 +85,15 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         if self.is_widget and ADDON.getSettingBool('widget_fanarttv_lookup'):
             return False
         if not self.is_widget and ADDON.getSettingBool('fanarttv_lookup'):
+            return False
+        return True
+
+    def tmdb_is_cache_only(self):
+        if self.cache_only == 'true':
+            return True
+        if self.ftv_api:
+            return False
+        if ADDON.getSettingBool('tmdb_details'):
             return False
         return True
 
@@ -133,7 +145,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             li.set_context_menu()  # Set the context menu items
             li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
             li.set_thumb_to_art(self.thumb_override == 2) if self.thumb_override else None
-            li.set_params_reroute(self.ftv_forced_lookup, self.flatten_seasons, self.params.get('extended'))  # Reroute details to proper end point
+            li.set_params_reroute(self.ftv_forced_lookup, self.flatten_seasons, self.params.get('extended'), self.cache_only)  # Reroute details to proper end point
             li.set_params_to_info(self.plugin_category)  # Set path params to properties for use in skins
             li.infoproperties.update(property_params or {})
             if self.thumb_override:
@@ -363,7 +375,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             parent_params=self.parent_params,
             property_params=self.set_params_to_container(**self.params),
             kodi_db=self.kodi_db,
-            cache_only=self.tmdb_cache_only if not self.ftv_api else False)
+            cache_only=self.tmdb_cache_only)
         self.finish_container(
             update_listing=self.update_listing,
             plugin_category=self.plugin_category,

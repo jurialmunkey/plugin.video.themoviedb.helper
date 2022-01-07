@@ -244,7 +244,7 @@ def _player_audiostream_items(items, prop='', schema=[]):
             i_prop = '{}.{}.{}'.format(prop, x + 1, i)
             detail = items[x].get(i) if x < items_len else None
             get_property(i_prop, set_property=detail, clear_property=detail is None)
-    get_property(prev_prop, set_property=x + 1)
+    get_property(prev_prop, set_property=items_len)
 
 
 def get_player_audiostreams(**kwargs):
