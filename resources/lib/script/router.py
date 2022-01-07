@@ -257,14 +257,14 @@ def get_player_audiostreams(**kwargs):
     _player_audiostream_items(
         items=response.get('subtitles', []), prop='Player.Subtitles',
         schema=['index', 'isdefault', 'isforced', 'isimpaired', 'language', 'name'])
-    get_property('Player.Subtitles.CurrentIndex', set_property=response.get('currentsubtitle').get('index', 0))
+    get_property('Player.Subtitles.CurrentIndex', set_property=response.get('currentsubtitle', {}).get('index', 0))
 
     # AudioStreams Properties
     _player_audiostream_items(
         items=response.get('audiostreams', []), prop='Player.AudioStreams',
         schema=['bitrate', 'channels', 'codec', 'index', 'isdefault', 'isimpaired',
                 'isoriginal', 'language', 'name', 'samplerate'])
-    get_property('Player.AudioStreams.CurrentIndex', set_property=response.get('currentaudiostream').get('index', 0))
+    get_property('Player.AudioStreams.CurrentIndex', set_property=response.get('currentaudiostream', {}).get('index', 0))
 
 
 def set_player_subtitle(set_player_subtitle, **kwargs):
