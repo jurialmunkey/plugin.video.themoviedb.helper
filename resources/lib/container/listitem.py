@@ -55,6 +55,7 @@ class _ListItem(object):
         self.context_menu = context_menu or []
         self.stream_details = stream_details or {}
         self.unique_ids = unique_ids or {}
+        self.next_page = next_page
         self._set_as_next_page(next_page)
 
     def _set_as_next_page(self, next_page=None):

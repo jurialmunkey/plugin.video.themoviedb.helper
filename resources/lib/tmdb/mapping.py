@@ -126,6 +126,7 @@ def get_providers(v):
             u'provider.{}.name'.format(x): i['provider_name'],
             u'provider.{}.icon'.format(x): get_imagepath_poster(i.get('logo_path'))})
         added_append(i['provider_name'])
+    infoproperties['providers'] = ' / '.join(added)
     return infoproperties
 
 
