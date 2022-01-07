@@ -59,16 +59,19 @@ class TMDbLists():
 
     def list_cast(self, tmdb_id, tmdb_type, season=None, episode=None, **kwargs):
         items = self.tmdb_api.get_cast_list(tmdb_id, tmdb_type, season=season, episode=episode)
+        self.tmdb_cache_only = True
         self.container_content = convert_type('person', 'container')
         return items
 
     def list_crew(self, tmdb_id, tmdb_type, season=None, episode=None, **kwargs):
         items = self.tmdb_api.get_cast_list(tmdb_id, tmdb_type, season=season, episode=episode, keys=['crew'])
+        self.tmdb_cache_only = True
         self.container_content = convert_type('person', 'container')
         return items
 
     def list_videos(self, tmdb_id, tmdb_type, season=None, episode=None, **kwargs):
         items = self.tmdb_api.get_videos(tmdb_id, tmdb_type, season, episode)
+        self.tmdb_cache_only = True
         self.container_content = convert_type('video', 'container')
         return items
 
