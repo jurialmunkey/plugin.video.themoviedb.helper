@@ -357,11 +357,11 @@ class _TraktSync():
     def get_sync_collection_shows(self, trakt_type, id_type=None):
         return self._get_sync('sync/collection/shows', trakt_type, id_type=id_type)
 
-    @use_activity_cache('movies', 'watched_at', CACHE_LONG, pickle_object=False)
+    @use_activity_cache('movies', 'paused_at', CACHE_LONG, pickle_object=False)
     def get_sync_playback_movies(self, trakt_type, id_type=None):
         return self._get_sync('sync/playback/movies', 'movie', id_type=id_type)
 
-    @use_activity_cache('episodes', 'watched_at', CACHE_LONG, pickle_object=False)
+    @use_activity_cache('episodes', 'paused_at', CACHE_LONG, pickle_object=False)
     def get_sync_playback_shows(self, trakt_type, id_type=None):
         return self._get_sync('sync/playback/episodes', trakt_type, id_type=id_type)
 
