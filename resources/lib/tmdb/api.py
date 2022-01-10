@@ -76,7 +76,8 @@ class TMDb(RequestAPI):
             request = func('find', tvdb_id, language=self.req_language, external_source='tvdb_id')
             request = request.get(u'{0}_results'.format(tmdb_type), [])
         elif query:
-            query = query.split(' (', 1)[0]  # Scrub added (Year) or other cruft in parentheses () added by Addons or TVDb
+            if tmdb_type in ['movie', 'tv']:
+                query = query.split(' (', 1)[0]  # Scrub added (Year) or other cruft in parentheses () added by Addons or TVDb
             if tmdb_type == 'tv':
                 request = func('search', tmdb_type, language=self.req_language, query=query, first_air_date_year=year)
             else:
