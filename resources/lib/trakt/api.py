@@ -145,11 +145,11 @@ class _TraktLists():
             return response['items'] + pages.get_next_page(response['headers'])
 
     @is_authorized
-    def get_stacked_list(self, path, trakt_type, page=1, limit=20, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, tvshow=True, **kwargs):
+    def get_stacked_list(self, path, trakt_type, page=1, limit=20, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, **kwargs):
         """ Get Basic list but stack repeat TV Shows """
         cache_refresh = True if try_int(page, fallback=1) == 1 else False
         response = self.get_simple_list(path, extended=extended, limit=4095, trakt_type=trakt_type, cache_refresh=cache_refresh)
-        response['items'] = self._stack_calendar_episodes(response['items'], tvshow=tvshow)
+        response['items'] = self._stack_calendar_tvshows(response['items'])
         response = PaginatedItems(items=response['items'], page=page, limit=limit).get_dict()
         if response:
             return response['items'] + pages.get_next_page(response['headers'])

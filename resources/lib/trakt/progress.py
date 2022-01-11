@@ -276,13 +276,9 @@ class _TraktProgress():
             return False
         return True
 
-    def _get_stacked_item(self, next_item, last_item, tvshow=False):
+    def _get_stacked_item(self, next_item, last_item):
         # If the next item is the same show then we stack the details onto the last item and add it next iteration
         ip = last_item['infoproperties']
-
-        if tvshow:  # Quick stack for tvshows
-            ip['stacked_count'] = ip.get('stacked_count', 0) + 1
-            return last_item
 
         # First time setup
         if not ip.get('stacked_count'):
@@ -322,7 +318,7 @@ class _TraktProgress():
             final_ep=ip['stacked_last'])
         return last_item
 
-    def _stack_calendar_episodes(self, episode_list, flipped=False, tvshow=False):
+    def _stack_calendar_episodes(self, episode_list, flipped=False):
         items = []
         last_item = None
         for i in reversed(episode_list) if flipped else episode_list:
@@ -331,21 +327,32 @@ class _TraktProgress():
                 continue
 
             # If the next item is a different show or day then we stop stacking and add the item
-            if tvshow:
-                cond = last_item['infolabels']['title'] != i['infolabels']['title']
-            else:
-                cond = last_item['infolabels']['tvshowtitle'] != i['infolabels']['tvshowtitle']
-                cond = cond or last_item['infolabels']['premiered'] != i['infolabels']['premiered']
-            if cond:
+            if (
+                    last_item['infolabels']['tvshowtitle'] != i['infolabels']['tvshowtitle']
+                    or last_item['infolabels']['premiered'] != i['infolabels']['premiered']
+            ):
                 items.append(last_item)
                 last_item = i
                 continue
 
-            last_item = self._get_stacked_item(i, last_item, tvshow)
+            last_item = self._get_stacked_item(i, last_item)
 
         else:  # The last item in the list won't be added in the for loop so do an extra action at the end to add it
             if last_item:
                 items.append(last_item)
+        return items[::-1] if flipped else items
+
+    def _stack_calendar_tvshows(self, tvshow_list, flipped=False):
+        items, titles = [], []
+        for i in reversed(tvshow_list) if flipped else tvshow_list:
+            t = i['infolabels']['title']
+            if t not in titles:
+                items.append(i)
+                titles.append(t)
+                continue
+            x = titles.index(t)
+            i = items[x]
+            i['infoproperties']['stacked_count'] = i['infoproperties'].get('stacked_count', 0) + 1
         return items[::-1] if flipped else items
 
     @use_simple_cache(cache_days=0.25)
