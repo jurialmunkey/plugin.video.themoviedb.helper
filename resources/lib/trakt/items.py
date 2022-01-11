@@ -4,6 +4,11 @@ from resources.lib.addon.setutils import del_empty_keys, get_params
 from resources.lib.addon.parser import try_int, try_str
 
 
+EPISODE_PARAMS = {
+    'info': 'details', 'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}',
+    'season': '{season}', 'episode': '{number}'}
+
+
 def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
     reverse = True if sort_how == 'desc' else False
     if sort_by == 'unsorted':

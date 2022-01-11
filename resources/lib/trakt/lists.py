@@ -175,7 +175,7 @@ class TraktLists():
             page=1)
 
     def list_ondeck(self, page=None, **kwargs):
-        items = self.trakt_api.get_ondeck_list(page=page)
+        items = self.trakt_api.get_ondeck_list(page=page, trakt_type='episode')
         self.tmdb_cache_only = False
         self.library = 'video'
         self.container_content = 'episodes'
@@ -193,8 +193,9 @@ class TraktLists():
                 sort_by=kwargs.get('sort_by', None),
                 sort_how=kwargs.get('sort_how', None))
         else:
-            items = self.trakt_api.get_inprogress_movies_list(
+            items = self.trakt_api.get_ondeck_list(
                 page=page,
+                trakt_type='movie',
                 sort_by=kwargs.get('sort_by', None),
                 sort_how=kwargs.get('sort_how', None))
         self.tmdb_cache_only = False

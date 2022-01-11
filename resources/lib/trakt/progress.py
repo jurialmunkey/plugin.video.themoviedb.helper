@@ -1,7 +1,7 @@
 import xbmc
 import xbmcaddon
 from resources.lib.container.pages import PaginatedItems
-from resources.lib.trakt.items import TraktItems
+from resources.lib.trakt.items import TraktItems, EPISODE_PARAMS
 from resources.lib.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.timedate import convert_timestamp, date_in_range, get_region_date, get_datetime_today, get_timedelta
@@ -14,39 +14,27 @@ ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 class _TraktProgress():
     @is_authorized
-    def get_ondeck_list(self, page=1, limit=None):
+    def get_ondeck_list(self, page=1, limit=None, sort_by=None, sort_how=None, trakt_type=None):
         limit = limit or self.item_limit
-        response = self._get_inprogress_episodes()
-        response = TraktItems(response, trakt_type='episode').configure_items(params_def={
-            'info': 'details', 'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}',
-            'season': '{season}', 'episode': '{number}'})
+        response = self._get_inprogress_items('show' if trakt_type == 'episode' else trakt_type)
+        response = TraktItems(response, trakt_type=trakt_type).build_items(
+            sort_by=sort_by, sort_how=sort_how,
+            params_def=EPISODE_PARAMS if trakt_type == 'episode' else None)
         response = PaginatedItems(response['items'], page=page, limit=limit)
         return response.items + response.next_page
 
     @is_authorized
     def get_towatch_list(self, trakt_type, page=1, limit=None):
         limit = limit or self.item_limit
-        items_ip = self._get_inprogress_shows() if trakt_type == 'show' else self._get_inprogress_movies()
+        items_ip = self._get_inprogress_shows() if trakt_type == 'show' else self._get_inprogress_items('movie')
         items_wl = self.get_sync('watchlist', trakt_type)
         response = TraktItems(items_ip + items_wl, trakt_type=trakt_type).build_items(sort_by='activity', sort_how='desc')
         response = PaginatedItems(response['items'], page=page, limit=limit)
         return response.items + response.next_page
 
-    @is_authorized
-    def get_inprogress_movies_list(self, page=1, limit=None, sort_by=None, sort_how=None):
-        limit = limit or self.item_limit
-        response = self._get_inprogress_movies()
-        response = TraktItems(response, trakt_type='movie').build_items(sort_by=sort_by, sort_how=sort_how)
-        response = PaginatedItems(response['items'], page=page, limit=limit)
-        return response.items + response.next_page
-
-    def _get_inprogress_movies(self):
-        response = self.get_sync('playback', 'movie')
-        return [i for i in response if 5 <= try_int(i.get('progress', 0)) <= 95]
-
-    def _get_inprogress_episodes(self):
-        response = self.get_sync('playback', 'show')
-        return [i for i in response if 5 <= try_int(i.get('progress', 0)) <= 95]
+    def _get_inprogress_items(self, sync_type, lowest=5, highest=95):
+        response = self.get_sync('playback', sync_type)
+        return [i for i in response if lowest <= try_int(i.get('progress', 0)) <= highest]
 
     @is_authorized
     def get_inprogress_shows_list(self, page=1, limit=None, params=None, next_page=True, sort_by=None, sort_how=None):
@@ -149,9 +137,7 @@ class _TraktProgress():
         if unique_id:
             showitem = self.get_details('show', unique_id)
             response = self.get_upnext_episodes(unique_id, showitem)
-            response = TraktItems(response, trakt_type='episode').configure_items(params_def={
-                'info': 'details', 'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}',
-                'season': '{season}', 'episode': '{number}'})
+            response = TraktItems(response, trakt_type='episode').configure_items(params_def=EPISODE_PARAMS)
             response = PaginatedItems(response['items'], page=page, limit=limit)
             return response.items + response.next_page
 
@@ -160,9 +146,7 @@ class _TraktProgress():
         """ Gets a list of episodes for in-progress shows that user should watch next """
         limit = limit or self.item_limit
         response = self._get_upnext_episodes_list(sort_by_premiered=sort_by_premiered)
-        response = TraktItems(response, trakt_type='episode').configure_items(params_def={
-            'info': 'details', 'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}',
-            'season': '{season}', 'episode': '{number}'})
+        response = TraktItems(response, trakt_type='episode').configure_items(params_def=EPISODE_PARAMS)
         response = PaginatedItems(response['items'], page=page, limit=limit)
         return response.items + response.next_page
 
