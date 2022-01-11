@@ -12,6 +12,7 @@ from resources.lib.files.utils import use_pickle
 from resources.lib.addon.constants import TMDB_GENRE_IDS
 from resources.lib.addon.window import get_property
 from resources.lib.addon.timedate import get_datetime_now, get_timedelta
+from urllib.parse import quote_plus
 from json import loads
 
 
@@ -56,7 +57,7 @@ class TMDb(RequestAPI):
         if not tmdb_type:
             return
         kwargs['cache_days'] = CACHE_SHORT
-        kwargs['cache_name'] = 'TMDb.get_tmdb_id.v2'
+        kwargs['cache_name'] = 'TMDb.get_tmdb_id.v3'
         kwargs['cache_combine_name'] = True
         return self._cache.use_cache(
             self._get_tmdb_id, tmdb_type=tmdb_type, imdb_id=imdb_id, tvdb_id=tvdb_id, query=query, year=year,
@@ -78,6 +79,7 @@ class TMDb(RequestAPI):
         elif query:
             if tmdb_type in ['movie', 'tv']:
                 query = query.split(' (', 1)[0]  # Scrub added (Year) or other cruft in parentheses () added by Addons or TVDb
+            query = quote_plus(query)
             if tmdb_type == 'tv':
                 request = func('search', tmdb_type, language=self.req_language, query=query, first_air_date_year=year)
             else:
@@ -411,9 +413,12 @@ class TMDb(RequestAPI):
             items.append({'next_page': try_int(page, fallback=1) + 1})
         return items
 
-    def get_search_list(self, tmdb_type, **kwargs):
+    def get_search_list(self, tmdb_type, query=None, **kwargs):
         """ standard kwargs: query= page= """
+        if not query:
+            return
         kwargs['key'] = 'results'
+        kwargs['query'] = quote_plus(query)
         return self.get_basic_list(u'search/{}'.format(tmdb_type), tmdb_type, **kwargs)
 
     def get_basic_list(self, path, tmdb_type, key='results', params=None, base_tmdb_type=None, **kwargs):
