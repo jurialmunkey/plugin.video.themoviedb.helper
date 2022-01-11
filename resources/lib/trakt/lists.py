@@ -174,6 +174,14 @@ class TraktLists():
             tmdb_id=item.get('params', {}).get('tmdb_id'),
             page=1)
 
+    def list_ondeck(self, page=None, **kwargs):
+        items = self.trakt_api.get_ondeck_list(page=page)
+        self.tmdb_cache_only = False
+        self.library = 'video'
+        self.container_content = 'episodes'
+        self.plugin_category = ADDON.getLocalizedString(32406)
+        return items
+
     def list_inprogress(self, info, tmdb_type, page=None, **kwargs):
         if tmdb_type == 'tv':
             items = self.trakt_api.get_inprogress_shows_list(

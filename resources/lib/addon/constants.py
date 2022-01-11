@@ -507,6 +507,9 @@ ROUTE_NO_ID = {
     'trakt_inprogress': {'route': {
         'lambda': lambda func, **kwargs: func(**kwargs),
         'getattr': 'list_inprogress'}},
+    'trakt_ondeck': {'route': {
+        'lambda': lambda func, **kwargs: func(**kwargs),
+        'getattr': 'list_ondeck'}},
     'trakt_towatch': {'route': {
         'lambda': lambda func, **kwargs: func(**kwargs),
         'getattr': 'list_towatch'}},

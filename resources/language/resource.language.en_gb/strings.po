@@ -2071,6 +2071,11 @@ msgctxt "#32405"
 msgid "Your TV Shows Airing This Week"
 msgstr ""
 
+#: /resources/lib/container/basedir.py
+msgctxt "#32406"
+msgid "Your In-Progress Episodes"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

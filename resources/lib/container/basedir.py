@@ -299,6 +299,12 @@ def _get_basedir_trakt():
             'sorting': True,
             'art': {'icon': u'{}/resources/icons/trakt/inprogress.png'.format(ADDONPATH)}},
         {
+            'label': ADDON.getLocalizedString(32406),
+            'types': ['tv'],
+            'params': {'info': 'trakt_ondeck'},
+            'path': PLUGINPATH,
+            'art': {'icon': u'{}/resources/icons/trakt/inprogress.png'.format(ADDONPATH)}},
+        {
             'label': u'{{item_type}}{{space}}{}'.format(ADDON.getLocalizedString(32078)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_towatch'},

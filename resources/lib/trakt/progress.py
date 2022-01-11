@@ -14,6 +14,16 @@ ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 class _TraktProgress():
     @is_authorized
+    def get_ondeck_list(self, page=1, limit=None):
+        limit = limit or self.item_limit
+        response = self._get_inprogress_episodes()
+        response = TraktItems(response, trakt_type='episode').configure_items(params_def={
+            'info': 'details', 'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}',
+            'season': '{season}', 'episode': '{number}'})
+        response = PaginatedItems(response['items'], page=page, limit=limit)
+        return response.items + response.next_page
+
+    @is_authorized
     def get_towatch_list(self, trakt_type, page=1, limit=None):
         limit = limit or self.item_limit
         items_ip = self._get_inprogress_shows() if trakt_type == 'show' else self._get_inprogress_movies()
@@ -32,6 +42,10 @@ class _TraktProgress():
 
     def _get_inprogress_movies(self):
         response = self.get_sync('playback', 'movie')
+        return [i for i in response if 5 <= try_int(i.get('progress', 0)) <= 95]
+
+    def _get_inprogress_episodes(self):
+        response = self.get_sync('playback', 'show')
         return [i for i in response if 5 <= try_int(i.get('progress', 0)) <= 95]
 
     @is_authorized
