@@ -20,7 +20,8 @@ class TraktLists():
         info_model = TRAKT_BASIC_LISTS.get(info)
         info_tmdb_type = info_model.get('tmdb_type') or tmdb_type
         trakt_type = convert_type(tmdb_type, 'trakt')
-        items = self.trakt_api.get_basic_list(
+        func = self.trakt_api.get_stacked_list if info_model.get('stacked') else self.trakt_api.get_basic_list
+        items = func(
             path=info_model.get('path', '').format(trakt_type=trakt_type, **kwargs),
             trakt_type=trakt_type,
             params=info_model.get('params'),

@@ -137,12 +137,21 @@ class _TraktLists():
             response = self.get_sorted_list(path, sort_by, sort_how, extended, cache_refresh=cache_refresh)
             response = PaginatedItems(items=response['items'], page=page, limit=limit).get_dict()
         else:  # Unsorted lists can be paginated by the API
-            response = self.get_simple_list(
-                path, extended=extended, page=page, limit=limit, trakt_type=trakt_type)
+            response = self.get_simple_list(path, extended=extended, page=page, limit=limit, trakt_type=trakt_type)
         if response:
             if randomise and len(response['items']) > limit:
                 items = random.sample(response['items'], limit)
                 return items
+            return response['items'] + pages.get_next_page(response['headers'])
+
+    @is_authorized
+    def get_stacked_list(self, path, trakt_type, page=1, limit=20, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, tvshow=True, **kwargs):
+        """ Get Basic list but stack repeat TV Shows """
+        cache_refresh = True if try_int(page, fallback=1) == 1 else False
+        response = self.get_simple_list(path, extended=extended, limit=4095, trakt_type=trakt_type, cache_refresh=cache_refresh)
+        response['items'] = self._stack_calendar_episodes(response['items'], tvshow=tvshow)
+        response = PaginatedItems(items=response['items'], page=page, limit=limit).get_dict()
+        if response:
             return response['items'] + pages.get_next_page(response['headers'])
 
     def get_custom_list(self, list_slug, user_slug=None, page=1, limit=20, params=None, authorize=False, sort_by=None, sort_how=None, extended=None, owner=False):

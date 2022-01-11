@@ -276,17 +276,21 @@ class _TraktProgress():
             return False
         return True
 
-    def _get_stacked_item(self, next_item, last_item):
+    def _get_stacked_item(self, next_item, last_item, tvshow=False):
         # If the next item is the same show then we stack the details onto the last item and add it next iteration
         ip = last_item['infoproperties']
 
+        if tvshow:  # Quick stack for tvshows
+            ip['stacked_count'] = ip.get('stacked_count', 0) + 1
+            return last_item
+
         # First time setup
         if not ip.get('stacked_count'):
+            ip['stacked_count'] = 1
             ti = last_item['infolabels']['title']
             se = '{season}x{episode:0>2}'.format(season=try_int(
                 last_item['infolabels']['season']), episode=try_int(last_item['infolabels']['episode']))
             ep = '{episode}. {label}'.format(episode=se, label=ti)
-            ip['stacked_count'] = 1
             ip['stacked_labels'] = ep
             ip['stacked_titles'] = ti
             ip['stacked_episodes'] = se
@@ -318,7 +322,7 @@ class _TraktProgress():
             final_ep=ip['stacked_last'])
         return last_item
 
-    def _stack_calendar_episodes(self, episode_list, flipped):
+    def _stack_calendar_episodes(self, episode_list, flipped=False, tvshow=False):
         items = []
         last_item = None
         for i in reversed(episode_list) if flipped else episode_list:
@@ -327,15 +331,17 @@ class _TraktProgress():
                 continue
 
             # If the next item is a different show or day then we stop stacking and add the item
-            if (
-                    last_item['infolabels']['tvshowtitle'] != i['infolabels']['tvshowtitle']
-                    or last_item['infolabels']['premiered'] != i['infolabels']['premiered']
-            ):
+            if tvshow:
+                cond = last_item['infolabels']['title'] != i['infolabels']['title']
+            else:
+                cond = last_item['infolabels']['tvshowtitle'] != i['infolabels']['tvshowtitle']
+                cond = cond or last_item['infolabels']['premiered'] != i['infolabels']['premiered']
+            if cond:
                 items.append(last_item)
                 last_item = i
                 continue
 
-            last_item = self._get_stacked_item(i, last_item)
+            last_item = self._get_stacked_item(i, last_item, tvshow)
 
         else:  # The last item in the list won't be added in the for loop so do an extra action at the end to add it
             if last_item:
