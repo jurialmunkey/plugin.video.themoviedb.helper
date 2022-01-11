@@ -37,6 +37,11 @@ def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
     elif sort_by == 'random':
         random.shuffle(items)
         return items
+    elif sort_by == 'activity':
+        return sorted(
+            items,
+            key=lambda i: max(i.get('last_watched_at', ''), i.get('paused_at', ''), i.get('listed_at', '')),
+            reverse=reverse)
     return sorted(items, key=lambda i: i.get('listed_at', ''), reverse=True)
 
 

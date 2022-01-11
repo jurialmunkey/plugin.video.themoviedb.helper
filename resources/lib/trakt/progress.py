@@ -14,6 +14,27 @@ ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 class _TraktProgress():
     @is_authorized
+    def get_towatch_list(self, trakt_type, page=1, limit=None):
+        limit = limit or self.item_limit
+        items_ip = self._get_inprogress_shows() if trakt_type == 'show' else self._get_inprogress_movies()
+        items_wl = self.get_sync('watchlist', trakt_type)
+        response = TraktItems(items_ip + items_wl, trakt_type=trakt_type).build_items(sort_by='activity', sort_how='desc')
+        response = PaginatedItems(response['items'], page=page, limit=limit)
+        return response.items + response.next_page
+
+    @is_authorized
+    def get_inprogress_movies_list(self, page=1, limit=None, sort_by=None, sort_how=None):
+        limit = limit or self.item_limit
+        response = self._get_inprogress_movies()
+        response = TraktItems(response, trakt_type='movie').build_items(sort_by=sort_by, sort_how=sort_how)
+        response = PaginatedItems(response['items'], page=page, limit=limit)
+        return response.items + response.next_page
+
+    def _get_inprogress_movies(self):
+        response = self.get_sync('playback', 'movie')
+        return [i for i in response if 5 <= try_int(i.get('progress', 0)) <= 95]
+
+    @is_authorized
     def get_inprogress_shows_list(self, page=1, limit=None, params=None, next_page=True, sort_by=None, sort_how=None):
         limit = limit or self.item_limit
         response = self._get_upnext_episodes_list(sort_by_premiered=True) if sort_by == 'year' else self._get_inprogress_shows()
