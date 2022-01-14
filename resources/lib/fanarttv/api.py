@@ -69,13 +69,15 @@ class FanartTV(RequestAPI):
         """
         if not ftv_type or not ftv_id:
             return
-        return self.get_request(
+        request = self.get_request(
             ftv_type, ftv_id,
             cache_force=7,  # Force the cache to save a dummy dict for 7 days so that we don't bother requesting 404s multiple times
             cache_fallback={'dummy': None},
             cache_days=CACHE_EXTENDED,
             cache_only=self.cache_only,
             cache_refresh=self.cache_refresh)
+        if request and 'dummy' not in request:
+            return request
 
     def _get_artwork_type(self, ftv_id, ftv_type, artwork_type, get_lang=True):
         if not artwork_type:
