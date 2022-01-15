@@ -8,7 +8,7 @@ from resources.lib.files.downloader import Downloader
 from resources.lib.container.listitem import ListItem
 from resources.lib.addon.constants import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES
 from resources.lib.addon.parser import try_int
-from resources.lib.files.utils import use_pickle
+from resources.lib.files.utils import use_pickle, validify_filename
 from resources.lib.addon.constants import TMDB_GENRE_IDS
 from resources.lib.addon.window import get_property
 from resources.lib.addon.timedate import get_datetime_now, get_timedelta
@@ -52,6 +52,38 @@ class TMDb(RequestAPI):
             return '%2C'
         else:
             return False
+
+    def _get_tmdb_multisearch_validfy(self, query=None, validfy=True):
+        if not validfy or not query:
+            return query
+        return validify_filename(query.lower(), alphanum=True)
+
+    def _get_tmdb_multisearch(self, query=None, validfy=True, media_type=None, **kwargs):
+        if not query:
+            return
+        request = self.get_request_sc('search', 'multi', language=self.req_language, query=query)
+        request = request.get('results', [])
+        if not request:
+            return
+        query = self._get_tmdb_multisearch_validfy(query, validfy=validfy)
+        for i in request:
+            if media_type and i.get('media_type') != media_type:
+                continue
+            if query == self._get_tmdb_multisearch_validfy(i.get('name', ''), validfy=validfy):
+                return i
+            if query == self._get_tmdb_multisearch_validfy(i.get('title', ''), validfy=validfy):
+                return i
+            if query == self._get_tmdb_multisearch_validfy(i.get('original_name', ''), validfy=validfy):
+                return i
+            if query == self._get_tmdb_multisearch_validfy(i.get('original_title', ''), validfy=validfy):
+                return i
+
+    def get_tmdb_multisearch(self, query=None, validfy=True, media_type=None, **kwargs):
+        kwargs['cache_days'] = CACHE_SHORT
+        kwargs['cache_name'] = 'TMDb.get_tmdb_multisearch.v1'
+        kwargs['cache_combine_name'] = True
+        return self._cache.use_cache(
+            self._get_tmdb_multisearch, query=query, validfy=validfy, media_type=media_type, **kwargs)
 
     def get_tmdb_id(self, tmdb_type=None, imdb_id=None, tvdb_id=None, query=None, year=None, episode_year=None, raw_data=False, **kwargs):
         if not tmdb_type:

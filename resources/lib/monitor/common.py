@@ -136,9 +136,13 @@ class CommonMonitorFunctions(object):
             self.set_indexed_properties(item.get('infoproperties', {}))
 
     @try_except_log('lib.monitor.common get_tmdb_id')
-    def get_tmdb_id(self, tmdb_type, imdb_id=None, query=None, year=None, episode_year=None):
+    def get_tmdb_id(self, tmdb_type, imdb_id=None, query=None, year=None, episode_year=None, media_type=None):
         if imdb_id and imdb_id.startswith('tt'):
             return self.tmdb_api.get_tmdb_id(tmdb_type=tmdb_type, imdb_id=imdb_id)
+        if tmdb_type == 'multi':
+            multi_i = self.tmdb_api.get_tmdb_multisearch(query=query, media_type=media_type) or {}
+            self.multisearch_tmdbtype = multi_i.get('media_type')
+            return multi_i.get('id')
         return self.tmdb_api.get_tmdb_id(tmdb_type=tmdb_type, query=query, year=year, episode_year=episode_year)
 
     def get_fanarttv_artwork(self, item, tmdb_type=None, tmdb_id=None, tvdb_id=None):

@@ -4,7 +4,7 @@ from resources.lib.kodi.rpc import get_person_stats
 from resources.lib.addon.window import get_property
 from resources.lib.monitor.common import CommonMonitorFunctions, SETMAIN_ARTWORK, SETPROP_RATINGS
 from resources.lib.monitor.images import ImageFunctions
-from resources.lib.addon.plugin import convert_media_type
+from resources.lib.addon.plugin import convert_media_type, convert_type
 from resources.lib.addon.decorators import try_except_log
 from threading import Thread
 
@@ -76,18 +76,22 @@ class ListItemMonitor(CommonMonitorFunctions):
     def get_dbtype(self):
         if self.get_infolabel('Property(tmdb_type)') == 'person':
             return 'actors'
-        elif xbmc.getCondVisibility(
-                "Window.IsVisible(DialogPVRInfo.xml) | "
-                "Window.IsVisible(MyPVRChannels.xml) | "
-                "Window.IsVisible(MyPVRGuide.xml)"):
-            return 'tvshows'
         dbtype = self.get_infolabel('dbtype')
-        if not dbtype and self.container == 'Container.':
-            return xbmc.getInfoLabel('Container.Content()') or ''
+        if not dbtype:
+            if xbmc.getCondVisibility(
+                    "Window.IsVisible(DialogPVRInfo.xml) | "
+                    "Window.IsVisible(MyPVRChannels.xml) | "
+                    "Window.IsVisible(MyPVRGuide.xml)"):
+                return 'multi'
+            if self.container == 'Container.':
+                return xbmc.getInfoLabel('Container.Content()') or ''
         return u'{0}s'.format(dbtype) if dbtype else ''
 
     def get_tmdb_type(self, dbtype=None):
-        return convert_media_type(dbtype or self.dbtype, 'tmdb', strip_plural=True, parent_type=True)
+        dbtype = dbtype or self.dbtype
+        if dbtype == 'multi':
+            return 'multi'
+        return convert_media_type(dbtype, 'tmdb', strip_plural=True, parent_type=True)
 
     def set_cur_item(self):
         self.dbtype = self.get_dbtype()
@@ -261,12 +265,17 @@ class ListItemMonitor(CommonMonitorFunctions):
         self.clear_property_list(SETPROP_RATINGS)
 
         # Get TMDb Details
+        self.multisearch_tmdbtype = None
         tmdb_id = self.get_tmdb_id(
             tmdb_type=tmdb_type,
             query=self.query,
             imdb_id=self.imdb_id if not self.season else None,  # Skip IMDb ID for seasons/episodes as we can't distinguish if the ID is for the episode or the show.
             year=self.year if tmdb_type == 'movie' else None,
-            episode_year=self.year if tmdb_type == 'tv' else None)
+            episode_year=self.year if tmdb_type == 'tv' else None,
+            media_type='tv' if tmdb_type == 'multi' and (self.get_infolabel('episode') or self.get_infolabel('season')) else None)
+        if tmdb_type == 'multi':
+            tmdb_type = self.multisearch_tmdbtype
+            self.dbtype = convert_type(tmdb_type, 'dbtype')
         details = self.tmdb_api.get_details(tmdb_type, tmdb_id, self.season, self.episode)
         if not details:
             self.clear_properties()
