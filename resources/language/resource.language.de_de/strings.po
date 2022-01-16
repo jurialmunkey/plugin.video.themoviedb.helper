@@ -447,7 +447,7 @@ msgstr "Bibliothek automatisch aktualisieren und neue/fehlende Folgen hinzufüge
 #: /resources/settings.xml
 msgctxt "#32087"
 msgid "Use resolvedURL method for suppressing strm next playlist error"
-msgstr "Verwendene die Methode resolvedURL$COMMA um den Fehler "Strm Next Playlist" zu unterdrücken"
+msgstr "Verwendene die Methode resolvedURL$COMMA um den Fehler Strm Next Playlist zu unterdrücken"
 
 #: /resources/settings.xml
 msgctxt "#32088"
