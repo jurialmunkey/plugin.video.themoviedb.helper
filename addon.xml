@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.themoviedb.helper"
-version="4.4.70"
+version="4.5.0"
 name="TheMovieDb Helper"
 provider-name="jurialmunkey">
 <requires>
@@ -68,6 +68,25 @@ provider-name="jurialmunkey">
     <screenshot>resources/screenshot-01.jpg</screenshot>
     <screenshot>resources/screenshot-02.jpg</screenshot>
   </assets>
-  <news>Add some additional dbid checking based on title/year combo</news>
+<news>
+  - Improved PVR service matching
+  - Avoid unnecessary FanartTV re-requests
+  - Add In-Progress Episodes Trakt list
+  - Add Still to Watch Trakt list (In-Progress+Watchlist)
+  - Allow stacking of episodes from same show in calendar
+  - Fix collection matching and query encoding
+  - Better list filtering options
+  - Add cacheonly=true param for faster dialog widget loading
+  - Add script getter/setter functions for audio/subs in player
+  - Allow larger sync list items per page limits
+  - Fix plugincategory labels
+  - Fix randomised lists not refreshing
+  - Fix string formatter for update to Py3.7 in 19.3
+  - Fix fallback players when asserted value not available
+  - Allow both mark as watched/unwatched in Trakt options
+  - Update branding and icons
+  - Add temporary service pause for custom dialogs via Window.Property(TMDbHelper.ServicePause)
+  - Artwork monitor fixes
+</news>
 </extension>
 </addon>
