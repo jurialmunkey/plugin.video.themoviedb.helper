@@ -210,6 +210,36 @@ class _TraktProgress():
         return self.get_sync('watched', 'movie', id_type).get(unique_id, {}).get('plays')
 
     @is_authorized
+    def get_movie_playprogress(self, unique_id, id_type):
+        return self.get_sync('playback', 'movie', id_type).get(unique_id, {}).get('progress')
+
+    @is_authorized
+    @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_LONG)
+    def _get_episode_playprogress(self, id_type):
+        sync_list = self.get_sync('playback', 'show')
+        if not sync_list:
+            return []
+        main_list = {}
+        for i in sync_list:
+            show_id = i.get('show', {}).get('ids', {}).get(id_type)
+            if not show_id:
+                continue
+            show_item = main_list.get(show_id) or i.get('show')
+            seasons = show_item.setdefault('seasons', {})
+            season = seasons.setdefault(i.get('episode', {}).get('season', 0), {})
+            season[i.get('episode', {}).get('number', 0)] = i
+            main_list[show_id] = show_item
+        return main_list
+
+    @is_authorized
+    @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_LONG)
+    def get_episode_playprogress(self, unique_id, id_type, season, episode):
+        season = try_int(season, fallback=-2)  # Make fallback -2 to prevent matching on 0
+        episode = try_int(episode, fallback=-2)  # Make fallback -2 to prevent matching on 0
+        return self._get_episode_playprogress(id_type).get(
+            unique_id, {}).get('seasons', {}).get(season, {}).get(episode, {}).get('progress')
+
+    @is_authorized
     @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_LONG)
     def get_episode_playcount(self, unique_id, id_type, season, episode):
         season = try_int(season, fallback=-2)  # Make fallback -2 to prevent matching on 0

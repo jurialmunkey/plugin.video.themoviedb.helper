@@ -103,6 +103,12 @@ def set_watched(dbid=None, dbtype=None, plays=1):
         params={db_key: dbid, "playcount": playcount})
 
 
+def set_playprogress(filename, position, total):
+    method = "Files.SetFileDetails"
+    params = {"file": filename, "media": "video", "resume": {"position": position, "total": total}}
+    return get_jsonrpc(method=method, params=params)
+
+
 def get_directory(url):
     method = "Files.GetDirectory"
     params = {

@@ -2076,6 +2076,11 @@ msgctxt "#32406"
 msgid "Your In-Progress Episodes"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32407"
+msgid "Get resume points from Trakt (increases load times)"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

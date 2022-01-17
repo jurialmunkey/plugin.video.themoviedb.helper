@@ -4,7 +4,7 @@ import xbmcplugin
 import xbmcaddon
 from threading import Thread
 from resources.lib.addon.constants import NO_LABEL_FORMATTING, RANDOMISED_TRAKT, RANDOMISED_LISTS, TRAKT_LIST_OF_LISTS, TMDB_BASIC_LISTS, TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, ROUTE_NO_ID, ROUTE_TMDB_ID
-from resources.lib.kodi.rpc import get_kodi_library, get_movie_details, get_tvshow_details, get_episode_details, get_season_details
+from resources.lib.kodi.rpc import get_kodi_library, get_movie_details, get_tvshow_details, get_episode_details, get_season_details, set_playprogress
 from resources.lib.addon.plugin import convert_type, reconfigure_legacy_params
 from resources.lib.script.router import related_lists
 from resources.lib.container.listitem import ListItem
@@ -56,6 +56,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.hide_watched = ADDON.getSettingBool('widgets_hidewatched') if self.is_widget else False
         self.flatten_seasons = ADDON.getSettingBool('flatten_seasons')
         self.trakt_watchedindicators = ADDON.getSettingBool('trakt_watchedindicators')
+        self.trakt_playprogress = ADDON.getSettingBool('trakt_playprogress')
         self.cache_only = self.params.pop('cacheonly', '').lower()
         self.ftv_forced_lookup = self.params.pop('fanarttv', '').lower()
         self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only())  # Set after ftv_forced_lookup, is_widget, cache_only
@@ -152,6 +153,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
                 li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb otherwise Kodi overrides after item is created
             if li.next_page:
                 li.params['plugin_category'] = self.plugin_category
+            self.set_playprogress_from_trakt(li)
             xbmcplugin.addDirectoryItem(
                 handle=self.handle,
                 url=li.get_url(),
@@ -218,6 +220,30 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         if li.infolabels.get('mediatype') in ['season', 'episode']:
             artwork = {u'tvshow.{}'.format(k): v for k, v in artwork.items() if v}
         return {'art': artwork}
+
+    def _set_playprogress_from_trakt(self, li):
+        if li.infolabels.get('mediatype') == 'movie':
+            return self.trakt_api.get_movie_playprogress(
+                id_type='tmdb',
+                unique_id=try_int(li.unique_ids.get('tmdb')))
+        return self.trakt_api.get_episode_playprogress(
+            id_type='tmdb',
+            unique_id=try_int(li.unique_ids.get('tmdb')),
+            season=li.infolabels.get('season'),
+            episode=li.infolabels.get('episode'))
+
+    def set_playprogress_from_trakt(self, li):
+        if not self.trakt_playprogress:
+            return
+        if li.infolabels.get('mediatype') not in ['movie', 'episode']:
+            return
+        duration = li.infolabels.get('duration')
+        if not duration:
+            return
+        progress = self._set_playprogress_from_trakt(li)
+        if not progress:
+            return
+        set_playprogress(li.get_url(), duration * progress / 100, duration)
 
     def get_playcount_from_trakt(self, li):
         if not self.trakt_watchedindicators:

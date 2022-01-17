@@ -59,6 +59,7 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32011]" type="text" id="trakt_token" default="" visible="False"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32169]" type="action" visible="!eq(-1,)" action="RunScript(plugin.video.themoviedb.helper,revoke_trakt)" option="close" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32034]" type="bool" id="trakt_watchedindicators" default="false" subsetting="true"/>
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32407]" type="bool" id="trakt_playprogress" default="false" subsetting="true"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32346]" type="bool" id="trakt_localhack" default="false" subsetting="true"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32403]" type="bool" id="trakt_expandedlimit" default="false" subsetting="true"/>
     </category>
