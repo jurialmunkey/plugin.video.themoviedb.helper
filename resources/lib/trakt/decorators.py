@@ -38,7 +38,7 @@ def use_lastupdated_cache(cache, func, *args, **kwargs):
     return response
 
 
-def use_activity_cache(activity_type=None, activity_key=None, cache_days=None, pickle_object=False, allow_fallback=False):
+def use_activity_cache(activity_type=None, activity_key=None, cache_days=None, pickle_object=False):
     """
     Decorator to cache and refresh if last activity changes
     Optionally can pickle instead of cache if necessary (useful for large objects like sync lists)
@@ -49,6 +49,7 @@ def use_activity_cache(activity_type=None, activity_key=None, cache_days=None, p
             if not self.authorize():
                 return
 
+            allow_fallback = kwargs.pop('allow_fallback', False)
             decorator_cache_refresh = kwargs.pop('decorator_cache_refresh', None)
 
             # Setup getter/setter cache funcs

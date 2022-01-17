@@ -312,17 +312,17 @@ class _TraktSync():
             self.last_activities = self.get_response_json('sync/last_activities')
         return self._get_activity_timestamp(self.last_activities, activity_type=activity_type, activity_key=activity_key)
 
-    @use_activity_cache(cache_days=CACHE_SHORT, pickle_object=False, allow_fallback=True)
-    def _get_sync_response(self, path, extended=None):
+    @use_activity_cache(cache_days=CACHE_SHORT, pickle_object=False)
+    def _get_sync_response(self, path, extended=None, allow_fallback=False):
         """ Quick sub-cache routine to avoid recalling full sync list if we also want to quicklist it """
         sync_name = u'sync_response.{}.{}'.format(path, extended)
         self.sync[sync_name] = self.sync.get(sync_name) or self.get_response_json(path, extended=extended)
         return self.sync[sync_name]
 
     @is_authorized
-    def _get_sync(self, path, trakt_type, id_type=None, extended=None):
+    def _get_sync(self, path, trakt_type, id_type=None, extended=None, allow_fallback=False):
         """ Get sync list """
-        response = self._get_sync_response(path, extended=extended)
+        response = self._get_sync_response(path, extended=extended, allow_fallback=allow_fallback)
         if not id_type:
             return response
         if response and trakt_type:
@@ -351,12 +351,12 @@ class _TraktSync():
 
     @use_activity_cache('movies', 'watched_at', CACHE_LONG, pickle_object=False)
     def get_sync_watched_movies(self, trakt_type, id_type=None):
-        return self._get_sync('sync/watched/movies', 'movie', id_type=id_type)
+        return self._get_sync('sync/watched/movies', 'movie', id_type=id_type, allow_fallback=True)
 
     # Watched shows sync uses short cache as needed for progress checks and new episodes might air tomorrow
     @use_activity_cache('episodes', 'watched_at', CACHE_SHORT, pickle_object=False)
     def get_sync_watched_shows(self, trakt_type, id_type=None):
-        return self._get_sync('sync/watched/shows', 'show', id_type=id_type, extended='full')
+        return self._get_sync('sync/watched/shows', 'show', id_type=id_type, extended='full', allow_fallback=True)
 
     @use_activity_cache('movies', 'collected_at', CACHE_LONG, pickle_object=False)
     def get_sync_collection_movies(self, trakt_type, id_type=None):
@@ -366,11 +366,11 @@ class _TraktSync():
     def get_sync_collection_shows(self, trakt_type, id_type=None):
         return self._get_sync('sync/collection/shows', trakt_type, id_type=id_type)
 
-    @use_activity_cache('movies', None, CACHE_LONG, pickle_object=False)
+    @use_activity_cache('movies', 'paused_at', CACHE_LONG, pickle_object=False)
     def get_sync_playback_movies(self, trakt_type, id_type=None):
         return self._get_sync('sync/playback/movies', 'movie', id_type=id_type)
 
-    @use_activity_cache('episodes', None, CACHE_LONG, pickle_object=False)
+    @use_activity_cache('episodes', 'paused_at', CACHE_LONG, pickle_object=False)
     def get_sync_playback_shows(self, trakt_type, id_type=None):
         return self._get_sync('sync/playback/episodes', trakt_type, id_type=id_type)
 
