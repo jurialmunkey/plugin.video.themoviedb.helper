@@ -2016,31 +2016,6 @@ msgctxt "#32394"
 msgid "Quick Update"
 msgstr ""
 
-#: /addon.xml
-msgctxt "#32395"
-msgid "Refresh Blur"
-msgstr ""
-
-#: /resources/lib/script/router.py
-msgctxt "#32396"
-msgid "Blur image window property empty"
-msgstr ""
-
-#: /resources/lib/script/router.py
-msgctxt "#32397"
-msgid "Texture cache entry missing for blurred image"
-msgstr ""
-
-#: /resources/lib/script/router.py
-msgctxt "#32398"
-msgid "Deleted Cached Images"
-msgstr ""
-
-#: /resources/lib/script/router.py
-msgctxt "#32399"
-msgid "Failed to delete file!\\n{}"
-msgstr ""
-
 #: /resources/settings.xml
 msgctxt "#32400"
 msgid "Play local Kodi library files"
