@@ -1,3 +1,4 @@
+import xbmc
 import xbmcgui
 import xbmcaddon
 import xml.etree.ElementTree as ET
@@ -51,7 +52,7 @@ class RequestAPI(object):
         self.req_api_key = req_api_key or ''
         self.req_api_name = req_api_name or ''
         self.req_timeout_err_prop = u'TimeOutError.{}'.format(self.req_api_name)
-        self.req_timeout_err = get_property(self.req_timeout_err_prop, is_type=float) or 0
+        self.req_timeout_err = 0  # Only check last timeout on timeout since we only want to suppress when multiple
         self.req_connect_err_prop = u'ConnectionError.{}'.format(self.req_api_name)
         self.req_connect_err = get_property(self.req_connect_err_prop, is_type=float) or 0
         self.req_500_err_prop = u'500Error.{}'.format(self.req_api_name)
@@ -70,9 +71,30 @@ class RequestAPI(object):
             return request.json()
         return {}
 
-    def connection_error(self, err, wait_time=30, msg_affix=''):
+    def nointernet_err(self, err, log_time=900):
+        # Check Kodi internet status to confirm network is down
+        if xbmc.getCondVisibility("System.InternetState"):
+            return
+
+        # Get the last error timestamp
+        err_prop = u'NoInternetError.{}'.format(self.req_api_name)
+        last_err = get_property(err_prop, is_type=float) or 0
+
+        # Only log error and notify user if it hasn't happened in last {log_time} seconds to avoid log/gui spam
+        if not get_timestamp(last_err):
+            xbmcgui.Dialog().notification(ADDON.getLocalizedString(32308).format(self.req_api_name), xbmc.getLocalizedString(13297))
+            kodi_log(u'ConnectionError: {}\n{}\nSuppressing retries.'.format(xbmc.getLocalizedString(13297), err), 1)
+
+        # Update our last error timestamp and return it
+        return get_property(err_prop, set_timestamp(log_time))
+
+    def connection_error(self, err, wait_time=30, msg_affix='', check_status=False):
         self.req_connect_err = set_timestamp(wait_time)
         get_property(self.req_connect_err_prop, self.req_connect_err)
+
+        if check_status and self.nointernet_err(err):
+            return
+
         kodi_log(u'ConnectionError: {} {}\nSuppressing retries for 30 seconds'.format(msg_affix, err), 1)
         xbmcgui.Dialog().notification(
             ADDON.getLocalizedString(32308).format(' '.join([self.req_api_name, msg_affix])),
@@ -92,6 +114,7 @@ class RequestAPI(object):
         e.g. if timeout limit is 10s then two timeouts within 30s trigger connection error
         """
         kodi_log(u'ConnectionTimeOut: {}'.format(err), 1)
+        self.req_timeout_err = self.req_timeout_err or get_property(self.req_timeout_err_prop, is_type=float) or 0
         if get_timestamp(self.req_timeout_err):
             self.connection_error(err, msg_affix='timeout')
         self.req_timeout_err = set_timestamp(self.timeout * 3)
@@ -108,7 +131,7 @@ class RequestAPI(object):
                 return requests.post(request, data=postdata, headers=headers, timeout=self.timeout)
             return requests.get(request, headers=headers, timeout=self.timeout)
         except requests.exceptions.ConnectionError as errc:
-            self.connection_error(errc)
+            self.connection_error(errc, check_status=True)
         except requests.exceptions.Timeout as errt:
             self.timeout_error(errt)
         except Exception as err:
