@@ -11,7 +11,7 @@ from resources.lib.kodi.library import add_to_library
 from resources.lib.kodi.userlist import monitor_userlist, library_autoupdate
 from resources.lib.kodi.rpc import get_jsonrpc
 from resources.lib.files.downloader import Downloader
-from resources.lib.files.utils import dumps_to_file, validify_filename
+from resources.lib.files.utils import dumps_to_file, validify_filename, read_file
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import reconfigure_legacy_params, kodi_log, format_folderpath, convert_type
 from resources.lib.addon.decorators import busy_dialog
@@ -111,14 +111,41 @@ def play_external(**kwargs):
 
 
 def play_using(play_using, mode='play', **kwargs):
-    url = xbmc.getInfoLabel('ListItem.FolderPath') or ''
-    params = parse_paramstring(url.replace('plugin://plugin.video.themoviedb.helper/?', ''))
-    if params.pop('info', None) in ['play', 'related']:
-        kwargs.update(params)
+    if 'tmdb_type' not in kwargs and not _update_from_listitem(kwargs):
+        return
     kwargs['mode'] = mode
     kwargs['player'] = play_using
     play_external(**kwargs)
 
+
+def _update_from_listitem(dictionary):
+    url = xbmc.getInfoLabel('ListItem.FileNameAndPath') or ''
+    if url[-5:] == '.strm':
+        url = read_file(url)
+    params = {}
+    if url.startswith('plugin://plugin.video.themoviedb.helper/?'):
+        params = parse_paramstring(url.replace('plugin://plugin.video.themoviedb.helper/?', ''))
+    if params.pop('info', None) in ['play', 'related']:
+        dictionary.update(params)
+    if dictionary.get('tmdb_type'):
+        return dictionary
+    dbtype = xbmc.getInfoLabel('ListItem.DBType')
+    if dbtype == 'movie':
+        dictionary['tmdb_type'] = 'movie'
+        dictionary['tmdb_id'] = xbmc.getInfoLabel('ListItem.UniqueId(tmdb)')
+        dictionary['imdb_id'] = xbmc.getInfoLabel('ListItem.UniqueId(imdb)')
+        dictionary['query'] = xbmc.getInfoLabel('ListItem.Title')
+        dictionary['year'] = xbmc.getInfoLabel('ListItem.Year')
+        if dictionary['tmdb_id'] or dictionary['imdb_id'] or dictionary['query']:
+            return dictionary
+    elif dbtype == 'episode':
+        dictionary['tmdb_type'] = 'tv'
+        dictionary['query'] = xbmc.getInfoLabel('ListItem.TVShowTitle')
+        dictionary['ep_year'] = xbmc.getInfoLabel('ListItem.Year')
+        dictionary['season'] = xbmc.getInfoLabel('ListItem.Season')
+        dictionary['episode'] = xbmc.getInfoLabel('ListItem.Episode')
+        if dictionary['query'] and dictionary['season'] and dictionary['episode']:
+            return dictionary
 
 # def add_to_queue(episodes, clear_playlist=False, play_next=False):
 #     if not episodes:
