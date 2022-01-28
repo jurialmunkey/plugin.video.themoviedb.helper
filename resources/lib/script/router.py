@@ -15,7 +15,7 @@ from resources.lib.files.utils import dumps_to_file, validify_filename
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import reconfigure_legacy_params, kodi_log, format_folderpath, convert_type
 from resources.lib.addon.decorators import busy_dialog
-from resources.lib.addon.parser import encode_url, try_int
+from resources.lib.addon.parser import encode_url, try_int, parse_paramstring
 from resources.lib.container.basedir import get_basedir_details
 from resources.lib.fanarttv.api import FanartTV
 from resources.lib.tmdb.api import TMDb
@@ -108,6 +108,16 @@ def delete_cache(delete_cache, **kwargs):
 def play_external(**kwargs):
     kodi_log(['lib.script.router - attempting to play\n', kwargs], 1)
     Players(**kwargs).play()
+
+
+def play_using(play_using, mode='play', **kwargs):
+    url = xbmc.getInfoLabel('ListItem.FolderPath') or ''
+    params = parse_paramstring(url.replace('plugin://plugin.video.themoviedb.helper/?', ''))
+    if params.pop('info', None) in ['play', 'related']:
+        kwargs.update(params)
+    kwargs['mode'] = mode
+    kwargs['player'] = play_using
+    play_external(**kwargs)
 
 
 # def add_to_queue(episodes, clear_playlist=False, play_next=False):
@@ -425,6 +435,7 @@ class Script(object):
         'log_request': lambda **kwargs: log_request(**kwargs),
         'delete_cache': lambda **kwargs: delete_cache(**kwargs),
         'play': lambda **kwargs: play_external(**kwargs),
+        'play_using': lambda **kwargs: play_using(**kwargs),
         'add_path': lambda **kwargs: WindowManager(**kwargs).router(),
         'add_query': lambda **kwargs: WindowManager(**kwargs).router(),
         'close_dialog': lambda **kwargs: WindowManager(**kwargs).router(),

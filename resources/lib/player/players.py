@@ -96,7 +96,7 @@ def resolve_to_dummy(handle=None, stop_after=1, delay_wait=0):
 
 
 class Players(object):
-    def __init__(self, tmdb_type, tmdb_id=None, season=None, episode=None, ignore_default=False, islocal=False, **kwargs):
+    def __init__(self, tmdb_type, tmdb_id=None, season=None, episode=None, ignore_default=False, islocal=False, player=None, mode=None, **kwargs):
         with ProgressDialog('TMDbHelper', u'{}...'.format(ADDON.getLocalizedString(32374)), total=3) as _p_dialog:
             self.api_language = None
             self.players = get_players_from_file()
@@ -110,7 +110,7 @@ class Players(object):
             self.dialog_players = self._get_players_for_dialog(tmdb_type)
 
             self.default_player = ADDON.getSettingString('default_player_movies') if tmdb_type == 'movie' else ADDON.getSettingString('default_player_episodes')
-            self.ignore_default = ignore_default
+            self.ignore_default = u'{} {}'.format(player, u'{}_{}'.format(mode or 'play', 'movie' if tmdb_type == 'movie' else 'episode')) if player else ignore_default or ''
             self.tmdb_type, self.tmdb_id, self.season, self.episode = tmdb_type, tmdb_id, season, episode
             self.dummy_duration = try_float(ADDON.getSettingString('dummy_duration')) or 1.0
             self.dummy_delay = try_float(ADDON.getSettingString('dummy_delay')) or 1.0
@@ -402,10 +402,10 @@ class Players(object):
     def get_default_player(self):
         """ Returns default player """
         if self.ignore_default:
-            return
-
-        # Check for local player if setting is enabled
-        if self.dialog_players[0].get('is_local') and ADDON.getSettingInt('default_player_kodi') == 1:
+            if self.ignore_default.lower() == 'true':
+                return
+            self.default_player = self.ignore_default
+        elif self.dialog_players[0].get('is_local') and ADDON.getSettingInt('default_player_kodi') == 1:
             player = self.dialog_players[0]
             player['idx'] = 0
             return player
