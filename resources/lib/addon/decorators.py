@@ -106,9 +106,9 @@ def timer_func(timer_name, log_threshold=0.001):
 
 
 class TimerList():
-    def __init__(self, list_obj, log_threshold=0.001, logging=True):
+    def __init__(self, dict_obj, list_name, log_threshold=0.001, logging=True):
         """ ContextManager for measuring time taken by code block """
-        self.list_obj = list_obj
+        self.list_obj = dict_obj.setdefault(list_name, [])
         self.log_threshold = log_threshold
         self.timer_a = timer() if logging else None
 
