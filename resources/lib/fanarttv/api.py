@@ -60,6 +60,7 @@ class FanartTV(RequestAPI):
         self.language = language[:2] if language else 'en'
         self.cache_only = cache_only
         self.cache_refresh = cache_refresh
+        self.quick_request = {}
         self.req_strip.append(('&client_key={}'.format(client_key), ''))
 
     def get_artwork_request(self, ftv_id, ftv_type):
@@ -69,13 +70,15 @@ class FanartTV(RequestAPI):
         """
         if not ftv_type or not ftv_id:
             return
-        request = self.get_request(
-            ftv_type, ftv_id,
-            cache_force=7,  # Force the cache to save a dummy dict for 7 days so that we don't bother requesting 404s multiple times
-            cache_fallback={'dummy': None},
-            cache_days=CACHE_EXTENDED,
-            cache_only=self.cache_only,
-            cache_refresh=self.cache_refresh)
+        request = self.quick_request.setdefault(ftv_type, {}).get(ftv_id)
+        if not request:
+            self.quick_request[ftv_type][ftv_id] = request = self.get_request(
+                ftv_type, ftv_id,
+                cache_force=7,  # Force the cache to save a dummy dict for 7 days so that we don't bother requesting 404s multiple times
+                cache_fallback={'dummy': None},
+                cache_days=CACHE_EXTENDED,
+                cache_only=self.cache_only,
+                cache_refresh=self.cache_refresh)
         if request and 'dummy' not in request:
             return request
 

@@ -1,9 +1,11 @@
 import xbmc
 import json
+import xbmcvfs
 from resources.lib.addon.plugin import kodi_log
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.setutils import find_dict_in_list
 from resources.lib.kodi.mapping import ItemMapper
+from resources.lib.addon.cache import BasicCache
 
 
 def get_jsonrpc(method=None, params=None):
@@ -172,6 +174,7 @@ def get_episode_details(dbid=None):
 class KodiLibrary(object):
     def __init__(self, dbtype=None, tvshowid=None, attempt_reconnect=False, logging=True):
         self.dbtype = dbtype
+        self._cache = BasicCache(filename='KodiLibrary.db')
         self.database = self._get_database(dbtype, tvshowid, attempt_reconnect)
 
     def _get_database(self, dbtype, tvshowid=None, attempt_reconnect=False, logging=True):
@@ -182,10 +185,16 @@ class KodiLibrary(object):
         return self.get_database(dbtype, tvshowid, attempt_reconnect)
 
     def get_database(self, dbtype, tvshowid=None, attempt_reconnect=False, logging=True):
+        cache_name = 'db.{}.{}'.format(dbtype, tvshowid)
+        cache_data = self._cache.get_cache(cache_name)
+        db_updated = xbmcvfs.Stat('special://database/MyVideos119.db').st_mtime() or -1
+        if cache_data and db_updated == cache_data.get('updated') and cache_data.get('database'):
+            return cache_data['database']
         retries = 5 if attempt_reconnect else 1
         while not xbmc.Monitor().abortRequested() and retries > 0:
             database = self._get_kodi_db(dbtype, tvshowid)
             if database:
+                self._cache.set_cache({'database': database, 'updated': db_updated}, cache_name, cache_days=1)
                 return database
             xbmc.Monitor().waitForAbort(1)
             retries -= 1
