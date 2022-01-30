@@ -101,7 +101,7 @@ def timer_func(timer_name):
     finally:
         timer_z = timer()
         total_time = timer_z - timer_a
-        if total_time > 0.05:
+        if total_time > 0.001:
             kodi_log(u'{}\n{:.3f} sec'.format(timer_name, total_time), 1)
 
 

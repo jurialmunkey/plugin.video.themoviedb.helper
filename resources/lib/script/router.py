@@ -27,6 +27,7 @@ from resources.lib.player.players import Players
 from resources.lib.player.configure import configure_players
 from resources.lib.monitor.images import ImageFunctions
 from resources.lib.container.listitem import ListItem
+from resources.lib.addon.decorators import timer_func
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
@@ -422,6 +423,22 @@ def sort_list(**kwargs):
     xbmc.executebuiltin(format_folderpath(encode_url(**kwargs)))
 
 
+def log_jsonrpc(**kwargs):
+    method = "VideoLibrary.GetMovies"
+    params = {
+        "properties": ["title", "imdbnumber", "originaltitle", "uniqueid", "year", "file"],
+        "sort": {"method": "year", "order": "descending"},
+        "filter": {"or": [
+            {"operator": "contains", "field": "title", "value": "Batman"},
+            {"operator": "contains", "field": "originaltitle", "value": "Batman"},
+        ]}
+    }
+    with timer_func('json_rpc'):
+        response = get_jsonrpc(method, params) or {}
+    xbmcgui.Dialog().ok('JSON_RPC Results', '{}'.format(response))
+    kodi_log(['JSONRPC:\n', response], 1)
+
+
 class Script(object):
     def __init__(self):
         self.params = {}
@@ -459,6 +476,7 @@ class Script(object):
         # 'play_season': lambda **kwargs: play_season(**kwargs),
         'play_media': lambda **kwargs: play_media(**kwargs),
         'run_plugin': lambda **kwargs: run_plugin(**kwargs),
+        'log_jsonrpc': lambda **kwargs: log_jsonrpc(**kwargs),
         'log_request': lambda **kwargs: log_request(**kwargs),
         'delete_cache': lambda **kwargs: delete_cache(**kwargs),
         'play': lambda **kwargs: play_external(**kwargs),
