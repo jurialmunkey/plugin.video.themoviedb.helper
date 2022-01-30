@@ -2017,6 +2017,11 @@ msgid "Quick Update"
 msgstr ""
 
 #: /resources/settings.xml
+msgctxt "#32395"
+msgid "Log timer reports for directories"
+msgstr ""
+
+#: /resources/settings.xml
 msgctxt "#32400"
 msgid "Play local Kodi library files"
 msgstr ""

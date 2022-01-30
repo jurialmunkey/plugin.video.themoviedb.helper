@@ -22,6 +22,7 @@ from resources.lib.tmdb.discover import UserDiscoverLists
 from resources.lib.api.mapping import set_show, get_empty_item
 from resources.lib.addon.parser import parse_paramstring, try_int
 from resources.lib.addon.setutils import split_items, random_from_list, merge_two_dicts
+from resources.lib.addon.decorators import TimerList, timer_func
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
@@ -48,6 +49,11 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.item_type = None
         self.kodi_db = None
         self.kodi_db_tv = {}
+        self.timer_lists = {
+            'get_list': [], ' - kodi_db': [], 'add_items': [],
+            'item_tmdb': [], 'item_ftv': [], 'item_kodi': [], 'item_trakt': [], 'item_build': [],
+            'total': []}
+        self.log_timers = ADDON.getSettingBool('timer_reports')
         self.library = None
         self.tmdb_api = TMDb()
         self.trakt_api = TraktAPI()
@@ -99,8 +105,10 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         return True
 
     def _add_item(self, x, li, cache_only=True, ftv_art=None):
-        li.set_details(details=self.get_tmdb_details(li, cache_only=cache_only))
-        li.set_details(details=ftv_art or self.get_ftv_artwork(li), reverse=True)
+        with TimerList(self.timer_lists['item_tmdb'], log_threshold=0.05, logging=self.log_timers):
+            li.set_details(details=self.get_tmdb_details(li, cache_only=cache_only))
+        with TimerList(self.timer_lists['item_ftv'], log_threshold=0.05, logging=self.log_timers):
+            li.set_details(details=ftv_art or self.get_ftv_artwork(li), reverse=True)
         self.items_queue[x] = li
 
     def add_items(self, items=None, pagination=True, parent_params=None, property_params=None, kodi_db=None, cache_only=True):
@@ -139,26 +147,29 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             li.set_episode_label()
             if check_is_aired and li.is_unaired(no_date=hide_nodate):
                 continue
-            li.set_details(details=self.get_kodi_details(li), reverse=True)  # Quick because local db
-            li.set_playcount(playcount=self.get_playcount_from_trakt(li))  # Quick because of agressive caching of Trakt object and pre-emptive dict comprehension
+            with TimerList(self.timer_lists['item_kodi'], log_threshold=0.05, logging=self.log_timers):
+                li.set_details(details=self.get_kodi_details(li), reverse=True)  # Quick because local db
+            with TimerList(self.timer_lists['item_trakt'], log_threshold=0.05, logging=self.log_timers):
+                li.set_playcount(playcount=self.get_playcount_from_trakt(li))  # Quick because of agressive caching of Trakt object and pre-emptive dict comprehension
             if self.hide_watched and try_int(li.infolabels.get('playcount')) != 0:
                 continue
-            li.set_context_menu()  # Set the context menu items
-            li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
-            li.set_thumb_to_art(self.thumb_override == 2) if self.thumb_override else None
-            li.set_params_reroute(self.ftv_forced_lookup, self.flatten_seasons, self.params.get('extended'), self.cache_only)  # Reroute details to proper end point
-            li.set_params_to_info(self.plugin_category)  # Set path params to properties for use in skins
-            li.infoproperties.update(property_params or {})
-            if self.thumb_override:
-                li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb otherwise Kodi overrides after item is created
-            if li.next_page:
-                li.params['plugin_category'] = self.plugin_category
-            self.set_playprogress_from_trakt(li)
-            xbmcplugin.addDirectoryItem(
-                handle=self.handle,
-                url=li.get_url(),
-                listitem=li.get_listitem(),
-                isFolder=li.is_folder)
+            with TimerList(self.timer_lists['item_build'], logging=self.log_timers):
+                li.set_context_menu()  # Set the context menu items
+                li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
+                li.set_thumb_to_art(self.thumb_override == 2) if self.thumb_override else None
+                li.set_params_reroute(self.ftv_forced_lookup, self.flatten_seasons, self.params.get('extended'), self.cache_only)  # Reroute details to proper end point
+                li.set_params_to_info(self.plugin_category)  # Set path params to properties for use in skins
+                li.infoproperties.update(property_params or {})
+                if self.thumb_override:
+                    li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb otherwise Kodi overrides after item is created
+                if li.next_page:
+                    li.params['plugin_category'] = self.plugin_category
+                self.set_playprogress_from_trakt(li)
+                xbmcplugin.addDirectoryItem(
+                    handle=self.handle,
+                    url=li.get_url(),
+                    listitem=li.get_listitem(),
+                    isFolder=li.is_folder)
 
     def set_params_to_container(self, **kwargs):
         params = {}
@@ -276,8 +287,9 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
                 season=li.infolabels.get('season'))
 
     def get_kodi_database(self, tmdb_type):
-        if ADDON.getSettingBool('local_db'):
-            return get_kodi_library(tmdb_type)
+        with TimerList(self.timer_lists[' - kodi_db'], logging=self.log_timers):
+            if ADDON.getSettingBool('local_db'):
+                return get_kodi_library(tmdb_type)
 
     def get_kodi_parent_dbid(self, li):
         if not self.kodi_db:
@@ -396,22 +408,42 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
 
         return self._get_items(route[info]['route'], **kwargs)
 
+    def log_timer_report(self):
+        timer_log = ['DIRECTORY TIMER REPORT\n', self.paramstring, '\n']
+        for k, v in self.timer_lists.items():
+            if k[:4] == 'item':
+                avg_time = u'{:7.3f} sec (Average) | {:3}'.format(sum(v) / len(v), len(v)) if v else '  None'
+                timer_log.append(' - {:12s}: {}\n'.format(k, avg_time))
+            else:
+                tot_time = u'{:7.3f} sec'.format(sum(v) / len(v)) if v else '  None'
+                timer_log.append('{:15s}: {}\n'.format(k, tot_time))
+        timer_log.append('------------------------------\n')
+        for k, v in self.timer_lists.items():
+            if v and k in ['item_tmdb', 'item_ftv']:
+                timer_log.append('\n{}:\n{}\n'.format(k, ' '.join([u'{:.3f} '.format(i) for i in v])))
+        kodi_log(timer_log, 1)
+
     def get_directory(self):
-        items = self.get_items(**self.params)
-        if not items:
-            return
-        self.plugin_category = self.params.get('plugin_category') or self.plugin_category
-        self.add_items(
-            items,
-            pagination=self.pagination,
-            parent_params=self.parent_params,
-            property_params=self.set_params_to_container(**self.params),
-            kodi_db=self.kodi_db,
-            cache_only=self.tmdb_cache_only)
-        self.finish_container(
-            update_listing=self.update_listing,
-            plugin_category=self.plugin_category,
-            container_content=self.container_content)
+        with TimerList(self.timer_lists['total'], logging=self.log_timers):
+            with TimerList(self.timer_lists['get_list'], logging=self.log_timers):
+                items = self.get_items(**self.params)
+            if not items:
+                return
+            self.plugin_category = self.params.get('plugin_category') or self.plugin_category
+            with TimerList(self.timer_lists['add_items'], logging=self.log_timers):
+                self.add_items(
+                    items,
+                    pagination=self.pagination,
+                    parent_params=self.parent_params,
+                    property_params=self.set_params_to_container(**self.params),
+                    kodi_db=self.kodi_db,
+                    cache_only=self.tmdb_cache_only)
+            self.finish_container(
+                update_listing=self.update_listing,
+                plugin_category=self.plugin_category,
+                container_content=self.container_content)
+        if self.log_timers:
+            self.log_timer_report()
         if self.container_update:
             xbmc.executebuiltin(u'Container.Update({})'.format(self.container_update))
         if self.container_refresh:

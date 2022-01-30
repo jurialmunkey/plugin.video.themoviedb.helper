@@ -94,15 +94,34 @@ def timer_report(func_name):
 
 
 @contextmanager
-def timer_func(timer_name):
+def timer_func(timer_name, log_threshold=0.001):
     timer_a = timer()
     try:
         yield
     finally:
         timer_z = timer()
         total_time = timer_z - timer_a
-        if total_time > 0.001:
+        if total_time > log_threshold:
             kodi_log(u'{}\n{:.3f} sec'.format(timer_name, total_time), 1)
+
+
+class TimerList():
+    def __init__(self, list_obj, log_threshold=0.001, logging=True):
+        """ ContextManager for measuring time taken by code block """
+        self.list_obj = list_obj
+        self.log_threshold = log_threshold
+        self.timer_a = timer() if logging else None
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        if not self.timer_a:
+            return
+        timer_z = timer()
+        total_time = timer_z - self.timer_a
+        if total_time > self.log_threshold:
+            self.list_obj.append(total_time)
 
 
 def log_output(func_name):
