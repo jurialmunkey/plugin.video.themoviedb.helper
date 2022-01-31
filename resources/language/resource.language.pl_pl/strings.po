@@ -17,10 +17,6 @@ msgstr ""
 "Language: pl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-msgctxt "#30100"
-msgid "Auto"
-msgstr ""
-
 msgctxt "#30000"
 msgid "Arabic (United Arab Emirates)"
 msgstr ""
