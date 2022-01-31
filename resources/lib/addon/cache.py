@@ -38,6 +38,12 @@ class BasicCache(object):
             self._cache.set(cache_name, my_object, cache_days=cache_days)
         return my_object
 
+    @try_except_log('lib.addon.cache del_cache')
+    def del_cache(self, cache_name):
+        self.ret_cache()
+        cache_name = get_pickle_name(cache_name or '')
+        self._cache.set(cache_name, None, cache_days=0)
+
     @try_except_log('lib.addon.cache use_cache')
     def use_cache(self, func, *args, **kwargs):
         """
