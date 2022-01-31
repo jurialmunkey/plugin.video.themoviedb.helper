@@ -132,6 +132,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             pool[x].start()
 
         # Wait to join threads in pool first before adding item to directory
+        all_items = []
         for x, i in enumerate(pool):
             if not i:
                 continue
@@ -141,6 +142,10 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
                 continue
             if not li.next_page and self.item_is_excluded(li):
                 continue
+            all_items.append(li)
+
+        # Final configuration before adding to directory
+        for li in all_items:
             li.set_episode_label()
             if check_is_aired and li.is_unaired(no_date=hide_nodate):
                 continue
@@ -410,8 +415,11 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         timer_log = ['DIRECTORY TIMER REPORT\n', self.paramstring, '\n']
         timer_log.append('------------------------------\n')
         for k, v in self.timer_lists.items():
-            if k[:4] == 'item':
-                avg_time = u'{:7.3f} sec (Average) | {:3}'.format(sum(v) / len(v), len(v)) if v else '  None'
+            if k in ['item_tmdb', 'item_ftv']:
+                avg_time = u'{:7.3f} sec avg | {:7.3f} sec max | {:3}'.format(sum(v) / len(v), max(v), len(v)) if v else '  None'
+                timer_log.append(' - {:12s}: {}\n'.format(k, avg_time))
+            elif k[:4] == 'item':
+                avg_time = u'{:7.3f} sec avg | {:7.3f} sec all | {:3}'.format(sum(v) / len(v), sum(v), len(v)) if v else '  None'
                 timer_log.append(' - {:12s}: {}\n'.format(k, avg_time))
             else:
                 tot_time = u'{:7.3f} sec'.format(sum(v) / len(v)) if v else '  None'

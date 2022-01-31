@@ -8,7 +8,7 @@ from resources.lib.addon.plugin import get_language
 from resources.lib.addon.setutils import del_empty_keys
 from resources.lib.addon.decorators import busy_dialog
 from resources.lib.addon.parser import try_int
-# from resources.lib.addon.decorators import timer_report
+# from resources.lib.addon.decorators import timer_func
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
@@ -82,26 +82,26 @@ class FanartTV(RequestAPI):
         if request and 'dummy' not in request:
             return request
 
-    def _get_artwork_type(self, ftv_id, ftv_type, artwork_type, get_lang=True):
+    def _get_artwork_type(self, ftv_id, ftv_type, artwork_type, get_lang=True, request=None):
         if not artwork_type:
             return
-        response = self.get_artwork_request(ftv_id, ftv_type)
+        response = request or self.get_artwork_request(ftv_id, ftv_type)
         if not response:
             return
         response = response.get(artwork_type) or []
         return response if get_lang else [i for i in response if i.get('lang') == '00' or not i.get('lang')]
 
-    def get_artwork_type(self, ftv_id, ftv_type, artwork_type, get_lang=True):
+    def get_artwork_type(self, ftv_id, ftv_type, artwork_type, get_lang=True, request=None):
         language = self.language if get_lang else '00'
         return self._cache.use_cache(
-            self._get_artwork_type, ftv_id, ftv_type, artwork_type, get_lang,
+            self._get_artwork_type, ftv_id, ftv_type, artwork_type, get_lang, request=request,
             cache_name=u'FanartTV.type.{}.{}.{}.{}'.format(language, ftv_id, ftv_type, artwork_type),
             cache_only=self.cache_only,
             cache_refresh=self.cache_refresh)
 
-    def _get_best_artwork(self, ftv_id, ftv_type, artwork_type, get_lang=True):
+    def _get_best_artwork(self, ftv_id, ftv_type, artwork_type, get_lang=True, request=None):
         language = self.language if get_lang else '00'
-        artwork = self.get_artwork_type(ftv_id, ftv_type, artwork_type, get_lang)
+        artwork = self.get_artwork_type(ftv_id, ftv_type, artwork_type, get_lang, request=request)
         best_like = -1
         best_item = None
         for i in artwork:
@@ -112,25 +112,22 @@ class FanartTV(RequestAPI):
                 best_like = i.get('likes', 0)
         return best_item
 
-    def get_best_artwork(self, ftv_id, ftv_type, artwork_type, get_lang=True):
+    def get_best_artwork(self, ftv_id, ftv_type, artwork_type, get_lang=True, request=None):
         language = self.language if get_lang else '00'
         return self._cache.use_cache(
-            self._get_best_artwork, ftv_id, ftv_type, artwork_type, get_lang,
+            self._get_best_artwork, ftv_id, ftv_type, artwork_type, get_lang, request=request,
             cache_name=u'FanartTV.best.{}.{}.{}.{}'.format(language, ftv_id, ftv_type, artwork_type),
             cache_only=self.cache_only,
             cache_refresh=self.cache_refresh)
 
-    def _get_artwork_func(self, ftv_id, ftv_type, artwork_type, get_list=False, get_lang=True):
-        func = self.get_best_artwork if not get_list else self.get_artwork_type
-        return func(ftv_id, ftv_type, artwork_type, get_lang)
-
     def get_all_artwork(self, ftv_id, ftv_type):
-        if not self.get_artwork_request(ftv_id, ftv_type):
+        request = self.get_artwork_request(ftv_id, ftv_type)
+        if not request:
             return  # Check we can get the request first so we don't re-ask eight times if it 404s
         artwork_types = ARTWORK_TYPES.get(ftv_type, {})
         all_artwork = del_empty_keys(
-            {i: self.get_artwork(ftv_id, ftv_type, i, get_lang=i not in NO_LANGUAGE) for i in artwork_types})
-        return add_extra_art(self.get_artwork(ftv_id, ftv_type, 'fanart', get_list=True), all_artwork)
+            {i: self.get_artwork(ftv_id, ftv_type, i, request=request, get_lang=i not in NO_LANGUAGE) for i in artwork_types})
+        return add_extra_art(self.get_artwork(ftv_id, ftv_type, 'fanart', get_list=True, request=request), all_artwork)
 
     def refresh_all_artwork(self, ftv_id, ftv_type, ok_dialog=True, container_refresh=True):
         self.cache_refresh = True
@@ -146,11 +143,14 @@ class FanartTV(RequestAPI):
             xbmc.executebuiltin('UpdateLibrary(video,/fake/path/to/force/refresh/on/home)')
         return artwork
 
-    def get_artwork(self, ftv_id, ftv_type, artwork_type, get_list=False, get_lang=True):
+    def get_artwork(self, ftv_id, ftv_type, artwork_type, get_list=False, get_lang=True, request=None):
         artwork_types = ARTWORK_TYPES.get(ftv_type, {}).get(artwork_type) or []
         artwork = None
+        func = self.get_best_artwork if not get_list else self.get_artwork_type
         for i in artwork_types:
-            artwork = artwork or self._get_artwork_func(ftv_id, ftv_type, i, get_list=get_list, get_lang=get_lang)
+            artwork = func(ftv_id, ftv_type, i, get_lang, request=request)
+            if artwork:
+                break
         return artwork
 
     def select_artwork(self, ftv_id, ftv_type, container_refresh=True, blacklist=[]):
