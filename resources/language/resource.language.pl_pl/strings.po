@@ -305,7 +305,7 @@ msgstr "pliki rozpakowane"
 #: /resources/lib/player.py
 msgctxt "#32061"
 msgid "Play with"
-msgstr " "
+msgstr "Odtwórz w"
 
 #: /resources/lib/context.py
 msgctxt "#32062"
