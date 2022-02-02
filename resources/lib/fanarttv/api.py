@@ -14,7 +14,7 @@ ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 API_URL = 'http://webservice.fanart.tv/v3'
-NO_LANGUAGE = ['keyart']
+NO_LANGUAGE = ['keyart', 'fanart']
 ARTWORK_TYPES = {
     'movies': {
         'clearart': ['hdmovieclearart', 'movieclearart'],
