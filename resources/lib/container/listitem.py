@@ -72,12 +72,10 @@ class _ListItem(object):
         self.is_folder = True
 
     def set_art_fallbacks(self):
-        if not self.art.get('poster'):
-            self.art['poster'] = self.art.get('icon') or u'{}/resources/icons/themoviedb/default.png'.format(ADDONPATH)
         if not self.art.get('fanart'):
             self.art['fanart'] = u'{}/fanart.jpg'.format(ADDONPATH)
         if not self.art.get('icon'):
-            self.art['icon'] = self.art['poster']
+            self.art['icon'] = self.art.get('poster') or u'{}/resources/icons/themoviedb/default.png'.format(ADDONPATH)
         return self.art
 
     def set_thumb_to_art(self, prefer_landscape=False):
