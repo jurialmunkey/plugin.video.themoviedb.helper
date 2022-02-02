@@ -107,7 +107,7 @@ class FanartTV(RequestAPI):
 
     def get_all_artwork(self, ftv_id, ftv_type):
         cache_name = u'FanartTV.allart.{}.{}'.format(ftv_id, ftv_type)
-        all_artwork = self._cache.get_cache(cache_name)
+        all_artwork = None if self.cache_refresh else self._cache.get_cache(cache_name)
         if all_artwork:
             return all_artwork
         request = self.get_artwork_request(ftv_id, ftv_type)
