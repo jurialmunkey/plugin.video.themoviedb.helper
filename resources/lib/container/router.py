@@ -143,7 +143,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             if not li.next_page and self.item_is_excluded(li):
                 continue
             all_items.append(li)
-
+        # TODO: Get trakt watched sync in thread beforehand and join here so ready - might save 0.5s
         # Final configuration before adding to directory
         for li in all_items:
             li.set_episode_label()

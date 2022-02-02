@@ -8,7 +8,6 @@ from resources.lib.addon.plugin import get_language
 from resources.lib.addon.setutils import del_empty_keys
 from resources.lib.addon.decorators import busy_dialog
 from resources.lib.addon.parser import try_int
-# from resources.lib.addon.decorators import timer_func
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
@@ -91,7 +90,7 @@ class FanartTV(RequestAPI):
         response = response.get(artwork_type) or []
         return response if get_lang else [i for i in response if not i.get('lang') or i['lang'] == '00']
 
-    def _get_best_artwork(self, ftv_id, ftv_type, artwork_type, get_lang=True, request=None):
+    def get_best_artwork(self, ftv_id, ftv_type, artwork_type, get_lang=True, request=None):
         language = self.language if get_lang else '00'
         artwork = self.get_artwork_type(ftv_id, ftv_type, artwork_type, get_lang, request=request)
         best_like = -1
@@ -105,14 +104,6 @@ class FanartTV(RequestAPI):
                 best_item = i.get('url', '')
                 best_like = i_like
         return best_item
-
-    def get_best_artwork(self, ftv_id, ftv_type, artwork_type, get_lang=True, request=None):
-        language = self.language if get_lang else '00'
-        return self._cache.use_cache(
-            self._get_best_artwork, ftv_id, ftv_type, artwork_type, get_lang, request=request,
-            cache_name=u'FanartTV.best.{}.{}.{}.{}'.format(language, ftv_id, ftv_type, artwork_type),
-            cache_only=self.cache_only,
-            cache_refresh=self.cache_refresh)
 
     def get_all_artwork(self, ftv_id, ftv_type):
         cache_name = u'FanartTV.allart.{}.{}'.format(ftv_id, ftv_type)
@@ -145,13 +136,11 @@ class FanartTV(RequestAPI):
 
     def get_artwork(self, ftv_id, ftv_type, artwork_type, get_list=False, get_lang=True, request=None):
         artwork_types = ARTWORK_TYPES.get(ftv_type, {}).get(artwork_type) or []
-        artwork = None
         func = self.get_best_artwork if not get_list else self.get_artwork_type
         for i in artwork_types:
             artwork = func(ftv_id, ftv_type, i, get_lang, request=request)
             if artwork:
-                break
-        return artwork
+                return artwork
 
     def select_artwork(self, ftv_id, ftv_type, container_refresh=True, blacklist=[]):
         if ftv_type not in ['movies', 'tv']:
@@ -188,15 +177,18 @@ class FanartTV(RequestAPI):
         if choice == -1:  # If user hits back go back to main menu rather than exit completely
             return self.select_artwork(ftv_id, ftv_type, container_refresh, blacklist)
 
-        # Cache our choice as the best artwork forever since it was selected manually
-        # Some types have have HD and SD variants so set cache for both
-        for i in ARTWORK_TYPES.get(ftv_type, {}).get(artwork_type, []):
-            success = self._cache.set_cache(
-                artwork_items[choice].get('url'),
-                cache_name=u'FanartTV.best.{}.{}.{}.{}'.format(self.language if get_lang else '00', ftv_id, ftv_type, i),
-                cache_days=10000)
-            self._cache.del_cache(u'FanartTV.allart.{}.{}'.format(ftv_id, ftv_type))  # Force all artwork cache to rebuild next lookiup
-        if success and container_refresh:
+        success = artwork_items[choice].get('url')
+        if not success:
+            return
+
+        # Cache our artwork forever since it was selected manually
+        all_art = self.get_all_artwork(ftv_id, ftv_type)
+        if not all_art:
+            return
+        all_art[artwork_type] = success
+        self._cache.set_cache(all_art, cache_name=u'FanartTV.allart.{}.{}'.format(ftv_id, ftv_type), cache_days=10000)
+
+        if container_refresh:
             xbmc.executebuiltin('Container.Refresh')
             xbmc.executebuiltin('UpdateLibrary(video,/fake/path/to/force/refresh/on/home)')
 
