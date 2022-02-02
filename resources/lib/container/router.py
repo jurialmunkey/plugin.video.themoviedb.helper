@@ -103,7 +103,9 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
 
     def _add_item(self, x, li, cache_only=True, ftv_art=None):
         with TimerList(self.timer_lists, 'item_tmdb', log_threshold=0.05, logging=self.log_timers):
-            li.set_details(details=self.get_tmdb_details(li, cache_only=cache_only))
+            details = self.get_tmdb_details(li, cache_only=cache_only) or {}
+            details['infoproperties'] = {}
+            li.set_details(details=details)
         with TimerList(self.timer_lists, 'item_ftv', log_threshold=0.05, logging=self.log_timers):
             li.set_details(details=ftv_art or self.get_ftv_artwork(li), reverse=True)
         self.items_queue[x] = li
