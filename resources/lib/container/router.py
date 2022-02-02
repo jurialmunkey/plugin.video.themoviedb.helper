@@ -122,6 +122,8 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
 
         # Build empty queue and thread pool
         self.items_queue, pool = [None] * len(items), [None] * len(items)
+        trakt_pre_sync = Thread(target=self.get_pre_trakt_sync, args=[self.container_content])
+        trakt_pre_sync.start()
 
         # Start item build threads
         for x, i in enumerate(items):
@@ -133,6 +135,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
 
         # Wait to join threads in pool first before adding item to directory
         all_items = []
+        trakt_pre_sync.join()
         for x, i in enumerate(pool):
             if not i:
                 continue
@@ -143,7 +146,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             if not li.next_page and self.item_is_excluded(li):
                 continue
             all_items.append(li)
-        # TODO: Get trakt watched sync in thread beforehand and join here so ready - might save 0.5s
+
         # Final configuration before adding to directory
         for li in all_items:
             li.set_episode_label()
@@ -256,7 +259,17 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         progress = self._set_playprogress_from_trakt(li)
         if not progress:
             return
-        set_playprogress(li.get_url(), duration * progress / 100, duration)
+        set_playprogress(li.get_url(), int(duration * progress // 100), duration)
+
+    def get_pre_trakt_sync(self, container_content=None):
+        if not self.trakt_watchedindicators:
+            return
+        if container_content == 'movies':
+            self.trakt_api.get_sync('watched', 'movie', 'tmdb')
+            return
+        if container_content in ['tvshows', 'seasons', 'episodes']:
+            self.trakt_api.get_sync('watched', 'show', 'tmdb')
+            return
 
     def get_playcount_from_trakt(self, li):
         if not self.trakt_watchedindicators:
