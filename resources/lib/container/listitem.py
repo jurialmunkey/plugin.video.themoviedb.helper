@@ -73,7 +73,7 @@ class _ListItem(object):
 
     def set_art_fallbacks(self):
         if not self.art.get('fanart'):
-            self.art['fanart'] = u'{}/fanart.jpg'.format(ADDONPATH)
+            self.art['fanart'] = u'{}/resources/icons/themoviedb/fanart.jpg'.format(ADDONPATH)
         if not self.art.get('icon'):
             self.art['icon'] = self.art.get('poster') or u'{}/resources/icons/themoviedb/default.png'.format(ADDONPATH)
         return self.art
