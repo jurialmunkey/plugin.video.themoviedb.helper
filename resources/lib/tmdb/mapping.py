@@ -1,7 +1,7 @@
 import xbmcaddon
 from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type
 from resources.lib.addon.parser import try_int, try_float
-from resources.lib.addon.setutils import iter_props, dict_to_list, get_params
+from resources.lib.addon.setutils import ITER_PROPS_MAX, iter_props, dict_to_list, get_params
 from resources.lib.addon.timedate import format_date, age_difference
 from resources.lib.addon.constants import IMAGEPATH_ORIGINAL, IMAGEPATH_POSTER, TMDB_GENRE_IDS
 from resources.lib.api.mapping import UPDATE_BASEKEY, _ItemMapper, get_empty_item
@@ -271,12 +271,14 @@ def get_crew_properties(v):
         if not i.get('name'):
             continue
         x += 1
-        infoproperties.update(set_crew_properties(i, x, 'Crew'))
+        if x <= ITER_PROPS_MAX:
+            infoproperties.update(set_crew_properties(i, x, 'Crew'))
         if i.get('department') not in department_map:
             continue
         dm = department_map[i['department']]
         dm['x'] += 1
-        infoproperties.update(set_crew_properties(i, dm['x'], dm['name']))
+        if dm['x'] <= ITER_PROPS_MAX:
+            infoproperties.update(set_crew_properties(i, dm['x'], dm['name']))
     return infoproperties
 
 
@@ -635,9 +637,10 @@ class ItemMapper(_ItemMapper):
             i = cast_dict[i]
             if not i or not i['name']:
                 continue
-            p = u'{}.{}.'.format('Cast', x)
-            for j in [('name', 'Name'), ('role', 'Role'), ('thumbnail', 'Thumb')]:
-                item['infoproperties'][u'{}{}'.format(p, j[1])] = i.get(j[0], '')
+            if x <= ITER_PROPS_MAX:
+                p = u'{}.{}.'.format('Cast', x)
+                for j in [('name', 'Name'), ('role', 'Role'), ('thumbnail', 'Thumb')]:
+                    item['infoproperties'][u'{}{}'.format(p, j[1])] = i.get(j[0], '')
             cast_prop.append(i['name'])
             cast_list.append(i)
         item['infoproperties']['cast'] = " / ".join(cast_prop)
