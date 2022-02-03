@@ -245,12 +245,12 @@ msgstr "Dodaj do kolekcji serwisu Trakt"
 #: /resources/lib/container.py
 msgctxt "#32049"
 msgid "Remove from Trakt Watchlist"
-msgstr "Usuń z Trakt z listy "do obejrzenia""
+msgstr "Usuń z Trakt z listy 'do obejrzenia'"
 
 #: /resources/lib/container.py
 msgctxt "#32050"
 msgid "Add to Trakt Watchlist"
-msgstr "Dodaj do Trakt do listy "do obejrzenia""
+msgstr "Dodaj do Trakt do listy 'do obejrzenia'"
 
 #: /resources/lib/container.py
 msgctxt "#32051"
@@ -260,7 +260,7 @@ msgstr "Usuń z historii oglądanej w serwisie Trakt"
 #: /resources/lib/container.py
 msgctxt "#32052"
 msgid "Add to Trakt Watched History"
-msgstr "Dodaj do historii "obejrzane" w serwisie Trakt"
+msgstr "Dodaj do historii 'obejrzane' w serwisie Trakt"
 
 #: /resources/lib/container.py
 msgctxt "#32053"
