@@ -233,6 +233,8 @@ class TMDb(RequestAPI):
         if not request or not request.get('groups'):
             return []
         base_item = self.get_details('tv', tmdb_id)
+        base_item.get('infolabels', {}).pop('season', None)
+        base_item.get('infolabels', {}).pop('episode', None)
         eps_group = request.get('groups', [])[try_int(position)] or {}
         return [
             self.mapper.get_info(i, 'episode', base_item, definition=TMDB_PARAMS_EPISODES, tmdb_id=tmdb_id)
@@ -243,6 +245,8 @@ class TMDb(RequestAPI):
         if not request or not request.get('groups'):
             return []
         base_item = self.get_details('tv', tmdb_id)
+        base_item.get('infolabels', {}).pop('season', None)
+        base_item.get('infolabels', {}).pop('episode', None)
         items = [
             self.mapper.get_info(i, 'season', base_item, tmdb_id=tmdb_id, definition={
                 'info': 'episode_group_episodes', 'tmdb_type': 'tv', 'tmdb_id': tmdb_id, 'group_id': group_id, 'position': str(x)})

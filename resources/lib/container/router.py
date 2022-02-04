@@ -243,7 +243,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         artwork['art']['fanart'] = artwork['art'].get('tvshow.fanart')
 
         # Only get season artwork for "real" seasons and episodes. Skip special tmdbhelper season folders.
-        if not self.ftv_merge_season or li.params.get('info') in ['episode_groups', 'trakt_upnext']:
+        if not self.ftv_merge_season or li.params.get('info') in ['episode_groups', 'trakt_upnext', 'episode_group_episodes']:
             return artwork
         season_artwork = self.ftv_api.get_all_artwork(li.get_ftv_id(), li.get_ftv_type(), li.infolabels.get('season'))
 
