@@ -447,7 +447,9 @@ TRAKT_LIST_OF_LISTS = {
 CONTEXT_MENU_ITEMS = {
     'tmdbhelper.context.artwork': {
         'movie': {'ftv_type': 'movies', 'ftv_id': '{ftv_id}'},
-        'tvshow': {'ftv_type': 'tv', 'ftv_id': '{ftv_id}'}
+        'tvshow': {'ftv_type': 'tv', 'ftv_id': '{ftv_id}'},
+        'season': {'ftv_type': 'tv', 'ftv_id': '{ftv_id}', 'season': '{season}'},
+        'episode': {'ftv_type': 'tv', 'ftv_id': '{ftv_id}', 'season': '{season}'}
     },
     'tmdbhelper.context.refresh': {
         'episode': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}', 'episode': '{episode}'},

@@ -199,14 +199,14 @@ def _get_ftv_id(**kwargs):
     return ListItem(**details).get_ftv_id()
 
 
-def manage_artwork(ftv_id=None, ftv_type=None, **kwargs):
+def manage_artwork(ftv_id=None, ftv_type=None, season=None, **kwargs):
     if not ftv_type:
         return
     if not ftv_id:
         ftv_id = _get_ftv_id(**kwargs)
     if not ftv_id:
         return
-    FanartTV().manage_artwork(ftv_id, ftv_type)
+    FanartTV().manage_artwork(ftv_id, ftv_type, season=season)
 
 
 @get_tmdb_id

@@ -114,11 +114,11 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         check_is_aired = parent_params.get('info') not in NO_LABEL_FORMATTING
         hide_nodate = ADDON.getSettingBool('nodate_is_unaired')
 
-        # Pre-game details and artwork cache for seasons/episodes before threading to avoid multiple API calls
+        # Pre-game details and artwork cache for episodes before threading to avoid multiple API calls
         ftv_art = None
-        if parent_params.get('info') in ['seasons', 'episodes', 'episode_groups', 'trakt_upnext']:
-            details = self.tmdb_api.get_details('tv', parent_params.get('tmdb_id'), parent_params.get('season', 0), cache_only=cache_only)
-            ftv_art = self.get_ftv_artwork(ListItem(parent_params=parent_params, **details))
+        if parent_params.get('info') in ['seasons', 'episodes', 'episode_groups', 'trakt_upnext', 'episode_group_seasons']:
+            details = self.tmdb_api.get_details('tv', parent_params.get('tmdb_id'), parent_params.get('season', None), cache_only=cache_only)
+            ftv_art = self.get_ftv_artwork(ListItem(parent_params=parent_params, **details)) if parent_params['info'] == 'episodes' else None
 
         # Build empty queue and thread pool
         self.items_queue, pool = [None] * len(items), [None] * len(items)
@@ -233,9 +233,22 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         artwork = self.ftv_api.get_all_artwork(li.get_ftv_id(), li.get_ftv_type())
         if not artwork:
             return
-        if li.infolabels.get('mediatype') in ['season', 'episode']:
-            artwork = {u'tvshow.{}'.format(k): v for k, v in artwork.items() if v}
-        return {'art': artwork}
+        artwork = {'art': artwork}
+
+        # Move tvshow artwork properties to tvshow. prefix for seasons/episodes
+        if li.infolabels.get('mediatype') not in ['season', 'episode']:
+            return artwork
+        artwork['art'] = {u'tvshow.{}'.format(k): v for k, v in artwork['art'].items() if v}
+
+        # Only get season artwork for "real" seasons and episodes. Skip special tmdbhelper season folders.
+        if li.params.get('info') in ['episode_groups', 'trakt_upnext']:
+            return artwork
+        season_artwork = self.ftv_api.get_all_artwork(li.get_ftv_id(), li.get_ftv_type(), li.infolabels.get('season'))
+
+        # Add season artwork properties to season. prefix for seasons/episodes
+        artwork['art'].update({u'season.{}'.format(k): v for k, v in season_artwork.items() if v})
+        artwork['art'].update(season_artwork)
+        return artwork
 
     def _set_playprogress_from_trakt(self, li):
         if li.infolabels.get('mediatype') == 'movie':
