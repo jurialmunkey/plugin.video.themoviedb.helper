@@ -240,6 +240,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         if li.infolabels.get('mediatype') not in ['season', 'episode']:
             return artwork
         artwork['art'] = {u'tvshow.{}'.format(k): v for k, v in artwork['art'].items() if v}
+        artwork['art']['fanart'] = artwork['art'].get('tvshow.fanart')
 
         # Only get season artwork for "real" seasons and episodes. Skip special tmdbhelper season folders.
         if not self.ftv_merge_season or li.params.get('info') in ['episode_groups', 'trakt_upnext']:
