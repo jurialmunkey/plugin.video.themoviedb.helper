@@ -34,7 +34,7 @@ class _ItemMapper(object):
             return item
         for d in ['infolabels', 'infoproperties', 'art']:
             for k, v in base_item.get(d, {}).items():
-                if not v or item[d].get(k):
+                if not v or item[d].get(k) is not None:
                     continue
                 if k in key_blacklist:
                     continue
