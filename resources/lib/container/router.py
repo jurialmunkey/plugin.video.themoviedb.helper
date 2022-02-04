@@ -63,6 +63,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.cache_only = self.params.pop('cacheonly', '').lower()
         self.ftv_forced_lookup = self.params.pop('fanarttv', '').lower()
         self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only())  # Set after ftv_forced_lookup, is_widget, cache_only
+        self.ftv_merge_season = ADDON.getSettingBool('fanarttv_merge_season')
         self.tmdb_cache_only = self.tmdb_is_cache_only()  # Set after ftv_api, cache_only
         self.filter_key = self.params.get('filter_key', None)
         self.filter_value = split_items(self.params.get('filter_value', None))[0]
@@ -241,7 +242,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         artwork['art'] = {u'tvshow.{}'.format(k): v for k, v in artwork['art'].items() if v}
 
         # Only get season artwork for "real" seasons and episodes. Skip special tmdbhelper season folders.
-        if li.params.get('info') in ['episode_groups', 'trakt_upnext']:
+        if not self.ftv_merge_season or li.params.get('info') in ['episode_groups', 'trakt_upnext']:
             return artwork
         season_artwork = self.ftv_api.get_all_artwork(li.get_ftv_id(), li.get_ftv_type(), li.infolabels.get('season'))
 

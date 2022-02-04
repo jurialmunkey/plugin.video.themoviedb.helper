@@ -2022,6 +2022,11 @@ msgid "Log timer reports for directories"
 msgstr ""
 
 #: /resources/settings.xml
+msgctxt "#32396"
+msgid "Retrieve season specific artwork"
+msgstr ""
+
+#: /resources/settings.xml
 msgctxt "#32400"
 msgid "Play local Kodi library files"
 msgstr ""
