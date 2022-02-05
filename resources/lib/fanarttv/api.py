@@ -8,6 +8,7 @@ from resources.lib.addon.plugin import get_language
 from resources.lib.addon.setutils import del_empty_keys, ITER_PROPS_MAX
 from resources.lib.addon.decorators import busy_dialog
 from resources.lib.addon.parser import try_int
+from resources.lib.addon.constants import ARTWORK_BLACKLIST
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
@@ -210,6 +211,7 @@ class FanartTV(RequestAPI):
         if choice == -1:
             return
         if choice == 0:
-            return self.select_artwork(ftv_id=ftv_id, ftv_type=ftv_type, season=season)
+            blacklist = ARTWORK_BLACKLIST[ADDON.getSettingInt('artwork_quality')]
+            return self.select_artwork(ftv_id=ftv_id, ftv_type=ftv_type, season=season, blacklist=blacklist)
         if choice == 1:
             return self.refresh_all_artwork(ftv_id=ftv_id, ftv_type=ftv_type, season=season)

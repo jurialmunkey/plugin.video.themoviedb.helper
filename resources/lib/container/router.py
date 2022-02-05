@@ -3,7 +3,7 @@ import xbmc
 import xbmcplugin
 import xbmcaddon
 from threading import Thread
-from resources.lib.addon.constants import NO_LABEL_FORMATTING, RANDOMISED_TRAKT, RANDOMISED_LISTS, TRAKT_LIST_OF_LISTS, TMDB_BASIC_LISTS, TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, ROUTE_NO_ID, ROUTE_TMDB_ID
+from resources.lib.addon.constants import NO_LABEL_FORMATTING, RANDOMISED_TRAKT, RANDOMISED_LISTS, TRAKT_LIST_OF_LISTS, TMDB_BASIC_LISTS, TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, ROUTE_NO_ID, ROUTE_TMDB_ID, ARTWORK_BLACKLIST
 from resources.lib.kodi.rpc import get_kodi_library, get_movie_details, get_tvshow_details, get_episode_details, get_season_details, set_playprogress
 from resources.lib.addon.plugin import convert_type, reconfigure_legacy_params
 from resources.lib.script.router import related_lists
@@ -64,6 +64,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.ftv_forced_lookup = self.params.pop('fanarttv', '').lower()
         self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only())  # Set after ftv_forced_lookup, is_widget, cache_only
         self.ftv_merge_season = ADDON.getSettingBool('fanarttv_merge_season')
+        self.ftv_blacklist = ARTWORK_BLACKLIST[ADDON.getSettingInt('artwork_quality')]
         self.tmdb_cache_only = self.tmdb_is_cache_only()  # Set after ftv_api, cache_only
         self.filter_key = self.params.get('filter_key', None)
         self.filter_value = split_items(self.params.get('filter_value', None))[0]
@@ -106,7 +107,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         with TimerList(self.timer_lists, 'item_tmdb', log_threshold=0.05, logging=self.log_timers):
             li.set_details(details=self.get_tmdb_details(li, cache_only=cache_only))
         with TimerList(self.timer_lists, 'item_ftv', log_threshold=0.05, logging=self.log_timers):
-            li.set_details(details=ftv_art or self.get_ftv_artwork(li), reverse=True)
+            li.set_artwork(details=ftv_art or self.get_ftv_artwork(li), blacklist=self.ftv_blacklist)
         self.items_queue[x] = li
 
     def add_items(self, items=None, pagination=True, parent_params=None, property_params=None, kodi_db=None, cache_only=True):

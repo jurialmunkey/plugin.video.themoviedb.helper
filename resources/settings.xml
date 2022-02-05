@@ -8,6 +8,7 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32038]" type="bool" id="local_db" default="false" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32401]" type="lsep"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32402]" type="bool" id="tmdb_details" default="false" />
+        <setting label="TMDb artwork quality" type="enum" id="artwork_quality" lvalues="32397|419|418" default="0" />
     </category>
     <category label="$ADDON[plugin.video.themoviedb.helper 32088]">
         <setting label="$ADDON[plugin.video.themoviedb.helper 32089]" type="lsep"/>

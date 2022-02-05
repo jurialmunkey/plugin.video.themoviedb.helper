@@ -3,19 +3,26 @@ from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_ty
 from resources.lib.addon.parser import try_int, try_float
 from resources.lib.addon.setutils import ITER_PROPS_MAX, iter_props, dict_to_list, get_params
 from resources.lib.addon.timedate import format_date, age_difference
-from resources.lib.addon.constants import IMAGEPATH_ORIGINAL, IMAGEPATH_POSTER, TMDB_GENRE_IDS
+from resources.lib.addon.constants import IMAGEPATH_ORIGINAL, IMAGEPATH_HIGH, IMAGEPATH_LOW, IMAGEPATH_POSTER, IMAGEPATH_SMALLPOSTER, TMDB_GENRE_IDS
 from resources.lib.api.mapping import UPDATE_BASEKEY, _ItemMapper, get_empty_item
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
+ARTWORK_QUALITY = ADDON.getSettingInt('artwork_quality')
+ARTWORK_QUALITY_POSTER = [IMAGEPATH_POSTER, IMAGEPATH_POSTER, IMAGEPATH_SMALLPOSTER][ARTWORK_QUALITY]
+ARTWORK_QUALITY_FANART = [IMAGEPATH_ORIGINAL, IMAGEPATH_HIGH, IMAGEPATH_LOW][ARTWORK_QUALITY]
 
 
 def get_imagepath_poster(v):
-    return u'{}{}'.format(IMAGEPATH_POSTER, v) if v else ''
+    return u'{}{}'.format(ARTWORK_QUALITY_POSTER, v) if v else ''
 
 
 def get_imagepath_fanart(v):
-    return u'{}{}'.format(IMAGEPATH_ORIGINAL, v) if v else ''
+    return u'{}{}'.format(ARTWORK_QUALITY_FANART, v) if v else ''
+
+
+def get_imagepath_quality(v, quality=IMAGEPATH_ORIGINAL):
+    return u'{}{}'.format(quality, v) if v else ''
 
 
 def get_runtime(v, *args, **kwargs):
@@ -165,18 +172,20 @@ def get_extra_art(v):
     """ Get additional artwork types from artwork list
     Fanart with language is treated as landscape because it will have text
     TODO: Add extra fanart
+    TODO: Ensure correct language for landscape
+    TODO: Add no language fanart
     """
     artwork = {}
 
     landscape = [i for i in v['backdrops'] if i.get('iso_639_1') and i.get('aspect_ratio') == 1.778] if v.get('backdrops') else None
     if landscape:
         landscape_item = sorted(landscape, key=lambda i: i.get('vote_average', 0), reverse=True)[0]
-        artwork['landscape'] = get_imagepath_fanart(landscape_item.get('file_path'))
+        artwork['landscape'] = get_imagepath_quality(landscape_item.get('file_path'), quality=IMAGEPATH_HIGH)
 
     clearlogo = [i for i in v['logos'] if i.get('file_path', '')[-4:] != '.svg'] if v.get('logos') else None
     if clearlogo:
         clearlogo_item = sorted(clearlogo, key=lambda i: i.get('vote_average', 0), reverse=True)[0]
-        artwork['clearlogo'] = get_imagepath_fanart(clearlogo_item.get('file_path'))
+        artwork['clearlogo'] = get_imagepath_quality(clearlogo_item.get('file_path'))
 
     return artwork
 
@@ -314,11 +323,11 @@ class ItemMapper(_ItemMapper):
             }],
             'file_path': [{
                 'keys': [('art', 'poster')],
-                'func': get_imagepath_fanart
+                'func': get_imagepath_quality
             }],
             'still_path': [{
                 'keys': [('art', 'thumb')],
-                'func': get_imagepath_fanart
+                'func': get_imagepath_quality
             }],
             'backdrop_path': [{
                 'keys': [('art', 'fanart')],

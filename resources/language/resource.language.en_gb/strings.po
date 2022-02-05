@@ -2027,6 +2027,11 @@ msgid "Retrieve season specific artwork"
 msgstr ""
 
 #: /resources/settings.xml
+msgctxt "#32397"
+msgid "Original"
+msgstr ""
+
+#: /resources/settings.xml
 msgctxt "#32400"
 msgid "Play local Kodi library files"
 msgstr ""

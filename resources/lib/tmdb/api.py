@@ -18,6 +18,7 @@ from json import loads
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 ADDONPATH = ADDON.getAddonInfo('path')
+ARTWORK_QUALITY = ADDON.getSettingInt('artwork_quality')
 
 
 API_URL = 'https://api.themoviedb.org/3'
@@ -194,7 +195,7 @@ class TMDb(RequestAPI):
 
     def get_details(self, tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
         kwargs['cache_days'] = CACHE_LONG
-        kwargs['cache_name'] = 'TMDb.get_details.v4_5_18.{}'.format(self.language)
+        kwargs['cache_name'] = 'TMDb.get_details.v4_5_25.{}.{}'.format(self.language, ARTWORK_QUALITY)
         kwargs['cache_combine_name'] = True
         return self._cache.use_cache(self._get_details, tmdb_type, tmdb_id, season, episode, **kwargs)
 

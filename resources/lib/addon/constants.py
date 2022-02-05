@@ -27,8 +27,13 @@ TMDB_PARAMS_EPISODES = {
     'episode': '{episode_number}'}
 
 IMAGEPATH_ORIGINAL = 'https://image.tmdb.org/t/p/original'
+IMAGEPATH_HIGH = 'https://image.tmdb.org/t/p/w1280'
+IMAGEPATH_LOW = 'https://image.tmdb.org/t/p/w780'
 
 IMAGEPATH_POSTER = 'https://image.tmdb.org/t/p/w500'
+IMAGEPATH_SMALLPOSTER = 'https://image.tmdb.org/t/p/w342'
+
+ARTWORK_BLACKLIST = [[], ['poster'], ['fanart', 'poster']]
 
 TMDB_GENRE_IDS = {
     "Action": 28, "Adventure": 12, "Action & Adventure": 10759, "Animation": 16, "Comedy": 35, "Crime": 80, "Documentary": 99, "Drama": 18,
