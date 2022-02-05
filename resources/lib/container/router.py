@@ -300,17 +300,23 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
                 season=li.infolabels.get('season'),
                 episode=li.infolabels.get('episode')) or 0
         if li.infolabels.get('mediatype') == 'tvshow':
-            li.infolabels['episode'] = self.trakt_api.get_episodes_airedcount(
+            air_count = self.trakt_api.get_episodes_airedcount(
                 id_type='tmdb',
                 unique_id=try_int(li.unique_ids.get('tmdb')))
+            if not air_count:
+                return
+            li.infolabels['episode'] = air_count
             return self.trakt_api.get_episodes_watchcount(
                 id_type='tmdb',
                 unique_id=try_int(li.unique_ids.get('tmdb'))) or 0
         if li.infolabels.get('mediatype') == 'season':
-            li.infolabels['episode'] = self.trakt_api.get_episodes_airedcount(
+            air_count = self.trakt_api.get_episodes_airedcount(
                 id_type='tmdb',
                 unique_id=try_int(li.unique_ids.get('tmdb')),
                 season=li.infolabels.get('season'))
+            if not air_count:
+                return
+            li.infolabels['episode'] = air_count
             return self.trakt_api.get_episodes_watchcount(
                 id_type='tmdb',
                 unique_id=try_int(li.unique_ids.get('tmdb')),

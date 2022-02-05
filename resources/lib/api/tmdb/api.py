@@ -333,6 +333,8 @@ class TMDb(RequestAPI):
                     'title': ADDON.getLocalizedString(32345)}, 'season', base_item, tmdb_id=tmdb_id, definition={
                         'info': 'episode_groups', 'tmdb_type': 'tv', 'tmdb_id': tmdb_id})
                 egroup_item['art']['thumb'] = egroup_item['art']['poster'] = u'{}/resources/icons/trakt/groupings.png'.format(ADDONPATH)
+                egroup_item['infolabels']['season'] = -1
+                egroup_item['infolabels']['episode'] = 0
                 items_end.append(egroup_item)
 
         # Up Next
@@ -342,6 +344,8 @@ class TMDb(RequestAPI):
                     'title': ADDON.getLocalizedString(32043)}, 'season', base_item, tmdb_id=tmdb_id, definition={
                         'info': 'trakt_upnext', 'tmdb_type': 'tv', 'tmdb_id': tmdb_id})
                 upnext_item['art']['thumb'] = upnext_item['art']['poster'] = u'{}/resources/icons/trakt/up-next.png'.format(ADDONPATH)
+                upnext_item['infolabels']['season'] = -1
+                upnext_item['infolabels']['episode'] = 0
                 items_end.append(upnext_item)
         return items + items_end
 
