@@ -301,7 +301,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
                 season=li.infolabels.get('season'),
                 episode=li.infolabels.get('episode')) or 0
         if li.infolabels.get('mediatype') == 'tvshow':
-            li.infolabels['episode'] = self.trakt_api.get_episodes_airedcount(
+            li.infolabels['episodes'] = self.trakt_api.get_episodes_airedcount(
                 id_type='tmdb',
                 unique_id=try_int(li.unique_ids.get('tmdb')))
             return self.trakt_api.get_episodes_watchcount(
