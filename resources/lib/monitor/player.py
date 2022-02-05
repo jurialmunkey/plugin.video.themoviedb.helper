@@ -1,6 +1,6 @@
 import xbmc
 import xbmcaddon
-import resources.lib.kodi.rpc as rpc
+import resources.lib.api.kodi.rpc as rpc
 from resources.lib.addon.window import get_property
 from resources.lib.monitor.common import CommonMonitorFunctions, SETPROP_RATINGS, SETMAIN_ARTWORK
 from json import loads

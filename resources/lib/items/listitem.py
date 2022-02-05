@@ -6,8 +6,7 @@ from resources.lib.addon.plugin import PLUGINPATH, kodi_log, convert_media_type
 from resources.lib.addon.parser import try_int, encode_url
 from resources.lib.addon.timedate import is_unaired_timestamp
 from resources.lib.addon.setutils import merge_two_dicts
-from resources.lib.container.context import ContextMenu
-# from resources.lib.addon.decorators import timer_report
+from resources.lib.items.context import ContextMenu
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')

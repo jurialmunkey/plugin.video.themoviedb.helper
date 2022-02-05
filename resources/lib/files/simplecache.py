@@ -18,8 +18,8 @@ from functools import reduce
 # from ast import literal_eval
 from contextlib import contextmanager
 from resources.lib.addon.plugin import kodi_log
-from resources.lib.files.utils import get_file_path
 from resources.lib.addon.timedate import get_timedelta, get_datetime_now, get_datetime_datetime
+from resources.lib.files.utils import get_file_path
 
 
 class SimpleCache(object):

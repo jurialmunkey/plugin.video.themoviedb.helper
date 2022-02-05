@@ -1,7 +1,7 @@
-from resources.lib.addon.simplecache import SimpleCache
 from resources.lib.addon.plugin import kodi_log, format_name
-from resources.lib.files.utils import get_pickle_name
 from resources.lib.addon.decorators import try_except_log
+from resources.lib.files.simplecache import SimpleCache
+from resources.lib.files.utils import get_pickle_name
 
 CACHE_LONG = 14
 CACHE_SHORT = 1

@@ -5,10 +5,10 @@ import xbmcgui
 import xbmcaddon
 import zipfile
 import gzip
-from resources.lib.addon.plugin import kodi_log
-from resources.lib.addon.decorators import busy_dialog
 from io import BytesIO
 from urllib.parse import urlparse
+from resources.lib.addon.plugin import kodi_log
+from resources.lib.addon.decorators import busy_dialog
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')

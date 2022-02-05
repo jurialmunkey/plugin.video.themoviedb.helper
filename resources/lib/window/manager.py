@@ -5,7 +5,7 @@ import resources.lib.addon.window as window
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.plugin import kodi_log
 from resources.lib.addon.decorators import busy_dialog
-from resources.lib.tmdb.api import TMDb
+from resources.lib.api.tmdb.api import TMDb
 
 PREFIX_PATH = 'Path.'
 PREFIX_QUERY = 'Query'

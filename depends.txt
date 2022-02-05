@@ -1,0 +1,25 @@
+DEPENDECY RULES
+Each block depends on higher blocks and must not depend on lower blocks
+-------------------
+lib.addon.X
+  -> parser -> window
+  -> constants -> plugin -> decorators -> timedate
+-------------------
+lib.files.X
+  -> utils -> simplecache -> cache
+lib.items.X
+  -> context -> listitem
+-------------------
+lib.api.X
+  => tmdb -> mapping -> api -> discover
+  => kodi -> mapping -> rpc
+  => omdb -> mapping -> api
+  => trakt -> decorators, items -> progress -> api -> lists
+  => fanarttv
+-------------------
+lib.update.X
+  -> logger, update, cacher -> library -> userlist
+lib.player.X
+  -> details, inputter, configure -> players
+
+

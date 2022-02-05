@@ -3,9 +3,9 @@ import xbmcgui
 import xbmcaddon
 from resources.lib.addon.decorators import busy_dialog
 from resources.lib.addon.plugin import kodi_log
-from resources.lib.trakt.api import TraktAPI
-from resources.lib.kodi.library import add_to_library
-from resources.lib.kodi.update import get_userlist
+from resources.lib.update.library import add_to_library
+from resources.lib.update.update import get_userlist
+from resources.lib.api.trakt.api import TraktAPI
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')

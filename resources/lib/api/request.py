@@ -2,11 +2,11 @@ import xbmc
 import xbmcgui
 import xbmcaddon
 import xml.etree.ElementTree as ET
-from resources.lib.addon.cache import BasicCache, CACHE_SHORT, CACHE_LONG
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import kodi_log
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.timedate import get_timestamp, set_timestamp
+from resources.lib.files.cache import BasicCache, CACHE_SHORT, CACHE_LONG
 from copy import copy
 from json import loads, dumps
 

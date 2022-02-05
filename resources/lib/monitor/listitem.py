@@ -1,6 +1,6 @@
 import xbmc
 import xbmcaddon
-from resources.lib.kodi.rpc import get_person_stats
+from resources.lib.api.kodi.rpc import get_person_stats
 from resources.lib.addon.window import get_property
 from resources.lib.monitor.common import CommonMonitorFunctions, SETMAIN_ARTWORK, SETPROP_RATINGS
 from resources.lib.monitor.images import ImageFunctions

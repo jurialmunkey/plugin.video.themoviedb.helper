@@ -2,18 +2,17 @@ import xbmc
 import xbmcgui
 import random
 import xbmcaddon
-import resources.lib.container.pages as pages
-from resources.lib.addon.window import get_property
 from json import loads, dumps
-from resources.lib.api.request import RequestAPI
+from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import kodi_log
-from resources.lib.container.pages import PaginatedItems
-from resources.lib.trakt.items import TraktItems
-from resources.lib.trakt.decorators import is_authorized, use_activity_cache
-from resources.lib.trakt.progress import _TraktProgress
 from resources.lib.addon.parser import try_int
-from resources.lib.addon.cache import CACHE_SHORT, CACHE_LONG, use_simple_cache
 from resources.lib.addon.timedate import set_timestamp, get_timestamp
+from resources.lib.files.cache import CACHE_SHORT, CACHE_LONG, use_simple_cache
+from resources.lib.items.pages import PaginatedItems, get_next_page
+from resources.lib.api.request import RequestAPI
+from resources.lib.api.trakt.items import TraktItems
+from resources.lib.api.trakt.decorators import is_authorized, use_activity_cache
+from resources.lib.api.trakt.progress import _TraktProgress
 
 
 API_URL = 'https://api.trakt.tv/'
@@ -142,7 +141,7 @@ class _TraktLists():
             if randomise and len(response['items']) > limit:
                 items = random.sample(response['items'], limit)
                 return items
-            return response['items'] + pages.get_next_page(response['headers'])
+            return response['items'] + get_next_page(response['headers'])
 
     @is_authorized
     def get_stacked_list(self, path, trakt_type, page=1, limit=20, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, **kwargs):
@@ -152,7 +151,7 @@ class _TraktLists():
         response['items'] = self._stack_calendar_tvshows(response['items'])
         response = PaginatedItems(items=response['items'], page=page, limit=limit).get_dict()
         if response:
-            return response['items'] + pages.get_next_page(response['headers'])
+            return response['items'] + get_next_page(response['headers'])
 
     def get_custom_list(self, list_slug, user_slug=None, page=1, limit=20, params=None, authorize=False, sort_by=None, sort_how=None, extended=None, owner=False):
         if authorize and not self.authorize():
@@ -246,7 +245,7 @@ class _TraktLists():
             items.append(item)
         if not next_page:
             return items
-        return items + pages.get_next_page(response.headers)
+        return items + get_next_page(response.headers)
 
     @is_authorized
     def like_userlist(self, user_slug=None, list_slug=None, confirmation=False, delete=False):

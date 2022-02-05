@@ -1,12 +1,12 @@
 import xbmc
 import xbmcaddon
-from resources.lib.container.pages import PaginatedItems
-from resources.lib.trakt.items import TraktItems, EPISODE_PARAMS
-from resources.lib.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.timedate import convert_timestamp, date_in_range, get_region_date, get_datetime_today, get_timedelta
+from resources.lib.files.cache import CACHE_SHORT, CACHE_LONG, use_simple_cache
+from resources.lib.items.pages import PaginatedItems
 from resources.lib.api.mapping import get_empty_item
-from resources.lib.addon.cache import CACHE_SHORT, CACHE_LONG, use_simple_cache
+from resources.lib.api.trakt.items import TraktItems, EPISODE_PARAMS
+from resources.lib.api.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')

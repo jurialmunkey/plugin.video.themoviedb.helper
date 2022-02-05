@@ -7,27 +7,26 @@ import xbmcvfs
 import xbmcgui
 import xbmcaddon
 from json import dumps
-from resources.lib.kodi.library import add_to_library
-from resources.lib.kodi.userlist import monitor_userlist, library_autoupdate
-from resources.lib.kodi.rpc import get_jsonrpc
-from resources.lib.files.downloader import Downloader
-from resources.lib.files.utils import dumps_to_file, validify_filename, read_file
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import reconfigure_legacy_params, kodi_log, format_folderpath, convert_type
-from resources.lib.addon.decorators import busy_dialog
+from resources.lib.addon.decorators import busy_dialog, timer_func
 from resources.lib.addon.parser import encode_url, try_int, parse_paramstring
-from resources.lib.container.basedir import get_basedir_details
-from resources.lib.fanarttv.api import FanartTV
-from resources.lib.tmdb.api import TMDb
-from resources.lib.trakt.api import TraktAPI, get_sort_methods
-from resources.lib.omdb.api import OMDb
-from resources.lib.script.sync import sync_trakt_item
+from resources.lib.files.downloader import Downloader
+from resources.lib.files.utils import dumps_to_file, validify_filename, read_file
+from resources.lib.items.basedir import get_basedir_details
+from resources.lib.items.listitem import ListItem
+from resources.lib.api.fanarttv.api import FanartTV
+from resources.lib.api.tmdb.api import TMDb
+from resources.lib.api.trakt.api import TraktAPI, get_sort_methods
+from resources.lib.api.omdb.api import OMDb
+from resources.lib.api.kodi.rpc import get_jsonrpc
+from resources.lib.update.library import add_to_library
+from resources.lib.update.userlist import monitor_userlist, library_autoupdate
 from resources.lib.window.manager import WindowManager
 from resources.lib.player.players import Players
 from resources.lib.player.configure import configure_players
 from resources.lib.monitor.images import ImageFunctions
-from resources.lib.container.listitem import ListItem
-from resources.lib.addon.decorators import timer_func
+from resources.lib.script.sync import sync_trakt_item
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')

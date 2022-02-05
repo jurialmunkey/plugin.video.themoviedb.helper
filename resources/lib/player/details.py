@@ -1,10 +1,10 @@
 from resources.lib.addon.timedate import get_datetime_now
 from resources.lib.addon.constants import PLAYERS_URLENCODE
-from resources.lib.tmdb.api import TMDb
-from resources.lib.trakt.api import TraktAPI
-from resources.lib.container.listitem import ListItem
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.setutils import del_empty_keys
+from resources.lib.items.listitem import ListItem
+from resources.lib.api.tmdb.api import TMDb
+from resources.lib.api.trakt.api import TraktAPI
 from json import dumps
 from collections import defaultdict
 from urllib.parse import quote_plus, quote

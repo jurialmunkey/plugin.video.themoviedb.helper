@@ -4,25 +4,24 @@ import xbmcplugin
 import xbmcaddon
 from threading import Thread
 from resources.lib.addon.constants import NO_LABEL_FORMATTING, RANDOMISED_TRAKT, RANDOMISED_LISTS, TRAKT_LIST_OF_LISTS, TMDB_BASIC_LISTS, TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, ROUTE_NO_ID, ROUTE_TMDB_ID, ARTWORK_BLACKLIST
-from resources.lib.kodi.rpc import get_kodi_library, get_movie_details, get_tvshow_details, get_episode_details, get_season_details, set_playprogress
-from resources.lib.addon.plugin import convert_type, reconfigure_legacy_params
-from resources.lib.script.router import related_lists
-from resources.lib.container.listitem import ListItem
-from resources.lib.tmdb.api import TMDb
-from resources.lib.trakt.api import TraktAPI
-from resources.lib.fanarttv.api import FanartTV
-from resources.lib.omdb.api import OMDb
-from resources.lib.player.players import Players
-from resources.lib.addon.plugin import kodi_log
-from resources.lib.container.basedir import BaseDirLists
-from resources.lib.tmdb.lists import TMDbLists
-from resources.lib.trakt.lists import TraktLists
-from resources.lib.tmdb.search import SearchLists
-from resources.lib.tmdb.discover import UserDiscoverLists
-from resources.lib.api.mapping import set_show, get_empty_item
+from resources.lib.addon.plugin import convert_type, reconfigure_legacy_params, kodi_log
 from resources.lib.addon.parser import parse_paramstring, try_int
 from resources.lib.addon.setutils import split_items, random_from_list, merge_two_dicts
 from resources.lib.addon.decorators import TimerList
+from resources.lib.items.listitem import ListItem
+from resources.lib.items.basedir import BaseDirLists
+from resources.lib.api.mapping import set_show, get_empty_item
+from resources.lib.api.kodi.rpc import get_kodi_library, get_movie_details, get_tvshow_details, get_episode_details, get_season_details, set_playprogress
+from resources.lib.api.tmdb.api import TMDb
+from resources.lib.api.tmdb.lists import TMDbLists
+from resources.lib.api.tmdb.search import SearchLists
+from resources.lib.api.tmdb.discover import UserDiscoverLists
+from resources.lib.api.trakt.api import TraktAPI
+from resources.lib.api.trakt.lists import TraktLists
+from resources.lib.api.fanarttv.api import FanartTV
+from resources.lib.api.omdb.api import OMDb
+from resources.lib.script.router import related_lists
+from resources.lib.player.players import Players
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')

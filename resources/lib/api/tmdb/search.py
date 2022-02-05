@@ -1,9 +1,9 @@
 import xbmc
 import xbmcgui
 import xbmcaddon
-from resources.lib.addon.cache import set_search_history, get_search_history
 from resources.lib.addon.plugin import PLUGINPATH, convert_type
 from resources.lib.addon.setutils import merge_two_dicts
+from resources.lib.files.cache import set_search_history, get_search_history
 from urllib.parse import urlencode
 
 

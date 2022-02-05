@@ -4,8 +4,8 @@ import xbmcvfs
 from resources.lib.addon.plugin import kodi_log
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.setutils import find_dict_in_list
-from resources.lib.kodi.mapping import ItemMapper
-from resources.lib.addon.cache import BasicCache
+from resources.lib.files.cache import BasicCache
+from resources.lib.api.kodi.mapping import ItemMapper
 
 
 def get_jsonrpc(method=None, params=None):
