@@ -3,14 +3,14 @@ from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_ty
 from resources.lib.addon.parser import try_int, try_float
 from resources.lib.addon.setutils import ITER_PROPS_MAX, iter_props, dict_to_list, get_params
 from resources.lib.addon.timedate import format_date, age_difference
-from resources.lib.addon.constants import IMAGEPATH_ORIGINAL, IMAGEPATH_HIGH, IMAGEPATH_LOW, IMAGEPATH_POSTER, IMAGEPATH_SMALLPOSTER, TMDB_GENRE_IDS
+from resources.lib.addon.constants import IMAGEPATH_ORIGINAL, IMAGEPATH_HIGH, IMAGEPATH_LOW, IMAGEPATH_BIGPOSTER, IMAGEPATH_POSTER, IMAGEPATH_SMALLPOSTER, TMDB_GENRE_IDS
 from resources.lib.api.mapping import UPDATE_BASEKEY, _ItemMapper, get_empty_item
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 ARTWORK_QUALITY = ADDON.getSettingInt('artwork_quality')
-ARTWORK_QUALITY_POSTER = [IMAGEPATH_POSTER, IMAGEPATH_POSTER, IMAGEPATH_SMALLPOSTER][ARTWORK_QUALITY]
-ARTWORK_QUALITY_FANART = [IMAGEPATH_ORIGINAL, IMAGEPATH_HIGH, IMAGEPATH_LOW][ARTWORK_QUALITY]
+ARTWORK_QUALITY_POSTER = [IMAGEPATH_ORIGINAL, IMAGEPATH_BIGPOSTER, IMAGEPATH_BIGPOSTER, IMAGEPATH_POSTER, IMAGEPATH_SMALLPOSTER, IMAGEPATH_SMALLPOSTER][ARTWORK_QUALITY]
+ARTWORK_QUALITY_FANART = [IMAGEPATH_ORIGINAL, IMAGEPATH_HIGH, IMAGEPATH_HIGH, IMAGEPATH_HIGH, IMAGEPATH_HIGH, IMAGEPATH_LOW][ARTWORK_QUALITY]
 
 
 def get_imagepath_poster(v):

@@ -2027,11 +2027,6 @@ msgid "Retrieve season specific artwork"
 msgstr ""
 
 #: /resources/settings.xml
-msgctxt "#32397"
-msgid "Original"
-msgstr ""
-
-#: /resources/settings.xml
 msgctxt "#32400"
 msgid "Play local Kodi library files"
 msgstr ""
@@ -2069,6 +2064,26 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32407"
 msgid "Get resume points from Trakt (increases load times)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32408"
+msgid "Original"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32409"
+msgid "Very High"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32410"
+msgid "Medium"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32411"
+msgid "Very Low"
 msgstr ""
 
 msgctxt "#30030"
