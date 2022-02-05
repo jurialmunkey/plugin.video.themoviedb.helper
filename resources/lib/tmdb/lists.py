@@ -32,6 +32,7 @@ class TMDbLists():
     def list_episode_group_seasons(self, tmdb_id, group_id, **kwargs):
         items = self.tmdb_api.get_episode_group_seasons_list(tmdb_id, group_id)
         self.container_content = convert_type('season', 'container')
+        self.trakt_watchedindicators = False  # Force override of setting because not "true" seasons so data will be incorrect
         return items
 
     def list_episode_groups(self, tmdb_id, **kwargs):

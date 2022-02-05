@@ -291,14 +291,17 @@ class _Tvshow(_Video):
         return self.unique_ids.get('tvdb')
 
     def _set_playcount(self, playcount):
-        playcount = try_int(playcount)
-        if not try_int(self.infolabels.get('episode')):
-            return
         ip, il = self.infoproperties, self.infolabels
+        totalepisodes = try_int(il.get('episode'))
+        if not totalepisodes:
+            return
+        ip['totalepisodes'] = totalepisodes
+        if playcount is None:  # Check None instead of "if not playcount" because 0 is valid value
+            return
+        playcount = try_int(playcount)
         ip['watchedepisodes'] = playcount
-        ip['totalepisodes'] = try_int(il.get('episode'))
-        ip['unwatchedepisodes'] = ip.get('totalepisodes') - try_int(ip.get('watchedepisodes'))
-        if not playcount or ip.get('unwatchedepisodes'):
+        ip['unwatchedepisodes'] = totalepisodes - try_int(ip['watchedepisodes'])
+        if not playcount or ip['unwatchedepisodes']:
             return
         il['playcount'] = playcount
         il['overlay'] = 5
