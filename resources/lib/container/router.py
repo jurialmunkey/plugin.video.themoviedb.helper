@@ -292,20 +292,20 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         if li.infolabels.get('mediatype') == 'movie':
             return self.trakt_api.get_movie_playcount(
                 id_type='tmdb',
-                unique_id=try_int(li.unique_ids.get('tmdb')))
+                unique_id=try_int(li.unique_ids.get('tmdb'))) or 0
         if li.infolabels.get('mediatype') == 'episode':
             return self.trakt_api.get_episode_playcount(
                 id_type='tmdb',
                 unique_id=try_int(li.unique_ids.get('tvshow.tmdb')),
                 season=li.infolabels.get('season'),
-                episode=li.infolabels.get('episode'))
+                episode=li.infolabels.get('episode')) or 0
         if li.infolabels.get('mediatype') == 'tvshow':
             li.infolabels['episode'] = self.trakt_api.get_episodes_airedcount(
                 id_type='tmdb',
                 unique_id=try_int(li.unique_ids.get('tmdb')))
             return self.trakt_api.get_episodes_watchcount(
                 id_type='tmdb',
-                unique_id=try_int(li.unique_ids.get('tmdb')))
+                unique_id=try_int(li.unique_ids.get('tmdb'))) or 0
         if li.infolabels.get('mediatype') == 'season':
             li.infolabels['episode'] = self.trakt_api.get_episodes_airedcount(
                 id_type='tmdb',
@@ -314,7 +314,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             return self.trakt_api.get_episodes_watchcount(
                 id_type='tmdb',
                 unique_id=try_int(li.unique_ids.get('tmdb')),
-                season=li.infolabels.get('season'))
+                season=li.infolabels.get('season')) or 0
 
     def get_kodi_database(self, tmdb_type):
         with TimerList(self.timer_lists, ' - kodi_db', logging=self.log_timers):
