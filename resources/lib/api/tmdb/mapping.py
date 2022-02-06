@@ -3,7 +3,7 @@ from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_ty
 from resources.lib.addon.parser import try_int, try_float
 from resources.lib.addon.setutils import ITER_PROPS_MAX, iter_props, dict_to_list, get_params
 from resources.lib.addon.timedate import format_date, age_difference
-from resources.lib.addon.constants import IMAGEPATH_ORIGINAL, IMAGEPATH_HIGH, IMAGEPATH_LOW, IMAGEPATH_POSTER, IMAGEPATH_SMALLPOSTER, TMDB_GENRE_IDS
+from resources.lib.addon.constants import IMAGEPATH_ORIGINAL, IMAGEPATH_HIGH, IMAGEPATH_LOW, IMAGEPATH_POSTER, IMAGEPATH_SMALLPOSTER, IMAGEPATH_SMALLLOGO, TMDB_GENRE_IDS
 from resources.lib.api.mapping import UPDATE_BASEKEY, _ItemMapper, get_empty_item
 
 
@@ -12,6 +12,7 @@ ARTWORK_QUALITY = ADDON.getSettingInt('artwork_quality')
 ARTWORK_QUALITY_POSTER = [IMAGEPATH_POSTER, IMAGEPATH_POSTER, IMAGEPATH_POSTER, IMAGEPATH_SMALLPOSTER][ARTWORK_QUALITY]
 ARTWORK_QUALITY_FANART = [IMAGEPATH_ORIGINAL, IMAGEPATH_HIGH, IMAGEPATH_HIGH, IMAGEPATH_LOW][ARTWORK_QUALITY]
 ARTWORK_QUALITY_THUMBS = [IMAGEPATH_ORIGINAL, IMAGEPATH_HIGH, IMAGEPATH_HIGH, IMAGEPATH_LOW][ARTWORK_QUALITY]
+ARTWORK_QUALITY_CLOGOS = [IMAGEPATH_ORIGINAL, IMAGEPATH_POSTER, IMAGEPATH_POSTER, IMAGEPATH_SMALLLOGO][ARTWORK_QUALITY]
 
 
 def get_imagepath_poster(v):
@@ -24,6 +25,10 @@ def get_imagepath_fanart(v):
 
 def get_imagepath_thumb(v):
     return u'{}{}'.format(ARTWORK_QUALITY_THUMBS, v) if v else ''
+
+
+def get_imagepath_logo(v):
+    return u'{}{}'.format(ARTWORK_QUALITY_CLOGOS, v) if v else ''
 
 
 def get_imagepath_quality(v, quality=IMAGEPATH_ORIGINAL):
@@ -136,7 +141,7 @@ def get_providers(v):
             u'provider.{}.id'.format(x): i.get('provider_id'),
             u'provider.{}.type'.format(x): i.get('key'),
             u'provider.{}.name'.format(x): i['provider_name'],
-            u'provider.{}.icon'.format(x): get_imagepath_poster(i.get('logo_path'))})
+            u'provider.{}.icon'.format(x): get_imagepath_logo(i.get('logo_path'))})
         added_append(i['provider_name'])
     infoproperties['providers'] = ' / '.join(added)
     return infoproperties
@@ -190,7 +195,7 @@ def get_extra_art(v):
     clearlogo = [i for i in v['logos'] if i.get('file_path', '')[-4:] != '.svg'] if v.get('logos') else None
     if clearlogo:
         clearlogo_item = sorted(clearlogo, key=lambda i: i.get('vote_average', 0), reverse=True)[0]
-        artwork['clearlogo'] = get_imagepath_quality(clearlogo_item.get('file_path'))
+        artwork['clearlogo'] = get_imagepath_logo(clearlogo_item.get('file_path'))
 
     return artwork
 

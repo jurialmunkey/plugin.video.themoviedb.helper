@@ -29,10 +29,9 @@ TMDB_PARAMS_EPISODES = {
 IMAGEPATH_ORIGINAL = 'https://image.tmdb.org/t/p/original'
 IMAGEPATH_HIGH = 'https://image.tmdb.org/t/p/w1280'
 IMAGEPATH_LOW = 'https://image.tmdb.org/t/p/w780'
-
 IMAGEPATH_POSTER = 'https://image.tmdb.org/t/p/w500'
 IMAGEPATH_SMALLPOSTER = 'https://image.tmdb.org/t/p/w342'
-
+IMAGEPATH_SMALLLOGO = 'https://image.tmdb.org/t/p/w300'
 ARTWORK_BLACKLIST = [[], ['fanart'], ['fanart', 'poster'], ['fanart', 'poster']]
 
 TMDB_GENRE_IDS = {
