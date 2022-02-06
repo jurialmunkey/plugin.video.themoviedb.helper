@@ -252,12 +252,12 @@ class _TraktProgress():
                     return j.get('plays', 1)
 
     @is_authorized
-    @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_SHORT)
     def get_episodes_airedcount(self, unique_id, id_type, season=None):
         """ Gets the number of aired episodes for a tvshow """
-        if season is not None:
-            return self.get_season_episodes_airedcount(unique_id, id_type, season)
-        return self.get_sync('watched', 'show', id_type).get(unique_id, {}).get('show', {}).get('aired_episodes')
+        aired_episodes = self.get_sync('watched', 'show', id_type).get(unique_id, {}).get('show', {}).get('aired_episodes')
+        if season is None or not aired_episodes:  # Don't get seasons if we don't have tvshow data
+            return aired_episodes
+        return self.get_season_episodes_airedcount(unique_id, id_type, season)
 
     @is_authorized
     @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_SHORT)
