@@ -2032,6 +2032,11 @@ msgid "Original"
 msgstr ""
 
 #: /resources/settings.xml
+msgctxt "#32398"
+msgid "Medium"
+msgstr ""
+
+#: /resources/settings.xml
 msgctxt "#32400"
 msgid "Play local Kodi library files"
 msgstr ""
