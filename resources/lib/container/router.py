@@ -104,7 +104,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
 
     def _add_item(self, x, li, cache_only=True, ftv_art=None):
         with TimerList(self.timer_lists, 'item_tmdb', log_threshold=0.05, logging=self.log_timers):
-            li.set_details(details=self.get_tmdb_details(li, cache_only=cache_only))
+            li.set_details(details=self.get_tmdb_details(li, cache_only=cache_only), set_artwork={'whitelist': ['fanart']})
         with TimerList(self.timer_lists, 'item_ftv', log_threshold=0.05, logging=self.log_timers):
             li.set_artwork(details=ftv_art or self.get_ftv_artwork(li), blacklist=self.ftv_blacklist)
         self.items_queue[x] = li

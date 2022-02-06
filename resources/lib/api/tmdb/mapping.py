@@ -181,21 +181,26 @@ def get_external_ids(v):
 def get_extra_art(v):
     """ Get additional artwork types from artwork list
     Fanart with language is treated as landscape because it will have text
-    TODO: Add extra fanart
-    TODO: Ensure correct language for landscape
-    TODO: Add no language fanart
     """
     artwork = {}
 
-    landscape = [i for i in v['backdrops'] if i.get('iso_639_1') and i.get('aspect_ratio') == 1.778] if v.get('backdrops') else None
+    landscape = [i for i in v.get('backdrops', []) if i.get('iso_639_1') and i.get('aspect_ratio') == 1.778]
     if landscape:
         landscape_item = sorted(landscape, key=lambda i: i.get('vote_average', 0), reverse=True)[0]
         artwork['landscape'] = get_imagepath_thumb(landscape_item.get('file_path'))
 
-    clearlogo = [i for i in v['logos'] if i.get('file_path', '')[-4:] != '.svg'] if v.get('logos') else None
+    clearlogo = [i for i in v.get('logos', []) if i.get('file_path', '')[-4:] != '.svg']
     if clearlogo:
         clearlogo_item = sorted(clearlogo, key=lambda i: i.get('vote_average', 0), reverse=True)[0]
         artwork['clearlogo'] = get_imagepath_logo(clearlogo_item.get('file_path'))
+
+    fanart = [i for i in v.get('backdrops', []) if not i.get('iso_639_1') and i.get('aspect_ratio') == 1.778]
+    if fanart:
+        fanart = sorted(fanart, key=lambda i: i.get('vote_average', 0), reverse=True)
+        artwork['fanart'] = get_imagepath_fanart(fanart[0].get('file_path'))
+        artwork.update({
+            u'fanart{}'.format(x): get_imagepath_fanart(i['file_path'])
+            for x, i in enumerate(fanart, 1) if i.get('file_path') and x <= ITER_PROPS_MAX})
 
     return artwork
 
