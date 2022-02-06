@@ -11,6 +11,7 @@ ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 ARTWORK_QUALITY = ADDON.getSettingInt('artwork_quality')
 ARTWORK_QUALITY_POSTER = [IMAGEPATH_POSTER, IMAGEPATH_POSTER, IMAGEPATH_SMALLPOSTER][ARTWORK_QUALITY]
 ARTWORK_QUALITY_FANART = [IMAGEPATH_ORIGINAL, IMAGEPATH_HIGH, IMAGEPATH_LOW][ARTWORK_QUALITY]
+ARTWORK_QUALITY_THUMBS = [IMAGEPATH_ORIGINAL, IMAGEPATH_HIGH, IMAGEPATH_LOW][ARTWORK_QUALITY]
 
 
 def get_imagepath_poster(v):
@@ -19,6 +20,10 @@ def get_imagepath_poster(v):
 
 def get_imagepath_fanart(v):
     return u'{}{}'.format(ARTWORK_QUALITY_FANART, v) if v else ''
+
+
+def get_imagepath_thumb(v):
+    return u'{}{}'.format(ARTWORK_QUALITY_THUMBS, v) if v else ''
 
 
 def get_imagepath_quality(v, quality=IMAGEPATH_ORIGINAL):
@@ -180,7 +185,7 @@ def get_extra_art(v):
     landscape = [i for i in v['backdrops'] if i.get('iso_639_1') and i.get('aspect_ratio') == 1.778] if v.get('backdrops') else None
     if landscape:
         landscape_item = sorted(landscape, key=lambda i: i.get('vote_average', 0), reverse=True)[0]
-        artwork['landscape'] = get_imagepath_quality(landscape_item.get('file_path'), quality=IMAGEPATH_HIGH)
+        artwork['landscape'] = get_imagepath_thumb(landscape_item.get('file_path'))
 
     clearlogo = [i for i in v['logos'] if i.get('file_path', '')[-4:] != '.svg'] if v.get('logos') else None
     if clearlogo:
@@ -204,7 +209,7 @@ def get_episode_to_air(v, name):
     infoproperties[u'{}.season'.format(name)] = i.get('season_number')
     infoproperties[u'{}.rating'.format(name)] = u'{:0,.1f}'.format(try_float(i.get('vote_average')))
     infoproperties[u'{}.votes'.format(name)] = i.get('vote_count')
-    infoproperties[u'{}.thumb'.format(name)] = get_imagepath_poster(i.get('still_path'))
+    infoproperties[u'{}.thumb'.format(name)] = get_imagepath_thumb(i.get('still_path'))
     return infoproperties
 
 
@@ -327,7 +332,7 @@ class ItemMapper(_ItemMapper):
             }],
             'still_path': [{
                 'keys': [('art', 'thumb')],
-                'func': get_imagepath_quality
+                'func': get_imagepath_thumb
             }],
             'backdrop_path': [{
                 'keys': [('art', 'fanart')],
