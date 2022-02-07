@@ -32,7 +32,7 @@ IMAGEPATH_LOW = 'https://image.tmdb.org/t/p/w780'
 IMAGEPATH_POSTER = 'https://image.tmdb.org/t/p/w500'
 IMAGEPATH_SMALLPOSTER = 'https://image.tmdb.org/t/p/w342'
 IMAGEPATH_SMALLLOGO = 'https://image.tmdb.org/t/p/w300'
-ARTWORK_BLACKLIST = [[], ['fanart'], ['fanart', 'poster'], ['fanart', 'poster']]
+ARTWORK_BLACKLIST = [[], ['poster'], ['fanart', 'poster'], ['fanart', 'poster']]
 
 TMDB_GENRE_IDS = {
     "Action": 28, "Adventure": 12, "Action & Adventure": 10759, "Animation": 16, "Comedy": 35, "Crime": 80, "Documentary": 99, "Drama": 18,
