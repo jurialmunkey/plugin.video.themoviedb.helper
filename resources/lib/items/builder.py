@@ -36,10 +36,6 @@ IMAGEPATH_MAP = {
 CACHE_DAYS = 10000
 
 
-def _timestamp(days=14):
-    return set_timestamp(days * 24 * 3600)
-
-
 class ItemBuilder(_ArtworkSelector):
     def __init__(self, tmdb_api=None, ftv_api=None, trakt_api=None, cache_only=False):
         self.parent = {}
@@ -53,6 +49,9 @@ class ItemBuilder(_ArtworkSelector):
         self.timer_lists = {}
         self.log_timers = False
         # self.__dict__.update(kwargs)
+
+    def _timestamp(self, days=14):
+        return set_timestamp(days * 24 * 3600)
 
     def get_ftv_typeid(self, tmdb_type, item):
         if not item:
@@ -120,10 +119,11 @@ class ItemBuilder(_ArtworkSelector):
                 tmdb_type = 'season' if episode is None else 'episode'
             item = {
                 'listitem': self.map_item(details, tmdb_type, base_item=base_item['listitem'] if base_item else None),
-                'expires': _timestamp(days=14),
+                'expires': self._timestamp(),
                 'artwork': {}}
             item['artwork']['tmdb'] = item['artwork'][ARTWORK_QUALITY] = item['listitem'].pop('art')
-            item['artwork']['manual'] = manual_art or {}
+            if manual_art:
+                item['artwork']['manual'] = manual_art
             item['listitem']['art'] = {}
         return item
 
@@ -132,12 +132,25 @@ class ItemBuilder(_ArtworkSelector):
             return
         name = '{}.{}.{}.{}'.format(tmdb_type, tmdb_id, season, episode)
         item = None if refresh_cache else self._cache.get_cache(name)
-        if self.cache_only or (item and get_timestamp(item['expires'])):  # TODO Check for correct artwork quality
+        if self.cache_only:
             return item
-        base_item = None if season is None else self.parent or self.get_item(tmdb_type, tmdb_id)
+        base_item = None
+        if season is not None:
+            base_name = '{}.{}.None.None'.format(tmdb_type, tmdb_id)
+            base_item = self.parent or self._cache.get_cache(base_name)
+        if item and get_timestamp(item['expires']):
+            if not base_item or base_item['expires'] < item['expires']:
+                return item
+        manual_art = item['artwork'].get('manual', {}) if item else {}
+        if season is not None:
+            base_item = base_item or self.get_item(tmdb_type, tmdb_id)
+            base_manual_art = base_item['artwork'].get('manual', {}) if base_item else {}
+            base_manual_art = {'tvshow.{}'.format(k): v for k, v in base_manual_art.items() if v}
+            base_manual_art.update(manual_art)
+            manual_art = base_manual_art
         item = self.get_tmdb_item(
-            tmdb_type, tmdb_id, season=season, episode=episode, base_item=base_item,
-            manual_art=item['artwork'].get('manual') if item else None)
+            tmdb_type, tmdb_id, season=season, episode=episode,
+            base_item=base_item, manual_art=manual_art)
         item = self.get_artwork(item, tmdb_type, season, base_item)
         return self._cache.set_cache(item, name, cache_days=CACHE_DAYS)
         # TODO: Remember to include OMDb too!
