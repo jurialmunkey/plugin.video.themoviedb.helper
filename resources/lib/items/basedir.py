@@ -3,6 +3,7 @@ import xbmcaddon
 from resources.lib.addon.timedate import get_timedelta, get_datetime_today
 from resources.lib.addon.plugin import PLUGINPATH, convert_type
 from resources.lib.addon.setutils import merge_two_items
+from resources.lib.items.builder import ItemBuilder
 from json import dumps
 
 
@@ -693,7 +694,8 @@ class BaseDirLists():
         return func()
 
     def list_details(self, tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
-        base_item = self.tmdb_api.get_details(tmdb_type, tmdb_id, season, episode)
+        base_item = ItemBuilder(tmdb_api=self.tmdb_api).get_item(tmdb_type, tmdb_id, season, episode)
+        base_item = base_item['listitem'] if base_item else {}
         base_item = self.omdb_api.get_item_ratings(base_item) if self.omdb_api else base_item
         items = get_basedir_details(tmdb_type, tmdb_id, season, episode, base_item)
         self.container_content = self.get_container_content(tmdb_type, season, episode)

@@ -183,35 +183,23 @@ class TMDb(RequestAPI):
             infoproperties.update(get_episode_to_air(response['last_episode_to_air'], 'last_aired'))
         return {'infoproperties': infoproperties}
 
-    def _get_details_request(self, tmdb_type, tmdb_id, season=None, episode=None):
+    def get_details_request(self, tmdb_type, tmdb_id, season=None, episode=None):
         path_affix = []
         if season is not None:
             path_affix += ['season', season]
         if season is not None and episode is not None:
             path_affix += ['episode', episode]
-        return self.get_response_json(
+        return self.get_request_lc(
             tmdb_type, tmdb_id, *path_affix, append_to_response=self.append_to_response) or {}
 
     def get_details(self, tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
-        kwargs['cache_days'] = CACHE_LONG
-        kwargs['cache_name'] = 'TMDb.get_details.v4_5_25.{}.{}'.format(self.language, ARTWORK_QUALITY)
-        kwargs['cache_combine_name'] = True
-        return self._cache.use_cache(self._get_details, tmdb_type, tmdb_id, season, episode, **kwargs)
-
-    def _get_details(self, tmdb_type, tmdb_id, season, episode, **kwargs):
-        if not tmdb_id or not tmdb_type:
-            return
-
-        # Get base item
-        info_item = self._get_details_request(tmdb_type, tmdb_id)
+        info_item = self.get_details_request(tmdb_type, tmdb_id)
         base_item = self.mapper.get_info(info_item, tmdb_type)
-
         if tmdb_type != 'tv' or season is None:
             return base_item
-
         # If we're getting season/episode details we need to add them to the base tv details
         child_type = 'episode' if episode else 'season'
-        child_info = self._get_details_request(tmdb_type, tmdb_id, season, episode)
+        child_info = self.get_details_request(tmdb_type, tmdb_id, season, episode)
         return self.mapper.get_info(child_info, child_type, base_item, tmdb_id=tmdb_id)
 
     def _get_upnext_season_item(self, base_item):
@@ -314,12 +302,6 @@ class TMDb(RequestAPI):
         items, items_end = [], []
         for i in request.get('seasons', []):
             item = self.mapper.get_info(i, 'season', base_item, definition=TMDB_PARAMS_SEASONS, tmdb_id=tmdb_id)
-            # TODO: Fix play all
-            # Might be issue with resolving to dummy file that resets playlist to 1
-            # item['context_menu'] += [(
-            #     xbmc.getLocalizedString(22083),
-            #     'RunScript(plugin.video.themoviedb.helper,play_season={},tmdb_id={})'.format(
-            #         item['infolabels']['season'], tmdb_id))]
             if i.get('season_number') != 0:
                 items.append(item)
             elif ((special_folders >> 0) & 1) == 0:  # on bit in 0 pos hides specials

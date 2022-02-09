@@ -10,6 +10,7 @@ from resources.lib.addon.parser import try_int
 from resources.lib.addon.setutils import merge_two_dicts
 from resources.lib.addon.decorators import try_except_log
 from resources.lib.addon.timedate import convert_timestamp, get_region_date
+from resources.lib.items.builder import ItemBuilder
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
@@ -42,8 +43,9 @@ class CommonMonitorFunctions(object):
         self.index_properties = set()
         self.trakt_api = TraktAPI()
         self.tmdb_api = TMDb()
-        self.fanarttv = FanartTV()
+        self.ftv_api = FanartTV()
         self.omdb_api = OMDb() if ADDON.getSettingString('omdb_apikey') else None
+        self.ib = ItemBuilder(tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api)
         self.imdb_top250 = {}
         self.property_prefix = 'ListItem'
 
@@ -144,22 +146,6 @@ class CommonMonitorFunctions(object):
             self.multisearch_tmdbtype = multi_i.get('media_type')
             return multi_i.get('id')
         return self.tmdb_api.get_tmdb_id(tmdb_type=tmdb_type, query=query, year=year, episode_year=episode_year)
-
-    def get_fanarttv_artwork(self, item, tmdb_type=None, tmdb_id=None, tvdb_id=None):
-        if not self.fanarttv or tmdb_type not in ['movie', 'tv']:
-            return item
-        lookup_id = None
-        if tmdb_type == 'tv':
-            ftv_type = 'tv'
-            lookup_id = tvdb_id or item.get('unique_ids', {}).get('tvshow.tvdb') or item.get('unique_ids', {}).get('tvdb')
-            func = self.fanarttv.get_all_artwork
-        elif tmdb_type == 'movie':
-            ftv_type = 'movies'
-            lookup_id = tmdb_id or item.get('unique_ids', {}).get('tmdb')
-            func = self.fanarttv.get_all_artwork
-        if lookup_id:
-            item['art'] = merge_two_dicts(item.get('art', {}), func(lookup_id, ftv_type))
-        return item
 
     def get_trakt_ratings(self, item, trakt_type, season=None, episode=None):
         ratings = self.trakt_api.get_ratings(

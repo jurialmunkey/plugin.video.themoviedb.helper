@@ -9,21 +9,10 @@ from resources.lib.addon.timedate import get_timestamp, set_timestamp
 from resources.lib.files.cache import BasicCache, CACHE_SHORT, CACHE_LONG
 from copy import copy
 from json import loads, dumps
-
+# from resources.lib.addon.decorators import timer_func
+import requests
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
-
-
-requests = None  # Requests module is slow to import so lazy import via decorator instead
-
-
-def lazyimport_requests(func):
-    def wrapper(*args, **kwargs):
-        global requests
-        if requests is None:
-            import requests
-        return func(*args, **kwargs)
-    return wrapper
 
 
 def dictify(r, root=True):
@@ -120,7 +109,6 @@ class RequestAPI(object):
         self.req_timeout_err = set_timestamp(self.timeout * 3)
         get_property(self.req_timeout_err_prop, self.req_timeout_err)
 
-    @lazyimport_requests
     def get_simple_api_request(self, request=None, postdata=None, headers=None, method=None):
         try:
             if method == 'delete':
@@ -137,7 +125,6 @@ class RequestAPI(object):
         except Exception as err:
             kodi_log(u'RequestError: {}'.format(err), 1)
 
-    @lazyimport_requests
     def get_api_request(self, request=None, postdata=None, headers=None):
         """
         Make the request to the API by passing a url request string

@@ -34,6 +34,14 @@ def get_datetime_datetime(*args, **kwargs):
     return datetime.datetime(*args, **kwargs)
 
 
+def convert_to_timestamp(date_time):
+    '''Converts a datetime object to unix timestamp'''
+    try:
+        return int(time.mktime(date_time.timetuple()))
+    except OverflowError:
+        return 2145916800  # Y2038 bug in time.mktime on 32bit float systems. Use 2038 Jan 1 UTC for db timestamp instead.
+
+
 def get_timestamp(timestamp=None):
     if not timestamp:
         return

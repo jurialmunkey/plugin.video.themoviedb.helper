@@ -12,13 +12,12 @@ Code cleanup
 import xbmcvfs
 import xbmcgui
 import xbmc
-import time
 import sqlite3
 from functools import reduce
 # from ast import literal_eval
 from contextlib import contextmanager
 from resources.lib.addon.plugin import kodi_log
-from resources.lib.addon.timedate import get_timedelta, get_datetime_now, get_datetime_datetime
+from resources.lib.addon.timedate import get_timedelta, get_datetime_now, get_datetime_datetime, convert_to_timestamp
 from resources.lib.files.utils import get_file_path
 
 
@@ -73,7 +72,7 @@ class SimpleCache(object):
             checkum: optional argument to check if the checksum in the cacheobject matches the checkum provided
         '''
         checksum = self._get_checksum(checksum)
-        cur_time = self._get_timestamp(get_datetime_now())
+        cur_time = convert_to_timestamp(get_datetime_now())
         result = self._get_mem_cache(endpoint, checksum, cur_time)  # Try from memory first
         if result is not None or self._mem_only:
             return result
@@ -85,7 +84,7 @@ class SimpleCache(object):
         '''
         with self.busy_tasks(u'set.{}'.format(endpoint)):
             checksum = self._get_checksum(checksum)
-            expires = self._get_timestamp(get_datetime_now() + get_timedelta(days=cache_days))
+            expires = convert_to_timestamp(get_datetime_now() + get_timedelta(days=cache_days))
             self._set_mem_cache(endpoint, checksum, expires, data)
             if not self._mem_only:
                 self._set_db_cache(endpoint, checksum, expires, data)
@@ -172,7 +171,7 @@ class SimpleCache(object):
 
         with self.busy_tasks(__name__):
             cur_time = get_datetime_now()
-            cur_timestamp = self._get_timestamp(cur_time)
+            cur_timestamp = convert_to_timestamp(cur_time)
             kodi_log("CACHE: Running cleanup...")
             if self._win.getProperty(u"{}.cleanbusy".format(self._sc_name)):
                 return
@@ -250,14 +249,6 @@ class SimpleCache(object):
                     break
             kodi_log(u"CACHE: _database ERROR ! -- {}".format(error), 1)
         return None
-
-    @staticmethod
-    def _get_timestamp(date_time):
-        '''Converts a datetime object to unix timestamp'''
-        try:
-            return int(time.mktime(date_time.timetuple()))
-        except OverflowError:
-            return 2145916800  # Y2038 bug in time.mktime on 32bit float systems. Use 2038 Jan 1 UTC for db timestamp instead.
 
     def _get_checksum(self, stringinput):
         '''get int checksum from string'''

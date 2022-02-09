@@ -120,11 +120,9 @@ class _ListItem(object):
     def set_playcount(self, playcount):
         return
 
-    def set_details(self, details=None, reverse=False, set_artwork={}):
+    def set_details(self, details=None, reverse=False):
         if not details:
             return
-        if set_artwork:
-            self.set_artwork(details, **set_artwork)
         self.stream_details = merge_two_dicts(details.get('stream_details', {}), self.stream_details, reverse=reverse)
         self.infolabels = merge_two_dicts(details.get('infolabels', {}), self.infolabels, reverse=reverse)
         self.infoproperties = merge_two_dicts(details.get('infoproperties', {}), self.infoproperties, reverse=reverse)
@@ -133,9 +131,9 @@ class _ListItem(object):
         self.cast = self.cast or details.get('cast', [])
 
     def set_artwork(self, details=None, blacklist=[], whitelist=[]):
-        if not details or 'art' not in details:
+        if not details:
             return
-        for k, v in details['art'].items():
+        for k, v in details.items():
             if not v:
                 continue
             if whitelist and k not in whitelist:

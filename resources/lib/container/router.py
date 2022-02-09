@@ -3,13 +3,11 @@ import xbmc
 import xbmcplugin
 import xbmcaddon
 from threading import Thread
-from resources.lib.addon.constants import NO_LABEL_FORMATTING, RANDOMISED_TRAKT, RANDOMISED_LISTS, TRAKT_LIST_OF_LISTS, TMDB_BASIC_LISTS, TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, ROUTE_NO_ID, ROUTE_TMDB_ID, ARTWORK_BLACKLIST
+from resources.lib.addon.constants import NO_LABEL_FORMATTING, RANDOMISED_TRAKT, RANDOMISED_LISTS, TRAKT_LIST_OF_LISTS, TMDB_BASIC_LISTS, TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, ROUTE_NO_ID, ROUTE_TMDB_ID
 from resources.lib.addon.plugin import convert_type, reconfigure_legacy_params, kodi_log
 from resources.lib.addon.parser import parse_paramstring, try_int
 from resources.lib.addon.setutils import split_items, random_from_list, merge_two_dicts
 from resources.lib.addon.decorators import TimerList
-from resources.lib.items.listitem import ListItem
-from resources.lib.items.basedir import BaseDirLists
 from resources.lib.api.mapping import set_show, get_empty_item
 from resources.lib.api.kodi.rpc import get_kodi_library, get_movie_details, get_tvshow_details, get_episode_details, get_season_details, set_playprogress
 from resources.lib.api.tmdb.api import TMDb
@@ -20,11 +18,14 @@ from resources.lib.api.trakt.api import TraktAPI
 from resources.lib.api.trakt.lists import TraktLists
 from resources.lib.api.fanarttv.api import FanartTV
 from resources.lib.api.omdb.api import OMDb
+from resources.lib.items.builder import ItemBuilder
+from resources.lib.items.basedir import BaseDirLists
 from resources.lib.script.router import related_lists
 from resources.lib.player.players import Players
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
+PREGAME_PARENT = ['seasons', 'episodes', 'episode_groups', 'trakt_upnext', 'episode_group_seasons']
 
 
 def filtered_item(item, key, value, exclude=False):
@@ -62,12 +63,10 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.cache_only = self.params.pop('cacheonly', '').lower()
         self.ftv_forced_lookup = self.params.pop('fanarttv', '').lower()
         self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only())  # Set after ftv_forced_lookup, is_widget, cache_only
-        self.ftv_merge_season = ADDON.getSettingBool('fanarttv_merge_season')
-        self.ftv_blacklist = ARTWORK_BLACKLIST[ADDON.getSettingInt('artwork_quality')]
         self.tmdb_cache_only = self.tmdb_is_cache_only()  # Set after ftv_api, cache_only
-        self.filter_key = self.params.get('filter_key', None)
-        self.filter_value = split_items(self.params.get('filter_value', None))[0]
-        self.exclude_key = self.params.get('exclude_key', None)
+        self.filter_key = self.params.get('filter_key', None),
+        self.filter_value = split_items(self.params.get('filter_value', None))[0],
+        self.exclude_key = self.params.get('exclude_key', None),
         self.exclude_value = split_items(self.params.get('exclude_value', None))[0]
         self.pagination = self.pagination_is_allowed()
         self.params = reconfigure_legacy_params(**self.params)
@@ -102,41 +101,62 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             return False
         return True
 
-    def _add_item(self, x, li, cache_only=True, ftv_art=None):
-        with TimerList(self.timer_lists, 'item_tmdb', log_threshold=0.05, logging=self.log_timers):
-            li.set_details(details=self.get_tmdb_details(li, cache_only=cache_only), set_artwork={'whitelist': ['fanart']})
-        with TimerList(self.timer_lists, 'item_ftv', log_threshold=0.05, logging=self.log_timers):
-            li.set_artwork(details=ftv_art or self.get_ftv_artwork(li), blacklist=self.ftv_blacklist)
+    def item_is_excluded(self, listitem):
+        if self.filter_key and self.filter_value:
+            if self.filter_value == 'is_empty':
+                if listitem.infolabels.get(self.filter_key) or listitem.infoproperties.get(self.filter_key):
+                    return True
+            elif self.filter_key in listitem.infolabels:
+                if filtered_item(listitem.infolabels, self.filter_key, self.filter_value):
+                    return True
+            elif self.filter_key in listitem.infoproperties:
+                if filtered_item(listitem.infoproperties, self.filter_key, self.filter_value):
+                    return True
+        if self.exclude_key and self.exclude_value:
+            if self.exclude_value == 'is_empty':
+                if not listitem.infolabels.get(self.exclude_key) and not listitem.infoproperties.get(self.exclude_key):
+                    return True
+            elif self.exclude_key in listitem.infolabels:
+                if filtered_item(listitem.infolabels, self.exclude_key, self.exclude_value, True):
+                    return True
+            elif self.exclude_key in listitem.infoproperties:
+                if filtered_item(listitem.infoproperties, self.exclude_key, self.exclude_value, True):
+                    return True
+
+    def _add_item(self, x, i):
+        with TimerList(self.timer_lists, 'item_api', log_threshold=0.05, logging=self.log_timers):
+            li = self.ib.get_listitem(i)
         self.items_queue[x] = li
 
-    def add_items(self, items=None, pagination=True, parent_params=None, property_params=None, kodi_db=None, cache_only=True):
+    def add_items(self, items=None, pagination=True, property_params=None, kodi_db=None, cache_only=True):
         if not items:
             return
-        check_is_aired = parent_params.get('info') not in NO_LABEL_FORMATTING
-        hide_nodate = ADDON.getSettingBool('nodate_is_unaired')
+
+        self.ib = ItemBuilder(tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api)
+        self.ib.cache_only = cache_only
+        self.ib.timer_lists = self.timer_lists
+        self.ib.log_timers = self.log_timers
 
         # Pre-game details and artwork cache for episodes before threading to avoid multiple API calls
-        ftv_art = None
-        if parent_params.get('info') in ['seasons', 'episodes', 'episode_groups', 'trakt_upnext', 'episode_group_seasons']:
-            details = self.tmdb_api.get_details('tv', parent_params.get('tmdb_id'), parent_params.get('season', None), cache_only=cache_only)
-            ftv_art = self.get_ftv_artwork(ListItem(parent_params=parent_params, **details)) if parent_params['info'] == 'episodes' else None
+        # season=self.parent_params.get('season', None) if self.parent_params['info'] == 'episodes' else None
+        if self.parent_params.get('info') in PREGAME_PARENT:
+            self.ib.parent = self.ib.get_item(tmdb_type='tv', tmdb_id=self.parent_params.get('tmdb_id'))
 
-        # Build empty queue and thread pool
-        self.items_queue, pool = [None] * len(items), [None] * len(items)
+        # Sync Trakt watched data before building items
+        hide_no_date = ADDON.getSettingBool('nodate_is_unaired')
+        hide_unaired = self.parent_params.get('info') not in NO_LABEL_FORMATTING
         trakt_pre_sync = Thread(target=self.get_pre_trakt_sync, args=[self.container_content])
         trakt_pre_sync.start()
 
-        # Start item build threads
+        # Thread pool and item build queue
+        all_items = []
+        self.ib.parent_params = self.parent_params
+        self.items_queue, pool = [None] * len(items), [None] * len(items)
         for x, i in enumerate(items):
             if not pagination and 'next_page' in i:
                 continue
-            li = ListItem(parent_params=parent_params, **i)
-            pool[x] = Thread(target=self._add_item, args=[x, li, cache_only, ftv_art])
+            pool[x] = Thread(target=self._add_item, args=[x, i])
             pool[x].start()
-
-        # Wait to join threads in pool first before adding item to directory
-        all_items = []
-        trakt_pre_sync.join()
         for x, i in enumerate(pool):
             if not i:
                 continue
@@ -146,20 +166,18 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
                 continue
             if not li.next_page and self.item_is_excluded(li):
                 continue
-            all_items.append(li)
-
-        # Final configuration before adding to directory
-        for li in all_items:
             li.set_episode_label()
-            if check_is_aired and li.is_unaired(no_date=hide_nodate):
+            if hide_unaired and li.is_unaired(no_date=hide_no_date):
                 continue
-            with TimerList(self.timer_lists, 'item_kodi', log_threshold=0.05, logging=self.log_timers):
-                li.set_details(details=self.get_kodi_details(li), reverse=True)  # Quick because local db
-            with TimerList(self.timer_lists, 'item_trakt', log_threshold=0.05, logging=self.log_timers):
-                li.set_playcount(playcount=self.get_playcount_from_trakt(li))  # Quick because of agressive caching of Trakt object and pre-emptive dict comprehension
+            all_items.append(li)
+        with TimerList(self.timer_lists, 'item_join', logging=self.log_timers):
+            trakt_pre_sync.join()
+        for li in all_items:
+            li.set_details(details=self.get_kodi_details(li), reverse=True)
+            li.set_playcount(playcount=self.get_playcount_from_trakt(li))
             if self.hide_watched and try_int(li.infolabels.get('playcount')) != 0:
                 continue
-            with TimerList(self.timer_lists, 'item_build', logging=self.log_timers):
+            with TimerList(self.timer_lists, 'item_make', logging=self.log_timers):
                 li.set_context_menu()  # Set the context menu items
                 li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
                 li.set_thumb_to_art(self.thumb_override == 2) if self.thumb_override else None
@@ -196,61 +214,14 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         xbmcplugin.setContent(self.handle, container_content)  # Container.Content
         xbmcplugin.endOfDirectory(self.handle, updateListing=update_listing)
 
-    def item_is_excluded(self, listitem):
-        if self.filter_key and self.filter_value:
-            if self.filter_value == 'is_empty':
-                if listitem.infolabels.get(self.filter_key) or listitem.infoproperties.get(self.filter_key):
-                    return True
-            elif self.filter_key in listitem.infolabels:
-                if filtered_item(listitem.infolabels, self.filter_key, self.filter_value):
-                    return True
-            elif self.filter_key in listitem.infoproperties:
-                if filtered_item(listitem.infoproperties, self.filter_key, self.filter_value):
-                    return True
-        if self.exclude_key and self.exclude_value:
-            if self.exclude_value == 'is_empty':
-                if not listitem.infolabels.get(self.exclude_key) and not listitem.infoproperties.get(self.exclude_key):
-                    return True
-            elif self.exclude_key in listitem.infolabels:
-                if filtered_item(listitem.infolabels, self.exclude_key, self.exclude_value, True):
-                    return True
-            elif self.exclude_key in listitem.infoproperties:
-                if filtered_item(listitem.infoproperties, self.exclude_key, self.exclude_value, True):
-                    return True
-
     def get_tmdb_details(self, li, cache_only=True):
         if not self.tmdb_api:
             return
-        return self.tmdb_api.get_details(
+        return self.ib.get_listitem(
             li.get_tmdb_type(),
             li.unique_ids.get('tvshow.tmdb') if li.infolabels.get('mediatype') in ['season', 'episode'] else li.unique_ids.get('tmdb'),
             li.infolabels.get('season', 0) if li.infolabels.get('mediatype') in ['season', 'episode'] else None,
-            li.infolabels.get('episode') if li.infolabels.get('mediatype') == 'episode' else None,
-            cache_only=cache_only)
-
-    def get_ftv_artwork(self, li):
-        if not self.ftv_api:
-            return
-        artwork = self.ftv_api.get_all_artwork(li.get_ftv_id(), li.get_ftv_type())
-        if not artwork:
-            return
-        artwork = {'art': artwork}
-
-        # Move tvshow artwork properties to tvshow. prefix for seasons/episodes
-        if li.infolabels.get('mediatype') not in ['season', 'episode']:
-            return artwork
-        artwork['art'] = {u'tvshow.{}'.format(k): v for k, v in artwork['art'].items() if v}
-        artwork['art']['fanart'] = artwork['art'].get('tvshow.fanart')
-
-        # Only get season artwork for "real" seasons and episodes. Skip special tmdbhelper season folders.
-        if not self.ftv_merge_season or li.params.get('info') in ['episode_groups', 'trakt_upnext', 'episode_group_episodes']:
-            return artwork
-        season_artwork = self.ftv_api.get_all_artwork(li.get_ftv_id(), li.get_ftv_type(), li.infolabels.get('season'))
-
-        # Add season artwork properties to season. prefix for seasons/episodes
-        artwork['art'].update({u'season.{}'.format(k): v for k, v in season_artwork.items() if v})
-        artwork['art'].update(season_artwork)
-        return artwork
+            li.infolabels.get('episode') if li.infolabels.get('mediatype') == 'episode' else None)
 
     def _set_playprogress_from_trakt(self, li):
         if li.infolabels.get('mediatype') == 'movie':
@@ -449,7 +420,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         timer_log = ['DIRECTORY TIMER REPORT\n', self.paramstring, '\n']
         timer_log.append('------------------------------\n')
         for k, v in self.timer_lists.items():
-            if k in ['item_tmdb', 'item_ftv']:
+            if k in ['item_api', 'item_tmdb', 'item_ftv']:
                 avg_time = u'{:7.3f} sec avg | {:7.3f} sec max | {:3}'.format(sum(v) / len(v), max(v), len(v)) if v else '  None'
                 timer_log.append(' - {:12s}: {}\n'.format(k, avg_time))
             elif k[:4] == 'item':
@@ -462,7 +433,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         tot_time = u'{:7.3f} sec'.format(sum(total_log) / len(total_log)) if total_log else '  None'
         timer_log.append('{:15s}: {}\n'.format('Total', tot_time))
         for k, v in self.timer_lists.items():
-            if v and k in ['item_tmdb', 'item_ftv']:
+            if v and k in ['item_api', 'item_tmdb', 'item_ftv']:
                 timer_log.append('\n{}:\n{}\n'.format(k, ' '.join([u'{:.3f} '.format(i) for i in v])))
         kodi_log(timer_log, 1)
 
@@ -477,7 +448,6 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
                 self.add_items(
                     items,
                     pagination=self.pagination,
-                    parent_params=self.parent_params,
                     property_params=self.set_params_to_container(**self.params),
                     kodi_db=self.kodi_db,
                     cache_only=self.tmdb_cache_only)

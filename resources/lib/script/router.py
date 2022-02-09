@@ -15,6 +15,7 @@ from resources.lib.files.downloader import Downloader
 from resources.lib.files.utils import dumps_to_file, validify_filename, read_file
 from resources.lib.items.basedir import get_basedir_details
 from resources.lib.items.listitem import ListItem
+from resources.lib.items.builder import ItemBuilder
 from resources.lib.api.fanarttv.api import FanartTV
 from resources.lib.api.tmdb.api import TMDb
 from resources.lib.api.trakt.api import TraktAPI, get_sort_methods
@@ -86,7 +87,8 @@ def delete_cache(delete_cache, **kwargs):
         'TMDb': lambda: TMDb(),
         'Trakt': lambda: TraktAPI(),
         'FanartTV': lambda: FanartTV(),
-        'OMDb': lambda: OMDb()}
+        'OMDb': lambda: OMDb(),
+        'Item Details': lambda: ItemBuilder()}
     if delete_cache == 'select':
         m = [i for i in d]
         x = xbmcgui.Dialog().contextmenu([ADDON.getLocalizedString(32387).format(i) for i in m])
@@ -198,14 +200,10 @@ def _get_ftv_id(**kwargs):
     return ListItem(**details).get_ftv_id()
 
 
-def manage_artwork(ftv_id=None, ftv_type=None, season=None, **kwargs):
-    if not ftv_type:
+def manage_artwork(tmdb_id=None, tmdb_type=None, season=None, **kwargs):
+    if not tmdb_type or not tmdb_id:
         return
-    if not ftv_id:
-        ftv_id = _get_ftv_id(**kwargs)
-    if not ftv_id:
-        return
-    FanartTV().manage_artwork(ftv_id, ftv_type, season=season)
+    ItemBuilder().manage_artwork(tmdb_id=tmdb_id, tmdb_type=tmdb_type, season=season)
 
 
 @get_tmdb_id
