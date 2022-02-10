@@ -235,7 +235,7 @@ class TMDb(RequestAPI):
         items_append = items.append
         for x, i in enumerate(request.get('groups', [])):
             item = self.mapper.get_info(i, 'season', None, tmdb_id=tmdb_id, definition={
-                'info': 'episode_group_episodes', 'tmdb_type': 'tv', 'tmdb_id': tmdb_id,
+                'info': 'episode_group_episodes', 'tmdb_type': 'tv', 'tmdb_id': str(tmdb_id),
                 'group_id': group_id, 'position': str(x)})
             item['infolabels']['season'] = -1
             item['infolabels']['episode'] = len(i.get('episodes', []))
@@ -249,7 +249,7 @@ class TMDb(RequestAPI):
         items = [
             self._clean_merged(
                 self.mapper.get_info(i, 'tv', None, tmdb_id=tmdb_id, definition={
-                    'info': 'episode_group_seasons', 'tmdb_type': 'tv', 'tmdb_id': tmdb_id, 'group_id': '{id}'}),
+                    'info': 'episode_group_seasons', 'tmdb_type': 'tv', 'tmdb_id': str(tmdb_id), 'group_id': '{id}'}),
                 tmdb_id=tmdb_id)
             for i in request.get('results', [])]
         return items
@@ -314,7 +314,7 @@ class TMDb(RequestAPI):
             if egroups and egroups.get('results'):
                 egroup_item = self.mapper.get_info({
                     'title': ADDON.getLocalizedString(32345)}, 'season', base_item, tmdb_id=tmdb_id, definition={
-                        'info': 'episode_groups', 'tmdb_type': 'tv', 'tmdb_id': tmdb_id})
+                        'info': 'episode_groups', 'tmdb_type': 'tv', 'tmdb_id': str(tmdb_id)})
                 egroup_item['art']['thumb'] = egroup_item['art']['poster'] = u'{}/resources/icons/trakt/groupings.png'.format(ADDONPATH)
                 egroup_item['infolabels']['season'] = -1
                 egroup_item['infolabels']['episode'] = 0
@@ -325,7 +325,7 @@ class TMDb(RequestAPI):
             if get_property('TraktIsAuth') == 'True':
                 upnext_item = self.mapper.get_info({
                     'title': ADDON.getLocalizedString(32043)}, 'season', base_item, tmdb_id=tmdb_id, definition={
-                        'info': 'trakt_upnext', 'tmdb_type': 'tv', 'tmdb_id': tmdb_id})
+                        'info': 'trakt_upnext', 'tmdb_type': 'tv', 'tmdb_id': str(tmdb_id)})
                 upnext_item['art']['thumb'] = upnext_item['art']['poster'] = u'{}/resources/icons/trakt/up-next.png'.format(ADDONPATH)
                 upnext_item['infolabels']['season'] = -1
                 upnext_item['infolabels']['episode'] = 0
