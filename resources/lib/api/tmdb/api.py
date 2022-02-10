@@ -1,6 +1,6 @@
 import xbmcgui
 import xbmcaddon
-from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type
+from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type, kodi_log
 from resources.lib.addon.constants import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, TMDB_GENRE_IDS
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.window import get_property
@@ -220,36 +220,37 @@ class TMDb(RequestAPI):
         request = self.get_request_sc(u'tv/episode_group/{}'.format(group_id))
         if not request or not request.get('groups'):
             return []
-        base_item = self.get_details('tv', tmdb_id)
         eps_group = request.get('groups', [])[try_int(position)] or {}
         return [
-            self.mapper.get_info(i, 'episode', base_item, definition=TMDB_PARAMS_EPISODES, tmdb_id=tmdb_id)
+            self._clean_merged(
+                self.mapper.get_info(i, 'episode', None, definition=TMDB_PARAMS_EPISODES, tmdb_id=tmdb_id),
+                tmdb_id=tmdb_id)
             for i in eps_group.get('episodes', [])]
 
     def get_episode_group_seasons_list(self, tmdb_id, group_id):
         request = self.get_request_sc(u'tv/episode_group/{}'.format(group_id))
         if not request or not request.get('groups'):
             return []
-        base_item = self.get_details('tv', tmdb_id)
         items = []
         items_append = items.append
         for x, i in enumerate(request.get('groups', [])):
-            item = self.mapper.get_info(i, 'season', base_item, tmdb_id=tmdb_id, definition={
+            item = self.mapper.get_info(i, 'season', None, tmdb_id=tmdb_id, definition={
                 'info': 'episode_group_episodes', 'tmdb_type': 'tv', 'tmdb_id': tmdb_id,
                 'group_id': group_id, 'position': str(x)})
             item['infolabels']['season'] = -1
             item['infolabels']['episode'] = len(i.get('episodes', []))
-            items_append(item)
+            items_append(self._clean_merged(item, tmdb_id=tmdb_id))
         return items
 
     def get_episode_groups_list(self, tmdb_id):
         request = self.get_request_sc(u'tv/{}/episode_groups'.format(tmdb_id))
         if not request or not request.get('results'):
             return []
-        base_item = self.get_details('tv', tmdb_id)
         items = [
-            self.mapper.get_info(i, 'tv', base_item, tmdb_id=tmdb_id, definition={
-                'info': 'episode_group_seasons', 'tmdb_type': 'tv', 'tmdb_id': tmdb_id, 'group_id': '{id}'})
+            self._clean_merged(
+                self.mapper.get_info(i, 'tv', None, tmdb_id=tmdb_id, definition={
+                    'info': 'episode_group_seasons', 'tmdb_type': 'tv', 'tmdb_id': tmdb_id, 'group_id': '{id}'}),
+                tmdb_id=tmdb_id)
             for i in request.get('results', [])]
         return items
 
@@ -331,14 +332,21 @@ class TMDb(RequestAPI):
                 items_end.append(upnext_item)
         return items + items_end
 
+    def _clean_merged(self, item, tmdb_id):
+        item['infolabels'].pop('tvshowtitle', None)
+        item['unique_ids']['tvshow.tmdb'] = item['infoproperties']['tvshow.tmdb_id'] = tmdb_id
+        return item
+
     def get_episode_list(self, tmdb_id, season):
         request = self.get_request_sc(u'tv/{}/season/{}'.format(tmdb_id, season))
         if not request:
             return []
-        base_item = self.get_details('tv', tmdb_id)
-        return [
-            self.mapper.get_info(i, 'episode', base_item, definition=TMDB_PARAMS_EPISODES, tmdb_id=tmdb_id)
+        items = [
+            self._clean_merged(
+                item=self.mapper.get_info(i, 'episode', None, definition=TMDB_PARAMS_EPISODES, tmdb_id=tmdb_id),
+                tmdb_id=tmdb_id)
             for i in request.get('episodes', [])]
+        return items
 
     def get_cast_list(self, tmdb_id, tmdb_type, season=None, episode=None, keys=['cast', 'guest_stars']):
         items = []

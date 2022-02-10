@@ -26,33 +26,39 @@ class TMDbLists():
 
     def list_episode_group_episodes(self, tmdb_id, group_id, position, **kwargs):
         items = self.tmdb_api.get_episode_group_episodes_list(tmdb_id, group_id, position)
+        self.tmdb_cache_only = False
         self.container_content = convert_type('episode', 'container')
         return items
 
     def list_episode_group_seasons(self, tmdb_id, group_id, **kwargs):
         items = self.tmdb_api.get_episode_group_seasons_list(tmdb_id, group_id)
+        self.tmdb_cache_only = False
         self.container_content = convert_type('season', 'container')
         self.trakt_watchedindicators = False  # Force override of setting because not "true" seasons so data will be incorrect
         return items
 
     def list_episode_groups(self, tmdb_id, **kwargs):
         items = self.tmdb_api.get_episode_groups_list(tmdb_id)
+        self.tmdb_cache_only = False
         self.container_content = convert_type('tv', 'container')
         return items
 
     def list_flatseasons(self, tmdb_id, **kwargs):
         items = self.tmdb_api.get_flatseasons_list(tmdb_id)
+        self.tmdb_cache_only = False
         self.kodi_db = self.get_kodi_database('tv')
         self.container_content = convert_type('episode', 'container')
         return items
 
     def list_seasons(self, tmdb_id, **kwargs):
         items = self.tmdb_api.get_season_list(tmdb_id, special_folders=ADDON.getSettingInt('special_folders'))
+        self.tmdb_cache_only = False
         self.container_content = convert_type('season', 'container')
         return items
 
     def list_episodes(self, tmdb_id, season, **kwargs):
         items = self.tmdb_api.get_episode_list(tmdb_id, season)
+        self.tmdb_cache_only = False
         self.kodi_db = self.get_kodi_database('tv')
         self.container_content = convert_type('episode', 'container')
         self.plugin_category = '{} {}'.format(xbmc.getLocalizedString(20373), season)

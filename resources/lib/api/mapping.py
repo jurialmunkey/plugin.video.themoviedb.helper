@@ -23,7 +23,7 @@ def set_show(item, base_item=None):
         {'tvshow.{}'.format(k): v for k, v in base_item.get('unique_ids', {}).items()})
     item['infoproperties'].update(
         {'tvshow.{}'.format(k): v for k, v in base_item.get('infolabels', {}).items() if type(v) not in [dict, list, tuple]})
-    item['infolabels']['tvshowtitle'] = base_item['infolabels'].get('title')
+    item['infolabels']['tvshowtitle'] = base_item['infolabels'].get('tvshowtitle') or base_item['infolabels'].get('title')
     item['unique_ids']['tmdb'] = item['unique_ids'].get('tvshow.tmdb')
     return item
 

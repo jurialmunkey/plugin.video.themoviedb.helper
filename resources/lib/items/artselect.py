@@ -112,13 +112,6 @@ class _ArtworkSelector():
                 xbmc.getLocalizedString(39123),
                 ADDON.getLocalizedString(32218).format(tmdb_type, tmdb_id, ', '.join(artwork_types)))
 
-        # Cache refreshed artwork
-        item['artwork'] = {
-            'tmdb': item['artwork'].get('tmdb'),
-            'fanarttv': item['artwork'].get('fanarttv')}
-        name = '{}.{}.{}.{}'.format(tmdb_type, tmdb_id, season, None)
-        self._cache.set_cache(item, cache_name=name, cache_days=10000)
-
         # Refresh container to display new artwork
         if container_refresh:
             xbmc.executebuiltin('Container.Refresh')

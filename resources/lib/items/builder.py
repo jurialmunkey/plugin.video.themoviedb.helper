@@ -38,7 +38,8 @@ CACHE_DAYS = 10000
 
 class ItemBuilder(_ArtworkSelector):
     def __init__(self, tmdb_api=None, ftv_api=None, trakt_api=None, cache_only=False):
-        self.parent = {}
+        self.parent_tv = {}
+        self.parent_season = {}
         self.tmdb_api = tmdb_api or TMDb()
         self.ftv_api = ftv_api or FanartTV()
         self.trakt_api = trakt_api
@@ -52,6 +53,14 @@ class ItemBuilder(_ArtworkSelector):
 
     def _timestamp(self, days=14):
         return set_timestamp(days * 24 * 3600)
+
+    def get_parents(self, tmdb_type, tmdb_id, season=None):
+        if tmdb_type != 'tv' or not tmdb_id:
+            return
+        if season is None:
+            self.parent_tv = self.get_item(tmdb_type=tmdb_type, tmdb_id=tmdb_id)
+            return
+        self.parent_season = self.get_item(tmdb_type=tmdb_type, tmdb_id=tmdb_id, season=season)
 
     def get_ftv_typeid(self, tmdb_type, item, season=None):
         if not item:
@@ -72,44 +81,56 @@ class ItemBuilder(_ArtworkSelector):
         """ Remaps artwork from TMDb to expected quality """
         return {k: self._regex.sub(IMAGEPATH_MAP[k], v) for k, v in artwork.items() if v and k in IMAGEPATH_MAP}
 
-    def get_ftv_artwork(self, ftv_id, ftv_type, season=None):
+    def join_base_artwork(self, base_artwork, base_items, prefix=''):
+        tv_artwork = {}
+        for k, v in base_artwork.items():
+            if not v:
+                continue
+            if k[:7] == 'tvshow.':
+                base_items[k] = v
+                if not prefix:
+                    tv_artwork[k.replace('tvshow.', '')] = v
+                continue
+            if prefix:
+                tv_artwork[k] = v
+            k = '{}{}'.format(prefix, k)
+            if k not in base_items:
+                base_items[k] = v
+        # Do quick second pass to fill missing spaces with parent artwork
+        for k, v in tv_artwork.items():
+            if k not in base_items:
+                base_items[k] = v
+        return base_items
+
+    def _get_ftv_artwork(self, ftv_id, ftv_type, season=None):
         with TimerList(self.timer_lists, 'item_ftv', log_threshold=0.05, logging=self.log_timers):
             if not self.ftv_api or not ftv_id or not ftv_type:
                 return
-            artwork = self.ftv_api.get_all_artwork(ftv_id, ftv_type)
-            if not artwork or season is None:
-                return artwork
-
-            # Move tvshow artwork properties to tvshow. prefix for seasons/episodes
-            artwork = {u'tvshow.{}'.format(k): v for k, v in artwork.items() if v}
-            artwork['fanart'] = artwork.get('tvshow.fanart')
-            season_artwork = self.ftv_api.get_all_artwork(ftv_id, ftv_type, season)
-
-            # Add season artwork properties to season. prefix for seasons/episodes
-            artwork.update({u'season.{}'.format(k): v for k, v in season_artwork.items() if v})
-            artwork.update(season_artwork)
+            artwork = self.ftv_api.get_all_artwork(ftv_id, ftv_type, season)
         return artwork
 
-    def _get_artwork(self, item):
+    def _get_tmdb_artwork(self, item):
         if not item or 'artwork' not in item:
             return {}
         return item['artwork'].get(ARTWORK_QUALITY) or self.map_artwork(item['artwork'].get('tmdb')) or {}
 
-    def get_artwork(self, item, tmdb_type, season=None, base_item=None):
+    def get_artwork(self, item, tmdb_type, season=None, base_item=None, prefix=''):
         if not item:
             return
 
-        tmdb_art = item['artwork'].get(ARTWORK_QUALITY)
-        if not tmdb_art:
-            tmdb_art = self._get_artwork(base_item)
-            tmdb_art.update(self.map_artwork(item['artwork']['tmdb']) or {})
-            item['artwork'][ARTWORK_QUALITY] = tmdb_art
+        # TMDb Artwork reconfigure quality and merge base_item
+        item_artwork = item['artwork'][ARTWORK_QUALITY] = self._get_tmdb_artwork(item)
+        self.join_base_artwork(self._get_tmdb_artwork(base_item), item_artwork, prefix=prefix)
 
+        # FanartTV retrieve artwork and merge base_item
         ftv_art = item['artwork'].get('fanarttv')
         if not ftv_art:
             ftv_id, ftv_type = self.get_ftv_typeid(tmdb_type, base_item or item)
-            ftv_art = self.get_ftv_artwork(ftv_id, ftv_type, season=season) or {}
+            ftv_art = self._get_ftv_artwork(ftv_id, ftv_type, season=season) or {}
             item['artwork']['fanarttv'] = ftv_art
+        if base_item and 'artwork' in base_item:
+            self.join_base_artwork(base_item['artwork'].get('fanarttv') or {}, ftv_art, prefix=prefix)
+
         return item
 
     def get_tmdb_item(self, tmdb_type, tmdb_id, season=None, episode=None, base_item=None, manual_art=None):
@@ -132,28 +153,40 @@ class ItemBuilder(_ArtworkSelector):
     def get_item(self, tmdb_type, tmdb_id, season=None, episode=None, refresh_cache=False):
         if not tmdb_type or not tmdb_id:
             return
+
+        # Get cached item
         name = '{}.{}.{}.{}'.format(tmdb_type, tmdb_id, season, episode)
         item = None if refresh_cache else self._cache.get_cache(name)
         if self.cache_only:
             return item
+
+        # Check our cached item hasn't expired
+        # Compare against parent expiry in case newer details available to merge
         base_item = None
+        base_name_season = None if episode is None else season
         if season is not None:
-            base_name = '{}.{}.None.None'.format(tmdb_type, tmdb_id)
-            base_item = self.parent or self._cache.get_cache(base_name)
+            parent = self.parent_tv if base_name_season is None else self.parent_season
+            base_name = '{}.{}.{}.None'.format(tmdb_type, tmdb_id, base_name_season)
+            base_item = parent or self._cache.get_cache(base_name)
         if item and get_timestamp(item['expires']):
             if not base_item or base_item['expires'] < item['expires']:
                 return item
+
+        # Keep previous manually selected artwork
+        prefix = ''
         manual_art = item['artwork'].get('manual', {}) if item else {}
         if season is not None:
-            base_item = base_item or self.get_item(tmdb_type, tmdb_id)
-            base_manual_art = base_item['artwork'].get('manual', {}) if base_item else {}
-            base_manual_art = {'tvshow.{}'.format(k): v for k, v in base_manual_art.items() if v}
-            base_manual_art.update(manual_art)
-            manual_art = base_manual_art
+            manual_art = {k: v for k, v in manual_art.items() if v and k[:7] != 'tvshow.'}
+            if episode is None:
+                prefix = 'tvshow.'
+            base_item = base_item or self.get_item(tmdb_type, tmdb_id, base_name_season)
+            base_artwork = base_item['artwork'].get('manual', {}) if base_item else {}
+            manual_art = self.join_base_artwork(base_artwork, manual_art, prefix=prefix)
+
         item = self.get_tmdb_item(
             tmdb_type, tmdb_id, season=season, episode=episode,
             base_item=base_item, manual_art=manual_art)
-        item = self.get_artwork(item, tmdb_type, season, base_item)
+        item = self.get_artwork(item, tmdb_type, season, base_item, prefix=prefix)
         return self._cache.set_cache(item, name, cache_days=CACHE_DAYS)
         # TODO: Remember to include OMDb too!
 

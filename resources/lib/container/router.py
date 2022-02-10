@@ -128,19 +128,20 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             li = self.ib.get_listitem(i)
         self.items_queue[x] = li
 
-    def add_items(self, items=None, pagination=True, property_params=None, kodi_db=None, cache_only=True):
+    def add_items(self, items=None, pagination=True, property_params=None, kodi_db=None):
         if not items:
             return
 
         self.ib = ItemBuilder(tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api)
-        self.ib.cache_only = cache_only
+        self.ib.cache_only = self.tmdb_cache_only
         self.ib.timer_lists = self.timer_lists
         self.ib.log_timers = self.log_timers
 
         # Pre-game details and artwork cache for episodes before threading to avoid multiple API calls
-        # season=self.parent_params.get('season', None) if self.parent_params['info'] == 'episodes' else None
         if self.parent_params.get('info') in PREGAME_PARENT:
-            self.ib.parent = self.ib.get_item(tmdb_type='tv', tmdb_id=self.parent_params.get('tmdb_id'))
+            self.ib.get_parents(
+                tmdb_type='tv', tmdb_id=self.parent_params.get('tmdb_id'),
+                season=self.parent_params.get('season', None) if self.parent_params['info'] == 'episodes' else None)
 
         # Sync Trakt watched data before building items
         hide_no_date = ADDON.getSettingBool('nodate_is_unaired')
@@ -213,15 +214,6 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         xbmcplugin.setPluginCategory(self.handle, plugin_category)  # Container.PluginCategory
         xbmcplugin.setContent(self.handle, container_content)  # Container.Content
         xbmcplugin.endOfDirectory(self.handle, updateListing=update_listing)
-
-    def get_tmdb_details(self, li, cache_only=True):
-        if not self.tmdb_api:
-            return
-        return self.ib.get_listitem(
-            li.get_tmdb_type(),
-            li.unique_ids.get('tvshow.tmdb') if li.infolabels.get('mediatype') in ['season', 'episode'] else li.unique_ids.get('tmdb'),
-            li.infolabels.get('season', 0) if li.infolabels.get('mediatype') in ['season', 'episode'] else None,
-            li.infolabels.get('episode') if li.infolabels.get('mediatype') == 'episode' else None)
 
     def _set_playprogress_from_trakt(self, li):
         if li.infolabels.get('mediatype') == 'movie':
@@ -449,8 +441,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
                     items,
                     pagination=self.pagination,
                     property_params=self.set_params_to_container(**self.params),
-                    kodi_db=self.kodi_db,
-                    cache_only=self.tmdb_cache_only)
+                    kodi_db=self.kodi_db)
             self.finish_container(
                 update_listing=self.update_listing,
                 plugin_category=self.plugin_category,
