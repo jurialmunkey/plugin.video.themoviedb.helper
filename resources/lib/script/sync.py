@@ -118,6 +118,7 @@ class _Menu():
         if item._sync == -1 or not notification:
             return
         if item._sync and item._sync.status_code in [200, 201, 204]:
+            self._trakt._cache.del_cache('trakt.last_activities')  # Wipe last activities cache to update now
             xbmcgui.Dialog().ok(
                 ADDON.getLocalizedString(32295),
                 ADDON.getLocalizedString(32297).format(

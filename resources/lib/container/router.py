@@ -237,6 +237,8 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         progress = self._set_playprogress_from_trakt(li)
         if not progress:
             return
+        if progress < 4 or progress > 96:
+            return
         set_playprogress(li.get_url(), int(duration * progress // 100), duration)
 
     def get_pre_trakt_sync(self, container_content=None):
