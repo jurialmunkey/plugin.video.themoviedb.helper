@@ -6,6 +6,7 @@ from resources.lib.api.fanarttv.api import ARTWORK_TYPES, NO_LANGUAGE
 from resources.lib.api.tmdb.mapping import get_imagepath_poster, get_imagepath_fanart, get_imagepath_thumb, get_imagepath_logo
 from resources.lib.addon.decorators import busy_dialog
 # from resources.lib.addon.plugin import kodi_log
+from resources.lib.addon.parser import try_int
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
@@ -21,7 +22,8 @@ class _ArtworkSelector():
                 label=i.get('url'),
                 label2=ADDON.getLocalizedString(32219).format(i.get('lang', ''), i.get('likes', 0), i.get('id', '')),
                 art={'thumb': i.get('url')}).get_listitem()
-            for i in ftv_items if i.get('url')]
+            for i in ftv_items
+            if i.get('url') and (season is None or try_int(i.get('season', season)) == try_int(season))]
 
     def get_tmdb_art(self, tmdb_type, tmdb_id, artwork_type, season=None):
         mappings = {
@@ -57,7 +59,7 @@ class _ArtworkSelector():
             item = self.get_item(tmdb_type, tmdb_id, season)
         if not item:
             return
-        ftv_id, ftv_type = self.get_ftv_typeid(tmdb_type, item)
+        ftv_id, ftv_type = self.get_ftv_typeid(tmdb_type, item, season=season)
         if not ftv_id or not ftv_type:
             return
         artwork_type = self.select_type(ftv_type if season is None else 'season', blacklist)

@@ -53,14 +53,16 @@ class ItemBuilder(_ArtworkSelector):
     def _timestamp(self, days=14):
         return set_timestamp(days * 24 * 3600)
 
-    def get_ftv_typeid(self, tmdb_type, item):
+    def get_ftv_typeid(self, tmdb_type, item, season=None):
         if not item:
             return None, None
         unique_ids = item['listitem'].get('unique_ids', {})
         if tmdb_type == 'movie':
             return (unique_ids.get('tmdb'), 'movies')
         if tmdb_type == 'tv':
-            return (unique_ids.get('tvdb'), 'tv')
+            if season is None:
+                return (unique_ids.get('tvdb'), 'tv')
+            return (unique_ids.get('tvshow.tvdb'), 'tv')
         return None, None
 
     def map_item(self, item, tmdb_type, base_item=None):
