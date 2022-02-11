@@ -34,6 +34,7 @@ IMAGEPATH_MAP = {
     "season.poster": ARTWORK_QUALITY_POSTER
 }
 CACHE_DAYS = 10000
+BACKFILL_BLACKLIST = ['poster']
 
 
 class ItemBuilder(_ArtworkSelector):
@@ -103,7 +104,8 @@ class ItemBuilder(_ArtworkSelector):
             k = k.replace('tvshow.', '')
             if k in base_items:
                 continue
-            base_items[k] = v
+            if k not in BACKFILL_BLACKLIST:
+                base_items[k] = v
         return base_items
 
     def _get_ftv_artwork(self, ftv_id, ftv_type, season=None):
