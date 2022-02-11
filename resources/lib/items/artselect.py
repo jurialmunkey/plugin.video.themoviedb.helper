@@ -23,7 +23,10 @@ class _ArtworkSelector():
                 label2=ADDON.getLocalizedString(32219).format(i.get('lang', ''), i.get('likes', 0), i.get('id', '')),
                 art={'thumb': i.get('url')}).get_listitem()
             for i in ftv_items
-            if i.get('url') and (season is None or try_int(i.get('season', season)) == try_int(season))]
+            if i.get('url') and (
+                season is None
+                or try_int(i.get('season', season)) == try_int(season)
+                or i.get('season') == 'all')]
 
     def get_tmdb_art(self, tmdb_type, tmdb_id, artwork_type, season=None):
         mappings = {
