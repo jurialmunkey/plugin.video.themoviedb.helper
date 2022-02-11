@@ -33,7 +33,7 @@ class ServiceMonitor(object):
 
     def _on_scroll(self):
         self.listitem_monitor.clear_on_scroll()
-        self.xbmc_monitor.waitForAbort(1)
+        self.xbmc_monitor.waitForAbort(0.3)
 
     def _on_fullscreen(self):
         if self.player_monitor.isPlayingVideo():
