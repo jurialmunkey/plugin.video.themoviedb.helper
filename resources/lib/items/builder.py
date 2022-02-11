@@ -154,13 +154,13 @@ class ItemBuilder(_ArtworkSelector):
             item['listitem']['art'] = {}
         return item
 
-    def get_item(self, tmdb_type, tmdb_id, season=None, episode=None, refresh_cache=False):
+    def get_item(self, tmdb_type, tmdb_id, season=None, episode=None, cache_refresh=False):
         if not tmdb_type or not tmdb_id:
             return
 
         # Get cached item
         name = '{}.{}.{}.{}'.format(tmdb_type, tmdb_id, season, episode)
-        item = None if refresh_cache else self._cache.get_cache(name)
+        item = None if cache_refresh else self._cache.get_cache(name)
         if self.cache_only:
             return item
 

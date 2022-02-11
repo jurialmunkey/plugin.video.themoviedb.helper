@@ -193,13 +193,6 @@ def sync_trakt(**kwargs):
         id_type='tmdb')
 
 
-def _get_ftv_id(**kwargs):
-    details = refresh_details(confirm=False, **kwargs)
-    if not details:
-        return
-    return ListItem(**details).get_ftv_id()
-
-
 def manage_artwork(tmdb_id=None, tmdb_type=None, season=None, **kwargs):
     if not tmdb_type or not tmdb_id:
         return
@@ -251,7 +244,8 @@ def refresh_details(tmdb_id=None, tmdb_type=None, season=None, episode=None, con
     if not tmdb_id or not tmdb_type:
         return
     with busy_dialog():
-        details = TMDb().get_details(tmdb_type, tmdb_id, season, episode, cache_refresh=True)
+        details = ItemBuilder().get_item(tmdb_type, tmdb_id, season, episode, cache_refresh=True) or {}
+        details = details.get('listitem')
     if details and confirm:
         xbmcgui.Dialog().ok('TMDbHelper', ADDON.getLocalizedString(32234).format(tmdb_type, tmdb_id))
         container_refresh()

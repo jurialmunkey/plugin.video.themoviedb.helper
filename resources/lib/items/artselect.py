@@ -103,7 +103,7 @@ class _ArtworkSelector():
         self.ftv_api.cache_refresh = True
 
         with busy_dialog():
-            item = self.get_item(tmdb_type, tmdb_id, season, refresh_cache=True)
+            item = self.get_item(tmdb_type, tmdb_id, season, cache_refresh=True)
         if not item:
             return xbmcgui.Dialog().ok(
                 xbmc.getLocalizedString(39123),
