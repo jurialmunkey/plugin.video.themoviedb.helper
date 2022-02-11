@@ -37,30 +37,35 @@ CACHE_DAYS = 10000
 
 
 class ItemBuilder(_ArtworkSelector):
-    def __init__(self, tmdb_api=None, ftv_api=None, trakt_api=None, cache_only=False):
+    def __init__(self, tmdb_api=None, ftv_api=None, trakt_api=None, cache_only=False, cache_manual=False):
         self.parent_tv = {}
         self.parent_season = {}
         self.tmdb_api = tmdb_api or TMDb()
         self.ftv_api = ftv_api or FanartTV()
         self.trakt_api = trakt_api
-        self._cache = BasicCache(filename='ItemBuilder.db')
+        self._cache = BasicCache(filename='ItemBuilder.db', manual=cache_manual)
         self._regex = re.compile(r'({})'.format('|'.join(IMAGEPATH_ALL)))
         self.parent_params = None
         self.cache_only = cache_only
         self.timer_lists = {}
         self.log_timers = False
+        self._yy = 0
         # self.__dict__.update(kwargs)
 
     def _timestamp(self, days=14):
         return set_timestamp(days * 24 * 3600)
 
+    def _timeint(self, x, div=5):
+        return int(x) // div
+
     def get_parents(self, tmdb_type, tmdb_id, season=None):
-        if tmdb_type != 'tv' or not tmdb_id:
-            return
-        self.parent_tv = self.get_item(tmdb_type=tmdb_type, tmdb_id=tmdb_id)
-        if season is None:
-            return
-        self.parent_season = self.get_item(tmdb_type=tmdb_type, tmdb_id=tmdb_id, season=season)
+        with TimerList(self.timer_lists, '{}.{}.{}'.format(tmdb_type, tmdb_id, season), log_threshold=0.05, logging=self.log_timers):
+            if tmdb_type != 'tv' or not tmdb_id:
+                return
+            self.parent_tv = self.get_item(tmdb_type=tmdb_type, tmdb_id=tmdb_id)
+            if season is None:
+                return
+            self.parent_season = self.get_item(tmdb_type=tmdb_type, tmdb_id=tmdb_id, season=season)
 
     def get_ftv_typeid(self, tmdb_type, item, season=None):
         if not item:
@@ -113,7 +118,7 @@ class ItemBuilder(_ArtworkSelector):
             return {}
         return item['artwork'].get(ARTWORK_QUALITY) or self.map_artwork(item['artwork'].get('tmdb')) or {}
 
-    def get_artwork(self, item, tmdb_type, season=None, base_item=None, prefix=''):
+    def get_artwork(self, item, tmdb_type, season=None, episode=None, base_item=None, prefix=''):
         if not item:
             return
 
@@ -122,13 +127,12 @@ class ItemBuilder(_ArtworkSelector):
         self.join_base_artwork(self._get_tmdb_artwork(base_item), item_artwork, prefix=prefix, backfill=True)
 
         # FanartTV retrieve artwork and merge base_item
-        ftv_art = item['artwork'].get('fanarttv')
-        if not ftv_art:
+        ftv_art = item['artwork'].setdefault('fanarttv', {})
+        if not ftv_art and episode is None:  # No episode art on ftv so don't look it up
             ftv_id, ftv_type = self.get_ftv_typeid(tmdb_type, base_item or item)
             ftv_art = self._get_ftv_artwork(ftv_id, ftv_type, season=season) or {}
-            item['artwork']['fanarttv'] = ftv_art
         if base_item and 'artwork' in base_item:
-            self.join_base_artwork(base_item['artwork'].get('fanarttv') or {}, ftv_art, prefix=prefix, backfill=True)
+            self.join_base_artwork(base_item['artwork'].get('fanarttv', {}), ftv_art, prefix=prefix, backfill=True)
 
         return item
 
@@ -168,7 +172,7 @@ class ItemBuilder(_ArtworkSelector):
             base_name = '{}.{}.{}.None'.format(tmdb_type, tmdb_id, base_name_season)
             base_item = parent or self._cache.get_cache(base_name)
         if item and get_timestamp(item['expires']):
-            if not base_item or base_item['expires'] < item['expires']:
+            if not base_item or self._timeint(base_item['expires']) <= self._timeint(item['expires']):
                 return item
 
         # Keep previous manually selected artwork
@@ -186,7 +190,7 @@ class ItemBuilder(_ArtworkSelector):
         item = self.get_tmdb_item(
             tmdb_type, tmdb_id, season=season, episode=episode,
             base_item=base_item, manual_art=manual_art)
-        item = self.get_artwork(item, tmdb_type, season, base_item, prefix=prefix)
+        item = self.get_artwork(item, tmdb_type, season, episode, base_item, prefix=prefix)
         return self._cache.set_cache(item, name, cache_days=CACHE_DAYS)
         # TODO: Remember to include OMDb too!
 

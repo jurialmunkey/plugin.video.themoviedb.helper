@@ -26,6 +26,7 @@ from resources.lib.player.players import Players
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 PREGAME_PARENT = ['seasons', 'episodes', 'episode_groups', 'trakt_upnext', 'episode_group_seasons']
+LOG_TIMER_ITEMS = ['item_api', 'item_tmdb', 'item_ftv', 'item_map']
 
 
 def filtered_item(item, key, value, exclude=False):
@@ -52,9 +53,10 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.timer_lists = {}
         self.log_timers = ADDON.getSettingBool('timer_reports')
         self.library = None
-        self.tmdb_api = TMDb()
-        self.trakt_api = TraktAPI()
-        self.omdb_api = OMDb() if ADDON.getSettingString('omdb_apikey') else None
+        self.ib = None
+        self.tmdb_api = TMDb(cache_manual=True)
+        self.trakt_api = TraktAPI(cache_manual=True)
+        self.omdb_api = OMDb(cache_manual=True) if ADDON.getSettingString('omdb_apikey') else None
         self.is_widget = self.params.pop('widget', '').lower() == 'true'
         self.hide_watched = ADDON.getSettingBool('widgets_hidewatched') if self.is_widget else False
         self.flatten_seasons = ADDON.getSettingBool('flatten_seasons')
@@ -62,7 +64,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.trakt_playprogress = ADDON.getSettingBool('trakt_playprogress')
         self.cache_only = self.params.pop('cacheonly', '').lower()
         self.ftv_forced_lookup = self.params.pop('fanarttv', '').lower()
-        self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only())  # Set after ftv_forced_lookup, is_widget, cache_only
+        self.ftv_api = FanartTV(cache_manual=True, cache_only=self.ftv_is_cache_only())  # Set after ftv_forced_lookup, is_widget, cache_only
         self.tmdb_cache_only = self.tmdb_is_cache_only()  # Set after ftv_api, cache_only
         self.filter_key = self.params.get('filter_key', None),
         self.filter_value = split_items(self.params.get('filter_value', None))[0],
@@ -132,7 +134,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         if not items:
             return
 
-        self.ib = ItemBuilder(tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api)
+        self.ib = ItemBuilder(tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api, cache_manual=True)
         self.ib.cache_only = self.tmdb_cache_only
         self.ib.timer_lists = self.timer_lists
         self.ib.log_timers = self.log_timers
@@ -414,7 +416,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         timer_log = ['DIRECTORY TIMER REPORT\n', self.paramstring, '\n']
         timer_log.append('------------------------------\n')
         for k, v in self.timer_lists.items():
-            if k in ['item_api', 'item_tmdb', 'item_ftv']:
+            if k in LOG_TIMER_ITEMS:
                 avg_time = u'{:7.3f} sec avg | {:7.3f} sec max | {:3}'.format(sum(v) / len(v), max(v), len(v)) if v else '  None'
                 timer_log.append(' - {:12s}: {}\n'.format(k, avg_time))
             elif k[:4] == 'item':
@@ -427,7 +429,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         tot_time = u'{:7.3f} sec'.format(sum(total_log) / len(total_log)) if total_log else '  None'
         timer_log.append('{:15s}: {}\n'.format('Total', tot_time))
         for k, v in self.timer_lists.items():
-            if v and k in ['item_api', 'item_tmdb', 'item_ftv']:
+            if v and k in LOG_TIMER_ITEMS:
                 timer_log.append('\n{}:\n{}\n'.format(k, ' '.join([u'{:.3f} '.format(i) for i in v])))
         kodi_log(timer_log, 1)
 
@@ -463,6 +465,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
 
     def context_related(self, **kwargs):
         if not kwargs.get('tmdb_id'):
+            self.tmdb_api._cache._manual = False
             kwargs['tmdb_id'] = self.tmdb_api.get_tmdb_id(**kwargs)
         kwargs['container_update'] = True
         related_lists(include_play=True, **kwargs)
@@ -472,4 +475,10 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             return self.play_external(**self.params)
         if self.params.get('info') == 'related':
             return self.context_related(**self.params)
-        return self.get_directory()
+        self.get_directory()
+        # Write out to disk cached items afterwards
+        for i in [self.tmdb_api, self.trakt_api, self.ftv_api, self.omdb_api, self.ib]:
+            if not i:
+                continue
+            if hasattr(i, '_cache'):
+                i._cache.man_cache()

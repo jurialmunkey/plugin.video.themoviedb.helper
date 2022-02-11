@@ -36,7 +36,7 @@ def translate_xml(request):
 
 
 class RequestAPI(object):
-    def __init__(self, req_api_url=None, req_api_key=None, req_api_name=None, timeout=None):
+    def __init__(self, req_api_url=None, req_api_key=None, req_api_name=None, timeout=None, cache_manual=False):
         self.req_api_url = req_api_url or ''
         self.req_api_key = req_api_key or ''
         self.req_api_name = req_api_name or ''
@@ -50,7 +50,7 @@ class RequestAPI(object):
         self.req_strip = [(self.req_api_url, self.req_api_name), (self.req_api_key, ''), ('is_xml=False', ''), ('is_xml=True', '')]
         self.headers = None
         self.timeout = timeout or 10
-        self._cache = BasicCache(filename='{}.db'.format(req_api_name or 'requests'))
+        self._cache = BasicCache(filename='{}.db'.format(req_api_name or 'requests'), manual=cache_manual)
 
     def get_api_request_json(self, request=None, postdata=None, headers=None, is_xml=False):
         request = self.get_api_request(request=request, postdata=postdata, headers=headers)
