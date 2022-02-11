@@ -131,6 +131,7 @@ class ItemBuilder(_ArtworkSelector):
         if not ftv_art and episode is None:  # No episode art on ftv so don't look it up
             ftv_id, ftv_type = self.get_ftv_typeid(tmdb_type, base_item or item)
             ftv_art = self._get_ftv_artwork(ftv_id, ftv_type, season=season) or {}
+            item['artwork']['fanarttv'] = ftv_art
         if base_item and 'artwork' in base_item:
             self.join_base_artwork(base_item['artwork'].get('fanarttv', {}), ftv_art, prefix=prefix, backfill=True)
 
