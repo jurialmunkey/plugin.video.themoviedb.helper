@@ -234,12 +234,13 @@ class TMDb(RequestAPI):
         items = []
         items_append = items.append
         for x, i in enumerate(request.get('groups', [])):
-            item = self.mapper.get_info(i, 'season', None, tmdb_id=tmdb_id, definition={
+            item = self.mapper.get_info(i, 'tv', None, tmdb_id=tmdb_id, definition={
                 'info': 'episode_group_episodes', 'tmdb_type': 'tv', 'tmdb_id': str(tmdb_id),
                 'group_id': group_id, 'position': str(x)})
             item['infolabels']['season'] = -1
             item['infolabels']['episode'] = len(i.get('episodes', []))
-            items_append(self._clean_merged(item, tmdb_id=tmdb_id))
+            item = self._clean_merged(item, tmdb_id=tmdb_id, episode_group=True)
+            items_append(item)
         return items
 
     def get_episode_groups_list(self, tmdb_id):
@@ -250,7 +251,7 @@ class TMDb(RequestAPI):
             self._clean_merged(
                 self.mapper.get_info(i, 'tv', None, tmdb_id=tmdb_id, definition={
                     'info': 'episode_group_seasons', 'tmdb_type': 'tv', 'tmdb_id': str(tmdb_id), 'group_id': '{id}'}),
-                tmdb_id=tmdb_id)
+                tmdb_id=tmdb_id, episode_group=True)
             for i in request.get('results', [])]
         return items
 
@@ -334,9 +335,11 @@ class TMDb(RequestAPI):
                 items_end.append(upnext_item)
         return items + items_end
 
-    def _clean_merged(self, item, tmdb_id):
+    def _clean_merged(self, item, tmdb_id, episode_group=False):
         item['infolabels'].pop('tvshowtitle', None)
         item['unique_ids']['tvshow.tmdb'] = item['infoproperties']['tvshow.tmdb_id'] = tmdb_id
+        if episode_group:
+            item['unique_ids']['tmdb'] = item['infoproperties']['tmdb_id'] = tmdb_id
         return item
 
     def get_episode_list(self, tmdb_id, season):
