@@ -318,6 +318,7 @@ class TMDb(RequestAPI):
                 egroup_item['art']['thumb'] = egroup_item['art']['poster'] = u'{}/resources/icons/trakt/groupings.png'.format(ADDONPATH)
                 egroup_item['infolabels']['season'] = -1
                 egroup_item['infolabels']['episode'] = 0
+                egroup_item['infoproperties']['specialseason'] = ADDON.getLocalizedString(32345)
                 items_end.append(egroup_item)
 
         # Up Next
@@ -329,6 +330,7 @@ class TMDb(RequestAPI):
                 upnext_item['art']['thumb'] = upnext_item['art']['poster'] = u'{}/resources/icons/trakt/up-next.png'.format(ADDONPATH)
                 upnext_item['infolabels']['season'] = -1
                 upnext_item['infolabels']['episode'] = 0
+                upnext_item['infoproperties']['specialseason'] = ADDON.getLocalizedString(32043)
                 items_end.append(upnext_item)
         return items + items_end
 

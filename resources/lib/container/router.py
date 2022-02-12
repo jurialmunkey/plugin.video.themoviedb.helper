@@ -170,8 +170,9 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             if not li.next_page and self.item_is_excluded(li):
                 continue
             li.set_episode_label()
-            if hide_unaired and li.is_unaired(no_date=hide_no_date):
-                continue
+            if hide_unaired and not li.infoproperties.get('specialseason'):
+                if li.is_unaired(no_date=hide_no_date):
+                    continue
             all_items.append(li)
         with TimerList(self.timer_lists, 'item_join', logging=self.log_timers):
             trakt_pre_sync.join()
