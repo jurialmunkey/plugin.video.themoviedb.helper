@@ -2,8 +2,8 @@ from resources.lib.addon.parser import try_int
 
 
 def get_next_page(response_headers=None):
-    num_pages = try_int(response_headers.get('X-Pagination-Page-Count', 0))
-    this_page = try_int(response_headers.get('X-Pagination-Page', 0))
+    num_pages = try_int(response_headers.get('x-pagination-page-count', 0))
+    this_page = try_int(response_headers.get('x-pagination-page', 0))
     if this_page < num_pages:
         return [{'next_page': this_page + 1}]
     return []
@@ -22,8 +22,8 @@ class PaginatedItems():
         self.index_z = len(self.all_items) if len(self.all_items) < self.index_z else self.index_z
         self.items = self.all_items[self.index_a:self.index_z]
         self.headers = {
-            'X-Pagination-Page-Count': -(-len(self.all_items) // self.limit),
-            'X-Pagination-Page': self.page}
+            'x-pagination-page-count': -(-len(self.all_items) // self.limit),
+            'x-pagination-page': self.page}
         self.next_page = get_next_page(self.headers)
         return self.items
 

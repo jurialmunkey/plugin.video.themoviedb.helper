@@ -99,8 +99,8 @@ class _TraktLists():
             items = response.json()
 
         return TraktItems(items, headers=response.headers).build_items(
-            sort_by=sort_by or response.headers.get('X-Sort-By'),
-            sort_how=sort_how or response.headers.get('X-Sort-How'),
+            sort_by=sort_by or response.headers.get('x-sort-by'),
+            sort_how=sort_how or response.headers.get('x-sort-how'),
             permitted_types=permitted_types)
 
     @use_simple_cache(cache_days=CACHE_SHORT)

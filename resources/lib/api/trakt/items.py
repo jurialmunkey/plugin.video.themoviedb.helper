@@ -117,7 +117,7 @@ class TraktItems():
         self.trakt_type = trakt_type
         self.sort_by = 'unsorted'
         self.sort_how = None
-        self.configured = {'items': [], 'headers': headers or {}}
+        self.configured = {'items': [], 'headers': {k.lower(): v for k, v in headers.items()} if headers else {}}
 
     def sort_items(self, sort_by=None, sort_how=None):
         """ (Re)Sorts items and returns sorted items """
