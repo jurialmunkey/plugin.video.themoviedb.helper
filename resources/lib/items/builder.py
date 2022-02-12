@@ -38,13 +38,13 @@ BACKFILL_BLACKLIST = ['poster']
 
 
 class ItemBuilder(_ArtworkSelector):
-    def __init__(self, tmdb_api=None, ftv_api=None, trakt_api=None, cache_only=False, cache_manual=False):
+    def __init__(self, tmdb_api=None, ftv_api=None, trakt_api=None, cache_only=False):
         self.parent_tv = {}
         self.parent_season = {}
         self.tmdb_api = tmdb_api or TMDb()
         self.ftv_api = ftv_api or FanartTV()
         self.trakt_api = trakt_api
-        self._cache = BasicCache(filename='ItemBuilder.db', manual=cache_manual)
+        self._cache = BasicCache(filename='ItemBuilder.db')
         self._regex = re.compile(r'({})'.format('|'.join(IMAGEPATH_ALL)))
         self.parent_params = None
         self.cache_only = cache_only

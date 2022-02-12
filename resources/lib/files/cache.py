@@ -10,12 +10,10 @@ SEARCH_HISTORY = 'search_history.db'
 
 
 class BasicCache(object):
-    def __init__(self, filename=None, mem_only=False, manual=False):
+    def __init__(self, filename=None, mem_only=False):
         self._filename = filename
         self._cache = None
         self._mem_only = mem_only
-        self._stored = {}
-        self._manual = manual
 
     @try_except_log('lib.addon.cache ret_cache')
     def ret_cache(self):
@@ -26,7 +24,7 @@ class BasicCache(object):
     @try_except_log('lib.addon.cache get_cache')
     def get_cache(self, cache_name):
         self.ret_cache()
-        return self._stored.get(cache_name) or self._cache.get(get_pickle_name(cache_name or ''))
+        return self._cache.get(get_pickle_name(cache_name or ''))
 
     @try_except_log('lib.addon.cache set_cache')
     def set_cache(self, my_object, cache_name, cache_days=14, force=False, fallback=None):
@@ -35,17 +33,8 @@ class BasicCache(object):
         if force and (not my_object or not cache_name or not cache_days):
             my_object = my_object or fallback
             cache_days = force if isinstance(force, int) else cache_days
-        self._stored[cache_name] = (my_object, cache_days)
-        self._cache.set(cache_name, my_object, cache_days=cache_days, mem_only=self._manual)
+        self._cache.set(cache_name, my_object, cache_days=cache_days)
         return my_object
-
-    @try_except_log('lib.addon.cache man_cache')
-    def man_cache(self):
-        if not self._stored or not self._manual:
-            return
-        for k, v in self._stored.items():
-            self._cache.set(k, v[0], cache_days=v[1])
-        self._stored = {}
 
     @try_except_log('lib.addon.cache del_cache')
     def del_cache(self, cache_name):
