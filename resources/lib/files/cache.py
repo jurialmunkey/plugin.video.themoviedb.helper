@@ -1,4 +1,3 @@
-from copy import deepcopy
 from resources.lib.addon.plugin import kodi_log, format_name
 from resources.lib.addon.decorators import try_except_log
 from resources.lib.files.simplecache import SimpleCache
@@ -36,7 +35,7 @@ class BasicCache(object):
         if force and (not my_object or not cache_name or not cache_days):
             my_object = my_object or fallback
             cache_days = force if isinstance(force, int) else cache_days
-        self._stored[cache_name] = (deepcopy(my_object), cache_days)
+        self._stored[cache_name] = (my_object, cache_days)
         self._cache.set(cache_name, my_object, cache_days=cache_days, mem_only=self._manual)
         return my_object
 
