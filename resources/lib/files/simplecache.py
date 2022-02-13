@@ -4,7 +4,6 @@
 """ Modification of marcelveldt's simplecache plugin
 Code cleanup
 - Removal of json methods
-- TODO: Switch to using ast.literal_eval for safety or ultrajson for speed
 - Leia/Matrix Python-2/3 cross-compatibility
 - Allow setting folder and filename of DB
 """
@@ -14,7 +13,6 @@ import xbmcgui
 import xbmc
 import sqlite3
 from functools import reduce
-# from ast import literal_eval
 from contextlib import contextmanager
 from resources.lib.addon.plugin import kodi_log
 from resources.lib.addon.timedate import get_timedelta, get_datetime_now, get_datetime_datetime, convert_to_timestamp
@@ -46,7 +44,7 @@ class SimpleCache(object):
         '''tell any tasks to stop immediately (as we can be called multithreaded) and cleanup objects'''
         self._exit = True
         # wait for all tasks to complete
-        while self._busy_tasks and not self._monitor.abortRequested():
+        while self._busy_tasks and self._monitor and self._win and not self._monitor.abortRequested():
             xbmc.sleep(25)
         del self._win
         del self._monitor
