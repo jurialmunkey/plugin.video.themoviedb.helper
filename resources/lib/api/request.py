@@ -10,9 +10,21 @@ from resources.lib.files.cache import BasicCache, CACHE_SHORT, CACHE_LONG
 from copy import copy
 from json import loads, dumps
 # from resources.lib.addon.decorators import timer_func
-import requests
+# import requests
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
+
+
+requests = None  # Requests module is slow to import so lazy import via decorator instead
+
+
+def lazyimport_requests(func):
+    def wrapper(*args, **kwargs):
+        global requests
+        if requests is None:
+            import requests
+        return func(*args, **kwargs)
+    return wrapper
 
 
 def dictify(r, root=True):
@@ -109,6 +121,7 @@ class RequestAPI(object):
         self.req_timeout_err = set_timestamp(self.timeout * 3)
         get_property(self.req_timeout_err_prop, self.req_timeout_err)
 
+    @lazyimport_requests
     def get_simple_api_request(self, request=None, postdata=None, headers=None, method=None):
         try:
             if method == 'delete':
@@ -141,7 +154,7 @@ class RequestAPI(object):
             return
 
         # Some error checking
-        if not response.status_code == requests.codes.ok and try_int(response.status_code) >= 400:  # Error Checking
+        if not response.status_code == 200 and try_int(response.status_code) >= 400:  # Error Checking
             # 500 code is server error which usually indicates Trakt is down
             # In this case let's set a connection error and suppress retries for a minute
             if response.status_code == 500:
