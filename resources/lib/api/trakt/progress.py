@@ -7,7 +7,7 @@ from resources.lib.items.pages import PaginatedItems
 from resources.lib.api.mapping import get_empty_item
 from resources.lib.api.trakt.items import TraktItems, EPISODE_PARAMS
 from resources.lib.api.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache
-
+from resources.lib.addon.decorators import ParallelThread
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
@@ -55,7 +55,10 @@ class _TraktProgress():
         response = self.get_sync('watched', 'show')
         response = TraktItems(response).sort_items('watched', 'desc')
         hidden_shows = self.get_hiddenitems('show')
-        return [i for i in response if self._is_inprogress_show(i, hidden_shows)]
+        # return [i for i in response if self._is_inprogress_show(i, hidden_shows)]
+        with ParallelThread(response, self._is_inprogress_show, hidden_shows) as pt:
+            item_queue = pt.queue
+        return [i for i in item_queue if i]
 
     def _is_inprogress_show(self, item, hidden_shows=None):
         """
@@ -158,18 +161,32 @@ class _TraktProgress():
     @is_authorized
     def _get_upnext_episodes_list(self, sort_by_premiered=False):
         shows = self._get_inprogress_shows() or []
-        items = [j for j in (self.get_upnext_episodes(
-            i.get('show', {}).get('ids', {}).get('slug'), i.get('show', {}), get_single_episode=True)
-            for i in shows) if j]
-        if sort_by_premiered:
-            items = [
-                {'show': i.get('show'), 'episode': self.get_details(
-                    'show', i.get('show', {}).get('ids', {}).get('slug'),
-                    season=i.get('episode', {}).get('season'),
-                    episode=i.get('episode', {}).get('number')) or i.get('episode')}
-                for i in items]
-            items = TraktItems(items, trakt_type='episode').sort_items('released', 'desc')
+
+        # items = [j for j in (self.get_upnext_episodes(
+        #     i.get('show', {}).get('ids', {}).get('slug'), i.get('show', {}), get_single_episode=True)
+        #     for i in shows) if j]
+        # Get upnext episodes threaded
+        with ParallelThread(shows, self._get_upnext_episodes) as pt:
+            item_queue = pt.queue
+        items = [i for i in item_queue if i]
+
+        if not sort_by_premiered:
+            return items
+
+        with ParallelThread(items, self._get_item_details) as pt:
+            item_queue = pt.queue
+        items = [i for i in item_queue if i]
+
+        items = TraktItems(items, trakt_type='episode').sort_items('released', 'desc')
         return items
+
+    def _get_item_details(self, i):
+        return {
+            'show': i.get('show'),
+            'episode': self.get_details(
+                'show', i.get('show', {}).get('ids', {}).get('slug'),
+                season=i.get('episode', {}).get('season'),
+                episode=i.get('episode', {}).get('number')) or i.get('episode')}
 
     @is_authorized
     @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_SHORT)
@@ -180,6 +197,12 @@ class _TraktProgress():
             self._cache, self.get_response_json, 'shows', slug, 'progress/watched',
             sync_info=self.get_sync('watched', 'show', 'slug').get(slug),
             cache_name=u'TraktAPI.get_show_progress.response.{}'.format(slug))
+
+    def _get_upnext_episodes(self, i, get_single_episode=True):
+        """ Helper func for upnext episodes to pass through threaded """
+        slug = i.get('show', {}).get('ids', {}).get('slug')
+        show = i.get('show', {})
+        return self.get_upnext_episodes(slug, show, get_single_episode=get_single_episode)
 
     @is_authorized
     def get_upnext_episodes(self, slug, show, get_single_episode=False):
