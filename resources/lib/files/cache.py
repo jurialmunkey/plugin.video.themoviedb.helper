@@ -28,6 +28,11 @@ class BasicCache(object):
     def get_cache(self, cache_name):
         self.ret_cache()
         return self._cache.get(get_pickle_name(cache_name or ''))
+        # with TimerList(self._timers, 'item_get') as tl:
+        #     item = self._cache.get(get_pickle_name(cache_name or ''))
+        #     if not item:
+        #         tl.list_obj = self._timers.setdefault('item_non', [])
+        # return item
 
     @try_except_log('lib.addon.cache set_cache')
     def set_cache(self, my_object, cache_name, cache_days=14, force=False, fallback=None):
@@ -39,6 +44,7 @@ class BasicCache(object):
 
     def _set_cache(self, my_object, cache_name, cache_days=14, force=False, fallback=None):
         """ set object to cache """
+        # with TimerList(self._timers, 'item_set'):
         self.ret_cache()
         cache_name = get_pickle_name(cache_name or '')
         if force and (not my_object or not cache_name or not cache_days):

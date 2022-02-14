@@ -26,7 +26,7 @@ from resources.lib.player.players import Players
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 PREGAME_PARENT = ['seasons', 'episodes', 'episode_groups', 'trakt_upnext', 'episode_group_seasons']
-LOG_TIMER_ITEMS = ['item_api', 'item_tmdb', 'item_ftv', 'item_map', 'item_cache']
+LOG_TIMER_ITEMS = ['item_api', 'item_tmdb', 'item_ftv', 'item_map', 'item_cache', 'item_set', 'item_get', 'item_non']
 
 
 def filtered_item(item, key, value, exclude=False):

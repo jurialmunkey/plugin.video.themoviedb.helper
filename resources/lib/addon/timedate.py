@@ -42,16 +42,22 @@ def convert_to_timestamp(date_time):
         return 2145916800  # Y2038 bug in time.mktime on 32bit float systems. Use 2038 Jan 1 UTC for db timestamp instead.
 
 
-def get_timestamp(timestamp=None):
+def get_timestamp(timestamp=None, set_int=False):
     if not timestamp:
         return
-    if time.time() > timestamp:
+    now = time.time()
+    tmp = timestamp
+    if set_int:
+        now = int(now)
+        tmp = int(tmp)
+    if now > tmp:
         return
     return timestamp
 
 
-def set_timestamp(wait_time=60):
-    return time.time() + wait_time
+def set_timestamp(wait_time=60, set_int=False):
+    timestamp = time.time() + wait_time
+    return int(timestamp) if set_int else timestamp
 
 
 def format_date(time_str, str_fmt="%A", time_fmt="%Y-%m-%d", time_lim=10, utc_convert=False, region_fmt=None):

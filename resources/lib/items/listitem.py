@@ -190,11 +190,11 @@ class _ListItem(object):
     def get_url(self):
         return encode_url(self.path, **self.params)
 
-    def get_listitem(self):
+    def get_listitem(self, offscreen=True):
         if self.infolabels.get('mediatype') not in ACCEPTED_MEDIATYPES:
             self.infolabels.pop('mediatype', None)
         self.infolabels['path'] = self.get_url()
-        listitem = xbmcgui.ListItem(label=self.label, label2=self.label2, path=self.infolabels['path'])
+        listitem = xbmcgui.ListItem(label=self.label, label2=self.label2, path=self.infolabels['path'], offscreen=offscreen)
         listitem.setLabel2(self.label2)
         listitem.setInfo(self.library, self.infolabels)
         listitem.setArt(self.set_art_fallbacks())

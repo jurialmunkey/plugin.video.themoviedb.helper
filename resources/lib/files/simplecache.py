@@ -15,22 +15,28 @@ import sqlite3
 from functools import reduce
 from contextlib import contextmanager
 from resources.lib.addon.plugin import kodi_log
-from resources.lib.addon.timedate import get_timedelta, get_datetime_now, get_datetime_datetime, convert_to_timestamp
+from resources.lib.addon.timedate import set_timestamp
 from resources.lib.files.utils import get_file_path
+from json import dumps as json_dumps
+from json import loads as json_loads
+
+TIME_MINUTES = 60
+TIME_HOURS = 60 * TIME_MINUTES
+TIME_DAYS = 24 * TIME_HOURS
 
 
 class SimpleCache(object):
     '''simple stateless caching system for Kodi'''
     global_checksum = None
     _exit = False
-    _auto_clean_interval = 4
+    _auto_clean_interval = 4 * TIME_HOURS
     _win = None
     _busy_tasks = []
     _database = None
 
     def __init__(self, folder=None, filename=None, mem_only=False):
         '''Initialize our caching class'''
-        folder = folder or 'database'
+        folder = folder or 'database_v2'
         filename = filename or 'defaultcache.db'
         self._win = xbmcgui.Window(10000)
         self._monitor = xbmc.Monitor()
@@ -68,7 +74,8 @@ class SimpleCache(object):
             checkum: optional argument to check if the checksum in the cacheobject matches the checkum provided
         '''
         checksum = self._get_checksum(checksum)
-        cur_time = convert_to_timestamp(get_datetime_now())
+        # cur_time = convert_to_timestamp(get_datetime_now())
+        cur_time = set_timestamp(0, True)
         result = self._get_mem_cache(endpoint, checksum, cur_time)  # Try from memory first
         if result is not None or self._mem_only:
             return result
@@ -78,7 +85,8 @@ class SimpleCache(object):
         """ set data in cache """
         with self.busy_tasks(u'set.{}'.format(endpoint)):
             checksum = self._get_checksum(checksum)
-            expires = convert_to_timestamp(get_datetime_now() + get_timedelta(days=cache_days))
+            # expires = convert_to_timestamp(get_datetime_now() + get_timedelta(days=cache_days))
+            expires = set_timestamp(cache_days * TIME_DAYS, True)
             self._set_mem_cache(endpoint, checksum, expires, data)
             if not self._mem_only:
                 self._set_db_cache(endpoint, checksum, expires, data)
@@ -87,11 +95,12 @@ class SimpleCache(object):
         '''check if cleanup is needed - public method, may be called by calling addon'''
         if self._mem_only:
             return
-        cur_time = get_datetime_now()
+        # cur_time = get_datetime_now()
+        cur_time = set_timestamp(0, True)
         lastexecuted = self._win.getProperty(u"{}.clean.lastexecuted".format(self._sc_name))
         if not lastexecuted:
-            self._win.setProperty(u"{}.clean.lastexecuted".format(self._sc_name), repr(tuple(cur_time.timetuple()[:6])))
-        elif (get_datetime_datetime(*eval(lastexecuted)) + get_timedelta(hours=self._auto_clean_interval)) < cur_time:
+            self._win.setProperty(u"{}.clean.lastexecuted".format(self._sc_name), str(cur_time))
+        elif (int(lastexecuted) + set_timestamp(self._auto_clean_interval, True)) < cur_time:
             self._do_cleanup()
 
     def _get_mem_cache(self, endpoint, checksum, cur_time):
@@ -103,8 +112,8 @@ class SimpleCache(object):
         cachedata = self._win.getProperty(endpoint)
         if not cachedata:
             return
-        cachedata = eval(cachedata)
-        if not cachedata or cachedata[0] <= cur_time:
+        cachedata = json_loads(cachedata)
+        if not cachedata or int(cachedata[0]) <= cur_time:
             return
         if not checksum or checksum == cachedata[2]:
             return cachedata[1]
@@ -115,8 +124,8 @@ class SimpleCache(object):
             usefull for (stateless) plugins
         '''
         endpoint = u'{}_{}'.format(self._sc_name, endpoint)  # Append name of cache since we can change it now
-        cachedata = (expires, data, checksum)
-        self._win.setProperty(endpoint, repr(cachedata))
+        cachedata = [expires, data, checksum]
+        self._win.setProperty(endpoint, json_dumps(cachedata))
 
     def _get_db_cache(self, endpoint, checksum, cur_time):
         '''get cache data from sqllite _database'''
@@ -126,17 +135,17 @@ class SimpleCache(object):
         if not cache_data:
             return
         cache_data = cache_data.fetchone()
-        if not cache_data or cache_data[0] <= cur_time:
+        if not cache_data or int(cache_data[0]) <= cur_time:
             return
         if not checksum or checksum == cache_data[2]:
-            result = eval(cache_data[1])
+            result = json_loads(cache_data[1])
             self._set_mem_cache(endpoint, checksum, cache_data[0], result)
         return result
 
     def _set_db_cache(self, endpoint, checksum, expires, data):
         ''' store cache data in _database '''
         query = "INSERT OR REPLACE INTO simplecache( id, expires, data, checksum) VALUES (?, ?, ?, ?)"
-        self._execute_sql(query, (endpoint, expires, repr(data), checksum))
+        self._execute_sql(query, (endpoint, expires, json_dumps(data), checksum))
 
     def _do_delete(self):
         '''perform cleanup task'''
@@ -144,7 +153,7 @@ class SimpleCache(object):
             return
 
         with self.busy_tasks(__name__):
-            cur_time = get_datetime_now()
+            cur_time = set_timestamp(0, True)
             kodi_log("CACHE: Deleting {}...".format(self._sc_name))
 
             self._win.setProperty(u"{}.cleanbusy".format(self._sc_name), "busy")
@@ -154,7 +163,7 @@ class SimpleCache(object):
             self._execute_sql("VACUUM")
 
         # Washup
-        self._win.setProperty(u"{}.clean.lastexecuted".format(self._sc_name), repr(tuple(cur_time.timetuple()[:6])))
+        self._win.setProperty(u"{}.clean.lastexecuted".format(self._sc_name), str(cur_time))
         self._win.clearProperty(u"{}.cleanbusy".format(self._sc_name))
         kodi_log("CACHE: Delete {} done".format(self._sc_name))
 
@@ -164,8 +173,7 @@ class SimpleCache(object):
             return
 
         with self.busy_tasks(__name__):
-            cur_time = get_datetime_now()
-            cur_timestamp = convert_to_timestamp(cur_time)
+            cur_time = set_timestamp(0, True)
             kodi_log("CACHE: Running cleanup...")
             if self._win.getProperty(u"{}.cleanbusy".format(self._sc_name)):
                 return
@@ -180,7 +188,7 @@ class SimpleCache(object):
                 # always cleanup all memory objects on each interval
                 self._win.clearProperty(cache_id)
                 # clean up db cache object only if expired
-                if force or cache_expires < cur_timestamp:
+                if force or int(cache_expires) < cur_time:
                     query = 'DELETE FROM simplecache WHERE id = ?'
                     self._execute_sql(query, (cache_id,))
                     kodi_log(u"CACHE: delete from db {}".format(cache_id))
@@ -189,7 +197,7 @@ class SimpleCache(object):
             self._execute_sql("VACUUM")
 
         # Washup
-        self._win.setProperty(u"{}.clean.lastexecuted".format(self._sc_name), repr(tuple(cur_time.timetuple()[:6])))
+        self._win.setProperty(u"{}.clean.lastexecuted".format(self._sc_name), str(cur_time))
         self._win.clearProperty(u"{}.cleanbusy".format(self._sc_name))
         kodi_log("CACHE: Auto cleanup done")
 
