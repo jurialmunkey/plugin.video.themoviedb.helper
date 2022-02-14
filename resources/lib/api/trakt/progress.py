@@ -229,7 +229,7 @@ class _TraktProgress():
             show_id = i.get('show', {}).get('ids', {}).get(id_type)
             if not show_id:
                 continue
-            show_item = main_list.get(show_id) or i.get('show')
+            show_item = main_list.get(show_id) or i.pop('show', None) or {}
             seasons = show_item.setdefault('seasons', {})
             season = seasons.setdefault(i.get('episode', {}).get('season', 0), {})
             season[i.get('episode', {}).get('number', 0)] = i
