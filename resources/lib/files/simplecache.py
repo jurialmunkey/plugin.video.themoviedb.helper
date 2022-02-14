@@ -75,9 +75,7 @@ class SimpleCache(object):
         return self._get_db_cache(endpoint, checksum, cur_time)  # Fallback to checking database if not in memory
 
     def set(self, endpoint, data, checksum="", cache_days=30):
-        '''
-            set data in cache
-        '''
+        """ set data in cache """
         with self.busy_tasks(u'set.{}'.format(endpoint)):
             checksum = self._get_checksum(checksum)
             expires = convert_to_timestamp(get_datetime_now() + get_timedelta(days=cache_days))

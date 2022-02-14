@@ -1,7 +1,9 @@
 from resources.lib.addon.plugin import kodi_log, format_name
 from resources.lib.addon.decorators import try_except_log
 from resources.lib.files.simplecache import SimpleCache
-from resources.lib.files.utils import get_pickle_name
+from resources.lib.files.utils import get_pickle_name, pickle_deepcopy
+from threading import Thread
+# from resources.lib.addon.decorators import TimerList
 
 CACHE_LONG = 14
 CACHE_SHORT = 1
@@ -14,6 +16,7 @@ class BasicCache(object):
         self._filename = filename
         self._cache = None
         self._mem_only = mem_only
+        self._timers = {}
 
     @try_except_log('lib.addon.cache ret_cache')
     def ret_cache(self):
@@ -28,13 +31,20 @@ class BasicCache(object):
 
     @try_except_log('lib.addon.cache set_cache')
     def set_cache(self, my_object, cache_name, cache_days=14, force=False, fallback=None):
+        """ set object to cache via thread """
+        # with TimerList(self._timers, 'item_cache'):
+        #    self._set_cache(my_object, cache_name, cache_days, force, fallback)
+        Thread(target=self._set_cache, args=[pickle_deepcopy(my_object), cache_name, cache_days, force, fallback]).start()
+        return my_object
+
+    def _set_cache(self, my_object, cache_name, cache_days=14, force=False, fallback=None):
+        """ set object to cache """
         self.ret_cache()
         cache_name = get_pickle_name(cache_name or '')
         if force and (not my_object or not cache_name or not cache_days):
             my_object = my_object or fallback
             cache_days = force if isinstance(force, int) else cache_days
         self._cache.set(cache_name, my_object, cache_days=cache_days)
-        return my_object
 
     @try_except_log('lib.addon.cache del_cache')
     def del_cache(self, cache_name):

@@ -26,7 +26,7 @@ from resources.lib.player.players import Players
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 PREGAME_PARENT = ['seasons', 'episodes', 'episode_groups', 'trakt_upnext', 'episode_group_seasons']
-LOG_TIMER_ITEMS = ['item_api', 'item_tmdb', 'item_ftv', 'item_map']
+LOG_TIMER_ITEMS = ['item_api', 'item_tmdb', 'item_ftv', 'item_map', 'item_cache']
 
 
 def filtered_item(item, key, value, exclude=False):
@@ -73,6 +73,11 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.pagination = self.pagination_is_allowed()
         self.params = reconfigure_legacy_params(**self.params)
         self.thumb_override = 0
+
+        # For cache profiling
+        # self.tmdb_api._cache._timers = self.timer_lists
+        # self.trakt_api._cache._timers = self.timer_lists
+        # self.ftv_api._cache._timers = self.timer_lists
 
     def pagination_is_allowed(self):
         if self.params.pop('nextpage', '').lower() == 'false':
@@ -136,7 +141,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
 
         self.ib = ItemBuilder(tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api)
         self.ib.cache_only = self.tmdb_cache_only
-        self.ib.timer_lists = self.timer_lists
+        self.ib.timer_lists = self.ib._cache._timers = self.timer_lists
         self.ib.log_timers = self.log_timers
 
         # Pre-game details and artwork cache for episodes before threading to avoid multiple API calls
