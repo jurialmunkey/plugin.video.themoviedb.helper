@@ -110,15 +110,15 @@ class ItemBuilder(_ArtworkSelector):
 
     def _get_ftv_artwork(self, ftv_id, ftv_type, season=None):
         with TimerList(self.timer_lists, 'item_ftv', log_threshold=0.05, logging=self.log_timers):
-            if not self.ftv_api or not ftv_id or not ftv_type:
-                return
-            artwork = self.ftv_api.get_all_artwork(ftv_id, ftv_type, season)
+            artwork = None
+            if self.ftv_api and ftv_id and ftv_type:
+                artwork = self.ftv_api.get_all_artwork(ftv_id, ftv_type, season)
         return artwork
 
     def _get_tmdb_artwork(self, item):
         if not item or 'artwork' not in item:
             return {}
-        return item['artwork'].get(ARTWORK_QUALITY) or self.map_artwork(item['artwork'].get('tmdb')) or {}
+        return item['artwork'].setdefault(str(ARTWORK_QUALITY), self.map_artwork(item['artwork'].get('tmdb')) or {})
 
     def get_artwork(self, item, tmdb_type, season=None, episode=None, base_item=None, prefix=''):
         if not item:
@@ -126,7 +126,8 @@ class ItemBuilder(_ArtworkSelector):
 
         # TMDb Artwork reconfigure quality and merge base_item
         item_artwork = self._get_tmdb_artwork(item)
-        self.join_base_artwork(self._get_tmdb_artwork(base_item), item_artwork, prefix=prefix, backfill=True)
+        item_artwork = self.join_base_artwork(self._get_tmdb_artwork(base_item), item_artwork, prefix=prefix, backfill=True)
+        item['artwork'][str(ARTWORK_QUALITY)] = item_artwork
 
         # FanartTV retrieve artwork and merge base_item
         ftv_art = item['artwork'].setdefault('fanarttv', {})
@@ -136,7 +137,6 @@ class ItemBuilder(_ArtworkSelector):
             item['artwork']['fanarttv'] = ftv_art
         if base_item and 'artwork' in base_item:
             self.join_base_artwork(base_item['artwork'].get('fanarttv', {}), ftv_art, prefix=prefix, backfill=True)
-
         return item
 
     def get_tmdb_item(self, tmdb_type, tmdb_id, season=None, episode=None, base_item=None, manual_art=None):
@@ -150,7 +150,7 @@ class ItemBuilder(_ArtworkSelector):
                 'listitem': self.map_item(details, tmdb_type, base_item=base_item['listitem'] if base_item else None),
                 'expires': self._timestamp(),
                 'artwork': {}}
-            item['artwork']['tmdb'] = item['artwork'][ARTWORK_QUALITY] = item['listitem'].pop('art')
+            item['artwork']['tmdb'] = item['artwork'][str(ARTWORK_QUALITY)] = item['listitem'].pop('art')
             if manual_art:
                 item['artwork']['manual'] = manual_art
             item['listitem']['art'] = {}
@@ -176,7 +176,14 @@ class ItemBuilder(_ArtworkSelector):
             base_item = parent or self._cache.get_cache(base_name)
         if item and get_timestamp(item['expires']):
             if not base_item or self._timeint(base_item['expires']) <= self._timeint(item['expires']):
-                return item
+                if not self.ftv_api or item['artwork'].get('fanarttv'):
+                    if item['artwork'].get(str(ARTWORK_QUALITY)):
+                        return item
+                # We're only missing artwork from a specific API or only need to remap quality
+                # kodi_log('REMAP {}.{}.format\n{}'.format(tmdb_type, tmdb_id, item['artwork'].keys()), 1)
+                prefix = 'tvshow.' if season is not None and episode is None else ''
+                item = self.get_artwork(item, tmdb_type, season, episode, base_item, prefix=prefix)
+                return self._cache.set_cache(item, name, cache_days=CACHE_DAYS)
 
         # Keep previous manually selected artwork
         prefix = ''
@@ -214,7 +221,7 @@ class ItemBuilder(_ArtworkSelector):
         if not item or 'listitem' not in item:
             return li
         li.set_details(item['listitem'])
-        li.set_artwork(item['artwork'].get(ARTWORK_QUALITY))
+        li.set_artwork(item['artwork'].get(str(ARTWORK_QUALITY)))
         li.set_artwork(item['artwork'].get('fanarttv'), blacklist=ARTWORK_BLACKLIST[ARTWORK_QUALITY])
         li.set_artwork(item['artwork'].get('manual'))
         return li
