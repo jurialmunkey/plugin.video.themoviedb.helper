@@ -44,10 +44,8 @@ class SimpleCache(object):
         '''tell any tasks to stop immediately (as we can be called multithreaded) and cleanup objects'''
         self._exit = True
         # wait for all tasks to complete
-        while self._busy_tasks and self._monitor and self._win and not self._monitor.abortRequested():
+        while self._busy_tasks and not self._monitor.abortRequested():
             xbmc.sleep(25)
-        del self._win
-        del self._monitor
         kodi_log("CACHE: Closed")
 
     def __del__(self):
