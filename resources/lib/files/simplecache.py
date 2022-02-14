@@ -213,7 +213,7 @@ class SimpleCache(object):
         self._win.clearProperty(u"{}.cleanbusy".format(self._sc_name))
         kodi_log("CACHE: Auto cleanup done")
 
-    def _get_database(self, attempts=3):
+    def _get_database(self, attempts=2):
         '''get reference to our sqllite _database - performs basic integrity check'''
         try:
             connection = sqlite3.connect(self._db_file, timeout=30, isolation_level=None)
@@ -230,12 +230,11 @@ class SimpleCache(object):
                     id TEXT UNIQUE, expires INTEGER, data TEXT, checksum INTEGER)""")
                 return connection
             except Exception as error:
-                kodi_log(u"CACHE: Exception while initializing _database: {}".format(error), 1)
+                kodi_log(u"CACHE: Exception while initializing _database: {} ({})".format(error, attempts), 1)
                 if attempts < 1:
                     return
                 attempts -= 1
-                kodi_log(u"CACHE: Reconnecting... Attempts Remaining {}".format(attempts), 1)
-                self._monitor.waitForAbort(0.5)
+                self._monitor.waitForAbort(1)
                 return self._get_database(attempts)
 
     def _execute_sql(self, query, data=None):
@@ -257,11 +256,14 @@ class SimpleCache(object):
                         result = _database.execute(query)
                     return result
                 except sqlite3.OperationalError as error:
-                    if "_database is locked" in error:
-                        kodi_log("CACHE: retrying DB commit...")
-                        retries += 1
-                        self._monitor.waitForAbort(0.5)
-                    else:
+                    try:
+                        if "database is locked" in error:
+                            kodi_log("CACHE: Locked: Retrying DB commit...")
+                            retries += 1
+                            self._monitor.waitForAbort(0.5)
+                        else:
+                            break
+                    except TypeError:
                         break
                 except Exception:
                     break
