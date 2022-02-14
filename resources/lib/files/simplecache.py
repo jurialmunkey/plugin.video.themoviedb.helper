@@ -17,6 +17,7 @@ from contextlib import contextmanager
 from resources.lib.addon.plugin import kodi_log
 from resources.lib.addon.timedate import set_timestamp
 from resources.lib.files.utils import get_file_path
+from resources.lib.files.utils import pickle_deepcopy
 from json import dumps as json_dumps
 from json import loads as json_loads
 
@@ -34,7 +35,7 @@ class SimpleCache(object):
     _busy_tasks = []
     _database = None
 
-    def __init__(self, folder=None, filename=None, mem_only=False):
+    def __init__(self, folder=None, filename=None, mem_only=False, delay_write=False):
         '''Initialize our caching class'''
         folder = folder or 'database_v2'
         filename = filename or 'defaultcache.db'
@@ -43,6 +44,8 @@ class SimpleCache(object):
         self._db_file = get_file_path(folder, filename)
         self._sc_name = u'{}_{}_simplecache'.format(folder, filename)
         self._mem_only = mem_only
+        self._queue = []
+        self._delaywrite = delay_write
         self.check_cleanup()
         kodi_log("CACHE: Initialized")
 
@@ -52,7 +55,12 @@ class SimpleCache(object):
         # wait for all tasks to complete
         while self._busy_tasks and not self._monitor.abortRequested():
             xbmc.sleep(25)
-        kodi_log("CACHE: Closed")
+        if self._queue:
+            kodi_log("CACHE: Write {} Items in Queue\n{}".format(len(self._queue), self._sc_name), 2)
+        for i in self._queue:
+            self._set_db_cache(*i)
+        self._queue = []
+        kodi_log("CACHE: Closed {}".format(self._sc_name))
 
     def __del__(self):
         '''make sure close is called'''
@@ -88,8 +96,12 @@ class SimpleCache(object):
             # expires = convert_to_timestamp(get_datetime_now() + get_timedelta(days=cache_days))
             expires = set_timestamp(cache_days * TIME_DAYS, True)
             self._set_mem_cache(endpoint, checksum, expires, data)
-            if not self._mem_only:
-                self._set_db_cache(endpoint, checksum, expires, data)
+            if self._mem_only:
+                return
+            if self._delaywrite:
+                self._queue.append((endpoint, checksum, expires, pickle_deepcopy(data)))
+                return
+            self._set_db_cache(endpoint, checksum, expires, data)
 
     def check_cleanup(self):
         '''check if cleanup is needed - public method, may be called by calling addon'''

@@ -411,8 +411,8 @@ class _TraktSync():
 
 
 class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
-    def __init__(self, force=False):
-        super(TraktAPI, self).__init__(req_api_url=API_URL, req_api_name='TraktAPI', timeout=20)
+    def __init__(self, force=False, delay_write=False):
+        super(TraktAPI, self).__init__(req_api_url=API_URL, req_api_name='TraktAPI', timeout=20, delay_write=delay_write)
         self.authorization = ''
         self.attempted_login = False
         self.dialog_noapikey_header = u'{0} {1} {2}'.format(ADDON.getLocalizedString(32007), self.req_api_name, ADDON.getLocalizedString(32011))

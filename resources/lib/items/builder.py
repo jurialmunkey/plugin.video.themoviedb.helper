@@ -38,13 +38,13 @@ BACKFILL_BLACKLIST = ['poster']
 
 
 class ItemBuilder(_ArtworkSelector):
-    def __init__(self, tmdb_api=None, ftv_api=None, trakt_api=None, cache_only=False):
+    def __init__(self, tmdb_api=None, ftv_api=None, trakt_api=None, cache_only=False, delay_write=False):
         self.parent_tv = {}
         self.parent_season = {}
         self.tmdb_api = tmdb_api or TMDb()
         self.ftv_api = ftv_api or FanartTV()
         self.trakt_api = trakt_api
-        self._cache = BasicCache(filename='ItemBuilder.db')
+        self._cache = BasicCache(filename='ItemBuilder.db', delay_write=delay_write)
         self._regex = re.compile(r'({})'.format('|'.join(IMAGEPATH_ALL)))
         self.parent_params = None
         self.cache_only = cache_only
@@ -197,6 +197,7 @@ class ItemBuilder(_ArtworkSelector):
             base_artwork = {k: v for k, v in base_artwork.items() if v}
             manual_art = self.join_base_artwork(base_artwork, manual_art, prefix=prefix)
 
+        # TODO: Get FTV in parallel thread if possible
         item = self.get_tmdb_item(
             tmdb_type, tmdb_id, season=season, episode=episode,
             base_item=base_item, manual_art=manual_art)

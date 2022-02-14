@@ -54,9 +54,9 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.log_timers = ADDON.getSettingBool('timer_reports')
         self.library = None
         self.ib = None
-        self.tmdb_api = TMDb()
-        self.trakt_api = TraktAPI()
-        self.omdb_api = OMDb() if ADDON.getSettingString('omdb_apikey') else None
+        self.tmdb_api = TMDb(delay_write=True)
+        self.trakt_api = TraktAPI(delay_write=True)
+        self.omdb_api = OMDb(delay_write=True) if ADDON.getSettingString('omdb_apikey') else None
         self.is_widget = self.params.pop('widget', '').lower() == 'true'
         self.hide_watched = ADDON.getSettingBool('widgets_hidewatched') if self.is_widget else False
         self.flatten_seasons = ADDON.getSettingBool('flatten_seasons')
@@ -64,7 +64,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.trakt_playprogress = ADDON.getSettingBool('trakt_playprogress')
         self.cache_only = self.params.pop('cacheonly', '').lower()
         self.ftv_forced_lookup = self.params.pop('fanarttv', '').lower()
-        self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only())  # Set after ftv_forced_lookup, is_widget, cache_only
+        self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only(), delay_write=True)  # Set after ftv_forced_lookup, is_widget, cache_only
         self.tmdb_cache_only = self.tmdb_is_cache_only()  # Set after ftv_api, cache_only
         self.filter_key = self.params.get('filter_key', None),
         self.filter_value = split_items(self.params.get('filter_value', None))[0],
@@ -139,7 +139,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         if not items:
             return
 
-        self.ib = ItemBuilder(tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api)
+        self.ib = ItemBuilder(tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api, delay_write=True)
         self.ib.cache_only = self.tmdb_cache_only
         self.ib.timer_lists = self.ib._cache._timers = self.timer_lists
         self.ib.log_timers = self.log_timers

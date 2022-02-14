@@ -3,6 +3,7 @@ import xbmcgui
 from contextlib import contextmanager
 from resources.lib.addon.plugin import kodi_log, kodi_traceback, format_name
 from timeit import default_timer as timer
+from threading import Thread
 
 
 class ProgressDialog(object):
@@ -122,6 +123,22 @@ class TimerList():
         total_time = timer_z - self.timer_a
         if total_time > self.log_threshold:
             self.list_obj.append(total_time)
+
+
+class ParallelThread():
+    def __init__(self, pool, x, func, *args, **kwargs):
+        """ ContextManager for running a parallel thread alongside another function """
+        self._thread = Thread(target=self._threadwrapper, args=[pool, x, func, *args], kwargs=kwargs)
+        self._thread.start()
+
+    def _threadwrapper(self, pool, x, func, *args, **kwargs):
+        pool[x] = func(*args, **kwargs)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        self._thread.join()
 
 
 def log_output(func_name):
