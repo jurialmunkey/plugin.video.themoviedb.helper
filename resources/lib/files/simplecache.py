@@ -58,17 +58,16 @@ class SimpleCache(object):
         # wait for all tasks to complete
         while self._busy_tasks and not self._monitor.abortRequested():
             xbmc.sleep(25)
+        kodi_log("CACHE: Closed {}".format(self._sc_name), 2)
+
+    def __del__(self):
+        '''make sure close is called'''
         if self._queue:
             kodi_log("CACHE: Write {} Items in Queue\n{}".format(len(self._queue), self._sc_name), 2)
         for i in self._queue:
             self._set_db_cache(*i)
         self._queue = []
-        kodi_log("CACHE: Closed {}".format(self._sc_name))
-
-    def __del__(self):
-        '''make sure close is called'''
-        if not self._exit:
-            self.close()
+        self.close()
 
     @contextmanager
     def busy_tasks(self, task_name):
@@ -128,8 +127,10 @@ class SimpleCache(object):
         # Retrieve data
         data_endpoint = u'{}_data_{}'.format(self._sc_name, endpoint)
         data_propdata = self._win.getProperty(data_endpoint)
-        data_propdata = data_loads(data_propdata)
-        return data_propdata
+        if not data_propdata:
+            return
+
+        return data_loads(data_propdata)
 
     def _set_mem_cache(self, endpoint, expires, data):
         '''

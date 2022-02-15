@@ -8,7 +8,7 @@ from resources.lib.api.fanarttv.api import FanartTV
 from resources.lib.addon.timedate import set_timestamp, get_timestamp
 from resources.lib.addon.constants import IMAGEPATH_QUALITY_POSTER, IMAGEPATH_QUALITY_FANART, IMAGEPATH_QUALITY_THUMBS, IMAGEPATH_QUALITY_CLOGOS, IMAGEPATH_ALL, ARTWORK_BLACKLIST
 from resources.lib.addon.decorators import TimerList, ParallelThread
-# from resources.lib.addon.plugin import kodi_log
+from resources.lib.addon.plugin import kodi_log
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 ARTWORK_QUALITY = ADDON.getSettingInt('artwork_quality')
@@ -103,7 +103,7 @@ class ItemBuilder(_ArtworkSelector):
         if tmdb_type == 'tv':
             if season is None:
                 return (unique_ids.get('tvdb'), 'tv')
-            return (unique_ids.get('tvshow.tvdb'), 'tv')
+            return (unique_ids.get('tvshow.tvdb') or unique_ids.get('tvdb'), 'tv')
         return None, None
 
     def _get_ftv_artwork(self, tmdb_type, item, season=None, tmdb_id=None):
@@ -122,7 +122,7 @@ class ItemBuilder(_ArtworkSelector):
     def _get_tmdb_artwork(self, item):
         if not item or 'artwork' not in item:
             return {}
-        return item['artwork'].setdefault(str(ARTWORK_QUALITY), self.map_artwork(item['artwork'].get('tmdb')) or {})
+        return item['artwork'].setdefault(ARTWORK_QUALITY, self.map_artwork(item['artwork'].get('tmdb')) or {})
 
     def get_artwork(self, item, tmdb_type, season=None, episode=None, base_item=None, prefix='', ftv_art=None):
         if not item:
@@ -131,7 +131,7 @@ class ItemBuilder(_ArtworkSelector):
         # TMDb Artwork reconfigure quality and merge base_item
         item_artwork = self._get_tmdb_artwork(item)
         item_artwork = self.join_base_artwork(self._get_tmdb_artwork(base_item), item_artwork, prefix=prefix, backfill=True)
-        item['artwork'][str(ARTWORK_QUALITY)] = item_artwork
+        item['artwork'][ARTWORK_QUALITY] = item_artwork
 
         # FanartTV retrieve artwork and merge base_item
         ftv_art = ftv_art or item['artwork'].setdefault('fanarttv', {})
@@ -155,7 +155,7 @@ class ItemBuilder(_ArtworkSelector):
                 'listitem': self.map_item(details, tmdb_type, base_item=base_item['listitem'] if base_item else None),
                 'expires': self._timestamp(),
                 'artwork': {}}
-            item['artwork']['tmdb'] = item['artwork'][str(ARTWORK_QUALITY)] = item['listitem'].pop('art')
+            item['artwork']['tmdb'] = item['artwork'][ARTWORK_QUALITY] = item['listitem'].pop('art')
             if manual_art:
                 item['artwork']['manual'] = manual_art
             item['listitem']['art'] = {}
@@ -182,7 +182,7 @@ class ItemBuilder(_ArtworkSelector):
         if item and get_timestamp(item['expires']):
             if not base_item or self._timeint(base_item['expires']) <= self._timeint(item['expires']):
                 if not self.ftv_api or item['artwork'].get('fanarttv'):
-                    if item['artwork'].get(str(ARTWORK_QUALITY)):
+                    if item['artwork'].get(ARTWORK_QUALITY):
                         return item
                 # We're only missing artwork from a specific API or only need to remap quality
                 # kodi_log('REMAP {}.{}.format\n{}'.format(tmdb_type, tmdb_id, item['artwork'].keys()), 1)
@@ -203,7 +203,10 @@ class ItemBuilder(_ArtworkSelector):
             manual_art = self.join_base_artwork(base_artwork, manual_art, prefix=prefix)
 
         # Try to get FTV artwork in parallel thread if IDs are available
-        with ParallelThread([tmdb_type], self._get_ftv_artwork, base_item or item, season=season, tmdb_id=tmdb_id) as pt:
+        with ParallelThread(
+                [tmdb_type] if episode is None else [],
+                self._get_ftv_artwork, base_item or item,
+                season=season, tmdb_id=tmdb_id) as pt:
             item = self.get_tmdb_item(
                 tmdb_type, tmdb_id, season=season, episode=episode,
                 base_item=base_item, manual_art=manual_art)
@@ -230,7 +233,7 @@ class ItemBuilder(_ArtworkSelector):
         if not item or 'listitem' not in item:
             return li
         li.set_details(item['listitem'])
-        li.set_artwork(item['artwork'].get(str(ARTWORK_QUALITY)))
+        li.set_artwork(item['artwork'].get(ARTWORK_QUALITY))
         li.set_artwork(item['artwork'].get('fanarttv'), blacklist=ARTWORK_BLACKLIST[ARTWORK_QUALITY])
         li.set_artwork(item['artwork'].get('manual'))
         return li
