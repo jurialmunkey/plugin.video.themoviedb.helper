@@ -7,7 +7,7 @@ from resources.lib.addon.constants import NO_LABEL_FORMATTING, RANDOMISED_TRAKT,
 from resources.lib.addon.plugin import convert_type, reconfigure_legacy_params, kodi_log
 from resources.lib.addon.parser import parse_paramstring, try_int
 from resources.lib.addon.setutils import split_items, random_from_list, merge_two_dicts
-from resources.lib.addon.decorators import TimerList
+from resources.lib.addon.decorators import TimerList, ParallelThread
 from resources.lib.api.mapping import set_show, get_empty_item
 from resources.lib.api.kodi.rpc import get_kodi_library, get_movie_details, get_tvshow_details, get_episode_details, get_season_details, set_playprogress
 from resources.lib.api.tmdb.api import TMDb
@@ -130,10 +130,38 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
                 if filtered_item(listitem.infoproperties, self.exclude_key, self.exclude_value, True):
                     return True
 
-    def _add_item(self, x, i):
+    def _add_item(self, i, pagination=True):
+        if not pagination and 'next_page' in i:
+            return
         with TimerList(self.timer_lists, 'item_api', log_threshold=0.05, logging=self.log_timers):
-            li = self.ib.get_listitem(i)
-        self.items_queue[x] = li
+            return self.ib.get_listitem(i)
+
+    def _make_item(self, li):
+        if not li:
+            return
+        if not li.next_page and self.item_is_excluded(li):
+            return
+        # with TimerList(self.timer_lists, 'item_map', log_threshold=0.05, logging=self.log_timers):
+        li.set_episode_label()
+        if self.hide_unaired and not li.infoproperties.get('specialseason'):
+            if li.is_unaired(no_date=self.hide_no_date):
+                return
+        li.set_details(details=self.get_kodi_details(li), reverse=True)
+        li.set_playcount(playcount=self.get_playcount_from_trakt(li))
+        if self.hide_watched and try_int(li.infolabels.get('playcount')) != 0:
+            return
+        li.set_context_menu()  # Set the context menu items
+        li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
+        li.set_thumb_to_art(self.thumb_override == 2) if self.thumb_override else None
+        li.set_params_reroute(self.ftv_forced_lookup, self.flatten_seasons, self.params.get('extended'), self.cache_only)  # Reroute details to proper end point
+        li.set_params_to_info(self.plugin_category)  # Set path params to properties for use in skins
+        li.infoproperties.update(self.property_params or {})
+        if self.thumb_override:
+            li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb otherwise Kodi overrides after item is created
+        if li.next_page:
+            li.params['plugin_category'] = self.plugin_category
+        self.set_playprogress_from_trakt(li)
+        return {'url': li.get_url(), 'listitem': li.get_listitem(), 'isFolder': li.is_folder}
 
     def add_items(self, items=None, pagination=True, property_params=None, kodi_db=None):
         if not items:
@@ -150,59 +178,27 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
                 tmdb_type='tv', tmdb_id=self.parent_params.get('tmdb_id'),
                 season=self.parent_params.get('season', None) if self.parent_params['info'] == 'episodes' else None)
 
-        # Sync Trakt watched data before building items
-        hide_no_date = ADDON.getSettingBool('nodate_is_unaired')
-        hide_unaired = self.parent_params.get('info') not in NO_LABEL_FORMATTING
-        trakt_pre_sync = Thread(target=self.get_pre_trakt_sync, args=[self.container_content])
-        trakt_pre_sync.start()
+        # Sync Trakt watched data in parallel thread while building items
+        with TimerList(self.timer_lists, '--build', log_threshold=0.05, logging=self.log_timers):
+            self.ib.parent_params = self.parent_params
+            with ParallelThread(items, self._add_item, pagination) as pt:
+                self.get_pre_trakt_sync(self.container_content)
+                item_queue = pt.queue
+            all_listitems = [i for i in item_queue if i]
 
-        # Thread pool and item build queue
-        all_items = []
-        self.ib.parent_params = self.parent_params
-        self.items_queue, pool = [None] * len(items), [None] * len(items)
-        for x, i in enumerate(items):
-            if not pagination and 'next_page' in i:
-                continue
-            pool[x] = Thread(target=self._add_item, args=[x, i])
-            pool[x].start()
-        for x, i in enumerate(pool):
-            if not i:
-                continue
-            i.join()
-            li = self.items_queue[x]
-            if not li:
-                continue
-            if not li.next_page and self.item_is_excluded(li):
-                continue
-            li.set_episode_label()
-            if hide_unaired and not li.infoproperties.get('specialseason'):
-                if li.is_unaired(no_date=hide_no_date):
-                    continue
-            all_items.append(li)
-        with TimerList(self.timer_lists, 'item_join', logging=self.log_timers):
-            trakt_pre_sync.join()
-        for li in all_items:
-            li.set_details(details=self.get_kodi_details(li), reverse=True)
-            li.set_playcount(playcount=self.get_playcount_from_trakt(li))
-            if self.hide_watched and try_int(li.infolabels.get('playcount')) != 0:
-                continue
-            with TimerList(self.timer_lists, 'item_make', logging=self.log_timers):
-                li.set_context_menu()  # Set the context menu items
-                li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
-                li.set_thumb_to_art(self.thumb_override == 2) if self.thumb_override else None
-                li.set_params_reroute(self.ftv_forced_lookup, self.flatten_seasons, self.params.get('extended'), self.cache_only)  # Reroute details to proper end point
-                li.set_params_to_info(self.plugin_category)  # Set path params to properties for use in skins
-                li.infoproperties.update(property_params or {})
-                if self.thumb_override:
-                    li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb otherwise Kodi overrides after item is created
-                if li.next_page:
-                    li.params['plugin_category'] = self.plugin_category
-                self.set_playprogress_from_trakt(li)
-                xbmcplugin.addDirectoryItem(
-                    handle=self.handle,
-                    url=li.get_url(),
-                    listitem=li.get_listitem(),
-                    isFolder=li.is_folder)
+        # Finalise listitems in parallel threads
+        with TimerList(self.timer_lists, '--make', log_threshold=0.05, logging=self.log_timers):
+            self.property_params = property_params
+            self.hide_no_date = ADDON.getSettingBool('nodate_is_unaired')
+            self.hide_unaired = self.parent_params.get('info') not in NO_LABEL_FORMATTING
+            with ParallelThread(all_listitems, self._make_item) as pt:
+                item_queue = pt.queue
+            all_itemtuples = [i for i in item_queue if i]
+
+        # Add items to directory
+        for i in all_itemtuples:
+            # with TimerList(self.timer_lists, 'item_add', log_threshold=0.05, logging=self.log_timers):
+            xbmcplugin.addDirectoryItem(handle=self.handle, **i)
 
     def set_params_to_container(self, **kwargs):
         params = {}

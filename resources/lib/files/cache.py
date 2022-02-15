@@ -4,7 +4,7 @@ from resources.lib.files.simplecache import SimpleCache
 from resources.lib.files.utils import get_pickle_name
 # from resources.lib.files.utils import pickle_deepcopy
 # from threading import Thread
-# from resources.lib.addon.decorators import TimerList
+from resources.lib.addon.decorators import TimerList
 
 CACHE_LONG = 14
 CACHE_SHORT = 1

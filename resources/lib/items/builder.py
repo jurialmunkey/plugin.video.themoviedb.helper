@@ -7,7 +7,7 @@ from resources.lib.api.tmdb.api import TMDb
 from resources.lib.api.fanarttv.api import FanartTV
 from resources.lib.addon.timedate import set_timestamp, get_timestamp
 from resources.lib.addon.constants import IMAGEPATH_QUALITY_POSTER, IMAGEPATH_QUALITY_FANART, IMAGEPATH_QUALITY_THUMBS, IMAGEPATH_QUALITY_CLOGOS, IMAGEPATH_ALL, ARTWORK_BLACKLIST
-from resources.lib.addon.decorators import TimerList
+from resources.lib.addon.decorators import TimerList, ParallelThread
 # from resources.lib.addon.plugin import kodi_log
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
@@ -68,18 +68,6 @@ class ItemBuilder(_ArtworkSelector):
                 return
             self.parent_season = self.get_item(tmdb_type=tmdb_type, tmdb_id=tmdb_id, season=season)
 
-    def get_ftv_typeid(self, tmdb_type, item, season=None):
-        if not item:
-            return None, None
-        unique_ids = item['listitem'].get('unique_ids', {})
-        if tmdb_type == 'movie':
-            return (unique_ids.get('tmdb'), 'movies')
-        if tmdb_type == 'tv':
-            if season is None:
-                return (unique_ids.get('tvdb'), 'tv')
-            return (unique_ids.get('tvshow.tvdb'), 'tv')
-        return None, None
-
     def map_item(self, item, tmdb_type, base_item=None):
         return self.tmdb_api.mapper.get_info(item, tmdb_type, base_item=base_item)
 
@@ -108,11 +96,27 @@ class ItemBuilder(_ArtworkSelector):
                 base_items[k] = v
         return base_items
 
-    def _get_ftv_artwork(self, ftv_id, ftv_type, season=None):
+    def get_ftv_typeid(self, tmdb_type, item, season=None, tmdb_id=None):
+        unique_ids = item['listitem'].get('unique_ids', {}) if item else {}
+        if tmdb_type == 'movie':
+            return (tmdb_id or unique_ids.get('tmdb'), 'movies')
+        if tmdb_type == 'tv':
+            if season is None:
+                return (unique_ids.get('tvdb'), 'tv')
+            return (unique_ids.get('tvshow.tvdb'), 'tv')
+        return None, None
+
+    def _get_ftv_artwork(self, tmdb_type, item, season=None, tmdb_id=None):
         with TimerList(self.timer_lists, 'item_ftv', log_threshold=0.05, logging=self.log_timers):
             artwork = None
-            if self.ftv_api and ftv_id and ftv_type:
-                artwork = self.ftv_api.get_all_artwork(ftv_id, ftv_type, season)
+            if not self.ftv_api:
+                return
+            ftv_id, ftv_type = self.get_ftv_typeid(tmdb_type, item, season, tmdb_id)
+            if not ftv_type:
+                return
+            if not ftv_id:
+                return -1 if ftv_type == 'movies' else None
+            artwork = self.ftv_api.get_all_artwork(ftv_id, ftv_type, season)
         return artwork
 
     def _get_tmdb_artwork(self, item):
@@ -120,7 +124,7 @@ class ItemBuilder(_ArtworkSelector):
             return {}
         return item['artwork'].setdefault(str(ARTWORK_QUALITY), self.map_artwork(item['artwork'].get('tmdb')) or {})
 
-    def get_artwork(self, item, tmdb_type, season=None, episode=None, base_item=None, prefix=''):
+    def get_artwork(self, item, tmdb_type, season=None, episode=None, base_item=None, prefix='', ftv_art=None):
         if not item:
             return
 
@@ -130,11 +134,12 @@ class ItemBuilder(_ArtworkSelector):
         item['artwork'][str(ARTWORK_QUALITY)] = item_artwork
 
         # FanartTV retrieve artwork and merge base_item
-        ftv_art = item['artwork'].setdefault('fanarttv', {})
+        ftv_art = ftv_art or item['artwork'].setdefault('fanarttv', {})
         if not ftv_art and episode is None:  # No episode art on ftv so don't look it up
-            ftv_id, ftv_type = self.get_ftv_typeid(tmdb_type, base_item or item)
-            ftv_art = self._get_ftv_artwork(ftv_id, ftv_type, season=season) or {}
-            item['artwork']['fanarttv'] = ftv_art
+            ftv_art = self._get_ftv_artwork(tmdb_type, base_item or item, season=season) or {}
+        if ftv_art == -1:
+            ftv_art = {}
+        item['artwork']['fanarttv'] = ftv_art
         if base_item and 'artwork' in base_item:
             self.join_base_artwork(base_item['artwork'].get('fanarttv', {}), ftv_art, prefix=prefix, backfill=True)
         return item
@@ -197,11 +202,14 @@ class ItemBuilder(_ArtworkSelector):
             base_artwork = {k: v for k, v in base_artwork.items() if v}
             manual_art = self.join_base_artwork(base_artwork, manual_art, prefix=prefix)
 
-        # TODO: Get FTV in parallel thread if possible
-        item = self.get_tmdb_item(
-            tmdb_type, tmdb_id, season=season, episode=episode,
-            base_item=base_item, manual_art=manual_art)
-        item = self.get_artwork(item, tmdb_type, season, episode, base_item, prefix=prefix)
+        # Try to get FTV artwork in parallel thread if IDs are available
+        with ParallelThread([tmdb_type], self._get_ftv_artwork, base_item or item, season=season, tmdb_id=tmdb_id) as pt:
+            item = self.get_tmdb_item(
+                tmdb_type, tmdb_id, season=season, episode=episode,
+                base_item=base_item, manual_art=manual_art)
+            item_queue = pt.queue
+        ftv_art = item_queue[0] if item_queue else None
+        item = self.get_artwork(item, tmdb_type, season, episode, base_item, prefix=prefix, ftv_art=ftv_art)
         return self._cache.set_cache(item, name, cache_days=CACHE_DAYS)
         # TODO: Remember to include OMDb too!
 
