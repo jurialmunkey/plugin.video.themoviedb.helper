@@ -1,5 +1,5 @@
 import xbmcaddon
-from resources.lib.addon.plugin import get_language
+from resources.lib.addon.plugin import get_language, kodi_log
 from resources.lib.addon.setutils import del_empty_keys, ITER_PROPS_MAX
 from resources.lib.addon.parser import try_int
 from resources.lib.files.cache import CACHE_EXTENDED
@@ -70,35 +70,27 @@ class FanartTV(RequestAPI):
         ftv_type can be 'movies' 'tv'
         ftv_id is tmdb_id|imdb_id for movies and tvdb_id for tv
         """
-        def get_artwork_type(art_type, get_lang=True):
-            if not art_type:
+        def get_artwork_type(key, get_lang=True):
+            if not key:
                 return
-            data = request.get(art_type) or []
-            if not get_lang:
-                data = [i for i in data if i.get('lang') in ['00', None]]
+            languages = [self.language] if get_lang else ['00', None, '']
+            data = (j for i in artwork_types.get(key, []) for j in request.get(i, []) if j.get('lang') in languages)
             if season is not None:
-                data = [i for i in data if try_int(season) == try_int(i.get('season'))]
+                data = (i for i in data if try_int(season) == try_int(i.get('season')))
             return data
 
-        def get_best_artwork(art_type, get_lang=True):
-            language = self.language if get_lang else '00'
-            response = get_artwork_type(art_type, get_lang)
+        def get_best_artwork(key, get_lang=True):
+            response = get_artwork_type(key, get_lang)
             try:
-                return next((i for i in response if i.get('lang') == language or (language == '00' and not i.get('lang')))).get('url', '')
+                return next(response).get('url', '')
             except StopIteration:
-                pass
-            response = [i for i in response if i.get('lang') in ['en', '00', None]]
-            if not response:
-                return
-            response.sort(key=lambda i: int(i.get('likes', 0)), reverse=True)
-            return response[0].get('url', '')
+                if not get_lang:
+                    return
+            return get_best_artwork(key, False)  # Try again with no language
 
-        def get_artwork(art_type, get_list=False, get_lang=True):
-            func = get_best_artwork if not get_list else get_artwork_type
-            for i in artwork_types.get(art_type, []):
-                data = func(i, get_lang)
-                if data:
-                    return data
+        def get_artwork(key, get_list=False, get_lang=True):
+            func = get_artwork_type if get_list else get_best_artwork
+            return func(key, get_lang)
 
         # __main__
         if not ftv_type or not ftv_id:
@@ -116,6 +108,7 @@ class FanartTV(RequestAPI):
             return {}
         artwork_types = ARTWORK_TYPES.get(ftv_type if season is None else 'season', {})
         if artlist_type:
-            return get_artwork(artlist_type, get_list=True, get_lang=artlist_type not in NO_LANGUAGE)
+            data = get_artwork(artlist_type, get_list=True, get_lang=artlist_type not in NO_LANGUAGE)
+            return [i for i in data] if data else []
         artwork_data = del_empty_keys({i: get_artwork(i, get_lang=i not in NO_LANGUAGE) for i in artwork_types})
         return add_extra_art(get_artwork('fanart', get_list=True), artwork_data)

@@ -282,17 +282,19 @@ class _TraktProgress():
     @is_authorized
     def get_episodes_airedcount(self, unique_id, id_type, season=None):
         """ Gets the number of aired episodes for a tvshow """
-        aired_episodes = self.get_sync('watched', 'show', id_type).get(unique_id, {}).get('show', {}).get('aired_episodes')
+        tv_sync = self.get_sync('watched', 'show', id_type).get(unique_id, {}).get('show', {})
+        aired_episodes = tv_sync.get('aired_episodes')
         if season is None or not aired_episodes:  # Don't get seasons if we don't have tvshow data
             return aired_episodes
-        return self.get_season_episodes_airedcount(unique_id, id_type, season)
+        return self.get_season_episodes_airedcount(unique_id, id_type, season, trakt_id=tv_sync.get('ids', {}).get('trakt'))
 
     @is_authorized
     @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_SHORT)
-    def get_season_episodes_airedcount(self, unique_id, id_type, season):
+    def get_season_episodes_airedcount(self, unique_id, id_type, season, trakt_id=None):
         season = try_int(season, fallback=-2)
-        slug = self.get_id(unique_id, id_type, trakt_type='show', output_type='slug')
-        for i in self.get_request_sc('shows', slug, 'seasons', extended='full'):
+        if not trakt_id:
+            trakt_id = self.get_id(unique_id, id_type, trakt_type='show', output_type='trakt')
+        for i in self.get_request_sc('shows', trakt_id, 'seasons', extended='full'):
             if i.get('number', -1) == season:
                 return i.get('aired_episodes')
 

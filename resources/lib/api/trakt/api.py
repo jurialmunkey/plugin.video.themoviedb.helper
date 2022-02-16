@@ -13,6 +13,7 @@ from resources.lib.api.request import RequestAPI
 from resources.lib.api.trakt.items import TraktItems
 from resources.lib.api.trakt.decorators import is_authorized, use_activity_cache
 from resources.lib.api.trakt.progress import _TraktProgress
+# from resources.lib.addon.decorators import timer_report
 
 
 API_URL = 'https://api.trakt.tv/'
@@ -311,7 +312,7 @@ class _TraktSync():
         if not self.last_activities:
             self.last_activities = self._cache.use_cache(
                 self.get_response_json, 'sync/last_activities',
-                cache_name='trakt.last_activities', cache_days=0.003, cache_refresh=cache_refresh)
+                cache_name='trakt.last_activities', cache_days=0.001, cache_refresh=cache_refresh)
         return self._get_activity_timestamp(self.last_activities, activity_type=activity_type, activity_key=activity_key)
 
     @use_activity_cache(cache_days=CACHE_SHORT, pickle_object=False)

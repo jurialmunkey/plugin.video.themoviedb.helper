@@ -2,7 +2,7 @@ import xbmc
 import xbmcgui
 import xbmcaddon
 from resources.lib.items.listitem import ListItem
-from resources.lib.api.fanarttv.api import ARTWORK_TYPES, NO_LANGUAGE
+from resources.lib.api.fanarttv.api import ARTWORK_TYPES
 from resources.lib.api.tmdb.mapping import get_imagepath_poster, get_imagepath_fanart, get_imagepath_thumb, get_imagepath_logo
 from resources.lib.addon.decorators import busy_dialog
 # from resources.lib.addon.plugin import kodi_log

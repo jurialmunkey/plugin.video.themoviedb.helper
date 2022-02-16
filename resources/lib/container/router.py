@@ -21,6 +21,7 @@ from resources.lib.items.builder import ItemBuilder
 from resources.lib.items.basedir import BaseDirLists
 from resources.lib.script.router import related_lists
 from resources.lib.player.players import Players
+from threading import Thread
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
@@ -147,7 +148,6 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             return
         if not li.next_page and self.item_is_excluded(li):
             return
-        # with TimerList(self.timer_lists, 'item_map', log_threshold=0.05, logging=self.log_timers):
         li.set_episode_label()
         if self.hide_unaired and not li.infoproperties.get('specialseason'):
             if li.is_unaired(no_date=self.hide_no_date):
@@ -186,24 +186,24 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
                 tmdb_type='tv', tmdb_id=self.parent_params.get('tmdb_id'),
                 season=self.parent_params.get('season', None) if self.parent_params['info'] == 'episodes' else None)
 
-        # Sync Trakt watched data in parallel thread while building items
+        # Build items in threadss
         with TimerList(self.timer_lists, '--build', log_threshold=0.05, logging=self.log_timers):
             self.ib.parent_params = self.parent_params
             with ParallelThread(items, self._add_item, pagination) as pt:
-                self.get_pre_trakt_sync(self.container_content)
                 item_queue = pt.queue
             all_listitems = [i for i in item_queue if i]
 
         # Finalise listitems in parallel threads
+        self._pre_sync.join()
         with TimerList(self.timer_lists, '--make', log_threshold=0.05, logging=self.log_timers):
             self.property_params = property_params
             self.hide_no_date = ADDON.getSettingBool('nodate_is_unaired')
             self.hide_unaired = self.parent_params.get('info') not in NO_LABEL_FORMATTING
-            all_itemtuples = (self._make_item(i) for i in all_listitems if i)
-            all_itemtuples = (i for i in all_itemtuples if i)
-            # with ParallelThread(all_listitems, self._make_item) as pt:
-            #     item_queue = pt.queue
-            # all_itemtuples = [i for i in item_queue if i]
+            # all_itemtuples = (self._make_item(i) for i in all_listitems if i)
+            # all_itemtuples = (i for i in all_itemtuples if i)
+            with ParallelThread(all_listitems, self._make_item) as pt:
+                item_queue = pt.queue
+            all_itemtuples = [i for i in item_queue if i]
             # Add items to directory
             for i in all_itemtuples:
                 xbmcplugin.addDirectoryItem(handle=self.handle, **i)
@@ -253,22 +253,31 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             return
         set_playprogress(li.get_url(), int(duration * progress // 100), duration)
 
-    def get_pre_trakt_sync(self, container_content=None):
-        if container_content == 'movies':
+    def get_pre_trakt_sync(self):
+        list_info = self.params.get('info')
+        tmdb_type = self.params.get('tmdb_type')
+        # TODO: Add other info endpoints that require conversion first
+        if list_info in ['stars_in_movies', 'crew_in_movies']:
+            tmdb_type = 'movie'
+        elif list_info in ['stars_in_tvshows', 'crew_in_tvshows']:
+            tmdb_type = 'tv'
+
+        if tmdb_type == 'movie':
             if self.trakt_watchedindicators:
                 self.trakt_api.get_sync('watched', 'movie', 'tmdb')
             if self.trakt_playprogress:
                 self.trakt_api.get_sync('playback', 'movie', 'tmdb')
             return
-        if container_content in ['tvshows', 'seasons', 'episodes']:
+
+        if tmdb_type in ['tv', 'season']:
+            tmdbid = try_int(self.params.get('tmdb_id'), fallback=None)
+            season = try_int(self.params.get('season', -2), fallback=-2)  # Use -2 to force all seasons lookup data on Trakt at seasons level
             if self.trakt_watchedindicators:
                 self.trakt_api.get_sync('watched', 'show', 'tmdb')
-                tmdbid = try_int(self.parent_params.get('tmdb_id'), fallback=None)
-                season = try_int(self.parent_params.get('season'), fallback=None)
-                if container_content != 'tvshows' and tmdbid:
+                if tmdbid:
                     self.trakt_api.get_episodes_airedcount(id_type='tmdb', unique_id=tmdbid, season=season)
                     self.trakt_api.get_episodes_watchcount(id_type='tmdb', unique_id=tmdbid, season=season)
-            if self.trakt_playprogress and container_content == 'episodes':
+            if self.trakt_playprogress and tmdbid and season != -2:
                 self.trakt_api.get_sync('playback', 'show', 'tmdb')
             return
 
@@ -454,6 +463,8 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
 
     def get_directory(self):
         with TimerList(self.timer_lists, 'total', logging=self.log_timers):
+            self._pre_sync = Thread(target=self.get_pre_trakt_sync)
+            self._pre_sync.start()
             with TimerList(self.timer_lists, 'get_list', logging=self.log_timers):
                 items = self.get_items(**self.params)
             if not items:
