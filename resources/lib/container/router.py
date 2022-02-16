@@ -60,6 +60,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.hide_watched = ADDON.getSettingBool('widgets_hidewatched') if self.is_widget else False
         self.flatten_seasons = ADDON.getSettingBool('flatten_seasons')
         self.trakt_watchedindicators = ADDON.getSettingBool('trakt_watchedindicators')
+        self.trakt_watchedinprogress = ADDON.getSettingBool('trakt_watchedinprogress')
         self.trakt_playprogress = ADDON.getSettingBool('trakt_playprogress')
         self.cache_only = self.params.pop('cacheonly', '').lower()
         self.ftv_forced_lookup = self.params.pop('fanarttv', '').lower()
@@ -81,8 +82,8 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         # Get IDX list from DB to avoid unnecessary disk lookups
         with TimerList(self.timer_lists, 'idx_lookup', logging=self.log_timers):
             self.tmdb_api._cache.get_id_list()
-            self.trakt_api._cache.get_id_list()
             self.ftv_api._cache.get_id_list()
+            # self.trakt_api._cache.get_id_list()
 
     def pagination_is_allowed(self):
         if self.params.pop('nextpage', '').lower() == 'false':
@@ -253,13 +254,22 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         set_playprogress(li.get_url(), int(duration * progress // 100), duration)
 
     def get_pre_trakt_sync(self, container_content=None):
-        if not self.trakt_watchedindicators:
-            return
         if container_content == 'movies':
-            self.trakt_api.get_sync('watched', 'movie', 'tmdb')
+            if self.trakt_watchedindicators:
+                self.trakt_api.get_sync('watched', 'movie', 'tmdb')
+            if self.trakt_playprogress:
+                self.trakt_api.get_sync('playback', 'movie', 'tmdb')
             return
         if container_content in ['tvshows', 'seasons', 'episodes']:
-            self.trakt_api.get_sync('watched', 'show', 'tmdb')
+            if self.trakt_watchedindicators:
+                self.trakt_api.get_sync('watched', 'show', 'tmdb')
+                tmdbid = try_int(self.parent_params.get('tmdb_id'), fallback=None)
+                season = try_int(self.parent_params.get('season'), fallback=None)
+                if container_content != 'tvshows' and tmdbid:
+                    self.trakt_api.get_episodes_airedcount(id_type='tmdb', unique_id=tmdbid, season=season)
+                    self.trakt_api.get_episodes_watchcount(id_type='tmdb', unique_id=tmdbid, season=season)
+            if self.trakt_playprogress and container_content == 'episodes':
+                self.trakt_api.get_sync('playback', 'show', 'tmdb')
             return
 
     def get_playcount_from_trakt(self, li):
@@ -280,7 +290,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
                 id_type='tmdb',
                 unique_id=try_int(li.unique_ids.get('tmdb')))
             if not air_count:
-                return
+                return None if self.trakt_watchedinprogress else 0
             li.infolabels['episode'] = air_count
             return self.trakt_api.get_episodes_watchcount(
                 id_type='tmdb',
@@ -291,7 +301,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
                 unique_id=try_int(li.unique_ids.get('tmdb')),
                 season=li.infolabels.get('season'))
             if not air_count:
-                return
+                return None if self.trakt_watchedinprogress else 0
             li.infolabels['episode'] = air_count
             return self.trakt_api.get_episodes_watchcount(
                 id_type='tmdb',

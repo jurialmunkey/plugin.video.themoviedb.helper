@@ -2022,6 +2022,11 @@ msgid "Log timer reports for directories"
 msgstr ""
 
 #: /resources/settings.xml
+msgctxt "#32396"
+msgid "Unwatched counts only on in-progress tvshows"
+msgstr ""
+
+#: /resources/settings.xml
 msgctxt "#32397"
 msgid "Original"
 msgstr ""
