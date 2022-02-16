@@ -1,5 +1,5 @@
 import xbmcaddon
-from resources.lib.addon.plugin import get_language, kodi_log
+from resources.lib.addon.plugin import get_language
 from resources.lib.addon.setutils import del_empty_keys, ITER_PROPS_MAX
 from resources.lib.addon.parser import try_int
 from resources.lib.files.cache import CACHE_EXTENDED
@@ -76,7 +76,8 @@ class FanartTV(RequestAPI):
             languages = [self.language] if get_lang else ['00', None, '']
             data = (j for i in artwork_types.get(key, []) for j in request.get(i, []) if j.get('lang') in languages)
             if season is not None:
-                data = (i for i in data if try_int(season) == try_int(i.get('season')))
+                season_int = try_int(season)
+                data = (i for i in data if try_int(i.get('season'), fallback='all') in [season_int, 'all'])
             return data
 
         def get_best_artwork(key, get_lang=True):
