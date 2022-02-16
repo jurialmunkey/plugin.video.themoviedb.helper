@@ -199,14 +199,14 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             self.property_params = property_params
             self.hide_no_date = ADDON.getSettingBool('nodate_is_unaired')
             self.hide_unaired = self.parent_params.get('info') not in NO_LABEL_FORMATTING
-            with ParallelThread(all_listitems, self._make_item) as pt:
-                item_queue = pt.queue
-            all_itemtuples = [i for i in item_queue if i]
-
-        # Add items to directory
-        for i in all_itemtuples:
-            # with TimerList(self.timer_lists, 'item_add', log_threshold=0.05, logging=self.log_timers):
-            xbmcplugin.addDirectoryItem(handle=self.handle, **i)
+            all_itemtuples = (self._make_item(i) for i in all_listitems if i)
+            all_itemtuples = (i for i in all_itemtuples if i)
+            # with ParallelThread(all_listitems, self._make_item) as pt:
+            #     item_queue = pt.queue
+            # all_itemtuples = [i for i in item_queue if i]
+            # Add items to directory
+            for i in all_itemtuples:
+                xbmcplugin.addDirectoryItem(handle=self.handle, **i)
 
     def set_params_to_container(self, **kwargs):
         params = {}
