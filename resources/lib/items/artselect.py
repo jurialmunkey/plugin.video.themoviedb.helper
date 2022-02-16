@@ -13,10 +13,8 @@ ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 class _ArtworkSelector():
     def get_ftv_art(self, ftv_type, ftv_id, artwork_type, season=None):
-        get_lang = artwork_type not in NO_LANGUAGE
-        ftv_items = self.ftv_api.get_artwork(
-            ftv_id, ftv_type, artwork_type,
-            get_list=True, get_lang=get_lang, season=season) or []
+        ftv_items = self.ftv_api.get_all_artwork(
+            ftv_id, ftv_type, season=season, artlist_type=artwork_type) or []
         return [
             ListItem(
                 label=i.get('url'),

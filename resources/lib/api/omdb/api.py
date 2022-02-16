@@ -12,7 +12,7 @@ class OMDb(RequestAPI):
         super(OMDb, self).__init__(
             req_api_key=u'apikey={0}'.format(api_key or ADDON.getSettingString('omdb_apikey')),
             req_api_name='OMDb',
-            req_api_url='http://www.omdbapi.com/',
+            req_api_url='https://www.omdbapi.com/',
             delay_write=delay_write)
 
     def get_request_item(self, imdb_id=None, title=None, year=None, tomatoes=True, fullplot=True, cache_only=False):

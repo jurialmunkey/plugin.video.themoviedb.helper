@@ -19,7 +19,7 @@ from resources.lib.files.utils import get_file_path
 
 from resources.lib.files.utils import json_loads as data_loads
 from json import dumps as data_dumps
-DATABASE_NAME = 'database_v2'
+DATABASE_NAME = 'database_v4'
 
 # data_loads = eval
 # data_dumps = repr
@@ -77,14 +77,14 @@ class SimpleCache(object):
         finally:
             self._busy_tasks.remove(task_name)
 
-    def get(self, endpoint):
+    def get(self, endpoint, no_hdd=False):
         '''
             get object from cache and return the results
             endpoint: the (unique) name of the cache object as reference
         '''
         cur_time = set_timestamp(0, True)
         result = self._get_mem_cache(endpoint, cur_time)  # Try from memory first
-        if result is not None or self._mem_only:
+        if result is not None or self._mem_only or no_hdd:
             return result
         return self._get_db_cache(endpoint, cur_time)  # Fallback to checking database if not in memory
 
@@ -141,6 +141,13 @@ class SimpleCache(object):
         data_endpoint = u'{}_data_{}'.format(self._sc_name, endpoint)
         self._win.setProperty(expr_endpoint, str(expires))
         self._win.setProperty(data_endpoint, data)
+
+    def get_id_list(self):
+        query = "SELECT id FROM simplecache"
+        cache_data = self._execute_sql(query)
+        if not cache_data:
+            return
+        return [job[0] for job in cache_data]
 
     def _get_db_cache(self, endpoint, cur_time):
         '''get cache data from sqllite _database'''
@@ -230,6 +237,7 @@ class SimpleCache(object):
                 connection.execute(
                     """CREATE TABLE IF NOT EXISTS simplecache(
                     id TEXT UNIQUE, expires INTEGER, data TEXT, checksum INTEGER)""")
+                connection.execute("CREATE INDEX idx ON simplecache(id)")
                 return connection
             except Exception as error:
                 kodi_log(u"CACHE: Exception while initializing _database: {} ({})".format(error, attempts), 1)

@@ -78,6 +78,12 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         # self.trakt_api._cache._timers = self.timer_lists
         # self.ftv_api._cache._timers = self.timer_lists
 
+        # Get IDX list from DB to avoid unnecessary disk lookups
+        with TimerList(self.timer_lists, 'idx_lookup', logging=self.log_timers):
+            self.tmdb_api._cache.get_id_list()
+            self.trakt_api._cache.get_id_list()
+            self.ftv_api._cache.get_id_list()
+
     def pagination_is_allowed(self):
         if self.params.pop('nextpage', '').lower() == 'false':
             return False
@@ -170,6 +176,8 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.ib.cache_only = self.tmdb_cache_only
         self.ib.timer_lists = self.ib._cache._timers = self.timer_lists
         self.ib.log_timers = self.log_timers
+        with TimerList(self.timer_lists, 'idx_lookup', logging=self.log_timers):
+            self.ib._cache.get_id_list()
 
         # Pre-game details and artwork cache for episodes before threading to avoid multiple API calls
         if self.parent_params.get('info') in PREGAME_PARENT:

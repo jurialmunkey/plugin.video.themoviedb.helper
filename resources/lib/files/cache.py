@@ -19,6 +19,7 @@ class BasicCache(object):
         self._mem_only = mem_only
         self._timers = {}
         self._delaywrite = delay_write
+        self._id_list = []
 
     @try_except_log('lib.addon.cache ret_cache')
     def ret_cache(self):
@@ -29,12 +30,21 @@ class BasicCache(object):
     @try_except_log('lib.addon.cache get_cache')
     def get_cache(self, cache_name):
         self.ret_cache()
-        return self._cache.get(get_pickle_name(cache_name or ''))
+        cache_name = get_pickle_name(cache_name or '')
+        no_hdd = True if self._id_list and cache_name not in self._id_list else False
+        return self._cache.get(cache_name, no_hdd=no_hdd)
         # with TimerList(self._timers, 'item_get') as tl:
-        #     item = self._cache.get(get_pickle_name(cache_name or ''))
+        #     cache_name = get_pickle_name(cache_name or '')
+        #     no_hdd = True if self._id_list and cache_name not in self._id_list else False
+        #     item = self._cache.get(cache_name, no_hdd=no_hdd)
         #     if not item:
         #         tl.list_obj = self._timers.setdefault('item_non', [])
         # return item
+
+    def get_id_list(self):
+        self.ret_cache()
+        self._id_list = self._cache.get_id_list() or []
+        return self._id_list
 
     @try_except_log('lib.addon.cache set_cache')
     def set_cache(self, my_object, cache_name, cache_days=14, force=False, fallback=None):

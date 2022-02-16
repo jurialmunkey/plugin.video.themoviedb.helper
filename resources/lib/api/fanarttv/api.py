@@ -8,7 +8,7 @@ from resources.lib.api.request import RequestAPI
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
-API_URL = 'http://webservice.fanart.tv/v3'
+API_URL = 'https://webservice.fanart.tv/v3'
 NO_LANGUAGE = ['keyart', 'fanart']
 ARTWORK_TYPES = {
     'movies': {
@@ -65,65 +65,57 @@ class FanartTV(RequestAPI):
         self.quick_request = {'movies': {}, 'tv': {}}
         self.req_strip.append(('&client_key={}'.format(client_key), ''))
 
-    def get_artwork_request(self, ftv_id, ftv_type):
+    def get_all_artwork(self, ftv_id, ftv_type, season=None, artlist_type=None):
         """
         ftv_type can be 'movies' 'tv'
         ftv_id is tmdb_id|imdb_id for movies and tvdb_id for tv
         """
+        def get_artwork_type(art_type, get_lang=True):
+            if not art_type:
+                return
+            data = request.get(art_type) or []
+            if not get_lang:
+                data = [i for i in data if i.get('lang') in ['00', None]]
+            if season is not None:
+                data = [i for i in data if try_int(season) == try_int(i.get('season'))]
+            return data
+
+        def get_best_artwork(art_type, get_lang=True):
+            language = self.language if get_lang else '00'
+            response = get_artwork_type(art_type, get_lang)
+            try:
+                return next((i for i in response if i.get('lang') == language or (language == '00' and not i.get('lang')))).get('url', '')
+            except StopIteration:
+                pass
+            response = [i for i in response if i.get('lang') in ['en', '00', None]]
+            if not response:
+                return
+            response.sort(key=lambda i: int(i.get('likes', 0)), reverse=True)
+            return response[0].get('url', '')
+
+        def get_artwork(art_type, get_list=False, get_lang=True):
+            func = get_best_artwork if not get_list else get_artwork_type
+            for i in artwork_types.get(art_type, []):
+                data = func(i, get_lang)
+                if data:
+                    return data
+
+        # __main__
         if not ftv_type or not ftv_id:
-            return
+            return {}
         request = self.quick_request[ftv_type].get(ftv_id)
         if not request:
-            self.quick_request[ftv_type][ftv_id] = request = self.get_request(
+            request = self.quick_request[ftv_type][ftv_id] = self.get_request(
                 ftv_type, ftv_id,
-                cache_force=7,  # Force the cache to save a dummy dict for 7 days so that we don't bother requesting 404s multiple times
+                cache_force=7,  # Force dummy request caching to prevent rerequesting 404s
                 cache_fallback={'dummy': None},
                 cache_days=CACHE_EXTENDED,
                 cache_only=self.cache_only,
                 cache_refresh=self.cache_refresh)
-        if request and 'dummy' not in request:
-            return request
-
-    def get_artwork_type(self, ftv_id, ftv_type, artwork_type, get_lang=True, request=None, **kwargs):
-        if not artwork_type:
-            return
-        response = request or self.get_artwork_request(ftv_id, ftv_type)
-        if not response:
-            return
-        response = response.get(artwork_type) or []
-        return response if get_lang else [i for i in response if not i.get('lang') or i['lang'] == '00']
-
-    def get_best_artwork(self, ftv_id, ftv_type, artwork_type, get_lang=True, request=None, season=None, **kwargs):
-        language = self.language if get_lang else '00'
-        artwork = self.get_artwork_type(ftv_id, ftv_type, artwork_type, get_lang, request=request)
-        best_like = -1
-        best_item = None
-        for i in artwork:
-            if season is not None and try_int(season) != try_int(i.get('season')):
-                continue
-            i_lang = i.get('lang')
-            if i_lang == language or (language == '00' and not i_lang):
-                return i.get('url', '')
-            i_like = try_int(i.get('likes', 0))
-            if i_lang in ['en', '00', None] and i_like > best_like:
-                best_item = i.get('url', '')
-                best_like = i_like
-        return best_item
-
-    def get_all_artwork(self, ftv_id, ftv_type, season=None):
-        request = self.get_artwork_request(ftv_id, ftv_type)
-        if not request:
-            return  # Check we can get the request first so we don't re-ask eight times if it 404s
+        if not request or 'dummy' in request:
+            return {}
         artwork_types = ARTWORK_TYPES.get(ftv_type if season is None else 'season', {})
-        all_artwork = del_empty_keys({
-            i: self.get_artwork(ftv_id, ftv_type, i, request=request, get_lang=i not in NO_LANGUAGE, season=season)
-            for i in artwork_types})
-        return add_extra_art(self.get_artwork(ftv_id, ftv_type, 'fanart', get_list=True, request=request), all_artwork)
-
-    def get_artwork(self, ftv_id, ftv_type, artwork_type, get_list=False, get_lang=True, request=None, season=None):
-        artwork_types = ARTWORK_TYPES.get(ftv_type if season is None else 'season', {}).get(artwork_type) or []
-        func = self.get_best_artwork if not get_list else self.get_artwork_type
-        for i in artwork_types:
-            artwork = func(ftv_id, ftv_type, i, get_lang, request=request, season=season)
-            if artwork:
-                return artwork
+        if artlist_type:
+            return get_artwork(artlist_type, get_list=True, get_lang=artlist_type not in NO_LANGUAGE)
+        artwork_data = del_empty_keys({i: get_artwork(i, get_lang=i not in NO_LANGUAGE) for i in artwork_types})
+        return add_extra_art(get_artwork('fanart', get_list=True), artwork_data)

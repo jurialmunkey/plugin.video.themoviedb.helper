@@ -182,17 +182,15 @@ class RequestAPI(object):
         Creates a url request string:
         https://api.themoviedb.org/3/arg1/arg2?api_key=foo&kwparamkey=kwparamvalue
         """
-        request = self.req_api_url
-        for arg in args:
-            if arg is not None:
-                request = u'{}/{}'.format(request, arg)
-        sep = '?' if '?' not in request else '&'
-        request = u'{}{}{}'.format(request, sep, self.req_api_key) if self.req_api_key else request
-        for key, value in sorted(kwargs.items()):
-            if value is not None:  # Don't add nonetype kwargs
-                sep = '?' if '?' not in request else ''
-                request = u'{}{}&{}={}'.format(request, sep, key, value)
-        return request
+        url = '/'.join((self.req_api_url, '/'.join(map(str, (i for i in args if i is not None)))))
+        sep = '?'
+        if self.req_api_key:
+            url = sep.join((url, self.req_api_key))
+            sep = '&'
+        if not kwargs:
+            return url
+        kws = '&'.join(('{}={}'.format(k, v) for k, v in kwargs.items() if v is not None))
+        return sep.join((url, kws)) if kws else url
 
     def get_request_sc(self, *args, **kwargs):
         """ Get API request using the short cache """
