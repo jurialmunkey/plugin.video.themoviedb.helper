@@ -8,7 +8,7 @@ ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 class TMDbLists():
-    def list_tmdb(self, info, tmdb_type, tmdb_id=None, page=None, **kwargs):
+    def list_tmdb(self, info, tmdb_type, tmdb_id=None, page=None, limit=None, **kwargs):
         info_model = TMDB_BASIC_LISTS.get(info)
         info_tmdb_type = info_model.get('tmdb_type') or tmdb_type
         items = self.tmdb_api.get_basic_list(
@@ -17,6 +17,7 @@ class TMDbLists():
             base_tmdb_type=tmdb_type,
             key=info_model.get('key', 'results'),
             params=info_model.get('params'),
+            limit=limit or info_model.get('limit'),
             page=page)
         self.kodi_db = self.get_kodi_database(info_tmdb_type)
         self.library = convert_type(info_tmdb_type, 'library')

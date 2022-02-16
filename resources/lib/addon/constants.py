@@ -229,6 +229,7 @@ TMDB_BASIC_LISTS = {
         'key': 'cast',
         'tmdb_type': 'movie',
         'dbid_sorting': True,
+        'limit': 20,
         'route': TMDB_BASIC_LISTS_ROUTE
     },
     'stars_in_tvshows': {
@@ -236,6 +237,7 @@ TMDB_BASIC_LISTS = {
         'key': 'cast',
         'dbid_sorting': True,
         'tmdb_type': 'tv',
+        'limit': 20,
         'route': TMDB_BASIC_LISTS_ROUTE
     },
     'crew_in_movies': {
@@ -243,6 +245,7 @@ TMDB_BASIC_LISTS = {
         'key': 'crew',
         'dbid_sorting': True,
         'tmdb_type': 'movie',
+        'limit': 20,
         'route': TMDB_BASIC_LISTS_ROUTE
     },
     'crew_in_tvshows': {
@@ -250,6 +253,7 @@ TMDB_BASIC_LISTS = {
         'key': 'crew',
         'dbid_sorting': True,
         'tmdb_type': 'tv',
+        'limit': 20,
         'route': TMDB_BASIC_LISTS_ROUTE
     },
     'images': {

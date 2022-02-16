@@ -1,6 +1,6 @@
 import xbmcgui
 import xbmcaddon
-from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type, kodi_log
+from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type
 from resources.lib.addon.constants import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, TMDB_GENRE_IDS
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.window import get_property
@@ -9,6 +9,7 @@ from resources.lib.files.cache import CACHE_SHORT, CACHE_LONG
 from resources.lib.files.downloader import Downloader
 from resources.lib.files.utils import use_pickle, validify_filename
 from resources.lib.items.listitem import ListItem
+from resources.lib.items.pages import PaginatedItems
 from resources.lib.api.request import RequestAPI
 from resources.lib.api.tmdb.mapping import ItemMapper, get_episode_to_air
 from urllib.parse import quote_plus
@@ -459,7 +460,7 @@ class TMDb(RequestAPI):
         kwargs['query'] = quote_plus(query)
         return self.get_basic_list(u'search/{}'.format(tmdb_type), tmdb_type, **kwargs)
 
-    def get_basic_list(self, path, tmdb_type, key='results', params=None, base_tmdb_type=None, **kwargs):
+    def get_basic_list(self, path, tmdb_type, key='results', params=None, base_tmdb_type=None, limit=None, **kwargs):
         response = self.get_request_sc(path, **kwargs)
         results = response.get(key, []) if response else []
         items = [
@@ -467,6 +468,9 @@ class TMDb(RequestAPI):
             for i in results if i]
         if try_int(response.get('page', 0)) < try_int(response.get('total_pages', 0)):
             items.append({'next_page': try_int(response.get('page', 0)) + 1})
+        elif limit is not None:
+            paginated_items = PaginatedItems(items, page=kwargs.get('page', 1), limit=limit)
+            return paginated_items.items + paginated_items.next_page
         return items
 
     def get_discover_list(self, tmdb_type, **kwargs):
