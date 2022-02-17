@@ -253,23 +253,19 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             return
         set_playprogress(li.get_url(), int(duration * progress // 100), duration)
 
-    def get_pre_trakt_sync(self):
+    def pre_sync_trakt(self):
         list_info = self.params.get('info')
         tmdb_type = self.params.get('tmdb_type')
-        # TODO: Add other info endpoints that require conversion first
-        if list_info in ['stars_in_movies', 'crew_in_movies']:
-            tmdb_type = 'movie'
-        elif list_info in ['stars_in_tvshows', 'crew_in_tvshows']:
-            tmdb_type = 'tv'
 
-        if tmdb_type == 'movie':
+        info_movies = ['stars_in_movies', 'crew_in_movies', 'trakt_userlist']
+        if tmdb_type in ['movie', 'both'] or list_info in info_movies:
             if self.trakt_watchedindicators:
                 self.trakt_api.get_sync('watched', 'movie', 'tmdb')
             if self.trakt_playprogress:
                 self.trakt_api.get_sync('playback', 'movie', 'tmdb')
-            return
 
-        if tmdb_type in ['tv', 'season']:
+        info_tvshow = ['stars_in_tvshows', 'crew_in_tvshows', 'trakt_userlist', 'trakt_calendar']
+        if tmdb_type in ['tv', 'season', 'both'] or list_info in info_tvshow:
             tmdbid = try_int(self.params.get('tmdb_id'), fallback=None)
             season = try_int(self.params.get('season', -2), fallback=-2)  # Use -2 to force all seasons lookup data on Trakt at seasons level
             if self.trakt_watchedindicators:
@@ -279,7 +275,6 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
                     self.trakt_api.get_episodes_watchcount(id_type='tmdb', unique_id=tmdbid, season=season)
             if self.trakt_playprogress and tmdbid and season != -2:
                 self.trakt_api.get_sync('playback', 'show', 'tmdb')
-            return
 
     def get_playcount_from_trakt(self, li):
         if not self.trakt_watchedindicators:
@@ -463,7 +458,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
 
     def get_directory(self):
         with TimerList(self.timer_lists, 'total', logging=self.log_timers):
-            self._pre_sync = Thread(target=self.get_pre_trakt_sync)
+            self._pre_sync = Thread(target=self.pre_sync_trakt)
             self._pre_sync.start()
             with TimerList(self.timer_lists, 'get_list', logging=self.log_timers):
                 items = self.get_items(**self.params)
