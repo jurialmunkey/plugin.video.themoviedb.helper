@@ -126,7 +126,7 @@ class TraktLists():
             sort_how=kwargs.get('sort_how', None),
             extended=kwargs.get('extended', None),
             authorize=False if user_slug else True,
-            always_refresh=ADDON.getSettingBool('trakt_alwaysrefresh'))
+            always_refresh=True if kwargs.get('owner', '').lower() == 'true' else False)
         if not response:
             return []
         self.tmdb_cache_only = False

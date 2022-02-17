@@ -2081,11 +2081,6 @@ msgctxt "#32407"
 msgid "Get resume points from Trakt (increases load times)"
 msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32408"
-msgid "Always refresh Trakt custom lists"
-msgstr ""
-
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

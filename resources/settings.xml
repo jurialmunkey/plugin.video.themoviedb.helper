@@ -65,7 +65,6 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32407]" type="bool" id="trakt_playprogress" default="false" subsetting="true"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32346]" type="bool" id="trakt_localhack" default="false" subsetting="true"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32403]" type="bool" id="trakt_expandedlimit" default="false" subsetting="true"/>
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32408]" type="bool" id="trakt_alwaysrefresh" default="true" subsetting="true"/>
     </category>
     <category label="$ADDON[plugin.video.themoviedb.helper 32014]">
         <setting label="$ADDON[plugin.video.themoviedb.helper 32033]" type="lsep"/>
