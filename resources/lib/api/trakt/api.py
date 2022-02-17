@@ -126,10 +126,10 @@ class _TraktLists():
             return random.sample(items, limit)
 
     @is_authorized
-    def get_basic_list(self, path, trakt_type, page=1, limit=20, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, randomise=False):
+    def get_basic_list(self, path, trakt_type, page=1, limit=20, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, randomise=False, always_refresh=True):
         # TODO: Add argument to check whether to refresh on first page (e.g. for user lists)
         # Also: Think about whether need to do it for standard respons
-        cache_refresh = True if try_int(page, fallback=1) == 1 else False
+        cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
         if randomise:
             response = self.get_simple_list(
                 path, extended=extended, page=1, limit=limit * 2, trakt_type=trakt_type)
@@ -145,21 +145,21 @@ class _TraktLists():
             return response['items'] + get_next_page(response['headers'])
 
     @is_authorized
-    def get_stacked_list(self, path, trakt_type, page=1, limit=20, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, **kwargs):
+    def get_stacked_list(self, path, trakt_type, page=1, limit=20, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, always_refresh=True, **kwargs):
         """ Get Basic list but stack repeat TV Shows """
-        cache_refresh = True if try_int(page, fallback=1) == 1 else False
+        cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
         response = self.get_simple_list(path, extended=extended, limit=4095, trakt_type=trakt_type, cache_refresh=cache_refresh)
         response['items'] = self._stack_calendar_tvshows(response['items'])
         response = PaginatedItems(items=response['items'], page=page, limit=limit).get_dict()
         if response:
             return response['items'] + get_next_page(response['headers'])
 
-    def get_custom_list(self, list_slug, user_slug=None, page=1, limit=20, params=None, authorize=False, sort_by=None, sort_how=None, extended=None, owner=False):
+    def get_custom_list(self, list_slug, user_slug=None, page=1, limit=20, params=None, authorize=False, sort_by=None, sort_how=None, extended=None, owner=False, always_refresh=True):
         if authorize and not self.authorize():
             return
         path = u'users/{}/lists/{}/items'.format(user_slug or 'me', list_slug)
         # Refresh cache on first page for user list because it might've changed
-        cache_refresh = True if try_int(page, fallback=1) == 1 else False
+        cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
         sorted_items = self.get_sorted_list(
             path, sort_by, sort_how, extended,
             permitted_types=['movie', 'show', 'person'],
@@ -179,9 +179,9 @@ class _TraktLists():
         func = TraktItems(items=self.get_sync(sync_type, trakt_type), trakt_type=trakt_type).build_items
         return func(sort_by, sort_how)
 
-    def get_sync_list(self, sync_type, trakt_type, page=1, limit=None, params=None, sort_by=None, sort_how=None, next_page=True):
+    def get_sync_list(self, sync_type, trakt_type, page=1, limit=None, params=None, sort_by=None, sort_how=None, next_page=True, always_refresh=True):
         limit = limit or self.item_limit
-        cache_refresh = True if try_int(page, fallback=1) == 1 else False
+        cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
         response = self._get_sync_list(sync_type, trakt_type, sort_by=sort_by, sort_how=sort_how, decorator_cache_refresh=cache_refresh)
         if not response:
             return

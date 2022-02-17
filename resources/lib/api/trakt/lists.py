@@ -30,7 +30,8 @@ class TraktLists():
             sort_by=info_model.get('sort_by', None),
             sort_how=info_model.get('sort_how', None),
             extended=info_model.get('extended', None),
-            randomise=randomise)
+            randomise=randomise,
+            always_refresh=False)  # Basic lists don't need updating more than once per day
         self.tmdb_cache_only = False
         self.kodi_db = self.get_kodi_database(info_tmdb_type)
         self.library = convert_type(info_tmdb_type, 'library')
@@ -124,7 +125,8 @@ class TraktLists():
             sort_by=kwargs.get('sort_by', None),
             sort_how=kwargs.get('sort_how', None),
             extended=kwargs.get('extended', None),
-            authorize=False if user_slug else True)
+            authorize=False if user_slug else True,
+            always_refresh=ADDON.getSettingBool('trakt_alwaysrefresh'))
         if not response:
             return []
         self.tmdb_cache_only = False
