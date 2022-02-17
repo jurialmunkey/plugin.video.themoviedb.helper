@@ -2037,6 +2037,11 @@ msgid "Medium"
 msgstr ""
 
 #: /resources/settings.xml
+msgctxt "#32399"
+msgid "Fallback to English when main language unavailable"
+msgstr ""
+
+#: /resources/settings.xml
 msgctxt "#32400"
 msgid "Play local Kodi library files"
 msgstr ""

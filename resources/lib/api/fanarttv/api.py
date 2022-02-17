@@ -6,6 +6,7 @@ from resources.lib.files.cache import CACHE_EXTENDED
 from resources.lib.api.request import RequestAPI
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
+EN_FALLBACK = ADDON.getSettingBool('fanarttv_enfallback')
 
 
 API_URL = 'https://webservice.fanart.tv/v3'
@@ -74,7 +75,7 @@ class FanartTV(RequestAPI):
             if not key:
                 return
             languages = [self.language] if get_lang else ['00', None, '']
-            data = (j for i in artwork_types.get(key, []) for j in request.get(i, []) if j.get('lang') in languages)
+            data = (j for i in artwork_types.get(key, []) for j in request.get(i, []) if get_lang == 'all' or j.get('lang') in languages)
             if season is not None:
                 season_int = try_int(season)
                 data = (i for i in data if try_int(i.get('season'), fallback='all') in [season_int, 'all'])
@@ -85,9 +86,11 @@ class FanartTV(RequestAPI):
             try:
                 return next(response).get('url', '')
             except StopIteration:
-                if not get_lang:
+                if get_lang == 'all':
                     return
-            return get_best_artwork(key, False)  # Try again with no language
+                if not get_lang and (key in NO_LANGUAGE or not EN_FALLBACK):
+                    return
+            return get_best_artwork(key, False if get_lang else 'all')  # Try again with no language OR all languages
 
         def get_artwork(key, get_list=False, get_lang=True):
             func = get_artwork_type if get_list else get_best_artwork
@@ -109,7 +112,7 @@ class FanartTV(RequestAPI):
             return {}
         artwork_types = ARTWORK_TYPES.get(ftv_type if season is None else 'season', {})
         if artlist_type:
-            data = get_artwork(artlist_type, get_list=True, get_lang=artlist_type not in NO_LANGUAGE)
+            data = get_artwork(artlist_type, get_list=True, get_lang='all')
             return [i for i in data] if data else []
         artwork_data = del_empty_keys({i: get_artwork(i, get_lang=i not in NO_LANGUAGE) for i in artwork_types})
         return add_extra_art(get_artwork('fanart', get_list=True), artwork_data)
