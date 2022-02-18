@@ -33,7 +33,11 @@ ARTWORK_TYPES = {
         'poster': ['seasonposter', 'tvposter'],
         'fanart': ['showbackground'],
         'landscape': ['seasonthumb', 'tvthumb'],
-        'banner': ['seasonbanner', 'tvbanner']}
+        'banner': ['seasonbanner', 'tvbanner']},
+    'season_only': {
+        'poster': ['seasonposter'],
+        'landscape': ['seasonthumb'],
+        'banner': ['seasonbanner']}
 }
 
 
@@ -66,7 +70,7 @@ class FanartTV(RequestAPI):
         self.quick_request = {'movies': {}, 'tv': {}}
         self.req_strip.append(('&client_key={}'.format(client_key), ''))
 
-    def get_all_artwork(self, ftv_id, ftv_type, season=None, artlist_type=None):
+    def get_all_artwork(self, ftv_id, ftv_type, season=None, artlist_type=None, season_type=None):
         """
         ftv_type can be 'movies' 'tv'
         ftv_id is tmdb_id|imdb_id for movies and tvdb_id for tv
@@ -77,8 +81,8 @@ class FanartTV(RequestAPI):
             languages = [self.language] if get_lang else ['00', None, '']
             data = (j for i in artwork_types.get(key, []) for j in request.get(i, []) if get_lang == 'all' or j.get('lang') in languages)
             if season is not None:
-                season_int = try_int(season)
-                data = (i for i in data if try_int(i.get('season'), fallback='all') in [season_int, 'all'])
+                allowlist = [try_int(season), 'all']
+                data = (i for i in data if try_int(i.get('season'), fallback='all') in allowlist)
             return data
 
         def get_best_artwork(key, get_lang=True):
@@ -110,9 +114,8 @@ class FanartTV(RequestAPI):
                 cache_refresh=self.cache_refresh)
         if not request or 'dummy' in request:
             return {}
-        artwork_types = ARTWORK_TYPES.get(ftv_type if season is None else 'season', {})
+        artwork_types = ARTWORK_TYPES.get(ftv_type if season is None else season_type or 'season', {})
         if artlist_type:
-            data = get_artwork(artlist_type, get_list=True, get_lang='all')
-            return [i for i in data] if data else []
+            return get_artwork(artlist_type, get_list=True, get_lang='all') or []
         artwork_data = del_empty_keys({i: get_artwork(i, get_lang=i not in NO_LANGUAGE) for i in artwork_types})
         return add_extra_art(get_artwork('fanart', get_list=True), artwork_data)

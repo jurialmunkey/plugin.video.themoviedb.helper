@@ -13,18 +13,13 @@ ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 class _ArtworkSelector():
     def get_ftv_art(self, ftv_type, ftv_id, artwork_type, season=None):
-        ftv_items = self.ftv_api.get_all_artwork(
-            ftv_id, ftv_type, season=season, artlist_type=artwork_type) or []
+        ftv_items = self.ftv_api.get_all_artwork(ftv_id, ftv_type, season=season, artlist_type=artwork_type, season_type='season_only')
         return [
             ListItem(
                 label=i.get('url'),
                 label2=ADDON.getLocalizedString(32219).format(i.get('lang', ''), i.get('likes', 0), i.get('id', '')),
                 art={'thumb': i.get('url')}).get_listitem()
-            for i in ftv_items
-            if i.get('url') and (
-                season is None
-                or try_int(i.get('season', season)) == try_int(season)
-                or i.get('season') == 'all')]
+            for i in ftv_items if i.get('url')]
 
     def get_tmdb_art(self, tmdb_type, tmdb_id, artwork_type, season=None):
         mappings = {
@@ -34,12 +29,9 @@ class _ArtworkSelector():
             'clearlogo': {'func': get_imagepath_logo, 'key': 'logos'}}
         if artwork_type not in mappings:
             return []
-        tmdb_items = self.tmdb_api.get_request_sc(tmdb_type, tmdb_id, 'images') or {}
+        tmdb_iargs = ['images'] if season is None else ['season', season, 'images']
+        tmdb_items = self.tmdb_api.get_request_sc(tmdb_type, tmdb_id, *tmdb_iargs) or {}
         tmdb_items = tmdb_items.get(mappings[artwork_type]['key']) or []
-        if season is not None:
-            season_items = self.tmdb_api.get_request_sc(tmdb_type, tmdb_id, 'season', season, 'images') or {}
-            season_items = season_items.get(mappings[artwork_type]['key']) or []
-            tmdb_items = season_items + tmdb_items
         func = mappings[artwork_type]['func']
         return [
             ListItem(
@@ -70,6 +62,11 @@ class _ArtworkSelector():
         # Get artwork of type and build list
         items = self.get_ftv_art(ftv_type, ftv_id, artwork_type, season=season)
         items += self.get_tmdb_art(tmdb_type, tmdb_id, artwork_type, season=season)
+        if season is not None:  # Also get base artwork at end of list
+            items += self.get_ftv_art(ftv_type, ftv_id, artwork_type)
+            items += self.get_tmdb_art(tmdb_type, tmdb_id, artwork_type)
+
+        # Nothing found so notify user
         if not items:
             xbmcgui.Dialog().notification(
                 xbmc.getLocalizedString(39123),
