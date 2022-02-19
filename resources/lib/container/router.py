@@ -21,6 +21,7 @@ from resources.lib.items.builder import ItemBuilder
 from resources.lib.items.basedir import BaseDirLists
 from resources.lib.script.router import related_lists
 from resources.lib.player.players import Players
+# from resources.lib.files.utils import write_to_file
 from threading import Thread
 
 
@@ -454,6 +455,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         for k, v in self.timer_lists.items():
             if v and k in LOG_TIMER_ITEMS:
                 timer_log.append('\n{}:\n{}\n'.format(k, ' '.join([u'{:.3f} '.format(i) for i in v])))
+        # write_to_file(''.join(timer_log), 'log_timers', '{}_{}.txt'.format(self.params.get('info'), self.params.get('tmdb_type')), append_to_file=True)
         kodi_log(timer_log, 1)
 
     def get_directory(self):

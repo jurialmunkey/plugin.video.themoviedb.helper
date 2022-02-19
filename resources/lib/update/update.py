@@ -92,8 +92,9 @@ def create_file(content, filename, *args, **kwargs):
         return
 
     # Write out our file
-    filepath = u'{}{}.{}'.format(path, validify_filename(filename), kwargs.get('file_ext', 'strm'))
-    write_to_file(filepath, content)
+    filename = u'{}.{}'.format(validify_filename(filename), kwargs.get('file_ext', 'strm'))
+    filepath = u'{}{}'.format(path, filename)
+    write_to_file(content, path, filename, join_addon_data=False)
     kodi_log(['ADD LIBRARY -- Successfully added:\n', filepath, '\n', content], 2)
     return filepath
 

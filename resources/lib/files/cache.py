@@ -34,8 +34,6 @@ class BasicCache(object):
         no_hdd = True if self._id_list and cache_name not in self._id_list else False
         return self._cache.get(cache_name, no_hdd=no_hdd)
         # with TimerList(self._timers, 'item_get') as tl:
-        #     cache_name = get_pickle_name(cache_name or '')
-        #     no_hdd = True if self._id_list and cache_name not in self._id_list else False
         #     item = self._cache.get(cache_name, no_hdd=no_hdd)
         #     if not item:
         #         tl.list_obj = self._timers.setdefault('item_non', [])

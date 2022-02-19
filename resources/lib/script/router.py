@@ -414,6 +414,7 @@ def sort_list(**kwargs):
 
 
 def log_jsonrpc(**kwargs):
+    dialog = xbmcgui.DialogProgress()
     method = "VideoLibrary.GetMovies"
     params = {
         "properties": ["title", "imdbnumber", "originaltitle", "uniqueid", "year", "file"],
@@ -423,9 +424,16 @@ def log_jsonrpc(**kwargs):
             {"operator": "contains", "field": "originaltitle", "value": "Batman"},
         ]}
     }
-    with timer_func('json_rpc'):
-        response = get_jsonrpc(method, params) or {}
-    xbmcgui.Dialog().ok('JSON_RPC Results', '{}'.format(response))
+    # with timer_func('json_rpc'):
+    response = get_jsonrpc(method, params) or {}
+    dialog.create('JSON_RPC Results', '{}'.format(response))
+    update = 0
+    while update < 100:
+        update += 10
+        dialog.update(update)
+        xbmc.sleep(500)
+    # xbmcgui.Dialog().ok('JSON_RPC Results', '{}'.format(response))
+    dialog.close()
     kodi_log(['JSONRPC:\n', response], 1)
 
 

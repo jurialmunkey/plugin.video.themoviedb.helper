@@ -49,12 +49,6 @@ def read_file(filepath):
     return content
 
 
-def write_to_file(filepath, content):
-    f = xbmcvfs.File(filepath, 'w')
-    f.write(content)
-    f.close()
-
-
 def get_tmdb_id_nfo(basedir, foldername, tmdb_type='tv'):
     try:
         folder = basedir + foldername + '/'
@@ -88,6 +82,14 @@ def dumps_to_file(data, folder, filename, indent=2, join_addon_data=True):
     with open(path, 'w') as file:
         json.dump(data, file, indent=indent)
     return path
+
+
+def write_to_file(data, folder, filename, join_addon_data=True, append_to_file=False):
+    path = os.path.join(get_write_path(folder, join_addon_data), filename)
+    if append_to_file:
+        data = '\n'.join([read_file(path), data])
+    with xbmcvfs.File(path, 'w') as f:
+        f.write(data)
 
 
 def get_write_path(folder, join_addon_data=True):
