@@ -30,9 +30,9 @@ def normalise_filesize(filesize):
     i_str = ['B', 'KB', 'MB', 'GB', 'TB']
     for i in i_str:
         if filesize < i_flt:
-            return u'{:.2f} {}'.format(filesize, i)
+            return f'{filesize:.2f} {i}'
         filesize = filesize / i_flt
-    return u'{:.2f} {}'.format(filesize, 'PB')
+    return f'{filesize:.2f} PB'
 
 
 def get_files_in_folder(folder, regex):
@@ -59,14 +59,14 @@ def get_tmdb_id_nfo(basedir, foldername, tmdb_type='tv'):
         # Check our nfo files for TMDb ID
         for nfo in nfo_list:
             content = read_file(folder + nfo)  # Get contents of .nfo file
-            tmdb_id = content.replace(u'https://www.themoviedb.org/{}/'.format(tmdb_type), '')  # Clean content to retrieve tmdb_id
+            tmdb_id = content.replace(f'https://www.themoviedb.org/{tmdb_type}/', '')  # Clean content to retrieve tmdb_id
             tmdb_id = tmdb_id.replace(u'&islocal=True', '')
             tmdb_id = try_int(tmdb_id)
             if tmdb_id:
-                return u'{}'.format(tmdb_id)
+                return f'{tmdb_id}'
 
     except Exception as exc:
-        kodi_log(u'ERROR GETTING TMDBID FROM NFO:\n{}'.format(exc))
+        kodi_log(f'ERROR GETTING TMDBID FROM NFO:\n{exc}')
 
 
 def get_file_path(folder, filename, join_addon_data=True):
@@ -119,14 +119,12 @@ def make_path(path, warn_dialog=False):
     if xbmcvfs.mkdirs(path):
         return xbmcvfs.translatePath(path)
     if ADDON.getSettingBool('ignore_folderchecking'):
-        kodi_log(u'Ignored xbmcvfs folder check error\n{}'.format(path), 2)
+        kodi_log(f'Ignored xbmcvfs folder check error\n{path}', 2)
         return xbmcvfs.translatePath(path)
-    kodi_log(u'XBMCVFS unable to create path:\n{}'.format(path), 2)
+    kodi_log(f'XBMCVFS unable to create path:\n{path}', 2)
     if not warn_dialog:
         return
-    xbmcgui.Dialog().ok(
-        'XBMCVFS', u'{} [B]{}[/B]\n{}'.format(
-            ADDON.getLocalizedString(32122), path, ADDON.getLocalizedString(32123)))
+    xbmcgui.Dialog().ok('XBMCVFS', f'{ADDON.getLocalizedString(32122)} [B]{path}[/B]\n{ADDON.getLocalizedString(32123)}')
 
 
 def json_loads(obj):
