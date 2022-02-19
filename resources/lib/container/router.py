@@ -110,6 +110,8 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
     def tmdb_is_cache_only(self):
         if self.cache_only == 'true':
             return True
+        if self.ftv_is_cache_only():
+            return False
         if ADDON.getSettingBool('tmdb_details'):
             return False
         return True
