@@ -85,9 +85,8 @@ class _ArtworkSelector():
         # Cache our artwork
         manual = item['artwork'].setdefault('manual', {})
         manual[artwork_type] = success
-        name = '{}.{}.{}.{}'.format(tmdb_type, tmdb_id, season, None)
         item['expires'] = self._timestamp()  # Reup our timestamp to force child items to recache
-        self._cache.set_cache(item, cache_name=name, cache_days=10000)
+        self._cache.set_cache(item, cache_name=self.get_cache_name(tmdb_type, tmdb_id, season), cache_days=10000)
 
         if container_refresh:
             xbmc.executebuiltin('Container.Refresh')

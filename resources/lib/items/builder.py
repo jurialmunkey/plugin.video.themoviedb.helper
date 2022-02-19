@@ -161,15 +161,16 @@ class ItemBuilder(_ArtworkSelector):
             item['listitem']['art'] = {}
         return item
 
+    def get_cache_name(self, tmdb_type, tmdb_id, season=None, episode=None):
+        language = self.tmdb_api.language
+        return '{}.{}.{}.{}.{}'.format(language, tmdb_type, tmdb_id, season, episode)
+
     def get_item(self, tmdb_type, tmdb_id, season=None, episode=None, cache_refresh=False):
         if not tmdb_type or not tmdb_id:
             return
 
-        # Set language
-        language = self.tmdb_api.language
-
         # Get cached item
-        name = '{}.{}.{}.{}.{}'.format(language, tmdb_type, tmdb_id, season, episode)
+        name = self.get_cache_name(tmdb_type, tmdb_id, season, episode)
         item = None if cache_refresh else self._cache.get_cache(name)
         if self.cache_only:
             return item
@@ -180,7 +181,7 @@ class ItemBuilder(_ArtworkSelector):
         if season is not None:
             base_name_season = None if episode is None else season
             parent = self.parent_tv if base_name_season is None else self.parent_season
-            base_name = '{}.{}.{}.{}.None'.format(language, tmdb_type, tmdb_id, base_name_season)
+            base_name = self.get_cache_name(tmdb_type, tmdb_id, base_name_season)
             base_item = parent or self._cache.get_cache(base_name)
         if item and get_timestamp(item['expires']):
             if not base_item or self._timeint(base_item['expires']) <= self._timeint(item['expires']):
