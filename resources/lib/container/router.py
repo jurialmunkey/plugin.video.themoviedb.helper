@@ -110,8 +110,6 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
     def tmdb_is_cache_only(self):
         if self.cache_only == 'true':
             return True
-        if self.ftv_api:
-            return False
         if ADDON.getSettingBool('tmdb_details'):
             return False
         return True
@@ -215,12 +213,12 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             if not k or not v:
                 continue
             try:
-                k = u'Param.{}'.format(k)
-                v = u'{}'.format(v)
+                k = f'Param.{k}'
+                v = f'{v}'
                 params[k] = v
                 xbmcplugin.setProperty(self.handle, k, v)  # Set params to container properties
             except Exception as exc:
-                kodi_log(u'Error: {}\nUnable to set param {} to {}'.format(exc, k, v), 1)
+                kodi_log(f'Error: {exc}\nUnable to set param {k} to {v}', 1)
         return params
 
     def finish_container(self, update_listing=False, plugin_category='', container_content=''):
@@ -391,7 +389,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         item = random_from_list(self.get_items(**params))
         if not item:
             return
-        self.plugin_category = '{}'.format(item.get('label'))
+        self.plugin_category = f'{item.get("label")}'
         self.parent_params = item.get('params', {})
         return self.get_items(**item.get('params', {}))
 
@@ -441,21 +439,20 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         timer_log.append('------------------------------\n')
         for k, v in self.timer_lists.items():
             if k in LOG_TIMER_ITEMS:
-                avg_time = u'{:7.3f} sec avg | {:7.3f} sec max | {:3}'.format(sum(v) / len(v), max(v), len(v)) if v else '  None'
-                timer_log.append(' - {:12s}: {}\n'.format(k, avg_time))
+                avg_time = f'{sum(v) / len(v):7.3f} sec avg | {max(v):7.3f} sec max | {len(v):3}' if v else '  None'
+                timer_log.append(f' - {k:12s}: {avg_time}\n')
             elif k[:4] == 'item':
-                avg_time = u'{:7.3f} sec avg | {:7.3f} sec all | {:3}'.format(sum(v) / len(v), sum(v), len(v)) if v else '  None'
-                timer_log.append(' - {:12s}: {}\n'.format(k, avg_time))
+                avg_time = f'{sum(v) / len(v):7.3f} sec avg | {sum(v):7.3f} sec all | {len(v):3}' if v else '  None'
+                timer_log.append(f' - {k:12s}: {avg_time}\n')
             else:
-                tot_time = u'{:7.3f} sec'.format(sum(v) / len(v)) if v else '  None'
-                timer_log.append('{:15s}: {}\n'.format(k, tot_time))
+                tot_time = f'{sum(v) / len(v):7.3f} sec' if v else '  None'
+                timer_log.append(f'{k:15s}: {tot_time}\n')
         timer_log.append('------------------------------\n')
-        tot_time = u'{:7.3f} sec'.format(sum(total_log) / len(total_log)) if total_log else '  None'
-        timer_log.append('{:15s}: {}\n'.format('Total', tot_time))
+        tot_time = f'{sum(total_log) / len(total_log):7.3f} sec' if total_log else '  None'
+        timer_log.append(f'{"Total":15s}: {tot_time}\n')
         for k, v in self.timer_lists.items():
             if v and k in LOG_TIMER_ITEMS:
-                timer_log.append('\n{}:\n{}\n'.format(k, ' '.join([u'{:.3f} '.format(i) for i in v])))
-        # write_to_file(''.join(timer_log), 'log_timers', '{}_{}.txt'.format(self.params.get('info'), self.params.get('tmdb_type')), append_to_file=True)
+                timer_log.append(f'\n{k}:\n{" ".join([f"{i:.3f} " for i in v])}\n')
         kodi_log(timer_log, 1)
 
     def get_directory(self):
@@ -480,7 +477,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         if self.log_timers:
             self.log_timer_report()
         if self.container_update:
-            xbmc.executebuiltin(u'Container.Update({})'.format(self.container_update))
+            xbmc.executebuiltin(f'Container.Update({self.container_update})')
         if self.container_refresh:
             xbmc.executebuiltin('Container.Refresh')
 
