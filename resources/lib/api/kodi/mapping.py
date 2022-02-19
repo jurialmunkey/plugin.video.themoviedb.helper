@@ -37,27 +37,27 @@ class ItemMapper(_ItemMapper):
                 'subkeys': ['metacritic', 'rating'],
                 'keys': [('infoproperties', 'metacritic_rating')],
                 'type': float,
-                'func': lambda v: u'{0:.1f}'.format(v)}, {
+                'func': lambda v: f'{v:.1f}'}, {
                 # ---
                 'subkeys': ['imdb', 'rating'],
                 'keys': [('infoproperties', 'imdb_rating')],
                 'type': float,
-                'func': lambda v: u'{0:.1f}'.format(v)}, {
+                'func': lambda v: f'{v:.1f}'}, {
                 # ---
                 'subkeys': ['themoviedb', 'rating'],
                 'keys': [('infoproperties', 'tmdb_rating')],
                 'type': float,
-                'func': lambda v: u'{0:.1f}'.format(v)}, {
+                'func': lambda v: f'{v:.1f}'}, {
                 # ---
                 'subkeys': ['imdb', 'votes'],
                 'keys': [('infoproperties', 'imdb_votes')],
                 'type': float,
-                'func': lambda v: u'{:0,.0f}'.format(v)}, {
+                'func': lambda v: f'{v:0,.0f}'}, {
                 # ---
                 'subkeys': ['themoviedb', 'votes'],
                 'keys': [('infoproperties', 'tmdb_votes')],
                 'type': float,
-                'func': lambda v: u'{:0,.0f}'.format(v)
+                'func': lambda v: f'{v:0,.0f}'
             }],
         }
         self.standard_map = {

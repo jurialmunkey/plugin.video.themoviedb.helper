@@ -23,7 +23,7 @@ def try_float(string):
 def try_str(value):
     '''helper to stringify value'''
     try:
-        return u'{}'.format(value)
+        return f'{value}'
     except Exception:
         return ''
 
@@ -51,8 +51,8 @@ def parse_paramstring(paramstring):
 
 def encode_url(path=None, **kwargs):
     path = path or PLUGINPATH
-    paramstring = u'?{}'.format(urlencode(kwargs)) if kwargs else ''
-    return u'{}{}'.format(path, paramstring)
+    paramstring = f'?{urlencode(kwargs)}' if kwargs else ''
+    return f'{path}{paramstring}'
 
 
 def get_between_strings(string, startswith='', endswith=''):

@@ -6,7 +6,7 @@ from resources.lib.addon.parser import try_type, try_int
 def get_property(name, set_property=None, clear_property=False, window_id=None, prefix=None, is_type=None):
     if prefix != -1:
         prefix = prefix or 'TMDbHelper'
-        name = u'{}.{}'.format(prefix, name)
+        name = f'{prefix}.{name}'
     if window_id == 'current':
         window_id = xbmcgui.getCurrentWindowId()
     window = xbmcgui.Window(window_id or 10000)  # Fallback to home window id=10000
@@ -14,7 +14,7 @@ def get_property(name, set_property=None, clear_property=False, window_id=None, 
     if clear_property:
         window.clearProperty(name)
     if set_property is not None:
-        window.setProperty(name, u'{}'.format(set_property))
+        window.setProperty(name, f'{set_property}')
     return try_type(ret_property, is_type or str)
 
 
@@ -46,15 +46,15 @@ def wait_for_property(name, value=None, set_property=False, poll=1, timeout=10):
 
 
 def is_visible(window_id):
-    return xbmc.getCondVisibility(u"Window.IsVisible({})".format(window_id))
+    return xbmc.getCondVisibility(f'Window.IsVisible({window_id})')
 
 
 def close(window_id):
-    return xbmc.executebuiltin(u'Dialog.Close({})'.format(window_id))
+    return xbmc.executebuiltin(f'Dialog.Close({window_id})')
 
 
 def activate(window_id):
-    return xbmc.executebuiltin(u'ActivateWindow({})'.format(window_id))
+    return xbmc.executebuiltin(f'ActivateWindow({window_id})')
 
 
 def _is_base_active(window_id):
@@ -64,8 +64,8 @@ def _is_base_active(window_id):
 
 
 def _is_updating(container_id):
-    is_updating = xbmc.getCondVisibility(u"Container({}).IsUpdating".format(container_id))
-    is_numitems = try_int(xbmc.getInfoLabel(u"Container({}).NumItems".format(container_id)))
+    is_updating = xbmc.getCondVisibility(f"Container({container_id}).IsUpdating")
+    is_numitems = try_int(xbmc.getInfoLabel(f"Container({container_id}).NumItems"))
     if is_updating or not is_numitems:
         return True
 

@@ -26,43 +26,43 @@ ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 def get_sort_methods(default_only=False):
     items = [
         {
-            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), ADDON.getLocalizedString(32286)),
+            'name': f'{ADDON.getLocalizedString(32287)}: {ADDON.getLocalizedString(32286)}',
             'params': {'sort_by': 'rank', 'sort_how': 'asc'}},
         {
-            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), ADDON.getLocalizedString(32106)),
+            'name': f'{ADDON.getLocalizedString(32287)}: {ADDON.getLocalizedString(32106)}',
             'params': {'sort_by': 'added', 'sort_how': 'desc'}},
         {
-            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(369)),
+            'name': f'{ADDON.getLocalizedString(32287)}: {xbmc.getLocalizedString(369)}',
             'params': {'sort_by': 'title', 'sort_how': 'asc'}},
         {
-            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(16102)),
+            'name': f'{ADDON.getLocalizedString(32287)}: {xbmc.getLocalizedString(16102)}',
             'params': {'sort_by': 'watched', 'sort_how': 'desc', 'extended': 'sync'}},
         {
-            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(563)),
+            'name': f'{ADDON.getLocalizedString(32287)}: {xbmc.getLocalizedString(563)}',
             'params': {'sort_by': 'percentage', 'sort_how': 'desc', 'extended': 'full'}},
         {
-            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(345)),
+            'name': f'{ADDON.getLocalizedString(32287)}: {xbmc.getLocalizedString(345)}',
             'params': {'sort_by': 'year', 'sort_how': 'desc'}},
         {
-            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), ADDON.getLocalizedString(32377)),
+            'name': f'{ADDON.getLocalizedString(32287)}: {ADDON.getLocalizedString(32377)}',
             'params': {'sort_by': 'plays', 'sort_how': 'desc', 'extended': 'sync'}},
         {
-            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), ADDON.getLocalizedString(32242)),
+            'name': f'{ADDON.getLocalizedString(32287)}: {ADDON.getLocalizedString(32242)}',
             'params': {'sort_by': 'released', 'sort_how': 'desc', 'extended': 'full'}},
         {
-            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(2050)),
+            'name': f'{ADDON.getLocalizedString(32287)}: {xbmc.getLocalizedString(2050)}',
             'params': {'sort_by': 'runtime', 'sort_how': 'desc', 'extended': 'full'}},
         {
-            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(205)),
+            'name': f'{ADDON.getLocalizedString(32287)}: {xbmc.getLocalizedString(205)}',
             'params': {'sort_by': 'votes', 'sort_how': 'desc', 'extended': 'full'}},
         {
-            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), ADDON.getLocalizedString(32175)),
+            'name': f'{ADDON.getLocalizedString(32287)}: {ADDON.getLocalizedString(32175)}',
             'params': {'sort_by': 'popularity', 'sort_how': 'desc', 'extended': 'full'}},
         {
-            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(575)),
+            'name': f'{ADDON.getLocalizedString(32287)}: {xbmc.getLocalizedString(575)}',
             'params': {'sort_by': 'watched', 'sort_how': 'desc', 'extended': 'inprogress'}},
         {
-            'name': u'{}: {}'.format(ADDON.getLocalizedString(32287), xbmc.getLocalizedString(590)),
+            'name': f'{ADDON.getLocalizedString(32287)}: {xbmc.getLocalizedString(590)}',
             'params': {'sort_by': 'random'}}]
     if default_only:
         return [i for i in items if i['params']['sort_by'] in ['rank', 'added', 'title', 'year', 'random']]
@@ -157,7 +157,7 @@ class _TraktLists():
     def get_custom_list(self, list_slug, user_slug=None, page=1, limit=20, params=None, authorize=False, sort_by=None, sort_how=None, extended=None, owner=False, always_refresh=True):
         if authorize and not self.authorize():
             return
-        path = u'users/{}/lists/{}/items'.format(user_slug or 'me', list_slug)
+        path = f'users/{user_slug or "me"}/lists/{list_slug}/items'
         # Refresh cache on first page for user list because it might've changed
         cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
         sorted_items = self.get_sorted_list(
@@ -285,7 +285,7 @@ class _TraktSync():
         user_slug = user_slug or 'me'
         return self.post_response(
             'users', user_slug, 'lists', list_slug, 'items/remove' if remove else 'items',
-            postdata={u'{}s'.format(trakt_type): [item]})
+            postdata={f'{trakt_type}s': [item]})
 
     def sync_item(self, method, trakt_type, unique_id, id_type, season=None, episode=None):
         """
@@ -295,7 +295,7 @@ class _TraktSync():
         item = self.get_sync_item(trakt_type, unique_id, id_type, season, episode)
         if not item:
             return
-        return self.post_response('sync', method, postdata={u'{}s'.format(trakt_type): [item]})
+        return self.post_response('sync', method, postdata={f'{trakt_type}s': [item]})
 
     def _get_activity_timestamp(self, activities, activity_type=None, activity_key=None):
         if not activities:
@@ -318,7 +318,7 @@ class _TraktSync():
     @use_activity_cache(cache_days=CACHE_SHORT, pickle_object=False)
     def _get_sync_response(self, path, extended=None, allow_fallback=False):
         """ Quick sub-cache routine to avoid recalling full sync list if we also want to quicklist it """
-        sync_name = u'sync_response.{}.{}'.format(path, extended)
+        sync_name = f'sync_response.{path}.{extended}'
         self.sync[sync_name] = self.sync.get(sync_name) or self.get_response_json(path, extended=extended)
         return self.sync[sync_name]
 
@@ -406,7 +406,7 @@ class _TraktSync():
             func = self.get_sync_recommendations_movies if trakt_type == 'movie' else self.get_sync_recommendations_shows
         else:
             return
-        sync_name = u'{}.{}.{}'.format(sync_type, trakt_type, id_type)
+        sync_name = f'{sync_type}.{trakt_type}.{id_type}'
         self.sync[sync_name] = self.sync.get(sync_name) or func(trakt_type, id_type)
         return self.sync[sync_name] or {}
 
@@ -416,7 +416,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         super(TraktAPI, self).__init__(req_api_url=API_URL, req_api_name='TraktAPI', timeout=20, delay_write=delay_write)
         self.authorization = ''
         self.attempted_login = False
-        self.dialog_noapikey_header = u'{0} {1} {2}'.format(ADDON.getLocalizedString(32007), self.req_api_name, ADDON.getLocalizedString(32011))
+        self.dialog_noapikey_header = f'{ADDON.getLocalizedString(32007)} {self.req_api_name} {ADDON.getLocalizedString(32011)}'
         self.dialog_noapikey_text = ADDON.getLocalizedString(32012)
         self.client_id = CLIENT_ID
         self.client_secret = CLIENT_SECRET
@@ -436,7 +436,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         token = self.get_stored_token()
         if token.get('access_token'):
             self.authorization = token
-            self.headers['Authorization'] = u'Bearer {0}'.format(self.authorization.get('access_token'))
+            self.headers['Authorization'] = f'Bearer {self.authorization.get("access_token")}'
 
         # No saved credentials and user trying to use a feature that requires authorization so ask them to login
         elif login:
@@ -502,8 +502,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         self.interval = self.code.get('interval', 5)
         self.expires_in = self.code.get('expires_in', 0)
         self.auth_dialog = xbmcgui.DialogProgress()
-        self.auth_dialog.create(ADDON.getLocalizedString(32097), u'{}\n{}: [B]{}[/B]'.format(
-            ADDON.getLocalizedString(32096), ADDON.getLocalizedString(32095), self.code.get('user_code')))
+        self.auth_dialog.create(ADDON.getLocalizedString(32097), f'{ADDON.getLocalizedString(32096)}\n{ADDON.getLocalizedString(32095)}: [B]{self.code.get("user_code")}[/B]')
         self.poller()
 
     def refresh_token(self):
@@ -564,7 +563,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         """Triggered when device authentication has been completed"""
         kodi_log(u'Trakt authenticated successfully!', 1)
         ADDON.setSettingString('trakt_token', dumps(self.authorization))
-        self.headers['Authorization'] = u'Bearer {0}'.format(self.authorization.get('access_token'))
+        self.headers['Authorization'] = f'Bearer {self.authorization.get("access_token")}'
         if auth_dialog:
             self.auth_dialog.close()
 
@@ -610,7 +609,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         for i in response:
             if i.get('type') != trakt_type:
                 continue
-            if u'{}'.format(i.get(trakt_type, {}).get('ids', {}).get(id_type)) != u'{}'.format(unique_id):
+            if f'{i.get(trakt_type, {}).get("ids", {}).get(id_type)}' != f'{unique_id}':
                 continue
             if not output_type:
                 return i.get(trakt_type, {}).get('ids', {})
@@ -623,7 +622,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         """
         return self._cache.use_cache(
             self._get_id, unique_id, id_type, trakt_type=trakt_type, output_type=output_type,
-            cache_name=u'trakt_get_id.{}.{}.{}.{}'.format(id_type, unique_id, trakt_type, output_type),
+            cache_name=f'trakt_get_id.{id_type}.{unique_id}.{trakt_type}.{output_type}',
             cache_days=CACHE_LONG)
 
     def get_details(self, trakt_type, id_num, season=None, episode=None, extended='full'):
@@ -644,14 +643,14 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         if not slug:
             return
         if episode and season:
-            url = u'shows/{}/seasons/{}/episodes/{}/ratings'.format(slug, season, episode)
+            url = f'shows/{slug}/seasons/{season}/episodes/{episode}/ratings'
         elif season:
-            url = u'shows/{}/seasons/{}/ratings'.format(slug, season)
+            url = f'shows/{slug}/seasons/{season}/ratings'
         else:
-            url = u'{}s/{}/ratings'.format(trakt_type, slug)
+            url = f'{trakt_type}s/{slug}/ratings'
         response = self.get_response_json(url)
         if not response:
             return
         return {
-            'trakt_rating': u'{:0.1f}'.format(response.get('rating') or 0.0),
-            'trakt_votes': u'{:0,.0f}'.format(response.get('votes') or 0.0)}
+            'trakt_rating': f'{response.get("rating") or 0.0:0.1f}',
+            'trakt_votes': f'{response.get("votes") or 0.0:0,.0f}'}

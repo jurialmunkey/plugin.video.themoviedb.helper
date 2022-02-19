@@ -21,7 +21,7 @@ def get_jsonrpc(method=None, params=None):
         jrpc = xbmc.executeJSONRPC(json.dumps(query))
         response = json.loads(jrpc)
     except Exception as exc:
-        kodi_log(u'TMDbHelper - JSONRPC Error:\n{}'.format(exc), 1)
+        kodi_log(f'TMDbHelper - JSONRPC Error:\n{exc}', 1)
         response = {}
     return response
 
@@ -94,14 +94,14 @@ def get_person_stats(person):
 def set_watched(dbid=None, dbtype=None, plays=1):
     if not dbid or not dbtype:
         return
-    db_key = u"{}id".format(dbtype)
+    db_key = f'{dbtype}id'
     json_info = get_jsonrpc(
-        method=u"VideoLibrary.Get{}Details".format(dbtype.capitalize()),
+        method=f'VideoLibrary.Get{dbtype.capitalize()}Details',
         params={db_key: dbid, "properties": ["playcount"]})
-    playcount = json_info.get('result', {}).get('{}details'.format(dbtype), {}).get('playcount', 0)
+    playcount = json_info.get('result', {}).get(f'{dbtype}details', {}).get('playcount', 0)
     playcount = try_int(playcount) + plays
     return get_jsonrpc(
-        method=u"VideoLibrary.Set{}Details".format(dbtype.capitalize()),
+        method=f'VideoLibrary.Set{dbtype.capitalize()}Details',
         params={db_key: dbid, "playcount": playcount})
 
 
@@ -127,12 +127,12 @@ def _get_item_details(dbid=None, method=None, key=None, properties=None):
     if not dbid or not method or not key or not properties:
         return {}
     params = {
-        u"{0}id".format(key): try_int(dbid),
+        f'{key}id': try_int(dbid),
         "properties": properties}
     details = get_jsonrpc(method, params)
     if not details or not isinstance(details, dict):
         return {}
-    details = details.get('result', {}).get(u'{0}details'.format(key))
+    details = details.get('result', {}).get(f'{key}details')
     if details:
         details['dbid'] = dbid
         return ItemMapper(key=key).get_info(details)
@@ -185,7 +185,7 @@ class KodiLibrary(object):
         return self.get_database(dbtype, tvshowid, attempt_reconnect)
 
     def get_database(self, dbtype, tvshowid=None, attempt_reconnect=False, logging=True):
-        cache_name = 'db.{}.{}'.format(dbtype, tvshowid)
+        cache_name = f'db.{dbtype}.{tvshowid}'
         cache_data = self._cache.get_cache(cache_name)
         db_updated = xbmcvfs.Stat('special://database/MyVideos119.db').st_mtime() or -1
         if cache_data and db_updated == cache_data.get('updated') and cache_data.get('database'):
@@ -199,7 +199,7 @@ class KodiLibrary(object):
             xbmc.Monitor().waitForAbort(1)
             retries -= 1
         if logging:
-            kodi_log(u'Getting KodiDB {} FAILED!'.format(dbtype), 1)
+            kodi_log(f'Getting KodiDB {dbtype} FAILED!', 1)
 
     def _get_kodi_db(self, dbtype=None, tvshowid=None):
         if not dbtype:
@@ -216,8 +216,8 @@ class KodiLibrary(object):
         if dbtype == "episode":
             method = "VideoLibrary.GetEpisodes"
             params = {"tvshowid": tvshowid, "properties": ["title", "showtitle", "season", "episode", "file"]}
-        dbid_name = u'{0}id'.format(dbtype)
-        key_to_get = u'{0}s'.format(dbtype)
+        dbid_name = f'{dbtype}id'
+        key_to_get = f'{dbtype}s'
         response = get_jsonrpc(method, params)
         return [{
             'imdb_id': item.get('uniqueid', {}).get('imdb'),

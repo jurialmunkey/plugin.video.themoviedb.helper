@@ -36,11 +36,11 @@ def format_name(cache_name, *args, **kwargs):
     for arg in args:
         if not isinstance(arg, permitted_types):
             continue
-        cache_name = u'{}/{}'.format(cache_name, arg) if cache_name else u'{}'.format(arg)
+        cache_name = f'{cache_name}/{arg}' if cache_name else f'{arg}'
     for key, value in sorted(kwargs.items()):
         if not isinstance(value, permitted_types):
             continue
-        cache_name = u'{}&{}={}'.format(cache_name, key, value) if cache_name else u'{}={}'.format(key, value)
+        cache_name = f'{cache_name}&{key}={value}' if cache_name else f'{key}={value}'
     return cache_name
 
 
@@ -48,10 +48,10 @@ def format_folderpath(path, content='videos', affix='return', info=None, play='P
     if not path:
         return
     if info == 'play':
-        return u'{}({})'.format(play, path)
+        return f'{play}({path})'
     if xbmc.getCondVisibility("Window.IsMedia"):
-        return u'Container.Update({})'.format(path)
-    return u'ActivateWindow({},{},{})'.format(content, path, affix)
+        return f'Container.Update({path})'
+    return f'ActivateWindow({content},{path},{affix})'
 
 
 def reconfigure_legacy_params(**kwargs):
@@ -78,7 +78,7 @@ def kodi_log(value, level=0):
             value = ''.join(map(str, value))
         if isinstance(value, bytes):
             value = value.decode('utf-8')
-        logvalue = u'{0}{1}'.format(_addonlogname, value)
+        logvalue = f'{_addonlogname}{value}'
         if level == 2 and _debuglogging:
             xbmc.log(logvalue, level=xbmc.LOGINFO)
         elif level == 1:
@@ -86,20 +86,19 @@ def kodi_log(value, level=0):
         else:
             xbmc.log(logvalue, level=xbmc.LOGDEBUG)
     except Exception as exc:
-        xbmc.log(u'Logging Error: {}'.format(exc), level=xbmc.LOGINFO)
+        xbmc.log(f'Logging Error: {exc}', level=xbmc.LOGINFO)
 
 
 def kodi_traceback(exception, log_msg=None, notification=True, log_level=1):
     if notification:
-        head = u'TheMovieDb Helper {}'.format(xbmc.getLocalizedString(257))
+        head = f'TheMovieDb Helper {xbmc.getLocalizedString(257)}'
         xbmcgui.Dialog().notification(head, xbmc.getLocalizedString(2104))
-    msg = u'Error Type: {0}\nError Contents: {1!r}'
-    msg = msg.format(type(exception).__name__, exception.args)
+    msg = f'Error Type: {type(exception).__name__}\nError Contents: {exception.args!r}'
     msg = [log_msg, '\n', msg, '\n'] if log_msg else [msg, '\n']
     try:
         kodi_log(msg + traceback.format_tb(exception.__traceback__), log_level)
     except Exception as exc:
-        kodi_log(u'ERROR WITH TRACEBACK!\n{}\n{}'.format(exc, msg), log_level)
+        kodi_log(f'ERROR WITH TRACEBACK!\n{exc}\n{msg}', log_level)
 
 
 def get_language():
@@ -110,8 +109,8 @@ def get_language():
 
 def get_mpaa_prefix():
     if ADDON.getSettingString('mpaa_prefix'):
-        return u'{} '.format(ADDON.getSettingString('mpaa_prefix'))
-    return u''
+        return f'{ADDON.getSettingString("mpaa_prefix")} '
+    return ''
 
 
 CONVERSION_TABLE = {

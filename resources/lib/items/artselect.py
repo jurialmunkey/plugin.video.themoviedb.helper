@@ -6,7 +6,6 @@ from resources.lib.api.fanarttv.api import ARTWORK_TYPES
 from resources.lib.api.tmdb.mapping import get_imagepath_poster, get_imagepath_fanart, get_imagepath_thumb, get_imagepath_logo
 from resources.lib.addon.decorators import busy_dialog
 # from resources.lib.addon.plugin import kodi_log
-from resources.lib.addon.parser import try_int
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 

@@ -157,7 +157,7 @@ class _SyncItem():
         """ Called after user selects choice """
         with busy_dialog():
             self._sync = self._trakt.sync_item(
-                '{}/remove'.format(self.method) if self.remove else self.method,
+                f'{self.method}/remove' if self.remove else self.method,
                 self._item.trakt_type, self._item.unique_id, self._item.id_type, self._item.season, self._item.episode)
         return self._sync
 
@@ -246,7 +246,7 @@ class _Comments():
         info = comments[x].get('comment')
         name = comments[x].get('user', {}).get('name')
         rate = comments[x].get('user_stats', {}).get('rating')
-        info = u'{}\n\n{} {}/10'.format(info, xbmc.getLocalizedString(563), rate) if rate else u'{}'.format(info)
+        info = f'{info}\n\n{xbmc.getLocalizedString(563)} {rate}/10' if rate else f'{info}'
         xbmcgui.Dialog().textviewer(name, info)
         return self._getcomment(itemlist, comments)
 
@@ -254,7 +254,7 @@ class _Comments():
         trakt_type = 'show' if self._item.trakt_type in ['season', 'episode'] else self._item.trakt_type
         with busy_dialog():
             slug = self._trakt.get_id(self._item.unique_id, self._item.id_type, trakt_type, 'slug')
-            comments = self._trakt.get_response_json(u'{}s'.format(trakt_type), slug, 'comments', limit=50) or []
+            comments = self._trakt.get_response_json(f'{trakt_type}s', slug, 'comments', limit=50) or []
             itemlist = [i.get('comment', '').replace('\n', ' ') for i in comments]
         self._sync = self._getcomment(itemlist, comments)
         return self._sync

@@ -23,15 +23,6 @@ ADDONPATH = ADDON.getAddonInfo('path')
 def string_format_map(fmt, d):
     """ Py 2/3 cross-compatibility to return defaultdict formatted string
     No longer needed after support for Py2 was dropped
-
-    Old code for legacy
-    try:
-        str.format_map
-    except AttributeError:
-        parts = Formatter().parse(fmt)
-        return fmt.format(**{part[1]: d[part[1]] for part in parts})
-    else:
-        return fmt.format(**d)
     """
     return fmt.format_map(d)  # NOTE: .format(**d) works in Py3.5 but not Py3.7+ so use format_map(d) instead
 
@@ -72,7 +63,7 @@ def resolve_to_dummy(handle=None, stop_after=1, delay_wait=0):
         return
 
     # Set our dummy resolved url
-    path = u'{}/resources/dummy.mp4'.format(ADDONPATH)
+    path = f'{ADDONPATH}/resources/dummy.mp4'
     kodi_log(['lib.player.players - attempt to resolve dummy file\n', path], 1)
     xbmcplugin.setResolvedUrl(handle, True, ListItem(path=path).get_listitem())
 
@@ -96,20 +87,20 @@ def resolve_to_dummy(handle=None, stop_after=1, delay_wait=0):
 
 class Players(object):
     def __init__(self, tmdb_type, tmdb_id=None, season=None, episode=None, ignore_default=False, islocal=False, player=None, mode=None, **kwargs):
-        with ProgressDialog('TMDbHelper', u'{}...'.format(ADDON.getLocalizedString(32374)), total=3) as _p_dialog:
+        with ProgressDialog('TMDbHelper', f'{ADDON.getLocalizedString(32374)}...', total=3) as _p_dialog:
             self.api_language = None
             self.players = get_players_from_file()
 
-            _p_dialog.update(u'{}...'.format(ADDON.getLocalizedString(32375)))
+            _p_dialog.update(f'{ADDON.getLocalizedString(32375)}...')
             self.details = get_item_details(tmdb_type, tmdb_id, season, episode)
             self.item = get_detailed_item(tmdb_type, tmdb_id, season, episode, details=self.details) or {}
 
-            _p_dialog.update(u'{}...'.format(ADDON.getLocalizedString(32376)))
+            _p_dialog.update(f'{ADDON.getLocalizedString(32376)}...')
             self.playerstring = get_playerstring(tmdb_type, tmdb_id, season, episode, details=self.details)
             self.dialog_players = self._get_players_for_dialog(tmdb_type)
 
             self.default_player = ADDON.getSettingString('default_player_movies') if tmdb_type == 'movie' else ADDON.getSettingString('default_player_episodes')
-            self.ignore_default = u'{} {}'.format(player, u'{}_{}'.format(mode or 'play', 'movie' if tmdb_type == 'movie' else 'episode')) if player else ignore_default or ''
+            self.ignore_default = f'{player} {mode or "play"}_{"movie" if tmdb_type == "movie" else "episode"}' if player else ignore_default or ''
             self.tmdb_type, self.tmdb_id, self.season, self.episode = tmdb_type, tmdb_id, season, episode
             self.dummy_duration = try_float(ADDON.getSettingString('dummy_duration')) or 1.0
             self.dummy_delay = try_float(ADDON.getSettingString('dummy_delay')) or 1.0
@@ -142,7 +133,7 @@ class Players(object):
             'is_resolvable': value.get('is_resolvable'),
             'api_language': value.get('api_language'),
             'language': value.get('language'),
-            'name': u'{} {}'.format(name, value.get('name')),
+            'name': f'{name} {value.get("name")}',
             'plugin_name': value.get('plugin'),
             'plugin_icon': value.get('icon', '').format(ADDONPATH) or xbmcaddon.Addon(value.get('plugin', '')).getAddonInfo('icon'),
             'fallback': value.get('fallback', {}).get(mode),
@@ -155,12 +146,12 @@ class Players(object):
         if not file:
             return []
         return [{
-            'name': u'{} Kodi'.format(ADDON.getLocalizedString(32061)),
+            'name': f'{ADDON.getLocalizedString(32061)} Kodi',
             'is_folder': False,
             'is_local': True,
             'is_resolvable': "true",
             'plugin_name': 'xbmc.core',
-            'plugin_icon': u'{}/resources/icons/other/kodi.png'.format(ADDONPATH),
+            'plugin_icon': f'{ADDONPATH}/resources/icons/other/kodi.png',
             'actions': file}]
 
     def _get_local_file(self, file):
@@ -218,11 +209,11 @@ class Players(object):
         dialog_players = [] if not clear_player else [{
             'name': ADDON.getLocalizedString(32311),
             'plugin_name': 'plugin.video.themoviedb.helper',
-            'plugin_icon': u'{}/resources/icons/other/kodi.png'.format(ADDONPATH)}]
+            'plugin_icon': f'{ADDONPATH}/resources/icons/other/kodi.png'}]
         dialog_players += self.dialog_players
         players = [ListItem(
             label=i.get('name'),
-            label2=u'{} v{}'.format(i.get('plugin_name'), xbmcaddon.Addon(i.get('plugin_name', '')).getAddonInfo('version')),
+            label2=f'{i.get("plugin_name")} v{xbmcaddon.Addon(i.get("plugin_name", "")).getAddonInfo("version")}',
             art={'thumb': i.get('plugin_icon')}).get_listitem() for i in dialog_players]
         x = xbmcgui.Dialog().select(header, players, useDetails=detailed)
         if x == -1:
@@ -258,7 +249,7 @@ class Players(object):
                 if k == 'position':  # We're looking for an item position not an infolabel
                     if try_int(string_format_map(v, self.item)) != x + 1:  # Format our position value and add one since people are dumb and don't know that arrays start at 0
                         break  # Not the item position we want so let's go to next item in folder
-                elif not f.get(k) or not re.match(string_format_map(v, self.item), u'{}'.format(f.get(k, ''))):  # Format our value and check if it regex matches the infolabel key
+                elif not f.get(k) or not re.match(string_format_map(v, self.item), f'{f.get(k, "")}'):  # Format our value and check if it regex matches the infolabel key
                     break  # Item's key value doesn't match value we are looking for so let's got to next item in folder
             else:  # Item matched our criteria so let's return it
                 if f.get('file'):
@@ -279,14 +270,14 @@ class Players(object):
 
             # Add year to our label if exists and not special value of 1601
             if f.get('year') and f.get('year') != 1601:
-                label_a = u'{} ({})'.format(label_a, f.get('year'))
+                label_a = f'{label_a} ({f.get("year")})'
 
             # Add season and episode numbers to label
             if try_int(f.get('season', 0)) > 0 and try_int(f.get('episode', 0)) > 0:
                 if f.get('filetype') == 'file':  # If file assume is an episode so add to main label
-                    label_a = u'{}x{}. {}'.format(f['season'], f['episode'], label_a)
+                    label_a = f'{f["season"]}x{f["episode"]}. {label_a}'
                 else:  # If folder assume is tvshow or season so add episode count to label2
-                    label_b_list.append(u'{} {}'.format(f['episode'], xbmc.getLocalizedString(20360)))
+                    label_b_list.append(f'{f["episode"]} {xbmc.getLocalizedString(20360)}')
 
             # Add various stream details to ListItem.Label2 (aka label_b)
             if f.get('streamdetails'):
@@ -294,20 +285,20 @@ class Players(object):
                 sda_list = f.get('streamdetails', {}).get('audio', [{}]) or [{}]
                 sdv, sda = sdv_list[0], sda_list[0]
                 if sdv.get('width') or sdv.get('height'):
-                    label_b_list.append(u'{}x{}'.format(sdv.get('width'), sdv.get('height')))
+                    label_b_list.append(f'{sdv.get("width")}x{sdv.get("width")}')
                 if sdv.get('codec'):
-                    label_b_list.append(u'{}'.format(sdv.get('codec', '').upper()))
+                    label_b_list.append(f'{sdv.get("codec", "").upper()}')
                 if sda.get('codec'):
-                    label_b_list.append(u'{}'.format(sda.get('codec', '').upper()))
+                    label_b_list.append(f'{sda.get("codec", "").upper()}')
                 if sda.get('channels'):
-                    label_b_list.append(u'{} CH'.format(sda.get('channels', '')))
+                    label_b_list.append(f'{sda.get("channels", "")} CH')
                 for i in sda_list:
                     if i.get('language'):
-                        label_b_list.append(u'{}'.format(i.get('language', '').upper()))
+                        label_b_list.append(f'{i.get("language", "").upper()}')
                 if sdv.get('duration'):
-                    label_b_list.append(u'{} mins'.format(try_int(sdv.get('duration', 0)) // 60))
+                    label_b_list.append(f'{try_int(sdv.get("duration", 0)) // 60} mins')
             if f.get('size'):
-                label_b_list.append(u'{}'.format(normalise_filesize(f.get('size', 0))))
+                label_b_list.append(f'{normalise_filesize(f.get("size", 0))}')
             label_b = ' | '.join(label_b_list) if label_b_list else ''
 
             # Add item to select dialog list
@@ -336,7 +327,7 @@ class Players(object):
             # Start thread with keyboard inputter if needed
             if action.get('keyboard'):
                 if action['keyboard'] in ['Up', 'Down', 'Left', 'Right', 'Select']:
-                    keyboard_input = KeyboardInputter(action="Input.{}".format(action.get('keyboard')))
+                    keyboard_input = KeyboardInputter(action=f'Input.{action.get("keyboard")}')
                 else:
                     text = string_format_map(action['keyboard'], self.item)
                     keyboard_input = KeyboardInputter(text=text[::-1] if action.get('direction') == 'rtl' else text)
@@ -423,7 +414,7 @@ class Players(object):
         if not player:
             header = self.item.get('name') or ADDON.getLocalizedString(32042)
             if self.item.get('episode') and self.item.get('title'):
-                header = u'{} - {}'.format(header, self.item['title'])
+                header = f'{header} - {self.item["title"]}'
             player = self.select_player(header=header)
             if not player:
                 return
@@ -480,7 +471,7 @@ class Players(object):
         container_folderpath = xbmc.getInfoLabel("Container.FolderPath")
         if container_folderpath == folder_path:
             return
-        xbmc.executebuiltin(u'Container.Update({},replace)'.format(folder_path))
+        xbmc.executebuiltin(f'Container.Update({folder_path},replace)')
         if not reset_focus:
             return
         timeout = 20
@@ -497,10 +488,10 @@ class Players(object):
         if not handle or listitem.getProperty('is_resolvable') == 'false':
             return path
         if listitem.getProperty('is_resolvable') == 'select' and not xbmcgui.Dialog().yesno(
-                '{} - {}'.format(listitem.getProperty('player_name'), ADDON.getLocalizedString(32353)),
+                f'{listitem.getProperty("player_name")} - {ADDON.getLocalizedString(32353)}',
                 ADDON.getLocalizedString(32354),
-                yeslabel=u"{} (setResolvedURL)".format(xbmc.getLocalizedString(107)),
-                nolabel=u"{} (PlayMedia)".format(xbmc.getLocalizedString(106))):
+                yeslabel=f'{xbmc.getLocalizedString(107)} (setResolvedURL)',
+                nolabel=f'{xbmc.getLocalizedString(106)} (PlayMedia)'):
             return path
 
     def play(self, folder_path=None, reset_focus=None, handle=None):
@@ -509,8 +500,8 @@ class Players(object):
             folder_path = xbmc.getInfoLabel("Container.FolderPath")
         if not reset_focus and folder_path:
             containerid = xbmc.getInfoLabel("System.CurrentControlID")
-            current_pos = xbmc.getInfoLabel("Container({}).CurrentItem".format(containerid))
-            reset_focus = 'SetFocus({},{},absolute)'.format(containerid, try_int(current_pos) - 1)
+            current_pos = xbmc.getInfoLabel(f'Container({containerid}).CurrentItem')
+            reset_focus = f'SetFocus({containerid},{try_int(current_pos) - 1},absolute)'
 
         # Get the resolved path
         listitem = self.get_resolved_path()
@@ -544,9 +535,9 @@ class Players(object):
         if action:
             if self.is_strm or not ADDON.getSettingBool('only_resolve_strm'):
                 resolve_to_dummy(handle, self.dummy_duration, self.dummy_delay)  # If we're calling external we need to resolve to dummy
-            xbmc.Player().play(action, listitem) if self.force_xbmcplayer else xbmc.executebuiltin(u'PlayMedia({})'.format(action))
+            xbmc.Player().play(action, listitem) if self.force_xbmcplayer else xbmc.executebuiltin(f'PlayMedia({action})')
             kodi_log([
-                'lib.player - playing path with {}\n'.format('xbmc.Player()' if self.force_xbmcplayer else 'PlayMedia'),
+                f'lib.player - playing path with {"xbmc.Player()" if self.force_xbmcplayer else "PlayMedia"}\n',
                 listitem.getPath()], 1)
             return
 
@@ -559,7 +550,7 @@ class Players(object):
         # If id/type not set to Player.GetItem things like Trakt don't work correctly.
         # Looking for better solution than this hack.
         if ADDON.getSettingBool('trakt_localhack') and listitem.getProperty('is_local') == 'true':
-            xbmc.Player().play(listitem.getPath(), listitem) if self.force_xbmcplayer else xbmc.executebuiltin(u'PlayMedia({})'.format(listitem.getPath()))
+            xbmc.Player().play(listitem.getPath(), listitem) if self.force_xbmcplayer else xbmc.executebuiltin(f'PlayMedia({listitem.getPath()})')
             kodi_log([
-                'Finished executing {}\n'.format('xbmc.Player()' if self.force_xbmcplayer else 'PlayMedia'),
+                f'Finished executing {"xbmc.Player()" if self.force_xbmcplayer else "PlayMedia"}\n',
                 listitem.getPath()], 1)

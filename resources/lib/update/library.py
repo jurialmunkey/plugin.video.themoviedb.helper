@@ -85,14 +85,14 @@ class LibraryAdder():
             return  # Skip shows without details/year
 
         # Get new name and compare to old name
-        name = u'{} ({})'.format(details.get('name'), details['first_air_date'][:4])
+        name = f'{details.get("name")} ({details["first_air_date"][:4]})'
         if folder == name:
             return  # Skip if already converted
 
         # Convert name
         basedir = BASEDIR_TV.replace('\\', '/')
-        old_folder = u'{}{}/'.format(basedir, validify_filename(folder))
-        new_folder = u'{}{}/'.format(basedir, validify_filename(name))
+        old_folder = f'{basedir}{validify_filename(folder)}/'
+        new_folder = f'{basedir}{validify_filename(name)}/'
         xbmcvfs.rename(old_folder, new_folder)
 
     def legacy_conversion(self, confirm=True):
@@ -103,7 +103,7 @@ class LibraryAdder():
         nfos_total = len(nfos)
         for x, i in enumerate(nfos):
             folder, tmdb_id = i['folder'], i['tmdb_id']
-            self._update(x, nfos_total, message=u'{} {}...'.format(ADDON.getLocalizedString(32167), folder))
+            self._update(x, nfos_total, message=f'{ADDON.getLocalizedString(32167)} {folder}...')
             self._legacy_conversion(folder, tmdb_id)
 
         # Mark as complete and set to clean library
@@ -116,11 +116,11 @@ class LibraryAdder():
         # Update each show in folder
         nfos_total = len(nfos)
         for x, i in enumerate(nfos):
-            self._update(x, nfos_total, message=u'{} {}...'.format(ADDON.getLocalizedString(32167), i['folder']))
+            self._update(x, nfos_total, message=f'{ADDON.getLocalizedString(32167)} {i["folder"]}...')
             self.add_tvshow(tmdb_id=i['tmdb_id'], force=force)
 
         # Update last updated stamp
-        ADDON.setSettingString('last_autoupdate', u'Last updated {}'.format(get_current_date_time()))
+        ADDON.setSettingString('last_autoupdate', f'Last updated {get_current_date_time()}')
 
     def add_userlist(self, user_slug=None, list_slug=None, confirm=True, force=False, **kwargs):
         request = get_userlist(user_slug=user_slug, list_slug=list_slug, confirm=confirm, busy_spinner=self.p_dialog)
@@ -130,7 +130,7 @@ class LibraryAdder():
         i_added = {'movie': [], 'show': []}
 
         for x, i in enumerate(request):
-            self._update(x, i_total, message=u'Updating {}...'.format(i.get(i.get('type'), {}).get('title')))
+            self._update(x, i_total, message=f'Updating {i.get(i.get("type"), {}).get("title")}...')
             playlist_rule = self._add_userlist_item(i, force=force)
             if not playlist_rule:
                 continue
@@ -172,7 +172,7 @@ class LibraryAdder():
         if not details or not details.get('title'):
             return
         imdb_id = details.get('external_ids', {}).get('imdb_id')
-        name = u'{} ({})'.format(details['title'], details['release_date'][:4]) if details.get('release_date') else details['title']
+        name = f'{details["title"]} ({details["release_date"][:4]})' if details.get('release_date') else details['title']
 
         # Only add strm if not in library
         file = self.kodi_db_movies.get_info(info='file', imdb_id=imdb_id, tmdb_id=tmdb_id)
@@ -204,9 +204,7 @@ class LibraryAdder():
 
         # Add seasons
         for x, season in enumerate(self.tv.get_seasons()):
-            self._update(x, self.tv.s_total, message=u'{} {} - {} {}...'.format(
-                ADDON.getLocalizedString(32167), self.tv.details.get('name'),
-                xbmc.getLocalizedString(20373), season.get('season_number', 0)))  # Update our progress dialog
+            self._update(x, self.tv.s_total, message=f'{ADDON.getLocalizedString(32167)} {self.tv.details.get("name")} - {xbmc.getLocalizedString(20373)} {season.get("season_number", 0)}...')  # Update our progress dialog
             self._add_season(season)
 
         # Store details about what we did into the cache
@@ -217,7 +215,7 @@ class LibraryAdder():
 
     def _add_season(self, season, blacklist=[0]):
         number = season.get('season_number', 0)
-        folder = u'Season {}'.format(number)
+        folder = f'Season {number}'
 
         # Skip blacklisted seasons
         if try_int(number) in blacklist:  # TODO: Optional whitelist also
@@ -240,7 +238,7 @@ class LibraryAdder():
 
     def _add_episode(self, episode, season, folder):
         number = episode.get('episode_number')
-        filename = validify_filename(u'S{:02d}E{:02d} - {}'.format(try_int(season), try_int(number), episode.get('name')))
+        filename = validify_filename(f'S{try_int(season):02d}E{try_int(number):02d} - {episode.get("name")}')
         self.tv._cache.my_history['episodes'].append(filename)
 
         # Skip episodes we added in the past
@@ -280,9 +278,8 @@ class _TVShow():
         return self.details
 
     def get_name(self):
-        name = u'{}{}'.format(
-            self.details.get('name'),
-            u' ({})'.format(self.details['first_air_date'][:4]) if self.details.get('first_air_date') else '')
+        date = f' ({self.details["first_air_date"][:4]})' if self.details.get('first_air_date') else ''
+        name = f'{self.details.get("name")}{date}'
         self.name = get_unique_folder(name, self.tmdb_id, BASEDIR_TV)
         return self.name
 

@@ -15,7 +15,7 @@ ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 def get_container():
     widget_id = get_property('WidgetContainer', is_type=int)
     if widget_id:
-        return u'Container({0}).'.format(widget_id)
+        return f'Container({widget_id}).'
     return 'Container.'
 
 
@@ -25,7 +25,7 @@ def get_container_item(container=None):
             "Window.IsVisible(movieinformation)] + "
             "!Skin.HasSetting(TMDbHelper.ForceWidgetContainer)"):
         return 'ListItem.'
-    return u'{}ListItem.'.format(container or get_container())
+    return f'{container or get_container()}ListItem.'
 
 
 class ListItemMonitor(CommonMonitorFunctions):
@@ -47,13 +47,13 @@ class ListItemMonitor(CommonMonitorFunctions):
         self.container_item = get_container_item(self.container)
 
     def get_infolabel(self, infolabel):
-        return xbmc.getInfoLabel(u'{}{}'.format(self.container_item, infolabel))
+        return xbmc.getInfoLabel(f'{self.container_item}{infolabel}')
 
     def get_position(self):
-        return xbmc.getInfoLabel(u'{}CurrentItem'.format(self.container))
+        return xbmc.getInfoLabel(f'{self.container}CurrentItem')
 
     def get_numitems(self):
-        return xbmc.getInfoLabel(u'{}NumItems'.format(self.container))
+        return xbmc.getInfoLabel(f'{self.container}NumItems')
 
     def get_imdb_id(self):
         imdb_id = self.get_infolabel('IMDBNumber') or ''
@@ -82,7 +82,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             return 'actors'
         dbtype = self.get_infolabel('dbtype')
         if dbtype:
-            return u'{}s'.format(dbtype)
+            return f'{dbtype}s'
         if xbmc.getCondVisibility(
                 "Window.IsVisible(DialogPVRInfo.xml) | "
                 "Window.IsVisible(MyPVRChannels.xml) | "
@@ -108,7 +108,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         self.episode = self.get_episode()
 
     def set_cur_name(self, tmdb_type, tmdb_id, season=None, episode=None):
-        self.cur_name = u'{}.{}.{}.{}'.format(tmdb_type, tmdb_id, season, episode)
+        self.cur_name = f'{tmdb_type}.{tmdb_id}.{season}.{episode}'
         return self.cur_name
 
     def get_cur_item(self):

@@ -8,7 +8,6 @@ from resources.lib.api.fanarttv.api import FanartTV
 from resources.lib.addon.timedate import set_timestamp, get_timestamp
 from resources.lib.addon.constants import IMAGEPATH_QUALITY_POSTER, IMAGEPATH_QUALITY_FANART, IMAGEPATH_QUALITY_THUMBS, IMAGEPATH_QUALITY_CLOGOS, IMAGEPATH_ALL, ARTWORK_BLACKLIST
 from resources.lib.addon.decorators import TimerList, ParallelThread
-from resources.lib.addon.plugin import kodi_log
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 ARTWORK_QUALITY = ADDON.getSettingInt('artwork_quality')
@@ -60,7 +59,7 @@ class ItemBuilder(_ArtworkSelector):
         return int(x) // div
 
     def get_parents(self, tmdb_type, tmdb_id, season=None):
-        with TimerList(self.timer_lists, '{}.{}.{}'.format(tmdb_type, tmdb_id, season), log_threshold=0.05, logging=self.log_timers):
+        with TimerList(self.timer_lists, f'{tmdb_type}.{tmdb_id}.{season}', log_threshold=0.05, logging=self.log_timers):
             if tmdb_type != 'tv' or not tmdb_id:
                 return
             self.parent_tv = self.get_item(tmdb_type=tmdb_type, tmdb_id=tmdb_id)
@@ -83,7 +82,7 @@ class ItemBuilder(_ArtworkSelector):
                 if not prefix:
                     base_items[k] = v
                 continue
-            k = '{}{}'.format(prefix, k)
+            k = f'{prefix}{k}'
             base_items[k] = v
         backfill_items = base_items.copy() if backfill else {}
         for k, v in backfill_items.items():
@@ -163,7 +162,7 @@ class ItemBuilder(_ArtworkSelector):
 
     def get_cache_name(self, tmdb_type, tmdb_id, season=None, episode=None):
         language = self.tmdb_api.language
-        return '{}.{}.{}.{}.{}'.format(language, tmdb_type, tmdb_id, season, episode)
+        return f'{language}.{tmdb_type}.{tmdb_id}.{season}.{episode}'
 
     def get_item(self, tmdb_type, tmdb_id, season=None, episode=None, cache_refresh=False):
         if not tmdb_type or not tmdb_id:
@@ -189,7 +188,6 @@ class ItemBuilder(_ArtworkSelector):
                     if item['artwork'].get(ARTWORK_QUALITY):
                         return item
                 # We're only missing artwork from a specific API or only need to remap quality
-                # kodi_log('REMAP {}.{}.format\n{}'.format(tmdb_type, tmdb_id, item['artwork'].keys()), 1)
                 prefix = 'tvshow.' if season is not None and episode is None else ''
                 item = self.get_artwork(item, tmdb_type, season, episode, base_item, prefix=prefix)
                 return self._cache.set_cache(item, name, cache_days=CACHE_DAYS)

@@ -44,7 +44,7 @@ ARTWORK_TYPES = {
 def add_extra_art(source, output={}):
     if not source:
         return output
-    output.update({u'fanart{}'.format(x): i['url'] for x, i in enumerate(source, 1) if i.get('url') and x <= ITER_PROPS_MAX})
+    output.update({f'fanart{x}': i['url'] for x, i in enumerate(source, 1) if i.get('url') and x <= ITER_PROPS_MAX})
     return output
 
 
@@ -60,15 +60,15 @@ class FanartTV(RequestAPI):
         super(FanartTV, self).__init__(
             req_api_name='FanartTV',
             req_api_url=API_URL,
-            req_api_key=u'api_key={}'.format(api_key),
+            req_api_key=f'api_key={api_key}',
             delay_write=delay_write)
-        self.req_api_key = u'api_key={0}'.format(api_key) if api_key else self.req_api_key
-        self.req_api_key = u'{0}&client_key={1}'.format(self.req_api_key, client_key) if client_key else self.req_api_key
+        self.req_api_key = f'api_key={api_key}' if api_key else self.req_api_key
+        self.req_api_key = f'{self.req_api_key}&client_key={client_key}' if client_key else self.req_api_key
         self.language = language[:2] if language else 'en'
         self.cache_only = cache_only
         self.cache_refresh = cache_refresh
         self.quick_request = {'movies': {}, 'tv': {}}
-        self.req_strip.append(('&client_key={}'.format(client_key), ''))
+        self.req_strip.append((f'&client_key={client_key}', ''))
 
     def get_all_artwork(self, ftv_id, ftv_type, season=None, artlist_type=None, season_type=None):
         """

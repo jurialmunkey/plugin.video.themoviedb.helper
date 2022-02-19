@@ -31,7 +31,7 @@ class CronJobMonitor(Thread):
             if ADDON.getSettingBool('library_autoupdate'):
                 if get_datetime_now() > self.next_time:  # Scheduled time has past so lets update
                     xbmc.executebuiltin('RunScript(plugin.video.themoviedb.helper,library_autoupdate)')
-                    xbmc.executebuiltin('Skin.SetString(TMDbHelper.AutoUpdate.LastTime,{})'.format(get_datetime_now().strftime("%Y-%m-%dT%H:%M:%S")))
+                    xbmc.executebuiltin(f'Skin.SetString(TMDbHelper.AutoUpdate.LastTime,{get_datetime_now().strftime("%Y-%m-%dT%H:%M:%S")})')
                     self.next_time += get_timedelta(hours=24)  # Set next update for tomorrow
             self.xbmc_monitor.waitForAbort(self.poll_time)
 

@@ -86,9 +86,9 @@ def timer_report(func_name):
             timer_z = timer()
             total_time = timer_z - timer_a
             if total_time > 0.001:
-                timer_name = u'{}.{}.'.format(self.__class__.__name__, func_name)
+                timer_name = f'{self.__class__.__name__}.{func_name}.'
                 timer_name = format_name(timer_name, *args, **kwargs)
-                kodi_log(u'{}\n{:.3f} sec'.format(timer_name, total_time), 1)
+                kodi_log(f'{timer_name}\n{total_time:.3f} sec', 1)
             return response
         return wrapper
     return decorator
@@ -103,7 +103,7 @@ def timer_func(timer_name, log_threshold=0.001):
         timer_z = timer()
         total_time = timer_z - timer_a
         if total_time > log_threshold:
-            kodi_log(u'{}\n{:.3f} sec'.format(timer_name, total_time), 1)
+            kodi_log(f'{timer_name}\n{total_time:.3f} sec', 1)
 
 
 class TimerList():
@@ -155,7 +155,7 @@ def log_output(func_name):
         def wrapper(self, *args, **kwargs):
             """ Syntactic sugar to log output of function """
             response = func(self, *args, **kwargs)
-            log_text = u'{}.{}.'.format(self.__class__.__name__, func_name)
+            log_text = f'{self.__class__.__name__}.{func_name}.'
             log_text = format_name(log_text, *args, **kwargs)
             kodi_log(log_text, 1)
             kodi_log(response, 1)
