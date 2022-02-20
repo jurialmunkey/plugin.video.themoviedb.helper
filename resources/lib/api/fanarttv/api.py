@@ -78,7 +78,7 @@ class FanartTV(RequestAPI):
         def get_artwork_type(key, get_lang=True):
             if not key:
                 return
-            languages = [self.language] if get_lang else ['00', None, '']
+            languages = [get_lang if isinstance(get_lang, str) and get_lang != 'all' else self.language] if get_lang else ['00', None, '']
             data = (j for i in artwork_types.get(key, []) for j in request.get(i, []) if get_lang == 'all' or j.get('lang') in languages)
             if season is not None:
                 allowlist = [try_int(season), 'all']
@@ -90,11 +90,11 @@ class FanartTV(RequestAPI):
             try:
                 return next(response).get('url', '')
             except StopIteration:
-                if get_lang == 'all':
+                if isinstance(get_lang, str):
                     return
                 if not get_lang and (key in NO_LANGUAGE or not EN_FALLBACK):
                     return
-            return get_best_artwork(key, False if get_lang else 'all')  # Try again with no language OR all languages
+            return get_best_artwork(key, False if get_lang else 'en')  # Try again with no language OR all languages
 
         def get_artwork(key, get_list=False, get_lang=True):
             func = get_artwork_type if get_list else get_best_artwork
