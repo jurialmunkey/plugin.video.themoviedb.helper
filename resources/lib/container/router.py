@@ -68,9 +68,9 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.ftv_forced_lookup = self.params.pop('fanarttv', '').lower()
         self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only(), delay_write=True)  # Set after ftv_forced_lookup, is_widget, cache_only
         self.tmdb_cache_only = self.tmdb_is_cache_only()  # Set after ftv_api, cache_only
-        self.filter_key = self.params.get('filter_key', None),
-        self.filter_value = split_items(self.params.get('filter_value', None))[0],
-        self.exclude_key = self.params.get('exclude_key', None),
+        self.filter_key = self.params.get('filter_key', None)
+        self.filter_value = split_items(self.params.get('filter_value', None))[0]
+        self.exclude_key = self.params.get('exclude_key', None)
         self.exclude_value = split_items(self.params.get('exclude_value', None))[0]
         self.pagination = self.pagination_is_allowed()
         self.params = reconfigure_legacy_params(**self.params)
@@ -121,20 +121,20 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             if self.filter_value == 'is_empty':
                 if listitem.infolabels.get(self.filter_key) or listitem.infoproperties.get(self.filter_key):
                     return True
-            elif self.filter_key in listitem.infolabels:
+            if self.filter_key in listitem.infolabels:
                 if filtered_item(listitem.infolabels, self.filter_key, self.filter_value):
                     return True
-            elif self.filter_key in listitem.infoproperties:
+            if self.filter_key in listitem.infoproperties:
                 if filtered_item(listitem.infoproperties, self.filter_key, self.filter_value):
                     return True
         if self.exclude_key and self.exclude_value:
             if self.exclude_value == 'is_empty':
                 if not listitem.infolabels.get(self.exclude_key) and not listitem.infoproperties.get(self.exclude_key):
                     return True
-            elif self.exclude_key in listitem.infolabels:
+            if self.exclude_key in listitem.infolabels:
                 if filtered_item(listitem.infolabels, self.exclude_key, self.exclude_value, True):
                     return True
-            elif self.exclude_key in listitem.infoproperties:
+            if self.exclude_key in listitem.infoproperties:
                 if filtered_item(listitem.infoproperties, self.exclude_key, self.exclude_value, True):
                     return True
 
@@ -147,7 +147,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
     def _make_item(self, li):
         if not li:
             return
-        if not li.next_page and self.item_is_excluded(li):
+        if self.item_is_excluded(li):
             return
         li.set_episode_label()
         if self.hide_unaired and not li.infoproperties.get('specialseason'):
