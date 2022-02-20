@@ -147,7 +147,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
     def _make_item(self, li):
         if not li:
             return
-        if self.item_is_excluded(li):
+        if not li.next_page and self.item_is_excluded(li):
             return
         li.set_episode_label()
         if self.hide_unaired and not li.infoproperties.get('specialseason'):
