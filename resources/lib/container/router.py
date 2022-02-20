@@ -7,7 +7,7 @@ from resources.lib.addon.plugin import convert_type, reconfigure_legacy_params, 
 from resources.lib.addon.parser import parse_paramstring, try_int
 from resources.lib.addon.setutils import split_items, random_from_list, merge_two_dicts
 from resources.lib.addon.decorators import TimerList, ParallelThread
-from resources.lib.api.mapping import set_show, get_empty_item
+from resources.lib.api.mapping import set_show, get_empty_item, is_excluded
 from resources.lib.api.kodi.rpc import get_kodi_library, get_movie_details, get_tvshow_details, get_episode_details, get_season_details, set_playprogress
 from resources.lib.api.tmdb.api import TMDb
 from resources.lib.api.tmdb.lists import TMDbLists
@@ -28,13 +28,6 @@ from threading import Thread
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 PREGAME_PARENT = ['seasons', 'episodes', 'episode_groups', 'trakt_upnext', 'episode_group_seasons']
 LOG_TIMER_ITEMS = ['item_api', 'item_tmdb', 'item_ftv', 'item_map', 'item_cache', 'item_set', 'item_get', 'item_non']
-
-
-def filtered_item(item, key, value, exclude=False):
-    boolean = False if exclude else True  # Flip values if we want to exclude instead of include
-    if key and value and key in item and str(value).lower() in str(item[key]).lower():
-        boolean = exclude
-    return boolean
 
 
 class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLists):
@@ -68,10 +61,12 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.ftv_forced_lookup = self.params.pop('fanarttv', '').lower()
         self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only(), delay_write=True)  # Set after ftv_forced_lookup, is_widget, cache_only
         self.tmdb_cache_only = self.tmdb_is_cache_only()  # Set after ftv_api, cache_only
-        self.filter_key = self.params.get('filter_key', None)
-        self.filter_value = split_items(self.params.get('filter_value', None))[0]
-        self.exclude_key = self.params.get('exclude_key', None)
-        self.exclude_value = split_items(self.params.get('exclude_value', None))[0]
+        self.filters = {
+            'filter_key': self.params.get('filter_key', None),
+            'filter_value': split_items(self.params.get('filter_value', None))[0],
+            'exclude_key': self.params.get('exclude_key', None),
+            'exclude_value': split_items(self.params.get('exclude_value', None))[0]
+        }
         self.pagination = self.pagination_is_allowed()
         self.params = reconfigure_legacy_params(**self.params)
         self.thumb_override = 0
@@ -116,28 +111,6 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             return False
         return True
 
-    def item_is_excluded(self, listitem):
-        if self.filter_key and self.filter_value:
-            if self.filter_value == 'is_empty':
-                if listitem.infolabels.get(self.filter_key) or listitem.infoproperties.get(self.filter_key):
-                    return True
-            if self.filter_key in listitem.infolabels:
-                if filtered_item(listitem.infolabels, self.filter_key, self.filter_value):
-                    return True
-            if self.filter_key in listitem.infoproperties:
-                if filtered_item(listitem.infoproperties, self.filter_key, self.filter_value):
-                    return True
-        if self.exclude_key and self.exclude_value:
-            if self.exclude_value == 'is_empty':
-                if not listitem.infolabels.get(self.exclude_key) and not listitem.infoproperties.get(self.exclude_key):
-                    return True
-            if self.exclude_key in listitem.infolabels:
-                if filtered_item(listitem.infolabels, self.exclude_key, self.exclude_value, True):
-                    return True
-            if self.exclude_key in listitem.infoproperties:
-                if filtered_item(listitem.infoproperties, self.exclude_key, self.exclude_value, True):
-                    return True
-
     def _add_item(self, i, pagination=True):
         if not pagination and 'next_page' in i:
             return
@@ -147,7 +120,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
     def _make_item(self, li):
         if not li:
             return
-        if not li.next_page and self.item_is_excluded(li):
+        if not li.next_page and is_excluded(li, is_listitem=True, **self.filters):
             return
         li.set_episode_label()
         if self.hide_unaired and not li.infoproperties.get('specialseason'):

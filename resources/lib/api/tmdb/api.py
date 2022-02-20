@@ -12,6 +12,7 @@ from resources.lib.items.listitem import ListItem
 from resources.lib.items.pages import PaginatedItems
 from resources.lib.api.request import RequestAPI
 from resources.lib.api.tmdb.mapping import ItemMapper, get_episode_to_air
+from resources.lib.api.mapping import is_excluded
 from urllib.parse import quote_plus
 from json import loads
 
@@ -460,12 +461,14 @@ class TMDb(RequestAPI):
         kwargs['query'] = quote_plus(query)
         return self.get_basic_list(u'search/{}'.format(tmdb_type), tmdb_type, **kwargs)
 
-    def get_basic_list(self, path, tmdb_type, key='results', params=None, base_tmdb_type=None, limit=None, **kwargs):
+    def get_basic_list(self, path, tmdb_type, key='results', params=None, base_tmdb_type=None, limit=None, filters={}, **kwargs):
         response = self.get_request_sc(path, **kwargs)
         results = response.get(key, []) if response else []
         items = [
             self.mapper.get_info(i, tmdb_type, definition=params, base_tmdb_type=base_tmdb_type)
             for i in results if i]
+        if filters:
+            items = [i for i in items if not is_excluded(i, **filters)]
         if try_int(response.get('page', 0)) < try_int(response.get('total_pages', 0)):
             items.append({'next_page': try_int(response.get('page', 0)) + 1})
         elif limit is not None:

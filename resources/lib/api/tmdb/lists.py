@@ -17,6 +17,7 @@ class TMDbLists():
             base_tmdb_type=tmdb_type,
             key=info_model.get('key', 'results'),
             params=info_model.get('params'),
+            filters=self.filters,
             limit=limit or info_model.get('limit'),
             page=page)
         self.kodi_db = self.get_kodi_database(info_tmdb_type)
