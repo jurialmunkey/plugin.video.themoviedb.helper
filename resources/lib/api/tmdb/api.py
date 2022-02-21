@@ -20,6 +20,7 @@ from json import loads
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 ADDONPATH = ADDON.getAddonInfo('path')
 ARTWORK_QUALITY = ADDON.getSettingInt('artwork_quality')
+EN_FALLBACK = ADDON.getSettingBool('fanarttv_enfallback')
 
 
 API_URL = 'https://api.themoviedb.org/3'
@@ -41,7 +42,7 @@ class TMDb(RequestAPI):
         self.language = language
         self.iso_language = language[:2]
         self.iso_country = language[-2:]
-        self.req_language = u'{0}-{1}&include_image_language={0},null'.format(self.iso_language, self.iso_country)
+        self.req_language = u'{0}-{1}&include_image_language={0},null{2}'.format(self.iso_language, self.iso_country, ',en' if EN_FALLBACK else '')
         self.mpaa_prefix = mpaa_prefix
         self.append_to_response = APPEND_TO_RESPONSE
         self.req_strip += [(self.append_to_response, ''), (self.req_language, self.iso_language)]
