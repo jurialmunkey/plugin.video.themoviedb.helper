@@ -8,9 +8,9 @@ from resources.lib.api.fanarttv.api import FanartTV
 from resources.lib.addon.timedate import set_timestamp, get_timestamp
 from resources.lib.addon.constants import IMAGEPATH_QUALITY_POSTER, IMAGEPATH_QUALITY_FANART, IMAGEPATH_QUALITY_THUMBS, IMAGEPATH_QUALITY_CLOGOS, IMAGEPATH_ALL, ARTWORK_BLACKLIST
 from resources.lib.addon.decorators import TimerList, ParallelThread
-from resources.lib.addon.plugin import kodi_log
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
+FTV_SECOND_PREF = ADDON.getSettingBool('fanarttv_secondpref')
 ARTWORK_QUALITY = ADDON.getSettingInt('artwork_quality')
 ARTWORK_QUALITY_FANART = IMAGEPATH_QUALITY_FANART[ARTWORK_QUALITY]
 ARTWORK_QUALITY_THUMBS = IMAGEPATH_QUALITY_THUMBS[ARTWORK_QUALITY]
@@ -220,10 +220,26 @@ class ItemBuilder(_ArtworkSelector):
         return self._cache.set_cache(item, name, cache_days=CACHE_DAYS)
         # TODO: Remember to include OMDb too!
 
-    def get_item_artwork(self, artwork):
-        art_dict = artwork.get('tmdb') or {}
-        art_dict.update(artwork.get('fanarttv') or {})
-        art_dict.update(artwork.get('manual') or {})
+    def get_item_artwork(self, artwork, art_dict={}):
+        def set_artwork(details=None, blacklist=[], whitelist=[]):
+            if not details:
+                return
+            for k, v in details.items():
+                if not v:
+                    continue
+                if whitelist and k not in whitelist:
+                    continue
+                if k in blacklist and art_dict.get(k):
+                    continue
+                art_dict[k] = v
+        tmdb_art = artwork.get(ARTWORK_QUALITY) or self.map_artwork(artwork.get('tmdb', {}))
+        if FTV_SECOND_PREF:
+            set_artwork(artwork.get('fanarttv'))
+            set_artwork(tmdb_art)
+        else:
+            set_artwork(tmdb_art)
+            set_artwork(artwork.get('fanarttv'), blacklist=ARTWORK_BLACKLIST[ARTWORK_QUALITY])
+        set_artwork(artwork.get('manual'))
         return art_dict
 
     def get_listitem(self, i):
@@ -237,7 +253,5 @@ class ItemBuilder(_ArtworkSelector):
         if not item or 'listitem' not in item:
             return li
         li.set_details(item['listitem'])
-        li.set_artwork(item['artwork'].get(ARTWORK_QUALITY))
-        li.set_artwork(item['artwork'].get('fanarttv'), blacklist=ARTWORK_BLACKLIST[ARTWORK_QUALITY])
-        li.set_artwork(item['artwork'].get('manual'))
+        li.art = self.get_item_artwork(item['artwork'], {})
         return li

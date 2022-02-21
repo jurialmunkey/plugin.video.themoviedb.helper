@@ -27,7 +27,7 @@ from threading import Thread
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 PREGAME_PARENT = ['seasons', 'episodes', 'episode_groups', 'trakt_upnext', 'episode_group_seasons']
-LOG_TIMER_ITEMS = ['item_api', 'item_tmdb', 'item_ftv', 'item_map', 'item_cache', 'item_set', 'item_get', 'item_non']
+LOG_TIMER_ITEMS = ['item_api', 'item_tmdb', 'item_ftv', 'item_map', 'item_cache', 'item_set', 'item_get', 'item_non', 'item_art']
 
 
 class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLists):

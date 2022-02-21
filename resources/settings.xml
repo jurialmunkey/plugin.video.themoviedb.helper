@@ -50,10 +50,13 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32001]" type="text" id="omdb_apikey" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32030]" type="lsep"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32019]" type="text" id="fanarttv_clientkey" />
-        <setting label="$ADDON[plugin.video.themoviedb.helper 32399]" type="bool" id="fanarttv_enfallback" default="true" subsetting="true" />
+
         <setting label="$ADDON[plugin.video.themoviedb.helper 32021]" type="bool" id="fanarttv_lookup" default="false" subsetting="true" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32028]" type="bool" id="widget_fanarttv_lookup" default="false" subsetting="true" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32163]" type="bool" id="service_fanarttv_lookup" default="false" subsetting="true" />
+
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32408]" type="bool" id="fanarttv_secondpref" default="false" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32399]" type="bool" id="fanarttv_enfallback" default="true" />
     </category>
     <category label="$ADDON[plugin.video.themoviedb.helper 32083]">
         <setting label="$ADDON[plugin.video.themoviedb.helper 32031]" type="lsep"/>
