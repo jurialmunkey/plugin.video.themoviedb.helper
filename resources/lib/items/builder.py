@@ -220,14 +220,15 @@ class ItemBuilder(_ArtworkSelector):
         return self._cache.set_cache(item, name, cache_days=CACHE_DAYS)
         # TODO: Remember to include OMDb too!
 
-    def get_item_artwork(self, artwork, art_dict={}):
-        def set_artwork(details=None, blacklist=[], whitelist=[]):
+    def get_item_artwork(self, artwork, art_dict={}, is_season=False):
+        def set_artwork(details=None, blacklist=[]):
             if not details:
+                return
+            if not blacklist:
+                art_dict.update(details)
                 return
             for k, v in details.items():
                 if not v:
-                    continue
-                if whitelist and k not in whitelist:
                     continue
                 if k in blacklist and art_dict.get(k):
                     continue
@@ -235,7 +236,7 @@ class ItemBuilder(_ArtworkSelector):
         tmdb_art = artwork.get(ARTWORK_QUALITY) or self.map_artwork(artwork.get('tmdb', {}))
         if FTV_SECOND_PREF:
             set_artwork(artwork.get('fanarttv'))
-            set_artwork(tmdb_art)
+            set_artwork(tmdb_art, blacklist=['landscape'] if is_season else [])
         else:
             set_artwork(tmdb_art)
             set_artwork(artwork.get('fanarttv'), blacklist=ARTWORK_BLACKLIST[ARTWORK_QUALITY])
@@ -253,5 +254,5 @@ class ItemBuilder(_ArtworkSelector):
         if not item or 'listitem' not in item:
             return li
         li.set_details(item['listitem'])
-        li.art = self.get_item_artwork(item['artwork'], {})
+        li.art = self.get_item_artwork(item['artwork'], {}, is_season=mediatype in ['season', 'episode'])
         return li
