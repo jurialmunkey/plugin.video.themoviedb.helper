@@ -132,18 +132,18 @@ class ListItemMonitor(CommonMonitorFunctions):
             self.pre_folder = self.cur_folder
 
     @try_except_log('lib.monitor.listitem.process_artwork')
-    def process_artwork(self, details, tmdb_type, artwork):
+    def process_artwork(self, artwork, tmdb_type):
         self.clear_property_list(SETMAIN_ARTWORK)
         if not self.is_same_item():
             return
-        art_details = self.ib.get_item_artwork(artwork)
-        self.set_iter_properties(art_details, SETMAIN_ARTWORK)
+        artwork = self.ib.get_item_artwork(artwork, is_season=True if self.season else False)
+        self.set_iter_properties(artwork, SETMAIN_ARTWORK)
 
         # Crop Image
         if xbmc.getCondVisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"):
             self.crop_img = ImageFunctions(method='crop', artwork=self.get_artwork(
                 source="Art(tvshow.clearlogo)|Art(clearlogo)",
-                fallback=art_details.get('clearlogo')))
+                fallback=artwork.get('clearlogo')))
             self.crop_img.setName('crop_img')
             self.crop_img.start()
 
@@ -290,7 +290,7 @@ class ListItemMonitor(CommonMonitorFunctions):
 
         # Get our artwork properties
         if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
-            thread_artwork = Thread(target=self.process_artwork, args=[details, tmdb_type, artwork])
+            thread_artwork = Thread(target=self.process_artwork, args=[artwork, tmdb_type])
             thread_artwork.start()
 
         # Item changed whilst retrieving details so lets clear and get next item
