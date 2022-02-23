@@ -189,12 +189,13 @@ class _TraktLists():
         return response.items if not next_page else response.items + response.next_page
 
     @is_authorized
-    def get_list_of_lists(self, path, page=1, limit=250, authorize=False, next_page=True):
+    def get_list_of_lists(self, path, page=1, limit=250, authorize=False, next_page=True, sort_likes=False):
         response = self.get_response(path, page=page, limit=limit)
         if not response:
             return
         items = []
-        for i in response.json():
+        sorted_list = sorted(response.json(), key=lambda i: i.get('likes', 0) or i.get('list', {}).get('likes', 0), reverse=True) if sort_likes else response.json()
+        for i in sorted_list:
             if i.get('list', {}).get('name'):
                 i = i.get('list', {})
             elif not i.get('name'):

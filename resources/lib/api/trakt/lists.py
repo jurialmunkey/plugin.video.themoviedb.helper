@@ -98,7 +98,7 @@ class TraktLists():
             if not kwargs['query']:
                 return
             self.container_update = u'{},replace'.format(encode_url(PLUGINPATH, **kwargs))
-        items = self.trakt_api.get_list_of_lists(path=u'search/list?query={}'.format(query))
+        items = self.trakt_api.get_list_of_lists(path=u'search/list?query={}&fields=name'.format(query), sort_likes=True)
         self.library = 'video'
         return items
 
