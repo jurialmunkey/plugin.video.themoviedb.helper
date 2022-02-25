@@ -278,8 +278,9 @@ class ListItemMonitor(CommonMonitorFunctions):
             self.dbtype = convert_type(tmdb_type, 'dbtype')
         self.ib.ftv_api = self.ftv_api if ADDON.getSettingBool('service_fanarttv_lookup') else None
         details = self.ib.get_item(tmdb_type, tmdb_id, self.season, self.episode)
-        artwork = details['artwork'] if details else None
-        details = details['listitem'] if details else None
+        if details:
+            artwork = details['artwork']
+            details = details['listitem']
         if not details:
             self.clear_properties()
             return get_property('IsUpdating', clear_property=True)

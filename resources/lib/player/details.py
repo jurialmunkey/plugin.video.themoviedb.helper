@@ -63,11 +63,12 @@ def get_item_details(tmdb_type, tmdb_id, season=None, episode=None, language=Non
     tmdb_api = TMDb(language=language) if language else TMDb()
     ib = ItemBuilder(tmdb_api=tmdb_api)
     details = ib.get_item(tmdb_type, tmdb_id, season, episode)
-    details = details['listitem'] if details else None
-    del tmdb_api
-    del ib
+    if details:
+        artwork = details['artwork']
+        details = details['listitem']
     if not details:
         return
+    details['art'] = ib.get_item_artwork(artwork, is_season=True if season else False)
     details = ListItem(**details)
     details.infolabels['mediatype'] == 'movie' if tmdb_type == 'movie' else 'episode'
     details.set_details(details=get_external_ids(details, season=season, episode=episode))
