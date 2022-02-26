@@ -4,7 +4,7 @@ from resources.lib.files.simplecache import SimpleCache
 from resources.lib.files.utils import get_pickle_name
 # from resources.lib.files.utils import pickle_deepcopy
 # from threading import Thread
-# from resources.lib.addon.decorators import TimerList
+from resources.lib.addon.decorators import TimerList
 
 CACHE_LONG = 14
 CACHE_SHORT = 1
@@ -33,10 +33,10 @@ class BasicCache(object):
         cache_name = get_pickle_name(cache_name or '')
         no_hdd = True if self._id_list and cache_name not in self._id_list else False
         return self._cache.get(cache_name, no_hdd=no_hdd)
-        # with TimerList(self._timers, 'item_get') as tl:
+        # with TimerList(self._timers, 'item_getx' if no_hdd else 'item_get', log_threshold=0) as tl:
         #     item = self._cache.get(cache_name, no_hdd=no_hdd)
         #     if not item:
-        #         tl.list_obj = self._timers.setdefault('item_non', [])
+        #         tl.list_obj = self._timers.setdefault('item_nonx' if no_hdd else 'item_non', [])
         # return item
 
     def get_id_list(self):
