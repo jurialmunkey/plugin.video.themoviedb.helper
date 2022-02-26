@@ -161,7 +161,7 @@ class _TraktLists():
         cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
         sorted_items = self.get_sorted_list(
             path, sort_by, sort_how, extended,
-            permitted_types=['movie', 'show', 'person'],
+            permitted_types=['movie', 'show', 'person', 'episode'],
             cache_refresh=cache_refresh) or {}
         paginated_items = PaginatedItems(
             items=sorted_items.get('items', []), page=page, limit=limit)
