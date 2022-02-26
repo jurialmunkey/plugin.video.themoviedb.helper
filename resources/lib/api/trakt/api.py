@@ -105,8 +105,7 @@ class _TraktLists():
             permitted_types=permitted_types)
 
     @use_simple_cache(cache_days=CACHE_SHORT)
-    def get_simple_list(self, *args, **kwargs):
-        trakt_type = kwargs.pop('trakt_type', None)
+    def get_simple_list(self, *args, trakt_type=None, **kwargs):
         response = self.get_response(*args, **kwargs)
         if not response:
             return
@@ -586,9 +585,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
             headers=self.headers,
             method='delete')
 
-    def post_response(self, *args, **kwargs):
-        postdata = kwargs.pop('postdata', None)
-        response_method = kwargs.pop('response_method', 'post')
+    def post_response(self, *args, postdata=None, response_method='post', **kwargs):
         return self.get_simple_api_request(
             self.get_request_url(*args, **kwargs),
             headers=self.headers,

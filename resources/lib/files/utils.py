@@ -178,14 +178,11 @@ def get_pickle(cache_name, json_dump=False):
         return cache_obj.get('my_object')
 
 
-def use_pickle(func, *args, **kwargs):
+def use_pickle(func, *args, cache_name='', cache_only=False, cache_refresh=False, **kwargs):
     """
     Simplecache takes func with args and kwargs
     Returns the cached item if it exists otherwise does the function
     """
-    cache_name = kwargs.pop('cache_name', '')
-    cache_only = kwargs.pop('cache_only', False)
-    cache_refresh = kwargs.pop('cache_refresh', False)
     my_object = get_pickle(cache_name) if not cache_refresh else None
     if my_object:
         return my_object
