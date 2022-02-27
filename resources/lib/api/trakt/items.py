@@ -92,7 +92,10 @@ def _get_item_unique_ids(item, unique_ids=None, prefix=None, show=None):
 def _get_item_info(item, item_type=None, base_item=None, check_tmdb_id=True, params_def=None):
     base_item = base_item or {}
     item_info = item.get(item_type, {}) or item
-    show_item = item.get('show') if item_type == 'episode' else None
+    show_item = None
+    if item_type == 'episode':
+        show_item = item.get('show')
+        params_def = params_def or EPISODE_PARAMS
     if not item_info:
         return base_item
     if check_tmdb_id and not item_info.get('ids', {}).get('tmdb'):

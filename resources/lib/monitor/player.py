@@ -89,7 +89,7 @@ class PlayerMonitor(xbmc.Player, CommonMonitorFunctions):
         # No need for merging Kodi DB artwork as we should have access to that via normal player properties
         if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
             if ADDON.getSettingBool('service_fanarttv_lookup'):
-                self.details['art'] = self.ib.get_item_artwork(self.artwork)
+                self.details['art'] = self.ib.get_item_artwork(self.artwork, is_season=True if self.season else False)
             self.set_iter_properties(self.details, SETMAIN_ARTWORK)
 
         self.set_properties(self.details)

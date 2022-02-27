@@ -105,8 +105,7 @@ class _TraktLists():
             permitted_types=permitted_types)
 
     @use_simple_cache(cache_days=CACHE_SHORT)
-    def get_simple_list(self, *args, **kwargs):
-        trakt_type = kwargs.pop('trakt_type', None)
+    def get_simple_list(self, *args, trakt_type=None, **kwargs):
         response = self.get_response(*args, **kwargs)
         if not response:
             return
@@ -162,7 +161,7 @@ class _TraktLists():
         cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
         sorted_items = self.get_sorted_list(
             path, sort_by, sort_how, extended,
-            permitted_types=['movie', 'show', 'person'],
+            permitted_types=['movie', 'show', 'person', 'episode'],
             cache_refresh=cache_refresh) or {}
         paginated_items = PaginatedItems(
             items=sorted_items.get('items', []), page=page, limit=limit)
@@ -189,12 +188,13 @@ class _TraktLists():
         return response.items if not next_page else response.items + response.next_page
 
     @is_authorized
-    def get_list_of_lists(self, path, page=1, limit=250, authorize=False, next_page=True):
+    def get_list_of_lists(self, path, page=1, limit=250, authorize=False, next_page=True, sort_likes=False):
         response = self.get_response(path, page=page, limit=limit)
         if not response:
             return
         items = []
-        for i in response.json():
+        sorted_list = sorted(response.json(), key=lambda i: i.get('likes', 0) or i.get('list', {}).get('likes', 0), reverse=True) if sort_likes else response.json()
+        for i in sorted_list:
             if i.get('list', {}).get('name'):
                 i = i.get('list', {})
             elif not i.get('name'):
@@ -584,9 +584,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
             headers=self.headers,
             method='delete')
 
-    def post_response(self, *args, **kwargs):
-        postdata = kwargs.pop('postdata', None)
-        response_method = kwargs.pop('response_method', 'post')
+    def post_response(self, *args, postdata=None, response_method='post', **kwargs):
         return self.get_simple_api_request(
             self.get_request_url(*args, **kwargs),
             headers=self.headers,

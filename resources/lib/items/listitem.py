@@ -130,18 +130,6 @@ class _ListItem(object):
         self.unique_ids = merge_two_dicts(details.get('unique_ids', {}), self.unique_ids, reverse=reverse)
         self.cast = self.cast or details.get('cast', [])
 
-    def set_artwork(self, details=None, blacklist=[], whitelist=[]):
-        if not details:
-            return
-        for k, v in details.items():
-            if not v:
-                continue
-            if whitelist and k not in whitelist:
-                continue
-            if k in blacklist and self.art.get(k):
-                continue
-            self.art[k] = v
-
     def _set_params_reroute_skinshortcuts(self):
         self.params['widget'] = 'true'
         # Reroute sortable lists to display options in skinshortcuts

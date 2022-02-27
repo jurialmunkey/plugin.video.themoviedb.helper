@@ -49,6 +49,7 @@ class SimpleCache(object):
         self._mem_only = mem_only
         self._queue = []
         self._delaywrite = delay_write
+        self._connection = None
         self.check_cleanup()
         kodi_log("CACHE: Initialized")
 
@@ -225,19 +226,23 @@ class SimpleCache(object):
     def _get_database(self, attempts=2):
         '''get reference to our sqllite _database - performs basic integrity check'''
         try:
-            connection = sqlite3.connect(self._db_file, timeout=30, isolation_level=None)
+            connection = self._connection or sqlite3.connect(self._db_file, timeout=30, isolation_level=None, check_same_thread=not self._delaywrite)
             connection.execute('SELECT * FROM simplecache LIMIT 1')
+            if self._delaywrite:
+                self._connection = connection
             return connection
         except Exception:
             # our _database is corrupt or doesn't exist yet, we simply try to recreate it
             if xbmcvfs.exists(self._db_file):
                 xbmcvfs.delete(self._db_file)
             try:
-                connection = sqlite3.connect(self._db_file, timeout=30, isolation_level=None)
+                connection = self._connection or sqlite3.connect(self._db_file, timeout=30, isolation_level=None, check_same_thread=not self._delaywrite)
                 connection.execute(
                     """CREATE TABLE IF NOT EXISTS simplecache(
                     id TEXT UNIQUE, expires INTEGER, data TEXT, checksum INTEGER)""")
                 connection.execute("CREATE INDEX idx ON simplecache(id)")
+                if self._delaywrite:
+                    self._connection = connection
                 return connection
             except Exception as error:
                 kodi_log(f'CACHE: Exception while initializing _database: {error} ({attempts})', 1)

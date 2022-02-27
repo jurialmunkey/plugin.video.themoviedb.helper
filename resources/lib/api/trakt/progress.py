@@ -5,7 +5,7 @@ from resources.lib.addon.timedate import convert_timestamp, date_in_range, get_r
 from resources.lib.files.cache import CACHE_SHORT, CACHE_LONG, use_simple_cache
 from resources.lib.items.pages import PaginatedItems
 from resources.lib.api.mapping import get_empty_item
-from resources.lib.api.trakt.items import TraktItems, EPISODE_PARAMS
+from resources.lib.api.trakt.items import TraktItems
 from resources.lib.api.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache
 from resources.lib.addon.decorators import ParallelThread
 
@@ -19,8 +19,7 @@ class _TraktProgress():
         self._cache.del_cache('trakt.last_activities')  # Wipe last activities cache to update now
         response = self._get_inprogress_items('show' if trakt_type == 'episode' else trakt_type)
         response = TraktItems(response, trakt_type=trakt_type).build_items(
-            sort_by=sort_by, sort_how=sort_how,
-            params_def=EPISODE_PARAMS if trakt_type == 'episode' else None)
+            sort_by=sort_by, sort_how=sort_how)
         response = PaginatedItems(response['items'], page=page, limit=limit)
         return response.items + response.next_page
 
@@ -144,7 +143,7 @@ class _TraktProgress():
         if unique_id:
             showitem = self.get_details('show', unique_id)
             response = self.get_upnext_episodes(unique_id, showitem)
-            response = TraktItems(response, trakt_type='episode').configure_items(params_def=EPISODE_PARAMS)
+            response = TraktItems(response, trakt_type='episode').configure_items()
             response = PaginatedItems(response['items'], page=page, limit=limit)
             return response.items + response.next_page
 
@@ -154,7 +153,7 @@ class _TraktProgress():
         limit = limit or self.item_limit
         self._cache.del_cache('trakt.last_activities')  # Wipe last activities cache to update now
         response = self._get_upnext_episodes_list(sort_by_premiered=sort_by_premiered)
-        response = TraktItems(response, trakt_type='episode').configure_items(params_def=EPISODE_PARAMS)
+        response = TraktItems(response, trakt_type='episode').configure_items()
         response = PaginatedItems(response['items'], page=page, limit=limit)
         return response.items + response.next_page
 

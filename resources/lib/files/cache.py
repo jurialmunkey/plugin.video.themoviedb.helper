@@ -33,10 +33,10 @@ class BasicCache(object):
         cache_name = get_pickle_name(cache_name or '')
         no_hdd = True if self._id_list and cache_name not in self._id_list else False
         return self._cache.get(cache_name, no_hdd=no_hdd)
-        # with TimerList(self._timers, 'item_get') as tl:
+        # with TimerList(self._timers, 'item_getx' if no_hdd else 'item_get', log_threshold=0) as tl:
         #     item = self._cache.get(cache_name, no_hdd=no_hdd)
         #     if not item:
-        #         tl.list_obj = self._timers.setdefault('item_non', [])
+        #         tl.list_obj = self._timers.setdefault('item_nonx' if no_hdd else 'item_non', [])
         # return item
 
     def get_id_list(self):
@@ -69,20 +69,15 @@ class BasicCache(object):
         self._cache.set(cache_name, None, cache_days=0)
 
     @try_except_log('lib.addon.cache use_cache')
-    def use_cache(self, func, *args, **kwargs):
+    def use_cache(
+            self, func, *args,
+            cache_days=14, cache_name='', cache_only=False, cache_force=False, cache_strip=[], cache_fallback=False,
+            cache_refresh=False, cache_combine_name=False, headers=None,
+            **kwargs):
         """
         Simplecache takes func with args and kwargs
         Returns the cached item if it exists otherwise does the function
         """
-        cache_days = kwargs.pop('cache_days', None) or 14
-        cache_name = kwargs.pop('cache_name', None) or ''
-        cache_only = kwargs.pop('cache_only', False)
-        cache_force = kwargs.pop('cache_force', False)
-        cache_strip = kwargs.pop('cache_strip', None) or []
-        cache_fallback = kwargs.pop('cache_fallback', False)
-        cache_refresh = kwargs.pop('cache_refresh', False)
-        cache_combine_name = kwargs.pop('cache_combine_name', False)
-        headers = kwargs.pop('headers', None) or None
         if not cache_name or cache_combine_name:
             cache_name = format_name(cache_name, *args, **kwargs)
             for k, v in cache_strip:

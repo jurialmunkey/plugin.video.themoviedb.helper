@@ -202,30 +202,24 @@ class RequestAPI(object):
         kwargs['cache_days'] = CACHE_LONG
         return self.get_request(*args, **kwargs)
 
-    def get_request(self, *args, **kwargs):
+    def get_request(
+            self, *args,
+            cache_days=0, cache_name='', cache_only=False, cache_force=False, cache_fallback=False, cache_refresh=False,
+            cache_combine_name=False, cache_strip=[], headers=None, postdata=None, is_xml=False,
+            **kwargs):
         """ Get API request from cache (or online if no cached version) """
-        cache_days = kwargs.pop('cache_days', 0)  # Number of days to cache retrieved object if not already in cache.
-        cache_name = kwargs.pop('cache_name', '')  # Affix to standard cache name.
-        cache_only = kwargs.pop('cache_only', False)  # Only retrieve object from cache.
-        cache_force = kwargs.pop('cache_force', False)  # Force retrieved object to be saved in cache. Use int to specify cache_days for fallback object.
-        cache_fallback = kwargs.pop('cache_fallback', False)  # Object to force cache if no object retrieved.
-        cache_refresh = kwargs.pop('cache_refresh', False)  # Ignore cached timestamps and retrieve new object.
-        cache_combine_name = kwargs.pop('cache_combine_name', False)  # Combine given cache_name with auto naming via args/kwargs
-        cache_strip = self.req_strip + kwargs.pop('cache_strip', [])  # Strip out api key and url from cache name
-        headers = kwargs.pop('headers', None) or self.headers  # Optional override to default headers.
-        postdata = kwargs.pop('postdata', None)  # Postdata if need to POST to a RESTful API.
-        is_xml = kwargs.pop('is_xml', False)  # Response needs translating from XML to dict
+        cache_strip = self.req_strip + cache_strip
         request_url = self.get_request_url(*args, **kwargs)
         return self._cache.use_cache(
             self.get_api_request_json, request_url,
-            headers=headers,
-            postdata=postdata,
-            is_xml=is_xml,
-            cache_refresh=cache_refresh,
-            cache_days=cache_days,
-            cache_name=cache_name,
-            cache_only=cache_only,
-            cache_force=cache_force,
-            cache_fallback=cache_fallback,
-            cache_combine_name=cache_combine_name,
-            cache_strip=cache_strip)
+            headers=headers or self.headers,  # Optional override to default headers.
+            postdata=postdata,  # Postdata if need to POST to a RESTful API.
+            is_xml=is_xml,  # Response needs translating from XML to dict
+            cache_refresh=cache_refresh,  # Ignore cached timestamps and retrieve new object.
+            cache_days=cache_days,  # Number of days to cache retrieved object if not already in cache.
+            cache_name=cache_name,  # Affix to standard cache name.
+            cache_only=cache_only,  # Only retrieve object from cache.
+            cache_force=cache_force,  # Force retrieved object to be saved in cache. Use int to specify cache_days for fallback object.
+            cache_fallback=cache_fallback,  # Object to force cache if no object retrieved.
+            cache_combine_name=cache_combine_name,  # Combine given cache_name with auto naming via args/kwargs
+            cache_strip=cache_strip)  # Strip out api key and url from cache name
