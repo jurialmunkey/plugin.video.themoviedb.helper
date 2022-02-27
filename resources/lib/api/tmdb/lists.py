@@ -63,7 +63,7 @@ class TMDbLists():
         self.tmdb_cache_only = False
         self.kodi_db = self.get_kodi_database('tv')
         self.container_content = convert_type('episode', 'container')
-        self.plugin_category = '{} {}'.format(xbmc.getLocalizedString(20373), season)
+        self.plugin_category = f'{xbmc.getLocalizedString(20373)} {season}'
         return items
 
     def list_cast(self, tmdb_id, tmdb_type, season=None, episode=None, **kwargs):

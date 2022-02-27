@@ -28,7 +28,7 @@ def get_players_from_file():
             plugins = meta.get('plugin') or 'plugin.undefined'  # Give dummy name to undefined plugins so that they fail the check
             plugins = plugins if isinstance(plugins, list) else [plugins]  # Listify for simplicity of code
             for i in plugins:
-                if not xbmc.getCondVisibility(u'System.AddonIsEnabled({0})'.format(i)):
+                if not xbmc.getCondVisibility(f'System.AddonIsEnabled({i})'):
                     break  # System doesn't have a required plugin so skip this player
             else:
                 meta['plugin'] = plugins[0]
@@ -65,11 +65,11 @@ class _ConfigurePlayer():
             return
         # Name; Enable/Disable; Priority; is_resolvable; fallbacks(?)
         return [
-            u'name: {}'.format(self.player.get('name')),
-            u'disabled: {}'.format(self.player.get('disabled', 'false').lower()),
-            u'priority: {}'.format(self.player.get('priority') or PLAYERS_PRIORITY),
-            u'is_resolvable: {}'.format(self.player.get('is_resolvable', 'select')),
-            u'fallback: {}'.format(dumps(self.player.get('fallback'))),
+            f'name: {self.player.get("name")}',
+            f'disabled: {self.player.get("disabled", "false").lower()}',
+            f'priority: {self.player.get("priority") or PLAYERS_PRIORITY}',
+            f'is_resolvable: {self.player.get("is_resolvable", "select")}',
+            f'fallback: {dumps(self.player.get("fallback"))}',
             ADDON.getLocalizedString(32330),
             xbmc.getLocalizedString(190)]
 
@@ -87,7 +87,7 @@ class _ConfigurePlayer():
         self.player['disabled'] = disabled
 
     def set_priority(self):
-        priority = u'{}'.format(self.player.get('priority') or PLAYERS_PRIORITY)  # Input numeric takes str for some reason?!
+        priority = f'{self.player.get("priority") or PLAYERS_PRIORITY}'  # Input numeric takes str for some reason?!
         priority = xbmcgui.Dialog().input(
             ADDON.getLocalizedString(32344).format(self.filename),
             defaultt=priority, type=xbmcgui.INPUT_NUMERIC)
@@ -121,7 +121,7 @@ class _ConfigurePlayer():
         """ Get the available methods for the player and ask user to select one """
         mt = self._get_method_type(og_method)
         methods = [
-            u'{} {}'.format(filename, i) for i in _get_player_methods(player) if mt in i
+            f'{filename} {i}' for i in _get_player_methods(player) if mt in i
             and (filename != self.filename or i != og_method)]  # Avoid adding same fallback method as original
         if not methods:
             return
@@ -142,7 +142,7 @@ class _ConfigurePlayer():
         # Get the methods that the player supports and ask user to select which they want to set
         methods = _get_player_methods(self.player)
         x = xbmcgui.Dialog().select(ADDON.getLocalizedString(32342).format(self.filename), [
-            u'{}: {}'.format(i, self.player.get('fallback', {}).get(i, 'null')) for i in methods])
+            f'{i}: {self.player.get("fallback", {}).get(i, "null")}' for i in methods])
         if x == -1:
             return
         fallback = self.get_fallback_player(methods[x])

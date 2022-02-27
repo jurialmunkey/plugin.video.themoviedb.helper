@@ -23,9 +23,9 @@ def monitor_userlist():
     # Build list choices
     with busy_dialog():
         user_lists = [
-            {'label': u'{} {}'.format(ADDON.getLocalizedString(32193), xbmc.getLocalizedString(20342)),
+            {'label': f'{ADDON.getLocalizedString(32193)} {xbmc.getLocalizedString(20342)}',
                 'params': {'user_slug': 'me', 'list_slug': 'watchlist/movies'}},
-            {'label': u'{} {}'.format(ADDON.getLocalizedString(32193), xbmc.getLocalizedString(20343)),
+            {'label': f'{ADDON.getLocalizedString(32193)} {xbmc.getLocalizedString(20343)}',
                 'params': {'user_slug': 'me', 'list_slug': 'watchlist/shows'}}]
         user_lists += TraktAPI().get_list_of_lists('users/me/lists', authorize=True, next_page=False) or []
         user_lists += TraktAPI().get_list_of_lists('users/likes/lists', authorize=True, next_page=False) or []
@@ -64,7 +64,7 @@ def monitor_userlist():
 
 def library_autoupdate(list_slugs=None, user_slugs=None, busy_spinner=False, force=False):
     kodi_log(u'UPDATING TV SHOWS LIBRARY', 1)
-    xbmcgui.Dialog().notification('TMDbHelper', u'{}...'.format(ADDON.getLocalizedString(32167)))
+    xbmcgui.Dialog().notification('TMDbHelper', f'{ADDON.getLocalizedString(32167)}...')
 
     # Update library from Trakt lists
     library_adder = None

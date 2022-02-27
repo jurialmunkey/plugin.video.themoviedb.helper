@@ -10,7 +10,7 @@ ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 class OMDb(RequestAPI):
     def __init__(self, api_key=None, delay_write=False):
         super(OMDb, self).__init__(
-            req_api_key=u'apikey={0}'.format(api_key or ADDON.getSettingString('omdb_apikey')),
+            req_api_key=f'apikey={api_key or ADDON.getSettingString("omdb_apikey")}',
             req_api_name='OMDb',
             req_api_url='https://www.omdbapi.com/',
             delay_write=delay_write)

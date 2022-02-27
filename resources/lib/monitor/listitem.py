@@ -15,7 +15,7 @@ ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 def get_container():
     widget_id = get_property('WidgetContainer', is_type=int)
     if widget_id:
-        return u'Container({0}).'.format(widget_id)
+        return f'Container({widget_id}).'
     return 'Container.'
 
 
@@ -25,7 +25,7 @@ def get_container_item(container=None):
             "Window.IsVisible(movieinformation)] + "
             "!Skin.HasSetting(TMDbHelper.ForceWidgetContainer)"):
         return 'ListItem.'
-    return u'{}ListItem.'.format(container or get_container())
+    return f'{container or get_container()}ListItem.'
 
 
 class ListItemMonitor(CommonMonitorFunctions):
@@ -33,23 +33,27 @@ class ListItemMonitor(CommonMonitorFunctions):
         super(ListItemMonitor, self).__init__()
         self.cur_item = 0
         self.pre_item = 1
+        self.cur_name = ''
         self.cur_folder = None
         self.pre_folder = None
         self.property_prefix = 'ListItem'
         self._last_blur_fallback = False
+        self._details = {}
+        self._nextaired = {}
+        self._ratings = {}
 
     def get_container(self):
         self.container = get_container()
         self.container_item = get_container_item(self.container)
 
     def get_infolabel(self, infolabel):
-        return xbmc.getInfoLabel(u'{}{}'.format(self.container_item, infolabel))
+        return xbmc.getInfoLabel(f'{self.container_item}{infolabel}')
 
     def get_position(self):
-        return xbmc.getInfoLabel(u'{}CurrentItem'.format(self.container))
+        return xbmc.getInfoLabel(f'{self.container}CurrentItem')
 
     def get_numitems(self):
-        return xbmc.getInfoLabel(u'{}NumItems'.format(self.container))
+        return xbmc.getInfoLabel(f'{self.container}NumItems')
 
     def get_imdb_id(self):
         imdb_id = self.get_infolabel('IMDBNumber') or ''
@@ -78,7 +82,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             return 'actors'
         dbtype = self.get_infolabel('dbtype')
         if dbtype:
-            return u'{}s'.format(dbtype)
+            return f'{dbtype}s'
         if xbmc.getCondVisibility(
                 "Window.IsVisible(DialogPVRInfo.xml) | "
                 "Window.IsVisible(MyPVRChannels.xml) | "
@@ -102,6 +106,10 @@ class ListItemMonitor(CommonMonitorFunctions):
         self.year = self.get_infolabel('year')
         self.season = self.get_season()
         self.episode = self.get_episode()
+
+    def set_cur_name(self, tmdb_type, tmdb_id, season=None, episode=None):
+        self.cur_name = f'{tmdb_type}.{tmdb_id}.{season}.{episode}'
+        return self.cur_name
 
     def get_cur_item(self):
         return (
@@ -147,16 +155,21 @@ class ListItemMonitor(CommonMonitorFunctions):
             self.crop_img.setName('crop_img')
             self.crop_img.start()
 
-    @try_except_log('lib.monitor.listitem.process_ratings')
-    def process_ratings(self, details, tmdb_type, tmdb_id):
-        if tmdb_type not in ['movie', 'tv']:
-            return
-        details = self.get_omdb_ratings(details)
+    @try_except_log('lib.monitor.listitem._process_ratings')
+    def _process_ratings(self, details, tmdb_type):
+        self.get_omdb_ratings(details)
         if tmdb_type == 'movie':
             details = self.get_imdb_top250_rank(details)
         details = self.get_trakt_ratings(
             details, 'movie' if tmdb_type == 'movie' else 'show',
             season=self.season, episode=self.episode)
+        return details
+
+    @try_except_log('lib.monitor.listitem.process_ratings')
+    def process_ratings(self, details, tmdb_type, cur_name):
+        if tmdb_type not in ['movie', 'tv']:
+            return
+        details = self._ratings.setdefault(cur_name, self._process_ratings(details, tmdb_type))
         if not self.is_same_item():
             return
         self.set_iter_properties(details.get('infoproperties', {}), SETPROP_RATINGS)
@@ -284,10 +297,13 @@ class ListItemMonitor(CommonMonitorFunctions):
         if not details:
             self.clear_properties()
             return get_property('IsUpdating', clear_property=True)
+        artwork = details['artwork']
+        details = details['listitem']
 
         # Need to update Next Aired with a shorter cache time than details
-        if tmdb_type == 'tv' and details.get('infoproperties'):
-            details['infoproperties'].update(self.tmdb_api.get_tvshow_nextaired(tmdb_id))
+        if tmdb_type == 'tv':
+            details['infoproperties'].update(self._nextaired.setdefault(
+                tmdb_id, self.tmdb_api.get_tvshow_nextaired(tmdb_id)))
 
         # Get our artwork properties
         if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
@@ -310,7 +326,7 @@ class ListItemMonitor(CommonMonitorFunctions):
 
         # Get our item ratings
         if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"):
-            thread_ratings = Thread(target=self.process_ratings, args=[details, tmdb_type, tmdb_id])
+            thread_ratings = Thread(target=self.process_ratings, args=[details, tmdb_type, self.cur_name])
             thread_ratings.start()
 
         self.set_properties(details)

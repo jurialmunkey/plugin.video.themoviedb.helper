@@ -94,7 +94,7 @@ def _get_language_item(tmdb_type, tmdb_id, season=None, episode=None, language=N
         return
 
     item['showname'] = item['clearname'] = item['tvshowtitle'] = item.get('title')
-    item['name'] = u'{} ({})'.format(item['title'], year) if item.get('title') and year else None
+    item['name'] = f'{item["title"]} ({year})' if item.get('title') and year else None
     if season is None or episode is None:
         return item
 
@@ -104,7 +104,7 @@ def _get_language_item(tmdb_type, tmdb_id, season=None, episode=None, language=N
 
     item['title'] = episode.get('title')
     item['plot'] = episode.get('plot') or item.get('plot')
-    item['name'] = u'{0} S{1:02d}E{2:02d}'.format(item['showname'], try_int(season), try_int(episode)) if item.get('showname') else None
+    item['name'] = f'{item["showname"]} S{try_int(season):02d}E{try_int(episode):02d}' if item.get('showname') else None
     return item
 
 
@@ -117,7 +117,7 @@ def get_language_details(base, tmdb_type, tmdb_id, season=None, episode=None, la
     item = {k: v or base.get(k) for k, v in item.items()}  # Fallback to default key in base if translation is empty
     item = _url_encode_item(item)
     for k, v in item.items():
-        base[u'{}_{}'.format(language, k)] = v
+        base[f'{language}_{k}'] = v
     return _url_encode_item(base)
 
 
@@ -126,8 +126,8 @@ def _url_encode_item(item, base=None):
     for k, v in base.items():
         if k not in PLAYERS_URLENCODE:
             continue
-        v = u'{0}'.format(v)
-        d = {k: v, u'{}_meta'.format(k): dumps(v)}
+        v = f'{v}'
+        d = {k: v, f'{k}_meta': dumps(v)}
         for key, value in d.items():
             item[key] = value.replace(',', '')
             item[key + '_+'] = value.replace(',', '').replace(' ', '+')
@@ -155,7 +155,7 @@ def get_detailed_item(tmdb_type, tmdb_id, season=None, episode=None, details=Non
     item['title'] = details.infolabels.get('tvshowtitle') or details.infolabels.get('title')
     item['showname'] = item['clearname'] = item['tvshowtitle'] = item.get('title')
     item['year'] = details.infolabels.get('year')
-    item['name'] = u'{} ({})'.format(item.get('title'), item.get('year'))
+    item['name'] = f'{item.get("title")} ({item.get("year")})'
     item['premiered'] = item['firstaired'] = item['released'] = details.infolabels.get('premiered')
     item['plot'] = details.infolabels.get('plot')
     item['cast'] = item['actors'] = " / ".join([i.get('name') for i in details.cast if i.get('name')])
@@ -167,7 +167,7 @@ def get_detailed_item(tmdb_type, tmdb_id, season=None, episode=None, details=Non
     if tmdb_type == 'tv' and season is not None and episode is not None:
         item['id'] = item['epid'] = item['eptvdb'] = item.get('tvdb')
         item['title'] = details.infolabels.get('title')  # Set Episode Title
-        item['name'] = u'{0} S{1:02d}E{2:02d}'.format(item.get('showname'), try_int(season), try_int(episode))
+        item['name'] = f'{item.get("showname")} S{try_int(season):02d}E{try_int(episode):02d}'
         item['season'] = season
         item['episode'] = episode
         item['showpremiered'] = details.infoproperties.get('tvshow.premiered')

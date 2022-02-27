@@ -5,4 +5,4 @@ import sys
 import xbmc
 
 if __name__ == '__main__':
-    xbmc.executebuiltin(u'RunPlugin({})'.format(sys.listitem.getProperty('tmdbhelper.context.playusing')))
+    xbmc.executebuiltin(f'RunPlugin({sys.listitem.getProperty("tmdbhelper.context.playusing")})')

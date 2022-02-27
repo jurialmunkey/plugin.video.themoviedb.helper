@@ -99,7 +99,7 @@ class PlayerMonitor(xbmc.Player, CommonMonitorFunctions):
             return
         if not self.current_time or not self.total_time:
             return
-        if u'{}'.format(self.playerstring.get('tmdb_id')) != u'{}'.format(self.details.get('unique_ids', {}).get('tmdb')):
+        if f'{self.playerstring.get("tmdb_id")}' != f'{self.details.get("unique_ids", {}).get("tmdb")}':
             return  # Item in the player doesn't match so don't mark as watched
 
         # Only update if progress is 75% or more

@@ -71,7 +71,7 @@ def _openimage(image, targetpath, filename):
                     return ''
 
             else:
-                targetfile = os.path.join(targetpath, 'temp_{}'.format(filename))  # Use temp file to avoid Kodi writing early
+                targetfile = os.path.join(targetpath, f'temp_{filename}')  # Use temp file to avoid Kodi writing early
                 if not xbmcvfs.exists(targetfile):
                     xbmcvfs.copy(image, targetfile)
 
@@ -133,17 +133,17 @@ class ImageFunctions(Thread):
         output = self.func(self.image) if self.image else None
         if not output:
             get_property(self.save_prop, clear_property=True)
-            get_property('{}.Original'.format(self.save_prop), clear_property=True) if self.save_orig else None
+            get_property(f'{self.save_prop}.Original', clear_property=True) if self.save_orig else None
             return
         get_property(self.save_prop, output)
-        get_property('{}.Original'.format(self.save_prop), self.image) if self.save_orig else None
+        get_property(f'{self.save_prop}.Original', self.image) if self.save_orig else None
 
     def clamp(self, x):
         return max(0, min(x, 255))
 
     @lazyimport_pil
     def crop(self, source):
-        filename = u'cropped-{}.png'.format(md5hash(source))
+        filename = f'cropped-{md5hash(source)}.png'
         destination = os.path.join(self.save_path, filename)
         try:
             if xbmcvfs.exists(destination):
@@ -161,7 +161,7 @@ class ImageFunctions(Thread):
 
     @lazyimport_pil
     def blur(self, source):
-        filename = u'{}{}.png'.format(md5hash(source), self.radius)
+        filename = f'{md5hash(source)}{self.radius}.png'
         destination = self.save_path + filename
         try:
             if xbmcvfs.exists(destination):
@@ -181,7 +181,7 @@ class ImageFunctions(Thread):
 
     @lazyimport_pil
     def desaturate(self, source):
-        filename = u'{}.png'.format(md5hash(source))
+        filename = f'{md5hash(source)}.png'
         destination = self.save_path + filename
         try:
             if xbmcvfs.exists(destination):
@@ -226,7 +226,7 @@ class ImageFunctions(Thread):
         return [try_int(self.clamp(i * 255)) for i in [r, g, b]]
 
     def rgb_to_hex(self, r, g, b):
-        return u'FF{:02x}{:02x}{:02x}'.format(r, g, b)
+        return f'FF{r:02x}{g:02x}{b:02x}'
 
     def hex_to_rgb(self, colorhex):
         r = try_int(colorhex[2:4], 16)
@@ -266,7 +266,7 @@ class ImageFunctions(Thread):
 
     @lazyimport_pil
     def colors(self, source):
-        filename = u'{}.png'.format(md5hash(source))
+        filename = f'{md5hash(source)}.png'
         destination = self.save_path + filename
 
         try:

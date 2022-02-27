@@ -9,7 +9,7 @@ import xbmcaddon
 from json import dumps
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import reconfigure_legacy_params, kodi_log, format_folderpath, convert_type
-from resources.lib.addon.decorators import busy_dialog, timer_func
+from resources.lib.addon.decorators import busy_dialog
 from resources.lib.addon.parser import encode_url, try_int, parse_paramstring
 from resources.lib.files.downloader import Downloader
 from resources.lib.files.utils import dumps_to_file, validify_filename, read_file
@@ -67,13 +67,13 @@ def is_in_kwargs(mapping={}):
 def play_media(**kwargs):
     with busy_dialog():
         kodi_log(['lib.script.router - attempting to play\n', kwargs.get('play_media')], 1)
-        xbmc.executebuiltin(u'PlayMedia({})'.format(kwargs.get('play_media')))
+        xbmc.executebuiltin(f'PlayMedia({kwargs.get("play_media")})')
 
 
 def run_plugin(**kwargs):
     with busy_dialog():
         kodi_log(['lib.script.router - attempting to play\n', kwargs.get('run_plugin')], 1)
-        xbmc.executebuiltin(u'RunPlugin({})'.format(kwargs.get('run_plugin')))
+        xbmc.executebuiltin(f'RunPlugin({kwargs.get("run_plugin")})')
 
 
 def container_refresh():
@@ -177,7 +177,7 @@ def _update_from_listitem(dictionary):
 def split_value(split_value, separator=None, **kwargs):
     split_value = split_value or ''
     for x, i in enumerate(split_value.split(separator or ' / ')):
-        name = u'{}.{}'.format(kwargs.get('property') or 'TMDbHelper.Split', x)
+        name = f'{kwargs.get("property") or "TMDbHelper.Split"}.{x}'
         get_property(name, set_property=i, prefix=-1)
 
 
@@ -257,7 +257,7 @@ def kodi_setting(kodi_setting, **kwargs):
     response = get_jsonrpc(method, params)
     get_property(
         name=kwargs.get('property') or 'TMDbHelper.KodiSetting',
-        set_property=u'{}'.format(response.get('result', {}).get('value', '')))
+        set_property=f'{response.get("result", {}).get("value", "")}')
 
 
 def user_list(user_list, user_slug=None, **kwargs):
@@ -300,7 +300,7 @@ def set_defaultplayer(**kwargs):
         return
     if not default_player.get('file') or not default_player.get('mode'):
         return ADDON.setSettingString(setting_name, '')
-    ADDON.setSettingString(setting_name, u'{} {}'.format(default_player['file'], default_player['mode']))
+    ADDON.setSettingString(setting_name, f'{default_player["file"]} {default_player["mode"]}')
 
 
 def blur_image(blur_image=None, **kwargs):
@@ -344,13 +344,15 @@ def log_request(**kwargs):
         else:
             kwargs['response'] = TMDb().get_response_json(kwargs['url'])
         if not kwargs['response']:
-            xbmcgui.Dialog().ok(kwargs['log_request'].capitalize(), u'{}\nNo Response!'.format(kwargs['url']))
+            xbmcgui.Dialog().ok(kwargs['log_request'].capitalize(), f'{kwargs["url"]}\nNo Response!')
             return
-        filename = validify_filename(u'{}_{}.json'.format(kwargs['log_request'], kwargs['url']))
+        filename = validify_filename(f'{kwargs["log_request"]}_{kwargs["url"]}.json')
         dumps_to_file(kwargs, 'log_request', filename)
-        xbmcgui.Dialog().ok(kwargs['log_request'].capitalize(), u'[B]{}[/B]\n\n{}\n{}\n{}'.format(
-            kwargs['url'], xbmcvfs.translatePath('special://profile/addon_data/'),
-            'plugin.video.themoviedb.helper/log_request', filename))
+
+        msg = (
+            f'[B]{kwargs["url"]}[/B]\n\n{xbmcvfs.translatePath("special://profile/addon_data/")}\n'
+            f'plugin.video.themoviedb.helper/log_request\n{filename}')
+        xbmcgui.Dialog().ok(kwargs['log_request'].capitalize(), msg)
         xbmcgui.Dialog().textviewer(filename, dumps(kwargs['response'], indent=2))
 
 
@@ -375,15 +377,13 @@ def log_jsonrpc(**kwargs):
             {"operator": "contains", "field": "originaltitle", "value": "Batman"},
         ]}
     }
-    # with timer_func('json_rpc'):
     response = get_jsonrpc(method, params) or {}
-    dialog.create('JSON_RPC Results', '{}'.format(response))
+    dialog.create('JSON_RPC Results', f'{response}')
     update = 0
     while update < 100:
         update += 10
         dialog.update(update)
         xbmc.sleep(500)
-    # xbmcgui.Dialog().ok('JSON_RPC Results', '{}'.format(response))
     dialog.close()
     kodi_log(['JSONRPC:\n', response], 1)
 

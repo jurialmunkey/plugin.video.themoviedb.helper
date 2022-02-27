@@ -493,15 +493,15 @@ def _get_basedir_top(tmdb_type):
     return [
         {
             'label': ADDON.getLocalizedString(32238).format(convert_type(tmdb_type, 'plural')),
-            'art': {'icon': u'{}/resources/icons/themoviedb/default.png'.format(ADDONPATH)},
+            'art': {'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'},
             'params': {'info': 'user_discover', 'tmdb_type': tmdb_type, 'method': 'open'}},
         {
             'label': ADDON.getLocalizedString(32239),
-            'art': {'icon': u'{}/resources/icons/themoviedb/default.png'.format(ADDONPATH)},
+            'art': {'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'},
             'params': {'info': 'user_discover', 'tmdb_type': tmdb_type, 'method': 'with_separator'}},
         {
             'label': ADDON.getLocalizedString(32240),
-            'art': {'icon': u'{}/resources/icons/themoviedb/default.png'.format(ADDONPATH)},
+            'art': {'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'},
             'params': {'info': 'user_discover', 'tmdb_type': tmdb_type, 'method': 'sort_by'}}]
 
 
@@ -509,15 +509,15 @@ def _get_basedir_end(tmdb_type):
     return [
         {
             'label': ADDON.getLocalizedString(32277),
-            'art': {'icon': u'{}/resources/icons/themoviedb/default.png'.format(ADDONPATH)},
+            'art': {'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'},
             'params': {'info': 'user_discover', 'tmdb_type': tmdb_type, 'method': 'add_rule'}},
         {
             'label': xbmc.getLocalizedString(192),
-            'art': {'icon': u'{}/resources/icons/themoviedb/default.png'.format(ADDONPATH)},
+            'art': {'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'},
             'params': {'info': 'user_discover', 'tmdb_type': tmdb_type, 'method': 'clear'}},
         {
             'label': xbmc.getLocalizedString(190),
-            'art': {'icon': u'{}/resources/icons/themoviedb/default.png'.format(ADDONPATH)},
+            'art': {'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'},
             'params': {'info': 'user_discover', 'tmdb_type': tmdb_type, 'method': 'save'}}]
 
 
@@ -577,7 +577,7 @@ def _get_basedir_add(tmdb_type):
 def _get_formatted_item(item):
     affix = _win_prop(item.get('params', {}).get('method'), 'Label')
     if affix:
-        item['label'] = u'{}: {}'.format(item.get('label'), affix)
+        item['label'] = f'{item.get("label")}: {affix}'
     return item
 
 
@@ -596,8 +596,8 @@ def _get_discover_params(tmdb_type, get_labels=False):
 def _win_prop(name, prefix=None, **kwargs):
     if not name:
         return
-    prefix = u'UserDiscover.{}'.format(prefix) if prefix else 'UserDiscover'
-    return get_property(u'{}.{}'.format(prefix, name), **kwargs)
+    prefix = f'UserDiscover.{prefix}' if prefix else 'UserDiscover'
+    return get_property(f'{prefix}.{name}', **kwargs)
 
 
 def _clear_properties(methods=ALL_METHODS):
@@ -621,7 +621,7 @@ def _get_query(tmdb_type, method, query=None, header=None, use_details=False):
     item = TMDb().get_tmdb_id_from_query(
         tmdb_type=tmdb_type,
         query=query or xbmcgui.Dialog().input(header),
-        header=header or u'{} {}'.format(ADDON.getLocalizedString(32276), tmdb_type),
+        header=header or f'{ADDON.getLocalizedString(32276)} {tmdb_type}',
         use_details=use_details,
         get_listitem=True)
     if item and item.getUniqueID('tmdb'):
@@ -659,8 +659,8 @@ def _set_rule(method, label, value, overwrite=False):
         return
     old_value = None if overwrite else _win_prop(method)
     old_label = None if overwrite else _win_prop(method, 'Label')
-    values = u'{} / {}'.format(old_value, value) if old_value else u'{}'.format(value)
-    labels = u'{} / {}'.format(old_label, label) if old_label else label
+    values = f'{old_value} / {value}' if old_value else f'{value}'
+    labels = f'{old_label} / {label}' if old_label else f'{label}'
     _win_prop(method, set_property=values)
     _win_prop(method, 'Label', set_property=labels)
 
@@ -689,8 +689,8 @@ def _select_properties(data_list, method, header=None, multiselect=True):
         value = data_list[i].get('id')
         if not value:
             continue
-        labels = u'{} / {}'.format(labels, label) if labels else label
-        values = u'{} / {}'.format(values, value) if values else u'{}'.format(value)
+        labels = f'{labels} / {label}' if labels else label
+        values = f'{values} / {value}' if values else f'{value}'
     if labels and values:
         return {'label': labels, 'value': values, 'method': method}
 
@@ -738,8 +738,8 @@ def _edit_rules(idx=-1):
         item = history[idx]
     except IndexError:
         return
-    _win_prop('save_index', set_property=u'{}'.format(len(history) - 1 - idx))
-    _win_prop('save_label', set_property=u'{}'.format(item.get('label')))
+    _win_prop('save_index', set_property=f'{len(history) - 1 - idx}')
+    _win_prop('save_label', set_property=f'{item.get("label")}')
     for k, v in item.get('params', {}).items():
         if k in ['info', 'tmdb_type']:
             continue
@@ -756,7 +756,7 @@ def _save_rules(tmdb_type):
         'discover',
         query={'label': label, 'params': params, 'labels': labels},
         replace=my_idx if my_idx != -1 else False)
-    xbmcgui.Dialog().ok(u'{} {}'.format(xbmc.getLocalizedString(35259), label), u'{}'.format(params))
+    xbmcgui.Dialog().ok(f'{xbmc.getLocalizedString(35259)} {label}', f'{params}')
 
 
 def _add_rule(tmdb_type, method=None):
@@ -788,7 +788,7 @@ def _add_rule(tmdb_type, method=None):
     elif 'vote_' in method or '_runtime' in method:
         rules = _get_numeric(method, header=xbmc.getLocalizedString(16028))
     elif '_date' in method:
-        header = u'{} YYYY-MM-DD\n{}'.format(ADDON.getLocalizedString(32114), ADDON.getLocalizedString(32113))
+        header = f'{ADDON.getLocalizedString(32114)} YYYY-MM-DD\n{ADDON.getLocalizedString(32113)}'
         rules = _get_keyboard(method, header=header)
     elif method == 'with_release_type':
         rules = _select_properties(_get_release_types(), method, header=ADDON.getLocalizedString(32119))
@@ -878,7 +878,7 @@ class UserDiscoverLists():
         params.pop('clear_cache', None)
         params.pop('method', None)
         params.pop('idx', None)
-        self.container_update = u'{},replace'.format(encode_url(PLUGINPATH, **params))
+        self.container_update = f'{encode_url(PLUGINPATH, **params)},replace'
 
         if kwargs.get('clear_cache') == 'True':
             set_search_history('discover', clear_cache=True)
@@ -906,10 +906,10 @@ class UserDiscoverLists():
     def list_discoverdir(self, **kwargs):
         items = []
         params = merge_two_dicts(kwargs, {'info': 'user_discover'})
-        artwork = {'icon': u'{}/resources/icons/themoviedb/default.png'.format(ADDONPATH)}
+        artwork = {'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'}
         for i in ['movie', 'tv']:
             item = {
-                'label': u'{} {}'.format(ADDON.getLocalizedString(32174), convert_type(i, 'plural')),
+                'label': f'{ADDON.getLocalizedString(32174)} {convert_type(i, "plural")}',
                 'params': merge_two_dicts(params, {'tmdb_type': i}),
                 'infoproperties': {'specialsort': 'top'},
                 'art': artwork}
@@ -927,9 +927,9 @@ class UserDiscoverLists():
                 'params': item_params,
                 'art': artwork,
                 'context_menu': [
-                    (xbmc.getLocalizedString(21435), u'Container.Update({})'.format(encode_url(PLUGINPATH, **edit_params))),
-                    (xbmc.getLocalizedString(118), u'Container.Update({})'.format(encode_url(PLUGINPATH, **name_params))),
-                    (xbmc.getLocalizedString(117), u'Container.Update({})'.format(encode_url(PLUGINPATH, **dele_params)))]}
+                    (xbmc.getLocalizedString(21435), f'Container.Update({encode_url(PLUGINPATH, **edit_params)})'),
+                    (xbmc.getLocalizedString(118), f'Container.Update({encode_url(PLUGINPATH, **name_params)})'),
+                    (xbmc.getLocalizedString(117), f'Container.Update({encode_url(PLUGINPATH, **dele_params)})')]}
             items.append(item)
         if history:
             item = {

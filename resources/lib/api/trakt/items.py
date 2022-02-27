@@ -82,7 +82,7 @@ def _get_item_unique_ids(item, unique_ids=None, prefix=None, show=None):
     prefix = prefix or ''
     unique_ids = unique_ids or {}
     for k, v in item.get('ids', {}).items():
-        unique_ids[u'{}{}'.format(prefix, k)] = v
+        unique_ids[f'{prefix}{k}'] = v
     if show:
         unique_ids = _get_item_unique_ids(show, unique_ids, prefix='tvshow.')
         unique_ids['tmdb'] = show.get('ids', {}).get('tmdb')
@@ -140,7 +140,7 @@ class TraktItems():
                 continue
             # Also add item to a list only containing that item type
             # Useful if we need to only get one type of item from a mixed list (e.g. only "movies")
-            self.configured.setdefault(u'{}s'.format(i_type), []).append(item)
+            self.configured.setdefault(f'{i_type}s', []).append(item)
             self.configured['items'].append(item)
         return self.configured
 

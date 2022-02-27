@@ -79,7 +79,7 @@ class TraktLists():
         self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = convert_type(tmdb_type, 'library')
         self.container_content = convert_type(tmdb_type, 'container')
-        self.plugin_category = '{} {}'.format(convert_type(tmdb_type, 'plural'), ADDON.getLocalizedString(32078))
+        self.plugin_category = f'{convert_type(tmdb_type, "plural")} {ADDON.getLocalizedString(32078)}'
         return items
 
     def list_lists(self, info, page=None, **kwargs):
@@ -97,14 +97,14 @@ class TraktLists():
             kwargs['query'] = query = xbmcgui.Dialog().input(ADDON.getLocalizedString(32044))
             if not kwargs['query']:
                 return
-            self.container_update = u'{},replace'.format(encode_url(PLUGINPATH, **kwargs))
-        items = self.trakt_api.get_list_of_lists(path=u'search/list?query={}&fields=name'.format(query), sort_likes=True)
+            self.container_update = f'{encode_url(PLUGINPATH, **kwargs)},replace'
+        items = self.trakt_api.get_list_of_lists(path=f'search/list?query={query}&fields=name', sort_likes=True)
         self.library = 'video'
         return items
 
     def _list_trakt_sortby_item(self, i, params):
         item = get_empty_item()
-        item['label'] = item['infolabels']['title'] = '{}[CR]{}'.format(params.get('list_name'), i['name'])
+        item['label'] = item['infolabels']['title'] = f'{params.get("list_name")}[CR]{i["name"]}'
         item['params'] = params
         for k, v in i['params'].items():
             item['params'][k] = v
@@ -169,7 +169,7 @@ class TraktLists():
             'info': 'recommendations',
             'tmdb_type': item.get('params', {}).get('tmdb_type'),
             'tmdb_id': item.get('params', {}).get('tmdb_id')}
-        self.params['plugin_category'] = u'{} {}'.format(ADDON.getLocalizedString(32288), item.get('label'))
+        self.params['plugin_category'] = f'{ADDON.getLocalizedString(32288)} {item.get("label")}'
         return self.list_tmdb(
             info='recommendations',
             tmdb_type=item.get('params', {}).get('tmdb_type'),
@@ -204,7 +204,7 @@ class TraktLists():
         self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = convert_type(tmdb_type, 'library')
         self.container_content = convert_type(tmdb_type, 'container')
-        self.plugin_category = '{} {}'.format(ADDON.getLocalizedString(32196), convert_type(tmdb_type, 'plural'))
+        self.plugin_category = f'{ADDON.getLocalizedString(32196)} {convert_type(tmdb_type, "plural")}'
         return items
 
     def list_nextepisodes(self, info, tmdb_type, page=None, **kwargs):

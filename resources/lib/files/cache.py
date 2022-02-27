@@ -97,8 +97,8 @@ def use_simple_cache(cache_days=None):
         def wrapper(self, *args, **kwargs):
             kwargs['cache_days'] = cache_days or kwargs.get('cache_days', None)
             kwargs['cache_combine_name'] = True
-            kwargs['cache_name'] = u'{}.'.format(func.__name__)
-            kwargs['cache_name'] = u'{}.{}'.format(self.__class__.__name__, kwargs['cache_name'])
+            kwargs['cache_name'] = f'{func.__name__}.'
+            kwargs['cache_name'] = f'{self.__class__.__name__}.{kwargs["cache_name"]}'
             return self._cache.use_cache(func, self, *args, **kwargs)
         return wrapper
     return decorator

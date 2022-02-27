@@ -16,23 +16,23 @@ ARTWORK_QUALITY_CLOGOS = IMAGEPATH_QUALITY_CLOGOS[ARTWORK_QUALITY]
 
 
 def get_imagepath_poster(v):
-    return u'{}{}'.format(ARTWORK_QUALITY_POSTER, v) if v else ''
+    return f'{ARTWORK_QUALITY_POSTER}{v}' if v else ''
 
 
 def get_imagepath_fanart(v):
-    return u'{}{}'.format(ARTWORK_QUALITY_FANART, v) if v else ''
+    return f'{ARTWORK_QUALITY_FANART}{v}' if v else ''
 
 
 def get_imagepath_thumb(v):
-    return u'{}{}'.format(ARTWORK_QUALITY_THUMBS, v) if v else ''
+    return f'{ARTWORK_QUALITY_THUMBS}{v}' if v else ''
 
 
 def get_imagepath_logo(v):
-    return u'{}{}'.format(ARTWORK_QUALITY_CLOGOS, v) if v else ''
+    return f'{ARTWORK_QUALITY_CLOGOS}{v}' if v else ''
 
 
 def get_imagepath_quality(v, quality=IMAGEPATH_ORIGINAL):
-    return u'{}{}'.format(quality, v) if v else ''
+    return f'{quality}{v}' if v else ''
 
 
 def get_runtime(v, *args, **kwargs):
@@ -64,16 +64,16 @@ def get_collection_properties(v):
     infoproperties = {}
     year_l, year_h, votes = 9999, 0, 0
     for p, i in enumerate(v, start=1):
-        infoproperties[u'set.{}.title'.format(p)] = i.get('title', '')
-        infoproperties[u'set.{}.tmdb_id'.format(p)] = i.get('id', '')
-        infoproperties[u'set.{}.originaltitle'.format(p)] = i.get('original_title', '')
-        infoproperties[u'set.{}.plot'.format(p)] = i.get('overview', '')
-        infoproperties[u'set.{}.premiered'.format(p)] = i.get('release_date', '')
-        infoproperties[u'set.{}.year'.format(p)] = i.get('release_date', '')[:4]
-        infoproperties[u'set.{}.rating'.format(p)] = u'{:0,.1f}'.format(try_float(i.get('vote_average')))
-        infoproperties[u'set.{}.votes'.format(p)] = i.get('vote_count', '')
-        infoproperties[u'set.{}.poster'.format(p)] = get_imagepath_poster(i.get('poster_path', ''))
-        infoproperties[u'set.{}.fanart'.format(p)] = get_imagepath_fanart(i.get('backdrop_path', ''))
+        infoproperties[f'set.{p}.title'] = i.get('title', '')
+        infoproperties[f'set.{p}.tmdb_id'] = i.get('id', '')
+        infoproperties[f'set.{p}.originaltitle'] = i.get('original_title', '')
+        infoproperties[f'set.{p}.plot'] = i.get('overview', '')
+        infoproperties[f'set.{p}.premiered'] = i.get('release_date', '')
+        infoproperties[f'set.{p}.year'] = i.get('release_date', '')[:4]
+        infoproperties[f'set.{p}.rating'] = f'{try_float(i.get("vote_average")):0,.1f}'
+        infoproperties[f'set.{p}.votes'] = i.get('vote_count', '')
+        infoproperties[f'set.{p}.poster'] = get_imagepath_poster(i.get('poster_path', ''))
+        infoproperties[f'set.{p}.fanart'] = get_imagepath_fanart(i.get('backdrop_path', ''))
         year_l = min(try_int(i.get('release_date', '')[:4]), year_l)
         year_h = max(try_int(i.get('release_date', '')[:4]), year_h)
         if i.get('vote_average'):
@@ -86,11 +86,11 @@ def get_collection_properties(v):
     if year_h:
         infoproperties['set.year.last'] = year_h
     if year_l and year_h:
-        infoproperties['set.years'] = u'{0} - {1}'.format(year_l, year_h)
+        infoproperties['set.years'] = f'{year_l} - {year_h}'
     if len(ratings):
-        infoproperties['set.rating'] = infoproperties['tmdb_rating'] = u'{:0,.1f}'.format(sum(ratings) / len(ratings))
+        infoproperties['set.rating'] = infoproperties['tmdb_rating'] = f'{sum(ratings) / len(ratings):0,.1f}'
     if votes:
-        infoproperties['set.votes'] = infoproperties['tmdb_votes'] = u'{:0,.0f}'.format(votes)
+        infoproperties['set.votes'] = infoproperties['tmdb_votes'] = f'{votes:0,.0f}'
     infoproperties['set.numitems'] = p
     return infoproperties
 
@@ -101,11 +101,11 @@ def get_mpaa_rating(v, mpaa_prefix, iso_country, certification=True):
             continue
         if not certification:
             if i.get('rating'):
-                return u'{}{}'.format(mpaa_prefix, i['rating'])
+                return f'{mpaa_prefix}{i["rating"]}'
             continue
         for i in sorted(i.get('release_dates', []), key=lambda k: k.get('type')):
             if i.get('certification'):
-                return u'{}{}'.format(mpaa_prefix, i['certification'])
+                return f'{mpaa_prefix}{i["certification"]}'
 
 
 def get_iter_props(v, base_name, *args, **kwargs):
@@ -132,16 +132,16 @@ def get_providers(v):
             continue
         # If provider already added just update type
         if i['provider_name'] in added:
-            idx = u'provider.{}.type'.format(added.index(i['provider_name']) + 1)
-            infoproperties[idx] = u'{} / {}'.format(infoproperties.get(idx), i.get('key'))
+            idx = f'provider.{added.index(i["provider_name"]) + 1}.type'
+            infoproperties[idx] = f'{infoproperties.get(idx)} / {i.get("key")}'
             continue
         # Add item provider
         x = len(added) + 1
         infoproperties.update({
-            u'provider.{}.id'.format(x): i.get('provider_id'),
-            u'provider.{}.type'.format(x): i.get('key'),
-            u'provider.{}.name'.format(x): i['provider_name'],
-            u'provider.{}.icon'.format(x): get_imagepath_logo(i.get('logo_path'))})
+            f'provider.{x}.id': i.get('provider_id'),
+            f'provider.{x}.type': i.get('key'),
+            f'provider.{x}.name': i['provider_name'],
+            f'provider.{x}.icon': get_imagepath_logo(i.get('logo_path'))})
         added_append(i['provider_name'])
     infoproperties['providers'] = ' / '.join(added)
     return infoproperties
@@ -153,7 +153,7 @@ def get_trailer(v):
     for i in v.get('results') or []:
         if i.get('type', '') != 'Trailer' or i.get('site', '') != 'YouTube' or not i.get('key'):
             continue
-        return u'plugin://plugin.video.youtube/play/?video_id={0}'.format(i.get('key'))
+        return f'plugin://plugin.video.youtube/play/?video_id={i.get("key")}'
 
 
 def _get_genre_by_id(genre_id):
@@ -205,18 +205,18 @@ def get_extra_art(v):
 def get_episode_to_air(v, name):
     i = v or {}
     infoproperties = {}
-    infoproperties[u'{}'.format(name)] = format_date(i.get('air_date'), region_fmt='dateshort')
-    infoproperties[u'{}.long'.format(name)] = format_date(i.get('air_date'), region_fmt='datelong')
-    infoproperties[u'{}.day'.format(name)] = format_date(i.get('air_date'), "%A")
-    infoproperties[u'{}.year'.format(name)] = format_date(i.get('air_date'), "%Y")
-    infoproperties[u'{}.episode'.format(name)] = i.get('episode_number')
-    infoproperties[u'{}.name'.format(name)] = i.get('name')
-    infoproperties[u'{}.tmdb_id'.format(name)] = i.get('id')
-    infoproperties[u'{}.plot'.format(name)] = i.get('overview')
-    infoproperties[u'{}.season'.format(name)] = i.get('season_number')
-    infoproperties[u'{}.rating'.format(name)] = u'{:0,.1f}'.format(try_float(i.get('vote_average')))
-    infoproperties[u'{}.votes'.format(name)] = i.get('vote_count')
-    infoproperties[u'{}.thumb'.format(name)] = get_imagepath_thumb(i.get('still_path'))
+    infoproperties[f'{name}'] = format_date(i.get('air_date'), region_fmt='dateshort')
+    infoproperties[f'{name}.long'] = format_date(i.get('air_date'), region_fmt='datelong')
+    infoproperties[f'{name}.day'] = format_date(i.get('air_date'), "%A")
+    infoproperties[f'{name}.year'] = format_date(i.get('air_date'), "%Y")
+    infoproperties[f'{name}.episode'] = i.get('episode_number')
+    infoproperties[f'{name}.name'] = i.get('name')
+    infoproperties[f'{name}.tmdb_id'] = i.get('id')
+    infoproperties[f'{name}.plot'] = i.get('overview')
+    infoproperties[f'{name}.season'] = i.get('season_number')
+    infoproperties[f'{name}.rating'] = f'{try_float(i.get("vote_average")):0,.1f}'
+    infoproperties[f'{name}.votes'] = i.get('vote_count')
+    infoproperties[f'{name}.thumb'] = get_imagepath_thumb(i.get('still_path'))
     return infoproperties
 
 
@@ -234,7 +234,7 @@ def _get_cast_item(i, cast_dict):
         return {'name': name, 'role': role, 'order': i.get('order', 9999)}
     item = cast_dict[name]
     if role and item.get('role') and role not in item['role']:
-        item['role'] = u'{} / {}'.format(item['role'], role)
+        item['role'] = f'{item["role"]} / {role}'
     item['order'] = min(item.get('order', 9999), i.get('order', 9999))
     return item
 
@@ -263,17 +263,17 @@ def _get_cast_dict(item, base_item=None):
 
 def set_crew_properties(i, x, prefix):
     infoproperties = {}
-    p = u'{}.{}.'.format(prefix, x)
+    p = f'{prefix}.{x}.'
     if i.get('name'):
-        infoproperties[u'{}name'.format(p)] = i['name']
+        infoproperties[f'{p}name'] = i['name']
     if i.get('job'):
-        infoproperties[u'{}role'.format(p)] = infoproperties[u'{}job'.format(p)] = i['job']
+        infoproperties[f'{p}role'] = infoproperties[f'{p}job'] = i['job']
     if i.get('character'):
-        infoproperties[u'{}role'.format(p)] = infoproperties[u'{}character'.format(p)] = i['character']
+        infoproperties[f'{p}role'] = infoproperties[f'{p}character'] = i['character']
     if i.get('department'):
-        infoproperties[u'{}department'.format(p)] = i['department']
+        infoproperties[f'{p}department'] = i['department']
     if i.get('profile_path'):
-        infoproperties[u'{}thumb'.format(p)] = get_imagepath_poster(i['profile_path'])
+        infoproperties[f'{p}thumb'] = get_imagepath_poster(i['profile_path'])
     return infoproperties
 
 
@@ -387,22 +387,22 @@ class ItemMapper(_ItemMapper):
             'vote_count': [{
                 'keys': [('infolabels', 'votes'), ('infoproperties', 'tmdb_votes')],
                 'type': float,
-                'func': lambda v: u'{:0,.0f}'.format(v)
+                'func': lambda v: f'{v:0,.0f}'
             }],
             'vote_average': [{
                 'keys': [('infolabels', 'rating'), ('infoproperties', 'tmdb_rating')],
                 'type': float,
-                'func': lambda v: u'{:.1f}'.format(v)
+                'func': lambda v: f'{v:.1f}'
             }],
             'budget': [{
                 'keys': [('infoproperties', 'budget')],
                 'type': float,
-                'func': lambda v: u'${:0,.0f}'.format(v)
+                'func': lambda v: f'${v:0,.0f}'
             }],
             'revenue': [{
                 'keys': [('infoproperties', 'revenue')],
                 'type': float,
-                'func': lambda v: u'${:0,.0f}'.format(v)
+                'func': lambda v: f'${v:0,.0f}'
             }],
             'spoken_languages': [{
                 'keys': [('infoproperties', UPDATE_BASEKEY)],
@@ -619,9 +619,7 @@ class ItemMapper(_ItemMapper):
         }
 
     def finalise_image(self, item):
-        item['infolabels']['title'] = u'{}x{}'.format(
-            item['infoproperties'].get('width'),
-            item['infoproperties'].get('height'))
+        item['infolabels']['title'] = f'{item["infoproperties"].get("width")}x{item["infoproperties"].get("height")}'
         item['params'] = -1
         item['path'] = item['art'].get('thumb') or item['art'].get('poster') or item['art'].get('fanart')
         item['is_folder'] = False
@@ -646,7 +644,7 @@ class ItemMapper(_ItemMapper):
         item['infoproperties']['tmdb_type'] = tmdb_type
         item['infolabels']['mediatype'] = item['infoproperties']['dbtype'] = convert_type(tmdb_type, 'dbtype')
         for k, v in item['unique_ids'].items():
-            item['infoproperties'][u'{}_id'.format(k)] = v
+            item['infoproperties'][f'{k}_id'] = v
         return item
 
     def add_cast(self, item, info_item, base_item=None):
@@ -659,9 +657,9 @@ class ItemMapper(_ItemMapper):
             if not i or not i['name']:
                 continue
             if x <= ITER_PROPS_MAX:
-                p = u'{}.{}.'.format('Cast', x)
+                p = f'Cast.{x}.'
                 for j in [('name', 'Name'), ('role', 'Role'), ('thumbnail', 'Thumb')]:
-                    item['infoproperties'][u'{}{}'.format(p, j[1])] = i.get(j[0], '')
+                    item['infoproperties'][f'{p}{j[1]}'] = i.get(j[0], '')
             cast_prop.append(i['name'])
             cast_list.append(i)
         item['infoproperties']['cast'] = " / ".join(cast_prop)

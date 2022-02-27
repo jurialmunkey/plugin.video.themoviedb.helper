@@ -51,16 +51,16 @@ class CommonMonitorFunctions(object):
 
     @try_except_log('lib.monitor.common clear_property')
     def clear_property(self, key):
-        key = u'{}.{}'.format(self.property_prefix, key)
+        key = f'{self.property_prefix}.{key}'
         get_property(key, clear_property=True)
 
     @try_except_log('lib.monitor.common set_property')
     def set_property(self, key, value):
-        key = u'{}.{}'.format(self.property_prefix, key)
+        key = f'{self.property_prefix}.{key}'
         if value is None:
             get_property(key, clear_property=True)
         else:
-            get_property(key, set_property=u'{0}'.format(value))
+            get_property(key, set_property=f'{value}')
 
     def set_iter_properties(self, dictionary, keys):
         if not isinstance(dictionary, dict):
@@ -72,11 +72,11 @@ class CommonMonitorFunctions(object):
                     try:
                         v = ' / '.join(v)
                     except Exception as exc:
-                        kodi_traceback(exc, u'\nlib.monitor.common set_iter_properties\nk: {} v: {}'.format(k, v))
+                        kodi_traceback(exc, f'\nlib.monitor.common set_iter_properties\nk: {k} v: {v}')
                 self.properties.add(k)
                 self.set_property(k, v)
             except Exception as exc:
-                kodi_traceback(exc, u'\nlib.monitor.common set_iter_properties\nk: {}'.format(k))
+                kodi_traceback(exc, f'\nlib.monitor.common set_iter_properties\nk: {k}')
 
     def set_indexed_properties(self, dictionary):
         if not isinstance(dictionary, dict):
@@ -91,7 +91,7 @@ class CommonMonitorFunctions(object):
                 self.set_property(k, v)
                 index_properties.add(k)
             except Exception as exc:
-                kodi_traceback(exc, u'\nlib.monitor.common set_indexed_properties\nk: {} v: {}'.format(k, v))
+                kodi_traceback(exc, f'\nlib.monitor.common set_indexed_properties\nk: {k} v: {v}')
 
         for k in (self.index_properties - index_properties):
             self.clear_property(k)
@@ -114,7 +114,7 @@ class CommonMonitorFunctions(object):
         self.set_property('Duration', totalmin)
         self.set_property('Duration_H', hours)
         self.set_property('Duration_M', minutes)
-        self.set_property('Duration_HHMM', u'{0:02d}:{1:02d}'.format(hours, minutes))
+        self.set_property('Duration_HHMM', f'{hours:02d}:{minutes:02d}')
         self.properties.update(['Duration', 'Duration_H', 'Duration_M', 'Duration_HHMM'])
 
     @try_except_log('lib.monitor.common set_date_properties')

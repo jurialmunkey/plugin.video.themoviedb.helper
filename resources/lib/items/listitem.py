@@ -61,8 +61,8 @@ class _ListItem(object):
         if not next_page:
             return
         self.label = xbmc.getLocalizedString(33078)
-        self.art['icon'] = u'{}/resources/icons/themoviedb/nextpage.png'.format(ADDONPATH)
-        self.art['landscape'] = u'{}/resources/icons/themoviedb/nextpage_wide.png'.format(ADDONPATH)
+        self.art['icon'] = f'{ADDONPATH}/resources/icons/themoviedb/nextpage.png'
+        self.art['landscape'] = f'{ADDONPATH}/resources/icons/themoviedb/nextpage_wide.png'
         self.infoproperties['specialsort'] = 'bottom'
         self.params = self.parent_params.copy()
         self.params['page'] = next_page
@@ -72,9 +72,9 @@ class _ListItem(object):
 
     def set_art_fallbacks(self):
         if not self.art.get('fanart'):
-            self.art['fanart'] = u'{}/resources/icons/themoviedb/fanart.jpg'.format(ADDONPATH)
+            self.art['fanart'] = f'{ADDONPATH}/resources/icons/themoviedb/fanart.jpg'
         if not self.art.get('icon'):
-            self.art['icon'] = self.art.get('poster') or u'{}/resources/icons/themoviedb/default.png'.format(ADDONPATH)
+            self.art['icon'] = self.art.get('poster') or f'{ADDONPATH}/resources/icons/themoviedb/default.png'
         return self.art
 
     def set_thumb_to_art(self, prefer_landscape=False):
@@ -163,13 +163,13 @@ class _ListItem(object):
         for k, v in self.unique_ids.items():
             if not v:
                 continue
-            self.infoproperties[u'{}_id'.format(k)] = v
+            self.infoproperties[f'{k}_id'] = v
 
     def set_params_to_info(self, widget=None):
         for k, v in self.params.items():
             if not k or not v:
                 continue
-            self.infoproperties[u'item.{}'.format(k)] = v
+            self.infoproperties[f'item.{k}'] = v
         if self.params.get('tmdb_type'):
             self.infoproperties['item.type'] = self.params['tmdb_type']
         if widget:
@@ -247,7 +247,7 @@ class _Video(_ListItem):
             if format_label:
                 self.label = format_label.format(self.label)
         except Exception as exc:
-            kodi_log(u'Error: {}'.format(exc), 1)
+            kodi_log(f'Error: {exc}', 1)
         if not check_hide_settings:
             return True
         return self.unaired_bool()
@@ -260,7 +260,7 @@ class _Video(_ListItem):
         else:
             self.params['info'] = 'related'
         self.is_folder = False
-        self.infoproperties['tmdbhelper.context.playusing'] = u'{}&ignore_default=true'.format(self.get_url())
+        self.infoproperties['tmdbhelper.context.playusing'] = f'{self.get_url()}&ignore_default=true'
 
     def _set_params_reroute_details(self, flatten_seasons):
         self._set_params_reroute_default()
@@ -353,7 +353,7 @@ class _Episode(_Tvshow):
         if (self.parent_params.get('info') == 'library_nextaired'
                 and ADDON.getSettingBool('nextaired_linklibrary')
                 and self.infoproperties.get('tvshow.dbid')):
-            self.path = u'videodb://tvshows/titles/{}/'.format(self.infoproperties['tvshow.dbid'])
+            self.path = f'videodb://tvshows/titles/{self.infoproperties["tvshow.dbid"]}/'
             self.params = {}
             self.is_folder = True
             return

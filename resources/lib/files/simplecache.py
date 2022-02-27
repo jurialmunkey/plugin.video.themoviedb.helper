@@ -45,7 +45,7 @@ class SimpleCache(object):
         self._win = xbmcgui.Window(10000)
         self._monitor = xbmc.Monitor()
         self._db_file = get_file_path(folder, filename)
-        self._sc_name = u'{}_{}_simplecache'.format(folder, filename)
+        self._sc_name = f'{folder}_{filename}_simplecache'
         self._mem_only = mem_only
         self._queue = []
         self._delaywrite = delay_write
@@ -59,12 +59,12 @@ class SimpleCache(object):
         # wait for all tasks to complete
         while self._busy_tasks and not self._monitor.abortRequested():
             xbmc.sleep(25)
-        kodi_log("CACHE: Closed {}".format(self._sc_name), 2)
+        kodi_log(f'CACHE: Closed {self._sc_name}', 2)
 
     def __del__(self):
         '''make sure close is called'''
         if self._queue:
-            kodi_log("CACHE: Write {} Items in Queue\n{}".format(len(self._queue), self._sc_name), 2)
+            kodi_log(f'CACHE: Write {len(self._queue)} Items in Queue\n{self._sc_name}', 2)
         for i in self._queue:
             self._set_db_cache(*i)
         self._queue = []
@@ -91,7 +91,7 @@ class SimpleCache(object):
 
     def set(self, endpoint, data, cache_days=30):
         """ set data in cache """
-        with self.busy_tasks(u'set.{}'.format(endpoint)):
+        with self.busy_tasks(f'set.{endpoint}'):
             expires = set_timestamp(cache_days * TIME_DAYS, True)
             data = data_dumps(data)
             self._set_mem_cache(endpoint, expires, data)
@@ -108,9 +108,9 @@ class SimpleCache(object):
             return
         # cur_time = get_datetime_now()
         cur_time = set_timestamp(0, True)
-        lastexecuted = self._win.getProperty(u"{}.clean.lastexecuted".format(self._sc_name))
+        lastexecuted = self._win.getProperty(f'{self._sc_name}.clean.lastexecuted')
         if not lastexecuted:
-            self._win.setProperty(u"{}.clean.lastexecuted".format(self._sc_name), str(cur_time))
+            self._win.setProperty(f'{self._sc_name}.clean.lastexecuted', str(cur_time))
         elif (int(lastexecuted) + set_timestamp(self._auto_clean_interval, True)) < cur_time:
             self._do_cleanup()
 
@@ -120,13 +120,13 @@ class SimpleCache(object):
             we use window properties because we need to be stateless
         '''
         # Check expiration time
-        expr_endpoint = u'{}_expr_{}'.format(self._sc_name, endpoint)
+        expr_endpoint = f'{self._sc_name}_expr_{endpoint}'
         expr_propdata = self._win.getProperty(expr_endpoint)
         if not expr_propdata or int(expr_propdata) <= cur_time:
             return
 
         # Retrieve data
-        data_endpoint = u'{}_data_{}'.format(self._sc_name, endpoint)
+        data_endpoint = f'{self._sc_name}_data_{endpoint}'
         data_propdata = self._win.getProperty(data_endpoint)
         if not data_propdata:
             return
@@ -138,8 +138,8 @@ class SimpleCache(object):
             window property cache as alternative for memory cache
             usefull for (stateless) plugins
         '''
-        expr_endpoint = u'{}_expr_{}'.format(self._sc_name, endpoint)
-        data_endpoint = u'{}_data_{}'.format(self._sc_name, endpoint)
+        expr_endpoint = f'{self._sc_name}_expr_{endpoint}'
+        data_endpoint = f'{self._sc_name}_data_{endpoint}'
         self._win.setProperty(expr_endpoint, str(expires))
         self._win.setProperty(data_endpoint, data)
 
@@ -176,18 +176,18 @@ class SimpleCache(object):
 
         with self.busy_tasks(__name__):
             cur_time = set_timestamp(0, True)
-            kodi_log("CACHE: Deleting {}...".format(self._sc_name))
+            kodi_log(f'CACHE: Deleting {self._sc_name}...')
 
-            self._win.setProperty(u"{}.cleanbusy".format(self._sc_name), "busy")
+            self._win.setProperty(f'{self._sc_name}.cleanbusy', "busy")
 
             query = 'DELETE FROM simplecache'
             self._execute_sql(query)
             self._execute_sql("VACUUM")
 
         # Washup
-        self._win.setProperty(u"{}.clean.lastexecuted".format(self._sc_name), str(cur_time))
-        self._win.clearProperty(u"{}.cleanbusy".format(self._sc_name))
-        kodi_log("CACHE: Delete {} done".format(self._sc_name))
+        self._win.setProperty(f'{self._sc_name}.clean.lastexecuted', str(cur_time))
+        self._win.clearProperty(f'{self._sc_name}.cleanbusy')
+        kodi_log(f'CACHE: Delete {self._sc_name} done')
 
     def _do_cleanup(self, force=False):
         '''perform cleanup task'''
@@ -197,9 +197,9 @@ class SimpleCache(object):
         with self.busy_tasks(__name__):
             cur_time = set_timestamp(0, True)
             kodi_log("CACHE: Running cleanup...")
-            if self._win.getProperty(u"{}.cleanbusy".format(self._sc_name)):
+            if self._win.getProperty(f'{self._sc_name}.cleanbusy'):
                 return
-            self._win.setProperty(u"{}.cleanbusy".format(self._sc_name), "busy")
+            self._win.setProperty(f'{self._sc_name}.cleanbusy', "busy")
 
             query = "SELECT id, expires FROM simplecache"
             for cache_data in self._execute_sql(query).fetchall():
@@ -213,14 +213,14 @@ class SimpleCache(object):
                 if force or int(cache_expires) < cur_time:
                     query = 'DELETE FROM simplecache WHERE id = ?'
                     self._execute_sql(query, (cache_id,))
-                    kodi_log(u"CACHE: delete from db {}".format(cache_id))
+                    kodi_log(f'CACHE: delete from db {cache_id}')
 
             # compact db
             self._execute_sql("VACUUM")
 
         # Washup
-        self._win.setProperty(u"{}.clean.lastexecuted".format(self._sc_name), str(cur_time))
-        self._win.clearProperty(u"{}.cleanbusy".format(self._sc_name))
+        self._win.setProperty(f'{self._sc_name}.clean.lastexecuted', str(cur_time))
+        self._win.clearProperty(f'{self._sc_name}.cleanbusy')
         kodi_log("CACHE: Auto cleanup done")
 
     def _get_database(self, attempts=2):
@@ -245,7 +245,7 @@ class SimpleCache(object):
                     self._connection = connection
                 return connection
             except Exception as error:
-                kodi_log(u"CACHE: Exception while initializing _database: {} ({})".format(error, attempts), 1)
+                kodi_log(f'CACHE: Exception while initializing _database: {error} ({attempts})', 1)
                 if attempts < 1:
                     return
                 attempts -= 1
@@ -282,5 +282,5 @@ class SimpleCache(object):
                         break
                 except Exception:
                     break
-            kodi_log(u"CACHE: _database ERROR ! -- {}".format(error), 1)
+            kodi_log(f'CACHE: _database ERROR ! -- {error}', 1)
         return None

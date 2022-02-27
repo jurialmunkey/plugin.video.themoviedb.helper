@@ -14,7 +14,7 @@ def use_lastupdated_cache(cache, func, *args, sync_info=None, cache_name='', **k
     """
     Not a decorator. Function to check sync_info last_updated_at to decide if cache or refresh
     sync_info=self.get_sync('watched', 'show', 'slug').get(slug)
-    cache_name='TraktAPI.get_show_progress.response.{}'.format(slug)
+    cache_name='TraktAPI.get_show_progress.response.{slug}'
     """
     sync_info = sync_info or {}
 
@@ -53,8 +53,8 @@ def use_activity_cache(activity_type=None, activity_key=None, cache_days=None, p
             func_set = set_pickle if pickle_object else self._cache.set_cache
 
             # Set cache_name
-            cache_name = u'{}.'.format(func.__name__)
-            cache_name = u'{}.{}'.format(self.__class__.__name__, cache_name)
+            cache_name = f'{func.__name__}.'
+            cache_name = f'{self.__class__.__name__}.{cache_name}'
             cache_name = format_name(cache_name, *args, **kwargs)
 
             # Cached response last_activity timestamp matches last_activity from trakt so no need to refresh

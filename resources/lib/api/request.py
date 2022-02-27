@@ -52,17 +52,17 @@ class RequestAPI(object):
         self.req_api_url = req_api_url or ''
         self.req_api_key = req_api_key or ''
         self.req_api_name = req_api_name or ''
-        self.req_timeout_err_prop = u'TimeOutError.{}'.format(self.req_api_name)
+        self.req_timeout_err_prop = f'TimeOutError.{self.req_api_name}'
         self.req_timeout_err = 0  # Only check last timeout on timeout since we only want to suppress when multiple
-        self.req_connect_err_prop = u'ConnectionError.{}'.format(self.req_api_name)
+        self.req_connect_err_prop = f'ConnectionError.{self.req_api_name}'
         self.req_connect_err = get_property(self.req_connect_err_prop, is_type=float) or 0
-        self.req_500_err_prop = u'500Error.{}'.format(self.req_api_name)
+        self.req_500_err_prop = f'500Error.{self.req_api_name}'
         self.req_500_err = get_property(self.req_500_err_prop)
         self.req_500_err = loads(self.req_500_err) if self.req_500_err else {}
         self.req_strip = [(self.req_api_url, self.req_api_name), (self.req_api_key, ''), ('is_xml=False', ''), ('is_xml=True', '')]
         self.headers = None
         self.timeout = timeout or 10
-        self._cache = BasicCache(filename='{}.db'.format(req_api_name or 'requests'), delay_write=delay_write)
+        self._cache = BasicCache(filename=f'{req_api_name or "requests"}.db', delay_write=delay_write)
 
     def get_api_request_json(self, request=None, postdata=None, headers=None, is_xml=False):
         request = self.get_api_request(request=request, postdata=postdata, headers=headers)
@@ -78,13 +78,13 @@ class RequestAPI(object):
             return
 
         # Get the last error timestamp
-        err_prop = u'NoInternetError.{}'.format(self.req_api_name)
+        err_prop = f'NoInternetError.{self.req_api_name}'
         last_err = get_property(err_prop, is_type=float) or 0
 
         # Only log error and notify user if it hasn't happened in last {log_time} seconds to avoid log/gui spam
         if not get_timestamp(last_err):
             xbmcgui.Dialog().notification(ADDON.getLocalizedString(32308).format(self.req_api_name), xbmc.getLocalizedString(13297))
-            kodi_log(u'ConnectionError: {}\n{}\nSuppressing retries.'.format(xbmc.getLocalizedString(13297), err), 1)
+            kodi_log(f'ConnectionError: {xbmc.getLocalizedString(13297)}\n{err}\nSuppressing retries.', 1)
 
         # Update our last error timestamp and return it
         return get_property(err_prop, set_timestamp(log_time))
@@ -96,7 +96,7 @@ class RequestAPI(object):
         if check_status and self.nointernet_err(err):
             return
 
-        kodi_log(u'ConnectionError: {} {}\nSuppressing retries for 30 seconds'.format(msg_affix, err), 1)
+        kodi_log(f'ConnectionError: {msg_affix} {err}\nSuppressing retries for 30 seconds', 1)
         xbmcgui.Dialog().notification(
             ADDON.getLocalizedString(32308).format(' '.join([self.req_api_name, msg_affix])),
             ADDON.getLocalizedString(32307).format('30'))
@@ -104,7 +104,7 @@ class RequestAPI(object):
     def fivehundred_error(self, request, wait_time=60):
         self.req_500_err[request] = set_timestamp(wait_time)
         get_property(self.req_500_err_prop, dumps(self.req_500_err))
-        kodi_log(u'ConnectionError: {}\nSuppressing retries for 60 seconds'.format(dumps(self.req_500_err)), 1)
+        kodi_log(f'ConnectionError: {dumps(self.req_500_err)}\nSuppressing retries for 60 seconds', 1)
         xbmcgui.Dialog().notification(
             ADDON.getLocalizedString(32308).format(self.req_api_name),
             ADDON.getLocalizedString(32307).format('60'))
@@ -114,7 +114,7 @@ class RequestAPI(object):
         If two timeouts occur in x3 the timeout limit then set connection error
         e.g. if timeout limit is 10s then two timeouts within 30s trigger connection error
         """
-        kodi_log(u'ConnectionTimeOut: {}'.format(err), 1)
+        kodi_log(f'ConnectionTimeOut: {err}', 1)
         self.req_timeout_err = self.req_timeout_err or get_property(self.req_timeout_err_prop, is_type=float) or 0
         if get_timestamp(self.req_timeout_err):
             self.connection_error(err, msg_affix='timeout')
@@ -136,7 +136,7 @@ class RequestAPI(object):
         except requests.exceptions.Timeout as errt:
             self.timeout_error(errt)
         except Exception as err:
-            kodi_log(u'RequestError: {}'.format(err), 1)
+            kodi_log(f'RequestError: {err}', 1)
 
     def get_api_request(self, request=None, postdata=None, headers=None):
         """
@@ -167,11 +167,11 @@ class RequestAPI(object):
             elif try_int(response.status_code) > 400:
                 log_level = 2 if try_int(response.status_code) in [404] else 1
                 kodi_log([
-                    u'HTTP Error Code: {}'.format(response.status_code),
-                    u'\nRequest: {}'.format(request.replace(self.req_api_key, '') if request else None),
-                    u'\nPostdata: {}'.format(postdata) if postdata else '',
-                    u'\nHeaders: {}'.format(headers) if headers else '',
-                    u'\nResponse: {}'.format(response) if response else ''], log_level)
+                    f'HTTP Error Code: {response.status_code}',
+                    f'\nRequest: {request.replace(self.req_api_key, "") if request else None}',
+                    f'\nPostdata: {postdata}' if postdata else '',
+                    f'\nHeaders: {headers}' if headers else '',
+                    f'\nResponse: {response}' if response else ''], log_level)
             return
 
         # Return our response
@@ -189,7 +189,7 @@ class RequestAPI(object):
             sep = '&'
         if not kwargs:
             return url
-        kws = '&'.join(('{}={}'.format(k, v) for k, v in kwargs.items() if v is not None))
+        kws = '&'.join((f'{k}={v}' for k, v in kwargs.items() if v is not None))
         return sep.join((url, kws)) if kws else url
 
     def get_request_sc(self, *args, **kwargs):
