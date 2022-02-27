@@ -41,7 +41,7 @@ class TMDb(RequestAPI):
         self.language = language
         self.iso_language = language[:2]
         self.iso_country = language[-2:]
-        self.req_language = f'{self.iso_language}-{self.iso_country}&include_image_language={self.iso_language},null{',en' if ARTLANG_FALLBACK else ''}'
+        self.req_language = f'{self.iso_language}-{self.iso_country}&include_image_language={self.iso_language},null{",en" if ARTLANG_FALLBACK else ""}'
         self.mpaa_prefix = mpaa_prefix
         self.append_to_response = APPEND_TO_RESPONSE
         self.req_strip += [(self.append_to_response, ''), (self.req_language, f'{self.iso_language}{"_en" if ARTLANG_FALLBACK else ""}')]
