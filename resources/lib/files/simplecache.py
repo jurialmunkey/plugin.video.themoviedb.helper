@@ -148,7 +148,7 @@ class SimpleCache(object):
         cache_data = self._execute_sql(query)
         if not cache_data:
             return
-        return [job[0] for job in cache_data]
+        return {job[0] for job in cache_data}
 
     def _get_db_cache(self, endpoint, cur_time):
         '''get cache data from sqllite _database'''

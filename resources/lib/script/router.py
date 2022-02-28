@@ -10,7 +10,7 @@ from json import dumps
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import reconfigure_legacy_params, kodi_log, format_folderpath, convert_type
 from resources.lib.addon.decorators import busy_dialog
-from resources.lib.addon.parser import encode_url, try_int, parse_paramstring
+from resources.lib.addon.parser import encode_url, parse_paramstring
 from resources.lib.files.downloader import Downloader
 from resources.lib.files.utils import dumps_to_file, validify_filename, read_file
 from resources.lib.items.basedir import get_basedir_details
@@ -147,31 +147,6 @@ def _update_from_listitem(dictionary):
         dictionary['episode'] = xbmc.getInfoLabel('ListItem.Episode')
         if dictionary['query'] and dictionary['season'] and dictionary['episode']:
             return dictionary
-
-# def add_to_queue(episodes, clear_playlist=False, play_next=False):
-#     if not episodes:
-#         return
-#     playlist = xbmc.PlayList(1)
-#     if clear_playlist:
-#         playlist.clear()
-#     for i in episodes:
-#         li = ListItem(**i)
-#         li.set_params_reroute()
-#         playlist.add(li.get_url(), li.get_listitem())
-#     if play_next:
-#         xbmc.Player().play(playlist)
-
-
-# def play_season(**kwargs):
-#     with busy_dialog():
-#         if not kwargs.get('tmdb_id'):
-#             kwargs['tmdb_type'] = 'tv'
-#             kwargs['tmdb_id'] = TMDb().get_tmdb_id(**kwargs)
-#         if not kwargs['tmdb_id']:
-#             return
-#         add_to_queue(
-#             TMDb().get_episode_list(tmdb_id=kwargs['tmdb_id'], season=kwargs['play_season']),
-#             clear_playlist=True, play_next=True)
 
 
 def split_value(split_value, separator=None, **kwargs):

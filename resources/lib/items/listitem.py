@@ -137,23 +137,23 @@ class _ListItem(object):
             self.params['parent_info'] = self.params['info']
             self.params['info'] = 'trakt_sortby'
 
-    def set_params_reroute(self, ftv_forced_lookup=False, flatten_seasons=False, extended=None, cache_only=False):
+    def set_params_reroute(self, is_fanarttv=False, extended=None, is_cacheonly=False):
         if xbmc.getCondVisibility("Window.IsVisible(script-skinshortcuts.xml)"):
             self._set_params_reroute_skinshortcuts()
 
-        if cache_only:  # Take cacheony param from parent list with us onto subsequent pages
-            self.params['cacheonly'] = cache_only
+        if is_cacheonly:  # Take cacheony param from parent list with us onto subsequent pages
+            self.params['cacheonly'] = is_cacheonly
 
-        if ftv_forced_lookup:  # Take fanarttv param from parent list with us onto subsequent pages
-            self.params['fanarttv'] = ftv_forced_lookup
+        if is_fanarttv:  # Take fanarttv param from parent list with us onto subsequent pages
+            self.params['fanarttv'] = is_fanarttv
 
         if extended == 'inprogress':  # Reroute for extended sorting of trakt list by inprogress to open up next folder
             self.params['info'] = 'trakt_upnext'
 
         if self.params.get('info') == 'details':  # Reconfigure details item into play/browse etc.
-            self._set_params_reroute_details(flatten_seasons)
+            self._set_params_reroute_details()
 
-    def _set_params_reroute_details(self, flatten_seasons):
+    def _set_params_reroute_details(self):
         return  # Done in child class
 
     def set_episode_label(self, format_label=None):
@@ -206,7 +206,7 @@ class _ListItem(object):
 
 
 class _Keyword(_ListItem):
-    def _set_params_reroute_details(self, flatten_seasons):
+    def _set_params_reroute_details(self):
         self.params['info'] = 'discover'
         self.params['tmdb_type'] = 'movie'
         self.params['with_keywords'] = self.unique_ids.get('tmdb')
@@ -215,7 +215,7 @@ class _Keyword(_ListItem):
 
 
 class _Studio(_ListItem):
-    def _set_params_reroute_details(self, flatten_seasons):
+    def _set_params_reroute_details(self):
         self.params['info'] = 'discover'
         self.params['tmdb_type'] = 'movie'
         self.params['with_companies'] = self.unique_ids.get('tmdb')
@@ -224,7 +224,7 @@ class _Studio(_ListItem):
 
 
 class _Person(_ListItem):
-    def _set_params_reroute_details(self, flatten_seasons):
+    def _set_params_reroute_details(self):
         self.params['info'] = 'related'
         self.params['tmdb_type'] = 'person'
         self.params['tmdb_id'] = self.unique_ids.get('tmdb')
@@ -235,7 +235,7 @@ class _Person(_ListItem):
 
 
 class _Collection(_ListItem):
-    def _set_params_reroute_details(self, flatten_seasons):
+    def _set_params_reroute_details(self):
         self.params['info'] = 'collection'
 
 
@@ -262,7 +262,7 @@ class _Video(_ListItem):
         self.is_folder = False
         self.infoproperties['tmdbhelper.context.playusing'] = f'{self.get_url()}&ignore_default=true'
 
-    def _set_params_reroute_details(self, flatten_seasons):
+    def _set_params_reroute_details(self):
         self._set_params_reroute_default()
 
 
@@ -281,7 +281,7 @@ class _Movie(_Video):
         if ADDON.getSettingBool('hide_unaired_movies'):
             return True
 
-    def _set_params_reroute_details(self, flatten_seasons):
+    def _set_params_reroute_details(self):
         self._set_params_reroute_default()
 
 
@@ -313,12 +313,12 @@ class _Tvshow(_Video):
         if ADDON.getSettingBool('hide_unaired_episodes'):
             return True
 
-    def _set_params_reroute_details(self, flatten_seasons):
+    def _set_params_reroute_details(self):
         if ADDON.getSettingInt('default_select'):
             self.params['info'] = 'related'
             self.is_folder = False
             return
-        self.params['info'] = 'flatseasons' if flatten_seasons else 'seasons'
+        self.params['info'] = 'flatseasons' if ADDON.getSettingBool('flatten_seasons') else 'seasons'
 
 
 class _Season(_Tvshow):
@@ -328,7 +328,7 @@ class _Season(_Tvshow):
     def get_tmdb_id(self):
         return self.unique_ids.get('tvshow.tmdb')
 
-    def _set_params_reroute_details(self, flatten_seasons):
+    def _set_params_reroute_details(self):
         self.params['info'] = 'episodes'
 
     def set_playcount(self, playcount):
@@ -349,7 +349,7 @@ class _Episode(_Tvshow):
         self.infolabels['playcount'] = playcount
         self.infolabels['overlay'] = 5
 
-    def _set_params_reroute_details(self, flatten_seasons):
+    def _set_params_reroute_details(self):
         if (self.parent_params.get('info') == 'library_nextaired'
                 and ADDON.getSettingBool('nextaired_linklibrary')
                 and self.infoproperties.get('tvshow.dbid')):

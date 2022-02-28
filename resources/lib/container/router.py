@@ -26,88 +26,89 @@ from threading import Thread
 
 
 ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
-PREGAME_PARENT = ['seasons', 'episodes', 'episode_groups', 'trakt_upnext', 'episode_group_seasons']
+PREBUILD_PARENTSHOW = ['seasons', 'episodes', 'episode_groups', 'trakt_upnext', 'episode_group_seasons']
 LOG_TIMER_ITEMS = ['item_api', 'item_tmdb', 'item_ftv', 'item_map', 'item_cache', 'item_set', 'item_get', 'item_getx', 'item_non', 'item_nonx', 'item_art']
 
 
 class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLists):
     def __init__(self):
-        self.handle = int(sys.argv[1])
-        self.paramstring = sys.argv[2][1:]
-        self.params = parse_paramstring(self.paramstring)
-        self.parent_params = self.params
-        self.update_listing = False
-        self.plugin_category = ''
-        self.container_content = ''
-        self.container_update = None
-        self.container_refresh = False
-        self.item_type = None
-        self.kodi_db = None
-        self.kodi_db_tv = {}
-        self.timer_lists = {}
-        self.log_timers = ADDON.getSettingBool('timer_reports')
-        self.library = None
-        self.ib = None
-        self.tmdb_api = TMDb(delay_write=True)
-        self.trakt_api = TraktAPI(delay_write=True)
-        self.omdb_api = OMDb(delay_write=True) if ADDON.getSettingString('omdb_apikey') else None
+        # plugin:// params configuration
+        self.handle = int(sys.argv[1])  # plugin:// handle
+        self.paramstring = sys.argv[2][1:]  # plugin://plugin.video.themoviedb.helper?paramstring
+        self.params = reconfigure_legacy_params(**parse_paramstring(self.paramstring))  # paramstring dictionary
+        self.parent_params = self.params.copy()  # TODO: CLEANUP
         self.is_widget = self.params.pop('widget', '').lower() == 'true'
-        self.hide_watched = ADDON.getSettingBool('widgets_hidewatched') if self.is_widget else False
-        self.flatten_seasons = ADDON.getSettingBool('flatten_seasons')
-        self.trakt_watchedindicators = ADDON.getSettingBool('trakt_watchedindicators')
-        self.trakt_watchedinprogress = ADDON.getSettingBool('trakt_watchedinprogress')
-        self.trakt_playprogress = ADDON.getSettingBool('trakt_playprogress')
-        self.cache_only = self.params.pop('cacheonly', '').lower()
-        self.ftv_forced_lookup = self.params.pop('fanarttv', '').lower()
-        self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only(), delay_write=True)  # Set after ftv_forced_lookup, is_widget, cache_only
-        self.tmdb_cache_only = self.tmdb_is_cache_only()  # Set after ftv_api, cache_only
+        self.is_cacheonly = self.params.pop('cacheonly', '').lower() == 'true'
+        self.is_fanarttv = self.params.pop('fanarttv', '').lower()
+        self.is_nextpage = self.params.pop('nextpage', '').lower() != 'false'
         self.filters = {
             'filter_key': self.params.get('filter_key', None),
             'filter_value': split_items(self.params.get('filter_value', None))[0],
             'exclude_key': self.params.get('exclude_key', None),
             'exclude_value': split_items(self.params.get('exclude_value', None))[0]
         }
+
+        # endOfDirectory
+        self.update_listing = False  # xbmcplugin.endOfDirectory(updateListing=) set True to replace current path
+        self.plugin_category = ''  # Container.PluginCategory / ListItem.Property(widget)
+        self.container_content = ''  # Container.Content({})
+        self.container_update = ''  # Add path to call Containr.Update({}) at end of directory
+        self.container_refresh = False  # True call Container.Refresh at end of directory
+        self.library = None  # TODO: FIX -- Currently broken -- SetInfo(library, info)
+
+        # KodiDB
+        self.kodi_db = None
+        self.kodi_db_tv = {}  # TODO: Move to KodiDB module
+
+        # API class initialisation
+        self.ib = None
+        self.tmdb_api = TMDb(delay_write=True)
+        self.trakt_api = TraktAPI(delay_write=True)
+        self.omdb_api = OMDb(delay_write=True) if ADDON.getSettingString('omdb_apikey') else None
+        self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only(), delay_write=True)
+
+        # Log Settings
+        self.log_timers = ADDON.getSettingBool('timer_reports')
+        self.timer_lists = {}
+
+        # Trakt Watched Progress Settings
+        self.trakt_hidewatched = ADDON.getSettingBool('widgets_hidewatched') if self.is_widget else False
+        self.trakt_watchedindicators = ADDON.getSettingBool('trakt_watchedindicators')
+        self.trakt_watchedinprogress = ADDON.getSettingBool('trakt_watchedinprogress')
+        self.trakt_playprogress = ADDON.getSettingBool('trakt_playprogress')
+
+        # Miscellaneous
+        self.nodate_is_unaired = ADDON.getSettingBool('nodate_is_unaired')  # Consider items with no date to be
+        self.tmdb_cache_only = self.tmdb_is_cache_only()
         self.pagination = self.pagination_is_allowed()
-        self.params = reconfigure_legacy_params(**self.params)
         self.thumb_override = 0
 
-        # For cache profiling
-        # self.tmdb_api._cache._timers = self.timer_lists
-        # self.trakt_api._cache._timers = self.timer_lists
-        # self.ftv_api._cache._timers = self.timer_lists
-
-        # Get IDX list from DB to avoid unnecessary disk lookups
-        # with TimerList(self.timer_lists, 'idx_lookup', logging=self.log_timers):
-        #     self.tmdb_api._cache.get_id_list()
-        #     self.ftv_api._cache.get_id_list()
-        #     self.trakt_api._cache.get_id_list()
-
     def pagination_is_allowed(self):
-        if self.params.pop('nextpage', '').lower() == 'false':
+        if not self.is_nextpage:  # nextpage=false param overrides all other settings
             return False
         if self.is_widget and not ADDON.getSettingBool('widgets_nextpage'):
             return False
         return True
 
     def ftv_is_cache_only(self):
-        if self.cache_only == 'true':
+        if self.is_cacheonly:  # cacheonly=true param overrides all other settings
             return True
-        if self.ftv_forced_lookup == 'true':
+        if self.is_fanarttv == 'true':
             return False
-        if self.ftv_forced_lookup == 'false':
+        if self.is_fanarttv == 'false':
             return True
-        if self.is_widget and ADDON.getSettingBool('widget_fanarttv_lookup'):
+        if self.is_widget and ADDON.getSettingBool('widget_fanarttv_lookup'):  # user settings
             return False
-        if not self.is_widget and ADDON.getSettingBool('fanarttv_lookup'):
+        if not self.is_widget and ADDON.getSettingBool('fanarttv_lookup'):  # user setting
             return False
         return True
 
     def tmdb_is_cache_only(self):
-        if self.cache_only == 'true':
+        if self.is_cacheonly:  # cacheonly=true param overrides all other settings
             return True
-        if not self.ftv_is_cache_only():
+        if not self.ftv_is_cache_only():  # fanarttv lookups require TMDb lookups for tvshow ID -- TODO: only force on tvshows
             return False
-        if ADDON.getSettingBool('tmdb_details'):
+        if ADDON.getSettingBool('tmdb_details'):  # user setting
             return False
         return True
 
@@ -122,24 +123,30 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             return
         if not li.next_page and is_excluded(li, is_listitem=True, **self.filters):
             return
+
+        # Reformat ListItem.Label for episodes to match Kodi default 1x01.Title
+        # Check if unaired and either apply special formatting or hide item depending on user settings
         li.set_episode_label()
-        if self.hide_unaired and not li.infoproperties.get('specialseason'):
-            if li.is_unaired(no_date=self.hide_no_date):
+        if self.format_episode_labels and not li.infoproperties.get('specialseason'):
+            if li.is_unaired(no_date=self.nodate_is_unaired):
                 return
-        li.set_details(details=self.get_kodi_details(li), reverse=True)
+
+        # Add Trakt playcount and watched status
+        li.set_details(details=self.get_kodi_details(li), reverse=True)  # Add details from Kodi library first if available
         li.set_playcount(playcount=self.get_playcount_from_trakt(li))
-        if self.hide_watched and try_int(li.infolabels.get('playcount')) != 0:
+        if self.trakt_hidewatched and try_int(li.infolabels.get('playcount')) != 0:
             return
+
         li.set_context_menu()  # Set the context menu items
         li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
-        li.set_thumb_to_art(self.thumb_override == 2) if self.thumb_override else None
-        li.set_params_reroute(self.ftv_forced_lookup, self.flatten_seasons, self.params.get('extended'), self.cache_only)  # Reroute details to proper end point
+        li.set_thumb_to_art(self.thumb_override == 2) if self.thumb_override else None  # Special override for calendars to prevent thumb spoilers
+        li.set_params_reroute(self.is_fanarttv, self.params.get('extended'), self.is_cacheonly)  # Reroute details to proper end point
         li.set_params_to_info(self.plugin_category)  # Set path params to properties for use in skins
         li.infoproperties.update(self.property_params or {})
         if self.thumb_override:
-            li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb otherwise Kodi overrides after item is created
+            li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb to prevent Kodi overwriting
         if li.next_page:
-            li.params['plugin_category'] = self.plugin_category
+            li.params['plugin_category'] = self.plugin_category  # Carry the plugin category to next page in plugin:// path
         self.set_playprogress_from_trakt(li)
         return {'url': li.get_url(), 'listitem': li.get_listitem(), 'isFolder': li.is_folder}
 
@@ -147,15 +154,15 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         if not items:
             return
 
-        self.ib = ItemBuilder(tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api, delay_write=True)
-        self.ib.cache_only = self.tmdb_cache_only
+        # Setup ItemBuilder
+        self.ib = ItemBuilder(
+            tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api,
+            delay_write=True, cache_only=self.tmdb_cache_only)
         self.ib.timer_lists = self.ib._cache._timers = self.timer_lists
         self.ib.log_timers = self.log_timers
-        # with TimerList(self.timer_lists, 'idx_lookup', logging=self.log_timers):
-        #     self.ib._cache.get_id_list()
 
-        # Pre-game details and artwork cache for episodes before threading to avoid multiple API calls
-        if self.parent_params.get('info') in PREGAME_PARENT:
+        # Prebuild parent show details
+        if self.parent_params.get('info') in PREBUILD_PARENTSHOW:
             self.ib.get_parents(
                 tmdb_type='tv', tmdb_id=self.parent_params.get('tmdb_id'),
                 season=self.parent_params.get('season', None) if self.parent_params['info'] == 'episodes' else None)
@@ -171,10 +178,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self._pre_sync.join()
         with TimerList(self.timer_lists, '--make', log_threshold=0.05, logging=self.log_timers):
             self.property_params = property_params
-            self.hide_no_date = ADDON.getSettingBool('nodate_is_unaired')
-            self.hide_unaired = self.parent_params.get('info') not in NO_LABEL_FORMATTING
-            # all_itemtuples = (self._make_item(i) for i in all_listitems if i)
-            # all_itemtuples = (i for i in all_itemtuples if i)
+            self.format_episode_labels = self.parent_params.get('info') not in NO_LABEL_FORMATTING
             with ParallelThread(all_listitems, self._make_item) as pt:
                 item_queue = pt.queue
             all_itemtuples = [i for i in item_queue if i]

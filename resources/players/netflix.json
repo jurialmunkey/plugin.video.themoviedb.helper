@@ -19,7 +19,7 @@
                             "plugin://plugin.video.netflix/directory/search/search/add/",
                             {"keyboard": "Select"},
                             {"keyboard": "{showname}"},
-                            {"title": "(?i).*{showname}.*"},
+                            {"title": "(?i)^(\\[.*\\])?{showname}(\\[.*\\])?$"},
                             {"return": "true", "season": "{season}", "episode": "{episode}"},
                             {"season": "{season}"},
                             {"season": "{season}", "episode": "{episode}"}
