@@ -16,7 +16,6 @@ ADDONPATH = ADDON.getAddonInfo('path')
 def ListItem(*args, **kwargs):
     """ Factory to build ListItem object """
     factory = {
-        'none': _ListItem,
         'movie': _Movie,
         'tvshow': _Tvshow,
         'season': _Season,
@@ -26,12 +25,15 @@ def ListItem(*args, **kwargs):
         'studio': _Studio,
         'keyword': _Keyword,
         'person': _Person}
-    mediatype = kwargs.get('infolabels', {}).get('mediatype')
+    if kwargs.get('next_page'):
+        return _NextPage(*args, **kwargs)._configure()
     if kwargs.get('infoproperties', {}).get('tmdb_type') == 'person':
-        mediatype = 'person'
-    if mediatype not in factory:
-        mediatype = 'none'
-    return factory[mediatype](*args, **kwargs)
+        return _Person(*args, **kwargs)
+    mediatype = kwargs.get('infolabels', {}).get('mediatype')
+    try:
+        return factory[mediatype](*args, **kwargs)
+    except KeyError:
+        return _ListItem(*args, **kwargs)
 
 
 class _ListItem(object):
@@ -55,20 +57,6 @@ class _ListItem(object):
         self.stream_details = stream_details or {}
         self.unique_ids = unique_ids or {}
         self.next_page = next_page
-        self._set_as_next_page(next_page)
-
-    def _set_as_next_page(self, next_page=None):
-        if not next_page:
-            return
-        self.label = xbmc.getLocalizedString(33078)
-        self.art['icon'] = f'{ADDONPATH}/resources/icons/themoviedb/nextpage.png'
-        self.art['landscape'] = f'{ADDONPATH}/resources/icons/themoviedb/nextpage_wide.png'
-        self.infoproperties['specialsort'] = 'bottom'
-        self.params = self.parent_params.copy()
-        self.params['page'] = next_page
-        self.params.pop('update_listing', None)  # Just in case we updated the listing for search results
-        self.path = PLUGINPATH
-        self.is_folder = True
 
     def set_art_fallbacks(self):
         if not self.art.get('fanart'):
@@ -203,6 +191,21 @@ class _ListItem(object):
                     continue
                 listitem.addStreamInfo(k, i)
         return listitem
+
+
+class _NextPage(_ListItem):
+    def _configure(self):
+        """ Run at class initialisation to configure next_page item. Returns self """
+        self.label = xbmc.getLocalizedString(33078)
+        self.art['icon'] = f'{ADDONPATH}/resources/icons/themoviedb/nextpage.png'
+        self.art['landscape'] = f'{ADDONPATH}/resources/icons/themoviedb/nextpage_wide.png'
+        self.infoproperties['specialsort'] = 'bottom'
+        self.params = self.parent_params.copy()
+        self.params['page'] = self.next_page
+        self.params.pop('update_listing', None)  # Just in case we updated the listing for search results
+        self.path = PLUGINPATH
+        self.is_folder = True
+        return self
 
 
 class _Keyword(_ListItem):
