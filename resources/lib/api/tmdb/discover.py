@@ -679,7 +679,7 @@ def _select_properties_dialog(data_list, header=None, multiselect=True):
     return select_list
 
 
-def _select_properties(data_list, method, header=None, multiselect=True):
+def _select_properties(data_list, method, header=None, multiselect=True, separator=' / '):
     select_list = _select_properties_dialog(data_list, header, multiselect)
     if not select_list:
         return
@@ -690,7 +690,7 @@ def _select_properties(data_list, method, header=None, multiselect=True):
         if not value:
             continue
         labels = f'{labels} / {label}' if labels else label
-        values = f'{values} / {value}' if values else f'{value}'
+        values = f'{values}{separator}{value}' if values else f'{value}'
     if labels and values:
         return {'label': labels, 'value': values, 'method': method}
 
@@ -795,7 +795,7 @@ def _add_rule(tmdb_type, method=None):
     elif method == 'region':
         rules = _select_properties(REGIONS, method, header=ADDON.getLocalizedString(32120), multiselect=False)
     elif method == 'with_original_language':
-        rules = _select_properties(LANGUAGES, method, header=ADDON.getLocalizedString(32120), multiselect=False)
+        rules = _select_properties(LANGUAGES, method, header=ADDON.getLocalizedString(32120), multiselect=True, separator='|')
     if not rules or not rules.get('value'):
         return
     _set_rule(method, rules.get('label'), rules.get('value'), overwrite=overwrite)
