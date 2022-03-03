@@ -223,14 +223,23 @@ class SimpleCache(object):
         self._win.clearProperty(f'{self._sc_name}.cleanbusy')
         kodi_log("CACHE: Auto cleanup done")
 
+    def _set_pragmas(self, connection):
+        if not self._connection:
+            connection.execute("PRAGMA synchronous=normal")
+            connection.execute("PRAGMA journal_mode=WAL")
+            # connection.execute("PRAGMA temp_store=memory")
+            # connection.execute("PRAGMA mmap_size=2000000000")
+            # connection.execute("PRAGMA cache_size=-500000000")
+        if self._delaywrite:
+            self._connection = connection
+        return connection
+
     def _get_database(self, attempts=2):
         '''get reference to our sqllite _database - performs basic integrity check'''
         try:
             connection = self._connection or sqlite3.connect(self._db_file, timeout=5, isolation_level=None, check_same_thread=not self._delaywrite)
             connection.execute('SELECT * FROM simplecache LIMIT 1')
-            if self._delaywrite:
-                self._connection = connection
-            return connection
+            return self._set_pragmas(connection)
         except Exception:
             # our _database is corrupt or doesn't exist yet, we simply try to recreate it
             if xbmcvfs.exists(self._db_file):
@@ -243,9 +252,7 @@ class SimpleCache(object):
                     """CREATE TABLE IF NOT EXISTS simplecache(
                     id TEXT UNIQUE, expires INTEGER, data TEXT, checksum INTEGER)""")
                 connection.execute("CREATE INDEX idx ON simplecache(id)")
-                if self._delaywrite:
-                    self._connection = connection
-                return connection
+                return self._set_pragmas(connection)
             except Exception as error:
                 kodi_log(f'CACHE: Exception while initializing _database: {error} ({attempts})', 1)
                 if attempts < 1:
