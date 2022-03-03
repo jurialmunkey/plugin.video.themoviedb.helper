@@ -226,7 +226,7 @@ class SimpleCache(object):
     def _get_database(self, attempts=2):
         '''get reference to our sqllite _database - performs basic integrity check'''
         try:
-            connection = self._connection or sqlite3.connect(self._db_file, timeout=30, isolation_level=None, check_same_thread=not self._delaywrite)
+            connection = self._connection or sqlite3.connect(self._db_file, timeout=5, isolation_level=None, check_same_thread=not self._delaywrite)
             connection.execute('SELECT * FROM simplecache LIMIT 1')
             if self._delaywrite:
                 self._connection = connection
@@ -234,9 +234,11 @@ class SimpleCache(object):
         except Exception:
             # our _database is corrupt or doesn't exist yet, we simply try to recreate it
             if xbmcvfs.exists(self._db_file):
+                kodi_log(f'CACHE: Deleting Corrupt File: {self._db_file}...', 1)
                 xbmcvfs.delete(self._db_file)
             try:
-                connection = self._connection or sqlite3.connect(self._db_file, timeout=30, isolation_level=None, check_same_thread=not self._delaywrite)
+                kodi_log(f'CACHE: Initialising: {self._db_file}...', 1)
+                connection = self._connection or sqlite3.connect(self._db_file, timeout=5, isolation_level=None, check_same_thread=not self._delaywrite)
                 connection.execute(
                     """CREATE TABLE IF NOT EXISTS simplecache(
                     id TEXT UNIQUE, expires INTEGER, data TEXT, checksum INTEGER)""")
@@ -254,12 +256,12 @@ class SimpleCache(object):
 
     def _execute_sql(self, query, data=None):
         '''little wrapper around execute and executemany to just retry a db command if db is locked'''
-        retries = 0
+        retries = 10
         result = None
-        error = None
+        error = ''
         # always use new db object because we need to be sure that data is available for other simplecache instances
         with self._get_database() as _database:
-            while not retries == 10 and not self._monitor.abortRequested():
+            while retries > 0 and not self._monitor.abortRequested():
                 if self._exit:
                     return None
                 try:
@@ -270,11 +272,12 @@ class SimpleCache(object):
                     else:
                         result = _database.execute(query)
                     return result
-                except sqlite3.OperationalError as error:
+                except sqlite3.OperationalError as err:
+                    error = err
                     try:
-                        if "database is locked" in error:
-                            kodi_log("CACHE: Locked: Retrying DB commit...")
-                            retries += 1
+                        if "database is locked" == f'{error}':
+                            kodi_log("CACHE: Locked: Retrying DB commit...", 1)
+                            retries -= 1
                             self._monitor.waitForAbort(0.5)
                         else:
                             break
