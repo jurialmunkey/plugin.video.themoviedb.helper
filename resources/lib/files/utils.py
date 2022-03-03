@@ -85,7 +85,8 @@ def dumps_to_file(data, folder, filename, indent=2, join_addon_data=True):
 
 
 def write_to_file(data, folder, filename, join_addon_data=True, append_to_file=False):
-    path = os.path.join(get_write_path(folder, join_addon_data), filename)
+    path = '/'.join((get_write_path(folder, join_addon_data), filename))
+    xbmcvfs.validatePath(xbmcvfs.translatePath(path))
     if append_to_file:
         data = '\n'.join([read_file(path), data])
     with xbmcvfs.File(path, 'w') as f:
@@ -93,10 +94,12 @@ def write_to_file(data, folder, filename, join_addon_data=True, append_to_file=F
 
 
 def get_write_path(folder, join_addon_data=True):
-    main_dir = os.path.join(xbmcvfs.translatePath(ADDONDATA), folder) if join_addon_data else xbmcvfs.translatePath(folder)
-    if not os.path.exists(main_dir):
+    if join_addon_data:
+        folder = f'{ADDONDATA}{folder}/'
+    main_dir = xbmcvfs.validatePath(xbmcvfs.translatePath(folder))
+    if not xbmcvfs.exists(main_dir):
         try:  # Try makedir to avoid race conditions
-            os.makedirs(main_dir)
+            xbmcvfs.mkdirs(main_dir)
         except FileExistsError:
             pass
     return main_dir
