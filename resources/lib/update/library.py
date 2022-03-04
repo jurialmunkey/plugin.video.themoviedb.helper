@@ -47,7 +47,7 @@ class LibraryAdder():
 
     def _start(self):
         if self.p_dialog:
-            self.p_dialog.create('TMDbHelper', get_setting(32166))
+            self.p_dialog.create('TMDbHelper', get_localized(32166))
         if not get_setting('legacy_conversion'):
             self.legacy_conversion()
 
@@ -99,7 +99,7 @@ class LibraryAdder():
         nfos_total = len(nfos)
         for x, i in enumerate(nfos):
             folder, tmdb_id = i['folder'], i['tmdb_id']
-            self._update(x, nfos_total, message=f'{get_setting(32167)} {folder}...')
+            self._update(x, nfos_total, message=f'{get_localized(32167)} {folder}...')
             self._legacy_conversion(folder, tmdb_id)
 
         # Mark as complete and set to clean library
@@ -112,7 +112,7 @@ class LibraryAdder():
         # Update each show in folder
         nfos_total = len(nfos)
         for x, i in enumerate(nfos):
-            self._update(x, nfos_total, message=f'{get_setting(32167)} {i["folder"]}...')
+            self._update(x, nfos_total, message=f'{get_localized(32167)} {i["folder"]}...')
             self.add_tvshow(tmdb_id=i['tmdb_id'], force=force)
 
         # Update last updated stamp
@@ -133,10 +133,10 @@ class LibraryAdder():
             i_added[i.get('type')].append(playlist_rule)
 
         if i_added.get('movie'):
-            self._update(1, 3, message=get_setting(32349))
+            self._update(1, 3, message=get_localized(32349))
             create_playlist(i_added['movie'], 'movies', user_slug, list_slug)
         if i_added.get('show'):
-            self._update(2, 3, message=get_setting(32350))
+            self._update(2, 3, message=get_localized(32350))
             create_playlist(i_added['show'], 'tvshows', user_slug, list_slug)
 
     def _add_userlist_item(self, i, force=False):
@@ -200,7 +200,7 @@ class LibraryAdder():
 
         # Add seasons
         for x, season in enumerate(self.tv.get_seasons()):
-            self._update(x, self.tv.s_total, message=f'{get_setting(32167)} {self.tv.details.get("name")} - {get_localized(20373)} {season.get("season_number", 0)}...')  # Update our progress dialog
+            self._update(x, self.tv.s_total, message=f'{get_localized(32167)} {self.tv.details.get("name")} - {get_localized(20373)} {season.get("season_number", 0)}...')  # Update our progress dialog
             self._add_season(season)
 
         # Store details about what we did into the cache
