@@ -2,13 +2,11 @@
 # Author: jurialmunkey
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 import sys
-import xbmc
 import xbmcvfs
-import xbmcgui
-import xbmcaddon
 from json import dumps
+from xbmcgui import Dialog
 from resources.lib.addon.window import get_property
-from resources.lib.addon.plugin import reconfigure_legacy_params, kodi_log, format_folderpath, convert_type
+from resources.lib.addon.plugin import reconfigure_legacy_params, kodi_log, format_folderpath, convert_type, get_localized, get_setting, set_setting, executebuiltin, get_infolabel
 from resources.lib.addon.decorators import busy_dialog
 from resources.lib.addon.parser import encode_url, parse_paramstring
 from resources.lib.files.downloader import Downloader
@@ -27,9 +25,6 @@ from resources.lib.player.players import Players
 from resources.lib.player.configure import configure_players
 from resources.lib.monitor.images import ImageFunctions
 from resources.lib.script.sync import sync_trakt_item
-
-
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 # Get TMDb ID decorator
@@ -67,18 +62,18 @@ def is_in_kwargs(mapping={}):
 def play_media(**kwargs):
     with busy_dialog():
         kodi_log(['lib.script.router - attempting to play\n', kwargs.get('play_media')], 1)
-        xbmc.executebuiltin(f'PlayMedia({kwargs.get("play_media")})')
+        executebuiltin(f'PlayMedia({kwargs.get("play_media")})')
 
 
 def run_plugin(**kwargs):
     with busy_dialog():
         kodi_log(['lib.script.router - attempting to play\n', kwargs.get('run_plugin')], 1)
-        xbmc.executebuiltin(f'RunPlugin({kwargs.get("run_plugin")})')
+        executebuiltin(f'RunPlugin({kwargs.get("run_plugin")})')
 
 
 def container_refresh():
-    xbmc.executebuiltin('Container.Refresh')
-    xbmc.executebuiltin('UpdateLibrary(video,/fake/path/to/force/refresh/on/home)')
+    executebuiltin('Container.Refresh')
+    executebuiltin('UpdateLibrary(video,/fake/path/to/force/refresh/on/home)')
 
 
 def delete_cache(delete_cache, **kwargs):
@@ -90,18 +85,18 @@ def delete_cache(delete_cache, **kwargs):
         'Item Details': lambda: ItemBuilder()}
     if delete_cache == 'select':
         m = [i for i in d]
-        x = xbmcgui.Dialog().contextmenu([ADDON.getLocalizedString(32387).format(i) for i in m])
+        x = Dialog().contextmenu([get_localized(32387).format(i) for i in m])
         if x == -1:
             return
         delete_cache = m[x]
     z = d.get(delete_cache)
     if not z:
         return
-    if not xbmcgui.Dialog().yesno(ADDON.getLocalizedString(32387).format(delete_cache), ADDON.getLocalizedString(32388).format(delete_cache)):
+    if not Dialog().yesno(get_localized(32387).format(delete_cache), get_localized(32388).format(delete_cache)):
         return
     with busy_dialog():
         z()._cache.ret_cache()._do_delete()
-    xbmcgui.Dialog().ok(ADDON.getLocalizedString(32387).format(delete_cache), ADDON.getLocalizedString(32389))
+    Dialog().ok(get_localized(32387).format(delete_cache), get_localized(32389))
 
 
 @map_kwargs({'play': 'tmdb_type'})
@@ -120,7 +115,7 @@ def play_using(play_using, mode='play', **kwargs):
 
 
 def _update_from_listitem(dictionary):
-    url = xbmc.getInfoLabel('ListItem.FileNameAndPath') or ''
+    url = get_infolabel('ListItem.FileNameAndPath') or ''
     if url[-5:] == '.strm':
         url = read_file(url)
     params = {}
@@ -130,21 +125,21 @@ def _update_from_listitem(dictionary):
         dictionary.update(params)
     if dictionary.get('tmdb_type'):
         return dictionary
-    dbtype = xbmc.getInfoLabel('ListItem.DBType')
+    dbtype = get_infolabel('ListItem.DBType')
     if dbtype == 'movie':
         dictionary['tmdb_type'] = 'movie'
-        dictionary['tmdb_id'] = xbmc.getInfoLabel('ListItem.UniqueId(tmdb)')
-        dictionary['imdb_id'] = xbmc.getInfoLabel('ListItem.UniqueId(imdb)')
-        dictionary['query'] = xbmc.getInfoLabel('ListItem.Title')
-        dictionary['year'] = xbmc.getInfoLabel('ListItem.Year')
+        dictionary['tmdb_id'] = get_infolabel('ListItem.UniqueId(tmdb)')
+        dictionary['imdb_id'] = get_infolabel('ListItem.UniqueId(imdb)')
+        dictionary['query'] = get_infolabel('ListItem.Title')
+        dictionary['year'] = get_infolabel('ListItem.Year')
         if dictionary['tmdb_id'] or dictionary['imdb_id'] or dictionary['query']:
             return dictionary
     elif dbtype == 'episode':
         dictionary['tmdb_type'] = 'tv'
-        dictionary['query'] = xbmc.getInfoLabel('ListItem.TVShowTitle')
-        dictionary['ep_year'] = xbmc.getInfoLabel('ListItem.Year')
-        dictionary['season'] = xbmc.getInfoLabel('ListItem.Season')
-        dictionary['episode'] = xbmc.getInfoLabel('ListItem.Episode')
+        dictionary['query'] = get_infolabel('ListItem.TVShowTitle')
+        dictionary['ep_year'] = get_infolabel('ListItem.Year')
+        dictionary['season'] = get_infolabel('ListItem.Season')
+        dictionary['episode'] = get_infolabel('ListItem.Episode')
         if dictionary['query'] and dictionary['season'] and dictionary['episode']:
             return dictionary
 
@@ -180,7 +175,7 @@ def related_lists(tmdb_id=None, tmdb_type=None, season=None, episode=None, conta
     items = get_basedir_details(tmdb_type=tmdb_type, tmdb_id=tmdb_id, season=season, episode=episode, include_play=include_play)
     if not items or len(items) <= 1:
         return
-    choice = xbmcgui.Dialog().contextmenu([i.get('label') for i in items])
+    choice = Dialog().contextmenu([i.get('label') for i in items])
     if choice == -1:
         return
     item = items[choice]
@@ -195,18 +190,18 @@ def related_lists(tmdb_id=None, tmdb_type=None, season=None, episode=None, conta
         path=encode_url(path=item.get('path'), **item.get('params')),
         info=item['params']['info'], play='RunPlugin',  # Use RunPlugin to avoid window manager info dialog crash with Browse method
         content='pictures' if item['params']['info'] in ['posters', 'fanart'] else 'videos')
-    xbmc.executebuiltin('Dialog.Close(busydialog)')  # Kill modals because prevents ActivateWindow
-    xbmc.executebuiltin(path)
+    executebuiltin('Dialog.Close(busydialog)')  # Kill modals because prevents ActivateWindow
+    executebuiltin(path)
 
 
 def update_players():
-    players_url = ADDON.getSettingString('players_url')
-    players_url = xbmcgui.Dialog().input(ADDON.getLocalizedString(32313), defaultt=players_url)
-    if not xbmcgui.Dialog().yesno(
-            ADDON.getLocalizedString(32032),
-            ADDON.getLocalizedString(32314).format(players_url)):
+    players_url = get_setting('players_url', 'str')
+    players_url = Dialog().input(get_localized(32313), defaultt=players_url)
+    if not Dialog().yesno(
+            get_localized(32032),
+            get_localized(32314).format(players_url)):
         return
-    ADDON.setSettingString('players_url', players_url)
+    set_setting('players_url', players_url, 'str')
     downloader = Downloader(
         extract_to='special://profile/addon_data/plugin.video.themoviedb.helper/players',
         download_url=players_url)
@@ -221,7 +216,7 @@ def refresh_details(tmdb_id=None, tmdb_type=None, season=None, episode=None, con
         details = ItemBuilder().get_item(tmdb_type, tmdb_id, season, episode, cache_refresh=True) or {}
         details = details.get('listitem')
     if details and confirm:
-        xbmcgui.Dialog().ok('TMDbHelper', ADDON.getLocalizedString(32234).format(tmdb_type, tmdb_id))
+        Dialog().ok('TMDbHelper', get_localized(32234).format(tmdb_type, tmdb_id))
         container_refresh()
     return details
 
@@ -243,14 +238,14 @@ def user_list(user_list, user_slug=None, **kwargs):
 
 
 def delete_list(delete_list, **kwargs):
-    if not xbmcgui.Dialog().yesno(ADDON.getLocalizedString(32358), ADDON.getLocalizedString(32357).format(delete_list)):
+    if not Dialog().yesno(get_localized(32358), get_localized(32357).format(delete_list)):
         return
     TraktAPI().delete_response('users/me/lists', delete_list)
     container_refresh()
 
 
 def rename_list(rename_list, **kwargs):
-    name = xbmcgui.Dialog().input(ADDON.getLocalizedString(32359))
+    name = Dialog().input(get_localized(32359))
     if not name:
         return
     TraktAPI().post_response('users/me/lists', rename_list, postdata={'name': name}, response_method='put')
@@ -274,8 +269,8 @@ def set_defaultplayer(**kwargs):
     if not default_player:
         return
     if not default_player.get('file') or not default_player.get('mode'):
-        return ADDON.setSettingString(setting_name, '')
-    ADDON.setSettingString(setting_name, f'{default_player["file"]} {default_player["mode"]}')
+        return set_setting(setting_name, '', 'str')
+    set_setting(setting_name, f'{default_player["file"]} {default_player["mode"]}', 'str')
 
 
 def blur_image(blur_image=None, **kwargs):
@@ -292,11 +287,11 @@ def image_colors(image_colors=None, **kwargs):
 
 def library_update(**kwargs):
     if kwargs.get('force') == 'select':
-        choice = xbmcgui.Dialog().yesno(
-            ADDON.getLocalizedString(32391),
-            ADDON.getLocalizedString(32392),
-            yeslabel=ADDON.getLocalizedString(32393),
-            nolabel=ADDON.getLocalizedString(32394))
+        choice = Dialog().yesno(
+            get_localized(32391),
+            get_localized(32392),
+            yeslabel=get_localized(32393),
+            nolabel=get_localized(32394))
         if choice == -1:
             return
         kwargs['force'] = True if choice else False
@@ -311,7 +306,7 @@ def log_request(**kwargs):
     with busy_dialog():
         kwargs['response'] = None
         if not kwargs.get('url'):
-            kwargs['url'] = xbmcgui.Dialog().input('URL')
+            kwargs['url'] = Dialog().input('URL')
         if not kwargs['url']:
             return
         if kwargs.get('log_request').lower() == 'trakt':
@@ -319,7 +314,7 @@ def log_request(**kwargs):
         else:
             kwargs['response'] = TMDb().get_response_json(kwargs['url'])
         if not kwargs['response']:
-            xbmcgui.Dialog().ok(kwargs['log_request'].capitalize(), f'{kwargs["url"]}\nNo Response!')
+            Dialog().ok(kwargs['log_request'].capitalize(), f'{kwargs["url"]}\nNo Response!')
             return
         filename = validify_filename(f'{kwargs["log_request"]}_{kwargs["url"]}.json')
         dumps_to_file(kwargs, 'log_request', filename)
@@ -327,22 +322,22 @@ def log_request(**kwargs):
         msg = (
             f'[B]{kwargs["url"]}[/B]\n\n{xbmcvfs.translatePath("special://profile/addon_data/")}\n'
             f'plugin.video.themoviedb.helper/log_request\n{filename}')
-        xbmcgui.Dialog().ok(kwargs['log_request'].capitalize(), msg)
-        xbmcgui.Dialog().textviewer(filename, dumps(kwargs['response'], indent=2))
+        Dialog().ok(kwargs['log_request'].capitalize(), msg)
+        Dialog().textviewer(filename, dumps(kwargs['response'], indent=2))
 
 
 def sort_list(**kwargs):
     sort_methods = get_sort_methods() if kwargs['info'] == 'trakt_userlist' else get_sort_methods(True)
-    x = xbmcgui.Dialog().contextmenu([i['name'] for i in sort_methods])
+    x = Dialog().contextmenu([i['name'] for i in sort_methods])
     if x == -1:
         return
     for k, v in sort_methods[x]['params'].items():
         kwargs[k] = v
-    xbmc.executebuiltin(format_folderpath(encode_url(**kwargs)))
+    executebuiltin(format_folderpath(encode_url(**kwargs)))
 
 
 def log_jsonrpc(**kwargs):
-    dialog = xbmcgui.DialogProgress()
+    dialog = DialogProgress()
     method = "VideoLibrary.GetMovies"
     params = {
         "properties": ["title", "imdbnumber", "originaltitle", "uniqueid", "year", "file"],
@@ -358,7 +353,6 @@ def log_jsonrpc(**kwargs):
     while update < 100:
         update += 10
         dialog.update(update)
-        xbmc.sleep(500)
     dialog.close()
     kodi_log(['JSONRPC:\n', response], 1)
 

@@ -1,5 +1,4 @@
-import xbmc
-import xbmcaddon
+from resources.lib.addon.plugin import get_setting, get_localized
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.timedate import convert_timestamp, date_in_range, get_region_date, get_datetime_today, get_timedelta
 from resources.lib.files.cache import CACHE_SHORT, CACHE_LONG, use_simple_cache
@@ -8,8 +7,6 @@ from resources.lib.api.mapping import get_empty_item
 from resources.lib.api.trakt.items import TraktItems
 from resources.lib.api.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache
 from resources.lib.addon.decorators import ParallelThread
-
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 class _TraktProgress():
@@ -386,7 +383,7 @@ class _TraktProgress():
         ip['stacked_last'] = se
         ip['stacked_last_episode'] = next_item['infolabels']['episode']
         ip['stacked_last_season'] = next_item['infolabels']['season']
-        last_item['label'] = f'{ip["stacked_first"]}-{ip["stacked_last"]}. {ip["stacked_count"]} {xbmc.getLocalizedString(20360)}'
+        last_item['label'] = f'{ip["stacked_first"]}-{ip["stacked_last"]}. {ip["stacked_count"]} {get_localized(20360)}'
         return last_item
 
     def _stack_calendar_episodes(self, episode_list, flipped=False):
@@ -439,7 +436,7 @@ class _TraktProgress():
 
     def get_calendar_episodes_list(self, startdate=0, days=1, user=True, kodi_db=None, page=1, limit=None):
         limit = limit or self.item_limit
-        response_items = self._get_calendar_episodes_list(startdate, days, user, kodi_db, stack=ADDON.getSettingBool('calendar_flatten'))
+        response_items = self._get_calendar_episodes_list(startdate, days, user, kodi_db, stack=get_setting('calendar_flatten'))
         response = PaginatedItems(response_items, page=page, limit=limit)
         if response and response.items:
             return response.items + response.next_page

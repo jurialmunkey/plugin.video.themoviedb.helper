@@ -1,6 +1,6 @@
 import re
-import xbmcaddon
 from resources.lib.items.artselect import _ArtworkSelector
+from resources.lib.addon.plugin import get_setting
 from resources.lib.items.listitem import ListItem
 from resources.lib.files.cache import BasicCache
 from resources.lib.api.tmdb.api import TMDb
@@ -9,9 +9,8 @@ from resources.lib.addon.timedate import set_timestamp, get_timestamp
 from resources.lib.addon.constants import IMAGEPATH_QUALITY_POSTER, IMAGEPATH_QUALITY_FANART, IMAGEPATH_QUALITY_THUMBS, IMAGEPATH_QUALITY_CLOGOS, IMAGEPATH_ALL, ARTWORK_BLACKLIST
 from resources.lib.addon.decorators import TimerList, ParallelThread
 
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
-FTV_SECOND_PREF = ADDON.getSettingBool('fanarttv_secondpref')
-ARTWORK_QUALITY = ADDON.getSettingInt('artwork_quality')
+FTV_SECOND_PREF = get_setting('fanarttv_secondpref')
+ARTWORK_QUALITY = get_setting('artwork_quality', 'int')
 ARTWORK_QUALITY_FANART = IMAGEPATH_QUALITY_FANART[ARTWORK_QUALITY]
 ARTWORK_QUALITY_THUMBS = IMAGEPATH_QUALITY_THUMBS[ARTWORK_QUALITY]
 ARTWORK_QUALITY_CLOGOS = IMAGEPATH_QUALITY_CLOGOS[ARTWORK_QUALITY]

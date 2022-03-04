@@ -1,21 +1,17 @@
 import re
 import os
 import json
-import xbmcgui
 import xbmcvfs
-import xbmcaddon
 import unicodedata
+from xbmcgui import Dialog
 from resources.lib.addon.timedate import get_timedelta, get_datetime_now, is_future_timestamp
 from resources.lib.addon.parser import try_int
-from resources.lib.addon.plugin import ADDONDATA, kodi_log
+from resources.lib.addon.plugin import ADDONDATA, kodi_log, get_localized, get_setting
 from resources.lib.addon.constants import ALPHANUM_CHARS, INVALID_FILECHARS
 try:
     import cPickle as _pickle
 except ImportError:
     import pickle as _pickle  # Newer versions of Py3 just use pickle
-
-
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 def validify_filename(filename, alphanum=False):
@@ -121,13 +117,13 @@ def make_path(path, warn_dialog=False):
         return xbmcvfs.translatePath(path)
     if xbmcvfs.mkdirs(path):
         return xbmcvfs.translatePath(path)
-    if ADDON.getSettingBool('ignore_folderchecking'):
+    if get_setting('ignore_folderchecking'):
         kodi_log(f'Ignored xbmcvfs folder check error\n{path}', 2)
         return xbmcvfs.translatePath(path)
     kodi_log(f'XBMCVFS unable to create path:\n{path}', 2)
     if not warn_dialog:
         return
-    xbmcgui.Dialog().ok('XBMCVFS', f'{ADDON.getLocalizedString(32122)} [B]{path}[/B]\n{ADDON.getLocalizedString(32123)}')
+    Dialog().ok('XBMCVFS', f'{get_localized(32122)} [B]{path}[/B]\n{get_localized(32123)}')
 
 
 def json_loads(obj):

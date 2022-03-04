@@ -1,19 +1,12 @@
 # -*- coding: utf-8 -*-
-
-import xbmc
-import xbmcgui
-import xbmcaddon
-from resources.lib.addon.plugin import PLUGINPATH, convert_type
+from xbmcgui import Dialog, INPUT_NUMERIC
+from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized
 from resources.lib.addon.parser import try_int, encode_url
 from resources.lib.addon.setutils import merge_two_dicts, split_items
 from resources.lib.addon.timedate import get_datetime_now, get_timedelta
 from resources.lib.addon.window import get_property
 from resources.lib.files.cache import set_search_history, get_search_history
 from resources.lib.api.tmdb.api import TMDb
-
-
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
-ADDONPATH = ADDON.getAddonInfo('path')
 
 
 RELATIVE_DATES = [
@@ -481,26 +474,26 @@ LANGUAGES = [
 
 def _get_release_types():
     return [
-        {'id': 1, 'name': ADDON.getLocalizedString(32242)},
-        {'id': 2, 'name': ADDON.getLocalizedString(32243)},
-        {'id': 3, 'name': ADDON.getLocalizedString(32244)},
-        {'id': 4, 'name': ADDON.getLocalizedString(32245)},
-        {'id': 5, 'name': ADDON.getLocalizedString(32246)},
-        {'id': 6, 'name': xbmc.getLocalizedString(36037)}]
+        {'id': 1, 'name': get_localized(32242)},
+        {'id': 2, 'name': get_localized(32243)},
+        {'id': 3, 'name': get_localized(32244)},
+        {'id': 4, 'name': get_localized(32245)},
+        {'id': 5, 'name': get_localized(32246)},
+        {'id': 6, 'name': get_localized(36037)}]
 
 
 def _get_basedir_top(tmdb_type):
     return [
         {
-            'label': ADDON.getLocalizedString(32238).format(convert_type(tmdb_type, 'plural')),
+            'label': get_localized(32238).format(convert_type(tmdb_type, 'plural')),
             'art': {'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'},
             'params': {'info': 'user_discover', 'tmdb_type': tmdb_type, 'method': 'open'}},
         {
-            'label': ADDON.getLocalizedString(32239),
+            'label': get_localized(32239),
             'art': {'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'},
             'params': {'info': 'user_discover', 'tmdb_type': tmdb_type, 'method': 'with_separator'}},
         {
-            'label': ADDON.getLocalizedString(32240),
+            'label': get_localized(32240),
             'art': {'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'},
             'params': {'info': 'user_discover', 'tmdb_type': tmdb_type, 'method': 'sort_by'}}]
 
@@ -508,59 +501,59 @@ def _get_basedir_top(tmdb_type):
 def _get_basedir_end(tmdb_type):
     return [
         {
-            'label': ADDON.getLocalizedString(32277),
+            'label': get_localized(32277),
             'art': {'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'},
             'params': {'info': 'user_discover', 'tmdb_type': tmdb_type, 'method': 'add_rule'}},
         {
-            'label': xbmc.getLocalizedString(192),
+            'label': get_localized(192),
             'art': {'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'},
             'params': {'info': 'user_discover', 'tmdb_type': tmdb_type, 'method': 'clear'}},
         {
-            'label': xbmc.getLocalizedString(190),
+            'label': get_localized(190),
             'art': {'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'},
             'params': {'info': 'user_discover', 'tmdb_type': tmdb_type, 'method': 'save'}}]
 
 
 def _get_basedir_rules_movies():
     return [
-        {'label': ADDON.getLocalizedString(32247), 'method': 'with_cast'},
-        {'label': ADDON.getLocalizedString(32248), 'method': 'with_crew'},
-        {'label': ADDON.getLocalizedString(32249), 'method': 'with_people'},
-        {'label': ADDON.getLocalizedString(32250), 'method': 'primary_release_year'},
-        {'label': ADDON.getLocalizedString(32251), 'method': 'primary_release_date.gte'},
-        {'label': ADDON.getLocalizedString(32252), 'method': 'primary_release_date.lte'},
-        {'label': ADDON.getLocalizedString(32253), 'method': 'release_date.gte'},
-        {'label': ADDON.getLocalizedString(32254), 'method': 'release_date.lte'},
-        {'label': ADDON.getLocalizedString(32255), 'method': 'with_release_type'},
-        {'label': ADDON.getLocalizedString(32256), 'method': 'region'}]
+        {'label': get_localized(32247), 'method': 'with_cast'},
+        {'label': get_localized(32248), 'method': 'with_crew'},
+        {'label': get_localized(32249), 'method': 'with_people'},
+        {'label': get_localized(32250), 'method': 'primary_release_year'},
+        {'label': get_localized(32251), 'method': 'primary_release_date.gte'},
+        {'label': get_localized(32252), 'method': 'primary_release_date.lte'},
+        {'label': get_localized(32253), 'method': 'release_date.gte'},
+        {'label': get_localized(32254), 'method': 'release_date.lte'},
+        {'label': get_localized(32255), 'method': 'with_release_type'},
+        {'label': get_localized(32256), 'method': 'region'}]
 
 
 def _get_basedir_rules_tv():
     return [
-        {'label': ADDON.getLocalizedString(32257), 'method': 'with_networks'},
-        {'label': ADDON.getLocalizedString(32258), 'method': 'air_date.gte'},
-        {'label': ADDON.getLocalizedString(32259), 'method': 'air_date.lte'},
-        {'label': ADDON.getLocalizedString(32260), 'method': 'first_air_date.gte'},
-        {'label': ADDON.getLocalizedString(32261), 'method': 'first_air_date.lte'},
-        {'label': ADDON.getLocalizedString(32262), 'method': 'first_air_date_year'}]
+        {'label': get_localized(32257), 'method': 'with_networks'},
+        {'label': get_localized(32258), 'method': 'air_date.gte'},
+        {'label': get_localized(32259), 'method': 'air_date.lte'},
+        {'label': get_localized(32260), 'method': 'first_air_date.gte'},
+        {'label': get_localized(32261), 'method': 'first_air_date.lte'},
+        {'label': get_localized(32262), 'method': 'first_air_date_year'}]
 
 
 def _get_basedir_rules(tmdb_type):
     items = [
-        {'label': ADDON.getLocalizedString(32263), 'method': 'with_genres'},
-        {'label': ADDON.getLocalizedString(32264), 'method': 'without_genres'},
-        {'label': ADDON.getLocalizedString(32265), 'method': 'with_companies'},
-        {'label': ADDON.getLocalizedString(32268), 'method': 'with_keywords'},
-        {'label': ADDON.getLocalizedString(32267), 'method': 'without_keywords'}]
+        {'label': get_localized(32263), 'method': 'with_genres'},
+        {'label': get_localized(32264), 'method': 'without_genres'},
+        {'label': get_localized(32265), 'method': 'with_companies'},
+        {'label': get_localized(32268), 'method': 'with_keywords'},
+        {'label': get_localized(32267), 'method': 'without_keywords'}]
     items += _get_basedir_rules_movies() if tmdb_type == 'movie' else _get_basedir_rules_tv()
     items += [
-        {'label': ADDON.getLocalizedString(32269), 'method': 'with_original_language'},
-        {'label': ADDON.getLocalizedString(32270), 'method': 'vote_count.gte'},
-        {'label': ADDON.getLocalizedString(32271), 'method': 'vote_count.lte'},
-        {'label': ADDON.getLocalizedString(32272), 'method': 'vote_average.gte'},
-        {'label': ADDON.getLocalizedString(32273), 'method': 'vote_average.lte'},
-        {'label': ADDON.getLocalizedString(32274), 'method': 'with_runtime.gte'},
-        {'label': ADDON.getLocalizedString(32275), 'method': 'with_runtime.lte'}]
+        {'label': get_localized(32269), 'method': 'with_original_language'},
+        {'label': get_localized(32270), 'method': 'vote_count.gte'},
+        {'label': get_localized(32271), 'method': 'vote_count.lte'},
+        {'label': get_localized(32272), 'method': 'vote_average.gte'},
+        {'label': get_localized(32273), 'method': 'vote_average.lte'},
+        {'label': get_localized(32274), 'method': 'with_runtime.gte'},
+        {'label': get_localized(32275), 'method': 'with_runtime.lte'}]
     return items
 
 
@@ -610,9 +603,9 @@ def _confirm_add(method):
     old_label = _win_prop(method, 'Label')
     old_value = _win_prop(method)
     if old_value or old_label:
-        if xbmcgui.Dialog().yesno(
-                method, '\n'.join([ADDON.getLocalizedString(32099), old_label, ADDON.getLocalizedString(32100)]),
-                yeslabel=ADDON.getLocalizedString(32101), nolabel=ADDON.getLocalizedString(32102)):
+        if Dialog().yesno(
+                method, '\n'.join([get_localized(32099), old_label, get_localized(32100)]),
+                yeslabel=get_localized(32101), nolabel=get_localized(32102)):
             return False
     return True
 
@@ -620,8 +613,8 @@ def _confirm_add(method):
 def _get_query(tmdb_type, method, query=None, header=None, use_details=False):
     item = TMDb().get_tmdb_id_from_query(
         tmdb_type=tmdb_type,
-        query=query or xbmcgui.Dialog().input(header),
-        header=header or f'{ADDON.getLocalizedString(32276)} {tmdb_type}',
+        query=query or Dialog().input(header),
+        header=header or f'{get_localized(32276)} {tmdb_type}',
         use_details=use_details,
         get_listitem=True)
     if item and item.getUniqueID('tmdb'):
@@ -638,9 +631,9 @@ def _get_method(tmdb_type, method, header=None, use_details=False, confirmation=
 
     # Ask user if they want to try again if nothing selected or no results returned for query
     if not properties:
-        if xbmcgui.Dialog().yesno(
-                ADDON.getLocalizedString(32103),
-                ADDON.getLocalizedString(32104).format(tmdb_type)):
+        if Dialog().yesno(
+                get_localized(32103),
+                get_localized(32104).format(tmdb_type)):
             return _get_method(tmdb_type, method, header, use_details, confirmation=False)
         return
 
@@ -649,7 +642,7 @@ def _get_method(tmdb_type, method, header=None, use_details=False, confirmation=
 
 def _select_method(tmdb_type, header=None):
     rules = _get_basedir_rules(tmdb_type)
-    x = xbmcgui.Dialog().select(header, [i.get('label') for i in rules])
+    x = Dialog().select(header, [i.get('label') for i in rules])
     if x != -1:
         return rules[x].get('method')
 
@@ -668,8 +661,8 @@ def _set_rule(method, label, value, overwrite=False):
 def _select_properties_dialog(data_list, header=None, multiselect=True):
     if not data_list:
         return
-    func = xbmcgui.Dialog().multiselect if multiselect else xbmcgui.Dialog().select
-    header = header or ADDON.getLocalizedString(32111)
+    func = Dialog().multiselect if multiselect else Dialog().select
+    header = header or get_localized(32111)
     dialog_list = [i.get('name') for i in data_list]
     select_list = func(header, dialog_list)
     if (multiselect and not select_list) or (not multiselect and select_list == -1):
@@ -698,32 +691,32 @@ def _select_properties(data_list, method, header=None, multiselect=True, separat
 def _get_genre(tmdb_type, method):
     data_list = TMDb().get_request_lc('genre', tmdb_type, 'list')
     if data_list and data_list.get('genres'):
-        return _select_properties(data_list['genres'], method, header=ADDON.getLocalizedString(32112))
+        return _select_properties(data_list['genres'], method, header=get_localized(32112))
 
 
 def _get_sorting(tmdb_type):
     sort_method_list = SORTBY_MOVIES if tmdb_type == 'movie' else SORTBY_TV
-    sort_method = xbmcgui.Dialog().select(xbmc.getLocalizedString(39010), sort_method_list)
+    sort_method = Dialog().select(get_localized(39010), sort_method_list)
     if sort_method != -1:
         return {'value': sort_method_list[sort_method], 'label': sort_method_list[sort_method], 'method': 'sort_by'}
 
 
 def _get_separator():
-    if xbmcgui.Dialog().yesno(
-            ADDON.getLocalizedString(32107), ADDON.getLocalizedString(32108),
-            yeslabel=ADDON.getLocalizedString(32109), nolabel=ADDON.getLocalizedString(32110)):
+    if Dialog().yesno(
+            get_localized(32107), get_localized(32108),
+            yeslabel=get_localized(32109), nolabel=get_localized(32110)):
         return {'value': 'OR', 'label': 'ANY', 'method': 'with_separator'}
     return {'value': 'AND', 'label': 'ALL', 'method': 'with_separator'}
 
 
 def _get_numeric(method, header=None):
-    value = xbmcgui.Dialog().input(
-        header, type=xbmcgui.INPUT_NUMERIC, defaultt=_win_prop(method))
+    value = Dialog().input(
+        header, type=INPUT_NUMERIC, defaultt=_win_prop(method))
     return {'value': value, 'label': value, 'method': method}
 
 
 def _get_keyboard(method, header=None):
-    value = xbmcgui.Dialog().input(
+    value = Dialog().input(
         header, defaultt=_win_prop(method))
     return {'value': value, 'label': value, 'method': method}
 
@@ -751,17 +744,17 @@ def _save_rules(tmdb_type):
     my_idx = try_int(_win_prop('save_index'), fallback=-1)
     params = _get_discover_params(tmdb_type)
     labels = _get_discover_params(tmdb_type, get_labels=True)
-    label = _win_prop('save_label') if my_idx != -1 else xbmcgui.Dialog().input(ADDON.getLocalizedString(32241))
+    label = _win_prop('save_label') if my_idx != -1 else Dialog().input(get_localized(32241))
     set_search_history(
         'discover',
         query={'label': label, 'params': params, 'labels': labels},
         replace=my_idx if my_idx != -1 else False)
-    xbmcgui.Dialog().ok(f'{xbmc.getLocalizedString(35259)} {label}', f'{params}')
+    Dialog().ok(f'{get_localized(35259)} {label}', f'{params}')
 
 
 def _add_rule(tmdb_type, method=None):
     if not method or method == 'add_rule':
-        method = _select_method(tmdb_type, header=ADDON.getLocalizedString(32277))
+        method = _select_method(tmdb_type, header=get_localized(32277))
     if not method:
         return
     rules = None
@@ -782,20 +775,20 @@ def _add_rule(tmdb_type, method=None):
         rules = _get_method('keyword', method, use_details=False)
         overwrite = False
     elif method == 'with_networks':
-        rules = _get_keyboard(method, header=ADDON.getLocalizedString(32278))
+        rules = _get_keyboard(method, header=get_localized(32278))
     elif '_year' in method:
-        rules = _get_numeric(method, header=ADDON.getLocalizedString(32279))
+        rules = _get_numeric(method, header=get_localized(32279))
     elif 'vote_' in method or '_runtime' in method:
-        rules = _get_numeric(method, header=xbmc.getLocalizedString(16028))
+        rules = _get_numeric(method, header=get_localized(16028))
     elif '_date' in method:
-        header = f'{ADDON.getLocalizedString(32114)} YYYY-MM-DD\n{ADDON.getLocalizedString(32113)}'
+        header = f'{get_localized(32114)} YYYY-MM-DD\n{get_localized(32113)}'
         rules = _get_keyboard(method, header=header)
     elif method == 'with_release_type':
-        rules = _select_properties(_get_release_types(), method, header=ADDON.getLocalizedString(32119))
+        rules = _select_properties(_get_release_types(), method, header=get_localized(32119))
     elif method == 'region':
-        rules = _select_properties(REGIONS, method, header=ADDON.getLocalizedString(32120), multiselect=False)
+        rules = _select_properties(REGIONS, method, header=get_localized(32120), multiselect=False)
     elif method == 'with_original_language':
-        rules = _select_properties(LANGUAGES, method, header=ADDON.getLocalizedString(32120), multiselect=True, separator='|')
+        rules = _select_properties(LANGUAGES, method, header=get_localized(32120), multiselect=True, separator='|')
     if not rules or not rules.get('value'):
         return
     _set_rule(method, rules.get('label'), rules.get('value'), overwrite=overwrite)
@@ -900,7 +893,7 @@ class UserDiscoverLists():
                 return
             if not item:
                 return
-            item['label'] = xbmcgui.Dialog().input('Rename', defaultt=item.get('label')) or item.get('label')
+            item['label'] = Dialog().input('Rename', defaultt=item.get('label')) or item.get('label')
             set_search_history('discover', item, replace=idx)
 
     def list_discoverdir(self, **kwargs):
@@ -909,7 +902,7 @@ class UserDiscoverLists():
         artwork = {'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'}
         for i in ['movie', 'tv']:
             item = {
-                'label': f'{ADDON.getLocalizedString(32174)} {convert_type(i, "plural")}',
+                'label': f'{get_localized(32174)} {convert_type(i, "plural")}',
                 'params': merge_two_dicts(params, {'tmdb_type': i}),
                 'infoproperties': {'specialsort': 'top'},
                 'art': artwork}
@@ -927,13 +920,13 @@ class UserDiscoverLists():
                 'params': item_params,
                 'art': artwork,
                 'context_menu': [
-                    (xbmc.getLocalizedString(21435), f'Container.Update({encode_url(PLUGINPATH, **edit_params)})'),
-                    (xbmc.getLocalizedString(118), f'Container.Update({encode_url(PLUGINPATH, **name_params)})'),
-                    (xbmc.getLocalizedString(117), f'Container.Update({encode_url(PLUGINPATH, **dele_params)})')]}
+                    (get_localized(21435), f'Container.Update({encode_url(PLUGINPATH, **edit_params)})'),
+                    (get_localized(118), f'Container.Update({encode_url(PLUGINPATH, **name_params)})'),
+                    (get_localized(117), f'Container.Update({encode_url(PLUGINPATH, **dele_params)})')]}
             items.append(item)
         if history:
             item = {
-                'label': ADDON.getLocalizedString(32237),
+                'label': get_localized(32237),
                 'art': artwork,
                 'params': merge_two_dicts(params, {'info': 'dir_discover', 'clear_cache': 'True'})}
             items.append(item)

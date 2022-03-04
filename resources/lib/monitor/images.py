@@ -1,9 +1,9 @@
 import os
-import xbmc
 import xbmcvfs
 import colorsys
+from xbmc import getCacheThumbName, skinHasImage, Monitor, sleep
 from resources.lib.addon.window import get_property
-from resources.lib.addon.plugin import kodi_log, md5hash
+from resources.lib.addon.plugin import kodi_log, md5hash, get_infolabel
 from resources.lib.addon.parser import try_int, try_float
 from resources.lib.files.utils import make_path
 from threading import Thread
@@ -38,7 +38,7 @@ def _openimage(image, targetpath, filename):
         cached_image_path = cached_image_path[:-1]
 
     cached_files = []
-    for path in [xbmc.getCacheThumbName(cached_image_path), xbmc.getCacheThumbName(image)]:
+    for path in [getCacheThumbName(cached_image_path), getCacheThumbName(image)]:
         cached_files.append(os.path.join('special://profile/Thumbnails/', path[0], path[:-4] + '.jpg'))
         cached_files.append(os.path.join('special://profile/Thumbnails/', path[0], path[:-4] + '.png'))
         cached_files.append(os.path.join('special://profile/Thumbnails/Video/', path[0], path))
@@ -59,7 +59,7 @@ def _openimage(image, targetpath, filename):
             ''' Skin images will be tried to be accessed directly. For all other ones
                 the source will be copied to the addon_data folder to get access.
             '''
-            if xbmc.skinHasImage(image):
+            if skinHasImage(image):
                 if not image.startswith('special://skin'):
                     image = os.path.join('special://skin/media/', image)
 
@@ -80,7 +80,7 @@ def _openimage(image, targetpath, filename):
 
         except Exception as error:
             kodi_log('Image error: Could not get image for %s (try %d) -> %s' % (image, i, error), 2)
-            xbmc.sleep(500)
+            sleep(500)
             pass
 
     return ''
@@ -111,7 +111,7 @@ class ImageFunctions(Thread):
             self.save_path = make_path(self.save_path.format('blur'))
             self.save_prop = 'ListItem.BlurImage'
             self.save_orig = True
-            self.radius = try_int(xbmc.getInfoLabel('Skin.String(TMDbHelper.Blur.Radius)')) or 20
+            self.radius = try_int(get_infolabel('Skin.String(TMDbHelper.Blur.Radius)')) or 20
         elif method == 'crop':
             self.func = self.crop
             self.save_path = make_path(self.save_path.format('crop'))
@@ -218,8 +218,8 @@ class ImageFunctions(Thread):
     def get_color_lumsat(self, r, g, b):
         hls_tuple = colorsys.rgb_to_hls(r / 255.0, g / 255.0, b / 255.0)
         hue = hls_tuple[0]
-        lum = try_float(xbmc.getInfoLabel('Skin.String(TMDbHelper.Colors.Luminance)')) or hls_tuple[1]
-        sat = try_float(xbmc.getInfoLabel('Skin.String(TMDbHelper.Colors.Saturation)')) or hls_tuple[2]
+        lum = try_float(get_infolabel('Skin.String(TMDbHelper.Colors.Luminance)')) or hls_tuple[1]
+        sat = try_float(get_infolabel('Skin.String(TMDbHelper.Colors.Saturation)')) or hls_tuple[2]
         return self.rgb_to_int(*colorsys.hls_to_rgb(hue, lum, sat))
 
     def rgb_to_int(self, r, g, b):
@@ -259,7 +259,7 @@ class ImageFunctions(Thread):
             val_r = val_r + inc_r
             val_g = val_g + inc_g
             val_b = val_b + inc_b
-            xbmc.Monitor().waitForAbort(0.05)
+            Monitor().waitForAbort(0.05)
 
         get_property(propname, set_property=end_hex)
         return end_hex

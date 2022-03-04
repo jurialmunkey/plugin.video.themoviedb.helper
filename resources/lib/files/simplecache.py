@@ -7,16 +7,14 @@ Code cleanup
 - Leia/Matrix Python-2/3 cross-compatibility
 - Allow setting folder and filename of DB
 """
-
 import xbmcvfs
-import xbmcgui
-import xbmc
 import sqlite3
+from xbmcgui import Window
+from xbmc import Monitor, sleep
 from contextlib import contextmanager
 from resources.lib.addon.plugin import kodi_log
 from resources.lib.addon.timedate import set_timestamp
 from resources.lib.files.utils import get_file_path
-
 from resources.lib.files.utils import json_loads as data_loads
 from json import dumps as data_dumps
 DATABASE_NAME = 'database_v4'
@@ -42,8 +40,8 @@ class SimpleCache(object):
         '''Initialize our caching class'''
         folder = folder or DATABASE_NAME
         filename = filename or 'defaultcache.db'
-        self._win = xbmcgui.Window(10000)
-        self._monitor = xbmc.Monitor()
+        self._win = Window(10000)
+        self._monitor = Monitor()
         self._db_file = get_file_path(folder, filename)
         self._sc_name = f'{folder}_{filename}_simplecache'
         self._mem_only = mem_only
@@ -58,7 +56,7 @@ class SimpleCache(object):
         self._exit = True
         # wait for all tasks to complete
         while self._busy_tasks and not self._monitor.abortRequested():
-            xbmc.sleep(25)
+            sleep(25)
         kodi_log(f'CACHE: Closed {self._sc_name}', 2)
 
     def __del__(self):

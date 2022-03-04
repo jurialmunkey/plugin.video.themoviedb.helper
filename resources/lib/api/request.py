@@ -1,9 +1,7 @@
-import xbmc
-import xbmcgui
-import xbmcaddon
 import xml.etree.ElementTree as ET
+from xbmcgui import Dialog
 from resources.lib.addon.window import get_property
-from resources.lib.addon.plugin import kodi_log
+from resources.lib.addon.plugin import kodi_log, get_localized, get_condvisibility
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.timedate import get_timestamp, set_timestamp
 from resources.lib.files.cache import BasicCache, CACHE_SHORT, CACHE_LONG
@@ -11,9 +9,6 @@ from copy import copy
 from json import loads, dumps
 # from resources.lib.addon.decorators import timer_func
 # import requests
-
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
-
 
 requests = None  # Requests module is slow to import so lazy import via decorator instead
 
@@ -74,7 +69,7 @@ class RequestAPI(object):
 
     def nointernet_err(self, err, log_time=900):
         # Check Kodi internet status to confirm network is down
-        if xbmc.getCondVisibility("System.InternetState"):
+        if get_condvisibility("System.InternetState"):
             return
 
         # Get the last error timestamp
@@ -83,8 +78,8 @@ class RequestAPI(object):
 
         # Only log error and notify user if it hasn't happened in last {log_time} seconds to avoid log/gui spam
         if not get_timestamp(last_err):
-            xbmcgui.Dialog().notification(ADDON.getLocalizedString(32308).format(self.req_api_name), xbmc.getLocalizedString(13297))
-            kodi_log(f'ConnectionError: {xbmc.getLocalizedString(13297)}\n{err}\nSuppressing retries.', 1)
+            Dialog().notification(get_localized(32308).format(self.req_api_name), get_localized(13297))
+            kodi_log(f'ConnectionError: {get_localized(13297)}\n{err}\nSuppressing retries.', 1)
 
         # Update our last error timestamp and return it
         return get_property(err_prop, set_timestamp(log_time))
@@ -97,17 +92,17 @@ class RequestAPI(object):
             return
 
         kodi_log(f'ConnectionError: {msg_affix} {err}\nSuppressing retries for 30 seconds', 1)
-        xbmcgui.Dialog().notification(
-            ADDON.getLocalizedString(32308).format(' '.join([self.req_api_name, msg_affix])),
-            ADDON.getLocalizedString(32307).format('30'))
+        Dialog().notification(
+            get_localized(32308).format(' '.join([self.req_api_name, msg_affix])),
+            get_localized(32307).format('30'))
 
     def fivehundred_error(self, request, wait_time=60):
         self.req_500_err[request] = set_timestamp(wait_time)
         get_property(self.req_500_err_prop, dumps(self.req_500_err))
         kodi_log(f'ConnectionError: {dumps(self.req_500_err)}\nSuppressing retries for 60 seconds', 1)
-        xbmcgui.Dialog().notification(
-            ADDON.getLocalizedString(32308).format(self.req_api_name),
-            ADDON.getLocalizedString(32307).format('60'))
+        Dialog().notification(
+            get_localized(32308).format(self.req_api_name),
+            get_localized(32307).format('60'))
 
     def timeout_error(self, err):
         """ Log timeout error

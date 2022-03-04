@@ -1,10 +1,10 @@
 import re
-import xbmc
-import xbmcgui
-import xbmcaddon
-import xbmcplugin
+from xbmc import Monitor, Player
+from xbmcgui import Dialog
+from xbmcplugin import setResolvedUrl
+from xbmcaddon import Addon as KodiAddon
 from resources.lib.addon.window import get_property
-from resources.lib.addon.plugin import PLUGINPATH, format_folderpath, kodi_log
+from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, format_folderpath, kodi_log, get_localized, get_setting, executebuiltin, get_infolabel
 from resources.lib.addon.parser import try_int, try_float
 from resources.lib.addon.constants import PLAYERS_PRIORITY
 from resources.lib.addon.decorators import busy_dialog, ProgressDialog
@@ -16,10 +16,6 @@ from resources.lib.player.inputter import KeyboardInputter
 from resources.lib.player.configure import get_players_from_file
 
 
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
-ADDONPATH = ADDON.getAddonInfo('path')
-
-
 def string_format_map(fmt, d):
     """ Py 2/3 cross-compatibility to return defaultdict formatted string
     No longer needed after support for Py2 was dropped
@@ -28,7 +24,7 @@ def string_format_map(fmt, d):
 
 
 def wait_for_player(to_start=None, timeout=5, poll=0.25, stop_after=0):
-    xbmc_monitor, xbmc_player = xbmc.Monitor(), xbmc.Player()
+    xbmc_monitor, xbmc_player = Monitor(), Player()
     while (
             not xbmc_monitor.abortRequested()
             and timeout > 0
@@ -65,7 +61,7 @@ def resolve_to_dummy(handle=None, stop_after=1, delay_wait=0):
     # Set our dummy resolved url
     path = f'{ADDONPATH}/resources/dummy.mp4'
     kodi_log(['lib.player.players - attempt to resolve dummy file\n', path], 1)
-    xbmcplugin.setResolvedUrl(handle, True, ListItem(path=path).get_listitem())
+    setResolvedUrl(handle, True, ListItem(path=path).get_listitem())
 
     # Wait till our file plays and then stop after setting duration
     if wait_for_player(to_start='dummy.mp4', stop_after=stop_after) <= 0:
@@ -79,7 +75,7 @@ def resolve_to_dummy(handle=None, stop_after=1, delay_wait=0):
 
     # Added delay
     with busy_dialog(False if delay_wait < 1 else True):
-        xbmc.Monitor().waitForAbort(delay_wait)
+        Monitor().waitForAbort(delay_wait)
 
     # Success
     kodi_log(['lib.player.players -- successfully resolved dummy file\n', path], 1)
@@ -87,24 +83,24 @@ def resolve_to_dummy(handle=None, stop_after=1, delay_wait=0):
 
 class Players(object):
     def __init__(self, tmdb_type, tmdb_id=None, season=None, episode=None, ignore_default=False, islocal=False, player=None, mode=None, **kwargs):
-        with ProgressDialog('TMDbHelper', f'{ADDON.getLocalizedString(32374)}...', total=3) as _p_dialog:
+        with ProgressDialog('TMDbHelper', f'{get_localized(32374)}...', total=3) as _p_dialog:
             self.api_language = None
             self.players = get_players_from_file()
 
-            _p_dialog.update(f'{ADDON.getLocalizedString(32375)}...')
+            _p_dialog.update(f'{get_localized(32375)}...')
             self.details = get_item_details(tmdb_type, tmdb_id, season, episode)
             self.item = get_detailed_item(tmdb_type, tmdb_id, season, episode, details=self.details) or {}
 
-            _p_dialog.update(f'{ADDON.getLocalizedString(32376)}...')
+            _p_dialog.update(f'{get_localized(32376)}...')
             self.playerstring = get_playerstring(tmdb_type, tmdb_id, season, episode, details=self.details)
             self.dialog_players = self._get_players_for_dialog(tmdb_type)
 
-            self.default_player = ADDON.getSettingString('default_player_movies') if tmdb_type == 'movie' else ADDON.getSettingString('default_player_episodes')
+            self.default_player = get_setting('default_player_movies', 'str') if tmdb_type == 'movie' else get_setting('default_player_episodes', 'str')
             self.ignore_default = f'{player} {mode or "play"}_{"movie" if tmdb_type == "movie" else "episode"}' if player else ignore_default or ''
             self.tmdb_type, self.tmdb_id, self.season, self.episode = tmdb_type, tmdb_id, season, episode
-            self.dummy_duration = try_float(ADDON.getSettingString('dummy_duration')) or 1.0
-            self.dummy_delay = try_float(ADDON.getSettingString('dummy_delay')) or 1.0
-            self.force_xbmcplayer = ADDON.getSettingBool('force_xbmcplayer')
+            self.dummy_duration = try_float(get_setting('dummy_duration', 'str')) or 1.0
+            self.dummy_delay = try_float(get_setting('dummy_delay', 'str')) or 1.0
+            self.force_xbmcplayer = get_setting('force_xbmcplayer')
             self.is_strm = islocal
 
     def _check_assert(self, keys=[]):
@@ -122,10 +118,10 @@ class Players(object):
     def _get_built_player(self, file, mode, value=None):
         value = value or self.players.get(file) or {}
         if mode in ['play_movie', 'play_episode']:
-            name = ADDON.getLocalizedString(32061)
+            name = get_localized(32061)
             is_folder = False
         else:
-            name = xbmc.getLocalizedString(137)
+            name = get_localized(137)
             is_folder = True
         return {
             'file': file, 'mode': mode,
@@ -135,18 +131,18 @@ class Players(object):
             'language': value.get('language'),
             'name': f'{name} {value.get("name")}',
             'plugin_name': value.get('plugin'),
-            'plugin_icon': value.get('icon', '').format(ADDONPATH) or xbmcaddon.Addon(value.get('plugin', '')).getAddonInfo('icon'),
+            'plugin_icon': value.get('icon', '').format(ADDONPATH) or KodiAddon(value.get('plugin', '')).getAddonInfo('icon'),
             'fallback': value.get('fallback', {}).get(mode),
             'actions': value.get(mode)}
 
     def _get_local_item(self, tmdb_type):
-        if not ADDON.getSettingInt('default_player_kodi'):
+        if not get_setting('default_player_kodi', 'int'):
             return []
         file = self._get_local_movie() if tmdb_type == 'movie' else self._get_local_episode()
         if not file:
             return []
         return [{
-            'name': f'{ADDON.getLocalizedString(32061)} Kodi',
+            'name': f'{get_localized(32061)} Kodi',
             'is_folder': False,
             'is_local': True,
             'is_resolvable': "true",
@@ -204,18 +200,18 @@ class Players(object):
                     dialog_search.append(self._get_built_player(file=k, mode='search_episode', value=v))
         return dialog_play + dialog_search
 
-    def select_player(self, detailed=True, clear_player=False, header=ADDON.getLocalizedString(32042)):
+    def select_player(self, detailed=True, clear_player=False, header=get_localized(32042)):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
         dialog_players = [] if not clear_player else [{
-            'name': ADDON.getLocalizedString(32311),
+            'name': get_localized(32311),
             'plugin_name': 'plugin.video.themoviedb.helper',
             'plugin_icon': f'{ADDONPATH}/resources/icons/other/kodi.png'}]
         dialog_players += self.dialog_players
         players = [ListItem(
             label=i.get('name'),
-            label2=f'{i.get("plugin_name")} v{xbmcaddon.Addon(i.get("plugin_name", "")).getAddonInfo("version")}',
+            label2=f'{i.get("plugin_name")} v{KodiAddon(i.get("plugin_name", "")).getAddonInfo("version")}',
             art={'thumb': i.get('plugin_icon')}).get_listitem() for i in dialog_players]
-        x = xbmcgui.Dialog().select(header, players, useDetails=detailed)
+        x = Dialog().select(header, players, useDetails=detailed)
         if x == -1:
             return {}
         player = dialog_players[x]
@@ -277,7 +273,7 @@ class Players(object):
                 if f.get('filetype') == 'file':  # If file assume is an episode so add to main label
                     label_a = f'{f["season"]}x{f["episode"]}. {label_a}'
                 else:  # If folder assume is tvshow or season so add episode count to label2
-                    label_b_list.append(f'{f["episode"]} {xbmc.getLocalizedString(20360)}')
+                    label_b_list.append(f'{f["episode"]} {get_localized(20360)}')
 
             # Add various stream details to ListItem.Label2 (aka label_b)
             if f.get('streamdetails'):
@@ -308,7 +304,7 @@ class Players(object):
             return  # No items so ask user to select new player
 
         # If autoselect enabled and only 1 item choose that otherwise ask user to choose
-        idx = 0 if auto and len(d_items) == 1 else xbmcgui.Dialog().select(ADDON.getLocalizedString(32236), d_items, useDetails=True)
+        idx = 0 if auto and len(d_items) == 1 else Dialog().select(get_localized(32236), d_items, useDetails=True)
 
         if idx == -1:
             return  # User exited the dialog so return nothing
@@ -395,7 +391,7 @@ class Players(object):
             if self.ignore_default.lower() == 'true':
                 return
             self.default_player = self.ignore_default
-        elif self.dialog_players[0].get('is_local') and ADDON.getSettingInt('default_player_kodi') == 1:
+        elif self.dialog_players[0].get('is_local') and get_setting('default_player_kodi', 'int') == 1:
             player = self.dialog_players[0]
             player['idx'] = 0
             return player
@@ -412,7 +408,7 @@ class Players(object):
 
         # If we dont have a player from fallback then ask user to select one
         if not player:
-            header = self.item.get('name') or ADDON.getLocalizedString(32042)
+            header = self.item.get('name') or get_localized(32042)
             if self.item.get('episode') and self.item.get('title'):
                 header = f'{header} - {self.item["title"]}'
             player = self.select_player(header=header)
@@ -467,19 +463,19 @@ class Players(object):
         """
         if not folder_path:
             return
-        xbmc.Monitor().waitForAbort(2)
-        container_folderpath = xbmc.getInfoLabel("Container.FolderPath")
+        Monitor().waitForAbort(2)
+        container_folderpath = get_infolabel("Container.FolderPath")
         if container_folderpath == folder_path:
             return
-        xbmc.executebuiltin(f'Container.Update({folder_path},replace)')
+        executebuiltin(f'Container.Update({folder_path},replace)')
         if not reset_focus:
             return
         timeout = 20
-        while not xbmc.Monitor().abortRequested() and xbmc.getInfoLabel("Container.FolderPath") != folder_path and timeout > 0:
-            xbmc.Monitor().waitForAbort(0.25)
+        while not Monitor().abortRequested() and get_infolabel("Container.FolderPath") != folder_path and timeout > 0:
+            Monitor().waitForAbort(0.25)
             timeout -= 1
-        xbmc.executebuiltin(reset_focus)
-        xbmc.Monitor().waitForAbort(0.5)
+        executebuiltin(reset_focus)
+        Monitor().waitForAbort(0.5)
 
     def configure_action(self, listitem, handle=None):
         path = listitem.getPath()
@@ -487,20 +483,20 @@ class Players(object):
             return format_folderpath(path)
         if not handle or listitem.getProperty('is_resolvable') == 'false':
             return path
-        if listitem.getProperty('is_resolvable') == 'select' and not xbmcgui.Dialog().yesno(
-                f'{listitem.getProperty("player_name")} - {ADDON.getLocalizedString(32353)}',
-                ADDON.getLocalizedString(32354),
-                yeslabel=f'{xbmc.getLocalizedString(107)} (setResolvedURL)',
-                nolabel=f'{xbmc.getLocalizedString(106)} (PlayMedia)'):
+        if listitem.getProperty('is_resolvable') == 'select' and not Dialog().yesno(
+                f'{listitem.getProperty("player_name")} - {get_localized(32353)}',
+                get_localized(32354),
+                yeslabel=f'{get_localized(107)} (setResolvedURL)',
+                nolabel=f'{get_localized(106)} (PlayMedia)'):
             return path
 
     def play(self, folder_path=None, reset_focus=None, handle=None):
         # Get some info about current container for container update hack
         if not folder_path:
-            folder_path = xbmc.getInfoLabel("Container.FolderPath")
+            folder_path = get_infolabel("Container.FolderPath")
         if not reset_focus and folder_path:
-            containerid = xbmc.getInfoLabel("System.CurrentControlID")
-            current_pos = xbmc.getInfoLabel(f'Container({containerid}).CurrentItem')
+            containerid = get_infolabel("System.CurrentControlID")
+            current_pos = get_infolabel(f'Container({containerid}).CurrentItem')
             reset_focus = f'SetFocus({containerid},{try_int(current_pos) - 1},absolute)'
 
         # Get the resolved path
@@ -517,13 +513,13 @@ class Players(object):
 
         # Kodi launches busy dialog on home screen that needs to be told to close
         # Otherwise the busy dialog will prevent window activation for folder path
-        xbmc.executebuiltin('Dialog.Close(busydialog)')
+        executebuiltin('Dialog.Close(busydialog)')
 
         # If a folder we need to resolve to dummy and then open folder
         if listitem.getProperty('is_folder') == 'true':
-            if self.is_strm or not ADDON.getSettingBool('only_resolve_strm'):
+            if self.is_strm or not get_setting('only_resolve_strm'):
                 resolve_to_dummy(handle, self.dummy_duration, self.dummy_delay)
-            xbmc.executebuiltin(action)
+            executebuiltin(action)
             kodi_log(['lib.player - finished executing action\n', action], 1)
             return
 
@@ -533,24 +529,24 @@ class Players(object):
 
         # If PlayMedia method chosen re-route to Player() unless expert settings on
         if action:
-            if self.is_strm or not ADDON.getSettingBool('only_resolve_strm'):
+            if self.is_strm or not get_setting('only_resolve_strm'):
                 resolve_to_dummy(handle, self.dummy_duration, self.dummy_delay)  # If we're calling external we need to resolve to dummy
-            xbmc.Player().play(action, listitem) if self.force_xbmcplayer else xbmc.executebuiltin(f'PlayMedia({action})')
+            Player().play(action, listitem) if self.force_xbmcplayer else executebuiltin(f'PlayMedia({action})')
             kodi_log([
-                f'lib.player - playing path with {"xbmc.Player()" if self.force_xbmcplayer else "PlayMedia"}\n',
+                f'lib.player - playing path with {"Player()" if self.force_xbmcplayer else "PlayMedia"}\n',
                 listitem.getPath()], 1)
             return
 
         # Otherwise we have a url we can resolve to
-        xbmcplugin.setResolvedUrl(handle, True, listitem)
+        setResolvedUrl(handle, True, listitem)
         kodi_log(['lib.player - finished resolving path to url\n', listitem.getPath()], 1)
 
         # Re-send local files to player due to "bug" (or maybe "feature") of setResolvedUrl
         # Because setResolvedURL doesn't set id/type (sets None, "unknown" instead) to player for plugins
         # If id/type not set to Player.GetItem things like Trakt don't work correctly.
         # Looking for better solution than this hack.
-        if ADDON.getSettingBool('trakt_localhack') and listitem.getProperty('is_local') == 'true':
-            xbmc.Player().play(listitem.getPath(), listitem) if self.force_xbmcplayer else xbmc.executebuiltin(f'PlayMedia({listitem.getPath()})')
+        if get_setting('trakt_localhack') and listitem.getProperty('is_local') == 'true':
+            Player().play(listitem.getPath(), listitem) if self.force_xbmcplayer else executebuiltin(f'PlayMedia({listitem.getPath()})')
             kodi_log([
-                f'Finished executing {"xbmc.Player()" if self.force_xbmcplayer else "PlayMedia"}\n',
+                f'Finished executing {"Player()" if self.force_xbmcplayer else "PlayMedia"}\n',
                 listitem.getPath()], 1)

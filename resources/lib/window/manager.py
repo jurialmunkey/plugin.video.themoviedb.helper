@@ -1,9 +1,8 @@
-import xbmc
-import xbmcgui
-import xbmcaddon
+from xbmc import Monitor
+from xbmcgui import Dialog, Window
 import resources.lib.addon.window as window
 from resources.lib.addon.parser import try_int
-from resources.lib.addon.plugin import kodi_log
+from resources.lib.addon.plugin import kodi_log, get_localized, executebuiltin
 from resources.lib.addon.decorators import busy_dialog
 from resources.lib.api.tmdb.api import TMDb
 
@@ -16,9 +15,6 @@ PREFIX_INSTANCE = 'Instance'
 PREFIX_COMMAND = 'Command'
 ID_VIDEOINFO = 12003
 CONTAINER_ID = 9999
-
-
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 def _configure_path(path):
@@ -51,13 +47,13 @@ class _EventLoop():
 
         # Close base window
         if window.is_visible(self.window_id):
-            xbmc.executebuiltin('Action(Back)')
+            executebuiltin('Action(Back)')
             window.wait_until_active(self.window_id, invert=True, poll=0.1)
 
         # If we don't have the return param then try to re-open original info
         if self.return_info and not self.params.get('return'):
             if window.wait_until_active(self.window_id, invert=True, poll=0.1, timeout=1):
-                xbmc.executebuiltin('Action(Info)')
+                executebuiltin('Action(Info)')
 
         # Clear our instance property because we left
         window.get_property(PREFIX_INSTANCE, clear_property=True)
@@ -104,7 +100,7 @@ class _EventLoop():
                 return self._call_exit()
 
         # Set our base window
-        base_window = xbmcgui.Window(self.kodi_id)
+        base_window = Window(self.kodi_id)
 
         # Check that base window has correct control ID and clear it out
         control_list = base_window.getControl(CONTAINER_ID)
@@ -119,8 +115,8 @@ class _EventLoop():
 
         # Open the info dialog
         base_window.setFocus(control_list)
-        xbmc.executebuiltin(f'SetFocus({CONTAINER_ID},0,absolute)')
-        xbmc.executebuiltin('Action(Info)')
+        executebuiltin(f'SetFocus({CONTAINER_ID},0,absolute)')
+        executebuiltin('Action(Info)')
         if not window.wait_until_active(ID_VIDEOINFO, self.window_id):
             return self._call_exit()
 
@@ -174,7 +170,7 @@ class WindowManager(_EventLoop):
         self.first_run = True
         self.params = kwargs
         self.exit = False
-        self.xbmc_monitor = xbmc.Monitor()
+        self.xbmc_monitor = Monitor()
 
     def reset_properties(self):
         self.position = 0
@@ -219,14 +215,14 @@ class WindowManager(_EventLoop):
     def add_query(self, query, tmdb_type, separator=' / '):
         if separator and separator in query:
             split_str = query.split(separator)
-            x = xbmcgui.Dialog().select(ADDON.getLocalizedString(32236), split_str)
+            x = Dialog().select(get_localized(32236), split_str)
             if x == -1:
                 return
             query = split_str[x]
         with busy_dialog():
             tmdb_id = TMDb().get_tmdb_id_from_query(tmdb_type, query, header=query, use_details=True, auto_single=True)
         if not tmdb_id:
-            xbmcgui.Dialog().notification('TMDbHelper', ADDON.getLocalizedString(32310).format(query))
+            Dialog().notification('TMDbHelper', get_localized(32310).format(query))
             return
         url = f'plugin://plugin.video.themoviedb.helper/?info=details&tmdb_type={tmdb_type}&tmdb_id={tmdb_id}'
         return self.add_path(url)
@@ -240,13 +236,13 @@ class WindowManager(_EventLoop):
 
     def call_window(self):
         if self.params.get('playmedia'):
-            return xbmc.executebuiltin(f'PlayMedia(\"{self.params["playmedia"]}\")')
+            return executebuiltin(f'PlayMedia(\"{self.params["playmedia"]}\")')
         if self.params.get('call_id'):
-            return xbmc.executebuiltin(f'ActivateWindow({self.params["call_id"]})')
+            return executebuiltin(f'ActivateWindow({self.params["call_id"]})')
         if self.params.get('call_path'):
-            return xbmc.executebuiltin(f'ActivateWindow(videos, {self.params["call_path"]}, return)')
+            return executebuiltin(f'ActivateWindow(videos, {self.params["call_path"]}, return)')
         if self.params.get('call_update'):
-            return xbmc.executebuiltin(f'Container.Update({self.params["call_update"]})')
+            return executebuiltin(f'Container.Update({self.params["call_update"]})')
 
     def router(self):
         if self.params.get('add_path'):

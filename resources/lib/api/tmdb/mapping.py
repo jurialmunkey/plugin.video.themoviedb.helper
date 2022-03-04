@@ -1,5 +1,4 @@
-import xbmcaddon
-from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type
+from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type, get_setting, get_localized
 from resources.lib.addon.parser import try_int, try_float
 from resources.lib.addon.setutils import ITER_PROPS_MAX, iter_props, dict_to_list, get_params
 from resources.lib.addon.timedate import format_date, age_difference
@@ -7,8 +6,7 @@ from resources.lib.addon.constants import IMAGEPATH_ORIGINAL, IMAGEPATH_QUALITY_
 from resources.lib.api.mapping import UPDATE_BASEKEY, _ItemMapper, get_empty_item
 
 
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
-ARTWORK_QUALITY = ADDON.getSettingInt('artwork_quality')
+ARTWORK_QUALITY = get_setting('artwork_quality', 'int')
 ARTWORK_QUALITY_POSTER = IMAGEPATH_QUALITY_POSTER[ARTWORK_QUALITY]
 ARTWORK_QUALITY_FANART = IMAGEPATH_QUALITY_FANART[ARTWORK_QUALITY]
 ARTWORK_QUALITY_THUMBS = IMAGEPATH_QUALITY_THUMBS[ARTWORK_QUALITY]
@@ -586,8 +584,8 @@ class ItemMapper(_ItemMapper):
                 'keys': [('infoproperties', 'gender')],
                 'func': lambda v, d: d.get(v),
                 'args': [{
-                    1: ADDON.getLocalizedString(32071),
-                    2: ADDON.getLocalizedString(32070)}]
+                    1: get_localized(32071),
+                    2: get_localized(32070)}]
             }]
         }
         self.standard_map = {

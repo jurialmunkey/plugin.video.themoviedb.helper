@@ -1,9 +1,7 @@
 import sys
-import xbmc
-import xbmcplugin
-import xbmcaddon
+from xbmcplugin import addDirectoryItem, setProperty, setPluginCategory, setContent, endOfDirectory
 from resources.lib.addon.constants import NO_LABEL_FORMATTING, RANDOMISED_TRAKT, RANDOMISED_LISTS, TRAKT_LIST_OF_LISTS, TMDB_BASIC_LISTS, TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, ROUTE_NO_ID, ROUTE_TMDB_ID
-from resources.lib.addon.plugin import convert_type, reconfigure_legacy_params, kodi_log
+from resources.lib.addon.plugin import convert_type, reconfigure_legacy_params, kodi_log, get_setting, executebuiltin
 from resources.lib.addon.parser import parse_paramstring, try_int
 from resources.lib.addon.setutils import split_items, random_from_list, merge_two_dicts
 from resources.lib.addon.decorators import TimerList, ParallelThread
@@ -25,7 +23,6 @@ from resources.lib.player.players import Players
 from threading import Thread
 
 
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 PREBUILD_PARENTSHOW = ['seasons', 'episodes', 'episode_groups', 'trakt_upnext', 'episode_group_seasons']
 LOG_TIMER_ITEMS = ['item_api', 'item_tmdb', 'item_ftv', 'item_map', 'item_cache', 'item_set', 'item_get', 'item_getx', 'item_non', 'item_nonx', 'item_art']
 
@@ -49,7 +46,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         }
 
         # endOfDirectory
-        self.update_listing = False  # xbmcplugin.endOfDirectory(updateListing=) set True to replace current path
+        self.update_listing = False  # endOfDirectory(updateListing=) set True to replace current path
         self.plugin_category = ''  # Container.PluginCategory / ListItem.Property(widget)
         self.container_content = ''  # Container.Content({})
         self.container_update = ''  # Add path to call Containr.Update({}) at end of directory
@@ -64,21 +61,21 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.ib = None
         self.tmdb_api = TMDb(delay_write=True)
         self.trakt_api = TraktAPI(delay_write=True)
-        self.omdb_api = OMDb(delay_write=True) if ADDON.getSettingString('omdb_apikey') else None
+        self.omdb_api = OMDb(delay_write=True) if get_setting('omdb_apikey', 'str') else None
         self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only(), delay_write=True)
 
         # Log Settings
-        self.log_timers = ADDON.getSettingBool('timer_reports')
+        self.log_timers = get_setting('timer_reports')
         self.timer_lists = {}
 
         # Trakt Watched Progress Settings
-        self.trakt_hidewatched = ADDON.getSettingBool('widgets_hidewatched') if self.is_widget else False
-        self.trakt_watchedindicators = ADDON.getSettingBool('trakt_watchedindicators')
-        self.trakt_watchedinprogress = ADDON.getSettingBool('trakt_watchedinprogress')
-        self.trakt_playprogress = ADDON.getSettingBool('trakt_playprogress')
+        self.trakt_hidewatched = get_setting('widgets_hidewatched') if self.is_widget else False
+        self.trakt_watchedindicators = get_setting('trakt_watchedindicators')
+        self.trakt_watchedinprogress = get_setting('trakt_watchedinprogress')
+        self.trakt_playprogress = get_setting('trakt_playprogress')
 
         # Miscellaneous
-        self.nodate_is_unaired = ADDON.getSettingBool('nodate_is_unaired')  # Consider items with no date to be
+        self.nodate_is_unaired = get_setting('nodate_is_unaired')  # Consider items with no date to be
         self.tmdb_cache_only = self.tmdb_is_cache_only()
         self.pagination = self.pagination_is_allowed()
         self.thumb_override = 0
@@ -86,7 +83,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
     def pagination_is_allowed(self):
         if not self.is_nextpage:  # nextpage=false param overrides all other settings
             return False
-        if self.is_widget and not ADDON.getSettingBool('widgets_nextpage'):
+        if self.is_widget and not get_setting('widgets_nextpage'):
             return False
         return True
 
@@ -97,9 +94,9 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             return False
         if self.is_fanarttv == 'false':
             return True
-        if self.is_widget and ADDON.getSettingBool('widget_fanarttv_lookup'):  # user settings
+        if self.is_widget and get_setting('widget_fanarttv_lookup'):  # user settings
             return False
-        if not self.is_widget and ADDON.getSettingBool('fanarttv_lookup'):  # user setting
+        if not self.is_widget and get_setting('fanarttv_lookup'):  # user setting
             return False
         return True
 
@@ -108,7 +105,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             return True
         if not self.ftv_is_cache_only():  # fanarttv lookups require TMDb lookups for tvshow ID -- TODO: only force on tvshows
             return False
-        if ADDON.getSettingBool('tmdb_details'):  # user setting
+        if get_setting('tmdb_details'):  # user setting
             return False
         return True
 
@@ -184,7 +181,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             all_itemtuples = [i for i in item_queue if i]
             # Add items to directory
             for i in all_itemtuples:
-                xbmcplugin.addDirectoryItem(handle=self.handle, **i)
+                addDirectoryItem(handle=self.handle, **i)
 
     def set_params_to_container(self, **kwargs):
         params = {}
@@ -195,15 +192,15 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
                 k = f'Param.{k}'
                 v = f'{v}'
                 params[k] = v
-                xbmcplugin.setProperty(self.handle, k, v)  # Set params to container properties
+                setProperty(self.handle, k, v)  # Set params to container properties
             except Exception as exc:
                 kodi_log(f'Error: {exc}\nUnable to set param {k} to {v}', 1)
         return params
 
     def finish_container(self, update_listing=False, plugin_category='', container_content=''):
-        xbmcplugin.setPluginCategory(self.handle, plugin_category)  # Container.PluginCategory
-        xbmcplugin.setContent(self.handle, container_content)  # Container.Content
-        xbmcplugin.endOfDirectory(self.handle, updateListing=update_listing)
+        setPluginCategory(self.handle, plugin_category)  # Container.PluginCategory
+        setContent(self.handle, container_content)  # Container.Content
+        endOfDirectory(self.handle, updateListing=update_listing)
 
     def _set_playprogress_from_trakt(self, li):
         if li.infolabels.get('mediatype') == 'movie':
@@ -292,7 +289,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
 
     def get_kodi_database(self, tmdb_type):
         with TimerList(self.timer_lists, ' - kodi_db', logging=self.log_timers):
-            if ADDON.getSettingBool('local_db'):
+            if get_setting('local_db'):
                 return get_kodi_library(tmdb_type)
 
     def get_kodi_parent_dbid(self, li):
@@ -456,9 +453,9 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         if self.log_timers:
             self.log_timer_report()
         if self.container_update:
-            xbmc.executebuiltin(f'Container.Update({self.container_update})')
+            executebuiltin(f'Container.Update({self.container_update})')
         if self.container_refresh:
-            xbmc.executebuiltin('Container.Refresh')
+            executebuiltin('Container.Refresh')
 
     def play_external(self, **kwargs):
         kodi_log(['lib.container.router - Attempting to play item\n', kwargs], 1)

@@ -1,10 +1,9 @@
-import xbmc
-import xbmcgui
 import random
-import xbmcaddon
+from xbmc import Monitor
+from xbmcgui import Dialog
 from json import loads, dumps
 from resources.lib.addon.window import get_property
-from resources.lib.addon.plugin import kodi_log
+from resources.lib.addon.plugin import kodi_log, get_localized, get_setting, set_setting
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.timedate import set_timestamp, get_timestamp
 from resources.lib.files.cache import CACHE_SHORT, CACHE_LONG, use_simple_cache
@@ -20,49 +19,47 @@ API_URL = 'https://api.trakt.tv/'
 CLIENT_ID = 'e6fde6173adf3c6af8fd1b0694b9b84d7c519cefc24482310e1de06c6abe5467'
 CLIENT_SECRET = '15119384341d9a61c751d8d515acbc0dd801001d4ebe85d3eef9885df80ee4d9'
 
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
-
 
 def get_sort_methods(default_only=False):
     items = [
         {
-            'name': f'{ADDON.getLocalizedString(32287)}: {ADDON.getLocalizedString(32286)}',
+            'name': f'{get_localized(32287)}: {get_localized(32286)}',
             'params': {'sort_by': 'rank', 'sort_how': 'asc'}},
         {
-            'name': f'{ADDON.getLocalizedString(32287)}: {ADDON.getLocalizedString(32106)}',
+            'name': f'{get_localized(32287)}: {get_localized(32106)}',
             'params': {'sort_by': 'added', 'sort_how': 'desc'}},
         {
-            'name': f'{ADDON.getLocalizedString(32287)}: {xbmc.getLocalizedString(369)}',
+            'name': f'{get_localized(32287)}: {get_localized(369)}',
             'params': {'sort_by': 'title', 'sort_how': 'asc'}},
         {
-            'name': f'{ADDON.getLocalizedString(32287)}: {xbmc.getLocalizedString(16102)}',
+            'name': f'{get_localized(32287)}: {get_localized(16102)}',
             'params': {'sort_by': 'watched', 'sort_how': 'desc', 'extended': 'sync'}},
         {
-            'name': f'{ADDON.getLocalizedString(32287)}: {xbmc.getLocalizedString(563)}',
+            'name': f'{get_localized(32287)}: {get_localized(563)}',
             'params': {'sort_by': 'percentage', 'sort_how': 'desc', 'extended': 'full'}},
         {
-            'name': f'{ADDON.getLocalizedString(32287)}: {xbmc.getLocalizedString(345)}',
+            'name': f'{get_localized(32287)}: {get_localized(345)}',
             'params': {'sort_by': 'year', 'sort_how': 'desc'}},
         {
-            'name': f'{ADDON.getLocalizedString(32287)}: {ADDON.getLocalizedString(32377)}',
+            'name': f'{get_localized(32287)}: {get_localized(32377)}',
             'params': {'sort_by': 'plays', 'sort_how': 'desc', 'extended': 'sync'}},
         {
-            'name': f'{ADDON.getLocalizedString(32287)}: {ADDON.getLocalizedString(32242)}',
+            'name': f'{get_localized(32287)}: {get_localized(32242)}',
             'params': {'sort_by': 'released', 'sort_how': 'desc', 'extended': 'full'}},
         {
-            'name': f'{ADDON.getLocalizedString(32287)}: {xbmc.getLocalizedString(2050)}',
+            'name': f'{get_localized(32287)}: {get_localized(2050)}',
             'params': {'sort_by': 'runtime', 'sort_how': 'desc', 'extended': 'full'}},
         {
-            'name': f'{ADDON.getLocalizedString(32287)}: {xbmc.getLocalizedString(205)}',
+            'name': f'{get_localized(32287)}: {get_localized(205)}',
             'params': {'sort_by': 'votes', 'sort_how': 'desc', 'extended': 'full'}},
         {
-            'name': f'{ADDON.getLocalizedString(32287)}: {ADDON.getLocalizedString(32175)}',
+            'name': f'{get_localized(32287)}: {get_localized(32175)}',
             'params': {'sort_by': 'popularity', 'sort_how': 'desc', 'extended': 'full'}},
         {
-            'name': f'{ADDON.getLocalizedString(32287)}: {xbmc.getLocalizedString(575)}',
+            'name': f'{get_localized(32287)}: {get_localized(575)}',
             'params': {'sort_by': 'watched', 'sort_how': 'desc', 'extended': 'inprogress'}},
         {
-            'name': f'{ADDON.getLocalizedString(32287)}: {xbmc.getLocalizedString(590)}',
+            'name': f'{get_localized(32287)}: {get_localized(590)}',
             'params': {'sort_by': 'random'}}]
     if default_only:
         return [i for i in items if i['params']['sort_by'] in ['rank', 'added', 'title', 'year', 'random']]
@@ -219,29 +216,29 @@ class _TraktLists():
 
             # Add library context menu
             item['context_menu'] = [(
-                xbmc.getLocalizedString(20444), u'Runscript(plugin.video.themoviedb.helper,{})'.format(
+                get_localized(20444), u'Runscript(plugin.video.themoviedb.helper,{})'.format(
                     u'user_list={list_slug},user_slug={user_slug}'.format(**item['params'])))]
 
             # Unlike list context menu
             if path.startswith('users/likes'):
                 item['context_menu'] += [(
-                    ADDON.getLocalizedString(32319), u'Runscript(plugin.video.themoviedb.helper,{},delete)'.format(
+                    get_localized(32319), u'Runscript(plugin.video.themoviedb.helper,{},delete)'.format(
                         u'like_list={list_slug},user_slug={user_slug}'.format(**item['params'])))]
 
             # Like list context menu
             elif path.startswith('lists/'):
                 item['context_menu'] += [(
-                    ADDON.getLocalizedString(32315), u'Runscript(plugin.video.themoviedb.helper,{})'.format(
+                    get_localized(32315), u'Runscript(plugin.video.themoviedb.helper,{})'.format(
                         u'like_list={list_slug},user_slug={user_slug}'.format(**item['params'])))]
 
             # Owner of list so set param to allow deleting later
             else:
                 item['params']['owner'] = 'true'
                 item['context_menu'] += [(
-                    xbmc.getLocalizedString(118), u'Runscript(plugin.video.themoviedb.helper,{})'.format(
+                    get_localized(118), u'Runscript(plugin.video.themoviedb.helper,{})'.format(
                         u'rename_list={list_slug}'.format(**item['params'])))]
                 item['context_menu'] += [(
-                    xbmc.getLocalizedString(117), u'Runscript(plugin.video.themoviedb.helper,{})'.format(
+                    get_localized(117), u'Runscript(plugin.video.themoviedb.helper,{})'.format(
                         u'delete_list={list_slug}'.format(**item['params'])))]
 
             items.append(item)
@@ -254,14 +251,14 @@ class _TraktLists():
         func = self.delete_response if delete else self.post_response
         response = func('users', user_slug, 'lists', list_slug, 'like')
         if confirmation:
-            affix = ADDON.getLocalizedString(32320) if delete else ADDON.getLocalizedString(32321)
+            affix = get_localized(32320) if delete else get_localized(32321)
             body = [
-                ADDON.getLocalizedString(32316).format(affix),
-                ADDON.getLocalizedString(32168).format(list_slug, user_slug)] if response.status_code == 204 else [
-                ADDON.getLocalizedString(32317).format(affix),
-                ADDON.getLocalizedString(32168).format(list_slug, user_slug),
-                ADDON.getLocalizedString(32318).format(response.status_code)]
-            xbmcgui.Dialog().ok(ADDON.getLocalizedString(32315), '\n'.join(body))
+                get_localized(32316).format(affix),
+                get_localized(32168).format(list_slug, user_slug)] if response.status_code == 204 else [
+                get_localized(32317).format(affix),
+                get_localized(32168).format(list_slug, user_slug),
+                get_localized(32318).format(response.status_code)]
+            Dialog().ok(get_localized(32315), '\n'.join(body))
         if response.status_code == 204:
             return response
 
@@ -416,15 +413,15 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         super(TraktAPI, self).__init__(req_api_url=API_URL, req_api_name='TraktAPI', timeout=20, delay_write=delay_write)
         self.authorization = ''
         self.attempted_login = False
-        self.dialog_noapikey_header = f'{ADDON.getLocalizedString(32007)} {self.req_api_name} {ADDON.getLocalizedString(32011)}'
-        self.dialog_noapikey_text = ADDON.getLocalizedString(32012)
+        self.dialog_noapikey_header = f'{get_localized(32007)} {self.req_api_name} {get_localized(32011)}'
+        self.dialog_noapikey_text = get_localized(32012)
         self.client_id = CLIENT_ID
         self.client_secret = CLIENT_SECRET
         self.headers = {'trakt-api-version': '2', 'trakt-api-key': self.client_id, 'Content-Type': 'application/json'}
         self.last_activities = {}
         self.sync_activities = {}
         self.sync = {}
-        self.item_limit = 83 if ADDON.getSettingBool('trakt_expandedlimit') else 20  # 84 (83+NextPage) has common factors 4,6,7,8 suitable for wall views
+        self.item_limit = 83 if get_setting('trakt_expandedlimit') else 20  # 84 (83+NextPage) has common factors 4,6,7,8 suitable for wall views
         self.login() if force else self.authorize()
 
     def authorize(self, login=False):
@@ -440,11 +437,11 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
 
         # No saved credentials and user trying to use a feature that requires authorization so ask them to login
         elif login:
-            if not self.attempted_login and xbmcgui.Dialog().yesno(
+            if not self.attempted_login and Dialog().yesno(
                     self.dialog_noapikey_header,
                     self.dialog_noapikey_text,
-                    nolabel=xbmc.getLocalizedString(222),
-                    yeslabel=xbmc.getLocalizedString(186)):
+                    nolabel=get_localized(222),
+                    yeslabel=get_localized(186)):
                 self.login()
             self.attempted_login = True
 
@@ -467,7 +464,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
 
     def get_stored_token(self):
         try:
-            token = loads(ADDON.getSettingString('trakt_token')) or {}
+            token = loads(get_setting('trakt_token', 'str')) or {}
         except Exception as exc:
             token = {}
             kodi_log(exc, 1)
@@ -476,7 +473,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
     def logout(self):
         token = self.get_stored_token()
 
-        if not xbmcgui.Dialog().yesno(ADDON.getLocalizedString(32212), ADDON.getLocalizedString(32213)):
+        if not Dialog().yesno(get_localized(32212), get_localized(32213)):
             return
 
         if token:
@@ -485,14 +482,14 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
                 'client_id': self.client_id,
                 'client_secret': self.client_secret})
             if response and response.status_code == 200:
-                msg = ADDON.getLocalizedString(32216)
-                ADDON.setSettingString('trakt_token', '')
+                msg = get_localized(32216)
+                set_setting('trakt_token', '', 'str')
             else:
-                msg = ADDON.getLocalizedString(32215)
+                msg = get_localized(32215)
         else:
-            msg = ADDON.getLocalizedString(32214)
+            msg = get_localized(32214)
 
-        xbmcgui.Dialog().ok(ADDON.getLocalizedString(32212), msg)
+        Dialog().ok(get_localized(32212), msg)
 
     def login(self):
         self.code = self.get_api_request_json('https://api.trakt.tv/oauth/device/code', postdata={'client_id': self.client_id})
@@ -501,8 +498,8 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         self.progress = 0
         self.interval = self.code.get('interval', 5)
         self.expires_in = self.code.get('expires_in', 0)
-        self.auth_dialog = xbmcgui.DialogProgress()
-        self.auth_dialog.create(ADDON.getLocalizedString(32097), f'{ADDON.getLocalizedString(32096)}\n{ADDON.getLocalizedString(32095)}: [B]{self.code.get("user_code")}[/B]')
+        self.auth_dialog = DialogProgress()
+        self.auth_dialog.create(get_localized(32097), f'{get_localized(32096)}\n{get_localized(32095)}: [B]{self.code.get("user_code")}[/B]')
         self.poller()
 
     def refresh_token(self):
@@ -544,8 +541,8 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         if self.authorization:
             self.on_authenticated()
             return
-        xbmc.Monitor().waitForAbort(self.interval)
-        if xbmc.Monitor().abortRequested():
+        Monitor().waitForAbort(self.interval)
+        if Monitor().abortRequested():
             return
         self.poller()
 
@@ -562,7 +559,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
     def on_authenticated(self, auth_dialog=True):
         """Triggered when device authentication has been completed"""
         kodi_log(u'Trakt authenticated successfully!', 1)
-        ADDON.setSettingString('trakt_token', dumps(self.authorization))
+        set_setting('trakt_token', dumps(self.authorization), 'str')
         self.headers['Authorization'] = f'Bearer {self.authorization.get("access_token")}'
         if auth_dialog:
             self.auth_dialog.close()

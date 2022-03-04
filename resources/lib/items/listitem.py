@@ -1,16 +1,10 @@
-import xbmc
-import xbmcgui
-import xbmcaddon
+from xbmcgui import ListItem as KodiListItem
 from resources.lib.addon.constants import ACCEPTED_MEDIATYPES
-from resources.lib.addon.plugin import PLUGINPATH, kodi_log, convert_media_type
+from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, kodi_log, convert_media_type, get_setting, get_condvisibility, get_localized
 from resources.lib.addon.parser import try_int, encode_url
 from resources.lib.addon.timedate import is_unaired_timestamp
 from resources.lib.addon.setutils import merge_two_dicts
 from resources.lib.items.context import ContextMenu
-
-
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
-ADDONPATH = ADDON.getAddonInfo('path')
 
 
 def ListItem(*args, **kwargs):
@@ -126,7 +120,7 @@ class _ListItem(object):
             self.params['info'] = 'trakt_sortby'
 
     def set_params_reroute(self, is_fanarttv=False, extended=None, is_cacheonly=False):
-        if xbmc.getCondVisibility("Window.IsVisible(script-skinshortcuts.xml)"):
+        if get_condvisibility("Window.IsVisible(script-skinshortcuts.xml)"):
             self._set_params_reroute_skinshortcuts()
 
         if is_cacheonly:  # Take cacheony param from parent list with us onto subsequent pages
@@ -170,7 +164,7 @@ class _ListItem(object):
         if self.infolabels.get('mediatype') not in ACCEPTED_MEDIATYPES:
             self.infolabels.pop('mediatype', None)
         self.infolabels['path'] = self.get_url()
-        listitem = xbmcgui.ListItem(label=self.label, label2=self.label2, path=self.infolabels['path'], offscreen=offscreen)
+        listitem = KodiListItem(label=self.label, label2=self.label2, path=self.infolabels['path'], offscreen=offscreen)
         listitem.setLabel2(self.label2)
         listitem.setInfo(self.library, self.infolabels)
         listitem.setArt(self.set_art_fallbacks())
@@ -196,7 +190,7 @@ class _ListItem(object):
 class _NextPage(_ListItem):
     def _configure(self):
         """ Run at class initialisation to configure next_page item. Returns self """
-        self.label = xbmc.getLocalizedString(33078)
+        self.label = get_localized(33078)
         self.art['icon'] = f'{ADDONPATH}/resources/icons/themoviedb/nextpage.png'
         self.art['landscape'] = f'{ADDONPATH}/resources/icons/themoviedb/nextpage_wide.png'
         self.infoproperties['specialsort'] = 'bottom'
@@ -256,9 +250,9 @@ class _Video(_ListItem):
         return self.unaired_bool()
 
     def _set_params_reroute_default(self):
-        if not ADDON.getSettingInt('default_select'):
+        if not get_setting('default_select', 'int'):
             self.params['info'] = 'play'
-            if not ADDON.getSettingBool('only_resolve_strm'):
+            if not get_setting('only_resolve_strm'):
                 self.infoproperties['isPlayable'] = 'true'
         else:
             self.params['info'] = 'related'
@@ -281,7 +275,7 @@ class _Movie(_Video):
         self.infolabels['overlay'] = 5
 
     def unaired_bool(self):
-        if ADDON.getSettingBool('hide_unaired_movies'):
+        if get_setting('hide_unaired_movies'):
             return True
 
     def _set_params_reroute_details(self):
@@ -313,15 +307,15 @@ class _Tvshow(_Video):
         self.infoproperties['totalseasons'] = try_int(self.infolabels.get('season'))
 
     def unaired_bool(self):
-        if ADDON.getSettingBool('hide_unaired_episodes'):
+        if get_setting('hide_unaired_episodes'):
             return True
 
     def _set_params_reroute_details(self):
-        if ADDON.getSettingInt('default_select'):
+        if get_setting('default_select', 'int'):
             self.params['info'] = 'related'
             self.is_folder = False
             return
-        self.params['info'] = 'flatseasons' if ADDON.getSettingBool('flatten_seasons') else 'seasons'
+        self.params['info'] = 'flatseasons' if get_setting('flatten_seasons') else 'seasons'
 
 
 class _Season(_Tvshow):
@@ -354,7 +348,7 @@ class _Episode(_Tvshow):
 
     def _set_params_reroute_details(self):
         if (self.parent_params.get('info') == 'library_nextaired'
-                and ADDON.getSettingBool('nextaired_linklibrary')
+                and get_setting('nextaired_linklibrary')
                 and self.infoproperties.get('tvshow.dbid')):
             self.path = f'videodb://tvshows/titles/{self.infoproperties["tvshow.dbid"]}/'
             self.params = {}
