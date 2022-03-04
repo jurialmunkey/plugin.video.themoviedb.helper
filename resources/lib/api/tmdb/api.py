@@ -1,6 +1,5 @@
-import xbmcgui
-import xbmcaddon
-from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type
+from xbmcgui import Dialog
+from resources.lib.addon.plugin import ADDONPATH, get_mpaa_prefix, get_language, convert_type, get_setting, get_localized
 from resources.lib.addon.constants import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, TMDB_GENRE_IDS
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.window import get_property
@@ -17,10 +16,8 @@ from urllib.parse import quote_plus
 from json import loads
 
 
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
-ADDONPATH = ADDON.getAddonInfo('path')
-ARTWORK_QUALITY = ADDON.getSettingInt('artwork_quality')
-ARTLANG_FALLBACK = True if ADDON.getSettingBool('fanarttv_enfallback') and not ADDON.getSettingBool('fanarttv_secondpref') else False
+ARTWORK_QUALITY = get_setting('artwork_quality', 'int')
+ARTLANG_FALLBACK = True if get_setting('fanarttv_enfallback') and not get_setting('fanarttv_secondpref') else False
 
 API_URL = 'https://api.themoviedb.org/3'
 APPEND_TO_RESPONSE = 'credits,images,release_dates,content_ratings,external_ids,movie_credits,tv_credits,keywords,reviews,videos,watch/providers'
@@ -145,7 +142,7 @@ class TMDb(RequestAPI):
             return
         x = 0
         if not auto_single or len(items) != 1:
-            x = xbmcgui.Dialog().select(header, items, useDetails=use_details)
+            x = Dialog().select(header, items, useDetails=use_details)
         if x != -1:
             return items[x] if get_listitem else items[x].getUniqueID('tmdb')
 
@@ -209,7 +206,7 @@ class TMDb(RequestAPI):
     def _get_upnext_season_item(self, base_item):
         base_item['params']['info'] = 'trakt_upnext'
         base_item['infolabels']['mediatype'] = 'season'
-        base_item['label'] = base_item['infolabels']['title'] = ADDON.getLocalizedString(32043)
+        base_item['label'] = base_item['infolabels']['title'] = get_localized(32043)
         return [base_item]
 
     def get_flatseasons_list(self, tmdb_id):
@@ -318,24 +315,24 @@ class TMDb(RequestAPI):
             egroups = self.get_request_sc(f'tv/{tmdb_id}/episode_groups')
             if egroups and egroups.get('results'):
                 egroup_item = self.mapper.get_info({
-                    'title': ADDON.getLocalizedString(32345)}, 'season', base_item, tmdb_id=tmdb_id, definition={
+                    'title': get_localized(32345)}, 'season', base_item, tmdb_id=tmdb_id, definition={
                         'info': 'episode_groups', 'tmdb_type': 'tv', 'tmdb_id': str(tmdb_id)})
                 egroup_item['art']['thumb'] = egroup_item['art']['poster'] = f'{ADDONPATH}/resources/icons/trakt/groupings.png'
                 egroup_item['infolabels']['season'] = -1
                 egroup_item['infolabels']['episode'] = 0
-                egroup_item['infoproperties']['specialseason'] = ADDON.getLocalizedString(32345)
+                egroup_item['infoproperties']['specialseason'] = get_localized(32345)
                 items_end.append(egroup_item)
 
         # Up Next
         if ((special_folders >> 1) & 1) == 0:  # on bit in 1 pos hides up next
             if get_property('TraktIsAuth') == 'True':
                 upnext_item = self.mapper.get_info({
-                    'title': ADDON.getLocalizedString(32043)}, 'season', base_item, tmdb_id=tmdb_id, definition={
+                    'title': get_localized(32043)}, 'season', base_item, tmdb_id=tmdb_id, definition={
                         'info': 'trakt_upnext', 'tmdb_type': 'tv', 'tmdb_id': str(tmdb_id)})
                 upnext_item['art']['thumb'] = upnext_item['art']['poster'] = f'{ADDONPATH}/resources/icons/trakt/up-next.png'
                 upnext_item['infolabels']['season'] = -1
                 upnext_item['infolabels']['episode'] = 0
-                upnext_item['infoproperties']['specialseason'] = ADDON.getLocalizedString(32043)
+                upnext_item['infoproperties']['specialseason'] = get_localized(32043)
                 items_end.append(upnext_item)
         return items + items_end
 

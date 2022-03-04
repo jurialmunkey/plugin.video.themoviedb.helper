@@ -1,14 +1,10 @@
-import xbmcaddon
-from resources.lib.addon.plugin import get_language
+from resources.lib.addon.plugin import get_language, get_setting
 from resources.lib.addon.setutils import del_empty_keys, ITER_PROPS_MAX
 from resources.lib.addon.parser import try_int
 from resources.lib.files.cache import CACHE_EXTENDED
 from resources.lib.api.request import RequestAPI
 
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
-EN_FALLBACK = ADDON.getSettingBool('fanarttv_enfallback')
-
-
+EN_FALLBACK = get_setting('fanarttv_enfallback')
 API_URL = 'https://webservice.fanart.tv/v3'
 NO_LANGUAGE = ['keyart', 'fanart']
 ARTWORK_TYPES = {
@@ -52,7 +48,7 @@ class FanartTV(RequestAPI):
     def __init__(
             self,
             api_key='fcca59bee130b70db37ee43e63f8d6c1',
-            client_key=ADDON.getSettingString('fanarttv_clientkey'),
+            client_key=get_setting('fanarttv_clientkey', 'str'),
             language=get_language(),
             cache_only=False,
             cache_refresh=False,

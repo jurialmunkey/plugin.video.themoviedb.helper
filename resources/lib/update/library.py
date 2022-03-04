@@ -1,8 +1,7 @@
-import xbmc
-import xbmcgui
 import xbmcvfs
-import xbmcaddon
 import resources.lib.api.kodi.rpc as rpc
+from xbmcgui import DialogProgressBG
+from resources.lib.addon.plugin import get_setting, get_localized, set_setting, executebuiltin
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.timedate import is_unaired_timestamp, get_current_date_time
 from resources.lib.files.utils import validify_filename, get_tmdb_id_nfo
@@ -10,9 +9,6 @@ from resources.lib.update.logger import _LibraryLogger
 from resources.lib.update.update import BASEDIR_MOVIE, BASEDIR_TV, STRM_MOVIE, STRM_EPISODE, create_file, create_nfo, get_unique_folder, get_userlist, create_playlist
 from resources.lib.update.cacher import _TVShowCache
 from resources.lib.api.tmdb.api import TMDb
-
-
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 def add_to_library(info, busy_spinner=True, library_adder=None, finished=True, **kwargs):
@@ -39,20 +35,20 @@ class LibraryAdder():
     def __init__(self, busy_spinner=True):
         self.kodi_db_movies = rpc.get_kodi_library('movie')
         self.kodi_db_tv = rpc.get_kodi_library('tv')
-        self.p_dialog = xbmcgui.DialogProgressBG() if busy_spinner else None
-        self.auto_update = ADDON.getSettingBool('auto_update')
+        self.p_dialog = DialogProgressBG() if busy_spinner else None
+        self.auto_update = get_setting('auto_update')
         self._log = _LibraryLogger()
         self.tv = None
-        self.hide_unaired = ADDON.getSettingBool('hide_unaired_episodes')
-        self.hide_nodate = ADDON.getSettingBool('nodate_is_unaired')
-        # self.debug_logging = ADDON.getSettingBool('debug_logging')
+        self.hide_unaired = get_setting('hide_unaired_episodes')
+        self.hide_nodate = get_setting('nodate_is_unaired')
+        # self.debug_logging = get_setting('debug_logging')
         self.debug_logging = True
         self.clean_library = False
 
     def _start(self):
         if self.p_dialog:
-            self.p_dialog.create('TMDbHelper', ADDON.getLocalizedString(32166))
-        if not ADDON.getSettingBool('legacy_conversion'):
+            self.p_dialog.create('TMDbHelper', get_setting(32166))
+        if not get_setting('legacy_conversion'):
             self.legacy_conversion()
 
     def _finish(self, update=True):
@@ -62,9 +58,9 @@ class LibraryAdder():
             self._log._clean()  # Clean up old log files first
             self._log._out()
         if self.clean_library:
-            xbmc.executebuiltin('CleanLibrary(video)')
+            executebuiltin('CleanLibrary(video)')
         if update and self.auto_update:
-            xbmc.executebuiltin('UpdateLibrary(video)')
+            executebuiltin('UpdateLibrary(video)')
 
     def _update(self, count, total, **kwargs):
         if self.p_dialog:
@@ -103,11 +99,11 @@ class LibraryAdder():
         nfos_total = len(nfos)
         for x, i in enumerate(nfos):
             folder, tmdb_id = i['folder'], i['tmdb_id']
-            self._update(x, nfos_total, message=f'{ADDON.getLocalizedString(32167)} {folder}...')
+            self._update(x, nfos_total, message=f'{get_setting(32167)} {folder}...')
             self._legacy_conversion(folder, tmdb_id)
 
         # Mark as complete and set to clean library
-        ADDON.setSettingBool('legacy_conversion', True)
+        set_setting('legacy_conversion', True)
         self.clean_library = True
 
     def update_tvshows(self, force=False, **kwargs):
@@ -116,11 +112,11 @@ class LibraryAdder():
         # Update each show in folder
         nfos_total = len(nfos)
         for x, i in enumerate(nfos):
-            self._update(x, nfos_total, message=f'{ADDON.getLocalizedString(32167)} {i["folder"]}...')
+            self._update(x, nfos_total, message=f'{get_setting(32167)} {i["folder"]}...')
             self.add_tvshow(tmdb_id=i['tmdb_id'], force=force)
 
         # Update last updated stamp
-        ADDON.setSettingString('last_autoupdate', f'Last updated {get_current_date_time()}')
+        set_setting('last_autoupdate', f'Last updated {get_current_date_time()}', 'str')
 
     def add_userlist(self, user_slug=None, list_slug=None, confirm=True, force=False, **kwargs):
         request = get_userlist(user_slug=user_slug, list_slug=list_slug, confirm=confirm, busy_spinner=self.p_dialog)
@@ -137,10 +133,10 @@ class LibraryAdder():
             i_added[i.get('type')].append(playlist_rule)
 
         if i_added.get('movie'):
-            self._update(1, 3, message=ADDON.getLocalizedString(32349))
+            self._update(1, 3, message=get_setting(32349))
             create_playlist(i_added['movie'], 'movies', user_slug, list_slug)
         if i_added.get('show'):
-            self._update(2, 3, message=ADDON.getLocalizedString(32350))
+            self._update(2, 3, message=get_setting(32350))
             create_playlist(i_added['show'], 'tvshows', user_slug, list_slug)
 
     def _add_userlist_item(self, i, force=False):
@@ -204,7 +200,7 @@ class LibraryAdder():
 
         # Add seasons
         for x, season in enumerate(self.tv.get_seasons()):
-            self._update(x, self.tv.s_total, message=f'{ADDON.getLocalizedString(32167)} {self.tv.details.get("name")} - {xbmc.getLocalizedString(20373)} {season.get("season_number", 0)}...')  # Update our progress dialog
+            self._update(x, self.tv.s_total, message=f'{get_setting(32167)} {self.tv.details.get("name")} - {get_localized(20373)} {season.get("season_number", 0)}...')  # Update our progress dialog
             self._add_season(season)
 
         # Store details about what we did into the cache

@@ -1,18 +1,13 @@
 # Module: default
 # Author: jurialmunkey
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
-import xbmc
-import xbmcgui
-import xbmcaddon
+from xbmcgui import Dialog
 from resources.lib.addon.decorators import busy_dialog
 from resources.lib.addon.parser import try_int
-from resources.lib.addon.plugin import set_kwargattr, convert_trakt_type
+from resources.lib.addon.plugin import set_kwargattr, convert_trakt_type, get_localized, executebuiltin, get_infolabel
 from resources.lib.api.trakt.api import TraktAPI
 from resources.lib.update.userlist import get_monitor_userlists
 from resources.lib.update.library import add_to_library
-
-
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 def _menu_items():
@@ -38,7 +33,7 @@ def _menu_items():
                 'allow_episodes': True,
                 'preconfigured': True,
                 'remove': False,
-                'name': xbmc.getLocalizedString(16103)}},
+                'name': get_localized(16103)}},
         {
             'class': _SyncItem,
             'kwargs': {
@@ -47,31 +42,31 @@ def _menu_items():
                 'allow_episodes': True,
                 'preconfigured': True,
                 'remove': True,
-                'name': xbmc.getLocalizedString(16104)}},
+                'name': get_localized(16104)}},
         {
             'class': _SyncItem,
             'kwargs': {
                 'method': 'collection',
                 'sync_type': 'collection',
                 'allow_episodes': True,
-                'name_add': ADDON.getLocalizedString(32289),
-                'name_remove': ADDON.getLocalizedString(32290)}},
+                'name_add': get_localized(32289),
+                'name_remove': get_localized(32290)}},
         {
             'class': _SyncItem,
             'kwargs': {
                 'method': 'watchlist',
                 'sync_type': 'watchlist',
                 'allow_episodes': False,
-                'name_add': ADDON.getLocalizedString(32291),
-                'name_remove': ADDON.getLocalizedString(32292)}},
+                'name_add': get_localized(32291),
+                'name_remove': get_localized(32292)}},
         {
             'class': _SyncItem,
             'kwargs': {
                 'method': 'recommendations',
                 'sync_type': 'recommendations',
                 'allow_episodes': False,
-                'name_add': ADDON.getLocalizedString(32293),
-                'name_remove': ADDON.getLocalizedString(32294)}},
+                'name_add': get_localized(32293),
+                'name_remove': get_localized(32294)}},
         {
             'class': _Comments},
     ]
@@ -105,7 +100,7 @@ class _Menu():
         """ Ask user to select menu item """
         if not self.menu:
             return
-        x = xbmcgui.Dialog().contextmenu([i.name for i in self.menu])
+        x = Dialog().contextmenu([i.name for i in self.menu])
         if x == -1:
             return
         return self.menu[x]
@@ -119,16 +114,16 @@ class _Menu():
             return
         if item._sync and item._sync.status_code in [200, 201, 204]:
             self._trakt._cache.del_cache('trakt.last_activities')  # Wipe last activities cache to update now
-            xbmcgui.Dialog().ok(
-                ADDON.getLocalizedString(32295),
-                ADDON.getLocalizedString(32297).format(
+            Dialog().ok(
+                get_localized(32295),
+                get_localized(32297).format(
                     item.name, self.trakt_type, self.id_type.upper(), self.unique_id))
-            xbmc.executebuiltin('Container.Refresh')
-            xbmc.executebuiltin('UpdateLibrary(video,/fake/path/to/force/refresh/on/home)')
+            executebuiltin('Container.Refresh')
+            executebuiltin('UpdateLibrary(video,/fake/path/to/force/refresh/on/home)')
             return
-        xbmcgui.Dialog().ok(
-            ADDON.getLocalizedString(32295),
-            ADDON.getLocalizedString(32296).format(
+        Dialog().ok(
+            get_localized(32295),
+            get_localized(32296).format(
                 item.name, self.trakt_type, self.id_type.upper(), self.unique_id))
 
 
@@ -168,13 +163,13 @@ class _UserList():
         set_kwargattr(self, kwargs)
 
     def _getself(self):
-        self.remove = xbmc.getInfoLabel("ListItem.Property(param.owner)") == 'true'
-        self.name = ADDON.getLocalizedString(32355) if self.remove else ADDON.getLocalizedString(32298)
+        self.remove = get_infolabel("ListItem.Property(param.owner)") == 'true'
+        self.name = get_localized(32355) if self.remove else get_localized(32298)
         return self
 
     def _addlist(self):
         """ Create a new Trakt list and returns tuple of list and user slug """
-        name = xbmcgui.Dialog().input(ADDON.getLocalizedString(32356))
+        name = Dialog().input(get_localized(32356))
         if not name:
             return
         response = self._trakt.post_response('users/me/lists', postdata={'name': name})
@@ -188,15 +183,15 @@ class _UserList():
         """ Get an existing Trakt list and returns tuple of list and user slug """
         if get_currentlist:
             return (
-                xbmc.getInfoLabel("ListItem.Property(param.list_slug)"),
-                xbmc.getInfoLabel("ListItem.Property(param.user_slug)"))
+                get_infolabel("ListItem.Property(param.list_slug)"),
+                get_infolabel("ListItem.Property(param.user_slug)"))
         with busy_dialog():
             list_sync = self._trakt.get_list_of_lists('users/me/lists') or []
-            list_sync.append({'label': ADDON.getLocalizedString(32299)})
-        x = xbmcgui.Dialog().contextmenu([i.get('label') for i in list_sync])
+            list_sync.append({'label': get_localized(32299)})
+        x = Dialog().contextmenu([i.get('label') for i in list_sync])
         if x == -1:
             return
-        if list_sync[x].get('label') == ADDON.getLocalizedString(32299):
+        if list_sync[x].get('label') == get_localized(32299):
             return self._addlist()
         return (
             list_sync[x].get('params', {}).get('list_slug'),
@@ -208,7 +203,7 @@ class _UserList():
         """
         if slug and slug not in get_monitor_userlists():
             return
-        if confirm and not xbmcgui.Dialog().yesno(xbmc.getLocalizedString(20444), ADDON.getLocalizedString(32362)):
+        if confirm and not Dialog().yesno(get_localized(20444), get_localized(32362)):
             return
         add_to_library(tmdb_type, tmdb_id=tmdb_id)
 
@@ -232,22 +227,22 @@ class _Comments():
         set_kwargattr(self, kwargs)
 
     def _getself(self):
-        self.name = ADDON.getLocalizedString(32304)
+        self.name = get_localized(32304)
         return self
 
     def _getcomment(self, itemlist, comments):
         """ Get a comment from a list of comments """
         if not itemlist:
-            xbmcgui.Dialog().ok(ADDON.getLocalizedString(32305), ADDON.getLocalizedString(32306))
+            Dialog().ok(get_localized(32305), get_localized(32306))
             return -1
-        x = xbmcgui.Dialog().select(ADDON.getLocalizedString(32305), itemlist)
+        x = Dialog().select(get_localized(32305), itemlist)
         if x == -1:
             return -1
         info = comments[x].get('comment')
         name = comments[x].get('user', {}).get('name')
         rate = comments[x].get('user_stats', {}).get('rating')
-        info = f'{info}\n\n{xbmc.getLocalizedString(563)} {rate}/10' if rate else f'{info}'
-        xbmcgui.Dialog().textviewer(name, info)
+        info = f'{info}\n\n{get_localized(563)} {rate}/10' if rate else f'{info}'
+        Dialog().textviewer(name, info)
         return self._getcomment(itemlist, comments)
 
     def sync(self):

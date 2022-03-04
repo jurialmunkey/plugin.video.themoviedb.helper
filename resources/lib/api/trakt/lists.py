@@ -1,16 +1,12 @@
 import random
-import xbmcgui
-import xbmcaddon
+from xbmcgui import Dialog
 from resources.lib.api.kodi.rpc import get_kodi_library
-from resources.lib.addon.plugin import convert_type, PLUGINPATH, get_plugin_category
+from resources.lib.addon.plugin import convert_type, PLUGINPATH, get_plugin_category, get_localized, get_setting
 from resources.lib.addon.constants import TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, TRAKT_LIST_OF_LISTS
 from resources.lib.addon.parser import try_int, encode_url
 from resources.lib.addon.timedate import get_calendar_name
 from resources.lib.api.mapping import get_empty_item
 from resources.lib.api.trakt.api import get_sort_methods
-
-
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 class TraktLists():
@@ -79,7 +75,7 @@ class TraktLists():
         self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = convert_type(tmdb_type, 'library')
         self.container_content = convert_type(tmdb_type, 'container')
-        self.plugin_category = f'{convert_type(tmdb_type, "plural")} {ADDON.getLocalizedString(32078)}'
+        self.plugin_category = f'{convert_type(tmdb_type, "plural")} {get_localized(32078)}'
         return items
 
     def list_lists(self, info, page=None, **kwargs):
@@ -94,7 +90,7 @@ class TraktLists():
 
     def list_lists_search(self, query=None, **kwargs):
         if not query:
-            kwargs['query'] = query = xbmcgui.Dialog().input(ADDON.getLocalizedString(32044))
+            kwargs['query'] = query = Dialog().input(get_localized(32044))
             if not kwargs['query']:
                 return
             self.container_update = f'{encode_url(PLUGINPATH, **kwargs)},replace'
@@ -169,7 +165,7 @@ class TraktLists():
             'info': 'recommendations',
             'tmdb_type': item.get('params', {}).get('tmdb_type'),
             'tmdb_id': item.get('params', {}).get('tmdb_id')}
-        self.params['plugin_category'] = f'{ADDON.getLocalizedString(32288)} {item.get("label")}'
+        self.params['plugin_category'] = f'{get_localized(32288)} {item.get("label")}'
         return self.list_tmdb(
             info='recommendations',
             tmdb_type=item.get('params', {}).get('tmdb_type'),
@@ -181,7 +177,7 @@ class TraktLists():
         self.tmdb_cache_only = False
         self.library = 'video'
         self.container_content = 'episodes'
-        self.plugin_category = ADDON.getLocalizedString(32406)
+        self.plugin_category = get_localized(32406)
         return items
 
     def list_inprogress(self, info, tmdb_type, page=None, **kwargs):
@@ -204,20 +200,20 @@ class TraktLists():
         self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = convert_type(tmdb_type, 'library')
         self.container_content = convert_type(tmdb_type, 'container')
-        self.plugin_category = f'{ADDON.getLocalizedString(32196)} {convert_type(tmdb_type, "plural")}'
+        self.plugin_category = f'{get_localized(32196)} {convert_type(tmdb_type, "plural")}'
         return items
 
     def list_nextepisodes(self, info, tmdb_type, page=None, **kwargs):
         if tmdb_type != 'tv':
             return
-        sort_by_premiered = True if ADDON.getSettingString('trakt_nextepisodesort') == 'airdate' else False
+        sort_by_premiered = True if get_setting('trakt_nextepisodesort', 'str') == 'airdate' else False
         items = self.trakt_api.get_upnext_episodes_list(page=page, sort_by_premiered=sort_by_premiered)
         self.tmdb_cache_only = False
         # self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = 'video'
         self.container_content = 'episodes'
-        self.thumb_override = ADDON.getSettingInt('calendar_art')
-        self.plugin_category = ADDON.getLocalizedString(32197)
+        self.thumb_override = get_setting('calendar_art', 'int')
+        self.plugin_category = get_localized(32197)
         return items
 
     def list_trakt_calendar(self, info, startdate, days, page=None, library=False, **kwargs):
@@ -233,7 +229,7 @@ class TraktLists():
         self.library = 'video'
         self.container_content = 'episodes'
         self.plugin_category = get_calendar_name(startdate=try_int(startdate), days=try_int(days))
-        self.thumb_override = ADDON.getSettingInt('calendar_art')
+        self.thumb_override = get_setting('calendar_art', 'int')
         return items
 
     def list_upnext(self, info, tmdb_type, tmdb_id, page=None, **kwargs):
@@ -247,5 +243,5 @@ class TraktLists():
         self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = 'video'
         self.container_content = 'episodes'
-        self.plugin_category = ADDON.getLocalizedString(32043)
+        self.plugin_category = get_localized(32043)
         return items

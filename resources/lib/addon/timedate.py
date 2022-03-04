@@ -1,13 +1,9 @@
 import _strptime
 import datetime
-import xbmc
 import time
-import xbmcaddon
-from resources.lib.addon.plugin import kodi_log
+from xbmc import getRegion
+from resources.lib.addon.plugin import kodi_log, get_localized
 from resources.lib.addon.decorators import try_except_log
-
-
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 def get_datetime_combine(*args, **kwargs):
@@ -88,7 +84,7 @@ def date_in_range(date_str, days=1, start_date=0, date_fmt="%Y-%m-%dT%H:%M:%S", 
 
 
 def get_region_date(date_obj, region_fmt='dateshort', del_fmt=':%S'):
-    xbmc_region = xbmc.getRegion(region_fmt).replace(del_fmt, '')  # Strip seconds from formatting durations
+    xbmc_region = getRegion(region_fmt).replace(del_fmt, '')  # Strip seconds from formatting durations
     date_string = date_obj.strftime(xbmc_region.encode('unicode-escape').decode())  # Avoid UnicodeEncode errors in strftime
     return date_string.encode().decode('unicode-escape')  # Restore Unicode characters
 
@@ -125,29 +121,29 @@ def get_todays_date(days=0, str_fmt='%Y-%m-%d'):
 def get_calendar_name(startdate=0, days=1):
     if days == 1:
         if startdate == -1:
-            return ADDON.getLocalizedString(32282)  # Yesterday
+            return get_localized(32282)  # Yesterday
         if startdate == 0:
-            return xbmc.getLocalizedString(33006)  # Today
+            return get_localized(33006)  # Today
         if startdate == 1:
-            return xbmc.getLocalizedString(33007)  # Tomorrow
+            return get_localized(33007)  # Tomorrow
         return get_todays_date(days=startdate, str_fmt="%A")
     if days == 7:
         if startdate == 0:
-            return ADDON.getLocalizedString(32284)  # This Week
+            return get_localized(32284)  # This Week
         if startdate == -7:
-            return ADDON.getLocalizedString(32281)  # Last Week
+            return get_localized(32281)  # Last Week
         return
     if days == 14:
         if startdate == 0:
-            return ADDON.getLocalizedString(32285)  # This Fortnight
+            return get_localized(32285)  # This Fortnight
         if startdate == -14:
-            return ADDON.getLocalizedString(32280)  # Last Fortnight
+            return get_localized(32280)  # Last Fortnight
         return
     if days == 30:
         if startdate == 0:
-            return ADDON.getLocalizedString(32326)  # This Month
+            return get_localized(32326)  # This Month
         if startdate == -30:
-            return ADDON.getLocalizedString(32327)  # Last Month
+            return get_localized(32327)  # Last Month
 
 
 def convert_timestamp(time_str, time_fmt="%Y-%m-%dT%H:%M:%S", time_lim=19, utc_convert=False):

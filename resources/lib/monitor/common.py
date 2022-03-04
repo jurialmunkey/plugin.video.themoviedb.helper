@@ -1,19 +1,14 @@
-import xbmc
-import xbmcaddon
 from resources.lib.addon.window import get_property
 from resources.lib.api.tmdb.api import TMDb
 from resources.lib.api.omdb.api import OMDb
 from resources.lib.api.trakt.api import TraktAPI
 from resources.lib.api.fanarttv.api import FanartTV
-from resources.lib.addon.plugin import kodi_traceback
+from resources.lib.addon.plugin import kodi_traceback, get_setting, get_infolabel, get_condvisibility
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.setutils import merge_two_dicts
 from resources.lib.addon.decorators import try_except_log
 from resources.lib.addon.timedate import convert_timestamp, get_region_date
 from resources.lib.items.builder import ItemBuilder
-
-
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 SETMAIN = {
@@ -44,7 +39,7 @@ class CommonMonitorFunctions(object):
         self.trakt_api = TraktAPI()
         self.tmdb_api = TMDb()
         self.ftv_api = FanartTV()
-        self.omdb_api = OMDb() if ADDON.getSettingString('omdb_apikey') else None
+        self.omdb_api = OMDb() if get_setting('omdb_apikey', 'str') else None
         self.ib = ItemBuilder(tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api)
         self.imdb_top250 = {}
         self.property_prefix = 'ListItem'
@@ -124,7 +119,7 @@ class CommonMonitorFunctions(object):
             return
         self.set_property('Premiered', get_region_date(date_obj, 'dateshort'))
         self.set_property('Premiered_Long', get_region_date(date_obj, 'datelong'))
-        self.set_property('Premiered_Custom', date_obj.strftime(xbmc.getInfoLabel('Skin.String(TMDbHelper.Date.Format)') or '%d %b %Y'))
+        self.set_property('Premiered_Custom', date_obj.strftime(get_infolabel('Skin.String(TMDbHelper.Date.Format)') or '%d %b %Y'))
         self.properties.update(['Premiered', 'Premiered_Long', 'Premiered_Custom'])
 
     def set_properties(self, item):
@@ -134,7 +129,7 @@ class CommonMonitorFunctions(object):
         self.set_time_properties(item.get('infolabels', {}).get('duration', 0))
         self.set_date_properties(item.get('infolabels', {}).get('premiered'))
         self.set_list_properties(item.get('cast', []), 'name', 'cast')
-        if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableExtendedProperties)"):
+        if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableExtendedProperties)"):
             self.set_indexed_properties(item.get('infoproperties', {}))
 
     @try_except_log('lib.monitor.common get_tmdb_id')

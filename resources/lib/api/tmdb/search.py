@@ -1,14 +1,9 @@
-import xbmc
-import xbmcgui
-import xbmcaddon
-from resources.lib.addon.plugin import PLUGINPATH, convert_type
+from xbmcgui import Dialog, INPUT_ALPHANUM
+from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized
 from resources.lib.addon.setutils import merge_two_dicts
 from resources.lib.files.cache import set_search_history, get_search_history
 from urllib.parse import urlencode
 
-
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
-ADDONPATH = ADDON.getAddonInfo('path')
 
 MULTISEARCH_TYPES = ['movie', 'tv', 'person', 'collection', 'company', 'keyword']
 
@@ -22,7 +17,7 @@ def get_zippered_list(lists):
 
 class SearchLists():
     def list_multisearchdir_router(self, **kwargs):
-        self.plugin_category = xbmc.getLocalizedString(137)
+        self.plugin_category = get_localized(137)
         if kwargs.get('clear_cache') != 'True':
             return self._list_multisearchdir(**kwargs)
         for tmdb_type in MULTISEARCH_TYPES:
@@ -34,14 +29,14 @@ class SearchLists():
         items = get_zippered_list(lists)
         if len(items) > len(MULTISEARCH_TYPES):  # We have search results so need clear cache item
             items.append({
-                'label': ADDON.getLocalizedString(32121),
+                'label': get_localized(32121),
                 'art': {'thumb': f'{ADDONPATH}/resources/icons/themoviedb/search.png'},
                 'infoproperties': {'specialsort': 'bottom'},
                 'params': {'info': 'dir_multisearch', 'clear_cache': 'True'}})
         return items
 
     def list_searchdir_router(self, tmdb_type, **kwargs):
-        self.plugin_category = xbmc.getLocalizedString(137)
+        self.plugin_category = get_localized(137)
         if kwargs.get('clear_cache') != 'True':
             return self.list_searchdir(tmdb_type, **kwargs)
         set_search_history(tmdb_type, clear_cache=True)
@@ -49,7 +44,7 @@ class SearchLists():
 
     def list_searchdir(self, tmdb_type, clear_cache_item=True, append_type=False, **kwargs):
         base_item = {
-            'label': f'{xbmc.getLocalizedString(137)} {convert_type(tmdb_type, "plural")}',
+            'label': f'{get_localized(137)} {convert_type(tmdb_type, "plural")}',
             'art': {'thumb': f'{ADDONPATH}/resources/icons/themoviedb/search.png'},
             'infoproperties': {'specialsort': 'top'},
             'params': merge_two_dicts(kwargs, {'info': 'search', 'tmdb_type': tmdb_type})}
@@ -66,7 +61,7 @@ class SearchLists():
             items.append(item)
         if history and clear_cache_item:
             item = {
-                'label': ADDON.getLocalizedString(32121),
+                'label': get_localized(32121),
                 'art': base_item.get('art'),
                 'infoproperties': {'specialsort': 'bottom'},
                 'params': merge_two_dicts(base_item.get('params', {}), {'info': 'dir_search', 'clear_cache': 'True'})}
@@ -78,7 +73,7 @@ class SearchLists():
 
         if not query:
             query = set_search_history(
-                query=xbmcgui.Dialog().input(ADDON.getLocalizedString(32044), type=xbmcgui.INPUT_ALPHANUM),
+                query=Dialog().input(get_localized(32044), type=INPUT_ALPHANUM),
                 tmdb_type=tmdb_type)
             if not query:
                 return
@@ -102,6 +97,6 @@ class SearchLists():
         self.update_listing = True if update_listing else False
         self.container_content = convert_type(tmdb_type, 'container')
         self.kodi_db = self.get_kodi_database(tmdb_type)
-        self.plugin_category = f'{xbmc.getLocalizedString(137)} - {query} ({tmdb_type})'
+        self.plugin_category = f'{get_localized(137)} - {query} ({tmdb_type})'
 
         return items

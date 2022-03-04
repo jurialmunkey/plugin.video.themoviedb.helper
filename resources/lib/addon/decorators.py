@@ -1,7 +1,6 @@
-import xbmc
-import xbmcgui
+from xbmcgui import DialogProgressBG
 from contextlib import contextmanager
-from resources.lib.addon.plugin import kodi_log, kodi_traceback, format_name
+from resources.lib.addon.plugin import kodi_log, kodi_traceback, format_name, executebuiltin
 from timeit import default_timer as timer
 from threading import Thread
 
@@ -20,7 +19,7 @@ class ProgressDialog(object):
         self.close()
 
     def _create(self, title='', message='', total=100):
-        self._pd = xbmcgui.DialogProgressBG()
+        self._pd = DialogProgressBG()
         self._pd.create(title, message)
         self._count = 0
         self._total = total
@@ -61,12 +60,12 @@ def try_except_log(log_msg, notification=True):
 @contextmanager
 def busy_dialog(is_enabled=True):
     if is_enabled:
-        xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+        executebuiltin('ActivateWindow(busydialognocancel)')
     try:
         yield
     finally:
         if is_enabled:
-            xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
+            executebuiltin('Dialog.Close(busydialognocancel)')
 
 
 def busy_decorator(func):

@@ -1,6 +1,6 @@
-import xbmc
-import json
-import xbmcvfs
+from xbmcvfs import Stat
+from xbmc import Monitor, executeJSONRPC
+from json import dumps, loads
 from resources.lib.addon.plugin import kodi_log
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.setutils import find_dict_in_list
@@ -18,8 +18,8 @@ def get_jsonrpc(method=None, params=None):
     if params:
         query["params"] = params
     try:
-        jrpc = xbmc.executeJSONRPC(json.dumps(query))
-        response = json.loads(jrpc)
+        jrpc = executeJSONRPC(dumps(query))
+        response = loads(jrpc)
     except Exception as exc:
         kodi_log(f'TMDbHelper - JSONRPC Error:\n{exc}', 1)
         response = {}
@@ -187,16 +187,16 @@ class KodiLibrary(object):
     def get_database(self, dbtype, tvshowid=None, attempt_reconnect=False, logging=True):
         cache_name = f'db.{dbtype}.{tvshowid}'
         cache_data = self._cache.get_cache(cache_name)
-        db_updated = xbmcvfs.Stat('special://database/MyVideos119.db').st_mtime() or -1
+        db_updated = Stat('special://database/MyVideos119.db').st_mtime() or -1
         if cache_data and db_updated == cache_data.get('updated') and cache_data.get('database'):
             return cache_data['database']
         retries = 5 if attempt_reconnect else 1
-        while not xbmc.Monitor().abortRequested() and retries > 0:
+        while not Monitor().abortRequested() and retries > 0:
             database = self._get_kodi_db(dbtype, tvshowid)
             if database:
                 self._cache.set_cache({'database': database, 'updated': db_updated}, cache_name, cache_days=1)
                 return database
-            xbmc.Monitor().waitForAbort(1)
+            Monitor().waitForAbort(1)
             retries -= 1
         if logging:
             kodi_log(f'Getting KodiDB {dbtype} FAILED!', 1)

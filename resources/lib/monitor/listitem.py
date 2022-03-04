@@ -1,15 +1,10 @@
-import xbmc
-import xbmcaddon
 from resources.lib.api.kodi.rpc import get_person_stats
 from resources.lib.addon.window import get_property
 from resources.lib.monitor.common import CommonMonitorFunctions, SETMAIN_ARTWORK, SETPROP_RATINGS
 from resources.lib.monitor.images import ImageFunctions
-from resources.lib.addon.plugin import convert_media_type, convert_type
+from resources.lib.addon.plugin import convert_media_type, convert_type, get_setting, get_infolabel, get_condvisibility
 from resources.lib.addon.decorators import try_except_log
 from threading import Thread
-
-
-ADDON = xbmcaddon.Addon('plugin.video.themoviedb.helper')
 
 
 def get_container():
@@ -20,7 +15,7 @@ def get_container():
 
 
 def get_container_item(container=None):
-    if xbmc.getCondVisibility(
+    if get_condvisibility(
             "[Window.IsVisible(DialogPVRInfo.xml) | "
             "Window.IsVisible(movieinformation)] + "
             "!Skin.HasSetting(TMDbHelper.ForceWidgetContainer)"):
@@ -45,13 +40,13 @@ class ListItemMonitor(CommonMonitorFunctions):
         self.container_item = get_container_item(self.container)
 
     def get_infolabel(self, infolabel):
-        return xbmc.getInfoLabel(f'{self.container_item}{infolabel}')
+        return get_infolabel(f'{self.container_item}{infolabel}')
 
     def get_position(self):
-        return xbmc.getInfoLabel(f'{self.container}CurrentItem')
+        return get_infolabel(f'{self.container}CurrentItem')
 
     def get_numitems(self):
-        return xbmc.getInfoLabel(f'{self.container}NumItems')
+        return get_infolabel(f'{self.container}NumItems')
 
     def get_imdb_id(self):
         imdb_id = self.get_infolabel('IMDBNumber') or ''
@@ -81,13 +76,13 @@ class ListItemMonitor(CommonMonitorFunctions):
         dbtype = self.get_infolabel('dbtype')
         if dbtype:
             return f'{dbtype}s'
-        if xbmc.getCondVisibility(
+        if get_condvisibility(
                 "Window.IsVisible(DialogPVRInfo.xml) | "
                 "Window.IsVisible(MyPVRChannels.xml) | "
                 "Window.IsVisible(MyPVRGuide.xml)"):
             return 'multi'
         if self.container == 'Container.':
-            return xbmc.getInfoLabel('Container.Content()') or ''
+            return get_infolabel('Container.Content()') or ''
         return ''
 
     def get_tmdb_type(self, dbtype=None):
@@ -123,7 +118,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             self.pre_item = self.cur_item
 
     def get_cur_folder(self):
-        return (self.container, xbmc.getInfoLabel('Container.Content()'), self.get_numitems())
+        return (self.container, get_infolabel('Container.Content()'), self.get_numitems())
 
     @try_except_log('lib.monitor.listitem.is_same_folder')
     def is_same_folder(self, update=True):
@@ -142,7 +137,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         self.set_iter_properties(artwork, SETMAIN_ARTWORK)
 
         # Crop Image
-        if xbmc.getCondVisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"):
+        if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"):
             self.crop_img = ImageFunctions(method='crop', artwork=self.get_artwork(
                 source="Art(tvshow.clearlogo)|Art(clearlogo)",
                 fallback=artwork.get('clearlogo')))
@@ -196,7 +191,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         fallback = get_property('Blur.Fallback')
         if not fallback:
             return
-        if xbmc.getCondVisibility("Skin.HasSetting(TMDbHelper.EnableBlur)"):
+        if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableBlur)"):
             self.blur_img = ImageFunctions(method='blur', artwork=fallback)
             self.blur_img.setName('blur_img')
             self.blur_img.start()
@@ -226,7 +221,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         self.set_cur_item()
 
         # Blur Image
-        if xbmc.getCondVisibility("Skin.HasSetting(TMDbHelper.EnableBlur)"):
+        if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableBlur)"):
             self.blur_img = ImageFunctions(method='blur', artwork=self.get_artwork(
                 source=get_property('Blur.SourceImage'),
                 fallback=get_property('Blur.Fallback')))
@@ -235,7 +230,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             self._last_blur_fallback = False
 
         # Desaturate Image
-        if xbmc.getCondVisibility("Skin.HasSetting(TMDbHelper.EnableDesaturate)"):
+        if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableDesaturate)"):
             self.desaturate_img = ImageFunctions(method='desaturate', artwork=self.get_artwork(
                 source=get_property('Desaturate.SourceImage'),
                 fallback=get_property('Desaturate.Fallback')))
@@ -243,7 +238,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             self.desaturate_img.start()
 
         # CompColors
-        if xbmc.getCondVisibility("Skin.HasSetting(TMDbHelper.EnableColors)"):
+        if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableColors)"):
             self.colors_img = ImageFunctions(method='colors', artwork=self.get_artwork(
                 source=get_property('Colors.SourceImage'),
                 fallback=get_property('Colors.Fallback')))
@@ -251,7 +246,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             self.colors_img.start()
 
         # Allow early exit to only do image manipulations
-        if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.Service)"):
+        if get_condvisibility("!Skin.HasSetting(TMDbHelper.Service)"):
             return get_property('IsUpdating', clear_property=True)
 
         # Need a TMDb type to do a details look-up so exit if we don't have one
@@ -278,7 +273,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         if tmdb_type == 'multi':
             tmdb_type = self.multisearch_tmdbtype
             self.dbtype = convert_type(tmdb_type, 'dbtype')
-        self.ib.ftv_api = self.ftv_api if ADDON.getSettingBool('service_fanarttv_lookup') else None
+        self.ib.ftv_api = self.ftv_api if get_setting('service_fanarttv_lookup') else None
         details = self.ib.get_item(tmdb_type, tmdb_id, self.season, self.episode)
         if details:
             artwork = details['artwork']
@@ -292,7 +287,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             details['infoproperties'].update(self._nextaired.setdefault(tmdb_id, self.tmdb_api.get_tvshow_nextaired(tmdb_id)))
 
         # Get our artwork properties
-        if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
+        if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
             thread_artwork = Thread(target=self.process_artwork, args=[artwork, tmdb_type])
             thread_artwork.start()
 
@@ -306,12 +301,12 @@ class ListItemMonitor(CommonMonitorFunctions):
 
         # Get person library statistics
         if tmdb_type == 'person' and details.get('infolabels', {}).get('title'):
-            if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisablePersonStats)"):
+            if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisablePersonStats)"):
                 details.setdefault('infoproperties', {}).update(
                     get_person_stats(details['infolabels']['title']) or {})
 
         # Get our item ratings
-        if xbmc.getCondVisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"):
+        if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"):
             thread_ratings = Thread(target=self.process_ratings, args=[details, tmdb_type])
             thread_ratings.start()
 
