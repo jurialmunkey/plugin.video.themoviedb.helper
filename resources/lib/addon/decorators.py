@@ -1,6 +1,7 @@
 from xbmcgui import DialogProgressBG
 from contextlib import contextmanager
-from resources.lib.addon.plugin import kodi_log, kodi_traceback, format_name, executebuiltin
+from resources.lib.addon.plugin import format_name, executebuiltin
+from resources.lib.addon.logger import kodi_log, kodi_traceback
 from timeit import default_timer as timer
 from threading import Thread
 

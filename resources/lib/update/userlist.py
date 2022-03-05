@@ -1,9 +1,10 @@
 from xbmcgui import Dialog
 from resources.lib.addon.decorators import busy_dialog
-from resources.lib.addon.plugin import kodi_log, get_setting, get_localized, set_setting
+from resources.lib.addon.plugin import get_setting, get_localized, set_setting
 from resources.lib.update.library import add_to_library
 from resources.lib.update.update import get_userlist
 from resources.lib.api.trakt.api import TraktAPI
+from resources.lib.addon.logger import kodi_log
 
 
 def get_monitor_userlists(list_slugs=None, user_slugs=None):

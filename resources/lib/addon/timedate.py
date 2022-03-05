@@ -2,8 +2,9 @@ import _strptime
 import datetime
 import time
 from xbmc import getRegion
-from resources.lib.addon.plugin import kodi_log, get_localized
+from resources.lib.addon.plugin import get_localized
 from resources.lib.addon.decorators import try_except_log
+from resources.lib.addon.logger import kodi_log
 
 
 def get_datetime_combine(*args, **kwargs):

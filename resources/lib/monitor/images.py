@@ -3,11 +3,12 @@ import xbmcvfs
 import colorsys
 from xbmc import getCacheThumbName, skinHasImage, Monitor, sleep
 from resources.lib.addon.window import get_property
-from resources.lib.addon.plugin import kodi_log, md5hash, get_infolabel
+from resources.lib.addon.plugin import md5hash, get_infolabel
 from resources.lib.addon.parser import try_int, try_float
 from resources.lib.files.utils import make_path
 from threading import Thread
 import urllib.request as urllib
+from resources.lib.addon.logger import kodi_log
 
 # PIL causes issues (via numpy) on Linux systems using python versions higher than 3.8.5
 # Lazy import PIL to avoid using it unless user requires ImageFunctions

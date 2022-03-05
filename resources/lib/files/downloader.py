@@ -5,8 +5,9 @@ import gzip
 from xbmcgui import Dialog, ALPHANUM_HIDE_INPUT
 from io import BytesIO
 from urllib.parse import urlparse
-from resources.lib.addon.plugin import kodi_log, get_localized, ADDONNAME
+from resources.lib.addon.plugin import get_localized, ADDONNAME
 from resources.lib.addon.decorators import busy_dialog
+from resources.lib.addon.logger import kodi_log
 
 
 requests = None  # Requests module is slow to import so lazy import via decorator instead

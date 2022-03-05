@@ -6,7 +6,7 @@ import xbmcvfs
 from json import dumps
 from xbmcgui import Dialog
 from resources.lib.addon.window import get_property
-from resources.lib.addon.plugin import reconfigure_legacy_params, kodi_log, format_folderpath, convert_type, get_localized, get_setting, set_setting, executebuiltin, get_infolabel
+from resources.lib.addon.plugin import reconfigure_legacy_params, format_folderpath, convert_type, get_localized, get_setting, set_setting, executebuiltin, get_infolabel
 from resources.lib.addon.decorators import busy_dialog
 from resources.lib.addon.parser import encode_url, parse_paramstring
 from resources.lib.files.downloader import Downloader
@@ -25,6 +25,7 @@ from resources.lib.player.players import Players
 from resources.lib.player.configure import configure_players
 from resources.lib.monitor.images import ImageFunctions
 from resources.lib.script.sync import sync_trakt_item
+from resources.lib.addon.logger import kodi_log
 
 
 # Get TMDb ID decorator

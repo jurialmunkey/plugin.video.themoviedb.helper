@@ -1,7 +1,7 @@
 import sys
 from xbmcplugin import addDirectoryItem, setProperty, setPluginCategory, setContent, endOfDirectory
 from resources.lib.addon.constants import NO_LABEL_FORMATTING, RANDOMISED_TRAKT, RANDOMISED_LISTS, TRAKT_LIST_OF_LISTS, TMDB_BASIC_LISTS, TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, ROUTE_NO_ID, ROUTE_TMDB_ID
-from resources.lib.addon.plugin import convert_type, reconfigure_legacy_params, kodi_log, get_setting, executebuiltin
+from resources.lib.addon.plugin import convert_type, reconfigure_legacy_params, get_setting, executebuiltin
 from resources.lib.addon.parser import parse_paramstring, try_int
 from resources.lib.addon.setutils import split_items, random_from_list, merge_two_dicts
 from resources.lib.addon.decorators import TimerList, ParallelThread
@@ -19,7 +19,7 @@ from resources.lib.items.builder import ItemBuilder
 from resources.lib.items.basedir import BaseDirLists
 from resources.lib.script.router import related_lists
 from resources.lib.player.players import Players
-# from resources.lib.files.utils import write_to_file
+from resources.lib.addon.logger import kodi_log
 from threading import Thread
 
 

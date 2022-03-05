@@ -1,5 +1,6 @@
 from resources.lib.files.utils import set_pickle, get_pickle
-from resources.lib.addon.plugin import format_name, kodi_log
+from resources.lib.addon.plugin import format_name
+from resources.lib.addon.logger import kodi_log
 
 
 def is_authorized(func):
