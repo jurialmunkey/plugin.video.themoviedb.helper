@@ -18,9 +18,9 @@ ADDONGETSETTINGROUTE = {
     'str': ADDON.getSettingString
 }
 ADDONSETSETTINGROUTE = {
-    'bool': ADDON.getSettingBool,
-    'int': ADDON.getSettingInt,
-    'str': ADDON.getSettingString
+    'bool': ADDON.setSettingBool,
+    'int': ADDON.setSettingInt,
+    'str': ADDON.setSettingString
 }
 
 _addonlogname = '[plugin.video.themoviedb.helper]\n'
