@@ -3,8 +3,7 @@ import datetime
 import time
 from xbmc import getRegion
 from resources.lib.addon.plugin import get_localized
-from resources.lib.addon.decorators import try_except_log
-from resources.lib.addon.logger import kodi_log
+from resources.lib.addon.logger import kodi_log, try_except_log
 
 
 def get_datetime_combine(*args, **kwargs):

@@ -2,7 +2,7 @@
 # Author: jurialmunkey
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 from xbmcgui import Dialog
-from resources.lib.addon.decorators import busy_dialog
+from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.plugin import set_kwargattr, convert_trakt_type, get_localized, executebuiltin, get_infolabel
 from resources.lib.api.trakt.api import TraktAPI
@@ -86,7 +86,7 @@ class _Menu():
         self.build_menu(items)
 
     def build_menu(self, items):
-        with busy_dialog():
+        with BusyDialog():
             self.menu = [j for j in (i['class'](self, **i.get('kwargs', {}))._getself() for i in items) if j]
         return self.menu
 
@@ -150,7 +150,7 @@ class _SyncItem():
 
     def sync(self):
         """ Called after user selects choice """
-        with busy_dialog():
+        with BusyDialog():
             self._sync = self._trakt.sync_item(
                 f'{self.method}/remove' if self.remove else self.method,
                 self._item.trakt_type, self._item.unique_id, self._item.id_type, self._item.season, self._item.episode)
@@ -185,7 +185,7 @@ class _UserList():
             return (
                 get_infolabel("ListItem.Property(param.list_slug)"),
                 get_infolabel("ListItem.Property(param.user_slug)"))
-        with busy_dialog():
+        with BusyDialog():
             list_sync = self._trakt.get_list_of_lists('users/me/lists') or []
             list_sync.append({'label': get_localized(32299)})
         x = Dialog().contextmenu([i.get('label') for i in list_sync])
@@ -212,7 +212,7 @@ class _UserList():
         slug = self._getlist(get_currentlist=self.remove)
         if not slug:
             return
-        with busy_dialog():
+        with BusyDialog():
             self._sync = self._trakt.add_list_item(
                 slug[0], self._item.trakt_type, self._item.unique_id, self._item.id_type,
                 season=self._item.season, episode=self._item.episode, remove=self.remove)
@@ -247,7 +247,7 @@ class _Comments():
 
     def sync(self):
         trakt_type = 'show' if self._item.trakt_type in ['season', 'episode'] else self._item.trakt_type
-        with busy_dialog():
+        with BusyDialog():
             slug = self._trakt.get_id(self._item.unique_id, self._item.id_type, trakt_type, 'slug')
             comments = self._trakt.get_response_json(f'{trakt_type}s', slug, 'comments', limit=50) or []
             itemlist = [i.get('comment', '').replace('\n', ' ') for i in comments]

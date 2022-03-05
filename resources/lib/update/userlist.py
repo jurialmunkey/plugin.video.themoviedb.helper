@@ -1,5 +1,5 @@
 from xbmcgui import Dialog
-from resources.lib.addon.decorators import busy_dialog
+from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.plugin import get_setting, get_localized, set_setting
 from resources.lib.update.library import add_to_library
 from resources.lib.update.update import get_userlist
@@ -17,7 +17,7 @@ def get_monitor_userlists(list_slugs=None, user_slugs=None):
 
 def monitor_userlist():
     # Build list choices
-    with busy_dialog():
+    with BusyDialog():
         user_lists = [
             {'label': f'{get_localized(32193)} {get_localized(20342)}',
                 'params': {'user_slug': 'me', 'list_slug': 'watchlist/movies'}},

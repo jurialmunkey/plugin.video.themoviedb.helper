@@ -3,7 +3,7 @@ from resources.lib.addon.window import get_property
 from resources.lib.monitor.common import CommonMonitorFunctions, SETMAIN_ARTWORK, SETPROP_RATINGS
 from resources.lib.monitor.images import ImageFunctions
 from resources.lib.addon.plugin import convert_media_type, convert_type, get_setting, get_infolabel, get_condvisibility
-from resources.lib.addon.decorators import try_except_log
+from resources.lib.addon.logger import try_except_log
 from threading import Thread
 
 

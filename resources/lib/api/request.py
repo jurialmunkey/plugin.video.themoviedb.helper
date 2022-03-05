@@ -8,7 +8,6 @@ from resources.lib.files.cache import BasicCache, CACHE_SHORT, CACHE_LONG
 from resources.lib.addon.logger import kodi_log
 from copy import copy
 from json import loads, dumps
-# from resources.lib.addon.decorators import timer_func
 # import requests
 
 requests = None  # Requests module is slow to import so lazy import via decorator instead

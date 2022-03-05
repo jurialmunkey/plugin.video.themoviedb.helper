@@ -1,6 +1,6 @@
 import xbmcvfs
 from xbmcgui import Dialog
-from resources.lib.addon.decorators import busy_dialog
+from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.plugin import get_setting, get_localized
 from resources.lib.addon.parser import try_int
 from resources.lib.files.utils import validify_filename, make_path, write_to_file, get_tmdb_id_nfo
@@ -125,7 +125,7 @@ def get_unique_folder(name, tmdb_id, basedir):
 
 
 def get_userlist(user_slug=None, list_slug=None, confirm=True, busy_spinner=True):
-    with busy_dialog(is_enabled=busy_spinner):
+    with BusyDialog(is_enabled=busy_spinner):
         if list_slug.startswith('watchlist'):
             path = ['users', user_slug, list_slug]
         else:

@@ -6,7 +6,7 @@ from xbmcgui import Dialog, ALPHANUM_HIDE_INPUT
 from io import BytesIO
 from urllib.parse import urlparse
 from resources.lib.addon.plugin import get_localized, ADDONNAME
-from resources.lib.addon.decorators import busy_dialog
+from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.logger import kodi_log
 
 
@@ -112,7 +112,7 @@ class Downloader(object):
         if not self.download_url:
             return
 
-        with busy_dialog():
+        with BusyDialog():
             response = self.open_url(self.download_url)
         if not response:
             Dialog().ok(ADDONNAME, get_localized(32058))
@@ -126,7 +126,7 @@ class Downloader(object):
         if not self.download_url or not self.extract_to:
             return
 
-        with busy_dialog():
+        with BusyDialog():
             response = self.open_url(self.download_url)
         if not response:
             Dialog().ok(ADDONNAME, get_localized(32058))
@@ -136,10 +136,10 @@ class Downloader(object):
             os.makedirs(self.extract_to)
 
         if Dialog().yesno(ADDONNAME, self.msg_cleardir):
-            with busy_dialog():
+            with BusyDialog():
                 self.clear_dir(self.extract_to)
 
-        with busy_dialog():
+        with BusyDialog():
             num_files = 0
             with zipfile.ZipFile(BytesIO(response.content)) as downloaded_zip:
                 for item in [x for x in downloaded_zip.namelist() if x.endswith('.json')]:

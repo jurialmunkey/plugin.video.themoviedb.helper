@@ -7,7 +7,7 @@ from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, format_folderpath, get_localized, get_setting, executebuiltin, get_infolabel
 from resources.lib.addon.parser import try_int, try_float
 from resources.lib.addon.constants import PLAYERS_PRIORITY
-from resources.lib.addon.decorators import busy_dialog, ProgressDialog
+from resources.lib.addon.dialog import BusyDialog, ProgressDialog
 from resources.lib.items.listitem import ListItem
 from resources.lib.files.utils import read_file, normalise_filesize
 from resources.lib.api.kodi.rpc import get_directory, KodiLibrary
@@ -75,7 +75,7 @@ def resolve_to_dummy(handle=None, stop_after=1, delay_wait=0):
         return -1
 
     # Added delay
-    with busy_dialog(False if delay_wait < 1 else True):
+    with BusyDialog(False if delay_wait < 1 else True):
         Monitor().waitForAbort(delay_wait)
 
     # Success

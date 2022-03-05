@@ -303,7 +303,6 @@ class _TraktSync():
             return activities.get(activity_type, {})
         return activities.get(activity_type, {}).get(activity_key)
 
-    # @timer_report('_get_last_activity')
     @is_authorized
     def _get_last_activity(self, activity_type=None, activity_key=None, cache_refresh=False):
         if not self.last_activities:

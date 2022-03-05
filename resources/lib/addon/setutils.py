@@ -56,7 +56,6 @@ def merge_two_items(base_item, item):
     return item
 
 
-# @timer_report('del_empty_keys')
 def del_empty_keys(d, values=[]):
     values += [None, '']
     return {k: v for k, v in d.items() if v not in values}

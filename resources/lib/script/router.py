@@ -7,7 +7,7 @@ from json import dumps
 from xbmcgui import Dialog
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import reconfigure_legacy_params, format_folderpath, convert_type, get_localized, get_setting, set_setting, executebuiltin, get_infolabel
-from resources.lib.addon.decorators import busy_dialog
+from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.parser import encode_url, parse_paramstring
 from resources.lib.files.downloader import Downloader
 from resources.lib.files.utils import dumps_to_file, validify_filename, read_file
@@ -31,7 +31,7 @@ from resources.lib.addon.logger import kodi_log
 # Get TMDb ID decorator
 def get_tmdb_id(func):
     def wrapper(*args, **kwargs):
-        with busy_dialog():
+        with BusyDialog():
             if not kwargs.get('tmdb_id'):
                 kwargs['tmdb_id'] = TMDb().get_tmdb_id(**kwargs)
         return func(*args, **kwargs)
@@ -61,13 +61,13 @@ def is_in_kwargs(mapping={}):
 
 
 def play_media(**kwargs):
-    with busy_dialog():
+    with BusyDialog():
         kodi_log(['lib.script.router - attempting to play\n', kwargs.get('play_media')], 1)
         executebuiltin(f'PlayMedia({kwargs.get("play_media")})')
 
 
 def run_plugin(**kwargs):
-    with busy_dialog():
+    with BusyDialog():
         kodi_log(['lib.script.router - attempting to play\n', kwargs.get('run_plugin')], 1)
         executebuiltin(f'RunPlugin({kwargs.get("run_plugin")})')
 
@@ -95,7 +95,7 @@ def delete_cache(delete_cache, **kwargs):
         return
     if not Dialog().yesno(get_localized(32387).format(delete_cache), get_localized(32388).format(delete_cache)):
         return
-    with busy_dialog():
+    with BusyDialog():
         z()._cache.ret_cache()._do_delete()
     Dialog().ok(get_localized(32387).format(delete_cache), get_localized(32389))
 
@@ -213,7 +213,7 @@ def update_players():
 def refresh_details(tmdb_id=None, tmdb_type=None, season=None, episode=None, confirm=True, **kwargs):
     if not tmdb_id or not tmdb_type:
         return
-    with busy_dialog():
+    with BusyDialog():
         details = ItemBuilder().get_item(tmdb_type, tmdb_id, season, episode, cache_refresh=True) or {}
         details = details.get('listitem')
     if details and confirm:
@@ -304,7 +304,7 @@ def library_update(**kwargs):
 
 
 def log_request(**kwargs):
-    with busy_dialog():
+    with BusyDialog():
         kwargs['response'] = None
         if not kwargs.get('url'):
             kwargs['url'] = Dialog().input('URL')
