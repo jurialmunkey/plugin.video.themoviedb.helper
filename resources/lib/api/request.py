@@ -178,7 +178,7 @@ class RequestAPI(object):
         https://api.themoviedb.org/3/arg1/arg2?api_key=foo&kwparamkey=kwparamvalue
         """
         url = '/'.join((self.req_api_url, '/'.join(map(str, (i for i in args if i is not None)))))
-        sep = '?'
+        sep = '&' if '?' in url else '?'
         if self.req_api_key:
             url = sep.join((url, self.req_api_key))
             sep = '&'
