@@ -1,10 +1,10 @@
-from xbmcgui import Dialog, DialogProgressBG
+import xbmcgui
 from resources.lib.addon.plugin import executebuiltin, get_localized
 from resources.lib.addon.logger import kodi_log, kodi_log_traceback
 """ Top level module only import plugin/constants/logger """
 
 
-DIALOG = Dialog()
+DIALOG = xbmcgui.Dialog()
 
 
 def kodi_notification(*args, **kwargs):
@@ -23,11 +23,16 @@ def kodi_dialog_multiselect(*args, **kwargs):
     return DIALOG.multiselect(*args, **kwargs)
 
 
+def kodi_dialog_select(*args, **kwargs):
+    return DIALOG.select(*args, **kwargs)
+
+
 def kodi_dialog_contextmenu(*args, **kwargs):
     return DIALOG.contextmenu(*args, **kwargs)
 
 
 def kodi_dialog_input(*args, **kwargs):
+    kwargs['type'] = getattr(xbmcgui, kwargs.get('type', 'INPUT_ALPHANUM'))
     return DIALOG.input(*args, **kwargs)
 
 
@@ -56,7 +61,7 @@ class ProgressDialog(object):
         self.close()
 
     def _create(self, title='', message='', total=100):
-        self._pd = DialogProgressBG()
+        self._pd = xbmcgui.DialogProgressBG()
         self._pd.create(title, message)
         self._count = 0
         self._total = total

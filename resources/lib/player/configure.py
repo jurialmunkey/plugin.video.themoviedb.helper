@@ -1,8 +1,7 @@
 from xbmcaddon import Addon as KodiAddon
-from xbmcgui import Dialog, INPUT_NUMERIC
-from resources.lib.addon.plugin import ADDONPATH, get_setting, get_localized, get_condvisibility
+from resources.lib.addon.plugin import ADDONPATH, get_setting, get_localized, get_condvisibility, kodi_dialog_input
 from resources.lib.addon.parser import try_int
-from resources.lib.addon.dialog import BusyDialog
+from resources.lib.addon.dialog import BusyDialog, kodi_dialog_select, kodi_dialog_yesno
 from resources.lib.addon.constants import PLAYERS_BASEDIR_BUNDLED, PLAYERS_BASEDIR_USER, PLAYERS_BASEDIR_SAVE, PLAYERS_PRIORITY
 from resources.lib.files.utils import get_files_in_folder
 from resources.lib.files.utils import read_file, dumps_to_file, delete_file
@@ -71,7 +70,7 @@ class _ConfigurePlayer():
 
     def set_name(self):
         name = self.player.get('name', '')
-        name = Dialog().input(get_localized(32331).format(self.filename), defaultt=name)
+        name = kodi_dialog_input(get_localized(32331).format(self.filename), defaultt=name)
         if not name:
             return
         self.player['name'] = name
@@ -84,16 +83,16 @@ class _ConfigurePlayer():
 
     def set_priority(self):
         priority = f'{self.player.get("priority") or PLAYERS_PRIORITY}'  # Input numeric takes str for some reason?!
-        priority = Dialog().input(
+        priority = kodi_dialog_input(
             get_localized(32344).format(self.filename),
-            defaultt=priority, type=INPUT_NUMERIC)
+            defaultt=priority, type='INPUT_NUMERIC')
         priority = try_int(priority)
         if not priority:
             return
         self.player['priority'] = priority
 
     def set_resolvable(self):
-        x = Dialog().select(get_localized(32332), [
+        x = kodi_dialog_select(get_localized(32332), [
             'setResolvedURL', 'PlayMedia', get_localized(32333)])
         if x == -1:
             return
@@ -101,7 +100,7 @@ class _ConfigurePlayer():
         if x == 0:
             is_resolvable = 'true'
         elif x == 1:
-            if not Dialog().yesno(
+            if not kodi_dialog_yesno(
                     get_localized(32339).format(self.filename),
                     get_localized(32340)):
                 return self.set_resolvable()
@@ -121,7 +120,7 @@ class _ConfigurePlayer():
             and (filename != self.filename or i != og_method)]  # Avoid adding same fallback method as original
         if not methods:
             return
-        x = Dialog().select(get_localized(32341), methods)
+        x = kodi_dialog_select(get_localized(32341), methods)
         if x == -1:
             return
         return methods[x]
@@ -137,7 +136,7 @@ class _ConfigurePlayer():
     def set_fallbacks(self):
         # Get the methods that the player supports and ask user to select which they want to set
         methods = _get_player_methods(self.player)
-        x = Dialog().select(get_localized(32342).format(self.filename), [
+        x = kodi_dialog_select(get_localized(32342).format(self.filename), [
             f'{i}: {self.player.get("fallback", {}).get(i, "null")}' for i in methods])
         if x == -1:
             return
@@ -150,7 +149,7 @@ class _ConfigurePlayer():
         """
         Returns player or -1 if reset to default (i.e. delete configured player)
         """
-        x = Dialog().select(self.filename, self.get_player_settings())
+        x = kodi_dialog_select(self.filename, self.get_player_settings())
         if x == -1:
             return self.player
         elif x == 0:
@@ -177,13 +176,13 @@ class ConfigurePlayers():
             self.dialog_players = _get_dialog_players(self.players)
 
     def select_player(self, header=get_localized(32328)):
-        x = Dialog().select(header, self.dialog_players, useDetails=True)
+        x = kodi_dialog_select(header, self.dialog_players, useDetails=True)
         if x == -1:
             return
         return self.dialog_players[x].getLabel2()  # Filename is saved in label2
 
     def delete_player(self, filename):
-        if not Dialog().yesno(
+        if not kodi_dialog_yesno(
                 get_localized(32334),
                 get_localized(32335).format(filename),
                 yeslabel=get_localized(13007), nolabel=get_localized(222)):
@@ -194,7 +193,7 @@ class ConfigurePlayers():
             self.dialog_players = _get_dialog_players(self.players)
 
     def save_player(self, player, filename, confirm=True):
-        if confirm and not Dialog().yesno(
+        if confirm and not kodi_dialog_yesno(
                 get_localized(32336), get_localized(32337).format(filename),
                 yeslabel=get_localized(190), nolabel=get_localized(32338)):
             return
