@@ -1,9 +1,9 @@
-from xbmcgui import Dialog
-from resources.lib.addon.decorators import busy_dialog
-from resources.lib.addon.plugin import kodi_log, get_setting, get_localized, set_setting
+from resources.lib.addon.dialog import BusyDialog, kodi_dialog_yesno, kodi_notification, kodi_dialog_multiselect
+from resources.lib.addon.plugin import get_setting, get_localized, set_setting
 from resources.lib.update.library import add_to_library
 from resources.lib.update.update import get_userlist
 from resources.lib.api.trakt.api import TraktAPI
+from resources.lib.addon.logger import kodi_log
 
 
 def get_monitor_userlists(list_slugs=None, user_slugs=None):
@@ -16,7 +16,7 @@ def get_monitor_userlists(list_slugs=None, user_slugs=None):
 
 def monitor_userlist():
     # Build list choices
-    with busy_dialog():
+    with BusyDialog():
         user_lists = [
             {'label': f'{get_localized(32193)} {get_localized(20342)}',
                 'params': {'user_slug': 'me', 'list_slug': 'watchlist/movies'}},
@@ -31,7 +31,7 @@ def monitor_userlist():
             if (i.get('params', {}).get('list_slug'), i.get('params', {}).get('user_slug')) in saved_lists]
 
     # Ask user to choose lists
-    indices = Dialog().multiselect(get_localized(32312), dialog_list, preselect=preselected)
+    indices = kodi_dialog_multiselect(get_localized(32312), dialog_list, preselect=preselected)
     if indices is None:
         return
 
@@ -53,13 +53,13 @@ def monitor_userlist():
     set_setting('monitor_userslug', added_users, 'str')
 
     # Update library?
-    if Dialog().yesno(get_localized(653), get_localized(32132)):
+    if kodi_dialog_yesno(get_localized(653), get_localized(32132)):
         library_autoupdate(list_slugs=added_lists, user_slugs=added_users, busy_spinner=True)
 
 
 def library_autoupdate(list_slugs=None, user_slugs=None, busy_spinner=False, force=False):
     kodi_log(u'UPDATING TV SHOWS LIBRARY', 1)
-    Dialog().notification('TMDbHelper', f'{get_localized(32167)}...')
+    kodi_notification('TMDbHelper', f'{get_localized(32167)}...')
 
     # Update library from Trakt lists
     library_adder = None

@@ -6,7 +6,8 @@ import unicodedata
 from xbmcgui import Dialog
 from resources.lib.addon.timedate import get_timedelta, get_datetime_now, is_future_timestamp
 from resources.lib.addon.parser import try_int
-from resources.lib.addon.plugin import ADDONDATA, kodi_log, get_localized, get_setting
+from resources.lib.addon.plugin import ADDONDATA, get_localized, get_setting
+from resources.lib.addon.logger import kodi_log
 from resources.lib.addon.constants import ALPHANUM_CHARS, INVALID_FILECHARS
 try:
     import cPickle as _pickle

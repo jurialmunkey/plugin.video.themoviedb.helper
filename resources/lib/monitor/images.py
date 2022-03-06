@@ -1,13 +1,15 @@
 import os
 import xbmcvfs
 import colorsys
+import hashlib
 from xbmc import getCacheThumbName, skinHasImage, Monitor, sleep
 from resources.lib.addon.window import get_property
-from resources.lib.addon.plugin import kodi_log, md5hash, get_infolabel
+from resources.lib.addon.plugin import get_infolabel
 from resources.lib.addon.parser import try_int, try_float
 from resources.lib.files.utils import make_path
 from threading import Thread
 import urllib.request as urllib
+from resources.lib.addon.logger import kodi_log
 
 # PIL causes issues (via numpy) on Linux systems using python versions higher than 3.8.5
 # Lazy import PIL to avoid using it unless user requires ImageFunctions
@@ -21,6 +23,11 @@ def lazyimport_pil(func):
             from PIL import ImageFilter
         return func(*args, **kwargs)
     return wrapper
+
+
+def md5hash(value):
+    value = str(value).encode()
+    return hashlib.md5(value).hexdigest()
 
 
 def _imageopen(image):

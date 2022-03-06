@@ -7,7 +7,8 @@ from resources.lib.api.tmdb.api import TMDb
 from resources.lib.api.fanarttv.api import FanartTV
 from resources.lib.addon.timedate import set_timestamp, get_timestamp
 from resources.lib.addon.constants import IMAGEPATH_QUALITY_POSTER, IMAGEPATH_QUALITY_FANART, IMAGEPATH_QUALITY_THUMBS, IMAGEPATH_QUALITY_CLOGOS, IMAGEPATH_ALL, ARTWORK_BLACKLIST
-from resources.lib.addon.decorators import TimerList, ParallelThread
+from resources.lib.addon.thread import ParallelThread
+from resources.lib.addon.logger import TimerList
 
 FTV_SECOND_PREF = get_setting('fanarttv_secondpref')
 ARTWORK_QUALITY = get_setting('artwork_quality', 'int')

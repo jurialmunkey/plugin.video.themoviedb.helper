@@ -1,10 +1,11 @@
 from xbmcgui import ListItem as KodiListItem
 from resources.lib.addon.constants import ACCEPTED_MEDIATYPES
-from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, kodi_log, convert_media_type, get_setting, get_condvisibility, get_localized
+from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_media_type, get_setting, get_condvisibility, get_localized
 from resources.lib.addon.parser import try_int, encode_url
 from resources.lib.addon.timedate import is_unaired_timestamp
 from resources.lib.addon.setutils import merge_two_dicts
 from resources.lib.items.context import ContextMenu
+from resources.lib.addon.logger import kodi_log
 
 
 def ListItem(*args, **kwargs):

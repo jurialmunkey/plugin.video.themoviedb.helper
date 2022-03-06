@@ -6,7 +6,7 @@ from resources.lib.items.pages import PaginatedItems
 from resources.lib.api.mapping import get_empty_item
 from resources.lib.api.trakt.items import TraktItems
 from resources.lib.api.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache
-from resources.lib.addon.decorators import ParallelThread
+from resources.lib.addon.thread import ParallelThread
 
 
 class _TraktProgress():

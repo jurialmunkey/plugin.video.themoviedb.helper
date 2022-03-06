@@ -1,7 +1,7 @@
 from xbmcvfs import Stat
 from xbmc import Monitor, executeJSONRPC
 from json import dumps, loads
-from resources.lib.addon.plugin import kodi_log
+from resources.lib.addon.logger import kodi_log
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.setutils import find_dict_in_list
 from resources.lib.files.cache import BasicCache

@@ -3,12 +3,13 @@ from resources.lib.api.tmdb.api import TMDb
 from resources.lib.api.omdb.api import OMDb
 from resources.lib.api.trakt.api import TraktAPI
 from resources.lib.api.fanarttv.api import FanartTV
-from resources.lib.addon.plugin import kodi_traceback, get_setting, get_infolabel, get_condvisibility
+from resources.lib.addon.plugin import get_setting, get_infolabel, get_condvisibility
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.setutils import merge_two_dicts
-from resources.lib.addon.decorators import try_except_log
 from resources.lib.addon.timedate import convert_timestamp, get_region_date
 from resources.lib.items.builder import ItemBuilder
+from resources.lib.addon.logger import try_except_log
+from resources.lib.addon.dialog import kodi_traceback
 
 
 SETMAIN = {

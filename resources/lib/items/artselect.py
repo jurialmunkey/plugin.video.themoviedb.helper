@@ -2,7 +2,7 @@ from xbmcgui import Dialog
 from resources.lib.items.listitem import ListItem
 from resources.lib.api.fanarttv.api import ARTWORK_TYPES
 from resources.lib.api.tmdb.mapping import get_imagepath_poster, get_imagepath_fanart, get_imagepath_thumb, get_imagepath_logo
-from resources.lib.addon.decorators import busy_dialog
+from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.plugin import get_localized, executebuiltin
 
 
@@ -43,7 +43,7 @@ class _ArtworkSelector():
         return artwork_types[choice]
 
     def select_artwork(self, tmdb_type, tmdb_id, container_refresh=True, blacklist=[], season=None):
-        with busy_dialog():
+        with BusyDialog():
             item = self.get_item(tmdb_type, tmdb_id, season)
         if not item:
             return
@@ -91,7 +91,7 @@ class _ArtworkSelector():
         old_cache_refresh = self.ftv_api.cache_refresh
         self.ftv_api.cache_refresh = True
 
-        with busy_dialog():
+        with BusyDialog():
             item = self.get_item(tmdb_type, tmdb_id, season, cache_refresh=True)
         if not item:
             return Dialog().ok(

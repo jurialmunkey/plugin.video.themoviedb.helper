@@ -2,7 +2,7 @@ from xbmcaddon import Addon as KodiAddon
 from xbmcgui import Dialog, INPUT_NUMERIC
 from resources.lib.addon.plugin import ADDONPATH, get_setting, get_localized, get_condvisibility
 from resources.lib.addon.parser import try_int
-from resources.lib.addon.decorators import busy_dialog
+from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.constants import PLAYERS_BASEDIR_BUNDLED, PLAYERS_BASEDIR_USER, PLAYERS_BASEDIR_SAVE, PLAYERS_PRIORITY
 from resources.lib.files.utils import get_files_in_folder
 from resources.lib.files.utils import read_file, dumps_to_file, delete_file
@@ -172,7 +172,7 @@ class _ConfigurePlayer():
 
 class ConfigurePlayers():
     def __init__(self):
-        with busy_dialog():
+        with BusyDialog():
             self.players = get_players_from_file()
             self.dialog_players = _get_dialog_players(self.players)
 
@@ -188,7 +188,7 @@ class ConfigurePlayers():
                 get_localized(32335).format(filename),
                 yeslabel=get_localized(13007), nolabel=get_localized(222)):
             return
-        with busy_dialog():
+        with BusyDialog():
             delete_file(PLAYERS_BASEDIR_SAVE, filename, join_addon_data=False)
             self.players = get_players_from_file()
             self.dialog_players = _get_dialog_players(self.players)
@@ -198,7 +198,7 @@ class ConfigurePlayers():
                 get_localized(32336), get_localized(32337).format(filename),
                 yeslabel=get_localized(190), nolabel=get_localized(32338)):
             return
-        with busy_dialog():
+        with BusyDialog():
             self.players[filename] = player  # Update our players dictionary
             self.dialog_players = _get_dialog_players(self.players)  # Update our dialog list
             dumps_to_file(player, PLAYERS_BASEDIR_SAVE, filename, indent=4, join_addon_data=False)  # Write out file

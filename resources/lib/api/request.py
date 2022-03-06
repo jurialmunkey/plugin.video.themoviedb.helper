@@ -1,13 +1,13 @@
 import xml.etree.ElementTree as ET
 from xbmcgui import Dialog
 from resources.lib.addon.window import get_property
-from resources.lib.addon.plugin import kodi_log, get_localized, get_condvisibility
+from resources.lib.addon.plugin import get_localized, get_condvisibility
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.timedate import get_timestamp, set_timestamp
 from resources.lib.files.cache import BasicCache, CACHE_SHORT, CACHE_LONG
+from resources.lib.addon.logger import kodi_log
 from copy import copy
 from json import loads, dumps
-# from resources.lib.addon.decorators import timer_func
 # import requests
 
 requests = None  # Requests module is slow to import so lazy import via decorator instead
