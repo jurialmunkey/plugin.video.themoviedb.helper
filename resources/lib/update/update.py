@@ -1,6 +1,5 @@
 import xbmcvfs
-from xbmcgui import Dialog
-from resources.lib.addon.dialog import BusyDialog
+from resources.lib.addon.dialog import BusyDialog, kodi_dialog_yesno, kodi_dialog_ok
 from resources.lib.addon.plugin import get_setting, get_localized
 from resources.lib.addon.parser import try_int
 from resources.lib.files.utils import validify_filename, make_path, write_to_file, get_tmdb_id_nfo
@@ -143,7 +142,7 @@ def get_userlist(user_slug=None, list_slug=None, confirm=True, busy_spinner=True
                 get_localized(32170).format(i_check_limits.get('show'), i_check_limits.get('movie')),
                 '',
                 get_localized(32164).format(LIBRARY_ADD_LIMIT_TVSHOWS, LIBRARY_ADD_LIMIT_MOVIES)]
-            Dialog().ok(d_head, '\n'.join(d_body))
+            kodi_dialog_ok(d_head, '\n'.join(d_body))
             return
         elif isinstance(confirm, bool) or len(request) > confirm:
             # List is within limits so ask for confirmation before adding it
@@ -152,6 +151,6 @@ def get_userlist(user_slug=None, list_slug=None, confirm=True, busy_spinner=True
                 get_localized(32171).format(len(request)) if len(request) > 20 else '',
                 '',
                 get_localized(32126)]
-            if not Dialog().yesno(d_head, '\n'.join(d_body)):
+            if not kodi_dialog_yesno(d_head, '\n'.join(d_body)):
                 return
     return request

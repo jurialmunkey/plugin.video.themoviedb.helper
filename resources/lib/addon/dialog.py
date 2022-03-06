@@ -4,8 +4,35 @@ from resources.lib.addon.logger import kodi_log, kodi_log_traceback
 """ Top level module only import plugin/constants/logger """
 
 
+DIALOG = Dialog()
+
+
 def kodi_notification(*args, **kwargs):
-    return Dialog().notification(*args, **kwargs)
+    return DIALOG.notification(*args, **kwargs)
+
+
+def kodi_dialog_ok(*args, **kwargs):
+    return DIALOG.ok(*args, **kwargs)
+
+
+def kodi_dialog_yesno(*args, **kwargs):
+    return DIALOG.yesno(*args, **kwargs)
+
+
+def kodi_dialog_multiselect(*args, **kwargs):
+    return DIALOG.multiselect(*args, **kwargs)
+
+
+def kodi_dialog_contextmenu(*args, **kwargs):
+    return DIALOG.contextmenu(*args, **kwargs)
+
+
+def kodi_dialog_input(*args, **kwargs):
+    return DIALOG.input(*args, **kwargs)
+
+
+def kodi_dialog_textviewer(*args, **kwargs):
+    return DIALOG.textviewer(*args, **kwargs)
 
 
 def kodi_traceback(exception, log_msg=None, notification=True, log_level=1):
