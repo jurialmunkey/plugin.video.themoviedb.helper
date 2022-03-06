@@ -1,9 +1,10 @@
 import os
 import xbmcvfs
 import colorsys
+import hashlib
 from xbmc import getCacheThumbName, skinHasImage, Monitor, sleep
 from resources.lib.addon.window import get_property
-from resources.lib.addon.plugin import md5hash, get_infolabel
+from resources.lib.addon.plugin import get_infolabel
 from resources.lib.addon.parser import try_int, try_float
 from resources.lib.files.utils import make_path
 from threading import Thread
@@ -22,6 +23,11 @@ def lazyimport_pil(func):
             from PIL import ImageFilter
         return func(*args, **kwargs)
     return wrapper
+
+
+def md5hash(value):
+    value = str(value).encode()
+    return hashlib.md5(value).hexdigest()
 
 
 def _imageopen(image):

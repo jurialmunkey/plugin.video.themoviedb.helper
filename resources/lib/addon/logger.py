@@ -42,7 +42,7 @@ def try_except_log(log_msg, notification=True):
             try:
                 return func(*args, **kwargs)
             except Exception as exc:
-                kodi_traceback(exc, log_msg, notification)
+                kodi_log_traceback(exc, log_msg, notification)
         return wrapper
     return decorator
 

@@ -1,6 +1,5 @@
 import re
 import xbmc
-import hashlib
 from xbmcaddon import Addon as KodiAddon
 from resources.lib.addon.constants import LANGUAGES
 """ Top level module only import constants """
@@ -99,11 +98,6 @@ def reconfigure_legacy_params(**kwargs):
 def set_kwargattr(obj, kwargs):
     for k, v in kwargs.items():
         setattr(obj, k, v)
-
-
-def md5hash(value):
-    value = str(value).encode()
-    return hashlib.md5(value).hexdigest()
 
 
 def get_language():
