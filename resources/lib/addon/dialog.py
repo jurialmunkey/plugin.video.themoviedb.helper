@@ -1,10 +1,18 @@
 from xbmcgui import Dialog, DialogProgressBG
-from resources.lib.addon.plugin import executebuiltin, kodi_log
-""" Top level module only import plugin/constants """
+from resources.lib.addon.plugin import executebuiltin, get_localized
+from resources.lib.addon.logger import kodi_log, kodi_log_traceback
+""" Top level module only import plugin/constants/logger """
 
 
 def kodi_notification(*args, **kwargs):
     return Dialog().notification(*args, **kwargs)
+
+
+def kodi_traceback(exception, log_msg=None, notification=True, log_level=1):
+    if notification:
+        head = f'TheMovieDb Helper {get_localized(257)}'
+        kodi_notification(head, get_localized(2104))
+    kodi_log_traceback(exception, log_msg=log_msg, log_level=log_level)
 
 
 class ProgressDialog(object):

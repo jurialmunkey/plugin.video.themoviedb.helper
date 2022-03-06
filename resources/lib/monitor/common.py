@@ -8,7 +8,8 @@ from resources.lib.addon.parser import try_int
 from resources.lib.addon.setutils import merge_two_dicts
 from resources.lib.addon.timedate import convert_timestamp, get_region_date
 from resources.lib.items.builder import ItemBuilder
-from resources.lib.addon.logger import kodi_traceback, try_except_log
+from resources.lib.addon.logger import try_except_log
+from resources.lib.addon.dialog import kodi_traceback
 
 
 SETMAIN = {

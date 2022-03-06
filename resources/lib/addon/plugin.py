@@ -3,6 +3,7 @@ import xbmc
 import hashlib
 from xbmcaddon import Addon as KodiAddon
 from resources.lib.addon.constants import LANGUAGES
+""" Top level module only import constants """
 
 
 ADDON = KodiAddon('plugin.video.themoviedb.helper')

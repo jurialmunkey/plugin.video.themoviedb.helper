@@ -1,8 +1,7 @@
 import xbmc
 import traceback
 from timeit import default_timer as timer
-from resources.lib.addon.dialog import kodi_notification
-from resources.lib.addon.plugin import get_localized, get_setting, format_name
+from resources.lib.addon.plugin import get_setting, format_name
 
 
 ADDON_LOGNAME = '[plugin.video.themoviedb.helper]\n'
@@ -26,11 +25,8 @@ def kodi_log(value, level=0):
         xbmc.log(f'Logging Error: {exc}', level=xbmc.LOGINFO)
 
 
-def kodi_traceback(exception, log_msg=None, notification=True, log_level=1):
+def kodi_log_traceback(exception, log_msg=None, log_level=1):
     """ Method for logging caught exceptions and notifying user """
-    if notification:
-        head = f'TheMovieDb Helper {get_localized(257)}'
-        kodi_notification(head, get_localized(2104))
     msg = f'Error Type: {type(exception).__name__}\nError Contents: {exception.args!r}'
     msg = [log_msg, '\n', msg, '\n'] if log_msg else [msg, '\n']
     try:
