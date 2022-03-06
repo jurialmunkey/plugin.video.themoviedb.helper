@@ -1,7 +1,7 @@
 from resources.lib.items.listitem import ListItem
 from resources.lib.api.fanarttv.api import ARTWORK_TYPES
 from resources.lib.api.tmdb.mapping import get_imagepath_poster, get_imagepath_fanart, get_imagepath_thumb, get_imagepath_logo
-from resources.lib.addon.dialog import BusyDialog, kodi_dialog_select, kodi_dialog_notification, kodi_dialog_contextmenu, kodi_dialog_ok
+from resources.lib.addon.dialog import BusyDialog, kodi_dialog_select, kodi_notification, kodi_dialog_contextmenu, kodi_dialog_ok
 from resources.lib.addon.plugin import get_localized, executebuiltin
 
 
@@ -62,7 +62,7 @@ class _ArtworkSelector():
 
         # Nothing found so notify user
         if not items:
-            kodi_dialog_notification(
+            kodi_notification(
                 get_localized(39123),
                 get_localized(32217).format(tmdb_type, tmdb_id))
             blacklist.append(artwork_type)  # Blacklist artwork type if not found before reprompting

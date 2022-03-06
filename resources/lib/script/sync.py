@@ -1,7 +1,7 @@
 # Module: default
 # Author: jurialmunkey
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
-from resources.lib.addon.dialog import BusyDialog, kodi_dialog_ok, kodi_dialog_contextmenu, kodi_dialog_input, kodi_dialog_yeno, kodi_dialog_select, kodi_dialog_textviewer
+from resources.lib.addon.dialog import BusyDialog, kodi_dialog_ok, kodi_dialog_contextmenu, kodi_dialog_input, kodi_dialog_yesno, kodi_dialog_select, kodi_dialog_textviewer
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.plugin import set_kwargattr, convert_trakt_type, get_localized, executebuiltin, get_infolabel
 from resources.lib.api.trakt.api import TraktAPI
@@ -202,7 +202,7 @@ class _UserList():
         """
         if slug and slug not in get_monitor_userlists():
             return
-        if confirm and not kodi_dialog_yeno(get_localized(20444), get_localized(32362)):
+        if confirm and not kodi_dialog_yesno(get_localized(20444), get_localized(32362)):
             return
         add_to_library(tmdb_type, tmdb_id=tmdb_id)
 
