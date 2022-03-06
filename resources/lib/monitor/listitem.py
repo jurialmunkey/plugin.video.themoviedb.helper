@@ -3,7 +3,7 @@ from resources.lib.addon.window import get_property
 from resources.lib.monitor.common import CommonMonitorFunctions, SETMAIN_ARTWORK, SETPROP_RATINGS
 from resources.lib.monitor.images import ImageFunctions
 from resources.lib.addon.plugin import convert_media_type, convert_type, get_setting, get_infolabel, get_condvisibility
-from resources.lib.addon.logger import try_except_log
+from resources.lib.addon.dialog import kodi_try_except
 from threading import Thread
 
 
@@ -120,7 +120,7 @@ class ListItemMonitor(CommonMonitorFunctions):
     def get_cur_folder(self):
         return (self.container, get_infolabel('Container.Content()'), self.get_numitems())
 
-    @try_except_log('lib.monitor.listitem.is_same_folder')
+    @kodi_try_except('lib.monitor.listitem.is_same_folder')
     def is_same_folder(self, update=True):
         self.cur_folder = self.get_cur_folder()
         if self.cur_folder == self.pre_folder:
@@ -128,7 +128,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         if update:
             self.pre_folder = self.cur_folder
 
-    @try_except_log('lib.monitor.listitem.process_artwork')
+    @kodi_try_except('lib.monitor.listitem.process_artwork')
     def process_artwork(self, artwork, tmdb_type):
         self.clear_property_list(SETMAIN_ARTWORK)
         if not self.is_same_item():
@@ -144,7 +144,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             self.crop_img.setName('crop_img')
             self.crop_img.start()
 
-    @try_except_log('lib.monitor.listitem.process_ratings')
+    @kodi_try_except('lib.monitor.listitem.process_ratings')
     def process_ratings(self, details, tmdb_type):
         if tmdb_type not in ['movie', 'tv']:
             return
@@ -158,7 +158,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             return
         self.set_iter_properties(details.get('infoproperties', {}), SETPROP_RATINGS)
 
-    @try_except_log('lib.monitor.listitem.clear_on_scroll')
+    @kodi_try_except('lib.monitor.listitem.clear_on_scroll')
     def clear_on_scroll(self):
         if not self.properties and not self.index_properties:
             return
@@ -169,7 +169,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             ignore_keys = SETMAIN_ARTWORK
         self.clear_properties(ignore_keys=ignore_keys)
 
-    @try_except_log('lib.monitor.listitem.get_artwork')
+    @kodi_try_except('lib.monitor.listitem.get_artwork')
     def get_artwork(self, source='', fallback=''):
         source = source.lower()
         lookup = {
@@ -184,7 +184,7 @@ class ListItemMonitor(CommonMonitorFunctions):
                 return artwork
         return fallback
 
-    @try_except_log('lib.monitor.listitem.blur_fallback')
+    @kodi_try_except('lib.monitor.listitem.blur_fallback')
     def blur_fallback(self):
         if self._last_blur_fallback:
             return
@@ -197,7 +197,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             self.blur_img.start()
             self._last_blur_fallback = True
 
-    @try_except_log('lib.monitor.listitem.get_listitem')
+    @kodi_try_except('lib.monitor.listitem.get_listitem')
     def get_listitem(self):
         self.get_container()
 

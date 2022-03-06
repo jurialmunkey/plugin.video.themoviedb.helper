@@ -35,16 +35,22 @@ def kodi_log_traceback(exception, log_msg=None, log_level=1):
         kodi_log(f'ERROR WITH TRACEBACK!\n{exc}\n{msg}', log_level)
 
 
-def try_except_log(log_msg, notification=True):
-    """ Decorator to catch exceptions and log for uninterruptable services """
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            try:
-                return func(*args, **kwargs)
-            except Exception as exc:
-                kodi_log_traceback(exc, log_msg, notification)
-        return wrapper
-    return decorator
+class TryExceptLog():
+    def __init__(self, exc_types=[Exception], log_msg=None, log_level=1):
+        """ ContextManager to allow exception passing and log """
+        self.log_msg = log_msg
+        self.exc_types = exc_types
+        self.log_level = log_level
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        if exc_type and exc_type not in self.exc_types:
+            return
+        if self.log_level:
+            kodi_log(f'{self.log_msg or "ERROR PASSED"}: {exc_type}', self.log_level)
+        return True
 
 
 def timer_report(func_name):
