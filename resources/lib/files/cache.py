@@ -1,7 +1,8 @@
 from resources.lib.addon.plugin import format_name
 from resources.lib.files.simplecache import SimpleCache
 from resources.lib.files.utils import get_pickle_name
-from resources.lib.addon.logger import kodi_log, try_except_log
+from resources.lib.addon.logger import kodi_log
+from resources.lib.addon.dialog import kodi_try_except
 
 
 CACHE_LONG = 14
@@ -19,13 +20,13 @@ class BasicCache(object):
         self._delaywrite = delay_write
         self._id_list = []
 
-    @try_except_log('lib.addon.cache ret_cache')
+    @kodi_try_except('lib.addon.cache ret_cache')
     def ret_cache(self):
         if not self._cache:
             self._cache = SimpleCache(filename=self._filename, mem_only=self._mem_only, delay_write=self._delaywrite)
         return self._cache
 
-    @try_except_log('lib.addon.cache get_cache')
+    @kodi_try_except('lib.addon.cache get_cache')
     def get_cache(self, cache_name):
         self.ret_cache()
         cache_name = get_pickle_name(cache_name or '')
@@ -42,7 +43,7 @@ class BasicCache(object):
         self._id_list = self._cache.get_id_list() or []
         return self._id_list
 
-    @try_except_log('lib.addon.cache set_cache')
+    @kodi_try_except('lib.addon.cache set_cache')
     def set_cache(self, my_object, cache_name, cache_days=14, force=False, fallback=None):
         """ set object to cache via thread """
         # with TimerList(self._timers, 'item_set'):
@@ -60,13 +61,13 @@ class BasicCache(object):
             cache_days = force if isinstance(force, int) else cache_days
         self._cache.set(cache_name, my_object, cache_days=cache_days)
 
-    @try_except_log('lib.addon.cache del_cache')
+    @kodi_try_except('lib.addon.cache del_cache')
     def del_cache(self, cache_name):
         self.ret_cache()
         cache_name = get_pickle_name(cache_name or '')
         self._cache.set(cache_name, None, cache_days=0)
 
-    @try_except_log('lib.addon.cache use_cache')
+    @kodi_try_except('lib.addon.cache use_cache')
     def use_cache(
             self, func, *args,
             cache_days=14, cache_name='', cache_only=False, cache_force=False, cache_strip=[], cache_fallback=False,

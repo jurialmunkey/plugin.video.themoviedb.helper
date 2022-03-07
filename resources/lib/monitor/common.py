@@ -8,8 +8,7 @@ from resources.lib.addon.parser import try_int
 from resources.lib.addon.setutils import merge_two_dicts
 from resources.lib.addon.timedate import convert_timestamp, get_region_date
 from resources.lib.items.builder import ItemBuilder
-from resources.lib.addon.logger import try_except_log
-from resources.lib.addon.dialog import kodi_traceback
+from resources.lib.addon.dialog import kodi_traceback, kodi_try_except
 
 
 SETMAIN = {
@@ -45,12 +44,12 @@ class CommonMonitorFunctions(object):
         self.imdb_top250 = {}
         self.property_prefix = 'ListItem'
 
-    @try_except_log('lib.monitor.common clear_property')
+    @kodi_try_except('lib.monitor.common clear_property')
     def clear_property(self, key):
         key = f'{self.property_prefix}.{key}'
         get_property(key, clear_property=True)
 
-    @try_except_log('lib.monitor.common set_property')
+    @kodi_try_except('lib.monitor.common set_property')
     def set_property(self, key, value):
         key = f'{self.property_prefix}.{key}'
         if value is None:
@@ -93,7 +92,7 @@ class CommonMonitorFunctions(object):
             self.clear_property(k)
         self.index_properties = index_properties.copy()
 
-    @try_except_log('lib.monitor.common set_list_properties')
+    @kodi_try_except('lib.monitor.common set_list_properties')
     def set_list_properties(self, items, key, prop):
         if not isinstance(items, list):
             return
@@ -102,7 +101,7 @@ class CommonMonitorFunctions(object):
         self.properties.add(prop)
         self.set_property(prop, joinlist)
 
-    @try_except_log('lib.monitor.common set_time_properties')
+    @kodi_try_except('lib.monitor.common set_time_properties')
     def set_time_properties(self, duration):
         minutes = duration // 60 % 60
         hours = duration // 60 // 60
@@ -113,7 +112,7 @@ class CommonMonitorFunctions(object):
         self.set_property('Duration_HHMM', f'{hours:02d}:{minutes:02d}')
         self.properties.update(['Duration', 'Duration_H', 'Duration_M', 'Duration_HHMM'])
 
-    @try_except_log('lib.monitor.common set_date_properties')
+    @kodi_try_except('lib.monitor.common set_date_properties')
     def set_date_properties(self, premiered):
         date_obj = convert_timestamp(premiered, time_fmt="%Y-%m-%d", time_lim=10)
         if not date_obj:
@@ -133,7 +132,7 @@ class CommonMonitorFunctions(object):
         if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableExtendedProperties)"):
             self.set_indexed_properties(item.get('infoproperties', {}))
 
-    @try_except_log('lib.monitor.common get_tmdb_id')
+    @kodi_try_except('lib.monitor.common get_tmdb_id')
     def get_tmdb_id(self, tmdb_type, imdb_id=None, query=None, year=None, episode_year=None, media_type=None):
         if imdb_id and imdb_id.startswith('tt'):
             return self.tmdb_api.get_tmdb_id(tmdb_type=tmdb_type, imdb_id=imdb_id)
