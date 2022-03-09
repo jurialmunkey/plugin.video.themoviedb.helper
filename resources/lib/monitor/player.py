@@ -57,9 +57,9 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.imdb_id = self.getVideoInfoTag().getIMDBNumber()
         self.query = self.getVideoInfoTag().getTVShowTitle() if self.dbtype == 'episode' else self.getVideoInfoTag().getTitle()
         self.year = self.getVideoInfoTag().getYear() if self.dbtype == 'movie' else None
-        self.epyear = self.getVideoInfoTag().getYear() if self.dbtype == 'episodes' else None
-        self.season = self.getVideoInfoTag().getSeason() if self.dbtype == 'episodes' else None
-        self.episode = self.getVideoInfoTag().getEpisode() if self.dbtype == 'episodes' else None
+        self.epyear = self.getVideoInfoTag().getYear() if self.dbtype == 'episode' else None
+        self.season = self.getVideoInfoTag().getSeason() if self.dbtype == 'episode' else None
+        self.episode = self.getVideoInfoTag().getEpisode() if self.dbtype == 'episode' else None
 
         self.tmdb_type = 'movie' if self.dbtype == 'movie' else 'tv'
         self.tmdb_id = self.get_tmdb_id(self.tmdb_type, self.imdb_id, self.query, self.year, self.epyear)
