@@ -17,13 +17,13 @@ def get_empty_item():
 def set_show(item, base_item=None, is_season=False):
     if not base_item:
         return item
-    prefix = 'season' if is_season else 'tvshow'
+    prefix = 'season.' if is_season else 'tvshow.'
     item['art'].update(
-        {f'{prefix}.{k}': v for k, v in base_item.get('art', {}).items()})
+        {f'{prefix if "." not in k else ""}{k}': v for k, v in base_item.get('art', {}).items()})
     item['unique_ids'].update(
-        {f'{prefix}.{k}': v for k, v in base_item.get('unique_ids', {}).items()})
+        {f'{prefix if "." not in k else ""}{k}': v for k, v in base_item.get('unique_ids', {}).items()})
     item['infoproperties'].update(
-        {f'{prefix}.{k}': v for k, v in base_item.get('infolabels', {}).items() if type(v) not in [dict, list, tuple]})
+        {f'{prefix if "." not in k else ""}{k}': v for k, v in base_item.get('infolabels', {}).items() if type(v) not in [dict, list, tuple]})
     if not is_season:
         item['infolabels']['tvshowtitle'] = base_item['infolabels'].get('tvshowtitle') or base_item['infolabels'].get('title')
         item['unique_ids']['tmdb'] = item['unique_ids'].get('{prefix}.tmdb')
