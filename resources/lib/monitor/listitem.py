@@ -140,8 +140,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"):
             if self.get_artwork(source="Art(tvshow.clearlogo)|Art(clearlogo)"):
                 return  # We already cropped listitem artwork so we only crop here if it didn't have a clearlogo and we need to look it up
-            ImageFunctions(method='crop', is_thread=False, artwork=self.get_artwork(
-                source="Art(clearlogo)", fallback=artwork.get('clearlogo'))).run()
+            ImageFunctions(method='crop', is_thread=False, artwork=artwork.get('clearlogo')).run()
 
     @kodi_try_except('lib.monitor.listitem.process_ratings')
     def process_ratings(self, details, tmdb_type):
