@@ -68,9 +68,6 @@ class ItemBuilder(_ArtworkSelector):
                 return
             self.parent_season = self.get_item(tmdb_type=tmdb_type, tmdb_id=tmdb_id, season=season)
 
-    def map_item(self, item, tmdb_type, base_item=None):
-        return self.tmdb_api.mapper.get_info(item, tmdb_type, base_item=base_item)
-
     def map_artwork(self, artwork):
         """ Remaps artwork from TMDb to expected quality """
         return {k: self._regex.sub(IMAGEPATH_MAP[k], v) for k, v in artwork.items() if v and k in IMAGEPATH_MAP}
@@ -144,7 +141,7 @@ class ItemBuilder(_ArtworkSelector):
             self.join_base_artwork(base_item['artwork'].get('fanarttv', {}), ftv_art, prefix=prefix, backfill=True)
         return item
 
-    def get_tmdb_item(self, tmdb_type, tmdb_id, season=None, episode=None, base_item=None, manual_art=None):
+    def get_tmdb_item(self, tmdb_type, tmdb_id, season=None, episode=None, base_item=None, manual_art=None, base_is_season=False):
         with TimerList(self.timer_lists, 'item_tmdb', log_threshold=0.05, logging=self.log_timers):
             details = self.tmdb_api.get_details_request(tmdb_type, tmdb_id, season, episode)
             if not details:
@@ -152,7 +149,10 @@ class ItemBuilder(_ArtworkSelector):
             if season is not None:
                 tmdb_type = 'season' if episode is None else 'episode'
             item = {
-                'listitem': self.map_item(details, tmdb_type, base_item=base_item['listitem'] if base_item else None),
+                'listitem': self.tmdb_api.mapper.get_info(
+                    details, tmdb_type,
+                    base_item=base_item['listitem'] if base_item else None,
+                    base_is_season=base_is_season),
                 'expires': self._timestamp(),
                 'artwork': {}}
             item['artwork']['tmdb'] = item['artwork'][ARTWORK_QUALITY] = item['listitem'].pop('art')
@@ -178,8 +178,10 @@ class ItemBuilder(_ArtworkSelector):
         # Check our cached item hasn't expired
         # Compare against parent expiry in case newer details available to merge
         base_item = None
+        base_name_season = None
         if season is not None:
-            base_name_season = None if episode is None else season
+            if episode is not None:
+                base_name_season = season
             parent = self.parent_tv if base_name_season is None else self.parent_season
             base_name = self.get_cache_name(tmdb_type, tmdb_id, base_name_season)
             base_item = parent or self._cache.get_cache(base_name)
@@ -212,7 +214,8 @@ class ItemBuilder(_ArtworkSelector):
                 season=season, tmdb_id=tmdb_id) as pt:
             item = self.get_tmdb_item(
                 tmdb_type, tmdb_id, season=season, episode=episode,
-                base_item=base_item, manual_art=manual_art)
+                base_item=base_item, manual_art=manual_art,
+                base_is_season=base_name_season is not None)
             item_queue = pt.queue
         ftv_art = item_queue[0] if item_queue else None
         item = self.get_artwork(item, tmdb_type, season, episode, base_item, prefix=prefix, ftv_art=ftv_art)

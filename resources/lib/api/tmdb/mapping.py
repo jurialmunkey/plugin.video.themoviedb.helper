@@ -323,6 +323,10 @@ class ItemMapper(_ItemMapper):
         use standard_map for direct one-to-one mapping of v onto single property tuple
         """
         self.advanced_map = {
+            'episodes': [{
+                'keys': [('infolabels', 'episode')],
+                'func': lambda v: f'{len(v)}'
+            }],
             'poster_path': [{
                 'keys': [('art', 'poster')],
                 'func': get_imagepath_poster
@@ -664,10 +668,10 @@ class ItemMapper(_ItemMapper):
         item['cast'] = cast_list
         return item
 
-    def get_info(self, info_item, tmdb_type, base_item=None, **kwargs):
+    def get_info(self, info_item, tmdb_type, base_item=None, base_is_season=False, **kwargs):
         item = get_empty_item()
         item = self.map_item(item, info_item)
-        item = self.add_base(item, base_item, tmdb_type, key_blacklist=['year', 'premiered', 'season', 'episode'])
+        item = self.add_base(item, base_item, tmdb_type, key_blacklist=['year', 'premiered', 'season', 'episode'], is_season=base_is_season)
         item = self.add_cast(item, info_item, base_item)
         item = self.finalise(item, tmdb_type)
         item['params'] = get_params(info_item, tmdb_type, params=item.get('params', {}), **kwargs)
