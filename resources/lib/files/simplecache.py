@@ -108,8 +108,8 @@ class SimpleCache(object):
         cur_time = set_timestamp(0, True)
         lastexecuted = self._win.getProperty(f'{self._sc_name}.clean.lastexecuted')
         if not lastexecuted:
-            self._win.setProperty(f'{self._sc_name}.clean.lastexecuted', str(cur_time))
-        elif (int(lastexecuted) + set_timestamp(self._auto_clean_interval, True)) < cur_time:
+            self._win.setProperty(f'{self._sc_name}.clean.lastexecuted', str(cur_time - self._auto_clean_interval + 600))
+        elif (int(lastexecuted) + self._auto_clean_interval) < cur_time:
             self._do_cleanup()
 
     def _get_mem_cache(self, endpoint, cur_time):
@@ -194,7 +194,7 @@ class SimpleCache(object):
 
         with self.busy_tasks(__name__):
             cur_time = set_timestamp(0, True)
-            kodi_log("CACHE: Running cleanup...")
+            kodi_log("CACHE: Running cleanup...", 1)
             if self._win.getProperty(f'{self._sc_name}.cleanbusy'):
                 return
             self._win.setProperty(f'{self._sc_name}.cleanbusy', "busy")
