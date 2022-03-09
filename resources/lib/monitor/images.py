@@ -106,8 +106,9 @@ def _saveimage(image, targetfile):
 
 
 class ImageFunctions(Thread):
-    def __init__(self, method=None, artwork=None):
-        Thread.__init__(self)
+    def __init__(self, method=None, artwork=None, is_thread=True):
+        if is_thread:
+            Thread.__init__(self)
         self.image = artwork
         self.func = None
         self.save_orig = False
