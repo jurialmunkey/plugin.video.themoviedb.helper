@@ -87,6 +87,8 @@
         <setting label="$ADDON[plugin.video.themoviedb.helper 32373]" type="bool" id="only_resolve_strm" default="False"/>
         <setting label="$LOCALIZE[14260]" type="lsep"/>
         <setting label="$ADDON[plugin.video.themoviedb.helper 32386]" type="action" action="RunScript(plugin.video.themoviedb.helper, delete_cache=select)" />
+        <setting label="$ADDON[plugin.video.themoviedb.helper 32409]" type="folder" id="cache_location" source="files" option="writeable" default=""/>
+
         <setting label="$ADDON[plugin.video.themoviedb.helper 32395]" type="bool" id="timer_reports" default="False" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32066]" type="bool" id="debug_logging" default="False" />
         <setting label="$ADDON[plugin.video.themoviedb.helper 32348]" type="action" action="RunScript(plugin.video.themoviedb.helper, log_request=tmdb)" />

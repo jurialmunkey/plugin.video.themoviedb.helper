@@ -12,6 +12,7 @@ import sqlite3
 from xbmcgui import Window
 from xbmc import Monitor, sleep
 from contextlib import contextmanager
+from resources.lib.addon.plugin import get_setting
 from resources.lib.addon.logger import kodi_log
 from resources.lib.addon.timedate import set_timestamp
 from resources.lib.files.utils import get_file_path
@@ -39,10 +40,12 @@ class SimpleCache(object):
     def __init__(self, folder=None, filename=None, mem_only=False, delay_write=False):
         '''Initialize our caching class'''
         folder = folder or DATABASE_NAME
+        basefolder = get_setting('cache_location', 'str') or ''
+        basefolder += folder
         filename = filename or 'defaultcache.db'
         self._win = Window(10000)
         self._monitor = Monitor()
-        self._db_file = get_file_path(folder, filename)
+        self._db_file = get_file_path(basefolder, filename, join_addon_data=basefolder == folder)
         self._sc_name = f'{folder}_{filename}_simplecache'
         self._mem_only = mem_only
         self._queue = []
@@ -194,7 +197,7 @@ class SimpleCache(object):
 
         with self.busy_tasks(__name__):
             cur_time = set_timestamp(0, True)
-            kodi_log("CACHE: Running cleanup...", 1)
+            kodi_log(f"CACHE: Running cleanup...\n{self._sc_name}", 1)
             if self._win.getProperty(f'{self._sc_name}.cleanbusy'):
                 return
             self._win.setProperty(f'{self._sc_name}.cleanbusy', "busy")
@@ -219,7 +222,7 @@ class SimpleCache(object):
         # Washup
         self._win.setProperty(f'{self._sc_name}.clean.lastexecuted', str(cur_time))
         self._win.clearProperty(f'{self._sc_name}.cleanbusy')
-        kodi_log("CACHE: Auto cleanup done")
+        kodi_log(f"CACHE: Cleanup complete...\n{self._sc_name}", 1)
 
     def _set_pragmas(self, connection):
         if not self._connection:

@@ -1967,7 +1967,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32386"
-msgid "Delete Cache"
+msgid "Delete cache"
 msgstr ""
 
 #: /resources/lib/script/router.py
@@ -2084,6 +2084,11 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32408"
 msgid "Prefer artwork from TMDb first if available"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32409"
+msgid "Cache database location"
 msgstr ""
 
 msgctxt "#30030"
