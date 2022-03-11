@@ -106,8 +106,9 @@ def _saveimage(image, targetfile):
 
 
 class ImageFunctions(Thread):
-    def __init__(self, method=None, artwork=None):
-        Thread.__init__(self)
+    def __init__(self, method=None, artwork=None, is_thread=True, prefix='ListItem'):
+        if is_thread:
+            Thread.__init__(self)
         self.image = artwork
         self.func = None
         self.save_orig = False
@@ -116,23 +117,23 @@ class ImageFunctions(Thread):
         if method == 'blur':
             self.func = self.blur
             self.save_path = make_path(self.save_path.format('blur'))
-            self.save_prop = 'ListItem.BlurImage'
+            self.save_prop = f'{prefix}.BlurImage'
             self.save_orig = True
             self.radius = try_int(get_infolabel('Skin.String(TMDbHelper.Blur.Radius)')) or 20
         elif method == 'crop':
             self.func = self.crop
             self.save_path = make_path(self.save_path.format('crop'))
-            self.save_prop = 'ListItem.CropImage'
+            self.save_prop = f'{prefix}.CropImage'
             self.save_orig = True
         elif method == 'desaturate':
             self.func = self.desaturate
             self.save_path = make_path(self.save_path.format('desaturate'))
-            self.save_prop = 'ListItem.DesaturateImage'
+            self.save_prop = f'{prefix}.DesaturateImage'
             self.save_orig = True
         elif method == 'colors':
             self.func = self.colors
             self.save_path = make_path(self.save_path.format('colors'))
-            self.save_prop = 'ListItem.Colors'
+            self.save_prop = f'{prefix}.Colors'
 
     def run(self):
         if not self.save_prop or not self.func:

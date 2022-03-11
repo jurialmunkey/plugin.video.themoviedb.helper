@@ -138,11 +138,9 @@ class ListItemMonitor(CommonMonitorFunctions):
 
         # Crop Image
         if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"):
-            self.crop_img = ImageFunctions(method='crop', artwork=self.get_artwork(
-                source="Art(tvshow.clearlogo)|Art(clearlogo)",
-                fallback=artwork.get('clearlogo')))
-            self.crop_img.setName('crop_img')
-            self.crop_img.start()
+            if self.get_artwork(source="Art(tvshow.clearlogo)|Art(clearlogo)"):
+                return  # We already cropped listitem artwork so we only crop here if it didn't have a clearlogo and we need to look it up
+            ImageFunctions(method='crop', is_thread=False, artwork=artwork.get('clearlogo')).run()
 
     @kodi_try_except('lib.monitor.listitem.process_ratings')
     def process_ratings(self, details, tmdb_type):
@@ -197,6 +195,32 @@ class ListItemMonitor(CommonMonitorFunctions):
             self.blur_img.start()
             self._last_blur_fallback = True
 
+    def run_imagefuncs(self):
+        # Blur Image
+        if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableBlur)"):
+            ImageFunctions(method='blur', is_thread=False, artwork=self.get_artwork(
+                source=get_property('Blur.SourceImage'),
+                fallback=get_property('Blur.Fallback'))).run()
+            self._last_blur_fallback = False
+
+        # Desaturate Image
+        if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableDesaturate)"):
+            ImageFunctions(method='desaturate', is_thread=False, artwork=self.get_artwork(
+                source=get_property('Desaturate.SourceImage'),
+                fallback=get_property('Desaturate.Fallback'))).run()
+
+        # CompColors
+        if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableColors)"):
+            ImageFunctions(method='colors', is_thread=False, artwork=self.get_artwork(
+                source=get_property('Colors.SourceImage'),
+                fallback=get_property('Colors.Fallback'))).run()
+
+        # Cropping
+        if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"):
+            if self.get_artwork(source="Art(tvshow.clearlogo)|Art(clearlogo)"):
+                ImageFunctions(method='crop', is_thread=False, artwork=self.get_artwork(
+                    source="Art(tvshow.clearlogo)|Art(clearlogo)")).run()
+
     @kodi_try_except('lib.monitor.listitem.get_listitem')
     def get_listitem(self):
         self.get_container()
@@ -220,30 +244,8 @@ class ListItemMonitor(CommonMonitorFunctions):
         # Get look-up details
         self.set_cur_item()
 
-        # Blur Image
-        if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableBlur)"):
-            self.blur_img = ImageFunctions(method='blur', artwork=self.get_artwork(
-                source=get_property('Blur.SourceImage'),
-                fallback=get_property('Blur.Fallback')))
-            self.blur_img.setName('blur_img')
-            self.blur_img.start()
-            self._last_blur_fallback = False
-
-        # Desaturate Image
-        if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableDesaturate)"):
-            self.desaturate_img = ImageFunctions(method='desaturate', artwork=self.get_artwork(
-                source=get_property('Desaturate.SourceImage'),
-                fallback=get_property('Desaturate.Fallback')))
-            self.desaturate_img.setName('desaturate_img')
-            self.desaturate_img.start()
-
-        # CompColors
-        if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableColors)"):
-            self.colors_img = ImageFunctions(method='colors', artwork=self.get_artwork(
-                source=get_property('Colors.SourceImage'),
-                fallback=get_property('Colors.Fallback')))
-            self.colors_img.setName('colors_img')
-            self.colors_img.start()
+        # Do image functions for blur crop etc. in a separate thread
+        Thread(target=self.run_imagefuncs).start()
 
         # Allow early exit to only do image manipulations
         if get_condvisibility("!Skin.HasSetting(TMDbHelper.Service)"):

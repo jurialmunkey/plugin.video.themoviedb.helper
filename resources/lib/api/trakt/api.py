@@ -1,6 +1,6 @@
 import random
 from xbmc import Monitor
-from xbmcgui import Dialog
+from xbmcgui import Dialog, DialogProgress
 from json import loads, dumps
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import get_localized, get_setting, set_setting
