@@ -409,7 +409,7 @@ class TMDb(RequestAPI):
         return use_pickle(
             self._get_downloaded_list,
             export_list=export_list, sorting=sorting, reverse=reverse, datestamp=datestamp,
-            cache_name=f'TMDb.Downloaded.List.v2.{export_list}.{sorting}.{reverse}')
+            cache_name=f'TMDb.Downloaded.List.v3.{export_list}.{sorting}.{reverse}')
 
     def get_all_items_list(self, tmdb_type, page=None):
         if tmdb_type not in TMDB_ALL_ITEMS_LISTS:

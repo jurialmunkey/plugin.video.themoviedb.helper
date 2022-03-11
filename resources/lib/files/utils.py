@@ -1,18 +1,22 @@
 import re
-import os
 import json
 import xbmcvfs
 import unicodedata
-from xbmcgui import Dialog
+from resources.lib.addon.constants import ALPHANUM_CHARS, INVALID_FILECHARS
 from resources.lib.addon.timedate import get_timedelta, get_datetime_now, is_future_timestamp
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.plugin import ADDONDATA, get_localized, get_setting
 from resources.lib.addon.logger import kodi_log
-from resources.lib.addon.constants import ALPHANUM_CHARS, INVALID_FILECHARS
+from resources.lib.addon.dialog import kodi_dialog_ok
 try:
     import cPickle as _pickle
 except ImportError:
     import pickle as _pickle  # Newer versions of Py3 just use pickle
+
+
+def validate_join(folder, filename):
+    path = '/'.join([folder, filename])
+    return xbmcvfs.validatePath(xbmcvfs.translatePath(path))
 
 
 def validify_filename(filename, alphanum=False):
@@ -37,12 +41,9 @@ def get_files_in_folder(folder, regex):
 
 
 def read_file(filepath):
-    vfs_file = xbmcvfs.File(filepath)
     content = ''
-    try:
+    with xbmcvfs.File(filepath) as vfs_file:
         content = vfs_file.read()
-    finally:
-        vfs_file.close()
     return content
 
 
@@ -66,35 +67,38 @@ def get_tmdb_id_nfo(basedir, foldername, tmdb_type='tv'):
         kodi_log(f'ERROR GETTING TMDBID FROM NFO:\n{exc}')
 
 
-def get_file_path(folder, filename, join_addon_data=True):
-    return os.path.join(get_write_path(folder, join_addon_data), filename)
+def get_file_path(folder, filename, join_addon_data=True, make_dir=True):
+    return validate_join(get_write_path(folder, join_addon_data, make_dir), filename)
 
 
 def delete_file(folder, filename, join_addon_data=True):
-    xbmcvfs.delete(get_file_path(folder, filename, join_addon_data))
+    xbmcvfs.delete(get_file_path(folder, filename, join_addon_data, make_dir=False))
+
+
+def delete_folder(folder, join_addon_data=True, force=False):
+    xbmcvfs.rmdir(get_write_path(folder, join_addon_data, make_dir=False), force=force)
 
 
 def dumps_to_file(data, folder, filename, indent=2, join_addon_data=True):
-    path = os.path.join(get_write_path(folder, join_addon_data), filename)
-    with open(path, 'w') as file:
+    path = get_file_path(folder, filename, join_addon_data)
+    with xbmcvfs.File(path, 'w') as file:
         json.dump(data, file, indent=indent)
     return path
 
 
 def write_to_file(data, folder, filename, join_addon_data=True, append_to_file=False):
-    path = '/'.join((get_write_path(folder, join_addon_data), filename))
-    xbmcvfs.validatePath(xbmcvfs.translatePath(path))
+    path = get_file_path(folder, filename, join_addon_data)
     if append_to_file:
         data = '\n'.join([read_file(path), data])
     with xbmcvfs.File(path, 'w') as f:
         f.write(data)
 
 
-def get_write_path(folder, join_addon_data=True):
+def get_write_path(folder, join_addon_data=True, make_dir=True):
     if join_addon_data:
         folder = f'{ADDONDATA}{folder}/'
     main_dir = xbmcvfs.validatePath(xbmcvfs.translatePath(folder))
-    if not xbmcvfs.exists(main_dir):
+    if make_dir and not xbmcvfs.exists(main_dir):
         try:  # Try makedir to avoid race conditions
             xbmcvfs.mkdirs(main_dir)
         except FileExistsError:
@@ -102,15 +106,10 @@ def get_write_path(folder, join_addon_data=True):
     return main_dir
 
 
-def _del_file(folder, filename):
-    file = os.path.join(folder, filename)
-    os.remove(file)
-
-
 def del_old_files(folder, limit=1):
     folder = get_write_path(folder, True)
-    for filename in sorted(os.listdir(folder))[:-limit]:
-        _del_file(folder, filename)
+    for filename in sorted(xbmcvfs.listdir(folder))[:-limit]:
+        delete_file(folder, filename, False)
 
 
 def make_path(path, warn_dialog=False):
@@ -124,7 +123,7 @@ def make_path(path, warn_dialog=False):
     kodi_log(f'XBMCVFS unable to create path:\n{path}', 2)
     if not warn_dialog:
         return
-    Dialog().ok('XBMCVFS', f'{get_localized(32122)} [B]{path}[/B]\n{get_localized(32123)}')
+    kodi_dialog_ok('XBMCVFS', f'{get_localized(32122)} [B]{path}[/B]\n{get_localized(32123)}')
 
 
 def json_loads(obj):
@@ -150,7 +149,7 @@ def get_pickle_name(cache_name, alphanum=False):
     return validify_filename(cache_name, alphanum=alphanum).rstrip('_')
 
 
-def set_pickle(my_object, cache_name, cache_days=14, json_dump=False):
+def set_pickle(my_object, cache_name, cache_days=14):
     if not my_object:
         return
     cache_name = get_pickle_name(cache_name)
@@ -158,19 +157,20 @@ def set_pickle(my_object, cache_name, cache_days=14, json_dump=False):
         return
     timestamp = get_datetime_now() + get_timedelta(days=cache_days)
     cache_obj = {'my_object': my_object, 'expires': timestamp.strftime("%Y-%m-%dT%H:%M:%S")}
-    with open(os.path.join(get_write_path('pickle'), cache_name), 'w' if json_dump else 'wb') as file:
-        json.dump(cache_obj, file, indent=4) if json_dump else _pickle.dump(cache_obj, file)
+
+    with xbmcvfs.File(validate_join(get_write_path('pickle'), cache_name), 'w') as file:
+        json.dump(cache_obj, file, indent=4)
     return my_object
 
 
-def get_pickle(cache_name, json_dump=False):
+def get_pickle(cache_name):
     cache_name = get_pickle_name(cache_name)
     if not cache_name:
         return
     try:
-        with open(os.path.join(get_write_path('pickle'), cache_name), 'r' if json_dump else 'rb') as file:
-            cache_obj = json.load(file) if json_dump else _pickle.load(file)
-    except IOError:
+        with xbmcvfs.File(validate_join(get_write_path('pickle'), cache_name), 'r') as file:
+            cache_obj = json.load(file)
+    except (IOError, json.JSONDecodeError):
         cache_obj = None
     if cache_obj and is_future_timestamp(cache_obj.get('expires', '')):
         return cache_obj.get('my_object')

@@ -3,6 +3,7 @@ from resources.lib.addon.parser import try_int
 from threading import Thread
 from resources.lib.addon.timedate import convert_timestamp, get_datetime_now, get_timedelta, get_datetime_today, get_datetime_time, get_datetime_combine
 from resources.lib.addon.plugin import get_setting, executebuiltin, get_infolabel
+from resources.lib.files.utils import delete_folder
 
 
 class CronJobMonitor(Thread):
@@ -14,6 +15,9 @@ class CronJobMonitor(Thread):
         self.xbmc_monitor = Monitor()
 
     def run(self):
+        for f in ['database', 'database_v2', 'database_v3']:
+            delete_folder(f, force=True)
+
         self.xbmc_monitor.waitForAbort(600)  # Wait 10 minutes before doing updates to give boot time
         if self.xbmc_monitor.abortRequested():
             del self.xbmc_monitor
