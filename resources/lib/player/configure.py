@@ -1,4 +1,4 @@
-from xbmcgui import Dialog
+from xbmcgui import Dialog, INPUT_NUMERIC
 from xbmcaddon import Addon as KodiAddon
 from resources.lib.addon.plugin import ADDONPATH, get_setting, get_localized, get_condvisibility
 from resources.lib.addon.parser import try_int
@@ -86,7 +86,7 @@ class _ConfigurePlayer():
         priority = f'{self.player.get("priority") or PLAYERS_PRIORITY}'  # Input numeric takes str for some reason?!
         priority = Dialog().input(
             get_localized(32344).format(self.filename),
-            defaultt=priority, type='INPUT_NUMERIC')
+            defaultt=priority, type=INPUT_NUMERIC)
         priority = try_int(priority)
         if not priority:
             return

@@ -2,7 +2,7 @@ import os
 import xbmcvfs
 import zipfile
 import gzip
-from xbmcgui import Dialog
+from xbmcgui import Dialog, ALPHANUM_HIDE_INPUT
 from io import BytesIO
 from urllib.parse import urlparse
 from resources.lib.addon.plugin import get_localized, ADDONNAME
@@ -85,7 +85,7 @@ class Downloader(object):
         if check:
             return True
         if valid == 'auth' and not cred:
-            cred = (Dialog().input(heading=get_localized(1014)) or '', Dialog().input(heading=get_localized(733), option='ALPHANUM_HIDE_INPUT') or '')
+            cred = (Dialog().input(heading=get_localized(1014)) or '', Dialog().input(heading=get_localized(733), option=ALPHANUM_HIDE_INPUT) or '')
 
         response = requests.get(url, timeout=10.000, stream=stream, auth=cred)
         if response.status_code == 401:
@@ -93,7 +93,7 @@ class Downloader(object):
                 Dialog().ok(ADDONNAME, get_localized(32055))
                 return False
             count += 1
-            cred = (Dialog().input(heading=get_localized(1014)) or '', Dialog().input(heading=get_localized(733), option='ALPHANUM_HIDE_INPUT') or '')
+            cred = (Dialog().input(heading=get_localized(1014)) or '', Dialog().input(heading=get_localized(733), option=ALPHANUM_HIDE_INPUT) or '')
             response = self.open_url(url, stream, check, cred, count)
         return response
 
