@@ -1,6 +1,5 @@
 import os
 import xbmcvfs
-import zipfile
 import gzip
 from xbmcgui import Dialog, ALPHANUM_HIDE_INPUT
 from io import BytesIO
@@ -8,18 +7,12 @@ from urllib.parse import urlparse
 from resources.lib.addon.plugin import get_localized, ADDONNAME
 from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.logger import kodi_log
+from resources.lib.addon.modimp import lazyimport_module
 
 
-requests = None  # Requests module is slow to import so lazy import via decorator instead
-
-
-def lazyimport_requests(func):
-    def wrapper(*args, **kwargs):
-        global requests
-        if requests is None:
-            import requests
-        return func(*args, **kwargs)
-    return wrapper
+# lazyimports for slow modules
+zipfile = None
+requests = None
 
 
 class Downloader(object):
@@ -50,7 +43,7 @@ class Downloader(object):
         except ValueError:
             return False
 
-    @lazyimport_requests
+    @lazyimport_module(globals(), 'requests')
     def check_url(self, url, cred):
         if not self.is_url(url):
             kodi_log(f'URL is not of a valid schema: {url}', 1)
@@ -73,7 +66,7 @@ class Downloader(object):
             kodi_log(f'URL check error for {url}: [{e}]', 1)
             return False
 
-    @lazyimport_requests
+    @lazyimport_module(globals(), 'requests')
     def open_url(self, url, stream=False, check=False, cred=None, count=0):
         if not url:
             return False
@@ -122,6 +115,7 @@ class Downloader(object):
             content = downloaded_gzip.read()
         return content
 
+    @lazyimport_module(globals(), 'zipfile')
     def get_extracted_zip(self):
         if not self.download_url or not self.extract_to:
             return

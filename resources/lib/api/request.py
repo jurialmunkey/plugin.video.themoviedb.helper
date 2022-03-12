@@ -1,5 +1,5 @@
-import xml.etree.ElementTree as ET
 from xbmcgui import Dialog
+from resources.lib.addon.modimp import lazyimport_module
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import get_localized, get_condvisibility
 from resources.lib.addon.parser import try_int
@@ -8,34 +8,26 @@ from resources.lib.files.cache import BasicCache, CACHE_SHORT, CACHE_LONG
 from resources.lib.addon.logger import kodi_log
 from copy import copy
 from json import loads, dumps
-# import requests
-
-requests = None  # Requests module is slow to import so lazy import via decorator instead
 
 
-def lazyimport_requests(func):
-    def wrapper(*args, **kwargs):
-        global requests
-        if requests is None:
-            import requests
-        return func(*args, **kwargs)
-    return wrapper
+# lazyimports for slow modules
+ET = None
+requests = None
 
 
-def dictify(r, root=True):
-    if root:
-        return {r.tag: dictify(r, False)}
-    d = copy(r.attrib)
-    if r.text:
-        d["_text"] = r.text
-    for x in r.findall("./*"):
-        if x.tag not in d:
-            d[x.tag] = []
-        d[x.tag].append(dictify(x, False))
-    return d
-
-
+@lazyimport_module(globals(), 'xml.etree.ElementTree', import_as='ET')
 def translate_xml(request):
+    def dictify(r, root=True):
+        if root:
+            return {r.tag: dictify(r, False)}
+        d = copy(r.attrib)
+        if r.text:
+            d["_text"] = r.text
+        for x in r.findall("./*"):
+            if x.tag not in d:
+                d[x.tag] = []
+            d[x.tag].append(dictify(x, False))
+        return d
     if request:
         request = ET.fromstring(request.content)
         request = dictify(request)
@@ -116,7 +108,7 @@ class RequestAPI(object):
         self.req_timeout_err = set_timestamp(self.timeout * 3)
         get_property(self.req_timeout_err_prop, self.req_timeout_err)
 
-    @lazyimport_requests
+    @lazyimport_module(globals(), 'requests')
     def get_simple_api_request(self, request=None, postdata=None, headers=None, method=None):
         try:
             if method == 'delete':
