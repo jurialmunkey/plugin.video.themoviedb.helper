@@ -1,4 +1,4 @@
-from resources.lib.addon.constants import CONTEXT_MENU_ITEMS
+from resources.lib.addon.consts import CONTEXT_MENU_ITEMS
 from resources.lib.addon.modimp import lazyimport_module
 """ Lazyimports """
 dumps = None

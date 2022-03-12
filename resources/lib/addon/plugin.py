@@ -1,7 +1,7 @@
 import re
 import xbmc
 from xbmcaddon import Addon as KodiAddon
-from resources.lib.addon.constants import LANGUAGES
+from resources.lib.addon.consts import LANGUAGES
 """ Top level module only import constants """
 
 

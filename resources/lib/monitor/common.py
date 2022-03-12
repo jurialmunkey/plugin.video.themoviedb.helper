@@ -5,8 +5,8 @@ from resources.lib.api.trakt.api import TraktAPI
 from resources.lib.api.fanarttv.api import FanartTV
 from resources.lib.addon.plugin import get_setting, get_infolabel, get_condvisibility
 from resources.lib.addon.parser import try_int
-from resources.lib.addon.setutils import merge_two_dicts
-from resources.lib.addon.timedate import convert_timestamp, get_region_date
+from resources.lib.addon.sutils import merge_two_dicts
+from resources.lib.addon.tmdate import convert_timestamp, get_region_date
 from resources.lib.items.builder import ItemBuilder
 from resources.lib.addon.logger import kodi_traceback, kodi_try_except
 

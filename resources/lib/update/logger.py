@@ -1,5 +1,5 @@
-from resources.lib.files.utils import dumps_to_file, del_old_files
-from resources.lib.addon.timedate import get_todays_date
+from resources.lib.files.futils import dumps_to_file, del_old_files
+from resources.lib.addon.tmdate import get_todays_date
 
 
 LOG_FOLDER = 'log_library'

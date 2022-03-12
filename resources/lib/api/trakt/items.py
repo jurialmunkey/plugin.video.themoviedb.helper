@@ -1,6 +1,6 @@
 import random
 from resources.lib.addon.plugin import PLUGINPATH, convert_type, convert_trakt_type
-from resources.lib.addon.setutils import del_empty_keys, get_params
+from resources.lib.addon.sutils import del_empty_keys, get_params
 from resources.lib.addon.parser import try_int, try_str
 
 

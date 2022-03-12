@@ -3,8 +3,8 @@ import resources.lib.api.kodi.rpc as rpc
 from xbmcgui import DialogProgressBG
 from resources.lib.addon.plugin import get_setting, get_localized, set_setting, executebuiltin
 from resources.lib.addon.parser import try_int
-from resources.lib.addon.timedate import is_unaired_timestamp, get_current_date_time
-from resources.lib.files.utils import validify_filename, get_tmdb_id_nfo
+from resources.lib.addon.tmdate import is_unaired_timestamp, get_current_date_time
+from resources.lib.files.futils import validify_filename, get_tmdb_id_nfo
 from resources.lib.update.logger import _LibraryLogger
 from resources.lib.update.update import BASEDIR_MOVIE, BASEDIR_TV, STRM_MOVIE, STRM_EPISODE, create_file, create_nfo, get_unique_folder, get_userlist, create_playlist
 from resources.lib.update.cacher import _TVShowCache

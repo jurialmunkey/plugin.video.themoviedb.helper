@@ -1,5 +1,5 @@
-from resources.lib.files.utils import get_json_filecache, set_json_filecache
-from resources.lib.addon.timedate import is_future_timestamp, get_todays_date
+from resources.lib.files.futils import get_json_filecache, set_json_filecache
+from resources.lib.addon.tmdate import is_future_timestamp, get_todays_date
 from resources.lib.addon.parser import try_int
 
 

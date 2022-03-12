@@ -1,14 +1,14 @@
 from xbmc import Monitor, executeJSONRPC
 from resources.lib.addon.logger import kodi_log
 from resources.lib.addon.parser import try_int
-from resources.lib.addon.setutils import find_dict_in_list
+from resources.lib.addon.sutils import find_dict_in_list
 from resources.lib.api.kodi.mapping import ItemMapper
 
 """ Lazyimports """
 from resources.lib.addon.modimp import lazyimport_module
 json = None
 Stat = None  # xbmcvfs
-BasicCache = None  # resources.lib.files.cache
+BasicCache = None  # resources.lib.files.bcache
 
 
 @lazyimport_module(globals(), 'json')
@@ -176,7 +176,7 @@ def get_episode_details(dbid=None):
 
 
 class KodiLibrary(object):
-    @lazyimport_module(globals(), 'resources.lib.files.cache', import_attr='BasicCache')
+    @lazyimport_module(globals(), 'resources.lib.files.bcache', import_attr='BasicCache')
     def __init__(self, dbtype=None, tvshowid=None, attempt_reconnect=False, logging=True):
         self.dbtype = dbtype
         self._cache = BasicCache(filename='KodiLibrary.db')
