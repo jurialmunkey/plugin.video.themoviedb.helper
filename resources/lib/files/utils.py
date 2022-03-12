@@ -2,12 +2,12 @@ import re
 import json
 import xbmcvfs
 import unicodedata
+from xbmcgui import Dialog
 from resources.lib.addon.constants import ALPHANUM_CHARS, INVALID_FILECHARS
 from resources.lib.addon.timedate import get_timedelta, get_datetime_now, is_future_timestamp
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.plugin import ADDONDATA, get_localized, get_setting
 from resources.lib.addon.logger import kodi_log
-from resources.lib.addon.dialog import kodi_dialog_ok
 try:
     import cPickle as _pickle
 except ImportError:
@@ -123,7 +123,7 @@ def make_path(path, warn_dialog=False):
     kodi_log(f'XBMCVFS unable to create path:\n{path}', 2)
     if not warn_dialog:
         return
-    kodi_dialog_ok('XBMCVFS', f'{get_localized(32122)} [B]{path}[/B]\n{get_localized(32123)}')
+    Dialog().ok('XBMCVFS', f'{get_localized(32122)} [B]{path}[/B]\n{get_localized(32123)}')
 
 
 def json_loads(obj):
@@ -143,16 +143,16 @@ def pickle_deepcopy(obj):
     return _pickle.loads(_pickle.dumps(obj))
 
 
-def get_pickle_name(cache_name, alphanum=False):
+def get_filecache_name(cache_name, alphanum=False):
     cache_name = cache_name or ''
     cache_name = cache_name.replace('\\', '_').replace('/', '_').replace('.', '_').replace('?', '_').replace('&', '_').replace('=', '_').replace('__', '_')
     return validify_filename(cache_name, alphanum=alphanum).rstrip('_')
 
 
-def set_pickle(my_object, cache_name, cache_days=14):
+def set_json_filecache(my_object, cache_name, cache_days=14):
     if not my_object:
         return
-    cache_name = get_pickle_name(cache_name)
+    cache_name = get_filecache_name(cache_name)
     if not cache_name:
         return
     timestamp = get_datetime_now() + get_timedelta(days=cache_days)
@@ -163,8 +163,8 @@ def set_pickle(my_object, cache_name, cache_days=14):
     return my_object
 
 
-def get_pickle(cache_name):
-    cache_name = get_pickle_name(cache_name)
+def get_json_filecache(cache_name):
+    cache_name = get_filecache_name(cache_name)
     if not cache_name:
         return
     try:
@@ -176,14 +176,14 @@ def get_pickle(cache_name):
         return cache_obj.get('my_object')
 
 
-def use_pickle(func, *args, cache_name='', cache_only=False, cache_refresh=False, **kwargs):
+def use_json_filecache(func, *args, cache_name='', cache_only=False, cache_refresh=False, **kwargs):
     """
     Simplecache takes func with args and kwargs
     Returns the cached item if it exists otherwise does the function
     """
-    my_object = get_pickle(cache_name) if not cache_refresh else None
+    my_object = get_json_filecache(cache_name) if not cache_refresh else None
     if my_object:
         return my_object
     elif not cache_only:
         my_object = func(*args, **kwargs)
-        return set_pickle(my_object, cache_name)
+        return set_json_filecache(my_object, cache_name)

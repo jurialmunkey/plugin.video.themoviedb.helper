@@ -3,10 +3,11 @@
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 import sys
 import xbmcvfs
+from xbmcgui import Dialog
 from json import dumps
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import reconfigure_legacy_params, format_folderpath, convert_type, get_localized, get_setting, set_setting, executebuiltin, get_infolabel
-from resources.lib.addon.dialog import BusyDialog, ProgressDialog, kodi_dialog_contextmenu, kodi_dialog_yesno, kodi_dialog_ok, kodi_dialog_input, kodi_dialog_textviewer
+from resources.lib.addon.dialog import BusyDialog, ProgressDialog
 from resources.lib.addon.parser import encode_url, parse_paramstring
 from resources.lib.files.downloader import Downloader
 from resources.lib.files.utils import dumps_to_file, validify_filename, read_file
@@ -85,18 +86,18 @@ def delete_cache(delete_cache, **kwargs):
         'Item Details': lambda: ItemBuilder()}
     if delete_cache == 'select':
         m = [i for i in d]
-        x = kodi_dialog_contextmenu([get_localized(32387).format(i) for i in m])
+        x = Dialog().contextmenu([get_localized(32387).format(i) for i in m])
         if x == -1:
             return
         delete_cache = m[x]
     z = d.get(delete_cache)
     if not z:
         return
-    if not kodi_dialog_yesno(get_localized(32387).format(delete_cache), get_localized(32388).format(delete_cache)):
+    if not Dialog().yesno(get_localized(32387).format(delete_cache), get_localized(32388).format(delete_cache)):
         return
     with BusyDialog():
         z()._cache.ret_cache()._do_delete()
-    kodi_dialog_ok(get_localized(32387).format(delete_cache), get_localized(32389))
+    Dialog().ok(get_localized(32387).format(delete_cache), get_localized(32389))
 
 
 @map_kwargs({'play': 'tmdb_type'})
@@ -175,7 +176,7 @@ def related_lists(tmdb_id=None, tmdb_type=None, season=None, episode=None, conta
     items = get_basedir_details(tmdb_type=tmdb_type, tmdb_id=tmdb_id, season=season, episode=episode, include_play=include_play)
     if not items or len(items) <= 1:
         return
-    choice = kodi_dialog_contextmenu([i.get('label') for i in items])
+    choice = Dialog().contextmenu([i.get('label') for i in items])
     if choice == -1:
         return
     item = items[choice]
@@ -196,8 +197,8 @@ def related_lists(tmdb_id=None, tmdb_type=None, season=None, episode=None, conta
 
 def update_players():
     players_url = get_setting('players_url', 'str')
-    players_url = kodi_dialog_input(get_localized(32313), defaultt=players_url)
-    if not kodi_dialog_yesno(
+    players_url = Dialog().input(get_localized(32313), defaultt=players_url)
+    if not Dialog().yesno(
             get_localized(32032),
             get_localized(32314).format(players_url)):
         return
@@ -216,7 +217,7 @@ def refresh_details(tmdb_id=None, tmdb_type=None, season=None, episode=None, con
         details = ItemBuilder().get_item(tmdb_type, tmdb_id, season, episode, cache_refresh=True) or {}
         details = details.get('listitem')
     if details and confirm:
-        kodi_dialog_ok('TMDbHelper', get_localized(32234).format(tmdb_type, tmdb_id))
+        Dialog().ok('TMDbHelper', get_localized(32234).format(tmdb_type, tmdb_id))
         container_refresh()
     return details
 
@@ -238,14 +239,14 @@ def user_list(user_list, user_slug=None, **kwargs):
 
 
 def delete_list(delete_list, **kwargs):
-    if not kodi_dialog_yesno(get_localized(32358), get_localized(32357).format(delete_list)):
+    if not Dialog().yesno(get_localized(32358), get_localized(32357).format(delete_list)):
         return
     TraktAPI().delete_response('users/me/lists', delete_list)
     container_refresh()
 
 
 def rename_list(rename_list, **kwargs):
-    name = kodi_dialog_input(get_localized(32359))
+    name = Dialog().input(get_localized(32359))
     if not name:
         return
     TraktAPI().post_response('users/me/lists', rename_list, postdata={'name': name}, response_method='put')
@@ -287,7 +288,7 @@ def image_colors(image_colors=None, **kwargs):
 
 def library_update(**kwargs):
     if kwargs.get('force') == 'select':
-        choice = kodi_dialog_yesno(
+        choice = Dialog().yesno(
             get_localized(32391),
             get_localized(32392),
             yeslabel=get_localized(32393),
@@ -306,7 +307,7 @@ def log_request(**kwargs):
     with BusyDialog():
         kwargs['response'] = None
         if not kwargs.get('url'):
-            kwargs['url'] = kodi_dialog_input('URL')
+            kwargs['url'] = Dialog().input('URL')
         if not kwargs['url']:
             return
         if kwargs.get('log_request').lower() == 'trakt':
@@ -314,7 +315,7 @@ def log_request(**kwargs):
         else:
             kwargs['response'] = TMDb().get_response_json(kwargs['url'])
         if not kwargs['response']:
-            kodi_dialog_ok(kwargs['log_request'].capitalize(), f'{kwargs["url"]}\nNo Response!')
+            Dialog().ok(kwargs['log_request'].capitalize(), f'{kwargs["url"]}\nNo Response!')
             return
         filename = validify_filename(f'{kwargs["log_request"]}_{kwargs["url"]}.json')
         dumps_to_file(kwargs, 'log_request', filename)
@@ -322,13 +323,13 @@ def log_request(**kwargs):
         msg = (
             f'[B]{kwargs["url"]}[/B]\n\n{xbmcvfs.translatePath("special://profile/addon_data/")}\n'
             f'plugin.video.themoviedb.helper/log_request\n{filename}')
-        kodi_dialog_ok(kwargs['log_request'].capitalize(), msg)
-        kodi_dialog_textviewer(filename, dumps(kwargs['response'], indent=2))
+        Dialog().ok(kwargs['log_request'].capitalize(), msg)
+        Dialog().textviewer(filename, dumps(kwargs['response'], indent=2))
 
 
 def sort_list(**kwargs):
     sort_methods = get_sort_methods() if kwargs['info'] == 'trakt_userlist' else get_sort_methods(True)
-    x = kodi_dialog_contextmenu([i['name'] for i in sort_methods])
+    x = Dialog().contextmenu([i['name'] for i in sort_methods])
     if x == -1:
         return
     for k, v in sort_methods[x]['params'].items():

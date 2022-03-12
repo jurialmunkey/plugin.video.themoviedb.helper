@@ -1,4 +1,5 @@
-from resources.lib.addon.dialog import BusyDialog, kodi_dialog_yesno, kodi_notification, kodi_dialog_multiselect
+from xbmcgui import Dialog
+from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.plugin import get_setting, get_localized, set_setting
 from resources.lib.update.library import add_to_library
 from resources.lib.update.update import get_userlist
@@ -31,7 +32,7 @@ def monitor_userlist():
             if (i.get('params', {}).get('list_slug'), i.get('params', {}).get('user_slug')) in saved_lists]
 
     # Ask user to choose lists
-    indices = kodi_dialog_multiselect(get_localized(32312), dialog_list, preselect=preselected)
+    indices = Dialog().multiselect(get_localized(32312), dialog_list, preselect=preselected)
     if indices is None:
         return
 
@@ -53,13 +54,13 @@ def monitor_userlist():
     set_setting('monitor_userslug', added_users, 'str')
 
     # Update library?
-    if kodi_dialog_yesno(get_localized(653), get_localized(32132)):
+    if Dialog().yesno(get_localized(653), get_localized(32132)):
         library_autoupdate(list_slugs=added_lists, user_slugs=added_users, busy_spinner=True)
 
 
 def library_autoupdate(list_slugs=None, user_slugs=None, busy_spinner=False, force=False):
     kodi_log(u'UPDATING TV SHOWS LIBRARY', 1)
-    kodi_notification('TMDbHelper', f'{get_localized(32167)}...')
+    Dialog().notification('TMDbHelper', f'{get_localized(32167)}...')
 
     # Update library from Trakt lists
     library_adder = None

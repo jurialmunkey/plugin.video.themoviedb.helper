@@ -1,8 +1,7 @@
 from resources.lib.addon.plugin import format_name
 from resources.lib.files.simplecache import SimpleCache
-from resources.lib.files.utils import get_pickle_name
-from resources.lib.addon.logger import kodi_log
-from resources.lib.addon.dialog import kodi_try_except
+from resources.lib.files.utils import get_filecache_name
+from resources.lib.addon.logger import kodi_log, kodi_try_except
 
 
 CACHE_LONG = 14
@@ -29,7 +28,7 @@ class BasicCache(object):
     @kodi_try_except('lib.addon.cache get_cache')
     def get_cache(self, cache_name):
         self.ret_cache()
-        cache_name = get_pickle_name(cache_name or '')
+        cache_name = get_filecache_name(cache_name or '')
         no_hdd = True if self._id_list and cache_name not in self._id_list else False
         return self._cache.get(cache_name, no_hdd=no_hdd)
         # with TimerList(self._timers, 'item_getx' if no_hdd else 'item_get', log_threshold=0) as tl:
@@ -55,7 +54,7 @@ class BasicCache(object):
         """ set object to cache """
         # with TimerList(self._timers, 'item_set'):
         self.ret_cache()
-        cache_name = get_pickle_name(cache_name or '')
+        cache_name = get_filecache_name(cache_name or '')
         if force and (not my_object or not cache_name or not cache_days):
             my_object = my_object or fallback
             cache_days = force if isinstance(force, int) else cache_days
@@ -64,7 +63,7 @@ class BasicCache(object):
     @kodi_try_except('lib.addon.cache del_cache')
     def del_cache(self, cache_name):
         self.ret_cache()
-        cache_name = get_pickle_name(cache_name or '')
+        cache_name = get_filecache_name(cache_name or '')
         self._cache.set(cache_name, None, cache_days=0)
 
     @kodi_try_except('lib.addon.cache use_cache')

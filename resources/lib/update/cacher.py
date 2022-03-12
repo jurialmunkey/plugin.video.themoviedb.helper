@@ -1,4 +1,4 @@
-from resources.lib.files.utils import get_pickle, set_pickle
+from resources.lib.files.utils import get_json_filecache, set_json_filecache
 from resources.lib.addon.timedate import is_future_timestamp, get_todays_date
 from resources.lib.addon.parser import try_int
 
@@ -13,14 +13,14 @@ class _TVShowCache():
     def __init__(self, tmdb_id, force=False):
         self.cache_version = 3
         self.cache_name = f'library_autoupdate_tv.{tmdb_id}'
-        self.cache_info = {} if force else get_pickle(self.cache_name) or {}
+        self.cache_info = {} if force else get_json_filecache(self.cache_name) or {}
         # Only use cache info if version matches
         if not self.cache_info.get('version') or self.cache_info.get('version') != self.cache_version:
             self.cache_info = {}
         self.my_history = {}
 
     def set_cache(self, cache_days=120):
-        set_pickle(self.my_history, self.cache_name, cache_days=cache_days)
+        set_json_filecache(self.my_history, self.cache_name, cache_days=cache_days)
 
     def get_next_check(self):
         """ If next check value is in future return log message """
