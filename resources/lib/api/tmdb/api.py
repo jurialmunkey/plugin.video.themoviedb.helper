@@ -1,11 +1,8 @@
 from xbmcgui import Dialog
 from resources.lib.addon.plugin import ADDONPATH, get_mpaa_prefix, get_language, convert_type, get_setting, get_localized
-from resources.lib.addon.constants import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, TMDB_GENRE_IDS
+from resources.lib.addon.constants import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, TMDB_GENRE_IDS, CACHE_SHORT, CACHE_LONG
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.window import get_property
-from resources.lib.addon.timedate import get_datetime_now, get_timedelta
-from resources.lib.files.cache import CACHE_SHORT, CACHE_LONG
-from resources.lib.files.downloader import Downloader
 from resources.lib.files.utils import use_json_filecache, validify_filename
 from resources.lib.items.listitem import ListItem
 from resources.lib.items.pages import PaginatedItems
@@ -13,7 +10,13 @@ from resources.lib.api.request import RequestAPI
 from resources.lib.api.tmdb.mapping import ItemMapper, get_episode_to_air
 from resources.lib.api.mapping import is_excluded
 from urllib.parse import quote_plus
-from json import loads
+
+""" Lazyimports """
+from resources.lib.addon.modimp import lazyimport_modules
+Downloader = None  # resources.lib.files.downloader
+json = None
+get_datetime_now = None  # from resources.lib.addon.timedate
+get_timedelta = None  # from resources.lib.addon.timedate
 
 
 ARTWORK_QUALITY = get_setting('artwork_quality', 'int')
@@ -393,13 +396,20 @@ class TMDb(RequestAPI):
                     p[k] = f'{p[k]} / {v}'
         return items
 
+    @lazyimport_modules(globals(), (
+        {'module_name': 'resources.lib.files.downloader', 'import_attr': 'Downloader'},
+        {'module_name': 'json'}))
     def _get_downloaded_list(self, export_list, sorting=None, reverse=False, datestamp=None):
         if not export_list or not datestamp:
             return
+        json_loads = json.loads
         download_url = f'https://files.tmdb.org/p/exports/{export_list}_ids_{datestamp}.json.gz'
-        raw_list = [loads(i) for i in Downloader(download_url=download_url).get_gzip_text().splitlines()]
+        raw_list = [json_loads(i) for i in Downloader(download_url=download_url).get_gzip_text().splitlines()]
         return sorted(raw_list, key=lambda k: k.get(sorting, ''), reverse=reverse) if sorting else raw_list
 
+    @lazyimport_modules(globals(), (
+        {'module_name': 'resources.lib.addon.timedate', 'import_attr': 'get_datetime_now'},
+        {'module_name': 'resources.lib.addon.timedate', 'import_attr': 'get_timedelta'}))
     def get_daily_list(self, export_list, sorting=None, reverse=False):
         if not export_list:
             return
@@ -428,15 +438,12 @@ class TMDb(RequestAPI):
         for i in daily_list[pos_a:pos_z]:
             if not i.get('id'):
                 continue
-            if tmdb_type in ['keyword', 'network', 'studio']:
-                item = {
-                    'label': i.get('name'),
-                    'infolabels': {'mediatype': dbtype},
-                    'infoproperties': {'dbtype': dbtype},
-                    'unique_ids': {'tmdb': i.get('id')},
-                    'params': {}}
-            else:
-                item = self.get_details(tmdb_type, i.get('id'))
+            item = {
+                'label': i.get('name'),
+                'infolabels': {'mediatype': dbtype},
+                'infoproperties': {'dbtype': dbtype},
+                'unique_ids': {'tmdb': i.get('id')},
+                'params': {}}
             if not item:
                 continue
             for k, v in param.items():

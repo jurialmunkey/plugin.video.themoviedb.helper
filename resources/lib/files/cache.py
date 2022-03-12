@@ -1,12 +1,12 @@
 from resources.lib.addon.plugin import format_name
-from resources.lib.files.simplecache import SimpleCache
 from resources.lib.files.utils import get_filecache_name
 from resources.lib.addon.logger import kodi_log, kodi_try_except
 
+""" Lazyimports """
+from resources.lib.addon.modimp import lazyimport_module
+sqlite3 = None
+SimpleCache = None  # resources.lib.files.simplecache
 
-CACHE_LONG = 14
-CACHE_SHORT = 1
-CACHE_EXTENDED = 90
 SEARCH_HISTORY = 'search_history.db'
 
 
@@ -20,6 +20,7 @@ class BasicCache(object):
         self._id_list = []
 
     @kodi_try_except('lib.addon.cache ret_cache')
+    @lazyimport_module(globals(), 'resources.lib.files.simplecache', import_attr='SimpleCache')
     def ret_cache(self):
         if not self._cache:
             self._cache = SimpleCache(filename=self._filename, mem_only=self._mem_only, delay_write=self._delaywrite)
@@ -31,11 +32,6 @@ class BasicCache(object):
         cache_name = get_filecache_name(cache_name or '')
         no_hdd = True if self._id_list and cache_name not in self._id_list else False
         return self._cache.get(cache_name, no_hdd=no_hdd)
-        # with TimerList(self._timers, 'item_getx' if no_hdd else 'item_get', log_threshold=0) as tl:
-        #     item = self._cache.get(cache_name, no_hdd=no_hdd)
-        #     if not item:
-        #         tl.list_obj = self._timers.setdefault('item_nonx' if no_hdd else 'item_non', [])
-        # return item
 
     def get_id_list(self):
         self.ret_cache()
@@ -45,14 +41,11 @@ class BasicCache(object):
     @kodi_try_except('lib.addon.cache set_cache')
     def set_cache(self, my_object, cache_name, cache_days=14, force=False, fallback=None):
         """ set object to cache via thread """
-        # with TimerList(self._timers, 'item_set'):
         self._set_cache(my_object, cache_name, cache_days, force, fallback)
-        # Thread(target=self._set_cache, args=[pickle_deepcopy(my_object), cache_name, cache_days, force, fallback]).start()
         return my_object
 
     def _set_cache(self, my_object, cache_name, cache_days=14, force=False, fallback=None):
         """ set object to cache """
-        # with TimerList(self._timers, 'item_set'):
         self.ret_cache()
         cache_name = get_filecache_name(cache_name or '')
         if force and (not my_object or not cache_name or not cache_days):

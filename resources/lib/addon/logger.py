@@ -102,7 +102,7 @@ def log_output(func_name):
 
 
 class TimerFunc():
-    def __init__(self, timer_name, log_threshold=0.001):
+    def __init__(self, timer_name, log_threshold=0.05):
         """ ContextManager for timing code blocks and outputing to log """
         self.timer_name = timer_name
         self.log_threshold = log_threshold

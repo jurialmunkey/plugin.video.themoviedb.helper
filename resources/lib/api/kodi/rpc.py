@@ -1,13 +1,17 @@
-from xbmcvfs import Stat
 from xbmc import Monitor, executeJSONRPC
-from json import dumps, loads
 from resources.lib.addon.logger import kodi_log
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.setutils import find_dict_in_list
-from resources.lib.files.cache import BasicCache
 from resources.lib.api.kodi.mapping import ItemMapper
 
+""" Lazyimports """
+from resources.lib.addon.modimp import lazyimport_module
+json = None
+Stat = None  # xbmcvfs
+BasicCache = None  # resources.lib.files.cache
 
+
+@lazyimport_module(globals(), 'json')
 def get_jsonrpc(method=None, params=None):
     if not method:
         return {}
@@ -18,8 +22,8 @@ def get_jsonrpc(method=None, params=None):
     if params:
         query["params"] = params
     try:
-        jrpc = executeJSONRPC(dumps(query))
-        response = loads(jrpc)
+        jrpc = executeJSONRPC(json.dumps(query))
+        response = json.loads(jrpc)
     except Exception as exc:
         kodi_log(f'TMDbHelper - JSONRPC Error:\n{exc}', 1)
         response = {}
@@ -172,6 +176,7 @@ def get_episode_details(dbid=None):
 
 
 class KodiLibrary(object):
+    @lazyimport_module(globals(), 'resources.lib.files.cache', import_attr='BasicCache')
     def __init__(self, dbtype=None, tvshowid=None, attempt_reconnect=False, logging=True):
         self.dbtype = dbtype
         self._cache = BasicCache(filename='KodiLibrary.db')
@@ -184,6 +189,7 @@ class KodiLibrary(object):
             return movies + tvshows
         return self.get_database(dbtype, tvshowid, attempt_reconnect)
 
+    @lazyimport_module(globals(), 'xbmcvfs', import_attr='Stat')
     def get_database(self, dbtype, tvshowid=None, attempt_reconnect=False, logging=True):
         cache_name = f'db.{dbtype}.{tvshowid}'
         cache_data = self._cache.get_cache(cache_name)

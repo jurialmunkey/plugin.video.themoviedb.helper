@@ -1,4 +1,4 @@
-import _strptime
+# import _strptime  # fix for py2.7 bug with import log shouldnt be a problem in py3.6+
 import datetime
 import time
 from xbmc import getRegion

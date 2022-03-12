@@ -1,7 +1,7 @@
 from resources.lib.addon.plugin import get_language, get_setting
 from resources.lib.addon.setutils import del_empty_keys, ITER_PROPS_MAX
 from resources.lib.addon.parser import try_int
-from resources.lib.files.cache import CACHE_EXTENDED
+from resources.lib.addon.constants import CACHE_EXTENDED
 from resources.lib.api.request import RequestAPI
 
 EN_FALLBACK = get_setting('fanarttv_enfallback')

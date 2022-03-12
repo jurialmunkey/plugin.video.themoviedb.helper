@@ -5,7 +5,6 @@ from resources.lib.addon.timedate import format_date, age_difference
 from resources.lib.addon.constants import IMAGEPATH_ORIGINAL, IMAGEPATH_QUALITY_POSTER, IMAGEPATH_QUALITY_FANART, IMAGEPATH_QUALITY_THUMBS, IMAGEPATH_QUALITY_CLOGOS, TMDB_GENRE_IDS
 from resources.lib.api.mapping import UPDATE_BASEKEY, _ItemMapper, get_empty_item
 
-
 ARTWORK_QUALITY = get_setting('artwork_quality', 'int')
 ARTWORK_QUALITY_POSTER = IMAGEPATH_QUALITY_POSTER[ARTWORK_QUALITY]
 ARTWORK_QUALITY_FANART = IMAGEPATH_QUALITY_FANART[ARTWORK_QUALITY]

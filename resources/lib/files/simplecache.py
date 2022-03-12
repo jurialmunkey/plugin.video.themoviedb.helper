@@ -1,14 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-""" Modification of marcelveldt's simplecache plugin
-Code cleanup
-- Removal of json methods
-- Leia/Matrix Python-2/3 cross-compatibility
-- Allow setting folder and filename of DB
-"""
 import xbmcvfs
-import sqlite3
 from xbmcgui import Window
 from xbmc import Monitor, sleep
 from contextlib import contextmanager
@@ -18,12 +11,13 @@ from resources.lib.addon.timedate import set_timestamp
 from resources.lib.files.utils import get_file_path
 from resources.lib.files.utils import json_loads as data_loads
 from json import dumps as data_dumps
+
+""" Lazyimports """
+from resources.lib.addon.modimp import lazyimport_module
+sqlite3 = None
+
+
 DATABASE_NAME = 'database_v4'
-
-# data_loads = eval
-# data_dumps = repr
-# DATABASE_NAME = 'database_v3'
-
 TIME_MINUTES = 60
 TIME_HOURS = 60 * TIME_MINUTES
 TIME_DAYS = 24 * TIME_HOURS
@@ -235,6 +229,7 @@ class SimpleCache(object):
             self._connection = connection
         return connection
 
+    @lazyimport_module(globals(), 'sqlite3')
     def _get_database(self, attempts=2):
         '''get reference to our sqllite _database - performs basic integrity check'''
         try:

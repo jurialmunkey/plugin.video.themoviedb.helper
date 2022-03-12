@@ -81,6 +81,7 @@ class TMDbLists():
 
     def list_all_items(self, tmdb_type, page=None, **kwargs):
         items = self.tmdb_api.get_all_items_list(tmdb_type, page=page)
+        self.tmdb_cache_only = False
         self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = convert_type(tmdb_type, 'library')
         self.container_content = convert_type(tmdb_type, 'container')

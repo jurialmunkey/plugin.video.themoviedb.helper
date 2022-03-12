@@ -1,6 +1,8 @@
 ALPHANUM_CHARS = "-_.() abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 INVALID_FILECHARS = "\\/\"\'<>:|?*"
 
+CACHE_SHORT, CACHE_LONG, CACHE_EXTENDED = 1, 14, 90
+
 ACCEPTED_MEDIATYPES = [
     'video', 'movie', 'tvshow', 'season', 'episode', 'musicvideo', 'music', 'song', 'album', 'artist']
 

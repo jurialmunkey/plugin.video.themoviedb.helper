@@ -7,10 +7,9 @@ from urllib.parse import urlparse
 from resources.lib.addon.plugin import get_localized, ADDONNAME
 from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.logger import kodi_log
+
+""" Lazyimports """
 from resources.lib.addon.modimp import lazyimport_module
-
-
-# lazyimports for slow modules
 zipfile = None
 requests = None
 

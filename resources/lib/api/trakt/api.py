@@ -6,13 +6,14 @@ from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import get_localized, get_setting, set_setting
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.timedate import set_timestamp, get_timestamp
-from resources.lib.files.cache import CACHE_SHORT, CACHE_LONG, use_simple_cache
+from resources.lib.files.cache import use_simple_cache
 from resources.lib.items.pages import PaginatedItems, get_next_page
 from resources.lib.api.request import RequestAPI
 from resources.lib.api.trakt.items import TraktItems
 from resources.lib.api.trakt.decorators import is_authorized, use_activity_cache
 from resources.lib.api.trakt.progress import _TraktProgress
 from resources.lib.addon.logger import kodi_log
+from resources.lib.addon.constants import CACHE_SHORT, CACHE_LONG
 
 
 API_URL = 'https://api.trakt.tv/'

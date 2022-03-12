@@ -1,17 +1,17 @@
 import re
-import json
 import xbmcvfs
-import unicodedata
 from xbmcgui import Dialog
 from resources.lib.addon.constants import ALPHANUM_CHARS, INVALID_FILECHARS
 from resources.lib.addon.timedate import get_timedelta, get_datetime_now, is_future_timestamp
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.plugin import ADDONDATA, get_localized, get_setting
 from resources.lib.addon.logger import kodi_log
-try:
-    import cPickle as _pickle
-except ImportError:
-    import pickle as _pickle  # Newer versions of Py3 just use pickle
+
+""" Lazyimports """
+from resources.lib.addon.modimp import lazyimport_module
+unicodedata = None
+pickle = None
+json = None
 
 
 def validate_join(folder, filename):
@@ -19,6 +19,7 @@ def validate_join(folder, filename):
     return xbmcvfs.validatePath(xbmcvfs.translatePath(path))
 
 
+@lazyimport_module(globals(), 'unicodedata')
 def validify_filename(filename, alphanum=False):
     filename = unicodedata.normalize('NFD', filename)
     filename = u''.join([c for c in filename if (not alphanum or c in ALPHANUM_CHARS) and c not in INVALID_FILECHARS])
@@ -79,6 +80,7 @@ def delete_folder(folder, join_addon_data=True, force=False):
     xbmcvfs.rmdir(get_write_path(folder, join_addon_data, make_dir=False), force=force)
 
 
+@lazyimport_module(globals(), 'json')
 def dumps_to_file(data, folder, filename, indent=2, join_addon_data=True):
     path = get_file_path(folder, filename, join_addon_data)
     with xbmcvfs.File(path, 'w') as file:
@@ -126,6 +128,7 @@ def make_path(path, warn_dialog=False):
     Dialog().ok('XBMCVFS', f'{get_localized(32122)} [B]{path}[/B]\n{get_localized(32123)}')
 
 
+@lazyimport_module(globals(), 'json')
 def json_loads(obj):
     def json_int_keys(ordered_pairs):
         result = {}
@@ -139,8 +142,9 @@ def json_loads(obj):
     return json.loads(obj, object_pairs_hook=json_int_keys)
 
 
+@lazyimport_module(globals(), 'pickle')
 def pickle_deepcopy(obj):
-    return _pickle.loads(_pickle.dumps(obj))
+    return pickle.loads(pickle.dumps(obj))
 
 
 def get_filecache_name(cache_name, alphanum=False):
@@ -149,6 +153,7 @@ def get_filecache_name(cache_name, alphanum=False):
     return validify_filename(cache_name, alphanum=alphanum).rstrip('_')
 
 
+@lazyimport_module(globals(), 'json')
 def set_json_filecache(my_object, cache_name, cache_days=14):
     if not my_object:
         return
@@ -163,6 +168,7 @@ def set_json_filecache(my_object, cache_name, cache_days=14):
     return my_object
 
 
+@lazyimport_module(globals(), 'json')
 def get_json_filecache(cache_name):
     cache_name = get_filecache_name(cache_name)
     if not cache_name:

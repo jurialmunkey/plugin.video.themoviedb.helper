@@ -3,7 +3,7 @@ from xbmcplugin import addDirectoryItem, setProperty, setPluginCategory, setCont
 from resources.lib.addon.constants import NO_LABEL_FORMATTING, RANDOMISED_TRAKT, RANDOMISED_LISTS, TRAKT_LIST_OF_LISTS, TMDB_BASIC_LISTS, TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, ROUTE_NO_ID, ROUTE_TMDB_ID
 from resources.lib.addon.plugin import convert_type, reconfigure_legacy_params, get_setting, executebuiltin
 from resources.lib.addon.parser import parse_paramstring, try_int
-from resources.lib.addon.setutils import split_items, random_from_list, merge_two_dicts
+from resources.lib.addon.setutils import split_items, merge_two_dicts
 from resources.lib.addon.thread import ParallelThread
 from resources.lib.api.mapping import set_show, get_empty_item, is_excluded
 from resources.lib.api.kodi.rpc import get_kodi_library, get_movie_details, get_tvshow_details, get_episode_details, get_season_details, set_playprogress
@@ -17,10 +17,14 @@ from resources.lib.api.fanarttv.api import FanartTV
 from resources.lib.api.omdb.api import OMDb
 from resources.lib.items.builder import ItemBuilder
 from resources.lib.items.basedir import BaseDirLists
-from resources.lib.script.router import related_lists
-from resources.lib.player.players import Players
 from resources.lib.addon.logger import kodi_log, TimerList
 from threading import Thread
+
+""" Lazyimports """
+from resources.lib.addon.modimp import lazyimport_module
+random = None
+Players = None  # resources.lib.player.players
+related_lists = None  # resources.lib.script.router
 
 
 PREBUILD_PARENTSHOW = ['seasons', 'episodes', 'episode_groups', 'trakt_upnext', 'episode_group_seasons']
@@ -360,7 +364,15 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.parent_params = kwargs
         return self.get_items(**kwargs)
 
+    @lazyimport_module(globals(), 'random')
     def list_randomised(self, **kwargs):
+        def random_from_list(i, remove_next_page=True):
+            if not i or not isinstance(i, list) or len(i) < 2:
+                return
+            item = random.choice(i)
+            if remove_next_page and isinstance(item, dict) and 'next_page' in item:
+                return random_from_list(i, remove_next_page=True)
+            return item
         params = merge_two_dicts(kwargs, RANDOMISED_LISTS.get(kwargs.get('info'), {}).get('params'))
         item = random_from_list(self.get_items(**params))
         if not item:
@@ -457,12 +469,14 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         if self.container_refresh:
             executebuiltin('Container.Refresh')
 
+    @lazyimport_module(globals(), 'resources.lib.player.players', import_attr='Players')
     def play_external(self, **kwargs):
         kodi_log(['lib.container.router - Attempting to play item\n', kwargs], 1)
         if not kwargs.get('tmdb_id'):
             kwargs['tmdb_id'] = self.tmdb_api.get_tmdb_id(**kwargs)
         Players(**kwargs).play(handle=self.handle if self.handle != -1 else None)
 
+    @lazyimport_module(globals(), 'resources.lib.script.router', import_attr='related_lists')
     def context_related(self, **kwargs):
         if not kwargs.get('tmdb_id'):
             kwargs['tmdb_id'] = self.tmdb_api.get_tmdb_id(**kwargs)

@@ -1,5 +1,9 @@
 import re
-from urllib.parse import urlencode, unquote_plus
+
+""" Lazyimports """
+from resources.lib.addon.modimp import lazyimport_module
+urlencode = None  # urllib.parse
+unquote_plus = None  # urllib.parse
 
 PLUGINPATH = u'plugin://plugin.video.themoviedb.helper/'
 
@@ -37,6 +41,7 @@ def try_type(value, output=None):
         return try_float(value)
 
 
+@lazyimport_module(globals(), 'urllib.parse', import_attr='unquote_plus')
 def parse_paramstring(paramstring):
     """ helper to assist to standardise urllib parsing """
     params = dict()
@@ -49,6 +54,7 @@ def parse_paramstring(paramstring):
     return params
 
 
+@lazyimport_module(globals(), 'urllib.parse', import_attr='urlencode')
 def encode_url(path=None, **kwargs):
     path = path or PLUGINPATH
     paramstring = f'?{urlencode(kwargs)}' if kwargs else ''
