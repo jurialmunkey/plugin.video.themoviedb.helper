@@ -6,10 +6,10 @@ from xbmcaddon import Addon as KodiAddon
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, format_folderpath, get_localized, get_setting, executebuiltin, get_infolabel
 from resources.lib.addon.parser import try_int, try_float
-from resources.lib.addon.constants import PLAYERS_PRIORITY
+from resources.lib.addon.consts import PLAYERS_PRIORITY
 from resources.lib.addon.dialog import BusyDialog, ProgressDialog
 from resources.lib.items.listitem import ListItem
-from resources.lib.files.utils import read_file, normalise_filesize
+from resources.lib.files.futils import read_file, normalise_filesize
 from resources.lib.api.kodi.rpc import get_directory, KodiLibrary
 from resources.lib.player.details import get_item_details, get_detailed_item, get_playerstring, get_language_details
 from resources.lib.player.inputter import KeyboardInputter

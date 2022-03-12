@@ -1,9 +1,9 @@
 from xbmcgui import Dialog
 from resources.lib.addon.plugin import ADDONPATH, get_mpaa_prefix, get_language, convert_type, get_setting, get_localized
-from resources.lib.addon.constants import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, TMDB_GENRE_IDS, CACHE_SHORT, CACHE_LONG
+from resources.lib.addon.consts import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, TMDB_GENRE_IDS, CACHE_SHORT, CACHE_LONG
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.window import get_property
-from resources.lib.files.utils import use_json_filecache, validify_filename
+from resources.lib.files.futils import use_json_filecache, validify_filename
 from resources.lib.items.listitem import ListItem
 from resources.lib.items.pages import PaginatedItems
 from resources.lib.api.request import RequestAPI
@@ -15,8 +15,8 @@ from urllib.parse import quote_plus
 from resources.lib.addon.modimp import lazyimport_modules
 Downloader = None  # resources.lib.files.downloader
 json = None
-get_datetime_now = None  # from resources.lib.addon.timedate
-get_timedelta = None  # from resources.lib.addon.timedate
+get_datetime_now = None  # from resources.lib.addon.tmdate
+get_timedelta = None  # from resources.lib.addon.tmdate
 
 
 ARTWORK_QUALITY = get_setting('artwork_quality', 'int')
@@ -408,8 +408,8 @@ class TMDb(RequestAPI):
         return sorted(raw_list, key=lambda k: k.get(sorting, ''), reverse=reverse) if sorting else raw_list
 
     @lazyimport_modules(globals(), (
-        {'module_name': 'resources.lib.addon.timedate', 'import_attr': 'get_datetime_now'},
-        {'module_name': 'resources.lib.addon.timedate', 'import_attr': 'get_timedelta'}))
+        {'module_name': 'resources.lib.addon.tmdate', 'import_attr': 'get_datetime_now'},
+        {'module_name': 'resources.lib.addon.tmdate', 'import_attr': 'get_timedelta'}))
     def get_daily_list(self, export_list, sorting=None, reverse=False):
         if not export_list:
             return

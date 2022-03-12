@@ -1,9 +1,9 @@
 from xbmc import Monitor
 from resources.lib.addon.parser import try_int
 from threading import Thread
-from resources.lib.addon.timedate import convert_timestamp, get_datetime_now, get_timedelta, get_datetime_today, get_datetime_time, get_datetime_combine
+from resources.lib.addon.tmdate import convert_timestamp, get_datetime_now, get_timedelta, get_datetime_today, get_datetime_time, get_datetime_combine
 from resources.lib.addon.plugin import get_setting, executebuiltin, get_infolabel
-from resources.lib.files.utils import delete_folder
+from resources.lib.files.futils import delete_folder
 
 
 class CronJobMonitor(Thread):

@@ -1,11 +1,11 @@
 from resources.lib.addon.plugin import format_name
-from resources.lib.files.utils import get_filecache_name
+from resources.lib.files.futils import get_filecache_name
 from resources.lib.addon.logger import kodi_log, kodi_try_except
 
 """ Lazyimports """
 from resources.lib.addon.modimp import lazyimport_module
 sqlite3 = None
-SimpleCache = None  # resources.lib.files.simplecache
+SimpleCache = None  # resources.lib.files.scache
 
 SEARCH_HISTORY = 'search_history.db'
 
@@ -20,7 +20,7 @@ class BasicCache(object):
         self._id_list = []
 
     @kodi_try_except('lib.addon.cache ret_cache')
-    @lazyimport_module(globals(), 'resources.lib.files.simplecache', import_attr='SimpleCache')
+    @lazyimport_module(globals(), 'resources.lib.files.scache', import_attr='SimpleCache')
     def ret_cache(self):
         if not self._cache:
             self._cache = SimpleCache(filename=self._filename, mem_only=self._mem_only, delay_write=self._delaywrite)

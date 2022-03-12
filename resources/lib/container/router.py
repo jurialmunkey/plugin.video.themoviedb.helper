@@ -1,9 +1,9 @@
 import sys
 from xbmcplugin import addDirectoryItem, setProperty, setPluginCategory, setContent, endOfDirectory
-from resources.lib.addon.constants import NO_LABEL_FORMATTING, RANDOMISED_TRAKT, RANDOMISED_LISTS, TRAKT_LIST_OF_LISTS, TMDB_BASIC_LISTS, TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, ROUTE_NO_ID, ROUTE_TMDB_ID
+from resources.lib.addon.consts import NO_LABEL_FORMATTING, RANDOMISED_TRAKT, RANDOMISED_LISTS, TRAKT_LIST_OF_LISTS, TMDB_BASIC_LISTS, TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, ROUTE_NO_ID, ROUTE_TMDB_ID
 from resources.lib.addon.plugin import convert_type, reconfigure_legacy_params, get_setting, executebuiltin
 from resources.lib.addon.parser import parse_paramstring, try_int
-from resources.lib.addon.setutils import split_items, merge_two_dicts
+from resources.lib.addon.sutils import split_items, merge_two_dicts
 from resources.lib.addon.thread import ParallelThread
 from resources.lib.api.mapping import set_show, get_empty_item, is_excluded
 from resources.lib.api.kodi.rpc import get_kodi_library, get_movie_details, get_tvshow_details, get_episode_details, get_season_details, set_playprogress

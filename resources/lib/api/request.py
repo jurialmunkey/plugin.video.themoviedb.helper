@@ -2,10 +2,10 @@ from xbmcgui import Dialog
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import get_localized, get_condvisibility
 from resources.lib.addon.parser import try_int
-from resources.lib.addon.timedate import get_timestamp, set_timestamp
-from resources.lib.files.cache import BasicCache
+from resources.lib.addon.tmdate import get_timestamp, set_timestamp
+from resources.lib.files.bcache import BasicCache
 from resources.lib.addon.logger import kodi_log
-from resources.lib.addon.constants import CACHE_SHORT, CACHE_LONG
+from resources.lib.addon.consts import CACHE_SHORT, CACHE_LONG
 
 """ Lazyimports """
 from resources.lib.addon.modimp import lazyimport_module, lazyimport_modules

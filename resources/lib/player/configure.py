@@ -3,9 +3,9 @@ from xbmcaddon import Addon as KodiAddon
 from resources.lib.addon.plugin import ADDONPATH, get_setting, get_localized, get_condvisibility
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.dialog import BusyDialog
-from resources.lib.addon.constants import PLAYERS_BASEDIR_BUNDLED, PLAYERS_BASEDIR_USER, PLAYERS_BASEDIR_SAVE, PLAYERS_PRIORITY
-from resources.lib.files.utils import get_files_in_folder
-from resources.lib.files.utils import read_file, dumps_to_file, delete_file
+from resources.lib.addon.consts import PLAYERS_BASEDIR_BUNDLED, PLAYERS_BASEDIR_USER, PLAYERS_BASEDIR_SAVE, PLAYERS_PRIORITY
+from resources.lib.files.futils import get_files_in_folder
+from resources.lib.files.futils import read_file, dumps_to_file, delete_file
 from resources.lib.items.listitem import ListItem
 from json import loads, dumps
 from copy import deepcopy

@@ -7,9 +7,9 @@ from xbmc import Monitor, sleep
 from contextlib import contextmanager
 from resources.lib.addon.plugin import get_setting
 from resources.lib.addon.logger import kodi_log
-from resources.lib.addon.timedate import set_timestamp
-from resources.lib.files.utils import get_file_path
-from resources.lib.files.utils import json_loads as data_loads
+from resources.lib.addon.tmdate import set_timestamp
+from resources.lib.files.futils import get_file_path
+from resources.lib.files.futils import json_loads as data_loads
 from json import dumps as data_dumps
 
 """ Lazyimports """

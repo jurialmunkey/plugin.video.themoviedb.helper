@@ -3,7 +3,7 @@ from xbmcgui import Dialog
 from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.plugin import get_setting, get_localized
 from resources.lib.addon.parser import try_int
-from resources.lib.files.utils import validify_filename, make_path, write_to_file, get_tmdb_id_nfo
+from resources.lib.files.futils import validify_filename, make_path, write_to_file, get_tmdb_id_nfo
 from resources.lib.api.trakt.api import TraktAPI
 from resources.lib.addon.logger import kodi_log
 

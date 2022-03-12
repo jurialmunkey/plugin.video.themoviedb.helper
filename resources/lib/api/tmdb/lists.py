@@ -1,4 +1,4 @@
-from resources.lib.addon.constants import TMDB_BASIC_LISTS
+from resources.lib.addon.consts import TMDB_BASIC_LISTS
 from resources.lib.addon.plugin import convert_type, get_plugin_category, get_setting, get_localized
 
 

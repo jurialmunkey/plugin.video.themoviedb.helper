@@ -1,6 +1,6 @@
-from resources.lib.addon.timedate import get_timedelta, get_datetime_today
+from resources.lib.addon.tmdate import get_timedelta, get_datetime_today
 from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized
-from resources.lib.addon.setutils import merge_two_items
+from resources.lib.addon.sutils import merge_two_items
 from resources.lib.items.builder import ItemBuilder
 from json import dumps
 
