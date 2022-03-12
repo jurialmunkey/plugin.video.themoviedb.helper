@@ -6,7 +6,7 @@ from resources.lib.addon.window import get_property
 from resources.lib.addon.timedate import get_datetime_now, get_timedelta
 from resources.lib.files.cache import CACHE_SHORT, CACHE_LONG
 from resources.lib.files.downloader import Downloader
-from resources.lib.files.utils import use_pickle, validify_filename
+from resources.lib.files.utils import use_json_filecache, validify_filename
 from resources.lib.items.listitem import ListItem
 from resources.lib.items.pages import PaginatedItems
 from resources.lib.api.request import RequestAPI
@@ -406,10 +406,10 @@ class TMDb(RequestAPI):
         datestamp = get_datetime_now() - get_timedelta(days=2)
         datestamp = datestamp.strftime("%m_%d_%Y")
         # Pickle results rather than cache due to being such a large list
-        return use_pickle(
+        return use_json_filecache(
             self._get_downloaded_list,
             export_list=export_list, sorting=sorting, reverse=reverse, datestamp=datestamp,
-            cache_name=f'TMDb.Downloaded.List.v2.{export_list}.{sorting}.{reverse}')
+            cache_name=f'TMDb.Downloaded.List.v3.{export_list}.{sorting}.{reverse}')
 
     def get_all_items_list(self, tmdb_type, page=None):
         if tmdb_type not in TMDB_ALL_ITEMS_LISTS:

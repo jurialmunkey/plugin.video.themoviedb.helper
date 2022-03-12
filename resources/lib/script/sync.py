@@ -1,7 +1,8 @@
 # Module: default
 # Author: jurialmunkey
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
-from resources.lib.addon.dialog import BusyDialog, kodi_dialog_ok, kodi_dialog_contextmenu, kodi_dialog_input, kodi_dialog_yesno, kodi_dialog_select, kodi_dialog_textviewer
+from xbmcgui import Dialog
+from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.plugin import set_kwargattr, convert_trakt_type, get_localized, executebuiltin, get_infolabel
 from resources.lib.api.trakt.api import TraktAPI
@@ -99,7 +100,7 @@ class _Menu():
         """ Ask user to select menu item """
         if not self.menu:
             return
-        x = kodi_dialog_contextmenu([i.name for i in self.menu])
+        x = Dialog().contextmenu([i.name for i in self.menu])
         if x == -1:
             return
         return self.menu[x]
@@ -113,14 +114,14 @@ class _Menu():
             return
         if item._sync and item._sync.status_code in [200, 201, 204]:
             self._trakt._cache.del_cache('trakt.last_activities')  # Wipe last activities cache to update now
-            kodi_dialog_ok(
+            Dialog().ok(
                 get_localized(32295),
                 get_localized(32297).format(
                     item.name, self.trakt_type, self.id_type.upper(), self.unique_id))
             executebuiltin('Container.Refresh')
             executebuiltin('UpdateLibrary(video,/fake/path/to/force/refresh/on/home)')
             return
-        kodi_dialog_ok(
+        Dialog().ok(
             get_localized(32295),
             get_localized(32296).format(
                 item.name, self.trakt_type, self.id_type.upper(), self.unique_id))
@@ -168,7 +169,7 @@ class _UserList():
 
     def _addlist(self):
         """ Create a new Trakt list and returns tuple of list and user slug """
-        name = kodi_dialog_input(get_localized(32356))
+        name = Dialog().input(get_localized(32356))
         if not name:
             return
         response = self._trakt.post_response('users/me/lists', postdata={'name': name})
@@ -187,7 +188,7 @@ class _UserList():
         with BusyDialog():
             list_sync = self._trakt.get_list_of_lists('users/me/lists') or []
             list_sync.append({'label': get_localized(32299)})
-        x = kodi_dialog_contextmenu([i.get('label') for i in list_sync])
+        x = Dialog().contextmenu([i.get('label') for i in list_sync])
         if x == -1:
             return
         if list_sync[x].get('label') == get_localized(32299):
@@ -202,7 +203,7 @@ class _UserList():
         """
         if slug and slug not in get_monitor_userlists():
             return
-        if confirm and not kodi_dialog_yesno(get_localized(20444), get_localized(32362)):
+        if confirm and not Dialog().yesno(get_localized(20444), get_localized(32362)):
             return
         add_to_library(tmdb_type, tmdb_id=tmdb_id)
 
@@ -232,16 +233,16 @@ class _Comments():
     def _getcomment(self, itemlist, comments):
         """ Get a comment from a list of comments """
         if not itemlist:
-            kodi_dialog_ok(get_localized(32305), get_localized(32306))
+            Dialog().ok(get_localized(32305), get_localized(32306))
             return -1
-        x = kodi_dialog_select(get_localized(32305), itemlist)
+        x = Dialog().select(get_localized(32305), itemlist)
         if x == -1:
             return -1
         info = comments[x].get('comment')
         name = comments[x].get('user', {}).get('name')
         rate = comments[x].get('user_stats', {}).get('rating')
         info = f'{info}\n\n{get_localized(563)} {rate}/10' if rate else f'{info}'
-        kodi_dialog_textviewer(name, info)
+        Dialog().textviewer(name, info)
         return self._getcomment(itemlist, comments)
 
     def sync(self):

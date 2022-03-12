@@ -1,7 +1,8 @@
+from xbmcgui import Dialog
 from resources.lib.items.listitem import ListItem
 from resources.lib.api.fanarttv.api import ARTWORK_TYPES
 from resources.lib.api.tmdb.mapping import get_imagepath_poster, get_imagepath_fanart, get_imagepath_thumb, get_imagepath_logo
-from resources.lib.addon.dialog import BusyDialog, kodi_dialog_select, kodi_notification, kodi_dialog_contextmenu, kodi_dialog_ok
+from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.plugin import get_localized, executebuiltin
 
 
@@ -36,7 +37,7 @@ class _ArtworkSelector():
 
     def select_type(self, ftv_type, blacklist=[]):
         artwork_types = [i for i in ARTWORK_TYPES.get(ftv_type, []) if i not in blacklist]  # Remove types that we previously looked for
-        choice = kodi_dialog_select(get_localized(13511), artwork_types)
+        choice = Dialog().select(get_localized(13511), artwork_types)
         if choice == -1:
             return
         return artwork_types[choice]
@@ -62,14 +63,14 @@ class _ArtworkSelector():
 
         # Nothing found so notify user
         if not items:
-            kodi_notification(
+            Dialog().notification(
                 get_localized(39123),
                 get_localized(32217).format(tmdb_type, tmdb_id))
             blacklist.append(artwork_type)  # Blacklist artwork type if not found before reprompting
             return self.select_artwork(tmdb_type, tmdb_id, container_refresh, blacklist, season=season)
 
         # Choose artwork from options
-        choice = kodi_dialog_select(get_localized(13511), items, useDetails=True)
+        choice = Dialog().select(get_localized(13511), items, useDetails=True)
         if choice == -1:  # If user hits back go back to main menu rather than exit completely
             return self.select_artwork(tmdb_type, tmdb_id, container_refresh, blacklist, season=season)
         success = items[choice].getLabel()
@@ -93,13 +94,13 @@ class _ArtworkSelector():
         with BusyDialog():
             item = self.get_item(tmdb_type, tmdb_id, season, cache_refresh=True)
         if not item:
-            return kodi_dialog_ok(
+            return Dialog().ok(
                 get_localized(39123),
                 get_localized(32217).format(tmdb_type, tmdb_id)) if ok_dialog else None
         if ok_dialog:
             artwork_types = {k.capitalize() for k, v in item['artwork'].get('tmdb', {}).items() if v}
             artwork_types |= {k.capitalize() for k, v in item['artwork'].get('fanarttv', {}).items() if v}
-            kodi_dialog_ok(
+            Dialog().ok(
                 get_localized(39123),
                 get_localized(32218).format(tmdb_type, tmdb_id, ', '.join(artwork_types)))
 
@@ -112,7 +113,7 @@ class _ArtworkSelector():
     def manage_artwork(self, tmdb_id=None, tmdb_type=None, season=None):
         if not tmdb_id or not tmdb_type:
             return
-        choice = kodi_dialog_contextmenu([
+        choice = Dialog().contextmenu([
             get_localized(32220),
             get_localized(32221)])
         if choice == -1:

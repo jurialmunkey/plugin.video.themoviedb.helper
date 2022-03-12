@@ -1,4 +1,3 @@
-from resources.lib.files.utils import set_pickle, get_pickle
 from resources.lib.addon.plugin import format_name
 from resources.lib.addon.logger import kodi_log
 
@@ -38,7 +37,7 @@ def use_lastupdated_cache(cache, func, *args, sync_info=None, cache_name='', **k
     return response
 
 
-def use_activity_cache(activity_type=None, activity_key=None, cache_days=None, pickle_object=False):
+def use_activity_cache(activity_type=None, activity_key=None, cache_days=None):
     """
     Decorator to cache and refresh if last activity changes
     Optionally can pickle instead of cache if necessary (useful for large objects like sync lists)
@@ -50,8 +49,8 @@ def use_activity_cache(activity_type=None, activity_key=None, cache_days=None, p
                 return
 
             # Setup getter/setter cache funcs
-            func_get = get_pickle if pickle_object else self._cache.get_cache
-            func_set = set_pickle if pickle_object else self._cache.set_cache
+            func_get = self._cache.get_cache
+            func_set = self._cache.set_cache
 
             # Set cache_name
             cache_name = f'{func.__name__}.'

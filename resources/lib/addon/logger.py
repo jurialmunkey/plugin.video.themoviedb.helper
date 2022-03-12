@@ -25,14 +25,31 @@ def kodi_log(value, level=0):
         xbmc.log(f'Logging Error: {exc}', level=xbmc.LOGINFO)
 
 
-def kodi_log_traceback(exception, log_msg=None, log_level=1):
+def kodi_traceback(exception, log_msg=None, log_level=1, notification=True):
     """ Method for logging caught exceptions and notifying user """
+    if notification:
+        from xbmcgui import Dialog
+        from resources.lib.addon.plugin import get_localized
+        head = f'TheMovieDb Helper {get_localized(257)}'
+        Dialog().notification(head, get_localized(2104))
     msg = f'Error Type: {type(exception).__name__}\nError Contents: {exception.args!r}'
     msg = [log_msg, '\n', msg, '\n'] if log_msg else [msg, '\n']
     try:
         kodi_log(msg + traceback.format_tb(exception.__traceback__), log_level)
     except Exception as exc:
         kodi_log(f'ERROR WITH TRACEBACK!\n{exc}\n{msg}', log_level)
+
+
+def kodi_try_except(log_msg, exception_type=Exception):
+    """ Decorator to catch exceptions and notify error for uninterruptable services """
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except exception_type as exc:
+                kodi_traceback(exc, log_msg)
+        return wrapper
+    return decorator
 
 
 class TryExceptLog():
