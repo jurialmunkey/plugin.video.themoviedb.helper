@@ -5,7 +5,7 @@ from resources.lib.addon.parser import try_int
 from resources.lib.addon.sutils import split_items, merge_two_dicts
 from resources.lib.addon.thread import ParallelThread
 from resources.lib.api.mapping import set_show, get_empty_item, is_excluded
-from resources.lib.api.kodi.rpc import get_kodi_library, get_movie_details, get_tvshow_details, get_episode_details, get_season_details, set_playprogress
+from resources.lib.api.kodi.rpc import get_kodi_library, get_movie_details, get_tvshow_details, get_episode_details, get_season_details
 from resources.lib.api.tmdb.api import TMDb
 from resources.lib.api.tmdb.lists import TMDbLists
 from resources.lib.api.tmdb.search import SearchLists
@@ -14,6 +14,7 @@ from resources.lib.api.trakt.api import TraktAPI
 from resources.lib.api.trakt.lists import TraktLists
 from resources.lib.api.fanarttv.api import FanartTV
 from resources.lib.api.omdb.api import OMDb
+from resources.lib.items.trakt import TraktMethods
 from resources.lib.items.builder import ItemBuilder
 from resources.lib.items.basedir import BaseDirLists
 from resources.lib.addon.logger import kodi_log, TimerList
@@ -70,10 +71,12 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         self.timer_lists = {}
 
         # Trakt Watched Progress Settings
-        self.trakt_hidewatched = get_setting('widgets_hidewatched') if self.is_widget else False
-        self.trakt_watchedindicators = get_setting('trakt_watchedindicators')
-        self.trakt_watchedinprogress = get_setting('trakt_watchedinprogress')
-        self.trakt_playprogress = get_setting('trakt_playprogress')
+        self.hide_watched = get_setting('widgets_hidewatched') if self.is_widget else False
+        self.trakt_method = TraktMethods(
+            trakt=self.trakt_api,
+            watchedindicators=get_setting('trakt_watchedindicators'),
+            pauseplayprogress=get_setting('trakt_playprogress'),
+            unwatchedepisodes=get_setting('trakt_watchedinprogress'))
 
         # Miscellaneous
         self.nodate_is_unaired = get_setting('nodate_is_unaired')  # Consider items with no date to be
@@ -131,8 +134,8 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
 
         # Add Trakt playcount and watched status
         li.set_details(details=self.get_kodi_details(li), reverse=True)  # Add details from Kodi library first if available
-        li.set_playcount(playcount=self.get_playcount_from_trakt(li))
-        if self.trakt_hidewatched and try_int(li.infolabels.get('playcount')) != 0:
+        li.set_playcount(playcount=self.trakt_method.get_playcount(li))
+        if self.hide_watched and try_int(li.infolabels.get('playcount')) != 0:
             return
 
         li.set_context_menu()  # Set the context menu items
@@ -145,7 +148,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb to prevent Kodi overwriting
         if li.next_page:
             li.params['plugin_category'] = self.plugin_category  # Carry the plugin category to next page in plugin:// path
-        self.set_playprogress_from_trakt(li)
+        self.trakt_method.set_playprogress(li)
         return {'url': li.get_url(), 'listitem': li.get_listitem(), 'isFolder': li.is_folder}
 
     def add_items(self, items=None, pagination=True, property_params=None, kodi_db=None):
@@ -202,91 +205,6 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         setPluginCategory(self.handle, plugin_category)  # Container.PluginCategory
         setContent(self.handle, container_content)  # Container.Content
         endOfDirectory(self.handle, updateListing=update_listing)
-
-    def _set_playprogress_from_trakt(self, li):
-        if li.infolabels.get('mediatype') == 'movie':
-            return self.trakt_api.get_movie_playprogress(
-                id_type='tmdb',
-                unique_id=try_int(li.unique_ids.get('tmdb')))
-        return self.trakt_api.get_episode_playprogress(
-            id_type='tmdb',
-            unique_id=try_int(li.unique_ids.get('tmdb')),
-            season=li.infolabels.get('season'),
-            episode=li.infolabels.get('episode'))
-
-    def set_playprogress_from_trakt(self, li):
-        if not self.trakt_playprogress:
-            return
-        if li.infolabels.get('mediatype') not in ['movie', 'episode']:
-            return
-        duration = li.infolabels.get('duration')
-        if not duration:
-            return
-        progress = self._set_playprogress_from_trakt(li)
-        if not progress:
-            return
-        if progress < 4 or progress > 96:
-            return
-        set_playprogress(li.get_url(), int(duration * progress // 100), duration)
-
-    def pre_sync_trakt(self):
-        list_info = self.params.get('info')
-        tmdb_type = self.params.get('tmdb_type')
-
-        info_movies = ['stars_in_movies', 'crew_in_movies', 'trakt_userlist']
-        if tmdb_type in ['movie', 'both'] or list_info in info_movies:
-            if self.trakt_watchedindicators:
-                self.trakt_api.get_sync('watched', 'movie', 'tmdb')
-            if self.trakt_playprogress:
-                self.trakt_api.get_sync('playback', 'movie', 'tmdb')
-
-        info_tvshow = ['stars_in_tvshows', 'crew_in_tvshows', 'trakt_userlist', 'trakt_calendar']
-        if tmdb_type in ['tv', 'season', 'both'] or list_info in info_tvshow:
-            tmdbid = try_int(self.params.get('tmdb_id'), fallback=None)
-            season = try_int(self.params.get('season', -2), fallback=-2)  # Use -2 to force all seasons lookup data on Trakt at seasons level
-            if self.trakt_watchedindicators:
-                self.trakt_api.get_sync('watched', 'show', 'tmdb')
-                if tmdbid:
-                    self.trakt_api.get_episodes_airedcount(id_type='tmdb', unique_id=tmdbid, season=season)
-                    self.trakt_api.get_episodes_watchcount(id_type='tmdb', unique_id=tmdbid, season=season)
-            if self.trakt_playprogress and tmdbid and season != -2:
-                self.trakt_api.get_sync('playback', 'show', 'tmdb')
-
-    def get_playcount_from_trakt(self, li):
-        if not self.trakt_watchedindicators:
-            return
-        if li.infolabels.get('mediatype') == 'movie':
-            return self.trakt_api.get_movie_playcount(
-                id_type='tmdb',
-                unique_id=try_int(li.unique_ids.get('tmdb'))) or 0
-        if li.infolabels.get('mediatype') == 'episode':
-            return self.trakt_api.get_episode_playcount(
-                id_type='tmdb',
-                unique_id=try_int(li.unique_ids.get('tvshow.tmdb')),
-                season=li.infolabels.get('season'),
-                episode=li.infolabels.get('episode')) or 0
-        if li.infolabels.get('mediatype') == 'tvshow':
-            air_count = self.trakt_api.get_episodes_airedcount(
-                id_type='tmdb',
-                unique_id=try_int(li.unique_ids.get('tmdb')))
-            if not air_count:
-                return None if self.trakt_watchedinprogress else 0
-            li.infolabels['episode'] = air_count
-            return self.trakt_api.get_episodes_watchcount(
-                id_type='tmdb',
-                unique_id=try_int(li.unique_ids.get('tmdb'))) or 0
-        if li.infolabels.get('mediatype') == 'season':
-            air_count = self.trakt_api.get_episodes_airedcount(
-                id_type='tmdb',
-                unique_id=try_int(li.unique_ids.get('tmdb')),
-                season=li.infolabels.get('season'))
-            if not air_count:
-                return None if self.trakt_watchedinprogress else 0
-            li.infolabels['episode'] = air_count
-            return self.trakt_api.get_episodes_watchcount(
-                id_type='tmdb',
-                unique_id=try_int(li.unique_ids.get('tmdb')),
-                season=li.infolabels.get('season')) or 0
 
     def get_kodi_database(self, tmdb_type):
         with TimerList(self.timer_lists, ' - kodi_db', logging=self.log_timers):
@@ -442,7 +360,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
 
     def get_directory(self):
         with TimerList(self.timer_lists, 'total', logging=self.log_timers):
-            self._pre_sync = Thread(target=self.pre_sync_trakt)
+            self._pre_sync = Thread(target=self.trakt_method.pre_sync, kwargs=self.params)
             self._pre_sync.start()
             with TimerList(self.timer_lists, 'get_list', logging=self.log_timers):
                 items = self.get_items(**self.params)
