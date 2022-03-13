@@ -67,3 +67,11 @@ def get_between_strings(string, startswith='', endswith=''):
         return re.search(exp, string).group(1)
     except AttributeError:
         return ''
+
+
+def reconfigure_legacy_params(**kwargs):
+    if 'type' in kwargs:
+        kwargs['tmdb_type'] = kwargs.pop('type')
+    if kwargs.get('tmdb_type') in ['season', 'episode']:
+        kwargs['tmdb_type'] = 'tv'
+    return kwargs

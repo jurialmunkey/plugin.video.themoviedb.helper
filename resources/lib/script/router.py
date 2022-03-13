@@ -6,9 +6,9 @@ import xbmcvfs
 from xbmcgui import Dialog
 from json import dumps
 from resources.lib.addon.window import get_property
-from resources.lib.addon.plugin import reconfigure_legacy_params, format_folderpath, convert_type, get_localized, get_setting, set_setting, executebuiltin, get_infolabel
+from resources.lib.addon.plugin import format_folderpath, convert_type, get_localized, get_setting, set_setting, executebuiltin, get_infolabel
 from resources.lib.addon.dialog import BusyDialog, ProgressDialog
-from resources.lib.addon.parser import encode_url, parse_paramstring
+from resources.lib.addon.parser import encode_url, parse_paramstring, reconfigure_legacy_params
 from resources.lib.files.downloader import Downloader
 from resources.lib.files.futils import dumps_to_file, validify_filename, read_file
 from resources.lib.items.basedir import get_basedir_details

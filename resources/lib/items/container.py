@@ -1,8 +1,7 @@
-import sys
 from xbmcplugin import addDirectoryItem, setProperty, setPluginCategory, setContent, endOfDirectory
 from resources.lib.addon.consts import NO_LABEL_FORMATTING, RANDOMISED_TRAKT, RANDOMISED_LISTS, TRAKT_LIST_OF_LISTS, TMDB_BASIC_LISTS, TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, ROUTE_NO_ID, ROUTE_TMDB_ID
-from resources.lib.addon.plugin import convert_type, reconfigure_legacy_params, get_setting, executebuiltin
-from resources.lib.addon.parser import parse_paramstring, try_int
+from resources.lib.addon.plugin import convert_type, get_setting, executebuiltin
+from resources.lib.addon.parser import try_int
 from resources.lib.addon.sutils import split_items, merge_two_dicts
 from resources.lib.addon.thread import ParallelThread
 from resources.lib.api.mapping import set_show, get_empty_item, is_excluded
@@ -23,8 +22,6 @@ from threading import Thread
 """ Lazyimports """
 from resources.lib.addon.modimp import lazyimport_module
 random = None
-Players = None  # resources.lib.player.players
-related_lists = None  # resources.lib.script.router
 
 
 PREBUILD_PARENTSHOW = ['seasons', 'episodes', 'episode_groups', 'trakt_upnext', 'episode_group_seasons']
@@ -32,11 +29,11 @@ LOG_TIMER_ITEMS = ['item_api', 'item_tmdb', 'item_ftv', 'item_map', 'item_cache'
 
 
 class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLists):
-    def __init__(self):
+    def __init__(self, handle, paramstring, **kwargs):
         # plugin:// params configuration
-        self.handle = int(sys.argv[1])  # plugin:// handle
-        self.paramstring = sys.argv[2][1:]  # plugin://plugin.video.themoviedb.helper?paramstring
-        self.params = reconfigure_legacy_params(**parse_paramstring(self.paramstring))  # paramstring dictionary
+        self.handle = handle  # plugin:// handle
+        self.paramstring = paramstring  # plugin://plugin.video.themoviedb.helper?paramstring
+        self.params = kwargs  # paramstring dictionary
         self.parent_params = self.params.copy()  # TODO: CLEANUP
         self.is_widget = self.params.pop('widget', '').lower() == 'true'
         self.is_cacheonly = self.params.pop('cacheonly', '').lower() == 'true'
@@ -468,24 +465,3 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             executebuiltin(f'Container.Update({self.container_update})')
         if self.container_refresh:
             executebuiltin('Container.Refresh')
-
-    @lazyimport_module(globals(), 'resources.lib.player.players', import_attr='Players')
-    def play_external(self, **kwargs):
-        kodi_log(['lib.container.router - Attempting to play item\n', kwargs], 1)
-        if not kwargs.get('tmdb_id'):
-            kwargs['tmdb_id'] = self.tmdb_api.get_tmdb_id(**kwargs)
-        Players(**kwargs).play(handle=self.handle if self.handle != -1 else None)
-
-    @lazyimport_module(globals(), 'resources.lib.script.router', import_attr='related_lists')
-    def context_related(self, **kwargs):
-        if not kwargs.get('tmdb_id'):
-            kwargs['tmdb_id'] = self.tmdb_api.get_tmdb_id(**kwargs)
-        kwargs['container_update'] = True
-        related_lists(include_play=True, **kwargs)
-
-    def router(self):
-        if self.params.get('info') == 'play':
-            return self.play_external(**self.params)
-        if self.params.get('info') == 'related':
-            return self.context_related(**self.params)
-        self.get_directory()

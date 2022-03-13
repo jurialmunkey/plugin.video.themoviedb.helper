@@ -87,14 +87,6 @@ def format_folderpath(path, content='videos', affix='return', info=None, play='P
     return f'ActivateWindow({content},{path},{affix})'
 
 
-def reconfigure_legacy_params(**kwargs):
-    if 'type' in kwargs:
-        kwargs['tmdb_type'] = kwargs.pop('type')
-    if kwargs.get('tmdb_type') in ['season', 'episode']:
-        kwargs['tmdb_type'] = 'tv'
-    return kwargs
-
-
 def set_kwargattr(obj, kwargs):
     for k, v in kwargs.items():
         setattr(obj, k, v)
