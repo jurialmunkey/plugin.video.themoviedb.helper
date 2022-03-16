@@ -138,3 +138,29 @@ class TimerList():
         total_time = timer_z - self.timer_a
         if total_time > self.log_threshold:
             self.list_obj.append(total_time)
+
+
+def log_timer_report(timer_lists, paramstring):
+    _threaded = [
+        'item_api', 'item_tmdb', 'item_ftv', 'item_map', 'item_cache',
+        'item_set', 'item_get', 'item_getx', 'item_non', 'item_nonx', 'item_art']
+    total_log = timer_lists.pop('total', 0)
+    timer_log = ['DIRECTORY TIMER REPORT\n', paramstring, '\n']
+    timer_log.append('------------------------------\n')
+    for k, v in timer_lists.items():
+        if k in _threaded:
+            avg_time = f'{sum(v) / len(v):7.3f} sec avg | {max(v):7.3f} sec max | {len(v):3}' if v else '  None'
+            timer_log.append(f' - {k:12s}: {avg_time}\n')
+        elif k[:4] == 'item':
+            avg_time = f'{sum(v) / len(v):7.3f} sec avg | {sum(v):7.3f} sec all | {len(v):3}' if v else '  None'
+            timer_log.append(f' - {k:12s}: {avg_time}\n')
+        else:
+            tot_time = f'{sum(v) / len(v):7.3f} sec' if v else '  None'
+            timer_log.append(f'{k:15s}: {tot_time}\n')
+    timer_log.append('------------------------------\n')
+    tot_time = f'{sum(total_log) / len(total_log):7.3f} sec' if total_log else '  None'
+    timer_log.append(f'{"Total":15s}: {tot_time}\n')
+    for k, v in timer_lists.items():
+        if v and k in _threaded:
+            timer_log.append(f'\n{k}:\n{" ".join([f"{i:.3f} " for i in v])}\n')
+    kodi_log(timer_log, 1)

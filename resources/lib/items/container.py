@@ -4,8 +4,7 @@ from resources.lib.addon.plugin import convert_type, get_setting, executebuiltin
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.sutils import split_items, merge_two_dicts
 from resources.lib.addon.thread import ParallelThread
-from resources.lib.api.mapping import set_show, get_empty_item, is_excluded
-from resources.lib.api.kodi.rpc import get_kodi_library, get_movie_details, get_tvshow_details, get_episode_details, get_season_details
+from resources.lib.api.mapping import is_excluded
 from resources.lib.api.tmdb.api import TMDb
 from resources.lib.api.tmdb.lists import TMDbLists
 from resources.lib.api.tmdb.search import SearchLists
@@ -17,16 +16,16 @@ from resources.lib.api.omdb.api import OMDb
 from resources.lib.items.trakt import TraktMethods
 from resources.lib.items.builder import ItemBuilder
 from resources.lib.items.basedir import BaseDirLists
-from resources.lib.addon.logger import kodi_log, TimerList
+from resources.lib.addon.logger import kodi_log, TimerList, log_timer_report
 from threading import Thread
 
 """ Lazyimports """
-from resources.lib.addon.modimp import lazyimport_module
+from resources.lib.addon.modimp import lazyimport_module, lazyimport
 random = None
+KodiDb = None  # from resources.lib.items.kodi import KodiDb
 
 
 PREBUILD_PARENTSHOW = ['seasons', 'episodes', 'episode_groups', 'trakt_upnext', 'episode_group_seasons']
-LOG_TIMER_ITEMS = ['item_api', 'item_tmdb', 'item_ftv', 'item_map', 'item_cache', 'item_set', 'item_get', 'item_getx', 'item_non', 'item_nonx', 'item_art']
 
 
 class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLists):
@@ -57,7 +56,6 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
 
         # KodiDB
         self.kodi_db = None
-        self.kodi_db_tv = {}  # TODO: Move to KodiDB module
 
         # API class initialisation
         self.ib = None
@@ -113,6 +111,12 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             return False
         return True
 
+    def get_kodi_database(self, tmdb_type):
+        if not get_setting('local_db'):
+            return
+        lazyimport(globals(), 'resources.lib.items.kodi', import_attr='KodiDb')
+        return KodiDb(tmdb_type)
+
     def _add_item(self, i, pagination=True):
         if not pagination and 'next_page' in i:
             return
@@ -132,8 +136,12 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
             if li.is_unaired(no_date=self.nodate_is_unaired):
                 return
 
+        try:  # Add details from Kodi library
+            li.set_details(details=self.kodi_db.get_kodi_details(li), reverse=True)
+        except AttributeError:
+            pass
+
         # Add Trakt playcount and watched status
-        li.set_details(details=self.get_kodi_details(li), reverse=True)  # Add details from Kodi library first if available
         li.set_playcount(playcount=self.trakt_method.get_playcount(li))
         if self.hide_watched and try_int(li.infolabels.get('playcount')) != 0:
             return
@@ -206,66 +214,6 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
         setContent(self.handle, container_content)  # Container.Content
         endOfDirectory(self.handle, updateListing=update_listing)
 
-    def get_kodi_database(self, tmdb_type):
-        with TimerList(self.timer_lists, ' - kodi_db', logging=self.log_timers):
-            if get_setting('local_db'):
-                return get_kodi_library(tmdb_type)
-
-    def get_kodi_parent_dbid(self, li):
-        if not self.kodi_db:
-            return
-        if li.infolabels.get('mediatype') in ['movie', 'tvshow']:
-            return self.kodi_db.get_info(
-                info='dbid',
-                imdb_id=li.unique_ids.get('imdb'),
-                tmdb_id=li.unique_ids.get('tmdb'),
-                tvdb_id=li.unique_ids.get('tvdb'),
-                originaltitle=li.infolabels.get('originaltitle'),
-                title=li.infolabels.get('title'),
-                year=li.infolabels.get('year'))
-        if li.infolabels.get('mediatype') in ['season', 'episode']:
-            return self.kodi_db.get_info(
-                info='dbid',
-                imdb_id=li.unique_ids.get('tvshow.imdb'),
-                tmdb_id=li.unique_ids.get('tvshow.tmdb'),
-                tvdb_id=li.unique_ids.get('tvshow.tvdb'),
-                title=li.infolabels.get('tvshowtitle'))
-
-    def get_kodi_details(self, li):
-        if not self.kodi_db:
-            return
-        dbid = self.get_kodi_parent_dbid(li)
-        if not dbid:
-            return
-        if li.infolabels.get('mediatype') == 'movie':
-            return get_movie_details(dbid)
-        if li.infolabels.get('mediatype') == 'tvshow':
-            return get_tvshow_details(dbid)
-        if li.infolabels.get('mediatype') == 'season':
-            return set_show(self.get_kodi_tvchild_details(
-                tvshowid=dbid,
-                season=li.infolabels.get('season'),
-                is_season=True) or get_empty_item(), get_tvshow_details(dbid))
-        if li.infolabels.get('mediatype') == 'episode':
-            return set_show(self.get_kodi_tvchild_details(
-                tvshowid=dbid,
-                season=li.infolabels.get('season'),
-                episode=li.infolabels.get('episode')) or get_empty_item(), get_tvshow_details(dbid))
-
-    def get_kodi_tvchild_details(self, tvshowid, season=None, episode=None, is_season=False):
-        if not tvshowid or not season or (not episode and not is_season):
-            return
-        library = 'season' if is_season else 'episode'
-        self.kodi_db_tv[tvshowid] = self.kodi_db_tv.get(tvshowid) or get_kodi_library(library, tvshowid)
-        if not self.kodi_db_tv[tvshowid].database:
-            return
-        dbid = self.kodi_db_tv[tvshowid].get_info('dbid', season=season, episode=episode)
-        if not dbid:
-            return
-        details = get_season_details(dbid) if is_season else get_episode_details(dbid)
-        details['infoproperties']['tvshow.dbid'] = tvshowid
-        return details
-
     def get_container_content(self, tmdb_type, season=None, episode=None):
         if tmdb_type == 'tv' and season and episode:
             return convert_type('episode', 'container')
@@ -336,28 +284,6 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
 
         return self._get_items(route[info]['route'], **kwargs)
 
-    def log_timer_report(self):
-        total_log = self.timer_lists.pop('total', 0)
-        timer_log = ['DIRECTORY TIMER REPORT\n', self.paramstring, '\n']
-        timer_log.append('------------------------------\n')
-        for k, v in self.timer_lists.items():
-            if k in LOG_TIMER_ITEMS:
-                avg_time = f'{sum(v) / len(v):7.3f} sec avg | {max(v):7.3f} sec max | {len(v):3}' if v else '  None'
-                timer_log.append(f' - {k:12s}: {avg_time}\n')
-            elif k[:4] == 'item':
-                avg_time = f'{sum(v) / len(v):7.3f} sec avg | {sum(v):7.3f} sec all | {len(v):3}' if v else '  None'
-                timer_log.append(f' - {k:12s}: {avg_time}\n')
-            else:
-                tot_time = f'{sum(v) / len(v):7.3f} sec' if v else '  None'
-                timer_log.append(f'{k:15s}: {tot_time}\n')
-        timer_log.append('------------------------------\n')
-        tot_time = f'{sum(total_log) / len(total_log):7.3f} sec' if total_log else '  None'
-        timer_log.append(f'{"Total":15s}: {tot_time}\n')
-        for k, v in self.timer_lists.items():
-            if v and k in LOG_TIMER_ITEMS:
-                timer_log.append(f'\n{k}:\n{" ".join([f"{i:.3f} " for i in v])}\n')
-        kodi_log(timer_log, 1)
-
     def get_directory(self):
         with TimerList(self.timer_lists, 'total', logging=self.log_timers):
             self._pre_sync = Thread(target=self.trakt_method.pre_sync, kwargs=self.params)
@@ -378,7 +304,7 @@ class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLi
                 plugin_category=self.plugin_category,
                 container_content=self.container_content)
         if self.log_timers:
-            self.log_timer_report()
+            log_timer_report(self.timer_lists, self.paramstring)
         if self.container_update:
             executebuiltin(f'Container.Update({self.container_update})')
         if self.container_refresh:

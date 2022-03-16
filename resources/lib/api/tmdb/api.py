@@ -1,6 +1,6 @@
 from xbmcgui import Dialog
 from resources.lib.addon.plugin import ADDONPATH, get_mpaa_prefix, get_language, convert_type, get_setting, get_localized
-from resources.lib.addon.consts import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, TMDB_GENRE_IDS, CACHE_SHORT, CACHE_LONG
+from resources.lib.addon.consts import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, TMDB_GENRE_IDS, CACHE_SHORT, CACHE_MEDIUM
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.window import get_property
 from resources.lib.files.futils import use_json_filecache, validify_filename
@@ -506,7 +506,7 @@ class TMDb(RequestAPI):
 
     def get_request_lc(self, *args, **kwargs):
         """ Get API request using the long cache """
-        kwargs['cache_days'] = CACHE_LONG
+        kwargs['cache_days'] = CACHE_MEDIUM
         kwargs['region'] = self.iso_country
         kwargs['language'] = self.req_language
         return self.get_request(*args, **kwargs)

@@ -11,7 +11,8 @@ class TraktMethods():
         self._pauseplayprogress = pauseplayprogress  # Set play progress using paused at position
         self._watchedindicators = watchedindicators  # Set watched status and playcount
         self._unwatchedepisodes = unwatchedepisodes  # Set unwatched episode count to total episode count for unwatched tvshows
-        lazyimport(globals(), 'resources.lib.api.kodi.rpc', import_attr="set_playprogress") if pauseplayprogress else None
+        if pauseplayprogress:
+            lazyimport(globals(), 'resources.lib.api.kodi.rpc', import_attr="set_playprogress")
 
     def set_playprogress(self, li):
         def _set_playprogress():

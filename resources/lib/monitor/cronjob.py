@@ -15,7 +15,7 @@ class CronJobMonitor(Thread):
         self.xbmc_monitor = Monitor()
 
     def run(self):
-        for f in ['database', 'database_v2', 'database_v3']:
+        for f in ['database', 'database_v2', 'database_v3', 'database_v4']:
             delete_folder(f, force=True)
 
         self.xbmc_monitor.waitForAbort(600)  # Wait 10 minutes before doing updates to give boot time
