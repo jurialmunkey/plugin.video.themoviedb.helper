@@ -160,6 +160,9 @@ def log_timer_report(timer_lists, paramstring):
     timer_log.append('------------------------------\n')
     tot_time = f'{sum(total_log) / len(total_log):7.3f} sec' if total_log else '  None'
     timer_log.append(f'{"Total":15s}: {tot_time}\n')
+    max_thrd = get_setting("max_threads", mode="int")
+    if max_thrd:
+        timer_log.append(f'Threads x{max_thrd}\n')
     for k, v in timer_lists.items():
         if v and k in _threaded:
             timer_log.append(f'\n{k}:\n{" ".join([f"{i:.3f} " for i in v])}\n')

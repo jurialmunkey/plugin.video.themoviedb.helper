@@ -1,4 +1,8 @@
+
+from xbmc import Monitor
 from threading import Thread
+from resources.lib.addon.plugin import get_setting
+from resources.lib.addon.logger import kodi_log
 
 
 class ParallelThread():
@@ -9,11 +13,25 @@ class ParallelThread():
             item_queue = pt.queue
         item_queue[x]  # to get returned items
         """
+        mon = Monitor()
+        thread_max = get_setting('max_threads', mode='int') or len(items)
         self.queue = [None] * len(items)
-        self._pool = [None] * len(items)
+        self._pool = [None] * thread_max
         for x, i in enumerate(items):
-            self._pool[x] = Thread(target=self._threadwrapper, args=[x, i, func, *args], kwargs=kwargs)
-            self._pool[x].start()
+            n = x
+            while n >= thread_max and not mon.abortRequested():  # Hit our thread limit so look for a spare spot in the queue
+                for y, j in enumerate(self._pool):
+                    if j.is_alive():
+                        continue
+                    n = y
+                    break
+                if n >= thread_max:
+                    mon.waitForAbort(0.025)
+            try:
+                self._pool[n] = Thread(target=self._threadwrapper, args=[x, i, func, *args], kwargs=kwargs)
+                self._pool[n].start()
+            except IndexError:
+                kodi_log(f'ParallelThread: INDEX {n} OUT OF RANGE {thread_max}', 1)
 
     def _threadwrapper(self, x, i, func, *args, **kwargs):
         self.queue[x] = func(i, *args, **kwargs)
@@ -23,4 +41,7 @@ class ParallelThread():
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
         for i in self._pool:
-            i.join()
+            try:
+                i.join()
+            except AttributeError:  # is None
+                pass
