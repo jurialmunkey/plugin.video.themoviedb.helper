@@ -28,44 +28,6 @@ def set_show(item, base_item=None, is_season=False):
     return item
 
 
-def is_excluded(item, filter_key=None, filter_value=None, exclude_key=None, exclude_value=None, is_listitem=False):
-    def is_filtered(d, k, v, exclude=False):
-        boolean = False if exclude else True  # Flip values if we want to exclude instead of include
-        if k and v and k in d and str(v).lower() in str(d[k]).lower():
-            boolean = exclude
-        return boolean
-
-    if not item:
-        return
-
-    if is_listitem:
-        il, ip = item.infolabels, item.infoproperties
-    else:
-        il, ip = item.get('infolabels', {}), item.get('infoproperties', {})
-
-    if filter_key and filter_value:
-        if filter_value == 'is_empty':
-            if il.get(filter_key) or ip.get(filter_key):
-                return True
-        if filter_key in il:
-            if is_filtered(il, filter_key, filter_value):
-                return True
-        if filter_key in ip:
-            if is_filtered(ip, filter_key, filter_value):
-                return True
-
-    if exclude_key and exclude_value:
-        if exclude_value == 'is_empty':
-            if not il.get(exclude_key) and not ip.get(exclude_key):
-                return True
-        if exclude_key in il:
-            if is_filtered(il, exclude_key, exclude_value, True):
-                return True
-        if exclude_key in ip:
-            if is_filtered(ip, exclude_key, exclude_value, True):
-                return True
-
-
 class _ItemMapper(object):
     def add_base(self, item, base_item=None, tmdb_type=None, key_blacklist=[], is_season=False):
         if not base_item:

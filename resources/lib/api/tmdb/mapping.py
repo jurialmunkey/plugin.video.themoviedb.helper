@@ -1,9 +1,16 @@
-from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type, get_setting, get_localized
-from resources.lib.addon.parser import try_int, try_float
-from resources.lib.addon.sutils import ITER_PROPS_MAX, iter_props, dict_to_list, get_params
-from resources.lib.addon.tmdate import format_date, age_difference
-from resources.lib.addon.consts import IMAGEPATH_ORIGINAL, IMAGEPATH_QUALITY_POSTER, IMAGEPATH_QUALITY_FANART, IMAGEPATH_QUALITY_THUMBS, IMAGEPATH_QUALITY_CLOGOS, TMDB_GENRE_IDS
 from resources.lib.api.mapping import UPDATE_BASEKEY, _ItemMapper, get_empty_item
+from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type, get_setting, get_localized
+from resources.lib.addon.parser import try_int, try_float, iter_props, dict_to_list, get_params
+from resources.lib.addon.tmdate import format_date, age_difference
+from resources.lib.addon.consts import (
+    IMAGEPATH_ORIGINAL,
+    IMAGEPATH_QUALITY_POSTER,
+    IMAGEPATH_QUALITY_FANART,
+    IMAGEPATH_QUALITY_THUMBS,
+    IMAGEPATH_QUALITY_CLOGOS,
+    TMDB_GENRE_IDS,
+    ITER_PROPS_MAX
+)
 
 ARTWORK_QUALITY = get_setting('artwork_quality', 'int')
 ARTWORK_QUALITY_POSTER = IMAGEPATH_QUALITY_POSTER[ARTWORK_QUALITY]

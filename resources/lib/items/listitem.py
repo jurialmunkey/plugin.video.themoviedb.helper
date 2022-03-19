@@ -1,9 +1,8 @@
 from xbmcgui import ListItem as KodiListItem
 from resources.lib.addon.consts import ACCEPTED_MEDIATYPES
 from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_media_type, get_setting, get_condvisibility, get_localized
-from resources.lib.addon.parser import try_int, encode_url
+from resources.lib.addon.parser import try_int, encode_url, merge_two_dicts
 from resources.lib.addon.tmdate import is_unaired_timestamp
-from resources.lib.addon.sutils import merge_two_dicts
 from resources.lib.addon.logger import kodi_log
 
 """ Lazyimports """

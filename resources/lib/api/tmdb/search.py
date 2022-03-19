@@ -1,6 +1,6 @@
 from xbmcgui import Dialog, INPUT_ALPHANUM
 from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized
-from resources.lib.addon.sutils import merge_two_dicts
+from resources.lib.addon.parser import merge_two_dicts
 from resources.lib.files.bcache import set_search_history, get_search_history
 from urllib.parse import urlencode
 

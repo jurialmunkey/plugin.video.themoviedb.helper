@@ -1,7 +1,7 @@
-from resources.lib.addon.sutils import del_empty_keys, merge_two_dicts
+from resources.lib.addon.plugin import get_setting
+from resources.lib.addon.parser import del_empty_keys, merge_two_dicts
 from resources.lib.api.request import RequestAPI
 from resources.lib.api.omdb.mapping import ItemMapper
-from resources.lib.addon.plugin import get_setting
 
 
 class OMDb(RequestAPI):

@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from xbmcgui import Dialog, INPUT_NUMERIC
 from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized
-from resources.lib.addon.parser import try_int, encode_url
-from resources.lib.addon.sutils import merge_two_dicts, split_items
+from resources.lib.addon.parser import try_int, encode_url, merge_two_dicts, split_items
 from resources.lib.addon.tmdate import get_datetime_now, get_timedelta
 from resources.lib.addon.window import get_property
 from resources.lib.files.bcache import set_search_history, get_search_history

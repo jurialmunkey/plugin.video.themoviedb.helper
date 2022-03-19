@@ -1,45 +1,52 @@
-from xbmcplugin import addDirectoryItems, setProperty, setPluginCategory, setContent, endOfDirectory
-from resources.lib.addon.consts import NO_LABEL_FORMATTING
-from resources.lib.addon.plugin import get_setting, executebuiltin
-from resources.lib.addon.parser import try_int, split_items, is_excluded
+from xbmcplugin import addDirectoryItem, setProperty, setPluginCategory, setContent, endOfDirectory
+from resources.lib.addon.consts import NO_LABEL_FORMATTING, RANDOMISED_TRAKT, RANDOMISED_LISTS, TRAKT_LIST_OF_LISTS, TMDB_BASIC_LISTS, TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, ROUTE_NO_ID, ROUTE_TMDB_ID
+from resources.lib.addon.plugin import convert_type, get_setting, executebuiltin
+from resources.lib.addon.parser import try_int, split_items, merge_two_dicts, is_excluded
 from resources.lib.addon.thread import ParallelThread
 from resources.lib.api.tmdb.api import TMDb
+from resources.lib.api.tmdb.lists import TMDbLists
+from resources.lib.api.tmdb.search import SearchLists
+from resources.lib.api.tmdb.discover import UserDiscoverLists
 from resources.lib.api.trakt.api import TraktAPI
+from resources.lib.api.trakt.lists import TraktLists
 from resources.lib.api.fanarttv.api import FanartTV
 from resources.lib.api.omdb.api import OMDb
 from resources.lib.items.trakt import TraktMethods
 from resources.lib.items.builder import ItemBuilder
+from resources.lib.items.basedir import BaseDirLists
 from resources.lib.addon.logger import kodi_log, TimerList, log_timer_report
 from threading import Thread
 
 """ Lazyimports """
 from resources.lib.addon.modimp import lazyimport_module, lazyimport
+random = None
 KodiDb = None  # from resources.lib.items.kodi import KodiDb
 
 
 PREBUILD_PARENTSHOW = ['seasons', 'episodes', 'episode_groups', 'trakt_upnext', 'episode_group_seasons']
 
 
-class Container():
+class Container(TMDbLists, BaseDirLists, SearchLists, UserDiscoverLists, TraktLists):
     def __init__(self, handle, paramstring, **kwargs):
         # plugin:// params configuration
         self.handle = handle  # plugin:// handle
         self.paramstring = paramstring  # plugin://plugin.video.themoviedb.helper?paramstring
         self.params = kwargs  # paramstring dictionary
         self.parent_params = self.params.copy()  # TODO: CLEANUP
+        self.is_widget = self.params.pop('widget', '').lower() == 'true'
+        self.is_cacheonly = self.params.pop('cacheonly', '').lower() == 'true'
+        self.is_fanarttv = self.params.pop('fanarttv', '').lower()
+        self.is_nextpage = self.params.pop('nextpage', '').lower() != 'false'
         self.filters = {
             'filter_key': self.params.get('filter_key', None),
             'filter_value': split_items(self.params.get('filter_value', None))[0],
             'exclude_key': self.params.get('exclude_key', None),
-            'exclude_value': split_items(self.params.get('exclude_value', None))[0]}
-
-        self.is_widget = self.params.get('widget', '').lower() == 'true'
-        self.is_cacheonly = self.params.get('cacheonly', '').lower() == 'true'
-        self.is_fanarttv = self.params.get('fanarttv', '').lower()
+            'exclude_value': split_items(self.params.get('exclude_value', None))[0]
+        }
 
         # endOfDirectory
         self.update_listing = False  # endOfDirectory(updateListing=) set True to replace current path
-        self.plugin_category = self.params.get('plugin_category', '')  # Container.PluginCategory / ListItem.Property(widget)
+        self.plugin_category = ''  # Container.PluginCategory / ListItem.Property(widget)
         self.container_content = ''  # Container.Content({})
         self.container_update = ''  # Add path to call Containr.Update({}) at end of directory
         self.container_refresh = False  # True call Container.Refresh at end of directory
@@ -74,7 +81,7 @@ class Container():
         self.thumb_override = 0
 
     def pagination_is_allowed(self):
-        if self.params.get('nextpage', '').lower() == 'false':
+        if not self.is_nextpage:  # nextpage=false param overrides all other settings
             return False
         if self.is_widget and not get_setting('widgets_nextpage'):
             return False
@@ -108,8 +115,8 @@ class Container():
         lazyimport(globals(), 'resources.lib.items.kodi', import_attr='KodiDb')
         return KodiDb(tmdb_type)
 
-    def _add_item(self, i):
-        if not self.pagination and 'next_page' in i:
+    def _add_item(self, i, pagination=True):
+        if not pagination and 'next_page' in i:
             return
         with TimerList(self.timer_lists, 'item_api', log_threshold=0.05, logging=self.log_timers):
             return self.ib.get_listitem(i)
@@ -148,9 +155,12 @@ class Container():
         if li.next_page:
             li.params['plugin_category'] = self.plugin_category  # Carry the plugin category to next page in plugin:// path
         self.trakt_method.set_playprogress(li)
-        return (li.get_url(), li.get_listitem(), li.is_folder)
+        return {'url': li.get_url(), 'listitem': li.get_listitem(), 'isFolder': li.is_folder}
 
-    def add_items(self, items):
+    def add_items(self, items=None, pagination=True, property_params=None, kodi_db=None):
+        if not items:
+            return
+
         # Setup ItemBuilder
         self.ib = ItemBuilder(
             tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api,
@@ -167,21 +177,25 @@ class Container():
         # Build items in threadss
         with TimerList(self.timer_lists, '--build', log_threshold=0.05, logging=self.log_timers):
             self.ib.parent_params = self.parent_params
-            with ParallelThread(items, self._add_item) as pt:
+            with ParallelThread(items, self._add_item, pagination) as pt:
                 item_queue = pt.queue
             all_listitems = [i for i in item_queue if i]
 
         # Finalise listitems in parallel threads
         self._pre_sync.join()
         with TimerList(self.timer_lists, '--make', log_threshold=0.05, logging=self.log_timers):
+            self.property_params = property_params
             self.format_episode_labels = self.parent_params.get('info') not in NO_LABEL_FORMATTING
             with ParallelThread(all_listitems, self._make_item) as pt:
                 item_queue = pt.queue
-            addDirectoryItems(self.handle, [i for i in item_queue if i])
+            all_itemtuples = [i for i in item_queue if i]
+            # Add items to directory
+            for i in all_itemtuples:
+                addDirectoryItem(handle=self.handle, **i)
 
-    def set_params_to_container(self):
+    def set_params_to_container(self, **kwargs):
         params = {}
-        for k, v in self.params.items():
+        for k, v in kwargs.items():
             if not k or not v:
                 continue
             try:
@@ -193,13 +207,80 @@ class Container():
                 kodi_log(f'Error: {exc}\nUnable to set param {k} to {v}', 1)
         return params
 
-    def finish_container(self):
-        setPluginCategory(self.handle, self.plugin_category)  # Container.PluginCategory
-        setContent(self.handle, self.container_content)  # Container.Content
-        endOfDirectory(self.handle, updateListing=self.update_listing)
+    def finish_container(self, update_listing=False, plugin_category='', container_content=''):
+        setPluginCategory(self.handle, plugin_category)  # Container.PluginCategory
+        setContent(self.handle, container_content)  # Container.Content
+        endOfDirectory(self.handle, updateListing=update_listing)
+
+    def get_container_content(self, tmdb_type, season=None, episode=None):
+        if tmdb_type == 'tv' and season and episode:
+            return convert_type('episode', 'container')
+        elif tmdb_type == 'tv' and season:
+            return convert_type('season', 'container')
+        return convert_type(tmdb_type, 'container')
+
+    def list_randomised_trakt(self, **kwargs):
+        kwargs['info'] = RANDOMISED_TRAKT.get(kwargs.get('info'), {}).get('info')
+        kwargs['randomise'] = True
+        self.parent_params = kwargs
+        return self.get_items(**kwargs)
+
+    @lazyimport_module(globals(), 'random')
+    def list_randomised(self, **kwargs):
+        def random_from_list(i, remove_next_page=True):
+            if not i or not isinstance(i, list) or len(i) < 2:
+                return
+            item = random.choice(i)
+            if remove_next_page and isinstance(item, dict) and 'next_page' in item:
+                return random_from_list(i, remove_next_page=True)
+            return item
+        params = merge_two_dicts(kwargs, RANDOMISED_LISTS.get(kwargs.get('info'), {}).get('params'))
+        item = random_from_list(self.get_items(**params))
+        if not item:
+            return
+        self.plugin_category = f'{item.get("label")}'
+        self.parent_params = item.get('params', {})
+        return self.get_items(**item.get('params', {}))
+
+    def get_tmdb_id(self, info, **kwargs):
+        if info == 'collection':
+            kwargs['tmdb_type'] = 'collection'
+        return self.tmdb_api.get_tmdb_id(**kwargs)
+
+    def _noop(self):
+        return None
+
+    def _get_items(self, func, **kwargs):
+        return func['lambda'](getattr(self, func['getattr']), **kwargs)
 
     def get_items(self, **kwargs):
-        pass
+        info = kwargs.get('info')
+
+        # Check routes that don't require ID lookups first
+        route = ROUTE_NO_ID
+        route.update(TRAKT_LIST_OF_LISTS)
+        route.update(RANDOMISED_LISTS)
+        route.update(RANDOMISED_TRAKT)
+
+        # Early exit if we have a route
+        if info in route:
+            return self._get_items(route[info]['route'], **kwargs)
+
+        # Check routes that require ID lookups second
+        route = ROUTE_TMDB_ID
+        route.update(TMDB_BASIC_LISTS)
+        route.update(TRAKT_BASIC_LISTS)
+        route.update(TRAKT_SYNC_LISTS)
+
+        # Early exit to basedir if no route found
+        if info not in route:
+            return self.list_basedir(info)
+
+        # Lookup up our TMDb ID
+        if not kwargs.get('tmdb_id'):
+            self.parent_params['tmdb_id'] = self.params['tmdb_id'] = kwargs['tmdb_id'] = self.get_tmdb_id(**kwargs)
+
+        return self._get_items(route[info]['route'], **kwargs)
 
     def get_directory(self):
         with TimerList(self.timer_lists, 'total', logging=self.log_timers):
@@ -209,10 +290,17 @@ class Container():
                 items = self.get_items(**self.params)
             if not items:
                 return
-            self.property_params = self.set_params_to_container()
+            self.plugin_category = self.params.get('plugin_category') or self.plugin_category
             with TimerList(self.timer_lists, 'add_items', logging=self.log_timers):
-                self.add_items(items)
-            self.finish_container()
+                self.add_items(
+                    items,
+                    pagination=self.pagination,
+                    property_params=self.set_params_to_container(**self.params),
+                    kodi_db=self.kodi_db)
+            self.finish_container(
+                update_listing=self.update_listing,
+                plugin_category=self.plugin_category,
+                container_content=self.container_content)
         if self.log_timers:
             log_timer_report(self.timer_lists, self.paramstring)
         if self.container_update:

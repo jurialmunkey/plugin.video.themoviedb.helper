@@ -2,6 +2,7 @@ ALPHANUM_CHARS = "-_.() abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123
 INVALID_FILECHARS = "\\/\"\'<>:|?*"
 
 CACHE_SHORT, CACHE_MEDIUM, CACHE_LONG, CACHE_EXTENDED = 1, 7, 14, 90
+ITER_PROPS_MAX = 10
 
 ACCEPTED_MEDIATYPES = [
     'video', 'movie', 'tvshow', 'season', 'episode', 'musicvideo', 'music', 'song', 'album', 'artist']

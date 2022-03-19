@@ -1,14 +1,13 @@
 from xbmcgui import Dialog
 from resources.lib.addon.plugin import ADDONPATH, get_mpaa_prefix, get_language, convert_type, get_setting, get_localized
 from resources.lib.addon.consts import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, TMDB_GENRE_IDS, CACHE_SHORT, CACHE_MEDIUM
-from resources.lib.addon.parser import try_int
+from resources.lib.addon.parser import try_int, is_excluded
 from resources.lib.addon.window import get_property
 from resources.lib.files.futils import use_json_filecache, validify_filename
 from resources.lib.items.listitem import ListItem
 from resources.lib.items.pages import PaginatedItems
 from resources.lib.api.request import RequestAPI
 from resources.lib.api.tmdb.mapping import ItemMapper, get_episode_to_air
-from resources.lib.api.mapping import is_excluded
 from urllib.parse import quote_plus
 
 """ Lazyimports """
