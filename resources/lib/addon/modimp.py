@@ -1,6 +1,13 @@
 from importlib import import_module
 
 
+def importmodule(module_name, import_attr=None):
+    module = import_module(module_name)
+    if not import_attr:
+        return module
+    return getattr(module, import_attr)
+
+
 def lazyimport(global_dict, module_name, import_as=None, import_attr=None):
     global_name = import_as or import_attr or module_name
     if not global_dict[global_name]:

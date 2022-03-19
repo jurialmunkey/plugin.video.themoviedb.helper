@@ -13,7 +13,7 @@ from resources.lib.addon.logger import kodi_log, TimerList, log_timer_report
 from threading import Thread
 
 """ Lazyimports """
-from resources.lib.addon.modimp import lazyimport_module, lazyimport
+from resources.lib.addon.modimp import lazyimport
 KodiDb = None  # from resources.lib.items.kodi import KodiDb
 
 
@@ -39,7 +39,7 @@ class Container():
 
         # endOfDirectory
         self.update_listing = False  # endOfDirectory(updateListing=) set True to replace current path
-        self.plugin_category = self.params.get('plugin_category', '')  # Container.PluginCategory / ListItem.Property(widget)
+        self.plugin_category = ''  # Container.PluginCategory / ListItem.Property(widget)
         self.container_content = ''  # Container.Content({})
         self.container_update = ''  # Add path to call Containr.Update({}) at end of directory
         self.container_refresh = False  # True call Container.Refresh at end of directory
@@ -198,8 +198,17 @@ class Container():
         setContent(self.handle, self.container_content)  # Container.Content
         endOfDirectory(self.handle, updateListing=self.update_listing)
 
+    def get_tmdb_id(self):
+        if self.params.get('info') == 'collection':
+            self.params['tmdb_type'] = 'collection'
+        if not self.params.get('tmdb_id'):
+            self.params['tmdb_id'] = self.tmdb_api.get_tmdb_id(**self.params)
+
     def get_items(self, **kwargs):
-        pass
+        """ Abstract method for getting items
+        TODO: abc.abstractmethod to force ???
+        """
+        return
 
     def get_directory(self):
         with TimerList(self.timer_lists, 'total', logging=self.log_timers):
@@ -210,6 +219,7 @@ class Container():
             if not items:
                 return
             self.property_params = self.set_params_to_container()
+            self.plugin_category = self.params.get('plugin_category') or self.plugin_category
             with TimerList(self.timer_lists, 'add_items', logging=self.log_timers):
                 self.add_items(items)
             self.finish_container()

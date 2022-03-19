@@ -7,12 +7,25 @@ from resources.lib.addon.parser import try_int, encode_url
 from resources.lib.addon.tmdate import get_calendar_name
 from resources.lib.api.mapping import get_empty_item
 from resources.lib.api.trakt.api import get_sort_methods
+from resources.lib.items.container import Container
 
 
-class TraktLists():
-    def list_trakt(self, info, tmdb_type, page=None, randomise=False, **kwargs):
+class ListBasic(Container):
+    def get_items(self, info, tmdb_type, page=None, randomise=False, **kwargs):
+        def _get_items_both():
+            info_model = TRAKT_BASIC_LISTS.get(info)
+            items = self.trakt_api.get_mixed_list(
+                path=info_model.get('path', ''),
+                trakt_types=['movie', 'show'],
+                authorize=info_model.get('authorize', False),
+                extended=info_model.get('extended', None))
+            self.tmdb_cache_only = False
+            self.library = 'video'
+            self.container_content = 'movies'
+            self.kodi_db = self.get_kodi_database('both')
+            return items
         if tmdb_type == 'both':
-            return self.list_mixed(info)
+            return _get_items_both()
         info_model = TRAKT_BASIC_LISTS.get(info)
         info_tmdb_type = info_model.get('tmdb_type') or tmdb_type
         trakt_type = convert_type(tmdb_type, 'trakt')
@@ -35,20 +48,9 @@ class TraktLists():
         self.plugin_category = get_plugin_category(info_model, convert_type(info_tmdb_type, 'plural'))
         return items
 
-    def list_mixed(self, info, **kwargs):
-        info_model = TRAKT_BASIC_LISTS.get(info)
-        items = self.trakt_api.get_mixed_list(
-            path=info_model.get('path', ''),
-            trakt_types=['movie', 'show'],
-            authorize=info_model.get('authorize', False),
-            extended=info_model.get('extended', None))
-        self.tmdb_cache_only = False
-        self.library = 'video'
-        self.container_content = 'movies'
-        self.kodi_db = self.get_kodi_database('both')
-        return items
 
-    def list_sync(self, info, tmdb_type, page=None, **kwargs):
+class ListSync(Container):
+    def get_items(self, info, tmdb_type, page=None, **kwargs):
         info_model = TRAKT_SYNC_LISTS.get(info)
         info_tmdb_type = info_model.get('tmdb_type') or tmdb_type
         items = self.trakt_api.get_sync_list(
@@ -65,7 +67,9 @@ class TraktLists():
         self.plugin_category = get_plugin_category(info_model, convert_type(info_tmdb_type, 'plural'))
         return items
 
-    def list_towatch(self, info, tmdb_type, page=None, **kwargs):
+
+class ListToWatch(Container):
+    def get_items(self, info, tmdb_type, page=None, **kwargs):
         """ Get a mix of watchlisted and inprogress """
         if tmdb_type not in ['movie', 'tv']:
             return
@@ -78,7 +82,130 @@ class TraktLists():
         self.plugin_category = f'{convert_type(tmdb_type, "plural")} {get_localized(32078)}'
         return items
 
-    def list_lists(self, info, page=None, **kwargs):
+
+class ListBecauseYouWatched(Container):
+    def get_items(self, info, tmdb_type, page=None, **kwargs):
+        trakt_type = convert_type(tmdb_type, 'trakt')
+        watched_items = self.trakt_api.get_sync_list(
+            sync_type='watched',
+            trakt_type=trakt_type,
+            page=1,
+            limit=5,
+            next_page=False,
+            params=None,
+            sort_by='plays' if info == 'trakt_becausemostwatched' else 'watched',
+            sort_how='desc')
+        if not watched_items:
+            return
+        item = watched_items[random.randint(0, len(watched_items) - 1)]
+        self.parent_params = {
+            'info': 'recommendations',
+            'tmdb_type': item.get('params', {}).get('tmdb_type'),
+            'tmdb_id': item.get('params', {}).get('tmdb_id')}
+        from resources.lib.api.tmdb.lists import ListBasic as TMDbListBasic
+        items = TMDbListBasic.get_items(
+            self,
+            info='recommendations',
+            tmdb_type=item.get('params', {}).get('tmdb_type'),
+            tmdb_id=item.get('params', {}).get('tmdb_id'),
+            page=1)
+        self.plugin_category = self.parent_params['plugin_category'] = f'{get_localized(32288)} {item.get("label")}'
+        return items
+
+
+class ListCalendar(Container):
+    def _get_calendar_items(self, info, startdate, days, page=None, kodi_db=None, **kwargs):
+        items = self.trakt_api.get_calendar_episodes_list(
+            try_int(startdate),
+            try_int(days),
+            kodi_db=kodi_db,
+            user=False if kodi_db else True,
+            page=page)
+        self.kodi_db = self.get_kodi_database('tv')
+        self.tmdb_cache_only = False
+        self.library = 'video'
+        self.container_content = 'episodes'
+        self.plugin_category = get_calendar_name(startdate=try_int(startdate), days=try_int(days))
+        self.thumb_override = get_setting('calendar_art', 'int')
+        return items
+
+    def get_items(self, **kwargs):
+        return self._get_calendar_items(**kwargs)
+
+
+class ListLibraryCalendar(ListCalendar):
+    def get_items(self, **kwargs):
+        return self._get_calendar_items(kodi_db=get_kodi_library('tv'), **kwargs)
+
+
+class ListInProgress(Container):
+    def get_items(self, info, tmdb_type, page=None, **kwargs):
+        if tmdb_type == 'tv':
+            items = self.trakt_api.get_inprogress_shows_list(
+                page=page,
+                params={
+                    'info': 'trakt_upnext',
+                    'tmdb_type': 'tv',
+                    'tmdb_id': '{tmdb_id}'},
+                sort_by=kwargs.get('sort_by', None),
+                sort_how=kwargs.get('sort_how', None))
+        else:
+            items = self.trakt_api.get_ondeck_list(
+                page=page,
+                trakt_type='movie',
+                sort_by=kwargs.get('sort_by', None),
+                sort_how=kwargs.get('sort_how', None))
+        self.tmdb_cache_only = False
+        self.kodi_db = self.get_kodi_database(tmdb_type)
+        self.library = convert_type(tmdb_type, 'library')
+        self.container_content = convert_type(tmdb_type, 'container')
+        self.plugin_category = f'{get_localized(32196)} {convert_type(tmdb_type, "plural")}'
+        return items
+
+
+class ListOnDeck(Container):
+    def get_items(self, page=None, **kwargs):
+        items = self.trakt_api.get_ondeck_list(page=page, trakt_type='episode')
+        self.tmdb_cache_only = False
+        self.library = 'video'
+        self.container_content = 'episodes'
+        self.plugin_category = get_localized(32406)
+        return items
+
+
+class ListNextEpisodes(Container):
+    def get_items(self, info, tmdb_type, page=None, **kwargs):
+        if tmdb_type != 'tv':
+            return
+        sort_by_premiered = True if get_setting('trakt_nextepisodesort', 'str') == 'airdate' else False
+        items = self.trakt_api.get_upnext_episodes_list(page=page, sort_by_premiered=sort_by_premiered)
+        self.tmdb_cache_only = False
+        # self.kodi_db = self.get_kodi_database(tmdb_type)
+        self.library = 'video'
+        self.container_content = 'episodes'
+        self.thumb_override = get_setting('calendar_art', 'int')
+        self.plugin_category = get_localized(32197)
+        return items
+
+
+class ListUpNext(Container):
+    def get_items(self, info, tmdb_type, tmdb_id, page=None, **kwargs):
+        if tmdb_type != 'tv':
+            return
+        items = self.trakt_api.get_upnext_list(unique_id=tmdb_id, id_type='tmdb', page=page)
+        self.tmdb_cache_only = False
+        if not items:
+            items = self.tmdb_api.get_episode_list(tmdb_id, 1)
+            self.tmdb_cache_only = True
+        self.kodi_db = self.get_kodi_database(tmdb_type)
+        self.library = 'video'
+        self.container_content = 'episodes'
+        self.plugin_category = get_localized(32043)
+        return items
+
+
+class ListLists(Container):
+    def get_items(self, info, page=None, **kwargs):
         info_model = TRAKT_LIST_OF_LISTS.get(info)
         items = self.trakt_api.get_list_of_lists(
             path=info_model.get('path', '').format(**kwargs),
@@ -88,32 +215,9 @@ class TraktLists():
         self.plugin_category = get_plugin_category(info_model)
         return items
 
-    def list_lists_search(self, query=None, **kwargs):
-        if not query:
-            kwargs['query'] = query = Dialog().input(get_localized(32044))
-            if not kwargs['query']:
-                return
-            self.container_update = f'{encode_url(PLUGINPATH, **kwargs)},replace'
-        items = self.trakt_api.get_list_of_lists(path=f'search/list?query={query}&fields=name', sort_likes=True)
-        self.library = 'video'
-        return items
 
-    def _list_trakt_sortby_item(self, i, params):
-        item = get_empty_item()
-        item['label'] = item['infolabels']['title'] = f'{params.get("list_name")}[CR]{i["name"]}'
-        item['params'] = params
-        for k, v in i['params'].items():
-            item['params'][k] = v
-        return item
-
-    def list_trakt_sortby(self, info, **kwargs):
-        kwargs['info'] = kwargs.pop('parent_info', None)
-        items = get_sort_methods() if kwargs['info'] == 'trakt_userlist' else get_sort_methods(True)
-        items = [self._list_trakt_sortby_item(i, kwargs.copy()) for i in items]
-        self.library = 'video'
-        return items
-
-    def list_userlist(self, list_slug, user_slug=None, page=None, **kwargs):
+class ListCustom(Container):
+    def get_items(self, list_slug, user_slug=None, page=None, **kwargs):
         response = self.trakt_api.get_custom_list(
             page=page or 1,
             list_slug=list_slug,
@@ -147,101 +251,30 @@ class TraktLists():
 
         return response.get('items', []) + response.get('next_page', [])
 
-    def list_becauseyouwatched(self, info, tmdb_type, page=None, **kwargs):
-        trakt_type = convert_type(tmdb_type, 'trakt')
-        watched_items = self.trakt_api.get_sync_list(
-            sync_type='watched',
-            trakt_type=trakt_type,
-            page=1,
-            limit=5,
-            next_page=False,
-            params=None,
-            sort_by='plays' if info == 'trakt_becausemostwatched' else 'watched',
-            sort_how='desc')
-        if not watched_items:
-            return
-        item = watched_items[random.randint(0, len(watched_items) - 1)]
-        self.parent_params = {
-            'info': 'recommendations',
-            'tmdb_type': item.get('params', {}).get('tmdb_type'),
-            'tmdb_id': item.get('params', {}).get('tmdb_id')}
-        self.params['plugin_category'] = f'{get_localized(32288)} {item.get("label")}'
-        return self.list_tmdb(
-            info='recommendations',
-            tmdb_type=item.get('params', {}).get('tmdb_type'),
-            tmdb_id=item.get('params', {}).get('tmdb_id'),
-            page=1)
 
-    def list_ondeck(self, page=None, **kwargs):
-        items = self.trakt_api.get_ondeck_list(page=page, trakt_type='episode')
-        self.tmdb_cache_only = False
+class ListCustomSearch(Container):
+    def get_items(self, query=None, **kwargs):
+        if not query:
+            kwargs['query'] = query = Dialog().input(get_localized(32044))
+            if not kwargs['query']:
+                return
+            self.container_update = f'{encode_url(PLUGINPATH, **kwargs)},replace'
+        items = self.trakt_api.get_list_of_lists(path=f'search/list?query={query}&fields=name', sort_likes=True)
         self.library = 'video'
-        self.container_content = 'episodes'
-        self.plugin_category = get_localized(32406)
         return items
 
-    def list_inprogress(self, info, tmdb_type, page=None, **kwargs):
-        if tmdb_type == 'tv':
-            items = self.trakt_api.get_inprogress_shows_list(
-                page=page,
-                params={
-                    'info': 'trakt_upnext',
-                    'tmdb_type': 'tv',
-                    'tmdb_id': '{tmdb_id}'},
-                sort_by=kwargs.get('sort_by', None),
-                sort_how=kwargs.get('sort_how', None))
-        else:
-            items = self.trakt_api.get_ondeck_list(
-                page=page,
-                trakt_type='movie',
-                sort_by=kwargs.get('sort_by', None),
-                sort_how=kwargs.get('sort_how', None))
-        self.tmdb_cache_only = False
-        self.kodi_db = self.get_kodi_database(tmdb_type)
-        self.library = convert_type(tmdb_type, 'library')
-        self.container_content = convert_type(tmdb_type, 'container')
-        self.plugin_category = f'{get_localized(32196)} {convert_type(tmdb_type, "plural")}'
-        return items
 
-    def list_nextepisodes(self, info, tmdb_type, page=None, **kwargs):
-        if tmdb_type != 'tv':
-            return
-        sort_by_premiered = True if get_setting('trakt_nextepisodesort', 'str') == 'airdate' else False
-        items = self.trakt_api.get_upnext_episodes_list(page=page, sort_by_premiered=sort_by_premiered)
-        self.tmdb_cache_only = False
-        # self.kodi_db = self.get_kodi_database(tmdb_type)
+class ListSortBy(Container):
+    def get_items(self, info, **kwargs):
+        def _listsortby_item(i, params):
+            item = get_empty_item()
+            item['label'] = item['infolabels']['title'] = f'{params.get("list_name")}[CR]{i["name"]}'
+            item['params'] = params
+            for k, v in i['params'].items():
+                item['params'][k] = v
+            return item
+        kwargs['info'] = kwargs.pop('parent_info', None)
+        items = get_sort_methods() if kwargs['info'] == 'trakt_userlist' else get_sort_methods(True)
+        items = [_listsortby_item(i, kwargs.copy()) for i in items]
         self.library = 'video'
-        self.container_content = 'episodes'
-        self.thumb_override = get_setting('calendar_art', 'int')
-        self.plugin_category = get_localized(32197)
-        return items
-
-    def list_trakt_calendar(self, info, startdate, days, page=None, library=False, **kwargs):
-        kodi_db = get_kodi_library('tv') if library else None
-        items = self.trakt_api.get_calendar_episodes_list(
-            try_int(startdate),
-            try_int(days),
-            kodi_db=kodi_db,
-            user=False if library else True,
-            page=page)
-        self.kodi_db = kodi_db or self.get_kodi_database('tv')
-        self.tmdb_cache_only = False
-        self.library = 'video'
-        self.container_content = 'episodes'
-        self.plugin_category = get_calendar_name(startdate=try_int(startdate), days=try_int(days))
-        self.thumb_override = get_setting('calendar_art', 'int')
-        return items
-
-    def list_upnext(self, info, tmdb_type, tmdb_id, page=None, **kwargs):
-        if tmdb_type != 'tv':
-            return
-        items = self.trakt_api.get_upnext_list(unique_id=tmdb_id, id_type='tmdb', page=page)
-        self.tmdb_cache_only = False
-        if not items:
-            items = self.tmdb_api.get_episode_list(tmdb_id, 1)
-            self.tmdb_cache_only = True
-        self.kodi_db = self.get_kodi_database(tmdb_type)
-        self.library = 'video'
-        self.container_content = 'episodes'
-        self.plugin_category = get_localized(32043)
         return items

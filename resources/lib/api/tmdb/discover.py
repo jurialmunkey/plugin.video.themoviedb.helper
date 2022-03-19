@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from xbmcgui import Dialog, INPUT_NUMERIC
+from resources.lib.items.container import Container
 from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized
 from resources.lib.addon.parser import try_int, encode_url, merge_two_dicts, split_items
 from resources.lib.addon.tmdate import get_datetime_now, get_timedelta
@@ -853,18 +854,55 @@ def _translate_discover_params(tmdb_type, params):
     return params
 
 
-class UserDiscoverLists():
-    def list_discover(self, tmdb_type, **kwargs):
+class ListDiscover(Container):
+    def get_items(self, tmdb_type, **kwargs):
         kwargs.pop('info', None)
-        items = TMDb().get_discover_list(tmdb_type, **_translate_discover_params(tmdb_type, kwargs))
+        items = self.tmdb_api.get_discover_list(tmdb_type, **_translate_discover_params(tmdb_type, kwargs))
         self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = convert_type(tmdb_type, 'library')
         self.container_content = convert_type(tmdb_type, 'container')
         return items
 
-    def list_discoverdir_router(self, **kwargs):
+
+class ListDiscoverDir(Container):
+    def get_items(self, **kwargs):
+        def _get_discover_dir():
+            items = []
+            params = merge_two_dicts(kwargs, {'info': 'user_discover'})
+            artwork = {'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'}
+            for i in ['movie', 'tv']:
+                item = {
+                    'label': f'{get_localized(32174)} {convert_type(i, "plural")}',
+                    'params': merge_two_dicts(params, {'tmdb_type': i}),
+                    'infoproperties': {'specialsort': 'top'},
+                    'art': artwork}
+                items.append(item)
+
+            history = get_search_history('discover')
+            history.reverse()
+            for x, i in enumerate(history):
+                item_params = merge_two_dicts(kwargs, i.get('params', {}))
+                edit_params = {'info': 'user_discover', 'tmdb_type': item_params.get('tmdb_type'), 'method': 'edit', 'idx': x}
+                name_params = {'info': 'dir_discover', 'tmdb_type': item_params.get('tmdb_type'), 'method': 'rename', 'idx': x}
+                dele_params = {'info': 'dir_discover', 'tmdb_type': item_params.get('tmdb_type'), 'method': 'delete', 'idx': x}
+                item = {
+                    'label': i.get('label'),
+                    'params': item_params,
+                    'art': artwork,
+                    'context_menu': [
+                        (get_localized(21435), f'Container.Update({encode_url(PLUGINPATH, **edit_params)})'),
+                        (get_localized(118), f'Container.Update({encode_url(PLUGINPATH, **name_params)})'),
+                        (get_localized(117), f'Container.Update({encode_url(PLUGINPATH, **dele_params)})')]}
+                items.append(item)
+            if history:
+                item = {
+                    'label': get_localized(32237),
+                    'art': artwork,
+                    'params': merge_two_dicts(params, {'info': 'dir_discover', 'clear_cache': 'True'})}
+                items.append(item)
+            return items
         if kwargs.get('clear_cache') != 'True' and kwargs.get('method') not in ['delete', 'rename']:
-            return self.list_discoverdir(**kwargs)
+            return _get_discover_dir()
 
         params = kwargs.copy()
         params.pop('clear_cache', None)
@@ -895,43 +933,9 @@ class UserDiscoverLists():
             item['label'] = Dialog().input('Rename', defaultt=item.get('label')) or item.get('label')
             set_search_history('discover', item, replace=idx)
 
-    def list_discoverdir(self, **kwargs):
-        items = []
-        params = merge_two_dicts(kwargs, {'info': 'user_discover'})
-        artwork = {'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'}
-        for i in ['movie', 'tv']:
-            item = {
-                'label': f'{get_localized(32174)} {convert_type(i, "plural")}',
-                'params': merge_two_dicts(params, {'tmdb_type': i}),
-                'infoproperties': {'specialsort': 'top'},
-                'art': artwork}
-            items.append(item)
 
-        history = get_search_history('discover')
-        history.reverse()
-        for x, i in enumerate(history):
-            item_params = merge_two_dicts(kwargs, i.get('params', {}))
-            edit_params = {'info': 'user_discover', 'tmdb_type': item_params.get('tmdb_type'), 'method': 'edit', 'idx': x}
-            name_params = {'info': 'dir_discover', 'tmdb_type': item_params.get('tmdb_type'), 'method': 'rename', 'idx': x}
-            dele_params = {'info': 'dir_discover', 'tmdb_type': item_params.get('tmdb_type'), 'method': 'delete', 'idx': x}
-            item = {
-                'label': i.get('label'),
-                'params': item_params,
-                'art': artwork,
-                'context_menu': [
-                    (get_localized(21435), f'Container.Update({encode_url(PLUGINPATH, **edit_params)})'),
-                    (get_localized(118), f'Container.Update({encode_url(PLUGINPATH, **name_params)})'),
-                    (get_localized(117), f'Container.Update({encode_url(PLUGINPATH, **dele_params)})')]}
-            items.append(item)
-        if history:
-            item = {
-                'label': get_localized(32237),
-                'art': artwork,
-                'params': merge_two_dicts(params, {'info': 'dir_discover', 'clear_cache': 'True'})}
-            items.append(item)
-        return items
-
-    def list_userdiscover(self, tmdb_type, **kwargs):
+class ListUserDiscover(Container):
+    def get_items(self, tmdb_type, **kwargs):
         method = kwargs.get('method')
 
         # Method routing

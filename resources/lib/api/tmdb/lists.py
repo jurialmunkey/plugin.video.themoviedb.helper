@@ -1,9 +1,10 @@
 from resources.lib.addon.consts import TMDB_BASIC_LISTS
 from resources.lib.addon.plugin import convert_type, get_plugin_category, get_setting, get_localized
+from resources.lib.items.container import Container
 
 
-class TMDbLists():
-    def list_tmdb(self, info, tmdb_type, tmdb_id=None, page=None, limit=None, **kwargs):
+class ListBasic(Container):
+    def get_items(self, info, tmdb_type, tmdb_id=None, page=None, limit=None, **kwargs):
         info_model = TMDB_BASIC_LISTS.get(info)
         info_tmdb_type = info_model.get('tmdb_type') or tmdb_type
         items = self.tmdb_api.get_basic_list(
@@ -21,39 +22,17 @@ class TMDbLists():
         self.plugin_category = get_plugin_category(info_model, convert_type(info_tmdb_type, 'plural'))
         return items
 
-    def list_episode_group_episodes(self, tmdb_id, group_id, position, **kwargs):
-        items = self.tmdb_api.get_episode_group_episodes_list(tmdb_id, group_id, position)
-        self.tmdb_cache_only = False
-        self.container_content = convert_type('episode', 'container')
-        return items
 
-    def list_episode_group_seasons(self, tmdb_id, group_id, **kwargs):
-        items = self.tmdb_api.get_episode_group_seasons_list(tmdb_id, group_id)
-        self.tmdb_cache_only = False
-        self.container_content = convert_type('season', 'container')
-        self.trakt_watchedindicators = False  # Force override of setting because not "true" seasons so data will be incorrect
-        return items
-
-    def list_episode_groups(self, tmdb_id, **kwargs):
-        items = self.tmdb_api.get_episode_groups_list(tmdb_id)
-        self.tmdb_cache_only = False
-        self.container_content = convert_type('tv', 'container')
-        return items
-
-    def list_flatseasons(self, tmdb_id, **kwargs):
-        items = self.tmdb_api.get_flatseasons_list(tmdb_id)
-        self.tmdb_cache_only = False
-        self.kodi_db = self.get_kodi_database('tv')
-        self.container_content = convert_type('episode', 'container')
-        return items
-
-    def list_seasons(self, tmdb_id, **kwargs):
+class ListSeasons(Container):
+    def get_items(self, tmdb_id, **kwargs):
         items = self.tmdb_api.get_season_list(tmdb_id, special_folders=get_setting('special_folders', 'int'))
         self.tmdb_cache_only = False
         self.container_content = convert_type('season', 'container')
         return items
 
-    def list_episodes(self, tmdb_id, season, **kwargs):
+
+class ListEpisodes(Container):
+    def get_items(self, tmdb_id, season, **kwargs):
         items = self.tmdb_api.get_episode_list(tmdb_id, season)
         self.tmdb_cache_only = False
         self.kodi_db = self.get_kodi_database('tv')
@@ -61,28 +40,70 @@ class TMDbLists():
         self.plugin_category = f'{get_localized(20373)} {season}'
         return items
 
-    def list_cast(self, tmdb_id, tmdb_type, season=None, episode=None, **kwargs):
-        items = self.tmdb_api.get_cast_list(tmdb_id, tmdb_type, season=season, episode=episode)
-        self.tmdb_cache_only = True
-        self.container_content = convert_type('person', 'container')
+
+class ListEpisodeGroups(Container):
+    def get_items(self, tmdb_id, **kwargs):
+        items = self.tmdb_api.get_episode_groups_list(tmdb_id)
+        self.tmdb_cache_only = False
+        self.container_content = convert_type('tv', 'container')
         return items
 
-    def list_crew(self, tmdb_id, tmdb_type, season=None, episode=None, **kwargs):
-        items = self.tmdb_api.get_cast_list(tmdb_id, tmdb_type, season=season, episode=episode, keys=['crew'])
-        self.tmdb_cache_only = True
-        self.container_content = convert_type('person', 'container')
+
+class ListEpisodeGroupSeasons(Container):
+    def get_items(self, tmdb_id, group_id, **kwargs):
+        items = self.tmdb_api.get_episode_group_seasons_list(tmdb_id, group_id)
+        self.tmdb_cache_only = False
+        self.container_content = convert_type('season', 'container')
+        self.trakt_watchedindicators = False  # Force override of setting because not "true" seasons so data will be incorrect
         return items
 
-    def list_videos(self, tmdb_id, tmdb_type, season=None, episode=None, **kwargs):
-        items = self.tmdb_api.get_videos(tmdb_id, tmdb_type, season, episode)
-        self.tmdb_cache_only = True
-        self.container_content = convert_type('video', 'container')
+
+class ListEpisodeGroupEpisodes(Container):
+    def get_items(self, tmdb_id, group_id, position, **kwargs):
+        items = self.tmdb_api.get_episode_group_episodes_list(tmdb_id, group_id, position)
+        self.tmdb_cache_only = False
+        self.container_content = convert_type('episode', 'container')
         return items
 
-    def list_all_items(self, tmdb_type, page=None, **kwargs):
+
+class ListAll(Container):
+    def get_items(self, tmdb_type, page=None, **kwargs):
         items = self.tmdb_api.get_all_items_list(tmdb_type, page=page)
         self.tmdb_cache_only = False
         self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = convert_type(tmdb_type, 'library')
         self.container_content = convert_type(tmdb_type, 'container')
+        return items
+
+
+class ListCast(Container):
+    def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, **kwargs):
+        items = self.tmdb_api.get_cast_list(tmdb_id, tmdb_type, season=season, episode=episode)
+        self.tmdb_cache_only = True
+        self.container_content = convert_type('person', 'container')
+        return items
+
+
+class ListCrew(Container):
+    def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, **kwargs):
+        items = self.tmdb_api.get_cast_list(tmdb_id, tmdb_type, season=season, episode=episode, keys=['crew'])
+        self.tmdb_cache_only = True
+        self.container_content = convert_type('person', 'container')
+        return items
+
+
+class ListFlatSeasons(Container):
+    def get_items(self, tmdb_id, **kwargs):
+        items = self.tmdb_api.get_flatseasons_list(tmdb_id)
+        self.tmdb_cache_only = False
+        self.kodi_db = self.get_kodi_database('tv')
+        self.container_content = convert_type('episode', 'container')
+        return items
+
+
+class ListVideos(Container):
+    def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, **kwargs):
+        items = self.tmdb_api.get_videos(tmdb_id, tmdb_type, season, episode)
+        self.tmdb_cache_only = True
+        self.container_content = convert_type('video', 'container')
         return items

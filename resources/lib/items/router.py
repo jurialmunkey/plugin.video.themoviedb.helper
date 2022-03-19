@@ -3,8 +3,8 @@ from resources.lib.addon.logger import kodi_log
 from resources.lib.addon.parser import parse_paramstring, reconfigure_legacy_params
 
 """ Lazyimports """
-from resources.lib.addon.modimp import lazyimport_module, lazyimport_modules
-OldContainer = None  # resources.lib.items.oldcontainer
+from resources.lib.addon.modimp import lazyimport_modules, lazyimport_module
+get_container = None  # resources.lib.items.routes
 Players = None  # resources.lib.player.players
 related_lists = None  # resources.lib.script.router
 TMDb = None  # resources.lib.api.tmdb.api
@@ -20,29 +20,30 @@ class Router():
     @lazyimport_modules(globals(), (
         {'module_name': 'resources.lib.player.players', 'import_attr': 'Players'},
         {'module_name': 'resources.lib.api.tmdb.api', 'import_attr': 'TMDb'}))
-    def play_external(self, **kwargs):
-        kodi_log(['lib.container.router - Attempting to play item\n', kwargs], 1)
-        if not kwargs.get('tmdb_id'):
-            kwargs['tmdb_id'] = TMDb().get_tmdb_id(**kwargs)
-        Players(**kwargs).play(handle=self.handle if self.handle != -1 else None)
+    def play_external(self):
+        kodi_log(['lib.container.router - Attempting to play item\n', self.params], 1)
+        if not self.params.get('tmdb_id'):
+            self.params['tmdb_id'] = TMDb().get_tmdb_id(**self.params)
+        Players(**self.params).play(handle=self.handle if self.handle != -1 else None)
 
     @lazyimport_modules(globals(), (
         {'module_name': 'resources.lib.script.router', 'import_attr': 'related_lists'},
         {'module_name': 'resources.lib.api.tmdb.api', 'import_attr': 'TMDb'}))
-    def context_related(self, **kwargs):
-        if not kwargs.get('tmdb_id'):
-            kwargs['tmdb_id'] = TMDb().get_tmdb_id(**kwargs)
-        kwargs['container_update'] = True
-        related_lists(include_play=True, **kwargs)
+    def context_related(self):
+        if not self.params.get('tmdb_id'):
+            self.params['tmdb_id'] = TMDb().get_tmdb_id(**self.params)
+        self.params['container_update'] = True
+        related_lists(include_play=True, **self.params)
 
-    @lazyimport_module(globals(), 'resources.lib.items.oldcontainer', import_attr='Container', import_as="OldContainer")
+    @lazyimport_module(globals(), 'resources.lib.items.routes', import_attr='get_container')
     def get_directory(self):
-        container = OldContainer(self.handle, self.paramstring, **self.params)
+        container = get_container(self.params.get('info'))(self.handle, self.paramstring, **self.params)
+        container.get_tmdb_id()  # TODO: Only get this as necessary
         container.get_directory()
 
     def run(self):
         if self.params.get('info') == 'play':
-            return self.play_external(**self.params)
+            return self.play_external()
         if self.params.get('info') == 'related':
-            return self.context_related(**self.params)
+            return self.context_related()
         self.get_directory()

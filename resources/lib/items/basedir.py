@@ -2,6 +2,7 @@ from resources.lib.addon.tmdate import get_timedelta, get_datetime_today
 from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized
 from resources.lib.addon.parser import merge_two_items
 from resources.lib.items.builder import ItemBuilder
+from resources.lib.items.container import Container
 from json import dumps
 
 
@@ -850,8 +851,8 @@ def get_basedir_details(tmdb_type, tmdb_id, season=None, episode=None, detailed_
     return items
 
 
-class BaseDirLists():
-    def list_basedir(self, info=None):
+class ListBaseDir(Container):
+    def get_items(self, info=None, **kwargs):
         route = {
             'dir_movie': lambda: _get_basedir_list('movie', tmdb=True, trakt=True),
             'dir_tv': lambda: _get_basedir_list('tv', tmdb=True, trakt=True),
@@ -865,11 +866,19 @@ class BaseDirLists():
         func = route.get(info, lambda: _build_basedir(None, _get_basedir_main()))
         return func()
 
-    def list_details(self, tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
+
+class ListDetails(Container):
+    def get_items(self, tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
+        def _get_container_content():
+            if tmdb_type == 'tv' and season and episode:
+                return convert_type('episode', 'container')
+            elif tmdb_type == 'tv' and season:
+                return convert_type('season', 'container')
+            return convert_type(tmdb_type, 'container')
         base_item = ItemBuilder(tmdb_api=self.tmdb_api).get_item(tmdb_type, tmdb_id, season, episode)
         base_item = base_item['listitem'] if base_item else {}
         base_item = self.omdb_api.get_item_ratings(base_item) if self.omdb_api else base_item
         items = get_basedir_details(tmdb_type, tmdb_id, season, episode, base_item)
-        self.container_content = self.get_container_content(tmdb_type, season, episode)
+        self.container_content = _get_container_content()
         self.kodi_db = self.get_kodi_database(tmdb_type)
         return items
