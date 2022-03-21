@@ -472,6 +472,20 @@ LANGUAGES = [
     {"id": "zu", "name": u"Zulu (zu)"}]
 
 
+TRANSLATE_PARAMS = {
+    'with_genres': ('genre', 'USER'),
+    'without_genres': ('genre', 'USER'),
+    'with_keywords': ('keyword', 'USER'),
+    'without_keywords': ('keyword', 'USER'),
+    'with_companies': ('company', 'NONE'),
+    'with_people': ('person', 'USER'),
+    'with_cast': ('person', 'USER'),
+    'with_crew': ('person', 'USER'),
+    'with_release_type': (None, 'OR'),
+    'with_networks': (None, 'OR'),
+}
+
+
 def _get_release_types():
     return [
         {'id': 1, 'name': get_localized(32242)},
@@ -795,47 +809,15 @@ def _add_rule(tmdb_type, method=None):
 
 
 def _translate_discover_params(tmdb_type, params):
-    lookup_keyword = None if params.get('with_id') and params.get('with_id') != 'False' else 'keyword'
-    lookup_company = None if params.get('with_id') and params.get('with_id') != 'False' else 'company'
-    lookup_person = None if params.get('with_id') and params.get('with_id') != 'False' else 'person'
-    lookup_genre = None if params.get('with_id') and params.get('with_id') != 'False' else 'genre'
-    with_separator = params.get('with_separator')
-
-    if params.get('with_genres'):
-        params['with_genres'] = TMDb().get_translated_list(
-            split_items(params.get('with_genres')), lookup_genre, separator=with_separator)
-
-    if params.get('without_genres'):
-        params['without_genres'] = TMDb().get_translated_list(
-            split_items(params.get('without_genres')), lookup_genre, separator=with_separator)
-
-    if params.get('with_keywords'):
-        params['with_keywords'] = TMDb().get_translated_list(
-            split_items(params.get('with_keywords')), lookup_keyword, separator=with_separator)
-
-    if params.get('without_keywords'):
-        params['without_keywords'] = TMDb().get_translated_list(
-            split_items(params.get('without_keywords')), lookup_keyword, separator=with_separator)
-
-    if params.get('with_companies'):
-        params['with_companies'] = TMDb().get_translated_list(
-            split_items(params.get('with_companies')), lookup_company, separator='NONE')
-
-    if params.get('with_people'):
-        params['with_people'] = TMDb().get_translated_list(
-            split_items(params.get('with_people')), lookup_person, separator=with_separator)
-
-    if params.get('with_cast'):
-        params['with_cast'] = TMDb().get_translated_list(
-            split_items(params.get('with_cast')), lookup_person, separator=with_separator)
-
-    if params.get('with_crew'):
-        params['with_crew'] = TMDb().get_translated_list(
-            split_items(params.get('with_crew')), lookup_person, separator=with_separator)
-
-    if params.get('with_release_type'):
-        params['with_release_type'] = TMDb().get_translated_list(
-            split_items(params.get('with_release_type')), None, separator='OR')
+    separator = params.get('with_separator')
+    lookup_id = False if params.get('with_id') else True
+    for k, v in TRANSLATE_PARAMS.items():
+        if not params.get(k):
+            continue
+        items = split_items(params[k])
+        ttype = v[0] if lookup_id else None
+        stype = separator if v[1] == 'USER' else v[1]
+        params[k] = TMDb().get_translated_list(items, ttype, separator=stype)
 
     # Translate relative dates based upon today's date
     for i in RELATIVE_DATES:
