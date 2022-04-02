@@ -95,6 +95,7 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
             if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"):
                 ImageFunctions(method='crop', is_thread=False, prefix='Player', artwork=(
                     get_infolabel('Player.Art(tvshow.clearlogo)')
+                    or get_infolabel('Player.Art(artist.clearlogo)')
                     or get_infolabel('Player.Art(clearlogo)')
                     or self.details.get('art', {}).get('clearlogo'))).run()
             self.set_iter_properties(self.details, SETMAIN_ARTWORK)
