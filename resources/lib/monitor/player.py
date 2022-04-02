@@ -19,6 +19,10 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.reset_properties()
         self.get_playingitem()
 
+    def onAVChange(self):
+        self.reset_properties()
+        self.get_playingitem()
+
     def onPlayBackEnded(self):
         self.set_watched()
         self.reset_properties()
