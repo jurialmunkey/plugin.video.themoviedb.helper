@@ -78,13 +78,14 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
 
         # Get ratings (no need for threading since we're only getting one item in player ever)
         if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"):
-            self.details = self.get_omdb_ratings(self.details)
-            if self.tmdb_type == 'movie':
-                self.details = self.get_imdb_top250_rank(self.details)
-            if self.tmdb_type in ['movie', 'tv']:
-                self.details = self.get_trakt_ratings(
-                    self.details, 'movie' if self.tmdb_type == 'movie' else 'show',
-                    season=self.season, episode=self.episode)
+            try:
+                trakt_type = {'movie': 'movie', 'tv': 'show'}[self.tmdb_type]
+            except KeyError:
+                trakt_type = None
+            if trakt_type:
+                self.details = self.get_omdb_ratings(self.details)
+                self.details = self.get_imdb_top250_rank(self.details, trakt_type=trakt_type)
+                self.details = self.get_trakt_ratings(self.details, trakt_type, season=self.season, episode=self.episode)
             self.set_iter_properties(self.details.get('infoproperties', {}), SETPROP_RATINGS)
 
         # Get artwork (no need for threading since we're only getting one item in player ever)

@@ -626,11 +626,16 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         return self.get_request_lc(trakt_type + 's', id_num, 'seasons', season, 'episodes', episode, extended=extended)
 
     @use_simple_cache(cache_days=CACHE_SHORT)
-    def get_imdb_top250(self, id_type=None):
-        path = 'users/justin/lists/imdb-top-rated-movies/items'
-        response = self.get_response(path, limit=4095)
-        sorted_items = TraktItems(response.json() if response else []).sort_items('rank', 'asc') or []
-        return [i['movie']['ids'][id_type] for i in sorted_items]
+    def get_imdb_top250(self, id_type=None, trakt_type='movie'):
+        paths = {
+            'movie': 'users/justin/lists/imdb-top-rated-movies/items',
+            'show': 'users/justin/lists/imdb-top-rated-tv-shows/items'}
+        try:
+            response = self.get_response(paths[trakt_type], limit=4095)
+            sorted_items = TraktItems(response.json() if response else []).sort_items('rank', 'asc') or []
+            return [i[trakt_type]['ids'][id_type] for i in sorted_items]
+        except KeyError:
+            return []
 
     @use_simple_cache(cache_days=CACHE_SHORT)
     def get_ratings(self, trakt_type, imdb_id=None, trakt_id=None, slug_id=None, season=None, episode=None):

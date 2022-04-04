@@ -154,14 +154,24 @@ class CommonMonitorFunctions(object):
         item['infoproperties'] = merge_two_dicts(item.get('infoproperties', {}), ratings)
         return item
 
-    def get_imdb_top250_rank(self, item):
-        if not self.imdb_top250:
-            self.imdb_top250 = self.trakt_api.get_imdb_top250(id_type='tmdb')
+    def get_imdb_top250_rank(self, item, trakt_type):
         try:
-            item['infoproperties']['top250'] = item['infolabels']['top250'] = self.imdb_top250.index(
-                try_int(item.get('unique_ids', {}).get('tmdb'))) + 1
+            tmdb_id = try_int(item['unique_ids'].get('tvshow.tmdb') or item['unique_ids'].get('tmdb'))
+        except KeyError:
+            tmdb_id = None
+        if not tmdb_id:
+            return item
+        try:
+            imdb_top250 = self.imdb_top250[trakt_type]
+        except KeyError:
+            imdb_top250 = self.trakt_api.get_imdb_top250(id_type='tmdb', trakt_type=trakt_type)
+            if not imdb_top250:
+                return item
+            self.imdb_top250[trakt_type] = imdb_top250
+        try:
+            item['infoproperties']['top250'] = item['infolabels']['top250'] = imdb_top250.index(tmdb_id) + 1
         except Exception:
-            pass
+            return item
         return item
 
     def get_omdb_ratings(self, item, cache_only=False):

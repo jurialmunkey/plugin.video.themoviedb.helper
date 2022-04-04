@@ -144,14 +144,13 @@ class ListItemMonitor(CommonMonitorFunctions):
 
     @kodi_try_except('lib.monitor.listitem.process_ratings')
     def process_ratings(self, details, tmdb_type):
-        if tmdb_type not in ['movie', 'tv']:
-            return
+        try:
+            trakt_type = {'movie': 'movie', 'tv': 'show'}[tmdb_type]
+        except KeyError:
+            return  # Only lookup ratings for movie or tvshow
         details = self.get_omdb_ratings(details)
-        if tmdb_type == 'movie':
-            details = self.get_imdb_top250_rank(details)
-        details = self.get_trakt_ratings(
-            details, 'movie' if tmdb_type == 'movie' else 'show',
-            season=self.season, episode=self.episode)
+        details = self.get_imdb_top250_rank(details, trakt_type=trakt_type)
+        details = self.get_trakt_ratings(details, trakt_type, season=self.season, episode=self.episode)
         if not self.is_same_item():
             return
         self.set_iter_properties(details.get('infoproperties', {}), SETPROP_RATINGS)
