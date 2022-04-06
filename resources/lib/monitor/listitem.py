@@ -16,7 +16,7 @@ def get_container():
 
 def get_container_item(container=None):
     if get_condvisibility(
-            "[Window.IsVisible(DialogPVRInfo.xml) | "
+            "[Window.IsVisible(DialogPVRInfo.xml) | Window.IsVisible(MyPVRGuide.xml) | "
             "Window.IsVisible(movieinformation)] + "
             "!Skin.HasSetting(TMDbHelper.ForceWidgetContainer)"):
         return 'ListItem.'
