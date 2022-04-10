@@ -120,6 +120,11 @@ class ListItemMonitor(CommonMonitorFunctions):
     def get_cur_folder(self):
         return (self.container, get_infolabel('Container.Content()'), self.get_numitems())
 
+    def clear_properties(self, ignore_keys=None):
+        if not self.get_artwork(source="Art(artist.clearlogo)|Art(tvshow.clearlogo)|Art(clearlogo)"):
+            self.properties.update({'CropImage', 'CropImage.Original'})
+        super().clear_properties(ignore_keys=ignore_keys)
+
     @kodi_try_except('lib.monitor.listitem.is_same_folder')
     def is_same_folder(self, update=True):
         self.cur_folder = self.get_cur_folder()
