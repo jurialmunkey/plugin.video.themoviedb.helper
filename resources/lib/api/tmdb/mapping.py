@@ -213,6 +213,7 @@ def get_episode_to_air(v, name):
     infoproperties[f'{name}.long'] = format_date(i.get('air_date'), region_fmt='datelong')
     infoproperties[f'{name}.short'] = format_date(i.get('air_date'), "%d %b")
     infoproperties[f'{name}.day'] = format_date(i.get('air_date'), "%A")
+    infoproperties[f'{name}.day_short'] = format_date(i.get('air_date'), "%a")
     infoproperties[f'{name}.year'] = format_date(i.get('air_date'), "%Y")
     infoproperties[f'{name}.episode'] = i.get('episode_number')
     infoproperties[f'{name}.name'] = i.get('name')
