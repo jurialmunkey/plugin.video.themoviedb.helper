@@ -17,7 +17,7 @@ SETMAIN_ARTWORK = {
 SETINFO = {
     'title', 'originaltitle', 'tvshowtitle', 'plot', 'rating', 'votes', 'premiered', 'year',
     'imdbnumber', 'tagline', 'status', 'episode', 'season', 'genre', 'set', 'studio', 'country',
-    'MPAA', 'director', 'writer', 'trailer', 'top250'}
+    'mpaa', 'director', 'writer', 'trailer', 'top250'}
 SETPROP = {
     'tmdb_id', 'imdb_id', 'tvdb_id', 'tvshow.tvdb_id', 'tvshow.tmdb_id', 'tvshow.imdb_id',
     'biography', 'birthday', 'age', 'deathday', 'character', 'department', 'job', 'known_for', 'role', 'born',
