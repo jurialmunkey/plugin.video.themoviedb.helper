@@ -628,33 +628,42 @@ class ItemMapper(_ItemMapper):
             'aspect_ratio': ('infoproperties', 'aspect_ratio')
         }
 
-    def finalise_image(self, item):
-        item['infolabels']['title'] = f'{item["infoproperties"].get("width")}x{item["infoproperties"].get("height")}'
-        item['params'] = -1
-        item['path'] = item['art'].get('thumb') or item['art'].get('poster') or item['art'].get('fanart')
-        item['is_folder'] = False
-        item['library'] = 'pictures'
-        return item
-
-    def finalise_person(self, item):
-        if item['infoproperties'].get('birthday'):
-            item['infoproperties']['age'] = age_difference(
-                item['infoproperties']['birthday'],
-                item['infoproperties'].get('deathday'))
-        return item
-
     def finalise(self, item, tmdb_type):
-        if tmdb_type == 'image':
-            item = self.finalise_image(item)
-        elif tmdb_type == 'person':
-            item = self.finalise_person(item)
-        elif tmdb_type == 'tv' and not item['infolabels'].get('tvshowtitle'):
+
+        def _finalise_image():
+            item['infolabels']['title'] = f'{item["infoproperties"].get("width")}x{item["infoproperties"].get("height")}'
+            item['params'] = -1
+            item['path'] = item['art'].get('thumb') or item['art'].get('poster') or item['art'].get('fanart')
+            item['is_folder'] = False
+            item['library'] = 'pictures'
+
+        def _finalise_person():
+            if item['infoproperties'].get('birthday'):
+                item['infoproperties']['age'] = age_difference(
+                    item['infoproperties']['birthday'],
+                    item['infoproperties'].get('deathday'))
+
+        def _finalise_tv():
             item['infolabels']['tvshowtitle'] = item['infolabels'].get('title')
+
+        def _finalise_video():
+            item['params'] = -1
+
+        finalise_route = {
+            'image': _finalise_image,
+            'person': _finalise_person,
+            'tv': _finalise_tv,
+            'video': _finalise_video}
+
+        if tmdb_type in finalise_route:
+            finalise_route[tmdb_type]()
+
         item['label'] = item['infolabels'].get('title')
         item['infoproperties']['tmdb_type'] = tmdb_type
         item['infolabels']['mediatype'] = item['infoproperties']['dbtype'] = convert_type(tmdb_type, 'dbtype')
         for k, v in item['unique_ids'].items():
             item['infoproperties'][f'{k}_id'] = v
+
         return item
 
     def add_cast(self, item, info_item, base_item=None):
