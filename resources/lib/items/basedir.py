@@ -194,7 +194,7 @@ def _get_basedir_details():
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/themoviedb/trakt.png'},
-            'types': ['null']}]
+            'types': ['movie', 'tv', 'episode']}]
 
 
 def _get_basedir_random():

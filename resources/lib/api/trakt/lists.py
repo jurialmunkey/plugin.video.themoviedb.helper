@@ -207,10 +207,16 @@ class ListUpNext(Container):
 class ListLists(Container):
     def get_items(self, info, page=None, **kwargs):
         info_model = TRAKT_LIST_OF_LISTS.get(info)
+
+        if info_model.get('get_trakt_id'):
+            kwargs['trakt_type'] = {'movie': 'movie', 'tv': 'show'}[kwargs['tmdb_type']]
+            kwargs['trakt_id'] = self.trakt_api.get_id(kwargs['tmdb_id'], 'tmdb', trakt_type=kwargs['trakt_type'], output_type='trakt')
+
         items = self.trakt_api.get_list_of_lists(
             path=info_model.get('path', '').format(**kwargs),
             page=page,
             authorize=info_model.get('authorize', False))
+
         self.library = 'video'
         self.plugin_category = get_plugin_category(info_model)
         return items

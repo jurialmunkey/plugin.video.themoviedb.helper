@@ -445,6 +445,12 @@ TRAKT_LIST_OF_LISTS_ROUTE = {
     'module_name': 'resources.lib.api.trakt.lists',
     'import_attr': 'ListLists'}
 TRAKT_LIST_OF_LISTS = {
+    'trakt_inlists': {
+        'path': '{trakt_type}s/{trakt_id}/lists/personal/popular',
+        'route': TRAKT_LIST_OF_LISTS_ROUTE,
+        'get_trakt_id': True,
+        'plugin_category': '{localized}',
+        'localized': 32232},
     'trakt_trendinglists': {
         'path': 'lists/trending',
         'route': TRAKT_LIST_OF_LISTS_ROUTE,
