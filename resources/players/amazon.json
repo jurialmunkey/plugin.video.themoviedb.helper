@@ -20,6 +20,7 @@
                             {"file": "(?i).*/search/"},
                             {"keyboard": "{showname}"},
                             {"label": "(?i).*{showname}.*"},
+                            {"return": "true", "season": "{season}", "episode": "{episode}"},
                             {"season": "{season}"},
                             {"season": "{season}", "episode": "{episode}"}
                           ],
