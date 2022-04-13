@@ -62,9 +62,11 @@ def get_item_details(tmdb_type, tmdb_id, season=None, episode=None, language=Non
     tmdb_api = TMDb(language=language) if language else TMDb()
     ib = ItemBuilder(tmdb_api=tmdb_api)
     details = ib.get_item(tmdb_type, tmdb_id, season, episode)
-    if details:
+    try:
         artwork = details['artwork']
         details = details['listitem']
+    except (KeyError, TypeError):
+        return
     if not details:
         return
     details['art'] = ib.get_item_artwork(artwork, is_season=True if season else False)

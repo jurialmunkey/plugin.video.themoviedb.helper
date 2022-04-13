@@ -2,6 +2,7 @@
     "name"              : "ABC iView",
     "plugin"            : "plugin.video.abc_iview",
     "priority"          : 1000,
+    "provider"          : "ABC iview",
     "is_resolvable"     : "true",
     "assert"            : {
                             "play_movie":       ["title", "year"],

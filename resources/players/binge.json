@@ -2,6 +2,7 @@
     "name"              : "BiNGE",
     "plugin"            : "slyguy.binge",
     "priority"          : 100,
+    "provider"          : "BINGE",
     "is_resolvable"     : "true",
     "assert"            : {
                             "play_movie":       ["title", "year"],

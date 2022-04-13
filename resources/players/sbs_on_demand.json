@@ -2,6 +2,7 @@
     "name"              : "SBS On Demand",
     "plugin"            : "plugin.video.sbs",
     "priority"          : 1000,
+    "provider"          : "SBS On Demand",
     "is_resolvable"     : "true",
     "assert"            : {
                             "play_movie":       ["title", "year"],

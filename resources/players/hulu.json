@@ -2,6 +2,7 @@
     "name"              : "Hulu",
     "plugin"            : "slyguy.hulu",
     "priority"          : 100,
+    "provider"          : "Hulu",
     "is_resolvable"     : "true",
     "assert"            : {
                             "play_movie":       ["title", "year"],

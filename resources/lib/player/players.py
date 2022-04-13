@@ -93,6 +93,7 @@ class Players(object):
             self.item = get_detailed_item(tmdb_type, tmdb_id, season, episode, details=self.details) or {}
 
             _p_dialog.update(f'{get_localized(32376)}...')
+            self._set_provider_priority()
             self.playerstring = get_playerstring(tmdb_type, tmdb_id, season, episode, details=self.details)
             self.dialog_players = self._get_players_for_dialog(tmdb_type)
 
@@ -103,6 +104,18 @@ class Players(object):
             self.dummy_delay = try_float(get_setting('dummy_delay', 'str')) or 1.0
             self.force_xbmcplayer = get_setting('force_xbmcplayer')
             self.is_strm = islocal
+
+    def _set_provider_priority(self):
+        try:  # Check if players are listed in providers and bump priority if found
+            providers = self.details.infoproperties['providers']
+            providers = providers.split(' / ')
+            for k, v in self.players.items():
+                if 'provider' not in v or v['provider'] not in providers:
+                    v['priority'] = v.get('priority', PLAYERS_PRIORITY) + 100  # Increase priority baseline by 100 to prevent other players displaying above providers
+                    continue
+                v['priority'] = providers.index(v['provider']) + 1  # Add 1 because sorted() puts 0 index last
+        except KeyError:
+            pass
 
     def _check_assert(self, keys=[]):
         if not self.item:
