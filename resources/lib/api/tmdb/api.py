@@ -468,7 +468,7 @@ class TMDb(RequestAPI):
         response = self.get_request_sc(path, **kwargs)
         results = response.get(key, []) if response else []
         items = [
-            self.mapper.get_info(i, tmdb_type, definition=params, base_tmdb_type=base_tmdb_type)
+            self.mapper.get_info(i, tmdb_type, definition=params, base_tmdb_type=base_tmdb_type, iso_country=self.iso_country)
             for i in results if i]
         if filters:
             items = [i for i in items if not is_excluded(i, **filters)]

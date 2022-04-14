@@ -8,7 +8,11 @@ class ListBasic(Container):
         info_model = TMDB_BASIC_LISTS.get(info)
         info_tmdb_type = info_model.get('tmdb_type') or tmdb_type
         items = self.tmdb_api.get_basic_list(
-            path=info_model.get('path', '').format(tmdb_type=tmdb_type, tmdb_id=tmdb_id, **kwargs),
+            path=info_model.get('path', '').format(
+                tmdb_type=tmdb_type,
+                tmdb_id=tmdb_id,
+                iso_country=self.tmdb_api.iso_country,
+                **kwargs),
             tmdb_type=info_tmdb_type,
             base_tmdb_type=tmdb_type,
             key=info_model.get('key', 'results'),
@@ -16,6 +20,8 @@ class ListBasic(Container):
             filters=self.filters,
             limit=limit or info_model.get('limit'),
             page=page)
+        if 'tmdb_cache_only' in info_model:
+            self.tmdb_cache_only = info_model['tmdb_cache_only']
         self.kodi_db = self.get_kodi_database(info_tmdb_type)
         self.library = convert_type(info_tmdb_type, 'library')
         self.container_content = convert_type(info_tmdb_type, 'container')

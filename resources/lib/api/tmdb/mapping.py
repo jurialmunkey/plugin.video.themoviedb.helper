@@ -351,6 +351,10 @@ class ItemMapper(_ItemMapper):
                 'keys': [('art', 'thumb')],
                 'func': get_imagepath_thumb
             }],
+            'logo_path': [{
+                'keys': [('art', 'thumb')],
+                'func': get_imagepath_quality
+            }],
             'backdrop_path': [{
                 'keys': [('art', 'fanart')],
                 'func': get_imagepath_fanart
@@ -605,11 +609,13 @@ class ItemMapper(_ItemMapper):
             'content': ('infolabels', 'plot'),
             'tagline': ('infolabels', 'tagline'),
             'id': ('unique_ids', 'tmdb'),
+            'provider_id': ('unique_ids', 'tmdb'),
             'original_title': ('infolabels', 'originaltitle'),
             'original_name': ('infolabels', 'originaltitle'),
             'title': ('infolabels', 'title'),
             'name': ('infolabels', 'title'),
             'author': ('infolabels', 'title'),
+            'provider_name': ('infolabels', 'title'),
             'origin_country': ('infolabels', 'country'),
             'status': ('infolabels', 'status'),
             'season_number': ('infolabels', 'season'),

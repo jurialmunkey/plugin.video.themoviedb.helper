@@ -605,6 +605,14 @@ def _get_basedir_tmdb():
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/themoviedb/genre.png'}},
         {
+            'label': u'{{item_type}}{{space}}{}'.format(get_localized(32411)),
+            'types': ['movie', 'tv'],
+            'params': {'info': 'watch_providers'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/themoviedb/airing.png'}},
+        {
             'label': u'{}{{space}}{{item_type}}'.format(get_localized(32184)),
             'types': ['movie'],
             'params': {'info': 'revenue_movies'},

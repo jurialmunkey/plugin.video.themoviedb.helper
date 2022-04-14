@@ -318,6 +318,7 @@ TMDB_BASIC_LISTS = {
         'path': 'movie/{tmdb_id}/keywords',
         'key': 'keywords',
         'tmdb_type': 'keyword',
+        'tmdb_cache_only': True,
         'params': {
             'info': 'discover',
             'tmdb_type': 'movie',
@@ -330,10 +331,26 @@ TMDB_BASIC_LISTS = {
         'path': 'genre/{tmdb_type}/list',
         'key': 'genres',
         'tmdb_type': 'genre',
+        'tmdb_cache_only': True,
         'params': {
             'info': 'discover',
             'tmdb_type': '{base_tmdb_type}',
             'with_genres': '{tmdb_id}',
+            'with_id': 'True'
+        },
+        'route': TMDB_BASIC_LISTS_ROUTE,
+        'plugin_category': '{plural}',
+    },
+    'watch_providers': {
+        'path': 'watch/providers/{tmdb_type}?watch_region={iso_country}',
+        'key': 'results',
+        'tmdb_type': 'provider',
+        'tmdb_cache_only': True,
+        'params': {
+            'info': 'discover',
+            'tmdb_type': '{base_tmdb_type}',
+            'with_watch_providers': '{provider_id}',
+            'watch_region': '{iso_country}',
             'with_id': 'True'
         },
         'route': TMDB_BASIC_LISTS_ROUTE,

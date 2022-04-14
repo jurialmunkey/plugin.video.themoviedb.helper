@@ -2096,6 +2096,16 @@ msgctxt "#32410"
 msgid "Max concurrent threads (0 is unlimited)"
 msgstr ""
 
+#: /resources/lib/items/basedir.py
+msgctxt "#32411"
+msgid "Providers"
+msgstr ""
+
+#: /resources/lib/api/tmdb/discover.py
+msgctxt "#32412"
+msgid "With watch providers"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

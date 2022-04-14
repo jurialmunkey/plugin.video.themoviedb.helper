@@ -142,14 +142,14 @@ def iter_props(items, property_name, infoproperties=None, func=None, **kwargs):
     return infoproperties
 
 
-def get_params(item, tmdb_type, tmdb_id=None, params=None, definition=None, base_tmdb_type=None):
+def get_params(item, tmdb_type, tmdb_id=None, params=None, definition=None, base_tmdb_type=None, iso_country=None):
     params = params or {}
     tmdb_id = tmdb_id or item.get('id')
     if params == -1:
         return {}
     definition = definition or {'info': 'details', 'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'}
     for k, v in definition.items():
-        params[k] = v.format(tmdb_type=tmdb_type, tmdb_id=tmdb_id, base_tmdb_type=base_tmdb_type, **item)
+        params[k] = v.format(tmdb_type=tmdb_type, tmdb_id=tmdb_id, base_tmdb_type=base_tmdb_type, iso_country=iso_country, **item)
     return del_empty_keys(params)  # TODO: Is this necessary??!
 
 
