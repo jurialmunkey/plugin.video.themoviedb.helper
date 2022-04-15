@@ -7,35 +7,21 @@ from xbmcgui import Dialog
 from json import dumps
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import format_folderpath, convert_type, get_localized, get_setting, set_setting, executebuiltin, get_infolabel
-from resources.lib.addon.dialog import BusyDialog, ProgressDialog
+from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.parser import encode_url, parse_paramstring, reconfigure_legacy_params
-from resources.lib.files.downloader import Downloader
 from resources.lib.files.futils import dumps_to_file, validify_filename, read_file
-from resources.lib.items.basedir import get_basedir_details
-from resources.lib.items.builder import ItemBuilder
-from resources.lib.api.fanarttv.api import FanartTV
-from resources.lib.api.tmdb.api import TMDb
-from resources.lib.api.trakt.api import TraktAPI, get_sort_methods
-from resources.lib.api.omdb.api import OMDb
-from resources.lib.api.kodi.rpc import get_jsonrpc
-from resources.lib.update.library import add_to_library
-from resources.lib.update.userlist import monitor_userlist, library_autoupdate
+from resources.lib.api.tmdb.api import TMDb, get_tmdb_id
+from resources.lib.api.trakt.api import TraktAPI
 from resources.lib.window.manager import WindowManager
 from resources.lib.player.players import Players
-from resources.lib.player.configure import configure_players
-from resources.lib.monitor.images import ImageFunctions
-from resources.lib.script.sync import sync_trakt_item
 from resources.lib.addon.logger import kodi_log
 
-
-# Get TMDb ID decorator
-def get_tmdb_id(func):
-    def wrapper(*args, **kwargs):
-        with BusyDialog():
-            if not kwargs.get('tmdb_id'):
-                kwargs['tmdb_id'] = TMDb().get_tmdb_id(**kwargs)
-        return func(*args, **kwargs)
-    return wrapper
+""" Lazyimports """
+from resources.lib.addon.modimp import lazyimport_modules, lazyimport
+ItemBuilder = None  # from resources.lib.items.builder
+ImageFunctions = None  # from resources.lib.monitor.images
+FanartTV = None  # from resources.lib.api.fanarttv.api
+OMDb = None  # from resources.lib.api.omdb.api
 
 
 def map_kwargs(mapping={}):
@@ -60,23 +46,15 @@ def is_in_kwargs(mapping={}):
     return decorator
 
 
-def play_media(**kwargs):
-    with BusyDialog():
-        kodi_log(['lib.script.router - attempting to play\n', kwargs.get('play_media')], 1)
-        executebuiltin(f'PlayMedia({kwargs.get("play_media")})')
-
-
-def run_plugin(**kwargs):
-    with BusyDialog():
-        kodi_log(['lib.script.router - attempting to play\n', kwargs.get('run_plugin')], 1)
-        executebuiltin(f'RunPlugin({kwargs.get("run_plugin")})')
-
-
 def container_refresh():
     executebuiltin('Container.Refresh')
     executebuiltin('UpdateLibrary(video,/fake/path/to/force/refresh/on/home)')
 
 
+@lazyimport_modules(globals(), (
+    {'module_name': 'resources.lib.items.builder', 'import_attr': 'ItemBuilder'},
+    {'module_name': 'resources.lib.api.fanarttv.api', 'import_attr': 'FanartTV'},
+    {'module_name': 'resources.lib.api.omdb.api', 'import_attr': 'OMDb'}))
 def delete_cache(delete_cache, **kwargs):
     d = {
         'TMDb': lambda: TMDb(),
@@ -155,6 +133,7 @@ def split_value(split_value, separator=None, **kwargs):
 @is_in_kwargs({'tmdb_type': ['movie', 'tv']})
 @get_tmdb_id
 def sync_trakt(**kwargs):
+    from resources.lib.script.sync import sync_trakt_item
     sync_trakt_item(
         trakt_type=convert_type(kwargs['tmdb_type'], 'trakt', season=kwargs.get('season'), episode=kwargs.get('episode')),
         unique_id=kwargs['tmdb_id'],
@@ -163,6 +142,14 @@ def sync_trakt(**kwargs):
         id_type='tmdb')
 
 
+def _module_method(module_name, import_attr, **kwargs):
+    _module = {'_method': None}
+    lazyimport(_module, module_name, import_attr=import_attr, import_as='_method')
+    _module['_method'](**kwargs)
+
+
+@lazyimport_modules(globals(), (
+    {'module_name': 'resources.lib.items.builder', 'import_attr': 'ItemBuilder'}))
 def manage_artwork(tmdb_id=None, tmdb_type=None, season=None, **kwargs):
     if not tmdb_type or not tmdb_id:
         return
@@ -171,6 +158,7 @@ def manage_artwork(tmdb_id=None, tmdb_type=None, season=None, **kwargs):
 
 @get_tmdb_id
 def related_lists(tmdb_id=None, tmdb_type=None, season=None, episode=None, container_update=True, include_play=False, **kwargs):
+    from resources.lib.items.basedir import get_basedir_details
     if not tmdb_id or not tmdb_type:
         return
     items = get_basedir_details(tmdb_type=tmdb_type, tmdb_id=tmdb_id, season=season, episode=episode, include_play=include_play)
@@ -196,6 +184,7 @@ def related_lists(tmdb_id=None, tmdb_type=None, season=None, episode=None, conta
 
 
 def update_players():
+    from resources.lib.files.downloader import Downloader
     players_url = get_setting('players_url', 'str')
     players_url = Dialog().input(get_localized(32313), defaultt=players_url)
     if not Dialog().yesno(
@@ -209,6 +198,8 @@ def update_players():
     downloader.get_extracted_zip()
 
 
+@lazyimport_modules(globals(), (
+    {'module_name': 'resources.lib.items.builder', 'import_attr': 'ItemBuilder'}))
 @get_tmdb_id
 def refresh_details(tmdb_id=None, tmdb_type=None, season=None, episode=None, confirm=True, **kwargs):
     if not tmdb_id or not tmdb_type:
@@ -223,6 +214,7 @@ def refresh_details(tmdb_id=None, tmdb_type=None, season=None, episode=None, con
 
 
 def kodi_setting(kodi_setting, **kwargs):
+    from resources.lib.api.kodi.rpc import get_jsonrpc
     method = "Settings.GetSettingValue"
     params = {"setting": kodi_setting}
     response = get_jsonrpc(method, params)
@@ -232,6 +224,7 @@ def kodi_setting(kodi_setting, **kwargs):
 
 
 def user_list(user_list, user_slug=None, **kwargs):
+    from resources.lib.update.library import add_to_library
     user_slug = user_slug or 'me'
     if not user_slug or not user_list:
         return
@@ -274,19 +267,24 @@ def set_defaultplayer(**kwargs):
     set_setting(setting_name, f'{default_player["file"]} {default_player["mode"]}', 'str')
 
 
+@lazyimport_modules(globals(), (
+    {'module_name': 'resources.lib.monitor.images', 'import_attr': 'ImageFunctions'}))
 def blur_image(blur_image=None, **kwargs):
     blur_img = ImageFunctions(method='blur', artwork=blur_image)
     blur_img.setName('blur_img')
     blur_img.start()
 
 
+@lazyimport_modules(globals(), (
+    {'module_name': 'resources.lib.monitor.images', 'import_attr': 'ImageFunctions'}))
 def image_colors(image_colors=None, **kwargs):
     image_colors = ImageFunctions(method='colors', artwork=image_colors)
     image_colors.setName('image_colors')
     image_colors.start()
 
 
-def library_update(**kwargs):
+def library_autoupdate(**kwargs):
+    from resources.lib.update.userlist import library_autoupdate as _library_autoupdate
     if kwargs.get('force') == 'select':
         choice = Dialog().yesno(
             get_localized(32391),
@@ -296,7 +294,7 @@ def library_update(**kwargs):
         if choice == -1:
             return
         kwargs['force'] = True if choice else False
-    library_autoupdate(
+    _library_autoupdate(
         list_slugs=kwargs.get('list_slug', None),
         user_slugs=kwargs.get('user_slug', None),
         busy_spinner=True if kwargs.get('busy_dialog', False) else False,
@@ -327,35 +325,6 @@ def log_request(**kwargs):
         Dialog().textviewer(filename, dumps(kwargs['response'], indent=2))
 
 
-def sort_list(**kwargs):
-    sort_methods = get_sort_methods() if kwargs['info'] == 'trakt_userlist' else get_sort_methods(True)
-    x = Dialog().contextmenu([i['name'] for i in sort_methods])
-    if x == -1:
-        return
-    for k, v in sort_methods[x]['params'].items():
-        kwargs[k] = v
-    executebuiltin(format_folderpath(encode_url(**kwargs)))
-
-
-def log_jsonrpc(**kwargs):
-    method = "VideoLibrary.GetMovies"
-    params = {
-        "properties": ["title", "imdbnumber", "originaltitle", "uniqueid", "year", "file"],
-        "sort": {"method": "year", "order": "descending"},
-        "filter": {"or": [
-            {"operator": "contains", "field": "title", "value": "Batman"},
-            {"operator": "contains", "field": "originaltitle", "value": "Batman"},
-        ]}
-    }
-    response = get_jsonrpc(method, params) or {}
-    with ProgressDialog('JSON_RPC Results', f'{response}', total=100, logging=0) as dialog:
-        update = 0
-        while update < 100:
-            update += 10
-            dialog.update(update)
-    kodi_log(['JSONRPC:\n', response], 1)
-
-
 class Script(object):
     def __init__(self):
         self.params = {}
@@ -368,47 +337,72 @@ class Script(object):
         self.params = reconfigure_legacy_params(**self.params)
 
     routing_table = {
-        'authenticate_trakt': lambda **kwargs: TraktAPI(force=True),
-        'revoke_trakt': lambda **kwargs: TraktAPI().logout(),
-        'split_value': lambda **kwargs: split_value(**kwargs),
-        'kodi_setting': lambda **kwargs: kodi_setting(**kwargs),
-        'sync_trakt': lambda **kwargs: sync_trakt(**kwargs),
-        'manage_artwork': lambda **kwargs: manage_artwork(**kwargs),
-        'refresh_details': lambda **kwargs: refresh_details(**kwargs),
-        'related_lists': lambda **kwargs: related_lists(**kwargs),
-        'user_list': lambda **kwargs: user_list(**kwargs),
-        'like_list': lambda **kwargs: like_list(**kwargs),
-        'delete_list': lambda **kwargs: delete_list(**kwargs),
-        'rename_list': lambda **kwargs: rename_list(**kwargs),
-        'blur_image': lambda **kwargs: blur_image(**kwargs),
-        'image_colors': lambda **kwargs: image_colors(**kwargs),
-        'monitor_userlist': lambda **kwargs: monitor_userlist(),
-        'update_players': lambda **kwargs: update_players(),
-        'set_defaultplayer': lambda **kwargs: set_defaultplayer(**kwargs),
-        'configure_players': lambda **kwargs: configure_players(**kwargs),
-        'library_autoupdate': lambda **kwargs: library_update(**kwargs),
-        # 'play_season': lambda **kwargs: play_season(**kwargs),
-        'play_media': lambda **kwargs: play_media(**kwargs),
-        'run_plugin': lambda **kwargs: run_plugin(**kwargs),
-        'log_jsonrpc': lambda **kwargs: log_jsonrpc(**kwargs),
-        'log_request': lambda **kwargs: log_request(**kwargs),
-        'delete_cache': lambda **kwargs: delete_cache(**kwargs),
-        'play': lambda **kwargs: play_external(**kwargs),
-        'play_using': lambda **kwargs: play_using(**kwargs),
-        'add_path': lambda **kwargs: WindowManager(**kwargs).router(),
-        'add_query': lambda **kwargs: WindowManager(**kwargs).router(),
-        'close_dialog': lambda **kwargs: WindowManager(**kwargs).router(),
-        'reset_path': lambda **kwargs: WindowManager(**kwargs).router(),
-        'call_id': lambda **kwargs: WindowManager(**kwargs).router(),
-        'call_path': lambda **kwargs: WindowManager(**kwargs).router(),
-        'call_update': lambda **kwargs: WindowManager(**kwargs).router()
+        'authenticate_trakt':
+            lambda **kwargs: TraktAPI(force=True),
+        'revoke_trakt':
+            lambda **kwargs: TraktAPI().logout(),
+        'split_value':
+            lambda **kwargs: split_value(**kwargs),
+        'kodi_setting':
+            lambda **kwargs: kodi_setting(**kwargs),
+        'sync_trakt':
+            lambda **kwargs: sync_trakt(**kwargs),
+        'manage_artwork':
+            lambda **kwargs: manage_artwork(**kwargs),
+        'refresh_details':
+            lambda **kwargs: refresh_details(**kwargs),
+        'related_lists':
+            lambda **kwargs: related_lists(**kwargs),
+        'user_list':
+            lambda **kwargs: user_list(**kwargs),
+        'like_list':
+            lambda **kwargs: like_list(**kwargs),
+        'delete_list':
+            lambda **kwargs: delete_list(**kwargs),
+        'rename_list':
+            lambda **kwargs: rename_list(**kwargs),
+        'blur_image':
+            lambda **kwargs: blur_image(**kwargs),
+        'image_colors':
+            lambda **kwargs: image_colors(**kwargs),
+        'monitor_userlist':
+            lambda **kwargs: _module_method('resources.lib.update.userlist', 'monitor_userlist'),
+        'update_players':
+            lambda **kwargs: update_players(),
+        'set_defaultplayer':
+            lambda **kwargs: set_defaultplayer(**kwargs),
+        'configure_players':
+            lambda **kwargs: _module_method('resources.lib.player.configure', 'configure_players', **kwargs),
+        'library_autoupdate':
+            lambda **kwargs: library_autoupdate(**kwargs),
+        'log_request':
+            lambda **kwargs: log_request(**kwargs),
+        'delete_cache':
+            lambda **kwargs: delete_cache(**kwargs),
+        'play':
+            lambda **kwargs: play_external(**kwargs),
+        'play_using':
+            lambda **kwargs: play_using(**kwargs),
+        'add_path':
+            lambda **kwargs: WindowManager(**kwargs).router(),
+        'add_query':
+            lambda **kwargs: WindowManager(**kwargs).router(),
+        'close_dialog':
+            lambda **kwargs: WindowManager(**kwargs).router(),
+        'reset_path':
+            lambda **kwargs: WindowManager(**kwargs).router(),
+        'call_id':
+            lambda **kwargs: WindowManager(**kwargs).router(),
+        'call_path':
+            lambda **kwargs: WindowManager(**kwargs).router(),
+        'call_update':
+            lambda **kwargs: WindowManager(**kwargs).router()
     }
 
     def router(self):
         if not self.params:
             return
         if self.params.get('restart_service'):
-            # Only do the import here because this function only for debugging purposes
             from resources.lib.monitor.service import restart_service_monitor
             return restart_service_monitor()
 
