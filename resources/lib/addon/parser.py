@@ -127,7 +127,13 @@ def del_empty_keys(d, values=[]):
 
 
 def find_dict_in_list(list_of_dicts, key, value):
+    """ Returns list of indexes for list of dictionaries where d.get(key) == value """
     return [list_index for list_index, dic in enumerate(list_of_dicts) if dic.get(key) == value]
+
+
+def find_dict_list_index(list_of_dicts, key, value, default=None):
+    """ Returns first index for list of dictionaries where d.get(ket) == value """
+    return next((list_index for list_index, dic in enumerate(list_of_dicts) if dic[key] == value), default)
 
 
 def iter_props(items, property_name, infoproperties=None, func=None, **kwargs):

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-from xbmcgui import Dialog, INPUT_NUMERIC
+from xbmcgui import Dialog, ListItem, INPUT_NUMERIC
 from resources.lib.items.container import Container
 from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized
-from resources.lib.addon.parser import try_int, encode_url, merge_two_dicts, split_items
+from resources.lib.addon.parser import try_int, encode_url, merge_two_dicts, split_items, find_dict_list_index
 from resources.lib.addon.tmdate import get_datetime_now, get_timedelta
 from resources.lib.addon.window import get_property
 from resources.lib.files.bcache import set_search_history, get_search_history
 from resources.lib.api.tmdb.api import TMDb
+from resources.lib.api.tmdb.mapping import get_imagepath_quality
 
 
 RELATIVE_DATES = [
@@ -29,8 +30,9 @@ ALL_METHODS = [
     'primary_release_year', 'primary_release_date.gte', 'primary_release_date.lte', 'release_date.gte', 'release_date.lte',
     'with_release_type', 'region', 'with_networks', 'air_date.gte', 'air_date.lte', 'first_air_date.gte',
     'first_air_date.lte', 'first_air_date_year', 'with_genres', 'without_genres', 'with_companies', 'with_keywords',
-    'without_keywords', 'with_original_language', 'vote_count.gte', 'vote_count.lte', 'vote_average.gte',
-    'vote_average.lte', 'with_runtime.gte', 'with_runtime.lte', 'save_index', 'save_label']
+    'without_keywords', 'watch_region', 'with_watch_providers', 'with_original_language',
+    'vote_count.gte', 'vote_count.lte', 'vote_average.gte', 'vote_average.lte',
+    'with_runtime.gte', 'with_runtime.lte', 'save_index', 'save_label']
 
 
 REGIONS = [
@@ -478,6 +480,7 @@ TRANSLATE_PARAMS = {
     'with_keywords': ('keyword', 'USER'),
     'without_keywords': ('keyword', 'USER'),
     'with_companies': ('company', 'NONE'),
+    'with_watch_providers': (None, 'OR'),
     'with_people': ('person', 'USER'),
     'with_cast': ('person', 'USER'),
     'with_crew': ('person', 'USER'),
@@ -557,6 +560,7 @@ def _get_basedir_rules(tmdb_type):
         {'label': get_localized(32263), 'method': 'with_genres'},
         {'label': get_localized(32264), 'method': 'without_genres'},
         {'label': get_localized(32265), 'method': 'with_companies'},
+        {'label': get_localized(32412), 'method': 'with_watch_providers'},
         {'label': get_localized(32268), 'method': 'with_keywords'},
         {'label': get_localized(32267), 'method': 'without_keywords'}]
     items += _get_basedir_rules_movies() if tmdb_type == 'movie' else _get_basedir_rules_tv()
@@ -589,11 +593,20 @@ def _get_formatted_item(item):
 
 
 def _get_discover_params(tmdb_type, get_labels=False):
-    params = {} if get_labels else {'info': 'discover', 'tmdb_type': tmdb_type, 'with_id': 'True'}
-    rules = [{'method': 'with_separator'}, {'method': 'sort_by'}] + _get_basedir_rules(tmdb_type)
+    """ Set the params for the discover path based on user rules
+    Takes an allowlist of rules to lookup window properties and place into params dict
+    """
+    params = {'info': 'discover', 'tmdb_type': tmdb_type, 'with_id': 'True'} if not get_labels else {}
+
+    # Allowlist of rules to check for when building params
+    rules = [{'method': 'with_separator'}, {'method': 'sort_by'}, {'method': 'watch_region'}]
+    rules += _get_basedir_rules(tmdb_type)
+
+    # Check for window properties and add values to params
+    prefix = 'Label' if get_labels else None
     for i in rules:
         method = i.pop('method', None)
-        value = _win_prop(method, 'Label' if get_labels else None)
+        value = _win_prop(method, prefix)
         if not value:
             continue
         params[method] = value
@@ -735,6 +748,49 @@ def _get_keyboard(method, header=None):
     return {'value': value, 'label': value, 'method': method}
 
 
+def _get_watch_provider(tmdb_type):
+    # If there's already values set then ask if the user wants to clear them instead of adding more
+    if not _confirm_add('with_watch_providers'):
+        return _clear_properties(['with_watch_providers', 'watch_region'])
+
+    # Don't ask for iso_country region again when adding more items
+    iso_country = _win_prop('watch_region')
+    iso_c_label = _win_prop('watch_region', 'Label')
+
+    tmdb = TMDb()
+
+    # Get valid provider regions from TMDb
+    if not iso_country:
+        regions = tmdb.get_request_lc('watch/providers/regions').get('results', [])
+        x = Dialog().select(
+            get_localized(20026),
+            [f"{i.get('iso_3166_1')} - {i.get('english_name')}" for i in regions],
+            preselect=find_dict_list_index(regions, 'iso_3166_1', tmdb.iso_country, -1))
+        if x == -1:
+            return
+        iso_country = regions[x].get('iso_3166_1')
+        iso_c_label = regions[x].get('english_name')
+
+    # Get providers for region
+    providers = tmdb.get_request_lc('watch/providers', tmdb_type, watch_region=iso_country).get('results', [])
+    gui_items = []
+    for i in providers:
+        li = ListItem(i.get('provider_name'), f"{iso_c_label} ({iso_country}) - ID #{i.get('provider_id')}")
+        li.setArt({'icon': get_imagepath_quality(i.get('logo_path'))})
+        gui_items.append(li)
+    x = Dialog().select(get_localized(19101), gui_items, useDetails=True)
+    if x == -1:
+        return
+    provider = providers[x]
+
+    # Set region and return provider rule
+    _set_rule('watch_region', iso_country, iso_country, overwrite=True)
+    return {
+        'value': provider['provider_id'],
+        'label': f"{provider['provider_name']} ({iso_country})",
+        'method': 'with_watch_providers'}
+
+
 def _edit_rules(idx=-1):
     """ Need to setup window properties if editing """
     if idx == -1:
@@ -784,6 +840,9 @@ def _add_rule(tmdb_type, method=None):
         overwrite = False
     elif method == 'with_companies':
         rules = _get_method('company', method, use_details=False)
+        overwrite = False
+    elif method == 'with_watch_providers':
+        rules = _get_watch_provider(tmdb_type)
         overwrite = False
     elif method in ['with_keywords', 'without_keywords']:
         rules = _get_method('keyword', method, use_details=False)

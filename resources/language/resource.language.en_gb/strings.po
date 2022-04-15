@@ -2103,7 +2103,7 @@ msgstr ""
 
 #: /resources/lib/api/tmdb/discover.py
 msgctxt "#32412"
-msgid "With watch providers"
+msgid "With Watch Provider"
 msgstr ""
 
 msgctxt "#30030"
