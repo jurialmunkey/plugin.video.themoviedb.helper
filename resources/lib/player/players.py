@@ -114,7 +114,7 @@ class Players(object):
                     v['priority'] = v.get('priority', PLAYERS_PRIORITY) + 100  # Increase priority baseline by 100 to prevent other players displaying above providers
                     continue
                 v['priority'] = providers.index(v['provider']) + 1  # Add 1 because sorted() puts 0 index last
-        except KeyError:
+        except (KeyError, AttributeError):
             pass
 
     def _check_assert(self, keys=[]):
