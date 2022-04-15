@@ -1,8 +1,8 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: "[BUG] Title"
-labels: ''
+title: "[BUG] ShortTitle"
+labels: bug
 assignees: ''
 
 ---
@@ -21,5 +21,5 @@ If applicable, add screenshots to help explain your problem.
 Add any other context about the problem here.
 
 **Checklist**
-[ ] I have described the bug and included steps to reproduce the issue
-[ ] I have included a full kodi debug log of the error
+- [ ] I have described the bug and included steps to reproduce the issue
+- [ ] I have included a full kodi debug log of the error
