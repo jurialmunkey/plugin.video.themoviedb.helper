@@ -6,7 +6,7 @@ from resources.lib.addon.parser import parse_paramstring, reconfigure_legacy_par
 from resources.lib.addon.modimp import lazyimport_modules, lazyimport_module
 get_container = None  # resources.lib.items.routes
 Players = None  # resources.lib.player.players
-related_lists = None  # resources.lib.script.router
+related_lists = None  # resources.lib.script.method
 TMDb = None  # resources.lib.api.tmdb.api
 
 
@@ -27,7 +27,7 @@ class Router():
         Players(**self.params).play(handle=self.handle if self.handle != -1 else None)
 
     @lazyimport_modules(globals(), (
-        {'module_name': 'resources.lib.script.router', 'import_attr': 'related_lists'},
+        {'module_name': 'resources.lib.script.method', 'import_attr': 'related_lists'},
         {'module_name': 'resources.lib.api.tmdb.api', 'import_attr': 'TMDb'}))
     def context_related(self):
         if not self.params.get('tmdb_id'):

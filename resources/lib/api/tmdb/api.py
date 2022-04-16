@@ -3,7 +3,6 @@ from resources.lib.addon.plugin import ADDONPATH, get_mpaa_prefix, get_language,
 from resources.lib.addon.consts import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, TMDB_GENRE_IDS, CACHE_SHORT, CACHE_MEDIUM
 from resources.lib.addon.parser import try_int, is_excluded
 from resources.lib.addon.window import get_property
-from resources.lib.addon.dialog import BusyDialog
 from resources.lib.files.futils import use_json_filecache, validify_filename
 from resources.lib.items.pages import PaginatedItems
 from resources.lib.api.request import RequestAPI
@@ -24,16 +23,6 @@ ARTLANG_FALLBACK = True if get_setting('fanarttv_enfallback') and not get_settin
 
 API_URL = 'https://api.themoviedb.org/3'
 APPEND_TO_RESPONSE = 'credits,images,release_dates,content_ratings,external_ids,movie_credits,tv_credits,keywords,reviews,videos,watch/providers'
-
-
-# Get TMDb ID decorator
-def get_tmdb_id(func):
-    def wrapper(*args, **kwargs):
-        with BusyDialog():
-            if not kwargs.get('tmdb_id'):
-                kwargs['tmdb_id'] = TMDb().get_tmdb_id(**kwargs)
-        return func(*args, **kwargs)
-    return wrapper
 
 
 class TMDb(RequestAPI):
