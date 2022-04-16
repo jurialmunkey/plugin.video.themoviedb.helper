@@ -134,7 +134,7 @@ class TMDb(RequestAPI):
         return request[0].get('id')
 
     @lazyimport_modules(globals(), (
-        {'module_name': 'resources.lib.items.listitem', 'import_attr': 'ListItem'}))
+        {'module_name': 'resources.lib.items.listitem', 'import_attr': 'ListItem'},))
     def get_tmdb_id_from_query(self, tmdb_type, query, header=None, use_details=False, get_listitem=False, auto_single=False):
         if not query or not tmdb_type:
             return
