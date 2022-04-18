@@ -142,7 +142,10 @@ CONVERSION_TABLE = {
 
 
 def _convert_types(base, key, output):
-    info = CONVERSION_TABLE.get(base, {}).get(key, {}).get(output) or ''
+    try:
+        info = CONVERSION_TABLE[base][key][output] or ''
+    except KeyError:
+        info = ''
     return info() if callable(info) else info
 
 
