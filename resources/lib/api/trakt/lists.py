@@ -98,16 +98,21 @@ class ListBecauseYouWatched(Container):
         if not watched_items:
             return
         item = watched_items[random.randint(0, len(watched_items) - 1)]
+        try:
+            item_tmdb_type = item['params']['tmdb_type']
+            item_tmdb_id = item['params']['tmdb_id']
+        except (AttributeError, KeyError):
+            return
         self.parent_params = {
             'info': 'recommendations',
-            'tmdb_type': item.get('params', {}).get('tmdb_type'),
-            'tmdb_id': item.get('params', {}).get('tmdb_id')}
+            'tmdb_type': item_tmdb_type,
+            'tmdb_id': item_tmdb_id}
         from resources.lib.api.tmdb.lists import ListBasic as TMDbListBasic
         items = TMDbListBasic.get_items(
             self,
             info='recommendations',
-            tmdb_type=item.get('params', {}).get('tmdb_type'),
-            tmdb_id=item.get('params', {}).get('tmdb_id'),
+            tmdb_type=item_tmdb_type,
+            tmdb_id=item_tmdb_id,
             page=1)
         self.plugin_category = self.parent_params['plugin_category'] = f'{get_localized(32288)} {item.get("label")}'
         return items
