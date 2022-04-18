@@ -145,7 +145,7 @@ def _convert_types(base, key, output):
     try:
         info = CONVERSION_TABLE[base][key][output] or ''
     except KeyError:
-        info = ''
+        return ''
     return info() if callable(info) else info
 
 
