@@ -67,6 +67,23 @@ def get_sort_methods(default_only=False):
     return items
 
 
+def _is_property_lock(property_name='TraktCheckingAuth', timeout=10, polling=0.2):
+    """ Checks for a window property lock and wait for it to be cleared before continuing
+    Returns True after property clears if was locked
+    """
+    if not get_property(property_name):
+        return False
+    monitor = Monitor()
+    timeout = int(timeout / polling)
+    while not monitor.abortRequested() and get_property(property_name) and timeout > 0:
+        monitor.waitForAbort(polling)
+        timeout -= 1
+    if timeout <= 0:
+        kodi_log(f'{property_name} timeout', 1)
+    del monitor
+    return True
+
+
 class _TraktLists():
     def _merge_sync_sort(self, items):
         """ Get sync dict sorted by slugs then merge slug into list """
@@ -306,10 +323,28 @@ class _TraktSync():
 
     @is_authorized
     def _get_last_activity(self, activity_type=None, activity_key=None, cache_refresh=False):
+        def _get_cached_activity():
+            from resources.lib.addon.tmdate import set_timestamp
+            last_exp = get_property('TraktSyncLastActivities.Expires', is_type=int)
+            cur_time = set_timestamp(0, True)
+            if not last_exp or last_exp < cur_time:  # Expired
+                if _is_property_lock('TraktSyncLastActivities.Locked', timeout=5, polling=0.1):
+                    return _get_cached_activity()  # Other thread is checking so wait for it
+                get_property('TraktSyncLastActivities.Locked', 1)  # Set property lock
+                response = self.get_response_json('sync/last_activities')
+                if not response:
+                    return
+                exp_time = cur_time + 90
+                from json import dumps as data_dumps
+                win_data = data_dumps(response, separators=(',', ':'))
+                get_property('TraktSyncLastActivities', set_property=win_data)
+                get_property('TraktSyncLastActivities.Expires', set_property=exp_time)
+                get_property('TraktSyncLastActivities.Locked', clear_property=True)  # Clear property lock
+                return response
+            from resources.lib.files.futils import json_loads as data_loads
+            return data_loads(get_property('TraktSyncLastActivities'))
         if not self.last_activities:
-            self.last_activities = self._cache.use_cache(
-                self.get_response_json, 'sync/last_activities',
-                cache_name='trakt.last_activities', cache_days=0.001, cache_refresh=cache_refresh)
+            self.last_activities = _get_cached_activity()
         return self._get_activity_timestamp(self.last_activities, activity_type=activity_type, activity_key=activity_key)
 
     @use_activity_cache(cache_days=CACHE_SHORT)
@@ -433,21 +468,6 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
             self.headers['Authorization'] = f'Bearer {self.authorization.get("access_token")}'
             return token
 
-        def _is_authorizing():
-            if not get_property('TraktCheckingAuth'):
-                return False
-            # Another thread is checking auth so wait for it
-            kodi_log('Trakt authorization in progress', 1)
-            monitor = Monitor()
-            timeout = 50  # Wait 10 seconds for auth (10 secs / 0.2 poll = 50)
-            while not monitor.abortRequested() and get_property('TraktCheckingAuth') and timeout > 0:
-                monitor.waitForAbort(0.2)
-                timeout -= 1
-            if timeout <= 0:
-                kodi_log('Trakt authorization wait timeout', 1)
-            del monitor
-            return True
-
         # Already got authorization so return credentials
         if self.authorization:
             return self.authorization
@@ -468,7 +488,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         # First time authorization in this session so let's confirm
         if self.authorization and get_property('TraktIsAuth') != 'True':
             if not get_timestamp(get_property('TraktRefreshTimeStamp', is_type=float) or 0):
-                if _is_authorizing():  # Wait if another thread is checking authorization
+                if _is_property_lock():  # Wait if another thread is checking authorization
                     _get_token()  # Get the token set in the other thread
                     return self.authorization  # Another thread checked token so return
 
