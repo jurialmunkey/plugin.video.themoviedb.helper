@@ -586,7 +586,10 @@ def _get_basedir_add(tmdb_type):
 
 
 def _get_formatted_item(item):
-    affix = _win_prop(item.get('params', {}).get('method'), 'Label')
+    try:
+        affix = _win_prop(item['params']['method'], 'Label')
+    except (KeyError, AttributeError):
+        return item
     if affix:
         item['label'] = f'{item.get("label")}: {affix}'
     return item

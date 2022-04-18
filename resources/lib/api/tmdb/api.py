@@ -423,16 +423,18 @@ class TMDb(RequestAPI):
             cache_name=f'TMDb.Downloaded.List.v3.{export_list}.{sorting}.{reverse}')
 
     def get_all_items_list(self, tmdb_type, page=None):
-        if tmdb_type not in TMDB_ALL_ITEMS_LISTS:
+        try:
+            schema = TMDB_ALL_ITEMS_LISTS[tmdb_type]
+        except KeyError:
             return
         daily_list = self.get_daily_list(
-            export_list=TMDB_ALL_ITEMS_LISTS.get(tmdb_type, {}).get('type'),
+            export_list=schema.get('type'),
             sorting=False, reverse=False)
         if not daily_list:
             return
         items = []
-        param = TMDB_ALL_ITEMS_LISTS.get(tmdb_type, {}).get('params', {})
-        limit = TMDB_ALL_ITEMS_LISTS.get(tmdb_type, {}).get('limit', 20)
+        param = schema.get('params', {})
+        limit = schema.get('limit', 20)
         pos_z = try_int(page, fallback=1) * limit
         pos_a = pos_z - limit
         dbtype = convert_type(tmdb_type, 'dbtype')
@@ -452,7 +454,7 @@ class TMDb(RequestAPI):
             items.append(item)
         if not items:
             return []
-        if TMDB_ALL_ITEMS_LISTS.get(tmdb_type, {}).get('sort'):
+        if schema.get('sort'):
             items = sorted(items, key=lambda k: k.get('label', ''))
         if len(daily_list) > pos_z:
             items.append({'next_page': try_int(page, fallback=1) + 1})
