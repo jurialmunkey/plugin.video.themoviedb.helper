@@ -243,7 +243,7 @@ class _TraktProgress():
     def _get_episode_playprogress(self, id_type):
         sync_list = self.get_sync('playback', 'show')
         if not sync_list:
-            return []
+            return {}
         main_list = {}
         for i in sync_list:
             show_id = i.get('show', {}).get('ids', {}).get(id_type)
@@ -261,8 +261,13 @@ class _TraktProgress():
     def get_episode_playprogress(self, unique_id, id_type, season, episode):
         season = try_int(season, fallback=-2)  # Make fallback -2 to prevent matching on 0
         episode = try_int(episode, fallback=-2)  # Make fallback -2 to prevent matching on 0
-        return self._get_episode_playprogress(id_type).get(
-            unique_id, {}).get('seasons', {}).get(season, {}).get(episode, {}).get('progress')
+        playprogress = self._get_episode_playprogress(id_type)
+        if not playprogress or unique_id not in playprogress:
+            return
+        try:
+            return playprogress[unique_id]['seasons'][season][episode]['progress']
+        except (KeyError, AttributeError):
+            return
 
     @is_authorized
     @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_LONG)
