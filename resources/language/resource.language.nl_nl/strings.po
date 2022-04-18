@@ -1665,9 +1665,9 @@ msgid ""
 "To override this dialog, set a resolve method for the player in TMDbHelper's player settings configuration dialog."
 msgstr ""
 "Configuratie voor speler ontbreekt de vlag \"is_resolvable\". Selecteer de oplossingsmethode.\n"
-"\N"
+"\n"
 "setResolvedUrl is de voorkeursmethode en zou over het algemeen moeten werken voor elke speler addon die bestanden rechtstreeks afspeelt, inputstream adapatief gebruikt of alleen vraagt ​​om bitrate / kwaliteit te selecteren. PlayMedia moet worden gebruikt voor elke speler addon die eerst een script uitvoert om bronnen te schrapen of anderszins  werkt niet correct met de setResolvedUrl methode.\n"
-"\N"
+"\n"
 "Om dit dialoogvenster te negeren, stelt u een oplossingsmethode in voor de speler in het configuratievenster voor spelerinstellingen van TMDbHelper."
 
 #: /resources/lib/helpers/timedate.py
@@ -1723,7 +1723,7 @@ msgid ""
 "[B]WARNING:[/B] This action cannot be undone."
 msgstr ""
 "Wilt u het [B]{}[/B] spelerbestand terugzetten naar de oorspronkelijke ongewijzigde staat op de schijf?\n"
-"\N"
+"\n"
 "[B]WAARSCHUWING:[/B] Deze actie kan niet ongedaan worden gemaakt."
 
 #: /resources/lib/player/configure.py
@@ -1741,7 +1741,7 @@ msgid ""
 msgstr ""
 "Het [B]{}[/B] spelerbestand is gewijzigd.\n"
 "Wilt u uw wijzigingen opslaan?\n"
-"\N"
+"\n"
 "Als u sluit zonder op te slaan, gaan uw wijzigingen verloren."
 
 #: /resources/lib/player/configure.py
@@ -1762,7 +1762,7 @@ msgid ""
 "Are you sure you want to set this player's resolve method to PlayMedia?"
 msgstr ""
 "Houd er rekening mee dat setResolvedUrl Kodi's voorkeursmethode is voor het oplossen van afspeel URL's. De PlayMedia methode mag alleen worden gebruikt als u problemen ondervindt bij het gebruik van setResolvedUrl met deze specifieke speler.\n"
-"\N"
+"\n"
 "Weet u zeker dat u de oplossingsmethode van deze speler wilt instellen op PlayMedia?"
 
 #: /resources/lib/player/configure.py
@@ -1838,7 +1838,7 @@ msgid ""
 "Select \"Yes\" for any player that plays directly from single source. Select \"No\" for players that scrape multiple sources or otherwise do not work with the setResolvedURL method."
 msgstr ""
 "Kan deze speler rechtstreeks worden omgezet in een enkel afspeelbaar bestand?\n"
-"\N"
+"\n"
 "Selecteer \"Ja\" voor elke speler die rechtstreeks vanaf één bron speelt. Selecteer \"Nee\" voor spelers die meerdere bronnen schrapen of anderszins niet werken met de setResolvedURL methode."
 
 #: /resources/lib/script/sync.py
@@ -1859,7 +1859,7 @@ msgid ""
 "This action cannot be undone."
 msgstr ""
 "Weet u zeker dat u [B]{}[/B] wilt verwijderen?\n"
-"\N"
+"\n"
 "Deze actie kan niet ongedaan gemaakt worden."
 
 #: /resources/lib/script/router.py
@@ -2020,7 +2020,7 @@ msgid ""
 "TMDbHelper performs regular automatic cache management and cleaning. You should only delete the cache manually in cases of persistent cache related errors."
 msgstr ""
 "Weet u zeker dat u de {} cache wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.\n"
-"\N"
+"\n"
 "TMDbHelper voert regelmatig automatisch cachebeheer en opschoning uit. U dient de cache alleen handmatig te verwijderen in het geval van aanhoudende cachegerelateerde fouten."
 
 #: /resources/lib/script/router.py
@@ -2046,7 +2046,7 @@ msgid ""
 "Use [B]Forced Update[/B] to ignore previously cached update details and recheck all items. Forced updates should only be used when cleaning and rebuilding the Kodi library."
 msgstr ""
 "Gebruik [B]Snelle update[/B] om te controleren op nieuwe items.\n"
-"\N"
+"\n"
 "Gebruik [B]Geforceerde update[/B] om eerder in de cache opgeslagen updatedetails te negeren en alle items opnieuw te controleren. Geforceerde updates mogen alleen worden gebruikt bij het opschonen en opnieuw opbouwen van de Kodi bibliotheek."
 
 #: /resources/lib/script/router.py
