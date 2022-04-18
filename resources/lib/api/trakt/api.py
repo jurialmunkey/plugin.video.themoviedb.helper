@@ -12,7 +12,7 @@ from resources.lib.api.request import RequestAPI
 from resources.lib.api.trakt.items import TraktItems
 from resources.lib.api.trakt.decorators import is_authorized, use_activity_cache
 from resources.lib.api.trakt.progress import _TraktProgress
-from resources.lib.addon.logger import kodi_log
+from resources.lib.addon.logger import kodi_log, TimerFunc
 from resources.lib.addon.consts import CACHE_SHORT, CACHE_LONG
 
 
@@ -425,18 +425,38 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         self.login() if force else self.authorize()
 
     def authorize(self, login=False):
+        def _get_token():
+            token = self.get_stored_token()
+            if not token.get('access_token'):
+                return
+            self.authorization = token
+            self.headers['Authorization'] = f'Bearer {self.authorization.get("access_token")}'
+            return token
+
+        def _is_authorizing():
+            if not get_property('TraktCheckingAuth'):
+                return False
+            # Another thread is checking auth so wait for it
+            kodi_log('Trakt authorization in progress', 1)
+            monitor = Monitor()
+            timeout = 50  # Wait 10 seconds for auth (10 secs / 0.2 poll = 50)
+            while not monitor.abortRequested() and get_property('TraktCheckingAuth') and timeout > 0:
+                monitor.waitForAbort(0.2)
+                timeout -= 1
+            if timeout <= 0:
+                kodi_log('Trakt authorization wait timeout', 1)
+            del monitor
+            return True
+
         # Already got authorization so return credentials
         if self.authorization:
             return self.authorization
 
-        # Get our saved credentials from previous login
-        token = self.get_stored_token()
-        if token.get('access_token'):
-            self.authorization = token
-            self.headers['Authorization'] = f'Bearer {self.authorization.get("access_token")}'
+        # Check for saved credentials from previous login
+        token = _get_token()
 
         # No saved credentials and user trying to use a feature that requires authorization so ask them to login
-        elif login:
+        if not token and login:
             if not self.attempted_login and Dialog().yesno(
                     self.dialog_noapikey_header,
                     self.dialog_noapikey_text,
@@ -448,18 +468,23 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         # First time authorization in this session so let's confirm
         if self.authorization and get_property('TraktIsAuth') != 'True':
             if not get_timestamp(get_property('TraktRefreshTimeStamp', is_type=float) or 0):
-                # Check if we can get a response from user account
-                kodi_log('Checking Trakt authorization', 2)
-                response = self.get_simple_api_request('https://api.trakt.tv/sync/last_activities', headers=self.headers)
-                # 401 is unauthorized error code so let's try refreshing the token
-                if not response or response.status_code == 401:
-                    kodi_log('Trakt unauthorized!', 2)
-                    self.authorization = self.refresh_token()
-                # Authorization confirmed so let's set a window property for future reference in this session
-                if self.authorization:
-                    kodi_log('Trakt user account authorized', 1)
-                    get_property('TraktIsAuth', 'True')
+                if _is_authorizing():  # Wait if another thread is checking authorization
+                    _get_token()  # Get the token set in the other thread
+                    return self.authorization  # Another thread checked token so return
 
+                get_property('TraktCheckingAuth', 1)  # Set Thread lock property
+                kodi_log('Trakt authorization started', 1)
+
+                # Check if we can get a response from user account
+                with TimerFunc('Trakt authorization took', inline=True):
+                    response = self.get_simple_api_request('https://api.trakt.tv/sync/last_activities', headers=self.headers)
+                    if not response or response.status_code == 401:  # 401 is unauthorized error code so let's try refreshing the token
+                        kodi_log('Trakt unauthorized!', 1)
+                        self.authorization = self.refresh_token()
+                    if self.authorization:  # Authorization confirmed so let's set a window property for future reference in this session
+                        kodi_log('Trakt user account authorized', 1)
+                        get_property('TraktIsAuth', 'True')
+                    get_property('TraktCheckingAuth', clear_property=True)
         return self.authorization
 
     def get_stored_token(self):

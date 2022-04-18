@@ -22,6 +22,10 @@ PREBUILD_PARENTSHOW = ['seasons', 'episodes', 'episode_groups', 'trakt_upnext', 
 
 class Container():
     def __init__(self, handle, paramstring, **kwargs):
+        # Log Settings
+        self.log_timers = get_setting('timer_reports')
+        self.timer_lists = {}
+
         # plugin:// params configuration
         self.handle = handle  # plugin:// handle
         self.paramstring = paramstring  # plugin://plugin.video.themoviedb.helper?paramstring
@@ -51,13 +55,9 @@ class Container():
         # API class initialisation
         self.ib = None
         self.tmdb_api = TMDb(delay_write=True)
-        self.trakt_api = TraktAPI(delay_write=True)
         self.omdb_api = OMDb(delay_write=True) if get_setting('omdb_apikey', 'str') else None
         self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only(), delay_write=True)
-
-        # Log Settings
-        self.log_timers = get_setting('timer_reports')
-        self.timer_lists = {}
+        self.trakt_api = TraktAPI(delay_write=True)
 
         # Trakt Watched Progress Settings
         self.hide_watched = get_setting('widgets_hidewatched') if self.is_widget else False
@@ -152,17 +152,16 @@ class Container():
 
     def add_items(self, items):
         # Setup ItemBuilder
-        self.ib = ItemBuilder(
-            tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api,
-            delay_write=True, cache_only=self.tmdb_cache_only)
-        self.ib.timer_lists = self.ib._cache._timers = self.timer_lists
-        self.ib.log_timers = self.log_timers
-
-        # Prebuild parent show details
-        if self.parent_params.get('info') in PREBUILD_PARENTSHOW:
-            self.ib.get_parents(
-                tmdb_type='tv', tmdb_id=self.parent_params.get('tmdb_id'),
-                season=self.parent_params.get('season', None) if self.parent_params['info'] == 'episodes' else None)
+        with TimerList(self.timer_lists, '--setup', log_threshold=0.05, logging=self.log_timers):
+            self.ib = ItemBuilder(
+                tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api,
+                delay_write=True, cache_only=self.tmdb_cache_only)
+            self.ib.timer_lists = self.ib._cache._timers = self.timer_lists
+            self.ib.log_timers = self.log_timers
+            if self.parent_params.get('info') in PREBUILD_PARENTSHOW:
+                self.ib.get_parents(
+                    tmdb_type='tv', tmdb_id=self.parent_params.get('tmdb_id'),
+                    season=self.parent_params.get('season', None) if self.parent_params['info'] == 'episodes' else None)
 
         # Build items in threadss
         with TimerList(self.timer_lists, '--build', log_threshold=0.05, logging=self.log_timers):
@@ -171,8 +170,11 @@ class Container():
                 item_queue = pt.queue
             all_listitems = [i for i in item_queue if i]
 
+        # Wait for sync thread
+        with TimerList(self.timer_lists, '--sync', log_threshold=0.05, logging=self.log_timers):
+            self._pre_sync.join()
+
         # Finalise listitems in parallel threads
-        self._pre_sync.join()
         with TimerList(self.timer_lists, '--make', log_threshold=0.05, logging=self.log_timers):
             self.format_episode_labels = self.parent_params.get('info') not in NO_LABEL_FORMATTING
             with ParallelThread(all_listitems, self._make_item) as pt:

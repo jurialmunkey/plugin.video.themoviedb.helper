@@ -105,8 +105,9 @@ def log_output(func_name):
 
 
 class TimerFunc():
-    def __init__(self, timer_name, log_threshold=0.05):
+    def __init__(self, timer_name, log_threshold=0.05, inline=False):
         """ ContextManager for timing code blocks and outputing to log """
+        self.inline = ' ' if inline else '\n'
         self.timer_name = timer_name
         self.log_threshold = log_threshold
         self.timer_a = timer()
@@ -118,7 +119,7 @@ class TimerFunc():
         timer_z = timer()
         total_time = timer_z - self.timer_a
         if total_time > self.log_threshold:
-            kodi_log(f'{self.timer_name}\n{total_time:.3f} sec', 1)
+            kodi_log(f'{self.timer_name}{self.inline}{total_time:.3f} sec', 1)
 
 
 class TimerList():
