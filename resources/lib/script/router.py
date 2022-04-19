@@ -71,6 +71,8 @@ class Script(object):
             lambda **kwargs: imp_mod('resources.lib.script.method', 'play_external')(**kwargs),
         'play_using':
             lambda **kwargs: imp_mod('resources.lib.script.method', 'play_using')(**kwargs),
+        'add_to_library':
+            lambda **kwargs: imp_mod('resources.lib.script.method', 'add_to_library')(**kwargs),
         'add_path':
             lambda **kwargs: imp_mod('resources.lib.window.manager', 'WindowManager')(**kwargs).router(),
         'add_query':

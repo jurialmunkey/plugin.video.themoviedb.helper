@@ -47,6 +47,47 @@ def get_tmdb_id(func):
     return wrapper
 
 
+def choose_tmdb_id(func):
+    """ Decorator to get tmdb_id if not in kwargs """
+    def wrapper(*args, **kwargs):
+        if kwargs.get('tmdb_id'):
+            return func(*args, **kwargs)
+
+        from xbmcgui import Dialog, ListItem
+        from resources.lib.addon.dialog import BusyDialog
+        from resources.lib.api.tmdb.api import TMDb
+        from resources.lib.api.tmdb.mapping import get_imagepath_poster
+
+        if kwargs.get('query'):
+            with BusyDialog():
+                response = TMDb().get_request_sc('search', kwargs['tmdb_type'], query=kwargs['query'])
+            if not response or not response.get('results'):
+                return
+
+            items = []
+            for i in response['results']:
+                li = ListItem(
+                    i.get('title') or i.get('name'),
+                    i.get('release_date') or i.get('first_air_date'))
+                li.setArt({'icon': get_imagepath_poster(i.get('poster_path'))})
+                items.append(li)
+
+            x = Dialog().select(kwargs['query'], items, useDetails=True)
+            if x == -1:
+                return
+            kwargs['tmdb_id'] = response['results'][x].get('id')
+
+        else:
+            with BusyDialog():
+                kwargs['tmdb_id'] = TMDb().get_tmdb_id(**kwargs)
+
+        if not kwargs['tmdb_id']:
+            return
+
+        return func(*args, **kwargs)
+    return wrapper
+
+
 def container_refresh():
     from resources.lib.addon.plugin import executebuiltin
     executebuiltin('Container.Refresh')
@@ -138,6 +179,13 @@ def related_lists(tmdb_id=None, tmdb_type=None, season=None, episode=None, conta
         content='pictures' if item['params']['info'] in ['posters', 'fanart'] else 'videos')
     executebuiltin('Dialog.Close(busydialog)')  # Kill modals because prevents ActivateWindow
     executebuiltin(path)
+
+
+@is_in_kwargs({'tmdb_type': ['movie', 'tv']})
+@choose_tmdb_id
+def add_to_library(tmdb_type=None, tmdb_id=None, **kwargs):
+    from resources.lib.update.library import add_to_library
+    add_to_library(info=tmdb_type, tmdb_id=tmdb_id)
 
 
 @is_in_kwargs({'user_list': True})
