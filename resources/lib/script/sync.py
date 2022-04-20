@@ -2,6 +2,7 @@
 # Author: jurialmunkey
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 from xbmcgui import Dialog
+from resources.lib.addon.window import get_property
 from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.parser import try_int
 from resources.lib.addon.plugin import set_kwargattr, convert_trakt_type, get_localized, executebuiltin, get_infolabel
@@ -113,7 +114,7 @@ class _Menu():
         if item._sync == -1 or not notification:
             return
         if item._sync and item._sync.status_code in [200, 201, 204]:
-            self._trakt._cache.del_cache('trakt.last_activities')  # Wipe last activities cache to update now
+            get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
             Dialog().ok(
                 get_localized(32295),
                 get_localized(32297).format(

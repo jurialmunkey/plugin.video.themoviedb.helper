@@ -8,13 +8,14 @@ from resources.lib.api.trakt.items import TraktItems
 from resources.lib.api.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache
 from resources.lib.addon.thread import ParallelThread
 from resources.lib.addon.consts import CACHE_SHORT, CACHE_LONG
+from resources.lib.addon.window import get_property
 
 
 class _TraktProgress():
     @is_authorized
     def get_ondeck_list(self, page=1, limit=None, sort_by=None, sort_how=None, trakt_type=None):
         limit = limit or self.item_limit
-        self._cache.del_cache('trakt.last_activities')  # Wipe last activities cache to update now
+        get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
         response = self._get_inprogress_items('show' if trakt_type == 'episode' else trakt_type)
         response = TraktItems(response, trakt_type=trakt_type).build_items(
             sort_by=sort_by, sort_how=sort_how)
@@ -24,7 +25,7 @@ class _TraktProgress():
     @is_authorized
     def get_towatch_list(self, trakt_type, page=1, limit=None):
         limit = limit or self.item_limit
-        self._cache.del_cache('trakt.last_activities')  # Wipe last activities cache to update now
+        get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
         items_ip = self._get_inprogress_shows() if trakt_type == 'show' else self._get_inprogress_items('movie')
         items_wl = self.get_sync('watchlist', trakt_type)
         response = TraktItems(items_ip + items_wl, trakt_type=trakt_type).build_items(sort_by='activity', sort_how='desc')
@@ -32,14 +33,14 @@ class _TraktProgress():
         return response.items + response.next_page
 
     def _get_inprogress_items(self, sync_type, lowest=5, highest=95):
-        self._cache.del_cache('trakt.last_activities')  # Wipe last activities cache to update now
+        get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
         response = self.get_sync('playback', sync_type)
         return [i for i in response if lowest <= try_int(i.get('progress', 0)) <= highest]
 
     @is_authorized
     def get_inprogress_shows_list(self, page=1, limit=None, params=None, next_page=True, sort_by=None, sort_how=None):
         limit = limit or self.item_limit
-        self._cache.del_cache('trakt.last_activities')  # Wipe last activities cache to update now
+        get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
         response = self._get_upnext_episodes_list(sort_by_premiered=True) if sort_by == 'year' else self._get_inprogress_shows()
         response = TraktItems(response, trakt_type='show').build_items(
             params_def=params, sort_by=sort_by if sort_by != 'year' else 'unsorted', sort_how=sort_how)
@@ -157,7 +158,7 @@ class _TraktProgress():
     def get_upnext_episodes_list(self, page=1, sort_by_premiered=False, limit=None):
         """ Gets a list of episodes for in-progress shows that user should watch next """
         limit = limit or self.item_limit
-        self._cache.del_cache('trakt.last_activities')  # Wipe last activities cache to update now
+        get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
         response = self._get_upnext_episodes_list(sort_by_premiered=sort_by_premiered)
         response = TraktItems(response, trakt_type='episode').configure_items()
         response = PaginatedItems(response['items'], page=page, limit=limit)
