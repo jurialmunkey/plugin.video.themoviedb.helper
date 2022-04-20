@@ -5,7 +5,7 @@ from resources.lib.addon.logger import kodi_log
 
 
 class ProgressDialog(object):
-    """ Wrapper class for using ProgressDialog in with statement """
+    """ ContextManager for DialogProgressBG use in with statement """
 
     def __init__(self, title='', message='', total=100, logging=1):
         self.logging = logging
@@ -47,7 +47,7 @@ class ProgressDialog(object):
 
 class BusyDialog():
     def __init__(self, is_enabled=True):
-        """ ContextManager for timing code blocks and outputing to log """
+        """ ContextManager for DialogBusy in with statement """
         if is_enabled:
             executebuiltin('ActivateWindow(busydialognocancel)')
         self.is_enabled = is_enabled
@@ -63,7 +63,7 @@ class BusyDialog():
 
 def busy_decorator(func):
     def wrapper(*args, **kwargs):
-        """ Decorator for BusyDialog around a function """
+        """ Decorator for wrappingBusyDialog around a function """
         with BusyDialog():
             response = func(*args, **kwargs)
         return response
