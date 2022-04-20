@@ -332,7 +332,7 @@ msgid ""
 "Do you wish to add {0} to your Trakt {1}?\n"
 "\n"
 "TMDb {2} ID {3}"
-msgstr ""Wilt u {0} toevoegen aan uw Trakt {1}?\n"
+msgstr "Wilt u {0} toevoegen aan uw Trakt {1}?\n"
 "\n"
 "TMDb {2} ID {3}"
 
