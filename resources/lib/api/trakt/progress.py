@@ -1,5 +1,5 @@
 from resources.lib.addon.plugin import get_setting, get_localized
-from resources.lib.addon.parser import try_int
+from resources.lib.addon.parser import try_int, find_dict_list_index
 from resources.lib.addon.tmdate import convert_timestamp, date_in_range, get_region_date, get_datetime_today, get_timedelta
 from resources.lib.files.bcache import use_simple_cache
 from resources.lib.items.pages import PaginatedItems
@@ -50,38 +50,73 @@ class _TraktProgress():
         return response.items + response.next_page
 
     def _get_inprogress_shows(self):
+        def _get_calendar_episodes(startdate=-14, days=15, id_type='slug'):
+            response = self.get_calendar_episodes(startdate=startdate, days=days)
+            if not response:
+                return
+            calendar = {}
+            for i in response:
+                try:
+                    if not date_in_range(i['first_aired'], utc_convert=True, start_date=startdate, days=days):
+                        continue
+                    if i['episode']['season'] == 0:  # Ignore specials
+                        continue
+                    show = calendar.setdefault(i['show']['ids'][id_type], {})
+                    show.setdefault(i['episode']['season'], []).append(i['episode']['number'])
+                except KeyError:
+                    continue
+            return calendar
         response = self.get_sync('watched', 'show')
         response = TraktItems(response).sort_items('watched', 'desc')
         hidden_shows = self.get_hiddenitems('show')
-        # return [i for i in response if self._is_inprogress_show(i, hidden_shows)]
-        with ParallelThread(response, self._is_inprogress_show, hidden_shows) as pt:
+        calendar_episodes = _get_calendar_episodes() if get_setting('nextepisodes_usecalendar') else None
+        with ParallelThread(response, self._is_inprogress_show, hidden_shows, calendar_episodes) as pt:
             item_queue = pt.queue
         return [i for i in item_queue if i]
 
-    def _is_inprogress_show(self, item, hidden_shows=None):
+    def _is_inprogress_show(self, item, hidden_shows=None, calendar_episodes=None):
         """
         Checks whether the show passed is in progress by comparing total and watched
         Optionally can pass a list of hidden_shows trakt slugs to ignore
         """
+        def _calendar_is_watched():
+            if not calendar_episodes or slug not in calendar_episodes:
+                return True
+            for season in calendar_episodes[slug]:
+                x = find_dict_list_index(item['seasons'], 'number', season)
+                if x is None:
+                    return False  # New Season Airing
+                episodes = item['seasons'][x]['episodes']
+                for episode in calendar_episodes[slug][season]:
+                    x = find_dict_list_index(episodes, 'number', episode)
+                    if x is None:
+                        return False  # New Episode Airing
+            return True
+
         try:
             show = item['show']
             slug = show['ids']['slug']
         except KeyError:
             return
+
         if hidden_shows and slug in hidden_shows:
             return
+
         try:
             aired_episodes = show['aired_episodes']
         except KeyError:
             return
         if not aired_episodes:
             return
+
         watch_episodes = use_lastupdated_cache(
             self._cache, self.get_episodes_watchcount, slug, 'slug', tvshow=item, count_progress=True,
             cache_name=f'TraktAPI.get_episodes_watchcount.response.slug.{slug}.True',
             sync_info=item) or 0
-        if aired_episodes <= watch_episodes:
+
+        if aired_episodes <= watch_episodes and _calendar_is_watched():
             return
+
         return item
 
     @is_authorized
@@ -141,7 +176,6 @@ class _TraktProgress():
         return list(hidden_items)
 
     @is_authorized
-    # @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_SHORT)
     def get_upnext_list(self, unique_id, id_type=None, page=1, limit=None):
         """ Gets the next episodes for a show that user should watch next """
         limit = limit or self.item_limit
@@ -166,10 +200,18 @@ class _TraktProgress():
 
     @is_authorized
     def _get_upnext_episodes_list(self, sort_by_premiered=False):
+        def _get_upnext_episodes(i, get_single_episode=True):
+            """ Helper func for upnext episodes to pass through threaded """
+            try:
+                show = i['show']
+                slug = show['ids']['slug']
+            except (AttributeError, KeyError):
+                return
+            return self.get_upnext_episodes(slug, show, get_single_episode=get_single_episode)
         shows = self._get_inprogress_shows() or []
 
         # Get upnext episodes threaded
-        with ParallelThread(shows, self._get_upnext_episodes) as pt:
+        with ParallelThread(shows, _get_upnext_episodes) as pt:
             item_queue = pt.queue
         items = [i for i in item_queue if i]
 
@@ -208,15 +250,6 @@ class _TraktProgress():
             self._cache, self.get_response_json, 'shows', slug, 'progress/watched',
             sync_info=self.get_sync('watched', 'show', 'slug').get(slug),
             cache_name=f'TraktAPI.get_show_progress.response.{slug}')
-
-    def _get_upnext_episodes(self, i, get_single_episode=True):
-        """ Helper func for upnext episodes to pass through threaded """
-        try:
-            show = i['show']
-            slug = show['ids']['slug']
-        except (AttributeError, KeyError):
-            return
-        return self.get_upnext_episodes(slug, show, get_single_episode=get_single_episode)
 
     @is_authorized
     def get_upnext_episodes(self, slug, show, get_single_episode=False):

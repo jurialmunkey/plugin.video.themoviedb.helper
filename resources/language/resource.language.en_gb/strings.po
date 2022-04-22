@@ -2106,6 +2106,11 @@ msgctxt "#32412"
 msgid "With Watch Provider"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32413"
+msgid "Next episodes checks calendar (slower but more accurate)"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
