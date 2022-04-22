@@ -67,19 +67,20 @@ def get_sort_methods(default_only=False):
     return items
 
 
-def _is_property_lock(property_name='TraktCheckingAuth', timeout=10, polling=0.2):
+def _is_property_lock(property_name='TraktCheckingAuth', timeout=5, polling=0.2):
     """ Checks for a window property lock and wait for it to be cleared before continuing
     Returns True after property clears if was locked
     """
     if not get_property(property_name):
         return False
     monitor = Monitor()
-    timeout = int(timeout / polling)
-    while not monitor.abortRequested() and get_property(property_name) and timeout > 0:
+    timeend = set_timestamp(timeout)
+    timeexp = True
+    while not monitor.abortRequested() and get_property(property_name) and timeexp:
         monitor.waitForAbort(polling)
-        timeout -= 1
-    if timeout <= 0:
-        kodi_log(f'{property_name} timeout', 1)
+        timeexp = get_timestamp(timeend)
+    if not timeexp:
+        kodi_log(f'{property_name} Timeout!', 1)
     del monitor
     return True
 
@@ -323,13 +324,15 @@ class _TraktSync():
 
     @is_authorized
     def _get_last_activity(self, activity_type=None, activity_key=None, cache_refresh=False):
-        def _get_cached_activity():
+        def cache_activity(reattempts=1):
             from resources.lib.addon.tmdate import set_timestamp
             last_exp = get_property('TraktSyncLastActivities.Expires', is_type=int)
             cur_time = set_timestamp(0, True)
             if not last_exp or last_exp < cur_time:  # Expired
-                if _is_property_lock('TraktSyncLastActivities.Locked', timeout=5, polling=0.1):
-                    return _get_cached_activity()  # Other thread is checking so wait for it
+                if reattempts <= 0:
+                    return
+                if _is_property_lock('TraktSyncLastActivities.Locked'):
+                    return cache_activity(reattempts - 1)  # Other thread is checking so wait for it
                 get_property('TraktSyncLastActivities.Locked', 1)  # Set property lock
                 response = self.get_response_json('sync/last_activities')
                 if not response:
@@ -344,7 +347,7 @@ class _TraktSync():
             from resources.lib.files.futils import json_loads as data_loads
             return data_loads(get_property('TraktSyncLastActivities'))
         if not self.last_activities:
-            self.last_activities = _get_cached_activity()
+            self.last_activities = cache_activity()
         return self._get_activity_timestamp(self.last_activities, activity_type=activity_type, activity_key=activity_key)
 
     @use_activity_cache(cache_days=CACHE_SHORT)
