@@ -51,6 +51,7 @@ class ItemBuilder(_ArtworkSelector):
         self.timer_lists = {}
         self.log_timers = False
         self._yy = 0
+        self.override = False if self.tmdb_api.iso_language == 'en' else True  # Override titles with TMDb translated data
         # self.__dict__.update(kwargs)
 
     def _timestamp(self, days=14):
@@ -256,6 +257,6 @@ class ItemBuilder(_ArtworkSelector):
             li.infolabels.get('episode') if mediatype == 'episode' else None)
         if not item or 'listitem' not in item:
             return li
-        li.set_details(item['listitem'])
+        li.set_details(item['listitem'], override=self.override)
         li.art = self.get_item_artwork(item['artwork'], is_season=mediatype in ['season', 'episode'])
         return li

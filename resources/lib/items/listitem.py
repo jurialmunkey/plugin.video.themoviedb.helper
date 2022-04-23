@@ -106,7 +106,7 @@ class _ListItem(object):
     def set_playcount(self, playcount):
         return
 
-    def set_details(self, details=None, reverse=False):
+    def set_details(self, details=None, reverse=False, override=False):
         if not details:
             return
         self.stream_details = merge_two_dicts(details.get('stream_details', {}), self.stream_details, reverse=reverse)
@@ -115,6 +115,11 @@ class _ListItem(object):
         self.art = merge_two_dicts(details.get('art', {}), self.art, reverse=reverse)
         self.unique_ids = merge_two_dicts(details.get('unique_ids', {}), self.unique_ids, reverse=reverse)
         self.cast = self.cast or details.get('cast', [])
+        if not override:
+            return
+        self.label = details.get('label') or self.label
+        self.infolabels['title'] = details.get('infolabels', {}).get('title') or self.infolabels.get('title')
+        self.infolabels['tvshowtitle'] = details.get('infolabels', {}).get('tvshowtitle') or self.infolabels.get('tvshowtitle')
 
     def _set_params_reroute_skinshortcuts(self):
         self.params['widget'] = 'true'
