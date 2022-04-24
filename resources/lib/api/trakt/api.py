@@ -211,26 +211,30 @@ class _TraktLists():
         items = []
         sorted_list = sorted(response.json(), key=lambda i: i.get('likes', 0) or i.get('list', {}).get('likes', 0), reverse=True) if sort_likes else response.json()
         for i in sorted_list:
-            if i.get('list', {}).get('name'):
-                i = i.get('list', {})
+            if i.get('list') and i['list'].get('name'):
+                i = i['list']
             elif not i.get('name'):
                 continue
 
+            i_usr = i.get('user', {})
+            i_ids = i.get('ids', {})
+            i_usr_ids = i_usr.get('ids', {})
+
             item = {}
-            item['label'] = i.get('name')
-            item['infolabels'] = {'plot': i.get('description')}
+            item['label'] = f"{i.get('name')}"
+            item['infolabels'] = {'plot': i.get('description'), 'studio': [i_usr.get('name') or i_usr_ids.get('slug')]}
             item['infoproperties'] = {k: v for k, v in i.items() if v and type(v) not in [list, dict]}
             item['art'] = {}
             item['params'] = {
                 'info': 'trakt_userlist',
                 'list_name': i.get('name'),
-                'list_slug': i.get('ids', {}).get('slug'),
-                'user_slug': i.get('user', {}).get('ids', {}).get('slug'),
+                'list_slug': i_ids.get('slug'),
+                'user_slug': i_usr_ids.get('slug'),
                 'plugin_category': i.get('name')}
             item['unique_ids'] = {
-                'trakt': i.get('ids', {}).get('trakt'),
-                'slug': i.get('ids', {}).get('slug'),
-                'user': i.get('user', {}).get('ids', {}).get('slug')}
+                'trakt': i_ids.get('trakt'),
+                'slug': i_ids.get('slug'),
+                'user': i_usr_ids.get('slug')}
             item['infoproperties']['tmdbhelper.context.sorting'] = dumps(item['params'])
 
             # Add library context menu

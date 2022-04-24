@@ -211,6 +211,8 @@ class ListUpNext(Container):
 
 class ListLists(Container):
     def get_items(self, info, page=None, **kwargs):
+        from xbmcplugin import SORT_METHOD_UNSORTED
+
         info_model = TRAKT_LIST_OF_LISTS.get(info)
 
         if info_model.get('get_trakt_id'):
@@ -224,6 +226,7 @@ class ListLists(Container):
 
         self.library = 'video'
         self.plugin_category = get_plugin_category(info_model)
+        self.sort_methods = [{'sortMethod': SORT_METHOD_UNSORTED, 'label2Mask': '%U'}]  # Label2 Mask by Studio (i.e. User Name)
         return items
 
 

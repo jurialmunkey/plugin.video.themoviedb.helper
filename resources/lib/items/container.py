@@ -1,4 +1,4 @@
-from xbmcplugin import addDirectoryItems, setProperty, setPluginCategory, setContent, endOfDirectory
+from xbmcplugin import addDirectoryItems, setProperty, setPluginCategory, setContent, endOfDirectory, addSortMethod, SORT_METHOD_UNSORTED
 from resources.lib.addon.consts import NO_LABEL_FORMATTING
 from resources.lib.addon.plugin import get_setting, executebuiltin
 from resources.lib.addon.parser import try_int, split_items, is_excluded
@@ -48,6 +48,7 @@ class Container():
         self.container_update = ''  # Add path to call Containr.Update({}) at end of directory
         self.container_refresh = False  # True call Container.Refresh at end of directory
         self.library = None  # TODO: FIX -- Currently broken -- SetInfo(library, info)
+        self.sort_methods = [{'sortMethod': SORT_METHOD_UNSORTED}]
 
         # KodiDB
         self.kodi_db = None
@@ -198,6 +199,8 @@ class Container():
     def finish_container(self):
         setPluginCategory(self.handle, self.plugin_category)  # Container.PluginCategory
         setContent(self.handle, self.container_content)  # Container.Content
+        for i in self.sort_methods:
+            addSortMethod(self.handle, **i)
         endOfDirectory(self.handle, updateListing=self.update_listing)
 
     def get_tmdb_id(self):
