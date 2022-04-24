@@ -155,6 +155,9 @@ RANDOMISED_TRAKT = {
     'random_mostplayed': {
         'info': 'trakt_mostplayed',
         'route': RANDOMISED_TRAKT_ROUTE},
+    'random_mostviewers': {
+        'info': 'trakt_mostviewers',
+        'route': RANDOMISED_TRAKT_ROUTE},
     'random_anticipated': {
         'info': 'trakt_anticipated',
         'route': RANDOMISED_TRAKT_ROUTE}}
@@ -380,6 +383,12 @@ TRAKT_BASIC_LISTS = {
         'route': TRAKT_BASIC_LISTS_ROUTE,
         'plugin_category': '{localized} {plural}',
         'localized': 32205
+    },
+    'trakt_mostviewers': {
+        'path': '{trakt_type}s/watched/weekly',
+        'route': TRAKT_BASIC_LISTS_ROUTE,
+        'plugin_category': '{localized} {plural}',
+        'localized': 32414
     },
     'trakt_anticipated': {
         'path': '{trakt_type}s/anticipated',

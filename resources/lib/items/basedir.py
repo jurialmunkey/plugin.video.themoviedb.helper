@@ -262,6 +262,15 @@ def _get_basedir_random():
                 'icon': f'{ADDONPATH}/resources/icons/trakt/mostplayed.png'}},
         {
             'label': u'{} {}{{space}}{{item_type}}'.format(
+                get_localized(590), get_localized(32414)),
+            'types': ['movie', 'tv', 'both'],
+            'params': {'info': 'random_mostviewers'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/mostplayed.png'}},
+        {
+            'label': u'{} {}{{space}}{{item_type}}'.format(
                 get_localized(590), get_localized(32206)),
             'types': ['movie', 'tv', 'both'],
             'params': {'info': 'random_anticipated'},
@@ -452,6 +461,14 @@ def _get_basedir_trakt():
             'label': u'{}{{space}}{{item_type}}'.format(get_localized(32205)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_mostplayed'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/mostplayed.png'}},
+        {
+            'label': u'{}{{space}}{{item_type}}'.format(get_localized(32414)),
+            'types': ['movie', 'tv'],
+            'params': {'info': 'trakt_mostviewers'},
             'path': PLUGINPATH,
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',
