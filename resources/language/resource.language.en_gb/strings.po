@@ -2116,6 +2116,11 @@ msgctxt "#32414"
 msgid "Most Watched"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32415"
+msgid "Combine all players for plugin into single entry"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
