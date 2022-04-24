@@ -639,7 +639,7 @@ class ItemMapper(_ItemMapper):
         def _finalise_image():
             item['infolabels']['title'] = f'{item["infoproperties"].get("width")}x{item["infoproperties"].get("height")}'
             item['params'] = -1
-            item['path'] = item['art'].get('thumb') or item['art'].get('poster') or item['art'].get('fanart')
+            item['infolabels']['picturepath'] = item['path'] = item['art'].get('thumb') or item['art'].get('poster') or item['art'].get('fanart')
             item['is_folder'] = False
             item['library'] = 'pictures'
 

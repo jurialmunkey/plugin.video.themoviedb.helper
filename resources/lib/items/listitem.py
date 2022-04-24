@@ -177,8 +177,8 @@ class _ListItem(object):
         listitem.setLabel2(self.label2)
         listitem.setInfo(self.library, self.infolabels)
         listitem.setArt(self.set_art_fallbacks())
-        if self.library == 'pictures':
-            return listitem
+        # if self.library == 'pictures':  # NOTE: Not sure why it was necessary to exit early before setting properties
+        #     return listitem
         listitem.setUniqueIDs(self.unique_ids)
         listitem.setProperties(self.infoproperties)
         listitem.setCast(self.cast)

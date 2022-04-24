@@ -82,7 +82,7 @@ def format_folderpath(path, content='videos', affix='return', info=None, play='P
         return
     if info == 'play':
         return f'{play}({path})'
-    if _getcondvisibility("Window.IsMedia"):
+    if _getcondvisibility("Window.IsMedia") and _getinfolabel("System.CurrentWindow").lower() == content:
         return f'Container.Update({path})'
     return f'ActivateWindow({content},{path},{affix})'
 
