@@ -142,6 +142,11 @@ def json_loads(obj):
     return json.loads(obj, object_pairs_hook=json_int_keys)
 
 
+@lazyimport_module(globals(), 'json')
+def json_dumps(obj, separators=(',', ':')):
+    return json.dumps(obj, separators=separators)
+
+
 @lazyimport_module(globals(), 'pickle')
 def pickle_deepcopy(obj):
     return pickle.loads(pickle.dumps(obj))

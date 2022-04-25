@@ -1,7 +1,8 @@
 import random
 from xbmc import Monitor
 from xbmcgui import Dialog, DialogProgress
-from json import loads, dumps
+from resources.lib.files.futils import json_loads as data_loads
+from resources.lib.files.futils import json_dumps as data_dumps
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import get_localized, get_setting, set_setting
 from resources.lib.addon.parser import try_int
@@ -235,7 +236,7 @@ class _TraktLists():
                 'trakt': i_ids.get('trakt'),
                 'slug': i_ids.get('slug'),
                 'user': i_usr_ids.get('slug')}
-            item['infoproperties']['tmdbhelper.context.sorting'] = dumps(item['params'])
+            item['infoproperties']['tmdbhelper.context.sorting'] = data_dumps(item['params'])
 
             # Add library context menu
             item['context_menu'] = [(
@@ -328,30 +329,35 @@ class _TraktSync():
 
     @is_authorized
     def _get_last_activity(self, activity_type=None, activity_key=None, cache_refresh=False):
-        def cache_activity(reattempts=1):
-            from resources.lib.addon.tmdate import set_timestamp
+        def _cache_expired():
+            """ Check if the cached last_activities has expired """
             last_exp = get_property('TraktSyncLastActivities.Expires', is_type=int)
-            cur_time = set_timestamp(0, True)
-            if not last_exp or last_exp < cur_time:  # Expired
-                if reattempts <= 0:
-                    return
-                if _is_property_lock('TraktSyncLastActivities.Locked'):
-                    return cache_activity(reattempts - 1)  # Other thread is checking so wait for it
-                get_property('TraktSyncLastActivities.Locked', 1)  # Set property lock
-                response = self.get_response_json('sync/last_activities')
-                if not response:
-                    return
-                exp_time = cur_time + 90
-                from json import dumps as data_dumps
-                win_data = data_dumps(response, separators=(',', ':'))
-                get_property('TraktSyncLastActivities', set_property=win_data)
-                get_property('TraktSyncLastActivities.Expires', set_property=exp_time)
-                get_property('TraktSyncLastActivities.Locked', clear_property=True)  # Clear property lock
-                return response
-            from resources.lib.files.futils import json_loads as data_loads
-            return data_loads(get_property('TraktSyncLastActivities'))
+            if not last_exp or last_exp < set_timestamp(0, True):  # Expired
+                return True
+            return False
+
+        def _cache_activity():
+            """ Get last_activities from Trakt and add to cache while locking other lookup threads """
+            get_property('TraktSyncLastActivities.Locked', 1)  # Lock other threads
+            response = self.get_response_json('sync/last_activities')  # Retrieve data from Trakt
+            if not response:
+                return
+            get_property('TraktSyncLastActivities', set_property=data_dumps(response))  # Dump data to property
+            get_property('TraktSyncLastActivities.Expires', set_property=set_timestamp(90, True))  # Set activity expiry
+            get_property('TraktSyncLastActivities.Locked', clear_property=True)  # Clear thread lock
+            return response
+
+        def _cache_router():
+            """ Routes between getting cached object or new lookup """
+            if not _cache_expired():
+                return data_loads(get_property('TraktSyncLastActivities'))
+            if _is_property_lock('TraktSyncLastActivities.Locked'):  # Other thread getting data so wait for it
+                return data_loads(get_property('TraktSyncLastActivities'))
+            return _cache_activity()
+
         if not self.last_activities:
-            self.last_activities = cache_activity()
+            self.last_activities = _cache_router()
+
         return self._get_activity_timestamp(self.last_activities, activity_type=activity_type, activity_key=activity_key)
 
     @use_activity_cache(cache_days=CACHE_SHORT)
@@ -516,7 +522,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
 
     def get_stored_token(self):
         try:
-            token = loads(get_setting('trakt_token', 'str')) or {}
+            token = data_loads(get_setting('trakt_token', 'str')) or {}
         except Exception as exc:
             token = {}
             kodi_log(exc, 1)
@@ -611,7 +617,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
     def on_authenticated(self, auth_dialog=True):
         """Triggered when device authentication has been completed"""
         kodi_log(u'Trakt authenticated successfully!', 1)
-        set_setting('trakt_token', dumps(self.authorization), 'str')
+        set_setting('trakt_token', data_dumps(self.authorization), 'str')
         self.headers['Authorization'] = f'Bearer {self.authorization.get("access_token")}'
         if auth_dialog:
             self.auth_dialog.close()
@@ -637,7 +643,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         return self.get_simple_api_request(
             self.get_request_url(*args, **kwargs),
             headers=self.headers,
-            postdata=dumps(postdata) if postdata else None,
+            postdata=data_dumps(postdata) if postdata else None,
             method=response_method)
 
     def get_response(self, *args, **kwargs):
