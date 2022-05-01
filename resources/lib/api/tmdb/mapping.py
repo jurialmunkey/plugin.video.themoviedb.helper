@@ -1,5 +1,5 @@
 from resources.lib.api.mapping import UPDATE_BASEKEY, _ItemMapper, get_empty_item
-from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type, get_setting, get_localized
+from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type, get_setting, get_infolabel, get_localized
 from resources.lib.addon.parser import try_int, try_float, iter_props, dict_to_list, get_params
 from resources.lib.addon.tmdate import format_date, age_difference
 from resources.lib.addon.consts import (
@@ -215,6 +215,7 @@ def get_episode_to_air(v, name):
     infoproperties[f'{name}.day'] = format_date(i.get('air_date'), "%A")
     infoproperties[f'{name}.day_short'] = format_date(i.get('air_date'), "%a")
     infoproperties[f'{name}.year'] = format_date(i.get('air_date'), "%Y")
+    infoproperties[f'{name}.custom'] = format_date(i.get('air_date'), get_infolabel('Skin.String(TMDbHelper.Date.Format)') or '%d %b %Y')
     infoproperties[f'{name}.episode'] = i.get('episode_number')
     infoproperties[f'{name}.name'] = i.get('name')
     infoproperties[f'{name}.tmdb_id'] = i.get('id')
