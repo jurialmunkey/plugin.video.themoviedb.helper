@@ -799,12 +799,12 @@ def _edit_rules(idx=-1):
     if idx == -1:
         return
     history = get_search_history('discover')
-    history.reverse()
     try:
         item = history[idx]
     except IndexError:
         return
-    _win_prop('save_index', set_property=f'{len(history) - 1 - idx}')
+    _clear_properties()  # Make sure old properties get cleared first
+    _win_prop('save_index', set_property=f'{idx}')
     _win_prop('save_label', set_property=f'{item.get("label")}')
     for k, v in item.get('params', {}).items():
         if k in ['info', 'tmdb_type']:
@@ -922,8 +922,8 @@ class ListDiscoverDir(Container):
                     'art': artwork}
                 items.append(item)
 
+            history_items = []
             history = get_search_history('discover')
-            history.reverse()
             for x, i in enumerate(history):
                 item_params = merge_two_dicts(kwargs, i.get('params', {}))
                 edit_params = {'info': 'user_discover', 'tmdb_type': item_params.get('tmdb_type'), 'method': 'edit', 'idx': x}
@@ -937,7 +937,10 @@ class ListDiscoverDir(Container):
                         (get_localized(21435), f'Container.Update({encode_url(PLUGINPATH, **edit_params)})'),
                         (get_localized(118), f'Container.Update({encode_url(PLUGINPATH, **name_params)})'),
                         (get_localized(117), f'Container.Update({encode_url(PLUGINPATH, **dele_params)})')]}
-                items.append(item)
+                history_items.append(item)
+            history_items.reverse()
+            items += history_items
+
             if history:
                 item = {
                     'label': get_localized(32237),
