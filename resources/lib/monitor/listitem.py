@@ -290,7 +290,7 @@ class ListItemMonitor(CommonMonitorFunctions):
 
         # Need to update Next Aired with a shorter cache time than details
         if tmdb_type == 'tv':
-            details['infoproperties'].update(self._nextaired.setdefault(tmdb_id, self.tmdb_api.get_tvshow_nextaired(tmdb_id)))
+            details['infoproperties'].update(self.tmdb_api.get_tvshow_nextaired(tmdb_id))
 
         # Get our artwork properties
         if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):

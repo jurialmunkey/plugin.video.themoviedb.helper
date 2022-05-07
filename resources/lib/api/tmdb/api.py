@@ -173,7 +173,7 @@ class TMDb(RequestAPI):
         return self._cache.use_cache(
             self._get_tvshow_nextaired, tmdb_id,
             cache_name=f'TMDb.get_tvshow_nextaired.{tmdb_id}',
-            cache_days=CACHE_SHORT)
+            cache_days=CACHE_SHORT).get('infoproperties', {})
 
     def _get_tvshow_nextaired(self, tmdb_id):
         if not tmdb_id:
