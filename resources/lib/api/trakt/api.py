@@ -386,16 +386,30 @@ class _TraktSync():
             season = try_int(season)
             episode = try_int(episode)
         sync_list = self.get_sync(sync_type, trakt_type, id_type)
-        if unique_id in sync_list:
-            if season is None:
+        if unique_id not in sync_list:
+            return
+        if season is None:
+            return True
+        try:
+            sync_item_seasons = sync_list[unique_id]['seasons']
+        except (KeyError, AttributeError):
+            return
+        if not sync_item_seasons:
+            return
+        for i in sync_item_seasons:
+            if season != i.get('number'):
+                continue
+            if episode is None:
                 return True
-            for i in sync_list.get(unique_id, {}).get('seasons', []):
-                if season == i.get('number'):
-                    if episode is None:
-                        return True
-                    for j in i.get('episodes', []):
-                        if episode == j.get('number'):
-                            return True
+            try:
+                sync_item_episodes = i['episodes']
+            except (KeyError, AttributeError):
+                return
+            if not sync_item_episodes:
+                return
+            for j in sync_item_episodes:
+                if episode == j.get('number'):
+                    return True
 
     @use_activity_cache('movies', 'watched_at', CACHE_LONG)
     def get_sync_watched_movies(self, trakt_type, id_type=None):

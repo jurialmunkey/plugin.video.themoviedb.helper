@@ -373,17 +373,17 @@ class _TraktProgress():
             if i.get('number', -1) == season:
                 return i.get('aired_episodes')
 
-    def get_calendar(self, trakt_type, user=True, start_date=None, days=None):
+    def get_calendar(self, trakt_type, user=True, start_date=None, days=None, endpoint=None):
         user = 'my' if user else 'all'
-        return self.get_response_json('calendars', user, trakt_type, start_date, days, extended='full')
+        return self.get_response_json('calendars', user, trakt_type, endpoint, start_date, days, extended='full')
 
     @use_simple_cache(cache_days=0.25)
-    def get_calendar_episodes(self, startdate=0, days=1, user=True):
+    def get_calendar_episodes(self, startdate=0, days=1, user=True, endpoint=None):
         # Broaden date range in case utc conversion bumps into different day
         mod_date = try_int(startdate) - 1
         mod_days = try_int(days) + 2
         date = get_datetime_today() + get_timedelta(days=mod_date)
-        return self.get_calendar('shows', user, start_date=date.strftime('%Y-%m-%d'), days=mod_days)
+        return self.get_calendar('shows', user, start_date=date.strftime('%Y-%m-%d'), days=mod_days, endpoint=endpoint)
 
     def _get_calendar_episode_item(self, i):
         air_date = convert_timestamp(i.get('first_aired'), utc_convert=True)
@@ -507,9 +507,9 @@ class _TraktProgress():
         return items[::-1] if flipped else items
 
     @use_simple_cache(cache_days=0.25)
-    def _get_calendar_episodes_list(self, startdate=0, days=1, user=True, kodi_db=None, stack=True):
+    def _get_calendar_episodes_list(self, startdate=0, days=1, user=True, kodi_db=None, stack=True, endpoint=None):
         # Get response
-        response = self.get_calendar_episodes(startdate=startdate, days=days, user=user)
+        response = self.get_calendar_episodes(startdate=startdate, days=days, user=user, endpoint=endpoint)
         if not response:
             return
         # Reverse items for date ranges in past
@@ -517,9 +517,9 @@ class _TraktProgress():
         items = [self._get_calendar_episode_item(i) for i in traktitems if self._get_calendar_episode_item_bool(i, kodi_db, user, startdate, days)]
         return self._stack_calendar_episodes(items, flipped=startdate < -1) if stack else items
 
-    def get_calendar_episodes_list(self, startdate=0, days=1, user=True, kodi_db=None, page=1, limit=None):
+    def get_calendar_episodes_list(self, startdate=0, days=1, user=True, kodi_db=None, page=1, limit=None, endpoint=None):
         limit = limit or self.item_limit
-        response_items = self._get_calendar_episodes_list(startdate, days, user, kodi_db, stack=get_setting('calendar_flatten'))
+        response_items = self._get_calendar_episodes_list(startdate, days, user, kodi_db, stack=get_setting('calendar_flatten'), endpoint=endpoint)
         response = PaginatedItems(response_items, page=page, limit=limit)
         if response and response.items:
             return response.items + response.next_page

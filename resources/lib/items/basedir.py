@@ -450,6 +450,46 @@ def _get_basedir_trakt():
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/trakt/calendar.png'}},
         {
+            'label': u'{} {{item_type}}{{space}}{} {}'.format(get_localized(32201), get_localized(32203), get_localized(32416)),
+            'types': ['tv'],
+            'params': {'info': 'dir_calendar_trakt', 'endpoint': 'premieres'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/calendar.png'}},
+        {
+            'label': u'{} {{item_type}}{{space}}{} {}'.format(get_localized(32201), get_localized(32203), get_localized(842)),
+            'types': ['tv'],
+            'params': {'info': 'dir_calendar_trakt', 'endpoint': 'new'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/calendar.png'}},
+        {
+            'label': u'{} {{item_type}}{{space}}{}'.format(get_localized(32186), get_localized(32203)),
+            'types': ['tv'],
+            'params': {'info': 'dir_calendar_trakt', 'user': 'false'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/calendar.png'}},
+        {
+            'label': u'{} {{item_type}}{{space}}{} {}'.format(get_localized(32186), get_localized(32203), get_localized(32416)),
+            'types': ['tv'],
+            'params': {'info': 'dir_calendar_trakt', 'endpoint': 'premieres', 'user': 'false'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/calendar.png'}},
+        {
+            'label': u'{} {{item_type}}{{space}}{} {}'.format(get_localized(32186), get_localized(32203), get_localized(842)),
+            'types': ['tv'],
+            'params': {'info': 'dir_calendar_trakt', 'endpoint': 'new', 'user': 'false'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/calendar.png'}},
+        {
             'label': u'{}{{space}}{{item_type}}'.format(get_localized(32204)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_trending'},
@@ -831,7 +871,7 @@ def _get_basedir_calendar_items():
                 'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'}}]
 
 
-def _get_basedir_calendar(info=None):
+def _get_basedir_calendar(info=None, endpoint=None, user=None):
     items = []
     today = get_datetime_today()
     for i in _get_basedir_calendar_items():
@@ -840,6 +880,10 @@ def _get_basedir_calendar(info=None):
         date = today + get_timedelta(days=i.get('params', {}).get('startdate', 0))
         i['label'] = i['label'].format(weekday=date.strftime('%A'))
         i['params']['info'] = info
+        if endpoint:
+            i['params']['endpoint'] = endpoint
+        if user:
+            i['params']['user'] = user
         items.append(i)
     return items
 
@@ -893,7 +937,7 @@ class ListBaseDir(Container):
             'dir_tmdb': lambda: _get_basedir_list(None, tmdb=True),
             'dir_trakt': lambda: _get_basedir_list(None, trakt=True),
             'dir_random': lambda: _build_basedir(None, _get_basedir_random()),
-            'dir_calendar_trakt': lambda: _get_basedir_calendar(info='trakt_calendar'),
+            'dir_calendar_trakt': lambda: _get_basedir_calendar(info='trakt_calendar', endpoint=kwargs.get('endpoint'), user=kwargs.get('user')),
             'dir_calendar_library': lambda: _get_basedir_calendar(info='library_nextaired')
         }
         func = route.get(info, lambda: _build_basedir(None, _get_basedir_main()))

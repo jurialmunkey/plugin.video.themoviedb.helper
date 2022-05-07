@@ -2,6 +2,7 @@
 # Author: jurialmunkey
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 from xbmcgui import Dialog
+from resources.lib.addon.thread import ParallelThread
 from resources.lib.addon.window import get_property
 from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.parser import try_int
@@ -87,8 +88,14 @@ class _Menu():
         self.build_menu(items)
 
     def build_menu(self, items):
+        def _threaditem(i):
+            return i['class'](self, **i.get('kwargs', {}))._getself()
+
         with BusyDialog():
-            self.menu = [j for j in (i['class'](self, **i.get('kwargs', {}))._getself() for i in items) if j]
+            with ParallelThread(items, _threaditem) as pt:
+                item_queue = pt.queue
+            self.menu = [i for i in item_queue if i]
+
         return self.menu
 
     def select(self):
