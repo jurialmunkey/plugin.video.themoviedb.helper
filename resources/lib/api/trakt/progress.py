@@ -288,9 +288,9 @@ class _TraktProgress():
             return
 
     @is_authorized
-    def get_movie_playprogress(self, unique_id, id_type):
+    def get_movie_playprogress(self, unique_id, id_type, key='progress'):
         try:
-            return self.get_sync('playback', 'movie', id_type)[unique_id]['progress']
+            return self.get_sync('playback', 'movie', id_type)[unique_id][key]
         except (AttributeError, KeyError):
             return
 
@@ -316,14 +316,14 @@ class _TraktProgress():
 
     @is_authorized
     @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_LONG)
-    def get_episode_playprogress(self, unique_id, id_type, season, episode):
+    def get_episode_playprogress(self, unique_id, id_type, season, episode, key='progress'):
         season = try_int(season, fallback=-2)  # Make fallback -2 to prevent matching on 0
         episode = try_int(episode, fallback=-2)  # Make fallback -2 to prevent matching on 0
         playprogress = self._get_episode_playprogress(id_type)
         if not playprogress or unique_id not in playprogress:
             return
         try:
-            return playprogress[unique_id]['seasons'][season][episode]['progress']
+            return playprogress[unique_id]['seasons'][season][episode][key]
         except (KeyError, AttributeError):
             return
 

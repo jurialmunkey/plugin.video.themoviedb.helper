@@ -2126,6 +2126,11 @@ msgctxt "#32416"
 msgid "Premieres"
 msgstr ""
 
+#: /resources/lib/script/sync.py
+msgctxt "#32417"
+msgid "Remove from progress"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

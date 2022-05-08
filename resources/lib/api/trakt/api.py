@@ -380,36 +380,35 @@ class _TraktSync():
 
     def is_sync(self, trakt_type, unique_id, season=None, episode=None, id_type=None, sync_type=None):
         """ Returns True if item in sync list else False """
-        if id_type in ['tmdb', 'tvdb', 'trakt']:
-            unique_id = try_int(unique_id)
-        if season is not None:
-            season = try_int(season)
-            episode = try_int(episode)
+
+        def _is_nested():
+            try:
+                sync_item_seasons = sync_list[unique_id]['seasons']
+            except (KeyError, AttributeError):
+                return
+            if not sync_item_seasons:
+                return
+            se_n, ep_n = try_int(season), try_int(episode)
+            for i in sync_item_seasons:
+                if se_n != i.get('number'):
+                    continue
+                if ep_n is None:
+                    return True
+                try:
+                    sync_item_episodes = i['episodes']
+                except (KeyError, AttributeError):
+                    return
+                if not sync_item_episodes:
+                    return
+                for j in sync_item_episodes:
+                    if ep_n == j.get('number'):
+                        return True
         sync_list = self.get_sync(sync_type, trakt_type, id_type)
         if unique_id not in sync_list:
             return
         if season is None:
             return True
-        try:
-            sync_item_seasons = sync_list[unique_id]['seasons']
-        except (KeyError, AttributeError):
-            return
-        if not sync_item_seasons:
-            return
-        for i in sync_item_seasons:
-            if season != i.get('number'):
-                continue
-            if episode is None:
-                return True
-            try:
-                sync_item_episodes = i['episodes']
-            except (KeyError, AttributeError):
-                return
-            if not sync_item_episodes:
-                return
-            for j in sync_item_episodes:
-                if episode == j.get('number'):
-                    return True
+        return _is_nested()
 
     @use_activity_cache('movies', 'watched_at', CACHE_LONG)
     def get_sync_watched_movies(self, trakt_type, id_type=None):
