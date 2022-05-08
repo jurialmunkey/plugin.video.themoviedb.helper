@@ -32,8 +32,6 @@ class ListItemMonitor(CommonMonitorFunctions):
         self.pre_folder = None
         self.property_prefix = 'ListItem'
         self._last_blur_fallback = False
-        self._nextaired = {}
-        self._ratings = {}
 
     def get_container(self):
         self.container = get_container()

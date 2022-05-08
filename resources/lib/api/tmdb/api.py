@@ -1,8 +1,9 @@
 from xbmcgui import Dialog
-from resources.lib.addon.plugin import ADDONPATH, get_mpaa_prefix, get_language, convert_type, get_setting, get_localized
+from resources.lib.addon.plugin import ADDONPATH, get_mpaa_prefix, get_language, convert_type, get_setting, get_localized, get_infolabel
 from resources.lib.addon.consts import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, TMDB_GENRE_IDS, CACHE_SHORT, CACHE_MEDIUM
 from resources.lib.addon.parser import try_int, is_excluded
 from resources.lib.addon.window import get_property
+from resources.lib.addon.tmdate import format_date
 from resources.lib.files.futils import use_json_filecache, validify_filename
 from resources.lib.items.pages import PaginatedItems
 from resources.lib.api.request import RequestAPI
@@ -170,6 +171,7 @@ class TMDb(RequestAPI):
 
     def get_tvshow_nextaired(self, tmdb_id):
         """ Get updated next aired data for tvshows using 24hr cache """
+
         def _get_nextaired():
             response = self.get_response_json('tv', tmdb_id, language=self.req_language)
             if not response:
@@ -178,9 +180,23 @@ class TMDb(RequestAPI):
             infoproperties.update(get_episode_to_air(response.get('next_episode_to_air'), 'next_aired'))
             infoproperties.update(get_episode_to_air(response.get('last_episode_to_air'), 'last_aired'))
             return infoproperties
+
+        def _get_formatted():
+            df = get_infolabel('Skin.String(TMDbHelper.Date.Format)') or '%d %b %Y'
+            for i in ['next_aired', 'last_aired']:
+                try:
+                    air_date = infoproperties[f'{i}.original']
+                except KeyError:
+                    continue
+                infoproperties[f'{i}.custom'] = format_date(air_date, df)
+            return infoproperties
+
         if not tmdb_id:
             return {}
-        return self._cache.use_cache(_get_nextaired, cache_name=f'TMDb.get_tvshow_aired.{tmdb_id}', cache_days=CACHE_SHORT)
+
+        cache_name = f'TMDb.get_tv_nextaired.{tmdb_id}'
+        infoproperties = self._cache.use_cache(_get_nextaired, cache_name=cache_name, cache_days=CACHE_SHORT)
+        return _get_formatted() if infoproperties else infoproperties
 
     def get_details_request(self, tmdb_type, tmdb_id, season=None, episode=None):
         path_affix = []

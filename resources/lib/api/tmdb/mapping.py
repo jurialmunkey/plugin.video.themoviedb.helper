@@ -224,6 +224,7 @@ def get_episode_to_air(v, name):
     infoproperties[f'{name}.rating'] = f'{try_float(i.get("vote_average")):0,.1f}'
     infoproperties[f'{name}.votes'] = i.get('vote_count')
     infoproperties[f'{name}.thumb'] = get_imagepath_thumb(i.get('still_path'))
+    infoproperties[f'{name}.original'] = air_date
     return infoproperties
 
 
