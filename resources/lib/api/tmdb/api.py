@@ -170,23 +170,17 @@ class TMDb(RequestAPI):
 
     def get_tvshow_nextaired(self, tmdb_id):
         """ Get updated next aired data for tvshows using 24hr cache """
-        return self._cache.use_cache(
-            self._get_tvshow_nextaired, tmdb_id,
-            cache_name=f'TMDb.get_tvshow_nextaired.{tmdb_id}',
-            cache_days=CACHE_SHORT).get('infoproperties', {})
-
-    def _get_tvshow_nextaired(self, tmdb_id):
+        def _get_nextaired():
+            response = self.get_response_json('tv', tmdb_id, language=self.req_language)
+            if not response:
+                return {}
+            infoproperties = {}
+            infoproperties.update(get_episode_to_air(response.get('next_episode_to_air'), 'next_aired'))
+            infoproperties.update(get_episode_to_air(response.get('last_episode_to_air'), 'last_aired'))
+            return infoproperties
         if not tmdb_id:
             return {}
-        response = self.get_response_json('tv', tmdb_id, language=self.req_language)
-        if not response:
-            return {}
-        infoproperties = {}
-        if response.get('next_episode_to_air'):
-            infoproperties.update(get_episode_to_air(response['next_episode_to_air'], 'next_aired'))
-        if response.get('last_episode_to_air'):
-            infoproperties.update(get_episode_to_air(response['last_episode_to_air'], 'last_aired'))
-        return {'infoproperties': infoproperties}
+        return self._cache.use_cache(_get_nextaired, cache_name=f'TMDb.get_tvshow_aired.{tmdb_id}', cache_days=CACHE_SHORT)
 
     def get_details_request(self, tmdb_type, tmdb_id, season=None, episode=None):
         path_affix = []

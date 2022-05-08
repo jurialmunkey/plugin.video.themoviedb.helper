@@ -208,13 +208,14 @@ def get_extra_art(v):
 
 def get_episode_to_air(v, name):
     i = v or {}
+    air_date = i.get('air_date')
     infoproperties = {}
-    infoproperties[f'{name}'] = format_date(i.get('air_date'), region_fmt='dateshort')
-    infoproperties[f'{name}.long'] = format_date(i.get('air_date'), region_fmt='datelong')
-    infoproperties[f'{name}.short'] = format_date(i.get('air_date'), "%d %b")
-    infoproperties[f'{name}.day'] = format_date(i.get('air_date'), "%A")
-    infoproperties[f'{name}.day_short'] = format_date(i.get('air_date'), "%a")
-    infoproperties[f'{name}.year'] = format_date(i.get('air_date'), "%Y")
+    infoproperties[f'{name}'] = format_date(air_date, region_fmt='dateshort')
+    infoproperties[f'{name}.long'] = format_date(air_date, region_fmt='datelong')
+    infoproperties[f'{name}.short'] = format_date(air_date, "%d %b")
+    infoproperties[f'{name}.day'] = format_date(air_date, "%A")
+    infoproperties[f'{name}.day_short'] = format_date(air_date, "%a")
+    infoproperties[f'{name}.year'] = format_date(air_date, "%Y")
     infoproperties[f'{name}.episode'] = i.get('episode_number')
     infoproperties[f'{name}.name'] = i.get('name')
     infoproperties[f'{name}.tmdb_id'] = i.get('id')
