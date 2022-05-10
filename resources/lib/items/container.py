@@ -1,4 +1,4 @@
-from xbmcplugin import addDirectoryItems, setProperty, setPluginCategory, setContent, endOfDirectory, addSortMethod, SORT_METHOD_UNSORTED
+from xbmcplugin import addDirectoryItems, setProperty, setPluginCategory, setContent, endOfDirectory, addSortMethod
 from resources.lib.addon.consts import NO_LABEL_FORMATTING
 from resources.lib.addon.plugin import get_setting, executebuiltin
 from resources.lib.addon.parser import try_int, split_items, is_excluded
@@ -48,7 +48,7 @@ class Container():
         self.container_update = ''  # Add path to call Containr.Update({}) at end of directory
         self.container_refresh = False  # True call Container.Refresh at end of directory
         self.library = None  # TODO: FIX -- Currently broken -- SetInfo(library, info)
-        self.sort_methods = [{'sortMethod': SORT_METHOD_UNSORTED}]
+        self.sort_methods = []  # List of kwargs dictionaries [{'sortMethod': SORT_METHOD_UNSORTED}]
 
         # KodiDB
         self.kodi_db = None
