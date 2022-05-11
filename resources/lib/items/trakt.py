@@ -33,10 +33,8 @@ class TraktMethods():
         if not duration:
             return
         progress = _set_playprogress()
-        if not progress:
-            return
-        if progress < 4 or progress > 96:
-            return
+        if not progress or progress < 4 or progress > 96:
+            progress = 0
         set_playprogress(li.get_url(), int(duration * progress // 100), duration)
 
     def pre_sync(self, info=None, tmdb_id=None, tmdb_type=None, season=-2, **kwargs):
