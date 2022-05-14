@@ -31,6 +31,8 @@ class Script(object):
             lambda **kwargs: importmodule('resources.lib.script.method', 'sync_trakt')(**kwargs),
         'manage_artwork':
             lambda **kwargs: importmodule('resources.lib.script.method', 'manage_artwork')(**kwargs),
+        'select_artwork':
+            lambda **kwargs: importmodule('resources.lib.script.method', 'select_artwork')(**kwargs),
         'refresh_details':
             lambda **kwargs: importmodule('resources.lib.script.method', 'refresh_details')(**kwargs),
         'related_lists':

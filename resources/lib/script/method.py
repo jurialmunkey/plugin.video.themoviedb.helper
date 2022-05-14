@@ -137,6 +137,13 @@ def manage_artwork(tmdb_id=None, tmdb_type=None, season=None, **kwargs):
 
 @is_in_kwargs({'tmdb_type': True})
 @get_tmdb_id
+def select_artwork(tmdb_id=None, tmdb_type=None, season=None, **kwargs):
+    from resources.lib.items.builder import ItemBuilder
+    ItemBuilder().select_artwork(tmdb_id=tmdb_id, tmdb_type=tmdb_type, season=season)
+
+
+@is_in_kwargs({'tmdb_type': True})
+@get_tmdb_id
 def refresh_details(tmdb_id=None, tmdb_type=None, season=None, episode=None, confirm=True, **kwargs):
     from xbmcgui import Dialog
     from resources.lib.items.builder import ItemBuilder
