@@ -295,8 +295,9 @@ class Players(object):
         if player.get('fallback'):
             return self._get_player_or_fallback(player['fallback'])
 
-    def _get_path_from_rules(self, folder, action):
+    def _get_path_from_rules(self, folder, action, strict=False):
         """ Returns tuple of (path, is_folder) """
+        _matches = []
         _action_log = []
         for x, f in enumerate(folder):
             _lastaction = ['   Itm: ', f.get('label'), '\n']
@@ -316,13 +317,26 @@ class Players(object):
                     _action_log += _lastaction
                     break  # Item's key value doesn't match value we are looking for so let's got to next item in folder
             else:  # Item matched our criteria so let's return it
-                if f.get('file'):
-                    self.action_log += _lastaction
-                    self.action_log += ('FMATCH: ', f['file'], '\n')
-                    is_folder = False if f.get('filetype') == 'file' else True  # Set false for files so we can play
-                    return (f['file'], is_folder)   # Get ListItem.FolderPath for item and return as player
-        self.action_log += ('STEP FAILED!', '\n') if folder and folder[0] else ('NO RESULTS!', '\n')
-        self.action_log += _action_log
+                if not f.get('file'):
+                    continue  # If the item doesn't have a path we should keep looking
+                _matches.append(f)
+                self.action_log += _lastaction
+                self.action_log += ('FMATCH: ', f['file'], '\n')
+                if not strict:  # Not strict match so don't bother checking rest of folder
+                    break
+
+        if not _matches:
+            self.action_log += ('STEP FAILED!', '\n') if folder and folder[0] else ('NO RESULTS!', '\n')
+            self.action_log += _action_log
+            return
+
+        if not strict or len(_matches) == 1:  # Strict match must give only one item
+            f = _matches[0]
+            is_folder = False if f.get('filetype') == 'file' else True  # Set false for files so we can play
+            return (f['file'], is_folder)  # Get ListItem.FolderPath for item and return as player
+
+        return _matches
+
 
     def _player_dialog_select(self, folder, auto=False):
         d_items = []
@@ -418,9 +432,16 @@ class Players(object):
             # Pop special actions
             is_return = action.pop('return', None)
             is_dialog = action.pop('dialog', None)
+            is_strict = action.pop('strict', None)
 
             # Get next path if there's still actions left
-            next_path = self._get_path_from_rules(folder, action) if action else None
+            next_path = self._get_path_from_rules(folder, action, is_strict) if action else None
+
+            # Strict flag checks that we received a single item
+            if is_strict and next_path and isinstance(next_path, list):
+                if is_dialog:  # A dialog action combined with strict flag allows users to choose
+                    folder = next_path  # Set our folder to list of matches to choose in dialog
+                next_path = None  # We didn't get a next path so
 
             # Special action to fallback to select dialog if match is not found directly
             if is_dialog and not next_path:
