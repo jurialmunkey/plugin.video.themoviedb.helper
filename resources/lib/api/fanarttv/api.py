@@ -8,22 +8,22 @@ API_URL = 'https://webservice.fanart.tv/v3'
 NO_LANGUAGE = ['keyart', 'fanart']
 ARTWORK_TYPES = {
     'movies': {
-        'clearart': ['hdmovieclearart', 'movieclearart'],
-        'clearlogo': ['hdmovielogo', 'movielogo'],
-        'discart': ['moviedisc'],
         'poster': ['movieposter'],
         'fanart': ['moviebackground'],
         'landscape': ['moviethumb'],
         'banner': ['moviebanner'],
+        'clearart': ['hdmovieclearart', 'movieclearart'],
+        'clearlogo': ['hdmovielogo', 'movielogo'],
+        'discart': ['moviedisc'],
         'keyart': ['movieposter']},
     'tv': {
-        'clearart': ['hdclearart', 'clearart'],
-        'clearlogo': ['hdtvlogo', 'clearlogo'],
-        'characterart': ['characterart'],
         'poster': ['tvposter'],
         'fanart': ['showbackground'],
         'landscape': ['tvthumb'],
-        'banner': ['tvbanner']},
+        'banner': ['tvbanner'],
+        'clearart': ['hdclearart', 'clearart'],
+        'clearlogo': ['hdtvlogo', 'clearlogo'],
+        'characterart': ['characterart']},
     'season': {
         'poster': ['seasonposter', 'tvposter'],
         'fanart': ['showbackground'],

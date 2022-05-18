@@ -337,7 +337,6 @@ class Players(object):
 
         return _matches
 
-
     def _player_dialog_select(self, folder, auto=False):
         d_items = []
         for f in folder:

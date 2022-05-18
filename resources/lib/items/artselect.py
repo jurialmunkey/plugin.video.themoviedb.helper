@@ -35,14 +35,15 @@ class _ArtworkSelector():
                 art={'thumb': func(i.get('file_path'))}).get_listitem()
             for i in tmdb_items if i.get('file_path') and i.get('file_path', '')[-4:] != '.svg']
 
-    def select_type(self, ftv_type, blacklist=[]):
+    def select_type(self, ftv_type, blacklist=[], item_artwork=None):
         artwork_types = [i for i in ARTWORK_TYPES.get(ftv_type, []) if i not in blacklist]  # Remove types that we previously looked for
-        choice = Dialog().select(get_localized(13511), artwork_types)
+        ditems = [ListItem(label=i, art={'thumb': item_artwork.get(i)}).get_listitem() for i in artwork_types] if item_artwork else artwork_types
+        choice = Dialog().select(get_localized(13511), ditems, useDetails=True if item_artwork else False)
         if choice == -1:
             return
         return artwork_types[choice]
 
-    def select_artwork(self, tmdb_type, tmdb_id, container_refresh=True, blacklist=[], season=None):
+    def select_artwork(self, tmdb_type, tmdb_id, container_refresh=False, blacklist=[], season=None):
         with BusyDialog():
             item = self.get_item(tmdb_type, tmdb_id, season)
         if not item:
@@ -50,8 +51,12 @@ class _ArtworkSelector():
         ftv_id, ftv_type = self.get_ftv_typeid(tmdb_type, item, season=season)
         if not ftv_id or not ftv_type:
             return
-        artwork_type = self.select_type(ftv_type if season is None else 'season', blacklist)
+        item_artwork = self.get_item_artwork(item['artwork'], is_season=season is not None)
+        artwork_type = self.select_type(ftv_type if season is None else 'season', blacklist, item_artwork=item_artwork)
         if not artwork_type:
+            if container_refresh:
+                executebuiltin('Container.Refresh')
+                executebuiltin('UpdateLibrary(video,/fake/path/to/force/refresh/on/home)')
             return
 
         # Get artwork of type and build list
@@ -76,16 +81,14 @@ class _ArtworkSelector():
         success = items[choice].getLabel()
         if not success:
             return
+        container_refresh = True
 
         # Cache our artwork
         manual = item['artwork'].setdefault('manual', {})
         manual[artwork_type] = success
         item['expires'] = self._timestamp()  # Reup our timestamp to force child items to recache
         self._cache.set_cache(item, cache_name=self.get_cache_name(tmdb_type, tmdb_id, season), cache_days=10000)
-
-        if container_refresh:
-            executebuiltin('Container.Refresh')
-            executebuiltin('UpdateLibrary(video,/fake/path/to/force/refresh/on/home)')
+        return self.select_artwork(tmdb_type, tmdb_id, container_refresh, blacklist, season=season)
 
     def refresh_all_artwork(self, tmdb_type, tmdb_id, ok_dialog=True, container_refresh=True, season=None):
         old_cache_refresh = self.ftv_api.cache_refresh
