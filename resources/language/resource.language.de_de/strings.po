@@ -63,7 +63,7 @@ msgstr "Deutsch (Schweiz)"
 
 msgctxt "#30011"
 msgid "German (Germany)"
-msgstr "Deutsch Deutschland)"
+msgstr "Deutsch (Deutschland)"
 
 msgctxt "#30012"
 msgid "Greek (Greece)"
@@ -127,7 +127,7 @@ msgstr "Französisch (Kanada)"
 
 msgctxt "#30027"
 msgid "French (France)"
-msgstr "Französisch Frankreich)"
+msgstr "Französisch (Frankreich)"
 
 msgctxt "#30028"
 msgid "Galician (Spain)"

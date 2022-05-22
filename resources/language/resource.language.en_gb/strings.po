@@ -2131,6 +2131,11 @@ msgctxt "#32417"
 msgid "Remove from progress"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32420"
+msgid "TMDb artwork quality"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
