@@ -77,6 +77,8 @@ class ListItemMonitor(CommonMonitorFunctions):
         if get_condvisibility(
                 "Window.IsVisible(DialogPVRInfo.xml) | "
                 "Window.IsVisible(MyPVRChannels.xml) | "
+                "Window.IsVisible(MyPVRRecordings.xml) | "
+                "Window.IsVisible(MyPVRSearch.xml) | "
                 "Window.IsVisible(MyPVRGuide.xml)"):
             return 'multi'
         if self.container == 'Container.':
