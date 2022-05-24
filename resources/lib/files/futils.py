@@ -119,7 +119,9 @@ def make_path(path, warn_dialog=False):
         return xbmcvfs.translatePath(path)
     if xbmcvfs.mkdirs(path):
         return xbmcvfs.translatePath(path)
-    if get_setting('ignore_folderchecking'):
+    if xbmcvfs.exists(path):  # mkdirs doesn't return true on success on some systems so double check
+        return xbmcvfs.translatePath(path)
+    if get_setting('ignore_folderchecking'):  # some systems lag in reporting folder exists after creation so allow overriding check
         kodi_log(f'Ignored xbmcvfs folder check error\n{path}', 2)
         return xbmcvfs.translatePath(path)
     kodi_log(f'XBMCVFS unable to create path:\n{path}', 2)

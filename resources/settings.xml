@@ -3,14 +3,14 @@
 	<section id="plugin.video.themoviedb.helper">
 		<category id="general" label="128" help="">
 			<group id="1" label="248">
-				<setting id="mpaa_prefix" type="string" label="32004" help="">
+				<setting id="mpaa_prefix" type="string" label="32004" help="32418">
 					<level>0</level>
 					<default>Rated </default>
 					<control type="edit" format="string">
-						<heading>$ADDON[plugin.video.themoviedb.helper 32004]</heading>
+						<heading>32004</heading>
 					</control>
 				</setting>
-				<setting id="language" type="integer" label="32005" help="">
+				<setting id="language" type="integer" label="32005" help="32419">
 					<level>0</level>
 					<default>18</default>
 					<constraints>
@@ -86,7 +86,7 @@
 						</options>
 					</constraints>
 					<control type="list" format="string">
-						<heading>$ADDON[plugin.video.themoviedb.helper 32005]</heading>
+						<heading>32005</heading>
 					</control>
 				</setting>
 			</group>
@@ -172,7 +172,7 @@
 						</options>
 					</constraints>
 					<control type="list" format="string">
-						<heading>$ADDON[plugin.video.themoviedb.helper 32091]</heading>
+						<heading>32091</heading>
 					</control>
 				</setting>
 				<setting id="flatten_seasons" type="boolean" label="32085" help="">
@@ -247,7 +247,7 @@
 						</sources>
 					</constraints>
 					<control type="button" format="path">
-						<heading>$LOCALIZE[342]</heading>
+						<heading>342</heading>
 					</control>
 				</setting>
 				<setting id="tvshows_library" type="path" label="32075" help="">
@@ -259,7 +259,7 @@
 						</sources>
 					</constraints>
 					<control type="button" format="path">
-						<heading>$ADDON[plugin.video.themoviedb.helper 32075]</heading>
+						<heading>32075</heading>
 					</control>
 				</setting>
 				<setting id="auto_update" type="boolean" label="32076" help="">
@@ -277,30 +277,30 @@
 					<default>0</default>
 					<constraints>
 						<options>
-							<option label="- 00:00">0</option>
-							<option label="- 01:00">1</option>
-							<option label="- 02:00">2</option>
-							<option label="- 03:00">3</option>
-							<option label="- 04:00">4</option>
-							<option label="- 05:00">5</option>
-							<option label="- 06:00">6</option>
-							<option label="- 07:00">7</option>
-							<option label="- 08:00">8</option>
-							<option label="- 09:00">9</option>
-							<option label="- 10:00">10</option>
-							<option label="- 11:00">11</option>
-							<option label="- 12:00">12</option>
-							<option label="- 13:00">13</option>
-							<option label="- 14:00">14</option>
-							<option label="- 15:00">15</option>
-							<option label="- 16:00">16</option>
-							<option label="- 17:00">17</option>
-							<option label="- 18:00">18</option>
-							<option label="- 19:00">19</option>
-							<option label="- 20:00">20</option>
-							<option label="- 21:00">21</option>
-							<option label="- 22:00">22</option>
-							<option label="- 23:00">23</option>
+							<option label="&#173;12 AM">0</option>
+							<option label="&#173;1 AM">1</option>
+							<option label="&#173;2 AM">2</option>
+							<option label="&#173;3 AM">3</option>
+							<option label="&#173;4 AM">4</option>
+							<option label="&#173;5 AM">5</option>
+							<option label="&#173;6 AM">6</option>
+							<option label="&#173;7 AM">7</option>
+							<option label="&#173;8 AM">8</option>
+							<option label="&#173;9 AM">9</option>
+							<option label="&#173;10 AM">10</option>
+							<option label="&#173;11 AM">11</option>
+							<option label="&#173;12 PM">12</option>
+							<option label="&#173;1 PM">13</option>
+							<option label="&#173;2 PM">14</option>
+							<option label="&#173;3 PM">15</option>
+							<option label="&#173;4 PM">16</option>
+							<option label="&#173;5 PM">17</option>
+							<option label="&#173;6 PM">18</option>
+							<option label="&#173;7 PM">19</option>
+							<option label="&#173;8 PM">20</option>
+							<option label="&#173;9 PM">21</option>
+							<option label="&#173;10 PM">22</option>
+							<option label="&#173;11 PM">23</option>
 						</options>
 					</constraints>
 					<dependencies>
@@ -386,7 +386,7 @@
 						<allowempty>true</allowempty>
 					</constraints>
 					<control type="edit" format="string">
-						<heading>$ADDON[plugin.video.themoviedb.helper 32001]</heading>
+						<heading>32001</heading>
 					</control>
 				</setting>
 			</group>
@@ -398,7 +398,7 @@
 						<allowempty>true</allowempty>
 					</constraints>
 					<control type="edit" format="string">
-						<heading>$ADDON[plugin.video.themoviedb.helper 32019]</heading>
+						<heading>32019</heading>
 					</control>
 				</setting>
 				<setting id="fanarttv_lookup" type="boolean" label="32021" help="" parent="fanarttv_clientkey">
@@ -452,7 +452,7 @@
 						</dependency>
 					</dependencies>
 					<control type="edit" format="string">
-						<heading>$ADDON[plugin.video.themoviedb.helper 32011]</heading>
+						<heading>32011</heading>
 					</control>
 				</setting>
 				<setting id="revoke_trakt" type="action" label="32169" help="">
@@ -635,7 +635,7 @@
 						<allowempty>true</allowempty>
 					</constraints>
 					<control type="button" format="path">
-						<heading>$ADDON[plugin.video.themoviedb.helper 32409]</heading>
+						<heading>32409</heading>
 					</control>
 				</setting>
 				<setting id="delete_cache" type="action" label="32386" help="">

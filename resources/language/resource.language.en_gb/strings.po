@@ -409,7 +409,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32081"
-msgid "Show next page item on widgets (requires skin reload)"
+msgid "Show next page item"
 msgstr ""
 
 #: /resources/settings.xml
@@ -716,7 +716,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32142"
-msgid "Hide watched items on widgets"
+msgid "Hide watched items"
 msgstr ""
 
 #: /resources/lib/context.py
@@ -2129,6 +2129,16 @@ msgstr ""
 #: /resources/lib/script/sync.py
 msgctxt "#32417"
 msgid "Remove from progress"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32418"
+msgid "Adds text to the start of the MPAA rating. For example if set to 'Rated' a 'PG' rating is displayed as 'Rated PG'. Cached items will need to be refreshed."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32419"
+msgid "The language and country settings used when looking up data from TMDb and Trakt APIs"
 msgstr ""
 
 #: /resources/settings.xml
