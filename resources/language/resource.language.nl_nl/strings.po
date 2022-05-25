@@ -1210,8 +1210,8 @@ msgstr "Ontdek geschiedenis wissen"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32238"
-msgid "Discover {} w/ Below Settings"
-msgstr "Ontdek {} met onderstaande instellingen"
+msgid "Discover {}"
+msgstr "Ontdek {}"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32239"

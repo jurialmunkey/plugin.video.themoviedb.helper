@@ -1200,7 +1200,7 @@ msgstr ""
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32238"
-msgid "Discover {} w/ Below Settings"
+msgid "Discover {}"
 msgstr ""
 
 #: /resources/lib/userdiscover.py

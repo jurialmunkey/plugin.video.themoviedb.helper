@@ -1213,8 +1213,8 @@ msgstr "Effacer l'historique de découverte"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32238"
-msgid "Discover {} w/ Below Settings"
-msgstr "Découvrez {} avec les paramètres ci-dessous"
+msgid "Discover {}"
+msgstr "Découvrez {}"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32239"

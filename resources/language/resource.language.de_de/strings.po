@@ -1213,8 +1213,8 @@ msgstr "Entdecke Verlauf löschen"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32238"
-msgid "Discover {} w/ Below Settings"
-msgstr "Entdecke {} mit den folgenden Einstellungen"
+msgid "Discover {}"
+msgstr "Entdecke {}"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32239"

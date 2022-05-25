@@ -1213,8 +1213,8 @@ msgstr "Wyczyść historię 'Odkrywaj'"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32238"
-msgid "Discover {} w/ Below Settings"
-msgstr "'Discover' {} w/ Poniższymi ustawieniami"
+msgid "Discover {}"
+msgstr "'Discover' {}"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32239"
