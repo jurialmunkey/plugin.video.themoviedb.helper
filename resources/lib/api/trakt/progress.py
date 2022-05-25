@@ -2,10 +2,11 @@ from resources.lib.addon.plugin import get_setting, get_localized
 from resources.lib.addon.parser import try_int, find_dict_list_index
 from resources.lib.addon.tmdate import convert_timestamp, date_in_range, get_region_date, get_datetime_today, get_timedelta
 from resources.lib.files.bcache import use_simple_cache
+from resources.lib.files.futils import pickle_deepcopy
 from resources.lib.items.pages import PaginatedItems
 from resources.lib.api.mapping import get_empty_item
 from resources.lib.api.trakt.items import TraktItems
-from resources.lib.api.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache
+from resources.lib.api.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache, use_thread_lock
 from resources.lib.addon.thread import ParallelThread
 from resources.lib.addon.consts import CACHE_SHORT, CACHE_LONG
 from resources.lib.addon.window import get_property
@@ -295,23 +296,44 @@ class _TraktProgress():
             return
 
     @is_authorized
+    @use_thread_lock("TraktAPI._get_episode_playprogress.Locked", timeout=10, polling=0.05)
     @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_LONG)
     def _get_episode_playprogress(self, id_type):
         sync_list = self.get_sync('playback', 'show')
         if not sync_list:
             return {}
+
         main_list = {}
+
+        def _get_tv_show():
+            try:
+                return main_list[show_id]
+            except KeyError:
+                pass
+            try:
+                return pickle_deepcopy(i['show'])
+            except KeyError:
+                return {}
+
+        def _get_episode():
+            try:
+                return pickle_deepcopy(i['episode'])
+            except KeyError:
+                return {}
+
         for i in sync_list:
             try:
                 show_id = i['show']['ids'][id_type]
             except KeyError:
                 continue
-            show_item = main_list.get(show_id) or i.pop('show', None) or {}
-            seasons = show_item.setdefault('seasons', {})
-            episode = i.get('episode', {})
+
+            tv_show = _get_tv_show()
+            seasons = tv_show.setdefault('seasons', {})
+            episode = _get_episode()
             season = seasons.setdefault(episode.get('season', 0), {})
             season[episode.get('number', 0)] = i
-            main_list[show_id] = show_item
+            main_list[show_id] = tv_show
+
         return main_list
 
     @is_authorized

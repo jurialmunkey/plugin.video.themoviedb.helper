@@ -11,7 +11,7 @@ from resources.lib.files.bcache import use_simple_cache
 from resources.lib.items.pages import PaginatedItems, get_next_page
 from resources.lib.api.request import RequestAPI
 from resources.lib.api.trakt.items import TraktItems
-from resources.lib.api.trakt.decorators import is_authorized, use_activity_cache
+from resources.lib.api.trakt.decorators import is_authorized, use_activity_cache, _is_property_lock, use_thread_lock
 from resources.lib.api.trakt.progress import _TraktProgress
 from resources.lib.addon.logger import kodi_log, TimerFunc
 from resources.lib.addon.consts import CACHE_SHORT, CACHE_LONG
@@ -66,24 +66,6 @@ def get_sort_methods(default_only=False):
     if default_only:
         return [i for i in items if i['params']['sort_by'] in ['rank', 'added', 'title', 'year', 'random']]
     return items
-
-
-def _is_property_lock(property_name='TraktCheckingAuth', timeout=5, polling=0.2):
-    """ Checks for a window property lock and wait for it to be cleared before continuing
-    Returns True after property clears if was locked
-    """
-    if not get_property(property_name):
-        return False
-    monitor = Monitor()
-    timeend = set_timestamp(timeout)
-    timeexp = True
-    while not monitor.abortRequested() and get_property(property_name) and timeexp:
-        monitor.waitForAbort(polling)
-        timeexp = get_timestamp(timeend)
-    if not timeexp:
-        kodi_log(f'{property_name} Timeout!', 1)
-    del monitor
-    return True
 
 
 class _TraktLists():
@@ -451,6 +433,7 @@ class _TraktSync():
     def get_sync_recommendations_shows(self, trakt_type, id_type=None):
         return self._get_sync('sync/recommendations/shows', 'show', id_type=id_type)
 
+    @use_thread_lock('TraktAPI.get_sync.Locked', timeout=10, polling=0.05, combine_name=True)
     def get_sync(self, sync_type, trakt_type, id_type=None):
         if sync_type == 'watched':
             func = self.get_sync_watched_movies if trakt_type == 'movie' else self.get_sync_watched_shows
@@ -514,7 +497,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         # First time authorization in this session so let's confirm
         if self.authorization and get_property('TraktIsAuth') != 'True':
             if not get_timestamp(get_property('TraktRefreshTimeStamp', is_type=float) or 0):
-                if _is_property_lock():  # Wait if another thread is checking authorization
+                if _is_property_lock('TraktCheckingAuth'):  # Wait if another thread is checking authorization
                     _get_token()  # Get the token set in the other thread
                     return self.authorization  # Another thread checked token so return
 
