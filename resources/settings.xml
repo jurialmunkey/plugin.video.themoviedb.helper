@@ -6,6 +6,9 @@
 				<setting id="mpaa_prefix" type="string" label="32004" help="32418">
 					<level>0</level>
 					<default>Rated </default>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
 					<control type="edit" format="string">
 						<heading>32004</heading>
 					</control>
