@@ -246,25 +246,7 @@ class ListCustom(Container):
         if not response:
             return []
         self.tmdb_cache_only = False
-        self.library = 'video'
-        lengths = [
-            len(response.get('movies', [])),
-            len(response.get('tvshows', [])),
-            len(response.get('persons', []))]
-        if lengths.index(max(lengths)) == 0:
-            self.container_content = 'movies'
-        elif lengths.index(max(lengths)) == 1:
-            self.container_content = 'tvshows'
-        elif lengths.index(max(lengths)) == 2:
-            self.container_content = 'actors'
-
-        if lengths[0] and lengths[1]:
-            self.kodi_db = self.get_kodi_database('both')
-        elif lengths[0]:
-            self.kodi_db = self.get_kodi_database('movie')
-        elif lengths[1]:
-            self.kodi_db = self.get_kodi_database('tvshow')
-
+        self.set_mixed_content(response)
         return response.get('items', []) + response.get('next_page', [])
 
 

@@ -6,6 +6,7 @@ from resources.lib.addon.consts import (
     TRAKT_BASIC_LISTS,
     ROUTE_TMDBID,
     TRAKT_LIST_OF_LISTS,
+    MDBLIST_LIST_OF_LISTS,
     RANDOMISED_LISTS,
     RANDOMISED_TRAKT
 )
@@ -15,6 +16,7 @@ def get_container(info):
     route = None
     routes = ROUTE_NOID
     routes.update(TRAKT_LIST_OF_LISTS)
+    routes.update(MDBLIST_LIST_OF_LISTS)
     routes.update(RANDOMISED_LISTS)
     routes.update(RANDOMISED_TRAKT)
     try:

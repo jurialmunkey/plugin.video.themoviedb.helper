@@ -7,6 +7,7 @@ from resources.lib.api.tmdb.api import TMDb
 from resources.lib.api.trakt.api import TraktAPI
 from resources.lib.api.fanarttv.api import FanartTV
 from resources.lib.api.omdb.api import OMDb
+from resources.lib.api.mdblist.api import MDbList
 from resources.lib.items.trakt import TraktMethods
 from resources.lib.items.builder import ItemBuilder
 from resources.lib.addon.logger import kodi_log, TimerList, log_timer_report
@@ -59,6 +60,7 @@ class Container():
         self.omdb_api = OMDb(delay_write=True) if get_setting('omdb_apikey', 'str') else None
         self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only(), delay_write=True)
         self.trakt_api = TraktAPI(delay_write=True)
+        self.mdblist_api = MDbList(delay_write=True)
 
         # Trakt Watched Progress Settings
         self.hide_watched = get_setting('widgets_hidewatched') if self.is_widget else False
@@ -181,6 +183,28 @@ class Container():
             with ParallelThread(all_listitems, self._make_item) as pt:
                 item_queue = pt.queue
             addDirectoryItems(self.handle, [i for i in item_queue if i])
+
+    def set_mixed_content(self, response):
+        self.library = 'video'
+
+        lengths = [
+            len(response.get('movies', [])),
+            len(response.get('tvshows', [])),
+            len(response.get('persons', []))]
+
+        if lengths.index(max(lengths)) == 0:
+            self.container_content = 'movies'
+        elif lengths.index(max(lengths)) == 1:
+            self.container_content = 'tvshows'
+        elif lengths.index(max(lengths)) == 2:
+            self.container_content = 'actors'
+
+        if lengths[0] and lengths[1]:
+            self.kodi_db = self.get_kodi_database('both')
+        elif lengths[0]:
+            self.kodi_db = self.get_kodi_database('movie')
+        elif lengths[1]:
+            self.kodi_db = self.get_kodi_database('tvshow')
 
     def set_params_to_container(self):
         params = {}

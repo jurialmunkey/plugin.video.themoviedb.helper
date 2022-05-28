@@ -322,10 +322,9 @@ class _TraktSync():
             """ Get last_activities from Trakt and add to cache while locking other lookup threads """
             get_property('TraktSyncLastActivities.Locked', 1)  # Lock other threads
             response = self.get_response_json('sync/last_activities')  # Retrieve data from Trakt
-            if not response:
-                return
-            get_property('TraktSyncLastActivities', set_property=data_dumps(response))  # Dump data to property
-            get_property('TraktSyncLastActivities.Expires', set_property=set_timestamp(90, True))  # Set activity expiry
+            if response:
+                get_property('TraktSyncLastActivities', set_property=data_dumps(response))  # Dump data to property
+                get_property('TraktSyncLastActivities.Expires', set_property=set_timestamp(90, True))  # Set activity expiry
             get_property('TraktSyncLastActivities.Locked', clear_property=True)  # Clear thread lock
             return response
 

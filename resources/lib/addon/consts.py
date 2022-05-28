@@ -501,6 +501,24 @@ TRAKT_LIST_OF_LISTS = {
         'localized': 32211}
 }
 
+
+MDBLIST_LIST_OF_LISTS_ROUTE = {
+    'module_name': 'resources.lib.api.mdblist.lists',
+    'import_attr': 'ListLists'}
+MDBLIST_LIST_OF_LISTS = {
+    'mdblist_toplists': {
+        'path': 'lists/top',
+        'route': MDBLIST_LIST_OF_LISTS_ROUTE,
+        'plugin_category': '{localized}',
+        'localized': 32421},
+    'mdblist_yourlists': {
+        'path': 'lists/user',
+        'route': MDBLIST_LIST_OF_LISTS_ROUTE,
+        'plugin_category': '{localized}',
+        'localized': 32211},
+}
+
+
 CONTEXT_MENU_ITEMS = {
     'tmdbhelper.context.artwork': {
         'movie': {'tmdb_type': 'movie', 'tmdb_id': '{tmdb_id}'},
@@ -581,6 +599,12 @@ ROUTE_NOID = {
     'trakt_sortby': {'route': {
         'module_name': 'resources.lib.api.trakt.lists',
         'import_attr': 'ListSortBy'}},
+    'mdblist_userlist': {'route': {
+        'module_name': 'resources.lib.api.mdblist.lists',
+        'import_attr': 'ListCustom'}},
+    'mdblist_searchlists': {'route': {
+        'module_name': 'resources.lib.api.mdblist.lists',
+        'import_attr': 'ListCustomSearch'}},
     'all_items': {'route': {
         'module_name': 'resources.lib.api.tmdb.lists',
         'import_attr': 'ListAll'}},

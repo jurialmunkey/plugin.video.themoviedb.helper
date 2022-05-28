@@ -393,7 +393,19 @@
 					</control>
 				</setting>
 			</group>
-			<group id="2" label="32030">
+			<group id="2" label="32422">
+				<setting id="mdblist_apikey" type="string" label="32423" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string">
+						<heading>32423</heading>
+					</control>
+				</setting>
+			</group>
+			<group id="3" label="32030">
 				<setting id="fanarttv_clientkey" type="string" label="32019" help="">
 					<level>0</level>
 					<default/>

@@ -28,12 +28,14 @@ def _build_basedir(item_type=None, basedir=None):
         if not item_type or item_type == t]
 
 
-def _get_basedir_list(item_type=None, trakt=False, tmdb=False):
+def _get_basedir_list(item_type=None, trakt=False, tmdb=False, mdblist=False):
     basedir = []
     if tmdb:
         basedir += _get_basedir_tmdb()
     if trakt:
         basedir += _get_basedir_trakt()
+    if mdblist:
+        basedir += _get_basedir_mdblist()
     return _build_basedir(item_type, basedir)
 
 
@@ -323,6 +325,34 @@ def _get_basedir_random():
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/trakt/mylists.png'}}
     ]
+
+
+def _get_basedir_mdblist():
+    return [
+        {
+            'label': get_localized(32421),
+            'types': ['both'],
+            'params': {'info': 'mdblist_toplists'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/mdblist/mdblist.png'}},
+        {
+            'label': get_localized(32211),
+            'types': ['both'],
+            'params': {'info': 'mdblist_yourlists'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/mdblist/mdblist.png'}},
+        {
+            'label': get_localized(32361),
+            'types': ['both'],
+            'params': {'info': 'mdblist_searchlists'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/mdblist/mdblist.png'}}]
 
 
 def _get_basedir_trakt():
@@ -768,7 +798,15 @@ def _get_basedir_main():
             'path': PLUGINPATH,
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',
-                'icon': f'{ADDONPATH}/resources/trakt.png'}}]
+                'icon': f'{ADDONPATH}/resources/trakt.png'}},
+        {
+            'label': u'MDbList',
+            'types': [None],
+            'params': {'info': 'dir_mdblist'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/mdblist/mdblist.png'}}]
 
 
 def _get_basedir_calendar_items():
@@ -936,6 +974,7 @@ class ListBaseDir(Container):
             'dir_person': lambda: _get_basedir_list('person', tmdb=True, trakt=True),
             'dir_tmdb': lambda: _get_basedir_list(None, tmdb=True),
             'dir_trakt': lambda: _get_basedir_list(None, trakt=True),
+            'dir_mdblist': lambda: _get_basedir_list(None, mdblist=True),
             'dir_random': lambda: _build_basedir(None, _get_basedir_random()),
             'dir_calendar_trakt': lambda: _get_basedir_calendar(info='trakt_calendar', endpoint=kwargs.get('endpoint'), user=kwargs.get('user')),
             'dir_calendar_library': lambda: _get_basedir_calendar(info='library_nextaired')
