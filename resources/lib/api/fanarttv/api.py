@@ -2,7 +2,6 @@ from resources.lib.addon.plugin import get_language, get_setting
 from resources.lib.addon.parser import try_int, del_empty_keys
 from resources.lib.addon.consts import CACHE_EXTENDED, ITER_PROPS_MAX
 from resources.lib.api.request import RequestAPI
-from resources.lib.addon.logger import kodi_log
 
 EN_FALLBACK = get_setting('fanarttv_enfallback')
 API_URL = 'https://webservice.fanart.tv/v3'
@@ -37,7 +36,8 @@ ARTWORK_TYPES = {
 }
 
 
-def add_extra_art(source, output={}):
+def add_extra_art(source, output=None):
+    output = output or {}
     if not source:
         return output
     output.update({f'fanart{x}': i['url'] for x, i in enumerate(source, 1) if i.get('url') and x <= ITER_PROPS_MAX})
