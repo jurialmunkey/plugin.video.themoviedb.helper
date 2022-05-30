@@ -2,6 +2,7 @@ from resources.lib.addon.plugin import get_language, get_setting
 from resources.lib.addon.parser import try_int, del_empty_keys
 from resources.lib.addon.consts import CACHE_EXTENDED, ITER_PROPS_MAX
 from resources.lib.api.request import RequestAPI
+from resources.lib.addon.logger import kodi_log
 
 EN_FALLBACK = get_setting('fanarttv_enfallback')
 API_URL = 'https://webservice.fanart.tv/v3'
@@ -113,4 +114,4 @@ class FanartTV(RequestAPI):
         if artlist_type:
             return get_artwork(artlist_type, get_list=True, get_lang='all') or []
         artwork_data = del_empty_keys({i: get_artwork(i, get_lang=i not in NO_LANGUAGE) for i in artwork_types})
-        return add_extra_art(get_artwork('fanart', get_list=True), artwork_data)
+        return add_extra_art(get_artwork('fanart', get_list=True, get_lang=False), artwork_data)
