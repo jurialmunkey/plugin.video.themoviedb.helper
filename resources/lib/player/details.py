@@ -3,11 +3,53 @@ from resources.lib.addon.consts import PLAYERS_URLENCODE
 from resources.lib.addon.parser import try_int, del_empty_keys
 from resources.lib.items.listitem import ListItem
 from resources.lib.items.builder import ItemBuilder
+from resources.lib.addon.thread import ParallelThread
 from resources.lib.api.tmdb.api import TMDb
 from resources.lib.api.trakt.api import TraktAPI
 from json import dumps
 from collections import defaultdict
 from urllib.parse import quote_plus, quote
+
+
+def get_next_episodes(tmdb_id, season, episode, player=None):
+    tmdb_api = TMDb()
+
+    all_episodes = tmdb_api.get_flatseasons_list(tmdb_id)
+    if not all_episodes:
+        return
+
+    snum, enum = try_int(season), try_int(episode)
+
+    def _is_future_ep(i):
+        i_snum = try_int(i['infolabels'].get('season', -1))
+        i_enum = try_int(i['infolabels'].get('episode', -1))
+        if i_snum == snum and i_enum >= enum:
+            return True
+        if i_snum > snum:
+            return True
+        return False
+
+    nxt_episodes = [i for i in all_episodes if _is_future_ep(i)]
+    if not nxt_episodes:
+        return
+
+    ib = ItemBuilder(tmdb_api=tmdb_api)
+    ib.get_parents(tmdb_type='tv', tmdb_id=tmdb_id)
+    ib.parent_params = {'tmdb_id': tmdb_id, 'tmdb_type': 'tv'}
+
+    def _make_listitem(i):
+        li = ib.get_listitem(i)
+        if not li:
+            return
+        li.set_params_reroute()  # Reroute details to proper end point
+        if player:
+            li.params['player'] = player
+            li.params['mode'] = 'play'
+        return li.get_listitem()
+
+    with ParallelThread(nxt_episodes, _make_listitem) as pt:
+        item_queue = pt.queue
+    return [i for i in item_queue if i]
 
 
 def get_external_ids(li, season=None, episode=None):

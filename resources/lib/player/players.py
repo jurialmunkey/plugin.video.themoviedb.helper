@@ -1,5 +1,5 @@
 import re
-from xbmc import Monitor, Player
+from xbmc import Monitor, Player, PlayList, PLAYLIST_VIDEO
 from xbmcgui import Dialog
 from xbmcplugin import setResolvedUrl
 from xbmcaddon import Addon as KodiAddon
@@ -11,7 +11,7 @@ from resources.lib.addon.dialog import BusyDialog, ProgressDialog
 from resources.lib.items.listitem import ListItem
 from resources.lib.files.futils import read_file, normalise_filesize
 from resources.lib.api.kodi.rpc import get_directory, KodiLibrary
-from resources.lib.player.details import get_item_details, get_detailed_item, get_playerstring, get_language_details
+from resources.lib.player.details import get_item_details, get_detailed_item, get_playerstring, get_language_details, get_next_episodes
 from resources.lib.player.inputter import KeyboardInputter
 from resources.lib.player.configure import get_players_from_file
 from resources.lib.addon.logger import kodi_log
@@ -30,7 +30,7 @@ def wait_for_player(to_start=None, timeout=5, poll=0.25, stop_after=0):
             not xbmc_monitor.abortRequested()
             and timeout > 0
             and (
-                (to_start and (not xbmc_player.isPlaying() or not xbmc_player.getPlayingFile().endswith(to_start)))
+                (to_start and (not xbmc_player.isPlaying() or (isinstance(to_start, str) and not xbmc_player.getPlayingFile().endswith(to_start))))
                 or (not to_start and xbmc_player.isPlaying()))):
         xbmc_monitor.waitForAbort(poll)
         timeout -= poll
@@ -106,6 +106,7 @@ class Players(object):
             self.force_xbmcplayer = get_setting('force_xbmcplayer')
             self.is_strm = islocal
             self.combined_players = get_setting('combined_players')
+            self.current_player = {}
 
     def _set_provider_priority(self):
         try:  # Check if players are listed in providers and bump priority if found
@@ -143,6 +144,7 @@ class Players(object):
             'file': file, 'mode': mode,
             'is_folder': is_folder,
             'is_resolvable': value.get('is_resolvable'),
+            'make_playlist': value.get('make_playlist'),
             'api_language': value.get('api_language'),
             'language': value.get('language'),
             'name': f'{name} {value.get("name")}',
@@ -162,6 +164,7 @@ class Players(object):
             'is_folder': False,
             'is_local': True,
             'is_resolvable': "true",
+            'make_playlist': "true",
             'plugin_name': 'xbmc.core',
             'plugin_icon': f'{ADDONPATH}/resources/icons/other/kodi.png',
             'actions': file}]
@@ -515,6 +518,7 @@ class Players(object):
         self.action_log += (
             'PLAYER: ', player.get('file'), ' ', player.get('mode'), ' ', player.get('is_resolvable'), '\n',
             'PLUGIN: ', player.get('plugin_name'), '\n')
+        self.current_player = player
 
         # Allow players to override language settings
         # Compare against self.api_language to check if another player changed language previously
@@ -559,6 +563,27 @@ class Players(object):
                 self.details.infoproperties[k] = v
             path = self.details.get_listitem()
         return path
+
+    def queue_next_episodes(self):
+        if not self.current_player or self.current_player.get('mode') != 'play_episode':
+            return
+        if self.season is None or self.episode is None:
+            return
+        episode_queue = get_next_episodes(self.tmdb_id, self.season, self.episode, self.current_player['file'])
+        if not episode_queue:
+            return
+        wait_for_player(to_start=True, timeout=30)
+        playlist = PlayList(PLAYLIST_VIDEO)
+
+        # Only rebuild playlist if user is starting playback from scratch
+        # Otherwise we keep the existing playlist to retain position
+        if playlist.getposition() != 0:
+            return
+
+        # Rebuild playlist from scratch
+        playlist.clear()
+        for li in episode_queue:
+            playlist.add(li.getPath(), li)
 
     def _update_listing_hack(self, folder_path=None, reset_focus=None):
         """
@@ -643,18 +668,22 @@ class Players(object):
             kodi_log([
                 f'lib.player - playing path with {"Player()" if self.force_xbmcplayer else "PlayMedia"}\n',
                 listitem.getPath()], 1)
-            return
 
-        # Otherwise we have a url we can resolve to
-        setResolvedUrl(handle, True, listitem)
-        kodi_log(['lib.player - finished resolving path to url\n', listitem.getPath()], 1)
+        else:
+            # Otherwise we have a url we can resolve to
+            setResolvedUrl(handle, True, listitem)
+            kodi_log(['lib.player - finished resolving path to url\n', listitem.getPath()], 1)
 
-        # Re-send local files to player due to "bug" (or maybe "feature") of setResolvedUrl
-        # Because setResolvedURL doesn't set id/type (sets None, "unknown" instead) to player for plugins
-        # If id/type not set to Player.GetItem things like Trakt don't work correctly.
-        # Looking for better solution than this hack.
-        if get_setting('trakt_localhack') and listitem.getProperty('is_local') == 'true':
-            Player().play(listitem.getPath(), listitem) if self.force_xbmcplayer else executebuiltin(f'PlayMedia({listitem.getPath()})')
-            kodi_log([
-                f'Finished executing {"Player()" if self.force_xbmcplayer else "PlayMedia"}\n',
-                listitem.getPath()], 1)
+            # Re-send local files to player due to "bug" (or maybe "feature") of setResolvedUrl
+            # Because setResolvedURL doesn't set id/type (sets None, "unknown" instead) to player for plugins
+            # If id/type not set to Player.GetItem things like Trakt don't work correctly.
+            # Looking for better solution than this hack.
+            if get_setting('trakt_localhack') and listitem.getProperty('is_local') == 'true':
+                Player().play(listitem.getPath(), listitem) if self.force_xbmcplayer else executebuiltin(f'PlayMedia({listitem.getPath()})')
+                kodi_log([
+                    f'Finished executing {"Player()" if self.force_xbmcplayer else "PlayMedia"}\n',
+                    listitem.getPath()], 1)
+
+        # Queue up next episodes if player supports it
+        if self.current_player and self.current_player.get('make_playlist', '').lower() == 'true':
+            self.queue_next_episodes()

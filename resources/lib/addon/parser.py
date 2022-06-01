@@ -203,4 +203,3 @@ def is_excluded(item, filter_key=None, filter_value=None, exclude_key=None, excl
         if exclude_key in ip:
             if is_filtered(ip, exclude_key, exclude_value, True):
                 return True
-

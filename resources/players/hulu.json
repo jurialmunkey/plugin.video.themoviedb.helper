@@ -4,6 +4,7 @@
     "priority"          : 100,
     "provider"          : "Hulu",
     "is_resolvable"     : "true",
+    "make_playlist"     : "true",
     "assert"            : {
                             "play_movie":       ["title", "year"],
                             "play_episode":     ["showname", "season", "episode"],
