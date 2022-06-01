@@ -12,13 +12,13 @@
                           },
     "play_movie"        : [
                             "plugin://plugin.video.amazon-test/",
-                            {"file": "(?i).*/search/"},
+                            {"file": "(?i).*(mode=Search|/search/).*"},
                             {"keyboard": "{title}"},
                             {"label": "(?i).*{title}.*", "year": "{year}"}
                           ],
     "play_episode"      : [
                             "plugin://plugin.video.amazon-test/",
-                            {"file": "(?i).*/search/"},
+                            {"file": "(?i).*(mode=Search|/search/).*"},
                             {"keyboard": "{showname}"},
                             {"label": "(?i).*{showname}.*"},
                             {"return": "true", "season": "{season}", "episode": "{episode}"},
@@ -27,12 +27,12 @@
                           ],
     "search_movie"      : [
                             "plugin://plugin.video.amazon-test/",
-                            {"file": "(?i).*/search/"},
+                            {"file": "(?i).*(mode=Search|/search/).*"},
                             {"keyboard": "{title}"}
                           ],
     "search_episode"    : [
                             "plugin://plugin.video.amazon-test/",
-                            {"file": "(?i).*/search/"},
+                            {"file": "(?i).*(mode=Search|/search/).*"},
                             {"keyboard": "{showname}"}
                           ]
 }
