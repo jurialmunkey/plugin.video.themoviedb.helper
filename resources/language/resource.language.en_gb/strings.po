@@ -2161,6 +2161,16 @@ msgctxt "#32423"
 msgid "MDbList API key"
 msgstr ""
 
+#: /resources/lib/player/configure.py
+msgctxt "#32424"
+msgid "Make episode playlists"
+msgstr ""
+
+#: /resources/lib/player/configure.py
+msgctxt "#32425"
+msgid "Have TMDbHelper queue all episodes in a playlist when playing an episode using this player?"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

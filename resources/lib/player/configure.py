@@ -65,6 +65,7 @@ class _ConfigurePlayer():
             f'disabled: {self.player.get("disabled", "false").lower()}',
             f'priority: {self.player.get("priority") or PLAYERS_PRIORITY}',
             f'is_resolvable: {self.player.get("is_resolvable", "select")}',
+            f'make_playlist: {self.player.get("make_playlist", "false").lower()}',
             f'fallback: {dumps(self.player.get("fallback"))}',
             get_localized(32330),
             get_localized(190)]
@@ -107,6 +108,13 @@ class _ConfigurePlayer():
                 return self.set_resolvable()
             is_resolvable = 'false'
         self.player['is_resolvable'] = is_resolvable
+
+    def set_makeplaylist(self):
+        x = Dialog().yesno(get_localized(32424), get_localized(32425))
+        if x == -1:
+            return
+        make_playlist = 'true' if x else 'false'
+        self.player['make_playlist'] = make_playlist
 
     def _get_method_type(self, method):
         for i in ['movie', 'episode']:
@@ -162,10 +170,12 @@ class _ConfigurePlayer():
         elif x == 3:
             self.set_resolvable()
         elif x == 4:
-            self.set_fallbacks()
+            self.set_makeplaylist()
         elif x == 5:
-            return -1
+            self.set_fallbacks()
         elif x == 6:
+            return -1
+        elif x == 7:
             return self.player
         return self.configure()
 
