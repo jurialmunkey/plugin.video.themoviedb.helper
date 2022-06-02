@@ -28,6 +28,6 @@
     "search_episode"    : [
                             "plugin://plugin.video.hbo.max/?_=search&query={showname_url}",
                             {"label": "(?i).*{showname}.*"},
-
                             {"season": "{season}"}
                           ]
+    }
