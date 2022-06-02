@@ -12,22 +12,15 @@
                             "search_episode":   ["showname"]
                           },
     "play_movie"        : [
-                            "plugin://plugin.video.hbo.max/?_=search&query={title_url}",
-                            {"label": "(?i).*{title}.*"}
+                            "plugin://slyguy.hbo.max/?_=search&query={title_url}",
+                            {"title": "{title}", "year": "{year}"}
                           ],
     "play_episode"      : [
-                            "plugin://plugin.video.hbo.max/?_=search&query={showname_url}",
-                            {"label": "(?i).*{showname}.*"},
-                            {"season": "{season}"},
+                            "plugin://slyguy.hbo.max/?_=search&query={showname_url}",
+                            {"title": "{showname}"},
+                            {"title": "Season {season}"},
                             {"season": "{season}", "episode": "{episode}"}
                           ],
-    "search_movie"      : [
-                            "plugin://plugin.video.hbo.max/?_=search&query={title_url}",
-                            {"label": "(?i).*{title}.*"}
-                          ],
-    "search_episode"    : [
-                            "plugin://plugin.video.hbo.max/?_=search&query={showname_url}",
-                            {"label": "(?i).*{showname}.*"},
-                            {"season": "{season}"}
-                          ]
-    }
+    "search_movie"      : "plugin://slyguy.hbo.max/?_=search&query={title_url}",
+    "search_episode"    : "plugin://slyguy.hbo.max/?_=search&query={showname_url}"
+}
