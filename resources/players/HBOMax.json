@@ -1,6 +1,6 @@
 {
     "name"              : "HBOMax",
-    "plugin"            : "slyguy.hbomax",
+    "plugin"            : "slyguy.hbo.max",
     "priority"          : 100,
     "provider"          : "HBOMax",
     "is_resolvable"     : "true",
@@ -12,15 +12,15 @@
                             "search_episode":   ["showname"]
                           },
     "play_movie"        : [
-                            "plugin://slyguy.hbomax/?_=search&query={title_url}",
+                            "plugin://slyguy.hbo.max/?_=search&query={title_url}",
                             {"title": "{title}", "year": "{year}"}
                           ],
     "play_episode"      : [
-                            "plugin://slyguy.hbomax/?_=search&query={showname_url}",
+                            "plugin://slyguy.hbo.max/?_=search&query={showname_url}",
                             {"title": "{showname}"},
                             {"title": "Season {season}"},
                             {"season": "{season}", "episode": "{episode}"}
                           ],
-    "search_movie"      : "plugin://slyguy.hbomax/?_=search&query={title_url}",
-    "search_episode"    : "plugin://slyguy.hbomax/?_=search&query={showname_url}"
+    "search_movie"      : "plugin://slyguy.hbo.max/?_=search&query={title_url}",
+    "search_episode"    : "plugin://slyguy.hbo.max/?_=search&query={showname_url}"
 }
