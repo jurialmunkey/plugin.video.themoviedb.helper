@@ -685,5 +685,5 @@ class Players(object):
                     listitem.getPath()], 1)
 
         # Queue up next episodes if player supports it
-        if self.current_player and self.current_player.get('make_playlist', '').lower() == 'true':
+        if self.current_player.get('make_playlist') and self.current_player['make_playlist'].lower() == 'true':
             self.queue_next_episodes()
