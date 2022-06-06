@@ -79,26 +79,29 @@ class MDbList(RequestAPI):
             req_api_url='https://mdblist.com/api',
             delay_write=delay_write)
 
-    def _get_request_sc(self, path):
-        response = self.get_request_sc(path)
+    def _get_request(self, func, *args, **kwargs):
+        response = func(*args, **kwargs)
         if isinstance(response, dict):  # API returns dict rather than list on failure
-            if response.get('error') == 'Invalid API key!' and get_setting("mdblist_apikey", "str"):
-                response = self.get_request_sc(path, cache_refresh=True)  # Refresh in case cached because we've got an api key
+            if not kwargs.get('cache_refresh') and response.get('error') == 'Invalid API key!' and get_setting("mdblist_apikey", "str"):
+                response = func(*args, **kwargs, cache_refresh=True)  # Refresh in case cached because we've got an api key
                 if not isinstance(response, dict):  # Check again in case now working and return response
                     return response
             Dialog().ok(get_localized(257), f'{response.get("error")}')
             return []
         return response
 
+    def _get_request_sc(self, *args, **kwargs):
+        return self._get_request(self.get_request_sc, *args, **kwargs)
+
     def get_list_of_lists(self, path, limit=None, page=1):
-        response = self._get_request_sc(path)
+        response = self._get_request_sc(path, cache_refresh=True if page == 1 else False)
         response, next_page = _get_paginated(response, limit=limit, page=page)
         items = _map_list(response)
         return items if not next_page else items + next_page
 
     def get_custom_list(self, list_id, page=1, limit=20):
         path = f'lists/{list_id}/items'
-        response = self._get_request_sc(path)
+        response = self._get_request_sc(path, cache_refresh=True if page == 1 else False)
         response, next_page = _get_paginated(response, limit=limit, page=page)
         items = _get_configured(response, permitted_types=['movie', 'show'])
         return {
