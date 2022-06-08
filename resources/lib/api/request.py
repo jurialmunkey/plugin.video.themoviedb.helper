@@ -55,16 +55,16 @@ class RequestAPI(object):
         self.req_500_err = json_loads(self.req_500_err) if self.req_500_err else {}
         self.req_strip = [(self.req_api_url, self.req_api_name), (self.req_api_key, ''), ('is_xml=False', ''), ('is_xml=True', '')]
         self.headers = None
-        self.timeout = timeout or 10
+        self.timeout = timeout or 15
         self._cache = BasicCache(filename=f'{req_api_name or "requests"}.db', delay_write=delay_write)
 
     def get_api_request_json(self, request=None, postdata=None, headers=None, is_xml=False):
         request = self.get_api_request(request=request, postdata=postdata, headers=headers)
-        if is_xml:
-            return translate_xml(request)
-        if request:
-            return request.json()
-        return {}
+        if not request:
+            return {}
+        response = translate_xml(request) if is_xml else request.json()
+        request.close()
+        return response
 
     def nointernet_err(self, err, log_time=900):
         # Check Kodi internet status to confirm network is down

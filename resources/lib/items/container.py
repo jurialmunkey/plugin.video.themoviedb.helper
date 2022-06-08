@@ -151,7 +151,7 @@ class Container():
         if li.next_page:
             li.params['plugin_category'] = self.plugin_category  # Carry the plugin category to next page in plugin:// path
         self.trakt_method.set_playprogress(li)
-        return (li.get_url(), li.get_listitem(), li.is_folder)
+        return li
 
     def add_items(self, items):
         # Setup ItemBuilder
@@ -182,7 +182,7 @@ class Container():
             self.format_episode_labels = self.parent_params.get('info') not in NO_LABEL_FORMATTING
             with ParallelThread(all_listitems, self._make_item) as pt:
                 item_queue = pt.queue
-            addDirectoryItems(self.handle, [i for i in item_queue if i])
+            addDirectoryItems(self.handle, [(li.get_url(), li.get_listitem(), li.is_folder) for li in item_queue if li])
 
     def set_mixed_content(self, response):
         self.library = 'video'
