@@ -35,7 +35,9 @@ class TraktMethods():
         progress = _set_playprogress()
         if not progress or progress < 4 or progress > 96:
             progress = 0
-        set_playprogress(li.get_url(), int(duration * progress // 100), duration)
+        li.infoproperties['ResumeTime'] = int(duration * progress // 100)
+        li.infoproperties['TotalTime'] = int(duration)
+        set_playprogress(li.get_url(), li.infoproperties['ResumeTime'], li.infoproperties['TotalTime'])
 
     def pre_sync(self, info=None, tmdb_id=None, tmdb_type=None, season=-2, **kwargs):
         info_movies = ['stars_in_movies', 'crew_in_movies', 'trakt_userlist']
