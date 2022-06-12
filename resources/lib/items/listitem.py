@@ -305,7 +305,8 @@ class _Tvshow(_Video):
             return
         playcount = try_int(playcount)
         ip['watchedepisodes'] = playcount
-        ip['unwatchedepisodes'] = totalepisodes - try_int(ip['watchedepisodes'])
+        ip['unwatchedepisodes'] = totalepisodes - playcount
+        ip['watchedprogress'] = int(playcount * 100 / totalepisodes)
         if not playcount or ip['unwatchedepisodes']:
             return
         il['playcount'] = playcount

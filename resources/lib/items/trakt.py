@@ -35,6 +35,7 @@ class TraktMethods():
         progress = _set_playprogress()
         if not progress or progress < 4 or progress > 96:
             progress = 0
+        li.infoproperties['watchedprogress'] = progress
         li.infoproperties['ResumeTime'] = int(duration * progress // 100)
         li.infoproperties['TotalTime'] = int(duration)
         set_playprogress(li.get_url(), li.infoproperties['ResumeTime'], li.infoproperties['TotalTime'])
