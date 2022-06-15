@@ -76,8 +76,11 @@ def delete_file(folder, filename, join_addon_data=True):
     xbmcvfs.delete(get_file_path(folder, filename, join_addon_data, make_dir=False))
 
 
-def delete_folder(folder, join_addon_data=True, force=False):
-    xbmcvfs.rmdir(get_write_path(folder, join_addon_data, make_dir=False), force=force)
+def delete_folder(folder, join_addon_data=True, force=False, check_exists=False):
+    path = get_write_path(folder, join_addon_data, make_dir=False)
+    if check_exists and not xbmcvfs.exists(path):
+        return
+    xbmcvfs.rmdir(path, force=force)
 
 
 @lazyimport_module(globals(), 'json')
