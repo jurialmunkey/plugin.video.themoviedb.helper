@@ -85,12 +85,12 @@ class TraktMethods():
         if li.infolabels.get('mediatype') == 'season':
             air_count = self._trakt.get_episodes_airedcount(
                 id_type='tmdb',
-                unique_id=try_int(li.unique_ids.get('tmdb')),
+                unique_id=try_int(li.unique_ids.get('tvshow.tmdb') or li.unique_ids.get('tmdb')),
                 season=li.infolabels.get('season'))
             if not air_count:
                 return None if self._unwatchedepisodes else 0
             li.infolabels['episode'] = air_count
             return self._trakt.get_episodes_watchcount(
                 id_type='tmdb',
-                unique_id=try_int(li.unique_ids.get('tmdb')),
+                unique_id=try_int(li.unique_ids.get('tvshow.tmdb') or li.unique_ids.get('tmdb')),
                 season=li.infolabels.get('season')) or 0
