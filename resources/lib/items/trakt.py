@@ -22,7 +22,7 @@ class TraktMethods():
                     unique_id=try_int(li.unique_ids.get('tmdb')))
             return self._trakt.get_episode_playprogress(
                 id_type='tmdb',
-                unique_id=try_int(li.unique_ids.get('tmdb')),
+                unique_id=try_int(li.unique_ids.get('tvshow.tmdb')),
                 season=li.infolabels.get('season'),
                 episode=li.infolabels.get('episode'))
         if not self._pauseplayprogress:
