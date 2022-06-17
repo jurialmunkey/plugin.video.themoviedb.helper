@@ -182,6 +182,19 @@ def get_external_ids(v):
     return unique_ids
 
 
+def get_roles(v, key='character'):
+    infoproperties = {}
+    for x, i in enumerate(sorted(v, key=lambda d: d.get('episode_count', 0)), start=1):
+        infoproperties[f'{key}.{x}.name'] = i.get(key)
+        infoproperties[f'{key}.{x}.episodes'] = i.get('episode_count')
+        infoproperties[f'{key}.{x}.id'] = i.get('credit_id')
+    else:
+        name = infoproperties[f'{key}.1.name']
+        episodes = infoproperties[f'{key}.1.episodes']
+        infoproperties[key] = infoproperties['role'] = f"{name} ({episodes})"
+    return infoproperties
+
+
 def get_extra_art(v):
     """ Get additional artwork types from artwork list
     Fanart with language is treated as landscape because it will have text
@@ -463,6 +476,16 @@ class ItemMapper(_ItemMapper):
                 # ---
                 'keys': [('infoproperties', 'known_for')],
                 'func': lambda v: ' / '.join([x['title'] for x in v or [] if x.get('title')])
+            }],
+            'roles': [{
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'func': get_roles,
+                'kwargs': {'key': 'character'}
+            }],
+            'jobs': [{
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'func': get_roles,
+                'kwargs': {'key': 'job'}
             }],
             'external_ids': [{
                 'keys': [('unique_ids', UPDATE_BASEKEY)],

@@ -368,7 +368,10 @@ class TMDb(RequestAPI):
             for i in request.get('episodes', [])]
         return items
 
-    def get_cast_list(self, tmdb_id, tmdb_type, season=None, episode=None, keys=['cast', 'guest_stars']):
+    def get_cast_list(self, tmdb_id, tmdb_type, season=None, episode=None, keys=['cast', 'guest_stars'], aggregate=False):
+        """ Get cast list
+        endpoint switch to aggregate_credits for full tv series cast
+        """
         items = []
         if season is not None and episode is not None:
             affix = f'season/{season}/episode/{episode}'
@@ -376,7 +379,8 @@ class TMDb(RequestAPI):
             affix = f'season/{season}'
         else:
             affix = None
-        response = self.get_request_lc(tmdb_type, tmdb_id, affix, 'credits')
+        endpoint = 'aggregate_credits' if aggregate and tmdb_type == 'tv' and affix is None else 'credits'
+        response = self.get_request_lc(tmdb_type, tmdb_id, affix, endpoint)
         if not response:
             return []
 
@@ -387,7 +391,11 @@ class TMDb(RequestAPI):
 
         # Add items
         item_ids = []
-        for i in sorted(cast_list, key=lambda k: k.get('order', 1000)):
+        if endpoint == 'aggregate_credits':
+            cast_list_sorted = sorted(cast_list, key=lambda k: k.get('roles', [{}])[0].get('episode_count', 0), reverse=True)
+        else:
+            cast_list_sorted = sorted(cast_list, key=lambda k: k.get('order', 1000))
+        for i in cast_list_sorted:
             if not i.get('id'):
                 continue
             # Avoid re-adding people that have multiple roles listed
@@ -405,6 +413,8 @@ class TMDb(RequestAPI):
                     p[k] = v
                 elif p[k] != v:
                     p[k] = f'{p[k]} / {v}'
+        for i in items:
+            i['label2'] = i['infoproperties'].get('role')
         return items
 
     @lazyimport_modules(globals(), (
