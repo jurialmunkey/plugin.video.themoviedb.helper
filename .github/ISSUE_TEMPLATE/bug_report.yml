@@ -24,14 +24,13 @@ body:
   attributes:
     label: Debug log
     description: |
-      Include your FULL kodi.log file by uploading to https://paste.kodi.tv/ and providing the link.
-      Alternatively you can attach the log file directly here.
+      If the bug relates to an error you must provide your FULL kodi.log file
+      Either upload your log to https://paste.kodi.tv/ and provide the link OR attach the log file here.
       
-      https://kodi.wiki/view/Log_file#Log_file_location
-
       Tip: You can attach files by clicking this area to highlight it and then dragging files in.
+      https://kodi.wiki/view/Log_file#Log_file_location
   validations:
-    required: true
+    required: false
 - type: textarea
   attributes:
     label: Screenshots and Additional Info
@@ -53,4 +52,4 @@ body:
     - label: I have described the bug and included steps to reproduce the issue
       required: true
     - label: I have uploaded my debug log.
-      required: true
+      required: false
