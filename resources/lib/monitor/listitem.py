@@ -153,12 +153,14 @@ class ListItemMonitor(CommonMonitorFunctions):
             trakt_type = {'movie': 'movie', 'tv': 'show'}[tmdb_type]
         except KeyError:
             return  # Only lookup ratings for movie or tvshow
+        get_property('IsUpdatingRatings', 'True')
         details = self.get_omdb_ratings(details)
         details = self.get_imdb_top250_rank(details, trakt_type=trakt_type)
         details = self.get_trakt_ratings(details, trakt_type, season=self.season, episode=self.episode)
         if not self.is_same_item():
-            return
+            return get_property('IsUpdatingRatings', clear_property=True)
         self.set_iter_properties(details.get('infoproperties', {}), SETPROP_RATINGS)
+        get_property('IsUpdatingRatings', clear_property=True)
 
     @kodi_try_except('lib.monitor.listitem.clear_on_scroll')
     def clear_on_scroll(self):
