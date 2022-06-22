@@ -270,18 +270,21 @@ TMDB_BASIC_LISTS = {
         'path': 'person/{tmdb_id}/images',
         'key': 'profiles',
         'tmdb_type': 'image',
+        'imagepath_quality': 'ARTWORK_QUALITY_POSTER',
         'route': TMDB_BASIC_LISTS_ROUTE
     },
     'posters': {
         'path': '{tmdb_type}/{tmdb_id}/images',
         'key': 'posters',
         'tmdb_type': 'image',
+        'imagepath_quality': 'ARTWORK_QUALITY_POSTER',
         'route': TMDB_BASIC_LISTS_ROUTE
     },
     'fanart': {
         'path': '{tmdb_type}/{tmdb_id}/images',
         'key': 'backdrops',
         'tmdb_type': 'image',
+        'imagepath_quality': 'ARTWORK_QUALITY_FANART',
         'route': TMDB_BASIC_LISTS_ROUTE
     },
     'episode_thumbs': {

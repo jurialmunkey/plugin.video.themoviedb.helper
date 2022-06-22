@@ -102,13 +102,14 @@ class ListItemMonitor(CommonMonitorFunctions):
 
     def get_cur_item(self):
         return (
+            'current_item',
             self.get_infolabel('dbtype'),
             self.get_infolabel('dbid'),
             self.get_infolabel('IMDBNumber'),
             self.get_infolabel('label'),
             self.get_infolabel('year'),
             self.get_infolabel('season'),
-            self.get_infolabel('episode'))
+            self.get_infolabel('episode'),)
 
     def is_same_item(self, update=False):
         self.cur_item = self.get_cur_item()

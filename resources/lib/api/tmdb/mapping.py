@@ -330,6 +330,7 @@ class ItemMapper(_ItemMapper):
         self.mpaa_prefix = mpaa_prefix or get_mpaa_prefix()
         self.iso_language = language[:2]
         self.iso_country = language[-2:]
+        self.imagepath_quality = 'IMAGEPATH_ORIGINAL'
         self.blacklist = []
         """ Mapping dictionary
         keys:       list of tuples containing parent and child key to add value. [('parent', 'child')]
@@ -360,7 +361,7 @@ class ItemMapper(_ItemMapper):
             }],
             'file_path': [{
                 'keys': [('art', 'poster')],
-                'func': get_imagepath_quality
+                'func': self.get_imagepath_quality
             }],
             'still_path': [{
                 'keys': [('art', 'thumb')],
@@ -658,6 +659,13 @@ class ItemMapper(_ItemMapper):
             'height': ('infoproperties', 'height'),
             'aspect_ratio': ('infoproperties', 'aspect_ratio')
         }
+
+    def get_imagepath_quality(self, v):
+        try:
+            quality = globals()[self.imagepath_quality]
+        except KeyError:
+            quality = IMAGEPATH_ORIGINAL
+        return get_imagepath_quality(v, quality)
 
     def finalise(self, item, tmdb_type):
 
