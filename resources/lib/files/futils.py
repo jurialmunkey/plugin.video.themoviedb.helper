@@ -97,6 +97,7 @@ def write_to_file(data, folder, filename, join_addon_data=True, append_to_file=F
         data = '\n'.join([read_file(path), data])
     with xbmcvfs.File(path, 'w') as f:
         f.write(data)
+    return path
 
 
 def get_write_path(folder, join_addon_data=True, make_dir=True):
