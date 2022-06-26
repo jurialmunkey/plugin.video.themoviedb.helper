@@ -49,6 +49,8 @@ class Script(object):
             lambda **kwargs: importmodule('resources.lib.script.method', 'blur_image')(**kwargs),
         'image_colors':
             lambda **kwargs: importmodule('resources.lib.script.method', 'image_colors')(**kwargs),
+        'provider_allowlist':
+            lambda **kwargs: importmodule('resources.lib.script.method', 'provider_allowlist')(),
         'monitor_userlist':
             lambda **kwargs: importmodule('resources.lib.update.userlist', 'monitor_userlist')(),
         'update_players':

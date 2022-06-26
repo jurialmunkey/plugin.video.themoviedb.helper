@@ -2221,6 +2221,26 @@ msgctxt "#32435"
 msgid "Input QUERYKEY where search query goes"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32436"
+msgid "Details"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32437"
+msgid "Configure provider data allowlist"
+msgstr ""
+
+#: /resources/lib/script/method.py
+msgctxt "#32438"
+msgid "Provider allowlist updated"
+msgstr ""
+
+#: /resources/lib/script/method.py
+msgctxt "#32439"
+msgid "The provider allowlist has been updated. Please note that updating provider details requires the item cache to be refreshed. The item cache can be deleted in the expert settings section."
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
