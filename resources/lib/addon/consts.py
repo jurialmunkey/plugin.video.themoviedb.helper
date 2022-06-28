@@ -297,6 +297,12 @@ TMDB_BASIC_LISTS = {
     'reviews': {
         'path': '{tmdb_type}/{tmdb_id}/reviews',
         'key': 'results',
+        'tmdb_type': 'review',
+        'params': {
+            'info': 'reviews',
+            'tmdb_type': '{tmdb_type}',
+            'tmdb_id': '{tmdb_id}'
+        },
         'route': TMDB_BASIC_LISTS_ROUTE
     },
     'revenue_movies': {
