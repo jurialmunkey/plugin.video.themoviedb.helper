@@ -1,0 +1,21 @@
+name: Dispatch to Repo
+on: 
+  push:
+    tags:
+      - "*"
+  workflow_dispatch:
+    
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        repo: ["jurialmunkey/repository.jurialmunkey"]
+    steps:
+      - name: Push to repo
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.TOKEN }}
+          repository: ${{ matrix.repo }}
+          event-type: update
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "module": "jurialmunkey/plugin.video.themoviedb.helper", "tag": "${{ github.ref_name }}"}'
