@@ -123,7 +123,7 @@ def get_iter_props(v, base_name, *args, **kwargs):
     return infoproperties
 
 
-def get_providers(v):
+def get_providers(v, allowlist=None):
     infoproperties = {}
     infoproperties['provider.link'] = v.pop('link', None)
     newlist = (
@@ -133,6 +133,8 @@ def get_providers(v):
     added_append = added.append
     for i in sorted(newlist, key=lambda k: k.get('display_priority', 1000)):
         if not i.get('provider_name'):
+            continue
+        if allowlist and i['provider_name'] not in allowlist:
             continue
         # If provider already added just update type
         if i['provider_name'] in added:
@@ -330,6 +332,9 @@ class ItemMapper(_ItemMapper):
         self.mpaa_prefix = mpaa_prefix or get_mpaa_prefix()
         self.iso_language = language[:2]
         self.iso_country = language[-2:]
+        self.imagepath_quality = 'IMAGEPATH_ORIGINAL'
+        self.provider_allowlist = get_setting('provider_allowlist', 'str')
+        self.provider_allowlist = self.provider_allowlist.split(' | ') if self.provider_allowlist else []
         self.blacklist = []
         """ Mapping dictionary
         keys:       list of tuples containing parent and child key to add value. [('parent', 'child')]
@@ -360,7 +365,7 @@ class ItemMapper(_ItemMapper):
             }],
             'file_path': [{
                 'keys': [('art', 'poster')],
-                'func': get_imagepath_quality
+                'func': self.get_imagepath_quality
             }],
             'still_path': [{
                 'keys': [('art', 'thumb')],
@@ -597,6 +602,7 @@ class ItemMapper(_ItemMapper):
             'watch/providers': [{
                 'keys': [('infoproperties', UPDATE_BASEKEY)],
                 'subkeys': ['results', self.iso_country],
+                'kwargs': {'allowlist': self.provider_allowlist},
                 'func': get_providers
             }],
             'last_episode_to_air': [{
@@ -658,6 +664,13 @@ class ItemMapper(_ItemMapper):
             'height': ('infoproperties', 'height'),
             'aspect_ratio': ('infoproperties', 'aspect_ratio')
         }
+
+    def get_imagepath_quality(self, v):
+        try:
+            quality = globals()[self.imagepath_quality]
+        except KeyError:
+            quality = IMAGEPATH_ORIGINAL
+        return get_imagepath_quality(v, quality)
 
     def finalise(self, item, tmdb_type):
 

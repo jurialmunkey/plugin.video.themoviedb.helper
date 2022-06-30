@@ -60,6 +60,7 @@ PLAYERS_URLENCODE = [
 PLAYERS_BASEDIR_USER = 'special://profile/addon_data/plugin.video.themoviedb.helper/players/'
 PLAYERS_BASEDIR_SAVE = 'special://profile/addon_data/plugin.video.themoviedb.helper/reconfigured_players/'
 PLAYERS_BASEDIR_BUNDLED = 'special://home/addons/plugin.video.themoviedb.helper/resources/players/'
+PLAYERS_BASEDIR_TEMPLATES = 'special://home/addons/plugin.video.themoviedb.helper/resources/templates/'
 PLAYERS_PRIORITY = 1000
 
 NO_LABEL_FORMATTING = ['details', 'upcoming', 'trakt_calendar', 'trakt_myairing', 'trakt_anticipated', 'library_nextaired', 'videos']
@@ -270,18 +271,21 @@ TMDB_BASIC_LISTS = {
         'path': 'person/{tmdb_id}/images',
         'key': 'profiles',
         'tmdb_type': 'image',
+        'imagepath_quality': 'ARTWORK_QUALITY_POSTER',
         'route': TMDB_BASIC_LISTS_ROUTE
     },
     'posters': {
         'path': '{tmdb_type}/{tmdb_id}/images',
         'key': 'posters',
         'tmdb_type': 'image',
+        'imagepath_quality': 'ARTWORK_QUALITY_POSTER',
         'route': TMDB_BASIC_LISTS_ROUTE
     },
     'fanart': {
         'path': '{tmdb_type}/{tmdb_id}/images',
         'key': 'backdrops',
         'tmdb_type': 'image',
+        'imagepath_quality': 'ARTWORK_QUALITY_FANART',
         'route': TMDB_BASIC_LISTS_ROUTE
     },
     'episode_thumbs': {
@@ -293,6 +297,12 @@ TMDB_BASIC_LISTS = {
     'reviews': {
         'path': '{tmdb_type}/{tmdb_id}/reviews',
         'key': 'results',
+        'tmdb_type': 'review',
+        'params': {
+            'info': 'reviews',
+            'tmdb_type': '{tmdb_type}',
+            'tmdb_id': '{tmdb_id}'
+        },
         'route': TMDB_BASIC_LISTS_ROUTE
     },
     'revenue_movies': {

@@ -56,8 +56,6 @@ class _ListItem(object):
         self.next_page = next_page
 
     def set_art_fallbacks(self):
-        if not self.art.get('fanart'):
-            self.art['fanart'] = f'{ADDONPATH}/resources/icons/themoviedb/fanart.jpg'
         if not self.art.get('icon'):
             self.art['icon'] = self.art.get('poster') or f'{ADDONPATH}/resources/icons/themoviedb/default.png'
         return self.art
@@ -132,17 +130,22 @@ class _ListItem(object):
         if get_condvisibility("Window.IsVisible(script-skinshortcuts.xml)"):
             self._set_params_reroute_skinshortcuts()
 
-        if is_cacheonly:  # Take cacheony param from parent list with us onto subsequent pages
-            self.params['cacheonly'] = is_cacheonly
-
-        if is_fanarttv:  # Take fanarttv param from parent list with us onto subsequent pages
-            self.params['fanarttv'] = is_fanarttv
-
-        if extended == 'inprogress':  # Reroute for extended sorting of trakt list by inprogress to open up next folder
+        # Reroute for extended sorting of trakt list by inprogress to open up next folder
+        if extended == 'inprogress':
             self.params['info'] = 'trakt_upnext'
 
-        if self.params.get('info') == 'details':  # Reconfigure details item into play/browse etc.
-            self._set_params_reroute_details()
+        # Reconfigure details item into play/browse etc.
+        if self.params.get('info') == 'details':
+            return self._set_params_reroute_details()
+
+        # Copy some params to next folder path
+        if not self.is_folder:
+            return
+        if is_cacheonly:
+            self.params['cacheonly'] = is_cacheonly
+        if is_fanarttv:
+            self.params['fanarttv'] = is_fanarttv
+            return
 
     def _set_params_reroute_details(self):
         return  # Done in child class

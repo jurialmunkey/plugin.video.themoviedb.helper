@@ -580,6 +580,19 @@
 				</setting>
 			</group>
 		</category>
+		<category id="details" label="32436" help="">
+			<group id="1" label="32436">
+				<setting id="provider_allowlist" type="string" label="32437" help="">
+					<level>0</level>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action">
+						<data>RunScript(plugin.video.themoviedb.helper,provider_allowlist)</data>
+					</control>
+				</setting>
+			</group>
+		</category>
 		<category id="expert" label="10039" help="">
 			<group id="1" label="32351">
 				<setting id="dummy_duration" type="string" label="32352" help="">
