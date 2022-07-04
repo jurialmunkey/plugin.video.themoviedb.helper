@@ -2,6 +2,7 @@
 # Author: jurialmunkey
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 from xbmcgui import Dialog
+from resources.lib.addon.tmdate import set_timestamp
 from resources.lib.addon.thread import ParallelThread
 from resources.lib.addon.window import get_property
 from resources.lib.addon.dialog import BusyDialog
@@ -131,7 +132,7 @@ class _Menu():
                 get_localized(32297).format(
                     item.name, self.trakt_type, self.id_type.upper(), self.unique_id))
             executebuiltin('Container.Refresh')
-            executebuiltin('UpdateLibrary(video,/fake/path/to/force/refresh/on/home)')
+            get_property('Widgets.Reload', set_property=f'{set_timestamp(0, True)}')
             return
         Dialog().ok(
             get_localized(32295),

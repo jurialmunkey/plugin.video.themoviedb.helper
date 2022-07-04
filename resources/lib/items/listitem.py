@@ -1,5 +1,5 @@
 from xbmcgui import ListItem as KodiListItem
-from resources.lib.addon.consts import ACCEPTED_MEDIATYPES
+from resources.lib.addon.consts import ACCEPTED_MEDIATYPES, PARAM_WIDGETS_RELOAD
 from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_media_type, get_setting, get_condvisibility, get_localized
 from resources.lib.addon.parser import try_int, encode_url, merge_two_dicts
 from resources.lib.addon.tmdate import is_unaired_timestamp
@@ -170,7 +170,10 @@ class _ListItem(object):
             self.infoproperties['widget'] = widget
 
     def get_url(self):
-        return encode_url(self.path, **self.params)
+        url = encode_url(self.path, **self.params)
+        if self.params.get('widget', '').lower() == 'true':
+            url = f'{url}&{PARAM_WIDGETS_RELOAD}'
+        return url
 
     def get_listitem(self, offscreen=True):
         if self.infolabels.get('mediatype') not in ACCEPTED_MEDIATYPES:

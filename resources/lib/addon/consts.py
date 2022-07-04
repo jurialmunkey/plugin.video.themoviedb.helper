@@ -65,6 +65,8 @@ PLAYERS_PRIORITY = 1000
 
 NO_LABEL_FORMATTING = ['details', 'upcoming', 'trakt_calendar', 'trakt_myairing', 'trakt_anticipated', 'library_nextaired', 'videos']
 
+PARAM_WIDGETS_RELOAD = 'reload=$INFO[Window(Home).Property(TMDbHelper.Widgets.Reload)]'
+
 TMDB_ALL_ITEMS_LISTS = {
     'movie': {
         'type': 'movie',

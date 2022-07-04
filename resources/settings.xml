@@ -378,6 +378,16 @@
 					</dependencies>
 					<control type="toggle"/>
 				</setting>
+				<setting id="update_skinshortcuts" type="boolean" help="">
+					<level>0</level>
+					<default>false</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
 			</group>
 		</category>
 		<category id="api keys" label="32017" help="">

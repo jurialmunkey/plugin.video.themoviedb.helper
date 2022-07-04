@@ -91,13 +91,17 @@ def dumps_to_file(data, folder, filename, indent=2, join_addon_data=True):
     return path
 
 
+def write_file(data, path):
+    with xbmcvfs.File(path, 'w') as f:
+        f.write(data)
+    return path
+
+
 def write_to_file(data, folder, filename, join_addon_data=True, append_to_file=False):
     path = get_file_path(folder, filename, join_addon_data)
     if append_to_file:
         data = '\n'.join([read_file(path), data])
-    with xbmcvfs.File(path, 'w') as f:
-        f.write(data)
-    return path
+    return write_file(data, path)
 
 
 def get_write_path(folder, join_addon_data=True, make_dir=True):
