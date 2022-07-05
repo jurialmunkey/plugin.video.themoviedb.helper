@@ -18,11 +18,12 @@ body:
 - type: textarea
   attributes:
     label: Steps to reproduce.
-    description: |
-      If this feature relates to an existing problem, please describe the steps to reproduce the issue.
-      1. Go here
-      2. Click this
-      3. See problem
+    description: If this feature relates to an existing problem, please describe the steps to reproduce the issue.
+    placeholder: |
+      1. Go to ...
+      2. Click on ...
+      3. Scroll to ...
+      4. See issue ...
   validations:
     required: false
 - type: textarea
