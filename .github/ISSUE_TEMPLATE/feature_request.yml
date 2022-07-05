@@ -5,16 +5,26 @@ labels: enhancement
 body:
 - type: textarea
   attributes:
-    label: Is your feature request related to a problem? Please describe.
-    description: A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+    label: Describe the feature that you'd like
+    description: A clear and concise description of what you want to happen.
   validations:
     required: true
 - type: textarea
   attributes:
-    label: Describe the solution you'd like
-    description: A clear and concise description of what you want to happen.
+    label: Why is this feature needed? What problem does it solve?
+    description: A clear explanation justifying why this feature should be added Ex. I'm always frustrated when [...].
   validations:
     required: true
+- type: textarea
+  attributes:
+    label: Steps to reproduce.
+    description: |
+      If this feature relates to an existing problem, please describe the steps to reproduce the issue.
+      1. Go here
+      2. Click this
+      3. See problem
+  validations:
+    required: false
 - type: textarea
   attributes:
     label: Screenshots and Additional Info
