@@ -153,13 +153,17 @@ def get_providers(v, allowlist=None):
     return infoproperties
 
 
-def get_trailer(v):
+def get_trailer(v, iso_639_1=None):
     if not isinstance(v, dict):
         return
+    url = None
     for i in v.get('results') or []:
         if i.get('type', '') != 'Trailer' or i.get('site', '') != 'YouTube' or not i.get('key'):
             continue
-        return f'plugin://plugin.video.youtube/play/?video_id={i.get("key")}'
+        if i.get('iso_639_1') == iso_639_1:
+            return f'plugin://plugin.video.youtube/play/?video_id={i["key"]}'
+        url = url or f'plugin://plugin.video.youtube/play/?video_id={i["key"]}'
+    return url
 
 
 def _get_genre_by_id(genre_id):
@@ -412,7 +416,8 @@ class ItemMapper(_ItemMapper):
             }],
             'videos': [{
                 'keys': [('infolabels', 'trailer')],
-                'func': get_trailer
+                'func': get_trailer,
+                'args': [self.iso_language]
             }],
             'popularity': [{
                 'keys': [('infoproperties', 'popularity')],
