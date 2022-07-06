@@ -3,7 +3,7 @@ from resources.lib.addon.plugin import get_setting, ADDONPATH, PLUGINPATH, conve
 from resources.lib.addon.parser import get_params
 from resources.lib.api.request import RequestAPI
 from resources.lib.items.pages import PaginatedItems
-# from resources.lib.addon.logger import kodi_log
+from resources.lib.addon.logger import kodi_log
 
 
 def _get_paginated(items, limit=None, page=1):
@@ -83,9 +83,11 @@ class MDbList(RequestAPI):
         response = func(*args, **kwargs)
         if isinstance(response, dict):  # API returns dict rather than list on failure
             if not kwargs.get('cache_refresh') and response.get('error') == 'Invalid API key!' and get_setting("mdblist_apikey", "str"):
-                response = func(*args, **kwargs, cache_refresh=True)  # Refresh in case cached because we've got an api key
+                kwargs['cache_refresh'] = True  # Refresh in case cached because we've got an api key
+                response = func(*args, **kwargs)
                 if not isinstance(response, dict):  # Check again in case now working and return response
                     return response
+            kodi_log(f'MDBList Error: {response.get("error")}', 1)
             Dialog().ok(get_localized(257), f'{response.get("error")}')
             return []
         return response
