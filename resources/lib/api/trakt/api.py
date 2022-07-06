@@ -155,7 +155,10 @@ class _TraktLists():
     def get_custom_list(self, list_slug, user_slug=None, page=1, limit=20, params=None, authorize=False, sort_by=None, sort_how=None, extended=None, owner=False, always_refresh=True):
         if authorize and not self.authorize():
             return
-        path = f'users/{user_slug or "me"}/lists/{list_slug}/items'
+        if user_slug == 'official':
+            path = f'lists/{list_slug}/items'
+        else:
+            path = f'users/{user_slug or "me"}/lists/{list_slug}/items'
         # Refresh cache on first page for user list because it might've changed
         cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
         sorted_items = self.get_sorted_list(
@@ -199,9 +202,13 @@ class _TraktLists():
             elif not i.get('name'):
                 continue
 
-            i_usr = i.get('user', {})
-            i_ids = i.get('ids', {})
-            i_usr_ids = i_usr.get('ids', {})
+            i_name = i.get('name')
+            i_usr = i.get('user') or {}
+            i_ids = i.get('ids') or {}
+            i_usr_ids = i_usr.get('ids') or {}
+            i_usr_slug = 'official' if i.get('type') == 'official' else i_usr_ids.get('slug')
+            i_lst_slug = i_ids.get('slug')
+            i_lst_trakt = i_ids.get('trakt')
 
             item = {}
             item['label'] = f"{i.get('name')}"
@@ -210,14 +217,14 @@ class _TraktLists():
             item['art'] = {}
             item['params'] = {
                 'info': 'trakt_userlist',
-                'list_name': i.get('name'),
-                'list_slug': i_ids.get('slug'),
-                'user_slug': i_usr_ids.get('slug'),
-                'plugin_category': i.get('name')}
+                'list_name': i_name,
+                'list_slug': i_lst_slug,
+                'user_slug': i_usr_slug,
+                'plugin_category': i_name}
             item['unique_ids'] = {
-                'trakt': i_ids.get('trakt'),
-                'slug': i_ids.get('slug'),
-                'user': i_usr_ids.get('slug')}
+                'trakt': i_lst_trakt,
+                'slug': i_lst_slug,
+                'user': i_usr_slug}
             item['infoproperties']['tmdbhelper.context.sorting'] = data_dumps(item['params'])
 
             # Add library context menu
