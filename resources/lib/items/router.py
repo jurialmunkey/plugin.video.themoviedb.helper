@@ -1,4 +1,3 @@
-import sys
 from resources.lib.addon.logger import kodi_log
 from resources.lib.addon.parser import parse_paramstring, reconfigure_legacy_params
 
@@ -11,10 +10,10 @@ TMDb = None  # resources.lib.api.tmdb.api
 
 
 class Router():
-    def __init__(self):
+    def __init__(self, handle, paramstring):
         # plugin:// params configuration
-        self.handle = int(sys.argv[1])  # plugin:// handle
-        self.paramstring = sys.argv[2][1:]  # plugin://plugin.video.themoviedb.helper?paramstring
+        self.handle = handle  # plugin:// handle
+        self.paramstring = paramstring  # plugin://plugin.video.themoviedb.helper?paramstring
         self.params = reconfigure_legacy_params(**parse_paramstring(self.paramstring))  # paramstring dictionary
 
     @lazyimport_modules(globals(), (

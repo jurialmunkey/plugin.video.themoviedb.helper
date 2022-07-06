@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.themoviedb.helper"
-version="4.10.2"
+version="4.10.3"
 name="TheMovieDb Helper"
 provider-name="jurialmunkey">
 <requires>
@@ -46,7 +46,7 @@ provider-name="jurialmunkey">
   </menu>
 </extension>
 <extension point="xbmc.addon.metadata">
-  <reuselanguageinvoker>true</reuselanguageinvoker>
+  <reuselanguageinvoker>false</reuselanguageinvoker>
   <summary lang="en_GB">TheMovieDb Helper - Now With Trakt Support!</summary>
   <summary lang="es_ES">TheMovieDb Helper - ¡Ahora con soporte para Trakt!</summary>
   <summary lang="fr_FR">TheMovieDb Helper - Maintenant avec support Trakt!</summary>
