@@ -170,10 +170,12 @@ class _ListItem(object):
             self.infoproperties['widget'] = widget
 
     def get_url(self):
-        url = encode_url(self.path, **self.params)
-        if self.params.get('widget', '').lower() == 'true':
-            url = f'{url}&{PARAM_WIDGETS_RELOAD}'
-        return url
+        def _get_url(path, reload=None, widget=None, **params):
+            url = encode_url(path, **params)
+            if widget and widget.lower() == 'true':
+                url = f'{url}&widget=true&{PARAM_WIDGETS_RELOAD}'
+            return url
+        return _get_url(self.path, **self.params)
 
     def get_listitem(self, offscreen=True):
         if self.infolabels.get('mediatype') not in ACCEPTED_MEDIATYPES:

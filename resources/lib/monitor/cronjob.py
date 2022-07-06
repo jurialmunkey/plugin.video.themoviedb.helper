@@ -10,15 +10,18 @@ def update_skinshortcuts():
     if get_setting('update_skinshortcuts'):
         return
     from resources.lib.files.futils import validate_join, get_files_in_folder, read_file, write_file
-    from resources.lib.addon.consts import PARAM_WIDGETS_RELOAD
+    from resources.lib.addon.consts import PARAM_WIDGETS_RELOAD, PARAM_WIDGETS_RELOAD_REPLACE
     folder = validate_join('special://profile/addon_data/', 'script.skinshortcuts/')
     files = get_files_in_folder(folder, regex=r".*\.(xml|properties)$")
     affix = PARAM_WIDGETS_RELOAD
+    subst = PARAM_WIDGETS_RELOAD_REPLACE
     for f in files:
         filename = validate_join(folder, f)
         filemeta = read_file(filename)
         fileline = filemeta.split('\n')
         for x, i in enumerate(fileline):
+            if subst in i:
+                i.replace(subst, affix)
             if affix in i:
                 continue
             if 'plugin://plugin.video.themoviedb.helper/' not in i:

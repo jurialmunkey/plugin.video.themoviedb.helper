@@ -264,7 +264,7 @@ class ListCustomSearch(Container):
 
 class ListSortBy(Container):
     def get_items(self, info, **kwargs):
-        def _listsortby_item(i, params):
+        def _listsortby_item(i, **params):
             item = get_empty_item()
             item['label'] = item['infolabels']['title'] = f'{params.get("list_name")}[CR]{i["name"]}'
             item['params'] = params
@@ -273,6 +273,6 @@ class ListSortBy(Container):
             return item
         kwargs['info'] = kwargs.pop('parent_info', None)
         items = get_sort_methods() if kwargs['info'] == 'trakt_userlist' else get_sort_methods(True)
-        items = [_listsortby_item(i, kwargs.copy()) for i in items]
+        items = [_listsortby_item(i, **kwargs) for i in items]
         self.library = 'video'
         return items
