@@ -4,6 +4,9 @@ from resources.lib.api.request import RequestAPI
 from resources.lib.api.omdb.mapping import ItemMapper
 
 
+IMDB_KEYPAIRS = [('infolabels', 'imdbnumber'), ('unique_ids', 'imdb'), ('unique_ids', 'tvshow.imdb')]
+
+
 class OMDb(RequestAPI):
     def __init__(self, api_key=None, delay_write=False):
         super(OMDb, self).__init__(
@@ -21,9 +24,9 @@ class OMDb(RequestAPI):
         kwparams['tomatoes'] = 'True' if tomatoes else None
         kwparams = del_empty_keys(kwparams)
         request = self.get_request_lc(is_xml=True, cache_only=cache_only, r='xml', **kwparams)
-        if request and request.get('root') and not request.get('root').get('response') == 'False':
-            request = request.get('root').get('movie')[0]
-        else:
+        try:
+            request = request['root']['movie'][0]
+        except (KeyError, TypeError, AttributeError):
             request = {}
         return request
 
@@ -31,12 +34,15 @@ class OMDb(RequestAPI):
         request = self.get_request_item(imdb_id=imdb_id, title=title, year=year, cache_only=cache_only)
         return ItemMapper().get_info(request, base_item=base_item)
 
-    def _get_item_imdb(self, item):
-        for i, j in [('infolabels', 'imdbnumber'), ('unique_ids', 'imdb'), ('unique_ids', 'tvshow.imdb')]:
+    def _get_item_value(self, item, key_pairs: list = None, starts_with: str = None):
+        for i, j in key_pairs:
             try:
-                imdb_id = item[i][j]
-                if imdb_id.startswith('tt'):
-                    return imdb_id
+                value = item[i][j]
+                if not value:
+                    continue
+                if starts_with and not value.startswith(starts_with):
+                    continue
+                return value
             except (KeyError, AttributeError):
                 continue
 
@@ -44,7 +50,7 @@ class OMDb(RequestAPI):
         """ Get ratings for an item using IMDb lookup """
         if not item:
             return
-        imdb_id = self._get_item_imdb(item)
+        imdb_id = self._get_item_value(item, key_pairs=IMDB_KEYPAIRS, starts_with='tt')
         if not imdb_id:
             return item
         ratings = self.get_ratings_awards(imdb_id=imdb_id, cache_only=cache_only)
