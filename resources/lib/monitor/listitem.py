@@ -80,7 +80,7 @@ class ListItemMonitor(CommonMonitorFunctions):
                 "Window.IsVisible(MyPVRRecordings.xml) | "
                 "Window.IsVisible(MyPVRSearch.xml) | "
                 "Window.IsVisible(MyPVRGuide.xml)"):
-            return 'multi'
+            return 'multi' if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisablePVR)") else ''
         if self.container == 'Container.':
             return get_infolabel('Container.Content()') or ''
         return ''
