@@ -13,7 +13,7 @@ from resources.lib.files.futils import read_file, normalise_filesize
 from resources.lib.api.kodi.rpc import get_directory, KodiLibrary
 from resources.lib.player.details import get_item_details, get_detailed_item, get_playerstring, get_language_details, get_next_episodes
 from resources.lib.player.inputter import KeyboardInputter
-from resources.lib.player.configure import get_players_from_file
+from resources.lib.player.putils import get_players_from_file
 from resources.lib.addon.logger import kodi_log
 
 
