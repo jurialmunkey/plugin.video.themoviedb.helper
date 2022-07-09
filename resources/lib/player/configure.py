@@ -21,19 +21,48 @@ class _ConfigurePlayer():
         self.player = player
         self.filename = filename
 
+        self._dialogsettings = [
+            {
+                'name': lambda: f'name: {self.player.get("name")}',
+                'func': lambda: self.set_name(),
+            },
+            {
+                'name': lambda: f'disabled: {self.player.get("disabled", "false").lower()}',
+                'func': lambda: self.set_disabled(),
+            },
+            {
+                'name': lambda: f'priority: {self.player.get("priority") or PLAYERS_PRIORITY}',
+                'func': lambda: self.set_priority(),
+            },
+            {
+                'name': lambda: f'is_resolvable: {self.player.get("is_resolvable", "select")}',
+                'func': lambda: self.set_resolvable(),
+            },
+            {
+                'name': lambda: f'make_playlist: {self.player.get("make_playlist", "false").lower()}',
+                'func': lambda: self.set_makeplaylist(),
+            },
+            {
+                'name': lambda: f'fallback: {dumps(self.player.get("fallback"))}',
+                'func': lambda: self.set_fallbacks(),
+            },
+            {
+                'name': lambda: get_localized(32330),
+                'func': lambda: -1,
+                'returns': True
+            },
+            {
+                'name': lambda: get_localized(190),
+                'func': lambda: self.player,
+                'returns': True
+            }
+        ]
+
     def get_player_settings(self):
         if not self.player:
             return
         # Name; Enable/Disable; Priority; is_resolvable; fallbacks(?)
-        return [
-            f'name: {self.player.get("name")}',
-            f'disabled: {self.player.get("disabled", "false").lower()}',
-            f'priority: {self.player.get("priority") or PLAYERS_PRIORITY}',
-            f'is_resolvable: {self.player.get("is_resolvable", "select")}',
-            f'make_playlist: {self.player.get("make_playlist", "false").lower()}',
-            f'fallback: {dumps(self.player.get("fallback"))}',
-            get_localized(32330),
-            get_localized(190)]
+        return [i['name']() for i in self._dialogsettings]
 
     def set_name(self):
         name = self.player.get('name', '')
@@ -60,7 +89,7 @@ class _ConfigurePlayer():
 
     def set_resolvable(self):
         x = Dialog().select(get_localized(32332), [
-            'setResolvedURL', 'PlayMedia', get_localized(32333)])
+            'setResolvedURL (true)', 'PlayMedia (false)', f'{get_localized(32333)} (select)'])
         if x == -1:
             return
         is_resolvable = 'select'
@@ -132,22 +161,12 @@ class _ConfigurePlayer():
         x = Dialog().select(self.filename, self.get_player_settings())
         if x == -1:
             return self.player
-        elif x == 0:
-            self.set_name()
-        elif x == 1:
-            self.set_disabled()
-        elif x == 2:
-            self.set_priority()
-        elif x == 3:
-            self.set_resolvable()
-        elif x == 4:
-            self.set_makeplaylist()
-        elif x == 5:
-            self.set_fallbacks()
-        elif x == 6:
-            return -1
-        elif x == 7:
-            return self.player
+        try:
+            value = self._dialogsettings[x]['func']()
+            if self._dialogsettings[x].get('returns'):
+                return value
+        except IndexError:
+            pass
         return self.configure()
 
 
