@@ -8,19 +8,19 @@ from resources.lib.files.futils import dumps_to_file, delete_file
 from resources.lib.items.listitem import ListItem
 from resources.lib.player.create import CreatePlayer
 from resources.lib.player.putils import get_players_from_file
+from resources.lib.player.editsteps import _EditPlayer
 from json import dumps
 from copy import deepcopy
 
 
 def configure_players(*args, **kwargs):
-    ConfigurePlayers().configure_players()
+    ConfigurePlayers().run()
 
 
 class _ConfigurePlayer():
     def __init__(self, player, filename):
         self.player = player
         self.filename = filename
-
         self._dialogsettings = [
             {
                 'name': lambda: f'name: {self.player.get("name")}',
@@ -47,6 +47,10 @@ class _ConfigurePlayer():
                 'func': lambda: self.set_fallbacks(),
             },
             {
+                'name': lambda: get_localized(32440),
+                'func': lambda: _EditPlayer(self.player, self.filename).run()
+            },
+            {
                 'name': lambda: get_localized(32330),
                 'func': lambda: -1,
                 'returns': True
@@ -61,7 +65,6 @@ class _ConfigurePlayer():
     def get_player_settings(self):
         if not self.player:
             return
-        # Name; Enable/Disable; Priority; is_resolvable; fallbacks(?)
         return [i['name']() for i in self._dialogsettings]
 
     def set_name(self):
@@ -154,7 +157,7 @@ class _ConfigurePlayer():
             self.player.setdefault('fallback', {})[methods[x]] = fallback
         return self.set_fallbacks()
 
-    def configure(self):
+    def run(self):
         """
         Returns player or -1 if reset to default (i.e. delete configured player)
         """
@@ -167,7 +170,7 @@ class _ConfigurePlayer():
                 return value
         except IndexError:
             pass
-        return self.configure()
+        return self.run()
 
 
 class ConfigurePlayers():
@@ -217,7 +220,7 @@ class ConfigurePlayers():
             dumps_to_file(player, PLAYERS_BASEDIR_SAVE, filename, indent=4, join_addon_data=False)  # Write out file
         return filename
 
-    def configure_players(self):
+    def run(self):
         filename = self.select_player()
         if not filename:
             return
@@ -228,7 +231,7 @@ class ConfigurePlayers():
             except KeyError:
                 return
 
-            player = _ConfigurePlayer(player, filename=filename).configure()
+            player = _ConfigurePlayer(player, filename=filename).run()
 
             if player == -1:  # Reset player (i.e. delete player file)
                 self.delete_player(filename)
@@ -240,4 +243,4 @@ class ConfigurePlayers():
             self.get_players()
 
         _configure_selected_player()
-        return self.configure_players()
+        return self.run()

@@ -2241,6 +2241,41 @@ msgctxt "#32439"
 msgid "The provider allowlist has been updated. Please note that updating provider details requires the item cache to be refreshed. The item cache can be deleted in the expert settings section."
 msgstr ""
 
+#: /resources/lib/player/configure.py
+msgctxt "#32440"
+msgid "Edit steps"
+msgstr ""
+
+#: /resources/lib/player/configure.py
+msgctxt "#32441"
+msgid "Add a new step"
+msgstr ""
+
+#: /resources/lib/player/configure.py
+msgctxt "#32442"
+msgid "Add a new rule"
+msgstr ""
+
+#: /resources/lib/player/configure.py
+msgctxt "#32443"
+msgid "Select value to match against {}"
+msgstr ""
+
+#: /resources/lib/player/configure.py
+msgctxt "#32444"
+msgid "Select rule or listitem key"
+msgstr ""
+
+#: /resources/lib/player/configure.py
+msgctxt "#32445"
+msgid "Edit Rules for Step {}"
+msgstr ""
+
+#: /resources/lib/player/configure.py
+msgctxt "#32446"
+msgid "plugin:// search URL for {}"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
