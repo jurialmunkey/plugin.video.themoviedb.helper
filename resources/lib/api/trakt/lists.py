@@ -184,8 +184,13 @@ class ListNextEpisodes(Container):
     def get_items(self, info, tmdb_type, page=None, **kwargs):
         if tmdb_type != 'tv':
             return
-        sort_by_premiered = True if get_setting('trakt_nextepisodesort', 'str') == 'airdate' else False
-        items = self.trakt_api.get_upnext_episodes_list(page=page, sort_by_premiered=sort_by_premiered)
+        sort_settings = {
+            'airdate': ('released', 'desc'),
+            'todays': ('airing', -1),
+            'lastweek': ('airing', -7),
+            'recentlywatched': (None, None)}
+        sort_by, sort_how = sort_settings[get_setting('trakt_nextepisodesort', 'str')]
+        items = self.trakt_api.get_upnext_episodes_list(page=page, sort_by=sort_by, sort_how=sort_how)
         self.tmdb_cache_only = False
         # self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = 'video'

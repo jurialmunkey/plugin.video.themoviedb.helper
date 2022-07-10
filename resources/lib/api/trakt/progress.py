@@ -42,7 +42,7 @@ class _TraktProgress():
     def get_inprogress_shows_list(self, page=1, limit=None, params=None, next_page=True, sort_by=None, sort_how=None):
         limit = limit or self.item_limit
         get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
-        response = self._get_upnext_episodes_list(sort_by_premiered=True) if sort_by == 'year' else self._get_inprogress_shows()
+        response = self._get_upnext_episodes_list(sort_by='released') if sort_by == 'year' else self._get_inprogress_shows()
         response = TraktItems(response, trakt_type='show').build_items(
             params_def=params, sort_by=sort_by if sort_by != 'year' else 'unsorted', sort_how=sort_how)
         response = PaginatedItems(response['items'], page=page, limit=limit)
@@ -190,17 +190,17 @@ class _TraktProgress():
             return response.items + response.next_page
 
     @is_authorized
-    def get_upnext_episodes_list(self, page=1, sort_by_premiered=False, limit=None):
+    def get_upnext_episodes_list(self, page=1, sort_by=None, sort_how='desc', limit=None):
         """ Gets a list of episodes for in-progress shows that user should watch next """
         limit = limit or self.item_limit
         get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
-        response = self._get_upnext_episodes_list(sort_by_premiered=sort_by_premiered)
+        response = self._get_upnext_episodes_list(sort_by=sort_by, sort_how=sort_how)
         response = TraktItems(response, trakt_type='episode').configure_items()
         response = PaginatedItems(response['items'], page=page, limit=limit)
         return response.items + response.next_page
 
     @is_authorized
-    def _get_upnext_episodes_list(self, sort_by_premiered=False):
+    def _get_upnext_episodes_list(self, sort_by=None, sort_how='desc'):
         def _get_upnext_episodes(i, get_single_episode=True):
             """ Helper func for upnext episodes to pass through threaded """
             try:
@@ -216,14 +216,14 @@ class _TraktProgress():
             item_queue = pt.queue
         items = [i for i in item_queue if i]
 
-        if not sort_by_premiered:
+        if not sort_by:
             return items
 
         with ParallelThread(items, self._get_item_details) as pt:
             item_queue = pt.queue
         items = [i for i in item_queue if i]
 
-        items = TraktItems(items, trakt_type='episode').sort_items('released', 'desc')
+        items = TraktItems(items, trakt_type='episode').sort_items(sort_by, sort_how)
         return items
 
     def _get_item_details(self, i):

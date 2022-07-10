@@ -1,6 +1,7 @@
 import random
 from resources.lib.addon.plugin import PLUGINPATH, convert_type, convert_trakt_type
-from resources.lib.addon.parser import try_int, try_str, del_empty_keys, get_params
+from resources.lib.addon.parser import try_int, try_str, del_empty_keys, get_params, partition_list
+from resources.lib.addon.tmdate import date_in_range
 
 
 EPISODE_PARAMS = {
@@ -9,44 +10,61 @@ EPISODE_PARAMS = {
 
 
 def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
-    reverse = True if sort_how == 'desc' else False
-    if sort_by == 'unsorted':
-        return items
-    elif sort_by == 'rank':
-        return sorted(items, key=lambda i: i.get('rank', 0), reverse=reverse)
-    elif sort_by == 'plays':
-        return sorted(items, key=lambda i: i.get('plays', 0), reverse=reverse)
-    elif sort_by == 'watched':
-        return sorted(items, key=lambda i: i.get('last_watched_at', ''), reverse=reverse)
-    elif sort_by == 'paused':
-        return sorted(items, key=lambda i: i.get('paused_at', ''), reverse=reverse)
-    elif sort_by == 'added':
-        return sorted(items, key=lambda i: i.get('listed_at', ''), reverse=reverse)
-    elif sort_by == 'title':
-        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('title', ''), reverse=reverse)
-    elif sort_by == 'year':
-        return sorted(items, key=lambda i: try_int(i.get(trakt_type or i.get('type'), {}).get('year', 0)), reverse=reverse)
-    elif sort_by == 'released':
-        return sorted(items, key=lambda i: try_str(i.get(trakt_type or i.get('type'), {}).get('first_aired', ''))
-                      if (trakt_type or i.get('type')) in ['show', 'episode']
-                      else try_str(i.get(trakt_type or i.get('type'), {}).get('released', '')), reverse=reverse)
-    elif sort_by == 'runtime':
-        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('runtime', 0), reverse=reverse)
-    elif sort_by == 'popularity':
-        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('comment_count', 0), reverse=reverse)
-    elif sort_by == 'percentage':
-        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('rating', 0), reverse=reverse)
-    elif sort_by == 'votes':
-        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), {}).get('votes', 0), reverse=reverse)
-    elif sort_by == 'random':
-        random.shuffle(items)
-        return items
-    elif sort_by == 'activity':
+    _dummydict, _dummystr, _dummyint = {}, '', 0
+
+    def _item_lambda_simple(sort_key: str, sort_fallback=None, sort_reverse=False):
+        return sorted(items, key=lambda i: i.get(sort_key, sort_fallback), reverse=sort_reverse)
+
+    def _item_lambda_parent(sort_key: str, sort_fallback=None, sort_reverse=False):
+        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), _dummydict).get(sort_key, sort_fallback), reverse=sort_reverse)
+
+    def _item_lambda_max_of(sort_keys: list, sort_fallback=None, sort_reverse=False):
+        return sorted(items, key=lambda i: max(*[i.get(k, sort_fallback) for k in sort_keys]), reverse=sort_reverse)
+
+    def _item_lambda_mixing(sort_keys: tuple, sort_fallback=None, sort_reverse=False, sort_types: list = None):
         return sorted(
             items,
-            key=lambda i: max(i.get('last_watched_at', ''), i.get('paused_at', ''), i.get('listed_at', '')),
-            reverse=reverse)
-    return sorted(items, key=lambda i: i.get('listed_at', ''), reverse=True)
+            key=lambda i: (
+                try_str(i.get(trakt_type or i.get('type'), _dummydict).get(sort_keys[0], sort_fallback)))
+            if (trakt_type or i.get('type')) in sort_types
+            else (
+                try_str(i.get(trakt_type or i.get('type'), _dummydict).get(sort_keys[1], sort_fallback))),
+            reverse=sort_reverse)
+
+    def _item_lambda_airing(sort_start: int):
+        ly, lx = partition_list(items, lambda i: date_in_range(
+            i.get(trakt_type or i.get('type'), _dummydict).get('first_aired'),
+            utc_convert=True, start_date=sort_start, days=abs(sort_start) + 1))
+        return list(lx) + list(ly)
+
+    def _item_lambda_random():
+        random.shuffle(items)
+        return items
+
+    reverse = True if sort_how == 'desc' else False
+    routing = {
+        'unsorted': lambda: items,
+        'rank': lambda: _item_lambda_simple('rank', _dummyint, reverse),
+        'plays': lambda: _item_lambda_simple('plays', _dummyint, reverse),
+        'watched': lambda: _item_lambda_simple('last_watched_at', _dummystr, reverse),
+        'paused': lambda: _item_lambda_simple('paused_at', _dummystr, reverse),
+        'added': lambda: _item_lambda_simple('listed_at', _dummystr, reverse),
+        'title': lambda: _item_lambda_parent('title', _dummystr, reverse),
+        'year': lambda: _item_lambda_parent('year', _dummyint, reverse),
+        'released': lambda: _item_lambda_mixing(('first_aired', 'released',), _dummystr, reverse, sort_types=['show', 'episode']),
+        'runtime': lambda: _item_lambda_parent('runtime', _dummyint, reverse),
+        'popularity': lambda: _item_lambda_parent('comment_count', _dummyint, reverse),
+        'percentage': lambda: _item_lambda_parent('rating', _dummyint, reverse),
+        'votes': lambda: _item_lambda_parent('votes', _dummyint, reverse),
+        'random': lambda: _item_lambda_random(),
+        'activity': lambda: _item_lambda_max_of(['last_watched_at', 'paused_at', 'listed_at'], _dummystr, reverse),
+        'airing': lambda: _item_lambda_airing(try_int(sort_how, fallback=_dummyint))
+    }
+
+    try:
+        return routing[sort_by]()
+    except KeyError:
+        return _item_lambda_simple('listed_at', _dummystr, True)
 
 
 def _get_item_title(item):

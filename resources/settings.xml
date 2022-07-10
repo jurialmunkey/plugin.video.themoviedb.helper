@@ -228,6 +228,8 @@
 						<options>
 							<option label="airdate">airdate</option>
 							<option label="recentlywatched">recentlywatched</option>
+							<option label="todays">todays</option>
+							<option label="lastweek">lastweek</option>
 						</options>
 					</constraints>
 					<control type="spinner" format="string"/>

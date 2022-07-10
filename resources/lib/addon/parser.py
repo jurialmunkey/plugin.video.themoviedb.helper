@@ -42,6 +42,15 @@ def try_type(value, output=None):
         return try_float(value)
 
 
+def partition_list(iterable, pred):
+    """Use a predicate to partition entries into false entries and true entries
+    partition(is_odd, range(10)) --> 0 2 4 6 8   and  1 3 5 7 9
+    """
+    from itertools import tee, filterfalse
+    t1, t2 = tee(iterable)
+    return filterfalse(pred, t1), filter(pred, t2)
+
+
 @lazyimport_module(globals(), 'urllib.parse', import_attr='unquote_plus')
 def parse_paramstring(paramstring):
     """ helper to assist to standardise urllib parsing """
