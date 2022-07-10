@@ -12,16 +12,16 @@ EPISODE_PARAMS = {
 def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
     _dummydict, _dummystr, _dummyint = {}, '', 0
 
-    def _item_lambda_simple(sort_key: str, sort_fallback=None, sort_reverse=False):
+    def _item_lambda_simple(items, sort_key: str, sort_fallback=None, sort_reverse=False):
         return sorted(items, key=lambda i: i.get(sort_key, sort_fallback), reverse=sort_reverse)
 
-    def _item_lambda_parent(sort_key: str, sort_fallback=None, sort_reverse=False):
+    def _item_lambda_parent(items, sort_key: str, sort_fallback=None, sort_reverse=False):
         return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), _dummydict).get(sort_key, sort_fallback), reverse=sort_reverse)
 
-    def _item_lambda_max_of(sort_keys: list, sort_fallback=None, sort_reverse=False):
+    def _item_lambda_max_of(items, sort_keys: list, sort_fallback=None, sort_reverse=False):
         return sorted(items, key=lambda i: max(*[i.get(k, sort_fallback) for k in sort_keys]), reverse=sort_reverse)
 
-    def _item_lambda_mixing(sort_keys: tuple, sort_fallback=None, sort_reverse=False, sort_types: list = None):
+    def _item_lambda_mixing(items, sort_keys: tuple, sort_fallback=None, sort_reverse=False, sort_types: list = None):
         return sorted(
             items,
             key=lambda i: (
@@ -31,34 +31,34 @@ def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
                 try_str(i.get(trakt_type or i.get('type'), _dummydict).get(sort_keys[1], sort_fallback))),
             reverse=sort_reverse)
 
-    def _item_lambda_airing(sort_start: int):
+    def _item_lambda_airing(items, sort_start: int):
         ly, lx = partition_list(items, lambda i: date_in_range(
             i.get(trakt_type or i.get('type'), _dummydict).get('first_aired'),
             utc_convert=True, start_date=sort_start, days=abs(sort_start) + 1))
-        return list(lx) + list(ly)
+        return _item_lambda_parent(list(lx), 'first_aired', _dummystr, True) + list(ly)
 
-    def _item_lambda_random():
+    def _item_lambda_random(items):
         random.shuffle(items)
         return items
 
     reverse = True if sort_how == 'desc' else False
     routing = {
         'unsorted': lambda: items,
-        'rank': lambda: _item_lambda_simple('rank', _dummyint, reverse),
-        'plays': lambda: _item_lambda_simple('plays', _dummyint, reverse),
-        'watched': lambda: _item_lambda_simple('last_watched_at', _dummystr, reverse),
-        'paused': lambda: _item_lambda_simple('paused_at', _dummystr, reverse),
-        'added': lambda: _item_lambda_simple('listed_at', _dummystr, reverse),
-        'title': lambda: _item_lambda_parent('title', _dummystr, reverse),
-        'year': lambda: _item_lambda_parent('year', _dummyint, reverse),
-        'released': lambda: _item_lambda_mixing(('first_aired', 'released',), _dummystr, reverse, sort_types=['show', 'episode']),
-        'runtime': lambda: _item_lambda_parent('runtime', _dummyint, reverse),
-        'popularity': lambda: _item_lambda_parent('comment_count', _dummyint, reverse),
-        'percentage': lambda: _item_lambda_parent('rating', _dummyint, reverse),
-        'votes': lambda: _item_lambda_parent('votes', _dummyint, reverse),
-        'random': lambda: _item_lambda_random(),
-        'activity': lambda: _item_lambda_max_of(['last_watched_at', 'paused_at', 'listed_at'], _dummystr, reverse),
-        'airing': lambda: _item_lambda_airing(try_int(sort_how, fallback=_dummyint))
+        'rank': lambda: _item_lambda_simple(items, 'rank', _dummyint, reverse),
+        'plays': lambda: _item_lambda_simple(items, 'plays', _dummyint, reverse),
+        'watched': lambda: _item_lambda_simple(items, 'last_watched_at', _dummystr, reverse),
+        'paused': lambda: _item_lambda_simple(items, 'paused_at', _dummystr, reverse),
+        'added': lambda: _item_lambda_simple(items, 'listed_at', _dummystr, reverse),
+        'title': lambda: _item_lambda_parent(items, 'title', _dummystr, reverse),
+        'year': lambda: _item_lambda_parent(items, 'year', _dummyint, reverse),
+        'released': lambda: _item_lambda_mixing(items, ('first_aired', 'released',), _dummystr, reverse, sort_types=['show', 'episode']),
+        'runtime': lambda: _item_lambda_parent(items, 'runtime', _dummyint, reverse),
+        'popularity': lambda: _item_lambda_parent(items, 'comment_count', _dummyint, reverse),
+        'percentage': lambda: _item_lambda_parent(items, 'rating', _dummyint, reverse),
+        'votes': lambda: _item_lambda_parent(items, 'votes', _dummyint, reverse),
+        'random': lambda: _item_lambda_random(items, ),
+        'activity': lambda: _item_lambda_max_of(items, ['last_watched_at', 'paused_at', 'listed_at'], _dummystr, reverse),
+        'airing': lambda: _item_lambda_airing(items, try_int(sort_how, fallback=_dummyint))
     }
 
     try:
