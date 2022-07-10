@@ -44,7 +44,7 @@ def try_type(value, output=None):
 
 def partition_list(iterable, pred):
     """Use a predicate to partition entries into false entries and true entries
-    partition(is_odd, range(10)) --> 0 2 4 6 8   and  1 3 5 7 9
+    partition(range(10), is_odd) --> 0 2 4 6 8   and  1 3 5 7 9
     """
     from itertools import tee, filterfalse
     t1, t2 = tee(iterable)
