@@ -198,14 +198,14 @@ class TMDb(RequestAPI):
         infoproperties = self._cache.use_cache(_get_nextaired, cache_name=cache_name, cache_days=CACHE_SHORT)
         return _get_formatted() if infoproperties else infoproperties
 
-    def get_details_request(self, tmdb_type, tmdb_id, season=None, episode=None):
+    def get_details_request(self, tmdb_type, tmdb_id, season=None, episode=None, cache_refresh=False):
         path_affix = []
         if season is not None:
             path_affix += ['season', season]
         if season is not None and episode is not None:
             path_affix += ['episode', episode]
         return self.get_request_lc(
-            tmdb_type, tmdb_id, *path_affix, append_to_response=self.append_to_response) or {}
+            tmdb_type, tmdb_id, *path_affix, append_to_response=self.append_to_response, cache_refresh=cache_refresh) or {}
 
     def get_details(self, tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
         info_item = self.get_details_request(tmdb_type, tmdb_id)
