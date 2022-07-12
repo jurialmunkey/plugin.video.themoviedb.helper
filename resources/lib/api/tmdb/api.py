@@ -307,12 +307,15 @@ class TMDb(RequestAPI):
             items.append(item)
         return items
 
-    def get_season_list(self, tmdb_id, special_folders=0):
+    def get_season_list(self, tmdb_id, special_folders=0, get_detailed=False):
         """
         special_folders: int binary to hide:
         001 (1) = Hide Specials, 010 (2) = Hide Up Next, 100 (4) = Hide Groups
+
+        Use get_detailed flag if going to be getting details via itembuilder anyway
+        TODO: Check if cached detailed version exists and automate this part
         """
-        request = self.get_request_sc(f'tv/{tmdb_id}')
+        request = self.get_details_request('tv', tmdb_id) if get_detailed else self.get_request_sc(f'tv/{tmdb_id}')
         if not request:
             return []
         base_item = self.mapper.get_info(request, 'tv')
@@ -357,8 +360,12 @@ class TMDb(RequestAPI):
             item['unique_ids']['tmdb'] = item['infoproperties']['tmdb_id'] = tmdb_id
         return item
 
-    def get_episode_list(self, tmdb_id, season):
-        request = self.get_request_sc(f'tv/{tmdb_id}/season/{season}')
+    def get_episode_list(self, tmdb_id, season, get_detailed=False):
+        """
+        Use get_detailed flag if going to be getting details via itembuilder anyway
+        TODO: Check if cached detailed version exists and automate this part
+        """
+        request = self.get_details_request('tv', tmdb_id, season) if get_detailed else self.get_request_sc(f'tv/{tmdb_id}/season/{season}')
         if not request:
             return []
         items = [

@@ -204,11 +204,11 @@ class ListUpNext(Container):
     def get_items(self, info, tmdb_type, tmdb_id, page=None, **kwargs):
         if tmdb_type != 'tv':
             return
+        self.ib.cache_only = self.tmdb_cache_only = False
+        self.precache_parent(tmdb_id)
         items = self.trakt_api.get_upnext_list(unique_id=tmdb_id, id_type='tmdb', page=page)
-        self.tmdb_cache_only = False
         if not items:
-            items = self.tmdb_api.get_episode_list(tmdb_id, 1)
-            self.tmdb_cache_only = True
+            items = self.tmdb_api.get_episode_list(tmdb_id, 1, get_detailed=True)
         self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = 'video'
         self.container_content = 'episodes'

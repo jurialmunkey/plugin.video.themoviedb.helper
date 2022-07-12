@@ -15,7 +15,6 @@ class BasicCache(object):
         self._filename = filename
         self._cache = None
         self._mem_only = mem_only
-        self._timers = {}
         self._delaywrite = delay_write
         self._id_list = []
 

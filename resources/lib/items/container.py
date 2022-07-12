@@ -18,9 +18,6 @@ from resources.lib.addon.modimp import lazyimport
 KodiDb = None  # from resources.lib.items.kodi import KodiDb
 
 
-PREBUILD_PARENTSHOW = ['seasons', 'episodes', 'episode_groups', 'trakt_upnext', 'episode_group_seasons']
-
-
 class Container():
     def __init__(self, handle, paramstring, **kwargs):
         # Log Settings
@@ -55,12 +52,14 @@ class Container():
         self.kodi_db = None
 
         # API class initialisation
-        self.ib = None
         self.tmdb_api = TMDb(delay_write=True)
         self.omdb_api = OMDb(delay_write=True) if get_setting('omdb_apikey', 'str') else None
         self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only(), delay_write=True)
         self.trakt_api = TraktAPI(delay_write=True)
         self.mdblist_api = MDbList(delay_write=True)
+        self.ib = ItemBuilder(
+            tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api,
+            delay_write=True, log_timers=self.log_timers, timer_lists=self.timer_lists)
 
         # Trakt Watched Progress Settings
         self.hide_watched = get_setting('widgets_hidewatched') if self.is_widget else False
@@ -153,20 +152,13 @@ class Container():
         self.trakt_method.set_playprogress(li)
         return li
 
-    def add_items(self, items):
-        # Setup ItemBuilder
-        with TimerList(self.timer_lists, '--setup', log_threshold=0.05, logging=self.log_timers):
-            self.ib = ItemBuilder(
-                tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api,
-                delay_write=True, cache_only=self.tmdb_cache_only)
-            self.ib.timer_lists = self.ib._cache._timers = self.timer_lists
-            self.ib.log_timers = self.log_timers
-            if self.parent_params.get('info') in PREBUILD_PARENTSHOW:
-                self.ib.get_parents(
-                    tmdb_type='tv', tmdb_id=self.parent_params.get('tmdb_id'),
-                    season=self.parent_params.get('season', None) if self.parent_params['info'] == 'episodes' else None)
+    def precache_parent(self, tmdb_id, season=None):
+        self.ib.get_parents(tmdb_type='tv', tmdb_id=tmdb_id, season=season)
+        # PREBUILD_PARENTSHOW = ['seasons', 'episodes', 'episode_groups', 'trakt_upnext', 'episode_group_seasons']
 
-        # Build items in threadss
+    def add_items(self, items):
+        # Build items in threads
+        self.ib.cache_only = self.tmdb_cache_only
         with TimerList(self.timer_lists, '--build', log_threshold=0.05, logging=self.log_timers):
             self.ib.parent_params = self.parent_params
             with ParallelThread(items, self._add_item) as pt:

@@ -38,7 +38,7 @@ BACKFILL_BLACKLIST = ['poster']
 
 
 class ItemBuilder(_ArtworkSelector):
-    def __init__(self, tmdb_api=None, ftv_api=None, trakt_api=None, cache_only=False, delay_write=False):
+    def __init__(self, tmdb_api=None, ftv_api=None, trakt_api=None, cache_only=False, delay_write=False, log_timers=False, timer_lists: dict = None):
         self.parent_tv = {}
         self.parent_season = {}
         self.tmdb_api = tmdb_api or TMDb()
@@ -48,8 +48,8 @@ class ItemBuilder(_ArtworkSelector):
         self._regex = re.compile(r'({})'.format('|'.join(IMAGEPATH_ALL)))
         self.parent_params = None
         self.cache_only = cache_only
-        self.timer_lists = {}
-        self.log_timers = False
+        self.timer_lists = timer_lists if isinstance(timer_lists, dict) else {}
+        self.log_timers = log_timers
         self._yy = 0
         self.override = False if self.tmdb_api.iso_language == 'en' else True  # Override titles with TMDb translated data
         # self.__dict__.update(kwargs)
