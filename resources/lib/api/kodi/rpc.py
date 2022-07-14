@@ -3,15 +3,9 @@ from resources.lib.addon.logger import kodi_log
 from resources.lib.addon.parser import try_int, find_dict_in_list
 from resources.lib.api.kodi.mapping import ItemMapper
 
-""" Lazyimports """
-from resources.lib.addon.modimp import lazyimport_module
-json = None
-Stat = None  # xbmcvfs
-BasicCache = None  # resources.lib.files.bcache
 
-
-@lazyimport_module(globals(), 'json')
 def get_jsonrpc(method=None, params=None, query_id=1):
+    import json
     if not method:
         return {}
     query = {
@@ -184,8 +178,8 @@ def get_episode_details(dbid=None):
 
 
 class KodiLibrary(object):
-    @lazyimport_module(globals(), 'resources.lib.files.bcache', import_attr='BasicCache')
     def __init__(self, dbtype=None, tvshowid=None, attempt_reconnect=False, logging=True):
+        from resources.lib.files.bcache import BasicCache
         self.dbtype = dbtype
         self._cache = BasicCache(filename='KodiLibrary.db')
         self.database = self._get_database(dbtype, tvshowid, attempt_reconnect)
@@ -197,8 +191,8 @@ class KodiLibrary(object):
             return movies + tvshows
         return self.get_database(dbtype, tvshowid, attempt_reconnect)
 
-    @lazyimport_module(globals(), 'xbmcvfs', import_attr='Stat')
     def get_database(self, dbtype, tvshowid=None, attempt_reconnect=False, logging=True):
+        from xbmcvfs import Stat
         cache_name = f'db.{dbtype}.{tvshowid}'
         cache_data = self._cache.get_cache(cache_name)
         db_updated = Stat('special://database/MyVideos119.db').st_mtime() or -1
