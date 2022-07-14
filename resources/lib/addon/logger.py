@@ -1,9 +1,9 @@
 import xbmc
 from timeit import default_timer as timer
 from resources.lib.addon.plugin import get_setting, format_name
-from resources.lib.addon.modimp import lazyimport_module
-""" Lazyimports """
-traceback = None
+""" Lazyimports
+import traceback
+"""
 
 
 ADDON_LOGNAME = '[plugin.video.themoviedb.helper]\n'
@@ -27,7 +27,6 @@ def kodi_log(value, level=0):
         xbmc.log(f'Logging Error: {exc}', level=xbmc.LOGINFO)
 
 
-@lazyimport_module(globals(), 'traceback')
 def kodi_traceback(exception, log_msg=None, log_level=1, notification=True):
     """ Method for logging caught exceptions and notifying user """
     if notification:
@@ -38,6 +37,7 @@ def kodi_traceback(exception, log_msg=None, log_level=1, notification=True):
     msg = f'Error Type: {type(exception).__name__}\nError Contents: {exception.args!r}'
     msg = [log_msg, '\n', msg, '\n'] if log_msg else [msg, '\n']
     try:
+        import traceback
         kodi_log(msg + traceback.format_tb(exception.__traceback__), log_level)
     except Exception as exc:
         kodi_log(f'ERROR WITH TRACEBACK!\n{exc}\n{msg}', log_level)

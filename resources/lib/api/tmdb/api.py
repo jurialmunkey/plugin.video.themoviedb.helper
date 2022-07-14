@@ -10,14 +10,11 @@ from resources.lib.api.request import RequestAPI
 from resources.lib.api.tmdb.mapping import ItemMapper, get_episode_to_air
 from urllib.parse import quote_plus
 
-""" Lazyimports """
-from resources.lib.addon.modimp import lazyimport_modules
-Downloader = None  # resources.lib.files.downloader
-json = None
-get_datetime_now = None  # from resources.lib.addon.tmdate
-get_timedelta = None  # from resources.lib.addon.tmdate
-ListItem = None  # from resources.lib.items.listitem
-
+""" Lazyimports
+from resources.lib.items.listitem import ListItem
+from resources.lib.files.downloader import Downloader
+from resources.lib.addon.tmdate import get_datetime_now, get_timedelta
+"""
 
 ARTWORK_QUALITY = get_setting('artwork_quality', 'int')
 ARTLANG_FALLBACK = True if get_setting('fanarttv_enfallback') and not get_setting('fanarttv_secondpref') else False
@@ -134,9 +131,8 @@ class TMDb(RequestAPI):
                         return i.get('id')
         return request[0].get('id')
 
-    @lazyimport_modules(globals(), (
-        {'module_name': 'resources.lib.items.listitem', 'import_attr': 'ListItem'},))
     def get_tmdb_id_from_query(self, tmdb_type, query, header=None, use_details=False, get_listitem=False, auto_single=False):
+        from resources.lib.items.listitem import ListItem
         if not query or not tmdb_type:
             return
         response = self.get_tmdb_id(tmdb_type, query=query, raw_data=True)
@@ -424,23 +420,19 @@ class TMDb(RequestAPI):
             i['label2'] = i['infoproperties'].get('role')
         return items
 
-    @lazyimport_modules(globals(), (
-        {'module_name': 'resources.lib.files.downloader', 'import_attr': 'Downloader'},
-        {'module_name': 'json'}))
     def _get_downloaded_list(self, export_list, sorting=None, reverse=False, datestamp=None):
+        from resources.lib.files.downloader import Downloader
         if not export_list or not datestamp:
             return
-        json_loads = json.loads
+        from json import loads as json_loads
         download_url = f'https://files.tmdb.org/p/exports/{export_list}_ids_{datestamp}.json.gz'
         raw_list = [json_loads(i) for i in Downloader(download_url=download_url).get_gzip_text().splitlines()]
         return sorted(raw_list, key=lambda k: k.get(sorting, ''), reverse=reverse) if sorting else raw_list
 
-    @lazyimport_modules(globals(), (
-        {'module_name': 'resources.lib.addon.tmdate', 'import_attr': 'get_datetime_now'},
-        {'module_name': 'resources.lib.addon.tmdate', 'import_attr': 'get_timedelta'}))
     def get_daily_list(self, export_list, sorting=None, reverse=False):
         if not export_list:
             return
+        from resources.lib.addon.tmdate import get_datetime_now, get_timedelta
         datestamp = get_datetime_now() - get_timedelta(days=2)
         datestamp = datestamp.strftime("%m_%d_%Y")
         # Pickle results rather than cache due to being such a large list

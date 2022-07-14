@@ -5,9 +5,9 @@ from resources.lib.addon.parser import try_int, encode_url, merge_two_dicts
 from resources.lib.addon.tmdate import is_unaired_timestamp
 from resources.lib.addon.logger import kodi_log
 
-""" Lazyimports """
-from resources.lib.addon.modimp import lazyimport_module
-ContextMenu = None  # resources.lib.items.context
+""" Lazyimports
+from resources.lib.items.context import ContextMenu
+"""
 
 
 def ListItem(*args, **kwargs):
@@ -96,8 +96,8 @@ class _ListItem(object):
     def unaired_bool(self):
         return False
 
-    @lazyimport_module(globals(), 'resources.lib.items.context', import_attr='ContextMenu')
     def set_context_menu(self):
+        from resources.lib.items.context import ContextMenu
         for k, v in ContextMenu(self).get():
             self.infoproperties[k] = v
 

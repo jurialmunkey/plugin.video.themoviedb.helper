@@ -1,10 +1,10 @@
 import re
 from resources.lib.addon.consts import ITER_PROPS_MAX
 
-""" Lazyimports """
-from resources.lib.addon.modimp import lazyimport_module
-urlencode = None  # urllib.parse
-unquote_plus = None  # urllib.parse
+""" Lazyimports
+from urllib.parse import unquote_plus
+from urllib.parse import urlencode
+"""
 
 PLUGINPATH = u'plugin://plugin.video.themoviedb.helper/'
 
@@ -51,9 +51,9 @@ def partition_list(iterable, pred):
     return filterfalse(pred, t1), filter(pred, t2)
 
 
-@lazyimport_module(globals(), 'urllib.parse', import_attr='unquote_plus')
 def parse_paramstring(paramstring):
     """ helper to assist to standardise urllib parsing """
+    from urllib.parse import unquote_plus
     params = dict()
     paramstring = paramstring.replace('&amp;', '&')  # Just in case xml string
     for param in paramstring.split('&'):
@@ -64,8 +64,8 @@ def parse_paramstring(paramstring):
     return params
 
 
-@lazyimport_module(globals(), 'urllib.parse', import_attr='urlencode')
 def encode_url(path=None, **kwargs):
+    from urllib.parse import urlencode
     path = path or PLUGINPATH
     paramstring = f'?{urlencode(kwargs)}' if kwargs else ''
     return f'{path}{paramstring}'
