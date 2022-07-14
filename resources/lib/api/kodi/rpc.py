@@ -11,13 +11,13 @@ BasicCache = None  # resources.lib.files.bcache
 
 
 @lazyimport_module(globals(), 'json')
-def get_jsonrpc(method=None, params=None):
+def get_jsonrpc(method=None, params=None, query_id=1):
     if not method:
         return {}
     query = {
         "jsonrpc": "2.0",
         "method": method,
-        "id": 1}
+        "id": query_id}
     if params:
         query["params"] = params
     try:

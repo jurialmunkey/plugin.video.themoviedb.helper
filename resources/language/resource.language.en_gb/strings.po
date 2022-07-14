@@ -2276,6 +2276,11 @@ msgctxt "#32446"
 msgid "plugin:// search URL for {}"
 msgstr ""
 
+#: /resources/lib/player/configure.py
+msgctxt "#32447"
+msgid "Up Next Only"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

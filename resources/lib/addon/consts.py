@@ -68,6 +68,30 @@ NO_LABEL_FORMATTING = ['details', 'upcoming', 'trakt_calendar', 'trakt_myairing'
 PARAM_WIDGETS_RELOAD = 'reload=$INFO[Window(Home).Property(TMDbHelper.Widgets.Reload)]'
 PARAM_WIDGETS_RELOAD_REPLACE = 'reload=%24INFO%5BWindow%28Home%29.Property%28TMDbHelper.Widgets.Reload%29%5D'
 
+UPNEXT_EPISODE_ART = {
+    'thumb': lambda li: li.art.get('thumb') or '',
+    'tvshow.clearart': lambda li: li.art.get('tvshow.clearart') or '',
+    'tvshow.clearlogo': lambda li: li.art.get('tvshow.clearlogo') or '',
+    'tvshow.fanart': lambda li: li.art.get('tvshow.fanart') or '',
+    'tvshow.landscape': lambda li: li.art.get('tvshow.landscape') or '',
+    'tvshow.poster': lambda li: li.art.get('tvshow.poster') or '',
+}
+
+UPNEXT_EPISODE = {
+    'episodeid': lambda li: li.unique_ids.get('tmdb') or '',
+    'tvshowid': lambda li: li.unique_ids.get('tvshow.tmdb') or '',
+    'title': lambda li: li.infolabels.get('title') or '',
+    'art': lambda li: {k: v(li) for k, v in UPNEXT_EPISODE_ART.items()},
+    'season': lambda li: li.infolabels.get('season') or 0,
+    'episode': lambda li: li.infolabels.get('episode') or 0,
+    'showtitle': lambda li: li.infolabels.get('tvshowtitle') or '',
+    'plot': lambda li: li.infolabels.get('plot') or '',
+    'playcount': lambda li: li.infolabels.get('playcount') or 0,
+    'rating': lambda li: li.infolabels.get('rating') or 0,
+    'firstaired': lambda li: li.infolabels.get('premiered') or '',
+    'runtime': lambda li: li.infolabels.get('duration') or 0,
+}
+
 TMDB_ALL_ITEMS_LISTS = {
     'movie': {
         'type': 'movie',

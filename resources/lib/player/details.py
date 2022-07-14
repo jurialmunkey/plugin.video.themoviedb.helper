@@ -45,7 +45,7 @@ def get_next_episodes(tmdb_id, season, episode, player=None):
         if player:
             li.params['player'] = player
             li.params['mode'] = 'play'
-        return li.get_listitem()
+        return li
 
     with ParallelThread(nxt_episodes, _make_listitem) as pt:
         item_queue = pt.queue

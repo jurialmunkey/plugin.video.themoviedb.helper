@@ -107,11 +107,10 @@ class _ConfigurePlayer():
         self.player['is_resolvable'] = is_resolvable
 
     def set_makeplaylist(self):
-        x = Dialog().yesno(get_localized(32424), get_localized(32425))
+        x = Dialog().yesnocustom(get_localized(32424), get_localized(32425), customlabel=get_localized(32447))
         if x == -1:
             return
-        make_playlist = 'true' if x else 'false'
-        self.player['make_playlist'] = make_playlist
+        self.player['make_playlist'] = ['false', 'true', 'upnext'][x]
 
     @staticmethod
     def _get_method_type(method):
