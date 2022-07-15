@@ -11,6 +11,7 @@ from xbmcvfs import Stat
 
 
 def get_jsonrpc(method=None, params=None, query_id=1):
+    import json
     if not method:
         return {}
     query = {
