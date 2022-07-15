@@ -162,8 +162,8 @@ def json_dumps(obj, separators=(',', ':')):
 
 
 def pickle_deepcopy(obj):
-    from pickle import loads
-    return loads(pickle.dumps(obj))
+    import pickle
+    return pickle.loads(pickle.dumps(obj))
 
 
 def get_filecache_name(cache_name, alphanum=False):
