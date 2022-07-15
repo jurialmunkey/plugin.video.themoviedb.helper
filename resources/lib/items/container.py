@@ -13,9 +13,9 @@ from resources.lib.items.builder import ItemBuilder
 from resources.lib.addon.logger import kodi_log, TimerList, log_timer_report
 from threading import Thread
 
-""" Lazyimports """
-from resources.lib.addon.modimp import lazyimport
-KodiDb = None  # from resources.lib.items.kodi import KodiDb
+""" Lazyimports
+from resources.lib.items.kodi import KodiDb
+"""
 
 
 class Container():
@@ -107,7 +107,7 @@ class Container():
     def get_kodi_database(self, tmdb_type):
         if not get_setting('local_db'):
             return
-        lazyimport(globals(), 'resources.lib.items.kodi', import_attr='KodiDb')
+        from resources.lib.items.kodi import KodiDb
         return KodiDb(tmdb_type)
 
     def _add_item(self, i):

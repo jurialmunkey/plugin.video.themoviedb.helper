@@ -7,21 +7,19 @@ from resources.lib.files.bcache import BasicCache
 from resources.lib.addon.logger import kodi_log
 from resources.lib.addon.consts import CACHE_SHORT, CACHE_LONG
 
-""" Lazyimports """
-from resources.lib.addon.modimp import lazyimport_module, lazyimport_modules
-ET = None  # xml.etree.ElementTree
-requests = None
-copy = None
-json = None
+""" Lazyimports
+import xml.etree.ElementTree as ET
+from copy import copy
+from json import dumps
+import requests
+"""
 
 
-@lazyimport_modules(globals(), (
-    {'module_name': 'xml.etree.ElementTree', 'import_as': 'ET'},
-    {'module_name': 'copy', 'import_attr': 'copy'}))
 def translate_xml(request):
     def dictify(r, root=True):
         if root:
             return {r.tag: dictify(r, False)}
+        from copy import copy
         d = copy(r.attrib)
         if r.text:
             d["_text"] = r.text
@@ -31,14 +29,15 @@ def translate_xml(request):
             d[x.tag].append(dictify(x, False))
         return d
     if request:
+        import xml.etree.ElementTree as ET
         request = ET.fromstring(request.content)
         request = dictify(request)
     return request
 
 
-@lazyimport_module(globals(), 'json')
 def json_loads(obj):
-    return json.loads(obj)
+    from json import loads
+    return loads(obj)
 
 
 class RequestAPI(object):
@@ -95,11 +94,11 @@ class RequestAPI(object):
             get_localized(32308).format(' '.join([self.req_api_name, msg_affix])),
             get_localized(32307).format('30'))
 
-    @lazyimport_module(globals(), 'json')
     def fivehundred_error(self, request, wait_time=60):
+        from json import dumps
         self.req_500_err[request] = set_timestamp(wait_time)
-        get_property(self.req_500_err_prop, json.dumps(self.req_500_err))
-        kodi_log(f'ConnectionError: {json.dumps(self.req_500_err)}\nSuppressing retries for 60 seconds', 1)
+        get_property(self.req_500_err_prop, dumps(self.req_500_err))
+        kodi_log(f'ConnectionError: {dumps(self.req_500_err)}\nSuppressing retries for 60 seconds', 1)
         Dialog().notification(
             get_localized(32308).format(self.req_api_name),
             get_localized(32307).format('60'))
@@ -116,8 +115,8 @@ class RequestAPI(object):
         self.req_timeout_err = set_timestamp(self.timeout * 3)
         get_property(self.req_timeout_err_prop, self.req_timeout_err)
 
-    @lazyimport_module(globals(), 'requests')
     def get_simple_api_request(self, request=None, postdata=None, headers=None, method=None):
+        import requests
         try:
             if method == 'delete':
                 return requests.delete(request, headers=headers, timeout=self.timeout)

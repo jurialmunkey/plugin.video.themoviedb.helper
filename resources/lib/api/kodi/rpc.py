@@ -3,6 +3,12 @@ from resources.lib.addon.logger import kodi_log
 from resources.lib.addon.parser import try_int, find_dict_in_list
 from resources.lib.api.kodi.mapping import ItemMapper
 
+""" Lazyimports
+from json import dumps, loads
+from resources.lib.files.bcache import BasicCache
+from xbmcvfs import Stat
+"""
+
 
 def get_jsonrpc(method=None, params=None, query_id=1):
     import json
@@ -15,8 +21,9 @@ def get_jsonrpc(method=None, params=None, query_id=1):
     if params:
         query["params"] = params
     try:
-        jrpc = executeJSONRPC(json.dumps(query))
-        response = json.loads(jrpc)
+        from json import dumps, loads
+        jrpc = executeJSONRPC(dumps(query))
+        response = loads(jrpc)
     except Exception as exc:
         kodi_log(f'TMDbHelper - JSONRPC Error:\n{exc}', 1)
         response = {}
