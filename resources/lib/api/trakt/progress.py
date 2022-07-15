@@ -297,7 +297,7 @@ class _TraktProgress():
 
     @is_authorized
     @use_thread_lock("TraktAPI._get_episode_playprogress.Locked", timeout=10, polling=0.05)
-    @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_LONG)
+    @use_activity_cache('episodes', 'paused_at', cache_days=CACHE_LONG)
     def _get_episode_playprogress(self, id_type):
         sync_list = self.get_sync('playback', 'show')
         if not sync_list:
@@ -337,7 +337,7 @@ class _TraktProgress():
         return main_list
 
     @is_authorized
-    @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_LONG)
+    @use_activity_cache('episodes', 'paused_at', cache_days=CACHE_LONG)
     def get_episode_playprogress(self, unique_id, id_type, season, episode, key='progress'):
         season = try_int(season, fallback=-2)  # Make fallback -2 to prevent matching on 0
         episode = try_int(episode, fallback=-2)  # Make fallback -2 to prevent matching on 0
