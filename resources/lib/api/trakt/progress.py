@@ -6,8 +6,8 @@ from resources.lib.files.futils import pickle_deepcopy
 from resources.lib.items.pages import PaginatedItems
 from resources.lib.api.mapping import get_empty_item
 from resources.lib.api.trakt.items import TraktItems
-from resources.lib.api.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache, use_thread_lock
-from resources.lib.addon.thread import ParallelThread
+from resources.lib.api.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache
+from resources.lib.addon.thread import ParallelThread, use_thread_lock
 from resources.lib.addon.consts import CACHE_SHORT, CACHE_LONG
 from resources.lib.addon.window import get_property
 

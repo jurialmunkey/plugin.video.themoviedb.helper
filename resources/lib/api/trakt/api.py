@@ -11,10 +11,11 @@ from resources.lib.files.bcache import use_simple_cache
 from resources.lib.items.pages import PaginatedItems, get_next_page
 from resources.lib.api.request import RequestAPI
 from resources.lib.api.trakt.items import TraktItems
-from resources.lib.api.trakt.decorators import is_authorized, use_activity_cache, _is_property_lock, use_thread_lock
+from resources.lib.api.trakt.decorators import is_authorized, use_activity_cache
 from resources.lib.api.trakt.progress import _TraktProgress
 from resources.lib.addon.logger import kodi_log, TimerFunc
 from resources.lib.addon.consts import CACHE_SHORT, CACHE_LONG
+from resources.lib.addon.thread import has_property_lock, use_thread_lock
 
 
 API_URL = 'https://api.trakt.tv/'
@@ -339,7 +340,7 @@ class _TraktSync():
             """ Routes between getting cached object or new lookup """
             if not _cache_expired():
                 return data_loads(get_property('TraktSyncLastActivities'))
-            if _is_property_lock('TraktSyncLastActivities.Locked'):  # Other thread getting data so wait for it
+            if has_property_lock('TraktSyncLastActivities.Locked'):  # Other thread getting data so wait for it
                 return data_loads(get_property('TraktSyncLastActivities'))
             return _cache_activity()
 
@@ -503,7 +504,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         # First time authorization in this session so let's confirm
         if self.authorization and get_property('TraktIsAuth') != 'True':
             if not get_timestamp(get_property('TraktRefreshTimeStamp', is_type=float) or 0):
-                if _is_property_lock('TraktCheckingAuth'):  # Wait if another thread is checking authorization
+                if has_property_lock('TraktCheckingAuth'):  # Wait if another thread is checking authorization
                     _get_token()  # Get the token set in the other thread
                     return self.authorization  # Another thread checked token so return
 
