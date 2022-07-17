@@ -10,6 +10,15 @@ from resources.lib.items.context import ContextMenu
 """
 
 
+_is_skinshortcuts = get_condvisibility("Window.IsVisible(script-skinshortcuts.xml)")
+_int_default_select = get_setting('default_select', 'int')
+_is_only_resolve_strm = get_setting('only_resolve_strm')
+_is_hide_unaired_movies = get_setting('hide_unaired_movies')
+_is_hide_unaired_episodes = get_setting('hide_unaired_episodes')
+_is_flatten_seasons = get_setting('flatten_seasons')
+_is_nextaired_linklibrary = get_setting('nextaired_linklibrary')
+
+
 def ListItem(*args, **kwargs):
     """ Factory to build ListItem object """
     factory = {
@@ -127,7 +136,7 @@ class _ListItem(object):
             self.params['info'] = 'trakt_sortby'
 
     def set_params_reroute(self, is_fanarttv=False, extended=None, is_cacheonly=False):
-        if get_condvisibility("Window.IsVisible(script-skinshortcuts.xml)"):
+        if _is_skinshortcuts:
             self._set_params_reroute_skinshortcuts()
 
         # Reroute for extended sorting of trakt list by inprogress to open up next folder
@@ -267,9 +276,9 @@ class _Video(_ListItem):
         return self.unaired_bool()
 
     def _set_params_reroute_default(self):
-        if not get_setting('default_select', 'int'):
+        if not _int_default_select:
             self.params['info'] = 'play'
-            if not get_setting('only_resolve_strm'):
+            if not _is_only_resolve_strm:
                 self.infoproperties['isPlayable'] = 'true'
         else:
             self.params['info'] = 'related'
@@ -292,7 +301,7 @@ class _Movie(_Video):
         self.infolabels['overlay'] = 5
 
     def unaired_bool(self):
-        if get_setting('hide_unaired_movies'):
+        if _is_hide_unaired_movies:
             return True
 
     def _set_params_reroute_details(self):
@@ -325,15 +334,15 @@ class _Tvshow(_Video):
         self.infoproperties['totalseasons'] = try_int(self.infolabels.get('season'))
 
     def unaired_bool(self):
-        if get_setting('hide_unaired_episodes'):
+        if _is_hide_unaired_episodes:
             return True
 
     def _set_params_reroute_details(self):
-        if get_setting('default_select', 'int'):
+        if _int_default_select:
             self.params['info'] = 'related'
             self.is_folder = False
             return
-        self.params['info'] = 'flatseasons' if get_setting('flatten_seasons') else 'seasons'
+        self.params['info'] = 'flatseasons' if _is_flatten_seasons else 'seasons'
 
 
 class _Season(_Tvshow):
@@ -366,7 +375,7 @@ class _Episode(_Tvshow):
 
     def _set_params_reroute_details(self):
         if (self.parent_params.get('info') == 'library_nextaired'
-                and get_setting('nextaired_linklibrary')
+                and _is_nextaired_linklibrary
                 and self.infoproperties.get('tvshow.dbid')):
             self.path = f'videodb://tvshows/titles/{self.infoproperties["tvshow.dbid"]}/'
             self.params = {}

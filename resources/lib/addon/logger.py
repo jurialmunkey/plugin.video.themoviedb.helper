@@ -144,7 +144,8 @@ class TimerList():
 def log_timer_report(timer_lists, paramstring):
     _threaded = [
         'item_api', 'item_tmdb', 'item_ftv', 'item_map', 'item_cache',
-        'item_set', 'item_get', 'item_getx', 'item_non', 'item_nonx', 'item_art']
+        'item_set', 'item_get', 'item_getx', 'item_non', 'item_nonx', 'item_art',
+        'item_abc', 'item_xyz']
     total_log = timer_lists.pop('total', 0)
     timer_log = ['DIRECTORY TIMER REPORT\n', paramstring, '\n']
     timer_log.append('------------------------------\n')
