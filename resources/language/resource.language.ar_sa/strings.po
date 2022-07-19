@@ -158,7 +158,7 @@ msgstr ""
 #: resources/settings.xml
 msgctxt "#32032"
 msgid "Download Players"
-msgstr "تنزيل مشغلين"
+msgstr "تنزيل المشغلات"
 
 #: resources/settings.xml
 msgctxt "#32033"
