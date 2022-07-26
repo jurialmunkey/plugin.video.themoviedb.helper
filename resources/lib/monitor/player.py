@@ -53,13 +53,16 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
             return self.reset_properties()  # Not a video so don't get info
         if self.getVideoInfoTag().getMediaType() not in ['movie', 'episode']:
             return self.reset_properties()  # Not a movie or episode so don't get info TODO Maybe get PVR details also?
+        self.playingfile = self.getPlayingFile()
+        if self.playingfile and self.playingfile.endswith('dummy.mp4'):
+            return self.reset_properties()  # Resolved to dummy so wait
         self.playerstring = get_property('PlayerInfoString')
         self.playerstring = loads(self.playerstring) if self.playerstring else None
 
         self.total_time = self.getTotalTime()
         self.dbtype = self.getVideoInfoTag().getMediaType()
         self.dbid = self.getVideoInfoTag().getDbId()
-        self.imdb_id = self.getVideoInfoTag().getIMDBNumber()
+        self.imdb_id = self.getVideoInfoTag().getIMDBNumber() if self.dbtype == 'movie' else None
         self.query = self.getVideoInfoTag().getTVShowTitle() if self.dbtype == 'episode' else self.getVideoInfoTag().getTitle()
         self.year = self.getVideoInfoTag().getYear() if self.dbtype == 'movie' else None
         self.epyear = self.getVideoInfoTag().getYear() if self.dbtype == 'episode' else None
@@ -78,7 +81,7 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.details = self.details['listitem'] if self.details else None
 
         if not self.details:
-            return self.reset_properties()
+            return self.clear_properties()
 
         self.clear_properties()
 
