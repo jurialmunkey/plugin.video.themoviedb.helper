@@ -50,9 +50,9 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
 
     def get_playingitem(self):
         if not self.isPlayingVideo():
-            return  # Not a video so don't get info
+            return self.reset_properties()  # Not a video so don't get info
         if self.getVideoInfoTag().getMediaType() not in ['movie', 'episode']:
-            return  # Not a movie or episode so don't get info TODO Maybe get PVR details also?
+            return self.reset_properties()  # Not a movie or episode so don't get info TODO Maybe get PVR details also?
         self.playerstring = get_property('PlayerInfoString')
         self.playerstring = loads(self.playerstring) if self.playerstring else None
 
