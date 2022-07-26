@@ -70,7 +70,7 @@ def resolve_to_dummy(handle=None, stop_after=1, delay_wait=0):
         return -1
 
     # Wait for our file to stop before continuing
-    if wait_for_player() <= 0:
+    if stop_after and wait_for_player() <= 0:
         kodi_log(['lib.player.players - stopping dummy file timeout\n', path], 1)
         return -1
 
@@ -103,6 +103,7 @@ class Players(object):
             self.tmdb_type, self.tmdb_id, self.season, self.episode = tmdb_type, tmdb_id, season, episode
             self.dummy_duration = try_float(get_setting('dummy_duration', 'str')) or 1.0
             self.dummy_delay = try_float(get_setting('dummy_delay', 'str')) or 1.0
+            self.dummy_waitresolve = get_setting('dummy_waitresolve')
             self.force_xbmcplayer = get_setting('force_xbmcplayer')
             self.is_strm = islocal
             self.combined_players = get_setting('combined_players')
@@ -658,7 +659,7 @@ class Players(object):
         # If PlayMedia method chosen re-route to Player() unless expert settings on
         if action:
             if self.is_strm or not get_setting('only_resolve_strm'):
-                resolve_to_dummy(handle, self.dummy_duration, self.dummy_delay)  # If we're calling external we need to resolve to dummy
+                resolve_to_dummy(handle, self.dummy_duration if self.dummy_waitresolve else 0, self.dummy_delay)  # If we're calling external we need to resolve to dummy
             Player().play(action, listitem) if self.force_xbmcplayer else executebuiltin(f'PlayMedia({action})')
             kodi_log([
                 f'lib.player - playing path with {"Player()" if self.force_xbmcplayer else "PlayMedia"}\n',

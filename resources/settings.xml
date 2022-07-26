@@ -641,14 +641,20 @@
 					</constraints>
 					<control type="spinner" format="string"/>
 				</setting>
+
+				<setting id="only_resolve_strm" type="boolean" label="32373" help="">
+					<level>0</level>
+					<default>False</default>
+					<control type="toggle"/>
+				</setting>
 				<setting id="force_xbmcplayer" type="boolean" label="32364" help="">
 					<level>0</level>
 					<default>True</default>
 					<control type="toggle"/>
 				</setting>
-				<setting id="only_resolve_strm" type="boolean" label="32373" help="">
+				<setting id="dummy_waitresolve" type="boolean" label="32448" help="">
 					<level>0</level>
-					<default>False</default>
+					<default>True</default>
 					<control type="toggle"/>
 				</setting>
 			</group>
