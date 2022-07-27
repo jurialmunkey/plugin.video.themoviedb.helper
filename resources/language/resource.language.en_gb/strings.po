@@ -138,7 +138,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32028"
-msgid "Use fanart.tv for widget artwork (increases load times)"
+msgid "Use fanart.tv for widget artwork (slower)"
 msgstr ""
 
 #: /resources/settings.xml
@@ -168,7 +168,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32034"
-msgid "Get watched indicators from Trakt"
+msgid "Get watched indicators and episode counts (slower)"
 msgstr ""
 
 #: /resources/settings.xml
@@ -409,7 +409,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32081"
-msgid "Show next page item"
+msgid "Next page item"
 msgstr ""
 
 #: /resources/settings.xml
@@ -1761,7 +1761,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32346"
-msgid "Use hack to get Kodi Trakt addon to scrobble local files"
+msgid "Resend local files (fix Trakt scrobbling bug)"
 msgstr ""
 
 #: /resources/settings.xml
@@ -1852,12 +1852,12 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32363"
-msgid "Delay before playing after dummy resolves (seconds)"
+msgid "Delay after resolving (seconds)"
 msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32364"
-msgid "Reroute PlayMedia to call xbmc.Player() directly"
+msgid "Reroute PlayMedia to xbmc.Player()"
 msgstr ""
 
 #: /resources/lib/addon/plugin.py
@@ -1902,7 +1902,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32373"
-msgid "Restrict dummy setResolvedUrl method to library strm"
+msgid "Restrict to library strm"
 msgstr ""
 
 #: /resources/lib/player/players.py
@@ -1990,7 +1990,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32390"
-msgid "Use alternative .nfo filename to avoid externally managed .nfo conflicts"
+msgid "Use alternative .nfo filename"
 msgstr ""
 
 #: /resources/lib/script/router.py
@@ -2023,7 +2023,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32396"
-msgid "Unwatched counts only on in-progress tvshows"
+msgid "Set unwatched episode count for in-progress tvshows only"
 msgstr ""
 
 #: /resources/settings.xml
@@ -2058,7 +2058,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32403"
-msgid "Increase synced lists items per page (increases load times)"
+msgid "Increase sync list item limit per page (slower)"
 msgstr ""
 
 #: /resources/settings.xml
@@ -2078,7 +2078,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32407"
-msgid "Get resume points from Trakt (increases load times)"
+msgid "Get resume points (experimental) (slower)"
 msgstr ""
 
 #: /resources/settings.xml
@@ -2283,7 +2283,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32448"
-msgid "Wait for dummy to stop before attempting playback"
+msgid "Stop before attempting playback"
 msgstr ""
 
 msgctxt "#30030"
@@ -2545,7 +2545,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32021"
-msgid "Use fanart.tv for plugin artwork (increases load times)"
+msgid "Use fanart.tv for plugin artwork (slower)"
 msgstr ""
 
 #: /resources/settings.xml
