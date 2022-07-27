@@ -655,6 +655,8 @@ class Players(object):
         # Set our playerstring for player monitor to update kodi watched status
         if self.playerstring:
             get_property('PlayerInfoString', set_property=self.playerstring)
+        else:
+            get_property('PlayerInfoString', clear_property=True)
 
         # If PlayMedia method chosen re-route to Player() unless expert settings on
         if action:
