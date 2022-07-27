@@ -64,7 +64,7 @@ def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
     try:
         return routing[sort_by]()
     except KeyError:
-        return _item_lambda_simple('listed_at', _dummystr, True)
+        return _item_lambda_simple(items, 'listed_at', _dummystr, True)
 
 
 def _get_item_title(item):
