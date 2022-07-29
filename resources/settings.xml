@@ -92,6 +92,11 @@
 						<heading>32005</heading>
 					</control>
 				</setting>
+				<setting id="ignore_regionreleasefilter" type="boolean" label="32449" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
 			</group>
 			<group id="2" label="32367">
 				<setting id="local_db" type="boolean" label="32038" help="">

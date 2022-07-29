@@ -2286,6 +2286,11 @@ msgctxt "#32448"
 msgid "Stop before attempting playback"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32449"
+msgid "Ignore region release filter"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

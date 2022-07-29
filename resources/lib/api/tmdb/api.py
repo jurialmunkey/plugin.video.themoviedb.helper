@@ -38,6 +38,7 @@ class TMDb(RequestAPI):
         self.language = language
         self.iso_language = language[:2]
         self.iso_country = language[-2:]
+        self.iso_region = None if get_setting('ignore_regionreleasefilter') else self.iso_country
         self.req_language = f'{self.iso_language}-{self.iso_country}&include_image_language={self.iso_language},null{",en" if ARTLANG_FALLBACK else ""}&include_video_language={self.iso_language},null,en'
         self.mpaa_prefix = mpaa_prefix
         self.append_to_response = APPEND_TO_RESPONSE
@@ -515,20 +516,20 @@ class TMDb(RequestAPI):
         return self.get_basic_list(path, tmdb_type, **kwargs)
 
     def get_response_json(self, *args, **kwargs):
-        kwargs['region'] = self.iso_country
+        kwargs['region'] = self.iso_region
         kwargs['language'] = self.req_language
         return self.get_api_request_json(self.get_request_url(*args, **kwargs))
 
     def get_request_sc(self, *args, **kwargs):
         """ Get API request using the short cache """
         kwargs['cache_days'] = CACHE_SHORT
-        kwargs['region'] = self.iso_country
+        kwargs['region'] = self.iso_region
         kwargs['language'] = self.req_language
         return self.get_request(*args, **kwargs)
 
     def get_request_lc(self, *args, **kwargs):
         """ Get API request using the long cache """
         kwargs['cache_days'] = CACHE_MEDIUM
-        kwargs['region'] = self.iso_country
+        kwargs['region'] = self.iso_region
         kwargs['language'] = self.req_language
         return self.get_request(*args, **kwargs)
