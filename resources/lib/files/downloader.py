@@ -8,10 +8,10 @@ from resources.lib.addon.plugin import get_localized, ADDONNAME
 from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.logger import kodi_log
 
-""" Lazyimports """
-from resources.lib.addon.modimp import lazyimport_module
-zipfile = None
-requests = None
+""" Lazyimports
+import zipfile
+import requests
+"""
 
 
 class Downloader(object):
@@ -42,8 +42,8 @@ class Downloader(object):
         except ValueError:
             return False
 
-    @lazyimport_module(globals(), 'requests')
     def check_url(self, url, cred):
+        import requests
         if not self.is_url(url):
             kodi_log(f'URL is not of a valid schema: {url}', 1)
             return False
@@ -65,8 +65,8 @@ class Downloader(object):
             kodi_log(f'URL check error for {url}: [{e}]', 1)
             return False
 
-    @lazyimport_module(globals(), 'requests')
     def open_url(self, url, stream=False, check=False, cred=None, count=0):
+        import requests
         if not url:
             return False
 
@@ -114,8 +114,8 @@ class Downloader(object):
             content = downloaded_gzip.read()
         return content
 
-    @lazyimport_module(globals(), 'zipfile')
     def get_extracted_zip(self):
+        import zipfile
         if not self.download_url or not self.extract_to:
             return
 

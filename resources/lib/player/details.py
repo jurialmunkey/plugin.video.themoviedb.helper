@@ -11,6 +11,9 @@ from collections import defaultdict
 from urllib.parse import quote_plus, quote
 
 
+EXTERNAL_ID_TYPES = ['tmdb', 'tvdb', 'imdb', 'slug', 'trakt']
+
+
 def get_next_episodes(tmdb_id, season, episode, player=None):
     tmdb_api = TMDb()
 
@@ -45,7 +48,7 @@ def get_next_episodes(tmdb_id, season, episode, player=None):
         if player:
             li.params['player'] = player
             li.params['mode'] = 'play'
-        return li.get_listitem()
+        return li
 
     with ParallelThread(nxt_episodes, _make_listitem) as pt:
         item_queue = pt.queue
@@ -72,32 +75,22 @@ def get_external_ids(li, season=None, episode=None):
     details = trakt_api.get_details(trakt_type, trakt_id, extended=None)
     if not details:
         return
+    _details_ids = details.get('ids', {})
     if li.infolabels.get('mediatype') in ['movie', 'tvshow', 'season']:
-        return {
-            'unique_ids': {
-                'tmdb': unique_id,
-                'tvdb': details.get('ids', {}).get('tvdb'),
-                'imdb': details.get('ids', {}).get('imdb'),
-                'slug': details.get('ids', {}).get('slug'),
-                'trakt': details.get('ids', {}).get('trakt')}}
+        _uids = {i: _details_ids[i] for i in EXTERNAL_ID_TYPES if _details_ids.get(i)}
+        _uids['tmdb'] = unique_id
+        return {'unique_ids': _uids}
     episode_details = trakt_api.get_details(
         trakt_type, trakt_id,
         season=season or li.infolabels.get('season'),
         episode=episode or li.infolabels.get('episode'),
         extended=None)
+    _episode_details_ids = episode_details.get('ids', {})
     if episode_details:
-        return {
-            'unique_ids': {
-                'tvshow.tmdb': unique_id,
-                'tvshow.tvdb': details.get('ids', {}).get('tvdb'),
-                'tvshow.imdb': details.get('ids', {}).get('imdb'),
-                'tvshow.slug': details.get('ids', {}).get('slug'),
-                'tvshow.trakt': details.get('ids', {}).get('trakt'),
-                'tvdb': episode_details.get('ids', {}).get('tvdb'),
-                'tmdb': episode_details.get('ids', {}).get('tmdb'),
-                'imdb': episode_details.get('ids', {}).get('imdb'),
-                'slug': episode_details.get('ids', {}).get('slug'),
-                'trakt': episode_details.get('ids', {}).get('trakt')}}
+        _uids = {f'tvshow.{i}': _details_ids[i] for i in EXTERNAL_ID_TYPES if _details_ids.get(i)}
+        _uids.update({f'{i}': _episode_details_ids[i] for i in EXTERNAL_ID_TYPES if _episode_details_ids.get(i)})
+        _uids['tvshow.tmdb'] = unique_id
+        return {'unique_ids': _uids}
 
 
 def get_item_details(tmdb_type, tmdb_id, season=None, episode=None, language=None):
@@ -114,7 +107,7 @@ def get_item_details(tmdb_type, tmdb_id, season=None, episode=None, language=Non
     details['art'] = ib.get_item_artwork(artwork, is_season=True if season else False)
     details = ListItem(**details)
     details.infolabels['mediatype'] == 'movie' if tmdb_type == 'movie' else 'episode'
-    details.set_details(details=get_external_ids(details, season=season, episode=episode))
+    details.set_details(details=get_external_ids(details, season=season, episode=episode), reverse=True)
     return details
 
 

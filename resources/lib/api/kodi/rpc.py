@@ -3,26 +3,26 @@ from resources.lib.addon.logger import kodi_log
 from resources.lib.addon.parser import try_int, find_dict_in_list
 from resources.lib.api.kodi.mapping import ItemMapper
 
-""" Lazyimports """
-from resources.lib.addon.modimp import lazyimport_module
-json = None
-Stat = None  # xbmcvfs
-BasicCache = None  # resources.lib.files.bcache
+""" Lazyimports
+from json import dumps, loads
+from resources.lib.files.bcache import BasicCache
+from xbmcvfs import Stat
+"""
 
 
-@lazyimport_module(globals(), 'json')
-def get_jsonrpc(method=None, params=None):
+def get_jsonrpc(method=None, params=None, query_id=1):
     if not method:
         return {}
     query = {
         "jsonrpc": "2.0",
         "method": method,
-        "id": 1}
+        "id": query_id}
     if params:
         query["params"] = params
     try:
-        jrpc = executeJSONRPC(json.dumps(query))
-        response = json.loads(jrpc)
+        from json import dumps, loads
+        jrpc = executeJSONRPC(dumps(query))
+        response = loads(jrpc)
     except Exception as exc:
         kodi_log(f'TMDbHelper - JSONRPC Error:\n{exc}', 1)
         response = {}
@@ -184,8 +184,8 @@ def get_episode_details(dbid=None):
 
 
 class KodiLibrary(object):
-    @lazyimport_module(globals(), 'resources.lib.files.bcache', import_attr='BasicCache')
     def __init__(self, dbtype=None, tvshowid=None, attempt_reconnect=False, logging=True):
+        from resources.lib.files.bcache import BasicCache
         self.dbtype = dbtype
         self._cache = BasicCache(filename='KodiLibrary.db')
         self.database = self._get_database(dbtype, tvshowid, attempt_reconnect)
@@ -197,8 +197,8 @@ class KodiLibrary(object):
             return movies + tvshows
         return self.get_database(dbtype, tvshowid, attempt_reconnect)
 
-    @lazyimport_module(globals(), 'xbmcvfs', import_attr='Stat')
     def get_database(self, dbtype, tvshowid=None, attempt_reconnect=False, logging=True):
+        from xbmcvfs import Stat
         cache_name = f'db.{dbtype}.{tvshowid}'
         cache_data = self._cache.get_cache(cache_name)
         db_updated = Stat('special://database/MyVideos119.db').st_mtime() or -1

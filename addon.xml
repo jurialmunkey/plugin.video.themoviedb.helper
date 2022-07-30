@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.themoviedb.helper"
-version="4.9.7"
+version="4.10.20"
 name="TheMovieDb Helper"
 provider-name="jurialmunkey">
 <requires>
   <import addon="xbmc.python" version="3.0.0"/>
   <import addon="script.module.requests" version="2.9.1"/>
   <import addon="script.module.pil" version="1.1.7"/>
+  <import addon="script.module.addon.signals" version="0.0.6" />
 </requires>
 <extension point="xbmc.python.pluginsource" library="plugin.py">
   <provides>video</provides>
@@ -46,6 +47,7 @@ provider-name="jurialmunkey">
   </menu>
 </extension>
 <extension point="xbmc.addon.metadata">
+  <reuselanguageinvoker>false</reuselanguageinvoker>
   <summary lang="en_GB">TheMovieDb Helper - Now With Trakt Support!</summary>
   <summary lang="es_ES">TheMovieDb Helper - ¡Ahora con soporte para Trakt!</summary>
   <summary lang="fr_FR">TheMovieDb Helper - Maintenant avec support Trakt!</summary>
@@ -64,25 +66,5 @@ provider-name="jurialmunkey">
     <screenshot>resources/screenshot-01.jpg</screenshot>
     <screenshot>resources/screenshot-02.jpg</screenshot>
   </assets>
-<news>
-  - Improved PVR service matching
-  - Avoid unnecessary FanartTV re-requests
-  - Add In-Progress Episodes Trakt list
-  - Add Still to Watch Trakt list (In-Progress+Watchlist)
-  - Allow stacking of episodes from same show in calendar
-  - Fix collection matching and query encoding
-  - Better list filtering options
-  - Add cacheonly=true param for faster dialog widget loading
-  - Add script getter/setter functions for audio/subs in player
-  - Allow larger sync list items per page limits
-  - Fix plugincategory labels
-  - Fix randomised lists not refreshing
-  - Fix string formatter for update to Py3.7 in 19.3
-  - Fix fallback players when asserted value not available
-  - Allow both mark as watched/unwatched in Trakt options
-  - Update branding and icons
-  - Add temporary service pause for custom dialogs via Window.Property(TMDbHelper.ServicePause)
-  - Artwork monitor fixes
-</news>
 </extension>
 </addon>

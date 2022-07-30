@@ -1,5 +1,5 @@
 import re
-from xbmc import Monitor, Player, PlayList, PLAYLIST_VIDEO
+from xbmc import Monitor, Player
 from xbmcgui import Dialog
 from xbmcplugin import setResolvedUrl
 from xbmcaddon import Addon as KodiAddon
@@ -13,7 +13,7 @@ from resources.lib.files.futils import read_file, normalise_filesize
 from resources.lib.api.kodi.rpc import get_directory, KodiLibrary
 from resources.lib.player.details import get_item_details, get_detailed_item, get_playerstring, get_language_details, get_next_episodes
 from resources.lib.player.inputter import KeyboardInputter
-from resources.lib.player.configure import get_players_from_file
+from resources.lib.player.putils import get_players_from_file, make_playlist, make_upnext
 from resources.lib.addon.logger import kodi_log
 
 
@@ -70,7 +70,7 @@ def resolve_to_dummy(handle=None, stop_after=1, delay_wait=0):
         return -1
 
     # Wait for our file to stop before continuing
-    if wait_for_player() <= 0:
+    if stop_after and wait_for_player() <= 0:
         kodi_log(['lib.player.players - stopping dummy file timeout\n', path], 1)
         return -1
 
@@ -103,6 +103,7 @@ class Players(object):
             self.tmdb_type, self.tmdb_id, self.season, self.episode = tmdb_type, tmdb_id, season, episode
             self.dummy_duration = try_float(get_setting('dummy_duration', 'str')) or 1.0
             self.dummy_delay = try_float(get_setting('dummy_delay', 'str')) or 1.0
+            self.dummy_waitresolve = get_setting('dummy_waitresolve')
             self.force_xbmcplayer = get_setting('force_xbmcplayer')
             self.is_strm = islocal
             self.combined_players = get_setting('combined_players')
@@ -564,26 +565,21 @@ class Players(object):
             path = self.details.get_listitem()
         return path
 
-    def queue_next_episodes(self):
+    def queue_next_episodes(self, route='make_upnext'):
         if not self.current_player or self.current_player.get('mode') != 'play_episode':
             return
         if self.season is None or self.episode is None:
             return
         episode_queue = get_next_episodes(self.tmdb_id, self.season, self.episode, self.current_player['file'])
-        if not episode_queue:
+        if not episode_queue or len(episode_queue) < 2:
             return
+
         wait_for_player(to_start=True, timeout=30)
-        playlist = PlayList(PLAYLIST_VIDEO)
 
-        # Only rebuild playlist if user is starting playback from scratch
-        # Otherwise we keep the existing playlist to retain position
-        if playlist.getposition() != 0:
-            return
-
-        # Rebuild playlist from scratch
-        playlist.clear()
-        for li in episode_queue:
-            playlist.add(li.getPath(), li)
+        if route == 'make_upnext':
+            return make_upnext(episode_queue[0], episode_queue[1])
+        if route == 'make_playlist':
+            return make_playlist(episode_queue)
 
     def _update_listing_hack(self, folder_path=None, reset_focus=None):
         """
@@ -659,11 +655,13 @@ class Players(object):
         # Set our playerstring for player monitor to update kodi watched status
         if self.playerstring:
             get_property('PlayerInfoString', set_property=self.playerstring)
+        else:
+            get_property('PlayerInfoString', clear_property=True)
 
         # If PlayMedia method chosen re-route to Player() unless expert settings on
         if action:
             if self.is_strm or not get_setting('only_resolve_strm'):
-                resolve_to_dummy(handle, self.dummy_duration, self.dummy_delay)  # If we're calling external we need to resolve to dummy
+                resolve_to_dummy(handle, self.dummy_duration if self.dummy_waitresolve else 0, self.dummy_delay)  # If we're calling external we need to resolve to dummy
             Player().play(action, listitem) if self.force_xbmcplayer else executebuiltin(f'PlayMedia({action})')
             kodi_log([
                 f'lib.player - playing path with {"Player()" if self.force_xbmcplayer else "PlayMedia"}\n',
@@ -685,5 +683,8 @@ class Players(object):
                     listitem.getPath()], 1)
 
         # Queue up next episodes if player supports it
-        if self.current_player.get('make_playlist') and self.current_player['make_playlist'].lower() == 'true':
-            self.queue_next_episodes()
+        if self.current_player.get('make_playlist'):
+            if self.current_player['make_playlist'].lower() == 'upnext':
+                self.queue_next_episodes(route='make_upnext')
+            elif self.current_player['make_playlist'].lower() == 'true':
+                self.queue_next_episodes(route='make_playlist')

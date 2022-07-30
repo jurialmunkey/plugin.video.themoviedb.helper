@@ -1,13 +1,22 @@
 from xbmcgui import ListItem as KodiListItem
-from resources.lib.addon.consts import ACCEPTED_MEDIATYPES
+from resources.lib.addon.consts import ACCEPTED_MEDIATYPES, PARAM_WIDGETS_RELOAD
 from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_media_type, get_setting, get_condvisibility, get_localized
 from resources.lib.addon.parser import try_int, encode_url, merge_two_dicts
 from resources.lib.addon.tmdate import is_unaired_timestamp
 from resources.lib.addon.logger import kodi_log
 
-""" Lazyimports """
-from resources.lib.addon.modimp import lazyimport_module
-ContextMenu = None  # resources.lib.items.context
+""" Lazyimports
+from resources.lib.items.context import ContextMenu
+"""
+
+
+_is_skinshortcuts = get_condvisibility("Window.IsVisible(script-skinshortcuts.xml)")
+_int_default_select = get_setting('default_select', 'int')
+_is_only_resolve_strm = get_setting('only_resolve_strm')
+_is_hide_unaired_movies = get_setting('hide_unaired_movies')
+_is_hide_unaired_episodes = get_setting('hide_unaired_episodes')
+_is_flatten_seasons = get_setting('flatten_seasons')
+_is_nextaired_linklibrary = get_setting('nextaired_linklibrary')
 
 
 def ListItem(*args, **kwargs):
@@ -96,8 +105,8 @@ class _ListItem(object):
     def unaired_bool(self):
         return False
 
-    @lazyimport_module(globals(), 'resources.lib.items.context', import_attr='ContextMenu')
     def set_context_menu(self):
+        from resources.lib.items.context import ContextMenu
         for k, v in ContextMenu(self).get():
             self.infoproperties[k] = v
 
@@ -127,7 +136,7 @@ class _ListItem(object):
             self.params['info'] = 'trakt_sortby'
 
     def set_params_reroute(self, is_fanarttv=False, extended=None, is_cacheonly=False):
-        if get_condvisibility("Window.IsVisible(script-skinshortcuts.xml)"):
+        if _is_skinshortcuts:
             self._set_params_reroute_skinshortcuts()
 
         # Reroute for extended sorting of trakt list by inprogress to open up next folder
@@ -170,7 +179,12 @@ class _ListItem(object):
             self.infoproperties['widget'] = widget
 
     def get_url(self):
-        return encode_url(self.path, **self.params)
+        def _get_url(path, reload=None, widget=None, **params):
+            url = encode_url(path, **params)
+            if widget and widget.lower() == 'true':
+                url = f'{url}&widget=true&{PARAM_WIDGETS_RELOAD}'
+            return url
+        return _get_url(self.path, **self.params)
 
     def get_listitem(self, offscreen=True):
         if self.infolabels.get('mediatype') not in ACCEPTED_MEDIATYPES:
@@ -262,9 +276,9 @@ class _Video(_ListItem):
         return self.unaired_bool()
 
     def _set_params_reroute_default(self):
-        if not get_setting('default_select', 'int'):
+        if not _int_default_select:
             self.params['info'] = 'play'
-            if not get_setting('only_resolve_strm'):
+            if not _is_only_resolve_strm:
                 self.infoproperties['isPlayable'] = 'true'
         else:
             self.params['info'] = 'related'
@@ -287,7 +301,7 @@ class _Movie(_Video):
         self.infolabels['overlay'] = 5
 
     def unaired_bool(self):
-        if get_setting('hide_unaired_movies'):
+        if _is_hide_unaired_movies:
             return True
 
     def _set_params_reroute_details(self):
@@ -320,15 +334,15 @@ class _Tvshow(_Video):
         self.infoproperties['totalseasons'] = try_int(self.infolabels.get('season'))
 
     def unaired_bool(self):
-        if get_setting('hide_unaired_episodes'):
+        if _is_hide_unaired_episodes:
             return True
 
     def _set_params_reroute_details(self):
-        if get_setting('default_select', 'int'):
+        if _int_default_select:
             self.params['info'] = 'related'
             self.is_folder = False
             return
-        self.params['info'] = 'flatseasons' if get_setting('flatten_seasons') else 'seasons'
+        self.params['info'] = 'flatseasons' if _is_flatten_seasons else 'seasons'
 
 
 class _Season(_Tvshow):
@@ -361,7 +375,7 @@ class _Episode(_Tvshow):
 
     def _set_params_reroute_details(self):
         if (self.parent_params.get('info') == 'library_nextaired'
-                and get_setting('nextaired_linklibrary')
+                and _is_nextaired_linklibrary
                 and self.infoproperties.get('tvshow.dbid')):
             self.path = f'videodb://tvshows/titles/{self.infoproperties["tvshow.dbid"]}/'
             self.params = {}

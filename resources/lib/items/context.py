@@ -1,7 +1,8 @@
 from resources.lib.addon.consts import CONTEXT_MENU_ITEMS
-from resources.lib.addon.modimp import lazyimport_module
-""" Lazyimports """
-dumps = None
+
+""" Lazyimports
+from json import dumps
+"""
 
 
 class ContextMenu():
@@ -22,8 +23,8 @@ class ContextMenu():
         }
         self.mediatype = self._li.infolabels.get('mediatype')
 
-    @lazyimport_module(globals(), 'json', import_attr='dumps')
     def get(self, context=None):
+        from json import dumps
         context = context or CONTEXT_MENU_ITEMS
         return [(name, dumps(item)) for name, item in (
             (name, self._build_item(mediatypes)) for name, mediatypes in context.items()) if item]

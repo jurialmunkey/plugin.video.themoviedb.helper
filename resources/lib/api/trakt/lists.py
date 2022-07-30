@@ -184,8 +184,13 @@ class ListNextEpisodes(Container):
     def get_items(self, info, tmdb_type, page=None, **kwargs):
         if tmdb_type != 'tv':
             return
-        sort_by_premiered = True if get_setting('trakt_nextepisodesort', 'str') == 'airdate' else False
-        items = self.trakt_api.get_upnext_episodes_list(page=page, sort_by_premiered=sort_by_premiered)
+        sort_settings = {
+            'airdate': ('released', 'desc'),
+            'todays': ('airing', -1),
+            'lastweek': ('airing', -7),
+            'recentlywatched': (None, None)}
+        sort_by, sort_how = sort_settings[get_setting('trakt_nextepisodesort', 'str')]
+        items = self.trakt_api.get_upnext_episodes_list(page=page, sort_by=sort_by, sort_how=sort_how)
         self.tmdb_cache_only = False
         # self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = 'video'
@@ -199,11 +204,11 @@ class ListUpNext(Container):
     def get_items(self, info, tmdb_type, tmdb_id, page=None, **kwargs):
         if tmdb_type != 'tv':
             return
+        self.ib.cache_only = self.tmdb_cache_only = False
+        self.precache_parent(tmdb_id)
         items = self.trakt_api.get_upnext_list(unique_id=tmdb_id, id_type='tmdb', page=page)
-        self.tmdb_cache_only = False
         if not items:
-            items = self.tmdb_api.get_episode_list(tmdb_id, 1)
-            self.tmdb_cache_only = True
+            items = self.tmdb_api.get_episode_list(tmdb_id, 1, get_detailed=True)
         self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = 'video'
         self.container_content = 'episodes'
@@ -264,7 +269,7 @@ class ListCustomSearch(Container):
 
 class ListSortBy(Container):
     def get_items(self, info, **kwargs):
-        def _listsortby_item(i, params):
+        def _listsortby_item(i, **params):
             item = get_empty_item()
             item['label'] = item['infolabels']['title'] = f'{params.get("list_name")}[CR]{i["name"]}'
             item['params'] = params
@@ -273,6 +278,6 @@ class ListSortBy(Container):
             return item
         kwargs['info'] = kwargs.pop('parent_info', None)
         items = get_sort_methods() if kwargs['info'] == 'trakt_userlist' else get_sort_methods(True)
-        items = [_listsortby_item(i, kwargs.copy()) for i in items]
+        items = [_listsortby_item(i, **kwargs) for i in items]
         self.library = 'video'
         return items

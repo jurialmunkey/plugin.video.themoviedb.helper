@@ -56,7 +56,11 @@ class CommonMonitorFunctions(object):
         else:
             get_property(key, set_property=f'{value}')
 
-    def set_iter_properties(self, dictionary, keys):
+    def set_iter_properties(self, dictionary: dict, keys: set):
+        """ Interates through a set of keys and adds corresponding value from the dictionary as a window property
+        Lists of values from dictionary are joined with ' / '.join(dictionary[key])
+        TMDbHelper.ListItem.{key} = dictionary[key]
+        """
         if not isinstance(dictionary, dict):
             dictionary = {}
         for k in keys:

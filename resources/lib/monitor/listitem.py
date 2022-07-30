@@ -80,7 +80,7 @@ class ListItemMonitor(CommonMonitorFunctions):
                 "Window.IsVisible(MyPVRRecordings.xml) | "
                 "Window.IsVisible(MyPVRSearch.xml) | "
                 "Window.IsVisible(MyPVRGuide.xml)"):
-            return 'multi'
+            return 'multi' if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisablePVR)") else ''
         if self.container == 'Container.':
             return get_infolabel('Container.Content()') or ''
         return ''
@@ -119,7 +119,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             self.pre_item = self.cur_item
 
     def get_cur_folder(self):
-        return (self.container, get_infolabel('Container.Content()'), self.get_numitems())
+        return ('current_folder', self.container, get_infolabel('Container.Content()'), self.get_numitems(),)
 
     def clear_properties(self, ignore_keys=None):
         if not self.get_artwork(source="Art(artist.clearlogo)|Art(tvshow.clearlogo)|Art(clearlogo)"):
@@ -245,7 +245,7 @@ class ListItemMonitor(CommonMonitorFunctions):
 
         # If the folder changed let's clear all the properties before doing a look-up
         # Possible that our new look-up will fail so good to have a clean slate
-        if not self.is_same_folder():
+        if not self.is_same_folder(update=True):
             self.clear_properties()
 
         # Get look-up details
@@ -261,7 +261,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         # Need a TMDb type to do a details look-up so exit if we don't have one
         tmdb_type = self.get_tmdb_type()
         if not tmdb_type:
-            self.clear_properties()
+            self.clear_properties(ignore_keys={'cur_item'})
             return get_property('IsUpdating', clear_property=True)
 
         # Immediately clear some properties like ratings and artwork
@@ -288,7 +288,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             artwork = details['artwork']
             details = details['listitem']
         if not details:
-            self.clear_properties()
+            self.clear_properties(ignore_keys={'cur_item'})
             return get_property('IsUpdating', clear_property=True)
 
         # Need to update Next Aired with a shorter cache time than details

@@ -16,11 +16,9 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.reset_properties()
 
     def onAVStarted(self):
-        self.reset_properties()
         self.get_playingitem()
 
     def onAVChange(self):
-        self.reset_properties()
         self.get_playingitem()
 
     def onPlayBackEnded(self):
@@ -47,24 +45,34 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.tmdb_id = None
         self.details = {}
         self.tmdb_type = None
+        self.previous_item = None
+        self.current_item = None
 
     def get_playingitem(self):
         if not self.isPlayingVideo():
-            return  # Not a video so don't get info
+            return self.reset_properties()  # Not a video so don't get info
         if self.getVideoInfoTag().getMediaType() not in ['movie', 'episode']:
-            return  # Not a movie or episode so don't get info TODO Maybe get PVR details also?
+            return self.reset_properties()  # Not a movie or episode so don't get info TODO Maybe get PVR details also?
+        self.playingfile = self.getPlayingFile()
+        if self.playingfile and self.playingfile.endswith('dummy.mp4'):
+            return self.reset_properties()  # Resolved to dummy so wait
         self.playerstring = get_property('PlayerInfoString')
         self.playerstring = loads(self.playerstring) if self.playerstring else None
 
         self.total_time = self.getTotalTime()
         self.dbtype = self.getVideoInfoTag().getMediaType()
         self.dbid = self.getVideoInfoTag().getDbId()
-        self.imdb_id = self.getVideoInfoTag().getIMDBNumber()
+        self.imdb_id = self.getVideoInfoTag().getIMDBNumber() if self.dbtype == 'movie' else None
         self.query = self.getVideoInfoTag().getTVShowTitle() if self.dbtype == 'episode' else self.getVideoInfoTag().getTitle()
         self.year = self.getVideoInfoTag().getYear() if self.dbtype == 'movie' else None
         self.epyear = self.getVideoInfoTag().getYear() if self.dbtype == 'episode' else None
         self.season = self.getVideoInfoTag().getSeason() if self.dbtype == 'episode' else None
         self.episode = self.getVideoInfoTag().getEpisode() if self.dbtype == 'episode' else None
+
+        self.current_item = (self.total_time, self.dbtype, self.dbid, self.imdb_id, self.query, self.year, self.epyear, self.season, self.episode, )
+        if self.previous_item and self.current_item == self.previous_item:
+            return  # Dont reset the same item again
+        self.previous_item = self.current_item  # Store for next time
 
         self.tmdb_type = 'movie' if self.dbtype == 'movie' else 'tv'
         self.tmdb_id = self.get_tmdb_id(self.tmdb_type, self.imdb_id, self.query, self.year, self.epyear)
@@ -72,9 +80,10 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.artwork = self.details['artwork'] if self.details else None
         self.details = self.details['listitem'] if self.details else None
 
-        # Clear everything if we didn't get details because nothing to compare
         if not self.details:
-            return self.reset_properties()
+            return self.clear_properties()
+
+        self.clear_properties()
 
         # Get ratings (no need for threading since we're only getting one item in player ever)
         if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"):
@@ -99,6 +108,8 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
                     or get_infolabel('Player.Art(artist.clearlogo)')
                     or get_infolabel('Player.Art(clearlogo)')
                     or self.details.get('art', {}).get('clearlogo'))).run()
+                self.properties.add('CropImage')
+                self.properties.add('CropImage.Original')
             self.set_iter_properties(self.details, SETMAIN_ARTWORK)
 
         self.set_properties(self.details)

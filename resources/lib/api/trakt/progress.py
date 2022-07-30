@@ -6,8 +6,8 @@ from resources.lib.files.futils import pickle_deepcopy
 from resources.lib.items.pages import PaginatedItems
 from resources.lib.api.mapping import get_empty_item
 from resources.lib.api.trakt.items import TraktItems
-from resources.lib.api.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache, use_thread_lock
-from resources.lib.addon.thread import ParallelThread
+from resources.lib.api.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache
+from resources.lib.addon.thread import ParallelThread, use_thread_lock
 from resources.lib.addon.consts import CACHE_SHORT, CACHE_LONG
 from resources.lib.addon.window import get_property
 
@@ -42,7 +42,7 @@ class _TraktProgress():
     def get_inprogress_shows_list(self, page=1, limit=None, params=None, next_page=True, sort_by=None, sort_how=None):
         limit = limit or self.item_limit
         get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
-        response = self._get_upnext_episodes_list(sort_by_premiered=True) if sort_by == 'year' else self._get_inprogress_shows()
+        response = self._get_upnext_episodes_list(sort_by='released') if sort_by == 'year' else self._get_inprogress_shows()
         response = TraktItems(response, trakt_type='show').build_items(
             params_def=params, sort_by=sort_by if sort_by != 'year' else 'unsorted', sort_how=sort_how)
         response = PaginatedItems(response['items'], page=page, limit=limit)
@@ -190,17 +190,17 @@ class _TraktProgress():
             return response.items + response.next_page
 
     @is_authorized
-    def get_upnext_episodes_list(self, page=1, sort_by_premiered=False, limit=None):
+    def get_upnext_episodes_list(self, page=1, sort_by=None, sort_how='desc', limit=None):
         """ Gets a list of episodes for in-progress shows that user should watch next """
         limit = limit or self.item_limit
         get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
-        response = self._get_upnext_episodes_list(sort_by_premiered=sort_by_premiered)
+        response = self._get_upnext_episodes_list(sort_by=sort_by, sort_how=sort_how)
         response = TraktItems(response, trakt_type='episode').configure_items()
         response = PaginatedItems(response['items'], page=page, limit=limit)
         return response.items + response.next_page
 
     @is_authorized
-    def _get_upnext_episodes_list(self, sort_by_premiered=False):
+    def _get_upnext_episodes_list(self, sort_by=None, sort_how='desc'):
         def _get_upnext_episodes(i, get_single_episode=True):
             """ Helper func for upnext episodes to pass through threaded """
             try:
@@ -216,14 +216,14 @@ class _TraktProgress():
             item_queue = pt.queue
         items = [i for i in item_queue if i]
 
-        if not sort_by_premiered:
+        if not sort_by:
             return items
 
         with ParallelThread(items, self._get_item_details) as pt:
             item_queue = pt.queue
         items = [i for i in item_queue if i]
 
-        items = TraktItems(items, trakt_type='episode').sort_items('released', 'desc')
+        items = TraktItems(items, trakt_type='episode').sort_items(sort_by, sort_how)
         return items
 
     def _get_item_details(self, i):
@@ -297,7 +297,7 @@ class _TraktProgress():
 
     @is_authorized
     @use_thread_lock("TraktAPI._get_episode_playprogress.Locked", timeout=10, polling=0.05)
-    @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_LONG)
+    @use_activity_cache('episodes', 'paused_at', cache_days=CACHE_LONG)
     def _get_episode_playprogress(self, id_type):
         sync_list = self.get_sync('playback', 'show')
         if not sync_list:
@@ -337,7 +337,7 @@ class _TraktProgress():
         return main_list
 
     @is_authorized
-    @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_LONG)
+    @use_activity_cache('episodes', 'paused_at', cache_days=CACHE_LONG)
     def get_episode_playprogress(self, unique_id, id_type, season, episode, key='progress'):
         season = try_int(season, fallback=-2)  # Make fallback -2 to prevent matching on 0
         episode = try_int(episode, fallback=-2)  # Make fallback -2 to prevent matching on 0

@@ -11,7 +11,7 @@ class ListLists(Container):
 
         items = self.mdblist_api.get_list_of_lists(
             path=info_model.get('path', '').format(**kwargs),
-            page=page)
+            page=page or 1)
 
         self.library = 'video'
         self.plugin_category = get_plugin_category(info_model)

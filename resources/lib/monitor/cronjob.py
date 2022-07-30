@@ -2,8 +2,46 @@ from xbmc import Monitor
 from resources.lib.addon.parser import try_int
 from threading import Thread
 from resources.lib.addon.tmdate import convert_timestamp, get_datetime_now, get_timedelta, get_datetime_today, get_datetime_time, get_datetime_combine
-from resources.lib.addon.plugin import get_setting, executebuiltin, get_infolabel
-from resources.lib.files.futils import delete_folder
+from resources.lib.addon.plugin import get_setting, executebuiltin, get_infolabel, set_setting
+
+
+def update_skinshortcuts():
+    """ Once-off routine to update skinshortcuts to append new widget reload affix """
+    if get_setting('update_skinshortcuts'):
+        return
+    from resources.lib.files.futils import validate_join, get_files_in_folder, read_file, write_file
+    from resources.lib.addon.consts import PARAM_WIDGETS_RELOAD, PARAM_WIDGETS_RELOAD_REPLACE
+    folder = validate_join('special://profile/addon_data/', 'script.skinshortcuts/')
+    files = get_files_in_folder(folder, regex=r".*\.(xml|properties)$")
+    affix = PARAM_WIDGETS_RELOAD
+    subst = PARAM_WIDGETS_RELOAD_REPLACE
+    for f in files:
+        filename = validate_join(folder, f)
+        filemeta = read_file(filename)
+        fileline = filemeta.split('\n')
+        for x, i in enumerate(fileline):
+            if subst in i:
+                i.replace(subst, affix)
+            if affix in i:
+                continue
+            if 'plugin://plugin.video.themoviedb.helper/' not in i:
+                continue
+            if '&widget=true' in i:
+                fileline[x] = i.replace('&widget=true', f'&widget=true&{affix}')
+                continue
+            if '&amp;widget=true' in i:
+                fileline[x] = i.replace('&amp;widget=true', f'&amp;widget=true&amp;{affix}')
+                continue
+        filemeta = '\n'.join(fileline)
+        write_file(filemeta, filename)
+    set_setting('update_skinshortcuts', True)
+
+
+def clean_old_databases():
+    """ Once-off routine to delete old unused database versions to avoid wasting disk space """
+    from resources.lib.files.futils import delete_folder
+    for f in ['database', 'database_v2', 'database_v3', 'database_v4']:
+        delete_folder(f, force=True, check_exists=True)
 
 
 class CronJobMonitor(Thread):
@@ -15,8 +53,8 @@ class CronJobMonitor(Thread):
         self.xbmc_monitor = Monitor()
 
     def run(self):
-        for f in ['database', 'database_v2', 'database_v3', 'database_v4']:
-            delete_folder(f, force=True, check_exists=True)
+        update_skinshortcuts()
+        clean_old_databases()
 
         self.xbmc_monitor.waitForAbort(600)  # Wait 10 minutes before doing updates to give boot time
         if self.xbmc_monitor.abortRequested():
