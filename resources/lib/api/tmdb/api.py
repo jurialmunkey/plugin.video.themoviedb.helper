@@ -488,9 +488,10 @@ class TMDb(RequestAPI):
         kwargs['query'] = quote_plus(query)
         return self.get_basic_list(f'search/{tmdb_type}', tmdb_type, **kwargs)
 
-    def get_basic_list(self, path, tmdb_type, key='results', params=None, base_tmdb_type=None, limit=None, filters={}, **kwargs):
+    def get_basic_list(self, path, tmdb_type, key='results', params=None, base_tmdb_type=None, limit=None, filters={}, sort_by=None, **kwargs):
         response = self.get_request_sc(path, **kwargs)
         results = response.get(key, []) if response else []
+        results = sorted(results, key=lambda i: i.get(sort_by, 0), reverse=True) if sort_by else results
         items = [
             self.mapper.get_info(i, tmdb_type, definition=params, base_tmdb_type=base_tmdb_type, iso_country=self.iso_country)
             for i in results if i]

@@ -4,7 +4,7 @@ from resources.lib.items.container import Container
 
 
 class ListBasic(Container):
-    def get_items(self, info, tmdb_type, tmdb_id=None, page=None, limit=None, **kwargs):
+    def get_items(self, info, tmdb_type, tmdb_id=None, page=None, limit=None, sort_by=None, **kwargs):
         info_model = TMDB_BASIC_LISTS.get(info)
         info_tmdb_type = info_model.get('tmdb_type') or tmdb_type
         self.tmdb_api.mapper.imagepath_quality = info_model.get('imagepath_quality', 'IMAGEPATH_ORIGINAL')
@@ -14,6 +14,7 @@ class ListBasic(Container):
                 tmdb_id=tmdb_id,
                 iso_country=self.tmdb_api.iso_country,
                 **kwargs),
+            sort_by=sort_by or info_model.get('sort_by'),
             tmdb_type=info_tmdb_type,
             base_tmdb_type=tmdb_type,
             key=info_model.get('key', 'results'),
