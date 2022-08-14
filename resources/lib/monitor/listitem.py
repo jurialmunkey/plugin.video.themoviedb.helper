@@ -270,13 +270,13 @@ class ListItemMonitor(CommonMonitorFunctions):
         # Check FTV lookup setting
         self.ib.ftv_api = self.ftv_api if get_setting('service_fanarttv_lookup') else None
 
-        # Get TMDb Details
+        # Check TMDb ID in cache
         cache_name = str(self.cur_item)
         cache_item = self._cache.get_cache(cache_name)
         if cache_item:
             tmdb_id = cache_item['tmdb_id']
             tmdb_type = cache_item['tmdb_type']
-            details = cache_item['details']
+            details = self.ib.get_item(tmdb_type, tmdb_id, self.season, self.episode)
         else:
             # Item not cached so clear some details now
             ignore_keys = {'cur_item'}
@@ -284,6 +284,7 @@ class ListItemMonitor(CommonMonitorFunctions):
                 ignore_keys.update(SETMAIN_ARTWORK)
             self.clear_properties(ignore_keys=ignore_keys)
 
+            # Lookup IDs
             imdb_id = self.imdb_id if not self.season else None  # Skip IMDb ID for seasons/episodes as we can't distinguish if the ID is for the episode or the show.
             li_year = self.year if tmdb_type == 'movie' else None
             ep_year = self.year if tmdb_type == 'tv' else None
@@ -295,11 +296,10 @@ class ListItemMonitor(CommonMonitorFunctions):
             else:
                 tmdb_id = self.get_tmdb_id(tmdb_type=tmdb_type, query=self.query, imdb_id=imdb_id, year=li_year, episode_year=ep_year)
             details = self.ib.get_item(tmdb_type, tmdb_id, self.season, self.episode)
-            cache_item = self._cache.set_cache(
-                {'tmdb_id': tmdb_id, 'tmdb_type': tmdb_type, 'details': details} if details else None,
-                cache_name=cache_name)
+            if details:
+                self._cache.set_cache({'tmdb_id': tmdb_id, 'tmdb_type': tmdb_type}, cache_name)
 
-        # Check TMDb details and clear properties if failed
+        # Get TMDb details and clear properties if fails
         if details:
             artwork = details['artwork']
             details = details['listitem']
