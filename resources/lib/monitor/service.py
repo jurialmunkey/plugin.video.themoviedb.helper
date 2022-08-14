@@ -92,10 +92,7 @@ class ServiceMonitor(object):
                 self._on_modal()
 
             # skip when container scrolling
-            elif get_condvisibility(
-                    "Container.OnScrollNext | "
-                    "Container.OnScrollPrevious | "
-                    "Container.Scrolling"):
+            elif get_condvisibility("Container.Scrolling"):
                 self._on_scroll()
 
             # media window is opened or widgetcontainer set - start listitem monitoring!
