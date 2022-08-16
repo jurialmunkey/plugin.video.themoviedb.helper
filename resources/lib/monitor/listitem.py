@@ -2,7 +2,7 @@ from resources.lib.api.kodi.rpc import get_person_stats
 from resources.lib.addon.window import get_property
 from resources.lib.monitor.common import CommonMonitorFunctions, SETMAIN_ARTWORK, SETPROP_RATINGS
 from resources.lib.monitor.images import ImageFunctions
-from resources.lib.addon.plugin import convert_media_type, convert_type, get_setting, get_infolabel, get_condvisibility
+from resources.lib.addon.plugin import convert_media_type, convert_type, get_setting, get_infolabel, get_condvisibility, get_localized
 from resources.lib.addon.logger import kodi_try_except
 from resources.lib.files.bcache import BasicCache
 from threading import Thread
@@ -34,6 +34,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         self.property_prefix = 'ListItem'
         self._last_blur_fallback = False
         self._cache = BasicCache(filename=f'QuickService.db')
+        self._ignored_labels = ['..', get_localized(33078)]
 
     def get_container(self):
         self.container = get_container()
@@ -239,8 +240,8 @@ class ListItemMonitor(CommonMonitorFunctions):
         if self.is_same_item(update=True):
             return
 
-        # Parent folder item so clear properties and stop
-        if self.get_infolabel('Label') == '..':
+        # Ignored folder item so clear properties and stop
+        if self.get_infolabel('Label') in self._ignored_labels:
             return self.clear_properties()
 
         # Set our is_updating flag
