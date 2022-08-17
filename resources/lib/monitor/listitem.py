@@ -316,8 +316,9 @@ class ListItemMonitor(CommonMonitorFunctions):
             self.clear_properties(ignore_keys=ignore_keys)
             return get_property('IsUpdating', clear_property=True)
 
-        # Get item folderpath for comparison
+        # Get item folderpath and filenameandpath for comparison
         details['folderpath'] = self.get_infolabel('folderpath')
+        details['filenameandpath'] = self.get_infolabel('filenameandpath')
 
         # Copy previous properties
         prev_properties = self.properties.copy()

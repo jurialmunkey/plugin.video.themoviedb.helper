@@ -11,7 +11,7 @@ from resources.lib.addon.logger import kodi_traceback, kodi_try_except
 
 
 SETMAIN = {
-    'label', 'tmdb_id', 'imdb_id', 'folderpath'}
+    'label', 'tmdb_id', 'imdb_id', 'folderpath', 'filenameandpath'}
 SETMAIN_ARTWORK = {
     'icon', 'poster', 'thumb', 'fanart', 'discart', 'clearart', 'clearlogo', 'landscape', 'banner', 'keyart'}
 SETINFO = {
