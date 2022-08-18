@@ -3,7 +3,6 @@ from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_
 from resources.lib.addon.parser import merge_two_items
 from resources.lib.items.builder import ItemBuilder
 from resources.lib.items.container import Container
-from json import dumps
 
 
 def _build_basedir_item(i, t, space):
@@ -12,7 +11,11 @@ def _build_basedir_item(i, t, space):
     item['params'] = i.get('params', {}).copy()
     item['params']['tmdb_type'] = t
     if item.pop('sorting', False):
-        item.setdefault('infoproperties', {})['tmdbhelper.context.sorting'] = dumps(item['params'])
+        item.setdefault('infoproperties', {})['is_sortable'] = 'True'
+        item['context_menu'] = [(
+            get_localized(32309),
+            u'Runscript(plugin.video.themoviedb.helper,sort_list,{})'.format(
+                u','.join(f'{k}={v}' for k, v in item['params'].items())))]
         item['params']['list_name'] = item['label']
     item.pop('types', None)
     return item

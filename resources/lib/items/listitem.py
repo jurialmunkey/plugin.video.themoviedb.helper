@@ -107,8 +107,7 @@ class _ListItem(object):
 
     def set_context_menu(self):
         from resources.lib.items.context import ContextMenu
-        for k, v in ContextMenu(self).get():
-            self.infoproperties[k] = v
+        self.context_menu += ContextMenu(self).get()
 
     def set_playcount(self, playcount):
         return
@@ -131,7 +130,7 @@ class _ListItem(object):
     def _set_params_reroute_skinshortcuts(self):
         self.params['widget'] = 'true'
         # Reroute sortable lists to display options in skinshortcuts
-        if self.infoproperties.get('tmdbhelper.context.sorting'):
+        if self.infoproperties.get('is_sortable'):
             self.params['parent_info'] = self.params['info']
             self.params['info'] = 'trakt_sortby'
 
@@ -283,7 +282,9 @@ class _Video(_ListItem):
         else:
             self.params['info'] = 'related'
         self.is_folder = False
-        self.infoproperties['tmdbhelper.context.playusing'] = f'{self.get_url()}&ignore_default=true'
+        self.context_menu.insert(0, (
+            '$ADDON[plugin.video.themoviedb.helper 32322]',
+            f'RunPlugin({self.get_url()}&ignore_default=true)',))
 
     def _set_params_reroute_details(self):
         self._set_params_reroute_default()

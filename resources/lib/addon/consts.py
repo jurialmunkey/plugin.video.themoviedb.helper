@@ -560,34 +560,6 @@ MDBLIST_LIST_OF_LISTS = {
 }
 
 
-CONTEXT_MENU_ITEMS = {
-    'tmdbhelper.context.artwork': {
-        'movie': {'tmdb_type': 'movie', 'tmdb_id': '{tmdb_id}'},
-        'tvshow': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}'},
-        'season': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}'},
-        'episode': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}'}
-    },
-    'tmdbhelper.context.refresh': {
-        'episode': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}', 'episode': '{episode}'},
-        'season': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}'},
-        'other': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'}
-    },
-    'tmdbhelper.context.related': {
-        'episode': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}', 'episode': '{episode}'},
-        'other': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'}
-    },
-    'tmdbhelper.context.addlibrary': {
-        'movie': {'info': '{tmdb_type}', 'tmdb_id': '{tmdb_id}', 'force': True},
-        'tvshow': {'info': '{tmdb_type}', 'tmdb_id': '{tmdb_id}', 'force': True},
-        'season': {'info': '{tmdb_type}', 'tmdb_id': '{tmdb_id}', 'force': True},
-        'episode': {'info': '{tmdb_type}', 'tmdb_id': '{tmdb_id}', 'force': True}
-    },
-    'tmdbhelper.context.trakt': {
-        'episode': {'trakt_type': '{trakt_type}', 'unique_id': '{tmdb_id}', 'id_type': 'tmdb', 'season': '{season}', 'episode': '{episode}'},
-        'other': {'trakt_type': '{trakt_type}', 'unique_id': '{tmdb_id}', 'id_type': 'tmdb'}
-    }
-}
-
 ROUTE_NOID = {
     'dir_search': {'route': {
         'module_name': 'resources.lib.api.tmdb.search',

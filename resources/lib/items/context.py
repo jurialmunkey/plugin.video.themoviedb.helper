@@ -1,8 +1,41 @@
-from resources.lib.addon.consts import CONTEXT_MENU_ITEMS
+CONTEXT_MENU_ITEMS = {
+    # Browse Lists
+    '$ADDON[plugin.video.themoviedb.helper 32235]': {
+        'command': 'RunScript(plugin.video.themoviedb.helper,related_lists,{})',
+        'episode': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}', 'episode': '{episode}'},
+        'other': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'}
+    },
+    # Trakt Options
+    '$ADDON[plugin.video.themoviedb.helper 32295]': {
+        'command': 'RunScript(plugin.video.themoviedb.helper,sync_trakt,{})',
+        'episode': {'trakt_type': '{trakt_type}', 'unique_id': '{tmdb_id}', 'id_type': 'tmdb', 'season': '{season}', 'episode': '{episode}'},
+        'other': {'trakt_type': '{trakt_type}', 'unique_id': '{tmdb_id}', 'id_type': 'tmdb'}
+    },
+    # Manage Artwork
+    '$ADDON[plugin.video.themoviedb.helper 32222]': {
+        'command': 'RunScript(plugin.video.themoviedb.helper,manage_artwork,{})',
+        'movie': {'tmdb_type': 'movie', 'tmdb_id': '{tmdb_id}'},
+        'tvshow': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}'},
+        'season': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}'},
+        'episode': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}'}
+    },
+    # Refresh Details
+    '$ADDON[plugin.video.themoviedb.helper 32233]': {
+        'command': 'RunScript(plugin.video.themoviedb.helper,refresh_details,{})',
+        'episode': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}', 'episode': '{episode}'},
+        'season': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}'},
+        'other': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'}
+    },
+    # Add to Library
+    '$LOCALIZE[20444]': {
+        'command': 'RunScript(plugin.video.themoviedb.helper,add_to_library,{})',
+        'movie': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'},
+        'tvshow': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'},
+        'season': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'},
+        'episode': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'}
+    }
 
-""" Lazyimports
-from json import dumps
-"""
+}
 
 
 class ContextMenu():
@@ -24,14 +57,14 @@ class ContextMenu():
         self.mediatype = self._li.infolabels.get('mediatype')
 
     def get(self, context=None):
-        from json import dumps
         context = context or CONTEXT_MENU_ITEMS
-        return [(name, dumps(item)) for name, item in (
+        return [(name, str(item)) for name, item in (
             (name, self._build_item(mediatypes)) for name, mediatypes in context.items()) if item]
 
     def _build_item(self, mediatypes):
         params_def = mediatypes.get(self.mediatype, mediatypes.get('other'))
-        if not params_def:
+        router_def = mediatypes.get('command')
+        if not params_def or not router_def:
             return
         item = {}
         for k, v in params_def.items():
@@ -42,4 +75,6 @@ class ContextMenu():
             if value in ['None', '', None]:
                 return  # Don't create a context item if we don't have a formatter value
             item[k] = value
-        return item
+
+        router_str = ','.join([f'{k}={v}' for k, v in item.items()])
+        return router_def.format(router_str)

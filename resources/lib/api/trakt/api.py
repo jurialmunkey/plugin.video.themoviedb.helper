@@ -226,10 +226,16 @@ class _TraktLists():
                 'trakt': i_lst_trakt,
                 'slug': i_lst_slug,
                 'user': i_usr_slug}
-            item['infoproperties']['tmdbhelper.context.sorting'] = data_dumps(item['params'])
+            item['infoproperties']['is_sortable'] = 'True'
+
+            # Add sort methods
+            item['context_menu'] = [(
+                get_localized(32309),
+                u'Runscript(plugin.video.themoviedb.helper,sort_list,{})'.format(
+                    u','.join(f'{k}={v}' for k, v in item['params'].items())))]
 
             # Add library context menu
-            item['context_menu'] = [(
+            item['context_menu'] += [(
                 get_localized(20444), u'Runscript(plugin.video.themoviedb.helper,{})'.format(
                     u'user_list={list_slug},user_slug={user_slug}'.format(**item['params'])))]
 

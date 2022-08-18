@@ -14,38 +14,6 @@ provider-name="jurialmunkey">
 </extension>
 <extension point="xbmc.python.script" library="script.py" />
 <extension point="xbmc.service" library="service.py" />
-<extension point="kodi.context.item">
-  <menu id="kodi.core.main">
-    <item library="context.py" args="playusing">
-      <label>$ADDON[plugin.video.themoviedb.helper 32322]</label>
-      <visible>!String.IsEmpty(ListItem.Property(tmdbhelper.context.playusing))</visible>
-    </item>
-    <item library="context.py" args="related">
-      <label>$ADDON[plugin.video.themoviedb.helper 32235]</label>
-      <visible>!String.IsEmpty(ListItem.Property(tmdbhelper.context.related))</visible>
-    </item>
-    <item library="context.py" args="addlibrary">
-      <label>$LOCALIZE[20444]</label>
-      <visible>!String.IsEmpty(ListItem.Property(tmdbhelper.context.addlibrary))</visible>
-    </item>
-    <item library="context.py" args="trakt">
-      <label>$ADDON[plugin.video.themoviedb.helper 32295]</label>
-      <visible>!String.IsEmpty(ListItem.Property(tmdbhelper.context.trakt))</visible>
-    </item>
-    <item library="context.py" args="refresh">
-      <label>$ADDON[plugin.video.themoviedb.helper 32233]</label>
-      <visible>!String.IsEmpty(ListItem.Property(tmdbhelper.context.refresh))</visible>
-    </item>
-    <item library="context.py" args="artwork">
-      <label>$ADDON[plugin.video.themoviedb.helper 32222]</label>
-      <visible>!String.IsEmpty(ListItem.Property(tmdbhelper.context.artwork))</visible>
-    </item>
-    <item library="context.py" args="sorting">
-      <label>$ADDON[plugin.video.themoviedb.helper 32309]</label>
-      <visible>!String.IsEmpty(ListItem.Property(tmdbhelper.context.sorting))</visible>
-    </item>
-  </menu>
-</extension>
 <extension point="xbmc.addon.metadata">
   <reuselanguageinvoker>false</reuselanguageinvoker>
   <summary lang="en_GB">TheMovieDb Helper - Now With Trakt Support!</summary>

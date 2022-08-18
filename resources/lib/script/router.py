@@ -28,6 +28,8 @@ class Script(object):
             lambda **kwargs: importmodule('resources.lib.script.method', 'kodi_setting')(**kwargs),
         'sync_trakt':
             lambda **kwargs: importmodule('resources.lib.script.method', 'sync_trakt')(**kwargs),
+        'sort_list':
+            lambda **kwargs: importmodule('resources.lib.script.method', 'sort_list')(**kwargs),
         'manage_artwork':
             lambda **kwargs: importmodule('resources.lib.script.method', 'manage_artwork')(**kwargs),
         'select_artwork':
