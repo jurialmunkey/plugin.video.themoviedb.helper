@@ -38,6 +38,7 @@ class Container():
         self.is_widget = self.params.get('widget', '').lower() == 'true'
         self.is_cacheonly = self.params.get('cacheonly', '').lower() == 'true'
         self.is_fanarttv = self.params.get('fanarttv', '').lower()
+        self.is_detailed = self.params.get('detailed', '').lower() == 'true' or self.params.get('info') == 'details'
 
         # endOfDirectory
         self.update_listing = False  # endOfDirectory(updateListing=) set True to replace current path
@@ -114,7 +115,7 @@ class Container():
         if not self.pagination and 'next_page' in i:
             return
         with TimerList(self.timer_lists, 'item_api', log_threshold=0.05, logging=self.log_timers):
-            return self.ib.get_listitem(i)
+            return self.ib.get_listitem(i, use_iterprops=self.is_detailed)
 
     def _make_item(self, li):
         if not li:

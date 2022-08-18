@@ -8,7 +8,7 @@ from resources.lib.api.fanarttv.api import FanartTV
 from resources.lib.addon.tmdate import set_timestamp, get_timestamp
 from resources.lib.addon.consts import IMAGEPATH_QUALITY_POSTER, IMAGEPATH_QUALITY_FANART, IMAGEPATH_QUALITY_THUMBS, IMAGEPATH_QUALITY_CLOGOS, IMAGEPATH_ALL, ARTWORK_BLACKLIST
 from resources.lib.addon.thread import ParallelThread
-from resources.lib.addon.logger import TimerList
+from resources.lib.addon.logger import TimerList, kodi_log
 
 FTV_SECOND_PREF = get_setting('fanarttv_secondpref')
 ARTWORK_QUALITY = get_setting('artwork_quality', 'int')
@@ -252,16 +252,28 @@ class ItemBuilder(_ArtworkSelector):
         set_artwork(artwork.get('manual'))
         return art_dict
 
-    def get_listitem(self, i):
+    def _undo_iterprops(self, item, tmdb_type, tmdb_id, season, episode):
+        if 'infoproperties_basic' not in item:
+            item['infoproperties_basic'] = {
+                k: v for k, v in item['listitem']['infoproperties'].items()
+                if not re.match(r'.*\.[0-9]*\..*', k)}  # Filter out indexed properties to leave only basic props
+            name = self.get_cache_name(tmdb_type, tmdb_id, season, episode)
+            self._cache.set_cache(item, name, cache_days=CACHE_DAYS)  # Set back to cache
+        item['listitem']['infoproperties'] = item['infoproperties_basic']  # Set filtered ip to ip
+        return item
+
+    def get_listitem(self, i, use_iterprops=True):
         li = ListItem(parent_params=self.parent_params, **i)
         mediatype = li.infolabels.get('mediatype')
-        item = self.get_item(
-            li.get_tmdb_type(),
-            li.unique_ids.get('tvshow.tmdb') if mediatype in ['season', 'episode'] else li.unique_ids.get('tmdb'),
-            li.infolabels.get('season', 0) if mediatype in ['season', 'episode'] else None,
-            li.infolabels.get('episode') if mediatype == 'episode' else None)
+        tmdb_type = li.get_tmdb_type()
+        tmdb_id = li.unique_ids.get('tvshow.tmdb') if mediatype in ['season', 'episode'] else li.unique_ids.get('tmdb')
+        season = li.infolabels.get('season', 0) if mediatype in ['season', 'episode'] else None
+        episode = li.infolabels.get('episode') if mediatype == 'episode' else None
+        item = self.get_item(tmdb_type, tmdb_id, season, episode)
         if not item or 'listitem' not in item:
             return li
+        if not use_iterprops:
+            item = self._undo_iterprops(item, tmdb_type, tmdb_id, season, episode)
         li.set_details(item['listitem'], override=self.override)
         li.art = self.get_item_artwork(item['artwork'], is_season=mediatype in ['season', 'episode'])
         return li
