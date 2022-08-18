@@ -50,7 +50,7 @@ def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
         'paused': lambda: _item_lambda_simple(items, 'paused_at', _dummystr, reverse),
         'added': lambda: _item_lambda_simple(items, 'listed_at', _dummystr, reverse),
         'title': lambda: _item_lambda_parent(items, 'title', _dummystr, reverse),
-        'year': lambda: _item_lambda_parent(items, 'year', _dummyint, reverse),
+        'year': lambda: _item_lambda_parent(items, 'year', _dummyint if reverse else 9999, reverse),
         'released': lambda: _item_lambda_mixing(items, ('first_aired', 'released',), _dummystr, reverse, sort_types=['show', 'episode']),
         'runtime': lambda: _item_lambda_parent(items, 'runtime', _dummyint, reverse),
         'popularity': lambda: _item_lambda_parent(items, 'comment_count', _dummyint, reverse),
