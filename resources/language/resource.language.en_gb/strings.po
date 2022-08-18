@@ -2291,6 +2291,11 @@ msgctxt "#32449"
 msgid "Ignore region release filter"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32450"
+msgid "Install context menu add-on"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

@@ -202,6 +202,19 @@
 					<default>false</default>
 					<control type="toggle"/>
 				</setting>
+				<setting id="install_contextmenu" type="string" label="32450" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action">
+						<data>InstallAddon(context.themoviedb.helper)</data>
+					</control>
+					<dependencies>
+						<dependency type="visible" on="property" name="infobool">!System.HasAddon(context.themoviedb.helper)</dependency>
+					</dependencies>
+				</setting>
 			</group>
 			<group id="2" label="32368">
 				<setting id="calendar_flatten" type="boolean" label="32404" help="">
