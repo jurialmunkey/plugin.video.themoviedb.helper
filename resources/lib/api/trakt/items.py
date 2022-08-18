@@ -13,22 +13,22 @@ def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
     _dummydict, _dummystr, _dummyint = {}, '', 0
 
     def _item_lambda_simple(items, sort_key: str, sort_fallback=None, sort_reverse=False):
-        return sorted(items, key=lambda i: i.get(sort_key, sort_fallback), reverse=sort_reverse)
+        return sorted(items, key=lambda i: i.get(sort_key) or sort_fallback, reverse=sort_reverse)
 
     def _item_lambda_parent(items, sort_key: str, sort_fallback=None, sort_reverse=False):
-        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), _dummydict).get(sort_key, sort_fallback), reverse=sort_reverse)
+        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), _dummydict).get(sort_key) or sort_fallback, reverse=sort_reverse)
 
     def _item_lambda_max_of(items, sort_keys: list, sort_fallback=None, sort_reverse=False):
-        return sorted(items, key=lambda i: max(*[i.get(k, sort_fallback) for k in sort_keys]), reverse=sort_reverse)
+        return sorted(items, key=lambda i: max(*[i.get(k) or sort_fallback for k in sort_keys]), reverse=sort_reverse)
 
     def _item_lambda_mixing(items, sort_keys: tuple, sort_fallback=None, sort_reverse=False, sort_types: list = None):
         return sorted(
             items,
             key=lambda i: (
-                try_str(i.get(trakt_type or i.get('type'), _dummydict).get(sort_keys[0], sort_fallback)))
+                try_str(i.get(trakt_type or i.get('type'), _dummydict).get(sort_keys[0]) or sort_fallback))
             if (trakt_type or i.get('type')) in sort_types
             else (
-                try_str(i.get(trakt_type or i.get('type'), _dummydict).get(sort_keys[1], sort_fallback))),
+                try_str(i.get(trakt_type or i.get('type'), _dummydict).get(sort_keys[1]) or sort_fallback)),
             reverse=sort_reverse)
 
     def _item_lambda_airing(items, sort_start: int):
