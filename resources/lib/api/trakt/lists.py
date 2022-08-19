@@ -6,7 +6,6 @@ from resources.lib.addon.consts import TRAKT_BASIC_LISTS, TRAKT_SYNC_LISTS, TRAK
 from resources.lib.addon.parser import try_int, encode_url
 from resources.lib.addon.tmdate import get_calendar_name
 from resources.lib.api.mapping import get_empty_item
-from resources.lib.api.trakt.api import get_sort_methods
 from resources.lib.items.container import Container
 
 
@@ -59,7 +58,8 @@ class ListSync(Container):
             page=page,
             params=info_model.get('params'),
             sort_by=kwargs.get('sort_by', None) or info_model.get('sort_by', None),
-            sort_how=kwargs.get('sort_how', None) or info_model.get('sort_how', None))
+            sort_how=kwargs.get('sort_how', None) or info_model.get('sort_how', None),
+            extended=kwargs.get('extended', None) or info_model.get('extended', None))
         self.tmdb_cache_only = False
         self.kodi_db = self.get_kodi_database(info_tmdb_type)
         self.library = convert_type(info_tmdb_type, 'library')
@@ -269,6 +269,8 @@ class ListCustomSearch(Container):
 
 class ListSortBy(Container):
     def get_items(self, info, **kwargs):
+        from resources.lib.api.trakt.api import get_sort_methods
+
         def _listsortby_item(i, **params):
             item = get_empty_item()
             item['label'] = item['infolabels']['title'] = f'{params.get("list_name")}[CR]{i["name"]}'
@@ -276,8 +278,9 @@ class ListSortBy(Container):
             for k, v in i['params'].items():
                 item['params'][k] = v
             return item
+
         kwargs['info'] = kwargs.pop('parent_info', None)
-        items = get_sort_methods() if kwargs['info'] == 'trakt_userlist' else get_sort_methods(True)
+        items = get_sort_methods(kwargs['info'])
         items = [_listsortby_item(i, **kwargs) for i in items]
         self.library = 'video'
         return items

@@ -455,7 +455,7 @@ def sort_list(**kwargs):
     from resources.lib.addon.parser import encode_url
     from resources.lib.addon.plugin import executebuiltin, format_folderpath
     from resources.lib.api.trakt.api import get_sort_methods
-    sort_methods = get_sort_methods() if kwargs['info'] == 'trakt_userlist' else get_sort_methods(True)
+    sort_methods = get_sort_methods(kwargs['info'])
     x = Dialog().contextmenu([i['name'] for i in sort_methods])
     if x == -1:
         return

@@ -23,7 +23,7 @@ CLIENT_ID = 'e6fde6173adf3c6af8fd1b0694b9b84d7c519cefc24482310e1de06c6abe5467'
 CLIENT_SECRET = '15119384341d9a61c751d8d515acbc0dd801001d4ebe85d3eef9885df80ee4d9'
 
 
-def get_sort_methods(default_only=False):
+def get_sort_methods(info=None):
     items = [
         {
             'name': f'{get_localized(32287)}: {get_localized(32286)}',
@@ -64,9 +64,12 @@ def get_sort_methods(default_only=False):
         {
             'name': f'{get_localized(32287)}: {get_localized(590)}',
             'params': {'sort_by': 'random'}}]
-    if default_only:
-        return [i for i in items if i['params']['sort_by'] in ['rank', 'added', 'title', 'year', 'random']]
-    return items
+
+    extended_sort_allowlist = {
+        'trakt_userlist': [None, 'sync', 'full', 'inprogress'],
+        'trakt_watchlist': [None, 'full']}
+    extended_allowlist = extended_sort_allowlist.get(info) or [None]
+    return [i for i in items if i['params'].get('extended', None) in extended_allowlist]
 
 
 class _TraktLists():
@@ -176,15 +179,15 @@ class _TraktLists():
             'next_page': paginated_items.next_page}
 
     @use_activity_cache(cache_days=CACHE_SHORT)
-    def _get_sync_list(self, sync_type, trakt_type, sort_by=None, sort_how=None, decorator_cache_refresh=False):
+    def _get_sync_list(self, sync_type, trakt_type, sort_by=None, sort_how=None, decorator_cache_refresh=False, extended=None):
         get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
-        func = TraktItems(items=self.get_sync(sync_type, trakt_type), trakt_type=trakt_type).build_items
+        func = TraktItems(items=self.get_sync(sync_type, trakt_type, extended=extended), trakt_type=trakt_type).build_items
         return func(sort_by, sort_how)
 
-    def get_sync_list(self, sync_type, trakt_type, page=1, limit=None, params=None, sort_by=None, sort_how=None, next_page=True, always_refresh=True):
+    def get_sync_list(self, sync_type, trakt_type, page=1, limit=None, params=None, sort_by=None, sort_how=None, next_page=True, always_refresh=True, extended=None):
         limit = limit or self.item_limit
         cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
-        response = self._get_sync_list(sync_type, trakt_type, sort_by=sort_by, sort_how=sort_how, decorator_cache_refresh=cache_refresh)
+        response = self._get_sync_list(sync_type, trakt_type, sort_by=sort_by, sort_how=sort_how, decorator_cache_refresh=cache_refresh, extended=extended)
         if not response:
             return
         response = PaginatedItems(items=response['items'], page=page, limit=limit)
@@ -406,48 +409,48 @@ class _TraktSync():
         return _is_nested()
 
     @use_activity_cache('movies', 'watched_at', CACHE_LONG)
-    def get_sync_watched_movies(self, trakt_type, id_type=None):
-        return self._get_sync('sync/watched/movies', 'movie', id_type=id_type, allow_fallback=True)
+    def get_sync_watched_movies(self, trakt_type, id_type=None, extended=None):
+        return self._get_sync('sync/watched/movies', 'movie', id_type=id_type, extended=extended, allow_fallback=True)
 
     # Watched shows sync uses short cache as needed for progress checks and new episodes might air tomorrow
     @use_activity_cache('episodes', 'watched_at', CACHE_SHORT)
-    def get_sync_watched_shows(self, trakt_type, id_type=None):
-        return self._get_sync('sync/watched/shows', 'show', id_type=id_type, extended='full', allow_fallback=True)
+    def get_sync_watched_shows(self, trakt_type, id_type=None, extended='full'):
+        return self._get_sync('sync/watched/shows', 'show', id_type=id_type, extended=extended, allow_fallback=True)
 
     @use_activity_cache('movies', 'collected_at', CACHE_LONG)
-    def get_sync_collection_movies(self, trakt_type, id_type=None):
-        return self._get_sync('sync/collection/movies', 'movie', id_type=id_type)
+    def get_sync_collection_movies(self, trakt_type, id_type=None, extended=None):
+        return self._get_sync('sync/collection/movies', 'movie', id_type=id_type, extended=extended)
 
     @use_activity_cache('episodes', 'collected_at', CACHE_LONG)
-    def get_sync_collection_shows(self, trakt_type, id_type=None):
-        return self._get_sync('sync/collection/shows', trakt_type, id_type=id_type)
+    def get_sync_collection_shows(self, trakt_type, id_type=None, extended=None):
+        return self._get_sync('sync/collection/shows', trakt_type, id_type=id_type, extended=extended)
 
     @use_activity_cache('movies', 'paused_at', CACHE_LONG)
-    def get_sync_playback_movies(self, trakt_type, id_type=None):
-        return self._get_sync('sync/playback/movies', 'movie', id_type=id_type)
+    def get_sync_playback_movies(self, trakt_type, id_type=None, extended=None):
+        return self._get_sync('sync/playback/movies', 'movie', id_type=id_type, extended=extended)
 
     @use_activity_cache('episodes', 'paused_at', CACHE_LONG)
-    def get_sync_playback_shows(self, trakt_type, id_type=None):
-        return self._get_sync('sync/playback/episodes', trakt_type, id_type=id_type)
+    def get_sync_playback_shows(self, trakt_type, id_type=None, extended=None):
+        return self._get_sync('sync/playback/episodes', trakt_type, id_type=id_type, extended=extended)
 
     @use_activity_cache('movies', 'watchlisted_at', CACHE_LONG)
-    def get_sync_watchlist_movies(self, trakt_type, id_type=None):
-        return self._get_sync('sync/watchlist/movies', 'movie', id_type=id_type)
+    def get_sync_watchlist_movies(self, trakt_type, id_type=None, extended=None):
+        return self._get_sync('sync/watchlist/movies', 'movie', id_type=id_type, extended=extended)
 
     @use_activity_cache('shows', 'watchlisted_at', CACHE_LONG)
-    def get_sync_watchlist_shows(self, trakt_type, id_type=None):
-        return self._get_sync('sync/watchlist/shows', 'show', id_type=id_type)
+    def get_sync_watchlist_shows(self, trakt_type, id_type=None, extended=None):
+        return self._get_sync('sync/watchlist/shows', 'show', id_type=id_type, extended=extended)
 
     @use_activity_cache('movies', 'recommendations_at', CACHE_LONG)
-    def get_sync_recommendations_movies(self, trakt_type, id_type=None):
-        return self._get_sync('sync/recommendations/movies', 'movie', id_type=id_type)
+    def get_sync_recommendations_movies(self, trakt_type, id_type=None, extended=None):
+        return self._get_sync('sync/recommendations/movies', 'movie', id_type=id_type, extended=extended)
 
     @use_activity_cache('shows', 'recommendations_at', CACHE_LONG)
-    def get_sync_recommendations_shows(self, trakt_type, id_type=None):
-        return self._get_sync('sync/recommendations/shows', 'show', id_type=id_type)
+    def get_sync_recommendations_shows(self, trakt_type, id_type=None, extended=None):
+        return self._get_sync('sync/recommendations/shows', 'show', id_type=id_type, extended=extended)
 
     @use_thread_lock('TraktAPI.get_sync.Locked', timeout=10, polling=0.05, combine_name=True)
-    def get_sync(self, sync_type, trakt_type, id_type=None):
+    def get_sync(self, sync_type, trakt_type, id_type=None, extended=None):
         if sync_type == 'watched':
             func = self.get_sync_watched_movies if trakt_type == 'movie' else self.get_sync_watched_shows
         elif sync_type == 'collection':
@@ -460,8 +463,8 @@ class _TraktSync():
             func = self.get_sync_recommendations_movies if trakt_type == 'movie' else self.get_sync_recommendations_shows
         else:
             return
-        sync_name = f'{sync_type}.{trakt_type}.{id_type}'
-        self.sync[sync_name] = self.sync.get(sync_name) or func(trakt_type, id_type)
+        sync_name = f'{sync_type}.{trakt_type}.{id_type}.{extended}'
+        self.sync[sync_name] = self.sync.get(sync_name) or func(trakt_type, id_type, extended)
         return self.sync[sync_name] or {}
 
 
