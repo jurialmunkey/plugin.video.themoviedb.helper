@@ -11,6 +11,7 @@ EPISODE_PARAMS = {
 
 def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
     _dummydict, _dummystr, _dummyint = {}, '', 0
+    _dummystr_release = '9999-01-01T00:00:00.000Z'
 
     def _item_lambda_simple(items, sort_key: str, sort_fallback=None, sort_reverse=False):
         return sorted(items, key=lambda i: i.get(sort_key) or sort_fallback, reverse=sort_reverse)
@@ -51,7 +52,7 @@ def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
         'added': lambda: _item_lambda_simple(items, 'listed_at', _dummystr, reverse),
         'title': lambda: _item_lambda_parent(items, 'title', _dummystr, reverse),
         'year': lambda: _item_lambda_parent(items, 'year', _dummyint if reverse else 9999, reverse),
-        'released': lambda: _item_lambda_mixing(items, ('first_aired', 'released',), _dummystr, reverse, sort_types=['show', 'episode']),
+        'released': lambda: _item_lambda_mixing(items, ('first_aired', 'released',), _dummystr if reverse else _dummystr_release, reverse, sort_types=['show', 'episode']),
         'runtime': lambda: _item_lambda_parent(items, 'runtime', _dummyint, reverse),
         'popularity': lambda: _item_lambda_parent(items, 'comment_count', _dummyint, reverse),
         'percentage': lambda: _item_lambda_parent(items, 'rating', _dummyint, reverse),
