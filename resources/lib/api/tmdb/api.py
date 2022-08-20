@@ -1,7 +1,7 @@
 from xbmcgui import Dialog
 from resources.lib.addon.plugin import ADDONPATH, get_mpaa_prefix, get_language, convert_type, get_setting, get_localized, get_infolabel
 from resources.lib.addon.consts import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, TMDB_GENRE_IDS, CACHE_SHORT, CACHE_MEDIUM
-from resources.lib.addon.parser import try_int, is_excluded
+from resources.lib.addon.parser import try_int
 from resources.lib.addon.window import get_property
 from resources.lib.addon.tmdate import format_date
 from resources.lib.files.futils import use_json_filecache, validify_filename
@@ -490,18 +490,26 @@ class TMDb(RequestAPI):
 
     def get_basic_list(self, path, tmdb_type, key='results', params=None, base_tmdb_type=None, limit=None, filters={}, sort_by=None, **kwargs):
         response = self.get_request_sc(path, **kwargs)
-        results = response.get(key, []) if response else []
+        if not response:
+            return []
+
+        results = response.get(key) or []
         results = sorted(results, key=lambda i: i.get(sort_by, 0), reverse=True) if sort_by else results
+
         items = [
             self.mapper.get_info(i, tmdb_type, definition=params, base_tmdb_type=base_tmdb_type, iso_country=self.iso_country)
             for i in results if i]
+
         if filters:
+            from resources.lib.items.filters import is_excluded
             items = [i for i in items if not is_excluded(i, **filters)]
+
         if try_int(response.get('page', 0)) < try_int(response.get('total_pages', 0)):
             items.append({'next_page': try_int(response.get('page', 0)) + 1})
         elif limit is not None:
             paginated_items = PaginatedItems(items, page=kwargs.get('page', 1), limit=limit)
             return paginated_items.items + paginated_items.next_page
+
         return items
 
     def get_discover_list(self, tmdb_type, **kwargs):

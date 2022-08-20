@@ -394,6 +394,24 @@ def _get_basedir_trakt():
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/trakt/watchlist.png'}},
         {
+            'label': u'{{item_type}}{{space}}{}'.format(get_localized(32456)),
+            'types': ['movie', 'tv'],
+            'params': {'info': 'trakt_watchlist_released'},
+            'path': PLUGINPATH,
+            'sorting': True,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/watchlist.png'}},
+        {
+            'label': u'{{item_type}}{{space}}{}'.format(get_localized(32457)),
+            'types': ['movie', 'tv'],
+            'params': {'info': 'trakt_watchlist_anticipated'},
+            'path': PLUGINPATH,
+            'sorting': True,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/watchlist.png'}},
+        {
             'label': u'{}{{space}}{{item_type}}'.format(get_localized(32194)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_history'},

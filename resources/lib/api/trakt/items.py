@@ -2,6 +2,7 @@ import random
 from resources.lib.addon.plugin import PLUGINPATH, convert_type, convert_trakt_type
 from resources.lib.addon.parser import try_int, try_str, del_empty_keys, get_params, partition_list
 from resources.lib.addon.tmdate import date_in_range
+from resources.lib.items.filters import is_excluded
 
 
 EPISODE_PARAMS = {
@@ -79,6 +80,8 @@ def _get_item_infolabels(item, item_type=None, infolabels=None, show=None):
     infolabels = infolabels or {}
     infolabels['title'] = _get_item_title(item)
     infolabels['year'] = item.get('year')
+    infolabels['premiered'] = item.get('first_aired') or item.get('released') or ''
+    infolabels['premiered'] = infolabels['premiered'][:10]
     infolabels['mediatype'] = convert_type(convert_trakt_type(item_type), 'dbtype')
     if show:
         infolabels['tvshowtitle'] = show.get('title') or ''
@@ -147,7 +150,7 @@ class TraktItems():
         self.items = _sort_itemlist(self.items, self.sort_by, self.sort_how, self.trakt_type)
         return self.items
 
-    def configure_items(self, permitted_types=None, params_def=None):
+    def configure_items(self, permitted_types=None, params_def=None, filters=None):
         """ (Re)Configures items for passing to listitem class in container and returns configured items """
         for i in self.items:
             i_type = self.trakt_type or i.get('type', None)
@@ -156,14 +159,16 @@ class TraktItems():
             item = _get_item_info(i, item_type=i_type, params_def=params_def)
             if not item:
                 continue
+            if filters and is_excluded(item, **filters):
+                continue
             # Also add item to a list only containing that item type
             # Useful if we need to only get one type of item from a mixed list (e.g. only "movies")
             self.configured.setdefault(f'{i_type}s', []).append(item)
             self.configured['items'].append(item)
         return self.configured
 
-    def build_items(self, sort_by=None, sort_how=None, permitted_types=None, params_def=None):
+    def build_items(self, sort_by=None, sort_how=None, permitted_types=None, params_def=None, filters=None):
         """ Sorts and Configures Items """
         self.sort_items(sort_by, sort_how)
-        self.configure_items(permitted_types, params_def)
+        self.configure_items(permitted_types, params_def, filters)
         return self.configured

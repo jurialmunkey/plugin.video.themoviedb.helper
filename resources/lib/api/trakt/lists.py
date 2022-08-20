@@ -57,7 +57,8 @@ class ListSync(Container):
             params=info_model.get('params'),
             sort_by=kwargs.get('sort_by', None) or info_model.get('sort_by', None),
             sort_how=kwargs.get('sort_how', None) or info_model.get('sort_how', None),
-            extended=kwargs.get('extended', None) or info_model.get('extended', None))
+            extended=kwargs.get('extended', None) or info_model.get('extended', None),
+            filters=info_model.get('filters', None))
         self.tmdb_cache_only = False
         self.kodi_db = self.get_kodi_database(info_tmdb_type)
         self.library = convert_type(info_tmdb_type, 'library')

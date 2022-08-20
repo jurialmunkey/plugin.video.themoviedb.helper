@@ -8,8 +8,8 @@ CONTEXT_MENU_ITEMS = {
     # Trakt Options
     '$ADDON[plugin.video.themoviedb.helper 32295]': {
         'command': 'RunScript(plugin.video.themoviedb.helper,sync_trakt,{})',
-        'episode': {'trakt_type': '{trakt_type}', 'unique_id': '{tmdb_id}', 'id_type': 'tmdb', 'season': '{season}', 'episode': '{episode}'},
-        'other': {'trakt_type': '{trakt_type}', 'unique_id': '{tmdb_id}', 'id_type': 'tmdb'}
+        'episode': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}', 'season': '{season}', 'episode': '{episode}'},
+        'other': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'}
     },
     # Manage Artwork
     '$ADDON[plugin.video.themoviedb.helper 32222]': {

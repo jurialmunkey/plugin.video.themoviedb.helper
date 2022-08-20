@@ -1,7 +1,7 @@
 from xbmcplugin import addDirectoryItems, setProperty, setPluginCategory, setContent, endOfDirectory, addSortMethod
 from resources.lib.addon.consts import NO_LABEL_FORMATTING
 from resources.lib.addon.plugin import get_setting, executebuiltin
-from resources.lib.addon.parser import try_int, split_items, is_excluded
+from resources.lib.addon.parser import try_int, split_items
 from resources.lib.addon.thread import ParallelThread
 from resources.lib.api.tmdb.api import TMDb
 from resources.lib.api.trakt.api import TraktAPI
@@ -10,6 +10,7 @@ from resources.lib.api.omdb.api import OMDb
 from resources.lib.api.mdblist.api import MDbList
 from resources.lib.items.trakt import TraktMethods
 from resources.lib.items.builder import ItemBuilder
+from resources.lib.items.filters import is_excluded
 from resources.lib.addon.logger import kodi_log, TimerList, log_timer_report
 from threading import Thread
 

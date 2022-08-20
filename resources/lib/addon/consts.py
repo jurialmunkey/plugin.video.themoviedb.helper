@@ -63,7 +63,7 @@ PLAYERS_BASEDIR_BUNDLED = 'special://home/addons/plugin.video.themoviedb.helper/
 PLAYERS_BASEDIR_TEMPLATES = 'special://home/addons/plugin.video.themoviedb.helper/resources/templates/'
 PLAYERS_PRIORITY = 1000
 
-NO_LABEL_FORMATTING = ['details', 'upcoming', 'trakt_calendar', 'trakt_myairing', 'trakt_anticipated', 'library_nextaired', 'videos']
+NO_LABEL_FORMATTING = ['details', 'upcoming', 'trakt_calendar', 'trakt_myairing', 'trakt_anticipated', 'library_nextaired', 'videos', 'trakt_watchlist_anticipated']
 
 PARAM_WIDGETS_RELOAD = 'reload=$INFO[Window(Home).Property(TMDbHelper.Widgets.Reload)]'
 PARAM_WIDGETS_RELOAD_REPLACE = 'reload=%24INFO%5BWindow%28Home%29.Property%28TMDbHelper.Widgets.Reload%29%5D'
@@ -480,6 +480,42 @@ TRAKT_SYNC_LISTS = {
         'route': TRAKT_SYNC_LISTS_ROUTE,
         'plugin_category': '{plural} {localized}',
         'localized': 32193
+    },
+    'trakt_watchlist_released': {
+        'sync_type': 'watchlist',
+        'use_show_activity': True,
+        'sort_by': 'released',
+        'sort_how': 'desc',
+        'extended': 'full',
+        'filters': {
+            'filter_key': 'premiered',
+            'filter_value': {
+                'module': 'resources.lib.addon.tmdate',
+                'method': 'get_todays_date',
+                'kwargs': {}},
+            'filter_operator': 'lt',
+            'exclude_key': 'premiered',
+            'exclude_value': 'is_empty'},
+        'route': TRAKT_SYNC_LISTS_ROUTE,
+        'plugin_category': '{plural} {localized}',
+        'localized': 32456
+    },
+    'trakt_watchlist_anticipated': {
+        'sync_type': 'watchlist',
+        'use_show_activity': True,
+        'sort_by': 'released',
+        'sort_how': 'asc',
+        'extended': 'full',
+        'filters': {
+            'exclude_key': 'premiered',
+            'exclude_value': {
+                'module': 'resources.lib.addon.tmdate',
+                'method': 'get_todays_date',
+                'kwargs': {}},
+            'exclude_operator': 'lt'},
+        'route': TRAKT_SYNC_LISTS_ROUTE,
+        'plugin_category': '{plural} {localized}',
+        'localized': 32457
     },
     'trakt_history': {
         'sync_type': 'watched',
