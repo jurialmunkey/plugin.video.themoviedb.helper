@@ -76,7 +76,7 @@ class _TraktLists():
     def _merge_sync_sort(self, items):
         """ Get sync dict sorted by slugs then merge slug into list """
         sync = {}
-        sync.update(self.get_sync('watched', 'show', 'slug'))
+        sync.update(self.get_sync('watched', 'show', 'slug', extended='full'))
         sync.update(self.get_sync('watched', 'movie', 'slug'))
         return [dict(i, **sync.get(i.get(i.get('type'), {}).get('ids', {}).get('slug'), {})) for i in items]
 
@@ -412,9 +412,8 @@ class _TraktSync():
     def get_sync_watched_movies(self, trakt_type, id_type=None, extended=None):
         return self._get_sync('sync/watched/movies', 'movie', id_type=id_type, extended=extended, allow_fallback=True)
 
-    # Watched shows sync uses short cache as needed for progress checks and new episodes might air tomorrow
-    @use_activity_cache('episodes', 'watched_at', CACHE_SHORT)
-    def get_sync_watched_shows(self, trakt_type, id_type=None, extended='full'):
+    @use_activity_cache('episodes', 'watched_at', CACHE_SHORT)  # Use short-cache to make sure we get newly aired metadata
+    def get_sync_watched_shows(self, trakt_type, id_type=None, extended=None):
         return self._get_sync('sync/watched/shows', 'show', id_type=id_type, extended=extended, allow_fallback=True)
 
     @use_activity_cache('movies', 'collected_at', CACHE_LONG)

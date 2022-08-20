@@ -52,7 +52,7 @@ class TraktMethods():
             tmdbid = try_int(tmdb_id, fallback=None)
             season = try_int(season, fallback=-2)  # Use -2 to force all seasons lookup data on Trakt at seasons level
             if self._watchedindicators:
-                self._trakt.get_sync('watched', 'show', 'tmdb')
+                self._trakt.get_sync('watched', 'show', 'tmdb', extended='full')
                 if tmdbid:
                     self._trakt.get_episodes_airedcount(id_type='tmdb', unique_id=tmdbid, season=season)
                     self._trakt.get_episodes_watchcount(id_type='tmdb', unique_id=tmdbid, season=season)

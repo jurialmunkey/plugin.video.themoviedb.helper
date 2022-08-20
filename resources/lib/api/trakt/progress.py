@@ -67,7 +67,7 @@ class _TraktProgress():
                 except KeyError:
                     continue
             return calendar
-        response = self.get_sync('watched', 'show')
+        response = self.get_sync('watched', 'show', extended='full')
         response = TraktItems(response).sort_items('watched', 'desc')
         hidden_shows = self.get_hiddenitems('show')
         calendar_episodes = _get_calendar_episodes() if get_setting('nextepisodes_usecalendar') else None
@@ -132,7 +132,7 @@ class _TraktProgress():
         """
         season = try_int(season) if season is not None else None
         if not tvshow and id_type and unique_id:
-            tvshow = self.get_sync('watched', 'show', id_type).get(unique_id)
+            tvshow = self.get_sync('watched', 'show', id_type, extended='full').get(unique_id)
         if not tvshow:
             return
         reset_at = None
@@ -249,7 +249,7 @@ class _TraktProgress():
             return
         return use_lastupdated_cache(
             self._cache, self.get_response_json, 'shows', slug, 'progress/watched',
-            sync_info=self.get_sync('watched', 'show', 'slug').get(slug),
+            sync_info=self.get_sync('watched', 'show', 'slug', extended='full').get(slug),
             cache_name=f'TraktAPI.get_show_progress.response.{slug}')
 
     @is_authorized
@@ -355,7 +355,7 @@ class _TraktProgress():
         season = try_int(season, fallback=-2)  # Make fallback -2 to prevent matching on 0
         episode = try_int(episode, fallback=-2)  # Make fallback -2 to prevent matching on 0
         try:
-            response = self.get_sync('watched', 'show', id_type)[unique_id]['seasons']
+            response = self.get_sync('watched', 'show', id_type, extended='full')[unique_id]['seasons']
         except (KeyError, AttributeError):
             return
         for i in response:
@@ -373,7 +373,7 @@ class _TraktProgress():
     def get_episodes_airedcount(self, unique_id, id_type, season=None):
         """ Gets the number of aired episodes for a tvshow """
         try:
-            tv_sync = self.get_sync('watched', 'show', id_type)[unique_id]['show']
+            tv_sync = self.get_sync('watched', 'show', id_type, extended='full')[unique_id]['show']
             aired_episodes = tv_sync['aired_episodes']
         except (KeyError, AttributeError):
             return

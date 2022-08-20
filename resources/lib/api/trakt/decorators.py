@@ -13,7 +13,7 @@ def is_authorized(func):
 def use_lastupdated_cache(cache, func, *args, sync_info=None, cache_name='', **kwargs):
     """
     Not a decorator. Function to check sync_info last_updated_at to decide if cache or refresh
-    sync_info=self.get_sync('watched', 'show', 'slug').get(slug)
+    sync_info=self.get_sync('watched', 'show', 'slug', extended='full').get(slug)
     cache_name='TraktAPI.get_show_progress.response.{slug}'
     """
     sync_info = sync_info or {}
