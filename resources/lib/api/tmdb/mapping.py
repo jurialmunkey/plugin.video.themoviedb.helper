@@ -190,14 +190,15 @@ def get_external_ids(v):
 
 def get_roles(v, key='character'):
     infoproperties = {}
+    episode_count = 0
     for x, i in enumerate(sorted(v, key=lambda d: d.get('episode_count', 0)), start=1):
+        episode_count += i.get('episode_count') or 0
         infoproperties[f'{key}.{x}.name'] = i.get(key)
         infoproperties[f'{key}.{x}.episodes'] = i.get('episode_count')
         infoproperties[f'{key}.{x}.id'] = i.get('credit_id')
     else:
-        name = infoproperties[f'{key}.1.name']
-        episodes = infoproperties[f'{key}.1.episodes']
-        infoproperties[key] = infoproperties['role'] = f"{name} ({episodes})"
+        infoproperties['episodes'] = episode_count
+        infoproperties[key] = infoproperties['role'] = infoproperties[f'{key}.1.name']
     return infoproperties
 
 
