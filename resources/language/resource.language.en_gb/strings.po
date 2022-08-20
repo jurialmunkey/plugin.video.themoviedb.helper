@@ -2296,6 +2296,31 @@ msgctxt "#32450"
 msgid "Install context menu add-on"
 msgstr ""
 
+#: /resources/lib/api/trakt/api.py
+msgctxt "#32451"
+msgid "Lowest"
+msgstr ""
+
+#: /resources/lib/api/trakt/api.py
+msgctxt "#32452"
+msgid "Highest"
+msgstr ""
+
+#: /resources/lib/api/trakt/api.py
+msgctxt "#32453"
+msgid "Least played"
+msgstr ""
+
+#: /resources/lib/api/trakt/api.py
+msgctxt "#32454"
+msgid "Shortest"
+msgstr ""
+
+#: /resources/lib/api/trakt/api.py
+msgctxt "#32455"
+msgid "Longest"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
