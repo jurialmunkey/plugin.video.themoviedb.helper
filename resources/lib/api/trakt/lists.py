@@ -147,7 +147,10 @@ class ListCalendar(Container):
 class ListLibraryCalendar(ListCalendar):
     def get_items(self, **kwargs):
         from resources.lib.api.kodi.rpc import get_kodi_library
-        return self._get_calendar_items(kodi_db=get_kodi_library('tv'), user=False, **kwargs)
+        kodi_db = get_kodi_library('tv')
+        if not kodi_db:
+            return
+        return self._get_calendar_items(kodi_db=kodi_db, user=False, **kwargs)
 
 
 class ListInProgress(Container):
