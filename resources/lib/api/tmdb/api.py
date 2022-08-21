@@ -176,6 +176,7 @@ class TMDb(RequestAPI):
             infoproperties = {}
             infoproperties.update(get_episode_to_air(response.get('next_episode_to_air'), 'next_aired'))
             infoproperties.update(get_episode_to_air(response.get('last_episode_to_air'), 'last_aired'))
+            infoproperties['status'] = response.get('status')
             return infoproperties
 
         def _get_formatted():

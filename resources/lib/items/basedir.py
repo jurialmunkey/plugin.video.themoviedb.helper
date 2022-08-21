@@ -493,6 +493,14 @@ def _get_basedir_trakt():
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/trakt/airing.png'}},
         {
+            'label': get_localized(32459),
+            'types': ['tv'],
+            'params': {'info': 'trakt_airingnext'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/calendar.png'}},
+        {
             'label': u'{} {{item_type}}{{space}}{}'.format(get_localized(32201), get_localized(32203)),
             'types': ['tv'],
             'params': {'info': 'dir_calendar_trakt'},
@@ -708,6 +716,14 @@ def _get_basedir_tmdb():
             'label': get_localized(32183),
             'types': ['tv'],
             'params': {'info': 'dir_calendar_library'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/themoviedb/airing.png'}},
+        {
+            'label': get_localized(32458),
+            'types': ['tv'],
+            'params': {'info': 'library_airingnext'},
             'path': PLUGINPATH,
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',

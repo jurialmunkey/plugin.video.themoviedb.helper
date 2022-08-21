@@ -63,7 +63,7 @@ PLAYERS_BASEDIR_BUNDLED = 'special://home/addons/plugin.video.themoviedb.helper/
 PLAYERS_BASEDIR_TEMPLATES = 'special://home/addons/plugin.video.themoviedb.helper/resources/templates/'
 PLAYERS_PRIORITY = 1000
 
-NO_LABEL_FORMATTING = ['details', 'upcoming', 'trakt_calendar', 'trakt_myairing', 'trakt_anticipated', 'library_nextaired', 'videos', 'trakt_watchlist_anticipated']
+NO_LABEL_FORMATTING = ['details', 'upcoming', 'trakt_calendar', 'trakt_myairing', 'trakt_anticipated', 'library_nextaired', 'library_airingnext', 'trakt_airingnext', 'videos', 'trakt_watchlist_anticipated']
 
 PARAM_WIDGETS_RELOAD = 'reload=$INFO[Window(Home).Property(TMDbHelper.Widgets.Reload)]'
 PARAM_WIDGETS_RELOAD_REPLACE = 'reload=%24INFO%5BWindow%28Home%29.Property%28TMDbHelper.Widgets.Reload%29%5D'
@@ -630,6 +630,12 @@ ROUTE_NOID = {
     'library_nextaired': {'route': {
         'module_name': 'resources.lib.api.trakt.lists',
         'import_attr': 'ListLibraryCalendar'}},
+    'library_airingnext': {'route': {
+        'module_name': 'resources.lib.api.tmdb.lists_airingnext',
+        'import_attr': 'ListLibraryAiringNext'}},
+    'trakt_airingnext': {'route': {
+        'module_name': 'resources.lib.api.tmdb.lists_airingnext',
+        'import_attr': 'ListTraktAiringNext'}},
     'trakt_inprogress': {'route': {
         'module_name': 'resources.lib.api.trakt.lists',
         'import_attr': 'ListInProgress'}},
