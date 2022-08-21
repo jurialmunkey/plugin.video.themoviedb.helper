@@ -6,6 +6,7 @@ from resources.lib.addon.plugin import convert_media_type, convert_type, get_set
 from resources.lib.addon.logger import kodi_try_except
 from resources.lib.files.bcache import BasicCache
 from threading import Thread
+from copy import deepcopy
 
 
 def get_container():
@@ -159,6 +160,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         except KeyError:
             return  # Only lookup ratings for movie or tvshow
         get_property('IsUpdatingRatings', 'True')
+        details = deepcopy(details)  # Avoid race conditions with main thread while iterating over dictionary
         details = self.get_omdb_ratings(details)
         details = self.get_imdb_top250_rank(details, trakt_type=trakt_type)
         details = self.get_trakt_ratings(details, trakt_type, season=self.season, episode=self.episode)
