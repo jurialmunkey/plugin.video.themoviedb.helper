@@ -1,5 +1,5 @@
 from resources.lib.api.mapping import _ItemMapper, get_empty_item
-from resources.lib.addon.parser import get_between_strings
+from tmdbhelper.parser import get_between_strings
 
 
 class ItemMapper(_ItemMapper):

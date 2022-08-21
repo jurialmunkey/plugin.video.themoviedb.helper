@@ -1,6 +1,6 @@
 from xbmc import Monitor, executeJSONRPC
 from resources.lib.addon.logger import kodi_log
-from resources.lib.addon.parser import try_int, find_dict_in_list
+from tmdbhelper.parser import try_int, find_dict_in_list
 from resources.lib.api.kodi.mapping import ItemMapper
 
 """ Lazyimports

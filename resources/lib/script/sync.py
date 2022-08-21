@@ -6,7 +6,7 @@ from resources.lib.addon.tmdate import set_timestamp
 from resources.lib.addon.thread import ParallelThread
 from resources.lib.addon.window import get_property
 from resources.lib.addon.dialog import BusyDialog
-from resources.lib.addon.parser import try_int
+from tmdbhelper.parser import try_int
 from resources.lib.addon.plugin import set_kwargattr, convert_trakt_type, get_localized, executebuiltin, get_infolabel
 from resources.lib.api.trakt.api import TraktAPI
 from resources.lib.update.userlist import get_monitor_userlists

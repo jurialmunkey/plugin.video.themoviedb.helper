@@ -1,5 +1,5 @@
 from resources.lib.addon.logger import kodi_log
-from resources.lib.addon.parser import parse_paramstring, reconfigure_legacy_params
+from tmdbhelper.parser import parse_paramstring, reconfigure_legacy_params
 
 """ Lazyimports
 from resources.lib.player.players import Players

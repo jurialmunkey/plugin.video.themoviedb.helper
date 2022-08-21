@@ -1,4 +1,4 @@
-from resources.lib.addon.parser import try_int
+from tmdbhelper.parser import try_int
 
 
 def get_next_page(response_headers=None):

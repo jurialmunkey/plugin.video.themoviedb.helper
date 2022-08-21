@@ -1,7 +1,7 @@
 from xbmcgui import Dialog
 from resources.lib.addon.plugin import ADDONPATH, get_mpaa_prefix, get_language, convert_type, get_setting, get_localized, get_infolabel
 from resources.lib.addon.consts import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, TMDB_GENRE_IDS, CACHE_SHORT, CACHE_MEDIUM
-from resources.lib.addon.parser import try_int
+from tmdbhelper.parser import try_int
 from resources.lib.addon.window import get_property
 from resources.lib.addon.tmdate import format_date
 from resources.lib.files.futils import use_json_filecache, validify_filename

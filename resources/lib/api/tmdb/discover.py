@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from xbmcgui import Dialog, ListItem, INPUT_NUMERIC
+from tmdbhelper.parser import try_int, merge_two_dicts, split_items, find_dict_list_index
 from resources.lib.items.container import Container
-from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized
-from resources.lib.addon.parser import try_int, encode_url, merge_two_dicts, split_items, find_dict_list_index
+from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized, encode_url
 from resources.lib.addon.tmdate import get_datetime_now, get_timedelta
 from resources.lib.addon.window import get_property
 from resources.lib.files.bcache import set_search_history, get_search_history

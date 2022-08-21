@@ -1,6 +1,6 @@
 from xbmc import Monitor
 from xbmcgui import Window, getCurrentWindowId
-from resources.lib.addon.parser import try_type, try_int
+from tmdbhelper.parser import try_type, try_int
 from resources.lib.addon.plugin import executebuiltin, get_condvisibility, get_infolabel
 
 

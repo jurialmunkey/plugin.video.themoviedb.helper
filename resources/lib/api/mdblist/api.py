@@ -1,6 +1,6 @@
 from xbmcgui import Dialog
 from resources.lib.addon.plugin import get_setting, ADDONPATH, PLUGINPATH, convert_trakt_type, convert_type, get_localized
-from resources.lib.addon.parser import get_params
+from tmdbhelper.parser import get_params
 from resources.lib.api.request import RequestAPI
 from resources.lib.items.pages import PaginatedItems
 from resources.lib.addon.logger import kodi_log

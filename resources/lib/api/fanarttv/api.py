@@ -1,5 +1,5 @@
 from resources.lib.addon.plugin import get_language, get_setting
-from resources.lib.addon.parser import try_int, del_empty_keys
+from tmdbhelper.parser import try_int, del_empty_keys
 from resources.lib.addon.consts import CACHE_EXTENDED, ITER_PROPS_MAX
 from resources.lib.api.request import RequestAPI
 

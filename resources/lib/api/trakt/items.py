@@ -1,6 +1,6 @@
 import random
 from resources.lib.addon.plugin import PLUGINPATH, convert_type, convert_trakt_type
-from resources.lib.addon.parser import try_int, try_str, del_empty_keys, get_params, partition_list
+from tmdbhelper.parser import try_int, try_str, del_empty_keys, get_params, partition_list
 from resources.lib.addon.tmdate import date_in_range
 from resources.lib.items.filters import is_excluded
 

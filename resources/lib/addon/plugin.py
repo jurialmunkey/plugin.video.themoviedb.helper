@@ -1,58 +1,29 @@
 import re
-import xbmc
-from xbmcaddon import Addon as KodiAddon
+import tmdbhelper.plugin as tmdbhelper_plugin
+import tmdbhelper.parser as tmdbhelper_parser
 from resources.lib.addon.consts import LANGUAGES
 """ Top level module only import constants """
 
 
-ADDON = KodiAddon('plugin.video.themoviedb.helper')
-ADDONPATH = ADDON.getAddonInfo('path')
-ADDONNAME = ADDON.getAddonInfo('name')
-PLUGINPATH = u'plugin://plugin.video.themoviedb.helper/'
+KODIPLUGIN = tmdbhelper_plugin.KodiPlugin('plugin.video.themoviedb.helper')
+ADDON = KODIPLUGIN._addon
+ADDONPATH = KODIPLUGIN._addon_path
+ADDONNAME = KODIPLUGIN._addon_name
 ADDONDATA = 'special://profile/addon_data/plugin.video.themoviedb.helper/'
-ADDONGETSETTINGROUTE = {
-    'bool': ADDON.getSettingBool,
-    'int': ADDON.getSettingInt,
-    'str': ADDON.getSettingString
-}
-ADDONSETSETTINGROUTE = {
-    'bool': ADDON.setSettingBool,
-    'int': ADDON.setSettingInt,
-    'str': ADDON.setSettingString
-}
+PLUGINPATH = u'plugin://plugin.video.themoviedb.helper/'
 
+get_setting = KODIPLUGIN.get_setting
+set_setting = KODIPLUGIN.set_setting
+get_localized = KODIPLUGIN.get_localized
 
-_executebuiltin = xbmc.executebuiltin
-_getcondvisibility = xbmc.getCondVisibility
-_getinfolabel = xbmc.getInfoLabel
-_getxbmclocalized = xbmc.getLocalizedString
-_getaddonlocalized = ADDON.getLocalizedString
+encode_url = tmdbhelper_parser.EncodeURL(u'plugin://plugin.video.themoviedb.helper/').encode_url
 
-
-def executebuiltin(builtin):
-    _executebuiltin(builtin)
-
-
-def get_condvisibility(condition):
-    return _getcondvisibility(condition)
-
-
-def get_infolabel(infolabel):
-    return _getinfolabel(infolabel)
-
-
-def get_setting(setting, mode='bool'):
-    return ADDONGETSETTINGROUTE[mode](setting)
-
-
-def set_setting(setting, data, mode='bool'):
-    return ADDONSETSETTINGROUTE[mode](setting, data)
-
-
-def get_localized(localize_int=0):
-    if localize_int < 30000 or localize_int >= 33000:
-        return _getxbmclocalized(localize_int)
-    return _getaddonlocalized(localize_int)
+executebuiltin = tmdbhelper_plugin.executebuiltin
+get_condvisibility = tmdbhelper_plugin.get_condvisibility
+get_infolabel = tmdbhelper_plugin.get_infolabel
+format_name = tmdbhelper_plugin.format_name
+format_folderpath = tmdbhelper_plugin.format_folderpath
+set_kwargattr = tmdbhelper_plugin.set_kwargattr
 
 
 def get_plugin_category(info_model, plural=''):
@@ -61,35 +32,6 @@ def get_plugin_category(info_model, plural=''):
         return
     localized = get_localized(info_model['localized']) if 'localized' in info_model else ''
     return plugin_category.format(localized=localized, plural=plural)
-
-
-def format_name(cache_name, *args, **kwargs):
-    # Define a type whitelist to avoiding adding non-basic types like classes to cache name
-    permitted_types = (int, float, str, bool, bytes)
-    for arg in args:
-        if not isinstance(arg, permitted_types):
-            continue
-        cache_name = f'{cache_name}/{arg}' if cache_name else f'{arg}'
-    for key, value in sorted(kwargs.items()):
-        if not isinstance(value, permitted_types):
-            continue
-        cache_name = f'{cache_name}&{key}={value}' if cache_name else f'{key}={value}'
-    return cache_name
-
-
-def format_folderpath(path, content='videos', affix='return', info=None, play='PlayMedia'):
-    if not path:
-        return
-    if info == 'play':
-        return f'{play}({path})'
-    if _getcondvisibility("Window.IsMedia") and _getinfolabel("System.CurrentWindow").lower() == content:
-        return f'Container.Update({path})'
-    return f'ActivateWindow({content},{path},{affix})'
-
-
-def set_kwargattr(obj, kwargs):
-    for k, v in kwargs.items():
-        setattr(obj, k, v)
 
 
 def get_language():

@@ -1,7 +1,7 @@
 # Module: default
 # Author: jurialmunkey
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
-from resources.lib.addon.parser import reconfigure_legacy_params
+from tmdbhelper.parser import reconfigure_legacy_params
 from resources.lib.addon.logger import kodi_log
 from resources.lib.addon.modimp import importmodule
 

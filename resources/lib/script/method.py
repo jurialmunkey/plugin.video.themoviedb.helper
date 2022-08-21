@@ -165,9 +165,7 @@ def refresh_details(tmdb_id=None, tmdb_type=None, season=None, episode=None, con
 def related_lists(tmdb_id=None, tmdb_type=None, season=None, episode=None, container_update=True, include_play=False, **kwargs):
     from xbmcgui import Dialog
     from resources.lib.items.basedir import get_basedir_details
-    from resources.lib.addon.plugin import format_folderpath
-    from resources.lib.addon.parser import encode_url
-    from resources.lib.addon.plugin import executebuiltin
+    from resources.lib.addon.plugin import format_folderpath, encode_url, executebuiltin
     items = get_basedir_details(tmdb_type=tmdb_type, tmdb_id=tmdb_id, season=season, episode=episode, include_play=include_play)
     if not items or len(items) <= 1:
         return
@@ -412,7 +410,7 @@ def play_external(**kwargs):
 def play_using(play_using, mode='play', **kwargs):
     from resources.lib.addon.plugin import get_infolabel
     from resources.lib.files.futils import read_file
-    from resources.lib.addon.parser import parse_paramstring
+    from tmdbhelper.parser import parse_paramstring
 
     def _update_from_listitem(dictionary):
         url = get_infolabel('ListItem.FileNameAndPath') or ''
@@ -452,8 +450,7 @@ def play_using(play_using, mode='play', **kwargs):
 
 def sort_list(**kwargs):
     from xbmcgui import Dialog
-    from resources.lib.addon.parser import encode_url
-    from resources.lib.addon.plugin import executebuiltin, format_folderpath
+    from resources.lib.addon.plugin import executebuiltin, format_folderpath, encode_url
     from resources.lib.api.trakt.api import get_sort_methods
     sort_methods = get_sort_methods(kwargs['info'])
     x = Dialog().contextmenu([i['name'] for i in sort_methods])

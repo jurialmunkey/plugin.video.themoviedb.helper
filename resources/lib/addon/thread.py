@@ -1,11 +1,10 @@
 
 from xbmc import Monitor
 from threading import Thread
-from resources.lib.addon.plugin import get_setting
+from resources.lib.addon.plugin import get_setting, encode_url
 from resources.lib.addon.logger import kodi_log
 from resources.lib.addon.tmdate import set_timestamp, get_timestamp
 from resources.lib.addon.window import get_property
-from resources.lib.addon.parser import encode_url
 
 
 def has_property_lock(property_name, timeout=5, polling=0.2):

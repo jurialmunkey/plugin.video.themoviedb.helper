@@ -1,5 +1,5 @@
 from resources.lib.addon.plugin import get_setting, get_localized
-from resources.lib.addon.parser import try_int, find_dict_list_index
+from tmdbhelper.parser import try_int, find_dict_list_index
 from resources.lib.addon.tmdate import convert_timestamp, date_in_range, get_region_date, get_datetime_today, get_timedelta
 from resources.lib.files.bcache import use_simple_cache
 from resources.lib.files.futils import pickle_deepcopy

@@ -4,7 +4,7 @@ from resources.lib.api.omdb.api import OMDb
 from resources.lib.api.trakt.api import TraktAPI
 from resources.lib.api.fanarttv.api import FanartTV
 from resources.lib.addon.plugin import get_setting, get_infolabel, get_condvisibility
-from resources.lib.addon.parser import try_int, merge_two_dicts
+from tmdbhelper.parser import try_int, merge_two_dicts
 from resources.lib.addon.tmdate import convert_timestamp, get_region_date
 from resources.lib.items.builder import ItemBuilder
 from resources.lib.addon.logger import kodi_traceback, kodi_try_except

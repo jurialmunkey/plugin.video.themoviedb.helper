@@ -5,7 +5,7 @@ from resources.lib.files.futils import json_loads as data_loads
 from resources.lib.files.futils import json_dumps as data_dumps
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import get_localized, get_setting, set_setting
-from resources.lib.addon.parser import try_int
+from tmdbhelper.parser import try_int
 from resources.lib.addon.tmdate import set_timestamp, get_timestamp
 from resources.lib.files.bcache import use_simple_cache
 from resources.lib.items.pages import PaginatedItems, get_next_page

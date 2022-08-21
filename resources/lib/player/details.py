@@ -1,6 +1,6 @@
 from resources.lib.addon.tmdate import get_datetime_now
 from resources.lib.addon.consts import PLAYERS_URLENCODE
-from resources.lib.addon.parser import try_int, del_empty_keys
+from tmdbhelper.parser import try_int, del_empty_keys
 from resources.lib.items.listitem import ListItem
 from resources.lib.items.builder import ItemBuilder
 from resources.lib.addon.thread import ParallelThread

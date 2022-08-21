@@ -5,7 +5,7 @@ from xbmcplugin import setResolvedUrl
 from xbmcaddon import Addon as KodiAddon
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, format_folderpath, get_localized, get_setting, executebuiltin, get_infolabel
-from resources.lib.addon.parser import try_int, try_float
+from tmdbhelper.parser import try_int, try_float
 from resources.lib.addon.consts import PLAYERS_PRIORITY
 from resources.lib.addon.dialog import BusyDialog, ProgressDialog
 from resources.lib.items.listitem import ListItem

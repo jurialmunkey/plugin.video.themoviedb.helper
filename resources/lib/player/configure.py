@@ -1,7 +1,7 @@
 from xbmcgui import Dialog, INPUT_NUMERIC
 from xbmcaddon import Addon as KodiAddon
 from resources.lib.addon.plugin import ADDONPATH, get_localized
-from resources.lib.addon.parser import try_int
+from tmdbhelper.parser import try_int
 from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.consts import PLAYERS_BASEDIR_SAVE, PLAYERS_PRIORITY
 from resources.lib.files.futils import dumps_to_file, delete_file

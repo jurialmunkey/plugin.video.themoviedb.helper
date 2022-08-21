@@ -5,7 +5,7 @@ import hashlib
 from xbmc import getCacheThumbName, skinHasImage, Monitor, sleep
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import get_infolabel
-from resources.lib.addon.parser import try_int, try_float
+from tmdbhelper.parser import try_int, try_float
 from resources.lib.files.futils import make_path
 from threading import Thread
 import urllib.request as urllib

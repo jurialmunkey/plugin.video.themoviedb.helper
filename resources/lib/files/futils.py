@@ -3,7 +3,7 @@ import xbmcvfs
 from xbmcgui import Dialog
 from resources.lib.addon.consts import ALPHANUM_CHARS, INVALID_FILECHARS
 from resources.lib.addon.tmdate import get_timedelta, get_datetime_now, is_future_timestamp
-from resources.lib.addon.parser import try_int
+from tmdbhelper.parser import try_int
 from resources.lib.addon.plugin import ADDONDATA, get_localized, get_setting
 from resources.lib.addon.logger import kodi_log
 

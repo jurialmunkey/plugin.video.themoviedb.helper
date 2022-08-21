@@ -1,5 +1,5 @@
-from resources.lib.addon.plugin import convert_type, PLUGINPATH, get_plugin_category, get_localized, get_setting
-from resources.lib.addon.parser import try_int, encode_url
+from tmdbhelper.parser import try_int
+from resources.lib.addon.plugin import convert_type, PLUGINPATH, get_plugin_category, get_localized, get_setting, encode_url
 from resources.lib.items.container import Container
 
 

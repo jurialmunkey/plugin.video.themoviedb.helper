@@ -1,4 +1,4 @@
-from resources.lib.addon.parser import try_int
+from tmdbhelper.parser import try_int
 
 """ Lazyimports """
 from resources.lib.addon.modimp import lazyimport

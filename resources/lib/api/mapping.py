@@ -1,4 +1,4 @@
-from resources.lib.addon.parser import try_type
+from tmdbhelper.parser import try_type
 
 UPDATE_BASEKEY = 1
 

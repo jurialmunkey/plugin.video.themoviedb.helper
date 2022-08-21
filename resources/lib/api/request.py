@@ -1,7 +1,7 @@
 from xbmcgui import Dialog
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import get_localized, get_condvisibility
-from resources.lib.addon.parser import try_int
+from tmdbhelper.parser import try_int
 from resources.lib.addon.tmdate import get_timestamp, set_timestamp
 from resources.lib.files.bcache import BasicCache
 from resources.lib.addon.logger import kodi_log

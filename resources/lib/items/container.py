@@ -1,7 +1,7 @@
 from xbmcplugin import addDirectoryItems, setProperty, setPluginCategory, setContent, endOfDirectory, addSortMethod
 from resources.lib.addon.consts import NO_LABEL_FORMATTING
 from resources.lib.addon.plugin import get_setting, executebuiltin
-from resources.lib.addon.parser import try_int, split_items
+from tmdbhelper.parser import try_int, split_items
 from resources.lib.addon.thread import ParallelThread
 from resources.lib.api.tmdb.api import TMDb
 from resources.lib.api.trakt.api import TraktAPI

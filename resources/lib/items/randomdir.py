@@ -1,7 +1,7 @@
 import random
 from resources.lib.items.container import Container
 from resources.lib.addon.consts import RANDOMISED_LISTS, RANDOMISED_TRAKT
-from resources.lib.addon.parser import merge_two_dicts
+from tmdbhelper.parser import merge_two_dicts
 from resources.lib.items.routes import get_container
 
 

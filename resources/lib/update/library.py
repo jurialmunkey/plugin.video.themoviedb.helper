@@ -2,7 +2,7 @@ import xbmcvfs
 import resources.lib.api.kodi.rpc as rpc
 from xbmcgui import DialogProgressBG
 from resources.lib.addon.plugin import get_setting, get_localized, set_setting, executebuiltin
-from resources.lib.addon.parser import try_int
+from tmdbhelper.parser import try_int
 from resources.lib.addon.tmdate import is_unaired_timestamp, get_current_date_time
 from resources.lib.files.futils import validify_filename, get_tmdb_id_nfo
 from resources.lib.update.logger import _LibraryLogger
