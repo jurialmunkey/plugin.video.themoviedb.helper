@@ -111,6 +111,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             self.get_infolabel('dbid'),
             self.get_infolabel('IMDBNumber'),
             self.get_infolabel('label'),
+            self.get_infolabel('tvshowtitle'),
             self.get_infolabel('year'),
             self.get_infolabel('season'),
             self.get_infolabel('episode'),)
