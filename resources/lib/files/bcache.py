@@ -10,10 +10,9 @@ SEARCH_HISTORY = 'search_history.db'
 
 
 class BasicCache(object):
-    def __init__(self, filename=None, mem_only=False, delay_write=False):
+    def __init__(self, filename=None, delay_write=False):
         self._filename = filename
         self._cache = None
-        self._mem_only = mem_only
         self._delaywrite = delay_write
         self._id_list = []
 
@@ -21,7 +20,7 @@ class BasicCache(object):
     def ret_cache(self):
         from resources.lib.files.scache import SimpleCache
         if not self._cache:
-            self._cache = SimpleCache(filename=self._filename, mem_only=self._mem_only, delay_write=self._delaywrite)
+            self._cache = SimpleCache(filename=self._filename, delay_write=self._delaywrite)
         return self._cache
 
     @kodi_try_except('lib.addon.cache get_cache')

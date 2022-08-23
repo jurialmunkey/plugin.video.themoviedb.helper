@@ -28,7 +28,7 @@ class SimpleCache(object):
     _busy_tasks = []
     _database = None
 
-    def __init__(self, folder=None, filename=None, mem_only=False, delay_write=False):
+    def __init__(self, folder=None, filename=None, delay_write=False):
         '''Initialize our caching class'''
         folder = folder or DATABASE_NAME
         basefolder = get_setting('cache_location', 'str') or ''
@@ -38,7 +38,6 @@ class SimpleCache(object):
         self._monitor = Monitor()
         self._db_file = get_file_path(basefolder, filename, join_addon_data=basefolder == folder)
         self._sc_name = f'{folder}_{filename}_simplecache'
-        self._mem_only = mem_only
         self._queue = []
         self._delaywrite = delay_write
         self._connection = None
@@ -59,6 +58,7 @@ class SimpleCache(object):
             kodi_log(f'CACHE: Write {len(self._queue)} Items in Queue\n{self._sc_name}', 2)
         for i in self._queue:
             self._set_db_cache(*i)
+            self._del_mem_cache(i[0])  # Clean out win props
         self._queue = []
         self.close()
 
@@ -77,7 +77,7 @@ class SimpleCache(object):
         '''
         cur_time = set_timestamp(0, True)
         result = self._get_mem_cache(endpoint, cur_time)  # Try from memory first
-        if result is not None or self._mem_only or no_hdd:
+        if result is not None or no_hdd:
             return result
         return self._get_db_cache(endpoint, cur_time)  # Fallback to checking database if not in memory
 
@@ -87,8 +87,6 @@ class SimpleCache(object):
             expires = set_timestamp(cache_days * TIME_DAYS, True)
             data = data_dumps(data, separators=(',', ':'))
             self._set_mem_cache(endpoint, expires, data)
-            if self._mem_only:
-                return
             if self._delaywrite:
                 self._queue.append((endpoint, expires, data))
                 return
@@ -96,9 +94,6 @@ class SimpleCache(object):
 
     def check_cleanup(self):
         '''check if cleanup is needed - public method, may be called by calling addon'''
-        if self._mem_only:
-            return
-        # cur_time = get_datetime_now()
         cur_time = set_timestamp(0, True)
         lastexecuted = self._win.getProperty(f'{self._sc_name}.clean.lastexecuted')
         if not lastexecuted:
@@ -130,10 +125,18 @@ class SimpleCache(object):
             window property cache as alternative for memory cache
             usefull for (stateless) plugins
         '''
+        if not self._delaywrite:
+            return
         expr_endpoint = f'{self._sc_name}_expr_{endpoint}'
         data_endpoint = f'{self._sc_name}_data_{endpoint}'
         self._win.setProperty(expr_endpoint, str(expires))
         self._win.setProperty(data_endpoint, data)
+
+    def _del_mem_cache(self, endpoint):
+        expr_endpoint = f'{self._sc_name}_expr_{endpoint}'
+        data_endpoint = f'{self._sc_name}_data_{endpoint}'
+        self._win.clearProperty(expr_endpoint)
+        self._win.clearProperty(data_endpoint)
 
     def get_id_list(self):
         query = "SELECT id FROM simplecache"
@@ -222,7 +225,8 @@ class SimpleCache(object):
 
     def _set_pragmas(self, connection):
         if not self._connection:
-            connection.execute("PRAGMA synchronous=normal")
+            connection.execute("PRAGMA synchronous=OFF")
+            # connection.execute("PRAGMA synchronous=normal")
             connection.execute("PRAGMA journal_mode=WAL")
             # connection.execute("PRAGMA temp_store=memory")
             # connection.execute("PRAGMA mmap_size=2000000000")
