@@ -225,8 +225,8 @@ class SimpleCache(object):
 
     def _set_pragmas(self, connection):
         if not self._connection:
-            connection.execute("PRAGMA synchronous=OFF")
-            # connection.execute("PRAGMA synchronous=normal")
+            # connection.execute("PRAGMA synchronous=OFF")
+            connection.execute("PRAGMA synchronous=NORMAL")
             connection.execute("PRAGMA journal_mode=WAL")
             # connection.execute("PRAGMA temp_store=memory")
             # connection.execute("PRAGMA mmap_size=2000000000")
