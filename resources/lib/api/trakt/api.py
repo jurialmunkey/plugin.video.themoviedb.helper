@@ -133,7 +133,7 @@ class _TraktLists():
         return TraktItems(response.json(), headers=response.headers, trakt_type=trakt_type).configure_items()
 
     @is_authorized
-    def get_mixed_list(self, path, trakt_types=[], limit=20, extended=None, authorize=False):
+    def get_mixed_list(self, path, trakt_types: list, limit: int = 20, extended: str = None, authorize=False):
         """ Returns a randomised simple list which combines movies and shows
         path uses {trakt_type} as format substitution for trakt_type in trakt_types
         """
@@ -146,9 +146,7 @@ class _TraktLists():
             return random.sample(items, limit)
 
     @is_authorized
-    def get_basic_list(self, path, trakt_type, page=1, limit=20, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, randomise=False, always_refresh=True):
-        # TODO: Add argument to check whether to refresh on first page (e.g. for user lists)
-        # Also: Think about whether need to do it for standard respons
+    def get_basic_list(self, path, trakt_type, page: int = 1, limit: int = 20, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, randomise=False, always_refresh=True):
         cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
         if randomise:
             response = self.get_simple_list(
@@ -165,7 +163,7 @@ class _TraktLists():
             return response['items'] + get_next_page(response['headers'])
 
     @is_authorized
-    def get_stacked_list(self, path, trakt_type, page=1, limit=20, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, always_refresh=True, **kwargs):
+    def get_stacked_list(self, path, trakt_type, page: int = 1, limit: int = 20, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, always_refresh=True, **kwargs):
         """ Get Basic list but stack repeat TV Shows """
         cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
         response = self.get_simple_list(path, extended=extended, limit=4095, trakt_type=trakt_type, cache_refresh=cache_refresh)
@@ -174,9 +172,8 @@ class _TraktLists():
         if response:
             return response['items'] + get_next_page(response['headers'])
 
-    def get_custom_list(self, list_slug, user_slug=None, page=1, limit=20, params=None, authorize=False, sort_by=None, sort_how=None, extended=None, owner=False, always_refresh=True):
-        if authorize and not self.authorize():
-            return
+    @is_authorized
+    def get_custom_list(self, list_slug, user_slug=None, page: int = 1, limit: int = 20, params=None, authorize=False, sort_by=None, sort_how=None, extended=None, owner=False, always_refresh=True):
         if user_slug == 'official':
             path = f'lists/{list_slug}/items'
         else:
@@ -202,7 +199,7 @@ class _TraktLists():
         func = TraktItems(items=self.get_sync(sync_type, trakt_type, extended=extended), trakt_type=trakt_type).build_items
         return func(sort_by, sort_how, filters=filters)
 
-    def get_sync_list(self, sync_type, trakt_type, page=1, limit=None, params=None, sort_by=None, sort_how=None, next_page=True, always_refresh=True, extended=None, filters=None):
+    def get_sync_list(self, sync_type, trakt_type, page: int = 1, limit: int = None, params=None, sort_by=None, sort_how=None, next_page=True, always_refresh=True, extended=None, filters=None):
         limit = limit or self.item_limit
         cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
         response = self._get_sync_list(sync_type, trakt_type, sort_by=sort_by, sort_how=sort_how, decorator_cache_refresh=cache_refresh, extended=extended, filters=filters)
@@ -212,7 +209,7 @@ class _TraktLists():
         return response.items if not next_page else response.items + response.next_page
 
     @is_authorized
-    def get_list_of_lists(self, path, page=1, limit=250, authorize=False, next_page=True, sort_likes=False):
+    def get_list_of_lists(self, path, page: int = 1, limit: int = 250, authorize=False, next_page=True, sort_likes=False):
         response = self.get_response(path, page=page, limit=limit)
         if not response:
             return
