@@ -2341,6 +2341,21 @@ msgctxt "#32459"
 msgid "Your Episodes Airing Next"
 msgstr ""
 
+#: /resources/lib/items/basedir.py
+msgctxt "#32460"
+msgid "Awards"
+msgstr ""
+
+#: /resources/lib/api/tvdb/lists.py
+msgctxt "#32461"
+msgid "Winner of"
+msgstr ""
+
+#: /resources/lib/api/tvdb/lists.py
+msgctxt "#32462"
+msgid "Nominated for"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

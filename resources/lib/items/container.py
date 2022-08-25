@@ -7,6 +7,7 @@ from resources.lib.api.tmdb.api import TMDb
 from resources.lib.api.trakt.api import TraktAPI
 from resources.lib.api.fanarttv.api import FanartTV
 from resources.lib.api.omdb.api import OMDb
+from resources.lib.api.tvdb.api import TVDb
 from resources.lib.api.mdblist.api import MDbList
 from resources.lib.items.trakt import TraktMethods
 from resources.lib.items.builder import ItemBuilder
@@ -59,6 +60,7 @@ class Container():
         self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only(), delay_write=True)
         self.trakt_api = TraktAPI(delay_write=True)
         self.mdblist_api = MDbList(delay_write=True)
+        self.tvdb_api = TVDb(delay_write=True)
         self.ib = ItemBuilder(
             tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api,
             delay_write=True, log_timers=self.log_timers, timer_lists=self.timer_lists)

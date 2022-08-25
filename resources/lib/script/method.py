@@ -336,6 +336,7 @@ def library_autoupdate(**kwargs):
         force=kwargs.get('force', False))
 
 
+
 def log_request(**kwargs):
     import xbmcvfs
     from json import dumps
@@ -343,6 +344,7 @@ def log_request(**kwargs):
     from resources.lib.addon.dialog import BusyDialog
     from resources.lib.api.trakt.api import TraktAPI
     from resources.lib.api.tmdb.api import TMDb
+    from resources.lib.api.tvdb.api import TVDb
     from resources.lib.files.futils import validify_filename
     from resources.lib.files.futils import dumps_to_file
     with BusyDialog():
@@ -353,6 +355,8 @@ def log_request(**kwargs):
             return
         if kwargs.get('log_request').lower() == 'trakt':
             kwargs['response'] = TraktAPI().get_response_json(kwargs['url'])
+        elif kwargs.get('log_request').lower() == 'tvdb':
+            kwargs['response'] = TVDb().get_response_json(kwargs['url'])
         else:
             kwargs['response'] = TMDb().get_response_json(kwargs['url'])
         if not kwargs['response']:

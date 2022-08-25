@@ -3,6 +3,7 @@ from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_
 from tmdbhelper.parser import merge_two_items
 from resources.lib.items.builder import ItemBuilder
 from resources.lib.items.container import Container
+from resources.lib.addon.consts import TVDB_DISCLAIMER
 
 
 def _build_basedir_item(i, t, space):
@@ -31,7 +32,7 @@ def _build_basedir(item_type=None, basedir=None):
         if not item_type or item_type == t]
 
 
-def _get_basedir_list(item_type=None, trakt=False, tmdb=False, mdblist=False):
+def _get_basedir_list(item_type=None, trakt=False, tmdb=False, mdblist=False, tvdb=False):
     basedir = []
     if tmdb:
         basedir += _get_basedir_tmdb()
@@ -39,6 +40,8 @@ def _get_basedir_list(item_type=None, trakt=False, tmdb=False, mdblist=False):
         basedir += _get_basedir_trakt()
     if mdblist:
         basedir += _get_basedir_mdblist()
+    if tvdb:
+        basedir += _get_basedir_tvdb()
     return _build_basedir(item_type, basedir)
 
 
@@ -327,6 +330,29 @@ def _get_basedir_random():
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/trakt/mylists.png'}}
+    ]
+
+
+def _get_basedir_tvdb():
+    return [
+        {
+            'label': get_localized(32460),
+            'types': ['both'],
+            'params': {'info': 'dir_tvdb_awards'},
+            'path': PLUGINPATH,
+            'infolabels': {'plot': TVDB_DISCLAIMER},
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/tvdb/tvdb.png'}},
+        {
+            'label': u'{{item_type}}{{space}}{}'.format(get_localized(135)),
+            'types': ['movie', 'tv'],
+            'params': {'info': 'dir_tvdb_genres'},
+            'path': PLUGINPATH,
+            'infolabels': {'plot': TVDB_DISCLAIMER},
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/tvdb/tvdb.png'}},
     ]
 
 
@@ -837,6 +863,14 @@ def _get_basedir_main():
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/trakt.png'}},
         {
+            'label': u'TVDb',
+            'types': [None],
+            'params': {'info': 'dir_tvdb'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/tvdb/tvdb.png'}},
+        {
             'label': u'MDbList',
             'types': [None],
             'params': {'info': 'dir_mdblist'},
@@ -1012,6 +1046,7 @@ class ListBaseDir(Container):
             'dir_tmdb': lambda: _get_basedir_list(None, tmdb=True),
             'dir_trakt': lambda: _get_basedir_list(None, trakt=True),
             'dir_mdblist': lambda: _get_basedir_list(None, mdblist=True),
+            'dir_tvdb': lambda: _get_basedir_list(None, tvdb=True),
             'dir_random': lambda: _build_basedir(None, _get_basedir_random()),
             'dir_calendar_trakt': lambda: _get_basedir_calendar(info='trakt_calendar', endpoint=kwargs.get('endpoint'), user=kwargs.get('user')),
             'dir_calendar_library': lambda: _get_basedir_calendar(info='library_nextaired')

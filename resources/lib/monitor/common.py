@@ -1,6 +1,7 @@
 from resources.lib.addon.window import get_property
 from resources.lib.api.tmdb.api import TMDb
 from resources.lib.api.omdb.api import OMDb
+from resources.lib.api.tvdb.api import TVDb
 from resources.lib.api.trakt.api import TraktAPI
 from resources.lib.api.fanarttv.api import FanartTV
 from resources.lib.addon.plugin import get_setting, get_infolabel, get_condvisibility
@@ -28,7 +29,8 @@ SETPROP_RATINGS = {
     'rottentomatoes_reviewsrotten', 'rottentomatoes_consensus', 'rottentomatoes_usermeter',
     'rottentomatoes_userreviews', 'trakt_rating', 'trakt_votes', 'goldenglobe_wins',
     'goldenglobe_nominations', 'oscar_wins', 'oscar_nominations', 'award_wins', 'award_nominations',
-    'emmy_wins', 'emmy_nominations', 'tmdb_rating', 'tmdb_votes', 'top250'}
+    'emmy_wins', 'emmy_nominations', 'tmdb_rating', 'tmdb_votes', 'top250',
+    'tvdb_rating'}
 
 
 class CommonMonitorFunctions(object):
@@ -38,6 +40,7 @@ class CommonMonitorFunctions(object):
         self.trakt_api = TraktAPI()
         self.tmdb_api = TMDb()
         self.ftv_api = FanartTV()
+        self.tvdb_api = TVDb()
         self.omdb_api = OMDb() if get_setting('omdb_apikey', 'str') else None
         self.ib = ItemBuilder(tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api)
         self.imdb_top250 = {}
@@ -147,11 +150,12 @@ class CommonMonitorFunctions(object):
         return (multi_i.get('id'), multi_i.get('media_type'),)
 
     def get_trakt_ratings(self, item, trakt_type, season=None, episode=None):
+        _dummdict = {}
         ratings = self.trakt_api.get_ratings(
             trakt_type=trakt_type,
-            imdb_id=item.get('unique_ids', {}).get('tvshow.imdb') or item.get('unique_ids', {}).get('imdb'),
-            trakt_id=item.get('unique_ids', {}).get('tvshow.trakt') or item.get('unique_ids', {}).get('trakt'),
-            slug_id=item.get('unique_ids', {}).get('tvshow.slug') or item.get('unique_ids', {}).get('slug'),
+            imdb_id=item.get('unique_ids', _dummdict).get('tvshow.imdb') or item.get('unique_ids', _dummdict).get('imdb'),
+            trakt_id=item.get('unique_ids', _dummdict).get('tvshow.trakt') or item.get('unique_ids', _dummdict).get('trakt'),
+            slug_id=item.get('unique_ids', _dummdict).get('tvshow.slug') or item.get('unique_ids', _dummdict).get('slug'),
             season=season,
             episode=episode)
         if not ratings:

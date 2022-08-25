@@ -487,6 +487,21 @@
 						<heading>32011</heading>
 					</control>
 				</setting>
+				<setting id="tvdb_token" type="string" label="32011" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">False</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>32011</heading>
+					</control>
+				</setting>
 				<setting id="revoke_trakt" type="action" label="32169" help="">
 					<level>0</level>
 					<data>RunScript(plugin.video.themoviedb.helper,revoke_trakt)</data>

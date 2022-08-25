@@ -57,8 +57,8 @@ class RequestAPI(object):
         self.timeout = timeout or 15
         self._cache = BasicCache(filename=f'{req_api_name or "requests"}.db', delay_write=delay_write)
 
-    def get_api_request_json(self, request=None, postdata=None, headers=None, is_xml=False):
-        request = self.get_api_request(request=request, postdata=postdata, headers=headers)
+    def get_api_request_json(self, request=None, postdata=None, headers=None, is_xml=False, method=None):
+        request = self.get_api_request(request=request, postdata=postdata, headers=headers, method=method)
         if not request:
             return {}
         response = translate_xml(request) if is_xml else request.json()
@@ -122,6 +122,8 @@ class RequestAPI(object):
                 return requests.delete(request, headers=headers, timeout=self.timeout)
             if method == 'put':
                 return requests.put(request, data=postdata, headers=headers, timeout=self.timeout)
+            if method == 'json':
+                return requests.post(request, json=postdata, headers=headers, timeout=self.timeout)
             if postdata or method == 'post':  # If pass postdata assume we want to post
                 return requests.post(request, data=postdata, headers=headers, timeout=self.timeout)
             return requests.get(request, headers=headers, timeout=self.timeout)
@@ -132,7 +134,7 @@ class RequestAPI(object):
         except Exception as err:
             kodi_log(f'RequestError: {err}', 1)
 
-    def get_api_request(self, request=None, postdata=None, headers=None):
+    def get_api_request(self, request=None, postdata=None, headers=None, method=None):
         """
         Make the request to the API by passing a url request string
         """
@@ -143,7 +145,7 @@ class RequestAPI(object):
             return
 
         # Get response
-        response = self.get_simple_api_request(request, postdata, headers)
+        response = self.get_simple_api_request(request, postdata, headers, method)
         if response is None or not response.status_code:
             return
 
