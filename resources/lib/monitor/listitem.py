@@ -347,6 +347,9 @@ class ListItemMonitor(CommonMonitorFunctions):
             thread_ratings = Thread(target=self.process_ratings, args=[details, tmdb_type])
             thread_ratings.start()
 
+        # Get TVDb Awards
+        details = self.get_tvdb_awards(details, tmdb_type, tmdb_id)
+
         # Set our properties
         self.set_properties(details)
 

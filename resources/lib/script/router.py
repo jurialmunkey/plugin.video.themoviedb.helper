@@ -22,6 +22,8 @@ class Script(object):
             lambda **kwargs: importmodule('resources.lib.api.trakt.api', 'TraktAPI')(force=True),
         'revoke_trakt':
             lambda **kwargs: importmodule('resources.lib.api.trakt.api', 'TraktAPI')().logout(),
+        'build_awards':
+            lambda **kwargs: importmodule('resources.lib.script.awards', 'build_awards')(**kwargs),
         'split_value':
             lambda **kwargs: importmodule('resources.lib.script.method', 'split_value')(**kwargs),
         'kodi_setting':

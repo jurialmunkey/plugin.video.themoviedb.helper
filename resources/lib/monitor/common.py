@@ -8,7 +8,10 @@ from resources.lib.addon.plugin import get_setting, get_infolabel, get_condvisib
 from tmdbhelper.parser import try_int, merge_two_dicts
 from resources.lib.addon.tmdate import convert_timestamp, get_region_date
 from resources.lib.items.builder import ItemBuilder
-from resources.lib.addon.logger import kodi_traceback, kodi_try_except
+from resources.lib.addon.logger import kodi_traceback, kodi_try_except, kodi_log
+from resources.lib.files.futils import validate_join
+import xbmcvfs
+import json
 
 
 SETMAIN = {
@@ -45,6 +48,14 @@ class CommonMonitorFunctions(object):
         self.ib = ItemBuilder(tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api)
         self.imdb_top250 = {}
         self.property_prefix = 'ListItem'
+
+        try:
+            filepath = validate_join('special://home/addons/plugin.video.themoviedb.helper/resources/jsondata/', 'awards.json')
+            with xbmcvfs.File(filepath, 'r') as file:
+                self.all_awards = json.load(file)
+        except (IOError, json.JSONDecodeError):
+            self.all_awards = {'movie': {}, 'tv': {}}
+            kodi_log('ERROR: Failed to load awards data!')
 
     @kodi_try_except('lib.monitor.common clear_property')
     def clear_property(self, key):
@@ -187,6 +198,31 @@ class CommonMonitorFunctions(object):
         if not self.omdb_api:
             return item
         return self.omdb_api.get_item_ratings(item, cache_only=cache_only)
+
+    def get_tvdb_awards(self, item, tmdb_type, tmdb_id):
+        tmdb_id = str(tmdb_id)
+
+        if not self.all_awards.get(tmdb_type):
+            kodi_log(f'No Awards for {tmdb_type}', 1)
+            return item
+
+        if not self.all_awards[tmdb_type].get(tmdb_id):
+            kodi_log(f'No Awards for {tmdb_type} {tmdb_id}', 1)
+            return item
+
+        awards = self.all_awards[tmdb_type][tmdb_id]
+        kodi_log(f'Awards for {tmdb_type} {tmdb_id}', 1)
+
+        for t in ['awards_won', 'awards_nominated']:
+            awards_won = awards.get(t, {})
+            awards_won = [f'{k} {i}' for k in awards_won for i in awards_won[k]]
+            if awards_won:
+                kodi_log(f'{len(awards_won)} {t} for {tmdb_type} {tmdb_id}', 1)
+                item['infoproperties'][f'total_{t}'] = len(awards_won)
+                item['infoproperties'][f'{t}_CR'] = '[CR]'.join(awards_won)
+                item['infoproperties'][t] = ' / '.join(awards_won)
+
+        return item
 
     def clear_properties(self, ignore_keys=None):
         if not ignore_keys:
