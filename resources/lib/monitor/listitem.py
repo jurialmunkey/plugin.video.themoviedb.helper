@@ -154,7 +154,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             ImageFunctions(method='crop', is_thread=False, artwork=artwork.get('clearlogo')).run()
 
     @kodi_try_except('lib.monitor.listitem.process_ratings')
-    def process_ratings(self, details, tmdb_type):
+    def process_ratings(self, details, tmdb_type, tmdb_id):
         self.clear_property_list(SETPROP_RATINGS)
         try:
             trakt_type = {'movie': 'movie', 'tv': 'show'}[tmdb_type]
@@ -165,6 +165,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         details = self.get_omdb_ratings(details)
         details = self.get_imdb_top250_rank(details, trakt_type=trakt_type)
         details = self.get_trakt_ratings(details, trakt_type, season=self.season, episode=self.episode)
+        details = self.get_tvdb_awards(details, tmdb_type, tmdb_id)
         if not self.is_same_item():
             return get_property('IsUpdatingRatings', clear_property=True)
         self.set_iter_properties(details.get('infoproperties', {}), SETPROP_RATINGS)
@@ -344,11 +345,8 @@ class ListItemMonitor(CommonMonitorFunctions):
 
         # Get our item ratings
         if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"):
-            thread_ratings = Thread(target=self.process_ratings, args=[details, tmdb_type])
+            thread_ratings = Thread(target=self.process_ratings, args=[details, tmdb_type, tmdb_id])
             thread_ratings.start()
-
-        # Get TVDb Awards
-        details = self.get_tvdb_awards(details, tmdb_type, tmdb_id)
 
         # Set our properties
         self.set_properties(details)

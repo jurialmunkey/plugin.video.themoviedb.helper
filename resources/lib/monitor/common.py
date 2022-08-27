@@ -32,8 +32,23 @@ SETPROP_RATINGS = {
     'rottentomatoes_reviewsrotten', 'rottentomatoes_consensus', 'rottentomatoes_usermeter',
     'rottentomatoes_userreviews', 'trakt_rating', 'trakt_votes', 'goldenglobe_wins',
     'goldenglobe_nominations', 'oscar_wins', 'oscar_nominations', 'award_wins', 'award_nominations',
-    'emmy_wins', 'emmy_nominations', 'tmdb_rating', 'tmdb_votes', 'top250',
-    'tvdb_rating'}
+    'emmy_wins', 'emmy_nominations', 'tmdb_rating', 'tmdb_votes', 'top250', 'tvdb_rating',
+    'total_awards_won', 'awards_won', 'awards_won_cr', 'academy_awards_won', 'goldenglobe_awards_won',
+    'mtv_awards_won', 'criticschoice_awards_won', 'emmy_awards_won', 'sag_awards_won', 'bafta_awards_won',
+    'total_awards_nominated', 'awards_nominated', 'awards_nominated_cr', 'academy_awards_nominated',
+    'goldenglobe_awards_nominated', 'mtv_awards_nominated', 'criticschoice_awards_nominated',
+    'emmy_awards_nominated', 'sag_awards_nominated', 'bafta_awards_nominated'}
+
+
+TVDB_AWARDS_KEYS = {
+    'Academy Awards': 'academy',
+    'Golden Globe Awards': 'goldenglobe',
+    'MTV Movie & TV Awards': 'mtv',
+    'Critics\' Choice Awards': 'criticschoice',
+    'Primetime Emmy Awards': 'emmy',
+    'Screen Actors Guild Awards': 'sag',
+    'BAFTA Awards': 'bafta',
+}
 
 
 class CommonMonitorFunctions(object):
@@ -200,27 +215,29 @@ class CommonMonitorFunctions(object):
         return self.omdb_api.get_item_ratings(item, cache_only=cache_only)
 
     def get_tvdb_awards(self, item, tmdb_type, tmdb_id):
-        tmdb_id = str(tmdb_id)
-
-        if not self.all_awards.get(tmdb_type):
-            kodi_log(f'No Awards for {tmdb_type}', 1)
+        try:
+            awards = self.all_awards[tmdb_type][str(tmdb_id)]
+        except(KeyError, TypeError, AttributeError):
             return item
-
-        if not self.all_awards[tmdb_type].get(tmdb_id):
-            kodi_log(f'No Awards for {tmdb_type} {tmdb_id}', 1)
-            return item
-
-        awards = self.all_awards[tmdb_type][tmdb_id]
-        kodi_log(f'Awards for {tmdb_type} {tmdb_id}', 1)
 
         for t in ['awards_won', 'awards_nominated']:
-            awards_won = awards.get(t, {})
-            awards_won = [f'{k} {i}' for k in awards_won for i in awards_won[k]]
-            if awards_won:
-                kodi_log(f'{len(awards_won)} {t} for {tmdb_type} {tmdb_id}', 1)
-                item['infoproperties'][f'total_{t}'] = len(awards_won)
-                item['infoproperties'][f'{t}_CR'] = '[CR]'.join(awards_won)
-                item['infoproperties'][t] = ' / '.join(awards_won)
+            item_awards = awards.get(t)
+            if not item_awards:
+                continue
+            all_awards, all_awards_cr = [], []
+            for cat, lst in item_awards.items():
+                all_awards_cr.append(f'[CR]{cat}' if all_awards else cat)
+                all_awards_cr += lst
+                all_awards += [(f'{cat} {i}') for i in lst]
+                try:
+                    item['infoproperties'][f'{TVDB_AWARDS_KEYS[cat]}_{t}'] = len(lst)
+                except(KeyError, TypeError, AttributeError):
+                    continue
+
+            if all_awards:
+                item['infoproperties'][f'total_{t}'] = len(all_awards)
+                item['infoproperties'][t] = ' / '.join(all_awards)
+                item['infoproperties'][f'{t}_cr'] = '[CR]'.join(all_awards_cr)
 
         return item
 
