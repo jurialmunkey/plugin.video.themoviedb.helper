@@ -7,7 +7,7 @@ from resources.lib.addon.tmdate import set_timestamp, get_timestamp
 from resources.lib.addon.window import get_property
 
 
-def has_property_lock(property_name, timeout=5, polling=0.2):
+def has_property_lock(property_name, timeout=5, polling=0.05):
     """ Checks for a window property lock and wait for it to be cleared before continuing
     Returns True after property clears if was locked
     """
@@ -25,7 +25,7 @@ def has_property_lock(property_name, timeout=5, polling=0.2):
     return True
 
 
-def use_thread_lock(property_name, timeout=10, polling=0.1, combine_name=False):
+def use_thread_lock(property_name, timeout=10, polling=0.05, combine_name=False):
     def decorator(func):
         def wrapper(self, *args, **kwargs):
             name = encode_url(f"{property_name}.{'.'.join(args)}", **kwargs) if combine_name else property_name

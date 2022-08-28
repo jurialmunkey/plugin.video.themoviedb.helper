@@ -28,7 +28,7 @@ class SimpleCache(object):
     _busy_tasks = []
     _database = None
 
-    def __init__(self, folder=None, filename=None, delay_write=False):
+    def __init__(self, folder=None, filename=None, delay_write=False, mem_cache=False):
         '''Initialize our caching class'''
         folder = folder or DATABASE_NAME
         basefolder = get_setting('cache_location', 'str') or ''
@@ -41,6 +41,7 @@ class SimpleCache(object):
         self._queue = []
         self._delaywrite = delay_write
         self._connection = None
+        self._memcache = mem_cache
         self.check_cleanup()
         kodi_log("CACHE: Initialized")
 
@@ -58,7 +59,8 @@ class SimpleCache(object):
             kodi_log(f'CACHE: Write {len(self._queue)} Items in Queue\n{self._sc_name}', 2)
         for i in self._queue:
             self._set_db_cache(*i)
-            self._del_mem_cache(i[0])  # Clean out win props
+            if not self._memcache:
+                self._del_mem_cache(i[0])  # Clean out win props
         self._queue = []
         self.close()
 
@@ -125,7 +127,7 @@ class SimpleCache(object):
             window property cache as alternative for memory cache
             usefull for (stateless) plugins
         '''
-        if not self._delaywrite:
+        if not self._memcache and not self._delaywrite:
             return
         expr_endpoint = f'{self._sc_name}_expr_{endpoint}'
         data_endpoint = f'{self._sc_name}_data_{endpoint}'
