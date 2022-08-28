@@ -32,7 +32,7 @@ SETPROP_RATINGS = {
     'rottentomatoes_reviewsrotten', 'rottentomatoes_consensus', 'rottentomatoes_usermeter',
     'rottentomatoes_userreviews', 'trakt_rating', 'trakt_votes', 'goldenglobe_wins',
     'goldenglobe_nominations', 'oscar_wins', 'oscar_nominations', 'award_wins', 'award_nominations',
-    'emmy_wins', 'emmy_nominations', 'tmdb_rating', 'tmdb_votes', 'top250', 'tvdb_rating',
+    'emmy_wins', 'emmy_nominations', 'tmdb_rating', 'tmdb_votes', 'top250',
     'total_awards_won', 'awards_won', 'awards_won_cr', 'academy_awards_won', 'goldenglobe_awards_won',
     'mtv_awards_won', 'criticschoice_awards_won', 'emmy_awards_won', 'sag_awards_won', 'bafta_awards_won',
     'total_awards_nominated', 'awards_nominated', 'awards_nominated_cr', 'academy_awards_nominated',

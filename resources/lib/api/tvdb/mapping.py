@@ -30,13 +30,11 @@ class ItemMapper(_ItemMapper):
             }],
         }
         self.standard_map = {
-            'score': ('infoproperties', 'tvdb_rating'),
             'id': ('unique_ids', 'tvdb'),
             'slug': ('unique_ids', 'tvdb_slug'),
-            'name': ('infolabels', 'title'),
-            'image': ('art', 'poster'),
+            'name': ('infolabels', 'originaltitle'),
+            # 'image': ('art', 'poster'),
             'year': ('infolabels', 'year'),
-            'overview': ('infolabels', 'plot'),
             'mediatype': ('infolabels', 'mediatype'),
         }
 
@@ -58,6 +56,6 @@ class ItemMapper(_ItemMapper):
     def get_info(self, info_item, tmdb_type=None, base_item=None, **kwargs):
         item = get_empty_item()
         item = self.map_item(item, info_item)
-        item = self.add_base(item, base_item, tmdb_type)
-        item = self.finalise(item)
+        # item = self.add_base(item, base_item, tmdb_type)
+        # item = self.finalise(item)
         return item

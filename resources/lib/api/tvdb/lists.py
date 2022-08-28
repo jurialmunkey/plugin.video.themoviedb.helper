@@ -2,9 +2,43 @@ from resources.lib.items.container import Container
 from resources.lib.api.mapping import get_empty_item
 from resources.lib.addon.plugin import ADDONPATH
 from resources.lib.addon.consts import TVDB_DISCLAIMER
+from resources.lib.items.pages import PaginatedItems
+from resources.lib.addon.thread import ParallelThread
 
 
 TVDB_ICON = f'{ADDONPATH}/resources/icons/tvdb/tvdb.png'
+
+
+class ListListItems(Container):
+    def _get_item_tmdb_id(self, item, tmdb_type):
+        if tmdb_type == 'tv':
+            tv_tmdb_id = self.tmdb_api.get_tmdb_id(
+                tmdb_type=tmdb_type,
+                tvdb_id=item['unique_ids'].get('tvdb'))
+            if not tv_tmdb_id:
+                tv_tmdb_id = self.tmdb_api.get_tmdb_id(
+                    tmdb_type=tmdb_type,
+                    query=item['infolabels'].get('originaltitle'),
+                    year=item['infolabels'].get('year'))
+            item['unique_ids']['tvshow.tmdb'] = item['unique_ids']['tmdb'] = tv_tmdb_id
+        elif tmdb_type == 'movie':
+            item['unique_ids']['tmdb'] = self.tmdb_api.get_tmdb_id(
+                tmdb_type=tmdb_type,
+                query=item['infolabels'].get('originaltitle'),
+                year=item['infolabels'].get('year'))
+        if not item['unique_ids'].get('tmdb'):
+            return
+        item['params'] = {'info': 'details', 'tmdb_type': tmdb_type, 'tmdb_id': item['unique_ids']['tmdb']}
+        return item
+
+    def _get_threaded_items(self, data, page, *args, **kwargs):
+        response = PaginatedItems(data, page=page)
+        if not response or not response.items:
+            return
+        with ParallelThread(response.items, self._get_item, *args, **kwargs) as pt:
+            item_queue = pt.queue
+        items = [i for i in item_queue if i]
+        return items + response.next_page
 
 
 class ListLists(Container):

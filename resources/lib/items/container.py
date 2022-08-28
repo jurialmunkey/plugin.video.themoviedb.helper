@@ -118,7 +118,10 @@ class Container():
         if not self.pagination and 'next_page' in i:
             return
         with TimerList(self.timer_lists, 'item_api', log_threshold=0.05, logging=self.log_timers):
-            return self.ib.get_listitem(i, use_iterprops=self.is_detailed)
+            li = self.ib.get_listitem(i, use_iterprops=self.is_detailed)
+            if li.infoproperties.get('plot_affix'):
+                li.infolabels['plot'] = f"{li.infoproperties['plot_affix']}. {li.infolabels.get('plot')}"
+            return li
 
     def _make_item(self, li):
         if not li:

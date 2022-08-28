@@ -90,7 +90,7 @@ class TMDb(RequestAPI):
     def get_tmdb_id(self, tmdb_type=None, imdb_id=None, tvdb_id=None, query=None, year=None, episode_year=None, raw_data=False, **kwargs):
         if not tmdb_type:
             return
-        kwargs['cache_days'] = CACHE_SHORT
+        kwargs['cache_days'] = CACHE_MEDIUM
         kwargs['cache_name'] = 'TMDb.get_tmdb_id.v3'
         kwargs['cache_combine_name'] = True
         return self._cache.use_cache(
@@ -98,7 +98,7 @@ class TMDb(RequestAPI):
             episode_year=episode_year, raw_data=raw_data, **kwargs)
 
     def _get_tmdb_id(self, tmdb_type, imdb_id, tvdb_id, query, year, episode_year, raw_data, **kwargs):
-        func = self.get_request_sc
+        func = self.get_request_lc
         if not tmdb_type:
             return
         request = None

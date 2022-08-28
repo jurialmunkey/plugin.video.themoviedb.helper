@@ -101,5 +101,6 @@ class AwardsBuilder():
 
 def build_awards(**kwargs):
     data = AwardsBuilder().run()
-    Dialog().textviewer('Awards', dumps(data, indent=2))
-    dumps_to_file(data, 'log_request', 'tvdb_awards_dict.json')
+    path = 'special://home/addons/plugin.video.themoviedb.helper/resources/jsondata/'
+    file = 'awards.json'
+    dumps_to_file(data, path, file, join_addon_data=False)

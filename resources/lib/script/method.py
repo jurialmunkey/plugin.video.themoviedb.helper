@@ -336,7 +336,6 @@ def library_autoupdate(**kwargs):
         force=kwargs.get('force', False))
 
 
-
 def log_request(**kwargs):
     import xbmcvfs
     from json import dumps
