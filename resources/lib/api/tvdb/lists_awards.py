@@ -22,12 +22,13 @@ class ListAwardCategory(ListListItems):
             return
         item = self.tvdb_api.mapper.get_info(item)
         tmdb_type = convert_media_type(item['infolabels'].get('mediatype'))
+        item = self._get_item_tmdb_id(item, tmdb_type)
+        if not item:
+            return
         item['infoproperties']['award_category'] = award_category
         item['infoproperties']['award_category_id'] = award_category_id
         item['infoproperties']['award_type'] = award_type
         item['infoproperties']['award_type_id'] = award_type_id
-        # item['infolabels']['plot'] = f"{get_localized(32461) if i.get('isWinner') else get_localized(32462)} {award_category} {i.get('year')}. {item['infolabels'].get('plot', '')}"
-        item = self._get_item_tmdb_id(item, tmdb_type)
         item['infoproperties']['plot_affix'] = f"{get_localized(32461) if i.get('isWinner') else get_localized(32462)} {award_category} {i.get('year')}"
         return item
 
@@ -51,7 +52,7 @@ class ListAwardCategory(ListListItems):
                 mediatypes.setdefault(i['infolabels']['mediatype'], []).append(i)
             except (KeyError, TypeError, AttributeError):
                 continue
-        info_mediatype = max(mediatypes, key=lambda k: len(mediatypes[k]))
+        info_mediatype = max(mediatypes, key=lambda k: len(mediatypes[k])) if mediatypes else 'movie'
 
         self.library = 'video'
         self.container_content = f'{info_mediatype}s'
