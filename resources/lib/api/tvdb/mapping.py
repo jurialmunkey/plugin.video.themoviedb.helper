@@ -1,5 +1,5 @@
 from resources.lib.api.mapping import _ItemMapper, get_empty_item
-from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH
+from resources.lib.addon.plugin import ADDONPATH
 
 
 TVDB_ICON = f'{ADDONPATH}/resources/icons/tvdb/tvdb.png'
@@ -51,11 +51,12 @@ class ItemMapper(_ItemMapper):
     def finalise(self, item):
         if not item['art'].get('icon') and not item['art'].get('poster'):
             item['art']['icon'] = TVDB_ICON
+        item['label'] = item['infolabels'].get('originaltitle') or ''
         return item
 
     def get_info(self, info_item, tmdb_type=None, base_item=None, **kwargs):
         item = get_empty_item()
         item = self.map_item(item, info_item)
-        # item = self.add_base(item, base_item, tmdb_type)
-        # item = self.finalise(item)
+        item = self.add_base(item, base_item, tmdb_type)
+        item = self.finalise(item)
         return item
