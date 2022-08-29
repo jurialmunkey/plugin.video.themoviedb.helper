@@ -542,6 +542,11 @@
 					<default>false</default>
 					<control type="toggle"/>
 				</setting>
+				<setting id="trakt_cacheownlists" type="boolean" label="32463" help="">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
 			</group>
 		</category>
 		<category id="players" label="32014" help="">

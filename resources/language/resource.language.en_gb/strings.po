@@ -2356,6 +2356,11 @@ msgctxt "#32462"
 msgid "Nominated for"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32463"
+msgid "Cache items in custom lists you own for 24 hours"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
