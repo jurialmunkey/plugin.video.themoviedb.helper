@@ -55,15 +55,15 @@ class Container():
         self.kodi_db = None
 
         # API class initialisation
-        self.tmdb_api = TMDb(delay_write=True)
-        self.omdb_api = OMDb(delay_write=True) if get_setting('omdb_apikey', 'str') else None
-        self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only(), delay_write=True)
-        self.trakt_api = TraktAPI(delay_write=True)
-        self.mdblist_api = MDbList(delay_write=True)
-        self.tvdb_api = TVDb(delay_write=True)
+        self.tmdb_api = TMDb()
+        self.omdb_api = OMDb() if get_setting('omdb_apikey', 'str') else None
+        self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only(), )
+        self.trakt_api = TraktAPI()
+        self.mdblist_api = MDbList()
+        self.tvdb_api = TVDb()
         self.ib = ItemBuilder(
             tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api,
-            delay_write=True, log_timers=self.log_timers, timer_lists=self.timer_lists)
+            log_timers=self.log_timers, timer_lists=self.timer_lists)
 
         # Trakt Watched Progress Settings
         self.hide_watched = get_setting('widgets_hidewatched') if self.is_widget else False

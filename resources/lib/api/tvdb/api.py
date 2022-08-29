@@ -17,13 +17,10 @@ def is_authorized(func):
 
 
 class TVDb(RequestAPI):
-    def __init__(
-            self,
-            delay_write=False):
+    def __init__(self):
         super(TVDb, self).__init__(
             req_api_name='TVDb',
-            req_api_url=API_URL,
-            delay_write=delay_write)
+            req_api_url=API_URL)
         self.mapper = ItemMapper()
         self.set_token()
 

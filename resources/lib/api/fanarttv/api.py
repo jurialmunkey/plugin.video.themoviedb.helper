@@ -51,13 +51,11 @@ class FanartTV(RequestAPI):
             client_key=get_setting('fanarttv_clientkey', 'str'),
             language=get_language(),
             cache_only=False,
-            cache_refresh=False,
-            delay_write=False):
+            cache_refresh=False):
         super(FanartTV, self).__init__(
             req_api_name='FanartTV',
             req_api_url=API_URL,
-            req_api_key=f'api_key={api_key}',
-            delay_write=delay_write)
+            req_api_key=f'api_key={api_key}')
         self.req_api_key = f'api_key={api_key}' if api_key else self.req_api_key
         self.req_api_key = f'{self.req_api_key}&client_key={client_key}' if client_key else self.req_api_key
         self.language = language[:2] if language else 'en'

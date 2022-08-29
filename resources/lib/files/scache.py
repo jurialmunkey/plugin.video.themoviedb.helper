@@ -28,7 +28,7 @@ class SimpleCache(object):
     _busy_tasks = []
     _database = None
 
-    def __init__(self, folder=None, filename=None, delay_write=False, mem_cache=False):
+    def __init__(self, folder=None, filename=None, mem_cache=False):
         '''Initialize our caching class'''
         folder = folder or DATABASE_NAME
         basefolder = get_setting('cache_location', 'str') or ''
@@ -39,7 +39,7 @@ class SimpleCache(object):
         self._db_file = get_file_path(basefolder, filename, join_addon_data=basefolder == folder)
         self._sc_name = f'{folder}_{filename}_simplecache'
         self._queue = []
-        self._delaywrite = delay_write
+        self._re_use_con = True
         self._connection = None
         self._memcache = mem_cache
         self.check_cleanup()
@@ -59,8 +59,6 @@ class SimpleCache(object):
             kodi_log(f'CACHE: Write {len(self._queue)} Items in Queue\n{self._sc_name}', 2)
         for i in self._queue:
             self._set_db_cache(*i)
-            if not self._memcache:
-                self._del_mem_cache(i[0])  # Clean out win props
         self._queue = []
         self.close()
 
@@ -89,9 +87,6 @@ class SimpleCache(object):
             expires = set_timestamp(cache_days * TIME_DAYS, True)
             data = data_dumps(data, separators=(',', ':'))
             self._set_mem_cache(endpoint, expires, data)
-            if self._delaywrite:
-                self._queue.append((endpoint, expires, data))
-                return
             self._set_db_cache(endpoint, expires, data)
 
     def check_cleanup(self):
@@ -108,6 +103,9 @@ class SimpleCache(object):
             get cache data from memory cache
             we use window properties because we need to be stateless
         '''
+        if not self._memcache:
+            return
+
         # Check expiration time
         expr_endpoint = f'{self._sc_name}_expr_{endpoint}'
         expr_propdata = self._win.getProperty(expr_endpoint)
@@ -127,7 +125,7 @@ class SimpleCache(object):
             window property cache as alternative for memory cache
             usefull for (stateless) plugins
         '''
-        if not self._memcache and not self._delaywrite:
+        if not self._memcache:
             return
         expr_endpoint = f'{self._sc_name}_expr_{endpoint}'
         data_endpoint = f'{self._sc_name}_data_{endpoint}'
@@ -233,14 +231,14 @@ class SimpleCache(object):
             # connection.execute("PRAGMA temp_store=memory")
             # connection.execute("PRAGMA mmap_size=2000000000")
             # connection.execute("PRAGMA cache_size=-500000000")
-        if self._delaywrite:
+        if self._re_use_con:
             self._connection = connection
         return connection
 
     def _get_database(self, attempts=2):
         '''get reference to our sqllite _database - performs basic integrity check'''
         try:
-            connection = self._connection or sqlite3.connect(self._db_file, timeout=5, isolation_level=None, check_same_thread=not self._delaywrite)
+            connection = self._connection or sqlite3.connect(self._db_file, timeout=5, isolation_level=None, check_same_thread=not self._re_use_con)
             connection.execute('SELECT * FROM simplecache LIMIT 1')
             return self._set_pragmas(connection)
         except Exception:
@@ -250,7 +248,7 @@ class SimpleCache(object):
                 xbmcvfs.delete(self._db_file)
             try:
                 kodi_log(f'CACHE: Initialising: {self._db_file}...', 1)
-                connection = self._connection or sqlite3.connect(self._db_file, timeout=5, isolation_level=None, check_same_thread=not self._delaywrite)
+                connection = self._connection or sqlite3.connect(self._db_file, timeout=5, isolation_level=None, check_same_thread=not self._re_use_con)
                 connection.execute(
                     """CREATE TABLE IF NOT EXISTS simplecache(
                     id TEXT UNIQUE, expires INTEGER, data TEXT, checksum INTEGER)""")

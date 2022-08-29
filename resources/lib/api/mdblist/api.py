@@ -72,12 +72,11 @@ def _get_configured(items, permitted_types=None, params_def=None):
 
 
 class MDbList(RequestAPI):
-    def __init__(self, api_key=None, delay_write=False):
+    def __init__(self, api_key=None):
         super(MDbList, self).__init__(
             req_api_key=f'apikey={api_key or get_setting("mdblist_apikey", "str")}',
             req_api_name='MDbList',
-            req_api_url='https://mdblist.com/api',
-            delay_write=delay_write)
+            req_api_url='https://mdblist.com/api')
 
     def _get_request(self, func, *args, **kwargs):
         response = func(*args, **kwargs)

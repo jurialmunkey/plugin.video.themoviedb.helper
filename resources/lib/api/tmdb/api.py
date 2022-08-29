@@ -28,13 +28,11 @@ class TMDb(RequestAPI):
             self,
             api_key='a07324c669cac4d96789197134ce272b',
             language=get_language(),
-            mpaa_prefix=get_mpaa_prefix(),
-            delay_write=False):
+            mpaa_prefix=get_mpaa_prefix()):
         super(TMDb, self).__init__(
             req_api_name='TMDb',
             req_api_url=API_URL,
-            req_api_key=f'api_key={api_key}',
-            delay_write=delay_write)
+            req_api_key=f'api_key={api_key}')
         self.language = language
         self.iso_language = language[:2]
         self.iso_country = language[-2:]
