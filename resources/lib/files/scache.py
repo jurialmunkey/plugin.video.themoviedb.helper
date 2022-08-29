@@ -70,16 +70,14 @@ class SimpleCache(object):
         finally:
             self._busy_tasks.remove(task_name)
 
-    def get(self, endpoint, no_hdd=False):
+    def get(self, endpoint):
         '''
             get object from cache and return the results
             endpoint: the (unique) name of the cache object as reference
         '''
         cur_time = set_timestamp(0, True)
         result = self._get_mem_cache(endpoint, cur_time)  # Try from memory first
-        if result is not None or no_hdd:
-            return result
-        return self._get_db_cache(endpoint, cur_time)  # Fallback to checking database if not in memory
+        return result or self._get_db_cache(endpoint, cur_time)  # Fallback to checking database if not in memory
 
     def set(self, endpoint, data, cache_days=30):
         """ set data in cache """
@@ -131,19 +129,6 @@ class SimpleCache(object):
         data_endpoint = f'{self._sc_name}_data_{endpoint}'
         self._win.setProperty(expr_endpoint, str(expires))
         self._win.setProperty(data_endpoint, data)
-
-    def _del_mem_cache(self, endpoint):
-        expr_endpoint = f'{self._sc_name}_expr_{endpoint}'
-        data_endpoint = f'{self._sc_name}_data_{endpoint}'
-        self._win.clearProperty(expr_endpoint)
-        self._win.clearProperty(data_endpoint)
-
-    def get_id_list(self):
-        query = "SELECT id FROM simplecache"
-        cache_data = self._execute_sql(query)
-        if not cache_data:
-            return
-        return {job[0] for job in cache_data}
 
     def _get_db_cache(self, endpoint, cur_time):
         '''get cache data from sqllite _database'''

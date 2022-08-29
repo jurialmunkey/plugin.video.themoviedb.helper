@@ -14,7 +14,6 @@ class BasicCache(object):
         self._filename = filename
         self._cache = None
         self._memcache = mem_cache
-        self._id_list = []
 
     @kodi_try_except('lib.addon.cache ret_cache')
     def ret_cache(self):
@@ -27,13 +26,7 @@ class BasicCache(object):
     def get_cache(self, cache_name):
         self.ret_cache()
         cache_name = get_filecache_name(cache_name or '')
-        no_hdd = True if self._id_list and cache_name not in self._id_list else False
-        return self._cache.get(cache_name, no_hdd=no_hdd)
-
-    def get_id_list(self):
-        self.ret_cache()
-        self._id_list = self._cache.get_id_list() or []
-        return self._id_list
+        return self._cache.get(cache_name)
 
     @kodi_try_except('lib.addon.cache set_cache')
     def set_cache(self, my_object, cache_name, cache_days=14, force=False, fallback=None):
