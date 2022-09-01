@@ -600,6 +600,9 @@ class ItemMapper(_ItemMapper):
                 'func': dict_to_list,
                 'args': ['name']}, {
                 # ---
+                'keys': [('infoproperties', 'studio')],
+                'func': lambda v: v[0].get('name') if v else ''}, {
+                # ---
                 'keys': [('infoproperties', UPDATE_BASEKEY)],
                 'func': get_iter_props,
                 'args': ['studio'],
