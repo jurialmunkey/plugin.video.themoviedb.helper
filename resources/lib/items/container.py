@@ -1,7 +1,7 @@
 from xbmcplugin import addDirectoryItems, setProperty, setPluginCategory, setContent, endOfDirectory, addSortMethod
 from resources.lib.addon.consts import NO_LABEL_FORMATTING
 from resources.lib.addon.plugin import get_setting, executebuiltin
-from tmdbhelper.parser import try_int, split_items
+from tmdbhelper.parser import try_int
 from resources.lib.addon.thread import ParallelThread
 from resources.lib.api.tmdb.api import TMDb
 from resources.lib.api.trakt.api import TraktAPI
@@ -33,9 +33,9 @@ class Container():
         self.parent_params = self.params.copy()  # TODO: CLEANUP
         self.filters = {
             'filter_key': self.params.get('filter_key', None),
-            'filter_value': split_items(self.params.get('filter_value', None))[0],
+            'filter_value': self.params.get('filter_value', '').replace(' / ', '|'),
             'exclude_key': self.params.get('exclude_key', None),
-            'exclude_value': split_items(self.params.get('exclude_value', None))[0]}
+            'exclude_value': self.params.get('exclude_value', '').replace(' / ', '|')}
 
         self.is_widget = self.params.get('widget', '').lower() == 'true'
         self.is_cacheonly = self.params.get('cacheonly', '').lower() == 'true'
