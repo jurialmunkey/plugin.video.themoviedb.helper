@@ -126,8 +126,6 @@ class Container():
     def _make_item(self, li):
         if not li:
             return
-        if not li.next_page and is_excluded(li, is_listitem=True, **self.filters):
-            return
 
         # Reformat ListItem.Label for episodes to match Kodi default 1x01.Title
         # Check if unaired and either apply special formatting or hide item depending on user settings
@@ -136,10 +134,15 @@ class Container():
             if li.is_unaired(no_date=self.nodate_is_unaired):
                 return
 
-        try:  # Add details from Kodi library
+        # Add details from Kodi library
+        try:
             li.set_details(details=self.kodi_db.get_kodi_details(li), reverse=True)
         except AttributeError:
             pass
+
+        # Filter out items that are excluded (done after adding Kodi details so can filter against them)
+        if not li.next_page and is_excluded(li, is_listitem=True, **self.filters):
+            return
 
         # Add Trakt playcount and watched status
         li.set_playcount(playcount=self.trakt_method.get_playcount(li))
