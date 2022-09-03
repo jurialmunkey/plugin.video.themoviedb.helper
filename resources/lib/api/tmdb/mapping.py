@@ -1,7 +1,7 @@
 from tmdbhelper.parser import try_int, try_float, dict_to_list, get_params, IterProps
 from resources.lib.api.mapping import UPDATE_BASEKEY, _ItemMapper, get_empty_item
 from resources.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type, get_setting, get_localized
-from resources.lib.addon.tmdate import format_date, age_difference
+from resources.lib.addon.tmdate import format_date, age_difference, is_future_timestamp
 from resources.lib.addon.consts import (
     IMAGEPATH_ORIGINAL,
     IMAGEPATH_QUALITY_POSTER,
@@ -112,6 +112,29 @@ def get_mpaa_rating(v, mpaa_prefix, iso_country, certification=True):
         for i in sorted(i.get('release_dates', []), key=lambda k: k.get('type')):
             if i.get('certification'):
                 return f'{mpaa_prefix}{i["certification"]}'
+
+
+def get_release_types(v, iso_country):
+    infoproperties = {}
+    released_types = []
+    _release_types = {1: 'Premiere', 2: 'Limited', 3: 'Theatrical', 4: 'Digital', 5: 'Physical', 6: 'TV'}
+    for i in v or []:
+        if not i.get('iso_3166_1') or i.get('iso_3166_1') != iso_country:
+            continue
+        for i in sorted(i.get('release_dates', []), key=lambda k: k.get('type')):
+            try:
+                rt = _release_types[i['type']]
+                rd = i['release_date'][:10]
+            except (KeyError, TypeError, AttributeError):
+                continue
+            if not rt or not rd:
+                continue
+            infoproperties[f"{rt.lower()}_release"] = rd
+            if not is_future_timestamp(rd, time_fmt="%Y-%m-%d", time_lim=10):
+                released_types.append(rt)
+    if released_types:
+        infoproperties['available_releases'] = ' / '.join(released_types)
+    return infoproperties
 
 
 def get_iter_props(v, base_name, *args, **kwargs):
@@ -396,7 +419,12 @@ class ItemMapper(_ItemMapper):
                 'keys': [('infolabels', 'mpaa')],
                 'subkeys': ['results'],
                 'func': get_mpaa_rating,
-                'args': [self.mpaa_prefix, self.iso_country, True]
+                'args': [self.mpaa_prefix, self.iso_country, True]}, {
+                # ---
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'subkeys': ['results'],
+                'func': get_release_types,
+                'args': [self.iso_country]
             }],
             'release_date': [{
                 'keys': [('infolabels', 'premiered')]}, {
