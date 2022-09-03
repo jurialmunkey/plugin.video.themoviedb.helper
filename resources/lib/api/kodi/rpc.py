@@ -185,9 +185,7 @@ def get_episode_details(dbid=None):
 
 class KodiLibrary(object):
     def __init__(self, dbtype=None, tvshowid=None, attempt_reconnect=False, logging=True):
-        from resources.lib.files.bcache import BasicCache
         self.dbtype = dbtype
-        self._cache = BasicCache(filename='KodiLibrary.db')
         self.database = self._get_database(dbtype, tvshowid, attempt_reconnect)
 
     def _get_database(self, dbtype, tvshowid=None, attempt_reconnect=False, logging=True):
@@ -198,17 +196,10 @@ class KodiLibrary(object):
         return self.get_database(dbtype, tvshowid, attempt_reconnect)
 
     def get_database(self, dbtype, tvshowid=None, attempt_reconnect=False, logging=True):
-        from xbmcvfs import Stat
-        cache_name = f'db.{dbtype}.{tvshowid}'
-        cache_data = self._cache.get_cache(cache_name)
-        db_updated = Stat('special://database/MyVideos119.db').st_mtime() or -1
-        if cache_data and db_updated == cache_data.get('updated') and cache_data.get('database'):
-            return cache_data['database']
         retries = 5 if attempt_reconnect else 1
         while not Monitor().abortRequested() and retries > 0:
             database = self._get_kodi_db(dbtype, tvshowid)
             if database:
-                self._cache.set_cache({'database': database, 'updated': db_updated}, cache_name, cache_days=1)
                 return database
             Monitor().waitForAbort(1)
             retries -= 1
