@@ -118,6 +118,7 @@ class Players(object):
                     v['priority'] = v.get('priority', PLAYERS_PRIORITY) + 100  # Increase priority baseline by 100 to prevent other players displaying above providers
                     continue
                 v['priority'] = providers.index(v['provider']) + 1  # Add 1 because sorted() puts 0 index last
+                v['is_provider'] = True
         except (KeyError, AttributeError):
             pass
 
@@ -144,6 +145,7 @@ class Players(object):
         return {
             'file': file, 'mode': mode,
             'is_folder': is_folder,
+            'is_provider': value.get('is_provider') if not is_folder else False,
             'is_resolvable': value.get('is_resolvable'),
             'make_playlist': value.get('make_playlist'),
             'api_language': value.get('api_language'),
@@ -491,10 +493,20 @@ class Players(object):
             if self.ignore_default.lower() == 'true':
                 return
             self.default_player = self.ignore_default
-        elif self.dialog_players[0].get('is_local') and get_setting('default_player_kodi', 'int') == 1:
-            player = self.dialog_players[0]
-            player['idx'] = 0
-            return player
+        elif self.dialog_players[0].get('is_local'):
+            if get_setting('default_player_kodi', 'int') == 1:
+                player = self.dialog_players[0]
+                player['idx'] = 0
+                return player
+            if len(self.dialog_players) > 1 and self.dialog_players[1].get('is_provider') and get_setting('default_player_provider'):
+                player = self.dialog_players[1]
+                player['idx'] = 1
+                return player
+        elif self.dialog_players[0].get('is_provider'):
+            if get_setting('default_player_provider'):
+                player = self.dialog_players[0]
+                player['idx'] = 0
+                return player
 
         # No default player setting or no players left
         if not self.default_player or not self.dialog_players:

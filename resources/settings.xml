@@ -569,6 +569,11 @@
 						<data>RunScript(plugin.video.themoviedb.helper, set_defaultplayer=tv)</data>
 					</control>
 				</setting>
+				<setting id="default_player_provider" type="boolean" label="32466" help="">
+					<level>0</level>
+					<default>True</default>
+					<control type="toggle"/>
+				</setting>
 				<setting id="default_player_kodi" type="integer" label="32400" help="">
 					<level>0</level>
 					<default>1</default>
