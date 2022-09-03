@@ -711,6 +711,11 @@
 						<heading>32409</heading>
 					</control>
 				</setting>
+				<setting id="use_mem_cache" type="boolean" label="32465" help="32464">
+					<level>0</level>
+					<default>False</default>
+					<control type="toggle"/>
+				</setting>
 				<setting id="delete_cache" type="action" label="32386" help="">
 					<level>0</level>
 					<data>RunScript(plugin.video.themoviedb.helper, delete_cache=select)</data>

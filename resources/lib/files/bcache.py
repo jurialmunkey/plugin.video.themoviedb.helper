@@ -10,16 +10,15 @@ SEARCH_HISTORY = 'search_history.db'
 
 
 class BasicCache(object):
-    def __init__(self, filename=None, mem_cache=False):
+    def __init__(self, filename=None):
         self._filename = filename
         self._cache = None
-        self._memcache = mem_cache
 
     @kodi_try_except('lib.addon.cache ret_cache')
     def ret_cache(self):
         from resources.lib.files.scache import SimpleCache
         if not self._cache:
-            self._cache = SimpleCache(filename=self._filename, mem_cache=self._memcache)
+            self._cache = SimpleCache(filename=self._filename)
         return self._cache
 
     @kodi_try_except('lib.addon.cache get_cache')

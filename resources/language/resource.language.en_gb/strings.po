@@ -2361,6 +2361,16 @@ msgctxt "#32463"
 msgid "Cache items in custom lists you own for 24 hours"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32464"
+msgid "Significantly increases RAM usage but might improve repeat cache reads for disk cache located on slow storage devices (e.g. USB or SD card storage). Will likely cause worse cache performance for devices with normal storage (e.g. SSD, eMMC or internal HDD) or limited RAM."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32465"
+msgid "Cache disk reads to memory (increases RAM usage)"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

@@ -28,11 +28,11 @@ class SimpleCache(object):
     _busy_tasks = []
     _database = None
 
-    def __init__(self, folder=None, filename=None, mem_cache=False):
+    def __init__(self, folder=None, filename=None):
         '''Initialize our caching class'''
         folder = folder or DATABASE_NAME
         basefolder = get_setting('cache_location', 'str') or ''
-        basefolder += folder
+        basefolder = f'{basefolder}{folder}'
         filename = filename or 'defaultcache.db'
         self._win = Window(10000)
         self._monitor = Monitor()
@@ -41,7 +41,7 @@ class SimpleCache(object):
         self._queue = []
         self._re_use_con = True
         self._connection = None
-        self._memcache = mem_cache
+        self._memcache = get_setting('use_mem_cache')
         self.check_cleanup()
         kodi_log("CACHE: Initialized")
 
@@ -210,12 +210,8 @@ class SimpleCache(object):
 
     def _set_pragmas(self, connection):
         if not self._connection:
-            # connection.execute("PRAGMA synchronous=OFF")
             connection.execute("PRAGMA synchronous=NORMAL")
             connection.execute("PRAGMA journal_mode=WAL")
-            # connection.execute("PRAGMA temp_store=memory")
-            # connection.execute("PRAGMA mmap_size=2000000000")
-            # connection.execute("PRAGMA cache_size=-500000000")
         if self._re_use_con:
             self._connection = connection
         return connection
