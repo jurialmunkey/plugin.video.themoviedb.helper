@@ -24,19 +24,28 @@ def is_excluded(item, filter_key=None, filter_value=None, filter_operator=None, 
         il, ip = item.get('infolabels', {}), item.get('infoproperties', {})
 
     if filter_key and filter_value:
-        for fv in filter_value.split('|'):
+        _exclude = False
+        for fv in filter_value.split(' / '):
+            _exclude = False
             if is_listitem and fv == 'is_empty':  # Only apply is_empty filter to end product
                 if il.get(filter_key) or ip.get(filter_key):
-                    return True
+                    _exclude = True
+                    continue
             if filter_key in il:
                 if is_filtered(il, filter_key, fv, operator_type=filter_operator):
-                    return True
+                    _exclude = True
+                    continue
             if filter_key in ip:
                 if is_filtered(ip, filter_key, fv, operator_type=filter_operator):
-                    return True
+                    _exclude = True
+                    continue
+            if not _exclude:
+                break
+        if _exclude:
+            return True
 
     if exclude_key and exclude_value:
-        for ev in exclude_value.split('|'):
+        for ev in exclude_value.split(' / '):
             if is_listitem and ev == 'is_empty':  # Only apply is_empty filter to end product
                 if not il.get(exclude_key) and not ip.get(exclude_key):
                     return True
