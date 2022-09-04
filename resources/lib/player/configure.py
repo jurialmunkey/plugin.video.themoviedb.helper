@@ -181,11 +181,14 @@ class ConfigurePlayers():
     def _get_dialog_players(players):
         return [
             ListItem(
-                label=v.get('name'), label2=k,
+                label=f"{'[DISABLED] ' if v.get('disabled', 'false').lower() == 'true' else ''}{v.get('name')}",
+                label2=k,
                 art={
                     'thumb': v.get('icon', '').format(ADDONPATH)
                     or KodiAddon(v.get('plugin', '')).getAddonInfo('icon')}).get_listitem()
-            for k, v in sorted(players.items(), key=lambda i: try_int(i[1].get('priority')) or PLAYERS_PRIORITY)]
+            for k, v in sorted(
+                players.items(),
+                key=lambda i: try_int(i[1].get('priority')) or PLAYERS_PRIORITY)]
 
     def get_players(self):
         self.players = {'create_player': {'name': 'Create new player', 'icon': '-', 'priority': 1}}
