@@ -1,7 +1,7 @@
 {
     "name"              : "BBC iPlayer",
     "plugin"            : "plugin.video.iplayerwww",
-    "priority"          : 1500,
+    "priority"          : 1000,
     "is_resolvable"     : "true",
     "assert"            : {
                             "play_movie":       ["title"],
