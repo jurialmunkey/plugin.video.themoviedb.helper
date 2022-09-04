@@ -11,7 +11,7 @@
                             "plugin://plugin.video.iplayerwww",
                             {"label": "(?i).*Categories.*"},
                             {"label": "(?i).*Films.*"},
-                            {"label": "(?i).*{title}.*"}
+                            {"dialog": "true", "strict": "true", "label": "(?i).*{title}.*"}
                           ],
     "play_episode"      : [
                             "plugin://plugin.video.iplayerwww",
@@ -19,14 +19,7 @@
                             {"label": "(?i){showname[0]}"},
                             {"label": "(?i).*{showname}.*available$"},
                             {"return": "true", "label": "(?i).*{episode}\\. {title}.*"},
-                            {"label": "(?i).*Series {season}"},
-                            {"label": "(?i).*{episode}\\. {title}.*"}
-                          ],
-    "search_episode"    : [
-                            "plugin://plugin.video.iplayerwww",
-                            {"label": "(?i).*Programme List A-Z.*"},
-                            {"label": "(?i){showname[0]}"},
-                            {"label": "(?i).*{showname}.*available$"},
-                            {"dialog": "True"}
+                            {"dialog": "true", "label": "(?i).*Series {season}"},
+                            {"dialog": "true", "label": "(?i).*{episode}\\. {title}.*"}
                           ]
 }
