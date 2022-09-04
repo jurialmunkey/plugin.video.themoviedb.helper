@@ -109,5 +109,5 @@ def convert_type(tmdb_type, output, season=None, episode=None):
             return 'pictures'
         return 'video'
     if tmdb_type == 'tv' and season is not None:
-        tmdb_type == 'episode' if episode is not None else 'season'
+        tmdb_type = 'episode' if episode is not None else 'season'
     return _convert_types('tmdb', tmdb_type, output)
