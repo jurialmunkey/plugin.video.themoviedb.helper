@@ -4,8 +4,15 @@
     "priority"          : 1500,
     "is_resolvable"     : "true",
     "assert"            : {
+                            "play_movie":       ["title"],
                             "play_episode":     ["showname", "season", "episode"]
                           },
+    "play_movie"        : [
+                            "plugin://plugin.video.iplayerwww",
+                            {"label": "(?i).*Categories.*"},
+                            {"label": "(?i).*Films.*"},
+                            {"label": "(?i).*{title}.*"}
+                          ],
     "play_episode"      : [
                             "plugin://plugin.video.iplayerwww",
                             {"label": "(?i).*Programme List A-Z.*"},
@@ -14,5 +21,12 @@
                             {"return": "true", "label": "(?i).*{episode}\\. {title}.*"},
                             {"label": "(?i).*Series {season}"},
                             {"label": "(?i).*{episode}\\. {title}.*"}
+                          ],
+    "search_episode"    : [
+                            "plugin://plugin.video.iplayerwww",
+                            {"label": "(?i).*Programme List A-Z.*"},
+                            {"label": "(?i){showname[0]}"},
+                            {"label": "(?i).*{showname}.*available$"},
+                            {"dialog": "True"}
                           ]
 }
