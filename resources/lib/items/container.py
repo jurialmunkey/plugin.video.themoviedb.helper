@@ -34,8 +34,10 @@ class Container():
         self.filters = {
             'filter_key': self.params.get('filter_key', None),
             'filter_value': self.params.get('filter_value', None),
+            'filter_operator': self.params.get('filter_operator', None),
             'exclude_key': self.params.get('exclude_key', None),
-            'exclude_value': self.params.get('exclude_value', None)}
+            'exclude_value': self.params.get('exclude_value', None),
+            'exclude_operator': self.params.get('exclude_operator', None)}
 
         self.is_widget = self.params.get('widget', '').lower() == 'true'
         self.is_cacheonly = self.params.get('cacheonly', '').lower() == 'true'
