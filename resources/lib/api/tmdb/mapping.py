@@ -69,7 +69,12 @@ def get_collection_properties(v):
     ratings = []
     infoproperties = {}
     year_l, year_h, votes = 9999, 0, 0
+    genres = set()
     for p, i in enumerate(v, start=1):
+        genre = get_genres_by_id(i.get('genre_ids'))
+        genres.update(genre)
+
+        infoproperties[f'set.{p}.genre'] = ' / '.join(genre)
         infoproperties[f'set.{p}.title'] = i.get('title', '')
         infoproperties[f'set.{p}.tmdb_id'] = i.get('id', '')
         infoproperties[f'set.{p}.originaltitle'] = i.get('original_title', '')
@@ -80,6 +85,7 @@ def get_collection_properties(v):
         infoproperties[f'set.{p}.votes'] = i.get('vote_count', '')
         infoproperties[f'set.{p}.poster'] = get_imagepath_poster(i.get('poster_path', ''))
         infoproperties[f'set.{p}.fanart'] = get_imagepath_fanart(i.get('backdrop_path', ''))
+
         year_l = min(try_int(i.get('release_date', '')[:4]), year_l)
         year_h = max(try_int(i.get('release_date', '')[:4]), year_h)
         if i.get('vote_average'):
@@ -97,6 +103,8 @@ def get_collection_properties(v):
         infoproperties['set.rating'] = infoproperties['tmdb_rating'] = f'{sum(ratings) / len(ratings):0,.1f}'
     if votes:
         infoproperties['set.votes'] = infoproperties['tmdb_votes'] = f'{votes:0,.0f}'
+    if genres:
+        infoproperties['set.genres'] = ' / '.join(genres)
     infoproperties['set.numitems'] = p
     return infoproperties
 
@@ -191,15 +199,10 @@ def get_trailer(v, iso_639_1=None):
     return url
 
 
-def _get_genre_by_id(genre_id):
-    for k, v in TMDB_GENRE_IDS.items():
-        if v == try_int(genre_id):
-            return k
-
-
 def get_genres_by_id(v):
     genre_ids = v or []
-    return [_get_genre_by_id(genre_id) for genre_id in genre_ids if _get_genre_by_id(genre_id)]
+    genre_map = {v: k for k, v in TMDB_GENRE_IDS.items()}
+    return [i for i in (genre_map.get(try_int(genre_id)) for genre_id in genre_ids) if i]
 
 
 def get_external_ids(v):
