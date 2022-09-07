@@ -211,17 +211,11 @@ class Container():
             self.kodi_db = self.get_kodi_database('tvshow')
 
     def set_params_to_container(self):
-        params = {}
-        for k, v in self.params.items():
-            if not k or not v:
-                continue
-            try:
-                k = f'Param.{k}'
-                v = f'{v}'
-                params[k] = v
-                setProperty(self.handle, k, v)  # Set params to container properties
-            except Exception as exc:
-                kodi_log(f'Error: {exc}\nUnable to set param {k} to {v}', 1)
+        params = {f'Param.{k}': f'{v}' for k, v in self.params.items() if k and v}
+        if self.handle == -1:
+            return params
+        for k, v in params.items():
+            setProperty(self.handle, k, v)  # Set params to container properties
         return params
 
     def finish_container(self):

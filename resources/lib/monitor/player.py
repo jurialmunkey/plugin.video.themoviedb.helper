@@ -103,11 +103,12 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
             if get_setting('service_fanarttv_lookup'):
                 self.details['art'] = self.ib.get_item_artwork(self.artwork, is_season=True if self.season else False)
             if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"):
-                ImageFunctions(method='crop', is_thread=False, prefix='Player', artwork=(
+                clearlogo = (
                     get_infolabel('Player.Art(tvshow.clearlogo)')
                     or get_infolabel('Player.Art(artist.clearlogo)')
-                    or get_infolabel('Player.Art(clearlogo)')
-                    or self.details.get('art', {}).get('clearlogo'))).run()
+                    or get_infolabel('Player.Art(clearlogo)'))
+                clearlogo = clearlogo or self.details.get('art', {}).get('clearlogo')
+                ImageFunctions(method='crop', is_thread=False, prefix='Player', artwork=clearlogo).run()
                 self.properties.add('CropImage')
                 self.properties.add('CropImage.Original')
             self.set_iter_properties(self.details, SETMAIN_ARTWORK)
