@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window type="dialog">
+    <defaultcontrol always="true">9902</defaultcontrol>
+    <onload>SetProperty(TMDbHelper.ServicePause,1)</onload>
+    <controls>
+        <include content="Background_Main">
+            <param name="plain_background">true</param>
+        </include>
+
+        <include content="List_Button_Row">
+            <param name="id">9902</param>
+            <param name="orientation">vertical</param>
+            <param name="offset_y">40</param>
+            <param name="item_w">480</param>
+            <param name="itemlayout_w">520</param>
+            <param name="itemlayout_include">Layout_DiscoverButton</param>
+            <focusposition>1</focusposition>
+            <movement>5</movement>
+            <top>160</top>
+            <bottom>60</bottom>
+            <onright>61</onright>
+            <preloaditems>0</preloaditems>
+            <include>Animation_Left_Delay</include>
+        </include>
+
+        <control type="group">
+            <include>Dimension_Info</include>
+            <include>Animation_Right_Delay</include>
+            <control type="group">
+                <!-- <top>160</top> -->
+                <left>560</left>
+                <control type="label" id="9901">
+                    <aligny>center</aligny>
+                    <height>80</height>
+                    <textcolor>main_fg_100</textcolor>
+                    <font>font_weatherlabel</font>
+                </control>
+                <control type="textbox" id="9903">
+                    <top>100</top>
+                    <align>left</align>
+                    <textcolor>main_fg_70</textcolor>
+                    <font>font_plotbox_dialog</font>
+                    <pagecontrol>61</pagecontrol>
+                    <autoscroll delay="8000" time="4000" repeat="12000">!Control.HasFocus(61)</autoscroll>
+                </control>
+            </control>
+        </control>
+
+        <include content="View_Furniture_Scrollbar_V">
+            <param name="onleft">9902</param>
+            <param name="onright">9902</param>
+            <right>0</right>
+            <top>view_top</top>
+            <bottom>view_pad</bottom>
+        </include>
+
+        <include content="Furniture_Top_Left">
+            <param name="label" value="Wikipedia" />
+        </include>
+        <include>Furniture_Top_Right</include>
+
+    </controls>
+</window>

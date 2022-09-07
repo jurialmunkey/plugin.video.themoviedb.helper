@@ -462,3 +462,13 @@ def sort_list(**kwargs):
     for k, v in sort_methods[x]['params'].items():
         kwargs[k] = v
     executebuiltin(format_folderpath(encode_url(**kwargs)))
+
+
+def wikipedia(wikipedia, tmdb_type=None, match=None, **kwargs):
+    from resources.lib.api.wikipedia.api import WikipediaAPI
+    from xbmcgui import Dialog
+    match = match or ''
+    wiki = WikipediaAPI()
+    name = wiki.get_match(wikipedia, tmdb_type, match)
+    data = wiki.parse_text(wiki.get_section(name, '0'))
+    Dialog().textviewer(f'Wikipedia {wikipedia} {match}', f'[B]{name}[/B]\n{data}')
