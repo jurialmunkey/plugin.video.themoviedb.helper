@@ -129,17 +129,41 @@ class WikipediaAPI(RequestAPI):
         raw_html = data['parse']['text']['*']
         soup = BeautifulSoup(raw_html, 'html.parser')
         text = [p.get_text() for p in soup.find_all('p')]
+        tabl = []
 
-        # tabl = [p.get_text() for p in soup.find_all('tr')]
-        # tabl = [i.replace('\n', ' ') for i in tabl if i]
+        def _parse_table(p):
+            for c in p.children:
+                if c.name == 'style':
+                    continue
+                if c.name in ['tr', 'li', 'p']:
+                    tabl.append('\n')
+                if c.string:
+                    if c.string.startswith('^'):
+                        continue
+                    t = c.string.replace('\n', ' ')
+                    tabl.append(f'[B]{t}[/B] ' if c.name == 'th' else f'{t} ')
+                    continue
+                if c.get('class') == 'mw-editsection':
+                    continue
+                if c.children:
+                    _parse_table(c)
+                    continue
+
+        for p in soup.find_all(['table', 'ul', 'ol', 'dl']):
+            tabl.append('\n\n')
+            _parse_table(p)
+        text.append(''.join(tabl))
+
+        # tabl = [' '.join([c.get_text().replace('\n\n', ' ').replace('  ', ' ') for c in p.children if c.name in ['th', 'td']]) for p in soup.find_all('tr')]
         # text += tabl
 
-        text += [p.get_text() for p in soup.find_all('li')]
+        # text += [p.get_text() for p in soup.find_all('li')]
         text = [i for i in text if 'Cite error' not in i and not i.startswith('^')]
-
         text = '\n'.join(text)
         text = re.sub(r'\[[0-9]*\]', '', text)
-        text = re.sub(r'^(\n)*', '', text)
+        text = re.sub(r' +', ' ', text)
+        text = re.sub(r'(\n){3,}', '\n\n', text)
+        text = re.sub(r'^(\n)+', '', text)
         return text
 
 
