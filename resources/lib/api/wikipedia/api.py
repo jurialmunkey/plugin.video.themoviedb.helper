@@ -9,8 +9,14 @@ from resources.lib.addon.thread import ParallelThread
 WIKI_NAME_ID = 9901
 WIKI_LIST_ID = 9902
 WIKI_TEXT_ID = 9903
+WIKI_ATTR_ID = 9904
+WIKI_CCIM_ID = 9905
+WIKI_ATTRIBUTION = 'Text from Wikipedia under CC BY-SA 3.0 license.\n{}'
+WIKI_CCBYSA_IMG = 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/CC_BY-SA_icon.svg/320px-CC_BY-SA_icon.svg.png'
+
 ACTION_CLOSEWINDOW = (9, 10, 92, 216, 247, 257, 275, 61467, 61448,)
 ACTION_MOVEMENT = (1, 2, 3, 4, )
+ACTION_SELECT = (7, )
 
 
 AFFIXES = {
@@ -77,6 +83,15 @@ class WikipediaAPI(RequestAPI):
         except (KeyError, AttributeError, TypeError):
             return []
 
+    def get_fullurl(self, title):
+        params = {'action': 'query', 'format': 'json', 'titles': title, 'prop': 'info', 'inprop': 'url'}
+        try:
+            data = self.get_request_lc(**params)['query']['pages']
+            data = data[next(iter(data))]['fullurl']
+        except (KeyError, AttributeError, TypeError):
+            return ''
+        return data
+
     def get_section(self, title, section_index):
         params = {
             'action': 'parse', 'page': title, 'format': 'json', 'prop': 'text',
@@ -87,6 +102,18 @@ class WikipediaAPI(RequestAPI):
         sections = self.get_sections(title)
         sections = [{'line': 'Overview', 'index': '0', 'number': '0'}] + sections
         return sections
+
+    def parse_links(self, data):
+        raw_html = data['parse']['text']['*']
+        soup = BeautifulSoup(raw_html, 'html.parser')
+        links = [
+            i['title'] for i in soup.find_all('a')
+            if i.get('title')
+            and i.get('href', '').startswith('/wiki/')
+            and not i['title'].startswith('Help:')
+            and not i['title'].startswith('Special:')
+            and not i.get('href', '').startswith('/wiki/File:')]
+        return links
 
     def parse_text(self, data):
         raw_html = data['parse']['text']['*']
@@ -113,30 +140,50 @@ class WikipediaGUI(xbmcgui.WindowXMLDialog):
         self._tmdb_type = kwargs.get('tmdb_type')
         self._wiki = WikipediaAPI()
         self._title = ''
+        self._history = []
         with BusyDialog():
-            self._title = self._wiki.get_match(self._query, self._tmdb_type)
-            self._overview = self._wiki.parse_text(self._wiki.get_section(self._title, '0'))
-            self._sections = self._wiki.get_all_sections(self._title)
+            self.do_setup()
+
+    def do_setup(self, title=None):
+        self._title = title or self._wiki.get_match(self._query, self._tmdb_type)
+        if not self._title:
+            return
+        self._overview = self._wiki.parse_text(self._wiki.get_section(self._title, '0'))
+        self._sections = self._wiki.get_all_sections(self._title)
+        self._fullurl = self._wiki.get_fullurl(self._title)
+
+    def do_init(self):
+        self._gui_name.setLabel(f'{self._title}')
+        self._gui_text.setText(f'{self._overview}')
+        self._gui_attr.setText(WIKI_ATTRIBUTION.format(self._fullurl))
+        self._gui_ccim.setImage(WIKI_CCBYSA_IMG)
+        self.set_sections()
 
     def onInit(self):
         self._gui_name = self.getControl(WIKI_NAME_ID)
         self._gui_list = self.getControl(WIKI_LIST_ID)
         self._gui_text = self.getControl(WIKI_TEXT_ID)
+        self._gui_attr = self.getControl(WIKI_ATTR_ID)
+        self._gui_ccim = self.getControl(WIKI_CCIM_ID)
         if not self._title:
-            xbmcgui.Dialog().ok('Wikipedia', 'No search results')
             self.close()
-        self._gui_name.setLabel(f'{self._title}')
-        self._gui_text.setText(f'{self._overview}')
-        self.set_sections()
-        # self._thread = Thread(target=self.set_sections)
-        # self._thread.start()
+        self.do_init()
 
     def onAction(self, action):
         _action_id = action.getId()
         if _action_id in ACTION_CLOSEWINDOW:
-            return self.close()
+            return self.do_close()
         if _action_id in ACTION_MOVEMENT:
             return self.do_scroll()
+        if _action_id in ACTION_SELECT:
+            return self.do_click()
+
+    def do_close(self):
+        if not self._history:  # No history so close
+            return self.close()
+        with BusyDialog():  # History so go back instead
+            self.do_setup(self._history.pop())
+        self.do_init()
 
     def do_scroll(self):
         if self.getFocusId() != WIKI_LIST_ID:
@@ -144,9 +191,26 @@ class WikipediaGUI(xbmcgui.WindowXMLDialog):
         x = self._gui_list.getSelectedPosition()
         try:
             text = self._index[x]
+            name = self._sections[x]['line']
         except (TypeError, AttributeError, KeyError, IndexError):
             return
-        self._gui_text.setText(text)
+        self._gui_text.setText(f'[B]{name}[/B]\n{text}')
+
+    def do_click(self):
+        if self.getFocusId() != WIKI_LIST_ID:
+            return
+        x = self._gui_list.getSelectedPosition()
+        links = self._wiki.parse_links(self._wiki.get_section(self._title, f'{x}'))
+        if not links:
+            return
+        links = [i for i in set(links)]
+        x = xbmcgui.Dialog().select('Links', links)
+        if x == -1:
+            return
+        self._history.append(self._title)
+        with BusyDialog():
+            self.do_setup(links[x])
+        self.do_init()
 
     def set_sections(self):
         self._index = []
@@ -163,6 +227,7 @@ class WikipediaGUI(xbmcgui.WindowXMLDialog):
             if not name or not indx:
                 continue
             itms.append((name, indx,))
+        self._gui_list.reset()
         self._gui_list.addItems([xbmcgui.ListItem(i) for i, j in itms])
 
         def _threaditem(i):
