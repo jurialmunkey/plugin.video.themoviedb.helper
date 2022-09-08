@@ -6,6 +6,7 @@ from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.thread import ParallelThread
 
 
+WIKI_SCRL_ID = 61
 WIKI_NAME_ID = 9901
 WIKI_LIST_ID = 9902
 WIKI_TEXT_ID = 9903
@@ -112,7 +113,16 @@ class WikipediaAPI(RequestAPI):
             and i.get('href', '').startswith('/wiki/')
             and not i['title'].startswith('Help:')
             and not i['title'].startswith('Special:')
+            and not i['title'].startswith('Wikipedia:')
+            and not i['title'].startswith('Template:')
+            and not i['title'].startswith('Category:')
             and not i.get('href', '').startswith('/wiki/File:')]
+        return links
+
+    def parse_image(self, data):
+        raw_html = data['parse']['text']['*']
+        soup = BeautifulSoup(raw_html, 'html.parser')
+        links = [i for i in soup.find_all('img') if i.get('src')]
         return links
 
     def parse_text(self, data):
@@ -140,6 +150,7 @@ class WikipediaGUI(xbmcgui.WindowXMLDialog):
         self._tmdb_type = kwargs.get('tmdb_type')
         self._wiki = WikipediaAPI()
         self._title = ''
+        self._overview_img = ''
         self._history = []
         with BusyDialog():
             self.do_setup()
@@ -154,10 +165,14 @@ class WikipediaGUI(xbmcgui.WindowXMLDialog):
 
     def do_init(self):
         self._gui_name.setLabel(f'{self._title}')
-        self._gui_text.setText(f'{self._overview}')
+        self._gui_text.setText(f'[B]Overview[/B]\n{self._overview}')
         self._gui_attr.setText(WIKI_ATTRIBUTION.format(self._fullurl))
         self._gui_ccim.setImage(WIKI_CCBYSA_IMG)
+        self.clearProperty('Image')
         self.set_sections()
+        self.setFocusId(WIKI_LIST_ID)
+        self.set_section(0)
+        self._overview_img = self.get_image(0)
 
     def onInit(self):
         self._gui_name = self.getControl(WIKI_NAME_ID)
@@ -179,6 +194,8 @@ class WikipediaGUI(xbmcgui.WindowXMLDialog):
             return self.do_click()
 
     def do_close(self):
+        if self.getFocusId() == WIKI_SCRL_ID:
+            return self.setFocusId(WIKI_LIST_ID)
         if not self._history:  # No history so close
             return self.close()
         with BusyDialog():  # History so go back instead
@@ -188,13 +205,7 @@ class WikipediaGUI(xbmcgui.WindowXMLDialog):
     def do_scroll(self):
         if self.getFocusId() != WIKI_LIST_ID:
             return
-        x = self._gui_list.getSelectedPosition()
-        try:
-            text = self._index[x]
-            name = self._sections[x]['line']
-        except (TypeError, AttributeError, KeyError, IndexError):
-            return
-        self._gui_text.setText(f'[B]{name}[/B]\n{text}')
+        self.set_section(self._gui_list.getSelectedPosition())
 
     def do_click(self):
         if self.getFocusId() != WIKI_LIST_ID:
@@ -211,6 +222,29 @@ class WikipediaGUI(xbmcgui.WindowXMLDialog):
         with BusyDialog():
             self.do_setup(links[x])
         self.do_init()
+
+    def get_image(self, x, p=0):
+        try:
+            imgs = self._wiki.parse_image(self._wiki.get_section(self._title, f'{x}'))
+        except (TypeError, AttributeError, KeyError, IndexError):
+            return
+        if not imgs or not imgs[p]:
+            return
+        return imgs[p]
+
+    def set_image(self, img=None):
+        img = img or self._overview_img
+        self.setProperty('Image', f'https:{img.get("src")}')
+        self.setProperty('ImageText', f'{img.get("alt", "")}')
+
+    def set_section(self, x):
+        try:
+            text = self._index[x]
+            name = self._sections[x]['line']
+        except (TypeError, AttributeError, KeyError, IndexError):
+            return
+        self._gui_text.setText(f'[B]{name}[/B]\n{text}')
+        self.set_image(self.get_image(x))
 
     def set_sections(self):
         self._index = []
