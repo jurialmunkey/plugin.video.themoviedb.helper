@@ -20,6 +20,12 @@ ACTION_MOVEMENT = (1, 2, 3, 4, )
 ACTION_SELECT = (7, )
 
 
+WIKI_TAG_LINK = '[COLOR=BF55DDFF]{}[/COLOR]'
+WIKI_TAG_BOLD = '[B]{}[/B]'
+WIKI_TAG_EMPH = '[CAPITALIZE]{}[/CAPITALIZE]'
+WIKI_TAG_SUPS = '[LIGHT]{}[/LIGHT]'
+
+
 AFFIXES = {
     'tv': {
         'regex': r'\(TV series\)$',
@@ -59,16 +65,6 @@ class WikipediaAPI(RequestAPI):
             return
         return items[x]
 
-        # best_title = None
-        # for i in data['query']['search']:
-        #     if regex and i['title'].split(' (')[0] == query and re.match(regex, i['title']):
-        #         return i['title']
-        #     if not best_title and i['title'] == query and match in i['snippet']:
-        #         best_title = i['title']
-        #     if not best_title and match in i['snippet']:
-        #         best_title = i['title']
-        # return best_title
-
     def get_extract(self, title):
         params = {
             'action': 'query', 'format': 'json', 'titles': title, 'prop': 'extracts',
@@ -96,7 +92,10 @@ class WikipediaAPI(RequestAPI):
     def get_section(self, title, section_index):
         params = {
             'action': 'parse', 'page': title, 'format': 'json', 'prop': 'text',
-            'disabletoc': True, 'section': section_index, 'redirects': ''}
+            'disabletoc': True, 'section': section_index, 'redirects': '',
+            'disablelimitreport': True,
+            'disableeditsection': True,
+            'mobileformat': True}
         return self.get_request_lc(**params)
 
     def get_all_sections(self, title):
@@ -128,41 +127,51 @@ class WikipediaAPI(RequestAPI):
     def parse_text(self, data):
         raw_html = data['parse']['text']['*']
         soup = BeautifulSoup(raw_html, 'html.parser')
-        text = [p.get_text() for p in soup.find_all('p')]
-        tabl = []
+        # return soup.prettify()
+        text = []
 
         def _parse_table(p):
             for c in p.children:
-                if c.name == 'style':
+                if c.name in ['style']:
                     continue
-                if c.name in ['tr', 'li', 'p']:
-                    tabl.append('\n')
+                if c.name and any(x in ['mw-references-wrap', 'references-text', 'mw-editsection'] for x in c.get('class', [])):
+                    continue
+                if c.name in ['p', 'table']:
+                    text.append('\n\n')
+                elif c.name in ['tr', 'li', 'ul', 'ol', 'dl']:
+                    text.append('\n')
+                if c.name == 'img' and c.get('title'):
+                    text.append(f'{c["title"]}')
+                    continue
                 if c.string:
                     if c.string.startswith('^'):
                         continue
                     t = c.string.replace('\n', ' ')
-                    tabl.append(f'[B]{t}[/B] ' if c.name == 'th' else f'{t} ')
-                    continue
-                if c.get('class') == 'mw-editsection':
+                    if c.name in ['th', 'td']:
+                        t = f'{t} '
+                    if c.name and 'mw-headline' in c.get('class', ''):
+                        t = WIKI_TAG_BOLD.format(t)
+                    elif c.name in ['th', 'h2', 'b', 'h3', 'h1', 'h4']:
+                        t = WIKI_TAG_BOLD.format(t)
+                    elif c.name in ['i', 'em']:
+                        t = WIKI_TAG_EMPH.format(t)
+                    elif c.name in ['sup']:
+                        t = WIKI_TAG_SUPS.format(t)
+                    elif c.name in ['u', 'a']:
+                        t = WIKI_TAG_LINK.format(t)
+                    # t = f'<{c.name if c.name else ""}>{t}'
+                    text.append(f'{t}')
                     continue
                 if c.children:
                     _parse_table(c)
                     continue
 
-        for p in soup.find_all(['table', 'ul', 'ol', 'dl']):
-            tabl.append('\n\n')
-            _parse_table(p)
-        text.append(''.join(tabl))
+        _parse_table(soup)
 
-        # tabl = [' '.join([c.get_text().replace('\n\n', ' ').replace('  ', ' ') for c in p.children if c.name in ['th', 'td']]) for p in soup.find_all('tr')]
-        # text += tabl
-
-        # text += [p.get_text() for p in soup.find_all('li')]
-        text = [i for i in text if 'Cite error' not in i and not i.startswith('^')]
-        text = '\n'.join(text)
+        text = ''.join(text)
         text = re.sub(r'\[[0-9]*\]', '', text)
         text = re.sub(r' +', ' ', text)
-        text = re.sub(r'(\n){3,}', '\n\n', text)
+        text = re.sub(r'( *\n){3,}', '\n\n', text)
         text = re.sub(r'^(\n)+', '', text)
         return text
 
@@ -232,13 +241,13 @@ class WikipediaGUI(xbmcgui.WindowXMLDialog):
         self.set_section(self._gui_list.getSelectedPosition())
 
     def do_click(self):
-        if self.getFocusId() != WIKI_LIST_ID:
-            return
+        # if self.getFocusId() != WIKI_LIST_ID:
+        #     return
         x = self._gui_list.getSelectedPosition()
         links = self._wiki.parse_links(self._wiki.get_section(self._title, f'{x}'))
         if not links:
             return
-        links = [i for i in set(links)]
+        links = list(dict.fromkeys(links))
         x = xbmcgui.Dialog().select('Links', links)
         if x == -1:
             return
@@ -247,27 +256,32 @@ class WikipediaGUI(xbmcgui.WindowXMLDialog):
             self.do_setup(links[x])
         self.do_init()
 
-    def get_image(self, x, p=0):
+    def get_image(self, x):
         try:
             imgs = self._wiki.parse_image(self._wiki.get_section(self._title, f'{x}'))
         except (TypeError, AttributeError, KeyError, IndexError):
             return
-        if not imgs or not imgs[p]:
+        if not imgs:
             return
-        return imgs[p]
+        for img in imgs:
+            if int(img.get('width', 100)) < 32:
+                continue
+            if int(img.get('height', 100)) < 32:
+                continue
+            return img
 
     def set_image(self, img=None):
         img = img or self._overview_img
         self.setProperty('Image', f'https:{img.get("src")}')
-        self.setProperty('ImageText', f'{img.get("alt", "")}')
+        self.setProperty('ImageText', f'{img.get("title") or img.get("alt")}')
 
     def set_section(self, x):
         try:
             text = self._index[x]
-            name = self._sections[x]['line']
+            # name = self._sections[x]['line']
         except (TypeError, AttributeError, KeyError, IndexError):
             return
-        self._gui_text.setText(f'[B]{name}[/B]\n{text}')
+        self._gui_text.setText(f'{text}')
         self.set_image(self.get_image(x))
 
     def set_sections(self):
