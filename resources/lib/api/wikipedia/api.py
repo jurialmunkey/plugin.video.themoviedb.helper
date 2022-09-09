@@ -22,7 +22,7 @@ ACTION_SELECT = (7, )
 
 WIKI_TAG_LINK = '[COLOR=BF55DDFF]{}[/COLOR]'
 WIKI_TAG_BOLD = '[B]{}[/B]'
-WIKI_TAG_EMPH = '[CAPITALIZE]{}[/CAPITALIZE]'
+WIKI_TAG_EMPH = '[LIGHT][I]{} [/I][/LIGHT]'
 WIKI_TAG_SUPS = '[LIGHT]{}[/LIGHT]'
 
 
@@ -136,10 +136,14 @@ class WikipediaAPI(RequestAPI):
                     continue
                 if c.name and any(x in ['mw-references-wrap', 'references-text', 'mw-editsection'] for x in c.get('class', [])):
                     continue
-                if c.name in ['p', 'table']:
+                # if c.name:
+                #     text.append(f'<{c.name}>')
+                if c.name in ['div', 'br']:
+                    text.append(' ')
+                elif c.name in ['p', 'table', 'tr', 'li']:
                     text.append('\n\n')
-                elif c.name in ['tr', 'li', 'ul', 'ol', 'dl']:
-                    text.append('\n')
+                # elif c.name in ['br']:
+                #     text.append('\n')
                 if c.name == 'img' and c.get('title'):
                     text.append(f'{c["title"]}')
                     continue
@@ -159,7 +163,8 @@ class WikipediaAPI(RequestAPI):
                         t = WIKI_TAG_SUPS.format(t)
                     elif c.name in ['u', 'a']:
                         t = WIKI_TAG_LINK.format(t)
-                    # t = f'<{c.name if c.name else ""}>{t}'
+                    elif c.name in ['li']:
+                        t = '* {}'.format(t)
                     text.append(f'{t}')
                     continue
                 if c.children:
@@ -173,6 +178,7 @@ class WikipediaAPI(RequestAPI):
         text = re.sub(r' +', ' ', text)
         text = re.sub(r'( *\n){3,}', '\n\n', text)
         text = re.sub(r'^(\n)+', '', text)
+        text = re.sub(r'^ +', '', text)
         return text
 
 
