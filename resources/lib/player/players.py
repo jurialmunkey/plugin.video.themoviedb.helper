@@ -114,9 +114,10 @@ class Players(object):
     def _get_external_ids(self, tmdb_type, tmdb_id, season, episode):
         self.details_ext_ids = get_external_ids(tmdb_type, tmdb_id, season=season, episode=episode)
 
-    def _set_external_ids(self, tmdb_type, tmdb_id, season, episode, details):
-        self._thread_ext_ids.join()
-        details.set_details(details=self.details_ext_ids, reverse=True)
+    def _set_external_ids(self, tmdb_type, tmdb_id, season, episode, details, required=True):
+        if required:
+            self._thread_ext_ids.join()
+            details.set_details(details=self.details_ext_ids, reverse=True)
         return set_detailed_item(tmdb_type, tmdb_id, season, episode, details=details) or {}
 
     def _set_provider_priority(self):
@@ -157,6 +158,7 @@ class Players(object):
             'is_folder': is_folder,
             'is_provider': value.get('is_provider') if not is_folder else False,
             'is_resolvable': value.get('is_resolvable'),
+            'requires_ids': value.get('requires_ids', False),
             'make_playlist': value.get('make_playlist'),
             'api_language': value.get('api_language'),
             'language': value.get('language'),
@@ -538,7 +540,7 @@ class Players(object):
                 return
 
         # Update item from external ID thread
-        self.item = self._set_external_ids(self.tmdb_type, self.tmdb_id, self.season, self.episode, details=self.details) or {}
+        self.item = self._set_external_ids(self.tmdb_type, self.tmdb_id, self.season, self.episode, details=self.details, required=player.get('requires_ids', False)) or {}
 
         # Log details
         self.action_log += (
@@ -551,7 +553,7 @@ class Players(object):
         if player.get('api_language', None) != self.api_language:
             self.api_language = player.get('api_language', None)
             self.details = get_item_details(self.tmdb_type, self.tmdb_id, self.season, self.episode, language=self.api_language)
-            self.item = self._set_external_ids(self.tmdb_type, self.tmdb_id, self.season, self.episode, details=self.details) or {}
+            self.item = self._set_external_ids(self.tmdb_type, self.tmdb_id, self.season, self.episode, details=self.details, required=player.get('requires_ids')) or {}
             self.action_log += ('APILAN: ', self.api_language, '\n')
 
         # Allow for a separate translation language to add "{de_title}" keys ("de" is iso language code)
