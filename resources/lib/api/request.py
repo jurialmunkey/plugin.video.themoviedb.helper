@@ -41,7 +41,7 @@ def json_loads(obj):
 
 
 class RequestAPI(object):
-    def __init__(self, req_api_url=None, req_api_key=None, req_api_name=None, timeout=None):
+    def __init__(self, req_api_url=None, req_api_key=None, req_api_name=None, timeout=None, error_notification=True):
         self.req_api_url = req_api_url or ''
         self.req_api_key = req_api_key or ''
         self.req_api_name = req_api_name or ''
@@ -56,6 +56,13 @@ class RequestAPI(object):
         self.headers = None
         self.timeout = timeout or 15
         self._cache = BasicCache(filename=f'{req_api_name or "requests"}.db')
+        self._error_notification = error_notification
+
+    def do_error_notification(self, log_msg, note_head, note_body):
+        kodi_log(log_msg, 1)
+        if not self._error_notification:
+            return
+        Dialog().notification(note_head, note_body)
 
     def get_api_request_json(self, request=None, postdata=None, headers=None, is_xml=False, method=None):
         request = self.get_api_request(request=request, postdata=postdata, headers=headers, method=method)
@@ -76,8 +83,9 @@ class RequestAPI(object):
 
         # Only log error and notify user if it hasn't happened in last {log_time} seconds to avoid log/gui spam
         if not get_timestamp(last_err):
-            Dialog().notification(get_localized(32308).format(self.req_api_name), get_localized(13297))
-            kodi_log(f'ConnectionError: {get_localized(13297)}\n{err}\nSuppressing retries.', 1)
+            self.do_error_notification(
+                f'ConnectionError: {get_localized(13297)}\n{err}\nSuppressing retries.',
+                get_localized(32308).format(self.req_api_name), get_localized(13297))
 
         # Update our last error timestamp and return it
         return get_property(err_prop, set_timestamp(log_time))
@@ -89,8 +97,8 @@ class RequestAPI(object):
         if check_status and self.nointernet_err(err):
             return
 
-        kodi_log(f'ConnectionError: {msg_affix} {err}\nSuppressing retries for 30 seconds', 1)
-        Dialog().notification(
+        self.do_error_notification(
+            f'ConnectionError: {msg_affix} {err}\nSuppressing retries for 30 seconds',
             get_localized(32308).format(' '.join([self.req_api_name, msg_affix])),
             get_localized(32307).format('30'))
 
@@ -98,8 +106,8 @@ class RequestAPI(object):
         from json import dumps
         self.req_500_err[request] = set_timestamp(wait_time)
         get_property(self.req_500_err_prop, dumps(self.req_500_err))
-        kodi_log(f'ConnectionError: {dumps(self.req_500_err)}\nSuppressing retries for 60 seconds', 1)
-        Dialog().notification(
+        self.do_error_notification(
+            f'ConnectionError: {dumps(self.req_500_err)}\nSuppressing retries for 60 seconds',
             get_localized(32308).format(self.req_api_name),
             get_localized(32307).format('60'))
 

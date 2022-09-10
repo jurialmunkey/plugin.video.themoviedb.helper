@@ -12,7 +12,8 @@ class OMDb(RequestAPI):
         super(OMDb, self).__init__(
             req_api_key=f'apikey={api_key or get_setting("omdb_apikey", "str")}',
             req_api_name='OMDb',
-            req_api_url='https://www.omdbapi.com/')
+            req_api_url='https://www.omdbapi.com/',
+            error_notification=False)
 
     def get_request_item(self, imdb_id=None, title=None, year=None, tomatoes=True, fullplot=True, cache_only=False):
         kwparams = {}
