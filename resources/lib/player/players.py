@@ -195,7 +195,8 @@ class Players(object):
         return file
 
     def _get_local_movie(self):
-        dbid = KodiLibrary(dbtype='movie').get_info(
+        k_db = KodiLibrary(dbtype='movie')
+        dbid = k_db.get_info(
             'dbid', fuzzy_match=False,
             tmdb_id=self.item.get('tmdb'),
             imdb_id=self.item.get('imdb'))
@@ -203,7 +204,7 @@ class Players(object):
             return
         if self.details:  # Add dbid to details to update our local progress.
             self.details.infolabels['dbid'] = dbid
-        return self._get_local_file(KodiLibrary(dbtype='movie').get_info('file', fuzzy_match=False, dbid=dbid))
+        return self._get_local_file(k_db.get_info('file', fuzzy_match=False, dbid=dbid))
 
     def _get_local_episode(self):
         dbid = KodiLibrary(dbtype='tvshow').get_info(
@@ -219,7 +220,8 @@ class Players(object):
             return []
         dialog_play = self._get_local_item(tmdb_type)
         dialog_search = []
-        for k, v in sorted(self.players.items(), key=lambda i: try_int(i[1].get('priority')) or PLAYERS_PRIORITY):
+        items = sorted(self.players.items(), key=lambda i: int(i[1].get('priority') or 0) or PLAYERS_PRIORITY)
+        for k, v in items:
             if v.get('disabled', '').lower() == 'true':
                 continue  # Skip disabled players
             if tmdb_type == 'movie':
