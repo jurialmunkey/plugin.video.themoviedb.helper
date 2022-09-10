@@ -1,20 +1,13 @@
-from resources.lib.addon.tmdate import get_datetime_now
-from resources.lib.addon.consts import PLAYERS_URLENCODE
 from tmdbhelper.parser import try_int, del_empty_keys
-from resources.lib.items.listitem import ListItem
 from resources.lib.items.builder import ItemBuilder
-from resources.lib.addon.thread import ParallelThread
 from resources.lib.api.tmdb.api import TMDb
-from resources.lib.api.trakt.api import TraktAPI
-from json import dumps
-from collections import defaultdict
-from urllib.parse import quote_plus, quote
 
 
 EXTERNAL_ID_TYPES = ['tmdb', 'tvdb', 'imdb', 'slug', 'trakt']
 
 
 def get_next_episodes(tmdb_id, season, episode, player=None):
+    from resources.lib.addon.thread import ParallelThread
     tmdb_api = TMDb()
 
     all_episodes = tmdb_api.get_flatseasons_list(tmdb_id)
@@ -55,45 +48,35 @@ def get_next_episodes(tmdb_id, season, episode, player=None):
     return [i for i in item_queue if i]
 
 
-def get_external_ids(li, season=None, episode=None):
+def get_external_ids(tmdb_type, tmdb_id, season=None, episode=None):
+    from resources.lib.api.trakt.api import TraktAPI
     trakt_api = TraktAPI()
-    unique_id, trakt_type = None, None
-    if li.infolabels.get('mediatype') == 'movie':
-        unique_id = li.unique_ids.get('tmdb')
-        trakt_type = 'movie'
-    elif li.infolabels.get('mediatype') == 'tvshow':
-        unique_id = li.unique_ids.get('tmdb')
-        trakt_type = 'show'
-    elif li.infolabels.get('mediatype') in ['season', 'episode']:
-        unique_id = li.unique_ids.get('tvshow.tmdb')
-        trakt_type = 'show'
-    if not unique_id or not trakt_type:
+    trakt_type = 'movie' if tmdb_type == 'movie' else 'show'
+    if not tmdb_id or not trakt_type:
         return
-    trakt_id = trakt_api.get_id(id_type='tmdb', unique_id=unique_id, trakt_type=trakt_type, output_type='trakt')
+
+    trakt_id = trakt_api.get_id(id_type='tmdb', unique_id=tmdb_id, trakt_type=trakt_type, output_type='trakt')
     if not trakt_id:
         return
+
     details = trakt_api.get_details(trakt_type, trakt_id, extended=None)
-    if not details:
+    if not details or not details.get('ids'):
         return
-    _details_ids = details.get('ids', {})
-    if li.infolabels.get('mediatype') in ['movie', 'tvshow', 'season']:
-        _uids = {i: _details_ids[i] for i in EXTERNAL_ID_TYPES if _details_ids.get(i)}
-        _uids['tmdb'] = unique_id
-        return {'unique_ids': _uids}
-    episode_details = trakt_api.get_details(
-        trakt_type, trakt_id,
-        season=season or li.infolabels.get('season'),
-        episode=episode or li.infolabels.get('episode'),
-        extended=None)
-    _episode_details_ids = episode_details.get('ids', {})
-    if episode_details:
-        _uids = {f'tvshow.{i}': _details_ids[i] for i in EXTERNAL_ID_TYPES if _details_ids.get(i)}
+
+    if episode is not None:
+        _uids = {f'tvshow.{i}': details['ids'][i] for i in EXTERNAL_ID_TYPES if details['ids'].get(i)}
+        _episode_details_ids = trakt_api.get_details(trakt_type, trakt_id, season=season, episode=episode, extended=None).get('ids') or {}
         _uids.update({f'{i}': _episode_details_ids[i] for i in EXTERNAL_ID_TYPES if _episode_details_ids.get(i)})
-        _uids['tvshow.tmdb'] = unique_id
-        return {'unique_ids': _uids}
+        _uids['tvshow.tmdb'] = tmdb_id
+    else:
+        _uids = {i: details['ids'][i] for i in EXTERNAL_ID_TYPES if details['ids'].get(i)}
+        _uids['tmdb'] = tmdb_id
+
+    return {'unique_ids': _uids}
 
 
 def get_item_details(tmdb_type, tmdb_id, season=None, episode=None, language=None):
+    from resources.lib.items.listitem import ListItem
     tmdb_api = TMDb(language=language) if language else TMDb()
     ib = ItemBuilder(tmdb_api=tmdb_api)
     details = ib.get_item(tmdb_type, tmdb_id, season, episode)
@@ -107,7 +90,6 @@ def get_item_details(tmdb_type, tmdb_id, season=None, episode=None, language=Non
     details['art'] = ib.get_item_artwork(artwork, is_season=True if season else False)
     details = ListItem(**details)
     details.infolabels['mediatype'] == 'movie' if tmdb_type == 'movie' else 'episode'
-    details.set_details(details=get_external_ids(details, season=season, episode=episode), reverse=True)
     return details
 
 
@@ -158,6 +140,9 @@ def get_language_details(base, tmdb_type, tmdb_id, season=None, episode=None, la
 
 
 def _url_encode_item(item, base=None):
+    from resources.lib.addon.consts import PLAYERS_URLENCODE
+    from urllib.parse import quote_plus, quote
+    from json import dumps
     base = base or item.copy()
     for k, v in base.items():
         if k not in PLAYERS_URLENCODE:
@@ -175,10 +160,11 @@ def _url_encode_item(item, base=None):
     return item
 
 
-def get_detailed_item(tmdb_type, tmdb_id, season=None, episode=None, details=None):
-    details = details or get_item_details(tmdb_type, tmdb_id, season, episode)
+def set_detailed_item(tmdb_type, tmdb_id, season=None, episode=None, details=None):
+    from resources.lib.addon.tmdate import get_datetime_now
+    from collections import defaultdict
     if not details:
-        return None
+        return
     item = defaultdict(lambda: '_')
     item['id'] = item['tmdb'] = tmdb_id
     item['imdb'] = details.unique_ids.get('imdb')
@@ -222,6 +208,7 @@ def get_detailed_item(tmdb_type, tmdb_id, season=None, episode=None, details=Non
 
 
 def get_playerstring(tmdb_type, tmdb_id, season=None, episode=None, details=None):
+    from json import dumps
     if not details:
         return None
     playerstring = {}

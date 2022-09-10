@@ -11,10 +11,11 @@ from resources.lib.addon.dialog import BusyDialog, ProgressDialog
 from resources.lib.items.listitem import ListItem
 from resources.lib.files.futils import read_file, normalise_filesize
 from resources.lib.api.kodi.rpc import get_directory, KodiLibrary
-from resources.lib.player.details import get_item_details, get_detailed_item, get_playerstring, get_language_details, get_next_episodes
+from resources.lib.player.details import get_item_details, set_detailed_item, get_playerstring, get_language_details, get_next_episodes, get_external_ids
 from resources.lib.player.inputter import KeyboardInputter
 from resources.lib.player.putils import get_players_from_file, make_playlist, make_upnext
 from resources.lib.addon.logger import kodi_log
+from threading import Thread
 
 
 def string_format_map(fmt, d):
@@ -90,14 +91,15 @@ class Players(object):
             self.players = get_players_from_file()
 
             _p_dialog.update(f'{get_localized(32375)}...')
+            self._thread_ext_ids = Thread(target=self._get_external_ids, args=[tmdb_type, tmdb_id, season, episode])
+            self._thread_ext_ids.start()  # We thread this lookup and rejoin later as Trakt is slow
             self.details = get_item_details(tmdb_type, tmdb_id, season, episode)
-            self.item = get_detailed_item(tmdb_type, tmdb_id, season, episode, details=self.details) or {}
+            self.item = set_detailed_item(tmdb_type, tmdb_id, season, episode, details=self.details) or {}
 
             _p_dialog.update(f'{get_localized(32376)}...')
             self._set_provider_priority()
             self.playerstring = get_playerstring(tmdb_type, tmdb_id, season, episode, details=self.details)
             self.dialog_players = self._get_players_for_dialog(tmdb_type)
-
             self.default_player = get_setting('default_player_movies', 'str') if tmdb_type == 'movie' else get_setting('default_player_episodes', 'str')
             self.ignore_default = f'{player} {mode or "play"}_{"movie" if tmdb_type == "movie" else "episode"}' if player else ignore_default or ''
             self.tmdb_type, self.tmdb_id, self.season, self.episode = tmdb_type, tmdb_id, season, episode
@@ -108,6 +110,14 @@ class Players(object):
             self.is_strm = islocal
             self.combined_players = get_setting('combined_players')
             self.current_player = {}
+
+    def _get_external_ids(self, tmdb_type, tmdb_id, season, episode):
+        self.details_ext_ids = get_external_ids(tmdb_type, tmdb_id, season=season, episode=episode)
+
+    def _set_external_ids(self, tmdb_type, tmdb_id, season, episode, details):
+        self._thread_ext_ids.join()
+        details.set_details(details=self.details_ext_ids, reverse=True)
+        return set_detailed_item(tmdb_type, tmdb_id, season, episode, details=details) or {}
 
     def _set_provider_priority(self):
         try:  # Check if players are listed in providers and bump priority if found
@@ -527,6 +537,9 @@ class Players(object):
             if not player:
                 return
 
+        # Update item from external ID thread
+        self.item = self._set_external_ids(self.tmdb_type, self.tmdb_id, self.season, self.episode, details=self.details) or {}
+
         # Log details
         self.action_log += (
             'PLAYER: ', player.get('file'), ' ', player.get('mode'), ' ', player.get('is_resolvable'), '\n',
@@ -538,7 +551,7 @@ class Players(object):
         if player.get('api_language', None) != self.api_language:
             self.api_language = player.get('api_language', None)
             self.details = get_item_details(self.tmdb_type, self.tmdb_id, self.season, self.episode, language=self.api_language)
-            self.item = get_detailed_item(self.tmdb_type, self.tmdb_id, self.season, self.episode, details=self.details) or {}
+            self.item = self._set_external_ids(self.tmdb_type, self.tmdb_id, self.season, self.episode, details=self.details) or {}
             self.action_log += ('APILAN: ', self.api_language, '\n')
 
         # Allow for a separate translation language to add "{de_title}" keys ("de" is iso language code)
