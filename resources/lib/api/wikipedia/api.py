@@ -179,6 +179,7 @@ class WikipediaAPI(RequestAPI):
         text = re.sub(r'( *\n){3,}', '\n\n', text)
         text = re.sub(r'^(\n)+', '', text)
         text = re.sub(r'^ +', '', text)
+        text = re.sub(r'\n +', '\n', text)
         return text
 
 
@@ -204,7 +205,7 @@ class WikipediaGUI(xbmcgui.WindowXMLDialog):
 
     def do_init(self):
         self._gui_name.setLabel(f'{self._title}')
-        self._gui_text.setText(f'[B]Overview[/B]\n{self._overview}')
+        self._gui_text.setText(f'{self._overview}')
         self._gui_attr.setText(WIKI_ATTRIBUTION.format(self._fullurl))
         self._gui_ccim.setImage(WIKI_CCBYSA_IMG)
         self.clearProperty('Image')
