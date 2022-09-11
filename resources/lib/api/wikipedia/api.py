@@ -42,6 +42,41 @@ AFFIXES = {
 }
 
 
+class WikimediaAPI(RequestAPI):
+    def __init__(self):
+        super(WikimediaAPI, self).__init__(
+            req_api_name='Wikimedia',
+            req_api_url='https://commons.m.wikimedia.org/w/api.php')
+
+    def get_titles(self, query):
+        params = {
+            'action': 'query', 'list': 'search', 'format': 'json',
+            'srsearch': f'File: {query}'}
+        data = self.get_request_lc(**params)
+        if not data:
+            return
+        return [i['title'] for i in data['query']['search'] if i.get('title')]
+
+    def get_images(self, titles):
+        params = {
+            'action': 'query', 'format': 'json', 'prop': 'imageinfo', 'titles': '|'.join(titles),
+            'iiprop': 'timestamp|user|userid|comment|canonicaltitle|url|size|dimensions|sha1|mime|thumbmime|mediatype|bitdepth'}
+        return self.get_request_lc(**params)
+
+    def get_backdrop(self, query):
+        data = self.get_images(self.get_titles(query))
+        for k, v in data['query']['pages'].items():
+            for i in v.get('imageinfo', []):
+                if i.get('width', 0) < 1280:
+                    continue
+                if i.get('width', 0) < i.get('height', 0):
+                    continue
+                if i.get('mime') != "image/jpeg":
+                    continue
+                if i.get('url'):
+                    return i.get('url')
+
+
 class WikipediaAPI(RequestAPI):
     def __init__(self):
         super(WikipediaAPI, self).__init__(
@@ -189,6 +224,8 @@ class WikipediaGUI(xbmcgui.WindowXMLDialog):
         self._query = kwargs.get('query')
         self._tmdb_type = kwargs.get('tmdb_type')
         self._wiki = WikipediaAPI()
+        self._wikimedia = WikimediaAPI()
+        self._backdrop = ''
         self._title = ''
         self._overview_img = ''
         self._history = []
@@ -196,6 +233,7 @@ class WikipediaGUI(xbmcgui.WindowXMLDialog):
             self.do_setup()
 
     def do_setup(self, title=None):
+        self._name = title or self._query
         self._title = title or self._wiki.get_match(self._query, self._tmdb_type)
         if not self._title:
             return
@@ -204,6 +242,8 @@ class WikipediaGUI(xbmcgui.WindowXMLDialog):
         self._fullurl = self._wiki.get_fullurl(self._title)
 
     def do_init(self):
+        xbmcgui.Window(10000).clearProperty('TMDbHelper.Wikipedia.Backdrop')
+        self.clearProperty('Backdrop')
         self._gui_name.setLabel(f'{self._title}')
         self._gui_text.setText(f'{self._overview}')
         self._gui_attr.setText(WIKI_ATTRIBUTION.format(self._fullurl))
@@ -213,6 +253,10 @@ class WikipediaGUI(xbmcgui.WindowXMLDialog):
         self.setFocusId(WIKI_LIST_ID)
         self.set_section(0)
         self._overview_img = self.get_image(0)
+        self._backdrop = self._wikimedia.get_backdrop(self._name) or ''
+        if self._backdrop:
+            xbmcgui.Window(10000).setProperty('TMDbHelper.Wikipedia.Backdrop', self._backdrop)
+            self.setProperty('Backdrop', self._backdrop)
 
     def onInit(self):
         self._gui_name = self.getControl(WIKI_NAME_ID)
