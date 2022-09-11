@@ -189,26 +189,26 @@ THREAD_LOCK = 'TMDbHelper.KodiLibrary.ThreadLock'
 
 
 class KodiLibrary(object):
-    def __init__(self, dbtype=None, tvshowid=None, attempt_reconnect=False, logging=True):
+    def __init__(self, dbtype=None, tvshowid=None, attempt_reconnect=False, logging=True, cache_refresh=False):
         self.dbtype = dbtype
         self._cache = MemoryCache(name='KodiLibrary_{dbtype}_{tvshowid}')
-        self._get_database(dbtype, tvshowid, attempt_reconnect, logging)
+        self._get_database(dbtype, tvshowid, attempt_reconnect, logging, cache_refresh)
 
     @use_thread_lock(THREAD_LOCK)
-    def _get_database(self, dbtype, tvshowid=None, attempt_reconnect=False, logging=True):
+    def _get_database(self, dbtype, tvshowid=None, attempt_reconnect=False, logging=True, cache_refresh=False):
 
         def _get_db():
             if dbtype == 'both':
                 movies = self._cache.use(
                     self.get_database, 'movie', None, attempt_reconnect,
-                    cache_name='database', cache_minutes=180) or []
+                    cache_name='database', cache_minutes=180, cache_refresh=cache_refresh) or []
                 tvshows = self._cache.use(
                     self.get_database, 'tvshow', None, attempt_reconnect,
-                    cache_name='database', cache_minutes=180) or []
+                    cache_name='database', cache_minutes=180, cache_refresh=cache_refresh) or []
                 return movies + tvshows
             return self._cache.use(
                 self.get_database, dbtype, tvshowid, attempt_reconnect,
-                cache_name='database', cache_minutes=180)
+                cache_name='database', cache_minutes=180, cache_refresh=cache_refresh)
 
         self.database = _get_db()
 

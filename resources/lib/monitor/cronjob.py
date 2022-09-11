@@ -2,7 +2,7 @@ from xbmc import Monitor
 from tmdbhelper.parser import try_int
 from threading import Thread
 from resources.lib.addon.tmdate import convert_timestamp, get_datetime_now, get_timedelta, get_datetime_today, get_datetime_time, get_datetime_combine
-from resources.lib.addon.plugin import get_setting, executebuiltin, get_infolabel
+from resources.lib.addon.plugin import get_setting, executebuiltin, get_infolabel, ADDONPATH
 
 
 def clean_old_databases():
@@ -15,9 +15,11 @@ def clean_old_databases():
 def mem_cache_kodidb():
     from resources.lib.api.kodi.rpc import KodiLibrary
     from resources.lib.addon.logger import TimerFunc
+    from xbmcgui import Dialog
     with TimerFunc('KodiLibrary sync took', inline=True):
-        KodiLibrary('movie')
-        KodiLibrary('tvshow')
+        KodiLibrary('movie', cache_refresh=True)
+        KodiLibrary('tvshow', cache_refresh=True)
+        Dialog().notification('TMDbHelper', 'Kodi Library cached to memory', icon=f'{ADDONPATH}/icon.png')
 
 
 class CronJobMonitor(Thread):

@@ -2376,6 +2376,11 @@ msgctxt "#32466"
 msgid "Play automatically using available providers"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32467"
+msgid "Refresh cached Kodi Library details"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
