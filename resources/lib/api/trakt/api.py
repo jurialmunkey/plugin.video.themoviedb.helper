@@ -4,7 +4,7 @@ from xbmcgui import Dialog, DialogProgress
 from resources.lib.files.futils import json_loads as data_loads
 from resources.lib.files.futils import json_dumps as data_dumps
 from resources.lib.addon.window import get_property
-from resources.lib.addon.plugin import get_localized, get_setting, set_setting
+from resources.lib.addon.plugin import get_localized, get_setting, set_setting, ADDONPATH
 from tmdbhelper.parser import try_int
 from resources.lib.addon.tmdate import set_timestamp, get_timestamp
 from resources.lib.files.bcache import use_simple_cache
@@ -16,6 +16,7 @@ from resources.lib.api.trakt.progress import _TraktProgress
 from resources.lib.addon.logger import kodi_log, TimerFunc
 from resources.lib.addon.consts import CACHE_SHORT, CACHE_LONG
 from resources.lib.addon.thread import has_property_lock, use_thread_lock
+from timeit import default_timer as timer
 
 
 API_URL = 'https://api.trakt.tv/'
@@ -535,7 +536,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
                 kodi_log('Trakt authorization started', 1)
 
                 # Check if we can get a response from user account
-                with TimerFunc('Trakt authorization took', inline=True):
+                with TimerFunc('Trakt authorization took', inline=True) as tf:
                     response = self.get_simple_api_request('https://api.trakt.tv/sync/last_activities', headers=self.headers)
                     if not response or response.status_code == 401:  # 401 is unauthorized error code so let's try refreshing the token
                         kodi_log('Trakt unauthorized!', 1)
@@ -544,6 +545,9 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
                         kodi_log('Trakt user account authorized', 1)
                         get_property('TraktIsAuth', 'True')
                     get_property('TraktCheckingAuth', clear_property=True)
+                    total_time = timer() - tf.timer_a
+                    Dialog().notification('TMDbHelper', f'Trakt authorized in {total_time:.3f}s', icon=f'{ADDONPATH}/icon.png')
+
         return self.authorization
 
     def get_stored_token(self):

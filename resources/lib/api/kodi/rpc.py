@@ -2,6 +2,8 @@ from xbmc import Monitor, executeJSONRPC
 from resources.lib.addon.logger import kodi_log
 from tmdbhelper.parser import try_int, find_dict_in_list
 from resources.lib.api.kodi.mapping import ItemMapper
+from resources.lib.files.mcache import MemoryCache
+from resources.lib.addon.thread import use_thread_lock
 
 """ Lazyimports
 from json import dumps, loads
@@ -183,17 +185,34 @@ def get_episode_details(dbid=None):
     return _get_item_details(dbid=dbid, method="VideoLibrary.GetEpisodeDetails", key="episode", properties=properties)
 
 
+THREAD_LOCK = 'TMDbHelper.KodiLibrary.ThreadLock'
+
+
 class KodiLibrary(object):
     def __init__(self, dbtype=None, tvshowid=None, attempt_reconnect=False, logging=True):
         self.dbtype = dbtype
-        self.database = self._get_database(dbtype, tvshowid, attempt_reconnect)
+        self._cache = MemoryCache(name='KodiLibrary_{dbtype}_{tvshowid}')
+        self._get_database(dbtype, tvshowid, attempt_reconnect, logging)
 
+    @use_thread_lock(THREAD_LOCK)
     def _get_database(self, dbtype, tvshowid=None, attempt_reconnect=False, logging=True):
-        if dbtype == 'both':
-            movies = self.get_database('movie', None, attempt_reconnect) or []
-            tvshows = self.get_database('tvshow', None, attempt_reconnect) or []
-            return movies + tvshows
-        return self.get_database(dbtype, tvshowid, attempt_reconnect)
+
+        def _get_db():
+            if dbtype == 'both':
+                movies = self._cache.use(
+                    self.get_database, 'movie', None, attempt_reconnect,
+                    cache_name='database', cache_minutes=180) or []
+                tvshows = self._cache.use(
+                    self.get_database, 'tvshow', None, attempt_reconnect,
+                    cache_name='database', cache_minutes=180) or []
+                return movies + tvshows
+            return self._cache.use(
+                self.get_database, dbtype, tvshowid, attempt_reconnect,
+                cache_name='database', cache_minutes=180)
+
+        self.database = _get_db()
+
+        return self.database
 
     def get_database(self, dbtype, tvshowid=None, attempt_reconnect=False, logging=True):
         retries = 5 if attempt_reconnect else 1
@@ -239,6 +258,15 @@ class KodiLibrary(object):
             'year': item.get('year'),
             'file': item.get('file')}
             for item in response]
+
+    # def get_info(
+    #         self, info, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None, season=None,
+    #         episode=None, fuzzy_match=False, tmdb_id=None, tvdb_id=None):
+    #     self._cache.use(
+    #         self._get_info,
+    #         info=info, dbid=dbid, imdb_id=imdb_id, originaltitle=originaltitle, title=title, year=year,
+    #         season=season, episode=episode, fuzzy_match=fuzzy_match, tmdb_id=tmdb_id, tvdb_id=tvdb_id,
+    #         cache_name='get_info', cache_minutes=180, cache_combine_name=True)
 
     def get_info(
             self, info, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None, season=None,

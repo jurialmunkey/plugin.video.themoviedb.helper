@@ -111,10 +111,11 @@ class Container():
         return True
 
     def get_kodi_database(self, tmdb_type):
-        if not get_setting('local_db'):
-            return
-        from resources.lib.items.kodi import KodiDb
-        return KodiDb(tmdb_type)
+        with TimerList(self.timer_lists, 'get_kodi', log_threshold=0.05, logging=self.log_timers):
+            if not get_setting('local_db'):
+                return
+            from resources.lib.items.kodi import KodiDb
+            return KodiDb(tmdb_type)
 
     def _add_item(self, i):
         if not self.pagination and 'next_page' in i:
@@ -129,40 +130,42 @@ class Container():
         if not li:
             return
 
-        # Reformat ListItem.Label for episodes to match Kodi default 1x01.Title
-        # Check if unaired and either apply special formatting or hide item depending on user settings
-        li.set_episode_label()
-        if self.format_episode_labels and not li.infoproperties.get('specialseason'):
-            if li.is_unaired(no_date=self.nodate_is_unaired):
+        with TimerList(self.timer_lists, 'item_abc', log_threshold=0.05, logging=self.log_timers):
+            # Reformat ListItem.Label for episodes to match Kodi default 1x01.Title
+            # Check if unaired and either apply special formatting or hide item depending on user settings
+            li.set_episode_label()
+            if self.format_episode_labels and not li.infoproperties.get('specialseason'):
+                if li.is_unaired(no_date=self.nodate_is_unaired):
+                    return
+
+            # Add details from Kodi library
+            try:
+                    li.set_details(details=self.kodi_db.get_kodi_details(li), reverse=True)
+            except AttributeError:
+                pass
+
+            # Filter out items that are excluded (done after adding Kodi details so can filter against them)
+            if not li.next_page and is_excluded(li, is_listitem=True, **self.filters):
                 return
 
-        # Add details from Kodi library
-        try:
-            li.set_details(details=self.kodi_db.get_kodi_details(li), reverse=True)
-        except AttributeError:
-            pass
+        with TimerList(self.timer_lists, 'item_xyz', log_threshold=0.05, logging=self.log_timers):
+            # Add Trakt playcount and watched status
+            li.set_playcount(playcount=self.trakt_method.get_playcount(li))
+            if self.hide_watched and try_int(li.infolabels.get('playcount')) != 0:
+                return
 
-        # Filter out items that are excluded (done after adding Kodi details so can filter against them)
-        if not li.next_page and is_excluded(li, is_listitem=True, **self.filters):
-            return
-
-        # Add Trakt playcount and watched status
-        li.set_playcount(playcount=self.trakt_method.get_playcount(li))
-        if self.hide_watched and try_int(li.infolabels.get('playcount')) != 0:
-            return
-
-        li.set_context_menu()  # Set the context menu items
-        li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
-        li.set_thumb_to_art(self.thumb_override == 2) if self.thumb_override else None  # Special override for calendars to prevent thumb spoilers
-        li.set_params_reroute(self.is_fanarttv, self.params.get('extended'), self.is_cacheonly)  # Reroute details to proper end point
-        li.set_params_to_info(self.plugin_category)  # Set path params to properties for use in skins
-        li.infoproperties.update(self.property_params or {})
-        if self.thumb_override:
-            li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb to prevent Kodi overwriting
-        if li.next_page:
-            li.params['plugin_category'] = self.plugin_category  # Carry the plugin category to next page in plugin:// path
-        self.trakt_method.set_playprogress(li)
-        return li
+            li.set_context_menu()  # Set the context menu items
+            li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
+            li.set_thumb_to_art(self.thumb_override == 2) if self.thumb_override else None  # Special override for calendars to prevent thumb spoilers
+            li.set_params_reroute(self.is_fanarttv, self.params.get('extended'), self.is_cacheonly)  # Reroute details to proper end point
+            li.set_params_to_info(self.plugin_category)  # Set path params to properties for use in skins
+            li.infoproperties.update(self.property_params or {})
+            if self.thumb_override:
+                li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb to prevent Kodi overwriting
+            if li.next_page:
+                li.params['plugin_category'] = self.plugin_category  # Carry the plugin category to next page in plugin:// path
+            self.trakt_method.set_playprogress(li)
+            return li
 
     def precache_parent(self, tmdb_id, season=None):
         self.ib.get_parents(tmdb_type='tv', tmdb_id=tmdb_id, season=season)
