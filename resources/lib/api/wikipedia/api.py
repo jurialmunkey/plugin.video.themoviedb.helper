@@ -233,10 +233,10 @@ class WikipediaGUI(xbmcgui.WindowXMLDialog):
             self.do_setup()
 
     def do_setup(self, title=None):
-        self._name = title or self._query
         self._title = title or self._wiki.get_match(self._query, self._tmdb_type)
         if not self._title:
             return
+        self._name = title or self._title
         self._overview = self._wiki.parse_text(self._wiki.get_section(self._title, '0'))
         self._sections = self._wiki.get_all_sections(self._title)
         self._fullurl = self._wiki.get_fullurl(self._title)
