@@ -88,6 +88,7 @@ class Players(object):
         with ProgressDialog('TMDbHelper', f'{get_localized(32374)}...', total=3) as _p_dialog:
             self.action_log = []
             self.api_language = None
+            self.tmdb_type, self.tmdb_id, self.season, self.episode = tmdb_type, tmdb_id, season, episode
             self.players = get_players_from_file()
 
             _p_dialog.update(f'{get_localized(32375)}...')
@@ -102,7 +103,6 @@ class Players(object):
             self.dialog_players = self._get_players_for_dialog(tmdb_type)
             self.default_player = get_setting('default_player_movies', 'str') if tmdb_type == 'movie' else get_setting('default_player_episodes', 'str')
             self.ignore_default = f'{player} {mode or "play"}_{"movie" if tmdb_type == "movie" else "episode"}' if player else ignore_default or ''
-            self.tmdb_type, self.tmdb_id, self.season, self.episode = tmdb_type, tmdb_id, season, episode
             self.dummy_duration = try_float(get_setting('dummy_duration', 'str')) or 1.0
             self.dummy_delay = try_float(get_setting('dummy_delay', 'str')) or 1.0
             self.dummy_waitresolve = get_setting('dummy_waitresolve')
@@ -207,6 +207,10 @@ class Players(object):
         return self._get_local_file(k_db.get_info('file', fuzzy_match=False, dbid=dbid))
 
     def _get_local_episode(self):
+        # Note: Don't forget about libraries that need TVDB ids from Trakt!!! Need to join ID lookup thread here!!!
+        self.item = self._set_external_ids(
+            self.tmdb_type, self.tmdb_id, self.season, self.episode,
+            details=self.details, required=True)
         dbid = KodiLibrary(dbtype='tvshow').get_info(
             'dbid', fuzzy_match=False,
             tmdb_id=self.item.get('tmdb'),
