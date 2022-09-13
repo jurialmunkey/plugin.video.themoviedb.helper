@@ -12,14 +12,15 @@ def clean_old_databases():
         delete_folder(f, force=True, check_exists=True)
 
 
-def mem_cache_kodidb():
+def mem_cache_kodidb(notification=True):
     from resources.lib.api.kodi.rpc import KodiLibrary
     from resources.lib.addon.logger import TimerFunc
     from xbmcgui import Dialog
     with TimerFunc('KodiLibrary sync took', inline=True):
         KodiLibrary('movie', cache_refresh=True)
         KodiLibrary('tvshow', cache_refresh=True)
-        Dialog().notification('TMDbHelper', 'Kodi Library cached to memory', icon=f'{ADDONPATH}/icon.png')
+        if notification:
+            Dialog().notification('TMDbHelper', 'Kodi Library cached to memory', icon=f'{ADDONPATH}/icon.png')
 
 
 class CronJobMonitor(Thread):
@@ -32,7 +33,7 @@ class CronJobMonitor(Thread):
 
     def run(self):
         clean_old_databases()
-        mem_cache_kodidb()
+        mem_cache_kodidb(notification=False)
 
         self.xbmc_monitor.waitForAbort(600)  # Wait 10 minutes before doing updates to give boot time
         if self.xbmc_monitor.abortRequested():

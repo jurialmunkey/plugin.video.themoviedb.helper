@@ -2381,6 +2381,11 @@ msgctxt "#32467"
 msgid "Refresh cached Kodi Library details"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32468"
+msgid "Authorisation and sync notifications on startup"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

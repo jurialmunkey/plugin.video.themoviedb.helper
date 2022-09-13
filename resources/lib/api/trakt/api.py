@@ -545,8 +545,9 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
                         kodi_log('Trakt user account authorized', 1)
                         get_property('TraktIsAuth', 'True')
                     get_property('TraktCheckingAuth', clear_property=True)
-                    total_time = timer() - tf.timer_a
-                    Dialog().notification('TMDbHelper', f'Trakt authorized in {total_time:.3f}s', icon=f'{ADDONPATH}/icon.png')
+                    if get_setting('startup_notifications'):
+                        total_time = timer() - tf.timer_a
+                        Dialog().notification('TMDbHelper', f'Trakt authorized in {total_time:.3f}s', icon=f'{ADDONPATH}/icon.png')
 
         return self.authorization
 

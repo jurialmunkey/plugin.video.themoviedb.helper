@@ -5,7 +5,7 @@
 			<group id="1" label="248">
 				<setting id="mpaa_prefix" type="string" label="32004" help="32418">
 					<level>0</level>
-					<default>Rated </default>
+					<default>Rated</default>
 					<constraints>
 						<allowempty>true</allowempty>
 					</constraints>
@@ -637,6 +637,13 @@
 						<allowempty>true</allowempty>
 					</constraints>
 					<control type="button" format="action"/>
+				</setting>
+			</group>
+			<group id="3" label="25000">
+				<setting id="startup_notifications" type="boolean" label="32468" help="">
+					<level>0</level>
+					<default>True</default>
+					<control type="toggle"/>
 				</setting>
 			</group>
 		</category>
