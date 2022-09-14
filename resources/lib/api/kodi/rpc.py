@@ -259,15 +259,6 @@ class KodiLibrary(object):
             'file': item.get('file')}
             for item in response]
 
-    # def get_info(
-    #         self, info, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None, season=None,
-    #         episode=None, fuzzy_match=False, tmdb_id=None, tvdb_id=None):
-    #     self._cache.use(
-    #         self._get_info,
-    #         info=info, dbid=dbid, imdb_id=imdb_id, originaltitle=originaltitle, title=title, year=year,
-    #         season=season, episode=episode, fuzzy_match=fuzzy_match, tmdb_id=tmdb_id, tvdb_id=tvdb_id,
-    #         cache_name='get_info', cache_minutes=180, cache_combine_name=True)
-
     def get_info(
             self, info, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None, season=None,
             episode=None, fuzzy_match=False, tmdb_id=None, tvdb_id=None):
