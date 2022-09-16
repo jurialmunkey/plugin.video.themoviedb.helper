@@ -15,6 +15,7 @@ class ListBasic(Container):
                 iso_country=self.tmdb_api.iso_country,
                 **kwargs),
             sort_by=sort_by or info_model.get('sort_by'),
+            stacked=info_model.get('stacked'),
             tmdb_type=info_tmdb_type,
             base_tmdb_type=tmdb_type,
             key=info_model.get('key', 'results'),

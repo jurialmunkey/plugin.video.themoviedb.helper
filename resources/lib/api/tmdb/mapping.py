@@ -660,6 +660,9 @@ class ItemMapper(_ItemMapper):
             'imdb_id': [{
                 'keys': [('infolabels', 'imdbnumber'), ('unique_ids', 'imdb')]
             }],
+            'episode_count': [{
+                'keys': [('infolabels', 'episode'), ('infoproperties', 'episodes')]
+            }],
             'character': [{
                 'keys': [('infoproperties', 'role'), ('infoproperties', 'character'), ('label2', None)]
             }],
@@ -694,7 +697,6 @@ class ItemMapper(_ItemMapper):
             'season_number': ('infolabels', 'season'),
             'episode_number': ('infolabels', 'episode'),
             'season_count': ('infolabels', 'season'),
-            'episode_count': ('infolabels', 'episode'),
             'number_of_seasons': ('infolabels', 'season'),
             'number_of_episodes': ('infolabels', 'episode'),
             'department': ('infoproperties', 'department'),

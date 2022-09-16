@@ -193,6 +193,10 @@ RANDOMISED_TRAKT = {
         'info': 'trakt_anticipated',
         'route': RANDOMISED_TRAKT_ROUTE}}
 
+TMDB_STACKED_CREDITS_PROPERTIES = [
+    ('infoproperties', 'job'),
+    ('infoproperties', 'character'),
+    ('infoproperties', 'role')]
 TMDB_BASIC_LISTS_ROUTE = {
     'module_name': 'resources.lib.api.tmdb.lists',
     'import_attr': 'ListBasic'}
@@ -270,6 +274,7 @@ TMDB_BASIC_LISTS = {
         'key': 'cast',
         'tmdb_type': 'movie',
         'sort_by': 'popularity',
+        'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
         'dbid_sorting': True,
         'limit': 20,
         'route': TMDB_BASIC_LISTS_ROUTE
@@ -278,6 +283,7 @@ TMDB_BASIC_LISTS = {
         'path': 'person/{tmdb_id}/tv_credits',
         'key': 'cast',
         'sort_by': 'popularity',
+        'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
         'dbid_sorting': True,
         'tmdb_type': 'tv',
         'limit': 20,
@@ -287,6 +293,7 @@ TMDB_BASIC_LISTS = {
         'path': 'person/{tmdb_id}/movie_credits',
         'key': 'crew',
         'sort_by': 'popularity',
+        'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
         'dbid_sorting': True,
         'tmdb_type': 'movie',
         'limit': 20,
@@ -296,6 +303,7 @@ TMDB_BASIC_LISTS = {
         'path': 'person/{tmdb_id}/tv_credits',
         'key': 'crew',
         'sort_by': 'popularity',
+        'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
         'dbid_sorting': True,
         'tmdb_type': 'tv',
         'limit': 20,

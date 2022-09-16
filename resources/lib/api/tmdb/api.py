@@ -487,7 +487,9 @@ class TMDb(RequestAPI):
         kwargs['query'] = quote_plus(query)
         return self.get_basic_list(f'search/{tmdb_type}', tmdb_type, **kwargs)
 
-    def get_basic_list(self, path, tmdb_type, key='results', params=None, base_tmdb_type=None, limit=None, filters={}, sort_by=None, **kwargs):
+    def get_basic_list(
+            self, path, tmdb_type, key='results', params=None, base_tmdb_type=None, limit=None, filters={},
+            sort_by=None, stacked=None, **kwargs):
         response = self.get_request_sc(path, **kwargs)
         if not response:
             return []
@@ -502,6 +504,22 @@ class TMDb(RequestAPI):
         if filters:
             from resources.lib.items.filters import is_excluded
             items = [i for i in items if not is_excluded(i, **filters)]
+
+        if stacked and items:
+            stacked_list = [items.pop(0)]
+            for i in items:
+                x = len(stacked_list) - 1
+                p = stacked_list[x]
+                if p['unique_ids'].get('tmdb') != i['unique_ids'].get('tmdb'):
+                    stacked_list.append(i)
+                    continue
+                for b, k in stacked:
+                    iv = i[b].get(k)
+                    if iv is None:
+                        continue
+                    pv = p[b].get(k)
+                    p[b][k] = iv if pv is None else f'{pv} / {iv}'
+            items = stacked_list
 
         if try_int(response.get('page', 0)) < try_int(response.get('total_pages', 0)):
             items.append({'next_page': try_int(response.get('page', 0)) + 1})
