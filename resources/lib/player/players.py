@@ -115,7 +115,7 @@ class Players(object):
         self.details_ext_ids = get_external_ids(tmdb_type, tmdb_id, season=season, episode=episode)
 
     def _set_external_ids(self, tmdb_type, tmdb_id, season, episode, details, required=True):
-        if required:
+        if required and details:
             self._thread_ext_ids.join()
             details.set_details(details=self.details_ext_ids, reverse=True)
         return set_detailed_item(tmdb_type, tmdb_id, season, episode, details=details) or {}
