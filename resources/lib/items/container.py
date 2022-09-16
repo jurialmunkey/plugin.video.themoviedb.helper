@@ -140,7 +140,7 @@ class Container():
 
             # Add details from Kodi library
             try:
-                    li.set_details(details=self.kodi_db.get_kodi_details(li), reverse=True)
+                li.set_details(details=self.kodi_db.get_kodi_details(li), reverse=True)
             except AttributeError:
                 pass
 
