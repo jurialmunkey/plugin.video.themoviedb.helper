@@ -26,11 +26,11 @@ class ServiceMonitor(object):
 
     def _on_listitem(self):
         self.listitem_monitor.get_listitem()
-        self.xbmc_monitor.waitForAbort(0.2)
+        self.xbmc_monitor.waitForAbort(0.15)
 
     def _on_scroll(self):
         self.listitem_monitor.clear_on_scroll()
-        self.xbmc_monitor.waitForAbort(0.2)
+        self.xbmc_monitor.waitForAbort(0.15)
 
     def _on_fullscreen(self):
         if self.player_monitor.isPlayingVideo():

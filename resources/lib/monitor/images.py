@@ -4,7 +4,7 @@ import colorsys
 import hashlib
 from xbmc import getCacheThumbName, skinHasImage, Monitor, sleep
 from resources.lib.addon.window import get_property
-from resources.lib.addon.plugin import get_infolabel
+from resources.lib.addon.plugin import get_infolabel, get_setting
 from tmdbhelper.parser import try_int, try_float
 from resources.lib.files.futils import make_path
 from threading import Thread
@@ -105,6 +105,9 @@ def _saveimage(image, targetfile):
     f.close()
 
 
+BASEFOLDER = 'special://profile/addon_data/plugin.video.themoviedb.helper/'
+
+
 class ImageFunctions(Thread):
     def __init__(self, method=None, artwork=None, is_thread=True, prefix='ListItem'):
         if is_thread:
@@ -113,7 +116,7 @@ class ImageFunctions(Thread):
         self.func = None
         self.save_orig = False
         self.save_prop = None
-        self.save_path = 'special://profile/addon_data/plugin.video.themoviedb.helper/{}/'
+        self.save_path = f"{get_setting('cache_location', 'str') or BASEFOLDER}{{}}/"
         if method == 'blur':
             self.func = self.blur
             self.save_path = make_path(self.save_path.format('blur'))
