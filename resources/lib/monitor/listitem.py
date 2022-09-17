@@ -211,6 +211,12 @@ class ListItemMonitor(CommonMonitorFunctions):
             self._last_blur_fallback = True
 
     def run_imagefuncs(self):
+        # Cropping
+        if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"):
+            if self.get_artwork(source="Art(artist.clearlogo)|Art(tvshow.clearlogo)|Art(clearlogo)"):
+                ImageFunctions(method='crop', is_thread=False, artwork=self.get_artwork(
+                    source="Art(artist.clearlogo)|Art(tvshow.clearlogo)|Art(clearlogo)")).run()
+
         # Blur Image
         if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableBlur)"):
             ImageFunctions(method='blur', is_thread=False, artwork=self.get_artwork(
@@ -229,12 +235,6 @@ class ListItemMonitor(CommonMonitorFunctions):
             ImageFunctions(method='colors', is_thread=False, artwork=self.get_artwork(
                 source=get_property('Colors.SourceImage'),
                 fallback=get_property('Colors.Fallback'))).run()
-
-        # Cropping
-        if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"):
-            if self.get_artwork(source="Art(artist.clearlogo)|Art(tvshow.clearlogo)|Art(clearlogo)"):
-                ImageFunctions(method='crop', is_thread=False, artwork=self.get_artwork(
-                    source="Art(artist.clearlogo)|Art(tvshow.clearlogo)|Art(clearlogo)")).run()
 
     @kodi_try_except('lib.monitor.listitem.get_listitem')
     def get_listitem(self):
