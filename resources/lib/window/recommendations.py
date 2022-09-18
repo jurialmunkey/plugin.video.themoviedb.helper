@@ -32,6 +32,7 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
             for list_id, url, related, action in (i.split('|') for i in self._recommendations)]
         self._actions = {i['list_id']: i.pop('action') for i in self._recommendations}
         self._list_id = None
+        self._context_action = kwargs.get('context')
 
     def onInit(self):
         if not self._tmdb_id or not self._recommendations:
@@ -60,7 +61,7 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
         if _action_id in ACTION_SHOW_INFO:
             return self.do_action()
         if _action_id in ACTION_CONTEXT_MENU:
-            return self.do_action()
+            return executebuiltin(self._context_action) if self._context_action else self.do_action()
         if _action_id in ACTION_SELECT:
             return self.do_action()
 
