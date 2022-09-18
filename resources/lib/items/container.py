@@ -117,7 +117,7 @@ class Container():
             from resources.lib.items.kodi import KodiDb
             return KodiDb(tmdb_type)
 
-    def _add_item(self, i):
+    def _build_item(self, i):
         if not self.pagination and 'next_page' in i:
             return
         with TimerList(self.timer_lists, 'item_api', log_threshold=0.05, logging=self.log_timers):
@@ -171,12 +171,12 @@ class Container():
         self.ib.get_parents(tmdb_type='tv', tmdb_id=tmdb_id, season=season)
         # PREBUILD_PARENTSHOW = ['seasons', 'episodes', 'episode_groups', 'trakt_upnext', 'episode_group_seasons']
 
-    def add_items(self, items):
+    def build_items(self, items):
         # Build items in threads
         self.ib.cache_only = self.tmdb_cache_only
         with TimerList(self.timer_lists, '--build', log_threshold=0.05, logging=self.log_timers):
             self.ib.parent_params = self.parent_params
-            with ParallelThread(items, self._add_item) as pt:
+            with ParallelThread(items, self._build_item) as pt:
                 item_queue = pt.queue
             all_listitems = [i for i in item_queue if i]
 
@@ -189,7 +189,11 @@ class Container():
             self.format_episode_labels = self.parent_params.get('info') not in NO_LABEL_FORMATTING
             with ParallelThread(all_listitems, self._make_item) as pt:
                 item_queue = pt.queue
-            addDirectoryItems(self.handle, [(li.get_url(), li.get_listitem(), li.is_folder) for li in item_queue if li])
+
+        return item_queue
+
+    def add_items(self, items):
+        addDirectoryItems(self.handle, [(li.get_url(), li.get_listitem(), li.is_folder) for li in items if li])
 
     def set_mixed_content(self, response):
         self.library = 'video'
@@ -240,7 +244,7 @@ class Container():
         """
         return
 
-    def get_directory(self):
+    def get_directory(self, items_only=False, build_items=True):
         with TimerList(self.timer_lists, 'total', logging=self.log_timers):
             self._pre_sync = Thread(target=self.trakt_method.pre_sync, kwargs=self.params)
             self._pre_sync.start()
@@ -248,9 +252,14 @@ class Container():
                 items = self.get_items(**self.params)
             if not items:
                 return
+            if not build_items:
+                return items
             self.property_params = self.set_params_to_container()
             self.plugin_category = self.params.get('plugin_category') or self.plugin_category
             with TimerList(self.timer_lists, 'add_items', logging=self.log_timers):
+                items = self.build_items(items)
+                if items_only:
+                    return items
                 self.add_items(items)
             self.finish_container()
         if self.log_timers:

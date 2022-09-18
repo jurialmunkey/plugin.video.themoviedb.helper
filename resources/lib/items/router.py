@@ -32,11 +32,11 @@ class Router():
         self.params['container_update'] = True
         related_lists(include_play=True, **self.params)
 
-    def get_directory(self):
+    def get_directory(self, items_only=False, build_items=True):
         from resources.lib.items.routes import get_container
         container = get_container(self.params.get('info'))(self.handle, self.paramstring, **self.params)
         container.get_tmdb_id()  # TODO: Only get this as necessary
-        container.get_directory()
+        return container.get_directory(items_only, build_items)
 
     def run(self):
         if self.params.get('info') == 'play':
