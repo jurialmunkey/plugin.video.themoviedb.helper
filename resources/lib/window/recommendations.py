@@ -65,6 +65,8 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
     def do_action(self):
         _fid = self.getFocusId()
         _action = self._actions.get(_fid)
+        if not _action:
+            return
         if _action in ['info', 'play', 'browse']:
             path = get_infolabel(f'Container({_fid}).ListItem.FolderPath') if _fid else None
             return self.do_windowmanager_action(path, _action)
