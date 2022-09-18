@@ -26,7 +26,7 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
         self._tmdb_affix = '&nextpage=false&fanarttv=false&cacheonly=true'
         self._tmdb_query = {i: kwargs[i] for i in TMDB_QUERY_PARAMS if kwargs.get(i)}
         self._tmdb_id = kwargs.get('tmdb_id') or self._tmdb_api.get_tmdb_id(tmdb_type=self._tmdb_type, **self._tmdb_query)
-        self._recommendations = kwargs['recommendations'].split('||')
+        self._recommendations = sorted(kwargs['recommendations'].split('||'))
         self._recommendations = [
             {'list_id': int(list_id), 'url': url, 'related': related.lower() == 'true', 'action': action}
             for list_id, url, related, action in (i.split('|') for i in self._recommendations)]
@@ -48,8 +48,10 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
             self.build_list(**i)
 
         with ParallelThread(self._recommendations, _threaditem):
-            self._mon.waitForAbort(0.1)  # Wait to ensure first list is visible
+            # self._mon.waitForAbort(0.1)  # Wait to ensure first list is visible
             self.setFocusId(self._list_id)  # Setfocus to first list id
+
+        self.setProperty(PROP_LIST_VISIBLE.format('All'), 'True')
 
     def onAction(self, action):
         _action_id = action.getId()
