@@ -1,17 +1,11 @@
-import re
 import xbmcvfs
-from xbmcgui import Dialog
-from resources.lib.addon.consts import ALPHANUM_CHARS, INVALID_FILECHARS
-from resources.lib.addon.tmdate import get_timedelta, get_datetime_now, is_future_timestamp
 from tmdbhelper.parser import try_int
 from resources.lib.addon.plugin import ADDONDATA, get_localized, get_setting
 from resources.lib.addon.logger import kodi_log
 
-""" Lazyimports
-import unicodedata
-import json
-import pickle
-"""
+
+ALPHANUM_CHARS = "-_.() abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+INVALID_FILECHARS = "\\/\"\'<>:|?*"
 
 
 def validate_join(folder, filename):
@@ -38,6 +32,7 @@ def normalise_filesize(filesize):
 
 
 def get_files_in_folder(folder, regex):
+    import re
     return [x for x in xbmcvfs.listdir(folder)[1] if re.match(regex, x)]
 
 
@@ -135,6 +130,7 @@ def make_path(path, warn_dialog=False):
     kodi_log(f'XBMCVFS unable to create path:\n{path}', 2)
     if not warn_dialog:
         return
+    from xbmcgui import Dialog
     Dialog().ok('XBMCVFS', f'{get_localized(32122)} [B]{path}[/B]\n{get_localized(32123)}')
 
 
@@ -174,6 +170,7 @@ def get_filecache_name(cache_name, alphanum=False):
 
 def set_json_filecache(my_object, cache_name, cache_days=14):
     from json import dump
+    from resources.lib.addon.tmdate import get_timedelta, get_datetime_now
     if not my_object:
         return
     cache_name = get_filecache_name(cache_name)
@@ -197,6 +194,7 @@ def get_json_filecache(cache_name):
             cache_obj = json.load(file)
     except (IOError, json.JSONDecodeError):
         cache_obj = None
+    from resources.lib.addon.tmdate import is_future_timestamp
     if cache_obj and is_future_timestamp(cache_obj.get('expires', '')):
         return cache_obj.get('my_object')
 
