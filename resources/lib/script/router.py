@@ -72,6 +72,8 @@ class Script(object):
             lambda **kwargs: importmodule('resources.lib.script.method', 'delete_cache')(**kwargs),
         'wikipedia':
             lambda **kwargs: importmodule('resources.lib.api.wikipedia.api', 'do_wikipedia_gui')(**kwargs),
+        'recommendations':
+            lambda **kwargs: importmodule('resources.lib.window.recommendations', 'open_recommendations_gui')(**kwargs),
         'play':
             lambda **kwargs: importmodule('resources.lib.script.method', 'play_external')(**kwargs),
         'play_using':
