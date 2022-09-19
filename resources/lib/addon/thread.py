@@ -50,6 +50,7 @@ class ParallelThread():
         thread_max = get_setting('max_threads', mode='int') or len(items)
         self.queue = [None] * len(items)
         self._pool = [None] * thread_max
+        self._exit = False
         for x, i in enumerate(items):
             n = x
             while n >= thread_max and not mon.abortRequested():  # Hit our thread limit so look for a spare spot in the queue
@@ -74,6 +75,8 @@ class ParallelThread():
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
         for i in self._pool:
+            if self._exit:
+                break
             try:
                 i.join()
             except AttributeError:  # is None

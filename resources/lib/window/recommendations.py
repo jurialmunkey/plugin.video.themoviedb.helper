@@ -59,11 +59,12 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
 
         from itertools import zip_longest
         for _items in zip_longest(*[iter(self._queue)] * x, fillvalue=None):
-            with ParallelThread(_items, _threaditem):
+            with ParallelThread(_items, _threaditem) as pt:
                 if self._next_id:
                     self._mon.waitForAbort(0.1)  # Wait to ensure first list is visible
                     self.setFocusId(self._next_id)  # Setfocus to first list id
                     self._next_id = None
+                pt._exit = True
 
     def _build_all_consecutively(self):
         """ Build remaining queue in serial order
