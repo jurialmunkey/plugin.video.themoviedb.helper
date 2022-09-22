@@ -1,10 +1,10 @@
 import re
 import xbmcgui
-import xbmc
 from bs4 import BeautifulSoup
 from resources.lib.api.request import RequestAPI
 from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.thread import ParallelThread
+from resources.lib.addon.plugin import get_language
 
 
 WIKI_SCRL_ID = 61
@@ -82,16 +82,8 @@ class WikimediaAPI(RequestAPI):
 
 class WikipediaAPI(RequestAPI):
     def __init__(self):
-
-        lang = xbmc.getLanguage(xbmc.ISO_639_1, True)
-        lang = lang[0:2]
-
-        if (lang in WIKI_LANGUAGE):
-            lang = WIKI_LANGUAGE[ lang ]
-        else:
-            lang = DEFAULT_WIKI_LANGUAGE
-
-        xbmc.log(f'use language: {lang}', xbmc.LOGINFO)
+        lang = get_language()[:2]
+        lang = WIKI_LANGUAGE.get(lang) or DEFAULT_WIKI_LANGUAGE
 
         super(WikipediaAPI, self).__init__(
             req_api_name='Wikipedia',
