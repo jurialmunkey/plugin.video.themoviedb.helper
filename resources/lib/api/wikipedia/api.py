@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from resources.lib.api.request import RequestAPI
 from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.thread import ParallelThread
+from resources.lib.addon.plugin import get_language
 
 
 WIKI_SCRL_ID = 61
@@ -19,6 +20,8 @@ ACTION_CLOSEWINDOW = (9, 10, 92, 216, 247, 257, 275, 61467, 61448,)
 ACTION_MOVEMENT = (1, 2, 3, 4, )
 ACTION_SELECT = (7, )
 
+WIKI_LANGUAGE = {'it': 'it', 'de': 'de', 'en': 'en', 'fr': 'fr', 'es': 'es'}
+DEFAULT_WIKI_LANGUAGE = 'en'
 
 WIKI_TAG_LINK = '[COLOR=BF55DDFF]{}[/COLOR]'
 WIKI_TAG_BOLD = '[B]{}[/B]'
@@ -79,9 +82,12 @@ class WikimediaAPI(RequestAPI):
 
 class WikipediaAPI(RequestAPI):
     def __init__(self):
+        lang = get_language()[:2]
+        lang = WIKI_LANGUAGE.get(lang) or DEFAULT_WIKI_LANGUAGE
+
         super(WikipediaAPI, self).__init__(
-            req_api_name='Wikipedia',
-            req_api_url='https://en.wikipedia.org/w/api.php')
+            req_api_name='Wikipedia' if lang == DEFAULT_WIKI_LANGUAGE else f'Wikipedia_{lang}',
+            req_api_url=f'https://{lang}.wikipedia.org/w/api.php')
 
     def get_search(self, query, affix=None):
         params = {
