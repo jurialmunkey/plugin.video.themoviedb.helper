@@ -86,7 +86,7 @@ class WikipediaAPI(RequestAPI):
         lang = WIKI_LANGUAGE.get(lang) or DEFAULT_WIKI_LANGUAGE
 
         super(WikipediaAPI, self).__init__(
-            req_api_name='Wikipedia',
+            req_api_name='Wikipedia' if lang == 'en' else f'Wikipedia_{lang}',
             req_api_url=f'https://{lang}.wikipedia.org/w/api.php')
 
     def get_search(self, query, affix=None):
