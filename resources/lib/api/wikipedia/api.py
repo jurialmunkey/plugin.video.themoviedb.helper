@@ -86,7 +86,9 @@ class WikipediaAPI(RequestAPI):
         lang = xbmc.getLanguage(xbmc.ISO_639_1, True)
         lang = lang[0:2]
 
-        if not (lang in WIKI_LANGUAGE):
+        if (lang in WIKI_LANGUAGE):
+            lang = WIKI_LANGUAGE[ lang ]
+        else:
             lang = DEFAULT_WIKI_LANGUAGE
 
         xbmc.log(f'use language: {lang}', xbmc.LOGINFO)
