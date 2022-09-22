@@ -1,5 +1,6 @@
 import re
 import xbmcgui
+import xbmc
 from bs4 import BeautifulSoup
 from resources.lib.api.request import RequestAPI
 from resources.lib.addon.dialog import BusyDialog
@@ -19,6 +20,8 @@ ACTION_CLOSEWINDOW = (9, 10, 92, 216, 247, 257, 275, 61467, 61448,)
 ACTION_MOVEMENT = (1, 2, 3, 4, )
 ACTION_SELECT = (7, )
 
+WIKI_LANGUAGE = {'it': 'it', 'de': 'de', 'en': 'en', 'fr': 'fr', 'es': 'es'}
+DEFAULT_WIKI_LANGUAGE = 'en'
 
 WIKI_TAG_LINK = '[COLOR=BF55DDFF]{}[/COLOR]'
 WIKI_TAG_BOLD = '[B]{}[/B]'
@@ -79,9 +82,18 @@ class WikimediaAPI(RequestAPI):
 
 class WikipediaAPI(RequestAPI):
     def __init__(self):
+
+        lang = xbmc.getLanguage(xbmc.ISO_639_1, True)
+        lang = lang[0:2]
+
+        if not (lang in WIKI_LANGUAGE):
+            lang = DEFAULT_WIKI_LANGUAGE
+
+        xbmc.log(f'use language: {lang}', xbmc.LOGINFO)
+
         super(WikipediaAPI, self).__init__(
             req_api_name='Wikipedia',
-            req_api_url='https://en.wikipedia.org/w/api.php')
+            req_api_url=f'https://{lang}.wikipedia.org/w/api.php')
 
     def get_search(self, query, affix=None):
         params = {
