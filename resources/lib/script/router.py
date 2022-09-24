@@ -73,7 +73,7 @@ class Script(object):
         'wikipedia':
             lambda **kwargs: importmodule('resources.lib.api.wikipedia.api', 'do_wikipedia_gui')(**kwargs),
         'recommendations':
-            lambda **kwargs: importmodule('resources.lib.window.recommendations', 'open_recommendations_gui')(**kwargs),
+            lambda **kwargs: importmodule('resources.lib.window.recommendations', 'WindowRecommendationsManager')(**kwargs).router(),
         'play':
             lambda **kwargs: importmodule('resources.lib.script.method', 'play_external')(**kwargs),
         'play_using':
