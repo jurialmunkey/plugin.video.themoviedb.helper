@@ -1,4 +1,5 @@
 import re
+import xbmc
 import tmdbhelper.plugin as tmdbhelper_plugin
 import tmdbhelper.parser as tmdbhelper_parser
 from resources.lib.addon.consts import LANGUAGES
@@ -18,9 +19,9 @@ get_localized = KODIPLUGIN.get_localized
 
 encode_url = tmdbhelper_parser.EncodeURL(u'plugin://plugin.video.themoviedb.helper/').encode_url
 
-executebuiltin = tmdbhelper_plugin.executebuiltin
-get_condvisibility = tmdbhelper_plugin.get_condvisibility
-get_infolabel = tmdbhelper_plugin.get_infolabel
+executebuiltin = xbmc.executebuiltin
+get_condvisibility = xbmc.getCondVisibility
+get_infolabel = xbmc.getInfoLabel
 format_name = tmdbhelper_plugin.format_name
 format_folderpath = tmdbhelper_plugin.format_folderpath
 set_kwargattr = tmdbhelper_plugin.set_kwargattr

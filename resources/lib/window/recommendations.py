@@ -198,10 +198,9 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
         if action == 'play':
             builtin = f'PlayMedia({path})'
         elif get_condvisibility('Window.IsVisible(MyVideoNav.xml)'):
-            builtin = f'ActivateWindow(videos,{path},return)'
-        else:
             builtin = f'Container.Update({path})'
-
+        else:
+            builtin = f'ActivateWindow(videos,{path},return)'
         executebuiltin(builtin)
 
     def _get_items(self, path):
