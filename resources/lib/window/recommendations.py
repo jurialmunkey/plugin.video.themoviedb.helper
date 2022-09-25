@@ -190,10 +190,10 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
         if not focus_id:
             return
 
-        path = get_infolabel(f'Container({focus_id}).ListItem.FolderPath')
-
-        self._window_manager.on_exit()
-        self.close()
+        with BusyDialog():
+            path = get_infolabel(f'Container({focus_id}).ListItem.FolderPath')
+            self._window_manager.on_exit()
+            self.close()
 
         if action == 'play':
             builtin = f'PlayMedia({path})'
@@ -330,7 +330,6 @@ class WindowRecommendationsManager():
                 self._current_path = path
                 self._current_dump = get_property(PROP_JSONDUMP, set_property=data)
                 return self.on_join(t, path)
-
 
         return self.on_back() if self._history and not self.is_exiting() else self.on_exit()
 
