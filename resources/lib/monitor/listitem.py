@@ -6,6 +6,8 @@ from resources.lib.monitor.images import ImageFunctions
 from resources.lib.addon.plugin import convert_media_type, convert_type, get_setting, get_infolabel, get_condvisibility, get_localized
 from resources.lib.addon.logger import kodi_try_except
 from resources.lib.files.bcache import BasicCache
+from resources.lib.items.listitem import ListItem
+from resources.lib.addon.tmdate import convert_timestamp, get_region_date
 from threading import Thread
 from copy import deepcopy
 from collections import namedtuple
@@ -27,6 +29,9 @@ class ListItemMonitor(CommonMonitorFunctions):
         self._last_blur_fallback = False
         self._cache = BasicCache(filename=f'QuickService.db')
         self._ignored_labels = ['..', get_localized(33078)]
+        self._listcontainer = None
+        self._listcache = {}
+        self._itemcache = {}
 
     def get_container(self):
 
@@ -161,25 +166,39 @@ class ListItemMonitor(CommonMonitorFunctions):
             ImageFunctions(method='crop', is_thread=False, artwork=artwork.get('clearlogo')).run()
 
     @kodi_try_except('lib.monitor.listitem.process_ratings')
-    def process_ratings(self, details, tmdb_type, tmdb_id):
+    def process_ratings(self, details, tmdb_type, tmdb_id, listitem=None):
         self.clear_property_list(SETPROP_RATINGS)
         try:
             trakt_type = {'movie': 'movie', 'tv': 'show'}[tmdb_type]
         except KeyError:
             return  # Only lookup ratings for movie or tvshow
         get_property('IsUpdatingRatings', 'True')
-        details = deepcopy(details)  # Avoid race conditions with main thread while iterating over dictionary
+        if not listitem:
+            details = deepcopy(details)  # Avoid race conditions with main thread while iterating over dictionary
         details = self.get_omdb_ratings(details)
         details = self.get_imdb_top250_rank(details, trakt_type=trakt_type)
         details = self.get_trakt_ratings(details, trakt_type, season=self.season, episode=self.episode)
         details = self.get_tvdb_awards(details, tmdb_type, tmdb_id)
         if not self.is_same_item():
-            return get_property('IsUpdatingRatings', clear_property=True)
-        self.set_iter_properties(details.get('infoproperties', {}), SETPROP_RATINGS)
+            get_property('IsUpdatingRatings', clear_property=True)
+            return
+        if not listitem:
+            self.set_iter_properties(details.get('infoproperties', {}), SETPROP_RATINGS)
+        else:
+            if tmdb_type == 'tv':
+                nextaired = self.tmdb_api.get_tvshow_nextaired(tmdb_id)
+                details['infoproperties'].update(nextaired)
+            listitem.setProperties(details.get('infoproperties', {}))
         get_property('IsUpdatingRatings', clear_property=True)
+        return details
 
     @kodi_try_except('lib.monitor.listitem.clear_on_scroll')
     def clear_on_scroll(self):
+        self.cur_window = self.get_window_id()
+        self._listcontainer = self.get_listcontainer()
+        if self._listcontainer:
+            return self.get_listitem()
+
         if not self.properties and not self.index_properties:
             return
         if self.is_same_item():
@@ -217,31 +236,62 @@ class ListItemMonitor(CommonMonitorFunctions):
             self.blur_img.start()
             self._last_blur_fallback = True
 
-    def run_imagefuncs(self):
+    def run_imagefuncs(self, itemdetails=None, listitem=None):
+        if listitem:
+            images = {}
+
         # Cropping
         if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"):
-            if self.get_artwork(source="Art(artist.clearlogo)|Art(tvshow.clearlogo)|Art(clearlogo)"):
-                ImageFunctions(method='crop', is_thread=False, artwork=self.get_artwork(
-                    source="Art(artist.clearlogo)|Art(tvshow.clearlogo)|Art(clearlogo)")).run()
+            artwork = self.get_artwork(source="Art(artist.clearlogo)|Art(tvshow.clearlogo)|Art(clearlogo)")
+            if not artwork and listitem and itemdetails:
+                artwork = self.ib.get_item_artwork(itemdetails.artwork, is_season=True if self.season else False)
+                artwork = artwork.get('clearlogo') or artwork.get('tvshow.clearlogo')
+            imgfunc = ImageFunctions(method='crop', is_thread=False, artwork=artwork)
+            if not listitem:
+                imgfunc.run()
+            else:
+                images['cropimage'] = imgfunc.func(imgfunc.image)
+                images['cropimage.original'] = imgfunc.image
 
         # Blur Image
         if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableBlur)"):
-            ImageFunctions(method='blur', is_thread=False, artwork=self.get_artwork(
+            imgfunc = ImageFunctions(method='blur', is_thread=False, artwork=self.get_artwork(
                 source=get_property('Blur.SourceImage'),
-                fallback=get_property('Blur.Fallback'))).run()
+                fallback=get_property('Blur.Fallback')))
             self._last_blur_fallback = False
+            if not listitem:
+                imgfunc.run()
+            else:
+                images['blurimage'] = imgfunc.func(imgfunc.image)
+                images['blurimage.original'] = imgfunc.image
 
         # Desaturate Image
         if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableDesaturate)"):
-            ImageFunctions(method='desaturate', is_thread=False, artwork=self.get_artwork(
+            imgfunc = ImageFunctions(method='desaturate', is_thread=False, artwork=self.get_artwork(
                 source=get_property('Desaturate.SourceImage'),
-                fallback=get_property('Desaturate.Fallback'))).run()
+                fallback=get_property('Desaturate.Fallback')))
+            if not listitem:
+                imgfunc.run()
+            else:
+                images['desaturateimage'] = imgfunc.func(imgfunc.image)
+                images['desaturateimage.original'] = imgfunc.image
 
         # CompColors
         if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableColors)"):
-            ImageFunctions(method='colors', is_thread=False, artwork=self.get_artwork(
+            imgfunc = ImageFunctions(method='colors', is_thread=False, artwork=self.get_artwork(
                 source=get_property('Colors.SourceImage'),
-                fallback=get_property('Colors.Fallback'))).run()
+                fallback=get_property('Colors.Fallback')))
+            if not listitem:
+                imgfunc.run()
+            else:
+                images['colors'] = imgfunc.func(imgfunc.image)
+                images['colors.original'] = imgfunc.image
+
+        if listitem and images:
+            artwork = self.ib.get_item_artwork(itemdetails.artwork, is_season=True if self.season else False)
+            artwork.update(images)
+            listitem.setArt(artwork)
+            return images
 
     def get_itemtypeid(self, tmdb_type):
         imdb_id = self.imdb_id if not self.season else None  # Cant tell if IMDb ID is show or season/episode so skip
@@ -258,66 +308,147 @@ class ListItemMonitor(CommonMonitorFunctions):
         tmdb_id = self.get_tmdb_id(tmdb_type=tmdb_type, query=self.query, imdb_id=imdb_id, year=li_year, episode_year=ep_year)
         return (tmdb_type, tmdb_id)
 
+    def get_itemdetails_quick(self, tmdb_type=None, tmdb_id=None, season=None, episode=None):
+        ItemDetails = namedtuple("ItemDetails", "tmdb_type tmdb_id listitem artwork")
+        if not tmdb_type or not tmdb_id:
+            return
+        cache_name = f'{tmdb_type}.{tmdb_id}.{season}.{episode}'
+        cache_item = self._itemcache.get(cache_name)
+        if cache_item:
+            return cache_item
+        details = self.ib.get_item(tmdb_type, tmdb_id, season, episode)
+        if not details:
+            return
+        try:
+            itemdetails = ItemDetails(tmdb_type, tmdb_id, details['listitem'], details['artwork'])
+        except (KeyError, AttributeError, TypeError):
+            return
+        self._itemcache[cache_name] = itemdetails
+        return itemdetails
+
     def get_itemdetails(self):
         """ Returns a named tuple of tmdb_type, tmdb_id, listitem, artwork """
-        ItemDetails = namedtuple("ItemDetails", "tmdb_type tmdb_id listitem artwork")
-
-        # Always need a tmdb type
         tmdb_type = self.get_tmdb_type()
         if not tmdb_type:
             return
 
         # Check TMDb ID in cache
         cache_name = str(self.cur_item)
-        cache_item = self._cache.get_cache(cache_name)
-        try:
-            details = self.ib.get_item(cache_item['tmdb_type'], cache_item['tmdb_id'], self.season, self.episode)
-            return ItemDetails(cache_item['tmdb_type'], cache_item['tmdb_id'], details['listitem'], details['artwork'])
-        except (KeyError, AttributeError, TypeError):
-            pass
+        cache_item = self._cache.get_cache(cache_name) or {}
+        itemdetails = self.get_itemdetails_quick(**cache_item)
 
-        # Item not cached so clear previous item details now
-        ignore_keys = SETMAIN_ARTWORK if self.dbtype in ['episodes', 'seasons'] else None
-        self.clear_properties(ignore_keys=ignore_keys)
+        if not itemdetails:
+            # Item not cached so clear previous item details now
+            ignore_keys = SETMAIN_ARTWORK if self.dbtype in ['episodes', 'seasons'] else None
+            self.clear_properties(ignore_keys=ignore_keys)
 
-        # Lookup new item details and cache them
-        tmdb_type, tmdb_id = self.get_itemtypeid(tmdb_type)
-        details = self.ib.get_item(tmdb_type, tmdb_id, self.season, self.episode)
-        if not details:
-            return
-        self._cache.set_cache({'tmdb_type': tmdb_type, 'tmdb_id': tmdb_id}, cache_name)
-        return ItemDetails(tmdb_type, tmdb_id, details['listitem'], details['artwork'])
+            # Lookup new item details and cache them
+            tmdb_type, tmdb_id = self.get_itemtypeid(tmdb_type)
+            itemdetails = self.get_itemdetails_quick(tmdb_type, tmdb_id, self.season, self.episode)
+            if not itemdetails:
+                return
+            self._cache.set_cache({'tmdb_type': tmdb_type, 'tmdb_id': tmdb_id}, cache_name)
+
+        return itemdetails
 
     def get_window_id(self):
         try:
             _id_dialog = xbmcgui.getCurrentWindowDialogId()
-            _id_window = xbmcgui.getCurrentWindowId()
-            return _id_dialog if _id_dialog not in DIALOG_ID_EXCLUDELIST else _id_window
+            return _id_dialog if _id_dialog not in DIALOG_ID_EXCLUDELIST else xbmcgui.getCurrentWindowId()
         except Exception:
             return
 
     def on_exit(self, keep_tv_artwork=False, clear_properties=True):
+        if self._listcontainer:
+            try:
+                _win = xbmcgui.Window(self.cur_window)  # Note get _win separate from _lst
+                _lst = _win.getControl(self._listcontainer)  # Note must get _lst in same func as addItem else Kodi crashes
+                _lst.addItem(ListItem().get_listitem())
+            except Exception:
+                return
+            return
         ignore_keys = SETMAIN_ARTWORK if keep_tv_artwork and self.dbtype in ['episodes', 'seasons'] else None
         self.clear_properties(ignore_keys=ignore_keys)
         return get_property('IsUpdating', clear_property=True)
 
-    def on_finished(self, listitem, prev_properties):
-        self.set_properties(listitem)
+    def get_listcontainer(self):
+        container_id = int(get_infolabel('Skin.String(TMDbHelper.MonitorContainer)') or 0)
+        if not self.cur_window or not container_id:
+            return
+        if not get_condvisibility(f'Control.IsVisible({container_id}'):
+            return -1
+        return container_id
 
-        # Do some cleanup of old properties
-        ignore_keys = prev_properties.intersection(self.properties)
-        ignore_keys.update(SETPROP_RATINGS)
-        ignore_keys.update(SETMAIN_ARTWORK)
-        for k in prev_properties - ignore_keys:
-            self.clear_property(k)
+    def get_builtitem(self, itemdetails):
+        if not itemdetails:
+            return
 
-        # Clear IsUpdating property
+        def set_time_properties(duration):
+            minutes = duration // 60 % 60
+            hours = duration // 60 // 60
+            itemdetails.listitem['infoproperties']['Duration'] = duration // 60
+            itemdetails.listitem['infoproperties']['Duration_H'] = hours
+            itemdetails.listitem['infoproperties']['Duration_M'] = minutes
+            itemdetails.listitem['infoproperties']['Duration_HHMM'] = f'{hours:02d}:{minutes:02d}'
+
+        def set_date_properties(premiered):
+            date_obj = convert_timestamp(premiered, time_fmt="%Y-%m-%d", time_lim=10)
+            if not date_obj:
+                return
+            itemdetails.listitem['infoproperties']['Premiered'] = get_region_date(date_obj, 'dateshort')
+            itemdetails.listitem['infoproperties']['Premiered_Long'] = get_region_date(date_obj, 'datelong')
+            itemdetails.listitem['infoproperties']['Premiered_Custom'] = date_obj.strftime(get_infolabel('Skin.String(TMDbHelper.Date.Format)') or '%d %b %Y')
+
+        set_time_properties(itemdetails.listitem['infolabels'].get('duration', 0))
+        set_date_properties(itemdetails.listitem['infolabels'].get('premiered'))
+
+        li = ListItem(**itemdetails.listitem)
+        li.art = self.ib.get_item_artwork(itemdetails.artwork, is_season=True if self.season else False)
+        return li.get_listitem()
+
+    def on_finished(self, itemdetails, prev_properties):
+        if self._listcontainer == -1:
+            return
+
+        if self._listcontainer:
+            try:
+                _win = xbmcgui.Window(self.cur_window)  # Note get _win separate from _lst
+                _lst = _win.getControl(self._listcontainer)  # Note must get _lst in same func as addItem else Kodi crashes
+            except Exception:
+                _lst = None
+        else:
+            _lst = None
+
+        if _lst:
+            # Add main item to our container
+            listitem = self.get_builtitem(itemdetails)
+            _lst.addItem(listitem)
+
+            # Process images and ratings in threads
+            Thread(target=self.run_imagefuncs, args=[
+                itemdetails, listitem]).start()
+            Thread(target=self.process_ratings, args=[
+                itemdetails.listitem, itemdetails.tmdb_type, itemdetails.tmdb_id, listitem]).start()
+
+        else:
+            self.set_properties(itemdetails.listitem)
+            ignore_keys = prev_properties.intersection(self.properties)
+            ignore_keys.update(SETPROP_RATINGS)
+            ignore_keys.update(SETMAIN_ARTWORK)
+            for k in prev_properties - ignore_keys:
+                self.clear_property(k)
+
         get_property('IsUpdating', clear_property=True)
 
     @kodi_try_except('lib.monitor.listitem.get_listitem')
     def get_listitem(self):
         self.get_container()
         self.cur_window = self.get_window_id()
+        self._listcontainer = self.get_listcontainer()
+
+        # We want to set a special container but it doesn't exist so exit
+        if self._listcontainer == -1:
+            return self.on_exit()
 
         # Check if the item has changed before retrieving details again
         if self.cur_window == self.pre_window and self.is_same_item(update=True):
@@ -340,7 +471,8 @@ class ListItemMonitor(CommonMonitorFunctions):
         self.set_cur_item()
 
         # Thread image functions to prevent blocking details lookup
-        Thread(target=self.run_imagefuncs).start()
+        if not self._listcontainer:
+            Thread(target=self.run_imagefuncs).start()
 
         # Allow early exit if the skin only needs image manipulations
         if get_condvisibility("!Skin.HasSetting(TMDbHelper.Service)"):
@@ -359,20 +491,20 @@ class ListItemMonitor(CommonMonitorFunctions):
             return self.on_exit(keep_tv_artwork=True)
 
         # Get item folderpath and filenameandpath for comparison
-        itemdetails.listitem['folderpath'] = self.get_infolabel('folderpath')
-        itemdetails.listitem['filenameandpath'] = self.get_infolabel('filenameandpath')
+        itemdetails.listitem['folderpath'] = itemdetails.listitem['infoproperties']['folderpath'] = self.get_infolabel('folderpath')
+        itemdetails.listitem['filenameandpath'] = itemdetails.listitem['infoproperties']['filenameandpath'] = self.get_infolabel('filenameandpath')
 
         # Copy previous properties
         prev_properties = self.properties.copy()
         self.properties = set()
 
         # Need to update Next Aired with a shorter cache time than details
-        if itemdetails.tmdb_type == 'tv':
+        if not self._listcontainer and itemdetails.tmdb_type == 'tv':
             nextaired = self.tmdb_api.get_tvshow_nextaired(itemdetails.tmdb_id)
             itemdetails.listitem['infoproperties'].update(nextaired)
 
         # Get our artwork properties
-        if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
+        if not self._listcontainer and get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
             thread_artwork = Thread(target=self.process_artwork, args=[itemdetails.artwork, itemdetails.tmdb_type])
             thread_artwork.start()
 
@@ -383,8 +515,8 @@ class ListItemMonitor(CommonMonitorFunctions):
                     get_person_stats(itemdetails.listitem['infolabels']['title']) or {})
 
         # Get our item ratings
-        if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"):
+        if not self._listcontainer and get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"):
             thread_ratings = Thread(target=self.process_ratings, args=[itemdetails.listitem, itemdetails.tmdb_type, itemdetails.tmdb_id])
             thread_ratings.start()
 
-        self.on_finished(itemdetails.listitem, prev_properties)
+        self.on_finished(itemdetails, prev_properties)
