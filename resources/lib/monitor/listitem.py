@@ -1,3 +1,4 @@
+import xbmcgui
 from resources.lib.api.kodi.rpc import get_person_stats
 from resources.lib.addon.window import get_property
 from resources.lib.monitor.common import CommonMonitorFunctions, SETMAIN_ARTWORK, SETPROP_RATINGS
@@ -10,6 +11,9 @@ from copy import deepcopy
 from collections import namedtuple
 
 
+DIALOG_ID_EXCLUDELIST = [9999]
+
+
 class ListItemMonitor(CommonMonitorFunctions):
     def __init__(self):
         super(ListItemMonitor, self).__init__()
@@ -17,6 +21,8 @@ class ListItemMonitor(CommonMonitorFunctions):
         self.pre_item = 1
         self.cur_folder = None
         self.pre_folder = None
+        self.cur_window = 0
+        self.pre_window = 1
         self.property_prefix = 'ListItem'
         self._last_blur_fallback = False
         self._cache = BasicCache(filename=f'QuickService.db')
@@ -282,13 +288,24 @@ class ListItemMonitor(CommonMonitorFunctions):
         self._cache.set_cache({'tmdb_type': tmdb_type, 'tmdb_id': tmdb_id}, cache_name)
         return ItemDetails(tmdb_type, tmdb_id, details['listitem'], details['artwork'])
 
+    def get_window_id(self):
+        try:
+            _id_dialog = xbmcgui.getCurrentWindowDialogId()
+            _id_window = xbmcgui.getCurrentWindowId()
+            return _id_dialog if _id_dialog in DIALOG_ID_EXCLUDELIST else _id_window
+        except Exception:
+            return
+
     @kodi_try_except('lib.monitor.listitem.get_listitem')
     def get_listitem(self):
         self.get_container()
+        self.cur_window = self.get_window_id()
 
         # Check if the item has changed before retrieving details again
-        if self.is_same_item(update=True):
+        if self.cur_window == self.pre_window and self.is_same_item(update=True):
             return
+
+        self.pre_window = self.cur_window
 
         # Ignore some special folders like next page and parent folder
         if self.get_infolabel('Label') in self._ignored_labels:
