@@ -292,7 +292,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         try:
             _id_dialog = xbmcgui.getCurrentWindowDialogId()
             _id_window = xbmcgui.getCurrentWindowId()
-            return _id_dialog if _id_dialog in DIALOG_ID_EXCLUDELIST else _id_window
+            return _id_dialog if _id_dialog not in DIALOG_ID_EXCLUDELIST else _id_window
         except Exception:
             return
 
