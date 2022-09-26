@@ -1,3 +1,4 @@
+import xbmcgui
 from resources.lib.api.kodi.rpc import get_person_stats
 from resources.lib.addon.window import get_property
 from resources.lib.monitor.common import CommonMonitorFunctions, SETMAIN_ARTWORK, SETPROP_RATINGS
@@ -10,6 +11,9 @@ from copy import deepcopy
 from collections import namedtuple
 
 
+DIALOG_ID_EXCLUDELIST = [9999]
+
+
 class ListItemMonitor(CommonMonitorFunctions):
     def __init__(self):
         super(ListItemMonitor, self).__init__()
@@ -17,6 +21,8 @@ class ListItemMonitor(CommonMonitorFunctions):
         self.pre_item = 1
         self.cur_folder = None
         self.pre_folder = None
+        self.cur_window = 0
+        self.pre_window = 1
         self.property_prefix = 'ListItem'
         self._last_blur_fallback = False
         self._cache = BasicCache(filename=f'QuickService.db')
@@ -282,17 +288,46 @@ class ListItemMonitor(CommonMonitorFunctions):
         self._cache.set_cache({'tmdb_type': tmdb_type, 'tmdb_id': tmdb_id}, cache_name)
         return ItemDetails(tmdb_type, tmdb_id, details['listitem'], details['artwork'])
 
+    def get_window_id(self):
+        try:
+            _id_dialog = xbmcgui.getCurrentWindowDialogId()
+            _id_window = xbmcgui.getCurrentWindowId()
+            return _id_dialog if _id_dialog in DIALOG_ID_EXCLUDELIST else _id_window
+        except Exception:
+            return
+
+    def on_exit(self, keep_tv_artwork=False, clear_properties=True):
+        ignore_keys = SETMAIN_ARTWORK if keep_tv_artwork and self.dbtype in ['episodes', 'seasons'] else None
+        self.clear_properties(ignore_keys=ignore_keys)
+        return get_property('IsUpdating', clear_property=True)
+
+    def on_finished(self, listitem, prev_properties):
+        self.set_properties(listitem)
+
+        # Do some cleanup of old properties
+        ignore_keys = prev_properties.intersection(self.properties)
+        ignore_keys.update(SETPROP_RATINGS)
+        ignore_keys.update(SETMAIN_ARTWORK)
+        for k in prev_properties - ignore_keys:
+            self.clear_property(k)
+
+        # Clear IsUpdating property
+        get_property('IsUpdating', clear_property=True)
+
     @kodi_try_except('lib.monitor.listitem.get_listitem')
     def get_listitem(self):
         self.get_container()
+        self.cur_window = self.get_window_id()
 
         # Check if the item has changed before retrieving details again
-        if self.is_same_item(update=True):
+        if self.cur_window == self.pre_window and self.is_same_item(update=True):
             return
+
+        self.pre_window = self.cur_window
 
         # Ignore some special folders like next page and parent folder
         if self.get_infolabel('Label') in self._ignored_labels:
-            return self.clear_properties()
+            return self.on_exit()
 
         # Set a property for skins to check if item details are updating
         get_property('IsUpdating', 'True')
@@ -317,16 +352,11 @@ class ListItemMonitor(CommonMonitorFunctions):
         # Lookup item and exit early if failed
         itemdetails = self.get_itemdetails()
         if not itemdetails or not itemdetails.tmdb_type or not itemdetails.listitem:
-            self.clear_properties()
-            return get_property('IsUpdating', clear_property=True)
+            return self.on_exit()
 
-        # Item changed whilst retrieving details so lets clear and get next item
+        # Item changed whilst retrieving details so clear and get next item
         if not self.is_same_item():
-            ignore_keys = None
-            if self.dbtype in ['episodes', 'seasons']:
-                ignore_keys = SETMAIN_ARTWORK
-            self.clear_properties(ignore_keys=ignore_keys)
-            return get_property('IsUpdating', clear_property=True)
+            return self.on_exit(keep_tv_artwork=True)
 
         # Get item folderpath and filenameandpath for comparison
         itemdetails.listitem['folderpath'] = self.get_infolabel('folderpath')
@@ -357,15 +387,4 @@ class ListItemMonitor(CommonMonitorFunctions):
             thread_ratings = Thread(target=self.process_ratings, args=[itemdetails.listitem, itemdetails.tmdb_type, itemdetails.tmdb_id])
             thread_ratings.start()
 
-        # Set our properties
-        self.set_properties(itemdetails.listitem)
-
-        # Cleanup
-        ignore_keys = prev_properties.intersection(self.properties)
-        ignore_keys.update(SETPROP_RATINGS)
-        ignore_keys.update(SETMAIN_ARTWORK)
-        for k in prev_properties - ignore_keys:
-            self.clear_property(k)
-
-        # Finished
-        get_property('IsUpdating', clear_property=True)
+        self.on_finished(itemdetails.listitem, prev_properties)
