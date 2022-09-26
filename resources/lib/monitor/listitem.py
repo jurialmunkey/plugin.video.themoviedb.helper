@@ -7,22 +7,7 @@ from resources.lib.addon.logger import kodi_try_except
 from resources.lib.files.bcache import BasicCache
 from threading import Thread
 from copy import deepcopy
-
-
-def get_container():
-    widget_id = get_property('WidgetContainer', is_type=int)
-    if widget_id:
-        return f'Container({widget_id}).'
-    return 'Container.'
-
-
-def get_container_item(container=None):
-    if get_condvisibility(
-            "[Window.IsVisible(DialogPVRInfo.xml) | Window.IsVisible(MyPVRGuide.xml) | "
-            "Window.IsVisible(movieinformation)] + "
-            "!Skin.HasSetting(TMDbHelper.ForceWidgetContainer)"):
-        return 'ListItem.'
-    return f'{container or get_container()}ListItem.'
+from collections import namedtuple
 
 
 class ListItemMonitor(CommonMonitorFunctions):
@@ -38,8 +23,24 @@ class ListItemMonitor(CommonMonitorFunctions):
         self._ignored_labels = ['..', get_localized(33078)]
 
     def get_container(self):
-        self.container = get_container()
-        self.container_item = get_container_item(self.container)
+
+        def _get_container():
+            widget_id = get_property('WidgetContainer', is_type=int)
+            if widget_id:
+                return f'Container({widget_id}).'
+            return 'Container.'
+
+        def _get_container_item():
+            if get_condvisibility(
+                    "[Window.IsVisible(DialogPVRInfo.xml)"
+                    " | Window.IsVisible(MyPVRGuide.xml)"
+                    " | Window.IsVisible(movieinformation)] + "
+                    "!Skin.HasSetting(TMDbHelper.ForceWidgetContainer)"):
+                return 'ListItem.'
+            return f'{self.container}ListItem.'
+
+        self.container = _get_container()
+        self.container_item = _get_container_item()
 
     def get_infolabel(self, infolabel):
         return get_infolabel(f'{self.container_item}{infolabel}')
@@ -236,80 +237,87 @@ class ListItemMonitor(CommonMonitorFunctions):
                 source=get_property('Colors.SourceImage'),
                 fallback=get_property('Colors.Fallback'))).run()
 
-    @kodi_try_except('lib.monitor.listitem.get_listitem')
-    def get_listitem(self):
-        self.get_container()
+    def get_itemtypeid(self, tmdb_type):
+        imdb_id = self.imdb_id if not self.season else None  # Cant tell if IMDb ID is show or season/episode so skip
+        li_year = self.year if tmdb_type == 'movie' else None
+        ep_year = self.year if tmdb_type == 'tv' else None
 
-        # Don't bother getting new details if we've got the same item
-        if self.is_same_item(update=True):
-            return
+        if tmdb_type == 'multi':
+            tmdb_id, tmdb_type = self.get_tmdb_id_multi(
+                media_type='tv' if self.get_infolabel('episode') or self.get_infolabel('season') else None,
+                query=self.query, imdb_id=imdb_id, year=li_year, episode_year=ep_year)
+            self.dbtype = convert_type(tmdb_type, 'dbtype')
+            return (tmdb_type, tmdb_id)
 
-        # Ignored folder item so clear properties and stop
-        if self.get_infolabel('Label') in self._ignored_labels:
-            return self.clear_properties()
+        tmdb_id = self.get_tmdb_id(tmdb_type=tmdb_type, query=self.query, imdb_id=imdb_id, year=li_year, episode_year=ep_year)
+        return (tmdb_type, tmdb_id)
 
-        # Set our is_updating flag
-        get_property('IsUpdating', 'True')
+    def get_itemdetails(self):
+        """ Returns a named tuple of tmdb_type, tmdb_id, listitem, artwork """
+        ItemDetails = namedtuple("ItemDetails", "tmdb_type tmdb_id listitem artwork")
 
-        # If the folder changed let's clear all the properties before doing a look-up
-        # Possible that our new look-up will fail so good to have a clean slate
-        if not self.is_same_folder(update=True):
-            self.clear_properties()
-
-        # Get look-up details
-        self.set_cur_item()
-
-        # Do image functions for blur crop etc. in a separate thread
-        Thread(target=self.run_imagefuncs).start()
-
-        # Allow early exit to only do image manipulations
-        if get_condvisibility("!Skin.HasSetting(TMDbHelper.Service)"):
-            return get_property('IsUpdating', clear_property=True)
-
-        # Need a TMDb type to do a details look-up so exit if we don't have one
+        # Always need a tmdb type
         tmdb_type = self.get_tmdb_type()
         if not tmdb_type:
-            self.clear_properties(ignore_keys={'cur_item'})
-            return get_property('IsUpdating', clear_property=True)
-
-        # Check FTV lookup setting
-        self.ib.ftv_api = self.ftv_api if get_setting('service_fanarttv_lookup') else None
+            return
 
         # Check TMDb ID in cache
         cache_name = str(self.cur_item)
         cache_item = self._cache.get_cache(cache_name)
-        if cache_item:
-            tmdb_id = cache_item['tmdb_id']
-            tmdb_type = cache_item['tmdb_type']
-            details = self.ib.get_item(tmdb_type, tmdb_id, self.season, self.episode)
-        else:
-            # Item not cached so clear some details now
-            ignore_keys = {'cur_item'}
-            if self.dbtype in ['episodes', 'seasons']:
-                ignore_keys.update(SETMAIN_ARTWORK)
-            self.clear_properties(ignore_keys=ignore_keys)
+        try:
+            details = self.ib.get_item(cache_item['tmdb_type'], cache_item['tmdb_id'], self.season, self.episode)
+            return ItemDetails(cache_item['tmdb_type'], cache_item['tmdb_id'], details['listitem'], details['artwork'])
+        except (KeyError, AttributeError, TypeError):
+            pass
 
-            # Lookup IDs
-            imdb_id = self.imdb_id if not self.season else None  # Skip IMDb ID for seasons/episodes as we can't distinguish if the ID is for the episode or the show.
-            li_year = self.year if tmdb_type == 'movie' else None
-            ep_year = self.year if tmdb_type == 'tv' else None
-            if tmdb_type == 'multi':
-                tmdb_id, tmdb_type = self.get_tmdb_id_multi(
-                    media_type='tv' if self.get_infolabel('episode') or self.get_infolabel('season') else None,
-                    query=self.query, imdb_id=imdb_id, year=li_year, episode_year=ep_year)
-                self.dbtype = convert_type(tmdb_type, 'dbtype')
-            else:
-                tmdb_id = self.get_tmdb_id(tmdb_type=tmdb_type, query=self.query, imdb_id=imdb_id, year=li_year, episode_year=ep_year)
-            details = self.ib.get_item(tmdb_type, tmdb_id, self.season, self.episode)
-            if details:
-                self._cache.set_cache({'tmdb_id': tmdb_id, 'tmdb_type': tmdb_type}, cache_name)
+        # Item not cached so clear previous item details now
+        ignore_keys = SETMAIN_ARTWORK if self.dbtype in ['episodes', 'seasons'] else None
+        self.clear_properties(ignore_keys=ignore_keys)
 
-        # Get TMDb details and clear properties if fails
-        if details:
-            artwork = details['artwork']
-            details = details['listitem']
+        # Lookup new item details and cache them
+        tmdb_type, tmdb_id = self.get_itemtypeid(tmdb_type)
+        details = self.ib.get_item(tmdb_type, tmdb_id, self.season, self.episode)
         if not details:
-            self.clear_properties(ignore_keys={'cur_item'})
+            return
+        self._cache.set_cache({'tmdb_type': tmdb_type, 'tmdb_id': tmdb_id}, cache_name)
+        return ItemDetails(tmdb_type, tmdb_id, details['listitem'], details['artwork'])
+
+    @kodi_try_except('lib.monitor.listitem.get_listitem')
+    def get_listitem(self):
+        self.get_container()
+
+        # Check if the item has changed before retrieving details again
+        if self.is_same_item(update=True):
+            return
+
+        # Ignore some special folders like next page and parent folder
+        if self.get_infolabel('Label') in self._ignored_labels:
+            return self.clear_properties()
+
+        # Set a property for skins to check if item details are updating
+        get_property('IsUpdating', 'True')
+
+        # Clear properties for clean slate if user opened a new directory
+        if not self.is_same_folder(update=True):
+            self.clear_properties()
+
+        # Get the current listitem details for the details lookup
+        self.set_cur_item()
+
+        # Thread image functions to prevent blocking details lookup
+        Thread(target=self.run_imagefuncs).start()
+
+        # Allow early exit if the skin only needs image manipulations
+        if get_condvisibility("!Skin.HasSetting(TMDbHelper.Service)"):
+            return get_property('IsUpdating', clear_property=True)
+
+        # Check ftv setting so item builder can skip artwork lookups if unneeded
+        self.ib.ftv_api = self.ftv_api if get_setting('service_fanarttv_lookup') else None
+
+        # Lookup item and exit early if failed
+        itemdetails = self.get_itemdetails()
+        if not itemdetails or not itemdetails.tmdb_type or not itemdetails.listitem:
+            self.clear_properties()
             return get_property('IsUpdating', clear_property=True)
 
         # Item changed whilst retrieving details so lets clear and get next item
@@ -321,41 +329,41 @@ class ListItemMonitor(CommonMonitorFunctions):
             return get_property('IsUpdating', clear_property=True)
 
         # Get item folderpath and filenameandpath for comparison
-        details['folderpath'] = self.get_infolabel('folderpath')
-        details['filenameandpath'] = self.get_infolabel('filenameandpath')
+        itemdetails.listitem['folderpath'] = self.get_infolabel('folderpath')
+        itemdetails.listitem['filenameandpath'] = self.get_infolabel('filenameandpath')
 
         # Copy previous properties
         prev_properties = self.properties.copy()
         self.properties = set()
 
         # Need to update Next Aired with a shorter cache time than details
-        if tmdb_type == 'tv':
-            details['infoproperties'].update(self.tmdb_api.get_tvshow_nextaired(tmdb_id))
+        if itemdetails.tmdb_type == 'tv':
+            nextaired = self.tmdb_api.get_tvshow_nextaired(itemdetails.tmdb_id)
+            itemdetails.listitem['infoproperties'].update(nextaired)
 
         # Get our artwork properties
         if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
-            thread_artwork = Thread(target=self.process_artwork, args=[artwork, tmdb_type])
+            thread_artwork = Thread(target=self.process_artwork, args=[itemdetails.artwork, itemdetails.tmdb_type])
             thread_artwork.start()
 
         # Get person library statistics
-        if tmdb_type == 'person' and details.get('infolabels', {}).get('title'):
+        if itemdetails.tmdb_type == 'person' and itemdetails.listitem.get('infolabels', {}).get('title'):
             if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisablePersonStats)"):
-                details.setdefault('infoproperties', {}).update(
-                    get_person_stats(details['infolabels']['title']) or {})
+                itemdetails.listitem.setdefault('infoproperties', {}).update(
+                    get_person_stats(itemdetails.listitem['infolabels']['title']) or {})
 
         # Get our item ratings
         if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"):
-            thread_ratings = Thread(target=self.process_ratings, args=[details, tmdb_type, tmdb_id])
+            thread_ratings = Thread(target=self.process_ratings, args=[itemdetails.listitem, itemdetails.tmdb_type, itemdetails.tmdb_id])
             thread_ratings.start()
 
         # Set our properties
-        self.set_properties(details)
+        self.set_properties(itemdetails.listitem)
 
         # Cleanup
         ignore_keys = prev_properties.intersection(self.properties)
         ignore_keys.update(SETPROP_RATINGS)
         ignore_keys.update(SETMAIN_ARTWORK)
-        ignore_keys.add('cur_item')
         for k in prev_properties - ignore_keys:
             self.clear_property(k)
 
