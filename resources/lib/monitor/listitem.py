@@ -15,6 +15,18 @@ from collections import namedtuple
 
 
 DIALOG_ID_EXCLUDELIST = [9999]
+BASEITEM_PROPERTIES = [
+    ('base_label', 'label'),
+    ('base_title', 'title'),
+    ('base_icon', 'icon'),
+    ('base_plot', 'plot'),
+    ('base_tagline', 'tagline'),
+    ('base_dbtype', 'dbtype'),
+    ('base_addon_description', 'addondescription'),
+    ('base_artist_description', 'Property(artist_description)'),
+    ('base_album_description', 'Property(album_description)'),
+    ('base_poster', 'Art(poster)'),
+    ('base_tvshowtitle', 'tvshowtitle')]
 ItemDetails = namedtuple("ItemDetails", "tmdb_type tmdb_id listitem artwork")
 
 
@@ -32,8 +44,8 @@ class ListItemMonitor(CommonMonitorFunctions):
         self._cache = BasicCache(filename=f'QuickService.db')
         self._ignored_labels = ['..', get_localized(33078)]
         self._listcontainer = None
-        self._listcache = {}
         self._itemcache = {}
+        self._last_listitem = None
 
     def get_container(self):
 
@@ -355,7 +367,8 @@ class ListItemMonitor(CommonMonitorFunctions):
     def get_window_id(self):
         try:
             _id_dialog = xbmcgui.getCurrentWindowDialogId()
-            return _id_dialog if _id_dialog not in DIALOG_ID_EXCLUDELIST else xbmcgui.getCurrentWindowId()
+            _id_window = _id_dialog if _id_dialog not in DIALOG_ID_EXCLUDELIST else xbmcgui.getCurrentWindowId()
+            return _id_window
         except Exception:
             return
 
@@ -372,9 +385,10 @@ class ListItemMonitor(CommonMonitorFunctions):
         self.clear_properties(ignore_keys=ignore_keys)
         return get_property('IsUpdating', clear_property=True)
 
-    def get_listcontainer(self):
-        container_id = int(get_infolabel('Skin.String(TMDbHelper.MonitorContainer)') or 0)
-        if not self.cur_window or not container_id:
+    def get_listcontainer(self, window_id=None, container_id=None):
+        window_id = window_id or self.cur_window
+        container_id = container_id or int(get_infolabel('Skin.String(TMDbHelper.MonitorContainer)') or 0)
+        if not window_id or not container_id:
             return
         if not get_condvisibility(f'Control.IsVisible({container_id}'):
             return -1
@@ -422,7 +436,7 @@ class ListItemMonitor(CommonMonitorFunctions):
 
         if _lst:
             # Add main item to our container
-            listitem = self.get_builtitem(itemdetails)
+            listitem = self._last_listitem = self.get_builtitem(itemdetails)
             _lst.addItem(listitem)
 
             # Process images and ratings in threads
@@ -440,6 +454,22 @@ class ListItemMonitor(CommonMonitorFunctions):
                 self.clear_property(k)
 
         get_property('IsUpdating', clear_property=True)
+
+    @kodi_try_except('lib.monitor.listitem.get_context_listitem')
+    def get_context_listitem(self):
+        if not self._last_listitem:
+            return
+        _id_dialog = xbmcgui.getCurrentWindowDialogId()
+        _id_d_list = self.get_listcontainer(_id_dialog)
+        if not _id_d_list or _id_d_list == -1:
+            return
+        _id_window = xbmcgui.getCurrentWindowId()
+        _id_w_list = self.get_listcontainer(_id_window)
+        if not _id_w_list or _id_w_list == -1:
+            return
+        _win = xbmcgui.Window(_id_dialog)
+        _lst = _win.getControl(_id_d_list)
+        _lst.addItem(self._last_listitem)
 
     @kodi_try_except('lib.monitor.listitem.get_listitem')
     def get_listitem(self):
@@ -491,11 +521,22 @@ class ListItemMonitor(CommonMonitorFunctions):
 
         # Item changed whilst retrieving details so clear and get next item
         if not self.is_same_item():
+            if self._listcontainer:  # Add some extra props for modals and hopefully will add before modal triggered
+                for k, v in BASEITEM_PROPERTIES:
+                    itemdetails.listitem['infoproperties'][k] = self.get_infolabel(v)
+                self._last_listitem = self.get_builtitem(itemdetails)
             return self.on_exit(keep_tv_artwork=True)
 
         # Get item folderpath and filenameandpath for comparison
         itemdetails.listitem['folderpath'] = itemdetails.listitem['infoproperties']['folderpath'] = self.get_infolabel('folderpath')
         itemdetails.listitem['filenameandpath'] = itemdetails.listitem['infoproperties']['filenameandpath'] = self.get_infolabel('filenameandpath')
+
+        # Add some additional listcontainer properties
+        if self._listcontainer:
+            itemdetails.listitem['infoproperties']['list_container_id'] = f'{self._listcontainer}'
+            itemdetails.listitem['infoproperties']['current_window_id'] = f'{self.cur_window}'
+            for k, v in BASEITEM_PROPERTIES:
+                itemdetails.listitem['infoproperties'][k] = self.get_infolabel(v)
 
         # Copy previous properties
         prev_properties = self.properties.copy()

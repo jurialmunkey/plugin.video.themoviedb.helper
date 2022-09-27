@@ -43,6 +43,10 @@ class ServiceMonitor(object):
     def _on_modal(self):
         self.xbmc_monitor.waitForAbort(1)
 
+    def _on_context(self):
+        self.listitem_monitor.get_context_listitem()
+        self.xbmc_monitor.waitForAbort(1)
+
     def _on_clear(self):
         """
         IF we've got properties to clear lets clear them and then jump back in the loop
@@ -81,15 +85,20 @@ class ServiceMonitor(object):
                     "!Skin.HasSetting(TMDbHelper.EnableColors)]"):
                 self._on_idle()
 
-            # skip when modal / busy dialogs are opened (e.g. context / select / busy etc.)
+            # skip when modal or busy dialogs are opened (e.g. select / progress / busy etc.)
             elif get_condvisibility(
                     "Window.IsActive(DialogSelect.xml) | "
                     "Window.IsActive(progressdialog) | "
-                    "Window.IsActive(contextmenu) | "
                     "Window.IsActive(busydialog) | "
                     "Window.IsActive(shutdownmenu) | "
                     "!String.IsEmpty(Window.Property(TMDbHelper.ServicePause))"):
                 self._on_modal()
+
+            # manage context menu separately from other modals to pass info through
+            elif get_condvisibility(
+                    "Window.IsActive(contextmenu) | "
+                    "!String.IsEmpty(Window.Property(TMDbHelper.ContextMenu))"):
+                self._on_context()
 
             # skip when container scrolling
             elif get_condvisibility("Container.Scrolling"):
