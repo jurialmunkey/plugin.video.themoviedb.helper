@@ -8,12 +8,14 @@ from resources.lib.addon.logger import kodi_try_except
 from resources.lib.files.bcache import BasicCache
 from resources.lib.items.listitem import ListItem
 from resources.lib.addon.tmdate import convert_timestamp, get_region_date
+from resources.lib.api.mapping import get_empty_item
 from threading import Thread
 from copy import deepcopy
 from collections import namedtuple
 
 
 DIALOG_ID_EXCLUDELIST = [9999]
+ItemDetails = namedtuple("ItemDetails", "tmdb_type tmdb_id listitem artwork")
 
 
 class ListItemMonitor(CommonMonitorFunctions):
@@ -309,7 +311,6 @@ class ListItemMonitor(CommonMonitorFunctions):
         return (tmdb_type, tmdb_id)
 
     def get_itemdetails_quick(self, tmdb_type=None, tmdb_id=None, season=None, episode=None):
-        ItemDetails = namedtuple("ItemDetails", "tmdb_type tmdb_id listitem artwork")
         if not tmdb_type or not tmdb_id:
             return
         cache_name = f'{tmdb_type}.{tmdb_id}.{season}.{episode}'
@@ -481,10 +482,12 @@ class ListItemMonitor(CommonMonitorFunctions):
         # Check ftv setting so item builder can skip artwork lookups if unneeded
         self.ib.ftv_api = self.ftv_api if get_setting('service_fanarttv_lookup') else None
 
-        # Lookup item and exit early if failed
+        # Lookup item and exit early if failed (when using win props method)
         itemdetails = self.get_itemdetails()
         if not itemdetails or not itemdetails.tmdb_type or not itemdetails.listitem:
-            return self.on_exit()
+            if not self._listcontainer:  # Early exit when using win props
+                return self.on_exit()
+            itemdetails = ItemDetails(None, None, get_empty_item(), {})  # Else set a blank item for artwork manipulations
 
         # Item changed whilst retrieving details so clear and get next item
         if not self.is_same_item():
@@ -498,12 +501,12 @@ class ListItemMonitor(CommonMonitorFunctions):
         prev_properties = self.properties.copy()
         self.properties = set()
 
-        # Need to update Next Aired with a shorter cache time than details
+        # Need to update Next Aired with a shorter cache time than details (we do this later for list method)
         if not self._listcontainer and itemdetails.tmdb_type == 'tv':
             nextaired = self.tmdb_api.get_tvshow_nextaired(itemdetails.tmdb_id)
             itemdetails.listitem['infoproperties'].update(nextaired)
 
-        # Get our artwork properties
+        # Get our artwork properties in a thread if using window properties method (we do this later for list method)
         if not self._listcontainer and get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
             thread_artwork = Thread(target=self.process_artwork, args=[itemdetails.artwork, itemdetails.tmdb_type])
             thread_artwork.start()
@@ -514,7 +517,7 @@ class ListItemMonitor(CommonMonitorFunctions):
                 itemdetails.listitem.setdefault('infoproperties', {}).update(
                     get_person_stats(itemdetails.listitem['infolabels']['title']) or {})
 
-        # Get our item ratings
+        # Get our item ratings in a thread if using window properties method (we do this later for list method)
         if not self._listcontainer and get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"):
             thread_ratings = Thread(target=self.process_ratings, args=[itemdetails.listitem, itemdetails.tmdb_type, itemdetails.tmdb_id])
             thread_ratings.start()
