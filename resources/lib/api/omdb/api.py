@@ -4,9 +4,6 @@ from resources.lib.api.request import RequestAPI
 from resources.lib.api.omdb.mapping import ItemMapper
 
 
-IMDB_KEYPAIRS = [('infolabels', 'imdbnumber'), ('unique_ids', 'imdb'), ('unique_ids', 'tvshow.imdb')]
-
-
 class OMDb(RequestAPI):
     def __init__(self, api_key=None):
         super(OMDb, self).__init__(
@@ -51,10 +48,15 @@ class OMDb(RequestAPI):
                 except (KeyError, AttributeError):
                     continue
 
-        imdb_id = _get_item_value(item, key_pairs=IMDB_KEYPAIRS, starts_with='tt')
+        imdb_id = _get_item_value(item, key_pairs=[('infolabels', 'imdbnumber'), ('unique_ids', 'imdb')], starts_with='tt')
         if not imdb_id:
             return item
-
         ratings = self.get_ratings_awards(imdb_id=imdb_id, cache_only=cache_only)
+        item['infoproperties'] = merge_two_dicts(item.get('infoproperties', {}), ratings.get('infoproperties', {}))
+        imdb_tv_id = _get_item_value(item, key_pairs=[('unique_ids', 'tvshow.tvshow.imdb'), ('unique_ids', 'tvshow.imdb')], starts_with='tt')
+        if not imdb_tv_id or imdb_tv_id == imdb_id:
+            return item
+        # Also merge base tv show details
+        ratings = self.get_ratings_awards(imdb_id=imdb_tv_id, cache_only=cache_only)
         item['infoproperties'] = merge_two_dicts(item.get('infoproperties', {}), ratings.get('infoproperties', {}))
         return item

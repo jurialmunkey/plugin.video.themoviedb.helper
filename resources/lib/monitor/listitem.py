@@ -348,7 +348,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         # Check TMDb ID in cache
         cache_name = str(self.cur_item)
         cache_item = self._cache.get_cache(cache_name) or {}
-        itemdetails = self.get_itemdetails_quick(**cache_item)
+        itemdetails = self.get_itemdetails_quick(**cache_item, season=self.season, episode=self.episode)
 
         if not itemdetails:
             # Item not cached so clear previous item details now
