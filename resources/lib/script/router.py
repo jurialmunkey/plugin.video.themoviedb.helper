@@ -19,8 +19,11 @@ class Script(object):
             if '=' in arg:
                 key, value = arg.split('=', 1)
                 for i in re.findall(REGEX_WINPROP_FINDALL, value):
-                    new = get_property(f'WinProp.{i}')
-                    value = re.sub(REGEX_WINPROP_SUB.format(i), new, value)
+                    value = re.sub(
+                        REGEX_WINPROP_SUB.format(i),
+                        re.escape(get_property(f'WinProp.{i}')),
+                        value)
+                    value = re.sub(r'\\(.)', r'\1', value)  # Unescape
                 self.params[key] = value.strip('\'').strip('"') if value else None
             else:
                 self.params[arg] = True
