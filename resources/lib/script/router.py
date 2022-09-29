@@ -1,9 +1,15 @@
 # Module: default
 # Author: jurialmunkey
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
+import re
+from resources.lib.addon.window import get_property
 from tmdbhelper.parser import reconfigure_legacy_params
 from resources.lib.addon.logger import kodi_log
 from resources.lib.addon.modimp import importmodule
+
+
+REGEX_WINPROP_FINDALL = r'\$WINPROP\[(.*?)\]'  # $WINPROP[key] = Window(10000).getProperty(TMDbHelper.WinProp.{key})
+REGEX_WINPROP_SUB = r'\$WINPROP\[{}\]'
 
 
 class Script(object):
@@ -12,6 +18,9 @@ class Script(object):
         for arg in args:
             if '=' in arg:
                 key, value = arg.split('=', 1)
+                for i in re.findall(REGEX_WINPROP_FINDALL, value):
+                    new = get_property(f'WinProp.{i}')
+                    value = re.sub(REGEX_WINPROP_SUB.format(i), new, value)
                 self.params[key] = value.strip('\'').strip('"') if value else None
             else:
                 self.params[arg] = True
