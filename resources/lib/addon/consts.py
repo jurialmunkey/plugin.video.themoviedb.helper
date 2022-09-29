@@ -270,7 +270,7 @@ TMDB_BASIC_LISTS = {
         'path': 'person/{tmdb_id}/movie_credits',
         'key': 'cast',
         'tmdb_type': 'movie',
-        'sort_by': 'popularity',
+        'sort_key': 'popularity',
         'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
         'dbid_sorting': True,
         'limit': 20,
@@ -279,7 +279,7 @@ TMDB_BASIC_LISTS = {
     'stars_in_tvshows': {
         'path': 'person/{tmdb_id}/tv_credits',
         'key': 'cast',
-        'sort_by': 'popularity',
+        'sort_key': 'popularity',
         'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
         'dbid_sorting': True,
         'tmdb_type': 'tv',
@@ -289,7 +289,7 @@ TMDB_BASIC_LISTS = {
     'crew_in_movies': {
         'path': 'person/{tmdb_id}/movie_credits',
         'key': 'crew',
-        'sort_by': 'popularity',
+        'sort_key': 'popularity',
         'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
         'dbid_sorting': True,
         'tmdb_type': 'movie',
@@ -299,7 +299,7 @@ TMDB_BASIC_LISTS = {
     'crew_in_tvshows': {
         'path': 'person/{tmdb_id}/tv_credits',
         'key': 'crew',
-        'sort_by': 'popularity',
+        'sort_key': 'popularity',
         'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
         'dbid_sorting': True,
         'tmdb_type': 'tv',

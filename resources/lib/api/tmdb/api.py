@@ -489,13 +489,13 @@ class TMDb(RequestAPI):
 
     def get_basic_list(
             self, path, tmdb_type, key='results', params=None, base_tmdb_type=None, limit=None, filters={},
-            sort_by=None, stacked=None, **kwargs):
+            sort_key=None, stacked=None, **kwargs):
         response = self.get_request_sc(path, **kwargs)
         if not response:
             return []
 
         results = response.get(key) or []
-        results = sorted(results, key=lambda i: i.get(sort_by, 0), reverse=True) if sort_by else results
+        results = sorted(results, key=lambda i: i.get(sort_key, 0), reverse=True) if sort_key else results
 
         items = [
             self.mapper.get_info(i, tmdb_type, definition=params, base_tmdb_type=base_tmdb_type, iso_country=self.iso_country)
