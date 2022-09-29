@@ -73,6 +73,7 @@ class WindowProperty():
 
 class WindowRecommendations(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
+        self._kwargs = kwargs
         self._initialised = False
         self._state = None
         self._tmdb_api = TMDb()
@@ -93,7 +94,6 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
             for k, v in kwargs.items()
             if k and k.startswith('winprop_')}
         self._setproperty = kwargs.get('setproperty')
-        self._kwargs = kwargs
 
     def onInit(self):
         for k, v in self._window_properties.items():
@@ -107,10 +107,10 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
         if not self._tmdb_id or not self._recommendations:
             return self.do_close()
 
-        with BusyDialog():
-            _list_id = self._build_next()
-        if not _list_id:
+        _next_id, _listitems = self._build_next()
+        if not _listitems or not _next_id:
             return self.do_close()
+        _list_id = self._add_items(_next_id, _listitems)
 
         self._build_all_in_groups(3, _list_id)
         self.setProperty(PROP_LIST_VISIBLE.format('All'), 'True')
@@ -119,9 +119,9 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
         try:
             _next_id = next(self._queue)
         except StopIteration:
-            return
+            return (None, None)
         _listitems = self.build_list(_next_id)
-        return self._add_items(_next_id, _listitems) if _listitems else self._build_next()
+        return (_next_id, _listitems) if _listitems else self._build_next()
 
     def _build_all_in_groups(self, x, list_id):
         """ Build remaining queue in threaded groups of x items
@@ -296,10 +296,11 @@ class WindowRecommendationsManager():
         return loads(data)
 
     def open_recommendations(self):
-        self._current_dump = get_property(PROP_JSONDUMP, set_property=self.dump_kwargs())
-        self._gui = WindowRecommendations(
-            'script-tmdbhelper-recommendations.xml', ADDONPATH, 'default', '1080i',
-            recommendations=self._recommendations, window_id=self._window_id, window_manager=self, **self._kwargs)
+        with BusyDialog():
+            self._current_dump = get_property(PROP_JSONDUMP, set_property=self.dump_kwargs())
+            self._gui = WindowRecommendations(
+                'script-tmdbhelper-recommendations.xml', ADDONPATH, 'default', '1080i',
+                recommendations=self._recommendations, window_id=self._window_id, window_manager=self, **self._kwargs)
         self._gui.doModal()
         return self._gui
 

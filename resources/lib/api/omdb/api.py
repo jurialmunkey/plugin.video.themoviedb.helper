@@ -34,25 +34,27 @@ class OMDb(RequestAPI):
         request = self.get_request_item(imdb_id=imdb_id, title=title, year=year, cache_only=cache_only)
         return ItemMapper().get_info(request, base_item=base_item)
 
-    def _get_item_value(self, item, key_pairs: list = None, starts_with: str = None):
-        for i, j in key_pairs:
-            try:
-                value = item[i][j]
-                if not value:
-                    continue
-                if starts_with and not value.startswith(starts_with):
-                    continue
-                return value
-            except (KeyError, AttributeError):
-                continue
-
     def get_item_ratings(self, item, cache_only=False):
         """ Get ratings for an item using IMDb lookup """
         if not item:
             return
-        imdb_id = self._get_item_value(item, key_pairs=IMDB_KEYPAIRS, starts_with='tt')
+
+        def _get_item_value(item, key_pairs: list = None, starts_with: str = None):
+            for i, j in key_pairs:
+                try:
+                    value = item[i][j]
+                    if not value:
+                        continue
+                    if starts_with and not value.startswith(starts_with):
+                        continue
+                    return value
+                except (KeyError, AttributeError):
+                    continue
+
+        imdb_id = _get_item_value(item, key_pairs=IMDB_KEYPAIRS, starts_with='tt')
         if not imdb_id:
             return item
+
         ratings = self.get_ratings_awards(imdb_id=imdb_id, cache_only=cache_only)
         item['infoproperties'] = merge_two_dicts(item.get('infoproperties', {}), ratings.get('infoproperties', {}))
         return item
