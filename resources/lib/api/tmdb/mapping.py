@@ -8,6 +8,7 @@ from resources.lib.addon.consts import (
     IMAGEPATH_QUALITY_FANART,
     IMAGEPATH_QUALITY_THUMBS,
     IMAGEPATH_QUALITY_CLOGOS,
+    IMAGEPATH_NEGATE,
     TMDB_GENRE_IDS,
     ITER_PROPS_MAX
 )
@@ -35,6 +36,10 @@ def get_imagepath_thumb(v):
 
 def get_imagepath_logo(v):
     return f'{ARTWORK_QUALITY_CLOGOS}{v}' if v else ''
+
+
+def get_imagepath_negate(v):
+    return f'{IMAGEPATH_NEGATE}{v}' if v else ''
 
 
 def get_imagepath_quality(v, quality=IMAGEPATH_ORIGINAL):
@@ -153,6 +158,9 @@ def get_iter_props(v, base_name, *args, **kwargs):
     if kwargs.get('image_keys'):
         infoproperties = iter_props(
             v, base_name, infoproperties, func=get_imagepath_poster, **kwargs['image_keys'])
+    if kwargs.get('negativeimage_keys'):
+        infoproperties = iter_props(
+            v, base_name, infoproperties, func=get_imagepath_negate, **kwargs['negativeimage_keys'])
     return infoproperties
 
 
@@ -180,7 +188,8 @@ def get_providers(v, allowlist=None):
             f'provider.{x}.id': i.get('provider_id'),
             f'provider.{x}.type': i.get('key'),
             f'provider.{x}.name': i['provider_name'],
-            f'provider.{x}.icon': get_imagepath_logo(i.get('logo_path'))})
+            f'provider.{x}.icon': get_imagepath_logo(i.get('logo_path')),
+            f'provider.{x}.monoicon': get_imagepath_negate(i.get('logo_path'))})
         added_append(i['provider_name'])
     infoproperties['providers'] = ' / '.join(added)
     return infoproperties
@@ -623,7 +632,8 @@ class ItemMapper(_ItemMapper):
                 'args': ['network'],
                 'kwargs': {
                     'basic_keys': {'name': 'name', 'tmdb_id': 'id'},
-                    'image_keys': {'icon': 'logo_path'}}
+                    'image_keys': {'icon': 'logo_path'},
+                    'negativeimage_keys': {'monoicon': 'logo_path'}}
             }],
             'production_companies': [{
                 'keys': [('infolabels', 'studio')],
@@ -639,7 +649,8 @@ class ItemMapper(_ItemMapper):
                 'args': ['studio'],
                 'kwargs': {
                     'basic_keys': {'name': 'name', 'tmdb_id': 'id'},
-                    'image_keys': {'icon': 'logo_path'}}
+                    'image_keys': {'icon': 'logo_path'},
+                    'negativeimage_keys': {'monoicon': 'logo_path'}}
             }],
             'watch/providers': [{
                 'keys': [('infoproperties', UPDATE_BASEKEY)],
