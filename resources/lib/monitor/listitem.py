@@ -390,7 +390,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         container_id = container_id or int(get_infolabel('Skin.String(TMDbHelper.MonitorContainer)') or 0)
         if not window_id or not container_id:
             return
-        if not get_condvisibility(f'Control.IsVisible({container_id}'):
+        if not get_condvisibility(f'Control.IsVisible({container_id})'):
             return -1
         return container_id
 
