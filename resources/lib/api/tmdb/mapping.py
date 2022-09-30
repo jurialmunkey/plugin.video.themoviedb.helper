@@ -8,7 +8,8 @@ from resources.lib.addon.consts import (
     IMAGEPATH_QUALITY_FANART,
     IMAGEPATH_QUALITY_THUMBS,
     IMAGEPATH_QUALITY_CLOGOS,
-    IMAGEPATH_NEGATE,
+    IMAGEPATH_NEGATE_A,
+    IMAGEPATH_NEGATE_B,
     TMDB_GENRE_IDS,
     ITER_PROPS_MAX
 )
@@ -38,8 +39,12 @@ def get_imagepath_logo(v):
     return f'{ARTWORK_QUALITY_CLOGOS}{v}' if v else ''
 
 
-def get_imagepath_negate(v):
-    return f'{IMAGEPATH_NEGATE}{v}' if v else ''
+def get_imagepath_negate_a(v):
+    return f'{IMAGEPATH_NEGATE_A}{v}' if v else ''
+
+
+def get_imagepath_negate_b(v):
+    return f'{IMAGEPATH_NEGATE_B}{v}' if v else ''
 
 
 def get_imagepath_quality(v, quality=IMAGEPATH_ORIGINAL):
@@ -160,7 +165,9 @@ def get_iter_props(v, base_name, *args, **kwargs):
             v, base_name, infoproperties, func=get_imagepath_poster, **kwargs['image_keys'])
     if kwargs.get('negativeimage_keys'):
         infoproperties = iter_props(
-            v, base_name, infoproperties, func=get_imagepath_negate, **kwargs['negativeimage_keys'])
+            v, base_name, infoproperties, func=get_imagepath_negate_a, **kwargs['negativeimage_keys'])
+        infoproperties = iter_props(
+            v, base_name, infoproperties, func=get_imagepath_negate_b, **{f'{k}.Flipped': v for k, v in kwargs['negativeimage_keys'].items()})
     return infoproperties
 
 
@@ -189,7 +196,8 @@ def get_providers(v, allowlist=None):
             f'provider.{x}.type': i.get('key'),
             f'provider.{x}.name': i['provider_name'],
             f'provider.{x}.icon': get_imagepath_logo(i.get('logo_path')),
-            f'provider.{x}.monoicon': get_imagepath_negate(i.get('logo_path'))})
+            f'provider.{x}.monoicon': get_imagepath_negate_a(i.get('logo_path')),
+            f'provider.{x}.monoicon.flipped': get_imagepath_negate_b(i.get('logo_path'))})
         added_append(i['provider_name'])
     infoproperties['providers'] = ' / '.join(added)
     return infoproperties
