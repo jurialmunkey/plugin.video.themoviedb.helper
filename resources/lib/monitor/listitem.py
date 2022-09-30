@@ -16,17 +16,15 @@ from collections import namedtuple
 
 DIALOG_ID_EXCLUDELIST = [9999]
 BASEITEM_PROPERTIES = [
-    ('base_label', 'label'),
-    ('base_title', 'title'),
-    ('base_icon', 'icon'),
-    ('base_plot', 'plot'),
-    ('base_tagline', 'tagline'),
-    ('base_dbtype', 'dbtype'),
-    ('base_addon_description', 'addondescription'),
-    ('base_artist_description', 'Property(artist_description)'),
-    ('base_album_description', 'Property(album_description)'),
-    ('base_poster', 'Art(poster)'),
-    ('base_tvshowtitle', 'tvshowtitle')]
+    ('base_label', ('label',)),
+    ('base_title', ('title',)),
+    ('base_icon', ('icon',)),
+    ('base_plot', ('plot', 'Property(artist_description)', 'Property(artist_description)', 'addondescription')),
+    ('base_tagline', ('tagline',)),
+    ('base_dbtype', ('dbtype',)),
+    ('base_poster', ('Art(poster)',)),
+    ('base_clearlogo', ('Art(clearlogo)', 'Art(tvshow.clearlogo)', 'Art(artist.clearlogo)')),
+    ('base_tvshowtitle', ('tvshowtitle',))]
 ItemDetails = namedtuple("ItemDetails", "tmdb_type tmdb_id listitem artwork")
 
 
@@ -372,7 +370,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         except Exception:
             return
 
-    def on_exit(self, keep_tv_artwork=False, clear_properties=True):
+    def on_exit(self, keep_tv_artwork=False, clear_properties=True, is_done=True):
         if self._listcontainer:
             try:
                 _win = xbmcgui.Window(self.cur_window)  # Note get _win separate from _lst
@@ -383,7 +381,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             return
         ignore_keys = SETMAIN_ARTWORK if keep_tv_artwork and self.dbtype in ['episodes', 'seasons'] else None
         self.clear_properties(ignore_keys=ignore_keys)
-        return get_property('IsUpdating', clear_property=True)
+        return get_property('IsUpdating', clear_property=True) if is_done else None
 
     def get_listcontainer(self, window_id=None, container_id=None):
         window_id = window_id or self.cur_window
@@ -471,6 +469,13 @@ class ListItemMonitor(CommonMonitorFunctions):
         _lst = _win.getControl(_id_d_list)
         _lst.addItem(self._last_listitem)
 
+    def get_additional_properties(self, itemdetails):
+        for k, v in BASEITEM_PROPERTIES:
+            try:
+                itemdetails.listitem['infoproperties'][k] = next(j for j in (self.get_infolabel(i) for i in v) if j)
+            except StopIteration:
+                itemdetails.listitem['infoproperties'][k] = None
+
     @kodi_try_except('lib.monitor.listitem.get_listitem')
     def get_listitem(self):
         self.get_container()
@@ -496,7 +501,7 @@ class ListItemMonitor(CommonMonitorFunctions):
 
         # Clear properties for clean slate if user opened a new directory
         if not self.is_same_folder(update=True):
-            self.clear_properties()
+            self.on_exit(is_done=False)
 
         # Get the current listitem details for the details lookup
         self.set_cur_item()
@@ -512,20 +517,14 @@ class ListItemMonitor(CommonMonitorFunctions):
         # Check ftv setting so item builder can skip artwork lookups if unneeded
         self.ib.ftv_api = self.ftv_api if get_setting('service_fanarttv_lookup') else None
 
-        # Lookup item and exit early if failed (when using win props method)
+        # Lookup item
         itemdetails = self.get_itemdetails()
         if not itemdetails or not itemdetails.tmdb_type or not itemdetails.listitem:
-            if not self._listcontainer:  # Early exit when using win props
+            if not self._listcontainer:
+                # Early exit when using legacy windowprops method
                 return self.on_exit()
-            itemdetails = ItemDetails(None, None, get_empty_item(), {})  # Else set a blank item for artwork manipulations
-
-        # Item changed whilst retrieving details so clear and get next item
-        if not self.is_same_item():
-            if self._listcontainer:  # Add some extra props for modals and hopefully will add before modal triggered
-                for k, v in BASEITEM_PROPERTIES:
-                    itemdetails.listitem['infoproperties'][k] = self.get_infolabel(v)
-                self._last_listitem = self.get_builtitem(itemdetails)
-            return self.on_exit(keep_tv_artwork=True)
+            # Set a blank item for artwork manipulations when using listcontainer method
+            itemdetails = ItemDetails(None, None, get_empty_item(), {})
 
         # Get item folderpath and filenameandpath for comparison
         itemdetails.listitem['folderpath'] = itemdetails.listitem['infoproperties']['folderpath'] = self.get_infolabel('folderpath')
@@ -535,19 +534,25 @@ class ListItemMonitor(CommonMonitorFunctions):
         if self._listcontainer:
             itemdetails.listitem['infoproperties']['list_container_id'] = f'{self._listcontainer}'
             itemdetails.listitem['infoproperties']['current_window_id'] = f'{self.cur_window}'
-            for k, v in BASEITEM_PROPERTIES:
-                itemdetails.listitem['infoproperties'][k] = self.get_infolabel(v)
+            self.get_additional_properties(itemdetails)
 
-        # Copy previous properties
+        # Item changed whilst retrieving details so clear and get next item
+        if not self.is_same_item():
+            if self._listcontainer:
+                # Set last listitem so can get passed to contextmenu modal
+                self._last_listitem = self.get_builtitem(itemdetails)
+            return self.on_exit(keep_tv_artwork=True)
+
+        # Copy previous properties for clearing intersection
         prev_properties = self.properties.copy()
         self.properties = set()
 
-        # Need to update Next Aired with a shorter cache time than details (we do this later for list method)
+        # Need to update Next Aired with a shorter cache time than details (listcontainer method does this on_finished instead)
         if not self._listcontainer and itemdetails.tmdb_type == 'tv':
             nextaired = self.tmdb_api.get_tvshow_nextaired(itemdetails.tmdb_id)
             itemdetails.listitem['infoproperties'].update(nextaired)
 
-        # Get our artwork properties in a thread if using window properties method (we do this later for list method)
+        # Get our artwork properties in a thread if using windowprops method (listcontainer method does this on_finished instead)
         if not self._listcontainer and get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
             thread_artwork = Thread(target=self.process_artwork, args=[itemdetails.artwork, itemdetails.tmdb_type])
             thread_artwork.start()
@@ -558,7 +563,7 @@ class ListItemMonitor(CommonMonitorFunctions):
                 itemdetails.listitem.setdefault('infoproperties', {}).update(
                     get_person_stats(itemdetails.listitem['infolabels']['title']) or {})
 
-        # Get our item ratings in a thread if using window properties method (we do this later for list method)
+        # Get our item ratings in a thread if using windowprops method  (listcontainer method does this on_finished instead)
         if not self._listcontainer and get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"):
             thread_ratings = Thread(target=self.process_ratings, args=[itemdetails.listitem, itemdetails.tmdb_type, itemdetails.tmdb_id])
             thread_ratings.start()

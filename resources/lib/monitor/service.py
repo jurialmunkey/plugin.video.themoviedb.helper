@@ -41,7 +41,7 @@ class ServiceMonitor(object):
         self.xbmc_monitor.waitForAbort(30)
 
     def _on_modal(self):
-        self.xbmc_monitor.waitForAbort(1)
+        self.xbmc_monitor.waitForAbort(0.5)
 
     def _on_context(self):
         self.listitem_monitor.get_context_listitem()
