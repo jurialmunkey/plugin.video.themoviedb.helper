@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2022-07-19 00:47+0000\n"
+"PO-Revision-Date: 2022-10-01 14:36+0000\n"
 "Last-Translator: psp2111-ADSLGATE <>\n"
 "Language-Team: Arabic (Saudi Arabia)\n"
 "Language: ar-SA\n"
@@ -137,8 +137,8 @@ msgstr ""
 
 #: resources/settings.xml
 msgctxt "#32028"
-msgid "Use fanart.tv for widget artwork (increases load times)"
-msgstr "استخدم fanart.tv للعمل الفني الخاص بالويدجيت (يزيد من أوقات التحميل)"
+msgid "Use fanart.tv for widget artwork (slower)"
+msgstr "استخدم fanart.tv للعمل الفني الخاص بالودجيت (أبطأ)"
 
 #: resources/settings.xml
 msgctxt "#32029"
@@ -167,8 +167,8 @@ msgstr "المشغل الافتراضي"
 
 #: resources/settings.xml
 msgctxt "#32034"
-msgid "Get watched indicators from Trakt"
-msgstr "احصل على تنبيهات و مؤشرات \"تمت المشاهدة\" من Trakt"
+msgid "Get watched indicators and episode counts (slower)"
+msgstr "احصل على مؤشرات \"تمت المشاهدة\" و عدد الحلقات (أبطأ)"
 
 #: resources/settings.xml
 msgctxt "#32035"
@@ -203,7 +203,7 @@ msgstr "العنصر غير موجود."
 #: resources/lib/player.py
 msgctxt "#32041"
 msgid "The plugin returned no results."
-msgstr ""
+msgstr "لم يقُدم المكون الإضافي أي نتائج."
 
 #: resources/lib/player.py
 msgctxt "#32042"
@@ -415,8 +415,8 @@ msgstr "أخرى"
 
 #: resources/settings.xml
 msgctxt "#32081"
-msgid "Show next page item"
-msgstr "إظهار عنصر \"الصفحة التالية\" في اخر الويدحيت"
+msgid "Next page item"
+msgstr "عرض عنصر \"الصفحة التالية\""
 
 #: resources/settings.xml
 msgctxt "#32082"
@@ -526,7 +526,7 @@ msgstr "إضافة عناصر"
 #: resources/lib/container.py
 msgctxt "#32103"
 msgid "No Value Added"
-msgstr ""
+msgstr "لم يتم إضافة قيمة"
 
 #: resources/lib/container.py
 msgctxt "#32104"
@@ -602,7 +602,7 @@ msgstr "الشبكة"
 #: resources/lib/container.py
 msgctxt "#32117"
 msgid "Keyword"
-msgstr ""
+msgstr "الكلمة الدالة"
 
 #: resources/lib/container.py
 msgctxt "#32118"
@@ -795,7 +795,7 @@ msgstr "تحديث المكتبة الآن"
 #: resources/settings.xml
 msgctxt "#32155"
 msgid "Next Aired (Library)"
-msgstr ""
+msgstr "مكتبة البث القادم"
 
 #: resources/settings.xml
 msgctxt "#32156"
@@ -946,7 +946,7 @@ msgstr "تبث حاليا"
 #: resources/lib/plugin.py
 msgctxt "#32183"
 msgid "Next Aired Library"
-msgstr ""
+msgstr "مكتبة البث القادم"
 
 #: resources/lib/plugin.py
 msgctxt "#32184"
@@ -1066,7 +1066,7 @@ msgstr "المرتقبة"
 #: resources/lib/plugin.py
 msgctxt "#32207"
 msgid "Top 10 Box Office"
-msgstr ""
+msgstr "أفضل 10 أفلام في شباك التذاكر"
 
 #: resources/lib/plugin.py
 msgctxt "#32208"
@@ -1800,8 +1800,8 @@ msgstr "المجموعات"
 
 #: resources/settings.xml
 msgctxt "#32346"
-msgid "Use hack to get Kodi Trakt addon to scrobble local files"
-msgstr "اجبر الإضافة \"Kodi Trakt\" على فحص الملفات المحلية"
+msgid "Resend local files (fix Trakt scrobbling bug)"
+msgstr ""
 
 #: resources/settings.xml
 msgctxt "#32347"
@@ -1896,12 +1896,12 @@ msgstr "هل تريد إضافة هذا العنصر إلى المكتبة ال�
 
 #: resources/settings.xml
 msgctxt "#32363"
-msgid "Delay before playing after dummy resolves (seconds)"
+msgid "Delay after resolving (seconds)"
 msgstr ""
 
 #: resources/settings.xml
 msgctxt "#32364"
-msgid "Reroute PlayMedia to call xbmc.Player() directly"
+msgid "Reroute PlayMedia to xbmc.Player()"
 msgstr ""
 
 #: resources/lib/addon/plugin.py
@@ -1946,7 +1946,7 @@ msgstr ""
 
 #: resources/settings.xml
 msgctxt "#32373"
-msgid "Restrict dummy setResolvedUrl method to library strm"
+msgid "Restrict to library strm"
 msgstr ""
 
 #: resources/lib/player/players.py
@@ -2040,9 +2040,8 @@ msgstr "تم مسح بيانات التخزين المؤقت"
 
 #: resources/settings.xml
 msgctxt "#32390"
-msgid ""
-"Use alternative .nfo filename to avoid externally managed .nfo conflicts"
-msgstr "استخدم ملفات .nfo بديلة لتجنب التعارضات مع ملفات .nfo الخارجية"
+msgid "Use alternative .nfo filename"
+msgstr "استخدم ملف .nfo بديل"
 
 #: resources/lib/script/router.py
 msgctxt "#32391"
@@ -2076,8 +2075,8 @@ msgstr ""
 
 #: resources/settings.xml
 msgctxt "#32396"
-msgid "Unwatched counts only on in-progress tvshows"
-msgstr "احتسب عدد الحلقات الغير مُشاهدة فقط على المسلسلات قيد التقدم"
+msgid "Set unwatched episode count for in-progress tvshows only"
+msgstr "احتسب عدد الحلقات الغير مُشاهدة فقط في المسلسلات قيد التقدم"
 
 #: resources/settings.xml
 msgctxt "#32397"
@@ -2111,8 +2110,8 @@ msgstr "احصل على تفاصيل إضافية وأعمال فنية من TMD
 
 #: resources/settings.xml
 msgctxt "#32403"
-msgid "Increase synced lists items per page (increases load times)"
-msgstr "زيادة عناصر القوائم المتزامنة لكل صفحة (يزيد من أوقات التحميل)"
+msgid "Increase sync list item limit per page (slower)"
+msgstr "زيادة عناصر القوائم المتزامنة لكل صفحة (أبطأ)"
 
 #: resources/settings.xml
 msgctxt "#32404"
@@ -2131,8 +2130,8 @@ msgstr "تكملة مشاهدة الحلقات"
 
 #: resources/settings.xml
 msgctxt "#32407"
-msgid "Get resume points from Trakt (increases load times)"
-msgstr "احصل على نقاط استئناف من Trakt (يزيد من أوقات التحميل)"
+msgid "Get resume points (experimental) (slower)"
+msgstr "احصل على نقاط استئناف من Trakt (تجريبي) (أبطأ)"
 
 #: resources/settings.xml
 msgctxt "#32408"
@@ -2162,7 +2161,7 @@ msgstr "اختيار موفر الخدمة"
 #: resources/settings.xml
 msgctxt "#32413"
 msgid "Next episodes checks calendar (slower but more accurate)"
-msgstr "Next episodes checks calendar (slower but more accurate)"
+msgstr "تحقق من التقويم للحلقات التالية (أبطأ لكن أكثر دقة)"
 
 #: resources/lib/addon/consts.py
 msgctxt "#32414"
@@ -2298,7 +2297,7 @@ msgstr "تكوين قائمة السماح ببيانات الموفر"
 #: resources/lib/script/method.py
 msgctxt "#32438"
 msgid "Provider allowlist updated"
-msgstr ""
+msgstr "تم تحديث قائمة السماح بمزودين الخدمة"
 
 #: resources/lib/script/method.py
 msgctxt "#32439"
@@ -2350,6 +2349,118 @@ msgstr ""
 msgctxt "#32447"
 msgid "Up Next Only"
 msgstr "الحلقة التالية فقط"
+
+#: resources/settings.xml
+msgctxt "#32448"
+msgid "Stop before attempting playback"
+msgstr ""
+
+#: resources/settings.xml
+msgctxt "#32449"
+msgid "Ignore region release filter"
+msgstr "تجاهل فلتر إصدارات المنطقة"
+
+#: resources/settings.xml
+msgctxt "#32450"
+msgid "Install context menu add-on"
+msgstr "الرجاء تثبيت إضافة قائمة السياق"
+
+#: resources/lib/api/trakt/api.py
+msgctxt "#32451"
+msgid "Lowest"
+msgstr "الأقصر"
+
+#: resources/lib/api/trakt/api.py
+msgctxt "#32452"
+msgid "Highest"
+msgstr ""
+
+#: resources/lib/api/trakt/api.py
+msgctxt "#32453"
+msgid "Least played"
+msgstr "الأقل مشاهدة"
+
+#: resources/lib/api/trakt/api.py
+msgctxt "#32454"
+msgid "Shortest"
+msgstr ""
+
+#: resources/lib/api/trakt/api.py
+msgctxt "#32455"
+msgid "Longest"
+msgstr "الأطول"
+
+#: resources/lib/items/basedir.py
+msgctxt "#32456"
+msgid "Watchlist (Released)"
+msgstr "قائمة المشاهدة (أصُدرت)"
+
+#: resources/lib/addon/consts.py
+msgctxt "#32457"
+msgid "Watchlist (Anticipated)"
+msgstr "قائمة المشاهدة (مرتقبة)"
+
+#: resources/lib/items/basedir.py
+msgctxt "#32458"
+msgid "Airing Next Library"
+msgstr ""
+
+#: resources/lib/items/basedir.py
+msgctxt "#32459"
+msgid "Your Episodes Airing Next"
+msgstr "حلقات سوف تبث قريبا"
+
+#: resources/lib/items/basedir.py
+msgctxt "#32460"
+msgid "Awards"
+msgstr "الجوائز"
+
+#: resources/lib/api/tvdb/lists.py
+msgctxt "#32461"
+msgid "Winner of"
+msgstr ""
+
+#: resources/lib/api/tvdb/lists.py
+msgctxt "#32462"
+msgid "Nominated for"
+msgstr ""
+
+#: resources/settings.xml
+msgctxt "#32463"
+msgid "Cache items in custom lists you own for 24 hours"
+msgstr "التخزين مؤقتاً لعناصر قائمتك المخصصة لمدة 24 ساعة"
+
+#: resources/settings.xml
+msgctxt "#32464"
+msgid ""
+"Significantly increases RAM usage but might improve repeat cache reads for "
+"disk cache located on slow storage devices (e.g. USB or SD card storage). "
+"Will likely cause worse cache performance for devices with normal storage (e."
+"g. SSD, eMMC or internal HDD) or limited RAM."
+msgstr ""
+"يزيد من استخدام الـRAM بشكل كبير ولكن يحسن من سرعة قراءة ذاكرة التخزين "
+"المؤقتة على الأجهزة البطيئة. من الممكن ان يكون الأداء ابطأ في الأجهزة التي "
+"تستخدم مساحة تخزين داخلية من نوع SSD أو eMMC أو حجم RAM محدود."
+
+#: resources/settings.xml
+msgctxt "#32465"
+msgid "Cache disk reads to memory (increases RAM usage)"
+msgstr "حفظ قراءات ذاكرة التخزين المؤقت على الـRAM (يزيد من استخدام الـRAM)"
+
+#: resources/settings.xml
+msgctxt "#32466"
+msgid "Play automatically using available providers"
+msgstr "قم بالتشغيل تلقائياً باستخدام مقدمي الخدمة المتاحين"
+
+#: resources/settings.xml
+msgctxt "#32467"
+msgid "Refresh cached Kodi Library details"
+msgstr "تحديث ذاكرة التخزين المؤقتة لتفاصيل مكتبة كودي"
+
+#: resources/settings.xml
+msgctxt "#32468"
+msgid "Authorisation and sync notifications on startup"
+msgstr "عرض تنبيهات المزامنة والمصادقة عند بدء التشغيل"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
@@ -2618,9 +2729,8 @@ msgstr "استخدم فقط إذا تم إلغاء تنشيط مفتاح api ا�
 
 #: resources/settings.xml
 msgctxt "#32021"
-msgid "Use fanart.tv for plugin artwork (increases load times)"
-msgstr ""
-"استخدم fanart.tv للعمل الفني الخاص بالمكون الإضافي (يزيد من أوقات التحميل)"
+msgid "Use fanart.tv for plugin artwork (slower)"
+msgstr "استخدم fanart.tv للعمل الفني الخاص بالمكون الإضافي (أبطأ)"
 
 #: resources/settings.xml
 msgctxt "#32022"
