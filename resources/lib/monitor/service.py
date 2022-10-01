@@ -111,6 +111,7 @@ class ServiceMonitor(object):
                     "Window.IsVisible(MyPVRGuide.xml) | "
                     "Window.IsVisible(DialogPVRInfo.xml) | "
                     "!String.IsEmpty(Window(Home).Property(TMDbHelper.WidgetContainer)) | "
+                    "!String.IsEmpty(Window.Property(TMDbHelper.WidgetContainer)) | "
                     "Window.IsVisible(movieinformation)"):
                 self._on_listitem()
 

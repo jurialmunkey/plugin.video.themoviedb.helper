@@ -1,6 +1,6 @@
 import xbmcgui
 from resources.lib.api.kodi.rpc import get_person_stats
-from resources.lib.addon.window import get_property
+from resources.lib.addon.window import get_property, get_current_window
 from resources.lib.monitor.common import CommonMonitorFunctions, SETMAIN_ARTWORK, SETPROP_RATINGS
 from resources.lib.monitor.images import ImageFunctions
 from resources.lib.addon.plugin import convert_media_type, convert_type, get_setting, get_infolabel, get_condvisibility, get_localized
@@ -14,7 +14,6 @@ from copy import deepcopy
 from collections import namedtuple
 
 
-DIALOG_ID_EXCLUDELIST = [9999]
 BASEITEM_PROPERTIES = [
     ('base_label', ('label',)),
     ('base_title', ('title',)),
@@ -48,9 +47,14 @@ class ListItemMonitor(CommonMonitorFunctions):
     def get_container(self):
 
         def _get_container():
-            widget_id = get_property('WidgetContainer', is_type=int)
+            if get_condvisibility('Skin.HasSetting(TMDbHelper.UseLocalWidgetContainer)'):
+                widget_id = get_property('WidgetContainer', window_id='current', is_type=int)
+            else:
+                widget_id = get_property('WidgetContainer', is_type=int)
+
             if widget_id:
                 return f'Container({widget_id}).'
+
             return 'Container.'
 
         def _get_container_item():
@@ -206,7 +210,7 @@ class ListItemMonitor(CommonMonitorFunctions):
 
     @kodi_try_except('lib.monitor.listitem.clear_on_scroll')
     def clear_on_scroll(self):
-        self.cur_window = self.get_window_id()
+        self.cur_window = get_current_window()
         self._listcontainer = self.get_listcontainer()
         if self._listcontainer:
             return self.get_listitem()
@@ -362,14 +366,6 @@ class ListItemMonitor(CommonMonitorFunctions):
 
         return itemdetails
 
-    def get_window_id(self):
-        try:
-            _id_dialog = xbmcgui.getCurrentWindowDialogId()
-            _id_window = _id_dialog if _id_dialog not in DIALOG_ID_EXCLUDELIST else xbmcgui.getCurrentWindowId()
-            return _id_window
-        except Exception:
-            return
-
     def on_exit(self, keep_tv_artwork=False, clear_properties=True, is_done=True):
         if self._listcontainer:
             try:
@@ -479,7 +475,7 @@ class ListItemMonitor(CommonMonitorFunctions):
     @kodi_try_except('lib.monitor.listitem.get_listitem')
     def get_listitem(self):
         self.get_container()
-        self.cur_window = self.get_window_id()
+        self.cur_window = get_current_window()
         self._listcontainer = self.get_listcontainer()
 
         # We want to set a special container but it doesn't exist so exit

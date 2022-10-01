@@ -1,7 +1,15 @@
 from xbmc import Monitor
-from xbmcgui import Window, getCurrentWindowId
+from xbmcgui import Window, getCurrentWindowId, getCurrentWindowDialogId
 from tmdbhelper.parser import try_type, try_int
 from resources.lib.addon.plugin import executebuiltin, get_condvisibility, get_infolabel
+
+
+DIALOG_ID_EXCLUDELIST = (9999, None)
+
+
+def get_current_window(get_dialog=True):
+    dialog = getCurrentWindowDialogId() if get_dialog else None
+    return dialog if dialog not in DIALOG_ID_EXCLUDELIST else getCurrentWindowId()
 
 
 def get_property(name, set_property=None, clear_property=False, window_id=None, prefix=None, is_type=None):
