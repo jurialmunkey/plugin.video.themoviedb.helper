@@ -56,6 +56,6 @@ class OMDb(RequestAPI):
         if imdb_tv_id and imdb_tv_id != imdb_id:
             # Also merge base tv show details
             tv_ratings = self.get_ratings_awards(imdb_id=imdb_tv_id, cache_only=cache_only)
-            merge_two_dicts(ratings.get('infoproperties', {}), tv_ratings.get('infoproperties', {}))
+            ratings['infoproperties'] = merge_two_dicts(tv_ratings.get('infoproperties', {}), ratings.get('infoproperties', {}))
         item['infoproperties'] = merge_two_dicts(item.get('infoproperties', {}), ratings.get('infoproperties', {}))
         return item
