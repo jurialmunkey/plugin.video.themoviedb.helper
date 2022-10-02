@@ -170,11 +170,6 @@ class CommonMonitorFunctions(object):
             return self.tmdb_api.get_tmdb_id(tmdb_type=tmdb_type, imdb_id=imdb_id)
         return self.tmdb_api.get_tmdb_id(tmdb_type=tmdb_type, query=query, year=year, episode_year=episode_year)
 
-    @kodi_try_except('lib.monitor.common get_tmdb_id')
-    def get_tmdb_id_multi(self, media_type=None, imdb_id=None, query=None, year=None, episode_year=None):
-        multi_i = self.tmdb_api.get_tmdb_multisearch(query=query, media_type=media_type) or {}
-        return (multi_i.get('id'), multi_i.get('media_type'),)
-
     def get_trakt_ratings(self, item, trakt_type, season=None, episode=None):
         _dummdict = {}
         ratings = self.trakt_api.get_ratings(
@@ -243,8 +238,8 @@ class CommonMonitorFunctions(object):
 
     def clear_properties(self, ignore_keys=None):
         if not ignore_keys:
-            self.cur_item = 0
-            self.pre_item = 1
+            self._cur_item = 0
+            self._pre_item = 1
         ignore_keys = ignore_keys or set()
         for k in self.properties - ignore_keys:
             self.clear_property(k)
