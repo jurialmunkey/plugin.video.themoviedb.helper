@@ -480,9 +480,11 @@ class ListItemMonitor(CommonMonitorFunctions):
             listitem.setArt(self.li_process_artwork(li_lookup))
 
         def _li_process_ratings(li_lookup, listitem):
+            get_property('IsUpdatingRatings', 'True')
             li_lookup.get_ratings()
             li_lookup.get_nextaired()
             listitem.setProperties(li_lookup._itemdetails.listitem['infoproperties'])
+            get_property('IsUpdatingRatings', clear_property=True)
 
         # Add main item to our container
         listitem = self._last_listitem = li_lookup.get_builtitem()
