@@ -554,7 +554,7 @@ class ListItemMonitor(CommonMonitorFunctions):
 
         # Avoid relookups of same item if user is idling and do some readahead instead
         if self._cur_window == self._pre_window and self.is_same_item(update=True):
-            return self.get_next_listitem()
+            return  # self.get_next_listitem()
         self._pre_window = self._cur_window
 
         # Ignore special folders like next-page/parent-folder and clear instead
