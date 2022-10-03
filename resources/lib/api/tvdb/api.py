@@ -1,6 +1,7 @@
 from resources.lib.api.request import RequestAPI
 from resources.lib.addon.plugin import get_setting, set_setting
 from resources.lib.addon.consts import CACHE_SHORT, CACHE_MEDIUM
+from resources.lib.addon.window import get_property
 from resources.lib.api.tvdb.mapping import ItemMapper
 from tmdbhelper.parser import load_in_data
 
@@ -55,7 +56,7 @@ class TVDb(RequestAPI):
         return self.get_api_request_json(self.get_request_url(*args, **kwargs), headers=self.headers)
 
     def get_token(self):
-        _token = get_setting('tvdb_token', 'str')
+        _token = get_property('tvdb_token', is_type=str)
         if not _token:
             _token = self.login()
         return _token
@@ -73,7 +74,7 @@ class TVDb(RequestAPI):
             _token = data['data']['token']
         except (KeyError, TypeError):
             return
-        set_setting('tvdb_token', _token, 'str')
+        get_property('tvdb_token', set_property=f'{_token}')
         return _token
 
     # def get_mapped_item(self, func, *args, **kwargs):
