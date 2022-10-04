@@ -113,7 +113,7 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
         _list_id = self._add_items(_next_id, _listitems)
 
         self._build_all_in_groups(3, _list_id)
-        self.setProperty(PROP_LIST_VISIBLE.format('All'), 'True')
+        self.setProperty(PROP_LIST_VISIBLE.format('Main'), 'True')
 
     def _build_next(self):
         try:
