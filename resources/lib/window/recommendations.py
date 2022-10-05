@@ -113,7 +113,7 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
             return self.do_close()
         _list_id = self._add_items(_next_id, _listitems)
 
-        self._build_all_in_groups(3, _list_id)
+        Thread(target=self._build_all_in_groups, args=[3, _list_id]).start()  # Don't block closing
         self.setProperty(PROP_LIST_VISIBLE.format('Main'), 'True')
 
     def _build_next(self):
