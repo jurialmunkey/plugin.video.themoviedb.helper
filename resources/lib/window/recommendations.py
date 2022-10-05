@@ -76,6 +76,7 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
         self._kwargs = kwargs
         self._initialised = False
         self._state = None
+        self._monitor = Monitor()
         self._tmdb_api = TMDb()
         self._tmdb_type = get_property(PROP_TMDBTYPE, kwargs['tmdb_type'])
         self._tmdb_affix = '&nextpage=false&fanarttv=false&cacheonly=true'
@@ -133,12 +134,11 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
 
         _mon = Monitor()
         for _items in zip_longest(*[iter(self._queue)] * x, fillvalue=None):
-            with ParallelThread(_items, _threaditem) as pt:
+            with ParallelThread(_items, _threaditem):
                 if list_id:
                     _mon.waitForAbort(0.1)  # Wait to ensure first list is visible
                     self.setFocusId(list_id)  # Setfocus to first list id
                     list_id = None
-                pt._exit = True
 
     def onAction(self, action):
         _action_id = action.getId()
