@@ -404,14 +404,14 @@ class WindowRecommendationsManager():
         with WindowProperty((PROP_ONCLOSED, 'True')):
             executebuiltin(builtin) if builtin and not after else None
             executebuiltin(f'Dialog.Close(movieinformation,true)')
-            self._mon.waitForAbort(1)
+            self._mon.waitForAbort(0.1)
             if not cond and xbmcgui.getCurrentWindowId() == self._window_id:
                 _win = xbmcgui.Window(self._window_id)
                 _win.close() if _win else None
             executebuiltin(builtin) if builtin and after else None
             for _gui, data in self._history:
                 del _gui
-            self._mon.waitForAbort(1)
+            self._mon.waitForAbort(0.1)
             get_property(PROP_HIDEINFO, clear_property=True)
             get_property(PROP_HIDERECS, clear_property=True)
             get_property(PROP_TMDBTYPE, clear_property=True)
