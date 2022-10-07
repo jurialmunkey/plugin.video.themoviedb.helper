@@ -1,6 +1,6 @@
 from xbmcgui import Dialog
 from resources.lib.addon.plugin import ADDONPATH, get_mpaa_prefix, get_language, convert_type, get_setting, get_localized, get_infolabel
-from resources.lib.addon.consts import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, TMDB_GENRE_IDS, CACHE_SHORT, CACHE_MEDIUM
+from resources.lib.addon.consts import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, CACHE_SHORT, CACHE_MEDIUM
 from tmdbhelper.parser import try_int
 from resources.lib.addon.window import get_property
 from resources.lib.addon.tmdate import format_date
@@ -41,7 +41,23 @@ class TMDb(RequestAPI):
         self.mpaa_prefix = mpaa_prefix
         self.append_to_response = APPEND_TO_RESPONSE
         self.req_strip += [(self.append_to_response, ''), (self.req_language, f'{self.iso_language}{"_en" if ARTLANG_FALLBACK else ""}')]
-        self.mapper = ItemMapper(self.language, self.mpaa_prefix)
+        self.genres = self.get_genres()
+        self.mapper = ItemMapper(self.language, self.mpaa_prefix, self.genres)
+
+    def get_genres(self):
+
+        def _get_genres():
+            genres = []
+            try:
+                genres += self.get_request_lc('genre', 'tv', 'list')['genres']
+                genres += self.get_request_lc('genre', 'movie', 'list')['genres']
+            except (KeyError, TypeError):
+                return genres
+
+            return {i['name']: i['id'] for i in genres}
+
+        cache_name = f'TMDb.GenreLookup.{self.language}'
+        return self._cache.use_cache(_get_genres, cache_name=cache_name)
 
     def get_url_separator(self, separator=None):
         if separator == 'AND':
@@ -101,7 +117,7 @@ class TMDb(RequestAPI):
             return
         request = None
         if tmdb_type == 'genre' and query:
-            return TMDB_GENRE_IDS.get(query, '')
+            return self.genres.get(query, '')
         elif imdb_id:
             request = func('find', imdb_id, language=self.req_language, external_source='imdb_id')
             request = request.get(f'{tmdb_type}_results', [])

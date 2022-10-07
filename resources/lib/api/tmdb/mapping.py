@@ -9,7 +9,6 @@ from resources.lib.addon.consts import (
     IMAGEPATH_QUALITY_THUMBS,
     IMAGEPATH_QUALITY_CLOGOS,
     IMAGEPATH_NEGATE,
-    TMDB_GENRE_IDS,
     ITER_PROPS_MAX
 )
 
@@ -67,50 +66,6 @@ def get_collection(v):
     infoproperties['set.name'] = v.get('name')
     infoproperties['set.poster'] = get_imagepath_poster(v.get('poster_path'))
     infoproperties['set.fanart'] = get_imagepath_fanart(v.get('backdrop_path'))
-    return infoproperties
-
-
-def get_collection_properties(v):
-    ratings = []
-    infoproperties = {}
-    year_l, year_h, votes = 9999, 0, 0
-    genres = set()
-    for p, i in enumerate(v, start=1):
-        genre = get_genres_by_id(i.get('genre_ids'))
-        genres.update(genre)
-
-        infoproperties[f'set.{p}.genre'] = ' / '.join(genre)
-        infoproperties[f'set.{p}.title'] = i.get('title', '')
-        infoproperties[f'set.{p}.tmdb_id'] = i.get('id', '')
-        infoproperties[f'set.{p}.originaltitle'] = i.get('original_title', '')
-        infoproperties[f'set.{p}.plot'] = i.get('overview', '')
-        infoproperties[f'set.{p}.premiered'] = i.get('release_date', '')
-        infoproperties[f'set.{p}.year'] = i.get('release_date', '')[:4]
-        infoproperties[f'set.{p}.rating'] = f'{try_float(i.get("vote_average")):0,.1f}'
-        infoproperties[f'set.{p}.votes'] = i.get('vote_count', '')
-        infoproperties[f'set.{p}.poster'] = get_imagepath_poster(i.get('poster_path', ''))
-        infoproperties[f'set.{p}.fanart'] = get_imagepath_fanart(i.get('backdrop_path', ''))
-
-        year_l = min(try_int(i.get('release_date', '')[:4]), year_l)
-        year_h = max(try_int(i.get('release_date', '')[:4]), year_h)
-        if i.get('vote_average'):
-            ratings.append(i['vote_average'])
-        votes += try_int(i.get('vote_count', 0))
-    if year_l == 9999:
-        year_l = None
-    if year_l:
-        infoproperties['set.year.first'] = year_l
-    if year_h:
-        infoproperties['set.year.last'] = year_h
-    if year_l and year_h:
-        infoproperties['set.years'] = f'{year_l} - {year_h}'
-    if len(ratings):
-        infoproperties['set.rating'] = infoproperties['tmdb_rating'] = f'{sum(ratings) / len(ratings):0,.1f}'
-    if votes:
-        infoproperties['set.votes'] = infoproperties['tmdb_votes'] = f'{votes:0,.0f}'
-    if genres:
-        infoproperties['set.genres'] = ' / '.join(genres)
-    infoproperties['set.numitems'] = p
     return infoproperties
 
 
@@ -205,12 +160,6 @@ def get_trailer(v, iso_639_1=None):
             return f'plugin://plugin.video.youtube/play/?video_id={i["key"]}'
         url = url or f'plugin://plugin.video.youtube/play/?video_id={i["key"]}'
     return url
-
-
-def get_genres_by_id(v):
-    genre_ids = v or []
-    genre_map = {v: k for k, v in TMDB_GENRE_IDS.items()}
-    return [i for i in (genre_map.get(try_int(genre_id)) for genre_id in genre_ids) if i]
 
 
 def get_external_ids(v):
@@ -368,11 +317,12 @@ def get_crew_properties(v):
 
 
 class ItemMapper(_ItemMapper):
-    def __init__(self, language=None, mpaa_prefix=None):
+    def __init__(self, language=None, mpaa_prefix=None, genres=None):
         self.language = language or get_language()
         self.mpaa_prefix = mpaa_prefix or get_mpaa_prefix()
         self.iso_language = language[:2]
         self.iso_country = language[-2:]
+        self.genres = genres
         self.imagepath_quality = 'IMAGEPATH_ORIGINAL'
         self.provider_allowlist = get_setting('provider_allowlist', 'str')
         self.provider_allowlist = self.provider_allowlist.split(' | ') if self.provider_allowlist else []
@@ -454,7 +404,7 @@ class ItemMapper(_ItemMapper):
             }],
             'genre_ids': [{
                 'keys': [('infolabels', 'genre')],
-                'func': get_genres_by_id
+                'func': self.get_genres_by_id
             }],
             'videos': [{
                 'keys': [('infolabels', 'trailer')],
@@ -557,7 +507,7 @@ class ItemMapper(_ItemMapper):
             }],
             'parts': [{
                 'keys': [('infoproperties', UPDATE_BASEKEY)],
-                'func': get_collection_properties
+                'func': self.get_collection_properties
             }],
             'movie_credits': [{
                 'keys': [('infoproperties', 'numitems.tmdb.movies.cast')],
@@ -718,6 +668,54 @@ class ItemMapper(_ItemMapper):
             'height': ('infoproperties', 'height'),
             'aspect_ratio': ('infoproperties', 'aspect_ratio')
         }
+
+    def get_genres_by_id(self, v):
+        genre_ids = v or []
+        genre_map = {v: k for k, v in self.genres.items()}
+        return [i for i in (genre_map.get(try_int(genre_id)) for genre_id in genre_ids) if i]
+
+    def get_collection_properties(self, v):
+        ratings = []
+        infoproperties = {}
+        year_l, year_h, votes = 9999, 0, 0
+        genres = set()
+        for p, i in enumerate(v, start=1):
+            genre = self.get_genres_by_id(i.get('genre_ids'))
+            genres.update(genre)
+
+            infoproperties[f'set.{p}.genre'] = ' / '.join(genre)
+            infoproperties[f'set.{p}.title'] = i.get('title', '')
+            infoproperties[f'set.{p}.tmdb_id'] = i.get('id', '')
+            infoproperties[f'set.{p}.originaltitle'] = i.get('original_title', '')
+            infoproperties[f'set.{p}.plot'] = i.get('overview', '')
+            infoproperties[f'set.{p}.premiered'] = i.get('release_date', '')
+            infoproperties[f'set.{p}.year'] = i.get('release_date', '')[:4]
+            infoproperties[f'set.{p}.rating'] = f'{try_float(i.get("vote_average")):0,.1f}'
+            infoproperties[f'set.{p}.votes'] = i.get('vote_count', '')
+            infoproperties[f'set.{p}.poster'] = get_imagepath_poster(i.get('poster_path', ''))
+            infoproperties[f'set.{p}.fanart'] = get_imagepath_fanart(i.get('backdrop_path', ''))
+
+            year_l = min(try_int(i.get('release_date', '')[:4]), year_l)
+            year_h = max(try_int(i.get('release_date', '')[:4]), year_h)
+            if i.get('vote_average'):
+                ratings.append(i['vote_average'])
+            votes += try_int(i.get('vote_count', 0))
+        if year_l == 9999:
+            year_l = None
+        if year_l:
+            infoproperties['set.year.first'] = year_l
+        if year_h:
+            infoproperties['set.year.last'] = year_h
+        if year_l and year_h:
+            infoproperties['set.years'] = f'{year_l} - {year_h}'
+        if len(ratings):
+            infoproperties['set.rating'] = infoproperties['tmdb_rating'] = f'{sum(ratings) / len(ratings):0,.1f}'
+        if votes:
+            infoproperties['set.votes'] = infoproperties['tmdb_votes'] = f'{votes:0,.0f}'
+        if genres:
+            infoproperties['set.genres'] = ' / '.join(genres)
+        infoproperties['set.numitems'] = p
+        return infoproperties
 
     def get_imagepath_quality(self, v):
         try:
