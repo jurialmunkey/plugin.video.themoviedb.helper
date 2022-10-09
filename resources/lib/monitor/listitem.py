@@ -38,6 +38,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         self.property_prefix = 'ListItem'
         self._clearfunc_wp = {'func': self.on_exit, 'keep_tv_artwork': True, 'is_done': False}
         self._clearfunc_lc = {'func': self.on_finalise_listcontainer, 'process_artwork': ADD_AFTER_PROCESSING, 'process_ratings': False}
+        self._pre_artwork_thread = None
 
     def setup_current_container(self):
         window_id = 'current' if get_condvisibility(CV_USE_LOCAL_CONTAINER) else None
@@ -169,7 +170,14 @@ class ListItemMonitor(CommonMonitorFunctions):
         _item.get_additional_properties()
         _listitem = self._last_listitem = _item.get_builtitem()
 
+        # Item changed so reset properties
+        if not self.is_same_item():
+            return self.on_exit(keep_tv_artwork=True)
+
         if process_artwork != ADD_AFTER_PROCESSING and process_ratings != ADD_AFTER_PROCESSING:
+            if self._pre_artwork_thread:
+                self._pre_artwork_thread.join()
+                self._pre_artwork_thread = None
             self.add_item_listcontainer(_listitem)
 
         def _process_artwork():
@@ -180,7 +188,10 @@ class ListItemMonitor(CommonMonitorFunctions):
                 self.add_item_listcontainer(_listitem)
 
         if process_artwork:
-            Thread(target=_process_artwork).start()
+            t = Thread(target=_process_artwork)
+            if process_artwork == ADD_AFTER_PROCESSING:
+                self._pre_artwork_thread = t
+            t.start()
 
         def _process_ratings():
             get_property('IsUpdatingRatings', 'True')
