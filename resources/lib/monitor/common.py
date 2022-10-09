@@ -5,11 +5,14 @@ from resources.lib.api.tvdb.api import TVDb
 from resources.lib.api.trakt.api import TraktAPI
 from resources.lib.api.fanarttv.api import FanartTV
 from resources.lib.addon.plugin import get_setting, get_infolabel, get_condvisibility
-from tmdbhelper.parser import try_int, merge_two_dicts
 from resources.lib.addon.tmdate import convert_timestamp, get_region_date
 from resources.lib.items.builder import ItemBuilder
 from resources.lib.addon.logger import kodi_traceback, kodi_try_except, kodi_log
 from resources.lib.files.futils import validate_join
+from resources.lib.api.mapping import get_empty_item
+from resources.lib.api.kodi.rpc import get_person_stats
+from tmdbhelper.parser import try_int, merge_two_dicts
+from collections import namedtuple
 import xbmcvfs
 import json
 
@@ -39,7 +42,6 @@ SETPROP_RATINGS = {
     'goldenglobe_awards_nominated', 'mtv_awards_nominated', 'criticschoice_awards_nominated',
     'emmy_awards_nominated', 'sag_awards_nominated', 'bafta_awards_nominated'}
 
-
 TVDB_AWARDS_KEYS = {
     'Academy Awards': 'academy',
     'Golden Globe Awards': 'goldenglobe',
@@ -47,30 +49,167 @@ TVDB_AWARDS_KEYS = {
     'Critics\' Choice Awards': 'criticschoice',
     'Primetime Emmy Awards': 'emmy',
     'Screen Actors Guild Awards': 'sag',
-    'BAFTA Awards': 'bafta',
-}
+    'BAFTA Awards': 'bafta'}
+
+ItemDetails = namedtuple("ItemDetails", "tmdb_type tmdb_id listitem artwork")
 
 
-class CommonMonitorFunctions(object):
+class CommonMonitorDetails():
     def __init__(self):
-        self.properties = set()
-        self.index_properties = set()
         self.trakt_api = TraktAPI()
         self.tmdb_api = TMDb()
         self.ftv_api = FanartTV()
         self.tvdb_api = TVDb()
         self.omdb_api = OMDb() if get_setting('omdb_apikey', 'str') else None
         self.ib = ItemBuilder(tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api)
+        self.ib.ftv_api = self.ftv_api if get_setting('service_fanarttv_lookup') else None
+        self.all_awards = self.get_awards_data()
         self.imdb_top250 = {}
-        self.property_prefix = 'ListItem'
+        self._itemcache = {}
 
+    def get_awards_data(self):
         try:
             filepath = validate_join('special://home/addons/plugin.video.themoviedb.helper/resources/jsondata/', 'awards.json')
             with xbmcvfs.File(filepath, 'r') as file:
-                self.all_awards = json.load(file)
+                return json.load(file)
         except (IOError, json.JSONDecodeError):
-            self.all_awards = {'movie': {}, 'tv': {}}
             kodi_log('ERROR: Failed to load awards data!')
+            return {'movie': {}, 'tv': {}}
+
+    @kodi_try_except('lib.monitor.common get_tmdb_id')
+    def get_tmdb_id(self, tmdb_type, imdb_id=None, query=None, year=None, episode_year=None):
+        if imdb_id and imdb_id.startswith('tt'):
+            return self.tmdb_api.get_tmdb_id(tmdb_type=tmdb_type, imdb_id=imdb_id)
+        return self.tmdb_api.get_tmdb_id(tmdb_type=tmdb_type, query=query, year=year, episode_year=episode_year)
+
+    @kodi_try_except('lib.monitor.common get_tmdb_id')
+    def get_tmdb_id_multi(self, media_type=None, imdb_id=None, query=None, year=None, episode_year=None):
+        multi_i = self.tmdb_api.get_tmdb_multisearch(query=query, media_type=media_type) or {}
+        return (multi_i.get('id'), multi_i.get('media_type'),)
+
+    def get_trakt_ratings(self, item, trakt_type, season=None, episode=None):
+        _dummdict = {}
+        ratings = self.trakt_api.get_ratings(
+            trakt_type=trakt_type,
+            imdb_id=item.get('unique_ids', _dummdict).get('tvshow.imdb') or item.get('unique_ids', _dummdict).get('imdb'),
+            trakt_id=item.get('unique_ids', _dummdict).get('tvshow.trakt') or item.get('unique_ids', _dummdict).get('trakt'),
+            slug_id=item.get('unique_ids', _dummdict).get('tvshow.slug') or item.get('unique_ids', _dummdict).get('slug'),
+            season=season,
+            episode=episode)
+        if not ratings:
+            return item
+        item['infoproperties'] = merge_two_dicts(item.get('infoproperties', {}), ratings)
+        return item
+
+    def get_imdb_top250_rank(self, item, trakt_type):
+        try:
+            tmdb_id = try_int(item['unique_ids'].get('tvshow.tmdb') or item['unique_ids'].get('tmdb'))
+        except KeyError:
+            tmdb_id = None
+        if not tmdb_id:
+            return item
+        try:
+            imdb_top250 = self.imdb_top250[trakt_type]
+        except KeyError:
+            imdb_top250 = self.trakt_api.get_imdb_top250(id_type='tmdb', trakt_type=trakt_type)
+            if not imdb_top250:
+                return item
+            self.imdb_top250[trakt_type] = imdb_top250
+        try:
+            item['infoproperties']['top250'] = item['infolabels']['top250'] = imdb_top250.index(tmdb_id) + 1
+        except Exception:
+            return item
+        return item
+
+    def get_omdb_ratings(self, item, cache_only=False):
+        if not self.omdb_api:
+            return item
+        return self.omdb_api.get_item_ratings(item, cache_only=cache_only)
+
+    def get_tvdb_awards(self, item, tmdb_type, tmdb_id):
+        try:
+            awards = self.all_awards[tmdb_type][str(tmdb_id)]
+        except(KeyError, TypeError, AttributeError):
+            return item
+        for t in ['awards_won', 'awards_nominated']:
+            item_awards = awards.get(t)
+            if not item_awards:
+                continue
+            all_awards, all_awards_cr = [], []
+            for cat, lst in item_awards.items():
+                all_awards_cr.append(f'[CR]{cat}' if all_awards else cat)
+                all_awards_cr += lst
+                all_awards += [(f'{cat} {i}') for i in lst]
+                try:
+                    item['infoproperties'][f'{TVDB_AWARDS_KEYS[cat]}_{t}'] = len(lst)
+                except(KeyError, TypeError, AttributeError):
+                    continue
+            if all_awards:
+                item['infoproperties'][f'total_{t}'] = len(all_awards)
+                item['infoproperties'][t] = ' / '.join(all_awards)
+                item['infoproperties'][f'{t}_cr'] = '[CR]'.join(all_awards_cr)
+        return item
+
+    def get_all_ratings(self, item, tmdb_type, tmdb_id, season=None, episode=None):
+        try:
+            trakt_type = {'movie': 'movie', 'tv': 'show'}[tmdb_type]
+        except KeyError:
+            return item  # Only lookup ratings for movie or tvshow
+        item = self.get_omdb_ratings(item)
+        item = self.get_imdb_top250_rank(item, trakt_type=trakt_type)
+        item = self.get_trakt_ratings(item, trakt_type, season=season, episode=episode)
+        item = self.get_tvdb_awards(item, tmdb_type, tmdb_id)
+        item = self.get_nextaired(item, tmdb_type, tmdb_id)
+        return item
+
+    def get_person_stats(self, item, tmdb_type, tmdb_id):
+        if tmdb_type != 'person':
+            return item
+
+            return item
+        try:
+            name = item['infolabels']['title']
+        except (KeyError, AttributeError, NameError):
+            return item
+        item.setdefault('infoproperties', {}).update(get_person_stats(name) or {})
+        return item
+
+    def get_nextaired(self, item, tmdb_type, tmdb_id):
+        if tmdb_type != 'tv':
+            return item
+        nextaired = self.tmdb_api.get_tvshow_nextaired(tmdb_id)
+        item['infoproperties'].update(nextaired)
+        return item
+
+    def use_itemcache(self, cache_name, func, *args, **kwargs):
+        cache_data = self._itemcache.get(cache_name) or func(*args, **kwargs)
+        if not cache_data:
+            return
+        self._itemcache[cache_name] = cache_data
+        return cache_data
+
+    @staticmethod
+    def get_itemdetails_blank():
+        return ItemDetails(None, None, get_empty_item(), {})
+
+    def get_itemdetails_lookup(self, tmdb_type=None, tmdb_id=None, season=None, episode=None):
+        details = self.ib.get_item(tmdb_type, tmdb_id, season, episode)
+        try:
+            return ItemDetails(tmdb_type, tmdb_id, details['listitem'], details['artwork'])
+        except (KeyError, AttributeError, TypeError):
+            return
+
+    def get_itemdetails_cache(self, tmdb_type=None, tmdb_id=None, season=None, episode=None):
+        cache_name = f'{tmdb_type}.{tmdb_id}.{season}.{episode}'
+        return self.use_itemcache(cache_name, self.get_itemdetails_lookup, tmdb_type, tmdb_id, season, episode)
+
+
+class CommonMonitorFunctions(CommonMonitorDetails):
+    def __init__(self):
+        self.properties = set()
+        self.index_properties = set()
+        self.property_prefix = 'ListItem'
+        super(CommonMonitorFunctions, self).__init__()
 
     @kodi_try_except('lib.monitor.common clear_property')
     def clear_property(self, key):
@@ -164,87 +303,10 @@ class CommonMonitorFunctions(object):
         if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableExtendedProperties)"):
             self.set_indexed_properties(item.get('infoproperties', {}))
 
-    @kodi_try_except('lib.monitor.common get_tmdb_id')
-    def get_tmdb_id(self, tmdb_type, imdb_id=None, query=None, year=None, episode_year=None):
-        if imdb_id and imdb_id.startswith('tt'):
-            return self.tmdb_api.get_tmdb_id(tmdb_type=tmdb_type, imdb_id=imdb_id)
-        return self.tmdb_api.get_tmdb_id(tmdb_type=tmdb_type, query=query, year=year, episode_year=episode_year)
-
-    @kodi_try_except('lib.monitor.common get_tmdb_id')
-    def get_tmdb_id_multi(self, media_type=None, imdb_id=None, query=None, year=None, episode_year=None):
-        multi_i = self.tmdb_api.get_tmdb_multisearch(query=query, media_type=media_type) or {}
-        return (multi_i.get('id'), multi_i.get('media_type'),)
-
-    def get_trakt_ratings(self, item, trakt_type, season=None, episode=None):
-        _dummdict = {}
-        ratings = self.trakt_api.get_ratings(
-            trakt_type=trakt_type,
-            imdb_id=item.get('unique_ids', _dummdict).get('tvshow.imdb') or item.get('unique_ids', _dummdict).get('imdb'),
-            trakt_id=item.get('unique_ids', _dummdict).get('tvshow.trakt') or item.get('unique_ids', _dummdict).get('trakt'),
-            slug_id=item.get('unique_ids', _dummdict).get('tvshow.slug') or item.get('unique_ids', _dummdict).get('slug'),
-            season=season,
-            episode=episode)
-        if not ratings:
-            return item
-        item['infoproperties'] = merge_two_dicts(item.get('infoproperties', {}), ratings)
-        return item
-
-    def get_imdb_top250_rank(self, item, trakt_type):
-        try:
-            tmdb_id = try_int(item['unique_ids'].get('tvshow.tmdb') or item['unique_ids'].get('tmdb'))
-        except KeyError:
-            tmdb_id = None
-        if not tmdb_id:
-            return item
-        try:
-            imdb_top250 = self.imdb_top250[trakt_type]
-        except KeyError:
-            imdb_top250 = self.trakt_api.get_imdb_top250(id_type='tmdb', trakt_type=trakt_type)
-            if not imdb_top250:
-                return item
-            self.imdb_top250[trakt_type] = imdb_top250
-        try:
-            item['infoproperties']['top250'] = item['infolabels']['top250'] = imdb_top250.index(tmdb_id) + 1
-        except Exception:
-            return item
-        return item
-
-    def get_omdb_ratings(self, item, cache_only=False):
-        if not self.omdb_api:
-            return item
-        return self.omdb_api.get_item_ratings(item, cache_only=cache_only)
-
-    def get_tvdb_awards(self, item, tmdb_type, tmdb_id):
-        try:
-            awards = self.all_awards[tmdb_type][str(tmdb_id)]
-        except(KeyError, TypeError, AttributeError):
-            return item
-
-        for t in ['awards_won', 'awards_nominated']:
-            item_awards = awards.get(t)
-            if not item_awards:
-                continue
-            all_awards, all_awards_cr = [], []
-            for cat, lst in item_awards.items():
-                all_awards_cr.append(f'[CR]{cat}' if all_awards else cat)
-                all_awards_cr += lst
-                all_awards += [(f'{cat} {i}') for i in lst]
-                try:
-                    item['infoproperties'][f'{TVDB_AWARDS_KEYS[cat]}_{t}'] = len(lst)
-                except(KeyError, TypeError, AttributeError):
-                    continue
-
-            if all_awards:
-                item['infoproperties'][f'total_{t}'] = len(all_awards)
-                item['infoproperties'][t] = ' / '.join(all_awards)
-                item['infoproperties'][f'{t}_cr'] = '[CR]'.join(all_awards_cr)
-
-        return item
-
     def clear_properties(self, ignore_keys=None):
         if not ignore_keys:
-            self.cur_item = 0
-            self.pre_item = 1
+            self._cur_item = 0
+            self._pre_item = 1
         ignore_keys = ignore_keys or set()
         for k in self.properties - ignore_keys:
             self.clear_property(k)

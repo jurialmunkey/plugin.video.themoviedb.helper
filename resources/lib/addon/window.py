@@ -117,3 +117,21 @@ def wait_until_updated(container_id=9999, instance_id=None, poll=1, timeout=60):
     del xbmc_monitor
     if timeout > 0 and _is_base_active(instance_id):
         return container_id
+
+
+class WindowProperty():
+    def __init__(self, *args):
+        """ ContextManager for setting a WindowProperty over duration """
+        self.property_pairs = args
+
+        for k, v in self.property_pairs:
+            if not k or not v:
+                continue
+            get_property(k, set_property=v)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        for k, v in self.property_pairs:
+            get_property(k, clear_property=True)

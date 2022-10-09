@@ -6,7 +6,7 @@ from resources.lib.addon.dialog import BusyDialog
 from resources.lib.addon.thread import ParallelThread
 from resources.lib.addon.plugin import get_infolabel, executebuiltin, get_condvisibility, ADDONPATH
 from resources.lib.api.tmdb.api import TMDb
-from resources.lib.addon.window import get_property
+from resources.lib.addon.window import get_property, WindowProperty
 from tmdbhelper.parser import parse_paramstring, reconfigure_legacy_params
 from threading import Thread
 
@@ -51,24 +51,6 @@ script-tmdbhelper-recommendations.xml
 <onload>SetProperty(Action_{list_id},action)</onload>
     * Set an action for an undefined list
 """
-
-
-class WindowProperty():
-    def __init__(self, *args):
-        """ ContextManager for DialogBusy in with statement """
-        self.property_pairs = args
-
-        for k, v in self.property_pairs:
-            if not k or not v:
-                continue
-            get_property(k, set_property=v)
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, exc_traceback):
-        for k, v in self.property_pairs:
-            get_property(k, clear_property=True)
 
 
 class WindowRecommendations(xbmcgui.WindowXMLDialog):
