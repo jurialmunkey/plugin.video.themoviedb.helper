@@ -41,12 +41,12 @@ class ListItemMonitor(CommonMonitorFunctions):
         self._pre_artwork_thread = None
 
     def setup_current_container(self):
-        window_id = 'current' if get_condvisibility(CV_USE_LOCAL_CONTAINER) else None
+        self._cur_window = get_current_window()
+        self._listcontainer = self.get_listcontainer()
+        window_id = self._cur_window if get_condvisibility(CV_USE_LOCAL_CONTAINER) else None
         widget_id = get_property('WidgetContainer', window_id=window_id, is_type=int)
         self.container = f'Container({widget_id}).' if widget_id else 'Container.'
         self.container_item = 'ListItem.' if get_condvisibility(CV_USE_LISTITEM) else f'{self.container}ListItem({{}}).'
-        self._cur_window = get_current_window()
-        self._listcontainer = self.get_listcontainer()
 
     def setup_current_item(self, position=0):
         self._item = ListItemDetails(self, position)

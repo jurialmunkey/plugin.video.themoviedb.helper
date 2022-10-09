@@ -17,7 +17,7 @@ def get_property(name, set_property=None, clear_property=False, window_id=None, 
         prefix = prefix or 'TMDbHelper'
         name = f'{prefix}.{name}'
     if window_id == 'current':
-        window_id = getCurrentWindowId()
+        window_id = get_current_window()
     window = Window(window_id or 10000)  # Fallback to home window id=10000
     ret_property = set_property or window.getProperty(name)
     if clear_property:
