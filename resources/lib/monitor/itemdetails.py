@@ -49,7 +49,7 @@ class ListItemDetails():
         self._dbtype = self.get_dbtype()
         self._query = self.get_query()
         self._year = self.get_infolabel('year')
-        if self._dbtype in ['episode', 'multi']:
+        if self._dbtype in ['episodes', 'multi']:
             self._season = self.get_infolabel('Season')
             self._episode = self.get_infolabel('Episode')
         self._imdb_id = self.get_imdb_id() if not self._season else None
