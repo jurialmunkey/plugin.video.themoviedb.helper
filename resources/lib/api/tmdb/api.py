@@ -509,9 +509,20 @@ class TMDb(RequestAPI):
 
         if kwargs.get('page') == 'random':
             import random
-            kwargs['page'] = random.randint(int(kwargs.get('random_page_start', 1)), int(kwargs.get('random_page_end', 10)))
 
-        response = self.get_request_sc(path, **kwargs)
+            def _get_random_page(page_end):
+                kwargs['page'] = random.randint(1, page_end)
+                return self.get_request_sc(path, **kwargs)
+
+            page_end = int(kwargs.get('random_page_limit', 10))
+            response = _get_random_page(page_end)
+
+            if response and not response.get(key) and int(response.get('total_pages') or 1) < page_end:
+                response = _get_random_page(int(response['total_pages'] or 1))
+
+        else:
+            response = self.get_request_sc(path, **kwargs)
+
         if not response:
             return []
 
