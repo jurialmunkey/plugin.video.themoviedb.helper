@@ -506,6 +506,11 @@ class TMDb(RequestAPI):
     def get_basic_list(
             self, path, tmdb_type, key='results', params=None, base_tmdb_type=None, limit=None, filters={},
             sort_key=None, stacked=None, **kwargs):
+
+        if kwargs.get('page') == 'random':
+            import random
+            kwargs['page'] = random.randint(int(kwargs.get('random_page_start', 1)), int(kwargs.get('random_page_end', 10)))
+
         response = self.get_request_sc(path, **kwargs)
         if not response:
             return []
