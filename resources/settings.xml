@@ -460,7 +460,7 @@
 				</setting>
 			</group>
 		</category>
-		<category id="accounts" label="32083" help="">
+		<category id="accounts" label="32470" help="">
 			<group id="1" label="32031">
 				<setting id="authenticate_trakt" type="action" label="32010" help="">
 					<level>0</level>
@@ -532,7 +532,7 @@
 					</dependencies>
 					<control type="toggle"/>
 				</setting>
-				<setting id="trakt_playprogress" type="boolean" label="32407" help="">
+				<setting id="trakt_sortignorearticle" type="boolean" label="32469" help="">
 					<level>0</level>
 					<default>false</default>
 					<control type="toggle"/>
@@ -545,6 +545,11 @@
 				<setting id="trakt_cacheownlists" type="boolean" label="32463" help="">
 					<level>0</level>
 					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="trakt_playprogress" type="boolean" label="32407" help="">
+					<level>0</level>
+					<default>false</default>
 					<control type="toggle"/>
 				</setting>
 			</group>

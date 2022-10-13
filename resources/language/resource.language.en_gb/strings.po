@@ -2386,6 +2386,16 @@ msgctxt "#32468"
 msgid "Authorisation and sync notifications on startup"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32469"
+msgid "Ignore articles when sorting alphabetically"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32470"
+msgid "Trakt"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

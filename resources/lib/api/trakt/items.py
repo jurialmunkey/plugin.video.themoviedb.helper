@@ -1,8 +1,12 @@
+import re
 import random
-from resources.lib.addon.plugin import PLUGINPATH, convert_type, convert_trakt_type
+from resources.lib.addon.plugin import PLUGINPATH, convert_type, convert_trakt_type, get_setting
 from tmdbhelper.parser import try_int, try_str, del_empty_keys, get_params, partition_list
 from resources.lib.addon.tmdate import date_in_range
 from resources.lib.items.filters import is_excluded
+
+
+REGEX_DEFARTICLE = r'(?i)^The '
 
 
 EPISODE_PARAMS = {
@@ -14,16 +18,24 @@ def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
     _dummydict, _dummystr, _dummyint = {}, '', 0
     _dummystr_release = '9999-01-01T00:00:00.000Z'
 
-    def _item_lambda_simple(items, sort_key: str, sort_fallback=None, sort_reverse=False):
+    def _item_lambda_parent(i, sort_key):
+        return i.get(trakt_type or i.get('type'), _dummydict).get(sort_key)
+
+    def _sort_lambda_simple(items, sort_key: str, sort_fallback=None, sort_reverse=False):
         return sorted(items, key=lambda i: i.get(sort_key) or sort_fallback, reverse=sort_reverse)
 
-    def _item_lambda_parent(items, sort_key: str, sort_fallback=None, sort_reverse=False):
-        return sorted(items, key=lambda i: i.get(trakt_type or i.get('type'), _dummydict).get(sort_key) or sort_fallback, reverse=sort_reverse)
+    def _sort_lambda_parent(items, sort_key: str, sort_fallback=None, sort_reverse=False):
+        return sorted(items, key=lambda i: _item_lambda_parent(i, sort_key) or sort_fallback, reverse=sort_reverse)
 
-    def _item_lambda_max_of(items, sort_keys: list, sort_fallback=None, sort_reverse=False):
+    def _sort_lambda_ignore(items, sort_key: str, sort_fallback=None, sort_reverse=False):
+        if not get_setting('trakt_sortignorearticle'):
+            return _sort_lambda_parent(items, sort_key, sort_fallback, sort_reverse)
+        return sorted(items, key=lambda i: re.sub(REGEX_DEFARTICLE, '', _item_lambda_parent(i, sort_key) or sort_fallback), reverse=sort_reverse)
+
+    def _sort_lambda_max_of(items, sort_keys: list, sort_fallback=None, sort_reverse=False):
         return sorted(items, key=lambda i: max(*[i.get(k) or sort_fallback for k in sort_keys]), reverse=sort_reverse)
 
-    def _item_lambda_mixing(items, sort_keys: tuple, sort_fallback=None, sort_reverse=False, sort_types: list = None):
+    def _sort_lambda_mixing(items, sort_keys: tuple, sort_fallback=None, sort_reverse=False, sort_types: list = None):
         return sorted(
             items,
             key=lambda i: (
@@ -33,40 +45,40 @@ def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
                 try_str(i.get(trakt_type or i.get('type'), _dummydict).get(sort_keys[1]) or sort_fallback)),
             reverse=sort_reverse)
 
-    def _item_lambda_airing(items, sort_start: int):
+    def _sort_lambda_airing(items, sort_start: int):
         ly, lx = partition_list(items, lambda i: date_in_range(
             i.get(trakt_type or i.get('type'), _dummydict).get('first_aired'),
             utc_convert=True, start_date=sort_start, days=abs(sort_start) + 1))
-        return _item_lambda_parent(list(lx), 'first_aired', _dummystr, True) + list(ly)
+        return _sort_lambda_parent(list(lx), 'first_aired', _dummystr, True) + list(ly)
 
-    def _item_lambda_random(items):
+    def _sort_lambda_random(items):
         random.shuffle(items)
         return items
 
     reverse = True if sort_how == 'desc' else False
     routing = {
         'unsorted': lambda: items,
-        'rank': lambda: _item_lambda_simple(items, 'rank', _dummyint, reverse),
-        'plays': lambda: _item_lambda_simple(items, 'plays', _dummyint, reverse),
-        'watched': lambda: _item_lambda_simple(items, 'last_watched_at', _dummystr, reverse),
-        'paused': lambda: _item_lambda_simple(items, 'paused_at', _dummystr, reverse),
-        'added': lambda: _item_lambda_simple(items, 'listed_at', _dummystr, reverse),
-        'title': lambda: _item_lambda_parent(items, 'title', _dummystr, reverse),
-        'year': lambda: _item_lambda_parent(items, 'year', _dummyint if reverse else 9999, reverse),
-        'released': lambda: _item_lambda_mixing(items, ('first_aired', 'released',), _dummystr if reverse else _dummystr_release, reverse, sort_types=['show', 'episode']),
-        'runtime': lambda: _item_lambda_parent(items, 'runtime', _dummyint, reverse),
-        'popularity': lambda: _item_lambda_parent(items, 'comment_count', _dummyint, reverse),
-        'percentage': lambda: _item_lambda_parent(items, 'rating', _dummyint, reverse),
-        'votes': lambda: _item_lambda_parent(items, 'votes', _dummyint, reverse),
-        'random': lambda: _item_lambda_random(items, ),
-        'activity': lambda: _item_lambda_max_of(items, ['last_watched_at', 'paused_at', 'listed_at'], _dummystr, reverse),
-        'airing': lambda: _item_lambda_airing(items, try_int(sort_how, fallback=_dummyint))
+        'rank': lambda: _sort_lambda_simple(items, 'rank', _dummyint, reverse),
+        'plays': lambda: _sort_lambda_simple(items, 'plays', _dummyint, reverse),
+        'watched': lambda: _sort_lambda_simple(items, 'last_watched_at', _dummystr, reverse),
+        'paused': lambda: _sort_lambda_simple(items, 'paused_at', _dummystr, reverse),
+        'added': lambda: _sort_lambda_simple(items, 'listed_at', _dummystr, reverse),
+        'title': lambda: _sort_lambda_ignore(items, 'title', _dummystr, reverse),
+        'year': lambda: _sort_lambda_parent(items, 'year', _dummyint if reverse else 9999, reverse),
+        'released': lambda: _sort_lambda_mixing(items, ('first_aired', 'released',), _dummystr if reverse else _dummystr_release, reverse, sort_types=['show', 'episode']),
+        'runtime': lambda: _sort_lambda_parent(items, 'runtime', _dummyint, reverse),
+        'popularity': lambda: _sort_lambda_parent(items, 'comment_count', _dummyint, reverse),
+        'percentage': lambda: _sort_lambda_parent(items, 'rating', _dummyint, reverse),
+        'votes': lambda: _sort_lambda_parent(items, 'votes', _dummyint, reverse),
+        'random': lambda: _sort_lambda_random(items, ),
+        'activity': lambda: _sort_lambda_max_of(items, ['last_watched_at', 'paused_at', 'listed_at'], _dummystr, reverse),
+        'airing': lambda: _sort_lambda_airing(items, try_int(sort_how, fallback=_dummyint))
     }
 
     try:
         return routing[sort_by]()
     except KeyError:
-        return _item_lambda_simple(items, 'listed_at', _dummystr, True)
+        return _sort_lambda_simple(items, 'listed_at', _dummystr, True)
 
 
 def _get_item_title(item):
