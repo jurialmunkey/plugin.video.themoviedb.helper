@@ -1,5 +1,5 @@
 from resources.lib.addon.tmdate import get_timedelta, get_datetime_today
-from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized
+from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized, ADDON
 from tmdbhelper.parser import merge_two_items
 from resources.lib.items.builder import ItemBuilder
 from resources.lib.items.container import Container
@@ -837,7 +837,7 @@ def _get_basedir_main():
             'path': PLUGINPATH,
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',
-                'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'}},
+                'icon': f'{ADDONPATH}/resources/icons/themoviedb/discover.png'}},
         {
             'label': get_localized(32173),
             'types': [None],
@@ -845,7 +845,7 @@ def _get_basedir_main():
             'path': PLUGINPATH,
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',
-                'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'}},
+                'icon': f'{ADDONPATH}/resources/icons/themoviedb/randomise.png'}},
         {
             'label': u'TheMovieDb',
             'types': [None],
@@ -877,7 +877,15 @@ def _get_basedir_main():
             'path': PLUGINPATH,
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',
-                'icon': f'{ADDONPATH}/resources/icons/mdblist/mdblist.png'}}]
+                'icon': f'{ADDONPATH}/resources/icons/mdblist/mdblist.png'}},
+        {
+            'label': u'Settings',
+            'types': [None],
+            'params': {'info': 'dir_settings'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/themoviedb/settings.png'}}]
 
 
 def _get_basedir_calendar_items():
@@ -1049,7 +1057,8 @@ class ListBaseDir(Container):
             'dir_tvdb': lambda: _get_basedir_list(None, tvdb=True),
             'dir_random': lambda: _build_basedir(None, _get_basedir_random()),
             'dir_calendar_trakt': lambda: _get_basedir_calendar(info='trakt_calendar', endpoint=kwargs.get('endpoint'), user=kwargs.get('user')),
-            'dir_calendar_library': lambda: _get_basedir_calendar(info='library_nextaired')
+            'dir_calendar_library': lambda: _get_basedir_calendar(info='library_nextaired'),
+            'dir_settings': lambda: ADDON.openSettings()
         }
         func = route.get(info, lambda: _build_basedir(None, _get_basedir_main()))
         return func()
