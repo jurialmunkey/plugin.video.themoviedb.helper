@@ -26,6 +26,7 @@ class ListBasic(Container):
         if 'tmdb_cache_only' in info_model:
             self.tmdb_cache_only = info_model['tmdb_cache_only']
         self.kodi_db = self.get_kodi_database(info_tmdb_type)
+        self.sort_by_dbid = True if self.kodi_db and info_model.get('dbid_sorting') else False
         self.library = convert_type(info_tmdb_type, 'library')
         self.container_content = convert_type(info_tmdb_type, 'container')
         self.plugin_category = get_plugin_category(info_model, convert_type(info_tmdb_type, 'plural'))
