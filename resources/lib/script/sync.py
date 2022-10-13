@@ -13,6 +13,74 @@ from resources.lib.update.userlist import get_monitor_userlists
 from resources.lib.update.library import add_to_library
 
 
+def _menu_item_watchlist():
+    return {
+        'class': _SyncItem,
+        'kwargs': {
+            'method': 'watchlist',
+            'sync_type': 'watchlist',
+            'allow_episodes': False,
+            'name_add': get_localized(32291),
+            'name_remove': get_localized(32292)}}
+
+def _menu_item_collection():
+    return {
+        'class': _SyncItem,
+        'kwargs': {
+            'method': 'collection',
+            'sync_type': 'collection',
+            'allow_episodes': True,
+            'name_add': get_localized(32289),
+            'name_remove': get_localized(32290)}}
+
+
+def _menu_item_recommendations():
+    return {
+        'class': _SyncItem,
+        'kwargs': {
+            'method': 'recommendations',
+            'sync_type': 'recommendations',
+            'allow_episodes': False,
+            'name_add': get_localized(32293),
+            'name_remove': get_localized(32294)}}
+
+
+def _menu_item_watched():
+    return {
+        'class': _SyncItem,
+        'kwargs': {
+            'method': 'history',
+            'sync_type': 'watched',
+            'allow_episodes': True,
+            'preconfigured': True,
+            'remove': False,
+            'name': get_localized(16103)}}
+
+
+def _menu_item_unwatched():
+    return {
+        'class': _SyncItem,
+        'kwargs': {
+            'method': 'history',
+            'sync_type': 'watched',
+            'allow_episodes': True,
+            'preconfigured': True,
+            'remove': True,
+            'name': get_localized(16104)}}
+
+
+def _menu_item_userlist():
+    return {'class': _UserList}
+
+
+def _menu_item_progress():
+    return {'class': _ProgressItem}
+
+
+def _menu_item_comments():
+    return {'class': _Comments}
+
+
 def _menu_items():
     """ Build the menu of options
     method and sync_type indicate Trakt API call
@@ -26,62 +94,38 @@ def _menu_items():
         - do not include the menu item if it is a single episode
     """
     return [
-        {
-            'class': _UserList},
-        {
-            'class': _SyncItem,
-            'kwargs': {
-                'method': 'history',
-                'sync_type': 'watched',
-                'allow_episodes': True,
-                'preconfigured': True,
-                'remove': False,
-                'name': get_localized(16103)}},
-        {
-            'class': _SyncItem,
-            'kwargs': {
-                'method': 'history',
-                'sync_type': 'watched',
-                'allow_episodes': True,
-                'preconfigured': True,
-                'remove': True,
-                'name': get_localized(16104)}},
-        {
-            'class': _ProgressItem},
-        {
-            'class': _SyncItem,
-            'kwargs': {
-                'method': 'collection',
-                'sync_type': 'collection',
-                'allow_episodes': True,
-                'name_add': get_localized(32289),
-                'name_remove': get_localized(32290)}},
-        {
-            'class': _SyncItem,
-            'kwargs': {
-                'method': 'watchlist',
-                'sync_type': 'watchlist',
-                'allow_episodes': False,
-                'name_add': get_localized(32291),
-                'name_remove': get_localized(32292)}},
-        {
-            'class': _SyncItem,
-            'kwargs': {
-                'method': 'recommendations',
-                'sync_type': 'recommendations',
-                'allow_episodes': False,
-                'name_add': get_localized(32293),
-                'name_remove': get_localized(32294)}},
-        {
-            'class': _Comments},
+        _menu_item_userlist(),
+        _menu_item_watched(),
+        _menu_item_unwatched(),
+        _menu_item_progress(),
+        _menu_item_collection(),
+        _menu_item_watchlist(),
+        _menu_item_recommendations(),
+        _menu_item_comments(),
     ]
 
 
-def sync_trakt_item(trakt_type, unique_id, season=None, episode=None, id_type=None):
+def sync_trakt_item(trakt_type, unique_id, season=None, episode=None, id_type=None, sync_type=None):
     if id_type in ['tmdb', 'tvdb', 'trakt']:
         unique_id = try_int(unique_id)
+
+    route = {
+        'watched': lambda: [_menu_item_watched()],
+        'unwatched': lambda: [_menu_item_unwatched()],
+        'collection': lambda: [_menu_item_collection()],
+        'watchlist': lambda: [_menu_item_watchlist()],
+        'recommendations': lambda: [_menu_item_recommendations()],
+        'comments': lambda: [_menu_item_comments()],
+        'userlist': lambda: [_menu_item_userlist()],
+        'progress': lambda: [_menu_item_progress()]}
+
+    try:
+        items = route[sync_type]()
+    except KeyError:
+        items = _menu_items()
+
     menu = _Menu(
-        items=_menu_items(), trakt_type=trakt_type, unique_id=unique_id, id_type=id_type,
+        items=items, trakt_type=trakt_type, unique_id=unique_id, id_type=id_type,
         season=try_int(season, fallback=None), episode=try_int(episode, fallback=None))
     menu.select()
 
@@ -105,9 +149,9 @@ class _Menu():
 
     def select(self):
         """ Ask user to select item from menu and do the appropriate sync action """
-        if not self.menu:
-            self.build_menu()
-        return self.sync(self._select())
+        if not self.menu and not self.build_menu():  # No menu so build it and if still None then exit
+            return
+        return self.sync(self.menu[0] if len(self.menu) == 1 else self._select())  # Auto-select if only one option
 
     def _select(self):
         """ Ask user to select menu item """

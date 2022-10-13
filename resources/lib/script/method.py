@@ -122,12 +122,12 @@ def kodi_setting(kodi_setting, **kwargs):
 
 @is_in_kwargs({'tmdb_type': ['movie', 'tv']})
 @get_tmdb_id
-def sync_trakt(tmdb_type=None, tmdb_id=None, season=None, episode=None, **kwargs):
+def sync_trakt(tmdb_type=None, tmdb_id=None, season=None, episode=None, sync_type=None, **kwargs):
     """ Open sync trakt menu for item """
     from resources.lib.script.sync import sync_trakt_item
     from resources.lib.addon.plugin import convert_type
     trakt_type = convert_type(tmdb_type, 'trakt', season=season, episode=episode)
-    sync_trakt_item(trakt_type=trakt_type, unique_id=tmdb_id, season=season, episode=episode, id_type='tmdb')
+    sync_trakt_item(trakt_type=trakt_type, unique_id=tmdb_id, season=season, episode=episode, id_type='tmdb', sync_type=sync_type)
 
 
 @is_in_kwargs({'tmdb_type': True})
