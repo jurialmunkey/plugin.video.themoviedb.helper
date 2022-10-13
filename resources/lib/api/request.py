@@ -1,6 +1,6 @@
 from xbmcgui import Dialog
 from resources.lib.addon.window import get_property
-from resources.lib.addon.plugin import get_localized, get_condvisibility
+from resources.lib.addon.plugin import get_localized, get_condvisibility, get_setting
 from tmdbhelper.parser import try_int
 from resources.lib.addon.tmdate import get_timestamp, set_timestamp
 from resources.lib.files.bcache import BasicCache
@@ -41,7 +41,7 @@ def json_loads(obj):
 
 
 class RequestAPI(object):
-    def __init__(self, req_api_url=None, req_api_key=None, req_api_name=None, timeout=None, error_notification=True):
+    def __init__(self, req_api_url=None, req_api_key=None, req_api_name=None, timeout=None, error_notification=get_setting('connection_notifications')):
         self.req_api_url = req_api_url or ''
         self.req_api_key = req_api_key or ''
         self.req_api_name = req_api_name or ''

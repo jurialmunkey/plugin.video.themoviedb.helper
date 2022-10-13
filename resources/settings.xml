@@ -650,6 +650,11 @@
 					<default>True</default>
 					<control type="toggle"/>
 				</setting>
+				<setting id="connection_notifications" type="boolean" label="32471" help="">
+					<level>0</level>
+					<default>True</default>
+					<control type="toggle"/>
+				</setting>
 			</group>
 		</category>
 		<category id="expert" label="10039" help="">
