@@ -35,8 +35,6 @@ class ListItemDetails():
     def __init__(self, parent, position=0):
         self._parent = parent
         self._position = position
-        self._tmdb_type = None
-        self._tmdb_id = None
         self._season = None
         self._episode = None
         self._itemdetails = None
@@ -127,19 +125,19 @@ class ListItemDetails():
             self._itemdetails.listitem, self._itemdetails.tmdb_type, self._itemdetails.tmdb_id)
 
     def get_all_ratings(self, use_deepcopy=False):
-        if self._tmdb_type not in ['movie', 'tv']:
+        if self._itemdetails.tmdb_type not in ['movie', 'tv']:
             return {}
         if not self._itemdetails or not self._itemdetails.listitem:
             return {}
         _listitem = deepcopy(self._itemdetails.listitem) if use_deepcopy else self._itemdetails.listitem
-        return self._parent.get_all_ratings(_listitem, self._tmdb_type, self._tmdb_id, self._season, self._episode) or {}
+        return self._parent.get_all_ratings(_listitem, self._itemdetails.tmdb_type, self._itemdetails.tmdb_id, self._season, self._episode) or {}
 
     def get_nextaired(self):
         if not self._itemdetails or not self._itemdetails.listitem:
             return {}
-        if self._tmdb_type != 'tv':
+        if self._itemdetails.tmdb_type != 'tv':
             return self._itemdetails.listitem
-        return self._parent.get_nextaired(self._itemdetails.listitem, self._tmdb_type, self._tmdb_id)
+        return self._parent.get_nextaired(self._itemdetails.listitem, self._itemdetails.tmdb_type, self._itemdetails.tmdb_id)
 
     def get_additional_properties(self):
         if not self._itemdetails:
@@ -152,38 +150,38 @@ class ListItemDetails():
             except StopIteration:
                 self._itemdetails.listitem['infoproperties'][k] = None
 
-    def get_itemtypeid(self):
-        li_year = self._year if self._tmdb_type == 'movie' else None
-        ep_year = self._year if self._tmdb_type == 'tv' else None
+    def get_itemtypeid(self, tmdb_type):
+        li_year = self._year if tmdb_type == 'movie' else None
+        ep_year = self._year if tmdb_type == 'tv' else None
         multi_t = 'tv' if self._episode or self._season else None
 
-        if self._tmdb_type == 'multi':
-            self._tmdb_id, self._tmdb_type = self._parent.get_tmdb_id_multi(
+        if tmdb_type == 'multi':
+            tmdb_id, tmdb_type = self._parent.get_tmdb_id_multi(
                 media_type=multi_t, query=self._query, imdb_id=self._imdb_id, year=li_year, episode_year=ep_year)
-            self._dbtype = convert_type(self._tmdb_type, 'dbtype')
+            self._dbtype = convert_type(tmdb_type, 'dbtype')
         else:
-            self._tmdb_id = self._parent.get_tmdb_id(
-                tmdb_type=self._tmdb_type, query=self._query, imdb_id=self._imdb_id, year=li_year, episode_year=ep_year)
+            tmdb_id = self._parent.get_tmdb_id(
+                tmdb_type=tmdb_type, query=self._query, imdb_id=self._imdb_id, year=li_year, episode_year=ep_year)
 
-        return {'tmdb_type': self._tmdb_type, 'tmdb_id': self._tmdb_id}
+        return {'tmdb_type': tmdb_type, 'tmdb_id': tmdb_id}
 
     def get_itemdetails(self, func, *args, **kwargs):
         """ Returns a named tuple of tmdb_type, tmdb_id, listitem, artwork """
-        self._tmdb_type = self.get_tmdb_type()
+        tmdb_type = self.get_tmdb_type()
 
         def _get_quick(cache_name_id):
-            cache_item = self._cache.get_cache(cache_name_id) if self._tmdb_type else None
+            cache_item = self._cache.get_cache(cache_name_id) if tmdb_type else None
 
             if not cache_item:
                 func(*args, **kwargs) if func else None
-                cache_item = self._cache.set_cache(self.get_itemtypeid(), cache_name_id)
+                cache_item = self._cache.set_cache(self.get_itemtypeid(tmdb_type), cache_name_id)
 
             cache_data = self._parent.get_itemdetails_cache(**cache_item, season=self._season, episode=self._episode)
             return cache_data
 
         cache_name_id = self._parent.get_cur_item(self._position)
         cache_name_iq = f'_get_quick.{cache_name_id}'
-        self._itemdetails = self._parent.use_itemcache(cache_name_iq, _get_quick, cache_name_id) if self._tmdb_type else None
+        self._itemdetails = self._parent.use_itemcache(cache_name_iq, _get_quick, cache_name_id) if tmdb_type else None
         self._itemdetails = self._itemdetails or self._parent.get_itemdetails_blank()
         return self._itemdetails
 
