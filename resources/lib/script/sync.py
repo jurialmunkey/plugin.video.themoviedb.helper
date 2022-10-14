@@ -23,6 +23,7 @@ def _menu_item_watchlist():
             'name_add': get_localized(32291),
             'name_remove': get_localized(32292)}}
 
+
 def _menu_item_collection():
     return {
         'class': _SyncItem,

@@ -98,11 +98,10 @@ def _saveimage(image, targetfile):
     Uses flush() and os.fsync() to ensure file is written to disk before continuing
     Used to prevent Kodi from attempting to cache the image before writing is complete
     """
-    f = open(targetfile, 'wb')
-    image.save(f, 'PNG')
-    f.flush()
-    os.fsync(f)
-    f.close()
+    with xbmcvfs.File(targetfile, 'wb') as f:
+        image.save(f, 'PNG')
+        f.flush()
+        os.fsync(f)
 
 
 class ImageFunctions(Thread):
@@ -113,7 +112,7 @@ class ImageFunctions(Thread):
         self.func = None
         self.save_orig = False
         self.save_prop = None
-        self.save_path = f"{get_setting('cache_location', 'str') or ADDONDATA}{{}}/"
+        self.save_path = f"{get_setting('image_location', 'str') or ADDONDATA}{{}}/"
         if method == 'blur':
             self.func = self.blur
             self.save_path = make_path(self.save_path.format('blur'))
@@ -154,9 +153,7 @@ class ImageFunctions(Thread):
         filename = f'cropped-{md5hash(source)}.png'
         destination = os.path.join(self.save_path, filename)
         try:
-            if xbmcvfs.exists(destination):
-                os.utime(destination, None)
-            else:
+            if not xbmcvfs.exists(destination):  # Used to do os.utime(destination, None) on existing here
                 img = _openimage(source, self.save_path, filename)
                 img = img.crop(img.convert('RGBa').getbbox())
                 _saveimage(img, destination)
@@ -172,9 +169,7 @@ class ImageFunctions(Thread):
         filename = f'{md5hash(source)}{self.radius}.png'
         destination = self.save_path + filename
         try:
-            if xbmcvfs.exists(destination):
-                os.utime(destination, None)
-            else:
+            if xbmcvfs.exists(destination):  # os.utime(destination, None)
                 img = _openimage(source, self.save_path, filename)
                 img.thumbnail((256, 256))
                 img = img.convert('RGB')
@@ -192,9 +187,7 @@ class ImageFunctions(Thread):
         filename = f'{md5hash(source)}.png'
         destination = self.save_path + filename
         try:
-            if xbmcvfs.exists(destination):
-                os.utime(destination, None)
-            else:
+            if xbmcvfs.exists(destination):  # os.utime(destination, None)
                 img = _openimage(source, self.save_path, filename)
                 img = img.convert('LA')
                 _saveimage(img, destination)
@@ -278,8 +271,7 @@ class ImageFunctions(Thread):
         destination = self.save_path + filename
 
         try:
-            if xbmcvfs.exists(destination):
-                os.utime(destination, None)
+            if xbmcvfs.exists(destination):  # os.utime(destination, None)
                 img = _imageopen(xbmcvfs.translatePath(destination))
             else:
                 img = _openimage(source, self.save_path, filename)

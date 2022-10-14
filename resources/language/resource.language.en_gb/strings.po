@@ -2401,6 +2401,11 @@ msgctxt "#32471"
 msgid "Connection error notifications"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32472"
+msgid "Cache image location"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

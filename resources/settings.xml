@@ -743,6 +743,19 @@
 						<heading>32409</heading>
 					</control>
 				</setting>
+				<setting id="image_location" type="path" label="32472" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<sources>
+							<source>files</source>
+						</sources>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="path">
+						<heading>32472</heading>
+					</control>
+				</setting>
 				<setting id="use_mem_cache" type="boolean" label="32465" help="32464">
 					<level>0</level>
 					<default>False</default>
