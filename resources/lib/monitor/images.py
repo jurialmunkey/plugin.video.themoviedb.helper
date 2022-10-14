@@ -100,8 +100,8 @@ def _saveimage(image, targetfile):
     """
     with xbmcvfs.File(targetfile, 'wb') as f:
         image.save(f, 'PNG')
-        f.flush()
-        os.fsync(f)
+        # f.flush()
+        # os.fsync(f)
 
 
 class ImageFunctions(Thread):
@@ -167,9 +167,9 @@ class ImageFunctions(Thread):
     @lazyimport_pil
     def blur(self, source):
         filename = f'{md5hash(source)}{self.radius}.png'
-        destination = self.save_path + filename
+        destination = os.path.join(self.save_path, filename)
         try:
-            if xbmcvfs.exists(destination):  # os.utime(destination, None)
+            if not xbmcvfs.exists(destination):  # os.utime(destination, None)
                 img = _openimage(source, self.save_path, filename)
                 img.thumbnail((256, 256))
                 img = img.convert('RGB')
@@ -185,9 +185,9 @@ class ImageFunctions(Thread):
     @lazyimport_pil
     def desaturate(self, source):
         filename = f'{md5hash(source)}.png'
-        destination = self.save_path + filename
+        destination = os.path.join(self.save_path, filename)
         try:
-            if xbmcvfs.exists(destination):  # os.utime(destination, None)
+            if not xbmcvfs.exists(destination):  # os.utime(destination, None)
                 img = _openimage(source, self.save_path, filename)
                 img = img.convert('LA')
                 _saveimage(img, destination)
