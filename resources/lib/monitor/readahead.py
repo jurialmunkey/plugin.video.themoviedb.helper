@@ -2,7 +2,7 @@ from resources.lib.monitor.itemdetails import ListItemDetails
 from resources.lib.addon.window import get_property, get_current_window
 from resources.lib.addon.plugin import get_setting
 
-READAHEAD_QUEUE = [1, 2, 3, -1, 4, -2, 5, 6, 7, 8, 9]  # Mostly only check items ahead but cache a few behind in case user scrolls back
+READAHEAD_QUEUE = [1, 2, 3, -1, 4, -2, 5, -3, 6, 7, 8, 9]  # Mostly only check items ahead but cache a few behind in case user scrolls back
 READAHEAD_CHANGED = -1  # Underlying item changed in the meantime so we reset readahead on this condition
 READAHEAD_SUCCESS = 0  # Got an item so will get next() on next while loop cycle
 READAHEAD_COMPLETED = 1  # Exausted queue so we sit idle until item changes
@@ -15,7 +15,7 @@ class ListItemReadAhead():
         self._pre_window = cur_window
         self._pre_item = cur_item
         self._queue = (x for x in READAHEAD_QUEUE)
-        self._debug = get_setting('debug_logging') == 2
+        self._debug = get_setting('debug_logging')
 
     def _get_readahead(self, x):
         _item = ListItemDetails(self._parent, x)
