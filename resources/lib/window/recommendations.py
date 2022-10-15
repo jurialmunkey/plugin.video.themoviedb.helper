@@ -139,7 +139,7 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
 
     def do_action(self):
         focus_id = self.getFocusId()
-        _action = self._recommendations.get(focus_id, {}).get('action') or self.getProperty(f'Action_{focus_id}')
+        _action = self.getProperty(f'Action_{focus_id}') or self._recommendations.get(focus_id, {}).get('action')
         if not _action:
             return
         if _action == 'info':
