@@ -526,11 +526,17 @@ class TMDb(RequestAPI):
         if not response:
             return []
 
-        results = response.get(key) or []
+        try:
+            results = response[key] or []
+        except (KeyError, TypeError):
+            return []
+
         results = sorted(results, key=lambda i: i.get(sort_key, 0), reverse=True) if sort_key else results
 
+        add_infoproperties = [('total_pages', response.get('total_pages')), ('total_results', response.get('total_results'))]
+
         items = [
-            self.mapper.get_info(i, tmdb_type, definition=params, base_tmdb_type=base_tmdb_type, iso_country=self.iso_country)
+            self.mapper.get_info(i, tmdb_type, definition=params, base_tmdb_type=base_tmdb_type, iso_country=self.iso_country, add_infoproperties=add_infoproperties)
             for i in results if i]
 
         if filters:

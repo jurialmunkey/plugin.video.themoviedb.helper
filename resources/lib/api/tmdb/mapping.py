@@ -781,11 +781,19 @@ class ItemMapper(_ItemMapper):
         item['cast'] = cast_list
         return item
 
-    def get_info(self, info_item, tmdb_type, base_item=None, base_is_season=False, **kwargs):
+    def add_infoproperties(self, item, infoproperties):
+        if not infoproperties:
+            return item
+        for k, v in infoproperties:
+            item['infoproperties'][k] = v
+        return item
+
+    def get_info(self, info_item, tmdb_type, base_item=None, base_is_season=False, add_infoproperties=None, **kwargs):
         item = get_empty_item()
         item = self.map_item(item, info_item)
         item = self.add_base(item, base_item, tmdb_type, key_blacklist=['year', 'premiered', 'season', 'episode'], is_season=base_is_season)
         item = self.add_cast(item, info_item, base_item)
+        item = self.add_infoproperties(item, add_infoproperties)
         item = self.finalise(item, tmdb_type)
         item['params'] = get_params(info_item, tmdb_type, params=item.get('params', {}), **kwargs)
         return item
