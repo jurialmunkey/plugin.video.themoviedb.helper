@@ -206,7 +206,7 @@ class Container():
 
         lengths = [
             len(response.get('movies', [])),
-            len(response.get('tvshows', [])),
+            len(response.get('shows', [])),
             len(response.get('persons', []))]
 
         if lengths.index(max(lengths)) == 0:
