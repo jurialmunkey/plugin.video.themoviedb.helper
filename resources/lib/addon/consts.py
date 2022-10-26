@@ -656,6 +656,9 @@ ROUTE_NOID = {
     'trakt_sortby': {'route': {
         'module_name': 'resources.lib.api.trakt.lists',
         'import_attr': 'ListSortBy'}},
+    'trakt_comments': {'route': {
+        'module_name': 'resources.lib.api.trakt.lists',
+        'import_attr': 'ListComments'}},
     'mdblist_userlist': {'route': {
         'module_name': 'resources.lib.api.mdblist.lists',
         'import_attr': 'ListCustom'}},
