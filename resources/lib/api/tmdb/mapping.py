@@ -107,12 +107,17 @@ def get_release_types(v, iso_country):
 
 def get_iter_props(v, base_name, *args, **kwargs):
     infoproperties = {}
+    if kwargs.get('sorted'):
+        v = sorted(v, **kwargs['sorted'])
     if kwargs.get('basic_keys'):
         infoproperties = iter_props(
             v, base_name, infoproperties, **kwargs['basic_keys'])
     if kwargs.get('image_keys'):
         infoproperties = iter_props(
             v, base_name, infoproperties, func=get_imagepath_poster, **kwargs['image_keys'])
+    if kwargs.get('fanart_keys'):
+        infoproperties = iter_props(
+            v, base_name, infoproperties, func=get_imagepath_fanart, **kwargs['fanart_keys'])
     if kwargs.get('negativeimage_keys'):
         infoproperties = iter_props(
             v, base_name, infoproperties, func=get_imagepath_negate, **kwargs['negativeimage_keys'])
@@ -517,8 +522,27 @@ class ItemMapper(_ItemMapper):
                 'func': lambda v: len(v.get('crew') or [])}, {
                 # ---
                 'keys': [('infoproperties', 'numitems.tmdb.movies.total')],
-                'func': lambda v: len(v.get('cast') or []) + len(v.get('crew') or [])
-
+                'func': lambda v: len(v.get('cast') or []) + len(v.get('crew') or [])}, {
+                # ---
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'subkeys': ['cast'],
+                'func': get_iter_props,
+                'args': ['movie.cast'],
+                'kwargs': {
+                    'sorted': {'key': lambda i: i.get('popularity', 0), 'reverse': True},
+                    'basic_keys': {'title': 'title', 'tmdb_id': 'id', 'plot': 'overview', 'rating': 'vote_average', 'votes': 'vote_count', 'character': 'character', 'premiered': 'release_date'},
+                    'image_keys': {'poster': 'poster_path'},
+                    'fanart_keys': {'fanart': 'backdrop_path'}}}, {
+                # ---
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'subkeys': ['crew'],
+                'func': get_iter_props,
+                'args': ['movie.crew'],
+                'kwargs': {
+                    'sorted': {'key': lambda i: i.get('popularity', 0), 'reverse': True},
+                    'basic_keys': {'title': 'title', 'tmdb_id': 'id', 'plot': 'overview', 'rating': 'vote_average', 'votes': 'vote_count', 'department': 'department', 'job': 'job', 'premiered': 'release_date'},
+                    'image_keys': {'poster': 'poster_path'},
+                    'fanart_keys': {'fanart': 'backdrop_path'}}
             }],
             'tv_credits': [{
                 'keys': [('infoproperties', 'numitems.tmdb.tvshows.cast')],
@@ -528,8 +552,27 @@ class ItemMapper(_ItemMapper):
                 'func': lambda v: len(v.get('crew') or [])}, {
                 # ---
                 'keys': [('infoproperties', 'numitems.tmdb.tvshows.total')],
-                'func': lambda v: len(v.get('cast') or []) + len(v.get('crew') or [])
-
+                'func': lambda v: len(v.get('cast') or []) + len(v.get('crew') or [])}, {
+                # ---
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'subkeys': ['cast'],
+                'func': get_iter_props,
+                'args': ['tvshow.cast'],
+                'kwargs': {
+                    'sorted': {'key': lambda i: i.get('popularity', 0), 'reverse': True},
+                    'basic_keys': {'title': 'name', 'tmdb_id': 'id', 'plot': 'overview', 'rating': 'vote_average', 'votes': 'vote_count', 'character': 'character', 'premiered': 'first_air_date', 'episodes': 'episode_count'},
+                    'image_keys': {'poster': 'poster_path'},
+                    'fanart_keys': {'fanart': 'backdrop_path'}}}, {
+                # ---
+                'keys': [('infoproperties', UPDATE_BASEKEY)],
+                'subkeys': ['crew'],
+                'func': get_iter_props,
+                'args': ['tvshow.crew'],
+                'kwargs': {
+                    'sorted': {'key': lambda i: i.get('popularity', 0), 'reverse': True},
+                    'basic_keys': {'title': 'name', 'tmdb_id': 'id', 'plot': 'overview', 'rating': 'vote_average', 'votes': 'vote_count', 'department': 'department', 'job': 'job', 'premiered': 'first_air_date', 'episodes': 'episode_count'},
+                    'image_keys': {'poster': 'poster_path'},
+                    'fanart_keys': {'fanart': 'backdrop_path'}}
             }],
             'belongs_to_collection': [{
                 'keys': [('infoproperties', UPDATE_BASEKEY)],
