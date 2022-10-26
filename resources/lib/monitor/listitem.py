@@ -123,7 +123,10 @@ class ListItemMonitor(CommonMonitorFunctions):
     def on_exit(self, keep_tv_artwork=False, is_done=True):
         if self._listcontainer:
             return self.add_item_listcontainer(ListItem().get_listitem())
-        ignore_keys = SETMAIN_ARTWORK if keep_tv_artwork and self._item._dbtype in ['episodes', 'seasons'] else None
+        try:
+            ignore_keys = SETMAIN_ARTWORK if keep_tv_artwork and self._item._dbtype in ['episodes', 'seasons'] else None
+        except AttributeError:
+            ignore_keys = None
         self.clear_properties(ignore_keys=ignore_keys)
         get_property('IsUpdating', clear_property=True) if is_done else None
 
