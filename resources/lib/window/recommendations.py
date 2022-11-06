@@ -12,6 +12,7 @@ from threading import Thread
 
 
 TMDB_QUERY_PARAMS = ('imdb_id', 'tvdb_id', 'query', 'year', 'episode_year',)
+TMDB_AFFIX = '&fanarttv=false&cacheonly=true'
 PROP_LIST_VISIBLE = 'List_{}_Visible'
 PROP_LIST_ISUPDATING = 'List_{}_IsUpdating'
 PROP_HIDEINFO = 'Recommendations.HideInfo'
@@ -61,7 +62,7 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
         self._monitor = Monitor()
         self._tmdb_api = TMDb()
         self._tmdb_type = get_property(PROP_TMDBTYPE, kwargs['tmdb_type'])
-        self._tmdb_affix = '&nextpage=false&fanarttv=false&cacheonly=true'
+        self._tmdb_affix = f"&nextpage=false{kwargs.get('affix') or TMDB_AFFIX}"
         self._tmdb_query = {i: kwargs[i] for i in TMDB_QUERY_PARAMS if kwargs.get(i)}
         self._tmdb_id = kwargs.get('tmdb_id') or self._tmdb_api.get_tmdb_id(tmdb_type=self._tmdb_type, **self._tmdb_query)
         self._recommendations = sorted(kwargs['recommendations'].split('||'))
