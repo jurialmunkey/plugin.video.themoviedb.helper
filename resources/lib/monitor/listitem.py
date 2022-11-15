@@ -282,7 +282,7 @@ class ListItemMonitor(CommonMonitorFunctions):
 
         # We want to set a special container but it doesn't exist so exit
         if self._listcontainer == -1:
-            return self.on_exit()
+            return
 
         # Check if the item has changed before retrieving details again
         if self.is_same_window(update=True) and self.is_same_item(update=True):
