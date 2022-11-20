@@ -395,17 +395,17 @@ class ItemMapper(_ItemMapper):
             'release_date': [{
                 'keys': [('infolabels', 'premiered')]}, {
                 'keys': [('infolabels', 'year')],
-                'func': lambda v: v[0:4]
+                'func': lambda v: int(v[0:4])
             }],
             'first_air_date': [{
                 'keys': [('infolabels', 'premiered')]}, {
                 'keys': [('infolabels', 'year')],
-                'func': lambda v: v[0:4]
+                'func': lambda v: int(v[0:4])
             }],
             'air_date': [{
                 'keys': [('infolabels', 'premiered')]}, {
                 'keys': [('infolabels', 'year')],
-                'func': lambda v: v[0:4]
+                'func': lambda v: int(v[0:4])
             }],
             'genre_ids': [{
                 'keys': [('infolabels', 'genre')],
@@ -421,12 +421,16 @@ class ItemMapper(_ItemMapper):
                 'type': str
             }],
             'vote_count': [{
-                'keys': [('infolabels', 'votes'), ('infoproperties', 'tmdb_votes')],
+                'keys': [('infolabels', 'votes')],
+                'type': int}, {
+                'keys': [('infoproperties', 'tmdb_votes')],
                 'type': float,
                 'func': lambda v: f'{v:0,.0f}'
             }],
             'vote_average': [{
-                'keys': [('infolabels', 'rating'), ('infoproperties', 'tmdb_rating')],
+                'keys': [('infolabels', 'rating')],
+                'type': float}, {
+                'keys': [('infoproperties', 'tmdb_rating')],
                 'type': float,
                 'func': lambda v: f'{v:.1f}'
             }],
@@ -772,7 +776,7 @@ class ItemMapper(_ItemMapper):
         def _finalise_image():
             item['infolabels']['title'] = f'{item["infoproperties"].get("width")}x{item["infoproperties"].get("height")}'
             item['params'] = -1
-            item['infolabels']['picturepath'] = item['path'] = item['art'].get('thumb') or item['art'].get('poster') or item['art'].get('fanart')
+            item['path'] = item['art'].get('thumb') or item['art'].get('poster') or item['art'].get('fanart')
             item['is_folder'] = False
             item['library'] = 'pictures'
 

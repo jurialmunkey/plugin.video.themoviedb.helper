@@ -14,7 +14,7 @@ from json import dumps as data_dumps
 import sqlite3
 
 
-DATABASE_NAME = 'database_v5'
+DATABASE_NAME = 'database_v6'
 TIME_MINUTES = 60
 TIME_HOURS = 60 * TIME_MINUTES
 TIME_DAYS = 24 * TIME_HOURS

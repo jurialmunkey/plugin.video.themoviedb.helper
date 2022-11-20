@@ -27,10 +27,6 @@ class ItemMapper(_ItemMapper):
             }],
             'playcount': [{
                 'keys': [('infolabels', 'playcount')],
-                'type': int}, {
-                # ---
-                'keys': [('infolabels', 'overlay')],
-                'func': lambda v: 5 if self.key in ['movie', 'episode'] and v > 0 else 4,
                 'type': int
             }],
             'ratings': [{
@@ -74,7 +70,6 @@ class ItemMapper(_ItemMapper):
             'tracknumber': ('infolabels', 'tracknumber'),
             'rating': ('infolabels', 'rating'),
             'userrating': ('infolabels', 'userrating'),
-            'overlay': ('infolabels', 'overlay'),
             'director': ('infolabels', 'director'),
             'mpaa': ('infolabels', 'mpaa'),
             'plot': ('infolabels', 'plot'),

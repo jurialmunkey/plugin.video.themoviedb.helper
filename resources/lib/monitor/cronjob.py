@@ -8,7 +8,7 @@ from resources.lib.addon.plugin import get_setting, executebuiltin, get_infolabe
 def clean_old_databases():
     """ Once-off routine to delete old unused database versions to avoid wasting disk space """
     from resources.lib.files.futils import delete_folder
-    for f in ['database', 'database_v2', 'database_v3', 'database_v4']:
+    for f in ['database', 'database_v2', 'database_v3', 'database_v4', 'database_v5']:
         delete_folder(f, force=True, check_exists=True)
 
 

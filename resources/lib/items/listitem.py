@@ -1,3 +1,4 @@
+from xbmc import Actor, VideoStreamDetail, AudioStreamDetail, SubtitleStreamDetail
 from xbmcgui import ListItem as KodiListItem
 from tmdbhelper.parser import try_int, merge_two_dicts
 from resources.lib.addon.consts import ACCEPTED_MEDIATYPES, PARAM_WIDGETS_RELOAD
@@ -17,6 +18,53 @@ _is_hide_unaired_movies = get_setting('hide_unaired_movies')
 _is_hide_unaired_episodes = get_setting('hide_unaired_episodes')
 _is_flatten_seasons = get_setting('flatten_seasons')
 _is_nextaired_linklibrary = get_setting('nextaired_linklibrary')
+
+
+INFOTAGVIDEO_ATTR = {
+    'dbid': ('setDbId', int),
+    'year': ('setYear', int),
+    'title': ('setTitle', str),
+    'originaltitle': ('setOriginalTitle', str),
+    'mpaa': ('setMpaa', str),
+    'plot': ('setPlot', str),
+    'plotoutline': ('setPlotOutline', str),
+    'episode': ('setEpisode', int),
+    'season': ('setSeason', int),
+    'sortseason': ('setSortSeason', int),
+    'episodeguide': ('setEpisodeGuide', str),
+    'top250': ('setTop250', int),
+    'setid': ('setSetId', int),
+    'tracknumber': ('setTrackNumber', int),
+    'rating': ('setRating', float),
+    'userrating': ('setUserRating', int),
+    'playcount': ('setPlaycount', int),
+    'sorttitle': ('setSortTitle', str),
+    'tagline': ('setTagLine', str),
+    'tvshowtitle': ('setTvShowTitle', str),
+    'status': ('setTvShowStatus', str),
+    'genre': ('setGenres', list),
+    'country': ('setCountries', list),
+    'director': ('setDirectors', list),
+    'studio': ('setStudios', list),
+    'writer': ('setWriters', list),
+    'duration': ('setDuration', int),
+    'premiered': ('setPremiered', str),
+    'set': ('setSet', str),
+    'setoverview': ('setOverview', str),
+    'tag': ('setTags', list),
+    'productioncode': ('setProductionCode', str),
+    'firstaired': ('setFirstAired', str),
+    'lastplayed': ('setLastPlayed', str),
+    'album': ('setAlbum', str),
+    'votes': ('setVotes', int),
+    'trailer': ('setTrailer', str),
+    'path': ('setPath', str),
+    'filenameandpath': ('setFilenameAndPath', str),
+    'imdbnumber': ('setIMDBNumber', str),
+    'dateadded': ('setDateAdded', str),
+    'mediatype': ('setMediaType', str),
+    'showlinks': ('setShowLinks', str),
+}
 
 
 def ListItem(*args, **kwargs):
@@ -189,26 +237,45 @@ class _ListItem(object):
         if self.infolabels.get('mediatype') not in ACCEPTED_MEDIATYPES:
             self.infolabels.pop('mediatype', None)
         self.infolabels['path'] = self.get_url()
+
         listitem = KodiListItem(label=self.label, label2=self.label2, path=self.infolabels['path'], offscreen=offscreen)
         listitem.setLabel2(self.label2)
-        listitem.setInfo(self.library, self.infolabels)
         listitem.setArt(self.set_art_fallbacks())
         listitem.setProperties(self.infoproperties)
         listitem.addContextMenuItems(self.context_menu)
-        if self.library == 'pictures':  # Exit early as adding cast to pictures causes issues
-            return listitem
-        listitem.setUniqueIDs(self.unique_ids)
-        listitem.setCast(self.cast)
 
-        if not self.stream_details:
+        if self.library == 'pictures':
             return listitem
-        for k, v in self.stream_details.items():
-            if not k or not v:
+
+        info_tag = listitem.getVideoInfoTag()
+
+        for k, v in self.infolabels.items():
+            if v is None:
                 continue
-            for i in v:
-                if not i:
-                    continue
-                listitem.addStreamInfo(k, i)
+            try:
+                func = getattr(info_tag, INFOTAGVIDEO_ATTR[k][0])
+                func(v)
+            except KeyError:
+                kodi_log(f'InfoTagVideo: KEYERROR: {k}', 1)
+                continue
+            except TypeError:
+                func(INFOTAGVIDEO_ATTR[k][1](v))
+
+        if self.unique_ids:
+            info_tag.setUniqueIDs({k: f'{v}' for k, v in self.unique_ids.items()})
+        if self.cast:
+            info_tag.setCast([Actor(**i) for i in self.cast])
+
+        if self.stream_details:
+            for i in self.stream_details.get('video'):
+                i['hdrType'] = i.pop('hdrtype', '')  # Workaround inconsistent key naming in VideoStreamDetail class and JSON-RPC
+                i['stereoMode'] = i.pop('stereomode', '')  # Workaround inconsistent key naming in VideoStreamDetail class and JSON-RPC
+                info_tag.addVideoStream(VideoStreamDetail(**i))
+            for i in self.stream_details.get('audio'):
+                info_tag.addAudioStream(AudioStreamDetail(**i))
+            for i in self.stream_details.get('subtitle'):
+                info_tag.addSubtitleStream(SubtitleStreamDetail(**i))
+
         return listitem
 
 
@@ -296,10 +363,7 @@ class _Movie(_Video):
 
     def set_playcount(self, playcount):
         playcount = try_int(playcount)
-        if not playcount:
-            return
         self.infolabels['playcount'] = playcount
-        self.infolabels['overlay'] = 5
 
     def unaired_bool(self):
         if _is_hide_unaired_movies:
@@ -325,10 +389,9 @@ class _Tvshow(_Video):
         ip['watchedepisodes'] = playcount
         ip['unwatchedepisodes'] = totalepisodes - playcount
         ip['watchedprogress'] = int(playcount * 100 / totalepisodes)
-        if not playcount or ip['unwatchedepisodes']:
-            return
+        if ip['unwatchedepisodes']:
+            playcount = 0
         il['playcount'] = playcount
-        il['overlay'] = 5
 
     def set_playcount(self, playcount):
         self._set_playcount(playcount)
@@ -369,10 +432,7 @@ class _Episode(_Tvshow):
 
     def set_playcount(self, playcount):
         playcount = try_int(playcount)
-        if not playcount:
-            return
         self.infolabels['playcount'] = playcount
-        self.infolabels['overlay'] = 5
 
     def _set_params_reroute_details(self):
         if (self.parent_params.get('info') == 'library_nextaired'
