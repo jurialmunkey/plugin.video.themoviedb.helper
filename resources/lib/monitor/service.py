@@ -107,12 +107,15 @@ class ServiceMonitor(object):
             # media window is opened or widgetcontainer set - start listitem monitoring!
             elif get_condvisibility(
                     "Window.IsMedia | "
-                    "Window.IsVisible(MyPVRChannels.xml) | "
-                    "Window.IsVisible(MyPVRGuide.xml) | "
-                    "Window.IsVisible(DialogPVRInfo.xml) | "
                     "!String.IsEmpty(Window(Home).Property(TMDbHelper.WidgetContainer)) | "
                     "!String.IsEmpty(Window.Property(TMDbHelper.WidgetContainer)) | "
-                    "Window.IsVisible(movieinformation)"):
+                    "Window.IsVisible(movieinformation) | "
+                    "Window.IsVisible(musicinformation) | "
+                    "Window.IsVisible(songinformation) | "
+                    "Window.IsVisible(addoninformation) | "
+                    "Window.IsVisible(pvrguideinfo) | "
+                    "Window.IsVisible(tvchannels) | "
+                    "Window.IsVisible(tvguide)"):
                 self._on_listitem()
 
             # Otherwise just sit here and wait
