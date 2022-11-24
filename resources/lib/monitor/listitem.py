@@ -11,8 +11,15 @@ from resources.lib.files.bcache import BasicCache
 from threading import Thread
 
 CV_USE_LISTITEM = ""\
-    "!Skin.HasSetting(TMDbHelper.ForceWidgetContainer) + !Window.IsActive(script-tmdbhelper-recommendations.xml) +"\
-    "[Window.IsVisible(DialogPVRInfo.xml) | Window.IsVisible(MyPVRGuide.xml) | Window.IsVisible(movieinformation)]"
+    "!Skin.HasSetting(TMDbHelper.ForceWidgetContainer) + "\
+    "!Window.IsActive(script-tmdbhelper-recommendations.xml) + ["\
+    "Window.IsVisible(movieinformation) | "\
+    "Window.IsVisible(musicinformation) | "\
+    "Window.IsVisible(songinformation) | "\
+    "Window.IsVisible(addoninformation) | "\
+    "Window.IsVisible(pvrguideinfo) | "\
+    "Window.IsVisible(tvchannels) | "\
+    "Window.IsVisible(tvguide)]"
 
 CV_USE_LOCAL_CONTAINER = "Skin.HasSetting(TMDbHelper.UseLocalWidgetContainer)"
 
