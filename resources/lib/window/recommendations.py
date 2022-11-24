@@ -363,8 +363,8 @@ class WindowRecommendationsManager():
         return data
 
     def open_info(self, listitem, func=None, threaded=False):
-        if get_condvisibility('Window.IsVisible(movieinformation)'):
-            executebuiltin(f'Dialog.Close(movieinformation,true)')
+        executebuiltin(f'Dialog.Close(movieinformation,true)')
+        executebuiltin(f'Dialog.Close(pvrguideinfo,true)')
         func() if func else None
         if xbmcgui.getCurrentWindowId() != self._window_id:
             executebuiltin(f'ActivateWindow({self._window_id})')
@@ -387,6 +387,7 @@ class WindowRecommendationsManager():
         with WindowProperty((PROP_ONCLOSED, 'True')):
             executebuiltin(builtin) if builtin and not after else None
             executebuiltin(f'Dialog.Close(movieinformation,true)')
+            executebuiltin(f'Dialog.Close(pvrguideinfo,true)')
             self._mon.waitForAbort(1)
             if not cond and xbmcgui.getCurrentWindowId() == self._window_id:
                 _win = xbmcgui.Window(self._window_id)
