@@ -2406,6 +2406,11 @@ msgctxt "#32472"
 msgid "Cache image location"
 msgstr ""
 
+#: /resources/lib/api/trakt/api.py
+msgctxt "#32473"
+msgid "Collected"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
