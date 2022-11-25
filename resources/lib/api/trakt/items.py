@@ -63,6 +63,7 @@ def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
         'watched': lambda: _sort_lambda_simple(items, 'last_watched_at', _dummystr, reverse),
         'paused': lambda: _sort_lambda_simple(items, 'paused_at', _dummystr, reverse),
         'added': lambda: _sort_lambda_simple(items, 'listed_at', _dummystr, reverse),
+        'collected': lambda: _sort_lambda_max_of(items, ['collected_at', 'last_collected_at'], _dummystr, reverse),
         'title': lambda: _sort_lambda_ignore(items, 'title', _dummystr, reverse),
         'year': lambda: _sort_lambda_parent(items, 'year', _dummyint if reverse else 9999, reverse),
         'released': lambda: _sort_lambda_mixing(items, ('first_aired', 'released',), _dummystr if reverse else _dummystr_release, reverse, sort_types=['show', 'episode']),
