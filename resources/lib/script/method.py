@@ -316,6 +316,65 @@ def set_defaultplayer(**kwargs):
     set_setting(setting_name, f'{default_player["file"]} {default_player["mode"]}', 'str')
 
 
+def set_chosenplayer(tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
+    """
+    Prompts user to select (or clear) a default player for a single movie or tvshow
+    """
+    from xbmcgui import Dialog
+    from resources.lib.player.players import Players
+    from resources.lib.addon.consts import PLAYERS_CHOSEN_DEFAULTS_FILENAME
+    from resources.lib.files.futils import get_json_filecache, set_json_filecache
+    from resources.lib.addon.plugin import get_localized
+
+    if tmdb_type not in ['movie', 'tv'] or not tmdb_id:
+        return
+
+    obj = get_json_filecache(PLAYERS_CHOSEN_DEFAULTS_FILENAME) or {}
+    lvl = obj
+    itm = obj.setdefault(tmdb_type, {}).setdefault(tmdb_id, {})
+    nme = kwargs.get('set_chosenplayer') or ''
+    itm['name'] = nme
+
+    # If theres a season/episode value then ask user if want to set for whole tvshow or just season/episode
+    x = 0
+    if season is not None:
+        func = Dialog()
+        opts = {'nolabel': get_localized(20364), 'yeslabel': get_localized(20373)}
+
+        if episode is not None:
+            func = func.yesnocustom
+            opts['customlabel'] = get_localized(20359)
+        else:
+            func = func.yesno
+
+        x = func(f'{tmdb_type} - {tmdb_id}', get_localized(32477), **opts)
+
+        if x == -1:
+            return
+        if x in [1, 2]:
+            lvl = itm.setdefault('season', {})
+            itm = lvl.setdefault(f'{season}', {})
+        if x == 2:
+            lvl = itm.setdefault('episode', {})
+            itm = lvl.setdefault(f'{episode}', {})
+
+    chosen_player = Players(tmdb_type).select_player(detailed=True, clear_player=True)
+    if not chosen_player:
+        return
+
+    if chosen_player.get('file') and chosen_player.get('mode'):
+        itm['file'] = chosen_player["file"]
+        itm['mode'] = chosen_player["mode"]
+        msg = get_localized(32474).format(f"{itm['file']} {itm['mode']}", nme)
+
+    else:
+        obj[tmdb_type].pop(f'{tmdb_id}')
+        msg = get_localized(32475).format(nme)
+
+    set_json_filecache(obj, PLAYERS_CHOSEN_DEFAULTS_FILENAME, 0)
+    Dialog().ok(f'{tmdb_type} - {tmdb_id}', msg)
+
+
 def library_autoupdate(**kwargs):
     from xbmcgui import Dialog
     from resources.lib.update.userlist import library_autoupdate as _library_autoupdate

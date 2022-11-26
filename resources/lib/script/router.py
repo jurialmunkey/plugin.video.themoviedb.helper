@@ -74,6 +74,8 @@ class Script(object):
             lambda **kwargs: importmodule('resources.lib.script.method', 'update_players')(),
         'set_defaultplayer':
             lambda **kwargs: importmodule('resources.lib.script.method', 'set_defaultplayer')(**kwargs),
+        'set_chosenplayer':
+            lambda **kwargs: importmodule('resources.lib.script.method', 'set_chosenplayer')(**kwargs),
         'configure_players':
             lambda **kwargs: importmodule('resources.lib.player.configure', 'configure_players')(**kwargs),
         'library_autoupdate':

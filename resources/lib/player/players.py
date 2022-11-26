@@ -6,7 +6,7 @@ from xbmcaddon import Addon as KodiAddon
 from resources.lib.addon.window import get_property
 from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, format_folderpath, get_localized, get_setting, executebuiltin, get_infolabel
 from tmdbhelper.parser import try_int, try_float
-from resources.lib.addon.consts import PLAYERS_PRIORITY
+from resources.lib.addon.consts import PLAYERS_PRIORITY, PLAYERS_CHOSEN_DEFAULTS_FILENAME
 from resources.lib.addon.dialog import BusyDialog, ProgressDialog
 from resources.lib.items.listitem import ListItem
 from resources.lib.files.futils import read_file, normalise_filesize
@@ -14,6 +14,7 @@ from resources.lib.api.kodi.rpc import get_directory, KodiLibrary
 from resources.lib.player.details import get_item_details, set_detailed_item, get_playerstring, get_language_details, get_next_episodes, get_external_ids
 from resources.lib.player.inputter import KeyboardInputter
 from resources.lib.player.putils import get_players_from_file, make_playlist, make_upnext
+from resources.lib.files.futils import get_json_filecache
 from resources.lib.addon.logger import kodi_log
 from threading import Thread
 
@@ -84,7 +85,7 @@ def resolve_to_dummy(handle=None, stop_after=1, delay_wait=0):
 
 
 class Players(object):
-    def __init__(self, tmdb_type, tmdb_id=None, season=None, episode=None, ignore_default=False, islocal=False, player=None, mode=None, **kwargs):
+    def __init__(self, tmdb_type, tmdb_id=None, season=None, episode=None, ignore_default='', islocal=False, player=None, mode=None, **kwargs):
         with ProgressDialog('TMDbHelper', f'{get_localized(32374)}...', total=3) as _p_dialog:
             self.action_log = []
             self.api_language = None
@@ -101,15 +102,38 @@ class Players(object):
             self._set_provider_priority()
             self.playerstring = get_playerstring(tmdb_type, tmdb_id, season, episode, details=self.details)
             self.dialog_players = self._get_players_for_dialog(tmdb_type)
+
+            self.chosen_default = self._get_chosen_default()
             self.default_player = get_setting('default_player_movies', 'str') if tmdb_type == 'movie' else get_setting('default_player_episodes', 'str')
-            self.ignore_default = f'{player} {mode or "play"}_{"movie" if tmdb_type == "movie" else "episode"}' if player else ignore_default or ''
+            self.forced_default = f'{player} {mode or "play"}_{"movie" if tmdb_type == "movie" else "episode"}' if player else ''
+            self.ignore_default = ignore_default.lower() == 'true'
+
             self.dummy_duration = try_float(get_setting('dummy_duration', 'str')) or 1.0
             self.dummy_delay = try_float(get_setting('dummy_delay', 'str')) or 1.0
             self.dummy_waitresolve = get_setting('dummy_waitresolve')
             self.force_xbmcplayer = get_setting('force_xbmcplayer')
-            self.is_strm = islocal
             self.combined_players = get_setting('combined_players')
+
+            self.is_strm = islocal
             self.current_player = {}
+
+    def _get_chosen_default(self):
+        """
+        Check if chosen item has a specific default player and return it as 'filename mode'
+        """
+        cd = get_json_filecache(PLAYERS_CHOSEN_DEFAULTS_FILENAME)
+        if not cd:
+            return
+        try:
+            if self.tmdb_type == 'movie':
+                cd = cd['movie'][f'{self.tmdb_id}']
+                return f"{cd['file']} {cd['mode']}"
+            cd = cd['tv'][f'{self.tmdb_id}']
+            cd = cd.get('season', {}).get(f'{self.season}') or cd
+            cd = cd.get('episode', {}).get(f'{self.episode}') or cd
+            return f"{cd['file']} {cd['mode']}"
+        except KeyError:
+            return
 
     def _get_external_ids(self, tmdb_type, tmdb_id, season, episode):
         self.details_ext_ids = get_external_ids(tmdb_type, tmdb_id, season=season, episode=episode)
@@ -507,27 +531,40 @@ class Players(object):
 
     def get_default_player(self):
         """ Returns default player """
+
         if self.ignore_default:
-            if self.ignore_default.lower() == 'true':
-                return
-            self.default_player = self.ignore_default
-        elif self.dialog_players[0].get('is_local'):
+            return
+
+        if not self.dialog_players:
+            return
+
+        if self.forced_default:
+            return self._get_player_or_fallback(self.forced_default)
+
+        if self.chosen_default:
+            return self._get_player_or_fallback(self.chosen_default)
+
+        x = 0
+
+        if self.dialog_players[x].get('is_local'):
             if get_setting('default_player_kodi', 'int') == 1:
-                player = self.dialog_players[0]
-                player['idx'] = 0
-                return player
-            if len(self.dialog_players) > 1 and self.dialog_players[1].get('is_provider') and get_setting('default_player_provider'):
-                player = self.dialog_players[1]
-                player['idx'] = 1
-                return player
-        elif self.dialog_players[0].get('is_provider'):
-            if get_setting('default_player_provider'):
-                player = self.dialog_players[0]
-                player['idx'] = 0
+                player = self.dialog_players[x]
+                player['idx'] = x
+                player['fallback'] = player.get('fallback') or self.default_player or ''  # Use default_player if this one fails
                 return player
 
-        # No default player setting or no players left
-        if not self.default_player or not self.dialog_players:
+            if len(self.dialog_players) > 1:
+                x = 1
+
+        if self.dialog_players[x].get('is_provider'):
+            if get_setting('default_player_provider'):
+                player = self.dialog_players[x]
+                player['idx'] = x
+                player['fallback'] = player.get('fallback') or self.default_player or ''  # Use default_player if this one fails
+                return player
+
+        # No default player setting
+        if not self.default_player:
             return
 
         return self._get_player_or_fallback(self.default_player)

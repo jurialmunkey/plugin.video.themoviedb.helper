@@ -356,6 +356,19 @@ class _Video(_ListItem):
     def _set_params_reroute_details(self):
         self._set_params_reroute_default()
 
+    def _set_contextmenu_choosedefault(self, tmdb_type, tmdb_id, season=None, episode=None):
+        name = self.infolabels.get('tvshowtitle') or self.infolabels.get('title') or self.label
+        path = f'set_chosenplayer={name},tmdb_type={tmdb_type},tmdb_id={tmdb_id}'
+
+        if season is not None:
+            path = f'{path},season={season}'
+            if episode is not None:
+                path = f'{path},episode={episode}'
+
+        self.context_menu.append((
+            '$ADDON[plugin.video.themoviedb.helper 32476]',
+            f'Runscript(plugin.video.themoviedb.helper,{path})',))
+
 
 class _Movie(_Video):
     def get_ftv_id(self):
@@ -370,6 +383,7 @@ class _Movie(_Video):
             return True
 
     def _set_params_reroute_details(self):
+        self._set_contextmenu_choosedefault('movie', self.unique_ids.get('tmdb'))
         self._set_params_reroute_default()
 
 
@@ -402,6 +416,7 @@ class _Tvshow(_Video):
             return True
 
     def _set_params_reroute_details(self):
+        self._set_contextmenu_choosedefault('tv', self.unique_ids.get('tmdb'))
         if _int_default_select:
             self.params['info'] = 'related'
             self.is_folder = False
@@ -417,6 +432,7 @@ class _Season(_Tvshow):
         return self.unique_ids.get('tvshow.tmdb')
 
     def _set_params_reroute_details(self):
+        self._set_contextmenu_choosedefault('tv', self.unique_ids.get('tvshow.tmdb'), season=self.infolabels.get('season'))
         self.params['info'] = 'episodes'
 
     def set_playcount(self, playcount):
@@ -435,6 +451,10 @@ class _Episode(_Tvshow):
         self.infolabels['playcount'] = playcount
 
     def _set_params_reroute_details(self):
+        self._set_contextmenu_choosedefault(
+            'tv', self.unique_ids.get('tvshow.tmdb'),
+            season=self.infolabels.get('season'),
+            episode=self.infolabels.get('episode'))
         if (self.parent_params.get('info') == 'library_nextaired'
                 and _is_nextaired_linklibrary
                 and self.infoproperties.get('tvshow.dbid')):

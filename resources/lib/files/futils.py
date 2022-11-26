@@ -171,16 +171,24 @@ def get_filecache_name(cache_name, alphanum=False):
 def set_json_filecache(my_object, cache_name, cache_days=14):
     from json import dump
     from resources.lib.addon.tmdate import get_timedelta, get_datetime_now
+
     if not my_object:
         return
+
     cache_name = get_filecache_name(cache_name)
     if not cache_name:
         return
-    timestamp = get_datetime_now() + get_timedelta(days=cache_days)
-    cache_obj = {'my_object': my_object, 'expires': timestamp.strftime("%Y-%m-%dT%H:%M:%S")}
+
+    timestamp = ''
+    if cache_days:
+        timestamp = get_datetime_now() + get_timedelta(days=cache_days)
+        timestamp = timestamp.strftime("%Y-%m-%dT%H:%M:%S")
+
+    cache_obj = {'my_object': my_object, 'expires': timestamp}
 
     with xbmcvfs.File(validate_join(get_write_path('pickle'), cache_name), 'w') as file:
         dump(cache_obj, file, indent=4)
+
     return my_object
 
 
@@ -195,7 +203,7 @@ def get_json_filecache(cache_name):
     except (IOError, json.JSONDecodeError):
         cache_obj = None
     from resources.lib.addon.tmdate import is_future_timestamp
-    if cache_obj and is_future_timestamp(cache_obj.get('expires', '')):
+    if cache_obj and (not cache_obj.get('expires') or is_future_timestamp(cache_obj.get('expires', ''))):
         return cache_obj.get('my_object')
 
 
