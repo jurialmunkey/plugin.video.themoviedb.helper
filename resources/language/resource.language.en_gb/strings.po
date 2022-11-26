@@ -2411,6 +2411,26 @@ msgctxt "#32473"
 msgid "Collected"
 msgstr ""
 
+#: /resources/lib/script/method.py
+msgctxt "#32474"
+msgid "Successfully added {} as default player for {}"
+msgstr ""
+
+#: /resources/lib/script/method.py
+msgctxt "#32475"
+msgid "Successfully cleared default player for {}"
+msgstr ""
+
+#: /resources/lib/items/listitem.py
+msgctxt "#32476"
+msgid "Choose default player"
+msgstr ""
+
+#: /resources/lib/script/method.py
+msgctxt "#32477"
+msgid "Change default player for tvshow, season, or episode"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
