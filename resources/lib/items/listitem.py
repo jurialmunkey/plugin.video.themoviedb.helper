@@ -268,9 +268,12 @@ class _ListItem(object):
 
         if self.stream_details:
             for i in self.stream_details.get('video'):
-                i['hdrType'] = i.pop('hdrtype', '')  # Workaround inconsistent key naming in VideoStreamDetail class and JSON-RPC
-                i['stereoMode'] = i.pop('stereomode', '')  # Workaround inconsistent key naming in VideoStreamDetail class and JSON-RPC
-                info_tag.addVideoStream(VideoStreamDetail(**i))
+                try:
+                    info_tag.addVideoStream(VideoStreamDetail(**i))
+                except TypeError:  # Work around inconsistent key names prior to Nexus fixes - TEMPORARY BANDAID, Remove with RC.
+                    i['hdrType'] = i.pop('hdrtype', '')
+                    i['stereoMode'] = i.pop('stereomode', '')
+                    info_tag.addVideoStream(VideoStreamDetail(**i))
             for i in self.stream_details.get('audio'):
                 info_tag.addAudioStream(AudioStreamDetail(**i))
             for i in self.stream_details.get('subtitle'):
