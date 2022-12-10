@@ -116,7 +116,7 @@ def kodi_setting(kodi_setting, **kwargs):
     params = {"setting": kodi_setting}
     response = get_jsonrpc(method, params)
     get_property(
-        name=kwargs.get('property') or 'TMDbHelper.KodiSetting',
+        name=kwargs.get('property') or 'KodiSetting',
         set_property=f'{response.get("result", {}).get("value", "")}')
 
 
