@@ -1,6 +1,6 @@
-from xbmc import Actor, VideoStreamDetail, AudioStreamDetail, SubtitleStreamDetail
 from xbmcgui import ListItem as KodiListItem
 from tmdbhelper.parser import try_int, merge_two_dicts
+from infotagger.listitem import ListItemInfoTag
 from resources.lib.addon.consts import ACCEPTED_MEDIATYPES, PARAM_WIDGETS_RELOAD
 from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_media_type, get_setting, get_condvisibility, get_localized, encode_url
 from resources.lib.addon.tmdate import is_unaired_timestamp
@@ -18,53 +18,6 @@ _is_hide_unaired_movies = get_setting('hide_unaired_movies')
 _is_hide_unaired_episodes = get_setting('hide_unaired_episodes')
 _is_flatten_seasons = get_setting('flatten_seasons')
 _is_nextaired_linklibrary = get_setting('nextaired_linklibrary')
-
-
-INFOTAGVIDEO_ATTR = {
-    'dbid': ('setDbId', int),
-    'year': ('setYear', int),
-    'title': ('setTitle', str),
-    'originaltitle': ('setOriginalTitle', str),
-    'mpaa': ('setMpaa', str),
-    'plot': ('setPlot', str),
-    'plotoutline': ('setPlotOutline', str),
-    'episode': ('setEpisode', int),
-    'season': ('setSeason', int),
-    'sortseason': ('setSortSeason', int),
-    'episodeguide': ('setEpisodeGuide', str),
-    'top250': ('setTop250', int),
-    'setid': ('setSetId', int),
-    'tracknumber': ('setTrackNumber', int),
-    'rating': ('setRating', float),
-    'userrating': ('setUserRating', int),
-    'playcount': ('setPlaycount', int),
-    'sorttitle': ('setSortTitle', str),
-    'tagline': ('setTagLine', str),
-    'tvshowtitle': ('setTvShowTitle', str),
-    'status': ('setTvShowStatus', str),
-    'genre': ('setGenres', list),
-    'country': ('setCountries', list),
-    'director': ('setDirectors', list),
-    'studio': ('setStudios', list),
-    'writer': ('setWriters', list),
-    'duration': ('setDuration', int),
-    'premiered': ('setPremiered', str),
-    'set': ('setSet', str),
-    'setoverview': ('setOverview', str),
-    'tag': ('setTags', list),
-    'productioncode': ('setProductionCode', str),
-    'firstaired': ('setFirstAired', str),
-    'lastplayed': ('setLastPlayed', str),
-    'album': ('setAlbum', str),
-    'votes': ('setVotes', int),
-    'trailer': ('setTrailer', str),
-    'path': ('setPath', str),
-    'filenameandpath': ('setFilenameAndPath', str),
-    'imdbnumber': ('setIMDBNumber', str),
-    'dateadded': ('setDateAdded', str),
-    'mediatype': ('setMediaType', str),
-    'showlinks': ('setShowLinks', str),
-}
 
 
 def ListItem(*args, **kwargs):
@@ -247,37 +200,11 @@ class _ListItem(object):
         if self.library == 'pictures':
             return listitem
 
-        info_tag = listitem.getVideoInfoTag()
-
-        for k, v in self.infolabels.items():
-            if v is None:
-                continue
-            try:
-                func = getattr(info_tag, INFOTAGVIDEO_ATTR[k][0])
-                func(v)
-            except KeyError:
-                kodi_log(f'InfoTagVideo: KEYERROR: {k}', 1)
-                continue
-            except TypeError:
-                func(INFOTAGVIDEO_ATTR[k][1](v))
-
-        if self.unique_ids:
-            info_tag.setUniqueIDs({k: f'{v}' for k, v in self.unique_ids.items()})
-        if self.cast:
-            info_tag.setCast([Actor(**i) for i in self.cast])
-
-        if self.stream_details:
-            for i in self.stream_details.get('video'):
-                try:
-                    info_tag.addVideoStream(VideoStreamDetail(**i))
-                except TypeError:  # Work around inconsistent key names prior to Nexus fixes - TEMPORARY BANDAID, Remove with RC.
-                    i['hdrType'] = i.pop('hdrtype', '')
-                    i['stereoMode'] = i.pop('stereomode', '')
-                    info_tag.addVideoStream(VideoStreamDetail(**i))
-            for i in self.stream_details.get('audio'):
-                info_tag.addAudioStream(AudioStreamDetail(**i))
-            for i in self.stream_details.get('subtitle'):
-                info_tag.addSubtitleStream(SubtitleStreamDetail(**i))
+        info_tag = ListItemInfoTag(listitem)
+        info_tag.set_info(self.infolabels)
+        info_tag.set_unique_ids(self.unique_ids)
+        info_tag.set_cast(self.cast)
+        info_tag.set_stream_details(self.stream_details)
 
         return listitem
 
