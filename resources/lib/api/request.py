@@ -98,18 +98,18 @@ class RequestAPI(object):
             return
 
         self.do_error_notification(
-            f'ConnectionError: {msg_affix} {err}\nSuppressing retries for 30 seconds',
+            f'ConnectionError: {msg_affix} {err}\nSuppressing retries for {wait_time} seconds',
             get_localized(32308).format(' '.join([self.req_api_name, msg_affix])),
-            get_localized(32307).format('30'))
+            get_localized(32307).format(f'{wait_time}'))
 
     def fivehundred_error(self, request, wait_time=60):
         from json import dumps
         self.req_500_err[request] = set_timestamp(wait_time)
         get_property(self.req_500_err_prop, dumps(self.req_500_err))
         self.do_error_notification(
-            f'ConnectionError: {dumps(self.req_500_err)}\nSuppressing retries for 60 seconds',
+            f'ConnectionError: {dumps(self.req_500_err)}\nSuppressing retries for {wait_time} seconds',
             get_localized(32308).format(self.req_api_name),
-            get_localized(32307).format('60'))
+            get_localized(32307).format(f'{wait_time}'))
 
     def timeout_error(self, err):
         """ Log timeout error
@@ -163,6 +163,10 @@ class RequestAPI(object):
             # In this case let's set a connection error and suppress retries for a minute
             if response.status_code == 500:
                 self.fivehundred_error(request)
+            # 503 code is server error which usually indicates Trakt has database maintenance
+            # In this case let's set a connection error and suppress retries for five minutes
+            elif response.status_code == 503:
+                self.connection_error(503, wait_time=300)
             # 429 is too many requests code so suppress retries for a minute
             elif response.status_code == 429:
                 self.connection_error(429)

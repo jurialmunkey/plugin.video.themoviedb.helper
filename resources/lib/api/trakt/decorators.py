@@ -71,7 +71,7 @@ def use_activity_cache(activity_type=None, activity_key=None, cache_days=None):
                 if allow_fallback:
                     kodi_log([
                         'No response for ', cache_name,
-                        '\nAttempting fallback... ', 'Failed!' if not cache_object else 'Success!'], 1)
+                        '\nAttempting fallback... ', 'Failed!' if not cache_object else 'Success!'], 2)
                 return cache_object.get('response') if cache_object else None
             func_set(
                 {'response': response, 'last_activity': last_activity},
