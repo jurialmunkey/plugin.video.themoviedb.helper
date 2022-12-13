@@ -525,6 +525,14 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
             self.headers['Authorization'] = f'Bearer {self.authorization.get("access_token")}'
             return token
 
+        def _check_auth():
+            url = 'https://api.trakt.tv/sync/last_activities'
+            response = self.get_simple_api_request(url, headers=self.headers)
+            try:
+                return response.status_code
+            except AttributeError:
+                return
+
         # Already got authorization so return credentials
         if self.authorization:
             return self.authorization
@@ -533,38 +541,60 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         token = _get_token()
 
         # No saved credentials and user trying to use a feature that requires authorization so ask them to login
-        if not token and login:
-            if not self.attempted_login and Dialog().yesno(
-                    self.dialog_noapikey_header,
-                    self.dialog_noapikey_text,
-                    nolabel=get_localized(222),
-                    yeslabel=get_localized(186)):
+        if not token and login and not self.attempted_login:
+            if Dialog().yesno(
+                    self.dialog_noapikey_header, self.dialog_noapikey_text,
+                    nolabel=get_localized(222), yeslabel=get_localized(186)):
                 self.login()
             self.attempted_login = True
 
         # First time authorization in this session so let's confirm
-        if self.authorization and get_property('TraktIsAuth') != 'True':
-            if not get_timestamp(get_property('TraktRefreshTimeStamp', is_type=float) or 0):
-                if has_property_lock('TraktCheckingAuth'):  # Wait if another thread is checking authorization
-                    _get_token()  # Get the token set in the other thread
-                    return self.authorization  # Another thread checked token so return
+        if (
+                self.authorization
+                and get_property('TraktIsAuth') != 'True'
+                and not get_timestamp(get_property('TraktRefreshTimeStamp', is_type=float) or 0)):
 
-                get_property('TraktCheckingAuth', 1)  # Set Thread lock property
-                kodi_log('Trakt authorization started', 1)
+            # Wait if another thread is checking authorization
+            if has_property_lock('TraktCheckingAuth'):
+                if get_property('TraktIsDown') == 'True':
+                    return  # Trakt is down so do nothing
+                _get_token()  # Get the token set in the other thread
+                return self.authorization  # Another thread checked token so return
+
+            # Set a thread lock property
+            get_property('TraktCheckingAuth', 1)
+
+            # Trakt was previously down so check again
+            if get_property('TraktIsDown') == 'True' and _check_auth() not in [None, 500, 503]:
+                get_property('TraktIsDown', clear_property=True)
+
+            if get_property('TraktIsDown') != 'True':
+                kodi_log('Trakt authorization check started', 1)
 
                 # Check if we can get a response from user account
-                with TimerFunc('Trakt authorization took', inline=True) as tf:
-                    response = self.get_simple_api_request('https://api.trakt.tv/sync/last_activities', headers=self.headers)
-                    if not response or response.status_code == 401:  # 401 is unauthorized error code so let's try refreshing the token
+                with TimerFunc('Trakt authorization check took', inline=True) as tf:
+                    response = _check_auth()
+
+                    # Unauthorised so attempt a refresh
+                    if response in [None, 401]:
                         kodi_log('Trakt unauthorized!', 1)
                         self.authorization = self.refresh_token()
-                    if self.authorization:  # Authorization confirmed so let's set a window property for future reference in this session
+
+                    # Trakt database is down
+                    if response in [500, 503]:
+                        kodi_log('Trakt is currently down!', 1)
+                        get_property('TraktIsDown', 'True')
+
+                    # Have a token and it worked! Auth confirmed.
+                    elif self.authorization:
                         kodi_log('Trakt user account authorized', 1)
                         get_property('TraktIsAuth', 'True')
-                    get_property('TraktCheckingAuth', clear_property=True)
-                    if get_setting('startup_notifications'):
-                        total_time = timer() - tf.timer_a
-                        Dialog().notification('TMDbHelper', f'Trakt authorized in {total_time:.3f}s', icon=f'{ADDONPATH}/icon.png')
+
+                        if get_setting('startup_notifications'):
+                            total_time = timer() - tf.timer_a
+                            Dialog().notification('TMDbHelper', f'Trakt authorized in {total_time:.3f}s', icon=f'{ADDONPATH}/icon.png')
+
+            get_property('TraktCheckingAuth', clear_property=True)
 
         return self.authorization
 
