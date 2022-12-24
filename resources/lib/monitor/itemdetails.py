@@ -192,7 +192,7 @@ class ListItemDetails():
 
     def get_builtitem(self):
         if not self._itemdetails:
-            return ListItem().get_listitem()
+            return ListItem().get_listitem(offscreen=False)
 
         def set_time_properties(duration):
             minutes = duration // 60 % 60
@@ -215,4 +215,4 @@ class ListItemDetails():
 
         li = ListItem(**self._itemdetails.listitem)
         li.art = self.get_builtartwork()
-        return li.get_listitem()
+        return li.get_listitem(offscreen=False)
