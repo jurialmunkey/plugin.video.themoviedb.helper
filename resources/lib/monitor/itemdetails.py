@@ -166,7 +166,9 @@ class ListItemDetails():
         return {'tmdb_type': tmdb_type, 'tmdb_id': tmdb_id}
 
     def get_itemdetails(self, func, *args, **kwargs):
-        """ Returns a named tuple of tmdb_type, tmdb_id, listitem, artwork """
+        """ Use itemdetails cache to return a named tuple of tmdb_type, tmdb_id, listitem, artwork
+        Runs func(*args, **kwargs) after retrieving a new uncached item for early code execution
+        """
         tmdb_type = self.get_tmdb_type()
 
         def _get_quick(cache_name_id):
