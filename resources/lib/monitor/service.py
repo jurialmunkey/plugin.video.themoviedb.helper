@@ -37,8 +37,8 @@ class ServiceMonitor(object):
             self.player_monitor.current_time = self.player_monitor.getTime()
         self.xbmc_monitor.waitForAbort(1)
 
-    def _on_idle(self):
-        self.xbmc_monitor.waitForAbort(30)
+    def _on_idle(self, wait_time=30):
+        self.xbmc_monitor.waitForAbort(wait_time)
 
     def _on_modal(self):
         self.xbmc_monitor.waitForAbort(1)
@@ -83,7 +83,11 @@ class ServiceMonitor(object):
                     "!Skin.HasSetting(TMDbHelper.EnableBlur) + "
                     "!Skin.HasSetting(TMDbHelper.EnableDesaturate) + "
                     "!Skin.HasSetting(TMDbHelper.EnableColors)]"):
-                self._on_idle()
+                self._on_idle(30)
+
+            # Sit idle in a holding pattern if screen saver is active
+            elif get_condvisibility("System.ScreenSaverActive"):
+                self._on_idle(4)
 
             # skip when modal or busy dialogs are opened (e.g. select / progress / busy etc.)
             elif get_condvisibility(
