@@ -638,8 +638,11 @@
 					<default>False</default>
 					<control type="toggle"/>
 				</setting>
-			</group>
-			<group id="2" label="14022">
+				<setting id="service_listitem_readahead" type="boolean" label="32480" help="">
+					<level>0</level>
+					<default>True</default>
+					<control type="toggle"/>
+				</setting>
 				<setting id="recache_kodidb" type="action" label="32467" help="">
 					<level>0</level>
 					<data>RunScript(plugin.video.themoviedb.helper, recache_kodidb)</data>
