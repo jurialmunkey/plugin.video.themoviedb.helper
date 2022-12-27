@@ -44,6 +44,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         self._clearfunc_wp = {'func': self.on_exit, 'keep_tv_artwork': True, 'is_done': False}
         self._clearfunc_lc = {'func': None}
         self._offscreen_li = get_setting('rebuild_listitem_offscreen')  # Forces rebuilding ListItem before joining artwork and ratings threads. Workaround for potential issues with offscreen=True listitems being updated onscreen and GUI lock jankiness making offscreen=False unsuitable.
+        self._readahead_li = get_setting('service_listitem_readahead')  # Allows readahead queue of next ListItems when idle
         self._pre_artwork_thread = None
 
     def setup_current_container(self):
@@ -270,6 +271,10 @@ class ListItemMonitor(CommonMonitorFunctions):
         get_property('IsUpdating', clear_property=True)
 
     def get_readahead(self):
+        # No readahead if disabled by user
+        if not self._readahead_li:
+            return
+
         # No readahead in info dialog
         if get_condvisibility(CV_USE_LISTITEM):
             return
