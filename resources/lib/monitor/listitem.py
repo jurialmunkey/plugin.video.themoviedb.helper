@@ -222,7 +222,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             t = Thread(target=_process_artwork_ratings)
             t.start()
 
-    def on_finalise_winproperties(self):
+    def on_finalise_winproperties(self, process_artwork=True, process_ratings=True):
         _item = self._item
         _item.get_additional_properties()
         _item.get_nextaired()
@@ -238,7 +238,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             self.clear_property_list(SETMAIN_ARTWORK)
             self.set_iter_properties(_artwork, SETMAIN_ARTWORK) if self.is_same_item() else None
 
-        if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
+        if process_artwork:
             thread_artwork = Thread(target=_process_artwork)
             thread_artwork.start()
 
@@ -250,7 +250,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             self.set_iter_properties(_details.get('infoproperties', {}), SETPROP_RATINGS) if self.is_same_item() else None
             get_property('IsUpdatingRatings', clear_property=True)
 
-        if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"):
+        if process_ratings:
             thread_ratings = Thread(target=_process_ratings)
             thread_ratings.start()
 
@@ -267,7 +267,10 @@ class ListItemMonitor(CommonMonitorFunctions):
             self.clear_property(k)
 
     def on_finalise(self):
-        self.on_finalise_listcontainer() if self._listcontainer else self.on_finalise_winproperties()
+        func = self.on_finalise_listcontainer if self._listcontainer else self.on_finalise_winproperties
+        func(
+            process_artwork=get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"),
+            process_ratings=get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"))
         get_property('IsUpdating', clear_property=True)
 
     def get_readahead(self):
