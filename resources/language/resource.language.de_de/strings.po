@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2022-10-15 14:23+0200\n"
+"PO-Revision-Date: 2022-12-06 17:37+0100\n"
 "Last-Translator: Peat80 <>\n"
 "Language-Team: LANGUAGE\n"
 "Language: de_DE\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.2\n"
 
 msgctxt "#30000"
 msgid "Arabic (United Arab Emirates)"
@@ -358,8 +358,7 @@ msgstr "Ungenaue Übereinstimmungen zulassen (Jahr ignorieren) für Filme"
 #: /resources/settings.xml
 msgctxt "#32069"
 msgid "Allow fuzzy matches (ignore year) for tvshows"
-msgstr ""
-"Ungenaue Übereinstimmungen zulassen (Jahr ignorieren) für Fernsehsendungen"
+msgstr "Ungenaue Übereinstimmungen für TV-Sendungen zulassen (Jahr ignorieren)"
 
 #: /resources/lib/tmdb.py
 msgctxt "#32070"
@@ -809,7 +808,8 @@ msgstr "Nächste Ausstrahlung (Bibliothek)"
 msgctxt "#32156"
 msgid "Next aired library calendar links to local tvshow"
 msgstr ""
-"\"Nächste Bibliotheksausstrahlung\" im Kalender verweist auf lokale TV-Show"
+"\"Nächste Bibliotheksausstrahlung\" im Kalender verweist auf lokale TV-"
+"Sendung"
 
 #: /resources/lib/context.py
 msgctxt "#32157"
@@ -926,7 +926,7 @@ msgstr "Bestbewertete"
 #: /resources/lib/plugin.py
 msgctxt "#32177"
 msgid "Upcoming"
-msgstr "Bevorstehende"
+msgstr "Demnächst"
 
 #: /resources/lib/plugin.py
 msgctxt "#32178"
@@ -941,7 +941,7 @@ msgstr "Diese Woche im Trend"
 #: /resources/lib/plugin.py
 msgctxt "#32180"
 msgid "In Theatres"
-msgstr "In Kinos"
+msgstr "Im Kino"
 
 #: /resources/lib/plugin.py
 msgctxt "#32181"
@@ -951,7 +951,7 @@ msgstr "Heute ausgestrahlt"
 #: /resources/lib/plugin.py
 msgctxt "#32182"
 msgid "Currently Airing"
-msgstr "Jetzt läuft"
+msgstr "Momentan auf Sendung"
 
 #: /resources/lib/plugin.py
 msgctxt "#32183"
@@ -986,7 +986,7 @@ msgstr "Bewertungen"
 #: /resources/lib/plugin.py
 msgctxt "#32189"
 msgid "TV Networks"
-msgstr "TV-Netzwerke"
+msgstr "Fernsehsender"
 
 #: /resources/lib/plugin.py
 msgctxt "#32190"
@@ -1081,7 +1081,7 @@ msgstr "Top 10 Kinokassen"
 #: /resources/lib/plugin.py
 msgctxt "#32208"
 msgid "Trending Lists"
-msgstr "Trendlisten"
+msgstr "Angesagte Listen"
 
 #: /resources/lib/plugin.py
 msgctxt "#32209"
@@ -1185,7 +1185,7 @@ msgstr "Besetzung in Filmen"
 #: /resources/lib/plugin.py
 msgctxt "#32228"
 msgid "Cast in TV Shows"
-msgstr "Besetzung in TV-Shows"
+msgstr "Besetzung in TV-Sendungen"
 
 #: /resources/lib/plugin.py
 msgctxt "#32229"
@@ -1195,7 +1195,7 @@ msgstr "Crew in Filmen"
 #: /resources/lib/plugin.py
 msgctxt "#32230"
 msgid "Crew in TV Shows"
-msgstr "Crew in TV-Shows"
+msgstr "Crew in TV-Sendungen"
 
 #: /resources/lib/plugin.py
 msgctxt "#32231"
@@ -1807,7 +1807,7 @@ msgstr ""
 "werden, wenn Schwierigkeiten bei der Verwendung von setResolvedUrl mit "
 "diesem Abspieler auftreten.\n"
 "\n"
-"Möchtest due die Auflösungsmethode dieses Players wirklich auf PlayMedia "
+"Möchtest du die Auflösungsmethode dieses Players wirklich auf PlayMedia "
 "einstellen?"
 
 #: /resources/lib/player/configure.py
@@ -2124,7 +2124,7 @@ msgstr "Timer-Reporte für Verzeichnisse loggen"
 #: /resources/settings.xml
 msgctxt "#32396"
 msgid "Set unwatched episode count for in-progress tvshows only"
-msgstr "\"Ungesehene Folgen\"-Zähler nur für begonnene TV-Shows verwenden"
+msgstr "\"Ungesehene Folgen\"-Zähler nur für begonnene TV-Sendungen verwenden"
 
 #: /resources/settings.xml
 msgctxt "#32397"
@@ -2164,12 +2164,12 @@ msgstr "Erhöhe Limits für synchronisierte Listeneinträge pro Seite (langsamer
 #: /resources/settings.xml
 msgctxt "#32404"
 msgid "Flatten tvshows with multiple episodes airing same day"
-msgstr "TV-Shows reduzieren wenn mehrere Folgen zeitgleich erscheinen"
+msgstr "TV-Sendungen reduzieren wenn mehrere Folgen zeitgleich erscheinen"
 
 #: /resources/lib/addon/constants.py
 msgctxt "#32405"
 msgid "Your TV Shows Airing This Week"
-msgstr "Deine TV-Shows mit Ausstrahlung diese Woche"
+msgstr "Deine TV-Sendungen mit Ausstrahlung diese Woche"
 
 #: /resources/lib/container/basedir.py
 msgctxt "#32406"
@@ -2300,7 +2300,7 @@ msgstr "Browse nach Such-URL für Filmsuche"
 #: /resources/lib/player/configure.py
 msgctxt "#32429"
 msgid "Browse for TVSHOW search url"
-msgstr "Browse nach Such-URL für TV-Show"
+msgstr "Browse nach Such-URL für TV-Sendung"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32430"
@@ -2310,7 +2310,7 @@ msgstr "Namen für diesen Player eingeben"
 #: /resources/lib/player/configure.py
 msgctxt "#32431"
 msgid "Use the same search URL for tvshows as movies?"
-msgstr "Gleiche Such-URL für TV-Shows & Filme verwenden?"
+msgstr "Gleiche Such-URL für TV-Sendungen & Filme verwenden?"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32432"
@@ -2451,7 +2451,7 @@ msgstr "Watchlist (Erwartet)"
 #: /resources/lib/items/basedir.py
 msgctxt "#32458"
 msgid "Airing Next Library"
-msgstr "Als Nächstes Ausgestrahlt (Bibliothek)"
+msgstr "Nächste Ausstrahlung (Bibliothek)"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32459"
@@ -2530,6 +2530,31 @@ msgstr "Benachrichtigungen bei Verbindungsfehlern"
 msgctxt "#32472"
 msgid "Cache image location"
 msgstr "Speicherort für Bilder-Cache"
+
+#: /resources/lib/api/trakt/api.py
+msgctxt "#32473"
+msgid "Collected"
+msgstr "Gesammelt"
+
+#: /resources/lib/script/method.py
+msgctxt "#32474"
+msgid "Successfully added {} as default player for {}"
+msgstr "{} als Standardabspieler für {} hinzugefügt"
+
+#: /resources/lib/script/method.py
+msgctxt "#32475"
+msgid "Successfully cleared default player for {}"
+msgstr "Standardabspieler für {} gelöscht"
+
+#: /resources/lib/items/listitem.py
+msgctxt "#32476"
+msgid "Choose default player"
+msgstr "Standardabspieler auswählen"
+
+#: /resources/lib/script/method.py
+msgctxt "#32477"
+msgid "Change default player for tvshow, season, or episode"
+msgstr "Standardabspieler für TV-Sendung, Staffel oder Folge ändern"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
