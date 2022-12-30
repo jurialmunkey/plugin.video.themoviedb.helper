@@ -171,6 +171,14 @@ class Players(object):
 
     def _get_built_player(self, file, mode, value=None):
         value = value or self.players.get(file) or {}
+        if not value:
+            plugin_name = file
+            plugin_players = [
+                (file, player) for file, player in self.players.items()
+                if player['plugin'] == plugin_name
+            ]
+            if plugin_players:
+                file, value = plugin_players[0]
         if mode in ['play_movie', 'play_episode']:
             name = get_localized(32061)
             is_folder = False
