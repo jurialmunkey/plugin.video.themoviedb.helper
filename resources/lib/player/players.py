@@ -169,16 +169,15 @@ class Players(object):
                     return False  # Key didn't have a value so player fails assert check
         return True  # Player passed the assert check
 
-    def _get_built_player(self, file, mode, value=None):
-        value = value or self.players.get(file) or {}
-        if not value:
-            plugin_name = file
-            plugin_players = [
-                (file, player) for file, player in self.players.items()
-                if player['plugin'] == plugin_name
-            ]
-            if plugin_players:
-                file, value = plugin_players[0]
+    def _get_built_player(self, player_id, mode, value=None):
+        value = value or self.players.get(player_id)
+        if value:
+            file = player_id
+        else:
+            file, value = next(
+                ((file, value) for file, value in self.players.items() if value.get('plugin') == player_id),
+                (player_id, {})
+            )
         if mode in ['play_movie', 'play_episode']:
             name = get_localized(32061)
             is_folder = False
@@ -262,14 +261,14 @@ class Players(object):
                 continue  # Skip disabled players
             if tmdb_type == 'movie':
                 if v.get('play_movie') and self._check_assert(v.get('assert', {}).get('play_movie', [])):
-                    dialog_play.append(self._get_built_player(file=k, mode='play_movie', value=v))
+                    dialog_play.append(self._get_built_player(player_id=k, mode='play_movie', value=v))
                 if v.get('search_movie') and self._check_assert(v.get('assert', {}).get('search_movie', [])):
-                    dialog_search.append(self._get_built_player(file=k, mode='search_movie', value=v))
+                    dialog_search.append(self._get_built_player(player_id=k, mode='search_movie', value=v))
             else:
                 if v.get('play_episode') and self._check_assert(v.get('assert', {}).get('play_episode', [])):
-                    dialog_play.append(self._get_built_player(file=k, mode='play_episode', value=v))
+                    dialog_play.append(self._get_built_player(player_id=k, mode='play_episode', value=v))
                 if v.get('search_episode') and self._check_assert(v.get('assert', {}).get('search_episode', [])):
-                    dialog_search.append(self._get_built_player(file=k, mode='search_episode', value=v))
+                    dialog_search.append(self._get_built_player(player_id=k, mode='search_episode', value=v))
         return dialog_play + dialog_search
 
     def select_player(self, detailed=True, clear_player=False, header=get_localized(32042), combined=False):
@@ -334,10 +333,10 @@ class Players(object):
     def _get_player_or_fallback(self, fallback):
         if not fallback:
             return
-        file, mode = fallback.split()
-        if not file or not mode:
+        player_id, mode = fallback.split()
+        if not player_id or not mode:
             return
-        player = self._get_built_player(file, mode)
+        player = self._get_built_player(player_id, mode)
         if not player:
             return
 
