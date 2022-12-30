@@ -174,10 +174,12 @@ class Players(object):
         if value:
             file = player_id
         else:
-            file, value = next(
-                ((file, value) for file, value in self.players.items() if value.get('plugin') == player_id),
-                (player_id, {})
-            )
+            for file, value in self.players.items():
+                if value.get('plugin') == player_id:
+                    break
+            else:
+                file = player_id
+                value = {}
         if mode in ['play_movie', 'play_episode']:
             name = get_localized(32061)
             is_folder = False
