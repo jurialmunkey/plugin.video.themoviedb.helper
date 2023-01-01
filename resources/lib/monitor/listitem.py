@@ -187,7 +187,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         _pre_item = self._pre_item
 
         if _pre_item != self.get_cur_item():
-            return self.on_exit(keep_tv_artwork=True)
+            return
 
         self.add_item_listcontainer(_listitem)
 
