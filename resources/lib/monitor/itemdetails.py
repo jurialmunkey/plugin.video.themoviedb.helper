@@ -14,6 +14,7 @@ BASEITEM_PROPERTIES = [
     ('base_tagline', ('tagline',)),
     ('base_dbtype', ('dbtype',)),
     ('base_poster', ('Art(poster)',)),
+    ('base_fanart', ('Art(fanart)',)),
     ('base_clearlogo', ('Art(clearlogo)', 'Art(tvshow.clearlogo)', 'Art(artist.clearlogo)')),
     ('base_tvshowtitle', ('tvshowtitle',))]
 
