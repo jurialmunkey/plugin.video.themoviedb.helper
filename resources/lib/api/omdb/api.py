@@ -4,6 +4,23 @@ from resources.lib.api.request import RequestAPI
 from resources.lib.api.omdb.mapping import ItemMapper
 
 
+def translate_xml(request):
+    """ Workaround wrapper for broken ElementTree in Python 3.11.1 """
+
+    if not request:
+        return
+
+    from xml.dom.minidom import parseString
+
+    try:
+        r = parseString(request.text)
+        d = {k: v for k, v in r.firstChild.firstChild.attributes.items() if k and v}
+    except AttributeError:
+        return
+
+    return {'root': {'movie': [d]}}
+
+
 class OMDb(RequestAPI):
     def __init__(self, api_key=None):
         super(OMDb, self).__init__(
@@ -11,6 +28,7 @@ class OMDb(RequestAPI):
             req_api_name='OMDb',
             req_api_url='https://www.omdbapi.com/',
             error_notification=False)
+        self.translate_xml = translate_xml  # Temp monkey patch bandaid for broken ElementTree. Remove after upstream fix.
 
     def get_request_item(self, imdb_id=None, title=None, year=None, tomatoes=True, fullplot=True, cache_only=False):
         kwparams = {}

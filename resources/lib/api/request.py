@@ -57,6 +57,7 @@ class RequestAPI(object):
         self.timeout = timeout or 15
         self._cache = BasicCache(filename=f'{req_api_name or "requests"}.db')
         self._error_notification = error_notification
+        self.translate_xml = translate_xml
 
     def do_error_notification(self, log_msg, note_head, note_body):
         kodi_log(log_msg, 1)
@@ -68,7 +69,7 @@ class RequestAPI(object):
         request = self.get_api_request(request=request, postdata=postdata, headers=headers, method=method)
         if not request:
             return {}
-        response = translate_xml(request) if is_xml else request.json()
+        response = self.translate_xml(request) if is_xml else request.json()
         request.close()
         return response
 
