@@ -8,7 +8,6 @@ from resources.lib.addon.logger import kodi_log
 from resources.lib.addon.consts import CACHE_SHORT, CACHE_LONG
 
 """ Lazyimports
-import xml.etree.ElementTree as ET
 from copy import copy
 from json import dumps
 import requests
@@ -16,23 +15,36 @@ import requests
 
 
 def translate_xml(request):
-    def dictify(r, root=True):
+    """ MiniDOM alternative to ElementTree parsing of XML to dictionary """
+
+    def dictify(r, root=True, parent_dict=None):
         if root:
-            return {r.tag: dictify(r, False)}
-        from copy import copy
-        d = copy(r.attrib)
-        if r.text:
-            d["_text"] = r.text
-        for x in r.findall("./*"):
-            if x.tag not in d:
-                d[x.tag] = []
-            d[x.tag].append(dictify(x, False))
-        return d
-    if request:
-        import xml.etree.ElementTree as ET
-        request = ET.fromstring(request.content)
-        request = dictify(request)
-    return request
+
+            r = r.firstChild
+            return {r.tagName: dictify(r, False)}
+
+        if parent_dict is None:
+            parent_dict = {}
+
+        for c in r.childNodes:
+            if c.nodeType == c.TEXT_NODE:
+                parent_dict['_text'] = c.nodeValue
+                continue
+
+            child_list = parent_dict.setdefault(c.tagName, [])
+            child_dict = {k: v for k, v in c.attributes.items()} if c.attributes else {}
+            child_list.append(child_dict)
+
+            if c.childNodes:
+                dictify(c, False, child_dict)
+
+        return parent_dict
+
+    if not request:
+        return
+
+    from xml.dom.minidom import parseString
+    return dictify(parseString(request.text))
 
 
 def json_loads(obj):
