@@ -78,11 +78,10 @@ class ServiceMonitor(object):
 
             # Sit idle in a holding pattern if the skin doesn't need the service monitor yet
             elif get_condvisibility(
-                    "System.ScreenSaverActive | "
-                    "[!Skin.HasSetting(TMDbHelper.Service) + "
+                    "!Skin.HasSetting(TMDbHelper.Service) + "
                     "!Skin.HasSetting(TMDbHelper.EnableBlur) + "
                     "!Skin.HasSetting(TMDbHelper.EnableDesaturate) + "
-                    "!Skin.HasSetting(TMDbHelper.EnableColors)]"):
+                    "!Skin.HasSetting(TMDbHelper.EnableColors)"):
                 self._on_idle(30)
 
             # Sit idle in a holding pattern if screen saver is active
