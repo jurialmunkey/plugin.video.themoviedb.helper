@@ -158,7 +158,9 @@ class Players(object):
                 priority = _providers.index(player_provider) + 1  # Add 1 because sorted() puts 0 index last
                 player['is_provider'] = True
             else:
-                priority = player.get('priority', PLAYERS_PRIORITY) + 100  # Increase priority baseline by 100 to prevent other players displaying above providers
+                if player.get('is_provider', True):
+                    priority = player.get('priority', PLAYERS_PRIORITY) + 100  # Increase priority baseline by 100 to prevent other players displaying above providers
+                player['is_provider'] = False    
             player['priority'] = priority
             return priority
 
