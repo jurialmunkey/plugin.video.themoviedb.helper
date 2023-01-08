@@ -162,7 +162,7 @@ class Players(object):
                     priority = player.get('priority', PLAYERS_PRIORITY) + 100  # Increase priority baseline by 100 to prevent other players displaying above providers
                 player['is_provider'] = False    
             player['priority'] = priority
-            return priority
+            return priority, player.get('name', '\uFFFF').lower()
 
         players = sorted(self.players.items(), key=_set_priority)
         return players
