@@ -39,11 +39,7 @@ class Router():
         return container.get_directory(items_only, build_items)
 
     def run(self):
-        mode = self.params.get('mode') or self.params.get('info')
-        player = self.params.get('player') or self.params.get('play_using')
-        if mode == 'play' or player:
-            self.params['mode'] = mode
-            self.params['player'] = player
+        if self.params.get('info') == 'play':
             return self.play_external()
         if self.params.get('info') == 'related':
             return self.context_related()
