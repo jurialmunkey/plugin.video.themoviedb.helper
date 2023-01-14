@@ -99,7 +99,7 @@ class Players(object):
             self.item = set_detailed_item(tmdb_type, tmdb_id, season, episode, details=self.details) or {}
 
             _p_dialog.update(f'{get_localized(32376)}...')
-            self.players_prioritised = self._set_provider_priority()
+            self.players_prioritised = self._get_prioritised_players()
             self.playerstring = get_playerstring(tmdb_type, tmdb_id, season, episode, details=self.details)
             self.dialog_players = self._get_players_for_dialog(tmdb_type)
 
@@ -144,7 +144,7 @@ class Players(object):
             details.set_details(details=self.details_ext_ids, reverse=True)
         return set_detailed_item(tmdb_type, tmdb_id, season, episode, details=details) or {}
 
-    def _set_provider_priority(self):
+    def _get_prioritised_players(self):
         try:
             providers = self.details.infoproperties.get('providers', '')
         except AttributeError:
