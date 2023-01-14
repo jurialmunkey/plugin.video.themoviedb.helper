@@ -17,7 +17,6 @@ from resources.lib.player.putils import get_players_from_file, make_playlist, ma
 from resources.lib.files.futils import get_json_filecache
 from resources.lib.addon.logger import kodi_log
 from threading import Thread
-from unicodedata import normalize as u_normalize
 
 
 def string_format_map(fmt, d):
@@ -163,7 +162,7 @@ class Players(object):
                     priority = player.get('priority', PLAYERS_PRIORITY) + 100  # Increase priority baseline by 100 to prevent other players displaying above providers
                 player['is_provider'] = False    
             player['priority'] = priority
-            return priority, u_normalize('NFKD', player.get('name', '\uFFFF')).lower()
+            return priority, player.get('plugin', '\uFFFF').lower()
 
         players = sorted(self.players.items(), key=_set_priority)
         return players
