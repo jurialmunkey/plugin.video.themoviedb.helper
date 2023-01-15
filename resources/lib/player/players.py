@@ -146,16 +146,17 @@ class Players(object):
 
     def _get_prioritised_players(self):
         try:
-            providers = self.details.infoproperties.get('providers', '')
+            providers = self.details.infoproperties.get('providers')
+            if providers:
+                providers = providers.split(' / ')
         except AttributeError:
-            providers = ''
-        providers = tuple(providers.split(' / '))
+            providers = None
 
-        def _set_priority(item, _providers=providers):
+        def _set_priority(item):
             file, player = item
-            player_provider = player.get('provider') or None
-            if player_provider in _providers:
-                priority = _providers.index(player_provider) + 1  # Add 1 because sorted() puts 0 index last
+            player_provider = providers and player.get('provider')
+            if player_provider and player_provider in providers:
+                priority = providers.index(player_provider) + 1  # Add 1 because sorted() puts 0 index last
                 player['is_provider'] = True
             else:
                 if player.get('is_provider', True):
