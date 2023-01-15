@@ -153,14 +153,14 @@ class Players(object):
 
         def _set_priority(item, _providers=providers):
             file, player = item
-            player_provider = player.get('provider')
+            player_provider = player.get('provider') or None
             if player_provider in _providers:
                 priority = _providers.index(player_provider) + 1  # Add 1 because sorted() puts 0 index last
                 player['is_provider'] = True
             else:
                 if player.get('is_provider', True):
                     priority = player.get('priority', PLAYERS_PRIORITY) + 100  # Increase priority baseline by 100 to prevent other players displaying above providers
-                player['is_provider'] = False    
+                player['is_provider'] = False
             player['priority'] = priority
             return priority, player.get('plugin', '\uFFFF').lower()
 
