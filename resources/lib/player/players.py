@@ -99,7 +99,7 @@ class Players(object):
             self.item = set_detailed_item(tmdb_type, tmdb_id, season, episode, details=self.details) or {}
 
             _p_dialog.update(f'{get_localized(32376)}...')
-            self._set_provider_priority()
+            self.players_prioritised = self._get_prioritised_players()
             self.playerstring = get_playerstring(tmdb_type, tmdb_id, season, episode, details=self.details)
             self.dialog_players = self._get_players_for_dialog(tmdb_type)
 
@@ -144,18 +144,29 @@ class Players(object):
             details.set_details(details=self.details_ext_ids, reverse=True)
         return set_detailed_item(tmdb_type, tmdb_id, season, episode, details=details) or {}
 
-    def _set_provider_priority(self):
-        try:  # Check if players are listed in providers and bump priority if found
-            providers = self.details.infoproperties['providers']
-            providers = providers.split(' / ')
-            for k, v in self.players.items():
-                if 'provider' not in v or v['provider'] not in providers:
-                    v['priority'] = v.get('priority', PLAYERS_PRIORITY) + 100  # Increase priority baseline by 100 to prevent other players displaying above providers
-                    continue
-                v['priority'] = providers.index(v['provider']) + 1  # Add 1 because sorted() puts 0 index last
-                v['is_provider'] = True
-        except (KeyError, AttributeError):
-            pass
+    def _get_prioritised_players(self):
+        try:
+            providers = self.details.infoproperties.get('providers')
+            if providers:
+                providers = providers.split(' / ')
+        except AttributeError:
+            providers = None
+
+        def _set_priority(item):
+            file, player = item
+            player_provider = providers and player.get('provider')
+            if player_provider and player_provider in providers:
+                priority = providers.index(player_provider) + 1  # Add 1 because sorted() puts 0 index last
+                player['is_provider'] = True
+            else:
+                if player.get('is_provider', True):
+                    priority = player.get('priority', PLAYERS_PRIORITY) + 100  # Increase priority baseline by 100 to prevent other players displaying above providers
+                player['is_provider'] = False
+            player['priority'] = priority
+            return priority, player.get('plugin', '\uFFFF').lower()
+
+        players = sorted(self.players.items(), key=_set_priority)
+        return players
 
     def _check_assert(self, keys=[]):
         if not self.item:
@@ -169,8 +180,19 @@ class Players(object):
                     return False  # Key didn't have a value so player fails assert check
         return True  # Player passed the assert check
 
-    def _get_built_player(self, file, mode, value=None):
-        value = value or self.players.get(file) or {}
+    def _get_built_player(self, player_id, mode, player=None):
+        player = player or self.players.get(player_id)
+        if player:
+            file = player_id
+        else:
+            for file, player in self.players_prioritised:
+                if mode not in player:
+                    continue
+                if player_id in (player.get('plugin'), player.get('provider'), player.get('name')):
+                    break
+            else:
+                file = player_id
+                player = {}
         if mode in ['play_movie', 'play_episode']:
             name = get_localized(32061)
             is_folder = False
@@ -180,17 +202,17 @@ class Players(object):
         return {
             'file': file, 'mode': mode,
             'is_folder': is_folder,
-            'is_provider': value.get('is_provider') if not is_folder else False,
-            'is_resolvable': value.get('is_resolvable'),
-            'requires_ids': value.get('requires_ids', False),
-            'make_playlist': value.get('make_playlist'),
-            'api_language': value.get('api_language'),
-            'language': value.get('language'),
-            'name': f'{name} {value.get("name")}',
-            'plugin_name': value.get('plugin'),
-            'plugin_icon': value.get('icon', '').format(ADDONPATH) or KodiAddon(value.get('plugin', '')).getAddonInfo('icon'),
-            'fallback': value.get('fallback', {}).get(mode),
-            'actions': value.get(mode)}
+            'is_provider': player.get('is_provider') if not is_folder else False,
+            'is_resolvable': player.get('is_resolvable'),
+            'requires_ids': player.get('requires_ids', False),
+            'make_playlist': player.get('make_playlist'),
+            'api_language': player.get('api_language'),
+            'language': player.get('language'),
+            'name': f'{name} {player.get("name")}',
+            'plugin_name': player.get('plugin'),
+            'plugin_icon': player.get('icon', '').format(ADDONPATH) or KodiAddon(player.get('plugin', '')).getAddonInfo('icon'),
+            'fallback': player.get('fallback', {}).get(mode),
+            'actions': player.get(mode)}
 
     def _get_local_item(self, tmdb_type):
         if not get_setting('default_player_kodi', 'int'):
@@ -248,20 +270,19 @@ class Players(object):
             return []
         dialog_play = self._get_local_item(tmdb_type)
         dialog_search = []
-        items = sorted(self.players.items(), key=lambda i: int(i[1].get('priority') or 0) or PLAYERS_PRIORITY)
-        for k, v in items:
-            if v.get('disabled', '').lower() == 'true':
+        for file, player in self.players_prioritised:
+            if player.get('disabled', '').lower() == 'true':
                 continue  # Skip disabled players
             if tmdb_type == 'movie':
-                if v.get('play_movie') and self._check_assert(v.get('assert', {}).get('play_movie', [])):
-                    dialog_play.append(self._get_built_player(file=k, mode='play_movie', value=v))
-                if v.get('search_movie') and self._check_assert(v.get('assert', {}).get('search_movie', [])):
-                    dialog_search.append(self._get_built_player(file=k, mode='search_movie', value=v))
+                if player.get('play_movie') and self._check_assert(player.get('assert', {}).get('play_movie', [])):
+                    dialog_play.append(self._get_built_player(player_id=file, mode='play_movie', player=player))
+                if player.get('search_movie') and self._check_assert(player.get('assert', {}).get('search_movie', [])):
+                    dialog_search.append(self._get_built_player(player_id=file, mode='search_movie', player=player))
             else:
-                if v.get('play_episode') and self._check_assert(v.get('assert', {}).get('play_episode', [])):
-                    dialog_play.append(self._get_built_player(file=k, mode='play_episode', value=v))
-                if v.get('search_episode') and self._check_assert(v.get('assert', {}).get('search_episode', [])):
-                    dialog_search.append(self._get_built_player(file=k, mode='search_episode', value=v))
+                if player.get('play_episode') and self._check_assert(player.get('assert', {}).get('play_episode', [])):
+                    dialog_play.append(self._get_built_player(player_id=file, mode='play_episode', player=player))
+                if player.get('search_episode') and self._check_assert(player.get('assert', {}).get('search_episode', [])):
+                    dialog_search.append(self._get_built_player(player_id=file, mode='search_episode', player=player))
         return dialog_play + dialog_search
 
     def select_player(self, detailed=True, clear_player=False, header=get_localized(32042), combined=False):
@@ -326,10 +347,10 @@ class Players(object):
     def _get_player_or_fallback(self, fallback):
         if not fallback:
             return
-        file, mode = fallback.split()
-        if not file or not mode:
+        player_id, mode = fallback.split()
+        if not player_id or not mode:
             return
-        player = self._get_built_player(file, mode)
+        player = self._get_built_player(player_id, mode)
         if not player:
             return
 
