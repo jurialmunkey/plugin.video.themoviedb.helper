@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2022-12-06 17:37+0100\n"
+"PO-Revision-Date: 2023-01-22 15:28+0100\n"
 "Last-Translator: Peat80 <>\n"
 "Language-Team: LANGUAGE\n"
 "Language: de_DE\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.2\n"
+"X-Generator: Poedit 3.2.2\n"
 
 msgctxt "#30000"
 msgid "Arabic (United Arab Emirates)"
@@ -2555,6 +2555,43 @@ msgstr "Standardabspieler auswählen"
 msgctxt "#32477"
 msgid "Change default player for tvshow, season, or episode"
 msgstr "Standardabspieler für TV-Sendung, Staffel oder Folge ändern"
+
+#: /resources/settings.xml
+msgctxt "#32478"
+msgid "Rebuild service listitems offscreen"
+msgstr "Wiederherstellen von Servicelisteneinträgen auslagern"
+
+#: /resources/settings.xml
+msgctxt "#32479"
+msgid ""
+"Some platforms experience crashes while updating onscreen background service "
+"listitems with additional properties. Forcing service listitems to be "
+"rebuilt offscreen prevents this issue but will be slightly slower to add "
+"artwork and ratings. Restart Kodi to see changes."
+msgstr ""
+"Auf einigen Plattformen kommt es zu Abstürzen wenn im Hintergrund "
+"Servicelisteneinträge mit zusätzlichen Eigenschaften aktualisiert werden. "
+"Eine erzwungene Auslagerung kann dies verhindern, das hinzufügen von Artwork "
+"und Bewertungen dauert dadurch aber länger. (Erfordert Neustart von KODI)"
+
+#: /resources/settings.xml
+msgctxt "#32480"
+msgid "Readahead caching of service listitems"
+msgstr "Readahed-Caching von Servicelisteneinträgen"
+
+#: /resources/settings.xml
+msgctxt "#32481"
+msgid ""
+"Increases the pool of recently watched items randomly selected from to use "
+"as the seed for becauase you watched style recommendations."
+msgstr ""
+"Vergrößert die Auswahlquellen der zufällig zusammengestellten \"Kürzlich "
+"gesehen\"-Einträge für Empfehlungen im \"Weil du gesehen hast\"-Stil."
+
+#: /resources/settings.xml
+msgctxt "#32482"
+msgid "Random seed pool for recommendations"
+msgstr "Zufällige Auswahlquellen für Empfehlungen"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
