@@ -17,6 +17,7 @@ provider-name="jurialmunkey">
 </extension>
 <extension point="xbmc.python.script" library="script.py" />
 <extension point="xbmc.service" library="service.py" />
+<extension point="xbmc.python.module" library="resources/lib"/>
 <extension point="xbmc.addon.metadata">
   <reuselanguageinvoker>false</reuselanguageinvoker>
   <summary lang="en_GB">TheMovieDb Helper</summary>
