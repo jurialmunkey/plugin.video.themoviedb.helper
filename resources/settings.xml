@@ -517,6 +517,18 @@
 						<close>true</close>
 					</control>
 				</setting>
+				<setting id="trakt_becausewatchedseed" type="integer" label="32482" help="32481">
+					<level>0</level>
+					<default>5</default>
+					<constraints>
+						<minimum>5</minimum>
+						<step>1</step>
+						<maximum>20</maximum>
+					</constraints>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
 				<setting id="trakt_watchedindicators" type="boolean" label="32034" help="">
 					<level>0</level>
 					<default>false</default>

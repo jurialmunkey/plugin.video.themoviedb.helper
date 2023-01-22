@@ -120,7 +120,7 @@ class ListBecauseYouWatched(Container):
             sync_type='watched',
             trakt_type=trakt_type,
             page=1,
-            limit=5,
+            limit=get_setting('trakt_becausewatchedseed', 'int') or 5,
             next_page=False,
             params=None,
             sort_by='plays' if info == 'trakt_becausemostwatched' else 'watched',

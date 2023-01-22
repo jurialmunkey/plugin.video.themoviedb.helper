@@ -2446,6 +2446,16 @@ msgctxt "#32480"
 msgid "Readahead caching of service listitems"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32481"
+msgid "Increases the pool of recently watched items randomly selected from to use as the seed for becauase you watched style recommendations."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32482"
+msgid "Random seed pool for recommendations"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
