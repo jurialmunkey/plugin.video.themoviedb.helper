@@ -18,6 +18,7 @@ _is_hide_unaired_movies = get_setting('hide_unaired_movies')
 _is_hide_unaired_episodes = get_setting('hide_unaired_episodes')
 _is_flatten_seasons = get_setting('flatten_seasons')
 _is_nextaired_linklibrary = get_setting('nextaired_linklibrary')
+_is_trakt_watchedindicators = get_setting('trakt_watchedindicators')
 
 
 def ListItem(*args, **kwargs):
@@ -306,6 +307,10 @@ class _Movie(_Video):
 
     def set_playcount(self, playcount):
         playcount = try_int(playcount)
+        # Setting playcount to 0 overrides internal playcount from Kodi to allow Trakt to set unwatched
+        # Not setting playcount at all will allow Kodi to manage internally instead
+        if not _is_trakt_watchedindicators and not playcount:
+            return
         self.infolabels['playcount'] = playcount
 
     def unaired_bool(self):
@@ -378,6 +383,10 @@ class _Episode(_Tvshow):
 
     def set_playcount(self, playcount):
         playcount = try_int(playcount)
+        # Setting playcount to 0 overrides internal playcount from Kodi to allow Trakt to set unwatched
+        # Not setting playcount at all will allow Kodi to manage internally instead
+        if not _is_trakt_watchedindicators and not playcount:
+            return
         self.infolabels['playcount'] = playcount
 
     def _set_params_reroute_details(self):
