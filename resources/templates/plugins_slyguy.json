@@ -12,13 +12,14 @@
                           },
     "play_movie"        : [
                             "plugin://STR_PLUGINID/?_=search&query={title_url}",
-                            {"strict": "true", "title": "(?i)^(\\[.*\\])?.*{title}.*(\\[.*\\])?$", "year": "{year}", "dialog": "true"}
+                            {"strict": "true", "title": "(?i)^(\\[.*\\])?.*{title}.*(\\[.*\\])?$", "year": "{year}", "dialog": "auto"}
                           ],
     "play_episode"      : [
                             "plugin://STR_PLUGINID/?_=search&query={showname_url}",
                             {"title": "(?i)^(\\[.*\\])?{showname}(\\[.*\\])?$"},
+                            {"return": "true", "season": "^{season}$", "episode": "^{episode}$"},
                             {"title": "(?i)^Season {season}$"},
-                            {"strict": "true", "season": "^{season}$", "episode": "^{episode}$", "dialog": "true"}
+                            {"strict": "true", "season": "^{season}$", "episode": "^{episode}$", "dialog": "auto"}
                           ],
     "search_movie"      : "plugin://STR_PLUGINID/?_=search&query={title_url}",
     "search_episode"    : "plugin://STR_PLUGINID/?_=search&query={showname_url}"
