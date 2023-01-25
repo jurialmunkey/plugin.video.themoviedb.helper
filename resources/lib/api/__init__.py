@@ -1,7 +1,7 @@
 __all__ = [
     'mapping',
     'request',
-    'fannarttv',
+    'fanarttv',
     'kodi',
     'mdblist',
     'omdb',
