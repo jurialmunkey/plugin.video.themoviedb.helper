@@ -1,15 +1,47 @@
+import pkgutil
 import sys
+from importlib.util import module_from_spec
+
 from xbmcaddon import Addon
 
-addon_path = Addon('plugin.video.themoviedb.helper').getAddonInfo('path')
-sys.path.append(addon_path)
+sys.path.append(Addon('plugin.video.themoviedb.helper').getAddonInfo('path'))
 
-from resources.lib.player.players import Players
-from resources.lib.api.tmdb.api import TMDb
-from resources.lib.player.details import get_next_episodes
+import resources.lib as base
 
-__all__ = (
-    'Players',
-    'TMDb',
-    'get_next_episodes',
-)
+__all__ = []
+
+prefix = f'{base.__name__}.'
+finder = None
+name = None
+ispkg = None
+spec = None
+module = None
+short_name = None
+
+for finder, name, ispkg in pkgutil.walk_packages(base.__path__, prefix=prefix):
+    if ispkg:
+        continue
+    spec = finder.find_spec(name)
+    if not spec:
+        continue
+
+    module = module_from_spec(spec)
+    short_name = name[len(prefix):]
+    sys.modules[f'{__name__}.{short_name}'] = module
+    spec.loader.exec_module(module)
+
+    __all__.append(short_name)
+    globals()[short_name] = module
+
+del short_name
+del module
+del spec
+del ispkg
+del name
+del finder
+del prefix
+del PERMISSIONS
+del base
+del Addon
+del module_from_spec
+del pkgutil
