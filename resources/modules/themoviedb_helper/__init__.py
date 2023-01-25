@@ -69,7 +69,7 @@ for finder, name, ispkg in packages:
         continue
 
     for sub_module in module.__dict__['__all__']:
-        long_name = f'{name}.{sub_module}'
+        long_name = f'{__name__}.{name[len(prefix):]}.{sub_module}'
         if long_name in sys.modules:
             setattr(module, sub_module, sys.modules[long_name])
             continue
