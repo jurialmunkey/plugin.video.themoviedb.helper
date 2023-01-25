@@ -1,3 +1,8 @@
+import sys
+from resources.lib.addon.consts import PERMISSIONS
+if PERMISSIONS('general', 'fanarttv') - getattr(sys.modules.get('themoviedb_helper'), '__permissions__', PERMISSIONS('all')):
+    raise ImportError('Access denied')
+
 from resources.lib.addon.plugin import get_language, get_setting
 from tmdbhelper.parser import try_int, del_empty_keys
 from resources.lib.addon.consts import CACHE_EXTENDED, ITER_PROPS_MAX
