@@ -1,3 +1,8 @@
+import sys
+from resources.lib.addon.consts import PERMISSIONS
+if PERMISSIONS('general', 'tmdb') - getattr(sys.modules.get('themoviedb_helper'), '__permissions__', PERMISSIONS('all')):
+    raise ImportError('Access denied')
+
 from resources.lib.api.request import RequestAPI
 from resources.lib.addon.plugin import get_setting, set_setting
 from resources.lib.addon.consts import CACHE_SHORT, CACHE_MEDIUM
