@@ -1,3 +1,8 @@
+import sys
+from resources.lib.addon.consts import PERMISSIONS
+if PERMISSIONS('general', 'tmdb') - getattr(sys.modules.get('themoviedb_helper'), '__permissions__', PERMISSIONS('all')):
+    raise ImportError('Access denied')
+    
 from xbmcgui import Dialog
 from resources.lib.addon.plugin import ADDONPATH, get_mpaa_prefix, get_language, convert_type, get_setting, get_localized, get_infolabel
 from resources.lib.addon.consts import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, CACHE_SHORT, CACHE_MEDIUM
