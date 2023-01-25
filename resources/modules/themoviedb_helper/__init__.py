@@ -49,7 +49,7 @@ for finder, name, ispkg in pkgutil.walk_packages(base.__path__, prefix=prefix):
     __all__.append(short_name)
     globals()[short_name] = module
 
-for finder, name, ispkg in packages:
+for finder, name, ispkg in reversed(packages):
     spec = finder.find_spec(name)
     if not spec:
         continue
