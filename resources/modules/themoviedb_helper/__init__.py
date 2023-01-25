@@ -7,8 +7,10 @@ from xbmcaddon import Addon
 sys.path.append(Addon('plugin.video.themoviedb.helper').getAddonInfo('path'))
 
 import resources.lib as base
+from resources.lib.addon.consts import PERMISSIONS
 
 __all__ = []
+__permissions__ = PERMISSIONS('general')
 
 prefix = f'{base.__name__}.'
 finder = None
@@ -40,6 +42,7 @@ del ispkg
 del name
 del finder
 del prefix
+del __permissions__
 del PERMISSIONS
 del base
 del Addon
