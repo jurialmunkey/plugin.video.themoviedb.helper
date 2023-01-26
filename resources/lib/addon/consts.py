@@ -734,7 +734,9 @@ _PERMISSIONS = {
     'tvdb' : 2 ** 6,
 }
 def PERMISSIONS(*permissions):
-    if 'none' in permissions:
+    if 'deny' in permissions:
+        return {None}
+    if not permissions or 'none' in permissions:
         return set()
     if 'all' in permissions:
         return set(_PERMISSIONS.values())
