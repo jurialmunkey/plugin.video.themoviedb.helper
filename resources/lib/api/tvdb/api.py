@@ -1,14 +1,7 @@
-import sys
-from resources.lib.addon.consts import PERMISSIONS
-if PERMISSIONS('general', 'tmdb') - getattr(sys.modules.get('themoviedb_helper'), '__permissions__', PERMISSIONS('all')):
-    raise ImportError('Access denied')
-
 from resources.lib.api.request import RequestAPI
-from resources.lib.addon.plugin import get_setting, set_setting
 from resources.lib.addon.consts import CACHE_SHORT, CACHE_MEDIUM
-from resources.lib.addon.window import get_property
 from resources.lib.api.tvdb.mapping import ItemMapper
-from tmdbhelper.parser import load_in_data
+from resources.lib.api.api_keys.tvdb import API_KEY, user_token_getter, user_token_setter
 
 
 API_URL = 'https://api4.thetvdb.com/v4'
@@ -23,12 +16,24 @@ def is_authorized(func):
 
 
 class TVDb(RequestAPI):
-    def __init__(self):
+    
+    api_key = API_KEY
+    get_user_token = user_token_getter
+    set_user_token = user_token_setter
+    
+    def __init__(
+            self,
+            api_key=None,
+            user_token_getter=None,
+            user_token_setter=None):
         super(TVDb, self).__init__(
             req_api_name='TVDb',
             req_api_url=API_URL)
         self.mapper = ItemMapper()
         self.set_token()
+        self.api_key = api_key or TVDb.api_key
+        self.get_user_token = user_token_getter or TVDb.get_user_token
+        self.set_user_token = user_token_setter or TVDb.set_user_token
 
     def set_token(self):
         self._token = self.get_token()
@@ -61,25 +66,21 @@ class TVDb(RequestAPI):
         return self.get_api_request_json(self.get_request_url(*args, **kwargs), headers=self.headers)
 
     def get_token(self):
-        _token = get_property('tvdb_token', is_type=str)
+        _token = self.get_user_token()
         if not _token:
             _token = self.login()
         return _token
 
     def login(self):
         path = self.get_request_url('login')
-        data = self.get_api_request_json(path, postdata={
-            'apikey': load_in_data(
-                b"#SFK\x03JI\x06N\x11\x04GY\x03\x14'\x0c_Y\x19\x0f]\x0c]\x00\x13\x01^JP\x11g(|\x03*",
-                b'Be respectful. Dont jeopardise TMDbHelper access to this data by stealing API keys or changing item limits.').decode()},
-            method='json')
+        data = self.get_api_request_json(path, postdata={'apikey': self.api_key}, method='json')
         if not data or not data.get('status') == 'success':
             return
         try:
             _token = data['data']['token']
         except (KeyError, TypeError):
             return
-        get_property('tvdb_token', set_property=f'{_token}')
+        self.set_user_token(_token)
         return _token
 
     # def get_mapped_item(self, func, *args, **kwargs):

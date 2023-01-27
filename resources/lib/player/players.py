@@ -1,8 +1,3 @@
-import sys
-from resources.lib.addon.consts import PERMISSIONS
-if PERMISSIONS('general') - getattr(sys.modules.get('themoviedb_helper'), '__permissions__', PERMISSIONS('all')):
-    raise ImportError('Access denied')
-
 import re
 from xbmc import Monitor, Player
 from xbmcgui import Dialog

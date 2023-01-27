@@ -1,15 +1,10 @@
-import sys
-from resources.lib.addon.consts import PERMISSIONS
-if PERMISSIONS('general', 'trakt') - getattr(sys.modules.get('themoviedb_helper'), '__permissions__', PERMISSIONS('all')):
-    raise ImportError('Access denied')
-
 import random
 from xbmc import Monitor
 from xbmcgui import Dialog, DialogProgress
 from resources.lib.files.futils import json_loads as data_loads
 from resources.lib.files.futils import json_dumps as data_dumps
 from resources.lib.addon.window import get_property
-from resources.lib.addon.plugin import get_localized, get_setting, set_setting, ADDONPATH
+from resources.lib.addon.plugin import get_localized, get_setting, ADDONPATH
 from tmdbhelper.parser import try_int
 from resources.lib.addon.tmdate import set_timestamp, get_timestamp
 from resources.lib.files.bcache import use_simple_cache
@@ -21,12 +16,11 @@ from resources.lib.api.trakt.progress import _TraktProgress
 from resources.lib.addon.logger import kodi_log, TimerFunc
 from resources.lib.addon.consts import CACHE_SHORT, CACHE_LONG
 from resources.lib.addon.thread import has_property_lock, use_thread_lock
+from resources.lib.api.api_keys.trakt import CLIENT_ID, CLIENT_SECRET, user_token_getter, user_token_setter
 from timeit import default_timer as timer
 
 
 API_URL = 'https://api.trakt.tv/'
-CLIENT_ID = 'e6fde6173adf3c6af8fd1b0694b9b84d7c519cefc24482310e1de06c6abe5467'
-CLIENT_SECRET = '15119384341d9a61c751d8d515acbc0dd801001d4ebe85d3eef9885df80ee4d9'
 
 
 def get_sort_methods(info=None):
@@ -506,14 +500,28 @@ class _TraktSync():
 
 
 class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
-    def __init__(self, force=False):
+
+    client_id = CLIENT_ID
+    client_secret = CLIENT_SECRET
+    get_user_token = user_token_getter
+    set_user_token = user_token_setter
+
+    def __init__(
+            self,
+            client_id=None,
+            client_secret=None,
+            user_token_getter=None,
+            user_token_setter=None,
+            force=False):
         super(TraktAPI, self).__init__(req_api_url=API_URL, req_api_name='TraktAPI', timeout=20)
         self.authorization = ''
         self.attempted_login = False
         self.dialog_noapikey_header = f'{get_localized(32007)} {self.req_api_name} {get_localized(32011)}'
         self.dialog_noapikey_text = get_localized(32012)
-        self.client_id = CLIENT_ID
-        self.client_secret = CLIENT_SECRET
+        self.client_id = client_id or TraktAPI.client_id
+        self.client_secret = client_secret or TraktAPI.client_secret
+        self.get_user_token = user_token_getter or TraktAPI.get_user_token
+        self.set_user_token = user_token_setter or TraktAPI.set_user_token
         self.headers = {'trakt-api-version': '2', 'trakt-api-key': self.client_id, 'Content-Type': 'application/json'}
         self.last_activities = {}
         self.sync_activities = {}
@@ -605,7 +613,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
 
     def get_stored_token(self):
         try:
-            token = data_loads(get_setting('trakt_token', 'str')) or {}
+            token = data_loads(self.get_user_token()) or {}
         except Exception as exc:
             token = {}
             kodi_log(exc, 1)
@@ -624,7 +632,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
                 'client_secret': self.client_secret})
             if response and response.status_code == 200:
                 msg = get_localized(32216)
-                set_setting('trakt_token', '', 'str')
+                self.set_user_token('')
             else:
                 msg = get_localized(32215)
         else:
@@ -700,7 +708,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
     def on_authenticated(self, auth_dialog=True):
         """Triggered when device authentication has been completed"""
         kodi_log(u'Trakt authenticated successfully!', 1)
-        set_setting('trakt_token', data_dumps(self.authorization), 'str')
+        self.set_user_token(data_dumps(self.authorization))
         self.headers['Authorization'] = f'Bearer {self.authorization.get("access_token")}'
         if auth_dialog:
             self.auth_dialog.close()

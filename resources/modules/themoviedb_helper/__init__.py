@@ -25,10 +25,10 @@ with import_lock:
 
     import resources.lib as base
     from resources.lib.addon.logger import kodi_traceback
-    from resources.lib.addon.consts import PERMISSIONS
+    from resources.lib.api.api_keys.permissions import third_party_permissions
 
     __all__ = []
-    __permissions__ = PERMISSIONS('general', 'tmdb')
+    __permissions__ = third_party_permissions(grant=['general', 'tmdb'])
     prefix = f'{base.__name__}.'
 
     for finder, name, ispkg in pkgutil.walk_packages(base.__path__,
@@ -100,7 +100,7 @@ del ispkg
 del name
 del finder
 del prefix
-del PERMISSIONS
+del third_party_permissions
 del kodi_traceback
 del base
 del addon_path
