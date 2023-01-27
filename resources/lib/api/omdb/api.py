@@ -1,12 +1,8 @@
-import sys
-from resources.lib.addon.consts import PERMISSIONS
-if PERMISSIONS('general', 'omdb') - getattr(sys.modules.get('themoviedb_helper'), '__permissions__', PERMISSIONS('all')):
-    raise ImportError('Access denied')
-
 from resources.lib.addon.plugin import get_setting
 from tmdbhelper.parser import del_empty_keys, merge_two_dicts
 from resources.lib.api.request import RequestAPI
 from resources.lib.api.omdb.mapping import ItemMapper
+from resources.lib.api.api_keys.omdb import API_KEY
 
 
 def translate_xml(request):
@@ -27,9 +23,14 @@ def translate_xml(request):
 
 
 class OMDb(RequestAPI):
+
+    api_key = API_KEY
+
     def __init__(self, api_key=None):
+        api_key = api_key or OMDb.api_key
+
         super(OMDb, self).__init__(
-            req_api_key=f'apikey={api_key or get_setting("omdb_apikey", "str")}',
+            req_api_key=f'apikey={api_key}',
             req_api_name='OMDb',
             req_api_url='https://www.omdbapi.com/',
             error_notification=False)

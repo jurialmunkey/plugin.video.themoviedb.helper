@@ -1,15 +1,10 @@
-import sys
-from resources.lib.addon.consts import PERMISSIONS
-if PERMISSIONS('general', 'mdblist') - getattr(sys.modules.get('themoviedb_helper'), '__permissions__', PERMISSIONS('all')):
-    raise ImportError('Access denied')
-
 from xbmcgui import Dialog
-from resources.lib.addon.plugin import get_setting, ADDONPATH, PLUGINPATH, convert_trakt_type, convert_type, get_localized
+from resources.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_trakt_type, convert_type, get_localized
 from tmdbhelper.parser import get_params
 from resources.lib.api.request import RequestAPI
 from resources.lib.items.pages import PaginatedItems
 from resources.lib.addon.logger import kodi_log
-
+from resources.lib.api.api_keys.mdblist import API_KEY
 
 def _get_paginated(items, limit=None, page=1):
     items = items or []
@@ -77,16 +72,22 @@ def _get_configured(items, permitted_types=None, params_def=None):
 
 
 class MDbList(RequestAPI):
+
+    api_key = API_KEY
+
     def __init__(self, api_key=None):
+        api_key = api_key or MDbList.api_key
+
         super(MDbList, self).__init__(
-            req_api_key=f'apikey={api_key or get_setting("mdblist_apikey", "str")}',
+            req_api_key=f'apikey={api_key}',
             req_api_name='MDbList',
             req_api_url='https://mdblist.com/api')
+        self.api_key = api_key
 
     def _get_request(self, func, *args, **kwargs):
         response = func(*args, **kwargs)
         if isinstance(response, dict):  # API returns dict rather than list on failure
-            if not kwargs.get('cache_refresh') and response.get('error') == 'Invalid API key!' and get_setting("mdblist_apikey", "str"):
+            if not kwargs.get('cache_refresh') and response.get('error') == 'Invalid API key!' and self.api_key:
                 kwargs['cache_refresh'] = True  # Refresh in case cached because we've got an api key
                 response = func(*args, **kwargs)
                 if not isinstance(response, dict):  # Check again in case now working and return response

@@ -1,8 +1,3 @@
-import sys
-from resources.lib.addon.consts import PERMISSIONS
-if PERMISSIONS('general') - getattr(sys.modules.get('themoviedb_helper'), '__permissions__', PERMISSIONS('all')):
-    raise ImportError('Access denied')
-
 from tmdbhelper.parser import try_int, del_empty_keys
 from resources.lib.items.builder import ItemBuilder
 from resources.lib.api.tmdb.api import TMDb

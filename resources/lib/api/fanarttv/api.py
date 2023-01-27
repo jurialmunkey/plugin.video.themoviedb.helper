@@ -1,12 +1,8 @@
-import sys
-from resources.lib.addon.consts import PERMISSIONS
-if PERMISSIONS('general', 'fanarttv') - getattr(sys.modules.get('themoviedb_helper'), '__permissions__', PERMISSIONS('all')):
-    raise ImportError('Access denied')
-
 from resources.lib.addon.plugin import get_language, get_setting
 from tmdbhelper.parser import try_int, del_empty_keys
 from resources.lib.addon.consts import CACHE_EXTENDED, ITER_PROPS_MAX
 from resources.lib.api.request import RequestAPI
+from resources.lib.api.api_keys.fanarttv import API_KEY, CLIENT_KEY
 
 EN_FALLBACK = get_setting('fanarttv_enfallback')
 API_URL = 'https://webservice.fanart.tv/v3'
@@ -50,13 +46,20 @@ def add_extra_art(source, output=None):
 
 
 class FanartTV(RequestAPI):
+
+    api_key = API_KEY
+    client_key = CLIENT_KEY
+
     def __init__(
             self,
-            api_key='fcca59bee130b70db37ee43e63f8d6c1',
-            client_key=get_setting('fanarttv_clientkey', 'str'),
+            api_key=None,
+            client_key=None,
             language=get_language(),
             cache_only=False,
             cache_refresh=False):
+        api_key = api_key or FanartTV.api_key
+        client_key = client_key or FanartTV.client_key
+
         super(FanartTV, self).__init__(
             req_api_name='FanartTV',
             req_api_url=API_URL,

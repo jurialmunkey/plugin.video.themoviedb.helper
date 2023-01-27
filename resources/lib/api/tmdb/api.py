@@ -1,8 +1,3 @@
-import sys
-from resources.lib.addon.consts import PERMISSIONS
-if PERMISSIONS('general', 'tmdb') - getattr(sys.modules.get('themoviedb_helper'), '__permissions__', PERMISSIONS('all')):
-    raise ImportError('Access denied')
-    
 from xbmcgui import Dialog
 from resources.lib.addon.plugin import ADDONPATH, get_mpaa_prefix, get_language, convert_type, get_setting, get_localized, get_infolabel
 from resources.lib.addon.consts import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, CACHE_SHORT, CACHE_MEDIUM
@@ -14,6 +9,7 @@ from resources.lib.items.pages import PaginatedItems
 from resources.lib.api.request import RequestAPI
 from resources.lib.api.tmdb.mapping import ItemMapper, get_episode_to_air
 from urllib.parse import quote_plus
+from resources.lib.api.api_keys.tmdb import API_KEY
 
 """ Lazyimports
 from resources.lib.items.listitem import ListItem
@@ -29,11 +25,16 @@ APPEND_TO_RESPONSE = 'credits,images,release_dates,content_ratings,external_ids,
 
 
 class TMDb(RequestAPI):
+
+    api_key = API_KEY
+
     def __init__(
             self,
-            api_key='a07324c669cac4d96789197134ce272b',
+            api_key=None,
             language=get_language(),
             mpaa_prefix=get_mpaa_prefix()):
+        api_key = api_key or TMDb.api_key
+
         super(TMDb, self).__init__(
             req_api_name='TMDb',
             req_api_url=API_URL,
