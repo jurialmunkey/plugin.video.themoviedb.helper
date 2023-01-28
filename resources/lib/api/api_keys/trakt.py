@@ -9,12 +9,10 @@ else:
     CLIENT_SECRET = ''
 
 if third_party_permissions(require=['trakt']):
-    @staticmethod
     def user_token_getter():
         return user_token_getter.getter('trakt_token', 'str')
     user_token_getter.getter = get_setting
 
-    @staticmethod
     def user_token_setter(token=''):
         return user_token_setter.setter('trakt_token', token, 'str')
     user_token_setter.setter = set_setting

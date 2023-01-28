@@ -27,7 +27,7 @@ class OMDb(RequestAPI):
     api_key = API_KEY
 
     def __init__(self, api_key=None):
-        api_key = api_key or OMDb.api_key
+        api_key = api_key or self.api_key
 
         super(OMDb, self).__init__(
             req_api_key=f'apikey={api_key}',
@@ -35,6 +35,7 @@ class OMDb(RequestAPI):
             req_api_url='https://www.omdbapi.com/',
             error_notification=False)
         self.translate_xml = translate_xml  # Temp monkey patch bandaid for broken ElementTree. Remove after upstream fix.
+        OMDb.api_key = api_key
 
     def get_request_item(self, imdb_id=None, title=None, year=None, tomatoes=True, fullplot=True, cache_only=False):
         kwparams = {}

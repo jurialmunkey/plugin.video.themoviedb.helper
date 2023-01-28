@@ -503,8 +503,8 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
 
     client_id = CLIENT_ID
     client_secret = CLIENT_SECRET
-    get_user_token = user_token_getter
-    set_user_token = user_token_setter
+    get_user_token = staticmethod(user_token_getter)
+    set_user_token = staticmethod(user_token_setter)
 
     def __init__(
             self,
@@ -518,10 +518,10 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         self.attempted_login = False
         self.dialog_noapikey_header = f'{get_localized(32007)} {self.req_api_name} {get_localized(32011)}'
         self.dialog_noapikey_text = get_localized(32012)
-        self.client_id = client_id or TraktAPI.client_id
-        self.client_secret = client_secret or TraktAPI.client_secret
-        self.get_user_token = user_token_getter or TraktAPI.get_user_token
-        self.set_user_token = user_token_setter or TraktAPI.set_user_token
+        TraktAPI.client_id = client_id or self.client_id
+        TraktAPI.client_secret = client_secret or self.client_secret
+        TraktAPI.get_user_token = staticmethod(user_token_getter or self.get_user_token)
+        TraktAPI.set_user_token = staticmethod(user_token_setter or self.set_user_token)
         self.headers = {'trakt-api-version': '2', 'trakt-api-key': self.client_id, 'Content-Type': 'application/json'}
         self.last_activities = {}
         self.sync_activities = {}

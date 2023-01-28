@@ -10,12 +10,10 @@ else:
     API_KEY = ''
 
 if third_party_permissions(require=['tvdb']):
-    @staticmethod
     def user_token_getter():
         return user_token_getter.getter('tvdb_token', is_type=str)
     user_token_getter.getter = get_property
 
-    @staticmethod
     def user_token_setter(token=''):
         return user_token_setter.setter('tvdb_token', set_property=f'{token}')
     user_token_setter.setter = get_property
