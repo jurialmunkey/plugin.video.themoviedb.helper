@@ -76,13 +76,13 @@ class MDbList(RequestAPI):
     api_key = API_KEY
 
     def __init__(self, api_key=None):
-        api_key = api_key or MDbList.api_key
+        api_key = api_key or self.api_key
 
         super(MDbList, self).__init__(
             req_api_key=f'apikey={api_key}',
             req_api_name='MDbList',
             req_api_url='https://mdblist.com/api')
-        self.api_key = api_key
+        MDbList.api_key = api_key
 
     def _get_request(self, func, *args, **kwargs):
         response = func(*args, **kwargs)

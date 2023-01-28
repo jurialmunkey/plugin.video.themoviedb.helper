@@ -57,8 +57,8 @@ class FanartTV(RequestAPI):
             language=get_language(),
             cache_only=False,
             cache_refresh=False):
-        api_key = api_key or FanartTV.api_key
-        client_key = client_key or FanartTV.client_key
+        api_key = api_key or self.api_key
+        client_key = client_key or self.client_key
 
         super(FanartTV, self).__init__(
             req_api_name='FanartTV',
@@ -72,6 +72,8 @@ class FanartTV(RequestAPI):
         self.cache_refresh = cache_refresh
         self.quick_request = {'movies': {}, 'tv': {}}
         self.req_strip.append((f'&client_key={client_key}', ''))
+        FanartTV.api_key = api_key
+        FanartTV.client_key = client_key
 
     def get_all_artwork(self, ftv_id, ftv_type, season=None, artlist_type=None, season_type=None):
         """

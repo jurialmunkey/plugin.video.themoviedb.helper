@@ -18,8 +18,8 @@ def is_authorized(func):
 class TVDb(RequestAPI):
     
     api_key = API_KEY
-    get_user_token = user_token_getter
-    set_user_token = user_token_setter
+    get_user_token = staticmethod(user_token_getter)
+    set_user_token = staticmethod(user_token_setter)
     
     def __init__(
             self,
@@ -31,9 +31,9 @@ class TVDb(RequestAPI):
             req_api_url=API_URL)
         self.mapper = ItemMapper()
         self.set_token()
-        self.api_key = api_key or TVDb.api_key
-        self.get_user_token = user_token_getter or TVDb.get_user_token
-        self.set_user_token = user_token_setter or TVDb.set_user_token
+        TVDb.api_key = api_key or self.api_key
+        TVDb.get_user_token = staticmethod(user_token_getter or self.get_user_token)
+        TVDb.set_user_token = staticmethod(user_token_setter or self.set_user_token)
 
     def set_token(self):
         self._token = self.get_token()
