@@ -1,6 +1,7 @@
 import pkgutil
 import sys
 from importlib.util import module_from_spec
+from os.path import abspath, dirname
 from threading import Lock
 
 from xbmcaddon import Addon
@@ -13,6 +14,7 @@ spec = None
 module = None
 short_name = None
 long_name = None
+sub_module_name = None
 sub_module = None
 packages = []
 
@@ -28,6 +30,7 @@ with import_lock:
     from resources.lib.api.api_keys.permissions import third_party_permissions
 
     __all__ = []
+    __path__ = []
     __permissions__ = third_party_permissions(grant=['general', 'tmdb'])
     prefix = f'{base.__name__}.'
 
@@ -69,16 +72,20 @@ with import_lock:
             spec.loader.exec_module(module)
             if '__all__' not in module.__dict__:
                 raise ImportError(f'__all__ not defined for package {name}')
+            __path__.append(abspath(dirname(module.__file__)))
+            module.__path__ = []
         except ImportError:
             del sys.modules[long_name]
             continue
 
-        for sub_module in module.__dict__['__all__']:
-            long_name = f'{__name__}.{name[len(prefix):]}.{sub_module}'
+        for sub_module_name in module.__all__:
+            long_name = f'{__name__}.{name[len(prefix):]}.{sub_module_name}'
             if long_name in sys.modules:
-                setattr(module, sub_module, sys.modules[long_name])
+                sub_module = sys.modules[long_name]
+                setattr(module, sub_module_name, sub_module)
+                module.__path__.append(abspath(dirname(sub_module.__file__)))
                 continue
-            module.__dict__['__all__'].remove(sub_module)
+            module.__all__.remove(sub_module_name)
             kodi_traceback(ImportError(f'{long_name}: Access denied'),
                            notification=False)
 
@@ -92,6 +99,7 @@ with import_lock:
 del import_lock
 del packages
 del sub_module
+del sub_module_name
 del long_name
 del short_name
 del module
@@ -106,5 +114,7 @@ del base
 del addon_path
 del Addon
 del Lock
+del dirname
+del abspath
 del module_from_spec
 del pkgutil
