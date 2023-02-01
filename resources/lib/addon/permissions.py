@@ -11,15 +11,18 @@ _LEVELS = {
 }
 
 
-def third_party_permissions(require=None, grant=None):
+def handler(**kwargs):
+    require = kwargs.get('require')
+    grant = kwargs.get('grant')
+
     if require:
-        granted = getattr(modules.get('themoviedb_helper'), '__permissions__',
-                          False)
-        if not granted:
+        check_permissions = getattr(modules.get('themoviedb_helper'),
+                                    '__protected_access__', False)
+        if not check_permissions:
             return True
         permissions = require
     else:
-        granted = None
+        check_permissions = False
         permissions = grant
 
     if not permissions or 'none' in permissions:
@@ -35,6 +38,6 @@ def third_party_permissions(require=None, grant=None):
             if permission:
                 permissions_set.add(permission)
 
-    if granted:
-        return not bool(permissions_set - granted)
+    if check_permissions:
+        return not bool(permissions_set - check_permissions)
     return permissions_set
