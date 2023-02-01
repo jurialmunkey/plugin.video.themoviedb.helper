@@ -1,120 +1,163 @@
-import pkgutil
 import sys
-from importlib.util import module_from_spec
-from os.path import abspath, dirname
-from threading import Lock
+from threading import Lock as _Lock
 
-from xbmcaddon import Addon
+from xbmcaddon import Addon as _Addon
 
-addon_path = Addon('plugin.video.themoviedb.helper').getAddonInfo('path')
-finder = None
-name = None
-ispkg = None
-spec = None
-module = None
-short_name = None
-long_name = None
-sub_module_name = None
-sub_module = None
-packages = []
 
-import_lock = Lock()
-with import_lock:
-    if addon_path not in sys.path:
-        sys.path.append(addon_path)
+__all__ = []
+__path__ = []
+__protected_access__ = set()
+
+
+def _import_module(name, package='resources.lib', excluding=(),
+                   reload=False, recursive=True,
+                   parent_module=None, parent_path=None,
+                   module_finder=None):
+
+    from importlib.machinery import ModuleSpec
+    from importlib.util import LazyLoader, module_from_spec, resolve_name
+    from pkgutil import iter_modules
+
+    class NotAvailableLoader:
+        def __init__(self, msg='Module not available'):
+            self.msg = msg
+
+        def create_module(self, _spec):
+            return None
+
+        def exec_module(self, _module):
+            raise ImportError(self.msg)
+
+    if not name:
+        msg = 'Empty module name'
+        raise ValueError(msg)
+
+    is_root = (name == package)
+
+    if is_root:
+        absolute_name = package
+        relative_name = ''
+        export_name = __name__
     else:
-        addon_path = None
+        if not name.startswith(('.', f'{package}.')):
+            name = f'.{name}'
+        absolute_name = resolve_name(name, package)
+        relative_name = absolute_name.partition(f'{package}.')[2]
+        export_name = f'{__name__}.{relative_name}'
 
-    import resources.lib as base
-    from resources.lib.addon.logger import kodi_traceback
-    from resources.lib.api.api_keys.permissions import third_party_permissions
-
-    __all__ = []
-    __path__ = []
-    __permissions__ = third_party_permissions(grant=['general', 'tmdb'])
-    prefix = f'{base.__name__}.'
-
-    for finder, name, ispkg in pkgutil.walk_packages(base.__path__,
-                                                     prefix=prefix):
-        if ispkg:
-            packages.append((finder, name, ispkg))
-            continue
-        spec = finder.find_spec(name)
-        if not spec:
-            continue
-
-        module = module_from_spec(spec)
-        short_name = name[len(prefix):]
-        long_name = f'{__name__}.{short_name}'
-
+    if not reload:
         try:
-            sys.modules[long_name] = module
-            spec.loader.exec_module(module)
-        except ImportError:
-            del sys.modules[long_name]
-            continue
+            module = sys.modules[absolute_name]
+            path = module.__spec__.submodule_search_locations
+            index = module.__dict__.get('__all__')
 
-        __all__.append(short_name)
-        globals()[short_name] = module
+            module = sys.modules[export_name]
+            module.__spec__.submodule_search_locations = path
+            if index:
+                module.__all__ = index
+            return module
+        except KeyError:
+            pass
 
-    for finder, name, ispkg in reversed(packages):
-        spec = finder.find_spec(name)
+    spec = None
+    path = None
+    module = None
+
+    if is_root:
+        parent_name = package
+    elif '.' in absolute_name:
+        parent_name, _, name = absolute_name.rpartition('.')
+
+    if not parent_module and parent_name:
+        parent_module = _import_module(parent_name, recursive=False)
+
+    if parent_module:
+        path = parent_path or parent_module.__spec__.submodule_search_locations
+        if is_root:
+            module = parent_module
+            spec = module.__spec__
+            parent_module = None
+
+    if not module:
+        if (not parent_module
+                or '__all__' not in parent_module.__dict__
+                or name not in parent_module.__all__):
+            if parent_module and name in parent_module.__dict__:
+                delattr(parent_module, name)
+            spec = ModuleSpec(
+                name=export_name,
+                loader=NotAvailableLoader(f'Module {absolute_name!r} not available for import'),
+                origin=None,
+                loader_state=None,
+                is_package=recursive,
+            )
+        elif excluding and relative_name.startswith(excluding):
+            if name in parent_module.__all__:
+                parent_module.__all__.remove(name)
+            if name in parent_module.__dict__:
+                delattr(parent_module, name)
+            spec = ModuleSpec(
+                name=export_name,
+                loader=NotAvailableLoader(f'Module {absolute_name!r} excluded from import'),
+                origin=None,
+                loader_state=None,
+                is_package=recursive,
+            )
+
         if not spec:
-            continue
+            for finder in [module_finder] + sys.meta_path:
+                if not finder or 'find_spec' not in finder.__dict__:
+                    continue
+                spec = finder.find_spec(absolute_name, path)
+                if spec is not None:
+                    break
+            else:
+                msg = f'No module named {absolute_name!r} in {path=!r}'
+                raise ModuleNotFoundError(msg, name=absolute_name, path=path)
 
-        spec.submodule_search_locations = None
+        spec.name = export_name
+        spec.loader.name = export_name
+        spec.loader = LazyLoader(spec.loader)
         module = module_from_spec(spec)
-        short_name = name[len(prefix):]
-        long_name = f'{__name__}.{short_name}'
+        sys.modules[export_name] = module
+        spec.loader.exec_module(module)
 
-        try:
-            sys.modules[long_name] = module
-            spec.loader.exec_module(module)
-            if '__all__' not in module.__dict__:
-                raise ImportError(f'__all__ not defined for package {name}')
-            __path__.append(abspath(dirname(module.__file__)))
-            module.__path__ = []
-        except ImportError:
-            del sys.modules[long_name]
-            continue
+    if parent_module:
+        setattr(parent_module, name, module)
+        __all__.append(relative_name)
+        globals()[relative_name] = module
+    elif is_root:
+        __all__.extend(module.__all__)
+        globals().update(module.__builtins__['globals']())
 
-        for sub_module_name in module.__all__:
-            long_name = f'{__name__}.{name[len(prefix):]}.{sub_module_name}'
-            if long_name in sys.modules:
-                sub_module = sys.modules[long_name]
-                setattr(module, sub_module_name, sub_module)
-                module.__path__.append(abspath(dirname(sub_module.__file__)))
-                continue
-            module.__all__.remove(sub_module_name)
-            kodi_traceback(ImportError(f'{long_name}: Access denied'),
-                           notification=False)
+    if not recursive or not spec.submodule_search_locations:
+        return module
 
-        __all__.append(short_name)
-        globals()[short_name] = module
+    path = spec.submodule_search_locations
+    prefix = f'{absolute_name}.'
+    for module_info in iter_modules(path, prefix):
+        _import_module(module_info.name, excluding=excluding,
+                       recursive=module_info.ispkg,
+                       parent_module=module, parent_path=path,
+                       module_finder=module_info.module_finder)
 
-    del __permissions__
-    if addon_path:
-        sys.path.remove(addon_path)
+    return module
 
-del import_lock
-del packages
-del sub_module
-del sub_module_name
-del long_name
-del short_name
-del module
-del spec
-del ispkg
-del name
-del finder
-del prefix
-del third_party_permissions
-del kodi_traceback
-del base
-del addon_path
-del Addon
-del Lock
-del dirname
-del abspath
-del module_from_spec
-del pkgutil
+
+_IMPORT_LOCK = _Lock()
+with _IMPORT_LOCK:
+    _PATH = _Addon('plugin.video.themoviedb.helper').getAddonInfo('path')
+    if _PATH not in sys.path:
+        sys.path.append(_PATH)
+    else:
+        _PATH = None
+
+    from resources.lib.addon.permissions import handler as _handler
+
+    __protected_access__.update(_handler(grant=['general', 'tmdb']))
+    _import_module('api', excluding='api.api_keys')
+    __protected_access__.clear()
+    _import_module('resources.lib', reload=True, excluding='api')
+
+    if _PATH:
+        sys.path.remove(_PATH)
