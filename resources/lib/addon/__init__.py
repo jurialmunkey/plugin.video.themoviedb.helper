@@ -3,6 +3,7 @@ __all__ = [
     'dialog',
     'logger',
     'modimp',
+    'permissions',
     'plugin',
     'thread',
     'tmdate',
