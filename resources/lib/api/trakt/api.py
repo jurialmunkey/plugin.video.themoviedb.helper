@@ -16,7 +16,7 @@ from resources.lib.api.trakt.progress import _TraktProgress
 from resources.lib.addon.logger import kodi_log, TimerFunc
 from resources.lib.addon.consts import CACHE_SHORT, CACHE_LONG
 from resources.lib.addon.thread import has_property_lock, use_thread_lock
-from resources.lib.api.api_keys.trakt import CLIENT_ID, CLIENT_SECRET, user_token_getter, user_token_setter
+from resources.lib.api.api_keys.trakt import CLIENT_ID, CLIENT_SECRET, USER_TOKEN
 from timeit import default_timer as timer
 
 
@@ -503,15 +503,13 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
 
     client_id = CLIENT_ID
     client_secret = CLIENT_SECRET
-    get_user_token = staticmethod(user_token_getter)
-    set_user_token = staticmethod(user_token_setter)
+    user_token = USER_TOKEN
 
     def __init__(
             self,
             client_id=None,
             client_secret=None,
-            user_token_getter=None,
-            user_token_setter=None,
+            user_token=None,
             force=False):
         super(TraktAPI, self).__init__(req_api_url=API_URL, req_api_name='TraktAPI', timeout=20)
         self.authorization = ''
@@ -520,8 +518,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         self.dialog_noapikey_text = get_localized(32012)
         TraktAPI.client_id = client_id or self.client_id
         TraktAPI.client_secret = client_secret or self.client_secret
-        TraktAPI.get_user_token = staticmethod(user_token_getter or self.get_user_token)
-        TraktAPI.set_user_token = staticmethod(user_token_setter or self.set_user_token)
+        TraktAPI.user_token = user_token or self.user_token
         self.headers = {'trakt-api-version': '2', 'trakt-api-key': self.client_id, 'Content-Type': 'application/json'}
         self.last_activities = {}
         self.sync_activities = {}
@@ -613,7 +610,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
 
     def get_stored_token(self):
         try:
-            token = data_loads(self.get_user_token()) or {}
+            token = data_loads(self.user_token.value) or {}
         except Exception as exc:
             token = {}
             kodi_log(exc, 1)
@@ -632,7 +629,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
                 'client_secret': self.client_secret})
             if response and response.status_code == 200:
                 msg = get_localized(32216)
-                self.set_user_token('')
+                self.user_token.value = ''
             else:
                 msg = get_localized(32215)
         else:
@@ -708,7 +705,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
     def on_authenticated(self, auth_dialog=True):
         """Triggered when device authentication has been completed"""
         kodi_log(u'Trakt authenticated successfully!', 1)
-        self.set_user_token(data_dumps(self.authorization))
+        self.user_token.value = data_dumps(self.authorization)
         self.headers['Authorization'] = f'Bearer {self.authorization.get("access_token")}'
         if auth_dialog:
             self.auth_dialog.close()

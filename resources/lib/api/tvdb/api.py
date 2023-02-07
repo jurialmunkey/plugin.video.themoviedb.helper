@@ -1,7 +1,7 @@
 from resources.lib.api.request import RequestAPI
 from resources.lib.addon.consts import CACHE_SHORT, CACHE_MEDIUM
 from resources.lib.api.tvdb.mapping import ItemMapper
-from resources.lib.api.api_keys.tvdb import API_KEY, user_token_getter, user_token_setter
+from resources.lib.api.api_keys.tvdb import API_KEY, USER_TOKEN
 
 
 API_URL = 'https://api4.thetvdb.com/v4'
@@ -18,22 +18,19 @@ def is_authorized(func):
 class TVDb(RequestAPI):
     
     api_key = API_KEY
-    get_user_token = staticmethod(user_token_getter)
-    set_user_token = staticmethod(user_token_setter)
+    user_token = USER_TOKEN
     
     def __init__(
             self,
             api_key=None,
-            user_token_getter=None,
-            user_token_setter=None):
+            user_token=None):
         super(TVDb, self).__init__(
             req_api_name='TVDb',
             req_api_url=API_URL)
         self.mapper = ItemMapper()
         self.set_token()
         TVDb.api_key = api_key or self.api_key
-        TVDb.get_user_token = staticmethod(user_token_getter or self.get_user_token)
-        TVDb.set_user_token = staticmethod(user_token_setter or self.set_user_token)
+        TVDb.user_token = user_token or self.user_token
 
     def set_token(self):
         self._token = self.get_token()
@@ -66,7 +63,7 @@ class TVDb(RequestAPI):
         return self.get_api_request_json(self.get_request_url(*args, **kwargs), headers=self.headers)
 
     def get_token(self):
-        _token = self.get_user_token()
+        _token = self.user_token.value
         if not _token:
             _token = self.login()
         return _token
@@ -80,7 +77,7 @@ class TVDb(RequestAPI):
             _token = data['data']['token']
         except (KeyError, TypeError):
             return
-        self.set_user_token(_token)
+        self.user_token.value = _token
         return _token
 
     # def get_mapped_item(self, func, *args, **kwargs):
