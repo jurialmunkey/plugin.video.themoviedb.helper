@@ -2650,7 +2650,7 @@ msgstr ""
 
 #: /resources/lib/requestapi.py
 msgctxt "#32008"
-msgid "API Key"
+msgid "Allow 3rd party plugin access to API key/token"
 msgstr ""
 
 #: /resources/lib/requestapi.py
