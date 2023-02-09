@@ -753,7 +753,7 @@ class Players(object):
         if action:
             if self.is_strm or not get_setting('only_resolve_strm'):
                 resolve_to_dummy(handle, self.dummy_duration if self.dummy_waitresolve else 0, self.dummy_delay)  # If we're calling external we need to resolve to dummy
-            Player().play(action, listitem) if self.force_xbmcplayer else executebuiltin(f'PlayMedia({action})')
+            Player().play(action, listitem) if self.force_xbmcplayer else executebuiltin(f'PlayMedia({action},playlist_type_hint=1)')
             kodi_log([
                 f'lib.player - playing path with {"Player()" if self.force_xbmcplayer else "PlayMedia"}\n',
                 listitem.getPath()], 1)
@@ -768,7 +768,7 @@ class Players(object):
             # If id/type not set to Player.GetItem things like Trakt don't work correctly.
             # Looking for better solution than this hack.
             if get_setting('trakt_localhack') and listitem.getProperty('is_local') == 'true':
-                Player().play(listitem.getPath(), listitem) if self.force_xbmcplayer else executebuiltin(f'PlayMedia({listitem.getPath()})')
+                Player().play(listitem.getPath(), listitem) if self.force_xbmcplayer else executebuiltin(f'PlayMedia({listitem.getPath()},playlist_type_hint=1)')
                 kodi_log([
                     f'Finished executing {"Player()" if self.force_xbmcplayer else "PlayMedia"}\n',
                     listitem.getPath()], 1)

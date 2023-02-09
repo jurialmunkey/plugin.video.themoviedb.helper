@@ -179,7 +179,7 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
             self.close()
 
         if action == 'play':
-            builtin = f'PlayMedia({path})'
+            builtin = f'PlayMedia({path},playlist_type_hint=1)'
         elif get_condvisibility('Window.IsVisible(MyVideoNav.xml)'):
             builtin = f'Container.Update({path})'
         else:
