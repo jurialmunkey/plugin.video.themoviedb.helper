@@ -89,9 +89,10 @@ class PermissionHandler:
     def has_access(self, *required):
         if self._PERMISSION_LEVELS['internal'] in self.access_levels:
             return True
-        if self._PERMISSION_LEVELS['deny'] in self.access_levels:
+        required = self._permissions(*required)
+        if self._PERMISSION_LEVELS['deny'] in required:
             return False
-        return not bool(self._permissions(*required) - self.access_levels)
+        return not bool(required - self.access_levels)
 
     def set_spec_access(self, spec, basename, relname):
         if (relname in self._RESTRICT
