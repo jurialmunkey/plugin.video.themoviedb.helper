@@ -45,19 +45,27 @@ class ListItemDetails():
         return self._parent.get_infolabel(info, self._position)
 
     def setup_current_listitem(self):
-        self._dbtype = self.get_dbtype()
-        self._query = self.get_query()
+        self._dbtype = self.get_listitem_dbtype()
+        self._query = self.get_listitem_query()
         self._year = self.get_infolabel('year')
         if self._dbtype in ['episodes', 'multi']:
             self._season = self.get_infolabel('Season') or None
             self._episode = self.get_infolabel('Episode') or None
-        self._imdb_id = self.get_imdb_id() if not self._season else None
+        self._imdb_id = self.get_listitem_imdb_id()
+        self._tmdb_id = self.get_listitem_tmdb_id()
 
-    def get_imdb_id(self):
+    def get_listitem_imdb_id(self):
+        if self._season or self._dbtype not in ['movies', 'tvshows']:
+            return
         imdb_id = self.get_infolabel('UniqueId(imdb)') or self.get_infolabel('IMDBNumber') or ''
         return imdb_id if imdb_id.startswith('tt') else ''
 
-    def get_query(self):
+    def get_listitem_tmdb_id(self):
+        if self._season or self._dbtype not in ['movies', 'tvshows']:
+            return
+        return self.get_infolabel('UniqueId(tmdb)')
+
+    def get_listitem_query(self):
         if self.get_infolabel('TvShowTitle'):
             return self.get_infolabel('TvShowTitle')
         if self.get_infolabel('Title'):
@@ -65,7 +73,7 @@ class ListItemDetails():
         if self.get_infolabel('Label'):
             return self.get_infolabel('Label')
 
-    def get_dbtype(self):
+    def get_listitem_dbtype(self):
         dbtype = 'actor' if self.get_infolabel('Property(tmdb_type)') == 'person' else self.get_infolabel('dbtype')
         if dbtype:
             return f'{dbtype}s'
@@ -160,6 +168,8 @@ class ListItemDetails():
             tmdb_id, tmdb_type = self._parent.get_tmdb_id_multi(
                 media_type=multi_t, query=self._query, imdb_id=self._imdb_id, year=li_year, episode_year=ep_year)
             self._dbtype = convert_type(tmdb_type, 'dbtype')
+        elif self._tmdb_id:
+            tmdb_id = self._tmdb_id
         else:
             tmdb_id = self._parent.get_tmdb_id(
                 tmdb_type=tmdb_type, query=self._query, imdb_id=self._imdb_id, year=li_year, episode_year=ep_year)
