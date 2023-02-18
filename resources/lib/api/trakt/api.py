@@ -735,7 +735,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         except AttributeError:
             return {}
 
-    def _get_id(self, unique_id, id_type, trakt_type=None, output_type=None):
+    def _get_id(self, unique_id, id_type, trakt_type, output_type=None, output_trakt_type=None):
         response = self.get_request_lc('search', id_type, unique_id, type=trakt_type)
         for i in response:
             if i.get('type') != trakt_type:
@@ -743,17 +743,28 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
             if f'{i.get(trakt_type, {}).get("ids", {}).get(id_type)}' != f'{unique_id}':
                 continue
             if not output_type:
-                return i.get(trakt_type, {}).get('ids', {})
-            return i.get(trakt_type, {}).get('ids', {}).get(output_type)
+                return i.get(output_trakt_type or trakt_type, {}).get('ids', {})
+            return i.get(output_trakt_type or trakt_type, {}).get('ids', {}).get(output_type)
 
-    def get_id(self, unique_id, id_type, trakt_type=None, output_type=None):
+    def get_id(self, unique_id, id_type, trakt_type, output_type=None, output_trakt_type=None):
         """
+        id_type: imdb, tmdb, trakt, tvdb
         trakt_type: movie, show, episode, person, list
         output_type: trakt, slug, imdb, tmdb, tvdb
+        output_trakt_type: optionally change trakt_type for output
+
+        Example usage: self.get_id(1234, 'tmdb', 'episode', 'slug', 'show')
+            -- gets trakt slug of the parent show for the episode with tmdb id 1234
         """
+        cache_name = f'trakt_get_id.{id_type}.{unique_id}.{trakt_type}.{output_type}'
+
+        # Avoid unnecessary extra API calls by only adding output type to cache name if it differs from input type
+        if output_trakt_type and output_trakt_type != trakt_type:
+            cache_name = f'{cache_name}.{output_trakt_type}'
+
         return self._cache.use_cache(
-            self._get_id, unique_id, id_type, trakt_type=trakt_type, output_type=output_type,
-            cache_name=f'trakt_get_id.{id_type}.{unique_id}.{trakt_type}.{output_type}',
+            self._get_id, unique_id, id_type, trakt_type=trakt_type, output_type=output_type, output_trakt_type=output_trakt_type,
+            cache_name=cache_name,
             cache_days=CACHE_LONG)
 
     def get_details(self, trakt_type, id_num, season=None, episode=None, extended='full'):

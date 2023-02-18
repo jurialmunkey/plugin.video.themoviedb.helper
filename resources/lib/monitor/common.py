@@ -82,10 +82,14 @@ class CommonMonitorDetails():
             return self.tmdb_api.get_tmdb_id(tmdb_type=tmdb_type, imdb_id=imdb_id)
         return self.tmdb_api.get_tmdb_id(tmdb_type=tmdb_type, query=query, year=year, episode_year=episode_year)
 
-    @kodi_try_except('lib.monitor.common get_tmdb_id')
+    @kodi_try_except('lib.monitor.common get_tmdb_id_multi')
     def get_tmdb_id_multi(self, media_type=None, imdb_id=None, query=None, year=None, episode_year=None):
         multi_i = self.tmdb_api.get_tmdb_multisearch(query=query, media_type=media_type) or {}
         return (multi_i.get('id'), multi_i.get('media_type'),)
+
+    @kodi_try_except('lib.monitor.common get_tmdb_id_parent')
+    def get_tmdb_id_parent(self, tmdb_id, trakt_type):
+        return self.trakt_api.get_id(tmdb_id, 'tmdb', trakt_type, output_type='tmdb', output_trakt_type='show')
 
     def get_trakt_ratings(self, item, trakt_type, season=None, episode=None):
         _dummdict = {}
