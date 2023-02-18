@@ -51,7 +51,8 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
     def get_playingitem(self):
         if not self.isPlayingVideo():
             return self.reset_properties()  # Not a video so don't get info
-        if self.getVideoInfoTag().getMediaType() not in ['movie', 'episode']:
+        info_tag = self.getVideoInfoTag()
+        if info_tag.getMediaType() not in ['movie', 'episode']:
             return self.reset_properties()  # Not a movie or episode so don't get info TODO Maybe get PVR details also?
         self.playingfile = self.getPlayingFile()
         if self.playingfile and self.playingfile.endswith('dummy.mp4'):
@@ -60,14 +61,16 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.playerstring = loads(self.playerstring) if self.playerstring else None
 
         self.total_time = self.getTotalTime()
-        self.dbtype = self.getVideoInfoTag().getMediaType()
-        self.dbid = self.getVideoInfoTag().getDbId()
-        self.imdb_id = self.getVideoInfoTag().getIMDBNumber() if self.dbtype == 'movie' else None
-        self.query = self.getVideoInfoTag().getTVShowTitle() if self.dbtype == 'episode' else self.getVideoInfoTag().getTitle()
-        self.year = self.getVideoInfoTag().getYear() if self.dbtype == 'movie' else None
-        self.epyear = self.getVideoInfoTag().getYear() if self.dbtype == 'episode' else None
-        self.season = self.getVideoInfoTag().getSeason() if self.dbtype == 'episode' else None
-        self.episode = self.getVideoInfoTag().getEpisode() if self.dbtype == 'episode' else None
+        self.dbtype = info_tag.getMediaType()
+        self.dbid = info_tag.getDbId()
+        self.imdb_id = info_tag.getIMDBNumber() if self.dbtype == 'movie' else None
+        self.query = info_tag.getTVShowTitle() if self.dbtype == 'episode' else info_tag.getTitle()
+        self.year = info_tag.getYear() if self.dbtype == 'movie' else None
+        self.epyear = info_tag.getYear() if self.dbtype == 'episode' else None
+        self.season = info_tag.getSeason() if self.dbtype == 'episode' else None
+        self.episode = info_tag.getEpisode() if self.dbtype == 'episode' else None
+        self.tmdb_id = info_tag.getUniqueID('tmdb')
+        self.tmdb_id = self.get_tmdb_id_parent(self.tmdb_id, 'episode') if self.dbtype == 'episode' else self.tmdb_id
 
         self.current_item = (self.total_time, self.dbtype, self.dbid, self.imdb_id, self.query, self.year, self.epyear, self.season, self.episode, )
         if self.previous_item and self.current_item == self.previous_item:
@@ -75,7 +78,7 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.previous_item = self.current_item  # Store for next time
 
         self.tmdb_type = 'movie' if self.dbtype == 'movie' else 'tv'
-        self.tmdb_id = self.get_tmdb_id(self.tmdb_type, self.imdb_id, self.query, self.year, self.epyear)
+        self.tmdb_id = self.tmdb_id or self.get_tmdb_id(self.tmdb_type, self.imdb_id, self.query, self.year, self.epyear)
         self.details = self.ib.get_item(self.tmdb_type, self.tmdb_id, self.season, self.episode)
         self.artwork = self.details['artwork'] if self.details else None
         self.details = self.details['listitem'] if self.details else None
