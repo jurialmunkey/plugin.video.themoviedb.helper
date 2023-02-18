@@ -61,9 +61,14 @@ class ListItemDetails():
         return imdb_id if imdb_id.startswith('tt') else ''
 
     def get_listitem_tmdb_id(self):
-        if self._season or self._dbtype not in ['movies', 'tvshows']:
+        if self._dbtype not in ['movies', 'tvshows', 'seasons', 'episodes']:
             return
-        return self.get_infolabel('UniqueId(tmdb)')
+        tmdb_id = self.get_infolabel('UniqueId(tmdb)')
+        if not tmdb_id:
+            return
+        if self._dbtype == 'episodes':
+            return self._parent.get_tmdb_id_parent(tmdb_id, 'episode')
+        return tmdb_id
 
     def get_listitem_query(self):
         if self.get_infolabel('TvShowTitle'):
