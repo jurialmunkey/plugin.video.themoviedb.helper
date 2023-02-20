@@ -409,7 +409,7 @@
 						<heading>32001</heading>
 					</control>
 				</setting>
-                <setting id="omdb_apikey_access" type="boolean" label="32008" help="" parent="omdb_apikey">
+                <setting id="omdb_apikey_access" type="boolean" label="32483" help="" parent="omdb_apikey">
 					<level>0</level>
 					<default>false</default>
 					<control type="toggle"/>
@@ -426,7 +426,7 @@
 						<heading>32423</heading>
 					</control>
 				</setting>
-                <setting id="mdblist_apikey_access" type="boolean" label="32008" help="" parent="mdblist_apikey">
+                <setting id="mdblist_apikey_access" type="boolean" label="32483" help="" parent="mdblist_apikey">
 					<level>0</level>
 					<default>false</default>
 					<control type="toggle"/>
@@ -458,7 +458,7 @@
 					<default>false</default>
 					<control type="toggle"/>
 				</setting>
-                <setting id="fanarttv_clientkey_access" type="boolean" label="32008" help="" parent="fanarttv_clientkey">
+                <setting id="fanarttv_clientkey_access" type="boolean" label="32483" help="" parent="fanarttv_clientkey">
 					<level>0</level>
 					<default>false</default>
 					<control type="toggle"/>
@@ -517,7 +517,7 @@
 						<close>true</close>
 					</control>
 				</setting>
-                <setting id="trakt_token_access" type="boolean" label="32008" help="" parent="authenticate_trakt">
+                <setting id="trakt_token_access" type="boolean" label="32483" help="" parent="authenticate_trakt">
 					<level>0</level>
 					<default>false</default>
 					<control type="toggle"/>
