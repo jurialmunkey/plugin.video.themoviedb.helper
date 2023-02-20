@@ -3,21 +3,23 @@ class PermissionHandler:
 
     _get_setting = staticmethod(_get_setting)
 
-    # Any module name (relative to resources.lib.) that exactly matches an item
-    # in _DENY is prevented from being imported outside of resources.lib
+    # Any module name (relative to resources.lib.) that matches an item in
+    # _DENY is prevented from being imported outside of resources.lib
     _DENY = (
+    )
+
+    # Any module name (relative to resources.lib.) that matches an item in
+    # _ALLOW is allowed to be imported from outside of resources.lib
+    # Overrides _DENY_ALL
+    _ALLOW = (
+        'api.tmdb.api',
     )
 
     # Any module name (relative to resources.lib.) that starts with an item in
     # _DENY_ALL is prevented from being imported outside of resources.lib
+    # Overrides _ALLOW_ALL
     _DENY_ALL = (
         'api.api_keys.',
-    )
-
-    # Any module name (relative to resources.lib.) that exactly matches an item
-    # in _ALLOW is allowed to be imported from outside of resources.lib
-    _ALLOW = (
-        'api.tmdb.api',
     )
 
     # Any module name (relative to resources.lib.) that starts with an item in
@@ -26,8 +28,8 @@ class PermissionHandler:
         'player.',
     )
 
-    # Any module name (relative to resources.lib.) that exactly matches an item
-    # in _RESTRICT requires specific user settings enabled to expose user data
+    # Any module name (relative to resources.lib.) that matches an item in
+    # _RESTRICT requires specific user settings enabled to expose user data
     # when imported from outside of resources.lib
     _RESTRICT = (
     )
@@ -76,13 +78,13 @@ class PermissionHandler:
     def import_allowed(cls, relname):
         if relname in cls._DENY:
             return False
-        if f'{relname}.'.startswith(cls._DENY_ALL):
-            return False
         if relname in cls._ALLOW:
             return True
-        if f'{relname}.'.startswith(cls._ALLOW_ALL):
-            return True
         if any(allow.startswith(relname) for allow in cls._ALLOW):
+            return True
+        if f'{relname}.'.startswith(cls._DENY_ALL):
+            return False
+        if f'{relname}.'.startswith(cls._ALLOW_ALL):
             return True
         return False
 
