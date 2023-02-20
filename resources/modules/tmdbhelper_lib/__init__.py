@@ -1,14 +1,6 @@
 import sys
 
 
-def log(msg, level=2):
-    from xbmc import log as _log
-    if isinstance(msg, str):
-        _log(msg, level)
-    else:
-        _log(f'{msg}', level)
-
-
 class _Finder:
     from importlib.util import find_spec as _find_spec
 
