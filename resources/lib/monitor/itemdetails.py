@@ -64,10 +64,9 @@ class ListItemDetails():
         if self._dbtype not in ['movies', 'tvshows', 'seasons', 'episodes']:
             return
         tmdb_id = self.get_infolabel('UniqueId(tmdb)')
-        if not tmdb_id:
-            return
         if self._dbtype == 'episodes':
-            return self._parent.get_tmdb_id_parent(tmdb_id, 'episode')
+            show_tmdb_id = self.get_infolabel('UniqueId(tvshow.tmdb)')
+            return show_tmdb_id if show_tmdb_id else self._parent.get_tmdb_id_parent(tmdb_id, 'episode')
         return tmdb_id
 
     def get_listitem_query(self):

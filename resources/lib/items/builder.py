@@ -166,7 +166,7 @@ class ItemBuilder(_ArtworkSelector):
 
     def get_cache_name(self, tmdb_type, tmdb_id, season=None, episode=None):
         language = self.tmdb_api.language
-        return f'{language}.{tmdb_type}.{tmdb_id}.{season}.{episode}'
+        return f'v2.{language}.{tmdb_type}.{tmdb_id}.{season}.{episode}'
 
     def get_item(self, tmdb_type, tmdb_id, season=None, episode=None, cache_refresh=False):
         if not tmdb_type or not tmdb_id:
