@@ -69,8 +69,12 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.epyear = info_tag.getYear() if self.dbtype == 'episode' else None
         self.season = info_tag.getSeason() if self.dbtype == 'episode' else None
         self.episode = info_tag.getEpisode() if self.dbtype == 'episode' else None
-        self.tmdb_id = info_tag.getUniqueID('tmdb')
-        self.tmdb_id = self.get_tmdb_id_parent(self.tmdb_id, 'episode') if self.dbtype == 'episode' else self.tmdb_id
+
+        if self.dbtype == 'episode':
+            show_tmdb_id = info_tag.getUniqueID('tvshow.tmdb')
+            self.tmdb_id = show_tmdb_id if show_tmdb_id else self.get_tmdb_id_parent(info_tag.getUniqueID('tmdb'), 'episode')
+        else:
+            self.tmdb_id = info_tag.getUniqueID('tmdb')
 
         self.current_item = (self.total_time, self.dbtype, self.dbid, self.imdb_id, self.query, self.year, self.epyear, self.season, self.episode, )
         if self.previous_item and self.current_item == self.previous_item:

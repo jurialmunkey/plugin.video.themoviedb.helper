@@ -24,7 +24,7 @@ def set_show(item, base_item=None, is_season=False):
     item['infoproperties'].update(
         {f'{"" if k.startswith("tvshow.") else "season." if is_season else "tvshow."}{k}': v for k, v in base_item.get('infolabels', {}).items() if type(v) not in [dict, list, tuple]})
     item['infolabels']['tvshowtitle'] = base_item['infolabels'].get('tvshowtitle') or base_item['infolabels'].get('title')
-    item['unique_ids']['tmdb'] = item['unique_ids'].get('tvshow.tmdb')
+    # item['unique_ids']['tmdb'] = item['unique_ids'].get('tvshow.tmdb')
     return item
 
 
