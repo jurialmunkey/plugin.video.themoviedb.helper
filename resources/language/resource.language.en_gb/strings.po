@@ -2456,6 +2456,10 @@ msgctxt "#32482"
 msgid "Random seed pool for recommendations"
 msgstr ""
 
+#: /resources/lib/requestapi.py
+msgctxt "#32483"
+msgid "Allow 3rd party plugin access to API key/token"
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

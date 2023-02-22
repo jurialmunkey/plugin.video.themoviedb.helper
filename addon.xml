@@ -12,11 +12,12 @@ provider-name="jurialmunkey">
   <import addon="script.module.infotagger" version="0.0.5" />
   <import addon="script.module.beautifulsoup4" version="4.9.3" />
 </requires>
-<extension point="xbmc.python.pluginsource" library="plugin.py">
+<extension point="xbmc.python.pluginsource" library="resources/plugin.py">
   <provides>video</provides>
 </extension>
-<extension point="xbmc.python.script" library="script.py" />
-<extension point="xbmc.service" library="service.py" />
+<extension point="xbmc.python.script" library="resources/script.py" />
+<extension point="xbmc.service" library="resources/service.py" />
+<extension point="xbmc.python.module" library="resources/modules"/>
 <extension point="xbmc.addon.metadata">
   <reuselanguageinvoker>false</reuselanguageinvoker>
   <summary lang="en_GB">TheMovieDb Helper</summary>

@@ -409,6 +409,11 @@
 						<heading>32001</heading>
 					</control>
 				</setting>
+                <setting id="omdb_apikey_access" type="boolean" label="32483" help="" parent="omdb_apikey">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
 			</group>
 			<group id="2" label="32422">
 				<setting id="mdblist_apikey" type="string" label="32423" help="">
@@ -420,6 +425,11 @@
 					<control type="edit" format="string">
 						<heading>32423</heading>
 					</control>
+				</setting>
+                <setting id="mdblist_apikey_access" type="boolean" label="32483" help="" parent="mdblist_apikey">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
 				</setting>
 			</group>
 			<group id="3" label="32030">
@@ -448,6 +458,11 @@
 					<default>false</default>
 					<control type="toggle"/>
 				</setting>
+                <setting id="fanarttv_clientkey_access" type="boolean" label="32483" help="" parent="fanarttv_clientkey">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
 				<setting id="fanarttv_secondpref" type="boolean" label="32408" help="">
 					<level>0</level>
 					<default>false</default>
@@ -462,6 +477,36 @@
 		</category>
 		<category id="accounts" label="32470" help="">
 			<group id="1" label="32031">
+                <setting id="trakt_token" type="string" label="32011" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">False</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>32011</heading>
+					</control>
+				</setting>
+                <setting id="tvdb_token" type="string" label="32011" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">False</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>32011</heading>
+					</control>
+				</setting>
 				<setting id="authenticate_trakt" type="action" label="32010" help="">
 					<level>0</level>
 					<data>RunScript(plugin.video.themoviedb.helper,authenticate_trakt)</data>
@@ -472,35 +517,10 @@
 						<close>true</close>
 					</control>
 				</setting>
-				<setting id="trakt_token" type="string" label="32011" help="">
+                <setting id="trakt_token_access" type="boolean" label="32483" help="" parent="authenticate_trakt">
 					<level>0</level>
-					<default/>
-					<constraints>
-						<allowempty>true</allowempty>
-					</constraints>
-					<dependencies>
-						<dependency type="visible">
-							<condition on="property" name="InfoBool">False</condition>
-						</dependency>
-					</dependencies>
-					<control type="edit" format="string">
-						<heading>32011</heading>
-					</control>
-				</setting>
-				<setting id="tvdb_token" type="string" label="32011" help="">
-					<level>0</level>
-					<default/>
-					<constraints>
-						<allowempty>true</allowempty>
-					</constraints>
-					<dependencies>
-						<dependency type="visible">
-							<condition on="property" name="InfoBool">False</condition>
-						</dependency>
-					</dependencies>
-					<control type="edit" format="string">
-						<heading>32011</heading>
-					</control>
+					<default>false</default>
+					<control type="toggle"/>
 				</setting>
 				<setting id="revoke_trakt" type="action" label="32169" help="">
 					<level>0</level>
