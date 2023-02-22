@@ -195,17 +195,17 @@ class _ListItem(object):
         listitem = KodiListItem(label=self.label, label2=self.label2, path=self.infolabels['path'], offscreen=offscreen)
         listitem.setLabel2(self.label2)
         listitem.setArt(self.set_art_fallbacks())
+
+        if self.library != 'pictures':
+            info_tag = ListItemInfoTag(listitem)
+            info_tag.set_info(self.infolabels)
+            info_tag.set_unique_ids(self.unique_ids)
+            info_tag.set_cast(self.cast)
+            info_tag.set_stream_details(self.stream_details)
+            info_tag.set_resume_point(self.infoproperties)
+
         listitem.setProperties(self.infoproperties)
         listitem.addContextMenuItems(self.context_menu)
-
-        if self.library == 'pictures':
-            return listitem
-
-        info_tag = ListItemInfoTag(listitem)
-        info_tag.set_info(self.infolabels)
-        info_tag.set_unique_ids(self.unique_ids)
-        info_tag.set_cast(self.cast)
-        info_tag.set_stream_details(self.stream_details)
 
         return listitem
 

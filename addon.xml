@@ -9,7 +9,7 @@ provider-name="jurialmunkey">
   <import addon="script.module.pil" version="1.1.7"/>
   <import addon="script.module.addon.signals" version="0.0.6" />
   <import addon="script.module.tmdbhelper" version="0.0.7" />
-  <import addon="script.module.infotagger" version="0.0.1" />
+  <import addon="script.module.infotagger" version="0.0.5" />
   <import addon="script.module.beautifulsoup4" version="4.9.3" />
 </requires>
 <extension point="xbmc.python.pluginsource" library="plugin.py">
