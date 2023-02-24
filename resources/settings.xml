@@ -497,6 +497,13 @@
                         <heading>32011</heading>
                     </control>
                 </setting>
+                <setting id="tvdb_token_access" type="boolean" label="32483" help="" parent="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <visible>false</visible>
+                    <enable>false</enable>
+                </setting>
             </group>
         </category>
         <category id="accounts" label="32470" help="">

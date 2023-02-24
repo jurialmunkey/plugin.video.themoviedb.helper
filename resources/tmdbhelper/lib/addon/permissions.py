@@ -58,6 +58,7 @@ class PermissionHandler:
         'mdblist': 'mdblist_apikey_access',
         'omdb': 'omdb_apikey_access',
         'trakt': 'trakt_token_access',
+        'tvdb': 'tvdb_token_access',
     }
 
     def __init__(self):
