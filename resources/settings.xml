@@ -413,6 +413,8 @@
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
+                    <visible>false</visible>
+                    <enable>false</enable>
                 </setting>
             </group>
             <group id="2" label="32422">
@@ -430,6 +432,8 @@
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
+                    <visible>false</visible>
+                    <enable>false</enable>
                 </setting>
             </group>
             <group id="3" label="32030">
@@ -462,6 +466,8 @@
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
+                    <visible>false</visible>
+                    <enable>false</enable>
                 </setting>
                 <setting id="fanarttv_secondpref" type="boolean" label="32408" help="">
                     <level>0</level>
@@ -521,6 +527,8 @@
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
+                    <visible>false</visible>
+                    <enable>false</enable>
                 </setting>
                 <setting id="revoke_trakt" type="action" label="32169" help="">
                     <level>0</level>
