@@ -480,10 +480,9 @@
                     <control type="toggle"/>
                 </setting>
             </group>
-        </category>
-        <category id="accounts" label="32470" help="">
-            <group id="1" label="32031">
-                <setting id="trakt_token" type="string" label="32011" help="">
+            <group id="4" label="32484">
+                <visible>false</visible>
+                <setting id="tvdb_token" type="string" label="32011" help="">
                     <level>0</level>
                     <default/>
                     <constraints>
@@ -498,7 +497,11 @@
                         <heading>32011</heading>
                     </control>
                 </setting>
-                <setting id="tvdb_token" type="string" label="32011" help="">
+            </group>
+        </category>
+        <category id="accounts" label="32470" help="">
+            <group id="1" label="32031">
+                <setting id="trakt_token" type="string" label="32011" help="">
                     <level>0</level>
                     <default/>
                     <constraints>
