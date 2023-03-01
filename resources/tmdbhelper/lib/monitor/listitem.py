@@ -35,7 +35,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         self._pre_window = 1
         self._last_blur_fallback = False
         self._cache = BasicCache(filename=f'QuickService.db')
-        self._ignored_labels = ['..', get_localized(33078)]
+        self._ignored_labels = ['..', get_localized(33078), get_localized(209)]
         self._listcontainer = None
         self._last_listitem = None
         self._readahead = None
@@ -79,7 +79,7 @@ class ListItemMonitor(CommonMonitorFunctions):
 
     def get_cur_item(self, position=0):
         return str((
-            'current_listitem_v3',
+            'current_listitem_v4',
             self.get_infolabel('dbtype', position),
             self.get_infolabel('dbid', position),
             self.get_infolabel('IMDBNumber', position),

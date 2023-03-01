@@ -70,15 +70,15 @@ class ListItemDetails():
         return tmdb_id
 
     def get_listitem_query(self):
-        if self.get_infolabel('TvShowTitle'):
-            return self.get_infolabel('TvShowTitle')
-        if self.get_infolabel('Title'):
-            return self.get_infolabel('Title')
-        if self.get_infolabel('Label'):
-            return self.get_infolabel('Label')
+        query = self.get_infolabel('TvShowTitle')
+        if not query and self._dbtype in ['movies', 'tvshows', 'actors', 'multi']:
+            query = self.get_infolabel('Title') or self.get_infolabel('Label')
+        return query
 
     def get_listitem_dbtype(self):
-        dbtype = 'actor' if self.get_infolabel('Property(tmdb_type)') == 'person' else self.get_infolabel('dbtype')
+        if self.get_infolabel('Property(tmdb_type)') == 'person':
+            return 'actors'
+        dbtype = self.get_infolabel('dbtype')
         if dbtype:
             return f'{dbtype}s'
         if get_condvisibility(CV_USE_MULTI_TYPE):
