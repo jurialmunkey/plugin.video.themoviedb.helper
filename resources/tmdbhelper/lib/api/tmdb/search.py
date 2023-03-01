@@ -96,6 +96,7 @@ class ListSearch(Container):
                 'info': 'search', 'tmdb_type': tmdb_type, 'page': page, 'query': query,
                 'update_listing': 'True'})
             self.container_update = f'{PLUGINPATH}?{urlencode(params)}'
+            self.parent_params = params
             # Trigger container update using new path with query after adding items
             # Prevents onback from re-prompting for user input by re-writing path
 
