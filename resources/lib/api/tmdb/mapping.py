@@ -666,6 +666,9 @@ class ItemMapper(_ItemMapper):
             'episode_count': [{
                 'keys': [('infolabels', 'episode'), ('infoproperties', 'episodes')]
             }],
+            'group_count': [{
+                'keys': [('infolabels', 'season'), ('infoproperties', 'seasons')]
+            }],
             'character': [{
                 'keys': [('infoproperties', 'role'), ('infoproperties', 'character'), ('label2', None)]
             }],

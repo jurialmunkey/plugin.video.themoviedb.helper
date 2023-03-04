@@ -346,7 +346,9 @@ class _Tvshow(_Video):
 
     def set_playcount(self, playcount):
         self._set_playcount(playcount)
-        self.infoproperties['totalseasons'] = try_int(self.infolabels.get('season'))
+        season_count = try_int(self.infolabels.get('season'))
+        if season_count > 0:
+            self.infoproperties['totalseasons'] = season_count
 
     def unaired_bool(self):
         if _is_hide_unaired_episodes:
