@@ -32,6 +32,9 @@ ARTWORK_LOOKUP_TABLE = {
     'thumb': ['Art(thumb)']}
 
 
+CROPIMAGE_SOURCE = "Art(artist.clearlogo)|Art(tvshow.clearlogo)|Art(clearlogo)"
+
+
 class ListItemDetails():
     def __init__(self, parent, position=0):
         self._parent = parent
@@ -88,19 +91,28 @@ class ListItemDetails():
     def get_tmdb_type(self):
         return 'multi' if self._dbtype == 'multi' else convert_media_type(self._dbtype, 'tmdb', strip_plural=True, parent_type=True)
 
-    def get_artwork(self, source=''):
+    def get_artwork(self, source='', build_fallback=False, built_artwork=None):
         source = source.lower()
         infolabels = ARTWORK_LOOKUP_TABLE.get(source, source.split("|") if source else ARTWORK_LOOKUP_TABLE.get('thumb'))
         for i in infolabels:
             artwork = self.get_infolabel(i)
-            if artwork:
-                return artwork
+            if not artwork:
+                continue
+            return artwork
+        if not build_fallback:
+            return
+        built_artwork = built_artwork or self.get_builtartwork()
+        if not built_artwork:
+            return
+        for i in infolabels:
+            if not i.startswith('art('):
+                continue
+            artwork = built_artwork.get(i[4:-1])
+            if not artwork:
+                continue
+            return artwork
 
-    def get_cropimage_fallback(self):
-        artwork = self.get_builtartwork()
-        return artwork.get('clearlogo') or artwork.get('tvshow.clearlogo')
-
-    def get_image_manipulations(self, use_winprops=False):
+    def get_image_manipulations(self, use_winprops=False, built_artwork=None):
         self._parent._last_blur_fallback = False
 
         images = {}
@@ -108,16 +120,27 @@ class ListItemDetails():
         _manipulations = (
             {'method': 'crop',
                 'active': lambda: get_condvisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"),
-                'images': lambda: self.get_artwork(source="Art(artist.clearlogo)|Art(tvshow.clearlogo)|Art(clearlogo)") or self.get_cropimage_fallback()},
+                'images': lambda: self.get_artwork(
+                    source=CROPIMAGE_SOURCE,
+                    build_fallback=True, built_artwork=built_artwork)},
             {'method': 'blur',
                 'active': lambda: get_condvisibility("Skin.HasSetting(TMDbHelper.EnableBlur)"),
-                'images': lambda: self.get_artwork(source=get_property('Blur.SourceImage')) or get_property('Blur.Fallback')},
+                'images': lambda: self.get_artwork(
+                    source=get_property('Blur.SourceImage'),
+                    build_fallback=True, built_artwork=built_artwork)
+                or get_property('Blur.Fallback')},
             {'method': 'desaturate',
                 'active': lambda: get_condvisibility("Skin.HasSetting(TMDbHelper.EnableDesaturate)"),
-                'images': lambda: self.get_artwork(source=get_property('Desaturate.SourceImage')) or get_property('Desaturate.Fallback')},
+                'images': lambda: self.get_artwork(
+                    source=get_property('Desaturate.SourceImage'),
+                    build_fallback=True, built_artwork=built_artwork)
+                or get_property('Desaturate.Fallback')},
             {'method': 'colors',
                 'active': lambda: get_condvisibility("Skin.HasSetting(TMDbHelper.EnableColors)"),
-                'images': lambda: self.get_artwork(source=get_property('Colors.SourceImage')) or get_property('Colors.Fallback')},)
+                'images': lambda: self.get_artwork(
+                    source=get_property('Colors.SourceImage'),
+                    build_fallback=True, built_artwork=built_artwork)
+                or get_property('Colors.Fallback')},)
 
         for i in _manipulations:
             if not i['active']():

@@ -193,7 +193,7 @@ class ListItemMonitor(CommonMonitorFunctions):
 
         def _process_artwork():
             _artwork = _item.get_builtartwork()
-            _artwork.update(_item.get_image_manipulations())
+            _artwork.update(_item.get_image_manipulations(built_artwork=_artwork))
             _listitem.setArt(_artwork)
 
         def _process_ratings():
@@ -234,7 +234,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         # Proces artwork in a thread
         def _process_artwork():
             _artwork = _item.get_builtartwork()
-            _artwork.update(_item.get_image_manipulations())
+            _artwork.update(_item.get_image_manipulations(built_artwork=_artwork))
             self.clear_property_list(SETMAIN_ARTWORK)
             self.set_iter_properties(_artwork, SETMAIN_ARTWORK) if self.is_same_item() else None
 
