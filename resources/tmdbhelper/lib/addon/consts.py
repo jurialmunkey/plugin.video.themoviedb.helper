@@ -61,7 +61,7 @@ PLAYERS_CHOSEN_DEFAULTS_FILENAME = 'player_defaults'
 NO_LABEL_FORMATTING = ['details', 'upcoming', 'trakt_calendar', 'trakt_myairing', 'trakt_anticipated', 'library_nextaired', 'library_airingnext', 'trakt_airingnext', 'videos', 'trakt_watchlist_anticipated']
 
 PARAM_WIDGETS_RELOAD = 'reload=$INFO[Window(Home).Property(TMDbHelper.Widgets.Reload)]'
-PARAM_WIDGETS_RELOAD_REPLACE = 'reload=%24INFO%5BWindow%28Home%29.Property%28TMDbHelper.Widgets.Reload%29%5D'
+PARAM_WIDGETS_RELOAD_FORCED = 'reload=$INFO[System.Time(hh:mm:ss)]'
 
 UPNEXT_EPISODE_ART = {
     'thumb': lambda li: li.art.get('thumb') or '',

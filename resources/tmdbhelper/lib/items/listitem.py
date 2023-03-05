@@ -1,7 +1,7 @@
 from xbmcgui import ListItem as KodiListItem
 from tmdbhelper.parser import try_int, merge_two_dicts
 from infotagger.listitem import ListItemInfoTag
-from tmdbhelper.lib.addon.consts import ACCEPTED_MEDIATYPES, PARAM_WIDGETS_RELOAD
+from tmdbhelper.lib.addon.consts import ACCEPTED_MEDIATYPES, PARAM_WIDGETS_RELOAD, PARAM_WIDGETS_RELOAD_FORCED
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_media_type, get_setting, get_condvisibility, get_localized, encode_url
 from tmdbhelper.lib.addon.tmdate import is_unaired_timestamp
 from tmdbhelper.lib.addon.logger import kodi_log
@@ -138,6 +138,9 @@ class _ListItem(object):
         if self.infoproperties.get('is_sortable'):
             self.params['parent_info'] = self.params['info']
             self.params['info'] = 'trakt_sortby'
+        # Add param to empty search to ensure reloads
+        if self.params.get('info') == 'search' and not self.params.get('query'):
+            self.params['reload'] = 'forced'
 
     def set_params_reroute(self, is_fanarttv=False, extended=None, is_cacheonly=False):
         if _is_skinshortcuts:
@@ -185,7 +188,9 @@ class _ListItem(object):
     def get_url(self):
         def _get_url(path, reload=None, widget=None, **params):
             url = encode_url(path, **params)
-            if widget and widget.lower() == 'true':
+            if reload == 'forced':  # Note reload not std builtin but param absorbed in kwargs
+                url = f'{url}&{PARAM_WIDGETS_RELOAD_FORCED}'
+            elif widget and widget.lower() == 'true':
                 url = f'{url}&widget=true&{PARAM_WIDGETS_RELOAD}'
             return url
         return _get_url(self.path, **self.params)

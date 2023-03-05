@@ -77,6 +77,9 @@ class ListSearch(Container):
         original_query = query
 
         if not query:
+            from tmdbhelper.lib.addon.consts import PARAM_WIDGETS_RELOAD_FORCED
+            if kwargs.get('reload') == PARAM_WIDGETS_RELOAD_FORCED:
+                return
             query = set_search_history(
                 query=Dialog().input(get_localized(32044), type=INPUT_ALPHANUM),
                 tmdb_type=tmdb_type)
