@@ -5,6 +5,7 @@ from tmdbhelper.lib.addon.consts import ACCEPTED_MEDIATYPES, PARAM_WIDGETS_RELOA
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_media_type, get_setting, get_condvisibility, get_localized, encode_url
 from tmdbhelper.lib.addon.tmdate import is_unaired_timestamp
 from tmdbhelper.lib.addon.logger import kodi_log
+from tmdbhelper.lib.addon.window import get_property
 
 """ Lazyimports
 from tmdbhelper.lib.items.context import ContextMenu
@@ -12,6 +13,7 @@ from tmdbhelper.lib.items.context import ContextMenu
 
 
 _is_skinshortcuts = get_condvisibility("Window.IsVisible(script-skinshortcuts.xml)")
+_is_skinshortcuts_standard = _is_skinshortcuts and get_property('IsStandardSkinShortcut')
 _int_default_select = get_setting('default_select', 'int')
 _is_only_resolve_strm = get_setting('only_resolve_strm')
 _is_hide_unaired_movies = get_setting('hide_unaired_movies')
@@ -130,7 +132,8 @@ class _ListItem(object):
         self.infolabels['tvshowtitle'] = details.get('infolabels', {}).get('tvshowtitle') or self.infolabels.get('tvshowtitle')
 
     def _set_params_reroute_skinshortcuts(self):
-        self.params['widget'] = 'true'
+        if not _is_skinshortcuts_standard:
+            self.params['widget'] = 'true'
         # Reroute sortable lists to display options in skinshortcuts
         if self.infoproperties.get('is_sortable'):
             self.params['parent_info'] = self.params['info']
