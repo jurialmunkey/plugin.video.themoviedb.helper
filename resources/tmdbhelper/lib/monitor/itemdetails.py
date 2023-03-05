@@ -96,8 +96,8 @@ class ListItemDetails():
         infolabels = ARTWORK_LOOKUP_TABLE.get(source, source.split("|") if source else ARTWORK_LOOKUP_TABLE.get('thumb'))
         for count, i in enumerate(infolabels):
             local_artwork = self.get_infolabel(i)
-            if not local_artwork:
-                continue
+            if local_artwork:
+                break
         if not build_fallback:
             return local_artwork or None
         built_artwork = built_artwork or self.get_builtartwork()
