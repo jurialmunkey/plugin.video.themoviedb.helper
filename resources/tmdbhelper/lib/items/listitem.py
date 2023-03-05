@@ -188,10 +188,12 @@ class _ListItem(object):
     def get_url(self):
         def _get_url(path, reload=None, widget=None, **params):
             url = encode_url(path, **params)
-            if reload == 'forced':  # Note reload not std builtin but param absorbed in kwargs
-                url = f'{url}&{PARAM_WIDGETS_RELOAD_FORCED}'
-            elif widget and widget.lower() == 'true':
+            reload_param = PARAM_WIDGETS_RELOAD_FORCED if reload == 'forced' else None  # Note reload not std builtin but param absorbed in kwargs
+            if widget and widget.lower() == 'true':
+                reload_param = PARAM_WIDGETS_RELOAD
                 url = f'{url}&widget=true&{PARAM_WIDGETS_RELOAD}'
+            if reload_param:
+                url = f'{url}&{reload_param}'
             return url
         return _get_url(self.path, **self.params)
 
