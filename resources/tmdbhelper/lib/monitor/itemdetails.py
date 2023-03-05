@@ -94,23 +94,23 @@ class ListItemDetails():
     def get_artwork(self, source='', build_fallback=False, built_artwork=None):
         source = source.lower()
         infolabels = ARTWORK_LOOKUP_TABLE.get(source, source.split("|") if source else ARTWORK_LOOKUP_TABLE.get('thumb'))
-        for i in infolabels:
-            artwork = self.get_infolabel(i)
-            if not artwork:
+        for count, i in enumerate(infolabels):
+            local_artwork = self.get_infolabel(i)
+            if not local_artwork:
                 continue
-            return artwork
         if not build_fallback:
-            return
+            return local_artwork or None
         built_artwork = built_artwork or self.get_builtartwork()
         if not built_artwork:
-            return
-        for i in infolabels:
+            return local_artwork or None
+        for i in infolabels[:count]:
             if not i.startswith('art('):
                 continue
             artwork = built_artwork.get(i[4:-1])
             if not artwork:
                 continue
             return artwork
+        return local_artwork or None
 
     def get_image_manipulations(self, use_winprops=False, built_artwork=None):
         self._parent._last_blur_fallback = False
