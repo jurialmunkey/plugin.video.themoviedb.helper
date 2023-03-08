@@ -1,5 +1,6 @@
 import operator
 from tmdbhelper.lib.addon.modimp import importmodule
+from tmdbhelper.parser import split_items
 
 
 def is_excluded(item, filter_key=None, filter_value=None, filter_operator=None, exclude_key=None, exclude_value=None, exclude_operator=None, is_listitem=False):
@@ -25,7 +26,7 @@ def is_excluded(item, filter_key=None, filter_value=None, filter_operator=None, 
 
     if filter_key and filter_value:
         _exclude = False
-        for fv in filter_value.split(' / '):
+        for fv in split_items(filter_value):
             _exclude = False
             if is_listitem and fv == 'is_empty':  # Only apply is_empty filter to end product
                 if il.get(filter_key) or ip.get(filter_key):
@@ -45,7 +46,7 @@ def is_excluded(item, filter_key=None, filter_value=None, filter_operator=None, 
             return True
 
     if exclude_key and exclude_value:
-        for ev in exclude_value.split(' / '):
+        for ev in split_items(exclude_value):
             if is_listitem and ev == 'is_empty':  # Only apply is_empty filter to end product
                 if not il.get(exclude_key) and not ip.get(exclude_key):
                     return True
