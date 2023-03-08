@@ -82,6 +82,10 @@ def _menu_item_comments():
     return {'class': _Comments}
 
 
+def _menu_item_rating():
+    return {'class': _Rating}
+
+
 def _menu_items():
     """ Build the menu of options
     method and sync_type indicate Trakt API call
@@ -103,6 +107,7 @@ def _menu_items():
         _menu_item_watchlist(),
         _menu_item_recommendations(),
         _menu_item_comments(),
+        _menu_item_rating(),
     ]
 
 
@@ -118,7 +123,8 @@ def sync_trakt_item(trakt_type, unique_id, season=None, episode=None, id_type=No
         'recommendations': lambda: [_menu_item_recommendations()],
         'comments': lambda: [_menu_item_comments()],
         'userlist': lambda: [_menu_item_userlist()],
-        'progress': lambda: [_menu_item_progress()]}
+        'progress': lambda: [_menu_item_progress()],
+        'rating': lambda: [_menu_item_rating()]}
 
     try:
         items = route[sync_type]()
@@ -340,4 +346,40 @@ class _Comments():
             comments = self._trakt.get_response_json(f'{trakt_type}s', slug, 'comments', limit=50) or []
             itemlist = [i.get('comment', '').replace('\n', ' ') for i in comments]
         self._sync = self._getcomment(itemlist, comments)
+        return self._sync
+
+
+class _Rating():
+    def __init__(self, item, **kwargs):
+        self._item, self._trakt = item, item._trakt
+        set_kwargattr(self, kwargs)
+
+    def _getself(self):
+        """ Method to see if we should return item in menu or not """
+        if self._item.season is not None and not self._item.episode:
+            return  # Only sync episodes if allowed and we have an episode number
+        self.name = get_localized(32485)
+        return self
+
+    def sync(self):
+        # Get base item definition from Trakt
+        with BusyDialog():
+            item = self._trakt.get_sync_item(
+                self._item.trakt_type, self._item.unique_id, self._item.id_type,
+                self._item.season, self._item.episode)
+        if not item:
+            return
+        # Ask user for rating
+        try:
+            x = int(Dialog().numeric(0, f'{self.name} (0-10)'))
+        except ValueError:
+            self._sync = -1
+            return
+        if x < 0 or x > 10:
+            self._sync = -1
+            return
+        item['rating'] = x
+        # Sync rating
+        with BusyDialog():
+            self._sync = self._trakt.post_response('sync', 'ratings', postdata={f'{self._item.trakt_type}s': [item]})
         return self._sync

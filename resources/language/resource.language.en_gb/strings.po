@@ -2466,6 +2466,11 @@ msgctxt "#32484"
 msgid "TVDb API"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32485"
+msgid "Add rating"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
