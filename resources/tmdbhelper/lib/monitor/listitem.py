@@ -35,7 +35,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         self._pre_window = 1
         self._last_blur_fallback = False
         self._cache = BasicCache(filename=f'QuickService.db')
-        self._ignored_labels = ['..', get_localized(33078), get_localized(209)]
+        self._ignored_labels = ['..', get_localized(33078).lower(), get_localized(209).lower()]
         self._listcontainer = None
         self._last_listitem = None
         self._readahead = None
@@ -311,7 +311,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             return self.get_readahead() if self._listcontainer else None
 
         # Ignore some special folders like next page and parent folder
-        if self.get_infolabel('Label') in self._ignored_labels:
+        if (self.get_infolabel('Label') or '').lower().split(' (', 1)[0] in self._ignored_labels:
             return self.on_exit()
 
         # Set a property for skins to check if item details are updating
