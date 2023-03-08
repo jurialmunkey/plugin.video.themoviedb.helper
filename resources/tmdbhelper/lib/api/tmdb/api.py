@@ -76,9 +76,11 @@ class TMDb(RequestAPI):
         else:
             return False
 
-    def _get_tmdb_multisearch_validfy(self, query=None, validfy=True):
+    def _get_tmdb_multisearch_validfy(self, query=None, validfy=True, scrub=True):
         if not validfy or not query:
             return query
+        if scrub:  # Scrub added (Year) or other cruft in parentheses () added by Addons or TVDb
+            query = query.split(' (', 1)[0]
         return validify_filename(query.lower(), alphanum=True)
 
     def _get_tmdb_multisearch(self, query=None, validfy=True, media_type=None, **kwargs):
