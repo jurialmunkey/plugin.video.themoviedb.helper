@@ -2471,6 +2471,21 @@ msgctxt "#32485"
 msgid "Add rating"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/api/tmdb/discover.py
+msgctxt "#32486"
+msgid "Certification"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/api/tmdb/discover.py
+msgctxt "#32487"
+msgid "Certification ( < or = )"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/api/tmdb/discover.py
+msgctxt "#32488"
+msgid "Certification ( > or = )"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

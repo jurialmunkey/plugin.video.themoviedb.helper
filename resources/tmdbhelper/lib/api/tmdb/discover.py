@@ -31,6 +31,7 @@ ALL_METHODS = [
     'with_release_type', 'region', 'with_networks', 'air_date.gte', 'air_date.lte', 'first_air_date.gte',
     'first_air_date.lte', 'first_air_date_year', 'with_genres', 'without_genres', 'with_companies', 'with_keywords',
     'without_keywords', 'watch_region', 'with_watch_providers', 'with_original_language',
+    'certification', 'certification.lte', 'certification.gte', 'certification_country',
     'vote_count.gte', 'vote_count.lte', 'vote_average.gte', 'vote_average.lte',
     'with_runtime.gte', 'with_runtime.lte', 'save_index', 'save_label']
 
@@ -542,7 +543,11 @@ def _get_basedir_rules_movies():
         {'label': get_localized(32253), 'method': 'release_date.gte'},
         {'label': get_localized(32254), 'method': 'release_date.lte'},
         {'label': get_localized(32255), 'method': 'with_release_type'},
-        {'label': get_localized(32256), 'method': 'region'}]
+        {'label': get_localized(32256), 'method': 'region'},
+        {'label': get_localized(32486), 'method': 'certification'},
+        {'label': get_localized(32488), 'method': 'certification.gte'},
+        {'label': get_localized(32487), 'method': 'certification.lte'},
+    ]
 
 
 def _get_basedir_rules_tv():
@@ -602,7 +607,7 @@ def _get_discover_params(tmdb_type, get_labels=False):
     params = {'info': 'discover', 'tmdb_type': tmdb_type, 'with_id': 'True'} if not get_labels else {}
 
     # Allowlist of rules to check for when building params
-    rules = [{'method': 'with_separator'}, {'method': 'sort_by'}, {'method': 'watch_region'}]
+    rules = [{'method': 'with_separator'}, {'method': 'sort_by'}, {'method': 'watch_region'}, {'method': 'certification_country'}]
     rules += _get_basedir_rules(tmdb_type)
 
     # Check for window properties and add values to params
@@ -751,6 +756,47 @@ def _get_keyboard(method, header=None):
     return {'value': value, 'label': value, 'method': method}
 
 
+def _get_certification(method='certification'):
+    # If there's already values set then ask if the user wants to clear them instead of adding more
+    if not _confirm_add(method):
+        return _clear_properties(['certification', 'certification.lte', 'certification.gte', 'certification_country'])
+
+    # Don't ask for iso_country region again when adding more items
+    iso_country = _win_prop('certification_country')
+
+    tmdb = TMDb()
+
+    # Get certification list from TMDb
+    certifications = tmdb.get_request_lc('/certification/movie/list').get('certifications', {})
+
+    # Ask for iso country
+    if not iso_country:
+        certifications_list = [i for i in certifications.keys()]
+        try:
+            preselect = certifications_list.index(tmdb.iso_country)
+        except ValueError:
+            preselect = -1
+        x = Dialog().select(get_localized(20026), certifications_list, preselect=preselect)
+        if x == -1:
+            return
+        iso_country = certifications_list[x]
+
+    # Get certifications for region
+    region_certifications = certifications.get(iso_country)
+    gui_items = [i.get('certification') for i in region_certifications]
+    x = Dialog().select(get_localized(19101), gui_items)
+    if x == -1:
+        return
+    certification = region_certifications[x].get('certification')
+
+    # Set region and return provider rule
+    _set_rule('certification_country', label=iso_country, value=iso_country, overwrite=True)
+    return {
+        'value': certification,
+        'label': f"{certification} ({iso_country})",
+        'method': method}
+
+
 def _get_watch_provider(tmdb_type):
     # If there's already values set then ask if the user wants to clear them instead of adding more
     if not _confirm_add('with_watch_providers'):
@@ -850,6 +896,8 @@ def _add_rule(tmdb_type, method=None):
     elif method in ['with_keywords', 'without_keywords']:
         rules = _get_method('keyword', method, use_details=False)
         overwrite = False
+    elif method in ['certification', 'certification.lte', 'certification.gte']:
+        rules = _get_certification(method)
     elif method == 'with_networks':
         rules = _get_keyboard(method, header=get_localized(32278))
     elif '_year' in method:
