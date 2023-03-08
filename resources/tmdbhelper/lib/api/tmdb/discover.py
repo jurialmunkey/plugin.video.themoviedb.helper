@@ -784,7 +784,7 @@ def _get_certification(method='certification'):
     # Get certifications for region
     region_certifications = certifications.get(iso_country)
     gui_items = [i.get('certification') for i in region_certifications]
-    x = Dialog().select(get_localized(19101), gui_items)
+    x = Dialog().select(get_localized(32486), gui_items)
     if x == -1:
         return
     certification = region_certifications[x].get('certification')
