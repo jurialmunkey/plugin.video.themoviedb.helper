@@ -702,6 +702,33 @@
                     <control type="button" format="action"/>
                 </setting>
             </group>
+            <group id="2" label="10106">
+                <setting id="contextmenu_related_lists" type="boolean" label="32235" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="contextmenu_sync_trakt" type="boolean" label="32295" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="contextmenu_manage_artwork" type="boolean" label="32222" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="contextmenu_refresh_details" type="boolean" label="32233" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="contextmenu_add_to_library" type="boolean" label="20444" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+            </group>
             <group id="3" label="25000">
                 <setting id="startup_notifications" type="boolean" label="32468" help="">
                     <level>0</level>
