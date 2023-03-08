@@ -44,7 +44,11 @@ def translate_xml(request):
         return
 
     from xml.dom.minidom import parseString
-    return dictify(parseString(request.text))
+    from xml.parsers.expat import ExpatError
+    try:
+        return dictify(parseString(request.text))
+    except ExpatError:
+        return
 
 
 def json_loads(obj):

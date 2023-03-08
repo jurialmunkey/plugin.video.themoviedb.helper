@@ -1,4 +1,3 @@
-from tmdbhelper.lib.addon.plugin import get_setting
 from tmdbhelper.parser import del_empty_keys, merge_two_dicts
 from tmdbhelper.lib.api.request import RequestAPI
 from tmdbhelper.lib.api.omdb.mapping import ItemMapper
@@ -12,11 +11,14 @@ def translate_xml(request):
         return
 
     from xml.dom.minidom import parseString
+    from xml.parsers.expat import ExpatError
 
     try:
         r = parseString(request.text)
         d = {k: v for k, v in r.firstChild.firstChild.attributes.items() if k and v}
     except AttributeError:
+        return
+    except ExpatError:
         return
 
     return {'root': {'movie': [d]}}
