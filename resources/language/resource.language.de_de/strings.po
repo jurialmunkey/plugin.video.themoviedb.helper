@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2023-01-22 15:28+0100\n"
+"PO-Revision-Date: 2023-03-12 19:01+0100\n"
 "Last-Translator: Peat80 <>\n"
 "Language-Team: LANGUAGE\n"
 "Language: de_DE\n"
@@ -43,7 +43,7 @@ msgstr "Katalanisch (Spanien)"
 
 msgctxt "#30006"
 msgid "Chamorro (Guam)"
-msgstr ""
+msgstr "Chamorro (Guam)"
 
 msgctxt "#30007"
 msgid "Czech (Czech Republic)"
@@ -145,17 +145,17 @@ msgstr "Verwende Fanart.tv für Widget-Grafiken (langsamer)"
 #: /resources/settings.xml
 msgctxt "#32029"
 msgid "OMDb API"
-msgstr ""
+msgstr "OMDb-API"
 
 #: /resources/settings.xml
 msgctxt "#32030"
 msgid "Fanart.tv API"
-msgstr ""
+msgstr "Fanart.tv-API"
 
 #: /resources/settings.xml
 msgctxt "#32031"
 msgid "Trakt API"
-msgstr ""
+msgstr "Trakt-API"
 
 #: /resources/settings.xml
 msgctxt "#32032"
@@ -388,7 +388,7 @@ msgstr "Bibliotheksintegration"
 #: /resources/settings.xml
 msgctxt "#32075"
 msgid "TV"
-msgstr ""
+msgstr "TV"
 
 #: /resources/settings.xml
 msgctxt "#32076"
@@ -473,7 +473,7 @@ msgstr "Extras zu Staffeln"
 #: /resources/settings.xml
 msgctxt "#32092"
 msgid "Widgets"
-msgstr ""
+msgstr "Widgets"
 
 #: /resources/settings.xml
 msgctxt "#32093"
@@ -1255,7 +1255,7 @@ msgstr "Speichern als"
 #: /resources/lib/userdiscover.py
 msgctxt "#32242"
 msgid "Premiere"
-msgstr ""
+msgstr "Premiere"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32243"
@@ -1270,7 +1270,7 @@ msgstr "Theatralisch"
 #: /resources/lib/userdiscover.py
 msgctxt "#32245"
 msgid "Digital"
-msgstr ""
+msgstr "Digital"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32246"
@@ -2129,7 +2129,7 @@ msgstr "\"Ungesehene Folgen\"-Zähler nur für begonnene TV-Sendungen verwenden"
 #: /resources/settings.xml
 msgctxt "#32397"
 msgid "Original"
-msgstr ""
+msgstr "Original"
 
 #: /resources/settings.xml
 msgctxt "#32398"
@@ -2261,7 +2261,7 @@ msgstr "Top-Listen"
 #: /resources/settings.xml
 msgctxt "#32422"
 msgid "MDbList API"
-msgstr ""
+msgstr "MDbList-API"
 
 #: /resources/settings.xml
 msgctxt "#32423"
@@ -2335,7 +2335,7 @@ msgstr "QUERYKEY eintragen wo der Suchbegriff hingehört"
 #: /resources/settings.xml
 msgctxt "#32436"
 msgid "Details"
-msgstr ""
+msgstr "Details"
 
 #: /resources/settings.xml
 msgctxt "#32437"
@@ -2519,7 +2519,7 @@ msgstr "Artikel bei alphabetischer Sortierung ignorieren"
 #: /resources/settings.xml
 msgctxt "#32470"
 msgid "Trakt"
-msgstr ""
+msgstr "Trakt"
 
 #: /resources/settings.xml
 msgctxt "#32471"
@@ -2592,6 +2592,36 @@ msgstr ""
 msgctxt "#32482"
 msgid "Random seed pool for recommendations"
 msgstr "Zufällige Auswahlquellen für Empfehlungen"
+
+#: /resources/settings.xml
+msgctxt "#32483"
+msgid "Allow 3rd party plugin access to API key/token"
+msgstr "Andere Plugins dürfen auf API-Key / Token zugreifen"
+
+#: /resources/settings.xml
+msgctxt "#32484"
+msgid "TVDb API"
+msgstr "TVDb-API"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32485"
+msgid "Add rating"
+msgstr "Bewertung hinzufügen"
+
+#: /resources/tmdbhelper/lib/api/tmdb/discover.py
+msgctxt "#32486"
+msgid "Certification"
+msgstr "Zertifizierung"
+
+#: /resources/tmdbhelper/lib/api/tmdb/discover.py
+msgctxt "#32487"
+msgid "Certification ( < or = )"
+msgstr "Zertifizierung ( < oder = )"
+
+#: /resources/tmdbhelper/lib/api/tmdb/discover.py
+msgctxt "#32488"
+msgid "Certification ( > or = )"
+msgstr "Zertifizierung ( > oder = )"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
@@ -2731,15 +2761,15 @@ msgstr "Vietnamesisch (Vietnam)"
 
 msgctxt "#30064"
 msgid "Mandarin (China)"
-msgstr ""
+msgstr "Mandarin (China)"
 
 msgctxt "#30065"
 msgid "Mandarin (Hong Kong)"
-msgstr ""
+msgstr "Mandarin (Hong Kong)"
 
 msgctxt "#30066"
 msgid "Mandarin (Taiwan)"
-msgstr ""
+msgstr "Mandarin (Taiwan)"
 
 msgctxt "#30067"
 msgid "Zulu (South Africa)"
@@ -2812,7 +2842,7 @@ msgstr "Trakt-Account authentifizieren..."
 #: /resources/lib/traktapi.py
 msgctxt "#32011"
 msgid "Token"
-msgstr ""
+msgstr "Token"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32012"
