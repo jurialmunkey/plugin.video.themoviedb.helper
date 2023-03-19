@@ -211,6 +211,14 @@ class _TraktSync():
     def get_sync_watchlist_shows(self, trakt_type, id_type=None, extended=None):
         return self._get_sync('sync/watchlist/shows', 'show', id_type=id_type, extended=extended)
 
+    @use_activity_cache('seasons', 'watchlisted_at', CACHE_LONG)
+    def get_sync_watchlist_seasons(self, trakt_type, id_type=None, extended=None):
+        return self._get_sync('sync/watchlist/seasons', 'show', id_type=id_type, extended=extended)
+
+    @use_activity_cache('episodes', 'watchlisted_at', CACHE_LONG)
+    def get_sync_watchlist_episodes(self, trakt_type, id_type=None, extended=None):
+        return self._get_sync('sync/watchlist/episodes', 'show', id_type=id_type, extended=extended)
+
     @use_activity_cache('movies', 'recommendations_at', CACHE_LONG)
     def get_sync_recommendations_movies(self, trakt_type, id_type=None, extended=None):
         return self._get_sync('sync/recommendations/movies', 'movie', id_type=id_type, extended=extended)
@@ -254,6 +262,8 @@ class _TraktSync():
             'watchlist': {
                 'movie': self.get_sync_watchlist_movies,
                 'show': self.get_sync_watchlist_shows,
+                'season': self.get_sync_watchlist_seasons,
+                'episode': self.get_sync_watchlist_episodes,
             },
             'recommendations': {
                 'movie': self.get_sync_recommendations_movies,
