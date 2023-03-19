@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from tmdbhelper.lib.api.request import RequestAPI
 from tmdbhelper.lib.addon.dialog import BusyDialog
 from tmdbhelper.lib.addon.thread import ParallelThread
-from tmdbhelper.lib.addon.plugin import get_language
+from tmdbhelper.lib.addon.plugin import get_language, get_infolabel
 
 
 WIKI_SCRL_ID = 61
@@ -84,6 +84,11 @@ class WikipediaAPI(RequestAPI):
     def __init__(self):
         lang = get_language()[:2]
         lang = WIKI_LANGUAGE.get(lang) or DEFAULT_WIKI_LANGUAGE
+
+        self._wiki_tag_link = get_infolabel('Skin.String(TMDbHelper.Wikipedia.Format.Link)') or WIKI_TAG_LINK
+        self._wiki_tag_bold = get_infolabel('Skin.String(TMDbHelper.Wikipedia.Format.Bold)') or WIKI_TAG_BOLD
+        self._wiki_tag_emph = get_infolabel('Skin.String(TMDbHelper.Wikipedia.Format.Emphasis)') or WIKI_TAG_EMPH
+        self._wiki_tag_sups = get_infolabel('Skin.String(TMDbHelper.Wikipedia.Format.Superscript)') or WIKI_TAG_SUPS
 
         super(WikipediaAPI, self).__init__(
             req_api_name='Wikipedia' if lang == DEFAULT_WIKI_LANGUAGE else f'Wikipedia_{lang}',
@@ -195,15 +200,15 @@ class WikipediaAPI(RequestAPI):
                     if c.name in ['th', 'td']:
                         t = f'{t} '
                     if c.name and 'mw-headline' in c.get('class', ''):
-                        t = WIKI_TAG_BOLD.format(t)
+                        t = self._wiki_tag_bold.format(t)
                     elif c.name in ['th', 'h2', 'b', 'h3', 'h1', 'h4']:
-                        t = WIKI_TAG_BOLD.format(t)
+                        t = self._wiki_tag_bold.format(t)
                     elif c.name in ['i', 'em']:
-                        t = WIKI_TAG_EMPH.format(t)
+                        t = self._wiki_tag_emph.format(t)
                     elif c.name in ['sup']:
-                        t = WIKI_TAG_SUPS.format(t)
+                        t = self._wiki_tag_sups.format(t)
                     elif c.name in ['u', 'a']:
-                        t = WIKI_TAG_LINK.format(t)
+                        t = self._wiki_tag_link.format(t)
                     elif c.name in ['li']:
                         t = '* {}'.format(t)
                     text.append(f'{t}')
