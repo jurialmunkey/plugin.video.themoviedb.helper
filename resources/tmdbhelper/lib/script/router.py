@@ -82,6 +82,8 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method', 'library_autoupdate')(**kwargs),
         'log_request':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method', 'log_request')(**kwargs),
+        'log_sync':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method', 'log_sync')(**kwargs),
         'delete_cache':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method', 'delete_cache')(**kwargs),
         'wikipedia':

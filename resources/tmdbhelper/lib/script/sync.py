@@ -356,9 +356,15 @@ class _Rating():
 
     def _getself(self):
         """ Method to see if we should return item in menu or not """
-        if self._item.season is not None and not self._item.episode:
-            return  # Only sync episodes if allowed and we have an episode number
-        self.name = get_localized(32485)
+        rating = self._trakt.is_sync(
+            self._item.trakt_type, self._item.unique_id, self._item.season, self._item.episode,
+            self._item.id_type, 'ratings')
+
+        if not rating:
+            self.name = get_localized(32485)
+        else:
+            self.name = f'{get_localized(32489)} ({rating.get("rating")})'
+
         return self
 
     def sync(self):

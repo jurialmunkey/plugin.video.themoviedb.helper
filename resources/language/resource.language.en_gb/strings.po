@@ -2486,6 +2486,11 @@ msgctxt "#32488"
 msgid "Certification ( > or = )"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32489"
+msgid "Change rating"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
