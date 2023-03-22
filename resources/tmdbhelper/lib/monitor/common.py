@@ -88,8 +88,8 @@ class CommonMonitorDetails():
         return (multi_i.get('id'), multi_i.get('media_type'),)
 
     @kodi_try_except('lib.monitor.common get_tmdb_id_parent')
-    def get_tmdb_id_parent(self, tmdb_id, trakt_type):
-        return self.trakt_api.get_id(tmdb_id, 'tmdb', trakt_type, output_type='tmdb', output_trakt_type='show')
+    def get_tmdb_id_parent(self, tmdb_id, trakt_type, season_episode_check=None):
+        return self.trakt_api.get_id(tmdb_id, 'tmdb', trakt_type, output_type='tmdb', output_trakt_type='show', season_episode_check=season_episode_check)
 
     def get_trakt_ratings(self, item, trakt_type, season=None, episode=None):
         _dummdict = {}

@@ -565,18 +565,30 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         except AttributeError:
             return {}
 
-    def _get_id(self, unique_id, id_type, trakt_type, output_type=None, output_trakt_type=None):
-        response = self.get_request_lc('search', id_type, unique_id, type=trakt_type)
-        for i in response:
-            if i.get('type') != trakt_type:
-                continue
-            if f'{i.get(trakt_type, {}).get("ids", {}).get(id_type)}' != f'{unique_id}':
-                continue
-            if not output_type:
-                return i.get(output_trakt_type or trakt_type, {}).get('ids', {})
-            return i.get(output_trakt_type or trakt_type, {}).get('ids', {}).get(output_type)
+    def _get_id(self, unique_id, id_type, trakt_type, output_type=None, output_trakt_type=None, season_episode_check=None):
 
-    def get_id(self, unique_id, id_type, trakt_type, output_type=None, output_trakt_type=None):
+        response = self.get_request_lc('search', id_type, unique_id, type=trakt_type)
+
+        for i in response:
+            try:
+                if i['type'] != trakt_type:
+                    continue
+                if f'{i[trakt_type]["ids"][id_type]}' != f'{unique_id}':
+                    continue
+                if trakt_type == 'episode' and season_episode_check is not None:
+                    if f'{i["episode"]["season"]}' != f'{season_episode_check[0]}':
+                        continue
+                    if f'{i["episode"]["number"]}' != f'{season_episode_check[1]}':
+                        continue
+
+                if not output_type:
+                    return i[output_trakt_type or trakt_type]['ids']
+                return i[output_trakt_type or trakt_type]['ids'][output_type]
+
+            except (TypeError, KeyError):
+                continue
+
+    def get_id(self, unique_id, id_type, trakt_type, output_type=None, output_trakt_type=None, season_episode_check=None):
         """
         id_type: imdb, tmdb, trakt, tvdb
         trakt_type: movie, show, episode, person, list
@@ -588,12 +600,18 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         """
         cache_name = f'trakt_get_id.{id_type}.{unique_id}.{trakt_type}.{output_type}'
 
+        # Some plugins incorrectly put TMDb ID for the **tvshow** in the episode instead of the **episode** ID
+        # season_episode_check tuple of season/episode numbers is used to bandaid against incorrect metadata
+        if trakt_type == 'episode' and season_episode_check is not None:
+            cache_name = f'{cache_name}.{season_episode_check[0]}.{season_episode_check[1]}'
+
         # Avoid unnecessary extra API calls by only adding output type to cache name if it differs from input type
         if output_trakt_type and output_trakt_type != trakt_type:
             cache_name = f'{cache_name}.{output_trakt_type}'
 
         return self._cache.use_cache(
             self._get_id, unique_id, id_type, trakt_type=trakt_type, output_type=output_type, output_trakt_type=output_trakt_type,
+            season_episode_check=season_episode_check,
             cache_name=cache_name,
             cache_days=CACHE_LONG)
 

@@ -69,7 +69,10 @@ class ListItemDetails():
         tmdb_id = self.get_infolabel('UniqueId(tmdb)')
         if self._dbtype == 'episodes':
             show_tmdb_id = self.get_infolabel('UniqueId(tvshow.tmdb)')
-            return show_tmdb_id if show_tmdb_id else self._parent.get_tmdb_id_parent(tmdb_id, 'episode')
+            if show_tmdb_id:
+                return show_tmdb_id
+            return self._parent.get_tmdb_id_parent(
+                tmdb_id, 'episode', season_episode_check=(self._season, self._episode,))
         return tmdb_id
 
     def get_listitem_query(self):

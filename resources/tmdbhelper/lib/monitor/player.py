@@ -72,7 +72,11 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
 
         if self.dbtype == 'episode':
             show_tmdb_id = info_tag.getUniqueID('tvshow.tmdb')
-            self.tmdb_id = show_tmdb_id if show_tmdb_id else self.get_tmdb_id_parent(info_tag.getUniqueID('tmdb'), 'episode')
+            if show_tmdb_id:
+                self.tmdb_id = show_tmdb_id
+            else:
+                self.tmdb_id = self.get_tmdb_id_parent(
+                    info_tag.getUniqueID('tmdb'), 'episode', season_episode_check=(self.season, self.episode,))
         else:
             self.tmdb_id = info_tag.getUniqueID('tmdb')
 
