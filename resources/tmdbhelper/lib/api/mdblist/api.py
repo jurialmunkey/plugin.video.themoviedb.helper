@@ -6,6 +6,7 @@ from tmdbhelper.lib.items.pages import PaginatedItems
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.api.api_keys.mdblist import API_KEY
 
+
 def _get_paginated(items, limit=None, page=1):
     items = items or []
     if limit is None:
@@ -99,6 +100,40 @@ class MDbList(RequestAPI):
 
     def _get_request_sc(self, *args, **kwargs):
         return self._get_request(self.get_request_sc, *args, **kwargs)
+
+    def get_details(self, media_type, imdb_id=None, trakt_id=None, tmdb_id=None, tvdb_id=None, title=None, year=None):
+        params = {
+            'i': imdb_id, 't': trakt_id, 'tm': tmdb_id, 'tv': tvdb_id,
+            'm': media_type, 's': title, 'y': year
+        }
+        params = {k: v for k, v in params.items() if v}
+        return self.get_request_sc(**params)
+
+    def get_ratings(self, media_type, imdb_id=None, trakt_id=None, tmdb_id=None, tvdb_id=None, title=None, year=None):
+        infoproperties = {}
+
+        details = self.get_details(media_type, imdb_id, trakt_id, tmdb_id, tvdb_id, title, year)
+
+        try:
+            infoproperties['mdblist_rating'] = details['score']
+            ratings = details['ratings']
+        except (KeyError, TypeError):
+            return infoproperties
+
+        translation = {
+            'tomatoes': 'rottentomatoes_rating',
+            'tomatoesaudience': 'rottentomatoes_usermeter'}
+        for i in ratings:
+            try:
+                name = i['source']
+            except KeyError:
+                continue
+            if i.get('value'):
+                infoproperties[translation.get(name) or f'{name}_rating'] = i['value']
+            if i.get('votes'):
+                infoproperties[f'{name}_votes'] = i['votes']
+
+        return infoproperties
 
     def get_list_of_lists(self, path, limit=None, page=1):
         response = self._get_request_sc(path, cache_refresh=True if page == 1 else False)

@@ -2,6 +2,7 @@ from tmdbhelper.lib.addon.window import get_property
 from tmdbhelper.lib.api.tmdb.api import TMDb
 from tmdbhelper.lib.api.omdb.api import OMDb
 from tmdbhelper.lib.api.tvdb.api import TVDb
+from tmdbhelper.lib.api.mdblist.api import MDbList
 from tmdbhelper.lib.api.trakt.api import TraktAPI
 from tmdbhelper.lib.api.fanarttv.api import FanartTV
 from tmdbhelper.lib.addon.plugin import get_setting, get_infolabel, get_condvisibility
@@ -61,6 +62,7 @@ class CommonMonitorDetails():
         self.ftv_api = FanartTV()
         self.tvdb_api = TVDb()
         self.omdb_api = OMDb() if get_setting('omdb_apikey', 'str') else None
+        self.mdblist_api = MDbList() if get_setting('mdblist_apikey', 'str') else None
         self.ib = ItemBuilder(tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api)
         self.ib.ftv_api = self.ftv_api if get_setting('service_fanarttv_lookup') else None
         self.all_awards = self.get_awards_data()
@@ -130,6 +132,14 @@ class CommonMonitorDetails():
             return item
         return self.omdb_api.get_item_ratings(item, cache_only=cache_only)
 
+    def get_mdblist_ratings(self, item, trakt_type, tmdb_id):
+        if not self.mdblist_api:
+            return item
+        ratings = self.mdblist_api.get_ratings(trakt_type, tmdb_id=tmdb_id) or {}
+        ratings.update(item['infoproperties'])
+        item['infoproperties'] = ratings
+        return item
+
     def get_tvdb_awards(self, item, tmdb_type, tmdb_id):
         try:
             awards = self.all_awards[tmdb_type][str(tmdb_id)]
@@ -163,6 +173,7 @@ class CommonMonitorDetails():
         item = self.get_imdb_top250_rank(item, trakt_type=trakt_type)
         item = self.get_trakt_ratings(item, trakt_type, season=season, episode=episode)
         item = self.get_tvdb_awards(item, tmdb_type, tmdb_id)
+        item = self.get_mdblist_ratings(item, trakt_type, tmdb_id)
         item = self.get_nextaired(item, tmdb_type, tmdb_id)
         return item
 
