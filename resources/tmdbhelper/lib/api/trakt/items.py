@@ -9,11 +9,11 @@ from tmdbhelper.lib.items.filters import is_excluded
 REGEX_DEFARTICLE = r'(?i)^The '
 
 EPISODE_PARAMS = {
-    'info': 'details', 'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}',
+    'info': 'details', 'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}',
     'season': '{season}', 'episode': '{number}'}
 
 SEASON_PARAMS = {
-    'info': 'episodes', 'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}',
+    'info': 'episodes', 'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}',
     'season': '{number}'}
 
 
