@@ -86,6 +86,8 @@ def resolve_to_dummy(handle=None, stop_after=1, delay_wait=0):
 
 class Players(object):
     def __init__(self, tmdb_type, tmdb_id=None, season=None, episode=None, ignore_default='', islocal=False, player=None, mode=None, **kwargs):
+        if tmdb_type in ['season', 'episode']:
+            tmdb_type = 'tv'
         with ProgressDialog('TMDbHelper', f'{get_localized(32374)}...', total=3) as _p_dialog:
             self.action_log = []
             self.api_language = None
