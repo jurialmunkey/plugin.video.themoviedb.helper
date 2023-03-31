@@ -1,7 +1,7 @@
 from xbmcgui import Dialog
 from tmdbhelper.lib.addon.window import get_property
 from tmdbhelper.lib.addon.plugin import get_localized, get_condvisibility, get_setting
-from tmdbhelper.parser import try_int
+from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.tmdate import get_timestamp, set_timestamp
 from tmdbhelper.lib.files.bcache import BasicCache
 from tmdbhelper.lib.addon.logger import kodi_log

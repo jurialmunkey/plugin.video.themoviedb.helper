@@ -1,4 +1,4 @@
-from tmdbhelper.parser import del_empty_keys, merge_two_dicts
+from jurialmunkey.parser import del_empty_keys, merge_two_dicts
 from tmdbhelper.lib.api.request import RequestAPI
 from tmdbhelper.lib.api.omdb.mapping import ItemMapper
 from tmdbhelper.lib.api.api_keys.omdb import API_KEY

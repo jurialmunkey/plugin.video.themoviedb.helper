@@ -1,6 +1,6 @@
 from xbmcgui import Dialog
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_trakt_type, convert_type, get_localized
-from tmdbhelper.parser import get_params
+from jurialmunkey.parser import get_params
 from tmdbhelper.lib.api.request import RequestAPI
 from tmdbhelper.lib.items.pages import PaginatedItems
 from tmdbhelper.lib.addon.logger import kodi_log

@@ -1,6 +1,6 @@
 from tmdbhelper.lib.addon.tmdate import get_timedelta, get_datetime_today
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized, ADDON
-from tmdbhelper.parser import merge_two_items
+from jurialmunkey.parser import merge_two_items
 from tmdbhelper.lib.items.builder import ItemBuilder
 from tmdbhelper.lib.items.container import Container
 from tmdbhelper.lib.addon.consts import TVDB_DISCLAIMER

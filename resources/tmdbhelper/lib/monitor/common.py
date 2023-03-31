@@ -12,7 +12,7 @@ from tmdbhelper.lib.addon.logger import kodi_traceback, kodi_try_except, kodi_lo
 from tmdbhelper.lib.files.futils import validate_join
 from tmdbhelper.lib.api.mapping import get_empty_item
 from tmdbhelper.lib.api.kodi.rpc import get_person_stats
-from tmdbhelper.parser import try_int, merge_two_dicts
+from jurialmunkey.parser import try_int, merge_two_dicts
 from collections import namedtuple
 import xbmcvfs
 import json

@@ -1,6 +1,6 @@
 from tmdbhelper.lib.addon.permissions import __access__
 from tmdbhelper.lib.api.api_keys.tokenhandler import TokenHandler
-from tmdbhelper.parser import load_in_data
+from jurialmunkey.parser import load_in_data
 
 if __access__.has_access('internal'):
     API_KEY = load_in_data(

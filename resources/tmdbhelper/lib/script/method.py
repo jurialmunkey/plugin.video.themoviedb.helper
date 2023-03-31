@@ -486,7 +486,7 @@ def play_external(**kwargs):
 def play_using(play_using, mode='play', **kwargs):
     from tmdbhelper.lib.addon.plugin import get_infolabel
     from tmdbhelper.lib.files.futils import read_file
-    from tmdbhelper.parser import parse_paramstring
+    from jurialmunkey.parser import parse_paramstring
 
     def _update_from_listitem(dictionary):
         url = get_infolabel('ListItem.FileNameAndPath') or ''

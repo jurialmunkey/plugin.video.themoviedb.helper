@@ -1,6 +1,6 @@
 import operator
 from tmdbhelper.lib.addon.modimp import importmodule
-from tmdbhelper.parser import split_items
+from jurialmunkey.parser import split_items
 
 
 def is_excluded(item, filter_key=None, filter_value=None, filter_operator=None, exclude_key=None, exclude_value=None, exclude_operator=None, is_listitem=False):

@@ -1,5 +1,5 @@
 from xbmcgui import ListItem as KodiListItem
-from tmdbhelper.parser import try_int, merge_two_dicts
+from jurialmunkey.parser import try_int, merge_two_dicts
 from infotagger.listitem import ListItemInfoTag
 from tmdbhelper.lib.addon.consts import ACCEPTED_MEDIATYPES, PARAM_WIDGETS_RELOAD, PARAM_WIDGETS_RELOAD_FORCED
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_media_type, get_setting, get_condvisibility, get_localized, encode_url

@@ -1,6 +1,6 @@
 from xbmc import Monitor, executeJSONRPC
 from tmdbhelper.lib.addon.logger import kodi_log
-from tmdbhelper.parser import try_int, find_dict_in_list
+from jurialmunkey.parser import try_int, find_dict_in_list
 from tmdbhelper.lib.api.kodi.mapping import ItemMapper
 from tmdbhelper.lib.files.mcache import MemoryCache
 from tmdbhelper.lib.addon.thread import use_thread_lock

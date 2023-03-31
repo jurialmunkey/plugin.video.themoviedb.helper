@@ -1,6 +1,6 @@
 from xbmcgui import Dialog, INPUT_ALPHANUM
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized
-from tmdbhelper.parser import merge_two_dicts
+from jurialmunkey.parser import merge_two_dicts
 from tmdbhelper.lib.files.bcache import set_search_history, get_search_history
 from tmdbhelper.lib.items.container import Container
 from urllib.parse import urlencode

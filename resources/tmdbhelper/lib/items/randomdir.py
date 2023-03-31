@@ -1,7 +1,7 @@
 import random
 from tmdbhelper.lib.items.container import Container
 from tmdbhelper.lib.addon.consts import RANDOMISED_LISTS, RANDOMISED_TRAKT
-from tmdbhelper.parser import merge_two_dicts
+from jurialmunkey.parser import merge_two_dicts
 from tmdbhelper.lib.items.routes import get_container
 
 

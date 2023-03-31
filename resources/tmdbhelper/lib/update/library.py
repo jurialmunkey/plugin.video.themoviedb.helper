@@ -2,7 +2,7 @@ import xbmcvfs
 import tmdbhelper.lib.api.kodi.rpc as rpc
 from xbmcgui import DialogProgressBG
 from tmdbhelper.lib.addon.plugin import get_setting, get_localized, set_setting, executebuiltin
-from tmdbhelper.parser import try_int
+from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.tmdate import is_unaired_timestamp, get_current_date_time
 from tmdbhelper.lib.files.futils import validify_filename, get_tmdb_id_nfo
 from tmdbhelper.lib.update.logger import _LibraryLogger

@@ -1,5 +1,5 @@
 from tmdbhelper.lib.api.mapping import _ItemMapper, get_empty_item
-from tmdbhelper.parser import get_between_strings
+from jurialmunkey.parser import get_between_strings
 
 
 class ItemMapper(_ItemMapper):
