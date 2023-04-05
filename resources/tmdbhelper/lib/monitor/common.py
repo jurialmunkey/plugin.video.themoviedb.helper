@@ -10,10 +10,8 @@ from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_region_date
 from tmdbhelper.lib.items.builder import ItemBuilder
 from tmdbhelper.lib.addon.logger import kodi_traceback, kodi_try_except, kodi_log
 from tmdbhelper.lib.files.futils import validate_join
-from tmdbhelper.lib.api.mapping import get_empty_item
 from tmdbhelper.lib.api.kodi.rpc import get_person_stats
 from jurialmunkey.parser import try_int, merge_two_dicts
-from collections import namedtuple
 import xbmcvfs
 import json
 
@@ -52,8 +50,6 @@ TVDB_AWARDS_KEYS = {
     'Screen Actors Guild Awards': 'sag',
     'BAFTA Awards': 'bafta'}
 
-ItemDetails = namedtuple("ItemDetails", "tmdb_type tmdb_id listitem artwork")
-
 
 class CommonMonitorDetails():
     def __init__(self):
@@ -67,7 +63,14 @@ class CommonMonitorDetails():
         self.ib.ftv_api = self.ftv_api if get_setting('service_fanarttv_lookup') else None
         self.all_awards = self.get_awards_data()
         self.imdb_top250 = {}
-        self._itemcache = {}
+        self._item_memory_cache = {}
+
+    def use_item_memory_cache(self, cache_name, func, *args, **kwargs):
+        cache_data = self._item_memory_cache.get(cache_name) or func(*args, **kwargs)
+        if not cache_data:
+            return
+        self._item_memory_cache[cache_name] = cache_data
+        return cache_data
 
     def get_awards_data(self):
         try:
@@ -195,28 +198,6 @@ class CommonMonitorDetails():
         nextaired = self.tmdb_api.get_tvshow_nextaired(tmdb_id)
         item['infoproperties'].update(nextaired)
         return item
-
-    def use_itemcache(self, cache_name, func, *args, **kwargs):
-        cache_data = self._itemcache.get(cache_name) or func(*args, **kwargs)
-        if not cache_data:
-            return
-        self._itemcache[cache_name] = cache_data
-        return cache_data
-
-    @staticmethod
-    def get_itemdetails_blank():
-        return ItemDetails(None, None, get_empty_item(), {})
-
-    def get_itemdetails_lookup(self, tmdb_type=None, tmdb_id=None, season=None, episode=None):
-        details = self.ib.get_item(tmdb_type, tmdb_id, season, episode)
-        try:
-            return ItemDetails(tmdb_type, tmdb_id, details['listitem'], details['artwork'])
-        except (KeyError, AttributeError, TypeError):
-            return
-
-    def get_itemdetails_cache(self, tmdb_type=None, tmdb_id=None, season=None, episode=None):
-        cache_name = f'{tmdb_type}.{tmdb_id}.{season}.{episode}'
-        return self.use_itemcache(cache_name, self.get_itemdetails_lookup, tmdb_type, tmdb_id, season, episode)
 
 
 class CommonMonitorFunctions(CommonMonitorDetails):

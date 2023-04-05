@@ -22,7 +22,7 @@ class ListItemReadAhead():
         _item.setup_current_listitem()
 
         # If we already cached this item before then move to next queue
-        if self._parent._itemcache.get(f'_get_itemdetails_quick.{self._parent.get_cur_item(x)}'):
+        if self._parent._item_memory_cache.get(f'_get_itemdetails_quick.{self._parent.get_cur_item(x)}'):
             get_property('ReadAheadStatus', f'{x} - Skipped') if self._debug else None
             return self._next_readahead()
 

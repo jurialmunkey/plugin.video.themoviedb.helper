@@ -79,7 +79,7 @@ class ListItemMonitor(CommonMonitorFunctions):
 
     def get_cur_item(self, position=0):
         return str((
-            'current_listitem_v4',
+            'current_listitem_v5',
             self.get_infolabel('dbtype', position),
             self.get_infolabel('dbid', position),
             self.get_infolabel('IMDBNumber', position),
