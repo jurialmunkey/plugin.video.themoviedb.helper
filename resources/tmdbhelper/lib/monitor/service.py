@@ -25,11 +25,11 @@ class ServiceMonitor(object):
         self.xbmc_monitor = Monitor()
 
     def _on_listitem(self):
-        self.listitem_monitor.get_listitem()
+        self.listitem_monitor.on_listitem()
         self.xbmc_monitor.waitForAbort(0.2)
 
     def _on_scroll(self):
-        self.listitem_monitor.clear_on_scroll()
+        self.listitem_monitor.on_scroll_clear()
         self.xbmc_monitor.waitForAbort(0.2)
 
     def _on_fullscreen(self):
@@ -44,7 +44,7 @@ class ServiceMonitor(object):
         self.xbmc_monitor.waitForAbort(1)
 
     def _on_context(self):
-        self.listitem_monitor.get_context_listitem()
+        self.listitem_monitor.on_context_listitem()
         self.xbmc_monitor.waitForAbort(1)
 
     def _on_clear(self):

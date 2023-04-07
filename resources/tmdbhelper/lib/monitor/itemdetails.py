@@ -57,7 +57,7 @@ class ListItemDetails():
         def _get_fallback():
             if get_condvisibility(CV_USE_MULTI_TYPE) and get_condvisibility("!Skin.HasSetting(TMDbHelper.DisablePVR)"):
                 return 'multi'
-            if self._parent.container == 'Container.':
+            if self._parent._container == 'Container.':
                 return get_infolabel('Container.Content()') or ''
             return ''
 
@@ -118,6 +118,7 @@ class ListItemDetails():
         return convert_media_type(self._dbtype, 'tmdb', strip_plural=True, parent_type=True)
 
     def setup_current_listitem(self):
+        """ Cache property getter return values for performance """
         self._dbtype = self.dbtype
         self._query = self.query
         self._year = self.year
@@ -257,7 +258,7 @@ class ListItemDetails():
             cache_data = self.get_itemdetails_online(**cache_item, season=self._season, episode=self._episode, use_cache=True)
             return cache_data
 
-        cache_name_id = self._parent.get_cur_item(self._position)
+        cache_name_id = self._parent.get_item_identifier(self._position)
         cache_name_iq = f'_get_quick.{cache_name_id}'
 
         self._itemdetails = self._parent.use_item_memory_cache(cache_name_iq, _get_quick, cache_name_id) if tmdb_type else None
