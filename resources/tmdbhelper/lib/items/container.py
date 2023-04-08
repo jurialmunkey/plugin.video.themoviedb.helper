@@ -1,7 +1,7 @@
 from xbmcplugin import addDirectoryItems, setProperty, setPluginCategory, setContent, endOfDirectory, addSortMethod
 from tmdbhelper.lib.addon.consts import NO_LABEL_FORMATTING
 from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin
-from tmdbhelper.parser import try_int
+from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.thread import ParallelThread
 from tmdbhelper.lib.api.tmdb.api import TMDb
 from tmdbhelper.lib.api.trakt.api import TraktAPI

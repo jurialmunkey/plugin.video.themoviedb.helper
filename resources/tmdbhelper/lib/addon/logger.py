@@ -1,9 +1,9 @@
-import tmdbhelper.logger as tmdbhelper_logger
+import jurialmunkey.logger as jurialmunkey_logger
 from timeit import default_timer as timer
 from tmdbhelper.lib.addon.plugin import get_setting, format_name, get_localized
 
 
-LOGGER = tmdbhelper_logger.Logger(
+LOGGER = jurialmunkey_logger.Logger(
     log_name='[plugin.video.themoviedb.helper]\n',
     notification_head=f'TheMovieDb Helper {get_localized(257)}',
     notification_text=get_localized(2104),
@@ -12,8 +12,8 @@ kodi_log = LOGGER.kodi_log
 kodi_traceback = LOGGER.kodi_traceback
 kodi_try_except = LOGGER.kodi_try_except
 log_timer_report = LOGGER.log_timer_report
-TimerList = tmdbhelper_logger.TimerList
-TimerFunc = tmdbhelper_logger.TimerFunc
+TimerList = jurialmunkey_logger.TimerList
+TimerFunc = jurialmunkey_logger.TimerFunc
 
 
 def timer_report(func_name):

@@ -5,7 +5,7 @@ from xbmcplugin import setResolvedUrl
 from xbmcaddon import Addon as KodiAddon
 from tmdbhelper.lib.addon.window import get_property
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, format_folderpath, get_localized, get_setting, executebuiltin, get_infolabel
-from tmdbhelper.parser import try_int, try_float
+from jurialmunkey.parser import try_int, try_float
 from tmdbhelper.lib.addon.consts import PLAYERS_PRIORITY, PLAYERS_CHOSEN_DEFAULTS_FILENAME
 from tmdbhelper.lib.addon.dialog import BusyDialog, ProgressDialog
 from tmdbhelper.lib.items.listitem import ListItem
@@ -86,6 +86,8 @@ def resolve_to_dummy(handle=None, stop_after=1, delay_wait=0):
 
 class Players(object):
     def __init__(self, tmdb_type, tmdb_id=None, season=None, episode=None, ignore_default='', islocal=False, player=None, mode=None, **kwargs):
+        if tmdb_type in ['season', 'episode']:
+            tmdb_type = 'tv'
         with ProgressDialog('TMDbHelper', f'{get_localized(32374)}...', total=3) as _p_dialog:
             self.action_log = []
             self.api_language = None

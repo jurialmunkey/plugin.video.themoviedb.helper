@@ -3,6 +3,8 @@ from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_region_date
 from tmdbhelper.lib.addon.window import get_property
 from tmdbhelper.lib.monitor.images import ImageFunctions
 from tmdbhelper.lib.items.listitem import ListItem
+from tmdbhelper.lib.api.mapping import get_empty_item
+from collections import namedtuple
 from copy import deepcopy
 
 
@@ -35,6 +37,9 @@ ARTWORK_LOOKUP_TABLE = {
 CROPIMAGE_SOURCE = "Art(artist.clearlogo)|Art(tvshow.clearlogo)|Art(clearlogo)"
 
 
+ItemDetails = namedtuple("ItemDetails", "tmdb_type tmdb_id listitem artwork")
+
+
 class ListItemDetails():
     def __init__(self, parent, position=0):
         self._parent = parent
@@ -44,52 +49,86 @@ class ListItemDetails():
         self._itemdetails = None
         self._cache = parent._cache
 
-    def get_infolabel(self, info):
-        return self._parent.get_infolabel(info, self._position)
+    @property
+    def dbtype(self):
+        if self.get_infolabel('Property(tmdb_type)') == 'person':
+            return 'actors'
 
-    def setup_current_listitem(self):
-        self._dbtype = self.get_listitem_dbtype()
-        self._query = self.get_listitem_query()
-        self._year = self.get_infolabel('year')
-        if self._dbtype in ['episodes', 'multi']:
-            self._season = self.get_infolabel('Season') or None
-            self._episode = self.get_infolabel('Episode') or None
-        self._imdb_id = self.get_listitem_imdb_id()
-        self._tmdb_id = self.get_listitem_tmdb_id()
+        def _get_fallback():
+            if get_condvisibility(CV_USE_MULTI_TYPE) and get_condvisibility("!Skin.HasSetting(TMDbHelper.DisablePVR)"):
+                return 'multi'
+            if self._parent._container == 'Container.':
+                return get_infolabel('Container.Content()') or ''
+            return ''
 
-    def get_listitem_imdb_id(self):
-        if self._season or self._dbtype not in ['movies', 'tvshows']:
-            return
-        imdb_id = self.get_infolabel('UniqueId(imdb)') or self.get_infolabel('IMDBNumber') or ''
-        return imdb_id if imdb_id.startswith('tt') else ''
+        dbtype = self.get_infolabel('dbtype')
+        return f'{dbtype}s' if dbtype else _get_fallback()
 
-    def get_listitem_tmdb_id(self):
-        if self._dbtype not in ['movies', 'tvshows', 'seasons', 'episodes']:
-            return
-        tmdb_id = self.get_infolabel('UniqueId(tmdb)')
-        if self._dbtype == 'episodes':
-            show_tmdb_id = self.get_infolabel('UniqueId(tvshow.tmdb)')
-            return show_tmdb_id if show_tmdb_id else self._parent.get_tmdb_id_parent(tmdb_id, 'episode')
-        return tmdb_id
-
-    def get_listitem_query(self):
+    @property
+    def query(self):
         query = self.get_infolabel('TvShowTitle')
         if not query and self._dbtype in ['movies', 'tvshows', 'actors', 'multi']:
             query = self.get_infolabel('Title') or self.get_infolabel('Label')
         return query
 
-    def get_listitem_dbtype(self):
-        if self.get_infolabel('Property(tmdb_type)') == 'person':
-            return 'actors'
-        dbtype = self.get_infolabel('dbtype')
-        if dbtype:
-            return f'{dbtype}s'
-        if get_condvisibility(CV_USE_MULTI_TYPE):
-            return 'multi' if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisablePVR)") else ''
-        return get_infolabel('Container.Content()') or '' if self._parent.container == 'Container.' else ''
+    @property
+    def year(self):
+        return self.get_infolabel('year')
 
-    def get_tmdb_type(self):
-        return 'multi' if self._dbtype == 'multi' else convert_media_type(self._dbtype, 'tmdb', strip_plural=True, parent_type=True)
+    @property
+    def season(self):
+        if self._dbtype not in ['seasons', 'episodes', 'multi']:
+            return
+        return self.get_infolabel('Season') or None
+
+    @property
+    def episode(self):
+        if self._dbtype not in ['episodes', 'multi']:
+            return
+        return self.get_infolabel('Episode') or None
+
+    @property
+    def imdb_id(self):
+        if self._season:
+            return
+        if self._dbtype not in ['movies', 'tvshows']:
+            return
+        imdb_id = self.get_infolabel('UniqueId(imdb)') or self.get_infolabel('IMDBNumber') or ''
+        return imdb_id if imdb_id.startswith('tt') else ''
+
+    @property
+    def tmdb_id(self):
+        if self._dbtype in ['movies', 'tvshows']:
+            return self.get_infolabel('UniqueId(tmdb)')
+
+        if self._dbtype == 'seasons':
+            # TODO: Trakt lookup of TMDb ID for season similar to episodes
+            return self.get_infolabel('UniqueId(tvshow.tmdb)')
+
+        if self._dbtype == 'episodes':
+            return self.get_infolabel('UniqueId(tvshow.tmdb)') or self._parent.get_tmdb_id_parent(
+                tmdb_id=self.get_infolabel('UniqueId(tmdb)'),
+                trakt_type='episode',
+                season_episode_check=(self._season, self._episode,))
+
+    @property
+    def tmdb_type(self):
+        if self._dbtype == 'multi':
+            return 'multi'
+        return convert_media_type(self._dbtype, 'tmdb', strip_plural=True, parent_type=True)
+
+    def setup_current_listitem(self):
+        """ Cache property getter return values for performance """
+        self._dbtype = self.dbtype
+        self._query = self.query
+        self._year = self.year
+        self._season = self.season
+        self._episode = self.episode
+        self._imdb_id = self.imdb_id
+        self._tmdb_id = self.tmdb_id
+
+    def get_infolabel(self, info):
+        return self._parent.get_infolabel(info, self._position)
 
     def get_artwork(self, source='', build_fallback=False, built_artwork=None):
         source = source.lower()
@@ -207,7 +246,7 @@ class ListItemDetails():
         """ Use itemdetails cache to return a named tuple of tmdb_type, tmdb_id, listitem, artwork
         Runs func(*args, **kwargs) after retrieving a new uncached item for early code execution
         """
-        tmdb_type = self.get_tmdb_type()
+        tmdb_type = self.tmdb_type
 
         def _get_quick(cache_name_id):
             cache_item = self._cache.get_cache(cache_name_id) if tmdb_type else None
@@ -216,14 +255,35 @@ class ListItemDetails():
                 func(*args, **kwargs) if func else None
                 cache_item = self._cache.set_cache(self.get_itemtypeid(tmdb_type), cache_name_id)
 
-            cache_data = self._parent.get_itemdetails_cache(**cache_item, season=self._season, episode=self._episode)
+            cache_data = self.get_itemdetails_online(**cache_item, season=self._season, episode=self._episode, use_cache=True)
             return cache_data
 
-        cache_name_id = self._parent.get_cur_item(self._position)
+        cache_name_id = self._parent.get_item_identifier(self._position)
         cache_name_iq = f'_get_quick.{cache_name_id}'
-        self._itemdetails = self._parent.use_itemcache(cache_name_iq, _get_quick, cache_name_id) if tmdb_type else None
-        self._itemdetails = self._itemdetails or self._parent.get_itemdetails_blank()
+
+        self._itemdetails = self._parent.use_item_memory_cache(cache_name_iq, _get_quick, cache_name_id) if tmdb_type else None
+        self._itemdetails = self._itemdetails or self.get_itemdetails_blank()
+
         return self._itemdetails
+
+    def get_itemdetails_online(self, tmdb_type=None, tmdb_id=None, season=None, episode=None, use_cache=False):
+
+        def _get_itemdetails_online():
+            details = self._parent.ib.get_item(tmdb_type, tmdb_id, season, episode)
+            try:
+                return ItemDetails(tmdb_type, tmdb_id, details['listitem'], details['artwork'])
+            except (KeyError, AttributeError, TypeError):
+                return
+
+        if not use_cache:
+            return _get_itemdetails_online()
+
+        cache_name = f'{tmdb_type}.{tmdb_id}.{season}.{episode}'
+        return self._parent.use_item_memory_cache(cache_name, _get_itemdetails_online)
+
+    @staticmethod
+    def get_itemdetails_blank():
+        return ItemDetails(None, None, get_empty_item(), {})
 
     def get_builtartwork(self):
         if not self._itemdetails or not self._itemdetails.artwork:

@@ -1,6 +1,6 @@
 from tmdbhelper.lib.files.futils import get_json_filecache, set_json_filecache
 from tmdbhelper.lib.addon.tmdate import is_future_timestamp, get_todays_date
-from tmdbhelper.parser import try_int
+from jurialmunkey.parser import try_int
 
 
 class _TVShowCache():

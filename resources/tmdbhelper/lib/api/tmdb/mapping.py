@@ -1,4 +1,4 @@
-from tmdbhelper.parser import try_int, try_float, dict_to_list, get_params, IterProps
+from jurialmunkey.parser import try_int, try_float, dict_to_list, get_params, IterProps
 from tmdbhelper.lib.api.mapping import UPDATE_BASEKEY, _ItemMapper, get_empty_item
 from tmdbhelper.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type, get_setting, get_localized
 from tmdbhelper.lib.addon.tmdate import format_date, age_difference, is_future_timestamp

@@ -1,5 +1,5 @@
 import xbmcvfs
-from tmdbhelper.parser import try_int
+from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.plugin import ADDONDATA, get_localized, get_setting
 from tmdbhelper.lib.addon.logger import kodi_log
 

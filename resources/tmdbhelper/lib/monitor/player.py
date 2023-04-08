@@ -72,7 +72,11 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
 
         if self.dbtype == 'episode':
             show_tmdb_id = info_tag.getUniqueID('tvshow.tmdb')
-            self.tmdb_id = show_tmdb_id if show_tmdb_id else self.get_tmdb_id_parent(info_tag.getUniqueID('tmdb'), 'episode')
+            if show_tmdb_id:
+                self.tmdb_id = show_tmdb_id
+            else:
+                self.tmdb_id = self.get_tmdb_id_parent(
+                    info_tag.getUniqueID('tmdb'), 'episode', season_episode_check=(self.season, self.episode,))
         else:
             self.tmdb_id = info_tag.getUniqueID('tmdb')
 
@@ -84,16 +88,13 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.tmdb_type = 'movie' if self.dbtype == 'movie' else 'tv'
         self.tmdb_id = self.tmdb_id or self.get_tmdb_id(self.tmdb_type, self.imdb_id, self.query, self.year, self.epyear)
         self.details = self.ib.get_item(self.tmdb_type, self.tmdb_id, self.season, self.episode)
-        self.artwork = self.details['artwork'] if self.details else None
-        self.details = self.details['listitem'] if self.details else None
-
-        if not self.details:
-            return self.clear_properties()
+        self.artwork = self.details['artwork'] if self.details else {}
+        self.details = self.details['listitem'] if self.details else {}
 
         self.clear_properties()
 
         # Get ratings (no need for threading since we're only getting one item in player ever)
-        if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"):
+        if self.details and get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"):
             try:
                 trakt_type = {'movie': 'movie', 'tv': 'show'}[self.tmdb_type]
             except KeyError:
@@ -101,13 +102,15 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
             if trakt_type:
                 self.details = self.get_omdb_ratings(self.details)
                 self.details = self.get_imdb_top250_rank(self.details, trakt_type=trakt_type)
+                self.details = self.get_tvdb_awards(self.details, self.tmdb_type, self.tmdb_id)
                 self.details = self.get_trakt_ratings(self.details, trakt_type, season=self.season, episode=self.episode)
+                self.details = self.get_mdblist_ratings(self.details, trakt_type, tmdb_id=self.tmdb_id)
             self.set_iter_properties(self.details.get('infoproperties', {}), SETPROP_RATINGS)
 
         # Get artwork (no need for threading since we're only getting one item in player ever)
         # No need for merging Kodi DB artwork as we should have access to that via normal player properties
         if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
-            if get_setting('service_fanarttv_lookup'):
+            if self.artwork and get_setting('service_fanarttv_lookup'):
                 self.details['art'] = self.ib.get_item_artwork(self.artwork, is_season=True if self.season else False)
             if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"):
                 art = self.details.get('art', {})

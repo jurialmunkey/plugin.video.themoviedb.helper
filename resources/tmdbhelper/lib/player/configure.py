@@ -1,7 +1,7 @@
 from xbmcgui import Dialog, INPUT_NUMERIC
 from xbmcaddon import Addon as KodiAddon
 from tmdbhelper.lib.addon.plugin import ADDONPATH, get_localized
-from tmdbhelper.parser import try_int
+from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.dialog import BusyDialog
 from tmdbhelper.lib.addon.consts import PLAYERS_BASEDIR_SAVE, PLAYERS_PRIORITY
 from tmdbhelper.lib.files.futils import dumps_to_file, delete_file

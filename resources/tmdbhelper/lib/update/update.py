@@ -2,7 +2,7 @@ import xbmcvfs
 from xbmcgui import Dialog
 from tmdbhelper.lib.addon.dialog import BusyDialog
 from tmdbhelper.lib.addon.plugin import get_setting, get_localized
-from tmdbhelper.parser import try_int
+from jurialmunkey.parser import try_int
 from tmdbhelper.lib.files.futils import validify_filename, make_path, write_to_file, get_tmdb_id_nfo
 from tmdbhelper.lib.api.trakt.api import TraktAPI
 from tmdbhelper.lib.addon.logger import kodi_log

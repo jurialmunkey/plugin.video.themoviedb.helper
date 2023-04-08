@@ -6,7 +6,7 @@ from tmdbhelper.lib.addon.tmdate import set_timestamp
 from tmdbhelper.lib.addon.thread import ParallelThread
 from tmdbhelper.lib.addon.window import get_property
 from tmdbhelper.lib.addon.dialog import BusyDialog
-from tmdbhelper.parser import try_int
+from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.plugin import set_kwargattr, convert_trakt_type, get_localized, executebuiltin, get_infolabel
 from tmdbhelper.lib.api.trakt.api import TraktAPI
 from tmdbhelper.lib.update.userlist import get_monitor_userlists
@@ -356,9 +356,15 @@ class _Rating():
 
     def _getself(self):
         """ Method to see if we should return item in menu or not """
-        if self._item.season is not None and not self._item.episode:
-            return  # Only sync episodes if allowed and we have an episode number
-        self.name = get_localized(32485)
+        rating = self._trakt.is_sync(
+            self._item.trakt_type, self._item.unique_id, self._item.season, self._item.episode,
+            self._item.id_type, 'ratings')
+
+        if not rating:
+            self.name = get_localized(32485)
+        else:
+            self.name = f'{get_localized(32489)} ({rating.get("rating")})'
+
         return self
 
     def sync(self):

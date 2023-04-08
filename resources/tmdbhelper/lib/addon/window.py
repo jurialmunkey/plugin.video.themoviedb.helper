@@ -1,6 +1,6 @@
 from xbmc import Monitor
 from xbmcgui import Window, getCurrentWindowId, getCurrentWindowDialogId
-from tmdbhelper.parser import try_type, try_int
+from jurialmunkey.parser import try_type, try_int
 from tmdbhelper.lib.addon.plugin import executebuiltin, get_condvisibility, get_infolabel
 
 

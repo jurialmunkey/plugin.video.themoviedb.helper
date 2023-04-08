@@ -3,7 +3,7 @@
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 import re
 from tmdbhelper.lib.addon.window import get_property
-from tmdbhelper.parser import reconfigure_legacy_params
+from jurialmunkey.parser import reconfigure_legacy_params
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.modimp import importmodule
 
@@ -82,6 +82,8 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method', 'library_autoupdate')(**kwargs),
         'log_request':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method', 'log_request')(**kwargs),
+        'log_sync':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method', 'log_sync')(**kwargs),
         'delete_cache':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method', 'delete_cache')(**kwargs),
         'wikipedia':

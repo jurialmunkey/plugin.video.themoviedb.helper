@@ -429,6 +429,20 @@ def log_request(**kwargs):
         Dialog().textviewer(filename, dumps(kwargs['response'], indent=2))
 
 
+def log_sync(log_sync, trakt_type='show', id_type=None, extended=None, **kwargs):
+    from json import dumps
+    from xbmcgui import Dialog
+    from tmdbhelper.lib.addon.dialog import BusyDialog
+    from tmdbhelper.lib.api.trakt.api import TraktAPI
+    from tmdbhelper.lib.files.futils import validify_filename
+    from tmdbhelper.lib.files.futils import dumps_to_file
+    with BusyDialog():
+        data = TraktAPI().get_sync(log_sync, trakt_type, id_type=id_type, extended=extended)
+        filename = validify_filename(f'sync__{log_sync}_{trakt_type}_{id_type}_{extended}.json')
+        dumps_to_file(data, 'log_request', filename)
+        Dialog().textviewer(filename, dumps(data, indent=2))
+
+
 def delete_cache(delete_cache, **kwargs):
     from xbmcgui import Dialog
     from tmdbhelper.lib.items.builder import ItemBuilder
@@ -472,7 +486,7 @@ def play_external(**kwargs):
 def play_using(play_using, mode='play', **kwargs):
     from tmdbhelper.lib.addon.plugin import get_infolabel
     from tmdbhelper.lib.files.futils import read_file
-    from tmdbhelper.parser import parse_paramstring
+    from jurialmunkey.parser import parse_paramstring
 
     def _update_from_listitem(dictionary):
         url = get_infolabel('ListItem.FileNameAndPath') or ''

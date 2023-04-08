@@ -1,5 +1,5 @@
 from xbmc import Monitor
-from tmdbhelper.parser import try_int
+from jurialmunkey.parser import try_int
 from threading import Thread
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_datetime_now, get_timedelta, get_datetime_today, get_datetime_time, get_datetime_combine
 from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin, get_infolabel, ADDONPATH

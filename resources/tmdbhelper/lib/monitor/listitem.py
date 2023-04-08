@@ -47,21 +47,56 @@ class ListItemMonitor(CommonMonitorFunctions):
         self._readahead_li = get_setting('service_listitem_readahead')  # Allows readahead queue of next ListItems when idle
         self._pre_artwork_thread = None
 
-    def setup_current_container(self):
-        self._cur_window = get_current_window()
-        self._listcontainer = self.get_listcontainer()
-        window_id = self._cur_window if get_condvisibility(CV_USE_LOCAL_CONTAINER) else None
-        widget_id = get_property('WidgetContainer', window_id=window_id, is_type=int)
-        self.container = f'Container({widget_id}).' if widget_id else 'Container.'
-        self.container_item = 'ListItem.' if get_condvisibility(CV_USE_LISTITEM) else f'{self.container}ListItem({{}}).'
+    # ==========
+    # PROPERTIES
+    # ==========
 
-    def setup_current_item(self, position=0):
-        self._item = ListItemDetails(self, position)
-        self._item.setup_current_listitem()
+    @property
+    def cur_window(self):
+        return get_current_window()
+
+    @property
+    def cur_folder(self):
+        return str(('current_folder', self._container, self.container_content, self.numitems,))
+
+    @property
+    def cur_item(self):
+        return self.get_item_identifier()
+
+    @property
+    def container_content(self):
+        return get_infolabel('Container.Content()')
+
+    @property
+    def widget_id(self):
+        window_id = self._cur_window if get_condvisibility(CV_USE_LOCAL_CONTAINER) else None
+        return get_property('WidgetContainer', window_id=window_id, is_type=int)
+
+    @property
+    def container(self):
+        return f'Container({self._widget_id}).' if self._widget_id else 'Container.'
+
+    @property
+    def container_item(self):
+        return 'ListItem.' if get_condvisibility(CV_USE_LISTITEM) else f'{self._container}ListItem({{}}).'
+
+    @property
+    def listcontainer_id(self):
+        return int(get_infolabel('Skin.String(TMDbHelper.MonitorContainer)') or 0)
+
+    @property
+    def listcontainer(self):
+        return self.get_listcontainer(self._cur_window, self._listcontainer_id)
+
+    @property
+    def numitems(self):
+        return get_infolabel(f'{self._container}NumItems')
+
+    # =======
+    # GETTERS
+    # =======
 
     def get_listcontainer(self, window_id=None, container_id=None):
-        window_id = window_id or self._cur_window
-        container_id = container_id or int(get_infolabel('Skin.String(TMDbHelper.MonitorContainer)') or 0)
         if not window_id or not container_id:
             return
         if not get_condvisibility(f'Control.IsVisible({container_id})'):
@@ -69,17 +104,11 @@ class ListItemMonitor(CommonMonitorFunctions):
         return container_id
 
     def get_infolabel(self, info, position=0):
-        return get_infolabel(f'{self.container_item.format(position)}{info}')
+        return get_infolabel(f'{self._container_item.format(position)}{info}')
 
-    def get_position(self):
-        return get_infolabel(f'{self.container}CurrentItem')
-
-    def get_numitems(self):
-        return get_infolabel(f'{self.container}NumItems')
-
-    def get_cur_item(self, position=0):
+    def get_item_identifier(self, position=0):
         return str((
-            'current_listitem_v4',
+            'current_listitem_v5',
             self.get_infolabel('dbtype', position),
             self.get_infolabel('dbid', position),
             self.get_infolabel('IMDBNumber', position),
@@ -89,53 +118,56 @@ class ListItemMonitor(CommonMonitorFunctions):
             self.get_infolabel('season', position),
             self.get_infolabel('episode', position),))
 
-    def get_cur_folder(self):
-        return str((
-            'current_folder',
-            self.container, get_infolabel('Container.Content()'),
-            self.get_numitems(),))
+    # ================
+    # SETUP PROPERTIES
+    # ================
+
+    def setup_current_container(self):
+        """ Cache property getter return values for performance """
+        self._cur_window = self.cur_window
+        self._listcontainer_id = self.listcontainer_id
+        self._listcontainer = self.listcontainer
+        self._widget_id = self.widget_id
+        self._container = self.container
+        self._container_item = self.container_item
+
+    def setup_current_item(self):
+        self._item = ListItemDetails(self, position=0)
+        self._item.setup_current_listitem()
+
+    # ==================
+    # COMPARISON METHODS
+    # ==================
 
     def is_same_item(self, update=False):
-        self._cur_item = self.get_cur_item()
+        self._cur_item = self.cur_item
         if self._cur_item == self._pre_item:
             return self._cur_item
         if update:
             self._pre_item = self._cur_item
 
     def is_same_folder(self, update=True):
-        self._cur_folder = self.get_cur_folder()
+        self._cur_folder = self.cur_folder
         if self._cur_folder == self._pre_folder:
             return self._cur_folder
         if update:
             self._pre_folder = self._cur_folder
 
     def is_same_window(self, update=True):
-        self._cur_window = get_current_window()
+        self._cur_window = self.cur_window
         if self._cur_window == self._pre_window:
             return self._cur_window
         if update:
             self._pre_window = self._cur_window
 
+    # =========
+    # FUNCTIONS
+    # =========
+
     def clear_properties(self, ignore_keys=None):
         if not self._item or not self._item.get_artwork(source="Art(artist.clearlogo)|Art(tvshow.clearlogo)|Art(clearlogo)"):
             self.properties.update({'CropImage', 'CropImage.Original'})
         super().clear_properties(ignore_keys=ignore_keys)
-
-    def clear_on_scroll(self):
-        self.setup_current_container()
-        if self.is_same_item():
-            return
-        return self.get_listitem() if self._listcontainer else self.on_exit(keep_tv_artwork=True)
-
-    def on_exit(self, keep_tv_artwork=False, is_done=True):
-        if self._listcontainer:
-            return self.add_item_listcontainer(ListItem().get_listitem())
-        try:
-            ignore_keys = SETMAIN_ARTWORK if keep_tv_artwork and self._item._dbtype in ['episodes', 'seasons'] else None
-        except AttributeError:
-            ignore_keys = None
-        self.clear_properties(ignore_keys=ignore_keys)
-        get_property('IsUpdating', clear_property=True) if is_done else None
 
     @kodi_try_except('lib.monitor.listitem.blur_fallback')
     def blur_fallback(self):
@@ -150,20 +182,6 @@ class ListItemMonitor(CommonMonitorFunctions):
             self.blur_img.start()
             self._last_blur_fallback = True
 
-    @kodi_try_except('lib.monitor.listitem.get_context_listitem')
-    def get_context_listitem(self):
-        if not self._last_listitem:
-            return
-        _id_dialog = xbmcgui.getCurrentWindowDialogId()
-        _id_d_list = self.get_listcontainer(_id_dialog)
-        if not _id_d_list or _id_d_list == -1:
-            return
-        _id_window = xbmcgui.getCurrentWindowId()
-        _id_w_list = self.get_listcontainer(_id_window)
-        if not _id_w_list or _id_w_list == -1:
-            return
-        self.add_item_listcontainer(self._last_listitem, _id_dialog, _id_d_list)
-
     def add_item_listcontainer(self, listitem, window_id=None, container_id=None):
         try:
             _win = xbmcgui.Window(window_id or self._cur_window)  # Note get _win separate from _lst
@@ -174,6 +192,10 @@ class ListItemMonitor(CommonMonitorFunctions):
             return
         _lst.addItem(listitem)  # Note dont delay adding listitem after retrieving list else memory reference changes
         return listitem
+
+    # =======
+    # ACTIONS
+    # =======
 
     def on_finalise_listcontainer(self, process_artwork=True, process_ratings=True):
         """ Constructs ListItem adds to hidden container
@@ -186,7 +208,7 @@ class ListItemMonitor(CommonMonitorFunctions):
         _listitem = self._last_listitem = _item.get_builtitem()
         _pre_item = self._pre_item
 
-        if _pre_item != self.get_cur_item():
+        if _pre_item != self.cur_item:
             return
 
         self.add_item_listcontainer(_listitem)
@@ -214,7 +236,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             t_ratings.join() if t_ratings else None
 
             # Check focused item is still the same before readding
-            if self._offscreen_li and _pre_item == self.get_cur_item():
+            if self._offscreen_li and _pre_item == self.cur_item:
                 self.add_item_listcontainer(_listitem)
 
         if process_artwork or process_ratings:
@@ -273,7 +295,7 @@ class ListItemMonitor(CommonMonitorFunctions):
             process_ratings=get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"))
         get_property('IsUpdating', clear_property=True)
 
-    def get_readahead(self):
+    def on_readahead(self):
         # No readahead if disabled by user
         if not self._readahead_li:
             return
@@ -298,8 +320,8 @@ class ListItemMonitor(CommonMonitorFunctions):
         t = Thread(target=_next_readahead)
         t.start()
 
-    @kodi_try_except('lib.monitor.listitem.get_listitem')
-    def get_listitem(self):
+    @kodi_try_except('lib.monitor.listitem.on_listitem')
+    def on_listitem(self):
         self.setup_current_container()
 
         # We want to set a special container but it doesn't exist so exit
@@ -308,7 +330,7 @@ class ListItemMonitor(CommonMonitorFunctions):
 
         # Check if the item has changed before retrieving details again
         if self.is_same_window(update=True) and self.is_same_item(update=True):
-            return self.get_readahead() if self._listcontainer else None
+            return self.on_readahead() if self._listcontainer else None
 
         # Ignore some special folders like next page and parent folder
         if (self.get_infolabel('Label') or '').lower().split(' (', 1)[0] in self._ignored_labels:
@@ -342,3 +364,33 @@ class ListItemMonitor(CommonMonitorFunctions):
 
         # Finish up setting our details to the container/window
         self.on_finalise()
+
+    @kodi_try_except('lib.monitor.listitem.on_context_listitem')
+    def on_context_listitem(self):
+        if not self._last_listitem:
+            return
+        _id_dialog = xbmcgui.getCurrentWindowDialogId()
+        _id_d_list = self.get_listcontainer(_id_dialog, self._listcontainer_id)
+        if not _id_d_list or _id_d_list == -1:
+            return
+        _id_window = xbmcgui.getCurrentWindowId()
+        _id_w_list = self.get_listcontainer(_id_window, self._listcontainer_id)
+        if not _id_w_list or _id_w_list == -1:
+            return
+        self.add_item_listcontainer(self._last_listitem, _id_dialog, _id_d_list)
+
+    def on_scroll_clear(self):
+        self.setup_current_container()
+        if self.is_same_item():
+            return
+        return self.on_listitem() if self._listcontainer else self.on_exit(keep_tv_artwork=True)
+
+    def on_exit(self, keep_tv_artwork=False, is_done=True):
+        if self._listcontainer:
+            return self.add_item_listcontainer(ListItem().get_listitem())
+        try:
+            ignore_keys = SETMAIN_ARTWORK if keep_tv_artwork and self._item._dbtype in ['episodes', 'seasons'] else None
+        except AttributeError:
+            ignore_keys = None
+        self.clear_properties(ignore_keys=ignore_keys)
+        get_property('IsUpdating', clear_property=True) if is_done else None

@@ -1,4 +1,4 @@
-from tmdbhelper.parser import try_int
+from jurialmunkey.parser import try_int
 
 """ Lazyimports """
 from tmdbhelper.lib.addon.modimp import lazyimport

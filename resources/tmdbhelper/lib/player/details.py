@@ -1,4 +1,4 @@
-from tmdbhelper.parser import try_int, del_empty_keys
+from jurialmunkey.parser import try_int, del_empty_keys
 from tmdbhelper.lib.items.builder import ItemBuilder
 from tmdbhelper.lib.api.tmdb.api import TMDb
 

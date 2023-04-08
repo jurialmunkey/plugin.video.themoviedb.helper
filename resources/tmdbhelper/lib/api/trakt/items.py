@@ -1,17 +1,20 @@
 import re
 import random
 from tmdbhelper.lib.addon.plugin import PLUGINPATH, convert_type, convert_trakt_type, get_setting
-from tmdbhelper.parser import try_int, try_str, del_empty_keys, get_params, partition_list
+from jurialmunkey.parser import try_int, try_str, del_empty_keys, get_params, partition_list
 from tmdbhelper.lib.addon.tmdate import date_in_range
 from tmdbhelper.lib.items.filters import is_excluded
 
 
 REGEX_DEFARTICLE = r'(?i)^The '
 
-
 EPISODE_PARAMS = {
-    'info': 'details', 'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}',
+    'info': 'details', 'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}',
     'season': '{season}', 'episode': '{number}'}
+
+SEASON_PARAMS = {
+    'info': 'episodes', 'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}',
+    'season': '{number}'}
 
 
 def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
@@ -127,14 +130,22 @@ def _get_item_info(item, item_type=None, base_item=None, check_tmdb_id=True, par
     base_item = base_item or {}
     item_info = item.get(item_type, {}) or item
     show_item = None
-    if item_type == 'episode':
+
+    if item_type in ['season', 'episode']:
         show_item = item.get('show')
-        params_def = params_def or EPISODE_PARAMS
+        if not params_def:
+            if item_type == 'season':
+                params_def = SEASON_PARAMS
+            else:
+                params_def = EPISODE_PARAMS
+
     if not item_info:
         return base_item
+
     if check_tmdb_id and not item_info.get('ids', {}).get('tmdb'):
         if not show_item or not show_item.get('ids', {}).get('tmdb'):
             return base_item
+
     base_item['label'] = _get_item_title(item_info) or ''
     base_item['infolabels'] = _get_item_infolabels(item_info, item_type=item_type, infolabels=base_item.get('infolabels', {}), show=show_item)
     base_item['infoproperties'] = _get_item_infoproperties(item_info, item_type=item_type, infoproperties=base_item.get('infoproperties', {}), show=show_item)
