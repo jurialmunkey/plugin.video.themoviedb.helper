@@ -7,13 +7,13 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2023-03-05 08:19+0000\n"
-"Last-Translator: Havokdan <havokdan@yahoo.com.br>\n"
-"Language-Team: Português do Brasil\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: pt-BR\n"
+"Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 msgctxt "#30000"
@@ -318,21 +318,21 @@ msgstr "ID TMDb removido com sucesso {0} de {1}"
 
 #: /resources/lib/context.py
 msgctxt "#32064"
-msgid "Do you wish to remove {0} from your Trakt {1}?\n"
+msgid ""
+"Do you wish to remove {0} from your Trakt {1}?\n"
 "\n"
 "TMDb {2} ID {3}"
-msgstr "Deseja remover {0} do seu Trakt {1}?\n"
-"\n"
-"TMDb {2} ID {3}"
+msgstr ""
+"Deseja remover {0} de seu Trakt {1}?\n\nTMDb {2} ID {3}"
 
 #: /resources/lib/context.py
 msgctxt "#32065"
-msgid "Do you wish to add {0} to your Trakt {1}?\n"
+msgid ""
+"Do you wish to add {0} to your Trakt {1}?\n"
 "\n"
 "TMDb {2} ID {3}"
-msgstr "Deseja adicionar {0} ao seu Trakt {1}?\n"
-"\n"
-"TMDb {2} ID {3}"
+msgstr ""
+"Deseja adicionar {0} ao seu Trakt {1}?\n\nTMDb {2} ID {3}"
 
 #: /resources/settings.xml
 msgctxt "#32066"
@@ -526,10 +526,11 @@ msgstr "Nenhum Valor Adicionado"
 
 #: /resources/lib/container.py
 msgctxt "#32104"
-msgid "TMDb ID for {} not found or none selected.\n"
+msgid ""
+"TMDb ID for {} not found or none selected.\n"
 "Do you want to add another value?"
-msgstr "ID TMDb para {} não encontrado ou nenhum selecionado.\n"
-"Deseja adicionar outro valor?"
+msgstr ""
+"ID TMDb para {} não encontrado ou nenhum selecionado.\nDeseja adicionar outro valor?"
 
 #: /resources/lib/container.py
 msgctxt "#32105"
@@ -828,15 +829,16 @@ msgstr "Usar fanart.tv para arte do monitor de serviço"
 
 #: /resources/lib/context.py
 msgctxt "#32164"
-msgid "Adding Trakt lists to library is limited to [B]{}[/B] TV Shows and [B]{}[/B] Movies per list.\n"
+msgid ""
+"Adding Trakt lists to library is limited to [B]{}[/B] TV Shows and [B]{}[/B] Movies per list.\n"
 "This limit is set to ensure that the APIs providing data for free are respected."
-msgstr "A adição de listas Trakt à biblioteca é limitada a [B]{}[/B] programas de TV e [B]{}[/B] filmes por lista.\n"
-"Esse limite é definido para garantir que as APIs que fornecem dados gratuitamente sejam respeitadas."
+msgstr ""
+"A adição de listas Trakt à biblioteca é limitada a [B]{}[/B] programas de TV e [B]{}[/B] filmes por lista.\nEsse limite é definido para garantir que as APIs que fornecem dados gratuitamente sejam respeitadas."
 
 #: /resources/lib/context.py
 msgctxt "#32165"
 msgid "List length exceeds limits. Skipping..."
-msgstr "O comprimento da lista excede os limites. Pular..."
+msgstr "O comprimento da lista excede os limites. Ignorar..."
 
 #: /resources/lib/context.py
 msgctxt "#32166"
@@ -1100,10 +1102,11 @@ msgstr "Nenhuma arte encontrada para {} ID {}"
 
 #: /resources/lib/script.py
 msgctxt "#32218"
-msgid "Artwork found for {} ID {}\n"
+msgid ""
+"Artwork found for {} ID {}\n"
 "{}"
-msgstr "Arte encontrada para {} ID {}\n"
-"{}"
+msgstr ""
+"Arte encontrada para {} ID {}\n{}"
 
 #: /resources/lib/fanarttv.py
 msgctxt "#32219"
@@ -1403,7 +1406,7 @@ msgstr "Adicionar Regra"
 #: /resources/lib/userdiscover.py
 msgctxt "#32278"
 msgid "Enter Network IDs separated with \" / \""
-msgstr "Insira os IDs de rede separados por \" / \""
+msgstr "Digitar ID de Rede separado com \" / \""
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32279"
@@ -1438,7 +1441,7 @@ msgstr "Esta Semana"
 #: /resources/lib/basedir.py
 msgctxt "#32285"
 msgid "This Fortnight"
-msgstr "Esta Quinzena"
+msgstr "Esta quinzena"
 
 #: /resources/lib/_trakt_itemlists.py
 msgctxt "#32286"
@@ -1492,22 +1495,24 @@ msgstr "Opções do Trakt"
 
 #: /resources/lib/script.py
 msgctxt "#32296"
-msgid "{} failed for {}!\n"
+msgid ""
+"{} failed for {}!\n"
 "{} ID {}"
-msgstr "{} falhou para {}!\n"
-"{} ID {}"
+msgstr ""
+"{} falhou para {}!\n{} ID {}"
 
 #: /resources/lib/script.py
 msgctxt "#32297"
-msgid "{} was successful for {}!\n"
+msgid ""
+"{} was successful for {}!\n"
 "{} ID {}"
-msgstr "{} foi bem sucedido para {}!\n"
-"{} ID {}"
+msgstr ""
+"{} foi bem-sucedido para {}!\n{} ID {}"
 
 #: /resources/lib/syncitem.py
 msgctxt "#32298"
 msgid "Add to user list"
-msgstr "Adicionar à lista de usuários"
+msgstr "Adicionar às lista de usuário"
 
 #: /resources/lib/syncitem.py
 msgctxt "#32299"
@@ -1586,10 +1591,11 @@ msgstr "Digite uma URL para baixar players"
 
 #: /resources/lib/script/router.py
 msgctxt "#32314"
-msgid "Download players from URL?\n"
+msgid ""
+"Download players from URL?\n"
 "[B]{}[/B]"
-msgstr "Baixar players da URL?\n"
-"[B]{}[/B]"
+msgstr ""
+"Baixar players da URL?\n[B]{}[/B]"
 
 #: /resources/lib/trakt/api.py
 msgctxt "#32315"
@@ -1609,7 +1615,7 @@ msgstr "Não foi possível {} listar!"
 #: /resources/lib/trakt/api.py
 msgctxt "#32318"
 msgid "Error code: {}"
-msgstr "Erro de código: {}"
+msgstr "Código de erro: {}"
 
 #: /resources/lib/trakt/api.py
 msgctxt "#32319"
@@ -1643,16 +1649,14 @@ msgstr "Selecionar Método de Reprodução"
 
 #: /resources/lib/player/players.py
 msgctxt "#32325"
-msgid "Configuration for player is missing \"is_resolvable\" flag. Please select resolve method.\n"
+msgid ""
+"Configuration for player is missing \"is_resolvable\" flag. Please select resolve method.\n"
 "\n"
 "setResolvedUrl is the preferred method and generally should work for any player addon that plays files directly, uses inputstream adapative, or only prompts to select bitrate/quality. PlayMedia should be used for any player addon which first runs a script to scrape sources or otherwise does not work correctly using the setResolvedUrl method.\n"
 "\n"
 "To override this dialog, set a resolve method for the player in TMDbHelper's player settings configuration dialog."
-msgstr "A configuração do player não possui o sinalizador \"is_resolvable\". Selecione o método de resolução.\n"
-"\n"
-"setResolvedUrl é o método preferencial e geralmente deve funcionar para qualquer complemento de player que reproduza arquivos diretamente, use inputstream adaptável ou apenas solicite a seleção de taxa de bits/qualidade. PlayMedia deve ser usado para qualquer complemento de player que primeiro executa um script para extrair fontes ou não funciona corretamente usando o método setResolvedUrl.\n"
-"\n"
-"Para substituir esta caixa de diálogo, defina um método de resolução para o jogador na caixa de diálogo de configuração das configurações do jogador TMDbHelper."
+msgstr ""
+"A configuração do player não possui o sinalizador \"is_resolvable\". Selecione o método de resolução.\n\nsetResolvedUrl é o método preferido e geralmente deve funcionar para qualquer complemento de player que reproduza arquivos diretamente, use fluxo de entrada adaptável ou apenas solicite a seleção de taxa de bits/qualidade. PlayMedia deve ser usado para qualquer complemento de player que primeiro executa um script para extrair fontes ou não funciona corretamente usando o método setResolvedUrl.\n\nPara substituir esta caixa de diálogo, defina um método de resolução para o player na caixa de diálogo de configuração de configurações do player do TMDbHelper."
 
 #: /resources/lib/helpers/timedate.py
 msgctxt "#32326"
@@ -1701,12 +1705,12 @@ msgstr "Restaurar player para o padrão?"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32335"
-msgid "Do you wish to reset the [B]{}[/B] player file back to its original unmodified state on disk?\n"
+msgid ""
+"Do you wish to reset the [B]{}[/B] player file back to its original unmodified state on disk?\n"
 "\n"
 "[B]WARNING:[/B] This action cannot be undone."
-msgstr "Deseja redefinir o arquivo do player [B]{}[/B] de volta ao seu estado original não modificado no disco?\n"
-"\n"
-"[B]AVISO:[/B] Esta ação não pode ser desfeita."
+msgstr ""
+"Deseja redefinir o arquivo do player [B]{}[/B] de volta ao seu estado original não modificado no disco?\n\n[B]AVISO:[/B] Esta ação não pode ser desfeita."
 
 #: /resources/lib/player/configure.py
 msgctxt "#32336"
@@ -1715,14 +1719,13 @@ msgstr "Salvar suas alterações?"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32337"
-msgid "The [B]{}[/B] player file has changed.\n"
+msgid ""
+"The [B]{}[/B] player file has changed.\n"
 "Do you wish to save your changes?\n"
 "\n"
 "If you close without saving, your changes will be lost."
-msgstr "O arquivo do reprodutor [B]{}[/B] foi alterado.\n"
-"Deseja salvar suas alterações?\n"
-"\n"
-"Se você fechar sem salvar, suas alterações serão perdidas."
+msgstr ""
+"O arquivo do player [B]{}[/B] foi alterado.\nDeseja salvar suas alterações?\n\nSe você fechar sem salvar, suas alterações serão perdidas."
 
 #: /resources/lib/player/configure.py
 msgctxt "#32338"
@@ -1736,12 +1739,12 @@ msgstr "{} método de resolução de URL de reprodução"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32340"
-msgid "Please note that setResolvedUrl is Kodi's preferred method for resolving playback URLs. The PlayMedia method should only be used if you experience difficulties using setResolvedUrl with this particular player.\n"
+msgid ""
+"Please note that setResolvedUrl is Kodi's preferred method for resolving playback URLs. The PlayMedia method should only be used if you experience difficulties using setResolvedUrl with this particular player.\n"
 "\n"
 "Are you sure you want to set this player's resolve method to PlayMedia?"
-msgstr "Observe que setResolvedUrl é o método preferido do Kodi para resolver URLs de reprodução. O método PlayMedia só deve ser usado se você tiver dificuldades ao usar setResolvedUrl com esse player específico.\n"
-"\n"
-"Tem certeza de que deseja definir o método de resolução deste player para PlayMedia?"
+msgstr ""
+"Observe que setResolvedUrl é o método preferido do Kodi para resolver URLs de reprodução. O método PlayMedia só deve ser usado se você tiver dificuldades ao usar setResolvedUrl com este player específico.\n\nTem certeza de que deseja definir o método de resolução deste player para PlayMedia?"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32341"
@@ -1806,16 +1809,16 @@ msgstr "Duração fictícia do vídeo (segundos)"
 #: /resources/lib/player/players.py
 msgctxt "#32353"
 msgid "Missing \"is_resolvable\" Flag"
-msgstr "Ausente sinalizador \"is_resolvable\""
+msgstr "Sinalizador \"is_resolvable\" ausente"
 
 #: /resources/lib/player/players.py
 msgctxt "#32354"
-msgid "Does this player resolve directly to a single playable file?\n"
+msgid ""
+"Does this player resolve directly to a single playable file?\n"
 "\n"
 "Select \"Yes\" for any player that plays directly from single source. Select \"No\" for players that scrape multiple sources or otherwise do not work with the setResolvedURL method."
-msgstr "Este player resolve diretamente para um único arquivo reproduzível?\n"
-"\n"
-"Selecione \"Sim\" para qualquer player que reproduza diretamente de uma única fonte. Selecione \"Não\" para players que coletam várias fontes ou não funcionam com o método setResolvedURL."
+msgstr ""
+"Este player resolve diretamente para um único arquivo reproduzível?\n\nSelecione \"Sim\" para qualquer player que reproduza diretamente de uma única fonte. Selecione \"Não\" para players que coletam várias fontes ou não funcionam com o método setResolvedURL."
 
 #: /resources/lib/script/sync.py
 msgctxt "#32355"
@@ -1829,12 +1832,12 @@ msgstr "Digite o novo nome da lista"
 
 #: /resources/lib/script/router.py
 msgctxt "#32357"
-msgid "Are you sure you want to delete [B]{}[/B]?\n"
+msgid ""
+"Are you sure you want to delete [B]{}[/B]?\n"
 "\n"
 "This action cannot be undone."
-msgstr "Tem certeza de que deseja excluir [B]{}[/B]?\n"
-"\n"
-"Essa ação não pode ser desfeita."
+msgstr ""
+"Tem certeza de que deseja excluir [B]{}[/B]?\n\nEsta ação não pode ser desfeita."
 
 #: /resources/lib/script/router.py
 msgctxt "#32358"
@@ -1988,12 +1991,12 @@ msgstr "Excluir {} Cache"
 
 #: /resources/lib/script/router.py
 msgctxt "#32388"
-msgid "Are you sure you want to delete the {} cache? This action cannot be undone.\n"
+msgid ""
+"Are you sure you want to delete the {} cache? This action cannot be undone.\n"
 "\n"
 "TMDbHelper performs regular automatic cache management and cleaning. You should only delete the cache manually in cases of persistent cache related errors."
-msgstr "Tem certeza de que deseja excluir o cache {}? Essa ação não pode ser desfeita.\n"
-"\n"
-"O TMDbHelper realiza gerenciamento e limpeza automáticos regulares do cache. Você só deve excluir o cache manualmente em casos de erros persistentes relacionados ao cache."
+msgstr ""
+"Tem certeza de que deseja excluir o cache {}? Esta ação não pode ser desfeita.\n\nTMDbHelper realiza gerenciamento e limpeza automáticos regulares do cache. Você só deve excluir o cache manualmente em casos de erros persistentes relacionados ao cache."
 
 #: /resources/lib/script/router.py
 msgctxt "#32389"
@@ -2012,12 +2015,12 @@ msgstr "Selecionar o tipo de atualização"
 
 #: /resources/lib/script/router.py
 msgctxt "#32392"
-msgid "Use [B]Quick Update[/B] to check for new items.\n"
+msgid ""
+"Use [B]Quick Update[/B] to check for new items.\n"
 "\n"
 "Use [B]Forced Update[/B] to ignore previously cached update details and recheck all items. Forced updates should only be used when cleaning and rebuilding the Kodi library."
-msgstr "Use [B]Atualização rápida[/B] para verificar se há novos itens.\n"
-"\n"
-"Use [B]Atualização forçada[/B] para ignorar os detalhes de atualização armazenados em cache anteriormente e verificar novamente todos os itens. As atualizações forçadas só devem ser usadas ao limpar e reconstruir a biblioteca Kodi."
+msgstr ""
+"Use [B]Atualização rápida[/B] para verificar se há novos itens.\n\nUse [B]Atualização forçada[/B] para ignorar detalhes de atualização em cache anteriormente e verifique novamente todos os itens. As atualizações forçadas só devem ser usadas ao limpar e reconstruir a biblioteca Kodi."
 
 #: /resources/lib/script/router.py
 msgctxt "#32393"
@@ -2462,12 +2465,12 @@ msgstr "Cache readahead de itens de lista de serviço"
 #: /resources/settings.xml
 msgctxt "#32481"
 msgid "Increases the pool of recently watched items randomly selected from to use as the seed for becauase you watched style recommendations."
-msgstr "Aumenta o pool de itens recentemente assistidos selecionados aleatoriamente para usar como semente porque você assistiu recomendações de estilo."
+msgstr "Aumenta o conjunto de itens recentemente assistidos selecionados aleatoriamente para usar como semente porque você assistiu recomendações do estilo."
 
 #: /resources/settings.xml
 msgctxt "#32482"
 msgid "Random seed pool for recommendations"
-msgstr "Conjunto de sementes aleatórias para recomendações"
+msgstr "Conjunto de sementes aleatório para recomendações"
 
 #: /resources/settings.xml
 msgctxt "#32483"
@@ -2478,6 +2481,31 @@ msgstr "Permitir acesso de plug-in de terceiros à chave/token da API"
 msgctxt "#32484"
 msgid "TVDb API"
 msgstr "TVDb API"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32485"
+msgid "Add rating"
+msgstr "Adicionar classificação"
+
+#: /resources/tmdbhelper/lib/api/tmdb/discover.py
+msgctxt "#32486"
+msgid "Certification"
+msgstr "Certificação"
+
+#: /resources/tmdbhelper/lib/api/tmdb/discover.py
+msgctxt "#32487"
+msgid "Certification ( < or = )"
+msgstr "Certificação ( < ou = )"
+
+#: /resources/tmdbhelper/lib/api/tmdb/discover.py
+msgctxt "#32488"
+msgid "Certification ( > or = )"
+msgstr "Certificação ( > ou = )"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32489"
+msgid "Change rating"
+msgstr "Alterar classificação"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
@@ -2679,7 +2707,7 @@ msgstr "Chave de API"
 #: /resources/lib/requestapi.py
 msgctxt "#32009"
 msgid "API returned 401 unauthorised error. If you have entered an API key for this service$COMMA please check that it is correct. If this error relates to TMDb API$COMMA please post a debug log to [B]https://github.com/jurialmunkey/plugin.video.themoviedb.helper/issues[/B]"
-msgstr "API retornou 401 erro não autorizado. Se você inseriu uma chave de API para este serviço$COMMA, verifique se está correta. Se este erro estiver relacionado ao TMDb API$COMMA, poste um log de depuração em [B]https://github.com/jurialmunkey/plugin.video.themoviedb.helper/issues[/B]"
+msgstr "API retornou 401 erro não autorizado. Se você inseriu uma chave de API para este serviço$COMMA verifique se está correto. Se este erro estiver relacionado à API TMDb$COMMA poste um log de depuração em [B]https://github.com/jurialmunkey/plugin.video.themoviedb.helper/issues[/B]"
 
 #: /resources/settings.xml
 msgctxt "#32010"
