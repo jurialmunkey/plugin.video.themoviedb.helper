@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2023-03-11 13:49+0300\n"
-"Last-Translator: \n"
+"PO-Revision-Date: 2023-04-08 08:38+0300\n"
+"Last-Translator: alexeichikad <alexeichikad@gmail.com>\n"
 "Language-Team: LANGUAGE\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -412,7 +412,7 @@ msgstr "Только для системного использования"
 #: /resources/settings.xml
 msgctxt "#32080"
 msgid "Other"
-msgstr "Другой"
+msgstr "Другие"
 
 #: /resources/settings.xml
 msgctxt "#32081"
@@ -527,7 +527,7 @@ msgstr "Добавить элементы"
 #: /resources/lib/container.py
 msgctxt "#32103"
 msgid "No Value Added"
-msgstr "Одсутствуют добавленные значения"
+msgstr "Значение не добавлено"
 
 #: /resources/lib/container.py
 msgctxt "#32104"
@@ -1883,7 +1883,7 @@ msgstr "Компании"
 #: /resources/lib/container/basedir.py
 msgctxt "#32361"
 msgid "Search Lists"
-msgstr "Списки поиска"
+msgstr "Поиск списков"
 
 #: /resources/lib/script/sync.py
 msgctxt "#32362"
@@ -2105,7 +2105,7 @@ msgstr "Получать дополнительную информацию и и
 #: /resources/settings.xml
 msgctxt "#32403"
 msgid "Increase sync list item limit per page (slower)"
-msgstr "Увеличить ограничение элемента синхронизации на страницу (медленнее)"
+msgstr "Увеличить лимит списка элементов синхронизации на страницу (медленнее)"
 
 #: /resources/settings.xml
 msgctxt "#32404"
