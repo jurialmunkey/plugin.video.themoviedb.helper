@@ -131,22 +131,46 @@ class ListItemDetails():
         return self._parent.get_infolabel(info, self._position)
 
     def get_artwork(self, source='', build_fallback=False, built_artwork=None):
+        source = source or ''
         source = source.lower()
-        infolabels = ARTWORK_LOOKUP_TABLE.get(source, source.split("|") if source else ARTWORK_LOOKUP_TABLE.get('thumb'))
-        for i in infolabels:
-            artwork = self.get_infolabel(i)
-            if not artwork:
-                continue
-            return artwork
-        if not build_fallback:
-            return
-        built_artwork = built_artwork or self.get_builtartwork()
-        if not built_artwork:
-            return
-        for i in infolabels:
-            if not i.startswith('art('):
-                continue
-            artwork = built_artwork.get(i[4:-1])
+
+        def _get_artwork_infolabel(_infolabels):
+            for i in _infolabels:
+                artwork = self.get_infolabel(i)
+                if not artwork:
+                    continue
+                return artwork
+
+        def _get_artwork_fallback(_infolabels, _built_artwork):
+            for i in _infolabels:
+                if not i.startswith('art('):
+                    continue
+                artwork = _built_artwork.get(i[4:-1])
+                if not artwork:
+                    continue
+                return artwork
+
+        def _get_artwork(_source):
+            if _source:
+                _infolabels = ARTWORK_LOOKUP_TABLE.get(_source, _source.split("|"))
+            else:
+                _infolabels = ARTWORK_LOOKUP_TABLE.get('thumb')
+
+            artwork = _get_artwork_infolabel(_infolabels)
+
+            if artwork or not build_fallback:
+                return artwork
+
+            nonlocal built_artwork
+
+            built_artwork = built_artwork or self.get_builtartwork()
+            if not built_artwork:
+                return
+
+            return _get_artwork_fallback(_infolabels, built_artwork)
+
+        for _source in source.split("||"):
+            artwork = _get_artwork(_source)
             if not artwork:
                 continue
             return artwork
