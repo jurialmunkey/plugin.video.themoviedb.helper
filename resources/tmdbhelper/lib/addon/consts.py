@@ -189,6 +189,9 @@ TMDB_STACKED_CREDITS_PROPERTIES = [
     ('infoproperties', 'job'),
     ('infoproperties', 'character'),
     ('infoproperties', 'role')]
+TMDB_COMBO_LISTS_ROUTE = {
+    'module_name': 'tmdbhelper.lib.api.tmdb.lists',
+    'import_attr': 'ListCombo'}
 TMDB_BASIC_LISTS_ROUTE = {
     'module_name': 'tmdbhelper.lib.api.tmdb.lists',
     'import_attr': 'ListBasic'}
@@ -281,6 +284,31 @@ TMDB_BASIC_LISTS = {
         'limit': 20,
         'route': TMDB_BASIC_LISTS_ROUTE
     },
+    'stars_in_both': {
+        'info_path_models': [
+            {
+                'path': 'person/{tmdb_id}/movie_credits',
+                'tmdb_type': 'movie',
+                'key': 'cast',
+                'sort_key': 'popularity',
+                'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
+                'limit': 20,
+            },
+            {
+                'path': 'person/{tmdb_id}/tv_credits',
+                'tmdb_type': 'tv',
+                'key': 'cast',
+                'sort_key': 'popularity',
+                'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
+                'limit': 20,
+            },
+        ],
+        'sort_key': 'popularity',
+        'tmdb_type': 'both',
+        'dbid_sorting': True,
+        'limit': 20,
+        'route': TMDB_COMBO_LISTS_ROUTE
+    },
     'crew_in_movies': {
         'path': 'person/{tmdb_id}/movie_credits',
         'key': 'crew',
@@ -300,6 +328,31 @@ TMDB_BASIC_LISTS = {
         'tmdb_type': 'tv',
         'limit': 20,
         'route': TMDB_BASIC_LISTS_ROUTE
+    },
+    'crew_in_both': {
+        'info_path_models': [
+            {
+                'path': 'person/{tmdb_id}/movie_credits',
+                'tmdb_type': 'movie',
+                'key': 'crew',
+                'sort_key': 'popularity',
+                'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
+                'limit': 20,
+            },
+            {
+                'path': 'person/{tmdb_id}/tv_credits',
+                'tmdb_type': 'tv',
+                'key': 'crew',
+                'sort_key': 'popularity',
+                'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
+                'limit': 20,
+            },
+        ],
+        'sort_key': 'popularity',
+        'tmdb_type': 'both',
+        'dbid_sorting': True,
+        'limit': 20,
+        'route': TMDB_COMBO_LISTS_ROUTE
     },
     'images': {
         'path': 'person/{tmdb_id}/images',

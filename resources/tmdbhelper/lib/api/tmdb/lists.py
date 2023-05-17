@@ -33,6 +33,47 @@ class ListBasic(Container):
         return items
 
 
+class ListCombo(Container):
+    def get_items(self, info, tmdb_id=None, limit=None, sort_key=None, **kwargs):
+        info_model = TMDB_BASIC_LISTS.get(info)
+        info_tmdb_type = info_model.get('tmdb_type')
+        sort_key = sort_key or info_model.get('sort_key')
+        info_path_models = info_model.get('info_path_models') or []
+        self.tmdb_api.mapper.imagepath_quality = info_model.get('imagepath_quality', 'IMAGEPATH_ORIGINAL')
+        items = []
+
+        for info_path_model in info_path_models:
+            tmdb_type = info_path_model.get('tmdb_type')
+            items += self.tmdb_api.get_basic_list(
+                path=info_path_model.get('path', '').format(
+                    tmdb_type=tmdb_type, tmdb_id=tmdb_id,
+                    iso_country=self.tmdb_api.iso_country),
+                sort_key=info_path_model.get('sort_key'),
+                stacked=info_path_model.get('stacked'),
+                tmdb_type=tmdb_type,
+                base_tmdb_type=tmdb_type,
+                key=info_path_model.get('key', 'results'),
+                params=info_path_model.get('params'),
+                filters=self.filters,
+                limit=limit or info_path_model.get('limit'),
+                pagination=False)
+
+        if 'tmdb_cache_only' in info_model:
+            self.tmdb_cache_only = info_model['tmdb_cache_only']
+
+        if sort_key:
+            dummy_dict = {}
+            items = sorted(items, key=lambda i: str(i.get('infolabels', dummy_dict).get(sort_key, 0) or i.get('infoproperties', dummy_dict).get(sort_key, 0)), reverse=True)
+
+        self.kodi_db = self.get_kodi_database(info_tmdb_type)
+        self.sort_by_dbid = True if self.kodi_db and info_model.get('dbid_sorting') else False
+        self.library = convert_type(info_tmdb_type, 'library')
+        self.container_content = convert_type(info_tmdb_type, 'container')
+        self.plugin_category = get_plugin_category(info_model, convert_type(info_tmdb_type, 'plural'))
+
+        return items
+
+
 class ListSeasons(Container):
     def get_items(self, tmdb_id, **kwargs):
         self.ib.cache_only = self.tmdb_cache_only = False

@@ -514,7 +514,7 @@ class TMDb(RequestAPI):
 
     def get_basic_list(
             self, path, tmdb_type, key='results', params=None, base_tmdb_type=None, limit=None, filters={},
-            sort_key=None, stacked=None, **kwargs):
+            sort_key=None, stacked=None, paginated=True, **kwargs):
 
         if kwargs.get('page') == 'random':
             import random
@@ -567,6 +567,9 @@ class TMDb(RequestAPI):
                     pv = p[b].get(k)
                     p[b][k] = iv if pv is None else f'{pv} / {iv}'
             items = stacked_list
+
+        if not paginated:
+            return items
 
         if try_int(response.get('page', 0)) < try_int(response.get('total_pages', 0)):
             items.append({'next_page': try_int(response.get('page', 0)) + 1})
