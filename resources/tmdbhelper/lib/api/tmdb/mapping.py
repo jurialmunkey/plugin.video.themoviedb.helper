@@ -292,6 +292,8 @@ def set_crew_properties(i, x, prefix):
         infoproperties[f'{p}department'] = i['department']
     if i.get('profile_path'):
         infoproperties[f'{p}thumb'] = get_imagepath_poster(i['profile_path'])
+    if i.get('id'):
+        infoproperties[f'{p}tmdb_id'] = i['id']
     return infoproperties
 
 
