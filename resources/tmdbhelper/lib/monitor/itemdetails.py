@@ -209,12 +209,12 @@ class ListItemDetails():
             if not i['active']():
                 continue
             imgfunc = ImageFunctions(method=i['method'], is_thread=False, artwork=i['images']())
+
+            output = imgfunc.func(imgfunc.image)
+            images[f'{i["method"]}image'] = output
+            images[f'{i["method"]}image.original'] = imgfunc.image
+
             if use_winprops:
-                imgfunc.run()
-            else:
-                output = imgfunc.func(imgfunc.image)
-                images[f'{i["method"]}image'] = output
-                images[f'{i["method"]}image.original'] = imgfunc.image
                 imgfunc.set_properties(output)
 
         return images

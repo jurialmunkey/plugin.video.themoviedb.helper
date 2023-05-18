@@ -215,7 +215,7 @@ class ListItemMonitor(CommonMonitorFunctions):
 
         def _process_artwork():
             _artwork = _item.get_builtartwork()
-            _artwork.update(_item.get_image_manipulations(built_artwork=_artwork))
+            _artwork.update(_item.get_image_manipulations(built_artwork=_artwork, use_winprops=True))
             _listitem.setArt(_artwork)
 
         def _process_ratings():
