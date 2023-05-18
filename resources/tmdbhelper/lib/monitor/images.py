@@ -138,6 +138,9 @@ class ImageFunctions(Thread):
         if not self.save_prop or not self.func:
             return
         output = self.func(self.image) if self.image else None
+        self.set_properties(output)
+
+    def set_properties(self, output):
         if not output:
             get_property(self.save_prop, clear_property=True)
             get_property(f'{self.save_prop}.Original', clear_property=True) if self.save_orig else None

@@ -212,8 +212,10 @@ class ListItemDetails():
             if use_winprops:
                 imgfunc.run()
             else:
-                images[f'{i["method"]}image'] = imgfunc.func(imgfunc.image)
+                output = imgfunc.func(imgfunc.image)
+                images[f'{i["method"]}image'] = output
                 images[f'{i["method"]}image.original'] = imgfunc.image
+                imgfunc.set_properties(output)
 
         return images
 
