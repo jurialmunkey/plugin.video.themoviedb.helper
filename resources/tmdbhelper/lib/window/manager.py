@@ -84,12 +84,12 @@ class _EventLoop():
     def _on_add(self):
         self.position += 1
         self.set_properties(self.position, window.get_property(PREFIX_ADDPATH))
-        window.wait_for_property(PREFIX_ADDPATH, None, True)  # Clear property before continuing
+        window.wait_for_property(PREFIX_ADDPATH, None, True, poll=0.3)  # Clear property before continuing
 
     def _on_back(self):
         # Get current position and clear it
         name = f'{PREFIX_PATH}{self.position}'
-        window.wait_for_property(name, None, True)
+        window.wait_for_property(name, None, True, poll=0.3)
 
         # If it was first position then let's exit
         if not self.position > 1:
@@ -100,7 +100,34 @@ class _EventLoop():
         name = f'{PREFIX_PATH}{self.position}'
         self.set_properties(self.position, window.get_property(name))
 
+    def _on_change_window(self, poll=0.3):
+        # On first run the base window won't be open yet so don't check for it
+        base_id = None if self.first_run else self.window_id
+
+        # Close the info dialog first before doing anything
+        if window.is_visible(ID_VIDEOINFO):
+            window.close(ID_VIDEOINFO)
+
+            # If we timeout or user forced back out of base window then we exit
+            if not window.wait_until_active(ID_VIDEOINFO, base_id, poll=poll, invert=True):
+                return False
+
+        # NOTE: Used to check for self.position == 0 and exit here
+        # Now checking prior to routine
+
+        # On first run let's open our base window
+        if self.first_run:
+            window.activate(self.window_id)
+            if not window.wait_until_active(self.window_id, poll=poll):
+                return False
+
+        return True
+
     def _on_change_manual(self):
+        # Close the info dialog and open base window first before doing anything
+        if not self._on_change_window():
+            return False
+
         # Set our base window
         base_window = Window(self.kodi_id)
 
@@ -127,40 +154,28 @@ class _EventLoop():
     def _on_change_direct(self):
 
         # Get the listitem from the item router
-        listitem = get_listitem(self.added_path)
+        with BusyDialog():
+            listitem = get_listitem(self.added_path)
 
         if not listitem:
+            return False
+
+        # Close the info dialog and open base window before continuing
+        if not self._on_change_window(poll=0.3):
             return False
 
         # Open the info dialog
         open_info(listitem, threaded=True)
 
-        if not window.wait_until_active(ID_VIDEOINFO, self.window_id):
+        if not window.wait_until_active(ID_VIDEOINFO, self.window_id, poll=0.5):
             return False
 
         return True
 
     def _on_change(self):
-        # On first run the base window won't be open yet so don't check for it
-        base_id = None if self.first_run else self.window_id
-
-        # Close the info dialog first before doing anything
-        if window.is_visible(ID_VIDEOINFO):
-            window.close(ID_VIDEOINFO)
-
-            # If we timeout or user forced back out of base window then we exit
-            if not window.wait_until_active(ID_VIDEOINFO, base_id, invert=True):
-                return self._call_exit()
-
         # On last position let's exit
         if self.position == 0:
             return self._call_exit(True)
-
-        # On first run let's open our base window
-        if self.first_run:
-            window.activate(self.window_id)
-            if not window.wait_until_active(self.window_id, poll=0.5):
-                return self._call_exit()
 
         # Update item and info dialog or exit if failed
         if not self._on_change_func():
@@ -172,7 +187,7 @@ class _EventLoop():
         self.first_run = False
 
     def event_loop(self):
-        window.wait_for_property(PREFIX_INSTANCE, 'True', True)
+        window.wait_for_property(PREFIX_INSTANCE, 'True', True, poll=0.3)
         while not self.xbmc_monitor.abortRequested() and not self.exit:
             # Path added so let's put it in the queue
             if window.get_property(PREFIX_ADDPATH):
@@ -185,7 +200,7 @@ class _EventLoop():
             # Path changed so let's update
             elif self.current_path != self.added_path:
                 self._on_change()
-                self.xbmc_monitor.waitForAbort(0.2)
+                self.xbmc_monitor.waitForAbort(0.3)
 
             # User force quit so let's exit
             elif not window.is_visible(self.window_id):
@@ -194,11 +209,11 @@ class _EventLoop():
             # User pressed back and closed video info window
             elif not window.is_visible(ID_VIDEOINFO):
                 self._on_back()
-                self.xbmc_monitor.waitForAbort(0.2)
+                self.xbmc_monitor.waitForAbort(0.3)
 
             # Nothing happened this round so let's loop and wait
             else:
-                self.xbmc_monitor.waitForAbort(0.2)
+                self.xbmc_monitor.waitForAbort(0.3)
 
         self._on_exit()
 
@@ -256,7 +271,7 @@ class WindowManager(_EventLoop):
             return
 
         # Set our path to the window property so we can add it
-        window.wait_for_property(PREFIX_ADDPATH, path, True)
+        window.wait_for_property(PREFIX_ADDPATH, path, True, poll=0.3)
         self.call_auto()
 
     def add_query(self, query, tmdb_type, separator=' / '):
@@ -275,8 +290,8 @@ class WindowManager(_EventLoop):
         return self.add_path(url)
 
     def close_dialog(self):
-        window.wait_for_property(PREFIX_COMMAND, 'exit', True)
-        window.wait_for_property(PREFIX_INSTANCE, None)
+        window.wait_for_property(PREFIX_COMMAND, 'exit', True, poll=0.3)
+        window.wait_for_property(PREFIX_INSTANCE, None, poll=0.3)
         self._call_exit()
         self._on_exit()
         self.call_window()
