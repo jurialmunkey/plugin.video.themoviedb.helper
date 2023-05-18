@@ -358,23 +358,23 @@ class ItemMapper(_ItemMapper):
                 'func': get_imagepath_poster
             }],
             'profile_path': [{
-                'keys': [('art', 'poster')],
+                'keys': [('art', 'poster'), ('art', 'profile')],
                 'func': get_imagepath_poster
             }],
             'file_path': [{
-                'keys': [('art', 'poster')],
+                'keys': [('art', 'poster'), ('art', 'file')],
                 'func': self.get_imagepath_quality
             }],
             'still_path': [{
-                'keys': [('art', 'thumb')],
+                'keys': [('art', 'thumb'), ('art', 'still')],
                 'func': get_imagepath_thumb
             }],
             'logo_path': [{
-                'keys': [('art', 'thumb')],
+                'keys': [('art', 'thumb'), ('art', 'logo')],
                 'func': get_imagepath_quality
             }],
             'backdrop_path': [{
-                'keys': [('art', 'fanart')],
+                'keys': [('art', 'fanart'), ('art', 'backdrop')],
                 'func': get_imagepath_fanart
             }],
             'content_ratings': [{

@@ -2,10 +2,12 @@ from xbmc import Monitor
 from xbmcgui import Dialog, Window
 import tmdbhelper.lib.addon.window as window
 from jurialmunkey.parser import try_int
-from tmdbhelper.lib.addon.plugin import get_localized, executebuiltin
+from tmdbhelper.lib.addon.plugin import get_condvisibility, get_localized, executebuiltin
 from tmdbhelper.lib.addon.dialog import BusyDialog
 from tmdbhelper.lib.api.tmdb.api import TMDb
 from tmdbhelper.lib.addon.logger import kodi_log
+from tmdbhelper.lib.items.router import Router
+from threading import Thread
 
 
 PREFIX_PATH = 'Path.'
@@ -27,6 +29,25 @@ def _configure_path(path):
     if 'extended=True' not in path:
         path = f'{path}&extended=True'
     return path
+
+
+def get_listitem(path):
+    try:
+        _path = path.replace('plugin://plugin.video.themoviedb.helper/?', '')  # _path = f"info=details&tmdb_type={tmdb_type}&tmdb_id={tmdb_id}"
+        return Router(-1, _path).get_directory(items_only=True)[0].get_listitem()
+    except (TypeError, IndexError, KeyError, AttributeError, NameError):
+        return
+
+
+def open_info(listitem, func=None, threaded=False):
+    executebuiltin(f'Dialog.Close(movieinformation,true)')
+    executebuiltin(f'Dialog.Close(pvrguideinfo,true)')
+    func() if func else None
+    if threaded:
+        t = Thread(target=Dialog().info, args=[listitem])
+        t.start()
+        return t
+    Dialog().info(listitem)
 
 
 class _EventLoop():
@@ -79,6 +100,46 @@ class _EventLoop():
         name = f'{PREFIX_PATH}{self.position}'
         self.set_properties(self.position, window.get_property(name))
 
+    def _on_change_manual(self):
+        # Set our base window
+        base_window = Window(self.kodi_id)
+
+        # Check that base window has correct control ID and clear it out
+        control_list = base_window.getControl(CONTAINER_ID)
+        if not control_list:
+            kodi_log(f'SKIN ERROR!\nControl {CONTAINER_ID} unavailable in Window {self.window_id}', 1)
+            return False
+        control_list.reset()
+
+        # Wait for the container to update before doing anything
+        if not window.wait_until_updated(container_id=CONTAINER_ID, instance_id=self.window_id):
+            return False
+
+        # Open the info dialog
+        base_window.setFocus(control_list)
+        executebuiltin(f'SetFocus({CONTAINER_ID},0,absolute)')
+        executebuiltin('Action(Info)')
+        if not window.wait_until_active(ID_VIDEOINFO, self.window_id):
+            return False
+
+        return True
+
+    def _on_change_direct(self):
+
+        # Get the listitem from the item router
+        listitem = get_listitem(self.added_path)
+
+        if not listitem:
+            return False
+
+        # Open the info dialog
+        open_info(listitem, threaded=True)
+
+        if not window.wait_until_active(ID_VIDEOINFO, self.window_id):
+            return False
+
+        return True
+
     def _on_change(self):
         # On first run the base window won't be open yet so don't check for it
         base_id = None if self.first_run else self.window_id
@@ -101,25 +162,8 @@ class _EventLoop():
             if not window.wait_until_active(self.window_id, poll=0.5):
                 return self._call_exit()
 
-        # Set our base window
-        base_window = Window(self.kodi_id)
-
-        # Check that base window has correct control ID and clear it out
-        control_list = base_window.getControl(CONTAINER_ID)
-        if not control_list:
-            kodi_log(f'SKIN ERROR!\nControl {CONTAINER_ID} unavailable in Window {self.window_id}', 1)
-            return self._call_exit()
-        control_list.reset()
-
-        # Wait for the container to update before doing anything
-        if not window.wait_until_updated(container_id=CONTAINER_ID, instance_id=self.window_id):
-            return self._call_exit()
-
-        # Open the info dialog
-        base_window.setFocus(control_list)
-        executebuiltin(f'SetFocus({CONTAINER_ID},0,absolute)')
-        executebuiltin('Action(Info)')
-        if not window.wait_until_active(ID_VIDEOINFO, self.window_id):
+        # Update item and info dialog or exit if failed
+        if not self._on_change_func():
             return self._call_exit()
 
         # Set current_path to added_path because we've now updated everything
@@ -141,7 +185,7 @@ class _EventLoop():
             # Path changed so let's update
             elif self.current_path != self.added_path:
                 self._on_change()
-                self.xbmc_monitor.waitForAbort(0.5)
+                self.xbmc_monitor.waitForAbort(0.2)
 
             # User force quit so let's exit
             elif not window.is_visible(self.window_id):
@@ -150,11 +194,11 @@ class _EventLoop():
             # User pressed back and closed video info window
             elif not window.is_visible(ID_VIDEOINFO):
                 self._on_back()
-                self.xbmc_monitor.waitForAbort(0.5)
+                self.xbmc_monitor.waitForAbort(0.2)
 
             # Nothing happened this round so let's loop and wait
             else:
-                self.xbmc_monitor.waitForAbort(0.5)
+                self.xbmc_monitor.waitForAbort(0.2)
 
         self._on_exit()
 
@@ -173,6 +217,7 @@ class WindowManager(_EventLoop):
         self.params = kwargs
         self.exit = False
         self.xbmc_monitor = Monitor()
+        self._on_change_func = self._on_change_direct if get_condvisibility("Skin.HasSetting(TMDbHelper.DirectCallAuto)") else self._on_change_manual
 
     def reset_properties(self):
         self.position = 0
