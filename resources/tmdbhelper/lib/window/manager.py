@@ -161,7 +161,7 @@ class _EventLoop():
             return False
 
         # Close the info dialog and open base window before continuing
-        if not self._on_change_window(poll=0.3):
+        if not self._on_change_window(poll=0.1):
             return False
 
         # Open the info dialog
