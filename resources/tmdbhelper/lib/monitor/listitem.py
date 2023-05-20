@@ -13,6 +13,7 @@ from threading import Thread
 CV_USE_LISTITEM = ""\
     "!Skin.HasSetting(TMDbHelper.ForceWidgetContainer) + "\
     "!Window.IsActive(script-tmdbhelper-recommendations.xml) + ["\
+    "!Skin.HasSetting(TMDbHelper.UseLocalWidgetContainer) | String.IsEmpty(Window.Property(TMDbHelper.WidgetContainer))] + ["\
     "Window.IsVisible(movieinformation) | "\
     "Window.IsVisible(musicinformation) | "\
     "Window.IsVisible(songinformation) | "\
