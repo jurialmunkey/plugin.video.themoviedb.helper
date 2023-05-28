@@ -109,11 +109,11 @@ class ListItemMonitor(CommonMonitorFunctions):
 
     def get_item_identifier(self, position=0):
         return str((
-            'current_listitem_v5',
+            'current_listitem_v6',
             self.get_infolabel('dbtype', position),
             self.get_infolabel('dbid', position),
             self.get_infolabel('IMDBNumber', position),
-            self.get_infolabel('label', position),
+            self.get_infolabel('title', position),
             self.get_infolabel('tvshowtitle', position),
             self.get_infolabel('year', position),
             self.get_infolabel('season', position),
