@@ -35,6 +35,10 @@ class ServiceMonitor(object):
     def _on_fullscreen(self):
         if self.player_monitor.isPlayingVideo():
             self.player_monitor.current_time = self.player_monitor.getTime()
+        if get_condvisibility(
+                "Skin.HasSetting(TMDbHelper.UseLocalWidgetContainer) + "
+                "!String.IsEmpty(Window.Property(TMDbHelper.WidgetContainer))"):
+            return self._on_listitem()
         self.xbmc_monitor.waitForAbort(1)
 
     def _on_idle(self, wait_time=30):
