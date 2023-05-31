@@ -3,7 +3,7 @@ from xbmc import Monitor, Player
 from xbmcgui import Dialog
 from xbmcplugin import setResolvedUrl
 from xbmcaddon import Addon as KodiAddon
-from tmdbhelper.lib.addon.window import get_property
+from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, format_folderpath, get_localized, get_setting, executebuiltin, get_infolabel
 from jurialmunkey.parser import try_int, try_float
 from tmdbhelper.lib.addon.consts import PLAYERS_PRIORITY, PLAYERS_CHOSEN_DEFAULTS_FILENAME

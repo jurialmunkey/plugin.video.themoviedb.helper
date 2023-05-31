@@ -1,7 +1,7 @@
 import xbmcgui
 from tmdbhelper.lib.addon.plugin import get_infolabel, get_condvisibility, get_localized, get_setting
 from tmdbhelper.lib.addon.logger import kodi_try_except
-from tmdbhelper.lib.addon.window import get_property, get_current_window
+from jurialmunkey.window import get_property, get_current_window
 from tmdbhelper.lib.monitor.common import CommonMonitorFunctions, SETMAIN_ARTWORK, SETPROP_RATINGS
 from tmdbhelper.lib.monitor.images import ImageFunctions
 from tmdbhelper.lib.monitor.itemdetails import ListItemDetails

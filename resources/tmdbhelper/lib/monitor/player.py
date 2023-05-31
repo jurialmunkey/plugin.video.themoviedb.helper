@@ -1,6 +1,6 @@
 import tmdbhelper.lib.api.kodi.rpc as rpc
 from xbmc import Player
-from tmdbhelper.lib.addon.window import get_property
+from jurialmunkey.window import get_property
 from tmdbhelper.lib.monitor.images import ImageFunctions
 from tmdbhelper.lib.monitor.common import CommonMonitorFunctions, SETPROP_RATINGS, SETMAIN_ARTWORK
 from tmdbhelper.lib.addon.plugin import get_setting, get_condvisibility, get_infolabel

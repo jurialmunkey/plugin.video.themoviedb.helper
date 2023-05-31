@@ -1,6 +1,6 @@
 from tmdbhelper.lib.files.futils import json_loads as data_loads
 from tmdbhelper.lib.files.futils import json_dumps as data_dumps
-from tmdbhelper.lib.addon.window import get_property
+from jurialmunkey.window import get_property
 from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.tmdate import set_timestamp
 from tmdbhelper.lib.api.trakt.decorators import is_authorized, use_activity_cache

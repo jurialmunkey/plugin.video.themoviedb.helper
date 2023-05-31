@@ -1,4 +1,4 @@
-from tmdbhelper.lib.addon.window import get_property
+from jurialmunkey.window import get_property
 from tmdbhelper.lib.api.tmdb.api import TMDb
 from tmdbhelper.lib.api.omdb.api import OMDb
 from tmdbhelper.lib.api.tvdb.api import TVDb

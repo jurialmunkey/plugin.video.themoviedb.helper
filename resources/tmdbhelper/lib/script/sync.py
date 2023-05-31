@@ -4,7 +4,7 @@
 from xbmcgui import Dialog
 from tmdbhelper.lib.addon.tmdate import set_timestamp
 from tmdbhelper.lib.addon.thread import ParallelThread
-from tmdbhelper.lib.addon.window import get_property
+from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.dialog import BusyDialog
 from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.plugin import set_kwargattr, convert_trakt_type, get_localized, executebuiltin, get_infolabel

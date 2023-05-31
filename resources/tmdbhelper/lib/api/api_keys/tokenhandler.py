@@ -1,7 +1,7 @@
 class TokenHandler:
     from tmdbhelper.lib.addon.plugin import (get_setting as _get_setting,
                                             set_setting as _set_setting,)
-    from tmdbhelper.lib.addon.window import get_property as _get_property
+    from jurialmunkey.window import get_property as _get_property
 
     _get_setting = staticmethod(_get_setting)
     _set_setting = staticmethod(_set_setting)

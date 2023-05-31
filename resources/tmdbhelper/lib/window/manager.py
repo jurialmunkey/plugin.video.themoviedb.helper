@@ -1,6 +1,6 @@
 from xbmc import Monitor
 from xbmcgui import Dialog, Window
-import tmdbhelper.lib.addon.window as window
+import jurialmunkey.window as window
 from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.plugin import get_condvisibility, get_localized, executebuiltin
 from tmdbhelper.lib.addon.dialog import BusyDialog

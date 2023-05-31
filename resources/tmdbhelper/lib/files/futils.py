@@ -1,23 +1,24 @@
 import xbmcvfs
+import jurialmunkey.futils
 from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.plugin import ADDONDATA, get_localized, get_setting
 from tmdbhelper.lib.addon.logger import kodi_log
 
 
-ALPHANUM_CHARS = "-_.() abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-INVALID_FILECHARS = "\\/\"\'<>:|?*"
+class FileUtils(jurialmunkey.futils.FileUtils):
+    addondata = ADDONDATA   # Override module addon_data with plugin addon_data
 
 
-def validate_join(folder, filename):
-    path = '/'.join([folder, filename])
-    return xbmcvfs.validatePath(xbmcvfs.translatePath(path))
+FILEUTILS = FileUtils()
 
 
-def validify_filename(filename, alphanum=False):
-    import unicodedata
-    filename = unicodedata.normalize('NFD', filename)
-    filename = u''.join([c for c in filename if (not alphanum or c in ALPHANUM_CHARS) and c not in INVALID_FILECHARS])
-    return filename.strip('.')
+json_loads = jurialmunkey.futils.json_loads
+json_dumps = jurialmunkey.futils.json_dumps
+validate_join = jurialmunkey.futils.validate_join
+validify_filename = jurialmunkey.futils.validify_filename
+get_filecache_name = jurialmunkey.futils.get_filecache_name
+get_file_path = FILEUTILS.get_file_path
+get_write_path = FILEUTILS.get_write_path
 
 
 def normalise_filesize(filesize):
@@ -63,10 +64,6 @@ def get_tmdb_id_nfo(basedir, foldername, tmdb_type='tv'):
         kodi_log(f'ERROR GETTING TMDBID FROM NFO:\n{exc}')
 
 
-def get_file_path(folder, filename, join_addon_data=True, make_dir=True):
-    return validate_join(get_write_path(folder, join_addon_data, make_dir), filename)
-
-
 def delete_file(folder, filename, join_addon_data=True):
     xbmcvfs.delete(get_file_path(folder, filename, join_addon_data, make_dir=False))
 
@@ -99,18 +96,6 @@ def write_to_file(data, folder, filename, join_addon_data=True, append_to_file=F
     return write_file(data, path)
 
 
-def get_write_path(folder, join_addon_data=True, make_dir=True):
-    if join_addon_data:
-        folder = f'{ADDONDATA}{folder}/'
-    main_dir = xbmcvfs.validatePath(xbmcvfs.translatePath(folder))
-    if make_dir and not xbmcvfs.exists(main_dir):
-        try:  # Try makedir to avoid race conditions
-            xbmcvfs.mkdirs(main_dir)
-        except FileExistsError:
-            pass
-    return main_dir
-
-
 def del_old_files(folder, limit=1):
     folder = get_write_path(folder, True)
     for filename in sorted(xbmcvfs.listdir(folder))[:-limit]:
@@ -134,38 +119,9 @@ def make_path(path, warn_dialog=False):
     Dialog().ok('XBMCVFS', f'{get_localized(32122)} [B]{path}[/B]\n{get_localized(32123)}')
 
 
-def json_loads(obj):
-    import json
-
-    def json_int_keys(ordered_pairs):
-        result = {}
-        for key, value in ordered_pairs:
-            try:
-                key = int(key)
-            except ValueError:
-                pass
-            result[key] = value
-        return result
-    try:
-        return json.loads(obj, object_pairs_hook=json_int_keys)
-    except json.JSONDecodeError:
-        return
-
-
-def json_dumps(obj, separators=(',', ':')):
-    from json import dumps
-    return dumps(obj, separators=separators)
-
-
 def pickle_deepcopy(obj):
     import pickle
     return pickle.loads(pickle.dumps(obj))
-
-
-def get_filecache_name(cache_name, alphanum=False):
-    cache_name = cache_name or ''
-    cache_name = cache_name.replace('\\', '_').replace('/', '_').replace('.', '_').replace('?', '_').replace('&', '_').replace('=', '_').replace('__', '_')
-    return validify_filename(cache_name, alphanum=alphanum).rstrip('_')
 
 
 def set_json_filecache(my_object, cache_name, cache_days=14):

@@ -2,7 +2,7 @@ from xbmcgui import Dialog
 from tmdbhelper.lib.addon.plugin import ADDONPATH, get_mpaa_prefix, get_language, convert_type, get_setting, get_localized, get_infolabel
 from tmdbhelper.lib.addon.consts import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, CACHE_SHORT, CACHE_MEDIUM
 from jurialmunkey.parser import try_int
-from tmdbhelper.lib.addon.window import get_property
+from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.tmdate import format_date
 from tmdbhelper.lib.files.futils import use_json_filecache, validify_filename
 from tmdbhelper.lib.items.pages import PaginatedItems

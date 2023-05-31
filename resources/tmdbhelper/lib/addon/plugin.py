@@ -1,12 +1,12 @@
 import re
 import xbmc
-import jurialmunkey.plugin as jurialmunkey_plugin
-import jurialmunkey.parser as jurialmunkey_parser
+import jurialmunkey.plugin
+import jurialmunkey.parser
 from tmdbhelper.lib.addon.consts import LANGUAGES
 """ Top level module only import constants """
 
 
-KODIPLUGIN = jurialmunkey_plugin.KodiPlugin('plugin.video.themoviedb.helper')
+KODIPLUGIN = jurialmunkey.plugin.KodiPlugin('plugin.video.themoviedb.helper')
 ADDON = KODIPLUGIN._addon
 ADDONPATH = KODIPLUGIN._addon_path
 ADDONNAME = KODIPLUGIN._addon_name
@@ -17,14 +17,14 @@ get_setting = KODIPLUGIN.get_setting
 set_setting = KODIPLUGIN.set_setting
 get_localized = KODIPLUGIN.get_localized
 
-encode_url = jurialmunkey_parser.EncodeURL(u'plugin://plugin.video.themoviedb.helper/').encode_url
+encode_url = jurialmunkey.parser.EncodeURL(u'plugin://plugin.video.themoviedb.helper/').encode_url
 
 executebuiltin = xbmc.executebuiltin
 get_condvisibility = xbmc.getCondVisibility
 get_infolabel = xbmc.getInfoLabel
-format_name = jurialmunkey_plugin.format_name
-format_folderpath = jurialmunkey_plugin.format_folderpath
-set_kwargattr = jurialmunkey_plugin.set_kwargattr
+format_name = jurialmunkey.plugin.format_name
+format_folderpath = jurialmunkey.plugin.format_folderpath
+set_kwargattr = jurialmunkey.plugin.set_kwargattr
 
 
 def get_plugin_category(info_model, plural=''):

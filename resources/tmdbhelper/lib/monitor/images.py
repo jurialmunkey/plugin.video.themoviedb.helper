@@ -3,7 +3,7 @@ import xbmcvfs
 import colorsys
 import hashlib
 from xbmc import getCacheThumbName, skinHasImage, Monitor, sleep
-from tmdbhelper.lib.addon.window import get_property
+from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.plugin import get_infolabel, get_setting, ADDONDATA
 from jurialmunkey.parser import try_int, try_float
 from tmdbhelper.lib.files.futils import make_path

@@ -9,7 +9,7 @@ from tmdbhelper.lib.api.trakt.items import TraktItems
 from tmdbhelper.lib.api.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache
 from tmdbhelper.lib.addon.thread import ParallelThread, use_thread_lock
 from tmdbhelper.lib.addon.consts import CACHE_SHORT, CACHE_LONG
-from tmdbhelper.lib.addon.window import get_property
+from jurialmunkey.window import get_property
 
 
 class _TraktProgress():

@@ -90,7 +90,7 @@ def choose_tmdb_id(func):
 
 def container_refresh():
     from tmdbhelper.lib.addon.tmdate import set_timestamp
-    from tmdbhelper.lib.addon.window import get_property
+    from jurialmunkey.window import get_property
     from tmdbhelper.lib.addon.plugin import executebuiltin
     executebuiltin('Container.Refresh')
     get_property('Widgets.Reload', set_property=f'{set_timestamp(0, True)}')
@@ -98,7 +98,7 @@ def container_refresh():
 
 def split_value(split_value, separator=None, **kwargs):
     """ Split string values and output to window properties """
-    from tmdbhelper.lib.addon.window import get_property
+    from jurialmunkey.window import get_property
     if not split_value:
         return
     v = f'{split_value}'
@@ -111,7 +111,7 @@ def split_value(split_value, separator=None, **kwargs):
 def kodi_setting(kodi_setting, **kwargs):
     """ Get Kodi setting value and output to window property """
     from tmdbhelper.lib.api.kodi.rpc import get_jsonrpc
-    from tmdbhelper.lib.addon.window import get_property
+    from jurialmunkey.window import get_property
     method = "Settings.GetSettingValue"
     params = {"setting": kodi_setting}
     response = get_jsonrpc(method, params)
@@ -537,11 +537,13 @@ def sort_list(**kwargs):
     executebuiltin(format_folderpath(encode_url(**kwargs)))
 
 
-def wikipedia(wikipedia, tmdb_type=None, match=None, **kwargs):
-    from tmdbhelper.lib.api.wikipedia.api import WikipediaAPI
-    from xbmcgui import Dialog
-    match = match or ''
-    wiki = WikipediaAPI()
-    name = wiki.get_match(wikipedia, tmdb_type, match)
-    data = wiki.parse_text(wiki.get_section(name, '0'))
-    Dialog().textviewer(f'Wikipedia {wikipedia} {match}', f'[B]{name}[/B]\n{data}')
+def do_wikipedia_gui(wikipedia, tmdb_type=None, **kwargs):
+    from xbmc import executebuiltin
+    from tmdbhelper.lib.addon.plugin import get_language
+    language = get_language()[:2]
+    cmd = f'script.wikipedia,wikipedia={wikipedia},xml_file=script-tmdbhelper-wikipedia.xml'
+    if tmdb_type:
+        cmd = f'{cmd},tmdb_type={tmdb_type}'
+    if language:
+        cmd = f'{cmd},language={language}'
+    executebuiltin(f'RunScript({cmd})')

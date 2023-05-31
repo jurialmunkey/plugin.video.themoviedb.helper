@@ -1,6 +1,6 @@
 from xbmc import Monitor
 from tmdbhelper.lib.addon.plugin import get_setting, get_condvisibility
-from tmdbhelper.lib.addon.window import get_property, wait_for_property
+from jurialmunkey.window import get_property, wait_for_property
 from tmdbhelper.lib.monitor.cronjob import CronJobMonitor
 from tmdbhelper.lib.monitor.listitem import ListItemMonitor
 from tmdbhelper.lib.monitor.player import PlayerMonitor
