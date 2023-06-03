@@ -5,7 +5,7 @@ from tmdbhelper.lib.addon.plugin import convert_type, get_localized
 class ListAiringNext(Container):
     def _get_items(self, seed_items: list, prefix: str, reverse: bool = False, **kwargs):
         from tmdbhelper.lib.addon.thread import ParallelThread
-        from tmdbhelper.lib.addon.tmdate import date_in_range
+        from tmdbhelper.lib.addon.tmdate import date_in_range, is_future_timestamp
         from tmdbhelper.lib.api.mapping import get_empty_item
         from tmdbhelper.lib.items.pages import PaginatedItems
 
@@ -68,7 +68,13 @@ class ListAiringNext(Container):
 
         with ParallelThread(seed_items, _get_nextaired_item_thread) as pt:
             item_queue = pt.queue
-        items = [i for i in item_queue if i]
+
+        items = [
+            i for i in item_queue if i
+            and is_future_timestamp(
+                i['infoproperties'].get(f'{prefix}.original'),
+                time_fmt="%Y-%m-%d", time_lim=10, days=-1)]
+
         items = sorted(items, key=lambda i: i['infoproperties'][f'{prefix}.original'], reverse=reverse)
 
         self.ib.cache_only = self.tmdb_cache_only = False
