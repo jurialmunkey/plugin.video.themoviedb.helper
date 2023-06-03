@@ -10,7 +10,7 @@ provider-name="jurialmunkey">
   <import addon="script.module.addon.signals" version="0.0.6" />
   <import addon="script.module.tmdbhelper" version="0.0.8" />
   <import addon="script.module.infotagger" version="0.0.5" />
-  <import addon="script.module.beautifulsoup4" version="4.9.3" />
+  <import addon="script.module.beautifulsoup4" version="4.9.3" />  
 </requires>
 <extension point="xbmc.python.pluginsource" library="resources/plugin.py">
   <provides>video</provides>

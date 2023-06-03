@@ -61,3 +61,6 @@ target/
 .idea/
 
 *.zip
+/.vs/plugin.video.themoviedb.helper/FileContentIndex
+/.vs/plugin.video.themoviedb.helper/v17
+/.vs

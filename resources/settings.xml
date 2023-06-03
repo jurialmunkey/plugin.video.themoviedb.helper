@@ -334,6 +334,16 @@
                         <data>RunScript(plugin.video.themoviedb.helper,monitor_userlist)</data>
                     </control>
                 </setting>
+                <setting id="trakt_list_folders" type="boolean" label="32490" help="" parent="library_autoupdate">
+                    <level>0</level>
+                    <default>false</default>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition operator="is" setting="library_autoupdate">True</condition>
+                        </dependency>
+                    </dependencies>                    
+                    <control type="toggle"/>                    
+                </setting>
                 <setting id="monitor_userslug" type="string" help="">
                     <level>0</level>
                     <default/>

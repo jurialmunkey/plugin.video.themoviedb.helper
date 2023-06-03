@@ -2782,3 +2782,8 @@ msgstr ""
 msgctxt "#32027"
 msgid "Clear default players"
 msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32490"
+msgid "Separate Trakt list(s) into folder(s)"
+msgstr ""

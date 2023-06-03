@@ -103,7 +103,7 @@ def create_nfo(tmdb_type, tmdb_id, *args, **kwargs):
     create_file(content, filename, *args, **kwargs)
 
 
-def create_playlist(items, dbtype, user_slug, list_slug):
+def create_playlist(items, dbtype, user_slug, list_slug, traktlist_dir):
     """ Creates a smart playlist from a list of titles """
     filename = f'{user_slug}-{list_slug}-{dbtype}'
     filepath = u'special://profile/playlists/video/'
@@ -111,8 +111,15 @@ def create_playlist(items, dbtype, user_slug, list_slug):
     fcontent.append(f'<smartplaylist type="{dbtype}">')
     fcontent.append(f'    <name>{list_slug} by {user_slug} ({dbtype})</name>')
     fcontent.append(u'    <match>any</match>')
-    for i in items:
-        fcontent.append(f'    <rule field="{i[0]}" operator="is"><value>{i[1]}</value></rule>')
+    if get_setting('trakt_list_folders'):
+        if dbtype == 'tvshows': BASEDIR = BASEDIR_TV
+        else: BASEDIR = BASEDIR_MOVIE
+        fcontent.append(u'    <rule field="path" operator="contains">')
+        fcontent.append(f'        <value>{BASEDIR}{traktlist_dir}</value>')
+        fcontent.append(u'    </rule>')
+    else:        
+        for i in items:
+            fcontent.append(f'    <rule field="{i[0]}" operator="is"><value>{i[1]}</value></rule>')
     fcontent.append(u'</smartplaylist>')
     create_file(u'\n'.join(fcontent), filename, basedir=filepath, file_ext='xsp', clean_url=False)
 

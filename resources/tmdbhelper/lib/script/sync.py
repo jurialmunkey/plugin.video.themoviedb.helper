@@ -299,7 +299,7 @@ class _UserList():
             return
         if confirm and not Dialog().yesno(get_localized(20444), get_localized(32362)):
             return
-        add_to_library(tmdb_type, tmdb_id=tmdb_id)
+        add_to_library(tmdb_type, tmdb_id=tmdb_id, list_slug=slug[0], user_slug=slug[1])
 
     def sync(self):
         """ Entry point """

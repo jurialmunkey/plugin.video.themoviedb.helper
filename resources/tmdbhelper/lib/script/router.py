@@ -28,7 +28,7 @@ class Script(object):
             else:
                 self.params[arg] = True
         self.params = reconfigure_legacy_params(**self.params)
-
+      
     routing_table = {
         'authenticate_trakt':
             lambda **kwargs: importmodule('tmdbhelper.lib.api.trakt.api', 'TraktAPI')(force=True),
@@ -114,7 +114,7 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.monitor.service', 'restart_service_monitor')()
     }
 
-    def router(self):
+    def router(self):        
         if not self.params:
             return
         routes_available = set(self.routing_table.keys())
