@@ -4,6 +4,7 @@ from jurialmunkey.window import get_property, wait_for_property
 from tmdbhelper.lib.monitor.cronjob import CronJobMonitor
 from tmdbhelper.lib.monitor.listitem import ListItemMonitor
 from tmdbhelper.lib.monitor.player import PlayerMonitor
+from tmdbhelper.lib.monitor.update import UpdateMonitor
 from threading import Thread
 
 
@@ -21,6 +22,7 @@ class ServiceMonitor(object):
         self.cron_job = CronJobMonitor(get_setting('library_autoupdate_hour', 'int'))
         self.cron_job.setName('Cron Thread')
         self.player_monitor = None
+        self.update_monitor = None
         self.listitem_monitor = ListItemMonitor()
         self.xbmc_monitor = Monitor()
 
@@ -67,6 +69,7 @@ class ServiceMonitor(object):
             get_property('ServiceStarted', clear_property=True)
             get_property('ServiceStop', clear_property=True)
         del self.player_monitor
+        del self.update_monitor
         del self.listitem_monitor
         del self.xbmc_monitor
 
@@ -136,4 +139,5 @@ class ServiceMonitor(object):
         get_property('ServiceStarted', 'True')
         self.cron_job.start()
         self.player_monitor = PlayerMonitor()
+        self.update_monitor = UpdateMonitor()
         self.poller()

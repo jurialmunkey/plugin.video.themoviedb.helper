@@ -88,6 +88,25 @@ def choose_tmdb_id(func):
     return wrapper
 
 
+def clean_old_databases():
+    """ Once-off routine to delete old unused database versions to avoid wasting disk space """
+    from tmdbhelper.lib.files.futils import delete_folder
+    for f in ['database', 'database_v2', 'database_v3', 'database_v4', 'database_v5']:
+        delete_folder(f, force=True, check_exists=True)
+
+
+def mem_cache_kodidb(notification=True):
+    from tmdbhelper.lib.addon.plugin import ADDONPATH
+    from tmdbhelper.lib.api.kodi.rpc import KodiLibrary
+    from tmdbhelper.lib.addon.logger import TimerFunc
+    from xbmcgui import Dialog
+    with TimerFunc('KodiLibrary sync took', inline=True):
+        KodiLibrary('movie', cache_refresh=True)
+        KodiLibrary('tvshow', cache_refresh=True)
+        if notification:
+            Dialog().notification('TMDbHelper', 'Kodi Library cached to memory', icon=f'{ADDONPATH}/icon.png')
+
+
 def container_refresh():
     from tmdbhelper.lib.addon.tmdate import set_timestamp
     from jurialmunkey.window import get_property

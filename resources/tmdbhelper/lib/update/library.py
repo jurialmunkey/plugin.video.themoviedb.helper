@@ -1,13 +1,14 @@
 import xbmcvfs
 import tmdbhelper.lib.api.kodi.rpc as rpc
 from xbmcgui import DialogProgressBG
-from tmdbhelper.lib.addon.plugin import get_setting, get_localized, set_setting, executebuiltin
+from tmdbhelper.lib.addon.plugin import get_setting, get_localized, set_setting
 from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.tmdate import is_unaired_timestamp, get_current_date_time
 from tmdbhelper.lib.files.futils import validify_filename, get_tmdb_id_nfo
 from tmdbhelper.lib.update.logger import _LibraryLogger
-from tmdbhelper.lib.update.update import BASEDIR_MOVIE, BASEDIR_TV, STRM_MOVIE, STRM_EPISODE, create_file, create_nfo, get_unique_folder, get_userlist, create_playlist
+from tmdbhelper.lib.update.update import BASEDIR_MOVIE, BASEDIR_TV, STRM_MOVIE, STRM_EPISODE, create_file, create_nfo, get_unique_folder
 from tmdbhelper.lib.update.cacher import _TVShowCache
+from tmdbhelper.lib.update.common import LibraryCommonFunctions
 from tmdbhelper.lib.api.tmdb.api import TMDb
 
 
@@ -17,6 +18,8 @@ def add_to_library(info, busy_spinner=True, library_adder=None, finished=True, *
     if not library_adder:
         library_adder = LibraryAdder(busy_spinner)
         library_adder._start()
+        if not get_setting('legacy_conversion'):
+            library_adder.legacy_conversion()
     if info == 'movie' and kwargs.get('tmdb_id'):
         library_adder.add_movie(**kwargs)
     elif info == 'tv' and kwargs.get('tmdb_id'):
@@ -31,10 +34,10 @@ def add_to_library(info, busy_spinner=True, library_adder=None, finished=True, *
     del library_adder
 
 
-class LibraryAdder():
+class LibraryAdder(LibraryCommonFunctions):
     def __init__(self, busy_spinner=True):
-        self.kodi_db_movies = rpc.get_kodi_library('movie')
-        self.kodi_db_tv = rpc.get_kodi_library('tv')
+        self.kodi_db_movies = rpc.get_kodi_library('movie', cache_refresh=True)
+        self.kodi_db_tv = rpc.get_kodi_library('tv', cache_refresh=True)
         self.p_dialog = DialogProgressBG() if busy_spinner else None
         self.auto_update = get_setting('auto_update')
         self._log = _LibraryLogger()
@@ -44,27 +47,8 @@ class LibraryAdder():
         # self.debug_logging = get_setting('debug_logging')
         self.debug_logging = True
         self.clean_library = False
-
-    def _start(self):
-        if self.p_dialog:
-            self.p_dialog.create('TMDbHelper', get_localized(32166))
-        if not get_setting('legacy_conversion'):
-            self.legacy_conversion()
-
-    def _finish(self, update=True):
-        if self.p_dialog:
-            self.p_dialog.close()
-        if self.debug_logging:
-            self._log._clean()  # Clean up old log files first
-            self._log._out()
-        if self.clean_library:
-            executebuiltin('CleanLibrary(video)')
-        if update and self.auto_update:
-            executebuiltin('UpdateLibrary(video)')
-
-    def _update(self, count, total, **kwargs):
-        if self.p_dialog:
-            self.p_dialog.update((((count + 1) * 100) // total), **kwargs)
+        self._msg_start = get_localized(32166)
+        self._msg_title = 'TMDbHelper Library'
 
     def get_tv_folder_nfos(self):
         nfos = []
@@ -117,47 +101,6 @@ class LibraryAdder():
 
         # Update last updated stamp
         set_setting('last_autoupdate', f'Last updated {get_current_date_time()}', 'str')
-
-    def add_userlist(self, user_slug=None, list_slug=None, confirm=True, force=False, **kwargs):
-        request = get_userlist(user_slug=user_slug, list_slug=list_slug, confirm=confirm, busy_spinner=self.p_dialog)
-        if not request:
-            return
-        i_total = len(request)
-        i_added = {'movie': [], 'show': []}
-
-        for x, i in enumerate(request):
-            self._update(x, i_total, message=f'Updating {i.get(i.get("type"), {}).get("title")}...')
-            playlist_rule = self._add_userlist_item(i, force=force)
-            if not playlist_rule:
-                continue
-            i_added[i.get('type')].append(playlist_rule)
-
-        if i_added.get('movie'):
-            self._update(1, 3, message=get_localized(32349))
-            create_playlist(i_added['movie'], 'movies', user_slug, list_slug)
-        if i_added.get('show'):
-            self._update(2, 3, message=get_localized(32350))
-            create_playlist(i_added['show'], 'tvshows', user_slug, list_slug)
-
-    def _add_userlist_item(self, i, force=False):
-        i_type = i.get('type')
-        if i_type == 'movie':
-            func = self.add_movie
-        elif i_type == 'show':
-            func = self.add_tvshow
-        else:
-            return
-
-        item = i.get(i_type, {})
-        tmdb_id = item.get('ids', {}).get('tmdb')
-
-        if not tmdb_id:
-            self._log._add(
-                'tv' if i_type == 'show' else 'movie', item.get('ids', {}).get('slug'),
-                'skipped item in Trakt user list with missing TMDb ID')
-            return
-
-        return func(tmdb_id, force=force)
 
     def add_movie(self, tmdb_id=None, **kwargs):
         if not tmdb_id:

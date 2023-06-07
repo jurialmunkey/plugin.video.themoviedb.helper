@@ -35,7 +35,7 @@ class Script(object):
         'revoke_trakt':
             lambda **kwargs: importmodule('tmdbhelper.lib.api.trakt.api', 'TraktAPI')().logout(),
         'recache_kodidb':
-            lambda **kwargs: importmodule('tmdbhelper.lib.monitor.cronjob', 'mem_cache_kodidb')(),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method', 'mem_cache_kodidb')(),
         'build_awards':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.awards', 'build_awards')(**kwargs),
         'split_value':

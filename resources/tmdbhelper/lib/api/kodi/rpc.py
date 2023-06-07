@@ -31,15 +31,15 @@ def get_jsonrpc(method=None, params=None, query_id=1):
     return response
 
 
-def get_kodi_library(tmdb_type, tvshowid=None):
+def get_kodi_library(tmdb_type, tvshowid=None, cache_refresh=False):
     if tmdb_type == 'movie':
-        return KodiLibrary(dbtype='movie')
+        return KodiLibrary(dbtype='movie', cache_refresh=cache_refresh)
     if tmdb_type == 'tv':
-        return KodiLibrary(dbtype='tvshow')
+        return KodiLibrary(dbtype='tvshow', cache_refresh=cache_refresh)
     if tmdb_type in ['season', 'episode'] and tvshowid:
-        return KodiLibrary(dbtype=tmdb_type, tvshowid=tvshowid)
+        return KodiLibrary(dbtype=tmdb_type, tvshowid=tvshowid, cache_refresh=cache_refresh)
     if tmdb_type == 'both':
-        return KodiLibrary(dbtype='both')
+        return KodiLibrary(dbtype='both', cache_refresh=cache_refresh)
 
 
 def get_library(dbtype=None, properties=None, filterr=None):
@@ -97,6 +97,28 @@ def get_person_stats(person):
         + try_int(infoproperties.get('numitems.dbid.tvshows'))
         + try_int(infoproperties.get('numitems.dbid.episodes')))
     return infoproperties
+
+
+def set_tags(dbid=None, dbtype=None, tags=None):
+    if not dbid or not dbtype or not tags:
+        return
+    db_key = f'{dbtype}id'
+    json_info = get_jsonrpc(
+        method=f'VideoLibrary.Get{dbtype.capitalize()}Details',
+        params={db_key: dbid, "properties": ["tag"]})
+    try:
+        db_tags = json_info['result'][f'{dbtype}details']['tag']
+    except (AttributeError, KeyError):
+        db_tags = []
+
+    for tag in tags:
+        if tag in db_tags:
+            continue
+        db_tags.append(tag)
+
+    return get_jsonrpc(
+        method=f'VideoLibrary.Set{dbtype.capitalize()}Details',
+        params={db_key: dbid, "tag": db_tags})
 
 
 def set_watched(dbid=None, dbtype=None, plays=1):
