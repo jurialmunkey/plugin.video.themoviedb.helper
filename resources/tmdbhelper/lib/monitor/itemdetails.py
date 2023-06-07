@@ -55,8 +55,13 @@ class ListItemDetails():
             return 'actors'
 
         def _get_fallback():
-            if get_condvisibility(CV_USE_MULTI_TYPE) and get_condvisibility("!Skin.HasSetting(TMDbHelper.DisablePVR)"):
-                return 'multi'
+            if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisablePVR)"):
+                if get_condvisibility(CV_USE_MULTI_TYPE):
+                    return 'multi'
+                if self.get_infolabel('ChannelNumberLabel'):
+                    return 'multi'
+                if self.get_infolabel('Path') == 'pvr://channels/tv/':
+                    return 'multi'
             if self._parent._container == 'Container.':
                 return get_infolabel('Container.Content()') or ''
             return ''
