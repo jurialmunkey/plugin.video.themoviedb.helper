@@ -67,7 +67,7 @@ class ListItemDetails():
     @property
     def query(self):
         query = self.get_infolabel('TvShowTitle')
-        if not query and self._dbtype in ['movies', 'tvshows', 'actors', 'multi']:
+        if not query and self._dbtype in ['movies', 'tvshows', 'actors', 'sets', 'multi']:
             query = self.get_infolabel('Title') or self.get_infolabel('Label')
         return query
 
