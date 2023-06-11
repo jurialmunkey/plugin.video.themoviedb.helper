@@ -73,7 +73,7 @@ class ListAiringNext(Container):
             i for i in item_queue if i
             and is_future_timestamp(
                 i['infoproperties'].get(f'{prefix}.original'),
-                time_fmt="%Y-%m-%d", time_lim=10, days=-1)]
+                time_fmt="%Y-%m-%d", time_lim=10, days=-2)]
 
         items = sorted(items, key=lambda i: i['infoproperties'][f'{prefix}.original'], reverse=reverse)
 
