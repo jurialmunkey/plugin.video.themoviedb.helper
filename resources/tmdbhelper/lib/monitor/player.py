@@ -110,7 +110,7 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         # Get artwork (no need for threading since we're only getting one item in player ever)
         # No need for merging Kodi DB artwork as we should have access to that via normal player properties
         if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"):
-            if self.artwork and get_setting('service_fanarttv_lookup'):
+            if self.artwork:
                 self.details['art'] = self.ib.get_item_artwork(self.artwork, is_season=True if self.season else False)
             if get_condvisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"):
                 art = self.details.get('art', {})
