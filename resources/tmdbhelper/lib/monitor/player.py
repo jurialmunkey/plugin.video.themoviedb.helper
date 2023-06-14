@@ -3,7 +3,7 @@ from xbmc import Player
 from jurialmunkey.window import get_property
 from tmdbhelper.lib.monitor.images import ImageFunctions
 from tmdbhelper.lib.monitor.common import CommonMonitorFunctions, SETPROP_RATINGS, SETMAIN_ARTWORK
-from tmdbhelper.lib.addon.plugin import get_setting, get_condvisibility, get_infolabel
+from tmdbhelper.lib.addon.plugin import get_condvisibility, get_infolabel
 from json import loads
 
 
@@ -126,7 +126,7 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
                 ImageFunctions(method='crop', is_thread=False, prefix='Player', artwork=clearlogo).run()
                 self.properties.add('CropImage')
                 self.properties.add('CropImage.Original')
-            self.set_iter_properties(self.details, SETMAIN_ARTWORK)
+            self.set_iter_properties(self.details.get('art', {}), SETMAIN_ARTWORK)
 
         self.set_properties(self.details)
 
