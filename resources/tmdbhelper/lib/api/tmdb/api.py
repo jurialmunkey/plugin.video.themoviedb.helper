@@ -510,7 +510,7 @@ class TMDb(RequestAPI):
             return
         kwargs['key'] = 'results'
         kwargs['query'] = quote_plus(query)
-        return self.get_basic_list(f'search/{tmdb_type}', tmdb_type, **kwargs)
+        return self.get_basic_list(f'search/{"multi" if tmdb_type == "both" else tmdb_type}', tmdb_type, **kwargs)
 
     def get_basic_list(
             self, path, tmdb_type, key='results', params=None, base_tmdb_type=None, limit=None, filters={},
@@ -544,8 +544,10 @@ class TMDb(RequestAPI):
 
         add_infoproperties = [('total_pages', response.get('total_pages')), ('total_results', response.get('total_results'))]
 
+        item_tmdb_type = None if tmdb_type == 'both' else tmdb_type
+
         items = [
-            self.mapper.get_info(i, tmdb_type, definition=params, base_tmdb_type=base_tmdb_type, iso_country=self.iso_country, add_infoproperties=add_infoproperties)
+            self.mapper.get_info(i, item_tmdb_type or i.get('media_type', ''), definition=params, base_tmdb_type=base_tmdb_type, iso_country=self.iso_country, add_infoproperties=add_infoproperties)
             for i in results if i]
 
         if filters:

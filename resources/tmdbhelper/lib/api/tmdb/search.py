@@ -6,7 +6,7 @@ from tmdbhelper.lib.items.container import Container
 from urllib.parse import urlencode
 
 
-MULTISEARCH_TYPES = ['movie', 'tv', 'person', 'collection', 'company', 'keyword']
+MULTISEARCH_TYPES = ['movie', 'tv', 'person', 'both', 'collection', 'company', 'keyword']
 
 
 def get_zippered_list(lists):
@@ -104,7 +104,7 @@ class ListSearch(Container):
             # Prevents onback from re-prompting for user input by re-writing path
 
         self.update_listing = True if update_listing else False
-        self.container_content = convert_type(tmdb_type, 'container')
+        self.container_content = convert_type('movie' if tmdb_type == 'both' else tmdb_type, 'container')
         self.kodi_db = self.get_kodi_database(tmdb_type)
         self.plugin_category = f'{get_localized(137)} - {query} ({tmdb_type})'
 
