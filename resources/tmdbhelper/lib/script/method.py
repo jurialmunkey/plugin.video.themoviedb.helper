@@ -91,8 +91,15 @@ def choose_tmdb_id(func):
 def clean_old_databases():
     """ Once-off routine to delete old unused database versions to avoid wasting disk space """
     from tmdbhelper.lib.files.futils import delete_folder
+    from tmdbhelper.lib.addon.plugin import get_setting
     for f in ['database', 'database_v2', 'database_v3', 'database_v4', 'database_v5']:
         delete_folder(f, force=True, check_exists=True)
+    save_path = get_setting('image_location', 'str')
+    for f in ['blur', 'crop', 'desaturate', 'colors']:
+        delete_folder(f, force=True, check_exists=True)
+        if not save_path:
+            continue
+        delete_folder(f'{save_path}{f}/', force=True, check_exists=True, join_addon_data=False)
 
 
 def mem_cache_kodidb(notification=True):
