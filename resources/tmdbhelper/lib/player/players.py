@@ -697,6 +697,9 @@ class Players(object):
 
     def configure_action(self, listitem, handle=None):
         path = listitem.getPath()
+        if path.startswith('executebuiltin://'):
+            listitem.setProperty('is_folder', 'true')
+            return path.replace('executebuiltin://', '')
         if listitem.getProperty('is_folder') == 'true':
             return format_folderpath(path)
         if not handle or listitem.getProperty('is_resolvable') == 'false':
