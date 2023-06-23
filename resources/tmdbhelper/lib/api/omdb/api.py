@@ -34,9 +34,9 @@ class OMDb(RequestAPI):
         super(OMDb, self).__init__(
             req_api_key=f'apikey={api_key}',
             req_api_name='OMDb',
-            req_api_url='https://www.omdbapi.com/',
-            error_notification=False)
+            req_api_url='https://www.omdbapi.com/')
         self.translate_xml = translate_xml  # Temp monkey patch bandaid for broken ElementTree. Remove after upstream fix.
+        self._error_notification = False  # Override user settings and always suppress OMDb error notifications since it times-out a lot.
         OMDb.api_key = api_key
 
     def get_request_item(self, imdb_id=None, title=None, year=None, tomatoes=True, fullplot=True, cache_only=False):
