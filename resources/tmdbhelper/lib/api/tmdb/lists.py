@@ -1,4 +1,4 @@
-from tmdbhelper.lib.addon.consts import TMDB_BASIC_LISTS
+from tmdbhelper.lib.addon.consts import TMDB_BASIC_LISTS, TMDB_SORT_TYPES
 from tmdbhelper.lib.addon.plugin import convert_type, get_plugin_category, get_setting, get_localized
 from tmdbhelper.lib.items.container import Container
 
@@ -34,10 +34,13 @@ class ListBasic(Container):
 
 
 class ListCombo(Container):
-    def get_items(self, info, tmdb_id=None, limit=None, sort_key=None, **kwargs):
+    def get_items(self, info, tmdb_id=None, limit=None, sort_key=None, sort_type=None, **kwargs):
         info_model = TMDB_BASIC_LISTS.get(info)
         info_tmdb_type = info_model.get('tmdb_type')
         sort_key = sort_key or info_model.get('sort_key')
+        sort_type = sort_type or info_model.get('sort_type')
+        sort_type = TMDB_SORT_TYPES.get(sort_type) or str
+
         info_path_models = info_model.get('info_path_models') or []
         self.tmdb_api.mapper.imagepath_quality = info_model.get('imagepath_quality', 'IMAGEPATH_ORIGINAL')
         items = []
@@ -63,7 +66,7 @@ class ListCombo(Container):
 
         if sort_key:
             dummy_dict = {}
-            items = sorted(items, key=lambda i: str(i.get('infolabels', dummy_dict).get(sort_key, 0) or i.get('infoproperties', dummy_dict).get(sort_key, 0)), reverse=True)
+            items = sorted(items, key=lambda i: sort_type(i.get('infolabels', dummy_dict).get(sort_key, 0) or i.get('infoproperties', dummy_dict).get(sort_key, 0)), reverse=True)
 
         self.kodi_db = self.get_kodi_database(info_tmdb_type)
         self.sort_by_dbid = True if self.kodi_db and info_model.get('dbid_sorting') else False
