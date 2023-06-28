@@ -365,6 +365,52 @@ TMDB_BASIC_LISTS = {
         'limit': 20,
         'route': TMDB_COMBO_LISTS_ROUTE
     },
+    'credits_in_both': {
+        'info_path_models': [
+            {
+                'path': 'person/{tmdb_id}/movie_credits',
+                'tmdb_type': 'movie',
+                'key': 'cast',
+                'sort_key': 'popularity',
+                'sort_type': 'float',
+                'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
+                'limit': 20,
+            },
+            {
+                'path': 'person/{tmdb_id}/tv_credits',
+                'tmdb_type': 'tv',
+                'key': 'cast',
+                'sort_key': 'popularity',
+                'sort_type': 'float',
+                'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
+                'limit': 20,
+            },
+            {
+                'path': 'person/{tmdb_id}/movie_credits',
+                'tmdb_type': 'movie',
+                'key': 'crew',
+                'sort_key': 'popularity',
+                'sort_type': 'float',
+                'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
+                'limit': 20,
+            },
+            {
+                'path': 'person/{tmdb_id}/tv_credits',
+                'tmdb_type': 'tv',
+                'key': 'crew',
+                'sort_key': 'popularity',
+                'sort_type': 'float',
+                'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
+                'limit': 20,
+            },
+        ],
+        'sort_key': 'popularity',
+        'sort_type': 'float',
+        'tmdb_type': 'both',
+        'dbid_sorting': True,
+        'limit': 20,
+        'route': TMDB_COMBO_LISTS_ROUTE
+    },
     'images': {
         'path': 'person/{tmdb_id}/images',
         'key': 'profiles',
