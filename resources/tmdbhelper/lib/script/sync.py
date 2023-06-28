@@ -35,15 +35,15 @@ def _menu_item_collection():
             'name_remove': get_localized(32290)}}
 
 
-def _menu_item_recommendations():
+def _menu_item_favorites():
     return {
         'class': _SyncItem,
         'kwargs': {
-            'method': 'recommendations',
-            'sync_type': 'recommendations',
+            'method': 'favorites',
+            'sync_type': 'favorites',
             'allow_episodes': False,
-            'name_add': get_localized(32293),
-            'name_remove': get_localized(32294)}}
+            'name_add': get_localized(32490),
+            'name_remove': get_localized(32491)}}
 
 
 def _menu_item_watched():
@@ -105,7 +105,7 @@ def _menu_items():
         _menu_item_progress(),
         _menu_item_collection(),
         _menu_item_watchlist(),
-        _menu_item_recommendations(),
+        _menu_item_favorites(),
         _menu_item_comments(),
         _menu_item_rating(),
     ]
@@ -120,7 +120,7 @@ def sync_trakt_item(trakt_type, unique_id, season=None, episode=None, id_type=No
         'unwatched': lambda: [_menu_item_unwatched()],
         'collection': lambda: [_menu_item_collection()],
         'watchlist': lambda: [_menu_item_watchlist()],
-        'recommendations': lambda: [_menu_item_recommendations()],
+        'favorites': lambda: [_menu_item_favorites()],
         'comments': lambda: [_menu_item_comments()],
         'userlist': lambda: [_menu_item_userlist()],
         'progress': lambda: [_menu_item_progress()],

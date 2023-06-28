@@ -607,6 +607,13 @@ TRAKT_SYNC_LISTS = {
         'route': TRAKT_SYNC_LISTS_ROUTE,
         'plugin_category': '{localized} {plural}',
         'localized': 32196
+    },
+    'trakt_favorites': {
+        'sync_type': 'favorites',
+        'sort_by': 'unsorted',
+        'route': TRAKT_SYNC_LISTS_ROUTE,
+        'plugin_category': '{plural} {localized}',
+        'localized': 1036
     }
 }
 
