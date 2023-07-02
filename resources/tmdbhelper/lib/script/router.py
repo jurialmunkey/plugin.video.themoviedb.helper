@@ -38,6 +38,8 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method', 'mem_cache_kodidb')(),
         'build_awards':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.awards', 'build_awards')(**kwargs),
+        'make_node':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method', 'make_node')(**kwargs),
         'split_value':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method', 'split_value')(**kwargs),
         'kodi_setting':

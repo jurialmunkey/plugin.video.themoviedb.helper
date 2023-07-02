@@ -1,6 +1,6 @@
 from xbmcplugin import addDirectoryItems, setProperty, setPluginCategory, setContent, endOfDirectory, addSortMethod
 from tmdbhelper.lib.addon.consts import NO_LABEL_FORMATTING
-from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin
+from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin, get_localized
 from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.thread import ParallelThread
 from tmdbhelper.lib.api.tmdb.api import TMDb
@@ -43,6 +43,8 @@ class Container():
         self.is_cacheonly = self.params.get('cacheonly', '').lower() == 'true'
         self.is_fanarttv = self.params.get('fanarttv', '').lower()
         self.is_detailed = self.params.get('detailed', '').lower() == 'true' or self.params.get('info') == 'details'
+
+        self.context_additions = None if self.is_widget else [(get_localized(32496), 'RunScript(plugin.video.themoviedb.helper,make_node)')]
 
         # endOfDirectory
         self.update_listing = False  # endOfDirectory(updateListing=) set True to replace current path
@@ -155,7 +157,7 @@ class Container():
             if self.hide_watched and try_int(li.infolabels.get('playcount')) != 0:
                 return
 
-            li.set_context_menu()  # Set the context menu items
+            li.set_context_menu(additions=self.context_additions)  # Set the context menu items
             li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
             li.set_thumb_to_art(self.thumb_override == 2) if self.thumb_override else None  # Special override for calendars to prevent thumb spoilers
             li.set_params_reroute(self.is_fanarttv, self.params.get('extended'), self.is_cacheonly)  # Reroute details to proper end point

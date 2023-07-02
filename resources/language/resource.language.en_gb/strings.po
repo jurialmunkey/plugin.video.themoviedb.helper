@@ -2501,6 +2501,31 @@ msgctxt "#32491"
 msgid "Remove from favourites"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32492"
+msgid "{} already exists in {}!\\nDo you wish to remove this item from the list?"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32493"
+msgid "Successfully removed {} from {}"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32494"
+msgid "Successfully added {} to {}"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32495"
+msgid "Create new node"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/items/container.py
+msgctxt "#32496"
+msgid "Add/Remove as Custom Node"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

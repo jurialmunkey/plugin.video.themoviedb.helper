@@ -109,9 +109,12 @@ class _ListItem(object):
     def unaired_bool(self):
         return False
 
-    def set_context_menu(self):
+    def set_context_menu(self, additions=None):
         from tmdbhelper.lib.items.context import ContextMenu
         self.context_menu += ContextMenu(self).get()
+        if not additions:
+            return
+        self.context_menu += additions
 
     def set_playcount(self, playcount):
         return
