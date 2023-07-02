@@ -3,7 +3,7 @@ from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get
 from jurialmunkey.parser import merge_two_items
 from tmdbhelper.lib.items.builder import ItemBuilder
 from tmdbhelper.lib.items.container import Container
-from tmdbhelper.lib.addon.consts import TVDB_DISCLAIMER
+from tmdbhelper.lib.addon.consts import TVDB_DISCLAIMER, NODE_BASEDIR
 
 
 def _build_basedir_item(i, t, space):
@@ -331,6 +331,53 @@ def _get_basedir_random():
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/trakt/mylists.png'}}
     ]
+
+
+def _get_basedir_nodes(filename=None, basedir=None):
+    from json import loads
+    from tmdbhelper.lib.files.futils import get_files_in_folder, read_file
+
+    basedir = basedir or NODE_BASEDIR
+    files = get_files_in_folder(basedir, r'.*\.json')
+
+    if not files:
+        return []
+
+    def _get_node(file):
+        data = read_file(basedir + file)
+        meta = loads(data) or {}
+        if not meta:
+            return
+        return {
+            'label': meta.get('name') or '',
+            'types': ['both'],
+            'params': {'info': 'dir_custom_node', 'filename': file, 'basedir': basedir},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': meta.get('icon') or ''}}
+
+    if not filename:
+        return [i for i in (_get_node(file) for file in files) if i]
+
+    if filename not in files:
+        return []
+
+    def _get_item(item):
+        if not item:
+            return
+        return {
+            'label': item.get('name') or '',
+            'path': item.get('path') or PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': item.get('icon') or ''}}
+    try:
+        data = read_file(basedir + filename)
+        meta = loads(data) or {}
+        return [i for i in (_get_item(item) for item in meta['list']) if i]
+    except (KeyError, TypeError):
+        return []
 
 
 def _get_basedir_tvdb():
@@ -873,6 +920,14 @@ def _get_basedir_main():
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/mdblist/mdblist.png'}},
         {
+            'label': u'Nodes',
+            'types': [None],
+            'params': {'info': 'dir_custom_node'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'}},
+        {
             'label': u'Settings',
             'types': [None],
             'params': {'info': 'dir_settings'},
@@ -1052,6 +1107,7 @@ class ListBaseDir(Container):
             'dir_random': lambda: _build_basedir(None, _get_basedir_random()),
             'dir_calendar_trakt': lambda: _get_basedir_calendar(info='trakt_calendar', endpoint=kwargs.get('endpoint'), user=kwargs.get('user')),
             'dir_calendar_library': lambda: _get_basedir_calendar(info='library_nextaired'),
+            'dir_custom_node': lambda: _get_basedir_nodes(filename=kwargs.get('filename'), basedir=kwargs.get('basedir')),
             'dir_settings': lambda: ADDON.openSettings()
         }
         func = route.get(info, lambda: _build_basedir(None, _get_basedir_main()))

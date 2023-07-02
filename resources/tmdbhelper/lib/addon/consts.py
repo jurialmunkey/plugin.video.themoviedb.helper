@@ -3,6 +3,8 @@ ITER_PROPS_MAX = 10
 
 TVDB_DISCLAIMER = 'Information provided by TheTVDB.com. Please consider supporting them. https://thetvdb.com/subscribe'
 
+NODE_BASEDIR = 'special://profile/addon_data/plugin.video.themoviedb.helper/nodes/'
+
 ACCEPTED_MEDIATYPES = [
     'video', 'movie', 'tvshow', 'season', 'episode', 'musicvideo', 'music', 'song', 'album', 'artist', 'set']
 
