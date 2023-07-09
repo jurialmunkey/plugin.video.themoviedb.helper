@@ -456,7 +456,7 @@ class _TraktProgress():
             return False
         return True
 
-    def _get_stacked_item(self, next_item, last_item):
+    def _get_stacked_item(self, next_item, last_item, info_param='episodes'):
         # If the next item is the same show then we stack the details onto the last item and add it next iteration
         ip = last_item['infoproperties']
 
@@ -474,7 +474,7 @@ class _TraktProgress():
             ip['stacked_first_season'] = last_item['infolabels']['season']
             ip['no_label_formatting'] = True
             last_item['params'].pop('episode', None)
-            last_item['params']['info'] = 'episodes'
+            last_item['params']['info'] = info_param
             last_item['is_folder'] = True
 
         # Stacked Setup
@@ -491,7 +491,7 @@ class _TraktProgress():
         last_item['label'] = f'{ip["stacked_first"]}-{ip["stacked_last"]}. {ip["stacked_count"]} {get_localized(20360)}'
         return last_item
 
-    def _stack_calendar_episodes(self, episode_list, flipped=False):
+    def _stack_calendar_episodes(self, episode_list, flipped=False, info_param='episodes'):
         items = []
         last_item = None
         for i in reversed(episode_list) if flipped else episode_list:
@@ -508,7 +508,7 @@ class _TraktProgress():
                 last_item = i
                 continue
 
-            last_item = self._get_stacked_item(i, last_item)
+            last_item = self._get_stacked_item(i, last_item, info_param=info_param)
 
         else:  # The last item in the list won't be added in the for loop so do an extra action at the end to add it
             if last_item:
@@ -537,7 +537,10 @@ class _TraktProgress():
         # Reverse items for date ranges in past
         traktitems = reversed(response) if startdate < -1 else response
         items = [self._get_calendar_episode_item(i) for i in traktitems if self._get_calendar_episode_item_bool(i, kodi_db, user, startdate, days)]
-        return self._stack_calendar_episodes(items, flipped=startdate < -1) if stack else items
+        if not stack:
+            return items
+        info_param = 'details' if kodi_db and get_setting('nextaired_linklibrary') else 'episodes'  # Fix for stacked episodes linking to library
+        return self._stack_calendar_episodes(items, flipped=startdate < -1, info_param=info_param)
 
     def get_calendar_episodes_list(self, startdate=0, days=1, user=True, kodi_db=None, page=1, limit=None, endpoint=None):
         limit = limit or self.item_limit
