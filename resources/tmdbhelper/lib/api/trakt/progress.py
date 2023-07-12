@@ -264,22 +264,28 @@ class _TraktProgress():
         response = self.get_show_progress(slug)
         if not response:
             return
-        # For single episodes just grab next episode and add in show details
-        if get_single_episode:
-            if not response.get('next_episode'):
-                return
+
+        # For single episodes just grab next episode and add in show details as long as there's no reset_at date
+        if get_single_episode and not response.get('reset_at') and response.get('next_episode'):
             return {'show': show, 'episode': response['next_episode']}
-        # For list of episodes we need to build them
-        # Get show reset_at value
-        reset_at = None
-        if response.get('reset_at'):
-            reset_at = convert_timestamp(response['reset_at'])
-        # Get next episode items
-        return [
+
+        # For list of episodes we need to build them by comparing against the reset_at date
+        reset_at = convert_timestamp(response['reset_at']) if response.get('reset_at') else None
+
+        # Get next episode items as a generator for quicker next() item
+        items = (
             {'show': show, 'episode': {'number': episode.get('number'), 'season': season.get('number')}}
             for season in response.get('seasons', []) for episode in season.get('episodes', [])
             if not episode.get('completed')
-            or (reset_at and convert_timestamp(episode.get('last_watched_at')) < reset_at)]
+            or (reset_at and convert_timestamp(episode.get('last_watched_at')) < reset_at))
+
+        # Only get next item in generator if getting a single episode to avoid unnecessarily checking all episodes
+        if not get_single_episode:
+            return items
+        try:
+            return next(items)
+        except StopIteration:
+            return
 
     @is_authorized
     def get_movie_playcount(self, unique_id, id_type):
