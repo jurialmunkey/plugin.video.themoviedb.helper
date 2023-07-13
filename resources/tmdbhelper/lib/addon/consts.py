@@ -514,6 +514,13 @@ TMDB_BASIC_LISTS = {
         },
         'route': TMDB_BASIC_LISTS_ROUTE,
         'plugin_category': '{plural}',
+    },
+    'tmdb_list': {
+        'path': 'list/{list_id}',
+        'key': 'items',
+        'route': TMDB_BASIC_LISTS_ROUTE,
+        'plugin_category': '{localized} {plural}',
+        'localized': 535
     }
 }
 

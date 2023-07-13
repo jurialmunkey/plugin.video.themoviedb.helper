@@ -28,7 +28,7 @@ class ListBasic(Container):
         self.kodi_db = self.get_kodi_database(info_tmdb_type)
         self.sort_by_dbid = True if self.kodi_db and info_model.get('dbid_sorting') else False
         self.library = convert_type(info_tmdb_type, 'library')
-        self.container_content = convert_type(info_tmdb_type, 'container')
+        self.container_content = convert_type(info_tmdb_type, 'container', items=items)
         self.plugin_category = get_plugin_category(info_model, convert_type(info_tmdb_type, 'plural'))
         return items
 

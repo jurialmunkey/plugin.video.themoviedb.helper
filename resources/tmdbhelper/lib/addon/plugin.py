@@ -78,8 +78,7 @@ CONVERSION_TABLE = {
         'genre': {'plural': lambda: get_localized(135), 'container': 'genres', 'dbtype': 'genre'},
         'season': {'plural': lambda: get_localized(33054), 'container': 'seasons', 'trakt': 'season', 'dbtype': 'season'},
         'episode': {'plural': lambda: get_localized(20360), 'container': 'episodes', 'trakt': 'episode', 'dbtype': 'episode'},
-        'video': {'plural': lambda: get_localized(10025), 'container': 'videos', 'dbtype': 'video'},
-        'both': {'plural': lambda: get_localized(32365), 'trakt': 'both'}
+        'video': {'plural': lambda: get_localized(10025), 'container': 'videos', 'dbtype': 'video'}
     }
 }
 
@@ -104,11 +103,32 @@ def convert_trakt_type(trakt_type, output='tmdb'):
     return _convert_types('trakt', trakt_type, output)
 
 
-def convert_type(tmdb_type, output, season=None, episode=None):
+def convert_type(tmdb_type, output, season=None, episode=None, items=None):
     if output == 'library':
         if tmdb_type == 'image':
             return 'pictures'
         return 'video'
+    if tmdb_type == 'both':
+        if output == 'plural':
+            return get_localized(32365)
+        if output == 'trakt':
+            return 'both'
+        if not items:
+            return ''
+        dbtypes = {}
+        for i in items:
+            try:
+                dbtype = i['infolabels']['mediatype']
+            except KeyError:
+                continue
+            if not dbtype:
+                continue
+            dbtypes[dbtype] = dbtypes.get(dbtype, 0) + 1
+        try:
+            dbtype = max(dbtypes, key=dbtypes.get)
+        except ValueError:
+            return ''
+        tmdb_type = convert_media_type(dbtype)
     if tmdb_type == 'tv' and season is not None:
         tmdb_type = 'episode' if episode is not None else 'season'
     return _convert_types('tmdb', tmdb_type, output)
