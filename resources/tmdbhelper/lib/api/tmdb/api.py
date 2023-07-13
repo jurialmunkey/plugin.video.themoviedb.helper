@@ -523,7 +523,7 @@ class TMDb(RequestAPI):
                 kwargs['page'] = random.randint(1, page_end)
                 return self.get_request_sc(path, **kwargs)
 
-            page_end = int(kwargs.get('random_page_limit', 10))
+            page_end = int(kwargs.pop('random_page_limit', 10))
             response = _get_random_page(page_end)
 
             if response and not response.get(key) and int(response.get('total_pages') or 1) < page_end:
@@ -583,13 +583,18 @@ class TMDb(RequestAPI):
 
     def get_discover_list(self, tmdb_type, **kwargs):
         # TODO: Check what regions etc we need to have
+        to_del = ['with_id', 'with_separator', 'cacheonly', 'nextpage', 'widget', 'fanarttv']
         for k, v in kwargs.items():
-            if k in ['with_id', 'with_separator', 'page', 'limit', 'nextpage', 'widget', 'fanarttv']:
+            if k in to_del:
+                continue
+            if k in ['page', 'limit']:
                 continue
             if k and v:
                 break
         else:  # Only build discover list if we have params to pass
             return
+        for k in to_del:
+            kwargs.pop(k, None)
         path = f'discover/{tmdb_type}'
         return self.get_basic_list(path, tmdb_type, **kwargs)
 
