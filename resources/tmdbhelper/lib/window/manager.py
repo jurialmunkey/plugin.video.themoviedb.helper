@@ -101,15 +101,12 @@ class _EventLoop():
         self.set_properties(self.position, window.get_property(name))
 
     def _on_change_window(self, poll=0.3):
-        # On first run the base window won't be open yet so don't check for it
-        base_id = None if self.first_run else self.window_id
-
         # Close the info dialog first before doing anything
         if window.is_visible(ID_VIDEOINFO):
             window.close(ID_VIDEOINFO)
 
             # If we timeout or user forced back out of base window then we exit
-            if not window.wait_until_active(ID_VIDEOINFO, base_id, poll=poll, invert=True):
+            if not window.wait_until_active(ID_VIDEOINFO, self.base_id, poll=poll, invert=True):
                 return False
 
         # NOTE: Used to check for self.position == 0 and exit here
@@ -233,6 +230,13 @@ class WindowManager(_EventLoop):
         self.exit = False
         self.xbmc_monitor = Monitor()
         self._on_change_func = self._on_change_direct if get_condvisibility("Skin.HasSetting(TMDbHelper.DirectCallAuto)") else self._on_change_manual
+
+    @property
+    def base_id(self):
+        # On first run the base window won't be open yet so don't check for it
+        if self.first_run:
+            return
+        return self.window_id
 
     def reset_properties(self):
         self.position = 0
