@@ -111,14 +111,16 @@ class _EventLoop():
 
         # NOTE: Used to check for self.position == 0 and exit here
         # Now checking prior to routine
+        if not self.first_run:
+            return True
 
-        # On first run let's open our base window
-        if self.first_run:
-            window.activate(self.window_id)
-            if not window.wait_until_active(self.window_id, poll=poll):
-                return False
+        # On first run we need to open the base window
+        window.activate(self.window_id)
+        if window.wait_until_active(self.window_id, poll=poll):
+            return True
 
-        return True
+        # Window ID didnt open successfully
+        return False
 
     def _on_change_manual(self):
         # Close the info dialog and open base window first before doing anything
