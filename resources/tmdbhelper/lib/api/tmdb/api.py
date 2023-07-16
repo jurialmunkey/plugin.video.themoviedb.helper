@@ -114,7 +114,7 @@ class TMDb(RequestAPI):
         if not tmdb_type:
             return
         kwargs['cache_days'] = CACHE_MEDIUM
-        kwargs['cache_name'] = 'TMDb.get_tmdb_id.v3'
+        kwargs['cache_name'] = 'TMDb.get_tmdb_id.v4'
         kwargs['cache_combine_name'] = True
         return self._cache.use_cache(
             self._get_tmdb_id, tmdb_type=tmdb_type, imdb_id=imdb_id, tvdb_id=tvdb_id, query=query, year=year,
@@ -136,11 +136,10 @@ class TMDb(RequestAPI):
         elif query:
             if tmdb_type in ['movie', 'tv']:
                 query = query.split(' (', 1)[0]  # Scrub added (Year) or other cruft in parentheses () added by Addons or TVDb
-            query = quote_plus(query)
             if tmdb_type == 'tv':
-                request = func('search', tmdb_type, language=self.req_language, query=query, first_air_date_year=year)
+                request = func('search', tmdb_type, language=self.req_language, query=quote_plus(query), first_air_date_year=year)
             else:
-                request = func('search', tmdb_type, language=self.req_language, query=query, year=year)
+                request = func('search', tmdb_type, language=self.req_language, query=quote_plus(query), year=year)
             request = request.get('results', [])
         if not request:
             return
