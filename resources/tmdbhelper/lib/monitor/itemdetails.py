@@ -1,6 +1,6 @@
 from tmdbhelper.lib.addon.plugin import get_condvisibility, get_infolabel, convert_media_type, convert_type
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_region_date
-from tmdbhelper.lib.addon.window import get_property
+from jurialmunkey.window import get_property
 from tmdbhelper.lib.monitor.images import ImageFunctions
 from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.api.mapping import get_empty_item
@@ -15,8 +15,8 @@ BASEITEM_PROPERTIES = [
     ('base_plot', ('plot', 'Property(artist_description)', 'Property(artist_description)', 'addondescription')),
     ('base_tagline', ('tagline',)),
     ('base_dbtype', ('dbtype',)),
-    ('base_poster', ('Art(poster)',)),
-    ('base_fanart', ('Art(fanart)',)),
+    ('base_poster', ('Art(poster)', 'Art(season.poster)', 'Art(tvshow.poster)')),
+    ('base_fanart', ('Art(fanart)', 'Art(season.fanart)', 'Art(tvshow.fanart)')),
     ('base_clearlogo', ('Art(clearlogo)', 'Art(tvshow.clearlogo)', 'Art(artist.clearlogo)')),
     ('base_tvshowtitle', ('tvshowtitle',))]
 
@@ -55,8 +55,13 @@ class ListItemDetails():
             return 'actors'
 
         def _get_fallback():
-            if get_condvisibility(CV_USE_MULTI_TYPE) and get_condvisibility("!Skin.HasSetting(TMDbHelper.DisablePVR)"):
-                return 'multi'
+            if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisablePVR)"):
+                if get_condvisibility(CV_USE_MULTI_TYPE):
+                    return 'multi'
+                if self.get_infolabel('ChannelNumberLabel'):
+                    return 'multi'
+                if self.get_infolabel('Path') == 'pvr://channels/tv/':
+                    return 'multi'
             if self._parent._container == 'Container.':
                 return get_infolabel('Container.Content()') or ''
             return ''
@@ -67,7 +72,7 @@ class ListItemDetails():
     @property
     def query(self):
         query = self.get_infolabel('TvShowTitle')
-        if not query and self._dbtype in ['movies', 'tvshows', 'actors', 'multi']:
+        if not query and self._dbtype in ['movies', 'tvshows', 'actors', 'sets', 'multi']:
             query = self.get_infolabel('Title') or self.get_infolabel('Label')
         return query
 
@@ -131,22 +136,46 @@ class ListItemDetails():
         return self._parent.get_infolabel(info, self._position)
 
     def get_artwork(self, source='', build_fallback=False, built_artwork=None):
+        source = source or ''
         source = source.lower()
-        infolabels = ARTWORK_LOOKUP_TABLE.get(source, source.split("|") if source else ARTWORK_LOOKUP_TABLE.get('thumb'))
-        for i in infolabels:
-            artwork = self.get_infolabel(i)
-            if not artwork:
-                continue
-            return artwork
-        if not build_fallback:
-            return
-        built_artwork = built_artwork or self.get_builtartwork()
-        if not built_artwork:
-            return
-        for i in infolabels:
-            if not i.startswith('art('):
-                continue
-            artwork = built_artwork.get(i[4:-1])
+
+        def _get_artwork_infolabel(_infolabels):
+            for i in _infolabels:
+                artwork = self.get_infolabel(i)
+                if not artwork:
+                    continue
+                return artwork
+
+        def _get_artwork_fallback(_infolabels, _built_artwork):
+            for i in _infolabels:
+                if not i.startswith('art('):
+                    continue
+                artwork = _built_artwork.get(i[4:-1])
+                if not artwork:
+                    continue
+                return artwork
+
+        def _get_artwork(_source):
+            if _source:
+                _infolabels = ARTWORK_LOOKUP_TABLE.get(_source, _source.split("|"))
+            else:
+                _infolabels = ARTWORK_LOOKUP_TABLE.get('thumb')
+
+            artwork = _get_artwork_infolabel(_infolabels)
+
+            if artwork or not build_fallback:
+                return artwork
+
+            nonlocal built_artwork
+
+            built_artwork = built_artwork or self.get_builtartwork()
+            if not built_artwork:
+                return
+
+            return _get_artwork_fallback(_infolabels, built_artwork)
+
+        for _source in source.split("||"):
+            artwork = _get_artwork(_source)
             if not artwork:
                 continue
             return artwork
@@ -185,11 +214,13 @@ class ListItemDetails():
             if not i['active']():
                 continue
             imgfunc = ImageFunctions(method=i['method'], is_thread=False, artwork=i['images']())
+
+            output = imgfunc.func(imgfunc.image)
+            images[f'{i["method"]}image'] = output
+            images[f'{i["method"]}image.original'] = imgfunc.image
+
             if use_winprops:
-                imgfunc.run()
-            else:
-                images[f'{i["method"]}image'] = imgfunc.func(imgfunc.image)
-                images[f'{i["method"]}image.original'] = imgfunc.image
+                imgfunc.set_properties(output)
 
         return images
 

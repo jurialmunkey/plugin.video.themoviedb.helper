@@ -1,5 +1,5 @@
 from tmdbhelper.lib.monitor.itemdetails import ListItemDetails
-from tmdbhelper.lib.addon.window import get_property, get_current_window
+from jurialmunkey.window import get_property, get_current_window
 from tmdbhelper.lib.addon.plugin import get_setting
 
 READAHEAD_QUEUE = [1, 2, 3, -1, 4, -2, 5, -3, 6, 7, 8, 9]  # Mostly only check items ahead but cache a few behind in case user scrolls back

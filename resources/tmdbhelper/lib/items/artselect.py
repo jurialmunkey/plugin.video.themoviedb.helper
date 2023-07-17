@@ -5,7 +5,7 @@ from tmdbhelper.lib.api.tmdb.mapping import get_imagepath_poster, get_imagepath_
 from tmdbhelper.lib.addon.dialog import BusyDialog
 from tmdbhelper.lib.addon.plugin import get_localized, executebuiltin
 from tmdbhelper.lib.addon.tmdate import set_timestamp
-from tmdbhelper.lib.addon.window import get_property
+from jurialmunkey.window import get_property
 
 
 class _ArtworkSelector():

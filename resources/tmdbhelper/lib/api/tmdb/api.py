@@ -2,7 +2,7 @@ from xbmcgui import Dialog
 from tmdbhelper.lib.addon.plugin import ADDONPATH, get_mpaa_prefix, get_language, convert_type, get_setting, get_localized, get_infolabel
 from tmdbhelper.lib.addon.consts import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, CACHE_SHORT, CACHE_MEDIUM
 from jurialmunkey.parser import try_int
-from tmdbhelper.lib.addon.window import get_property
+from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.tmdate import format_date
 from tmdbhelper.lib.files.futils import use_json_filecache, validify_filename
 from tmdbhelper.lib.items.pages import PaginatedItems
@@ -114,7 +114,7 @@ class TMDb(RequestAPI):
         if not tmdb_type:
             return
         kwargs['cache_days'] = CACHE_MEDIUM
-        kwargs['cache_name'] = 'TMDb.get_tmdb_id.v3'
+        kwargs['cache_name'] = 'TMDb.get_tmdb_id.v4'
         kwargs['cache_combine_name'] = True
         return self._cache.use_cache(
             self._get_tmdb_id, tmdb_type=tmdb_type, imdb_id=imdb_id, tvdb_id=tvdb_id, query=query, year=year,
@@ -136,11 +136,10 @@ class TMDb(RequestAPI):
         elif query:
             if tmdb_type in ['movie', 'tv']:
                 query = query.split(' (', 1)[0]  # Scrub added (Year) or other cruft in parentheses () added by Addons or TVDb
-            query = quote_plus(query)
             if tmdb_type == 'tv':
-                request = func('search', tmdb_type, language=self.req_language, query=query, first_air_date_year=year)
+                request = func('search', tmdb_type, language=self.req_language, query=quote_plus(query), first_air_date_year=year)
             else:
-                request = func('search', tmdb_type, language=self.req_language, query=query, year=year)
+                request = func('search', tmdb_type, language=self.req_language, query=quote_plus(query), year=year)
             request = request.get('results', [])
         if not request:
             return
@@ -510,11 +509,11 @@ class TMDb(RequestAPI):
             return
         kwargs['key'] = 'results'
         kwargs['query'] = quote_plus(query)
-        return self.get_basic_list(f'search/{tmdb_type}', tmdb_type, **kwargs)
+        return self.get_basic_list(f'search/{"multi" if tmdb_type == "both" else tmdb_type}', tmdb_type, **kwargs)
 
     def get_basic_list(
             self, path, tmdb_type, key='results', params=None, base_tmdb_type=None, limit=None, filters={},
-            sort_key=None, stacked=None, **kwargs):
+            sort_key=None, stacked=None, paginated=True, **kwargs):
 
         if kwargs.get('page') == 'random':
             import random
@@ -523,7 +522,7 @@ class TMDb(RequestAPI):
                 kwargs['page'] = random.randint(1, page_end)
                 return self.get_request_sc(path, **kwargs)
 
-            page_end = int(kwargs.get('random_page_limit', 10))
+            page_end = int(kwargs.pop('random_page_limit', 10))
             response = _get_random_page(page_end)
 
             if response and not response.get(key) and int(response.get('total_pages') or 1) < page_end:
@@ -544,8 +543,10 @@ class TMDb(RequestAPI):
 
         add_infoproperties = [('total_pages', response.get('total_pages')), ('total_results', response.get('total_results'))]
 
+        item_tmdb_type = None if tmdb_type == 'both' else tmdb_type
+
         items = [
-            self.mapper.get_info(i, tmdb_type, definition=params, base_tmdb_type=base_tmdb_type, iso_country=self.iso_country, add_infoproperties=add_infoproperties)
+            self.mapper.get_info(i, item_tmdb_type or i.get('media_type', ''), definition=params, base_tmdb_type=base_tmdb_type, iso_country=self.iso_country, add_infoproperties=add_infoproperties)
             for i in results if i]
 
         if filters:
@@ -568,6 +569,9 @@ class TMDb(RequestAPI):
                     p[b][k] = iv if pv is None else f'{pv} / {iv}'
             items = stacked_list
 
+        if not paginated:
+            return items
+
         if try_int(response.get('page', 0)) < try_int(response.get('total_pages', 0)):
             items.append({'next_page': try_int(response.get('page', 0)) + 1})
         elif limit is not None:
@@ -578,13 +582,18 @@ class TMDb(RequestAPI):
 
     def get_discover_list(self, tmdb_type, **kwargs):
         # TODO: Check what regions etc we need to have
+        to_del = ['with_id', 'with_separator', 'cacheonly', 'nextpage', 'widget', 'fanarttv']
         for k, v in kwargs.items():
-            if k in ['with_id', 'with_separator', 'page', 'limit', 'nextpage', 'widget', 'fanarttv']:
+            if k in to_del:
+                continue
+            if k in ['page', 'limit']:
                 continue
             if k and v:
                 break
         else:  # Only build discover list if we have params to pass
             return
+        for k in to_del:
+            kwargs.pop(k, None)
         path = f'discover/{tmdb_type}'
         return self.get_basic_list(path, tmdb_type, **kwargs)
 

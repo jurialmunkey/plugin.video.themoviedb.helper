@@ -1,7 +1,7 @@
 import xbmcgui
 from tmdbhelper.lib.addon.plugin import get_infolabel, get_condvisibility, get_localized, get_setting
 from tmdbhelper.lib.addon.logger import kodi_try_except
-from tmdbhelper.lib.addon.window import get_property, get_current_window
+from jurialmunkey.window import get_property, get_current_window
 from tmdbhelper.lib.monitor.common import CommonMonitorFunctions, SETMAIN_ARTWORK, SETPROP_RATINGS
 from tmdbhelper.lib.monitor.images import ImageFunctions
 from tmdbhelper.lib.monitor.itemdetails import ListItemDetails
@@ -13,6 +13,7 @@ from threading import Thread
 CV_USE_LISTITEM = ""\
     "!Skin.HasSetting(TMDbHelper.ForceWidgetContainer) + "\
     "!Window.IsActive(script-tmdbhelper-recommendations.xml) + ["\
+    "!Skin.HasSetting(TMDbHelper.UseLocalWidgetContainer) | String.IsEmpty(Window.Property(TMDbHelper.WidgetContainer))] + ["\
     "Window.IsVisible(movieinformation) | "\
     "Window.IsVisible(musicinformation) | "\
     "Window.IsVisible(songinformation) | "\
@@ -108,11 +109,11 @@ class ListItemMonitor(CommonMonitorFunctions):
 
     def get_item_identifier(self, position=0):
         return str((
-            'current_listitem_v5',
+            'current_listitem_v5.1.17',
             self.get_infolabel('dbtype', position),
             self.get_infolabel('dbid', position),
             self.get_infolabel('IMDBNumber', position),
-            self.get_infolabel('label', position),
+            self.get_infolabel('title', position) or self.get_infolabel('label', position),
             self.get_infolabel('tvshowtitle', position),
             self.get_infolabel('year', position),
             self.get_infolabel('season', position),
@@ -215,7 +216,7 @@ class ListItemMonitor(CommonMonitorFunctions):
 
         def _process_artwork():
             _artwork = _item.get_builtartwork()
-            _artwork.update(_item.get_image_manipulations(built_artwork=_artwork))
+            _artwork.update(_item.get_image_manipulations(built_artwork=_artwork, use_winprops=True))
             _listitem.setArt(_artwork)
 
         def _process_ratings():

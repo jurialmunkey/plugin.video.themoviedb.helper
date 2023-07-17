@@ -9,7 +9,7 @@ from tmdbhelper.lib.api.trakt.items import TraktItems
 from tmdbhelper.lib.api.trakt.decorators import is_authorized, use_activity_cache, use_lastupdated_cache
 from tmdbhelper.lib.addon.thread import ParallelThread, use_thread_lock
 from tmdbhelper.lib.addon.consts import CACHE_SHORT, CACHE_LONG
-from tmdbhelper.lib.addon.window import get_property
+from jurialmunkey.window import get_property
 
 
 class _TraktProgress():
@@ -264,22 +264,28 @@ class _TraktProgress():
         response = self.get_show_progress(slug)
         if not response:
             return
-        # For single episodes just grab next episode and add in show details
-        if get_single_episode:
-            if not response.get('next_episode'):
-                return
+
+        # For single episodes just grab next episode and add in show details as long as there's no reset_at date
+        if get_single_episode and not response.get('reset_at') and response.get('next_episode'):
             return {'show': show, 'episode': response['next_episode']}
-        # For list of episodes we need to build them
-        # Get show reset_at value
-        reset_at = None
-        if response.get('reset_at'):
-            reset_at = convert_timestamp(response['reset_at'])
-        # Get next episode items
-        return [
+
+        # For list of episodes we need to build them by comparing against the reset_at date
+        reset_at = convert_timestamp(response['reset_at']) if response.get('reset_at') else None
+
+        # Get next episode items as a generator for quicker next() item
+        items = (
             {'show': show, 'episode': {'number': episode.get('number'), 'season': season.get('number')}}
             for season in response.get('seasons', []) for episode in season.get('episodes', [])
             if not episode.get('completed')
-            or (reset_at and convert_timestamp(episode.get('last_watched_at')) < reset_at)]
+            or (reset_at and convert_timestamp(episode.get('last_watched_at')) < reset_at))
+
+        # Only get next item in generator if getting a single episode to avoid unnecessarily checking all episodes
+        if not get_single_episode:
+            return items
+        try:
+            return next(items)
+        except StopIteration:
+            return
 
     @is_authorized
     def get_movie_playcount(self, unique_id, id_type):
@@ -456,7 +462,7 @@ class _TraktProgress():
             return False
         return True
 
-    def _get_stacked_item(self, next_item, last_item):
+    def _get_stacked_item(self, next_item, last_item, stack_info='episodes'):
         # If the next item is the same show then we stack the details onto the last item and add it next iteration
         ip = last_item['infoproperties']
 
@@ -474,7 +480,7 @@ class _TraktProgress():
             ip['stacked_first_season'] = last_item['infolabels']['season']
             ip['no_label_formatting'] = True
             last_item['params'].pop('episode', None)
-            last_item['params']['info'] = 'episodes'
+            last_item['params']['info'] = stack_info
             last_item['is_folder'] = True
 
         # Stacked Setup
@@ -491,7 +497,7 @@ class _TraktProgress():
         last_item['label'] = f'{ip["stacked_first"]}-{ip["stacked_last"]}. {ip["stacked_count"]} {get_localized(20360)}'
         return last_item
 
-    def _stack_calendar_episodes(self, episode_list, flipped=False):
+    def _stack_calendar_episodes(self, episode_list, flipped=False, stack_info='episodes'):
         items = []
         last_item = None
         for i in reversed(episode_list) if flipped else episode_list:
@@ -508,7 +514,7 @@ class _TraktProgress():
                 last_item = i
                 continue
 
-            last_item = self._get_stacked_item(i, last_item)
+            last_item = self._get_stacked_item(i, last_item, stack_info=stack_info)
 
         else:  # The last item in the list won't be added in the for loop so do an extra action at the end to add it
             if last_item:
@@ -529,7 +535,7 @@ class _TraktProgress():
         return items[::-1] if flipped else items
 
     @use_simple_cache(cache_days=0.25)
-    def _get_calendar_episodes_list(self, startdate=0, days=1, user=True, kodi_db=None, stack=True, endpoint=None):
+    def _get_calendar_episodes_list(self, startdate=0, days=1, user=True, kodi_db=None, stack=True, endpoint=None, stack_info='episodes'):
         # Get response
         response = self.get_calendar_episodes(startdate=startdate, days=days, user=user, endpoint=endpoint)
         if not response:
@@ -537,11 +543,15 @@ class _TraktProgress():
         # Reverse items for date ranges in past
         traktitems = reversed(response) if startdate < -1 else response
         items = [self._get_calendar_episode_item(i) for i in traktitems if self._get_calendar_episode_item_bool(i, kodi_db, user, startdate, days)]
-        return self._stack_calendar_episodes(items, flipped=startdate < -1) if stack else items
+        if not stack:
+            return items
+        return self._stack_calendar_episodes(items, flipped=startdate < -1, stack_info=stack_info)
 
     def get_calendar_episodes_list(self, startdate=0, days=1, user=True, kodi_db=None, page=1, limit=None, endpoint=None):
         limit = limit or self.item_limit
-        response_items = self._get_calendar_episodes_list(startdate, days, user, kodi_db, stack=get_setting('calendar_flatten'), endpoint=endpoint)
+        stack = get_setting('calendar_flatten')
+        stack_info = 'details' if kodi_db and get_setting('nextaired_linklibrary') else 'episodes'  # Fix for stacked episodes linking to library
+        response_items = self._get_calendar_episodes_list(startdate, days, user, kodi_db, stack=stack, endpoint=endpoint, stack_info=stack_info)
         response = PaginatedItems(response_items, page=page, limit=limit)
         if response and response.items:
             return response.items + response.next_page

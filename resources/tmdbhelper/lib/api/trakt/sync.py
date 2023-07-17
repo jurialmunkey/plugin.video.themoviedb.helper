@@ -1,6 +1,6 @@
 from tmdbhelper.lib.files.futils import json_loads as data_loads
 from tmdbhelper.lib.files.futils import json_dumps as data_dumps
-from tmdbhelper.lib.addon.window import get_property
+from jurialmunkey.window import get_property
 from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.tmdate import set_timestamp
 from tmdbhelper.lib.api.trakt.decorators import is_authorized, use_activity_cache
@@ -31,7 +31,7 @@ class _TraktSync():
 
     def sync_item(self, method, trakt_type, unique_id, id_type, season=None, episode=None):
         """
-        methods = history watchlist collection recommendations
+        methods = history watchlist collection favorites
         trakt_type = movie, show, season, episode
         """
         item = self.get_sync_item(trakt_type, unique_id, id_type, season, episode)
@@ -219,13 +219,13 @@ class _TraktSync():
     def get_sync_watchlist_episodes(self, trakt_type, id_type=None, extended=None):
         return self._get_sync('sync/watchlist/episodes', 'show', id_type=id_type, extended=extended)
 
-    @use_activity_cache('movies', 'recommendations_at', CACHE_LONG)
-    def get_sync_recommendations_movies(self, trakt_type, id_type=None, extended=None):
-        return self._get_sync('sync/recommendations/movies', 'movie', id_type=id_type, extended=extended)
+    @use_activity_cache('movies', 'favorited_at', CACHE_LONG)
+    def get_sync_favorites_movies(self, trakt_type, id_type=None, extended=None):
+        return self._get_sync('sync/favorites/movies', 'movie', id_type=id_type, extended=extended)
 
-    @use_activity_cache('shows', 'recommendations_at', CACHE_LONG)
-    def get_sync_recommendations_shows(self, trakt_type, id_type=None, extended=None):
-        return self._get_sync('sync/recommendations/shows', 'show', id_type=id_type, extended=extended)
+    @use_activity_cache('shows', 'favorited_at', CACHE_LONG)
+    def get_sync_favorites_shows(self, trakt_type, id_type=None, extended=None):
+        return self._get_sync('sync/favorites/shows', 'show', id_type=id_type, extended=extended)
 
     @use_activity_cache('movies', 'rated_at', CACHE_LONG)
     def get_sync_ratings_movies(self, trakt_type, id_type=None, extended=None):
@@ -265,9 +265,9 @@ class _TraktSync():
                 'season': self.get_sync_watchlist_seasons,
                 'episode': self.get_sync_watchlist_episodes,
             },
-            'recommendations': {
-                'movie': self.get_sync_recommendations_movies,
-                'show': self.get_sync_recommendations_shows,
+            'favorites': {
+                'movie': self.get_sync_favorites_movies,
+                'show': self.get_sync_favorites_shows,
             },
             'ratings': {
                 'movie': self.get_sync_ratings_movies,

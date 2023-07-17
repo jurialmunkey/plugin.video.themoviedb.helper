@@ -80,6 +80,7 @@ class AwardsBuilder():
             self._pd.update(f'Got TMDb ID for {tmdb_type} {v.get("name")}')
 
         _pool = []
+        _threads = 20
         for i_type in self.listings_tvdb:
             tmdb_type = {'movie': 'movie', 'series': 'tv'}[i_type]
             self._pd.update('Getting TMDb IDs', total=len(self.listings_tvdb[i_type]))
@@ -87,6 +88,9 @@ class AwardsBuilder():
                 t = Thread(target=_get_tmdb_id, args=[tvdb_id, v])
                 t.start()
                 _pool.append(t)
+                if len(_pool) >= _threads:
+                    for _ in range(_threads // 3):
+                        _pool.pop(0).join()
         for t in _pool:
             t.join()
 

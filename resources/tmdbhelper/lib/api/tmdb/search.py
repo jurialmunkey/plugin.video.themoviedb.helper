@@ -1,12 +1,12 @@
 from xbmcgui import Dialog, INPUT_ALPHANUM
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized
 from jurialmunkey.parser import merge_two_dicts
-from tmdbhelper.lib.files.bcache import set_search_history, get_search_history
+from tmdbhelper.lib.files.hcache import set_search_history, get_search_history
 from tmdbhelper.lib.items.container import Container
 from urllib.parse import urlencode
 
 
-MULTISEARCH_TYPES = ['movie', 'tv', 'person', 'collection', 'company', 'keyword']
+MULTISEARCH_TYPES = ['movie', 'tv', 'person', 'both', 'collection', 'company', 'keyword']
 
 
 def get_zippered_list(lists):
@@ -104,7 +104,7 @@ class ListSearch(Container):
             # Prevents onback from re-prompting for user input by re-writing path
 
         self.update_listing = True if update_listing else False
-        self.container_content = convert_type(tmdb_type, 'container')
+        self.container_content = convert_type(tmdb_type, 'container', items=items)
         self.kodi_db = self.get_kodi_database(tmdb_type)
         self.plugin_category = f'{get_localized(137)} - {query} ({tmdb_type})'
 

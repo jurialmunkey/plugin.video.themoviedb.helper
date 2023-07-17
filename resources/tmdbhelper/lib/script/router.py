@@ -2,7 +2,7 @@
 # Author: jurialmunkey
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 import re
-from tmdbhelper.lib.addon.window import get_property
+from jurialmunkey.window import get_property
 from jurialmunkey.parser import reconfigure_legacy_params
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.modimp import importmodule
@@ -35,9 +35,11 @@ class Script(object):
         'revoke_trakt':
             lambda **kwargs: importmodule('tmdbhelper.lib.api.trakt.api', 'TraktAPI')().logout(),
         'recache_kodidb':
-            lambda **kwargs: importmodule('tmdbhelper.lib.monitor.cronjob', 'mem_cache_kodidb')(),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method', 'mem_cache_kodidb')(),
         'build_awards':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.awards', 'build_awards')(**kwargs),
+        'make_node':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method', 'make_node')(**kwargs),
         'split_value':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method', 'split_value')(**kwargs),
         'kodi_setting':
@@ -87,7 +89,7 @@ class Script(object):
         'delete_cache':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method', 'delete_cache')(**kwargs),
         'wikipedia':
-            lambda **kwargs: importmodule('tmdbhelper.lib.api.wikipedia.api', 'do_wikipedia_gui')(**kwargs),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method', 'do_wikipedia_gui')(**kwargs),
         'recommendations':
             lambda **kwargs: importmodule('tmdbhelper.lib.window.recommendations', 'WindowRecommendationsManager')(**kwargs).router(),
         'play':
