@@ -25,7 +25,9 @@ class _LibraryLogger():
         self._log_item(key, tmdb_id, season=season, episode=episode, log_msg=log_msg, **kwargs)
         return log_msg
 
-    def _out(self):  # TODO: Check logging value
+    def _out(self):
+        if not self.logging:
+            return
         filename = f'{get_todays_date(str_fmt="%Y-%m-%d-%H%M%S")}.json'
         dumps_to_file(self.logging, self.log_folder, filename)
 
