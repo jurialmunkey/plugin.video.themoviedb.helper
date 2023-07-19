@@ -38,8 +38,13 @@ class ServiceMonitor(object):
         if self.player_monitor.isPlayingVideo():
             self.player_monitor.current_time = self.player_monitor.getTime()
         if get_condvisibility(
-                "Skin.HasSetting(TMDbHelper.UseLocalWidgetContainer) + "
-                "!String.IsEmpty(Window.Property(TMDbHelper.WidgetContainer))"):
+                "Skin.HasSetting(TMDbHelper.UseLocalWidgetContainer) + ["
+                "!String.IsEmpty(Window.Property(TMDbHelper.WidgetContainer)) | "
+                "Window.IsVisible(movieinformation) | "
+                "Window.IsVisible(musicinformation) | "
+                "Window.IsVisible(songinformation) | "
+                "Window.IsVisible(addoninformation) | "
+                "Window.IsVisible(pvrguideinfo)]"):
             return self._on_listitem()
         self.xbmc_monitor.waitForAbort(1)
 
