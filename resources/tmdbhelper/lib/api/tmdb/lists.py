@@ -91,6 +91,7 @@ class ListEpisodes(Container):
         self.ib.cache_only = self.tmdb_cache_only = False
         self.precache_parent(tmdb_id, season)
         items = self.tmdb_api.get_episode_list(tmdb_id, season, get_detailed=True)
+        items = list(items) if items else []
         self.kodi_db = self.get_kodi_database('tv')
         self.container_content = convert_type('episode', 'container')
         self.plugin_category = f'{get_localized(20373)} {season}'
@@ -125,6 +126,55 @@ class ListEpisodeGroupEpisodes(Container):
         return items
 
 
+class ListNextRecommendation(Container):
+    def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, **kwargs):
+        if tmdb_type not in ['movie', 'tv']:
+            return []
+
+        def _get_next_recommendation():
+            path = f'{tmdb_type}/{tmdb_id}/recommendations'
+            response = self.tmdb_api.get_basic_list(path, tmdb_type=tmdb_type, paginated=False)
+            try:
+                return response[0]
+            except IndexError:
+                return
+
+        def _get_next_collection():
+            path = f'movie/{tmdb_id}'
+            response = self.tmdb_api.get_request_sc(path)
+            try:
+                collection_id = response['belongs_to_collection']['id']
+                path = f'collection/{collection_id}'
+                response = self.tmdb_api.get_basic_list(path, tmdb_type='movie', key='parts', paginated=False)
+                for x, item in enumerate(response):
+                    if str(item['infoproperties']['tmdb_id']) == str(tmdb_id):
+                        return response[x + 1]
+            except (KeyError, IndexError, TypeError):
+                return _get_next_recommendation()
+
+        def _get_next_episode():
+            item = None
+            if season and episode:
+                item = self.tmdb_api.get_next_episode(tmdb_id, season, episode)
+            if not item:
+                item = _get_next_recommendation()
+                try:
+                    item = self.tmdb_api.get_next_episode(item['infoproperties']['tmdb_id'], 1, 0)
+                except KeyError:
+                    return
+            return item
+
+        next_item = _get_next_episode() if tmdb_type == 'tv' else _get_next_collection()
+
+        if not next_item:
+            return []
+
+        self.kodi_db = self.get_kodi_database(tmdb_type)
+        self.library = convert_type(tmdb_type, 'library')
+        self.container_content = 'episodes' if tmdb_type == 'tv' else 'movies'
+        return [next_item]
+
+
 class ListAll(Container):
     def get_items(self, tmdb_type, page=None, **kwargs):
         items = self.tmdb_api.get_all_items_list(tmdb_type, page=page)
@@ -154,6 +204,7 @@ class ListCrew(Container):
 class ListFlatSeasons(Container):
     def get_items(self, tmdb_id, **kwargs):
         items = self.tmdb_api.get_flatseasons_list(tmdb_id)
+        items = list(items) if items else []
         self.tmdb_cache_only = False
         self.kodi_db = self.get_kodi_database('tv')
         self.container_content = convert_type('episode', 'container')

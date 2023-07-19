@@ -247,9 +247,9 @@ class TMDb(RequestAPI):
         request = self.get_request_sc(f'tv/{tmdb_id}')
         if not request or not request.get('seasons'):
             return []
-        return [
+        return (
             j for i in request['seasons'] for j in self.get_episode_list(tmdb_id, i['season_number'])
-            if i.get('season_number')]
+            if i.get('season_number'))
 
     def get_episode_group_episodes_list(self, tmdb_id, group_id, position):
         request = self.get_request_sc(f'tv/episode_group/{group_id}')
@@ -289,6 +289,26 @@ class TMDb(RequestAPI):
                 tmdb_id=tmdb_id, episode_group=True)
             for i in request.get('results', [])]
         return items
+
+    def get_next_episode(self, tmdb_id, season, episode):
+        snum, enum = try_int(season), try_int(episode)
+
+        if snum < 1 or enum < 0:
+            return
+
+        all_episodes = self.get_flatseasons_list(tmdb_id)
+        if not all_episodes:
+            return
+
+        for i in all_episodes:
+            i_snum = try_int(i['infolabels'].get('season', -1))
+            if i_snum > snum:
+                return i
+            if i_snum < snum:
+                continue
+            i_enum = try_int(i['infolabels'].get('episode', -1))
+            if i_enum > enum:
+                return i
 
     def _get_videos(self, tmdb_id, tmdb_type, season=None, episode=None):
         path = f'{tmdb_type}/{tmdb_id}'
@@ -388,11 +408,11 @@ class TMDb(RequestAPI):
         request = self.get_details_request('tv', tmdb_id, season) if get_detailed else self.get_request_sc(f'tv/{tmdb_id}/season/{season}')
         if not request:
             return []
-        items = [
+        items = (
             self._clean_merged(
                 item=self.mapper.get_info(i, 'episode', None, definition=TMDB_PARAMS_EPISODES, tmdb_id=tmdb_id),
                 tmdb_id=tmdb_id)
-            for i in request.get('episodes', [])]
+            for i in request.get('episodes', []))
         return items
 
     def get_cast_list(self, tmdb_id, tmdb_type, season=None, episode=None, keys=['cast', 'guest_stars'], aggregate=False):

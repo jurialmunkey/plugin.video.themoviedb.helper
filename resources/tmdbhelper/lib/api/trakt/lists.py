@@ -246,6 +246,7 @@ class ListUpNext(Container):
         items = self.trakt_api.get_upnext_list(unique_id=tmdb_id, id_type='tmdb', page=page)
         if not items:
             items = self.tmdb_api.get_episode_list(tmdb_id, 1, get_detailed=True)
+            items = list(items) if items else []
         self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = 'video'
         self.container_content = 'episodes'

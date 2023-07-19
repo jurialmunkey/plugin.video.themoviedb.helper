@@ -844,6 +844,9 @@ ROUTE_TMDBID = {
     'episode_group_episodes': {'route': {
         'module_name': 'tmdbhelper.lib.api.tmdb.lists',
         'import_attr': 'ListEpisodeGroupEpisodes'}},
+    'next_recommendation': {'route': {
+        'module_name': 'tmdbhelper.lib.api.tmdb.lists',
+        'import_attr': 'ListNextRecommendation'}},
     'trakt_upnext': {'route': {
         'module_name': 'tmdbhelper.lib.api.trakt.lists',
         'import_attr': 'ListUpNext'}},
