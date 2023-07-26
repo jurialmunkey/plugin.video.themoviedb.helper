@@ -22,7 +22,7 @@ get_directory = jurialmunkey_jsnrpc.get_directory
 
 
 def get_jsonrpc(method=None, params=None, query_id=1):
-    return jurialmunkey_jsnrpc.get_jsonrpc(method, params, query_id, kodi_log)
+    return jurialmunkey_jsnrpc.get_jsonrpc(method, params, query_id)
 
 
 def get_kodi_library(tmdb_type, tvshowid=None, cache_refresh=False):
