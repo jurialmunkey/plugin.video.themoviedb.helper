@@ -1,7 +1,7 @@
 from jurialmunkey.parser import try_int
 
 """ Lazyimports """
-from tmdbhelper.lib.addon.modimp import lazyimport
+from jurialmunkey.modimp import lazyimport
 set_playprogress = None
 
 

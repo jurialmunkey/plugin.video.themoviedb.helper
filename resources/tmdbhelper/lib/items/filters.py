@@ -1,5 +1,5 @@
 import operator
-from tmdbhelper.lib.addon.modimp import importmodule
+from jurialmunkey.modimp import importmodule
 from jurialmunkey.parser import split_items
 
 

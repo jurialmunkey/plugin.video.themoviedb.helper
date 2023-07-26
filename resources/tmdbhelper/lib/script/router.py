@@ -5,7 +5,7 @@ import re
 from jurialmunkey.window import get_property
 from jurialmunkey.parser import reconfigure_legacy_params
 from tmdbhelper.lib.addon.logger import kodi_log
-from tmdbhelper.lib.addon.modimp import importmodule
+from jurialmunkey.modimp import importmodule
 
 
 REGEX_WINPROP_FINDALL = r'\$WINPROP\[(.*?)\]'  # $WINPROP[key] = Window(10000).getProperty(TMDbHelper.WinProp.{key})

@@ -1,4 +1,4 @@
-from tmdbhelper.lib.addon.modimp import importmodule
+from jurialmunkey.modimp import importmodule
 from tmdbhelper.lib.addon.consts import (
     ROUTE_NOID,
     TMDB_BASIC_LISTS,
