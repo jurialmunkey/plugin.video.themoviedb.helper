@@ -1,9 +1,10 @@
-from xbmc import Monitor, executeJSONRPC
+from xbmc import Monitor
 from tmdbhelper.lib.addon.logger import kodi_log
 from jurialmunkey.parser import try_int, find_dict_in_list
 from tmdbhelper.lib.api.kodi.mapping import ItemMapper
 from tmdbhelper.lib.files.mcache import MemoryCache
 from tmdbhelper.lib.addon.thread import use_thread_lock
+import jurialmunkey.jsnrpc as jurialmunkey_jsnrpc
 
 """ Lazyimports
 from json import dumps, loads
@@ -12,23 +13,16 @@ from xbmcvfs import Stat
 """
 
 
+get_library = jurialmunkey_jsnrpc.get_library
+get_num_credits = jurialmunkey_jsnrpc.get_num_credits
+set_tags = jurialmunkey_jsnrpc.set_tags
+set_watched = jurialmunkey_jsnrpc.set_watched
+set_playprogress = jurialmunkey_jsnrpc.set_playprogress
+get_directory = jurialmunkey_jsnrpc.get_directory
+
+
 def get_jsonrpc(method=None, params=None, query_id=1):
-    if not method:
-        return {}
-    query = {
-        "jsonrpc": "2.0",
-        "method": method,
-        "id": query_id}
-    if params:
-        query["params"] = params
-    try:
-        from json import dumps, loads
-        jrpc = executeJSONRPC(dumps(query))
-        response = loads(jrpc)
-    except Exception as exc:
-        kodi_log(f'TMDbHelper - JSONRPC Error:\n{exc}', 1)
-        response = {}
-    return response
+    return jurialmunkey_jsnrpc.get_jsonrpc(method, params, query_id, kodi_log)
 
 
 def get_kodi_library(tmdb_type, tvshowid=None, cache_refresh=False):
@@ -40,51 +34,6 @@ def get_kodi_library(tmdb_type, tvshowid=None, cache_refresh=False):
         return KodiLibrary(dbtype=tmdb_type, tvshowid=tvshowid, cache_refresh=cache_refresh)
     if tmdb_type == 'both':
         return KodiLibrary(dbtype='both', cache_refresh=cache_refresh)
-
-
-def get_library(dbtype=None, properties=None, filterr=None):
-    if dbtype == "movie":
-        method = "VideoLibrary.GetMovies"
-    elif dbtype == "tvshow":
-        method = "VideoLibrary.GetTVShows"
-    elif dbtype == "episode":
-        method = "VideoLibrary.GetEpisodes"
-    else:
-        return
-
-    params = {"properties": properties or ["title"]}
-    if filterr:
-        params['filter'] = filterr
-
-    response = get_jsonrpc(method, params)
-    return response.get('result')
-
-
-def get_num_credits(dbtype, person):
-    if dbtype == 'movie':
-        filterr = {
-            "or": [
-                {"field": "actor", "operator": "contains", "value": person},
-                {"field": "director", "operator": "contains", "value": person},
-                {"field": "writers", "operator": "contains", "value": person}]}
-    elif dbtype == 'tvshow':
-        filterr = {
-            "or": [
-                {"field": "actor", "operator": "contains", "value": person},
-                {"field": "director", "operator": "contains", "value": person}]}
-    elif dbtype == 'episode':
-        filterr = {
-            "or": [
-                {"field": "actor", "operator": "contains", "value": person},
-                {"field": "director", "operator": "contains", "value": person},
-                {"field": "writers", "operator": "contains", "value": person}]}
-    else:
-        return
-    response = get_library(dbtype, filterr=filterr)
-    try:
-        return response['limits']['total']
-    except (AttributeError, KeyError):
-        return 0
 
 
 def get_person_stats(person):
@@ -99,67 +48,7 @@ def get_person_stats(person):
     return infoproperties
 
 
-def set_tags(dbid=None, dbtype=None, tags=None):
-    if not dbid or not dbtype or not tags:
-        return
-    db_key = f'{dbtype}id'
-    json_info = get_jsonrpc(
-        method=f'VideoLibrary.Get{dbtype.capitalize()}Details',
-        params={db_key: dbid, "properties": ["tag"]})
-    try:
-        db_tags = json_info['result'][f'{dbtype}details']['tag']
-    except (AttributeError, KeyError):
-        db_tags = []
-
-    for tag in tags:
-        if tag in db_tags:
-            continue
-        db_tags.append(tag)
-
-    return get_jsonrpc(
-        method=f'VideoLibrary.Set{dbtype.capitalize()}Details',
-        params={db_key: dbid, "tag": db_tags})
-
-
-def set_watched(dbid=None, dbtype=None, plays=1):
-    if not dbid or not dbtype:
-        return
-    db_key = f'{dbtype}id'
-    json_info = get_jsonrpc(
-        method=f'VideoLibrary.Get{dbtype.capitalize()}Details',
-        params={db_key: dbid, "properties": ["playcount"]})
-    try:
-        playcount = json_info['result'][f'{dbtype}details']['playcount']
-    except (AttributeError, KeyError):
-        playcount = 0
-    playcount = try_int(playcount) + plays
-    return get_jsonrpc(
-        method=f'VideoLibrary.Set{dbtype.capitalize()}Details',
-        params={db_key: dbid, "playcount": playcount})
-
-
-def set_playprogress(filename, position, total):
-    method = "Files.SetFileDetails"
-    params = {"file": filename, "media": "video", "resume": {"position": position, "total": total}}
-    return get_jsonrpc(method=method, params=params)
-
-
-def get_directory(url):
-    method = "Files.GetDirectory"
-    params = {
-        "directory": url,
-        "media": "files",
-        "properties": [
-            "title", "year", "originaltitle", "imdbnumber", "premiered", "streamdetails", "size",
-            "firstaired", "season", "episode", "showtitle", "file", "tvshowid", "thumbnail"]}
-    response = get_jsonrpc(method, params)
-    try:
-        return response['result']['files'] or [{}]
-    except KeyError:
-        return [{}]
-
-
-def _get_item_details(dbid=None, method=None, key=None, properties=None):
+def get_item_details(dbid=None, method=None, key=None, properties=None):
     if not dbid or not method or not key or not properties:
         return {}
     params = {
@@ -180,7 +69,7 @@ def get_movie_details(dbid=None):
         "lastplayed", "playcount", "writer", "studio", "mpaa", "cast", "country", "imdbnumber", "runtime", "set",
         "showlink", "streamdetails", "top250", "votes", "fanart", "thumbnail", "file", "sorttitle", "resume", "setid",
         "dateadded", "tag", "art", "userrating", "ratings", "premiered", "uniqueid"]
-    return _get_item_details(dbid=dbid, method="VideoLibrary.GetMovieDetails", key="movie", properties=properties)
+    return get_item_details(dbid=dbid, method="VideoLibrary.GetMovieDetails", key="movie", properties=properties)
 
 
 def get_tvshow_details(dbid=None):
@@ -188,14 +77,14 @@ def get_tvshow_details(dbid=None):
         "title", "genre", "year", "rating", "plot", "studio", "mpaa", "cast", "playcount", "episode", "imdbnumber",
         "premiered", "votes", "lastplayed", "fanart", "thumbnail", "file", "originaltitle", "sorttitle", "episodeguide",
         "season", "watchedepisodes", "dateadded", "tag", "art", "userrating", "ratings", "runtime", "uniqueid"]
-    return _get_item_details(dbid=dbid, method="VideoLibrary.GetTVShowDetails", key="tvshow", properties=properties)
+    return get_item_details(dbid=dbid, method="VideoLibrary.GetTVShowDetails", key="tvshow", properties=properties)
 
 
 def get_season_details(dbid=None):
     properties = [
         "season", "showtitle", "playcount", "episode", "fanart", "thumbnail", "tvshowid", "watchedepisodes",
         "art", "userrating", "title"]
-    return _get_item_details(dbid=dbid, method="VideoLibrary.GetSeasonDetails", key="season", properties=properties)
+    return get_item_details(dbid=dbid, method="VideoLibrary.GetSeasonDetails", key="season", properties=properties)
 
 
 def get_episode_details(dbid=None):
@@ -204,7 +93,7 @@ def get_episode_details(dbid=None):
         "season", "episode", "originaltitle", "showtitle", "cast", "streamdetails", "lastplayed", "fanart", "thumbnail",
         "file", "resume", "tvshowid", "dateadded", "uniqueid", "art", "specialsortseason", "specialsortepisode", "userrating",
         "seasonid", "ratings"]
-    return _get_item_details(dbid=dbid, method="VideoLibrary.GetEpisodeDetails", key="episode", properties=properties)
+    return get_item_details(dbid=dbid, method="VideoLibrary.GetEpisodeDetails", key="episode", properties=properties)
 
 
 THREAD_LOCK = 'TMDbHelper.KodiLibrary.ThreadLock'
