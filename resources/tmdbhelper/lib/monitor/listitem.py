@@ -388,7 +388,10 @@ class ListItemMonitor(CommonMonitorFunctions):
 
     def on_exit(self, keep_tv_artwork=False, is_done=True):
         if self._listcontainer:
-            return self.add_item_listcontainer(ListItem().get_listitem())
+            self.add_item_listcontainer(ListItem().get_listitem())
+            self.clear_properties()
+            self.blur_fallback()
+            return
         try:
             ignore_keys = SETMAIN_ARTWORK if keep_tv_artwork and self._item._dbtype in ['episodes', 'seasons'] else None
         except AttributeError:
