@@ -683,7 +683,7 @@
                         <data>RunScript(plugin.video.themoviedb.helper,provider_allowlist)</data>
                     </control>
                 </setting>
-                <setting id="rebuild_listitem_offscreen" type="boolean" label="32478" help="32479">
+                <setting id="service_container_content_fallback" type="boolean" label="32497" help="32498">
                     <level>0</level>
                     <default>False</default>
                     <control type="toggle"/>
@@ -853,6 +853,11 @@
                         <allowempty>true</allowempty>
                     </constraints>
                     <control type="button" format="action"/>
+                </setting>
+                <setting id="rebuild_listitem_offscreen" type="boolean" label="32478" help="32479">
+                    <level>0</level>
+                    <default>False</default>
+                    <control type="toggle"/>
                 </setting>
             </group>
             <group id="4" label="14260">

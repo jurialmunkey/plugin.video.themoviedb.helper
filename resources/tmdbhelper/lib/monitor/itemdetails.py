@@ -1,4 +1,4 @@
-from tmdbhelper.lib.addon.plugin import get_condvisibility, get_infolabel, convert_media_type, convert_type
+from tmdbhelper.lib.addon.plugin import get_condvisibility, get_infolabel, convert_media_type, convert_type, get_setting
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_region_date
 from jurialmunkey.window import get_property
 from tmdbhelper.lib.monitor.images import ImageFunctions
@@ -62,8 +62,8 @@ class ListItemDetails():
                     return 'multi'
                 if self.get_infolabel('Path') == 'pvr://channels/tv/':
                     return 'multi'
-            if self._parent._container == 'Container.':
-                return get_infolabel('Container.Content()') or ''
+            if self._parent._container == 'Container.' and get_setting('service_container_content_fallback'):
+                return get_infolabel('Container.Content') or ''
             return ''
 
         dbtype = self.get_infolabel('dbtype')
