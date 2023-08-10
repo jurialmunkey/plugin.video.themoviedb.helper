@@ -587,11 +587,6 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="trakt_expandedlimit" type="boolean" label="32403" help="">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                </setting>
                 <setting id="trakt_cacheownlists" type="boolean" label="32463" help="">
                     <level>0</level>
                     <default>true</default>
@@ -702,7 +697,45 @@
                     <control type="button" format="action"/>
                 </setting>
             </group>
-            <group id="2" label="10106">
+            <group id="2" label="32499">
+                <setting id="pagemulti_tmdb" type="integer" label="32500" help="">
+                    <level>0</level>
+                    <default>1</default>
+                    <constraints>
+                        <minimum>1</minimum>
+                        <step>1</step>
+                        <maximum>3</maximum>
+                    </constraints>
+                    <control type="slider" format="integer">
+                        <popup>false</popup>
+                    </control>
+                </setting>
+                <setting id="pagemulti_trakt" type="integer" label="32501" help="">
+                    <level>0</level>
+                    <default>1</default>
+                    <constraints>
+                        <minimum>1</minimum>
+                        <step>1</step>
+                        <maximum>3</maximum>
+                    </constraints>
+                    <control type="slider" format="integer">
+                        <popup>false</popup>
+                    </control>
+                </setting>
+                <setting id="pagemulti_sync" type="integer" label="32502" help="">
+                    <level>0</level>
+                    <default>1</default>
+                    <constraints>
+                        <minimum>1</minimum>
+                        <step>1</step>
+                        <maximum>4</maximum>
+                    </constraints>
+                    <control type="slider" format="integer">
+                        <popup>false</popup>
+                    </control>
+                </setting>
+            </group>
+            <group id="3" label="10106">
                 <setting id="contextmenu_related_lists" type="boolean" label="32235" help="">
                     <level>0</level>
                     <default>true</default>
@@ -729,7 +762,7 @@
                     <control type="toggle"/>
                 </setting>
             </group>
-            <group id="3" label="25000">
+            <group id="4" label="25000">
                 <setting id="startup_notifications" type="boolean" label="32468" help="">
                     <level>0</level>
                     <default>True</default>

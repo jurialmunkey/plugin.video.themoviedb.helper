@@ -49,6 +49,7 @@ class TMDb(RequestAPI):
         self.req_strip += [(self.append_to_response, ''), (self.req_language, f'{self.iso_language}{"_en" if ARTLANG_FALLBACK else ""}')]
         self.genres = self.get_genres()
         self.mapper = ItemMapper(self.language, self.mpaa_prefix, self.genres)
+        self.page_length = get_setting('pagemulti_tmdb', 'int')
         TMDb.api_key = api_key
 
     def get_genres(self):
@@ -548,6 +549,8 @@ class TMDb(RequestAPI):
     def get_basic_list(
             self, path, tmdb_type, key='results', params=None, base_tmdb_type=None, limit=None, filters={},
             sort_key=None, stacked=None, paginated=True, length=None, **kwargs):
+
+        length = length or self.page_length
 
         def _get_page(page):
             kwargs['page'] = page

@@ -151,11 +151,12 @@ class _TraktLists():
         return TraktItems(response.json(), headers=response.headers, trakt_type=trakt_type).configure_items()
 
     @is_authorized
-    def get_mixed_list(self, path, trakt_types: list, limit: int = 20, extended: str = None, authorize=False):
+    def get_mixed_list(self, path, trakt_types: list, limit: int = None, extended: str = None, authorize=False):
         """ Returns a randomised simple list which combines movies and shows
         path uses {trakt_type} as format substitution for trakt_type in trakt_types
         """
         items = []
+        limit = limit or self.item_limit
         for trakt_type in trakt_types:
             response = self.get_simple_list(
                 path.format(trakt_type=trakt_type), extended=extended, page=1, limit=limit * 2, trakt_type=trakt_type) or {}
@@ -164,8 +165,9 @@ class _TraktLists():
             return random.sample(items, limit)
 
     @is_authorized
-    def get_basic_list(self, path, trakt_type, page: int = 1, limit: int = 20, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, randomise=False, always_refresh=True):
+    def get_basic_list(self, path, trakt_type, page: int = 1, limit: int = None, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, randomise=False, always_refresh=True):
         cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
+        limit = limit or self.item_limit
         if randomise:
             response = self.get_simple_list(
                 path, extended=extended, page=1, limit=limit * 2, trakt_type=trakt_type)
@@ -181,8 +183,9 @@ class _TraktLists():
             return response['items'] + get_next_page(response['headers'])
 
     @is_authorized
-    def get_stacked_list(self, path, trakt_type, page: int = 1, limit: int = 20, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, always_refresh=True, **kwargs):
+    def get_stacked_list(self, path, trakt_type, page: int = 1, limit: int = None, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, always_refresh=True, **kwargs):
         """ Get Basic list but stack repeat TV Shows """
+        limit = limit or self.item_limit
         cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
         response = self.get_simple_list(path, extended=extended, limit=4095, trakt_type=trakt_type, cache_refresh=cache_refresh)
         response['items'] = self._stack_calendar_tvshows(response['items'])
@@ -191,7 +194,8 @@ class _TraktLists():
             return response['items'] + get_next_page(response['headers'])
 
     @is_authorized
-    def get_custom_list(self, list_slug, user_slug=None, page: int = 1, limit: int = 20, params=None, authorize=False, sort_by=None, sort_how=None, extended=None, owner=False, always_refresh=True):
+    def get_custom_list(self, list_slug, user_slug=None, page: int = 1, limit: int = None, params=None, authorize=False, sort_by=None, sort_how=None, extended=None, owner=False, always_refresh=True):
+        limit = limit or self.item_limit
         if user_slug == 'official':
             path = f'lists/{list_slug}/items'
         else:
@@ -218,7 +222,7 @@ class _TraktLists():
         return func(sort_by, sort_how, filters=filters)
 
     def get_sync_list(self, sync_type, trakt_type, page: int = 1, limit: int = None, params=None, sort_by=None, sort_how=None, next_page=True, always_refresh=True, extended=None, filters=None):
-        limit = limit or self.item_limit
+        limit = limit or self.sync_item_limit
         cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
         response = self._get_sync_list(sync_type, trakt_type, sort_by=sort_by, sort_how=sort_how, decorator_cache_refresh=cache_refresh, extended=extended, filters=filters)
         if not response:
@@ -343,7 +347,8 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         self.last_activities = {}
         self.sync_activities = {}
         self.sync = {}
-        self.item_limit = 83 if get_setting('trakt_expandedlimit') else 20  # 84 (83+NextPage) has common factors 4,6,7,8 suitable for wall views
+        self.sync_item_limit = 20 * get_setting('pagemulti_sync', 'int')
+        self.item_limit = 20 * get_setting('pagemulti_trakt', 'int')
         self.login() if force else self.authorize()
 
     def authorize(self, login=False):

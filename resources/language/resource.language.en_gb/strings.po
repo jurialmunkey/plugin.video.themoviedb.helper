@@ -2536,6 +2536,26 @@ msgctxt "#32498"
 msgid "Some plugins have poor metadata and fail to fill the item mediatype which results in the service monitor not completing an item lookup. This setting allows the service monitor to use the container content type when item mediatype is missing. Note this setting will likely result more frequent incorrect matches due to the end plugin having bad metadata."
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32499"
+msgid "Page multipliers (higher is slower)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32500"
+msgid "Page multiplier (TMDb basic lists)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32501"
+msgid "Page multiplier (Trakt basic lists)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32502"
+msgid "Page multiplier (Trakt sync lists)"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

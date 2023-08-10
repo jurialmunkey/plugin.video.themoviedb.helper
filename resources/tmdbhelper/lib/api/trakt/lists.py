@@ -4,7 +4,7 @@ from tmdbhelper.lib.items.container import Container
 
 
 class ListBasic(Container):
-    def get_items(self, info, tmdb_type, page=None, randomise=False, **kwargs):
+    def get_items(self, info, tmdb_type, page=None, randomise=False, limit=None, **kwargs):
         from tmdbhelper.lib.addon.consts import TRAKT_BASIC_LISTS
 
         def _get_items_both():
@@ -31,6 +31,7 @@ class ListBasic(Container):
             trakt_type=trakt_type,
             params=info_model.get('params'),
             page=page,
+            limit=limit,
             authorize=info_model.get('authorize', False),
             sort_by=info_model.get('sort_by', None),
             sort_how=info_model.get('sort_how', None),

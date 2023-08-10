@@ -15,7 +15,7 @@ from jurialmunkey.window import get_property
 class _TraktProgress():
     @is_authorized
     def get_ondeck_list(self, page=1, limit=None, sort_by=None, sort_how=None, trakt_type=None):
-        limit = limit or self.item_limit
+        limit = limit or self.sync_item_limit
         get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
         response = self._get_inprogress_items('show' if trakt_type == 'episode' else trakt_type)
         response = TraktItems(response, trakt_type=trakt_type).build_items(
@@ -25,7 +25,7 @@ class _TraktProgress():
 
     @is_authorized
     def get_towatch_list(self, trakt_type, page=1, limit=None):
-        limit = limit or self.item_limit
+        limit = limit or self.sync_item_limit
         get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
         items_ip = self._get_inprogress_shows() if trakt_type == 'show' else self._get_inprogress_items('movie')
         items_wl = self.get_sync('watchlist', trakt_type)
@@ -40,7 +40,7 @@ class _TraktProgress():
 
     @is_authorized
     def get_inprogress_shows_list(self, page=1, limit=None, params=None, next_page=True, sort_by=None, sort_how=None):
-        limit = limit or self.item_limit
+        limit = limit or self.sync_item_limit
         get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
         response = self._get_upnext_episodes_list(sort_by='released') if sort_by == 'year' else self._get_inprogress_shows()
         response = TraktItems(response, trakt_type='show').build_items(
@@ -179,7 +179,7 @@ class _TraktProgress():
     @is_authorized
     def get_upnext_list(self, unique_id, id_type=None, page=1, limit=None):
         """ Gets the next episodes for a show that user should watch next """
-        limit = limit or self.item_limit
+        limit = limit or self.sync_item_limit
         if id_type != 'slug':
             unique_id = self.get_id(unique_id, id_type, 'show', output_type='slug')
         if unique_id:
@@ -192,7 +192,7 @@ class _TraktProgress():
     @is_authorized
     def get_upnext_episodes_list(self, page=1, sort_by=None, sort_how='desc', limit=None):
         """ Gets a list of episodes for in-progress shows that user should watch next """
-        limit = limit or self.item_limit
+        limit = limit or self.sync_item_limit
         get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
         response = self._get_upnext_episodes_list(sort_by=sort_by, sort_how=sort_how)
         response = TraktItems(response, trakt_type='episode').configure_items()
@@ -548,7 +548,7 @@ class _TraktProgress():
         return self._stack_calendar_episodes(items, flipped=startdate < -1, stack_info=stack_info)
 
     def get_calendar_episodes_list(self, startdate=0, days=1, user=True, kodi_db=None, page=1, limit=None, endpoint=None):
-        limit = limit or self.item_limit
+        limit = limit or self.sync_item_limit
         stack = get_setting('calendar_flatten')
         stack_info = 'details' if kodi_db and get_setting('nextaired_linklibrary') else 'episodes'  # Fix for stacked episodes linking to library
         response_items = self._get_calendar_episodes_list(startdate, days, user, kodi_db, stack=stack, endpoint=endpoint, stack_info=stack_info)
