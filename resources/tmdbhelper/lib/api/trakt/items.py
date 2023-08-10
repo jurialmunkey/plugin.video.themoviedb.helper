@@ -191,6 +191,11 @@ class TraktItems():
                 continue
             if filters and is_excluded(item, **filters):
                 continue
+            # Check we haven't already added that item
+            if item['unique_ids']['tmdb'] in self.configured.get(f'{i_type}_ids', []):
+                continue
+            # Add item ID to checklist to avoid duplicates
+            self.configured.setdefault(f'{i_type}_ids', []).append(item['unique_ids']['tmdb'])
             # Also add item to a list only containing that item type
             # Useful if we need to only get one type of item from a mixed list (e.g. only "movies")
             self.configured.setdefault(f'{i_type}s', []).append(item)
