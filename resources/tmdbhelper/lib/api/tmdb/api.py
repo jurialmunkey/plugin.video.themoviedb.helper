@@ -533,32 +533,44 @@ class TMDb(RequestAPI):
 
     def get_basic_list(
             self, path, tmdb_type, key='results', params=None, base_tmdb_type=None, limit=None, filters={},
-            sort_key=None, stacked=None, paginated=True, **kwargs):
+            sort_key=None, stacked=None, paginated=True, length=None, **kwargs):
 
-        if kwargs.get('page') == 'random':
+        def _get_page(page):
+            kwargs['page'] = page
+            return self.get_request_sc(path, **kwargs)
+
+        def _get_random():
             import random
 
-            def _get_random_page(page_end):
-                kwargs['page'] = random.randint(1, page_end)
-                return self.get_request_sc(path, **kwargs)
-
             page_end = int(kwargs.pop('random_page_limit', 10))
-            response = _get_random_page(page_end)
+            response = _get_page(random.randint(1, page_end))
 
-            if response and not response.get(key) and int(response.get('total_pages') or 1) < page_end:
-                response = _get_random_page(int(response['total_pages'] or 1))
+            if not response:
+                return
+            if response.get(key):
+                return response
+            if int(response.get('total_pages') or 1) < page_end:
+                return _get_page(random.randint(1, int(response['total_pages'] or 1)))
 
-        else:
-            response = self.get_request_sc(path, **kwargs)
+        def _get_results(response):
+            try:
+                return response[key] or []
+            except (KeyError, TypeError):
+                return []
 
-        if not response:
-            return []
+        def _get_response(page, length):
+            if page == 'random':
+                response = _get_random()
+                results = _get_results(response)
+                return response, results
+            results = []
+            page = try_int(page, fallback=1)
+            for x in range(try_int(length, fallback=1)):
+                response = _get_page(page + x)
+                results += _get_results(response)
+            return response, results
 
-        try:
-            results = response[key] or []
-        except (KeyError, TypeError):
-            return []
-
+        response, results = _get_response(kwargs.get('page'), length=length)
         results = sorted(results, key=lambda i: i.get(sort_key, 0), reverse=True) if sort_key else results
 
         add_infoproperties = [('total_pages', response.get('total_pages')), ('total_results', response.get('total_results'))]
@@ -566,7 +578,12 @@ class TMDb(RequestAPI):
         item_tmdb_type = None if tmdb_type == 'both' else tmdb_type
 
         items = [
-            self.mapper.get_info(i, item_tmdb_type or i.get('media_type', ''), definition=params, base_tmdb_type=base_tmdb_type, iso_country=self.iso_country, add_infoproperties=add_infoproperties)
+            self.mapper.get_info(
+                i, item_tmdb_type or i.get('media_type', ''),
+                definition=params,
+                base_tmdb_type=base_tmdb_type,
+                iso_country=self.iso_country,
+                add_infoproperties=add_infoproperties)
             for i in results if i]
 
         if filters:
