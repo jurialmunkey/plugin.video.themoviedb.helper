@@ -278,7 +278,7 @@ class _TraktSync():
         }
 
         func = routes[sync_type][trakt_type]
-
+        fallback = {} if id_type else []  # ID Type lookup via dict whilst raw response is list
         sync_name = f'{sync_type}.{trakt_type}.{id_type}.{extended}'
         self.sync[sync_name] = self.sync.get(sync_name) or func(trakt_type, id_type, extended)
-        return self.sync[sync_name] or {}
+        return self.sync[sync_name] or fallback
