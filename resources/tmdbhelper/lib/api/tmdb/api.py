@@ -76,6 +76,16 @@ class TMDb(RequestAPI):
         else:
             return False
 
+    @staticmethod
+    def get_paginated_items(items, limit=None, page=1, total_pages=None):
+        if total_pages and try_int(page) < try_int(total_pages):
+            items.append({'next_page': try_int(page) + 1})
+            return items
+        if limit is not None:
+            paginated_items = PaginatedItems(items, page=page, limit=limit)
+            return paginated_items.items + paginated_items.next_page
+        return items
+
     def _get_tmdb_multisearch_validfy(self, query=None, validfy=True, scrub=True):
         if not validfy or not query:
             return query
@@ -415,7 +425,7 @@ class TMDb(RequestAPI):
             for i in request.get('episodes', []))
         return items
 
-    def get_cast_list(self, tmdb_id, tmdb_type, season=None, episode=None, keys=['cast', 'guest_stars'], aggregate=False):
+    def get_cast_list(self, tmdb_id, tmdb_type, season=None, episode=None, keys=['cast', 'guest_stars'], aggregate=False, paginated=True, limit=None, page=None, **kwargs):
         """ Get cast list
         endpoint switch to aggregate_credits for full tv series cast
         """
@@ -462,7 +472,11 @@ class TMDb(RequestAPI):
                     p[k] = f'{p[k]} / {v}'
         for i in items:
             i['label2'] = i['infoproperties'].get('role')
-        return items
+
+        if not paginated:
+            return items
+
+        return self.get_paginated_items(items, limit, page)
 
     def _get_downloaded_list(self, export_list, sorting=None, reverse=False, datestamp=None):
         from tmdbhelper.lib.files.downloader import Downloader
@@ -609,13 +623,7 @@ class TMDb(RequestAPI):
         if not paginated:
             return items
 
-        if try_int(response.get('page', 0)) < try_int(response.get('total_pages', 0)):
-            items.append({'next_page': try_int(response.get('page', 0)) + 1})
-        elif limit is not None:
-            paginated_items = PaginatedItems(items, page=kwargs.get('page', 1), limit=limit)
-            return paginated_items.items + paginated_items.next_page
-
-        return items
+        return self.get_paginated_items(items, limit, kwargs['page'], response.get('total_pages'))
 
     def get_discover_list(self, tmdb_type, **kwargs):
         # TODO: Check what regions etc we need to have

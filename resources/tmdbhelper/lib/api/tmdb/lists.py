@@ -188,7 +188,7 @@ class ListAll(Container):
 
 class ListCast(Container):
     def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, aggregate=False, **kwargs):
-        items = self.tmdb_api.get_cast_list(tmdb_id, tmdb_type, season=season, episode=episode, aggregate=aggregate)
+        items = self.tmdb_api.get_cast_list(tmdb_id, tmdb_type, season=season, episode=episode, aggregate=aggregate, **kwargs)
         self.tmdb_cache_only = True
         self.container_content = convert_type('person', 'container')
         return items
@@ -196,7 +196,7 @@ class ListCast(Container):
 
 class ListCrew(Container):
     def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, aggregate=False, **kwargs):
-        items = self.tmdb_api.get_cast_list(tmdb_id, tmdb_type, season=season, episode=episode, keys=['crew'], aggregate=aggregate)
+        items = self.tmdb_api.get_cast_list(tmdb_id, tmdb_type, season=season, episode=episode, keys=['crew'], aggregate=aggregate, **kwargs)
         self.tmdb_cache_only = True
         self.container_content = convert_type('person', 'container')
         return items
