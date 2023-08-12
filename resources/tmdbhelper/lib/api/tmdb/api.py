@@ -585,6 +585,8 @@ class TMDb(RequestAPI):
             for x in range(try_int(length, fallback=1)):
                 response = _get_page(page + x)
                 results += _get_results(response)
+                if int(response.get('total_pages') or 1) <= int(response.get('page') or 1):
+                    break
             return response, results
 
         response, results = _get_response(kwargs.get('page'), length=length)
