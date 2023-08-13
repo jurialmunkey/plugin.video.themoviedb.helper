@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2022-10-01 14:36+0000\n"
+"PO-Revision-Date: 2023-08-13 22:39+0000\n"
 "Last-Translator: psp2111-ADSLGATE <>\n"
 "Language-Team: Arabic (Saudi Arabia)\n"
 "Language: ar-SA\n"
@@ -795,7 +795,7 @@ msgstr "تحديث المكتبة الآن"
 #: resources/settings.xml
 msgctxt "#32155"
 msgid "Next Aired (Library)"
-msgstr "مكتبة البث القادم"
+msgstr "يبث قريباً (المكتبة)"
 
 #: resources/settings.xml
 msgctxt "#32156"
@@ -1510,7 +1510,7 @@ msgstr "إزالة من التوصيات"
 #: resources/lib/script.py
 msgctxt "#32295"
 msgid "Trakt options"
-msgstr "خيارات Trakt"
+msgstr "مدير Trakt"
 
 #: resources/lib/script.py
 msgctxt "#32296"
@@ -2403,7 +2403,7 @@ msgstr "قائمة المشاهدة (مرتقبة)"
 #: resources/lib/items/basedir.py
 msgctxt "#32458"
 msgid "Airing Next Library"
-msgstr ""
+msgstr "يبث قريباً"
 
 #: resources/lib/items/basedir.py
 msgctxt "#32459"
@@ -2461,6 +2461,193 @@ msgstr "تحديث ذاكرة التخزين المؤقتة لتفاصيل مك�
 msgctxt "#32468"
 msgid "Authorisation and sync notifications on startup"
 msgstr "عرض تنبيهات المزامنة والمصادقة عند بدء التشغيل"
+
+#: resources/settings.xml
+msgctxt "#32469"
+msgid "Ignore articles when sorting alphabetically"
+msgstr ""
+
+#: resources/settings.xml
+msgctxt "#32470"
+msgid "Trakt"
+msgstr ""
+
+#: resources/settings.xml
+msgctxt "#32471"
+msgid "Connection error notifications"
+msgstr "عرض تنبيهات انقطاع أو فقد الاتصال"
+
+#: resources/settings.xml
+msgctxt "#32472"
+msgid "Cache image location"
+msgstr "موقع التخزين المؤقت للصور"
+
+#: resources/lib/api/trakt/api.py
+msgctxt "#32473"
+msgid "Collected"
+msgstr ""
+
+#: resources/lib/script/method.py
+msgctxt "#32474"
+msgid "Successfully added {} as default player for {}"
+msgstr "تم إضافة {} كمشغل افتراضي لـ{}"
+
+#: resources/lib/script/method.py
+msgctxt "#32475"
+msgid "Successfully cleared default player for {}"
+msgstr "تم مسح المشغل الافتراضي لـ{}"
+
+#: resources/lib/items/listitem.py
+msgctxt "#32476"
+msgid "Choose default player"
+msgstr "اختيار مشغل افتراضي"
+
+#: resources/lib/script/method.py
+msgctxt "#32477"
+msgid "Change default player for tvshow, season, or episode"
+msgstr "تغيير المشغل الافتراضي للمسلسل أو الموسم أو الحلقة"
+
+#: resources/settings.xml
+msgctxt "#32478"
+msgid "Rebuild service listitems offscreen"
+msgstr ""
+
+#: resources/settings.xml
+msgctxt "#32479"
+msgid ""
+"Some platforms experience crashes while updating onscreen background service "
+"listitems with additional properties. Forcing service listitems to be "
+"rebuilt offscreen prevents this issue but will be slightly slower to add "
+"artwork and ratings. Restart Kodi to see changes."
+msgstr ""
+
+#: resources/settings.xml
+msgctxt "#32480"
+msgid "Readahead caching of service listitems"
+msgstr ""
+
+#: resources/settings.xml
+msgctxt "#32481"
+msgid ""
+"Increases the pool of recently watched items randomly selected from to use "
+"as the seed for becauase you watched style recommendations."
+msgstr ""
+
+#: resources/settings.xml
+msgctxt "#32482"
+msgid "Random seed pool for recommendations"
+msgstr ""
+
+#: resources/settings.xml
+msgctxt "#32483"
+msgid "Allow 3rd party plugin access to API key/token"
+msgstr ""
+
+#: resources/settings.xml
+msgctxt "#32484"
+msgid "TVDb API"
+msgstr ""
+
+#: resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32485"
+msgid "Add rating"
+msgstr "إضافة تقييمك"
+
+#: resources/tmdbhelper/lib/api/tmdb/discover.py
+msgctxt "#32486"
+msgid "Certification"
+msgstr "التقييم العمري"
+
+#: resources/tmdbhelper/lib/api/tmdb/discover.py
+msgctxt "#32487"
+msgid "Certification ( < or = )"
+msgstr "التقييم العمري (أصغر من أو يساوي)"
+
+#: resources/tmdbhelper/lib/api/tmdb/discover.py
+msgctxt "#32488"
+msgid "Certification ( > or = )"
+msgstr "التقييم العمري (أكبر من أو يساوي)"
+
+#: resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32489"
+msgid "Change rating"
+msgstr "تغيير تقييمك"
+
+#: resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32490"
+msgid "Add to favourites"
+msgstr "إضافة الى المفضلة"
+
+#: resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32491"
+msgid "Remove from favourites"
+msgstr "إزالة من المفضلة"
+
+#: resources/tmdbhelper/lib/script/method.py
+msgctxt "#32492"
+msgid ""
+"{} already exists in {}!\\nDo you wish to remove this item from the list?"
+msgstr "قسم {} بالفعل موجود في {}![CR]هل تريد إزالة هذا القسم؟"
+
+#: resources/tmdbhelper/lib/script/method.py
+msgctxt "#32493"
+msgid "Successfully removed {} from {}"
+msgstr "تم بنجاح إزالة {} الى الاختصار {}"
+
+#: resources/tmdbhelper/lib/script/method.py
+msgctxt "#32494"
+msgid "Successfully added {} to {}"
+msgstr "تم بنجاح إضافة {} الى الاختصار {}"
+
+#: resources/tmdbhelper/lib/script/method.py
+msgctxt "#32495"
+msgid "Create new node"
+msgstr "إدراج اختصار جديد"
+
+#: resources/tmdbhelper/lib/items/container.py
+msgctxt "#32496"
+msgid "Add/Remove as Custom Node"
+msgstr "إضافة/إزالة من الاختصارات"
+
+#: resources/settings.xml
+msgctxt "#32497"
+msgid "Container content fallback for service listitems without mediatypes"
+msgstr ""
+
+#: resources/settings.xml
+msgctxt "#32498"
+msgid ""
+"Some plugins have poor metadata and fail to fill the item mediatype which "
+"results in the service monitor not completing an item lookup. This setting "
+"allows the service monitor to use the container content type when item "
+"mediatype is missing. Note this setting will likely result more frequent "
+"incorrect matches due to the end plugin having bad metadata."
+msgstr ""
+
+#: resources/settings.xml
+msgctxt "#32499"
+msgid "Page multipliers (higher is slower)"
+msgstr "مضاعفة عدد عناصر الصفحة (الزيادة تسبب البطء)"
+
+#: resources/settings.xml
+msgctxt "#32500"
+msgid "Page multiplier (TMDb basic lists)"
+msgstr "قوائم TMDb (عامل مضاعفة)"
+
+#: resources/settings.xml
+msgctxt "#32501"
+msgid "Page multiplier (Trakt basic lists)"
+msgstr "قوائم Trakt (عامل مضاعفة)"
+
+#: resources/settings.xml
+msgctxt "#32502"
+msgid "Page multiplier (Trakt sync lists)"
+msgstr "قوائم مزامنة Trakt (عامل مضاعفة)"
+
+#: /resources/settings.xml
+msgctxt "#32503"
+msgid "Page multiplier (Library windows)"
+msgstr "قوائم المكتبة (عامل مضاعفة)"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
