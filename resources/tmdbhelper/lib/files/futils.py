@@ -19,6 +19,7 @@ validify_filename = jurialmunkey.futils.validify_filename
 get_filecache_name = jurialmunkey.futils.get_filecache_name
 get_file_path = FILEUTILS.get_file_path
 get_write_path = FILEUTILS.get_write_path
+dumps_to_file = FILEUTILS.dumps_to_file
 
 
 def normalise_filesize(filesize):
@@ -73,14 +74,6 @@ def delete_folder(folder, join_addon_data=True, force=False, check_exists=False)
     if check_exists and not xbmcvfs.exists(path):
         return
     xbmcvfs.rmdir(path, force=force)
-
-
-def dumps_to_file(data, folder, filename, indent=2, join_addon_data=True):
-    from json import dump
-    path = get_file_path(folder, filename, join_addon_data)
-    with xbmcvfs.File(path, 'w') as file:
-        dump(data, file, indent=indent)
-    return path
 
 
 def write_file(data, path):

@@ -2556,6 +2556,11 @@ msgctxt "#32502"
 msgid "Page multiplier (Trakt sync lists)"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32503"
+msgid "Page multiplier (Library windows)"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

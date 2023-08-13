@@ -334,7 +334,8 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
             client_id=None,
             client_secret=None,
             user_token=None,
-            force=False):
+            force=False,
+            page_length=1):
         super(TraktAPI, self).__init__(req_api_url=API_URL, req_api_name='TraktAPI', timeout=20)
         self.authorization = ''
         self.attempted_login = False
@@ -347,8 +348,8 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         self.last_activities = {}
         self.sync_activities = {}
         self.sync = {}
-        self.sync_item_limit = 20 * get_setting('pagemulti_sync', 'int')
-        self.item_limit = 20 * get_setting('pagemulti_trakt', 'int')
+        self.sync_item_limit = 20 * max(get_setting('pagemulti_sync', 'int'), page_length)
+        self.item_limit = 20 * max(get_setting('pagemulti_trakt', 'int'), page_length)
         self.login() if force else self.authorize()
 
     def authorize(self, login=False):

@@ -32,7 +32,8 @@ class TMDb(RequestAPI):
             self,
             api_key=None,
             language=get_language(),
-            mpaa_prefix=get_mpaa_prefix()):
+            mpaa_prefix=get_mpaa_prefix(),
+            page_length=1):
         api_key = api_key or self.api_key
 
         super(TMDb, self).__init__(
@@ -49,7 +50,7 @@ class TMDb(RequestAPI):
         self.req_strip += [(self.append_to_response, ''), (self.req_language, f'{self.iso_language}{"_en" if ARTLANG_FALLBACK else ""}')]
         self.genres = self.get_genres()
         self.mapper = ItemMapper(self.language, self.mpaa_prefix, self.genres)
-        self.page_length = get_setting('pagemulti_tmdb', 'int')
+        self.page_length = max(get_setting('pagemulti_tmdb', 'int'), page_length)
         TMDb.api_key = api_key
 
     def get_genres(self):
