@@ -8,4 +8,4 @@ See [TMDbHelper Wiki](https://github.com/jurialmunkey/plugin.video.themoviedb.he
 
 Kodi Versions:
 
-- [Matrix](https://github.com/jurialmunkey/plugin.video.themoviedb.helper/tree/matrix)
+- [Nexus](https://github.com/jurialmunkey/plugin.video.themoviedb.helper/tree/nexus)
