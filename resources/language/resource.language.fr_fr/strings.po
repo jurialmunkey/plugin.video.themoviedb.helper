@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2022-07-30 06:56-0400\n"
+"PO-Revision-Date: 2023-08-01 01:45-0400\n"
 "Last-Translator: \n"
 "Language-Team: LANGUAGE\n"
 "Language: fr_FR\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.3.2\n"
 
 msgctxt "#30000"
 msgid "Arabic (United Arab Emirates)"
@@ -1025,7 +1025,7 @@ msgstr "Basé sur les plus visionné"
 #: /resources/lib/plugin.py
 msgctxt "#32201"
 msgid "Your"
-msgstr "Vos"
+msgstr "Votre"
 
 #: /resources/lib/plugin.py
 msgctxt "#32202"
@@ -2145,12 +2145,12 @@ msgstr "Nombre maximal de threads simultanés (0 est illimité)"
 #: /resources/lib/items/basedir.py
 msgctxt "#32411"
 msgid "Providers"
-msgstr "Fournisseurs"
+msgstr "Diffuseurs"
 
 #: /resources/lib/api/tmdb/discover.py
 msgctxt "#32412"
 msgid "With Watch Provider"
-msgstr "Avec les fournisseurs de contenu"
+msgstr "Avec les diffuseurs de contenu"
 
 #: /resources/settings.xml
 msgctxt "#32413"
@@ -2336,6 +2336,241 @@ msgstr "Arrêt avant de tenter la lecture"
 msgctxt "#32449"
 msgid "Ignore region release filter"
 msgstr "Ignorer le filtre régional"
+
+#: /resources/settings.xml
+msgctxt "#32450"
+msgid "Install context menu add-on"
+msgstr "Installer le module complémentaire de menu contextuel"
+
+#: /resources/lib/api/trakt/api.py
+msgctxt "#32451"
+msgid "Lowest"
+msgstr "Petite Offre"
+
+#: /resources/lib/api/trakt/api.py
+msgctxt "#32452"
+msgid "Highest"
+msgstr "Top Offre"
+
+#: /resources/lib/api/trakt/api.py
+msgctxt "#32453"
+msgid "Least played"
+msgstr "Le moins joué"
+
+#: /resources/lib/api/trakt/api.py
+msgctxt "#32454"
+msgid "Shortest"
+msgstr "Plus court"
+
+#: /resources/lib/api/trakt/api.py
+msgctxt "#32455"
+msgid "Longest"
+msgstr "Le plus long"
+
+#: /resources/lib/items/basedir.py
+msgctxt "#32456"
+msgid "Watchlist (Released)"
+msgstr "Liste de surveillance (Publié)"
+
+#: /resources/lib/addon/consts.py
+msgctxt "#32457"
+msgid "Watchlist (Anticipated)"
+msgstr "Liste de surveillance (prévue)"
+
+#: /resources/lib/items/basedir.py
+msgctxt "#32458"
+msgid "Airing Next Library"
+msgstr "Diffusion de la prochaine bibliothèque"
+
+#: /resources/lib/items/basedir.py
+msgctxt "#32459"
+msgid "Your Episodes Airing Next"
+msgstr "Vos épisodes seront diffusés prochainement"
+
+#: /resources/lib/items/basedir.py
+msgctxt "#32460"
+msgid "Awards"
+msgstr "Récompenses"
+
+#: /resources/lib/api/tvdb/lists.py
+msgctxt "#32461"
+msgid "Winner of"
+msgstr "Gagnant de"
+
+#: /resources/lib/api/tvdb/lists.py
+msgctxt "#32462"
+msgid "Nominated for"
+msgstr "Nominé pour"
+
+#: /resources/settings.xml
+msgctxt "#32463"
+msgid "Cache items in custom lists you own for 24 hours"
+msgstr "Mettre en cache les éléments dans les listes personnalisées que vous possédez pendant 24 heures"
+
+#: /resources/settings.xml
+msgctxt "#32464"
+msgid "Significantly increases RAM usage but might improve repeat cache reads for disk cache located on slow storage devices (e.g. USB or SD card storage). Will likely cause worse cache performance for devices with normal storage (e.g. SSD, eMMC or internal HDD) or limited RAM."
+msgstr "Augmente considérablement l’utilisation de la RAM, mais peut améliorer les lectures de cache répétées pour le cache disque situé sur des périphériques de stockage lents (par exemple, le stockage USB ou sur carte SD). Causera probablement une détérioration des performances du cache pour les périphériques disposant d’un stockage normal (par exemple, SSD, eMMC ou disque dur interne) ou d’une RAM limitée."
+
+#: /resources/settings.xml
+msgctxt "#32465"
+msgid "Cache disk reads to memory (increases RAM usage)"
+msgstr "Cache disque lit en mémoire (augmente l’utilisation de la RAM)"
+
+#: /resources/settings.xml
+msgctxt "#32466"
+msgid "Play automatically using available providers"
+msgstr "Jouez automatiquement en utilisant les diffuseurs disponibles"
+
+#: /resources/settings.xml
+msgctxt "#32467"
+msgid "Refresh cached Kodi Library details"
+msgstr "Actualiser les détails de la bibliothèque Kodi mise en cache"
+
+#: /resources/settings.xml
+msgctxt "#32468"
+msgid "Authorisation and sync notifications on startup"
+msgstr "Notifications d’autorisation et de synchronisation au démarrage"
+
+#: /resources/settings.xml
+msgctxt "#32469"
+msgid "Ignore articles when sorting alphabetically"
+msgstr "Ignorer les articles lors du tri alphabétique"
+
+#: /resources/settings.xml
+msgctxt "#32470"
+msgid "Trakt"
+msgstr "Trakt"
+
+#: /resources/settings.xml
+msgctxt "#32471"
+msgid "Connection error notifications"
+msgstr "Notifications d’erreur de connexion"
+
+#: /resources/settings.xml
+msgctxt "#32472"
+msgid "Cache image location"
+msgstr "Emplacement de l’image du cache"
+
+#: /resources/lib/api/trakt/api.py
+msgctxt "#32473"
+msgid "Collected"
+msgstr "Collectés"
+
+#: /resources/lib/script/method.py
+msgctxt "#32474"
+msgid "Successfully added {} as default player for {}"
+msgstr "Ajout réussi de {} en tant que lecteur par défaut pour {}"
+
+#: /resources/lib/script/method.py
+msgctxt "#32475"
+msgid "Successfully cleared default player for {}"
+msgstr "Suppression réussie du lecteur par défaut pour {}"
+
+#: /resources/lib/items/listitem.py
+msgctxt "#32476"
+msgid "Choose default player"
+msgstr "Choisissez le lecteur par défaut"
+
+#: /resources/lib/script/method.py
+msgctxt "#32477"
+msgid "Change default player for tvshow, season, or episode"
+msgstr "Modifier le lecteur par défaut pour la série télévisée, la saison ou l’épisode"
+
+#: /resources/settings.xml
+msgctxt "#32478"
+msgid "Rebuild service listitems offscreen"
+msgstr "Reconstruire des éléments de liste de service hors écran"
+
+#: /resources/settings.xml
+msgctxt "#32479"
+msgid "Some platforms experience crashes while updating onscreen background service listitems with additional properties. Forcing service listitems to be rebuilt offscreen prevents this issue but will be slightly slower to add artwork and ratings. Restart Kodi to see changes."
+msgstr "Certaines plates-formes rencontrent des blocages lors de la mise à jour des éléments de liste de service en arrière-plan à l’écran avec des propriétés supplémentaires. Le fait de forcer la reconstruction des éléments de liste de service hors écran évite ce problème, mais sera légèrement plus lent à ajouter des illustrations et des évaluations. Redémarrez Kodi pour voir les changements."
+
+#: /resources/settings.xml
+msgctxt "#32480"
+msgid "Readahead caching of service listitems"
+msgstr "Mise en cache anticipée des éléments de liste de service"
+
+#: /resources/settings.xml
+msgctxt "#32481"
+msgid "Increases the pool of recently watched items randomly selected from to use as the seed for becauase you watched style recommendations."
+msgstr "Augmente le nombre d’éléments récemment surveillés sélectionnés au hasard à partir desquels vous pouvez les utiliser comme amorce pour les recommandations de style de becauase que vous avez regardées."
+
+#: /resources/settings.xml
+msgctxt "#32482"
+msgid "Random seed pool for recommendations"
+msgstr "Pool de semences aléatoires pour les recommandations"
+
+#: /resources/settings.xml
+msgctxt "#32483"
+msgid "Allow 3rd party plugin access to API key/token"
+msgstr "Autoriser l’accès du plugin tiers 3rd à la clé / jeton API"
+
+#: /resources/settings.xml
+msgctxt "#32484"
+msgid "TVDb API"
+msgstr "TVDb API"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32485"
+msgid "Add rating"
+msgstr "Ajouter une note"
+
+#: /resources/tmdbhelper/lib/api/tmdb/discover.py
+msgctxt "#32486"
+msgid "Certification"
+msgstr "Certification"
+
+#: /resources/tmdbhelper/lib/api/tmdb/discover.py
+msgctxt "#32487"
+msgid "Certification ( < or = )"
+msgstr "Certification ( < ou = )"
+
+#: /resources/tmdbhelper/lib/api/tmdb/discover.py
+msgctxt "#32488"
+msgid "Certification ( > or = )"
+msgstr "Certification ( > ou = )"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32489"
+msgid "Change rating"
+msgstr "Modifier l’évaluation"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32490"
+msgid "Add to favourites"
+msgstr "Ajouter aux favoris"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32491"
+msgid "Remove from favourites"
+msgstr "Supprimer des favoris"
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32492"
+msgid "{} already exists in {}!\\nDo you wish to remove this item from the list?"
+msgstr "{} existe déjà dans {}!\\nSouhaitez-vous supprimer cet élément de la liste ?"
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32493"
+msgid "Successfully removed {} from {}"
+msgstr "Suppression réussie {} de {}"
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32494"
+msgid "Successfully added {} to {}"
+msgstr "Ajout réussi de {} à {}"
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32495"
+msgid "Create new node"
+msgstr "Créer nouveau noeud"
+
+#: /resources/tmdbhelper/lib/items/container.py
+msgctxt "#32496"
+msgid "Add/Remove as Custom Node"
+msgstr "Ajouter/Supprimer en tant que nœud personnalisé"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
