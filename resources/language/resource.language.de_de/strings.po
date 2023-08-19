@@ -2631,7 +2631,7 @@ msgstr "Bewertung ändern"
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32490"
 msgid "Add to favourites"
-msgstr "Zur Favoriten hinzufügen"
+msgstr "Zu Favoriten hinzufügen"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32491"
