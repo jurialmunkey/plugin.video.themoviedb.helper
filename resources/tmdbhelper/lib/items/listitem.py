@@ -1,11 +1,11 @@
 from xbmcgui import ListItem as KodiListItem
-from tmdbhelper.parser import try_int, merge_two_dicts
+from jurialmunkey.parser import try_int, merge_two_dicts
 from infotagger.listitem import ListItemInfoTag
 from tmdbhelper.lib.addon.consts import ACCEPTED_MEDIATYPES, PARAM_WIDGETS_RELOAD, PARAM_WIDGETS_RELOAD_FORCED
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_media_type, get_setting, get_condvisibility, get_localized, encode_url
 from tmdbhelper.lib.addon.tmdate import is_unaired_timestamp
 from tmdbhelper.lib.addon.logger import kodi_log
-from tmdbhelper.lib.addon.window import get_property
+from jurialmunkey.window import get_property
 
 """ Lazyimports
 from tmdbhelper.lib.items.context import ContextMenu
@@ -109,9 +109,12 @@ class _ListItem(object):
     def unaired_bool(self):
         return False
 
-    def set_context_menu(self):
+    def set_context_menu(self, additions=None):
         from tmdbhelper.lib.items.context import ContextMenu
         self.context_menu += ContextMenu(self).get()
+        if not additions:
+            return
+        self.context_menu += additions
 
     def set_playcount(self, playcount):
         return

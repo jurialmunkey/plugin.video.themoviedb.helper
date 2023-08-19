@@ -6,8 +6,8 @@ from tmdbhelper.lib.addon.dialog import BusyDialog
 from tmdbhelper.lib.addon.thread import ParallelThread
 from tmdbhelper.lib.addon.plugin import get_infolabel, executebuiltin, get_condvisibility, ADDONPATH
 from tmdbhelper.lib.api.tmdb.api import TMDb
-from tmdbhelper.lib.addon.window import get_property, WindowProperty
-from tmdbhelper.parser import parse_paramstring, reconfigure_legacy_params
+from jurialmunkey.window import get_property, WindowProperty
+from jurialmunkey.parser import parse_paramstring, reconfigure_legacy_params
 from threading import Thread
 
 

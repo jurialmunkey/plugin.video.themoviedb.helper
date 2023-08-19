@@ -3,6 +3,8 @@ ITER_PROPS_MAX = 10
 
 TVDB_DISCLAIMER = 'Information provided by TheTVDB.com. Please consider supporting them. https://thetvdb.com/subscribe'
 
+NODE_BASEDIR = 'special://profile/addon_data/plugin.video.themoviedb.helper/nodes/'
+
 ACCEPTED_MEDIATYPES = [
     'video', 'movie', 'tvshow', 'season', 'episode', 'musicvideo', 'music', 'song', 'album', 'artist', 'set']
 
@@ -185,10 +187,14 @@ RANDOMISED_TRAKT = {
         'info': 'trakt_anticipated',
         'route': RANDOMISED_TRAKT_ROUTE}}
 
+TMDB_SORT_TYPES = {'int': int, 'float': float, 'str': str}
 TMDB_STACKED_CREDITS_PROPERTIES = [
     ('infoproperties', 'job'),
     ('infoproperties', 'character'),
     ('infoproperties', 'role')]
+TMDB_COMBO_LISTS_ROUTE = {
+    'module_name': 'tmdbhelper.lib.api.tmdb.lists',
+    'import_attr': 'ListCombo'}
 TMDB_BASIC_LISTS_ROUTE = {
     'module_name': 'tmdbhelper.lib.api.tmdb.lists',
     'import_attr': 'ListBasic'}
@@ -266,6 +272,7 @@ TMDB_BASIC_LISTS = {
         'key': 'cast',
         'tmdb_type': 'movie',
         'sort_key': 'popularity',
+        'sort_type': 'float',
         'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
         'dbid_sorting': True,
         'limit': 20,
@@ -275,16 +282,46 @@ TMDB_BASIC_LISTS = {
         'path': 'person/{tmdb_id}/tv_credits',
         'key': 'cast',
         'sort_key': 'popularity',
+        'sort_type': 'float',
         'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
         'dbid_sorting': True,
         'tmdb_type': 'tv',
         'limit': 20,
         'route': TMDB_BASIC_LISTS_ROUTE
     },
+    'stars_in_both': {
+        'info_path_models': [
+            {
+                'path': 'person/{tmdb_id}/movie_credits',
+                'tmdb_type': 'movie',
+                'key': 'cast',
+                'sort_key': 'popularity',
+                'sort_type': 'float',
+                'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
+                'limit': 20,
+            },
+            {
+                'path': 'person/{tmdb_id}/tv_credits',
+                'tmdb_type': 'tv',
+                'key': 'cast',
+                'sort_key': 'popularity',
+                'sort_type': 'float',
+                'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
+                'limit': 20,
+            },
+        ],
+        'sort_key': 'popularity',
+        'sort_type': 'float',
+        'tmdb_type': 'both',
+        'dbid_sorting': True,
+        'limit': 20,
+        'route': TMDB_COMBO_LISTS_ROUTE
+    },
     'crew_in_movies': {
         'path': 'person/{tmdb_id}/movie_credits',
         'key': 'crew',
         'sort_key': 'popularity',
+        'sort_type': 'float',
         'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
         'dbid_sorting': True,
         'tmdb_type': 'movie',
@@ -295,11 +332,86 @@ TMDB_BASIC_LISTS = {
         'path': 'person/{tmdb_id}/tv_credits',
         'key': 'crew',
         'sort_key': 'popularity',
+        'sort_type': 'float',
         'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
         'dbid_sorting': True,
         'tmdb_type': 'tv',
         'limit': 20,
         'route': TMDB_BASIC_LISTS_ROUTE
+    },
+    'crew_in_both': {
+        'info_path_models': [
+            {
+                'path': 'person/{tmdb_id}/movie_credits',
+                'tmdb_type': 'movie',
+                'key': 'crew',
+                'sort_key': 'popularity',
+                'sort_type': 'float',
+                'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
+                'limit': 20,
+            },
+            {
+                'path': 'person/{tmdb_id}/tv_credits',
+                'tmdb_type': 'tv',
+                'key': 'crew',
+                'sort_key': 'popularity',
+                'sort_type': 'float',
+                'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
+                'limit': 20,
+            },
+        ],
+        'sort_key': 'popularity',
+        'sort_type': 'float',
+        'tmdb_type': 'both',
+        'dbid_sorting': True,
+        'limit': 20,
+        'route': TMDB_COMBO_LISTS_ROUTE
+    },
+    'credits_in_both': {
+        'info_path_models': [
+            {
+                'path': 'person/{tmdb_id}/movie_credits',
+                'tmdb_type': 'movie',
+                'key': 'cast',
+                'sort_key': 'popularity',
+                'sort_type': 'float',
+                'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
+                'limit': 20,
+            },
+            {
+                'path': 'person/{tmdb_id}/tv_credits',
+                'tmdb_type': 'tv',
+                'key': 'cast',
+                'sort_key': 'popularity',
+                'sort_type': 'float',
+                'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
+                'limit': 20,
+            },
+            {
+                'path': 'person/{tmdb_id}/movie_credits',
+                'tmdb_type': 'movie',
+                'key': 'crew',
+                'sort_key': 'popularity',
+                'sort_type': 'float',
+                'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
+                'limit': 20,
+            },
+            {
+                'path': 'person/{tmdb_id}/tv_credits',
+                'tmdb_type': 'tv',
+                'key': 'crew',
+                'sort_key': 'popularity',
+                'sort_type': 'float',
+                'stacked': TMDB_STACKED_CREDITS_PROPERTIES,
+                'limit': 20,
+            },
+        ],
+        'sort_key': 'popularity',
+        'sort_type': 'float',
+        'tmdb_type': 'both',
+        'dbid_sorting': True,
+        'limit': 20,
+        'route': TMDB_COMBO_LISTS_ROUTE
     },
     'images': {
         'path': 'person/{tmdb_id}/images',
@@ -402,6 +514,13 @@ TMDB_BASIC_LISTS = {
         },
         'route': TMDB_BASIC_LISTS_ROUTE,
         'plugin_category': '{plural}',
+    },
+    'tmdb_list': {
+        'path': 'list/{list_id}',
+        'key': 'items',
+        'route': TMDB_BASIC_LISTS_ROUTE,
+        'plugin_category': '{localized} {plural}',
+        'localized': 535
     }
 }
 
@@ -543,6 +662,13 @@ TRAKT_SYNC_LISTS = {
         'route': TRAKT_SYNC_LISTS_ROUTE,
         'plugin_category': '{localized} {plural}',
         'localized': 32196
+    },
+    'trakt_favorites': {
+        'sync_type': 'favorites',
+        'sort_by': 'unsorted',
+        'route': TRAKT_SYNC_LISTS_ROUTE,
+        'plugin_category': '{plural} {localized}',
+        'localized': 1036
     }
 }
 
@@ -718,6 +844,9 @@ ROUTE_TMDBID = {
     'episode_group_episodes': {'route': {
         'module_name': 'tmdbhelper.lib.api.tmdb.lists',
         'import_attr': 'ListEpisodeGroupEpisodes'}},
+    'next_recommendation': {'route': {
+        'module_name': 'tmdbhelper.lib.api.tmdb.lists',
+        'import_attr': 'ListNextRecommendation'}},
     'trakt_upnext': {'route': {
         'module_name': 'tmdbhelper.lib.api.trakt.lists',
         'import_attr': 'ListUpNext'}},

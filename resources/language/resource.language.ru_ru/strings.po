@@ -4,18 +4,18 @@
 # Addon Provider: jurialmunkey
 msgid ""
 msgstr ""
-"Project-Id-Version: XBMC-Addons\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2023-03-11 13:49+0300\n"
-"Last-Translator: \n"
-"Language-Team: LANGUAGE\n"
+"PO-Revision-Date: 2023-07-17 12:03+0300\n"
+"Last-Translator: alexeichikad <alexeichikad@gmail.com>\n"
+"Language-Team: \n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.3.2\n"
 
 msgctxt "#30000"
 msgid "Arabic (United Arab Emirates)"
@@ -140,7 +140,7 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32028"
 msgid "Use fanart.tv for widget artwork (slower)"
-msgstr "Используйте fanart.tv для изображений виджетов (медленнее)"
+msgstr "Использовать fanart.tv для изображений виджетов (медленнее)"
 
 #: /resources/settings.xml
 msgctxt "#32029"
@@ -190,7 +190,8 @@ msgstr "Использовать встроенные проигрыватели
 #: /resources/settings.xml
 msgctxt "#32038"
 msgid "Get additional details from the local Kodi library database"
-msgstr "Получать дополнительную информацию из локальной базы данных библиотеки Kodi"
+msgstr ""
+"Получать дополнительную информацию из локальной базы данных библиотеки Kodi"
 
 #: /resources/settings.xml
 msgctxt "#32039"
@@ -265,7 +266,7 @@ msgstr "Добавить в Trakt Watched History"
 #: /resources/lib/container.py
 msgctxt "#32053"
 msgid "Refresh Cache"
-msgstr "Обновить кеш"
+msgstr "Обновить кэш"
 
 #: /resources/lib/downloader.py
 msgctxt "#32054"
@@ -279,8 +280,11 @@ msgstr "Аутентификация не удалась."
 
 #: /resources/lib/downloader.py
 msgctxt "#32056"
-msgid "Either the username or password were invalid. Would you like to try again?"
-msgstr "Введенные имя пользователя или пароль недействительны. Хотите попробовать еще раз?"
+msgid ""
+"Either the username or password were invalid. Would you like to try again?"
+msgstr ""
+"Введенные имя пользователя или пароль недействительны. Хотите попробовать "
+"еще раз?"
 
 #: /resources/lib/downloader.py
 msgctxt "#32057"
@@ -412,7 +416,7 @@ msgstr "Только для системного использования"
 #: /resources/settings.xml
 msgctxt "#32080"
 msgid "Other"
-msgstr "Другой"
+msgstr "Другие"
 
 #: /resources/settings.xml
 msgctxt "#32081"
@@ -447,7 +451,8 @@ msgstr "Автообновление библиотеки и добавить н
 #: /resources/settings.xml
 msgctxt "#32087"
 msgid "Use resolvedURL method for suppressing strm next playlist error"
-msgstr "Используйте метод resolveURL для устранения ошибки следующего плейлиста strm"
+msgstr ""
+"Используйте метод resolveURL для устранения ошибки следующего плейлиста strm"
 
 #: /resources/settings.xml
 msgctxt "#32088"
@@ -527,7 +532,7 @@ msgstr "Добавить элементы"
 #: /resources/lib/container.py
 msgctxt "#32103"
 msgid "No Value Added"
-msgstr "Одсутствуют добавленные значения"
+msgstr "Значение не добавлено"
 
 #: /resources/lib/container.py
 msgctxt "#32104"
@@ -580,8 +585,12 @@ msgstr "Выбрать жанры"
 
 #: /resources/lib/container.py
 msgctxt "#32113"
-msgid "Also accepts X days relative from today in the format T-X or T+X (e.g. T-10 is ten days ago)"
-msgstr "Также допускает X дней относительно сегодняшнего дня в формате T-X или T+X (например, T-10 — десять дней назад)"
+msgid ""
+"Also accepts X days relative from today in the format T-X or T+X (e.g. T-10 "
+"is ten days ago)"
+msgstr ""
+"Также допускает X дней относительно сегодняшнего дня в формате T-X или T+X "
+"(например, T-10 — десять дней назад)"
 
 #: /resources/lib/container.py
 msgctxt "#32114"
@@ -630,8 +639,12 @@ msgstr "XBMCVFS сообщает, что не удалось создать пу
 
 #: /resources/lib/context.py
 msgctxt "#32123"
-msgid "If error persists and the folders are created correctly, please disable folder path creation checking in TMDBHelper settings."
-msgstr "Если ошибка сохраняется, и папки создаются правильно, пожалуйста, отключите проверку создания папок в настройках TMDBHelper."
+msgid ""
+"If error persists and the folders are created correctly, please disable "
+"folder path creation checking in TMDBHelper settings."
+msgstr ""
+"Если ошибка сохраняется, и папки создаются правильно, пожалуйста, отключите "
+"проверку создания папок в настройках TMDBHelper."
 
 #: /resources/lib/context.py
 msgctxt "#32124"
@@ -646,7 +659,8 @@ msgstr "Добавить список Trakt в библиотеку Kodi"
 #: /resources/lib/context.py
 msgctxt "#32126"
 msgid "Are you sure you want to add this Trakt list to your Kodi library?"
-msgstr "Вы уверены, что хотите добавить этот список Trakt в свою библиотеку Kodi?"
+msgstr ""
+"Вы уверены, что хотите добавить этот список Trakt в свою библиотеку Kodi?"
 
 #: /resources/lib/context.py
 msgctxt "#32127"
@@ -836,11 +850,15 @@ msgstr "Использовать fanart.tv для изображений service
 #: /resources/lib/context.py
 msgctxt "#32164"
 msgid ""
-"Adding Trakt lists to library is limited to [B]{}[/B] TV Shows and [B]{}[/B] Movies per list.\n"
-"This limit is set to ensure that the APIs providing data for free are respected."
+"Adding Trakt lists to library is limited to [B]{}[/B] TV Shows and [B]{}[/B] "
+"Movies per list.\n"
+"This limit is set to ensure that the APIs providing data for free are "
+"respected."
 msgstr ""
-"Добавление списков Trakt в библиотеку ограничено [B]{}[/B] сериалами и [B]{}[/B] фильмами на список.\n"
-"Это ограничение установлено для обеспечения соблюдения API, предоставляющих данные бесплатно."
+"Добавление списков Trakt в библиотеку ограничено [B]{}[/B] сериалами и [B]{}"
+"[/B] фильмами на список.\n"
+"Это ограничение установлено для обеспечения соблюдения API, предоставляющих "
+"данные бесплатно."
 
 #: /resources/lib/context.py
 msgctxt "#32165"
@@ -869,8 +887,12 @@ msgstr "Выход из учетной записи Trakt..."
 
 #: /resources/lib/libraryupdate.py
 msgctxt "#32170"
-msgid "[B][COLOR=red]Warning[/COLOR][/B] This list contains [B]{}[/B] TV Shows and [B]{}[/B] Movies"
-msgstr "[B][COLOR=red]Warning[/COLOR][/B] Этот список содержит [B]{}[/B] сериалов и [B]{}[/B] фильмов"
+msgid ""
+"[B][COLOR=red]Warning[/COLOR][/B] This list contains [B]{}[/B] TV Shows and "
+"[B]{}[/B] Movies"
+msgstr ""
+"[B][COLOR=red]Warning[/COLOR][/B] Этот список содержит [B]{}[/B] сериалов и "
+"[B]{}[/B] фильмов"
 
 #: /resources/lib/libraryupdate.py
 msgctxt "#32171"
@@ -1169,12 +1191,12 @@ msgstr "Сериалы с этим актером"
 #: /resources/lib/plugin.py
 msgctxt "#32229"
 msgid "Crew in Movies"
-msgstr "Фильмы в роли члена съемочной группы"
+msgstr "В роли члена съемочной группы фильмов"
 
 #: /resources/lib/plugin.py
 msgctxt "#32230"
 msgid "Crew in TV Shows"
-msgstr "Сериалы в роли члена съемочной группы"
+msgstr "В роли члена съемочной группы сериалов"
 
 #: /resources/lib/plugin.py
 msgctxt "#32231"
@@ -1516,7 +1538,7 @@ msgid ""
 "{} was successful for {}!\n"
 "{} ID {}"
 msgstr ""
-"{} был успешным для {}!\n"
+"{} было успешным для {}!\n"
 "{} ID {}"
 
 #: /resources/lib/syncitem.py
@@ -1572,7 +1594,7 @@ msgstr "Подавление повторных попыток на {} секу�
 #: /resources/lib/request/api.py
 msgctxt "#32308"
 msgid "ConnectionError: {}"
-msgstr ""
+msgstr "Ошибка подключения: {}"
 
 #: /addon.xml
 msgctxt "#32309"
@@ -1661,17 +1683,31 @@ msgstr "Выберите метод воспроизведения"
 #: /resources/lib/player/players.py
 msgctxt "#32325"
 msgid ""
-"Configuration for player is missing \"is_resolvable\" flag. Please select resolve method.\n"
+"Configuration for player is missing \"is_resolvable\" flag. Please select "
+"resolve method.\n"
 "\n"
-"setResolvedUrl is the preferred method and generally should work for any player addon that plays files directly, uses inputstream adapative, or only prompts to select bitrate/quality. PlayMedia should be used for any player addon which first runs a script to scrape sources or otherwise does not work correctly using the setResolvedUrl method.\n"
+"setResolvedUrl is the preferred method and generally should work for any "
+"player addon that plays files directly, uses inputstream adapative, or only "
+"prompts to select bitrate/quality. PlayMedia should be used for any player "
+"addon which first runs a script to scrape sources or otherwise does not work "
+"correctly using the setResolvedUrl method.\n"
 "\n"
-"To override this dialog, set a resolve method for the player in TMDbHelper's player settings configuration dialog."
+"To override this dialog, set a resolve method for the player in TMDbHelper's "
+"player settings configuration dialog."
 msgstr ""
-"В конфигурации плеера отсутствует флаг \"is_resolvable\". Пожалуйста, выберите метод получения ссылок.\n"
+"В конфигурации плеера отсутствует флаг \"is_resolvable\". Пожалуйста, "
+"выберите метод получения ссылок.\n"
 "\n"
-"setResolvedUrl является предпочтительным методом и, как правило, должен работать для любого дополнения к проигрывателю, которое воспроизводит файлы напрямую, использует адаптивный входной поток или только предлагает выбрать битрейт/качество. PlayMedia следует использовать для любого аддона проигрывателя, который сначала запускает скрипт для поиска исходников или иным образом работает некорректно, используя метод setResolvedUrl.\n"
+"setResolvedUrl является предпочтительным методом и, как правило, должен "
+"работать для любого дополнения к проигрывателю, которое воспроизводит файлы "
+"напрямую, использует адаптивный входной поток или только предлагает выбрать "
+"битрейт/качество. PlayMedia следует использовать для любого аддона "
+"проигрывателя, который сначала запускает скрипт для поиска исходников или "
+"иным образом работает некорректно, используя метод setResolvedUrl.\n"
 "\n"
-"Чтобы убрать это диалоговое окно, установите метод разрешения для проигрывателя в диалоговом окне конфигурации настроек проигрывателя TMDbHelper."
+"Чтобы убрать это диалоговое окно, установите метод разрешения для "
+"проигрывателя в диалоговом окне конфигурации настроек проигрывателя "
+"TMDbHelper."
 
 #: /resources/lib/helpers/timedate.py
 msgctxt "#32326"
@@ -1716,16 +1752,18 @@ msgstr "Выбор пользователя"
 #: /resources/lib/player/configure.py
 msgctxt "#32334"
 msgid "Reset player to defaults?"
-msgstr "Reset player to defaults?"
+msgstr "Сбросить настройки плеера к дефолтным?"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32335"
 msgid ""
-"Do you wish to reset the [B]{}[/B] player file back to its original unmodified state on disk?\n"
+"Do you wish to reset the [B]{}[/B] player file back to its original "
+"unmodified state on disk?\n"
 "\n"
 "[B]WARNING:[/B] This action cannot be undone."
 msgstr ""
-"Вы хотите сбросить [B]{}[/B] файл проигрывателя и вернуться в исходное неизмененное состояние на диске?\n"
+"Вы хотите сбросить [B]{}[/B] файл проигрывателя и вернуться в исходное "
+"неизмененное состояние на диске?\n"
 "\n"
 "[B]WARNING:[/B] Это действие не может быть отменено."
 
@@ -1760,13 +1798,19 @@ msgstr "{} метод разрешения URL воспроизведения"
 #: /resources/lib/player/configure.py
 msgctxt "#32340"
 msgid ""
-"Please note that setResolvedUrl is Kodi's preferred method for resolving playback URLs. The PlayMedia method should only be used if you experience difficulties using setResolvedUrl with this particular player.\n"
+"Please note that setResolvedUrl is Kodi's preferred method for resolving "
+"playback URLs. The PlayMedia method should only be used if you experience "
+"difficulties using setResolvedUrl with this particular player.\n"
 "\n"
 "Are you sure you want to set this player's resolve method to PlayMedia?"
 msgstr ""
-"Обратите внимание, что setResolvedUrl - это предпочтительный метод Kodi для разрешения URL-адресов воспроизведения. Метод PlayMedia следует использовать только в том случае, если у вас возникли трудности с использованием setResolvedUrl с этим конкретным проигрывателем.\n"
+"Обратите внимание, что setResolvedUrl - это предпочтительный метод Kodi для "
+"разрешения URL-адресов воспроизведения. Метод PlayMedia следует использовать "
+"только в том случае, если у вас возникли трудности с использованием "
+"setResolvedUrl с этим конкретным проигрывателем.\n"
 "\n"
-"Вы уверены, что хотите установить для этого проигрывателя метод разрешения PlayMedia?"
+"Вы уверены, что хотите установить для этого проигрывателя метод разрешения "
+"PlayMedia?"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32341"
@@ -1796,7 +1840,8 @@ msgstr "Группы эпизодов"
 #: /resources/settings.xml
 msgctxt "#32346"
 msgid "Resend local files (fix Trakt scrobbling bug)"
-msgstr "Повторная отправка локальных файлов (исправление ошибки скроблинга Trakt)"
+msgstr ""
+"Повторная отправка локальных файлов (исправление ошибки скроблинга Trakt)"
 
 #: /resources/settings.xml
 msgctxt "#32347"
@@ -1838,11 +1883,15 @@ msgctxt "#32354"
 msgid ""
 "Does this player resolve directly to a single playable file?\n"
 "\n"
-"Select \"Yes\" for any player that plays directly from single source. Select \"No\" for players that scrape multiple sources or otherwise do not work with the setResolvedURL method."
+"Select \"Yes\" for any player that plays directly from single source. Select "
+"\"No\" for players that scrape multiple sources or otherwise do not work "
+"with the setResolvedURL method."
 msgstr ""
 "Этот плеер разрешает напрямую в один воспроизводимый файл?\n"
 "\n"
-"Выберите «Да» для любого плеера, который воспроизводит напрямую из одного источника. Выберите «Нет» для плееров, которые сканируют несколько источников или иным образом не работают с методом setResolvedURL."
+"Выберите «Да» для любого плеера, который воспроизводит напрямую из одного "
+"источника. Выберите «Нет» для плееров, которые сканируют несколько "
+"источников или иным образом не работают с методом setResolvedURL."
 
 #: /resources/lib/script/sync.py
 msgctxt "#32355"
@@ -1883,7 +1932,7 @@ msgstr "Компании"
 #: /resources/lib/container/basedir.py
 msgctxt "#32361"
 msgid "Search Lists"
-msgstr "Списки поиска"
+msgstr "Поиск списков"
 
 #: /resources/lib/script/sync.py
 msgctxt "#32362"
@@ -1948,7 +1997,7 @@ msgstr "Ограничить strm из библиотеки"
 #: /resources/lib/player/players.py
 msgctxt "#32374"
 msgid "Constructing Players"
-msgstr "Конфигуриирование проигрывателей"
+msgstr "Конфигурирование проигрывателей"
 
 #: /resources/lib/player/players.py
 msgctxt "#32375"
@@ -2008,7 +2057,7 @@ msgstr "Скрыть все"
 #: /resources/settings.xml
 msgctxt "#32386"
 msgid "Delete cache"
-msgstr "Удалить кеш"
+msgstr "Удалить кэш"
 
 #: /resources/lib/script/router.py
 msgctxt "#32387"
@@ -2020,11 +2069,15 @@ msgctxt "#32388"
 msgid ""
 "Are you sure you want to delete the {} cache? This action cannot be undone.\n"
 "\n"
-"TMDbHelper performs regular automatic cache management and cleaning. You should only delete the cache manually in cases of persistent cache related errors."
+"TMDbHelper performs regular automatic cache management and cleaning. You "
+"should only delete the cache manually in cases of persistent cache related "
+"errors."
 msgstr ""
 "Вы уверены, что хотите удалить {} кэш? Это действие не может быть отменено.\n"
 "\n"
-"TMDbHelper выполняет регулярное автоматическое управление кешем и его очистку. Вам следует удалять кеш вручную только в случаях постоянных ошибок, связанных с кешем."
+"TMDbHelper выполняет регулярное автоматическое управление кешем и его "
+"очистку. Вам следует удалять кеш вручную только в случаях постоянных ошибок, "
+"связанных с кешем."
 
 #: /resources/lib/script/router.py
 msgctxt "#32389"
@@ -2046,11 +2099,16 @@ msgctxt "#32392"
 msgid ""
 "Use [B]Quick Update[/B] to check for new items.\n"
 "\n"
-"Use [B]Forced Update[/B] to ignore previously cached update details and recheck all items. Forced updates should only be used when cleaning and rebuilding the Kodi library."
+"Use [B]Forced Update[/B] to ignore previously cached update details and "
+"recheck all items. Forced updates should only be used when cleaning and "
+"rebuilding the Kodi library."
 msgstr ""
 "Используйте [B]Быстрое обновление[/B] для проверки наличия новых элементов.\n"
 "\n"
-"Используйте [B]Принудительное обновление[/B] чтобы игнорировать ранее кэшированные сведения об обновлении и перепроверить все элементы. Принудительные обновления следует использовать только при очистке и восстановлении библиотеки Kodi."
+"Используйте [B]Принудительное обновление[/B] чтобы игнорировать ранее "
+"кэшированные сведения об обновлении и перепроверить все элементы. "
+"Принудительные обновления следует использовать только при очистке и "
+"восстановлении библиотеки Kodi."
 
 #: /resources/lib/script/router.py
 msgctxt "#32393"
@@ -2070,7 +2128,9 @@ msgstr "Отчеты таймера для каталогов в журнале"
 #: /resources/settings.xml
 msgctxt "#32396"
 msgid "Set unwatched episode count for in-progress tvshows only"
-msgstr "Установить количество непросмотренных серий только для просматриваемых сериалов"
+msgstr ""
+"Установить количество непросмотренных серий только для просматриваемых "
+"сериалов"
 
 #: /resources/settings.xml
 msgctxt "#32397"
@@ -2105,7 +2165,7 @@ msgstr "Получать дополнительную информацию и и
 #: /resources/settings.xml
 msgctxt "#32403"
 msgid "Increase sync list item limit per page (slower)"
-msgstr "Увеличить ограничение элемента синхронизации на страницу (медленнее)"
+msgstr "Увеличить лимит списка элементов синхронизации на страницу (медленнее)"
 
 #: /resources/settings.xml
 msgctxt "#32404"
@@ -2179,13 +2239,22 @@ msgstr "Удалить из прогресса"
 
 #: /resources/settings.xml
 msgctxt "#32418"
-msgid "Adds text to the start of the MPAA rating. For example if set to 'Rated' a 'PG' rating is displayed as 'Rated PG'. Cached items will need to be refreshed."
-msgstr "Добавляет текст в начало рейтинга MPAA. Например, если установлено значение 'Rated', рейтинг 'PG' отображается как 'Rated PG'. Кэшированные элементы необходимо будет обновить."
+msgid ""
+"Adds text to the start of the MPAA rating. For example if set to 'Rated' a "
+"'PG' rating is displayed as 'Rated PG'. Cached items will need to be "
+"refreshed."
+msgstr ""
+"Добавляет текст в начало рейтинга MPAA. Например, если установлено значение "
+"'Rated', рейтинг 'PG' отображается как 'Rated PG'. Кэшированные элементы "
+"необходимо будет обновить."
 
 #: /resources/settings.xml
 msgctxt "#32419"
-msgid "The language and country settings used when looking up data from TMDb and Trakt APIs"
-msgstr "Настройки языка и страны, используемые при поиске данных из API TMDb и Trakt"
+msgid ""
+"The language and country settings used when looking up data from TMDb and "
+"Trakt APIs"
+msgstr ""
+"Настройки языка и страны, используемые при поиске данных из API TMDb и Trakt"
 
 #: /resources/settings.xml
 msgctxt "#32420"
@@ -2214,8 +2283,12 @@ msgstr "Создать плейлисты эпизодов"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32425"
-msgid "Have TMDbHelper queue all episodes in a playlist when playing an episode using this player?"
-msgstr "Ставить ли TMDbHelper в очередь все эпизоды в плейлисте при воспроизведении эпизода с помощью этого проигрывателя?"
+msgid ""
+"Have TMDbHelper queue all episodes in a playlist when playing an episode "
+"using this player?"
+msgstr ""
+"Ставить ли TMDbHelper в очередь все эпизоды в плейлисте при воспроизведении "
+"эпизода с помощью этого проигрывателя?"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32426"
@@ -2284,8 +2357,14 @@ msgstr "Список разрешенных провайдеров обновл�
 
 #: /resources/lib/script/method.py
 msgctxt "#32439"
-msgid "The provider allowlist has been updated. Please note that updating provider details requires the item cache to be refreshed. The item cache can be deleted in the expert settings section."
-msgstr "Список разрешенных провайдеров обновлен. Обратите внимание, что для обновления сведений о поставщике необходимо обновить кеш элементов. Кэш элементов можно удалить в экспертном разделе настроек."
+msgid ""
+"The provider allowlist has been updated. Please note that updating provider "
+"details requires the item cache to be refreshed. The item cache can be "
+"deleted in the expert settings section."
+msgstr ""
+"Список разрешенных провайдеров обновлен. Обратите внимание, что для "
+"обновления сведений о поставщике необходимо обновить кеш элементов. Кэш "
+"элементов можно удалить в экспертном разделе настроек."
 
 #: /resources/lib/player/configure.py
 msgctxt "#32440"
@@ -2409,13 +2488,24 @@ msgstr "Кэшировать элементы в пользовательски�
 
 #: /resources/settings.xml
 msgctxt "#32464"
-msgid "Significantly increases RAM usage but might improve repeat cache reads for disk cache located on slow storage devices (e.g. USB or SD card storage). Will likely cause worse cache performance for devices with normal storage (e.g. SSD, eMMC or internal HDD) or limited RAM."
-msgstr "Значительно увеличивает использование оперативной памяти, но может улучшить повторные чтения кэша для дискового кеша, расположенного на медленных устройствах хранения (например, USB или SD карт). Скорее всего, приведет к худшей производительности кэша для устройств с нормальным хранением (например, SSD, EMMC или внутреннего HDD) или ограниченной оперативной памяти."
+msgid ""
+"Significantly increases RAM usage but might improve repeat cache reads for "
+"disk cache located on slow storage devices (e.g. USB or SD card storage). "
+"Will likely cause worse cache performance for devices with normal storage (e."
+"g. SSD, eMMC or internal HDD) or limited RAM."
+msgstr ""
+"Значительно увеличивает использование оперативной памяти, но может улучшить "
+"повторные чтения кэша для дискового кеша, расположенного на медленных "
+"устройствах хранения (например, USB или SD карт). Скорее всего, приведет к "
+"худшей производительности кэша для устройств с нормальным хранением "
+"(например, SSD, EMMC или внутреннего HDD) или ограниченной оперативной "
+"памяти."
 
 #: /resources/settings.xml
 msgctxt "#32465"
 msgid "Cache disk reads to memory (increases RAM usage)"
-msgstr "Кэшировать считываемое с диска в память (увеличивает использование ОЗУ)"
+msgstr ""
+"Кэшировать считываемое с диска в память (увеличивает использование ОЗУ)"
 
 #: /resources/settings.xml
 msgctxt "#32466"
@@ -2484,8 +2574,17 @@ msgstr "Перестроение элементов списка за преде
 
 #: /resources/settings.xml
 msgctxt "#32479"
-msgid "Some platforms experience crashes while updating onscreen background service listitems with additional properties. Forcing service listitems to be rebuilt offscreen prevents this issue but will be slightly slower to add artwork and ratings. Restart Kodi to see changes."
-msgstr "На некоторых платформах возникают сбои при обновлении элементов списка с дополнительными свойствами фоновой службой на экране . Принудительное перестроение элементов списка за пределами экрана предотвращает эту проблему, но будет немного медленнее добавлять обложки и рейтинги. Перезапустите Kodi, чтобы увидеть изменения."
+msgid ""
+"Some platforms experience crashes while updating onscreen background service "
+"listitems with additional properties. Forcing service listitems to be "
+"rebuilt offscreen prevents this issue but will be slightly slower to add "
+"artwork and ratings. Restart Kodi to see changes."
+msgstr ""
+"На некоторых платформах возникают сбои при обновлении элементов списка с "
+"дополнительными свойствами фоновой службой на экране . Принудительное "
+"перестроение элементов списка за пределами экрана предотвращает эту "
+"проблему, но будет немного медленнее добавлять обложки и рейтинги. "
+"Перезапустите Kodi, чтобы увидеть изменения."
 
 #: /resources/settings.xml
 msgctxt "#32480"
@@ -2494,8 +2593,12 @@ msgstr "Упреждающее кэширование элементов спи�
 
 #: /resources/settings.xml
 msgctxt "#32481"
-msgid "Increases the pool of recently watched items randomly selected from to use as the seed for becauase you watched style recommendations."
-msgstr "Увеличивает пул недавно просмотренных элементов, выбранных случайным образом для использования в качестве рекомендаций."
+msgid ""
+"Increases the pool of recently watched items randomly selected from to use "
+"as the seed for becauase you watched style recommendations."
+msgstr ""
+"Увеличивает пул недавно просмотренных элементов, выбранных случайным образом "
+"для использования в качестве рекомендаций."
 
 #: /resources/settings.xml
 msgctxt "#32482"
@@ -2531,6 +2634,47 @@ msgstr "Сертификация ( < или = )"
 msgctxt "#32488"
 msgid "Certification ( > or = )"
 msgstr "Сертификация ( > или = )"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32489"
+msgid "Change rating"
+msgstr "Изменить рейтинг"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32490"
+msgid "Add to favourites"
+msgstr "Добавить в избранное"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32491"
+msgid "Remove from favourites"
+msgstr "Удалить из избранного"
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32492"
+msgid ""
+"{} already exists in {}!\\nDo you wish to remove this item from the list?"
+msgstr "{} уже существует в {}!\\nВы хотите удалить этот элемент из списка?"
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32493"
+msgid "Successfully removed {} from {}"
+msgstr "Успешно удалено {} из {}"
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32494"
+msgid "Successfully added {} to {}"
+msgstr "Успешно добавлено {} в {}"
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32495"
+msgid "Create new node"
+msgstr "Создать новый узел"
+
+#: /resources/tmdbhelper/lib/items/container.py
+msgctxt "#32496"
+msgid "Add/Remove as Custom Node"
+msgstr "Добавить/Удалить как пользовательский узел"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
@@ -2697,12 +2841,12 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32002"
 msgid "Days to cache details"
-msgstr "Кешировать сведения дней"
+msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32003"
 msgid "Days to cache lists"
-msgstr "Кешировать списки дней"
+msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32004"
@@ -2731,7 +2875,11 @@ msgstr ""
 
 #: /resources/lib/requestapi.py
 msgctxt "#32009"
-msgid "API returned 401 unauthorised error. If you have entered an API key for this service$COMMA please check that it is correct. If this error relates to TMDb API$COMMA please post a debug log to [B]https://github.com/jurialmunkey/plugin.video.themoviedb.helper/issues[/B]"
+msgid ""
+"API returned 401 unauthorised error. If you have entered an API key for this "
+"service$COMMA please check that it is correct. If this error relates to TMDb "
+"API$COMMA please post a debug log to [B]https://github.com/jurialmunkey/"
+"plugin.video.themoviedb.helper/issues[/B]"
 msgstr ""
 
 #: /resources/settings.xml
@@ -2747,12 +2895,15 @@ msgstr ""
 #: /resources/lib/traktapi.py
 msgctxt "#32012"
 msgid "You must authenticate your Trakt account to use this feature."
-msgstr "Вы должны аутентифицировать свою учетную запись Trakt, чтобы использовать эту функцию."
+msgstr ""
+"Вы должны аутентифицировать свою учетную запись Trakt, чтобы использовать "
+"эту функцию."
 
 #: /resources/settings.xml
 msgctxt "#32013"
 msgid "Display Trakt list management options in TMDb details list"
-msgstr "Отображение параметров управления списками Trakt в списке сведений TMDb"
+msgstr ""
+"Отображение параметров управления списками Trakt в списке сведений TMDb"
 
 #: /resources/settings.xml
 msgctxt "#32014"

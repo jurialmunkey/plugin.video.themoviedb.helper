@@ -1,5 +1,5 @@
 from tmdbhelper.lib.addon.plugin import get_language, get_setting
-from tmdbhelper.parser import try_int, del_empty_keys
+from jurialmunkey.parser import try_int, del_empty_keys
 from tmdbhelper.lib.addon.consts import CACHE_EXTENDED, ITER_PROPS_MAX
 from tmdbhelper.lib.api.request import RequestAPI
 from tmdbhelper.lib.api.api_keys.fanarttv import API_KEY, CLIENT_KEY

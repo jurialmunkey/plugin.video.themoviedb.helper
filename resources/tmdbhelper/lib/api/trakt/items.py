@@ -1,17 +1,20 @@
 import re
 import random
 from tmdbhelper.lib.addon.plugin import PLUGINPATH, convert_type, convert_trakt_type, get_setting
-from tmdbhelper.parser import try_int, try_str, del_empty_keys, get_params, partition_list
+from jurialmunkey.parser import try_int, try_str, del_empty_keys, get_params, partition_list
 from tmdbhelper.lib.addon.tmdate import date_in_range
 from tmdbhelper.lib.items.filters import is_excluded
 
 
 REGEX_DEFARTICLE = r'(?i)^The '
 
-
 EPISODE_PARAMS = {
-    'info': 'details', 'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}',
+    'info': 'details', 'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}',
     'season': '{season}', 'episode': '{number}'}
+
+SEASON_PARAMS = {
+    'info': 'episodes', 'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}',
+    'season': '{number}'}
 
 
 def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
@@ -106,9 +109,15 @@ def _get_item_infolabels(item, item_type=None, infolabels=None, show=None):
     return del_empty_keys(infolabels)
 
 
-def _get_item_infoproperties(item, item_type=None, infoproperties=None, show=None):
+def _get_item_infoproperties(item, item_type=None, infoproperties=None, show=None, main=None):
     infoproperties = infoproperties or {}
     infoproperties['tmdb_type'] = convert_trakt_type(item_type)
+    for k, v in (main or []).items():
+        if v is None:
+            continue
+        if not isinstance(v, (str, int, float,)):
+            continue
+        infoproperties[f'trakt_{k}'] = f'{v}'
     return del_empty_keys(infoproperties)
 
 
@@ -127,17 +136,25 @@ def _get_item_info(item, item_type=None, base_item=None, check_tmdb_id=True, par
     base_item = base_item or {}
     item_info = item.get(item_type, {}) or item
     show_item = None
-    if item_type == 'episode':
+
+    if item_type in ['season', 'episode']:
         show_item = item.get('show')
-        params_def = params_def or EPISODE_PARAMS
+        if not params_def:
+            if item_type == 'season':
+                params_def = SEASON_PARAMS
+            else:
+                params_def = EPISODE_PARAMS
+
     if not item_info:
         return base_item
+
     if check_tmdb_id and not item_info.get('ids', {}).get('tmdb'):
         if not show_item or not show_item.get('ids', {}).get('tmdb'):
             return base_item
+
     base_item['label'] = _get_item_title(item_info) or ''
     base_item['infolabels'] = _get_item_infolabels(item_info, item_type=item_type, infolabels=base_item.get('infolabels', {}), show=show_item)
-    base_item['infoproperties'] = _get_item_infoproperties(item_info, item_type=item_type, infoproperties=base_item.get('infoproperties', {}), show=show_item)
+    base_item['infoproperties'] = _get_item_infoproperties(item_info, item_type=item_type, infoproperties=base_item.get('infoproperties', {}), show=show_item, main=item)
     base_item['unique_ids'] = _get_item_unique_ids(item_info, unique_ids=base_item.get('unique_ids', {}), show=show_item)
     base_item['params'] = get_params(
         item_info, convert_trakt_type(item_type),
@@ -174,6 +191,12 @@ class TraktItems():
                 continue
             if filters and is_excluded(item, **filters):
                 continue
+            # Check we haven't already added that item
+            unique_id = f"{item['unique_ids']['tmdb']}_{item.get('label')}_{item['infolabels'].get('season')}_{item['infolabels'].get('episode')}"
+            if unique_id in self.configured.get(f'{i_type}_ids', []):
+                continue
+            # Add item ID to checklist to avoid duplicates
+            self.configured.setdefault(f'{i_type}_ids', []).append(unique_id)
             # Also add item to a list only containing that item type
             # Useful if we need to only get one type of item from a mixed list (e.g. only "movies")
             self.configured.setdefault(f'{i_type}s', []).append(item)

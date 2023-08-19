@@ -59,7 +59,7 @@ def monitor_userlist():
 
 
 def library_autoupdate(list_slugs=None, user_slugs=None, busy_spinner=False, force=False):
-    kodi_log(u'UPDATING TV SHOWS LIBRARY', 1)
+    kodi_log(u'UPDATING LIBRARY', 1)
     Dialog().notification('TMDbHelper', f'{get_localized(32167)}...')
 
     # Update library from Trakt lists

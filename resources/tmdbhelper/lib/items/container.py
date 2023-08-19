@@ -1,7 +1,7 @@
 from xbmcplugin import addDirectoryItems, setProperty, setPluginCategory, setContent, endOfDirectory, addSortMethod
 from tmdbhelper.lib.addon.consts import NO_LABEL_FORMATTING
-from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin
-from tmdbhelper.parser import try_int
+from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin, get_localized, get_condvisibility
+from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.thread import ParallelThread
 from tmdbhelper.lib.api.tmdb.api import TMDb
 from tmdbhelper.lib.api.trakt.api import TraktAPI
@@ -44,6 +44,8 @@ class Container():
         self.is_fanarttv = self.params.get('fanarttv', '').lower()
         self.is_detailed = self.params.get('detailed', '').lower() == 'true' or self.params.get('info') == 'details'
 
+        self.context_additions = None if self.is_widget else [(get_localized(32496), 'RunScript(plugin.video.themoviedb.helper,make_node)')]
+
         # endOfDirectory
         self.update_listing = False  # endOfDirectory(updateListing=) set True to replace current path
         self.plugin_category = ''  # Container.PluginCategory / ListItem.Property(widget)
@@ -58,10 +60,10 @@ class Container():
         self.kodi_db = None
 
         # API class initialisation
-        self.tmdb_api = TMDb()
+        self.tmdb_api = TMDb(page_length=self.page_length)
         self.omdb_api = OMDb() if get_setting('omdb_apikey', 'str') else None
         self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only(), )
-        self.trakt_api = TraktAPI()
+        self.trakt_api = TraktAPI(page_length=self.page_length)
         self.mdblist_api = MDbList()
         self.tvdb_api = TVDb()
         self.ib = ItemBuilder(
@@ -81,6 +83,12 @@ class Container():
         self.tmdb_cache_only = self.tmdb_is_cache_only()
         self.pagination = self.pagination_is_allowed()
         self.thumb_override = 0
+
+    @property
+    def page_length(self):
+        if self.is_widget or not get_condvisibility('Window.IsVisible(MyVideoNav.xml)'):
+            return 1
+        return get_setting('pagemulti_library', 'int')
 
     def pagination_is_allowed(self):
         if self.params.get('nextpage', '').lower() == 'false':
@@ -155,7 +163,7 @@ class Container():
             if self.hide_watched and try_int(li.infolabels.get('playcount')) != 0:
                 return
 
-            li.set_context_menu()  # Set the context menu items
+            li.set_context_menu(additions=self.context_additions)  # Set the context menu items
             li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
             li.set_thumb_to_art(self.thumb_override == 2) if self.thumb_override else None  # Special override for calendars to prevent thumb spoilers
             li.set_params_reroute(self.is_fanarttv, self.params.get('extended'), self.is_cacheonly)  # Reroute details to proper end point

@@ -3,9 +3,9 @@ from xbmc import Monitor
 from xbmcgui import Dialog, DialogProgress
 from tmdbhelper.lib.files.futils import json_loads as data_loads
 from tmdbhelper.lib.files.futils import json_dumps as data_dumps
-from tmdbhelper.lib.addon.window import get_property
+from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.plugin import get_localized, get_setting, ADDONPATH
-from tmdbhelper.parser import try_int
+from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp
 from tmdbhelper.lib.files.bcache import use_simple_cache
 from tmdbhelper.lib.items.pages import PaginatedItems, get_next_page
@@ -13,9 +13,10 @@ from tmdbhelper.lib.api.request import RequestAPI
 from tmdbhelper.lib.api.trakt.items import TraktItems
 from tmdbhelper.lib.api.trakt.decorators import is_authorized, use_activity_cache
 from tmdbhelper.lib.api.trakt.progress import _TraktProgress
+from tmdbhelper.lib.api.trakt.sync import _TraktSync
 from tmdbhelper.lib.addon.logger import kodi_log, TimerFunc
 from tmdbhelper.lib.addon.consts import CACHE_SHORT, CACHE_LONG
-from tmdbhelper.lib.addon.thread import has_property_lock, use_thread_lock
+from tmdbhelper.lib.addon.thread import has_property_lock
 from tmdbhelper.lib.api.api_keys.trakt import CLIENT_ID, CLIENT_SECRET, USER_TOKEN
 from timeit import default_timer as timer
 
@@ -150,11 +151,12 @@ class _TraktLists():
         return TraktItems(response.json(), headers=response.headers, trakt_type=trakt_type).configure_items()
 
     @is_authorized
-    def get_mixed_list(self, path, trakt_types: list, limit: int = 20, extended: str = None, authorize=False):
+    def get_mixed_list(self, path, trakt_types: list, limit: int = None, extended: str = None, authorize=False):
         """ Returns a randomised simple list which combines movies and shows
         path uses {trakt_type} as format substitution for trakt_type in trakt_types
         """
         items = []
+        limit = limit or self.item_limit
         for trakt_type in trakt_types:
             response = self.get_simple_list(
                 path.format(trakt_type=trakt_type), extended=extended, page=1, limit=limit * 2, trakt_type=trakt_type) or {}
@@ -163,8 +165,9 @@ class _TraktLists():
             return random.sample(items, limit)
 
     @is_authorized
-    def get_basic_list(self, path, trakt_type, page: int = 1, limit: int = 20, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, randomise=False, always_refresh=True):
+    def get_basic_list(self, path, trakt_type, page: int = 1, limit: int = None, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, randomise=False, always_refresh=True):
         cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
+        limit = limit or self.item_limit
         if randomise:
             response = self.get_simple_list(
                 path, extended=extended, page=1, limit=limit * 2, trakt_type=trakt_type)
@@ -180,8 +183,9 @@ class _TraktLists():
             return response['items'] + get_next_page(response['headers'])
 
     @is_authorized
-    def get_stacked_list(self, path, trakt_type, page: int = 1, limit: int = 20, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, always_refresh=True, **kwargs):
+    def get_stacked_list(self, path, trakt_type, page: int = 1, limit: int = None, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, always_refresh=True, **kwargs):
         """ Get Basic list but stack repeat TV Shows """
+        limit = limit or self.item_limit
         cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
         response = self.get_simple_list(path, extended=extended, limit=4095, trakt_type=trakt_type, cache_refresh=cache_refresh)
         response['items'] = self._stack_calendar_tvshows(response['items'])
@@ -190,7 +194,8 @@ class _TraktLists():
             return response['items'] + get_next_page(response['headers'])
 
     @is_authorized
-    def get_custom_list(self, list_slug, user_slug=None, page: int = 1, limit: int = 20, params=None, authorize=False, sort_by=None, sort_how=None, extended=None, owner=False, always_refresh=True):
+    def get_custom_list(self, list_slug, user_slug=None, page: int = 1, limit: int = None, params=None, authorize=False, sort_by=None, sort_how=None, extended=None, owner=False, always_refresh=True):
+        limit = limit or self.item_limit
         if user_slug == 'official':
             path = f'lists/{list_slug}/items'
         else:
@@ -217,7 +222,7 @@ class _TraktLists():
         return func(sort_by, sort_how, filters=filters)
 
     def get_sync_list(self, sync_type, trakt_type, page: int = 1, limit: int = None, params=None, sort_by=None, sort_how=None, next_page=True, always_refresh=True, extended=None, filters=None):
-        limit = limit or self.item_limit
+        limit = limit or self.sync_item_limit
         cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
         response = self._get_sync_list(sync_type, trakt_type, sort_by=sort_by, sort_how=sort_how, decorator_cache_refresh=cache_refresh, extended=extended, filters=filters)
         if not response:
@@ -318,187 +323,6 @@ class _TraktLists():
             return response
 
 
-class _TraktSync():
-    def get_sync_item(self, trakt_type, unique_id, id_type, season=None, episode=None):
-        """ Gets an item configured for syncing as postdata """
-        if not unique_id or not id_type or not trakt_type:
-            return
-        base_trakt_type = 'show' if trakt_type in ['season', 'episode'] else trakt_type
-        if id_type != 'slug':
-            unique_id = self.get_id(unique_id, id_type, base_trakt_type, output_type='slug')
-        if not unique_id:
-            return
-        return self.get_details(base_trakt_type, unique_id, season=season, episode=episode, extended=None)
-
-    def add_list_item(self, list_slug, trakt_type, unique_id, id_type, season=None, episode=None, user_slug=None, remove=False):
-        item = self.get_sync_item(trakt_type, unique_id, id_type, season, episode)
-        if not item:
-            return
-        user_slug = user_slug or 'me'
-        return self.post_response(
-            'users', user_slug, 'lists', list_slug, 'items/remove' if remove else 'items',
-            postdata={f'{trakt_type}s': [item]})
-
-    def sync_item(self, method, trakt_type, unique_id, id_type, season=None, episode=None):
-        """
-        methods = history watchlist collection recommendations
-        trakt_type = movie, show, season, episode
-        """
-        item = self.get_sync_item(trakt_type, unique_id, id_type, season, episode)
-        if not item:
-            return
-        return self.post_response('sync', method, postdata={f'{trakt_type}s': [item]})
-
-    def _get_activity_timestamp(self, activities, activity_type=None, activity_key=None):
-        if not activities:
-            return
-        if not activity_type:
-            return activities.get('all', '')
-        if not activity_key:
-            return activities.get(activity_type, {})
-        return activities.get(activity_type, {}).get(activity_key)
-
-    @is_authorized
-    def _get_last_activity(self, activity_type=None, activity_key=None, cache_refresh=False):
-        def _cache_expired():
-            """ Check if the cached last_activities has expired """
-            last_exp = get_property('TraktSyncLastActivities.Expires', is_type=int)
-            if not last_exp or last_exp < set_timestamp(0, True):  # Expired
-                return True
-            return False
-
-        def _cache_activity():
-            """ Get last_activities from Trakt and add to cache while locking other lookup threads """
-            get_property('TraktSyncLastActivities.Locked', 1)  # Lock other threads
-            response = self.get_response_json('sync/last_activities')  # Retrieve data from Trakt
-            if response:
-                get_property('TraktSyncLastActivities', set_property=data_dumps(response))  # Dump data to property
-                get_property('TraktSyncLastActivities.Expires', set_property=set_timestamp(90, True))  # Set activity expiry
-            get_property('TraktSyncLastActivities.Locked', clear_property=True)  # Clear thread lock
-            return response
-
-        def _cache_router():
-            """ Routes between getting cached object or new lookup """
-            if not _cache_expired():
-                return data_loads(get_property('TraktSyncLastActivities'))
-            if has_property_lock('TraktSyncLastActivities.Locked'):  # Other thread getting data so wait for it
-                return data_loads(get_property('TraktSyncLastActivities'))
-            return _cache_activity()
-
-        if not self.last_activities:
-            self.last_activities = _cache_router()
-
-        return self._get_activity_timestamp(self.last_activities, activity_type=activity_type, activity_key=activity_key)
-
-    @use_activity_cache(cache_days=CACHE_SHORT)
-    def _get_sync_response(self, path, extended=None, allow_fallback=False):
-        """ Quick sub-cache routine to avoid recalling full sync list if we also want to quicklist it """
-        sync_name = f'sync_response.{path}.{extended}'
-        self.sync[sync_name] = self.sync.get(sync_name) or self.get_response_json(path, extended=extended)
-        return self.sync[sync_name]
-
-    @is_authorized
-    def _get_sync(self, path, trakt_type, id_type=None, extended=None, allow_fallback=False):
-        """ Get sync list """
-        response = self._get_sync_response(path, extended=extended, allow_fallback=allow_fallback)
-        if not id_type:
-            return response
-        if response and trakt_type:
-            return {
-                i[trakt_type]['ids'][id_type]: i for i in response
-                if i.get(trakt_type, {}).get('ids', {}).get(id_type)}
-
-    def is_sync(self, trakt_type, unique_id, season=None, episode=None, id_type=None, sync_type=None):
-        """ Returns True if item in sync list else False """
-
-        def _is_nested():
-            try:
-                sync_item_seasons = sync_list[unique_id]['seasons']
-            except (KeyError, AttributeError):
-                return
-            if not sync_item_seasons:
-                return
-            se_n, ep_n = try_int(season), try_int(episode)
-            for i in sync_item_seasons:
-                if se_n != i.get('number'):
-                    continue
-                if ep_n is None:
-                    return True
-                try:
-                    sync_item_episodes = i['episodes']
-                except (KeyError, AttributeError):
-                    return
-                if not sync_item_episodes:
-                    return
-                for j in sync_item_episodes:
-                    if ep_n == j.get('number'):
-                        return True
-        sync_list = self.get_sync(sync_type, trakt_type, id_type)
-        if unique_id not in sync_list:
-            return
-        if season is None:
-            return True
-        return _is_nested()
-
-    @use_activity_cache('movies', 'watched_at', CACHE_LONG)
-    def get_sync_watched_movies(self, trakt_type, id_type=None, extended=None):
-        return self._get_sync('sync/watched/movies', 'movie', id_type=id_type, extended=extended, allow_fallback=True)
-
-    @use_activity_cache('episodes', 'watched_at', CACHE_SHORT)  # Use short-cache to make sure we get newly aired metadata
-    def get_sync_watched_shows(self, trakt_type, id_type=None, extended=None):
-        return self._get_sync('sync/watched/shows', 'show', id_type=id_type, extended=extended, allow_fallback=True)
-
-    @use_activity_cache('movies', 'collected_at', CACHE_LONG)
-    def get_sync_collection_movies(self, trakt_type, id_type=None, extended=None):
-        return self._get_sync('sync/collection/movies', 'movie', id_type=id_type, extended=extended)
-
-    @use_activity_cache('episodes', 'collected_at', CACHE_LONG)
-    def get_sync_collection_shows(self, trakt_type, id_type=None, extended=None):
-        return self._get_sync('sync/collection/shows', trakt_type, id_type=id_type, extended=extended)
-
-    @use_activity_cache('movies', 'paused_at', CACHE_LONG)
-    def get_sync_playback_movies(self, trakt_type, id_type=None, extended=None):
-        return self._get_sync('sync/playback/movies', 'movie', id_type=id_type, extended=extended)
-
-    @use_activity_cache('episodes', 'paused_at', CACHE_LONG)
-    def get_sync_playback_shows(self, trakt_type, id_type=None, extended=None):
-        return self._get_sync('sync/playback/episodes', trakt_type, id_type=id_type, extended=extended)
-
-    @use_activity_cache('movies', 'watchlisted_at', CACHE_LONG)
-    def get_sync_watchlist_movies(self, trakt_type, id_type=None, extended=None):
-        return self._get_sync('sync/watchlist/movies', 'movie', id_type=id_type, extended=extended)
-
-    @use_activity_cache('shows', 'watchlisted_at', CACHE_LONG)
-    def get_sync_watchlist_shows(self, trakt_type, id_type=None, extended=None):
-        return self._get_sync('sync/watchlist/shows', 'show', id_type=id_type, extended=extended)
-
-    @use_activity_cache('movies', 'recommendations_at', CACHE_LONG)
-    def get_sync_recommendations_movies(self, trakt_type, id_type=None, extended=None):
-        return self._get_sync('sync/recommendations/movies', 'movie', id_type=id_type, extended=extended)
-
-    @use_activity_cache('shows', 'recommendations_at', CACHE_LONG)
-    def get_sync_recommendations_shows(self, trakt_type, id_type=None, extended=None):
-        return self._get_sync('sync/recommendations/shows', 'show', id_type=id_type, extended=extended)
-
-    @use_thread_lock('TraktAPI.get_sync.Locked', timeout=10, polling=0.05, combine_name=True)
-    def get_sync(self, sync_type, trakt_type, id_type=None, extended=None):
-        if sync_type == 'watched':
-            func = self.get_sync_watched_movies if trakt_type == 'movie' else self.get_sync_watched_shows
-        elif sync_type == 'collection':
-            func = self.get_sync_collection_movies if trakt_type == 'movie' else self.get_sync_collection_shows
-        elif sync_type == 'playback':
-            func = self.get_sync_playback_movies if trakt_type == 'movie' else self.get_sync_playback_shows
-        elif sync_type == 'watchlist':
-            func = self.get_sync_watchlist_movies if trakt_type == 'movie' else self.get_sync_watchlist_shows
-        elif sync_type == 'recommendations':
-            func = self.get_sync_recommendations_movies if trakt_type == 'movie' else self.get_sync_recommendations_shows
-        else:
-            return
-        sync_name = f'{sync_type}.{trakt_type}.{id_type}.{extended}'
-        self.sync[sync_name] = self.sync.get(sync_name) or func(trakt_type, id_type, extended)
-        return self.sync[sync_name] or {}
-
-
 class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
 
     client_id = CLIENT_ID
@@ -510,7 +334,8 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
             client_id=None,
             client_secret=None,
             user_token=None,
-            force=False):
+            force=False,
+            page_length=1):
         super(TraktAPI, self).__init__(req_api_url=API_URL, req_api_name='TraktAPI', timeout=20)
         self.authorization = ''
         self.attempted_login = False
@@ -523,7 +348,8 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         self.last_activities = {}
         self.sync_activities = {}
         self.sync = {}
-        self.item_limit = 83 if get_setting('trakt_expandedlimit') else 20  # 84 (83+NextPage) has common factors 4,6,7,8 suitable for wall views
+        self.sync_item_limit = 20 * max(get_setting('pagemulti_sync', 'int'), page_length)
+        self.item_limit = 20 * max(get_setting('pagemulti_trakt', 'int'), page_length)
         self.login() if force else self.authorize()
 
     def authorize(self, login=False):
@@ -745,18 +571,30 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         except AttributeError:
             return {}
 
-    def _get_id(self, unique_id, id_type, trakt_type, output_type=None, output_trakt_type=None):
-        response = self.get_request_lc('search', id_type, unique_id, type=trakt_type)
-        for i in response:
-            if i.get('type') != trakt_type:
-                continue
-            if f'{i.get(trakt_type, {}).get("ids", {}).get(id_type)}' != f'{unique_id}':
-                continue
-            if not output_type:
-                return i.get(output_trakt_type or trakt_type, {}).get('ids', {})
-            return i.get(output_trakt_type or trakt_type, {}).get('ids', {}).get(output_type)
+    def _get_id(self, unique_id, id_type, trakt_type, output_type=None, output_trakt_type=None, season_episode_check=None):
 
-    def get_id(self, unique_id, id_type, trakt_type, output_type=None, output_trakt_type=None):
+        response = self.get_request_lc('search', id_type, unique_id, type=trakt_type)
+
+        for i in response:
+            try:
+                if i['type'] != trakt_type:
+                    continue
+                if f'{i[trakt_type]["ids"][id_type]}' != f'{unique_id}':
+                    continue
+                if trakt_type == 'episode' and season_episode_check is not None:
+                    if f'{i["episode"]["season"]}' != f'{season_episode_check[0]}':
+                        continue
+                    if f'{i["episode"]["number"]}' != f'{season_episode_check[1]}':
+                        continue
+
+                if not output_type:
+                    return i[output_trakt_type or trakt_type]['ids']
+                return i[output_trakt_type or trakt_type]['ids'][output_type]
+
+            except (TypeError, KeyError):
+                continue
+
+    def get_id(self, unique_id, id_type, trakt_type, output_type=None, output_trakt_type=None, season_episode_check=None):
         """
         id_type: imdb, tmdb, trakt, tvdb
         trakt_type: movie, show, episode, person, list
@@ -768,12 +606,18 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         """
         cache_name = f'trakt_get_id.{id_type}.{unique_id}.{trakt_type}.{output_type}'
 
+        # Some plugins incorrectly put TMDb ID for the **tvshow** in the episode instead of the **episode** ID
+        # season_episode_check tuple of season/episode numbers is used to bandaid against incorrect metadata
+        if trakt_type == 'episode' and season_episode_check is not None:
+            cache_name = f'{cache_name}.{season_episode_check[0]}.{season_episode_check[1]}'
+
         # Avoid unnecessary extra API calls by only adding output type to cache name if it differs from input type
         if output_trakt_type and output_trakt_type != trakt_type:
             cache_name = f'{cache_name}.{output_trakt_type}'
 
         return self._cache.use_cache(
             self._get_id, unique_id, id_type, trakt_type=trakt_type, output_type=output_type, output_trakt_type=output_trakt_type,
+            season_episode_check=season_episode_check,
             cache_name=cache_name,
             cache_days=CACHE_LONG)
 

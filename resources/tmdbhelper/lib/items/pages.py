@@ -1,4 +1,4 @@
-from tmdbhelper.parser import try_int
+from jurialmunkey.parser import try_int
 
 
 def get_next_page(response_headers=None):

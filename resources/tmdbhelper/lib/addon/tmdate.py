@@ -4,6 +4,11 @@ import time
 from xbmc import getRegion
 from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.addon.logger import kodi_log
+import jurialmunkey.tmdate as jurialmunkey_tmdate
+
+
+get_timestamp = jurialmunkey_tmdate.get_timestamp
+set_timestamp = jurialmunkey_tmdate.set_timestamp
 
 
 def get_datetime_combine(*args, **kwargs):
@@ -36,24 +41,6 @@ def convert_to_timestamp(date_time):
         return int(time.mktime(date_time.timetuple()))
     except OverflowError:
         return 2145916800  # Y2038 bug in time.mktime on 32bit float systems. Use 2038 Jan 1 UTC for db timestamp instead.
-
-
-def get_timestamp(timestamp=None, set_int=False):
-    if not timestamp:
-        return
-    now = time.time()
-    tmp = timestamp
-    if set_int:
-        now = int(now)
-        tmp = int(tmp)
-    if now > tmp:
-        return
-    return timestamp
-
-
-def set_timestamp(wait_time=60, set_int=False):
-    timestamp = time.time() + wait_time
-    return int(timestamp) if set_int else timestamp
 
 
 def format_date(time_str, str_fmt="%A", time_fmt="%Y-%m-%d", time_lim=10, utc_convert=False, region_fmt=None):

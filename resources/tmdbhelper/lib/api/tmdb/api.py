@@ -1,8 +1,8 @@
 from xbmcgui import Dialog
 from tmdbhelper.lib.addon.plugin import ADDONPATH, get_mpaa_prefix, get_language, convert_type, get_setting, get_localized, get_infolabel
 from tmdbhelper.lib.addon.consts import TMDB_ALL_ITEMS_LISTS, TMDB_PARAMS_SEASONS, TMDB_PARAMS_EPISODES, CACHE_SHORT, CACHE_MEDIUM
-from tmdbhelper.parser import try_int
-from tmdbhelper.lib.addon.window import get_property
+from jurialmunkey.parser import try_int
+from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.tmdate import format_date
 from tmdbhelper.lib.files.futils import use_json_filecache, validify_filename
 from tmdbhelper.lib.items.pages import PaginatedItems
@@ -32,7 +32,8 @@ class TMDb(RequestAPI):
             self,
             api_key=None,
             language=get_language(),
-            mpaa_prefix=get_mpaa_prefix()):
+            mpaa_prefix=get_mpaa_prefix(),
+            page_length=1):
         api_key = api_key or self.api_key
 
         super(TMDb, self).__init__(
@@ -49,6 +50,7 @@ class TMDb(RequestAPI):
         self.req_strip += [(self.append_to_response, ''), (self.req_language, f'{self.iso_language}{"_en" if ARTLANG_FALLBACK else ""}')]
         self.genres = self.get_genres()
         self.mapper = ItemMapper(self.language, self.mpaa_prefix, self.genres)
+        self.page_length = max(get_setting('pagemulti_tmdb', 'int'), page_length)
         TMDb.api_key = api_key
 
     def get_genres(self):
@@ -75,6 +77,16 @@ class TMDb(RequestAPI):
             return '%2C'
         else:
             return False
+
+    @staticmethod
+    def get_paginated_items(items, limit=None, page=1, total_pages=None):
+        if total_pages and try_int(page) < try_int(total_pages):
+            items.append({'next_page': try_int(page) + 1})
+            return items
+        if limit is not None:
+            paginated_items = PaginatedItems(items, page=page, limit=limit)
+            return paginated_items.items + paginated_items.next_page
+        return items
 
     def _get_tmdb_multisearch_validfy(self, query=None, validfy=True, scrub=True):
         if not validfy or not query:
@@ -114,7 +126,7 @@ class TMDb(RequestAPI):
         if not tmdb_type:
             return
         kwargs['cache_days'] = CACHE_MEDIUM
-        kwargs['cache_name'] = 'TMDb.get_tmdb_id.v3'
+        kwargs['cache_name'] = 'TMDb.get_tmdb_id.v4'
         kwargs['cache_combine_name'] = True
         return self._cache.use_cache(
             self._get_tmdb_id, tmdb_type=tmdb_type, imdb_id=imdb_id, tvdb_id=tvdb_id, query=query, year=year,
@@ -136,11 +148,10 @@ class TMDb(RequestAPI):
         elif query:
             if tmdb_type in ['movie', 'tv']:
                 query = query.split(' (', 1)[0]  # Scrub added (Year) or other cruft in parentheses () added by Addons or TVDb
-            query = quote_plus(query)
             if tmdb_type == 'tv':
-                request = func('search', tmdb_type, language=self.req_language, query=query, first_air_date_year=year)
+                request = func('search', tmdb_type, language=self.req_language, query=quote_plus(query), first_air_date_year=year)
             else:
-                request = func('search', tmdb_type, language=self.req_language, query=query, year=year)
+                request = func('search', tmdb_type, language=self.req_language, query=quote_plus(query), year=year)
             request = request.get('results', [])
         if not request:
             return
@@ -248,9 +259,9 @@ class TMDb(RequestAPI):
         request = self.get_request_sc(f'tv/{tmdb_id}')
         if not request or not request.get('seasons'):
             return []
-        return [
+        return (
             j for i in request['seasons'] for j in self.get_episode_list(tmdb_id, i['season_number'])
-            if i.get('season_number')]
+            if i.get('season_number'))
 
     def get_episode_group_episodes_list(self, tmdb_id, group_id, position):
         request = self.get_request_sc(f'tv/episode_group/{group_id}')
@@ -290,6 +301,26 @@ class TMDb(RequestAPI):
                 tmdb_id=tmdb_id, episode_group=True)
             for i in request.get('results', [])]
         return items
+
+    def get_next_episode(self, tmdb_id, season, episode):
+        snum, enum = try_int(season), try_int(episode)
+
+        if snum < 1 or enum < 0:
+            return
+
+        all_episodes = self.get_flatseasons_list(tmdb_id)
+        if not all_episodes:
+            return
+
+        for i in all_episodes:
+            i_snum = try_int(i['infolabels'].get('season', -1))
+            if i_snum > snum:
+                return i
+            if i_snum < snum:
+                continue
+            i_enum = try_int(i['infolabels'].get('episode', -1))
+            if i_enum > enum:
+                return i
 
     def _get_videos(self, tmdb_id, tmdb_type, season=None, episode=None):
         path = f'{tmdb_type}/{tmdb_id}'
@@ -389,14 +420,14 @@ class TMDb(RequestAPI):
         request = self.get_details_request('tv', tmdb_id, season) if get_detailed else self.get_request_sc(f'tv/{tmdb_id}/season/{season}')
         if not request:
             return []
-        items = [
+        items = (
             self._clean_merged(
                 item=self.mapper.get_info(i, 'episode', None, definition=TMDB_PARAMS_EPISODES, tmdb_id=tmdb_id),
                 tmdb_id=tmdb_id)
-            for i in request.get('episodes', [])]
+            for i in request.get('episodes', []))
         return items
 
-    def get_cast_list(self, tmdb_id, tmdb_type, season=None, episode=None, keys=['cast', 'guest_stars'], aggregate=False):
+    def get_cast_list(self, tmdb_id, tmdb_type, season=None, episode=None, keys=['cast', 'guest_stars'], aggregate=False, paginated=True, limit=None, page=None, **kwargs):
         """ Get cast list
         endpoint switch to aggregate_credits for full tv series cast
         """
@@ -443,7 +474,11 @@ class TMDb(RequestAPI):
                     p[k] = f'{p[k]} / {v}'
         for i in items:
             i['label2'] = i['infoproperties'].get('role')
-        return items
+
+        if not paginated:
+            return items
+
+        return self.get_paginated_items(items, limit, page)
 
     def _get_downloaded_list(self, export_list, sorting=None, reverse=False, datestamp=None):
         from tmdbhelper.lib.files.downloader import Downloader
@@ -510,42 +545,65 @@ class TMDb(RequestAPI):
             return
         kwargs['key'] = 'results'
         kwargs['query'] = quote_plus(query)
-        return self.get_basic_list(f'search/{tmdb_type}', tmdb_type, **kwargs)
+        return self.get_basic_list(f'search/{"multi" if tmdb_type == "both" else tmdb_type}', tmdb_type, **kwargs)
 
     def get_basic_list(
             self, path, tmdb_type, key='results', params=None, base_tmdb_type=None, limit=None, filters={},
-            sort_key=None, stacked=None, **kwargs):
+            sort_key=None, stacked=None, paginated=True, length=None, **kwargs):
 
-        if kwargs.get('page') == 'random':
+        length = length or self.page_length
+
+        def _get_page(page):
+            kwargs['page'] = page
+            return self.get_request_sc(path, **kwargs)
+
+        def _get_random():
             import random
 
-            def _get_random_page(page_end):
-                kwargs['page'] = random.randint(1, page_end)
-                return self.get_request_sc(path, **kwargs)
+            page_end = int(kwargs.pop('random_page_limit', 10))
+            response = _get_page(random.randint(1, page_end))
 
-            page_end = int(kwargs.get('random_page_limit', 10))
-            response = _get_random_page(page_end)
+            if not response:
+                return
+            if response.get(key):
+                return response
+            if int(response.get('total_pages') or 1) < page_end:
+                return _get_page(random.randint(1, int(response['total_pages'] or 1)))
 
-            if response and not response.get(key) and int(response.get('total_pages') or 1) < page_end:
-                response = _get_random_page(int(response['total_pages'] or 1))
+        def _get_results(response):
+            try:
+                return response[key] or []
+            except (KeyError, TypeError):
+                return []
 
-        else:
-            response = self.get_request_sc(path, **kwargs)
+        def _get_response(page, length):
+            if page == 'random':
+                response = _get_random()
+                results = _get_results(response)
+                return response, results
+            results = []
+            page = try_int(page, fallback=1)
+            for x in range(try_int(length, fallback=1)):
+                response = _get_page(page + x)
+                results += _get_results(response)
+                if int(response.get('total_pages') or 1) <= int(response.get('page') or 1):
+                    break
+            return response, results
 
-        if not response:
-            return []
-
-        try:
-            results = response[key] or []
-        except (KeyError, TypeError):
-            return []
-
+        response, results = _get_response(kwargs.get('page'), length=length)
         results = sorted(results, key=lambda i: i.get(sort_key, 0), reverse=True) if sort_key else results
 
         add_infoproperties = [('total_pages', response.get('total_pages')), ('total_results', response.get('total_results'))]
 
+        item_tmdb_type = None if tmdb_type == 'both' else tmdb_type
+
         items = [
-            self.mapper.get_info(i, tmdb_type, definition=params, base_tmdb_type=base_tmdb_type, iso_country=self.iso_country, add_infoproperties=add_infoproperties)
+            self.mapper.get_info(
+                i, item_tmdb_type or i.get('media_type', ''),
+                definition=params,
+                base_tmdb_type=base_tmdb_type,
+                iso_country=self.iso_country,
+                add_infoproperties=add_infoproperties)
             for i in results if i]
 
         if filters:
@@ -568,23 +626,25 @@ class TMDb(RequestAPI):
                     p[b][k] = iv if pv is None else f'{pv} / {iv}'
             items = stacked_list
 
-        if try_int(response.get('page', 0)) < try_int(response.get('total_pages', 0)):
-            items.append({'next_page': try_int(response.get('page', 0)) + 1})
-        elif limit is not None:
-            paginated_items = PaginatedItems(items, page=kwargs.get('page', 1), limit=limit)
-            return paginated_items.items + paginated_items.next_page
+        if not paginated:
+            return items
 
-        return items
+        return self.get_paginated_items(items, limit, kwargs['page'], response.get('total_pages'))
 
     def get_discover_list(self, tmdb_type, **kwargs):
         # TODO: Check what regions etc we need to have
+        to_del = ['with_id', 'with_separator', 'cacheonly', 'nextpage', 'widget', 'fanarttv']
         for k, v in kwargs.items():
-            if k in ['with_id', 'with_separator', 'page', 'limit', 'nextpage', 'widget', 'fanarttv']:
+            if k in to_del:
+                continue
+            if k in ['page', 'limit']:
                 continue
             if k and v:
                 break
         else:  # Only build discover list if we have params to pass
             return
+        for k in to_del:
+            kwargs.pop(k, None)
         path = f'discover/{tmdb_type}'
         return self.get_basic_list(path, tmdb_type, **kwargs)
 

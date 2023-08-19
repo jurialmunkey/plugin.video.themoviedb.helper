@@ -88,9 +88,90 @@ def choose_tmdb_id(func):
     return wrapper
 
 
+def make_node(name=None, icon=None, path=None, **kwargs):
+    from json import loads
+    from xbmcgui import Dialog
+    from tmdbhelper.lib.addon.plugin import get_infolabel, get_localized
+    from tmdbhelper.lib.files.futils import get_files_in_folder, read_file
+    from tmdbhelper.lib.addon.consts import NODE_BASEDIR
+    from tmdbhelper.lib.files.futils import dumps_to_file
+
+    name = name or get_infolabel('Container.ListItem.Label') or ''
+    icon = icon or get_infolabel('Container.ListItem.Icon') or ''
+    path = path or get_infolabel('Container.ListItem.FolderPath') or ''
+    item = {'name': name, 'icon': icon, 'path': path}
+
+    basedir = NODE_BASEDIR
+    files = get_files_in_folder(basedir, r'.*\.json')
+
+    x = Dialog().contextmenu([f for f in files] + [get_localized(32495)])
+    if x == -1:
+        return
+    elif x == len(files):
+        file = Dialog().input(get_localized(551))
+        if not file:
+            return
+        meta = {
+            "name": file,
+            "icon": "",
+            "list": []}
+        file = f'{file}.json'
+    else:
+        file = files[x]
+        data = read_file(basedir + file)
+        meta = loads(data) or {}
+    if not meta or 'list' not in meta:
+        return
+
+    removals = []
+    for x, i in enumerate(meta['list']):
+        if path != i['path']:
+            continue
+        if not Dialog().yesno(f'{name}', get_localized(32492).format(name, file)):
+            return
+        removals.append(x)
+
+    if removals:
+        for x in sorted(removals, reverse=True):
+            del meta['list'][x]
+        text = get_localized(32493).format(name, file)
+    else:
+        meta['list'].append(item)
+        text = get_localized(32494).format(name, file)
+
+    dumps_to_file(meta, basedir, file, join_addon_data=False)
+    Dialog().ok(f'{name}', text)
+
+
+def clean_old_databases():
+    """ Once-off routine to delete old unused database versions to avoid wasting disk space """
+    from tmdbhelper.lib.files.futils import delete_folder
+    from tmdbhelper.lib.addon.plugin import get_setting
+    for f in ['database', 'database_v2', 'database_v3', 'database_v4', 'database_v5']:
+        delete_folder(f, force=True, check_exists=True)
+    save_path = get_setting('image_location', 'str')
+    for f in ['blur', 'crop', 'desaturate', 'colors']:
+        delete_folder(f, force=True, check_exists=True)
+        if not save_path:
+            continue
+        delete_folder(f'{save_path}{f}/', force=True, check_exists=True, join_addon_data=False)
+
+
+def mem_cache_kodidb(notification=True):
+    from tmdbhelper.lib.addon.plugin import ADDONPATH
+    from tmdbhelper.lib.api.kodi.rpc import KodiLibrary
+    from tmdbhelper.lib.addon.logger import TimerFunc
+    from xbmcgui import Dialog
+    with TimerFunc('KodiLibrary sync took', inline=True):
+        KodiLibrary('movie', cache_refresh=True)
+        KodiLibrary('tvshow', cache_refresh=True)
+        if notification:
+            Dialog().notification('TMDbHelper', 'Kodi Library cached to memory', icon=f'{ADDONPATH}/icon.png')
+
+
 def container_refresh():
     from tmdbhelper.lib.addon.tmdate import set_timestamp
-    from tmdbhelper.lib.addon.window import get_property
+    from jurialmunkey.window import get_property
     from tmdbhelper.lib.addon.plugin import executebuiltin
     executebuiltin('Container.Refresh')
     get_property('Widgets.Reload', set_property=f'{set_timestamp(0, True)}')
@@ -98,7 +179,7 @@ def container_refresh():
 
 def split_value(split_value, separator=None, **kwargs):
     """ Split string values and output to window properties """
-    from tmdbhelper.lib.addon.window import get_property
+    from jurialmunkey.window import get_property
     if not split_value:
         return
     v = f'{split_value}'
@@ -111,7 +192,7 @@ def split_value(split_value, separator=None, **kwargs):
 def kodi_setting(kodi_setting, **kwargs):
     """ Get Kodi setting value and output to window property """
     from tmdbhelper.lib.api.kodi.rpc import get_jsonrpc
-    from tmdbhelper.lib.addon.window import get_property
+    from jurialmunkey.window import get_property
     method = "Settings.GetSettingValue"
     params = {"setting": kodi_setting}
     response = get_jsonrpc(method, params)
@@ -429,6 +510,20 @@ def log_request(**kwargs):
         Dialog().textviewer(filename, dumps(kwargs['response'], indent=2))
 
 
+def log_sync(log_sync, trakt_type='show', id_type=None, extended=None, **kwargs):
+    from json import dumps
+    from xbmcgui import Dialog
+    from tmdbhelper.lib.addon.dialog import BusyDialog
+    from tmdbhelper.lib.api.trakt.api import TraktAPI
+    from tmdbhelper.lib.files.futils import validify_filename
+    from tmdbhelper.lib.files.futils import dumps_to_file
+    with BusyDialog():
+        data = TraktAPI().get_sync(log_sync, trakt_type, id_type=id_type, extended=extended)
+        filename = validify_filename(f'sync__{log_sync}_{trakt_type}_{id_type}_{extended}.json')
+        dumps_to_file(data, 'log_request', filename)
+        Dialog().textviewer(filename, dumps(data, indent=2))
+
+
 def delete_cache(delete_cache, **kwargs):
     from xbmcgui import Dialog
     from tmdbhelper.lib.items.builder import ItemBuilder
@@ -472,7 +567,7 @@ def play_external(**kwargs):
 def play_using(play_using, mode='play', **kwargs):
     from tmdbhelper.lib.addon.plugin import get_infolabel
     from tmdbhelper.lib.files.futils import read_file
-    from tmdbhelper.parser import parse_paramstring
+    from jurialmunkey.parser import parse_paramstring
 
     def _update_from_listitem(dictionary):
         url = get_infolabel('ListItem.FileNameAndPath') or ''
@@ -523,11 +618,13 @@ def sort_list(**kwargs):
     executebuiltin(format_folderpath(encode_url(**kwargs)))
 
 
-def wikipedia(wikipedia, tmdb_type=None, match=None, **kwargs):
-    from tmdbhelper.lib.api.wikipedia.api import WikipediaAPI
-    from xbmcgui import Dialog
-    match = match or ''
-    wiki = WikipediaAPI()
-    name = wiki.get_match(wikipedia, tmdb_type, match)
-    data = wiki.parse_text(wiki.get_section(name, '0'))
-    Dialog().textviewer(f'Wikipedia {wikipedia} {match}', f'[B]{name}[/B]\n{data}')
+def do_wikipedia_gui(wikipedia, tmdb_type=None, **kwargs):
+    from xbmc import executebuiltin
+    from tmdbhelper.lib.addon.plugin import get_language
+    language = get_language()[:2]
+    cmd = f'script.wikipedia,wikipedia={wikipedia},xml_file=script-tmdbhelper-wikipedia.xml'
+    if tmdb_type:
+        cmd = f'{cmd},tmdb_type={tmdb_type}'
+    if language:
+        cmd = f'{cmd},language={language}'
+    executebuiltin(f'RunScript({cmd})')

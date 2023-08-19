@@ -1,5 +1,5 @@
 from tmdbhelper.lib.addon.logger import kodi_log
-from tmdbhelper.parser import parse_paramstring, reconfigure_legacy_params
+from jurialmunkey.parser import parse_paramstring, reconfigure_legacy_params
 
 """ Lazyimports
 from tmdbhelper.lib.player.players import Players

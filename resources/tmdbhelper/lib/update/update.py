@@ -2,7 +2,7 @@ import xbmcvfs
 from xbmcgui import Dialog
 from tmdbhelper.lib.addon.dialog import BusyDialog
 from tmdbhelper.lib.addon.plugin import get_setting, get_localized
-from tmdbhelper.parser import try_int
+from jurialmunkey.parser import try_int
 from tmdbhelper.lib.files.futils import validify_filename, make_path, write_to_file, get_tmdb_id_nfo
 from tmdbhelper.lib.api.trakt.api import TraktAPI
 from tmdbhelper.lib.addon.logger import kodi_log
@@ -103,16 +103,16 @@ def create_nfo(tmdb_type, tmdb_id, *args, **kwargs):
     create_file(content, filename, *args, **kwargs)
 
 
-def create_playlist(items, dbtype, user_slug, list_slug):
+def create_playlist(dbtype, user_slug, list_slug):
     """ Creates a smart playlist from a list of titles """
     filename = f'{user_slug}-{list_slug}-{dbtype}'
     filepath = u'special://profile/playlists/video/'
     fcontent = [u'<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>']
     fcontent.append(f'<smartplaylist type="{dbtype}">')
     fcontent.append(f'    <name>{list_slug} by {user_slug} ({dbtype})</name>')
-    fcontent.append(u'    <match>any</match>')
-    for i in items:
-        fcontent.append(f'    <rule field="{i[0]}" operator="is"><value>{i[1]}</value></rule>')
+    fcontent.append(u'    <match>all</match>')
+    fcontent.append(f'    <rule field="tag" operator="is"><value>Trakt User {user_slug}</value></rule>')
+    fcontent.append(f'    <rule field="tag" operator="is"><value>Trakt List {list_slug}</value></rule>')
     fcontent.append(u'</smartplaylist>')
     create_file(u'\n'.join(fcontent), filename, basedir=filepath, file_ext='xsp', clean_url=False)
 

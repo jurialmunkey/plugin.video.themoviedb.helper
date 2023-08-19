@@ -1,4 +1,4 @@
-from tmdbhelper.parser import try_type
+from jurialmunkey.parser import try_type
 
 UPDATE_BASEKEY = 1
 

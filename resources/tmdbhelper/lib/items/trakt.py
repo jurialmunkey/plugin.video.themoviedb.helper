@@ -1,7 +1,7 @@
-from tmdbhelper.parser import try_int
+from jurialmunkey.parser import try_int
 
 """ Lazyimports """
-from tmdbhelper.lib.addon.modimp import lazyimport
+from jurialmunkey.modimp import lazyimport
 set_playprogress = None
 
 
@@ -40,14 +40,14 @@ class TraktMethods():
         set_playprogress(li.get_url(), li.infoproperties['ResumeTime'], li.infoproperties['TotalTime'])
 
     def pre_sync(self, info=None, tmdb_id=None, tmdb_type=None, season=-2, **kwargs):
-        info_movies = ['stars_in_movies', 'crew_in_movies', 'trakt_userlist']
+        info_movies = ['stars_in_movies', 'crew_in_movies', 'trakt_userlist', 'stars_in_both', 'crew_in_both']
         if tmdb_type in ['movie', 'both'] or info in info_movies:
             if self._watchedindicators:
                 self._trakt.get_sync('watched', 'movie', 'tmdb')
             if self._pauseplayprogress:
                 self._trakt.get_sync('playback', 'movie', 'tmdb')
 
-        info_tvshow = ['stars_in_tvshows', 'crew_in_tvshows', 'trakt_userlist', 'trakt_calendar']
+        info_tvshow = ['stars_in_tvshows', 'crew_in_tvshows', 'trakt_userlist', 'trakt_calendar', 'stars_in_both', 'crew_in_both']
         if tmdb_type in ['tv', 'season', 'both'] or info in info_tvshow:
             tmdbid = try_int(tmdb_id, fallback=None)
             season = try_int(season, fallback=-2)  # Use -2 to force all seasons lookup data on Trakt at seasons level

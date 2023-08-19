@@ -4,9 +4,9 @@
 from xbmcgui import Dialog
 from tmdbhelper.lib.addon.tmdate import set_timestamp
 from tmdbhelper.lib.addon.thread import ParallelThread
-from tmdbhelper.lib.addon.window import get_property
+from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.dialog import BusyDialog
-from tmdbhelper.parser import try_int
+from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.plugin import set_kwargattr, convert_trakt_type, get_localized, executebuiltin, get_infolabel
 from tmdbhelper.lib.api.trakt.api import TraktAPI
 from tmdbhelper.lib.update.userlist import get_monitor_userlists
@@ -35,15 +35,15 @@ def _menu_item_collection():
             'name_remove': get_localized(32290)}}
 
 
-def _menu_item_recommendations():
+def _menu_item_favorites():
     return {
         'class': _SyncItem,
         'kwargs': {
-            'method': 'recommendations',
-            'sync_type': 'recommendations',
+            'method': 'favorites',
+            'sync_type': 'favorites',
             'allow_episodes': False,
-            'name_add': get_localized(32293),
-            'name_remove': get_localized(32294)}}
+            'name_add': get_localized(32490),
+            'name_remove': get_localized(32491)}}
 
 
 def _menu_item_watched():
@@ -105,7 +105,7 @@ def _menu_items():
         _menu_item_progress(),
         _menu_item_collection(),
         _menu_item_watchlist(),
-        _menu_item_recommendations(),
+        _menu_item_favorites(),
         _menu_item_comments(),
         _menu_item_rating(),
     ]
@@ -120,7 +120,7 @@ def sync_trakt_item(trakt_type, unique_id, season=None, episode=None, id_type=No
         'unwatched': lambda: [_menu_item_unwatched()],
         'collection': lambda: [_menu_item_collection()],
         'watchlist': lambda: [_menu_item_watchlist()],
-        'recommendations': lambda: [_menu_item_recommendations()],
+        'favorites': lambda: [_menu_item_favorites()],
         'comments': lambda: [_menu_item_comments()],
         'userlist': lambda: [_menu_item_userlist()],
         'progress': lambda: [_menu_item_progress()],
@@ -356,9 +356,15 @@ class _Rating():
 
     def _getself(self):
         """ Method to see if we should return item in menu or not """
-        if self._item.season is not None and not self._item.episode:
-            return  # Only sync episodes if allowed and we have an episode number
-        self.name = get_localized(32485)
+        rating = self._trakt.is_sync(
+            self._item.trakt_type, self._item.unique_id, self._item.season, self._item.episode,
+            self._item.id_type, 'ratings')
+
+        if not rating:
+            self.name = get_localized(32485)
+        else:
+            self.name = f'{get_localized(32489)} ({rating.get("rating")})'
+
         return self
 
     def sync(self):

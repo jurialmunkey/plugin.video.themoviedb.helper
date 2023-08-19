@@ -1,10 +1,10 @@
-from tmdbhelper.parser import try_int
+from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.plugin import convert_type, PLUGINPATH, get_plugin_category, get_localized, get_setting, encode_url
 from tmdbhelper.lib.items.container import Container
 
 
 class ListBasic(Container):
-    def get_items(self, info, tmdb_type, page=None, randomise=False, **kwargs):
+    def get_items(self, info, tmdb_type, page=None, randomise=False, limit=None, **kwargs):
         from tmdbhelper.lib.addon.consts import TRAKT_BASIC_LISTS
 
         def _get_items_both():
@@ -31,6 +31,7 @@ class ListBasic(Container):
             trakt_type=trakt_type,
             params=info_model.get('params'),
             page=page,
+            limit=limit,
             authorize=info_model.get('authorize', False),
             sort_by=info_model.get('sort_by', None),
             sort_how=info_model.get('sort_how', None),
@@ -246,6 +247,7 @@ class ListUpNext(Container):
         items = self.trakt_api.get_upnext_list(unique_id=tmdb_id, id_type='tmdb', page=page)
         if not items:
             items = self.tmdb_api.get_episode_list(tmdb_id, 1, get_detailed=True)
+            items = list(items) if items else []
         self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = 'video'
         self.container_content = 'episodes'

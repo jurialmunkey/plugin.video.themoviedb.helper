@@ -3,9 +3,9 @@ import xbmcvfs
 import colorsys
 import hashlib
 from xbmc import getCacheThumbName, skinHasImage, Monitor, sleep
-from tmdbhelper.lib.addon.window import get_property
+from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.plugin import get_infolabel, get_setting, ADDONDATA
-from tmdbhelper.parser import try_int, try_float
+from jurialmunkey.parser import try_int, try_float
 from tmdbhelper.lib.files.futils import make_path
 from threading import Thread
 import urllib.request as urllib
@@ -37,6 +37,13 @@ def _imageopen(image):
     return Image.open(image)
 
 
+def _closeimage(image, targetfile=None):
+    image.close()
+    if not targetfile:
+        return
+    xbmcvfs.delete(targetfile)
+
+
 def _openimage(image, targetpath, filename):
     """ Open image helper with thanks to sualfred """
     # some paths require unquoting to get a valid cached thumb hash
@@ -58,7 +65,7 @@ def _openimage(image, targetpath, filename):
                 if xbmcvfs.exists(cache):
                     try:
                         img = _imageopen(xbmcvfs.translatePath(cache))
-                        return img
+                        return (img, None)
 
                     except Exception as error:
                         kodi_log('Image error: Could not open cached image --> %s' % error, 2)
@@ -72,10 +79,10 @@ def _openimage(image, targetpath, filename):
 
                 try:  # in case image is packed in textures.xbt
                     img = _imageopen(xbmcvfs.translatePath(image))
-                    return img
+                    return (img, None)
 
                 except Exception:
-                    return ''
+                    return ('', None)
 
             else:
                 targetfile = os.path.join(targetpath, f'temp_{filename}')  # Use temp file to avoid Kodi writing early
@@ -83,14 +90,14 @@ def _openimage(image, targetpath, filename):
                     xbmcvfs.copy(image, targetfile)
 
                 img = _imageopen(targetfile)
-                return img
+                return (img, targetfile)
 
         except Exception as error:
             kodi_log('Image error: Could not get image for %s (try %d) -> %s' % (image, i, error), 2)
             sleep(500)
             pass
 
-    return ''
+    return ('', None)
 
 
 def _saveimage(image, targetfile):
@@ -105,6 +112,11 @@ def _saveimage(image, targetfile):
 
 
 class ImageFunctions(Thread):
+    save_path = f"{get_setting('image_location', 'str') or ADDONDATA}{{}}/"
+    blur_size = try_int(get_infolabel('Skin.String(TMDbHelper.Blur.Size)')) or 480
+    crop_size = (800, 310)
+    radius = try_int(get_infolabel('Skin.String(TMDbHelper.Blur.Radius)')) or 40
+
     def __init__(self, method=None, artwork=None, is_thread=True, prefix='ListItem'):
         if is_thread:
             Thread.__init__(self)
@@ -112,32 +124,33 @@ class ImageFunctions(Thread):
         self.func = None
         self.save_orig = False
         self.save_prop = None
-        self.save_path = f"{get_setting('image_location', 'str') or ADDONDATA}{{}}/"
         if method == 'blur':
             self.func = self.blur
-            self.save_path = make_path(self.save_path.format('blur'))
+            self.save_path = make_path(self.save_path.format('blur_v2'))
             self.save_prop = f'{prefix}.BlurImage'
             self.save_orig = True
-            self.radius = try_int(get_infolabel('Skin.String(TMDbHelper.Blur.Radius)')) or 20
         elif method == 'crop':
             self.func = self.crop
-            self.save_path = make_path(self.save_path.format('crop'))
+            self.save_path = make_path(self.save_path.format('crop_v2'))
             self.save_prop = f'{prefix}.CropImage'
             self.save_orig = True
         elif method == 'desaturate':
             self.func = self.desaturate
-            self.save_path = make_path(self.save_path.format('desaturate'))
+            self.save_path = make_path(self.save_path.format('desaturate_v2'))
             self.save_prop = f'{prefix}.DesaturateImage'
             self.save_orig = True
         elif method == 'colors':
             self.func = self.colors
-            self.save_path = make_path(self.save_path.format('colors'))
+            self.save_path = make_path(self.save_path.format('colors_v2'))
             self.save_prop = f'{prefix}.Colors'
 
     def run(self):
         if not self.save_prop or not self.func:
             return
         output = self.func(self.image) if self.image else None
+        self.set_properties(output)
+
+    def set_properties(self, output):
         if not output:
             get_property(self.save_prop, clear_property=True)
             get_property(f'{self.save_prop}.Original', clear_property=True) if self.save_orig else None
@@ -154,10 +167,11 @@ class ImageFunctions(Thread):
         destination = os.path.join(self.save_path, filename)
         try:
             if not xbmcvfs.exists(destination):  # Used to do os.utime(destination, None) on existing here
-                img = _openimage(source, self.save_path, filename)
+                img, targetfile = _openimage(source, self.save_path, filename)
                 img = img.crop(img.convert('RGBa').getbbox())
+                img.thumbnail(self.crop_size)
                 _saveimage(img, destination)
-                img.close()
+                _closeimage(img, targetfile)
 
             return destination
 
@@ -166,16 +180,16 @@ class ImageFunctions(Thread):
 
     @lazyimport_pil
     def blur(self, source):
-        filename = f'{md5hash(source)}{self.radius}.png'
+        filename = f'{md5hash(source)}-{self.radius}-{self.blur_size}.jpg'
         destination = os.path.join(self.save_path, filename)
         try:
             if not xbmcvfs.exists(destination):  # os.utime(destination, None)
-                img = _openimage(source, self.save_path, filename)
-                img.thumbnail((256, 256))
+                img, targetfile = _openimage(source, self.save_path, filename)
+                img.thumbnail((self.blur_size, self.blur_size))
                 img = img.convert('RGB')
                 img = img.filter(ImageFilter.GaussianBlur(self.radius))
                 _saveimage(img, destination)
-                img.close()
+                _closeimage(img, targetfile)
 
             return destination
 
@@ -188,10 +202,10 @@ class ImageFunctions(Thread):
         destination = os.path.join(self.save_path, filename)
         try:
             if not xbmcvfs.exists(destination):  # os.utime(destination, None)
-                img = _openimage(source, self.save_path, filename)
+                img, targetfile = _openimage(source, self.save_path, filename)
                 img = img.convert('LA')
                 _saveimage(img, destination)
-                img.close()
+                _closeimage(img, targetfile)
 
             return destination
 
@@ -269,13 +283,14 @@ class ImageFunctions(Thread):
     def colors(self, source):
         filename = f'{md5hash(source)}.png'
         destination = self.save_path + filename
+        targetfile = None
 
         try:
             if xbmcvfs.exists(destination):  # os.utime(destination, None)
                 img = _imageopen(xbmcvfs.translatePath(destination))
             else:
-                img = _openimage(source, self.save_path, filename)
-                img.thumbnail((256, 256))
+                img, targetfile = _openimage(source, self.save_path, filename)
+                img.thumbnail((128, 128))
                 img = img.convert('RGB')
                 _saveimage(img, destination)
 
@@ -306,7 +321,7 @@ class ImageFunctions(Thread):
                     compcolor_propname, compcolor_propvalu, compcolor_hex, compcolor_propchek])
                 thread_compcolor.start()
 
-            img.close()
+            _closeimage(img, targetfile)
             return maincolor_hex
 
         except Exception as exc:
