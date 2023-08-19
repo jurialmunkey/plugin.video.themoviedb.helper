@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2023-03-12 19:01+0100\n"
+"PO-Revision-Date: 2023-08-19 16:53+0200\n"
 "Last-Translator: Peat80 <>\n"
 "Language-Team: LANGUAGE\n"
 "Language: de_DE\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.3.2\n"
 
 msgctxt "#30000"
 msgid "Arabic (United Arab Emirates)"
@@ -2622,6 +2622,93 @@ msgstr "Zertifizierung ( < oder = )"
 msgctxt "#32488"
 msgid "Certification ( > or = )"
 msgstr "Zertifizierung ( > oder = )"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32489"
+msgid "Change rating"
+msgstr "Bewertung ändern"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32490"
+msgid "Add to favourites"
+msgstr "Zur Favoriten hinzufügen"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32491"
+msgid "Remove from favourites"
+msgstr "Aus Favoriten entfernen"
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32492"
+msgid ""
+"{} already exists in {}!\\nDo you wish to remove this item from the list?"
+msgstr "{} existiert bereits in {}!\\nDiesen Eintrag aus der Liste entfernen?"
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32493"
+msgid "Successfully removed {} from {}"
+msgstr "Erfolgreich {} aus {} entfernt"
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32494"
+msgid "Successfully added {} to {}"
+msgstr "Erfolgreich {} zu {} hinzugefügt"
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32495"
+msgid "Create new node"
+msgstr "Neuen Knoten erstellen"
+
+#: /resources/tmdbhelper/lib/items/container.py
+msgctxt "#32496"
+msgid "Add/Remove as Custom Node"
+msgstr "Benutzerdefinierten Knoten hinzufügen / entfernen"
+
+#: /resources/settings.xml
+msgctxt "#32497"
+msgid "Container content fallback for service listitems without mediatypes"
+msgstr ""
+"Containerinhaltstyp für Servicelisteneinträge ohne Mediatypen verwenden"
+
+#: /resources/settings.xml
+msgctxt "#32498"
+msgid ""
+"Some plugins have poor metadata and fail to fill the item mediatype which "
+"results in the service monitor not completing an item lookup. This setting "
+"allows the service monitor to use the container content type when item "
+"mediatype is missing. Note this setting will likely result more frequent "
+"incorrect matches due to the end plugin having bad metadata."
+msgstr ""
+"Einige Plugins mit wenig Metadaten geben den Medientyp des Eintrags nicht "
+"an. Dadurch kann der Servicemonitor die Eintragssuche nicht abschließen. "
+"Diese Einstellung nutzt den Inhaltstyp des Containers wenn der Medientyp "
+"fehlt. Die Benutzung schlechter Metadaten wird wahrscheinlich zu mehr "
+"fehlerhaften Treffern führen."
+
+#: /resources/settings.xml
+msgctxt "#32499"
+msgid "Page multipliers (higher is slower)"
+msgstr "Seitenmultiplikatoren (Höher ist langsamer)"
+
+#: /resources/settings.xml
+msgctxt "#32500"
+msgid "Page multiplier (TMDb basic lists)"
+msgstr "Seitenmultiplikatoren (TMDb einfache Listen)"
+
+#: /resources/settings.xml
+msgctxt "#32501"
+msgid "Page multiplier (Trakt basic lists)"
+msgstr "Seitenmultiplikatoren (Trakt einfache Listen)"
+
+#: /resources/settings.xml
+msgctxt "#32502"
+msgid "Page multiplier (Trakt sync lists)"
+msgstr "Seitenmultiplikatoren (Trakt synchronisierte Listen)"
+
+#: /resources/settings.xml
+msgctxt "#32503"
+msgid "Page multiplier (Library windows)"
+msgstr "Seitenmultiplikatoren (Bibliotheksansichten)"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
