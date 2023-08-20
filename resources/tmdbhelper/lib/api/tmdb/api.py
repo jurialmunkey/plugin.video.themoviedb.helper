@@ -182,6 +182,13 @@ class TMDb(RequestAPI):
         if x != -1:
             return items[x] if get_listitem else items[x].getUniqueID('tmdb')
 
+    def get_collection_tmdb_id(self, tmdb_id):
+        details = self.get_details_request('movie', tmdb_id) if tmdb_id else None
+        try:
+            return details['belongs_to_collection']['id']
+        except (KeyError, TypeError):
+            return
+
     def get_translated_list(self, items, tmdb_type=None, separator=None):
         """
         If tmdb_type specified will look-up IDs using search function otherwise assumes item ID is passed

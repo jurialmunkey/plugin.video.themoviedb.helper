@@ -247,10 +247,17 @@ class Container():
         endOfDirectory(self.handle, updateListing=self.update_listing)
 
     def get_tmdb_id(self):
-        if self.params.get('info') == 'collection':
+
+        if self.params.get('info') == 'collection' and self.params['tmdb_type'] == 'movie':
+            movie_tmdb_id = self.params.get('tmdb_id') or self.tmdb_api.get_tmdb_id(**self.params)
+            self.params['tmdb_id'] = self.tmdb_api.get_collection_tmdb_id(movie_tmdb_id)
             self.params['tmdb_type'] = 'collection'
-        if not self.params.get('tmdb_id'):
-            self.params['tmdb_id'] = self.tmdb_api.get_tmdb_id(**self.params)
+            return
+
+        if self.params.get('tmdb_id'):
+            return
+
+        self.params['tmdb_id'] = self.tmdb_api.get_tmdb_id(**self.params)
 
     def get_items(self, **kwargs):
         """ Abstract method for getting items

@@ -68,6 +68,14 @@ def _get_basedir_details():
                 'icon': f'{ADDONPATH}/resources/icons/themoviedb/episodes.png'},
             'types': ['tv', 'episode']},
         {
+            'label': get_localized(32192),
+            'params': {'info': 'collection'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/themoviedb/movies.png'},
+            'types': ['movie']},
+        {
             'label': get_localized(20360),
             'params': {'info': 'episodes'},
             'path': PLUGINPATH,
