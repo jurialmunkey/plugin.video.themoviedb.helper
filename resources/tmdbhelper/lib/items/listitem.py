@@ -88,20 +88,33 @@ class _ListItem(object):
             self.art['thumb'] = self.art['tvshow.fanart']
             return self.art['tvshow.fanart']
 
-    def get_trakt_type(self):
+    @property
+    def trakt_type(self):
         return convert_media_type(self.infolabels.get('mediatype'), 'trakt')
 
-    def get_tmdb_type(self):
+    @property
+    def tmdb_type(self):
         return convert_media_type(self.infolabels.get('mediatype'), 'tmdb', parent_type=True)
 
-    def get_ftv_type(self):
+    @property
+    def ftv_type(self):
         return convert_media_type(self.infolabels.get('mediatype'), 'ftv')
 
-    def get_ftv_id(self):
+    @property
+    def ftv_id(self):
         return None
 
-    def get_tmdb_id(self):
+    @property
+    def tmdb_id(self):
         return self.unique_ids.get('tmdb')
+
+    @property
+    def season(self):
+        return None
+
+    @property
+    def episode(self):
+        return
 
     def is_unaired(self, format_label=None, check_hide_settings=True, no_date=True):
         return
@@ -263,7 +276,8 @@ class _Person(_ListItem):
         self.params['tmdb_id'] = self.unique_ids.get('tmdb')
         self.is_folder = False
 
-    def get_tmdb_type(self):
+    @property
+    def tmdb_type(self):
         return 'person'
 
 
@@ -315,7 +329,8 @@ class _Video(_ListItem):
 
 
 class _Movie(_Video):
-    def get_ftv_id(self):
+    @property
+    def ftv_id(self):
         return self.unique_ids.get('tmdb')
 
     def set_playcount(self, playcount):
@@ -336,7 +351,8 @@ class _Movie(_Video):
 
 
 class _Tvshow(_Video):
-    def get_ftv_id(self):
+    @property
+    def ftv_id(self):
         return self.unique_ids.get('tvdb')
 
     def _set_playcount(self, playcount):
@@ -375,11 +391,17 @@ class _Tvshow(_Video):
 
 
 class _Season(_Tvshow):
-    def get_ftv_id(self):
+    @property
+    def ftv_id(self):
         return self.unique_ids.get('tvshow.tvdb')
 
-    def get_tmdb_id(self):
+    @property
+    def tmdb_id(self):
         return self.unique_ids.get('tvshow.tmdb')
+
+    @property
+    def season(self):
+        return self.infolabels.get('season')
 
     def _set_params_reroute_details(self):
         self._set_contextmenu_choosedefault('tv', self.unique_ids.get('tvshow.tmdb'), season=self.infolabels.get('season'))
@@ -390,11 +412,21 @@ class _Season(_Tvshow):
 
 
 class _Episode(_Tvshow):
-    def get_ftv_id(self):
+    @property
+    def ftv_id(self):
         return self.unique_ids.get('tvshow.tvdb')
 
-    def get_tmdb_id(self):
+    @property
+    def tmdb_id(self):
         return self.unique_ids.get('tvshow.tmdb')
+
+    @property
+    def season(self):
+        return self.infolabels.get('season')
+
+    @property
+    def episode(self):
+        return self.infolabels.get('episode')
 
     def set_playcount(self, playcount):
         playcount = try_int(playcount)

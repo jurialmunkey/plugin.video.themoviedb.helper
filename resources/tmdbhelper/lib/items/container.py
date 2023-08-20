@@ -248,7 +248,7 @@ class Container():
 
     def get_tmdb_id(self):
 
-        if self.params.get('info') == 'collection' and self.params['tmdb_type'] == 'movie':
+        if self.params.get('info') == 'collection' and self.params.get('tmdb_type') == 'movie':
             movie_tmdb_id = self.params.get('tmdb_id') or self.tmdb_api.get_tmdb_id(**self.params)
             self.params['tmdb_id'] = self.tmdb_api.get_collection_tmdb_id(movie_tmdb_id)
             self.params['tmdb_type'] = 'collection'

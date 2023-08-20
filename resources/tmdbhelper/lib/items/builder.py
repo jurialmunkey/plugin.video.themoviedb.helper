@@ -265,7 +265,7 @@ class ItemBuilder(_ArtworkSelector):
     def get_listitem(self, i, use_iterprops=True):
         li = ListItem(parent_params=self.parent_params, **i)
         mediatype = li.infolabels.get('mediatype')
-        tmdb_type = li.get_tmdb_type()
+        tmdb_type = li.tmdb_type
         tmdb_id = li.unique_ids.get('tvshow.tmdb') if mediatype in ['season', 'episode'] else li.unique_ids.get('tmdb')
         season = li.infolabels.get('season', 0) if mediatype in ['season', 'episode'] else None
         episode = li.infolabels.get('episode') if mediatype == 'episode' else None
