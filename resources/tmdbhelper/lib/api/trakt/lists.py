@@ -105,6 +105,7 @@ class ListComments(Container):
             item['label'] = item['infolabels']['title'] = i.get('user', {}).get('name') or i.get('user', {}).get('username')
             item['infolabels']['premiered'] = date
             item['infolabels']['rating'] = rate
+            item['params'] = {'comment_id': i.get('id'), 'parent_id': i.get('parent_id'), 'user_slug': i.get('user', {}).get('ids', {}).get('slug')}
             return item
 
         items = [_map_item(i) for i in items if i]
