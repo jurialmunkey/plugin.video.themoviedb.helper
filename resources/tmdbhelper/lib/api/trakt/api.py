@@ -161,8 +161,11 @@ class _TraktLists():
             response = self.get_simple_list(
                 path.format(trakt_type=trakt_type), extended=extended, page=1, limit=limit * 2, trakt_type=trakt_type) or {}
             items += response.get('items') or []
-        if items:
-            return random.sample(items, limit)
+        if not items:
+            return
+        if len(items) <= limit:
+            return items
+        return random.sample(items, limit)
 
     @is_authorized
     def get_basic_list(self, path, trakt_type, page: int = 1, limit: int = None, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, randomise=False, always_refresh=True):
@@ -176,11 +179,11 @@ class _TraktLists():
             response = PaginatedItems(items=response['items'], page=page, limit=limit).get_dict()
         else:  # Unsorted lists can be paginated by the API
             response = self.get_simple_list(path, extended=extended, page=page, limit=limit, trakt_type=trakt_type)
-        if response:
-            if randomise and len(response['items']) > limit:
-                items = random.sample(response['items'], limit)
-                return items
-            return response['items'] + get_next_page(response['headers'])
+        if not response:
+            return
+        if randomise and len(response['items']) > limit:
+            return random.sample(response['items'], limit)
+        return response['items'] + get_next_page(response['headers'])
 
     @is_authorized
     def get_stacked_list(self, path, trakt_type, page: int = 1, limit: int = None, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, always_refresh=True, **kwargs):
