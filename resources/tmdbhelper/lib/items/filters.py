@@ -25,6 +25,8 @@ def is_excluded(item, filter_key=None, filter_value=None, filter_operator=None, 
             internal = result.group(1)
             return func(string, external, internal)
 
+        return string
+
     def is_filtered(d, k, v, exclude=False, operator_type=None):
         if isinstance(v, str):
             v = mod_regex(v)
