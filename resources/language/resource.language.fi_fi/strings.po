@@ -1,16 +1,16 @@
-# Kodi language file
+# Kodi addon language file
 # Addon Name: TheMovieDb Helper
 # Addon id: plugin.video.themoviedb.helper
 # Addon Provider: jurialmunkey
 msgid ""
 msgstr ""
 "Project-Id-Version: TheMovieDB Helper\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
-"POT-Creation-Date: 2014-10-26 17:05+0000\n"
+"Report-Msgid-Bugs-To: https://github.com/jurialmunkey/plugin.video.themoviedb.helper/issues\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "PO-Revision-Date: 2023-09-30 03:05+0300\n"
 "Last-Translator: Oskari Lavinto <olavinto@protonmail.com>\n"
-"Language-Team: olavinto@protonmail.com\n"
-"Language: fi\n"
+"Language-Team: Finnish\n"
+"Language: fi_FI\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
