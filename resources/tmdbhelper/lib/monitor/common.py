@@ -1,16 +1,10 @@
 from jurialmunkey.window import get_property
-from tmdbhelper.lib.api.tmdb.api import TMDb
-from tmdbhelper.lib.api.omdb.api import OMDb
-from tmdbhelper.lib.api.tvdb.api import TVDb
-from tmdbhelper.lib.api.mdblist.api import MDbList
-from tmdbhelper.lib.api.trakt.api import TraktAPI
-from tmdbhelper.lib.api.fanarttv.api import FanartTV
-from tmdbhelper.lib.addon.plugin import get_setting, get_infolabel, get_condvisibility
+from tmdbhelper.lib.addon.plugin import get_infolabel, get_condvisibility
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_region_date
-from tmdbhelper.lib.items.builder import ItemBuilder
 from tmdbhelper.lib.addon.logger import kodi_traceback, kodi_try_except, kodi_log
 from tmdbhelper.lib.files.futils import validate_join
 from tmdbhelper.lib.api.kodi.rpc import get_person_stats
+from tmdbhelper.lib.api.contains import CommonContainerAPIs
 from jurialmunkey.parser import try_int, merge_two_dicts
 import xbmcvfs
 import json
@@ -51,19 +45,21 @@ TVDB_AWARDS_KEYS = {
     'BAFTA Awards': 'bafta'}
 
 
-class CommonMonitorDetails():
+class CommonMonitorDetails(CommonContainerAPIs):
     def __init__(self):
-        self.trakt_api = TraktAPI()
-        self.tmdb_api = TMDb()
-        self.ftv_api = FanartTV()
-        self.tvdb_api = TVDb()
-        self.omdb_api = OMDb() if get_setting('omdb_apikey', 'str') else None
-        self.mdblist_api = MDbList() if get_setting('mdblist_apikey', 'str') else None
-        self.ib = ItemBuilder(tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api)
-        self.ib.ftv_api = self.ftv_api if get_setting('service_fanarttv_lookup') else None
-        self.all_awards = self.get_awards_data()
         self.imdb_top250 = {}
         self._item_memory_cache = {}
+
+    @property
+    def ib(self):
+        try:
+            return self._ib
+        except AttributeError:
+            from tmdbhelper.lib.items.builder import ItemBuilder
+            from tmdbhelper.lib.addon.plugin import get_setting
+            self._ib = ItemBuilder(tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api)
+            self._ib.ftv_api = self.ftv_api if get_setting('service_fanarttv_lookup') else None
+            return self._ib
 
     def use_item_memory_cache(self, cache_name, func, *args, **kwargs):
         cache_data = self._item_memory_cache.get(cache_name) or func(*args, **kwargs)
