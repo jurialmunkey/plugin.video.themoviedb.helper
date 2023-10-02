@@ -104,7 +104,7 @@ def make_node(name=None, icon=None, path=None, **kwargs):
     basedir = NODE_BASEDIR
     files = get_files_in_folder(basedir, r'.*\.json')
 
-    x = Dialog().contextmenu([f for f in files] + [get_localized(32495)])
+    x = Dialog().select(get_localized(32504).format(name), [f for f in files] + [get_localized(32495)])
     if x == -1:
         return
     elif x == len(files):
