@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: TheMovieDB Helper\n"
 "Report-Msgid-Bugs-To: https://github.com/jurialmunkey/plugin.video.themoviedb.helper/issues\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2023-09-30 03:05+0300\n"
+"PO-Revision-Date: 2023-10-03 10:14+0300\n"
 "Last-Translator: Oskari Lavinto <olavinto@protonmail.com>\n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.3.2\n"
+"X-Generator: Poedit 3.4\n"
 
 msgctxt "#30000"
 msgid "Arabic (United Arab Emirates)"
@@ -220,102 +220,102 @@ msgstr "Up Next"
 #: /resources/lib/container.py
 msgctxt "#32044"
 msgid "Enter Search Query"
-msgstr ""
+msgstr "Syötä hakulauseke"
 
 #: /resources/lib/container.py
 msgctxt "#32045"
 msgid "Cache Refresh"
-msgstr ""
+msgstr "Puskuroi päivitys"
 
 #: /resources/lib/container.py
 msgctxt "#32046"
 msgid "Cached details were refreshed"
-msgstr ""
+msgstr "Välimuistin tiedot päivitettiin"
 
 #: /resources/lib/container.py
 msgctxt "#32047"
 msgid "Remove from Trakt Collection"
-msgstr ""
+msgstr "Poista Trakt-kokoelmasta"
 
 #: /resources/lib/container.py
 msgctxt "#32048"
 msgid "Add to Trakt Collection"
-msgstr ""
+msgstr "Lisää Trakt-kokoelmaan"
 
 #: /resources/lib/container.py
 msgctxt "#32049"
 msgid "Remove from Trakt Watchlist"
-msgstr ""
+msgstr "Poista Trakt-katselulistalta"
 
 #: /resources/lib/container.py
 msgctxt "#32050"
 msgid "Add to Trakt Watchlist"
-msgstr ""
+msgstr "Poista Trakt-katselulistalle"
 
 #: /resources/lib/container.py
 msgctxt "#32051"
 msgid "Remove from Trakt Watched History"
-msgstr ""
+msgstr "Poista Trakt-katseluhistoriasta"
 
 #: /resources/lib/container.py
 msgctxt "#32052"
 msgid "Add to Trakt Watched History"
-msgstr ""
+msgstr "Lisää Trakt-katseluhistoriaan"
 
 #: /resources/lib/container.py
 msgctxt "#32053"
 msgid "Refresh Cache"
-msgstr "Tyhjennä välimuisti"
+msgstr "Päivitä välimuisti"
 
 #: /resources/lib/downloader.py
 msgctxt "#32054"
 msgid "Would you like to clear existing players first?"
-msgstr ""
+msgstr "Haluatko ensin tyhjentää olemassa olevat soittimet?"
 
 #: /resources/lib/downloader.py
 msgctxt "#32055"
 msgid "Authentication Failed."
-msgstr ""
+msgstr "Todennus epäonnistui."
 
 #: /resources/lib/downloader.py
 msgctxt "#32056"
 msgid "Either the username or password were invalid. Would you like to try again?"
-msgstr ""
+msgstr "Syötetty käyttäjätunnus ja salasana ovat virheellisiä. Haluatko yrittää uudelleen?"
 
 #: /resources/lib/downloader.py
 msgctxt "#32057"
 msgid "Retry"
-msgstr ""
+msgstr "Yritä uudelleen"
 
 #: /resources/lib/downloader.py
 msgctxt "#32058"
 msgid "The provided URL is either invalid or inaccesible."
-msgstr ""
+msgstr "Syötetty URL-osoite on virheellinen tai ei käytettävissä"
 
 #: /resources/lib/downloader.py
 msgctxt "#32059"
 msgid "Success!"
-msgstr ""
+msgstr "Onnistui!"
 
 #: /resources/lib/downloader.py
 msgctxt "#32060"
 msgid "files extracted"
-msgstr ""
+msgstr "tiedostoa purettu"
 
 #: /resources/lib/player.py
 msgctxt "#32061"
 msgid "Play with"
-msgstr ""
+msgstr "Toista soittimella"
 
 #: /resources/lib/context.py
 msgctxt "#32062"
 msgid "Successfully Added TMDb ID {0} to {1}"
-msgstr ""
+msgstr "TMDb ID {0} lisättiin kohteeseen \"{1}\""
 
 #: /resources/lib/context.py
 msgctxt "#32063"
 msgid "Successfully Removed TMDb ID {0} from {1}"
-msgstr ""
+msgstr "TMDb ID {0} poistettiin kohteesta \"{1}\""
 
 #: /resources/lib/context.py
 msgctxt "#32064"
@@ -324,6 +324,9 @@ msgid ""
 "\n"
 "TMDb {2} ID {3}"
 msgstr ""
+"Haluatko poistaa kohteen \"{0}\" Trakt-{1}?\n"
+"\n"
+"TMDb {2} ID {3}"
 
 #: /resources/lib/context.py
 msgctxt "#32065"
@@ -332,196 +335,199 @@ msgid ""
 "\n"
 "TMDb {2} ID {3}"
 msgstr ""
+"Haluatko lisätä kohteen \"{0}\" Trakt-{1}?\n"
+"\n"
+"TMDb {2} ID {3}"
 
 #: /resources/settings.xml
 msgctxt "#32066"
 msgid "Debug logging"
-msgstr ""
+msgstr "Vianselvitysloki"
 
 #: /resources/settings.xml
 msgctxt "#32067"
 msgid "Fuzzy local library matching"
-msgstr ""
+msgstr "Epäselvempi paikallisen kirjaston täsmäys"
 
 #: /resources/settings.xml
 msgctxt "#32068"
 msgid "Allow fuzzy matches (ignore year) for movies"
-msgstr ""
+msgstr "Salli elokuvien epäselvät täsmäykset (älä huomioi vuotta)"
 
 #: /resources/settings.xml
 msgctxt "#32069"
 msgid "Allow fuzzy matches (ignore year) for tvshows"
-msgstr ""
+msgstr "Salli sarjojen epäselvät täsmäykset (älä huomioi vuotta)"
 
 #: /resources/lib/tmdb.py
 msgctxt "#32070"
 msgid "Male"
-msgstr ""
+msgstr "Mies"
 
 #: /resources/lib/tmdb.py
 msgctxt "#32071"
 msgid "Female"
-msgstr ""
+msgstr "Nainen"
 
 #: /resources/settings.xml
 msgctxt "#32072"
 msgid "Unaired Items"
-msgstr ""
+msgstr "Esittämättömät kohteet"
 
 #: /resources/settings.xml
 msgctxt "#32073"
 msgid "Hide unaired movies"
-msgstr ""
+msgstr "Piilota esittämättömät elokuvat"
 
 #: /resources/settings.xml
 msgctxt "#32074"
 msgid "Library Integration"
-msgstr ""
+msgstr "Kirjastointegraatio"
 
 #: /resources/settings.xml
 msgctxt "#32075"
 msgid "TV"
-msgstr ""
+msgstr "Televisio"
 
 #: /resources/settings.xml
 msgctxt "#32076"
 msgid "Update library after adding items"
-msgstr ""
+msgstr "Päivitä kirjasto kohteiden lisäyksen jälkeen"
 
 #: /resources/settings.xml
 msgctxt "#32077"
 msgid "Ignore folder creation checks"
-msgstr ""
+msgstr "Älä huomioi kansioiden luontitarkastuksia"
 
 #: /resources/lib/container/basedir.py
 msgctxt "#32078"
 msgid "Still to Watch"
-msgstr ""
+msgstr "Vielä katsottavana"
 
 #: /resources/settings.xml
 msgctxt "#32079"
 msgid "System Use Only"
-msgstr ""
+msgstr "Vain järjestelmän käyttöön"
 
 #: /resources/settings.xml
 msgctxt "#32080"
 msgid "Other"
-msgstr ""
+msgstr "Muu"
 
 #: /resources/settings.xml
 msgctxt "#32081"
 msgid "Next page item"
-msgstr ""
+msgstr "Seuraava sivu -kohde"
 
 #: /resources/settings.xml
 msgctxt "#32082"
 msgid "Watchlist sort method"
-msgstr ""
+msgstr "Katselulistan järjestystapa"
 
 #: /resources/settings.xml
 msgctxt "#32083"
 msgid "Accounts"
-msgstr ""
+msgstr "Käyttäjätilit"
 
 #: /resources/settings.xml
 msgctxt "#32084"
 msgid "Hide unaired episodes"
-msgstr ""
+msgstr "Piilota esittämättömät jaksot"
 
 #: /resources/settings.xml
 msgctxt "#32085"
 msgid "Flatten seasons"
-msgstr ""
+msgstr "Yhdistä tuotantokaudet"
 
 #: /resources/settings.xml
 msgctxt "#32086"
 msgid "Auto-update library and add new/missing episodes"
-msgstr ""
+msgstr "Päivitä kirjasto automaattisesti ja lisää uudet/puuttuvat jaksot"
 
 #: /resources/settings.xml
 msgctxt "#32087"
 msgid "Use resolvedURL method for suppressing strm next playlist error"
-msgstr ""
+msgstr "Käytä resolvedURL-tapaa \"strm next playlist\" -virheen tukahduttamiseen"
 
 #: /resources/settings.xml
 msgctxt "#32088"
 msgid "Navigation"
-msgstr ""
+msgstr "Navigointi"
 
 #: /resources/settings.xml
 msgctxt "#32089"
 msgid "Select Action"
-msgstr ""
+msgstr "Valinnan toiminto"
 
 #: /resources/settings.xml
 msgctxt "#32090"
 msgid "Content"
-msgstr ""
+msgstr "Sisältö"
 
 #: /resources/settings.xml
 msgctxt "#32091"
 msgid "Special season folders"
-msgstr ""
+msgstr "Erikoiskausien kansiot"
 
 #: /resources/settings.xml
 msgctxt "#32092"
 msgid "Widgets"
-msgstr ""
+msgstr "Widgetit"
 
 #: /resources/settings.xml
 msgctxt "#32093"
 msgid "Next episodes sort method"
-msgstr ""
+msgstr "Seuraavien jaksojen järjestystapa"
 
 #: /resources/settings.xml
 msgctxt "#32094"
 msgid "Prioritise local files over default player"
-msgstr ""
+msgstr "Painota paikallisia tiedostoja oletussoittimen sijaan"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32095"
 msgid "Enter the code"
-msgstr ""
+msgstr "Syötä koodi"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32096"
 msgid "Go to [B]https://trakt.tv/activate[/B]"
-msgstr ""
+msgstr "Avaa [B]https://trakt.tv/activate[/B]"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32097"
 msgid "Trakt Authentication"
-msgstr ""
+msgstr "Trakt-todennus"
 
 #: /resources/lib/container.py
 msgctxt "#32098"
 msgid "Exists"
-msgstr ""
+msgstr "Poistumiset"
 
 #: /resources/lib/container.py
 msgctxt "#32099"
 msgid "A value has already been set for this parameter"
-msgstr ""
+msgstr "Parametrille on jo asetettu arvo"
 
 #: /resources/lib/container.py
 msgctxt "#32100"
 msgid "Do you wish to clear the existing items or add more?"
-msgstr ""
+msgstr "Haluatko tyhjentää olemassa olevat kohteet vai lisätä kohteita?"
 
 #: /resources/lib/container.py
 msgctxt "#32101"
 msgid "Clear Items"
-msgstr ""
+msgstr "Tyhjentää kohteet"
 
 #: /resources/lib/container.py
 msgctxt "#32102"
 msgid "Add Items"
-msgstr ""
+msgstr "Lisätä kohteita"
 
 #: /resources/lib/container.py
 msgctxt "#32103"
 msgid "No Value Added"
-msgstr ""
+msgstr "Arvoa ei lisätty"
 
 #: /resources/lib/container.py
 msgctxt "#32104"
@@ -529,51 +535,53 @@ msgid ""
 "TMDb ID for {} not found or none selected.\n"
 "Do you want to add another value?"
 msgstr ""
+"Kohteen {} TMDb ID:tä ei löytynyt tai mitään ei valittu.\n"
+"haluatko lisätä eri arvon?"
 
 #: /resources/lib/container.py
 msgctxt "#32105"
 msgid "Do you want to add another value?"
-msgstr ""
+msgstr "Haluatko lisätä eri arvon?"
 
 #: /resources/lib/container.py
 msgctxt "#32106"
 msgid "Added"
-msgstr ""
+msgstr "Lisätty"
 
 #: /resources/lib/container.py
 msgctxt "#32107"
 msgid "Set Match Method"
-msgstr ""
+msgstr "Aseta täsmäystapa"
 
 #: /resources/lib/container.py
 msgctxt "#32108"
 msgid "Choose matching method for parameters with multiple values."
-msgstr ""
+msgstr "Valitse useita arvoja sisältävien parametrien täsmäystapa."
 
 #: /resources/lib/container.py
 msgctxt "#32109"
 msgid "Match ANY Value"
-msgstr ""
+msgstr "Täsmää MIKÄ TAHANSA arvo"
 
 #: /resources/lib/container.py
 msgctxt "#32110"
 msgid "Match ALL Values"
-msgstr ""
+msgstr "Täsmää KAIKKI arvot"
 
 #: /resources/lib/container.py
 msgctxt "#32111"
 msgid "Select Items"
-msgstr ""
+msgstr "Valitse kohteet"
 
 #: /resources/lib/container.py
 msgctxt "#32112"
 msgid "Select Genres"
-msgstr ""
+msgstr "Valitse lajityypit"
 
 #: /resources/lib/container.py
 msgctxt "#32113"
 msgid "Also accepts X days relative from today in the format T-X or T+X (e.g. T-10 is ten days ago)"
-msgstr ""
+msgstr "Hyväksyy myös X päivää suhteessa tähän päivään muodossa \"T-X\" tai \"T+X\" (esim. T-10 tarkoittaa kymmenen päivää sitten)"
 
 #: /resources/lib/container.py
 msgctxt "#32114"
@@ -583,97 +591,97 @@ msgstr ""
 #: /resources/lib/container.py
 msgctxt "#32115"
 msgid "Company"
-msgstr ""
+msgstr "Yritys"
 
 #: /resources/lib/container.py
 msgctxt "#32116"
 msgid "Network"
-msgstr ""
+msgstr "Verkko"
 
 #: /resources/lib/container.py
 msgctxt "#32117"
 msgid "Keyword"
-msgstr ""
+msgstr "Avainsana"
 
 #: /resources/lib/container.py
 msgctxt "#32118"
 msgid "Person"
-msgstr ""
+msgstr "Henkilö"
 
 #: /resources/lib/container.py
 msgctxt "#32119"
 msgid "Select Release Types"
-msgstr ""
+msgstr "Valitse julkaisutyypit"
 
 #: /resources/lib/container.py
 msgctxt "#32120"
 msgid "Select Region for Release"
-msgstr ""
+msgstr "Valitse julkaisualue"
 
 #: /resources/lib/container.py
 msgctxt "#32121"
 msgid "Clear Search History"
-msgstr ""
+msgstr "Tyhjennä hakuhistoria"
 
 #: /resources/lib/context.py
 msgctxt "#32122"
 msgid "XBMCVFS reports unable to create path"
-msgstr ""
+msgstr "XBMCVFS-raportointi ei voi luoda sijaintia"
 
 #: /resources/lib/context.py
 msgctxt "#32123"
 msgid "If error persists and the folders are created correctly, please disable folder path creation checking in TMDBHelper settings."
-msgstr ""
+msgstr "Jos ongelma jatkuu ja kansiot on luotu oikein, poista kansion polun luontivalinta käytöstä TMDBHelperin asetuksista."
 
 #: /resources/lib/context.py
 msgctxt "#32124"
 msgid "Adding"
-msgstr ""
+msgstr "Lisätään"
 
 #: /resources/lib/context.py
 msgctxt "#32125"
 msgid "Add Trakt list to Kodi library"
-msgstr ""
+msgstr "Lisää Trakt-lista Kodin kirjastoon"
 
 #: /resources/lib/context.py
 msgctxt "#32126"
 msgid "Are you sure you want to add this Trakt list to your Kodi library?"
-msgstr ""
+msgstr "Haluatko varmasti lisätä tämän Trakt-listan Kodin kirjastoon?"
 
 #: /resources/lib/context.py
 msgctxt "#32127"
 msgid "by user"
-msgstr ""
+msgstr "käyttäjältä"
 
 #: /resources/lib/context.py
 msgctxt "#32128"
 msgid "This list contains"
-msgstr ""
+msgstr "Lista sisältää"
 
 #: /resources/lib/context.py
 msgctxt "#32129"
 msgid "items"
-msgstr ""
+msgstr "kohdetta"
 
 #: /resources/settings.xml
 msgctxt "#32130"
 msgid "Auto-update library at time"
-msgstr ""
+msgstr "Päivitä kirjasto automaattisesti"
 
 #: /resources/settings.xml
 msgctxt "#32131"
 msgid "Auto-update library from Trakt list(s)"
-msgstr ""
+msgstr "Päivitä kirjasto automaattisesti Trakt-listoista"
 
 #: /resources/lib/script.py
 msgctxt "#32132"
 msgid "Do you wish to update the library from the Trakt list(s) now?"
-msgstr ""
+msgstr "Halautko päivittää kirjaston Trakt-listoista nyt?"
 
 #: /resources/lib/script.py
 msgctxt "#32133"
 msgid "Select List(s)"
-msgstr ""
+msgstr "Valitse listat"
 
 #: /resources/settings.xml
 msgctxt "#32134"
@@ -683,107 +691,107 @@ msgstr ""
 #: /resources/lib/traktapi.py
 msgctxt "#32135"
 msgid "Successfully removed {} {} from {} list."
-msgstr ""
+msgstr "Kohde \"{}\" {} poistettiin listalta {}."
 
 #: /resources/lib/traktapi.py
 msgctxt "#32136"
 msgid "Successfully added {} {} to {} list."
-msgstr ""
+msgstr "Kohde \"{}\" {} lisättiin listalle {}."
 
 #: /resources/lib/traktapi.py
 msgctxt "#32137"
 msgid "Failed to remove {} {} from {} list."
-msgstr ""
+msgstr "Kohteen \"{}\" {} poisto listalta {} epäonnistui."
 
 #: /resources/lib/traktapi.py
 msgctxt "#32138"
 msgid "Failed to add {} {} to {} list."
-msgstr ""
+msgstr "Kohteen \"{}\" {} lisäys listalle {} epäonnistui."
 
 #: /resources/lib/traktapi.py
 msgctxt "#32139"
 msgid "Remove from Trakt list"
-msgstr ""
+msgstr "Poistettiin Trakt-listalta"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32140"
 msgid "Add to Trakt list"
-msgstr ""
+msgstr "Lisättiin Trakt-listalle"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32141"
 msgid "Create new list..."
-msgstr ""
+msgstr "Luo uusi lista..."
 
 #: /resources/settings.xml
 msgctxt "#32142"
 msgid "Hide watched items"
-msgstr ""
+msgstr "Piilota katsotut kohteet"
 
 #: /resources/lib/context.py
 msgctxt "#32143"
 msgid "Cached details for {} successfully refreshed!"
-msgstr ""
+msgstr "Kohteen \"{}\" välimuistiin puskuroidut tiedot päivitettiin."
 
 #: /resources/lib/context.py
 msgctxt "#32144"
 msgid "Refresh TheMovieDb Details"
-msgstr ""
+msgstr "Päivitä TheMovieDb-tiedot"
 
 #: /addon.xml
 msgctxt "#32145"
 msgid "TMDbHelper Options"
-msgstr ""
+msgstr "TMDbHelperin asetukset"
 
 #: /addon.xml
 msgctxt "#32146"
 msgid "Play using (TMDbHelper)"
-msgstr ""
+msgstr "Toista soittimella (TMDbHelper)"
 
 #: /addon.xml
 msgctxt "#32147"
 msgid "Browse seasons (TMDbHelper)"
-msgstr ""
+msgstr "Selaa tuotantokausia (TMDbHelper)"
 
 #: /addon.xml
 msgctxt "#32148"
 msgid "Add/Remove from Trakt Watchlist"
-msgstr ""
+msgstr "Lisää/poista Trakt-katselulistalta"
 
 #: /addon.xml
 msgctxt "#32149"
 msgid "Add/Remove from Trakt History"
-msgstr ""
+msgstr "Lisää/poista Trakt-historiasta"
 
 #: /addon.xml
 msgctxt "#32150"
 msgid "Add/Remove from Trakt Collection"
-msgstr ""
+msgstr "Lisää/poista Trakt-kokoelmasta"
 
 #: /addon.xml
 msgctxt "#32151"
 msgid "Add to Kodi Library"
-msgstr ""
+msgstr "Lisää Kodin kirjastoon"
 
 #: /addon.xml
 msgctxt "#32152"
 msgid "Remove from list"
-msgstr ""
+msgstr "Poista listalta"
 
 #: /addon.xml
 msgctxt "#32153"
 msgid "Refresh cached details"
-msgstr ""
+msgstr "Pävitä välimuistin tiedot"
 
 #: /resources/settings.xml
 msgctxt "#32154"
 msgid "Update library now"
-msgstr ""
+msgstr "Päivitä kirjasto nyt"
 
 #: /resources/settings.xml
 msgctxt "#32155"
 msgid "Next Aired (Library)"
-msgstr ""
+msgstr "Seuraavat esitykset (kirjasto)"
 
 #: /resources/settings.xml
 msgctxt "#32156"
@@ -793,37 +801,37 @@ msgstr ""
 #: /resources/lib/context.py
 msgctxt "#32157"
 msgid "Unable to find TMDb ID for item."
-msgstr ""
+msgstr "Kohteelle ei löydetty TMDb ID -tunnistetta."
 
 #: /resources/settings.xml
 msgctxt "#32158"
 msgid "Automatically use player if only one available"
-msgstr ""
+msgstr "Jos vain yksi soitin on käytettävissä, käytä sitä automaattisesti"
 
 #: /resources/lib/container.py
 msgctxt "#32159"
 msgid "Select Original Language"
-msgstr ""
+msgstr "Valitse alkuperäinen kieli"
 
 #: /resources/lib/context.py
 msgctxt "#32160"
 msgid "Adding {} - {} to library..."
-msgstr ""
+msgstr "Lisätään {} - {} kirjastoon..."
 
 #: /resources/lib/traktapi.py
 msgctxt "#32161"
 msgid "Do you wish to update the library with this list now?"
-msgstr ""
+msgstr "Haluatko päivittää kirjaston tällä listalla nyt?"
 
 #: /resources/settings.xml
 msgctxt "#32162"
 msgid "Automatically play local files"
-msgstr ""
+msgstr "`Toista paikalliset tiedostot automaattisesti"
 
 #: /resources/settings.xml
 msgctxt "#32163"
 msgid "Use fanart.tv for service monitor artwork"
-msgstr ""
+msgstr "Käytä palveluseurannan mediakuvituksiin Fanart.tv-palvelua"
 
 #: /resources/lib/context.py
 msgctxt "#32164"
