@@ -3,14 +3,8 @@ from tmdbhelper.lib.addon.consts import NO_LABEL_FORMATTING
 from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin, get_localized, get_condvisibility
 from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.thread import ParallelThread
-from tmdbhelper.lib.api.tmdb.api import TMDb
-from tmdbhelper.lib.api.trakt.api import TraktAPI
-from tmdbhelper.lib.api.fanarttv.api import FanartTV
-from tmdbhelper.lib.api.omdb.api import OMDb
-from tmdbhelper.lib.api.tvdb.api import TVDb
-from tmdbhelper.lib.api.mdblist.api import MDbList
 from tmdbhelper.lib.items.trakt import TraktMethods
-from tmdbhelper.lib.items.builder import ItemBuilder
+from tmdbhelper.lib.api.contains import CommonContainerAPIs
 from tmdbhelper.lib.items.filters import is_excluded
 from tmdbhelper.lib.addon.logger import TimerList, log_timer_report
 from threading import Thread
@@ -20,7 +14,7 @@ from tmdbhelper.lib.items.kodi import KodiDb
 """
 
 
-class Container():
+class Container(CommonContainerAPIs):
     def __init__(self, handle, paramstring, **kwargs):
         # Log Settings
         self.log_timers = get_setting('timer_reports')
@@ -59,17 +53,6 @@ class Container():
         # KodiDB
         self.kodi_db = None
 
-        # API class initialisation
-        self.tmdb_api = TMDb(page_length=self.page_length)
-        self.omdb_api = OMDb() if get_setting('omdb_apikey', 'str') else None
-        self.ftv_api = FanartTV(cache_only=self.ftv_is_cache_only(), )
-        self.trakt_api = TraktAPI(page_length=self.page_length)
-        self.mdblist_api = MDbList()
-        self.tvdb_api = TVDb()
-        self.ib = ItemBuilder(
-            tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api,
-            log_timers=self.log_timers, timer_lists=self.timer_lists)
-
         # Trakt Watched Progress Settings
         self.hide_watched = get_setting('widgets_hidewatched') if self.is_widget else False
         self.trakt_method = TraktMethods(
@@ -85,6 +68,17 @@ class Container():
         self.thumb_override = 0
 
     @property
+    def ib(self):
+        try:
+            return self._ib
+        except AttributeError:
+            from tmdbhelper.lib.items.builder import ItemBuilder
+            self._ib = ItemBuilder(
+                tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api,
+                log_timers=self.log_timers, timer_lists=self.timer_lists)
+            return self._ib
+
+    @property
     def page_length(self):
         if self.is_widget or not get_condvisibility('Window.IsVisible(MyVideoNav.xml)'):
             return 1
@@ -97,6 +91,7 @@ class Container():
             return False
         return True
 
+    @property
     def ftv_is_cache_only(self):
         if self.is_cacheonly:  # cacheonly=true param overrides all other settings
             return True
@@ -113,7 +108,7 @@ class Container():
     def tmdb_is_cache_only(self):
         if self.is_cacheonly:  # cacheonly=true param overrides all other settings
             return True
-        if not self.ftv_is_cache_only():  # fanarttv lookups require TMDb lookups for tvshow ID -- TODO: only force on tvshows
+        if not self.ftv_is_cache_only:  # fanarttv lookups require TMDb lookups for tvshow ID -- TODO: only force on tvshows
             return False
         if get_setting('tmdb_details'):  # user setting
             return False

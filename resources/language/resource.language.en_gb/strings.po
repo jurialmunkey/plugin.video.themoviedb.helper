@@ -2561,6 +2561,11 @@ msgctxt "#32503"
 msgid "Page multiplier (Library windows)"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32504"
+msgid "Add {} to node"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
