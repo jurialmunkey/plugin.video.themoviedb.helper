@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: TheMovieDB Helper\n"
 "Report-Msgid-Bugs-To: https://github.com/jurialmunkey/plugin.video.themoviedb.helper/issues\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2023-10-03 12:22+0300\n"
+"PO-Revision-Date: 2023-10-03 12:27+0300\n"
 "Last-Translator: Oskari Lavinto <olavinto@protonmail.com>\n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -586,7 +586,7 @@ msgstr "Hyväksyy myös X päivää suhteessa tähän päivään muodossa \"T-X\
 #: /resources/lib/container.py
 msgctxt "#32114"
 msgid "Enter"
-msgstr ""
+msgstr "Syötä"
 
 #: /resources/lib/container.py
 msgctxt "#32115"
@@ -933,7 +933,7 @@ msgstr "Esitetään parhaillaan"
 #: /resources/lib/plugin.py
 msgctxt "#32183"
 msgid "Next Aired Library"
-msgstr ""
+msgstr "Esitetään seuraavaksi -kirjasto"
 
 #: /resources/lib/plugin.py
 msgctxt "#32184"
@@ -1766,17 +1766,17 @@ msgstr "Valitse varmistava toistotapa"
 #: /resources/lib/player/configure.py
 msgctxt "#32342"
 msgid "Fallbacks for {}"
-msgstr ""
+msgstr "Varmistukset kohteelle {}"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32343"
 msgid "Choose fallback for {} {}"
-msgstr ""
+msgstr "Valitsevarmistus kohteelle {} {}"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32344"
 msgid "Enter New Priority for {}"
-msgstr ""
+msgstr "Syötä uusi painotus kohteelle {}"
 
 #: /resources/lib/tmdb/api.py
 msgctxt "#32345"
@@ -2164,7 +2164,7 @@ msgstr "Poista edistymisestä"
 #: /resources/settings.xml
 msgctxt "#32418"
 msgid "Adds text to the start of the MPAA rating. For example if set to 'Rated' a 'PG' rating is displayed as 'Rated PG'. Cached items will need to be refreshed."
-msgstr "Lisää MPAA-ikäluokituksen eteen tekstin. Esim. teksti \"Ikäluokitus\" tuottaa \"PG\"-luokituksella \"Ikäluokitus PG\". Vaatii välimuistiin puskuroitujen kohteiden päivityksen."
+msgstr "Lisää MPAA-ikäluokitusten eteen tekstin. Esim. teksti \"Ikäluokitus\" tuottaa \"PG\"-luokituksella \"Ikäluokitus PG\". Vaatii välimuistiin puskuroitujen kohteiden päivityksen."
 
 #: /resources/settings.xml
 msgctxt "#32419"
@@ -2404,7 +2404,7 @@ msgstr "Puskuroi levyn luku muistiin (kasvattaa RAM-muistin varausta)"
 #: /resources/settings.xml
 msgctxt "#32466"
 msgid "Play automatically using available providers"
-msgstr ""
+msgstr "Toista automaattisesti käytettävissä olevilla toimittajilla"
 
 #: /resources/settings.xml
 msgctxt "#32467"
@@ -2414,7 +2414,7 @@ msgstr "Päivitä välimuistiin puskuroidut Kodin kirjaston tiedot"
 #: /resources/settings.xml
 msgctxt "#32468"
 msgid "Authorisation and sync notifications on startup"
-msgstr ""
+msgstr "Todennus- ja synkronointi-ilmoitukset käynnistettäessä"
 
 #: /resources/settings.xml
 msgctxt "#32469"
@@ -2499,7 +2499,7 @@ msgstr "TVDb API"
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32485"
 msgid "Add rating"
-msgstr "Lisää arvio"
+msgstr "Lisää luokitus"
 
 #: /resources/tmdbhelper/lib/api/tmdb/discover.py
 msgctxt "#32486"
