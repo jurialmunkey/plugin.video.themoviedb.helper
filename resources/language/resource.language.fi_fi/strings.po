@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: TheMovieDB Helper\n"
 "Report-Msgid-Bugs-To: https://github.com/jurialmunkey/plugin.video.themoviedb.helper/issues\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2023-10-03 11:03+0300\n"
+"PO-Revision-Date: 2023-10-03 11:41+0300\n"
 "Last-Translator: Oskari Lavinto <olavinto@protonmail.com>\n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -1609,7 +1609,7 @@ msgstr ""
 #: /resources/lib/trakt/api.py
 msgctxt "#32315"
 msgid "Add to liked lists"
-msgstr ""
+msgstr "Lisää Tykätyt-listalle"
 
 #: /resources/lib/trakt/api.py
 msgctxt "#32316"
@@ -1624,37 +1624,37 @@ msgstr ""
 #: /resources/lib/trakt/api.py
 msgctxt "#32318"
 msgid "Error code: {}"
-msgstr ""
+msgstr "Virhekoodi: {}"
 
 #: /resources/lib/trakt/api.py
 msgctxt "#32319"
 msgid "Remove from liked lists"
-msgstr ""
+msgstr "Poista Tykätyt-listoilta"
 
 #: /resources/lib/trakt/api.py
 msgctxt "#32320"
 msgid "unliked"
-msgstr ""
+msgstr "ei tykätyt"
 
 #: /resources/lib/trakt/api.py
 msgctxt "#32321"
 msgid "liked"
-msgstr ""
+msgstr "tykätyt"
 
 #: /addon.xml
 msgctxt "#32322"
 msgid "Select player"
-msgstr ""
+msgstr "Valitse soitin"
 
 #: /resources/lib/helpers/update.py
 msgctxt "#32323"
 msgid "Item added to library"
-msgstr ""
+msgstr "Kohde lisättiin kirjastoon"
 
 #: /resources/lib/player/players.py
 msgctxt "#32324"
 msgid "Select Play Method"
-msgstr ""
+msgstr "Valitse toistotapa"
 
 #: /resources/lib/player/players.py
 msgctxt "#32325"
@@ -1669,47 +1669,47 @@ msgstr ""
 #: /resources/lib/helpers/timedate.py
 msgctxt "#32326"
 msgid "This Month"
-msgstr ""
+msgstr "Tämä kuukausi"
 
 #: /resources/lib/helpers/timedate.py
 msgctxt "#32327"
 msgid "Last Month"
-msgstr ""
+msgstr "Edellinen kuukausi"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32328"
 msgid "Select Player to Configure"
-msgstr ""
+msgstr "Määritä valitsemalla soitin"
 
 #: /resources/settings.xml
 msgctxt "#32329"
 msgid "Configure players"
-msgstr ""
+msgstr "Määritä soittimet"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32330"
 msgid "Reset to Defaults"
-msgstr ""
+msgstr "Palauta oletukset"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32331"
 msgid "Enter New Name for {}"
-msgstr ""
+msgstr "Syötä uusi nimi kohteelle {}"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32332"
 msgid "Choose resolve method for player"
-msgstr ""
+msgstr "Valitse soittimen selvitystapa"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32333"
 msgid "User Choice"
-msgstr ""
+msgstr "Käyttäjän valinta"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32334"
 msgid "Reset player to defaults?"
-msgstr ""
+msgstr "Palautetaanko soittimen oletukset?"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32335"
@@ -1718,11 +1718,14 @@ msgid ""
 "\n"
 "[B]WARNING:[/B] This action cannot be undone."
 msgstr ""
+"Haluatko palauttaa soitintiedoston [B]{}[/B] sen alkuperäiseen tilaan levyllä?\n"
+"\n"
+"[B]VAROITUS:[/B] Toiminnon kumoaminen ei ole mahdollista."
 
 #: /resources/lib/player/configure.py
 msgctxt "#32336"
 msgid "Save your changes?"
-msgstr ""
+msgstr "Tallennetaanko muutokset?"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32337"
@@ -1732,16 +1735,20 @@ msgid ""
 "\n"
 "If you close without saving, your changes will be lost."
 msgstr ""
+"Soitintiedosto [B]{}[/B] on muuttunut.\n"
+"Haluatko tallentaa muutokset?\n"
+"\n"
+"Jos suljet tallentamatta, muutokset menetetään."
 
 #: /resources/lib/player/configure.py
 msgctxt "#32338"
 msgid "Close without Saving"
-msgstr ""
+msgstr "Sulje tallentamatta"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32339"
 msgid "{} playback URL resolve method"
-msgstr ""
+msgstr "{} toiston URL-osoitteen selvitystapa"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32340"
@@ -1754,7 +1761,7 @@ msgstr ""
 #: /resources/lib/player/configure.py
 msgctxt "#32341"
 msgid "Choose fallback player method"
-msgstr ""
+msgstr "Valitse varmistava toistotapa"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32342"
@@ -1774,47 +1781,47 @@ msgstr ""
 #: /resources/lib/tmdb/api.py
 msgctxt "#32345"
 msgid "Episode groups"
-msgstr ""
+msgstr "Jaksoryhmät"
 
 #: /resources/settings.xml
 msgctxt "#32346"
 msgid "Resend local files (fix Trakt scrobbling bug)"
-msgstr ""
+msgstr "Lähetä paikalliset tiedostot uudelleen (korjaa Trakt-seurannan vian)"
 
 #: /resources/settings.xml
 msgctxt "#32347"
 msgid "Log output of Trakt request"
-msgstr ""
+msgstr "Kirjaa Trakt-pyynnöt"
 
 #: /resources/settings.xml
 msgctxt "#32348"
 msgid "Log output of TMDb request"
-msgstr ""
+msgstr "Kirjaa TMDb-pyynnöt"
 
 #: /resources/lib/kodi/library.py
 msgctxt "#32349"
 msgid "Creating movies playlist"
-msgstr ""
+msgstr "Luodaan elokuvatoistolistaa"
 
 #: /resources/lib/kodi/library.py
 msgctxt "#32350"
 msgid "Creating tvshows playlist"
-msgstr ""
+msgstr "Luodaan sarjatoistolistaa"
 
 #: /resources/settings.xml
 msgctxt "#32351"
 msgid "Dummy ResolvedURL"
-msgstr ""
+msgstr "Tyhjä selvitetty URL-osoite"
 
 #: /resources/settings.xml
 msgctxt "#32352"
 msgid "Dummy video duration (seconds)"
-msgstr ""
+msgstr "Tyhjä videon kesto (sekuntia)"
 
 #: /resources/lib/player/players.py
 msgctxt "#32353"
 msgid "Missing \"is_resolvable\" Flag"
-msgstr ""
+msgstr "\"is_resolvable\"-merkintä puuttuu"
 
 #: /resources/lib/player/players.py
 msgctxt "#32354"
@@ -1827,12 +1834,12 @@ msgstr ""
 #: /resources/lib/script/sync.py
 msgctxt "#32355"
 msgid "Remove from user list"
-msgstr ""
+msgstr "Poista käyttäjän listalta"
 
 #: /resources/lib/script/sync.py
 msgctxt "#32356"
 msgid "Enter new list name"
-msgstr ""
+msgstr "Syötä listalle uusi nimi"
 
 #: /resources/lib/script/router.py
 msgctxt "#32357"
@@ -1841,81 +1848,84 @@ msgid ""
 "\n"
 "This action cannot be undone."
 msgstr ""
+"Haluatko varmasti poistaa kohteen [B]{}[/B]?\n"
+"\n"
+"Toimintoa ei ole mahdollista kumota."
 
 #: /resources/lib/script/router.py
 msgctxt "#32358"
 msgid "Delete user list"
-msgstr ""
+msgstr "Poista käyttäjän lista"
 
 #: /resources/lib/script/router.py
 msgctxt "#32359"
 msgid "Enter new name"
-msgstr ""
+msgstr "Syötä uusi nimi"
 
 #: /resources/lib/addon/plugin.py
 msgctxt "#32360"
 msgid "Companies"
-msgstr ""
+msgstr "Yritykset"
 
 #: /resources/lib/container/basedir.py
 msgctxt "#32361"
 msgid "Search Lists"
-msgstr ""
+msgstr "Hakulistat"
 
 #: /resources/lib/script/sync.py
 msgctxt "#32362"
 msgid "Do you want to add this item to the library now?"
-msgstr ""
+msgstr "Haluatko lisätä kohteen kirjastoon nyt?"
 
 #: /resources/settings.xml
 msgctxt "#32363"
 msgid "Delay after resolving (seconds)"
-msgstr ""
+msgstr "Selvityksen jälkeinen viive (sekuntia)"
 
 #: /resources/settings.xml
 msgctxt "#32364"
 msgid "Reroute PlayMedia to xbmc.Player()"
-msgstr ""
+msgstr "Välitä PlayMedia kohteeseen xbmc.Player()"
 
 #: /resources/lib/addon/plugin.py
 msgctxt "#32365"
 msgid "Combined"
-msgstr ""
+msgstr "Yhdistetty"
 
 #: /resources/settings.xml
 msgctxt "#32366"
 msgid "Hide items without airdates"
-msgstr ""
+msgstr "Piilota kohteet, joilla ei ole esityspäiväyksiä"
 
 #: /resources/settings.xml
 msgctxt "#32367"
 msgid "Local Information"
-msgstr ""
+msgstr "Paikalliset tiedot"
 
 #: /resources/settings.xml
 msgctxt "#32368"
 msgid "Next Aired / Next Episodes"
-msgstr ""
+msgstr "Seuraava esitys/Seuraavat jaksot"
 
 #: /resources/settings.xml
 msgctxt "#32369"
 msgid "thumbs"
-msgstr ""
+msgstr "thumb-kuvat"
 
 #: /resources/settings.xml
 msgctxt "#32370"
 msgid "landscape"
-msgstr ""
+msgstr "landscape-kuvat"
 
 #: /resources/settings.xml
 msgctxt "#32371"
 msgid "Preferred artwork for thumbs"
-msgstr ""
+msgstr "Pienoiskuvina käytettävä mediakuvitus"
 
 #: /resources/settings.xml
 msgctxt "#32372"
 msgid "fanart"
-msgstr ""
+msgstr "fanart-kuvat"
 
 #: /resources/settings.xml
 msgctxt "#32373"
@@ -1925,72 +1935,72 @@ msgstr ""
 #: /resources/lib/player/players.py
 msgctxt "#32374"
 msgid "Constructing Players"
-msgstr ""
+msgstr "Rakennetaan soittimia"
 
 #: /resources/lib/player/players.py
 msgctxt "#32375"
 msgid "Retrieving Item Details"
-msgstr ""
+msgstr "Noudetaan kohteen tietoja"
 
 #: /resources/lib/player/players.py
 msgctxt "#32376"
 msgid "Building Player Dialog"
-msgstr ""
+msgstr "Rakennetaan soittimen ikkunaa"
 
 #: /resources/lib/trakt/api.py
 msgctxt "#32377"
 msgid "Playcount"
-msgstr ""
+msgstr "Toistomäärä"
 
 #: /resources/settings.xml
 msgctxt "#32378"
 msgid "Show All"
-msgstr ""
+msgstr "Näytä kaikki"
 
 #: /resources/settings.xml
 msgctxt "#32379"
 msgid "Hide Specials"
-msgstr ""
+msgstr "Piilota erikoisjaksot"
 
 #: /resources/settings.xml
 msgctxt "#32380"
 msgid "Hide Up Next"
-msgstr ""
+msgstr "Piilota esitetään seuraavaksi"
 
 #: /resources/settings.xml
 msgctxt "#32381"
 msgid "Hide Up Next and Specials"
-msgstr ""
+msgstr "Piilota esitetään seuraavaksi ja erikoisjaksot"
 
 #: /resources/settings.xml
 msgctxt "#32382"
 msgid "Hide Episode Groups"
-msgstr ""
+msgstr "Piilota jaksoryhmät"
 
 #: /resources/settings.xml
 msgctxt "#32383"
 msgid "Hide Episode Groups and Specials"
-msgstr ""
+msgstr "Piilota jaksoryhmät ja erikoisjaksot"
 
 #: /resources/settings.xml
 msgctxt "#32384"
 msgid "Hide Episode Groups and Up Next"
-msgstr ""
+msgstr "Piilota jaksoryhmät ja esitetään seuraavaksi"
 
 #: /resources/settings.xml
 msgctxt "#32385"
 msgid "Hide All"
-msgstr ""
+msgstr "Piilota kaikki"
 
 #: /resources/settings.xml
 msgctxt "#32386"
 msgid "Delete cache"
-msgstr ""
+msgstr "Poista välimuisti"
 
 #: /resources/lib/script/router.py
 msgctxt "#32387"
 msgid "Delete {} Cache"
-msgstr ""
+msgstr "Poista {} välimuisti"
 
 #: /resources/lib/script/router.py
 msgctxt "#32388"
@@ -1999,21 +2009,24 @@ msgid ""
 "\n"
 "TMDbHelper performs regular automatic cache management and cleaning. You should only delete the cache manually in cases of persistent cache related errors."
 msgstr ""
+"Haluatko varmasti poistaa {} välimuistin? Toimintoa ei ole mahdollista perua.\n"
+"\n"
+"TMDbHelper järjestää ja siivoaa välimuistin ajoittain automaattisesti. Välimuistin manuaalinen poisto tulisi suorittaa vain, jos pysyvässä välimuistissa havaitaan ongelmia."
 
 #: /resources/lib/script/router.py
 msgctxt "#32389"
 msgid "Cache deleted!"
-msgstr ""
+msgstr "Välimuisti on poistettu."
 
 #: /resources/settings.xml
 msgctxt "#32390"
 msgid "Use alternative .nfo filename"
-msgstr ""
+msgstr "Käytä vaihtoehtoista .nfo-tiedoston nimeä"
 
 #: /resources/lib/script/router.py
 msgctxt "#32391"
 msgid "Select update type"
-msgstr ""
+msgstr "Valitse päivitystyyppi"
 
 #: /resources/lib/script/router.py
 msgctxt "#32392"
@@ -2026,12 +2039,12 @@ msgstr ""
 #: /resources/lib/script/router.py
 msgctxt "#32393"
 msgid "Forced Update"
-msgstr ""
+msgstr "Pakota päivitys"
 
 #: /resources/lib/script/router.py
 msgctxt "#32394"
 msgid "Quick Update"
-msgstr ""
+msgstr "Pikapäivitys"
 
 #: /resources/settings.xml
 msgctxt "#32395"
@@ -2046,32 +2059,32 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32397"
 msgid "Original"
-msgstr ""
+msgstr "Alkuperäinen"
 
 #: /resources/settings.xml
 msgctxt "#32398"
 msgid "Medium"
-msgstr ""
+msgstr "Keskitasoinen"
 
 #: /resources/settings.xml
 msgctxt "#32399"
 msgid "Fallback to English when main language unavailable"
-msgstr ""
+msgstr "Käytä Englantia, jos ensisijainen kieli ei ole käytettävissä"
 
 #: /resources/settings.xml
 msgctxt "#32400"
 msgid "Play local Kodi library files"
-msgstr ""
+msgstr "Toista paikalliset Kodi-kirjaston tiedostot"
 
 #: /resources/settings.xml
 msgctxt "#32401"
 msgid "TMDb detailed information"
-msgstr ""
+msgstr "Yksityiskohtaiset TMDb-tiedot"
 
 #: /resources/settings.xml
 msgctxt "#32402"
 msgid "Get additional details and artwork from TMDb"
-msgstr ""
+msgstr "Nouda TMDb:stä lisätietoja ja mediakuvituksia"
 
 #: /resources/settings.xml
 msgctxt "#32403"
@@ -2585,200 +2598,200 @@ msgstr "Lisää {} solmuun"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
-msgstr ""
+msgstr "Hindi (Intia)"
 
 msgctxt "#30031"
 msgid "Hungarian (Hungary)"
-msgstr ""
+msgstr "Unkari (Unkari)"
 
 msgctxt "#30032"
 msgid "Indonesian (Indonesia)"
-msgstr ""
+msgstr "Indonesia (Indonesia)"
 
 msgctxt "#30033"
 msgid "Italian (Italy)"
-msgstr ""
+msgstr "Italia (Italia)"
 
 msgctxt "#30034"
 msgid "Japanese (Japan)"
-msgstr ""
+msgstr "Japani (Japani)"
 
 msgctxt "#30035"
 msgid "Georgian (Georgia)"
-msgstr ""
+msgstr "Georgia (Georgia)"
 
 msgctxt "#30036"
 msgid "Kazakh (Kazakhstan)"
-msgstr ""
+msgstr "Kazakki (Kazakstan)"
 
 msgctxt "#30037"
 msgid "Kannada (India)"
-msgstr ""
+msgstr "Kannada (Intia)"
 
 msgctxt "#30038"
 msgid "Korean (South Korea)"
-msgstr ""
+msgstr "Korea (Etelä-Korea)"
 
 msgctxt "#30039"
 msgid "Lithuanian (Lithuania)"
-msgstr ""
+msgstr "Liettua (Liettua)"
 
 msgctxt "#30040"
 msgid "Latvian (Latvia)"
-msgstr ""
+msgstr "Latvia (Latvia)"
 
 msgctxt "#30041"
 msgid "Malayalam (India)"
-msgstr ""
+msgstr "Malayalam (Intia)"
 
 msgctxt "#30042"
 msgid "Malay (Malaysia)"
-msgstr ""
+msgstr "Malaiji (Malesia)"
 
 msgctxt "#30043"
 msgid "Malay (Singapore)"
-msgstr ""
+msgstr "Malaiji (Singapore)"
 
 msgctxt "#30044"
 msgid "Norwegian Bokmål (Norway)"
-msgstr ""
+msgstr "Kirjanorja (Norja)"
 
 msgctxt "#30045"
 msgid "Dutch (Netherlands)"
-msgstr ""
+msgstr "Hollanti (Alankomaat)"
 
 msgctxt "#30046"
 msgid "Norwegian (Norway)"
-msgstr ""
+msgstr "Norja (Norja)"
 
 msgctxt "#30047"
 msgid "Polish (Poland)"
-msgstr ""
+msgstr "Puola (Puola)"
 
 msgctxt "#30048"
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "Portugali (Brasilia)"
 
 msgctxt "#30049"
 msgid "Portuguese (Portugal)"
-msgstr ""
+msgstr "Portugali (Portugali)"
 
 msgctxt "#30050"
 msgid "Romanian (Romania)"
-msgstr ""
+msgstr "Romania (Romania)"
 
 msgctxt "#30051"
 msgid "Russian (Russia)"
-msgstr ""
+msgstr "Venäjä (Venäjä)"
 
 msgctxt "#30052"
 msgid "Sinhalese (Sri Lanka)"
-msgstr ""
+msgstr "Sinhali (Sri Lanka)"
 
 msgctxt "#30053"
 msgid "Slovak (Slovakia)"
-msgstr ""
+msgstr "Slovakki (Slovakia)"
 
 msgctxt "#30054"
 msgid "Slovenian (Slovenia)"
-msgstr ""
+msgstr "Slovenia (Slovenia)"
 
 msgctxt "#30055"
 msgid "Serbian (Serbia)"
-msgstr ""
+msgstr "Serbian (Serbia)"
 
 msgctxt "#30056"
 msgid "Swedish (Sweden)"
-msgstr ""
+msgstr "Ruotsi (Ruotsi)"
 
 msgctxt "#30057"
 msgid "Tamil (India)"
-msgstr ""
+msgstr "Tamili (Intia)"
 
 msgctxt "#30058"
 msgid "Telugu (India)"
-msgstr ""
+msgstr "Telugu (Intia)"
 
 msgctxt "#30059"
 msgid "Thai (Thailand)"
-msgstr ""
+msgstr "Thai (Thaimaa)"
 
 msgctxt "#30060"
 msgid "Tagalog (Philippines)"
-msgstr ""
+msgstr "Tagalog (Filippiinit)"
 
 msgctxt "#30061"
 msgid "Turkish (Turkey)"
-msgstr ""
+msgstr "Turkki (Turkki)"
 
 msgctxt "#30062"
 msgid "Ukrainian (Ukraine)"
-msgstr ""
+msgstr "Ukraina (Ukraina)"
 
 msgctxt "#30063"
 msgid "Vietnamese (Vietnam)"
-msgstr ""
+msgstr "Vietnam (Vietnam)"
 
 msgctxt "#30064"
 msgid "Mandarin (China)"
-msgstr ""
+msgstr "Mandar (Kiina)"
 
 msgctxt "#30065"
 msgid "Mandarin (Hong Kong)"
-msgstr ""
+msgstr "Mandar (Hong Kong)"
 
 msgctxt "#30066"
 msgid "Mandarin (Taiwan)"
-msgstr ""
+msgstr "Mandar (Taiwan)"
 
 msgctxt "#30067"
 msgid "Zulu (South Africa)"
-msgstr ""
+msgstr "Zulu (Etelä-Afrikka)"
 
 #: /resources/settings.xml
 msgctxt "#32000"
 msgid "TMDb API key"
-msgstr ""
+msgstr "TMDb API-avain"
 
 #: /resources/settings.xml
 msgctxt "#32001"
 msgid "OMDb API key"
-msgstr ""
+msgstr "OMDb API-avain"
 
 #: /resources/settings.xml
 msgctxt "#32002"
 msgid "Days to cache details"
-msgstr ""
+msgstr "Tietojen puskurointiaika (päivää)"
 
 #: /resources/settings.xml
 msgctxt "#32003"
 msgid "Days to cache lists"
-msgstr ""
+msgstr "Listojen puskurointiaika (päivää)"
 
 #: /resources/settings.xml
 msgctxt "#32004"
 msgid "MPAA rating prefix"
-msgstr ""
+msgstr "MPAA-arvion etuliite"
 
 #: /resources/settings.xml
 msgctxt "#32005"
 msgid "Language and country"
-msgstr ""
+msgstr "Kieli ja maa"
 
 #: /resources/lib/utils.py
 msgctxt "#32006"
 msgid "Choose item"
-msgstr ""
+msgstr "Valitse kohde"
 
 #: /resources/lib/requestapi.py
 msgctxt "#32007"
 msgid "Unauthorised 401 Error"
-msgstr ""
+msgstr "Unauthorised 401 -virhe"
 
 #: /resources/lib/requestapi.py
 msgctxt "#32008"
 msgid "API Key"
-msgstr ""
+msgstr "API-avain"
 
 #: /resources/lib/requestapi.py
 msgctxt "#32009"
@@ -2788,89 +2801,89 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32010"
 msgid "Authenticate Trakt account..."
-msgstr ""
+msgstr "Todenna Trakt-tili..."
 
 #: /resources/lib/traktapi.py
 msgctxt "#32011"
 msgid "Token"
-msgstr ""
+msgstr "Tunniste"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32012"
 msgid "You must authenticate your Trakt account to use this feature."
-msgstr ""
+msgstr "Ominaisuuden käyttö edellyttää Trakt-tilin todennusta."
 
 #: /resources/settings.xml
 msgctxt "#32013"
 msgid "Display Trakt list management options in TMDb details list"
-msgstr ""
+msgstr "Näytä Trakt-listojen hallintavalinnat TMDb-tietolistassa"
 
 #: /resources/settings.xml
 msgctxt "#32014"
 msgid "Players"
-msgstr ""
+msgstr "Soittimet"
 
 #: /resources/settings.xml
 msgctxt "#32015"
 msgid "Players URL"
-msgstr ""
+msgstr "Soisttimen URL-osoite"
 
 #: /resources/settings.xml
 msgctxt "#32016"
 msgid "Update players from URL"
-msgstr ""
+msgstr "Päivitä soittimet URL-osoitteesta"
 
 #: /resources/settings.xml
 msgctxt "#32017"
 msgid "API Keys"
-msgstr ""
+msgstr "API-avaimet"
 
 #: /resources/settings.xml
 msgctxt "#32018"
 msgid "Fanart.tv API key"
-msgstr ""
+msgstr "Fanart.tv API -avain"
 
 #: /resources/settings.xml
 msgctxt "#32019"
 msgid "Fanart.tv client key"
-msgstr ""
+msgstr "Fanart.tv Client -avain"
 
 #: /resources/settings.xml
 msgctxt "#32020"
 msgid "Only use if default api key is deactivated"
-msgstr ""
+msgstr "Käytä vain, jos oletusarovoinen API-avain on poistettu käytöstä"
 
 #: /resources/settings.xml
 msgctxt "#32021"
 msgid "Use fanart.tv for plugin artwork (slower)"
-msgstr ""
+msgstr "Käytä lisäosan mediakuvituksille Fanart.tv-palvelua (hitaampi)"
 
 #: /resources/settings.xml
 msgctxt "#32022"
 msgid "Play / Open"
-msgstr ""
+msgstr "Toista / Avaa"
 
 #: /resources/settings.xml
 msgctxt "#32023"
 msgid "Default select action in addon"
-msgstr ""
+msgstr "Valinnan oletustoiminto lisäosassa"
 
 #: /resources/settings.xml
 msgctxt "#32024"
 msgid "Default player for movies"
-msgstr ""
+msgstr "Elokuvien oletussoitin"
 
 #: /resources/settings.xml
 msgctxt "#32025"
 msgid "Default player for episodes"
-msgstr ""
+msgstr "Jaksojen oletussoitin"
 
 #: /resources/settings.xml
 msgctxt "#32026"
 msgid "Choose default players"
-msgstr ""
+msgstr "Valitse oletussoittimet"
 
 #: /resources/settings.xml
 msgctxt "#32027"
 msgid "Clear default players"
-msgstr ""
+msgstr "Tyhjennä oletussoittimet"
