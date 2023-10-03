@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: TheMovieDB Helper\n"
 "Report-Msgid-Bugs-To: https://github.com/jurialmunkey/plugin.video.themoviedb.helper/issues\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2023-10-03 11:41+0300\n"
+"PO-Revision-Date: 2023-10-03 12:22+0300\n"
 "Last-Translator: Oskari Lavinto <olavinto@protonmail.com>\n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -290,7 +290,7 @@ msgstr "Yritä uudelleen"
 #: /resources/lib/downloader.py
 msgctxt "#32058"
 msgid "The provided URL is either invalid or inaccesible."
-msgstr "Syötetty URL-osoite on virheellinen tai ei käytettävissä"
+msgstr "Annettu URL-osoite on virheellinen tai sitä ei tavoiteta."
 
 #: /resources/lib/downloader.py
 msgctxt "#32059"
@@ -731,7 +731,7 @@ msgstr "Piilota katsotut kohteet"
 #: /resources/lib/context.py
 msgctxt "#32143"
 msgid "Cached details for {} successfully refreshed!"
-msgstr "Kohteen \"{}\" välimuistiin puskuroidut tiedot päivitettiin."
+msgstr "Kohteen \"{}\" välimuistiin puskuroidut tiedot on päivitetty!"
 
 #: /resources/lib/context.py
 msgctxt "#32144"
@@ -848,7 +848,7 @@ msgstr "Listan pituus ylittää rajoitukset. Ohitetaan..."
 #: /resources/lib/context.py
 msgctxt "#32166"
 msgid "Adding items to library..."
-msgstr "Lisätään kohteita kirjastoon"
+msgstr "Kohteita lisätään kirjastoon..."
 
 #: /resources/lib/context.py
 msgctxt "#32167"
@@ -1560,7 +1560,7 @@ msgstr "Kommentit"
 #: /resources/lib/trakt/sync.py
 msgctxt "#32306"
 msgid "No comments found!"
-msgstr "Kommentteja ei löytynyt."
+msgstr "Kommentteja ei löytynyt!"
 
 #: /resources/lib/request/api.py
 msgctxt "#32307"
@@ -2016,7 +2016,7 @@ msgstr ""
 #: /resources/lib/script/router.py
 msgctxt "#32389"
 msgid "Cache deleted!"
-msgstr "Välimuisti on poistettu."
+msgstr "Välimuisti on poistettu!"
 
 #: /resources/settings.xml
 msgctxt "#32390"
@@ -2094,42 +2094,42 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32404"
 msgid "Flatten tvshows with multiple episodes airing same day"
-msgstr ""
+msgstr "Yhdistä sarjat, joista esitetään useita jaksoja samana päivänä"
 
 #: /resources/lib/addon/constants.py
 msgctxt "#32405"
 msgid "Your TV Shows Airing This Week"
-msgstr ""
+msgstr "Tällä viikolla esitettävät sarjasi"
 
 #: /resources/lib/container/basedir.py
 msgctxt "#32406"
 msgid "Your In-Progress Episodes"
-msgstr ""
+msgstr "Keskeneräiset jaksosi"
 
 #: /resources/settings.xml
 msgctxt "#32407"
 msgid "Get resume points (experimental) (slower)"
-msgstr ""
+msgstr "Nouda katselun jatkopisteet (kokeellinen ja hitaampi)"
 
 #: /resources/settings.xml
 msgctxt "#32408"
 msgid "Prefer artwork from TMDb first if available"
-msgstr ""
+msgstr "Suosit ensisijaisesti TMDb:n mediakuvituksia, jos saatavilla"
 
 #: /resources/settings.xml
 msgctxt "#32409"
 msgid "Cache database location"
-msgstr ""
+msgstr "Puskuroi tietokannan sijainti välimuistiin"
 
 #: /resources/settings.xml
 msgctxt "#32410"
 msgid "Max concurrent threads (0 is unlimited)"
-msgstr ""
+msgstr "Yhdenaikaisten säikeiden enimmäismäärä (0 on rajaton)"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32411"
 msgid "Providers"
-msgstr ""
+msgstr "Toimittajat"
 
 #: /resources/lib/api/tmdb/discover.py
 msgctxt "#32412"
@@ -2139,252 +2139,252 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32413"
 msgid "Next episodes checks calendar (slower but more accurate)"
-msgstr ""
+msgstr "Varmista seuraavat jaksot kalenterista (hitaampi, mutta tarkempi)"
 
 #: /resources/lib/addon/consts.py
 msgctxt "#32414"
 msgid "Most Watched"
-msgstr ""
+msgstr "Katsotuimmat"
 
 #: /resources/settings.xml
 msgctxt "#32415"
 msgid "Combine all players for plugin into single entry"
-msgstr ""
+msgstr "Yhdistä lisäosan kaikki soittimet yhteen merkintään"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32416"
 msgid "Premieres"
-msgstr ""
+msgstr "Ensiesitykset"
 
 #: /resources/lib/script/sync.py
 msgctxt "#32417"
 msgid "Remove from progress"
-msgstr ""
+msgstr "Poista edistymisestä"
 
 #: /resources/settings.xml
 msgctxt "#32418"
 msgid "Adds text to the start of the MPAA rating. For example if set to 'Rated' a 'PG' rating is displayed as 'Rated PG'. Cached items will need to be refreshed."
-msgstr ""
+msgstr "Lisää MPAA-ikäluokituksen eteen tekstin. Esim. teksti \"Ikäluokitus\" tuottaa \"PG\"-luokituksella \"Ikäluokitus PG\". Vaatii välimuistiin puskuroitujen kohteiden päivityksen."
 
 #: /resources/settings.xml
 msgctxt "#32419"
 msgid "The language and country settings used when looking up data from TMDb and Trakt APIs"
-msgstr ""
+msgstr "Kieli jota käytetään etsittäessä tietoja TMDb- ja Trakt-rajapinnoilla."
 
 #: /resources/settings.xml
 msgctxt "#32420"
 msgid "TMDb artwork quality"
-msgstr ""
+msgstr "TMDb-mediakuvitusten laatu"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32421"
 msgid "Top Lists"
-msgstr ""
+msgstr "Top-listat"
 
 #: /resources/settings.xml
 msgctxt "#32422"
 msgid "MDbList API"
-msgstr ""
+msgstr "MDbList API"
 
 #: /resources/settings.xml
 msgctxt "#32423"
 msgid "MDbList API key"
-msgstr ""
+msgstr "MDbList API -avain"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32424"
 msgid "Make episode playlists"
-msgstr ""
+msgstr "Luo jaksotoistolistoja"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32425"
 msgid "Have TMDbHelper queue all episodes in a playlist when playing an episode using this player?"
-msgstr ""
+msgstr "Kun jakso toistetaan tällä soittimella, tuleeko TMDbHelperin lisätä kaikki jaksot toistolistalle sen perään?"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32426"
 msgid "Return to previous folder (..)"
-msgstr ""
+msgstr "Palaa edelliseen kansioon (..)"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32427"
 msgid "Use current folder as search URL"
-msgstr ""
+msgstr "Käytä nykyistä kansiota haun URL-osoitteena"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32428"
 msgid "Browse for MOVIE search url"
-msgstr ""
+msgstr "Selaa elokuvahaun URL-osoitetta"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32429"
 msgid "Browse for TVSHOW search url"
-msgstr ""
+msgstr "Selaa sarjahaun URL-osoitetta"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32430"
 msgid "Enter a name for this player"
-msgstr ""
+msgstr "Syötä soittimelle nimi"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32431"
 msgid "Use the same search URL for tvshows as movies?"
-msgstr ""
+msgstr "Käytetäänkö sarjoille samaa URL-osoitetta kuin elokuvillekin?"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32432"
 msgid "Select template"
-msgstr ""
+msgstr "Valitse malli"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32433"
 msgid "Missing QUERYKEY in URL"
-msgstr ""
+msgstr "URL-osoitteesta puuttuu QUERYKEY-arvo"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32434"
 msgid "You must insert QUERYKEY where the search query for the URL goes"
-msgstr ""
+msgstr "URL-osoitteeseen on sisällytettävä hakulausekkeen paikan kertova QUERYKEY-arvo"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32435"
 msgid "Input QUERYKEY where search query goes"
-msgstr ""
+msgstr "Syötä hakulausekkeen paikalle QUERYKEY"
 
 #: /resources/settings.xml
 msgctxt "#32436"
 msgid "Details"
-msgstr ""
+msgstr "Tietoja"
 
 #: /resources/settings.xml
 msgctxt "#32437"
 msgid "Configure provider data allowlist"
-msgstr ""
+msgstr "Määritä toimittajan sallitut tiedot"
 
 #: /resources/lib/script/method.py
 msgctxt "#32438"
 msgid "Provider allowlist updated"
-msgstr ""
+msgstr "Toimittajan sallittujen tietojen lista päivitettiin"
 
 #: /resources/lib/script/method.py
 msgctxt "#32439"
 msgid "The provider allowlist has been updated. Please note that updating provider details requires the item cache to be refreshed. The item cache can be deleted in the expert settings section."
-msgstr ""
+msgstr "Toimittajan sallittujen tietojen lista päivitettiin. Huomioi että toimittajan tietojen päivitys edellyttää välimuistin päivitystä. Kohdevälimuisti voidaan poistaa asetusten Asiantuntija-oiosta."
 
 #: /resources/lib/player/configure.py
 msgctxt "#32440"
 msgid "Edit steps"
-msgstr ""
+msgstr "Muokkaa vaiheita"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32441"
 msgid "Add a new step"
-msgstr ""
+msgstr "Lisää vaihe"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32442"
 msgid "Add a new rule"
-msgstr ""
+msgstr "Lisää sääntö"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32443"
 msgid "Select value to match against {}"
-msgstr ""
+msgstr "Valitse kohteen {} täsmäysarvo"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32444"
 msgid "Select rule or listitem key"
-msgstr ""
+msgstr "Valitse sääntö tai listitem-avain"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32445"
 msgid "Edit Rules for Step {}"
-msgstr ""
+msgstr "Muokkaa vaiheen {} sääntöjä"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32446"
 msgid "plugin:// search URL for {}"
-msgstr ""
+msgstr "plugin://-haku-URL kohteelle {}"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32447"
 msgid "Up Next Only"
-msgstr ""
+msgstr "Vain esitetään seuraavaksi"
 
 #: /resources/settings.xml
 msgctxt "#32448"
 msgid "Stop before attempting playback"
-msgstr ""
+msgstr "Pysäytä ennen toiston yritystä"
 
 #: /resources/settings.xml
 msgctxt "#32449"
 msgid "Ignore region release filter"
-msgstr ""
+msgstr "Älä huomioi alueellista julkaisusuodatinta"
 
 #: /resources/settings.xml
 msgctxt "#32450"
 msgid "Install context menu add-on"
-msgstr ""
+msgstr "Asenna sisältövalikkolisäosa"
 
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32451"
 msgid "Lowest"
-msgstr ""
+msgstr "Alin"
 
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32452"
 msgid "Highest"
-msgstr ""
+msgstr "Korkein"
 
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32453"
 msgid "Least played"
-msgstr ""
+msgstr "Vähiten toistetut"
 
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32454"
 msgid "Shortest"
-msgstr ""
+msgstr "Lyhin"
 
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32455"
 msgid "Longest"
-msgstr ""
+msgstr "Pisin"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32456"
 msgid "Watchlist (Released)"
-msgstr ""
+msgstr "Katselulista (julkaistut)"
 
 #: /resources/lib/addon/consts.py
 msgctxt "#32457"
 msgid "Watchlist (Anticipated)"
-msgstr ""
+msgstr "Katselulista (odotetut)"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32458"
 msgid "Airing Next Library"
-msgstr ""
+msgstr "Esitetään seuraavaksi-kirjasto"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32459"
 msgid "Your Episodes Airing Next"
-msgstr ""
+msgstr "Seuraavaksi esitettävät jaksosi"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32460"
 msgid "Awards"
-msgstr ""
+msgstr "Palkinnot"
 
 #: /resources/lib/api/tvdb/lists.py
 msgctxt "#32461"
 msgid "Winner of"
-msgstr ""
+msgstr "Voitti"
 
 #: /resources/lib/api/tvdb/lists.py
 msgctxt "#32462"
 msgid "Nominated for"
-msgstr ""
+msgstr "Ehdolla"
 
 #: /resources/settings.xml
 msgctxt "#32463"
@@ -2399,7 +2399,7 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32465"
 msgid "Cache disk reads to memory (increases RAM usage)"
-msgstr ""
+msgstr "Puskuroi levyn luku muistiin (kasvattaa RAM-muistin varausta)"
 
 #: /resources/settings.xml
 msgctxt "#32466"
@@ -2409,7 +2409,7 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32467"
 msgid "Refresh cached Kodi Library details"
-msgstr ""
+msgstr "Päivitä välimuistiin puskuroidut Kodin kirjaston tiedot"
 
 #: /resources/settings.xml
 msgctxt "#32468"
@@ -2419,27 +2419,27 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32469"
 msgid "Ignore articles when sorting alphabetically"
-msgstr ""
+msgstr "Älä huomioi etuliitteitä järjestettäessä aakkosellisesti"
 
 #: /resources/settings.xml
 msgctxt "#32470"
 msgid "Trakt"
-msgstr ""
+msgstr "Trakt"
 
 #: /resources/settings.xml
 msgctxt "#32471"
 msgid "Connection error notifications"
-msgstr ""
+msgstr "Ilmoitukset yhteysvirheistä"
 
 #: /resources/settings.xml
 msgctxt "#32472"
 msgid "Cache image location"
-msgstr ""
+msgstr "Kuvavälimuistin sijainti"
 
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32473"
 msgid "Collected"
-msgstr ""
+msgstr "Kerätty"
 
 #: /resources/lib/script/method.py
 msgctxt "#32474"
@@ -2454,12 +2454,12 @@ msgstr ""
 #: /resources/lib/items/listitem.py
 msgctxt "#32476"
 msgid "Choose default player"
-msgstr ""
+msgstr "Valitse oletussoitin"
 
 #: /resources/lib/script/method.py
 msgctxt "#32477"
 msgid "Change default player for tvshow, season, or episode"
-msgstr ""
+msgstr "Valitse sarjan, kauden tai jakson oletussoitin"
 
 #: /resources/settings.xml
 msgctxt "#32478"
@@ -2494,67 +2494,69 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32484"
 msgid "TVDb API"
-msgstr ""
+msgstr "TVDb API"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32485"
 msgid "Add rating"
-msgstr ""
+msgstr "Lisää arvio"
 
 #: /resources/tmdbhelper/lib/api/tmdb/discover.py
 msgctxt "#32486"
 msgid "Certification"
-msgstr ""
+msgstr "Luokitus"
 
 #: /resources/tmdbhelper/lib/api/tmdb/discover.py
 msgctxt "#32487"
 msgid "Certification ( < or = )"
-msgstr ""
+msgstr "Luokitus ( < or = )"
 
 #: /resources/tmdbhelper/lib/api/tmdb/discover.py
 msgctxt "#32488"
 msgid "Certification ( > or = )"
-msgstr ""
+msgstr "Luokitus ( > or = )"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32489"
 msgid "Change rating"
-msgstr ""
+msgstr "Muuta luokitusta"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32490"
 msgid "Add to favourites"
-msgstr ""
+msgstr "Lisää suosikkeihin"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32491"
 msgid "Remove from favourites"
-msgstr ""
+msgstr "Poista suosikeista"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32492"
 msgid "{} already exists in {}!\\nDo you wish to remove this item from the list?"
 msgstr ""
+"{} on jo kohteessa {}!\n"
+"Haluatko poistaa kohteen listalta?"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32493"
 msgid "Successfully removed {} from {}"
-msgstr ""
+msgstr "{} poistettiin kohteesta {}"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32494"
 msgid "Successfully added {} to {}"
-msgstr ""
+msgstr "{} lisättiin kohteeseen {}"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32495"
 msgid "Create new node"
-msgstr ""
+msgstr "Luo uusi solmu"
 
 #: /resources/tmdbhelper/lib/items/container.py
 msgctxt "#32496"
 msgid "Add/Remove as Custom Node"
-msgstr ""
+msgstr "Lisää/poista mukautetuista solmuista"
 
 #: /resources/settings.xml
 msgctxt "#32497"
@@ -2569,27 +2571,27 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32499"
 msgid "Page multipliers (higher is slower)"
-msgstr ""
+msgstr "Sivukertoimet (korkeampi on hitaampi)"
 
 #: /resources/settings.xml
 msgctxt "#32500"
 msgid "Page multiplier (TMDb basic lists)"
-msgstr ""
+msgstr "Sivukerroin (TMDb:n peruslistat)"
 
 #: /resources/settings.xml
 msgctxt "#32501"
 msgid "Page multiplier (Trakt basic lists)"
-msgstr ""
+msgstr "Sivukerroin (Tarktin peruslistat)"
 
 #: /resources/settings.xml
 msgctxt "#32502"
 msgid "Page multiplier (Trakt sync lists)"
-msgstr ""
+msgstr "Sivukerroin (Tarktin synkronointilistat)"
 
 #: /resources/settings.xml
 msgctxt "#32503"
 msgid "Page multiplier (Library windows)"
-msgstr ""
+msgstr "Sivukerroin (kirjaston ikkunat)"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32504"
@@ -2796,7 +2798,7 @@ msgstr "API-avain"
 #: /resources/lib/requestapi.py
 msgctxt "#32009"
 msgid "API returned 401 unauthorised error. If you have entered an API key for this service$COMMA please check that it is correct. If this error relates to TMDb API$COMMA please post a debug log to [B]https://github.com/jurialmunkey/plugin.video.themoviedb.helper/issues[/B]"
-msgstr ""
+msgstr "API palautti \"401 unauthorised\" -virheen. Jos palvelulle on syötetty API-avain, varmista että se on oikein. Jos ongelma liittyy TMDb API:in, lähetä avaa ongelma vianselvityslokilla osoitteessa [B]https://github.com/jurialmunkey/plugin.video.themoviedb.helper/issues[/B]."
 
 #: /resources/settings.xml
 msgctxt "#32010"
