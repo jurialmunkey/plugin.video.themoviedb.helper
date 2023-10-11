@@ -159,7 +159,7 @@ class _ListItem(object):
             self.params['reload'] = 'forced'
 
     def set_params_reroute(self, is_fanarttv=False, extended=None, is_cacheonly=False):
-        if _is_skinshortcuts:
+        if _is_skinshortcuts and self.path.startswith(PLUGINPATH):
             self._set_params_reroute_skinshortcuts()
 
         # Reroute for extended sorting of trakt list by inprogress to open up next folder
