@@ -163,19 +163,29 @@ class ImageFunctions(Thread):
 
     @lazyimport_pil
     def crop(self, source):
+        if not source:
+            return ''
         filename = f'cropped-{md5hash(source)}.png'
         destination = os.path.join(self.save_path, filename)
         try:
             if not xbmcvfs.exists(destination):  # Used to do os.utime(destination, None) on existing here
                 img, targetfile = _openimage(source, self.save_path, filename)
-                img = img.crop(img.convert('RGBa').getbbox())
+                try:
+                    # Errors with single channel L conversion to RGBa so catch exceptions
+                    img_rgba = img.convert('RGBa')
+                    img = img.crop(img_rgba.getbbox())
+                except Exception:
+                    # If we get a conversion error just try getting bounding box with current channel
+                    # We'll probably be okay with single channel texture since Kodi now handles these better
+                    img = img.crop(img.getbbox())
                 img.thumbnail(self.crop_size)
                 _saveimage(img, destination)
                 _closeimage(img, targetfile)
 
             return destination
 
-        except Exception:
+        except Exception as exc:
+            kodi_log(f'Crop Error:\n{source}\n{destination}\n{exc}', 2)
             return ''
 
     @lazyimport_pil
