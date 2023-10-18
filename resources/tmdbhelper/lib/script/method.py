@@ -317,16 +317,16 @@ def rename_list(rename_list=None, **kwargs):
     container_refresh()
 
 
-def blur_image(blur_image=None, **kwargs):
+def blur_image(blur_image=None, prefix='ListItem', **kwargs):
     from tmdbhelper.lib.monitor.images import ImageFunctions
-    blur_img = ImageFunctions(method='blur', artwork=blur_image)
+    blur_img = ImageFunctions(method='blur', artwork=blur_image, prefix=prefix)
     blur_img.setName('blur_img')
     blur_img.start()
 
 
-def image_colors(image_colors=None, **kwargs):
+def image_colors(image_colors=None, prefix='ListItem', **kwargs):
     from tmdbhelper.lib.monitor.images import ImageFunctions
-    image_colors = ImageFunctions(method='colors', artwork=image_colors)
+    image_colors = ImageFunctions(method='colors', artwork=image_colors, prefix=prefix)
     image_colors.setName('image_colors')
     image_colors.start()
 
