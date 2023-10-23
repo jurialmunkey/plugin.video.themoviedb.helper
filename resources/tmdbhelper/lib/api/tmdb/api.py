@@ -556,7 +556,7 @@ class TMDb(RequestAPI):
 
     def get_basic_list(
             self, path, tmdb_type, key='results', params=None, base_tmdb_type=None, limit=None, filters={},
-            sort_key=None, stacked=None, paginated=True, length=None, **kwargs):
+            sort_key=None, stacked=None, paginated=True, length=None, icon_path=None, **kwargs):
 
         length = length or self.page_length
 
@@ -612,6 +612,20 @@ class TMDb(RequestAPI):
                 iso_country=self.iso_country,
                 add_infoproperties=add_infoproperties)
             for i in results if i]
+
+        def _add_icon(i):
+            import xbmcvfs
+            tmdb_id = i.get('unique_ids', {}).get('tmdb')
+            if not tmdb_id:
+                return i
+            filepath = xbmcvfs.validatePath(xbmcvfs.translatePath(f'{icon_path}/{tmdb_id}.png'))
+            if not xbmcvfs.exists(filepath):
+                return i
+            i['art']['icon'] = filepath
+            return i
+
+        if icon_path:
+            items = [_add_icon(i) for i in items]
 
         if filters:
             from tmdbhelper.lib.items.filters import is_excluded

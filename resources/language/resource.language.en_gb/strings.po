@@ -2566,6 +2566,16 @@ msgctxt "#32504"
 msgid "Add {} to node"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32505"
+msgid "Genre icons folder"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32506"
+msgid "Provider icons folder"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

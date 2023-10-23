@@ -21,6 +21,7 @@ class ListBasic(Container):
             key=info_model.get('key', 'results'),
             params=info_model.get('params'),
             filters=self.filters,
+            icon_path=get_setting(info_model['icon_path'], 'str') if 'icon_path' in info_model else None,
             limit=limit or info_model.get('limit'),
             length=length or info_model.get('length'),
             page=page)

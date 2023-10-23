@@ -497,6 +497,7 @@ TMDB_BASIC_LISTS = {
             'with_genres': '{tmdb_id}',
             'with_id': 'True'
         },
+        'icon_path': 'genre_icon_location',
         'route': TMDB_BASIC_LISTS_ROUTE,
         'plugin_category': '{plural}',
     },
@@ -512,6 +513,7 @@ TMDB_BASIC_LISTS = {
             'watch_region': '{iso_country}',
             'with_id': 'True'
         },
+        'icon_path': 'provider_icon_location',
         'route': TMDB_BASIC_LISTS_ROUTE,
         'plugin_category': '{plural}',
     },
