@@ -788,6 +788,19 @@
                         <heading>32505</heading>
                     </control>
                 </setting>
+                <setting id="trakt_genre_icon_location" type="path" label="32507" help="">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <sources>
+                            <source>files</source>
+                        </sources>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="path">
+                        <heading>32507</heading>
+                    </control>
+                </setting>
                 <setting id="provider_icon_location" type="path" label="32506" help="">
                     <level>0</level>
                     <default/>

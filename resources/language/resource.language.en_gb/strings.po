@@ -2568,12 +2568,17 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32505"
-msgid "Genre icons folder"
+msgid "Genre icons folder (TMDb)"
 msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32506"
-msgid "Provider icons folder"
+msgid "Provider icons folder (TMDb)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32507"
+msgid "Genre icon folder (Trakt)"
 msgstr ""
 
 msgctxt "#30030"

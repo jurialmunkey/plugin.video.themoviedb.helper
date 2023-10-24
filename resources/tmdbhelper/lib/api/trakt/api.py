@@ -326,6 +326,22 @@ class _TraktLists():
             item['unique_ids'] = {'slug': i.get('slug')}
             items.append(item)
 
+        def _add_icon(i):
+            import xbmcvfs
+            slug = i['unique_ids']['slug']
+            if not slug:
+                return i
+            filepath = xbmcvfs.validatePath(xbmcvfs.translatePath(f'{icon_path}/{slug}.png'))
+            if not xbmcvfs.exists(filepath):
+                return i
+            i['art']['icon'] = filepath
+            return i
+
+        icon_path = get_setting('trakt_genre_icon_location', 'str')
+
+        if icon_path:
+            items = [_add_icon(i) for i in items]
+
         return items
 
     @is_authorized
