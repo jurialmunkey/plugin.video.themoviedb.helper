@@ -788,6 +788,9 @@ ROUTE_NOID = {
     'trakt_comments': {'route': {
         'module_name': 'tmdbhelper.lib.api.trakt.lists',
         'import_attr': 'ListComments'}},
+    'trakt_genres': {'route': {
+        'module_name': 'tmdbhelper.lib.api.trakt.lists',
+        'import_attr': 'ListGenres'}},
     'mdblist_userlist': {'route': {
         'module_name': 'tmdbhelper.lib.api.mdblist.lists',
         'import_attr': 'ListCustom'}},

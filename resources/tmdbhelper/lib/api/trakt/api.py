@@ -299,6 +299,35 @@ class _TraktLists():
         response = PaginatedItems(items=response['items'], page=page, limit=limit)
         return response.items if not next_page else response.items + response.next_page
 
+    def get_list_of_genres(self, trakt_type):
+        if trakt_type not in ['movie', 'show']:
+            return
+
+        response = self.get_response(f'genres/{trakt_type}s')
+
+        if not response:
+            return
+
+        items = []
+
+        for i in response.json():
+            item = {}
+            item['label'] = i.get('name')
+            item['infolabels'] = {}
+            item['infoproperties'] = {}
+            item['art'] = {
+                'icon': f'{ADDONPATH}/resources/icons/trakt/genres.png'
+            }
+            item['params'] = {
+                'info': 'trakt_trending',
+                'genres': i.get('slug'),
+                'tmdb_type': 'movie' if trakt_type == 'movie' else 'tv'
+            }
+            item['unique_ids'] = {'slug': i.get('slug')}
+            items.append(item)
+
+        return items
+
     @is_authorized
     def get_list_of_lists(self, path, page: int = 1, limit: int = 250, authorize=False, next_page=True, sort_likes=False):
         response = self.get_response(path, page=page, limit=limit)

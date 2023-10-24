@@ -624,6 +624,14 @@ def _get_basedir_trakt():
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/trakt/calendar.png'}},
         {
+            'label': u'{{item_type}}{{space}}{}'.format(get_localized(135)),
+            'types': ['movie', 'tv'],
+            'params': {'info': 'trakt_genres'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/genres.png'}},
+        {
             'label': u'{}{{space}}{{item_type}}'.format(get_localized(32204)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_trending'},

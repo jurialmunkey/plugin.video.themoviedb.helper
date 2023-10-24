@@ -265,6 +265,14 @@ class ListUpNext(Container):
         return items
 
 
+class ListGenres(Container):
+    def get_items(self, info, tmdb_type, **kwargs):
+        items = self.trakt_api.get_list_of_genres(convert_type(tmdb_type, 'trakt'))
+        self.library = 'video'
+        self.plugin_category = get_localized(135)
+        return items
+
+
 class ListLists(Container):
     def get_items(self, info, page=None, **kwargs):
         from xbmcplugin import SORT_METHOD_UNSORTED
