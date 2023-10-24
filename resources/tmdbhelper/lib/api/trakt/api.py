@@ -319,8 +319,8 @@ class _TraktLists():
                 'icon': f'{ADDONPATH}/resources/icons/trakt/genres.png'
             }
             item['params'] = {
-                'info': 'trakt_trending',
-                'genres': i.get('slug'),
+                'info': 'dir_trakt_genre',
+                'genre': i.get('slug'),
                 'tmdb_type': 'movie' if trakt_type == 'movie' else 'tv'
             }
             item['unique_ids'] = {'slug': i.get('slug')}
