@@ -4,7 +4,12 @@ from tmdbhelper.lib.items.container import Container
 
 
 class ListBasic(Container):
-    def get_items(self, info, tmdb_type, page=None, randomise=False, limit=None, **kwargs):
+    def get_items(
+            self, info, tmdb_type, page=None, randomise=False, limit=None,
+            genres=None, years=None, query=None, languages=None, countries=None, runtimes=None, studio_ids=None,
+            **kwargs
+    ):
+
         from tmdbhelper.lib.addon.consts import TRAKT_BASIC_LISTS
 
         def _get_items_both():
@@ -13,7 +18,9 @@ class ListBasic(Container):
                 path=info_model.get('path', ''),
                 trakt_types=['movie', 'show'],
                 authorize=info_model.get('authorize', False),
-                extended=info_model.get('extended', None))
+                extended=info_model.get('extended', None),
+                genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids
+            )
             self.tmdb_cache_only = False
             self.library = 'video'
             self.container_content = 'movies'
@@ -37,7 +44,9 @@ class ListBasic(Container):
             sort_how=info_model.get('sort_how', None),
             extended=info_model.get('extended', None),
             randomise=randomise,
-            always_refresh=False)  # Basic lists don't need updating more than once per day
+            genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids,
+            always_refresh=False   # Basic lists don't need updating more than once per day
+        )
         self.tmdb_cache_only = False
         self.kodi_db = self.get_kodi_database(info_tmdb_type)
         self.library = convert_type(info_tmdb_type, 'library')
@@ -279,7 +288,10 @@ class ListLists(Container):
 
 
 class ListCustom(Container):
-    def get_items(self, list_slug, user_slug=None, page=None, **kwargs):
+    def get_items(
+            self, list_slug, user_slug=None, page=None,
+            **kwargs
+    ):
         response = self.trakt_api.get_custom_list(
             page=page or 1,
             list_slug=list_slug,

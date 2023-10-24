@@ -126,17 +126,26 @@ class _TraktLists():
         return items
 
     @use_simple_cache(cache_days=CACHE_SHORT)
-    def get_sorted_list(self, path, sort_by=None, sort_how=None, extended=None, trakt_type=None, permitted_types=None, cache_refresh=False):
-        response = self.get_response(path, extended=extended, limit=4095)
+    def get_sorted_list(
+            self, path, sort_by=None, sort_how=None, extended=None, trakt_type=None, permitted_types=None, cache_refresh=False,
+            genres=None, years=None, query=None, languages=None, countries=None, runtimes=None, studio_ids=None
+    ):
+        response = self.get_response(
+            path, extended=extended, limit=4095,
+            genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids
+        )
+
         if not response:
             return
 
-        if extended == 'sync':
-            items = self._merge_sync_sort(response.json())
-        elif extended == 'inprogress':
-            items = self._filter_inprogress(self._merge_sync_sort(response.json()))
-        else:
-            items = response.json()
+        def _get_sorted_list_items():
+            if extended == 'sync':
+                return self._merge_sync_sort(response.json())
+            if extended == 'inprogress':
+                return self._filter_inprogress(self._merge_sync_sort(response.json()))
+            return response.json()
+
+        items = _get_sorted_list_items()
 
         return TraktItems(items, headers=response.headers).build_items(
             sort_by=sort_by or response.headers.get('x-sort-by'),
@@ -151,66 +160,118 @@ class _TraktLists():
         return TraktItems(response.json(), headers=response.headers, trakt_type=trakt_type).configure_items()
 
     @is_authorized
-    def get_mixed_list(self, path, trakt_types: list, limit: int = None, extended: str = None, authorize=False):
+    def get_mixed_list(
+            self, path, trakt_types: list, limit: int = None, extended: str = None, authorize=False,
+            genres=None, years=None, query=None, languages=None, countries=None, runtimes=None, studio_ids=None
+    ):
         """ Returns a randomised simple list which combines movies and shows
         path uses {trakt_type} as format substitution for trakt_type in trakt_types
         """
         items = []
         limit = limit or self.item_limit
+
         for trakt_type in trakt_types:
             response = self.get_simple_list(
-                path.format(trakt_type=trakt_type), extended=extended, page=1, limit=limit * 2, trakt_type=trakt_type) or {}
+                path.format(trakt_type=trakt_type),
+                extended=extended, page=1, limit=limit * 2, trakt_type=trakt_type,
+                genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids
+            ) or {}
             items += response.get('items') or []
+
         if not items:
             return
+
         if len(items) <= limit:
             return items
+
         return random.sample(items, limit)
 
     @is_authorized
-    def get_basic_list(self, path, trakt_type, page: int = 1, limit: int = None, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, randomise=False, always_refresh=True):
+    def get_basic_list(
+            self, path, trakt_type, page: int = 1, limit: int = None, params=None,
+            sort_by=None, sort_how=None, extended=None, authorize=False, randomise=False, always_refresh=True,
+            genres=None, years=None, query=None, languages=None, countries=None, runtimes=None, studio_ids=None
+    ):
+
         cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
         limit = limit or self.item_limit
+
         if randomise:
             response = self.get_simple_list(
-                path, extended=extended, page=1, limit=limit * 2, trakt_type=trakt_type)
+                path, extended=extended, page=1, limit=limit * 2, trakt_type=trakt_type,
+                genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids
+            )
+
         elif sort_by is not None:  # Sorted list manually paginated because need to sort first
-            response = self.get_sorted_list(path, sort_by, sort_how, extended, cache_refresh=cache_refresh)
+            response = self.get_sorted_list(
+                path, sort_by, sort_how, extended, cache_refresh=cache_refresh,
+                genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids
+            )
             response = PaginatedItems(items=response['items'], page=page, limit=limit).get_dict()
+
         else:  # Unsorted lists can be paginated by the API
-            response = self.get_simple_list(path, extended=extended, page=page, limit=limit, trakt_type=trakt_type)
+            response = self.get_simple_list(
+                path, extended=extended, page=page, limit=limit, trakt_type=trakt_type,
+                genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids
+            )
+
         if not response:
             return
+
         if randomise and len(response['items']) > limit:
             return random.sample(response['items'], limit)
+
         return response['items'] + get_next_page(response['headers'])
 
     @is_authorized
-    def get_stacked_list(self, path, trakt_type, page: int = 1, limit: int = None, params=None, sort_by=None, sort_how=None, extended=None, authorize=False, always_refresh=True, **kwargs):
+    def get_stacked_list(
+            self, path, trakt_type, page: int = 1, limit: int = None, params=None, sort_by=None, sort_how=None,
+            extended=None, authorize=False, always_refresh=True,
+            genres=None, years=None, query=None, languages=None, countries=None, runtimes=None, studio_ids=None,
+            **kwargs
+    ):
         """ Get Basic list but stack repeat TV Shows """
         limit = limit or self.item_limit
         cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
-        response = self.get_simple_list(path, extended=extended, limit=4095, trakt_type=trakt_type, cache_refresh=cache_refresh)
+
+        response = self.get_simple_list(
+            path, extended=extended, limit=4095, trakt_type=trakt_type, cache_refresh=cache_refresh,
+            genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids
+        )
+
         response['items'] = self._stack_calendar_tvshows(response['items'])
         response = PaginatedItems(items=response['items'], page=page, limit=limit).get_dict()
-        if response:
-            return response['items'] + get_next_page(response['headers'])
+
+        if not response:
+            return
+
+        return response['items'] + get_next_page(response['headers'])
 
     @is_authorized
-    def get_custom_list(self, list_slug, user_slug=None, page: int = 1, limit: int = None, params=None, authorize=False, sort_by=None, sort_how=None, extended=None, owner=False, always_refresh=True):
+    def get_custom_list(
+            self, list_slug, user_slug=None, page: int = 1, limit: int = None, params=None, authorize=False,
+            sort_by=None, sort_how=None, extended=None, owner=False, always_refresh=True
+    ):
+
         limit = limit or self.item_limit
+
         if user_slug == 'official':
             path = f'lists/{list_slug}/items'
         else:
             path = f'users/{user_slug or "me"}/lists/{list_slug}/items'
+
         # Refresh cache on first page for user list because it might've changed
         cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
+
         sorted_items = self.get_sorted_list(
             path, sort_by, sort_how, extended,
             permitted_types=['movie', 'show', 'person', 'episode'],
-            cache_refresh=cache_refresh) or {}
+            cache_refresh=cache_refresh
+        ) or {}
+
         paginated_items = PaginatedItems(
             items=sorted_items.get('items', []), page=page, limit=limit)
+
         return {
             'items': paginated_items.items,
             'movies': sorted_items.get('movies', []),
@@ -219,12 +280,17 @@ class _TraktLists():
             'next_page': paginated_items.next_page}
 
     @use_activity_cache(cache_days=CACHE_SHORT)
-    def _get_sync_list(self, sync_type, trakt_type, sort_by=None, sort_how=None, decorator_cache_refresh=False, extended=None, filters=None):
+    def _get_sync_list(
+        self, sync_type, trakt_type, sort_by=None, sort_how=None, decorator_cache_refresh=False, extended=None, filters=None
+    ):
         get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
         func = TraktItems(items=self.get_sync(sync_type, trakt_type, extended=extended), trakt_type=trakt_type).build_items
         return func(sort_by, sort_how, filters=filters)
 
-    def get_sync_list(self, sync_type, trakt_type, page: int = 1, limit: int = None, params=None, sort_by=None, sort_how=None, next_page=True, always_refresh=True, extended=None, filters=None):
+    def get_sync_list(
+        self, sync_type, trakt_type, page: int = 1, limit: int = None, params=None, sort_by=None, sort_how=None, next_page=True,
+        always_refresh=True, extended=None, filters=None
+    ):
         limit = limit or self.sync_item_limit
         cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
         response = self._get_sync_list(sync_type, trakt_type, sort_by=sort_by, sort_how=sort_how, decorator_cache_refresh=cache_refresh, extended=extended, filters=filters)
