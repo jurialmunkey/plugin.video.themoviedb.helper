@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2023-08-19 16:53+0200\n"
+"PO-Revision-Date: 2023-10-25 17:45+0200\n"
 "Last-Translator: Peat80 <>\n"
 "Language-Team: LANGUAGE\n"
 "Language: de_DE\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.3.2\n"
+"X-Generator: Poedit 3.4\n"
 
 msgctxt "#30000"
 msgid "Arabic (United Arab Emirates)"
@@ -2709,6 +2709,26 @@ msgstr "Seitenmultiplikatoren (Trakt synchronisierte Listen)"
 msgctxt "#32503"
 msgid "Page multiplier (Library windows)"
 msgstr "Seitenmultiplikatoren (Bibliotheksansichten)"
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32504"
+msgid "Add {} to node"
+msgstr "{} zu Knoten hinzufügen"
+
+#: /resources/settings.xml
+msgctxt "#32505"
+msgid "Genre icons folder (TMDb)"
+msgstr "Ordner für Genre-Icons (TMDb)"
+
+#: /resources/settings.xml
+msgctxt "#32506"
+msgid "Provider icons folder (TMDb)"
+msgstr "Ordner für Provider-Icons (TMDb)"
+
+#: /resources/settings.xml
+msgctxt "#32507"
+msgid "Genre icon folder (Trakt)"
+msgstr "Ordner für Genre-Icons (Trakt)"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
