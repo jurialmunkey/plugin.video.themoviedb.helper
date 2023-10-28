@@ -275,13 +275,6 @@ class WindowRecommendationsManager():
         data = get_property(PROP_JSONDUMP, set_property=data)
         return data
 
-    def load_kwargs(self):
-        data = get_property(PROP_JSONDUMP)
-        if not data or data == self._current_dump:
-            return
-        from tmdbhelper.lib.files.futils import json_loads as loads
-        return loads(data)
-
     def open_recommendations(self):
         with BusyDialog():
             self.dump_kwargs(update_current_dump=True)
@@ -295,23 +288,40 @@ class WindowRecommendationsManager():
         if self.is_exiting():
             return self.on_exit()
 
+        data = None
+
+        # While INFO is active wait in loop until new action or we exit
         while t.is_alive() and not self._mon.abortRequested():
-            if self._current_dump != get_property(PROP_JSONDUMP):
+
+            # If the action trigger changed lets do something
+            data = get_property(PROP_JSONDUMP)
+            if self._current_dump != data:
                 break
+            data = None
+
+            # We got an Exit command so we force quit out
             if self.is_exiting():
                 return self.on_exit()
+
+            # We sit in a loop and poll ever 100ms
             self._mon.waitForAbort(0.1)
 
+        # Check that the currently active info dialog is the one we want to act
         if self._current_path != path:
             return
 
-        kwargs = self.load_kwargs()
-        if kwargs and self._window_id == kwargs.pop('window_id'):
-            self._recommendations = kwargs.pop('recommendations')
-            self._kwargs = kwargs
+        if data:
+            from tmdbhelper.lib.files.futils import json_loads as loads
+            data = loads(data)
+
+        # The trigger changed so lets open the recommendations window
+        if data and self._window_id == data.pop('window_id'):
+            self._recommendations = data.pop('recommendations')
+            self._kwargs = data
             _gui = self._gui
             data = self._current_dump
             self.open_recommendations()
+
             if self._gui._state == 'onback':
                 self._gui = _gui
                 self._current_path = path
