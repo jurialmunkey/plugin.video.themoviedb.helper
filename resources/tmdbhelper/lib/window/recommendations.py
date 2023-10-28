@@ -242,6 +242,9 @@ class WindowRecommendationsManager():
         with WindowProperty((PROP_ISACTIVE, 'True')):
             self.on_info_new() if self._recommendations == 'oninfo' else self.open_recommendations()
 
+    def wait_until_active(self, *args, **kwargs):
+        return wait_until_active(*args, xbmc_monitor=self._mon, **kwargs)
+
     def is_exiting(self):
         if xbmcgui.getCurrentWindowId() != self._window_id:
             return True
@@ -326,7 +329,7 @@ class WindowRecommendationsManager():
         with WindowProperty((PROP_HIDERECS, 'True'), (setproperty, 'True')):
             self.add_history()
             t = self.open_info(listitem, self._gui.close if self._gui else None, threaded=True)
-            wait_until_active(ID_VIDEOINFO, poll=0.1)  # Wait to allow info dialog to open
+            self.wait_until_active(ID_VIDEOINFO, poll=0.1)  # Wait to allow info dialog to open
 
         return self.on_join(t, listitem.getPath())
 
@@ -341,7 +344,7 @@ class WindowRecommendationsManager():
         with WindowProperty((PROP_HIDEINFO, 'True'), (setproperty, 'True')):
             get_property(PROP_TMDBTYPE, self._gui._tmdb_type)
             t = self.open_info(listitem, threaded=True)
-            wait_until_active(ID_VIDEOINFO, poll=0.1)  # Wait to allow info dialog to open
+            self.wait_until_active(ID_VIDEOINFO, poll=0.1)  # Wait to allow info dialog to open
             self._gui.doModal()
 
         # Thread joins when Recs and Info close
@@ -367,7 +370,7 @@ class WindowRecommendationsManager():
         func() if func else None
         if xbmcgui.getCurrentWindowId() != self._window_id:
             executebuiltin(f'ActivateWindow({self._window_id})')
-            wait_until_active(self._window_id, poll=0.1)
+            self.wait_until_active(self._window_id, poll=0.1)
         if threaded:
             t = Thread(target=xbmcgui.Dialog().info, args=[listitem])
             t.start()
@@ -388,11 +391,11 @@ class WindowRecommendationsManager():
             executebuiltin(builtin) if builtin and not after else None
             executebuiltin(f'Dialog.Close(movieinformation,true)')
             executebuiltin(f'Dialog.Close(pvrguideinfo,true)')
-            wait_until_active(ID_VIDEOINFO, invert=True, poll=0.1)
+            self.wait_until_active(ID_VIDEOINFO, invert=True, poll=0.1)
             if not cond and xbmcgui.getCurrentWindowId() == self._window_id:
                 _win = xbmcgui.Window(self._window_id)
                 _win.close() if _win else None
-            wait_until_active(self._window_id, invert=True, poll=0.1)
+            self.wait_until_active(self._window_id, invert=True, poll=0.1)
             executebuiltin(builtin) if builtin and after else None
             for _gui, data in self._history:
                 del _gui
