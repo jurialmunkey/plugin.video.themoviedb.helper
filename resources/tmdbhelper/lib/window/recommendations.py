@@ -10,6 +10,8 @@ from jurialmunkey.window import get_property, WindowProperty, wait_until_active
 from jurialmunkey.parser import parse_paramstring, reconfigure_legacy_params
 from threading import Thread
 
+from tmdbhelper.lib.addon.logger import kodi_log
+
 
 TMDB_QUERY_PARAMS = ('imdb_id', 'tvdb_id', 'query', 'year', 'episode_year',)
 TMDB_AFFIX = '&fanarttv=false&cacheonly=true'
@@ -26,6 +28,7 @@ ACTION_CONTEXT_MENU = (117,)
 ACTION_SHOW_INFO = (11,)
 ACTION_SELECT = (7, )
 ACTION_CLOSEWINDOW = (9, 10, 92, 216, 247, 257, 275, 61467, 61448,)
+ID_VIDEOINFO = 12003
 
 
 """
@@ -249,11 +252,7 @@ class WindowRecommendationsManager():
     def on_active(self):
         if self.is_exiting():
             return
-        prop = get_property(PROP_JSONDUMP)
-        data = self.dump_kwargs()
-        if prop == data:
-            return  # Do nothing. User likely pressed twice
-        get_property(PROP_JSONDUMP, set_property=data)
+        get_property(PROP_JSONDUMP, set_property=self.dump_kwargs())
 
     def on_info_new(self):
         _tmdb_type = self._kwargs['tmdb_type']
@@ -327,7 +326,7 @@ class WindowRecommendationsManager():
         with WindowProperty((PROP_HIDERECS, 'True'), (setproperty, 'True')):
             self.add_history()
             t = self.open_info(listitem, self._gui.close if self._gui else None, threaded=True)
-            self._mon.waitForAbort(0.5)  # Wait a moment to allow info dialog to open before clearing props
+            wait_until_active(ID_VIDEOINFO, poll=0.1)  # Wait to allow info dialog to open
 
         return self.on_join(t, listitem.getPath())
 
@@ -342,7 +341,7 @@ class WindowRecommendationsManager():
         with WindowProperty((PROP_HIDEINFO, 'True'), (setproperty, 'True')):
             get_property(PROP_TMDBTYPE, self._gui._tmdb_type)
             t = self.open_info(listitem, threaded=True)
-            self._mon.waitForAbort(0.5)
+            wait_until_active(ID_VIDEOINFO, poll=0.1)  # Wait to allow info dialog to open
             self._gui.doModal()
 
         # Thread joins when Recs and Info close
@@ -389,14 +388,14 @@ class WindowRecommendationsManager():
             executebuiltin(builtin) if builtin and not after else None
             executebuiltin(f'Dialog.Close(movieinformation,true)')
             executebuiltin(f'Dialog.Close(pvrguideinfo,true)')
-            self._mon.waitForAbort(1)
+            wait_until_active(ID_VIDEOINFO, invert=True, poll=0.1)
             if not cond and xbmcgui.getCurrentWindowId() == self._window_id:
                 _win = xbmcgui.Window(self._window_id)
                 _win.close() if _win else None
+            wait_until_active(self._window_id, invert=True, poll=0.1)
             executebuiltin(builtin) if builtin and after else None
             for _gui, data in self._history:
                 del _gui
-            self._mon.waitForAbort(1)
             get_property(PROP_HIDEINFO, clear_property=True)
             get_property(PROP_HIDERECS, clear_property=True)
             get_property(PROP_TMDBTYPE, clear_property=True)
