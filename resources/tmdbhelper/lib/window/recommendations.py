@@ -10,8 +10,6 @@ from jurialmunkey.window import get_property, WindowProperty, wait_until_active
 from jurialmunkey.parser import parse_paramstring, reconfigure_legacy_params
 from threading import Thread
 
-from tmdbhelper.lib.addon.logger import kodi_log
-
 
 TMDB_QUERY_PARAMS = ('imdb_id', 'tvdb_id', 'query', 'year', 'episode_year',)
 TMDB_AFFIX = '&fanarttv=false&cacheonly=true'
