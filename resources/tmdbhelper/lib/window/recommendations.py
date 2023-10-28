@@ -10,6 +10,8 @@ from jurialmunkey.window import get_property, WindowProperty, wait_until_active
 from jurialmunkey.parser import parse_paramstring, reconfigure_legacy_params
 from threading import Thread
 
+from tmdbhelper.lib.addon.logger import kodi_log
+
 
 TMDB_QUERY_PARAMS = ('imdb_id', 'tvdb_id', 'query', 'year', 'episode_year',)
 TMDB_AFFIX = '&fanarttv=false&cacheonly=true'
@@ -253,7 +255,7 @@ class WindowRecommendationsManager():
     def on_active(self):
         if self.is_exiting():
             return
-        get_property(PROP_JSONDUMP, set_property=self.dump_kwargs())
+        self.dump_kwargs()
 
     def on_info_new(self):
         _tmdb_type = self._kwargs['tmdb_type']
@@ -261,15 +263,19 @@ class WindowRecommendationsManager():
         _tmdb_id = self._kwargs.get('tmdb_id') or TMDb().get_tmdb_id(tmdb_type=_tmdb_type, **_tmdb_query)
         if not _tmdb_type or not _tmdb_id:
             return
-        self._current_dump = get_property(PROP_JSONDUMP, set_property=self.dump_kwargs())
+        self.dump_kwargs(update_current_dump=True)
         self.on_info(_tmdb_type, _tmdb_id)
 
-    def dump_kwargs(self):
+    def dump_kwargs(self, update_current_dump=False):
         from json import dumps
         data = self._kwargs.copy()
         data['recommendations'] = self._recommendations
         data['window_id'] = self._window_id
-        return dumps(data, separators=(',', ':'))
+        data = dumps(data, separators=(',', ':'))
+        if update_current_dump:
+            self._current_dump = data
+        data = get_property(PROP_JSONDUMP, set_property=data)
+        return data
 
     def load_kwargs(self):
         data = get_property(PROP_JSONDUMP)
@@ -280,7 +286,7 @@ class WindowRecommendationsManager():
 
     def open_recommendations(self):
         with BusyDialog():
-            self._current_dump = get_property(PROP_JSONDUMP, set_property=self.dump_kwargs())
+            self.dump_kwargs(update_current_dump=True)
             self._gui = WindowRecommendations(
                 'script-tmdbhelper-recommendations.xml', ADDONPATH, 'default', '1080i',
                 recommendations=self._recommendations, window_id=self._window_id, window_manager=self, **self._kwargs)
@@ -311,7 +317,7 @@ class WindowRecommendationsManager():
             if self._gui._state == 'onback':
                 self._gui = _gui
                 self._current_path = path
-                self._current_dump = get_property(PROP_JSONDUMP, set_property=data)
+                self._current_dump = get_property(PROP_JSONDUMP, set_property=data)  # CHECK HERE
                 return self.on_join(t, path)
 
         return self.on_back() if self._history and not self.is_exiting() else self.on_exit()
@@ -350,17 +356,18 @@ class WindowRecommendationsManager():
 
     def pop_history(self):
         try:
-            self._gui, data = self._history.pop()
-            return data
+            self._gui, meta, data = self._history.pop()
+            return meta
         except IndexError:
             return
 
     def add_history(self):
         if not self._gui or not self._gui._tmdb_type or not self._gui._tmdb_id:
             return
-        data = {'tmdb_type': self._gui._tmdb_type, 'tmdb_id': self._gui._tmdb_id}
-        self._history.append((self._gui, data))
-        return data
+        meta = {'tmdb_type': self._gui._tmdb_type, 'tmdb_id': self._gui._tmdb_id}
+        data = get_property(PROP_JSONDUMP)
+        self._history.append((self._gui, meta, data))
+        return meta
 
     def open_info(self, listitem, func=None, threaded=False):
         executebuiltin(f'Dialog.Close(movieinformation,true)')
@@ -395,7 +402,7 @@ class WindowRecommendationsManager():
                 _win.close() if _win else None
             self.wait_until_active(self._window_id, invert=True, poll=0.1)
             executebuiltin(builtin) if builtin and after else None
-            for _gui, data in self._history:
+            for _gui, meta, data in self._history:
                 del _gui
             get_property(PROP_HIDEINFO, clear_property=True)
             get_property(PROP_HIDERECS, clear_property=True)
