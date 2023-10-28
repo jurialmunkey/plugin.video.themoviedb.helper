@@ -6,7 +6,7 @@ from tmdbhelper.lib.addon.dialog import BusyDialog
 from tmdbhelper.lib.addon.thread import ParallelThread
 from tmdbhelper.lib.addon.plugin import get_infolabel, executebuiltin, get_condvisibility, ADDONPATH
 from tmdbhelper.lib.api.tmdb.api import TMDb
-from jurialmunkey.window import get_property, WindowProperty
+from jurialmunkey.window import get_property, WindowProperty, wait_until_active
 from jurialmunkey.parser import parse_paramstring, reconfigure_legacy_params
 from threading import Thread
 
@@ -368,6 +368,7 @@ class WindowRecommendationsManager():
         func() if func else None
         if xbmcgui.getCurrentWindowId() != self._window_id:
             executebuiltin(f'ActivateWindow({self._window_id})')
+            wait_until_active(self._window_id, poll=0.1)
         if threaded:
             t = Thread(target=xbmcgui.Dialog().info, args=[listitem])
             t.start()
