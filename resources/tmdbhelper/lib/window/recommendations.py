@@ -322,10 +322,10 @@ class WindowRecommendationsManager():
             data = self._current_dump
             self.open_recommendations()
 
+            # If RECS closed because ONBACK then we need to go back to the previous info and join it
             if self._gui._state == 'onback':
                 self._gui = _gui
                 self._current_path = path
-                self._current_dump = get_property(PROP_JSONDUMP, set_property=data)  # CHECK HERE
                 return self.on_join(t, path)
 
         return self.on_back() if self._history and not self.is_exiting() else self.on_exit()
@@ -384,6 +384,8 @@ class WindowRecommendationsManager():
         if xbmcgui.getCurrentWindowId() != self._window_id:
             executebuiltin(f'ActivateWindow({self._window_id})')
             self.wait_until_active(self._window_id, poll=0.1)
+        self._current_dump = ''
+        get_property(PROP_JSONDUMP, clear_property=True)
         if threaded:
             t = Thread(target=xbmcgui.Dialog().info, args=[listitem])
             t.start()
