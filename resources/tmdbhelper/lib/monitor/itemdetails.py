@@ -15,6 +15,7 @@ BASEITEM_PROPERTIES = [
     ('base_plot', ('plot', 'Property(artist_description)', 'Property(artist_description)', 'addondescription')),
     ('base_tagline', ('tagline',)),
     ('base_dbtype', ('dbtype',)),
+    ('base_rating', ('userrating', 'rating',)),
     ('base_poster', ('Art(poster)', 'Art(season.poster)', 'Art(tvshow.poster)')),
     ('base_fanart', ('Art(fanart)', 'Art(season.fanart)', 'Art(tvshow.fanart)')),
     ('base_clearlogo', ('Art(clearlogo)', 'Art(tvshow.clearlogo)', 'Art(artist.clearlogo)')),
