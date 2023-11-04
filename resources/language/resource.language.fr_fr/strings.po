@@ -309,12 +309,12 @@ msgstr "Lire avec"
 #: /resources/lib/context.py 
 msgctxt "#32062"
 msgid "Successfully Added TMDb ID {0} to {1}"
-msgstr "Ajouté avec succès l'ID TMDb {0} à {1}"
+msgstr "L'ID TMDb {0} a été ajouté avec succès à {1} "
 
 #: /resources/lib/context.py 
 msgctxt "#32063"
 msgid "Successfully Removed TMDb ID {0} from {1}"
-msgstr "ID TMDb {0} à {1} ajouté avec succès"
+msgstr "L'ID TMDb {0} a été retiré avec succès à {1} "
 
 #: /resources/lib/context.py 
 msgctxt "#32064"
