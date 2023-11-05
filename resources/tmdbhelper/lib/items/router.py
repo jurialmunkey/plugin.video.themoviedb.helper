@@ -1,13 +1,6 @@
 from tmdbhelper.lib.addon.logger import kodi_log
 from jurialmunkey.parser import parse_paramstring, reconfigure_legacy_params
 
-""" Lazyimports
-from tmdbhelper.lib.player.players import Players
-from tmdbhelper.lib.api.tmdb.api import TMDb
-from tmdbhelper.lib.script.method import related_lists
-from tmdbhelper.lib.items.routes import get_container
-"""
-
 
 class Router():
     def __init__(self, handle, paramstring):
@@ -25,7 +18,7 @@ class Router():
         Players(**self.params).play(handle=self.handle if self.handle != -1 else None)
 
     def context_related(self):
-        from tmdbhelper.lib.script.method import related_lists
+        from tmdbhelper.lib.script.method.context_menu import related_lists
         from tmdbhelper.lib.api.tmdb.api import TMDb
         if not self.params.get('tmdb_id'):
             self.params['tmdb_id'] = TMDb().get_tmdb_id(**self.params)

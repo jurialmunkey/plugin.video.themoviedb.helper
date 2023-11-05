@@ -3,7 +3,7 @@ from jurialmunkey.parser import try_int
 from threading import Thread
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_datetime_now, get_timedelta, get_datetime_today, get_datetime_time, get_datetime_combine
 from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin, get_infolabel
-from tmdbhelper.lib.script.method import mem_cache_kodidb, clean_old_databases
+from tmdbhelper.lib.script.method.maintenance import recache_kodidb, clean_old_databases
 
 
 class CronJobMonitor(Thread):
@@ -16,7 +16,7 @@ class CronJobMonitor(Thread):
 
     def run(self):
         clean_old_databases()
-        mem_cache_kodidb(notification=False)
+        recache_kodidb(notification=False)
 
         self.xbmc_monitor.waitForAbort(600)  # Wait 10 minutes before doing updates to give boot time
         if self.xbmc_monitor.abortRequested():
