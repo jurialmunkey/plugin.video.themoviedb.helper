@@ -61,3 +61,22 @@ def sort_list(**kwargs):
     for k, v in sort_methods[x]['params'].items():
         kwargs[k] = v
     executebuiltin(format_folderpath(encode_url(**kwargs)))
+
+
+def get_stats(**kwargs):
+    from tmdbhelper.lib.api.trakt.api import TraktAPI
+    from jurialmunkey.window import get_property
+
+    response = TraktAPI().get_request('users/me/stats', cache_refresh=True)
+    if not response:
+        return
+
+    def _set_stats(d, prop):
+        for k, v in d.items():
+            name = f'{prop}.{k}'
+            if isinstance(v, dict):
+                _set_stats(v, name)
+                continue
+            get_property(name, set_property=f'{v}')
+
+    _set_stats(response, 'TraktStats')
