@@ -67,9 +67,18 @@ def get_stats(**kwargs):
     from tmdbhelper.lib.api.trakt.api import TraktAPI
     from jurialmunkey.window import get_property
 
-    response = TraktAPI().get_request('users/me/stats', cache_refresh=True)
+    response = TraktAPI().get_request('users/me/stats', cache_days=0.015)
     if not response:
         return
+
+    combined_stats = {}
+
+    def _set_property(name, value, key):
+        get_property(name, set_property=f'{value}')
+        if not isinstance(value, int):
+            return
+        combined_stats.setdefault(key, 0)
+        combined_stats[key] += value
 
     def _set_stats(d, prop):
         for k, v in d.items():
@@ -77,6 +86,21 @@ def get_stats(**kwargs):
             if isinstance(v, dict):
                 _set_stats(v, name)
                 continue
-            get_property(name, set_property=f'{v}')
+            _set_property(name, v, key=k)
+            if k == 'minutes':
+                days, minutes = divmod(int(v), 60 * 24)
+                hours, minutes = divmod(int(minutes), 60)
+                _set_property(f'{name}_d', days, key=k)
+                _set_property(f'{name}_h', hours, key=k)
+                _set_property(f'{name}_mm', minutes, key=k)
 
     _set_stats(response, 'TraktStats')
+    _set_stats(combined_stats, 'TraktStats.Total')
+
+    for i in ('movie', 'episode', ''):
+        path = f'users/me/history/{i}s' if i else 'users/me/history'
+        response = TraktAPI().get_request(path, cache_days=0.015, limit=1)
+        if not response:
+            continue
+        for x, j in enumerate(response):
+            _set_stats(j, f'TraktStats.Recent{i}.{x}')
