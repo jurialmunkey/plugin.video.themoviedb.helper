@@ -49,7 +49,7 @@ class _TraktSync():
         return activities.get(activity_type, {}).get(activity_key)
 
     @is_authorized
-    def _get_last_activity(self, activity_type=None, activity_key=None, cache_refresh=False):
+    def _get_last_activity(self, activity_type=None, activity_key=None, cache_refresh=False, cache_only=False):
         def _cache_expired():
             """ Check if the cached last_activities has expired """
             last_exp = get_property('TraktSyncLastActivities.Expires', is_type=int)
@@ -74,6 +74,9 @@ class _TraktSync():
             if has_property_lock('TraktSyncLastActivities.Locked'):  # Other thread getting data so wait for it
                 return data_loads(get_property('TraktSyncLastActivities'))
             return _cache_activity()
+
+        if cache_only:
+            return -1
 
         if not self.last_activities:
             self.last_activities = _cache_router()

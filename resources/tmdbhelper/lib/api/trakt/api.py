@@ -127,11 +127,11 @@ class _TraktLists():
 
     @use_simple_cache(cache_days=CACHE_SHORT)
     def get_sorted_list(
-            self, path, sort_by=None, sort_how=None, extended=None, trakt_type=None, permitted_types=None, cache_refresh=False,
+            self, path, sort_by=None, sort_how=None, extended=None, trakt_type=None, permitted_types=None, cache_refresh=False, cache_only=False,
             genres=None, years=None, query=None, languages=None, countries=None, runtimes=None, studio_ids=None
     ):
         response = self.get_response(
-            path, extended=extended, limit=4095,
+            path, extended=extended, limit=4095, cache_only=cache_only,
             genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids
         )
 
@@ -161,7 +161,7 @@ class _TraktLists():
 
     @is_authorized
     def get_mixed_list(
-            self, path, trakt_types: list, limit: int = None, extended: str = None, authorize=False,
+            self, path, trakt_types: list, limit: int = None, extended: str = None, authorize=False, cache_only=False,
             genres=None, years=None, query=None, languages=None, countries=None, runtimes=None, studio_ids=None
     ):
         """ Returns a randomised simple list which combines movies and shows
@@ -173,7 +173,7 @@ class _TraktLists():
         for trakt_type in trakt_types:
             response = self.get_simple_list(
                 path.format(trakt_type=trakt_type),
-                extended=extended, page=1, limit=limit * 2, trakt_type=trakt_type,
+                extended=extended, page=1, limit=limit * 2, trakt_type=trakt_type, cache_only=cache_only,
                 genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids
             ) or {}
             items += response.get('items') or []
@@ -189,7 +189,7 @@ class _TraktLists():
     @is_authorized
     def get_basic_list(
             self, path, trakt_type, page: int = 1, limit: int = None, params=None,
-            sort_by=None, sort_how=None, extended=None, authorize=False, randomise=False, always_refresh=True,
+            sort_by=None, sort_how=None, extended=None, authorize=False, cache_only=False, randomise=False, always_refresh=True,
             genres=None, years=None, query=None, languages=None, countries=None, runtimes=None, studio_ids=None
     ):
 
@@ -198,20 +198,20 @@ class _TraktLists():
 
         if randomise:
             response = self.get_simple_list(
-                path, extended=extended, page=1, limit=limit * 2, trakt_type=trakt_type,
+                path, extended=extended, page=1, limit=limit * 2, trakt_type=trakt_type, cache_only=cache_only,
                 genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids
             )
 
         elif sort_by is not None:  # Sorted list manually paginated because need to sort first
             response = self.get_sorted_list(
-                path, sort_by, sort_how, extended, cache_refresh=cache_refresh,
+                path, sort_by, sort_how, extended, cache_refresh=cache_refresh, cache_only=cache_only,
                 genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids
             )
             response = PaginatedItems(items=response['items'], page=page, limit=limit).get_dict()
 
         else:  # Unsorted lists can be paginated by the API
             response = self.get_simple_list(
-                path, extended=extended, page=page, limit=limit, trakt_type=trakt_type,
+                path, extended=extended, page=page, limit=limit, trakt_type=trakt_type, cache_only=cache_only,
                 genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids
             )
 
@@ -226,7 +226,7 @@ class _TraktLists():
     @is_authorized
     def get_stacked_list(
             self, path, trakt_type, page: int = 1, limit: int = None, params=None, sort_by=None, sort_how=None,
-            extended=None, authorize=False, always_refresh=True,
+            extended=None, authorize=False, always_refresh=True, cache_only=False,
             genres=None, years=None, query=None, languages=None, countries=None, runtimes=None, studio_ids=None,
             **kwargs
     ):
@@ -235,9 +235,12 @@ class _TraktLists():
         cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
 
         response = self.get_simple_list(
-            path, extended=extended, limit=4095, trakt_type=trakt_type, cache_refresh=cache_refresh,
+            path, extended=extended, limit=4095, trakt_type=trakt_type, cache_refresh=cache_refresh, cache_only=cache_only,
             genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids
         )
+
+        if not response:
+            return
 
         response['items'] = self._stack_calendar_tvshows(response['items'])
         response = PaginatedItems(items=response['items'], page=page, limit=limit).get_dict()
@@ -250,7 +253,7 @@ class _TraktLists():
     @is_authorized
     def get_custom_list(
             self, list_slug, user_slug=None, page: int = 1, limit: int = None, params=None, authorize=False,
-            sort_by=None, sort_how=None, extended=None, owner=False, always_refresh=True
+            sort_by=None, sort_how=None, extended=None, owner=False, always_refresh=True, cache_only=False
     ):
 
         limit = limit or self.item_limit
@@ -266,7 +269,7 @@ class _TraktLists():
         sorted_items = self.get_sorted_list(
             path, sort_by, sort_how, extended,
             permitted_types=['movie', 'show', 'person', 'episode'],
-            cache_refresh=cache_refresh
+            cache_refresh=cache_refresh, cache_only=cache_only
         ) or {}
 
         paginated_items = PaginatedItems(
@@ -279,7 +282,6 @@ class _TraktLists():
             'persons': sorted_items.get('persons', []),
             'next_page': paginated_items.next_page}
 
-    @use_activity_cache(cache_days=CACHE_SHORT)
     def _get_sync_list(
         self, sync_type, trakt_type, sort_by=None, sort_how=None, decorator_cache_refresh=False, extended=None, filters=None
     ):
@@ -287,14 +289,15 @@ class _TraktLists():
         func = TraktItems(items=self.get_sync(sync_type, trakt_type, extended=extended), trakt_type=trakt_type).build_items
         return func(sort_by, sort_how, filters=filters)
 
-    @is_authorized
     def get_sync_list(
         self, sync_type, trakt_type, page: int = 1, limit: int = None, params=None, sort_by=None, sort_how=None, next_page=True,
         always_refresh=True, extended=None, filters=None
     ):
         limit = limit or self.sync_item_limit
         cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
-        response = self._get_sync_list(sync_type, trakt_type, sort_by=sort_by, sort_how=sort_how, decorator_cache_refresh=cache_refresh, extended=extended, filters=filters)
+        response = self._get_sync_list(
+            sync_type, trakt_type, sort_by=sort_by, sort_how=sort_how,
+            decorator_cache_refresh=cache_refresh, extended=extended, filters=filters)
         if not response:
             return
         response = PaginatedItems(items=response['items'], page=page, limit=limit)
@@ -346,7 +349,7 @@ class _TraktLists():
         return items
 
     @is_authorized
-    def get_list_of_lists(self, path, page: int = 1, limit: int = 250, authorize=False, next_page=True, sort_likes=False):
+    def get_list_of_lists(self, path, page: int = 1, limit: int = 250, authorize=False, next_page=True, sort_likes=False, **kwargs):
         response = self.get_response(path, page=page, limit=limit)
         if not response:
             return
@@ -467,7 +470,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         self.item_limit = 20 * max(get_setting('pagemulti_trakt', 'int'), page_length)
         self.login(force)
 
-    def authorize(self, login=False):
+    def authorize(self, login=False, confirmation=False):
         def _get_token():
             token = self.get_stored_token()
             if not token.get('access_token'):
@@ -512,11 +515,15 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         if not token and login:
             _ask_login()
 
+        if not confirmation:
+            return self.authorization
+
         # First time authorization in this session so let's confirm
         if (
                 self.authorization
                 and not boolean(get_property('TraktIsAuth'))
-                and not get_timestamp(get_property('TraktRefreshTimeStamp', is_type=float) or 0)):
+                and not get_timestamp(get_property('TraktRefreshTimeStamp', is_type=float) or 0)
+        ):
 
             # Wait if another thread is checking authorization
             if has_property_lock('TraktCheckingAuth'):
