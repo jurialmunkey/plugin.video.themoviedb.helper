@@ -17,11 +17,12 @@ class CronJobMonitor(Thread):
         from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin, get_infolabel
         from tmdbhelper.lib.script.method.maintenance import recache_kodidb, clean_old_databases
 
-        # Check Trakt authorization
-        TraktAPI().authorize(confirmation=True)
-
         clean_old_databases()
         recache_kodidb(notification=False)
+
+        # Check Trakt authorization
+        self.xbmc_monitor.waitForAbort(2)
+        TraktAPI().authorize(confirmation=True)
 
         self.xbmc_monitor.waitForAbort(600)  # Wait 10 minutes before doing updates to give boot time
         if self.xbmc_monitor.abortRequested():
