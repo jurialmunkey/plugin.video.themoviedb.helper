@@ -13,7 +13,6 @@ from jurialmunkey.window import get_property
 
 
 class _TraktProgress():
-    @is_authorized
     def get_ondeck_list(self, page=1, limit=None, sort_by=None, sort_how=None, trakt_type=None):
         limit = limit or self.sync_item_limit
         get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
@@ -23,7 +22,6 @@ class _TraktProgress():
         response = PaginatedItems(response['items'], page=page, limit=limit)
         return response.items + response.next_page
 
-    @is_authorized
     def get_towatch_list(self, trakt_type, page=1, limit=None):
         limit = limit or self.sync_item_limit
         get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
@@ -38,7 +36,6 @@ class _TraktProgress():
         response = self.get_sync('playback', sync_type)
         return [i for i in response if lowest <= try_int(i.get('progress', 0)) <= highest]
 
-    @is_authorized
     def get_inprogress_shows_list(self, page=1, limit=None, params=None, next_page=True, sort_by=None, sort_how=None):
         limit = limit or self.sync_item_limit
         get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
@@ -174,7 +171,6 @@ class _TraktProgress():
         hidden_items = {j for j in (_get_comp_item(i) for i in response) if j}
         return list(hidden_items)
 
-    @is_authorized
     def get_upnext_list(self, unique_id, id_type=None, page=1, limit=None):
         """ Gets the next episodes for a show that user should watch next """
         limit = limit or self.sync_item_limit
@@ -187,7 +183,6 @@ class _TraktProgress():
             response = PaginatedItems(response['items'], page=page, limit=limit)
             return response.items + response.next_page
 
-    @is_authorized
     def get_upnext_episodes_list(self, page=1, sort_by=None, sort_how='desc', limit=None):
         """ Gets a list of episodes for in-progress shows that user should watch next """
         limit = limit or self.sync_item_limit
@@ -197,8 +192,10 @@ class _TraktProgress():
         response = PaginatedItems(response['items'], page=page, limit=limit)
         return response.items + response.next_page
 
-    @is_authorized
     def _get_upnext_episodes_list(self, sort_by=None, sort_how='desc'):
+
+        shows = self._get_inprogress_shows() or []
+
         def _get_upnext_episodes(i, get_single_episode=True):
             """ Helper func for upnext episodes to pass through threaded """
             try:
@@ -207,7 +204,6 @@ class _TraktProgress():
             except (AttributeError, KeyError):
                 return
             return self.get_upnext_episodes(slug, show, get_single_episode=get_single_episode)
-        shows = self._get_inprogress_shows() or []
 
         # Get upnext episodes threaded
         with ParallelThread(shows, _get_upnext_episodes) as pt:
@@ -284,14 +280,12 @@ class _TraktProgress():
         except StopIteration:
             return
 
-    @is_authorized
     def get_movie_playcount(self, unique_id, id_type):
         try:
             return self.get_sync('watched', 'movie', id_type)[unique_id]['plays']
         except (AttributeError, KeyError):
             return
 
-    @is_authorized
     def get_movie_playprogress(self, unique_id, id_type, key='progress'):
         try:
             return self.get_sync('playback', 'movie', id_type)[unique_id][key]
@@ -369,7 +363,6 @@ class _TraktProgress():
                 if j.get('number', -1) == episode:
                     return j.get('plays', 1)
 
-    @is_authorized
     def get_episodes_airedcount(self, unique_id, id_type, season=None):
         """ Gets the number of aired episodes for a tvshow """
         try:
@@ -394,11 +387,11 @@ class _TraktProgress():
             if i.get('number', -1) == season:
                 return i.get('aired_episodes')
 
-    def get_calendar(self, trakt_type, user=True, start_date=None, days=None, endpoint=None):
+    @is_authorized
+    def get_calendar(self, trakt_type, user=True, start_date=None, days=None, endpoint=None, **kwargs):
         user = 'my' if user else 'all'
         return self.get_response_json('calendars', user, trakt_type, endpoint, start_date, days, extended='full')
 
-    @is_authorized
     @use_simple_cache(cache_days=0.25)
     def get_calendar_episodes(self, startdate=0, days=1, user=True, endpoint=None):
         # Broaden date range in case utc conversion bumps into different day
