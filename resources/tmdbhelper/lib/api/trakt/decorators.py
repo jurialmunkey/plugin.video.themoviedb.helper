@@ -3,10 +3,27 @@ from tmdbhelper.lib.addon.logger import kodi_log
 
 
 def is_authorized(func):
+    from jurialmunkey.window import get_property
+    from jurialmunkey.parser import boolean
+
     def wrapper(self, *args, **kwargs):
-        if kwargs.get('authorize', True) and not self.authorize():
-            return
-        return func(self, *args, **kwargs)
+        # Authorization not required for this method
+        if not kwargs.get('authorize', True):
+            return func(self, *args, **kwargs)
+
+        # Authorization already granted in this session
+        if self.authorization:
+            return func(self, *args, **kwargs)
+
+        # Authorization already granted in this boot cycle
+        if boolean(get_property('TraktIsAuth')) and self.authorize():
+            return func(self, *args, **kwargs)
+
+        # Ask user to login because they want to use a method requiring authorization:
+        if not self.attempted_login and self.authorize(login=True):
+            return func(self, *args, **kwargs)
+
+        return
     return wrapper
 
 
@@ -44,10 +61,9 @@ def use_activity_cache(activity_type=None, activity_key=None, cache_days=None):
     Optionally send decorator_cache_refresh=True in func kwargs to force refresh
     """
     def decorator(func):
-        def wrapper(self, *args, allow_fallback=False, decorator_cache_refresh=None, **kwargs):
-            if not self.authorize():
-                return
 
+        @is_authorized
+        def wrapper(self, *args, allow_fallback=False, decorator_cache_refresh=None, **kwargs):
             # Setup getter/setter cache funcs
             func_get = self._cache.get_cache
             func_set = self._cache.set_cache
@@ -77,5 +93,6 @@ def use_activity_cache(activity_type=None, activity_key=None, cache_days=None):
                 {'response': response, 'last_activity': last_activity},
                 cache_name=cache_name, cache_days=cache_days)
             return response
+
         return wrapper
     return decorator

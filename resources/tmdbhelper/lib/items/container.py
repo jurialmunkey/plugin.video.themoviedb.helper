@@ -3,7 +3,6 @@ from tmdbhelper.lib.addon.consts import NO_LABEL_FORMATTING
 from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin, get_localized, get_condvisibility
 from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.thread import ParallelThread
-from tmdbhelper.lib.items.trakt import TraktMethods
 from tmdbhelper.lib.api.contains import CommonContainerAPIs
 from tmdbhelper.lib.items.filters import is_excluded
 from tmdbhelper.lib.addon.logger import TimerList, log_timer_report
@@ -55,17 +54,24 @@ class Container(CommonContainerAPIs):
 
         # Trakt Watched Progress Settings
         self.hide_watched = get_setting('widgets_hidewatched') if self.is_widget else False
-        self.trakt_method = TraktMethods(
-            trakt=self.trakt_api,
-            watchedindicators=get_setting('trakt_watchedindicators'),
-            pauseplayprogress=get_setting('trakt_playprogress'),
-            unwatchedepisodes=get_setting('trakt_watchedinprogress'))
 
         # Miscellaneous
         self.nodate_is_unaired = get_setting('nodate_is_unaired')  # Consider items with no date to be
         self.tmdb_cache_only = self.tmdb_is_cache_only()
         self.pagination = self.pagination_is_allowed()
         self.thumb_override = 0
+
+    @property
+    def trakt_method(self):
+        try:
+            return self._trakt_method
+        except AttributeError:
+            from tmdbhelper.lib.items.trakt import TraktMethods
+            self._trakt_method = TraktMethods(
+                watchedindicators=get_setting('trakt_watchedindicators'),
+                pauseplayprogress=get_setting('trakt_playprogress'),
+                unwatchedepisodes=get_setting('trakt_watchedinprogress'))
+            return self._trakt_method
 
     @property
     def ib(self):

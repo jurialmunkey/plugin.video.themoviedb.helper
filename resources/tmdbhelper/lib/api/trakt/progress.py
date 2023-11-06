@@ -120,7 +120,6 @@ class _TraktProgress():
 
         return item
 
-    @is_authorized
     @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_LONG)
     def get_episodes_watchcount(
             self, unique_id, id_type, season=None, exclude_specials=True,
@@ -155,7 +154,6 @@ class _TraktProgress():
                 count += 1
         return count
 
-    @is_authorized
     @use_activity_cache(cache_days=CACHE_LONG)
     def get_hiddenitems(self, trakt_type, progress_watched=True, progress_collected=True, calendar=True, id_type='slug'):
         """ Get items that are hidden on Trakt """
@@ -242,7 +240,6 @@ class _TraktProgress():
             pass
         return {'show': show, 'episode': self.get_details('show', slug, season=snum, episode=enum) or i_ep}
 
-    @is_authorized
     @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_SHORT)
     def get_show_progress(self, slug):
         if not slug:
@@ -301,7 +298,6 @@ class _TraktProgress():
         except (AttributeError, KeyError):
             return
 
-    @is_authorized
     @use_thread_lock("TraktAPI._get_episode_playprogress.Locked", timeout=10, polling=0.05)
     @use_activity_cache('episodes', 'paused_at', cache_days=CACHE_LONG)
     def _get_episode_playprogress(self, id_type):
@@ -342,7 +338,6 @@ class _TraktProgress():
 
         return main_list
 
-    @is_authorized
     @use_activity_cache('episodes', 'paused_at', cache_days=CACHE_LONG)
     def get_episode_playprogress(self, unique_id, id_type, season, episode, key='progress'):
         season = try_int(season, fallback=-2)  # Make fallback -2 to prevent matching on 0
@@ -355,7 +350,6 @@ class _TraktProgress():
         except (KeyError, AttributeError):
             return
 
-    @is_authorized
     @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_LONG)
     def get_episode_playcount(self, unique_id, id_type, season, episode):
         season = try_int(season, fallback=-2)  # Make fallback -2 to prevent matching on 0
@@ -391,7 +385,6 @@ class _TraktProgress():
             trakt_id = None
         return self.get_season_episodes_airedcount(unique_id, id_type, season, trakt_id=trakt_id)
 
-    @is_authorized
     @use_activity_cache('episodes', 'watched_at', cache_days=CACHE_SHORT)
     def get_season_episodes_airedcount(self, unique_id, id_type, season, trakt_id=None):
         season = try_int(season, fallback=-2)
@@ -405,6 +398,7 @@ class _TraktProgress():
         user = 'my' if user else 'all'
         return self.get_response_json('calendars', user, trakt_type, endpoint, start_date, days, extended='full')
 
+    @is_authorized
     @use_simple_cache(cache_days=0.25)
     def get_calendar_episodes(self, startdate=0, days=1, user=True, endpoint=None):
         # Broaden date range in case utc conversion bumps into different day

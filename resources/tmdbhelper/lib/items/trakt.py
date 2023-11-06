@@ -6,8 +6,10 @@ set_playprogress = None
 
 
 class TraktMethods():
-    def __init__(self, trakt, pauseplayprogress=False, watchedindicators=False, unwatchedepisodes=False):
-        self._trakt = trakt
+    def __init__(self, pauseplayprogress=False, watchedindicators=False, unwatchedepisodes=False):
+        from tmdbhelper.lib.api.trakt.api import TraktAPI
+        self._trakt = TraktAPI()
+        self._trakt.attempted_login = True  # Avoid asking for authorization
         self._pauseplayprogress = pauseplayprogress  # Set play progress using paused at position
         self._watchedindicators = watchedindicators  # Set watched status and playcount
         self._unwatchedepisodes = unwatchedepisodes  # Set unwatched episode count to total episode count for unwatched tvshows

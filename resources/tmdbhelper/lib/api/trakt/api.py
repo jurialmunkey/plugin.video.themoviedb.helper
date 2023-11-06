@@ -5,7 +5,7 @@ from tmdbhelper.lib.files.futils import json_loads as data_loads
 from tmdbhelper.lib.files.futils import json_dumps as data_dumps
 from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.plugin import get_localized, get_setting, ADDONPATH
-from jurialmunkey.parser import try_int
+from jurialmunkey.parser import try_int, boolean
 from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp
 from tmdbhelper.lib.files.bcache import use_simple_cache
 from tmdbhelper.lib.items.pages import PaginatedItems, get_next_page
@@ -287,6 +287,7 @@ class _TraktLists():
         func = TraktItems(items=self.get_sync(sync_type, trakt_type, extended=extended), trakt_type=trakt_type).build_items
         return func(sort_by, sort_how, filters=filters)
 
+    @is_authorized
     def get_sync_list(
         self, sync_type, trakt_type, page: int = 1, limit: int = None, params=None, sort_by=None, sort_how=None, next_page=True,
         always_refresh=True, extended=None, filters=None
@@ -452,7 +453,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
             page_length=1):
         super(TraktAPI, self).__init__(req_api_url=API_URL, req_api_name='TraktAPI', timeout=20)
         self.authorization = ''
-        self.attempted_login = False
+        self.attempted_login = boolean(get_property('TraktAttemptedLogin'))
         self.dialog_noapikey_header = f'{get_localized(32007)} {self.req_api_name} {get_localized(32011)}'
         self.dialog_noapikey_text = get_localized(32012)
         TraktAPI.client_id = client_id or self.client_id
@@ -464,7 +465,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         self.sync = {}
         self.sync_item_limit = 20 * max(get_setting('pagemulti_sync', 'int'), page_length)
         self.item_limit = 20 * max(get_setting('pagemulti_trakt', 'int'), page_length)
-        self.login() if force else self.authorize()
+        self.login(force)
 
     def authorize(self, login=False):
         def _get_token():
@@ -483,6 +484,23 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
             except AttributeError:
                 return
 
+        def _ask_login():
+            # We only ask once per instance to avoid spamming user with login prompts
+            if self.attempted_login:
+                return
+            self.attempted_login = True
+            x = Dialog().yesnocustom(
+                self.dialog_noapikey_header, self.dialog_noapikey_text,
+                nolabel=get_localized(222), yeslabel=get_localized(186), customlabel=get_localized(13170))
+            # User chose "Cancel" or pressed back so we do nothing
+            if x == 0 or x == -1:
+                return
+            # User chose "Never" so we set a property to avoid future instances from asking again
+            if x == 2:
+                get_property('TraktAttemptedLogin', 'True')
+                return
+            return self.login()
+
         # Already got authorization so return credentials
         if self.authorization:
             return self.authorization
@@ -491,22 +509,18 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         token = _get_token()
 
         # No saved credentials and user trying to use a feature that requires authorization so ask them to login
-        if not token and login and not self.attempted_login:
-            if Dialog().yesno(
-                    self.dialog_noapikey_header, self.dialog_noapikey_text,
-                    nolabel=get_localized(222), yeslabel=get_localized(186)):
-                self.login()
-            self.attempted_login = True
+        if not token and login:
+            _ask_login()
 
         # First time authorization in this session so let's confirm
         if (
                 self.authorization
-                and get_property('TraktIsAuth') != 'True'
+                and not boolean(get_property('TraktIsAuth'))
                 and not get_timestamp(get_property('TraktRefreshTimeStamp', is_type=float) or 0)):
 
             # Wait if another thread is checking authorization
             if has_property_lock('TraktCheckingAuth'):
-                if get_property('TraktIsDown') == 'True':
+                if boolean(get_property('TraktIsDown')):
                     return  # Trakt is down so do nothing
                 _get_token()  # Get the token set in the other thread
                 return self.authorization  # Another thread checked token so return
@@ -515,10 +529,10 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
             get_property('TraktCheckingAuth', 1)
 
             # Trakt was previously down so check again
-            if get_property('TraktIsDown') == 'True' and _check_auth() not in [None, 500, 503]:
+            if boolean(get_property('TraktIsDown')) and _check_auth() not in [None, 500, 503]:
                 get_property('TraktIsDown', clear_property=True)
 
-            if get_property('TraktIsDown') != 'True':
+            if not boolean(get_property('TraktIsDown')):
                 kodi_log('Trakt authorization check started', 1)
 
                 # Check if we can get a response from user account
@@ -577,10 +591,14 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
 
         Dialog().ok(get_localized(32212), msg)
 
-    def login(self):
+    def login(self, force=True):
+        if not force:
+            return
+
         self.code = self.get_api_request_json('https://api.trakt.tv/oauth/device/code', postdata={'client_id': self.client_id})
         if not self.code.get('user_code') or not self.code.get('device_code'):
             return  # TODO: DIALOG: Authentication Error
+
         self.progress = 0
         self.interval = self.code.get('interval', 5)
         self.expires_in = self.code.get('expires_in', 0)
