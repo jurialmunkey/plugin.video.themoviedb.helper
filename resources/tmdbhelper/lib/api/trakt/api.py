@@ -463,6 +463,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         TraktAPI.client_secret = client_secret or self.client_secret
         TraktAPI.user_token = user_token or self.user_token
         self.headers = {'trakt-api-version': '2', 'trakt-api-key': self.client_id, 'Content-Type': 'application/json'}
+        self.last_activities_expires = 0
         self.last_activities = {}
         self.sync_activities = {}
         self.sync = {}

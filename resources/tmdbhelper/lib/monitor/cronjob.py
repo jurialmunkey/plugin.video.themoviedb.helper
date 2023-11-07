@@ -19,9 +19,6 @@ class CronJobMonitor(Thread):
 
         clean_old_databases()
         recache_kodidb(notification=False)
-
-        # Check Trakt authorization
-        self.xbmc_monitor.waitForAbort(2)
         TraktAPI().authorize(confirmation=True)
 
         self.xbmc_monitor.waitForAbort(600)  # Wait 10 minutes before doing updates to give boot time

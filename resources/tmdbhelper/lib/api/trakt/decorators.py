@@ -1,5 +1,4 @@
 from tmdbhelper.lib.addon.plugin import format_name
-from tmdbhelper.lib.addon.logger import kodi_log
 
 
 def is_authorized(func):
@@ -7,33 +6,32 @@ def is_authorized(func):
     from jurialmunkey.parser import boolean
 
     def wrapper(self, *args, **kwargs):
-        # Authorization not required for this method
-        if not kwargs.get('authorize', True):
-            return func(self, *args, **kwargs)
 
-        # Authorization already granted in this session
-        if self.authorization:
-            return func(self, *args, **kwargs)
+        def _get_request_data():
+            # Authorization not required for this method
+            if not kwargs.get('authorize', True):
+                return func(self, *args, **kwargs)
+            # Authorization already granted in this instance
+            if self.authorization:
+                return func(self, *args, **kwargs)
+            # Authorization already granted in this boot cycle
+            if boolean(get_property('TraktIsAuth')) and self.authorize():
+                return func(self, *args, **kwargs)
+            # Authorization required ask for login if no token
+            if not self.attempted_login and self.authorize(login=True):
+                return func(self, *args, **kwargs)
 
-        # Authorization already granted in this boot cycle
-        if boolean(get_property('TraktIsAuth')) and self.authorize():
-            return func(self, *args, **kwargs)
+        def _get_cached_data():
+            params = {}
+            params.update(kwargs)
+            params['cache_only'] = True
+            try:
+                return func(self, *args, **params)
+            except TypeError:
+                return
 
-        # User not authorized or not authorized yet so get cached data instead
-        params = {}
-        params.update(kwargs)
-        params['cache_only'] = True
-        try:
-            content = None
-            content = func(self, *args, **params)
-        except TypeError:
-            pass
+        return _get_request_data() or _get_cached_data()
 
-        # Ask user to login because they want to use a method requiring authorization and theres no cached data
-        if not content and not self.attempted_login and self.authorize(login=True):
-            return func(self, *args, **kwargs)
-
-        return content
     return wrapper
 
 
@@ -85,31 +83,42 @@ def use_activity_cache(activity_type=None, activity_key=None, cache_days=None):
             # Check last activity from Trakt
             last_activity = self._get_last_activity(activity_type, activity_key)
 
-            # Trakt not authorized yet so lets use or cached object only
-            if last_activity == -1:
-                cache_object = func_get(cache_name) or {}
-                return cache_object.get('response')
-
             # Get our cached object
+            response = None
             cache_object = None
+            if last_activity == -1:  # Cache only mode
+                cache_object = func_get(cache_name)
+                if cache_object:
+                    response = cache_object.get('response')
+                return response
             if last_activity and not decorator_cache_refresh:
                 cache_object = func_get(cache_name)
-            if cache_object and cache_object.get('last_activity') == last_activity:
-                if cache_object.get('response') and cache_object.get('last_activity'):
-                    return cache_object['response']
+
+            # Check that cached object matches last_activity
+            if cache_object and cache_object.get('response'):
+                if cache_object.get('last_activity') >= last_activity:
+                    response = cache_object['response']
+                    return response
+
+            def _get_fallback():
+                _cache_object = cache_object
+                if allow_fallback and not _cache_object:
+                    _cache_object = func_get(cache_name)
+                if _cache_object:
+                    return _cache_object.get('response')
 
             # Either not cached or last_activity doesn't match so get a new request and cache it
             response = func(self, *args, **kwargs)
+
+            # If we dont have a response then get fallback from cache
             if not response:
-                cache_object = cache_object or func_get(cache_name) if allow_fallback else None
-                if allow_fallback:
-                    kodi_log([
-                        'No response for ', cache_name,
-                        '\nAttempting fallback... ', 'Failed!' if not cache_object else 'Success!'], 2)
-                return cache_object.get('response') if cache_object else None
+                response = _get_fallback()
+                return response
+
             func_set(
                 {'response': response, 'last_activity': last_activity},
                 cache_name=cache_name, cache_days=cache_days)
+
             return response
 
         return wrapper
