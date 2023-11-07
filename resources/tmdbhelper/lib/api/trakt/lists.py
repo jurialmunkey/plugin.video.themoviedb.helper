@@ -300,6 +300,7 @@ class ListCustom(Container):
             self, list_slug, user_slug=None, page=None,
             **kwargs
     ):
+        from jurialmunkey.parser import boolean
         response = self.trakt_api.get_custom_list(
             page=page or 1,
             list_slug=list_slug,
@@ -307,8 +308,8 @@ class ListCustom(Container):
             sort_by=kwargs.get('sort_by', None),
             sort_how=kwargs.get('sort_how', None),
             extended=kwargs.get('extended', None),
-            authorize=False if user_slug else True,
-            always_refresh=True if not get_setting('trakt_cacheownlists') and kwargs.get('owner', '').lower() == 'true' else False)
+            authorize=False if user_slug and not boolean(kwargs.get('owner', False)) else True,
+            always_refresh=True if not get_setting('trakt_cacheownlists') and boolean(kwargs.get('owner', False)) else False)
         if not response:
             return []
         self.tmdb_cache_only = False

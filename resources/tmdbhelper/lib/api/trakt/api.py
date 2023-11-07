@@ -469,7 +469,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktLists, _TraktProgress):
         self.sync = {}
         self.sync_item_limit = 20 * max(get_setting('pagemulti_sync', 'int'), page_length)
         self.item_limit = 20 * max(get_setting('pagemulti_trakt', 'int'), page_length)
-        self.login(force)
+        self.login() if force else self.authorize()
 
     def authorize(self, login=False, confirmation=False):
         def _get_token():
