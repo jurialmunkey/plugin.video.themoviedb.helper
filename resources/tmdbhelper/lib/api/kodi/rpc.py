@@ -1,17 +1,7 @@
 from xbmc import Monitor
-from tmdbhelper.lib.addon.logger import kodi_log
 from jurialmunkey.parser import try_int, find_dict_in_list
-from tmdbhelper.lib.api.kodi.mapping import ItemMapper
-from tmdbhelper.lib.files.mcache import MemoryCache
 from tmdbhelper.lib.addon.thread import use_thread_lock
 import jurialmunkey.jsnrpc as jurialmunkey_jsnrpc
-
-""" Lazyimports
-from json import dumps, loads
-from tmdbhelper.lib.files.bcache import BasicCache
-from xbmcvfs import Stat
-"""
-
 
 get_library = jurialmunkey_jsnrpc.get_library
 get_num_credits = jurialmunkey_jsnrpc.get_num_credits
@@ -58,6 +48,7 @@ def get_item_details(dbid=None, method=None, key=None, properties=None):
         details = get_jsonrpc(method, params)
         details = details['result'][f'{key}details']
         details['dbid'] = dbid
+        from tmdbhelper.lib.api.kodi.mapping import ItemMapper
         return ItemMapper(key=key).get_info(details)
     except (AttributeError, KeyError):
         return {}
@@ -102,6 +93,7 @@ THREAD_LOCK = 'TMDbHelper.KodiLibrary.ThreadLock'
 class KodiLibrary(object):
     def __init__(self, dbtype=None, tvshowid=None, attempt_reconnect=False, logging=True, cache_refresh=False):
         self.dbtype = dbtype
+        from tmdbhelper.lib.files.mcache import MemoryCache
         self._cache = MemoryCache(name='KodiLibrary_{dbtype}_{tvshowid}')
         self._get_database(dbtype, tvshowid, attempt_reconnect, logging, cache_refresh)
 
@@ -134,6 +126,7 @@ class KodiLibrary(object):
             Monitor().waitForAbort(1)
             retries -= 1
         if logging:
+            from tmdbhelper.lib.addon.logger import kodi_log
             kodi_log(f'Getting KodiDB {dbtype} FAILED!', 1)
 
     def _get_kodi_db(self, dbtype=None, tvshowid=None):
