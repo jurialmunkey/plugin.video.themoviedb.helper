@@ -1,13 +1,11 @@
 import re
 from xbmc import Monitor, Player
 from xbmcgui import Dialog
-from xbmcplugin import setResolvedUrl
 from xbmcaddon import Addon as KodiAddon
 from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, format_folderpath, get_localized, get_setting, executebuiltin, get_infolabel
 from jurialmunkey.parser import try_int, try_float
 from tmdbhelper.lib.addon.consts import PLAYERS_PRIORITY, PLAYERS_CHOSEN_DEFAULTS_FILENAME
-from tmdbhelper.lib.addon.dialog import BusyDialog, ProgressDialog
 from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.files.futils import read_file, normalise_filesize
 from tmdbhelper.lib.api.kodi.rpc import get_directory, KodiLibrary
@@ -64,6 +62,7 @@ def resolve_to_dummy(handle=None, stop_after=1, delay_wait=0):
     # Set our dummy resolved url
     path = f'{ADDONPATH}/resources/dummy.mp4'
     kodi_log(['lib.player.players - attempt to resolve dummy file\n', path], 1)
+    from xbmcplugin import setResolvedUrl
     setResolvedUrl(handle, True, ListItem(path=path).get_listitem())
 
     # Wait till our file plays and then stop after setting duration
@@ -77,6 +76,7 @@ def resolve_to_dummy(handle=None, stop_after=1, delay_wait=0):
         return -1
 
     # Added delay
+    from tmdbhelper.lib.addon.dialog import BusyDialog
     with BusyDialog(False if delay_wait < 1 else True):
         Monitor().waitForAbort(delay_wait)
 
@@ -88,6 +88,7 @@ class Players(object):
     def __init__(self, tmdb_type, tmdb_id=None, season=None, episode=None, ignore_default='', islocal=False, player=None, mode=None, **kwargs):
         if tmdb_type in ['season', 'episode']:
             tmdb_type = 'tv'
+        from tmdbhelper.lib.addon.dialog import ProgressDialog
         with ProgressDialog('TMDbHelper', f'{get_localized(32374)}...', total=3) as _p_dialog:
             self.action_log = []
             self.api_language = None
@@ -765,6 +766,7 @@ class Players(object):
 
         else:
             # Otherwise we have a url we can resolve to
+            from xbmcplugin import setResolvedUrl
             setResolvedUrl(handle, True, listitem)
             kodi_log(['lib.player - finished resolving path to url\n', listitem.getPath()], 1)
 
