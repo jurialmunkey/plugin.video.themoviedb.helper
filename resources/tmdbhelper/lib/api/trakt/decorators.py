@@ -76,7 +76,7 @@ def use_activity_cache(activity_type=None, activity_key=None, cache_days=None):
             cache_name = format_name(cache_name, *args, **kwargs)
 
             # Check last activity from Trakt
-            last_activity = self._get_last_activity(activity_type, activity_key)
+            last_activity = self.get_last_activity(activity_type, activity_key)
 
             # Get our cached object
             response = None

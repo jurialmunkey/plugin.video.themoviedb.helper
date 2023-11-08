@@ -6,17 +6,13 @@ from tmdbhelper.lib.api.request import RequestAPI
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.thread import has_property_lock
 from tmdbhelper.lib.api.api_keys.trakt import CLIENT_ID, CLIENT_SECRET, USER_TOKEN
-
-
-from tmdbhelper.lib.api.trakt.content import _TraktContent
-from tmdbhelper.lib.api.trakt.progress import _TraktProgress
-from tmdbhelper.lib.api.trakt.sync import _TraktSync
+from tmdbhelper.lib.api.trakt.content import TraktMethods
 
 
 API_URL = 'https://api.trakt.tv/'
 
 
-class TraktAPI(RequestAPI, _TraktSync, _TraktContent, _TraktProgress):
+class TraktAPI(RequestAPI, TraktMethods):
 
     client_id = CLIENT_ID
     client_secret = CLIENT_SECRET
