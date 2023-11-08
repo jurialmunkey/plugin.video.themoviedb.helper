@@ -927,7 +927,7 @@ def _translate_discover_params(tmdb_type, params):
         items = split_items(params[k])
         ttype = v[0] if lookup_id else None
         stype = separator if v[1] == 'USER' else v[1]
-        params[k] = TMDb().get_translated_list(items, ttype, separator=stype)
+        params[k] = TMDb().get_tmdb_id_list(items, ttype, separator=stype)
 
     # Translate relative dates based upon today's date
     for i in RELATIVE_DATES:

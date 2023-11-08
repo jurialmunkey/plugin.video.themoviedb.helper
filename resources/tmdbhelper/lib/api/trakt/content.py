@@ -264,6 +264,10 @@ class TraktMethods():
         from tmdbhelper.lib.api.trakt.methods.progress import get_season_episodes_airedcount
         return get_season_episodes_airedcount(self, *args, **kwargs)
 
+    """
+    TRAKT CALENDAR METHODS
+    """
+
     def get_calendar(self, *args, **kwargs):
         from tmdbhelper.lib.api.trakt.methods.calendar import get_calendar
         return get_calendar(self, *args, **kwargs)

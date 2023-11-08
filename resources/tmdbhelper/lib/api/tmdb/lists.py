@@ -215,7 +215,7 @@ class ListFlatSeasons(Container):
 
 class ListVideos(Container):
     def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, **kwargs):
-        items = self.tmdb_api.get_videos(tmdb_id, tmdb_type, season, episode)
+        items = self.tmdb_api.get_videos_list(tmdb_id, tmdb_type, season, episode)
         self.tmdb_cache_only = True
         self.container_content = convert_type('video', 'container')
         return items
