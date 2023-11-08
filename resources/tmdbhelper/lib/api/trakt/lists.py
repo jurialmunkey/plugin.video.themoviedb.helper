@@ -332,7 +332,7 @@ class ListCustomSearch(Container):
 
 class ListSortBy(Container):
     def get_items(self, info, **kwargs):
-        from tmdbhelper.lib.api.trakt.api import get_sort_methods
+        from tmdbhelper.lib.api.trakt.sorting import get_sort_methods
         from tmdbhelper.lib.api.mapping import get_empty_item
 
         def _listsortby_item(i, **params):

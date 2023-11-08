@@ -53,7 +53,7 @@ def rename_list(rename_list=None, **kwargs):
 def sort_list(**kwargs):
     from xbmcgui import Dialog
     from tmdbhelper.lib.addon.plugin import executebuiltin, format_folderpath, encode_url
-    from tmdbhelper.lib.api.trakt.api import get_sort_methods
+    from tmdbhelper.lib.api.trakt.sorting import get_sort_methods
     sort_methods = get_sort_methods(kwargs['info'])
     x = Dialog().contextmenu([i['name'] for i in sort_methods])
     if x == -1:
