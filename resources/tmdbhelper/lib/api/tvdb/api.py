@@ -16,10 +16,10 @@ def is_authorized(func):
 
 
 class TVDb(RequestAPI):
-    
+
     api_key = API_KEY
     user_token = USER_TOKEN
-    
+
     def __init__(
             self,
             api_key=None,
