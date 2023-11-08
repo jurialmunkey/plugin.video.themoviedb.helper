@@ -1,13 +1,12 @@
-
 from xbmcgui import Dialog, DialogProgress
 from jurialmunkey.parser import try_int, boolean
 from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.plugin import get_localized, get_setting, ADDONPATH
 from tmdbhelper.lib.api.request import RequestAPI
-from tmdbhelper.lib.addon.logger import kodi_log, TimerFunc
+from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.thread import has_property_lock
 from tmdbhelper.lib.api.api_keys.trakt import CLIENT_ID, CLIENT_SECRET, USER_TOKEN
-from timeit import default_timer as timer
+
 
 from tmdbhelper.lib.api.trakt.content import _TraktContent
 from tmdbhelper.lib.api.trakt.progress import _TraktProgress
@@ -60,7 +59,7 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktContent, _TraktProgress):
             self.ask_for_login()
 
         if not confirmation:
-            return self. authorization
+            return self.authorization
 
         return self.confirm_authorization()
 
@@ -102,13 +101,15 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktContent, _TraktProgress):
             self.get_token()  # Get the token set in the other thread
             return self.authorization  # Another thread checked token so return
 
-        def _check_authorization():
+        def _check_authorization(attempt=1):
             response = self.check_authorization()
 
             # Unauthorised so attempt a refresh
-            if response in [None, 401]:
+            if attempt == 1 and response in [None, 401]:
                 kodi_log('Trakt unauthorized!', 1)
-                self.authorization = self.refresh_token()
+                if not self.refresh_token():
+                    return
+                return _check_authorization(attempt=attempt + 1)
 
             # Trakt database is down
             if response in [500, 503]:
@@ -120,21 +121,20 @@ class TraktAPI(RequestAPI, _TraktSync, _TraktContent, _TraktProgress):
                 return
 
             kodi_log('Trakt user account authorized', 1)
+            get_property('TraktIsDown', clear_property=True)
             return get_property('TraktIsAuth', 'True')
 
         def _confirm_authorization():
-            if boolean(get_property('TraktIsDown')):
-                if not self.check_authorization() not in [None, 500, 503]:  # Trakt was previously down so check again
-                    return  # Trakt still down
-                get_property('TraktIsDown', clear_property=True)  # Trakt no longer down so clear the property
-            kodi_log('Trakt authorization check started', 1)
+            from timeit import default_timer as timer
+            from tmdbhelper.lib.addon.logger import TimerFunc
             with TimerFunc('Trakt authorization check took', inline=True) as tf:
-                if _check_authorization() and get_setting('startup_notifications'):
-                    total_time = timer() - tf.timer_a
-                    Dialog().notification(
-                        'TMDbHelper',
-                        f'Trakt authorized in {total_time:.3f}s',
-                        icon=f'{ADDONPATH}/icon.png')
+                if not _check_authorization():
+                    return
+                if not get_setting('startup_notifications'):
+                    return
+                total_time = timer() - tf.timer_a
+                notification = f'Trakt authorized in {total_time:.3f}s'
+                Dialog().notification('TMDbHelper', notification, icon=f'{ADDONPATH}/icon.png')
 
         # Set a thread lock property
         with WindowProperty(('TraktCheckingAuth', 1)):
