@@ -6,12 +6,13 @@ class CronJobMonitor(Thread):
         from xbmc import Monitor
         Thread.__init__(self)
         self.exit = False
-        self.poll_time = 1800  # Poll every 30 mins since we don't need to get exact time for update
+        self.poll_time = 900  # Poll every 15 mins since we don't need to get exact time for update
         self.update_hour = update_hour
         self.xbmc_monitor = Monitor()
 
     def run(self):
-        from jurialmunkey.parser import try_int
+        from jurialmunkey.window import get_property
+        from jurialmunkey.parser import try_int, boolean
         from tmdbhelper.lib.api.trakt.api import TraktAPI
         from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_datetime_now, get_timedelta, get_datetime_today, get_datetime_time, get_datetime_combine
         from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin, get_infolabel
@@ -21,7 +22,14 @@ class CronJobMonitor(Thread):
         recache_kodidb(notification=False)
         TraktAPI().authorize(confirmation=True)
 
-        self.xbmc_monitor.waitForAbort(600)  # Wait 10 minutes before doing updates to give boot time
+        self.xbmc_monitor.waitForAbort(1)
+
+        if boolean(get_property('TraktIsAuth')):
+            from tmdbhelper.lib.script.method.trakt import get_stats
+            get_stats()
+
+        self.xbmc_monitor.waitForAbort(300)
+
         if self.xbmc_monitor.abortRequested():
             del self.xbmc_monitor
             return
