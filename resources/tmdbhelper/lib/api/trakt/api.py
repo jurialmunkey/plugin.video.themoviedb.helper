@@ -44,7 +44,7 @@ class TraktAPI(RequestAPI, TraktMethods):
 
     def authorize(self, login=False, confirmation=False):
         # Already got authorization so return credentials
-        if self.authorization:
+        if not confirmation and self.authorization:
             return self.authorization
 
         # Check for saved credentials from previous login
