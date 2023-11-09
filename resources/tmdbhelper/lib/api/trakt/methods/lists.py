@@ -309,11 +309,8 @@ def get_sync_list(
     self, sync_type, trakt_type, page: int = 1, limit: int = None, params=None, sort_by=None, sort_how=None, next_page=True,
     always_refresh=True, extended=None, filters=None
 ):
-    from jurialmunkey.window import get_property
     from tmdbhelper.lib.api.trakt.items import TraktItems
     limit = limit or self.sync_item_limit
-    if always_refresh:  # Wipe last activities cache to ensure recheck
-        get_property('TraktSyncLastActivities.Expires', clear_property=True)
     sync = self.get_sync(sync_type, trakt_type, extended=extended)
     func = TraktItems(items=sync, trakt_type=trakt_type).build_items
     response = func(sort_by, sort_how, filters=filters)

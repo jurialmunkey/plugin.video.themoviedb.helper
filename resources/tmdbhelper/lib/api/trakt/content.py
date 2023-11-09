@@ -180,14 +180,6 @@ class TraktMethods():
             self._sync_item = sync_item
             return self._sync_item(self, *args, **kwargs)
 
-    def get_last_activity(self, *args, **kwargs):
-        try:
-            return self._get_last_activity(self, *args, **kwargs)
-        except AttributeError:
-            from tmdbhelper.lib.api.trakt.methods.sync import get_last_activity
-            self._get_last_activity = get_last_activity
-            return self._get_last_activity(self, *args, **kwargs)
-
     def get_sync_response(self, *args, **kwargs):
         try:
             return self._get_sync_response(self, *args, **kwargs)
@@ -347,6 +339,18 @@ class TraktMethods():
             from tmdbhelper.lib.api.trakt.methods.sync import get_sync
             self._get_sync = get_sync
             return self._get_sync(self, *args, **kwargs)
+
+    """
+    TRAKT ACTIVITIES METHODS
+    """
+
+    def get_last_activity(self, *args, **kwargs):
+        try:
+            return self._get_last_activity(self, *args, **kwargs)
+        except AttributeError:
+            from tmdbhelper.lib.api.trakt.methods.activities import get_last_activity
+            self._get_last_activity = get_last_activity
+            return self._get_last_activity(self, *args, **kwargs)
 
     """
     TRAKT PROGRESS METHODS
