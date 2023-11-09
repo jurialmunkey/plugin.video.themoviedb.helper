@@ -39,7 +39,7 @@ class TMDb(RequestAPI, TMDbMethods):
     def req_strip(self):
         req_strip_add = [
             (self.append_to_response, ''),
-            (self.req_language, f'{self.iso_language}' + '_en' if ARTLANG_FALLBACK else '')
+            (self.req_language, f'{self.iso_language}{"_en" if ARTLANG_FALLBACK else ""}')
         ]
         try:
             return self._req_strip + req_strip_add
@@ -58,11 +58,7 @@ class TMDb(RequestAPI, TMDbMethods):
 
     @property
     def req_language(self):
-        return ','.join([
-            f'{self.iso_language}-{self.iso_country}',
-            f'include_image_language={self.iso_language},null' + ',en' if ARTLANG_FALLBACK else '',
-            f'include_video_language={self.iso_language},null,en'
-        ])
+        return f'{self.iso_language}-{self.iso_country}&include_image_language={self.iso_language},null{",en" if ARTLANG_FALLBACK else ""}&include_video_language={self.iso_language},null,en'
 
     @property
     def iso_language(self):
@@ -74,11 +70,15 @@ class TMDb(RequestAPI, TMDbMethods):
 
     @property
     def iso_region(self):
+        return None if self.setting_ignore_regionreleasefilter else self.iso_country
+
+    @property
+    def setting_ignore_regionreleasefilter(self):
         try:
-            return self._iso_region
+            return self._setting_ignore_regionreleasefilter
         except AttributeError:
-            self._iso_region = None if get_setting('ignore_regionreleasefilter') else self.iso_country
-            return self._iso_region
+            self._setting_ignore_regionreleasefilter = get_setting('ignore_regionreleasefilter')
+            return self._setting_ignore_regionreleasefilter
 
     @property
     def genres(self):
