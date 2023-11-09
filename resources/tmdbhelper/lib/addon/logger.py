@@ -17,7 +17,7 @@ TimerFunc = jurialmunkey_logger.TimerFunc
 
 
 class CProfiler():
-    def __init__(self, filename='output.txt'):
+    def __init__(self, filename='output'):
         """ ContextManager for setting a WindowProperty over duration """
         import cProfile
         self.filename = filename
@@ -37,8 +37,12 @@ class CProfiler():
         stream = io.StringIO()
         profile_stats = pstats.Stats(self.profiler, stream=stream).sort_stats('cumtime')
         profile_stats.print_stats()
+        write_to_file(stream.getvalue(), 'cProfile', self.filename + '_cumtime.txt', join_addon_data=True)
 
-        write_to_file(stream.getvalue(), 'cProfile', self.filename, join_addon_data=True)
+        stream = io.StringIO()
+        profile_stats = pstats.Stats(self.profiler, stream=stream).sort_stats('tottime')
+        profile_stats.print_stats()
+        write_to_file(stream.getvalue(), 'cProfile', self.filename + '_tottime.txt', join_addon_data=True)
 
 
 def timer_report(func_name):
