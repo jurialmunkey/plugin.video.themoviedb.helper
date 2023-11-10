@@ -10,9 +10,11 @@ from tmdbhelper.lib.addon.logger import kodi_log
 def get_monitor_userlists(list_slugs=None, user_slugs=None):
     saved_lists = list_slugs or get_setting('monitor_userlist', 'str') or ''
     saved_users = user_slugs or get_setting('monitor_userslug', 'str') or ''
+    if not saved_lists or not saved_users:
+        return []
     saved_lists = saved_lists.split(' | ') or []
     saved_users = saved_users.split(' | ') or []
-    return [(i, saved_users[x]) for x, i in enumerate(saved_lists)]
+    return [(i, saved_users[x]) for x, i in enumerate(saved_lists) if i]
 
 
 def monitor_userlist():

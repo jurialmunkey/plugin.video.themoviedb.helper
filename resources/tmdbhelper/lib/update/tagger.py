@@ -41,10 +41,14 @@ class LibraryTagger(LibraryCommonFunctions):
         self.add_item('tvshow', self.kodi_db_tv, user_slug, list_slug, tmdb_id, imdb_id, **kwargs)
 
     def update_tags(self, list_slugs=None, user_slugs=None):
+        user_lists = get_monitor_userlists(list_slugs, user_slugs)
+
+        if not user_lists:
+            return
+
         kodi_log(u'UPDATING LIBRARY TAGS', 1)
 
         # Update library tags according to Trakt list names
-        user_lists = get_monitor_userlists(list_slugs, user_slugs)
         for list_slug, user_slug in user_lists:
             self.add_userlist(user_slug=user_slug, list_slug=list_slug, confirm=False)
             create_playlist('movies', user_slug, list_slug)
