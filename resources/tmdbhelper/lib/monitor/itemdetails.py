@@ -22,7 +22,8 @@ BASEITEM_PROPERTIES = [
     ('base_tvshowtitle', ('tvshowtitle',), None),
     ('base_studio', ('studio',), lambda v: v.split(' / ')[0] if v else None),
     ('base_genre', ('genre',), lambda v: v.split(' / ')[0] if v else None),
-
+    ('base_director', ('director',), lambda v: v.split(' / ')[0] if v else None),
+    ('base_writer', ('writer',), lambda v: v.split(' / ')[0] if v else None),
 ]
 
 CV_USE_MULTI_TYPE = ""\
