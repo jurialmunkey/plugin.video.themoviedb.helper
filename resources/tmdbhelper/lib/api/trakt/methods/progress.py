@@ -4,11 +4,9 @@ from tmdbhelper.lib.addon.thread import use_thread_lock
 
 
 def get_ondeck_list(self, page=1, limit=None, sort_by=None, sort_how=None, trakt_type=None):
-    from jurialmunkey.window import get_property
     from tmdbhelper.lib.api.trakt.items import TraktItems
     from tmdbhelper.lib.items.pages import PaginatedItems
     limit = limit or self.sync_item_limit
-    get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
     response = self.get_inprogress_items('show' if trakt_type == 'episode' else trakt_type)
     response = TraktItems(response, trakt_type=trakt_type).build_items(
         sort_by=sort_by, sort_how=sort_how)
@@ -17,11 +15,9 @@ def get_ondeck_list(self, page=1, limit=None, sort_by=None, sort_how=None, trakt
 
 
 def get_towatch_list(self, trakt_type, page=1, limit=None):
-    from jurialmunkey.window import get_property
     from tmdbhelper.lib.api.trakt.items import TraktItems
     from tmdbhelper.lib.items.pages import PaginatedItems
     limit = limit or self.sync_item_limit
-    get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
     items_ip = self.get_inprogress_shows() if trakt_type == 'show' else self.get_inprogress_items('movie')
     items_wl = self.get_sync('watchlist', trakt_type)
     response = TraktItems(items_ip + items_wl, trakt_type=trakt_type).build_items(sort_by='activity', sort_how='desc')
@@ -30,19 +26,15 @@ def get_towatch_list(self, trakt_type, page=1, limit=None):
 
 
 def get_inprogress_items(self, sync_type, lowest=5, highest=95):
-    from jurialmunkey.window import get_property
     from jurialmunkey.parser import try_int
-    get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
     response = self.get_sync('playback', sync_type)
     return [i for i in response if lowest <= try_int(i.get('progress', 0)) <= highest]
 
 
 def get_inprogress_shows_list(self, page=1, limit=None, params=None, next_page=True, sort_by=None, sort_how=None):
-    from jurialmunkey.window import get_property
     from tmdbhelper.lib.api.trakt.items import TraktItems
     from tmdbhelper.lib.items.pages import PaginatedItems
     limit = limit or self.sync_item_limit
-    get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
     response = self.get_upnext_episodes_listitems(sort_by='released') if sort_by == 'year' else self.get_inprogress_shows()
     response = TraktItems(response, trakt_type='show').build_items(
         params_def=params, sort_by=sort_by if sort_by != 'year' else 'unsorted', sort_how=sort_how)
@@ -212,11 +204,9 @@ def get_upnext_list(self, unique_id, id_type=None, page=1, limit=None):
 
 def get_upnext_episodes_list(self, page=1, sort_by=None, sort_how='desc', limit=None):
     """ Gets a list of episodes for in-progress shows that user should watch next """
-    from jurialmunkey.window import get_property
     from tmdbhelper.lib.api.trakt.items import TraktItems
     from tmdbhelper.lib.items.pages import PaginatedItems
     limit = limit or self.sync_item_limit
-    get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
     response = self.get_upnext_episodes_listitems(sort_by=sort_by, sort_how=sort_how)
     response = TraktItems(response, trakt_type='episode').configure_items()
     response = PaginatedItems(response['items'], page=page, limit=limit)

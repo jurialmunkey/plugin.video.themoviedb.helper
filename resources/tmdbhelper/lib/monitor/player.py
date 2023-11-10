@@ -22,12 +22,12 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
     def onPlayBackEnded(self):
         self.set_watched()
         self.reset_properties()
-        self.check_trakt_stats()
+        self.set_trakt_properties()
 
     def onPlayBackStopped(self):
         self.set_watched()
         self.reset_properties()
-        self.check_trakt_stats()
+        self.set_trakt_properties()
 
     def reset_properties(self):
         self.clear_properties()
@@ -48,10 +48,12 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.previous_item = None
         self.current_item = None
 
-    def check_trakt_stats(self):
+    def set_trakt_properties(self):
         if not boolean(get_property('TraktIsAuth')):
             return
         from tmdbhelper.lib.script.method.trakt import get_stats
+        from tmdbhelper.lib.api.trakt.methods.activities import del_lastactivities_expiry
+        del_lastactivities_expiry()
         get_stats()
 
     def get_playingitem(self):
