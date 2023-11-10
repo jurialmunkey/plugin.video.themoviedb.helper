@@ -145,9 +145,11 @@ class ItemBuilder(_ArtworkSelector):
     def get_tmdb_item(
             self, tmdb_type, tmdb_id, season=None, episode=None, base_item=None, manual_art=None,
             base_is_season=False, cache_refresh=False):
-        with TimerList(self.timer_lists, 'item_tmdb', log_threshold=0.05, logging=self.log_timers):
+        with TimerList(self.timer_lists, 'item_tmdb', log_threshold=0.05, logging=self.log_timers) as tl:
             details = self.tmdb_api.get_details_request(tmdb_type, tmdb_id, season, episode, cache_refresh=cache_refresh)
             if not details:
+                if self.log_timers and tl.total_time > tl.log_threshold:  # TMDb API missing item so log fail time
+                    kodi_log(f'item_tmdb -- get_details_request({tmdb_type},{tmdb_id},{season},{episode}) FAILED after {tl.total_time:.3f} sec', 1)
                 return
             if season is not None:
                 tmdb_type = 'season' if episode is None else 'episode'
