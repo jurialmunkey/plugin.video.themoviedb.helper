@@ -28,5 +28,5 @@ def get_container(info):
             continue
 
     if info and info[:4] != 'dir_':
-        raise
+        raise Exception(f'info={info} is not valid route')
     return importmodule(module_name='tmdbhelper.lib.items.basedir', import_attr='ListBaseDir')
