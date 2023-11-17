@@ -10,7 +10,7 @@ def get_genres(self):
         genres += self.get_request_lc('genre', 'movie', 'list')['genres']
     except (KeyError, TypeError):
         return genres
-    return {i['name']: i['id'] for i in genres}
+    return {i['name']: i['id'] for i in genres if i} if genres else {}
 
 
 def get_tmdb_multisearch_validfy(query=None, validfy=True, scrub=True):
