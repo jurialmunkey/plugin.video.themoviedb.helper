@@ -12,7 +12,7 @@ from tmdbhelper.lib.items.context import ContextMenu
 """
 
 
-_is_skinshortcuts = get_condvisibility("Window.IsVisible(script-skinshortcuts.xml)")
+_is_skinshortcuts = get_condvisibility("Window.IsVisible(script-skinshortcuts.xml)") or get_property('IsSkinShortcut')
 _is_skinshortcuts_standard = _is_skinshortcuts and get_property('IsStandardSkinShortcut')
 _int_default_select = get_setting('default_select', 'int')
 _is_only_resolve_strm = get_setting('only_resolve_strm')
