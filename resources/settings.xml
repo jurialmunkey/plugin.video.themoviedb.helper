@@ -881,8 +881,12 @@
                     <default>True</default>
                     <control type="toggle"/>
                 </setting>
-
                 <setting id="trakt_localhack" type="boolean" label="32346" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="force_recache_kodidb" type="boolean" label="32508" help="">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>

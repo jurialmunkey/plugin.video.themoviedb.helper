@@ -96,6 +96,9 @@ class Players(object):
             self.players = get_players_from_file()
 
             _p_dialog.update(f'{get_localized(32375)}...')
+            if get_setting('force_recache_kodidb'):
+                from tmdbhelper.lib.script.method.maintenance import recache_kodidb
+                recache_kodidb(notification=False)
             self._thread_ext_ids = Thread(target=self._get_external_ids, args=[tmdb_type, tmdb_id, season, episode])
             self._thread_ext_ids.start()  # We thread this lookup and rejoin later as Trakt is slow
             self.details = get_item_details(tmdb_type, tmdb_id, season, episode)
