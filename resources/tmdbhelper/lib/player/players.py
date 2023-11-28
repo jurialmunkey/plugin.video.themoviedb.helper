@@ -108,6 +108,7 @@ class PlayerHacks():
             Player().play(action, listitem)
             return
         kodi_log([f'lib.player - playing path with PlayMedia():\n', listitem.getPath()], 1)
+        action = f'"{action}"' if ',' in action else action
         executebuiltin(f'PlayMedia({action},playlist_type_hint=1)')
 
     @staticmethod
