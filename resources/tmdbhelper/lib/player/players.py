@@ -101,6 +101,30 @@ class PlayerHacks():
         from tmdbhelper.lib.script.method.maintenance import recache_kodidb
         recache_kodidb(notification=False)
 
+    @staticmethod
+    def playmedia_rerouteplay_hack(action, listitem):
+        if get_setting('force_xbmcplayer'):
+            kodi_log([f'lib.player - playing path with xbmc.Player():\n', listitem.getPath()], 1)
+            Player().play(action, listitem)
+            return
+        kodi_log([f'lib.player - playing path with PlayMedia():\n', listitem.getPath()], 1)
+        executebuiltin(f'PlayMedia({action},playlist_type_hint=1)')
+
+    @staticmethod
+    def playmedia_resendtrakt_hack(listitem):
+        """
+        Re-send local files to player due to "bug" (or maybe "feature") of setResolvedUrl
+        Because setResolvedURL doesn't set id/type (sets None, "unknown" instead) to player for plugins
+        If id/type not set to Player.GetItem things like Trakt don't work correctly.
+        Looking for better solution than this hack.
+        """
+        if not get_setting('trakt_localhack'):
+            return
+        if not listitem.getProperty('is_local') == 'true':
+            return
+        kodi_log(['lib.player - trakt_localhack enabled'], 1)
+        PlayerHacks.playmedia_rerouteplay_hack(listitem.getPath(), listitem)
+
 
 class PlayerMethods():
     def string_format_map(self, fmt):
@@ -440,9 +464,6 @@ class Players(PlayerProperties, PlayerDetails, PlayerMethods, PlayerHacks):
 
         self.dummy_duration = try_float(get_setting('dummy_duration', 'str')) or 1.0
         self.dummy_delay = try_float(get_setting('dummy_delay', 'str')) or 1.0
-        self.dummy_waitresolve = get_setting('dummy_waitresolve')
-        self.force_xbmcplayer = get_setting('force_xbmcplayer')
-        self.combined_players = get_setting('combined_players')
 
         self.is_strm = islocal
         self.current_player = {}
@@ -764,7 +785,7 @@ class Players(PlayerProperties, PlayerDetails, PlayerMethods, PlayerHacks):
             header = self.item.get('name') or get_localized(32042)
             if self.item.get('episode') and self.item.get('title'):
                 header = f'{header} - {self.item["title"]}'
-            player = self.select_player(header=header, combined=self.combined_players)
+            player = self.select_player(header=header, combined=get_setting('combined_players'))
             if not player:
                 return
 
@@ -851,6 +872,43 @@ class Players(PlayerProperties, PlayerDetails, PlayerMethods, PlayerHacks):
                 nolabel=f'{get_localized(106)} (PlayMedia)'):
             return path
 
+    def update_playerstring(self):
+        if not self.playerstring:
+            return get_property('PlayerInfoString', clear_property=True)
+        get_property('PlayerInfoString', set_property=self.playerstring)
+
+    def playqueue_next_episodes(self):
+        make_playlist = self.current_player.get('make_playlist')
+        if not make_playlist:
+            return
+        if make_playlist.lower() == 'upnext':
+            self.queue_next_episodes(route='make_upnext')
+            return
+        if make_playlist.lower() == 'true':
+            self.queue_next_episodes(route='make_playlist')
+            return
+
+    def playbrowse_folder(self, handle, action):
+        if self.is_strm or not get_setting('only_resolve_strm'):
+            self.resolve_to_dummy_hack(handle, self.dummy_duration, self.dummy_delay)
+        kodi_log(['lib.player - executing action:\n', action], 1)
+        executebuiltin(action)
+
+    @staticmethod
+    def playmedia_resolve(handle, listitem):
+        from xbmcplugin import setResolvedUrl
+        kodi_log(['lib.player - resolving path to url\n', listitem.getPath()], 1)
+        setResolvedUrl(handle, True, listitem)
+
+    def playmedia(self, handle, action, listitem):
+        if not action:  # Resolvable file so resolve
+            self.playmedia_resolve(handle, listitem)
+            self.playmedia_resendtrakt_hack(listitem)
+            return
+        if self.is_strm or not get_setting('only_resolve_strm'):  # If we're calling external or using a .strm then we need to resolve to dummy
+            self.resolve_to_dummy_hack(handle, self.dummy_duration if get_setting('dummy_waitresolve') else 0, self.dummy_delay)
+        self.playmedia_rerouteplay_hack(action, listitem)
+
     def play(self, folder_path=None, reset_focus=None, handle=None):
         # Get some info about current container for container update hack
         if not folder_path:
@@ -882,46 +940,14 @@ class Players(PlayerProperties, PlayerDetails, PlayerMethods, PlayerHacks):
 
         # If a folder we need to resolve to dummy and then open folder
         if listitem.getProperty('is_folder') == 'true':
-            if self.is_strm or not get_setting('only_resolve_strm'):
-                self.resolve_to_dummy_hack(handle, self.dummy_duration, self.dummy_delay)
-            executebuiltin(action)
-            kodi_log(['lib.player - finished executing action\n', action], 1)
+            self.playbrowse_folder(handle, action)
             return
 
         # Set our playerstring for player monitor to update kodi watched status
-        if self.playerstring:
-            get_property('PlayerInfoString', set_property=self.playerstring)
-        else:
-            get_property('PlayerInfoString', clear_property=True)
+        self.update_playerstring()
 
-        # If PlayMedia method chosen re-route to Player() unless expert settings on
-        if action:
-            if self.is_strm or not get_setting('only_resolve_strm'):
-                self.resolve_to_dummy_hack(handle, self.dummy_duration if self.dummy_waitresolve else 0, self.dummy_delay)  # If we're calling external we need to resolve to dummy
-            Player().play(action, listitem) if self.force_xbmcplayer else executebuiltin(f'PlayMedia({action},playlist_type_hint=1)')
-            kodi_log([
-                f'lib.player - playing path with {"Player()" if self.force_xbmcplayer else "PlayMedia"}\n',
-                listitem.getPath()], 1)
-
-        else:
-            # Otherwise we have a url we can resolve to
-            from xbmcplugin import setResolvedUrl
-            setResolvedUrl(handle, True, listitem)
-            kodi_log(['lib.player - finished resolving path to url\n', listitem.getPath()], 1)
-
-            # Re-send local files to player due to "bug" (or maybe "feature") of setResolvedUrl
-            # Because setResolvedURL doesn't set id/type (sets None, "unknown" instead) to player for plugins
-            # If id/type not set to Player.GetItem things like Trakt don't work correctly.
-            # Looking for better solution than this hack.
-            if get_setting('trakt_localhack') and listitem.getProperty('is_local') == 'true':
-                Player().play(listitem.getPath(), listitem) if self.force_xbmcplayer else executebuiltin(f'PlayMedia({listitem.getPath()},playlist_type_hint=1)')
-                kodi_log([
-                    f'Finished executing {"Player()" if self.force_xbmcplayer else "PlayMedia"}\n',
-                    listitem.getPath()], 1)
+        # We resolve to our file
+        self.playmedia(handle, action, listitem)
 
         # Queue up next episodes if player supports it
-        if self.current_player.get('make_playlist'):
-            if self.current_player['make_playlist'].lower() == 'upnext':
-                self.queue_next_episodes(route='make_upnext')
-            elif self.current_player['make_playlist'].lower() == 'true':
-                self.queue_next_episodes(route='make_playlist')
+        self.playqueue_next_episodes()
