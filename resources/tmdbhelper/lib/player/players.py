@@ -7,12 +7,8 @@ from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, format_folderpath
 from jurialmunkey.parser import try_int, try_float, boolean
 from tmdbhelper.lib.addon.consts import PLAYERS_PRIORITY, PLAYERS_CHOSEN_DEFAULTS_FILENAME
 from tmdbhelper.lib.items.listitem import ListItem
-from tmdbhelper.lib.files.futils import read_file, normalise_filesize
 from tmdbhelper.lib.api.kodi.rpc import get_directory, KodiLibrary
-from tmdbhelper.lib.player.details import get_next_episodes
 from tmdbhelper.lib.player.inputter import KeyboardInputter
-from tmdbhelper.lib.player.putils import get_players_from_file, make_playlist, make_upnext
-from tmdbhelper.lib.files.futils import get_json_filecache
 from tmdbhelper.lib.addon.logger import kodi_log
 from threading import Thread
 
@@ -110,36 +106,61 @@ class PlayerMethods():
     def string_format_map(self, fmt):
         return fmt.format_map(self.item)  # NOTE: .format(**d) works in Py3.5 but not Py3.7+ so use format_map(d) instead
 
-    def get_external_ids(self):
-        from tmdbhelper.lib.player.details import get_external_ids
-        self._external_ids = get_external_ids(self.tmdb_type, self.tmdb_id, season=self.season, episode=self.episode)
-        return self._external_ids
-
-    def get_item_details(self, language=None):
-        from tmdbhelper.lib.player.details import get_item_details
-        self._details = get_item_details(self.tmdb_type, self.tmdb_id, season=self.season, episode=self.episode, language=language)
-        return self._details
-
-    def set_detailed_item(self):
-        from tmdbhelper.lib.player.details import set_detailed_item
-        self._item = set_detailed_item(self.tmdb_type, self.tmdb_id, season=self.season, episode=self.episode, details=self.details) or {}
-        return self._item
-
-    def get_language_details(self, language=None, year=None):
-        from tmdbhelper.lib.player.details import get_language_details
-        self._item = get_language_details(self.item, self.tmdb_type, self.tmdb_id, self.season, self.episode, language=language, year=year)
-        return self._item
-
     def set_external_ids(self, required=True):
         if required and self.details:
             self.thread_external_ids.join()
             self.details.set_details(details=self.external_ids, reverse=True)
         return self.set_detailed_item()
 
-    def get_playerstring(self):
-        from tmdbhelper.lib.player.details import get_playerstring
-        self._playerstring = get_playerstring(self.tmdb_type, self.tmdb_id, self.season, self.episode, details=self.details)
-        return self._playerstring
+    def get_local_item(self):
+        if not get_setting('default_player_kodi', 'int'):
+            return []
+        file = self.get_local_movie() if self.tmdb_type == 'movie' else self.get_local_episode()
+        if not file:
+            return []
+        return [{
+            'name': f'{get_localized(32061)} Kodi',
+            'is_folder': False,
+            'is_local': True,
+            'is_resolvable': "true",
+            'make_playlist': "true",
+            'plugin_name': 'xbmc.core',
+            'plugin_icon': f'{ADDONPATH}/resources/icons/other/kodi.png',
+            'actions': file}]
+
+    def get_local_movie(self):
+        k_db = KodiLibrary(dbtype='movie')
+        dbid = k_db.get_info(
+            'dbid', fuzzy_match=False,
+            tmdb_id=self.item.get('tmdb'),
+            imdb_id=self.item.get('imdb'))
+        if not dbid:
+            return
+        if self.details:  # Add dbid to details to update our local progress.
+            self.details.infolabels['dbid'] = dbid
+        return self.get_local_file(k_db.get_info('file', fuzzy_match=False, dbid=dbid))
+
+    def get_local_episode(self):
+        self.set_external_ids(required=True)  # Note: Don't forget about libraries that need TVDB ids from Trakt!!! Need to join ID lookup thread here!!!
+        dbid = KodiLibrary(dbtype='tvshow').get_info(
+            'dbid', fuzzy_match=False,
+            tmdb_id=self.item.get('tmdb'),
+            tvdb_id=self.item.get('tvdb'),
+            imdb_id=self.item.get('imdb'))
+        return self.get_local_file(KodiLibrary(dbtype='episode', tvshowid=dbid).get_info(
+            'file', season=self.item.get('season'), episode=self.item.get('episode')))
+
+    @staticmethod
+    def get_local_file(file):
+        if not file:
+            return
+        if file.endswith('.strm'):
+            from tmdbhelper.lib.files.futils import read_file
+            contents = read_file(file)
+            if contents.startswith('plugin://plugin.video.themoviedb.helper'):
+                return
+            return contents
+        return file
 
     def get_providers(self):
         try:
@@ -171,6 +192,7 @@ class PlayerMethods():
         """
         Check if chosen item has a specific default player and return it as 'filename mode'
         """
+        from tmdbhelper.lib.files.futils import get_json_filecache
         cd = get_json_filecache(PLAYERS_CHOSEN_DEFAULTS_FILENAME)
         if not cd:
             self._chosen_default = None
@@ -190,7 +212,19 @@ class PlayerMethods():
 
     def get_dialog_players(self):
 
-        dialog_play = self._get_local_item(self.tmdb_type)
+        def _check_assert(keys=tuple()):
+            if not self.item:
+                return True  # No item so no need to assert values as we're only building to choose default player
+            for i in keys:
+                if i.startswith('!'):  # Inverted assert check for NOT value
+                    if self.item.get(i[1:]) and self.item.get(i[1:]) != 'None':
+                        return False  # Key has a value so player fails assert check
+                else:  # Standard assert check for value
+                    if not self.item.get(i) or self.item.get(i) == 'None':
+                        return False  # Key didn't have a value so player fails assert check
+            return True  # Player passed the assert check
+
+        dialog_play = self.get_local_item()
         dialog_search = []
 
         for file, player in self.players_prioritised:
@@ -199,20 +233,86 @@ class PlayerMethods():
                 continue  # Skip disabled players
 
             if self.tmdb_type == 'movie':
-                if player.get('play_movie') and self._check_assert(player.get('assert', {}).get('play_movie', [])):
-                    dialog_play.append(self._get_built_player(player_id=file, mode='play_movie', player=player))
-                if player.get('search_movie') and self._check_assert(player.get('assert', {}).get('search_movie', [])):
-                    dialog_search.append(self._get_built_player(player_id=file, mode='search_movie', player=player))
+                if player.get('play_movie') and _check_assert(player.get('assert', {}).get('play_movie', [])):
+                    dialog_play.append(self.get_built_player(player_id=file, mode='play_movie', player=player))
+                if player.get('search_movie') and _check_assert(player.get('assert', {}).get('search_movie', [])):
+                    dialog_search.append(self.get_built_player(player_id=file, mode='search_movie', player=player))
                 continue
 
             if self.tmdb_type == 'tv':
-                if player.get('play_episode') and self._check_assert(player.get('assert', {}).get('play_episode', [])):
-                    dialog_play.append(self._get_built_player(player_id=file, mode='play_episode', player=player))
-                if player.get('search_episode') and self._check_assert(player.get('assert', {}).get('search_episode', [])):
-                    dialog_search.append(self._get_built_player(player_id=file, mode='search_episode', player=player))
+                if player.get('play_episode') and _check_assert(player.get('assert', {}).get('play_episode', [])):
+                    dialog_play.append(self.get_built_player(player_id=file, mode='play_episode', player=player))
+                if player.get('search_episode') and _check_assert(player.get('assert', {}).get('search_episode', [])):
+                    dialog_search.append(self.get_built_player(player_id=file, mode='search_episode', player=player))
                 continue
 
         return dialog_play + dialog_search
+
+    def get_built_player(self, player_id, mode, player=None):
+        player = player or self.players.get(player_id)
+        if player:
+            file = player_id
+        else:
+            for file, player in self.players_prioritised:
+                if mode not in player:
+                    continue
+                if player_id in (player.get('plugin'), player.get('provider'), player.get('name')):
+                    break
+            else:
+                file = player_id
+                player = {}
+        if mode in ['play_movie', 'play_episode']:
+            name = get_localized(32061)
+            is_folder = False
+        else:
+            name = get_localized(137)
+            is_folder = True
+        return {
+            'file': file, 'mode': mode,
+            'is_folder': is_folder,
+            'is_provider': player.get('is_provider') if not is_folder else False,
+            'is_resolvable': player.get('is_resolvable'),
+            'requires_ids': player.get('requires_ids', False),
+            'make_playlist': player.get('make_playlist'),
+            'api_language': player.get('api_language'),
+            'language': player.get('language'),
+            'name': f'{name} {player.get("name")}',
+            'plugin_name': player.get('plugin'),
+            'plugin_icon': player.get('icon', '').format(ADDONPATH) or KodiAddon(player.get('plugin', '')).getAddonInfo('icon'),
+            'fallback': player.get('fallback', {}).get(mode),
+            'actions': player.get(mode)}
+
+
+class PlayerDetails():
+    def get_external_ids(self):
+        from tmdbhelper.lib.player.details import get_external_ids
+        self._external_ids = get_external_ids(self.tmdb_type, self.tmdb_id, season=self.season, episode=self.episode)
+        return self._external_ids
+
+    def get_item_details(self, language=None):
+        from tmdbhelper.lib.player.details import get_item_details
+        self._details = get_item_details(self.tmdb_type, self.tmdb_id, season=self.season, episode=self.episode, language=language)
+        return self._details
+
+    def set_detailed_item(self):
+        from tmdbhelper.lib.player.details import set_detailed_item
+        self._item = set_detailed_item(self.tmdb_type, self.tmdb_id, season=self.season, episode=self.episode, details=self.details) or {}
+        return self._item
+
+    def get_language_details(self, language=None, year=None):
+        from tmdbhelper.lib.player.details import get_language_details
+        self._item = get_language_details(self.item, self.tmdb_type, self.tmdb_id, self.season, self.episode, language=language, year=year)
+        return self._item
+
+    def get_next_episodes(self):
+        from tmdbhelper.lib.player.details import get_next_episodes
+        self._next_episodes = get_next_episodes(self.tmdb_id, self.season, self.episode, self.current_player['file'])
+        return self._next_episodes
+
+    def get_playerstring(self):
+        from tmdbhelper.lib.player.details import get_playerstring
+        self._playerstring = get_playerstring(self.tmdb_type, self.tmdb_id, self.season, self.episode, details=self.details)
+        return self._playerstring
 
 
 class PlayerProperties():
@@ -221,6 +321,7 @@ class PlayerProperties():
         try:
             return self._players
         except AttributeError:
+            from tmdbhelper.lib.player.putils import get_players_from_file
             self._players = get_players_from_file()
             return self._players
 
@@ -266,6 +367,14 @@ class PlayerProperties():
             return self._playerstring
 
     @property
+    def next_episodes(self):
+        try:
+            return self._next_episodes
+        except AttributeError:
+            self._next_episodes = self.get_next_episodes()
+            return self._next_episodes
+
+    @property
     def dialog_players(self):
         try:
             return self._dialog_players
@@ -308,7 +417,7 @@ class PlayerProperties():
             return self._p_dialog
 
 
-class Players(PlayerProperties, PlayerMethods, PlayerHacks):
+class Players(PlayerProperties, PlayerDetails, PlayerMethods, PlayerHacks):
 
     TMDB_TYPE_CONVERSION = {'season': 'tv', 'episode': 'tv'}
 
@@ -339,101 +448,6 @@ class Players(PlayerProperties, PlayerMethods, PlayerHacks):
         self.current_player = {}
 
         self.p_dialog.close()
-
-    def _check_assert(self, keys=[]):
-        if not self.item:
-            return True  # No item so no need to assert values as we're only building to choose default player
-        for i in keys:
-            if i.startswith('!'):  # Inverted assert check for NOT value
-                if self.item.get(i[1:]) and self.item.get(i[1:]) != 'None':
-                    return False  # Key has a value so player fails assert check
-            else:  # Standard assert check for value
-                if not self.item.get(i) or self.item.get(i) == 'None':
-                    return False  # Key didn't have a value so player fails assert check
-        return True  # Player passed the assert check
-
-    def _get_built_player(self, player_id, mode, player=None):
-        player = player or self.players.get(player_id)
-        if player:
-            file = player_id
-        else:
-            for file, player in self.players_prioritised:
-                if mode not in player:
-                    continue
-                if player_id in (player.get('plugin'), player.get('provider'), player.get('name')):
-                    break
-            else:
-                file = player_id
-                player = {}
-        if mode in ['play_movie', 'play_episode']:
-            name = get_localized(32061)
-            is_folder = False
-        else:
-            name = get_localized(137)
-            is_folder = True
-        return {
-            'file': file, 'mode': mode,
-            'is_folder': is_folder,
-            'is_provider': player.get('is_provider') if not is_folder else False,
-            'is_resolvable': player.get('is_resolvable'),
-            'requires_ids': player.get('requires_ids', False),
-            'make_playlist': player.get('make_playlist'),
-            'api_language': player.get('api_language'),
-            'language': player.get('language'),
-            'name': f'{name} {player.get("name")}',
-            'plugin_name': player.get('plugin'),
-            'plugin_icon': player.get('icon', '').format(ADDONPATH) or KodiAddon(player.get('plugin', '')).getAddonInfo('icon'),
-            'fallback': player.get('fallback', {}).get(mode),
-            'actions': player.get(mode)}
-
-    def _get_local_item(self, tmdb_type):
-        if not get_setting('default_player_kodi', 'int'):
-            return []
-        file = self._get_local_movie() if tmdb_type == 'movie' else self._get_local_episode()
-        if not file:
-            return []
-        return [{
-            'name': f'{get_localized(32061)} Kodi',
-            'is_folder': False,
-            'is_local': True,
-            'is_resolvable': "true",
-            'make_playlist': "true",
-            'plugin_name': 'xbmc.core',
-            'plugin_icon': f'{ADDONPATH}/resources/icons/other/kodi.png',
-            'actions': file}]
-
-    def _get_local_file(self, file):
-        if not file:
-            return
-        if file.endswith('.strm'):
-            contents = read_file(file)
-            if contents.startswith('plugin://plugin.video.themoviedb.helper'):
-                return
-            return contents
-        return file
-
-    def _get_local_movie(self):
-        k_db = KodiLibrary(dbtype='movie')
-        dbid = k_db.get_info(
-            'dbid', fuzzy_match=False,
-            tmdb_id=self.item.get('tmdb'),
-            imdb_id=self.item.get('imdb'))
-        if not dbid:
-            return
-        if self.details:  # Add dbid to details to update our local progress.
-            self.details.infolabels['dbid'] = dbid
-        return self._get_local_file(k_db.get_info('file', fuzzy_match=False, dbid=dbid))
-
-    def _get_local_episode(self):
-        # Note: Don't forget about libraries that need TVDB ids from Trakt!!! Need to join ID lookup thread here!!!
-        self.set_external_ids(required=True)
-        dbid = KodiLibrary(dbtype='tvshow').get_info(
-            'dbid', fuzzy_match=False,
-            tmdb_id=self.item.get('tmdb'),
-            tvdb_id=self.item.get('tvdb'),
-            imdb_id=self.item.get('imdb'))
-        return self._get_local_file(KodiLibrary(dbtype='episode', tvshowid=dbid).get_info(
-            'file', season=self.item.get('season'), episode=self.item.get('episode')))
 
     def select_player(self, detailed=True, clear_player=False, header=get_localized(32042), combined=False):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
@@ -500,7 +514,7 @@ class Players(PlayerProperties, PlayerMethods, PlayerHacks):
         player_id, mode = fallback.split()
         if not player_id or not mode:
             return
-        player = self._get_built_player(player_id, mode)
+        player = self.get_built_player(player_id, mode)
         if not player:
             return
 
@@ -557,6 +571,7 @@ class Players(PlayerProperties, PlayerMethods, PlayerHacks):
         return _matches
 
     def _player_dialog_select(self, folder, auto=False):
+        from tmdbhelper.lib.files.futils import normalise_filesize
         d_items = []
         for f in folder:
 
@@ -808,16 +823,17 @@ class Players(PlayerProperties, PlayerMethods, PlayerHacks):
             return
         if self.season is None or self.episode is None:
             return
-        episode_queue = get_next_episodes(self.tmdb_id, self.season, self.episode, self.current_player['file'])
-        if not episode_queue or len(episode_queue) < 2:
+        if not self.next_episodes or len(self.next_episodes) < 2:
             return
 
         self.wait_for_player_hack(to_start=True, timeout=30)
 
         if route == 'make_upnext':
-            return make_upnext(episode_queue[0], episode_queue[1])
+            from tmdbhelper.lib.player.putils import make_upnext
+            return make_upnext(self.next_episodes[0], self.next_episodes[1])
         if route == 'make_playlist':
-            return make_playlist(episode_queue)
+            from tmdbhelper.lib.player.putils import make_playlist
+            return make_playlist(self.next_episodes)
 
     def configure_action(self, listitem, handle=None):
         path = listitem.getPath()
