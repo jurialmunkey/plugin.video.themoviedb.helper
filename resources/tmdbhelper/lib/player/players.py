@@ -406,6 +406,7 @@ class PlayerProperties():
         except AttributeError:
             self.p_dialog.update(f'{get_localized(32376)}...')
             self._dialog_players = self.get_dialog_players()
+            self.p_dialog.close()
             return self._dialog_players
 
     @property
@@ -448,6 +449,10 @@ class Players(PlayerProperties, PlayerDetails, PlayerMethods, PlayerHacks):
 
     def __init__(self, tmdb_type, tmdb_id=None, season=None, episode=None, ignore_default='', islocal=False, player=None, mode=None, **kwargs):
 
+        # Kodi launches busy dialog on home screen that needs to be told to close
+        # Otherwise the busy dialog will prevent window activation for folder path
+        executebuiltin('Dialog.Close(busydialog)')
+
         self.action_log = []
         self.api_language = None
         self.tmdb_type = self.TMDB_TYPE_CONVERSION.get(tmdb_type, tmdb_type)
@@ -468,8 +473,6 @@ class Players(PlayerProperties, PlayerDetails, PlayerMethods, PlayerHacks):
 
         self.is_strm = islocal
         self.current_player = {}
-
-        self.p_dialog.close()
 
     def select_player(self, detailed=True, clear_player=False, header=get_localized(32042), combined=False):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
@@ -934,10 +937,6 @@ class Players(PlayerProperties, PlayerDetails, PlayerMethods, PlayerHacks):
             return
 
         action = self.configure_action(listitem, handle)
-
-        # Kodi launches busy dialog on home screen that needs to be told to close
-        # Otherwise the busy dialog will prevent window activation for folder path
-        executebuiltin('Dialog.Close(busydialog)')
 
         # If a folder we need to resolve to dummy and then open folder
         if listitem.getProperty('is_folder') == 'true':
