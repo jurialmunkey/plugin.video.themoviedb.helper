@@ -325,7 +325,7 @@ class ListCustomSearch(Container):
             if not kwargs['query']:
                 return
             self.container_update = f'{encode_url(PLUGINPATH, **kwargs)},replace'
-        items = self.trakt_api.get_list_of_lists(path=f'search/list?query={query}&fields=name', sort_likes=True)
+        items = self.trakt_api.get_list_of_lists(path=f'search/list?query={query}&fields=name', sort_likes=True, authorize=False)
         self.library = 'video'
         return items
 
