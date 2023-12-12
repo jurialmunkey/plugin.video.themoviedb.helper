@@ -51,8 +51,6 @@ class _ArtworkSelector():
         if not item:
             return
         ftv_id, ftv_type = self.get_ftv_typeid(tmdb_type, item, season=season)
-        if not ftv_id or not ftv_type:
-            return
         item_artwork = self.get_item_artwork(item['artwork'], is_season=season is not None)
         artwork_type = self.select_type(ftv_type if season is None else 'season', blacklist, item_artwork=item_artwork)
         if not artwork_type:
@@ -62,10 +60,10 @@ class _ArtworkSelector():
             return
 
         # Get artwork of type and build list
-        items = self.get_ftv_art(ftv_type, ftv_id, artwork_type, season=season)
+        items = self.get_ftv_art(ftv_type, ftv_id, artwork_type, season=season) if ftv_type and ftv_id else []
         items += self.get_tmdb_art(tmdb_type, tmdb_id, artwork_type, season=season)
         if season is not None:  # Also get base artwork at end of list
-            items += self.get_ftv_art(ftv_type, ftv_id, artwork_type)
+            items += self.get_ftv_art(ftv_type, ftv_id, artwork_type) if ftv_type and ftv_id else []
             items += self.get_tmdb_art(tmdb_type, tmdb_id, artwork_type)
 
         # Nothing found so notify user
