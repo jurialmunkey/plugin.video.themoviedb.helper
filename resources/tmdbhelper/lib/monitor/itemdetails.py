@@ -12,7 +12,7 @@ BASEITEM_PROPERTIES = [
     ('base_label', ('label',), None),
     ('base_title', ('title',), None),
     ('base_icon', ('icon',), None),
-    ('base_plot', ('plot', 'Property(artist_description)', 'Property(artist_description)', 'addondescription'), None),
+    ('base_plot', ('plot', 'Property(artist_description)', 'Property(album_description)', 'addondescription'), None),
     ('base_tagline', ('tagline',), None),
     ('base_dbtype', ('dbtype',), None),
     ('base_rating', ('userrating', 'rating',), None),
