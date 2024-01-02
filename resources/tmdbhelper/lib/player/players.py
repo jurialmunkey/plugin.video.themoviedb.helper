@@ -230,7 +230,7 @@ class PlayerMethods():
             cd = cd.get('season', {}).get(f'{self.season}') or cd
             cd = cd.get('episode', {}).get(f'{self.episode}') or cd
             self._chosen_default = f"{cd['file']} {cd['mode']}"
-            return self._self._chosen_default
+            return self._chosen_default
         except KeyError:
             self._chosen_default = None
             return self._chosen_default
