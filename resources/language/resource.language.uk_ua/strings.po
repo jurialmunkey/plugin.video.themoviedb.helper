@@ -189,7 +189,7 @@ msgstr "Використовувати вбудовані плеєри"
 #: /resources/settings.xml
 msgctxt "#32038"
 msgid "Get additional details from the local Kodi library database"
-msgstr "Додаткові подробиці з локальної бази даних каталогу Kodi"
+msgstr "Отримувати додаткові відомості з локальної бази даних каталогу Kodi"
 
 #: /resources/settings.xml
 msgctxt "#32039"
@@ -229,27 +229,27 @@ msgstr "Оновити кеш"
 #: /resources/lib/container.py
 msgctxt "#32046"
 msgid "Cached details were refreshed"
-msgstr "Кеш подробиць оновлено"
+msgstr "Кеш відомостей оновлено"
 
 #: /resources/lib/container.py
 msgctxt "#32047"
 msgid "Remove from Trakt Collection"
-msgstr "Видалити з колекції (Trakt)"
+msgstr "Видалити з колекції Trakt"
 
 #: /resources/lib/container.py
 msgctxt "#32048"
 msgid "Add to Trakt Collection"
-msgstr "Додати до колекції (Trakt)"
+msgstr "Додати до колекції Trakt"
 
 #: /resources/lib/container.py
 msgctxt "#32049"
 msgid "Remove from Trakt Watchlist"
-msgstr "Видалити з списку спостереження Trakt"
+msgstr "Видалити із закладок Trakt"
 
 #: /resources/lib/container.py
 msgctxt "#32050"
 msgid "Add to Trakt Watchlist"
-msgstr "Додати до списку спостереження Trakt"
+msgstr "Додати до закладок Trakt"
 
 #: /resources/lib/container.py
 msgctxt "#32051"
@@ -401,7 +401,7 @@ msgstr "Ігнорувати перевірку створення тек"
 #: /resources/lib/container/basedir.py
 msgctxt "#32078"
 msgid "Still to Watch"
-msgstr "Продовжити перегляд"
+msgstr "Перегляну пізніше"
 
 #: /resources/settings.xml
 msgctxt "#32079"
@@ -421,7 +421,7 @@ msgstr "Наступна сторінка"
 #: /resources/settings.xml
 msgctxt "#32082"
 msgid "Watchlist sort method"
-msgstr "Сортування списку спостереження"
+msgstr "Сортування закладок"
 
 #: /resources/settings.xml
 msgctxt "#32083"
@@ -730,12 +730,12 @@ msgstr "Сховати переглянуті елементи"
 #: /resources/lib/context.py
 msgctxt "#32143"
 msgid "Cached details for {} successfully refreshed!"
-msgstr "Кеш подробиць для {} успішно оновлено!"
+msgstr "Кеш відомостей для {} успішно оновлено!"
 
 #: /resources/lib/context.py
 msgctxt "#32144"
 msgid "Refresh TheMovieDb Details"
-msgstr "Оновити подробиці TheMovieDb"
+msgstr "Оновити відомості TheMovieDb"
 
 #: /addon.xml
 msgctxt "#32145"
@@ -755,7 +755,7 @@ msgstr "Оглянути сезони (TMDbHelper)"
 #: /addon.xml
 msgctxt "#32148"
 msgid "Add/Remove from Trakt Watchlist"
-msgstr "Додати/видалити зі списку спостереження Trakt"
+msgstr "Додати/видалити із закладок Trakt"
 
 #: /addon.xml
 msgctxt "#32149"
@@ -780,7 +780,7 @@ msgstr "Видалити зі списку"
 #: /addon.xml
 msgctxt "#32153"
 msgid "Refresh cached details"
-msgstr "Оновити кеш подробиць"
+msgstr "Оновити кеш відомостей"
 
 #: /resources/settings.xml
 msgctxt "#32154"
@@ -984,12 +984,12 @@ msgstr "Колекції"
 #: /resources/lib/plugin.py
 msgctxt "#32193"
 msgid "Watchlist"
-msgstr "Список спостереження"
+msgstr "Закладки"
 
 #: /resources/lib/plugin.py
 msgctxt "#32194"
 msgid "Your Recently Watched"
-msgstr "Ваші нещодавно переглянуті"
+msgstr "Нещодавно переглянуті"
 
 #: /resources/lib/plugin.py
 msgctxt "#32195"
@@ -999,7 +999,7 @@ msgstr "Ваші \"Найбільше переглядів\""
 #: /resources/lib/plugin.py
 msgctxt "#32196"
 msgid "Your In-Progress"
-msgstr "Ваші поточні"
+msgstr "Продовжити перегляд"
 
 #: /resources/lib/plugin.py
 msgctxt "#32197"
@@ -1009,7 +1009,7 @@ msgstr "Ваші наступні серії"
 #: /resources/lib/plugin.py
 msgctxt "#32198"
 msgid "Recommended For You"
-msgstr "Ваші рекомендації"
+msgstr "Рекомендації"
 
 #: /resources/lib/plugin.py
 msgctxt "#32199"
@@ -1233,7 +1233,7 @@ msgstr "Зберегти як"
 #: /resources/lib/userdiscover.py
 msgctxt "#32242"
 msgid "Premiere"
-msgstr "Прем\'єра"
+msgstr "Прем'єра"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32243"
@@ -1478,12 +1478,12 @@ msgstr "Видалити з колекції"
 #: /resources/lib/script.py
 msgctxt "#32291"
 msgid "Add to watchlist"
-msgstr "Додати до списку спостереження"
+msgstr "Додати до закладок"
 
 #: /resources/lib/script.py
 msgctxt "#32292"
 msgid "Remove from watchlist"
-msgstr "Видалити зі списку спостереження"
+msgstr "Видалити із закладок"
 
 #: /resources/lib/script.py
 msgctxt "#32293"
@@ -1726,7 +1726,7 @@ msgid ""
 msgstr ""
 "Скинути файл плеєру [B]{}[/B] до початкового стану?\n"
 "\n"
-"[B]УВАГА:[/B] Цю дію не можливо відмінити."
+"[B]УВАГА:[/B] Цю дію неможливо відмінити."
 
 #: /resources/lib/player/configure.py
 msgctxt "#32336"
@@ -1952,7 +1952,7 @@ msgstr "Будуємо плеєри"
 #: /resources/lib/player/players.py
 msgctxt "#32375"
 msgid "Retrieving Item Details"
-msgstr "Отримання подробиць"
+msgstr "Отримання відомостей"
 
 #: /resources/lib/player/players.py
 msgctxt "#32376"
@@ -2094,12 +2094,12 @@ msgstr "Відтворити файли з локального каталогу
 #: /resources/settings.xml
 msgctxt "#32401"
 msgid "TMDb detailed information"
-msgstr "Подробиці TMDb"
+msgstr "Відомості TMDb"
 
 #: /resources/settings.xml
 msgctxt "#32402"
 msgid "Get additional details and artwork from TMDb"
-msgstr "Подробиці та ілюстрації з TMDb"
+msgstr "Отримувати відомості та ілюстрації з TMDb"
 
 #: /resources/settings.xml
 msgctxt "#32403"
@@ -2119,7 +2119,7 @@ msgstr "Ваші серіали в ефірі цього тижня"
 #: /resources/lib/container/basedir.py
 msgctxt "#32406"
 msgid "Your In-Progress Episodes"
-msgstr "Ваші поточні серії"
+msgstr "Продовжити перегляд (серіали)"
 
 #: /resources/settings.xml
 msgctxt "#32407"
@@ -2144,7 +2144,7 @@ msgstr "Кількість одночасних потоків (0 = необме
 #: /resources/lib/items/basedir.py
 msgctxt "#32411"
 msgid "Providers"
-msgstr "Провайдери"
+msgstr "Платформи"
 
 #: /resources/lib/api/tmdb/discover.py
 msgctxt "#32412"
@@ -2269,7 +2269,7 @@ msgstr "Введіть QUERYKEY на місце пошукового запит�
 #: /resources/settings.xml
 msgctxt "#32436"
 msgid "Details"
-msgstr "Подробиці"
+msgstr "Відомості"
 
 #: /resources/settings.xml
 msgctxt "#32437"
@@ -2279,12 +2279,12 @@ msgstr "Налаштування списку дозволених провай�
 #: /resources/lib/script/method.py
 msgctxt "#32438"
 msgid "Provider allowlist updated"
-msgstr "Оновлено список дозволених провайдерів"
+msgstr "Оновлено список дозволених платформ"
 
 #: /resources/lib/script/method.py
 msgctxt "#32439"
 msgid "The provider allowlist has been updated. Please note that updating provider details requires the item cache to be refreshed. The item cache can be deleted in the expert settings section."
-msgstr "Оновлено список дозволених провайдерів. Зверніть увагу, оновлення провайдерів подробиць потребує оновлення кешу елементів. Кеш елементів можна видалити в секції експертних налаштувань."
+msgstr "Оновлено список дозволених провайдерів. Зверніть увагу, оновлення провайдерів відомостей потребує оновлення кешу елементів. Кеш елементів можна видалити в секції експертних налаштувань."
 
 #: /resources/lib/player/configure.py
 msgctxt "#32440"
@@ -2369,12 +2369,12 @@ msgstr "Найдовший"
 #: /resources/lib/items/basedir.py
 msgctxt "#32456"
 msgid "Watchlist (Released)"
-msgstr "Список спостереження (вийшли)"
+msgstr "Закладки (вийшли)"
 
 #: /resources/lib/addon/consts.py
 msgctxt "#32457"
 msgid "Watchlist (Anticipated)"
-msgstr "Список спостереження (очікувано)"
+msgstr "Закладки (очікується)"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32458"
@@ -2424,7 +2424,7 @@ msgstr "Відтворювати автоматично з доступними 
 #: /resources/settings.xml
 msgctxt "#32467"
 msgid "Refresh cached Kodi Library details"
-msgstr "Оновити закешовані подробиці каталогу Kodi"
+msgstr "Оновити кеш відомостей каталогу Kodi"
 
 #: /resources/settings.xml
 msgctxt "#32468"
@@ -2619,7 +2619,7 @@ msgstr "Тека іконок жанрів (TMDb)"
 #: /resources/settings.xml
 msgctxt "#32506"
 msgid "Provider icons folder (TMDb)"
-msgstr "Тека іконок провайдерів (TMDb)"
+msgstr "Тека іконок платформ (TMDb)"
 
 #: /resources/settings.xml
 msgctxt "#32507"
@@ -2629,7 +2629,7 @@ msgstr "Тека іконок жанрів (Trakt)"
 #: /resources/settings.xml
 msgctxt "#32508"
 msgid "Recache Kodi Library details when building players"
-msgstr "Оновити кеш подробиць каталогу Kodi при побудові плеєрів"
+msgstr "Оновити кеш відомостей каталогу Kodi при побудові плеєрів"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
@@ -2796,7 +2796,7 @@ msgstr "API ключ OMDb"
 #: /resources/settings.xml
 msgctxt "#32002"
 msgid "Days to cache details"
-msgstr "Тривалість кешу подробиць"
+msgstr "Тривалість кешу відомостей"
 
 #: /resources/settings.xml
 msgctxt "#32003"
@@ -2851,7 +2851,7 @@ msgstr "Для використання цієї функції необхідн
 #: /resources/settings.xml
 msgctxt "#32013"
 msgid "Display Trakt list management options in TMDb details list"
-msgstr "Відображатати опції налаштування списку Trakt в списку подробиць TMDb"
+msgstr "Відображатати опції налаштування списку Trakt в списку відомостей TMDb"
 
 #: /resources/settings.xml
 msgctxt "#32014"
