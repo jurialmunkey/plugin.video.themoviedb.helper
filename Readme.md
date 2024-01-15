@@ -17,7 +17,7 @@ Kodi File Manager Source:
 https://jurialmunkey.github.io/repository.jurialmunkey/
 
 Direct ZIP Install:
-https://jurialmunkey.github.io/repositor...ey-3.3.zip
+https://jurialmunkey.github.io/repository.jurialmunkey/repository.jurialmunkey-3.4.zip 
 
 Instructions:
 
