@@ -162,7 +162,7 @@ class ListNextRecommendation(Container):
                 item = _get_next_recommendation()
                 try:
                     item = self.tmdb_api.get_next_episode(item['infoproperties']['tmdb_id'], 1, 0)
-                except KeyError:
+                except (KeyError, TypeError):
                     return
             return item
 
