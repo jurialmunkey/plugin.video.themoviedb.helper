@@ -112,12 +112,23 @@ def _get_item_infolabels(item, item_type=None, infolabels=None, show=None):
 def _get_item_infoproperties(item, item_type=None, infoproperties=None, show=None, main=None):
     infoproperties = infoproperties or {}
     infoproperties['tmdb_type'] = convert_trakt_type(item_type)
-    for k, v in (main or []).items():
-        if v is None:
-            continue
-        if not isinstance(v, (str, int, float,)):
-            continue
-        infoproperties[f'trakt_{k}'] = f'{v}'
+
+    def _set_main_infoproperties():
+        if not main:
+            return
+        for k, v in main.items():
+            if v is None or not isinstance(v, (str, int, float,)):
+                continue
+            infoproperties[f'trakt_{k}'] = f'{v}'
+
+    def _set_episode_infoproperties():
+        if item_type != 'episode':
+            return
+        infoproperties[f'episode_type'] = item.get('episode_type')
+
+    _set_main_infoproperties()
+    _set_episode_infoproperties()
+
     return del_empty_keys(infoproperties)
 
 
