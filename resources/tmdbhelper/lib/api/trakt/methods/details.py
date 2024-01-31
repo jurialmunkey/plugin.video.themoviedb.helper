@@ -1,11 +1,10 @@
-from tmdbhelper.lib.addon.consts import CACHE_SHORT, CACHE_LONG
-from tmdbhelper.lib.files.bcache import use_simple_cache
+from tmdbhelper.lib.addon.consts import CACHE_LONG
 
 
-def get_details(self, trakt_type, id_num, season=None, episode=None, extended='full'):
+def get_details(self, trakt_type, trakt_id, season=None, episode=None, extended='full'):
     if not season or not episode:
-        return self.get_request_lc(trakt_type + 's', id_num, extended=extended)
-    return self.get_request_lc(trakt_type + 's', id_num, 'seasons', season, 'episodes', episode, extended=extended)
+        return self.get_request_lc(trakt_type + 's', trakt_id, extended=extended)
+    return self.get_request_lc(trakt_type + 's', trakt_id, 'seasons', season, 'episodes', episode, extended=extended)
 
 
 def get_id(self, unique_id, id_type, trakt_type, output_type=None, output_trakt_type=None, season_episode_check=None):
@@ -76,20 +75,29 @@ def get_showitem_details(self, i):
     return {'show': show, 'episode': self.get_details('show', slug, season=snum, episode=enum) or i_ep}
 
 
-@use_simple_cache(cache_days=CACHE_SHORT)
-def get_ratings(self, trakt_type, imdb_id=None, trakt_id=None, slug_id=None, season=None, episode=None):
-    slug = slug_id or trakt_id or imdb_id
-    if not slug:
+def get_episode_type(self, trakt_id=None, season=None, episode=None):
+    if not trakt_id or not episode or not season:
         return
-    if episode and season:
-        url = f'shows/{slug}/seasons/{season}/episodes/{episode}/ratings'
-    elif season:
-        url = f'shows/{slug}/seasons/{season}/ratings'
-    else:
-        url = f'{trakt_type}s/{slug}/ratings'
-    response = self.get_response_json(url)
-    if not response:
-        return
-    return {
-        'trakt_rating': f'{response.get("rating") or 0.0:0.1f}',
-        'trakt_votes': f'{response.get("votes") or 0.0:0,.0f}'}
+    from contextlib import suppress
+    with suppress(KeyError, TypeError):
+        return self.get_details('show', trakt_id, season=season, episode=episode)['episode_type']
+
+
+def get_ratings(self, trakt_id, season=None, episode=None, trakt_type=None):
+    from contextlib import suppress
+
+    def _get_url():
+        if episode and season:
+            return f'shows/{trakt_id}/seasons/{season}/episodes/{episode}/ratings'
+        if season:
+            return f'shows/{trakt_id}/seasons/{season}/ratings'
+        return f'{trakt_type}s/{trakt_id}/ratings'
+
+    response = self.get_request_sc(_get_url())
+
+    trakt_rating, trakt_votes = None, None
+    with suppress(KeyError, TypeError):
+        trakt_rating = f'{response["rating"] or 0.0:0.1f}'
+        trakt_votes = f'{response["votes"] or 0.0:0.1f}'
+
+    return (trakt_rating, trakt_votes)

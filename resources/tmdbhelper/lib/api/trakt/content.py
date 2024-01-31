@@ -136,6 +136,14 @@ class TraktMethods():
             self._get_showitem_details = get_showitem_details
             return self._get_showitem_details(self, *args, **kwargs)
 
+    def get_episode_type(self, *args, **kwargs):
+        try:
+            return self._get_episode_type(self, *args, **kwargs)
+        except AttributeError:
+            from tmdbhelper.lib.api.trakt.methods.details import get_episode_type
+            self._get_episode_type = get_episode_type
+            return self._get_episode_type(self, *args, **kwargs)
+
     def get_ratings(self, *args, **kwargs):
         try:
             return self._get_ratings(self, *args, **kwargs)

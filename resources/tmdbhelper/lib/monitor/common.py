@@ -92,18 +92,33 @@ class CommonMonitorDetails(CommonContainerAPIs):
     def get_tmdb_id_parent(self, tmdb_id, trakt_type, season_episode_check=None):
         return self.trakt_api.get_id(tmdb_id, 'tmdb', trakt_type, output_type='tmdb', output_trakt_type='show', season_episode_check=season_episode_check)
 
+    def get_trakt_episode_type(self, item, season=None, episode=None):
+        from contextlib import suppress
+        with suppress(KeyError, TypeError):
+            trakt_id = None
+            trakt_id = item['unique_ids'].get('tvshow.trakt') \
+                or item['unique_ids'].get('tvshow.slug') \
+                or item['unique_ids'].get('tvshow.imdb')
+        episode_type = self.trakt_api.get_episode_type(trakt_id, season, episode)
+        if episode_type:
+            item['infoproperties']['episode_type'] = episode_type
+        return item
+
     def get_trakt_ratings(self, item, trakt_type, season=None, episode=None):
-        _dummdict = {}
-        ratings = self.trakt_api.get_ratings(
-            trakt_type=trakt_type,
-            imdb_id=item.get('unique_ids', _dummdict).get('tvshow.imdb') or item.get('unique_ids', _dummdict).get('imdb'),
-            trakt_id=item.get('unique_ids', _dummdict).get('tvshow.trakt') or item.get('unique_ids', _dummdict).get('trakt'),
-            slug_id=item.get('unique_ids', _dummdict).get('tvshow.slug') or item.get('unique_ids', _dummdict).get('slug'),
-            season=season,
-            episode=episode)
-        if not ratings:
-            return item
-        item['infoproperties'] = merge_two_dicts(item.get('infoproperties', {}), ratings)
+        from contextlib import suppress
+        with suppress(KeyError, TypeError):
+            trakt_id = None
+            trakt_id = item['unique_ids'].get('tvshow.trakt') \
+                or item['unique_ids'].get('tvshow.slug') \
+                or item['unique_ids'].get('tvshow.imdb') \
+                or item['unique_ids'].get('trakt') \
+                or item['unique_ids'].get('slug') \
+                or item['unique_ids'].get('imdb')
+        trakt_rating, trakt_votes = self.trakt_api.get_ratings(trakt_type, trakt_id, season, episode)
+        if trakt_rating:
+            item['infoproperties']['trakt_rating'] = trakt_rating
+        if trakt_votes:
+            item['infoproperties']['trakt_votes'] = trakt_votes
         return item
 
     def get_imdb_top250_rank(self, item, trakt_type):
@@ -171,6 +186,7 @@ class CommonMonitorDetails(CommonContainerAPIs):
         item = self.get_omdb_ratings(item)
         item = self.get_imdb_top250_rank(item, trakt_type=trakt_type)
         item = self.get_trakt_ratings(item, trakt_type, season=season, episode=episode)
+        item = self.get_trakt_episode_type(item, season=season, episode=episode)
         item = self.get_tvdb_awards(item, tmdb_type, tmdb_id)
         item = self.get_mdblist_ratings(item, trakt_type, tmdb_id)
         item = self.get_nextaired(item, tmdb_type, tmdb_id)
