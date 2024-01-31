@@ -98,6 +98,6 @@ def get_ratings(self, trakt_id, season=None, episode=None, trakt_type=None):
     trakt_rating, trakt_votes = None, None
     with suppress(KeyError, TypeError):
         trakt_rating = f'{response["rating"] or 0.0:0.1f}'
-        trakt_votes = f'{response["votes"] or 0.0:0.1f}'
+        trakt_votes = f'{response["votes"] or 0.0:0,.0f}'
 
     return (trakt_rating, trakt_votes)
