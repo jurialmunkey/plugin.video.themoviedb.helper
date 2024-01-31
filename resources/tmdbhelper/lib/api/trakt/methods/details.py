@@ -83,7 +83,7 @@ def get_episode_type(self, trakt_id=None, season=None, episode=None):
         return self.get_details('show', trakt_id, season=season, episode=episode)['episode_type']
 
 
-def get_ratings(self, trakt_id, season=None, episode=None, trakt_type=None):
+def get_ratings(self, trakt_type, trakt_id, season=None, episode=None):
     from contextlib import suppress
 
     def _get_url():
