@@ -23,6 +23,7 @@ def get_calendar_episode_item(i):
     from jurialmunkey.parser import try_int
     from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_region_date, get_datetime_today
     from tmdbhelper.lib.api.mapping import get_empty_item
+
     air_date = convert_timestamp(i.get('first_aired'), utc_convert=True)
     epsd = i.get('episode', {})
     show = i.get('show', {})
@@ -49,6 +50,7 @@ def get_calendar_episode_item(i):
     days_to_air = (air_date.date() - get_datetime_today().date()).days
     dtaproperty = 'days_from_aired' if days_to_air < 0 else 'days_until_aired'
     item['infoproperties'][dtaproperty] = str(abs(days_to_air))
+    item['infoproperties']['episode_type'] = epsd.get('episode_type')
     item['unique_ids'] = {f'tvshow.{k}': v for k, v in sids.items()}
     item['params'] = {
         'info': 'details',
