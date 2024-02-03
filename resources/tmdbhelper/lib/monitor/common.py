@@ -229,9 +229,10 @@ class CommonMonitorFunctions(CommonMonitorDetails):
         key = f'{self.property_prefix}.{key}'
         if value is None:
             get_property(key, clear_property=True)
-        else:
-            get_property(key, set_property=f'{value}')
+            return
+        get_property(key, set_property=f'{value}')
 
+    @kodi_try_except('lib.monitor.common set_iter_properties')
     def set_iter_properties(self, dictionary: dict, keys: set):
         """ Interates through a set of keys and adds corresponding value from the dictionary as a window property
         Lists of values from dictionary are joined with ' / '.join(dictionary[key])
@@ -240,35 +241,34 @@ class CommonMonitorFunctions(CommonMonitorDetails):
         if not isinstance(dictionary, dict):
             dictionary = {}
         for k in keys:
-            try:
-                v = dictionary.get(k, None)
-                if isinstance(v, list):
-                    try:
-                        v = ' / '.join(v)
-                    except Exception as exc:
-                        kodi_traceback(exc, f'\nlib.monitor.common set_iter_properties\nk: {k} v: {v}')
-                self.properties.add(k)
-                self.set_property(k, v)
-            except Exception as exc:
-                kodi_traceback(exc, f'\nlib.monitor.common set_iter_properties\nk: {k}')
+            v = dictionary.get(k)
+            if isinstance(v, list):
+                v = ' / '.join(v)
+            self.properties.add(k)
+            self.set_property(k, v)
 
+    @kodi_try_except('lib.monitor.common set_indexed_properties')
     def set_indexed_properties(self, dictionary):
         if not isinstance(dictionary, dict):
             return
 
+        # Convert dictionary to list of keys to avoid iteration size change errors
+        keys = (
+            k for k in list(dictionary)
+            if k not in self.properties
+            and k not in SETPROP_RATINGS
+            and k not in SETMAIN_ARTWORK)
+
         index_properties = set()
-        for k, v in dictionary.items():
-            if k in self.properties or k in SETPROP_RATINGS or k in SETMAIN_ARTWORK:
-                continue
-            try:
-                v = v or ''
-                self.set_property(k, v)
-                index_properties.add(k)
-            except Exception as exc:
-                kodi_traceback(exc, f'\nlib.monitor.common set_indexed_properties\nk: {k} v: {v}')
+
+        for k in keys:
+            v = dictionary.get(k)
+            self.set_property(k, v)
+            index_properties.add(k)
 
         for k in (self.index_properties - index_properties):
             self.clear_property(k)
+
         self.index_properties = index_properties.copy()
 
     @kodi_try_except('lib.monitor.common set_list_properties')
