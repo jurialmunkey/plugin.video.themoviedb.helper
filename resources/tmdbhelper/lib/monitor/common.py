@@ -302,14 +302,18 @@ class CommonMonitorFunctions(CommonMonitorDetails):
         self.properties.update(['Premiered', 'Premiered_Long', 'Premiered_Custom'])
 
     def set_properties(self, item):
+        cast = item.get('cast', [])
+        infolabels = item.get('infolabels', {})
+        infoproperties = item.get('infoproperties', {})
         self.set_iter_properties(item, SETMAIN)
-        self.set_iter_properties(item.get('infolabels', {}), SETINFO)
-        self.set_iter_properties(item.get('infoproperties', {}), SETPROP)
-        self.set_time_properties(item.get('infolabels', {}).get('duration', 0))
-        self.set_date_properties(item.get('infolabels', {}).get('premiered'))
-        self.set_list_properties(item.get('cast', []), 'name', 'cast')
-        if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableExtendedProperties)"):
-            self.set_indexed_properties(item.get('infoproperties', {}))
+        self.set_iter_properties(infolabels, SETINFO)
+        self.set_iter_properties(infoproperties, SETPROP)
+        self.set_time_properties(infolabels.get('duration', 0))
+        self.set_date_properties(infolabels.get('premiered'))
+        self.set_list_properties(cast, 'name', 'cast')
+        if get_condvisibility("Skin.HasSetting(TMDbHelper.DisableExtendedProperties)"):
+            return
+        self.set_indexed_properties(infoproperties)
 
     def clear_properties(self, ignore_keys=None):
         if not ignore_keys:
