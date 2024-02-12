@@ -1,3 +1,6 @@
+# Module: default
+# Author: jurialmunkey
+# License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 from tmdbhelper.lib.addon.plugin import get_setting
 
 
@@ -55,12 +58,12 @@ class ContextMenu():
     def __init__(self, listitem):
         self._li = listitem
         self.info = {
-            'ftv_id': self._li.get_ftv_id(),
-            'tmdb_id': self._li.get_tmdb_id(),
-            'tmdb_type': self._li.get_tmdb_type(),
-            'trakt_type': self._li.get_trakt_type(),
-            'season': self._li.infolabels.get('season'),
-            'episode': self._li.infolabels.get('episode'),
+            'ftv_id': self._li.ftv_id,
+            'tmdb_id': self._li.tmdb_id,
+            'tmdb_type': self._li.tmdb_type,
+            'trakt_type': self._li.trakt_type,
+            'season': self._li.season,
+            'episode': self._li.episode,
         }
         self.mediatype = self._li.infolabels.get('mediatype')
 

@@ -19,6 +19,7 @@ def _build_basedir_item(i, t, space):
                 u','.join(f'{k}={v}' for k, v in item['params'].items())))]
         item['params']['list_name'] = item['label']
     item.pop('types', None)
+    item.pop('filters', None)
     return item
 
 
@@ -67,6 +68,14 @@ def _get_basedir_details():
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/themoviedb/episodes.png'},
             'types': ['tv', 'episode']},
+        {
+            'label': get_localized(32192),
+            'params': {'info': 'collection'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/themoviedb/movies.png'},
+            'types': ['movie']},
         {
             'label': get_localized(20360),
             'params': {'info': 'episodes'},
@@ -331,6 +340,26 @@ def _get_basedir_random():
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/trakt/mylists.png'}}
     ]
+
+
+def _get_basedir_trakt_genre_types(genre, tmdb_type):
+    items = []
+
+    endpoints = [d for d in _get_basedir_trakt() if d.get('filters')]
+
+    for i in endpoints:
+        item = {}
+        item['label'] = i['label'].format(space=' ', item_type=f'{genre.capitalize()} {convert_type(tmdb_type, "plural")}')
+        item['infolabels'] = {}
+        item['infoproperties'] = {}
+        item['params'] = i.get('params', {}).copy()
+        item['params']['tmdb_type'] = tmdb_type
+        item['params']['genres'] = genre
+        item['art'] = i.get('art', {}).copy()
+        item['unique_ids'] = {'slug': i.get('slug')}
+        items.append(item)
+
+    return items
 
 
 def _get_basedir_nodes(filename=None, basedir=None):
@@ -616,9 +645,18 @@ def _get_basedir_trakt():
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/trakt/calendar.png'}},
         {
+            'label': u'{{item_type}}{{space}}{}'.format(get_localized(135)),
+            'types': ['movie', 'tv'],
+            'params': {'info': 'trakt_genres'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/genres.png'}},
+        {
             'label': u'{}{{space}}{{item_type}}'.format(get_localized(32204)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_trending'},
+            'filters': True,
             'path': PLUGINPATH,
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',
@@ -627,6 +665,7 @@ def _get_basedir_trakt():
             'label': u'{}{{space}}{{item_type}}'.format(get_localized(32175)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_popular'},
+            'filters': True,
             'path': PLUGINPATH,
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',
@@ -635,6 +674,7 @@ def _get_basedir_trakt():
             'label': u'{}{{space}}{{item_type}}'.format(get_localized(32205)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_mostplayed'},
+            'filters': True,
             'path': PLUGINPATH,
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',
@@ -643,6 +683,7 @@ def _get_basedir_trakt():
             'label': u'{}{{space}}{{item_type}}'.format(get_localized(32414)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_mostviewers'},
+            'filters': True,
             'path': PLUGINPATH,
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',
@@ -651,6 +692,7 @@ def _get_basedir_trakt():
             'label': u'{}{{space}}{{item_type}}'.format(get_localized(32206)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_anticipated'},
+            'filters': True,
             'path': PLUGINPATH,
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',
@@ -1108,6 +1150,7 @@ class ListBaseDir(Container):
             'dir_calendar_trakt': lambda: _get_basedir_calendar(info='trakt_calendar', endpoint=kwargs.get('endpoint'), user=kwargs.get('user')),
             'dir_calendar_library': lambda: _get_basedir_calendar(info='library_nextaired'),
             'dir_custom_node': lambda: _get_basedir_nodes(filename=kwargs.get('filename'), basedir=kwargs.get('basedir')),
+            'dir_trakt_genre': lambda: _get_basedir_trakt_genre_types(genre=kwargs.get('genre'), tmdb_type=kwargs.get('tmdb_type')),
             'dir_settings': lambda: ADDON.openSettings()
         }
         func = route.get(info, lambda: _build_basedir(None, _get_basedir_main()))

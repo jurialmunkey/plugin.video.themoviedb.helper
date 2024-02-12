@@ -1,9 +1,6 @@
-from xbmcgui import Dialog
-from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_trakt_type, convert_type, get_localized
 from jurialmunkey.parser import get_params
+from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_trakt_type, convert_type, get_localized
 from tmdbhelper.lib.api.request import RequestAPI
-from tmdbhelper.lib.items.pages import PaginatedItems
-from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.api.api_keys.mdblist import API_KEY
 
 
@@ -11,6 +8,7 @@ def _get_paginated(items, limit=None, page=1):
     items = items or []
     if limit is None:
         return (items, None)
+    from tmdbhelper.lib.items.pages import PaginatedItems
     paginated_items = PaginatedItems(items, page=page, limit=limit)
     return (paginated_items.items, paginated_items.next_page)
 
@@ -93,7 +91,9 @@ class MDbList(RequestAPI):
                 response = func(*args, **kwargs)
                 if not isinstance(response, dict):  # Check again in case now working and return response
                     return response
+            from tmdbhelper.lib.addon.logger import kodi_log
             kodi_log(f'MDBList Error: {response.get("error")}', 1)
+            from xbmcgui import Dialog
             Dialog().ok(get_localized(257), f'{response.get("error")}')
             return []
         return response

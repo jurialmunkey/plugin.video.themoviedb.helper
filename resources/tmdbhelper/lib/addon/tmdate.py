@@ -1,9 +1,6 @@
 # import _strptime  # fix for py2.7 bug with import log shouldnt be a problem in py3.6+
 import datetime
 import time
-from xbmc import getRegion
-from tmdbhelper.lib.addon.plugin import get_localized
-from tmdbhelper.lib.addon.logger import kodi_log
 import jurialmunkey.tmdate as jurialmunkey_tmdate
 
 
@@ -17,6 +14,10 @@ def get_datetime_combine(*args, **kwargs):
 
 def get_datetime_time(*args, **kwargs):
     return datetime.time(*args, **kwargs)
+
+
+def get_datetime_utcnow_isoformat():
+    return f'{datetime.datetime.utcnow().isoformat()}Z'
 
 
 def get_datetime_now():
@@ -70,6 +71,7 @@ def date_in_range(date_str, days=1, start_date=0, date_fmt="%Y-%m-%dT%H:%M:%S", 
 
 
 def get_region_date(date_obj, region_fmt='dateshort', del_fmt=':%S'):
+    from xbmc import getRegion
     xbmc_region = getRegion(region_fmt).replace(del_fmt, '')  # Strip seconds from formatting durations
     date_string = date_obj.strftime(xbmc_region.encode('unicode-escape').decode())  # Avoid UnicodeEncode errors in strftime
     return date_string.encode().decode('unicode-escape')  # Restore Unicode characters
@@ -105,6 +107,7 @@ def get_todays_date(days=0, str_fmt='%Y-%m-%d'):
 
 
 def get_calendar_name(startdate=0, days=1):
+    from tmdbhelper.lib.addon.plugin import get_localized
     if days == 1:
         if startdate == -1:
             return get_localized(32282)  # Yesterday
@@ -133,6 +136,7 @@ def get_calendar_name(startdate=0, days=1):
 
 
 def convert_timestamp(time_str, time_fmt="%Y-%m-%dT%H:%M:%S", time_lim=19, utc_convert=False):
+    from tmdbhelper.lib.addon.logger import kodi_log
     if not time_str:
         return
     time_str = time_str[:time_lim] if time_lim else time_str

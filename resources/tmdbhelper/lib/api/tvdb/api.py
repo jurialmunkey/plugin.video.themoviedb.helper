@@ -1,6 +1,5 @@
 from tmdbhelper.lib.api.request import RequestAPI
 from tmdbhelper.lib.addon.consts import CACHE_SHORT, CACHE_MEDIUM
-from tmdbhelper.lib.api.tvdb.mapping import ItemMapper
 from tmdbhelper.lib.api.api_keys.tvdb import API_KEY, USER_TOKEN
 
 
@@ -16,10 +15,10 @@ def is_authorized(func):
 
 
 class TVDb(RequestAPI):
-    
+
     api_key = API_KEY
     user_token = USER_TOKEN
-    
+
     def __init__(
             self,
             api_key=None,
@@ -27,10 +26,18 @@ class TVDb(RequestAPI):
         super(TVDb, self).__init__(
             req_api_name='TVDb',
             req_api_url=API_URL)
-        self.mapper = ItemMapper()
         self.set_token()
         TVDb.api_key = api_key or self.api_key
         TVDb.user_token = user_token or self.user_token
+
+    @property
+    def mapper(self):
+        try:
+            return self._mapper
+        except AttributeError:
+            from tmdbhelper.lib.api.tvdb.mapping import ItemMapper
+            self._mapper = ItemMapper()
+            return self._mapper
 
     def set_token(self):
         self._token = self.get_token()
@@ -79,12 +86,3 @@ class TVDb(RequestAPI):
             return
         self.user_token.value = _token
         return _token
-
-    # def get_mapped_item(self, func, *args, **kwargs):
-    #     func = getattr(self, func)
-    #     if not func:
-    #         return
-    #     data = func(*args, **kwargs)
-    #     if not data:
-    #         return
-    #     return self.mapper.get_info(data)

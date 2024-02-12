@@ -112,12 +112,23 @@ def _get_item_infolabels(item, item_type=None, infolabels=None, show=None):
 def _get_item_infoproperties(item, item_type=None, infoproperties=None, show=None, main=None):
     infoproperties = infoproperties or {}
     infoproperties['tmdb_type'] = convert_trakt_type(item_type)
-    for k, v in (main or []).items():
-        if v is None:
-            continue
-        if not isinstance(v, (str, int, float,)):
-            continue
-        infoproperties[f'trakt_{k}'] = f'{v}'
+
+    def _set_main_infoproperties():
+        if not main:
+            return
+        for k, v in main.items():
+            if v is None or not isinstance(v, (str, int, float,)):
+                continue
+            infoproperties[f'trakt_{k}'] = f'{v}'
+
+    def _set_episode_infoproperties():
+        if item_type != 'episode':
+            return
+        infoproperties[f'episode_type'] = item.get('episode_type')
+
+    _set_main_infoproperties()
+    _set_episode_infoproperties()
+
     return del_empty_keys(infoproperties)
 
 
@@ -191,6 +202,12 @@ class TraktItems():
                 continue
             if filters and is_excluded(item, **filters):
                 continue
+            # Check we haven't already added that item
+            unique_id = f"{item['unique_ids']['tmdb']}_{item.get('label')}_{item['infolabels'].get('season')}_{item['infolabels'].get('episode')}"
+            if unique_id in self.configured.get(f'{i_type}_ids', []):
+                continue
+            # Add item ID to checklist to avoid duplicates
+            self.configured.setdefault(f'{i_type}_ids', []).append(unique_id)
             # Also add item to a list only containing that item type
             # Useful if we need to only get one type of item from a mixed list (e.g. only "movies")
             self.configured.setdefault(f'{i_type}s', []).append(item)

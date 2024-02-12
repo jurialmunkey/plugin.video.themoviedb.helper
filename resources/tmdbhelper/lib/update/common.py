@@ -3,6 +3,8 @@ from tmdbhelper.lib.addon.plugin import executebuiltin
 
 
 class LibraryCommonFunctions():
+    busy_spinner = False
+
     def _start(self):
         if self.p_dialog:
             self.p_dialog.create(self._msg_title, self._msg_start)
@@ -23,7 +25,7 @@ class LibraryCommonFunctions():
             self.p_dialog.update((((count + 1) * 100) // total), **kwargs)
 
     def add_userlist(self, user_slug=None, list_slug=None, confirm=True, force=False, **kwargs):
-        request = get_userlist(user_slug=user_slug, list_slug=list_slug, confirm=confirm, busy_spinner=self.p_dialog)
+        request = get_userlist(user_slug=user_slug, list_slug=list_slug, confirm=confirm, busy_spinner=self.busy_spinner)
         if not request:
             return
         i_total = len(request)

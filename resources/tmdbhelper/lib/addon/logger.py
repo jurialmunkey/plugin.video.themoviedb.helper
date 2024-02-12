@@ -16,6 +16,35 @@ TimerList = jurialmunkey_logger.TimerList
 TimerFunc = jurialmunkey_logger.TimerFunc
 
 
+class CProfiler():
+    def __init__(self, filename='output'):
+        """ ContextManager for setting a WindowProperty over duration """
+        import cProfile
+        self.filename = filename
+        self.profiler = cProfile.Profile()
+        self.profiler.enable()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        self.profiler.disable()
+
+        import io
+        import pstats
+        from tmdbhelper.lib.files.futils import write_to_file
+
+        stream = io.StringIO()
+        profile_stats = pstats.Stats(self.profiler, stream=stream).sort_stats('cumtime')
+        profile_stats.print_stats()
+        write_to_file(stream.getvalue(), 'cProfile', self.filename + '_cumtime.txt', join_addon_data=True)
+
+        stream = io.StringIO()
+        profile_stats = pstats.Stats(self.profiler, stream=stream).sort_stats('tottime')
+        profile_stats.print_stats()
+        write_to_file(stream.getvalue(), 'cProfile', self.filename + '_tottime.txt', join_addon_data=True)
+
+
 def timer_report(func_name):
     def decorator(func):
         def wrapper(self, *args, **kwargs):

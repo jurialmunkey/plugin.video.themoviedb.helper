@@ -1,4 +1,4 @@
-from tmdbhelper.lib.addon.plugin import get_condvisibility, get_infolabel, convert_media_type, convert_type
+from tmdbhelper.lib.addon.plugin import get_condvisibility, get_infolabel, convert_media_type, convert_type, get_setting
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_region_date
 from jurialmunkey.window import get_property
 from tmdbhelper.lib.monitor.images import ImageFunctions
@@ -9,16 +9,22 @@ from copy import deepcopy
 
 
 BASEITEM_PROPERTIES = [
-    ('base_label', ('label',)),
-    ('base_title', ('title',)),
-    ('base_icon', ('icon',)),
-    ('base_plot', ('plot', 'Property(artist_description)', 'Property(artist_description)', 'addondescription')),
-    ('base_tagline', ('tagline',)),
-    ('base_dbtype', ('dbtype',)),
-    ('base_poster', ('Art(poster)', 'Art(season.poster)', 'Art(tvshow.poster)')),
-    ('base_fanart', ('Art(fanart)', 'Art(season.fanart)', 'Art(tvshow.fanart)')),
-    ('base_clearlogo', ('Art(clearlogo)', 'Art(tvshow.clearlogo)', 'Art(artist.clearlogo)')),
-    ('base_tvshowtitle', ('tvshowtitle',))]
+    ('base_label', ('label',), None),
+    ('base_title', ('title',), None),
+    ('base_icon', ('icon',), None),
+    ('base_plot', ('plot', 'Property(artist_description)', 'Property(album_description)', 'addondescription'), None),
+    ('base_tagline', ('tagline',), None),
+    ('base_dbtype', ('dbtype',), None),
+    ('base_rating', ('userrating', 'rating',), None),
+    ('base_poster', ('Art(poster)', 'Art(season.poster)', 'Art(tvshow.poster)'), None),
+    ('base_fanart', ('Art(fanart)', 'Art(season.fanart)', 'Art(tvshow.fanart)'), None),
+    ('base_clearlogo', ('Art(clearlogo)', 'Art(tvshow.clearlogo)', 'Art(artist.clearlogo)'), None),
+    ('base_tvshowtitle', ('tvshowtitle',), None),
+    ('base_studio', ('studio',), lambda v: v.split(' / ')[0] if v else None),
+    ('base_genre', ('genre',), lambda v: v.split(' / ')[0] if v else None),
+    ('base_director', ('director',), lambda v: v.split(' / ')[0] if v else None),
+    ('base_writer', ('writer',), lambda v: v.split(' / ')[0] if v else None),
+]
 
 CV_USE_MULTI_TYPE = ""\
     "Window.IsVisible(DialogPVRInfo.xml) | "\
@@ -62,8 +68,8 @@ class ListItemDetails():
                     return 'multi'
                 if self.get_infolabel('Path') == 'pvr://channels/tv/':
                     return 'multi'
-            if self._parent._container == 'Container.':
-                return get_infolabel('Container.Content()') or ''
+            if self._parent._container == 'Container.' and get_setting('service_container_content_fallback'):
+                return get_infolabel('Container.Content') or ''
             return ''
 
         dbtype = self.get_infolabel('dbtype')
@@ -250,9 +256,10 @@ class ListItemDetails():
             return
         self._itemdetails.listitem['folderpath'] = self._itemdetails.listitem['infoproperties']['folderpath'] = self.get_infolabel('folderpath')
         self._itemdetails.listitem['filenameandpath'] = self._itemdetails.listitem['infoproperties']['filenameandpath'] = self.get_infolabel('filenameandpath')
-        for k, v in BASEITEM_PROPERTIES:
+        for k, v, f in BASEITEM_PROPERTIES:
             try:
-                self._itemdetails.listitem['infoproperties'][k] = next(j for j in (self.get_infolabel(i) for i in v) if j)
+                value = next(j for j in (self.get_infolabel(i) for i in v) if j)
+                self._itemdetails.listitem['infoproperties'][k] = f(value) if f else value
             except StopIteration:
                 self._itemdetails.listitem['infoproperties'][k] = None
 

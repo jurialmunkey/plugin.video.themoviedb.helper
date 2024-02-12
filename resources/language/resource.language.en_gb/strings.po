@@ -2526,6 +2526,66 @@ msgctxt "#32496"
 msgid "Add/Remove as Custom Node"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32497"
+msgid "Container content fallback for service listitems without mediatypes"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32498"
+msgid "Some plugins have poor metadata and fail to fill the item mediatype which results in the service monitor not completing an item lookup. This setting allows the service monitor to use the container content type when item mediatype is missing. Note this setting will likely result more frequent incorrect matches due to the end plugin having bad metadata."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32499"
+msgid "Page multipliers (higher is slower)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32500"
+msgid "Page multiplier (TMDb basic lists)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32501"
+msgid "Page multiplier (Trakt basic lists)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32502"
+msgid "Page multiplier (Trakt sync lists)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32503"
+msgid "Page multiplier (Library windows)"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32504"
+msgid "Add {} to node"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32505"
+msgid "Genre icons folder (TMDb)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32506"
+msgid "Provider icons folder (TMDb)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32507"
+msgid "Genre icon folder (Trakt)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32508"
+msgid "Recache Kodi Library details when building players"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

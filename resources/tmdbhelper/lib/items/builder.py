@@ -2,7 +2,7 @@ import re
 from tmdbhelper.lib.items.artselect import _ArtworkSelector
 from tmdbhelper.lib.addon.plugin import get_setting
 from tmdbhelper.lib.items.listitem import ListItem
-from tmdbhelper.lib.files.bcache import BasicCache
+from tmdbhelper.lib.files.bcache import BasicCacheMem
 from tmdbhelper.lib.api.tmdb.api import TMDb
 from tmdbhelper.lib.api.fanarttv.api import FanartTV
 from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp
@@ -44,7 +44,7 @@ class ItemBuilder(_ArtworkSelector):
         self.tmdb_api = tmdb_api or TMDb()
         self.ftv_api = ftv_api or FanartTV()
         self.trakt_api = trakt_api
-        self._cache = BasicCache(filename='ItemBuilder.db')
+        self._cache = BasicCacheMem(filename='ItemBuilder.db')
         self._regex = re.compile(r'({})'.format('|'.join(IMAGEPATH_ALL)))
         self.parent_params = None
         self.cache_only = cache_only
@@ -145,9 +145,11 @@ class ItemBuilder(_ArtworkSelector):
     def get_tmdb_item(
             self, tmdb_type, tmdb_id, season=None, episode=None, base_item=None, manual_art=None,
             base_is_season=False, cache_refresh=False):
-        with TimerList(self.timer_lists, 'item_tmdb', log_threshold=0.05, logging=self.log_timers):
+        with TimerList(self.timer_lists, 'item_tmdb', log_threshold=0.05, logging=self.log_timers) as tl:
             details = self.tmdb_api.get_details_request(tmdb_type, tmdb_id, season, episode, cache_refresh=cache_refresh)
             if not details:
+                if self.log_timers and tl.total_time > tl.log_threshold:  # TMDb API missing item so log fail time
+                    kodi_log(f'item_tmdb -- get_details_request({tmdb_type},{tmdb_id},{season},{episode}) FAILED after {tl.total_time:.3f} sec', 1)
                 return
             if season is not None:
                 tmdb_type = 'season' if episode is None else 'episode'
@@ -265,7 +267,7 @@ class ItemBuilder(_ArtworkSelector):
     def get_listitem(self, i, use_iterprops=True):
         li = ListItem(parent_params=self.parent_params, **i)
         mediatype = li.infolabels.get('mediatype')
-        tmdb_type = li.get_tmdb_type()
+        tmdb_type = li.tmdb_type
         tmdb_id = li.unique_ids.get('tvshow.tmdb') if mediatype in ['season', 'episode'] else li.unique_ids.get('tmdb')
         season = li.infolabels.get('season', 0) if mediatype in ['season', 'episode'] else None
         episode = li.infolabels.get('episode') if mediatype == 'episode' else None

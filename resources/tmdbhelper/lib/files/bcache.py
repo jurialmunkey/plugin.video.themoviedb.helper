@@ -1,5 +1,5 @@
 from tmdbhelper.lib.addon.logger import kodi_traceback
-from tmdbhelper.lib.files.scache import SimpleCache
+from tmdbhelper.lib.files.scache import SimpleCache, SimpleCacheMem
 import jurialmunkey.bcache
 
 BasicCache = jurialmunkey.bcache.BasicCache
@@ -12,3 +12,7 @@ class BasicCache(jurialmunkey.bcache.BasicCache):
     @staticmethod
     def kodi_traceback(exc, log_msg):
         kodi_traceback(exc, log_msg)
+
+
+class BasicCacheMem(BasicCache):
+    _simplecache = SimpleCacheMem

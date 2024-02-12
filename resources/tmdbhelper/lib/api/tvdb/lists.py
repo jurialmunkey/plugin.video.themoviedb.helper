@@ -1,12 +1,4 @@
 from tmdbhelper.lib.items.container import Container
-from tmdbhelper.lib.api.mapping import get_empty_item
-from tmdbhelper.lib.addon.plugin import ADDONPATH
-from tmdbhelper.lib.addon.consts import TVDB_DISCLAIMER
-from tmdbhelper.lib.items.pages import PaginatedItems
-from tmdbhelper.lib.addon.thread import ParallelThread
-
-
-TVDB_ICON = f'{ADDONPATH}/resources/icons/tvdb/tvdb.png'
 
 
 class ListListItems(Container):
@@ -32,9 +24,11 @@ class ListListItems(Container):
         return item
 
     def _get_threaded_items(self, data, page, *args, **kwargs):
+        from tmdbhelper.lib.items.pages import PaginatedItems
         response = PaginatedItems(data, page=page)
         if not response or not response.items:
             return
+        from tmdbhelper.lib.addon.thread import ParallelThread
         with ParallelThread(response.items, self._get_item, *args, **kwargs) as pt:
             item_queue = pt.queue
         items = [i for i in item_queue if i]
@@ -50,10 +44,15 @@ class ListLists(Container):
         if not data:
             return
 
+        from tmdbhelper.lib.api.mapping import get_empty_item
+        from tmdbhelper.lib.addon.consts import TVDB_DISCLAIMER
+        from tmdbhelper.lib.addon.plugin import ADDONPATH
+        tvdb_icon = f'{ADDONPATH}/resources/icons/tvdb/tvdb.png'
+
         def _get_item(i):
             item = get_empty_item()
             item['label'] = i.get('name')
-            item['art']['icon'] = TVDB_ICON
+            item['art']['icon'] = tvdb_icon
             item['params'] = {'info': param_info, 'tvdb_id': i.get('id')}
             item['infolabels']['plot'] = TVDB_DISCLAIMER
             if params:

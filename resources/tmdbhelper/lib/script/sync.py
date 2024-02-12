@@ -177,7 +177,8 @@ class _Menu():
         if item._sync == -1 or not notification:
             return
         if item._sync and item._sync.status_code in [200, 201, 204]:
-            get_property('TraktSyncLastActivities.Expires', clear_property=True)  # Wipe last activities cache to update now
+            from tmdbhelper.lib.api.trakt.methods.activities import del_lastactivities_expiry
+            del_lastactivities_expiry()
             Dialog().ok(
                 get_localized(32295),
                 get_localized(32297).format(

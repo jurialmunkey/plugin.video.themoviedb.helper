@@ -1,10 +1,8 @@
-import tmdbhelper.lib.api.kodi.rpc as rpc
 from xbmc import Player
+from jurialmunkey.parser import boolean
 from jurialmunkey.window import get_property
-from tmdbhelper.lib.monitor.images import ImageFunctions
 from tmdbhelper.lib.monitor.common import CommonMonitorFunctions, SETPROP_RATINGS, SETMAIN_ARTWORK
 from tmdbhelper.lib.addon.plugin import get_condvisibility, get_infolabel
-from json import loads
 
 
 class PlayerMonitor(Player, CommonMonitorFunctions):
@@ -24,10 +22,12 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
     def onPlayBackEnded(self):
         self.set_watched()
         self.reset_properties()
+        self.set_trakt_properties()
 
     def onPlayBackStopped(self):
         self.set_watched()
         self.reset_properties()
+        self.set_trakt_properties()
 
     def reset_properties(self):
         self.clear_properties()
@@ -48,6 +48,14 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.previous_item = None
         self.current_item = None
 
+    def set_trakt_properties(self):
+        if not boolean(get_property('TraktIsAuth')):
+            return
+        from tmdbhelper.lib.script.method.trakt import get_stats
+        from tmdbhelper.lib.api.trakt.methods.activities import del_lastactivities_expiry
+        del_lastactivities_expiry()
+        get_stats()
+
     def get_playingitem(self):
         if not self.isPlayingVideo():
             return self.reset_properties()  # Not a video so don't get info
@@ -58,6 +66,8 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         if self.playingfile and self.playingfile.endswith('dummy.mp4'):
             return self.reset_properties()  # Resolved to dummy so wait
         self.playerstring = get_property('PlayerInfoString')
+
+        from json import loads
         self.playerstring = loads(self.playerstring) if self.playerstring else None
 
         self.total_time = self.getTotalTime()
@@ -123,6 +133,7 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
                     or get_infolabel('Player.Art(tvshow.clearlogo)')
                     or get_infolabel('Player.Art(clearlogo)')
                     or tmdb_logo)
+                from tmdbhelper.lib.monitor.images import ImageFunctions
                 ImageFunctions(method='crop', is_thread=False, prefix='Player', artwork=clearlogo).run()
                 self.properties.add('CropImage')
                 self.properties.add('CropImage.Original')
@@ -142,6 +153,8 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         progress = ((self.current_time / self.total_time) * 100)
         if progress < 75:
             return
+
+        import tmdbhelper.lib.api.kodi.rpc as rpc
 
         if self.playerstring.get('tmdb_type') == 'episode':
             tvshowid = rpc.KodiLibrary('tvshow').get_info(

@@ -1,7 +1,5 @@
 from tmdbhelper.lib.api.tvdb.api import TVDb
 from tmdbhelper.lib.api.tmdb.api import TMDb
-from xbmcgui import Dialog
-from json import dumps
 from tmdbhelper.lib.addon.dialog import ProgressDialog
 from tmdbhelper.lib.files.futils import dumps_to_file
 from threading import Thread

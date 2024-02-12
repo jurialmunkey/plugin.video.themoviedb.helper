@@ -6,7 +6,7 @@ from tmdbhelper.lib.addon.dialog import BusyDialog
 from tmdbhelper.lib.addon.thread import ParallelThread
 from tmdbhelper.lib.addon.plugin import get_infolabel, executebuiltin, get_condvisibility, ADDONPATH
 from tmdbhelper.lib.api.tmdb.api import TMDb
-from jurialmunkey.window import get_property, WindowProperty
+from jurialmunkey.window import get_property, WindowProperty, wait_until_active
 from jurialmunkey.parser import parse_paramstring, reconfigure_legacy_params
 from threading import Thread
 
@@ -26,6 +26,7 @@ ACTION_CONTEXT_MENU = (117,)
 ACTION_SHOW_INFO = (11,)
 ACTION_SELECT = (7, )
 ACTION_CLOSEWINDOW = (9, 10, 92, 216, 247, 257, 275, 61467, 61448,)
+ID_VIDEOINFO = 12003
 
 
 """
@@ -239,6 +240,9 @@ class WindowRecommendationsManager():
         with WindowProperty((PROP_ISACTIVE, 'True')):
             self.on_info_new() if self._recommendations == 'oninfo' else self.open_recommendations()
 
+    def wait_until_active(self, *args, **kwargs):
+        return wait_until_active(*args, xbmc_monitor=self._mon, **kwargs)
+
     def is_exiting(self):
         if xbmcgui.getCurrentWindowId() != self._window_id:
             return True
@@ -249,11 +253,7 @@ class WindowRecommendationsManager():
     def on_active(self):
         if self.is_exiting():
             return
-        prop = get_property(PROP_JSONDUMP)
-        data = self.dump_kwargs()
-        if prop == data:
-            return  # Do nothing. User likely pressed twice
-        get_property(PROP_JSONDUMP, set_property=data)
+        self.dump_kwargs()
 
     def on_info_new(self):
         _tmdb_type = self._kwargs['tmdb_type']
@@ -261,26 +261,23 @@ class WindowRecommendationsManager():
         _tmdb_id = self._kwargs.get('tmdb_id') or TMDb().get_tmdb_id(tmdb_type=_tmdb_type, **_tmdb_query)
         if not _tmdb_type or not _tmdb_id:
             return
-        self._current_dump = get_property(PROP_JSONDUMP, set_property=self.dump_kwargs())
+        self.dump_kwargs(update_current_dump=True)
         self.on_info(_tmdb_type, _tmdb_id)
 
-    def dump_kwargs(self):
+    def dump_kwargs(self, update_current_dump=False):
         from json import dumps
         data = self._kwargs.copy()
         data['recommendations'] = self._recommendations
         data['window_id'] = self._window_id
-        return dumps(data, separators=(',', ':'))
-
-    def load_kwargs(self):
-        data = get_property(PROP_JSONDUMP)
-        if not data or data == self._current_dump:
-            return
-        from tmdbhelper.lib.files.futils import json_loads as loads
-        return loads(data)
+        data = dumps(data, separators=(',', ':'))
+        if update_current_dump:
+            self._current_dump = data
+        data = get_property(PROP_JSONDUMP, set_property=data)
+        return data
 
     def open_recommendations(self):
         with BusyDialog():
-            self._current_dump = get_property(PROP_JSONDUMP, set_property=self.dump_kwargs())
+            self.dump_kwargs(update_current_dump=True)
             self._gui = WindowRecommendations(
                 'script-tmdbhelper-recommendations.xml', ADDONPATH, 'default', '1080i',
                 recommendations=self._recommendations, window_id=self._window_id, window_manager=self, **self._kwargs)
@@ -291,27 +288,44 @@ class WindowRecommendationsManager():
         if self.is_exiting():
             return self.on_exit()
 
+        data = None
+
+        # While INFO is active wait in loop until new action or we exit
         while t.is_alive() and not self._mon.abortRequested():
-            if self._current_dump != get_property(PROP_JSONDUMP):
+
+            # If the action trigger changed lets do something
+            data = get_property(PROP_JSONDUMP)
+            if self._current_dump != data:
                 break
+            data = None
+
+            # We got an Exit command so we force quit out
             if self.is_exiting():
                 return self.on_exit()
+
+            # We sit in a loop and poll ever 100ms
             self._mon.waitForAbort(0.1)
 
+        # Check that the currently active info dialog is the one we want to act
         if self._current_path != path:
             return
 
-        kwargs = self.load_kwargs()
-        if kwargs and self._window_id == kwargs.pop('window_id'):
-            self._recommendations = kwargs.pop('recommendations')
-            self._kwargs = kwargs
+        if data:
+            from tmdbhelper.lib.files.futils import json_loads as loads
+            data = loads(data)
+
+        # The trigger changed so lets open the recommendations window
+        if data and self._window_id == data.pop('window_id'):
+            self._recommendations = data.pop('recommendations')
+            self._kwargs = data
             _gui = self._gui
             data = self._current_dump
             self.open_recommendations()
+
+            # If RECS closed because ONBACK then we need to go back to the previous info and join it
             if self._gui._state == 'onback':
                 self._gui = _gui
                 self._current_path = path
-                self._current_dump = get_property(PROP_JSONDUMP, set_property=data)
                 return self.on_join(t, path)
 
         return self.on_back() if self._history and not self.is_exiting() else self.on_exit()
@@ -327,7 +341,7 @@ class WindowRecommendationsManager():
         with WindowProperty((PROP_HIDERECS, 'True'), (setproperty, 'True')):
             self.add_history()
             t = self.open_info(listitem, self._gui.close if self._gui else None, threaded=True)
-            self._mon.waitForAbort(0.5)  # Wait a moment to allow info dialog to open before clearing props
+            self.wait_until_active(ID_VIDEOINFO, poll=0.1)  # Wait to allow info dialog to open
 
         return self.on_join(t, listitem.getPath())
 
@@ -342,7 +356,7 @@ class WindowRecommendationsManager():
         with WindowProperty((PROP_HIDEINFO, 'True'), (setproperty, 'True')):
             get_property(PROP_TMDBTYPE, self._gui._tmdb_type)
             t = self.open_info(listitem, threaded=True)
-            self._mon.waitForAbort(0.5)
+            self.wait_until_active(ID_VIDEOINFO, poll=0.1)  # Wait to allow info dialog to open
             self._gui.doModal()
 
         # Thread joins when Recs and Info close
@@ -350,17 +364,18 @@ class WindowRecommendationsManager():
 
     def pop_history(self):
         try:
-            self._gui, data = self._history.pop()
-            return data
+            self._gui, meta, data = self._history.pop()
+            return meta
         except IndexError:
             return
 
     def add_history(self):
         if not self._gui or not self._gui._tmdb_type or not self._gui._tmdb_id:
             return
-        data = {'tmdb_type': self._gui._tmdb_type, 'tmdb_id': self._gui._tmdb_id}
-        self._history.append((self._gui, data))
-        return data
+        meta = {'tmdb_type': self._gui._tmdb_type, 'tmdb_id': self._gui._tmdb_id}
+        data = get_property(PROP_JSONDUMP)
+        self._history.append((self._gui, meta, data))
+        return meta
 
     def open_info(self, listitem, func=None, threaded=False):
         executebuiltin(f'Dialog.Close(movieinformation,true)')
@@ -368,6 +383,9 @@ class WindowRecommendationsManager():
         func() if func else None
         if xbmcgui.getCurrentWindowId() != self._window_id:
             executebuiltin(f'ActivateWindow({self._window_id})')
+            self.wait_until_active(self._window_id, poll=0.1)
+        self._current_dump = ''
+        get_property(PROP_JSONDUMP, clear_property=True)
         if threaded:
             t = Thread(target=xbmcgui.Dialog().info, args=[listitem])
             t.start()
@@ -388,14 +406,14 @@ class WindowRecommendationsManager():
             executebuiltin(builtin) if builtin and not after else None
             executebuiltin(f'Dialog.Close(movieinformation,true)')
             executebuiltin(f'Dialog.Close(pvrguideinfo,true)')
-            self._mon.waitForAbort(1)
+            self.wait_until_active(ID_VIDEOINFO, invert=True, poll=0.1)
             if not cond and xbmcgui.getCurrentWindowId() == self._window_id:
                 _win = xbmcgui.Window(self._window_id)
                 _win.close() if _win else None
+            self.wait_until_active(self._window_id, invert=True, poll=0.1)
             executebuiltin(builtin) if builtin and after else None
-            for _gui, data in self._history:
+            for _gui, meta, data in self._history:
                 del _gui
-            self._mon.waitForAbort(1)
             get_property(PROP_HIDEINFO, clear_property=True)
             get_property(PROP_HIDERECS, clear_property=True)
             get_property(PROP_TMDBTYPE, clear_property=True)

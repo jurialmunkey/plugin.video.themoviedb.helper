@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2023-03-12 19:01+0100\n"
+"PO-Revision-Date: 2023-12-13 15:30+0100\n"
 "Last-Translator: Peat80 <>\n"
 "Language-Team: LANGUAGE\n"
 "Language: de_DE\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.4.1\n"
 
 msgctxt "#30000"
 msgid "Arabic (United Arab Emirates)"
@@ -170,12 +170,12 @@ msgstr "Standardabspieler"
 #: /resources/settings.xml
 msgctxt "#32034"
 msgid "Get watched indicators and episode counts (slower)"
-msgstr "Indikatoren für Gesehen & Folgenanzahl von Trakt laden (langsamer)"
+msgstr "Indikatoren für Gesehen & Episodenanzahl von Trakt laden (langsamer)"
 
 #: /resources/settings.xml
 msgctxt "#32035"
 msgid "Get tvshow watched episode counts from Trakt"
-msgstr "Lade die Anzahl der angesehenen TV-Folgen von Trakt"
+msgstr "Anzahl angesehener Serien-Episoden von Trakt laden"
 
 #: /resources/settings.xml
 msgctxt "#32036"
@@ -358,7 +358,7 @@ msgstr "Ungenaue Übereinstimmungen zulassen (Jahr ignorieren) für Filme"
 #: /resources/settings.xml
 msgctxt "#32069"
 msgid "Allow fuzzy matches (ignore year) for tvshows"
-msgstr "Ungenaue Übereinstimmungen für TV-Sendungen zulassen (Jahr ignorieren)"
+msgstr "Ungenaue Übereinstimmungen für Serien zulassen (Jahr ignorieren)"
 
 #: /resources/lib/tmdb.py
 msgctxt "#32070"
@@ -433,7 +433,7 @@ msgstr "Konten"
 #: /resources/settings.xml
 msgctxt "#32084"
 msgid "Hide unaired episodes"
-msgstr "Nicht ausgestrahlte Folgen ausblenden"
+msgstr "Nicht ausgestrahlte Episoden ausblenden"
 
 #: /resources/settings.xml
 msgctxt "#32085"
@@ -443,7 +443,7 @@ msgstr "Serienstaffeln reduzieren"
 #: /resources/settings.xml
 msgctxt "#32086"
 msgid "Auto-update library and add new/missing episodes"
-msgstr "Auto-Update & neue / fehlende Folgen zur Bibliothek hinzufügen"
+msgstr "Auto-Update & neue / fehlende Episoden zur Bibliothek hinzufügen"
 
 #: /resources/settings.xml
 msgctxt "#32087"
@@ -478,7 +478,7 @@ msgstr "Widgets"
 #: /resources/settings.xml
 msgctxt "#32093"
 msgid "Next episodes sort method"
-msgstr "Sortiermethode für die nächsten Folgen"
+msgstr "Sortiermethode für die nächsten Episoden"
 
 #: /resources/settings.xml
 msgctxt "#32094"
@@ -808,8 +808,7 @@ msgstr "Nächste Ausstrahlung (Bibliothek)"
 msgctxt "#32156"
 msgid "Next aired library calendar links to local tvshow"
 msgstr ""
-"\"Nächste Bibliotheksausstrahlung\" im Kalender verweist auf lokale TV-"
-"Sendung"
+"\"Nächste Bibliotheksausstrahlung\" im Kalender verweist auf lokale Serie"
 
 #: /resources/lib/context.py
 msgctxt "#32157"
@@ -854,8 +853,8 @@ msgid ""
 "This limit is set to ensure that the APIs providing data for free are "
 "respected."
 msgstr ""
-"Das Hinzufügen von Trakt-Listen zur Bibliothek ist auf [B]{}[/B] TV-"
-"Sendungen und [B]{}[/B] Filme pro Liste beschränkt\n"
+"Das Hinzufügen von Trakt-Listen zur Bibliothek ist auf [B]{}[/B] Serien und "
+"[B]{}[/B] Filme pro Liste beschränkt\n"
 "Dieses Limit wird festgelegt um sicherzustellen dass die kostenlos "
 "bereitgestellten Daten der APIs respektiert werden."
 
@@ -890,8 +889,8 @@ msgid ""
 "[B][COLOR=red]Warning[/COLOR][/B] This list contains [B]{}[/B] TV Shows and "
 "[B]{}[/B] Movies"
 msgstr ""
-"[B][COLOR=red]Warnung[/COLOR][/B] Diese Liste enthält [B]{}[/B] TV-Sendungen "
-"und [B]{}[/B] Filme"
+"[B][COLOR=red]Warnung[/COLOR][/B] Diese Liste enthält [B]{}[/B] Serien und "
+"[B]{}[/B] Filme"
 
 #: /resources/lib/libraryupdate.py
 msgctxt "#32171"
@@ -1026,7 +1025,7 @@ msgstr "Dein Fortschritt"
 #: /resources/lib/plugin.py
 msgctxt "#32197"
 msgid "Your Next Episodes"
-msgstr "Deine nächsten Folgen"
+msgstr "Deine nächsten Episoden"
 
 #: /resources/lib/plugin.py
 msgctxt "#32198"
@@ -1185,7 +1184,7 @@ msgstr "Besetzung in Filmen"
 #: /resources/lib/plugin.py
 msgctxt "#32228"
 msgid "Cast in TV Shows"
-msgstr "Besetzung in TV-Sendungen"
+msgstr "Serien-Besetzung"
 
 #: /resources/lib/plugin.py
 msgctxt "#32229"
@@ -1195,7 +1194,7 @@ msgstr "Crew in Filmen"
 #: /resources/lib/plugin.py
 msgctxt "#32230"
 msgid "Crew in TV Shows"
-msgstr "Crew in TV-Sendungen"
+msgstr "Serien-Crew"
 
 #: /resources/lib/plugin.py
 msgctxt "#32231"
@@ -1858,7 +1857,7 @@ msgstr "Erstellen einer Filmwiedergabeliste"
 #: /resources/lib/kodi/library.py
 msgctxt "#32350"
 msgid "Creating tvshows playlist"
-msgstr "Erstellen einer TV-Wiedergabeliste"
+msgstr "Erstelle Serien-Wiedergabeliste"
 
 #: /resources/settings.xml
 msgctxt "#32351"
@@ -1964,7 +1963,7 @@ msgstr "Lokale Informationen"
 #: /resources/settings.xml
 msgctxt "#32368"
 msgid "Next Aired / Next Episodes"
-msgstr "Nächste Ausstrahlung / Nächste Folgen"
+msgstr "Nächste Ausstrahlung / Nächste Episoden"
 
 #: /resources/settings.xml
 msgctxt "#32369"
@@ -2124,7 +2123,7 @@ msgstr "Timer-Reporte für Verzeichnisse loggen"
 #: /resources/settings.xml
 msgctxt "#32396"
 msgid "Set unwatched episode count for in-progress tvshows only"
-msgstr "\"Ungesehene Folgen\"-Zähler nur für begonnene TV-Sendungen verwenden"
+msgstr "Zähler für ungesehene Episoden nur bei begonnenen Serien setzen"
 
 #: /resources/settings.xml
 msgctxt "#32397"
@@ -2164,17 +2163,17 @@ msgstr "Erhöhe Limits für synchronisierte Listeneinträge pro Seite (langsamer
 #: /resources/settings.xml
 msgctxt "#32404"
 msgid "Flatten tvshows with multiple episodes airing same day"
-msgstr "TV-Sendungen reduzieren wenn mehrere Folgen zeitgleich erscheinen"
+msgstr "Serien mit zeitgleich erscheinenden Episoden zusammenfassen"
 
 #: /resources/lib/addon/constants.py
 msgctxt "#32405"
 msgid "Your TV Shows Airing This Week"
-msgstr "Deine TV-Sendungen mit Ausstrahlung diese Woche"
+msgstr "Deine Serien mit Ausstrahlung diese Woche"
 
 #: /resources/lib/container/basedir.py
 msgctxt "#32406"
 msgid "Your In-Progress Episodes"
-msgstr "Deine begonnenen Folgen"
+msgstr "Deine begonnenen Episoden"
 
 #: /resources/settings.xml
 msgctxt "#32407"
@@ -2209,7 +2208,7 @@ msgstr "Mit Watch-Provider"
 #: /resources/settings.xml
 msgctxt "#32413"
 msgid "Next episodes checks calendar (slower but more accurate)"
-msgstr "\"Nächste Folgen\" prüft Kalender (langsamer aber genauer)"
+msgstr "\"Nächste Episoden\" prüft Kalender (langsamer aber genauer)"
 
 #: /resources/lib/addon/consts.py
 msgctxt "#32414"
@@ -2271,7 +2270,7 @@ msgstr "API-Schlüssel für MDbList"
 #: /resources/lib/player/configure.py
 msgctxt "#32424"
 msgid "Make episode playlists"
-msgstr "Serienfolgen als Playliste verwenden"
+msgstr "Episoden als Playliste verwenden"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32425"
@@ -2279,7 +2278,7 @@ msgid ""
 "Have TMDbHelper queue all episodes in a playlist when playing an episode "
 "using this player?"
 msgstr ""
-"Soll TMDbHelper beim Abspielen mit diesem Player alle Folgen zu einer "
+"Soll TMDbHelper beim Abspielen mit diesem Player alle Episoden zu einer "
 "Playlist hinzufügen?"
 
 #: /resources/lib/player/configure.py
@@ -2300,7 +2299,7 @@ msgstr "Browse nach Such-URL für Filmsuche"
 #: /resources/lib/player/configure.py
 msgctxt "#32429"
 msgid "Browse for TVSHOW search url"
-msgstr "Browse nach Such-URL für TV-Sendung"
+msgstr "Browse nach Such-URL für SERIE"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32430"
@@ -2310,7 +2309,7 @@ msgstr "Namen für diesen Player eingeben"
 #: /resources/lib/player/configure.py
 msgctxt "#32431"
 msgid "Use the same search URL for tvshows as movies?"
-msgstr "Gleiche Such-URL für TV-Sendungen & Filme verwenden?"
+msgstr "Gleiche Such-URL für Serien & Filme verwenden?"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32432"
@@ -2456,7 +2455,7 @@ msgstr "Nächste Ausstrahlung (Bibliothek)"
 #: /resources/lib/items/basedir.py
 msgctxt "#32459"
 msgid "Your Episodes Airing Next"
-msgstr "Deine als Nächstes laufenden Folgen"
+msgstr "Deine als Nächstes laufenden Episoden"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32460"
@@ -2554,7 +2553,7 @@ msgstr "Standardabspieler auswählen"
 #: /resources/lib/script/method.py
 msgctxt "#32477"
 msgid "Change default player for tvshow, season, or episode"
-msgstr "Standardabspieler für TV-Sendung, Staffel oder Folge ändern"
+msgstr "Standardabspieler für Serie, Staffel oder Episode ändern"
 
 #: /resources/settings.xml
 msgctxt "#32478"
@@ -2622,6 +2621,118 @@ msgstr "Zertifizierung ( < oder = )"
 msgctxt "#32488"
 msgid "Certification ( > or = )"
 msgstr "Zertifizierung ( > oder = )"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32489"
+msgid "Change rating"
+msgstr "Bewertung ändern"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32490"
+msgid "Add to favourites"
+msgstr "Zu Favoriten hinzufügen"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32491"
+msgid "Remove from favourites"
+msgstr "Aus Favoriten entfernen"
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32492"
+msgid ""
+"{} already exists in {}!\\nDo you wish to remove this item from the list?"
+msgstr "{} existiert bereits in {}!\\nDiesen Eintrag aus der Liste entfernen?"
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32493"
+msgid "Successfully removed {} from {}"
+msgstr "Erfolgreich {} aus {} entfernt"
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32494"
+msgid "Successfully added {} to {}"
+msgstr "Erfolgreich {} zu {} hinzugefügt"
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32495"
+msgid "Create new node"
+msgstr "Neuen Knoten erstellen"
+
+#: /resources/tmdbhelper/lib/items/container.py
+msgctxt "#32496"
+msgid "Add/Remove as Custom Node"
+msgstr "Benutzerdefinierten Knoten hinzufügen / entfernen"
+
+#: /resources/settings.xml
+msgctxt "#32497"
+msgid "Container content fallback for service listitems without mediatypes"
+msgstr ""
+"Containerinhaltstyp für Servicelisteneinträge ohne Mediatypen verwenden"
+
+#: /resources/settings.xml
+msgctxt "#32498"
+msgid ""
+"Some plugins have poor metadata and fail to fill the item mediatype which "
+"results in the service monitor not completing an item lookup. This setting "
+"allows the service monitor to use the container content type when item "
+"mediatype is missing. Note this setting will likely result more frequent "
+"incorrect matches due to the end plugin having bad metadata."
+msgstr ""
+"Einige Plugins mit wenig Metadaten geben den Medientyp des Eintrags nicht "
+"an. Dadurch kann der Servicemonitor die Eintragssuche nicht abschließen. "
+"Diese Einstellung nutzt den Inhaltstyp des Containers wenn der Medientyp "
+"fehlt. Die Benutzung schlechter Metadaten wird wahrscheinlich zu mehr "
+"fehlerhaften Treffern führen."
+
+#: /resources/settings.xml
+msgctxt "#32499"
+msgid "Page multipliers (higher is slower)"
+msgstr "Seitenmultiplikatoren (Höher ist langsamer)"
+
+#: /resources/settings.xml
+msgctxt "#32500"
+msgid "Page multiplier (TMDb basic lists)"
+msgstr "Seitenmultiplikatoren (TMDb einfache Listen)"
+
+#: /resources/settings.xml
+msgctxt "#32501"
+msgid "Page multiplier (Trakt basic lists)"
+msgstr "Seitenmultiplikatoren (Trakt einfache Listen)"
+
+#: /resources/settings.xml
+msgctxt "#32502"
+msgid "Page multiplier (Trakt sync lists)"
+msgstr "Seitenmultiplikatoren (Trakt synchronisierte Listen)"
+
+#: /resources/settings.xml
+msgctxt "#32503"
+msgid "Page multiplier (Library windows)"
+msgstr "Seitenmultiplikatoren (Bibliotheksansichten)"
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32504"
+msgid "Add {} to node"
+msgstr "{} zu Knoten hinzufügen"
+
+#: /resources/settings.xml
+msgctxt "#32505"
+msgid "Genre icons folder (TMDb)"
+msgstr "Ordner für Genre-Icons (TMDb)"
+
+#: /resources/settings.xml
+msgctxt "#32506"
+msgid "Provider icons folder (TMDb)"
+msgstr "Ordner für Provider-Icons (TMDb)"
+
+#: /resources/settings.xml
+msgctxt "#32507"
+msgid "Genre icon folder (Trakt)"
+msgstr "Ordner für Genre-Icons (Trakt)"
+
+#: /resources/settings.xml
+msgctxt "#32508"
+msgid "Recache Kodi Library details when building players"
+msgstr "Bei Player-Erstellung Cache der Kodi-Bibliothek aktualisieren"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
@@ -2915,7 +3026,7 @@ msgstr "Standardabspieler (Filme)"
 #: /resources/settings.xml
 msgctxt "#32025"
 msgid "Default player for episodes"
-msgstr "Standardabspieler (Folgen)"
+msgstr "Standardabspieler (Episoden)"
 
 #: /resources/settings.xml
 msgctxt "#32026"
