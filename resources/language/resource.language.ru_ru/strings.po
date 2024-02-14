@@ -7,15 +7,16 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2023-07-17 12:03+0300\n"
+"PO-Revision-Date: 2024-02-12 22:34+0300\n"
 "Last-Translator: alexeichikad <alexeichikad@gmail.com>\n"
 "Language-Team: \n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.3.2\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"X-Generator: Poedit 3.4.2\n"
 
 msgctxt "#30000"
 msgid "Arabic (United Arab Emirates)"
@@ -1211,7 +1212,7 @@ msgstr "В списках Trakt"
 #: /resources/lib/listitem.py
 msgctxt "#32233"
 msgid "Refresh details"
-msgstr "Обновить сведения"
+msgstr "Обновление сведений"
 
 #: /resources/lib/script.py
 msgctxt "#32234"
@@ -1221,7 +1222,7 @@ msgstr "Обновлены сведения для {} ID {}"
 #: /resources/lib/listitem.py
 msgctxt "#32235"
 msgid "Browse lists"
-msgstr "Просмотреть списки"
+msgstr "Просмотр списков"
 
 #: /resources/lib/players.py
 msgctxt "#32236"
@@ -1476,7 +1477,7 @@ msgstr "Эти две недели"
 #: /resources/lib/_trakt_itemlists.py
 msgctxt "#32286"
 msgid "Rank"
-msgstr ""
+msgstr "Рейтинг"
 
 #: /resources/lib/_trakt_itemlists.py
 msgctxt "#32287"
@@ -1538,7 +1539,7 @@ msgid ""
 "{} was successful for {}!\n"
 "{} ID {}"
 msgstr ""
-"{} было успешным для {}!\n"
+"{} прошло успешно для {}!\n"
 "{} ID {}"
 
 #: /resources/lib/syncitem.py
@@ -2638,7 +2639,7 @@ msgstr "Сертификация ( > или = )"
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32489"
 msgid "Change rating"
-msgstr "Изменить рейтинг"
+msgstr "Изменение рейтинга"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32490"
@@ -2675,6 +2676,80 @@ msgstr "Создать новый узел"
 msgctxt "#32496"
 msgid "Add/Remove as Custom Node"
 msgstr "Добавить/Удалить как пользовательский узел"
+
+#: /resources/settings.xml
+msgctxt "#32497"
+msgid "Container content fallback for service listitems without mediatypes"
+msgstr ""
+"Использовать медиатип контента контейнера, когда медиатип элемента "
+"отсутствует"
+
+#: /resources/settings.xml
+msgctxt "#32498"
+msgid ""
+"Some plugins have poor metadata and fail to fill the item mediatype which "
+"results in the service monitor not completing an item lookup. This setting "
+"allows the service monitor to use the container content type when item "
+"mediatype is missing. Note this setting will likely result more frequent "
+"incorrect matches due to the end plugin having bad metadata."
+msgstr ""
+"Некоторые плагины имеют плохие метаданные и не могут заполнить медиатип "
+"элемента, в результате чего монитор службы не выполняет поиск элемента. Этот "
+"параметр позволяет монитору службы использовать тип контента контейнера, "
+"когда медиатип элемента отсутствует. Обратите внимание, что этот параметр, "
+"скорее всего, приведет к более частым неправильным совпадениям из-за того, "
+"что конечный плагин имеет неверные метаданные."
+
+#: /resources/settings.xml
+msgctxt "#32499"
+msgid "Page multipliers (higher is slower)"
+msgstr "Множители страниц (больше - медленнее)"
+
+#: /resources/settings.xml
+msgctxt "#32500"
+msgid "Page multiplier (TMDb basic lists)"
+msgstr "Множитель страниц (основные списки TMDb)"
+
+#: /resources/settings.xml
+msgctxt "#32501"
+msgid "Page multiplier (Trakt basic lists)"
+msgstr "Множитель страниц (основные списки Тракт)"
+
+#: /resources/settings.xml
+msgctxt "#32502"
+msgid "Page multiplier (Trakt sync lists)"
+msgstr "Множитель страниц (списки синхронизации Trakt)"
+
+#: /resources/settings.xml
+msgctxt "#32503"
+msgid "Page multiplier (Library windows)"
+msgstr "Множитель страниц (Библиотека)"
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32504"
+msgid "Add {} to node"
+msgstr "Добавить {} к узлу"
+
+#: /resources/settings.xml
+msgctxt "#32505"
+msgid "Genre icons folder (TMDb)"
+msgstr "Папка с иконками жанра (TMDb)"
+
+#: /resources/settings.xml
+msgctxt "#32506"
+msgid "Provider icons folder (TMDb)"
+msgstr "Папка с иконками провайдеров (TMDb)"
+
+#: /resources/settings.xml
+msgctxt "#32507"
+msgid "Genre icon folder (Trakt)"
+msgstr "Папка с иконками жанров (Trakt)"
+
+#: /resources/settings.xml
+msgctxt "#32508"
+msgid "Recache Kodi Library details when building players"
+msgstr ""
+"Обновить кэшированные данные библиотеки Kodi при построении проигрывателей"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
@@ -2841,12 +2916,12 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32002"
 msgid "Days to cache details"
-msgstr ""
+msgstr "Время кэширования сведений (дней)"
 
 #: /resources/settings.xml
 msgctxt "#32003"
 msgid "Days to cache lists"
-msgstr ""
+msgstr "Время кэширования списков (дней)"
 
 #: /resources/settings.xml
 msgctxt "#32004"
