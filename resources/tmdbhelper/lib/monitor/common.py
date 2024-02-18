@@ -35,6 +35,12 @@ SETPROP_RATINGS = {
     'goldenglobe_awards_nominated', 'mtv_awards_nominated', 'criticschoice_awards_nominated',
     'emmy_awards_nominated', 'sag_awards_nominated', 'bafta_awards_nominated'}
 
+SETBASE = {
+    'base_label', 'base_title', 'base_icon', 'base_plot', 'base_tagline', 'base_dbtype', 'base_rating',
+    'base_poster', 'base_fanart', 'base_clearlogo', 'base_tvshowtitle', 'base_studio', 'base_genre',
+    'base_director', 'base_writer'
+}
+
 TVDB_AWARDS_KEYS = {
     'Academy Awards': 'academy',
     'Golden Globe Awards': 'goldenglobe',
@@ -300,6 +306,10 @@ class CommonMonitorFunctions(CommonMonitorDetails):
         self.set_property('Premiered_Long', get_region_date(date_obj, 'datelong'))
         self.set_property('Premiered_Custom', date_obj.strftime(get_infolabel('Skin.String(TMDbHelper.Date.Format)') or '%d %b %Y'))
         self.properties.update(['Premiered', 'Premiered_Long', 'Premiered_Custom'])
+
+    def set_base_properties(self, item):
+        infoproperties = item.get('infoproperties', {})
+        self.set_iter_properties(infoproperties, SETBASE)
 
     def set_properties(self, item):
         cast = item.get('cast', [])
