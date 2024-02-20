@@ -139,7 +139,7 @@ msgstr "Іврит (Ізраїль)"
 #: /resources/settings.xml
 msgctxt "#32028"
 msgid "Use fanart.tv for widget artwork (slower)"
-msgstr "Використовувати fanart.tv для віджетів (повільно)"
+msgstr "Використовувати fanart.tv для ілюстрацій віджетів (повільно)"
 
 #: /resources/settings.xml
 msgctxt "#32029"
@@ -189,12 +189,12 @@ msgstr "Використовувати вбудовані плеєри"
 #: /resources/settings.xml
 msgctxt "#32038"
 msgid "Get additional details from the local Kodi library database"
-msgstr "Отримувати додаткові відомості з локальної бази даних каталогу Kodi"
+msgstr "Отримувати додаткові відомості з локальної бази даних локальної медіатеки"
 
 #: /resources/settings.xml
 msgctxt "#32039"
 msgid "Kodi Library DB"
-msgstr "База даних каталогу Kodi"
+msgstr "База даних локальної медіатеки"
 
 #: /resources/lib/player.py
 msgctxt "#32040"
@@ -214,7 +214,7 @@ msgstr "Обрати дію"
 #: /resources/lib/container.py
 msgctxt "#32043"
 msgid "Up Next"
-msgstr "Наступне"
+msgstr "Далі"
 
 #: /resources/lib/container.py
 msgctxt "#32044"
@@ -269,7 +269,7 @@ msgstr "Оновити кеш"
 #: /resources/lib/downloader.py
 msgctxt "#32054"
 msgid "Would you like to clear existing players first?"
-msgstr "Спочатку очистити існуючі плеєри?"
+msgstr "Бажаєте спочатку очистити існуючі плеєри?"
 
 #: /resources/lib/downloader.py
 msgctxt "#32055"
@@ -284,7 +284,7 @@ msgstr "Некоректний логін чи пароль. Повторити?
 #: /resources/lib/downloader.py
 msgctxt "#32057"
 msgid "Retry"
-msgstr "Повтор"
+msgstr "Повторити"
 
 #: /resources/lib/downloader.py
 msgctxt "#32058"
@@ -346,7 +346,7 @@ msgstr "Журнал налагодження"
 #: /resources/settings.xml
 msgctxt "#32067"
 msgid "Fuzzy local library matching"
-msgstr "Нечіткий підбір локального каталогу"
+msgstr "Нечіткий підбір локальної медіатеки"
 
 #: /resources/settings.xml
 msgctxt "#32068"
@@ -381,7 +381,7 @@ msgstr "Сховати невидані фільми"
 #: /resources/settings.xml
 msgctxt "#32074"
 msgid "Library Integration"
-msgstr "Інтеграція каталогу"
+msgstr "Інтеграція медіатеки"
 
 #: /resources/settings.xml
 msgctxt "#32075"
@@ -391,7 +391,7 @@ msgstr "Серіали"
 #: /resources/settings.xml
 msgctxt "#32076"
 msgid "Update library after adding items"
-msgstr "Оновити каталог після додавання елементів"
+msgstr "Оновити медіатеку після додавання елементів"
 
 #: /resources/settings.xml
 msgctxt "#32077"
@@ -436,17 +436,17 @@ msgstr "Сховати невидані серії"
 #: /resources/settings.xml
 msgctxt "#32085"
 msgid "Flatten seasons"
-msgstr "Компактні сезони"
+msgstr "Об'єднати сезони в один ряд"
 
 #: /resources/settings.xml
 msgctxt "#32086"
 msgid "Auto-update library and add new/missing episodes"
-msgstr "Автоматично оновляти каталог та додавати нові/пропущені серії"
+msgstr "Автоматично оновляти медіатеку та додавати нові/пропущені серії"
 
 #: /resources/settings.xml
 msgctxt "#32087"
 msgid "Use resolvedURL method for suppressing strm next playlist error"
-msgstr "Метод resolvedURL для усунення помилки наступного плейлисту strm"
+msgstr "Метод resolvedURL для усунення помилки наступного плейлисту"
 
 #: /resources/settings.xml
 msgctxt "#32088"
@@ -456,7 +456,7 @@ msgstr "Навігація"
 #: /resources/settings.xml
 msgctxt "#32089"
 msgid "Select Action"
-msgstr "Дія при виборі"
+msgstr "Обрати дію"
 
 #: /resources/settings.xml
 msgctxt "#32090"
@@ -640,12 +640,12 @@ msgstr "Додаємо"
 #: /resources/lib/context.py
 msgctxt "#32125"
 msgid "Add Trakt list to Kodi library"
-msgstr "Додати список Trakt до каталогу Kodi"
+msgstr "Додати список Trakt до локальної медіатеки"
 
 #: /resources/lib/context.py
 msgctxt "#32126"
 msgid "Are you sure you want to add this Trakt list to your Kodi library?"
-msgstr "Додати список Trakt до каталогу Kodi?"
+msgstr "Додати список Trakt до локальної медіатеки?"
 
 #: /resources/lib/context.py
 msgctxt "#32127"
@@ -665,17 +665,17 @@ msgstr "елементів"
 #: /resources/settings.xml
 msgctxt "#32130"
 msgid "Auto-update library at time"
-msgstr "Автоматично оновляти каталог в"
+msgstr "Автоматично оновляти медіатеку о"
 
 #: /resources/settings.xml
 msgctxt "#32131"
 msgid "Auto-update library from Trakt list(s)"
-msgstr "Автоматично оновляти каталог із списків Trakt"
+msgstr "Автоматично оновляти медіатеку із списків Trakt"
 
 #: /resources/lib/script.py
 msgctxt "#32132"
 msgid "Do you wish to update the library from the Trakt list(s) now?"
-msgstr "Оновити каталог із списків Trakt зараз?"
+msgstr "Оновити медіатеку із списків Trakt зараз?"
 
 #: /resources/lib/script.py
 msgctxt "#32133"
@@ -770,7 +770,7 @@ msgstr "Додати/Видалити із колекції Trakt"
 #: /addon.xml
 msgctxt "#32151"
 msgid "Add to Kodi Library"
-msgstr "Додати до каталогу Kodi"
+msgstr "Додати до локальної медіатеки"
 
 #: /addon.xml
 msgctxt "#32152"
@@ -785,17 +785,17 @@ msgstr "Оновити кеш відомостей"
 #: /resources/settings.xml
 msgctxt "#32154"
 msgid "Update library now"
-msgstr "Оновити каталог зараз"
+msgstr "Оновити медіатеку зараз"
 
 #: /resources/settings.xml
 msgctxt "#32155"
 msgid "Next Aired (Library)"
-msgstr "Наступне (Каталог)"
+msgstr "Наступні в ефірі (Медіатека)"
 
 #: /resources/settings.xml
 msgctxt "#32156"
 msgid "Next aired library calendar links to local tvshow"
-msgstr "Посилатися на локальний серіал в каталозі наступних епізодів"
+msgstr "Посилатися на локальний календар наступних епізодів в ефірі для серіалів"
 
 #: /resources/lib/context.py
 msgctxt "#32157"
@@ -815,12 +815,12 @@ msgstr "Вибрати мову оригіналу"
 #: /resources/lib/context.py
 msgctxt "#32160"
 msgid "Adding {} - {} to library..."
-msgstr "Додаємо {} - {} до каталогу..."
+msgstr "Додаємо {} - {} до медіатеки..."
 
 #: /resources/lib/traktapi.py
 msgctxt "#32161"
 msgid "Do you wish to update the library with this list now?"
-msgstr "Оновити каталог із цим списком зараз?"
+msgstr "Оновити медіатеку із цим списком зараз?"
 
 #: /resources/settings.xml
 msgctxt "#32162"
@@ -838,7 +838,7 @@ msgid ""
 "Adding Trakt lists to library is limited to [B]{}[/B] TV Shows and [B]{}[/B] Movies per list.\n"
 "This limit is set to ensure that the APIs providing data for free are respected."
 msgstr ""
-"Внесення списків Trakt до каталогу обмежено до [B]{}[/B] серіалів та [B]{}[/B] фільмів.\n"
+"Внесення списків Trakt до медіатеки обмежено до [B]{}[/B] серіалів та [B]{}[/B] фільмів.\n"
 "Це обмеження необхідне задля дотримання лімітів безкоштовних API."
 
 #: /resources/lib/context.py
@@ -849,7 +849,7 @@ msgstr "Довжина списку перевищує обмеження. Пр�
 #: /resources/lib/context.py
 msgctxt "#32166"
 msgid "Adding items to library..."
-msgstr "Додаємо елементи до каталогу..."
+msgstr "Додаємо елементи до медіатеки..."
 
 #: /resources/lib/context.py
 msgctxt "#32167"
@@ -884,7 +884,7 @@ msgstr "Актори"
 #: /resources/lib/constants.py
 msgctxt "#32173"
 msgid "Randomised"
-msgstr "Випадково"
+msgstr "Рандомізовано"
 
 #: /resources/lib/constants.py
 msgctxt "#32174"
@@ -929,12 +929,12 @@ msgstr "Сьогодні в ефірі"
 #: /resources/lib/plugin.py
 msgctxt "#32182"
 msgid "Currently Airing"
-msgstr "Зараз на ТБ"
+msgstr "Зараз в ефірі"
 
 #: /resources/lib/plugin.py
 msgctxt "#32183"
 msgid "Next Aired Library"
-msgstr "Каталог наступних серій"
+msgstr "Каталог наступних в ефірі"
 
 #: /resources/lib/plugin.py
 msgctxt "#32184"
@@ -989,12 +989,12 @@ msgstr "Закладки"
 #: /resources/lib/plugin.py
 msgctxt "#32194"
 msgid "Your Recently Watched"
-msgstr "Нещодавно переглянуті"
+msgstr "Ваші нещодавно переглянуті"
 
 #: /resources/lib/plugin.py
 msgctxt "#32195"
 msgid "Your Most Watched"
-msgstr "Ваші \"Найбільше переглядів\""
+msgstr "Ваші найчастіше переглядувані"
 
 #: /resources/lib/plugin.py
 msgctxt "#32196"
@@ -1019,7 +1019,7 @@ msgstr "На основі нещодавно переглянутих"
 #: /resources/lib/plugin.py
 msgctxt "#32200"
 msgid "Based on Most Watched"
-msgstr "На основі \"Найбільше переглядів\""
+msgstr "На основі найчастіше переглядуваного"
 
 #: /resources/lib/plugin.py
 msgctxt "#32201"
@@ -1089,7 +1089,7 @@ msgstr "Вийти з облікового запису Trakt?"
 #: /resources/lib/traktapi.py
 msgctxt "#32214"
 msgid "Trakt access token not found"
-msgstr "Trakt access токен не знайдено"
+msgstr "Токен доступу Trakt не знайдено"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32215"
@@ -1650,7 +1650,7 @@ msgstr "Обрати плеєр"
 #: /resources/lib/helpers/update.py
 msgctxt "#32323"
 msgid "Item added to library"
-msgstr "Елемент додано до каталогу"
+msgstr "Елемент додано до медіатеки"
 
 #: /resources/lib/player/players.py
 msgctxt "#32324"
@@ -1690,7 +1690,7 @@ msgstr "Обрати плеєр для налаштування"
 #: /resources/settings.xml
 msgctxt "#32329"
 msgid "Configure players"
-msgstr "Змінити плеєри"
+msgstr "Редагувати плеєри"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32330"
@@ -1839,7 +1839,7 @@ msgid ""
 "\n"
 "Select \"Yes\" for any player that plays directly from single source. Select \"No\" for players that scrape multiple sources or otherwise do not work with the setResolvedURL method."
 msgstr ""
-"Цей плеєр відразу одразу отримує один файл який можна відтворити?\n"
+"Цей плеєр відразу отримує один файл який можна відтворити?\n"
 "\n"
 "Оберіть \"Так\" для будь-якого плеєра який підтримує відтворення з одного джерела. Оберіть \"Ні\" для плеєрів що оброблюють кілька джерел чи не підтримують метод setResolvedURL."
 
@@ -1887,7 +1887,7 @@ msgstr "Списки пошуку"
 #: /resources/lib/script/sync.py
 msgctxt "#32362"
 msgid "Do you want to add this item to the library now?"
-msgstr "Додати елемент до каталогу зараз?"
+msgstr "Додати елемент до медіатеки зараз?"
 
 #: /resources/settings.xml
 msgctxt "#32363"
@@ -1942,7 +1942,7 @@ msgstr "фанарт"
 #: /resources/settings.xml
 msgctxt "#32373"
 msgid "Restrict to library strm"
-msgstr "Обмежити до strm каталогу"
+msgstr "Обмежити до strm медіатеки"
 
 #: /resources/lib/player/players.py
 msgctxt "#32374"
@@ -2049,7 +2049,7 @@ msgid ""
 msgstr ""
 "[B]Швидке оновлення[/B] для перевірки нових елементів.\n"
 "\n"
-"[B]Примусове оновлення[/B] ігнорує попереднє оновлення та перевіряє всі елементи. Примусове оновлення рекомендовано тільки при очищенні та перебудові каталогу Kodi."
+"[B]Примусове оновлення[/B] ігнорує попереднє оновлення та перевіряє всі елементи. Примусове оновлення рекомендовано тільки при очищенні та перебудові медіатеки Kodi."
 
 #: /resources/lib/script/router.py
 msgctxt "#32393"
@@ -2089,7 +2089,7 @@ msgstr "Англійська як запасна опція коли систе�
 #: /resources/settings.xml
 msgctxt "#32400"
 msgid "Play local Kodi library files"
-msgstr "Відтворити файли з локального каталогу Kodi"
+msgstr "Відтворити файли з локальної медіатеки"
 
 #: /resources/settings.xml
 msgctxt "#32401"
@@ -2319,12 +2319,12 @@ msgstr "Змінити правила для кроку {}"
 #: /resources/lib/player/configure.py
 msgctxt "#32446"
 msgid "plugin:// search URL for {}"
-msgstr "plugin:// пошукове посилання для {}"
+msgstr "пошукове посилання plugin:// для {}"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32447"
 msgid "Up Next Only"
-msgstr "Тільки наступні"
+msgstr "Тільки \"Далі\""
 
 #: /resources/settings.xml
 msgctxt "#32448"
@@ -2379,7 +2379,7 @@ msgstr "Закладки (очікується)"
 #: /resources/lib/items/basedir.py
 msgctxt "#32458"
 msgid "Airing Next Library"
-msgstr "Каталог наступних"
+msgstr "Наступні в ефірі (Медіатека)"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32459"
@@ -2424,7 +2424,7 @@ msgstr "Відтворювати автоматично з доступними 
 #: /resources/settings.xml
 msgctxt "#32467"
 msgid "Refresh cached Kodi Library details"
-msgstr "Оновити кеш відомостей каталогу Kodi"
+msgstr "Оновити кеш відомостей локальної медіатеки"
 
 #: /resources/settings.xml
 msgctxt "#32468"
@@ -2604,7 +2604,7 @@ msgstr "Мультиплікатор сторінки (списки синхро
 #: /resources/settings.xml
 msgctxt "#32503"
 msgid "Page multiplier (Library windows)"
-msgstr "Мультиплікатор сторінки (вікна каталогу)"
+msgstr "Мультиплікатор сторінки (вікна медіатеки)"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32504"
@@ -2629,7 +2629,7 @@ msgstr "Тека іконок жанрів (Trakt)"
 #: /resources/settings.xml
 msgctxt "#32508"
 msgid "Recache Kodi Library details when building players"
-msgstr "Оновити кеш відомостей каталогу Kodi при побудові плеєрів"
+msgstr "Оновити кеш відомостей локальної медіатеки при побудові плеєрів"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
@@ -2796,12 +2796,12 @@ msgstr "API ключ OMDb"
 #: /resources/settings.xml
 msgctxt "#32002"
 msgid "Days to cache details"
-msgstr "Тривалість кешу відомостей"
+msgstr "Зберігати кеш відомостей"
 
 #: /resources/settings.xml
 msgctxt "#32003"
 msgid "Days to cache lists"
-msgstr "Тривалість кешу списків"
+msgstr "Зберігати кеш списків"
 
 #: /resources/settings.xml
 msgctxt "#32004"
@@ -2881,7 +2881,7 @@ msgstr "API ключ Fanart.tv"
 #: /resources/settings.xml
 msgctxt "#32019"
 msgid "Fanart.tv client key"
-msgstr ""
+msgstr "Клієнтський ключ Fanart.tv"
 
 #: /resources/settings.xml
 msgctxt "#32020"
