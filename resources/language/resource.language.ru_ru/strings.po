@@ -1154,7 +1154,7 @@ msgstr "Обновить все иллюстрации"
 #: /resources/lib/listitem.py
 msgctxt "#32222"
 msgid "Manage artwork"
-msgstr "Управление иллюстрации"
+msgstr "Управление иллюстрациями"
 
 #: /resources/lib/plugin.py
 msgctxt "#32223"
