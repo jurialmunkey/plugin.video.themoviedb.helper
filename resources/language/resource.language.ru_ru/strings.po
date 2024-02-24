@@ -2536,7 +2536,7 @@ msgstr "Уведомления об ошибках подключения"
 #: /resources/settings.xml
 msgctxt "#32472"
 msgid "Cache image location"
-msgstr "Расположение кеша изображений"
+msgstr "Расположение кэша изображений"
 
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32473"
