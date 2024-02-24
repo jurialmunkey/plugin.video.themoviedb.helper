@@ -259,7 +259,8 @@ class ListItemDetails():
         for k, v, f in BASEITEM_PROPERTIES:
             try:
                 value = next(j for j in (self.get_infolabel(i) for i in v) if j)
-                self._itemdetails.listitem['infoproperties'][k] = f(value) if f else value
+                value = f(value) if f else value
+                self._itemdetails.listitem['infoproperties'][k] = value
             except StopIteration:
                 self._itemdetails.listitem['infoproperties'][k] = None
 

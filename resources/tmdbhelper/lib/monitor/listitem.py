@@ -245,6 +245,8 @@ class ListItemMonitor(CommonMonitorFunctions):
             t = Thread(target=_process_artwork_ratings)
             t.start()
 
+        self.set_base_properties(_item._itemdetails.listitem)
+
     def on_finalise_winproperties(self, process_artwork=True, process_ratings=True):
         _item = self._item
         _item.get_additional_properties()
