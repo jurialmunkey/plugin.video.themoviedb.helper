@@ -140,7 +140,7 @@ msgstr "Иврит (Израиль)"
 #: /resources/settings.xml
 msgctxt "#32028"
 msgid "Use fanart.tv for widget artwork (slower)"
-msgstr "Использовать fanart.tv для изображений виджетов (медленнее)"
+msgstr "Использовать fanart.tv для иллюстраций виджетов (медленнее)"
 
 #: /resources/settings.xml
 msgctxt "#32029"
@@ -844,7 +844,7 @@ msgstr "Автоматически воспроизводить локальны
 #: /resources/settings.xml
 msgctxt "#32163"
 msgid "Use fanart.tv for service monitor artwork"
-msgstr "Использовать fanart.tv для службы мониторинга"
+msgstr "Использовать fanart.tv для иллюстраций службы мониторинга"
 
 #: /resources/lib/context.py
 msgctxt "#32164"
