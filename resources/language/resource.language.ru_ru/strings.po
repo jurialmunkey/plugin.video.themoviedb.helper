@@ -753,7 +753,7 @@ msgstr "Обновить сведения  TheMovieDb"
 #: /addon.xml
 msgctxt "#32145"
 msgid "TMDbHelper Options"
-msgstr "[COLOR=blue]TMDbHelper[/COLOR] Меню"
+msgstr "[COLOR=blue]TMDbHelper[/COLOR] Меню..."
 
 #: /addon.xml
 msgctxt "#32146"
@@ -2119,7 +2119,7 @@ msgstr "Быстрое обновление"
 #: /resources/settings.xml
 msgctxt "#32395"
 msgid "Log timer reports for directories"
-msgstr "Записывать в журнал отчеты таймера для папок"
+msgstr "Сохранять в журнал отчеты таймера для папок"
 
 #: /resources/settings.xml
 msgctxt "#32396"
