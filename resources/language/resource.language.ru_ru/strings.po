@@ -246,12 +246,12 @@ msgstr "Добавить в коллекцию Trakt"
 #: /resources/lib/container.py
 msgctxt "#32049"
 msgid "Remove from Trakt Watchlist"
-msgstr "Удалить из закладок Trakt (Watchlist)"
+msgstr "Удалить из закладок Trakt"
 
 #: /resources/lib/container.py
 msgctxt "#32050"
 msgid "Add to Trakt Watchlist"
-msgstr "Добавить в закладки Trakt (Watchlist)"
+msgstr "Добавить в закладки Trakt"
 
 #: /resources/lib/container.py
 msgctxt "#32051"
@@ -351,17 +351,17 @@ msgstr "Журнал отладки"
 #: /resources/settings.xml
 msgctxt "#32067"
 msgid "Fuzzy local library matching"
-msgstr "Нечеткое  сопоставление локальной медиатеки"
+msgstr "Нечеткое  совпадение локальной медиатеки"
 
 #: /resources/settings.xml
 msgctxt "#32068"
 msgid "Allow fuzzy matches (ignore year) for movies"
-msgstr "Разрешить нечеткое сопоставления (игнорировать год) для фильмов"
+msgstr "Разрешить нечеткие совпадения (игнорировать год) для фильмов"
 
 #: /resources/settings.xml
 msgctxt "#32069"
 msgid "Allow fuzzy matches (ignore year) for tvshows"
-msgstr "Разрешить нечеткие сопоставления (игнорировать год) для сериалов"
+msgstr "Разрешить нечеткие совпадения (игнорировать год) для сериалов"
 
 #: /resources/lib/tmdb.py
 msgctxt "#32070"
@@ -426,7 +426,7 @@ msgstr "Следующая страница"
 #: /resources/settings.xml
 msgctxt "#32082"
 msgid "Watchlist sort method"
-msgstr "Сортировка закладок (Watchlist)"
+msgstr "Сортировка закладок"
 
 #: /resources/settings.xml
 msgctxt "#32083"
@@ -555,22 +555,22 @@ msgstr "Добавлено"
 #: /resources/lib/container.py
 msgctxt "#32107"
 msgid "Set Match Method"
-msgstr "Установить метод сопоставления"
+msgstr "Установить метод подбора"
 
 #: /resources/lib/container.py
 msgctxt "#32108"
 msgid "Choose matching method for parameters with multiple values."
-msgstr "Выберите метод сопоставления для параметров с несколькими значениями."
+msgstr "Выберите метод подбора для параметров с несколькими значениями."
 
 #: /resources/lib/container.py
 msgctxt "#32109"
 msgid "Match ANY Value"
-msgstr "Совпадение с ЛЮБЫМ значением"
+msgstr "Совпадает с ЛЮБЫМ значением"
 
 #: /resources/lib/container.py
 msgctxt "#32110"
 msgid "Match ALL Values"
-msgstr "Совпадение со ВСЕМИ значениями"
+msgstr "Совпадает со ВСЕМИ значениями"
 
 #: /resources/lib/container.py
 msgctxt "#32111"
@@ -768,7 +768,7 @@ msgstr "Обзор сезонов (TMDbHelper)"
 #: /addon.xml
 msgctxt "#32148"
 msgid "Add/Remove from Trakt Watchlist"
-msgstr "Добавить/удалить из закладок Trakt (Watchlist)"
+msgstr "Добавить/удалить из закладок Trakt"
 
 #: /addon.xml
 msgctxt "#32149"
@@ -910,7 +910,7 @@ msgstr "Случайно"
 #: /resources/lib/constants.py
 msgctxt "#32174"
 msgid "Discover"
-msgstr "Узнать"
+msgstr "Обнаружить"
 
 #: /resources/lib/plugin.py
 msgctxt "#32175"
@@ -1005,7 +1005,7 @@ msgstr "Коллекция"
 #: /resources/lib/plugin.py
 msgctxt "#32193"
 msgid "Watchlist"
-msgstr "Закладки (Watchlist)"
+msgstr "Закладки"
 
 #: /resources/lib/plugin.py
 msgctxt "#32194"
@@ -1229,17 +1229,17 @@ msgstr "Выбрать элемент"
 #: /resources/lib/userdiscover.py
 msgctxt "#32237"
 msgid "Clear Discover History"
-msgstr "Очистить историю ознакомления"
+msgstr "Очистить историю обнаружения"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32238"
 msgid "Discover {}"
-msgstr "Ознакомиться с {}"
+msgstr "Обнаружить {}"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32239"
 msgid "Match"
-msgstr "Соответствие"
+msgstr "Подбор"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32240"
@@ -1294,7 +1294,7 @@ msgstr "С актерами"
 #: /resources/lib/userdiscover.py
 msgctxt "#32250"
 msgid "Primary Release Year"
-msgstr "Основной год релиза"
+msgstr "Основная дата релиза"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32251"
@@ -1499,12 +1499,12 @@ msgstr "Удалить из коллекции"
 #: /resources/lib/script.py
 msgctxt "#32291"
 msgid "Add to watchlist"
-msgstr "Добавить в закладки (Watchlist)"
+msgstr "Добавить в закладки"
 
 #: /resources/lib/script.py
 msgctxt "#32292"
 msgid "Remove from watchlist"
-msgstr "Удалить из закладок  (Watchlist)"
+msgstr "Удалить из закладок"
 
 #: /resources/lib/script.py
 msgctxt "#32293"
@@ -2381,7 +2381,7 @@ msgstr "Добавить новое правило"
 #: /resources/lib/player/configure.py
 msgctxt "#32443"
 msgid "Select value to match against {}"
-msgstr "Выберите значение для сравнения {}"
+msgstr "Выберать значение для подбора {}"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32444"
