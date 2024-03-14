@@ -2464,7 +2464,7 @@ msgstr "Cache readahead de itens de lista de serviço"
 
 #: /resources/settings.xml
 msgctxt "#32481"
-msgid "Increases the pool of recently watched items randomly selected from to use as the seed for becauase you watched style recommendations."
+msgid "Increases the pool of recently watched items randomly selected from the seed to use for \"Because You Watched\" style recommendations."
 msgstr "Aumenta o conjunto de itens recentemente assistidos selecionados aleatoriamente para usar como semente porque você assistiu recomendações do estilo."
 
 #: /resources/settings.xml
