@@ -137,6 +137,7 @@ def get_season_list(self, tmdb_id, special_folders=0, get_detailed=False):
             egroup_item['infolabels']['season'] = -1
             egroup_item['infolabels']['episode'] = 0
             egroup_item['infoproperties']['specialseason'] = get_localized(32345)
+            egroup_item['infoproperties']['IsSpecial'] = 'true'
             items_end.append(egroup_item)
 
     # Up Next
@@ -150,6 +151,7 @@ def get_season_list(self, tmdb_id, special_folders=0, get_detailed=False):
             upnext_item['infolabels']['season'] = -1
             upnext_item['infolabels']['episode'] = 0
             upnext_item['infoproperties']['specialseason'] = get_localized(32043)
+            upnext_item['infoproperties']['IsSpecial'] = 'true'
             items_end.append(upnext_item)
 
     return items + items_end
