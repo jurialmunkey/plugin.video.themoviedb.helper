@@ -93,7 +93,7 @@ class ListToWatch(Container):
 
 
 class ListComments(Container):
-    def get_items(self, info, tmdb_type, tmdb_id, **kwargs):
+    def get_items(self, info, tmdb_type, tmdb_id, sort=None, **kwargs):
         """ Get a mix of watchlisted and inprogress """
         from tmdbhelper.lib.api.mapping import get_empty_item
 
@@ -101,7 +101,7 @@ class ListComments(Container):
             return
         trakt_type = convert_type(tmdb_type, 'trakt')
         slug = self.trakt_api.get_id(tmdb_id, 'tmdb', trakt_type, 'slug')
-        items = self.trakt_api.get_request_sc(f'{trakt_type}s', slug, 'comments', limit=50)
+        items = self.trakt_api.get_request_sc(f'{trakt_type}s', slug, 'comments', sort, limit=50)
 
         def _map_item(i):
             item = get_empty_item()
