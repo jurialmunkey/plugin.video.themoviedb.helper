@@ -2528,9 +2528,7 @@ msgstr ""
 
 #: resources/settings.xml
 msgctxt "#32481"
-msgid ""
-"Increases the pool of recently watched items randomly selected from to use "
-"as the seed for becauase you watched style recommendations."
+msgid "Increases the pool of recently watched items randomly selected from the seed to use for \"Because You Watched\" style recommendations."
 msgstr ""
 
 #: resources/settings.xml

@@ -139,7 +139,7 @@ msgstr "Іврит (Ізраїль)"
 #: /resources/settings.xml
 msgctxt "#32028"
 msgid "Use fanart.tv for widget artwork (slower)"
-msgstr "Використовувати fanart.tv для ілюстрацій віджетів (повільно)"
+msgstr "Викор. fanart.tv для ілюстрацій віджетів (повільно)"
 
 #: /resources/settings.xml
 msgctxt "#32029"
@@ -174,7 +174,7 @@ msgstr "Індикатори переглянутого та кількості 
 #: /resources/settings.xml
 msgctxt "#32035"
 msgid "Get tvshow watched episode counts from Trakt"
-msgstr "Індикатор кількості серій з Trakt"
+msgstr "Отримувати індикатори к-сті серій з Trakt"
 
 #: /resources/settings.xml
 msgctxt "#32036"
@@ -189,12 +189,12 @@ msgstr "Використовувати вбудовані плеєри"
 #: /resources/settings.xml
 msgctxt "#32038"
 msgid "Get additional details from the local Kodi library database"
-msgstr "Отримувати додаткові відомості з локальної бази даних локальної медіатеки"
+msgstr "Отримувати додаткові відомості з локальної бази даних медіатеки"
 
 #: /resources/settings.xml
 msgctxt "#32039"
 msgid "Kodi Library DB"
-msgstr "База даних локальної медіатеки"
+msgstr "База даних медіатеки"
 
 #: /resources/lib/player.py
 msgctxt "#32040"
@@ -204,7 +204,7 @@ msgstr "Елемент не знайдено."
 #: /resources/lib/player.py
 msgctxt "#32041"
 msgid "The plugin returned no results."
-msgstr "Плагін не повернув результату"
+msgstr "Плагін не повернув результату."
 
 #: /resources/lib/player.py
 msgctxt "#32042"
@@ -229,7 +229,7 @@ msgstr "Оновити кеш"
 #: /resources/lib/container.py
 msgctxt "#32046"
 msgid "Cached details were refreshed"
-msgstr "Кеш відомостей оновлено"
+msgstr "Закешовані відомості оновлено"
 
 #: /resources/lib/container.py
 msgctxt "#32047"
@@ -279,7 +279,7 @@ msgstr "Невдала авторизація."
 #: /resources/lib/downloader.py
 msgctxt "#32056"
 msgid "Either the username or password were invalid. Would you like to try again?"
-msgstr "Некоректний логін чи пароль. Повторити?"
+msgstr "Невірний логін чи пароль. Спробувати ще раз?"
 
 #: /resources/lib/downloader.py
 msgctxt "#32057"
@@ -323,7 +323,7 @@ msgid ""
 "\n"
 "TMDb {2} ID {3}"
 msgstr ""
-"Видалити {0} з вашого Trakt {1}?\n"
+"Бажаєте видалити {0} з вашого Trakt {1}?\n"
 "\n"
 "TMDb {2} ID {3}"
 
@@ -334,7 +334,7 @@ msgid ""
 "\n"
 "TMDb {2} ID {3}"
 msgstr ""
-"Додати {0} до вашого Trakt {1}?\n"
+"Бажаєте додати {0} до вашого Trakt {1}?\n"
 "\n"
 "TMDb {2} ID {3}"
 
@@ -391,7 +391,7 @@ msgstr "Серіали"
 #: /resources/settings.xml
 msgctxt "#32076"
 msgid "Update library after adding items"
-msgstr "Оновити медіатеку після додавання елементів"
+msgstr "Оновляти медіатеку після додавання елементів"
 
 #: /resources/settings.xml
 msgctxt "#32077"
@@ -670,7 +670,7 @@ msgstr "Автоматично оновляти медіатеку о"
 #: /resources/settings.xml
 msgctxt "#32131"
 msgid "Auto-update library from Trakt list(s)"
-msgstr "Автоматично оновляти медіатеку із списків Trakt"
+msgstr "Автоматично оновляти медіатеку зі списків Trakt"
 
 #: /resources/lib/script.py
 msgctxt "#32132"
@@ -760,12 +760,12 @@ msgstr "Додати/видалити із закладок Trakt"
 #: /addon.xml
 msgctxt "#32149"
 msgid "Add/Remove from Trakt History"
-msgstr "Додати/Видалити із історії Trakt"
+msgstr "Додати/Видалити з історії Trakt"
 
 #: /addon.xml
 msgctxt "#32150"
 msgid "Add/Remove from Trakt Collection"
-msgstr "Додати/Видалити із колекції Trakt"
+msgstr "Додати/Видалити з колекції Trakt"
 
 #: /addon.xml
 msgctxt "#32151"
@@ -830,7 +830,7 @@ msgstr "Автоматично відтворювати локальні фай�
 #: /resources/settings.xml
 msgctxt "#32163"
 msgid "Use fanart.tv for service monitor artwork"
-msgstr "Використовувати fanart.tv для служби моніторинга"
+msgstr "Викор. fanart.tv для служби моніторинга"
 
 #: /resources/lib/context.py
 msgctxt "#32164"
@@ -864,7 +864,7 @@ msgstr "[B]{}[/B] користувачем [B]{}[/B]"
 #: /resources/settings.xml
 msgctxt "#32169"
 msgid "Logout of Trakt account..."
-msgstr "Вихід з акаунту Trakt..."
+msgstr "Вийти з акаунту Trakt..."
 
 #: /resources/lib/libraryupdate.py
 msgctxt "#32170"
@@ -894,7 +894,7 @@ msgstr "Оглянути"
 #: /resources/lib/plugin.py
 msgctxt "#32175"
 msgid "Popular"
-msgstr "Популярні"
+msgstr "Що популярно"
 
 #: /resources/lib/plugin.py
 msgctxt "#32176"
@@ -904,22 +904,22 @@ msgstr "Рейтингові"
 #: /resources/lib/plugin.py
 msgctxt "#32177"
 msgid "Upcoming"
-msgstr "Анонсовані"
+msgstr "Очікувані"
 
 #: /resources/lib/plugin.py
 msgctxt "#32178"
 msgid "Trending Today"
-msgstr "Трендові сьогодні"
+msgstr "В тренді сьогодні"
 
 #: /resources/lib/plugin.py
 msgctxt "#32179"
 msgid "Trending This Week"
-msgstr "Трендові цього тижня"
+msgstr "В тренді цього тижня"
 
 #: /resources/lib/plugin.py
 msgctxt "#32180"
 msgid "In Theatres"
-msgstr "В прокаті"
+msgstr "Зараз у кіно"
 
 #: /resources/lib/plugin.py
 msgctxt "#32181"
@@ -929,17 +929,17 @@ msgstr "Сьогодні в ефірі"
 #: /resources/lib/plugin.py
 msgctxt "#32182"
 msgid "Currently Airing"
-msgstr "Зараз в ефірі"
+msgstr "Зараз на ТБ"
 
 #: /resources/lib/plugin.py
 msgctxt "#32183"
 msgid "Next Aired Library"
-msgstr "Каталог наступних в ефірі"
+msgstr "Скоро в ефірі (Медіатека)"
 
 #: /resources/lib/plugin.py
 msgctxt "#32184"
 msgid "Highest Revenue"
-msgstr "Касові"
+msgstr "Найбільші касові збори"
 
 #: /resources/lib/plugin.py
 msgctxt "#32185"
@@ -1009,7 +1009,7 @@ msgstr "Ваші наступні серії"
 #: /resources/lib/plugin.py
 msgctxt "#32198"
 msgid "Recommended For You"
-msgstr "Рекомендації"
+msgstr "Персональні рекомендації"
 
 #: /resources/lib/plugin.py
 msgctxt "#32199"
@@ -1039,7 +1039,7 @@ msgstr "Календар"
 #: /resources/lib/plugin.py
 msgctxt "#32204"
 msgid "Trending"
-msgstr "Трендові"
+msgstr "В тренді"
 
 #: /resources/lib/plugin.py
 msgctxt "#32205"
@@ -1795,7 +1795,7 @@ msgstr "Групи серій"
 #: /resources/settings.xml
 msgctxt "#32346"
 msgid "Resend local files (fix Trakt scrobbling bug)"
-msgstr "Заново відправити локальні файли (виправляє баг Trakt scrobbling)"
+msgstr "Повторно відправляти локальні файли (виправляє баг скроблінгу Trakt)"
 
 #: /resources/settings.xml
 msgctxt "#32347"
@@ -1825,7 +1825,7 @@ msgstr "Тестовий ResolvedURL"
 #: /resources/settings.xml
 msgctxt "#32352"
 msgid "Dummy video duration (seconds)"
-msgstr "Тестова тривалість відео (секунди)"
+msgstr "Тривалість тестового відео (секунди)"
 
 #: /resources/lib/player/players.py
 msgctxt "#32353"
@@ -2033,7 +2033,7 @@ msgstr "Кеш видалено!"
 #: /resources/settings.xml
 msgctxt "#32390"
 msgid "Use alternative .nfo filename"
-msgstr "Альтернативний .nfo файл"
+msgstr "Використовувати альтернативну назву .nfo файла"
 
 #: /resources/lib/script/router.py
 msgctxt "#32391"
@@ -2119,7 +2119,7 @@ msgstr "Ваші серіали в ефірі цього тижня"
 #: /resources/lib/container/basedir.py
 msgctxt "#32406"
 msgid "Your In-Progress Episodes"
-msgstr "Продовжити перегляд (серіали)"
+msgstr "Ваші незавершені серії"
 
 #: /resources/settings.xml
 msgctxt "#32407"
@@ -2129,7 +2129,7 @@ msgstr "Пункт відновлення (експеримент.) (повіл�
 #: /resources/settings.xml
 msgctxt "#32408"
 msgid "Prefer artwork from TMDb first if available"
-msgstr "При наявності надавати перевагу ілюстраціям з TMDb"
+msgstr "При можливості надавати перевагу ілюстраціям з TMDb"
 
 #: /resources/settings.xml
 msgctxt "#32409"
@@ -2154,7 +2154,7 @@ msgstr "З провайдером перегляду"
 #: /resources/settings.xml
 msgctxt "#32413"
 msgid "Next episodes checks calendar (slower but more accurate)"
-msgstr "Перевірка календаря наступних епізодів (повільно, але більш точно)"
+msgstr "Перевіряти календар для наступних серій (повільно, але більш точно)"
 
 #: /resources/lib/addon/consts.py
 msgctxt "#32414"
@@ -2369,22 +2369,22 @@ msgstr "Найдовший"
 #: /resources/lib/items/basedir.py
 msgctxt "#32456"
 msgid "Watchlist (Released)"
-msgstr "Закладки (вийшли)"
+msgstr "Випущені в закладках"
 
 #: /resources/lib/addon/consts.py
 msgctxt "#32457"
 msgid "Watchlist (Anticipated)"
-msgstr "Закладки (очікується)"
+msgstr "Анонсовані в закладках"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32458"
 msgid "Airing Next Library"
-msgstr "Наступні в ефірі (Медіатека)"
+msgstr "Скоро в ефірі (Медіатека)"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32459"
 msgid "Your Episodes Airing Next"
-msgstr "Ваші наступні серії"
+msgstr "Ваші серії скоро в ефірі"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32460"
@@ -2479,12 +2479,12 @@ msgstr "Змінити стандартний плеєр для серіалів
 #: /resources/settings.xml
 msgctxt "#32478"
 msgid "Rebuild service listitems offscreen"
-msgstr "Перебудова служби елементів списку поза екраном"
+msgstr "Перебудова елементів списку поза екраном"
 
 #: /resources/settings.xml
 msgctxt "#32479"
 msgid "Some platforms experience crashes while updating onscreen background service listitems with additional properties. Forcing service listitems to be rebuilt offscreen prevents this issue but will be slightly slower to add artwork and ratings. Restart Kodi to see changes."
-msgstr "На деяких платформах оновлення елементів списку додатковими властивостями фонової служби на екрані викликає збої. Примусове відновлення елементів списку поза екраном запобігає цій проблемі, але додавання ілюстрація та оцінок буде повільнішим. Для застосування змін необхідне перезавантаження."
+msgstr "На деяких платформах оновлення наекранних елементів списку з додатковими властивостями фоновою службою викликає збої. Примусове відновлення елементів списку поза екраном запобігає цій проблемі, але сповільнює додавання ілюстрацій та оцінок. Для застосування змін необхідне перезавантаження Kodi."
 
 #: /resources/settings.xml
 msgctxt "#32480"
@@ -2493,13 +2493,13 @@ msgstr "Заздалегідь кешувати список елементів 
 
 #: /resources/settings.xml
 msgctxt "#32481"
-msgid "Increases the pool of recently watched items randomly selected from to use as the seed for becauase you watched style recommendations."
-msgstr "Збільшення пулу випадкових нещодавно переглянутих елементів для використання в якості рекомендацій."
+msgid "Increases the pool of recently watched items randomly selected from the seed to use for \"Because You Watched\" style recommendations."
+msgstr "Збільшення масиву випадкових нещодавно переглянутих елементів для рекомендацій накшталт \"Тому що ви переглядали\"."
 
 #: /resources/settings.xml
 msgctxt "#32482"
 msgid "Random seed pool for recommendations"
-msgstr "Випадковий сід пулу для рекомендацій"
+msgstr "Випадковий масив сіду для рекомендацій"
 
 #: /resources/settings.xml
 msgctxt "#32483"
@@ -2891,7 +2891,7 @@ msgstr "Тільки якщо стандартний API ключ вимкнен
 #: /resources/settings.xml
 msgctxt "#32021"
 msgid "Use fanart.tv for plugin artwork (slower)"
-msgstr "Використовувати fanart.tv для ілюстрацій плагіну (повільно)"
+msgstr "Викор. fanart.tv для ілюстрацій плагіну (повільно)"
 
 #: /resources/settings.xml
 msgctxt "#32022"

@@ -2493,7 +2493,7 @@ msgstr "Mise en cache anticipée des éléments de liste de service"
 
 #: /resources/settings.xml
 msgctxt "#32481"
-msgid "Increases the pool of recently watched items randomly selected from to use as the seed for becauase you watched style recommendations."
+msgid "Increases the pool of recently watched items randomly selected from the seed to use for \"Because You Watched\" style recommendations."
 msgstr "Augmente le nombre d'éléments récemment regardés de façon aléatoire afin d'enrichir les recommandations de style \"parce que vous avez regardé\"."
 
 #: /resources/settings.xml
