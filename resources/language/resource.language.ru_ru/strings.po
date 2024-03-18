@@ -753,7 +753,7 @@ msgstr "Обновить сведения  TheMovieDb"
 #: /addon.xml
 msgctxt "#32145"
 msgid "TMDbHelper Options"
-msgstr "[COLOR=blue]TMDbHelper[/COLOR] Меню..."
+msgstr "[COLOR=FFFF6B00]TMDbHelper[/COLOR] Меню..."
 
 #: /addon.xml
 msgctxt "#32146"
@@ -809,7 +809,7 @@ msgstr "Следующий эфир (Медиатека)"
 msgctxt "#32156"
 msgid "Next aired library calendar links to local tvshow"
 msgstr ""
-"Ссылаться на локальный календарь следующих эпизодов в эфире для сериалов "
+"Ссылаться на локальный календарь следующих эпизодов в эфире для сериалов"
 
 #: /resources/lib/context.py
 msgctxt "#32157"
@@ -1484,7 +1484,7 @@ msgstr "Сортировать по"
 #: /resources/lib/traktlists.py
 msgctxt "#32288"
 msgid "Because you watched"
-msgstr "Потому что вы просматривали"
+msgstr "Потому что вы смотрели"
 
 #: /resources/lib/script.py
 msgctxt "#32289"
@@ -2589,10 +2589,12 @@ msgstr "Упреждающее кэширование списка  элемен
 
 #: /resources/settings.xml
 msgctxt "#32481"
-msgid "Increases the pool of recently watched items randomly selected from the seed to use for \"Because You Watched\" style recommendations."
+msgid ""
+"Increases the pool of recently watched items randomly selected from the seed "
+"to use for \"Because You Watched\" style recommendations."
 msgstr ""
-"Увеличивает пул недавно просмотренных элементов для использования в качестве "
-"рекомендаций."
+"Увеличивает пул недавно просмотренных элементов случайно выбранных из списка "
+"просмотренных для использования в рекомендациях \"Потому что вы смотрели\"."
 
 #: /resources/settings.xml
 msgctxt "#32482"
@@ -2989,7 +2991,7 @@ msgstr "Ссылка на файлы проигрывателей"
 #: /resources/settings.xml
 msgctxt "#32016"
 msgid "Update players from URL"
-msgstr "Обновить файлы проигрывателей из ссылки "
+msgstr "Обновить файлы проигрывателей по ссылке"
 
 #: /resources/settings.xml
 msgctxt "#32017"
