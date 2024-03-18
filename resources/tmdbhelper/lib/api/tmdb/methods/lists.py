@@ -6,6 +6,8 @@ def clean_merged(item, tmdb_id, episode_group=False):
     item['unique_ids']['tvshow.tmdb'] = item['infoproperties']['tvshow.tmdb_id'] = tmdb_id
     if episode_group:
         item['unique_ids']['tmdb'] = item['infoproperties']['tmdb_id'] = tmdb_id
+    if item['infolabels'].get('season') == 0:
+        item['infoproperties']['IsSpecial'] = 'true'
     return item
 
 
@@ -119,6 +121,7 @@ def get_season_list(self, tmdb_id, special_folders=0, get_detailed=False):
         if i.get('season_number') != 0:
             items.append(item)
         elif ((special_folders >> 0) & 1) == 0:  # on bit in 0 pos hides specials
+            item['infoproperties']['IsSpecial'] = 'true'
             items_end.append(item)
 
     from tmdbhelper.lib.addon.plugin import ADDONPATH, get_localized
@@ -134,6 +137,7 @@ def get_season_list(self, tmdb_id, special_folders=0, get_detailed=False):
             egroup_item['infolabels']['season'] = -1
             egroup_item['infolabels']['episode'] = 0
             egroup_item['infoproperties']['specialseason'] = get_localized(32345)
+            egroup_item['infoproperties']['IsSpecial'] = 'true'
             items_end.append(egroup_item)
 
     # Up Next
@@ -147,6 +151,7 @@ def get_season_list(self, tmdb_id, special_folders=0, get_detailed=False):
             upnext_item['infolabels']['season'] = -1
             upnext_item['infolabels']['episode'] = 0
             upnext_item['infoproperties']['specialseason'] = get_localized(32043)
+            upnext_item['infoproperties']['IsSpecial'] = 'true'
             items_end.append(upnext_item)
 
     return items + items_end
