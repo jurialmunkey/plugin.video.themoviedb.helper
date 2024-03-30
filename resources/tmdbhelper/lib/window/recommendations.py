@@ -73,7 +73,7 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
         self._queue = (i for i in self._recommendations)
         self._context_action = kwargs.get('context')
         self._window_id = kwargs['window_id']
-        self._focus_id = kwargs.get('focus_id')
+        self._focus_id = int(kwargs['focus_id']) if 'focus_id' in kwargs else None
         self._window_manager = kwargs['window_manager']
         self._window_properties = {
             k.replace('winprop_', ''): v
@@ -97,7 +97,7 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
         if not _listitems or not _next_id:
             return self.do_close()
         _list_id = self._add_items(_next_id, _listitems)
-        _list_id = self._focus_id or _list_id # Allow skinner to override first list default focus
+        _list_id = self._focus_id or _list_id  # Allow skinner to override first list default focus
 
         Thread(target=self._build_all_in_groups, args=[3, _list_id]).start()  # Don't block closing
         self.setProperty(PROP_LIST_VISIBLE.format('Main'), 'True')
