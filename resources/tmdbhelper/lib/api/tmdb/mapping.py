@@ -718,7 +718,8 @@ class ItemMapper(_ItemMapper):
             'deathday': ('infoproperties', 'deathday'),
             'width': ('infoproperties', 'width'),
             'height': ('infoproperties', 'height'),
-            'aspect_ratio': ('infoproperties', 'aspect_ratio')
+            'aspect_ratio': ('infoproperties', 'aspect_ratio'),
+            'original_language': ('infoproperties', 'original_language')
         }
 
     def get_genres_by_id(self, v):
