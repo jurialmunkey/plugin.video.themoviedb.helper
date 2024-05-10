@@ -1,4 +1,5 @@
 import os
+import io
 import xbmcvfs
 import colorsys
 import hashlib
@@ -34,7 +35,9 @@ def _imageopen(image):
     global Image
     if Image is None:
         from PIL import Image
-    return Image.open(image)
+    with xbmcvfs.File(image, 'rb') as f:
+        image_bytes = f.readBytes()
+    return Image.open(io.BytesIO(image_bytes))
 
 
 def _closeimage(image, targetfile=None):
