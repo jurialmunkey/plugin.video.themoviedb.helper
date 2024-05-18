@@ -94,7 +94,14 @@ def get_item_details(tmdb_type, tmdb_id, season=None, episode=None, language=Non
 
 
 def _get_language_details(tmdb_type, tmdb_id, season=None, episode=None, language=None):
-    details = TMDb().get_request_lc(tmdb_type, tmdb_id, 'translations')
+    affix = ''
+    if tmdb_type == 'tv':
+        if season is not None:
+            affix = f'{affix}season/{season}/'
+            if episode is not None:
+                affix = f'{affix}episode/{episode}/'
+    affix = f'{affix}translations'
+    details = TMDb().get_request_lc(tmdb_type, tmdb_id, affix)
     if not details or not details.get('translations'):
         return
 
