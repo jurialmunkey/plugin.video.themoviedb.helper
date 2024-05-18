@@ -85,7 +85,7 @@ class TMDb(RequestAPI, TMDbMethods):
         try:
             return self._genres
         except AttributeError:
-            cache_name = f'TMDb.GenreLookup.{self.language}'
+            cache_name = f'TMDb.GenreLookup.v2.{self.language}'
             self._genres = self._cache.use_cache(self.get_genres, cache_name=cache_name)
             return self._genres
 

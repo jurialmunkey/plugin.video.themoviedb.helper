@@ -5,12 +5,13 @@ from tmdbhelper.lib.addon.consts import CACHE_SHORT, CACHE_MEDIUM
 
 def get_genres(self):
     genres = []
-    try:
+    from contextlib import suppress
+    with suppress(KeyError, TypeError):
         genres += self.get_request_lc('genre', 'tv', 'list')['genres']
         genres += self.get_request_lc('genre', 'movie', 'list')['genres']
-    except (KeyError, TypeError):
-        return genres
-    return {i['name']: i['id'] for i in genres if i} if genres else {}
+    if not genres:
+        return {}
+    return {i['name']: i['id'] for i in genres if i}
 
 
 def get_tmdb_multisearch_validfy(query=None, validfy=True, scrub=True):
