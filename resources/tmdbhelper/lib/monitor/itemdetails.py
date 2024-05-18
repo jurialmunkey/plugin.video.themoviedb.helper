@@ -128,6 +128,19 @@ class ListItemDetails():
             return 'multi'
         return convert_media_type(self._dbtype, 'tmdb', strip_plural=True, parent_type=True)
 
+    @property
+    def kodi_db(self):
+        if not get_setting('local_db'):
+            return
+
+        if self._dbtype == 'movies':
+            from tmdbhelper.lib.items.kodi import KodiDb
+            return KodiDb('movie')
+
+        if self._dbtype in ['tvshows', 'seasons', 'episodes']:
+            from tmdbhelper.lib.items.kodi import KodiDb
+            return KodiDb('tv')
+
     def setup_current_listitem(self):
         """ Cache property getter return values for performance """
         self._dbtype = self.dbtype
@@ -354,4 +367,10 @@ class ListItemDetails():
 
         li = ListItem(**self._itemdetails.listitem)
         li.art = self.get_builtartwork()
+
+        try:
+            li.set_details(details=self.kodi_db.get_kodi_details(li), reverse=True)
+        except AttributeError:
+            pass
+
         return li.get_listitem()

@@ -301,7 +301,7 @@ class Container(CommonContainerAPIs):
         elif lengths[0]:
             self.kodi_db = self.get_kodi_database('movie')
         elif lengths[1]:
-            self.kodi_db = self.get_kodi_database('tvshow')
+            self.kodi_db = self.get_kodi_database('tv')
 
     def set_params_to_container(self):
         params = {f'Param.{k}': f'{v}' for k, v in self.params.items() if k and v}
