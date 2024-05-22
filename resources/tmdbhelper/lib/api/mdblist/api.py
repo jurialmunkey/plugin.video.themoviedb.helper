@@ -144,6 +144,9 @@ class MDbList(RequestAPI):
     def get_custom_list(self, list_id, page=1, limit=20):
         path = f'lists/{list_id}/items'
         response = self._get_request_sc(path, cache_refresh=True if page == 1 else False)
+        return self.get_custom_list_paginated(response, page, limit)
+
+    def get_custom_list_paginated(self, response, page=1, limit=20):
         response, next_page = _get_paginated(response, limit=limit, page=page)
         items = _get_configured(response, permitted_types=['movie', 'show'])
         return {

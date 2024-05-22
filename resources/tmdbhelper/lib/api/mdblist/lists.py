@@ -3,6 +3,32 @@ from tmdbhelper.lib.addon.plugin import get_plugin_category, get_localized, PLUG
 from tmdbhelper.lib.addon.consts import MDBLIST_LIST_OF_LISTS
 
 
+class ListLocal(Container):
+    def get_items(self, paths, page=None, **kwargs):
+        if not paths or not isinstance(paths, list):
+            return
+
+        import json
+        import xbmcvfs
+        import contextlib
+
+        response = None
+        filepath = paths[0]
+        with contextlib.suppress(IOError, json.JSONDecodeError):
+            with xbmcvfs.File(filepath, 'r') as file:
+                response = json.load(file)
+
+        if not response:
+            return
+
+        response = self.mdblist_api.get_custom_list_paginated(response, page=page or 1)
+
+        self.tmdb_cache_only = False
+        self.set_mixed_content(response)
+
+        return response.get('items', []) + response.get('next_page', [])
+
+
 class ListLists(Container):
     def get_items(self, info, page=None, **kwargs):
         from xbmcplugin import SORT_METHOD_UNSORTED

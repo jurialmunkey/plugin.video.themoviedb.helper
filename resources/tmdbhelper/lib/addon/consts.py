@@ -793,6 +793,9 @@ ROUTE_NOID = {
     'trakt_genres': {'route': {
         'module_name': 'tmdbhelper.lib.api.trakt.lists',
         'import_attr': 'ListGenres'}},
+    'mdblist_locallist': {'route': {
+        'module_name': 'tmdbhelper.lib.api.mdblist.lists',
+        'import_attr': 'ListLocal'}},
     'mdblist_userlist': {'route': {
         'module_name': 'tmdbhelper.lib.api.mdblist.lists',
         'import_attr': 'ListCustom'}},
