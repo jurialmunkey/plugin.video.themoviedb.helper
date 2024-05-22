@@ -468,6 +468,8 @@ TMDB_BASIC_LISTS = {
     'collection': {
         'path': 'collection/{tmdb_id}',
         'key': 'parts',
+        'sort_key': 'release_date',
+        'sort_key_order': 'asc',
         'tmdb_type': 'movie',
         'route': TMDB_BASIC_LISTS_ROUTE,
         'plugin_category': '{localized}',

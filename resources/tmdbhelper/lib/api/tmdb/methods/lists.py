@@ -315,7 +315,7 @@ def get_search_list(self, tmdb_type, query=None, **kwargs):
 
 def get_basic_list(
         self, path, tmdb_type, key='results', params=None, base_tmdb_type=None, limit=None, filters={},
-        sort_key=None, stacked=None, paginated=True, length=None, icon_path=None, **kwargs
+        sort_key=None, sort_key_order=None, stacked=None, paginated=True, length=None, icon_path=None, **kwargs
 ):
 
     from jurialmunkey.parser import try_int
@@ -360,7 +360,7 @@ def get_basic_list(
         return response, results
 
     response, results = _get_response(kwargs.get('page'), length=length)
-    results = sorted(results, key=lambda i: i.get(sort_key, 0), reverse=True) if sort_key else results
+    results = sorted(results, key=lambda i: i.get(sort_key, 0), reverse=sort_key_order != 'asc') if sort_key else results
 
     add_infoproperties = [('total_pages', response.get('total_pages')), ('total_results', response.get('total_results'))]
 
