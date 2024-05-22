@@ -1,11 +1,11 @@
 from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.plugin import get_infolabel, get_condvisibility
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_region_date
-from tmdbhelper.lib.addon.logger import kodi_traceback, kodi_try_except, kodi_log
+from tmdbhelper.lib.addon.logger import kodi_try_except, kodi_log
 from tmdbhelper.lib.files.futils import validate_join
 from tmdbhelper.lib.api.kodi.rpc import get_person_stats
 from tmdbhelper.lib.api.contains import CommonContainerAPIs
-from jurialmunkey.parser import try_int, merge_two_dicts
+from jurialmunkey.parser import try_int
 import xbmcvfs
 import json
 
