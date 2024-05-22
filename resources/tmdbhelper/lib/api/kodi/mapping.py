@@ -78,6 +78,7 @@ class ItemMapper(_ItemMapper):
             'originaltitle': ('infolabels', 'originaltitle'),
             'sorttitle': ('infolabels', 'sorttitle'),
             'duration': ('infolabels', 'duration'),
+            'runtime': ('infolabels', 'duration'),
             'studio': ('infolabels', 'studio'),
             'tagline': ('infolabels', 'tagline'),
             'writer': ('infolabels', 'writer'),

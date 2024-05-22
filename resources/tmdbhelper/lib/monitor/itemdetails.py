@@ -346,24 +346,24 @@ class ListItemDetails():
         if not self._itemdetails:
             return ListItem().get_listitem()
 
-        def set_time_properties(duration):
-            minutes = duration // 60 % 60
+        def set_time_properties(li):
+            duration = li.infolabels.get('duration') or 0
             hours = duration // 60 // 60
-            self._itemdetails.listitem['infoproperties']['Duration'] = duration // 60
-            self._itemdetails.listitem['infoproperties']['Duration_H'] = hours
-            self._itemdetails.listitem['infoproperties']['Duration_M'] = minutes
-            self._itemdetails.listitem['infoproperties']['Duration_HHMM'] = f'{hours:02d}:{minutes:02d}'
+            minutes = duration // 60 % 60
+            totalmin = duration // 60
+            li.infoproperties['Duration'] = totalmin
+            li.infoproperties['Duration_H'] = hours
+            li.infoproperties['Duration_M'] = minutes
+            li.infoproperties['Duration_HHMM'] = f'{hours:02d}:{minutes:02d}'
 
-        def set_date_properties(premiered):
+        def set_date_properties(li):
+            premiered = li.infolabels.get('premiered')
             date_obj = convert_timestamp(premiered, time_fmt="%Y-%m-%d", time_lim=10)
             if not date_obj:
                 return
-            self._itemdetails.listitem['infoproperties']['Premiered'] = get_region_date(date_obj, 'dateshort')
-            self._itemdetails.listitem['infoproperties']['Premiered_Long'] = get_region_date(date_obj, 'datelong')
-            self._itemdetails.listitem['infoproperties']['Premiered_Custom'] = date_obj.strftime(get_infolabel('Skin.String(TMDbHelper.Date.Format)') or '%d %b %Y')
-
-        set_time_properties(self._itemdetails.listitem['infolabels'].get('duration', 0))
-        set_date_properties(self._itemdetails.listitem['infolabels'].get('premiered'))
+            li.infoproperties['Premiered'] = get_region_date(date_obj, 'dateshort')
+            li.infoproperties['Premiered_Long'] = get_region_date(date_obj, 'datelong')
+            li.infoproperties['Premiered_Custom'] = date_obj.strftime(get_infolabel('Skin.String(TMDbHelper.Date.Format)') or '%d %b %Y')
 
         li = ListItem(**self._itemdetails.listitem)
         li.art = self.get_builtartwork()
@@ -372,5 +372,8 @@ class ListItemDetails():
             li.set_details(details=self.kodi_db.get_kodi_details(li), reverse=True)
         except AttributeError:
             pass
+
+        set_time_properties(li)
+        set_date_properties(li)
 
         return li.get_listitem()
