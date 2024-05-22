@@ -287,7 +287,10 @@ class Container(CommonContainerAPIs):
         lengths = [
             len(response.get('movies', [])),
             len(response.get('shows', [])),
-            len(response.get('persons', []))]
+            len(response.get('persons', [])),
+            len(response.get('seasons', [])),
+            len(response.get('episodes', []))
+        ]
 
         if lengths.index(max(lengths)) == 0:
             self.container_content = 'movies'
@@ -295,12 +298,16 @@ class Container(CommonContainerAPIs):
             self.container_content = 'tvshows'
         elif lengths.index(max(lengths)) == 2:
             self.container_content = 'actors'
+        elif lengths.index(max(lengths)) == 3:
+            self.container_content = 'seasons'
+        elif lengths.index(max(lengths)) == 4:
+            self.container_content = 'episodes'
 
-        if lengths[0] and lengths[1]:
+        if lengths[0] and (lengths[1] or lengths[3] or lengths[4]):
             self.kodi_db = self.get_kodi_database('both')
         elif lengths[0]:
             self.kodi_db = self.get_kodi_database('movie')
-        elif lengths[1]:
+        elif (lengths[1] or lengths[3] or lengths[4]):
             self.kodi_db = self.get_kodi_database('tv')
 
     def set_params_to_container(self):

@@ -4,6 +4,18 @@ from tmdbhelper.lib.api.request import RequestAPI
 from tmdbhelper.lib.api.api_keys.mdblist import API_KEY
 
 
+PARAMS_DEF = {
+    'episode': {
+        'info': 'details', 'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}',
+        'season': '{season}', 'episode': '{episode}'
+    },
+    'season': {
+        'info': 'episodes', 'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}',
+        'season': '{season}'
+    }
+}
+
+
 def _get_paginated(items, limit=None, page=1):
     items = items or []
     if limit is None:
@@ -35,38 +47,57 @@ def _map_list(response):
     return items
 
 
+def _get_item_unique_ids(item, item_type=None, unique_ids=None):
+    unique_ids = unique_ids or {}
+    unique_ids['tmdb'] = item.get('id')
+    unique_ids['imdb'] = item.get('imdb_id')
+    if item_type in ('season', 'episode'):
+        unique_ids['tvshow.tmdb'] = item.get('id')
+    return unique_ids
+
+
 def _get_item_infolabels(item, item_type=None, infolabels=None):
     infolabels = infolabels or {}
     infolabels['title'] = item.get('title')
     infolabels['year'] = item.get('release_year')
     infolabels['mediatype'] = convert_type(convert_trakt_type(item_type), 'dbtype')
+    if item_type in ('season', 'episode'):
+        infolabels['season'] = item.get('season')
+    if item_type == 'episode':
+        infolabels['episode'] = item.get('episode')
     return infolabels
 
 
 def _get_item_info(item, item_type=None, params_def=None):
     base_item = {}
     base_item['label'] = item.get('title') or ''
-    base_item['unique_ids'] = {'tmdb': item.get('id'), 'imdb': item.get('imdb_id')}
+    base_item['unique_ids'] = _get_item_unique_ids(item, item_type=item_type)
     base_item['infolabels'] = _get_item_infolabels(item, item_type=item_type)
     base_item['params'] = get_params(item, convert_trakt_type(item_type), definition=params_def)
     base_item['path'] = PLUGINPATH
     return base_item
 
 
-def _get_configured(items, permitted_types=None, params_def=None):
+def _get_configured(items, permitted_types=None):
     configured = {'items': []}
     configured_items_append = configured['items'].append
+
     for i in items:
         i_type = i.get('mediatype', None)
+
         if permitted_types and i_type not in permitted_types:
             continue
-        item = _get_item_info(i, item_type=i_type, params_def=params_def)
+
+        item = _get_item_info(i, item_type=i_type, params_def=PARAMS_DEF.get(i_type))
+
         if not item:
             continue
+
         # Also add item to a list only containing that item type
         # Useful if we need to only get one type of item from a mixed list (e.g. only "movies")
         configured.setdefault(f'{i_type}s', []).append(item)
         configured_items_append(item)
+
     return configured
 
 
@@ -148,9 +179,11 @@ class MDbList(RequestAPI):
 
     def get_custom_list_paginated(self, response, page=1, limit=20):
         response, next_page = _get_paginated(response, limit=limit, page=page)
-        items = _get_configured(response, permitted_types=['movie', 'show'])
+        items = _get_configured(response, permitted_types=['movie', 'show', 'season', 'episode'])
         return {
             'items': items['items'],
             'movies': items.get('movies', []),
             'shows': items.get('shows', []),
+            'seasons': items.get('seasons', []),
+            'episodes': items.get('episodes', []),
             'next_page': next_page}

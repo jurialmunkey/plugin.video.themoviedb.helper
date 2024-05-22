@@ -26,6 +26,9 @@ class ListLocal(Container):
         self.tmdb_cache_only = False
         self.set_mixed_content(response)
 
+        # from tmdbhelper.lib.addon.logger import kodi_log
+        # kodi_log(f'OUTPUT: {response}', 1)
+
         return response.get('items', []) + response.get('next_page', [])
 
 
