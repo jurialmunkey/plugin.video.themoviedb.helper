@@ -45,14 +45,28 @@ class MemoryCache(object):
         self._win.setProperty(expr_endpoint, str(expires))
         self._win.setProperty(data_endpoint, data)
 
-    def use(self, func, *args, cache_name=None, cache_minutes=60, cache_combine_name=True, cache_refresh=False, **kwargs):
+    def use(
+            self, func, *args, cache_name=None, cache_minutes=60, cache_combine_name=True,
+            cache_refresh=False, cache_store_none=False, **kwargs
+    ):
+
         if not cache_name or cache_combine_name:
             cache_name = format_name(cache_name, *args, **kwargs)
+
         my_object = self.get(cache_name) if not cache_refresh else None
+        empty_obj = f'{self._sc_name}_none_{cache_name}'
+
+        if my_object == empty_obj:
+            return
+
         if my_object:
             return my_object
+
         my_object = func(*args, **kwargs)
-        if not my_object:
-            return
-        self.set(cache_name, my_object, cache_minutes)
-        return my_object
+
+        if my_object:
+            self.set(cache_name, my_object, cache_minutes)
+            return my_object
+
+        if cache_store_none:
+            self.set(cache_name, empty_obj, cache_minutes)

@@ -1,4 +1,3 @@
-from xbmc import Monitor
 from jurialmunkey.parser import try_int, find_dict_in_list
 from tmdbhelper.lib.addon.thread import use_thread_lock
 import jurialmunkey.jsnrpc as jurialmunkey_jsnrpc
@@ -92,88 +91,121 @@ THREAD_LOCK = 'TMDbHelper.KodiLibrary.ThreadLock'
 
 class KodiLibrary(object):
     def __init__(self, dbtype=None, tvshowid=None, logging=True, cache_refresh=False):
-        self.dbtype = dbtype
-        from tmdbhelper.lib.files.mcache import MemoryCache
-        self._cache = MemoryCache(name='KodiLibrary')
-        self._get_database(dbtype, tvshowid, logging, cache_refresh)
+        self._dbtype = dbtype
+        self._tvshowid = tvshowid
+        self._logging = logging
+        self._cache_refresh = cache_refresh
+
+    @property
+    def cache(self):
+        try:
+            return self._cache
+        except AttributeError:
+            from tmdbhelper.lib.files.mcache import MemoryCache
+            self._cache = MemoryCache(name='KodiLibrary')
+            return self._cache
+
+    @property
+    def database(self):
+        try:
+            return self._database
+        except AttributeError:
+            self._database = self._get_cached_database()
+            return self._database
 
     @use_thread_lock(THREAD_LOCK)
-    def _get_database(self, dbtype, tvshowid=None, logging=True, cache_refresh=False):
+    def _get_cached_database(self):
 
-        def _get_db():
-            if dbtype == 'both':
-                movies = self._cache.use(
-                    self.get_database, 'movie', None,
-                    cache_name='database',
-                    cache_minutes=180,
-                    cache_refresh=cache_refresh
-                ) or []
-                tvshows = self._cache.use(
-                    self.get_database, 'tvshow', None,
-                    cache_name='database',
-                    cache_minutes=180,
-                    cache_refresh=cache_refresh
-                ) or []
-                return movies + tvshows
+        if self._dbtype == 'both':
 
-            return self._cache.use(
-                self.get_database, dbtype, tvshowid,
+            movies = self.cache.use(
+                self._get_database, 'movie', None,
                 cache_name='database',
                 cache_minutes=180,
-                cache_refresh=cache_refresh)
+                cache_refresh=self._cache_refresh,
+                cache_store_none=True
+            ) or []
 
-        self.database = _get_db()
+            tvshows = self.cache.use(
+                self._get_database, 'tvshow', None,
+                cache_name='database',
+                cache_minutes=180,
+                cache_refresh=self._cache_refresh,
+                cache_store_none=True
+            ) or []
 
-        return self.database
+            database = movies + tvshows
 
-    def get_database(self, dbtype, tvshowid=None, logging=True):
-        database = self._get_kodi_db(dbtype, tvshowid)
-        if not database and logging:
-            from tmdbhelper.lib.addon.logger import kodi_log
-            kodi_log(f'Getting KodiDB {dbtype} FAILED!', 1)
+        else:
+
+            database = self.cache.use(
+                self._get_database, self._dbtype, self._tvshowid,
+                cache_name='database',
+                cache_minutes=180,
+                cache_refresh=self._cache_refresh,
+                cache_store_none=True
+            )
+
         return database
 
-    def _get_kodi_db(self, dbtype=None, tvshowid=None):
-        if not dbtype:
-            return
-        if dbtype == "movie":
-            method = "VideoLibrary.GetMovies"
-            params = {"properties": ["title", "imdbnumber", "originaltitle", "uniqueid", "year", "file"]}
-        if dbtype == "tvshow":
-            method = "VideoLibrary.GetTVShows"
-            params = {"properties": ["title", "imdbnumber", "originaltitle", "uniqueid", "year"]}
-        if dbtype == "season":
-            method = "VideoLibrary.GetSeasons"
-            params = {"tvshowid": tvshowid, "properties": ["title", "showtitle", "season"]}
-        if dbtype == "episode":
-            method = "VideoLibrary.GetEpisodes"
-            params = {"tvshowid": tvshowid, "properties": ["title", "showtitle", "season", "episode", "file"]}
-        try:
-            response = get_jsonrpc(method, params)['result'][f'{dbtype}s'] or []
-        except (KeyError, AttributeError):
-            return []
-        dbid_name = f'{dbtype}id'
-        return [{
-            'imdb_id': item.get('uniqueid', {}).get('imdb'),
-            'tmdb_id': item.get('uniqueid', {}).get('tmdb'),
-            'tvdb_id': item.get('uniqueid', {}).get('tvdb'),
-            'dbid': item.get(dbid_name),
-            'title': item.get('title'),
-            'originaltitle': item.get('originaltitle'),
-            'showtitle': item.get('showtitle'),
-            'season': item.get('season'),
-            'episode': item.get('episode'),
-            'year': item.get('year'),
-            'file': item.get('file')}
-            for item in response]
+    def _get_database(self, dbtype, tvshowid=None):
 
-    def get_info(
-            self, info, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None, season=None,
-            episode=None, fuzzy_match=False, tmdb_id=None, tvdb_id=None):
+        def _get_kodi_database():
+            if not dbtype:
+                return []
+            if dbtype == "movie":
+                method = "VideoLibrary.GetMovies"
+                params = {"properties": ["title", "imdbnumber", "originaltitle", "uniqueid", "year", "file"]}
+            if dbtype == "tvshow":
+                method = "VideoLibrary.GetTVShows"
+                params = {"properties": ["title", "imdbnumber", "originaltitle", "uniqueid", "year"]}
+            if dbtype == "season":
+                method = "VideoLibrary.GetSeasons"
+                params = {"tvshowid": tvshowid, "properties": ["title", "showtitle", "season"]}
+            if dbtype == "episode":
+                method = "VideoLibrary.GetEpisodes"
+                params = {"tvshowid": tvshowid, "properties": ["title", "showtitle", "season", "episode", "file"]}
+            try:
+                response = get_jsonrpc(method, params)['result'][f'{dbtype}s'] or []
+            except (KeyError, AttributeError):
+                return []
+            dbid_name = f'{dbtype}id'
+            return [
+                {
+                    'imdb_id': item.get('uniqueid', {}).get('imdb'),
+                    'tmdb_id': item.get('uniqueid', {}).get('tmdb'),
+                    'tvdb_id': item.get('uniqueid', {}).get('tvdb'),
+                    'dbid': item.get(dbid_name),
+                    'title': item.get('title'),
+                    'originaltitle': item.get('originaltitle'),
+                    'showtitle': item.get('showtitle'),
+                    'season': item.get('season'),
+                    'episode': item.get('episode'),
+                    'year': item.get('year'),
+                    'file': item.get('file')
+                }
+                for item in response
+            ]
+
+        database = _get_kodi_database()
+
+        if not database and self._logging:
+            from tmdbhelper.lib.addon.logger import kodi_log
+            kodi_log(f'Getting KodiDB {dbtype} FAILED!', 1)
+
+        return database
+
+    def _get_info(
+        self, info, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None,
+        season=None, episode=None, fuzzy_match=False, tmdb_id=None, tvdb_id=None
+    ):
+
         if not self.database or not info:
             return
+
         yearcheck = False
         index_list = find_dict_in_list(self.database, 'dbid', dbid) if dbid else []
+
         if not index_list and season:
             index_list = find_dict_in_list(self.database, 'season', try_int(season))
         if not index_list and imdb_id:
@@ -188,13 +220,36 @@ class KodiLibrary(object):
             index_list = find_dict_in_list(self.database, 'originaltitle', originaltitle)
         if not index_list and title:
             index_list = find_dict_in_list(self.database, 'title', title)
+
         for i in index_list:
             if season and episode:
                 if try_int(episode) == self.database[i].get('episode'):
                     return self.database[i].get(info)
             elif not yearcheck or yearcheck in str(self.database[i].get('year')):
                 return self.database[i].get(info)
+
         if index_list and fuzzy_match and not season and not episode:
             """ Fuzzy Match """
             i = index_list[0]
             return self.database[i].get(info)
+
+    def get_info(
+        self, info, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None,
+        season=None, episode=None, fuzzy_match=False, tmdb_id=None, tvdb_id=None
+    ):
+        return self.cache.use(
+            self._get_info, info,
+            dbid=dbid,
+            imdb_id=imdb_id,
+            originaltitle=originaltitle,
+            title=title,
+            year=year,
+            season=season,
+            episode=episode,
+            fuzzy_match=fuzzy_match,
+            tmdb_id=tmdb_id,
+            tvdb_id=tvdb_id,
+            cache_name=f'get_info',
+            cache_minutes=180,
+            cache_refresh=self._cache_refresh,
+            cache_store_none=True)
