@@ -81,10 +81,18 @@ class Container(CommonContainerAPIs):
         try:
             return self._context_additions
         except AttributeError:
-            self._context_additions = None
-            if not self.is_widget:
-                self._context_additions = [(get_localized(32496), 'RunScript(plugin.video.themoviedb.helper,make_node)')]
+            self._context_additions = []
+            if self.context_additions_make_node:
+                self._context_additions += [(get_localized(32496), 'RunScript(plugin.video.themoviedb.helper,make_node)')]
             return self._context_additions
+
+    @property
+    def context_additions_make_node(self):
+        try:
+            return self._context_additions_make_node
+        except AttributeError:
+            self._context_additions_make_node = get_setting('contextmenu_make_node') if not self.is_widget else False
+            return self._context_additions_make_node
 
     @property
     def hide_watched(self):
