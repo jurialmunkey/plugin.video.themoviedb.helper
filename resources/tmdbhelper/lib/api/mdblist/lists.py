@@ -14,9 +14,15 @@ class ListLocal(Container):
 
         response = None
         filepath = paths[0]
-        with contextlib.suppress(IOError, json.JSONDecodeError):
-            with xbmcvfs.File(filepath, 'r') as file:
-                response = json.load(file)
+
+        if filepath.startswith('http'):
+            import requests
+            response = requests.get(filepath, timeout=10.000)
+            response = response.json() if response else None
+        else:
+            with contextlib.suppress(IOError, json.JSONDecodeError):
+                with xbmcvfs.File(filepath, 'r') as file:
+                    response = json.load(file)
 
         if not response:
             return
