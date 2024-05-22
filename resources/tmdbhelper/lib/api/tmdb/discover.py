@@ -22,7 +22,7 @@ SORTBY_MOVIES = [
 
 SORTBY_TV = [
     'vote_average.desc', 'vote_average.asc', 'first_air_date.desc', 'first_air_date.asc',
-    'popularity.desc', 'popularity.asc']
+    'popularity.desc', 'popularity.asc', 'vote_count.asc', 'vote_count.desc']
 
 
 ALL_METHODS = [
