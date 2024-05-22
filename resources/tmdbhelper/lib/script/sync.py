@@ -382,11 +382,18 @@ class _Rating():
         except ValueError:
             self._sync = -1
             return
+
         if x < 0 or x > 10:
             self._sync = -1
             return
+
         item['rating'] = x
+
         # Sync rating
         with BusyDialog():
-            self._sync = self._trakt.post_response('sync', 'ratings', postdata={f'{self._item.trakt_type}s': [item]})
+            self._sync = self._trakt.post_response(
+                'sync',
+                'ratings/remove' if x == 0 else 'ratings',
+                postdata={f'{self._item.trakt_type}s': [item]}
+            )
         return self._sync
