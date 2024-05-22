@@ -91,43 +91,47 @@ THREAD_LOCK = 'TMDbHelper.KodiLibrary.ThreadLock'
 
 
 class KodiLibrary(object):
-    def __init__(self, dbtype=None, tvshowid=None, attempt_reconnect=False, logging=True, cache_refresh=False):
+    def __init__(self, dbtype=None, tvshowid=None, logging=True, cache_refresh=False):
         self.dbtype = dbtype
         from tmdbhelper.lib.files.mcache import MemoryCache
-        self._cache = MemoryCache(name='KodiLibrary_{dbtype}_{tvshowid}')
-        self._get_database(dbtype, tvshowid, attempt_reconnect, logging, cache_refresh)
+        self._cache = MemoryCache(name='KodiLibrary')
+        self._get_database(dbtype, tvshowid, logging, cache_refresh)
 
     @use_thread_lock(THREAD_LOCK)
-    def _get_database(self, dbtype, tvshowid=None, attempt_reconnect=False, logging=True, cache_refresh=False):
+    def _get_database(self, dbtype, tvshowid=None, logging=True, cache_refresh=False):
 
         def _get_db():
             if dbtype == 'both':
                 movies = self._cache.use(
-                    self.get_database, 'movie', None, attempt_reconnect,
-                    cache_name='database', cache_minutes=180, cache_refresh=cache_refresh) or []
+                    self.get_database, 'movie', None,
+                    cache_name='database',
+                    cache_minutes=180,
+                    cache_refresh=cache_refresh
+                ) or []
                 tvshows = self._cache.use(
-                    self.get_database, 'tvshow', None, attempt_reconnect,
-                    cache_name='database', cache_minutes=180, cache_refresh=cache_refresh) or []
+                    self.get_database, 'tvshow', None,
+                    cache_name='database',
+                    cache_minutes=180,
+                    cache_refresh=cache_refresh
+                ) or []
                 return movies + tvshows
+
             return self._cache.use(
-                self.get_database, dbtype, tvshowid, attempt_reconnect,
-                cache_name='database', cache_minutes=180, cache_refresh=cache_refresh)
+                self.get_database, dbtype, tvshowid,
+                cache_name='database',
+                cache_minutes=180,
+                cache_refresh=cache_refresh)
 
         self.database = _get_db()
 
         return self.database
 
-    def get_database(self, dbtype, tvshowid=None, attempt_reconnect=False, logging=True):
-        retries = 5 if attempt_reconnect else 1
-        while not Monitor().abortRequested() and retries > 0:
-            database = self._get_kodi_db(dbtype, tvshowid)
-            if database:
-                return database
-            Monitor().waitForAbort(1)
-            retries -= 1
-        if logging:
+    def get_database(self, dbtype, tvshowid=None, logging=True):
+        database = self._get_kodi_db(dbtype, tvshowid)
+        if not database and logging:
             from tmdbhelper.lib.addon.logger import kodi_log
             kodi_log(f'Getting KodiDB {dbtype} FAILED!', 1)
+        return database
 
     def _get_kodi_db(self, dbtype=None, tvshowid=None):
         if not dbtype:
