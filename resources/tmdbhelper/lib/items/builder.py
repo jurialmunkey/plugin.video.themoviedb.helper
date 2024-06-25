@@ -96,7 +96,7 @@ class ItemBuilder(_ArtworkSelector):
 
     def get_ftv_typeid(self, tmdb_type, item, season=None, tmdb_id=None):
         unique_ids = item['listitem'].get('unique_ids', {}) if item else {}
-        if tmdb_type == 'movie':
+        if tmdb_type in ('movie', 'collection'):
             return (tmdb_id or unique_ids.get('tmdb'), 'movies')
         if tmdb_type == 'tv':
             if season is None:
