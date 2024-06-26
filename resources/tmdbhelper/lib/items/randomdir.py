@@ -34,4 +34,6 @@ class ListRandom(Container):
         self.plugin_category = f'{item.get("label")}'
         self.parent_params = itemparams
 
+        del self._tmdb_cache_only  # Avoid inheriting cache settings from seed item
+
         return get_container(itemparams['info']).get_items(self, **itemparams)
