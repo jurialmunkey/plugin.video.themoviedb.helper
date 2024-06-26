@@ -898,6 +898,11 @@
                 </setting>
             </group>
             <group id="3" label="29921">
+                <setting id="use_alternate_api_url" type="boolean" label="32509">
+                    <level>0</level>
+                    <default>False</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="max_threads" type="integer" label="32410" help="">
                     <level>0</level>
                     <default>0</default>
