@@ -6,14 +6,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
-"POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2024-06-20 15:19+0000\n"
+"POT-Creation-Date: 2024-06-20 20:05+0000\n"
+"PO-Revision-Date: 2024-07-14 15:40+0000\n"
 "Last-Translator: Gregorio Cuad(x722)\n"
-"Language-Team: GTKing Phoenix TEAM\n"
+"Language-Team: Spanish - GTKing Phoenix TEAM\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: es-ES\n"
+"Language: es_ES\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 msgctxt "#30000"
@@ -839,7 +839,7 @@ msgid ""
 "This limit is set to ensure that the APIs providing data for free are respected."
 msgstr ""
 "Agregar listas de Trakt a la biblioteca está limitado a [B]{}[/B] programas de TV y [B]{}[/B] películas por lista.\n"
-"Este límite se establece para garantizar que se respeten las API que proporcionan datos de forma gratuita".
+"Este límite se establece para garantizar que se respeten las API que proporcionan datos de forma gratuita."
 
 #: /resources/lib/context.py
 msgctxt "#32165"
@@ -1670,7 +1670,7 @@ msgstr ""
 "\n"
 "setResolvedUrl es el método preferido y generalmente debería funcionar para cualquier complemento de reproductor que reproduzca archivos directamente, use un flujo de entrada adaptativo o solo solicite seleccionar velocidad de bits/calidad. PlayMedia debe usarse para cualquier complemento de reproductor que primero ejecute un script para extraer fuentes o de otra manera no funciona correctamente usando el método setResolvedUrl.\n"
 "\n"
-"Para anular este cuadro de diálogo, establezca un método de resolución para el reproductor en el cuadro de diálogo de configuración del reproductor de TMDbHelper".
+"Para anular este cuadro de diálogo, establezca un método de resolución para el reproductor en el cuadro de diálogo de configuración del reproductor de TMDbHelper."
 
 #: /resources/lib/helpers/timedate.py
 msgctxt "#32326"
@@ -1744,7 +1744,7 @@ msgstr ""
 "El archivo del reproductor [B]{}[/B] ha cambiado.\n"
 "¿Desea guardar los cambios?\n"
 "\n"
-"Si cierras sin guardar, los cambios se perderán".
+"Si cierras sin guardar, los cambios se perderán."
 
 #: /resources/lib/player/configure.py
 msgctxt "#32338"
@@ -1841,7 +1841,7 @@ msgid ""
 msgstr ""
 "¿Este reproductor se resuelve directamente en un único archivo reproducible?\n"
 "\n"
-"Seleccione \"Sí\" para cualquier reproductor que reproduzca directamente desde una sola fuente. Seleccione \"No\" para reproductores que extraigan múltiples fuentes o que no funcionen con el método setResolvedURL".
+"Seleccione \"Sí\" para cualquier reproductor que reproduzca directamente desde una sola fuente. Seleccione \"No\" para reproductores que extraigan múltiples fuentes o que no funcionen con el método setResolvedURL"
 
 #: /resources/lib/script/sync.py
 msgctxt "#32355"
@@ -1972,7 +1972,7 @@ msgstr "Mostrar todo"
 #: /resources/settings.xml
 msgctxt "#32379"
 msgid "Hide Specials"
-msgstr ""
+msgstr "Ocultar Especiales"
 
 #: /resources/settings.xml
 msgctxt "#32380"
@@ -2023,7 +2023,7 @@ msgid ""
 msgstr ""
 "¿Está seguro de que desea eliminar el caché {}? Esta acción no se puede deshacer.\n"
 "\n"
-"TMDbHelper realiza una gestión y limpieza automática de la caché de forma regular. Sólo debe eliminar la caché manualmente en casos de errores persistentes relacionados con la caché".
+"TMDbHelper realiza una gestión y limpieza automática de la caché de forma regular. Sólo debe eliminar la caché manualmente en casos de errores persistentes relacionados con la caché."
 
 #: /resources/lib/script/router.py
 msgctxt "#32389"
@@ -2049,7 +2049,7 @@ msgid ""
 msgstr ""
 "Utilice [B]Actualización rápida[/B] para buscar nuevos elementos.\n"
 "\n"
-"Utilice [B]Actualización forzada[/B] para ignorar los detalles de la actualización previamente almacenada en caché y volver a comprobar todos los elementos. Las actualizaciones forzadas sólo deben usarse al limpiar y reconstruir la biblioteca Kodi".
+"Utilice [B]Actualización forzada[/B] para ignorar los detalles de la actualización previamente almacenada en caché y volver a comprobar todos los elementos. Las actualizaciones forzadas sólo deben usarse al limpiar y reconstruir la biblioteca Kodi."
 
 #: /resources/lib/script/router.py
 msgctxt "#32393"
@@ -2499,7 +2499,7 @@ msgstr "Aumenta aleatoriamente la cantidad de elementos vistos recientemente par
 #: /resources/settings.xml
 msgctxt "#32482"
 msgid "Random seed pool for recommendations"
-msgstr "Grupo de recomendaciones aleatoria "
+msgstr "Grupo de recomendaciones aleatoria"
 
 #: /resources/settings.xml
 msgctxt "#32483"
