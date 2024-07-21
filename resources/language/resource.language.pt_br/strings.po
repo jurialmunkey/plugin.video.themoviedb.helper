@@ -1029,7 +1029,7 @@ msgstr "Seu"
 #: /resources/lib/plugin.py
 msgctxt "#32202"
 msgid "Airing This Week"
-msgstr "Exibição esta semana"
+msgstr "Exibição Esta Semana"
 
 #: /resources/lib/plugin.py
 msgctxt "#32203"
@@ -1112,7 +1112,8 @@ msgid ""
 "Artwork found for {} ID {}\n"
 "{}"
 msgstr ""
-"Arte encontrada para {} ID {}\n{}"
+"Arte encontrada para {} ID {}\n
+"{}"
 
 #: /resources/lib/fanarttv.py
 msgctxt "#32219"
