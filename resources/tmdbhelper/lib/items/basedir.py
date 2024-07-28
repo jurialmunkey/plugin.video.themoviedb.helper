@@ -1,5 +1,5 @@
 from tmdbhelper.lib.addon.tmdate import get_timedelta, get_datetime_today
-from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized, ADDON
+from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized, ADDON, get_flatseasons_info_param
 from jurialmunkey.parser import merge_two_items
 from tmdbhelper.lib.items.builder import ItemBuilder
 from tmdbhelper.lib.items.container import Container
@@ -62,7 +62,7 @@ def _get_basedir_details():
     return [
         {
             'label': get_localized(33054),
-            'params': {'info': 'seasons'},
+            'params': {'info': get_flatseasons_info_param()},
             'path': PLUGINPATH,
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',
@@ -1122,7 +1122,7 @@ def get_basedir_details(tmdb_type, tmdb_id, season=None, episode=None, detailed_
         base_item['infolabels']['mediatype'] = 'season'
         basedir_items = _build_basedir('season', _get_basedir_details())
     elif tmdb_type == 'tv':
-        base_item['params']['info'] = 'seasons'
+        base_item['params']['info'] = get_flatseasons_info_param()
         base_item['infolabels']['mediatype'] = 'tvshow'
         basedir_items = _build_basedir('tv', _get_basedir_details())
     elif tmdb_type == 'person':

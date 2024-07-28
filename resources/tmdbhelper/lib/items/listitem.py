@@ -2,7 +2,7 @@ from xbmcgui import ListItem as KodiListItem
 from jurialmunkey.parser import try_int, merge_two_dicts
 from infotagger.listitem import ListItemInfoTag
 from tmdbhelper.lib.addon.consts import ACCEPTED_MEDIATYPES, PARAM_WIDGETS_RELOAD, PARAM_WIDGETS_RELOAD_FORCED
-from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_media_type, get_setting, get_condvisibility, get_localized, encode_url
+from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_media_type, get_setting, get_condvisibility, get_localized, encode_url, get_flatseasons_info_param
 from tmdbhelper.lib.addon.tmdate import is_unaired_timestamp
 from tmdbhelper.lib.addon.logger import kodi_log
 from jurialmunkey.window import get_property
@@ -18,9 +18,9 @@ _int_default_select = get_setting('default_select', 'int')
 _is_only_resolve_strm = get_setting('only_resolve_strm')
 _is_hide_unaired_movies = get_setting('hide_unaired_movies')
 _is_hide_unaired_episodes = get_setting('hide_unaired_episodes')
-_is_flatten_seasons = get_setting('flatten_seasons')
 _is_nextaired_linklibrary = get_setting('nextaired_linklibrary')
 _is_trakt_watchedindicators = get_setting('trakt_watchedindicators')
+_param_info_seasons = get_flatseasons_info_param()
 
 
 def ListItem(*args, **kwargs):
@@ -387,7 +387,7 @@ class _Tvshow(_Video):
             self.params['info'] = 'related'
             self.is_folder = False
             return
-        self.params['info'] = 'flatseasons' if _is_flatten_seasons else 'seasons'
+        self.params['info'] = _param_info_seasons
 
 
 class _Season(_Tvshow):

@@ -47,6 +47,10 @@ def get_mpaa_prefix():
     return ''
 
 
+def get_flatseasons_info_param():
+    return 'flatseasons' if get_setting('flatten_seasons') else 'seasons'
+
+
 CONVERSION_TABLE = {
     'media': {
         'movie': {'tmdb': 'movie', 'trakt': 'movie', 'ftv': 'movies'},
