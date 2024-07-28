@@ -136,3 +136,19 @@ def convert_type(tmdb_type, output, season=None, episode=None, items=None):
     if tmdb_type == 'tv' and season is not None:
         tmdb_type = 'episode' if episode is not None else 'season'
     return _convert_types('tmdb', tmdb_type, output)
+
+
+class GlobalSettingsDict(dict):
+
+    def __init__(self):
+        self.route = {}
+
+    def __missing__(self, key):
+        if key in self.route:
+            func = self.route[key][0]
+            args = self.route[key][1] or tuple()
+        else:
+            func = get_setting
+            args = (key, )
+        self[key] = func(*args)
+        return self[key]
