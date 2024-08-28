@@ -559,7 +559,7 @@
                     <level>0</level>
                     <default>5</default>
                     <constraints>
-                        <minimum>5</minimum>
+                        <minimum>1</minimum>
                         <step>1</step>
                         <maximum>20</maximum>
                     </constraints>
