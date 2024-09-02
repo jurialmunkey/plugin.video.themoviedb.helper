@@ -27,7 +27,7 @@ def lazyimport_pil(func):
 
 
 def md5hash(value):
-    value = str(value).encode()
+    value = str(value).encode(errors='surrogatepass')  # Use surrogatepass to avoid emoji in filenames raising exceptions for utf-8
     return hashlib.md5(value).hexdigest()
 
 
