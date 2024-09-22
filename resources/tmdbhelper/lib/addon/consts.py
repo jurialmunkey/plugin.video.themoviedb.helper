@@ -61,6 +61,7 @@ PLAYERS_REQUIRED_IDS = ['{imdb}', '{tvdb}', '{trakt}', '{slug}', '{eptvdb}' '{ep
 PLAYERS_CHOSEN_DEFAULTS_FILENAME = 'player_defaults'
 
 NO_LABEL_FORMATTING = ['details', 'upcoming', 'trakt_calendar', 'trakt_myairing', 'trakt_anticipated', 'library_nextaired', 'library_airingnext', 'trakt_airingnext', 'videos', 'trakt_watchlist_anticipated']
+REMOVE_EPISODE_COUNT = ['stars_in_tvshows', 'stars_in_both', 'crew_in_tvshows', 'crew_in_both']
 
 PARAM_WIDGETS_RELOAD = 'reload=$INFO[Window(Home).Property(TMDbHelper.Widgets.Reload)]'
 PARAM_WIDGETS_RELOAD_FORCED = 'reload=$INFO[System.Time(hh:mm:ss)]'
