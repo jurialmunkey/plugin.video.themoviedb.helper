@@ -156,8 +156,12 @@ class CommonMonitorDetails(CommonContainerAPIs):
         if not self.mdblist_api:
             return item
         ratings = self.mdblist_api.get_ratings(trakt_type, tmdb_id=tmdb_id) or {}
-        ratings.update(item['infoproperties'])
-        item['infoproperties'] = ratings
+
+        # Pop some ratings we already retrieve from other services
+        for i in ('trakt_rating', 'trakt_votes', 'tmdb_rating', 'tmdb_votes'):
+            ratings.pop(i, None)
+
+        item['infoproperties'].update(ratings)
         return item
 
     def get_tvdb_awards(self, item, tmdb_type, tmdb_id):
