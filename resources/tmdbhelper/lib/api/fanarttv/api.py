@@ -3,6 +3,7 @@ from jurialmunkey.parser import try_int, del_empty_keys
 from tmdbhelper.lib.addon.consts import CACHE_EXTENDED, ITER_PROPS_MAX
 from tmdbhelper.lib.api.request import RequestAPI
 from tmdbhelper.lib.api.api_keys.fanarttv import API_KEY, CLIENT_KEY
+from requests.utils import requote_uri
 
 EN_FALLBACK = get_setting('fanarttv_enfallback')
 API_URL = 'https://webservice.fanart.tv/v3'
@@ -37,11 +38,16 @@ ARTWORK_TYPES = {
 }
 
 
+def get_encoded_url(d):
+    url = d.get('url') or ''
+    return requote_uri(url)  # Ugly hack to replace unencoded spaces returned by API
+
+
 def add_extra_art(source, output=None):
     output = output or {}
     if not source:
         return output
-    output.update({f'fanart{x}': i['url'] for x, i in enumerate(source, 1) if i.get('url') and x <= ITER_PROPS_MAX})
+    output.update({f'fanart{x}': get_encoded_url(i) for x, i in enumerate(source, 1) if get_encoded_url(i) and x <= ITER_PROPS_MAX})
     return output
 
 
@@ -93,7 +99,7 @@ class FanartTV(RequestAPI):
         def get_best_artwork(key, get_lang=True):
             response = get_artwork_type(key, get_lang)
             try:
-                return next(response).get('url', '')
+                return get_encoded_url(next(response))
             except StopIteration:
                 if isinstance(get_lang, str):
                     return
@@ -119,8 +125,10 @@ class FanartTV(RequestAPI):
                 cache_refresh=self.cache_refresh)
         if not request or 'dummy' in request:
             return {}
+
         artwork_types = ARTWORK_TYPES.get(ftv_type if season is None else season_type or 'season', {})
         if artlist_type:
-            return get_artwork(artlist_type, get_list=True, get_lang='all') or []
+            artwork_data = get_artwork(artlist_type, get_list=True, get_lang='all') or []
+            return artwork_data
         artwork_data = del_empty_keys({i: get_artwork(i, get_lang=i not in NO_LANGUAGE) for i in artwork_types})
         return add_extra_art(get_artwork('fanart', get_list=True, get_lang=False), artwork_data)
