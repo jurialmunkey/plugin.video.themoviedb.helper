@@ -3,7 +3,6 @@ from jurialmunkey.parser import try_int, del_empty_keys
 from tmdbhelper.lib.addon.consts import CACHE_EXTENDED, ITER_PROPS_MAX
 from tmdbhelper.lib.api.request import RequestAPI
 from tmdbhelper.lib.api.api_keys.fanarttv import API_KEY, CLIENT_KEY
-from requests.utils import requote_uri
 
 EN_FALLBACK = get_setting('fanarttv_enfallback')
 API_URL = 'https://webservice.fanart.tv/v3'
@@ -40,7 +39,7 @@ ARTWORK_TYPES = {
 
 def get_encoded_url(d):
     url = d.get('url') or ''
-    return requote_uri(url)  # Ugly hack to replace unencoded spaces returned by API
+    return url.replace(' ', '%20')  # Ugly hack to replace unencoded spaces returned by API
 
 
 def add_extra_art(source, output=None):
