@@ -446,11 +446,17 @@ class _Episode(_Tvshow):
             return
         self._set_params_reroute_default()
 
-    def set_episode_label(self, format_label=u'{season}x{episode:0>2}. {label}'):
+    def set_episode_label(self, format_label=u'{show_title} - {season}x{episode:0>2}. {label}'):
         if self.infoproperties.pop('no_label_formatting', None):
             return
         season = try_int(self.infolabels.get('season', 0))
         episode = try_int(self.infolabels.get('episode', 0))
         if not episode:
             return
-        self.label = format_label.format(season=season, episode=episode, label=self.infolabels.get('title', ''))
+        show_title = self.infolabels.get('tvshowtitle', '')  # Retrieve the show's title
+        self.label = format_label.format(
+            show_title=show_title,
+            season=season,
+            episode=episode,
+            label=self.infolabels.get('title', '')
+        )
