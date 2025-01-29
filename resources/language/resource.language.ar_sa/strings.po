@@ -1,10 +1,11 @@
+
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
 "PO-Revision-Date: 2023-08-13 22:39+0000\n"
-"Last-Translator: psp2111-ADSLGATE <>\n"
+"Last-Translator: psp2111-ADSLGATE / AbuKarim<>\n"
 "Language-Team: Arabic (Saudi Arabia)\n"
 "Language: ar-SA\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -17,11 +18,11 @@ msgstr ""
 
 msgctxt "#30000"
 msgid "Arabic (United Arab Emirates)"
-msgstr ""
+msgstr "(العربية جزئيا (الامارات العربية المتحدة"
 
 msgctxt "#30001"
 msgid "Arabic (Saudi Arabia)"
-msgstr ""
+msgstr "(العربية (المملكة العربية السعودية"
 
 msgctxt "#30002"
 msgid "Belarusian (Belarus)"
@@ -2646,6 +2647,21 @@ msgstr "قوائم مزامنة Trakt (عامل مضاعفة)"
 msgctxt "#32503"
 msgid "Page multiplier (Library windows)"
 msgstr "قوائم المكتبة (عامل مضاعفة)"
+
+#: /resources/settings.xml
+msgctxt "#32510"
+msgid "Items only"
+msgstr "العناصر فقط"
+
+#: /resources/settings.xml
+msgctxt "#32511"
+msgid "Items"
+msgstr "العناصر"
+
+#: /resources/settings.xml
+msgctxt "#32512"
+msgid "Cache disk reads to memory"
+msgstr ""
 
 msgctxt "#30030"
 msgid "Hindi (India)"
