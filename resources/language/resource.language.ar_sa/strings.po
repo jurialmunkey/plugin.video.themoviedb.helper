@@ -18,11 +18,11 @@ msgstr ""
 
 msgctxt "#30000"
 msgid "Arabic (United Arab Emirates)"
-msgstr "(العربية جزئيا (الامارات العربية المتحدة"
+msgstr "العربية جزئيا/الامارات العربية المتحدة"
 
 msgctxt "#30001"
 msgid "Arabic (Saudi Arabia)"
-msgstr "(العربية (المملكة العربية السعودية"
+msgstr "العربية/المملكة العربية السعودية"
 
 msgctxt "#30002"
 msgid "Belarusian (Belarus)"
@@ -2662,6 +2662,41 @@ msgstr "العناصر"
 msgctxt "#32512"
 msgid "Cache disk reads to memory"
 msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32513"
+msgid "MDbList options"
+msgstr "تخصيص MDbList"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32514"
+msgid "Add to MDbList list"
+msgstr "اضافة الى قائمة MDbList"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32515"
+msgid "Already exists in list."
+msgstr "تم اضافتها سابقا"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32516"
+msgid "MDbList API credentials not found."
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32517"
+msgid "Add your personal MDbList API key in TMDbHelper settings."
+msgstr "قم باضافة مفتاح MDbList في TMDbHelper"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32518"
+msgid "No static lists found for current MDbList user."
+msgstr "لا تتوفر قائمة لمستخدم MDbList الحالي"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32519"
+msgid "Remove from MDbList list"
+msgstr "مسح من قائمة ال MDbList"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
