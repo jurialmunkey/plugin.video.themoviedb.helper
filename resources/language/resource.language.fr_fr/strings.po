@@ -2631,6 +2631,106 @@ msgctxt "#32508"
 msgid "Recache Kodi Library details when building players"
 msgstr "Regénérer le cache des détails de la médiathèque Kodi lors de la création de lecteurs"
 
+#: /resources/settings.xml
+msgctxt "#32509"
+msgid "Use alternative TMDb API url"
+msgstr "Utiliser une URL d'API TMDb alternative"
+
+#: /resources/settings.xml
+msgctxt "#32510"
+msgid "Items only"
+msgstr "Éléments uniquement"
+
+#: /resources/settings.xml
+msgctxt "#32511"
+msgid "Items"
+msgstr "Éléments"
+
+#: /resources/settings.xml
+msgctxt "#32512"
+msgid "Cache disk reads to memory"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32513"
+msgid "MDbList options"
+msgstr "Options MDbList"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32514"
+msgid "Add to MDbList list"
+msgstr "Ajouter à la liste MDbList"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32515"
+msgid "Already exists in list."
+msgstr "Existe déjà dans la liste."
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32516"
+msgid "MDbList API credentials not found."
+msgstr "Les informations d'identification de l'API MDbList ne sont pas trouvées."
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32517"
+msgid "Add your personal MDbList API key in TMDbHelper settings."
+msgstr "Ajoutez votre clé API MDbList personnelle dans les paramètres de TMDbHelper."
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32518"
+msgid "No static lists found for current MDbList user."
+msgstr "Aucune liste statique trouvée pour l'utilisateur MDbList actuel."
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32519"
+msgid "Remove from MDbList list"
+msgstr "Supprimer de la liste MDbList"
+
+#: /resources/settings.xml
+msgctxt "#32520"
+msgid "TMDb"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32521"
+msgid "Rated"
+msgstr "Noté"
+
+#: /resources/settings.xml
+msgctxt "#32522"
+msgid "TMDb user options"
+msgstr "Options utilisateur TMDb"
+
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+msgctxt "#32523"
+msgid "Add/Remove from TMDb user list"
+msgstr "Ajouter/supprimer de la liste des utilisateurs TMDb"
+
+#: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
+msgctxt "#32524"
+msgid "User lists"
+msgstr "Listes d'utilisateurs"
+
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+msgctxt "#32525"
+msgid "Add/Remove from TMDb favourites"
+msgstr "Ajouter/Supprimer des favoris TMDb"
+
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+msgctxt "#32526"
+msgid "Add/Remove from TMDb watchlist"
+msgstr "Ajouter/Supprimer de la liste de surveillance TMDb"
+
+#: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
+msgctxt "#32527"
+msgid "Remove from {}"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
+msgctxt "#32528"
+msgid "Add to {}"
+msgstr "Supprimer de {}"
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr "Hindi (Inde)"
