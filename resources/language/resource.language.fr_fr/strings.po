@@ -2724,12 +2724,12 @@ msgstr "Ajouter/Supprimer de la liste de surveillance TMDb"
 #: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
 msgctxt "#32527"
 msgid "Remove from {}"
-msgstr ""
+msgstr "Supprimer de {}"
 
 #: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
 msgctxt "#32528"
 msgid "Add to {}"
-msgstr "Supprimer de {}"
+msgstr "Ajouter à {}"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
