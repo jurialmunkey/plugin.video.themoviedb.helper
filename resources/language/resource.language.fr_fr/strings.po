@@ -1123,7 +1123,7 @@ msgstr "Langue {} | {} ont aimé | IDENTIFIANT {}"
 #: /resources/lib/script.py 
 msgctxt "#32220"
 msgid "Select artwork"
-msgstr "Sélectionnez l'illsutration"
+msgstr "Sélectionnez l'illustration"
 
 #: /resources/lib/script.py 
 msgctxt "#32221"
@@ -1133,7 +1133,7 @@ msgstr "Actualiser toutes les illustrations"
 #: /resources/lib/listitem.py 
 msgctxt "#32222"
 msgid "Manage artwork"
-msgstr "Gérer les illsutrations"
+msgstr "Gérer les illustrations"
 
 #: /resources/lib/plugin.py
 msgctxt "#32223"
