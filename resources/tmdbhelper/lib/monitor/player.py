@@ -132,12 +132,13 @@ class PlayerTMDbItem():
             trakt_type = None
         if not trakt_type:
             return {}
-        self.details = self._parent.get_omdb_ratings(self.details)
-        self.details = self._parent.get_imdb_top250_rank(self.details, trakt_type=trakt_type)
-        self.details = self._parent.get_tvdb_awards(self.details, self.tmdb_type, self.tmdb_id)
-        self.details = self._parent.get_trakt_ratings(self.details, trakt_type, season=self.season, episode=self.episode)
-        self.details = self._parent.get_mdblist_ratings(self.details, trakt_type, tmdb_id=self.tmdb_id)
-        return self.details.get('infoproperties', {})
+        details = self.details
+        details = self._parent.get_omdb_ratings(details)
+        details = self._parent.get_imdb_top250_rank(details, trakt_type=trakt_type)
+        details = self._parent.get_tvdb_awards(details, self.tmdb_type, self.tmdb_id)
+        details = self._parent.get_trakt_ratings(details, trakt_type, season=self.season, episode=self.episode)
+        details = self._parent.get_mdblist_ratings(details, trakt_type, tmdb_id=self.tmdb_id)
+        return details.get('infoproperties', {})
 
     def get_artwork(self):
         if get_condvisibility("Skin.HasSetting(TMDbHelper.DisableArtwork)"):
