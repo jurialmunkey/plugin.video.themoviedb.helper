@@ -44,7 +44,8 @@ class ServiceMonitor(Poller):
 
     def _on_player(self):
         if self.player_monitor.isPlayingVideo():
-            self.player_monitor.current_time = self.player_monitor.getTime()
+            self.player_monitor.update_time()
+            self.player_monitor.update_artwork()
 
     def _on_context(self):
         self.listitem_funcs.on_context_listitem()
