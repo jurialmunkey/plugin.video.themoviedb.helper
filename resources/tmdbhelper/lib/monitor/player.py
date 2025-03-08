@@ -114,7 +114,7 @@ class PlayerTMDbItem():
                 season_episode_check=(self.season, self.episode,))
         else:
             tmdb_id = self.info_tag.getUniqueID('tmdb')
-        return tmdb_id or self._parent.self.get_tmdb_id(
+        return tmdb_id or self._parent.get_tmdb_id(
             self.tmdb_type,
             self.imdb_id,
             self.query,
