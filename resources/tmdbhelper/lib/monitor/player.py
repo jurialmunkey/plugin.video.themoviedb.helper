@@ -1,6 +1,7 @@
 from xbmc import Player
 from jurialmunkey.parser import boolean
 from jurialmunkey.window import get_property
+from tmdbhelper.lib.monitor.images import ImageFunctions
 from tmdbhelper.lib.monitor.common import CommonMonitorFunctions, SETPROP_RATINGS, SETMAIN_ARTWORK
 from tmdbhelper.lib.addon.plugin import get_condvisibility, get_infolabel
 
@@ -14,36 +15,57 @@ class PlayerTMDbItem():
         try:
             return self._baseitem
         except AttributeError:
-            self._baseitem = self._parent.ib.get_item(
-                self._parent.tmdb_type,
-                self._parent.tmdb_id,
-                self._parent.season,
-                self._parent.episode)
+            self._baseitem = self.get_baseitem()
             return self._baseitem
+
+    def get_baseitem(self):
+        if not self._parent.isPlayingVideo():
+            return
+        return self._parent.ib.get_item(
+            self._parent.tmdb_type,
+            self._parent.tmdb_id,
+            self._parent.season,
+            self._parent.episode)
 
     @property
     def details(self):
         try:
             return self._details
         except AttributeError:
-            self._details = self.baseitem['listitem'] if self.baseitem else {}
+            self._details = self.get_baseitem_details()
             return self._details
+
+    def get_baseitem_details(self):
+        if not self.baseitem:
+            return {}
+        return self.baseitem['listitem']
 
     @property
     def artwork(self):
         try:
             return self._artwork
         except AttributeError:
-            self._artwork = self.baseitem['artwork'] if self.baseitem else {}
+            self._artwork = self.get_baseitem_artwork()
             return self._artwork
+
+    def get_baseitem_artwork(self):
+        if not self.baseitem:
+            return {}
+        return self.baseitem['artwork']
 
     @property
     def info_tag(self):
         try:
             return self._info_tag
         except AttributeError:
-            self._info_tag = self._parent.getVideoInfoTag()
+            self._info_tag = self.get_info_tag()
             return self._info_tag
+
+    def get_info_tag(self):
+        if self._parent.isPlayingVideo():
+            return self._parent.getVideoInfoTag()
+        if self._parent.isPlayingAudio():
+            return self._parent.getMusicInfoTag()
 
     @property
     def dbtype(self):
@@ -74,8 +96,9 @@ class PlayerTMDbItem():
 
     @property
     def year(self):
-        if self.dbtype == 'movie':
-            return self.info_tag.getYear()
+        if self.dbtype == 'episode':
+            return
+        return self.info_tag.getYear()
 
     @property
     def epyear(self):
@@ -96,7 +119,9 @@ class PlayerTMDbItem():
     def tmdb_type(self):
         if self.dbtype == 'movie':
             return 'movie'
-        return 'tv'
+        if self.dbtype == 'episode':
+            return 'tv'
+        return ''
 
     @property
     def tmdb_id(self):
@@ -107,6 +132,9 @@ class PlayerTMDbItem():
             return self._tmdb_id
 
     def get_tmdb_id(self):
+        if self.dbtype not in ('episode', 'movie'):
+            return
+
         if self.dbtype == 'episode':
             tmdb_id = self.info_tag.getUniqueID('tvshow.tmdb')
             tmdb_id = tmdb_id or self._parent.get_tmdb_id_parent(
@@ -114,6 +142,7 @@ class PlayerTMDbItem():
                 season_episode_check=(self.season, self.episode,))
         else:
             tmdb_id = self.info_tag.getUniqueID('tmdb')
+
         return tmdb_id or self._parent.get_tmdb_id(
             self.tmdb_type,
             self.imdb_id,
@@ -178,8 +207,6 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
     def reset_properties(self):
         self.clear_properties()
         self.clear_artwork()
-        self.properties = set()
-        self.index_properties = set()
         self.total_time = 0
         self.current_time = 0
         self.previous_item = None
@@ -249,13 +276,9 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
     def update_time(self):
         self.current_time = self.getTime()
 
-    def update_artwork(self):
-        if get_condvisibility("Skin.HasSetting(TMDbHelper.DisableArtwork)"):
-            return
+    def update_crop(self, art: dict):
         if get_condvisibility("!Skin.HasSetting(TMDbHelper.EnableCrop)"):
             return
-
-        art = self.details.get('art', {})
 
         clearlogo = (
             get_infolabel('Player.Art(clearlogo)')
@@ -264,32 +287,60 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
             or art.get('clearlogo')
             or art.get('tvshow.clearlogo'))
 
-        if clearlogo == self.previous_clearlogo:
+        if clearlogo != self.previous_clearlogo:
+            ImageFunctions(method='crop', is_thread=False, prefix='Player', artwork=clearlogo).run()
+            self.previous_clearlogo = clearlogo
+
+    def update_blur(self, art: dict):
+        if get_condvisibility("!Skin.HasSetting(TMDbHelper.EnableBlur)"):
             return
 
-        from tmdbhelper.lib.monitor.images import ImageFunctions
-        ImageFunctions(method='crop', is_thread=False, prefix='Player', artwork=clearlogo).run()
-        self.previous_clearlogo = clearlogo
+        fanart = (
+            get_infolabel('Player.Art(fanart)')
+            or get_infolabel('Player.Art(artist.fanart)')
+            or get_infolabel('Player.Art(tvshow.fanart)')
+            or art.get('fanart')
+            or art.get('tvshow.fanart'))
+
+        poster = (
+            get_infolabel('Player.Art(poster)')
+            or get_infolabel('Player.Art(artist.poster)')
+            or get_infolabel('Player.Art(tvshow.poster)')
+            or get_infolabel('Player.Icon')
+            or art.get('poster')
+            or art.get('tvshow.poster'))
+
+        if poster != self.previous_poster:
+            ImageFunctions(method='blur', is_thread=False, prefix='Player.Poster', artwork=poster).run()
+            self.previous_poster = poster
+
+        if fanart != self.previous_fanart:
+            ImageFunctions(method='blur', is_thread=False, prefix='Player.Fanart', artwork=fanart).run()
+            self.previous_fanart = fanart
+
+    def update_artwork(self):
+        if get_condvisibility("Skin.HasSetting(TMDbHelper.DisableArtwork)"):
+            return
+
+        art = self.details.get('art', {})
+
+        self.update_crop(art)
+        self.update_blur(art)
 
     def clear_artwork(self):
         self.clear_property('CropImage')
         self.clear_property('CropImage.Original')
+        self.clear_property('Poster.BlurImage')
+        self.clear_property('Poster.BlurImage.Original')
+        self.clear_property('Fanart.BlurImage')
+        self.clear_property('Fanart.BlurImage.Original')
         self.previous_clearlogo = None
+        self.previous_poster = None
+        self.previous_fanart = None
 
     def get_playingitem(self):
-
-        # Check that video is playing
-        if not self.isPlayingVideo():
-            self.reset_properties()
-            return
-
         # Check that video other than dummy splash video is playing
         if self.getPlayingFile() and self.getPlayingFile().endswith('dummy.mp4'):
-            self.reset_properties()
-            return
-
-        # Only get info for Movies and Episodes -- TODO: Maybe get for PVR details?
-        if self.dbtype not in ('movie', 'episode', ):
             self.reset_properties()
             return
 
@@ -318,6 +369,12 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         # Clear properties and store the last cleared item
         self.previous_item = self.current_item
         self.clear_properties()
+        self.clear_artwork()
+
+        # Only get info for Movies and Episodes -- TODO: Maybe get for PVR details?
+        if self.dbtype not in ('movie', 'episode', ):
+            self.update_artwork()
+            return
 
         # Get ratings and artwork (no need for threading since we're only getting one item in player ever)
         self.set_iter_properties(self.player_item.get_ratings(), SETPROP_RATINGS)
