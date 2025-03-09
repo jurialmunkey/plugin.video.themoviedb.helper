@@ -158,9 +158,11 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.reset_properties()
 
     def onAVStarted(self):
+        self.reset_properties()
         self.get_playingitem()
 
     def onAVChange(self):
+        self.reset_properties()
         self.get_playingitem()
 
     def onPlayBackEnded(self):
@@ -175,13 +177,13 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
 
     def reset_properties(self):
         self.clear_properties()
+        self.clear_artwork()
         self.properties = set()
         self.index_properties = set()
         self.total_time = 0
         self.current_time = 0
         self.previous_item = None
         self.current_item = None
-        self.previous_clearlogo = None
         self.player_item = PlayerTMDbItem(self)
 
     @property
@@ -268,6 +270,11 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         from tmdbhelper.lib.monitor.images import ImageFunctions
         ImageFunctions(method='crop', is_thread=False, prefix='Player', artwork=clearlogo).run()
         self.previous_clearlogo = clearlogo
+
+    def clear_artwork(self):
+        self.clear_property('CropImage')
+        self.clear_property('CropImage.Original')
+        self.previous_clearlogo = None
 
     def get_playingitem(self):
 
