@@ -345,9 +345,24 @@ class WindowManager(_EventLoop):
         self._on_exit()
         self.call_window()
 
+    def get_playmedia_builtin(self):
+        params = [f'\"{self.params["playmedia"]}\"', f'playlist_type_hint={self.params.get("playlist_type_hint") or "1"}']
+        for k in ('resume', 'noresume', 'isdir', ):
+            if not self.params.get(k):
+                continue
+            params.append(k)
+        for k in ('playoffset', ):
+            if not self.params.get(k):
+                continue
+            params.append(f'{k}={self.params[k]}')
+        params = ','.join(params)
+        return f'PlayMedia({params})'
+
     def call_window(self):
+        if self.params.get('executebuiltin'):
+            return executebuiltin(f'{self.params["executebuiltin"]}')
         if self.params.get('playmedia'):
-            return executebuiltin(f'PlayMedia(\"{self.params["playmedia"]}\",playlist_type_hint=1)')
+            return executebuiltin(self.get_playmedia_builtin())
         if self.params.get('call_id'):
             return executebuiltin(f'ActivateWindow({self.params["call_id"]})')
         if self.params.get('call_path'):
