@@ -276,9 +276,11 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
     def update_time(self):
         self.current_time = self.getTime()
 
-    def update_crop(self, art: dict):
+    def update_crop(self):
         if get_condvisibility("!Skin.HasSetting(TMDbHelper.EnableCrop)"):
             return
+
+        art = self.details.get('art') or {}
 
         clearlogo = (
             get_infolabel('Player.Art(clearlogo)')
@@ -291,9 +293,11 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
             ImageFunctions(method='crop', is_thread=False, prefix='Player', artwork=clearlogo).run()
             self.previous_clearlogo = clearlogo
 
-    def update_blur(self, art: dict):
+    def update_blur(self):
         if get_condvisibility("!Skin.HasSetting(TMDbHelper.EnableBlur)"):
             return
+
+        art = self.details.get('art') or {}
 
         fanart = (
             get_infolabel('Player.Art(fanart)')
@@ -319,13 +323,8 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
             self.previous_fanart = fanart
 
     def update_artwork(self):
-        if get_condvisibility("Skin.HasSetting(TMDbHelper.DisableArtwork)"):
-            return
-
-        art = self.details.get('art', {})
-
-        self.update_crop(art)
-        self.update_blur(art)
+        self.update_crop()
+        self.update_blur()
 
     def clear_artwork(self):
         self.clear_property('CropImage')
