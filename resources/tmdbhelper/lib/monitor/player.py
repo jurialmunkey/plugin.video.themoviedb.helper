@@ -6,7 +6,7 @@ from tmdbhelper.lib.monitor.common import CommonMonitorFunctions, SETPROP_RATING
 from tmdbhelper.lib.addon.plugin import get_condvisibility, get_infolabel
 
 
-class PlayerTMDbItem():
+class PlayerItem():
     def __init__(self, parent):
         self._parent = parent
 
@@ -54,14 +54,36 @@ class PlayerTMDbItem():
         return self.baseitem['artwork']
 
     @property
-    def info_tag(self):
+    def meta(self):
         try:
-            return self._info_tag
+            return self._meta
         except AttributeError:
-            self._info_tag = self.get_info_tag()
-            return self._info_tag
+            self._meta = self.get_meta()
+            return self._meta
 
-    def get_info_tag(self):
+    def get_meta(self):
+        info_tag = self.get_player_info_tag()
+
+        if not info_tag:
+            return {}
+
+        meta = {}
+        meta['DbId'] = info_tag.getDbId()
+        meta['MediaType'] = info_tag.getMediaType()
+        meta['Title'] = info_tag.getTitle()
+        meta['Year'] = info_tag.getYear()
+
+        if self._parent.isPlayingVideo():
+            meta['IMDBNumber'] = info_tag.getIMDBNumber()
+            meta['TVShowTitle'] = info_tag.getTVShowTitle()
+            meta['Season'] = info_tag.getSeason()
+            meta['Episode'] = info_tag.getEpisode()
+            meta['UniqueID.tvshow.tmdb'] = info_tag.getUniqueID('tvshow.tmdb')
+            meta['UniqueID.tmdb'] = info_tag.getUniqueID('tmdb')
+
+        return meta
+
+    def get_player_info_tag(self):
         if self._parent.isPlayingVideo():
             return self._parent.getVideoInfoTag()
         if self._parent.isPlayingAudio():
@@ -69,51 +91,47 @@ class PlayerTMDbItem():
 
     @property
     def dbtype(self):
-        try:
-            return self._dbtype
-        except AttributeError:
-            self._dbtype = self.info_tag.getMediaType()
-            return self._dbtype
+        return self.meta.get('MediaType')
 
     @property
     def dbid(self):
-        try:
-            return self._dbid
-        except AttributeError:
-            self._dbid = self.info_tag.getDbId()
-            return self._dbid
+        return self.meta.get('DbId')
 
     @property
     def imdb_id(self):
-        if self.dbtype == 'movie':
-            return self.info_tag.getIMDBNumber()
+        if self.dbtype != 'movie':
+            return
+        return self.meta.get('IMDBNumber')
 
     @property
     def query(self):
         if self.dbtype == 'episode':
-            return self.info_tag.getTVShowTitle()
-        return self.info_tag.getTitle()
+            return self.meta.get('TVShowTitle')
+        return self.meta.get('Title')
 
     @property
     def year(self):
         if self.dbtype == 'episode':
             return
-        return self.info_tag.getYear()
+        return self.meta.get('Year')
 
     @property
     def epyear(self):
-        if self.dbtype == 'episode':
-            self.info_tag.getYear()
+        if self.dbtype != 'episode':
+            return
+        return self.meta.get('Year')
 
     @property
     def season(self):
-        if self.dbtype == 'episode':
-            return self.info_tag.getSeason()
+        if self.dbtype != 'episode':
+            return
+        return self.meta.get('Season')
 
     @property
     def episode(self):
-        if self.dbtype == 'episode':
-            return self.info_tag.getEpisode()
+        if self.dbtype != 'episode':
+            return
+        return self.meta.get('Episode')
 
     @property
     def tmdb_type(self):
@@ -131,24 +149,34 @@ class PlayerTMDbItem():
             self._tmdb_id = self.get_tmdb_id()
             return self._tmdb_id
 
+    def get_tmdb_id_parent(self):
+        if self.dbtype != 'episode':
+            return self.meta.get('UniqueID.tmdb')
+
+        tmdb_id = self.meta.get('UniqueID.tvshow.tmdb')
+
+        return tmdb_id or self._parent.get_tmdb_id_parent(
+            tmdb_id=self.meta.get('UniqueID.tmdb'),
+            trakt_type='episode',
+            season_episode_check=(
+                self.season,
+                self.episode,
+            )
+        )
+
     def get_tmdb_id(self):
         if self.dbtype not in ('episode', 'movie'):
             return
 
-        if self.dbtype == 'episode':
-            tmdb_id = self.info_tag.getUniqueID('tvshow.tmdb')
-            tmdb_id = tmdb_id or self._parent.get_tmdb_id_parent(
-                self.info_tag.getUniqueID('tmdb'), 'episode',
-                season_episode_check=(self.season, self.episode,))
-        else:
-            tmdb_id = self.info_tag.getUniqueID('tmdb')
+        tmdb_id = self.get_tmdb_id_parent()
 
         return tmdb_id or self._parent.get_tmdb_id(
             self.tmdb_type,
             self.imdb_id,
             self.query,
             self.year,
-            self.epyear)
+            self.epyear
+        )
 
     def get_ratings(self):
         if not self.details:
@@ -187,11 +215,9 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.reset_properties()
 
     def onAVStarted(self):
-        self.reset_properties()
         self.get_playingitem()
 
     def onAVChange(self):
-        self.reset_properties()
         self.get_playingitem()
 
     def onPlayBackEnded(self):
@@ -204,6 +230,9 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.reset_properties()
         self.update_trakt()
 
+    def reset_player_item(self):
+        self.player_item = PlayerItem(self)
+
     def reset_properties(self):
         self.clear_properties()
         self.clear_artwork()
@@ -211,7 +240,6 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.current_time = 0
         self.previous_item = None
         self.current_item = None
-        self.player_item = PlayerTMDbItem(self)
 
     @property
     def details(self):
@@ -220,10 +248,6 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
     @property
     def artwork(self):
         return self.player_item.artwork
-
-    @property
-    def info_tag(self):
-        return self.player_item.info_tag
 
     @property
     def dbtype(self):
@@ -343,6 +367,9 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
             self.reset_properties()
             return
 
+        # Get fresh info tags etc.
+        self.reset_player_item()
+
         # Update some base values
         from json import loads
         self.playerstring = get_property('PlayerInfoString')
@@ -368,22 +395,23 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         # Clear properties and store the last cleared item
         self.previous_item = self.current_item
         self.clear_properties()
-        self.clear_artwork()
 
-        # Only get info for Movies and Episodes -- TODO: Maybe get for PVR details?
+        # Extra info only for Movies and Episodes. Exit early and only update monitor art for other types. TODO: Maybe get extra PVR info?
         if self.dbtype not in ('movie', 'episode', ):
             self.update_artwork()
             return
 
-        # Get ratings and artwork (no need for threading since we're only getting one item in player ever)
-        self.set_iter_properties(self.player_item.get_ratings(), SETPROP_RATINGS)
+        # Update artwork details
         self.set_iter_properties(self.player_item.get_artwork(), SETMAIN_ARTWORK)
-
-        # Update our properties
-        self.set_properties(self.details)
 
         # Update our artwork manipulation cropped logo
         self.update_artwork()
+
+        # Update ratings _details
+        self.set_iter_properties(self.player_item.get_ratings(), SETPROP_RATINGS)
+
+        # Update our properties
+        self.set_properties(self.details)
 
     def set_watched(self):
         if not self.playerstring:
