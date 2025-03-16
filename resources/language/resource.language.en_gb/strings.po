@@ -2691,6 +2691,11 @@ msgctxt "#32529"
 msgid "Scrobble items played via TMDbHelper"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32530"
+msgid "Remove rating"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
