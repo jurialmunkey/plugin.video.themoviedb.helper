@@ -8,7 +8,7 @@ class TraktMethods():
         self._trakt.attempted_login = True  # Avoid asking for authorization
         self._pauseplayprogress = pauseplayprogress  # Set play progress using paused at position
         self._watchedindicators = watchedindicators  # Set watched status and playcount
-        self._unwatchedepisodes = unwatchedepisodes  # Set unwatched episode count to total episode count for unwatched tvshows
+        self._unwatchedepisodes = unwatchedepisodes  # Set unwatched episode count to total episode count for unwatched tvshows (if false)
 
     def set_playprogress(self, li):
         def _set_playprogress():

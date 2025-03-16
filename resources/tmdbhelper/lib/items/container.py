@@ -147,8 +147,7 @@ class Container(CommonContainerAPIs):
             from tmdbhelper.lib.items.trakt import TraktMethods
             self._trakt_method = TraktMethods(
                 watchedindicators=get_setting('trakt_watchedindicators'),
-                pauseplayprogress=get_setting('trakt_playprogress'),
-                unwatchedepisodes=get_setting('trakt_watchedinprogress'))
+                pauseplayprogress=get_setting('trakt_playprogress'))
             return self._trakt_method
 
     @property

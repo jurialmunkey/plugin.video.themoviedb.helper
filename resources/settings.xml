@@ -592,19 +592,19 @@
                         <popup>false</popup>
                     </control>
                 </setting>
+                <setting id="trakt_scrobbling" type="boolean" label="32529" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="trakt_watchedindicators" type="boolean" label="32034" help="">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="trakt_watchedinprogress" type="boolean" label="32396" help="">
+                <setting id="trakt_playprogress" type="boolean" label="32407" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <dependencies>
-                        <dependency type="enable">
-                            <condition operator="is" setting="trakt_watchedindicators">True</condition>
-                        </dependency>
-                    </dependencies>
+                    <default>false</default>
                     <control type="toggle"/>
                 </setting>
                 <setting id="trakt_sortignorearticle" type="boolean" label="32469" help="">
@@ -615,11 +615,6 @@
                 <setting id="trakt_cacheownlists" type="boolean" label="32463" help="">
                     <level>0</level>
                     <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="trakt_playprogress" type="boolean" label="32407" help="">
-                    <level>0</level>
-                    <default>false</default>
                     <control type="toggle"/>
                 </setting>
             </group>
@@ -914,11 +909,6 @@
                 <setting id="force_xbmcplayer" type="boolean" label="32364" help="">
                     <level>0</level>
                     <default>True</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="trakt_localhack" type="boolean" label="32346" help="">
-                    <level>0</level>
-                    <default>false</default>
                     <control type="toggle"/>
                 </setting>
                 <setting id="force_recache_kodidb" type="boolean" label="32508" help="">

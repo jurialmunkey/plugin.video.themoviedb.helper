@@ -2686,6 +2686,11 @@ msgctxt "#32528"
 msgid "Add to {}"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32529"
+msgid "Scrobble items played via TMDbHelper"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
