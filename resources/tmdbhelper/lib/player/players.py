@@ -10,7 +10,7 @@ from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.api.kodi.rpc import get_directory, KodiLibrary
 from tmdbhelper.lib.player.inputter import KeyboardInputter
 from tmdbhelper.lib.addon.logger import kodi_log
-from threading import Thread
+from tmdbhelper.lib.addon.thread import SafeThread
 
 
 class PlayerHacks():
@@ -430,7 +430,7 @@ class PlayerProperties():
         try:
             return self._thread_external_ids
         except AttributeError:
-            self._thread_external_ids = Thread(target=self.get_external_ids)
+            self._thread_external_ids = SafeThread(target=self.get_external_ids)
             return self._thread_external_ids
 
     @property

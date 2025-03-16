@@ -9,7 +9,7 @@ from tmdbhelper.lib.addon.plugin import get_infolabel, get_setting, get_condvisi
 from tmdbhelper.lib.monitor.propertysetter import PropertySetter
 from jurialmunkey.parser import try_int, try_float
 from tmdbhelper.lib.files.futils import make_path
-from threading import Thread
+from tmdbhelper.lib.addon.thread import SafeThread
 import urllib.request as urllib
 from tmdbhelper.lib.addon.logger import kodi_log
 
@@ -123,7 +123,7 @@ def _saveimage(image, targetfile):
         # os.fsync(f)
 
 
-class ImageFunctions(Thread, PropertySetter):
+class ImageFunctions(SafeThread, PropertySetter):
     save_path = f"{get_setting('image_location', 'str') or ADDONDATA}{{}}/"
     blur_size = try_int(get_infolabel('Skin.String(TMDbHelper.Blur.Size)')) or 480
     crop_size = (800, 310)
@@ -131,7 +131,7 @@ class ImageFunctions(Thread, PropertySetter):
 
     def __init__(self, method=None, artwork=None, is_thread=True, prefix='ListItem'):
         if is_thread:
-            Thread.__init__(self)
+            SafeThread.__init__(self)
         self.image = artwork
         self.func = None
         self.save_orig = False
@@ -328,7 +328,7 @@ class ImageFunctions(Thread, PropertySetter):
                 self.get_property(maincolor_propname, set_property=maincolor_hex)
             else:
                 self.get_property(maincolor_propchek, set_property=maincolor_propvalu)
-                thread_maincolor = Thread(target=self.set_prop_colorgradient, args=[
+                thread_maincolor = SafeThread(target=self.set_prop_colorgradient, args=[
                     maincolor_propname, maincolor_propvalu, maincolor_hex, maincolor_propchek])
                 thread_maincolor.start()
 
@@ -339,7 +339,7 @@ class ImageFunctions(Thread, PropertySetter):
                 self.get_property(compcolor_propname, set_property=compcolor_hex)
             else:
                 self.get_property(compcolor_propchek, set_property=compcolor_propvalu)
-                thread_compcolor = Thread(target=self.set_prop_colorgradient, args=[
+                thread_compcolor = SafeThread(target=self.set_prop_colorgradient, args=[
                     compcolor_propname, compcolor_propvalu, compcolor_hex, compcolor_propchek])
                 thread_compcolor.start()
 

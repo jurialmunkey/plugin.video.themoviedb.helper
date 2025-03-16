@@ -8,7 +8,7 @@ from tmdbhelper.lib.monitor.readahead import ListItemReadAhead, READAHEAD_CHANGE
 from tmdbhelper.lib.monitor.baseitem import BaseItemSkinDefaults
 from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.files.bcache import BasicCache
-from threading import Thread
+from tmdbhelper.lib.addon.thread import SafeThread
 
 CV_USE_LISTITEM = (
     "!Skin.HasSetting(TMDbHelper.ForceWidgetContainer) + "
@@ -229,8 +229,8 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
             self.get_property('IsUpdatingRatings', 'True')
 
             # Thread ratings and artwork processing
-            t_artwork = Thread(target=_process_artwork) if process_artwork else None
-            t_ratings = Thread(target=_process_ratings) if process_ratings else None
+            t_artwork = SafeThread(target=_process_artwork) if process_artwork else None
+            t_ratings = SafeThread(target=_process_ratings) if process_ratings else None
             t_artwork.start() if t_artwork else None
             t_ratings.start() if t_ratings else None
 
@@ -250,7 +250,7 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
             _listitem.setProperties(_detailed['ratings'] or {}) if process_ratings else None
 
         if process_artwork or process_ratings:
-            t = Thread(target=_process_artwork_ratings)
+            t = SafeThread(target=_process_artwork_ratings)
             t.start()
 
     def on_finalise_winproperties(self, process_artwork=True, process_ratings=True):
@@ -290,8 +290,8 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
             self.get_property('IsUpdatingRatings', 'True')
 
             # Thread ratings and artwork processing
-            t_artwork = Thread(target=_process_artwork) if process_artwork else None
-            t_ratings = Thread(target=_process_ratings) if process_ratings else None
+            t_artwork = SafeThread(target=_process_artwork) if process_artwork else None
+            t_ratings = SafeThread(target=_process_ratings) if process_ratings else None
             t_artwork.start() if t_artwork else None
             t_ratings.start() if t_ratings else None
 
@@ -302,7 +302,7 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
             self.get_property('IsUpdatingRatings', clear_property=True)
 
         if process_artwork or process_ratings:
-            t = Thread(target=_process_artwork_ratings)
+            t = SafeThread(target=_process_artwork_ratings)
             t.start()
 
         with self._parent.mutex_lock:
@@ -348,7 +348,7 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
             self._readahead = None
 
         # Readahead is threaded to avoid locking up main lookup while loop
-        t = Thread(target=_next_readahead)
+        t = SafeThread(target=_next_readahead)
         t.start()
 
     @kodi_try_except('lib.monitor.listitem.on_listitem')

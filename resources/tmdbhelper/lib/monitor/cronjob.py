@@ -1,15 +1,15 @@
-from threading import Thread
+from tmdbhelper.lib.addon.thread import SafeThread
 
 
 CRONJOB_POLL_TIME = 600
 
 
-class CronJobMonitor(Thread):
+class CronJobMonitor(SafeThread):
 
     _poll_time = CRONJOB_POLL_TIME
 
     def __init__(self, parent, update_hour=0):
-        Thread.__init__(self)
+        SafeThread.__init__(self)
         self.exit = False
         self.update_hour = update_hour
         self.update_monitor = parent.update_monitor

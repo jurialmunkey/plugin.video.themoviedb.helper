@@ -277,7 +277,7 @@ class Container(CommonContainerAPIs):
 
         # Wait for sync thread
         with TimerList(self.timer_lists, '--sync', log_threshold=0.05, logging=self.log_timers):
-            self._pre_sync.join()
+            self.trakt_method.pre_sync_join()
 
         # Finalise listitems in parallel threads
         with TimerList(self.timer_lists, '--make', log_threshold=0.05, logging=self.log_timers):
@@ -365,10 +365,8 @@ class Container(CommonContainerAPIs):
         return
 
     def get_directory(self, items_only=False, build_items=True):
-        from threading import Thread
         with TimerList(self.timer_lists, 'total', logging=self.log_timers):
-            self._pre_sync = Thread(target=self.trakt_method.pre_sync, kwargs=self.params)
-            self._pre_sync.start()
+            self.trakt_method.pre_sync_start(**self.params)
             with TimerList(self.timer_lists, 'get_list', logging=self.log_timers):
                 items = self.get_items(**self.params)
             if not items:

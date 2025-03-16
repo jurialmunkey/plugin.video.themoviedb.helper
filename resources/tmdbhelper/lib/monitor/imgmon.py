@@ -3,10 +3,10 @@ from tmdbhelper.lib.monitor.poller import Poller, POLL_MIN_INCREMENT
 from tmdbhelper.lib.monitor.listitemtools import ListItemInfoGetter
 from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp
 from tmdbhelper.lib.addon.logger import kodi_try_except
-from threading import Thread
+from tmdbhelper.lib.addon.thread import SafeThread
 
 
-class ImagesMonitor(Thread, ListItemInfoGetter, ImageManipulations, Poller):
+class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
     _cond_on_disabled = (
         "!Skin.HasSetting(TMDbHelper.EnableCrop) + "
         "!Skin.HasSetting(TMDbHelper.EnableBlur) + "
@@ -25,7 +25,7 @@ class ImagesMonitor(Thread, ListItemInfoGetter, ImageManipulations, Poller):
     _this_refresh_increment = 3   # How long to wait for ListItem.Art() availability check
 
     def __init__(self, parent):
-        Thread.__init__(self)
+        SafeThread.__init__(self)
         self._cur_item = 0
         self._pre_item = 1
         self._cur_window = 0

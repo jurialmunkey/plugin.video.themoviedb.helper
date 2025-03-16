@@ -6,7 +6,8 @@ from tmdbhelper.lib.monitor.player import PlayerMonitor
 from tmdbhelper.lib.monitor.update import UpdateMonitor
 from tmdbhelper.lib.monitor.imgmon import ImagesMonitor
 from tmdbhelper.lib.monitor.poller import Poller, POLL_MIN_INCREMENT, POLL_MID_INCREMENT
-from threading import Thread, Lock
+from tmdbhelper.lib.addon.thread import SafeThread
+from threading import Lock
 
 
 class ServiceMonitor(Poller):
@@ -72,4 +73,4 @@ def restart_service_monitor():
     if get_property('ServiceStarted') == 'True':
         wait_for_property('ServiceStop', value='True', set_property=True)  # Stop service
     wait_for_property('ServiceStop', value=None)  # Wait until Service clears property
-    Thread(target=ServiceMonitor().run).start()
+    SafeThread(target=ServiceMonitor().run).start()

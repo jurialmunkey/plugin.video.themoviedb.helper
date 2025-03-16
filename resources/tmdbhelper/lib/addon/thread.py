@@ -7,6 +7,9 @@ from jurialmunkey.window import get_property
 import jurialmunkey.thread as jurialmunkey_thread
 
 
+SafeThread = jurialmunkey_thread.SafeThread
+
+
 def has_property_lock(property_name, timeout=5, polling=0.05):
     """ Checks for a window property lock and wait for it to be cleared before continuing
     Returns True after property clears if was locked

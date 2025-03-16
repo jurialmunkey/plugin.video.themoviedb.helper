@@ -6,7 +6,7 @@ from tmdbhelper.lib.addon.plugin import get_condvisibility, get_localized, execu
 from tmdbhelper.lib.addon.dialog import BusyDialog
 from tmdbhelper.lib.api.tmdb.api import TMDb
 from tmdbhelper.lib.addon.logger import kodi_log
-from threading import Thread
+from tmdbhelper.lib.addon.thread import SafeThread
 
 
 PREFIX_PATH = 'Path.'
@@ -71,7 +71,7 @@ def open_info(listitem, func=None, threaded=False):
     executebuiltin(f'Dialog.Close(pvrguideinfo,true)')
     func() if func else None
     if threaded:
-        t = Thread(target=Dialog().info, args=[listitem])
+        t = SafeThread(target=Dialog().info, args=[listitem])
         t.start()
         return t
     Dialog().info(listitem)

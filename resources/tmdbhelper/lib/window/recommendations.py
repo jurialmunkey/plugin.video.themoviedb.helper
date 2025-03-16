@@ -3,12 +3,11 @@ from xbmc import Monitor
 from itertools import zip_longest
 from tmdbhelper.lib.items.router import Router
 from tmdbhelper.lib.addon.dialog import BusyDialog
-from tmdbhelper.lib.addon.thread import ParallelThread
+from tmdbhelper.lib.addon.thread import ParallelThread, SafeThread
 from tmdbhelper.lib.addon.plugin import get_infolabel, executebuiltin, get_condvisibility, ADDONPATH
 from tmdbhelper.lib.api.tmdb.api import TMDb
 from jurialmunkey.window import get_property, WindowProperty, wait_until_active
 from jurialmunkey.parser import parse_paramstring, reconfigure_legacy_params
-from threading import Thread
 
 
 TMDB_QUERY_PARAMS = ('imdb_id', 'tvdb_id', 'query', 'year', 'episode_year',)
@@ -128,7 +127,7 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
         _list_id = self._add_items(_next_id, _listitems)
         _list_id = self._focus_id or _list_id  # Allow skinner to override first list default focus
 
-        Thread(target=self._build_all_in_groups, args=[3, _list_id]).start()  # Don't block closing
+        SafeThread(target=self._build_all_in_groups, args=[3, _list_id]).start()  # Don't block closing
         self.setProperty(PROP_LIST_VISIBLE.format('Main'), 'True')
 
     def _build_next(self):
@@ -425,7 +424,7 @@ class WindowRecommendationsManager():
         self._current_dump = ''
         get_property(PROP_JSONDUMP, clear_property=True)
         if threaded:
-            t = Thread(target=xbmcgui.Dialog().info, args=[listitem])
+            t = SafeThread(target=xbmcgui.Dialog().info, args=[listitem])
             t.start()
             return t
         xbmcgui.Dialog().info(listitem)

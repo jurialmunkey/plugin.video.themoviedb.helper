@@ -8,9 +8,9 @@ class UpdateMonitor(xbmc.Monitor):
 
     @staticmethod
     def run_library_tagger():
-        from threading import Thread
+        from tmdbhelper.lib.addon.thread import SafeThread
         from tmdbhelper.lib.update.tagger import LibraryTagger
-        Thread(target=LibraryTagger).start()
+        SafeThread(target=LibraryTagger).start()
 
     def onScanFinished(self, library):
         if library == 'video':

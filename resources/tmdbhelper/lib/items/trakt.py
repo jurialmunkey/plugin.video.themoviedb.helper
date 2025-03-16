@@ -54,6 +54,17 @@ class TraktMethods():
             if self._pauseplayprogress and tmdbid and season != -2:
                 self._trakt.get_sync('playback', 'show', 'tmdb')
 
+    def pre_sync_start(self, **kwargs):
+        from tmdbhelper.lib.addon.thread import SafeThread
+        self._pre_sync = SafeThread(target=self.pre_sync, kwargs=kwargs)
+        self._pre_sync.start()
+
+    def pre_sync_join(self):
+        try:
+            self._pre_sync.join()
+        except AttributeError:
+            return
+
     def get_playcount(self, li):
         if not self._watchedindicators:
             return
