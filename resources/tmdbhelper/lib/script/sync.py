@@ -500,4 +500,12 @@ class _Rating():
                 'ratings/remove' if x == 0 else 'ratings',
                 postdata={f'{self._item.trakt_type}s': [item]}
             )
+
+        if not self._trakt.is_sync(self._item.trakt_type, self._item.unique_id, self._item.season, self._item.episode, self._item.id_type, 'ratings'):
+            self.name = get_localized(32485)
+        elif x == 0:
+            self.name = get_localized(32530)
+        else:
+            self.name = f'{get_localized(32489)} ({x})'
+            
         return self._sync
