@@ -480,6 +480,13 @@ class _Rating():
                 self._item.season, self._item.episode)
         if not item:
             return
+
+        # We check if there is a rating on the Trakt server
+        had_rating = self._trakt.is_sync(
+            self._item.trakt_type, self._item.unique_id, self._item.season,
+            self._item.episode, self._item.id_type, "ratings"
+        )
+
         # Ask user for rating
         try:
             x = int(Dialog().numeric(0, f'{self.name} (0-10)'))
@@ -501,11 +508,11 @@ class _Rating():
                 postdata={f'{self._item.trakt_type}s': [item]}
             )
 
-        if not self._trakt.is_sync(self._item.trakt_type, self._item.unique_id, self._item.season, self._item.episode, self._item.id_type, 'ratings'):
-            self.name = get_localized(32485)
-        elif x == 0:
-            self.name = get_localized(32530)
+        if x == 0:
+            self.name = get_localized(32530)  # Remove Rating
+        elif had_rating:  
+            self.name = f'{get_localized(32489)} ({x})'  # Change Rating (x)
         else:
-            self.name = f'{get_localized(32489)} ({x})'
-            
+            self.name = get_localized(32485)  # Add Rating
+
         return self._sync
