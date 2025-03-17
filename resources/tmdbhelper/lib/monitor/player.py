@@ -436,8 +436,11 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
             if not self.total_time:
                 return
             # Check playerstring item matches item in player
-            # if f'{self.playerstring.get("tmdb_id")}' != f'{self.details.get("unique_ids", {}).get("tmdb")}':
-            #     return
+            if f'{self.playerstring.get("tmdb_id")}' not in (
+                f'{self.details.get("unique_ids", {}).get("tmdb")}',
+                f'{self.details.get("unique_ids", {}).get("tvshow.tmdb")}',
+            ):
+                return
             return func(self, *args, **kwargs)
 
         return wrapper
