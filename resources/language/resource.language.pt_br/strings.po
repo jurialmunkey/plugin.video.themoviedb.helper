@@ -550,7 +550,7 @@ msgstr "Adicionado"
 #: /resources/lib/container.py
 msgctxt "#32107"
 msgid "Set Match Method"
-msgstr "Definir método de correspondência"
+msgstr "Definir Método de Correspondência"
 
 #: /resources/lib/container.py
 msgctxt "#32108"
@@ -560,12 +560,12 @@ msgstr "Escolha o método de correspondência para parâmetros com vários valor
 #: /resources/lib/container.py
 msgctxt "#32109"
 msgid "Match ANY Value"
-msgstr "Correspondente a QUAISQUER valor"
+msgstr "Corresponder a QUAISQUER valor"
 
 #: /resources/lib/container.py
 msgctxt "#32110"
 msgid "Match ALL Values"
-msgstr "Correspondente a TODO valor"
+msgstr "Corresponder a TODOS os valores"
 
 #: /resources/lib/container.py
 msgctxt "#32111"
