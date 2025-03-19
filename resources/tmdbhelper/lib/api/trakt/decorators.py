@@ -1,15 +1,4 @@
-from jurialmunkey.parser import boolean
-from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.plugin import format_name
-
-
-def is_trakt_authorized(func):
-    """ Decorator to check if trakt is authorized before doing a function"""
-    def wrapper(*args, **kwargs):
-        if not boolean(get_property('TraktIsAuth')):
-            return
-        return func(*args, **kwargs)
-    return wrapper
 
 
 def is_authorized(func):
