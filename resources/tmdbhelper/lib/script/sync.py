@@ -500,4 +500,12 @@ class _Rating():
                 'ratings/remove' if x == 0 else 'ratings',
                 postdata={f'{self._item.trakt_type}s': [item]}
             )
+
+        if x == 0:
+            self.name = get_localized(32530)  # Remove Rating
+        elif self.name == get_localized(32485):
+            self.name = f'{get_localized(32485)} ({x})'  # Add Rating (x)
+        else:
+            self.name = f'{get_localized(32489)} ({x})'  # Change Rating (x)
+
         return self._sync
