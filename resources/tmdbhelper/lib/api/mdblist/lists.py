@@ -27,6 +27,7 @@ class ListLocal(Container):
         if not response:
             return
 
+        response = {"all": response}
         response = self.mdblist_api.get_paginated(response, page=page or 1)
 
         self.tmdb_cache_only = False
