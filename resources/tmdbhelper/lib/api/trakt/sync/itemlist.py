@@ -102,8 +102,14 @@ class ItemListSyncData:
             return
 
     def make_detailed_item(self, i, item_type='show'):
+        if not i['id']:
+            return i
         slug = self._class_instance_trakt_api.get_id(unique_id=i['id'], id_type='tmdb', trakt_type=item_type, output_type='slug')
+        if not slug:
+            return i
         item = self._class_instance_trakt_api.get_details(item_type, slug, season=i.get('season'), episode=i.get('episode'))
+        if not item:
+            return i
         item.pop('ids', None)
         item.update(i)
         return item
@@ -259,7 +265,8 @@ class ItemListSyncDataNextUp(ItemListSyncData):
         days = -1 if self.sort_by == 'todays' else -7
         recent, remainder = [], []
         for i in self.presorted_items:
-            if is_future_timestamp(i['first_aired'], "%Y-%m-%d", 10, use_today=True, days=days):
+            first_aired = i.get('first_aired')
+            if first_aired and is_future_timestamp(first_aired, "%Y-%m-%d", 10, use_today=True, days=days):
                 recent.append(i)
                 continue
             remainder.append(i)
@@ -267,7 +274,7 @@ class ItemListSyncDataNextUp(ItemListSyncData):
 
     def get_items(self):
         if self.sort_by == 'airdate':
-            return sorted(self.presorted_items, key=lambda x: x['first_aired'], reverse=True)
+            return sorted(self.presorted_items, key=lambda x: x.get('first_aired') or '0', reverse=True)
         if self.sort_by in ('todays', 'lastweek', ):
             return self.get_special_sort()
         return self.presorted_items
