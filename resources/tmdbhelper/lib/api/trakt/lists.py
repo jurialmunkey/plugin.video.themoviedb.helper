@@ -61,14 +61,14 @@ class ListSync(Container):
         from tmdbhelper.lib.items.itemlist import ItemListPagination
 
         item_keys = tuple(set([v for k, v in filters.items() if k.startswith('filter_key') or k.startswith('exclude_key')])) if filters else None
-        sync_ilist = ItemListSyncDataFactory(sync_type, self.trakt_api, sort_by=sort_by, sort_how=sort_how, item_type=item_type, item_keys=item_keys, tmdb_id=tmdb_id)
+        sync_list = ItemListSyncDataFactory(sync_type, self.trakt_api, sort_by=sort_by, sort_how=sort_how, item_type=item_type, item_keys=item_keys, tmdb_id=tmdb_id)
 
-        if not sync_ilist.items:
+        if not sync_list.items:
             return
 
         limit = limit or self.trakt_api.sync_item_limit
         params_def = {item_type: params} if params else None
-        response = ItemListPagination({item_type: sync_ilist.items}, page=page or 1, limit=limit, params_def=params_def, filters=filters)
+        response = ItemListPagination({item_type: sync_list.items}, page=page or 1, limit=limit, params_def=params_def, filters=filters)
 
         return response.items if not next_page or sort_by == 'random' else response.items + response.next_page
 
