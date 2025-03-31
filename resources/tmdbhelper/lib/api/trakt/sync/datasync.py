@@ -3,7 +3,7 @@
 from jurialmunkey.parser import LazyPropertyProtected, LazyProperty
 from jurialmunkey.checks import has_arg_value
 from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA
-from tmdbhelper.lib.api.trakt.sync.database import SyncDataBase, SIMPLECACHE_COLUMNS
+from tmdbhelper.lib.api.trakt.sync.database import SyncDataBase
 
 
 class SyncDataSetters:
@@ -318,7 +318,7 @@ class SyncData(SyncDataGetters):
         return self._class_instance_trakt_api.get_response_json(*args, **kwargs)
 
     def get_routes(self):
-        return {k: v['sync'] for k, v in SIMPLECACHE_COLUMNS.items()}
+        return {k: v['sync'] for k, v in self.cache.simplecache_columns.items()}
 
     def reset_lastactivities(self):
         self.window.get_property(LASTACTIVITIES_DATA, clear_property=True)  # Wipe new last activities cache
