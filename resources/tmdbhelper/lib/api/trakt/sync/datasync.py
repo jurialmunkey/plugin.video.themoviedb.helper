@@ -354,10 +354,3 @@ class SyncData(SyncDataGetters):
         from jurialmunkey.modimp import importmodule
         for route in set([j for j in (self.routes.get(k) for k in keys) if j]):
             importmodule(*route)(self, item_type).sync(forced=forced)
-
-    def test(self):
-        # data = self.get_response_json('sync', 'watchlist', 'shows', extended='full')
-        sd = self.get_all_collected_getter('show')
-        data = sd.items
-        from tmdbhelper.lib.files.futils import dumps_to_file
-        dumps_to_file(data, 'log_data', 'collected.json', join_addon_data=True)

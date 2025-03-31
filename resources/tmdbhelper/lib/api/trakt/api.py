@@ -43,9 +43,6 @@ class TraktSync:
         from tmdbhelper.lib.api.trakt.sync.datasync import SyncData
         return SyncData(self)
 
-    def trakt_syncdata_test(self, *args, **kwargs):
-        return self.trakt_syncdata.test(*args, **kwargs)
-
 
 class TraktAPI(RequestAPI, TraktContent, TraktSync):
 
