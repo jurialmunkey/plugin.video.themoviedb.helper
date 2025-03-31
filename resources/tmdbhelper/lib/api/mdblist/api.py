@@ -42,7 +42,8 @@ class MDbListPaginationLists(ListPagination):
 class MDbListRatingMapping():
     ratings_translation = {
         'tomatoes': 'rottentomatoes_rating',
-        'tomatoesaudience': 'rottentomatoes_usermeter'}
+        'tomatoesaudience': 'rottentomatoes_usermeter',
+        'popcorn': 'rottentomatoes_usermeter'}
 
     def __init__(self, meta):
         self.meta = meta
