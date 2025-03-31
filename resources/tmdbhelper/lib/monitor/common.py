@@ -4,7 +4,7 @@ from tmdbhelper.lib.addon.logger import kodi_try_except, kodi_log
 from tmdbhelper.lib.files.futils import validate_join
 from tmdbhelper.lib.api.kodi.rpc import get_person_stats
 from tmdbhelper.lib.api.contains import CommonContainerAPIs
-from tmdbhelper.lib.monitor.propertysetter import PropertySetter
+from jurialmunkey.window import WindowPropertySetter
 from jurialmunkey.parser import try_int
 import xbmcvfs
 import json
@@ -230,7 +230,7 @@ class CommonMonitorDetails(CommonContainerAPIs):
         return item
 
 
-class CommonMonitorFunctions(PropertySetter, CommonMonitorDetails):
+class CommonMonitorFunctions(WindowPropertySetter, CommonMonitorDetails):
     def __init__(self):
         self.properties = set()
         self.index_properties = set()

@@ -69,6 +69,8 @@ REMOVE_EPISODE_COUNT = ['stars_in_tvshows', 'stars_in_both', 'crew_in_tvshows', 
 PARAM_WIDGETS_RELOAD = 'reload=$INFO[Window(Home).Property(TMDbHelper.Widgets.Reload)]'
 PARAM_WIDGETS_RELOAD_FORCED = 'reload=$INFO[System.Time(hh:mm:ss)]'
 
+LASTACTIVITIES_DATA = 'TraktNewSyncLastActivities'
+
 UPNEXT_EPISODE_ART = {
     'thumb': lambda li: li.art.get('thumb') or '',
     'tvshow.clearart': lambda li: li.art.get('tvshow.clearart') or '',
@@ -656,7 +658,6 @@ TRAKT_SYNC_LISTS = {
     },
     'trakt_watchlist': {
         'sync_type': 'watchlist',
-        'use_show_activity': True,
         'sort_by': 'unsorted',
         'route': TRAKT_SYNC_LISTS_ROUTE,
         'plugin_category': '{plural} {localized}',
@@ -664,7 +665,6 @@ TRAKT_SYNC_LISTS = {
     },
     'trakt_watchlist_released': {
         'sync_type': 'watchlist',
-        'use_show_activity': True,
         'sort_by': 'released',
         'sort_how': 'desc',
         'extended': 'full',
@@ -683,7 +683,6 @@ TRAKT_SYNC_LISTS = {
     },
     'trakt_watchlist_anticipated': {
         'sync_type': 'watchlist',
-        'use_show_activity': True,
         'sort_by': 'released',
         'sort_how': 'asc',
         'extended': 'full',

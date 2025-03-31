@@ -1,6 +1,34 @@
 from tmdbhelper.lib.files.bcache import use_simple_cache
 from tmdbhelper.lib.addon.consts import CACHE_SHORT
-from tmdbhelper.lib.api.trakt.decorators import is_authorized
+
+
+def is_authorized(func):
+
+    def wrapper(self, *args, **kwargs):
+
+        def _get_request_data():
+            # Authorization not required for this method
+            if not kwargs.get('authorize', True):
+                return func(self, *args, **kwargs)
+            # Authorization already granted in this instance
+            if self.authorization:
+                return func(self, *args, **kwargs)
+            # Authorization required ask for login if no token
+            if not self.attempted_login and self.authorize(login=True):
+                return func(self, *args, **kwargs)
+
+        def _get_cached_data():
+            params = {}
+            params.update(kwargs)
+            params['cache_only'] = True
+            try:
+                return func(self, *args, **params)
+            except TypeError:
+                return
+
+        return _get_request_data() or _get_cached_data()
+
+    return wrapper
 
 
 @use_simple_cache(cache_days=CACHE_SHORT)
@@ -303,37 +331,6 @@ def get_list_of_lists(self, path, page: int = 1, limit: int = 250, authorize=Fal
         return items
     from tmdbhelper.lib.items.pages import get_next_page
     return items + get_next_page(response.headers)
-
-
-def get_sync_list(
-    self, sync_type, trakt_type, page: int = 1, limit: int = None, params=None, sort_by=None, sort_how=None, next_page=True,
-    always_refresh=True, extended=None, filters=None
-):
-    from tmdbhelper.lib.api.trakt.items import TraktItems
-
-    sync_trakt_types = ['movie', 'show'] if trakt_type == 'both' else [trakt_type]
-
-    def _configure_item(i, sync_trakt_type):
-        i['type'] = sync_trakt_type
-        return i
-
-    sync = []
-    for sync_trakt_type in sync_trakt_types:
-        items = self.get_sync(sync_type, sync_trakt_type, extended=extended) or []
-        sync += [_configure_item(i, sync_trakt_type) for i in items if i]
-
-    if not sync:
-        return
-
-    func = TraktItems(items=sync).build_items
-    response = func(sort_by, sort_how, filters=filters)
-    if not response:
-        return
-
-    from tmdbhelper.lib.items.pages import PaginatedItems
-    limit = limit or self.sync_item_limit
-    response = PaginatedItems(items=response['items'], page=page, limit=limit)
-    return response.items if not next_page else response.items + response.next_page
 
 
 def merge_sync_sort(self, items):

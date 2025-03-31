@@ -16,7 +16,8 @@ CONTEXT_MENU_ITEMS = {
     '$ADDON[plugin.video.themoviedb.helper 32295]': {
         'command': 'RunScript(plugin.video.themoviedb.helper,sync_trakt,{})',
         'setting': 'contextmenu_sync_trakt',
-        'episode': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}', 'season': '{season}', 'episode': '{episode}'},
+        'season': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}'},
+        'episode': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}', 'episode': '{episode}'},
         'other': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'}
     },
     # TMDb User Options

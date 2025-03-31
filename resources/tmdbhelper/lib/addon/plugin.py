@@ -25,7 +25,6 @@ get_infolabel = xbmc.getInfoLabel
 get_skindir = xbmc.getSkinDir
 format_name = jurialmunkey.plugin.format_name
 format_folderpath = jurialmunkey.plugin.format_folderpath
-set_kwargattr = jurialmunkey.plugin.set_kwargattr
 
 
 def get_plugin_category(info_model, plural=''):

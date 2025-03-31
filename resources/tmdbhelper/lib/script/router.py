@@ -73,6 +73,8 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.api.trakt.api', 'TraktAPI')(force=True),
         'revoke_trakt':
             lambda **kwargs: importmodule('tmdbhelper.lib.api.trakt.api', 'TraktAPI')().logout(),
+        'trakt_syncdata_test':
+            lambda **kwargs: importmodule('tmdbhelper.lib.api.trakt.api', 'TraktAPI')().trakt_syncdata_test(),
 
         # Image Functions
         'blur_image':

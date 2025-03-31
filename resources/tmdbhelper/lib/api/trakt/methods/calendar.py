@@ -1,4 +1,4 @@
-from tmdbhelper.lib.api.trakt.decorators import is_authorized
+from tmdbhelper.lib.api.trakt.api import is_authorized
 from tmdbhelper.lib.files.bcache import use_simple_cache
 
 

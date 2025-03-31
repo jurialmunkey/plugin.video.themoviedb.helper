@@ -2696,6 +2696,11 @@ msgctxt "#32530"
 msgid "Remove rating"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/sync/item.py
+msgctxt "#32531"
+msgid "Method only available for VIP accounts."
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

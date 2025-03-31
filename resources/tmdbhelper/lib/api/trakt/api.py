@@ -6,13 +6,48 @@ from tmdbhelper.lib.api.request import RequestAPI
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.thread import has_property_lock
 from tmdbhelper.lib.api.api_keys.trakt import CLIENT_ID, CLIENT_SECRET, USER_TOKEN
-from tmdbhelper.lib.api.trakt.content import TraktMethods
+from tmdbhelper.lib.api.trakt.content import TraktContent
 
 
 API_URL = 'https://api.trakt.tv/'
 
 
-class TraktAPI(RequestAPI, TraktMethods):
+def is_authorized(func):
+
+    def wrapper(self, *args, **kwargs):
+
+        # Set authorize=False to skip authorization for that method
+        if not kwargs.get('authorize', True):
+            return func(self, *args, **kwargs)
+        # Authorization already granted in this instance
+        if self.authorization:
+            return func(self, *args, **kwargs)
+        # Authorization required ask for login if no token
+        if not self.attempted_login and self.authorize(login=True):
+            return func(self, *args, **kwargs)
+
+    return wrapper
+
+
+class TraktSync:
+    @property
+    def trakt_syncdata(self):
+        try:
+            return self._trakt_syncdata
+        except AttributeError:
+            self._trakt_syncdata = self.get_trakt_syncdata()
+            return self._trakt_syncdata
+
+    @is_authorized
+    def get_trakt_syncdata(self):
+        from tmdbhelper.lib.api.trakt.sync.datasync import SyncData
+        return SyncData(self)
+
+    def trakt_syncdata_test(self, *args, **kwargs):
+        return self.trakt_syncdata.test(*args, **kwargs)
+
+
+class TraktAPI(RequestAPI, TraktContent, TraktSync):
 
     client_id = CLIENT_ID
     client_secret = CLIENT_SECRET

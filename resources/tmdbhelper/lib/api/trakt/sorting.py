@@ -5,14 +5,16 @@ def get_sort_methods(info=None):
     items = [
         {
             'name': f'{get_localized(32287)}: {get_localized(32451)} {get_localized(32286)}',
-            'params': {'sort_by': 'rank', 'sort_how': 'asc'}},
+            'params': {'sort_by': 'rank', 'sort_how': 'asc'},
+            'blocklist': ('trakt_inprogress',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(32452)} {get_localized(32286)}',
-            'params': {'sort_by': 'rank', 'sort_how': 'desc'}},
+            'params': {'sort_by': 'rank', 'sort_how': 'desc'},
+            'blocklist': ('trakt_inprogress',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(20382).capitalize()}',
             'params': {'sort_by': 'added', 'sort_how': 'desc'},
-            'blocklist': ('trakt_collection',)},
+            'blocklist': ('trakt_collection', 'trakt_inprogress',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(32473)}',
             'params': {'sort_by': 'collected', 'sort_how': 'desc'},
@@ -26,7 +28,7 @@ def get_sort_methods(info=None):
         {
             'name': f'{get_localized(32287)}: {get_localized(16102)}',
             'params': {'sort_by': 'watched', 'sort_how': 'desc', 'extended': 'sync'},
-            'allowlist': ('trakt_userlist',)},
+            'allowlist': ('trakt_userlist', 'trakt_inprogress',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(563)}',
             'params': {'sort_by': 'percentage', 'sort_how': 'desc', 'extended': 'full'},
@@ -40,31 +42,31 @@ def get_sort_methods(info=None):
         {
             'name': f'{get_localized(32287)}: {get_localized(32453).capitalize()}',
             'params': {'sort_by': 'plays', 'sort_how': 'asc', 'extended': 'sync'},
-            'allowlist': ('trakt_userlist',)},
+            'allowlist': ('trakt_userlist', 'trakt_inprogress',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(32205)}',
             'params': {'sort_by': 'plays', 'sort_how': 'desc', 'extended': 'sync'},
-            'allowlist': ('trakt_userlist',)},
+            'allowlist': ('trakt_userlist', 'trakt_inprogress',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(32242)} {get_localized(584)}',
             'params': {'sort_by': 'released', 'sort_how': 'asc', 'extended': 'full'},
-            'allowlist': ('trakt_userlist', 'trakt_watchlist', 'trakt_watchlist_released', 'trakt_watchlist_anticipated',)},
+            'allowlist': ('trakt_userlist', 'trakt_inprogress', 'trakt_watchlist', 'trakt_watchlist_released', 'trakt_watchlist_anticipated',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(32242)} {get_localized(585)}',
             'params': {'sort_by': 'released', 'sort_how': 'desc', 'extended': 'full'},
-            'allowlist': ('trakt_userlist', 'trakt_watchlist', 'trakt_watchlist_released', 'trakt_watchlist_anticipated',)},
+            'allowlist': ('trakt_userlist', 'trakt_inprogress', 'trakt_watchlist', 'trakt_watchlist_released', 'trakt_watchlist_anticipated',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(32454)} {get_localized(2050)}',
             'params': {'sort_by': 'runtime', 'sort_how': 'asc', 'extended': 'full'},
-            'allowlist': ('trakt_userlist', 'trakt_watchlist', 'trakt_watchlist_released', 'trakt_watchlist_anticipated',)},
+            'allowlist': ('trakt_userlist', 'trakt_inprogress', 'trakt_watchlist', 'trakt_watchlist_released', 'trakt_watchlist_anticipated',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(32455)} {get_localized(2050)}',
             'params': {'sort_by': 'runtime', 'sort_how': 'desc', 'extended': 'full'},
-            'allowlist': ('trakt_userlist', 'trakt_watchlist', 'trakt_watchlist_released', 'trakt_watchlist_anticipated',)},
+            'allowlist': ('trakt_userlist', 'trakt_inprogress', 'trakt_watchlist', 'trakt_watchlist_released', 'trakt_watchlist_anticipated',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(205)}',
             'params': {'sort_by': 'votes', 'sort_how': 'desc', 'extended': 'full'},
-            'allowlist': ('trakt_userlist', 'trakt_watchlist', 'trakt_watchlist_released', 'trakt_watchlist_anticipated',)},
+            'allowlist': ('trakt_userlist', 'trakt_inprogress', 'trakt_watchlist', 'trakt_watchlist_released', 'trakt_watchlist_anticipated',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(32175)}',
             'params': {'sort_by': 'popularity', 'sort_how': 'desc', 'extended': 'full'},

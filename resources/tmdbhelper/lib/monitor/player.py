@@ -160,8 +160,8 @@ class PlayerScrobbler():
     @is_trakt_authorized
     def update_stats(self):
         from tmdbhelper.lib.script.method.trakt import get_stats
-        from tmdbhelper.lib.api.trakt.methods.activities import del_lastactivities_expiry
-        del_lastactivities_expiry()
+        from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA
+        get_property(LASTACTIVITIES_DATA, clear_property=True)
         get_stats()
 
     @is_scrobbling

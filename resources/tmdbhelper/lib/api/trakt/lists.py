@@ -56,18 +56,33 @@ class ListBasic(Container):
 
 
 class ListSync(Container):
+    def get_list_items(self, sync_type, item_type, page=1, limit=None, sort_by=None, sort_how=None, params=None, next_page=True, filters=None, tmdb_id=None, **kwargs):
+        from tmdbhelper.lib.api.trakt.sync.itemlist import ItemListSyncDataFactory
+        from tmdbhelper.lib.items.itemlist import ItemListPagination
+
+        item_keys = tuple(set([v for k, v in filters.items() if k.startswith('filter_key') or k.startswith('exclude_key')])) if filters else None
+        sync_ilist = ItemListSyncDataFactory(sync_type, self.trakt_api, sort_by=sort_by, sort_how=sort_how, item_type=item_type, item_keys=item_keys, tmdb_id=tmdb_id)
+
+        if not sync_ilist.items:
+            return
+
+        limit = limit or self.trakt_api.sync_item_limit
+        params_def = {item_type: params} if params else None
+        response = ItemListPagination({item_type: sync_ilist.items}, page=page or 1, limit=limit, params_def=params_def, filters=filters)
+
+        return response.items if not next_page or sort_by == 'random' else response.items + response.next_page
+
     def get_items(self, info, tmdb_type, page=None, **kwargs):
         from tmdbhelper.lib.addon.consts import TRAKT_SYNC_LISTS
         info_model = TRAKT_SYNC_LISTS.get(info)
         info_tmdb_type = info_model.get('tmdb_type') or tmdb_type
-        items = self.trakt_api.get_sync_list(
+        items = self.get_list_items(
             sync_type=info_model.get('sync_type', ''),
-            trakt_type=convert_type(tmdb_type, 'trakt'),
+            item_type=convert_type(tmdb_type, 'trakt'),
             page=page,
-            params=info_model.get('params'),
             sort_by=kwargs.get('sort_by', None) or info_model.get('sort_by', None),
             sort_how=kwargs.get('sort_how', None) or info_model.get('sort_how', None),
-            extended=kwargs.get('extended', None) or info_model.get('extended', None),
+            params=info_model.get('params'),
             filters=info_model.get('filters', None))
         self.tmdb_cache_only = False
         self.kodi_db = self.get_kodi_database(info_tmdb_type)
@@ -77,19 +92,20 @@ class ListSync(Container):
         return items
 
 
-class ListToWatch(Container):
+class ListToWatch(ListSync):
     def get_items(self, info, tmdb_type, page=None, **kwargs):
         """ Get a mix of watchlisted and inprogress """
         if tmdb_type not in ['movie', 'tv']:
             return
-        trakt_type = convert_type(tmdb_type, 'trakt')
-        items = self.trakt_api.get_towatch_list(trakt_type=trakt_type, page=page)
         self.tmdb_cache_only = False
         self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = convert_type(tmdb_type, 'library')
         self.container_content = convert_type(tmdb_type, 'container')
         self.plugin_category = f'{convert_type(tmdb_type, "plural")} {get_localized(32078)}'
-        return items
+        return self.get_list_items(
+            sync_type='towatch',
+            item_type='movie' if tmdb_type == 'movie' else 'show',
+            page=page)
 
 
 class ListComments(Container):
@@ -122,14 +138,12 @@ class ListComments(Container):
         return items
 
 
-class ListBecauseYouWatched(Container):
+class ListBecauseYouWatched(ListSync):
     def get_items(self, info, tmdb_type, page=None, **kwargs):
         import random
-
-        trakt_type = convert_type(tmdb_type, 'trakt')
-        watched_items = self.trakt_api.get_sync_list(
+        watched_items = self.get_list_items(
             sync_type='watched',
-            trakt_type=trakt_type,
+            item_type=convert_type(tmdb_type, 'trakt'),
             page=1,
             limit=get_setting('trakt_becausewatchedseed', 'int') or 5,
             next_page=False,
@@ -193,68 +207,64 @@ class ListLibraryCalendar(ListCalendar):
         return self._get_calendar_items(kodi_db=kodi_db, user=False, **kwargs)
 
 
-class ListInProgress(Container):
-    def get_items(self, info, tmdb_type, page=None, **kwargs):
+class ListInProgress(ListSync):
+    def get_items(self, info, tmdb_type, page=None, sort_by=None, sort_how=None, **kwargs):
         if tmdb_type == 'tv':
-            items = self.trakt_api.get_inprogress_shows_list(
-                page=page,
-                params={
-                    'info': 'trakt_upnext',
-                    'tmdb_type': 'tv',
-                    'tmdb_id': '{tmdb_id}'},
-                sort_by=kwargs.get('sort_by', None),
-                sort_how=kwargs.get('sort_how', None))
+            sync_type = 'inprogress'
+            item_type = 'show'
+            params = {
+                'info': 'trakt_upnext',
+                'tmdb_type': 'tv',
+                'tmdb_id': '{tmdb_id}'}
         else:
-            items = self.trakt_api.get_ondeck_list(
-                page=page,
-                trakt_type='movie',
-                sort_by=kwargs.get('sort_by', None),
-                sort_how=kwargs.get('sort_how', None))
+            sync_type = 'playback'
+            item_type = 'movie'
+            params = None
+
         self.tmdb_cache_only = False
         self.kodi_db = self.get_kodi_database(tmdb_type)
         self.library = convert_type(tmdb_type, 'library')
         self.container_content = convert_type(tmdb_type, 'container')
         self.plugin_category = f'{get_localized(32196)} {convert_type(tmdb_type, "plural")}'
-        return items
+        return self.get_list_items(sync_type=sync_type, item_type=item_type, page=page, sort_by=sort_by, sort_how=sort_how, params=params)
 
 
-class ListOnDeck(Container):
-    def get_items(self, page=None, **kwargs):
-        items = self.trakt_api.get_ondeck_list(page=page, trakt_type='episode')
+class ListOnDeck(ListSync):
+    def get_items(self, page=None, sort_by=None, sort_how=None, **kwargs):
         self.tmdb_cache_only = False
         self.library = 'video'
         self.container_content = 'episodes'
         self.plugin_category = get_localized(32406)
-        return items
+        return self.get_list_items(sync_type='playback', item_type='episode', page=page, sort_by=sort_by, sort_how=sort_how)
 
 
-class ListNextEpisodes(Container):
+class ListNextEpisodes(ListSync):
     def get_items(self, info, tmdb_type, page=None, **kwargs):
         if tmdb_type != 'tv':
             return
-        sort_settings = {
-            'airdate': ('released', 'desc'),
-            'todays': ('airing', -1),
-            'lastweek': ('airing', -7),
-            'recentlywatched': (None, None)}
-        sort_by, sort_how = sort_settings[get_setting('trakt_nextepisodesort', 'str')]
-        items = self.trakt_api.get_upnext_episodes_list(page=page, sort_by=sort_by, sort_how=sort_how)
         self.tmdb_cache_only = False
-        # self.kodi_db = self.get_kodi_database(tmdb_type)
+
+        sort_by = get_setting('trakt_nextepisodesort', 'str')
+        sort_how = 'desc'
+
         self.library = 'video'
         self.container_content = 'episodes'
         self.thumb_override = get_setting('calendar_art', 'int')
         self.plugin_category = get_localized(32197)
-        return items
+        return self.get_list_items(sync_type='nextup', item_type='episode', page=page, sort_by=sort_by, sort_how=sort_how)
 
 
-class ListUpNext(Container):
+class ListUpNext(ListSync):
     def get_items(self, info, tmdb_type, tmdb_id, page=None, **kwargs):
         if tmdb_type != 'tv':
             return
         self.ib.cache_only = self.tmdb_cache_only = False
         self.precache_parent(tmdb_id)
-        items = self.trakt_api.get_upnext_list(unique_id=tmdb_id, id_type='tmdb', page=page)
+        items = self.get_list_items(
+            sync_type='upnext',
+            item_type='episode',
+            tmdb_id=tmdb_id,
+            page=page)
         if not items:
             items = self.tmdb_api.get_episode_list(tmdb_id, 1, get_detailed=True)
             items = list(items) if items else []

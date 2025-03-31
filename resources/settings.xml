@@ -536,9 +536,7 @@
                 <setting id="trakt_token" type="string" label="32011" help="">
                     <level>0</level>
                     <default/>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
+                    <constraints><allowempty>true</allowempty></constraints>
                     <dependencies>
                         <dependency type="visible">
                             <condition on="property" name="InfoBool">False</condition>

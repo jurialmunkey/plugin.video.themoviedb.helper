@@ -52,8 +52,6 @@ class ItemBuilder(_ArtworkSelector):
         self.cache_only = cache_only
         self.timer_lists = timer_lists if isinstance(timer_lists, dict) else {}
         self.log_timers = log_timers
-        self._yy = 0
-        self.override = False if self.tmdb_api.iso_language == 'en' else True  # Override titles with TMDb translated data
 
     def _timestamp(self, days=14):
         return set_timestamp(days * 24 * 3600)
@@ -277,7 +275,7 @@ class ItemBuilder(_ArtworkSelector):
             return li
         if not use_iterprops:
             item = self._undo_iterprops(item, tmdb_type, tmdb_id, season, episode)
-        li.set_details(item['listitem'], override=self.override)
+        li.set_details(item['listitem'], override=True)  # Old method for override checked (if self.tmdb_api.iso_language == 'en') to override only for non-English but lets standardise behaviour
         li.art = self.get_item_artwork(item['artwork'], is_season=mediatype in ['season', 'episode'])
         return li
 

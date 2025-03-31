@@ -6,7 +6,7 @@ import hashlib
 import random
 from xbmc import getCacheThumbName, skinHasImage, Monitor, sleep
 from tmdbhelper.lib.addon.plugin import get_infolabel, get_setting, get_condvisibility, ADDONDATA
-from tmdbhelper.lib.monitor.propertysetter import PropertySetter
+from jurialmunkey.window import WindowPropertySetter
 from jurialmunkey.parser import try_int, try_float
 from tmdbhelper.lib.files.futils import make_path
 from tmdbhelper.lib.addon.thread import SafeThread
@@ -123,7 +123,7 @@ def _saveimage(image, targetfile):
         # os.fsync(f)
 
 
-class ImageFunctions(SafeThread, PropertySetter):
+class ImageFunctions(SafeThread, WindowPropertySetter):
     save_path = f"{get_setting('image_location', 'str') or ADDONDATA}{{}}/"
     blur_size = try_int(get_infolabel('Skin.String(TMDbHelper.Blur.Size)')) or 480
     crop_size = (800, 310)
@@ -438,7 +438,7 @@ class ImageArtworkGetter():
         return random.choice(artworks)
 
 
-class ImageManipulations(PropertySetter):
+class ImageManipulations(WindowPropertySetter):
     def get_infolabel(self, info):
         return get_infolabel(f'ListItem.{info}')
 
