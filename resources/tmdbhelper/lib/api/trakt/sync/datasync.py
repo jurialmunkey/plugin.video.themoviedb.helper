@@ -51,10 +51,10 @@ class SyncDataGetterAll:
 
     def get_base_keys(self):
         if self.item_type == 'season':
-            return ('tmdb_id', 'season_number', )
+            return ('tmdb_id', 'title', 'season_number', )
         if self.item_type == 'episode':
-            return ('tmdb_id', 'season_number', 'episode_number', )
-        return ('tmdb_id', )
+            return ('tmdb_id', 'title', 'season_number', 'episode_number', )
+        return ('tmdb_id', 'title', )
 
     def get_clause(self):
         clause = [f'{k} IS NOT NULL' for k in self.clause_keys]

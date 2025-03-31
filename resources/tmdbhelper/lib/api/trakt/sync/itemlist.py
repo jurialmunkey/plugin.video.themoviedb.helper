@@ -142,7 +142,7 @@ class ItemListSyncData:
         return [self.make_item(i, argx_dictionary) for i in self.sort_data(data, sd) if i]
 
     def make_item(self, i, argx_dictionary, detailed_item=False):
-        item = {'id': i[argx_dictionary['tmdb_id']], 'mediatype': i[argx_dictionary['mediatype']]}
+        item = {'id': i[argx_dictionary['tmdb_id']], 'mediatype': i[argx_dictionary['mediatype']], 'title': i[argx_dictionary['title']]}
         if i[argx_dictionary['mediatype']] in ('season', 'episode', ):
             item['season'] = i[argx_dictionary['season_number']]
         if i[argx_dictionary['mediatype']] == 'episode':
