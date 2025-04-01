@@ -3,10 +3,8 @@ from tmdbhelper.lib.addon.dialog import BusyDialog
 from xbmcgui import Dialog
 
 
-class ItemSyncAttributes:
-    """
-    kodi_log
-    """
+class ItemSyncProperties:
+
     @property
     def kodi_log(self):
         try:
@@ -19,13 +17,6 @@ class ItemSyncAttributes:
     def kodi_log(self, value):
         self._kodi_log = value
 
-    def get_kodi_log(self):
-        from tmdbhelper.lib.addon.logger import kodi_log
-        return kodi_log
-
-    """
-    trakt_api
-    """
     @property
     def trakt_api(self):
         try:
@@ -38,13 +29,6 @@ class ItemSyncAttributes:
     def trakt_api(self, value):
         self._trakt_api = value
 
-    def get_trakt_api(self):
-        from tmdbhelper.lib.api.trakt.api import TraktAPI
-        return TraktAPI()
-
-    """
-    trakt_syncdata
-    """
     @property
     def trakt_syncdata(self):
         try:
@@ -57,12 +41,6 @@ class ItemSyncAttributes:
     def trakt_syncdata(self, value):
         self._trakt_syncdata = value
 
-    def get_trakt_syncdata(self):
-        return self.trakt_api.trakt_syncdata
-
-    """
-    trakt_sync_value
-    """
     @property
     def trakt_sync_value(self):
         try:
@@ -75,12 +53,6 @@ class ItemSyncAttributes:
     def trakt_sync_value(self, value):
         self._trakt_sync_value = value
 
-    def get_trakt_sync_value(self):
-        return self.trakt_syncdata.get_value(self.tmdb_type, self.tmdb_id, self.season, self.episode, self.trakt_sync_key)
-
-    """
-    name_add
-    """
     @property
     def name_add(self):
         try:
@@ -93,14 +65,6 @@ class ItemSyncAttributes:
     def name_add(self, value):
         self._name_add = value
 
-    def get_name_add(self):
-        if not self.localized_name_add:
-            return 'FIXME'
-        return get_localized(self.localized_name_add)
-
-    """
-    name_remove
-    """
     @property
     def name_remove(self):
         try:
@@ -113,14 +77,6 @@ class ItemSyncAttributes:
     def name_remove(self, value):
         self._name_remove = value
 
-    def get_name_remove(self):
-        if not self.localized_name_rem:
-            return 'FIXME'
-        return get_localized(self.localized_name_rem)
-
-    """
-    name
-    """
     @property
     def name(self):
         try:
@@ -133,18 +89,6 @@ class ItemSyncAttributes:
     def name(self, value):
         self._name = value
 
-    def get_name(self):
-        if not self.preconfigured:
-            if not self.remove:
-                return self.name_add
-            return self.name_remove
-        if not self.localized_name:
-            return 'FIXME'
-        return get_localized(self.localized_name)
-
-    """
-    is_sync
-    """
     @property
     def is_sync(self):
         try:
@@ -157,14 +101,6 @@ class ItemSyncAttributes:
     def is_sync(self, value):
         self._is_sync = value
 
-    def get_is_sync(self):
-        if self.trakt_sync_value:
-            return True
-        return False
-
-    """
-    remove
-    """
     @property
     def remove(self):
         try:
@@ -177,14 +113,6 @@ class ItemSyncAttributes:
     def remove(self, value):
         self._remove = value
 
-    def get_remove(self):
-        if self.is_sync:
-            return True
-        return False
-
-    """
-    is_allowed_type
-    """
     @property
     def is_allowed_type(self):
         try:
@@ -197,20 +125,6 @@ class ItemSyncAttributes:
     def is_allowed_type(self, value):
         self._is_allowed_type = value
 
-    def get_is_allowed_type(self):
-        if self.season is None:
-            return True
-        if self.episode is None:
-            if self.allow_seasons:
-                return True
-            return False
-        if self.allow_episodes:
-            return True
-        return False
-
-    """
-    method
-    """
     @property
     def method(self):
         try:
@@ -223,14 +137,6 @@ class ItemSyncAttributes:
     def method(self, value):
         self._method = value
 
-    def get_method(self):
-        if not self.remove:
-            return self.trakt_sync_url
-        return f'{self.trakt_sync_url}/remove'
-
-    """
-    trakt_type
-    """
     @property
     def trakt_type(self):
         try:
@@ -243,20 +149,6 @@ class ItemSyncAttributes:
     def trakt_type(self, value):
         self._trakt_type = value
 
-    def get_trakt_type(self):
-        if self.tmdb_type == 'movie':
-            return 'movie'
-        if self.tmdb_type != 'tv':
-            return
-        if self.season is None:
-            return 'show'
-        if self.episode is None:
-            return 'season'
-        return 'episode'
-
-    """
-    base_trakt_type
-    """
     @property
     def base_trakt_type(self):
         try:
@@ -269,16 +161,6 @@ class ItemSyncAttributes:
     def base_trakt_type(self, value):
         self._base_trakt_type = value
 
-    def get_base_trakt_type(self):
-        if self.tmdb_type == 'movie':
-            return 'movie'
-        if self.tmdb_type != 'tv':
-            return
-        return 'show'
-
-    """
-    item_id
-    """
     @property
     def item_id(self):
         try:
@@ -291,12 +173,6 @@ class ItemSyncAttributes:
     def item_id(self, value):
         self._item_id = value
 
-    def get_item_id(self):
-        return '.'.join([i for i in (self.tmdb_id, self.season, self.episode) if i])
-
-    """
-    dialog_message
-    """
     @property
     def dialog_message(self):
         try:
@@ -309,18 +185,6 @@ class ItemSyncAttributes:
     def dialog_message(self, value):
         self._dialog_message = value
 
-    def get_dialog_message(self):
-        if self.sync_response.status_code == 420:
-            dialog_message = f'{get_localized(32296)}\n{get_localized(32531)}'
-        elif not self.is_successful_sync:
-            dialog_message = f'{get_localized(32296)}\nHTTP {self.sync_response.status_code}'
-        else:
-            dialog_message = get_localized(32297)
-        return dialog_message.format(self.dialog_header, self.tmdb_type, 'TMDb', self.item_id)
-
-    """
-    slug
-    """
     @property
     def slug(self):
         try:
@@ -333,12 +197,6 @@ class ItemSyncAttributes:
     def slug(self, value):
         self._slug = value
 
-    def get_slug(self):
-        return self.trakt_api.get_id(self.tmdb_id, 'tmdb', self.base_trakt_type, output_type='slug')
-
-    """
-    sync_response
-    """
     @property
     def sync_response(self):
         try:
@@ -351,14 +209,6 @@ class ItemSyncAttributes:
     def sync_response(self, value):
         self._sync_response = value
 
-    def get_sync_response(self):
-        """ Called after user selects choice """
-        with BusyDialog():
-            return self.trakt_api.post_response(*self.post_response_args, postdata=self.post_response_data)
-
-    """
-    post_response_args
-    """
     @property
     def post_response_args(self):
         try:
@@ -371,12 +221,6 @@ class ItemSyncAttributes:
     def post_response_args(self, value):
         self._post_response_args = value
 
-    def get_post_response_args(self):
-        return ('sync', self.method, )
-
-    """
-    post_response_data
-    """
     @property
     def post_response_data(self):
         try:
@@ -389,12 +233,6 @@ class ItemSyncAttributes:
     def post_response_data(self, value):
         self._post_response_data = value
 
-    def get_post_response_data(self):
-        return {f'{self.post_response_type}': self.post_response_item}
-
-    """
-    post_response_type
-    """
     @property
     def post_response_type(self):
         try:
@@ -407,14 +245,6 @@ class ItemSyncAttributes:
     def post_response_type(self, value):
         self._post_response_type = value
 
-    def get_post_response_type(self):
-        if self.trakt_type == 'season':
-            return 'episodes'
-        return f'{self.trakt_type}s'
-
-    """
-    post_response_item
-    """
     @property
     def post_response_item(self):
         try:
@@ -427,14 +257,6 @@ class ItemSyncAttributes:
     def post_response_item(self, value):
         self._post_response_item = value
 
-    def get_post_response_item(self):
-        if isinstance(self.sync_item, list):
-            return self.sync_item
-        return [self.sync_item]
-
-    """
-    sync_item
-    """
     @property
     def sync_item(self):
         try:
@@ -447,16 +269,6 @@ class ItemSyncAttributes:
     def sync_item(self, value):
         self._sync_item = value
 
-    def get_sync_item(self):
-        if self.season is None:
-            return self.trakt_api.get_request_lc(f'{self.base_trakt_type}s', self.slug)
-        if self.episode is None:
-            return self.trakt_api.get_request_lc(f'{self.base_trakt_type}s', self.slug, 'seasons', self.season)
-        return self.trakt_api.get_request_lc(f'{self.base_trakt_type}s', self.slug, 'seasons', self.season, 'episodes', self.episode)
-
-    """
-    is_successful_sync
-    """
     @property
     def is_successful_sync(self):
         try:
@@ -469,16 +281,6 @@ class ItemSyncAttributes:
     def is_successful_sync(self, value):
         self._is_successful_sync = value
 
-    def get_is_successful_sync(self):
-        if not self.sync_response:
-            return False
-        if self.sync_response.status_code not in [200, 201, 204]:
-            return False
-        return True
-
-    """
-    dialog_header
-    """
     @property
     def dialog_header(self):
         try:
@@ -491,12 +293,137 @@ class ItemSyncAttributes:
     def dialog_header(self, value):
         self._dialog_header = value
 
+
+class ItemSyncGetters:
+    def get_kodi_log(self):
+        from tmdbhelper.lib.addon.logger import kodi_log
+        return kodi_log
+
+    def get_trakt_api(self):
+        from tmdbhelper.lib.api.trakt.api import TraktAPI
+        return TraktAPI()
+
+    def get_trakt_syncdata(self):
+        return self.trakt_api.trakt_syncdata
+
+    def get_trakt_sync_value(self):
+        return self.trakt_syncdata.get_value(self.tmdb_type, self.tmdb_id, self.season, self.episode, self.trakt_sync_key)
+
+    def get_name_add(self):
+        if not self.localized_name_add:
+            return 'FIXME'
+        return get_localized(self.localized_name_add)
+
+    def get_name_remove(self):
+        if not self.localized_name_rem:
+            return 'FIXME'
+        return get_localized(self.localized_name_rem)
+
+    def get_name(self):
+        if not self.preconfigured:
+            if not self.remove:
+                return self.name_add
+            return self.name_remove
+        if not self.localized_name:
+            return 'FIXME'
+        return get_localized(self.localized_name)
+
+    def get_is_sync(self):
+        if self.trakt_sync_value:
+            return True
+        return False
+
+    def get_remove(self):
+        if self.is_sync:
+            return True
+        return False
+
+    def get_is_allowed_type(self):
+        if self.season is None:
+            return True
+        if self.episode is None:
+            if self.allow_seasons:
+                return True
+            return False
+        if self.allow_episodes:
+            return True
+        return False
+
+    def get_method(self):
+        if not self.remove:
+            return self.trakt_sync_url
+        return f'{self.trakt_sync_url}/remove'
+
+    def get_trakt_type(self):
+        if self.tmdb_type == 'movie':
+            return 'movie'
+        if self.tmdb_type != 'tv':
+            return
+        if self.season is None:
+            return 'show'
+        if self.episode is None:
+            return 'season'
+        return 'episode'
+
+    def get_base_trakt_type(self):
+        if self.tmdb_type == 'movie':
+            return 'movie'
+        if self.tmdb_type != 'tv':
+            return
+        return 'show'
+
+    def get_item_id(self):
+        return '.'.join([i for i in (self.tmdb_id, self.season, self.episode) if i])
+
+    def get_dialog_message(self):
+        if self.sync_response.status_code == 420:
+            dialog_message = f'{get_localized(32296)}\n{get_localized(32531)}'
+        elif not self.is_successful_sync:
+            dialog_message = f'{get_localized(32296)}\nHTTP {self.sync_response.status_code}'
+        else:
+            dialog_message = get_localized(32297)
+        return dialog_message.format(self.dialog_header, self.tmdb_type, 'TMDb', self.item_id)
+
+    def get_slug(self):
+        return self.trakt_api.get_id(self.tmdb_id, 'tmdb', self.base_trakt_type, output_type='slug')
+
+    def get_sync_response(self):
+        """ Called after user selects choice """
+        with BusyDialog():
+            return self.trakt_api.post_response(*self.post_response_args, postdata=self.post_response_data)
+
+    def get_post_response_args(self):
+        return ('sync', self.method, )
+
+    def get_post_response_data(self):
+        return {f'{self.post_response_type}': self.post_response_item}
+
+    def get_post_response_type(self):
+        if self.trakt_type == 'season':
+            return 'episodes'
+        return f'{self.trakt_type}s'
+
+    def get_post_response_item(self):
+        if isinstance(self.sync_item, list):
+            return self.sync_item
+        return [self.sync_item]
+
+    def get_sync_item(self):
+        if self.season is None:
+            return self.trakt_api.get_request_lc(f'{self.base_trakt_type}s', self.slug)
+        if self.episode is None:
+            return self.trakt_api.get_request_lc(f'{self.base_trakt_type}s', self.slug, 'seasons', self.season)
+        return self.trakt_api.get_request_lc(f'{self.base_trakt_type}s', self.slug, 'seasons', self.season, 'episodes', self.episode)
+
+    def get_is_successful_sync(self):
+        if not self.sync_response:
+            return False
+        if self.sync_response.status_code not in [200, 201, 204]:
+            return False
+        return True
+
     def get_dialog_header(self):
         return self.name
-
-    """
-    self
-    """
 
     def get_self(self):
         """ Method to see if we should return item in menu or not """
@@ -516,7 +443,7 @@ class ItemSyncAttributes:
         return self
 
 
-class ItemSync(ItemSyncAttributes):
+class ItemSync(ItemSyncGetters, ItemSyncProperties):
     preconfigured = False
     allow_seasons = False
     allow_episodes = False
