@@ -1,3 +1,4 @@
+from functools import cached_property
 from tmdbhelper.lib.addon.dialog import BusyDialog
 from tmdbhelper.lib.script.sync.basic import ItemWatched, ItemUnwatched, ItemWatchlist, ItemCollection, ItemFavorites
 from tmdbhelper.lib.script.sync.rating import ItemRating
@@ -11,17 +12,9 @@ class MenuAttributes:
     """
     choices
     """
-    @property
+    @cached_property
     def choices(self):
-        try:
-            return self._choices
-        except AttributeError:
-            self._choices = self.get_choices()
-            return self._choices
-
-    @choices.setter
-    def choices(self, value):
-        self._choices = value
+        return self.get_choices()
 
     def get_choices(self):
         from tmdbhelper.lib.addon.thread import ParallelThread
@@ -39,17 +32,9 @@ class MenuAttributes:
     """
     trakt_api
     """
-    @property
+    @cached_property
     def trakt_api(self):
-        try:
-            return self._trakt_api
-        except AttributeError:
-            self._trakt_api = self.get_trakt_api()
-            return self._trakt_api
-
-    @trakt_api.setter
-    def trakt_api(self, value):
-        self._trakt_api = value
+        return self.get_trakt_api()
 
     def get_trakt_api(self):
         from tmdbhelper.lib.api.trakt.api import TraktAPI

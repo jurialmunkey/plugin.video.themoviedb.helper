@@ -1,297 +1,105 @@
+from functools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized, executebuiltin
 from tmdbhelper.lib.addon.dialog import BusyDialog
 from xbmcgui import Dialog
 
 
-class ItemSyncProperties:
-
-    @property
+class ItemSyncCachedProperties:
+    @cached_property
     def kodi_log(self):
-        try:
-            return self._kodi_log
-        except AttributeError:
-            self._kodi_log = self.get_kodi_log()
-            return self._kodi_log
+        return self.get_kodi_log()
 
-    @kodi_log.setter
-    def kodi_log(self, value):
-        self._kodi_log = value
-
-    @property
+    @cached_property
     def trakt_api(self):
-        try:
-            return self._trakt_api
-        except AttributeError:
-            self._trakt_api = self.get_trakt_api()
-            return self._trakt_api
+        return self.get_trakt_api()
 
-    @trakt_api.setter
-    def trakt_api(self, value):
-        self._trakt_api = value
-
-    @property
+    @cached_property
     def trakt_syncdata(self):
-        try:
-            return self._trakt_syncdata
-        except AttributeError:
-            self._trakt_syncdata = self.get_trakt_syncdata()
-            return self._trakt_syncdata
+        return self.get_trakt_syncdata()
 
-    @trakt_syncdata.setter
-    def trakt_syncdata(self, value):
-        self._trakt_syncdata = value
-
-    @property
+    @cached_property
     def trakt_sync_value(self):
-        try:
-            return self._trakt_sync_value
-        except AttributeError:
-            self._trakt_sync_value = self.get_trakt_sync_value()
-            return self._trakt_sync_value
+        return self.get_trakt_sync_value()
 
-    @trakt_sync_value.setter
-    def trakt_sync_value(self, value):
-        self._trakt_sync_value = value
-
-    @property
+    @cached_property
     def name_add(self):
-        try:
-            return self._name_add
-        except AttributeError:
-            self._name_add = self.get_name_add()
-            return self._name_add
+        return self.get_name_add()
 
-    @name_add.setter
-    def name_add(self, value):
-        self._name_add = value
-
-    @property
+    @cached_property
     def name_remove(self):
-        try:
-            return self._name_remove
-        except AttributeError:
-            self._name_remove = self.get_name_remove()
-            return self._name_remove
+        return self.get_name_remove()
 
-    @name_remove.setter
-    def name_remove(self, value):
-        self._name_remove = value
-
-    @property
+    @cached_property
     def name(self):
-        try:
-            return self._name
-        except AttributeError:
-            self._name = self.get_name()
-            return self._name
+        return self.get_name()
 
-    @name.setter
-    def name(self, value):
-        self._name = value
-
-    @property
+    @cached_property
     def is_sync(self):
-        try:
-            return self._is_sync
-        except AttributeError:
-            self._is_sync = self.get_is_sync()
-            return self._is_sync
+        return self.get_is_sync()
 
-    @is_sync.setter
-    def is_sync(self, value):
-        self._is_sync = value
-
-    @property
+    @cached_property
     def remove(self):
-        try:
-            return self._remove
-        except AttributeError:
-            self._remove = self.get_remove()
-            return self._remove
+        return self.get_remove()
 
-    @remove.setter
-    def remove(self, value):
-        self._remove = value
-
-    @property
+    @cached_property
     def is_allowed_type(self):
-        try:
-            return self._is_allowed_type
-        except AttributeError:
-            self._is_allowed_type = self.get_is_allowed_type()
-            return self._is_allowed_type
+        return self.get_is_allowed_type()
 
-    @is_allowed_type.setter
-    def is_allowed_type(self, value):
-        self._is_allowed_type = value
-
-    @property
+    @cached_property
     def method(self):
-        try:
-            return self._method
-        except AttributeError:
-            self._method = self.get_method()
-            return self._method
+        return self.get_method()
 
-    @method.setter
-    def method(self, value):
-        self._method = value
-
-    @property
+    @cached_property
     def trakt_type(self):
-        try:
-            return self._trakt_type
-        except AttributeError:
-            self._trakt_type = self.get_trakt_type()
-            return self._trakt_type
+        return self.get_trakt_type()
 
-    @trakt_type.setter
-    def trakt_type(self, value):
-        self._trakt_type = value
-
-    @property
+    @cached_property
     def base_trakt_type(self):
-        try:
-            return self._base_trakt_type
-        except AttributeError:
-            self._base_trakt_type = self.get_base_trakt_type()
-            return self._base_trakt_type
+        return self.get_base_trakt_type()
 
-    @base_trakt_type.setter
-    def base_trakt_type(self, value):
-        self._base_trakt_type = value
-
-    @property
+    @cached_property
     def item_id(self):
-        try:
-            return self._item_id
-        except AttributeError:
-            self._item_id = self.get_item_id()
-            return self._item_id
+        return self.get_item_id()
 
-    @item_id.setter
-    def item_id(self, value):
-        self._item_id = value
-
-    @property
+    @cached_property
     def dialog_message(self):
-        try:
-            return self._dialog_message
-        except AttributeError:
-            self._dialog_message = self.get_dialog_message()
-            return self._dialog_message
+        return self.get_dialog_message()
 
-    @dialog_message.setter
-    def dialog_message(self, value):
-        self._dialog_message = value
-
-    @property
+    @cached_property
     def slug(self):
-        try:
-            return self._slug
-        except AttributeError:
-            self._slug = self.get_slug()
-            return self._slug
+        return self.get_slug()
 
-    @slug.setter
-    def slug(self, value):
-        self._slug = value
-
-    @property
+    @cached_property
     def sync_response(self):
-        try:
-            return self._sync_response
-        except AttributeError:
-            self._sync_response = self.get_sync_response()
-            return self._sync_response
+        return self.get_sync_response()
 
-    @sync_response.setter
-    def sync_response(self, value):
-        self._sync_response = value
-
-    @property
+    @cached_property
     def post_response_args(self):
-        try:
-            return self._post_response_args
-        except AttributeError:
-            self._post_response_args = self.get_post_response_args()
-            return self._post_response_args
+        return self.get_post_response_args()
 
-    @post_response_args.setter
-    def post_response_args(self, value):
-        self._post_response_args = value
-
-    @property
+    @cached_property
     def post_response_data(self):
-        try:
-            return self._post_response_data
-        except AttributeError:
-            self._post_response_data = self.get_post_response_data()
-            return self._post_response_data
+        return self.get_post_response_data()
 
-    @post_response_data.setter
-    def post_response_data(self, value):
-        self._post_response_data = value
-
-    @property
+    @cached_property
     def post_response_type(self):
-        try:
-            return self._post_response_type
-        except AttributeError:
-            self._post_response_type = self.get_post_response_type()
-            return self._post_response_type
+        return self.get_post_response_type()
 
-    @post_response_type.setter
-    def post_response_type(self, value):
-        self._post_response_type = value
-
-    @property
+    @cached_property
     def post_response_item(self):
-        try:
-            return self._post_response_item
-        except AttributeError:
-            self._post_response_item = self.get_post_response_item()
-            return self._post_response_item
+        return self.get_post_response_item()
 
-    @post_response_item.setter
-    def post_response_item(self, value):
-        self._post_response_item = value
-
-    @property
+    @cached_property
     def sync_item(self):
-        try:
-            return self._sync_item
-        except AttributeError:
-            self._sync_item = self.get_sync_item()
-            return self._sync_item
+        return self.get_sync_item()
 
-    @sync_item.setter
-    def sync_item(self, value):
-        self._sync_item = value
-
-    @property
+    @cached_property
     def is_successful_sync(self):
-        try:
-            return self._is_successful_sync
-        except AttributeError:
-            self._is_successful_sync = self.get_is_successful_sync()
-            return self._is_successful_sync
+        return self.get_is_successful_sync()
 
-    @is_successful_sync.setter
-    def is_successful_sync(self, value):
-        self._is_successful_sync = value
-
-    @property
+    @cached_property
     def dialog_header(self):
-        try:
-            return self._dialog_header
-        except AttributeError:
-            self._dialog_header = self.get_dialog_header()
-            return self._dialog_header
-
-    @dialog_header.setter
-    def dialog_header(self, value):
-        self._dialog_header = value
+        return self.get_dialog_header()
 
 
 class ItemSyncGetters:
@@ -443,7 +251,7 @@ class ItemSyncGetters:
         return self
 
 
-class ItemSync(ItemSyncGetters, ItemSyncProperties):
+class ItemSync(ItemSyncGetters, ItemSyncCachedProperties):
     preconfigured = False
     allow_seasons = False
     allow_episodes = False
