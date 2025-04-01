@@ -67,6 +67,10 @@ class SyncDataBase(SimpleCache):
             'data': 'INTEGER',
             'sync': None
         },
+        'episode_type': {
+            'data': 'TEXT',
+            'sync': None
+        },
         'plays': {
             'data': 'INTEGER DEFAULT 0',
             'sync': ('tmdbhelper.lib.api.trakt.sync.datatype', 'SyncWatched', )

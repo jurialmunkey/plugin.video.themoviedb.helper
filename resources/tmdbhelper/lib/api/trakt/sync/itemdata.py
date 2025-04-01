@@ -167,6 +167,14 @@ class SyncItemDataAttributes:
         return self.item.get('notes')
 
     """
+    episode_type
+    """
+    episode_type = LazyProperty('episode_type')
+
+    def get_episode_type(self):
+        return self.item.get('episode_type')
+
+    """
     id
     """
     id = LazyProperty('id')
