@@ -1,13 +1,22 @@
 from tmdbhelper.lib.script.sync.item import ItemSync
 from tmdbhelper.lib.addon.dialog import BusyDialog
-from jurialmunkey.parser import LazyProperty
 
 
 class ItemProgressAttributes:
     """
     playback_id
     """
-    playback_id = LazyProperty('playback_id')
+    @property
+    def playback_id(self):
+        try:
+            return self._playback_id
+        except AttributeError:
+            self._playback_id = self.get_playback_id()
+            return self._playback_id
+
+    @playback_id.setter
+    def playback_id(self, value):
+        self._playback_id = value
 
     def get_playback_id(self):
         if self.trakt_type == 'movie':

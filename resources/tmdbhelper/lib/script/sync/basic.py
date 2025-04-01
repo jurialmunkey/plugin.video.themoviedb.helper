@@ -1,5 +1,4 @@
 from tmdbhelper.lib.script.sync.item import ItemSync
-from jurialmunkey.parser import LazyPropertyProtected
 
 
 class ItemWatched(ItemSync):

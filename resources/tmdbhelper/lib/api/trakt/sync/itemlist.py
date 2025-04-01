@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from jurialmunkey.parser import LazyPropertyProtected
 from tmdbhelper.lib.addon.thread import ParallelThread
 
 
@@ -21,22 +20,84 @@ class ItemListSyncData:
         'lastweek': ('last_watched_at', True, '', ),
     }
 
-    items = LazyPropertyProtected('items')
-    additional_keys = LazyPropertyProtected('additional_keys')
-    syncdata_getter = LazyPropertyProtected('syncdata_getter')
-    argx_dictionary = LazyPropertyProtected('argx_dictionary')
-    presorted_items = LazyPropertyProtected('presorted_items')
-    sort_method = LazyPropertyProtected('sort_method')
-    sort_key = LazyPropertyProtected('sort_key')
-    nonetype = LazyPropertyProtected('nonetype')
-    reverse = LazyPropertyProtected('reverse')
-
     def __init__(self, class_instance_trakt_api, item_type=None, sort_by=None, sort_how=None, item_keys=None, tmdb_id=None):
         self._class_instance_trakt_api = class_instance_trakt_api
         self._sort_by, self._sort_how = sort_by, sort_how
         self._item_keys = item_keys or ()
         self._item_type = item_type
         self._tmdb_id = tmdb_id
+
+    @property
+    def items(self):
+        try:
+            return self._items
+        except AttributeError:
+            self._items = self.get_items()
+            return self._items
+
+    @property
+    def additional_keys(self):
+        try:
+            return self._additional_keys
+        except AttributeError:
+            self._additional_keys = self.get_additional_keys()
+            return self._additional_keys
+
+    @property
+    def syncdata_getter(self):
+        try:
+            return self._syncdata_getter
+        except AttributeError:
+            self._syncdata_getter = self.get_syncdata_getter()
+            return self._syncdata_getter
+
+    @property
+    def argx_dictionary(self):
+        try:
+            return self._argx_dictionary
+        except AttributeError:
+            self._argx_dictionary = self.get_argx_dictionary()
+            return self._argx_dictionary
+
+    @property
+    def presorted_items(self):
+        try:
+            return self._presorted_items
+        except AttributeError:
+            self._presorted_items = self.get_presorted_items()
+            return self._presorted_items
+
+    @property
+    def sort_method(self):
+        try:
+            return self._sort_method
+        except AttributeError:
+            self._sort_method = self.get_sort_method()
+            return self._sort_method
+
+    @property
+    def sort_key(self):
+        try:
+            return self._sort_key
+        except AttributeError:
+            self._sort_key = self.get_sort_key()
+            return self._sort_key
+
+    @property
+    def nonetype(self):
+        try:
+            return self._nonetype
+        except AttributeError:
+            self._nonetype = self.get_nonetype()
+            return self._nonetype
+
+    @property
+    def reverse(self):
+        try:
+            return self._reverse
+        except AttributeError:
+            self._reverse = self.get_reverse()
+            return self._reverse
 
     @property
     def trakt_syncdata(self):

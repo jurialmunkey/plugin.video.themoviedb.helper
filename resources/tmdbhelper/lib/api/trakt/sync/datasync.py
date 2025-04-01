@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from jurialmunkey.parser import LazyPropertyProtected, LazyProperty
 from jurialmunkey.checks import has_arg_value
 from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA
 from tmdbhelper.lib.api.trakt.sync.database import SyncDataBase
@@ -37,17 +36,36 @@ class SyncDataGetterAll:
     clause_keys = ()  # WHERE {query_clauses} AND ({clause_key} IS NOT NULL {operator} {clause_key} IS NOT NULL)
     additional_keys = ()  # Additional keys to retrieve values for
     query_value_item_argx = 0  # Query value to use as sync item_type (normally item_type query is first ie 0 index)
-    item_type = LazyProperty('item_type')
-    base_keys = LazyProperty('base_keys')
-    clause = LazyPropertyProtected('clause')
-    items = LazyPropertyProtected('items')
-    keys = LazyPropertyProtected('keys')
 
     def __init__(self, class_instance_syncdata):
         self._class_instance_syncdata = class_instance_syncdata  # The SyncData object sync called from
 
+    @property
+    def item_type(self):
+        try:
+            return self._item_type
+        except AttributeError:
+            self._item_type = self.get_item_type()
+            return self._item_type
+
+    @item_type.setter
+    def item_type(self, value):
+        self._item_type = value
+
     def get_item_type(self):
         return self.query_values[self.query_value_item_argx]
+
+    @property
+    def base_keys(self):
+        try:
+            return self._base_keys
+        except AttributeError:
+            self._base_keys = self.get_base_keys()
+            return self._base_keys
+
+    @base_keys.setter
+    def base_keys(self, value):
+        self._base_keys = value
 
     def get_base_keys(self):
         if self.item_type == 'season':
@@ -56,6 +74,14 @@ class SyncDataGetterAll:
             return ('tmdb_id', 'title', 'season_number', 'episode_number', )
         return ('tmdb_id', 'title', )
 
+    @property
+    def clause(self):
+        try:
+            return self._clause
+        except AttributeError:
+            self._clause = self.get_clause()
+            return self._clause
+
     def get_clause(self):
         clause = [f'{k} IS NOT NULL' for k in self.clause_keys]
         clause = '({})'.format(f' {self.operator} '.join(clause))
@@ -63,8 +89,24 @@ class SyncDataGetterAll:
         clause = ' AND '.join(clause)
         return clause
 
+    @property
+    def keys(self):
+        try:
+            return self._keys
+        except AttributeError:
+            self._keys = self.get_keys()
+            return self._keys
+
     def get_keys(self):
         return (*(self.base_keys or ()), *(self.clause_keys or ()), *(self.additional_keys or ()), )
+
+    @property
+    def items(self):
+        try:
+            return self._items
+        except AttributeError:
+            self._items = self.get_items()
+            return self._items
 
     def get_items(self):
         self._class_instance_syncdata.sync(self.item_type, self.keys)
@@ -138,13 +180,6 @@ class SyncDataGetterUnHiddenShowEpisodesUpNext(SyncDataGetterAllUnHidden):
 class SyncDataGetterAllUnHiddenShowsInProgress:
     calendar_startdate = -14
     calendar_days = 15
-    calendar_episodes = LazyPropertyProtected('calendar_episodes')
-    calendar_data = LazyPropertyProtected('calendar_data')
-    calendar_data = LazyPropertyProtected('calendar_data')
-    calendar_data = LazyPropertyProtected('calendar_data')
-    parent_getter = LazyPropertyProtected('parent_getter')
-    items = LazyPropertyProtected('items')
-    keys = LazyPropertyProtected('keys')
     additional_keys = ()
 
     def __init__(self, class_instance_syncdata):
@@ -158,9 +193,25 @@ class SyncDataGetterAllUnHiddenShowsInProgress:
     def get_episode_playcount(self):
         return self._class_instance_syncdata.get_episode_playcount
 
+    @property
+    def calendar_data(self):
+        try:
+            return self._calendar_data
+        except AttributeError:
+            self._calendar_data = self.get_calendar_data()
+            return self._calendar_data
+
     def get_calendar_data(self):
         return self._class_instance_syncdata._class_instance_trakt_api.get_calendar_episodes(
             startdate=self.calendar_startdate, days=self.calendar_days)
+
+    @property
+    def calendar_episodes(self):
+        try:
+            return self._calendar_episodes
+        except AttributeError:
+            self._calendar_episodes = self.get_calendar_episodes()
+            return self._calendar_episodes
 
     def get_calendar_episodes(self):
         from tmdbhelper.lib.addon.tmdate import date_in_range
@@ -203,10 +254,26 @@ class SyncDataGetterAllUnHiddenShowsInProgress:
                 return False
         return True
 
+    @property
+    def parent_getter(self):
+        try:
+            return self._parent_getter
+        except AttributeError:
+            self._parent_getter = self.get_parent_getter()
+            return self._parent_getter
+
     def get_parent_getter(self):
         sd = self._class_instance_syncdata.get_all_unhidden_shows_started_getter()
         sd.additional_keys = self.parent_additional_keys
         return sd
+
+    @property
+    def keys(self):
+        try:
+            return self._keys
+        except AttributeError:
+            self._keys = self.get_keys()
+            return self._keys
 
     def get_keys(self):
         return self.parent_getter.keys
@@ -214,6 +281,14 @@ class SyncDataGetterAllUnHiddenShowsInProgress:
     @property
     def parent_additional_keys(self):
         return ('aired_episodes', 'watched_episodes', 'hidden_at', 'last_watched_at', *(self.additional_keys or ()))
+
+    @property
+    def items(self):
+        try:
+            return self._items
+        except AttributeError:
+            self._items = self.get_items()
+            return self._items
 
     def get_items(self):
         sd = self.parent_getter
@@ -301,10 +376,6 @@ class SyncData(SyncDataGetters):
 
     cache_filename = 'TraktSync.db'
 
-    cache = LazyPropertyProtected('cache')
-    window = LazyPropertyProtected('window')
-    routes = LazyPropertyProtected('routes')
-
     def __init__(self, class_instance_trakt_api):
         self._class_instance_trakt_api = class_instance_trakt_api  # The TraktAPI object sync called from
 
@@ -317,14 +388,38 @@ class SyncData(SyncDataGetters):
     def get_response_json(self, *args, **kwargs):
         return self._class_instance_trakt_api.get_response_json(*args, **kwargs)
 
+    @property
+    def routes(self):
+        try:
+            return self._routes
+        except AttributeError:
+            self._routes = self.get_routes()
+            return self._routes
+
     def get_routes(self):
         return {k: v['sync'] for k, v in self.cache.simplecache_columns.items()}
 
     def reset_lastactivities(self):
         self.window.get_property(LASTACTIVITIES_DATA, clear_property=True)  # Wipe new last activities cache
 
+    @property
+    def cache(self):
+        try:
+            return self._cache
+        except AttributeError:
+            self._cache = self.get_cache()
+            return self._cache
+
     def get_cache(self):
         return SyncDataBase(filename=self.cache_filename)
+
+    @property
+    def window(self):
+        try:
+            return self._window
+        except AttributeError:
+            self._window = self.get_window()
+            return self._window
 
     def get_window(self):
         from jurialmunkey.window import WindowPropertySetter

@@ -1,4 +1,3 @@
-from jurialmunkey.parser import LazyPropertyProtected
 from tmdbhelper.lib.files.futils import json_loads as data_loads
 from tmdbhelper.lib.files.futils import json_dumps as data_dumps
 from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp
@@ -21,10 +20,38 @@ def mutexlock(func):
 
 
 class SyncLastActivities:
-    json = LazyPropertyProtected('json')
-    json_data = LazyPropertyProtected('json_data')
-    json_prop = LazyPropertyProtected('json_prop')
-    json_sync = LazyPropertyProtected('json_sync')
+    @property
+    def json(self):
+        try:
+            return self._json
+        except AttributeError:
+            self._json = self.get_json()
+            return self._json
+
+    @property
+    def json_data(self):
+        try:
+            return self._json_data
+        except AttributeError:
+            self._json_data = self.get_json_data()
+            return self._json_data
+
+    @property
+    def json_prop(self):
+        try:
+            return self._json_prop
+        except AttributeError:
+            self._json_prop = self.get_json_prop()
+            return self._json_prop
+
+    @property
+    def json_sync(self):
+        try:
+            return self._json_sync
+        except AttributeError:
+            self._json_sync = self.get_json_sync()
+            return self._json_sync
+
     lock_name = 'sync_last_activities'
 
     def __init__(self, class_instance_syncdata):

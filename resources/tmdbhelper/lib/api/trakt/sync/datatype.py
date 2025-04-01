@@ -1,6 +1,5 @@
 from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp
 from tmdbhelper.lib.api.trakt.sync.activity import SyncLastActivities
-from jurialmunkey.parser import LazyPropertyProtected
 
 
 def timerlock(func):
@@ -60,7 +59,6 @@ class DataType:
     sync_kwgs = {}
     lock_name = 'sync_trakt'
     key_prefix = None
-    last_activities = LazyPropertyProtected('last_activities')
 
     def __init__(self, class_instance_syncdata, item_type):
         self._class_instance_syncdata = class_instance_syncdata
@@ -97,6 +95,14 @@ class DataType:
     @property
     def trakt_api(self):
         return self._class_instance_syncdata._class_instance_trakt_api
+
+    @property
+    def last_activities(self):
+        try:
+            return self._last_activities
+        except AttributeError:
+            self._last_activities = self.get_last_activities()
+            return self._last_activities
 
     def get_last_activities(self):
         return SyncLastActivities(self._class_instance_syncdata)

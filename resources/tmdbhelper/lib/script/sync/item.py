@@ -1,6 +1,5 @@
 from tmdbhelper.lib.addon.plugin import get_localized, executebuiltin
 from tmdbhelper.lib.addon.dialog import BusyDialog
-from jurialmunkey.parser import LazyProperty
 from xbmcgui import Dialog
 
 
@@ -8,7 +7,17 @@ class ItemSyncAttributes:
     """
     kodi_log
     """
-    kodi_log = LazyProperty('kodi_log')
+    @property
+    def kodi_log(self):
+        try:
+            return self._kodi_log
+        except AttributeError:
+            self._kodi_log = self.get_kodi_log()
+            return self._kodi_log
+
+    @kodi_log.setter
+    def kodi_log(self, value):
+        self._kodi_log = value
 
     def get_kodi_log(self):
         from tmdbhelper.lib.addon.logger import kodi_log
@@ -17,7 +26,17 @@ class ItemSyncAttributes:
     """
     trakt_api
     """
-    trakt_api = LazyProperty('trakt_api')
+    @property
+    def trakt_api(self):
+        try:
+            return self._trakt_api
+        except AttributeError:
+            self._trakt_api = self.get_trakt_api()
+            return self._trakt_api
+
+    @trakt_api.setter
+    def trakt_api(self, value):
+        self._trakt_api = value
 
     def get_trakt_api(self):
         from tmdbhelper.lib.api.trakt.api import TraktAPI
@@ -26,7 +45,17 @@ class ItemSyncAttributes:
     """
     trakt_syncdata
     """
-    trakt_syncdata = LazyProperty('trakt_syncdata')
+    @property
+    def trakt_syncdata(self):
+        try:
+            return self._trakt_syncdata
+        except AttributeError:
+            self._trakt_syncdata = self.get_trakt_syncdata()
+            return self._trakt_syncdata
+
+    @trakt_syncdata.setter
+    def trakt_syncdata(self, value):
+        self._trakt_syncdata = value
 
     def get_trakt_syncdata(self):
         return self.trakt_api.trakt_syncdata
@@ -34,7 +63,17 @@ class ItemSyncAttributes:
     """
     trakt_sync_value
     """
-    trakt_sync_value = LazyProperty('trakt_sync_value')
+    @property
+    def trakt_sync_value(self):
+        try:
+            return self._trakt_sync_value
+        except AttributeError:
+            self._trakt_sync_value = self.get_trakt_sync_value()
+            return self._trakt_sync_value
+
+    @trakt_sync_value.setter
+    def trakt_sync_value(self, value):
+        self._trakt_sync_value = value
 
     def get_trakt_sync_value(self):
         return self.trakt_syncdata.get_value(self.tmdb_type, self.tmdb_id, self.season, self.episode, self.trakt_sync_key)
@@ -42,7 +81,17 @@ class ItemSyncAttributes:
     """
     name_add
     """
-    name_add = LazyProperty('name_add')
+    @property
+    def name_add(self):
+        try:
+            return self._name_add
+        except AttributeError:
+            self._name_add = self.get_name_add()
+            return self._name_add
+
+    @name_add.setter
+    def name_add(self, value):
+        self._name_add = value
 
     def get_name_add(self):
         if not self.localized_name_add:
@@ -52,7 +101,17 @@ class ItemSyncAttributes:
     """
     name_remove
     """
-    name_remove = LazyProperty('name_remove')
+    @property
+    def name_remove(self):
+        try:
+            return self._name_remove
+        except AttributeError:
+            self._name_remove = self.get_name_remove()
+            return self._name_remove
+
+    @name_remove.setter
+    def name_remove(self, value):
+        self._name_remove = value
 
     def get_name_remove(self):
         if not self.localized_name_rem:
@@ -62,7 +121,17 @@ class ItemSyncAttributes:
     """
     name
     """
-    name = LazyProperty('name')
+    @property
+    def name(self):
+        try:
+            return self._name
+        except AttributeError:
+            self._name = self.get_name()
+            return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = value
 
     def get_name(self):
         if not self.preconfigured:
@@ -76,7 +145,17 @@ class ItemSyncAttributes:
     """
     is_sync
     """
-    is_sync = LazyProperty('is_sync')
+    @property
+    def is_sync(self):
+        try:
+            return self._is_sync
+        except AttributeError:
+            self._is_sync = self.get_is_sync()
+            return self._is_sync
+
+    @is_sync.setter
+    def is_sync(self, value):
+        self._is_sync = value
 
     def get_is_sync(self):
         if self.trakt_sync_value:
@@ -86,7 +165,17 @@ class ItemSyncAttributes:
     """
     remove
     """
-    remove = LazyProperty('remove')
+    @property
+    def remove(self):
+        try:
+            return self._remove
+        except AttributeError:
+            self._remove = self.get_remove()
+            return self._remove
+
+    @remove.setter
+    def remove(self, value):
+        self._remove = value
 
     def get_remove(self):
         if self.is_sync:
@@ -96,7 +185,17 @@ class ItemSyncAttributes:
     """
     is_allowed_type
     """
-    is_allowed_type = LazyProperty('is_allowed_type')
+    @property
+    def is_allowed_type(self):
+        try:
+            return self._is_allowed_type
+        except AttributeError:
+            self._is_allowed_type = self.get_is_allowed_type()
+            return self._is_allowed_type
+
+    @is_allowed_type.setter
+    def is_allowed_type(self, value):
+        self._is_allowed_type = value
 
     def get_is_allowed_type(self):
         if self.season is None:
@@ -112,7 +211,17 @@ class ItemSyncAttributes:
     """
     method
     """
-    method = LazyProperty('method')
+    @property
+    def method(self):
+        try:
+            return self._method
+        except AttributeError:
+            self._method = self.get_method()
+            return self._method
+
+    @method.setter
+    def method(self, value):
+        self._method = value
 
     def get_method(self):
         if not self.remove:
@@ -122,7 +231,17 @@ class ItemSyncAttributes:
     """
     trakt_type
     """
-    trakt_type = LazyProperty('trakt_type')
+    @property
+    def trakt_type(self):
+        try:
+            return self._trakt_type
+        except AttributeError:
+            self._trakt_type = self.get_trakt_type()
+            return self._trakt_type
+
+    @trakt_type.setter
+    def trakt_type(self, value):
+        self._trakt_type = value
 
     def get_trakt_type(self):
         if self.tmdb_type == 'movie':
@@ -138,7 +257,17 @@ class ItemSyncAttributes:
     """
     base_trakt_type
     """
-    base_trakt_type = LazyProperty('base_trakt_type')
+    @property
+    def base_trakt_type(self):
+        try:
+            return self._base_trakt_type
+        except AttributeError:
+            self._base_trakt_type = self.get_base_trakt_type()
+            return self._base_trakt_type
+
+    @base_trakt_type.setter
+    def base_trakt_type(self, value):
+        self._base_trakt_type = value
 
     def get_base_trakt_type(self):
         if self.tmdb_type == 'movie':
@@ -150,7 +279,17 @@ class ItemSyncAttributes:
     """
     item_id
     """
-    item_id = LazyProperty('item_id')
+    @property
+    def item_id(self):
+        try:
+            return self._item_id
+        except AttributeError:
+            self._item_id = self.get_item_id()
+            return self._item_id
+
+    @item_id.setter
+    def item_id(self, value):
+        self._item_id = value
 
     def get_item_id(self):
         return '.'.join([i for i in (self.tmdb_id, self.season, self.episode) if i])
@@ -158,7 +297,17 @@ class ItemSyncAttributes:
     """
     dialog_message
     """
-    dialog_message = LazyProperty('dialog_message')
+    @property
+    def dialog_message(self):
+        try:
+            return self._dialog_message
+        except AttributeError:
+            self._dialog_message = self.get_dialog_message()
+            return self._dialog_message
+
+    @dialog_message.setter
+    def dialog_message(self, value):
+        self._dialog_message = value
 
     def get_dialog_message(self):
         if self.sync_response.status_code == 420:
@@ -172,7 +321,17 @@ class ItemSyncAttributes:
     """
     slug
     """
-    slug = LazyProperty('slug')
+    @property
+    def slug(self):
+        try:
+            return self._slug
+        except AttributeError:
+            self._slug = self.get_slug()
+            return self._slug
+
+    @slug.setter
+    def slug(self, value):
+        self._slug = value
 
     def get_slug(self):
         return self.trakt_api.get_id(self.tmdb_id, 'tmdb', self.base_trakt_type, output_type='slug')
@@ -180,7 +339,17 @@ class ItemSyncAttributes:
     """
     sync_response
     """
-    sync_response = LazyProperty('sync_response')
+    @property
+    def sync_response(self):
+        try:
+            return self._sync_response
+        except AttributeError:
+            self._sync_response = self.get_sync_response()
+            return self._sync_response
+
+    @sync_response.setter
+    def sync_response(self, value):
+        self._sync_response = value
 
     def get_sync_response(self):
         """ Called after user selects choice """
@@ -190,7 +359,17 @@ class ItemSyncAttributes:
     """
     post_response_args
     """
-    post_response_args = LazyProperty('post_response_args')
+    @property
+    def post_response_args(self):
+        try:
+            return self._post_response_args
+        except AttributeError:
+            self._post_response_args = self.get_post_response_args()
+            return self._post_response_args
+
+    @post_response_args.setter
+    def post_response_args(self, value):
+        self._post_response_args = value
 
     def get_post_response_args(self):
         return ('sync', self.method, )
@@ -198,7 +377,17 @@ class ItemSyncAttributes:
     """
     post_response_data
     """
-    post_response_data = LazyProperty('post_response_data')
+    @property
+    def post_response_data(self):
+        try:
+            return self._post_response_data
+        except AttributeError:
+            self._post_response_data = self.get_post_response_data()
+            return self._post_response_data
+
+    @post_response_data.setter
+    def post_response_data(self, value):
+        self._post_response_data = value
 
     def get_post_response_data(self):
         return {f'{self.post_response_type}': self.post_response_item}
@@ -206,7 +395,17 @@ class ItemSyncAttributes:
     """
     post_response_type
     """
-    post_response_type = LazyProperty('post_response_type')
+    @property
+    def post_response_type(self):
+        try:
+            return self._post_response_type
+        except AttributeError:
+            self._post_response_type = self.get_post_response_type()
+            return self._post_response_type
+
+    @post_response_type.setter
+    def post_response_type(self, value):
+        self._post_response_type = value
 
     def get_post_response_type(self):
         if self.trakt_type == 'season':
@@ -216,7 +415,17 @@ class ItemSyncAttributes:
     """
     post_response_item
     """
-    post_response_item = LazyProperty('post_response_item')
+    @property
+    def post_response_item(self):
+        try:
+            return self._post_response_item
+        except AttributeError:
+            self._post_response_item = self.get_post_response_item()
+            return self._post_response_item
+
+    @post_response_item.setter
+    def post_response_item(self, value):
+        self._post_response_item = value
 
     def get_post_response_item(self):
         if isinstance(self.sync_item, list):
@@ -226,7 +435,17 @@ class ItemSyncAttributes:
     """
     sync_item
     """
-    sync_item = LazyProperty('sync_item')
+    @property
+    def sync_item(self):
+        try:
+            return self._sync_item
+        except AttributeError:
+            self._sync_item = self.get_sync_item()
+            return self._sync_item
+
+    @sync_item.setter
+    def sync_item(self, value):
+        self._sync_item = value
 
     def get_sync_item(self):
         if self.season is None:
@@ -238,7 +457,17 @@ class ItemSyncAttributes:
     """
     is_successful_sync
     """
-    is_successful_sync = LazyProperty('is_successful_sync')
+    @property
+    def is_successful_sync(self):
+        try:
+            return self._is_successful_sync
+        except AttributeError:
+            self._is_successful_sync = self.get_is_successful_sync()
+            return self._is_successful_sync
+
+    @is_successful_sync.setter
+    def is_successful_sync(self, value):
+        self._is_successful_sync = value
 
     def get_is_successful_sync(self):
         if not self.sync_response:
@@ -250,7 +479,17 @@ class ItemSyncAttributes:
     """
     dialog_header
     """
-    dialog_header = LazyProperty('dialog_header')
+    @property
+    def dialog_header(self):
+        try:
+            return self._dialog_header
+        except AttributeError:
+            self._dialog_header = self.get_dialog_header()
+            return self._dialog_header
+
+    @dialog_header.setter
+    def dialog_header(self, value):
+        self._dialog_header = value
 
     def get_dialog_header(self):
         return self.name

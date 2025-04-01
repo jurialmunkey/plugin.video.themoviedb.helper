@@ -1,7 +1,6 @@
 from tmdbhelper.lib.script.sync.item import ItemSync
 from tmdbhelper.lib.addon.plugin import get_infolabel, get_localized, get_setting
 from tmdbhelper.lib.addon.dialog import BusyDialog
-from jurialmunkey.parser import LazyProperty
 from xbmcgui import Dialog
 
 
@@ -9,7 +8,17 @@ class ItemMDbListAttributes:
     """
     lists
     """
-    lists = LazyProperty('lists')
+    @property
+    def lists(self):
+        try:
+            return self._lists
+        except AttributeError:
+            self._lists = self.get_lists()
+            return self._lists
+
+    @lists.setter
+    def lists(self, value):
+        self._lists = value
 
     def get_lists(self):
         from tmdbhelper.lib.api.mdblist.api import MDbList
@@ -21,7 +30,17 @@ class ItemMDbListAttributes:
     """
     list_id
     """
-    list_id = LazyProperty('list_id')
+    @property
+    def list_id(self):
+        try:
+            return self._list_id
+        except AttributeError:
+            self._list_id = self.get_list_id()
+            return self._list_id
+
+    @list_id.setter
+    def list_id(self, value):
+        self._list_id = value
 
     def get_list_id(self):
         if self.remove:
@@ -74,9 +93,42 @@ class ItemMDbList(ItemSync, ItemMDbListAttributes):
 class ItemUserList(ItemSync):
     preconfigured = True
     trakt_sync_url = 'items'
-    userlist = LazyProperty('userlist')
-    userlist_slug = LazyProperty('userlist_slug')
-    userlist_user = LazyProperty('userlist_user')
+
+    @property
+    def userlist(self):
+        try:
+            return self._userlist
+        except AttributeError:
+            self._userlist = self.get_userlist()
+            return self._userlist
+
+    @userlist.setter
+    def userlist(self, value):
+        self._userlist = value
+
+    @property
+    def userlist_slug(self):
+        try:
+            return self._userlist_slug
+        except AttributeError:
+            self._userlist_slug = self.get_userlist_slug()
+            return self._userlist_slug
+
+    @userlist_slug.setter
+    def userlist_slug(self, value):
+        self._userlist_slug = value
+
+    @property
+    def userlist_user(self):
+        try:
+            return self._userlist_user
+        except AttributeError:
+            self._userlist_user = self.get_userlist_user()
+            return self._userlist_user
+
+    @userlist_user.setter
+    def userlist_user(self, value):
+        self._userlist_user = value
 
     """
     methods
