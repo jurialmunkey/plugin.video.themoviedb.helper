@@ -148,6 +148,14 @@ class SyncDataGetterAllItems(SyncDataGetterAll):
         return (self.item_type, )
 
 
+class SyncDataGetterAllUnwatchedItems(SyncDataGetterAll):
+    query_clauses = ('item_type=?', 'last_watched_at IS NULL')  # WHERE {query_clauses}
+
+    @property
+    def query_values(self):
+        return (self.item_type, )
+
+
 class SyncDataGetterAllItemsCollected(SyncDataGetterAllItems):
     clause_keys = ('collection_last_collected_at', )
 
@@ -165,6 +173,10 @@ class SyncDataGetterAllItemsWatched(SyncDataGetterAllItems):
 
 
 class SyncDataGetterAllItemsPlayback(SyncDataGetterAllItems):
+    clause_keys = ('playback_progress', )
+
+
+class SyncDataGetterAllUnwatchedItemsPlayback(SyncDataGetterAllUnwatchedItems):
     clause_keys = ('playback_progress', )
 
 
@@ -339,6 +351,11 @@ class SyncDataGetters:
 
     def get_all_playback_getter(self, item_type):
         sd = SyncDataGetterAllItemsPlayback(self)
+        sd.item_type = item_type
+        return sd
+
+    def get_all_unwatched_playback_getter(self, item_type):
+        sd = SyncDataGetterAllUnwatchedItemsPlayback(self)
         sd.item_type = item_type
         return sd
 

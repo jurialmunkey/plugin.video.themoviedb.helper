@@ -829,6 +829,9 @@ ROUTE_NOID = {
     'trakt_ondeck': {'route': {
         'module_name': 'tmdbhelper.lib.api.trakt.lists',
         'import_attr': 'ListOnDeck'}},
+    'trakt_ondeck_unwatched': {'route': {
+        'module_name': 'tmdbhelper.lib.api.trakt.lists',
+        'import_attr': 'ListOnDeckUnWatched'}},
     'trakt_nextepisodes': {'route': {
         'module_name': 'tmdbhelper.lib.api.trakt.lists',
         'import_attr': 'ListNextEpisodes'}},

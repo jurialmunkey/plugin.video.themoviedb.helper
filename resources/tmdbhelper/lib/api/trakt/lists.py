@@ -208,22 +208,32 @@ class ListLibraryCalendar(ListCalendar):
 
 
 class ListOnDeck(ListSync):
-    def get_ondeck_movies(self, page=None, sort_by=None, sort_how=None, **kwargs):
+    def get_ondeck_movies(self, page=None, sort_by=None, sort_how=None, unwatched=False, **kwargs):
         self.container_content = 'movies'
         self.plugin_category = f'{get_localized(32196)} {convert_type("movie", "plural")}'
         self.kodi_db = self.get_kodi_database('movie')
-        return self.get_list_items(sync_type='playback', item_type='movie', page=page, sort_by=sort_by, sort_how=sort_how)
+        sync_type = 'unwatchedplayback' if unwatched else 'playback'
+        return self.get_list_items(sync_type=sync_type, item_type='movie', page=page, sort_by=sort_by, sort_how=sort_how)
 
-    def get_ondeck_episodes(self, page=None, sort_by=None, sort_how=None, **kwargs):
+    def get_ondeck_episodes(self, page=None, sort_by=None, sort_how=None, unwatched=False, **kwargs):
         self.container_content = 'episodes'
         self.plugin_category = get_localized(32406)
         self.kodi_db = self.get_kodi_database('tv')
-        return self.get_list_items(sync_type='playback', item_type='episode', page=page, sort_by=sort_by, sort_how=sort_how)
+        sync_type = 'unwatchedplayback' if unwatched else 'playback'
+        return self.get_list_items(sync_type=sync_type, item_type='episode', page=page, sort_by=sort_by, sort_how=sort_how)
 
     def get_items(self, **kwargs):
         self.tmdb_cache_only = False
         self.library = 'video'
         return self.get_ondeck_episodes(**kwargs)
+
+
+class ListOnDeckUnWatched(ListOnDeck):
+    def get_items(self, tmdb_type, **kwargs):
+        self.tmdb_cache_only = False
+        self.library = 'video'
+        func = self.get_ondeck_episodes if tmdb_type == 'tv' else self.get_ondeck_movies
+        return func(unwatched=True, **kwargs)
 
 
 class ListInProgress(ListOnDeck):

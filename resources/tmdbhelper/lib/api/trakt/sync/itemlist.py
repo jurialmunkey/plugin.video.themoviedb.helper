@@ -267,6 +267,13 @@ class ItemListSyncDataFavorites(ItemListSyncData):
         return self.make_list(self.trakt_syncdata.get_all_favorites_getter)
 
 
+class ItemListSyncDataUnwatchedPlayback(ItemListSyncData):
+    """ Episodes and movies partially watched with resume points """
+
+    def get_items(self):
+        return self.make_list(self.trakt_syncdata.get_all_unwatched_playback_getter)
+
+
 class ItemListSyncDataToWatch(ItemListSyncData):
     """ Mix of watchlist and inprogress items """
 
@@ -380,7 +387,8 @@ def ItemListSyncDataFactory(sync_type, *args, **kwargs):
         'nextup': ItemListSyncDataNextUp,
         'upnext': ItemListSyncDataUpNext,
         'inprogress': ItemListSyncDataInProgress,
-        'towatch': ItemListSyncDataToWatch
+        'towatch': ItemListSyncDataToWatch,
+        'unwatchedplayback': ItemListSyncDataUnwatchedPlayback,
     }
 
     return routes[sync_type](*args, **kwargs)

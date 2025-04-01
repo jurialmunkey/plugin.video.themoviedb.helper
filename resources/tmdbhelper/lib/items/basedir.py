@@ -541,6 +541,22 @@ def _get_basedir_trakt():
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/trakt/inprogress.png'}},
         {
+            'label': u'{}{{space}}{{item_type}} ({})'.format(get_localized(32196), get_localized(16101)),
+            'types': ['movie'],
+            'params': {'info': 'trakt_ondeck_unwatched'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/inprogress.png'}},
+        {
+            'label': f'{get_localized(32406)} ({get_localized(16101)})',
+            'types': ['tv'],
+            'params': {'info': 'trakt_ondeck_unwatched'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/inprogress.png'}},
+        {
             'label': u'{{item_type}}{{space}}{}'.format(get_localized(32078)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_towatch'},
