@@ -76,7 +76,7 @@ def refresh_trakt_sync(**kwargs):
         (get_localized(563), 'rated_at', ('movie', 'show', 'season', 'episode', )),
         (get_localized(1036), 'favorites_listed_at', ('movie', 'show', )),
         (get_localized(32193), 'watchlist_listed_at', ('movie', 'show', 'season', 'episode', )),
-        (get_localized(32192), 'collection_last_collected_at', ('movie', 'show', 'episode', )),
+        (get_localized(32192), 'collection_last_collected_at', ('movie', 'show', )),
     )
     x = Dialog().select(get_localized(32532), [i[0] for i in choices])
     if x == -1:
