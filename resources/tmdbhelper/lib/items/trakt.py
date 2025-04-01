@@ -1,4 +1,4 @@
-class TraktMethods():
+class TraktPlayData():
     def __init__(self, pauseplayprogress=False, watchedindicators=False, unwatchedepisodes=False):
         self._pauseplayprogress = pauseplayprogress  # Set play progress using paused at position
         self._watchedindicators = watchedindicators  # Set watched status and playcount
