@@ -3,30 +3,7 @@
 from tmdbhelper.lib.addon.thread import ParallelThread
 
 
-class ItemListSyncData:
-
-    # Tuple of column_name, reverse_sort, fallback_nonetype
-    sort = {
-        'year': ('year', True, 0, ),
-        'released': ('premiered', True, '', ),
-        'title': ('title', True, '', ),
-        'watched': ('last_watched_at', True, '', ),
-        'votes': ('trakt_votes', True, 0, ),
-        'plays': ('plays', True, 0, ),
-        'runtime': ('runtime', True, 0, ),
-        'collected': ('collection_last_collected_at', True, '', ),
-        'airdate': ('last_watched_at', True, '', ),
-        'todays': ('last_watched_at', True, '', ),
-        'lastweek': ('last_watched_at', True, '', ),
-    }
-
-    def __init__(self, class_instance_trakt_api, item_type=None, sort_by=None, sort_how=None, item_keys=None, tmdb_id=None):
-        self._class_instance_trakt_api = class_instance_trakt_api
-        self._sort_by, self._sort_how = sort_by, sort_how
-        self._item_keys = item_keys or ()
-        self._item_type = item_type
-        self._tmdb_id = tmdb_id
-
+class ItemListSyncDataProperties:
     @property
     def items(self):
         try:
@@ -129,38 +106,17 @@ class ItemListSyncData:
             return ('movie', 'show', )
         return (self._item_type, )
 
-    def get_sort_method(self):
-        try:
-            return self.sort[self.sort_by]
-        except KeyError:
-            return
 
-    def get_sort_key(self):
-        try:
-            return self.sort_method[0]
-        except TypeError:  # No sort method
-            return
-
-    def get_additional_keys(self):
-        try:
-            return (self.sort_method[0], *self._item_keys)
-        except TypeError:  # No sort method
-            return
-
-    def get_reverse(self):
-        try:
-            reverse = self.sort_method[1]
-        except TypeError:  # No sort method
-            return
-        if self.sort_how != 'asc':
-            return reverse
-        return not reverse
-
-    def get_nonetype(self):
-        try:
-            return self.sort_method[2]
-        except TypeError:  # No sort method
-            return
+class ItemListSyncDataMethods:
+    def sort_data(self, data, sd, argx_offset=1):
+        if self.sort_by == 'random':
+            import random
+            random.shuffle(data)
+            return data
+        if not self.additional_keys:
+            return data
+        argx = sd.keys.index(self.sort_key) + argx_offset
+        return sorted(data, key=lambda x: x[argx] if x[argx] is not None else self.nonetype, reverse=self.reverse)
 
     def make_detailed_item(self, i, item_type='show'):
         if not i['id']:
@@ -174,16 +130,6 @@ class ItemListSyncData:
         item.pop('ids', None)
         item.update(i)
         return item
-
-    def sort_data(self, data, sd, argx_offset=1):
-        if self.sort_by == 'random':
-            import random
-            random.shuffle(data)
-            return data
-        if not self.additional_keys:
-            return data
-        argx = sd.keys.index(self.sort_key) + argx_offset
-        return sorted(data, key=lambda x: x[argx] if x[argx] is not None else self.nonetype, reverse=self.reverse)
 
     def make_list(self, sd_func):
         data = []
@@ -221,6 +167,64 @@ class ItemListSyncData:
         for x, k in enumerate(additional_key_index):
             argx_dictionary[k] = x
         return argx_dictionary
+
+
+class ItemListSyncData(ItemListSyncDataProperties, ItemListSyncDataMethods):
+
+    # Tuple of column_name, reverse_sort, fallback_nonetype
+    sort = {
+        'year': ('year', True, 0, ),
+        'released': ('premiered', True, '', ),
+        'title': ('title', True, '', ),
+        'watched': ('last_watched_at', True, '', ),
+        'votes': ('trakt_votes', True, 0, ),
+        'plays': ('plays', True, 0, ),
+        'runtime': ('runtime', True, 0, ),
+        'collected': ('collection_last_collected_at', True, '', ),
+        'airdate': ('last_watched_at', True, '', ),
+        'todays': ('last_watched_at', True, '', ),
+        'lastweek': ('last_watched_at', True, '', ),
+    }
+
+    def __init__(self, class_instance_trakt_api, item_type=None, sort_by=None, sort_how=None, item_keys=None, tmdb_id=None):
+        self._class_instance_trakt_api = class_instance_trakt_api
+        self._sort_by, self._sort_how = sort_by, sort_how
+        self._item_keys = item_keys or ()
+        self._item_type = item_type
+        self._tmdb_id = tmdb_id
+
+    def get_sort_method(self):
+        try:
+            return self.sort[self.sort_by]
+        except KeyError:
+            return
+
+    def get_sort_key(self):
+        try:
+            return self.sort_method[0]
+        except TypeError:  # No sort method
+            return
+
+    def get_additional_keys(self):
+        try:
+            return (self.sort_method[0], *self._item_keys)
+        except TypeError:  # No sort method
+            return
+
+    def get_reverse(self):
+        try:
+            reverse = self.sort_method[1]
+        except TypeError:  # No sort method
+            return
+        if self.sort_how != 'asc':
+            return reverse
+        return not reverse
+
+    def get_nonetype(self):
+        try:
+            return self.sort_method[2]
+        except TypeError:  # No sort method
+            return
 
     def get_argx_dictionary(self):
         return self.make_argx_dictionary(self.syncdata_getter)
