@@ -61,6 +61,35 @@ def sort_list(**kwargs):
     executebuiltin(format_folderpath(encode_url(**kwargs)))
 
 
+def refresh_trakt_sync(**kwargs):
+    from xbmcgui import Dialog
+    from tmdbhelper.lib.addon.plugin import get_localized, executebuiltin
+    from jurialmunkey.window import get_property
+    from tmdbhelper.lib.addon.tmdate import set_timestamp
+    from tmdbhelper.lib.api.trakt.api import TraktAPI
+    from tmdbhelper.lib.api.trakt.sync.datasync import SyncData
+
+    choices = (
+        (get_localized(19022), 'hidden_at', ('movie', 'show', )),
+        (get_localized(16102), 'last_watched_at', ('movie', 'show', 'episode', )),
+        (get_localized(14086), 'playback_paused_at', ('movie', 'episode', )),
+        (get_localized(563), 'rated_at', ('movie', 'show', 'season', 'episode', )),
+        (get_localized(1036), 'favorites_listed_at', ('movie', 'show', )),
+        (get_localized(32193), 'watchlist_listed_at', ('movie', 'show', 'season', 'episode', )),
+        (get_localized(32192), 'collection_last_collected_at', ('movie', 'show', 'episode', )),
+    )
+    x = Dialog().select(get_localized(32532), [i[0] for i in choices])
+    if x == -1:
+        return
+
+    keys = (choices[x][1], )
+    trakt_api = TraktAPI()
+    for item_type in choices[x][2]:
+        SyncData(trakt_api).sync(item_type, keys, forced=True)
+    executebuiltin('Container.Refresh')
+    get_property('Widgets.Reload', set_property=f'{set_timestamp(0, True)}')
+
+
 def get_stats(**kwargs):
     from tmdbhelper.lib.api.trakt.api import TraktAPI
     from jurialmunkey.window import get_property
