@@ -1,34 +1,6 @@
+from tmdbhelper.lib.api.trakt.api import is_authorized
 from tmdbhelper.lib.files.bcache import use_simple_cache
 from tmdbhelper.lib.addon.consts import CACHE_SHORT
-
-
-def is_authorized(func):
-
-    def wrapper(self, *args, **kwargs):
-
-        def _get_request_data():
-            # Authorization not required for this method
-            if not kwargs.get('authorize', True):
-                return func(self, *args, **kwargs)
-            # Authorization already granted in this instance
-            if self.authorization:
-                return func(self, *args, **kwargs)
-            # Authorization required ask for login if no token
-            if not self.attempted_login and self.authorize(login=True):
-                return func(self, *args, **kwargs)
-
-        def _get_cached_data():
-            params = {}
-            params.update(kwargs)
-            params['cache_only'] = True
-            try:
-                return func(self, *args, **params)
-            except TypeError:
-                return
-
-        return _get_request_data() or _get_cached_data()
-
-    return wrapper
 
 
 @use_simple_cache(cache_days=CACHE_SHORT)
