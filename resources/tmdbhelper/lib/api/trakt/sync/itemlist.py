@@ -6,6 +6,8 @@ from tmdbhelper.lib.addon.thread import ParallelThread
 class ItemListSyncDataProperties:
     @property
     def items(self):
+        if not self.trakt_syncdata:
+            return
         try:
             return self._items
         except AttributeError:
