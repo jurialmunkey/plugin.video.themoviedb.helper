@@ -82,6 +82,18 @@ class DataType:
     def get_response_json(self):
         return self._class_instance_syncdata.get_response_json
 
+    def get_response_sync(self, *args, **kwargs):
+        path = self.trakt_api.get_request_url(*args, **kwargs)
+        data = self.trakt_api.get_api_request(path, headers=self.trakt_api.headers)
+        if data is None:
+            return
+        try:
+            return data.json()
+        except ValueError:
+            return
+        except AttributeError:
+            return
+
     @property
     def trakt_api(self):
         return self._class_instance_syncdata._class_instance_trakt_api
@@ -116,14 +128,13 @@ class DataType:
     def sync_func(self):
         from tmdbhelper.lib.addon.logger import TimerFunc
         with TimerFunc(f'Sync: {self.method} {self.item_type}', inline=True, log_threshold=0.001):
-            return self.get_response_json('sync', self.method, f'{self.item_type}s', **self.sync_kwgs)
+            return self.get_response_sync('sync', self.method, f'{self.item_type}s', **self.sync_kwgs)
 
     @progress_bg
     def sync_data(self, **kwargs):
-
         self.dialog_progress_bg.update(20, message='Refreshing Data')
         meta = self.sync_func()
-        if not meta:
+        if meta is None:
             return
 
         from tmdbhelper.lib.api.trakt.sync.itemdata import SyncItem
@@ -131,6 +142,9 @@ class DataType:
 
         self.dialog_progress_bg.update(40, message='Cleaning Data')
         self.clear_columns(item.base_table_keys)
+
+        if not meta:
+            return
 
         self.dialog_progress_bg.update(60, message='Configuring Data')
         data = item.data
@@ -172,9 +186,9 @@ class SyncHidden(DataType):
         from tmdbhelper.lib.addon.logger import TimerFunc
         with TimerFunc(f'Sync: {self.method} {self.item_type}', inline=True, log_threshold=0.001):
             response = []
-            response += self.get_response_json('users', self.method, 'progress_watched', type=f'{self.item_type}s', limit=4095) or []
-            response += self.get_response_json('users', self.method, 'progress_collected', type=f'{self.item_type}s', limit=4095) or []
-            response += self.get_response_json('users', self.method, 'calendar', type=f'{self.item_type}s', limit=4095) or []
+            response += self.get_response_sync('users', self.method, 'progress_watched', type=f'{self.item_type}s', limit=4095) or []
+            response += self.get_response_sync('users', self.method, 'progress_collected', type=f'{self.item_type}s', limit=4095) or []
+            response += self.get_response_sync('users', self.method, 'calendar', type=f'{self.item_type}s', limit=4095) or []
             return response
 
 
@@ -239,7 +253,7 @@ class SyncAllNextEpisodes(DataTypeEpisodes):
     def get_next_episodes_response(self, slug):
         if not slug:
             return
-        return self.get_response_json('shows', slug, 'progress/watched')
+        return self.get_response_sync('shows', slug, 'progress/watched')
 
     def get_next_episodes(self, tmdb_id, slug):
         response = self.get_next_episodes_response(slug)
