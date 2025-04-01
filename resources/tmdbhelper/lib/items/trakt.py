@@ -4,6 +4,13 @@ class TraktMethods():
         self._watchedindicators = watchedindicators  # Set watched status and playcount
         self._unwatchedepisodes = unwatchedepisodes  # Set unwatched episode count to total episode count for unwatched tvshows (if false)
 
+    def is_sync(func):
+        def wrapper(self, *args, **kwargs):
+            if not self.trakt_syncdata:
+                return
+            return func(self, *args, **kwargs)
+        return wrapper
+
     @property
     def trakt_api(self):
         try:
@@ -22,6 +29,7 @@ class TraktMethods():
             self._trakt_syncdata = self.trakt_api.trakt_syncdata
             return self._trakt_syncdata
 
+    @is_sync
     def pre_sync(self, info=None, tmdb_id=None, tmdb_type=None, season=None, **kwargs):
         info_movies = ('stars_in_movies', 'crew_in_movies', 'trakt_userlist', 'stars_in_both', 'crew_in_both',)
         if tmdb_type in ('movie', 'both',) or info in info_movies:
@@ -37,17 +45,20 @@ class TraktMethods():
             if self._pauseplayprogress and tmdb_id is not None and season is not None:
                 self.trakt_syncdata.sync('show', ('playback_progress', ))
 
+    @is_sync
     def pre_sync_start(self, **kwargs):
         from tmdbhelper.lib.addon.thread import SafeThread
         self._pre_sync = SafeThread(target=self.pre_sync, kwargs=kwargs)
         self._pre_sync.start()
 
+    @is_sync
     def pre_sync_join(self):
         try:
             self._pre_sync.join()
         except AttributeError:
             return
 
+    @is_sync
     def set_playprogress(self, li):
 
         def _set_playprogress():
@@ -77,6 +88,7 @@ class TraktMethods():
         li.infoproperties['ResumeTime'] = int(duration * progress // 100)
         li.infoproperties['TotalTime'] = int(duration)
 
+    @is_sync
     def get_playcount(self, li):
         if not self._watchedindicators:
             return
