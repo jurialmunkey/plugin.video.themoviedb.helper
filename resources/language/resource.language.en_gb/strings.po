@@ -2701,6 +2701,11 @@ msgctxt "#32531"
 msgid "Method only available for VIP accounts."
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32532"
+msgid "Force resync"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

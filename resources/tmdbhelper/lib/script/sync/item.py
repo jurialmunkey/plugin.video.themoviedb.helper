@@ -258,6 +258,7 @@ class ItemSyncAttributes:
     """
     self
     """
+
     def get_self(self):
         """ Method to see if we should return item in menu or not """
 

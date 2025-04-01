@@ -1,5 +1,5 @@
 from tmdbhelper.lib.addon.dialog import BusyDialog
-from tmdbhelper.lib.script.sync.basic import ItemWatched, ItemUnwatched, ItemWatchlist, ItemCollection, ItemFavorites
+from tmdbhelper.lib.script.sync.basic import ItemWatched, ItemUnwatched, ItemWatchlist, ItemCollection, ItemFavorites, ItemRefresh
 from tmdbhelper.lib.script.sync.rating import ItemRating
 from tmdbhelper.lib.script.sync.comments import ItemComments
 from tmdbhelper.lib.script.sync.userlist import ItemUserList, ItemMDbList
@@ -49,6 +49,7 @@ class Menu(MenuAttributes):
         'progress': ItemProgress,
         'comments': ItemComments,
         'rating': ItemRating,
+        'refresh': ItemRefresh,
     }
 
     def __init__(self, tmdb_type, tmdb_id, season=None, episode=None):

@@ -96,7 +96,7 @@ class TraktMethods():
                 tmdb_id=li.unique_ids.get('tvshow.tmdb') or li.unique_ids.get('tmdb'))
             if air_count and air_count > 0:
                 li.infolabels['episode'] = air_count
-            air_count = max(li.infolabels.get('episode') or 0, air_count or 0, 0)
+            air_count = max(int(li.infolabels.get('episode') or 0), int(air_count or 0), 0)
             return min(self.trakt_syncdata.get_episode_watchedcount(
                 tmdb_id=li.unique_ids.get('tvshow.tmdb') or li.unique_ids.get('tmdb')) or 0, air_count)
 
@@ -106,7 +106,7 @@ class TraktMethods():
                 season=li.infolabels.get('season'))
             if air_count and air_count > 0:
                 li.infolabels['episode'] = air_count
-            air_count = max(li.infolabels.get('episode') or 0, air_count or 0, 0)
+            air_count = max(int(li.infolabels.get('episode') or 0), int(air_count or 0), 0)
             return min(self.trakt_syncdata.get_episode_watchedcount(
                 tmdb_id=li.unique_ids.get('tvshow.tmdb'),
                 season=li.infolabels.get('season')) or 0, air_count)
