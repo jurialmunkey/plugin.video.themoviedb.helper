@@ -1,5 +1,6 @@
 from tmdbhelper.lib.addon.plugin import get_localized, executebuiltin
 from tmdbhelper.lib.addon.dialog import BusyDialog
+from jurialmunkey.parser import LazyProperty
 from xbmcgui import Dialog
 
 
@@ -353,11 +354,47 @@ class ItemSyncAttributes:
 
     def get_sync_response(self):
         """ Called after user selects choice """
-        trakt_type = 'episodes' if self.trakt_type == 'season' else f'{self.trakt_type}s'
         with BusyDialog():
-            item = self.sync_item if isinstance(self.sync_item, list) else [self.sync_item]
-            data = self.trakt_api.post_response('sync', self.method, postdata={f'{trakt_type}': item})
-        return data
+            return self.trakt_api.post_response(*self.post_response_args, postdata=self.post_response_data)
+
+    """
+    post_response_args
+    """
+    post_response_args = LazyProperty('post_response_args')
+
+    def get_post_response_args(self):
+        return ('sync', self.method, )
+
+
+    """
+    post_response_data
+    """
+    post_response_data = LazyProperty('post_response_data')
+
+    def get_post_response_data(self):
+        return {f'{self.post_response_type}': self.post_response_item}
+
+
+    """
+    post_response_type
+    """
+    post_response_type = LazyProperty('post_response_type')
+
+    def get_post_response_type(self):
+        if self.trakt_type == 'season':
+            return 'episodes'
+        return f'{self.trakt_type}s'
+
+    """
+    post_response_item
+    """
+    post_response_item = LazyProperty('post_response_item')
+
+    def get_post_response_item(self):
+        if isinstance(self.sync_item, list):
+            return self.sync_item
+        return [self.sync_item]
+
 
     """
     sync_item

@@ -1,6 +1,7 @@
 from tmdbhelper.lib.script.sync.item import ItemSync
 from tmdbhelper.lib.addon.plugin import get_infolabel, get_localized, get_setting
 from tmdbhelper.lib.addon.dialog import BusyDialog
+from jurialmunkey.parser import LazyProperty
 from xbmcgui import Dialog
 
 
@@ -85,6 +86,9 @@ class ItemMDbList(ItemSync, ItemMDbListAttributes):
 class ItemUserList(ItemSync):
     preconfigured = True
     trakt_sync_url = 'items'
+    userlist = LazyProperty('userlist')
+    userlist_slug = LazyProperty('userlist_slug')
+    userlist_user = LazyProperty('userlist_user')
 
     """
     methods
@@ -126,7 +130,7 @@ class ItemUserList(ItemSync):
     def get_name(self):
         return get_localized(32355) if self.remove else get_localized(32298)
 
-    def get_slug(self):
+    def get_userlist(self):
         """ Get an existing Trakt list and returns tuple of list and user slug """
         if self.remove:
             return (
@@ -144,16 +148,22 @@ class ItemUserList(ItemSync):
             list_sync[x].get('params', {}).get('list_slug'),
             list_sync[x].get('params', {}).get('user_slug'))
 
-    def get_sync_response(self):
-        """ Called after user selects choice """
-        trakt_type = 'episodes' if self.trakt_type == 'season' else f'{self.trakt_type}s'
-        with BusyDialog():
-            item = self.sync_item if isinstance(self.sync_item, list) else [self.sync_item]
-            data = self.trakt_api.post_response('users', self.slug[1], 'lists', self.slug[0], self.method, postdata={f'{trakt_type}': item})
-        return data
+    def get_userlist_slug(self):
+        if not self.userlist:
+            return
+        return self.userlist[0]
+
+    def get_userlist_user(self):
+        if not self.userlist:
+            return
+        return self.userlist[1]
+
+    def get_post_response_args(self):
+        return ('users', self.userlist_user, 'lists', self.userlist_slug, self.method, )
 
     def sync(self):
         """ Entry point """
         if self.is_successful_sync:
             self.add_to_library(self.tmdb_type, self.tmdb_id, slug=self.slug)
         self.display_dialog()
+        self.refresh_containers()
