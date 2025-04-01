@@ -207,35 +207,42 @@ class ListLibraryCalendar(ListCalendar):
         return self._get_calendar_items(kodi_db=kodi_db, user=False, **kwargs)
 
 
-class ListInProgress(ListSync):
-    def get_items(self, info, tmdb_type, page=None, sort_by=None, sort_how=None, **kwargs):
-        if tmdb_type == 'tv':
-            sync_type = 'inprogress'
-            item_type = 'show'
-            params = {
-                'info': 'trakt_upnext',
-                'tmdb_type': 'tv',
-                'tmdb_id': '{tmdb_id}'}
-        else:
-            sync_type = 'playback'
-            item_type = 'movie'
-            params = None
-
-        self.tmdb_cache_only = False
-        self.kodi_db = self.get_kodi_database(tmdb_type)
-        self.library = convert_type(tmdb_type, 'library')
-        self.container_content = convert_type(tmdb_type, 'container')
-        self.plugin_category = f'{get_localized(32196)} {convert_type(tmdb_type, "plural")}'
-        return self.get_list_items(sync_type=sync_type, item_type=item_type, page=page, sort_by=sort_by, sort_how=sort_how, params=params)
-
-
 class ListOnDeck(ListSync):
-    def get_items(self, page=None, sort_by=None, sort_how=None, **kwargs):
-        self.tmdb_cache_only = False
-        self.library = 'video'
+    def get_ondeck_movies(self, page=None, sort_by=None, sort_how=None, **kwargs):
+        self.container_content = 'movies'
+        self.plugin_category = f'{get_localized(32196)} {convert_type("movie", "plural")}'
+        self.kodi_db = self.get_kodi_database('movie')
+        return self.get_list_items(sync_type='playback', item_type='movie', page=page, sort_by=sort_by, sort_how=sort_how)
+
+    def get_ondeck_episodes(self, page=None, sort_by=None, sort_how=None, **kwargs):
         self.container_content = 'episodes'
         self.plugin_category = get_localized(32406)
+        self.kodi_db = self.get_kodi_database('tv')
         return self.get_list_items(sync_type='playback', item_type='episode', page=page, sort_by=sort_by, sort_how=sort_how)
+
+    def get_items(self, **kwargs):
+        self.tmdb_cache_only = False
+        self.library = 'video'
+        return self.get_ondeck_episodes(**kwargs)
+
+
+class ListInProgress(ListOnDeck):
+    def get_items(self, info, tmdb_type, page=None, sort_by=None, sort_how=None, **kwargs):
+        self.tmdb_cache_only = False
+        self.library = convert_type(tmdb_type, 'library')
+
+        if tmdb_type != 'tv':
+            return self.get_ondeck_movies(page=page, sort_by=sort_by, sort_how=sort_how, **kwargs)
+
+        params = {
+            'info': 'trakt_upnext',
+            'tmdb_type': 'tv',
+            'tmdb_id': '{tmdb_id}'}
+
+        self.kodi_db = self.get_kodi_database(tmdb_type)
+        self.container_content = convert_type(tmdb_type, 'container')
+        self.plugin_category = f'{get_localized(32196)} {convert_type(tmdb_type, "plural")}'
+        return self.get_list_items(sync_type='inprogress', item_type='show', page=page, sort_by=sort_by, sort_how=sort_how, params=params)
 
 
 class ListNextEpisodes(ListSync):
