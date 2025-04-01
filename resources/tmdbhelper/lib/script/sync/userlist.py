@@ -9,13 +9,7 @@ class ItemMDbListAttributes:
     """
     lists
     """
-    @property
-    def lists(self):
-        try:
-            return self._lists
-        except AttributeError:
-            self._lists = self.get_lists()
-            return self._lists
+    lists = LazyProperty('lists')
 
     def get_lists(self):
         from tmdbhelper.lib.api.mdblist.api import MDbList
@@ -27,13 +21,7 @@ class ItemMDbListAttributes:
     """
     list_id
     """
-    @property
-    def list_id(self):
-        try:
-            return self._list_id
-        except AttributeError:
-            self._list_id = self.get_list_id()
-            return self._list_id
+    list_id = LazyProperty('list_id')
 
     def get_list_id(self):
         if self.remove:

@@ -4,6 +4,7 @@ from tmdbhelper.lib.script.sync.rating import ItemRating
 from tmdbhelper.lib.script.sync.comments import ItemComments
 from tmdbhelper.lib.script.sync.userlist import ItemUserList, ItemMDbList
 from tmdbhelper.lib.script.sync.progress import ItemProgress
+from jurialmunkey.parser import LazyProperty
 from xbmcgui import Dialog
 
 
@@ -11,17 +12,7 @@ class MenuAttributes:
     """
     choices
     """
-    @property
-    def choices(self):
-        try:
-            return self._choices
-        except AttributeError:
-            self._choices = self.get_choices()
-            return self._choices
-
-    @choices.setter
-    def choices(self, value):
-        self._choices = value
+    choices = LazyProperty('choices')
 
     def get_choices(self):
         from tmdbhelper.lib.addon.thread import ParallelThread
@@ -39,13 +30,7 @@ class MenuAttributes:
     """
     trakt_api
     """
-    @property
-    def trakt_api(self):
-        try:
-            return self._trakt_api
-        except AttributeError:
-            self._trakt_api = self.get_trakt_api()
-            return self._trakt_api
+    trakt_api = LazyProperty('trakt_api')
 
     def get_trakt_api(self):
         from tmdbhelper.lib.api.trakt.api import TraktAPI
