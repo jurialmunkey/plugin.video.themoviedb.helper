@@ -854,6 +854,11 @@
                     <default>True</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="sync_notifications" type="boolean" label="32534" help="">
+                    <level>0</level>
+                    <default>True</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="connection_notifications" type="boolean" label="32471" help="">
                     <level>0</level>
                     <default>True</default>

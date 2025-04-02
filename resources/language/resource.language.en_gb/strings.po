@@ -2711,6 +2711,11 @@ msgctxt "#32533"
 msgid "Get episode types (slower)"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32534"
+msgid "Trakt sync progress notifications"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

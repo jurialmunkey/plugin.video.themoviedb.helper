@@ -18,9 +18,10 @@ def timerlock(func):
 
 def progress_bg(func):
     def wrapper(self, *args, **kwargs):
-        from xbmcgui import DialogProgressBG
-        self.dialog_progress_bg = DialogProgressBG()
-        self.dialog_progress_bg.create(heading=f'Syncing {self.item_type} {self.method}')
+        from tmdbhelper.lib.api.trakt.sync.dialogbg import DialogProgressSyncBG
+        self.dialog_progress_bg = DialogProgressSyncBG()
+        self.dialog_progress_bg.heading = f'Syncing {self.item_type} {self.method}'
+        self.dialog_progress_bg.create()
         data = func(self, *args, **kwargs)
         self.dialog_progress_bg.close()
         return data
@@ -37,23 +38,6 @@ def mutexlock(func):
                 return
             return func(self, *args, **kwargs)
     return wrapper
-
-
-class DialogProgressIncrementor:
-    def __init__(self, dialog_progress_bg, max_value=100, now_value=0):
-        self.max_value = max_value
-        self.now_value = now_value
-        self.dialog_progress_bg = dialog_progress_bg
-
-    def increment(self, x=1):
-        self.now_value += x
-
-    @property
-    def progress(self):
-        return int((self.now_value / self.max_value) * 100)
-
-    def set_message(self, message):
-        self.dialog_progress_bg.update(self.progress, message=message)
 
 
 class DataType:
@@ -270,7 +254,7 @@ class SyncAllNextEpisodes(DataTypeEpisodes):
         from tmdbhelper.lib.addon.thread import ParallelThread
         from tmdbhelper.lib.addon.logger import TimerFunc
 
-        dpro = DialogProgressIncrementor(self.dialog_progress_bg)
+        dpro = self.dialog_progress_bg
         argx = {}
 
         def get_item(i, item_id):
@@ -327,7 +311,7 @@ class SyncNextEpisodes(SyncAllNextEpisodes):
         from tmdbhelper.lib.addon.thread import ParallelThread
         from tmdbhelper.lib.addon.logger import TimerFunc
 
-        dpro = DialogProgressIncrementor(self.dialog_progress_bg)
+        dpro = self.dialog_progress_bg
         argx = {}
 
         def get_item(i):
