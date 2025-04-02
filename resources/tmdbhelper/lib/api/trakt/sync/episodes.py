@@ -51,7 +51,7 @@ class SyncEpisodes(SyncDataBase):
         },
     }
 
-    shows_slugs_columns = {
+    slugs_columns = {
         'slug': {
             'data': 'TEXT',
             'sync': None
@@ -63,7 +63,7 @@ class SyncEpisodes(SyncDataBase):
         return {
             'simplecache': self.simplecache_columns,
             'lactivities': self.lactivities_columns,
-            'shows_slugs': self.shows_slugs_columns,
+            'slugs': self.slugs_columns,
         }
 
 
@@ -132,7 +132,7 @@ class SyncTraktAPI:
 
     def get_slug(self, tmdb_id):
         return self.use_cached(
-            f'tv.{tmdb_id}', 'slug', 'shows_slugs',
+            f'tv.{tmdb_id}', 'slug', 'slugs',
             self.get_id, tmdb_id, 'tmdb', 'show', 'slug')
 
     def get_cached(self, item_id, key, table):
