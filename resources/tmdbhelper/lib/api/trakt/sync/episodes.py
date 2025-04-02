@@ -116,16 +116,24 @@ class SyncShowSeasonEpisodesData:
 
     def get_episode(self, episode):
         episode_number = episode['number']
+        if self.check_value(episode_number):  # Only get episodes we dont already have in cache
+            return
         return self.class_instance_sync_episodes_data.get_request_lc(
             'shows', self.slug, 'seasons', self.season_number, 'episodes', episode_number, extended='full')
 
     @cached_property
+    def season_episodes(self):
+        return self.class_instance_sync_episodes_data.get_request_lc('shows', self.slug, 'seasons', self.season_number)
+
+    def check_value(self, episode_number):
+        return self.class_instance_sync_episodes_data.cache.get_values(
+            self.get_name('tv', self.tmdb_id, self.season_number, episode_number), ('id', ))
+
+    @cached_property
     def episodes(self):
-        episodes = self.class_instance_sync_episodes_data.get_request_lc(
-            'shows', self.slug, 'seasons', self.season_number)
-        if not episodes:
+        if not self.season_episodes:
             return
-        with ParallelThread(episodes, self.get_episode) as pt:
+        with ParallelThread(self.season_episodes, self.get_episode) as pt:
             item_queue = pt.queue
         data = [episode for episode in item_queue if episode]
         return data
@@ -232,20 +240,15 @@ class SyncEpisodesData:
 
     @mutexlock
     def sync_all_episodes(self, tmdb_id):
-        if self.cache.get_values(self.get_name('tv', tmdb_id, 1, 1), ('id', )):
-            return
-        self.sync_func_all_episodes(tmdb_id)
-
-    def sync_func_single_episode(self, tmdb_id, season, episode):
-        slug = self.get_id(tmdb_id, 'tmdb', 'show', 'slug')
-        item = self.get_request_lc('shows', slug, 'seasons', season, 'episodes', episode, extended='full')
-        data = SyncEpisodeItemData(item, tmdb_id)
-        self.cache.set_many_values(self.keys, {data.item_id: [getattr(data, k) for k in self.keys]})
-
-    def sync_func_all_episodes(self, tmdb_id):
         data = {}
         sync = SyncShowEpisodesData(self, tmdb_id)
         for item in sync.episodes:
             item_data = SyncEpisodeItemData(item, tmdb_id)
             data[item_data.item_id] = [getattr(item_data, k) for k in self.keys]
         self.cache.set_many_values(self.keys, data)
+
+    def sync_func_single_episode(self, tmdb_id, season, episode):
+        slug = self.get_id(tmdb_id, 'tmdb', 'show', 'slug')
+        item = self.get_request_lc('shows', slug, 'seasons', season, 'episodes', episode, extended='full')
+        data = SyncEpisodeItemData(item, tmdb_id)
+        self.cache.set_many_values(self.keys, {data.item_id: [getattr(data, k) for k in self.keys]})
