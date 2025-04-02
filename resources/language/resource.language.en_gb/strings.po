@@ -2706,6 +2706,11 @@ msgctxt "#32532"
 msgid "Force resync"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32533"
+msgid "Get episode types (slower)"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

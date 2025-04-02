@@ -147,7 +147,8 @@ class Container(CommonContainerAPIs):
             from tmdbhelper.lib.items.trakt import TraktPlayData
             self._trakt_playdata = TraktPlayData(
                 watchedindicators=get_setting('trakt_watchedindicators'),
-                pauseplayprogress=get_setting('trakt_playprogress'))
+                pauseplayprogress=get_setting('trakt_playprogress'),
+                traktepisodetypes=get_setting('trakt_episodetypes'))
             return self._trakt_playdata
 
     @property
