@@ -51,9 +51,20 @@ class SyncEpisodes(SyncDataBase):
         },
     }
 
-    lactivities_columns = {
-        'data': {'data': 'TEXT', 'sync': None}
+    shows_slugs_columns = {
+        'slug': {
+            'data': 'TEXT',
+            'sync': None
+        },
     }
+
+    @property
+    def database_tables(self):
+        return {
+            'simplecache': self.simplecache_columns,
+            'lactivities': self.lactivities_columns,
+            'shows_slugs': self.shows_slugs_columns,
+        }
 
 
 class SyncEpisodeItemData:
@@ -119,6 +130,28 @@ class SyncTraktAPI:
     def get_id(self, *args, **kwargs):
         return self.class_instance_trakt_api.get_id(*args, **kwargs)
 
+    def get_slug(self, tmdb_id):
+        return self.use_cached(
+            f'tv.{tmdb_id}', 'slug', 'shows_slugs',
+            self.get_id, tmdb_id, 'tmdb', 'show', 'slug')
+
+    def get_cached(self, item_id, key, table):
+        data = self.cache.get_values(item_id, keys=(key, ), table=table)
+        return data[0] if data else None
+
+    def set_cached(self, item_id, key, table, data):
+        if not data:
+            return
+        key_value_pair = (key, data,)
+        self.cache.set_values(item_id, key_value_pairs=(key_value_pair, ), table=table)
+        return data
+
+    def use_cached(self, item_id, key, table, func, *args, **kwargs):
+        data = self.get_cached(item_id, key, table)
+        if not data:
+            data = self.set_cached(item_id, key, table, func(*args, **kwargs))
+        return data
+
 
 class SyncShowSeasonEpisodesData(SyncTraktAPI):
     def __init__(self, class_instance_sync_episodes_data, tmdb_id, slug, season):
@@ -165,7 +198,7 @@ class SyncShowEpisodesData(SyncTraktAPI):
 
     @cached_property
     def slug(self):
-        return self.get_id(self.tmdb_id, 'tmdb', 'show', 'slug')
+        return self.get_slug(self.tmdb_id)
 
     @cached_property
     def seasons(self):
@@ -198,16 +231,10 @@ class SyncEpisodesData(SyncTraktAPI):
 
     @cached_property
     def cache(self):
-        return self.get_cache()
-
-    def get_cache(self):
         return SyncEpisodes(filename=self.cache_filename)
 
     @cached_property
     def window(self):
-        return self.get_window()
-
-    def get_window(self):
         from jurialmunkey.window import WindowPropertySetter
         return WindowPropertySetter()
 
@@ -252,7 +279,11 @@ class SyncEpisodesData(SyncTraktAPI):
         self.cache.set_many_values(self.keys, data)
 
     def sync_func_single_episode(self, tmdb_id, season, episode):
-        slug = self.get_id(tmdb_id, 'tmdb', 'show', 'slug')
+        slug = self.get_slug(tmdb_id)
+        if not slug:
+            return
         item = self.get_response_json('shows', slug, 'seasons', season, 'episodes', episode, extended='full')
+        if not item:
+            return
         data = SyncEpisodeItemData(item, tmdb_id)
         self.cache.set_many_values(self.keys, {data.item_id: [getattr(data, k) for k in self.keys]})

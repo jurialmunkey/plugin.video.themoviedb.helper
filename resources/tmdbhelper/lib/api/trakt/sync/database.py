@@ -252,12 +252,15 @@ class SyncDataBase(SimpleCache):
         query = 'INSERT OR IGNORE INTO {table}( id) VALUES (?)'.format(table=table)
         self._execute_sql(query, [(idx,) for idx in items])
 
-    def create_database_execute(self, connection):
-        tables = {
+    @property
+    def database_tables(self):
+        return {
             'simplecache': self.simplecache_columns,
             'lactivities': self.lactivities_columns,
         }
-        for table, columns in tables.items():
+
+    def create_database_execute(self, connection):
+        for table, columns in self.database_tables.items():
             query = 'CREATE TABLE IF NOT EXISTS {}(id TEXT UNIQUE, {})'
             query = query.format(table, ', '.join([f'{k} {v["data"]}' for k, v in columns.items()]))
             connection.execute(query)
