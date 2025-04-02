@@ -1,82 +1,47 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from functools import cached_property
 from tmdbhelper.lib.addon.thread import ParallelThread
 
 
 class ItemListSyncDataProperties:
-    @property
+    @cached_property
     def items(self):
         if not self.trakt_syncdata:
             return
-        try:
-            return self._items
-        except AttributeError:
-            self._items = self.get_items()
-            return self._items
+        return self.get_items()
 
-    @property
+    @cached_property
     def additional_keys(self):
-        try:
-            return self._additional_keys
-        except AttributeError:
-            self._additional_keys = self.get_additional_keys()
-            return self._additional_keys
+        return self.get_additional_keys()
 
-    @property
+    @cached_property
     def syncdata_getter(self):
-        try:
-            return self._syncdata_getter
-        except AttributeError:
-            self._syncdata_getter = self.get_syncdata_getter()
-            return self._syncdata_getter
+        return self.get_syncdata_getter()
 
-    @property
+    @cached_property
     def argx_dictionary(self):
-        try:
-            return self._argx_dictionary
-        except AttributeError:
-            self._argx_dictionary = self.get_argx_dictionary()
-            return self._argx_dictionary
+        return self.get_argx_dictionary()
 
-    @property
+    @cached_property
     def presorted_items(self):
-        try:
-            return self._presorted_items
-        except AttributeError:
-            self._presorted_items = self.get_presorted_items()
-            return self._presorted_items
+        return self.get_presorted_items()
 
-    @property
+    @cached_property
     def sort_method(self):
-        try:
-            return self._sort_method
-        except AttributeError:
-            self._sort_method = self.get_sort_method()
-            return self._sort_method
+        return self.get_sort_method()
 
-    @property
+    @cached_property
     def sort_key(self):
-        try:
-            return self._sort_key
-        except AttributeError:
-            self._sort_key = self.get_sort_key()
-            return self._sort_key
+        return self.get_sort_key()
 
-    @property
+    @cached_property
     def nonetype(self):
-        try:
-            return self._nonetype
-        except AttributeError:
-            self._nonetype = self.get_nonetype()
-            return self._nonetype
+        return self.get_nonetype()
 
-    @property
+    @cached_property
     def reverse(self):
-        try:
-            return self._reverse
-        except AttributeError:
-            self._reverse = self.get_reverse()
-            return self._reverse
+        return self.get_reverse()
 
     @property
     def trakt_syncdata(self):

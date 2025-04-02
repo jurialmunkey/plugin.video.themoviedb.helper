@@ -1,3 +1,4 @@
+from functools import cached_property
 from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp
 from tmdbhelper.lib.api.trakt.sync.activity import SyncLastActivities
 
@@ -96,13 +97,9 @@ class DataType:
     def trakt_api(self):
         return self._class_instance_syncdata._class_instance_trakt_api
 
-    @property
+    @cached_property
     def last_activities(self):
-        try:
-            return self._last_activities
-        except AttributeError:
-            self._last_activities = self.get_last_activities()
-            return self._last_activities
+        return self.get_last_activities()
 
     def get_last_activities(self):
         return SyncLastActivities(self._class_instance_syncdata)

@@ -1,3 +1,4 @@
+from functools import cached_property
 from tmdbhelper.lib.files.futils import json_loads as data_loads
 from tmdbhelper.lib.files.futils import json_dumps as data_dumps
 from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp
@@ -20,37 +21,21 @@ def mutexlock(func):
 
 
 class SyncLastActivities:
-    @property
+    @cached_property
     def json(self):
-        try:
-            return self._json
-        except AttributeError:
-            self._json = self.get_json()
-            return self._json
+        return self.get_json()
 
-    @property
+    @cached_property
     def json_data(self):
-        try:
-            return self._json_data
-        except AttributeError:
-            self._json_data = self.get_json_data()
-            return self._json_data
+        return self.get_json_data()
 
-    @property
+    @cached_property
     def json_prop(self):
-        try:
-            return self._json_prop
-        except AttributeError:
-            self._json_prop = self.get_json_prop()
-            return self._json_prop
+        return self.get_json_prop()
 
-    @property
+    @cached_property
     def json_sync(self):
-        try:
-            return self._json_sync
-        except AttributeError:
-            self._json_sync = self.get_json_sync()
-            return self._json_sync
+        return self.get_json_sync()
 
     lock_name = 'sync_last_activities'
 
