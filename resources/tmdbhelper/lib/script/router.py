@@ -14,9 +14,9 @@ REGEX_WINPROP_SUB = r'\$WINPROP\[{}\]'
 
 def test_func():
     from tmdbhelper.lib.api.trakt.api import TraktAPI
-    data = TraktAPI().trakt_episodedata.get_value(1399, 1, 1, key='episode_type')
+    data = TraktAPI().trakt_episodedata.sync_all_episodes(1396)
     import xbmcgui
-    xbmcgui.Dialog().ok('TEST', f'{data}')
+    xbmcgui.Dialog().textviewer('TEST', f'{data}')
 
 
 class Script(object):
