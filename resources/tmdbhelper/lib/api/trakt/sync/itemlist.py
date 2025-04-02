@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from functools import cached_property
+from collections import namedtuple
 from tmdbhelper.lib.addon.thread import ParallelThread
 
 
@@ -18,10 +19,6 @@ class ItemListSyncDataProperties:
     @cached_property
     def syncdata_getter(self):
         return self.get_syncdata_getter()
-
-    @cached_property
-    def argx_dictionary(self):
-        return self.get_argx_dictionary()
 
     @cached_property
     def presorted_items(self):
@@ -47,6 +44,16 @@ class ItemListSyncDataProperties:
     def trakt_syncdata(self):
         return self._class_instance_trakt_api.trakt_syncdata
 
+    @cached_property
+    def namedtuple_basic(self):
+        BasicTuple = namedtuple("BasicTuple", "item mediatype")
+        return BasicTuple
+
+    @cached_property
+    def namedtuple_episode(self):
+        EpisodeTuple = namedtuple("EpisodeTuple", "item mediatype season_number episode_number")
+        return EpisodeTuple
+
     @property
     def detailed_item(self):
         if self.item_type != 'episode':
@@ -63,15 +70,14 @@ class ItemListSyncDataProperties:
 
 
 class ItemListSyncDataMethods:
-    def sort_data(self, data, sd, argx_offset=1):
+    def sort_data(self, data):
         if self.sort_by == 'random':
             import random
             random.shuffle(data)
             return data
         if not self.additional_keys:
             return data
-        argx = sd.keys.index(self.sort_key) + argx_offset
-        return sorted(data, key=lambda x: x[argx] if x[argx] is not None else self.nonetype, reverse=self.reverse)
+        return sorted(data, key=lambda x: x[0][self.sort_key] if x[0][self.sort_key] is not None else self.nonetype, reverse=self.reverse)
 
     def make_detailed_item(self, i, item_type='show'):
         if not i['id']:
@@ -91,37 +97,25 @@ class ItemListSyncDataMethods:
         for item_type in self.item_types:
             sd = sd_func(item_type)
             sd.additional_keys = self.additional_keys
-            data += [(item_type, *i, ) for i in sd.items] if sd.items else []
+            data += [self.namedtuple_basic(i, item_type, ) for i in sd.items] if sd.items else []
 
         if not data:
             return
 
-        argx = sd.keys.index(sd.clause_keys[0]) + 1  # item_type pushed to front so offset argx positions by 1
-        data = sorted(data, key=lambda x: x[argx], reverse=True)
+        data = sorted(data, key=lambda x: x.item[sd.clause_keys[0]], reverse=True)
+        return [self.make_item(i) for i in self.sort_data(data) if i]
 
-        # Store argx positions for keys in dict for quick access
-        argx_dictionary = self.make_argx_dictionary(sd)
-        return [self.make_item(i, argx_dictionary) for i in self.sort_data(data, sd) if i]
-
-    def make_item(self, i, argx_dictionary, detailed_item=False):
-        item = {'id': i[argx_dictionary['tmdb_id']], 'mediatype': i[argx_dictionary['mediatype']], 'title': i[argx_dictionary['title']]}
-        if i[argx_dictionary['mediatype']] in ('season', 'episode', ):
-            item['season'] = i[argx_dictionary['season_number']]
-        if i[argx_dictionary['mediatype']] == 'episode':
-            item['episode'] = i[argx_dictionary['episode_number']]
+    def make_item(self, i, detailed_item=False):
+        item = {'id': i.item['tmdb_id'], 'mediatype': i.mediatype, 'title': i.item['title']}
+        if i.mediatype in ('season', 'episode', ):
+            item['season'] = i.season_number
+        if i.mediatype == 'episode':
+            item['episode'] = i.episode_number
         for k in (self.item_keys or ()):
-            item.setdefault('infoproperties', {})[k] = i[argx_dictionary[k]]
+            item.setdefault('infoproperties', {})[k] = i.item[k]
         if detailed_item:
             item = self.make_detailed_item(item)
         return item
-
-    @staticmethod
-    def make_argx_dictionary(sd, additional_key_index=('mediatype', )):
-        offset = len(additional_key_index) if additional_key_index else 0
-        argx_dictionary = {k: (sd.keys.index(k) + offset) for k in sd.keys}
-        for x, k in enumerate(additional_key_index):
-            argx_dictionary[k] = x
-        return argx_dictionary
 
 
 class ItemListSyncData(ItemListSyncDataProperties, ItemListSyncDataMethods):
@@ -181,9 +175,6 @@ class ItemListSyncData(ItemListSyncDataProperties, ItemListSyncDataMethods):
         except TypeError:  # No sort method
             return
 
-    def get_argx_dictionary(self):
-        return self.make_argx_dictionary(self.syncdata_getter)
-
 
 class ItemListSyncDataCollection(ItemListSyncData):
     """ Items in collection """
@@ -242,8 +233,8 @@ class ItemListSyncDataToWatch(ItemListSyncData):
         return sorted(self.syncdata_getter.items, key=lambda x: x['watchlist_listed_at'] or x['last_watched_at'], reverse=True)
 
     def get_items(self):
-        data = [(self.item_type, *i, ) for i in self.presorted_items]
-        return [self.make_item(i, self.argx_dictionary) for i in self.sort_data(data, self.syncdata_getter) if i]
+        data = [self.namedtuple_basic(i, self.item_type, ) for i in self.presorted_items]
+        return [self.make_item(i) for i in self.sort_data(data) if i]
 
 
 class ItemListSyncDataInProgress(ItemListSyncData):
@@ -258,28 +249,23 @@ class ItemListSyncDataInProgress(ItemListSyncData):
         return sorted(self.syncdata_getter.items, key=lambda x: x['last_watched_at'], reverse=True)
 
     def get_items(self):
-        data = [('show', *i, ) for i in self.presorted_items]
-        return [self.make_item(i, self.argx_dictionary) for i in self.sort_data(data, self.syncdata_getter) if i]
+        data = [self.namedtuple_basic(i, 'show', ) for i in self.presorted_items]
+        return [self.make_item(i) for i in self.sort_data(data) if i]
 
 
 class ItemListSyncDataNextUp(ItemListSyncData):
     """ Episodes next up to watch for all inprogress shows """
-
-    additional_key_index = ('mediatype', 'season_number', 'episode_number',)
 
     def get_syncdata_getter(self):
         sd = self.trakt_syncdata.get_all_unhidden_shows_nextepisode_getter()
         sd.additional_keys = self.additional_keys
         return sd
 
-    def get_argx_dictionary(self):
-        return self.make_argx_dictionary(self.syncdata_getter, additional_key_index=self.additional_key_index)
-
     def get_presorted_items(self):
         # configure items
-        data = [('episode', i['next_episode_id'].split('.')[2], i['next_episode_id'].split('.')[3], *i, ) for i in self.syncdata_getter.items]
-        data = [i for i in self.sort_data(data, self.syncdata_getter, argx_offset=len(self.additional_key_index)) if i]
-        with ParallelThread(data, self.make_item, self.argx_dictionary, detailed_item=self.detailed_item) as pt:
+        data = [self.namedtuple_episode(i, 'episode', i['next_episode_id'].split('.')[2], i['next_episode_id'].split('.')[3], ) for i in self.syncdata_getter.items]
+        data = [i for i in self.sort_data(data) if i]
+        with ParallelThread(data, self.make_item, detailed_item=self.detailed_item) as pt:
             item_queue = pt.queue
         return [i for i in item_queue if i]
 
@@ -306,24 +292,18 @@ class ItemListSyncDataNextUp(ItemListSyncData):
 class ItemListSyncDataUpNext(ItemListSyncData):
     """ Episodes Up Next for specific tmdb_id show """
 
-    additional_key_index = ('mediatype', 'season_number', 'episode_number',)
-
     def get_syncdata_getter(self):
         sd = self.trakt_syncdata.get_unhidden_show_episodes_upnext(self.tmdb_id)
         sd.additional_keys = self.additional_keys
         return sd
 
-    def get_argx_dictionary(self):
-        return self.make_argx_dictionary(self.syncdata_getter, additional_key_index=self.additional_key_index)
-
     def get_presorted_items(self):
         return [
-            ('episode', i['upnext_episode_id'].split('.')[2], i['upnext_episode_id'].split('.')[3], *i, )
+            self.namedtuple_episode(i, 'episode', i['upnext_episode_id'].split('.')[2], i['upnext_episode_id'].split('.')[3], )
             for i in self.syncdata_getter.items]
 
     def get_items(self):
-        data = self.sort_data(self.presorted_items, self.syncdata_getter, argx_offset=len(self.additional_key_index))
-        return [self.make_item(i, self.argx_dictionary) for i in data if i]
+        return [self.make_item(i) for i in self.sort_data(self.presorted_items) if i]
 
 
 def ItemListSyncDataFactory(sync_type, *args, **kwargs):
