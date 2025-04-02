@@ -103,12 +103,31 @@ class SyncEpisodeItemData:
         return self.item["episode_type"]
 
 
-class SyncShowSeasonEpisodesData:
+class SyncTraktAPI:
+    def delete_response(self, *args, **kwargs):
+        return self.class_instance_trakt_api.delete_response(*args, **kwargs)
+
+    def post_response(self, *args, **kwargs):
+        return self.class_instance_trakt_api.post_response(*args, **kwargs)
+
+    def get_response_json(self, *args, **kwargs):
+        return self.class_instance_trakt_api.get_response_json(*args, **kwargs)
+
+    def get_request_lc(self, *args, **kwargs):
+        return self.class_instance_trakt_api.get_request_lc(*args, **kwargs)
+
+    def get_id(self, *args, **kwargs):
+        return self.class_instance_trakt_api.get_id(*args, **kwargs)
+
+
+class SyncShowSeasonEpisodesData(SyncTraktAPI):
     def __init__(self, class_instance_sync_episodes_data, tmdb_id, slug, season):
-        self.class_instance_sync_episodes_data = class_instance_sync_episodes_data
         self.tmdb_id = tmdb_id
         self.slug = slug
         self.season = season
+        self.cache = class_instance_sync_episodes_data.cache
+        self.class_instance_trakt_api = class_instance_sync_episodes_data.class_instance_trakt_api
+        self.class_instance_sync_episodes_data = class_instance_sync_episodes_data
 
     @cached_property
     def season_number(self):
@@ -118,16 +137,14 @@ class SyncShowSeasonEpisodesData:
         episode_number = episode['number']
         if self.check_value(episode_number):  # Only get episodes we dont already have in cache
             return
-        return self.class_instance_sync_episodes_data.get_request_lc(
-            'shows', self.slug, 'seasons', self.season_number, 'episodes', episode_number, extended='full')
+        return self.get_response_json('shows', self.slug, 'seasons', self.season_number, 'episodes', episode_number, extended='full')
 
     @cached_property
     def season_episodes(self):
-        return self.class_instance_sync_episodes_data.get_request_lc('shows', self.slug, 'seasons', self.season_number)
+        return self.get_request_lc('shows', self.slug, 'seasons', self.season_number)
 
     def check_value(self, episode_number):
-        return self.class_instance_sync_episodes_data.cache.get_values(
-            self.get_name('tv', self.tmdb_id, self.season_number, episode_number), ('id', ))
+        return self.cache.get_values(self.get_name('tv', self.tmdb_id, self.season_number, episode_number), ('id', ))
 
     @cached_property
     def episodes(self):
@@ -139,20 +156,22 @@ class SyncShowSeasonEpisodesData:
         return data
 
 
-class SyncShowEpisodesData:
+class SyncShowEpisodesData(SyncTraktAPI):
     def __init__(self, class_instance_sync_episodes_data, tmdb_id):
-        self.class_instance_sync_episodes_data = class_instance_sync_episodes_data
         self.tmdb_id = tmdb_id
+        self.cache = class_instance_sync_episodes_data.cache
+        self.class_instance_trakt_api = class_instance_sync_episodes_data.class_instance_trakt_api
+        self.class_instance_sync_episodes_data = class_instance_sync_episodes_data
 
     @cached_property
     def slug(self):
-        return self.class_instance_sync_episodes_data.get_id(self.tmdb_id, 'tmdb', 'show', 'slug')
+        return self.get_id(self.tmdb_id, 'tmdb', 'show', 'slug')
 
     @cached_property
     def seasons(self):
         if not self.slug:
             return
-        return self.class_instance_sync_episodes_data.get_request_lc('shows', self.slug, 'seasons')
+        return self.get_request_lc('shows', self.slug, 'seasons')
 
     @cached_property
     def episodes(self):
@@ -170,27 +189,12 @@ class SyncShowEpisodesData:
         return self.episodes
 
 
-class SyncEpisodesData:
+class SyncEpisodesData(SyncTraktAPI):
 
     cache_filename = 'TraktEpisodes.db'
 
     def __init__(self, class_instance_trakt_api):
-        self._class_instance_trakt_api = class_instance_trakt_api  # The TraktAPI object sync called from
-
-    def delete_response(self, *args, **kwargs):
-        return self._class_instance_trakt_api.delete_response(*args, **kwargs)
-
-    def post_response(self, *args, **kwargs):
-        return self._class_instance_trakt_api.post_response(*args, **kwargs)
-
-    def get_response_json(self, *args, **kwargs):
-        return self._class_instance_trakt_api.get_response_json(*args, **kwargs)
-
-    def get_request_lc(self, *args, **kwargs):
-        return self._class_instance_trakt_api.get_request_lc(*args, **kwargs)
-
-    def get_id(self, *args, **kwargs):
-        return self._class_instance_trakt_api.get_id(*args, **kwargs)
+        self.class_instance_trakt_api = class_instance_trakt_api  # The TraktAPI object sync called from
 
     @cached_property
     def cache(self):
@@ -249,6 +253,6 @@ class SyncEpisodesData:
 
     def sync_func_single_episode(self, tmdb_id, season, episode):
         slug = self.get_id(tmdb_id, 'tmdb', 'show', 'slug')
-        item = self.get_request_lc('shows', slug, 'seasons', season, 'episodes', episode, extended='full')
+        item = self.get_response_json('shows', slug, 'seasons', season, 'episodes', episode, extended='full')
         data = SyncEpisodeItemData(item, tmdb_id)
         self.cache.set_many_values(self.keys, {data.item_id: [getattr(data, k) for k in self.keys]})

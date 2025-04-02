@@ -4,6 +4,9 @@ from tmdbhelper.lib.addon.tmdate import set_timestamp
 from tmdbhelper.lib.files.scache import SimpleCache
 
 
+DEFAULT_TABLE = 'simplecache'
+
+
 class SyncDataBase(SimpleCache):
 
     simplecache_columns = {
@@ -168,11 +171,10 @@ class SyncDataBase(SimpleCache):
         cur_time = set_timestamp(0, True)
         self.set_window_property(f'{self._sc_name}.clean.lastexecuted', str(cur_time))
 
-    def keys_are_valid(self, keys):
-        for k in keys:
-            if k not in self.simplecache_columns.keys():
-                return False
-        return True
+    def set_activity(self, item_type, method, value):
+        idx = f'{item_type}.{method}'
+        query = 'INSERT OR REPLACE INTO lactivities( id, data) VALUES (?, ?)'
+        return self._execute_sql(query, (idx, value, ))
 
     def get_activity(self, item_type, method):
         idx = f'{item_type}.{method}'
@@ -185,58 +187,69 @@ class SyncDataBase(SimpleCache):
             return
         return cache[0]
 
-    def get_list_values(self, conditions, values, keys):
-        if not self.keys_are_valid(keys):
+    def keys_are_valid(self, keys, table):
+        columns_keys = getattr(self, f'{table}_columns')
+        for k in keys:
+            if k not in columns_keys.keys():
+                return False
+        return True
+
+    def get_list_values(self, conditions, values, keys, table=DEFAULT_TABLE):
+        if not self.keys_are_valid(keys, table):
             return
-        query = 'SELECT {keys} FROM simplecache WHERE {conditions}'.format(
+        query = 'SELECT {keys} FROM {table} WHERE {conditions}'.format(
             keys=', '.join(keys),
-            conditions=conditions
+            table=table,
+            conditions=conditions,
         )
         cache = self._execute_sql(query, values, read_only=True)
         if not cache:
             return
         return cache.fetchall()
 
-    def get_values(self, idx, keys):
-        if not self.keys_are_valid(keys):
+    def get_values(self, idx, keys, table=DEFAULT_TABLE):
+        if not self.keys_are_valid(keys, table):
             return
-        query = 'SELECT {keys} FROM simplecache WHERE id=? LIMIT 1'.format(keys=', '.join(keys))
+        query = 'SELECT {keys} FROM {table} WHERE id=? LIMIT 1'.format(
+            keys=', '.join(keys),
+            table=table)
         cache = self._execute_sql(query, (idx, ), read_only=True)
         if not cache:
             return
         return cache.fetchone()
 
-    def set_activity(self, item_type, method, value):
-        idx = f'{item_type}.{method}'
-        query = 'INSERT OR REPLACE INTO lactivities( id, data) VALUES (?, ?)'
-        return self._execute_sql(query, (idx, value, ))
-
-    def set_values(self, idx, key_value_pairs):
+    def set_values(self, idx, key_value_pairs, table=DEFAULT_TABLE):
         keys, values = zip(*key_value_pairs)
-        if not self.keys_are_valid(keys):
+        if not self.keys_are_valid(keys, table):
             return
-        query = 'UPDATE simplecache SET {keys} WHERE id=?'.format(keys=', '.join([f'{k}=ifnull(?,{k})' for k in keys]))
-        self.create_item(idx)
+        query = 'UPDATE {table} SET {keys} WHERE id=?'.format(
+            keys=', '.join([f'{k}=ifnull(?,{k})' for k in keys]),
+            table=table)
+        self.create_item(idx, table)
         return self._execute_sql(query, (*values, idx, ))
 
-    def set_many_values(self, keys, data):
+    def set_many_values(self, keys, data, table=DEFAULT_TABLE):
         """ {idx: key_value_pairs} """
-        if not self.keys_are_valid(keys):
+        if not self.keys_are_valid(keys, table):
             return
-        query = 'UPDATE simplecache SET {keys} WHERE id=?'.format(keys=', '.join([f'{k}=ifnull(?,{k})' for k in keys]))
-        self.create_many_items([idx for idx in data.keys()])
+        query = 'UPDATE {table} SET {keys} WHERE id=?'.format(
+            keys=', '.join([f'{k}=ifnull(?,{k})' for k in keys]),
+            table=table)
+        self.create_many_items([idx for idx in data.keys()], table)
         return self._execute_sql(query, [(*values, idx, ) for idx, values in data.items()])
 
-    def del_column_values(self, keys, item_type):
-        query = 'UPDATE simplecache SET {keys} WHERE item_type=?'.format(keys=', '.join([f'{k}=NULL' for k in keys]))
+    def del_column_values(self, keys, item_type, table=DEFAULT_TABLE):
+        query = 'UPDATE {table} SET {keys} WHERE item_type=?'.format(
+            keys=', '.join([f'{k}=NULL' for k in keys]),
+            table=table)
         return self._execute_sql(query, (item_type, ))
 
-    def create_item(self, idx):
-        query = 'INSERT OR IGNORE INTO simplecache( id) VALUES (?)'
+    def create_item(self, idx, table=DEFAULT_TABLE):
+        query = 'INSERT OR IGNORE INTO {table}( id) VALUES (?)'.format(table=table)
         self._execute_sql(query, (idx,))
 
-    def create_many_items(self, items):
-        query = 'INSERT OR IGNORE INTO simplecache( id) VALUES (?)'
+    def create_many_items(self, items, table=DEFAULT_TABLE):
+        query = 'INSERT OR IGNORE INTO {table}( id) VALUES (?)'.format(table=table)
         self._execute_sql(query, [(idx,) for idx in items])
 
     def create_database_execute(self, connection):
