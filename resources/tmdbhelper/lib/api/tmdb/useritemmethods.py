@@ -42,16 +42,12 @@ class TMDbUserItemMethods():
         return response
 
     def check_item_status(self, route, tmdb_type, tmdb_id, *args, **kwargs):
-        path = self.format_authorised_path(f'account/{{account_id}}/{tmdb_type}/{route}')
-        for page in range(1, 20):
-            response = self.get_authorised_response_json(path, page=page)
-            if not response or not response.get('results'):
-                return False
-            if int(tmdb_id) in [int(i['id']) for i in response.get('results') if i and i.get('id')]:
-                return True
-            if response.get('total_pages') >= page:
-                return False
-        return False
+        response = self.get_authorised_response_json_v3(f'{tmdb_type}/{tmdb_id}/account_states')
+        if not response:
+            return False
+        if route not in response:
+            return False
+        return response[route]
 
     def check_list_item_status(self, list_id, tmdb_type, tmdb_id, *args, **kwargs):
         url_path = f'list/{list_id}/item_status'
