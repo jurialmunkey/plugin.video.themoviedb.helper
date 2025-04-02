@@ -93,6 +93,10 @@ def get_ratings(self, trakt_type, trakt_id, season=None, episode=None):
             return f'shows/{trakt_id}/seasons/{season}/ratings'
         return f'{trakt_type}s/{trakt_id}/ratings'
 
+    # Trakt Ratings now require Auth !!!
+    if not self.authorization:
+        return (None, None)
+
     response = self.get_request_sc(_get_url())
 
     trakt_rating, trakt_votes = None, None
