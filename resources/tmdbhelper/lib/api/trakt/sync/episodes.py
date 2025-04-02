@@ -204,7 +204,7 @@ class SyncEpisodesData:
         return f'{tmdb_type}.{tmdb_id}.{season}.{episode}'
 
     def get_values(self, tmdb_id, season, episode, keys=None):
-        self.sync(tmdb_id, season, episode)
+        self.sync_single_episode(tmdb_id, season, episode)
         return self.cache.get_values(self.get_name('tv', tmdb_id, season, episode), keys)
 
     def get_value(self, tmdb_id, season, episode, key=None):
@@ -225,10 +225,16 @@ class SyncEpisodesData:
         return wrapper
 
     @mutexlock
-    def sync(self, tmdb_id, season, episode):
+    def sync_single_episode(self, tmdb_id, season, episode):
         if self.cache.get_values(self.get_name('tv', tmdb_id, season, episode), ('id', )):
             return
         self.sync_func_single_episode(tmdb_id, season, episode)
+
+    @mutexlock
+    def sync_all_episodes(self, tmdb_id):
+        if self.cache.get_values(self.get_name('tv', tmdb_id, 1, 1), ('id', )):
+            return
+        self.sync_func_all_episodes(tmdb_id)
 
     def sync_func_single_episode(self, tmdb_id, season, episode):
         slug = self.get_id(tmdb_id, 'tmdb', 'show', 'slug')
