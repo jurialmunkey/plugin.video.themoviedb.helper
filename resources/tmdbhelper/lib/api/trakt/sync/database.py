@@ -1,13 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from tmdbhelper.lib.addon.tmdate import set_timestamp
-from tmdbhelper.lib.files.scache import SimpleCache
+from tmdbhelper.lib.files.scache import SimpleCacheRowFactory
 
 
 DEFAULT_TABLE = 'simplecache'
 
 
-class SyncDataBase(SimpleCache):
+class SyncDataBase(SimpleCacheRowFactory):
 
     simplecache_columns = {
         'item_type': {

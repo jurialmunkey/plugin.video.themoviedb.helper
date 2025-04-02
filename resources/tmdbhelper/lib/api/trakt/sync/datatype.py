@@ -255,30 +255,27 @@ class SyncAllNextEpisodes(DataTypeEpisodes):
         from tmdbhelper.lib.addon.logger import TimerFunc
 
         dpro = self.dialog_progress_bg
-        argx = {}
 
         def get_item(i, item_id):
             tmdb_type, tmdb_id, season_number, episode_number = item_id.split('.')
-            item = {"show": {"ids": {"tmdb": i[argx["tmdb_id"]], "slug": i[argx["slug"]]}}}
+            item = {"show": {"ids": {"tmdb": i["tmdb_id"], "slug": i["slug"]}}}
             item['upnext_episode_id'] = item_id
             item['type'] = 'episode'
             item['episode'] = {'season': season_number, 'number': episode_number}
             return item
 
         def get_items(i):
-            next_episodes = self.get_next_episodes(i[argx["tmdb_id"]], i[argx["slug"]])
+            next_episodes = self.get_next_episodes(i["tmdb_id"], i["slug"])
             dpro.increment()
             if not next_episodes:
-                dpro.set_message(f'Skip: {i[argx["tmdb_id"]]} {i[argx["slug"]]}')
+                dpro.set_message(f'Skip: {i["tmdb_id"]} {i["slug"]}')
                 return
-            dpro.set_message(f'Sync: {i[argx["tmdb_id"]]} {i[argx["slug"]]}')
+            dpro.set_message(f'Sync: {i["tmdb_id"]} {i["slug"]}')
             return [get_item(i, item_id) for item_id in next_episodes]
 
         with TimerFunc(f'Sync: {self.method} {self.item_type}', inline=True, log_threshold=0.001):
             sd = self._class_instance_syncdata.get_all_unhidden_shows_inprogress_getter()
             sd.additional_keys = ('slug', )
-            for k in sd.keys:
-                argx[k] = sd.keys.index(k)
             dpro.max_value = len(sd.items)
             with ParallelThread(sd.items, get_items) as pt:
                 item_queue = pt.queue
@@ -312,22 +309,19 @@ class SyncNextEpisodes(SyncAllNextEpisodes):
         from tmdbhelper.lib.addon.logger import TimerFunc
 
         dpro = self.dialog_progress_bg
-        argx = {}
 
         def get_item(i):
-            next_episode_id = self.get_next_episode(i[argx["tmdb_id"]], i[argx["slug"]])
+            next_episode_id = self.get_next_episode(i["tmdb_id"], i["slug"])
             dpro.increment()
             if not next_episode_id:
                 dpro.set_message(f'Skip: {next_episode_id}')
                 return
             dpro.set_message(f'Sync: {next_episode_id}')
-            return {"next_episode_id": next_episode_id, "show": {"ids": {"tmdb": i[argx["tmdb_id"]], "slug": i[argx["slug"]]}}}
+            return {"next_episode_id": next_episode_id, "show": {"ids": {"tmdb": i["tmdb_id"], "slug": i["slug"]}}}
 
         with TimerFunc(f'Sync: {self.method} {self.item_type}', inline=True, log_threshold=0.001):
             sd = self._class_instance_syncdata.get_all_unhidden_shows_inprogress_getter()
             sd.additional_keys = ('slug', )
-            for k in sd.keys:
-                argx[k] = sd.keys.index(k)
             dpro.max_value = len(sd.items)
             with ParallelThread(sd.items, get_item) as pt:
                 item_queue = pt.queue

@@ -239,9 +239,7 @@ class ItemListSyncDataToWatch(ItemListSyncData):
         return sd
 
     def get_presorted_items(self):
-        sort_x1 = self.syncdata_getter.keys.index('watchlist_listed_at')
-        sort_x2 = self.syncdata_getter.keys.index('last_watched_at')
-        return sorted(self.syncdata_getter.items, key=lambda x: x[sort_x1] or x[sort_x2], reverse=True)
+        return sorted(self.syncdata_getter.items, key=lambda x: x['watchlist_listed_at'] or x['last_watched_at'], reverse=True)
 
     def get_items(self):
         data = [(self.item_type, *i, ) for i in self.presorted_items]
@@ -257,8 +255,7 @@ class ItemListSyncDataInProgress(ItemListSyncData):
         return sd
 
     def get_presorted_items(self):
-        sort_x = self.syncdata_getter.keys.index('last_watched_at')
-        return sorted(self.syncdata_getter.items, key=lambda x: x[sort_x], reverse=True)
+        return sorted(self.syncdata_getter.items, key=lambda x: x['last_watched_at'], reverse=True)
 
     def get_items(self):
         data = [('show', *i, ) for i in self.presorted_items]
@@ -280,8 +277,7 @@ class ItemListSyncDataNextUp(ItemListSyncData):
 
     def get_presorted_items(self):
         # configure items
-        episode_id_x = self.syncdata_getter.keys.index('next_episode_id')
-        data = [('episode', i[episode_id_x].split('.')[2], i[episode_id_x].split('.')[3], *i, ) for i in self.syncdata_getter.items]
+        data = [('episode', i['next_episode_id'].split('.')[2], i['next_episode_id'].split('.')[3], *i, ) for i in self.syncdata_getter.items]
         data = [i for i in self.sort_data(data, self.syncdata_getter, argx_offset=len(self.additional_key_index)) if i]
         with ParallelThread(data, self.make_item, self.argx_dictionary, detailed_item=self.detailed_item) as pt:
             item_queue = pt.queue
@@ -321,8 +317,9 @@ class ItemListSyncDataUpNext(ItemListSyncData):
         return self.make_argx_dictionary(self.syncdata_getter, additional_key_index=self.additional_key_index)
 
     def get_presorted_items(self):
-        episode_id_x = self.syncdata_getter.keys.index('upnext_episode_id')
-        return [('episode', i[episode_id_x].split('.')[2], i[episode_id_x].split('.')[3], *i, ) for i in self.syncdata_getter.items]
+        return [
+            ('episode', i['upnext_episode_id'].split('.')[2], i['upnext_episode_id'].split('.')[3], *i, )
+            for i in self.syncdata_getter.items]
 
     def get_items(self):
         data = self.sort_data(self.presorted_items, self.syncdata_getter, argx_offset=len(self.additional_key_index))

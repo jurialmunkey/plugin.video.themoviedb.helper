@@ -13,3 +13,7 @@ class SimpleCache(jurialmunkey.scache.SimpleCache):
     @staticmethod
     def kodi_log(msg, level=0):
         kodi_log(msg, level)
+
+
+class SimpleCacheRowFactory(SimpleCache):
+    _row_factory = True
