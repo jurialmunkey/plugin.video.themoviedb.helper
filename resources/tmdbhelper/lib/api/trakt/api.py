@@ -44,6 +44,20 @@ class TraktSync:
         return SyncData(self)
 
 
+    @property
+    def trakt_episodedata(self):
+        try:
+            return self._trakt_episodedata
+        except AttributeError:
+            self._trakt_episodedata = self.get_trakt_episodedata()
+            return self._trakt_episodedata
+
+    @is_authorized
+    def get_trakt_episodedata(self):
+        from tmdbhelper.lib.api.trakt.sync.episodes import SyncEpisodesData
+        return SyncEpisodesData(self)
+
+
 class TraktAPI(RequestAPI, TraktContent, TraktSync):
 
     client_id = CLIENT_ID

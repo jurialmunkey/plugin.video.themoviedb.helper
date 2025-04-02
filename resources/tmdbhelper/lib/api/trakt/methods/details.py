@@ -75,14 +75,6 @@ def get_showitem_details(self, i):
     return {'show': show, 'episode': self.get_details('show', slug, season=snum, episode=enum) or i_ep}
 
 
-def get_episode_type(self, trakt_id=None, season=None, episode=None):
-    if not trakt_id or not episode or not season:
-        return
-    from contextlib import suppress
-    with suppress(KeyError, TypeError):
-        return self.get_details('show', trakt_id, season=season, episode=episode)['episode_type']
-
-
 def get_ratings(self, trakt_type, trakt_id, season=None, episode=None):
     from contextlib import suppress
 

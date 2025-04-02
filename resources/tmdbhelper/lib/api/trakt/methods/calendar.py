@@ -50,8 +50,6 @@ def get_calendar_episode_item(i):
 
     days_to_air, is_aired = get_days_to_air(air_date)
     item['infoproperties']['days_from_aired' if is_aired else 'days_until_aired'] = str(days_to_air)
-
-    item['infoproperties']['episode_type'] = epsd.get('episode_type')
     item['unique_ids'] = {f'tvshow.{k}': v for k, v in sids.items()}
     item['params'] = {
         'info': 'details',

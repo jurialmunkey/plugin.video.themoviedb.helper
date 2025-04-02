@@ -12,6 +12,13 @@ REGEX_WINPROP_FINDALL = r'\$WINPROP\[(.*?)\]'  # $WINPROP[key] = Window(10000).g
 REGEX_WINPROP_SUB = r'\$WINPROP\[{}\]'
 
 
+def test_func():
+    from tmdbhelper.lib.api.trakt.api import TraktAPI
+    data = TraktAPI().trakt_episodedata.get_value(1399, 1, 1, key='episode_type')
+    import xbmcgui
+    xbmcgui.Dialog().ok('TEST', f'{data}')
+
+
 class Script(object):
     def __init__(self, *args):
         self.params = {}
@@ -30,6 +37,9 @@ class Script(object):
         self.params = reconfigure_legacy_params(**self.params)
 
     routing_table = {
+        'test_func':
+            lambda **kwargs: test_func(),
+
         # Node Maker
         'make_node':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.make_node', 'make_node')(**kwargs),

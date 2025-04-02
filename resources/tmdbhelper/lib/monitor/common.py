@@ -39,7 +39,7 @@ SETPROP_RATINGS = {
     'mtv_awards_won', 'criticschoice_awards_won', 'emmy_awards_won', 'sag_awards_won', 'bafta_awards_won',
     'total_awards_nominated', 'awards_nominated', 'awards_nominated_cr', 'academy_awards_nominated',
     'goldenglobe_awards_nominated', 'mtv_awards_nominated', 'criticschoice_awards_nominated',
-    'emmy_awards_nominated', 'sag_awards_nominated', 'bafta_awards_nominated', 'status', 'episode_type',
+    'emmy_awards_nominated', 'sag_awards_nominated', 'bafta_awards_nominated', 'status',
     'next_aired', 'next_aired.long', 'next_aired.short', 'next_aired.day', 'next_aired.day_short', 'next_aired.year', 'next_aired.episode',
     'next_aired.name', 'next_aired.tmdb_id', 'next_aired.plot', 'next_aired.season', 'next_aired.rating', 'next_aired.votes', 'next_aired.thumb',
     'next_aired.original', 'next_aired.days_from_aired', 'next_aired.days_until_aired', 'next_aired.original', 'next_aired.custom',
@@ -103,18 +103,6 @@ class CommonMonitorDetails(CommonContainerAPIs):
     @kodi_try_except('lib.monitor.common get_tmdb_id_parent')
     def get_tmdb_id_parent(self, tmdb_id, trakt_type, season_episode_check=None):
         return self.trakt_api.get_id(tmdb_id, 'tmdb', trakt_type, output_type='tmdb', output_trakt_type='show', season_episode_check=season_episode_check)
-
-    def get_trakt_episode_type(self, item, season=None, episode=None):
-        from contextlib import suppress
-        with suppress(KeyError, TypeError):
-            trakt_id = None
-            trakt_id = item['unique_ids'].get('tvshow.trakt') \
-                or item['unique_ids'].get('tvshow.slug') \
-                or item['unique_ids'].get('tvshow.imdb')
-        episode_type = self.trakt_api.get_episode_type(trakt_id, season, episode)
-        if episode_type:
-            item['infoproperties']['episode_type'] = episode_type
-        return item
 
     def get_trakt_ratings(self, item, trakt_type, season=None, episode=None):
         from contextlib import suppress
@@ -202,7 +190,6 @@ class CommonMonitorDetails(CommonContainerAPIs):
         item = self.get_omdb_ratings(item)
         item = self.get_imdb_top250_rank(item, trakt_type=trakt_type)
         item = self.get_trakt_ratings(item, trakt_type, season=season, episode=episode)
-        item = self.get_trakt_episode_type(item, season=season, episode=episode)
         item = self.get_tvdb_awards(item, tmdb_type, tmdb_id)
         item = self.get_mdblist_ratings(item, trakt_type, tmdb_id)
         item = self.get_nextaired(item, tmdb_type, tmdb_id)

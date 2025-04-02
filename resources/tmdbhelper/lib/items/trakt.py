@@ -1,8 +1,12 @@
+from functools import cached_property
+
+
 class TraktPlayData():
-    def __init__(self, pauseplayprogress=False, watchedindicators=False, unwatchedepisodes=False):
+    def __init__(self, pauseplayprogress=False, watchedindicators=False, unwatchedepisodes=False, traktepisodetypes=True):
         self._pauseplayprogress = pauseplayprogress  # Set play progress using paused at position
         self._watchedindicators = watchedindicators  # Set watched status and playcount
         self._unwatchedepisodes = unwatchedepisodes  # Set unwatched episode count to total episode count for unwatched tvshows (if false)
+        self._traktepisodetypes = traktepisodetypes  # Set episode_type property for episodes
 
     def is_sync(func):
         def wrapper(self, *args, **kwargs):
@@ -11,23 +15,20 @@ class TraktPlayData():
             return func(self, *args, **kwargs)
         return wrapper
 
-    @property
+    @cached_property
     def trakt_api(self):
-        try:
-            return self._trakt_api
-        except AttributeError:
-            from tmdbhelper.lib.api.trakt.api import TraktAPI
-            self._trakt_api = TraktAPI()
-            self._trakt_api.attempted_login = True  # Avoid asking for authorization
-            return self._trakt_api
+        from tmdbhelper.lib.api.trakt.api import TraktAPI
+        api = TraktAPI()
+        api.attempted_login = True  # Avoid asking for authorization
+        return api
 
-    @property
+    @cached_property
     def trakt_syncdata(self):
-        try:
-            return self._trakt_syncdata
-        except AttributeError:
-            self._trakt_syncdata = self.trakt_api.trakt_syncdata
-            return self._trakt_syncdata
+        return self.trakt_api.trakt_syncdata
+
+    @cached_property
+    def trakt_episodedata(self):
+        return self.trakt_api.trakt_episodedata
 
     @is_sync
     def pre_sync(self, info=None, tmdb_id=None, tmdb_type=None, season=None, **kwargs):
@@ -57,6 +58,22 @@ class TraktPlayData():
             self._pre_sync.join()
         except AttributeError:
             return
+
+    @is_sync
+    def set_episode_type(self, li):
+        if not self._traktepisodetypes:
+            return
+        if li.infolabels.get('mediatype') != 'episode':
+            return
+        tmdb = li.tmdb_id
+        snum = li.season
+        enum = li.episode
+        if not tmdb or not snum or not enum:
+            return
+        episode_type = self.trakt_episodedata.get_value(tmdb, snum, enum, key='episode_type')
+        if not episode_type:
+            return
+        li.infoproperties['episode_type'] = episode_type
 
     @is_sync
     def set_playprogress(self, li):

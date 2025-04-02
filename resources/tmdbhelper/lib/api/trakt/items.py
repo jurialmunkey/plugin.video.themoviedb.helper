@@ -121,14 +121,7 @@ def _get_item_infoproperties(item, item_type=None, infoproperties=None, show=Non
                 continue
             infoproperties[f'trakt_{k}'] = f'{v}'
 
-    def _set_episode_infoproperties():
-        if item_type != 'episode':
-            return
-        infoproperties[f'episode_type'] = item.get('episode_type')
-
     _set_main_infoproperties()
-    _set_episode_infoproperties()
-
     return del_empty_keys(infoproperties)
 
 

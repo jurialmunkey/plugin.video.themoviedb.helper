@@ -146,7 +146,7 @@ class ItemListSyncData(ItemListSyncDataProperties, ItemListSyncDataMethods):
         self.sort_by, self.sort_how = sort_by, sort_how
         self.item_keys = item_keys or ()
         self.item_type = item_type
-        self.tmdb_type = tmdb_id
+        self.tmdb_id = tmdb_id
 
     def get_sort_method(self):
         try:

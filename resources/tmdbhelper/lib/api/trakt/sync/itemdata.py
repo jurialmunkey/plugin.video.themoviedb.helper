@@ -3,7 +3,12 @@
 from functools import cached_property
 
 
-class SyncItemDataAttributes:
+class SyncItemData:
+
+    def __init__(self, item, item_type):
+        self.item = item
+        self.item_type = item_type
+
     """
     season_number
     """
@@ -201,16 +206,6 @@ class SyncItemDataAttributes:
 
     def get_notes(self):
         return self.item.get('notes')
-
-    """
-    episode_type
-    """
-    @cached_property
-    def episode_type(self):
-        return self.get_episode_type()
-
-    def get_episode_type(self):
-        return self.item.get('episode_type')
 
     """
     id
@@ -413,13 +408,6 @@ class SyncItemDataAttributes:
             return self.item['movie'].get('votes')
 
 
-class SyncItemData(SyncItemDataAttributes):
-
-    def __init__(self, item, item_type):
-        self.item = item
-        self.item_type = item_type
-
-
 class SyncItem:
 
     _additional_keys = (
@@ -529,3 +517,4 @@ class SyncItem:
             data[item_data.item_id] = [getattr(item_data, k) for k in self.keys]
 
         return data
+

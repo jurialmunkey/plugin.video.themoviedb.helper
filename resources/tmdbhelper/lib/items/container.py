@@ -257,6 +257,7 @@ class Container(CommonContainerAPIs):
                 li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb to prevent Kodi overwriting
             if li.next_page:
                 li.params['plugin_category'] = self.plugin_category  # Carry the plugin category to next page in plugin:// path
+            self.trakt_playdata.set_episode_type(li)
             self.trakt_playdata.set_playprogress(li)
             return li
 
