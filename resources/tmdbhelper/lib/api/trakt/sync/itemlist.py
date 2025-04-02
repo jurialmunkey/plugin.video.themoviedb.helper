@@ -48,20 +48,8 @@ class ItemListSyncDataProperties:
         return self._class_instance_trakt_api.trakt_syncdata
 
     @property
-    def sort_by(self):
-        return self._sort_by
-
-    @property
-    def sort_how(self):
-        return self._sort_how
-
-    @property
-    def tmdb_id(self):
-        return self._tmdb_id
-
-    @property
     def detailed_item(self):
-        if self._item_type != 'episode':
+        if self.item_type != 'episode':
             return False
         if self.sort_by not in ('airdate', 'todays', 'lastweek', ):
             return False
@@ -69,9 +57,9 @@ class ItemListSyncDataProperties:
 
     @property
     def item_types(self):
-        if self._item_type == 'both':
+        if self.item_type == 'both':
             return ('movie', 'show', )
-        return (self._item_type, )
+        return (self.item_type, )
 
 
 class ItemListSyncDataMethods:
@@ -121,7 +109,7 @@ class ItemListSyncDataMethods:
             item['season'] = i[argx_dictionary['season_number']]
         if i[argx_dictionary['mediatype']] == 'episode':
             item['episode'] = i[argx_dictionary['episode_number']]
-        for k in (self._item_keys or ()):
+        for k in (self.item_keys or ()):
             item.setdefault('infoproperties', {})[k] = i[argx_dictionary[k]]
         if detailed_item:
             item = self.make_detailed_item(item)
@@ -155,10 +143,10 @@ class ItemListSyncData(ItemListSyncDataProperties, ItemListSyncDataMethods):
 
     def __init__(self, class_instance_trakt_api, item_type=None, sort_by=None, sort_how=None, item_keys=None, tmdb_id=None):
         self._class_instance_trakt_api = class_instance_trakt_api
-        self._sort_by, self._sort_how = sort_by, sort_how
-        self._item_keys = item_keys or ()
-        self._item_type = item_type
-        self._tmdb_id = tmdb_id
+        self.sort_by, self.sort_how = sort_by, sort_how
+        self.item_keys = item_keys or ()
+        self.item_type = item_type
+        self.tmdb_type = tmdb_id
 
     def get_sort_method(self):
         try:
@@ -174,7 +162,7 @@ class ItemListSyncData(ItemListSyncDataProperties, ItemListSyncDataMethods):
 
     def get_additional_keys(self):
         try:
-            return (self.sort_method[0], *self._item_keys)
+            return (self.sort_method[0], *self.item_keys)
         except TypeError:  # No sort method
             return
 
@@ -243,11 +231,11 @@ class ItemListSyncDataToWatch(ItemListSyncData):
     """ Mix of watchlist and inprogress items """
 
     def get_syncdata_getter(self):
-        if self._item_type == 'movie':
+        if self.item_type == 'movie':
             sd = self.trakt_syncdata.get_all_unhidden_movies_towatch_getter()
         else:
             sd = self.trakt_syncdata.get_all_unhidden_shows_towatch_getter()
-        sd.additional_keys = ('last_watched_at', *self._item_keys, )
+        sd.additional_keys = ('last_watched_at', *self.item_keys, )
         return sd
 
     def get_presorted_items(self):
@@ -256,7 +244,7 @@ class ItemListSyncDataToWatch(ItemListSyncData):
         return sorted(self.syncdata_getter.items, key=lambda x: x[sort_x1] or x[sort_x2], reverse=True)
 
     def get_items(self):
-        data = [(self._item_type, *i, ) for i in self.presorted_items]
+        data = [(self.item_type, *i, ) for i in self.presorted_items]
         return [self.make_item(i, self.argx_dictionary) for i in self.sort_data(data, self.syncdata_getter) if i]
 
 
