@@ -5,6 +5,12 @@ from tmdbhelper.lib.items.database.database import ItemDetailsDataBaseCache
 from tmdbhelper.lib.api.mapping import _ItemMapper
 
 
+def split_array(items, dictionary=None, **kwargs):
+    if not items or not isinstance(items, list):
+        return ()
+    return [{k: i.get(v) for k, v in kwargs.items()} for i in items]
+
+
 class BlankNoneDict(dict):
     def __missing__(self, key):
         return None
@@ -12,7 +18,8 @@ class BlankNoneDict(dict):
 
 def get_empty_item():
     return {
-        'simplecache': BlankNoneDict()
+        'simplecache': BlankNoneDict(),
+        'genre': (),
     }
 
 
@@ -39,6 +46,11 @@ class ItemMapper(_ItemMapper):
                 'keys': [('simplecache', 'year')],
                 'func': lambda v: int(v[0:4])
             }],
+            'genres': [{
+                'keys': [('genre', None)],
+                'func': split_array,
+                'kwargs': {'name': 'name', 'tmdb_id': 'id'}
+            }],
         }
         self.standard_map = {
             'id': ('simplecache', 'tmdb_id'),
@@ -58,24 +70,46 @@ class ItemMapper(_ItemMapper):
         return item
 
 
-class TMDbItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
-    table = 'simplecache'  # Table in database
+class DetailsDataBaseCache(ItemDetailsDataBaseCache):
     conditions = 'id=?'  # WHERE conditions
+    table = ''
+    keys = ()
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, )
+
+    def configure_mapped_data(self, data):
+        return {self.item_id: [data[self.table][k] for k in self.keys]}
+
+    def configure_mapped_data_list(self, data):
+        return {self.get_item_uid(i): [self.item_id if k == 'parent_id' else i[k] for k in self.keys] for i in data[self.table]}
+
+
+class GenreDetailsDataBaseCache(DetailsDataBaseCache):
+    table = 'genre'
+    keys = ('name', 'tmdb_id', 'parent_id', )
+
+    def get_item_uid(self, i):
+        return f'{self.item_id}.genre.{i["tmdb_id"]}'
+
+    def get_cached_data(self):
+        return self.cache.get_list_values(self.conditions, self.values, self.keys, self.table)
+
+    def set_cached_data(self, online_data_mapped):
+        data = self.configure_mapped_data_list(online_data_mapped)
+        self.set_cached_many(self.keys, self.table, data)
+        return self.get_cached_data()
+
+
+class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
+    table = 'simplecache'  # Table in database
     keys = (
         'mediatype', 'tmdb_id', 'season', 'episode', 'year', 'mpaa', 'plot', 'title',
         'originaltitle', 'duration', 'tagline', 'tvshowtitle', 'status', 'premiered', 'collection', 'trailer',
     )  # Keys to lookup
     online_data_kwgs = {}  # KWGS for online_data_func
     data_cond = True  # Condition to retrieve any data
-
-    @cached_property
-    def tmdb_api(self):
-        from tmdbhelper.lib.api.tmdb.api import TMDbAPI
-        return TMDbAPI()
-
-    @cached_property
-    def item_mapper(self):
-        return ItemMapper()
 
     @cached_property
     def tmdb_type(self):
@@ -85,6 +119,19 @@ class TMDbItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
             return 'tv'
 
     @property
+    def item_id(self):
+        return self.get_base_id(self.tmdb_type, self.tmdb_id)
+
+    @cached_property
+    def item_mapper(self):
+        return ItemMapper()
+
+    @cached_property
+    def tmdb_api(self):
+        from tmdbhelper.lib.api.tmdb.api import TMDbAPI
+        return TMDbAPI()
+
+    @property
     def online_data_func(self):  # The function to get data e.g. get_response_json
         return self.tmdb_api.get_request_sc
 
@@ -92,18 +139,42 @@ class TMDbItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
     def online_data_args(self):
         return (self.tmdb_type, self.tmdb_id, )
 
-    @property
-    def item_id(self):
-        return self.get_base_id(self.tmdb_type, self.tmdb_id)
-
-    @property
-    def values(self):  # WHERE conditions values for ?
-        return (self.item_id, )
-
-    def get_online_data(self):
+    @cached_property
+    def online_data_mapped(self):
         """ function called when local cache does not have any data """
         if not self.online_data:
             return
         data = self.item_mapper.get_info(self.online_data)
         data['simplecache']['mediatype'] = self.mediatype
-        return {self.item_id: [data[self.table][k] for k in self.keys]}
+        return data
+
+    def get_db_cache(self, database_class):
+        dbc = database_class()
+        dbc.cache = self.cache
+        dbc.mediatype = self.mediatype
+        dbc.item_id = self.item_id
+        return dbc
+
+    @cached_property
+    def db_genre_cache(self):
+        return self.get_db_cache(GenreDetailsDataBaseCache)
+
+    def get_cached_data(self):
+        data = self.cache.get_list_values(self.conditions, self.values, self.keys, self.table)
+        if not data:
+            return
+        # TODO: ADD OTHER CACHE METHODS AND JOIN
+        return data
+
+    def set_cached_data(self):
+        if not self.online_data_mapped:
+            return
+        self.set_cached_many(self.keys, self.table, self.configure_mapped_data(self.online_data_mapped))
+        self.db_genre_cache.set_cached_data(self.online_data_mapped)
+        return self.get_cached_data()
+
+    @cached_property
+    def data(self):
+        if not self.data_cond:
+            return
+        return self.get_cached_data() or self.set_cached_data()

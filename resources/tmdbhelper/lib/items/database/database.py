@@ -217,7 +217,7 @@ class ItemDetailsDataBase(DataBase):
 
     genre_columns = {
         'id': {
-            'data': 'TEXT',
+            'data': 'TEXT UNIQUE',
             'sync': None
         },
         'name': {
@@ -228,7 +228,11 @@ class ItemDetailsDataBase(DataBase):
             'data': 'INTEGER',
             'sync': None
         },
-        'FOREIGN KEY(id)': {
+        'parent_id': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'FOREIGN KEY(parent_id)': {
             'data': 'REFERENCES simplecache(id)',
             'sync': None
         }
@@ -236,7 +240,7 @@ class ItemDetailsDataBase(DataBase):
 
     country_columns = {
         'id': {
-            'data': 'TEXT',
+            'data': 'TEXT UNIQUE',
             'sync': None
         },
         'name': {
@@ -247,7 +251,11 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'FOREIGN KEY(id)': {
+        'parent_id': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'FOREIGN KEY(parent_id)': {
             'data': 'REFERENCES simplecache(id)',
             'sync': None
         }
@@ -255,7 +263,7 @@ class ItemDetailsDataBase(DataBase):
 
     studio_columns = {
         'id': {
-            'data': 'TEXT',
+            'data': 'TEXT UNIQUE',
             'sync': None
         },
         'name': {
@@ -274,7 +282,11 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'FOREIGN KEY(id)': {
+        'parent_id': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'FOREIGN KEY(parent_id)': {
             'data': 'REFERENCES simplecache(id)',
             'sync': None
         }
@@ -282,7 +294,7 @@ class ItemDetailsDataBase(DataBase):
 
     crew_columns = {
         'id': {
-            'data': 'TEXT',
+            'data': 'TEXT UNIQUE',
             'sync': None
         },
         'name': {
@@ -309,7 +321,11 @@ class ItemDetailsDataBase(DataBase):
             'data': 'INTEGER',
             'sync': None
         },
-        'FOREIGN KEY(id)': {
+        'parent_id': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'FOREIGN KEY(parent_id)': {
             'data': 'REFERENCES simplecache(id)',
             'sync': None
         }
@@ -317,7 +333,7 @@ class ItemDetailsDataBase(DataBase):
 
     cast_columns = {
         'id': {
-            'data': 'TEXT',
+            'data': 'TEXT UNIQUE',
             'sync': None
         },
         'name': {
@@ -340,7 +356,11 @@ class ItemDetailsDataBase(DataBase):
             'data': 'INTEGER',
             'sync': None
         },
-        'FOREIGN KEY(id)': {
+        'parent_id': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'FOREIGN KEY(parent_id)': {
             'data': 'REFERENCES simplecache(id)',
             'sync': None
         }
@@ -348,7 +368,7 @@ class ItemDetailsDataBase(DataBase):
 
     custom_columns = {
         'id': {
-            'data': 'TEXT',
+            'data': 'TEXT UNIQUE',
             'sync': None
         },
         'key': {
@@ -359,7 +379,11 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'FOREIGN KEY(id)': {
+        'parent_id': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'FOREIGN KEY(parent_id)': {
             'data': 'REFERENCES simplecache(id)',
             'sync': None
         }
@@ -367,7 +391,7 @@ class ItemDetailsDataBase(DataBase):
 
     artwork_columns = {
         'id': {
-            'data': 'TEXT',
+            'data': 'TEXT UNIQUE',
             'sync': None
         },
         'key': {
@@ -378,7 +402,11 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'FOREIGN KEY(id)': {
+        'parent_id': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'FOREIGN KEY(parent_id)': {
             'data': 'REFERENCES simplecache(id)',
             'sync': None
         }
@@ -386,7 +414,7 @@ class ItemDetailsDataBase(DataBase):
 
     unique_id_columns = {
         'id': {
-            'data': 'TEXT',
+            'data': 'TEXT UNIQUE',
             'sync': None
         },
         'key': {
@@ -397,7 +425,11 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'FOREIGN KEY(id)': {
+        'parent_id': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'FOREIGN KEY(parent_id)': {
             'data': 'REFERENCES simplecache(id)',
             'sync': None
         }
