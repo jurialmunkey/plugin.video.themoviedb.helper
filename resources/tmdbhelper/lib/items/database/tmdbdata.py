@@ -177,7 +177,10 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
         # WHERE
         conditions = f'{self.table}.id=?'
 
-        return self.cache.get_list_values(conditions, self.values, keys, table)
+        # WHERE condition ? ? ? ? = value, value, value, value
+        values = (self.item_id, )
+
+        return self.cache.get_list_values(conditions, values, keys, table)
 
     def set_cached_data(self):
         if not self.online_data_mapped:
