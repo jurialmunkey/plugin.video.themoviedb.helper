@@ -108,9 +108,9 @@ class ItemListSyncDataMethods:
     def make_item(self, i, detailed_item=False):
         item = {'id': i.item['tmdb_id'], 'mediatype': i.mediatype, 'title': i.item['title']}
         if i.mediatype in ('season', 'episode', ):
-            item['season'] = i.season_number
+            item['season'] = i.season_number if 'season_number' in i._fields else i.item['season_number']
         if i.mediatype == 'episode':
-            item['episode'] = i.episode_number
+            item['episode'] = i.episode_number if 'episode_number' in i._fields else i.item['episode_number']
         for k in (self.item_keys or ()):
             item.setdefault('infoproperties', {})[k] = i.item[k]
         if detailed_item:
