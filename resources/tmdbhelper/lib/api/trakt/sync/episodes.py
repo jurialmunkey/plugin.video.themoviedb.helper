@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from functools import cached_property
+from tmdbhelper.lib.files.database import DataBaseCache
 from tmdbhelper.lib.api.trakt.sync.database import SyncDataBase
 from tmdbhelper.lib.addon.thread import ParallelThread
 from jurialmunkey.locker import MutexPropLock
@@ -114,7 +115,7 @@ class SyncEpisodes(SyncDataBase):
 class SyncTraktAPIData:
 
     table = None  # Table in database
-    conditions = ()  # WHERE conditions
+    conditions = ''  # WHERE conditions
     values = ()  # WHERE conditions values for ?
     keys = ()  # Keys to lookup
     online_data_args = ()  # ARGS for get_response_json
@@ -149,7 +150,7 @@ class SyncTraktAPIData:
 class SyncTraktAPISeasonsData(SyncTraktAPIData):
 
     table = 'seasons'
-    conditions = ('slug=?',)
+    conditions = 'slug=?'
     keys = ('tmdb_id', 'season_number', 'slug', )
 
     def __init__(self, ci_synctraktapi, tmdb_id):
@@ -184,7 +185,7 @@ class SyncTraktAPISeasonsData(SyncTraktAPIData):
 class SyncTraktAPISeasonEpisodesData(SyncTraktAPISeasonsData):
 
     table = 'episodes'
-    conditions = ('slug=?', 'season_number=?', )
+    conditions = 'slug=? AND season_number=?'
     keys = ('tmdb_id', 'season_number', 'episode_number', 'slug', )
 
     def __init__(self, ci_synctraktapi, tmdb_id, season_number):
@@ -209,7 +210,7 @@ class SyncTraktAPISeasonEpisodesData(SyncTraktAPISeasonsData):
         return {self.get_item_id(i['number']): (self.tmdb_id, self.season_number, i['number'], self.slug, ) for i in self.online_data}
 
 
-class SyncTraktAPI:
+class SyncTraktAPI(DataBaseCache):
     def delete_response(self, *args, **kwargs):
         return self.class_instance_trakt_api.delete_response(*args, **kwargs)
 
@@ -229,35 +230,6 @@ class SyncTraktAPI:
         return self.use_cached(
             f'tv.{tmdb_id}', 'slug', 'slugs',
             self.get_id, tmdb_id, 'tmdb', 'show', 'slug')
-
-    def get_cached(self, item_id, key, table):
-        data = self.cache.get_values(item_id, keys=(key, ), table=table)
-        return data[0] if data else None
-
-    def set_cached(self, item_id, key, table, data):
-        if not data:
-            return
-        key_value_pair = (key, data,)
-        self.cache.set_values(item_id, key_value_pairs=(key_value_pair, ), table=table)
-        return data
-
-    def use_cached(self, item_id, key, table, func, *args, **kwargs):
-        data = self.get_cached(item_id, key, table)
-        if not data:
-            data = self.set_cached(item_id, key, table, func(*args, **kwargs))
-        return data
-
-    def set_cached_many(self, keys, table, data):
-        if not data:
-            return
-        self.cache.set_many_values(keys=keys, data=data, table=table)
-        return [v for _, v in data.items()]
-
-    def use_cached_many(self, conditions, values, keys, table, func, *args, **kwargs):
-        data = self.cache.get_list_values(conditions, values, keys, table)
-        if not data:
-            data = self.set_cached_many(keys, table, func(*args, **kwargs))
-        return data
 
     def get_seasons_data(self, tmdb_id, slug=None):
         sync = SyncTraktAPISeasonsData(self, tmdb_id)

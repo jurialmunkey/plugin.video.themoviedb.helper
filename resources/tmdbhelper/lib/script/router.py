@@ -13,9 +13,12 @@ REGEX_WINPROP_SUB = r'\$WINPROP\[{}\]'
 
 
 def test_func():
-    from tmdbhelper.lib.api.trakt.api import TraktAPI
-    data = TraktAPI().trakt_episodedata.sync_all_episodes(1396)
+    from tmdbhelper.lib.items.database.tmdbdata import TMDbItemDetailsDataBaseCache
+    sync = TMDbItemDetailsDataBaseCache()
+    sync.tmdb_id = 348
+    sync.mediatype = 'movie'
     import xbmcgui
+    data = {k: i[k] for i in sync.data for k in i.keys()}
     xbmcgui.Dialog().textviewer('TEST', f'{data}')
 
 

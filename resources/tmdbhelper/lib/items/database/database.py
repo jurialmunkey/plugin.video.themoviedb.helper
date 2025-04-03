@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from tmdbhelper.lib.files.database import DataBase
+from functools import cached_property
+from tmdbhelper.lib.files.database import DataBaseCache, DataBase
 
 
 class ItemDetailsDataBase(DataBase):
@@ -38,10 +39,6 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'plotoutline': {
-            'data': 'TEXT',
-            'sync': None
-        },
         'title': {
             'data': 'TEXT',
             'sync': None
@@ -70,7 +67,7 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'set': {
+        'collection': {
             'data': 'TEXT',
             'sync': None
         },
@@ -246,8 +243,8 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'tmdb_id': {
-            'data': 'INTEGER',
+        'iso': {
+            'data': 'TEXT',
             'sync': None
         },
         'FOREIGN KEY(id)': {
@@ -425,6 +422,7 @@ class ItemDetailsDataBase(DataBase):
     def database_tables(self):
         return {
             'simplecache': self.simplecache_columns,
+            'lactivities': self.lactivities_columns,
             'ratings_awards': self.ratings_awards_columns,
             'kodi_db_ids': self.kodi_db_ids_columns,
             'genre': self.genre_columns,
@@ -440,6 +438,65 @@ class ItemDetailsDataBase(DataBase):
 
     def create_database_execute(self, connection):
         for table, columns in self.database_tables.items():
-            query = 'CREATE TABLE IF NOT EXISTS {table}({data})'
-            query = query.format(table=table, data=', '.join([f'{k} {v["data"]}' for k, v in columns.items()]))
+            query = 'CREATE TABLE IF NOT EXISTS {}({})'
+            query = query.format(table, ', '.join([f'{k} {v["data"]}' for k, v in columns.items()]))
             connection.execute(query)
+
+
+class ItemDetailsDataBaseCache(DataBaseCache):
+    cache_filename = 'ItemDetails.db'
+
+    table = None  # Table in database
+    conditions = ''  # WHERE conditions
+    values = ()  # WHERE conditions values for ?
+    keys = ()  # Keys to lookup
+    online_data_func = None  # The function to get data e.g. get_response_json
+    online_data_args = ()  # ARGS for online_data_func
+    online_data_kwgs = {}  # KWGS for online_data_func
+    data_cond = True  # Condition to retrieve any data
+
+    @cached_property
+    def cache(self):
+        return ItemDetailsDataBase(filename=self.cache_filename)
+
+    @cached_property
+    def window(self):
+        from jurialmunkey.window import WindowPropertySetter
+        return WindowPropertySetter()
+
+    @staticmethod
+    def get_base_id(tmdb_type, tmdb_id):
+        return f'{tmdb_type}.{tmdb_id}'
+
+    @staticmethod
+    def get_season_id(tmdb_type, tmdb_id, season):
+        return f'{tmdb_type}.{tmdb_id}.{season}'
+
+    @staticmethod
+    def get_episode_id(tmdb_type, tmdb_id, season, episode):
+        return f'{tmdb_type}.{tmdb_id}.{season}.{episode}'
+
+    @property
+    def online_data_cond(self):
+        """ condition to determine whether to retrieve online data - defaults to data_cond """
+        return self.data_cond
+
+    @cached_property
+    def online_data(self):
+        """ cache online data from func to property """
+        if not self.online_data_cond:
+            return
+        return self.online_data_func(*self.online_data_args, **self.online_data_kwgs)
+
+    def get_online_data(self):
+        """ function called when local cache does not have any data """
+        return self.online_data
+
+    @cached_property
+    def data(self):
+        if not self.data_cond:
+            return
+        return self.use_cached_many(
+            self.conditions, self.values, self.keys, self.table,
+            self.get_online_data
+        )

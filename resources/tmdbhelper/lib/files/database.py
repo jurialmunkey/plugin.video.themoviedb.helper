@@ -113,3 +113,35 @@ class DataBase(SimpleCacheRowFactory):
             query = 'CREATE TABLE IF NOT EXISTS {}(id TEXT UNIQUE, {})'
             query = query.format(table, ', '.join([f'{k} {v["data"]}' for k, v in columns.items()]))
             connection.execute(query)
+
+
+class DataBaseCache:
+    def get_cached(self, item_id, key, table):
+        data = self.cache.get_values(item_id, keys=(key, ), table=table)
+        return data[0] if data else None
+
+    def set_cached(self, item_id, key, table, data):
+        if not data:
+            return
+        key_value_pair = (key, data,)
+        self.cache.set_values(item_id, key_value_pairs=(key_value_pair, ), table=table)
+        return data
+
+    def use_cached(self, item_id, key, table, func, *args, **kwargs):
+        data = self.get_cached(item_id, key, table)
+        if not data:
+            data = self.set_cached(item_id, key, table, func(*args, **kwargs))
+        return data
+
+    def set_cached_many(self, keys, table, data):
+        if not data:
+            return
+        self.cache.set_many_values(keys=keys, data=data, table=table)
+        return data
+
+    def use_cached_many(self, conditions, values, keys, table, func, *args, **kwargs):
+        data = self.cache.get_list_values(conditions, values, keys, table)
+        if not data:
+            data = self.set_cached_many(keys, table, func(*args, **kwargs))
+            data = self.cache.get_list_values(conditions, values, keys, table) if data else None
+        return data
