@@ -36,16 +36,7 @@ class DataBase(SimpleCacheRowFactory):
             return
         return cache[0]
 
-    def keys_are_valid(self, keys, table):
-        columns_keys = getattr(self, f'{table}_columns')
-        for k in keys:
-            if k not in columns_keys.keys():
-                return False
-        return True
-
     def get_list_values(self, conditions, values, keys, table=DEFAULT_TABLE):
-        if not self.keys_are_valid(keys, table):
-            return
         query = 'SELECT {keys} FROM {table} WHERE {conditions}'.format(
             keys=', '.join(keys),
             table=table,
@@ -57,8 +48,6 @@ class DataBase(SimpleCacheRowFactory):
         return cache.fetchall()
 
     def get_values(self, idx, keys, table=DEFAULT_TABLE):
-        if not self.keys_are_valid(keys, table):
-            return
         query = 'SELECT {keys} FROM {table} WHERE id=? LIMIT 1'.format(
             keys=', '.join(keys),
             table=table)
@@ -69,8 +58,6 @@ class DataBase(SimpleCacheRowFactory):
 
     def set_values(self, idx, key_value_pairs, table=DEFAULT_TABLE):
         keys, values = zip(*key_value_pairs)
-        if not self.keys_are_valid(keys, table):
-            return
         query = 'UPDATE {table} SET {keys} WHERE id=?'.format(
             keys=', '.join([f'{k}=ifnull(?,{k})' for k in keys]),
             table=table)
@@ -79,8 +66,6 @@ class DataBase(SimpleCacheRowFactory):
 
     def set_many_values(self, keys, data, table=DEFAULT_TABLE):
         """ {idx: key_value_pairs} """
-        if not self.keys_are_valid(keys, table):
-            return
         query = 'UPDATE {table} SET {keys} WHERE id=?'.format(
             keys=', '.join([f'{k}=ifnull(?,{k})' for k in keys]),
             table=table)

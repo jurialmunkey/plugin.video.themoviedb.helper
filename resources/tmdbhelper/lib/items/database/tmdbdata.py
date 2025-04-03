@@ -87,8 +87,9 @@ class DetailsDataBaseCache(ItemDetailsDataBaseCache):
 
 
 class GenreDetailsDataBaseCache(DetailsDataBaseCache):
+    conditions = 'parent_id=?'  # WHERE conditions
     table = 'genre'
-    keys = ('name', 'tmdb_id', 'parent_id', )
+    keys = ('name', 'tmdb_id', )
 
     def get_item_uid(self, i):
         return f'{self.item_id}.genre.{i["tmdb_id"]}'
@@ -160,11 +161,23 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
         return self.get_db_cache(GenreDetailsDataBaseCache)
 
     def get_cached_data(self):
-        data = self.cache.get_list_values(self.conditions, self.values, self.keys, self.table)
-        if not data:
-            return
-        # TODO: ADD OTHER CACHE METHODS AND JOIN
-        return data
+        # SELECT
+        keys = (
+            *[f'{self.table}.{k}' for k in self.keys],
+            'GROUP_CONCAT(genre.name," / ") as genre',
+            'GROUP_CONCAT(genre.name || "=" || genre.tmdb_id,"&") as properties_genre',
+        )
+
+        # FROM
+        table = ' '.join((
+            self.table,
+            f'{self.table} LEFT JOIN genre ON genre.parent_id = {self.table}.id',
+        ))
+
+        # WHERE
+        conditions = f'{self.table}.id=?'
+
+        return self.cache.get_list_values(conditions, self.values, keys, table)
 
     def set_cached_data(self):
         if not self.online_data_mapped:
