@@ -66,8 +66,8 @@ class ItemSyncCachedProperties:
         return self.get_dialog_message()
 
     @cached_property
-    def slug(self):
-        return self.get_slug()
+    def trakt_id(self):
+        return self.get_trakt_id()
 
     @cached_property
     def sync_response(self):
@@ -192,8 +192,8 @@ class ItemSyncGetters:
             dialog_message = get_localized(32297)
         return dialog_message.format(self.dialog_header, self.tmdb_type, 'TMDb', self.item_id)
 
-    def get_slug(self):
-        return self.trakt_api.get_id(self.tmdb_id, 'tmdb', self.base_trakt_type, output_type='slug')
+    def get_trakt_id(self):
+        return self.trakt_api.get_id(self.tmdb_id, 'tmdb', self.base_trakt_type, output_type='trakt')
 
     def get_sync_response(self):
         """ Called after user selects choice """
@@ -218,10 +218,10 @@ class ItemSyncGetters:
 
     def get_sync_item(self):
         if self.season is None:
-            return self.trakt_api.get_request_lc(f'{self.base_trakt_type}s', self.slug)
+            return self.trakt_api.get_request_lc(f'{self.base_trakt_type}s', self.trakt_id)
         if self.episode is None:
-            return self.trakt_api.get_request_lc(f'{self.base_trakt_type}s', self.slug, 'seasons', self.season)
-        return self.trakt_api.get_request_lc(f'{self.base_trakt_type}s', self.slug, 'seasons', self.season, 'episodes', self.episode)
+            return self.trakt_api.get_request_lc(f'{self.base_trakt_type}s', self.trakt_id, 'seasons', self.season)
+        return self.trakt_api.get_request_lc(f'{self.base_trakt_type}s', self.trakt_id, 'seasons', self.season, 'episodes', self.episode)
 
     def get_is_successful_sync(self):
         if not self.sync_response:

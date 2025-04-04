@@ -146,13 +146,13 @@ class ItemUserList(ItemSync):
             response.json().get('ids', {}).get('slug'),
             response.json().get('user', {}).get('ids', {}).get('slug'))
 
-    def add_to_library(self, tmdb_type, tmdb_id, slug=None, confirm=True):
+    def add_to_library(self, tmdb_type, tmdb_id, list_user_slug_tuple=None, confirm=True):
         """ Add item to library
         Pass optional slug tuple (list, user) to check if in monitored lists
         """
         from tmdbhelper.lib.update.userlist import get_monitor_userlists
         from tmdbhelper.lib.update.library import add_to_library
-        if slug and slug not in get_monitor_userlists():
+        if list_user_slug_tuple and list_user_slug_tuple not in get_monitor_userlists():
             return
         if confirm and not Dialog().yesno(get_localized(20444), get_localized(32362)):
             return
@@ -204,6 +204,6 @@ class ItemUserList(ItemSync):
     def sync(self):
         """ Entry point """
         if self.is_successful_sync:
-            self.add_to_library(self.tmdb_type, self.tmdb_id, slug=self.slug)
+            self.add_to_library(self.tmdb_type, self.tmdb_id, list_user_slug_tuple=(self.userlist_slug, self.userlist_user, ))
         self.display_dialog()
         self.refresh_containers()
