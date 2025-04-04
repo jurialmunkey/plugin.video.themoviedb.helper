@@ -15,8 +15,9 @@ REGEX_WINPROP_SUB = r'\$WINPROP\[{}\]'
 def test_func():
     from tmdbhelper.lib.items.database.tmdbdata import TMDbItemDetailsDataBaseCache
     sync = TMDbItemDetailsDataBaseCache()
-    sync.tmdb_id = 348
-    sync.mediatype = 'movie'
+    sync.tmdb_id = 1399
+    sync.mediatype = 'tvshow'
+    # sync.cache_refresh = 'force'
     import xbmcgui
     data = {k: i[k] for i in sync.data for k in i.keys()}
     xbmcgui.Dialog().textviewer('TEST', f'{data}')

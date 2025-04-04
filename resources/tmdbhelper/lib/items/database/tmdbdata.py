@@ -20,6 +20,7 @@ def get_empty_item():
     return {
         'simplecache': BlankNoneDict(),
         'genre': (),
+        'country': (),
     }
 
 
@@ -50,6 +51,11 @@ class ItemMapper(_ItemMapper):
                 'keys': [('genre', None)],
                 'func': split_array,
                 'kwargs': {'name': 'name', 'tmdb_id': 'id'}
+            }],
+            'production_countries': [{
+                'keys': [('country', None)],
+                'func': split_array,
+                'kwargs': {'name': 'name', 'iso': 'iso_3166_1'}
             }],
         }
         self.standard_map = {
@@ -86,13 +92,12 @@ class DetailsDataBaseCache(ItemDetailsDataBaseCache):
         return {self.get_item_uid(i): [self.item_id if k == 'parent_id' else i[k] for k in self.keys] for i in data[self.table]}
 
 
-class GenreDetailsDataBaseCache(DetailsDataBaseCache):
+class MultiDetailsDataBaseCache(DetailsDataBaseCache):
     conditions = 'parent_id=?'  # WHERE conditions
-    table = 'genre'
-    keys = ('name', 'tmdb_id', )
+    item_sub_id_key = 'tmdb_id'
 
     def get_item_uid(self, i):
-        return f'{self.item_id}.genre.{i["tmdb_id"]}'
+        return f'{self.item_id}.{self.table}.{i[self.item_sub_id_key]}'
 
     def get_cached_data(self):
         return self.cache.get_list_values(self.conditions, self.values, self.keys, self.table)
@@ -103,6 +108,17 @@ class GenreDetailsDataBaseCache(DetailsDataBaseCache):
         return self.get_cached_data()
 
 
+class CountryDetailsDataBaseCache(MultiDetailsDataBaseCache):
+    table = 'country'
+    keys = ('name', 'iso', 'parent_id', )
+    item_sub_id_key = 'iso'
+
+
+class GenreDetailsDataBaseCache(MultiDetailsDataBaseCache):
+    table = 'genre'
+    keys = ('name', 'tmdb_id', 'parent_id', )
+
+
 class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
     table = 'simplecache'  # Table in database
     keys = (
@@ -111,6 +127,7 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
     )  # Keys to lookup
     online_data_kwgs = {}  # KWGS for online_data_func
     data_cond = True  # Condition to retrieve any data
+    cache_refresh = None  # Set to "never" for cache only, or "force" for forced refresh
 
     @cached_property
     def tmdb_type(self):
@@ -118,6 +135,7 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
             return 'movie'
         if self.mediatype in ('tvshow', 'season', 'episode', ):
             return 'tv'
+        raise Exception(f'Invalid mediatype: {self.mediatype}')
 
     @property
     def item_id(self):
@@ -160,18 +178,28 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
     def db_genre_cache(self):
         return self.get_db_cache(GenreDetailsDataBaseCache)
 
+    @cached_property
+    def db_country_cache(self):
+        return self.get_db_cache(CountryDetailsDataBaseCache)
+
     def get_cached_data(self):
         # SELECT
+        # Do some weird group concats since json array doesnt appear to be supported
+        # Resplit list groups into infolabel lists as e.g. Action||Adventure -- genre: [Action, Adventure]
+        # Resplit property_list into infoproperties as e.g. name=Australia|iso=AU||name=Germany|iso=DE -- country.1.name: Australia, country.1.iso: AU
         keys = (
             *[f'{self.table}.{k}' for k in self.keys],
-            'GROUP_CONCAT(genre.name," / ") as genre',
-            'GROUP_CONCAT(genre.name || "=" || genre.tmdb_id,"&") as properties_genre',
+            'replace(GROUP_CONCAT(DISTINCT genre.name), ",", "||") as list_genre',
+            'replace(GROUP_CONCAT(DISTINCT country.name), ",", "||") as list_country',
+            'replace(GROUP_CONCAT(DISTINCT "name=" || genre.name || "|tmdb_id=" || genre.tmdb_id), ",", "||") as property_list_genre',
+            'replace(GROUP_CONCAT(DISTINCT "name=" || country.name || "|iso="  || country.iso), ",", "||") as property_list_country',
         )
 
         # FROM
         table = ' '.join((
             self.table,
-            f'{self.table} LEFT JOIN genre ON genre.parent_id = {self.table}.id',
+            f'LEFT JOIN genre ON genre.parent_id = {self.table}.id',
+            f'LEFT JOIN country ON country.parent_id = {self.table}.id',
         ))
 
         # WHERE
@@ -180,17 +208,25 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
         # WHERE condition ? ? ? ? = value, value, value, value
         values = (self.item_id, )
 
-        return self.cache.get_list_values(conditions, values, keys, table)
+        data = self.cache.get_list_values(conditions, values, keys, table)
+        if not data[0]['tmdb_id']:
+            return
+        return data
 
     def set_cached_data(self):
         if not self.online_data_mapped:
             return
         self.set_cached_many(self.keys, self.table, self.configure_mapped_data(self.online_data_mapped))
         self.db_genre_cache.set_cached_data(self.online_data_mapped)
+        self.db_country_cache.set_cached_data(self.online_data_mapped)
         return self.get_cached_data()
 
     @cached_property
     def data(self):
         if not self.data_cond:
             return
+        if self.cache_refresh == 'force':
+            return self.set_cached_data()
+        if self.cache_refresh == 'never':
+            return self.get_cached_data()
         return self.get_cached_data() or self.set_cached_data()
