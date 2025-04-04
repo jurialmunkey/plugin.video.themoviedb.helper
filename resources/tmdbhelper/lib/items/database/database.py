@@ -278,6 +278,41 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
+        'country': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'parent_id': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'FOREIGN KEY(parent_id)': {
+            'data': 'REFERENCES simplecache(id)',
+            'sync': None
+        }
+    }
+
+    network_columns = {
+        'id': {
+            'data': 'TEXT UNIQUE',
+            'sync': None
+        },
+        'name': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'tmdb_id': {
+            'data': 'INTEGER',
+            'sync': None
+        },
+        'icon': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'country': {
+            'data': 'TEXT',
+            'sync': None
+        },
         'parent_id': {
             'data': 'TEXT',
             'sync': None
@@ -456,6 +491,7 @@ class ItemDetailsDataBase(DataBase):
             'genre': self.genre_columns,
             'country': self.country_columns,
             'studio': self.studio_columns,
+            'network': self.network_columns,
             'crew': self.crew_columns,
             'cast': self.cast_columns,
             'custom': self.custom_columns,

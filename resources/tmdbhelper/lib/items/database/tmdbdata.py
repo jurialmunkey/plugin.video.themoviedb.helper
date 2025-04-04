@@ -8,7 +8,13 @@ from tmdbhelper.lib.api.mapping import _ItemMapper
 def split_array(items, dictionary=None, **kwargs):
     if not items or not isinstance(items, list):
         return ()
-    return [{k: i.get(v) for k, v in kwargs.items()} for i in items]
+
+    def get_item(i, v):
+        if not callable(v):
+            return i.get(v)
+        return v(i)
+
+    return [{k: get_item(i, v) for k, v in kwargs.items()} for i in items]
 
 
 class BlankNoneDict(dict):
@@ -22,6 +28,7 @@ def get_empty_item():
         'genre': (),
         'country': (),
         'studio': (),
+        'network': (),
     }
 
 
@@ -58,15 +65,15 @@ class ItemMapper(_ItemMapper):
                 'func': split_array,
                 'kwargs': {'name': 'name', 'iso': 'iso_3166_1'}
             }],
-            'production_companies': [{  # TODO: Make sure this goes AFTER NETWORKS
+            'production_companies': [{
                 'keys': [('studio', None)],
                 'func': split_array,
-                'kwargs': {'name': 'name', 'tmdb_id': 'id', 'icon': 'logo_path'}
+                'kwargs': {'name': 'name', 'tmdb_id': 'id', 'icon': 'logo_path', 'country': 'origin_country'}
             }],
             'networks': [{
-                'keys': [('studio', None)],
+                'keys': [('network', None)],
                 'func': split_array,
-                'kwargs': {'name': 'name', 'tmdb_id': 'id', 'icon': 'logo_path'}
+                'kwargs': {'name': 'name', 'tmdb_id': 'id', 'icon': 'logo_path', 'country': 'origin_country'}
             }],
 
         }
@@ -122,7 +129,7 @@ class MultiDetailsDataBaseCache(DetailsDataBaseCache):
 
 class StudioDetailsDataBaseCache(MultiDetailsDataBaseCache):
     table = 'studio'
-    keys = ('name', 'tmdb_id', 'icon', 'parent_id', )
+    keys = ('name', 'tmdb_id', 'icon', 'country', 'parent_id', )
 
 
 class CountryDetailsDataBaseCache(MultiDetailsDataBaseCache):
@@ -192,6 +199,12 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
         return dbc
 
     @cached_property
+    def db_studio_table(self):
+        if self.mediatype == 'movie':
+            return 'studio'
+        return 'network'
+
+    @cached_property
     def db_genre_cache(self):
         return self.get_db_cache(GenreDetailsDataBaseCache)
 
@@ -201,7 +214,9 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
 
     @cached_property
     def db_studio_cache(self):
-        return self.get_db_cache(StudioDetailsDataBaseCache)
+        dbc = self.get_db_cache(StudioDetailsDataBaseCache)
+        dbc.table = self.db_studio_table  # Use networks not studios for TV
+        return dbc
 
     def get_cached_data(self):
         # SELECT
@@ -212,7 +227,7 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
             *[f'{self.table}.{k}' for k in self.keys],
             'replace(GROUP_CONCAT(DISTINCT genre.name), ",", "||") as list_genre',
             'replace(GROUP_CONCAT(DISTINCT country.name), ",", "||") as list_country',
-            'replace(GROUP_CONCAT(DISTINCT studio.name), ",", "||") as list_studio',
+            f'replace(GROUP_CONCAT(DISTINCT {self.db_studio_table}.name), ",", "||") as list_studio',  # Switch out studios for networks for TV Shows
             # 'replace(GROUP_CONCAT(DISTINCT "name=" || genre.name || "|tmdb_id=" || genre.tmdb_id), ",", "||") as property_list_genre',
             # 'replace(GROUP_CONCAT(DISTINCT "name=" || country.name || "|iso="  || country.iso), ",", "||") as property_list_country',
         )
@@ -222,7 +237,7 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
             self.table,
             f'LEFT JOIN genre ON genre.parent_id = {self.table}.id',
             f'LEFT JOIN country ON country.parent_id = {self.table}.id',
-            f'LEFT JOIN studio ON studio.parent_id = {self.table}.id',
+            f'LEFT JOIN {self.db_studio_table} ON {self.db_studio_table}.parent_id = {self.table}.id',
         ))
 
         # WHERE
