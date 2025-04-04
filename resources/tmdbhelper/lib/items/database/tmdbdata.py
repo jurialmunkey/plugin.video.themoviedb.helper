@@ -21,6 +21,7 @@ def get_empty_item():
         'simplecache': BlankNoneDict(),
         'genre': (),
         'country': (),
+        'studio': (),
     }
 
 
@@ -57,6 +58,17 @@ class ItemMapper(_ItemMapper):
                 'func': split_array,
                 'kwargs': {'name': 'name', 'iso': 'iso_3166_1'}
             }],
+            'production_companies': [{  # TODO: Make sure this goes AFTER NETWORKS
+                'keys': [('studio', None)],
+                'func': split_array,
+                'kwargs': {'name': 'name', 'tmdb_id': 'id', 'icon': 'logo_path'}
+            }],
+            'networks': [{
+                'keys': [('studio', None)],
+                'func': split_array,
+                'kwargs': {'name': 'name', 'tmdb_id': 'id', 'icon': 'logo_path'}
+            }],
+
         }
         self.standard_map = {
             'id': ('simplecache', 'tmdb_id'),
@@ -106,6 +118,11 @@ class MultiDetailsDataBaseCache(DetailsDataBaseCache):
         data = self.configure_mapped_data_list(online_data_mapped)
         self.set_cached_many(self.keys, self.table, data)
         return self.get_cached_data()
+
+
+class StudioDetailsDataBaseCache(MultiDetailsDataBaseCache):
+    table = 'studio'
+    keys = ('name', 'tmdb_id', 'icon', 'parent_id', )
 
 
 class CountryDetailsDataBaseCache(MultiDetailsDataBaseCache):
@@ -182,6 +199,10 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
     def db_country_cache(self):
         return self.get_db_cache(CountryDetailsDataBaseCache)
 
+    @cached_property
+    def db_studio_cache(self):
+        return self.get_db_cache(StudioDetailsDataBaseCache)
+
     def get_cached_data(self):
         # SELECT
         # Do some weird group concats since json array doesnt appear to be supported
@@ -191,8 +212,9 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
             *[f'{self.table}.{k}' for k in self.keys],
             'replace(GROUP_CONCAT(DISTINCT genre.name), ",", "||") as list_genre',
             'replace(GROUP_CONCAT(DISTINCT country.name), ",", "||") as list_country',
-            'replace(GROUP_CONCAT(DISTINCT "name=" || genre.name || "|tmdb_id=" || genre.tmdb_id), ",", "||") as property_list_genre',
-            'replace(GROUP_CONCAT(DISTINCT "name=" || country.name || "|iso="  || country.iso), ",", "||") as property_list_country',
+            'replace(GROUP_CONCAT(DISTINCT studio.name), ",", "||") as list_studio',
+            # 'replace(GROUP_CONCAT(DISTINCT "name=" || genre.name || "|tmdb_id=" || genre.tmdb_id), ",", "||") as property_list_genre',
+            # 'replace(GROUP_CONCAT(DISTINCT "name=" || country.name || "|iso="  || country.iso), ",", "||") as property_list_country',
         )
 
         # FROM
@@ -200,6 +222,7 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
             self.table,
             f'LEFT JOIN genre ON genre.parent_id = {self.table}.id',
             f'LEFT JOIN country ON country.parent_id = {self.table}.id',
+            f'LEFT JOIN studio ON studio.parent_id = {self.table}.id',
         ))
 
         # WHERE
@@ -219,6 +242,7 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
         self.set_cached_many(self.keys, self.table, self.configure_mapped_data(self.online_data_mapped))
         self.db_genre_cache.set_cached_data(self.online_data_mapped)
         self.db_country_cache.set_cached_data(self.online_data_mapped)
+        self.db_studio_cache.set_cached_data(self.online_data_mapped)
         return self.get_cached_data()
 
     @cached_property

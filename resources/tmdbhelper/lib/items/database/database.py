@@ -278,10 +278,6 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'monoicon': {
-            'data': 'TEXT',
-            'sync': None
-        },
         'parent_id': {
             'data': 'TEXT',
             'sync': None
