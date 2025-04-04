@@ -255,6 +255,7 @@ class ItemListSyncDataInProgress(ItemListSyncData):
 
 class ItemListSyncDataNextUp(ItemListSyncData):
     """ Episodes next up to watch for all inprogress shows """
+    sort_method = ('last_watched_at', True, '', )
 
     def get_syncdata_getter(self):
         sd = self.trakt_syncdata.get_all_unhidden_shows_nextepisode_getter()
