@@ -184,6 +184,8 @@ class ItemSyncGetters:
         return '.'.join([i for i in (self.tmdb_id, self.season, self.episode) if i])
 
     def get_dialog_message(self):
+        if not self.sync_response:
+            return
         if self.sync_response.status_code == 420:
             dialog_message = f'{get_localized(32296)}\n{get_localized(32531)}'
         elif not self.is_successful_sync:
@@ -276,6 +278,8 @@ class ItemSync(ItemSyncGetters, ItemSyncCachedProperties):
         get_property('Widgets.Reload', set_property=f'{set_timestamp(0, True)}')
 
     def display_dialog(self):
+        if not self.dialog_message:
+            return
         Dialog().ok(self.dialog_header, self.dialog_message)
 
     def reset_lastactivities(self):
