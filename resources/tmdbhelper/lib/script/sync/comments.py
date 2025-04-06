@@ -7,8 +7,6 @@ from xbmcgui import Dialog
 class ItemComments(ItemSync):
     localized_name = 32304
     preconfigured = True
-    allow_episodes = True
-    allow_seasons = True
 
     def get_trakt_type(self):
         if self.tmdb_type == 'movie':
