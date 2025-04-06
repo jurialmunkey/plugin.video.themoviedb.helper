@@ -18,6 +18,7 @@ def test_func():
     sync.tmdb_id = 1399
     sync.mediatype = 'tvshow'
     sync.cache_refresh = 'force'
+    # sync.cache.del_window_property(f'{sync.cache._sc_name}.clean.lastexecuted')
     import xbmcgui
     data = {k: i[k] for i in sync.data for k in i.keys()}
     xbmcgui.Dialog().textviewer('TEST', f'{data}')

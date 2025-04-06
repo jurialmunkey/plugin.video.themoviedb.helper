@@ -24,7 +24,7 @@ class BlankNoneDict(dict):
 
 def get_empty_item():
     return {
-        'simplecache': BlankNoneDict(),
+        'item': BlankNoneDict(),
         'genre': (),
         'country': (),
         'studio': (),
@@ -51,8 +51,8 @@ class ItemMapper(_ItemMapper):
         """
         self.advanced_map = {
             'release_date': [{
-                'keys': [('simplecache', 'premiered')]}, {
-                'keys': [('simplecache', 'year')],
+                'keys': [('item', 'premiered')]}, {
+                'keys': [('item', 'year')],
                 'func': lambda v: int(v[0:4])
             }],
             'genres': [{
@@ -78,15 +78,15 @@ class ItemMapper(_ItemMapper):
 
         }
         self.standard_map = {
-            'id': ('simplecache', 'tmdb_id'),
-            'title': ('simplecache', 'title'),
-            'tagline': ('simplecache', 'tagline'),
-            'overview': ('simplecache', 'plot'),
-            'original_title': ('simplecache', 'originaltitle'),
-            'original_name': ('simplecache', 'originaltitle'),
-            'status': ('simplecache', 'status'),
-            'season_number': ('simplecache', 'season'),
-            'episode_number': ('simplecache', 'episode'),
+            'id': ('item', 'tmdb_id'),
+            'title': ('item', 'title'),
+            'tagline': ('item', 'tagline'),
+            'overview': ('item', 'plot'),
+            'original_title': ('item', 'originaltitle'),
+            'original_name': ('item', 'originaltitle'),
+            'status': ('item', 'status'),
+            'season_number': ('item', 'season'),
+            'episode_number': ('item', 'episode'),
         }
 
     def get_info(self, data, **kwargs):
@@ -101,11 +101,15 @@ class DetailsDataBaseCache(ItemDetailsDataBaseCache):
     keys = ()
 
     @property
+    def item_info(self):
+        return self.table
+
+    @property
     def values(self):  # WHERE conditions values for ?
         return (self.item_id, )
 
     def configure_mapped_data(self, data):
-        return {self.item_id: [data[self.table][k] for k in self.keys]}
+        return {self.item_id: [data[self.item_info][k] for k in self.keys]}
 
     def configure_mapped_data_list(self, data):
         return {self.get_item_uid(i): [self.item_id if k == 'parent_id' else i[k] for k in self.keys] for i in data[self.table]}
@@ -144,14 +148,18 @@ class GenreDetailsDataBaseCache(MultiDetailsDataBaseCache):
 
 
 class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
-    table = 'simplecache'  # Table in database
-    keys = (
-        'mediatype', 'tmdb_id', 'season', 'episode', 'year', 'mpaa', 'plot', 'title',
-        'originaltitle', 'duration', 'tagline', 'tvshowtitle', 'status', 'premiered', 'collection', 'trailer',
-    )  # Keys to lookup
     online_data_kwgs = {}  # KWGS for online_data_func
     data_cond = True  # Condition to retrieve any data
     cache_refresh = None  # Set to "never" for cache only, or "force" for forced refresh
+    item_info = 'item'
+
+    @cached_property
+    def keys(self):
+        return [k for k in getattr(self.cache, f'{self.table}_columns').keys()]
+
+    @cached_property
+    def table(self):
+        return self.mediatype
 
     @cached_property
     def tmdb_type(self):
@@ -188,7 +196,7 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
         if not self.online_data:
             return
         data = self.item_mapper.get_info(self.online_data)
-        data['simplecache']['mediatype'] = self.mediatype
+        data['item']['mediatype'] = self.mediatype
         return data
 
     def get_db_cache(self, database_class):
@@ -254,10 +262,11 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
     def set_cached_data(self):
         if not self.online_data_mapped:
             return
+        self.cache.set_values(self.item_id, key_value_pairs=(('mediatype', self.mediatype), ('expiry', 'expiry'),), table='simplecache')
         self.set_cached_many(self.keys, self.table, self.configure_mapped_data(self.online_data_mapped))
-        self.db_genre_cache.set_cached_data(self.online_data_mapped)
-        self.db_country_cache.set_cached_data(self.online_data_mapped)
-        self.db_studio_cache.set_cached_data(self.online_data_mapped)
+        # self.db_genre_cache.set_cached_data(self.online_data_mapped)
+        # self.db_country_cache.set_cached_data(self.online_data_mapped)
+        # self.db_studio_cache.set_cached_data(self.online_data_mapped)
         return self.get_cached_data()
 
     @cached_property

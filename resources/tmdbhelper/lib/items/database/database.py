@@ -15,15 +15,18 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
+        'expiry': {
+            'data': 'TEXT',
+            'sync': None
+        },
+    }
+
+    movie_columns = {
+        'id': {
+            'data': 'TEXT UNIQUE',
+            'sync': None
+        },
         'tmdb_id': {
-            'data': 'INTEGER',
-            'sync': None
-        },
-        'season': {
-            'data': 'INTEGER',
-            'sync': None
-        },
-        'episode': {
             'data': 'INTEGER',
             'sync': None
         },
@@ -55,7 +58,54 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'tvshowtitle': {
+        'status': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'premiered': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'trailer': {
+            'data': 'TEXT',
+            'sync': None
+        },
+    }
+
+    tvshow_columns = {
+        'id': {
+            'data': 'TEXT UNIQUE',
+            'sync': None
+        },
+        'tmdb_id': {
+            'data': 'INTEGER',
+            'sync': None
+        },
+        'year': {
+            'data': 'INTEGER',
+            'sync': None
+        },
+        'mpaa': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'plot': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'title': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'originaltitle': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'duration': {
+            'data': 'INTEGER',
+            'sync': None
+        },
+        'tagline': {
             'data': 'TEXT',
             'sync': None
         },
@@ -67,11 +117,85 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'collection': {
+        'trailer': {
             'data': 'TEXT',
             'sync': None
         },
-        'trailer': {
+    }
+
+    season_columns = {
+        'id': {
+            'data': 'TEXT UNIQUE',
+            'sync': None
+        },
+        'season': {
+            'data': 'INTEGER',
+            'sync': None
+        },
+        'year': {
+            'data': 'INTEGER',
+            'sync': None
+        },
+        'plot': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'title': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'originaltitle': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'premiered': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'tvshow_id': {
+            'data': 'TEXT',
+            'sync': None
+        },
+    }
+
+    episode_columns = {
+        'id': {
+            'data': 'TEXT UNIQUE',
+            'sync': None
+        },
+        'episode': {
+            'data': 'INTEGER',
+            'sync': None
+        },
+        'year': {
+            'data': 'INTEGER',
+            'sync': None
+        },
+        'plot': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'title': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'originaltitle': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'premiered': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'duration': {
+            'data': 'INTEGER',
+            'sync': None
+        },
+        'season_id': {
+            'data': 'TEXT',
+            'sync': None
+        },
+        'tvshow_id': {
             'data': 'TEXT',
             'sync': None
         },
@@ -194,13 +318,9 @@ class ItemDetailsDataBase(DataBase):
             'data': 'INTEGER',
             'sync': None
         },
-        'FOREIGN KEY(id)': {
-            'data': 'REFERENCES simplecache(id)',
-            'sync': None
-        }
     }
 
-    kodi_db_ids_columns = {
+    kodi_dbid_columns = {
         'id': {
             'data': 'TEXT UNIQUE',
             'sync': None
@@ -209,10 +329,6 @@ class ItemDetailsDataBase(DataBase):
             'data': 'INTEGER',
             'sync': None
         },
-        'FOREIGN KEY(id)': {
-            'data': 'REFERENCES simplecache(id)',
-            'sync': None
-        }
     }
 
     genre_columns = {
@@ -232,10 +348,6 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'FOREIGN KEY(parent_id)': {
-            'data': 'REFERENCES simplecache(id)',
-            'sync': None
-        }
     }
 
     country_columns = {
@@ -255,10 +367,6 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'FOREIGN KEY(parent_id)': {
-            'data': 'REFERENCES simplecache(id)',
-            'sync': None
-        }
     }
 
     studio_columns = {
@@ -286,10 +394,6 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'FOREIGN KEY(parent_id)': {
-            'data': 'REFERENCES simplecache(id)',
-            'sync': None
-        }
     }
 
     network_columns = {
@@ -317,10 +421,6 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'FOREIGN KEY(parent_id)': {
-            'data': 'REFERENCES simplecache(id)',
-            'sync': None
-        }
     }
 
     crew_columns = {
@@ -348,7 +448,7 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'order': {
+        'ordering': {
             'data': 'INTEGER',
             'sync': None
         },
@@ -356,10 +456,6 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'FOREIGN KEY(parent_id)': {
-            'data': 'REFERENCES simplecache(id)',
-            'sync': None
-        }
     }
 
     cast_columns = {
@@ -383,7 +479,7 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'order': {
+        'ordering': {
             'data': 'INTEGER',
             'sync': None
         },
@@ -391,10 +487,6 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'FOREIGN KEY(parent_id)': {
-            'data': 'REFERENCES simplecache(id)',
-            'sync': None
-        }
     }
 
     custom_columns = {
@@ -414,10 +506,6 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'FOREIGN KEY(parent_id)': {
-            'data': 'REFERENCES simplecache(id)',
-            'sync': None
-        }
     }
 
     artwork_columns = {
@@ -437,10 +525,6 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'FOREIGN KEY(parent_id)': {
-            'data': 'REFERENCES simplecache(id)',
-            'sync': None
-        }
     }
 
     unique_id_columns = {
@@ -460,34 +544,19 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
-        'FOREIGN KEY(parent_id)': {
-            'data': 'REFERENCES simplecache(id)',
-            'sync': None
-        }
-    }
-
-    expiry_columns = {
-        'id': {
-            'data': 'TEXT UNIQUE',
-            'sync': None
-        },
-        'expiry': {
-            'data': 'TEXT',
-            'sync': None
-        },
-        'FOREIGN KEY(id)': {
-            'data': 'REFERENCES simplecache(id)',
-            'sync': None
-        }
     }
 
     @property
     def database_tables(self):
         return {
             'simplecache': self.simplecache_columns,
+            'movie': self.movie_columns,
+            'tvshow': self.tvshow_columns,
+            'season': self.season_columns,
+            'episode': self.episode_columns,
             'lactivities': self.lactivities_columns,
             'ratings_awards': self.ratings_awards_columns,
-            'kodi_db_ids': self.kodi_db_ids_columns,
+            'kodi_dbid': self.kodi_dbid_columns,
             'genre': self.genre_columns,
             'country': self.country_columns,
             'studio': self.studio_columns,
@@ -497,7 +566,6 @@ class ItemDetailsDataBase(DataBase):
             'custom': self.custom_columns,
             'artwork': self.artwork_columns,
             'unique_id': self.unique_id_columns,
-            'expiry': self.expiry_columns,
         }
 
     def create_database_execute(self, connection):
