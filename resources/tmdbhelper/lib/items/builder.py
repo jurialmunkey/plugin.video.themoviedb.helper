@@ -144,6 +144,8 @@ class ItemBuilder(_ArtworkSelector):
     def get_tmdb_item(
             self, tmdb_type, tmdb_id, season=None, episode=None, base_item=None, manual_art=None,
             base_is_season=False, cache_refresh=False):
+        if season == -1:
+            return
         with TimerList(self.timer_lists, 'item_tmdb', log_threshold=0.05, logging=self.log_timers) as tl:
             details = self.tmdb_api.get_details_request(tmdb_type, tmdb_id, season, episode, cache_refresh=cache_refresh)
             if not details:
