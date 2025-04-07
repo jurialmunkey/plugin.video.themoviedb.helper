@@ -2731,6 +2731,36 @@ msgctxt "#32528"
 msgid "Add to {}"
 msgstr "Adicionar a {}"
 
+#: /resources/settings.xml
+msgctxt "#32529"
+msgid "Scrobble items played via TMDbHelper"
+msgstr "Itens de scrobble reproduzidos via TMDbHelper"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32530"
+msgid "Remove rating"
+msgstr "Remover avaliação"
+
+#: /resources/tmdbhelper/lib/script/sync/item.py
+msgctxt "#32531"
+msgid "Method only available for VIP accounts."
+msgstr "Método disponível apenas para contas VIP."
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32532"
+msgid "Force resync"
+msgstr "Forçar ressincronização"
+
+#: /resources/settings.xml
+msgctxt "#32533"
+msgid "Get episode types (slower)"
+msgstr "Obtenha tipos de episódios (mais lento)"
+
+#: /resources/settings.xml
+msgctxt "#32534"
+msgid "Trakt sync progress notifications"
+msgstr "Notificações de progresso de sincronização de trakt"
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr "Hindi (Índia)"
