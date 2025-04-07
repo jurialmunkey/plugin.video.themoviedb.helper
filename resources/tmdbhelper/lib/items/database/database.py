@@ -6,7 +6,7 @@ from tmdbhelper.lib.files.database import DataBaseCache, DataBase
 
 class ItemDetailsDataBase(DataBase):
 
-    simplecache_columns = {
+    baseitem_columns = {
         'id': {
             'data': 'TEXT UNIQUE',
             'sync': None
@@ -70,6 +70,10 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
+        'FOREIGN KEY(id)': {
+            'data': 'REFERENCES baseitem(id)',
+            'sync': None
+        }
     }
 
     tvshow_columns = {
@@ -121,6 +125,10 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
+        'FOREIGN KEY(id)': {
+            'data': 'REFERENCES baseitem(id)',
+            'sync': None
+        }
     }
 
     season_columns = {
@@ -156,6 +164,14 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
+        'FOREIGN KEY(id)': {
+            'data': 'REFERENCES baseitem(id)',
+            'sync': None
+        },
+        'FOREIGN KEY(tvshow_id)': {
+            'data': 'REFERENCES tvshow(id)',
+            'sync': None
+        }
     }
 
     episode_columns = {
@@ -199,9 +215,21 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
+        'FOREIGN KEY(id)': {
+            'data': 'REFERENCES baseitem(id)',
+            'sync': None
+        },
+        'FOREIGN KEY(tvshow_id)': {
+            'data': 'REFERENCES tvshow(id)',
+            'sync': None
+        },
+        'FOREIGN KEY(season_id)': {
+            'data': 'REFERENCES season(id)',
+            'sync': None
+        }
     }
 
-    ratings_awards_columns = {
+    ratings_columns = {
         'id': {
             'data': 'TEXT UNIQUE',
             'sync': None
@@ -318,6 +346,11 @@ class ItemDetailsDataBase(DataBase):
             'data': 'INTEGER',
             'sync': None
         },
+        'FOREIGN KEY(id)': {
+            'data': 'REFERENCES baseitem(id)',
+            'sync': None
+        }
+
     }
 
     kodi_dbid_columns = {
@@ -329,6 +362,10 @@ class ItemDetailsDataBase(DataBase):
             'data': 'INTEGER',
             'sync': None
         },
+        'FOREIGN KEY(id)': {
+            'data': 'REFERENCES baseitem(id)',
+            'sync': None
+        }
     }
 
     genre_columns = {
@@ -348,6 +385,10 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
+        'FOREIGN KEY(parent_id)': {
+            'data': 'REFERENCES baseitem(id)',
+            'sync': None
+        }
     }
 
     country_columns = {
@@ -367,6 +408,10 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
+        'FOREIGN KEY(parent_id)': {
+            'data': 'REFERENCES baseitem(id)',
+            'sync': None
+        }
     }
 
     studio_columns = {
@@ -394,6 +439,10 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
+        'FOREIGN KEY(parent_id)': {
+            'data': 'REFERENCES baseitem(id)',
+            'sync': None
+        }
     }
 
     network_columns = {
@@ -421,6 +470,10 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
+        'FOREIGN KEY(parent_id)': {
+            'data': 'REFERENCES baseitem(id)',
+            'sync': None
+        }
     }
 
     crew_columns = {
@@ -456,6 +509,10 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
+        'FOREIGN KEY(parent_id)': {
+            'data': 'REFERENCES baseitem(id)',
+            'sync': None
+        }
     }
 
     cast_columns = {
@@ -487,6 +544,10 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
+        'FOREIGN KEY(parent_id)': {
+            'data': 'REFERENCES baseitem(id)',
+            'sync': None
+        }
     }
 
     custom_columns = {
@@ -506,6 +567,10 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
+        'FOREIGN KEY(parent_id)': {
+            'data': 'REFERENCES baseitem(id)',
+            'sync': None
+        }
     }
 
     artwork_columns = {
@@ -525,6 +590,10 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
+        'FOREIGN KEY(parent_id)': {
+            'data': 'REFERENCES baseitem(id)',
+            'sync': None
+        }
     }
 
     unique_id_columns = {
@@ -544,18 +613,42 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
             'sync': None
         },
+        'FOREIGN KEY(parent_id)': {
+            'data': 'REFERENCES baseitem(id)',
+            'sync': None
+        }
     }
+
+    # TABLE, COLUMN
+    table_index = (
+        ('baseitem', 'id', ),
+        ('movie', 'id', ),
+        ('tvshow', 'id', ),
+        ('season', 'id', ),
+        ('episode', 'id', ),
+        ('ratings', 'id', ),
+        ('kodi_dbid', 'id', ),
+        ('genre', 'id', ),
+        ('country', 'id', ),
+        ('studio', 'id', ),
+        ('network', 'id', ),
+        ('crew', 'id', ),
+        ('cast', 'id', ),
+        ('custom', 'id', ),
+        ('artwork', 'id', ),
+        ('unique_id', 'id', ),
+    )
 
     @property
     def database_tables(self):
         return {
-            'simplecache': self.simplecache_columns,
+            'baseitem': self.baseitem_columns,
             'movie': self.movie_columns,
             'tvshow': self.tvshow_columns,
             'season': self.season_columns,
             'episode': self.episode_columns,
             'lactivities': self.lactivities_columns,
-            'ratings_awards': self.ratings_awards_columns,
+            'ratings': self.ratings_columns,
             'kodi_dbid': self.kodi_dbid_columns,
             'genre': self.genre_columns,
             'country': self.country_columns,
@@ -572,7 +665,17 @@ class ItemDetailsDataBase(DataBase):
         for table, columns in self.database_tables.items():
             query = 'CREATE TABLE IF NOT EXISTS {}({})'
             query = query.format(table, ', '.join([f'{k} {v["data"]}' for k, v in columns.items()]))
-            connection.execute(query)
+            try:
+                connection.execute(query)
+            except Exception as error:
+                self.kodi_log(f'CACHE: Exception while initializing _database: {error}\n{self._sc_name} - {query}', 1)
+
+        for table, column in self.table_index:
+            query = 'CREATE INDEX {table}_{column}_x ON {table}({column})'.format(table=table, column=column)
+            try:
+                connection.execute(query)
+            except Exception as error:
+                self.kodi_log(f'CACHE: Exception while initializing _database: {error}\n{self._sc_name} - {query}', 1)
 
 
 class ItemDetailsDataBaseCache(DataBaseCache):

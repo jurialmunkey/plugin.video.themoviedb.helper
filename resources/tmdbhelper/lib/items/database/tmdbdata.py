@@ -155,7 +155,7 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
 
     @cached_property
     def keys(self):
-        return [k for k in getattr(self.cache, f'{self.table}_columns').keys()]
+        return [k for k in getattr(self.cache, f'{self.table}_columns').keys() if not k.startswith('FOREIGN KEY')]
 
     @cached_property
     def table(self):
@@ -242,10 +242,11 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
 
         # FROM
         table = ' '.join((
-            self.table,
-            f'LEFT JOIN genre ON genre.parent_id = {self.table}.id',
-            f'LEFT JOIN country ON country.parent_id = {self.table}.id',
-            f'LEFT JOIN {self.db_studio_table} ON {self.db_studio_table}.parent_id = {self.table}.id',
+            'baseitem',
+            f'LEFT JOIN {self.table} ON {self.table}.id = baseitem.id',
+            f'LEFT JOIN genre ON genre.parent_id = baseitem.id',
+            f'LEFT JOIN country ON country.parent_id = baseitem.id',
+            f'LEFT JOIN {self.db_studio_table} ON {self.db_studio_table}.parent_id = baseitem.id',
         ))
 
         # WHERE
@@ -262,11 +263,11 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
     def set_cached_data(self):
         if not self.online_data_mapped:
             return
-        self.cache.set_values(self.item_id, key_value_pairs=(('mediatype', self.mediatype), ('expiry', 'expiry'),), table='simplecache')
+        self.cache.set_values(self.item_id, key_value_pairs=(('mediatype', self.mediatype), ('expiry', 'expiry'),), table='baseitem')
         self.set_cached_many(self.keys, self.table, self.configure_mapped_data(self.online_data_mapped))
-        # self.db_genre_cache.set_cached_data(self.online_data_mapped)
-        # self.db_country_cache.set_cached_data(self.online_data_mapped)
-        # self.db_studio_cache.set_cached_data(self.online_data_mapped)
+        self.db_genre_cache.set_cached_data(self.online_data_mapped)
+        self.db_country_cache.set_cached_data(self.online_data_mapped)
+        self.db_studio_cache.set_cached_data(self.online_data_mapped)
         return self.get_cached_data()
 
     @cached_property
