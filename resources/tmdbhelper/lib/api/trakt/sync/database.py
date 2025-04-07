@@ -26,8 +26,8 @@ class SyncDataBase(DataBase):
             'data': 'INTEGER',
             'sync': None
         },
-        'slug': {
-            'data': 'TEXT',
+        'trakt_id': {
+            'data': 'INTEGER',
             'sync': None
         },
         'premiered': {

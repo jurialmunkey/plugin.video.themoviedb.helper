@@ -237,13 +237,13 @@ class SyncAllNextEpisodes(DataTypeEpisodes):
             for season in response.get('seasons', []) for episode in season.get('episodes', [])
             if not episode.get('completed') or (reset_at and convert_timestamp(episode.get('last_watched_at')) < reset_at))
 
-    def get_next_episodes_response(self, slug):
-        if not slug:
+    def get_next_episodes_response(self, trakt_id):
+        if not trakt_id:
             return
-        return self.get_response_sync('shows', slug, 'progress/watched')
+        return self.get_response_sync('shows', trakt_id, 'progress/watched')
 
-    def get_next_episodes(self, tmdb_id, slug):
-        response = self.get_next_episodes_response(slug)
+    def get_next_episodes(self, tmdb_id, trakt_id):
+        response = self.get_next_episodes_response(trakt_id)
         if not response:
             return
         return self.get_all_next_episodes(response, tmdb_id)
@@ -258,24 +258,24 @@ class SyncAllNextEpisodes(DataTypeEpisodes):
 
         def get_item(i, item_id):
             tmdb_type, tmdb_id, season_number, episode_number = item_id.split('.')
-            item = {"show": {"ids": {"tmdb": i["tmdb_id"], "slug": i["slug"]}}}
+            item = {"show": {"ids": {"tmdb": i["tmdb_id"], "trakt": i["trakt_id"]}}}
             item['upnext_episode_id'] = item_id
             item['type'] = 'episode'
             item['episode'] = {'season': season_number, 'number': episode_number}
             return item
 
         def get_items(i):
-            next_episodes = self.get_next_episodes(i["tmdb_id"], i["slug"])
+            next_episodes = self.get_next_episodes(i["tmdb_id"], i["trakt_id"])
             dpro.increment()
             if not next_episodes:
-                dpro.set_message(f'Skip: {i["tmdb_id"]} {i["slug"]}')
+                dpro.set_message(f'Skip: {i["tmdb_id"]} {i["trakt_id"]}')
                 return
-            dpro.set_message(f'Sync: {i["tmdb_id"]} {i["slug"]}')
+            dpro.set_message(f'Sync: {i["tmdb_id"]} {i["trakt_id"]}')
             return [get_item(i, item_id) for item_id in next_episodes]
 
         with TimerFunc(f'Sync: {self.method} {self.item_type}', inline=True, log_threshold=0.001):
             sd = self._class_instance_syncdata.get_all_unhidden_shows_inprogress_getter()
-            sd.additional_keys = ('slug', )
+            sd.additional_keys = ('trakt_id', )
             dpro.max_value = len(sd.items)
             with ParallelThread(sd.items, get_items) as pt:
                 item_queue = pt.queue
@@ -288,8 +288,8 @@ class SyncNextEpisodes(SyncAllNextEpisodes):
     last_activities_key = 'watched_at'
     method = 'nextup'
 
-    def get_next_episode(self, tmdb_id, slug):
-        response = self.get_next_episodes_response(slug)
+    def get_next_episode(self, tmdb_id, trakt_id):
+        response = self.get_next_episodes_response(trakt_id)
         if not response:
             return
         if not response.get('reset_at') and response.get('next_episode'):
@@ -311,17 +311,17 @@ class SyncNextEpisodes(SyncAllNextEpisodes):
         dpro = self.dialog_progress_bg
 
         def get_item(i):
-            next_episode_id = self.get_next_episode(i["tmdb_id"], i["slug"])
+            next_episode_id = self.get_next_episode(i["tmdb_id"], i["trakt_id"])
             dpro.increment()
             if not next_episode_id:
                 dpro.set_message(f'Skip: {next_episode_id}')
                 return
             dpro.set_message(f'Sync: {next_episode_id}')
-            return {"next_episode_id": next_episode_id, "show": {"ids": {"tmdb": i["tmdb_id"], "slug": i["slug"]}}}
+            return {"next_episode_id": next_episode_id, "show": {"ids": {"tmdb": i["tmdb_id"], "trakt": i["trakt_id"]}}}
 
         with TimerFunc(f'Sync: {self.method} {self.item_type}', inline=True, log_threshold=0.001):
             sd = self._class_instance_syncdata.get_all_unhidden_shows_inprogress_getter()
-            sd.additional_keys = ('slug', )
+            sd.additional_keys = ('trakt_id', )
             dpro.max_value = len(sd.items)
             with ParallelThread(sd.items, get_item) as pt:
                 item_queue = pt.queue

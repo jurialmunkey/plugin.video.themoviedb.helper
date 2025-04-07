@@ -343,7 +343,7 @@ class SyncDataGetters:
 
 class SyncData(SyncDataGetters):
 
-    cache_filename = 'TraktSync.db'
+    cache_filename = 'TraktSync_v2.db'
 
     def __init__(self, class_instance_trakt_api):
         self._class_instance_trakt_api = class_instance_trakt_api  # The TraktAPI object sync called from
