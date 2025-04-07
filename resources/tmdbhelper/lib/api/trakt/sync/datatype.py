@@ -152,8 +152,8 @@ class DataType:
 class DataTypeEpisodes(DataType):
     def clear_child_columns(self, keys):
         if self.item_type == 'show':
-            self.cache.del_column_values(self.keys, 'season')
-            self.cache.del_column_values(self.keys, 'episode')
+            self.cache.del_column_values(keys, 'season')
+            self.cache.del_column_values(keys, 'episode')
 
     @property
     def last_activities_item_type(self):
