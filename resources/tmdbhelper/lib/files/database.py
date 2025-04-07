@@ -148,6 +148,14 @@ class DataBase:
             return
         return cache[0]
 
+    def set_list_values(self, values, keys, table=DEFAULT_TABLE):
+        query = 'INSERT OR IGNORE INTO {table} ({keys}) VALUES ({values})'.format(
+            keys=', '.join(keys),
+            values=', '.join(['?' for _ in keys]),
+            table=table,
+        )
+        return self._execute_sql(query, values)
+
     def get_list_values(self, conditions, values, keys, table=DEFAULT_TABLE):
         query = 'SELECT {keys} FROM {table} WHERE {conditions}'.format(
             keys=', '.join(keys),

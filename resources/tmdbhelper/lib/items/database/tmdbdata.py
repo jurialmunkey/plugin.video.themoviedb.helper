@@ -80,6 +80,7 @@ class ItemMapper(_ItemMapper):
         self.standard_map = {
             'id': ('item', 'tmdb_id'),
             'title': ('item', 'title'),
+            'name': ('item', 'title'),
             'tagline': ('item', 'tagline'),
             'overview': ('item', 'plot'),
             'original_title': ('item', 'originaltitle'),
@@ -100,6 +101,11 @@ class DetailsDataBaseCache(ItemDetailsDataBaseCache):
     table = ''
     keys = ()
 
+    item_sub_id_key = 'tmdb_id'
+
+    def get_item_uid(self, i):
+        return f'{self.item_id}.{self.table}.{i[self.item_sub_id_key]}'
+
     @property
     def item_info(self):
         return self.table
@@ -115,34 +121,33 @@ class DetailsDataBaseCache(ItemDetailsDataBaseCache):
         return {self.get_item_uid(i): [self.item_id if k == 'parent_id' else i[k] for k in self.keys] for i in data[self.table]}
 
 
-class MultiDetailsDataBaseCache(DetailsDataBaseCache):
+class ListDetailsDataBaseCache(DetailsDataBaseCache):
     conditions = 'parent_id=?'  # WHERE conditions
-    item_sub_id_key = 'tmdb_id'
-
-    def get_item_uid(self, i):
-        return f'{self.item_id}.{self.table}.{i[self.item_sub_id_key]}'
 
     def get_cached_data(self):
         return self.cache.get_list_values(self.conditions, self.values, self.keys, self.table)
 
+    def configure_mapped_data_list(self, data):
+        return [tuple([self.item_id if k == 'parent_id' else i[k] for k in self.keys]) for i in data[self.table]]
+
     def set_cached_data(self, online_data_mapped):
         data = self.configure_mapped_data_list(online_data_mapped)
-        self.set_cached_many(self.keys, self.table, data)
+        self.cache.set_list_values(values=data, keys=self.keys, table=self.table)
         return self.get_cached_data()
 
 
-class StudioDetailsDataBaseCache(MultiDetailsDataBaseCache):
+class StudioDetailsDataBaseCache(ListDetailsDataBaseCache):
     table = 'studio'
     keys = ('name', 'tmdb_id', 'icon', 'country', 'parent_id', )
 
 
-class CountryDetailsDataBaseCache(MultiDetailsDataBaseCache):
+class CountryDetailsDataBaseCache(ListDetailsDataBaseCache):
     table = 'country'
     keys = ('name', 'iso', 'parent_id', )
     item_sub_id_key = 'iso'
 
 
-class GenreDetailsDataBaseCache(MultiDetailsDataBaseCache):
+class GenreDetailsDataBaseCache(ListDetailsDataBaseCache):
     table = 'genre'
     keys = ('name', 'tmdb_id', 'parent_id', )
 
@@ -155,7 +160,7 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
 
     @cached_property
     def keys(self):
-        return [k for k in getattr(self.cache, f'{self.table}_columns').keys() if not k.startswith('FOREIGN KEY')]
+        return [k for k in getattr(self.cache, f'{self.table}_columns').keys() if not k.startswith(('FOREIGN KEY', 'UNIQUE',))]
 
     @cached_property
     def table(self):
