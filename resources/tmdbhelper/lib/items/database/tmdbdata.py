@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from functools import cached_property
+from tmdbhelper.lib.addon.tmdate import set_timestamp
 from tmdbhelper.lib.items.database.database import ItemDetailsDataBaseCache
 from tmdbhelper.lib.api.mapping import _ItemMapper
 
@@ -189,6 +190,15 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
     data_cond = True  # Condition to retrieve any data
     cache_refresh = None  # Set to "never" for cache only, or "force" for forced refresh
     item_info = 'item'
+    expiry_time = 30 * 86400  # 30d = 86400 = 60s(1m) * 60m(1h) * 24h(1d)
+
+    @property
+    def expiry(self):
+        return self.current_time + self.expiry_time
+
+    @property
+    def current_time(self):
+        return set_timestamp(0, set_int=True)
 
     @cached_property
     def keys(self):
@@ -296,10 +306,10 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
         ))
 
         # WHERE
-        conditions = f'{self.table}.id=?'
+        conditions = f'baseitem.id=? AND baseitem.expiry>=?'
 
         # WHERE condition ? ? ? ? = value, value, value, value
-        values = (self.item_id, )
+        values = (self.item_id, self.current_time, )
 
         data = self.cache.get_list_values(conditions, values, keys, table)
         if not data[0]['tmdb_id']:
@@ -309,7 +319,7 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
     def set_cached_data(self):
         if not self.online_data_mapped:
             return
-        self.cache.set_values(self.item_id, key_value_pairs=(('mediatype', self.mediatype), ('expiry', 'expiry'),), table='baseitem')
+        self.cache.set_values(self.item_id, key_value_pairs=(('mediatype', self.mediatype), ('expiry', self.expiry),), table='baseitem')
         self.set_cached_many(self.keys, self.table, self.configure_mapped_data(self.online_data_mapped))
         self.db_genre_cache.set_cached_data(self.online_data_mapped)
         self.db_country_cache.set_cached_data(self.online_data_mapped)

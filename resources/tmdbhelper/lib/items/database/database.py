@@ -14,7 +14,7 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
         },
         'expiry': {
-            'data': 'TEXT',
+            'data': 'INTEGER',
         },
     }
 
