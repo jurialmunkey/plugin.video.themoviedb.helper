@@ -457,6 +457,36 @@ class ItemDetailsDataBase(DataBase):
         }
     }
 
+    provider_columns = {
+        'name': {
+            'data': 'TEXT',
+        },
+        'tmdb_id': {
+            'data': 'INTEGER',
+        },
+        'display_priority': {
+            'data': 'INTEGER',
+        },
+        'iso': {
+            'data': 'TEXT',
+        },
+        'logo': {
+            'data': 'TEXT',
+        },
+        'availability': {
+            'data': 'TEXT',
+        },
+        'parent_id': {
+            'data': 'TEXT',
+        },
+        'FOREIGN KEY(parent_id)': {
+            'data': 'REFERENCES baseitem(id)',
+        },
+        'UNIQUE': {
+            'data': '(tmdb_id, parent_id)',
+        }
+    }
+
     artwork_columns = {
         'key': {
             'data': 'TEXT',
@@ -506,7 +536,6 @@ class ItemDetailsDataBase(DataBase):
             'season': self.season_columns,
             'episode': self.episode_columns,
             'person': self.person_columns,
-            'lactivities': self.lactivities_columns,
             'ratings': self.ratings_columns,
             'kodi_dbid': self.kodi_dbid_columns,
             'genre': self.genre_columns,
@@ -515,6 +544,7 @@ class ItemDetailsDataBase(DataBase):
             'network': self.network_columns,
             'crew': self.crew_columns,
             'cast': self.cast_columns,
+            'provider': self.provider_columns,
             'custom': self.custom_columns,
             'artwork': self.artwork_columns,
             'unique_id': self.unique_id_columns,

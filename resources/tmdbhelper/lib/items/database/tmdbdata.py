@@ -5,7 +5,7 @@ from tmdbhelper.lib.items.database.database import ItemDetailsDataBaseCache
 from tmdbhelper.lib.api.mapping import _ItemMapper
 
 
-def split_array(items, dictionary=None, **kwargs):
+def split_array(items, **kwargs):
     if not items or not isinstance(items, list):
         return ()
 
@@ -15,6 +15,29 @@ def split_array(items, dictionary=None, **kwargs):
         return v(i)
 
     return [{k: get_item(i, v) for k, v in kwargs.items()} for i in items]
+
+
+def get_providers(items, **kwargs):
+    if not items:
+        return
+    results = items.get('results')
+    if not results:
+        return
+    data = []
+    for iso, availabilities in results.items():
+        for availability, datalist in availabilities.items():
+            if availability == 'link':
+                continue
+            for provider in datalist:
+                data.append({
+                    'iso': iso,
+                    'availability': availability,
+                    'display_priority': provider.get('display_priority'),
+                    'name': provider.get('provider_name'),
+                    'logo': provider.get('logo_path'),
+                    'tmdb_id': provider.get('provider_id'),
+                })
+    return data
 
 
 class BlankNoneDict(dict):
@@ -29,6 +52,7 @@ def get_empty_item():
         'country': (),
         'studio': (),
         'network': (),
+        'provider': (),
     }
 
 
@@ -74,6 +98,10 @@ class ItemMapper(_ItemMapper):
                 'keys': [('network', None)],
                 'func': split_array,
                 'kwargs': {'name': 'name', 'tmdb_id': 'id', 'icon': 'logo_path', 'country': 'origin_country'}
+            }],
+            'watch/providers': [{
+                'keys': [('provider', None)],
+                'func': get_providers,
             }],
 
         }
@@ -152,8 +180,12 @@ class GenreDetailsDataBaseCache(ListDetailsDataBaseCache):
     keys = ('name', 'tmdb_id', 'parent_id', )
 
 
+class ProviderDetailsDataBaseCache(ListDetailsDataBaseCache):
+    table = 'provider'
+    keys = ('name', 'tmdb_id', 'display_priority', 'iso', 'logo', 'availability', 'parent_id')
+
+
 class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
-    online_data_kwgs = {}  # KWGS for online_data_func
     data_cond = True  # Condition to retrieve any data
     cache_refresh = None  # Set to "never" for cache only, or "force" for forced refresh
     item_info = 'item'
@@ -184,8 +216,8 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
 
     @cached_property
     def tmdb_api(self):
-        from tmdbhelper.lib.api.tmdb.api import TMDbAPI
-        return TMDbAPI()
+        from tmdbhelper.lib.api.tmdb.api import TMDb
+        return TMDb()
 
     @property
     def online_data_func(self):  # The function to get data e.g. get_response_json
@@ -194,6 +226,10 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
     @property
     def online_data_args(self):
         return (self.tmdb_type, self.tmdb_id, )
+
+    @property
+    def online_data_kwgs(self):
+        return {'append_to_response': self.tmdb_api.append_to_response}
 
     @cached_property
     def online_data_mapped(self):
@@ -231,6 +267,10 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
         dbc.table = self.db_studio_table  # Use networks not studios for TV
         return dbc
 
+    @cached_property
+    def db_provider_cache(self):
+        return self.get_db_cache(ProviderDetailsDataBaseCache)
+
     def get_cached_data(self):
         # SELECT
         # Do some weird group concats since json array doesnt appear to be supported
@@ -252,6 +292,7 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
             f'LEFT JOIN genre ON genre.parent_id = baseitem.id',
             f'LEFT JOIN country ON country.parent_id = baseitem.id',
             f'LEFT JOIN {self.db_studio_table} ON {self.db_studio_table}.parent_id = baseitem.id',
+            f'LEFT JOIN provider ON provider.parent_id = baseitem.id',
         ))
 
         # WHERE
@@ -273,6 +314,7 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
         self.db_genre_cache.set_cached_data(self.online_data_mapped)
         self.db_country_cache.set_cached_data(self.online_data_mapped)
         self.db_studio_cache.set_cached_data(self.online_data_mapped)
+        self.db_provider_cache.set_cached_data(self.online_data_mapped)
         return self.get_cached_data()
 
     @cached_property
