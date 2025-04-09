@@ -1,6 +1,7 @@
 from functools import cached_property
 from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp
 from tmdbhelper.lib.api.trakt.sync.activity import SyncLastActivities
+from tmdbhelper.lib.files.locker import mutexlock
 
 
 def timerlock(func):
@@ -28,18 +29,6 @@ def progress_bg(func):
     return wrapper
 
 
-def mutexlock(func):
-    def wrapper(self, *args, **kwargs):
-        from jurialmunkey.locker import MutexPropLock
-        filename = f'{self.lock_name}.{self.item_type}.{self.method}'
-        filename = f'{self.cache._db_file}.{filename}.lockfile'
-        with MutexPropLock(filename, timeout=300, kodi_log=self.cache.kodi_log) as mutex_lock:
-            if mutex_lock.lockstate == -1:  # Abort or Timeout
-                return
-            return func(self, *args, **kwargs)
-    return wrapper
-
-
 class DataType:
     sync_kwgs = {}
     lock_name = 'sync_trakt'
@@ -48,6 +37,10 @@ class DataType:
     def __init__(self, class_instance_syncdata, item_type):
         self._class_instance_syncdata = class_instance_syncdata
         self._item_type = item_type
+
+    @property
+    def mutex_lockname(self):
+        return f'{self.cache._db_file}.{self.lock_name}.{self.item_type}.{self.method}.lockfile'
 
     @property
     def cache(self):
