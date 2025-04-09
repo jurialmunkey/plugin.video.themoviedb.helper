@@ -9,613 +9,496 @@ class ItemDetailsDataBase(DataBase):
     baseitem_columns = {
         'id': {
             'data': 'TEXT UNIQUE',
-            'sync': None
         },
         'mediatype': {
             'data': 'TEXT',
-            'sync': None
         },
         'expiry': {
-            'data': 'TEXT',
-            'sync': None
+            'data': 'INTEGER',
         },
     }
 
     movie_columns = {
         'id': {
             'data': 'TEXT UNIQUE',
-            'sync': None
         },
         'tmdb_id': {
             'data': 'INTEGER',
-            'sync': None
         },
         'year': {
             'data': 'INTEGER',
-            'sync': None
         },
         'mpaa': {
             'data': 'TEXT',
-            'sync': None
         },
         'plot': {
             'data': 'TEXT',
-            'sync': None
         },
         'title': {
             'data': 'TEXT',
-            'sync': None
         },
         'originaltitle': {
             'data': 'TEXT',
-            'sync': None
         },
         'duration': {
             'data': 'INTEGER',
-            'sync': None
         },
         'tagline': {
             'data': 'TEXT',
-            'sync': None
         },
         'status': {
             'data': 'TEXT',
-            'sync': None
         },
         'premiered': {
             'data': 'TEXT',
-            'sync': None
         },
         'trailer': {
             'data': 'TEXT',
-            'sync': None
         },
         'FOREIGN KEY(id)': {
             'data': 'REFERENCES baseitem(id)',
-            'sync': None
         }
     }
 
     tvshow_columns = {
         'id': {
             'data': 'TEXT UNIQUE',
-            'sync': None
         },
         'tmdb_id': {
             'data': 'INTEGER',
-            'sync': None
         },
         'year': {
             'data': 'INTEGER',
-            'sync': None
         },
         'mpaa': {
             'data': 'TEXT',
-            'sync': None
         },
         'plot': {
             'data': 'TEXT',
-            'sync': None
         },
         'title': {
             'data': 'TEXT',
-            'sync': None
         },
         'originaltitle': {
             'data': 'TEXT',
-            'sync': None
         },
         'duration': {
             'data': 'INTEGER',
-            'sync': None
         },
         'tagline': {
             'data': 'TEXT',
-            'sync': None
         },
         'status': {
             'data': 'TEXT',
-            'sync': None
         },
         'premiered': {
             'data': 'TEXT',
-            'sync': None
         },
         'trailer': {
             'data': 'TEXT',
-            'sync': None
         },
         'FOREIGN KEY(id)': {
             'data': 'REFERENCES baseitem(id)',
-            'sync': None
         }
     }
 
     season_columns = {
         'id': {
             'data': 'TEXT UNIQUE',
-            'sync': None
         },
         'season': {
             'data': 'INTEGER',
-            'sync': None
         },
         'year': {
             'data': 'INTEGER',
-            'sync': None
         },
         'plot': {
             'data': 'TEXT',
-            'sync': None
         },
         'title': {
             'data': 'TEXT',
-            'sync': None
         },
         'originaltitle': {
             'data': 'TEXT',
-            'sync': None
         },
         'premiered': {
             'data': 'TEXT',
-            'sync': None
         },
         'tvshow_id': {
             'data': 'TEXT',
-            'sync': None
         },
         'FOREIGN KEY(id)': {
             'data': 'REFERENCES baseitem(id)',
-            'sync': None
         },
         'FOREIGN KEY(tvshow_id)': {
             'data': 'REFERENCES tvshow(id)',
-            'sync': None
         }
     }
 
     episode_columns = {
         'id': {
             'data': 'TEXT UNIQUE',
-            'sync': None
         },
         'episode': {
             'data': 'INTEGER',
-            'sync': None
         },
         'year': {
             'data': 'INTEGER',
-            'sync': None
         },
         'plot': {
             'data': 'TEXT',
-            'sync': None
         },
         'title': {
             'data': 'TEXT',
-            'sync': None
         },
         'originaltitle': {
             'data': 'TEXT',
-            'sync': None
         },
         'premiered': {
             'data': 'TEXT',
-            'sync': None
         },
         'duration': {
             'data': 'INTEGER',
-            'sync': None
         },
         'season_id': {
             'data': 'TEXT',
-            'sync': None
         },
         'tvshow_id': {
             'data': 'TEXT',
-            'sync': None
         },
         'FOREIGN KEY(id)': {
             'data': 'REFERENCES baseitem(id)',
-            'sync': None
         },
         'FOREIGN KEY(tvshow_id)': {
             'data': 'REFERENCES tvshow(id)',
-            'sync': None
         },
         'FOREIGN KEY(season_id)': {
             'data': 'REFERENCES season(id)',
-            'sync': None
         }
     }
 
     ratings_columns = {
         'id': {
             'data': 'TEXT UNIQUE',
-            'sync': None
         },
         'top250': {
             'data': 'INTEGER',
-            'sync': None
         },
         'tmdb_rating': {
             'data': 'INTEGER',
-            'sync': None
         },
         'tmdb_votes': {
             'data': 'INTEGER',
-            'sync': None
         },
         'imdb_rating': {
             'data': 'INTEGER',
-            'sync': None
         },
         'imdb_votes': {
             'data': 'INTEGER',
-            'sync': None
         },
         'rottentomatoes_rating': {
             'data': 'INTEGER',
-            'sync': None
         },
         'rottentomatoes_usermeter': {
             'data': 'INTEGER',
-            'sync': None
         },
         'rottentomatoes_userreviews': {
             'data': 'INTEGER',
-            'sync': None
         },
         'rottentomatoes_reviewtotal': {
             'data': 'INTEGER',
-            'sync': None
         },
         'rottentomatoes_reviewsfresh': {
             'data': 'INTEGER',
-            'sync': None
         },
         'rottentomatoes_reviewsrotten': {
             'data': 'INTEGER',
-            'sync': None
         },
         'rottentomatoes_consensus': {
             'data': 'TEXT',
-            'sync': None
         },
         'metacritic_rating': {
             'data': 'INTEGER',
-            'sync': None
         },
         'trakt_rating': {
             'data': 'INTEGER',
-            'sync': None
         },
         'trakt_votes': {
             'data': 'INTEGER',
-            'sync': None
         },
         'letterboxd_rating': {
             'data': 'INTEGER',
-            'sync': None
         },
         'letterboxd_votes': {
             'data': 'INTEGER',
-            'sync': None
         },
         'mdblist_rating': {
             'data': 'INTEGER',
-            'sync': None
         },
         'mdblist_votes': {
             'data': 'INTEGER',
-            'sync': None
         },
         'awards': {
             'data': 'TEXT',
-            'sync': None
         },
         'goldenglobe_wins': {
             'data': 'INTEGER',
-            'sync': None
         },
         'goldenglobe_nominations': {
             'data': 'INTEGER',
-            'sync': None
         },
         'oscar_wins': {
             'data': 'INTEGER',
-            'sync': None
         },
         'oscar_nominations': {
             'data': 'INTEGER',
-            'sync': None
         },
         'award_wins': {
             'data': 'INTEGER',
-            'sync': None
         },
         'award_nominations': {
             'data': 'INTEGER',
-            'sync': None
         },
         'emmy_wins': {
             'data': 'INTEGER',
-            'sync': None
         },
         'emmy_nominations': {
             'data': 'INTEGER',
-            'sync': None
         },
         'FOREIGN KEY(id)': {
             'data': 'REFERENCES baseitem(id)',
-            'sync': None
         }
 
     }
 
-    kodi_dbid_columns = {
-        'id': {
-            'data': 'TEXT UNIQUE',
-            'sync': None
+    person_columns = {
+        'name': {
+            'data': 'TEXT',
         },
-        'dbid': {
+        'tmdb_id': {
+            'data': 'INTEGER UNIQUE',
+        },
+        'thumb': {
+            'data': 'TEXT',
+        },
+        'known_for_department': {
+            'data': 'TEXT',
+        },
+        'gender': {
             'data': 'INTEGER',
-            'sync': None
         },
-        'FOREIGN KEY(id)': {
-            'data': 'REFERENCES baseitem(id)',
-            'sync': None
-        }
+        'biography': {
+            'data': 'TEXT',
+        },
     }
 
     genre_columns = {
-        'id': {
-            'data': 'TEXT UNIQUE',
-            'sync': None
-        },
         'name': {
             'data': 'TEXT',
-            'sync': None
         },
         'tmdb_id': {
             'data': 'INTEGER',
-            'sync': None
         },
         'parent_id': {
             'data': 'TEXT',
-            'sync': None
         },
         'FOREIGN KEY(parent_id)': {
             'data': 'REFERENCES baseitem(id)',
-            'sync': None
+        },
+        'UNIQUE': {
+            'data': '(tmdb_id, parent_id)',
         }
     }
 
     country_columns = {
-        'id': {
-            'data': 'TEXT UNIQUE',
-            'sync': None
-        },
         'name': {
             'data': 'TEXT',
-            'sync': None
         },
         'iso': {
             'data': 'TEXT',
-            'sync': None
         },
         'parent_id': {
             'data': 'TEXT',
-            'sync': None
         },
         'FOREIGN KEY(parent_id)': {
             'data': 'REFERENCES baseitem(id)',
-            'sync': None
+        },
+        'UNIQUE': {
+            'data': '(iso, parent_id)',
         }
     }
 
     studio_columns = {
-        'id': {
-            'data': 'TEXT UNIQUE',
-            'sync': None
-        },
         'name': {
             'data': 'TEXT',
-            'sync': None
         },
         'tmdb_id': {
             'data': 'INTEGER',
-            'sync': None
         },
         'icon': {
             'data': 'TEXT',
-            'sync': None
         },
         'country': {
             'data': 'TEXT',
-            'sync': None
         },
         'parent_id': {
             'data': 'TEXT',
-            'sync': None
         },
         'FOREIGN KEY(parent_id)': {
             'data': 'REFERENCES baseitem(id)',
-            'sync': None
+        },
+        'UNIQUE': {
+            'data': '(tmdb_id, parent_id)',
         }
     }
 
     network_columns = {
-        'id': {
-            'data': 'TEXT UNIQUE',
-            'sync': None
-        },
         'name': {
             'data': 'TEXT',
-            'sync': None
         },
         'tmdb_id': {
             'data': 'INTEGER',
-            'sync': None
         },
         'icon': {
             'data': 'TEXT',
-            'sync': None
         },
         'country': {
             'data': 'TEXT',
-            'sync': None
         },
         'parent_id': {
             'data': 'TEXT',
-            'sync': None
         },
         'FOREIGN KEY(parent_id)': {
             'data': 'REFERENCES baseitem(id)',
-            'sync': None
+        },
+        'UNIQUE': {
+            'data': '(tmdb_id, parent_id)',
         }
     }
 
-    crew_columns = {
-        'id': {
-            'data': 'TEXT UNIQUE',
-            'sync': None
-        },
-        'name': {
-            'data': 'TEXT',
-            'sync': None
-        },
+    crewmember_columns = {
         'tmdb_id': {
             'data': 'INTEGER',
-            'sync': None
         },
         'role': {
             'data': 'TEXT',
-            'sync': None
         },
         'department': {
             'data': 'TEXT',
-            'sync': None
-        },
-        'thumb': {
-            'data': 'TEXT',
-            'sync': None
         },
         'ordering': {
             'data': 'INTEGER',
-            'sync': None
         },
         'parent_id': {
             'data': 'TEXT',
-            'sync': None
         },
         'FOREIGN KEY(parent_id)': {
             'data': 'REFERENCES baseitem(id)',
-            'sync': None
+        },
+        'FOREIGN KEY(tmdb_id)': {
+            'data': 'REFERENCES person(tmdb_id)',
+        },
+        'UNIQUE': {
+            'data': '(tmdb_id, parent_id)',
         }
     }
 
-    cast_columns = {
-        'id': {
-            'data': 'TEXT UNIQUE',
-            'sync': None
-        },
-        'name': {
-            'data': 'TEXT',
-            'sync': None
-        },
+    castmember_columns = {
         'tmdb_id': {
             'data': 'INTEGER',
-            'sync': None
         },
         'role': {
             'data': 'TEXT',
-            'sync': None
-        },
-        'thumb': {
-            'data': 'TEXT',
-            'sync': None
         },
         'ordering': {
             'data': 'INTEGER',
-            'sync': None
         },
         'parent_id': {
             'data': 'TEXT',
-            'sync': None
         },
         'FOREIGN KEY(parent_id)': {
             'data': 'REFERENCES baseitem(id)',
-            'sync': None
+        },
+        'FOREIGN KEY(tmdb_id)': {
+            'data': 'REFERENCES person(tmdb_id)',
+        },
+        'UNIQUE': {
+            'data': '(tmdb_id, parent_id)',
         }
     }
 
     custom_columns = {
-        'id': {
-            'data': 'TEXT UNIQUE',
-            'sync': None
-        },
         'key': {
             'data': 'TEXT',
-            'sync': None
         },
         'value': {
             'data': 'TEXT',
-            'sync': None
         },
         'parent_id': {
             'data': 'TEXT',
-            'sync': None
         },
         'FOREIGN KEY(parent_id)': {
             'data': 'REFERENCES baseitem(id)',
-            'sync': None
+        }
+    }
+
+    provider_columns = {
+        'name': {
+            'data': 'TEXT',
+        },
+        'tmdb_id': {
+            'data': 'INTEGER',
+        },
+        'display_priority': {
+            'data': 'INTEGER',
+        },
+        'iso': {
+            'data': 'TEXT',
+        },
+        'logo': {
+            'data': 'TEXT',
+        },
+        'availability': {
+            'data': 'TEXT',
+        },
+        'parent_id': {
+            'data': 'TEXT',
+        },
+        'FOREIGN KEY(parent_id)': {
+            'data': 'REFERENCES baseitem(id)',
+        },
+        'UNIQUE': {
+            'data': '(tmdb_id, parent_id)',
         }
     }
 
     artwork_columns = {
-        'id': {
-            'data': 'TEXT UNIQUE',
-            'sync': None
-        },
         'key': {
             'data': 'TEXT',
-            'sync': None
         },
         'value': {
             'data': 'TEXT',
-            'sync': None
         },
         'parent_id': {
             'data': 'TEXT',
-            'sync': None
         },
         'FOREIGN KEY(parent_id)': {
             'data': 'REFERENCES baseitem(id)',
-            'sync': None
         }
     }
 
     unique_id_columns = {
-        'id': {
-            'data': 'TEXT UNIQUE',
-            'sync': None
-        },
         'key': {
             'data': 'TEXT',
-            'sync': None
         },
         'value': {
             'data': 'TEXT',
-            'sync': None
         },
         'parent_id': {
             'data': 'TEXT',
-            'sync': None
         },
         'FOREIGN KEY(parent_id)': {
             'data': 'REFERENCES baseitem(id)',
-            'sync': None
         }
     }
 
@@ -627,16 +510,15 @@ class ItemDetailsDataBase(DataBase):
         ('season', 'id', ),
         ('episode', 'id', ),
         ('ratings', 'id', ),
-        ('kodi_dbid', 'id', ),
-        ('genre', 'id', ),
-        ('country', 'id', ),
-        ('studio', 'id', ),
-        ('network', 'id', ),
-        ('crew', 'id', ),
-        ('cast', 'id', ),
-        ('custom', 'id', ),
-        ('artwork', 'id', ),
-        ('unique_id', 'id', ),
+        ('person', 'tmdb_id', ),
+        ('genre', 'parent_id', ),
+        ('studio', 'parent_id', ),
+        ('network', 'parent_id', ),
+        ('country', 'parent_id', ),
+        ('castmember', 'parent_id', ),
+        ('castmember', 'tmdb_id', ),
+        ('crewmember', 'parent_id', ),
+        ('crewmember', 'tmdb_id', ),
     )
 
     @property
@@ -647,15 +529,15 @@ class ItemDetailsDataBase(DataBase):
             'tvshow': self.tvshow_columns,
             'season': self.season_columns,
             'episode': self.episode_columns,
-            'lactivities': self.lactivities_columns,
             'ratings': self.ratings_columns,
-            'kodi_dbid': self.kodi_dbid_columns,
+            'person': self.person_columns,
             'genre': self.genre_columns,
             'country': self.country_columns,
             'studio': self.studio_columns,
             'network': self.network_columns,
-            'crew': self.crew_columns,
-            'cast': self.cast_columns,
+            'crewmember': self.crewmember_columns,
+            'castmember': self.castmember_columns,
+            'provider': self.provider_columns,
             'custom': self.custom_columns,
             'artwork': self.artwork_columns,
             'unique_id': self.unique_id_columns,

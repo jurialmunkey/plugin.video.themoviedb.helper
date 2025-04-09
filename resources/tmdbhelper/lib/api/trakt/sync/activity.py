@@ -3,24 +3,17 @@ from tmdbhelper.lib.files.futils import json_loads as data_loads
 from tmdbhelper.lib.files.futils import json_dumps as data_dumps
 from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp
 from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA
+from tmdbhelper.lib.files.locker import mutexlock
 
 
 LASTACTIVITIES_EXPIRY = 600
 
 
-def mutexlock(func):
-    def wrapper(self, *args, **kwargs):
-        from jurialmunkey.locker import MutexPropLock
-        filename = f'{self.lock_name}'
-        filename = f'{self.cache._db_file}.{filename}.lockfile'
-        with MutexPropLock(filename, timeout=300, kodi_log=self.cache.kodi_log) as mutex_lock:
-            if mutex_lock.lockstate == -1:  # Abort or Timeout
-                return
-            return func(self, *args, **kwargs)
-    return wrapper
-
-
 class SyncLastActivities:
+    @property
+    def mutex_lockname(self):
+        return f'{self.cache._db_file}.sync_last_activities.lockfile'
+
     @cached_property
     def json(self):
         return self.get_json()
@@ -36,8 +29,6 @@ class SyncLastActivities:
     @cached_property
     def json_sync(self):
         return self.get_json_sync()
-
-    lock_name = 'sync_last_activities'
 
     def __init__(self, class_instance_syncdata):
         self.class_instance_syncdata = class_instance_syncdata

@@ -4,7 +4,7 @@ from functools import cached_property
 from tmdbhelper.lib.files.database import DataBaseCache
 from tmdbhelper.lib.api.trakt.sync.database import SyncDataBase
 from tmdbhelper.lib.addon.thread import ParallelThread
-from jurialmunkey.locker import MutexPropLock
+from tmdbhelper.lib.files.locker import mutexlock_funcname
 
 
 class SyncEpisodes(SyncDataBase):
@@ -360,6 +360,10 @@ class SyncEpisodesData(SyncTraktAPI):
     def __init__(self, class_instance_trakt_api):
         self.class_instance_trakt_api = class_instance_trakt_api  # The TraktAPI object sync called from
 
+    @property
+    def mutex_lockname(self):
+        return f'{self.cache._db_file}.lockfile'
+
     @cached_property
     def cache(self):
         return SyncEpisodes(filename=self.cache_filename)
@@ -385,22 +389,13 @@ class SyncEpisodesData(SyncTraktAPI):
     def keys(self):
         return tuple([k for k in self.cache.simplecache_columns.keys()])
 
-    def mutexlock(func):
-        def wrapper(self, *args, **kwargs):
-            filename = f'{self.cache._db_file}.{func.__name__}.{args}.lockfile'
-            with MutexPropLock(filename, timeout=300, kodi_log=self.cache.kodi_log) as mutex_lock:
-                if mutex_lock.lockstate == -1:  # Abort or Timeout
-                    return
-                return func(self, *args, **kwargs)
-        return wrapper
-
-    @mutexlock
+    @mutexlock_funcname
     def sync_single_episode(self, tmdb_id, season, episode):
         if self.cache.get_values(self.get_name('tv', tmdb_id, season, episode), ('id', )):
             return
         self.sync_func_single_episode(tmdb_id, season, episode)
 
-    @mutexlock
+    @mutexlock_funcname
     def sync_all_episodes(self, tmdb_id):
         data = {}
         sync = SyncShowEpisodesData(self, tmdb_id)

@@ -221,16 +221,25 @@ class ItemListSyncDataUnwatchedPlayback(ItemListSyncData):
 class ItemListSyncDataToWatch(ItemListSyncData):
     """ Mix of watchlist and inprogress items """
 
-    def get_syncdata_getter(self):
+    @cached_property
+    def presorted_fallback_key(self):
         if self.item_type == 'movie':
-            sd = self.trakt_syncdata.get_all_unhidden_movies_towatch_getter()
-        else:
-            sd = self.trakt_syncdata.get_all_unhidden_shows_towatch_getter()
-        sd.additional_keys = ('last_watched_at', *self.item_keys, )
+            return 'playback_paused_at'
+        return 'last_watched_at'
+
+    @cached_property
+    def syncdata_getter_func(self):
+        if self.item_type == 'movie':
+            return self.trakt_syncdata.get_all_unhidden_movies_towatch_getter
+        return self.trakt_syncdata.get_all_unhidden_shows_towatch_getter
+
+    def get_syncdata_getter(self):
+        sd = self.syncdata_getter_func()
+        sd.additional_keys = (self.presorted_fallback_key, *self.item_keys, )
         return sd
 
     def get_presorted_items(self):
-        return sorted(self.syncdata_getter.items, key=lambda x: x['watchlist_listed_at'] or x['last_watched_at'], reverse=True)
+        return sorted(self.syncdata_getter.items, key=lambda x: x['watchlist_listed_at'] or x[self.presorted_fallback_key], reverse=True)
 
     def get_items(self):
         data = [self.namedtuple_basic(i, self.item_type, ) for i in self.presorted_items]

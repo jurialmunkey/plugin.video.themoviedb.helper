@@ -16,6 +16,11 @@ TimerList = jurialmunkey_logger.TimerList
 TimerFunc = jurialmunkey_logger.TimerFunc
 
 
+def textviewer_output(message, header=''):
+    from xbmcgui import Dialog
+    Dialog().textviewer(header, f'{message}')
+
+
 class CProfiler():
     def __init__(self, filename='output'):
         """ ContextManager for setting a WindowProperty over duration """

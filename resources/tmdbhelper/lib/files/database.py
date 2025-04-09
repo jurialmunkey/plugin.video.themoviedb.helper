@@ -120,9 +120,9 @@ class DataBase:
                     return database.executemany(query, data)
                 return database.execute(query, data)
             except sqlite3.OperationalError as operational_exception:
-                self.kodi_log(f'CACHE: database OPERATIONAL ERROR! -- {operational_exception}\n{self._sc_name} -- read_only: {read_only}', 2)
+                self.kodi_log(f'CACHE: database OPERATIONAL ERROR! -- {operational_exception}\n{self._sc_name} -- read_only: {read_only}\n--query--\n{query}\n--data--\n{data}', 2)
             except Exception as other_exception:
-                self.kodi_log(f'CACHE: database OTHER ERROR! -- {other_exception}\n{self._sc_name} -- read_only: {read_only}', 2)
+                self.kodi_log(f'CACHE: database OTHER ERROR! -- {other_exception}\n{self._sc_name} -- read_only: {read_only}\n--query--\n{query}\n--data--\n{data}', 2)
 
         # always use new db object because we need to be sure that data is available for other simplecache instances
         try:
@@ -147,6 +147,14 @@ class DataBase:
         if not cache:
             return
         return cache[0]
+
+    def set_list_values(self, values, keys, table=DEFAULT_TABLE):
+        query = 'INSERT OR IGNORE INTO {table} ({keys}) VALUES ({values})'.format(
+            keys=', '.join(keys),
+            values=', '.join(['?' for _ in keys]),
+            table=table,
+        )
+        return self._execute_sql(query, values)
 
     def get_list_values(self, conditions, values, keys, table=DEFAULT_TABLE):
         query = 'SELECT {keys} FROM {table} WHERE {conditions}'.format(
