@@ -18,7 +18,7 @@ def test_func():
     sync.tmdb_id = 1399
     sync.season = 2
     sync.episode = 6
-    # sync.cache_refresh = 'force'
+    sync.cache_refresh = 'force'
     # sync.cache.del_database_init()
     from tmdbhelper.lib.addon.logger import TimerFunc
     with TimerFunc('TEST FUNC TOOK:', inline=True, log_threshold=0.0001):
