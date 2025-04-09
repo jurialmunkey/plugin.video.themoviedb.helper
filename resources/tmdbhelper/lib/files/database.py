@@ -120,9 +120,9 @@ class DataBase:
                     return database.executemany(query, data)
                 return database.execute(query, data)
             except sqlite3.OperationalError as operational_exception:
-                self.kodi_log(f'CACHE: database OPERATIONAL ERROR! -- {operational_exception}\n{self._sc_name} -- read_only: {read_only}', 2)
+                self.kodi_log(f'CACHE: database OPERATIONAL ERROR! -- {operational_exception}\n{self._sc_name} -- read_only: {read_only}\n--query--\n{query}\n--data--\n{data}', 2)
             except Exception as other_exception:
-                self.kodi_log(f'CACHE: database OTHER ERROR! -- {other_exception}\n{self._sc_name} -- read_only: {read_only}', 2)
+                self.kodi_log(f'CACHE: database OTHER ERROR! -- {other_exception}\n{self._sc_name} -- read_only: {read_only}\n--query--\n{query}\n--data--\n{data}', 2)
 
         # always use new db object because we need to be sure that data is available for other simplecache instances
         try:

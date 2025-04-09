@@ -4,6 +4,8 @@ from functools import cached_property
 from tmdbhelper.lib.addon.tmdate import set_timestamp
 from tmdbhelper.lib.items.database.database import ItemDetailsDataBaseCache
 from tmdbhelper.lib.api.mapping import _ItemMapper
+from tmdbhelper.lib.files.locker import mutexlock
+from tmdbhelper.lib.addon.logger import textviewer_output
 
 
 def split_array(items, **kwargs):
@@ -143,11 +145,19 @@ class DetailsDataBaseCache(ItemDetailsDataBaseCache):
     def values(self):  # WHERE conditions values for ?
         return (self.item_id, )
 
+    def get_configure_mapped_data(self, data, k):
+        return data[self.item_info][k]
+
+    def get_configure_mapped_data_list(self, i, k):
+        if k == 'parent_id':
+            return self.item_id
+        return i[k]
+
     def configure_mapped_data(self, data):
-        return {self.item_id: [data[self.item_info][k] for k in self.keys]}
+        return {self.item_id: [self.get_configure_mapped_data(data, k) for k in self.keys]}
 
     def configure_mapped_data_list(self, data):
-        return {self.get_item_uid(i): [self.item_id if k == 'parent_id' else i[k] for k in self.keys] for i in data[self.table]}
+        return {self.get_item_uid(i): [self.get_configure_mapped_data_list(i, k) for k in self.keys] for i in data[self.table]}
 
 
 class ListDetailsDataBaseCache(DetailsDataBaseCache):
@@ -191,6 +201,8 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
     cache_refresh = None  # Set to "never" for cache only, or "force" for forced refresh
     item_info = 'item'
     expiry_time = 30 * 86400  # 30d = 86400 = 60s(1m) * 60m(1h) * 24h(1d)
+    db_studio_table = 'studio'
+    cached_data_check_key = 'tmdb_id'
 
     @property
     def expiry(self):
@@ -203,18 +215,6 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
     @cached_property
     def keys(self):
         return [k for k in getattr(self.cache, f'{self.table}_columns').keys() if not k.startswith(('FOREIGN KEY', 'UNIQUE',))]
-
-    @cached_property
-    def table(self):
-        return self.mediatype
-
-    @cached_property
-    def tmdb_type(self):
-        if self.mediatype == 'movie':
-            return 'movie'
-        if self.mediatype in ('tvshow', 'season', 'episode', ):
-            return 'tv'
-        raise Exception(f'Invalid mediatype: {self.mediatype}')
 
     @property
     def item_id(self):
@@ -250,18 +250,68 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
         data['item']['mediatype'] = self.mediatype
         return data
 
+    @property
+    def cached_data_keys(self):
+        """ SELECT """
+        return (*[f'{self.table}.{k}' for k in self.keys],)
+
+    @property
+    def cached_data_table(self):
+        """ FROM """
+        return ' '.join((
+            'baseitem',
+            f'LEFT JOIN {self.table} ON {self.table}.id = baseitem.id',
+        ))
+
+    @property
+    def cached_data_conditions(self):
+        """ WHERE """
+        return f'baseitem.id=? AND baseitem.expiry>=?'
+
+    @property
+    def cached_data_values(self):
+        """ WHERE condition ? ? ? ? = value, value, value, value """
+        return (self.item_id, self.current_time, )
+
+    def get_cached_data(self):
+        data = self.cache.get_list_values(self.cached_data_conditions, self.cached_data_values, self.cached_data_keys, self.cached_data_table)
+        if not data[0][self.cached_data_check_key]:
+            return
+        return data
+
+    def set_cached_data(self):
+        if not self.online_data_mapped:
+            return
+        self.cache.set_values(self.item_id, key_value_pairs=(('mediatype', self.mediatype), ('expiry', self.expiry),), table='baseitem')
+        self.set_cached_many(self.keys, self.table, self.configure_mapped_data(self.online_data_mapped))
+        return self.get_cached_data()
+
+    @property
+    def mutex_lockname(self):
+        return f'{self.cache._db_file}.{self.item_id}.lockfile'
+
+    @mutexlock  # Use a mutex lock on the item_id to avoid double up of setting data or attempting get in middle of set
+    def use_cached_data(self):
+        return self.get_cached_data() or self.set_cached_data()
+
+    @cached_property
+    def data(self):
+        if not self.data_cond:
+            return
+        if self.cache_refresh == 'force':
+            return self.set_cached_data()
+        if self.cache_refresh == 'never':
+            return self.get_cached_data()
+        return self.use_cached_data()
+
+
+class TMDbBaseItemDetailsDataBaseCache(TMDbItemDetailsDataBaseCache):
     def get_db_cache(self, database_class):
         dbc = database_class()
         dbc.cache = self.cache
         dbc.mediatype = self.mediatype
         dbc.item_id = self.item_id
         return dbc
-
-    @cached_property
-    def db_studio_table(self):
-        if self.mediatype == 'movie':
-            return 'studio'
-        return 'network'
 
     @cached_property
     def db_genre_cache(self):
@@ -281,12 +331,13 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
     def db_provider_cache(self):
         return self.get_db_cache(ProviderDetailsDataBaseCache)
 
-    def get_cached_data(self):
-        # SELECT
+    @property
+    def cached_data_keys(self):
+        """ SELECT """
         # Do some weird group concats since json array doesnt appear to be supported
         # Resplit list groups into infolabel lists as e.g. Action||Adventure -- genre: [Action, Adventure]
         # Resplit property_list into infoproperties as e.g. name=Australia|iso=AU||name=Germany|iso=DE -- country.1.name: Australia, country.1.iso: AU
-        keys = (
+        return (
             *[f'{self.table}.{k}' for k in self.keys],
             'replace(GROUP_CONCAT(DISTINCT genre.name), ",", "||") as list_genre',
             'replace(GROUP_CONCAT(DISTINCT country.name), ",", "||") as list_country',
@@ -295,8 +346,10 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
             # 'replace(GROUP_CONCAT(DISTINCT "name=" || country.name || "|iso="  || country.iso), ",", "||") as property_list_country',
         )
 
-        # FROM
-        table = ' '.join((
+    @property
+    def cached_data_table(self):
+        """ FROM """
+        return ' '.join((
             'baseitem',
             f'LEFT JOIN {self.table} ON {self.table}.id = baseitem.id',
             f'LEFT JOIN genre ON genre.parent_id = baseitem.id',
@@ -305,34 +358,90 @@ class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
             f'LEFT JOIN provider ON provider.parent_id = baseitem.id',
         ))
 
-        # WHERE
-        conditions = f'baseitem.id=? AND baseitem.expiry>=?'
-
-        # WHERE condition ? ? ? ? = value, value, value, value
-        values = (self.item_id, self.current_time, )
-
-        data = self.cache.get_list_values(conditions, values, keys, table)
-        if not data[0]['tmdb_id']:
-            return
-        return data
-
     def set_cached_data(self):
         if not self.online_data_mapped:
             return
+
         self.cache.set_values(self.item_id, key_value_pairs=(('mediatype', self.mediatype), ('expiry', self.expiry),), table='baseitem')
         self.set_cached_many(self.keys, self.table, self.configure_mapped_data(self.online_data_mapped))
         self.db_genre_cache.set_cached_data(self.online_data_mapped)
         self.db_country_cache.set_cached_data(self.online_data_mapped)
         self.db_studio_cache.set_cached_data(self.online_data_mapped)
         self.db_provider_cache.set_cached_data(self.online_data_mapped)
+
         return self.get_cached_data()
 
-    @cached_property
-    def data(self):
-        if not self.data_cond:
+
+class TMDbMovieItemDetailsDataBaseCache(TMDbBaseItemDetailsDataBaseCache):
+    table = 'movie'
+    tmdb_type = 'movie'
+
+
+class TMDbTVShowItemDetailsDataBaseCache(TMDbBaseItemDetailsDataBaseCache):
+    table = 'tvshow'
+    tmdb_type = 'tv'
+    db_studio_table = 'network'
+
+
+class TMDbSeasonItemDetailsDataBaseCache(TMDbTVShowItemDetailsDataBaseCache):
+    table = 'season'
+    cached_data_check_key = 'tvshow_id'
+
+    @property
+    def item_id(self):
+        return self.get_season_id(self.tmdb_type, self.tmdb_id, self.season)
+
+    @property
+    def tvshow_id(self):
+        return self.get_base_id(self.tmdb_type, self.tmdb_id)
+
+    @property
+    def online_data_args(self):
+        return (self.tmdb_type, self.tmdb_id, 'season', self.season)
+
+    @property
+    def cached_data_table(self):
+        """ FROM """
+        return ' '.join((
+            'baseitem',
+            f'LEFT JOIN {self.table} ON {self.table}.id = baseitem.id',
+            f'LEFT JOIN tvshow ON tvshow.id = season.tvshow_id',
+            f'LEFT JOIN genre ON genre.parent_id = season.tvshow_id',
+            f'LEFT JOIN country ON country.parent_id = season.tvshow_id',
+            f'LEFT JOIN {self.db_studio_table} ON {self.db_studio_table}.parent_id = season.tvshow_id',
+            f'LEFT JOIN provider ON provider.parent_id = baseitem.id',  # Seasons individually have providers
+        ))
+
+    def get_configure_mapped_data(self, data, k):
+        if k == 'tvshow_id':
+            return self.tvshow_id
+        return data[self.item_info][k]
+
+    def set_cached_data(self):
+        if not self.online_data_mapped:
             return
-        if self.cache_refresh == 'force':
-            return self.set_cached_data()
-        if self.cache_refresh == 'never':
-            return self.get_cached_data()
-        return self.get_cached_data() or self.set_cached_data()
+
+        # Check we have base tvshow before mapping other data
+        base_dbc = TMDbTVShowItemDetailsDataBaseCache()
+        base_dbc.mediatype = 'tvshow'
+        base_dbc.tmdb_id = self.tmdb_id
+        base_dbc.data
+
+        self.cache.set_values(self.item_id, key_value_pairs=(('mediatype', self.mediatype), ('expiry', self.expiry),), table='baseitem')
+        self.set_cached_many(self.keys, self.table, self.configure_mapped_data(self.online_data_mapped))
+        self.db_provider_cache.set_cached_data(self.online_data_mapped)
+
+        return self.get_cached_data()
+
+
+def TMDbItemDetailsDataBaseCacheFactory(mediatype, *args, **kwargs):
+
+    routes = {
+        'movie': TMDbMovieItemDetailsDataBaseCache,
+        'tvshow': TMDbTVShowItemDetailsDataBaseCache,
+        'season': TMDbSeasonItemDetailsDataBaseCache,
+    }
+
+    dbc = routes[mediatype](*args, **kwargs)
+    dbc.mediatype = mediatype
+    return dbc
