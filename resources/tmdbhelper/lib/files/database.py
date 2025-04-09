@@ -149,6 +149,8 @@ class DataBase:
         return cache[0]
 
     def set_list_values(self, values, keys, table=DEFAULT_TABLE):
+        if not values:
+            return
         query = 'INSERT OR IGNORE INTO {table} ({keys}) VALUES ({values})'.format(
             keys=', '.join(keys),
             values=', '.join(['?' for _ in keys]),

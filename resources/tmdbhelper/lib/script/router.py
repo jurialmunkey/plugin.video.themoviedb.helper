@@ -16,15 +16,15 @@ def test_func():
     from tmdbhelper.lib.items.database.tmdbdata import TMDbItemDetailsDataBaseCacheFactory
     sync = TMDbItemDetailsDataBaseCacheFactory('episode')
     sync.tmdb_id = 1399
-    sync.season = 2
-    sync.episode = 6
-    sync.cache_refresh = 'force'
-    # sync.cache.del_database_init()
-    from tmdbhelper.lib.addon.logger import TimerFunc
-    with TimerFunc('TEST FUNC TOOK:', inline=True, log_threshold=0.0001):
-        data = {k: i[k] for i in sync.data for k in i.keys()}
+    sync.season = 1
+    sync.episode = 5
+    # sync.cache_refresh = 'force'
+    sync.cache.del_database_init()
+    # from tmdbhelper.lib.addon.logger import TimerFunc
+    # with TimerFunc('TEST FUNC TOOK:', inline=True, log_threshold=0.0001):
+    # data = {k: i[k] for i in sync.data for k in i.keys()}
     import xbmcgui
-    xbmcgui.Dialog().textviewer('TEST', f'{data}')
+    xbmcgui.Dialog().textviewer('TEST', f'{sync.data}')
 
 
 class Script(object):

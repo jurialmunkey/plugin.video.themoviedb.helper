@@ -50,21 +50,19 @@ class CProfiler():
         write_to_file(stream.getvalue(), 'cProfile', self.filename + '_tottime.txt', join_addon_data=True)
 
 
-def timer_report(func_name):
-    def decorator(func):
-        def wrapper(self, *args, **kwargs):
-            """ Syntactic sugar to time a class function """
-            timer_a = timer()
-            response = func(self, *args, **kwargs)
-            timer_z = timer()
-            total_time = timer_z - timer_a
-            if total_time > 0.001:
-                timer_name = f'{self.__class__.__name__}.{func_name}.'
-                timer_name = format_name(timer_name, *args, **kwargs)
-                kodi_log(f'{timer_name}\n{total_time:.3f} sec', 1)
-            return response
-        return wrapper
-    return decorator
+def timer_report(func):
+    def wrapper(self, *args, **kwargs):
+        """ Syntactic sugar to time a class function """
+        timer_a = timer()
+        response = func(self, *args, **kwargs)
+        timer_z = timer()
+        total_time = timer_z - timer_a
+        if total_time > 0.001:
+            timer_name = f'{self.__class__.__name__}.{func.__name__}.'
+            timer_name = format_name(timer_name, *args, **kwargs)
+            kodi_log(f'{timer_name}\n{total_time:.3f} sec', 1)
+        return response
+    return wrapper
 
 
 def log_output(func_name):
