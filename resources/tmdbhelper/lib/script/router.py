@@ -14,9 +14,10 @@ REGEX_WINPROP_SUB = r'\$WINPROP\[{}\]'
 
 def test_func():
     from tmdbhelper.lib.items.database.tmdbdata import TMDbItemDetailsDataBaseCacheFactory
-    sync = TMDbItemDetailsDataBaseCacheFactory('season')
+    sync = TMDbItemDetailsDataBaseCacheFactory('episode')
     sync.tmdb_id = 1399
-    sync.season = 1
+    sync.season = 2
+    sync.episode = 4
     sync.cache_refresh = 'force'
     # sync.cache.del_database_init()
     import xbmcgui
