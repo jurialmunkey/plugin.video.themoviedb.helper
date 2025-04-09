@@ -177,24 +177,6 @@ class ItemDetailsDataBase(DataBase):
         }
     }
 
-    person_columns = {
-        'id': {
-            'data': 'TEXT UNIQUE',
-        },
-        'tmdb_id': {
-            'data': 'INTEGER',
-        },
-        'plot': {
-            'data': 'TEXT',
-        },
-        'title': {
-            'data': 'TEXT',
-        },
-        'FOREIGN KEY(id)': {
-            'data': 'REFERENCES baseitem(id)',
-        }
-    }
-
     ratings_columns = {
         'id': {
             'data': 'TEXT UNIQUE',
@@ -289,16 +271,25 @@ class ItemDetailsDataBase(DataBase):
 
     }
 
-    kodi_dbid_columns = {
-        'id': {
-            'data': 'TEXT UNIQUE',
+    person_columns = {
+        'name': {
+            'data': 'TEXT',
         },
-        'dbid': {
+        'tmdb_id': {
+            'data': 'INTEGER UNIQUE',
+        },
+        'thumb': {
+            'data': 'TEXT',
+        },
+        'known_for_department': {
+            'data': 'TEXT',
+        },
+        'gender': {
             'data': 'INTEGER',
         },
-        'FOREIGN KEY(id)': {
-            'data': 'REFERENCES baseitem(id)',
-        }
+        'biography': {
+            'data': 'TEXT',
+        },
     }
 
     genre_columns = {
@@ -385,10 +376,7 @@ class ItemDetailsDataBase(DataBase):
         }
     }
 
-    crew_columns = {
-        'name': {
-            'data': 'TEXT',
-        },
+    crewmember_columns = {
         'tmdb_id': {
             'data': 'INTEGER',
         },
@@ -398,9 +386,6 @@ class ItemDetailsDataBase(DataBase):
         'department': {
             'data': 'TEXT',
         },
-        'thumb': {
-            'data': 'TEXT',
-        },
         'ordering': {
             'data': 'INTEGER',
         },
@@ -409,23 +394,20 @@ class ItemDetailsDataBase(DataBase):
         },
         'FOREIGN KEY(parent_id)': {
             'data': 'REFERENCES baseitem(id)',
+        },
+        'FOREIGN KEY(tmdb_id)': {
+            'data': 'REFERENCES person(tmdb_id)',
         },
         'UNIQUE': {
             'data': '(tmdb_id, parent_id)',
         }
     }
 
-    cast_columns = {
-        'name': {
-            'data': 'TEXT',
-        },
+    castmember_columns = {
         'tmdb_id': {
             'data': 'INTEGER',
         },
         'role': {
-            'data': 'TEXT',
-        },
-        'thumb': {
             'data': 'TEXT',
         },
         'ordering': {
@@ -436,6 +418,9 @@ class ItemDetailsDataBase(DataBase):
         },
         'FOREIGN KEY(parent_id)': {
             'data': 'REFERENCES baseitem(id)',
+        },
+        'FOREIGN KEY(tmdb_id)': {
+            'data': 'REFERENCES person(tmdb_id)',
         },
         'UNIQUE': {
             'data': '(tmdb_id, parent_id)',
@@ -525,6 +510,15 @@ class ItemDetailsDataBase(DataBase):
         ('season', 'id', ),
         ('episode', 'id', ),
         ('ratings', 'id', ),
+        ('person', 'tmdb_id', ),
+        ('genre', 'parent_id', ),
+        ('studio', 'parent_id', ),
+        ('network', 'parent_id', ),
+        ('country', 'parent_id', ),
+        ('castmember', 'parent_id', ),
+        ('castmember', 'tmdb_id', ),
+        ('crewmember', 'parent_id', ),
+        ('crewmember', 'tmdb_id', ),
     )
 
     @property
@@ -535,15 +529,14 @@ class ItemDetailsDataBase(DataBase):
             'tvshow': self.tvshow_columns,
             'season': self.season_columns,
             'episode': self.episode_columns,
-            'person': self.person_columns,
             'ratings': self.ratings_columns,
-            'kodi_dbid': self.kodi_dbid_columns,
+            'person': self.person_columns,
             'genre': self.genre_columns,
             'country': self.country_columns,
             'studio': self.studio_columns,
             'network': self.network_columns,
-            'crew': self.crew_columns,
-            'cast': self.cast_columns,
+            'crewmember': self.crewmember_columns,
+            'castmember': self.castmember_columns,
             'provider': self.provider_columns,
             'custom': self.custom_columns,
             'artwork': self.artwork_columns,

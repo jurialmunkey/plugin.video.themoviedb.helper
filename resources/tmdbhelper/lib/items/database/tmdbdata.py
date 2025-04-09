@@ -36,7 +36,7 @@ class DetailsDataBaseCache(ItemDetailsDataBaseCache):
     def get_configure_mapped_data_list(self, i, k):
         if k == 'parent_id':
             return self.item_id
-        return i[k]
+        return i.get(k)
 
     def configure_mapped_data(self, data):
         return {self.item_id: [self.get_configure_mapped_data(data, k) for k in self.keys]}
@@ -52,7 +52,7 @@ class ListDetailsDataBaseCache(DetailsDataBaseCache):
         return self.cache.get_list_values(self.conditions, self.values, self.keys, self.table)
 
     def configure_mapped_data_list(self, data):
-        return [tuple([self.item_id if k == 'parent_id' else i[k] for k in self.keys]) for i in data[self.table]]
+        return [tuple([self.get_configure_mapped_data_list(i, k) for k in self.keys]) for i in data[self.table]]
 
     def set_cached_data(self, online_data_mapped):
         data = self.configure_mapped_data_list(online_data_mapped)
@@ -79,6 +79,22 @@ class GenreDetailsDataBaseCache(ListDetailsDataBaseCache):
 class ProviderDetailsDataBaseCache(ListDetailsDataBaseCache):
     table = 'provider'
     keys = ('name', 'tmdb_id', 'display_priority', 'iso', 'logo', 'availability', 'parent_id')
+
+
+class CastMemberDetailsDataBaseCache(ListDetailsDataBaseCache):
+    table = 'castmember'
+    keys = ('tmdb_id', 'role', 'ordering', 'parent_id')
+
+
+class CrewMemberDetailsDataBaseCache(ListDetailsDataBaseCache):
+    table = 'crewmember'
+    keys = ('tmdb_id', 'role', 'department', 'ordering', 'parent_id')
+
+
+class PersonDetailsDataBaseCache(ListDetailsDataBaseCache):
+    table = 'person'
+    keys = ('tmdb_id', 'thumb', 'name', 'gender', 'biography', 'known_for_department')
+    conditions = 'tmdb_id=?'
 
 
 class TMDbItemDetailsDataBaseCache(DetailsDataBaseCache):
@@ -213,6 +229,18 @@ class TMDbBaseItemDetailsDataBaseCache(TMDbItemDetailsDataBaseCache):
         return dbc
 
     @cached_property
+    def db_castmember_cache(self):
+        return self.get_db_cache(CastMemberDetailsDataBaseCache)
+
+    @cached_property
+    def db_crewmember_cache(self):
+        return self.get_db_cache(CrewMemberDetailsDataBaseCache)
+
+    @cached_property
+    def db_person_cache(self):
+        return self.get_db_cache(PersonDetailsDataBaseCache)
+
+    @cached_property
     def db_provider_cache(self):
         return self.get_db_cache(ProviderDetailsDataBaseCache)
 
@@ -226,6 +254,9 @@ class TMDbBaseItemDetailsDataBaseCache(TMDbItemDetailsDataBaseCache):
             *[f'{self.table}.{k}' for k in self.keys],
             'replace(GROUP_CONCAT(DISTINCT genre.name), ",", "||") as list_genre',
             'replace(GROUP_CONCAT(DISTINCT country.name), ",", "||") as list_country',
+            'replace(GROUP_CONCAT(DISTINCT castperson.name), ",", "||") as list_cast',
+            # 'replace(GROUP_CONCAT(DISTINCT crewperson.name), ",", "||") as list_crew',
+
             f'replace(GROUP_CONCAT(DISTINCT {self.db_studio_table}.name), ",", "||") as list_studio',  # Switch out studios for networks for TV Shows
             # 'replace(GROUP_CONCAT(DISTINCT "name=" || genre.name || "|tmdb_id=" || genre.tmdb_id), ",", "||") as property_list_genre',
             # 'replace(GROUP_CONCAT(DISTINCT "name=" || country.name || "|iso="  || country.iso), ",", "||") as property_list_country',
@@ -241,6 +272,8 @@ class TMDbBaseItemDetailsDataBaseCache(TMDbItemDetailsDataBaseCache):
             f'LEFT JOIN country ON country.parent_id = baseitem.id',
             f'LEFT JOIN {self.db_studio_table} ON {self.db_studio_table}.parent_id = baseitem.id',
             f'LEFT JOIN provider ON provider.parent_id = baseitem.id',
+            f'LEFT JOIN (castmember INNER JOIN person ON person.tmdb_id = castmember.tmdb_id) AS castperson ON castperson.parent_id = baseitem.id',
+            f'LEFT JOIN (crewmember INNER JOIN person ON person.tmdb_id = crewmember.tmdb_id) AS crewperson ON crewperson.parent_id = baseitem.id',
         ))
 
     def set_cached_data(self):
@@ -253,6 +286,9 @@ class TMDbBaseItemDetailsDataBaseCache(TMDbItemDetailsDataBaseCache):
         self.db_country_cache.set_cached_data(self.online_data_mapped)
         self.db_studio_cache.set_cached_data(self.online_data_mapped)
         self.db_provider_cache.set_cached_data(self.online_data_mapped)
+        self.db_person_cache.set_cached_data(self.online_data_mapped)
+        self.db_castmember_cache.set_cached_data(self.online_data_mapped)
+        self.db_crewmember_cache.set_cached_data(self.online_data_mapped)
 
         return self.get_cached_data()
 
@@ -295,6 +331,8 @@ class TMDbSeasonItemDetailsDataBaseCache(TMDbTVShowItemDetailsDataBaseCache):
             f'LEFT JOIN country ON country.parent_id = season.tvshow_id',
             f'LEFT JOIN {self.db_studio_table} ON {self.db_studio_table}.parent_id = season.tvshow_id',
             f'LEFT JOIN provider ON provider.parent_id = baseitem.id',  # Seasons individually have providers
+            f'LEFT JOIN (castmember INNER JOIN person ON person.tmdb_id = castmember.tmdb_id) AS castperson ON castperson.parent_id = baseitem.id',
+            f'LEFT JOIN (crewmember INNER JOIN person ON person.tmdb_id = crewmember.tmdb_id) AS crewperson ON crewperson.parent_id = baseitem.id',
         ))
 
     def set_cached_data(self):
@@ -310,6 +348,9 @@ class TMDbSeasonItemDetailsDataBaseCache(TMDbTVShowItemDetailsDataBaseCache):
         self.cache.set_values(self.item_id, key_value_pairs=(('mediatype', self.mediatype), ('expiry', self.expiry),), table='baseitem')
         self.set_cached_many(self.keys, self.table, self.configure_mapped_data(self.online_data_mapped))
         self.db_provider_cache.set_cached_data(self.online_data_mapped)
+        self.db_person_cache.set_cached_data(self.online_data_mapped)
+        self.db_castmember_cache.set_cached_data(self.online_data_mapped)
+        self.db_crewmember_cache.set_cached_data(self.online_data_mapped)
 
         return self.get_cached_data()
 
@@ -341,6 +382,8 @@ class TMDbEpisodeItemDetailsDataBaseCache(TMDbSeasonItemDetailsDataBaseCache):
             f'LEFT JOIN country ON country.parent_id = episode.tvshow_id',
             f'LEFT JOIN {self.db_studio_table} ON {self.db_studio_table}.parent_id = episode.tvshow_id',
             f'LEFT JOIN provider ON provider.parent_id = baseitem.id',  # Episodes individually have providers
+            f'LEFT JOIN (castmember INNER JOIN person ON person.tmdb_id = castmember.tmdb_id) AS castperson ON castperson.parent_id = baseitem.id',
+            f'LEFT JOIN (crewmember INNER JOIN person ON person.tmdb_id = crewmember.tmdb_id) AS crewperson ON crewperson.parent_id = baseitem.id',
         ))
 
     def set_cached_data(self):
@@ -357,6 +400,9 @@ class TMDbEpisodeItemDetailsDataBaseCache(TMDbSeasonItemDetailsDataBaseCache):
         self.cache.set_values(self.item_id, key_value_pairs=(('mediatype', self.mediatype), ('expiry', self.expiry),), table='baseitem')
         self.set_cached_many(self.keys, self.table, self.configure_mapped_data(self.online_data_mapped))
         self.db_provider_cache.set_cached_data(self.online_data_mapped)
+        self.db_person_cache.set_cached_data(self.online_data_mapped)
+        self.db_castmember_cache.set_cached_data(self.online_data_mapped)
+        self.db_crewmember_cache.set_cached_data(self.online_data_mapped)
 
         return self.get_cached_data()
 

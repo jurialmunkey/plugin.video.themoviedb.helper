@@ -3,8 +3,17 @@
 from tmdbhelper.lib.api.mapping import _ItemMapper
 
 
-def split_array(items, **kwargs):
-    if not items or not isinstance(items, list):
+def split_array(items, subkeys=(), **kwargs):
+    if not items:
+        return ()
+
+    for subkey in subkeys:
+        try:
+            items = items[subkey]
+        except (TypeError, KeyError):
+            return ()
+
+    if not isinstance(items, list):
         return ()
 
     def get_item(i, v):
@@ -51,6 +60,9 @@ def get_empty_item():
         'studio': (),
         'network': (),
         'provider': (),
+        'castmember': (),
+        'crewmember': (),
+        'person': [],
     }
 
 
@@ -100,6 +112,33 @@ class ItemMapper(_ItemMapper):
             'watch/providers': [{
                 'keys': [('provider', None)],
                 'func': get_providers,
+            }],
+            'credits': [{
+                'keys': [('castmember', None)],
+                'func': split_array,
+                'kwargs': {
+                    'subkeys': ('cast', ),
+                    'tmdb_id': 'id', 'role': 'character', 'ordering': 'order'}}, {
+                # ---
+                'keys': [('person', None)],
+                'extend': True,
+                'func': split_array,
+                'kwargs': {
+                    'subkeys': ('cast', ),
+                    'tmdb_id': 'id', 'thumb': 'profile_path', 'name': 'name', 'gender': 'gender', 'known_for_department': 'known_for_department'}}, {
+                # ---
+                'keys': [('crewmember', None)],
+                'func': split_array,
+                'kwargs': {
+                    'subkeys': ('crew', ),
+                    'tmdb_id': 'id', 'role': 'job', 'department': 'department', 'ordering': 'order'}}, {
+                # ---
+                'keys': [('person', None)],
+                'extend': True,
+                'func': split_array,
+                'kwargs': {
+                    'subkeys': ('crew', ),
+                    'tmdb_id': 'id', 'thumb': 'profile_path', 'name': 'name', 'gender': 'gender', 'known_for_department': 'known_for_department'}
             }],
 
         }
