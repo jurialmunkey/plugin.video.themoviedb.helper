@@ -398,7 +398,7 @@ class SeasonItemDetailsDataBaseCache(TVShowItemDetailsDataBaseCache):
         base_dbc.tmdb_id = self.tmdb_id
         base_dbc.data
 
-        self.set_cached_values(self.item_id, key_value_pairs=(('mediatype', self.mediatype), ('expiry', self.expiry),), table='baseitem')
+        self.set_cached_values('baseitem', self.item_id, keys=('mediatype', 'expiry'), values=(self.mediatype, self.expiry))
         self.set_cached_many(self.table, self.keys, self.configure_mapped_data(self.online_data_mapped))
 
         self.db_provider_cache.set_cached_data(self.online_data_mapped)
@@ -449,7 +449,7 @@ class EpisodeItemDetailsDataBaseCache(SeasonItemDetailsDataBaseCache):
         base_dbc.season = self.season
         base_dbc.data
 
-        self.set_cached_values(self.item_id, key_value_pairs=(('mediatype', self.mediatype), ('expiry', self.expiry),), table='baseitem')
+        self.set_cached_values('baseitem', self.item_id, keys=('mediatype', 'expiry'), values=(self.mediatype, self.expiry))
         self.set_cached_many(self.table, self.keys, self.configure_mapped_data(self.online_data_mapped))
         self.db_provider_cache.set_cached_data(self.online_data_mapped)
         self.db_person_cache.set_cached_data(self.online_data_mapped)
