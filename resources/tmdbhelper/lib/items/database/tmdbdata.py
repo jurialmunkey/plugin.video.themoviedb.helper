@@ -8,7 +8,7 @@ from tmdbhelper.lib.items.database.mappings import ItemMapper
 from tmdbhelper.lib.files.database import DataBaseCache
 from tmdbhelper.lib.files.locker import mutexlock
 # from tmdbhelper.lib.addon.logger import textviewer_output
-# from tmdbhelper.lib.addon.logger import timer_report
+from tmdbhelper.lib.addon.logger import timer_report
 from tmdbhelper.lib.addon.consts import (
     IMAGEPATH_QUALITY_POSTER,
     IMAGEPATH_QUALITY_FANART,
@@ -174,7 +174,7 @@ class ArtDetailsDataBaseCache(ItemDetailsListDataBaseCache):
 
 
 class ArtTypeDetailsDataBaseCache(ArtDetailsDataBaseCache):
-    conditions = 'parent_id=? AND type=? ORDER BY vote_average DESC'  # WHERE conditions
+    conditions = 'parent_id=? AND type=? ORDER BY vote_average DESC LIMIT 1'  # WHERE conditions
 
     @staticmethod
     def image_path_func(v):
@@ -209,11 +209,11 @@ class ArtPosterDetailsDataBaseCache(ArtTypeDetailsDataBaseCache):
 
 
 class ArtFanartDetailsDataBaseCache(ArtTypeDetailsDataBaseCache):
-    conditions = 'parent_id=? AND type=? AND aspect_ratio=1.778 ORDER BY vote_average DESC'  # WHERE conditions
+    conditions = 'parent_id=? AND type=? AND aspect_ratio=? ORDER BY vote_average DESC LIMIT 1'  # WHERE conditions
 
     @property
     def values(self):  # WHERE conditions values for ?  self.tmdb_api.iso_language
-        return (self.item_id, 'backdrops')
+        return (self.item_id, 'backdrops', 'landscape')
 
     @staticmethod
     def image_path_func(v):
@@ -229,11 +229,11 @@ class ArtLandscapeDetailsDataBaseCache(ArtFanartDetailsDataBaseCache):
 
 
 class ArtClearlogoDetailsDataBaseCache(ArtTypeDetailsDataBaseCache):
-    conditions = 'parent_id=? AND type=? AND extension!=? ORDER BY vote_average DESC'  # WHERE conditions
+    conditions = 'parent_id=? AND type=? AND extension=? ORDER BY vote_average DESC LIMIT 1'  # WHERE conditions
 
     @property
     def values(self):  # WHERE conditions values for ?  self.tmdb_api.iso_language
-        return (self.item_id, 'logos', 'svg')
+        return (self.item_id, 'logos', 'png')
 
     @staticmethod
     def image_path_func(v):
@@ -569,7 +569,7 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         )
 
         for instance, dkey in artwork_routes:
-            art[dkey] = instance.image_path_func(next((i['icon'] for i in instance.cached_data), None))
+            art[dkey] = instance.image_path_func(instance.cached_data[0]['icon'] if instance.cached_data else None)
 
         if self.mediatype == 'episode':
             artwork_routes = (
@@ -579,8 +579,8 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
             )
 
             for instance, dkey in artwork_routes:
-                art[dkey] = art[dkey] or instance.image_path_func(next((i['icon'] for i in instance.cached_data), None))
-                art[f'season.{dkey}'] = instance.image_path_func(next((i['icon'] for i in instance.cached_data), None))
+                art[dkey] = art[dkey] or instance.image_path_func(instance.cached_data[0]['icon'] if instance.cached_data else None)
+                art[f'season.{dkey}'] = instance.image_path_func(instance.cached_data[0]['icon'] if instance.cached_data else None)
 
         if self.mediatype in ('season', 'episode'):
             artwork_routes = (
@@ -590,8 +590,8 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
             )
 
             for instance, dkey in artwork_routes:
-                art[dkey] = art[dkey] or instance.image_path_func(next((i['icon'] for i in instance.cached_data), None))
-                art[f'tvshow.{dkey}'] = instance.image_path_func(next((i['icon'] for i in instance.cached_data), None))
+                art[dkey] = art[dkey] or instance.image_path_func(instance.cached_data[0]['icon'] if instance.cached_data else None)
+                art[f'tvshow.{dkey}'] = instance.image_path_func(instance.cached_data[0]['icon'] if instance.cached_data else None)
 
         # ==========
         # UNIQUE_IDS
@@ -618,7 +618,7 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
     def data(self):
         return self.get_data()
 
-    # @timer_report
+    @timer_report
     def get_data(self):
         if not self.data_cond:
             return

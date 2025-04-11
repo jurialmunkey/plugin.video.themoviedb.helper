@@ -52,18 +52,31 @@ def get_art(items, **kwargs):
         return
     data = []
 
+    def get_aspect_ratio(aspect_ratio):
+        if aspect_ratio < 1:
+            return 'poster'
+        if aspect_ratio == 1:
+            return 'square'
+        if 1.7 <= aspect_ratio <= 1.8:
+            return 'landscape'
+        if aspect_ratio < 1.7:
+            return 'thumb'
+        if aspect_ratio > 1.8:
+            return 'wide'
+        return 'other'
+
     for artwork_type, artworks in items.items():
         for artwork in artworks:
             path = artwork['file_path']
             data.append({
-                'aspect_ratio': artwork['aspect_ratio'],
+                'aspect_ratio': get_aspect_ratio(artwork['aspect_ratio']),
                 'height': artwork['height'],
                 'width': artwork['width'],
                 'iso': artwork['iso_639_1'],
                 'icon': path,
                 'type': artwork_type,
                 'extension': path.split('.')[-1] if path else None,
-                'vote_average': artwork['vote_average'],
+                'vote_average': int(artwork['vote_average'] * 100),
                 'vote_count': artwork['vote_count'],
             })
 

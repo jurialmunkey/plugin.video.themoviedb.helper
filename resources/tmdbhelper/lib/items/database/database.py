@@ -443,7 +443,7 @@ class ItemDetailsDataBase(DataBase):
 
     art_columns = {
         'aspect_ratio': {
-            'data': 'REAL',
+            'data': 'TEXT',
             'indexed': True
         },
         'height': {
@@ -468,7 +468,7 @@ class ItemDetailsDataBase(DataBase):
             'indexed': True
         },
         'vote_average': {
-            'data': 'REAL',
+            'data': 'INTEGER',
             'indexed': True
         },
         'vote_count': {
