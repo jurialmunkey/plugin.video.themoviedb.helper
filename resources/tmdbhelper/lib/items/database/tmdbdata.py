@@ -144,7 +144,7 @@ class GenreDetailsDataBaseCache(ItemDetailsListDataBaseCache):
 class ProviderDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     table = 'provider'
     keys = ('name', 'tmdb_id', 'display_priority', 'iso', 'logo', 'availability', 'parent_id')
-    conditions = 'parent_id=? AND iso=?'  # WHERE conditions
+    conditions = 'parent_id=? AND iso=? ORDER BY display_priority ASC'  # WHERE conditions
 
     @property
     def values(self):  # WHERE conditions values for ?
