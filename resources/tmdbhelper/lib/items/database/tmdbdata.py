@@ -394,6 +394,21 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
             infoproperties[ckey[0]] = ' / '.join(join_data)
             infoproperties[f'{ckey[0]}_CR'] = '[CR]'.join(join_data)
 
+        # ====
+        # CAST
+        # ====
+        cast = ()
+
+        # ===
+        # ART
+        # ===
+        art = {}
+
+        # ==========
+        # UNIQUE_IDS
+        # ==========
+        unique_ids = {}
+
         # ========
         # ITEM MAP
         # ========
@@ -401,6 +416,9 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         return {
             'infolabels': infolabels,
             'infoproperties': infoproperties,
+            'cast': cast,
+            'art': art,
+            'unique_ids': unique_ids,
         }
 
     @mutexlock  # Use a mutex lock on the item_id to avoid double up of setting data or attempting get in middle of set
