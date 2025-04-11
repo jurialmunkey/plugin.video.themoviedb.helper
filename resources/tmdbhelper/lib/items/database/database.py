@@ -318,7 +318,7 @@ class ItemDetailsDataBase(DataBase):
             'data': 'INTEGER',
             'unique': True
         },
-        'icon': {
+        'logo': {
             'data': 'TEXT',
         },
         'country': {
@@ -340,7 +340,7 @@ class ItemDetailsDataBase(DataBase):
             'data': 'INTEGER',
             'unique': True
         },
-        'icon': {
+        'logo': {
             'data': 'TEXT',
         },
         'country': {
@@ -441,12 +441,38 @@ class ItemDetailsDataBase(DataBase):
         },
     }
 
-    artwork_columns = {
-        'key': {
+    art_columns = {
+        'aspect_ratio': {
+            'data': 'REAL',
+            'indexed': True
+        },
+        'height': {
+            'data': 'INTEGER',
+        },
+        'width': {
+            'data': 'INTEGER',
+        },
+        'iso': {
+            'data': 'TEXT',
+            'indexed': True
+        },
+        'icon': {
             'data': 'TEXT',
         },
-        'value': {
+        'type': {
             'data': 'TEXT',
+            'indexed': True
+        },
+        'extension': {
+            'data': 'TEXT',
+            'indexed': True
+        },
+        'vote_average': {
+            'data': 'REAL',
+            'indexed': True
+        },
+        'vote_count': {
+            'data': 'INTEGER',
         },
         'parent_id': {
             'data': 'TEXT',
@@ -487,7 +513,7 @@ class ItemDetailsDataBase(DataBase):
             'castmember': self.castmember_columns,
             'provider': self.provider_columns,
             'custom': self.custom_columns,
-            'artwork': self.artwork_columns,
+            'art': self.art_columns,
             'unique_id': self.unique_id_columns,
         }
 

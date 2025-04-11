@@ -1,13 +1,47 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from functools import cached_property
+from tmdbhelper.lib.addon.plugin import get_setting
 from tmdbhelper.lib.addon.tmdate import set_timestamp
 from tmdbhelper.lib.items.database.database import ItemDetailsDataBase
 from tmdbhelper.lib.items.database.mappings import ItemMapper
 from tmdbhelper.lib.files.database import DataBaseCache
 from tmdbhelper.lib.files.locker import mutexlock
 # from tmdbhelper.lib.addon.logger import textviewer_output
-from tmdbhelper.lib.addon.logger import timer_report
+# from tmdbhelper.lib.addon.logger import timer_report
+from tmdbhelper.lib.addon.consts import (
+    IMAGEPATH_QUALITY_POSTER,
+    IMAGEPATH_QUALITY_FANART,
+    IMAGEPATH_QUALITY_THUMBS,
+    IMAGEPATH_QUALITY_CLOGOS,
+    IMAGEPATH_NEGATE,
+)
+
+ARTWORK_QUALITY = get_setting('artwork_quality', 'int')
+ARTWORK_QUALITY_POSTER = IMAGEPATH_QUALITY_POSTER[ARTWORK_QUALITY]
+ARTWORK_QUALITY_FANART = IMAGEPATH_QUALITY_FANART[ARTWORK_QUALITY]
+ARTWORK_QUALITY_THUMBS = IMAGEPATH_QUALITY_THUMBS[ARTWORK_QUALITY]
+ARTWORK_QUALITY_CLOGOS = IMAGEPATH_QUALITY_CLOGOS[ARTWORK_QUALITY]
+
+
+def get_imagepath_poster(v):
+    return f'{ARTWORK_QUALITY_POSTER}{v}' if v else ''
+
+
+def get_imagepath_fanart(v):
+    return f'{ARTWORK_QUALITY_FANART}{v}' if v else ''
+
+
+def get_imagepath_thumbs(v):
+    return f'{ARTWORK_QUALITY_THUMBS}{v}' if v else ''
+
+
+def get_imagepath_clogos(v):
+    return f'{ARTWORK_QUALITY_CLOGOS}{v}' if v else ''
+
+
+def get_imagepath_negate(v):
+    return f'{IMAGEPATH_NEGATE}{v}' if v else ''
 
 
 class ItemDetailsDataBaseCache(DataBaseCache):
@@ -21,8 +55,6 @@ class ItemDetailsDataBaseCache(DataBaseCache):
     online_data_args = ()  # ARGS for online_data_func
     online_data_kwgs = {}  # KWGS for online_data_func
     data_cond = True  # Condition to retrieve any data
-
-    item_sub_id_key = 'tmdb_id'
 
     @cached_property
     def cache(self):
@@ -75,9 +107,6 @@ class ItemDetailsDataBaseCache(DataBaseCache):
             self.get_online_data
         )
 
-    def get_item_uid(self, i):
-        return f'{self.item_id}.{self.table}.{i[self.item_sub_id_key]}'
-
     @property
     def item_info(self):
         return self.table
@@ -93,16 +122,8 @@ class ItemDetailsDataBaseCache(DataBaseCache):
             return self.season_id
         return data[self.item_info][k]
 
-    def get_configure_mapped_data_list(self, i, k):
-        if k == 'parent_id':
-            return self.item_id
-        return i.get(k)
-
     def configure_mapped_data(self, data):
         return {self.item_id: [self.get_configure_mapped_data(data, k) for k in self.keys]}
-
-    def configure_mapped_data_list(self, data):
-        return {self.get_item_uid(i): [self.get_configure_mapped_data_list(i, k) for k in self.keys] for i in data[self.table]}
 
 
 class ItemDetailsListDataBaseCache(ItemDetailsDataBaseCache):
@@ -127,6 +148,11 @@ class ItemDetailsListDataBaseCache(ItemDetailsDataBaseCache):
     def cached_data(self):
         return self.get_cached_data()
 
+    def get_configure_mapped_data_list(self, i, k):
+        if k == 'parent_id':
+            return self.item_id
+        return i.get(k)
+
     def configure_mapped_data_list(self, data):
         return [tuple([self.get_configure_mapped_data_list(i, k) for k in self.keys]) for i in data[self.table]]
 
@@ -137,15 +163,91 @@ class ItemDetailsListDataBaseCache(ItemDetailsDataBaseCache):
         return self.get_cached_data()
 
 
+class ArtDetailsDataBaseCache(ItemDetailsListDataBaseCache):
+    table = 'art'
+    keys = ('aspect_ratio', 'height', 'width', 'iso', 'icon', 'type', 'extension', 'vote_average', 'vote_count', 'parent_id',)
+    conditions = 'parent_id=? ORDER BY vote_average DESC'  # WHERE conditions
+
+    @property
+    def values(self):  # WHERE conditions values for ?  self.tmdb_api.iso_language
+        return (self.item_id, )
+
+
+class ArtTypeDetailsDataBaseCache(ArtDetailsDataBaseCache):
+    conditions = 'parent_id=? AND type=? ORDER BY vote_average DESC'  # WHERE conditions
+
+    @staticmethod
+    def image_path_func(v):
+        return get_imagepath_fanart(v)
+
+    def get_cached_data_by_language(self):
+        conditions = f'iso=? AND {self.conditions}'
+        values = (self.tmdb_api.iso_language, *self.values)
+        return self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, values, conditions)
+
+    def get_cached_data_by_english(self):
+        conditions = f'iso=? AND {self.conditions}'
+        values = ('en', *self.values)
+        return self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, values, conditions)
+
+    def get_cached_data_by_null(self):
+        conditions = f'iso IS NULL AND {self.conditions}'
+        return self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, self.values, conditions)
+
+    def get_cached_data(self):
+        return self.get_cached_data_by_language() or self.get_cached_data_by_english() or self.get_cached_data_by_null()
+
+
+class ArtPosterDetailsDataBaseCache(ArtTypeDetailsDataBaseCache):
+    @property
+    def values(self):  # WHERE conditions values for ?  self.tmdb_api.iso_language
+        return (self.item_id, 'posters')
+
+    @staticmethod
+    def image_path_func(v):
+        return get_imagepath_poster(v)
+
+
+class ArtFanartDetailsDataBaseCache(ArtTypeDetailsDataBaseCache):
+    conditions = 'parent_id=? AND type=? AND aspect_ratio=1.778 ORDER BY vote_average DESC'  # WHERE conditions
+
+    @property
+    def values(self):  # WHERE conditions values for ?  self.tmdb_api.iso_language
+        return (self.item_id, 'backdrops')
+
+    @staticmethod
+    def image_path_func(v):
+        return get_imagepath_fanart(v)
+
+    def get_cached_data(self):
+        return self.get_cached_data_by_null()
+
+
+class ArtLandscapeDetailsDataBaseCache(ArtFanartDetailsDataBaseCache):
+    def get_cached_data(self):
+        return self.get_cached_data_by_language() or self.get_cached_data_by_english()
+
+
+class ArtClearlogoDetailsDataBaseCache(ArtTypeDetailsDataBaseCache):
+    conditions = 'parent_id=? AND type=? AND extension!=? ORDER BY vote_average DESC'  # WHERE conditions
+
+    @property
+    def values(self):  # WHERE conditions values for ?  self.tmdb_api.iso_language
+        return (self.item_id, 'logos', 'svg')
+
+    @staticmethod
+    def image_path_func(v):
+        return get_imagepath_clogos(v)
+
+
 class StudioDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     table = 'studio'
-    keys = ('name', 'tmdb_id', 'icon', 'country', 'parent_id', )
+    keys = ('name', 'tmdb_id', 'logo', 'country', 'parent_id', )
 
 
 class CountryDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     table = 'country'
     keys = ('name', 'iso', 'parent_id', )
-    item_sub_id_key = 'iso'
 
 
 class GenreDetailsDataBaseCache(ItemDetailsListDataBaseCache):
@@ -233,6 +335,60 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         dbc.tmdb_api = self.tmdb_api
         dbc.connection = self.connection
         return dbc
+
+    def get_tvshow_db_cache(self, database_class):
+        dbc = self.get_db_cache(database_class)
+        dbc.item_id = self.tvshow_id
+        dbc.parent_id = self.tvshow_id
+        dbc.mediatype = 'tvshow'
+        return dbc
+
+    def get_season_db_cache(self, database_class):
+        dbc = self.get_db_cache(database_class)
+        dbc.item_id = self.season_id
+        dbc.parent_id = self.season_id
+        dbc.mediatype = 'season'
+        return dbc
+
+    @cached_property
+    def db_art_cache(self):
+        return self.get_db_cache(ArtDetailsDataBaseCache)
+
+    @cached_property
+    def db_art_poster_cache(self):
+        return self.get_db_cache(ArtPosterDetailsDataBaseCache)
+
+    @cached_property
+    def db_art_fanart_cache(self):
+        return self.get_db_cache(ArtFanartDetailsDataBaseCache)
+
+    @cached_property
+    def db_art_clearlogo_cache(self):
+        return self.get_db_cache(ArtClearlogoDetailsDataBaseCache)
+
+    @cached_property
+    def db_art_tvshow_poster_cache(self):
+        return self.get_tvshow_db_cache(ArtPosterDetailsDataBaseCache)
+
+    @cached_property
+    def db_art_tvshow_fanart_cache(self):
+        return self.get_tvshow_db_cache(ArtFanartDetailsDataBaseCache)
+
+    @cached_property
+    def db_art_tvshow_clearlogo_cache(self):
+        return self.get_tvshow_db_cache(ArtClearlogoDetailsDataBaseCache)
+
+    @cached_property
+    def db_art_season_poster_cache(self):
+        return self.get_season_db_cache(ArtPosterDetailsDataBaseCache)
+
+    @cached_property
+    def db_art_season_fanart_cache(self):
+        return self.get_season_db_cache(ArtFanartDetailsDataBaseCache)
+
+    @cached_property
+    def db_art_season_clearlogo_cache(self):
+        return self.get_season_db_cache(ArtClearlogoDetailsDataBaseCache)
 
     @cached_property
     def db_genre_cache(self):
@@ -329,6 +485,7 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
             self.db_person_cache,
             self.db_castmember_cache,
             self.db_crewmember_cache,
+            self.db_art_cache,
         )
 
     def set_cached_data(self, return_data=False):
@@ -378,7 +535,7 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         infoproperty_routes = (
             (self.db_genre_cache, {'name': 'name', 'tmdb_id': 'tmdb_id'}, 'genre', None),
             (self.db_country_cache, {'name': 'name', 'iso': 'iso'}, 'country', None),
-            (self.db_studio_cache, {'name': 'name', 'tmdb_id': 'tmdb_id', 'icon': 'icon', 'country': 'country'}, 'studio', None),
+            (self.db_studio_cache, {'name': 'name', 'tmdb_id': 'tmdb_id', 'logo': 'logo', 'country': 'country'}, 'studio', None),
             (self.db_provider_cache, {'name': 'name', 'tmdb_id': 'tmdb_id', 'type': 'availability', 'logo': 'logo'}, 'provider', ('providers', 'name')),
             (self.db_castmember_cache, {'name': 'name', 'tmdb_id': 'tmdb_id'}, 'cast', ('cast', 'name')),
             (self.db_crewmember_cache, {'name': 'name', 'tmdb_id': 'tmdb_id'}, 'crew', ('crew', 'name')),
@@ -402,7 +559,39 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         # ===
         # ART
         # ===
+
         art = {}
+
+        artwork_routes = (
+            (self.db_art_poster_cache, 'poster'),
+            (self.db_art_fanart_cache, 'fanart'),
+            (self.db_art_clearlogo_cache, 'clearlogo'),
+        )
+
+        for instance, dkey in artwork_routes:
+            art[dkey] = instance.image_path_func(next((i['icon'] for i in instance.cached_data), None))
+
+        if self.mediatype == 'episode':
+            artwork_routes = (
+                (self.db_art_season_poster_cache, 'poster'),
+                (self.db_art_season_fanart_cache, 'fanart'),
+                (self.db_art_season_clearlogo_cache, 'clearlogo'),
+            )
+
+            for instance, dkey in artwork_routes:
+                art[dkey] = art[dkey] or instance.image_path_func(next((i['icon'] for i in instance.cached_data), None))
+                art[f'season.{dkey}'] = instance.image_path_func(next((i['icon'] for i in instance.cached_data), None))
+
+        if self.mediatype in ('season', 'episode'):
+            artwork_routes = (
+                (self.db_art_tvshow_poster_cache, 'poster'),
+                (self.db_art_tvshow_fanart_cache, 'fanart'),
+                (self.db_art_tvshow_clearlogo_cache, 'clearlogo'),
+            )
+
+            for instance, dkey in artwork_routes:
+                art[dkey] = art[dkey] or instance.image_path_func(next((i['icon'] for i in instance.cached_data), None))
+                art[f'tvshow.{dkey}'] = instance.image_path_func(next((i['icon'] for i in instance.cached_data), None))
 
         # ==========
         # UNIQUE_IDS
@@ -429,7 +618,7 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
     def data(self):
         return self.get_data()
 
-    @timer_report
+    # @timer_report
     def get_data(self):
         if not self.data_cond:
             return
@@ -491,6 +680,7 @@ class SeasonItemDetailsDataBaseCache(TVShowItemDetailsDataBaseCache):
             self.db_person_cache,
             self.db_castmember_cache,
             self.db_crewmember_cache,
+            self.db_art_cache,
         )
 
 
@@ -535,6 +725,7 @@ class EpisodeItemDetailsDataBaseCache(SeasonItemDetailsDataBaseCache):
             self.db_person_cache,
             self.db_castmember_cache,
             self.db_crewmember_cache,
+            self.db_art_cache,
         )
 
 

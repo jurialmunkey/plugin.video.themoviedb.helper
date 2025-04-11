@@ -47,6 +47,29 @@ def get_providers(items, **kwargs):
     return data
 
 
+def get_art(items, **kwargs):
+    if not items:
+        return
+    data = []
+
+    for artwork_type, artworks in items.items():
+        for artwork in artworks:
+            path = artwork['file_path']
+            data.append({
+                'aspect_ratio': artwork['aspect_ratio'],
+                'height': artwork['height'],
+                'width': artwork['width'],
+                'iso': artwork['iso_639_1'],
+                'icon': path,
+                'type': artwork_type,
+                'extension': path.split('.')[-1] if path else None,
+                'vote_average': artwork['vote_average'],
+                'vote_count': artwork['vote_count'],
+            })
+
+    return data
+
+
 class BlankNoneDict(dict):
     def __missing__(self, key):
         return None
@@ -63,6 +86,7 @@ def get_empty_item():
         'castmember': (),
         'crewmember': (),
         'person': [],
+        'art': (),
     }
 
 
@@ -102,16 +126,20 @@ class ItemMapper(_ItemMapper):
             'production_companies': [{
                 'keys': [('studio', None)],
                 'func': split_array,
-                'kwargs': {'name': 'name', 'tmdb_id': 'id', 'icon': 'logo_path', 'country': 'origin_country'}
+                'kwargs': {'name': 'name', 'tmdb_id': 'id', 'logo': 'logo_path', 'country': 'origin_country'}
             }],
             'networks': [{
                 'keys': [('network', None)],
                 'func': split_array,
-                'kwargs': {'name': 'name', 'tmdb_id': 'id', 'icon': 'logo_path', 'country': 'origin_country'}
+                'kwargs': {'name': 'name', 'tmdb_id': 'id', 'logo': 'logo_path', 'country': 'origin_country'}
             }],
             'watch/providers': [{
                 'keys': [('provider', None)],
                 'func': get_providers,
+            }],
+            'images': [{
+                'keys': [('art', None)],
+                'func': get_art,
             }],
             'credits': [{
                 'keys': [('castmember', None)],

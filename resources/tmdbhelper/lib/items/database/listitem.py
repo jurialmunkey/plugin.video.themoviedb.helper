@@ -3,6 +3,16 @@ from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.items.database.tmdbdata import ItemDetailsDataBaseCacheFactory
 
 
+# @property
+# def lidc(self):
+#     try:
+#         return self._lidc
+#     except AttributeError:
+#         from tmdbhelper.lib.items.database.listitem import ListItemDetailsConfigurator
+#         self._lidc = ListItemDetailsConfigurator(tmdb_api=self.tmdb_api)
+#         return self._lidc
+
+
 class ListItemDetailsConfigurator:
     def __init__(self, tmdb_api=None):
         self._tmdb_api = tmdb_api
