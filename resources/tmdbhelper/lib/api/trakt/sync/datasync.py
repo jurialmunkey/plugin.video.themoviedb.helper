@@ -83,7 +83,7 @@ class SyncDataGetterAll:
 
     def get_items(self):
         self._class_instance_syncdata.sync(self.item_type, self.keys)
-        return self._class_instance_syncdata.cache.get_list_values(self.clause, self.query_values, self.keys)
+        return self._class_instance_syncdata.cache.get_list_values(keys=self.keys, values=self.query_values, conditions=self.clause)
 
 
 class SyncDataGetterAllUnHidden(SyncDataGetterAll):
@@ -396,7 +396,7 @@ class SyncData(SyncDataGetters):
     @has_arg_value(0, ('tv', 'movie', ))
     def get_values(self, tmdb_type, tmdb_id, season=None, episode=None, keys=None):
         self.sync('show' if tmdb_type == 'tv' else 'movie', keys)
-        return self.cache.get_values(self.get_name(tmdb_type, tmdb_id, season, episode), keys)
+        return self.cache.get_values(item_id=self.get_name(tmdb_type, tmdb_id, season, episode), keys=keys)
 
     def get_value(self, tmdb_type, tmdb_id, season=None, episode=None, key=None):
         data = self.get_values(tmdb_type, tmdb_id, season, episode, keys=(key,))

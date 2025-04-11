@@ -93,7 +93,7 @@ class DataType:
         return (self.last_activities_item_type, self.last_activities_key, )
 
     def clear_columns(self, keys):
-        self.cache.del_column_values(keys, self.item_type)
+        self.cache.del_column_values(keys=keys, item_type=self.item_type)
         self.clear_child_columns(keys)
 
     def clear_child_columns(self, keys):
@@ -130,7 +130,7 @@ class DataType:
         data = item.data
 
         self.dialog_progress_bg.update(80, message='Updating Data')
-        self.cache.set_many_values(item.table_keys, data)
+        self.cache.set_many_values(keys=item.table_keys, data=data)
 
         return (item.table_keys, data, )
 
@@ -145,8 +145,8 @@ class DataType:
 class DataTypeEpisodes(DataType):
     def clear_child_columns(self, keys):
         if self.item_type == 'show':
-            self.cache.del_column_values(keys, 'season')
-            self.cache.del_column_values(keys, 'episode')
+            self.cache.del_column_values(keys=keys, item_type='season')
+            self.cache.del_column_values(keys=keys, item_type='episode')
 
     @property
     def last_activities_item_type(self):

@@ -134,7 +134,7 @@ class SyncTraktAPIData:
         if not self.data_cond:
             return
         return self.ci_synctraktapi.use_cached_many(
-            self.conditions, self.values, self.keys, self.table,
+            self.table, self.keys, self.values, self.conditions,
             self.get_online_data
         )
 
@@ -220,7 +220,7 @@ class SyncTraktAPI(DataBaseCache):
 
     def get_trakt_id(self, tmdb_id):
         return self.use_cached(
-            f'tv.{tmdb_id}', 'trakt_id', 'trakt_ids',
+            'trakt_ids', f'tv.{tmdb_id}', 'trakt_id',
             self.get_id, tmdb_id, 'tmdb', 'show', 'trakt')
 
     def get_seasons_data(self, tmdb_id, trakt_id=None):
@@ -259,7 +259,7 @@ class SyncShowSeasonEpisodesData(SyncTraktAPI):
         return f'{tmdb_type}.{tmdb_id}.{season}.{episode}'
 
     def check_value(self, episode_number):
-        return self.cache.get_values(self.get_name('tv', self.tmdb_id, self.season_number, episode_number), ('id', ))
+        return self.cache.get_values(item_id=self.get_name('tv', self.tmdb_id, self.season_number, episode_number), keys=('id', ))
 
     @cached_property
     def episodes(self):
@@ -379,7 +379,7 @@ class SyncEpisodesData(SyncTraktAPI):
 
     def get_values(self, tmdb_id, season, episode, keys=None):
         self.sync_single_episode(tmdb_id, season, episode)
-        return self.cache.get_values(self.get_name('tv', tmdb_id, season, episode), keys)
+        return self.cache.get_values(item_id=self.get_name('tv', tmdb_id, season, episode), keys=keys)
 
     def get_value(self, tmdb_id, season, episode, key=None):
         data = self.get_values(tmdb_id, season, episode, keys=(key,))
@@ -391,7 +391,7 @@ class SyncEpisodesData(SyncTraktAPI):
 
     @mutexlock_funcname
     def sync_single_episode(self, tmdb_id, season, episode):
-        if self.cache.get_values(self.get_name('tv', tmdb_id, season, episode), ('id', )):
+        if self.cache.get_values(item_id=self.get_name('tv', tmdb_id, season, episode), keys=('id', )):
             return
         self.sync_func_single_episode(tmdb_id, season, episode)
 
@@ -402,7 +402,7 @@ class SyncEpisodesData(SyncTraktAPI):
         for item in sync.episodes:
             item_data = SyncEpisodeItemData(item, tmdb_id)
             data[item_data.item_id] = [getattr(item_data, k) for k in self.keys]
-        self.cache.set_many_values(self.keys, data)
+        self.cache.set_many_values(keys=self.keys, data=data)
         return data
 
     def sync_func_single_episode(self, tmdb_id, season, episode):
@@ -413,4 +413,4 @@ class SyncEpisodesData(SyncTraktAPI):
         if not item:
             return
         data = SyncEpisodeItemData(item, tmdb_id)
-        self.cache.set_many_values(self.keys, {data.item_id: [getattr(data, k) for k in self.keys]})
+        self.cache.set_many_values(keys=self.keys, data={data.item_id: [getattr(data, k) for k in self.keys]})

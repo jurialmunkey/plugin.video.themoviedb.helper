@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from functools import cached_property
-from tmdbhelper.lib.files.database import DataBaseCache, DataBase
+from tmdbhelper.lib.files.database import DataBase
 
 
 class ItemDetailsDataBase(DataBase):
@@ -511,62 +510,3 @@ class ItemDetailsDataBase(DataBase):
                     connection.execute(query)
                 except Exception as error:
                     self.kodi_log(f'CACHE: Exception while initializing _database: {error}\n{self._sc_name} - {query}', 1)
-
-
-class ItemDetailsDataBaseCache(DataBaseCache):
-    cache_filename = 'ItemDetails.db'
-
-    table = None  # Table in database
-    conditions = ''  # WHERE conditions
-    values = ()  # WHERE conditions values for ?
-    keys = ()  # Keys to lookup
-    online_data_func = None  # The function to get data e.g. get_response_json
-    online_data_args = ()  # ARGS for online_data_func
-    online_data_kwgs = {}  # KWGS for online_data_func
-    data_cond = True  # Condition to retrieve any data
-
-    @cached_property
-    def cache(self):
-        return ItemDetailsDataBase(filename=self.cache_filename)
-
-    @cached_property
-    def window(self):
-        from jurialmunkey.window import WindowPropertySetter
-        return WindowPropertySetter()
-
-    @staticmethod
-    def get_base_id(tmdb_type, tmdb_id):
-        return f'{tmdb_type}.{tmdb_id}'
-
-    @staticmethod
-    def get_season_id(tmdb_type, tmdb_id, season):
-        return f'{tmdb_type}.{tmdb_id}.{season}'
-
-    @staticmethod
-    def get_episode_id(tmdb_type, tmdb_id, season, episode):
-        return f'{tmdb_type}.{tmdb_id}.{season}.{episode}'
-
-    @property
-    def online_data_cond(self):
-        """ condition to determine whether to retrieve online data - defaults to data_cond """
-        return self.data_cond
-
-    @cached_property
-    def online_data(self):
-        """ cache online data from func to property """
-        if not self.online_data_cond:
-            return
-        return self.online_data_func(*self.online_data_args, **self.online_data_kwgs)
-
-    def get_online_data(self):
-        """ function called when local cache does not have any data """
-        return self.online_data
-
-    @cached_property
-    def data(self):
-        if not self.data_cond:
-            return
-        return self.use_cached_many(
-            self.conditions, self.values, self.keys, self.table,
-            self.get_online_data
-        )

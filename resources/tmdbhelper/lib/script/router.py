@@ -13,18 +13,22 @@ REGEX_WINPROP_SUB = r'\$WINPROP\[{}\]'
 
 
 def test_func():
-    from tmdbhelper.lib.items.database.tmdbdata import TMDbItemDetailsDataBaseCacheFactory
-    sync = TMDbItemDetailsDataBaseCacheFactory('episode')
+    from tmdbhelper.lib.items.database.tmdbdata import ItemDetailsDataBaseCacheFactory
+    sync = ItemDetailsDataBaseCacheFactory('episode')
     sync.tmdb_id = 1399
-    sync.season = 1
-    sync.episode = 5
-    # sync.cache_refresh = 'force'
+    sync.season = 5
+    sync.episode = 2
+    sync.cache_refresh = 'force'
     sync.cache.del_database_init()
     # from tmdbhelper.lib.addon.logger import TimerFunc
     # with TimerFunc('TEST FUNC TOOK:', inline=True, log_threshold=0.0001):
     # data = {k: i[k] for i in sync.data for k in i.keys()}
+
+    with sync.cache._get_database() as sync.connection:
+        data = sync.data
+
     import xbmcgui
-    xbmcgui.Dialog().textviewer('TEST', f'{sync.data}')
+    xbmcgui.Dialog().textviewer('TEST', f'{data}')
 
 
 class Script(object):
