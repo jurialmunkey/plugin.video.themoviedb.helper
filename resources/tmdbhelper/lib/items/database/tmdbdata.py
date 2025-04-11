@@ -376,7 +376,10 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
 
         # instance, dictionary of infoproperty name and key from instance item, infoproperty basename, tuple pair of infoproperty and key value to concatenate as separated list
         infoproperty_routes = (
-            (self.db_provider_cache, {'name': 'name', 'id': 'tmdb_id', 'type': 'availability'}, 'provider', ('providers', 'name')),
+            (self.db_genre_cache, {'name': 'name', 'tmdb_id': 'tmdb_id'}, 'genre', None),
+            (self.db_country_cache, {'name': 'name', 'iso': 'iso'}, 'country', None),
+            (self.db_studio_cache, {'name': 'name', 'tmdb_id': 'tmdb_id', 'icon': 'icon', 'country': 'country'}, 'studio', None),
+            (self.db_provider_cache, {'name': 'name', 'tmdb_id': 'tmdb_id', 'type': 'availability', 'logo': 'logo'}, 'provider', ('providers', 'name')),
             (self.db_castmember_cache, {'name': 'name', 'tmdb_id': 'tmdb_id'}, 'cast', ('cast', 'name')),
             (self.db_crewmember_cache, {'name': 'name', 'tmdb_id': 'tmdb_id'}, 'crew', ('crew', 'name')),
         )
@@ -385,7 +388,11 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
             for x, i in enumerate(instance.cached_data):
                 for dkey, ikey in keys.items():
                     infoproperties[f'{prop}.{x}.{dkey}'] = i[ikey]
-            infoproperties[ckey[0]] = ' / '.join([i[ckey[1]] for i in instance.cached_data if i[ckey[1]]])
+            if ckey is None:
+                continue
+            join_data = [i[ckey[1]] for i in instance.cached_data if i[ckey[1]]]
+            infoproperties[ckey[0]] = ' / '.join(join_data)
+            infoproperties[f'{ckey[0]}_CR'] = '[CR]'.join(join_data)
 
         # ========
         # ITEM MAP
