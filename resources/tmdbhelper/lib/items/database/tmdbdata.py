@@ -7,7 +7,7 @@ from tmdbhelper.lib.items.database.mappings import ItemMapper
 from tmdbhelper.lib.files.database import DataBaseCache
 from tmdbhelper.lib.files.locker import mutexlock
 # from tmdbhelper.lib.addon.logger import textviewer_output
-# from tmdbhelper.lib.addon.logger import timer_report
+from tmdbhelper.lib.addon.logger import timer_report
 
 
 class ItemDetailsDataBaseCache(DataBaseCache):
@@ -112,8 +112,20 @@ class ItemDetailsListDataBaseCache(ItemDetailsDataBaseCache):
     def values(self):  # WHERE conditions values for ?
         return (self.parent_id, )
 
+    @property
+    def cached_data_table(self):
+        return self.table
+
+    @property
+    def cached_data_keys(self):
+        return self.keys
+
     def get_cached_data(self):
-        return self.get_cached_list_values(self.table, self.keys, self.values, self.conditions)
+        return self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, self.values, self.conditions)
+
+    @cached_property
+    def cached_data(self):
+        return self.get_cached_data()
 
     def configure_mapped_data_list(self, data):
         return [tuple([self.get_configure_mapped_data_list(i, k) for k in self.keys]) for i in data[self.table]]
@@ -154,9 +166,22 @@ class ProviderDetailsDataBaseCache(ItemDetailsListDataBaseCache):
 class CastMemberDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     table = 'castmember'
     keys = ('tmdb_id', 'role', 'ordering', 'parent_id')
+    conditions = 'parent_id=? ORDER BY ordering ASC'  # WHERE conditions
+
+    @property
+    def cached_data_table(self):
+        table = ' '.join((
+            f'{self.table}',
+            f'INNER JOIN person ON person.tmdb_id = {self.table}.tmdb_id'
+        ))
+        return f'({table}) as creditedperson'
+
+    @property
+    def cached_data_keys(self):
+        return [f'creditedperson.{k}' for k in (*self.keys, 'thumb', 'name', 'gender', 'biography', 'known_for_department')]
 
 
-class CrewMemberDetailsDataBaseCache(ItemDetailsListDataBaseCache):
+class CrewMemberDetailsDataBaseCache(CastMemberDetailsDataBaseCache):
     table = 'crewmember'
     keys = ('tmdb_id', 'role', 'department', 'ordering', 'parent_id')
 
@@ -326,29 +351,50 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         if not data or not data[0] or not data[0][self.cached_data_check_key]:
             return
 
-        item = {k: data[0][k] for k in data[0].keys() if k not in ('id', 'tmdb_id', )}
+        # ==========
+        # INFOLABELS
+        # ==========
 
-        routes = (
+        infolabels = {k: data[0][k] for k in data[0].keys() if k not in ('id', 'tmdb_id', )}
+
+        # instance, key from instance item, infolabel
+        infolabel_routes = (
             (self.db_genre_cache, 'name', 'genre'),
             (self.db_country_cache, 'name', 'country'),
             (self.db_studio_cache, 'name', 'studio'),
-            (self.db_provider_cache, 'name', 'provider'),
+            (self.db_castmember_cache, 'name', 'cast'),
         )
 
-        for instance, name, key in routes:
-            item[key] = [i[name] for i in instance.get_cached_data()]
+        for instance, ikey, dkey in infolabel_routes:
+            infolabels[dkey] = [i[ikey] for i in instance.cached_data]
 
-        # {k: i[k] for i in sync.data for k in i.keys()}
+        # ==============
+        # INFOPROPERTIES
+        # ==============
 
-        # self.db_genre_cache.set_cached_data(self.online_data_mapped)
-        # self.db_country_cache.set_cached_data(self.online_data_mapped)
-        # self.db_studio_cache.set_cached_data(self.online_data_mapped)
-        # self.db_provider_cache.set_cached_data(self.online_data_mapped)
-        # self.db_person_cache.set_cached_data(self.online_data_mapped)
-        # self.db_castmember_cache.set_cached_data(self.online_data_mapped)
-        # self.db_crewmember_cache.set_cached_data(self.online_data_mapped)
+        infoproperties = {}
 
-        return item
+        # instance, dictionary of infoproperty name and key from instance item, infoproperty basename, tuple pair of infoproperty and key value to concatenate as separated list
+        infoproperty_routes = (
+            (self.db_provider_cache, {'name': 'name', 'id': 'tmdb_id', 'type': 'availability'}, 'provider', ('providers', 'name')),
+            (self.db_castmember_cache, {'name': 'name', 'tmdb_id': 'tmdb_id'}, 'cast', ('cast', 'name')),
+            (self.db_crewmember_cache, {'name': 'name', 'tmdb_id': 'tmdb_id'}, 'crew', ('crew', 'name')),
+        )
+
+        for instance, keys, prop, ckey in infoproperty_routes:
+            for x, i in enumerate(instance.cached_data):
+                for dkey, ikey in keys.items():
+                    infoproperties[f'{prop}.{x}.{dkey}'] = i[ikey]
+            infoproperties[ckey[0]] = ' / '.join([i[ckey[1]] for i in instance.cached_data if i[ckey[1]]])
+
+        # ========
+        # ITEM MAP
+        # ========
+
+        return {
+            'infolabels': infolabels,
+            'infoproperties': infoproperties,
+        }
 
     @mutexlock  # Use a mutex lock on the item_id to avoid double up of setting data or attempting get in middle of set
     def use_cached_data(self):
@@ -358,7 +404,7 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
     def data(self):
         return self.get_data()
 
-    # @timer_report
+    @timer_report
     def get_data(self):
         if not self.data_cond:
             return

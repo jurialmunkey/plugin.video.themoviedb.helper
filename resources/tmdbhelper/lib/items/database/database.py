@@ -124,6 +124,7 @@ class ItemDetailsDataBase(DataBase):
         'tvshow_id': {
             'data': 'TEXT',
             'foreign_key': 'tvshow(id)',
+            'indexed': True
         },
     }
 
@@ -156,10 +157,12 @@ class ItemDetailsDataBase(DataBase):
         'season_id': {
             'data': 'TEXT',
             'foreign_key': 'season(id)',
+            'indexed': True
         },
         'tvshow_id': {
             'data': 'TEXT',
             'foreign_key': 'tvshow(id)',
+            'indexed': True
         },
     }
 
@@ -286,6 +289,7 @@ class ItemDetailsDataBase(DataBase):
         'parent_id': {
             'data': 'TEXT',
             'foreign_key': 'baseitem(id)',
+            'indexed': True,
             'unique': True
         },
     }
@@ -301,6 +305,7 @@ class ItemDetailsDataBase(DataBase):
         'parent_id': {
             'data': 'TEXT',
             'foreign_key': 'baseitem(id)',
+            'indexed': True,
             'unique': True
         },
     }
@@ -322,6 +327,7 @@ class ItemDetailsDataBase(DataBase):
         'parent_id': {
             'data': 'TEXT',
             'foreign_key': 'baseitem(id)',
+            'indexed': True,
             'unique': True
         },
     }
@@ -343,6 +349,7 @@ class ItemDetailsDataBase(DataBase):
         'parent_id': {
             'data': 'TEXT',
             'foreign_key': 'baseitem(id)',
+            'indexed': True,
             'unique': True
         },
     }
@@ -351,6 +358,7 @@ class ItemDetailsDataBase(DataBase):
         'tmdb_id': {
             'data': 'INTEGER',
             'foreign_key': 'person(tmdb_id)',
+            'indexed': True,
             'unique': True
         },
         'role': {
@@ -365,6 +373,7 @@ class ItemDetailsDataBase(DataBase):
         'parent_id': {
             'data': 'TEXT',
             'foreign_key': 'baseitem(id)',
+            'indexed': True,
             'unique': True
         },
     }
@@ -373,6 +382,7 @@ class ItemDetailsDataBase(DataBase):
         'tmdb_id': {
             'data': 'INTEGER',
             'foreign_key': 'person(tmdb_id)',
+            'indexed': True,
             'unique': True
         },
         'role': {
@@ -384,6 +394,7 @@ class ItemDetailsDataBase(DataBase):
         'parent_id': {
             'data': 'TEXT',
             'foreign_key': 'baseitem(id)',
+            'indexed': True,
             'unique': True
         },
     }
@@ -398,6 +409,7 @@ class ItemDetailsDataBase(DataBase):
         'parent_id': {
             'data': 'TEXT',
             'foreign_key': 'baseitem(id)',
+            'indexed': True
         },
     }
 
@@ -424,6 +436,7 @@ class ItemDetailsDataBase(DataBase):
         'parent_id': {
             'data': 'TEXT',
             'foreign_key': 'baseitem(id)',
+            'indexed': True,
             'unique': True
         },
     }
@@ -438,6 +451,7 @@ class ItemDetailsDataBase(DataBase):
         'parent_id': {
             'data': 'TEXT',
             'foreign_key': 'baseitem(id)',
+            'indexed': True
         },
     }
 
@@ -451,6 +465,7 @@ class ItemDetailsDataBase(DataBase):
         'parent_id': {
             'data': 'TEXT',
             'foreign_key': 'baseitem(id)',
+            'indexed': True
         },
     }
 
