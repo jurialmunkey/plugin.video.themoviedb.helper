@@ -73,7 +73,7 @@ class DataBase:
             self.init_database()
             return
 
-    def _set_pragmas(self, connection):
+    def set_pragmas(self, connection):
         connection.execute("PRAGMA synchronous=NORMAL")
         connection.execute("PRAGMA journal_mode=WAL")
         connection.execute("PRAGMA foreign_keys=ON")
@@ -85,21 +85,21 @@ class DataBase:
         with MutexPropLock(f'{self._db_file}.lockfile', kodi_log=self.kodi_log):
             if xbmcvfs.exists(self._db_file):
                 return
-            database = self._create_database()
+            database = self.create_database()
             self.set_database_init()
         return database
 
-    def _create_database(self):
+    def create_database(self):
         try:
             self.kodi_log(f'CACHE: Initialising: {self._db_file}...', 1)
             connection = sqlite3.connect(self._db_file, timeout=5.0, isolation_level=None)
-            connection = self._set_pragmas(connection)
+            connection = self.set_pragmas(connection)
             self.create_database_execute(connection)
             return connection
         except Exception as error:
             self.kodi_log(f'CACHE: Exception while initializing _database: {error}\n{self._sc_name}', 1)
 
-    def _get_database(self, read_only=False, log_level=1):
+    def get_database(self, read_only=False, log_level=1):
         timeout = self._db_read_timeout if read_only else self._db_timeout
         try:
             connection = sqlite3.connect(self._db_file, timeout=timeout, isolation_level=None)
@@ -107,9 +107,9 @@ class DataBase:
             self.kodi_log(f'CACHE: ERROR while retrieving _database: {error}\n{self._sc_name}', log_level)
             return
         connection.row_factory = sqlite3.Row
-        return self._set_pragmas(connection)
+        return self.set_pragmas(connection)
 
-    def _database_execute(self, connection, query, data=None):
+    def database_execute(self, connection, query, data=None):
         try:
             if not data:
                 return connection.execute(query)
@@ -121,14 +121,14 @@ class DataBase:
         except Exception as other_exception:
             self.kodi_log(f'CACHE: database OTHER ERROR! -- {other_exception}\n{self._sc_name}\n--query--\n{query}\n--data--\n{data}', 2)
 
-    def _execute_sql(self, query, data=None, read_only=False, connection=None):
+    def execute_sql(self, query, data=None, read_only=False, connection=None):
         '''little wrapper around execute and executemany to just retry a db command if db is locked'''
         # always use new db object because we need to be sure that data is available for other simplecache instances
         try:
             if connection:
-                return self._database_execute(connection, query, data=data)
-            with self._get_database(read_only=read_only) as connection:
-                return self._database_execute(connection, query, data=data)
+                return self.database_execute(connection, query, data=data)
+            with self.get_database(read_only=read_only) as connection:
+                return self.database_execute(connection, query, data=data)
         except Exception as database_exception:
             self.kodi_log(f'CACHE: database GET DATABASE ERROR! -- {database_exception}\n{self._sc_name} -- read_only: {read_only}', 2)
 
@@ -169,12 +169,12 @@ class DataBase:
             keys=', '.join(keys), table=table, conditions=conditions)
 
     def set_activity(self, item_type, method, value):
-        return self._execute_sql(
+        return self.execute_sql(
             self.statement_insert_or_replace('lactivities', keys=('id', 'data')),
             (f'{item_type}.{method}', value, ))
 
     def get_activity(self, item_type, method):
-        result = self._execute_sql(self.statement_select_limit('lactivities', keys=('data', )), (f'{item_type}.{method}', ))
+        result = self.execute_sql(self.statement_select_limit('lactivities', keys=('data', )), (f'{item_type}.{method}', ))
         if not result:
             return
         result = result.fetchone()
@@ -185,10 +185,10 @@ class DataBase:
     def set_list_values(self, table=DEFAULT_TABLE, keys=(), values=(), connection=None):
         if not values:
             return
-        return self._execute_sql(self.statement_insert_or_ignore(table, keys), values, connection=connection)
+        return self.execute_sql(self.statement_insert_or_ignore(table, keys), values, connection=connection)
 
     def get_list_values(self, table=DEFAULT_TABLE, keys=(), values=(), conditions=None, connection=None):
-        result = self._execute_sql(
+        result = self.execute_sql(
             self.statement_select(table, keys, conditions),
             data=values,
             read_only=True,
@@ -198,7 +198,7 @@ class DataBase:
         return result.fetchall()
 
     def get_values(self, table=DEFAULT_TABLE, item_id=None, keys=(), connection=None):
-        result = self._execute_sql(
+        result = self.execute_sql(
             self.statement_select_limit(table, keys),
             data=(item_id, ),
             read_only=True,
@@ -216,7 +216,7 @@ class DataBase:
             item_id=item_id,
             connection=connection)
 
-        return self._execute_sql(
+        return self.execute_sql(
             self.statement_update_if_null(table, keys),
             data=(*values, item_id, ),
             connection=connection)
@@ -230,26 +230,26 @@ class DataBase:
             item_ids=[item_id for item_id in data.keys()],
             connection=connection)
 
-        return self._execute_sql(
+        return self.execute_sql(
             self.statement_update_if_null(table, keys),
             data=[(*values, item_id, ) for item_id, values in data.items()],
             connection=connection)
 
     def del_column_values(self, table=DEFAULT_TABLE, keys=(), item_type=None, connection=None):
-        return self._execute_sql(
+        return self.execute_sql(
             self.statement_delete_keys(table, keys),
             data=(item_type, ),
             connection=connection
         )
 
     def create_item(self, table=DEFAULT_TABLE, item_id=None, connection=None):
-        self._execute_sql(
+        self.execute_sql(
             self.statement_insert_or_ignore(table),
             data=(item_id,),
             connection=connection)
 
     def create_many_items(self, table=DEFAULT_TABLE, item_ids=(), connection=None):
-        self._execute_sql(
+        self.execute_sql(
             self.statement_insert_or_ignore(table),
             data=[(item_id,) for item_id in item_ids],
             connection=connection)

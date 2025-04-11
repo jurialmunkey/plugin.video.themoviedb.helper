@@ -24,7 +24,7 @@ def test_func():
     # with TimerFunc('TEST FUNC TOOK:', inline=True, log_threshold=0.0001):
     # data = {k: i[k] for i in sync.data for k in i.keys()}
 
-    with sync.cache._get_database() as sync.connection:
+    with sync.cache.get_database() as sync.connection:
         data = sync.data
 
     import xbmcgui

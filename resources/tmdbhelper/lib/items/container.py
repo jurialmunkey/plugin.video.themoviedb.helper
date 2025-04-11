@@ -4,6 +4,8 @@ from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin, get_localiz
 from tmdbhelper.lib.api.contains import CommonContainerAPIs
 from tmdbhelper.lib.addon.logger import TimerList
 
+from tmdbhelper.lib.items.database.listitem import configure_listitem
+
 
 """ Lazyimports
 from tmdbhelper.lib.items.kodi import KodiDb
@@ -208,6 +210,7 @@ class Container(CommonContainerAPIs):
         if not self.pagination and 'next_page' in i:
             return
         with TimerList(self.timer_lists, 'item_api', log_threshold=0.05, logging=self.log_timers):
+            return configure_listitem(i)
             li = self.ib.get_listitem(i, use_iterprops=self.is_detailed)
             if li.infoproperties.get('plot_affix'):
                 li.infolabels['plot'] = f"{li.infoproperties['plot_affix']}. {li.infolabels.get('plot')}"

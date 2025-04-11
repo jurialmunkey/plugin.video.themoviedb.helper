@@ -17,7 +17,7 @@ def configure_listitem(i):
     if mediatype == 'episode':
         dbc.episode = li.infolabels.get('episode')
 
-    with dbc.cache._get_database() as dbc.connection:
+    with dbc.cache.get_database() as dbc.connection:
         if not dbc.data:
             return li
         li.set_details({'infolabels': dbc.data}, override=True)

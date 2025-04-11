@@ -33,6 +33,11 @@ class ItemDetailsDataBaseCache(DataBaseCache):
         from jurialmunkey.window import WindowPropertySetter
         return WindowPropertySetter()
 
+    @cached_property
+    def tmdb_api(self):
+        from tmdbhelper.lib.api.tmdb.api import TMDb
+        return TMDb()
+
     @staticmethod
     def get_base_id(tmdb_type, tmdb_id):
         return f'{tmdb_type}.{tmdb_id}'
@@ -139,10 +144,11 @@ class GenreDetailsDataBaseCache(ItemDetailsListDataBaseCache):
 class ProviderDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     table = 'provider'
     keys = ('name', 'tmdb_id', 'display_priority', 'iso', 'logo', 'availability', 'parent_id')
+    conditions = 'parent_id=? AND iso=?'  # WHERE conditions
 
     @property
     def values(self):  # WHERE conditions values for ?
-        return (self.item_id, )
+        return (self.item_id, self.tmdb_api.iso_country)
 
 
 class CastMemberDetailsDataBaseCache(ItemDetailsListDataBaseCache):
@@ -193,17 +199,13 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
     def item_mapper(self):
         return ItemMapper()
 
-    @cached_property
-    def tmdb_api(self):
-        from tmdbhelper.lib.api.tmdb.api import TMDb
-        return TMDb()
-
     def get_db_cache(self, database_class):
         dbc = database_class()
         dbc.cache = self.cache
         dbc.mediatype = self.mediatype
         dbc.item_id = self.item_id
         dbc.parent_id = self.parent_id
+        dbc.tmdb_api = self.tmdb_api
         dbc.connection = self.connection
         return dbc
 
@@ -285,19 +287,34 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         """ WHERE condition ? ? ? ? = value, value, value, value """
         return (self.item_id, self.current_time, )
 
+    def db_baseitem_cache_get_parent_data(self):
+        return
+
+    def db_baseitem_cache_set_cached_data(self):
+        self.set_cached_values('baseitem', self.item_id, keys=('mediatype', 'expiry'), values=(self.mediatype, self.expiry))
+        self.set_cached_many(self.table, self.keys, self.configure_mapped_data(self.online_data_mapped))
+
+    @property
+    def db_table_caches(self):
+        return (
+            self.db_genre_cache,
+            self.db_country_cache,
+            self.db_studio_cache,
+            self.db_provider_cache,
+            self.db_person_cache,
+            self.db_castmember_cache,
+            self.db_crewmember_cache,
+        )
+
     def set_cached_data(self, return_data=False):
         if not self.online_data_mapped:
             return
 
-        self.set_cached_values(table='baseitem', item_id=self.item_id, keys=('mediatype', 'expiry'), values=(self.mediatype, self.expiry))
-        self.set_cached_many(self.table, self.keys, self.configure_mapped_data(self.online_data_mapped))
-        self.db_genre_cache.set_cached_data(self.online_data_mapped)
-        self.db_country_cache.set_cached_data(self.online_data_mapped)
-        self.db_studio_cache.set_cached_data(self.online_data_mapped)
-        self.db_provider_cache.set_cached_data(self.online_data_mapped)
-        self.db_person_cache.set_cached_data(self.online_data_mapped)
-        self.db_castmember_cache.set_cached_data(self.online_data_mapped)
-        self.db_crewmember_cache.set_cached_data(self.online_data_mapped)
+        self.db_baseitem_cache_get_parent_data()
+        self.db_baseitem_cache_set_cached_data()
+
+        for db_cache in self.db_table_caches:
+            db_cache.set_cached_data(self.online_data_mapped)
 
         if not return_data:
             return
@@ -315,6 +332,7 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
             (self.db_genre_cache, 'name', 'genre'),
             (self.db_country_cache, 'name', 'country'),
             (self.db_studio_cache, 'name', 'studio'),
+            (self.db_provider_cache, 'name', 'provider'),
         )
 
         for instance, name, key in routes:
@@ -387,29 +405,22 @@ class SeasonItemDetailsDataBaseCache(TVShowItemDetailsDataBaseCache):
             f'LEFT JOIN tvshow ON tvshow.id = season.tvshow_id'
         ))
 
-    def set_cached_data(self, return_data=False):
-        if not self.online_data_mapped:
-            return
-
-        # Check we have base tvshow before mapping other data
+    def db_baseitem_cache_get_parent_data(self):
         base_dbc = TVShowItemDetailsDataBaseCache()
+        base_dbc.tmdb_api = self.tmdb_api
         base_dbc.connection = self.connection
         base_dbc.mediatype = 'tvshow'
         base_dbc.tmdb_id = self.tmdb_id
-        base_dbc.data
+        return base_dbc.data
 
-        self.set_cached_values('baseitem', self.item_id, keys=('mediatype', 'expiry'), values=(self.mediatype, self.expiry))
-        self.set_cached_many(self.table, self.keys, self.configure_mapped_data(self.online_data_mapped))
-
-        self.db_provider_cache.set_cached_data(self.online_data_mapped)
-        self.db_person_cache.set_cached_data(self.online_data_mapped)
-        self.db_castmember_cache.set_cached_data(self.online_data_mapped)
-        self.db_crewmember_cache.set_cached_data(self.online_data_mapped)
-
-        if not return_data:
-            return
-
-        return self.get_cached_data()
+    @property
+    def db_table_caches(self):
+        return (
+            self.db_provider_cache,
+            self.db_person_cache,
+            self.db_castmember_cache,
+            self.db_crewmember_cache,
+        )
 
 
 class EpisodeItemDetailsDataBaseCache(SeasonItemDetailsDataBaseCache):
@@ -437,29 +448,23 @@ class EpisodeItemDetailsDataBaseCache(SeasonItemDetailsDataBaseCache):
             f'LEFT JOIN tvshow ON tvshow.id = episode.tvshow_id',
         ))
 
-    def set_cached_data(self, return_data=False):
-        if not self.online_data_mapped:
-            return
-
-        # Check we have base season before mapping other data
+    def db_baseitem_cache_get_parent_data(self):
         base_dbc = SeasonItemDetailsDataBaseCache()
+        base_dbc.tmdb_api = self.tmdb_api
         base_dbc.connection = self.connection
         base_dbc.mediatype = 'season'
         base_dbc.tmdb_id = self.tmdb_id
         base_dbc.season = self.season
-        base_dbc.data
+        return base_dbc.data
 
-        self.set_cached_values('baseitem', self.item_id, keys=('mediatype', 'expiry'), values=(self.mediatype, self.expiry))
-        self.set_cached_many(self.table, self.keys, self.configure_mapped_data(self.online_data_mapped))
-        self.db_provider_cache.set_cached_data(self.online_data_mapped)
-        self.db_person_cache.set_cached_data(self.online_data_mapped)
-        self.db_castmember_cache.set_cached_data(self.online_data_mapped)
-        self.db_crewmember_cache.set_cached_data(self.online_data_mapped)
-
-        if not return_data:
-            return
-
-        return self.get_cached_data()
+    @property
+    def db_table_caches(self):
+        return (
+            self.db_provider_cache,
+            self.db_person_cache,
+            self.db_castmember_cache,
+            self.db_crewmember_cache,
+        )
 
 
 def ItemDetailsDataBaseCacheFactory(mediatype, *args, **kwargs):
