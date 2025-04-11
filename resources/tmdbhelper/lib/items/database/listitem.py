@@ -65,3 +65,12 @@ class ListItemDetailsConfigurator:
 
         # li.art = self.get_item_artwork(item['artwork'], is_season=mediatype in ['season', 'episode'])
         return li
+
+    def configure_listitems_threaded(self, items):
+        from tmdbhelper.lib.addon.thread import ParallelThread
+        with ParallelThread(items, self.configure_listitem) as pt:
+            item_queue = pt.queue
+        return [i for i in item_queue if i]
+
+    def configure_listitems(self, items):
+        return [j for j in (self.configure_listitem(i) for i in items if i) if j]
