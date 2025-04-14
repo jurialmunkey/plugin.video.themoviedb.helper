@@ -312,18 +312,10 @@ class ItemDetailsDataBase(DataBase):
     }
 
     studio_columns = {
-        'name': {
-            'data': 'TEXT',
-        },
         'tmdb_id': {
             'data': 'INTEGER',
-            'unique': True
-        },
-        'logo': {
-            'data': 'TEXT',
-        },
-        'country': {
-            'data': 'TEXT',
+            'unique': True,
+            'foreign_key': 'company(tmdb_id)',
         },
         'parent_id': {
             'data': 'TEXT',
@@ -334,24 +326,32 @@ class ItemDetailsDataBase(DataBase):
     }
 
     network_columns = {
-        'name': {
-            'data': 'TEXT',
-        },
         'tmdb_id': {
             'data': 'INTEGER',
-            'unique': True
-        },
-        'logo': {
-            'data': 'TEXT',
-        },
-        'country': {
-            'data': 'TEXT',
+            'unique': True,
+            'foreign_key': 'company(tmdb_id)',
         },
         'parent_id': {
             'data': 'TEXT',
             'foreign_key': 'baseitem(id)',
             'indexed': True,
             'unique': True
+        },
+    }
+
+    company_columns = {
+        'tmdb_id': {
+            'data': 'INTEGER PRIMARY KEY',
+            'indexed': True
+        },
+        'name': {
+            'data': 'TEXT',
+        },
+        'logo': {
+            'data': 'TEXT',
+        },
+        'country': {
+            'data': 'TEXT',
         },
     }
 
@@ -415,21 +415,10 @@ class ItemDetailsDataBase(DataBase):
     }
 
     provider_columns = {
-        'name': {
-            'data': 'TEXT',
-        },
         'tmdb_id': {
             'data': 'INTEGER',
+            'foreign_key': 'service(tmdb_id)',
             'unique': True
-        },
-        'display_priority': {
-            'data': 'INTEGER',
-        },
-        'iso': {
-            'data': 'TEXT',
-        },
-        'logo': {
-            'data': 'TEXT',
         },
         'availability': {
             'data': 'TEXT',
@@ -439,6 +428,25 @@ class ItemDetailsDataBase(DataBase):
             'foreign_key': 'baseitem(id)',
             'indexed': True,
             'unique': True
+        },
+    }
+
+    service_columns = {
+        'tmdb_id': {
+            'data': 'INTEGER PRIMARY KEY',
+            'indexed': True
+        },
+        'display_priority': {
+            'data': 'INTEGER',
+        },
+        'name': {
+            'data': 'TEXT',
+        },
+        'iso': {
+            'data': 'TEXT',
+        },
+        'logo': {
+            'data': 'TEXT',
         },
     }
 
@@ -510,9 +518,11 @@ class ItemDetailsDataBase(DataBase):
             'country': self.country_columns,
             'studio': self.studio_columns,
             'network': self.network_columns,
+            'company': self.company_columns,
             'crewmember': self.crewmember_columns,
             'castmember': self.castmember_columns,
             'provider': self.provider_columns,
+            'service': self.service_columns,
             'custom': self.custom_columns,
             'art': self.art_columns,
             'unique_id': self.unique_id_columns,

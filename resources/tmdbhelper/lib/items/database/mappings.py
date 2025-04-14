@@ -26,7 +26,7 @@ class ItemMapperMethods:
         return [{k: get_item(i, v) for k, v in kwargs.items()} for i in items]
 
     @staticmethod
-    def get_providers(items, **kwargs):
+    def get_providers(items, service=False, **kwargs):
         if not items:
             return
         results = items.get('results')
@@ -38,14 +38,20 @@ class ItemMapperMethods:
                 if availability == 'link':
                     continue
                 for provider in datalist:
-                    data.append({
-                        'iso': iso,
-                        'availability': availability,
-                        'display_priority': provider.get('display_priority'),
-                        'name': provider.get('provider_name'),
-                        'logo': provider.get('logo_path'),
-                        'tmdb_id': provider.get('provider_id'),
-                    })
+                    if service:
+                        item = {
+                            'iso': iso,
+                            'display_priority': provider.get('display_priority'),
+                            'name': provider.get('provider_name'),
+                            'logo': provider.get('logo_path'),
+                            'tmdb_id': provider.get('provider_id'),
+                        }
+                    else:
+                        item = {
+                            'availability': availability,
+                            'tmdb_id': provider.get('provider_id'),
+                        }
+                    data.append(item)
         return data
 
     @staticmethod
@@ -132,16 +138,31 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'production_companies': [{
                 'keys': [('studio', None)],
                 'func': self.split_array,
-                'kwargs': {'name': 'name', 'tmdb_id': 'id', 'logo': 'logo_path', 'country': 'origin_country'}
+                'kwargs': {'tmdb_id': 'id'}}, {
+                # ---
+                'keys': [('company', None)],
+                'extend': True,
+                'func': self.split_array,
+                'kwargs': {'tmdb_id': 'id', 'name': 'name', 'logo': 'logo_path', 'country': 'origin_country'}
             }],
             'networks': [{
                 'keys': [('network', None)],
                 'func': self.split_array,
-                'kwargs': {'name': 'name', 'tmdb_id': 'id', 'logo': 'logo_path', 'country': 'origin_country'}
+                'kwargs': {'tmdb_id': 'id'}}, {
+                # ---
+                'keys': [('company', None)],
+                'extend': True,
+                'func': self.split_array,
+                'kwargs': {'tmdb_id': 'id', 'name': 'name', 'logo': 'logo_path', 'country': 'origin_country'}
             }],
             'watch/providers': [{
                 'keys': [('provider', None)],
+                'func': self.get_providers}, {
+                # ---
+                'keys': [('service', None)],
+                'extend': True,
                 'func': self.get_providers,
+                'kwargs': {'service': True}
             }],
             'images': [{
                 'keys': [('art', None)],
@@ -199,9 +220,11 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'item': BlankNoneDict(),
             'genre': (),
             'country': (),
+            'company': [],
             'studio': (),
             'network': (),
             'provider': (),
+            'service': [],
             'castmember': (),
             'crewmember': (),
             'unique_id': [],

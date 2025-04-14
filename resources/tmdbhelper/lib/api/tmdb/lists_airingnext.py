@@ -1,17 +1,6 @@
 from tmdbhelper.lib.items.container import Container
 from tmdbhelper.lib.addon.plugin import convert_type, get_localized, get_setting
-
-
-def progress_bg(func):
-    def wrapper(self, *args, **kwargs):
-        from tmdbhelper.lib.api.trakt.sync.dialogbg import DialogProgressSyncBG
-        self.dialog_progress_bg = DialogProgressSyncBG()
-        self.dialog_progress_bg.heading = f'Updating {self.__class__.__name__}'
-        self.dialog_progress_bg.create()
-        data = func(self, *args, **kwargs)
-        self.dialog_progress_bg.close()
-        return data
-    return wrapper
+from tmdbhelper.lib.addon.dialog import progress_bg
 
 
 class ListAiringNext(Container):

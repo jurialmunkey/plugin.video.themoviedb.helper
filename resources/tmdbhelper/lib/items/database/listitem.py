@@ -10,6 +10,16 @@ from tmdbhelper.lib.items.database.tmdbdata import ItemDetailsDataBaseCacheFacto
 #     return ListItemDetailsConfigurator(tmdb_api=self.tmdb_api)
 
 
+def progress_sync_bg(func):
+    def wrapper(self, *args, **kwargs):
+        from tmdbhelper.lib.addon.dialog import DialogProgressSyncBG
+        self.dialog_progress_sync_bg = DialogProgressSyncBG()
+        data = func(self, *args, **kwargs)
+        self.dialog_progress_sync_bg.close()
+        return data
+    return wrapper
+
+
 class ThreadLocks(dict):
     def __missing__(self, key):
         self[key] = Lock()
@@ -17,6 +27,8 @@ class ThreadLocks(dict):
 
 
 class ListItemDetailsConfigurator:
+    dialog_progress_sync_bg = None
+
     def __init__(self, tmdb_api=None):
         self._tmdb_api = tmdb_api
 
@@ -76,6 +88,8 @@ class ListItemDetailsConfigurator:
         if not dbc:
             return li
 
+        dbc.dialog_progress_sync_bg = self.dialog_progress_sync_bg
+
         with dbc.cache.get_database() as dbc.connection:
             db_cache_data = dbc.data
 
@@ -87,8 +101,11 @@ class ListItemDetailsConfigurator:
         # li.art = self.get_item_artwork(item['artwork'], is_season=mediatype in ['season', 'episode'])
         return li
 
+    @progress_sync_bg
     def configure_listitems_threaded(self, items):  # TODO: Retrieve sequentially then pool unavailable items and thread lookups before setting sequentially
         from tmdbhelper.lib.addon.thread import ParallelThread
+        self.dialog_progress_sync_bg.max_value = len(items)
+        self.dialog_progress_sync_bg.heading = 'Cache item details'
         with ParallelThread(items, self.configure_listitem) as pt:
             item_queue = pt.queue
         return [i for i in item_queue if i]

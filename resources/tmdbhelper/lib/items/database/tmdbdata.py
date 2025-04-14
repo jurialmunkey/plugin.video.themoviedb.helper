@@ -21,6 +21,7 @@ class ItemDetailsDataBaseCache(DataBaseCache):
     online_data_args = ()  # ARGS for online_data_func
     online_data_kwgs = {}  # KWGS for online_data_func
     data_cond = True  # Condition to retrieve any data
+    dialog_progress_sync_bg = None
 
     @cached_property
     def cache(self):
@@ -209,7 +210,19 @@ class ArtClearlogoDetailsDataBaseCache(ArtTypeDetailsDataBaseCache):
 
 class StudioDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     table = 'studio'
-    keys = ('name', 'tmdb_id', 'logo', 'country', 'parent_id', )
+    keys = ('tmdb_id', 'parent_id')
+
+    @property
+    def cached_data_table(self):
+        table = ' '.join((
+            f'{self.table}',
+            f'INNER JOIN company ON company.tmdb_id = {self.table}.tmdb_id'
+        ))
+        return f'({table}) as studiocompany'
+
+    @property
+    def cached_data_keys(self):
+        return [f'studiocompany.{k}' for k in (*self.keys, 'name', 'tmdb_id', 'logo', 'country')]
 
 
 class CountryDetailsDataBaseCache(ItemDetailsListDataBaseCache):
@@ -231,14 +244,32 @@ class UniqueIdDetailsDataBaseCache(ItemDetailsListDataBaseCache):
         return (self.item_id, )
 
 
+class ServiceDetailsDataBaseCache(ItemDetailsListDataBaseCache):
+    table = 'service'
+    keys = ('tmdb_id', 'name', 'display_priority', 'iso', 'logo')
+    conditions = 'tmdb_id=?'
+
+
 class ProviderDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     table = 'provider'
-    keys = ('name', 'tmdb_id', 'display_priority', 'iso', 'logo', 'availability', 'parent_id')
+    keys = ('tmdb_id', 'availability', 'parent_id')
     conditions = 'parent_id=? AND iso=? ORDER BY display_priority ASC'  # WHERE conditions
 
     @property
     def values(self):  # WHERE conditions values for ?
         return (self.item_id, self.tmdb_api.iso_country)
+
+    @property
+    def cached_data_table(self):
+        table = ' '.join((
+            f'{self.table}',
+            f'INNER JOIN service ON service.tmdb_id = {self.table}.tmdb_id'
+        ))
+        return f'({table}) as providerservice'
+
+    @property
+    def cached_data_keys(self):
+        return [f'providerservice.{k}' for k in (*self.keys, 'name', 'display_priority', 'iso', 'logo')]
 
 
 class CastMemberDetailsDataBaseCache(ItemDetailsListDataBaseCache):
@@ -267,6 +298,12 @@ class CrewMemberDetailsDataBaseCache(CastMemberDetailsDataBaseCache):
 class PersonDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     table = 'person'
     keys = ('tmdb_id', 'thumb', 'name', 'gender', 'biography', 'known_for_department')
+    conditions = 'tmdb_id=?'
+
+
+class CompanyDetailsDataBaseCache(ItemDetailsListDataBaseCache):
+    table = 'company'
+    keys = ('tmdb_id', 'name', 'logo', 'country')
     conditions = 'tmdb_id=?'
 
 
@@ -396,6 +433,14 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         return self.get_db_cache(CountryDetailsDataBaseCache)
 
     @cached_property
+    def db_company_cache(self):
+        return self.get_db_cache(CompanyDetailsDataBaseCache)
+
+    @cached_property
+    def db_service_cache(self):
+        return self.get_db_cache(ServiceDetailsDataBaseCache)
+
+    @cached_property
     def db_studio_cache(self):
         dbc = self.get_db_cache(StudioDetailsDataBaseCache)
         dbc.table = self.db_studio_table  # Use networks not studios for TV
@@ -477,7 +522,9 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         return (
             self.db_genre_cache,
             self.db_country_cache,
+            self.db_company_cache,
             self.db_studio_cache,
+            self.db_service_cache,
             self.db_provider_cache,
             self.db_person_cache,
             self.db_castmember_cache,
@@ -488,6 +535,11 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
 
     def set_cached_data(self, return_data=False):
         with self.thread_lock:
+            try:
+                self.dialog_progress_sync_bg.set_message(f'{self.item_id}')
+            except AttributeError:
+                pass
+
             if not self.online_data_mapped:
                 return
 
@@ -637,7 +689,18 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
     def data(self):
         return self.get_data()
 
+    def dialog_progress_sync_bg_increment(func):
+        def wrapper(self, *args, **kwargs):
+            data = func(self, *args, **kwargs)
+            try:
+                self.dialog_progress_sync_bg.increment()
+            except AttributeError:
+                pass
+            return data
+        return wrapper
+
     # @timer_report
+    @dialog_progress_sync_bg_increment
     def get_data(self):
         if not self.data_cond:
             return
@@ -695,6 +758,7 @@ class SeasonItemDetailsDataBaseCache(TVShowItemDetailsDataBaseCache):
     @property
     def db_table_caches(self):
         return (
+            self.db_service_cache,
             self.db_provider_cache,
             self.db_person_cache,
             self.db_castmember_cache,
@@ -741,6 +805,7 @@ class EpisodeItemDetailsDataBaseCache(SeasonItemDetailsDataBaseCache):
     @property
     def db_table_caches(self):
         return (
+            self.db_service_cache,
             self.db_provider_cache,
             self.db_person_cache,
             self.db_castmember_cache,

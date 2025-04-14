@@ -19,7 +19,7 @@ def timerlock(func):
 
 def progress_bg(func):
     def wrapper(self, *args, **kwargs):
-        from tmdbhelper.lib.api.trakt.sync.dialogbg import DialogProgressSyncBG
+        from tmdbhelper.lib.addon.dialog import DialogProgressSyncBG
         self.dialog_progress_bg = DialogProgressSyncBG()
         self.dialog_progress_bg.heading = f'Syncing {self.item_type} {self.method}'
         self.dialog_progress_bg.create()
