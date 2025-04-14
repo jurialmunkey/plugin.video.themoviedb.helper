@@ -1,3 +1,4 @@
+from functools import cached_property
 from jurialmunkey.parser import try_int, boolean
 from tmdbhelper.lib.addon.consts import NO_UNAIRED_LABEL, NO_UNAIRED_CHECK, REMOVE_EPISODE_COUNT
 from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin, get_localized, get_condvisibility
@@ -44,123 +45,69 @@ class Container(CommonContainerAPIs):
         self.kodi_db = None
         self.thumb_override = 0
 
-    @property
+    @cached_property
     def is_fanarttv(self):
-        try:
-            return self._is_fanarttv
-        except AttributeError:
-            self._is_fanarttv = self.params.get('fanarttv', '').lower()
-            return self._is_fanarttv
+        return self.params.get('fanarttv', '').lower()
 
-    @property
+    @cached_property
     def is_widget(self):
-        try:
-            return self._is_widget
-        except AttributeError:
-            self._is_widget = boolean(self.params.get('widget', False))
-            return self._is_widget
+        return boolean(self.params.get('widget', False))
 
-    @property
+    @cached_property
     def is_cacheonly(self):
-        try:
-            return self._is_cacheonly
-        except AttributeError:
-            self._is_cacheonly = boolean(self.params.get('cacheonly', False))
-            return self._is_cacheonly
+        return boolean(self.params.get('cacheonly', False))
 
-    @property
+    @cached_property
     def is_detailed(self):
-        try:
-            return self._is_detailed
-        except AttributeError:
-            self._is_detailed = boolean(self.params.get('detailed', False)) or self.params.get('info') == 'details'
-            return self._is_detailed
+        return boolean(self.params.get('detailed', False)) or self.params.get('info') == 'details'
 
-    @property
+    @cached_property
     def context_additions(self):
-        try:
-            return self._context_additions
-        except AttributeError:
-            self._context_additions = []
-            if self.context_additions_make_node:
-                self._context_additions += [(get_localized(32496), 'RunScript(plugin.video.themoviedb.helper,make_node)')]
-            return self._context_additions
+        if self.context_additions_make_node:
+            return [(get_localized(32496), 'RunScript(plugin.video.themoviedb.helper,make_node)')]
+        return []
 
-    @property
+    @cached_property
     def context_additions_make_node(self):
-        try:
-            return self._context_additions_make_node
-        except AttributeError:
-            self._context_additions_make_node = get_setting('contextmenu_make_node') if not self.is_widget else False
-            return self._context_additions_make_node
+        return get_setting('contextmenu_make_node') if not self.is_widget else False
 
-    @property
+    @cached_property
     def hide_watched(self):
-        try:
-            return self._hide_watched
-        except AttributeError:
-            self._hide_watched = get_setting('widgets_hidewatched') if self.is_widget else False
-            return self._hide_watched
+        return get_setting('widgets_hidewatched') if self.is_widget else False
 
-    @property
+    @cached_property
     def nodate_is_unaired(self):
-        try:
-            return self._nodate_is_unaired
-        except AttributeError:
-            self._nodate_is_unaired = get_setting('nodate_is_unaired')
-            return self._nodate_is_unaired
+        return get_setting('nodate_is_unaired')
 
-    @property
+    @cached_property
     def tmdb_cache_only(self):
-        try:
-            return self._tmdb_cache_only
-        except AttributeError:
-            def _tmdb_is_cache_only():
-                if self.is_cacheonly:  # cacheonly=true param overrides all other settings
-                    return True
-                if not self.ftv_is_cache_only:  # fanarttv lookups require TMDb lookups for tvshow ID -- TODO: only force on tvshows
-                    return False
-                if get_setting('tmdb_details'):  # user setting
-                    return False
-                return True
-            self._tmdb_cache_only = _tmdb_is_cache_only()
-            return self._tmdb_cache_only
+        if self.is_cacheonly:  # cacheonly=true param overrides all other settings
+            return True
+        if not self.ftv_is_cache_only:  # fanarttv lookups require TMDb lookups for tvshow ID -- TODO: only force on tvshows
+            return False
+        if get_setting('tmdb_details'):  # user setting
+            return False
+        return True
 
-    @tmdb_cache_only.setter
-    def tmdb_cache_only(self, value):
-        self._tmdb_cache_only = value
-
-    @property
+    @cached_property
     def is_excluded(self):
-        try:
-            return self._is_excluded
-        except AttributeError:
-            from tmdbhelper.lib.items.filters import is_excluded
-            self._is_excluded = is_excluded
-            return self._is_excluded
+        from tmdbhelper.lib.items.filters import is_excluded
+        return is_excluded
 
-    @property
+    @cached_property
     def trakt_playdata(self):
-        try:
-            return self._trakt_playdata
-        except AttributeError:
-            from tmdbhelper.lib.items.trakt import TraktPlayData
-            self._trakt_playdata = TraktPlayData(
-                watchedindicators=get_setting('trakt_watchedindicators'),
-                pauseplayprogress=get_setting('trakt_playprogress'),
-                traktepisodetypes=get_setting('trakt_episodetypes'))
-            return self._trakt_playdata
+        from tmdbhelper.lib.items.trakt import TraktPlayData
+        return TraktPlayData(
+            watchedindicators=get_setting('trakt_watchedindicators'),
+            pauseplayprogress=get_setting('trakt_playprogress'),
+            traktepisodetypes=get_setting('trakt_episodetypes'))
 
-    @property
+    @cached_property
     def ib(self):
-        try:
-            return self._ib
-        except AttributeError:
-            from tmdbhelper.lib.items.builder import ItemBuilder
-            self._ib = ItemBuilder(
-                tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api,
-                log_timers=self.log_timers, timer_lists=self.timer_lists)
-            return self._ib
+        from tmdbhelper.lib.items.builder import ItemBuilder
+        return ItemBuilder(
+            tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api,
+            log_timers=self.log_timers, timer_lists=self.timer_lists)
 
     @property
     def page_length(self):
@@ -168,20 +115,13 @@ class Container(CommonContainerAPIs):
             return 1
         return get_setting('pagemulti_library', 'int')
 
-    @property
+    @cached_property
     def pagination(self):
-        try:
-            return self._pagination
-        except AttributeError:
-            def _pagination_is_allowed():
-                if not boolean(self.params.get('nextpage', True)):
-                    return False
-                if self.is_widget and not get_setting('widgets_nextpage'):
-                    return False
-                return True
-
-            self._pagination = _pagination_is_allowed()
-            return self._pagination
+        if not boolean(self.params.get('nextpage', True)):
+            return False
+        if self.is_widget and not get_setting('widgets_nextpage'):
+            return False
+        return True
 
     @property
     def ftv_is_cache_only(self):
