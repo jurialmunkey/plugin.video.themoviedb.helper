@@ -484,9 +484,9 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         if not data or not data[0] or not data[0][self.cached_data_check_key]:
             return
 
-        # ==========
-        # INFOLABELS
-        # ==========
+        """
+        INFOLABELS
+        """
 
         infolabels = {k: data[0][k] for k in data[0].keys() if k not in ('id', 'tmdb_id', )}
 
@@ -501,9 +501,9 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         for instance, ikey, dkey in infolabel_routes:
             infolabels[dkey] = [i[ikey] for i in instance.cached_data]
 
-        # ==============
-        # INFOPROPERTIES
-        # ==============
+        """
+        INFOPROPERTIES
+        """
 
         infoproperties = {}
 
@@ -527,9 +527,10 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
             infoproperties[ckey[0]] = ' / '.join(join_data)
             infoproperties[f'{ckey[0]}_CR'] = '[CR]'.join(join_data)
 
-        # ====
-        # CAST
-        # ====
+        """
+        CAST
+        """
+
         cast = [
             {
                 'name': i['name'],
@@ -540,9 +541,9 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
             for i in self.db_castmember_cache.cached_data
         ]
 
-        # ===
-        # ART
-        # ===
+        """
+        ART
+        """
 
         art = {}
 
@@ -577,14 +578,15 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
                 art[dkey] = art[dkey] or instance.image_path_func(instance.cached_data[0]['icon'] if instance.cached_data else None)
                 art[f'tvshow.{dkey}'] = instance.image_path_func(instance.cached_data[0]['icon'] if instance.cached_data else None)
 
-        # ==========
-        # UNIQUE_IDS
-        # ==========
+        """
+        UNIQUE IDS
+        """
+
         unique_ids = {}
 
-        # ========
-        # ITEM MAP
-        # ========
+        """
+        ITEM MAP
+        """
 
         return {
             'infolabels': infolabels,
