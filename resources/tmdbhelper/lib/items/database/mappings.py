@@ -125,6 +125,16 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'keys': [('item', 'year')],
                 'func': lambda v: int(v[0:4])
             }],
+            'first_air_date': [{
+                'keys': [('item', 'premiered')]}, {
+                'keys': [('item', 'year')],
+                'func': lambda v: int(v[0:4])
+            }],
+            'air_date': [{
+                'keys': [('item', 'premiered')]}, {
+                'keys': [('item', 'year')],
+                'func': lambda v: int(v[0:4])
+            }],
             'genres': [{
                 'keys': [('genre', None)],
                 'func': self.split_array,
