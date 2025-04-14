@@ -4,14 +4,10 @@ from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.items.database.tmdbdata import ItemDetailsDataBaseCacheFactory
 
 
-# @property
+# @cached_property
 # def lidc(self):
-#     try:
-#         return self._lidc
-#     except AttributeError:
-#         from tmdbhelper.lib.items.database.listitem import ListItemDetailsConfigurator
-#         self._lidc = ListItemDetailsConfigurator(tmdb_api=self.tmdb_api)
-#         return self._lidc
+#     from tmdbhelper.lib.items.database.listitem import ListItemDetailsConfigurator
+#     return ListItemDetailsConfigurator(tmdb_api=self.tmdb_api)
 
 
 class ThreadLocks(dict):
