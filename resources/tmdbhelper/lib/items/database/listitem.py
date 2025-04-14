@@ -105,7 +105,7 @@ class ListItemDetailsConfigurator:
     def configure_listitems_threaded(self, items):  # TODO: Retrieve sequentially then pool unavailable items and thread lookups before setting sequentially
         from tmdbhelper.lib.addon.thread import ParallelThread
         self.dialog_progress_sync_bg.max_value = len(items)
-        self.dialog_progress_sync_bg.heading = 'Cache item details'
+        self.dialog_progress_sync_bg.heading = 'Caching item'
         with ParallelThread(items, self.configure_listitem) as pt:
             item_queue = pt.queue
         return [i for i in item_queue if i]
