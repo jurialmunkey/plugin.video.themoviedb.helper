@@ -495,7 +495,7 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
             (self.db_genre_cache, 'name', 'genre'),
             (self.db_country_cache, 'name', 'country'),
             (self.db_studio_cache, 'name', 'studio'),
-            (self.db_castmember_cache, 'name', 'cast'),
+            # (self.db_castmember_cache, 'name', 'cast'),
         )
 
         for instance, ikey, dkey in infolabel_routes:
@@ -530,7 +530,15 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         # ====
         # CAST
         # ====
-        cast = ()
+        cast = [
+            {
+                'name': i['name'],
+                'role': i['role'],
+                'order': i['ordering'],
+                'thumbnail': self.tmdb_imagepath.get_imagepath_poster(i['thumb'])
+            }
+            for i in self.db_castmember_cache.cached_data
+        ]
 
         # ===
         # ART

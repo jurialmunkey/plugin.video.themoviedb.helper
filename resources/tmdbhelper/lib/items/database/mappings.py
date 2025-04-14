@@ -3,84 +3,86 @@
 from tmdbhelper.lib.api.mapping import _ItemMapper
 
 
-def split_array(items, subkeys=(), **kwargs):
-    if not items:
-        return ()
-
-    for subkey in subkeys:
-        try:
-            items = items[subkey]
-        except (TypeError, KeyError):
+class ItemMapperMethods:
+    @staticmethod
+    def split_array(items, subkeys=(), **kwargs):
+        if not items:
             return ()
 
-    if not isinstance(items, list):
-        return ()
+        for subkey in subkeys:
+            try:
+                items = items[subkey]
+            except (TypeError, KeyError):
+                return ()
 
-    def get_item(i, v):
-        if not callable(v):
-            return i.get(v)
-        return v(i)
+        if not isinstance(items, list):
+            return ()
 
-    return [{k: get_item(i, v) for k, v in kwargs.items()} for i in items]
+        def get_item(i, v):
+            if not callable(v):
+                return i.get(v)
+            return v(i)
 
+        return [{k: get_item(i, v) for k, v in kwargs.items()} for i in items]
 
-def get_providers(items, **kwargs):
-    if not items:
-        return
-    results = items.get('results')
-    if not results:
-        return
-    data = []
-    for iso, availabilities in results.items():
-        for availability, datalist in availabilities.items():
-            if availability == 'link':
-                continue
-            for provider in datalist:
+    @staticmethod
+    def get_providers(items, **kwargs):
+        if not items:
+            return
+        results = items.get('results')
+        if not results:
+            return
+        data = []
+        for iso, availabilities in results.items():
+            for availability, datalist in availabilities.items():
+                if availability == 'link':
+                    continue
+                for provider in datalist:
+                    data.append({
+                        'iso': iso,
+                        'availability': availability,
+                        'display_priority': provider.get('display_priority'),
+                        'name': provider.get('provider_name'),
+                        'logo': provider.get('logo_path'),
+                        'tmdb_id': provider.get('provider_id'),
+                    })
+        return data
+
+    @staticmethod
+    def get_art(items, **kwargs):
+        if not items:
+            return
+        data = []
+
+        def get_aspect_ratio(aspect_ratio):
+            if aspect_ratio < 1:
+                return 'poster'
+            if aspect_ratio == 1:
+                return 'square'
+            if 1.7 <= aspect_ratio <= 1.8:
+                return 'landscape'
+            if aspect_ratio < 1.7:
+                return 'thumb'
+            if aspect_ratio > 1.8:
+                return 'wide'
+            return 'other'
+
+        for artwork_type, artworks in items.items():
+            for artwork in artworks:
+                path = artwork['file_path']
                 data.append({
-                    'iso': iso,
-                    'availability': availability,
-                    'display_priority': provider.get('display_priority'),
-                    'name': provider.get('provider_name'),
-                    'logo': provider.get('logo_path'),
-                    'tmdb_id': provider.get('provider_id'),
+                    'aspect_ratio': get_aspect_ratio(artwork['aspect_ratio']),
+                    'height': artwork['height'],
+                    'width': artwork['width'],
+                    'iso': artwork['iso_639_1'],
+                    'icon': path,
+                    'type': artwork_type,
+                    'extension': path.split('.')[-1] if path else None,
+                    'vote_average': int(artwork['vote_average'] * 100),
+                    'vote_count': artwork['vote_count'],
                 })
-    return data
 
-
-def get_art(items, **kwargs):
-    if not items:
-        return
-    data = []
-
-    def get_aspect_ratio(aspect_ratio):
-        if aspect_ratio < 1:
-            return 'poster'
-        if aspect_ratio == 1:
-            return 'square'
-        if 1.7 <= aspect_ratio <= 1.8:
-            return 'landscape'
-        if aspect_ratio < 1.7:
-            return 'thumb'
-        if aspect_ratio > 1.8:
-            return 'wide'
-        return 'other'
-
-    for artwork_type, artworks in items.items():
-        for artwork in artworks:
-            path = artwork['file_path']
-            data.append({
-                'aspect_ratio': get_aspect_ratio(artwork['aspect_ratio']),
-                'height': artwork['height'],
-                'width': artwork['width'],
-                'iso': artwork['iso_639_1'],
-                'icon': path,
-                'type': artwork_type,
-                'extension': path.split('.')[-1] if path else None,
-                'vote_average': int(artwork['vote_average'] * 100),
-                'vote_count': artwork['vote_count'],
-            })
-
-    return data
+        return data
 
 
 class BlankNoneDict(dict):
@@ -88,22 +90,7 @@ class BlankNoneDict(dict):
         return None
 
 
-def get_empty_item():
-    return {
-        'item': BlankNoneDict(),
-        'genre': (),
-        'country': (),
-        'studio': (),
-        'network': (),
-        'provider': (),
-        'castmember': (),
-        'crewmember': (),
-        'person': [],
-        'art': (),
-    }
-
-
-class ItemMapper(_ItemMapper):
+class ItemMapper(_ItemMapper, ItemMapperMethods):
     def __init__(self):
         self.blacklist = ()
         """ Mapping dictionary
@@ -128,55 +115,55 @@ class ItemMapper(_ItemMapper):
             }],
             'genres': [{
                 'keys': [('genre', None)],
-                'func': split_array,
+                'func': self.split_array,
                 'kwargs': {'name': 'name', 'tmdb_id': 'id'}
             }],
             'production_countries': [{
                 'keys': [('country', None)],
-                'func': split_array,
+                'func': self.split_array,
                 'kwargs': {'name': 'name', 'iso': 'iso_3166_1'}
             }],
             'production_companies': [{
                 'keys': [('studio', None)],
-                'func': split_array,
+                'func': self.split_array,
                 'kwargs': {'name': 'name', 'tmdb_id': 'id', 'logo': 'logo_path', 'country': 'origin_country'}
             }],
             'networks': [{
                 'keys': [('network', None)],
-                'func': split_array,
+                'func': self.split_array,
                 'kwargs': {'name': 'name', 'tmdb_id': 'id', 'logo': 'logo_path', 'country': 'origin_country'}
             }],
             'watch/providers': [{
                 'keys': [('provider', None)],
-                'func': get_providers,
+                'func': self.get_providers,
             }],
             'images': [{
                 'keys': [('art', None)],
-                'func': get_art,
+                'func': self.get_art,
             }],
             'credits': [{
                 'keys': [('castmember', None)],
-                'func': split_array,
+                'func': self.split_array,
                 'kwargs': {
                     'subkeys': ('cast', ),
                     'tmdb_id': 'id', 'role': 'character', 'ordering': 'order'}}, {
                 # ---
                 'keys': [('person', None)],
                 'extend': True,
-                'func': split_array,
+                'func': self.split_array,
                 'kwargs': {
                     'subkeys': ('cast', ),
                     'tmdb_id': 'id', 'thumb': 'profile_path', 'name': 'name', 'gender': 'gender', 'known_for_department': 'known_for_department'}}, {
                 # ---
                 'keys': [('crewmember', None)],
-                'func': split_array,
+                'func': self.split_array,
                 'kwargs': {
                     'subkeys': ('crew', ),
                     'tmdb_id': 'id', 'role': 'job', 'department': 'department', 'ordering': 'order'}}, {
                 # ---
                 'keys': [('person', None)],
                 'extend': True,
-                'func': split_array,
+                'func': self.split_array,
                 'kwargs': {
                     'subkeys': ('crew', ),
                     'tmdb_id': 'id', 'thumb': 'profile_path', 'name': 'name', 'gender': 'gender', 'known_for_department': 'known_for_department'}
@@ -196,7 +183,22 @@ class ItemMapper(_ItemMapper):
             'episode_number': ('item', 'episode'),
         }
 
+    @staticmethod
+    def get_empty_item():
+        return {
+            'item': BlankNoneDict(),
+            'genre': (),
+            'country': (),
+            'studio': (),
+            'network': (),
+            'provider': (),
+            'castmember': (),
+            'crewmember': (),
+            'person': [],
+            'art': (),
+        }
+
     def get_info(self, data, **kwargs):
-        item = get_empty_item()
+        item = self.get_empty_item()
         item = self.map_item(item, data)
         return item
