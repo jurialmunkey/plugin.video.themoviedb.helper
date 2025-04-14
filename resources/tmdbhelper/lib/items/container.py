@@ -336,7 +336,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
             executebuiltin('Container.Refresh')
 
 
-class ContainerDirectory(ContainerDirectoryCommon):
+class ContainerDirectoryItemBuilder(ContainerDirectoryCommon):
     @cached_property
     def ib(self):
         from tmdbhelper.lib.items.builder import ItemBuilder
@@ -364,3 +364,25 @@ class ContainerDirectory(ContainerDirectoryCommon):
             with ParallelThread(items, self.build_detailed_item) as pt:
                 item_queue = pt.queue
         return [i for i in item_queue if i]
+
+
+class ContainerDirectoryItemDetails(ContainerDirectoryCommon):
+    @cached_property
+    def lidc(self):
+        from tmdbhelper.lib.items.database.listitem import ListItemDetailsConfigurator
+        lidc = ListItemDetailsConfigurator(tmdb_api=self.tmdb_api)
+        lidc.pagination = self.pagination
+        return lidc
+
+    def build_detailed_item(self, li):
+        if li.infoproperties.get('plot_affix'):
+            li.infolabels['plot'] = f"{li.infoproperties['plot_affix']}. {li.infolabels.get('plot')}"
+        return li
+
+    def build_detailed_items(self, items):
+        items = self.lidc.configure_listitems_threaded(items)
+        return [i for i in (self.build_detailed_item(li) for li in items if li) if i]
+
+
+ContainerDirectory = ContainerDirectoryItemBuilder
+# ContainerDirectory = ContainerDirectoryItemDetails

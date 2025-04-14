@@ -17,6 +17,8 @@ class ThreadLocks(dict):
 
 
 class ListItemDetailsConfigurator:
+    pagination = False
+
     def __init__(self, tmdb_api=None):
         self._tmdb_api = tmdb_api
 
@@ -69,6 +71,10 @@ class ListItemDetailsConfigurator:
 
     def configure_listitem(self, i, cache_refresh=None):
         li = ListItem(**i)
+
+        if 'next_page' in i:
+            return li if self.pagination else None
+
         dbc = self.get_configured_db_cache(li)
 
         if not dbc:
@@ -85,10 +91,6 @@ class ListItemDetailsConfigurator:
 
     def configure_listitems_threaded(self, items):  # TODO: Retrieve sequentially then pool unavailable items and thread lookups before setting sequentially
         from tmdbhelper.lib.addon.thread import ParallelThread
-
-        from tmdbhelper.lib.files.futils import dumps_to_file
-        dumps_to_file(items, 'log_data', 'directory.json', join_addon_data=True)
-
         with ParallelThread(items, self.configure_listitem, cache_refresh='never') as pt:
             item_queue = pt.queue
         missing_indices = [x for x, i in enumerate(item_queue) if i is None]
