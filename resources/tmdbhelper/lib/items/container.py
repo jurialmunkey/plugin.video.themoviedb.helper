@@ -109,11 +109,6 @@ class Container(CommonContainerAPIs):
             tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api,
             log_timers=self.log_timers, timer_lists=self.timer_lists)
 
-    @cached_property
-    def lidc(self):
-        from tmdbhelper.lib.items.database.listitem import ListItemDetailsConfigurator
-        return ListItemDetailsConfigurator(tmdb_api=self.tmdb_api)
-
     @property
     def page_length(self):
         if self.is_widget or not get_condvisibility('Window.IsVisible(MyVideoNav.xml)'):
@@ -216,11 +211,10 @@ class Container(CommonContainerAPIs):
         from tmdbhelper.lib.addon.thread import ParallelThread
         self.ib.cache_only = self.tmdb_cache_only
         with TimerList(self.timer_lists, '--build', log_threshold=0.05, logging=self.log_timers):
-            all_listitems = self.lidc.configure_listitems_threaded(items)
-            # self.ib.parent_params = self.parent_params
-            # with ParallelThread(items, self._build_item) as pt:
-            #     item_queue = pt.queue
-            # all_listitems = [i for i in item_queue if i]
+            self.ib.parent_params = self.parent_params
+            with ParallelThread(items, self._build_item) as pt:
+                item_queue = pt.queue
+            all_listitems = [i for i in item_queue if i]
 
         # Wait for sync thread
         with TimerList(self.timer_lists, '--sync', log_threshold=0.05, logging=self.log_timers):
