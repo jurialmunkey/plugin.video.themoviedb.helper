@@ -42,18 +42,31 @@ class ListItemDetailsConfigurator:
             return
 
         dbc = self.get_db_cache(mediatype)
-        dbc.tmdb_id = li.unique_ids.get('tmdb')
 
-        if mediatype not in ('season', 'episode'):
-            return dbc
+        def get_movie():
+            dbc.tmdb_id = li.unique_ids.get('tmdb')
 
-        dbc.season = li.infolabels.get('season', 0)
-        dbc.tmdb_id = li.unique_ids.get('tvshow.tmdb')
+        def get_tvshow():
+            dbc.tmdb_id = li.unique_ids.get('tmdb') or li.unique_ids.get('tvshow.tmdb')
 
-        if mediatype != 'episode':
-            return dbc
+        def get_season():
+            dbc.season = li.infolabels.get('season', 0)
+            dbc.tmdb_id = li.unique_ids.get('tvshow.tmdb')
 
-        dbc.episode = li.infolabels.get('episode')
+        def get_episode():
+            dbc.episode = li.infolabels.get('episode')
+            dbc.season = li.infolabels.get('season', 0)
+            dbc.tmdb_id = li.unique_ids.get('tvshow.tmdb')
+
+        routes = {
+            'movie': get_movie,
+            'tvshow': get_tvshow,
+            'season': get_season,
+            'episode': get_episode
+        }
+
+        routes[mediatype]()
+
         return dbc
 
     def configure_listitem(self, i):
