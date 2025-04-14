@@ -1,5 +1,5 @@
 from xbmcgui import Dialog
-from functools import cached_property
+from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.api.fanarttv.api import ARTWORK_TYPES, get_encoded_url
 from tmdbhelper.lib.addon.dialog import BusyDialog

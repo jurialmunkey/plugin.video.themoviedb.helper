@@ -1,4 +1,4 @@
-from functools import cached_property
+from tmdbhelper.lib.files.ftools import cached_property
 from jurialmunkey.parser import try_int, try_float, dict_to_list, get_params, IterProps
 from tmdbhelper.lib.api.mapping import UPDATE_BASEKEY, _ItemMapper, get_empty_item
 from tmdbhelper.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type, get_setting, get_localized

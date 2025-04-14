@@ -1,4 +1,4 @@
-from functools import cached_property
+from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.logger import kodi_log
 import jurialmunkey.dialog as jurialmunkey_dialog
 """ Top level module only import plugin/constants/logger """

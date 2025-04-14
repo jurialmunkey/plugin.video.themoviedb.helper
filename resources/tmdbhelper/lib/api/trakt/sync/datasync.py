@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from functools import cached_property
+from tmdbhelper.lib.files.ftools import cached_property
 from jurialmunkey.checks import has_arg_value
 from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA
 from tmdbhelper.lib.api.trakt.sync.database import SyncDataBase

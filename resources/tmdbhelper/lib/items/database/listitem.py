@@ -1,4 +1,4 @@
-from functools import cached_property
+from tmdbhelper.lib.files.ftools import cached_property
 from threading import Lock
 from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.items.database.tmdbdata import ItemDetailsDataBaseCacheFactory
@@ -10,16 +10,6 @@ from tmdbhelper.lib.items.database.tmdbdata import ItemDetailsDataBaseCacheFacto
 #     return ListItemDetailsConfigurator(tmdb_api=self.tmdb_api)
 
 
-def progress_sync_bg(func):
-    def wrapper(self, *args, **kwargs):
-        from tmdbhelper.lib.addon.dialog import DialogProgressSyncBG
-        self.dialog_progress_sync_bg = DialogProgressSyncBG()
-        data = func(self, *args, **kwargs)
-        self.dialog_progress_sync_bg.close()
-        return data
-    return wrapper
-
-
 class ThreadLocks(dict):
     def __missing__(self, key):
         self[key] = Lock()
@@ -27,8 +17,6 @@ class ThreadLocks(dict):
 
 
 class ListItemDetailsConfigurator:
-    dialog_progress_sync_bg = None
-
     def __init__(self, tmdb_api=None):
         self._tmdb_api = tmdb_api
 
@@ -49,11 +37,6 @@ class ListItemDetailsConfigurator:
 
     def get_configured_db_cache(self, li):
         mediatype = li.infolabels.get('mediatype')
-
-        if mediatype not in ('movie', 'tvshow', 'season', 'episode'):
-            return
-
-        dbc = self.get_db_cache(mediatype)
 
         def get_movie():
             dbc.tmdb_id = li.unique_ids.get('tmdb')
@@ -77,38 +60,42 @@ class ListItemDetailsConfigurator:
             'episode': get_episode
         }
 
-        routes[mediatype]()
+        if mediatype not in routes:
+            return
 
+        dbc = self.get_db_cache(mediatype)
+        routes[mediatype]()
         return dbc
 
-    def configure_listitem(self, i):
+    def configure_listitem(self, i, cache_refresh=None):
         li = ListItem(**i)
         dbc = self.get_configured_db_cache(li)
 
         if not dbc:
-            return li
-
-        dbc.dialog_progress_sync_bg = self.dialog_progress_sync_bg
+            return li if cache_refresh != 'never' else None
 
         with dbc.cache.get_database() as dbc.connection:
             db_cache_data = dbc.data
 
         if not db_cache_data:
-            return li
+            return li if cache_refresh != 'never' else None
 
         li.set_details(db_cache_data, override=True)
 
         # li.art = self.get_item_artwork(item['artwork'], is_season=mediatype in ['season', 'episode'])
         return li
 
-    @progress_sync_bg
     def configure_listitems_threaded(self, items):  # TODO: Retrieve sequentially then pool unavailable items and thread lookups before setting sequentially
         from tmdbhelper.lib.addon.thread import ParallelThread
-        self.dialog_progress_sync_bg.max_value = len(items)
-        self.dialog_progress_sync_bg.heading = 'Caching item'
-        with ParallelThread(items, self.configure_listitem) as pt:
+        with ParallelThread(items, self.configure_listitem, cache_refresh='never') as pt:
             item_queue = pt.queue
-        return [i for i in item_queue if i]
+        missing_indices = [x for x, i in enumerate(item_queue) if i is None]
+        missing_items = [items[x] for x in missing_indices]
+        with ParallelThread(missing_items, self.configure_listitem, cache_refresh='force') as pt:
+            refresh_item_queue = pt.queue
+        refresh_item_queue_iter = iter(refresh_item_queue)
+        all_items = [i or next(refresh_item_queue_iter) for i in item_queue]
+        return [i for i in all_items if i]
 
     def configure_listitems(self, items):
         return [j for j in (self.configure_listitem(i) for i in items if i) if j]

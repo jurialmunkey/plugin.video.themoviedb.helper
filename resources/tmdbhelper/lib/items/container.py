@@ -1,4 +1,4 @@
-from functools import cached_property
+from tmdbhelper.lib.files.ftools import cached_property
 from jurialmunkey.parser import try_int, boolean
 from tmdbhelper.lib.addon.consts import NO_UNAIRED_LABEL, NO_UNAIRED_CHECK, REMOVE_EPISODE_COUNT
 from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin, get_localized, get_condvisibility

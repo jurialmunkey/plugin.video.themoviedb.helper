@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from functools import cached_property
+from tmdbhelper.lib.files.ftools import cached_property, threaded_cached_property
 from tmdbhelper.lib.addon.tmdate import set_timestamp
 from tmdbhelper.lib.items.database.database import ItemDetailsDataBase
 from tmdbhelper.lib.items.database.mappings import ItemMapper
@@ -8,6 +8,7 @@ from tmdbhelper.lib.files.database import DataBaseCache
 # from tmdbhelper.lib.files.locker import mutexlock
 # from tmdbhelper.lib.addon.logger import textviewer_output
 # from tmdbhelper.lib.addon.logger import timer_report
+# from tmdbhelper.lib.addon.logger import kodi_log
 
 
 class ItemDetailsDataBaseCache(DataBaseCache):
@@ -21,9 +22,8 @@ class ItemDetailsDataBaseCache(DataBaseCache):
     online_data_args = ()  # ARGS for online_data_func
     online_data_kwgs = {}  # KWGS for online_data_func
     data_cond = True  # Condition to retrieve any data
-    dialog_progress_sync_bg = None
 
-    @cached_property
+    @threaded_cached_property
     def cache(self):
         return ItemDetailsDataBase(filename=self.cache_filename)
 
@@ -32,12 +32,12 @@ class ItemDetailsDataBaseCache(DataBaseCache):
         from jurialmunkey.window import WindowPropertySetter
         return WindowPropertySetter()
 
-    @cached_property
+    @threaded_cached_property
     def tmdb_api(self):
         from tmdbhelper.lib.api.tmdb.api import TMDb
         return TMDb()
 
-    @cached_property
+    @threaded_cached_property
     def tmdb_imagepath(self):
         from tmdbhelper.lib.api.tmdb.images import TMDbImagePath
         return TMDbImagePath()
@@ -535,11 +535,6 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
 
     def set_cached_data(self, return_data=False):
         with self.thread_lock:
-            try:
-                self.dialog_progress_sync_bg.set_message(f'{self.item_id}')
-            except AttributeError:
-                pass
-
             if not self.online_data_mapped:
                 return
 
@@ -689,18 +684,7 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
     def data(self):
         return self.get_data()
 
-    def dialog_progress_sync_bg_increment(func):
-        def wrapper(self, *args, **kwargs):
-            data = func(self, *args, **kwargs)
-            try:
-                self.dialog_progress_sync_bg.increment()
-            except AttributeError:
-                pass
-            return data
-        return wrapper
-
     # @timer_report
-    @dialog_progress_sync_bg_increment
     def get_data(self):
         if not self.data_cond:
             return

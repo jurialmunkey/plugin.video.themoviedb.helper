@@ -1,4 +1,4 @@
-from functools import cached_property
+from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.dialog import BusyDialog
 from tmdbhelper.lib.script.sync.basic import ItemWatched, ItemUnwatched, ItemWatchlist, ItemCollection, ItemFavorites
 from tmdbhelper.lib.script.sync.rating import ItemRating

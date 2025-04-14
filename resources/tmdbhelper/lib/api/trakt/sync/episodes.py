@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from functools import cached_property
+from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.files.database import DataBaseCache
 from tmdbhelper.lib.api.trakt.sync.database import SyncDataBase
 from tmdbhelper.lib.addon.thread import ParallelThread
