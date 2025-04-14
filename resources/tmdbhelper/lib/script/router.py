@@ -23,8 +23,8 @@ def test_func():
     from tmdbhelper.lib.api.tmdb.api import TMDb
     sync.tmdb_api = TMDb()
 
-    # sync.cache_refresh = 'force'
-    # sync.cache.del_database_init()
+    sync.cache_refresh = 'force'
+    sync.cache.del_database_init()
 
     with sync.cache.get_database() as sync.connection:
         data = sync.data

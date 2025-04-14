@@ -1,4 +1,5 @@
 from functools import cached_property
+from threading import Lock
 from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.items.database.tmdbdata import ItemDetailsDataBaseCacheFactory
 
@@ -13,6 +14,12 @@ from tmdbhelper.lib.items.database.tmdbdata import ItemDetailsDataBaseCacheFacto
 #         return self._lidc
 
 
+class ThreadLocks(dict):
+    def __missing__(self, key):
+        self[key] = Lock()
+        return self[key]
+
+
 class ListItemDetailsConfigurator:
     def __init__(self, tmdb_api=None):
         self._tmdb_api = tmdb_api
@@ -22,9 +29,14 @@ class ListItemDetailsConfigurator:
         from tmdbhelper.lib.api.tmdb.api import TMDb
         return self._tmdb_api or TMDb()
 
+    @cached_property
+    def thread_locks(self):
+        return ThreadLocks()
+
     def get_db_cache(self, mediatype):
         dbc = ItemDetailsDataBaseCacheFactory(mediatype)
         dbc.tmdb_api = self.tmdb_api
+        dbc.thread_locks = self.thread_locks
         return dbc
 
     def get_configured_db_cache(self, li):
@@ -66,7 +78,7 @@ class ListItemDetailsConfigurator:
         # li.art = self.get_item_artwork(item['artwork'], is_season=mediatype in ['season', 'episode'])
         return li
 
-    def configure_listitems_threaded(self, items):
+    def configure_listitems_threaded(self, items):  # TODO: Retrieve sequentially then pool unavailable items and thread lookups before setting sequentially
         from tmdbhelper.lib.addon.thread import ParallelThread
         with ParallelThread(items, self.configure_listitem) as pt:
             item_queue = pt.queue

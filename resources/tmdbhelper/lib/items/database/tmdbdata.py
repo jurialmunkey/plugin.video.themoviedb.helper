@@ -6,9 +6,9 @@ from tmdbhelper.lib.addon.tmdate import set_timestamp
 from tmdbhelper.lib.items.database.database import ItemDetailsDataBase
 from tmdbhelper.lib.items.database.mappings import ItemMapper
 from tmdbhelper.lib.files.database import DataBaseCache
-from tmdbhelper.lib.files.locker import mutexlock
+# from tmdbhelper.lib.files.locker import mutexlock
 # from tmdbhelper.lib.addon.logger import textviewer_output
-from tmdbhelper.lib.addon.logger import timer_report
+# from tmdbhelper.lib.addon.logger import timer_report
 from tmdbhelper.lib.addon.consts import (
     IMAGEPATH_QUALITY_POSTER,
     IMAGEPATH_QUALITY_FANART,
@@ -301,6 +301,14 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
     expiry_time = 30 * 86400  # 30d = 86400 = 60s(1m) * 60m(1h) * 24h(1d)
     db_studio_table = 'studio'
     cached_data_check_key = 'tmdb_id'
+    thread_locks = None
+
+    @cached_property
+    def thread_lock(self):
+        if not self.thread_locks:
+            from contextlib import nullcontext
+            return nullcontext()
+        return self.thread_locks[self.mutex_lockname]
 
     @property
     def expiry(self):
@@ -489,17 +497,18 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         )
 
     def set_cached_data(self, return_data=False):
-        if not self.online_data_mapped:
-            return
+        with self.thread_lock:
+            if not self.online_data_mapped:
+                return
 
-        self.db_baseitem_cache_get_parent_data()
-        self.db_baseitem_cache_set_cached_data()
+            self.db_baseitem_cache_get_parent_data()
+            self.db_baseitem_cache_set_cached_data()
 
-        for db_cache in self.db_table_caches:
-            db_cache.set_cached_data(self.online_data_mapped)
+            for db_cache in self.db_table_caches:
+                db_cache.set_cached_data(self.online_data_mapped)
 
-        if not return_data:
-            return
+            if not return_data:
+                return
 
         return self.get_cached_data()
 
@@ -610,7 +619,7 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
             'unique_ids': unique_ids,
         }
 
-    @mutexlock  # Use a mutex lock on the item_id to avoid double up of setting data or attempting get in middle of set
+    # @mutexlock  # Use a mutex lock on the item_id to avoid double up of setting data or attempting get in middle of set
     def use_cached_data(self):
         return self.get_cached_data() or self.set_cached_data(return_data=True)
 
@@ -618,7 +627,7 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
     def data(self):
         return self.get_data()
 
-    @timer_report
+    # @timer_report
     def get_data(self):
         if not self.data_cond:
             return
