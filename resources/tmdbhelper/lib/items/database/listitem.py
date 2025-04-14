@@ -80,12 +80,15 @@ class ListItemDetailsConfigurator:
             return li if cache_refresh != 'never' else None
 
         li.set_details(db_cache_data, override=True)
-
         # li.art = self.get_item_artwork(item['artwork'], is_season=mediatype in ['season', 'episode'])
         return li
 
     def configure_listitems_threaded(self, items):  # TODO: Retrieve sequentially then pool unavailable items and thread lookups before setting sequentially
         from tmdbhelper.lib.addon.thread import ParallelThread
+
+        from tmdbhelper.lib.files.futils import dumps_to_file
+        dumps_to_file(items, 'log_data', 'directory.json', join_addon_data=True)
+
         with ParallelThread(items, self.configure_listitem, cache_refresh='never') as pt:
             item_queue = pt.queue
         missing_indices = [x for x, i in enumerate(item_queue) if i is None]
@@ -94,7 +97,9 @@ class ListItemDetailsConfigurator:
             refresh_item_queue = pt.queue
         refresh_item_queue_iter = iter(refresh_item_queue)
         all_items = [i or next(refresh_item_queue_iter) for i in item_queue]
-        return [i for i in all_items if i]
+        all_items = [i for i in all_items if i]
+
+        return all_items
 
     def configure_listitems(self, items):
         return [j for j in (self.configure_listitem(i) for i in items if i) if j]

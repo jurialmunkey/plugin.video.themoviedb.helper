@@ -1,8 +1,3 @@
-from functools import wraps
-import threading
-import asyncio
-
-
 class cached_property:
     """
     A property that is only computed once per instance and then replaces itself
@@ -18,20 +13,8 @@ class cached_property:
         if obj is None:
             return self
 
-        if asyncio.iscoroutinefunction(self.func):
-            return self._wrap_in_coroutine(obj)
-
         value = obj.__dict__[self.func.__name__] = self.func(obj)
         return value
-
-    def _wrap_in_coroutine(self, obj):
-        @wraps(obj)
-        def wrapper():
-            future = asyncio.ensure_future(self.func(obj))
-            obj.__dict__[self.func.__name__] = future
-            return future
-
-        return wrapper()
 
 
 class threaded_cached_property:
@@ -41,6 +24,7 @@ class threaded_cached_property:
     """
 
     def __init__(self, func):
+        import threading
         self.__doc__ = getattr(func, "__doc__")
         self.func = func
         self.lock = threading.RLock()

@@ -538,8 +538,9 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
             if not self.online_data_mapped:
                 return
 
+            self.db_baseitem_cache_get_parent_data()
+
             with self.cache.get_database() as self.connection:
-                self.db_baseitem_cache_get_parent_data()
                 self.db_baseitem_cache_set_cached_data()
 
                 for db_cache in self.db_table_caches:
