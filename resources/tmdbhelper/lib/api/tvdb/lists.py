@@ -1,7 +1,7 @@
-from tmdbhelper.lib.items.container import Container
+from tmdbhelper.lib.items.container import ContainerDirectory
 
 
-class ListListItems(Container):
+class ListListItems(ContainerDirectory):
     def _get_item_tmdb_id(self, item, tmdb_type):
         if tmdb_type == 'tv':
             tv_tmdb_id = self.tmdb_api.get_tmdb_id(
@@ -35,7 +35,7 @@ class ListListItems(Container):
         return items + response.next_page
 
 
-class ListLists(Container):
+class ListLists(ContainerDirectory):
     def _get_items(self, endpoint, param_info, key=None, params=None):
         data = self.tvdb_api.get_request_lc(endpoint)
         if key and data:

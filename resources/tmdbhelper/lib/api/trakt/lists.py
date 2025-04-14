@@ -1,9 +1,9 @@
 from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.plugin import convert_type, PLUGINPATH, get_plugin_category, get_localized, get_setting, encode_url
-from tmdbhelper.lib.items.container import Container
+from tmdbhelper.lib.items.container import ContainerDirectory
 
 
-class ListBasic(Container):
+class ListBasic(ContainerDirectory):
     def get_items(
             self, info, tmdb_type, page=None, randomise=False, limit=None,
             genres=None, years=None, query=None, languages=None, countries=None, runtimes=None, studio_ids=None,
@@ -55,7 +55,7 @@ class ListBasic(Container):
         return items
 
 
-class ListSync(Container):
+class ListSync(ContainerDirectory):
     def get_list_items(self, sync_type, item_type, page=1, limit=None, sort_by=None, sort_how=None, params=None, next_page=True, filters=None, tmdb_id=None, **kwargs):
         from tmdbhelper.lib.api.trakt.sync.itemlist import ItemListSyncDataFactory
         from tmdbhelper.lib.items.itemlist import ItemListPagination
@@ -108,7 +108,7 @@ class ListToWatch(ListSync):
             page=page)
 
 
-class ListComments(Container):
+class ListComments(ContainerDirectory):
     def get_items(self, info, tmdb_type, tmdb_id, sort=None, **kwargs):
         """ Get a mix of watchlisted and inprogress """
         from tmdbhelper.lib.api.mapping import get_empty_item
@@ -173,7 +173,7 @@ class ListBecauseYouWatched(ListSync):
         return items
 
 
-class ListCalendar(Container):
+class ListCalendar(ContainerDirectory):
     def _get_calendar_items(self, info, startdate, days, page=None, kodi_db=None, endpoint=None, user=True, **kwargs):
         from tmdbhelper.lib.addon.tmdate import get_calendar_name
 
@@ -292,7 +292,7 @@ class ListUpNext(ListSync):
         return items
 
 
-class ListGenres(Container):
+class ListGenres(ContainerDirectory):
     def get_items(self, info, tmdb_type, **kwargs):
         items = self.trakt_api.get_list_of_genres(convert_type(tmdb_type, 'trakt'))
         self.library = 'video'
@@ -300,7 +300,7 @@ class ListGenres(Container):
         return items
 
 
-class ListLists(Container):
+class ListLists(ContainerDirectory):
     def get_items(self, info, page=None, **kwargs):
         from xbmcplugin import SORT_METHOD_UNSORTED
         from tmdbhelper.lib.addon.consts import TRAKT_LIST_OF_LISTS
@@ -322,7 +322,7 @@ class ListLists(Container):
         return items
 
 
-class ListCustom(Container):
+class ListCustom(ContainerDirectory):
     def get_items(
             self, list_slug, user_slug=None, page=None,
             **kwargs
@@ -344,7 +344,7 @@ class ListCustom(Container):
         return response.get('items', []) + response.get('next_page', [])
 
 
-class ListCustomSearch(Container):
+class ListCustomSearch(ContainerDirectory):
     def get_items(self, query=None, **kwargs):
         from xbmcgui import Dialog
         if not query:
@@ -357,7 +357,7 @@ class ListCustomSearch(Container):
         return items
 
 
-class ListSortBy(Container):
+class ListSortBy(ContainerDirectory):
     def get_items(self, info, **kwargs):
         from tmdbhelper.lib.api.trakt.sorting import get_sort_methods
         from tmdbhelper.lib.api.mapping import get_empty_item

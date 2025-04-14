@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from xbmcgui import Dialog, ListItem, INPUT_NUMERIC
 from jurialmunkey.parser import try_int, merge_two_dicts, split_items, find_dict_list_index
-from tmdbhelper.lib.items.container import Container
+from tmdbhelper.lib.items.container import ContainerDirectory
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized, encode_url
 from tmdbhelper.lib.addon.tmdate import get_datetime_now, get_timedelta
 from jurialmunkey.window import get_property
@@ -953,7 +953,7 @@ def _translate_discover_params(tmdb_type, params):
     return params
 
 
-class ListDiscover(Container):
+class ListDiscover(ContainerDirectory):
     def get_items(self, tmdb_type, **kwargs):
         kwargs.pop('info', None)
         items = self.tmdb_api.get_discover_list(tmdb_type, **_translate_discover_params(tmdb_type, kwargs))
@@ -963,7 +963,7 @@ class ListDiscover(Container):
         return items
 
 
-class ListDiscoverDir(Container):
+class ListDiscoverDir(ContainerDirectory):
     def get_items(self, **kwargs):
         def _get_discover_dir():
             items = []
@@ -1036,7 +1036,7 @@ class ListDiscoverDir(Container):
             set_search_history('discover', item, replace=idx)
 
 
-class ListUserDiscover(Container):
+class ListUserDiscover(ContainerDirectory):
     def get_items(self, tmdb_type, **kwargs):
         method = kwargs.get('method')
 

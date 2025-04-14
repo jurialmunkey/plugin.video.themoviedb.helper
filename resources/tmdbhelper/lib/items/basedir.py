@@ -2,7 +2,7 @@ from tmdbhelper.lib.addon.tmdate import get_timedelta, get_datetime_today
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized, ADDON, get_flatseasons_info_param
 from jurialmunkey.parser import merge_two_items
 from tmdbhelper.lib.items.builder import ItemBuilder
-from tmdbhelper.lib.items.container import Container
+from tmdbhelper.lib.items.container import ContainerDirectory
 from tmdbhelper.lib.addon.consts import TVDB_DISCLAIMER, NODE_BASEDIR
 
 
@@ -1212,7 +1212,7 @@ def _get_tmdb_v4():
     return _build_basedir(None, _get_basedir_tmdb_v4())
 
 
-class ListBaseDir(Container):
+class ListBaseDir(ContainerDirectory):
     def get_items(self, info=None, **kwargs):
         route = {
             'dir_movie': lambda: _get_basedir_list('movie', tmdb=True, trakt=True),
@@ -1234,7 +1234,7 @@ class ListBaseDir(Container):
         return func()
 
 
-class ListDetails(Container):
+class ListDetails(ContainerDirectory):
     def get_items(self, tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
         def _get_container_content():
             if tmdb_type == 'tv' and season and episode:

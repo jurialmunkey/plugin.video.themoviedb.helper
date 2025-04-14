@@ -1,9 +1,9 @@
-from tmdbhelper.lib.items.container import Container
+from tmdbhelper.lib.items.container import ContainerDirectory
 from tmdbhelper.lib.addon.plugin import convert_type, get_localized, get_setting
 from tmdbhelper.lib.addon.dialog import progress_bg
 
 
-class ListAiringNext(Container):
+class ListAiringNext(ContainerDirectory):
 
     @progress_bg
     def get_list_items(self, seed_items: list, prefix: str, reverse: bool = False, **kwargs):

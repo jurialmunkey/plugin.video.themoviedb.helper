@@ -11,7 +11,7 @@ from tmdbhelper.lib.items.kodi import KodiDb
 """
 
 
-class ContainerCommon(CommonContainerAPIs):
+class ContainerDirectoryCommon(CommonContainerAPIs):
     def __init__(self, handle, paramstring, **kwargs):
         # Log Settings
         self.log_timers = get_setting('timer_reports')
@@ -336,7 +336,7 @@ class ContainerCommon(CommonContainerAPIs):
             executebuiltin('Container.Refresh')
 
 
-class Container(ContainerCommon):
+class ContainerDirectory(ContainerDirectoryCommon):
     @cached_property
     def ib(self):
         from tmdbhelper.lib.items.builder import ItemBuilder
