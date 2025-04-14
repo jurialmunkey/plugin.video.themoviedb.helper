@@ -538,146 +538,155 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
             if not self.online_data_mapped:
                 return
 
-            self.db_baseitem_cache_get_parent_data()
-
             with self.cache.get_database() as self.connection:
+                self.db_baseitem_cache_get_parent_data()
                 self.db_baseitem_cache_set_cached_data()
 
                 for db_cache in self.db_table_caches:
                     db_cache.set_cached_data(self.online_data_mapped)
+            self.connection = None
 
             if not return_data:
                 return
 
         return self.get_cached_data()
 
+    def database_connection(func):
+        def wrapper(self, *args, **kwargs):
+            with self.cache.get_database() as self.connection:
+                data = func(self, *args, **kwargs)
+            self.connection = None
+            return data
+        return wrapper
+
+    @database_connection
     def get_cached_data(self):
-        with self.cache.get_database() as self.connection:
-            data = self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, self.cached_data_values, self.cached_data_conditions)
-            if not data or not data[0] or not data[0][self.cached_data_check_key]:
-                return
+        data = self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, self.cached_data_values, self.cached_data_conditions)
 
-            """
-            INFOLABELS
-            """
-            infolabels = {k: data[0][k] for k in data[0].keys() if k not in self.deny_infolabel_keys}
+        if not data or not data[0] or not data[0][self.cached_data_check_key]:
+            return
 
-            # instance, key from instance item, infolabel
-            infolabel_routes = (
-                (self.db_genre_cache, 'name', 'genre'),
-                (self.db_country_cache, 'name', 'country'),
-                (self.db_studio_cache, 'name', 'studio'),
-                # (self.db_castmember_cache, 'name', 'cast'),
-            )
+        """
+        INFOLABELS
+        """
+        infolabels = {k: data[0][k] for k in data[0].keys() if k not in self.deny_infolabel_keys}
 
-            for instance, ikey, dkey in infolabel_routes:
-                infolabels[dkey] = [i[ikey] for i in instance.cached_data]
+        # instance, key from instance item, infolabel
+        infolabel_routes = (
+            (self.db_genre_cache, 'name', 'genre'),
+            (self.db_country_cache, 'name', 'country'),
+            (self.db_studio_cache, 'name', 'studio'),
+            # (self.db_castmember_cache, 'name', 'cast'),
+        )
 
-            """
-            INFOPROPERTIES
-            """
+        for instance, ikey, dkey in infolabel_routes:
+            infolabels[dkey] = [i[ikey] for i in instance.cached_data]
 
-            infoproperties = {}
+        """
+        INFOPROPERTIES
+        """
 
-            # instance, dictionary of infoproperty name and key from instance item, infoproperty basename, tuple pair of infoproperty and key value to concatenate as separated list
-            infoproperty_routes = (
-                (self.db_genre_cache, {'name': 'name', 'tmdb_id': 'tmdb_id'}, 'genre', None),
-                (self.db_country_cache, {'name': 'name', 'iso': 'iso'}, 'country', None),
-                (self.db_studio_cache, {'name': 'name', 'tmdb_id': 'tmdb_id', 'logo': 'logo', 'country': 'country'}, 'studio', None),
-                (self.db_provider_cache, {'name': 'name', 'tmdb_id': 'tmdb_id', 'type': 'availability', 'logo': 'logo'}, 'provider', ('providers', 'name')),
-                (self.db_castmember_cache, {'name': 'name', 'tmdb_id': 'tmdb_id'}, 'cast', ('cast', 'name')),
-                (self.db_crewmember_cache, {'name': 'name', 'tmdb_id': 'tmdb_id'}, 'crew', ('crew', 'name')),
-            )
+        infoproperties = {}
 
-            for instance, keys, prop, ckey in infoproperty_routes:
-                for x, i in enumerate(instance.cached_data):
-                    for dkey, ikey in keys.items():
-                        infoproperties[f'{prop}.{x}.{dkey}'] = i[ikey]
-                if ckey is None:
-                    continue
-                join_data = [i[ckey[1]] for i in instance.cached_data if i[ckey[1]]]
-                infoproperties[ckey[0]] = ' / '.join(join_data)
-                infoproperties[f'{ckey[0]}_CR'] = '[CR]'.join(join_data)
+        # instance, dictionary of infoproperty name and key from instance item, infoproperty basename, tuple pair of infoproperty and key value to concatenate as separated list
+        infoproperty_routes = (
+            (self.db_genre_cache, {'name': 'name', 'tmdb_id': 'tmdb_id'}, 'genre', None),
+            (self.db_country_cache, {'name': 'name', 'iso': 'iso'}, 'country', None),
+            (self.db_studio_cache, {'name': 'name', 'tmdb_id': 'tmdb_id', 'logo': 'logo', 'country': 'country'}, 'studio', None),
+            (self.db_provider_cache, {'name': 'name', 'tmdb_id': 'tmdb_id', 'type': 'availability', 'logo': 'logo'}, 'provider', ('providers', 'name')),
+            (self.db_castmember_cache, {'name': 'name', 'tmdb_id': 'tmdb_id'}, 'cast', ('cast', 'name')),
+            (self.db_crewmember_cache, {'name': 'name', 'tmdb_id': 'tmdb_id'}, 'crew', ('crew', 'name')),
+        )
 
-            """
-            CAST
-            """
+        for instance, keys, prop, ckey in infoproperty_routes:
+            for x, i in enumerate(instance.cached_data):
+                for dkey, ikey in keys.items():
+                    infoproperties[f'{prop}.{x}.{dkey}'] = i[ikey]
+            if ckey is None:
+                continue
+            join_data = [i[ckey[1]] for i in instance.cached_data if i[ckey[1]]]
+            infoproperties[ckey[0]] = ' / '.join(join_data)
+            infoproperties[f'{ckey[0]}_CR'] = '[CR]'.join(join_data)
 
-            cast = [
-                {
-                    'name': i['name'],
-                    'role': i['role'],
-                    'order': i['ordering'],
-                    'thumbnail': self.tmdb_imagepath.get_imagepath_poster(i['thumb'])
-                }
-                for i in self.db_castmember_cache.cached_data
-            ]
+        """
+        CAST
+        """
 
-            """
-            ART
-            """
+        cast = [
+            {
+                'name': i['name'],
+                'role': i['role'],
+                'order': i['ordering'],
+                'thumbnail': self.tmdb_imagepath.get_imagepath_poster(i['thumb'])
+            }
+            for i in self.db_castmember_cache.cached_data
+        ]
 
-            art = {}
+        """
+        ART
+        """
 
+        art = {}
+
+        artwork_routes = (
+            (self.db_art_poster_cache, 'poster'),
+            (self.db_art_fanart_cache, 'fanart'),
+            (self.db_art_clearlogo_cache, 'clearlogo'),
+        )
+
+        for instance, dkey in artwork_routes:
+            art[dkey] = instance.image_path_func(instance.cached_data[0]['icon'] if instance.cached_data else None)
+
+        if self.mediatype == 'episode':
             artwork_routes = (
-                (self.db_art_poster_cache, 'poster'),
-                (self.db_art_fanart_cache, 'fanart'),
-                (self.db_art_clearlogo_cache, 'clearlogo'),
+                (self.db_art_season_poster_cache, 'poster'),
+                (self.db_art_season_fanart_cache, 'fanart'),
+                (self.db_art_season_clearlogo_cache, 'clearlogo'),
             )
 
             for instance, dkey in artwork_routes:
-                art[dkey] = instance.image_path_func(instance.cached_data[0]['icon'] if instance.cached_data else None)
+                art[dkey] = art[dkey] or instance.image_path_func(instance.cached_data[0]['icon'] if instance.cached_data else None)
+                art[f'season.{dkey}'] = instance.image_path_func(instance.cached_data[0]['icon'] if instance.cached_data else None)
 
-            if self.mediatype == 'episode':
-                artwork_routes = (
-                    (self.db_art_season_poster_cache, 'poster'),
-                    (self.db_art_season_fanart_cache, 'fanart'),
-                    (self.db_art_season_clearlogo_cache, 'clearlogo'),
-                )
+        if self.mediatype in ('season', 'episode'):
+            artwork_routes = (
+                (self.db_art_tvshow_poster_cache, 'poster'),
+                (self.db_art_tvshow_fanart_cache, 'fanart'),
+                (self.db_art_tvshow_clearlogo_cache, 'clearlogo'),
+            )
 
-                for instance, dkey in artwork_routes:
-                    art[dkey] = art[dkey] or instance.image_path_func(instance.cached_data[0]['icon'] if instance.cached_data else None)
-                    art[f'season.{dkey}'] = instance.image_path_func(instance.cached_data[0]['icon'] if instance.cached_data else None)
+            for instance, dkey in artwork_routes:
+                art[dkey] = art[dkey] or instance.image_path_func(instance.cached_data[0]['icon'] if instance.cached_data else None)
+                art[f'tvshow.{dkey}'] = instance.image_path_func(instance.cached_data[0]['icon'] if instance.cached_data else None)
 
-            if self.mediatype in ('season', 'episode'):
-                artwork_routes = (
-                    (self.db_art_tvshow_poster_cache, 'poster'),
-                    (self.db_art_tvshow_fanart_cache, 'fanart'),
-                    (self.db_art_tvshow_clearlogo_cache, 'clearlogo'),
-                )
+        """
+        UNIQUE IDS
+        """
 
-                for instance, dkey in artwork_routes:
-                    art[dkey] = art[dkey] or instance.image_path_func(instance.cached_data[0]['icon'] if instance.cached_data else None)
-                    art[f'tvshow.{dkey}'] = instance.image_path_func(instance.cached_data[0]['icon'] if instance.cached_data else None)
+        unique_ids = {}
 
-            """
-            UNIQUE IDS
-            """
+        for i in self.db_unique_id_cache.cached_data:
+            unique_ids[i['key']] = i['value']
 
-            unique_ids = {}
+        if self.mediatype == 'episode':
+            for i in self.db_unique_id_season_cache.cached_data:
+                unique_ids[f"tvshow.{i['key']}"] = i['value']
 
-            for i in self.db_unique_id_cache.cached_data:
-                unique_ids[i['key']] = i['value']
+        if self.mediatype in ('season', 'episode'):
+            for i in self.db_unique_id_tvshow_cache.cached_data:
+                unique_ids[f"season.{i['key']}"] = i['value']
 
-            if self.mediatype == 'episode':
-                for i in self.db_unique_id_season_cache.cached_data:
-                    unique_ids[f"tvshow.{i['key']}"] = i['value']
+        """
+        ITEM MAP
+        """
 
-            if self.mediatype in ('season', 'episode'):
-                for i in self.db_unique_id_tvshow_cache.cached_data:
-                    unique_ids[f"season.{i['key']}"] = i['value']
-
-            """
-            ITEM MAP
-            """
-
-            return {
-                'infolabels': infolabels,
-                'infoproperties': infoproperties,
-                'cast': cast,
-                'art': art,
-                'unique_ids': unique_ids,
-            }
+        return {
+            'infolabels': infolabels,
+            'infoproperties': infoproperties,
+            'cast': cast,
+            'art': art,
+            'unique_ids': unique_ids,
+        }
 
     # @mutexlock  # Use a mutex lock on the item_id to avoid double up of setting data or attempting get in middle of set
     def use_cached_data(self):
