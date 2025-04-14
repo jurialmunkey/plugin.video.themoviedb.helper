@@ -74,8 +74,7 @@ class ListItemDetailsConfigurator:
         if not dbc:
             return li if cache_refresh != 'never' else None
 
-        with dbc.cache.get_database() as dbc.connection:
-            db_cache_data = dbc.data
+        db_cache_data = dbc.data
 
         if not db_cache_data:
             return li if cache_refresh != 'never' else None

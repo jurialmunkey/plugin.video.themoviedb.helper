@@ -22,7 +22,7 @@ class DataBase:
     _database = None
     _basefolder = get_setting('cache_location', 'str') or ''
     _fileutils = FileUtils()  # Import to use plugin addon_data folder not the module one
-    _db_timeout = 3.0
+    _db_timeout = 60.0
     _db_read_timeout = 1.0
 
     def __init__(self, folder=None, filename=None):
@@ -92,7 +92,7 @@ class DataBase:
     def create_database(self):
         try:
             self.kodi_log(f'CACHE: Initialising: {self._db_file}...', 1)
-            connection = sqlite3.connect(self._db_file, timeout=5.0, isolation_level=None)
+            connection = sqlite3.connect(self._db_file, timeout=self._db_timeout, isolation_level=None)
             connection = self.set_pragmas(connection)
             self.create_database_execute(connection)
             return connection
