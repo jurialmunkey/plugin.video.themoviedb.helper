@@ -524,7 +524,7 @@ class ItemDetailsDataBase(DataBase):
             return [f'{k} {v["data"]}' for k, v in columns.items()]
 
         def create_column_fkey(columns):
-            return [f'FOREIGN KEY({k}) REFERENCES {v["foreign_key"]}' for k, v in columns.items() if 'foreign_key' in v]
+            return [f'FOREIGN KEY({k}) REFERENCES {v["foreign_key"]} ON DELETE CASCADE' for k, v in columns.items() if 'foreign_key' in v]
 
         def create_column_uids(columns):
             keys = [k for k, v in columns.items() if v.get('unique')]

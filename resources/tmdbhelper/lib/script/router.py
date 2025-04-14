@@ -25,7 +25,7 @@ def test_func():
     sync.tmdb_api = TMDb()
 
     sync.cache_refresh = 'force'
-    # sync.cache.del_database_init()
+    sync.cache.del_database_init()
 
     # with CProfiler():
     with sync.cache.get_database() as sync.connection:
