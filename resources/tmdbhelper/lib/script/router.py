@@ -13,6 +13,7 @@ REGEX_WINPROP_SUB = r'\$WINPROP\[{}\]'
 
 
 def test_func():
+    from tmdbhelper.lib.addon.logger import CProfiler
     from tmdbhelper.lib.items.database.tmdbdata import ItemDetailsDataBaseCacheFactory
     sync = ItemDetailsDataBaseCacheFactory('episode')
     # sync.tmdb_id = 348
@@ -24,10 +25,11 @@ def test_func():
     sync.tmdb_api = TMDb()
 
     sync.cache_refresh = 'force'
-    sync.cache.del_database_init()
+    # sync.cache.del_database_init()
 
-    with sync.cache.get_database() as sync.connection:
-        data = sync.data
+    with CProfiler():
+        with sync.cache.get_database() as sync.connection:
+            data = sync.data
 
     import xbmcgui
     xbmcgui.Dialog().textviewer('TEST', f'{data}')

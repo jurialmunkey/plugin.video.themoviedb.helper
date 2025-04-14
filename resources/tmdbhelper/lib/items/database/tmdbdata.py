@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from functools import cached_property
-from tmdbhelper.lib.addon.plugin import get_setting
 from tmdbhelper.lib.addon.tmdate import set_timestamp
 from tmdbhelper.lib.items.database.database import ItemDetailsDataBase
 from tmdbhelper.lib.items.database.mappings import ItemMapper
@@ -9,39 +8,6 @@ from tmdbhelper.lib.files.database import DataBaseCache
 # from tmdbhelper.lib.files.locker import mutexlock
 # from tmdbhelper.lib.addon.logger import textviewer_output
 # from tmdbhelper.lib.addon.logger import timer_report
-from tmdbhelper.lib.addon.consts import (
-    IMAGEPATH_QUALITY_POSTER,
-    IMAGEPATH_QUALITY_FANART,
-    IMAGEPATH_QUALITY_THUMBS,
-    IMAGEPATH_QUALITY_CLOGOS,
-    IMAGEPATH_NEGATE,
-)
-
-ARTWORK_QUALITY = get_setting('artwork_quality', 'int')
-ARTWORK_QUALITY_POSTER = IMAGEPATH_QUALITY_POSTER[ARTWORK_QUALITY]
-ARTWORK_QUALITY_FANART = IMAGEPATH_QUALITY_FANART[ARTWORK_QUALITY]
-ARTWORK_QUALITY_THUMBS = IMAGEPATH_QUALITY_THUMBS[ARTWORK_QUALITY]
-ARTWORK_QUALITY_CLOGOS = IMAGEPATH_QUALITY_CLOGOS[ARTWORK_QUALITY]
-
-
-def get_imagepath_poster(v):
-    return f'{ARTWORK_QUALITY_POSTER}{v}' if v else ''
-
-
-def get_imagepath_fanart(v):
-    return f'{ARTWORK_QUALITY_FANART}{v}' if v else ''
-
-
-def get_imagepath_thumbs(v):
-    return f'{ARTWORK_QUALITY_THUMBS}{v}' if v else ''
-
-
-def get_imagepath_clogos(v):
-    return f'{ARTWORK_QUALITY_CLOGOS}{v}' if v else ''
-
-
-def get_imagepath_negate(v):
-    return f'{IMAGEPATH_NEGATE}{v}' if v else ''
 
 
 class ItemDetailsDataBaseCache(DataBaseCache):
@@ -69,6 +35,11 @@ class ItemDetailsDataBaseCache(DataBaseCache):
     def tmdb_api(self):
         from tmdbhelper.lib.api.tmdb.api import TMDb
         return TMDb()
+
+    @cached_property
+    def tmdb_imagepath(self):
+        from tmdbhelper.lib.api.tmdb.images import TMDbImagePath
+        return TMDbImagePath()
 
     @staticmethod
     def get_base_id(tmdb_type, tmdb_id):
@@ -176,9 +147,8 @@ class ArtDetailsDataBaseCache(ItemDetailsListDataBaseCache):
 class ArtTypeDetailsDataBaseCache(ArtDetailsDataBaseCache):
     conditions = 'parent_id=? AND type=? ORDER BY vote_average DESC LIMIT 1'  # WHERE conditions
 
-    @staticmethod
-    def image_path_func(v):
-        return get_imagepath_fanart(v)
+    def image_path_func(self, v):
+        return self.tmdb_imagepath.get_imagepath_fanart(v)
 
     def get_cached_data_by_language(self):
         conditions = f'iso=? AND {self.conditions}'
@@ -203,9 +173,8 @@ class ArtPosterDetailsDataBaseCache(ArtTypeDetailsDataBaseCache):
     def values(self):  # WHERE conditions values for ?  self.tmdb_api.iso_language
         return (self.item_id, 'posters')
 
-    @staticmethod
-    def image_path_func(v):
-        return get_imagepath_poster(v)
+    def image_path_func(self, v):
+        return self.tmdb_imagepath.get_imagepath_poster(v)
 
 
 class ArtFanartDetailsDataBaseCache(ArtTypeDetailsDataBaseCache):
@@ -215,9 +184,8 @@ class ArtFanartDetailsDataBaseCache(ArtTypeDetailsDataBaseCache):
     def values(self):  # WHERE conditions values for ?  self.tmdb_api.iso_language
         return (self.item_id, 'backdrops', 'landscape')
 
-    @staticmethod
-    def image_path_func(v):
-        return get_imagepath_fanart(v)
+    def image_path_func(self, v):
+        return self.tmdb_imagepath.get_imagepath_fanart(v)
 
     def get_cached_data(self):
         return self.get_cached_data_by_null()
@@ -235,9 +203,8 @@ class ArtClearlogoDetailsDataBaseCache(ArtTypeDetailsDataBaseCache):
     def values(self):  # WHERE conditions values for ?  self.tmdb_api.iso_language
         return (self.item_id, 'logos', 'png')
 
-    @staticmethod
-    def image_path_func(v):
-        return get_imagepath_clogos(v)
+    def image_path_func(self, v):
+        return self.tmdb_imagepath.get_imagepath_clogos(v)
 
 
 class StudioDetailsDataBaseCache(ItemDetailsListDataBaseCache):
