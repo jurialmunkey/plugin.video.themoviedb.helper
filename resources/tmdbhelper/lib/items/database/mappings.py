@@ -84,6 +84,12 @@ class ItemMapperMethods:
 
         return data
 
+    @staticmethod
+    def get_unique_ids(results, **kwargs):
+        if not results:
+            return
+        return [{'key': ('tmdb_id' if k == 'id' else k).replace('_id', ''), 'value': f'{v}'} for k, v in results.items()]
+
 
 class BlankNoneDict(dict):
     def __missing__(self, key):
@@ -141,6 +147,10 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'keys': [('art', None)],
                 'func': self.get_art,
             }],
+            'external_ids': [{
+                'keys': [('unique_id', None)],
+                'func': self.get_unique_ids,
+            }],
             'credits': [{
                 'keys': [('castmember', None)],
                 'func': self.split_array,
@@ -194,6 +204,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'provider': (),
             'castmember': (),
             'crewmember': (),
+            'unique_id': [],
             'person': [],
             'art': (),
         }

@@ -222,6 +222,15 @@ class GenreDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     keys = ('name', 'tmdb_id', 'parent_id', )
 
 
+class UniqueIdDetailsDataBaseCache(ItemDetailsListDataBaseCache):
+    table = 'unique_id'
+    keys = ('key', 'value', 'parent_id', )
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, )
+
+
 class ProviderDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     table = 'provider'
     keys = ('name', 'tmdb_id', 'display_priority', 'iso', 'logo', 'availability', 'parent_id')
@@ -269,6 +278,7 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
     db_studio_table = 'studio'
     cached_data_check_key = 'tmdb_id'
     thread_locks = None
+    deny_infolabel_keys = ('id', 'tmdb_id', 'parent_id', 'season_id', 'tvshow_id')  # Dont add these keys to infolabels
 
     @cached_property
     def thread_lock(self):
@@ -366,6 +376,18 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         return self.get_season_db_cache(ArtClearlogoDetailsDataBaseCache)
 
     @cached_property
+    def db_unique_id_tvshow_cache(self):
+        return self.get_tvshow_db_cache(UniqueIdDetailsDataBaseCache)
+
+    @cached_property
+    def db_unique_id_season_cache(self):
+        return self.get_season_db_cache(UniqueIdDetailsDataBaseCache)
+
+    @cached_property
+    def db_unique_id_cache(self):
+        return self.get_db_cache(UniqueIdDetailsDataBaseCache)
+
+    @cached_property
     def db_genre_cache(self):
         return self.get_db_cache(GenreDetailsDataBaseCache)
 
@@ -460,6 +482,7 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
             self.db_person_cache,
             self.db_castmember_cache,
             self.db_crewmember_cache,
+            self.db_unique_id_cache,
             self.db_art_cache,
         )
 
@@ -487,8 +510,7 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         """
         INFOLABELS
         """
-
-        infolabels = {k: data[0][k] for k in data[0].keys() if k not in ('id', 'tmdb_id', )}
+        infolabels = {k: data[0][k] for k in data[0].keys() if k not in self.deny_infolabel_keys}
 
         # instance, key from instance item, infolabel
         infolabel_routes = (
@@ -584,6 +606,17 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
 
         unique_ids = {}
 
+        for i in self.db_unique_id_cache.cached_data:
+            unique_ids[i['key']] = i['value']
+
+        if self.mediatype == 'episode':
+            for i in self.db_unique_id_season_cache.cached_data:
+                unique_ids[f"tvshow.{i['key']}"] = i['value']
+
+        if self.mediatype in ('season', 'episode'):
+            for i in self.db_unique_id_tvshow_cache.cached_data:
+                unique_ids[f"season.{i['key']}"] = i['value']
+
         """
         ITEM MAP
         """
@@ -666,6 +699,7 @@ class SeasonItemDetailsDataBaseCache(TVShowItemDetailsDataBaseCache):
             self.db_person_cache,
             self.db_castmember_cache,
             self.db_crewmember_cache,
+            self.db_unique_id_cache,
             self.db_art_cache,
         )
 
@@ -711,6 +745,7 @@ class EpisodeItemDetailsDataBaseCache(SeasonItemDetailsDataBaseCache):
             self.db_person_cache,
             self.db_castmember_cache,
             self.db_crewmember_cache,
+            self.db_unique_id_cache,
             self.db_art_cache,
         )
 
