@@ -15,6 +15,7 @@ class ItemDetailsDataBase(DataBase):
         },
         'expiry': {
             'data': 'INTEGER',
+            'indexed': True
         },
     }
 

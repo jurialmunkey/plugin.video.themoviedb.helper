@@ -1,6 +1,6 @@
-import jurialmunkey.logger as jurialmunkey_logger
 from timeit import default_timer as timer
 from tmdbhelper.lib.addon.plugin import get_setting, format_name, get_localized
+import jurialmunkey.logger as jurialmunkey_logger
 
 
 LOGGER = jurialmunkey_logger.Logger(
@@ -62,6 +62,32 @@ def timer_report(func):
             timer_name = format_name(timer_name, *args, **kwargs)
             kodi_log(f'{timer_name}\n{total_time:.3f} sec', 1)
         return response
+    return wrapper
+
+
+def timer_report_profiler_time(self, func, *args, **kwargs):
+    timer_a = timer()
+    response = func(self, *args, **kwargs)
+    timer_z = timer()
+    total_time = timer_z - timer_a
+    if total_time > 0.001:
+        timer_name = format_name(f'{total_time:.3f} -- {self.__class__.__name__}.{func.__name__}.', *args, **kwargs)
+        self.timer_report_profiler_data.append(timer_name)
+    return response
+
+
+def timer_report_profiler_init(func):
+    def wrapper(self, *args, **kwargs):
+        self.timer_report_profiler_data = []
+        response = timer_report_profiler_time(self, func, *args, **kwargs)
+        kodi_log('\n'.join(self.timer_report_profiler_data), 1)
+        return response
+    return wrapper
+
+
+def timer_report_profiler_item(func):
+    def wrapper(self, *args, **kwargs):
+        return timer_report_profiler_time(self, func, *args, **kwargs)
     return wrapper
 
 
