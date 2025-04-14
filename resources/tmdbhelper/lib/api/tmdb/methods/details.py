@@ -148,13 +148,15 @@ def get_tmdb_id_list(self, items, tmdb_type=None, separator=None):
 def get_tvshow_nextaired(self, tmdb_id):
     """ Get updated next aired data for tvshows using 24hr cache """
     from tmdbhelper.lib.addon.tmdate import format_date
-    from tmdbhelper.lib.api.tmdb.mapping import get_episode_to_air
     from tmdbhelper.lib.addon.plugin import get_infolabel
+    from tmdbhelper.lib.api.tmdb.mapping import ItemMapperMethods
+
+    item_mapper_methods = ItemMapperMethods()
 
     def _get_nextaired_ip(response):
         ip = {}
-        ip.update(get_episode_to_air(response.get('next_episode_to_air'), 'next_aired'))
-        ip.update(get_episode_to_air(response.get('last_episode_to_air'), 'last_aired'))
+        ip.update(item_mapper_methods.get_episode_to_air(response.get('next_episode_to_air'), 'next_aired'))
+        ip.update(item_mapper_methods.get_episode_to_air(response.get('last_episode_to_air'), 'last_aired'))
         ip['status'] = response.get('status')
         return ip
 

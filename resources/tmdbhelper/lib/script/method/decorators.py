@@ -57,9 +57,11 @@ def choose_tmdb_id(func):
         from xbmcgui import Dialog, ListItem
         from tmdbhelper.lib.addon.dialog import BusyDialog
         from tmdbhelper.lib.api.tmdb.api import TMDb
-        from tmdbhelper.lib.api.tmdb.mapping import get_imagepath_poster
 
         if kwargs.get('query'):
+            from tmdbhelper.lib.api.tmdb.images import TMDbImagePath
+            tmdb_imagepath = TMDbImagePath()
+
             with BusyDialog():
                 response = TMDb().get_request_sc('search', kwargs['tmdb_type'], query=kwargs['query'])
             if not response or not response.get('results'):
@@ -70,7 +72,7 @@ def choose_tmdb_id(func):
                 li = ListItem(
                     i.get('title') or i.get('name'),
                     i.get('release_date') or i.get('first_air_date'))
-                li.setArt({'icon': get_imagepath_poster(i.get('poster_path'))})
+                li.setArt({'icon': tmdb_imagepath.get_imagepath_poster(i.get('poster_path'))})
                 items.append(li)
 
             x = Dialog().select(kwargs['query'], items, useDetails=True)

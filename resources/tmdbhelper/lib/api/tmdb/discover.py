@@ -7,7 +7,6 @@ from tmdbhelper.lib.addon.tmdate import get_datetime_now, get_timedelta
 from jurialmunkey.window import get_property
 from tmdbhelper.lib.files.hcache import set_search_history, get_search_history
 from tmdbhelper.lib.api.tmdb.api import TMDb
-from tmdbhelper.lib.api.tmdb.mapping import get_imagepath_quality
 from urllib.parse import urlencode
 
 
@@ -825,12 +824,15 @@ def _get_watch_provider(tmdb_type):
         iso_country = regions[x].get('iso_3166_1')
         iso_c_label = regions[x].get('english_name')
 
+    from tmdbhelper.lib.api.tmdb.images import TMDbImagePath
+    tmdb_imagepath = TMDbImagePath()
+
     # Get providers for region
     providers = tmdb.get_request_lc('watch/providers', tmdb_type, watch_region=iso_country).get('results', [])
     gui_items = []
     for i in providers:
         li = ListItem(i.get('provider_name'), f"{iso_c_label} ({iso_country}) - ID #{i.get('provider_id')}")
-        li.setArt({'icon': get_imagepath_quality(i.get('logo_path'))})
+        li.setArt({'icon': tmdb_imagepath.get_imagepath_origin(i.get('logo_path'))})
         gui_items.append(li)
     x = Dialog().select(get_localized(19101), gui_items, useDetails=True)
     if x == -1:
