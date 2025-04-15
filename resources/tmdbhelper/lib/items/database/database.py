@@ -30,9 +30,6 @@ class ItemDetailsDataBase(DataBase):
         'year': {
             'data': 'INTEGER',
         },
-        'mpaa': {
-            'data': 'TEXT',
-        },
         'plot': {
             'data': 'TEXT',
         },
@@ -69,9 +66,6 @@ class ItemDetailsDataBase(DataBase):
         },
         'year': {
             'data': 'INTEGER',
-        },
-        'mpaa': {
-            'data': 'TEXT',
         },
         'plot': {
             'data': 'TEXT',
@@ -279,6 +273,37 @@ class ItemDetailsDataBase(DataBase):
         },
     }
 
+    certification_columns = {
+        'name': {
+            'data': 'TEXT',
+        },
+        'iso_country': {
+            'data': 'TEXT',
+            'unique': True,
+            'indexed': True,
+        },
+        'iso_language': {
+            'data': 'TEXT',
+            'unique': True
+        },
+        'release_date': {
+            'data': 'TEXT',
+            'unique': True,
+            'indexed': True,
+        },
+        'release_type': {
+            'data': 'TEXT',
+            'unique': True,
+            'indexed': True,
+        },
+        'parent_id': {
+            'data': 'TEXT',
+            'foreign_key': 'baseitem(id)',
+            'indexed': True,
+            'unique': True
+        },
+    }
+
     genre_columns = {
         'name': {
             'data': 'TEXT',
@@ -367,9 +392,6 @@ class ItemDetailsDataBase(DataBase):
         },
         'department': {
             'data': 'TEXT',
-        },
-        'ordering': {
-            'data': 'INTEGER',
         },
         'parent_id': {
             'data': 'TEXT',
@@ -519,6 +541,7 @@ class ItemDetailsDataBase(DataBase):
             'studio': self.studio_columns,
             'network': self.network_columns,
             'company': self.company_columns,
+            'certification': self.certification_columns,
             'crewmember': self.crewmember_columns,
             'castmember': self.castmember_columns,
             'provider': self.provider_columns,

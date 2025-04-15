@@ -86,7 +86,6 @@ class ListItemDetailsConfigurator:
             return li if cache_refresh != 'never' else None
 
         li.set_details(db_cache_data, override=True)
-        # li.art = self.get_item_artwork(item['artwork'], is_season=mediatype in ['season', 'episode'])
         return li
 
     def configure_listitems_threaded(self, items):  # TODO: Retrieve sequentially then pool unavailable items and thread lookups before setting sequentially

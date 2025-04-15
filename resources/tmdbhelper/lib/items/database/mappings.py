@@ -4,6 +4,16 @@ from tmdbhelper.lib.api.mapping import _ItemMapper
 
 
 class ItemMapperMethods:
+
+    @staticmethod
+    def get_runtime(v, *args, **kwargs):
+        if isinstance(v, list):
+            v = v[0]
+        try:
+            return int(v) * 60
+        except (TypeError, ValueError):
+            return 0
+
     @staticmethod
     def split_array(items, subkeys=(), **kwargs):
         if not items:
@@ -52,6 +62,27 @@ class ItemMapperMethods:
                             'tmdb_id': provider.get('provider_id'),
                         }
                     data.append(item)
+        return data
+
+    @staticmethod
+    def get_certifications(items, **kwargs):
+        if not items:
+            return
+        results = items.get('results')
+        if not results:
+            return
+        data = []
+        tmdb_release_types = {1: 'Premiere', 2: 'Limited', 3: 'Theatrical', 4: 'Digital', 5: 'Physical', 6: 'TV'}
+        for release_country in results:
+            iso_country = release_country['iso_3166_1']
+            for release in (release_country.get('release_dates') or ()):
+                data.append({
+                    'name': release['certification'],
+                    'iso_country': iso_country,
+                    'iso_language': release['iso_639_1'],
+                    'release_date': release['release_date'],
+                    'release_type': tmdb_release_types.get(release['type']),
+                })
         return data
 
     @staticmethod
@@ -135,10 +166,29 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'keys': [('item', 'year')],
                 'func': lambda v: int(v[0:4])
             }],
+            'episode_run_time': [{
+                'keys': [('item', 'duration')],
+                'func': self.get_runtime
+            }],
+            'runtime': [{
+                'keys': [('item', 'duration')],
+                'func': self.get_runtime
+            }],
             'genres': [{
                 'keys': [('genre', None)],
                 'func': self.split_array,
                 'kwargs': {'name': 'name', 'tmdb_id': 'id'}
+            }],
+            'content_ratings': [{
+                'keys': [('certification', None)],
+                'func': self.split_array,
+                'kwargs': {
+                    'subkeys': ('results', ),
+                    'name': 'rating', 'iso_country': 'iso_3166_1'}
+            }],
+            'release_dates': [{
+                'keys': [('certification', None)],
+                'func': self.get_certifications,
             }],
             'production_countries': [{
                 'keys': [('country', None)],
@@ -200,7 +250,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'func': self.split_array,
                 'kwargs': {
                     'subkeys': ('crew', ),
-                    'tmdb_id': 'id', 'role': 'job', 'department': 'department', 'ordering': 'order'}}, {
+                    'tmdb_id': 'id', 'role': 'job', 'department': 'department'}}, {
                 # ---
                 'keys': [('person', None)],
                 'extend': True,
@@ -234,6 +284,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'studio': (),
             'network': (),
             'provider': (),
+            'certification': (),
             'service': [],
             'castmember': (),
             'crewmember': (),

@@ -212,6 +212,9 @@ class StudioDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     table = 'studio'
     keys = ('tmdb_id', 'parent_id')
 
+    def image_path_func(self, v):
+        return self.tmdb_imagepath.get_imagepath_thumbs(v)
+
     @property
     def cached_data_table(self):
         table = ' '.join((
@@ -223,6 +226,16 @@ class StudioDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     @property
     def cached_data_keys(self):
         return [f'studiocompany.{k}' for k in (*self.keys, 'name', 'tmdb_id', 'logo', 'country')]
+
+
+class CertificationDetailsDataBaseCache(ItemDetailsListDataBaseCache):
+    table = 'certification'
+    keys = ('name', 'iso_country', 'iso_language', 'release_date', 'release_type', 'parent_id', )
+    conditions = 'parent_id=? AND iso_country=? ORDER BY release_date ASC LIMIT 1'  # WHERE conditions
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, self.tmdb_api.iso_country)
 
 
 class CountryDetailsDataBaseCache(ItemDetailsListDataBaseCache):
@@ -249,6 +262,9 @@ class ServiceDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     keys = ('tmdb_id', 'name', 'display_priority', 'iso', 'logo')
     conditions = 'tmdb_id=?'
 
+    def image_path_func(self, v):
+        return self.tmdb_imagepath.get_imagepath_thumbs(v)
+
 
 class ProviderDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     table = 'provider'
@@ -258,6 +274,9 @@ class ProviderDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     @property
     def values(self):  # WHERE conditions values for ?
         return (self.item_id, self.tmdb_api.iso_country)
+
+    def image_path_func(self, v):
+        return self.tmdb_imagepath.get_imagepath_thumbs(v)
 
     @property
     def cached_data_table(self):
@@ -277,6 +296,9 @@ class CastMemberDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     keys = ('tmdb_id', 'role', 'ordering', 'parent_id')
     conditions = 'parent_id=? ORDER BY ordering ASC'  # WHERE conditions
 
+    def image_path_func(self, v):
+        return self.tmdb_imagepath.get_imagepath_poster(v)
+
     @property
     def cached_data_table(self):
         table = ' '.join((
@@ -292,7 +314,24 @@ class CastMemberDetailsDataBaseCache(ItemDetailsListDataBaseCache):
 
 class CrewMemberDetailsDataBaseCache(CastMemberDetailsDataBaseCache):
     table = 'crewmember'
-    keys = ('tmdb_id', 'role', 'department', 'ordering', 'parent_id')
+    keys = ('tmdb_id', 'role', 'department', 'parent_id')
+    conditions = 'parent_id=?'
+
+
+class DirectorDetailsDataBaseCache(CrewMemberDetailsDataBaseCache):
+    conditions = 'parent_id=? AND department=? AND role=?'
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, 'Directing', 'Director')
+
+
+class WriterDetailsDataBaseCache(CrewMemberDetailsDataBaseCache):
+    conditions = 'parent_id=? AND department=?'
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, 'Writing', )
 
 
 class PersonDetailsDataBaseCache(ItemDetailsListDataBaseCache):
@@ -305,6 +344,9 @@ class CompanyDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     table = 'company'
     keys = ('tmdb_id', 'name', 'logo', 'country')
     conditions = 'tmdb_id=?'
+
+    def image_path_func(self, v):
+        return self.tmdb_imagepath.get_imagepath_thumbs(v)
 
 
 class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
@@ -433,6 +475,10 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         return self.get_db_cache(CountryDetailsDataBaseCache)
 
     @cached_property
+    def db_certification_cache(self):
+        return self.get_db_cache(CertificationDetailsDataBaseCache)
+
+    @cached_property
     def db_company_cache(self):
         return self.get_db_cache(CompanyDetailsDataBaseCache)
 
@@ -453,6 +499,14 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
     @cached_property
     def db_crewmember_cache(self):
         return self.get_db_cache(CrewMemberDetailsDataBaseCache)
+
+    @cached_property
+    def db_director_cache(self):
+        return self.get_db_cache(DirectorDetailsDataBaseCache)
+
+    @cached_property
+    def db_writer_cache(self):
+        return self.get_db_cache(WriterDetailsDataBaseCache)
 
     @cached_property
     def db_person_cache(self):
@@ -522,6 +576,7 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         return (
             self.db_genre_cache,
             self.db_country_cache,
+            self.db_certification_cache,
             self.db_company_cache,
             self.db_studio_cache,
             self.db_service_cache,
@@ -560,6 +615,12 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
             return data
         return wrapper
 
+    @staticmethod
+    def get_configured_item_value(i, ikey, instance):
+        if ikey not in ('thumb', 'logo', ):
+            return i[ikey]
+        return instance.image_path_func(i[ikey])
+
     @database_connection
     def get_cached_data(self):
         data = self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, self.cached_data_values, self.cached_data_conditions)
@@ -572,16 +633,37 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         """
         infolabels = {k: data[0][k] for k in data[0].keys() if k not in self.deny_infolabel_keys}
 
-        # instance, key from instance item, infolabel
+        # instance, key from instance item, infolabel [list methods]
         infolabel_routes = (
             (self.db_genre_cache, 'name', 'genre'),
             (self.db_country_cache, 'name', 'country'),
             (self.db_studio_cache, 'name', 'studio'),
-            # (self.db_castmember_cache, 'name', 'cast'),
+            (self.db_director_cache, 'name', 'director'),
+            (self.db_writer_cache, 'name', 'writer'),
         )
 
         for instance, ikey, dkey in infolabel_routes:
-            infolabels[dkey] = [i[ikey] for i in instance.cached_data]
+            try:
+                infolabels[dkey] = [i[ikey] for i in instance.cached_data]
+            except (IndexError, TypeError, KeyError):
+                pass
+
+        # instance, key from instance item, infolabel [item methods]
+        infolabel_routes = (
+            (self.db_certification_cache, 'name', 'mpaa'),
+        )
+
+        for instance, ikey, dkey in infolabel_routes:
+            try:
+                infolabels[dkey] = instance.cached_data[0][ikey]
+            except (IndexError, TypeError, KeyError):
+                pass
+
+        if self.mediatype == 'tvshow':
+            try:
+                infolabels['tvshowtitle'] = infolabels['title']
+            except (TypeError, KeyError):
+                pass
 
         """
         INFOPROPERTIES
@@ -595,14 +677,16 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
             (self.db_country_cache, {'name': 'name', 'iso': 'iso'}, 'country', None),
             (self.db_studio_cache, {'name': 'name', 'tmdb_id': 'tmdb_id', 'logo': 'logo', 'country': 'country'}, 'studio', None),
             (self.db_provider_cache, {'name': 'name', 'tmdb_id': 'tmdb_id', 'type': 'availability', 'logo': 'logo'}, 'provider', ('providers', 'name')),
-            (self.db_castmember_cache, {'name': 'name', 'tmdb_id': 'tmdb_id'}, 'cast', ('cast', 'name')),
-            (self.db_crewmember_cache, {'name': 'name', 'tmdb_id': 'tmdb_id'}, 'crew', ('crew', 'name')),
+            (self.db_castmember_cache, {'name': 'name', 'tmdb_id': 'tmdb_id', 'role': 'role', 'thumb': 'thumb'}, 'cast', ('cast', 'name')),
+            (self.db_crewmember_cache, {'name': 'name', 'tmdb_id': 'tmdb_id', 'department': 'department', 'role': 'role', 'thumb': 'thumb'}, 'crew', ('crew', 'name')),
+            (self.db_director_cache, {'name': 'name', 'tmdb_id': 'tmdb_id', 'role': 'role', 'thumb': 'thumb'}, 'director', ('director', 'name')),
+            (self.db_writer_cache, {'name': 'name', 'tmdb_id': 'tmdb_id', 'role': 'role', 'thumb': 'thumb'}, 'writer', ('writer', 'name')),
         )
 
         for instance, keys, prop, ckey in infoproperty_routes:
             for x, i in enumerate(instance.cached_data):
                 for dkey, ikey in keys.items():
-                    infoproperties[f'{prop}.{x}.{dkey}'] = i[ikey]
+                    infoproperties[f'{prop}.{x}.{dkey}'] = self.get_configured_item_value(i, ikey, instance)
             if ckey is None:
                 continue
             join_data = [i[ckey[1]] for i in instance.cached_data if i[ckey[1]]]
