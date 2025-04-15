@@ -50,7 +50,7 @@ class ItemMapperMethods:
                 for provider in datalist:
                     if service:
                         item = {
-                            'iso': iso,
+                            'iso_country': iso,
                             'display_priority': provider.get('display_priority'),
                             'name': provider.get('provider_name'),
                             'logo': provider.get('logo_path'),
@@ -86,6 +86,27 @@ class ItemMapperMethods:
         return data
 
     @staticmethod
+    def get_video(items, **kwargs):
+        if not items:
+            return
+        results = items.get('results')
+        if not results:
+            return
+        data = []
+        for video in results:
+            if video['site'] != 'YouTube':
+                continue
+            data.append({
+                'name': video['name'],
+                'iso_country': video['iso_3166_1'],
+                'iso_language': video['iso_639_1'],
+                'release_date': video['published_at'],
+                'content': video['type'],
+                'path': f"plugin://plugin.video.youtube/play/?video_id={video['key']}",
+            })
+        return data
+
+    @staticmethod
     def get_art(items, **kwargs):
         if not items:
             return
@@ -111,7 +132,7 @@ class ItemMapperMethods:
                     'aspect_ratio': get_aspect_ratio(artwork['aspect_ratio']),
                     'height': artwork['height'],
                     'width': artwork['width'],
-                    'iso': artwork['iso_639_1'],
+                    'iso_language': artwork['iso_639_1'],
                     'icon': path,
                     'type': artwork_type,
                     'extension': path.split('.')[-1] if path else None,
@@ -193,7 +214,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'production_countries': [{
                 'keys': [('country', None)],
                 'func': self.split_array,
-                'kwargs': {'name': 'name', 'iso': 'iso_3166_1'}
+                'kwargs': {'name': 'name', 'iso_country': 'iso_3166_1'}
             }],
             'production_companies': [{
                 'keys': [('studio', None)],
@@ -231,6 +252,10 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'external_ids': [{
                 'keys': [('unique_id', None)],
                 'func': self.get_unique_ids,
+            }],
+            'videos': [{
+                'keys': [('video', None)],
+                'func': self.get_video,
             }],
             'credits': [{
                 'keys': [('castmember', None)],
@@ -286,6 +311,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'provider': (),
             'certification': (),
             'service': [],
+            'video': (),
             'castmember': (),
             'crewmember': (),
             'unique_id': [],

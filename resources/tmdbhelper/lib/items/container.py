@@ -380,8 +380,9 @@ class ContainerDirectoryItemDetails(ContainerDirectoryCommon):
         return li
 
     def build_detailed_items(self, items):
-        items = self.lidc.configure_listitems_threaded(items)
-        return [i for i in (self.build_detailed_item(li) for li in items if li) if i]
+        with TimerList(self.timer_lists, '--build', log_threshold=0.05, logging=self.log_timers):
+            items = self.lidc.configure_listitems_threaded(items)
+            return [i for i in (self.build_detailed_item(li) for li in items if li) if i]
 
 
 ContainerDirectory = ContainerDirectoryItemBuilder

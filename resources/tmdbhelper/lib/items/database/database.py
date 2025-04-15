@@ -51,9 +51,6 @@ class ItemDetailsDataBase(DataBase):
         'premiered': {
             'data': 'TEXT',
         },
-        'trailer': {
-            'data': 'TEXT',
-        }
     }
 
     tvshow_columns = {
@@ -88,9 +85,6 @@ class ItemDetailsDataBase(DataBase):
         'premiered': {
             'data': 'TEXT',
         },
-        'trailer': {
-            'data': 'TEXT',
-        }
     }
 
     season_columns = {
@@ -304,6 +298,36 @@ class ItemDetailsDataBase(DataBase):
         },
     }
 
+    video_columns = {
+        'name': {
+            'data': 'TEXT',
+        },
+        'iso_country': {
+            'data': 'TEXT',
+            'indexed': True,
+        },
+        'iso_language': {
+            'data': 'TEXT',
+            'indexed': True,
+        },
+        'release_date': {
+            'data': 'TEXT',
+            'indexed': True,
+        },
+        'path': {
+            'data': 'TEXT',
+        },
+        'content': {
+            'data': 'TEXT',
+            'indexed': True,
+        },
+        'parent_id': {
+            'data': 'TEXT',
+            'foreign_key': 'baseitem(id)',
+            'indexed': True,
+        },
+    }
+
     genre_columns = {
         'name': {
             'data': 'TEXT',
@@ -324,7 +348,7 @@ class ItemDetailsDataBase(DataBase):
         'name': {
             'data': 'TEXT',
         },
-        'iso': {
+        'iso_country': {
             'data': 'TEXT',
             'unique': True
         },
@@ -464,7 +488,7 @@ class ItemDetailsDataBase(DataBase):
         'name': {
             'data': 'TEXT',
         },
-        'iso': {
+        'iso_country': {
             'data': 'TEXT',
         },
         'logo': {
@@ -483,7 +507,7 @@ class ItemDetailsDataBase(DataBase):
         'width': {
             'data': 'INTEGER',
         },
-        'iso': {
+        'iso_language': {
             'data': 'TEXT',
             'indexed': True
         },
@@ -541,6 +565,7 @@ class ItemDetailsDataBase(DataBase):
             'studio': self.studio_columns,
             'network': self.network_columns,
             'company': self.company_columns,
+            'video': self.video_columns,
             'certification': self.certification_columns,
             'crewmember': self.crewmember_columns,
             'castmember': self.castmember_columns,

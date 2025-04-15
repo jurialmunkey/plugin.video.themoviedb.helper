@@ -137,7 +137,7 @@ class ItemDetailsListDataBaseCache(ItemDetailsDataBaseCache):
 
 class ArtDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     table = 'art'
-    keys = ('aspect_ratio', 'height', 'width', 'iso', 'icon', 'type', 'extension', 'vote_average', 'vote_count', 'parent_id',)
+    keys = ('aspect_ratio', 'height', 'width', 'iso_language', 'icon', 'type', 'extension', 'vote_average', 'vote_count', 'parent_id',)
     conditions = 'parent_id=? ORDER BY vote_average DESC'  # WHERE conditions
 
     @property
@@ -152,17 +152,17 @@ class ArtTypeDetailsDataBaseCache(ArtDetailsDataBaseCache):
         return self.tmdb_imagepath.get_imagepath_fanart(v)
 
     def get_cached_data_by_language(self):
-        conditions = f'iso=? AND {self.conditions}'
+        conditions = f'iso_language=? AND {self.conditions}'
         values = (self.tmdb_api.iso_language, *self.values)
         return self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, values, conditions)
 
     def get_cached_data_by_english(self):
-        conditions = f'iso=? AND {self.conditions}'
+        conditions = f'iso_language=? AND {self.conditions}'
         values = ('en', *self.values)
         return self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, values, conditions)
 
     def get_cached_data_by_null(self):
-        conditions = f'iso IS NULL AND {self.conditions}'
+        conditions = f'iso_language IS NULL AND {self.conditions}'
         return self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, self.values, conditions)
 
     def get_cached_data(self):
@@ -238,9 +238,19 @@ class CertificationDetailsDataBaseCache(ItemDetailsListDataBaseCache):
         return (self.item_id, self.tmdb_api.iso_country)
 
 
+class VideoDetailsDataBaseCache(ItemDetailsListDataBaseCache):
+    table = 'video'
+    keys = ('name', 'iso_country', 'iso_language', 'release_date', 'path', 'content', 'parent_id', )
+    conditions = 'parent_id=? AND content=? ORDER BY iso_language=?, release_date DESC LIMIT 1'  # WHERE conditions
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, 'Trailer', self.tmdb_api.iso_language)
+
+
 class CountryDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     table = 'country'
-    keys = ('name', 'iso', 'parent_id', )
+    keys = ('name', 'iso_country', 'parent_id', )
 
 
 class GenreDetailsDataBaseCache(ItemDetailsListDataBaseCache):
@@ -259,7 +269,7 @@ class UniqueIdDetailsDataBaseCache(ItemDetailsListDataBaseCache):
 
 class ServiceDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     table = 'service'
-    keys = ('tmdb_id', 'name', 'display_priority', 'iso', 'logo')
+    keys = ('tmdb_id', 'name', 'display_priority', 'iso_country', 'logo')
     conditions = 'tmdb_id=?'
 
     def image_path_func(self, v):
@@ -269,7 +279,7 @@ class ServiceDetailsDataBaseCache(ItemDetailsListDataBaseCache):
 class ProviderDetailsDataBaseCache(ItemDetailsListDataBaseCache):
     table = 'provider'
     keys = ('tmdb_id', 'availability', 'parent_id')
-    conditions = 'parent_id=? AND iso=? ORDER BY display_priority ASC'  # WHERE conditions
+    conditions = 'parent_id=? AND iso_country=? ORDER BY display_priority ASC'  # WHERE conditions
 
     @property
     def values(self):  # WHERE conditions values for ?
@@ -288,7 +298,7 @@ class ProviderDetailsDataBaseCache(ItemDetailsListDataBaseCache):
 
     @property
     def cached_data_keys(self):
-        return [f'providerservice.{k}' for k in (*self.keys, 'name', 'display_priority', 'iso', 'logo')]
+        return [f'providerservice.{k}' for k in (*self.keys, 'name', 'display_priority', 'iso_country', 'logo')]
 
 
 class CastMemberDetailsDataBaseCache(ItemDetailsListDataBaseCache):
@@ -475,6 +485,10 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         return self.get_db_cache(CountryDetailsDataBaseCache)
 
     @cached_property
+    def db_video_cache(self):
+        return self.get_db_cache(VideoDetailsDataBaseCache)
+
+    @cached_property
     def db_certification_cache(self):
         return self.get_db_cache(CertificationDetailsDataBaseCache)
 
@@ -577,6 +591,7 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
             self.db_genre_cache,
             self.db_country_cache,
             self.db_certification_cache,
+            self.db_video_cache,
             self.db_company_cache,
             self.db_studio_cache,
             self.db_service_cache,
@@ -651,6 +666,7 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         # instance, key from instance item, infolabel [item methods]
         infolabel_routes = (
             (self.db_certification_cache, 'name', 'mpaa'),
+            (self.db_video_cache, 'path', 'trailer'),
         )
 
         for instance, ikey, dkey in infolabel_routes:
@@ -674,7 +690,7 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
         # instance, dictionary of infoproperty name and key from instance item, infoproperty basename, tuple pair of infoproperty and key value to concatenate as separated list
         infoproperty_routes = (
             (self.db_genre_cache, {'name': 'name', 'tmdb_id': 'tmdb_id'}, 'genre', None),
-            (self.db_country_cache, {'name': 'name', 'iso': 'iso'}, 'country', None),
+            (self.db_country_cache, {'name': 'name', 'iso_country': 'iso_country'}, 'country', None),
             (self.db_studio_cache, {'name': 'name', 'tmdb_id': 'tmdb_id', 'logo': 'logo', 'country': 'country'}, 'studio', None),
             (self.db_provider_cache, {'name': 'name', 'tmdb_id': 'tmdb_id', 'type': 'availability', 'logo': 'logo'}, 'provider', ('providers', 'name')),
             (self.db_castmember_cache, {'name': 'name', 'tmdb_id': 'tmdb_id', 'role': 'role', 'thumb': 'thumb'}, 'cast', ('cast', 'name')),

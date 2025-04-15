@@ -13,17 +13,25 @@ REGEX_WINPROP_SUB = r'\$WINPROP\[{}\]'
 
 
 def test_func():
+    from tmdbhelper.lib.api.tmdb.api import TMDb
+    tmdb_api = TMDb()
+
+    # data = tmdb_api.get_request_sc('tv', '1399', 'season', '1', append_to_response=tmdb_api.append_to_response)
+    # from tmdbhelper.lib.files.futils import dumps_to_file
+    # dumps_to_file(data, 'log_data', 'sync_data_season.json', join_addon_data=True)
+    # data = tmdb_api.get_request_sc('tv', '1399', 'season', '1', 'episode', '1', append_to_response=tmdb_api.append_to_response)
+    # from tmdbhelper.lib.files.futils import dumps_to_file
+    # dumps_to_file(data, 'log_data', 'sync_data_episode.json', join_addon_data=True)
+    # return
     # from tmdbhelper.lib.addon.logger import CProfiler
+
     from tmdbhelper.lib.items.database.tmdbdata import ItemDetailsDataBaseCacheFactory
     sync = ItemDetailsDataBaseCacheFactory('episode')
     # sync.tmdb_id = 348
     sync.tmdb_id = 1399
     sync.season = 2
     sync.episode = 3
-
-    from tmdbhelper.lib.api.tmdb.api import TMDb
-    sync.tmdb_api = TMDb()
-
+    sync.tmdb_api = tmdb_api
     sync.cache_refresh = 'force'
     sync.cache.del_database_init()
 
