@@ -19,13 +19,19 @@ class ThreadLocks(dict):
 class ListItemDetailsConfigurator:
     pagination = False
 
-    def __init__(self, tmdb_api=None):
+    def __init__(self, tmdb_api=None, trakt_api=None):
         self._tmdb_api = tmdb_api
+        self._trakt_api = trakt_api
 
     @cached_property
     def tmdb_api(self):
         from tmdbhelper.lib.api.tmdb.api import TMDb
         return self._tmdb_api or TMDb()
+
+    @cached_property
+    def trakt_api(self):
+        from tmdbhelper.lib.api.trakt.api import TraktAPI
+        return self._trakt_api or TraktAPI()
 
     @cached_property
     def thread_locks(self):

@@ -45,10 +45,10 @@ class ItemDetailsDataBase(DataBase):
         'tagline': {
             'data': 'TEXT',
         },
-        'status': {
+        'premiered': {
             'data': 'TEXT',
         },
-        'premiered': {
+        'status': {
             'data': 'TEXT',
         },
     }
@@ -79,10 +79,10 @@ class ItemDetailsDataBase(DataBase):
         'tagline': {
             'data': 'TEXT',
         },
-        'status': {
+        'premiered': {
             'data': 'TEXT',
         },
-        'premiered': {
+        'status': {
             'data': 'TEXT',
         },
     }
@@ -108,6 +108,9 @@ class ItemDetailsDataBase(DataBase):
             'data': 'TEXT',
         },
         'premiered': {
+            'data': 'TEXT',
+        },
+        'status': {
             'data': 'TEXT',
         },
         'tvshow_id': {
@@ -143,6 +146,9 @@ class ItemDetailsDataBase(DataBase):
         'duration': {
             'data': 'INTEGER',
         },
+        'status': {
+            'data': 'TEXT',
+        },
         'season_id': {
             'data': 'TEXT',
             'foreign_key': 'season(id)',
@@ -156,7 +162,7 @@ class ItemDetailsDataBase(DataBase):
     }
 
     ratings_columns = {
-        'id': {
+        'parent_id': {
             'data': 'TEXT PRIMARY KEY',
             'foreign_key': 'baseitem(id)',
         },

@@ -370,7 +370,7 @@ class ContainerDirectoryItemDetails(ContainerDirectoryCommon):
     @cached_property
     def lidc(self):
         from tmdbhelper.lib.items.database.listitem import ListItemDetailsConfigurator
-        lidc = ListItemDetailsConfigurator(tmdb_api=self.tmdb_api)
+        lidc = ListItemDetailsConfigurator(tmdb_api=self.tmdb_api, trakt_api=self.trakt_api)
         lidc.pagination = self.pagination
         return lidc
 

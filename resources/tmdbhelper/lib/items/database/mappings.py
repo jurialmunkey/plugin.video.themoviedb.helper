@@ -297,6 +297,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'status': ('item', 'status'),
             'season_number': ('item', 'season'),
             'episode_number': ('item', 'episode'),
+            'episode_type': ('item', 'status'),
         }
 
     @staticmethod

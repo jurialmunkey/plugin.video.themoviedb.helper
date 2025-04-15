@@ -42,6 +42,11 @@ class ItemDetailsDataBaseCache(DataBaseCache):
         from tmdbhelper.lib.api.tmdb.images import TMDbImagePath
         return TMDbImagePath()
 
+    @threaded_cached_property
+    def trakt_api(self):
+        from tmdbhelper.lib.api.trakt.api import TraktAPI
+        return TraktAPI()
+
     @staticmethod
     def get_base_id(tmdb_type, tmdb_id):
         return f'{tmdb_type}.{tmdb_id}'
@@ -709,6 +714,9 @@ class BaseItemDetailsDataBaseCache(ItemDetailsDataBaseCache):
             infoproperties[ckey[0]] = ' / '.join(join_data)
             infoproperties[f'{ckey[0]}_CR'] = '[CR]'.join(join_data)
 
+        if self.mediatype == 'episode':
+            infoproperties['episode_type'] = data[0]['status']
+
         """
         CAST
         """
@@ -879,6 +887,24 @@ class EpisodeItemDetailsDataBaseCache(SeasonItemDetailsDataBaseCache):
     @property
     def online_data_args(self):
         return (self.tmdb_type, self.tmdb_id, 'season', self.season, 'episode', self.episode)
+
+    @cached_property
+    def online_data(self):
+        """ cache online data from func to property """
+        if not self.online_data_cond:
+            return
+        data = self.online_data_func(*self.online_data_args, **self.online_data_kwgs)
+
+        trakt_id = self.trakt_api.get_id(self.tmdb_id, 'tmdb', 'show', 'trakt')
+        if not trakt_id:
+            return data
+
+        trakt_data = self.trakt_api.get_request_sc('shows', trakt_id, 'seasons', self.season, 'episodes', self.episode, extended='full')
+        if not trakt_data:
+            return data
+
+        trakt_data.update(data)
+        return trakt_data
 
     @property
     def cached_data_table(self):
