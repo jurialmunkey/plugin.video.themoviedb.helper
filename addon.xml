@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.themoviedb.helper"
-version="6.0.9"
+version="6.0.10"
 name="TMDb Helper"
 provider-name="jurialmunkey">
 <requires>
@@ -8,7 +8,7 @@ provider-name="jurialmunkey">
   <import addon="script.module.requests" version="2.9.1"/>
   <import addon="script.module.pil" version="1.1.7"/>
   <import addon="script.module.addon.signals" version="0.0.6" />
-  <import addon="script.module.jurialmunkey" version="0.2.27" />
+  <import addon="script.module.jurialmunkey" version="0.2.28" />
   <import addon="script.module.infotagger" version="0.0.5" />
   <import addon="script.module.beautifulsoup4" version="4.9.3" />
 </requires>
