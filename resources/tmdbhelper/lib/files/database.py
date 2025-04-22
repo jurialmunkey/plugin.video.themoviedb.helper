@@ -22,7 +22,7 @@ class DataBase:
     _database = None
     _basefolder = get_setting('cache_location', 'str') or ''
     _fileutils = FileUtils()  # Import to use plugin addon_data folder not the module one
-    _db_timeout = 3.0
+    _db_timeout = 60.0
     _db_read_timeout = 1.0
 
     def __init__(self, folder=None, filename=None):
@@ -73,7 +73,7 @@ class DataBase:
             self.init_database()
             return
 
-    def _set_pragmas(self, connection):
+    def set_pragmas(self, connection):
         connection.execute("PRAGMA synchronous=NORMAL")
         connection.execute("PRAGMA journal_mode=WAL")
         connection.execute("PRAGMA foreign_keys=ON")
@@ -85,21 +85,21 @@ class DataBase:
         with MutexPropLock(f'{self._db_file}.lockfile', kodi_log=self.kodi_log):
             if xbmcvfs.exists(self._db_file):
                 return
-            database = self._create_database()
+            database = self.create_database()
             self.set_database_init()
         return database
 
-    def _create_database(self):
+    def create_database(self):
         try:
             self.kodi_log(f'CACHE: Initialising: {self._db_file}...', 1)
-            connection = sqlite3.connect(self._db_file, timeout=5.0, isolation_level=None)
-            connection = self._set_pragmas(connection)
+            connection = sqlite3.connect(self._db_file, timeout=self._db_timeout, isolation_level=None)
+            connection = self.set_pragmas(connection)
             self.create_database_execute(connection)
             return connection
         except Exception as error:
             self.kodi_log(f'CACHE: Exception while initializing _database: {error}\n{self._sc_name}', 1)
 
-    def _get_database(self, read_only=False, log_level=1):
+    def get_database(self, read_only=False, log_level=1):
         timeout = self._db_read_timeout if read_only else self._db_timeout
         try:
             connection = sqlite3.connect(self._db_file, timeout=timeout, isolation_level=None)
@@ -107,104 +107,152 @@ class DataBase:
             self.kodi_log(f'CACHE: ERROR while retrieving _database: {error}\n{self._sc_name}', log_level)
             return
         connection.row_factory = sqlite3.Row
-        return self._set_pragmas(connection)
+        return self.set_pragmas(connection)
 
-    def _execute_sql(self, query, data=None, read_only=False):
+    def database_execute(self, connection, query, data=None):
+        try:
+            if not data:
+                return connection.execute(query)
+            if isinstance(data, list):
+                return connection.executemany(query, data)
+            return connection.execute(query, data)
+        except sqlite3.OperationalError as operational_exception:
+            self.kodi_log(f'CACHE: database OPERATIONAL ERROR! -- {operational_exception}\n{self._sc_name}\n--query--\n{query}\n--data--\n{data}', 2)
+        except Exception as other_exception:
+            self.kodi_log(f'CACHE: database OTHER ERROR! -- {other_exception}\n{self._sc_name}\n--query--\n{query}\n--data--\n{data}', 2)
+
+    def execute_sql(self, query, data=None, read_only=False, connection=None):
         '''little wrapper around execute and executemany to just retry a db command if db is locked'''
-
-        def database_execute(database):
-            try:
-                if not data:
-                    return database.execute(query)
-                if isinstance(data, list):
-                    return database.executemany(query, data)
-                return database.execute(query, data)
-            except sqlite3.OperationalError as operational_exception:
-                self.kodi_log(f'CACHE: database OPERATIONAL ERROR! -- {operational_exception}\n{self._sc_name} -- read_only: {read_only}\n--query--\n{query}\n--data--\n{data}', 2)
-            except Exception as other_exception:
-                self.kodi_log(f'CACHE: database OTHER ERROR! -- {other_exception}\n{self._sc_name} -- read_only: {read_only}\n--query--\n{query}\n--data--\n{data}', 2)
-
         # always use new db object because we need to be sure that data is available for other simplecache instances
         try:
-            with self._get_database(read_only=read_only) as database:
-                return database_execute(database)
-
+            if connection:
+                return self.database_execute(connection, query, data=data)
+            with self.get_database(read_only=read_only) as connection:
+                return self.database_execute(connection, query, data=data)
         except Exception as database_exception:
             self.kodi_log(f'CACHE: database GET DATABASE ERROR! -- {database_exception}\n{self._sc_name} -- read_only: {read_only}', 2)
 
+    @staticmethod
+    def statement_insert_or_ignore(table, keys=('id', )):
+        return 'INSERT OR IGNORE INTO {table}({keys}) VALUES ({values})'.format(
+            table=table,
+            keys=', '.join(keys),
+            values=', '.join(['?' for _ in keys]))
+
+    @staticmethod
+    def statement_insert_or_replace(table, keys=('id', )):
+        return 'INSERT OR REPLACE INTO {table}({keys}) VALUES ({values})'.format(
+            table=table,
+            keys=', '.join(keys),
+            values=', '.join(['?' for _ in keys]))
+
+    @staticmethod
+    def statement_delete_keys(table, keys, conditions='item_type=?'):
+        return 'UPDATE {table} SET {keys} WHERE {conditions}'.format(
+            table=table,
+            keys=', '.join([f'{k}=NULL' for k in keys]),
+            conditions=conditions)
+
+    @staticmethod
+    def statement_update_if_null(table, keys, conditions='id=?'):
+        return 'UPDATE {table} SET {keys} WHERE {conditions}'.format(
+            keys=', '.join([f'{k}=ifnull(?,{k})' for k in keys]), table=table, conditions=conditions)
+
+    @staticmethod
+    def statement_select_limit(table, keys, conditions='id=?'):
+        return 'SELECT {keys} FROM {table} WHERE {conditions} LIMIT 1'.format(
+            keys=', '.join(keys), table=table, conditions=conditions)
+
+    @staticmethod
+    def statement_select(table, keys, conditions):
+        return 'SELECT {keys} FROM {table} WHERE {conditions}'.format(
+            keys=', '.join(keys), table=table, conditions=conditions)
+
     def set_activity(self, item_type, method, value):
-        idx = f'{item_type}.{method}'
-        query = 'INSERT OR REPLACE INTO lactivities( id, data) VALUES (?, ?)'
-        return self._execute_sql(query, (idx, value, ))
+        return self.execute_sql(
+            self.statement_insert_or_replace('lactivities', keys=('id', 'data')),
+            (f'{item_type}.{method}', value, ))
 
     def get_activity(self, item_type, method):
-        idx = f'{item_type}.{method}'
-        query = 'SELECT data FROM lactivities WHERE id=? LIMIT 1'
-        cache = self._execute_sql(query, (idx, ))
-        if not cache:
+        result = self.execute_sql(self.statement_select_limit('lactivities', keys=('data', )), (f'{item_type}.{method}', ))
+        if not result:
             return
-        cache = cache.fetchone()
-        if not cache:
+        result = result.fetchone()
+        if not result:
             return
-        return cache[0]
+        return result[0]
 
-    def set_list_values(self, values, keys, table=DEFAULT_TABLE):
-        query = 'INSERT OR IGNORE INTO {table} ({keys}) VALUES ({values})'.format(
-            keys=', '.join(keys),
-            values=', '.join(['?' for _ in keys]),
+    def set_list_values(self, table=DEFAULT_TABLE, keys=(), values=(), connection=None):
+        if not values:
+            return
+        return self.execute_sql(self.statement_insert_or_ignore(table, keys), values, connection=connection)
+
+    def get_list_values(self, table=DEFAULT_TABLE, keys=(), values=(), conditions=None, connection=None):
+        result = self.execute_sql(
+            self.statement_select(table, keys, conditions),
+            data=values,
+            read_only=True,
+            connection=connection)
+        if not result:
+            return
+        return result.fetchall()
+
+    def get_values(self, table=DEFAULT_TABLE, item_id=None, keys=(), connection=None):
+        result = self.execute_sql(
+            self.statement_select_limit(table, keys),
+            data=(item_id, ),
+            read_only=True,
+            connection=connection)
+
+        if not result:
+            return
+
+        return result.fetchone()
+
+    def set_item_values(self, table=DEFAULT_TABLE, item_id=None, keys=(), values=(), connection=None):
+        """ Create a new row at id=item_id (or update if it exists) and then update null values with new data """
+        self.create_item(
             table=table,
-        )
-        return self._execute_sql(query, values)
+            item_id=item_id,
+            connection=connection)
 
-    def get_list_values(self, conditions, values, keys, table=DEFAULT_TABLE):
-        query = 'SELECT {keys} FROM {table} WHERE {conditions}'.format(
-            keys=', '.join(keys),
+        return self.execute_sql(
+            self.statement_update_if_null(table, keys),
+            data=(*values, item_id, ),
+            connection=connection)
+
+    def set_many_values(self, table=DEFAULT_TABLE, keys=(), data=None, connection=None):
+        """ data={item_id: ((key, value), (key, value))} """
+
+        # Create new rows if items dont exist
+        self.create_many_items(
             table=table,
-            conditions=conditions,
+            item_ids=[item_id for item_id in data.keys()],
+            connection=connection)
+
+        return self.execute_sql(
+            self.statement_update_if_null(table, keys),
+            data=[(*values, item_id, ) for item_id, values in data.items()],
+            connection=connection)
+
+    def del_column_values(self, table=DEFAULT_TABLE, keys=(), item_type=None, connection=None):
+        return self.execute_sql(
+            self.statement_delete_keys(table, keys),
+            data=(item_type, ),
+            connection=connection
         )
-        cache = self._execute_sql(query, values, read_only=True)
-        if not cache:
-            return
-        return cache.fetchall()
 
-    def get_values(self, idx, keys, table=DEFAULT_TABLE):
-        query = 'SELECT {keys} FROM {table} WHERE id=? LIMIT 1'.format(
-            keys=', '.join(keys),
-            table=table)
-        cache = self._execute_sql(query, (idx, ), read_only=True)
-        if not cache:
-            return
-        return cache.fetchone()
+    def create_item(self, table=DEFAULT_TABLE, item_id=None, connection=None):
+        self.execute_sql(
+            self.statement_insert_or_ignore(table),
+            data=(item_id,),
+            connection=connection)
 
-    def set_values(self, idx, key_value_pairs, table=DEFAULT_TABLE):
-        keys, values = zip(*key_value_pairs)
-        query = 'UPDATE {table} SET {keys} WHERE id=?'.format(
-            keys=', '.join([f'{k}=ifnull(?,{k})' for k in keys]),
-            table=table)
-        self.create_item(idx, table)
-        return self._execute_sql(query, (*values, idx, ))
-
-    def set_many_values(self, keys, data, table=DEFAULT_TABLE):
-        """ {idx: key_value_pairs} """
-        query = 'UPDATE {table} SET {keys} WHERE id=?'.format(
-            keys=', '.join([f'{k}=ifnull(?,{k})' for k in keys]),
-            table=table)
-        self.create_many_items([idx for idx in data.keys()], table)
-        return self._execute_sql(query, [(*values, idx, ) for idx, values in data.items()])
-
-    def del_column_values(self, keys, item_type, table=DEFAULT_TABLE):
-        query = 'UPDATE {table} SET {keys} WHERE item_type=?'.format(
-            keys=', '.join([f'{k}=NULL' for k in keys]),
-            table=table)
-        return self._execute_sql(query, (item_type, ))
-
-    def create_item(self, idx, table=DEFAULT_TABLE):
-        query = 'INSERT OR IGNORE INTO {table}( id) VALUES (?)'.format(table=table)
-        self._execute_sql(query, (idx,))
-
-    def create_many_items(self, items, table=DEFAULT_TABLE):
-        query = 'INSERT OR IGNORE INTO {table}( id) VALUES (?)'.format(table=table)
-        self._execute_sql(query, [(idx,) for idx in items])
+    def create_many_items(self, table=DEFAULT_TABLE, item_ids=(), connection=None):
+        self.execute_sql(
+            self.statement_insert_or_ignore(table),
+            data=[(item_id,) for item_id in item_ids],
+            connection=connection)
 
     @property
     def database_tables(self):
@@ -223,32 +271,58 @@ class DataBase:
 
 
 class DataBaseCache:
-    def get_cached(self, item_id, key, table):
-        data = self.cache.get_values(item_id, keys=(key, ), table=table)
+
+    connection = None
+
+    # ======================================
+    # Single item with single key/value pair
+    # ======================================
+
+    def get_cached(self, table, item_id, key):
+        data = self.cache.get_values(table, item_id, keys=(key, ), connection=self.connection)
         return data[0] if data else None
 
-    def set_cached(self, item_id, key, table, data):
+    def set_cached(self, table, item_id, key, value):
+        """ Set key to value for id=item_id in table """
+        if not value:
+            return
+        self.cache.set_item_values(table, item_id, keys=(key, ), values=(value, ), connection=self.connection)
+        return value
+
+    def use_cached(self, table, item_id, key, func, *args, **kwargs):
+        """ Get key for id=item_id in table else set key to func(*args, **kwargs) """
+        value = self.get_cached(table, item_id, key)
+        if not value:
+            value = func(*args, **kwargs)
+            value = self.set_cached(table, item_id, key, value)
+        return value
+
+    # =========================================
+    # Single item with multiple key/value pairs
+    # =========================================
+
+    def set_cached_values(self, table, item_id, keys, values):
+        return self.cache.set_item_values(table, item_id, keys, values, connection=self.connection)
+
+    # ============================================
+    # Multiple items with multiple key/value pairs
+    # ============================================
+
+    def get_cached_list_values(self, table, keys, values, conditions):
+        return self.cache.get_list_values(table, keys, values, conditions, connection=self.connection)
+
+    def set_cached_list_values(self, table, keys, values):
+        return self.cache.set_list_values(table, keys, values, connection=self.connection)
+
+    def set_cached_many(self, table, keys, data):
         if not data:
             return
-        key_value_pair = (key, data,)
-        self.cache.set_values(item_id, key_value_pairs=(key_value_pair, ), table=table)
+        self.cache.set_many_values(table, keys, data, connection=self.connection)
         return data
 
-    def use_cached(self, item_id, key, table, func, *args, **kwargs):
-        data = self.get_cached(item_id, key, table)
+    def use_cached_many(self, table, keys, values, conditions, func, *args, **kwargs):
+        data = self.get_cached_list_values(table, keys, values, conditions)
         if not data:
-            data = self.set_cached(item_id, key, table, func(*args, **kwargs))
-        return data
-
-    def set_cached_many(self, keys, table, data):
-        if not data:
-            return
-        self.cache.set_many_values(keys=keys, data=data, table=table)
-        return data
-
-    def use_cached_many(self, conditions, values, keys, table, func, *args, **kwargs):
-        data = self.cache.get_list_values(conditions, values, keys, table)
-        if not data:
-            data = self.set_cached_many(keys, table, func(*args, **kwargs))
-            data = self.cache.get_list_values(conditions, values, keys, table) if data else None
+            data = self.set_cached_many(table, keys, func(*args, **kwargs))
+            data = self.get_cached_list_values(table, keys, values, conditions) if data else None
         return data

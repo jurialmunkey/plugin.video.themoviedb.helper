@@ -1,9 +1,9 @@
-from tmdbhelper.lib.items.container import Container
+from tmdbhelper.lib.items.container import ContainerDirectory
 from tmdbhelper.lib.addon.plugin import get_plugin_category, get_localized, PLUGINPATH
 from tmdbhelper.lib.addon.consts import MDBLIST_LIST_OF_LISTS
 
 
-class ListLocal(Container):
+class ListLocal(ContainerDirectory):
     def get_items(self, paths, page=None, **kwargs):
         if not paths or not isinstance(paths, list):
             return
@@ -36,7 +36,7 @@ class ListLocal(Container):
         return response.items + response.next_page
 
 
-class ListLists(Container):
+class ListLists(ContainerDirectory):
     def get_items(self, info, page=None, **kwargs):
         from xbmcplugin import SORT_METHOD_UNSORTED
 
@@ -52,7 +52,7 @@ class ListLists(Container):
         return items
 
 
-class ListCustom(Container):
+class ListCustom(ContainerDirectory):
     def get_items(self, list_id, page=None, **kwargs):
         response = self.mdblist_api.get_custom_list(list_id, page=page or 1)
 
@@ -62,7 +62,7 @@ class ListCustom(Container):
         return response.items + response.next_page
 
 
-class ListCustomSearch(Container):
+class ListCustomSearch(ContainerDirectory):
     def get_items(self, query=None, **kwargs):
         if not query:
             from xbmcgui import Dialog

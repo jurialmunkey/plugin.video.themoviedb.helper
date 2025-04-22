@@ -1,3 +1,4 @@
+from tmdbhelper.lib.files.ftools import cached_property
 from jurialmunkey.parser import try_int, boolean
 from tmdbhelper.lib.addon.consts import NO_UNAIRED_LABEL, NO_UNAIRED_CHECK, REMOVE_EPISODE_COUNT
 from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin, get_localized, get_condvisibility
@@ -10,7 +11,7 @@ from tmdbhelper.lib.items.kodi import KodiDb
 """
 
 
-class Container(CommonContainerAPIs):
+class ContainerDirectoryCommon(CommonContainerAPIs):
     def __init__(self, handle, paramstring, **kwargs):
         # Log Settings
         self.log_timers = get_setting('timer_reports')
@@ -44,123 +45,69 @@ class Container(CommonContainerAPIs):
         self.kodi_db = None
         self.thumb_override = 0
 
-    @property
+    @cached_property
     def is_fanarttv(self):
-        try:
-            return self._is_fanarttv
-        except AttributeError:
-            self._is_fanarttv = self.params.get('fanarttv', '').lower()
-            return self._is_fanarttv
+        return self.params.get('fanarttv', '').lower()
 
-    @property
+    @cached_property
     def is_widget(self):
-        try:
-            return self._is_widget
-        except AttributeError:
-            self._is_widget = boolean(self.params.get('widget', False))
-            return self._is_widget
+        return boolean(self.params.get('widget', False))
 
-    @property
+    @cached_property
     def is_cacheonly(self):
-        try:
-            return self._is_cacheonly
-        except AttributeError:
-            self._is_cacheonly = boolean(self.params.get('cacheonly', False))
-            return self._is_cacheonly
+        return boolean(self.params.get('cacheonly', False))
 
-    @property
+    @cached_property
     def is_detailed(self):
-        try:
-            return self._is_detailed
-        except AttributeError:
-            self._is_detailed = boolean(self.params.get('detailed', False)) or self.params.get('info') == 'details'
-            return self._is_detailed
+        return boolean(self.params.get('detailed', False)) or self.params.get('info') == 'details'
 
-    @property
+    @cached_property
     def context_additions(self):
-        try:
-            return self._context_additions
-        except AttributeError:
-            self._context_additions = []
-            if self.context_additions_make_node:
-                self._context_additions += [(get_localized(32496), 'RunScript(plugin.video.themoviedb.helper,make_node)')]
-            return self._context_additions
+        if self.context_additions_make_node:
+            return [(get_localized(32496), 'RunScript(plugin.video.themoviedb.helper,make_node)')]
+        return []
 
-    @property
+    @cached_property
     def context_additions_make_node(self):
-        try:
-            return self._context_additions_make_node
-        except AttributeError:
-            self._context_additions_make_node = get_setting('contextmenu_make_node') if not self.is_widget else False
-            return self._context_additions_make_node
+        return get_setting('contextmenu_make_node') if not self.is_widget else False
 
-    @property
+    @cached_property
     def hide_watched(self):
-        try:
-            return self._hide_watched
-        except AttributeError:
-            self._hide_watched = get_setting('widgets_hidewatched') if self.is_widget else False
-            return self._hide_watched
+        return get_setting('widgets_hidewatched') if self.is_widget else False
 
-    @property
+    @cached_property
     def nodate_is_unaired(self):
-        try:
-            return self._nodate_is_unaired
-        except AttributeError:
-            self._nodate_is_unaired = get_setting('nodate_is_unaired')
-            return self._nodate_is_unaired
+        return get_setting('nodate_is_unaired')
 
-    @property
+    @cached_property
     def tmdb_cache_only(self):
-        try:
-            return self._tmdb_cache_only
-        except AttributeError:
-            def _tmdb_is_cache_only():
-                if self.is_cacheonly:  # cacheonly=true param overrides all other settings
-                    return True
-                if not self.ftv_is_cache_only:  # fanarttv lookups require TMDb lookups for tvshow ID -- TODO: only force on tvshows
-                    return False
-                if get_setting('tmdb_details'):  # user setting
-                    return False
-                return True
-            self._tmdb_cache_only = _tmdb_is_cache_only()
-            return self._tmdb_cache_only
+        if self.is_cacheonly:  # cacheonly=true param overrides all other settings
+            return True
+        if not self.ftv_is_cache_only:  # fanarttv lookups require TMDb lookups for tvshow ID -- TODO: only force on tvshows
+            return False
+        if get_setting('tmdb_details'):  # user setting
+            return False
+        return True
 
-    @tmdb_cache_only.setter
-    def tmdb_cache_only(self, value):
-        self._tmdb_cache_only = value
-
-    @property
+    @cached_property
     def is_excluded(self):
-        try:
-            return self._is_excluded
-        except AttributeError:
-            from tmdbhelper.lib.items.filters import is_excluded
-            self._is_excluded = is_excluded
-            return self._is_excluded
+        from tmdbhelper.lib.items.filters import is_excluded
+        return is_excluded
 
-    @property
+    @cached_property
     def trakt_playdata(self):
-        try:
-            return self._trakt_playdata
-        except AttributeError:
-            from tmdbhelper.lib.items.trakt import TraktPlayData
-            self._trakt_playdata = TraktPlayData(
-                watchedindicators=get_setting('trakt_watchedindicators'),
-                pauseplayprogress=get_setting('trakt_playprogress'),
-                traktepisodetypes=get_setting('trakt_episodetypes'))
-            return self._trakt_playdata
+        from tmdbhelper.lib.items.trakt import TraktPlayData
+        return TraktPlayData(
+            watchedindicators=get_setting('trakt_watchedindicators'),
+            pauseplayprogress=get_setting('trakt_playprogress'),
+            traktepisodetypes=get_setting('trakt_episodetypes'))
 
-    @property
+    @cached_property
     def ib(self):
-        try:
-            return self._ib
-        except AttributeError:
-            from tmdbhelper.lib.items.builder import ItemBuilder
-            self._ib = ItemBuilder(
-                tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api,
-                log_timers=self.log_timers, timer_lists=self.timer_lists)
-            return self._ib
+        from tmdbhelper.lib.items.builder import ItemBuilder
+        return ItemBuilder(
+            tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api,
+            log_timers=self.log_timers, timer_lists=self.timer_lists)
 
     @property
     def page_length(self):
@@ -168,20 +115,13 @@ class Container(CommonContainerAPIs):
             return 1
         return get_setting('pagemulti_library', 'int')
 
-    @property
+    @cached_property
     def pagination(self):
-        try:
-            return self._pagination
-        except AttributeError:
-            def _pagination_is_allowed():
-                if not boolean(self.params.get('nextpage', True)):
-                    return False
-                if self.is_widget and not get_setting('widgets_nextpage'):
-                    return False
-                return True
-
-            self._pagination = _pagination_is_allowed()
-            return self._pagination
+        if not boolean(self.params.get('nextpage', True)):
+            return False
+        if self.is_widget and not get_setting('widgets_nextpage'):
+            return False
+        return True
 
     @property
     def ftv_is_cache_only(self):
@@ -198,22 +138,25 @@ class Container(CommonContainerAPIs):
         return True
 
     def get_kodi_database(self, tmdb_type):
+        if not get_setting('local_db'):
+            return
         with TimerList(self.timer_lists, 'get_kodi', log_threshold=0.05, logging=self.log_timers):
-            if not get_setting('local_db'):
-                return
             from tmdbhelper.lib.items.kodi import KodiDb
             return KodiDb(tmdb_type)
 
-    def _build_item(self, i):
-        if not self.pagination and 'next_page' in i:
-            return
-        with TimerList(self.timer_lists, 'item_api', log_threshold=0.05, logging=self.log_timers):
-            li = self.ib.get_listitem(i, use_iterprops=self.is_detailed)
-            if li.infoproperties.get('plot_affix'):
-                li.infolabels['plot'] = f"{li.infoproperties['plot_affix']}. {li.infolabels.get('plot')}"
-            return li
+    @cached_property
+    def remove_unaired_object(self):
+        return self.parent_params.get('info') not in NO_UNAIRED_CHECK
 
-    def _make_item(self, li):
+    @cached_property
+    def format_unaired_labels(self):
+        return self.parent_params.get('info') not in NO_UNAIRED_LABEL
+
+    @cached_property
+    def remove_episode_counts(self):
+        return self.parent_params.get('info') in REMOVE_EPISODE_COUNT
+
+    def make_item(self, li):
         if not li:
             return
 
@@ -262,19 +205,31 @@ class Container(CommonContainerAPIs):
             self.trakt_playdata.set_playprogress(li)
             return li
 
-    def precache_parent(self, tmdb_id, season=None):
-        self.ib.get_parents(tmdb_type='tv', tmdb_id=tmdb_id, season=season)
-        # PREBUILD_PARENTSHOW = ['seasons', 'episodes', 'episode_groups', 'trakt_upnext', 'episode_group_seasons']
+    def make_items(self, items):
+        from tmdbhelper.lib.addon.thread import ParallelThread
+        with ParallelThread(items, self.make_item) as pt:
+            item_queue = pt.queue
+        return self.sort_items_by_dbid(item_queue)
+
+    def sort_items_by_dbid(self, items):
+        if not self.sort_by_dbid:
+            return items
+        items_dbid = [li for li in items if li and li.infolabels.get('dbid')]
+        items_tmdb = [li for li in items if li and not li.infolabels.get('dbid')]
+        return items_dbid + items_tmdb
+
+    @staticmethod
+    def precache_parent(tmdb_id, season=None):
+        return
+
+    @staticmethod
+    def build_detailed_items(items):
+        return items
 
     def build_items(self, items):
         """ Build items in threads """
-        from tmdbhelper.lib.addon.thread import ParallelThread
-        self.ib.cache_only = self.tmdb_cache_only
-        with TimerList(self.timer_lists, '--build', log_threshold=0.05, logging=self.log_timers):
-            self.ib.parent_params = self.parent_params
-            with ParallelThread(items, self._build_item) as pt:
-                item_queue = pt.queue
-            all_listitems = [i for i in item_queue if i]
+
+        items = self.build_detailed_items(items)
 
         # Wait for sync thread
         with TimerList(self.timer_lists, '--sync', log_threshold=0.05, logging=self.log_timers):
@@ -282,19 +237,9 @@ class Container(CommonContainerAPIs):
 
         # Finalise listitems in parallel threads
         with TimerList(self.timer_lists, '--make', log_threshold=0.05, logging=self.log_timers):
-            info = self.parent_params.get('info')
-            self.remove_unaired_object = info not in NO_UNAIRED_CHECK
-            self.format_unaired_labels = info not in NO_UNAIRED_LABEL
-            self.remove_episode_counts = info in REMOVE_EPISODE_COUNT
-            with ParallelThread(all_listitems, self._make_item) as pt:
-                item_queue = pt.queue
+            items = self.make_items(items)
 
-        if self.sort_by_dbid:
-            item_queue_dbid = [li for li in item_queue if li and li.infolabels.get('dbid')]
-            item_queue_tmdb = [li for li in item_queue if li and not li.infolabels.get('dbid')]
-            item_queue = item_queue_dbid + item_queue_tmdb
-
-        return item_queue
+        return items
 
     def add_items(self, items):
         from xbmcplugin import addDirectoryItems
@@ -389,3 +334,56 @@ class Container(CommonContainerAPIs):
             executebuiltin(f'Container.Update({self.container_update})')
         if self.container_refresh:
             executebuiltin('Container.Refresh')
+
+
+class ContainerDirectoryItemBuilder(ContainerDirectoryCommon):
+    @cached_property
+    def ib(self):
+        from tmdbhelper.lib.items.builder import ItemBuilder
+        return ItemBuilder(
+            tmdb_api=self.tmdb_api, ftv_api=self.ftv_api, trakt_api=self.trakt_api,
+            log_timers=self.log_timers, timer_lists=self.timer_lists)
+
+    def precache_parent(self, tmdb_id, season=None):
+        self.ib.get_parents(tmdb_type='tv', tmdb_id=tmdb_id, season=season)
+
+    def build_detailed_item(self, i):
+        if not self.pagination and 'next_page' in i:
+            return
+        with TimerList(self.timer_lists, 'item_api', log_threshold=0.05, logging=self.log_timers):
+            li = self.ib.get_listitem(i, use_iterprops=self.is_detailed)
+        if li.infoproperties.get('plot_affix'):
+            li.infolabels['plot'] = f"{li.infoproperties['plot_affix']}. {li.infolabels.get('plot')}"
+        return li
+
+    def build_detailed_items(self, items):
+        from tmdbhelper.lib.addon.thread import ParallelThread
+        self.ib.cache_only = self.tmdb_cache_only
+        self.ib.parent_params = self.parent_params
+        with TimerList(self.timer_lists, '--build', log_threshold=0.05, logging=self.log_timers):
+            with ParallelThread(items, self.build_detailed_item) as pt:
+                item_queue = pt.queue
+        return [i for i in item_queue if i]
+
+
+class ContainerDirectoryItemDetails(ContainerDirectoryCommon):
+    @cached_property
+    def lidc(self):
+        from tmdbhelper.lib.items.database.listitem import ListItemDetailsConfigurator
+        lidc = ListItemDetailsConfigurator(tmdb_api=self.tmdb_api, trakt_api=self.trakt_api)
+        lidc.pagination = self.pagination
+        return lidc
+
+    def build_detailed_item(self, li):
+        if li.infoproperties.get('plot_affix'):
+            li.infolabels['plot'] = f"{li.infoproperties['plot_affix']}. {li.infolabels.get('plot')}"
+        return li
+
+    def build_detailed_items(self, items):
+        with TimerList(self.timer_lists, '--build', log_threshold=0.05, logging=self.log_timers):
+            items = self.lidc.configure_listitems_threaded(items)
+            return [i for i in (self.build_detailed_item(li) for li in items if li) if i]
+
+
+ContainerDirectory = ContainerDirectoryItemBuilder
+# ContainerDirectory = ContainerDirectoryItemDetails

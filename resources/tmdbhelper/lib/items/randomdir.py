@@ -1,11 +1,11 @@
 import random
-from tmdbhelper.lib.items.container import Container
+from tmdbhelper.lib.items.container import ContainerDirectory
 from tmdbhelper.lib.addon.consts import RANDOMISED_LISTS, RANDOMISED_TRAKT
 from jurialmunkey.parser import merge_two_dicts
 from tmdbhelper.lib.items.routes import get_container
 
 
-class ListTraktRandom(Container):
+class ListTraktRandom(ContainerDirectory):
     def get_items(self, **kwargs):
         kwargs['info'] = RANDOMISED_TRAKT.get(kwargs.get('info'), {}).get('info')
         kwargs['randomise'] = True
@@ -13,7 +13,7 @@ class ListTraktRandom(Container):
         return get_container(kwargs['info']).get_items(self, **kwargs)
 
 
-class ListRandom(Container):
+class ListRandom(ContainerDirectory):
     def get_items(self, **kwargs):
         def random_from_list(i, remove_next_page=True):
             if not i or not isinstance(i, list) or len(i) < 2:

@@ -1,35 +1,34 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from functools import cached_property
-from tmdbhelper.lib.files.database import DataBaseCache, DataBase
+from tmdbhelper.lib.files.database import DataBase
 
 
 class ItemDetailsDataBase(DataBase):
 
     baseitem_columns = {
         'id': {
-            'data': 'TEXT UNIQUE',
+            'data': 'TEXT PRIMARY KEY',
+            'indexed': True
         },
         'mediatype': {
             'data': 'TEXT',
         },
         'expiry': {
             'data': 'INTEGER',
+            'indexed': True
         },
     }
 
     movie_columns = {
         'id': {
-            'data': 'TEXT UNIQUE',
+            'data': 'TEXT PRIMARY KEY',
+            'foreign_key': 'baseitem(id)',
         },
         'tmdb_id': {
             'data': 'INTEGER',
         },
         'year': {
             'data': 'INTEGER',
-        },
-        'mpaa': {
-            'data': 'TEXT',
         },
         'plot': {
             'data': 'TEXT',
@@ -46,32 +45,24 @@ class ItemDetailsDataBase(DataBase):
         'tagline': {
             'data': 'TEXT',
         },
-        'status': {
-            'data': 'TEXT',
-        },
         'premiered': {
             'data': 'TEXT',
         },
-        'trailer': {
+        'status': {
             'data': 'TEXT',
         },
-        'FOREIGN KEY(id)': {
-            'data': 'REFERENCES baseitem(id)',
-        }
     }
 
     tvshow_columns = {
         'id': {
-            'data': 'TEXT UNIQUE',
+            'data': 'TEXT PRIMARY KEY',
+            'foreign_key': 'baseitem(id)',
         },
         'tmdb_id': {
             'data': 'INTEGER',
         },
         'year': {
             'data': 'INTEGER',
-        },
-        'mpaa': {
-            'data': 'TEXT',
         },
         'plot': {
             'data': 'TEXT',
@@ -88,23 +79,18 @@ class ItemDetailsDataBase(DataBase):
         'tagline': {
             'data': 'TEXT',
         },
-        'status': {
-            'data': 'TEXT',
-        },
         'premiered': {
             'data': 'TEXT',
         },
-        'trailer': {
+        'status': {
             'data': 'TEXT',
         },
-        'FOREIGN KEY(id)': {
-            'data': 'REFERENCES baseitem(id)',
-        }
     }
 
     season_columns = {
         'id': {
-            'data': 'TEXT UNIQUE',
+            'data': 'TEXT PRIMARY KEY',
+            'foreign_key': 'baseitem(id)',
         },
         'season': {
             'data': 'INTEGER',
@@ -124,20 +110,20 @@ class ItemDetailsDataBase(DataBase):
         'premiered': {
             'data': 'TEXT',
         },
-        'tvshow_id': {
+        'status': {
             'data': 'TEXT',
         },
-        'FOREIGN KEY(id)': {
-            'data': 'REFERENCES baseitem(id)',
+        'tvshow_id': {
+            'data': 'TEXT',
+            'foreign_key': 'tvshow(id)',
+            'indexed': True
         },
-        'FOREIGN KEY(tvshow_id)': {
-            'data': 'REFERENCES tvshow(id)',
-        }
     }
 
     episode_columns = {
         'id': {
-            'data': 'TEXT UNIQUE',
+            'data': 'TEXT PRIMARY KEY',
+            'foreign_key': 'baseitem(id)',
         },
         'episode': {
             'data': 'INTEGER',
@@ -160,26 +146,25 @@ class ItemDetailsDataBase(DataBase):
         'duration': {
             'data': 'INTEGER',
         },
+        'status': {
+            'data': 'TEXT',
+        },
         'season_id': {
             'data': 'TEXT',
+            'foreign_key': 'season(id)',
+            'indexed': True
         },
         'tvshow_id': {
             'data': 'TEXT',
+            'foreign_key': 'tvshow(id)',
+            'indexed': True
         },
-        'FOREIGN KEY(id)': {
-            'data': 'REFERENCES baseitem(id)',
-        },
-        'FOREIGN KEY(tvshow_id)': {
-            'data': 'REFERENCES tvshow(id)',
-        },
-        'FOREIGN KEY(season_id)': {
-            'data': 'REFERENCES season(id)',
-        }
     }
 
     ratings_columns = {
-        'id': {
-            'data': 'TEXT UNIQUE',
+        'parent_id': {
+            'data': 'TEXT PRIMARY KEY',
+            'foreign_key': 'baseitem(id)',
         },
         'top250': {
             'data': 'INTEGER',
@@ -265,18 +250,14 @@ class ItemDetailsDataBase(DataBase):
         'emmy_nominations': {
             'data': 'INTEGER',
         },
-        'FOREIGN KEY(id)': {
-            'data': 'REFERENCES baseitem(id)',
-        }
-
     }
 
     person_columns = {
+        'tmdb_id': {
+            'data': 'INTEGER PRIMARY KEY',
+        },
         'name': {
             'data': 'TEXT',
-        },
-        'tmdb_id': {
-            'data': 'INTEGER UNIQUE',
         },
         'thumb': {
             'data': 'TEXT',
@@ -292,93 +273,149 @@ class ItemDetailsDataBase(DataBase):
         },
     }
 
+    certification_columns = {
+        'name': {
+            'data': 'TEXT',
+        },
+        'iso_country': {
+            'data': 'TEXT',
+            'unique': True,
+            'indexed': True,
+        },
+        'iso_language': {
+            'data': 'TEXT',
+            'unique': True
+        },
+        'release_date': {
+            'data': 'TEXT',
+            'unique': True,
+            'indexed': True,
+        },
+        'release_type': {
+            'data': 'TEXT',
+            'unique': True,
+            'indexed': True,
+        },
+        'parent_id': {
+            'data': 'TEXT',
+            'foreign_key': 'baseitem(id)',
+            'indexed': True,
+            'unique': True
+        },
+    }
+
+    video_columns = {
+        'name': {
+            'data': 'TEXT',
+        },
+        'iso_country': {
+            'data': 'TEXT',
+            'indexed': True,
+        },
+        'iso_language': {
+            'data': 'TEXT',
+            'indexed': True,
+        },
+        'release_date': {
+            'data': 'TEXT',
+            'indexed': True,
+        },
+        'path': {
+            'data': 'TEXT',
+        },
+        'content': {
+            'data': 'TEXT',
+            'indexed': True,
+        },
+        'parent_id': {
+            'data': 'TEXT',
+            'foreign_key': 'baseitem(id)',
+            'indexed': True,
+        },
+    }
+
     genre_columns = {
         'name': {
             'data': 'TEXT',
         },
         'tmdb_id': {
             'data': 'INTEGER',
+            'unique': True
         },
         'parent_id': {
             'data': 'TEXT',
+            'foreign_key': 'baseitem(id)',
+            'indexed': True,
+            'unique': True
         },
-        'FOREIGN KEY(parent_id)': {
-            'data': 'REFERENCES baseitem(id)',
-        },
-        'UNIQUE': {
-            'data': '(tmdb_id, parent_id)',
-        }
     }
 
     country_columns = {
         'name': {
             'data': 'TEXT',
         },
-        'iso': {
+        'iso_country': {
             'data': 'TEXT',
+            'unique': True
         },
         'parent_id': {
             'data': 'TEXT',
+            'foreign_key': 'baseitem(id)',
+            'indexed': True,
+            'unique': True
         },
-        'FOREIGN KEY(parent_id)': {
-            'data': 'REFERENCES baseitem(id)',
-        },
-        'UNIQUE': {
-            'data': '(iso, parent_id)',
-        }
     }
 
     studio_columns = {
-        'name': {
-            'data': 'TEXT',
-        },
         'tmdb_id': {
             'data': 'INTEGER',
-        },
-        'icon': {
-            'data': 'TEXT',
-        },
-        'country': {
-            'data': 'TEXT',
+            'unique': True,
+            'foreign_key': 'company(tmdb_id)',
         },
         'parent_id': {
             'data': 'TEXT',
+            'foreign_key': 'baseitem(id)',
+            'indexed': True,
+            'unique': True
         },
-        'FOREIGN KEY(parent_id)': {
-            'data': 'REFERENCES baseitem(id)',
-        },
-        'UNIQUE': {
-            'data': '(tmdb_id, parent_id)',
-        }
     }
 
     network_columns = {
+        'tmdb_id': {
+            'data': 'INTEGER',
+            'unique': True,
+            'foreign_key': 'company(tmdb_id)',
+        },
+        'parent_id': {
+            'data': 'TEXT',
+            'foreign_key': 'baseitem(id)',
+            'indexed': True,
+            'unique': True
+        },
+    }
+
+    company_columns = {
+        'tmdb_id': {
+            'data': 'INTEGER PRIMARY KEY',
+            'indexed': True
+        },
         'name': {
             'data': 'TEXT',
         },
-        'tmdb_id': {
-            'data': 'INTEGER',
-        },
-        'icon': {
+        'logo': {
             'data': 'TEXT',
         },
         'country': {
             'data': 'TEXT',
         },
-        'parent_id': {
-            'data': 'TEXT',
-        },
-        'FOREIGN KEY(parent_id)': {
-            'data': 'REFERENCES baseitem(id)',
-        },
-        'UNIQUE': {
-            'data': '(tmdb_id, parent_id)',
-        }
     }
 
     crewmember_columns = {
         'tmdb_id': {
             'data': 'INTEGER',
+            'foreign_key': 'person(tmdb_id)',
+            'indexed': True,
+            'unique': True
         },
         'role': {
             'data': 'TEXT',
@@ -386,26 +423,20 @@ class ItemDetailsDataBase(DataBase):
         'department': {
             'data': 'TEXT',
         },
-        'ordering': {
-            'data': 'INTEGER',
-        },
         'parent_id': {
             'data': 'TEXT',
+            'foreign_key': 'baseitem(id)',
+            'indexed': True,
+            'unique': True
         },
-        'FOREIGN KEY(parent_id)': {
-            'data': 'REFERENCES baseitem(id)',
-        },
-        'FOREIGN KEY(tmdb_id)': {
-            'data': 'REFERENCES person(tmdb_id)',
-        },
-        'UNIQUE': {
-            'data': '(tmdb_id, parent_id)',
-        }
     }
 
     castmember_columns = {
         'tmdb_id': {
             'data': 'INTEGER',
+            'foreign_key': 'person(tmdb_id)',
+            'indexed': True,
+            'unique': True
         },
         'role': {
             'data': 'TEXT',
@@ -415,16 +446,10 @@ class ItemDetailsDataBase(DataBase):
         },
         'parent_id': {
             'data': 'TEXT',
+            'foreign_key': 'baseitem(id)',
+            'indexed': True,
+            'unique': True
         },
-        'FOREIGN KEY(parent_id)': {
-            'data': 'REFERENCES baseitem(id)',
-        },
-        'FOREIGN KEY(tmdb_id)': {
-            'data': 'REFERENCES person(tmdb_id)',
-        },
-        'UNIQUE': {
-            'data': '(tmdb_id, parent_id)',
-        }
     }
 
     custom_columns = {
@@ -436,55 +461,85 @@ class ItemDetailsDataBase(DataBase):
         },
         'parent_id': {
             'data': 'TEXT',
+            'foreign_key': 'baseitem(id)',
+            'indexed': True
         },
-        'FOREIGN KEY(parent_id)': {
-            'data': 'REFERENCES baseitem(id)',
-        }
     }
 
     provider_columns = {
-        'name': {
-            'data': 'TEXT',
-        },
         'tmdb_id': {
             'data': 'INTEGER',
-        },
-        'display_priority': {
-            'data': 'INTEGER',
-        },
-        'iso': {
-            'data': 'TEXT',
-        },
-        'logo': {
-            'data': 'TEXT',
+            'foreign_key': 'service(tmdb_id)',
+            'unique': True
         },
         'availability': {
             'data': 'TEXT',
         },
         'parent_id': {
             'data': 'TEXT',
+            'foreign_key': 'baseitem(id)',
+            'indexed': True,
+            'unique': True
         },
-        'FOREIGN KEY(parent_id)': {
-            'data': 'REFERENCES baseitem(id)',
-        },
-        'UNIQUE': {
-            'data': '(tmdb_id, parent_id)',
-        }
     }
 
-    artwork_columns = {
-        'key': {
+    service_columns = {
+        'tmdb_id': {
+            'data': 'INTEGER PRIMARY KEY',
+            'indexed': True
+        },
+        'display_priority': {
+            'data': 'INTEGER',
+        },
+        'name': {
             'data': 'TEXT',
         },
-        'value': {
+        'iso_country': {
             'data': 'TEXT',
+        },
+        'logo': {
+            'data': 'TEXT',
+        },
+    }
+
+    art_columns = {
+        'aspect_ratio': {
+            'data': 'TEXT',
+            'indexed': True
+        },
+        'height': {
+            'data': 'INTEGER',
+        },
+        'width': {
+            'data': 'INTEGER',
+        },
+        'iso_language': {
+            'data': 'TEXT',
+            'indexed': True
+        },
+        'icon': {
+            'data': 'TEXT',
+        },
+        'type': {
+            'data': 'TEXT',
+            'indexed': True
+        },
+        'extension': {
+            'data': 'TEXT',
+            'indexed': True
+        },
+        'vote_average': {
+            'data': 'INTEGER',
+            'indexed': True
+        },
+        'vote_count': {
+            'data': 'INTEGER',
         },
         'parent_id': {
             'data': 'TEXT',
+            'foreign_key': 'baseitem(id)',
+            'indexed': True
         },
-        'FOREIGN KEY(parent_id)': {
-            'data': 'REFERENCES baseitem(id)',
-        }
     }
 
     unique_id_columns = {
@@ -496,30 +551,10 @@ class ItemDetailsDataBase(DataBase):
         },
         'parent_id': {
             'data': 'TEXT',
+            'foreign_key': 'baseitem(id)',
+            'indexed': True
         },
-        'FOREIGN KEY(parent_id)': {
-            'data': 'REFERENCES baseitem(id)',
-        }
     }
-
-    # TABLE, COLUMN
-    table_index = (
-        ('baseitem', 'id', ),
-        ('movie', 'id', ),
-        ('tvshow', 'id', ),
-        ('season', 'id', ),
-        ('episode', 'id', ),
-        ('ratings', 'id', ),
-        ('person', 'tmdb_id', ),
-        ('genre', 'parent_id', ),
-        ('studio', 'parent_id', ),
-        ('network', 'parent_id', ),
-        ('country', 'parent_id', ),
-        ('castmember', 'parent_id', ),
-        ('castmember', 'tmdb_id', ),
-        ('crewmember', 'parent_id', ),
-        ('crewmember', 'tmdb_id', ),
-    )
 
     @property
     def database_tables(self):
@@ -535,85 +570,49 @@ class ItemDetailsDataBase(DataBase):
             'country': self.country_columns,
             'studio': self.studio_columns,
             'network': self.network_columns,
+            'company': self.company_columns,
+            'video': self.video_columns,
+            'certification': self.certification_columns,
             'crewmember': self.crewmember_columns,
             'castmember': self.castmember_columns,
             'provider': self.provider_columns,
+            'service': self.service_columns,
             'custom': self.custom_columns,
-            'artwork': self.artwork_columns,
+            'art': self.art_columns,
             'unique_id': self.unique_id_columns,
         }
 
     def create_database_execute(self, connection):
+
+        def create_column_data(columns):
+            return [f'{k} {v["data"]}' for k, v in columns.items()]
+
+        def create_column_fkey(columns):
+            return [f'FOREIGN KEY({k}) REFERENCES {v["foreign_key"]} ON DELETE CASCADE' for k, v in columns.items() if 'foreign_key' in v]
+
+        def create_column_uids(columns):
+            keys = [k for k, v in columns.items() if v.get('unique')]
+            if not keys:
+                return []
+            return ['UNIQUE ({})'.format(', '.join(keys))]
+
         for table, columns in self.database_tables.items():
-            query = 'CREATE TABLE IF NOT EXISTS {}({})'
-            query = query.format(table, ', '.join([f'{k} {v["data"]}' for k, v in columns.items()]))
+            query = []
+            query += create_column_data(columns)
+            query += create_column_fkey(columns)
+            query += create_column_uids(columns)
+            query = 'CREATE TABLE IF NOT EXISTS {table}({query})'.format(table=table, query=', '.join(query))
             try:
                 connection.execute(query)
             except Exception as error:
                 self.kodi_log(f'CACHE: Exception while initializing _database: {error}\n{self._sc_name} - {query}', 1)
 
-        for table, column in self.table_index:
-            query = 'CREATE INDEX {table}_{column}_x ON {table}({column})'.format(table=table, column=column)
-            try:
-                connection.execute(query)
-            except Exception as error:
-                self.kodi_log(f'CACHE: Exception while initializing _database: {error}\n{self._sc_name} - {query}', 1)
-
-
-class ItemDetailsDataBaseCache(DataBaseCache):
-    cache_filename = 'ItemDetails.db'
-
-    table = None  # Table in database
-    conditions = ''  # WHERE conditions
-    values = ()  # WHERE conditions values for ?
-    keys = ()  # Keys to lookup
-    online_data_func = None  # The function to get data e.g. get_response_json
-    online_data_args = ()  # ARGS for online_data_func
-    online_data_kwgs = {}  # KWGS for online_data_func
-    data_cond = True  # Condition to retrieve any data
-
-    @cached_property
-    def cache(self):
-        return ItemDetailsDataBase(filename=self.cache_filename)
-
-    @cached_property
-    def window(self):
-        from jurialmunkey.window import WindowPropertySetter
-        return WindowPropertySetter()
-
-    @staticmethod
-    def get_base_id(tmdb_type, tmdb_id):
-        return f'{tmdb_type}.{tmdb_id}'
-
-    @staticmethod
-    def get_season_id(tmdb_type, tmdb_id, season):
-        return f'{tmdb_type}.{tmdb_id}.{season}'
-
-    @staticmethod
-    def get_episode_id(tmdb_type, tmdb_id, season, episode):
-        return f'{tmdb_type}.{tmdb_id}.{season}.{episode}'
-
-    @property
-    def online_data_cond(self):
-        """ condition to determine whether to retrieve online data - defaults to data_cond """
-        return self.data_cond
-
-    @cached_property
-    def online_data(self):
-        """ cache online data from func to property """
-        if not self.online_data_cond:
-            return
-        return self.online_data_func(*self.online_data_args, **self.online_data_kwgs)
-
-    def get_online_data(self):
-        """ function called when local cache does not have any data """
-        return self.online_data
-
-    @cached_property
-    def data(self):
-        if not self.data_cond:
-            return
-        return self.use_cached_many(
-            self.conditions, self.values, self.keys, self.table,
-            self.get_online_data
-        )
+        for table, columns in self.database_tables.items():
+            for column, v in columns.items():
+                if not v.get('indexed'):
+                    continue
+                query = 'CREATE INDEX {table}_{column}_x ON {table}({column})'.format(table=table, column=column)
+                try:
+                    connection.execute(query)
+                except Exception as error:
+                    self.kodi_log(f'CACHE: Exception while initializing _database: {error}\n{self._sc_name} - {query}', 1)

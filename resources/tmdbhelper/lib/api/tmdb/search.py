@@ -2,7 +2,7 @@ from xbmcgui import Dialog, INPUT_ALPHANUM
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized
 from jurialmunkey.parser import merge_two_dicts
 from tmdbhelper.lib.files.hcache import set_search_history, get_search_history
-from tmdbhelper.lib.items.container import Container
+from tmdbhelper.lib.items.container import ContainerDirectory
 from urllib.parse import urlencode
 
 
@@ -43,7 +43,7 @@ def get_searchdir(tmdb_type, clear_cache_item=True, append_type=False, **kwargs)
     return items
 
 
-class ListSearchDir(Container):
+class ListSearchDir(ContainerDirectory):
     def get_items(self, tmdb_type, **kwargs):  # list_searchdir_router
         self.plugin_category = get_localized(137)
         if kwargs.get('clear_cache') != 'True':
@@ -52,7 +52,7 @@ class ListSearchDir(Container):
         self.container_refresh = True
 
 
-class ListMultiSearchDir(Container):
+class ListMultiSearchDir(ContainerDirectory):
     def get_items(self, **kwargs):  # list_multisearchdir_router
         def _get_multisearchdir():
             lists = [get_searchdir(i, clear_cache_item=False, append_type=True) for i in MULTISEARCH_TYPES]
@@ -72,7 +72,7 @@ class ListMultiSearchDir(Container):
         self.container_refresh = True
 
 
-class ListSearch(Container):
+class ListSearch(ContainerDirectory):
     def get_items(self, tmdb_type, query=None, update_listing=False, page=None, **kwargs):
         original_query = query
 

@@ -43,7 +43,6 @@ class TraktSync:
         from tmdbhelper.lib.api.trakt.sync.datasync import SyncData
         return SyncData(self)
 
-
     @property
     def trakt_episodedata(self):
         try:

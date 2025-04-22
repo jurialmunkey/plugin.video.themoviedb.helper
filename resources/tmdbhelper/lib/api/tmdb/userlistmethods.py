@@ -8,13 +8,15 @@ class TMDbUserListMethods():
         if not response or not response.get('results'):
             return []
 
-        from tmdbhelper.lib.api.tmdb.mapping import get_imagepath_fanart
+        from tmdbhelper.lib.api.tmdb.images import TMDbImagePath
+
+        tmdb_imagepath = TMDbImagePath()
 
         def configure_item(i):
             i_name = i.get('name') or ''
             i_list_id = str(i.get('id') or '')
             i_user_id = self.authenticator.authorised_access.get('account_id')
-            i_artwork = get_imagepath_fanart(i.get('backdrop_path'))
+            i_artwork = tmdb_imagepath.get_imagepath_fanart(i.get('backdrop_path'))
 
             item = {}
             item['label'] = i_name

@@ -3,48 +3,150 @@
 from tmdbhelper.lib.api.mapping import _ItemMapper
 
 
-def split_array(items, subkeys=(), **kwargs):
-    if not items:
-        return ()
+class ItemMapperMethods:
 
-    for subkey in subkeys:
+    @staticmethod
+    def get_runtime(v, *args, **kwargs):
+        if isinstance(v, list):
+            v = v[0]
         try:
-            items = items[subkey]
-        except (TypeError, KeyError):
+            return int(v) * 60
+        except (TypeError, ValueError):
+            return 0
+
+    @staticmethod
+    def split_array(items, subkeys=(), **kwargs):
+        if not items:
             return ()
 
-    if not isinstance(items, list):
-        return ()
+        for subkey in subkeys:
+            try:
+                items = items[subkey]
+            except (TypeError, KeyError):
+                return ()
 
-    def get_item(i, v):
-        if not callable(v):
-            return i.get(v)
-        return v(i)
+        if not isinstance(items, list):
+            return ()
 
-    return [{k: get_item(i, v) for k, v in kwargs.items()} for i in items]
+        def get_item(i, v):
+            if not callable(v):
+                return i.get(v)
+            return v(i)
 
+        return [{k: get_item(i, v) for k, v in kwargs.items()} for i in items]
 
-def get_providers(items, **kwargs):
-    if not items:
-        return
-    results = items.get('results')
-    if not results:
-        return
-    data = []
-    for iso, availabilities in results.items():
-        for availability, datalist in availabilities.items():
-            if availability == 'link':
-                continue
-            for provider in datalist:
+    @staticmethod
+    def get_providers(items, service=False, **kwargs):
+        if not items:
+            return
+        results = items.get('results')
+        if not results:
+            return
+        data = []
+        for iso, availabilities in results.items():
+            for availability, datalist in availabilities.items():
+                if availability == 'link':
+                    continue
+                for provider in datalist:
+                    if service:
+                        item = {
+                            'iso_country': iso,
+                            'display_priority': provider.get('display_priority'),
+                            'name': provider.get('provider_name'),
+                            'logo': provider.get('logo_path'),
+                            'tmdb_id': provider.get('provider_id'),
+                        }
+                    else:
+                        item = {
+                            'availability': availability,
+                            'tmdb_id': provider.get('provider_id'),
+                        }
+                    data.append(item)
+        return data
+
+    @staticmethod
+    def get_certifications(items, **kwargs):
+        if not items:
+            return
+        results = items.get('results')
+        if not results:
+            return
+        data = []
+        tmdb_release_types = {1: 'Premiere', 2: 'Limited', 3: 'Theatrical', 4: 'Digital', 5: 'Physical', 6: 'TV'}
+        for release_country in results:
+            iso_country = release_country['iso_3166_1']
+            for release in (release_country.get('release_dates') or ()):
                 data.append({
-                    'iso': iso,
-                    'availability': availability,
-                    'display_priority': provider.get('display_priority'),
-                    'name': provider.get('provider_name'),
-                    'logo': provider.get('logo_path'),
-                    'tmdb_id': provider.get('provider_id'),
+                    'name': release['certification'],
+                    'iso_country': iso_country,
+                    'iso_language': release['iso_639_1'],
+                    'release_date': release['release_date'],
+                    'release_type': tmdb_release_types.get(release['type']),
                 })
-    return data
+        return data
+
+    @staticmethod
+    def get_video(items, **kwargs):
+        if not items:
+            return
+        results = items.get('results')
+        if not results:
+            return
+        data = []
+        for video in results:
+            if video['site'] != 'YouTube':
+                continue
+            data.append({
+                'name': video['name'],
+                'iso_country': video['iso_3166_1'],
+                'iso_language': video['iso_639_1'],
+                'release_date': video['published_at'],
+                'content': video['type'],
+                'path': f"plugin://plugin.video.youtube/play/?video_id={video['key']}",
+            })
+        return data
+
+    @staticmethod
+    def get_art(items, **kwargs):
+        if not items:
+            return
+        data = []
+
+        def get_aspect_ratio(aspect_ratio):
+            if aspect_ratio < 1:
+                return 'poster'
+            if aspect_ratio == 1:
+                return 'square'
+            if 1.7 <= aspect_ratio <= 1.8:
+                return 'landscape'
+            if aspect_ratio < 1.7:
+                return 'thumb'
+            if aspect_ratio > 1.8:
+                return 'wide'
+            return 'other'
+
+        for artwork_type, artworks in items.items():
+            for artwork in artworks:
+                path = artwork['file_path']
+                data.append({
+                    'aspect_ratio': get_aspect_ratio(artwork['aspect_ratio']),
+                    'height': artwork['height'],
+                    'width': artwork['width'],
+                    'iso_language': artwork['iso_639_1'],
+                    'icon': path,
+                    'type': artwork_type,
+                    'extension': path.split('.')[-1] if path else None,
+                    'vote_average': int(artwork['vote_average'] * 100),
+                    'vote_count': artwork['vote_count'],
+                })
+
+        return data
+
+    @staticmethod
+    def get_unique_ids(results, **kwargs):
+        if not results:
+            return
+        return [{'key': ('tmdb_id' if k == 'id' else k).replace('_id', ''), 'value': f'{v}'} for k, v in results.items()]
 
 
 class BlankNoneDict(dict):
@@ -52,21 +154,7 @@ class BlankNoneDict(dict):
         return None
 
 
-def get_empty_item():
-    return {
-        'item': BlankNoneDict(),
-        'genre': (),
-        'country': (),
-        'studio': (),
-        'network': (),
-        'provider': (),
-        'castmember': (),
-        'crewmember': (),
-        'person': [],
-    }
-
-
-class ItemMapper(_ItemMapper):
+class ItemMapper(_ItemMapper, ItemMapperMethods):
     def __init__(self):
         self.blacklist = ()
         """ Mapping dictionary
@@ -89,53 +177,109 @@ class ItemMapper(_ItemMapper):
                 'keys': [('item', 'year')],
                 'func': lambda v: int(v[0:4])
             }],
+            'first_air_date': [{
+                'keys': [('item', 'premiered')]}, {
+                'keys': [('item', 'year')],
+                'func': lambda v: int(v[0:4])
+            }],
+            'air_date': [{
+                'keys': [('item', 'premiered')]}, {
+                'keys': [('item', 'year')],
+                'func': lambda v: int(v[0:4])
+            }],
+            'episode_run_time': [{
+                'keys': [('item', 'duration')],
+                'func': self.get_runtime
+            }],
+            'runtime': [{
+                'keys': [('item', 'duration')],
+                'func': self.get_runtime
+            }],
             'genres': [{
                 'keys': [('genre', None)],
-                'func': split_array,
+                'func': self.split_array,
                 'kwargs': {'name': 'name', 'tmdb_id': 'id'}
+            }],
+            'content_ratings': [{
+                'keys': [('certification', None)],
+                'func': self.split_array,
+                'kwargs': {
+                    'subkeys': ('results', ),
+                    'name': 'rating', 'iso_country': 'iso_3166_1'}
+            }],
+            'release_dates': [{
+                'keys': [('certification', None)],
+                'func': self.get_certifications,
             }],
             'production_countries': [{
                 'keys': [('country', None)],
-                'func': split_array,
-                'kwargs': {'name': 'name', 'iso': 'iso_3166_1'}
+                'func': self.split_array,
+                'kwargs': {'name': 'name', 'iso_country': 'iso_3166_1'}
             }],
             'production_companies': [{
                 'keys': [('studio', None)],
-                'func': split_array,
-                'kwargs': {'name': 'name', 'tmdb_id': 'id', 'icon': 'logo_path', 'country': 'origin_country'}
+                'func': self.split_array,
+                'kwargs': {'tmdb_id': 'id'}}, {
+                # ---
+                'keys': [('company', None)],
+                'extend': True,
+                'func': self.split_array,
+                'kwargs': {'tmdb_id': 'id', 'name': 'name', 'logo': 'logo_path', 'country': 'origin_country'}
             }],
             'networks': [{
                 'keys': [('network', None)],
-                'func': split_array,
-                'kwargs': {'name': 'name', 'tmdb_id': 'id', 'icon': 'logo_path', 'country': 'origin_country'}
+                'func': self.split_array,
+                'kwargs': {'tmdb_id': 'id'}}, {
+                # ---
+                'keys': [('company', None)],
+                'extend': True,
+                'func': self.split_array,
+                'kwargs': {'tmdb_id': 'id', 'name': 'name', 'logo': 'logo_path', 'country': 'origin_country'}
             }],
             'watch/providers': [{
                 'keys': [('provider', None)],
-                'func': get_providers,
+                'func': self.get_providers}, {
+                # ---
+                'keys': [('service', None)],
+                'extend': True,
+                'func': self.get_providers,
+                'kwargs': {'service': True}
+            }],
+            'images': [{
+                'keys': [('art', None)],
+                'func': self.get_art,
+            }],
+            'external_ids': [{
+                'keys': [('unique_id', None)],
+                'func': self.get_unique_ids,
+            }],
+            'videos': [{
+                'keys': [('video', None)],
+                'func': self.get_video,
             }],
             'credits': [{
                 'keys': [('castmember', None)],
-                'func': split_array,
+                'func': self.split_array,
                 'kwargs': {
                     'subkeys': ('cast', ),
                     'tmdb_id': 'id', 'role': 'character', 'ordering': 'order'}}, {
                 # ---
                 'keys': [('person', None)],
                 'extend': True,
-                'func': split_array,
+                'func': self.split_array,
                 'kwargs': {
                     'subkeys': ('cast', ),
                     'tmdb_id': 'id', 'thumb': 'profile_path', 'name': 'name', 'gender': 'gender', 'known_for_department': 'known_for_department'}}, {
                 # ---
                 'keys': [('crewmember', None)],
-                'func': split_array,
+                'func': self.split_array,
                 'kwargs': {
                     'subkeys': ('crew', ),
-                    'tmdb_id': 'id', 'role': 'job', 'department': 'department', 'ordering': 'order'}}, {
+                    'tmdb_id': 'id', 'role': 'job', 'department': 'department'}}, {
                 # ---
                 'keys': [('person', None)],
                 'extend': True,
-                'func': split_array,
+                'func': self.split_array,
                 'kwargs': {
                     'subkeys': ('crew', ),
                     'tmdb_id': 'id', 'thumb': 'profile_path', 'name': 'name', 'gender': 'gender', 'known_for_department': 'known_for_department'}
@@ -153,9 +297,30 @@ class ItemMapper(_ItemMapper):
             'status': ('item', 'status'),
             'season_number': ('item', 'season'),
             'episode_number': ('item', 'episode'),
+            'episode_type': ('item', 'status'),
+        }
+
+    @staticmethod
+    def get_empty_item():
+        return {
+            'item': BlankNoneDict(),
+            'genre': (),
+            'country': (),
+            'company': [],
+            'studio': (),
+            'network': (),
+            'provider': (),
+            'certification': (),
+            'service': [],
+            'video': (),
+            'castmember': (),
+            'crewmember': (),
+            'unique_id': [],
+            'person': [],
+            'art': (),
         }
 
     def get_info(self, data, **kwargs):
-        item = get_empty_item()
+        item = self.get_empty_item()
         item = self.map_item(item, data)
         return item

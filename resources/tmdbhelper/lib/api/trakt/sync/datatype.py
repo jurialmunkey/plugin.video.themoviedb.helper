@@ -1,4 +1,4 @@
-from functools import cached_property
+from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp
 from tmdbhelper.lib.api.trakt.sync.activity import SyncLastActivities
 from tmdbhelper.lib.files.locker import mutexlock
@@ -19,7 +19,7 @@ def timerlock(func):
 
 def progress_bg(func):
     def wrapper(self, *args, **kwargs):
-        from tmdbhelper.lib.api.trakt.sync.dialogbg import DialogProgressSyncBG
+        from tmdbhelper.lib.addon.dialog import DialogProgressSyncBG
         self.dialog_progress_bg = DialogProgressSyncBG()
         self.dialog_progress_bg.heading = f'Syncing {self.item_type} {self.method}'
         self.dialog_progress_bg.create()
@@ -93,7 +93,7 @@ class DataType:
         return (self.last_activities_item_type, self.last_activities_key, )
 
     def clear_columns(self, keys):
-        self.cache.del_column_values(keys, self.item_type)
+        self.cache.del_column_values(keys=keys, item_type=self.item_type)
         self.clear_child_columns(keys)
 
     def clear_child_columns(self, keys):
@@ -130,7 +130,7 @@ class DataType:
         data = item.data
 
         self.dialog_progress_bg.update(80, message='Updating Data')
-        self.cache.set_many_values(item.table_keys, data)
+        self.cache.set_many_values(keys=item.table_keys, data=data)
 
         return (item.table_keys, data, )
 
@@ -145,8 +145,8 @@ class DataType:
 class DataTypeEpisodes(DataType):
     def clear_child_columns(self, keys):
         if self.item_type == 'show':
-            self.cache.del_column_values(keys, 'season')
-            self.cache.del_column_values(keys, 'episode')
+            self.cache.del_column_values(keys=keys, item_type='season')
+            self.cache.del_column_values(keys=keys, item_type='episode')
 
     @property
     def last_activities_item_type(self):

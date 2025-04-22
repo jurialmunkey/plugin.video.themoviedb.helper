@@ -1,7 +1,7 @@
 from xbmcgui import Dialog
+from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.api.fanarttv.api import ARTWORK_TYPES, get_encoded_url
-from tmdbhelper.lib.api.tmdb.mapping import get_imagepath_poster, get_imagepath_fanart, get_imagepath_thumb, get_imagepath_logo
 from tmdbhelper.lib.addon.dialog import BusyDialog
 from tmdbhelper.lib.addon.plugin import get_localized, executebuiltin
 from tmdbhelper.lib.addon.tmdate import set_timestamp
@@ -9,6 +9,11 @@ from jurialmunkey.window import get_property
 
 
 class _ArtworkSelector():
+    @cached_property
+    def tmdb_imagepath(self):
+        from tmdbhelper.lib.api.tmdb.images import TMDbImagePath
+        return TMDbImagePath()
+
     def get_ftv_art(self, ftv_type, ftv_id, artwork_type, season=None):
         ftv_items = self.ftv_api.get_all_artwork(ftv_id, ftv_type, season=season, artlist_type=artwork_type, season_type='season_only')
         return [
@@ -20,10 +25,10 @@ class _ArtworkSelector():
 
     def get_tmdb_art(self, tmdb_type, tmdb_id, artwork_type, season=None):
         mappings = {
-            'poster': {'func': get_imagepath_poster, 'key': 'posters'},
-            'fanart': {'func': get_imagepath_fanart, 'key': 'backdrops'},
-            'landscape': {'func': get_imagepath_thumb, 'key': 'backdrops'},
-            'clearlogo': {'func': get_imagepath_logo, 'key': 'logos'}}
+            'poster': {'func': self.tmdb_imagepath.get_imagepath_poster, 'key': 'posters'},
+            'fanart': {'func': self.tmdb_imagepath.get_imagepath_fanart, 'key': 'backdrops'},
+            'landscape': {'func': self.tmdb_imagepath.get_imagepath_thumbs, 'key': 'backdrops'},
+            'clearlogo': {'func': self.tmdb_imagepath.get_imagepath_clogos, 'key': 'logos'}}
         if artwork_type not in mappings:
             return []
         tmdb_iargs = ['images'] if season is None else ['season', season, 'images']
