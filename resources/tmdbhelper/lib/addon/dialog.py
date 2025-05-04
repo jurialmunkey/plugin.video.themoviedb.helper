@@ -1,4 +1,4 @@
-from tmdbhelper.lib.files.ftools import cached_property
+from tmdbhelper.lib.files.ftools import threaded_cached_property
 from tmdbhelper.lib.addon.logger import kodi_log
 import jurialmunkey.dialog as jurialmunkey_dialog
 """ Top level module only import plugin/constants/logger """
@@ -24,15 +24,15 @@ class DialogProgressSyncBG:
     now_value = 0
     heading = ''
 
-    @cached_property
+    @threaded_cached_property
     def dialog_progress_bg_enabled(self):
         from tmdbhelper.lib.addon.plugin import get_setting
         return get_setting('sync_notifications')
 
-    @cached_property
+    @threaded_cached_property
     def dialog_progress_bg(self):
-        if not self.dialog_progress_bg_enabled:
-            return
+        # if not self.dialog_progress_bg_enabled:
+        #     return
         from xbmcgui import DialogProgressBG
         return DialogProgressBG()
 

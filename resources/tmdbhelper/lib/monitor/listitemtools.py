@@ -1,13 +1,11 @@
 import xbmcgui
-from tmdbhelper.lib.addon.plugin import get_infolabel, get_condvisibility, get_localized, get_setting, get_skindir
+from tmdbhelper.lib.addon.plugin import get_infolabel, get_condvisibility, get_localized, get_skindir
 from tmdbhelper.lib.addon.logger import kodi_try_except
 from jurialmunkey.window import get_property, get_current_window
-from tmdbhelper.lib.monitor.common import CommonMonitorFunctions, SETMAIN_ARTWORK, SETPROP_RATINGS
+from tmdbhelper.lib.monitor.common import CommonMonitorFunctions
 from tmdbhelper.lib.monitor.itemdetails import ListItemDetails
-from tmdbhelper.lib.monitor.readahead import ListItemReadAhead, READAHEAD_CHANGED
 from tmdbhelper.lib.monitor.baseitem import BaseItemSkinDefaults
 from tmdbhelper.lib.items.listitem import ListItem
-from tmdbhelper.lib.files.bcache import BasicCache
 from tmdbhelper.lib.addon.thread import SafeThread
 
 CV_USE_LISTITEM = (
@@ -110,16 +108,11 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         self._pre_item = 1
         self._cur_window = 0
         self._pre_window = 1
-        self._cache = BasicCache(filename=f'QuickService.db')
         self._ignored_labels = ['..', get_localized(33078).lower(), get_localized(209).lower()]
         self._listcontainer = None
         self._last_listitem = None
-        self._readahead = None
         self._item = None
         self.property_prefix = 'ListItem'
-        self._clearfunc_wp = {'func': None}
-        self._clearfunc_lc = {'func': None}
-        self._readahead_li = get_setting('service_listitem_read_ahead')  # Allows readahead queue of next ListItems when idle
         self._pre_artwork_thread = None
         self._baseitem_skindefaults = BaseItemSkinDefaults()
         self._parent = parent
@@ -180,9 +173,6 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
     # FUNCTIONS
     # =========
 
-    def clear_properties(self, ignore_keys=None):
-        super().clear_properties(ignore_keys=ignore_keys)
-
     def add_item_listcontainer(self, listitem, window_id=None, container_id=None):
         try:
             _win = xbmcgui.Window(window_id or self._cur_window)  # Note get _win separate from _lst
@@ -222,7 +212,6 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
 
         def _process_ratings():
             _ratings = _item.get_all_ratings() or {}
-            _ratings = _ratings.get('infoproperties')
             _detailed['ratings'] = _ratings
 
         def _process_artwork_ratings():
@@ -261,63 +250,33 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         if _pre_item != self.cur_item:
             return
 
-        # Proces artwork in a thread
-        def _process_artwork():
-            _artwork = _item.get_builtartwork()
-            _artwork_properties = set()
+        def process_ratings():
+            ratings_item = {'ratings': _item.get_all_ratings() or {}}
 
             if _pre_item != self.cur_item:
                 return
 
             with self._parent.mutex_lock:
-                self._parent.images_monitor.remote_artwork[_pre_item] = _artwork.copy()
-                self._parent.images_monitor.update_artwork()
-                self.set_iter_properties(_artwork, SETMAIN_ARTWORK, property_object=_artwork_properties)
-                self.clear_property_list(SETMAIN_ARTWORK.difference(_artwork_properties))
+                self.set_ratings_properties(ratings_item)
 
-        # Process ratings in a thread
-        def _process_ratings():
-            _details = _item.get_all_ratings() or {}
-            _ratings_properties = set()
-
-            with self._parent.mutex_lock:
-                if _pre_item != self.cur_item:
-                    return
-                self.set_iter_properties(_details.get('infoproperties', {}), SETPROP_RATINGS, property_object=_ratings_properties)
-                self.clear_property_list(SETPROP_RATINGS.difference(_ratings_properties))
-
-        def _process_artwork_ratings():
+        def process_ratings_thread():
             self.get_property('IsUpdatingRatings', 'True')
-
-            # Thread ratings and artwork processing
-            t_artwork = SafeThread(target=_process_artwork) if process_artwork else None
-            t_ratings = SafeThread(target=_process_ratings) if process_ratings else None
-            t_artwork.start() if t_artwork else None
-            t_ratings.start() if t_ratings else None
-
-            # Wait for threads to join before readding listitem
-            t_artwork.join() if t_artwork else None
-            t_ratings.join() if t_ratings else None
-
+            process_ratings()
             self.get_property('IsUpdatingRatings', clear_property=True)
 
-        if process_artwork or process_ratings:
-            t = SafeThread(target=_process_artwork_ratings)
+        # Process ratings in thread to avoid holding up main loop
+        if process_ratings:
+            t = SafeThread(target=process_ratings_thread)
             t.start()
 
         with self._parent.mutex_lock:
-            # Copy previous properties for clearing intersection
-            prev_properties = self.properties.copy()
-            self.properties = set()
+            # Add remote artwork to artwork monitor and update in case local items doesn't have some artwork types
+            if process_artwork and _item._itemdetails.artwork:
+                self._parent.images_monitor.remote_artwork[_pre_item] = _item._itemdetails.artwork.copy()
+                self._parent.images_monitor.update_artwork(forced=True)
 
-            # Set our properties
-            self.set_properties(_item._itemdetails.listitem, self.baseitem_properties)
-
-            ignore_keys = prev_properties.intersection(self.properties)
-            ignore_keys.update(SETPROP_RATINGS)
-            ignore_keys.update(SETMAIN_ARTWORK)
-            for k in prev_properties - ignore_keys:
-                self.clear_property(k)
+            # Set the main properties
+            self.set_properties(_item._itemdetails.listitem)
 
     def on_finalise(self):
         func = self.on_finalise_listcontainer if self._listcontainer else self.on_finalise_winproperties
@@ -325,31 +284,6 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
             process_artwork=get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"),
             process_ratings=get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"))
         self.get_property('IsUpdating', clear_property=True)
-
-    def on_readahead(self):
-        # No readahead if disabled by user
-        if not self._readahead_li:
-            return
-
-        # No readahead in info dialog
-        if get_condvisibility(CV_USE_LISTITEM):
-            return
-
-        # No readahead has started so let's start one
-        if not self._readahead:
-            self._readahead = ListItemReadAhead(self, self._cur_window, self._cur_item)
-
-        # Readahead next item and if the main item changes in the meantime we reset to None
-        def _next_readahead():
-            if self._readahead._locked:
-                return
-            if self._readahead.next_readahead() != READAHEAD_CHANGED:
-                return
-            self._readahead = None
-
-        # Readahead is threaded to avoid locking up main lookup while loop
-        t = SafeThread(target=_next_readahead)
-        t.start()
 
     @kodi_try_except('lib.monitor.listitem.on_listitem')
     def on_listitem(self):
@@ -361,7 +295,7 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
 
         # Check if the item has changed before retrieving details again
         if self.is_same_window(update=True) and self.is_same_item(update=True):
-            return self.on_readahead()
+            return
 
         # Ignore some special folders like next page and parent folder
         if (self.get_infolabel('Label') or '').lower().split(' (', 1)[0] in self._ignored_labels:
@@ -374,8 +308,7 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         self.setup_current_item()
 
         # Get item details
-        uncached_func = self._clearfunc_lc if self._listcontainer else self._clearfunc_wp
-        self._item.get_itemdetails(**uncached_func)
+        self._item.get_itemdetails()
 
         # Get library stats for person
         if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisablePersonStats)"):

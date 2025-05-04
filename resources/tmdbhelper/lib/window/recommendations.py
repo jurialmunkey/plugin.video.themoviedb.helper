@@ -10,8 +10,8 @@ from jurialmunkey.window import get_property, WindowProperty, wait_until_active
 from jurialmunkey.parser import parse_paramstring, reconfigure_legacy_params
 
 
-TMDB_QUERY_PARAMS = ('imdb_id', 'tvdb_id', 'query', 'year', 'episode_year',)
-TMDB_AFFIX = '&fanarttv=false&cacheonly=true'
+TMDB_QUERY_PARAMS = ('imdb_id', 'tvdb_id', 'query', 'year', )
+TMDB_AFFIX = '&cacheonly=true'
 PROP_LIST_VISIBLE = 'List_{}_Visible'
 PROP_LIST_ISUPDATING = 'List_{}_IsUpdating'
 PROP_HIDEINFO = 'Recommendations.HideInfo'
@@ -93,7 +93,7 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
         self._tmdb_type = get_property(PROP_TMDBTYPE, kwargs['tmdb_type'])
         self._tmdb_affix = f"&nextpage=false{kwargs.get('affix') or TMDB_AFFIX}"
         self._tmdb_query = {i: kwargs[i] for i in TMDB_QUERY_PARAMS if kwargs.get(i)}
-        self._tmdb_id = kwargs.get('tmdb_id') or self._tmdb_api.get_tmdb_id(tmdb_type=self._tmdb_type, **self._tmdb_query)
+        self._tmdb_id = kwargs.get('tmdb_id') or self._tmdb_api.tmdb_database.get_tmdb_id(tmdb_type=self._tmdb_type, **self._tmdb_query)
         self._recommendations = {
             rv.list_id: rv.output_dictionary
             for rv in (RecommendationsValues(*i.split('|')) for i in sorted(kwargs['recommendations'].split('||')))
@@ -295,7 +295,7 @@ class WindowRecommendationsManager():
     def on_info_new(self):
         _tmdb_type = self._kwargs['tmdb_type']
         _tmdb_query = {i: self._kwargs[i] for i in TMDB_QUERY_PARAMS if self._kwargs.get(i)}
-        _tmdb_id = self._kwargs.get('tmdb_id') or TMDb().get_tmdb_id(tmdb_type=_tmdb_type, **_tmdb_query)
+        _tmdb_id = self._kwargs.get('tmdb_id') or TMDb().tmdb_database.get_tmdb_id(tmdb_type=_tmdb_type, **_tmdb_query)
         if not _tmdb_type or not _tmdb_id:
             return
         self.dump_kwargs(update_current_dump=True)

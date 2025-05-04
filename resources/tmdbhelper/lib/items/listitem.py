@@ -2,9 +2,8 @@ from xbmcgui import ListItem as KodiListItem
 from jurialmunkey.parser import try_int, merge_two_dicts
 from infotagger.listitem import ListItemInfoTag
 from tmdbhelper.lib.addon.consts import ACCEPTED_MEDIATYPES, PARAM_WIDGETS_RELOAD, PARAM_WIDGETS_RELOAD_FORCED
-from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_media_type, get_setting, get_condvisibility, get_localized, encode_url, get_flatseasons_info_param, GlobalSettingsDict
+from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_media_type, get_condvisibility, get_localized, encode_url, get_flatseasons_info_param, GlobalSettingsDict
 from tmdbhelper.lib.addon.tmdate import is_unaired_timestamp
-from tmdbhelper.lib.addon.logger import kodi_log
 from jurialmunkey.window import get_property
 
 """ Lazyimports
@@ -16,7 +15,6 @@ global_setting = GlobalSettingsDict()
 global_setting.route = {
     'is_skinshortcuts': (lambda: get_condvisibility("Window.IsVisible(script-skinshortcuts.xml)") or get_property('IsSkinShortcut'), None, ),
     'is_skinshortcuts_standard': (lambda: global_setting['is_skinshortcuts'] and get_property('IsStandardSkinShortcut'), None, ),
-    'default_select': (get_setting, ('default_select', 'int', )),
     'flatseasons_info_param': (get_flatseasons_info_param, None, )
 }
 
@@ -114,11 +112,8 @@ class _ListItem(object):
     def episode(self):
         return
 
-    def is_unaired(self, format_label=None, no_date=True):
+    def format_unaired_label(self, format_label=None, no_date=True):
         return
-
-    def unaired_bool(self):
-        return False
 
     def set_context_menu(self, additions=None):
         from tmdbhelper.lib.items.context import ContextMenu
@@ -156,8 +151,11 @@ class _ListItem(object):
         if self.params.get('info') == 'search' and not self.params.get('query'):
             self.params['reload'] = 'forced'
 
-    def set_params_reroute(self, is_fanarttv=False, extended=None, is_cacheonly=False):
-        if global_setting['is_skinshortcuts'] and self.path.startswith(PLUGINPATH):
+    def set_params_reroute(self, extended=None, is_cacheonly=False):
+        if not self.path.startswith(PLUGINPATH):
+            return
+
+        if global_setting['is_skinshortcuts']:
             self._set_params_reroute_skinshortcuts()
 
         # Reroute for extended sorting of trakt list by inprogress to open up next folder
@@ -173,8 +171,6 @@ class _ListItem(object):
             return
         if is_cacheonly:
             self.params['cacheonly'] = is_cacheonly
-        if is_fanarttv:
-            self.params['fanarttv'] = is_fanarttv
             return
 
     def _set_params_reroute_details(self):
@@ -212,6 +208,8 @@ class _ListItem(object):
         return _get_url(self.path, **self.params)
 
     def get_listitem(self, offscreen=True):
+        if self.infolabels.get('mediatype') == 'person':
+            self.infolabels['mediatype'] = 'video'
         if self.infolabels.get('mediatype') not in ACCEPTED_MEDIATYPES:
             self.infolabels.pop('mediatype', None)
         self.infolabels['path'] = self.get_url()
@@ -285,23 +283,18 @@ class _Collection(_ListItem):
 
 
 class _Video(_ListItem):
-    def is_unaired(self, format_label=u'[COLOR=ffcc0000][I]{}[/I][/COLOR]', no_date=True):
-        try:
-            if not is_unaired_timestamp(self.infolabels.get('premiered'), no_date):
-                return
-            if format_label:
-                self.label = format_label.format(self.label)
-        except Exception as exc:
-            kodi_log(f'Error: {exc}', 1)
-        return self.unaired_bool()
+    def format_unaired_label(self, format_label=u'[COLOR=ffcc0000][I]{}[/I][/COLOR]', no_date=True):
+        if not format_label:
+            return
+        if not is_unaired_timestamp(self.infolabels.get('premiered'), no_date):
+            return
+        self.label = format_label.format(self.label)
+        return self.label
 
     def _set_params_reroute_default(self):
-        if not global_setting['default_select']:
-            self.params['info'] = 'play'
-            if not global_setting['only_resolve_strm']:
-                self.infoproperties['isPlayable'] = 'true'
-        else:
-            self.params['info'] = 'related'
+        self.params['info'] = 'play'
+        if not global_setting['only_resolve_strm']:
+            self.infoproperties['isPlayable'] = 'true'
         self.is_folder = False
         self.context_menu.insert(0, (
             '$ADDON[plugin.video.themoviedb.helper 32322]',
@@ -330,16 +323,7 @@ class _Movie(_Video):
         return self.unique_ids.get('tmdb')
 
     def set_playcount(self, playcount):
-        playcount = try_int(playcount)
-        # Setting playcount to 0 overrides internal playcount from Kodi to allow Trakt to set unwatched
-        # Not setting playcount at all will allow Kodi to manage internally instead
-        if not global_setting['trakt_watchedindicators'] and not playcount:
-            return
-        self.infolabels['playcount'] = playcount
-
-    def unaired_bool(self):
-        if global_setting['hide_unaired_movies']:
-            return True
+        self.infolabels['playcount'] = try_int(playcount)
 
     def _set_params_reroute_details(self):
         self._set_contextmenu_choosedefault('movie', self.unique_ids.get('tmdb'))
@@ -373,16 +357,8 @@ class _Tvshow(_Video):
         if season_count > 0:
             self.infoproperties['totalseasons'] = season_count
 
-    def unaired_bool(self):
-        if global_setting['hide_unaired_episodes']:
-            return True
-
     def _set_params_reroute_details(self):
         self._set_contextmenu_choosedefault('tv', self.unique_ids.get('tmdb'))
-        if global_setting['default_select']:
-            self.params['info'] = 'related'
-            self.is_folder = False
-            return
         self.params['info'] = global_setting['flatseasons_info_param']
 
 

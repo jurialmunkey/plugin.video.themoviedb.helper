@@ -1,10 +1,11 @@
+from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.api.request import RequestAPI
 from tmdbhelper.lib.api.api_keys.mdblist import API_KEY
 from tmdbhelper.lib.addon.plugin import ADDONPATH
-from tmdbhelper.lib.items.itemlist import ItemListPagination, ListPagination
+from tmdbhelper.lib.items.itemlist import ItemListPagination, ItemListPaginationBasic
 
 
-class MDbListPaginationLists(ListPagination):
+class MDbListPaginationLists(ItemListPaginationBasic):
     """ Paginates and configures items in a list of lists """
 
     @staticmethod
@@ -26,17 +27,9 @@ class MDbListPaginationLists(ListPagination):
             item['params']['dynamic'] = 'true'
         return item
 
-    @property
+    @cached_property
     def items(self):
-        try:
-            return self._items
-        except AttributeError:
-            self.update_pagination()
-            return self._items
-
-    def update_pagination(self):
-        self._paginated_items = self.get_updated_pagination()
-        self._items = [j for j in (self.map_item(i) for i in self.paginated_items.items) if j]
+        return [j for j in (self.map_item(i) for i in self.paginated_items.items) if j]
 
 
 class MDbListRatingMapping():
@@ -44,6 +37,13 @@ class MDbListRatingMapping():
         'tomatoes': 'rottentomatoes_rating',
         'tomatoesaudience': 'rottentomatoes_usermeter',
         'popcorn': 'rottentomatoes_usermeter'}
+
+    ratings_func = {
+        'imdb': lambda v: int(v * 10),  # Convert out of /10 to 100%
+        'metacriticuser': lambda v: int(v * 10),  # Convert out of /10 to 100%
+        'letterboxd': lambda v: int(v * 20),  # Convert 5 stars to 100%
+        'rogerebert': lambda v: int(v * 25),  # Convert 4 stars to 100%
+    }
 
     def __init__(self, meta):
         self.meta = meta
@@ -72,7 +72,8 @@ class MDbListRatingMapping():
             except KeyError:
                 continue
             if i.get('value'):
-                ratings[self.ratings_translation.get(name) or f'{name}_rating'] = i['value']
+                func = self.ratings_func.get(name) or (lambda v: v)
+                ratings[self.ratings_translation.get(name) or f'{name}_rating'] = func(i['value'])
             if i.get('votes'):
                 ratings[f'{name}_votes'] = i['votes']
 
@@ -89,7 +90,7 @@ class MDbList(RequestAPI):
 
         super(MDbList, self).__init__(
             req_api_key=f'apikey={api_key}',
-            req_api_name='MDbList.v2',
+            req_api_name='MDbList',
             req_api_url='https://api.mdblist.com')  # OLD API = https://mdblist.com/api
         MDbList.api_key = api_key
 

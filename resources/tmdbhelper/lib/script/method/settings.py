@@ -12,10 +12,11 @@ def configure_provider_allowlist():
     def _get_available_providers():
         available_providers = set()
         for tmdb_type in ['movie', 'tv']:
-            results = tmdb_api.get_request_lc('watch/providers', tmdb_type, watch_region=tmdb_api.iso_country).get('results')
-            if not results:
+
+            data = tmdb_api.tmdb_database.get_watch_providers(tmdb_type, tmdb_api.iso_country)
+            if not data:
                 continue
-            available_providers |= {i.get('provider_name') for i in results}
+            available_providers |= {i.get('provider_name') for i in data}
         return available_providers
 
     available_providers = _get_available_providers()

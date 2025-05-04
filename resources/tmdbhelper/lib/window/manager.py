@@ -326,7 +326,7 @@ class WindowManager(_EventLoop):
                 return
             query = split_str[x]
         with BusyDialog():
-            tmdb_id = TMDb().get_tmdb_id_from_query(tmdb_type, query, header=query, use_details=True, auto_single=True)
+            tmdb_id = TMDb().tmdb_database.get_tmdb_id_from_query(tmdb_type, query, header=query, use_details=True, auto_single=True)
         if not tmdb_id:
             Dialog().notification('TMDbHelper', get_localized(32310).format(query))
             return

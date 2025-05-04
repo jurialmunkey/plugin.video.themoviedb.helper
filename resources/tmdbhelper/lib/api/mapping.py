@@ -14,22 +14,21 @@ def get_empty_item():
         'context_menu': []}
 
 
-def set_show(item, base_item=None, is_season=False):
+def set_show(item, base_item=None):
     if not base_item:
         return item
     item['art'].update(
-        {f'{"" if k.startswith("tvshow.") else "season." if is_season else "tvshow."}{k}': v for k, v in base_item.get('art', {}).items()})
+        {f'{"" if k.startswith("tvshow.") else "tvshow."}{k}': v for k, v in base_item.get('art', {}).items()})
     item['unique_ids'].update(
-        {f'{"" if k.startswith("tvshow.") else "season." if is_season else "tvshow."}{k}': v for k, v in base_item.get('unique_ids', {}).items()})
+        {f'{"" if k.startswith("tvshow.") else "tvshow."}{k}': v for k, v in base_item.get('unique_ids', {}).items()})
     item['infoproperties'].update(
-        {f'{"" if k.startswith("tvshow.") else "season." if is_season else "tvshow."}{k}': v for k, v in base_item.get('infolabels', {}).items() if type(v) not in [dict, list, tuple]})
+        {f'{"" if k.startswith("tvshow.") else "tvshow."}{k}': v for k, v in base_item.get('infolabels', {}).items() if type(v) not in [dict, list, tuple]})
     item['infolabels']['tvshowtitle'] = base_item['infolabels'].get('tvshowtitle') or base_item['infolabels'].get('title')
-    # item['unique_ids']['tmdb'] = item['unique_ids'].get('tvshow.tmdb')
     return item
 
 
 class _ItemMapper(object):
-    def add_base(self, item, base_item=None, tmdb_type=None, key_blacklist=[], is_season=False):
+    def add_base(self, item, base_item=None, tmdb_type=None, key_blacklist=[]):
         if not base_item:
             return item
         for d in ['infolabels', 'infoproperties', 'art']:
@@ -40,7 +39,7 @@ class _ItemMapper(object):
                     continue
                 item[d][k] = v
         if tmdb_type in ['season', 'episode', 'tv']:
-            return set_show(item, base_item, is_season=is_season)
+            return set_show(item, base_item)
         return item
 
     def map_item(self, item, i):

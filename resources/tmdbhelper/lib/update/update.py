@@ -32,7 +32,6 @@ def clean_content(content, details='info=play'):
     content = content.replace('info=related', details)
     content = content.replace('info=flatseasons', details)
     content = content.replace('info=details', details)
-    content = content.replace('fanarttv=True', '')
     content = content.replace('widget=True', '')
     content = content.replace('localdb=True', '')
     content = content.replace('nextpage=True', '')

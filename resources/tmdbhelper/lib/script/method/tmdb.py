@@ -40,3 +40,21 @@ def sync_tmdb_item(tmdb_type=None, tmdb_id=None, season=None, episode=None, sync
     tmdb_user_api = TMDbUser()
     func = getattr(tmdb_user_api, TMDB_USER_API_ROUTES[sync_type]['func'])
     func(tmdb_type=tmdb_type, tmdb_id=tmdb_id, season=season, episode=episode)
+
+
+def refresh_item(tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
+    from tmdbhelper.lib.script.method.kodi_utils import container_refresh
+    from tmdbhelper.lib.addon.plugin import get_localized, convert_type
+    from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
+    mediatype = convert_type(tmdb_type, 'dbtype', season, episode)
+    sync = BaseItemFactory(mediatype)
+    sync.tmdb_id = tmdb_id
+    sync.season = season
+    sync.episode = episode
+    sync.cache_refresh = 'force'
+    sync.data
+
+    import xbmcgui
+    xbmcgui.Dialog().ok(get_localized(32233), f'{sync.item_id}')
+
+    container_refresh()

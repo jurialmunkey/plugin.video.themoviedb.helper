@@ -41,51 +41,8 @@ def get_tmdb_id(func):
         from tmdbhelper.lib.api.tmdb.api import TMDb
         with BusyDialog():
             if not kwargs.get('tmdb_id'):
-                kwargs['tmdb_id'] = TMDb().get_tmdb_id(**kwargs)
+                kwargs['tmdb_id'] = TMDb().tmdb_database.get_tmdb_id(**kwargs)
                 if not kwargs['tmdb_id']:
                     return
-        return func(*args, **kwargs)
-    return wrapper
-
-
-def choose_tmdb_id(func):
-    """ Decorator to get tmdb_id if not in kwargs """
-    def wrapper(*args, **kwargs):
-        if kwargs.get('tmdb_id'):
-            return func(*args, **kwargs)
-
-        from xbmcgui import Dialog, ListItem
-        from tmdbhelper.lib.addon.dialog import BusyDialog
-        from tmdbhelper.lib.api.tmdb.api import TMDb
-
-        if kwargs.get('query'):
-            from tmdbhelper.lib.api.tmdb.images import TMDbImagePath
-            tmdb_imagepath = TMDbImagePath()
-
-            with BusyDialog():
-                response = TMDb().get_request_sc('search', kwargs['tmdb_type'], query=kwargs['query'])
-            if not response or not response.get('results'):
-                return
-
-            items = []
-            for i in response['results']:
-                li = ListItem(
-                    i.get('title') or i.get('name'),
-                    i.get('release_date') or i.get('first_air_date'))
-                li.setArt({'icon': tmdb_imagepath.get_imagepath_poster(i.get('poster_path'))})
-                items.append(li)
-
-            x = Dialog().select(kwargs['query'], items, useDetails=True)
-            if x == -1:
-                return
-            kwargs['tmdb_id'] = response['results'][x].get('id')
-
-        else:
-            with BusyDialog():
-                kwargs['tmdb_id'] = TMDb().get_tmdb_id(**kwargs)
-
-        if not kwargs['tmdb_id']:
-            return
-
         return func(*args, **kwargs)
     return wrapper

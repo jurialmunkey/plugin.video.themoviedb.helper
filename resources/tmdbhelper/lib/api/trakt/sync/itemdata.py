@@ -422,6 +422,10 @@ class SyncItem:
         self._item_type = item_type
         self._key_prefix = key_prefix
 
+    @cached_property
+    def data(self):
+        return self.get_data()
+
     @property
     def meta(self):
         return self._meta
@@ -455,10 +459,6 @@ class SyncItem:
     @property
     def table_keys(self):
         return (*self.base_table_keys, *self.additional_keys)
-
-    @cached_property
-    def data(self):
-        return self.get_data()
 
     def get_data(self):
         data = {}
@@ -517,4 +517,3 @@ class SyncItem:
             data[item_data.item_id] = [getattr(item_data, k) for k in self.keys]
 
         return data
-

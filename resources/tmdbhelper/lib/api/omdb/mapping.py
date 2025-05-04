@@ -1,5 +1,5 @@
-from tmdbhelper.lib.api.mapping import _ItemMapper, get_empty_item
-from jurialmunkey.parser import get_between_strings
+from tmdbhelper.lib.api.mapping import _ItemMapper
+from jurialmunkey.parser import get_between_strings, try_type
 
 
 class ItemMapper(_ItemMapper):
@@ -21,59 +21,72 @@ class ItemMapper(_ItemMapper):
         """
         self.advanced_map = {
             'awards': [{
-                'keys': [('infoproperties', 'awards')]}, {
+                'keys': [('awards', None)]}, {
                 # ---
-                'keys': [('infoproperties', 'oscar_wins')],
-                'func': lambda v: get_between_strings(v or '', 'Won ', ' Oscar')}, {
+                'keys': [('oscar_wins', None)],
+                'func': lambda v: try_type(get_between_strings(v or '', 'Won ', ' Oscar'), int)}, {
                 # ---
-                'keys': [('infoproperties', 'emmy_wins')],
-                'func': lambda v: get_between_strings(v or '', 'Won ', ' Primetime Emmy')}, {
+                'keys': [('emmy_wins', None)],
+                'func': lambda v: try_type(get_between_strings(v or '', 'Won ', ' Primetime Emmy'), int)}, {
                 # ---
-                'keys': [('infoproperties', 'award_wins')],
-                'func': lambda v: get_between_strings(v or '', '.* ', ' win') or get_between_strings(v or '', '', ' win')}, {
+                'keys': [('award_wins', None)],
+                'func': lambda v: try_type(get_between_strings(v or '', '.* ', ' win') or get_between_strings(v or '', '', ' win'), int)}, {
                 # ---
-                'keys': [('infoproperties', 'oscar_nominations')],
-                'func': lambda v: get_between_strings(v or '', 'Nominated for ', ' Oscar')}, {
+                'keys': [('oscar_nominations', None)],
+                'func': lambda v: try_type(get_between_strings(v or '', 'Nominated for ', ' Oscar'), int)}, {
                 # ---
-                'keys': [('infoproperties', 'emmy_nominations')],
-                'func': lambda v: get_between_strings(v or '', 'Nominated for ', ' Primetime Emmy')}, {
+                'keys': [('emmy_nominations', None)],
+                'func': lambda v: try_type(get_between_strings(v or '', 'Nominated for ', ' Primetime Emmy'), int)}, {
                 # ---
-                'keys': [('infoproperties', 'award_nominations')],
-                'func': lambda v: get_between_strings(v or '', 'wins? & ', ' nomination') or get_between_strings(v or '', '', ' nomination')
+                'keys': [('award_nominations', None)],
+                'func': lambda v: try_type(get_between_strings(v or '', 'wins? & ', ' nomination') or get_between_strings(v or '', '', ' nomination'), int)
             }],
             'tomatoReviews': [{
-                'keys': [('infoproperties', 'rottentomatoes_reviewstotal')],
-                'type': float,
-                'func': lambda v: f'{v:0,.0f}'
+                'keys': [('rottentomatoes_reviewstotal', None)],
+                'type': int,
             }],
             'tomatoFresh': [{
-                'keys': [('infoproperties', 'rottentomatoes_reviewsfresh')],
-                'type': float,
-                'func': lambda v: f'{v:0,.0f}'
+                'keys': [('rottentomatoes_reviewsfresh', None)],
+                'type': int,
             }],
             'tomatoRotten': [{
-                'keys': [('infoproperties', 'rottentomatoes_reviewsrotten')],
-                'type': float,
-                'func': lambda v: f'{v:0,.0f}'
+                'keys': [('rottentomatoes_reviewsrotten', None)],
+                'type': int,
             }],
             'tomatoUserReviews': [{
-                'keys': [('infoproperties', 'rottentomatoes_userreviews')],
-                'type': float,
-                'func': lambda v: f'{v:0,.0f}'
-            }]
+                'keys': [('rottentomatoes_userreviews', None)],
+                'type': int,
+            }],
+            'metascore': [{
+                'keys': [('metacritic_rating', None)],
+                'type': int,
+            }],
+            'imdbRating': [{
+                'keys': [('imdb_rating', None)],
+                'func': lambda v: try_type(try_type(v, float) * 10, int)
+            }],
+            'imdbVotes': [{
+                'keys': [('imdb_votes', None)],
+                'func': lambda v: try_type(v.replace(',', ''), int)
+            }],
+            'tomatoMeter': [{
+                'keys': [('rottentomatoes_rating', None)],
+                'type': int,
+            }],
+            'tomatoImage': [{
+                'keys': [('rottentomatoes_image', None)],
+            }],
+            'tomatoConsensus': [{
+                'keys': [('rottentomatoes_consensus', None)],
+            }],
+            'tomatoUserMeter': [{
+                'keys': [('rottentomatoes_usermeter', None)],
+                'type': int,
+            }],
         }
-        self.standard_map = {
-            'metascore': ('infoproperties', 'metacritic_rating'),
-            'imdbRating': ('infoproperties', 'imdb_rating'),
-            'imdbVotes': ('infoproperties', 'imdb_votes'),
-            'tomatoMeter': ('infoproperties', 'rottentomatoes_rating'),
-            'tomatoImage': ('infoproperties', 'rottentomatoes_image'),
-            'tomatoConsensus': ('infoproperties', 'rottentomatoes_consensus'),
-            'tomatoUserMeter': ('infoproperties', 'rottentomatoes_usermeter')
-        }
+        self.standard_map = {}
 
-    def get_info(self, info_item, tmdb_type=None, base_item=None, **kwargs):
-        item = get_empty_item()
+    def get_info(self, info_item, tmdb_type=None, **kwargs):
+        item = {}
         item = self.map_item(item, info_item)
-        item = self.add_base(item, base_item, tmdb_type)
         return item

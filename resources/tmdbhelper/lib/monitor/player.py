@@ -2,9 +2,11 @@ from xbmc import Player
 from json import loads
 from jurialmunkey.parser import boolean
 from jurialmunkey.window import get_property
+from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.monitor.images import ImageFunctions
-from tmdbhelper.lib.monitor.common import CommonMonitorFunctions, SETPROP_RATINGS, SETMAIN_ARTWORK
+from tmdbhelper.lib.monitor.common import CommonMonitorFunctions
 from tmdbhelper.lib.addon.plugin import get_condvisibility, get_infolabel, get_setting
+from tmdbhelper.lib.addon.logger import kodi_log
 
 
 class PlayerScrobbler():
@@ -65,13 +67,9 @@ class PlayerScrobbler():
     def progress(self):
         return ((self.current_time / self.total_time) * 100)
 
-    @property
+    @cached_property
     def playerstring(self):
-        try:
-            return self._playerstring
-        except AttributeError:
-            self._playerstring = self.get_playerstring()
-            return self._playerstring
+        return self.get_playerstring()
 
     @staticmethod
     def get_playerstring():
@@ -93,13 +91,9 @@ class PlayerScrobbler():
             return
         self.current_time = current_time
 
-    @property
+    @cached_property
     def trakt_item(self):
-        try:
-            return self._trakt_item
-        except AttributeError:
-            self._trakt_item = self.get_trakt_item() or {}
-            return self._trakt_item
+        return self.get_trakt_item() or {}
 
     @is_scrobbling
     def get_trakt_item(self):
@@ -208,58 +202,38 @@ class PlayerItem():
     def __init__(self, parent):
         self._parent = parent
 
-    @property
+    @cached_property
     def baseitem(self):
-        try:
-            return self._baseitem
-        except AttributeError:
-            self._baseitem = self.get_baseitem()
-            return self._baseitem
-
-    def get_baseitem(self):
         if not self._parent.isPlayingVideo():
             return
-        return self._parent.ib.get_item(
+        item_data = self._parent.lidc.get_item(
             self._parent.tmdb_type,
             self._parent.tmdb_id,
             self._parent.season,
             self._parent.episode)
 
-    @property
-    def details(self):
         try:
-            return self._details
-        except AttributeError:
-            self._details = self.get_baseitem_details()
-            return self._details
+            return {
+                'listitem': item_data,
+                'artwork': item_data['art'],
+            }
+        except (KeyError, AttributeError, TypeError):
+            return {}
 
-    def get_baseitem_details(self):
+    @cached_property
+    def details(self):
         if not self.baseitem:
             return {}
         return self.baseitem['listitem']
 
-    @property
+    @cached_property
     def artwork(self):
-        try:
-            return self._artwork
-        except AttributeError:
-            self._artwork = self.get_baseitem_artwork()
-            return self._artwork
-
-    def get_baseitem_artwork(self):
         if not self.baseitem:
             return {}
         return self.baseitem['artwork']
 
-    @property
+    @cached_property
     def meta(self):
-        try:
-            return self._meta
-        except AttributeError:
-            self._meta = self.get_meta()
-            return self._meta
-
-    def get_meta(self):
         info_tag = self.get_player_info_tag()
 
         if not info_tag:
@@ -297,8 +271,6 @@ class PlayerItem():
 
     @property
     def imdb_id(self):
-        if self.dbtype != 'movie':
-            return
         return self.meta.get('IMDBNumber')
 
     @property
@@ -310,12 +282,6 @@ class PlayerItem():
     @property
     def year(self):
         if self.dbtype == 'episode':
-            return
-        return self.meta.get('Year')
-
-    @property
-    def epyear(self):
-        if self.dbtype != 'episode':
             return
         return self.meta.get('Year')
 
@@ -339,13 +305,9 @@ class PlayerItem():
             return 'tv'
         return ''
 
-    @property
+    @cached_property
     def tmdb_id(self):
-        try:
-            return self._tmdb_id
-        except AttributeError:
-            self._tmdb_id = self.get_tmdb_id()
-            return self._tmdb_id
+        return self.get_tmdb_id()
 
     def get_tmdb_id_parent(self):
         if self.dbtype != 'episode':
@@ -373,7 +335,6 @@ class PlayerItem():
             self.imdb_id,
             self.query,
             self.year,
-            self.epyear
         )
 
     def get_ratings(self):
@@ -381,27 +342,7 @@ class PlayerItem():
             return {}
         if get_condvisibility("Skin.HasSetting(TMDbHelper.DisableRatings)"):
             return {}
-        try:
-            trakt_type = {'movie': 'movie', 'tv': 'show'}[self.tmdb_type]
-        except KeyError:
-            trakt_type = None
-        if not trakt_type:
-            return {}
-        details = self.details
-        details = self._parent.get_omdb_ratings(details)
-        details = self._parent.get_imdb_top250_rank(details, trakt_type=trakt_type)
-        details = self._parent.get_tvdb_awards(details, self.tmdb_type, self.tmdb_id)
-        details = self._parent.get_trakt_ratings(details, trakt_type, season=self.season, episode=self.episode)
-        details = self._parent.get_mdblist_ratings(details, trakt_type, tmdb_id=self.tmdb_id)
-        return details.get('infoproperties', {})
-
-    def get_artwork(self):
-        if get_condvisibility("Skin.HasSetting(TMDbHelper.DisableArtwork)"):
-            return {}
-        if not self.artwork:
-            return {}
-        self.details['art'] = self._parent.ib.get_item_artwork(self.artwork, is_season=True if self.season else False)
-        return self.details['art']
+        return self._parent.get_all_ratings(self.tmdb_type, self.tmdb_id, self.season, self.episode) or {}
 
 
 class PlayerMonitor(Player, CommonMonitorFunctions):
@@ -489,10 +430,6 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
     @property
     def year(self):
         return self.player_item.year
-
-    @property
-    def epyear(self):
-        return self.player_item.epyear
 
     @property
     def season(self):
@@ -585,7 +522,6 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
             self.imdb_id,
             self.query,
             self.year,
-            self.epyear,
             self.season,
             self.episode,
         )
@@ -607,14 +543,11 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
             self.update_artwork()
             return
 
-        # Update artwork details
-        self.set_iter_properties(self.player_item.get_artwork(), SETMAIN_ARTWORK)
-
         # Update our artwork manipulation cropped logo
         self.update_artwork()
 
-        # Update ratings _details
-        self.set_iter_properties(self.player_item.get_ratings(), SETPROP_RATINGS)
+        # Update ratings
+        self.set_ratings_properties({'ratings': self.player_item.get_ratings()})
 
         # Update our properties
         self.set_properties(self.details)

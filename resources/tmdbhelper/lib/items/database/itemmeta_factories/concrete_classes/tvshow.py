@@ -1,0 +1,35 @@
+from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem
+
+
+class Tvshow(MediaItem):
+    infolabels_dbcitem_routes = (
+        (('certification', None), 'name', 'mpaa'),
+        (('video', None), 'path', 'trailer'),
+        (('watchedcount', None), 'watched_episodes', 'playcount'),  # TODO: FIX FOR SEASONS AS NOT SYNCED AIRED COUNT
+        (('airedcount', None), 'aired_episodes', 'episode'),  # TODO: FIX FOR SEASONS AS NOT SYNCED AIRED COUNT
+    )
+
+    infoproperties_dbclist_routes = (
+        *MediaItem.infoproperties_dbclist_routes,
+        {
+            'instance': ('studio', None),
+            'mappings': {'name': 'name', 'tmdb_id': 'tmdb_id', 'logo': 'logo', 'country': 'country'},
+            'propname': ('network', ),  # For backwards compatibility also set studio to network
+            'joinings': None
+        }
+    )
+
+    def get_infolabels_special(self, infolabels):
+        try:
+            infolabels['tvshowtitle'] = self.data[0]['title']
+        except (TypeError, KeyError, IndexError):
+            pass
+        return infolabels
+
+    def get_infoproperties_special(self, infoproperties):
+        infoproperties = self.get_infoproperties_custom(infoproperties)
+        try:
+            infoproperties['next_episode_to_air_id'] = self.data[0]['next_episode_to_air_id']
+        except (TypeError, KeyError, IndexError):
+            pass
+        return infoproperties

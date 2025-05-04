@@ -1,112 +1,119 @@
+from tmdbhelper.lib.api.contains import CommonContainerAPIs
+from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
 from tmdbhelper.lib.files.ftools import cached_property
-from threading import Lock
 from tmdbhelper.lib.items.listitem import ListItem
-from tmdbhelper.lib.items.database.tmdbdata import ItemDetailsDataBaseCacheFactory
+from tmdbhelper.lib.addon.plugin import convert_type
+# from tmdbhelper.lib.addon.logger import CProfiler
 
 
-# @cached_property
-# def lidc(self):
-#     from tmdbhelper.lib.items.database.listitem import ListItemDetailsConfigurator
-#     return ListItemDetailsConfigurator(tmdb_api=self.tmdb_api)
+class ListItemConfig:
+    def __init__(self, item):
+        self.item = item
+
+    @cached_property
+    def listitem(self):
+        return ListItem(**self.item)
+
+    def get_configured_listitem(self, data):
+        self.listitem.set_details(data, override=True) if data else None
+        return self.listitem
+
+    @cached_property
+    def mediatype(self):
+        if self.listitem.infoproperties.get('tmdb_type') == 'person':
+            return 'person'
+        return self.listitem.infolabels.get('mediatype')
+
+    @cached_property
+    def tmdb_id(self):
+        if self.mediatype == 'movie':
+            return self.listitem.unique_ids.get('tmdb')
+        if self.mediatype == 'tvshow':
+            return self.listitem.unique_ids.get('tmdb') or self.listitem.unique_ids.get('tvshow.tmdb')
+        if self.mediatype == 'season':
+            return self.listitem.unique_ids.get('tvshow.tmdb')
+        if self.mediatype == 'episode':
+            return self.listitem.unique_ids.get('tvshow.tmdb')
+        if self.mediatype == 'person':
+            return self.listitem.unique_ids.get('tmdb') or self.listitem.infoproperties.get('tmdb_id')
+        return
+
+    @cached_property
+    def tmdb_type(self):
+        if self.mediatype == 'movie':
+            return 'movie'
+        if self.mediatype == 'tvshow':
+            return 'tv'
+        if self.mediatype == 'season':
+            return 'tv'
+        if self.mediatype == 'episode':
+            return 'tv'
+        if self.mediatype == 'person':
+            return 'person'
+        return
+
+    @cached_property
+    def season(self):
+        if self.mediatype not in ('episode', 'season'):
+            return
+        return self.listitem.infolabels.get('season', 0)
+
+    @cached_property
+    def episode(self):
+        if self.mediatype != 'episode':
+            return
+        return self.listitem.infolabels.get('episode', 0)
+
+    @cached_property
+    def db_cache(self):
+        if not self.baseitem_db_cache_func:
+            return
+        return self.baseitem_db_cache_func(self.mediatype, self.tmdb_id, self.season, self.episode)
 
 
-class ThreadLocks(dict):
-    def __missing__(self, key):
-        self[key] = Lock()
-        return self[key]
-
-
-class ListItemDetailsConfigurator:
+class ListItemDetails:
     pagination = False
+    cache_refresh = None
+    extendedinfo = False
 
-    def __init__(self, tmdb_api=None, trakt_api=None):
-        self._tmdb_api = tmdb_api
-        self._trakt_api = trakt_api
+    def __init__(self, common_apis=None):
+        self.common_apis = common_apis or CommonContainerAPIs()
 
-    @cached_property
-    def tmdb_api(self):
-        from tmdbhelper.lib.api.tmdb.api import TMDb
-        return self._tmdb_api or TMDb()
+    def get_item(self, tmdb_type, tmdb_id, season=None, episode=None):
+        mediatype = convert_type(tmdb_type, output='dbtype', season=season, episode=episode)
 
-    @cached_property
-    def trakt_api(self):
-        from tmdbhelper.lib.api.trakt.api import TraktAPI
-        return self._trakt_api or TraktAPI()
-
-    @cached_property
-    def thread_locks(self):
-        return ThreadLocks()
-
-    def get_db_cache(self, mediatype):
-        dbc = ItemDetailsDataBaseCacheFactory(mediatype)
-        dbc.tmdb_api = self.tmdb_api
-        dbc.thread_locks = self.thread_locks
-        return dbc
-
-    def get_configured_db_cache(self, li):
-        mediatype = li.infolabels.get('mediatype')
-
-        def get_movie():
-            dbc.tmdb_id = li.unique_ids.get('tmdb')
-
-        def get_tvshow():
-            dbc.tmdb_id = li.unique_ids.get('tmdb') or li.unique_ids.get('tvshow.tmdb')
-
-        def get_season():
-            dbc.season = li.infolabels.get('season', 0)
-            dbc.tmdb_id = li.unique_ids.get('tvshow.tmdb')
-
-        def get_episode():
-            dbc.episode = li.infolabels.get('episode')
-            dbc.season = li.infolabels.get('season', 0)
-            dbc.tmdb_id = li.unique_ids.get('tvshow.tmdb')
-
-        routes = {
-            'movie': get_movie,
-            'tvshow': get_tvshow,
-            'season': get_season,
-            'episode': get_episode
-        }
-
-        if mediatype not in routes:
+        try:
+            baseitem_db_cache = BaseItemFactory(mediatype)
+            baseitem_db_cache.tmdb_id = tmdb_id
+            baseitem_db_cache.season = season
+            baseitem_db_cache.episode = episode
+            baseitem_db_cache.common_apis = self.common_apis
+            baseitem_db_cache.extendedinfo = self.extendedinfo
+            baseitem_db_cache.cache_refresh = self.cache_refresh
+        except(AttributeError, TypeError, KeyError):
             return
 
-        dbc = self.get_db_cache(mediatype)
-        routes[mediatype]()
-        return dbc
+        try:
+            baseitem_db_cache.data['infoproperties']['dbtype'] = mediatype
+            baseitem_db_cache.data['label'] = baseitem_db_cache.data['infolabels']['title']
+        except(AttributeError, TypeError, KeyError):
+            return
 
-    def configure_listitem(self, i, cache_refresh=None):
-        li = ListItem(**i)
+        return baseitem_db_cache.data
 
+    def get_listitem(self, i):
+        # with CProfiler(i.get('label', 'None') if i else 'None'):
+        i['parent_params'] = self.parent_params
         if 'next_page' in i:
-            return li if self.pagination else None
+            return ListItem(**i) if self.pagination else None
+        listitem_config = ListItemConfig(i)
+        baseitem_dbdata = self.get_item(listitem_config.tmdb_type, listitem_config.tmdb_id, listitem_config.season, listitem_config.episode)
+        return listitem_config.get_configured_listitem(baseitem_dbdata)
 
-        dbc = self.get_configured_db_cache(li)
-
-        if not dbc:
-            return li if cache_refresh != 'never' else None
-
-        db_cache_data = dbc.data
-
-        if not db_cache_data:
-            return li if cache_refresh != 'never' else None
-
-        li.set_details(db_cache_data, override=True)
-        return li
-
-    def configure_listitems_threaded(self, items):  # TODO: Retrieve sequentially then pool unavailable items and thread lookups before setting sequentially
+    def configure_listitems_threaded(self, items):
+        # with CProfiler():
+        #     return [j for j in (self.get_listitem(i) for i in items if i) if j]
         from tmdbhelper.lib.addon.thread import ParallelThread
-        with ParallelThread(items, self.configure_listitem, cache_refresh='never') as pt:
+        with ParallelThread(items, self.get_listitem) as pt:
             item_queue = pt.queue
-        missing_indices = [x for x, i in enumerate(item_queue) if i is None]
-        missing_items = [items[x] for x in missing_indices]
-        with ParallelThread(missing_items, self.configure_listitem, cache_refresh='force') as pt:
-            refresh_item_queue = pt.queue
-        refresh_item_queue_iter = iter(refresh_item_queue)
-        all_items = [i or next(refresh_item_queue_iter) for i in item_queue]
-        all_items = [i for i in all_items if i]
-
-        return all_items
-
-    def configure_listitems(self, items):
-        return [j for j in (self.configure_listitem(i) for i in items if i) if j]
+        return [i for i in item_queue if i]

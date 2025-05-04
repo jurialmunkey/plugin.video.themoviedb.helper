@@ -3,7 +3,28 @@
 from tmdbhelper.lib.files.ftools import cached_property
 from jurialmunkey.checks import has_arg_value
 from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA
-from tmdbhelper.lib.api.trakt.sync.database import SyncDataBase
+from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
+from tmdbhelper.lib.files.dbdata import DatabaseStatements
+
+
+class SyncItemDetailsDatabase(ItemDetailsDatabase):
+    def set_activity(self, item_type, method, value, expiry):
+        cursor = self.execute_sql(
+            DatabaseStatements.insert_or_replace('lactivities', keys=('id', 'data', 'expiry')),
+            (f'{item_type}.{method}', value, expiry))
+        cursor.close() if cursor else None
+
+    def get_activity(self, item_type, method, expiry=0):
+        cursor = self.execute_sql(
+            DatabaseStatements.select_limit('lactivities', keys=('data', ), conditions='id=? and expiry>=?'),
+            (f'{item_type}.{method}', expiry))
+        if not cursor:
+            return
+        result = cursor.fetchone()
+        cursor.close()
+        if not result:
+            return
+        return result[0]
 
 
 class SyncDataSetters:
@@ -86,31 +107,51 @@ class SyncDataGetterAll:
         return self._class_instance_syncdata.cache.get_list_values(keys=self.keys, values=self.query_values, conditions=self.clause)
 
 
-class SyncDataGetterAllUnHidden(SyncDataGetterAll):
-    query_clauses = ('item_type=?', 'hidden_at IS NULL', )
+class SyncDataGetterProgressWatchedUnHidden(SyncDataGetterAll):
+    query_clauses = ('item_type=?', 'progress_watched_hidden_at IS NULL', )
 
 
-class SyncDataGetterAllUnHiddenMoviesToWatch(SyncDataGetterAllUnHidden):
+class SyncDataGetterProgressCollectedUnHidden(SyncDataGetterAll):
+    query_clauses = ('item_type=?', 'progress_collected_hidden_at IS NULL', )
+
+
+class SyncDataGetterCalendarUnHidden(SyncDataGetterAll):
+    query_clauses = ('item_type=?', 'calendar_hidden_at IS NULL', )
+
+
+class SyncDataGetterDroppedWatchedUnHidden(SyncDataGetterAll):
+    query_clauses = ('item_type=?', 'dropped_hidden_at IS NULL AND progress_watched_hidden_at IS NULL', )
+
+
+class SyncDataGetterDroppedCollectionUnHidden(SyncDataGetterAll):
+    query_clauses = ('item_type=?', 'dropped_hidden_at IS NULL AND progress_collected_hidden_at IS NULL', )
+
+
+class SyncDataGetterDroppedCalendarUnHidden(SyncDataGetterAll):
+    query_clauses = ('item_type=?', 'dropped_hidden_at IS NULL AND calendar_hidden_at IS NULL', )
+
+
+class SyncDataGetterAllUnHiddenMoviesToWatch(SyncDataGetterProgressWatchedUnHidden):
     query_values = ('movie', )
     clause_keys = ('playback_progress', 'watchlist_listed_at', )
 
 
-class SyncDataGetterAllUnHiddenShowsToWatch(SyncDataGetterAllUnHidden):
+class SyncDataGetterAllUnHiddenShowsToWatch(SyncDataGetterDroppedWatchedUnHidden):
     query_values = ('show', )
     clause_keys = ('next_episode_id', 'watchlist_listed_at', )
 
 
-class SyncDataGetterAllUnHiddenShowsStarted(SyncDataGetterAllUnHidden):
+class SyncDataGetterAllUnHiddenShowsStarted(SyncDataGetterDroppedWatchedUnHidden):
     query_values = ('show', )
     clause_keys = ('last_watched_at', )
 
 
-class SyncDataGetterAllUnHiddenShowsNextEpisode(SyncDataGetterAllUnHidden):
+class SyncDataGetterAllUnHiddenShowsNextEpisode(SyncDataGetterDroppedWatchedUnHidden):
     query_values = ('show', )
     clause_keys = ('next_episode_id', )
 
 
-class SyncDataGetterAllUnHiddenEpisodesUpNext(SyncDataGetterAllUnHidden):
+class SyncDataGetterAllUnHiddenEpisodesUpNext(SyncDataGetterDroppedWatchedUnHidden):  # TODO: UNSURE ABOUT THIS ONE
     query_values = ('episode', )
     clause_keys = ('upnext_episode_id', )
 
@@ -153,7 +194,7 @@ class SyncDataGetterAllUnwatchedItemsPlayback(SyncDataGetterAllUnwatchedItems):
     clause_keys = ('playback_progress', )
 
 
-class SyncDataGetterUnHiddenShowEpisodesUpNext(SyncDataGetterAllUnHidden):
+class SyncDataGetterUnHiddenShowEpisodesUpNext(SyncDataGetterDroppedWatchedUnHidden):
     clause_keys = ('upnext_episode_id', )
     query_clauses = ('item_type=?', 'tmdb_id=?', )
 
@@ -249,7 +290,7 @@ class SyncDataGetterAllUnHiddenShowsInProgress:
 
     @property
     def parent_additional_keys(self):
-        return ('aired_episodes', 'watched_episodes', 'hidden_at', 'last_watched_at', *(self.additional_keys or ()))
+        return ('aired_episodes', 'watched_episodes', 'dropped_hidden_at', 'last_watched_at', *(self.additional_keys or ()))
 
     @cached_property
     def items(self):
@@ -343,8 +384,6 @@ class SyncDataGetters:
 
 class SyncData(SyncDataGetters):
 
-    cache_filename = 'TraktSync_v2.db'
-
     def __init__(self, class_instance_trakt_api):
         self._class_instance_trakt_api = class_instance_trakt_api  # The TraktAPI object sync called from
 
@@ -372,7 +411,7 @@ class SyncData(SyncDataGetters):
         return self.get_cache()
 
     def get_cache(self):
-        return SyncDataBase(filename=self.cache_filename)
+        return SyncItemDetailsDatabase()
 
     @cached_property
     def window(self):
