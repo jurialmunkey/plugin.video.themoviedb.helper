@@ -59,6 +59,16 @@ msgctxt "#30006"
 msgid "Chamorro (Guam)"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32008"
+msgid "Low"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32009"
+msgid "High"
+msgstr ""
+
 msgctxt "#30007"
 msgid "Czech (Czech Republic)"
 msgstr ""
