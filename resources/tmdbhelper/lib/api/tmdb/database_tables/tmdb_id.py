@@ -118,7 +118,7 @@ class TableTMDbID:
                     if (i['name'] or '').casefold() == self.query and (i['first_air_date'] or '').startswith(str(self.year))), None)
             return next((
                 i['id'] for i in data
-                if (i['name'] or '').casefold() == self.query), None)
+                if (i.get('name') or i.get('title') or '').casefold() == self.query), None)
 
         return return_next_matching_result()
 
