@@ -9,11 +9,11 @@ def get_next_episodes(tmdb_id, season, episode, player=None):
     # Pre cache parent item
     from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
     sync = BaseItemFactory('tvshow')
-    sync.tmdb_id = int(tmdb_id)
+    sync.tmdb_id = try_int(tmdb_id)
     sync.data
 
     from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
-    all_episodes = BaseViewFactory('flatseasons', 'tv', int(tmdb_id)).data
+    all_episodes = BaseViewFactory('flatseasons', 'tv', tmdb_id).data
     if not all_episodes:
         return
 

@@ -1,6 +1,7 @@
 # from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import convert_type
 from jurialmunkey.modimp import importmodule
+from jurialmunkey.parser import try_int
 # from tmdbhelper.lib.addon.logger import kodi_log
 
 """
@@ -20,9 +21,9 @@ def BaseViewFactory(import_attr, tmdb_type, tmdb_id, season=None, episode=None, 
     obj = clsimport()
     obj.mediatype = mediatype
     obj.tmdb_type = tmdb_type
-    obj.tmdb_id = tmdb_id
-    obj.season = season
-    obj.episode = episode
+    obj.tmdb_id = try_int(tmdb_id)
+    obj.season = try_int(season, fallback=None)
+    obj.episode = try_int(episode, fallback=None)
     obj.filters = filters
     obj.limit = limit
     return obj

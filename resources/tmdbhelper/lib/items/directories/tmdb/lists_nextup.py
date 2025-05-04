@@ -21,13 +21,13 @@ class ListNextRecommendation(ContainerDirectory):
             items = ListCollection(-1, '').get_items(tmdb_id=collection_tmdb_id, tmdb_type='collection') or []
             items = sorted(items, key=lambda i: i['infolabels'].get('year') or 9999)
             try:
-                iyear = next((i for i in items if int(i['unique_ids'].get('tmdb')) == int(tmdb_id)), None)
+                iyear = next((i for i in items if try_int(i['unique_ids'].get('tmdb')) == try_int(tmdb_id)), None)
                 iyear = iyear['infolabels']['year']
             except (KeyError, TypeError, AttributeError, IndexError):
                 return
             if not iyear:
                 return
-            return next((i for i in items if int(i['infolabels'].get('year')) > int(iyear)), None)
+            return next((i for i in items if try_int(i['infolabels'].get('year')) > try_int(iyear)), None)
 
         def _get_next_recommended_collection():
             return _get_next_collection() or _get_next_recommendation()

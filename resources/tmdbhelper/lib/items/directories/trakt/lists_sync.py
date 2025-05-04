@@ -178,7 +178,7 @@ class ListUpNext(ListStandardSync):
     def get_items_sync_list_fallback(self, item_type, sort_by=None, sort_how=None, tmdb_id=None, **kwargs):
         from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
         try:
-            items = BaseViewFactory('episodes', 'tv', int(tmdb_id), season=1).data
+            items = BaseViewFactory('episodes', 'tv', tmdb_id, season=1).data
         except TypeError:
             return
         self.kodi_db = self.get_kodi_database('tv')

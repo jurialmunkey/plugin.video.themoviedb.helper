@@ -3,6 +3,7 @@ from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFac
 from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
 from tmdbhelper.lib.items.container import ContainerDirectory
 from jurialmunkey.window import get_property
+from jurialmunkey.parser import try_int
 
 
 class ListSeasons(ContainerDirectory):
@@ -13,7 +14,7 @@ class ListSeasons(ContainerDirectory):
         items = []
 
         sync = BaseItemFactory('tvshow')
-        sync.tmdb_id = int(tmdb_id)
+        sync.tmdb_id = try_int(tmdb_id)
         sync.tmdb_type = 'tv'
         sync.common_apis = self
         base_item = sync.data
@@ -65,7 +66,7 @@ class ListSeasons(ContainerDirectory):
         return items
 
     def get_items(self, tmdb_id, limit=None, **kwargs):
-        sync = BaseViewFactory('seasons', 'tv', int(tmdb_id), filters=self.filters, limit=limit)
+        sync = BaseViewFactory('seasons', 'tv', tmdb_id, filters=self.filters, limit=limit)
         self.container_content = convert_type('season', 'container')
         try:
             return sync.data + self.get_special_seasons(tmdb_id)
@@ -82,14 +83,14 @@ class ListFlatSeasons(ContainerDirectory):
             mediatype = 'season'
             base_dbc = BaseItemFactory(mediatype)
             base_dbc.mediatype = mediatype
-            base_dbc.tmdb_id = int(tmdb_id)
+            base_dbc.tmdb_id = try_int(tmdb_id)
             base_dbc.tmdb_type = 'tv'
             base_dbc.season = season
             base_dbc.common_apis = tvshow_sync.common_apis
             base_dbc.connection = tvshow_sync.connection
             return base_dbc.data
 
-        tvshow_sync = BaseViewFactory('seasons', 'tv', int(tmdb_id))
+        tvshow_sync = BaseViewFactory('seasons', 'tv', tmdb_id)
 
         for season in tvshow_sync.data:
             try:
@@ -97,7 +98,7 @@ class ListFlatSeasons(ContainerDirectory):
             except (AttributeError, TypeError, KeyError):
                 continue
 
-        sync = BaseViewFactory('flatseasons', 'tv', int(tmdb_id), filters=self.filters, limit=limit)
+        sync = BaseViewFactory('flatseasons', 'tv', tmdb_id, filters=self.filters, limit=limit)
         self.container_content = convert_type('episode', 'container')
 
         return sync.data
@@ -109,7 +110,7 @@ class ListEpisodes(ContainerDirectory):
 
     def get_items(self, tmdb_id, season, limit=None, **kwargs):
         try:
-            sync = BaseViewFactory('episodes', 'tv', int(tmdb_id), season=season, filters=self.filters, limit=limit)
+            sync = BaseViewFactory('episodes', 'tv', tmdb_id, season=season, filters=self.filters, limit=limit)
         except TypeError:
             return
         self.kodi_db = self.get_kodi_database('tv')
