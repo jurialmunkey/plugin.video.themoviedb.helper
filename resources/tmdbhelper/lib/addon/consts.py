@@ -520,7 +520,7 @@ ROUTE_NOID = {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_discover',
         'import_attr': 'ListUserDiscover'}},
     'trakt_towatch': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.list_sync',
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
         'import_attr': 'ListToWatch'}},
     'trakt_becauseyouwatched': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
@@ -653,6 +653,6 @@ ROUTE_TMDBID = {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_nextup',
         'import_attr': 'ListNextRecommendation'}},
     'trakt_upnext': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.list_sync',
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
         'import_attr': 'ListUpNext'}},
 }
