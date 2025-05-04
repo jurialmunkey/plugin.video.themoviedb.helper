@@ -95,6 +95,8 @@ class ListItemDetails:
 
         try:
             baseitem_db_cache.data['infoproperties']['dbtype'] = mediatype
+            baseitem_db_cache.data['infoproperties']['tmdb_type'] = tmdb_type
+            baseitem_db_cache.data['infoproperties']['tmdb_id'] = tmdb_id
             baseitem_db_cache.data['label'] = baseitem_db_cache.data['infolabels']['title']
         except(AttributeError, TypeError, KeyError):
             return
