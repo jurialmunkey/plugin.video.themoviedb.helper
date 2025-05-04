@@ -2,6 +2,7 @@ from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp
 from tmdbhelper.lib.api.trakt.sync.activity import SyncLastActivities
 from tmdbhelper.lib.files.locker import mutexlock
+from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY, SHORTER_EXPIRY
 
 
 def timerlock(func):
@@ -33,6 +34,7 @@ class DataType:
     sync_kwgs = {}
     lock_name = 'sync_trakt'
     key_prefix = None
+    expiry_time = DEFAULT_EXPIRY
 
     def __init__(self, class_instance_syncdata, item_type):
         self._class_instance_syncdata = class_instance_syncdata
@@ -82,7 +84,7 @@ class DataType:
         return SyncLastActivities(self._class_instance_syncdata)
 
     def store_last_activity(self):
-        self.cache.set_activity(self.item_type, self.method, self.last_activities.json.get('all') or '2000-01-01T00:00:00.000Z')
+        self.cache.set_activity(self.item_type, self.method, self.last_activities.json.get('all') or '2000-01-01T00:00:00.000Z', set_timestamp(self.expiry_time, set_int=True))
 
     @property
     def last_activities_item_type(self):
@@ -101,7 +103,7 @@ class DataType:
 
     @property
     def is_expired(self):
-        timestamp = self.cache.get_activity(self.item_type, self.method)
+        timestamp = self.cache.get_activity(self.item_type, self.method, set_timestamp(0, set_int=True))
         return self.last_activities.is_expired(timestamp, keys=self.last_activities_keys)
 
     @timerlock
@@ -155,10 +157,11 @@ class DataTypeEpisodes(DataType):
         return f'{self.item_type}s'
 
 
-class SyncHidden(DataType):
+class SyncHiddenProgressWatched(DataType):
     keys = ('hidden_at', )
     last_activities_key = 'hidden_at'
-    method = 'hidden'
+    method = 'hidden/progress_watched'
+    key_prefix = 'progress_watched'
 
     @timerlock
     def sync_func(self):
@@ -166,10 +169,26 @@ class SyncHidden(DataType):
         from tmdbhelper.lib.addon.logger import TimerFunc
         with TimerFunc(f'Sync: {self.method} {self.item_type}', inline=True, log_threshold=0.001):
             response = []
-            response += self.get_response_sync('users', self.method, 'progress_watched', type=f'{self.item_type}s', limit=4095) or []
-            response += self.get_response_sync('users', self.method, 'progress_collected', type=f'{self.item_type}s', limit=4095) or []
-            response += self.get_response_sync('users', self.method, 'calendar', type=f'{self.item_type}s', limit=4095) or []
+            response += self.get_response_sync('users', self.method, type=f'{self.item_type}s', limit=4095) or []
             return response
+
+
+class SyncHiddenProgressCollected(SyncHiddenProgressWatched):
+    last_activities_key = 'hidden_at'
+    method = 'hidden/progress_collected'
+    key_prefix = 'progress_collected'
+
+
+class SyncHiddenCalendar(SyncHiddenProgressWatched):
+    last_activities_key = 'hidden_at'
+    method = 'hidden/calendar'
+    key_prefix = 'calendar'
+
+
+class SyncHiddenDropped(SyncHiddenProgressWatched):
+    last_activities_key = 'dropped_at'
+    method = 'hidden/dropped'
+    key_prefix = 'dropped'
 
 
 class SyncWatched(DataTypeEpisodes):
@@ -220,6 +239,7 @@ class SyncAllNextEpisodes(DataTypeEpisodes):
     keys = ('upnext_episode_id', )
     last_activities_key = 'watched_at'
     method = 'all_next_episodes'
+    expiry_time = SHORTER_EXPIRY
 
     def get_all_next_episodes(self, response, tmdb_id):
         # For list of episodes we need to build them by comparing against the reset_at date
@@ -280,6 +300,7 @@ class SyncNextEpisodes(SyncAllNextEpisodes):
     keys = ('next_episode_id', )
     last_activities_key = 'watched_at'
     method = 'nextup'
+    expiry_time = SHORTER_EXPIRY
 
     def get_next_episode(self, tmdb_id, trakt_id):
         response = self.get_next_episodes_response(trakt_id)

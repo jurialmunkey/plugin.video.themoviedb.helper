@@ -1,5 +1,6 @@
 import xbmcvfs
 import tmdbhelper.lib.api.kodi.rpc as rpc
+from tmdbhelper.lib.files.ftools import cached_property
 from xbmcgui import DialogProgressBG
 from tmdbhelper.lib.addon.plugin import get_setting, get_localized, set_setting
 from jurialmunkey.parser import try_int
@@ -9,7 +10,8 @@ from tmdbhelper.lib.update.logger import _LibraryLogger
 from tmdbhelper.lib.update.update import BASEDIR_MOVIE, BASEDIR_TV, STRM_MOVIE, STRM_EPISODE, create_file, create_nfo, get_unique_folder
 from tmdbhelper.lib.update.cacher import _TVShowCache
 from tmdbhelper.lib.update.common import LibraryCommonFunctions
-from tmdbhelper.lib.api.tmdb.api import TMDb
+from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
+from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
 
 
 def add_to_library(info, busy_spinner=True, library_adder=None, finished=True, **kwargs):
@@ -41,8 +43,8 @@ class LibraryAdder(LibraryCommonFunctions):
         self.auto_update = get_setting('auto_update')
         self._log = _LibraryLogger()
         self.tv = None
-        self.hide_unaired = get_setting('hide_unaired_episodes')
-        self.hide_nodate = get_setting('nodate_is_unaired')
+        self.hide_unaired = True
+        self.hide_nodate = False
         # self.debug_logging = get_setting('debug_logging')
         self.debug_logging = True
         self.clean_library = False
@@ -59,12 +61,21 @@ class LibraryAdder(LibraryCommonFunctions):
 
     def _legacy_conversion(self, folder, tmdb_id):
         # Get details
-        details = TMDb().get_request_sc('tv', tmdb_id, append_to_response='external_ids')
-        if not details or not details.get('first_air_date'):
-            return  # Skip shows without details/year
+
+        sync = BaseItemFactory('tvshow')
+        sync.tmdb_id = tmdb_id
+
+        try:
+            details_name = sync.data['infolabels']['tvshowtitle']
+            details_year = sync.data['infolabels']['premiered'][:4]
+        except (KeyError, TypeError, AttributeError):
+            return
+
+        if not details_name or not details_year:
+            return
 
         # Get new name and compare to old name
-        name = f'{details.get("name")} ({details["first_air_date"][:4]})'
+        name = f'{details_name} ({details_year})'
         if folder == name:
             return  # Skip if already converted
 
@@ -106,14 +117,24 @@ class LibraryAdder(LibraryCommonFunctions):
             return
 
         # Get movie details
-        details = TMDb().get_request_sc('movie', tmdb_id, append_to_response='external_ids')
-        if not details or not details.get('title'):
+        sync = BaseItemFactory('movie')
+        sync.tmdb_id = tmdb_id
+
+        try:
+            details_name = sync.data['infolabels']['title']
+            details_year = sync.data['infolabels']['premiered'][:4]
+            details_imdb = sync.data['unique_ids']['imdb']
+        except (KeyError, TypeError, AttributeError):
+            pass
+
+        if not details_name or not details_year:
             return
-        imdb_id = details.get('external_ids', {}).get('imdb_id')
-        name = f'{details["title"]} ({details["release_date"][:4]})' if details.get('release_date') else details['title']
+
+        name = f'{details_name} ({details_year})'
 
         # Only add strm if not in library
-        file = self.kodi_db_movies.get_info(info='file', imdb_id=imdb_id, tmdb_id=tmdb_id)
+        file = self.kodi_db_movies.get_info(info='file', imdb_id=details_imdb, tmdb_id=tmdb_id)
+
         if not file:
             file = create_file(STRM_MOVIE.format(tmdb_id), name, name, basedir=BASEDIR_MOVIE)
             create_nfo('movie', tmdb_id, name, basedir=BASEDIR_MOVIE)
@@ -131,127 +152,190 @@ class LibraryAdder(LibraryCommonFunctions):
         if self._log._add('tv', tmdb_id, self.tv._cache.get_next_check()):
             return ('title', self.tv._cache.cache_info.get('name'))
 
-        if not self.tv.get_details():
+        if not self.tv.details:
             return  # Skip if no details found on TMDb
-        if not self.tv.get_name():
+        if not self.tv.name:
             return  # Skip if we don't have a folder name for some reason
 
-        self.tv.get_dbid()
         self.tv.make_nfo()
         self.tv.set_next()
 
         # Add seasons
-        for x, season in enumerate(self.tv.get_seasons()):
-            self._update(x, self.tv.s_total, message=f'{get_localized(32167)} {self.tv.details.get("name")} - {get_localized(20373)} {season.get("season_number", 0)}...')  # Update our progress dialog
+        for x, season in enumerate(self.tv.seasons):
+            self._update(x, len(self.tv.seasons), message=f'{get_localized(32167)} {self.tv.name} - {get_localized(20373)} {season.number}...')  # Update our progress dialog
             self._add_season(season)
 
         # Store details about what we did into the cache
         self.tv._cache.set_cache()
 
         # Return our playlist rule tuple
-        return ('title', self.tv.details.get('name'))
+        return ('title', self.tv.tvshowtitle)
 
-    def _add_season(self, season, blacklist=[0]):
-        number = season.get('season_number', 0)
-        folder = f'Season {number}'
-
-        # Skip blacklisted seasons
-        if try_int(number) in blacklist:  # TODO: Optional whitelist also
-            self._log._add('tv', self.tv.tmdb_id, 'skipped special season', season=number)
-            return
+    def _add_season(self, season):
+        folder = f'Season {season.number}'
 
         # Skip if we've added season before and it isn't the most recent season
         # We still add most recent season even if we added it before because it might currently be airing
-        if self._log._add('tv', self.tv.tmdb_id, self.tv._cache.is_added_season(number), season=number):
+        if self._log._add('tv', self.tv.tmdb_id, self.tv._cache.is_added_season(season.number), season=season.number):
             return
 
         # Add our episodes
-        for x, episode in enumerate(self.tv.get_episodes(number), 1):
-            self._add_episode(episode, number, folder)
-            self._update(x, self.tv.e_total)
+        for x, episode in enumerate(season.episodes, 1):
+            self._add_episode(episode, folder)
+            self._update(x, len(season.episodes))
 
         # Store a season value of where we got up to
-        if self.tv.e_total > 2 and season.get('air_date') and not is_unaired_timestamp(season.get('air_date'), self.hide_nodate):
-            self.tv._cache.my_history['latest_season'] = try_int(number)
+        if len(season.episodes) > 2 and season.premiered and not is_unaired_timestamp(season.premiered, self.hide_nodate):
+            self.tv._cache.my_history['latest_season'] = try_int(season.number)
 
-    def _add_episode(self, episode, season, folder):
-        number = episode.get('episode_number')
-        filename = validify_filename(f'S{try_int(season):02d}E{try_int(number):02d} - {episode.get("name")}')
-        self.tv._cache.my_history['episodes'].append(filename)
+    def _add_episode(self, episode, folder):
+        self.tv._cache.my_history['episodes'].append(episode.filename)
 
         # Skip episodes we added in the past
-        if self._log._add('tv', self.tv.tmdb_id, self.tv._cache.is_added_episode(filename), season=season, episode=number):
+        if self._log._add('tv', self.tv.tmdb_id, self.tv._cache.is_added_episode(episode.filename), season=episode.season, episode=episode.number):
             return
 
         # Skip future episodes
-        if self.hide_unaired and is_unaired_timestamp(episode.get('air_date'), self.hide_nodate):
-            self.tv._cache.my_history['skipped'].append(filename)
-            self._log._add('tv', self.tv.tmdb_id, 'unaired episode', season=season, episode=number, air_date=episode.get('air_date'))
+        if self.hide_unaired and is_unaired_timestamp(episode.premiered, self.hide_nodate):
+            self.tv._cache.my_history['skipped'].append(episode.filename)
+            self._log._add('tv', self.tv.tmdb_id, 'unaired episode', season=episode.season, episode=episode.number, air_date=episode.premiered)
             return
 
         # Check if item has already been added
-        file = self.tv.get_episode_db_info(season, number, info='file')
+        file = self.tv.get_episode_db_info(episode.season, episode.number, info='file')
         if file:
-            self._log._add('tv', self.tv.tmdb_id, 'found in library', season=season, episode=number, path=file)
+            self._log._add('tv', self.tv.tmdb_id, 'found in library', season=episode.season, episode=episode.number, path=file)
             return
 
         # Add our strm file
-        file = create_file(STRM_EPISODE.format(self.tv.tmdb_id, season, number), filename, self.tv.name, folder, basedir=BASEDIR_TV)
-        self._log._add('tv', self.tv.tmdb_id, 'added strm file', season=season, episode=number, path=file)
+        file = create_file(STRM_EPISODE.format(self.tv.tmdb_id, episode.season, episode.number), episode.filename, self.tv.name, folder, basedir=BASEDIR_TV)
+        self._log._add('tv', self.tv.tmdb_id, 'added strm file', season=episode.season, episode=episode.number, path=file)
 
 
-class _TVShow():
+class _MixinGetDetailsKey:
+    def get_details_key(self, key, subkey='infolabels', fallback=''):
+        try:
+            return self.details[subkey][key]
+        except (KeyError, TypeError, AttributeError):
+            return fallback
+
+
+class _Episode(_MixinGetDetailsKey):
+    def __init__(self, tmdb_id, details):
+        self.tmdb_id = tmdb_id
+        self.details = details
+
+    @cached_property
+    def filename(self):
+        return validify_filename(f'S{try_int(self.season):02d}E{try_int(self.number):02d} - {self.name}')
+
+    @cached_property
+    def number(self):
+        return self.get_details_key('episode', fallback=0)
+
+    @cached_property
+    def season(self):
+        return self.get_details_key('season', fallback=0)
+
+    @cached_property
+    def name(self):
+        return self.get_details_key('title')
+
+    @cached_property
+    def premiered(self):
+        return self.get_details_key('premiered')
+
+
+class _Season(_MixinGetDetailsKey):
+    def __init__(self, tmdb_id, details):
+        self.tmdb_id = tmdb_id
+        self.details = details
+
+    @cached_property
+    def number(self):
+        return self.get_details_key('season', fallback=0)
+
+    @cached_property
+    def premiered(self):
+        return self.get_details_key('premiered')
+
+    @cached_property
+    def episodes(self):
+        try:
+            sync = BaseViewFactory('episodes', 'tv', int(self.tmdb_id), season=self.number)
+        except TypeError:
+            return []
+        if not sync.data:
+            return []
+        return [i for i in (_Episode(self.tmdb_id, episode) for episode in sync.data) if i.number != 0]
+
+
+class _TVShow(_MixinGetDetailsKey):
     def __init__(self, tmdb_id, force=False):
         self._cache = _TVShowCache(tmdb_id, force)
         self.tmdb_id = tmdb_id
-        self.details = None
-        self.name = None
 
-    def get_details(self):
-        self.details = TMDb().get_request_sc('tv', self.tmdb_id, append_to_response='external_ids')
-        if not self.details:
-            return
-        self.tvdb_id = self.details.get('external_ids', {}).get('tvdb_id')
-        self.imdb_id = self.details.get('external_ids', {}).get('imdb_id')
-        return self.details
+    @cached_property
+    def name(self):
+        name = f'{self.tvshowtitle} ({self.year})' if self.year else self.tvshowtitle
+        return get_unique_folder(name, self.tmdb_id, BASEDIR_TV)
 
-    def get_name(self):
-        date = f' ({self.details["first_air_date"][:4]})' if self.details.get('first_air_date') else ''
-        name = f'{self.details.get("name")}{date}'
-        self.name = get_unique_folder(name, self.tmdb_id, BASEDIR_TV)
-        return self.name
+    @cached_property
+    def tvshowtitle(self):
+        return self.get_details_key('tvshowtitle')
 
-    def get_dbid(self, kodi_db=None):
-        kodi_db = kodi_db or rpc.get_kodi_library('tv')
-        self.dbid = kodi_db.get_info(info='dbid', imdb_id=self.imdb_id, tmdb_id=self.tmdb_id, tvdb_id=self.tvdb_id)
-        return self.dbid
+    @cached_property
+    def year(self):
+        return self.get_details_key('year')
+
+    @cached_property
+    def tvdb_id(self):
+        return self.get_details_key('tvdb', subkey='unique_ids')
+
+    @cached_property
+    def imdb_id(self):
+        return self.get_details_key('imdb', subkey='unique_ids')
+
+    @cached_property
+    def details(self):
+        sync = BaseItemFactory('tvshow')
+        sync.tmdb_id = self.tmdb_id
+        return sync.data
+
+    @cached_property
+    def dbid(self):
+        return rpc.get_kodi_library('tv').get_info(
+            info='dbid',
+            imdb_id=self.imdb_id,
+            tmdb_id=self.tmdb_id,
+            tvdb_id=self.tvdb_id
+        )
 
     def get_episode_db_info(self, season, episode, info='dbid'):
         if not self.dbid:
             return
         return rpc.KodiLibrary(dbtype='episode', tvshowid=self.dbid, logging=False).get_info(
-            info=info, season=season, episode=episode)
+            info=info,
+            season=season,
+            episode=episode
+        )
 
-    def get_seasons(self):
-        self.seasons = self.details.get('seasons', [])
-        self.s_total = len(self.seasons)
-        return self.seasons
-
-    def get_episodes(self, season):
-        self.e_total = 0
-        self.season_details = TMDb().get_request('tv', self.tmdb_id, 'season', season, cache_refresh=True)
-        if not self.season_details:
+    @cached_property
+    def seasons(self):
+        try:
+            sync = BaseViewFactory('seasons', 'tv', int(self.tmdb_id))
+        except TypeError:
             return []
-        self.episodes = [i for i in self.season_details.get('episodes', []) if i.get('episode_number', 0) != 0]
-        self.e_total = len(self.episodes)
-        return self.episodes
+        if not sync.data:
+            return []
+        return [i for i in (_Season(self.tmdb_id, season) for season in sync.data) if i.number != 0]
 
     def make_nfo(self):
         create_nfo('tv', self.tmdb_id, self.name, basedir=BASEDIR_TV)
 
     def set_next(self):
-        self._cache.create_new_cache(self.details.get('name', ''))
-        self._cache.set_next_check(
+        self._cache.create_new_cache(self.name)
+        self._cache.set_next_check(  # TODO: FIX ME
             next_aired=self.details.get('next_episode_to_air', {}),
             last_aired=self.details.get('last_episode_to_air', {}),
             status=self.details.get('status'))

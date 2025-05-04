@@ -138,11 +138,6 @@ msgid "Hebrew (Israel)"
 msgstr ""
 
 #: /resources/settings.xml
-msgctxt "#32028"
-msgid "Use fanart.tv for widget artwork (slower)"
-msgstr "Käytä widgettien mediakuvituksille Fanart.tv-palvelua (hitaampi)"
-
-#: /resources/settings.xml
 msgctxt "#32029"
 msgid "OMDb API"
 msgstr "OMDb API"
@@ -173,16 +168,6 @@ msgid "Get watched indicators and episode counts (slower)"
 msgstr "Nouda katselutiedot ja jaksomäärät (hitaampi)"
 
 #: /resources/settings.xml
-msgctxt "#32035"
-msgid "Get tvshow watched episode counts from Trakt"
-msgstr "Nouda sarjan katsottujen jaksojen määrä Trakt-palvelusta"
-
-#: /resources/settings.xml
-msgctxt "#32036"
-msgid "Bundled Players"
-msgstr "Sisältyvät soittimet"
-
-#: /resources/settings.xml
 msgctxt "#32037"
 msgid "Use bundled players"
 msgstr "Käytä sisältyviä soittimia"
@@ -193,21 +178,6 @@ msgid "Get additional details from the local Kodi library database"
 msgstr "Nouda lisätietoja paikallisesta Kodi-kirjaston tietokannasta"
 
 #: /resources/settings.xml
-msgctxt "#32039"
-msgid "Kodi Library DB"
-msgstr "Kodi-kirjaston tietokanta"
-
-#: /resources/lib/player.py
-msgctxt "#32040"
-msgid "Item not found."
-msgstr "Kohdetta ei löytynyt."
-
-#: /resources/lib/player.py
-msgctxt "#32041"
-msgid "The plugin returned no results."
-msgstr "Lisäosa ei löytänyt tuloksia."
-
-#: /resources/lib/player.py
 msgctxt "#32042"
 msgid "Choose Action"
 msgstr "Valitse toiminto"
@@ -223,51 +193,6 @@ msgid "Enter Search Query"
 msgstr "Syötä hakulauseke"
 
 #: /resources/lib/container.py
-msgctxt "#32045"
-msgid "Cache Refresh"
-msgstr "Puskuroi päivitys"
-
-#: /resources/lib/container.py
-msgctxt "#32046"
-msgid "Cached details were refreshed"
-msgstr "Välimuistin tiedot päivitettiin"
-
-#: /resources/lib/container.py
-msgctxt "#32047"
-msgid "Remove from Trakt Collection"
-msgstr "Poista Trakt-kokoelmasta"
-
-#: /resources/lib/container.py
-msgctxt "#32048"
-msgid "Add to Trakt Collection"
-msgstr "Lisää Trakt-kokoelmaan"
-
-#: /resources/lib/container.py
-msgctxt "#32049"
-msgid "Remove from Trakt Watchlist"
-msgstr "Poista Trakt-katselulistalta"
-
-#: /resources/lib/container.py
-msgctxt "#32050"
-msgid "Add to Trakt Watchlist"
-msgstr "Poista Trakt-katselulistalle"
-
-#: /resources/lib/container.py
-msgctxt "#32051"
-msgid "Remove from Trakt Watched History"
-msgstr "Poista Trakt-katseluhistoriasta"
-
-#: /resources/lib/container.py
-msgctxt "#32052"
-msgid "Add to Trakt Watched History"
-msgstr "Lisää Trakt-katseluhistoriaan"
-
-#: /resources/lib/container.py
-msgctxt "#32053"
-msgid "Refresh Cache"
-msgstr "Päivitä välimuisti"
-
-#: /resources/lib/downloader.py
 msgctxt "#32054"
 msgid "Would you like to clear existing players first?"
 msgstr "Haluatko ensin tyhjentää olemassa olevat soittimet?"
@@ -308,58 +233,11 @@ msgid "Play with"
 msgstr "Toista soittimella"
 
 #: /resources/lib/context.py
-msgctxt "#32062"
-msgid "Successfully Added TMDb ID {0} to {1}"
-msgstr "TMDb ID {0} lisättiin kohteeseen \"{1}\""
-
-#: /resources/lib/context.py
-msgctxt "#32063"
-msgid "Successfully Removed TMDb ID {0} from {1}"
-msgstr "TMDb ID {0} poistettiin kohteesta \"{1}\""
-
-#: /resources/lib/context.py
-msgctxt "#32064"
-msgid ""
-"Do you wish to remove {0} from your Trakt {1}?\n"
-"\n"
-"TMDb {2} ID {3}"
-msgstr ""
-"Haluatko poistaa kohteen \"{0}\" Trakt-{1}?\n"
-"\n"
-"TMDb {2} ID {3}"
-
-#: /resources/lib/context.py
-msgctxt "#32065"
-msgid ""
-"Do you wish to add {0} to your Trakt {1}?\n"
-"\n"
-"TMDb {2} ID {3}"
-msgstr ""
-"Haluatko lisätä kohteen \"{0}\" Trakt-{1}?\n"
-"\n"
-"TMDb {2} ID {3}"
-
-#: /resources/settings.xml
 msgctxt "#32066"
 msgid "Debug logging"
 msgstr "Vianselvitysloki"
 
 #: /resources/settings.xml
-msgctxt "#32067"
-msgid "Fuzzy local library matching"
-msgstr "Epäselvempi paikallisen kirjaston täsmäys"
-
-#: /resources/settings.xml
-msgctxt "#32068"
-msgid "Allow fuzzy matches (ignore year) for movies"
-msgstr "Salli elokuvien epäselvät täsmäykset (älä huomioi vuotta)"
-
-#: /resources/settings.xml
-msgctxt "#32069"
-msgid "Allow fuzzy matches (ignore year) for tvshows"
-msgstr "Salli sarjojen epäselvät täsmäykset (älä huomioi vuotta)"
-
-#: /resources/lib/tmdb.py
 msgctxt "#32070"
 msgid "Male"
 msgstr "Mies"
@@ -368,11 +246,6 @@ msgstr "Mies"
 msgctxt "#32071"
 msgid "Female"
 msgstr "Nainen"
-
-#: /resources/settings.xml
-msgctxt "#32072"
-msgid "Unaired Items"
-msgstr "Esittämättömät kohteet"
 
 #: /resources/settings.xml
 msgctxt "#32073"
@@ -405,11 +278,6 @@ msgid "Still to Watch"
 msgstr "Vielä katsottavana"
 
 #: /resources/settings.xml
-msgctxt "#32079"
-msgid "System Use Only"
-msgstr "Vain järjestelmän käyttöön"
-
-#: /resources/settings.xml
 msgctxt "#32080"
 msgid "Other"
 msgstr "Muu"
@@ -418,16 +286,6 @@ msgstr "Muu"
 msgctxt "#32081"
 msgid "Next page item"
 msgstr "Seuraava sivu -kohde"
-
-#: /resources/settings.xml
-msgctxt "#32082"
-msgid "Watchlist sort method"
-msgstr "Katselulistan järjestystapa"
-
-#: /resources/settings.xml
-msgctxt "#32083"
-msgid "Accounts"
-msgstr "Käyttäjätilit"
 
 #: /resources/settings.xml
 msgctxt "#32084"
@@ -443,11 +301,6 @@ msgstr "Yhdistä tuotantokaudet"
 msgctxt "#32086"
 msgid "Auto-update library and add new/missing episodes"
 msgstr "Päivitä kirjasto automaattisesti ja lisää uudet/puuttuvat jaksot"
-
-#: /resources/settings.xml
-msgctxt "#32087"
-msgid "Use resolvedURL method for suppressing strm next playlist error"
-msgstr "Käytä resolvedURL-tapaa \"strm next playlist\" -virheen tukahduttamiseen"
 
 #: /resources/settings.xml
 msgctxt "#32088"
@@ -480,11 +333,6 @@ msgid "Next episodes sort method"
 msgstr "Seuraavien jaksojen järjestystapa"
 
 #: /resources/settings.xml
-msgctxt "#32094"
-msgid "Prioritise local files over default player"
-msgstr "Painota paikallisia tiedostoja oletussoittimen sijaan"
-
-#: /resources/lib/traktapi.py
 msgctxt "#32095"
 msgid "Enter the code"
 msgstr "Syötä koodi"
@@ -498,11 +346,6 @@ msgstr "Avaa [B]https://trakt.tv/activate[/B]"
 msgctxt "#32097"
 msgid "Trakt Authentication"
 msgstr "Trakt-todennus"
-
-#: /resources/lib/container.py
-msgctxt "#32098"
-msgid "Exists"
-msgstr "Poistumiset"
 
 #: /resources/lib/container.py
 msgctxt "#32099"
@@ -537,16 +380,6 @@ msgid ""
 msgstr ""
 "Kohteen {} TMDb ID:tä ei löytynyt tai mitään ei valittu.\n"
 "haluatko lisätä eri arvon?"
-
-#: /resources/lib/container.py
-msgctxt "#32105"
-msgid "Do you want to add another value?"
-msgstr "Haluatko lisätä eri arvon?"
-
-#: /resources/lib/container.py
-msgctxt "#32106"
-msgid "Added"
-msgstr "Lisätty"
 
 #: /resources/lib/container.py
 msgctxt "#32107"
@@ -589,24 +422,9 @@ msgid "Enter"
 msgstr "Syötä"
 
 #: /resources/lib/container.py
-msgctxt "#32115"
-msgid "Company"
-msgstr "Yritys"
-
-#: /resources/lib/container.py
-msgctxt "#32116"
-msgid "Network"
-msgstr "Verkko"
-
-#: /resources/lib/container.py
 msgctxt "#32117"
 msgid "Keyword"
 msgstr "Avainsana"
-
-#: /resources/lib/container.py
-msgctxt "#32118"
-msgid "Person"
-msgstr "Henkilö"
 
 #: /resources/lib/container.py
 msgctxt "#32119"
@@ -634,11 +452,6 @@ msgid "If error persists and the folders are created correctly, please disable f
 msgstr "Jos ongelma jatkuu ja kansiot on luotu oikein, poista kansion polun luontivalinta käytöstä TMDBHelperin asetuksista."
 
 #: /resources/lib/context.py
-msgctxt "#32124"
-msgid "Adding"
-msgstr "Lisätään"
-
-#: /resources/lib/context.py
 msgctxt "#32125"
 msgid "Add Trakt list to Kodi library"
 msgstr "Lisää Trakt-lista Kodin kirjastoon"
@@ -649,21 +462,6 @@ msgid "Are you sure you want to add this Trakt list to your Kodi library?"
 msgstr "Haluatko varmasti lisätä tämän Trakt-listan Kodin kirjastoon?"
 
 #: /resources/lib/context.py
-msgctxt "#32127"
-msgid "by user"
-msgstr "käyttäjältä"
-
-#: /resources/lib/context.py
-msgctxt "#32128"
-msgid "This list contains"
-msgstr "Lista sisältää"
-
-#: /resources/lib/context.py
-msgctxt "#32129"
-msgid "items"
-msgstr "kohdetta"
-
-#: /resources/settings.xml
 msgctxt "#32130"
 msgid "Auto-update library at time"
 msgstr "Päivitä kirjasto automaattisesti"
@@ -684,134 +482,19 @@ msgid "Select List(s)"
 msgstr "Valitse listat"
 
 #: /resources/settings.xml
-msgctxt "#32134"
-msgid "User slug"
-msgstr "Käyttäjän slug"
-
-#: /resources/lib/traktapi.py
-msgctxt "#32135"
-msgid "Successfully removed {} {} from {} list."
-msgstr "Kohde \"{}\" {} poistettiin listalta {}."
-
-#: /resources/lib/traktapi.py
-msgctxt "#32136"
-msgid "Successfully added {} {} to {} list."
-msgstr "Kohde \"{}\" {} lisättiin listalle {}."
-
-#: /resources/lib/traktapi.py
-msgctxt "#32137"
-msgid "Failed to remove {} {} from {} list."
-msgstr "Kohteen \"{}\" {} poisto listalta {} epäonnistui."
-
-#: /resources/lib/traktapi.py
-msgctxt "#32138"
-msgid "Failed to add {} {} to {} list."
-msgstr "Kohteen \"{}\" {} lisäys listalle {} epäonnistui."
-
-#: /resources/lib/traktapi.py
-msgctxt "#32139"
-msgid "Remove from Trakt list"
-msgstr "Poistettiin Trakt-listalta"
-
-#: /resources/lib/traktapi.py
-msgctxt "#32140"
-msgid "Add to Trakt list"
-msgstr "Lisättiin Trakt-listalle"
-
-#: /resources/lib/traktapi.py
-msgctxt "#32141"
-msgid "Create new list..."
-msgstr "Luo uusi lista..."
-
-#: /resources/settings.xml
 msgctxt "#32142"
 msgid "Hide watched items"
 msgstr "Piilota katsotut kohteet"
 
 #: /resources/lib/context.py
-msgctxt "#32143"
-msgid "Cached details for {} successfully refreshed!"
-msgstr "Kohteen \"{}\" välimuistiin puskuroidut tiedot on päivitetty!"
-
-#: /resources/lib/context.py
-msgctxt "#32144"
-msgid "Refresh TheMovieDb Details"
-msgstr "Päivitä TheMovieDb-tiedot"
-
-#: /addon.xml
-msgctxt "#32145"
-msgid "TMDbHelper Options"
-msgstr "TMDbHelperin asetukset"
-
-#: /addon.xml
-msgctxt "#32146"
-msgid "Play using (TMDbHelper)"
-msgstr "Toista soittimella (TMDbHelper)"
-
-#: /addon.xml
-msgctxt "#32147"
-msgid "Browse seasons (TMDbHelper)"
-msgstr "Selaa tuotantokausia (TMDbHelper)"
-
-#: /addon.xml
-msgctxt "#32148"
-msgid "Add/Remove from Trakt Watchlist"
-msgstr "Lisää/poista Trakt-katselulistalta"
-
-#: /addon.xml
-msgctxt "#32149"
-msgid "Add/Remove from Trakt History"
-msgstr "Lisää/poista Trakt-historiasta"
-
-#: /addon.xml
-msgctxt "#32150"
-msgid "Add/Remove from Trakt Collection"
-msgstr "Lisää/poista Trakt-kokoelmasta"
-
-#: /addon.xml
-msgctxt "#32151"
-msgid "Add to Kodi Library"
-msgstr "Lisää Kodin kirjastoon"
-
-#: /addon.xml
-msgctxt "#32152"
-msgid "Remove from list"
-msgstr "Poista listalta"
-
-#: /addon.xml
-msgctxt "#32153"
-msgid "Refresh cached details"
-msgstr "Pävitä välimuistin tiedot"
-
-#: /resources/settings.xml
 msgctxt "#32154"
 msgid "Update library now"
 msgstr "Päivitä kirjasto nyt"
 
 #: /resources/settings.xml
-msgctxt "#32155"
-msgid "Next Aired (Library)"
-msgstr "Seuraavat esitykset (kirjasto)"
-
-#: /resources/settings.xml
 msgctxt "#32156"
 msgid "Next aired library calendar links to local tvshow"
 msgstr "Kirjaston Seuraavat esitykset -kalenteri kohdistuu paikalliseen sarjaan"
-
-#: /resources/lib/context.py
-msgctxt "#32157"
-msgid "Unable to find TMDb ID for item."
-msgstr "Kohteelle ei löydetty TMDb ID -tunnistetta."
-
-#: /resources/settings.xml
-msgctxt "#32158"
-msgid "Automatically use player if only one available"
-msgstr "Jos vain yksi soitin on käytettävissä, käytä sitä automaattisesti"
-
-#: /resources/lib/container.py
-msgctxt "#32159"
-msgid "Select Original Language"
-msgstr "Valitse alkuperäinen kieli"
 
 #: /resources/lib/context.py
 msgctxt "#32160"
@@ -841,11 +524,6 @@ msgid ""
 msgstr ""
 "Trakt-listojen kirjastoon lisäystä rajoittaa listakohtainen [B]{}[/B] sarjan ja [B]{}[/B] elokuvan määrärajoitus.\n"
 "Rajoituksella varmistetaan, että tietoja ilmaiseksi toimittavia rajapintoja kunnioitetaan."
-
-#: /resources/lib/context.py
-msgctxt "#32165"
-msgid "List length exceeds limits. Skipping..."
-msgstr "Listan pituus ylittää rajoitukset. Ohitetaan..."
 
 #: /resources/lib/context.py
 msgctxt "#32166"
@@ -1103,35 +781,6 @@ msgid "Successfully logged out of Trakt user account"
 msgstr "Trat-tili uloskirjattiin"
 
 #: /resources/lib/script.py
-msgctxt "#32217"
-msgid "No artwork found for {} ID {}"
-msgstr "{} ID:lle {} ei löytynyt mediakuvituksia"
-
-#: /resources/lib/script.py
-msgctxt "#32218"
-msgid ""
-"Artwork found for {} ID {}\n"
-"{}"
-msgstr ""
-"{} ID:lle {} ei löytyi mediakuvitukset\n"
-"{}"
-
-#: /resources/lib/fanarttv.py
-msgctxt "#32219"
-msgid "Language {} | {} likes | ID {}"
-msgstr "Kieli {} | {} tykkäystä | ID {}"
-
-#: /resources/lib/script.py
-msgctxt "#32220"
-msgid "Select artwork"
-msgstr "Valitse mediakuvitukset"
-
-#: /resources/lib/script.py
-msgctxt "#32221"
-msgid "Refresh all artwork"
-msgstr "Päivitä kaikki mediakuvitukset"
-
-#: /resources/lib/listitem.py
 msgctxt "#32222"
 msgid "Manage artwork"
 msgstr "Hallitse mediakuvituksia"
@@ -1192,11 +841,6 @@ msgid "Refresh details"
 msgstr "Päivitä tiedot"
 
 #: /resources/lib/script.py
-msgctxt "#32234"
-msgid "Refreshed details for {} ID {}"
-msgstr "{} ID:n {} tiedot päivitettiin"
-
-#: /resources/lib/listitem.py
 msgctxt "#32235"
 msgid "Browse lists"
 msgstr "Selaa listoja"
@@ -1210,11 +854,6 @@ msgstr "Valitse kohde"
 msgctxt "#32237"
 msgid "Clear Discover History"
 msgstr "Tyhjennä Löydä katseltavaa -historia"
-
-#: /resources/lib/userdiscover.py
-msgctxt "#32238"
-msgid "Discover {}"
-msgstr "Löydä {}"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32239"
@@ -1487,16 +1126,6 @@ msgid "Remove from watchlist"
 msgstr "Poista katselulistalta"
 
 #: /resources/lib/script.py
-msgctxt "#32293"
-msgid "Add to recommendations"
-msgstr "Lisää suosituksiin"
-
-#: /resources/lib/script.py
-msgctxt "#32294"
-msgid "Remove from recommendations"
-msgstr "Poista suosituksista"
-
-#: /resources/lib/script.py
 msgctxt "#32295"
 msgid "Trakt options"
 msgstr "Trakt-asetukset"
@@ -1565,16 +1194,6 @@ msgid "No comments found!"
 msgstr "Kommentteja ei löytynyt!"
 
 #: /resources/lib/request/api.py
-msgctxt "#32307"
-msgid "Suppressing retries for {} seconds"
-msgstr "Tukahdutetaan uudelleenyritykset {} sekunniksi"
-
-#: /resources/lib/request/api.py
-msgctxt "#32308"
-msgid "ConnectionError: {}"
-msgstr "Yhteysvirhe: {}"
-
-#: /addon.xml
 msgctxt "#32309"
 msgid "Browse sorted list"
 msgstr "Selaa järjestettyä listaa"
@@ -1649,31 +1268,6 @@ msgid "Select player"
 msgstr "Valitse soitin"
 
 #: /resources/lib/helpers/update.py
-msgctxt "#32323"
-msgid "Item added to library"
-msgstr "Kohde lisättiin kirjastoon"
-
-#: /resources/lib/player/players.py
-msgctxt "#32324"
-msgid "Select Play Method"
-msgstr "Valitse toistotapa"
-
-#: /resources/lib/player/players.py
-msgctxt "#32325"
-msgid ""
-"Configuration for player is missing \"is_resolvable\" flag. Please select resolve method.\n"
-"\n"
-"setResolvedUrl is the preferred method and generally should work for any player addon that plays files directly, uses inputstream adapative, or only prompts to select bitrate/quality. PlayMedia should be used for any player addon which first runs a script to scrape sources or otherwise does not work correctly using the setResolvedUrl method.\n"
-"\n"
-"To override this dialog, set a resolve method for the player in TMDbHelper's player settings configuration dialog."
-msgstr ""
-"Soittimen määrityksistä puuttuu \"is_resolvable\"-lippu. Valitse selvitysmenetelmä.\n"
-"\n"
-"setResolvedUrl on Kodin ensisijainen menetelmä ja yleisesti sen pitäisi toimia minkä tahansa soitinlisäosan kanssa, joka toistaa tiedostot suoraan, käyttää Input Stream Adaptive -lisäosaa tai pyytää valitsemaan vain bittinupeuden/laadun. PlayMedia-menetelmää tulisi käyttää soitinlisäosille, jotka vaativat ensin lähteiden tutkintaa komentosarjan avulla tai eivät muuten toimi oikein setResolvedUrl-menetelmän kanssa.\n"
-"\n"
-"Ohita tämä ruutu asettamalla selvitysmenetelmä TMDbHelperin soitinasetusten määritysruudusta."
-
-#: /resources/lib/helpers/timedate.py
 msgctxt "#32326"
 msgid "This Month"
 msgstr "Tämä kuukausi"
@@ -1794,11 +1388,6 @@ msgid "Episode groups"
 msgstr "Jaksoryhmät"
 
 #: /resources/settings.xml
-msgctxt "#32346"
-msgid "Resend local files (fix Trakt scrobbling bug)"
-msgstr "Lähetä paikalliset tiedostot uudelleen (korjaa Trakt-seurannan vian)"
-
-#: /resources/settings.xml
 msgctxt "#32347"
 msgid "Log output of Trakt request"
 msgstr "Kirjaa Trakt-pyynnöt"
@@ -1809,16 +1398,6 @@ msgid "Log output of TMDb request"
 msgstr "Kirjaa TMDb-pyynnöt"
 
 #: /resources/lib/kodi/library.py
-msgctxt "#32349"
-msgid "Creating movies playlist"
-msgstr "Luodaan elokuvatoistolistaa"
-
-#: /resources/lib/kodi/library.py
-msgctxt "#32350"
-msgid "Creating tvshows playlist"
-msgstr "Luodaan sarjatoistolistaa"
-
-#: /resources/settings.xml
 msgctxt "#32351"
 msgid "Dummy ResolvedURL"
 msgstr "Tyhjä selvitetty URL-osoite"
@@ -1961,11 +1540,6 @@ msgid "Building Player Dialog"
 msgstr "Rakennetaan soittimen ikkunaa"
 
 #: /resources/lib/trakt/api.py
-msgctxt "#32377"
-msgid "Playcount"
-msgstr "Toistomäärä"
-
-#: /resources/settings.xml
 msgctxt "#32378"
 msgid "Show All"
 msgstr "Näytä kaikki"
@@ -2006,32 +1580,11 @@ msgid "Hide All"
 msgstr "Piilota kaikki"
 
 #: /resources/settings.xml
-msgctxt "#32386"
-msgid "Delete cache"
-msgstr "Poista välimuisti"
-
-#: /resources/lib/script/router.py
 msgctxt "#32387"
 msgid "Delete {} Cache"
 msgstr "Poista {} välimuisti"
 
 #: /resources/lib/script/router.py
-msgctxt "#32388"
-msgid ""
-"Are you sure you want to delete the {} cache? This action cannot be undone.\n"
-"\n"
-"TMDbHelper performs regular automatic cache management and cleaning. You should only delete the cache manually in cases of persistent cache related errors."
-msgstr ""
-"Haluatko varmasti poistaa {} välimuistin? Toimintoa ei ole mahdollista perua.\n"
-"\n"
-"TMDbHelper järjestää ja siivoaa välimuistin ajoittain automaattisesti. Välimuistin manuaalinen poisto tulisi suorittaa vain, jos pysyvässä välimuistissa havaitaan ongelmia."
-
-#: /resources/lib/script/router.py
-msgctxt "#32389"
-msgid "Cache deleted!"
-msgstr "Välimuisti on poistettu!"
-
-#: /resources/settings.xml
 msgctxt "#32390"
 msgid "Use alternative .nfo filename"
 msgstr "Käytä vaihtoehtoista .nfo-tiedoston nimeä"
@@ -2068,11 +1621,6 @@ msgid "Log timer reports for directories"
 msgstr "Kirjaa hakemistojen ajastusraportit"
 
 #: /resources/settings.xml
-msgctxt "#32396"
-msgid "Set unwatched episode count for in-progress tvshows only"
-msgstr "Aseta katsomattomien jaksojen määrä vain keskeneräisille sarjoille"
-
-#: /resources/settings.xml
 msgctxt "#32397"
 msgid "Original"
 msgstr "Alkuperäinen"
@@ -2083,11 +1631,6 @@ msgid "Medium"
 msgstr "Keskitasoinen"
 
 #: /resources/settings.xml
-msgctxt "#32399"
-msgid "Fallback to English when main language unavailable"
-msgstr "Käytä Englantia, jos ensisijainen kieli ei ole käytettävissä"
-
-#: /resources/settings.xml
 msgctxt "#32400"
 msgid "Play local Kodi library files"
 msgstr "Toista paikalliset Kodi-kirjaston tiedostot"
@@ -2096,16 +1639,6 @@ msgstr "Toista paikalliset Kodi-kirjaston tiedostot"
 msgctxt "#32401"
 msgid "TMDb detailed information"
 msgstr "Yksityiskohtaiset TMDb-tiedot"
-
-#: /resources/settings.xml
-msgctxt "#32402"
-msgid "Get additional details and artwork from TMDb"
-msgstr "Nouda TMDb:stä lisätietoja ja mediakuvituksia"
-
-#: /resources/settings.xml
-msgctxt "#32403"
-msgid "Increase sync list item limit per page (slower)"
-msgstr "Kasvata sivukohtaista listan kohteiden synkronointirajoitusta (hitaampi)"
 
 #: /resources/settings.xml
 msgctxt "#32404"
@@ -2126,11 +1659,6 @@ msgstr "Keskeneräiset jaksosi"
 msgctxt "#32407"
 msgid "Get resume points (experimental) (slower)"
 msgstr "Nouda katselun jatkopisteet (kokeellinen ja hitaampi)"
-
-#: /resources/settings.xml
-msgctxt "#32408"
-msgid "Prefer artwork from TMDb first if available"
-msgstr "Suosit ensisijaisesti TMDb:n mediakuvituksia, jos saatavilla"
 
 #: /resources/settings.xml
 msgctxt "#32409"
@@ -2173,11 +1701,6 @@ msgid "Premieres"
 msgstr "Ensiesitykset"
 
 #: /resources/lib/script/sync.py
-msgctxt "#32417"
-msgid "Remove from progress"
-msgstr "Poista edistymisestä"
-
-#: /resources/settings.xml
 msgctxt "#32418"
 msgid "Adds text to the start of the MPAA rating. For example if set to 'Rated' a 'PG' rating is displayed as 'Rated PG'. Cached items will need to be refreshed."
 msgstr "Lisää MPAA-ikäluokitusten eteen tekstin. Esim. teksti \"Ikäluokitus\" tuottaa \"PG\"-luokituksella \"Ikäluokitus PG\". Vaatii välimuistiin puskuroitujen kohteiden päivityksen."
@@ -2283,11 +1806,6 @@ msgid "Provider allowlist updated"
 msgstr "Toimittajan sallittujen tietojen lista päivitettiin"
 
 #: /resources/lib/script/method.py
-msgctxt "#32439"
-msgid "The provider allowlist has been updated. Please note that updating provider details requires the item cache to be refreshed. The item cache can be deleted in the expert settings section."
-msgstr "Toimittajan sallittujen tietojen lista päivitettiin. Huomioi että toimittajan tietojen päivitys edellyttää välimuistin päivitystä. Kohdevälimuisti voidaan poistaa asetusten Asiantuntija-oiosta."
-
-#: /resources/lib/player/configure.py
 msgctxt "#32440"
 msgid "Edit steps"
 msgstr "Muokkaa vaiheita"
@@ -2338,11 +1856,6 @@ msgid "Ignore region release filter"
 msgstr "Älä huomioi alueellista julkaisusuodatinta"
 
 #: /resources/settings.xml
-msgctxt "#32450"
-msgid "Install context menu add-on"
-msgstr "Asenna sisältövalikkolisäosa"
-
-#: /resources/lib/api/trakt/api.py
 msgctxt "#32451"
 msgid "Lowest"
 msgstr "Alin"
@@ -2408,16 +1921,6 @@ msgid "Cache items in custom lists you own for 24 hours"
 msgstr "Puskuroi omistamiesi mukautettujen listojen kohteet 24 tunnin ajan"
 
 #: /resources/settings.xml
-msgctxt "#32464"
-msgid "Significantly increases RAM usage but might improve repeat cache reads for disk cache located on slow storage devices (e.g. USB or SD card storage). Will likely cause worse cache performance for devices with normal storage (e.g. SSD, eMMC or internal HDD) or limited RAM."
-msgstr "Kasvatt RMA-varausta merkittävästi, mutta voi parantaa hitailla tallennusmedioilla (esim. USB-muistit tai SD-muistikortit) sijaitsevan levyvälimuistin suorituskykyä. Todennäköisesti heikentää suorituskykyä tavallisella tallennusmedialla (esim. SSD, eMMC tai sisäinen HDD) tai rajallisella RAM-muistimäärällä varustetuilla laitteilla."
-
-#: /resources/settings.xml
-msgctxt "#32465"
-msgid "Cache disk reads to memory (increases RAM usage)"
-msgstr "Puskuroi levyn luku muistiin (kasvattaa RAM-muistin varausta)"
-
-#: /resources/settings.xml
 msgctxt "#32466"
 msgid "Play automatically using available providers"
 msgstr "Toista automaattisesti käytettävissä olevilla toimittajilla"
@@ -2476,21 +1979,6 @@ msgstr "Valitse oletussoitin"
 msgctxt "#32477"
 msgid "Change default player for tvshow, season, or episode"
 msgstr "Valitse sarjan, kauden tai jakson oletussoitin"
-
-#: /resources/settings.xml
-msgctxt "#32478"
-msgid "Rebuild service listitems offscreen"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32479"
-msgid "Some platforms experience crashes while updating onscreen background service listitems with additional properties. Forcing service listitems to be rebuilt offscreen prevents this issue but will be slightly slower to add artwork and ratings. Restart Kodi to see changes."
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32480"
-msgid "Readahead caching of service listitems"
-msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32481"
@@ -2767,11 +2255,6 @@ msgid "Zulu (South Africa)"
 msgstr "Zulu (Etelä-Afrikka)"
 
 #: /resources/settings.xml
-msgctxt "#32000"
-msgid "TMDb API key"
-msgstr "TMDb API-avain"
-
-#: /resources/settings.xml
 msgctxt "#32001"
 msgid "OMDb API key"
 msgstr "OMDb API-avain"
@@ -2780,11 +2263,6 @@ msgstr "OMDb API-avain"
 msgctxt "#32002"
 msgid "Days to cache details"
 msgstr "Tietojen puskurointiaika (päivää)"
-
-#: /resources/settings.xml
-msgctxt "#32003"
-msgid "Days to cache lists"
-msgstr "Listojen puskurointiaika (päivää)"
 
 #: /resources/settings.xml
 msgctxt "#32004"
@@ -2797,26 +2275,11 @@ msgid "Language and country"
 msgstr "Kieli ja maa"
 
 #: /resources/lib/utils.py
-msgctxt "#32006"
-msgid "Choose item"
-msgstr "Valitse kohde"
-
-#: /resources/lib/requestapi.py
 msgctxt "#32007"
 msgid "Unauthorised 401 Error"
 msgstr "Unauthorised 401 -virhe"
 
 #: /resources/lib/requestapi.py
-msgctxt "#32008"
-msgid "API Key"
-msgstr "API-avain"
-
-#: /resources/lib/requestapi.py
-msgctxt "#32009"
-msgid "API returned 401 unauthorised error. If you have entered an API key for this service$COMMA please check that it is correct. If this error relates to TMDb API$COMMA please post a debug log to [B]https://github.com/jurialmunkey/plugin.video.themoviedb.helper/issues[/B]"
-msgstr "API palautti \"401 unauthorised\" -virheen. Jos palvelulle on syötetty API-avain, varmista että se on oikein. Jos ongelma liittyy TMDb API:in, lähetä avaa ongelma vianselvityslokilla osoitteessa [B]https://github.com/jurialmunkey/plugin.video.themoviedb.helper/issues[/B]."
-
-#: /resources/settings.xml
 msgctxt "#32010"
 msgid "Authenticate Trakt account..."
 msgstr "Todenna Trakt-tili..."
@@ -2832,19 +2295,9 @@ msgid "You must authenticate your Trakt account to use this feature."
 msgstr "Ominaisuuden käyttö edellyttää Trakt-tilin todennusta."
 
 #: /resources/settings.xml
-msgctxt "#32013"
-msgid "Display Trakt list management options in TMDb details list"
-msgstr "Näytä Trakt-listojen hallintavalinnat TMDb-tietolistassa"
-
-#: /resources/settings.xml
 msgctxt "#32014"
 msgid "Players"
 msgstr "Soittimet"
-
-#: /resources/settings.xml
-msgctxt "#32015"
-msgid "Players URL"
-msgstr "Soittimen URL-osoite"
 
 #: /resources/settings.xml
 msgctxt "#32016"
@@ -2857,29 +2310,14 @@ msgid "API Keys"
 msgstr "API-avaimet"
 
 #: /resources/settings.xml
-msgctxt "#32018"
-msgid "Fanart.tv API key"
-msgstr "Fanart.tv API -avain"
-
-#: /resources/settings.xml
 msgctxt "#32019"
 msgid "Fanart.tv client key"
 msgstr "Fanart.tv Client -avain"
 
 #: /resources/settings.xml
-msgctxt "#32020"
-msgid "Only use if default api key is deactivated"
-msgstr "Käytä vain, jos oletusarovoinen API-avain on poistettu käytöstä"
-
-#: /resources/settings.xml
 msgctxt "#32021"
 msgid "Use fanart.tv for plugin artwork (slower)"
 msgstr "Käytä lisäosan mediakuvituksille Fanart.tv-palvelua (hitaampi)"
-
-#: /resources/settings.xml
-msgctxt "#32022"
-msgid "Play / Open"
-msgstr "Toista / Avaa"
 
 #: /resources/settings.xml
 msgctxt "#32023"
@@ -2895,11 +2333,6 @@ msgstr "Elokuvien oletussoitin"
 msgctxt "#32025"
 msgid "Default player for episodes"
 msgstr "Jaksojen oletussoitin"
-
-#: /resources/settings.xml
-msgctxt "#32026"
-msgid "Choose default players"
-msgstr "Valitse oletussoittimet"
 
 #: /resources/settings.xml
 msgctxt "#32027"

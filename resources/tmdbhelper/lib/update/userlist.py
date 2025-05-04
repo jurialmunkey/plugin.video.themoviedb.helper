@@ -1,3 +1,4 @@
+from xbmc import executebuiltin
 from xbmcgui import Dialog
 from tmdbhelper.lib.addon.dialog import BusyDialog
 from tmdbhelper.lib.addon.plugin import get_setting, get_localized, set_setting
@@ -84,6 +85,9 @@ def monitor_userlist():
 def library_autoupdate(list_slugs=None, user_slugs=None, busy_spinner=False, force=False):
     kodi_log(u'UPDATING LIBRARY', 1)
     Dialog().notification('TMDbHelper', f'{get_localized(32167)}...')
+
+    # Clean library if forcing to make sure dead entries removed
+    executebuiltin('CleanLibrary("video")', True) if force else None
 
     # Update library from Trakt lists
     library_adder = None

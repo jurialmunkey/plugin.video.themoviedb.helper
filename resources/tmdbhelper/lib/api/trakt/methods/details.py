@@ -76,8 +76,6 @@ def get_showitem_details(self, i):
 
 
 def get_ratings(self, trakt_type, trakt_id, season=None, episode=None):
-    from contextlib import suppress
-
     def _get_url():
         if episode and season:
             return f'shows/{trakt_id}/seasons/{season}/episodes/{episode}/ratings'
@@ -91,9 +89,7 @@ def get_ratings(self, trakt_type, trakt_id, season=None, episode=None):
 
     response = self.get_request_sc(_get_url())
 
-    trakt_rating, trakt_votes = None, None
-    with suppress(KeyError, TypeError):
-        trakt_rating = f'{response["rating"] or 0.0:0.1f}'
-        trakt_votes = f'{response["votes"] or 0.0:0,.0f}'
-
-    return (trakt_rating, trakt_votes)
+    try:
+        return (response['rating'], response['votes'])
+    except (KeyError, TypeError):
+        return (None, None)

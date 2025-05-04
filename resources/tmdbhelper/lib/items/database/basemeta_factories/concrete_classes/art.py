@@ -1,0 +1,83 @@
+
+from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.baseclass import ItemDetailsList, ArtworkDetailsMixin
+
+
+class Art(ItemDetailsList):
+    table = 'art'
+    keys = ('aspect_ratio', 'quality', 'iso_language', 'icon', 'type', 'extension', 'rating', 'votes', 'parent_id',)
+    conditions = 'parent_id=? ORDER BY rating DESC'  # WHERE conditions
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, )
+
+
+class ArtType(ArtworkDetailsMixin, Art):
+    conditions = 'parent_id=? AND type=? ORDER BY rating DESC LIMIT 1'  # WHERE conditions
+
+    def image_path_func(self, v):
+        return self.common_apis.tmdb_imagepath.get_imagepath_fanart(v)
+
+
+class ArtPoster(ArtType):
+    conditions = 'parent_id=? AND (type=? OR type=?) ORDER BY rating DESC LIMIT 1'  # WHERE conditions
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, 'posters', 'profiles')
+
+    def image_path_func(self, v):
+        return self.common_apis.tmdb_imagepath.get_imagepath_poster(v)
+
+
+class ArtThumbs(ArtType):
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, 'stills')
+
+    def image_path_func(self, v):
+        return self.common_apis.tmdb_imagepath.get_imagepath_thumbs(v)
+
+
+class ArtFanart(ArtType):
+    conditions = 'parent_id=? AND type=? ORDER BY rating DESC LIMIT 1'  # WHERE conditions
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, 'backdrops', )
+
+    def image_path_func(self, v):
+        return self.common_apis.tmdb_imagepath.get_imagepath_fanart(v)
+
+    def get_cached_data(self):
+        return self.get_cached_data_by_null()
+
+
+class ArtExtraFanart(ArtType):
+    conditions = 'parent_id=? AND type=? ORDER BY rating DESC LIMIT 10 OFFSET 1'  # WHERE conditions
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, 'backdrops', )
+
+    def image_path_func(self, v):
+        return self.common_apis.tmdb_imagepath.get_imagepath_fanart(v)
+
+    def get_cached_data(self):
+        return self.get_cached_data_by_null()
+
+
+class ArtLandscape(ArtFanart):
+    def get_cached_data(self):
+        return self.get_cached_data_by_language() or self.get_cached_data_by_english()
+
+
+class ArtClearlogo(ArtType):
+    conditions = 'parent_id=? AND type=? AND extension=? ORDER BY rating DESC LIMIT 1'  # WHERE conditions
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, 'logos', 'png')
+
+    def image_path_func(self, v):
+        return self.common_apis.tmdb_imagepath.get_imagepath_clogos(v)

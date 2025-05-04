@@ -13,34 +13,102 @@ REGEX_WINPROP_SUB = r'\$WINPROP\[{}\]'
 
 
 def test_func():
-    from tmdbhelper.lib.api.tmdb.api import TMDb
-    tmdb_api = TMDb()
-
-    # data = tmdb_api.get_request_sc('tv', '1399', 'season', '1', append_to_response=tmdb_api.append_to_response)
-    # from tmdbhelper.lib.files.futils import dumps_to_file
-    # dumps_to_file(data, 'log_data', 'sync_data_season.json', join_addon_data=True)
-    # data = tmdb_api.get_request_sc('tv', '1399', 'season', '1', 'episode', '1', append_to_response=tmdb_api.append_to_response)
-    # from tmdbhelper.lib.files.futils import dumps_to_file
-    # dumps_to_file(data, 'log_data', 'sync_data_episode.json', join_addon_data=True)
-    # return
-    # from tmdbhelper.lib.addon.logger import CProfiler
-
-    from tmdbhelper.lib.items.database.tmdbdata import ItemDetailsDataBaseCacheFactory
-    sync = ItemDetailsDataBaseCacheFactory('episode')
-    # sync.tmdb_id = 348
-    sync.tmdb_id = 1399
-    sync.season = 2
-    sync.episode = 3
-    sync.tmdb_api = tmdb_api
-    sync.cache_refresh = 'force'
-    sync.cache.del_database_init()
-
-    # with CProfiler():
-    with sync.cache.get_database() as sync.connection:
-        data = sync.data
-
     import xbmcgui
-    xbmcgui.Dialog().textviewer('TEST', f'{data}')
+    from tmdbhelper.lib.api.tmdb.api import TMDb
+    from tmdbhelper.lib.api.trakt.api import TraktAPI
+    from tmdbhelper.lib.files.futils import dumps_to_file
+    from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
+    from tmdbhelper.lib.addon.plugin import get_version
+    head = ''
+    data = ''
+
+    # data = get_version()
+
+    # from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
+    # iddb = ItemDetailsDatabase()
+    # iddb.clean_expired_items()
+
+    tmdb_api = TMDb()
+    # data = tmdb_api.tmdb_database.get_nextaired(100088)
+    # data = tmdb_api.tmdb_database.get_tmdb_id('movie', imdb_id='tt0078748')
+    # data = tmdb_api.tmdb_database.get_tmdb_id('tv', tvdb_id=81189)
+    # data = tmdb_api.tmdb_database.get_tmdb_id('tv', imdb_id='tt0903747')
+    # data = tmdb_api.tmdb_database.get_tmdb_id('movie', title='aLIEN', year=1979)
+    # data = tmdb_api.tmdb_database.get_tmdb_id('tv', title='Breaking Bad', year=2008)
+    # data = tmdb_api.tmdb_database.get_tmdb_id('collection', title='Alien Collection')
+    # data = tmdb_api.tmdb_database.get_tmdb_id('company', title='Netflix')
+    # data = tmdb_api.tmdb_database.get_tmdb_id('keyword', title='aliens')
+    # data = tmdb_api.tmdb_database.get_tmdb_id('person', title='danny devito')
+    # data = tmdb_api.tmdb_database.get_tmdb_id_from_query('person', 'danny dev', use_details=True)
+    # data = tmdb_api.tmdb_database.get_watch_providers('tv', 'AU')
+    # data = tmdb_api.tmdb_database.get_certification('tv', 'AU')
+    # data = tmdb_api.tmdb_database.get_tmdb_id(query='the Terminator', use_multisearch=True)
+    # data = tmdb_api.tmdb_database.get_watch_providers('movie', 'AU')
+    # data = tmdb_api.tmdb_database.get_keywords()
+
+    data = tmdb_api.get_response_json('find', 'tt20603288', external_source='imdb_id')
+
+    # trakt_api = TraktAPI()
+    # path = trakt_api.get_request_url('users/hidden/dropped')
+    # data = trakt_api.get_api_request(path, headers=trakt_api.headers).json()
+
+    # sync = BaseItemFactory('season')
+    # sync.tmdb_id = 79744
+    # sync.season = 2
+    # sync.cache_refresh = 'force'
+    # sync.cache.del_database_init()
+    # data = sync.data
+
+    # sync = BaseItemFactory('episode')
+    # sync.tmdb_id = 1399
+    # sync.season = 2
+    # sync.episode = 3
+
+    # sync = BaseItemFactory('video')
+    # sync.tmdb_id = 17419
+
+    # sync = BaseItemFactory('movie')
+    # sync.tmdb_id = 348
+    # data = sync.data['infoproperties']['set.tmdb_id']
+    # head = sync.item_id
+
+    # from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
+    # sync = BaseViewFactory('episodes', 'tv', 1396, season=2)
+    # data = sync.data
+
+    # sync.cache_refresh = 'never'
+    # data = sync.return_basemeta_db('art_poster').item_id
+
+    # from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
+    # sync = BaseViewFactory('crewedmovies', 'person', 138)
+    # data = sync.data
+
+    # sync.extendedinfo = True
+
+    # head = sync.item_id
+
+    # tmdb = TMDb()
+    # data = tmdb.genres
+    # data = tmdb.get_response_json('configuration')
+    # data = tmdb.get_response_json('tv', 249042, append_to_response=tmdb.append_to_response)
+
+    # from tmdbhelper.lib.api.kodi.rpc import get_jsonrpc
+    # method = 'VideoLibrary.GetMovies'
+    # params = {
+    #     'properties': [
+    #         'title', 'year'
+    #     ],
+    #     'filter': {
+    #         'and': [
+    #             {'field': 'title', 'operator': 'is', 'value': 'Alien'},
+    #             {'field': 'year', 'operator': 'is', 'value': '1979'}
+    #         ]
+    #     }
+    # }
+    # data = get_jsonrpc(method, params)
+
+    xbmcgui.Dialog().textviewer(f'{head}', f'{data}')
+    dumps_to_file(data, 'log_data', 'test_func.json', join_addon_data=True)
 
 
 class Script(object):
@@ -74,14 +142,6 @@ class Script(object):
         'kodi_setting':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.kodi_utils', 'kodi_setting')(**kwargs),
 
-        # ItemBuilder Details
-        'manage_artwork':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.itembuilder', 'manage_artwork')(**kwargs),
-        'select_artwork':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.itembuilder', 'select_artwork')(**kwargs),
-        'refresh_details':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.itembuilder', 'refresh_details')(**kwargs),
-
         # Context Menu
         'related_lists':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.context_menu', 'related_lists')(**kwargs),
@@ -89,6 +149,8 @@ class Script(object):
         # TMDb Utils
         'sync_tmdb':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.tmdb', 'sync_tmdb')(**kwargs),
+        'refresh_details':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.tmdb', 'refresh_item')(**kwargs),
 
         # Trakt Utils
         'like_list':
@@ -169,8 +231,6 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.logging', 'log_request')(**kwargs),
         'log_sync':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.logging', 'log_sync')(**kwargs),
-        'delete_cache':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.maintenance', 'delete_cache')(**kwargs),
         'recache_kodidb':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.maintenance', 'recache_kodidb')(),
         'build_awards':

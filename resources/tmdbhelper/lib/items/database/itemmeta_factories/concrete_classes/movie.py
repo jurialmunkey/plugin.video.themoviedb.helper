@@ -1,0 +1,28 @@
+from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem
+
+
+class Movie(MediaItem):
+    infolabels_dbcitem_routes = (
+        (('certification', None), 'name', 'mpaa'),
+        (('video', None), 'path', 'trailer'),
+        (('playcount', None), 'plays', 'playcount'),
+    )
+
+    def get_infoproperties_special(self, infoproperties):
+        infoproperties = self.get_infoproperties_custom(infoproperties)
+        infoproperties = self.get_infoproperties_progress(infoproperties)
+        infoproperties = self.get_infoproperties_collection(infoproperties)
+        return infoproperties
+
+    def get_infoproperties_collection(self, infoproperties):
+        infoproperties = self.get_infoproperties_custom(infoproperties)
+        try:
+            from tmdbhelper.lib.api.tmdb.images import TMDbImagePath
+            tmdb_imagepath = TMDbImagePath()
+            infoproperties['set.title'] = infoproperties['set.name'] = self.data[0]['collection_title']
+            infoproperties['set.tmdb_id'] = self.data[0]['collection_tmdb_id']
+            infoproperties['set.poster'] = tmdb_imagepath.get_imagepath_poster(self.data[0]['collection_poster'])
+            infoproperties['set.fanart'] = tmdb_imagepath.get_imagepath_fanart(self.data[0]['collection_fanart'])
+        except (TypeError, KeyError, IndexError):
+            pass
+        return infoproperties

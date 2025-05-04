@@ -137,11 +137,6 @@ msgid "Hebrew (Israel)"
 msgstr "Іврит (Ізраїль)"
 
 #: /resources/settings.xml
-msgctxt "#32028"
-msgid "Use fanart.tv for widget artwork (slower)"
-msgstr "Викор. fanart.tv для ілюстрацій віджетів (повільно)"
-
-#: /resources/settings.xml
 msgctxt "#32029"
 msgid "OMDb API"
 msgstr ""
@@ -172,16 +167,6 @@ msgid "Get watched indicators and episode counts (slower)"
 msgstr "Індикатори переглянутого та кількості серій"
 
 #: /resources/settings.xml
-msgctxt "#32035"
-msgid "Get tvshow watched episode counts from Trakt"
-msgstr "Отримувати індикатори к-сті серій з Trakt"
-
-#: /resources/settings.xml
-msgctxt "#32036"
-msgid "Bundled Players"
-msgstr "Вбудовані плеєри"
-
-#: /resources/settings.xml
 msgctxt "#32037"
 msgid "Use bundled players"
 msgstr "Використовувати вбудовані плеєри"
@@ -192,21 +177,6 @@ msgid "Get additional details from the local Kodi library database"
 msgstr "Отримувати додаткові відомості з локальної бази даних медіатеки"
 
 #: /resources/settings.xml
-msgctxt "#32039"
-msgid "Kodi Library DB"
-msgstr "База даних медіатеки"
-
-#: /resources/lib/player.py
-msgctxt "#32040"
-msgid "Item not found."
-msgstr "Елемент не знайдено."
-
-#: /resources/lib/player.py
-msgctxt "#32041"
-msgid "The plugin returned no results."
-msgstr "Плагін не повернув результату."
-
-#: /resources/lib/player.py
 msgctxt "#32042"
 msgid "Choose Action"
 msgstr "Обрати дію"
@@ -222,51 +192,6 @@ msgid "Enter Search Query"
 msgstr "Введіть пошуковий запит"
 
 #: /resources/lib/container.py
-msgctxt "#32045"
-msgid "Cache Refresh"
-msgstr "Оновити кеш"
-
-#: /resources/lib/container.py
-msgctxt "#32046"
-msgid "Cached details were refreshed"
-msgstr "Закешовані відомості оновлено"
-
-#: /resources/lib/container.py
-msgctxt "#32047"
-msgid "Remove from Trakt Collection"
-msgstr "Видалити з колекції Trakt"
-
-#: /resources/lib/container.py
-msgctxt "#32048"
-msgid "Add to Trakt Collection"
-msgstr "Додати до колекції Trakt"
-
-#: /resources/lib/container.py
-msgctxt "#32049"
-msgid "Remove from Trakt Watchlist"
-msgstr "Видалити із закладок Trakt"
-
-#: /resources/lib/container.py
-msgctxt "#32050"
-msgid "Add to Trakt Watchlist"
-msgstr "Додати до закладок Trakt"
-
-#: /resources/lib/container.py
-msgctxt "#32051"
-msgid "Remove from Trakt Watched History"
-msgstr "Видалити з історії переглянутого Trakt"
-
-#: /resources/lib/container.py
-msgctxt "#32052"
-msgid "Add to Trakt Watched History"
-msgstr "Додати до історії переглянутого Trakt"
-
-#: /resources/lib/container.py
-msgctxt "#32053"
-msgid "Refresh Cache"
-msgstr "Оновити кеш"
-
-#: /resources/lib/downloader.py
 msgctxt "#32054"
 msgid "Would you like to clear existing players first?"
 msgstr "Бажаєте спочатку очистити існуючі плеєри?"
@@ -307,58 +232,11 @@ msgid "Play with"
 msgstr "Відтворити в"
 
 #: /resources/lib/context.py
-msgctxt "#32062"
-msgid "Successfully Added TMDb ID {0} to {1}"
-msgstr "Успішно додано TMDb ID {0} до {1}"
-
-#: /resources/lib/context.py
-msgctxt "#32063"
-msgid "Successfully Removed TMDb ID {0} from {1}"
-msgstr "Успішно видалено TMDb ID {0} з {1}"
-
-#: /resources/lib/context.py
-msgctxt "#32064"
-msgid ""
-"Do you wish to remove {0} from your Trakt {1}?\n"
-"\n"
-"TMDb {2} ID {3}"
-msgstr ""
-"Бажаєте видалити {0} з вашого Trakt {1}?\n"
-"\n"
-"TMDb {2} ID {3}"
-
-#: /resources/lib/context.py
-msgctxt "#32065"
-msgid ""
-"Do you wish to add {0} to your Trakt {1}?\n"
-"\n"
-"TMDb {2} ID {3}"
-msgstr ""
-"Бажаєте додати {0} до вашого Trakt {1}?\n"
-"\n"
-"TMDb {2} ID {3}"
-
-#: /resources/settings.xml
 msgctxt "#32066"
 msgid "Debug logging"
 msgstr "Журнал налагодження"
 
 #: /resources/settings.xml
-msgctxt "#32067"
-msgid "Fuzzy local library matching"
-msgstr "Нечіткий підбір локальної медіатеки"
-
-#: /resources/settings.xml
-msgctxt "#32068"
-msgid "Allow fuzzy matches (ignore year) for movies"
-msgstr "Дозволити нечіткий підбір (ігнорувати рік) для фільмів"
-
-#: /resources/settings.xml
-msgctxt "#32069"
-msgid "Allow fuzzy matches (ignore year) for tvshows"
-msgstr "Дозволити нечіткий підбір (ігнорувати рік) для серіалів"
-
-#: /resources/lib/tmdb.py
 msgctxt "#32070"
 msgid "Male"
 msgstr "Чоловік"
@@ -367,11 +245,6 @@ msgstr "Чоловік"
 msgctxt "#32071"
 msgid "Female"
 msgstr "Жінка"
-
-#: /resources/settings.xml
-msgctxt "#32072"
-msgid "Unaired Items"
-msgstr "Невидані елементи"
 
 #: /resources/settings.xml
 msgctxt "#32073"
@@ -404,11 +277,6 @@ msgid "Still to Watch"
 msgstr "Перегляну пізніше"
 
 #: /resources/settings.xml
-msgctxt "#32079"
-msgid "System Use Only"
-msgstr "Тільки для системного використання"
-
-#: /resources/settings.xml
 msgctxt "#32080"
 msgid "Other"
 msgstr "Інші"
@@ -417,16 +285,6 @@ msgstr "Інші"
 msgctxt "#32081"
 msgid "Next page item"
 msgstr "Наступна сторінка"
-
-#: /resources/settings.xml
-msgctxt "#32082"
-msgid "Watchlist sort method"
-msgstr "Сортування закладок"
-
-#: /resources/settings.xml
-msgctxt "#32083"
-msgid "Accounts"
-msgstr "Акаунти"
 
 #: /resources/settings.xml
 msgctxt "#32084"
@@ -442,11 +300,6 @@ msgstr "Об'єднати сезони в один ряд"
 msgctxt "#32086"
 msgid "Auto-update library and add new/missing episodes"
 msgstr "Автоматично оновляти медіатеку та додавати нові/пропущені серії"
-
-#: /resources/settings.xml
-msgctxt "#32087"
-msgid "Use resolvedURL method for suppressing strm next playlist error"
-msgstr "Метод resolvedURL для усунення помилки наступного плейлисту"
 
 #: /resources/settings.xml
 msgctxt "#32088"
@@ -479,11 +332,6 @@ msgid "Next episodes sort method"
 msgstr "Метод сортування наступних серій"
 
 #: /resources/settings.xml
-msgctxt "#32094"
-msgid "Prioritise local files over default player"
-msgstr "Надавати перевагу локальним файлам заміть стандартного плеєра"
-
-#: /resources/lib/traktapi.py
 msgctxt "#32095"
 msgid "Enter the code"
 msgstr "Введіть код"
@@ -497,11 +345,6 @@ msgstr "Перейдіть на [B]https://trakt.tv/activate[/B]"
 msgctxt "#32097"
 msgid "Trakt Authentication"
 msgstr "Авторизація Trakt"
-
-#: /resources/lib/container.py
-msgctxt "#32098"
-msgid "Exists"
-msgstr "Існує"
 
 #: /resources/lib/container.py
 msgctxt "#32099"
@@ -536,16 +379,6 @@ msgid ""
 msgstr ""
 "TMDb ID для {} не знайдено або не обрано.\n"
 "Додати інше значення?"
-
-#: /resources/lib/container.py
-msgctxt "#32105"
-msgid "Do you want to add another value?"
-msgstr "Додати інше значення?"
-
-#: /resources/lib/container.py
-msgctxt "#32106"
-msgid "Added"
-msgstr "Додано"
 
 #: /resources/lib/container.py
 msgctxt "#32107"
@@ -588,24 +421,9 @@ msgid "Enter"
 msgstr "Ввести"
 
 #: /resources/lib/container.py
-msgctxt "#32115"
-msgid "Company"
-msgstr "Компанія"
-
-#: /resources/lib/container.py
-msgctxt "#32116"
-msgid "Network"
-msgstr "Мережа"
-
-#: /resources/lib/container.py
 msgctxt "#32117"
 msgid "Keyword"
 msgstr "Ключове слово"
-
-#: /resources/lib/container.py
-msgctxt "#32118"
-msgid "Person"
-msgstr "Персона"
 
 #: /resources/lib/container.py
 msgctxt "#32119"
@@ -633,11 +451,6 @@ msgid "If error persists and the folders are created correctly, please disable f
 msgstr "Якщо помилка не зникає та теки створюються вірно, будь ласка, вимкніть опцію перевірки створення шляху теки в налаштуваннях TMDbHelper."
 
 #: /resources/lib/context.py
-msgctxt "#32124"
-msgid "Adding"
-msgstr "Додаємо"
-
-#: /resources/lib/context.py
 msgctxt "#32125"
 msgid "Add Trakt list to Kodi library"
 msgstr "Додати список Trakt до локальної медіатеки"
@@ -648,21 +461,6 @@ msgid "Are you sure you want to add this Trakt list to your Kodi library?"
 msgstr "Додати список Trakt до локальної медіатеки?"
 
 #: /resources/lib/context.py
-msgctxt "#32127"
-msgid "by user"
-msgstr "користувачем"
-
-#: /resources/lib/context.py
-msgctxt "#32128"
-msgid "This list contains"
-msgstr "Цей список містить"
-
-#: /resources/lib/context.py
-msgctxt "#32129"
-msgid "items"
-msgstr "елементів"
-
-#: /resources/settings.xml
 msgctxt "#32130"
 msgid "Auto-update library at time"
 msgstr "Автоматично оновляти медіатеку о"
@@ -683,134 +481,19 @@ msgid "Select List(s)"
 msgstr "Оберіть список"
 
 #: /resources/settings.xml
-msgctxt "#32134"
-msgid "User slug"
-msgstr "Користувацький slug"
-
-#: /resources/lib/traktapi.py
-msgctxt "#32135"
-msgid "Successfully removed {} {} from {} list."
-msgstr "Успішно видалено {} {} зі списку {}."
-
-#: /resources/lib/traktapi.py
-msgctxt "#32136"
-msgid "Successfully added {} {} to {} list."
-msgstr "Успішно додано {} {} до списку {}."
-
-#: /resources/lib/traktapi.py
-msgctxt "#32137"
-msgid "Failed to remove {} {} from {} list."
-msgstr "Не вдалося видалити {} {} зі списку {}."
-
-#: /resources/lib/traktapi.py
-msgctxt "#32138"
-msgid "Failed to add {} {} to {} list."
-msgstr "Не вдалося додати {} {} до списку {}."
-
-#: /resources/lib/traktapi.py
-msgctxt "#32139"
-msgid "Remove from Trakt list"
-msgstr "Видалити зі списку Trakt"
-
-#: /resources/lib/traktapi.py
-msgctxt "#32140"
-msgid "Add to Trakt list"
-msgstr "Додати до списку Trakt"
-
-#: /resources/lib/traktapi.py
-msgctxt "#32141"
-msgid "Create new list..."
-msgstr "Створити новий список..."
-
-#: /resources/settings.xml
 msgctxt "#32142"
 msgid "Hide watched items"
 msgstr "Сховати переглянуті елементи"
 
 #: /resources/lib/context.py
-msgctxt "#32143"
-msgid "Cached details for {} successfully refreshed!"
-msgstr "Кеш відомостей для {} успішно оновлено!"
-
-#: /resources/lib/context.py
-msgctxt "#32144"
-msgid "Refresh TheMovieDb Details"
-msgstr "Оновити відомості TheMovieDb"
-
-#: /addon.xml
-msgctxt "#32145"
-msgid "TMDbHelper Options"
-msgstr "Опції TMDbHelper"
-
-#: /addon.xml
-msgctxt "#32146"
-msgid "Play using (TMDbHelper)"
-msgstr "Відтворити в (TMDbHelper)"
-
-#: /addon.xml
-msgctxt "#32147"
-msgid "Browse seasons (TMDbHelper)"
-msgstr "Оглянути сезони (TMDbHelper)"
-
-#: /addon.xml
-msgctxt "#32148"
-msgid "Add/Remove from Trakt Watchlist"
-msgstr "Додати/видалити із закладок Trakt"
-
-#: /addon.xml
-msgctxt "#32149"
-msgid "Add/Remove from Trakt History"
-msgstr "Додати/Видалити з історії Trakt"
-
-#: /addon.xml
-msgctxt "#32150"
-msgid "Add/Remove from Trakt Collection"
-msgstr "Додати/Видалити з колекції Trakt"
-
-#: /addon.xml
-msgctxt "#32151"
-msgid "Add to Kodi Library"
-msgstr "Додати до локальної медіатеки"
-
-#: /addon.xml
-msgctxt "#32152"
-msgid "Remove from list"
-msgstr "Видалити зі списку"
-
-#: /addon.xml
-msgctxt "#32153"
-msgid "Refresh cached details"
-msgstr "Оновити кеш відомостей"
-
-#: /resources/settings.xml
 msgctxt "#32154"
 msgid "Update library now"
 msgstr "Оновити медіатеку зараз"
 
 #: /resources/settings.xml
-msgctxt "#32155"
-msgid "Next Aired (Library)"
-msgstr "Наступні в ефірі (Медіатека)"
-
-#: /resources/settings.xml
 msgctxt "#32156"
 msgid "Next aired library calendar links to local tvshow"
 msgstr "Посилатися на локальний календар наступних епізодів в ефірі для серіалів"
-
-#: /resources/lib/context.py
-msgctxt "#32157"
-msgid "Unable to find TMDb ID for item."
-msgstr "Не вдалося знайти TMDb ID для елемента."
-
-#: /resources/settings.xml
-msgctxt "#32158"
-msgid "Automatically use player if only one available"
-msgstr "Автоматично використати плеєр, якщо всього один"
-
-#: /resources/lib/container.py
-msgctxt "#32159"
-msgid "Select Original Language"
-msgstr "Вибрати мову оригіналу"
 
 #: /resources/lib/context.py
 msgctxt "#32160"
@@ -840,11 +523,6 @@ msgid ""
 msgstr ""
 "Внесення списків Trakt до медіатеки обмежено до [B]{}[/B] серіалів та [B]{}[/B] фільмів.\n"
 "Це обмеження необхідне задля дотримання лімітів безкоштовних API."
-
-#: /resources/lib/context.py
-msgctxt "#32165"
-msgid "List length exceeds limits. Skipping..."
-msgstr "Довжина списку перевищує обмеження. Пропуск..."
 
 #: /resources/lib/context.py
 msgctxt "#32166"
@@ -1102,35 +780,6 @@ msgid "Successfully logged out of Trakt user account"
 msgstr "Успішний вихід з облікового запису Trakt"
 
 #: /resources/lib/script.py
-msgctxt "#32217"
-msgid "No artwork found for {} ID {}"
-msgstr "Не знайдено ілюстрацій для {} ID {}"
-
-#: /resources/lib/script.py
-msgctxt "#32218"
-msgid ""
-"Artwork found for {} ID {}\n"
-"{}"
-msgstr ""
-"Знайдено ілюстрації для {} ID {}\n"
-"{}"
-
-#: /resources/lib/fanarttv.py
-msgctxt "#32219"
-msgid "Language {} | {} likes | ID {}"
-msgstr "Мова {} | {} вподобань | ID {}"
-
-#: /resources/lib/script.py
-msgctxt "#32220"
-msgid "Select artwork"
-msgstr "Обрати ілюстрацію"
-
-#: /resources/lib/script.py
-msgctxt "#32221"
-msgid "Refresh all artwork"
-msgstr "Оновити всі ілюстрації"
-
-#: /resources/lib/listitem.py
 msgctxt "#32222"
 msgid "Manage artwork"
 msgstr "Керування ілюстраціями"
@@ -1191,11 +840,6 @@ msgid "Refresh details"
 msgstr "Оновити відомості"
 
 #: /resources/lib/script.py
-msgctxt "#32234"
-msgid "Refreshed details for {} ID {}"
-msgstr "Оновлено відомості про {} ID {}"
-
-#: /resources/lib/listitem.py
 msgctxt "#32235"
 msgid "Browse lists"
 msgstr "Оглянути списки"
@@ -1209,11 +853,6 @@ msgstr "Обрати елемент"
 msgctxt "#32237"
 msgid "Clear Discover History"
 msgstr "Очистити історію ознайомлення"
-
-#: /resources/lib/userdiscover.py
-msgctxt "#32238"
-msgid "Discover {}"
-msgstr "Ознайомитись з {}"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32239"
@@ -1486,16 +1125,6 @@ msgid "Remove from watchlist"
 msgstr "Видалити із закладок"
 
 #: /resources/lib/script.py
-msgctxt "#32293"
-msgid "Add to recommendations"
-msgstr "Додати до рекомендацій"
-
-#: /resources/lib/script.py
-msgctxt "#32294"
-msgid "Remove from recommendations"
-msgstr "Видалити з рекомендацій"
-
-#: /resources/lib/script.py
 msgctxt "#32295"
 msgid "Trakt options"
 msgstr "Опції Trakt"
@@ -1564,16 +1193,6 @@ msgid "No comments found!"
 msgstr "Не знайдено коментарів!"
 
 #: /resources/lib/request/api.py
-msgctxt "#32307"
-msgid "Suppressing retries for {} seconds"
-msgstr "Спроби призупинено на {} секунд"
-
-#: /resources/lib/request/api.py
-msgctxt "#32308"
-msgid "ConnectionError: {}"
-msgstr "Помилка підключення: {}"
-
-#: /addon.xml
 msgctxt "#32309"
 msgid "Browse sorted list"
 msgstr "Оглянути відсортований список"
@@ -1648,31 +1267,6 @@ msgid "Select player"
 msgstr "Обрати плеєр"
 
 #: /resources/lib/helpers/update.py
-msgctxt "#32323"
-msgid "Item added to library"
-msgstr "Елемент додано до медіатеки"
-
-#: /resources/lib/player/players.py
-msgctxt "#32324"
-msgid "Select Play Method"
-msgstr "Обрати метод відтворення"
-
-#: /resources/lib/player/players.py
-msgctxt "#32325"
-msgid ""
-"Configuration for player is missing \"is_resolvable\" flag. Please select resolve method.\n"
-"\n"
-"setResolvedUrl is the preferred method and generally should work for any player addon that plays files directly, uses inputstream adapative, or only prompts to select bitrate/quality. PlayMedia should be used for any player addon which first runs a script to scrape sources or otherwise does not work correctly using the setResolvedUrl method.\n"
-"\n"
-"To override this dialog, set a resolve method for the player in TMDbHelper's player settings configuration dialog."
-msgstr ""
-"Налаштування плеєру не містить опції \"is_resolvable\". Будь ласка, оберіть метод отримання.\n"
-"\n"
-"setResolvedUrl є рекомендованим методом, та, як правило, повинен працювати для будь-якого доповнення до плеєру, який безпосередньо відтворює файли, використовує адаптивний вхідний потік або пропонує лише вибирати бітрейт/якість. PlayMedia слід використовувати для будь-яких додатків, які спочатку запускають сценарій пошуку джерел або працює неправильно з методом setResolvedUrl.\n"
-"\n"
-"Щоб прибрати це вікно оберіть метод отримання для плеєру у вікні налаштування плеєру TMDbHelper."
-
-#: /resources/lib/helpers/timedate.py
 msgctxt "#32326"
 msgid "This Month"
 msgstr "Цього місяця"
@@ -1793,11 +1387,6 @@ msgid "Episode groups"
 msgstr "Групи серій"
 
 #: /resources/settings.xml
-msgctxt "#32346"
-msgid "Resend local files (fix Trakt scrobbling bug)"
-msgstr "Повторно відправляти локальні файли (виправляє баг скроблінгу Trakt)"
-
-#: /resources/settings.xml
 msgctxt "#32347"
 msgid "Log output of Trakt request"
 msgstr "Логувати вивід запиту TMDb"
@@ -1808,16 +1397,6 @@ msgid "Log output of TMDb request"
 msgstr "Логувати вивід запиту TMDb"
 
 #: /resources/lib/kodi/library.py
-msgctxt "#32349"
-msgid "Creating movies playlist"
-msgstr "Створення списку фільмів"
-
-#: /resources/lib/kodi/library.py
-msgctxt "#32350"
-msgid "Creating tvshows playlist"
-msgstr "Створення списку серіалів"
-
-#: /resources/settings.xml
 msgctxt "#32351"
 msgid "Dummy ResolvedURL"
 msgstr "Тестовий ResolvedURL"
@@ -2015,22 +1594,6 @@ msgid "Delete {} Cache"
 msgstr "Видалити кеш {}"
 
 #: /resources/lib/script/router.py
-msgctxt "#32388"
-msgid ""
-"Are you sure you want to delete the {} cache? This action cannot be undone.\n"
-"\n"
-"TMDbHelper performs regular automatic cache management and cleaning. You should only delete the cache manually in cases of persistent cache related errors."
-msgstr ""
-"Видалити кеш {}? Цю дію неможливо скасувати.\n"
-"\n"
-"TMDbHelper здійснює регулярну автоматичну очистку та управління кешем. Видаліть кеш вручну тільки в разі постійних помилок, пов'язаних з ним."
-
-#: /resources/lib/script/router.py
-msgctxt "#32389"
-msgid "Cache deleted!"
-msgstr "Кеш видалено!"
-
-#: /resources/settings.xml
 msgctxt "#32390"
 msgid "Use alternative .nfo filename"
 msgstr "Використовувати альтернативну назву .nfo файла"
@@ -2067,11 +1630,6 @@ msgid "Log timer reports for directories"
 msgstr "Логувати звіти таймеру для тек"
 
 #: /resources/settings.xml
-msgctxt "#32396"
-msgid "Set unwatched episode count for in-progress tvshows only"
-msgstr "Лічильник непереглянутих серій тільки для поточних серіалів"
-
-#: /resources/settings.xml
 msgctxt "#32397"
 msgid "Original"
 msgstr "Оригінальна"
@@ -2082,11 +1640,6 @@ msgid "Medium"
 msgstr "Середня"
 
 #: /resources/settings.xml
-msgctxt "#32399"
-msgid "Fallback to English when main language unavailable"
-msgstr "Англійська як запасна опція коли системна мова не доступна"
-
-#: /resources/settings.xml
 msgctxt "#32400"
 msgid "Play local Kodi library files"
 msgstr "Відтворити файли з локальної медіатеки"
@@ -2095,16 +1648,6 @@ msgstr "Відтворити файли з локальної медіатеки
 msgctxt "#32401"
 msgid "TMDb detailed information"
 msgstr "Відомості TMDb"
-
-#: /resources/settings.xml
-msgctxt "#32402"
-msgid "Get additional details and artwork from TMDb"
-msgstr "Отримувати відомості та ілюстрації з TMDb"
-
-#: /resources/settings.xml
-msgctxt "#32403"
-msgid "Increase sync list item limit per page (slower)"
-msgstr "Збільшити обмеження синхронизації списку елементів для сторінки (повільно)"
 
 #: /resources/settings.xml
 msgctxt "#32404"
@@ -2125,11 +1668,6 @@ msgstr "Ваші незавершені серії"
 msgctxt "#32407"
 msgid "Get resume points (experimental) (slower)"
 msgstr "Пункт відновлення (експеримент.) (повільно)"
-
-#: /resources/settings.xml
-msgctxt "#32408"
-msgid "Prefer artwork from TMDb first if available"
-msgstr "При можливості надавати перевагу ілюстраціям з TMDb"
 
 #: /resources/settings.xml
 msgctxt "#32409"
@@ -2172,11 +1710,6 @@ msgid "Premieres"
 msgstr "Прем'єра"
 
 #: /resources/lib/script/sync.py
-msgctxt "#32417"
-msgid "Remove from progress"
-msgstr "Видалити з прогресу"
-
-#: /resources/settings.xml
 msgctxt "#32418"
 msgid "Adds text to the start of the MPAA rating. For example if set to 'Rated' a 'PG' rating is displayed as 'Rated PG'. Cached items will need to be refreshed."
 msgstr "Додає префікс до рейтингу MPAA. Наприклад, якщо вказано 'Рейтинг' то рейтинг 'PG' буде відображено як 'Рейтинг PG'. Закешовані елементи потребують оновлення."
@@ -2282,11 +1815,6 @@ msgid "Provider allowlist updated"
 msgstr "Оновлено список дозволених платформ"
 
 #: /resources/lib/script/method.py
-msgctxt "#32439"
-msgid "The provider allowlist has been updated. Please note that updating provider details requires the item cache to be refreshed. The item cache can be deleted in the expert settings section."
-msgstr "Оновлено список дозволених провайдерів. Зверніть увагу, оновлення провайдерів відомостей потребує оновлення кешу елементів. Кеш елементів можна видалити в секції експертних налаштувань."
-
-#: /resources/lib/player/configure.py
 msgctxt "#32440"
 msgid "Edit steps"
 msgstr "Змінити кроки"
@@ -2337,11 +1865,6 @@ msgid "Ignore region release filter"
 msgstr "Ігнорувати фільтр регіону релізу"
 
 #: /resources/settings.xml
-msgctxt "#32450"
-msgid "Install context menu add-on"
-msgstr "Встановити додаток контекстного меню"
-
-#: /resources/lib/api/trakt/api.py
 msgctxt "#32451"
 msgid "Lowest"
 msgstr "Найнижчий"
@@ -2407,16 +1930,6 @@ msgid "Cache items in custom lists you own for 24 hours"
 msgstr "Кешувати елементи в користувацьких списках на 24 години"
 
 #: /resources/settings.xml
-msgctxt "#32464"
-msgid "Significantly increases RAM usage but might improve repeat cache reads for disk cache located on slow storage devices (e.g. USB or SD card storage). Will likely cause worse cache performance for devices with normal storage (e.g. SSD, eMMC or internal HDD) or limited RAM."
-msgstr "Значно збільшує використання оперативної пам'яті, але може покращити повторні читання кешу для кешу на диску, розташованому на повільних накопичувачах (наприклад, USB або SD). Швидше за все, призведе до найгіршої продуктивності кешу для звичайних накопичувачів (напр. SSD, eMMC або внутрішній ЖД) або обмеженої оперативної пам'яті."
-
-#: /resources/settings.xml
-msgctxt "#32465"
-msgid "Cache disk reads to memory (increases RAM usage)"
-msgstr "Кешувати зчитування диску в пам'ять (збільшує використання оперативної пам'яті)"
-
-#: /resources/settings.xml
 msgctxt "#32466"
 msgid "Play automatically using available providers"
 msgstr "Відтворювати автоматично з доступними провайдерами"
@@ -2475,21 +1988,6 @@ msgstr "Обрати стандартний плеєр"
 msgctxt "#32477"
 msgid "Change default player for tvshow, season, or episode"
 msgstr "Змінити стандартний плеєр для серіалів, сезонів чи епізодів"
-
-#: /resources/settings.xml
-msgctxt "#32478"
-msgid "Rebuild service listitems offscreen"
-msgstr "Перебудова елементів списку поза екраном"
-
-#: /resources/settings.xml
-msgctxt "#32479"
-msgid "Some platforms experience crashes while updating onscreen background service listitems with additional properties. Forcing service listitems to be rebuilt offscreen prevents this issue but will be slightly slower to add artwork and ratings. Restart Kodi to see changes."
-msgstr "На деяких платформах оновлення наекранних елементів списку з додатковими властивостями фоновою службою викликає збої. Примусове відновлення елементів списку поза екраном запобігає цій проблемі, але сповільнює додавання ілюстрацій та оцінок. Для застосування змін необхідне перезавантаження Kodi."
-
-#: /resources/settings.xml
-msgctxt "#32480"
-msgid "Readahead caching of service listitems"
-msgstr "Заздалегідь кешувати список елементів служби"
 
 #: /resources/settings.xml
 msgctxt "#32481"
@@ -2784,11 +2282,6 @@ msgid "Zulu (South Africa)"
 msgstr "Зулуська (ПАР)"
 
 #: /resources/settings.xml
-msgctxt "#32000"
-msgid "TMDb API key"
-msgstr "API ключ TMDb"
-
-#: /resources/settings.xml
 msgctxt "#32001"
 msgid "OMDb API key"
 msgstr "API ключ OMDb"
@@ -2797,11 +2290,6 @@ msgstr "API ключ OMDb"
 msgctxt "#32002"
 msgid "Days to cache details"
 msgstr "Зберігати кеш відомостей"
-
-#: /resources/settings.xml
-msgctxt "#32003"
-msgid "Days to cache lists"
-msgstr "Зберігати кеш списків"
 
 #: /resources/settings.xml
 msgctxt "#32004"
@@ -2814,26 +2302,11 @@ msgid "Language and country"
 msgstr "Мова та країна"
 
 #: /resources/lib/utils.py
-msgctxt "#32006"
-msgid "Choose item"
-msgstr "Обрати елемент"
-
-#: /resources/lib/requestapi.py
 msgctxt "#32007"
 msgid "Unauthorised 401 Error"
 msgstr "Помилка 401"
 
 #: /resources/lib/requestapi.py
-msgctxt "#32008"
-msgid "API Key"
-msgstr "Ключ API"
-
-#: /resources/lib/requestapi.py
-msgctxt "#32009"
-msgid "API returned 401 unauthorised error. If you have entered an API key for this service$COMMA please check that it is correct. If this error relates to TMDb API$COMMA please post a debug log to [B]https://github.com/jurialmunkey/plugin.video.themoviedb.helper/issues[/B]"
-msgstr "API повернуло помилку 401. Якщо ви ввели API ключ для цього сервісу$COMMA будь ласка$COMMA перевірте його. Якщо ця помилка пов'язана з TMDb API$COMMA будь ласка$COMMA відправте звіт помилки на [B]https://github.com/jurialmunkey/plugin.video.themoviedb.helper/issues[/B]"
-
-#: /resources/settings.xml
 msgctxt "#32010"
 msgid "Authenticate Trakt account..."
 msgstr "Авторизуватись в Trakt..."
@@ -2849,19 +2322,9 @@ msgid "You must authenticate your Trakt account to use this feature."
 msgstr "Для використання цієї функції необхідно увійти до акаунту Trakt"
 
 #: /resources/settings.xml
-msgctxt "#32013"
-msgid "Display Trakt list management options in TMDb details list"
-msgstr "Відображатати опції налаштування списку Trakt в списку відомостей TMDb"
-
-#: /resources/settings.xml
 msgctxt "#32014"
 msgid "Players"
 msgstr "Плеєри"
-
-#: /resources/settings.xml
-msgctxt "#32015"
-msgid "Players URL"
-msgstr "Посилання плеєрів"
 
 #: /resources/settings.xml
 msgctxt "#32016"
@@ -2874,29 +2337,14 @@ msgid "API Keys"
 msgstr "Ключі API"
 
 #: /resources/settings.xml
-msgctxt "#32018"
-msgid "Fanart.tv API key"
-msgstr "API ключ Fanart.tv"
-
-#: /resources/settings.xml
 msgctxt "#32019"
 msgid "Fanart.tv client key"
 msgstr "Клієнтський ключ Fanart.tv"
 
 #: /resources/settings.xml
-msgctxt "#32020"
-msgid "Only use if default api key is deactivated"
-msgstr "Тільки якщо стандартний API ключ вимкнено"
-
-#: /resources/settings.xml
 msgctxt "#32021"
 msgid "Use fanart.tv for plugin artwork (slower)"
 msgstr "Викор. fanart.tv для ілюстрацій плагіну (повільно)"
-
-#: /resources/settings.xml
-msgctxt "#32022"
-msgid "Play / Open"
-msgstr "Відтворити / Відкрити"
 
 #: /resources/settings.xml
 msgctxt "#32023"
@@ -2912,11 +2360,6 @@ msgstr "Плеєр для фільмів"
 msgctxt "#32025"
 msgid "Default player for episodes"
 msgstr "Плеєр для серіалів"
-
-#: /resources/settings.xml
-msgctxt "#32026"
-msgid "Choose default players"
-msgstr "Обрати стандартні плеєри"
 
 #: /resources/settings.xml
 msgctxt "#32027"

@@ -1,4 +1,5 @@
 from tmdbhelper.lib.addon.thread import SafeThread
+from tmdbhelper.lib.files.ftools import cached_property
 
 
 CRONJOB_POLL_TIME = 600
@@ -20,17 +21,19 @@ class CronJobMonitor(SafeThread):
         self._do_trakt_authorization()
 
     def _on_poll(self):
+        self._do_database_vacuum()
         self._do_library_update_check()
         self._do_reset_trakt_lastactivities()
 
-    @property
+    @cached_property
     def trakt_api(self):
-        try:
-            return self._trakt_api
-        except AttributeError:
-            from tmdbhelper.lib.api.trakt.api import TraktAPI
-            self._trakt_api = TraktAPI()
-            return self._trakt_api
+        from tmdbhelper.lib.api.trakt.api import TraktAPI
+        return TraktAPI()
+
+    @staticmethod
+    def _do_database_vacuum():
+        from tmdbhelper.lib.script.method.maintenance import vacuum_databases
+        vacuum_databases()
 
     @staticmethod
     def _do_delete_old_databases():

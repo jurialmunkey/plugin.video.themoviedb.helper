@@ -1,5 +1,4 @@
 from jurialmunkey.parser import try_int, del_empty_keys
-from tmdbhelper.lib.items.builder import ItemBuilder
 from tmdbhelper.lib.api.tmdb.api import TMDb
 
 
@@ -7,10 +6,14 @@ EXTERNAL_ID_TYPES = ['tmdb', 'tvdb', 'imdb', 'slug', 'trakt']
 
 
 def get_next_episodes(tmdb_id, season, episode, player=None):
-    from tmdbhelper.lib.addon.thread import ParallelThread
-    tmdb_api = TMDb()
+    # Pre cache parent item
+    from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
+    sync = BaseItemFactory('tvshow')
+    sync.tmdb_id = try_int(tmdb_id)
+    sync.data
 
-    all_episodes = tmdb_api.get_flatseasons_list(tmdb_id)
+    from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
+    all_episodes = BaseViewFactory('flatseasons', 'tv', tmdb_id).data
     if not all_episodes:
         return
 
@@ -29,22 +32,28 @@ def get_next_episodes(tmdb_id, season, episode, player=None):
     if not nxt_episodes:
         return
 
-    ib = ItemBuilder(tmdb_api=tmdb_api)
-    ib.get_parents(tmdb_type='tv', tmdb_id=tmdb_id)
-    ib.parent_params = {'tmdb_id': tmdb_id, 'tmdb_type': 'tv'}
+    from tmdbhelper.lib.items.listitem import ListItem
+    from tmdbhelper.lib.items.database.listitem import ListItemDetails
+
+    lidc = ListItemDetails()
+    lidc.cache_refresh = None
+    lidc.extendedinfo = True
 
     def _make_listitem(i):
-        li = ib.get_listitem(i)
-        if not li:
+        item = lidc.get_item('tv', tmdb_id, season, episode)
+        if not item:
             return
+        li = ListItem(**item)
         li.set_params_reroute()  # Reroute details to proper end point
         if player:
             li.params['player'] = player
             li.params['mode'] = 'play'
         return li
 
+    from tmdbhelper.lib.addon.thread import ParallelThread
     with ParallelThread(nxt_episodes, _make_listitem) as pt:
         item_queue = pt.queue
+
     return [i for i in item_queue if i]
 
 
@@ -77,20 +86,18 @@ def get_external_ids(tmdb_type, tmdb_id, season=None, episode=None):
 
 def get_item_details(tmdb_type, tmdb_id, season=None, episode=None, language=None):
     from tmdbhelper.lib.items.listitem import ListItem
-    tmdb_api = TMDb(language=language) if language else TMDb()
-    ib = ItemBuilder(tmdb_api=tmdb_api)
-    details = ib.get_item(tmdb_type, tmdb_id, season, episode)
-    try:
-        artwork = details['artwork']
-        details = details['listitem']
-    except (KeyError, TypeError):
-        return
+    from tmdbhelper.lib.items.database.listitem import ListItemDetails
+
+    lidc = ListItemDetails()
+    lidc.cache_refresh = None
+    lidc.extendedinfo = True
+
+    details = lidc.get_item(tmdb_type, tmdb_id, season, episode)
+
     if not details:
         return
-    details['art'] = ib.get_item_artwork(artwork, is_season=True if season else False)
-    details = ListItem(**details)
-    details.infolabels['mediatype'] == 'movie' if tmdb_type == 'movie' else 'episode'
-    return details
+
+    return ListItem(**details)
 
 
 def _get_language_details(tmdb_type, tmdb_id, season=None, episode=None, language=None):
@@ -101,7 +108,7 @@ def _get_language_details(tmdb_type, tmdb_id, season=None, episode=None, languag
             if episode is not None:
                 affix = f'{affix}episode/{episode}/'
     affix = f'{affix}translations'
-    details = TMDb().get_request_lc(tmdb_type, tmdb_id, affix)
+    details = TMDb().get_response_json(tmdb_type, tmdb_id, affix)
     if not details or not details.get('translations'):
         return
 

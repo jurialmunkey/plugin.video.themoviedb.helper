@@ -138,11 +138,6 @@ msgid "Hebrew (Israel)"
 msgstr "Ebraico (Israele)"
 
 #: /resources/settings.xml
-msgctxt "#32028"
-msgid "Use fanart.tv for widget artwork (increases load times)"
-msgstr "Usa fanart.tv per la grafica dei widget (aumenta i tempi di caricamento)"
-
-#: /resources/settings.xml
 msgctxt "#32029"
 msgid "OMDb API"
 msgstr "API OMDb"
@@ -173,16 +168,6 @@ msgid "Get watched indicators from Trakt"
 msgstr "Ottieni indicatori visti da Trakt"
 
 #: /resources/settings.xml
-msgctxt "#32035"
-msgid "Get tvshow watched episode counts from Trakt"
-msgstr "Ottieni il conteggio degli episodi visti da Trakt"
-
-#: /resources/settings.xml
-msgctxt "#32036"
-msgid "Bundled Players"
-msgstr "Lettori in bundle"
-
-#: /resources/settings.xml
 msgctxt "#32037"
 msgid "Use bundled players"
 msgstr "Usa lettori in bundle"
@@ -193,21 +178,6 @@ msgid "Get additional details from the local Kodi library database"
 msgstr "Ottieni ulteriori dettagli dal database locale della libreria di Kodi"
 
 #: /resources/settings.xml
-msgctxt "#32039"
-msgid "Kodi Library DB"
-msgstr "DB Libreria di Kodi"
-
-#: /resources/lib/player.py
-msgctxt "#32040"
-msgid "Item not found."
-msgstr "Elemento non trovato."
-
-#: /resources/lib/player.py
-msgctxt "#32041"
-msgid "The plugin returned no results."
-msgstr "Il plugin non ha restituito risultati."
-
-#: /resources/lib/player.py
 msgctxt "#32042"
 msgid "Choose Action"
 msgstr "Scegli un'azione"
@@ -223,51 +193,6 @@ msgid "Enter Search Query"
 msgstr "Inserisci la query di ricerca"
 
 #: /resources/lib/container.py
-msgctxt "#32045"
-msgid "Cache Refresh"
-msgstr "Aggiorna cache"
-
-#: /resources/lib/container.py
-msgctxt "#32046"
-msgid "Cached details were refreshed"
-msgstr "I dettagli memorizzati nella cache sono stati aggiornati"
-
-#: /resources/lib/container.py
-msgctxt "#32047"
-msgid "Remove from Trakt Collection"
-msgstr "Rimuovi dalla collezione Trakt"
-
-#: /resources/lib/container.py
-msgctxt "#32048"
-msgid "Add to Trakt Collection"
-msgstr "Aggiungi alla collezione Trakt"
-
-#: /resources/lib/container.py
-msgctxt "#32049"
-msgid "Remove from Trakt Watchlist"
-msgstr "Rimuovi dalla Watchlist Trakt"
-
-#: /resources/lib/container.py
-msgctxt "#32050"
-msgid "Add to Trakt Watchlist"
-msgstr "Aggiungi alla Watchlist Trakt"
-
-#: /resources/lib/container.py
-msgctxt "#32051"
-msgid "Remove from Trakt Watched History"
-msgstr "Rimuovi dalla storia Visti di Trakt"
-
-#: /resources/lib/container.py
-msgctxt "#32052"
-msgid "Add to Trakt Watched History"
-msgstr "Aggiungi alla storia Visti di Trakt"
-
-#: /resources/lib/container.py
-msgctxt "#32053"
-msgid "Refresh Cache"
-msgstr "Aggiorna Cache"
-
-#: /resources/lib/downloader.py
 msgctxt "#32054"
 msgid "Would you like to clear existing players first?"
 msgstr "Vuoi eliminare prima i lettori esistenti?"
@@ -308,52 +233,11 @@ msgid "Play with"
 msgstr "Esegui con"
 
 #: /resources/lib/context.py
-msgctxt "#32062"
-msgid "Successfully Added TMDb ID {0} to {1}"
-msgstr "ID TMDb {0} aggiunto correttamente a {1"
-
-#: /resources/lib/context.py
-msgctxt "#32063"
-msgid "Successfully Removed TMDb ID {0} from {1}"
-msgstr "ID TMDb {0} rimosso con successo da {1}"
-
-#: /resources/lib/context.py
-msgctxt "#32064"
-msgid ""
-"Do you wish to remove {0} from your Trakt {1}?\n"
-"\n"
-"TMDb {2} ID {3}"
-msgstr ""
-
-#: /resources/lib/context.py
-msgctxt "#32065"
-msgid ""
-"Do you wish to add {0} to your Trakt {1}?\n"
-"\n"
-"TMDb {2} ID {3}"
-msgstr ""
-
-#: /resources/settings.xml
 msgctxt "#32066"
 msgid "Debug logging"
 msgstr "Logging di Debug"
 
 #: /resources/settings.xml
-msgctxt "#32067"
-msgid "Fuzzy local library matching"
-msgstr "Corrispondenza fuzzy della libreria locale"
-
-#: /resources/settings.xml
-msgctxt "#32068"
-msgid "Allow fuzzy matches (ignore year) for movies"
-msgstr "Consenti le corrispondenze fuzzy (ignora l'anno) per i film"
-
-#: /resources/settings.xml
-msgctxt "#32069"
-msgid "Allow fuzzy matches (ignore year) for tvshows"
-msgstr "Consenti le corrispondenze fuzzy (ignora l'anno) per i programmi tv"
-
-#: /resources/lib/tmdb.py
 msgctxt "#32070"
 msgid "Male"
 msgstr "Maschio"
@@ -362,11 +246,6 @@ msgstr "Maschio"
 msgctxt "#32071"
 msgid "Female"
 msgstr "Femmina"
-
-#: /resources/settings.xml
-msgctxt "#32072"
-msgid "Unaired Items"
-msgstr "Elementi non in onda"
 
 #: /resources/settings.xml
 msgctxt "#32073"
@@ -399,11 +278,6 @@ msgid "Expand Trakt list limit to 20 items"
 msgstr "Espandi il limite dell'elenco Trakt a 20 elementi"
 
 #: /resources/settings.xml
-msgctxt "#32079"
-msgid "System Use Only"
-msgstr "Solo a uso del sistema"
-
-#: /resources/settings.xml
 msgctxt "#32080"
 msgid "Other"
 msgstr "Altro"
@@ -412,16 +286,6 @@ msgstr "Altro"
 msgctxt "#32081"
 msgid "Show next page item on widgets (requires skin reload)"
 msgstr "Mostra l'elemento della pagina successiva sui widget (richiede il ricaricamento della skin)"
-
-#: /resources/settings.xml
-msgctxt "#32082"
-msgid "Watchlist sort method"
-msgstr "Metodo di ordinamento della watchlist"
-
-#: /resources/settings.xml
-msgctxt "#32083"
-msgid "Accounts"
-msgstr "Account"
 
 #: /resources/settings.xml
 msgctxt "#32084"
@@ -437,11 +301,6 @@ msgstr "Appiattisci le stagioni"
 msgctxt "#32086"
 msgid "Auto-update library and add new/missing episodes"
 msgstr "Aggiorna automaticamente la libreria e aggiungi episodi nuovi/mancanti"
-
-#: /resources/settings.xml
-msgctxt "#32087"
-msgid "Use resolvedURL method for suppressing strm next playlist error"
-msgstr "Usa il metodo fixedURL per correggere l'errore della playlist successiva strm"
 
 #: /resources/settings.xml
 msgctxt "#32088"
@@ -474,11 +333,6 @@ msgid "Next episodes sort method"
 msgstr "Metodo di ordinamento dei prossimi episodi"
 
 #: /resources/settings.xml
-msgctxt "#32094"
-msgid "Prioritise local files over default player"
-msgstr "Dai priorità ai file locali rispetto al lettore predefinito"
-
-#: /resources/lib/traktapi.py
 msgctxt "#32095"
 msgid "Enter the code"
 msgstr "Inserisci il codice"
@@ -492,11 +346,6 @@ msgstr "Vai su [B]https://trakt.tv/activate[/B]"
 msgctxt "#32097"
 msgid "Trakt Authentication"
 msgstr "Autenticazione Trakt"
-
-#: /resources/lib/container.py
-msgctxt "#32098"
-msgid "Exists"
-msgstr "Esistente"
 
 #: /resources/lib/container.py
 msgctxt "#32099"
@@ -529,16 +378,6 @@ msgid ""
 "TMDb ID for {} not found or none selected.\n"
 "Do you want to add another value?"
 msgstr ""
-
-#: /resources/lib/container.py
-msgctxt "#32105"
-msgid "Do you want to add another value?"
-msgstr "Vuoi aggiungere un altro valore?"
-
-#: /resources/lib/container.py
-msgctxt "#32106"
-msgid "Added"
-msgstr "Aggiunto"
 
 #: /resources/lib/container.py
 msgctxt "#32107"
@@ -581,24 +420,9 @@ msgid "Enter"
 msgstr "Accedi"
 
 #: /resources/lib/container.py
-msgctxt "#32115"
-msgid "Company"
-msgstr "Azienda"
-
-#: /resources/lib/container.py
-msgctxt "#32116"
-msgid "Network"
-msgstr ""
-
-#: /resources/lib/container.py
 msgctxt "#32117"
 msgid "Keyword"
 msgstr "Parola chiave"
-
-#: /resources/lib/container.py
-msgctxt "#32118"
-msgid "Person"
-msgstr "Persona"
 
 #: /resources/lib/container.py
 msgctxt "#32119"
@@ -626,11 +450,6 @@ msgid "If error persists and the folders are created correctly, please disable f
 msgstr "Se l'errore persiste e le cartelle vengono create correttamente, disabilitare il controllo della creazione del percorso della cartella nelle impostazioni di TMDBHelper."
 
 #: /resources/lib/context.py
-msgctxt "#32124"
-msgid "Adding"
-msgstr "Aggiungo"
-
-#: /resources/lib/context.py
 msgctxt "#32125"
 msgid "Add Trakt list to Kodi library"
 msgstr "Aggiungi l'elenco Trakt alla libreria di Kodi"
@@ -641,21 +460,6 @@ msgid "Are you sure you want to add this Trakt list to your Kodi library?"
 msgstr "Sei sicuro di voler aggiungere questo elenco di Trakt alla tua libreria di Kodi?"
 
 #: /resources/lib/context.py
-msgctxt "#32127"
-msgid "by user"
-msgstr "per utente"
-
-#: /resources/lib/context.py
-msgctxt "#32128"
-msgid "This list contains"
-msgstr "Questo elenco contiene"
-
-#: /resources/lib/context.py
-msgctxt "#32129"
-msgid "items"
-msgstr "elementi"
-
-#: /resources/settings.xml
 msgctxt "#32130"
 msgid "Auto-update library at time"
 msgstr "Aggiornamento istantaneo automatico libreria"
@@ -676,134 +480,19 @@ msgid "Select List(s)"
 msgstr "Seleziona elenco(i)"
 
 #: /resources/settings.xml
-msgctxt "#32134"
-msgid "User slug"
-msgstr "Utelnte Lumaca"
-
-#: /resources/lib/traktapi.py
-msgctxt "#32135"
-msgid "Successfully removed {} {} from {} list."
-msgstr "Rimosso con successo {} {} dall'elenco {}."
-
-#: /resources/lib/traktapi.py
-msgctxt "#32136"
-msgid "Successfully added {} {} to {} list."
-msgstr "{} {} aggiunto con successo all'elenco {}."
-
-#: /resources/lib/traktapi.py
-msgctxt "#32137"
-msgid "Failed to remove {} {} from {} list."
-msgstr "Impossibile rimuovere {} {} dall'elenco {}."
-
-#: /resources/lib/traktapi.py
-msgctxt "#32138"
-msgid "Failed to add {} {} to {} list."
-msgstr "Impossibile aggiungere {} {} all'elenco {}."
-
-#: /resources/lib/traktapi.py
-msgctxt "#32139"
-msgid "Remove from Trakt list"
-msgstr "Rimuovi dall'elenco Trakt"
-
-#: /resources/lib/traktapi.py
-msgctxt "#32140"
-msgid "Add to Trakt list"
-msgstr "Aggiungi all'elenco Trakt"
-
-#: /resources/lib/traktapi.py
-msgctxt "#32141"
-msgid "Create new list..."
-msgstr "Creazione nuovo elenco..."
-
-#: /resources/settings.xml
 msgctxt "#32142"
 msgid "Hide watched items on widgets"
 msgstr "Nascondi gli elementi guardati sui widget"
 
 #: /resources/lib/context.py
-msgctxt "#32143"
-msgid "Cached details for {} successfully refreshed!"
-msgstr "Dettagli memorizzati nella cache per {} aggiornati con successo"
-
-#: /resources/lib/context.py
-msgctxt "#32144"
-msgid "Refresh TheMovieDb Details"
-msgstr "Aggiorna i dettagli di TheMovieDb"
-
-#: /addon.xml
-msgctxt "#32145"
-msgid "TMDbHelper Options"
-msgstr "Opzioni TMDBHelper"
-
-#: /addon.xml
-msgctxt "#32146"
-msgid "Play using (TMDbHelper)"
-msgstr "Esegui utilizzando (TMDbHelper)"
-
-#: /addon.xml
-msgctxt "#32147"
-msgid "Browse seasons (TMDbHelper)"
-msgstr "Sfoglia le stagioni (TMDbHelper)"
-
-#: /addon.xml
-msgctxt "#32148"
-msgid "Add/Remove from Trakt Watchlist"
-msgstr "Aggiungi/Rimuovi dalla Watchlist di Trakt"
-
-#: /addon.xml
-msgctxt "#32149"
-msgid "Add/Remove from Trakt History"
-msgstr "Aggiungi/Rimuovi dalla storia di Trakt"
-
-#: /addon.xml
-msgctxt "#32150"
-msgid "Add/Remove from Trakt Collection"
-msgstr "Aggiungi/Rimuovi dalla collezione di Trakt"
-
-#: /addon.xml
-msgctxt "#32151"
-msgid "Add to Kodi Library"
-msgstr "Aggiungi alla libreria di Kodi"
-
-#: /addon.xml
-msgctxt "#32152"
-msgid "Remove from list"
-msgstr "Rimuovere dalle'elenco"
-
-#: /addon.xml
-msgctxt "#32153"
-msgid "Refresh cached details"
-msgstr "Aggiorna i dettagli memorizzati nella cache"
-
-#: /resources/settings.xml
 msgctxt "#32154"
 msgid "Update library now"
 msgstr "Aggiorna la libreria ora"
 
 #: /resources/settings.xml
-msgctxt "#32155"
-msgid "Next Aired (Library)"
-msgstr "Prossima messa in onda (Libreria)"
-
-#: /resources/settings.xml
 msgctxt "#32156"
 msgid "Next aired library calendar links to local tvshow"
 msgstr "Il calendario della prossima messa in onda della libreria si collega al programma televisivo locale"
-
-#: /resources/lib/context.py
-msgctxt "#32157"
-msgid "Unable to find TMDb ID for item."
-msgstr "Impossibile trovare l'ID TMDb per l'elemento."
-
-#: /resources/settings.xml
-msgctxt "#32158"
-msgid "Automatically use player if only one available"
-msgstr "Usa automaticamente il lettore se solo uno disponibile"
-
-#: /resources/lib/container.py
-msgctxt "#32159"
-msgid "Select Original Language"
-msgstr "Seleziona la lingua originale"
 
 #: /resources/lib/context.py
 msgctxt "#32160"
@@ -831,11 +520,6 @@ msgid ""
 "Adding Trakt lists to library is limited to [B]{}[/B] TV Shows and [B]{}[/B] Movies per list.\n"
 "This limit is set to ensure that the APIs providing data for free are respected."
 msgstr ""
-
-#: /resources/lib/context.py
-msgctxt "#32165"
-msgid "List length exceeds limits. Skipping..."
-msgstr "La lunghezza dell'elenco supera i limiti. Salto..."
 
 #: /resources/lib/context.py
 msgctxt "#32166"
@@ -1093,33 +777,6 @@ msgid "Successfully logged out of Trakt user account"
 msgstr "Disconnessione riuscita dall'account utente di Trakt"
 
 #: /resources/lib/script.py
-msgctxt "#32217"
-msgid "No artwork found for {} ID {}"
-msgstr "Nessun artwork trovato per {} ID {}"
-
-#: /resources/lib/script.py
-msgctxt "#32218"
-msgid ""
-"Artwork found for {} ID {}\n"
-"{}"
-msgstr ""
-
-#: /resources/lib/fanarttv.py
-msgctxt "#32219"
-msgid "Language {} | {} likes | ID {}"
-msgstr "Lingua {} | {} mi piace | ID {}"
-
-#: /resources/lib/script.py
-msgctxt "#32220"
-msgid "Select artwork"
-msgstr "Seleziona artwork"
-
-#: /resources/lib/script.py
-msgctxt "#32221"
-msgid "Refresh all artwork"
-msgstr "Aggiorna tutti gli artwork"
-
-#: /resources/lib/listitem.py
 msgctxt "#32222"
 msgid "Manage artwork"
 msgstr "Gestisci artwork"
@@ -1180,11 +837,6 @@ msgid "Refresh details"
 msgstr "Aggiorna dettagli"
 
 #: /resources/lib/script.py
-msgctxt "#32234"
-msgid "Refreshed details for {} ID {}"
-msgstr "Dettagli aggiornati per {} ID {}"
-
-#: /resources/lib/listitem.py
 msgctxt "#32235"
 msgid "Browse lists"
 msgstr "Esplora elenchi"
@@ -1198,11 +850,6 @@ msgstr "Seleziona elemento"
 msgctxt "#32237"
 msgid "Clear Discover History"
 msgstr "Cancella la cronologia delle scoperte"
-
-#: /resources/lib/userdiscover.py
-msgctxt "#32238"
-msgid "Discover {} w/ Below Settings"
-msgstr "Scopri {} con le w/ impostazioni sotto"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32239"
@@ -1475,16 +1122,6 @@ msgid "Remove from watchlist"
 msgstr "Rimuovi dalla watchlist"
 
 #: /resources/lib/script.py
-msgctxt "#32293"
-msgid "Add to recommendations"
-msgstr "Aggiungi ai raccomandati"
-
-#: /resources/lib/script.py
-msgctxt "#32294"
-msgid "Remove from recommendations"
-msgstr "Rimuovi dai raccomandati"
-
-#: /resources/lib/script.py
 msgctxt "#32295"
 msgid "Trakt options"
 msgstr "Opzioni Trakt"
@@ -1549,16 +1186,6 @@ msgid "No comments found!"
 msgstr "Nessun commento trovato!"
 
 #: /resources/lib/request/api.py
-msgctxt "#32307"
-msgid "Suppressing retries for {} seconds"
-msgstr "Soppressione dei tentativi per {} secondi"
-
-#: /resources/lib/request/api.py
-msgctxt "#32308"
-msgid "ConnectionError: {}"
-msgstr "Errore di connessione: {}"
-
-#: /addon.xml
 msgctxt "#32309"
 msgid "Browse sorted list"
 msgstr "Sfoglia l'elenco ordinato"
@@ -1631,26 +1258,6 @@ msgid "Select player"
 msgstr "Seleziona lettore"
 
 #: /resources/lib/helpers/update.py
-msgctxt "#32323"
-msgid "Item added to library"
-msgstr "Aggiungi elemento alla libreria"
-
-#: /resources/lib/player/players.py
-msgctxt "#32324"
-msgid "Select Play Method"
-msgstr "Seleziona il metodo di riproduzione"
-
-#: /resources/lib/player/players.py
-msgctxt "#32325"
-msgid ""
-"Configuration for player is missing \"is_resolvable\" flag. Please select resolve method.\n"
-"\n"
-"setResolvedUrl is the preferred method and generally should work for any player addon that plays files directly, uses inputstream adapative, or only prompts to select bitrate/quality. PlayMedia should be used for any player addon which first runs a script to scrape sources or otherwise does not work correctly using the setResolvedUrl method.\n"
-"\n"
-"To override this dialog, set a resolve method for the player in TMDbHelper's player settings configuration dialog."
-msgstr ""
-
-#: /resources/lib/helpers/timedate.py
 msgctxt "#32326"
 msgid "This Month"
 msgstr "Questo mese"
@@ -1761,11 +1368,6 @@ msgid "Episode groups"
 msgstr "Gruppi di episodi"
 
 #: /resources/settings.xml
-msgctxt "#32346"
-msgid "Use hack to get Kodi Trakt addon to scrobble local files"
-msgstr "Usa l'hack per ottenere l'addon di Kodi Trakt per eseguire lo scrobble dei file locali"
-
-#: /resources/settings.xml
 msgctxt "#32347"
 msgid "Log output of Trakt request"
 msgstr "Log delle richiesta Trakt"
@@ -1776,16 +1378,6 @@ msgid "Log output of TMDb request"
 msgstr "Log delle richieste di TMDb"
 
 #: /resources/lib/kodi/library.py
-msgctxt "#32349"
-msgid "Creating movies playlist"
-msgstr "Creazione playlist dei film"
-
-#: /resources/lib/kodi/library.py
-msgctxt "#32350"
-msgid "Creating tvshows playlist"
-msgstr "Creazione playlist dei programmi TV"
-
-#: /resources/settings.xml
 msgctxt "#32351"
 msgid "Dummy ResolvedURL"
 msgstr "ResolvedURL fittizio"
@@ -1922,11 +1514,6 @@ msgid "Building Player Dialog"
 msgstr "Finestra di dialogo del lettore integrato"
 
 #: /resources/lib/trakt/api.py
-msgctxt "#32377"
-msgid "Playcount"
-msgstr "Conteggio eseguiti"
-
-#: /resources/settings.xml
 msgctxt "#32378"
 msgid "Show All"
 msgstr "Mostra tutto"
@@ -2119,11 +1706,6 @@ msgid "Zulu (South Africa)"
 msgstr "Zulu (Sud Africa)"
 
 #: /resources/settings.xml
-msgctxt "#32000"
-msgid "TMDb API key"
-msgstr "API key TMDb"
-
-#: /resources/settings.xml
 msgctxt "#32001"
 msgid "OMDb API key"
 msgstr "API key OMDb"
@@ -2132,11 +1714,6 @@ msgstr "API key OMDb"
 msgctxt "#32002"
 msgid "Days to cache details"
 msgstr "Giorni per memorizzare i dettagli"
-
-#: /resources/settings.xml
-msgctxt "#32003"
-msgid "Days to cache lists"
-msgstr "Giorni per memorizzare gli elenchi"
 
 #: /resources/settings.xml
 msgctxt "#32004"
@@ -2149,26 +1726,11 @@ msgid "Language and country"
 msgstr "Lingua e paese"
 
 #: /resources/lib/utils.py
-msgctxt "#32006"
-msgid "Choose item"
-msgstr "Scegli elemento"
-
-#: /resources/lib/requestapi.py
 msgctxt "#32007"
 msgid "Unauthorised 401 Error"
 msgstr "Errore 401 non autorizzato"
 
 #: /resources/lib/requestapi.py
-msgctxt "#32008"
-msgid "API Key"
-msgstr ""
-
-#: /resources/lib/requestapi.py
-msgctxt "#32009"
-msgid "API returned 401 unauthorised error. If you have entered an API key for this service$COMMA please check that it is correct. If this error relates to TMDb API$COMMA please post a debug log to [B]https://github.com/jurialmunkey/plugin.video.themoviedb.helper/issues[/B]"
-msgstr "L'API ha restituito l'errore 401 non autorizzato. Se hai inserito una chiave API per questo servizio$COMMA controlla che sia corretta. Se questo errore si riferisce a TMDb API$COMMA, pubblica un log di debug su [B]https://github.com/jurialmunkey/plugin.video.themoviedb.helper/issues[/B]"
-
-#: /resources/settings.xml
 msgctxt "#32010"
 msgid "Authenticate Trakt account..."
 msgstr "Autentico account Trakt..."
@@ -2184,19 +1746,9 @@ msgid "You must authenticate your Trakt account to use this feature."
 msgstr "Devi autenticare il tuo account Trakt per utilizzare questa funzione."
 
 #: /resources/settings.xml
-msgctxt "#32013"
-msgid "Display Trakt list management options in TMDb details list"
-msgstr "Visualizza le opzioni di gestione dell'elenco Trakt nell'elenco dei dettagli di TMDb"
-
-#: /resources/settings.xml
 msgctxt "#32014"
 msgid "Players"
 msgstr "Lettori"
-
-#: /resources/settings.xml
-msgctxt "#32015"
-msgid "Players URL"
-msgstr "URL Lettori"
 
 #: /resources/settings.xml
 msgctxt "#32016"
@@ -2209,29 +1761,14 @@ msgid "API Keys"
 msgstr ""
 
 #: /resources/settings.xml
-msgctxt "#32018"
-msgid "Fanart.tv API key"
-msgstr "API key Fanart.tv"
-
-#: /resources/settings.xml
 msgctxt "#32019"
 msgid "Fanart.tv client key"
 msgstr "Client key Fanart.tv"
 
 #: /resources/settings.xml
-msgctxt "#32020"
-msgid "Only use if default api key is deactivated"
-msgstr "Utilizzare solo se la chiave API predefinita è disattivata"
-
-#: /resources/settings.xml
 msgctxt "#32021"
 msgid "Use fanart.tv for plugin artwork (increases load times)"
 msgstr "Usa fanart.tv per gli artwork del plug-in (aumenta i tempi di caricamento)"
-
-#: /resources/settings.xml
-msgctxt "#32022"
-msgid "Play / Open"
-msgstr "Esegui / Apri"
 
 #: /resources/settings.xml
 msgctxt "#32023"
@@ -2247,11 +1784,6 @@ msgstr "Lettore predefinito per i film"
 msgctxt "#32025"
 msgid "Default player for episodes"
 msgstr "Lettore predefinito per gli episodi"
-
-#: /resources/settings.xml
-msgctxt "#32026"
-msgid "Choose default players"
-msgstr "Scegli i lettori predefiniti"
 
 #: /resources/settings.xml
 msgctxt "#32027"

@@ -1,11 +1,11 @@
 # Module: default
 # Author: jurialmunkey
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
-from tmdbhelper.lib.script.method.decorators import is_in_kwargs, choose_tmdb_id
+from tmdbhelper.lib.script.method.decorators import is_in_kwargs, get_tmdb_id
 
 
 @is_in_kwargs({'tmdb_type': ['movie', 'tv']})
-@choose_tmdb_id
+@get_tmdb_id
 def add_to_library(tmdb_type=None, tmdb_id=None, **kwargs):
     from tmdbhelper.lib.update.library import add_to_library
     add_to_library(info=tmdb_type, tmdb_id=tmdb_id)

@@ -21,6 +21,13 @@ def textviewer_output(message, header=''):
     Dialog().textviewer(header, f'{message}')
 
 
+def timer_method(func):
+    def wrapper(self, *args, **kwargs):
+        with TimerFunc(f'{self.__class__.__name__} {func.__name__} took:', inline=True):
+            return func(self, *args, **kwargs)
+    return wrapper
+
+
 class CProfiler():
     def __init__(self, filename='output'):
         """ ContextManager for setting a WindowProperty over duration """

@@ -1,0 +1,104 @@
+from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.baseclass import ItemDetailsList
+
+
+class CastMember(ItemDetailsList):
+    table = 'castmember'
+    keys = ('tmdb_id', 'role', 'ordering', 'appearances', 'parent_id')
+    conditions = 'parent_id=? ORDER BY ordering ASC NULLS LAST LIMIT 100'  # WHERE conditions  # TODO: Move limit to settings ???
+    cached_data_keys = (
+        'castmember.tmdb_id', 'role', 'ordering', 'appearances',
+        'thumb', 'name', 'gender', 'biography', 'known_for_department')
+
+    def image_path_func(self, v):
+        return self.common_apis.tmdb_imagepath.get_imagepath_poster(v)
+
+    @property
+    def cached_data_table(self):
+        return f'{self.table} INNER JOIN person ON person.tmdb_id = {self.table}.tmdb_id'
+
+
+class CrewMember(CastMember):
+    table = 'crewmember'
+    keys = ('tmdb_id', 'role', 'department', 'appearances', 'parent_id')
+    conditions = 'parent_id=? ORDER BY appearances ASC NULLS LAST LIMIT 100'
+    cached_data_keys = (
+        'crewmember.tmdb_id', 'role', 'department', 'appearances',
+        'thumb', 'name', 'gender', 'biography', 'known_for_department')
+
+
+class Creator(CrewMember):
+    conditions = 'parent_id=? AND role=? LIMIT 20'
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, 'Creator',)
+
+
+class Director(CrewMember):
+    conditions = 'parent_id=? AND department=? AND role=? LIMIT 20'
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, 'Directing', 'Director')
+
+
+class Writer(CrewMember):
+    conditions = 'parent_id=? AND department=? LIMIT 20'
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, 'Writing', )
+
+
+class Screenplay(CrewMember):
+    conditions = 'parent_id=? AND department=? AND role=? LIMIT 20'
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, 'Writing', 'Screenplay')
+
+
+class Producer(CrewMember):
+    conditions = 'parent_id=? AND department=? LIMIT 20'
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, 'Production')
+
+
+class SoundDepartment(CrewMember):
+    conditions = 'parent_id=? AND department=? LIMIT 20'
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, 'Sound')
+
+
+class ArtDepartment(CrewMember):
+    conditions = 'parent_id=? AND department=? LIMIT 20'
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, 'Art')
+
+
+class Photography(CrewMember):
+    conditions = 'parent_id=? AND department=? LIMIT 20'
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, 'Camera')
+
+
+class Editor(CrewMember):
+    conditions = 'parent_id=? AND department=? LIMIT 20'
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, 'Editing')
+
+
+class Person(ItemDetailsList):
+    table = 'person'
+    keys = ('id', 'tmdb_id', 'thumb', 'name', 'gender', 'biography', 'known_for_department')
+    conditions = 'tmdb_id=?'

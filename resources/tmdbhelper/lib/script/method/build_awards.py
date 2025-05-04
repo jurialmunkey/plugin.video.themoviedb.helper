@@ -67,9 +67,9 @@ class AwardsBuilder():
         def _get_tmdb_id(tvdb_id, v):
             tmdb_id = None
             if tmdb_type == 'tv':
-                tmdb_id = self.tmdb_api.get_tmdb_id(tmdb_type, tvdb_id=tvdb_id, query=v.get('name'), year=v.get('year'))
+                tmdb_id = self.tmdb_api.tmdb_database.get_tmdb_id(tmdb_type, tvdb_id=tvdb_id, query=v.get('name'), year=v.get('year'))
             else:
-                tmdb_id = self.tmdb_api.get_tmdb_id(tmdb_type, query=v.get('name'), year=v.get('year'))
+                tmdb_id = self.tmdb_api.tmdb_database.get_tmdb_id(tmdb_type, query=v.get('name'), year=v.get('year'))
             if not tmdb_id:
                 self._pd.update(f'Failed to get TMDb ID for {v.get("name")}')
                 return

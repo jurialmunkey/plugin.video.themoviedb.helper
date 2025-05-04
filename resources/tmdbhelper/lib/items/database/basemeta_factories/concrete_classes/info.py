@@ -1,0 +1,135 @@
+from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.baseclass import ItemDetailsList
+from tmdbhelper.lib.files.ftools import cached_property
+
+
+class Studio(ItemDetailsList):
+    table = 'studio'
+    keys = ('tmdb_id', 'parent_id')
+    cached_data_keys = ('company.name', 'company.tmdb_id', 'company.logo', 'company.country')
+
+    def image_path_func(self, v):
+        return self.common_apis.tmdb_imagepath.get_imagepath_thumbs(v)
+
+    @property
+    def cached_data_table(self):
+        return f'{self.table} INNER JOIN company ON company.tmdb_id = {self.table}.tmdb_id'
+
+
+class Certification(ItemDetailsList):
+    table = 'certification'
+    keys = ('name', 'iso_country', 'iso_language', 'release_date', 'release_type', 'parent_id', )
+    conditions = 'parent_id=? AND iso_country=? ORDER BY release_date ASC NULLS LAST LIMIT 1'  # WHERE conditions
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, self.common_apis.tmdb_api.iso_country)
+
+
+class Video(ItemDetailsList):
+    table = 'video'
+    keys = ('name', 'iso_country', 'iso_language', 'release_date', 'path', 'content', 'key', 'parent_id', )
+    conditions = 'parent_id=? AND content=? ORDER BY iso_language=?, release_date DESC LIMIT 1'  # WHERE conditions
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, 'Trailer', self.common_apis.tmdb_api.iso_language)
+
+
+class Country(ItemDetailsList):
+    table = 'country'
+    keys = ('name', 'iso_country', 'parent_id', )
+
+
+class Genre(ItemDetailsList):
+    table = 'genre'
+    keys = ('name', 'tmdb_id', 'parent_id', )
+
+
+class UniqueId(ItemDetailsList):
+    table = 'unique_id'
+    keys = ('key', 'value', 'parent_id', )
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, )
+
+
+class Custom(UniqueId):
+    table = 'custom'
+
+
+class Service(ItemDetailsList):
+    table = 'service'
+    keys = ('tmdb_id', 'name', 'display_priority', 'iso_country', 'logo')
+    conditions = 'tmdb_id=?'
+
+    def image_path_func(self, v):
+        return self.common_apis.tmdb_imagepath.get_imagepath_thumbs(v)
+
+
+class Provider(ItemDetailsList):
+    table = 'provider'
+    keys = ('tmdb_id', 'availability', 'parent_id')
+
+    cached_data_keys = ('provider.tmdb_id', 'availability', 'name', 'display_priority', 'iso_country', 'logo')
+    cached_data_table = 'provider INNER JOIN service ON service.tmdb_id = provider.tmdb_id'
+
+    @cached_property
+    def provider_allowlist(self):
+        from tmdbhelper.lib.addon.plugin import get_setting
+        provider_allowlist = get_setting('provider_allowlist', 'str')
+        provider_allowlist = provider_allowlist.split(' | ') if provider_allowlist else []
+        provider_allowlist = [f"'{i}'" for i in provider_allowlist]
+        provider_allowlist = ', '.join(provider_allowlist)
+        provider_allowlist = f'name IN ({provider_allowlist}) AND ' if provider_allowlist else ''
+        return provider_allowlist
+
+    @property
+    def conditions(self):
+        return f'{self.provider_allowlist}parent_id=? AND iso_country=? ORDER BY display_priority ASC NULLS LAST'
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, self.common_apis.tmdb_api.iso_country)
+
+    def image_path_func(self, v):
+        return self.common_apis.tmdb_imagepath.get_imagepath_thumbs(v)
+
+
+class Company(ItemDetailsList):
+    table = 'company'
+    keys = ('tmdb_id', 'name', 'logo', 'country')
+    conditions = 'tmdb_id=?'
+
+    def image_path_func(self, v):
+        return self.common_apis.tmdb_imagepath.get_imagepath_thumbs(v)
+
+
+class Base(ItemDetailsList):
+    table = 'baseitem'
+    keys = ('id', 'mediatype', 'expiry', )
+
+
+class Movie(ItemDetailsList):
+    table = 'movie'
+    keys = ('id', 'tmdb_id', 'year', 'premiered', 'plot', 'title', 'originaltitle', 'rating', 'votes', 'popularity')
+
+
+class Tvshow(ItemDetailsList):
+    table = 'tvshow'
+    keys = ('id', 'tmdb_id', 'year', 'premiered', 'plot', 'title', 'originaltitle', 'rating', 'votes', 'popularity')
+
+
+class Season(ItemDetailsList):
+    table = 'season'
+    keys = ('id', 'season', 'year', 'plot', 'title', 'originaltitle', 'premiered', 'status', 'rating', 'votes', 'popularity', 'tvshow_id')
+
+
+class Episode(ItemDetailsList):
+    table = 'episode'
+    keys = ('id', 'episode', 'year', 'plot', 'title', 'originaltitle', 'premiered', 'duration', 'status', 'rating', 'votes', 'popularity', 'season_id', 'tvshow_id')
+
+
+class MovieCollection(ItemDetailsList):
+    table = 'collection'
+    keys = ('id', 'tmdb_id', 'title', 'plot', 'poster', 'fanart')

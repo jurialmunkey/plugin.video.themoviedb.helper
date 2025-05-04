@@ -12,8 +12,20 @@ TIME_MINUTES = 60
 
 class MemoryCache(object):
     def __init__(self, name):
-        self._win = Window(10000)
         self._sc_name = f'TMDBHelper.MemCache.{name}'
+
+    @property
+    def window_home(self):
+        return Window(10000)
+
+    def get_window_property(self, name):
+        return self.window_home.getProperty(name)
+
+    def set_window_property(self, name, value):
+        return self.window_home.setProperty(name, value)
+
+    def del_window_property(self, name):
+        return self.window_home.clearProperty(name)
 
     def get(self, endpoint):
         '''
@@ -24,13 +36,13 @@ class MemoryCache(object):
 
         # Check expiration time
         expr_endpoint = f'{self._sc_name}_expr_{endpoint}'
-        expr_propdata = self._win.getProperty(expr_endpoint)
+        expr_propdata = self.get_window_property(expr_endpoint)
         if not expr_propdata or int(expr_propdata) <= cur_time:
             return
 
         # Retrieve data
         data_endpoint = f'{self._sc_name}_data_{endpoint}'
-        data_propdata = self._win.getProperty(data_endpoint)
+        data_propdata = self.get_window_property(data_endpoint)
         if not data_propdata:
             return
 
@@ -42,8 +54,8 @@ class MemoryCache(object):
         data = data_dumps(data, separators=(',', ':'))
         expr_endpoint = f'{self._sc_name}_expr_{endpoint}'
         data_endpoint = f'{self._sc_name}_data_{endpoint}'
-        self._win.setProperty(expr_endpoint, str(expires))
-        self._win.setProperty(data_endpoint, data)
+        self.set_window_property(expr_endpoint, str(expires))
+        self.set_window_property(data_endpoint, data)
 
     def use(
             self, func, *args, cache_name=None, cache_minutes=60, cache_combine_name=True,

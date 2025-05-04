@@ -70,6 +70,7 @@ def refresh_trakt_sync(**kwargs):
     from tmdbhelper.lib.api.trakt.sync.datasync import SyncData
 
     choices = (
+        # TODO FIX HIDDEN AT
         (get_localized(19022), 'hidden_at', ('movie', 'show', )),
         (get_localized(16102), 'last_watched_at', ('movie', 'show', 'episode', )),
         (get_localized(14086), 'playback_paused_at', ('movie', 'episode', )),
