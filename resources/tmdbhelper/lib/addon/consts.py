@@ -361,89 +361,54 @@ TRAKT_BASIC_LISTS = {
 }
 
 
-TRAKT_SYNC_LISTS_ROUTE = {
-    'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
-    'import_attr': 'ListSync'}
 TRAKT_SYNC_LISTS = {
     'trakt_collection': {
-        'sync_type': 'collection',
-        'sort_by': 'title',
-        'sort_how': 'asc',
-        'route': TRAKT_SYNC_LISTS_ROUTE,
-        'plugin_category': '{plural} {localized}',
-        'localized': 32192
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+            'import_attr': 'ListCollection'
+        },
     },
     'trakt_watchlist': {
-        'sync_type': 'watchlist',
-        'sort_by': 'unsorted',
-        'route': TRAKT_SYNC_LISTS_ROUTE,
-        'plugin_category': '{plural} {localized}',
-        'localized': 32193
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+            'import_attr': 'ListWatchlist'
+        },
     },
     'trakt_watchlist_released': {
-        'sync_type': 'watchlist',
-        'sort_by': 'released',
-        'sort_how': 'desc',
-        'extended': 'full',
-        'filters': {
-            'filter_key': 'premiered',
-            'filter_value': {
-                'module': 'tmdbhelper.lib.addon.tmdate',
-                'method': 'get_todays_date',
-                'kwargs': {}},
-            'filter_operator': 'lt',
-            'exclude_key': 'premiered',
-            'exclude_value': 'is_empty'},
-        'route': TRAKT_SYNC_LISTS_ROUTE,
-        'plugin_category': '{plural} {localized}',
-        'localized': 32456
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+            'import_attr': 'ListWatchlistReleased'
+        },
     },
     'trakt_watchlist_anticipated': {
-        'sync_type': 'watchlist',
-        'sort_by': 'released',
-        'sort_how': 'asc',
-        'extended': 'full',
-        'filters': {
-            'exclude_key': 'premiered',
-            'exclude_value': {
-                'module': 'tmdbhelper.lib.addon.tmdate',
-                'method': 'get_todays_date',
-                'kwargs': {}},
-            'exclude_operator': 'lt'},
-        'route': TRAKT_SYNC_LISTS_ROUTE,
-        'plugin_category': '{plural} {localized}',
-        'localized': 32457
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+            'import_attr': 'ListWatchlistAnticipated'
+        },
     },
     'trakt_history': {
-        'sync_type': 'watched',
-        'sort_by': 'watched',
-        'sort_how': 'desc',
-        'route': TRAKT_SYNC_LISTS_ROUTE,
-        'plugin_category': '{localized} {plural}',
-        'localized': 32194
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+            'import_attr': 'ListHistory'
+        },
     },
     'trakt_mostwatched': {
-        'sync_type': 'watched',
-        'sort_by': 'plays',
-        'sort_how': 'desc',
-        'route': TRAKT_SYNC_LISTS_ROUTE,
-        'plugin_category': '{localized} {plural}',
-        'localized': 32195
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+            'import_attr': 'ListMostWatched'
+        },
     },
     'trakt_inprogress': {
-        'sync_type': 'playback',
-        'sort_by': 'paused',
-        'sort_how': 'desc',
-        'route': TRAKT_SYNC_LISTS_ROUTE,
-        'plugin_category': '{localized} {plural}',
-        'localized': 32196
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+            'import_attr': 'ListPlaybackProgress'
+        },
     },
     'trakt_favorites': {
-        'sync_type': 'favorites',
-        'sort_by': 'unsorted',
-        'route': TRAKT_SYNC_LISTS_ROUTE,
-        'plugin_category': '{plural} {localized}',
-        'localized': 1036
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+            'import_attr': 'ListFavorites'
+        },
     }
 }
 
