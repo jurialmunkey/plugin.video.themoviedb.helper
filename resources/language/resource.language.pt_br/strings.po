@@ -24,6 +24,11 @@ msgctxt "#30001"
 msgid "Arabic (Saudi Arabia)"
 msgstr "Arábico (Arábia Saudita)"
 
+#: /resources/tmdbhelper/lib/api/tmdb/methods/lists.py
+msgctxt "#32000"
+msgid "Unaired"
+msgstr "Não Exibido"
+
 msgctxt "#30002"
 msgid "Belarusian (Belarus)"
 msgstr "Bielorrusso (Bielorrússia)"
@@ -32,6 +37,11 @@ msgctxt "#30003"
 msgid "Bulgarian (Bulgaria)"
 msgstr "Búlgaro (Bulgária)"
 
+#: /resources/settings.xml
+msgctxt "#32003"
+msgid "Preferred"
+msgstr "Preferido"
+
 msgctxt "#30004"
 msgid "Bengali (Bangladesh)"
 msgstr "Bengali (Bangladesh)"
@@ -39,6 +49,11 @@ msgstr "Bengali (Bangladesh)"
 msgctxt "#30005"
 msgid "Catalan (Spain)"
 msgstr "Catalão (Espanha)"
+
+#: /resources/settings.xml
+msgctxt "#32006"
+msgid "Supplement"
+msgstr "Suplemento"
 
 msgctxt "#30006"
 msgid "Chamorro (Guam)"
@@ -647,7 +662,7 @@ msgstr "Redes de TV"
 #: /resources/lib/plugin.py
 msgctxt "#32190"
 msgid "Movie Studios"
-msgstr "Estúdios de cinema"
+msgstr "Estúdios de Cinema"
 
 #: /resources/lib/plugin.py
 msgctxt "#32191"
@@ -1539,11 +1554,6 @@ msgid "Building Player Dialog"
 msgstr "Criando Caixa de Diálogo do Player"
 
 #: /resources/lib/trakt/api.py
-msgctxt "#32377"
-msgid "Playcount"
-msgstr "Número de Reproduções"
-
-#: /resources/settings.xml
 msgctxt "#32378"
 msgid "Show All"
 msgstr "Mostrar Tudo"
@@ -1584,11 +1594,6 @@ msgid "Hide All"
 msgstr "Ocultar Todos"
 
 #: /resources/settings.xml
-msgctxt "#32386"
-msgid "Delete cache"
-msgstr "Excluir cache"
-
-#: /resources/lib/script/router.py
 msgctxt "#32387"
 msgid "Delete {} Cache"
 msgstr "Excluir {} Cache"
@@ -1815,6 +1820,11 @@ msgid "Provider allowlist updated"
 msgstr "Lista de permissões do provedor atualizada"
 
 #: /resources/lib/script/method.py
+msgctxt "#32439"
+msgid "The provider allowlist has been updated."
+msgstr "A lista de permissões do provedor foi atualizada."
+
+#: /resources/lib/player/configure.py
 msgctxt "#32440"
 msgid "Edit steps"
 msgstr "Editar passos"
@@ -2204,6 +2214,41 @@ msgctxt "#32528"
 msgid "Add to {}"
 msgstr "Adicionar a {}"
 
+#: /resources/settings.xml
+msgctxt "#32529"
+msgid "Scrobble items played via TMDbHelper"
+msgstr "Itens scrobble reproduzidos via TMDbHelper"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32530"
+msgid "Remove rating"
+msgstr "Remover avaliação"
+
+#: /resources/tmdbhelper/lib/script/sync/item.py
+msgctxt "#32531"
+msgid "Method only available for VIP accounts."
+msgstr "Método disponível apenas para contas VIP."
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32532"
+msgid "Force resync"
+msgstr "Forçar ressincronização"
+
+#: /resources/settings.xml
+msgctxt "#32534"
+msgid "Trakt sync progress notifications"
+msgstr "Notificações de progresso de sincronização de trakt"
+
+#: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
+msgctxt "#32535"
+msgid "Non-binary"
+msgstr "Não binário"
+
+#: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
+msgctxt "#32536"
+msgid "Unspecified"
+msgstr "Não especificado"
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr "Hindi (Índia)"
@@ -2435,8 +2480,3 @@ msgstr "Player padrão para filmes"
 msgctxt "#32025"
 msgid "Default player for episodes"
 msgstr "Player padrão para episódios"
-
-#: /resources/settings.xml
-msgctxt "#32027"
-msgid "Clear default players"
-msgstr "Limpar players padrões"
