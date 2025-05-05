@@ -36,6 +36,6 @@ class ListRandomBecauseYouWatched(ListRecommendations):
 
         items = super().get_items(**params)
 
-        self.plugin_category = f'{get_localized(32288)} ({label})'
+        self.plugin_category = f'{get_localized(32288)} {label}'
 
         return items
