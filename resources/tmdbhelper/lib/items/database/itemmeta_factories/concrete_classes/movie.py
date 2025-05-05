@@ -8,6 +8,13 @@ class Movie(MediaItem):
         (('playcount', None), 'plays', 'playcount'),
     )
 
+    def get_infolabels_special(self, infolabels):
+        try:
+            infolabels['set'] = self.data[0]['collection_title']
+        except (TypeError, KeyError, IndexError):
+            pass
+        return infolabels
+
     def get_infoproperties_special(self, infoproperties):
         infoproperties = self.get_infoproperties_custom(infoproperties)
         infoproperties = self.get_infoproperties_progress(infoproperties)
