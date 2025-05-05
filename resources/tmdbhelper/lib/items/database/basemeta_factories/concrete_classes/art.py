@@ -61,6 +61,12 @@ class ArtExtraFanart(ArtFanart):
 
 
 class ArtLandscape(ArtFanart):
+    conditions = 'parent_id=? AND (type=? OR type=?) ORDER BY rating DESC LIMIT 1'  # WHERE conditions
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, 'backdrops', 'stills')
+
     def get_cached_data(self):
         return self.get_cached_data_by_language() or self.get_cached_data_by_english()
 
