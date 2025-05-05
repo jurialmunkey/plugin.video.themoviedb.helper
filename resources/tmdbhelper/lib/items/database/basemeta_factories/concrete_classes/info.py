@@ -18,7 +18,7 @@ class Studio(ItemDetailsList):
 class Certification(ItemDetailsList):
     table = 'certification'
     keys = ('name', 'iso_country', 'iso_language', 'release_date', 'release_type', 'parent_id', )
-    conditions = 'parent_id=? AND iso_country=? ORDER BY release_date ASC NULLS LAST LIMIT 1'  # WHERE conditions
+    conditions = 'parent_id=? AND iso_country=? AND name IS NOT NULL AND name != "" ORDER BY release_date ASC NULLS LAST LIMIT 1'  # WHERE conditions
 
     @property
     def values(self):  # WHERE conditions values for ?

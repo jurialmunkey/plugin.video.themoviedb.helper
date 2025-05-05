@@ -90,10 +90,10 @@ class ItemMapperMethods:
             iso_country = release_country['iso_3166_1']
             for release in (release_country.get('release_dates') or ()):
                 data.append({
-                    'name': release['certification'],
-                    'iso_country': iso_country,
-                    'iso_language': release['iso_639_1'],
-                    'release_date': release['release_date'],
+                    'name': release['certification'] or None,
+                    'iso_country': iso_country or None,
+                    'iso_language': release['iso_639_1'] or None,
+                    'release_date': release['release_date'] or None,
                     'release_type': tmdb_release_types.get(release['type']),
                 })
         return data
