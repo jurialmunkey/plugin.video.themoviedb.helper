@@ -49,6 +49,7 @@ class ListStarredMovies(ContainerDirectory):
     # @timer_method
     def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, limit=None, **kwargs):
         sync = BaseViewFactory('starredmovies', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
+        self.kodi_db = self.get_kodi_database('movie')
         self.container_content = convert_type('movie', 'container')
         return sync.data
 
@@ -57,6 +58,7 @@ class ListStarredTvshows(ContainerDirectory):
     # @timer_method
     def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, limit=None, **kwargs):
         sync = BaseViewFactory('starredtvshows', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
+        self.kodi_db = self.get_kodi_database('tv')
         self.container_content = convert_type('tv', 'container')
         return sync.data
 
@@ -68,6 +70,7 @@ class ListStarredCombined(ContainerDirectory):
         movies_data = sync.data or []
         sync = BaseViewFactory('starredtvshows', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
         tvshows_data = sync.data or []
+        self.kodi_db = self.get_kodi_database('both')
         self.container_content = convert_type('movie' if len(movies_data) >= len(tvshows_data) else 'tv', 'container')
         return sorted(movies_data + tvshows_data, key=lambda x: x['infolabels']['votes'], reverse=True)
 
@@ -76,6 +79,7 @@ class ListCrewedMovies(ContainerDirectory):
     # @timer_method
     def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, limit=None, **kwargs):
         sync = BaseViewFactory('crewedmovies', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
+        self.kodi_db = self.get_kodi_database('movie')
         self.container_content = convert_type('movie', 'container')
         return sync.data
 
@@ -84,6 +88,7 @@ class ListCrewedTvshows(ContainerDirectory):
     # @timer_method
     def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, limit=None, **kwargs):
         sync = BaseViewFactory('crewedtvshows', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
+        self.kodi_db = self.get_kodi_database('tv')
         self.container_content = convert_type('tv', 'container')
         return sync.data
 
@@ -95,6 +100,7 @@ class ListCrewedCombined(ContainerDirectory):
         movies_data = sync.data or []
         sync = BaseViewFactory('crewedtvshows', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
         tvshows_data = sync.data or []
+        self.kodi_db = self.get_kodi_database('both')
         self.container_content = convert_type('movie' if len(movies_data) >= len(tvshows_data) else 'tv', 'container')
         return sorted(movies_data + tvshows_data, key=lambda x: x['infolabels']['votes'], reverse=True)
 
@@ -124,6 +130,7 @@ class ListCreditsCombined(ContainerDirectory):
         unique_tvshows_data = [j for j in (label_check(i) for i in tvshows_data) if j]
         unique_movies_data = [j for j in (label_check(i) for i in movies_data) if j]
 
+        self.kodi_db = self.get_kodi_database('both')
         self.container_content = convert_type('movie' if len(unique_movies_data) >= len(unique_tvshows_data) else 'tv', 'container')
         return sorted(unique_movies_data + unique_tvshows_data, key=lambda x: x['infolabels']['votes'], reverse=True)
 
