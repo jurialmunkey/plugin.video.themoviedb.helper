@@ -72,7 +72,7 @@ class ListStarredCombined(ContainerDirectory):
         tvshows_data = sync.data or []
         self.kodi_db = self.get_kodi_database('both')
         self.container_content = convert_type('movie' if len(movies_data) >= len(tvshows_data) else 'tv', 'container')
-        return sorted(movies_data + tvshows_data, key=lambda x: x['infolabels']['votes'], reverse=True)
+        return sorted(movies_data + tvshows_data, key=lambda x: x['infolabels']['votes'] or 0, reverse=True)
 
 
 class ListCrewedMovies(ContainerDirectory):
@@ -102,7 +102,7 @@ class ListCrewedCombined(ContainerDirectory):
         tvshows_data = sync.data or []
         self.kodi_db = self.get_kodi_database('both')
         self.container_content = convert_type('movie' if len(movies_data) >= len(tvshows_data) else 'tv', 'container')
-        return sorted(movies_data + tvshows_data, key=lambda x: x['infolabels']['votes'], reverse=True)
+        return sorted(movies_data + tvshows_data, key=lambda x: x['infolabels']['votes'] or 0, reverse=True)
 
 
 class ListCreditsCombined(ContainerDirectory):
@@ -132,7 +132,7 @@ class ListCreditsCombined(ContainerDirectory):
 
         self.kodi_db = self.get_kodi_database('both')
         self.container_content = convert_type('movie' if len(unique_movies_data) >= len(unique_tvshows_data) else 'tv', 'container')
-        return sorted(unique_movies_data + unique_tvshows_data, key=lambda x: x['infolabels']['votes'], reverse=True)
+        return sorted(unique_movies_data + unique_tvshows_data, key=lambda x: x['infolabels']['votes'] or 0, reverse=True)
 
 
 class ListVideos(ContainerDirectory):
