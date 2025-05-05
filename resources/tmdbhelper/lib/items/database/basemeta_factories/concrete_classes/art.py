@@ -38,6 +38,9 @@ class ArtThumbs(ArtType):
     def image_path_func(self, v):
         return self.common_apis.tmdb_imagepath.get_imagepath_thumbs(v)
 
+    def get_cached_data(self):
+        return self.get_cached_data_by_null()
+
 
 class ArtFanart(ArtType):
     conditions = 'parent_id=? AND type=? ORDER BY rating DESC LIMIT 1'  # WHERE conditions
