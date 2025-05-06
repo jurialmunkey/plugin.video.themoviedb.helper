@@ -108,7 +108,8 @@ class BaseItem:
                 if not subtype:
                     continue
 
-                art[f'{subtype}.{this_dkey}'] = url
+                subtype_dkey = f'{subtype}.{this_dkey}'
+                art[subtype_dkey] = art.get(subtype_dkey) or url
 
         return art
 
