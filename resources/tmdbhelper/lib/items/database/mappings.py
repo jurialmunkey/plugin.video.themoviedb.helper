@@ -457,6 +457,30 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'keys': [('video', None)],
                 'func': self.get_video,
             }],
+            'created_by': [{
+                'keys': [('baseitem', None)],
+                'extend': True,
+                'func': self.split_array,
+                'kwargs': {
+                    'id': lambda i: f'person.{i["id"]}',
+                    'mediatype': lambda _: 'person',
+                    'expiry': lambda _: 0}}, {
+                # ---
+                'keys': [('crewmember', None)],
+                'extend': True,
+                'func': self.split_array,
+                'kwargs': {
+                    'tmdb_id': 'id',
+                    'role': lambda _: 'Creator',
+                    'department': lambda _: 'Creator'}}, {
+                # ---
+                'keys': [('person', None)],
+                'extend': True,
+                'func': self.split_array,
+                'kwargs': {
+                    'id': lambda i: f'person.{i["id"]}',
+                    'tmdb_id': 'id', 'thumb': 'profile_path', 'name': 'name', 'gender': 'gender'}
+            }],
             'credits': [{
                 'keys': [('baseitem', None)],
                 'extend': True,
