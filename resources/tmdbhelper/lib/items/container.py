@@ -58,6 +58,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         }
 
         self.sort_methods = []  # List of kwargs dictionaries [{'sortMethod': SORT_METHOD_UNSORTED}]
+        self.property_params = {}
 
     @cached_property
     def is_widget(self):
@@ -167,8 +168,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
             li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
             li.set_thumb_to_art(self.thumb_override == 2) if self.thumb_override else None  # Special override for calendars to prevent thumb spoilers
             li.set_params_reroute(self.params.get('extended'), self.is_cacheonly)  # Reroute details to proper end point
-            li.set_params_to_info(self.plugin_category)  # Set path params to properties for use in skins
-            li.infoproperties.update(self.property_params or {})
+            li.set_params_to_info(widget=self.plugin_category, **self.property_params)  # Set path params to properties for use in skins
             if self.thumb_override:
                 li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb to prevent Kodi overwriting
             if li.next_page:
@@ -238,7 +238,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
             self.kodi_db = self.get_kodi_database('tv')
 
     def set_params_to_container(self):
-        params = {f'Param.{k}': f'{v}' for k, v in self.params.items() if k and v}
+        params = {f'param.{k}': f'{v}' for k, v in self.params.items() if k and v}
         if self.handle == -1:
             return params
         from xbmcplugin import setProperty
@@ -292,7 +292,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
                 return
             if not build_items:
                 return items
-            self.property_params = self.set_params_to_container()
+            self.property_params.update(self.set_params_to_container())
             self.plugin_category = self.params.get('plugin_category') or self.plugin_category
             with TimerList(self.timer_lists, '--sync', log_threshold=0.05, logging=self.log_timers):
                 self.trakt_playdata.pre_sync_join()

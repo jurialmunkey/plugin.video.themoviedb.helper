@@ -28,6 +28,8 @@ class ListRandomBecauseYouWatched(ListRecommendations):
         except (AttributeError, KeyError):
             return
 
+        localized = get_localized(32288)
+
         params = {
             'info': 'recommendations',
             'tmdb_type': tmdb_type,
@@ -36,6 +38,14 @@ class ListRandomBecauseYouWatched(ListRecommendations):
 
         items = super().get_items(**params)
 
-        self.plugin_category = f'{get_localized(32288)} {label}'
+        self.plugin_category = f'{localized} {label}'
+        self.property_params.update(
+            {
+                'widget.label': label,
+                'widget.tmdb_type': tmdb_type,
+                'widget.tmdb_id': tmdb_id,
+                'widget.category': localized,
+            }
+        )
 
         return items

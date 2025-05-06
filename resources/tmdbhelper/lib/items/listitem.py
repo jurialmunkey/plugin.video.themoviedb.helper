@@ -185,15 +185,15 @@ class _ListItem(object):
                 continue
             self.infoproperties[f'{k}_id'] = v
 
-    def set_params_to_info(self, widget=None):
+    def set_params_to_info(self, **kwargs):
         for k, v in self.params.items():
             if not k or not v:
                 continue
             self.infoproperties[f'item.{k}'] = v
         if self.params.get('tmdb_type'):
             self.infoproperties['item.type'] = self.params['tmdb_type']
-        if widget:
-            self.infoproperties['widget'] = widget
+        for k, v in kwargs.items():
+            self.infoproperties[k] = v
 
     def get_url(self):
         def _get_url(path, reload=None, widget=None, **params):
