@@ -12,15 +12,23 @@ REGEX_WINPROP_FINDALL = r'\$WINPROP\[(.*?)\]'  # $WINPROP[key] = Window(10000).g
 REGEX_WINPROP_SUB = r'\$WINPROP\[{}\]'
 
 
-def test_func():
+def test_func(test_func=None, path=None, **kwargs):
     import xbmcgui
     from tmdbhelper.lib.api.tmdb.api import TMDb
-    from tmdbhelper.lib.api.trakt.api import TraktAPI
+    # from tmdbhelper.lib.api.trakt.api import TraktAPI
     from tmdbhelper.lib.files.futils import dumps_to_file
-    from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
-    from tmdbhelper.lib.addon.plugin import get_version
+    # from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
+    # from tmdbhelper.lib.addon.plugin import get_version
+    tmdb_api = TMDb()
     head = ''
     data = ''
+
+    if test_func is None:
+        pass
+
+    elif test_func == 'response':
+        head = path
+        data = tmdb_api.get_response_json(path, **kwargs)
 
     # data = get_version()
 
@@ -28,7 +36,6 @@ def test_func():
     # iddb = ItemDetailsDatabase()
     # iddb.clean_expired_items()
 
-    tmdb_api = TMDb()
     # data = tmdb_api.tmdb_database.get_nextaired(100088)
     # data = tmdb_api.tmdb_database.get_tmdb_id('movie', imdb_id='tt0078748')
     # data = tmdb_api.tmdb_database.get_tmdb_id('tv', tvdb_id=81189)
@@ -46,7 +53,7 @@ def test_func():
     # data = tmdb_api.tmdb_database.get_watch_providers('movie', 'AU')
     # data = tmdb_api.tmdb_database.get_keywords()
 
-    data = tmdb_api.get_response_json('find', 'tt20603288', external_source='imdb_id')
+
 
     # trakt_api = TraktAPI()
     # path = trakt_api.get_request_url('users/hidden/dropped')
@@ -108,7 +115,7 @@ def test_func():
     # data = get_jsonrpc(method, params)
 
     xbmcgui.Dialog().textviewer(f'{head}', f'{data}')
-    dumps_to_file(data, 'log_data', 'test_func.json', join_addon_data=True)
+    dumps_to_file(data, 'log_data', f'test_func_{test_func}.json', join_addon_data=True)
 
 
 class Script(object):
@@ -130,7 +137,7 @@ class Script(object):
 
     routing_table = {
         'test_func':
-            lambda **kwargs: test_func(),
+            lambda **kwargs: test_func(**kwargs),
 
         # Node Maker
         'make_node':
