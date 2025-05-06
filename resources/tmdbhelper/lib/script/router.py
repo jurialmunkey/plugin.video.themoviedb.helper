@@ -26,7 +26,7 @@ def test_func(test_func, **kwargs):
         data = TMDb().get_response_json(path, **kwargs)
         return finalise(head, data)
 
-    def test_func_baseitem_factory(mediatype, tmdb_id, season=None, episode=None, cache_refresh=None, del_database_init=False):
+    def test_func_baseitem_factory(mediatype, tmdb_id, season=None, episode=None, cache_refresh=None, del_database_init=False, attr='data'):
         from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
         sync = BaseItemFactory(mediatype)
         sync.tmdb_id = int(tmdb_id)
@@ -34,7 +34,7 @@ def test_func(test_func, **kwargs):
         sync.episode = int(episode) if episode is not None else None
         sync.cache_refresh = cache_refresh
         sync.cache.del_database_init() if del_database_init else None
-        data = sync.data
+        data = getattr(sync, attr)
         head = f'{mediatype} {tmdb_id} {season} {episode}'
         return finalise(head, data)
 
