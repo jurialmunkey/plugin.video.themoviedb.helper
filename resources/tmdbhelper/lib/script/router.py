@@ -20,15 +20,18 @@ def test_func(test_func=None, path=None, **kwargs):
     # from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
     # from tmdbhelper.lib.addon.plugin import get_version
     tmdb_api = TMDb()
-    head = ''
-    data = ''
+
+    def finalise(head='', data=''):
+        xbmcgui.Dialog().textviewer(f'{head}', f'{data}')
+        dumps_to_file(data, 'log_data', f'test_func_{test_func}.json', join_addon_data=True)
 
     if test_func is None:
-        pass
+        return finalise()
 
-    elif test_func == 'response':
+    if test_func == 'response':
         head = path
         data = tmdb_api.get_response_json(path, **kwargs)
+        return finalise(head, data)
 
     # data = get_version()
 
@@ -111,9 +114,6 @@ def test_func(test_func=None, path=None, **kwargs):
     #     }
     # }
     # data = get_jsonrpc(method, params)
-
-    xbmcgui.Dialog().textviewer(f'{head}', f'{data}')
-    dumps_to_file(data, 'log_data', f'test_func_{test_func}.json', join_addon_data=True)
 
 
 class Script(object):
