@@ -1823,8 +1823,8 @@ msgstr "提供程序允许列表已更新"
 
 #: /resources/lib/script/method.py
 msgctxt "#32439"
-msgid "The provider allowlist has been updated. Please note that updating provider details requires the item cache to be refreshed. The item cache can be deleted in the expert settings section."
-msgstr "提供程序列表已更新。请注意，更新提供程序详细信息需要刷新项目缓存。可以在专家设置部分删除项目缓存。"
+msgid "The provider allowlist has been updated. "
+msgstr "提供程序列表已更新。"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32440"
