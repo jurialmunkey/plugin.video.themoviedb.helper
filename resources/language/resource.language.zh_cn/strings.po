@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-05-06 13:49+0800\n"
+"PO-Revision-Date: 2025-05-06 14:13+0800\n"
 "Last-Translator: Wabisabi\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -386,7 +386,7 @@ msgstr "增加项目"
 #: /resources/lib/container.py
 msgctxt "#32103"
 msgid "No Value Added"
-msgstr "无附加值"
+msgstr "未添加值"
 
 #: /resources/lib/container.py
 msgctxt "#32104"
@@ -669,7 +669,7 @@ msgstr "电影公司"
 #: /resources/lib/plugin.py
 msgctxt "#32191"
 msgid "Images"
-msgstr "图片"
+msgstr "图像"
 
 #: /resources/lib/plugin.py
 msgctxt "#32192"
@@ -1488,12 +1488,12 @@ msgstr "现在添加项目到媒体库？"
 #: /resources/settings.xml
 msgctxt "#32363"
 msgid "Delay after resolving (seconds)"
-msgstr "解析后延迟（秒）"
+msgstr "解析完成后延迟（秒）"
 
 #: /resources/settings.xml
 msgctxt "#32364"
 msgid "Reroute PlayMedia to xbmc.Player()"
-msgstr "将媒体重新路由到播放器"
+msgstr "将 PlayMedia 请求重定向到 xbmc.Player() 方法"
 
 #: /resources/lib/addon/plugin.py
 msgctxt "#32365"
@@ -1939,7 +1939,7 @@ msgstr "提名"
 #: /resources/settings.xml
 msgctxt "#32463"
 msgid "Cache items in custom lists you own for 24 hours"
-msgstr "将您拥有的自定义列表中的项目缓存24小时"
+msgstr "将您创建的自定义列表中的项目缓存24小时"
 
 #: /resources/settings.xml
 msgctxt "#32466"
@@ -1974,7 +1974,7 @@ msgstr "连接错误通知"
 #: /resources/settings.xml
 msgctxt "#32472"
 msgid "Cache image location"
-msgstr "缓存图片位置"
+msgstr "缓存图像位置"
 
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32473"
@@ -2084,12 +2084,12 @@ msgstr "添加/删除为自定义节点"
 #: /resources/settings.xml
 msgctxt "#32497"
 msgid "Container content fallback for service listitems without mediatypes"
-msgstr "不带媒体类型的服务列表项的容器内容回退"
+msgstr "为无媒体类型的服务列表项设置容器内容回退"
 
 #: /resources/settings.xml
 msgctxt "#32498"
 msgid "Some plugins have poor metadata and fail to fill the item mediatype which results in the service monitor not completing an item lookup. This setting allows the service monitor to use the container content type when item mediatype is missing. Note this setting will likely result more frequent incorrect matches due to the end plugin having bad metadata."
-msgstr "有些插件的元数据很差，无法填充项中介类型，导致服务监视器无法完成项查找。此设置允许服务监视器在缺少项中介类型时使用容器内容类型。请注意，由于最终插件的元数据不正确，此设置可能会导致更频繁的不正确匹配。"
+msgstr "部分插件的元数据质量较差，未能正确填充项目的媒体类型，导致服务监视器无法完成条目查找。此设置允许服务监视器在媒体类型缺失时，使用容器的内容类型作为回退。注意：启用此选项可能导致匹配错误率增加，因下游插件的元数据不完整或错误。"
 
 # 翻页速度倍数
 #: /resources/settings.xml
