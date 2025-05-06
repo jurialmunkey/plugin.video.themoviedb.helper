@@ -53,8 +53,6 @@ def test_func(test_func=None, path=None, **kwargs):
     # data = tmdb_api.tmdb_database.get_watch_providers('movie', 'AU')
     # data = tmdb_api.tmdb_database.get_keywords()
 
-
-
     # trakt_api = TraktAPI()
     # path = trakt_api.get_request_url('users/hidden/dropped')
     # data = trakt_api.get_api_request(path, headers=trakt_api.headers).json()
