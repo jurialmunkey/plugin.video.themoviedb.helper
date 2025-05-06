@@ -6,6 +6,7 @@ class Tvshow(MediaItem):
     table = 'tvshow'
     tmdb_type = 'tv'
     db_studio_table = 'network'
+    ftv_type = 'tv'
 
     @property
     def online_data_kwgs(self):
