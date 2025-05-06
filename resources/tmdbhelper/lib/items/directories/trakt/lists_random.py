@@ -17,7 +17,7 @@ class ListRandomBecauseYouWatched(ListRecommendations):
             return
 
         limit = get_setting('trakt_becausewatchedseed', 'int') or 5
-        watched_items[:limit]
+        watched_items = watched_items[:limit]
 
         item = watched_items[random.randint(0, len(watched_items) - 1)]
 
