@@ -403,7 +403,7 @@ msgid ""
 "TMDb ID for {} not found or none selected.\n"
 "Do you want to add another value?"
 msgstr ""
-„A(z) {} TMDb azonosítója nem található, vagy nincs kiválasztva.”
+"A(z) {} TMDb azonosítója nem található, vagy nincs kiválasztva.”
 "Szeretnél még egy értéket hozzáadni?"
 
 #: /resources/lib/container.py
@@ -547,8 +547,8 @@ msgid ""
 "Adding Trakt lists to library is limited to [B]{}[/B] TV Shows and [B]{}[/B] Movies per list.\n"
 "This limit is set to ensure that the APIs providing data for free are respected."
 msgstr ""
-„A Trakt listák könyvtárhoz való hozzáadása listánként legfeljebb [B]{}[/B] tévéműsorra és [B]{}[/B] filmre korlátozódik.”
-„Ez a korlátozás annak biztosítására szolgál, hogy az ingyenes adatokat biztosító API-kat tiszteletben tartsák.”
+"A Trakt listák könyvtárhoz való hozzáadása listánként legfeljebb [B]{}[/B] tévéműsorra és [B]{}[/B] filmre korlátozódik.”
+"Ez a korlátozás annak biztosítására szolgál, hogy az ingyenes adatokat biztosító API-kat tiszteletben tartsák.”
 
 #: /resources/lib/context.py
 msgctxt "#32166"
@@ -1078,7 +1078,7 @@ msgstr "Szabály hozzáadása"
 #: /resources/lib/userdiscover.py
 msgctxt "#32278"
 msgid "Enter Network IDs separated with \" / \""
-msgstr "Add meg a hálózati azonosítókat \" / \ karakterekkel elválasztva"
+msgstr "Add meg a hálózati azonosítókat \" / \" karakterekkel elválasztva"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32279"
@@ -1161,8 +1161,8 @@ msgid ""
 "{} failed for {}!\n"
 "{} ID {}"
 msgstr ""
-„A(z) {} azonosító nem felelt meg a következőnek: {}!\n”
-„{} ID {}”
+"A(z) {} azonosító nem felelt meg a következőnek: {}!\n”
+"{} ID {}”
 
 #: /resources/lib/script.py
 msgctxt "#32297"
@@ -1170,8 +1170,8 @@ msgid ""
 "{} was successful for {}!\n"
 "{} ID {}"
 msgstr ""
-„A(z) {} sikeresen végrehajtotta a(z) {}!\n műveletet”
-„{} ID {}”
+"A(z) {} sikeresen végrehajtotta a(z) {}!\n műveletet”
+"{} ID {}”
 
 #: /resources/lib/syncitem.py
 msgctxt "#32298"
@@ -1344,9 +1344,9 @@ msgid ""
 "\n"
 "[B]WARNING:[/B] This action cannot be undone."
 msgstr ""
-„Vissza szeretnéd állítani a(z) [B]{}[/B] lejátszófájlt az eredeti, módosítatlan állapotába a lemezen?\n”
-„\n”
-„[B]FIGYELMEZTETÉS:[/B] Ez a művelet nem vonható vissza.”
+"Vissza szeretnéd állítani a(z) [B]{}[/B] lejátszófájlt az eredeti, módosítatlan állapotába a lemezen?\n”
+"\n”
+"[B]FIGYELMEZTETÉS:[/B] Ez a művelet nem vonható vissza.”
 
 #: /resources/lib/player/configure.py
 msgctxt "#32336"
@@ -1361,10 +1361,10 @@ msgid ""
 "\n"
 "If you close without saving, your changes will be lost."
 msgstr ""
-„A [B]{}[/B] lejátszófájl megváltozott.\n”
-„Mented a módosításokat?”\n”
-„\n”
-„Ha mentés nélkül bezárod, a módosítások elvesznek.”
+"A [B]{}[/B] lejátszófájl megváltozott.\n”
+"Mented a módosításokat?”\n”
+"\n”
+"Ha mentés nélkül bezárod, a módosítások elvesznek.”
 
 #: /resources/lib/player/configure.py
 msgctxt "#32338"
@@ -1383,9 +1383,9 @@ msgid ""
 "\n"
 "Are you sure you want to set this player's resolve method to PlayMedia?"
 msgstr ""
-„Kérjük, vedd figyelembe, hogy a setResolvedUrl a Kodi által preferált módszer a lejátszási URL-ek feloldására. A PlayMedia metódust csak akkor használd, ha nehézségeid vannak a setResolvedUrl használatával ennél a lejátszónál.”\n”
-„\n”
-„Biztos vagy benne, hogy a lejátszó feloldási metódusát a PlayMediára szeretnéd állítani?”
+"Kérjük, vedd figyelembe, hogy a setResolvedUrl a Kodi által preferált módszer a lejátszási URL-ek feloldására. A PlayMedia metódust csak akkor használd, ha nehézségeid vannak a setResolvedUrl használatával ennél a lejátszónál.\n”
+"\n”
+"Biztos vagy benne, hogy a lejátszó feloldási metódusát a PlayMediára szeretnéd állítani?”
 
 #: /resources/lib/player/configure.py
 msgctxt "#32341"
@@ -1465,7 +1465,7 @@ msgid ""
 "\n"
 "This action cannot be undone."
 msgstr ""
-"Biztosan törölni szeretnéd ezt: [B]{}[/B]?”\n”
+"Biztosan törölni szeretnéd ezt: [B]{}[/B]?\n”
 "\n”
 "Ez a művelet nem vonható vissza.”
 
@@ -1813,7 +1813,7 @@ msgstr "A QUERYKEY kifejezést oda kell beilleszteni, ahová az URL-re vonatkoz�
 #: /resources/lib/player/configure.py
 msgctxt "#32435"
 msgid "Input QUERYKEY where search query goes"
-msgstr "rja be a QUERYKEY-t, ahová a keresési lekérdezés kerül"
+msgstr "Írja be a QUERYKEY-t, ahová a keresési lekérdezés kerül"
 
 #: /resources/settings.xml
 msgctxt "#32436"
