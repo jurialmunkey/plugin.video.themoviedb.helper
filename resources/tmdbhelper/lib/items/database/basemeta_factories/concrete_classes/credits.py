@@ -31,7 +31,7 @@ class Creator(CrewMember):
 
     @property
     def values(self):  # WHERE conditions values for ?
-        return (self.item_id, 'Creator',)
+        return (self.parent_id, 'Creator',)  # Creator is for TV Show so get parent for season/episode
 
 
 class Director(CrewMember):
