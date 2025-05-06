@@ -1249,8 +1249,8 @@ msgid ""
 "Download players from URL?\n"
 "[B]{}[/B]"
 msgstr ""
-„Lejátszók letöltése URL-ről?\n”
-„[B]{}[/B]”
+"Lejátszók letöltése URL-ről?\n”
+" [B]{}[/B]”
 
 #: /resources/lib/trakt/api.py
 msgctxt "#32315"
