@@ -516,12 +516,7 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="trakt_watchedindicators" type="boolean" label="32034" help="">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="trakt_playprogress" type="boolean" label="32407" help="">
+                <setting id="trakt_watchedindicators" type="boolean" label="32013" help="">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>

@@ -81,6 +81,11 @@ msgctxt "#30009"
 msgid "German (Austria)"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32013"
+msgid "Get watched indicators, episode counts, and resume points"
+msgstr ""
+
 msgctxt "#30010"
 msgid "German (Switzerland)"
 msgstr ""
