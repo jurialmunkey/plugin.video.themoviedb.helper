@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-05-06 14:13+0800\n"
+"PO-Revision-Date: 2025-05-07 17:36+0800\n"
 "Last-Translator: Wabisabi\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -59,6 +59,16 @@ msgstr "补充"
 msgctxt "#30006"
 msgid "Chamorro (Guam)"
 msgstr "查莫罗（关岛）"
+
+#: /resources/settings.xml
+msgctxt "#32008"
+msgid "Low"
+msgstr "低"
+
+#: /resources/settings.xml
+msgctxt "#32009"
+msgid "High"
+msgstr "高"
 
 msgctxt "#30007"
 msgid "Czech (Czech Republic)"
