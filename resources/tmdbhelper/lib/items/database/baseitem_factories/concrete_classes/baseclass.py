@@ -5,7 +5,6 @@ from tmdbhelper.lib.items.database.basedata import ItemDetailsDatabaseAccess
 from tmdbhelper.lib.items.database.basemeta_factories.factory import BaseMetaFactory
 from tmdbhelper.lib.items.database.itemmeta_factories.factory import ItemMetaFactory
 from infotagger.listitem import _ListItemInfoTagVideo
-from tmdbhelper.lib.files.dbfunc import database_connection
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_days_to_air
 from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY, SHORTER_EXPIRY, DAY_IN_SECONDS
 
@@ -142,14 +141,12 @@ class BaseItem(ItemDetailsDatabaseAccess):
             return
         self.expiry_time = ((days_to_air // 2) + 1) * DAY_IN_SECONDS  # Refresh in half number of days (rounded + 1)
 
-    @database_connection
     def get_cached_data(self):
-        data = self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, self.cached_data_values, self.cached_data_conditions)
-
-        if not data or not data[0] or not data[0][self.cached_data_check_key]:
-            return
-
-        return self.get_item_meta(data)
+        with self.connection.open(self.cache):
+            data = self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, self.cached_data_values, self.cached_data_conditions)
+            if not data or not data[0] or not data[0][self.cached_data_check_key]:
+                return
+            return self.get_item_meta(data)
 
     def set_cached_data(self, item_id, mediatype, expiry, table, keys, mapped_data, return_data=False):
         if not return_data:

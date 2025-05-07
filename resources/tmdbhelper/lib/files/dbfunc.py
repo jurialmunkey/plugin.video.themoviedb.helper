@@ -101,10 +101,3 @@ class DatabaseAccess:
             return self.get_cached_list_values(table, keys, values, conditions)
 
         return internal_data or get_external_data()
-
-
-def database_connection(func):
-    def wrapper(self, *args, **kwargs):
-        with self.connection.open(self.cache):
-            return func(self, *args, **kwargs)
-    return wrapper
