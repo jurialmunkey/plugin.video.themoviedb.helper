@@ -142,7 +142,7 @@ class BaseItem(ItemDetailsDatabaseAccess):
         self.expiry_time = ((days_to_air // 2) + 1) * DAY_IN_SECONDS  # Refresh in half number of days (rounded + 1)
 
     def get_cached_data(self):
-        with self.connection.open(self.cache):
+        with self.connection.open():
             data = self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, self.cached_data_values, self.cached_data_conditions)
             if not data or not data[0] or not data[0][self.cached_data_check_key]:
                 return
@@ -180,7 +180,7 @@ class BaseItem(ItemDetailsDatabaseAccess):
                 qitem = db_cache.try_cached_data(online_data_mapped)
                 queue.append(qitem)
 
-        with self.connection.open(self.cache):
+        with self.connection.open():
             self.connection.open_connection.execute('BEGIN')
             for func, args, kwgs in queue:
                 func(*args, **kwgs)

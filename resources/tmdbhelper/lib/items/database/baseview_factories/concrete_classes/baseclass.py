@@ -55,7 +55,7 @@ class BaseList(ItemDetailsDatabaseAccess):
         return base_dbc.data
 
     def get_unmapped_data(self):
-        with self.connection.open(self.cache):
+        with self.connection.open():
             data = self.get_cached_list_values(
                 self.cached_data_table,
                 self.cached_data_keys,

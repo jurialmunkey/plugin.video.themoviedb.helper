@@ -4,6 +4,8 @@ from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.addon.plugin import convert_type
 # from tmdbhelper.lib.addon.logger import CProfiler
+from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
+from tmdbhelper.lib.files.dbfunc import DatabaseConnection
 
 
 class ListItemConfig:
@@ -78,6 +80,7 @@ class ListItemDetails:
 
     def __init__(self, common_apis=None):
         self.common_apis = common_apis or CommonContainerAPIs()
+        self.cache = ItemDetailsDatabase()
 
     def get_item(self, tmdb_type, tmdb_id, season=None, episode=None):
         mediatype = convert_type(tmdb_type, output='dbtype', season=season, episode=episode)
@@ -90,6 +93,7 @@ class ListItemDetails:
             baseitem_db_cache.common_apis = self.common_apis
             baseitem_db_cache.extendedinfo = self.extendedinfo
             baseitem_db_cache.cache_refresh = self.cache_refresh
+            baseitem_db_cache.cache = self.cache
         except(AttributeError, TypeError, KeyError):
             return
 
@@ -104,7 +108,6 @@ class ListItemDetails:
         return baseitem_db_cache.data
 
     def get_listitem(self, i):
-        # with CProfiler(i.get('label', 'None') if i else 'None'):
         i['parent_params'] = self.parent_params
         if 'next_page' in i:
             return ListItem(**i) if self.pagination else None
