@@ -52,7 +52,6 @@ class Season(Tvshow):
     def db_baseitem_cache_get_parent_data(self):
         base_dbc = Tvshow()
         base_dbc.common_apis = self.common_apis
-        base_dbc.connection = self.connection
         base_dbc.mediatype = 'tvshow'
         base_dbc.tmdb_id = self.tmdb_id
         return base_dbc.data

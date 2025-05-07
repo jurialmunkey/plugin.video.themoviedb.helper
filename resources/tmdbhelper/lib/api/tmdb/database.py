@@ -87,7 +87,7 @@ class TMDbDatabase(
 
     def get_cached_item_values(self, table, item_id, keys, mapping_function=None):
         data = None
-        with self.access.connection.open(self):
+        with self.access.connection.open():
             if not self.is_expired(f'{table}.{item_id}'):
                 data = self.get_item_values(table, item_id, keys=keys)
         return mapping_function(data) if mapping_function else data
@@ -97,7 +97,7 @@ class TMDbDatabase(
 
     def get_cached_values(self, table, keys, mapping_function=None, values=None, conditions=None):
         data = None
-        with self.access.connection.open(self):
+        with self.access.connection.open():
             if not self.is_expired(table):
                 data = self.get_all_values(
                     table,
@@ -107,7 +107,7 @@ class TMDbDatabase(
         return mapping_function(data) if mapping_function else data
 
     def set_cached_values(self, table, keys, values, item_id=None, expiry=DEFAULT_EXPIRY, overwrite=True):
-        with self.access.connection.open(self) as connection:
+        with self.access.connection.open() as connection:
             connection.execute('BEGIN')
             self.set_expiry(f'{table}.{item_id}' if item_id else table, expiry=expiry) if expiry else None
             self.access.set_cached_list_values(table, keys=keys, values=values, overwrite=overwrite)

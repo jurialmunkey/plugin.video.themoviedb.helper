@@ -17,6 +17,12 @@ class ListStandardSync(ContainerDirectory):
     item_list_plugin_name = '{plural} {localized}'
     item_list_localize = None
     item_list_sync_params_def = None
+    item_list_sync_container_content = None
+
+    def get_items_container_content(self, tmdb_type, items):
+        if not self.item_list_sync_container_content:
+            return convert_type(tmdb_type, 'container', items=items)
+        return self.item_list_sync_container_content
 
     def get_items_sync_list_fallback(self, item_type, sort_by=None, sort_how=None, tmdb_id=None, **kwargs):
         return
@@ -59,7 +65,7 @@ class ListStandardSync(ContainerDirectory):
             filters=self.item_list_sync_filters)
 
         self.kodi_db = self.get_kodi_database(tmdb_type)
-        self.container_content = convert_type(tmdb_type, 'container', items=response.items)
+        self.container_content = self.get_items_container_content(tmdb_type, response.items)
 
         if not self.item_list_sync_next_page or sort_by == 'random':
             return response.items
@@ -158,6 +164,7 @@ class ListNextEpisodes(ListStandardSync):
     item_list_localize = 32197
     item_list_plugin_name = '{localized}'
     item_list_sync_item_type = 'episode'
+    item_list_sync_container_content = 'episodes'
 
     @cached_property
     def thumb_override(self):
@@ -174,6 +181,7 @@ class ListUpNext(ListStandardSync):
     item_list_localize = 32043
     item_list_plugin_name = '{localized}'
     item_list_sync_item_type = 'episode'
+    item_list_sync_container_content = 'episodes'
 
     def get_items_sync_list_fallback(self, item_type, sort_by=None, sort_how=None, tmdb_id=None, **kwargs):
         from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
@@ -194,6 +202,7 @@ class ListOnDeck(ListStandardSync):
     item_list_plugin_name = '{localized}'
 
     def get_items(self, tmdb_type, **kwargs):
+        self.item_list_sync_container_content = 'episodes' if tmdb_type == 'tv' else 'movies'
         self.item_list_sync_item_type = 'episode' if tmdb_type == 'tv' else 'movie'
         return super().get_items(tmdb_type=tmdb_type, **kwargs)
 

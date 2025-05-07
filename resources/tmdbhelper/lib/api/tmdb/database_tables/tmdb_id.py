@@ -26,7 +26,7 @@ class TableTMDbID:
         return self.tmdb_api.get_response_json
 
     def get_id(self, values, conditions, keys=None):
-        with self.access.connection.open(self.parent):
+        with self.access.connection.open():
             data = self.access.get_cached_list_values(
                 self.table,
                 keys=('tmdb_id', ) if not keys else keys,
@@ -41,7 +41,7 @@ class TableTMDbID:
         statement_update = DatabaseStatements.update_if_null(
             self.table, (external_source, ), conditions="tmdb_type=? AND tmdb_id=?")
 
-        with self.access.connection.open(self.parent) as connection:
+        with self.access.connection.open() as connection:
             connection.execute('BEGIN')
             connection.execute(statement_insert, (tmdb_id, self.tmdb_type))
             connection.execute(statement_update, (data_id, self.tmdb_type, tmdb_id, ))
@@ -161,7 +161,7 @@ class TableTMDbID:
         statement_update = DatabaseStatements.update_if_null(
             self.table, ('title', 'year'), conditions="tmdb_type=? AND tmdb_id=?")
 
-        with self.access.connection.open(self.parent) as connection:
+        with self.access.connection.open() as connection:
             connection.execute('BEGIN')
             connection.execute(statement_insert, (tmdb_id, self.tmdb_type))
             connection.execute(statement_update, (self.query, self.year, self.tmdb_type, tmdb_id, ))
@@ -190,7 +190,7 @@ class TableTMDbID:
         statement_update = DatabaseStatements.update_if_null(
             self.table, ('title', ), conditions="tmdb_type=? AND tmdb_id=?")
 
-        with self.access.connection.open(self.parent) as connection:
+        with self.access.connection.open() as connection:
             connection.execute('BEGIN')
             connection.execute(statement_insert, (tmdb_id, tmdb_type))
             connection.execute(statement_update, (self.query, tmdb_type, tmdb_id, ))

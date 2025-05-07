@@ -1,5 +1,4 @@
 from tmdbhelper.lib.files.ftools import cached_property
-from tmdbhelper.lib.files.dbfunc import database_connection
 from tmdbhelper.lib.items.database.basedata import ItemDetailsDatabaseAccess
 
 
@@ -51,18 +50,16 @@ class BaseList(ItemDetailsDatabaseAccess):
         base_dbc.season = self.season
         base_dbc.episode = self.episode
         base_dbc.common_apis = self.common_apis
-        base_dbc.connection = self.connection
-        base_dbc.tmdb_id = self.tmdb_id
         return base_dbc.data
 
-    @database_connection
     def get_unmapped_data(self):
-        data = self.get_cached_list_values(
-            self.cached_data_table,
-            self.cached_data_keys,
-            self.cached_data_values,
-            self.cached_data_conditions
-        )
+        with self.connection.open():
+            data = self.get_cached_list_values(
+                self.cached_data_table,
+                self.cached_data_keys,
+                self.cached_data_values,
+                self.cached_data_conditions
+            )
         try:
             data_check = data[0][self.cached_data_check_key]
         except(TypeError, KeyError, AttributeError, IndexError):

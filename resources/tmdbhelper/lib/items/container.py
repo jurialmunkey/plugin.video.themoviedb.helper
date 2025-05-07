@@ -94,7 +94,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         from tmdbhelper.lib.items.trakt import TraktPlayData
         return TraktPlayData(
             watchedindicators=get_setting('trakt_watchedindicators'),
-            pauseplayprogress=get_setting('trakt_playprogress'))
+            pauseplayprogress=get_setting('trakt_watchedindicators'))
 
     @cached_property
     def page_length(self):

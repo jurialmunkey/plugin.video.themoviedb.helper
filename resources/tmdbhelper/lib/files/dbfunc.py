@@ -7,6 +7,9 @@ from contextlib import contextmanager
 class DatabaseConnection:
     open_connection = None
 
+    def __init__(self, cache):
+        self.cache = cache
+
     def close(self):
         if not self.open_connection:
             return
@@ -14,11 +17,11 @@ class DatabaseConnection:
         self.open_connection = None
 
     @contextmanager
-    def open(self, cache):
+    def open(self):
         existing_connection = bool(self.open_connection)
 
         if not existing_connection:
-            self.open_connection = cache.get_database()
+            self.open_connection = self.cache.get_database()
 
         yield self.open_connection
 
@@ -30,7 +33,7 @@ class DatabaseAccess:
 
     @cached_property
     def connection(self):
-        return DatabaseConnection()
+        return DatabaseConnection(self.cache)
 
     @property
     def open_connection(self):
@@ -101,10 +104,3 @@ class DatabaseAccess:
             return self.get_cached_list_values(table, keys, values, conditions)
 
         return internal_data or get_external_data()
-
-
-def database_connection(func):
-    def wrapper(self, *args, **kwargs):
-        with self.connection.open(self.cache):
-            return func(self, *args, **kwargs)
-    return wrapper

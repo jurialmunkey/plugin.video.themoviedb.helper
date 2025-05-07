@@ -70,7 +70,8 @@ class Person(BaseItem):
     def get_infolabels_details(self):
         return {
             'title': self.data[0]['name'],
-            'plot': self.data[0]['biography']
+            'plot': self.data[0]['biography'],
+            'mediatype': 'person',
         }
 
     def get_infoproperties_person(self, infoproperties):

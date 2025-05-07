@@ -1,6 +1,7 @@
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.baseclass import BaseList
 from tmdbhelper.lib.addon.thread import ParallelThread
+from jurialmunkey.parser import try_int
 
 
 class RatingsDict(BaseList):
@@ -24,7 +25,7 @@ class RatingsDict(BaseList):
         trakt_type = 'show' if self.tmdb_type == 'tv' else 'movie'
         try:
             imdb_top250 = self.common_apis.trakt_api.get_imdb_top250(id_type='tmdb', trakt_type=trakt_type)
-            return {'top250': imdb_top250.index(self.tmdb_id) + 1}
+            return {'top250': imdb_top250.index(try_int(self.tmdb_id)) + 1}  # Must be an int to match
         except (KeyError, TypeError, IndexError, ValueError):
             return {}
 
@@ -104,7 +105,6 @@ class RatingsDict(BaseList):
         base_dbc = BaseItemFactory(mediatype)
         base_dbc.mediatype = mediatype
         base_dbc.common_apis = self.common_apis
-        base_dbc.connection = self.connection
         base_dbc.tmdb_id = self.tmdb_id
         return base_dbc.data
 
@@ -161,7 +161,7 @@ class RatingsDict(BaseList):
         args = (self.table, self.item_id, self.keys)
         kwgs = {'values': self.configure_mapped_data(self.online_data_mapped)}
 
-        with self.connection.open(self.cache):
+        with self.connection.open():
             self.connection.open_connection.execute('BEGIN')
             func(*args, **kwgs)
             self.connection.open_connection.execute('COMMIT')

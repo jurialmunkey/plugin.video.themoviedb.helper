@@ -126,6 +126,7 @@ class ItemListSyncData(ItemListSyncDataProperties, ItemListSyncDataMethods):
         'released': ('premiered', True, '', ),
         'title': ('title', True, '', ),
         'watched': ('last_watched_at', True, '', ),
+        'paused': ('playback_paused_at', True, '', ),
         'votes': ('trakt_votes', True, 0, ),
         'plays': ('plays', True, 0, ),
         'runtime': ('runtime', True, 0, ),

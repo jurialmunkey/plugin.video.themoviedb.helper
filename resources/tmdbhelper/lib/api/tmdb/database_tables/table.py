@@ -72,7 +72,7 @@ class TMDbDatabaseTable:
 
     def get(self):
         data = None
-        with self.access.connection.open(self.parent):
+        with self.access.connection.open():
             if not self.is_expired_get:
                 data = self.parent.get_list_values(
                     self.table,
@@ -82,7 +82,7 @@ class TMDbDatabaseTable:
         return self.get_mapping(data)
 
     def set(self):
-        with self.access.connection.open(self.parent):
+        with self.access.connection.open():
             if not self.is_expired_set:
                 return
 
@@ -95,7 +95,7 @@ class TMDbDatabaseTable:
 
         statements = [i.statement(i.table, i.keys) for i in self.insert_statements]
 
-        with self.access.connection.open(self.parent) as connection:
+        with self.access.connection.open() as connection:
             connection.execute('BEGIN')
             self.set_tables(connection, statements, data)
             self.set_expiry(self.expiry_id)
