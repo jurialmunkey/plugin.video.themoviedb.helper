@@ -90,6 +90,11 @@ msgctxt "#30010"
 msgid "German (Switzerland)"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32015"
+msgid "Additional season: Up next"
+msgstr ""
+
 msgctxt "#30011"
 msgid "German (Germany)"
 msgstr ""
@@ -98,8 +103,18 @@ msgctxt "#30012"
 msgid "Greek (Greece)"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32018"
+msgid "Additional season: Anticipated"
+msgstr ""
+
 msgctxt "#30013"
 msgid "English (Australia)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32020"
+msgid "Additional season: Specials"
 msgstr ""
 
 msgctxt "#30014"

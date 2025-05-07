@@ -10,6 +10,14 @@ class SeasonMediaList(MediaList):
     item_tmdb_type = 'tv'
     item_label_key = 'title'
 
+    filter_key_map = {
+        'season': 'season',
+        'year': 'year',
+        'title': 'title',
+        'premiered': 'premiered',
+        'rating': 'rating',
+    }
+
     @property
     def cached_data_values(self):
         return (self.item_id, )

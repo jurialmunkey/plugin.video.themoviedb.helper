@@ -134,6 +134,26 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="seasons_specials" type="boolean" label="32020" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="seasons_anticipated" type="boolean" label="32018" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="seasons_upnext" type="boolean" label="32015" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition operator="!is" setting="trakt_token"/>
+                        </dependency>
+                    </dependencies>
+                </setting>
             </group>
         </category>
         <category id="widgets" label="32092" help="">

@@ -3,12 +3,22 @@ from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.basemedia
 
 class FlatSeasonMediaList(MediaList):
     table = 'episode'
-    cached_data_conditions_base = 'episode.tvshow_id=? AND baseitem.expiry>=? ORDER BY episode ASC'
+    cached_data_conditions_base = 'episode.tvshow_id=? AND baseitem.expiry>=? ORDER BY season=0, season ASC, episode ASC'
     cached_data_check_key = 'episode'
     keys = ()
     item_mediatype = 'episode'
     item_tmdb_type = 'tv'
     item_label_key = 'title'
+
+    filter_key_map = {
+        'season': 'season',
+        'episode': 'episode',
+        'year': 'year',
+        'title': 'title',
+        'votes': 'votes',
+        'premiered': 'premiered',
+        'rating': 'rating',
+    }
 
     @property
     def cached_data_table(self):
