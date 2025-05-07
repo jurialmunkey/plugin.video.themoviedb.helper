@@ -199,7 +199,7 @@ msgstr "Utiliser des lecteurs groupés"
 #: /resources/settings.xml
 msgctxt "#32038"
 msgid "Get additional details from the local Kodi library database"
-msgstr "Obtenir des informations supplémentaires depuis la base de données de la médiathèque Kodi locale"
+msgstr "Obtenir des informations depuis votre médiathèque locale kodi"
 
 #: /resources/settings.xml
 msgctxt "#32042"
