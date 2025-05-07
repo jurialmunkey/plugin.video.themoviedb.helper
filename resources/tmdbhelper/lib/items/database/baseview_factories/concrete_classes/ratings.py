@@ -105,7 +105,6 @@ class RatingsDict(BaseList):
         base_dbc = BaseItemFactory(mediatype)
         base_dbc.mediatype = mediatype
         base_dbc.common_apis = self.common_apis
-        base_dbc.connection = self.connection
         base_dbc.tmdb_id = self.tmdb_id
         return base_dbc.data
 

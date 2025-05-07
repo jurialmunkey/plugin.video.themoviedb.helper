@@ -50,8 +50,6 @@ class BaseList(ItemDetailsDatabaseAccess):
         base_dbc.season = self.season
         base_dbc.episode = self.episode
         base_dbc.common_apis = self.common_apis
-        base_dbc.connection = self.connection
-        base_dbc.tmdb_id = self.tmdb_id
         return base_dbc.data
 
     def get_unmapped_data(self):

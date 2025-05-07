@@ -72,7 +72,6 @@ class Episode(Season):
     def db_baseitem_cache_get_parent_data(self):
         base_dbc = Season()
         base_dbc.common_apis = self.common_apis
-        base_dbc.connection = self.connection
         base_dbc.mediatype = 'season'
         base_dbc.tmdb_id = self.tmdb_id
         base_dbc.season = self.season
