@@ -21,7 +21,7 @@ class DatabaseConnection:
         existing_connection = bool(self.open_connection)
 
         if not existing_connection:
-            self.open_connection = self.cache.get_database()
+            self.open_connection = self.cache.get_database().cursor()
 
         yield self.open_connection
 

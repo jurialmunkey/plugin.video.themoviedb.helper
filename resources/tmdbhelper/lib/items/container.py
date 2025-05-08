@@ -323,6 +323,8 @@ class ContainerDirectory(ContainerDirectoryCommon):
         lidc.pagination = self.pagination
         lidc.cache_refresh = 'never' if self.is_cacheonly else None
         lidc.extendedinfo = True if self.is_detailed else False
+        lidc.timer_lists = self.timer_lists
+        lidc.log_timers = self.log_timers
         return lidc
 
     def build_detailed_item(self, li):

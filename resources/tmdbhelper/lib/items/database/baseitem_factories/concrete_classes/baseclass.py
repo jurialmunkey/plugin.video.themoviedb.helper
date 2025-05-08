@@ -154,7 +154,7 @@ class BaseItem(ItemDetailsDatabaseAccess):
         self.set_cached_values('baseitem', item_id, keys=('mediatype', 'expiry'), values=(mediatype, expiry))
         self.set_cached_many(table, keys, mapped_data)
 
-    def try_cached_data(self, return_data=False):
+    def try_cached_data(self, return_data=False, return_queue=False):
         online_data_mapped = self.online_data_mapped
         if not online_data_mapped:
             return
@@ -180,14 +180,22 @@ class BaseItem(ItemDetailsDatabaseAccess):
                 qitem = db_cache.try_cached_data(online_data_mapped)
                 queue.append(qitem)
 
+        if return_queue:
+            return queue
+
+        self.write_data_queue(queue)
+
+        if not return_data:
+            return
+
+        return self.get_cached_data()
+
+    def write_data_queue(self, queue):
         with self.connection.open():
             self.connection.open_connection.execute('BEGIN')
             for func, args, kwgs in queue:
                 func(*args, **kwgs)
             self.connection.open_connection.execute('COMMIT')
-        if not return_data:
-            return
-        return self.get_cached_data()
 
     @cached_property
     def data(self):
