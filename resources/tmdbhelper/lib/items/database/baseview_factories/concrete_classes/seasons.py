@@ -2,13 +2,16 @@ from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.basemedia
 
 
 class SeasonMediaList(MediaList):
-    cached_data_table = table = 'season'
+    table = 'season'
     cached_data_conditions_base = 'tvshow_id=? ORDER BY season=0, season ASC'
     cached_data_check_key = 'season'
     keys = ('season', 'year', 'plot', 'title', 'premiered', 'rating')
     item_mediatype = 'season'
     item_tmdb_type = 'tv'
     item_label_key = 'title'
+
+    cached_data_table = 'season INNER JOIN tvshow ON tvshow.id = season.tvshow_id'
+    cached_data_keys = ('season', 'season.year as year', 'ifnull(season.plot, tvshow.plot) as plot', 'season.title as title', 'season.premiered as premiered', 'season.rating as rating', 'tvshow.title as tvshowtitle')
 
     filter_key_map = {
         'season': 'season',
