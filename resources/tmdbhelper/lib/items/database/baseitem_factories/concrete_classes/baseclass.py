@@ -17,6 +17,7 @@ class BaseItem(ItemDetailsDatabaseAccess):
     extendedinfo = False
     routes_basemeta_db = {}
     allowlist_infolabel_keys = _ListItemInfoTagVideo._tag_attr
+    datalevel = 2
 
     @property
     def data_cond(self):
@@ -71,14 +72,14 @@ class BaseItem(ItemDetailsDatabaseAccess):
     @property
     def cached_data_conditions(self):
         """ WHERE """
-        return 'baseitem.id=? AND baseitem.expiry>=?'
+        return 'baseitem.id=? AND baseitem.expiry>=? AND baseitem.datalevel>=?'
 
     @property
     def cached_data_values(self):
         """ WHERE condition ? ? ? ? = value, value, value, value """
         if self.cache_refresh == 'never':
-            return (self.item_id, 0, )
-        return (self.item_id, self.current_time, )
+            return (self.item_id, 0, 0, )
+        return (self.item_id, self.current_time, self.datalevel)
 
     @property
     def db_table_caches(self):
@@ -134,10 +135,10 @@ class BaseItem(ItemDetailsDatabaseAccess):
                 return
             return self.get_item_meta(data)
 
-    def set_cached_data(self, item_id, mediatype, expiry, table, keys, mapped_data, return_data=False):
+    def set_cached_data(self, item_id, mediatype, expiry, datalevel, table, keys, mapped_data, return_data=False):
         if not return_data:
             self.del_cached('baseitem', item_id)
-        self.set_cached_values('baseitem', item_id, keys=('mediatype', 'expiry'), values=(mediatype, expiry))
+        self.set_cached_values('baseitem', item_id, keys=('mediatype', 'expiry', 'datalevel'), values=(mediatype, expiry, datalevel))
         self.set_cached_many(table, keys, mapped_data)
 
     def try_cached_data(self, return_data=False, return_queue=False):
@@ -151,7 +152,7 @@ class BaseItem(ItemDetailsDatabaseAccess):
         # TODO: A better queuing method
         func = self.set_cached_data
         args = (
-            self.item_id, self.mediatype, self.expiry, self.table, self.keys,
+            self.item_id, self.mediatype, self.expiry, self.datalevel, self.table, self.keys,
             self.configure_mapped_data(online_data_mapped))
         kwgs = {'return_data': return_data}
 

@@ -6,7 +6,8 @@ class BaseList(ItemDetailsDatabaseAccess):
     cached_data_check_key = 'expiry'
     cache_refresh = None  # Set to "never" for cache only, or "force" for forced refresh
     cached_data_table = table = 'baseitem'
-    cached_data_conditions = 'id=? AND expiry>=?'
+    cached_data_conditions = 'id=? AND expiry>=? AND datalevel>=?'
+    datalevel = 2
     season = None
     episode = None
 
@@ -28,8 +29,8 @@ class BaseList(ItemDetailsDatabaseAccess):
     def cached_data_values(self):
         """ WHERE condition ? ? ? ? = value, value, value, value """
         if self.cache_refresh == 'never':
-            return (self.item_id, 0, )
-        return (self.item_id, self.current_time, )
+            return (self.item_id, 0, 0, )
+        return (self.item_id, self.current_time, self.datalevel)
 
     def configure_mapped_data(self, data):
         def get_value(k):

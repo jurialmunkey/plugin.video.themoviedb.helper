@@ -107,7 +107,7 @@ class Company(ItemDetailsList):
 
 class Base(ItemDetailsList):
     table = 'baseitem'
-    keys = ('id', 'mediatype', 'expiry', )
+    keys = ('id', 'mediatype', 'expiry', 'datalevel', )
 
 
 class Movie(ItemDetailsList):
