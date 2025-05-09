@@ -88,9 +88,6 @@ class BaseItem(ItemDetailsDatabaseAccess):
             return (self.item_id, 0, )
         return (self.item_id, self.current_time, )
 
-    def db_baseitem_cache_get_parent_data(self):
-        return
-
     @property
     def db_table_caches(self):
         return ()
@@ -158,9 +155,6 @@ class BaseItem(ItemDetailsDatabaseAccess):
         online_data_mapped = self.online_data_mapped
         if not online_data_mapped:
             return
-
-        # Check for parent data (if needed)
-        self.db_baseitem_cache_get_parent_data()
 
         # Check for future items to lower expiry and refresh more frequently closer to premiere
         self.unaired_expiry(online_data_mapped['item'].get('premiered'), online_data_mapped['item'].get('next_episode_to_air_id'))

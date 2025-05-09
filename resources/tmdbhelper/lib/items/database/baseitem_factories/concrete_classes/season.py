@@ -49,13 +49,6 @@ class Season(Tvshow):
         additional_keys = ['tvshow.title AS tvshowtitle', 'tvshow.tagline as tagline']
         return tuple([f'{self.table}.{k}' for k in self.keys] + additional_keys)
 
-    def db_baseitem_cache_get_parent_data(self):
-        base_dbc = Tvshow()
-        base_dbc.common_apis = self.common_apis
-        base_dbc.mediatype = 'tvshow'
-        base_dbc.tmdb_id = self.tmdb_id
-        return base_dbc.data
-
     @cached_property
     def db_table_caches(self):
         return (

@@ -7,6 +7,8 @@ class BaseList(ItemDetailsDatabaseAccess):
     cache_refresh = None  # Set to "never" for cache only, or "force" for forced refresh
     cached_data_table = table = 'baseitem'
     cached_data_conditions = 'id=? AND expiry>=?'
+    season = None
+    episode = None
 
     @property
     def data_cond(self):
@@ -41,17 +43,21 @@ class BaseList(ItemDetailsDatabaseAccess):
                 return
         return [get_value(k) for k in self.keys]
 
-    def db_baseitem_cache_get_parent_data(self):
+    @cached_property
+    def parent_item_data(self):
         from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
-        base_dbc = BaseItemFactory(self.mediatype)
-        base_dbc.mediatype = self.mediatype
-        base_dbc.tmdb_id = self.tmdb_id
-        base_dbc.tmdb_type = self.tmdb_type
-        base_dbc.season = self.season
-        base_dbc.episode = self.episode
-        base_dbc.common_apis = self.common_apis
-        base_dbc.cache = self.cache
-        base_dbc.connection = self.connection
+        try:
+            base_dbc = BaseItemFactory(self.mediatype)
+            base_dbc.mediatype = self.mediatype
+            base_dbc.tmdb_id = self.tmdb_id
+            base_dbc.tmdb_type = self.tmdb_type
+            base_dbc.season = self.season
+            base_dbc.episode = self.episode
+            base_dbc.common_apis = self.common_apis
+            base_dbc.connection = self.connection
+            base_dbc.cache = self.cache
+        except (TypeError, KeyError, IndexError, ValueError):
+            return
         return base_dbc.data
 
     def get_unmapped_data(self):
@@ -81,7 +87,8 @@ class BaseList(ItemDetailsDatabaseAccess):
         return [self.map_item(i) for i in data]
 
     def try_cached_data(self, return_data=False):
-        self.db_baseitem_cache_get_parent_data()
+        if not self.parent_item_data:
+            return
         if not return_data:
             return
         return self.get_cached_data()

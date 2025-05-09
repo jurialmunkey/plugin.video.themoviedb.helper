@@ -9,22 +9,33 @@ class RatingsDict(BaseList):
     cached_data_table = table = 'ratings'
 
     @cached_property
+    def mediatype(self):
+        if self.tmdb_type == 'movie':
+            return 'movie'
+        if self.tmdb_type == 'tv':
+            return 'tvshow'
+
+    @cached_property
+    def trakt_type(self):
+        if self.tmdb_type == 'movie':
+            return 'movie'
+        if self.tmdb_type == 'tv':
+            return 'show'
+
+    @cached_property
     def imdb_id(self):
-        trakt_type = 'show' if self.tmdb_type == 'tv' else 'movie'
-        return self.common_apis.trakt_api.get_id(self.tmdb_id, 'tmdb', trakt_type, 'imdb')
+        return self.common_apis.trakt_api.get_id(self.tmdb_id, 'tmdb', self.trakt_type, 'imdb')
 
     @cached_property
     def mdblist_ratings(self):
         if not self.common_apis.mdblist_api:
             return {}
-        mdblist_type = 'show' if self.tmdb_type == 'tv' else 'movie'
-        return self.common_apis.mdblist_api.get_ratings(mdblist_type, self.tmdb_id) or {}
+        return self.common_apis.mdblist_api.get_ratings(self.trakt_type, self.tmdb_id) or {}
 
     @cached_property
     def imdb_top250(self):
-        trakt_type = 'show' if self.tmdb_type == 'tv' else 'movie'
         try:
-            imdb_top250 = self.common_apis.trakt_api.get_imdb_top250(id_type='tmdb', trakt_type=trakt_type)
+            imdb_top250 = self.common_apis.trakt_api.get_imdb_top250(id_type='tmdb', trakt_type=self.trakt_type)
             return {'top250': imdb_top250.index(try_int(self.tmdb_id)) + 1}  # Must be an int to match
         except (KeyError, TypeError, IndexError, ValueError):
             return {}
@@ -42,8 +53,7 @@ class RatingsDict(BaseList):
     def trakt_ratings(self):
         if not self.common_apis.trakt_api or not self.common_apis.trakt_api.authorization or not self.imdb_id:
             return {}
-        trakt_type = 'show' if self.tmdb_type == 'tv' else 'movie'
-        trakt_rating, trakt_votes = self.common_apis.trakt_api.get_ratings(trakt_type, self.imdb_id)
+        trakt_rating, trakt_votes = self.common_apis.trakt_api.get_ratings(self.trakt_type, self.imdb_id)
         data = {}
         if trakt_rating:
             data['trakt_rating'] = int(float(trakt_rating) * 10)  # Convert /10 float to /100 int
@@ -94,20 +104,6 @@ class RatingsDict(BaseList):
                 return
         return [get_value(k) for k in self.keys]
 
-    def db_baseitem_cache_get_parent_data(self):
-        from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
-        if self.tmdb_type == 'movie':
-            mediatype = 'movie'
-        elif self.tmdb_type == 'tv':
-            mediatype = 'tvshow'
-        else:
-            return
-        base_dbc = BaseItemFactory(mediatype)
-        base_dbc.mediatype = mediatype
-        base_dbc.common_apis = self.common_apis
-        base_dbc.tmdb_id = self.tmdb_id
-        return base_dbc.data
-
     def get_cached_data(self):
         data = self.get_unmapped_data()
         if not data:
@@ -153,9 +149,10 @@ class RatingsDict(BaseList):
         return mapped_data
 
     def try_cached_data(self, return_data=False):
+        if not self.parent_item_data:
+            return
         if not self.online_data_mapped:
             return
-        self.db_baseitem_cache_get_parent_data()
 
         func = self.set_cached_values
         args = (self.table, self.item_id, self.keys)
