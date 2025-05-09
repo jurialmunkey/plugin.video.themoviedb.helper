@@ -1,51 +1,51 @@
-from tmdbhelper.lib.items.container import ContainerDirectory
+from tmdbhelper.lib.items.container import ContainerDefaultCacheDirectory, ContainerCacheOnlyDirectory
 from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
 from tmdbhelper.lib.addon.plugin import convert_type
 
 
-class ListFanart(ContainerDirectory):
+class ListFanart(ContainerCacheOnlyDirectory):
     def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, limit=None, **kwargs):
         sync = BaseViewFactory('fanart', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
         self.container_content = convert_type('image', 'container')
         return sync.data
 
 
-class ListPoster(ContainerDirectory):
+class ListPoster(ContainerCacheOnlyDirectory):
     def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, limit=None, **kwargs):
         sync = BaseViewFactory('poster', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
         self.container_content = convert_type('image', 'container')
         return sync.data
 
 
-class ListImage(ContainerDirectory):
+class ListImage(ContainerCacheOnlyDirectory):
     def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, limit=None, **kwargs):
         sync = BaseViewFactory('image', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
         self.container_content = convert_type('image', 'container')
         return sync.data
 
 
-class ListThumb(ContainerDirectory):
+class ListThumb(ContainerCacheOnlyDirectory):
     def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, limit=None, **kwargs):
         sync = BaseViewFactory('thumb', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
         self.container_content = convert_type('image', 'container')
         return sync.data
 
 
-class ListCast(ContainerDirectory):
+class ListCast(ContainerCacheOnlyDirectory):
     def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, limit=None, **kwargs):
         sync = BaseViewFactory('castmember', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
         self.container_content = convert_type('person', 'container')
         return sync.data
 
 
-class ListCrew(ContainerDirectory):
+class ListCrew(ContainerCacheOnlyDirectory):
     def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, limit=None, **kwargs):
         sync = BaseViewFactory('crewmember', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
         self.container_content = convert_type('person', 'container')
         return sync.data
 
 
-class ListStarredMovies(ContainerDirectory):
+class ListStarredMovies(ContainerDefaultCacheDirectory):
     # @timer_method
     def get_items(self, tmdb_id, limit=None, **kwargs):
         sync = BaseViewFactory('starredmovies', 'person', tmdb_id, filters=self.filters, limit=limit)
@@ -54,7 +54,7 @@ class ListStarredMovies(ContainerDirectory):
         return sync.data
 
 
-class ListStarredTvshows(ContainerDirectory):
+class ListStarredTvshows(ContainerDefaultCacheDirectory):
     # @timer_method
     def get_items(self, tmdb_id, limit=None, **kwargs):
         sync = BaseViewFactory('starredtvshows', 'person', tmdb_id, filters=self.filters, limit=limit)
@@ -63,7 +63,7 @@ class ListStarredTvshows(ContainerDirectory):
         return sync.data
 
 
-class ListStarredCombined(ContainerDirectory):
+class ListStarredCombined(ContainerDefaultCacheDirectory):
     # @timer_method
     def get_items(self, tmdb_id, limit=None, **kwargs):
         sync = BaseViewFactory('starredmovies', 'person', tmdb_id, filters=self.filters, limit=limit)
@@ -75,7 +75,7 @@ class ListStarredCombined(ContainerDirectory):
         return sorted(movies_data + tvshows_data, key=lambda x: x['infolabels']['votes'] or 0, reverse=True)
 
 
-class ListCrewedMovies(ContainerDirectory):
+class ListCrewedMovies(ContainerDefaultCacheDirectory):
     # @timer_method
     def get_items(self, tmdb_id, limit=None, **kwargs):
         sync = BaseViewFactory('crewedmovies', 'person', tmdb_id, filters=self.filters, limit=limit)
@@ -84,7 +84,7 @@ class ListCrewedMovies(ContainerDirectory):
         return sync.data
 
 
-class ListCrewedTvshows(ContainerDirectory):
+class ListCrewedTvshows(ContainerDefaultCacheDirectory):
     # @timer_method
     def get_items(self, tmdb_id, limit=None, **kwargs):
         sync = BaseViewFactory('crewedtvshows', 'person', tmdb_id, filters=self.filters, limit=limit)
@@ -93,7 +93,7 @@ class ListCrewedTvshows(ContainerDirectory):
         return sync.data
 
 
-class ListCrewedCombined(ContainerDirectory):
+class ListCrewedCombined(ContainerDefaultCacheDirectory):
     # @timer_method
     def get_items(self, tmdb_id, limit=None, **kwargs):
         sync = BaseViewFactory('crewedmovies', 'person', tmdb_id, filters=self.filters, limit=limit)
@@ -105,8 +105,7 @@ class ListCrewedCombined(ContainerDirectory):
         return sorted(movies_data + tvshows_data, key=lambda x: x['infolabels']['votes'] or 0, reverse=True)
 
 
-class ListCreditsCombined(ContainerDirectory):
-    # @timer_method
+class ListCreditsCombined(ContainerDefaultCacheDirectory):
     def get_items(self, tmdb_id, limit=None, **kwargs):
         movies_data = []
         tvshows_data = []
@@ -135,7 +134,7 @@ class ListCreditsCombined(ContainerDirectory):
         return sorted(unique_movies_data + unique_tvshows_data, key=lambda x: x['infolabels']['votes'] or 0, reverse=True)
 
 
-class ListVideos(ContainerDirectory):
+class ListVideos(ContainerCacheOnlyDirectory):
     def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, limit=None, **kwargs):
         sync = BaseViewFactory('videos', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
         self.container_content = convert_type('video', 'container')

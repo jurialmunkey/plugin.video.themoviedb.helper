@@ -1,4 +1,4 @@
-from tmdbhelper.lib.items.container import ContainerDirectory, use_item_cache
+from tmdbhelper.lib.items.container import ContainerDefaultCacheDirectory, use_item_cache
 from tmdbhelper.lib.addon.plugin import convert_type, get_localized, get_setting, get_condvisibility
 from tmdbhelper.lib.items.filters import is_excluded
 from jurialmunkey.parser import try_int
@@ -8,7 +8,7 @@ ITEMS_LENGTH = 20
 PAGES_LENGTH = get_setting('pagemulti_tmdb', 'int') or 1
 
 
-class ListStandard(ContainerDirectory):
+class ListStandard(ContainerDefaultCacheDirectory):
     item_list_request_url = ''  # PATH to request
     item_list_results_key = 'results'  # KEY in RESPONSE from PATH holding ITEMS
     item_list_plugin_name = '{localized} {plural}'
@@ -18,12 +18,6 @@ class ListStandard(ContainerDirectory):
     item_list_sorted_function = None
     item_list_length = None  # Override user setting for length
     item_list_tmdb_type = None  # Override type for items (e.g. for related lists that get a different type to source)
-
-    @property
-    def default_cacheonly(self):
-        if get_condvisibility('Skin.HasSetting(TMDbHelper.DisableDefaultCacheOnly)'):
-            return False
-        return True
 
     def get_plugin_category(self, plural=''):
         localized = get_localized(self.item_list_localize) if self.item_list_localize else ''
