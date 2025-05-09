@@ -1,11 +1,9 @@
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.database.baseitem_factories.concrete_classes.baseclass import BaseItem
-from tmdbhelper.lib.addon.logger import kodi_log
 
 
 class MediaItem(BaseItem):
     db_studio_table = 'studio'
-    ftv_id = None
     ftv_type = None
 
     def config_basemeta_db_studio(self, database_obj):
@@ -45,29 +43,53 @@ class MediaItem(BaseItem):
         )
 
     @cached_property
-    def ftv_data(self):
+    def online_data_ftv(self):
         """ Get data from fanart tv if enabled """
-        if not self.has_fanart_tv:
+        if not self.common_apis.ftv_api:
             return
+
+        if not self.ftv_type:
+            return
+
+        if self.ftv_type == 'tv':
+            try:
+                ftv_id = self.online_data_tmdb['external_ids']['tvdb_id']
+            except (KeyError, TypeError, AttributeError):
+                ftv_id = None
+        else:
+            ftv_id = self.tmdb_id
+
+        if not ftv_id:
+            return
+
         data = self.common_apis.ftv_api.get_request(
-            self.ftv_type, self.ftv_id,
+            self.ftv_type, ftv_id,
             cache_force=7,  # Force dummy request caching to prevent rerequesting 404s
             cache_fallback={'dummy': None},
             cache_days=30)
+
         if not data:
             return
+
         if 'dummy' in data:
             return
+
         return data
+
+    @cached_property
+    def online_data_tmdb(self):
+        if not self.online_data_cond:
+            return
+        return self.online_data_func(*self.online_data_args, **self.online_data_kwgs)
 
     @cached_property
     def online_data(self):
         """ Get data from online source """
         if not self.online_data_cond:
             return
-        # kodi_log(f'SYNC CACHE: {self.online_data_args}', 2)
-        tmdb_data = self.online_data_func(*self.online_data_args, **self.online_data_kwgs) or {}
-        if not self.ftv_data:
-            return tmdb_data
-        tmdb_data['fanart_tv'] = self.ftv_data
-        return tmdb_data
+        if not self.online_data_tmdb:
+            return {}
+        if not self.online_data_ftv:
+            return self.online_data_tmdb
+        self.online_data_tmdb['fanart_tv'] = self.online_data_ftv
+        return self.online_data_tmdb

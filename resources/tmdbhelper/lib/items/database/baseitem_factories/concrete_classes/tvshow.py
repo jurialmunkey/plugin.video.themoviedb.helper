@@ -12,10 +12,6 @@ class Tvshow(MediaItem):
     def online_data_kwgs(self):
         return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow}
 
-    @cached_property
-    def ftv_id(self):
-        return self.common_apis.trakt_api.get_id(self.tmdb_id, 'tmdb', 'show', 'tvdb')
-
     def config_basemeta_db_tvshow(self, database_obj):
         database_obj = self.config_basemeta_db(database_obj)
         database_obj.item_id = self.tvshow_id

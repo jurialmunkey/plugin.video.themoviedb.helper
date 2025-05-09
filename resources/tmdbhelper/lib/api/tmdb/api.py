@@ -110,7 +110,8 @@ class TMDbAPI(RequestAPI):
 
     def get_response_json(self, *args, postdata=None, headers=None, method=None, **kwargs):
         kwargs = self.configure_request_kwargs(kwargs)
-        return self.get_api_request_json(self.get_request_url(*args, **kwargs), postdata=postdata, headers=headers, method=method)
+        requrl = self.get_request_url(*args, **kwargs)
+        return self.get_api_request_json(requrl, postdata=postdata, headers=headers, method=method)
 
 
 class TMDb(TMDbAPI):

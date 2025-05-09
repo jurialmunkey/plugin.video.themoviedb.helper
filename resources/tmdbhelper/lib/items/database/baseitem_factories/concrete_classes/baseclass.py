@@ -38,14 +38,6 @@ class BaseItem(ItemDetailsDatabaseAccess):
         return item_mapper
 
     @property
-    def has_fanart_tv(self):
-        if not self.common_apis.ftv_api:
-            return False
-        if not self.ftv_id:
-            return False
-        return True
-
-    @property
     def online_data_func(self):  # The function to get data e.g. get_response_json
         return self.common_apis.tmdb_api.get_response_json
 
@@ -107,9 +99,6 @@ class BaseItem(ItemDetailsDatabaseAccess):
 
         with contextlib.suppress(AttributeError):
             return getattr(self, attr)
-
-        if route.startswith('fanart_tv') and not self.has_fanart_tv:
-            return
 
         configurator = self.routes_basemeta_db.get(attr) or self.config_basemeta_db
         database_obj = configurator(BaseMetaFactory(route))

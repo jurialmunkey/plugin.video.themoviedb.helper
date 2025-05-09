@@ -7,6 +7,7 @@ class Season(Tvshow):
     table = 'season'
     cached_data_check_key = 'tvshow_id'
     expiry_time = SHORTER_EXPIRY  # Refresh weekly in case of new episodes
+    ftv_type = None
 
     @property
     def online_data_kwgs(self):

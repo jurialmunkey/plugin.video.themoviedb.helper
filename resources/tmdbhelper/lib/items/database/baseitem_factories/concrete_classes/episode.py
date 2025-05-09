@@ -1,10 +1,10 @@
 from tmdbhelper.lib.items.database.baseitem_factories.concrete_classes.season import Season
 from tmdbhelper.lib.files.ftools import cached_property
-from tmdbhelper.lib.addon.logger import kodi_log
 
 
 class Episode(Season):
     table = 'episode'
+    ftv_type = None
 
     @property
     def data_cond(self):

@@ -26,10 +26,6 @@ class Movie(MediaItem):
         ]
         return tuple([f'{self.table}.{k}' for k in self.keys] + additional_keys)
 
-    @property
-    def ftv_id(self):
-        return self.tmdb_id
-
     @cached_property
     def db_table_caches(self):
         """ Database tables that will have data set as part of cache setter """
