@@ -1,4 +1,5 @@
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem
+from tmdbhelper.lib.addon.tmdate import is_future_timestamp
 
 
 class Episode(MediaItem):
@@ -40,6 +41,20 @@ class Episode(MediaItem):
             'joinings': None
         }
     )
+
+    def get_premiered_status(self):
+        premiered = self.get_data_value('premiered')
+        if not premiered:
+            return 'Unknown'
+        if is_future_timestamp(premiered, "%Y-%m-%d", 10, use_today=True, days=1):
+            return 'Anticipated'
+        if is_future_timestamp(premiered, "%Y-%m-%d", 10, use_today=True, days=0):
+            return 'Airing'
+        return 'Released'
+
+    def get_infolabels_special(self, infolabels):
+        infolabels['status'] = self.get_premiered_status()
+        return infolabels
 
     def get_unique_ids(self, unique_ids):
         unique_ids = super().get_unique_ids(unique_ids)
