@@ -176,6 +176,86 @@ class ListItemCacher:
         return self.baseitem_db_cache.try_cached_data(return_queue=True)
 
 
+class ListItemThread:
+    def __init__(self, parent, items):
+        if parent.__class__.__name__ != 'ListItemDetails':
+            raise Exception(f'Requires ListItemDetails parent but {parent.__class__.__name__} given')
+        self.parent = parent  # ListItemDetails instance
+        self.items = items
+        self.connection = self.parent.connection
+        self.log_timers = self.parent.log_timers
+        self.timer_lists = self.parent.timer_lists
+
+    @cached_property
+    def cached_data(self):
+        with TimerList(self.timer_lists, ' - cached', log_threshold=0.05, logging=self.log_timers):
+            with self.connection.open():
+                return self.get_cached_data()
+
+    def get_cached_data(self):
+        return [
+            listitem_config.get_cached_item(self.connection)
+            for listitem_config in self.items
+        ]
+
+    @cached_property
+    def uncached_items(self):
+        return self.get_uncached_items()
+
+    def get_uncached_items(self):
+        return [
+            self.items[x] for x, cached_item in enumerate(self.cached_data)
+            if cached_item is None
+        ]
+
+    @cached_property
+    def configured_list(self):
+        return self.get_configured_list()
+
+    def get_configured_list(self):
+        return [
+            listitem_config.get_configured_listitem(self.cached_data[x])
+            for x, listitem_config in enumerate(self.items)
+        ]
+
+    @cached_property
+    def func_queue(self):
+        with TimerList(self.timer_lists, ' - online', log_threshold=0.05, logging=self.log_timers):
+            return self.get_func_queue()
+
+    def get_func_queue(self):
+
+        def _queued_data(listitem_config):
+            return listitem_config.try_queued_data()
+
+        with ParallelThread(self.uncached_items, _queued_data) as pt:
+            item_queue = pt.queue
+
+        return list(itertools.chain.from_iterable((i for i in item_queue if i)))
+
+    def set_func_queue(self):
+        self.connection.open_connection.execute('BEGIN')
+        with TimerList(self.timer_lists, ' - writer', log_threshold=0.05, logging=self.log_timers):
+            for func, args, kwgs in self.func_queue:
+                func(*args, **kwgs)
+        with TimerList(self.timer_lists, ' - commit', log_threshold=0.05, logging=self.log_timers):
+            self.connection.open_connection.execute('COMMIT')
+        with TimerList(self.timer_lists, ' - return', log_threshold=0.05, logging=self.log_timers):
+            self.cached_data = self.get_cached_data()
+
+    @cached_property
+    def configured_items(self):
+        if self.parent.cache_refresh == 'never':
+            return self.configured_list
+        if not self.uncached_items:
+            return self.configured_list
+        if not self.func_queue:
+            return self.configured_list
+        with self.connection.open():
+            self.set_func_queue()
+        return self.configured_list
+
+
 class ListItemDetails:
     pagination = False
     cache_refresh = None
@@ -196,54 +276,4 @@ class ListItemDetails:
             connection=self.connection, cache_refresh=self.cache_refresh)
 
     def configure_listitems_threaded(self, items):
-        items = [ListItemConfig(self, i) for i in items]
-
-        def _get_cached_data():
-            return [
-                listitem_config.get_cached_item(self.connection)
-                for listitem_config in items
-            ]
-
-        def _get_uncached_items():
-            return [
-                items[x] for x, cached_item in enumerate(cached_data)
-                if cached_item is None
-            ]
-
-        def _get_configured_list():
-            return [
-                listitem_config.get_configured_listitem(cached_data[x])
-                for x, listitem_config in enumerate(items)
-            ]
-
-        with TimerList(self.timer_lists, ' - cached', log_threshold=0.05, logging=self.log_timers):
-            with self.connection.open():
-                cached_data = _get_cached_data()
-            uncached_items = _get_uncached_items()
-
-        if not uncached_items or self.cache_refresh == 'never':
-            return _get_configured_list()
-
-        def _queued_data(listitem_config):
-            return listitem_config.try_queued_data()
-
-        with TimerList(self.timer_lists, ' - online', log_threshold=0.05, logging=self.log_timers):
-            with ParallelThread(uncached_items, _queued_data) as pt:
-                item_queue = pt.queue
-
-        func_queue = list(itertools.chain.from_iterable((i for i in item_queue if i)))
-
-        if not func_queue:
-            return _get_configured_list()
-
-        with self.connection.open():
-            self.connection.open_connection.execute('BEGIN')
-            with TimerList(self.timer_lists, ' - writer', log_threshold=0.05, logging=self.log_timers):
-                for func, args, kwgs in func_queue:
-                    func(*args, **kwgs)
-            with TimerList(self.timer_lists, ' - commit', log_threshold=0.05, logging=self.log_timers):
-                self.connection.open_connection.execute('COMMIT')
-            with TimerList(self.timer_lists, ' - return', log_threshold=0.05, logging=self.log_timers):
-                cached_data = _get_cached_data()
-
-        return _get_configured_list()
+        return ListItemThread(self, [ListItemConfig(self, i) for i in items]).configured_items
