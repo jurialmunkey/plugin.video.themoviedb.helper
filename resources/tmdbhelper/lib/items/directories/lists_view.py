@@ -47,8 +47,8 @@ class ListCrew(ContainerDirectory):
 
 class ListStarredMovies(ContainerDirectory):
     # @timer_method
-    def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, limit=None, **kwargs):
-        sync = BaseViewFactory('starredmovies', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
+    def get_items(self, tmdb_id, limit=None, **kwargs):
+        sync = BaseViewFactory('starredmovies', 'person', tmdb_id, filters=self.filters, limit=limit)
         self.kodi_db = self.get_kodi_database('movie')
         self.container_content = convert_type('movie', 'container')
         return sync.data
@@ -56,8 +56,8 @@ class ListStarredMovies(ContainerDirectory):
 
 class ListStarredTvshows(ContainerDirectory):
     # @timer_method
-    def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, limit=None, **kwargs):
-        sync = BaseViewFactory('starredtvshows', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
+    def get_items(self, tmdb_id, limit=None, **kwargs):
+        sync = BaseViewFactory('starredtvshows', 'person', tmdb_id, filters=self.filters, limit=limit)
         self.kodi_db = self.get_kodi_database('tv')
         self.container_content = convert_type('tv', 'container')
         return sync.data
@@ -65,10 +65,10 @@ class ListStarredTvshows(ContainerDirectory):
 
 class ListStarredCombined(ContainerDirectory):
     # @timer_method
-    def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, limit=None, **kwargs):
-        sync = BaseViewFactory('starredmovies', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
+    def get_items(self, tmdb_id, limit=None, **kwargs):
+        sync = BaseViewFactory('starredmovies', 'person', tmdb_id, filters=self.filters, limit=limit)
         movies_data = sync.data or []
-        sync = BaseViewFactory('starredtvshows', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
+        sync = BaseViewFactory('starredtvshows', 'person', tmdb_id, filters=self.filters, limit=limit)
         tvshows_data = sync.data or []
         self.kodi_db = self.get_kodi_database('both')
         self.container_content = convert_type('movie' if len(movies_data) >= len(tvshows_data) else 'tv', 'container')
@@ -77,8 +77,8 @@ class ListStarredCombined(ContainerDirectory):
 
 class ListCrewedMovies(ContainerDirectory):
     # @timer_method
-    def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, limit=None, **kwargs):
-        sync = BaseViewFactory('crewedmovies', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
+    def get_items(self, tmdb_id, limit=None, **kwargs):
+        sync = BaseViewFactory('crewedmovies', 'person', tmdb_id, filters=self.filters, limit=limit)
         self.kodi_db = self.get_kodi_database('movie')
         self.container_content = convert_type('movie', 'container')
         return sync.data
@@ -86,8 +86,8 @@ class ListCrewedMovies(ContainerDirectory):
 
 class ListCrewedTvshows(ContainerDirectory):
     # @timer_method
-    def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, limit=None, **kwargs):
-        sync = BaseViewFactory('crewedtvshows', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
+    def get_items(self, tmdb_id, limit=None, **kwargs):
+        sync = BaseViewFactory('crewedtvshows', 'person', tmdb_id, filters=self.filters, limit=limit)
         self.kodi_db = self.get_kodi_database('tv')
         self.container_content = convert_type('tv', 'container')
         return sync.data
@@ -95,10 +95,10 @@ class ListCrewedTvshows(ContainerDirectory):
 
 class ListCrewedCombined(ContainerDirectory):
     # @timer_method
-    def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, limit=None, **kwargs):
-        sync = BaseViewFactory('crewedmovies', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
+    def get_items(self, tmdb_id, limit=None, **kwargs):
+        sync = BaseViewFactory('crewedmovies', 'person', tmdb_id, filters=self.filters, limit=limit)
         movies_data = sync.data or []
-        sync = BaseViewFactory('crewedtvshows', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
+        sync = BaseViewFactory('crewedtvshows', 'person', tmdb_id, filters=self.filters, limit=limit)
         tvshows_data = sync.data or []
         self.kodi_db = self.get_kodi_database('both')
         self.container_content = convert_type('movie' if len(movies_data) >= len(tvshows_data) else 'tv', 'container')
@@ -107,16 +107,16 @@ class ListCrewedCombined(ContainerDirectory):
 
 class ListCreditsCombined(ContainerDirectory):
     # @timer_method
-    def get_items(self, tmdb_id, tmdb_type, season=None, episode=None, limit=None, **kwargs):
+    def get_items(self, tmdb_id, limit=None, **kwargs):
         movies_data = []
         tvshows_data = []
-        sync = BaseViewFactory('starredmovies', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
+        sync = BaseViewFactory('starredmovies', 'person', tmdb_id, filters=self.filters, limit=limit)
         movies_data += sync.data or []
-        sync = BaseViewFactory('starredtvshows', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
+        sync = BaseViewFactory('starredtvshows', 'person', tmdb_id, filters=self.filters, limit=limit)
         tvshows_data += sync.data or []
-        sync = BaseViewFactory('crewedmovies', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
+        sync = BaseViewFactory('crewedmovies', 'person', tmdb_id, filters=self.filters, limit=limit)
         movies_data += sync.data or []
-        sync = BaseViewFactory('crewedtvshows', tmdb_type, tmdb_id, season, episode, filters=self.filters, limit=limit)
+        sync = BaseViewFactory('crewedtvshows', 'person', tmdb_id, filters=self.filters, limit=limit)
         tvshows_data += sync.data or []
 
         titles = []
