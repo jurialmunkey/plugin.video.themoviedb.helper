@@ -162,8 +162,11 @@ class DatabaseCore:
             for version, changes in self.database_changes.items():
                 if version <= this_database_version:
                     continue
-                for command in changes:
-                    cursor.execute(command)
+                for query in changes:
+                    try:
+                        cursor.execute(query)
+                    except Exception as error:
+                        self.kodi_log(f'CACHE: Exception while initializing _database: {error}\n{self._sc_name} - {query}', 1)
 
         # CREATE TABLES IF NOT EXISTS
         for table, columns in self.database_tables.items():
