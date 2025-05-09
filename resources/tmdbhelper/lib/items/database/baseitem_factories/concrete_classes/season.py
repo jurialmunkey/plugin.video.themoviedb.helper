@@ -25,6 +25,27 @@ class Season(Tvshow):
         return True
 
     @property
+    def online_data_cond(self):
+        if not self.data_cond:
+            return False
+        if not self.parent_item_data:
+            return False
+        return True
+
+    @cached_property
+    def parent_item_data(self):
+        try:
+            base_dbc = Tvshow()
+            base_dbc.mediatype = 'tvshow'
+            base_dbc.tmdb_type = 'tv'
+            base_dbc.tmdb_id = self.tmdb_id
+            base_dbc.common_apis = self.common_apis
+            base_dbc.cache = self.cache
+        except (TypeError, KeyError, IndexError, ValueError):
+            return
+        return base_dbc.data
+
+    @property
     def item_id(self):
         return self.get_season_id(self.tmdb_type, self.tmdb_id, self.season)
 
