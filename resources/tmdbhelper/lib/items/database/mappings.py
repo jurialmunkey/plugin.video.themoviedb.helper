@@ -150,6 +150,12 @@ class ItemMapperMethods:
                     snum = (art_item.get('season') or 'all')
                     if snum != 'all':
                         item['parent_id'] = f'tv.{self.tmdb_id}.{snum}'
+                        self.item['baseitem'].append({
+                            'id': f'tv.{self.tmdb_id}.{snum}',
+                            'mediatype': 'season',
+                            'expiry': 0,
+                            'datalevel': 0,
+                        })
 
                 data.append(item)
 
@@ -305,7 +311,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'func': lambda v: [{
                     'id': f"collection.{v['id']}",
                     'mediatype': 'collection',
-                    'expiry': 0}]}, {
+                    'expiry': 0,
+                    'datalevel': 0}]}, {
                 # ---
                 'keys': [('collection', None)],
                 'extend': True,
@@ -364,7 +371,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'kwargs': {
                     'id': lambda i: f'tv.{self.tmdb_id}.{i["season_number"]}',
                     'mediatype': lambda _: 'season',
-                    'expiry': lambda _: 0}
+                    'expiry': lambda _: 0,
+                    'datalevel': lambda _: 0}
             }],
             'episodes': [{
                 'keys': [('episode', None)],
@@ -389,7 +397,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'kwargs': {
                     'id': lambda i: f'tv.{self.tmdb_id}.{i["season_number"]}.{i["episode_number"]}',
                     'mediatype': lambda _: 'episode',
-                    'expiry': lambda _: 0}
+                    'expiry': lambda _: 0,
+                    'datalevel': lambda _: 0}
             }],
             'next_episode_to_air': [{
                 'keys': [('episode', None)],
@@ -424,7 +433,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'kwargs': {
                     'id': lambda i: f'tv.{self.tmdb_id}.{i["season_number"]}.{i["episode_number"]}',
                     'mediatype': lambda _: 'episode',
-                    'expiry': lambda _: 0}
+                    'expiry': lambda _: 0,
+                    'datalevel': lambda _: 0}
             }],
             'production_companies': [{
                 'keys': [('studio', None)],
@@ -475,7 +485,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'kwargs': {
                     'id': lambda i: f'person.{i["id"]}',
                     'mediatype': lambda _: 'person',
-                    'expiry': lambda _: 0}}, {
+                    'expiry': lambda _: 0,
+                    'datalevel': lambda _: 0}}, {
                 # ---
                 'keys': [('crewmember', None)],
                 'extend': True,
@@ -500,7 +511,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                     'subkeys': ('cast', ),
                     'id': lambda i: f'person.{i["id"]}',
                     'mediatype': lambda _: 'person',
-                    'expiry': lambda _: 0}}, {
+                    'expiry': lambda _: 0,
+                    'datalevel': lambda _: 0}}, {
                 # ---
                 'keys': [('castmember', None)],
                 'extend': True,
@@ -524,7 +536,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                     'subkeys': ('crew', ),
                     'id': lambda i: f'person.{i["id"]}',
                     'mediatype': lambda _: 'person',
-                    'expiry': lambda _: 0}}, {
+                    'expiry': lambda _: 0,
+                    'datalevel': lambda _: 0}}, {
                 # ---
                 'keys': [('crewmember', None)],
                 'extend': True,
@@ -548,7 +561,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                     'subkeys': ('guest_stars', ),
                     'id': lambda i: f'person.{i["id"]}',
                     'mediatype': lambda _: 'person',
-                    'expiry': lambda _: 0}}, {
+                    'expiry': lambda _: 0,
+                    'datalevel': lambda _: 0}}, {
                 # ---
                 'keys': [('castmember', None)],
                 'extend': True,
@@ -573,7 +587,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                     'subkeys': ('cast', ),
                     'id': lambda i: f'person.{i["id"]}',
                     'mediatype': lambda _: 'person',
-                    'expiry': lambda _: 0}}, {
+                    'expiry': lambda _: 0,
+                    'datalevel': lambda _: 0}}, {
                 # ---
                 'keys': [('castmember', None)],
                 'extend': True,
@@ -600,7 +615,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                     'subkeys': ('crew', ),
                     'id': lambda i: f'person.{i["id"]}',
                     'mediatype': lambda _: 'person',
-                    'expiry': lambda _: 0}}, {
+                    'expiry': lambda _: 0,
+                    'datalevel': lambda _: 0}}, {
                 # ---
                 'keys': [('crewmember', None)],
                 'extend': True,
@@ -638,6 +654,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'func': lambda v: [{'key': 'revenue', 'value': f'${float(v):0,.0f}'}]
             }],
         }
+
         self.standard_map = {
             'id': ('item', 'tmdb_id'),
             'title': ('item', 'title'),
@@ -706,7 +723,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'subkeys': (subkey, ),
                 'id': lambda i: f'{tmdb_type}.{i["id"]}',
                 'mediatype': lambda _: 'movie' if tmdb_type == 'movie' else 'tvshow',
-                'expiry': lambda _: 0}
+                'expiry': lambda _: 0,
+                'datalevel': lambda _: 0}
         }
 
     def dict_person_credits_tmdbtype(self, tmdb_type, subkey):
@@ -773,6 +791,6 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
         }
 
     def get_info(self, data, **kwargs):
-        item = self.get_empty_item()
-        item = self.map_item(item, data)
-        return item
+        self.item = self.get_empty_item()
+        self.item = self.map_item(self.item, data)
+        return self.item
