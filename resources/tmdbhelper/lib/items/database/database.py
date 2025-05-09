@@ -10,11 +10,14 @@ class ItemDetailsDatabase(Database):
         super().__init__(filename=self.cache_filename)
 
     # DB version must be max of table_version
-    database_version = 17
+    database_version = 18
 
     database_changes = {
         17: (
             'ALTER TABLE baseitem ADD datalevel INTEGER',
+        ),
+        18: (
+            'ALTER TABLE baseitem DROP COLUMN datalevel',
         )
     }
 
@@ -27,10 +30,6 @@ class ItemDetailsDatabase(Database):
             'data': 'TEXT',
         },
         'expiry': {
-            'data': 'INTEGER',
-            'indexed': True
-        },
-        'datalevel': {
             'data': 'INTEGER',
             'indexed': True
         },

@@ -3,7 +3,6 @@ from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.basemedia
 
 class StarredMoviesMediaList(MediaList):
     table = 'castmember'
-
     cached_data_innertable = 'movie'
 
     @property
@@ -32,7 +31,7 @@ class StarredMoviesMediaList(MediaList):
     @property
     def cached_data_conditions_base(self):  # WHERE conditions
         return (
-            f'{self.table}.tmdb_id=? AND baseitem.expiry>=? AND baseitem.datalevel>=? '
+            f'{self.table}.tmdb_id=? AND baseitem.expiry>=? '
             f'GROUP BY {self.table}.parent_id '
             f'ORDER BY {self.cached_data_innertable}.votes DESC'
         )
@@ -40,7 +39,7 @@ class StarredMoviesMediaList(MediaList):
     @property
     def cached_data_values(self):
         """ WHERE condition ? ? ? ? = value, value, value, value """
-        return (self.tmdb_id, self.current_time, self.datalevel)
+        return (self.tmdb_id, self.current_time)
 
     cached_data_check_key = 'tmdb_id'
     item_mediatype = 'movie'
