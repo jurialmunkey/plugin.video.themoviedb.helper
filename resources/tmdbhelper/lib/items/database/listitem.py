@@ -7,11 +7,38 @@ from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
 from tmdbhelper.lib.files.dbfunc import DatabaseConnection
 from tmdbhelper.lib.addon.logger import TimerList
 from tmdbhelper.lib.addon.thread import ParallelThread
+import itertools
 
 
 class ListItemConfig:
-    def __init__(self, item):
+    listitem_cacher_permitted_types = ('movie', 'tvshow', 'season', 'episode', 'person')
+
+    def __init__(self, parent, item, pagination=False):
+        if parent.__class__.__name__ != 'ListItemDetails':
+            raise Exception(f'Requires ListItemDetails parent but {parent.__class__.__name__} given')
         self.item = item
+        self.pagination = pagination
+        self.next_page = bool('next_page' in item)
+        self.parent = parent
+        self.item['parent_params'] = self.parent.parent_params
+
+    @cached_property
+    def listitem_cacher(self):
+        if self.next_page:
+            return
+        if self.mediatype not in self.listitem_cacher_permitted_types:
+            return
+        if not self.tmdb_id:
+            return
+        if not self.tmdb_type:
+            return
+        return ListItemCacher(
+            self.parent,
+            self.tmdb_type,
+            self.tmdb_id,
+            self.season,
+            self.episode
+        )
 
     @cached_property
     def listitem(self):
@@ -73,9 +100,21 @@ class ListItemConfig:
             return
         return self.baseitem_db_cache_func(self.mediatype, self.tmdb_id, self.season, self.episode)
 
+    def get_cached_item(self, connection):
+        if not self.listitem_cacher:
+            return
+        return self.listitem_cacher.get_cached_item(connection)
+
+    def try_queued_data(self):
+        if not self.listitem_cacher:
+            return
+        return self.listitem_cacher.try_queued_data()
+
 
 class ListItemCacher:
-    def __init__(self, parent, tmdb_type, tmdb_id, season=None, episode=None):
+    def __init__(self, parent, tmdb_type, tmdb_id, season=None, episode=None, listitem_config=None):
+        if parent.__class__.__name__ != 'ListItemDetails':
+            raise Exception(f'Requires ListItemDetails parent but {parent.__class__.__name__} given')
         self.parent = parent  # ListItemDetails instance
         self.tmdb_type = tmdb_type
         self.tmdb_id = tmdb_id
@@ -84,6 +123,7 @@ class ListItemCacher:
         self.common_apis = self.parent.common_apis
         self.extendedinfo = self.parent.extendedinfo
         self.cache = self.parent.cache
+        self.listitem_config = listitem_config
 
     @cached_property
     def mediatype(self):
@@ -136,20 +176,6 @@ class ListItemCacher:
         return self.baseitem_db_cache.try_cached_data(return_queue=True)
 
 
-def ListItemCacherFactory(self, listitem_config):
-    if listitem_config.__class__.__name__ != 'ListItemConfig':
-        return
-    if not listitem_config.tmdb_id:
-        return
-    if not listitem_config.tmdb_type:
-        return
-    if listitem_config.tmdb_type not in ('movie', 'tv', 'season', 'episode', 'person'):
-        return
-    return ListItemCacher(
-        self, listitem_config.tmdb_type, listitem_config.tmdb_id,
-        listitem_config.season, listitem_config.episode)
-
-
 class ListItemDetails:
     pagination = False
     cache_refresh = None
@@ -169,67 +195,47 @@ class ListItemDetails:
         return ListItemCacher(self, tmdb_type, tmdb_id, season, episode).get_item(
             connection=self.connection, cache_refresh=self.cache_refresh)
 
-    # def get_listitem(self, i):
-    #     i['parent_params'] = self.parent_params
-    #     if 'next_page' in i:
-    #         return ListItem(**i) if self.pagination else None
-    #     listitem_config = ListItemConfig(i)
-    #     baseitem_dbdata = self.get_item(listitem_config.tmdb_type, listitem_config.tmdb_id, listitem_config.season, listitem_config.episode)
-    #     return listitem_config.get_configured_listitem(baseitem_dbdata)
-
-    def configure_listitem(self, i):
-        i['parent_params'] = self.parent_params
-
-        listitem_config = ListItemConfig(i) if 'next_page' not in i else ListItem(**i) if self.pagination else None
-        listitem_cacher = ListItemCacherFactory(self, listitem_config)
-
-        return (listitem_config, listitem_cacher)
-
     def configure_listitems_threaded(self, items):
-        items = [j for j in (self.configure_listitem(i) for i in items) if j]
+        items = [ListItemConfig(self, i) for i in items]
+
+        def _get_cached_data():
+            return [
+                listitem_config.get_cached_item(self.connection)
+                for listitem_config in items
+            ]
+
+        def _get_uncached_items():
+            return [
+                items[x] for x, cached_item in enumerate(cached_data)
+                if cached_item is None
+            ]
+
+        def _get_configured_list():
+            return [
+                listitem_config.get_configured_listitem(cached_data[x])
+                for x, listitem_config in enumerate(items)
+            ]
 
         with TimerList(self.timer_lists, ' - cached', log_threshold=0.05, logging=self.log_timers):
             with self.connection.open():
-                previously_cached_items = [
-                    listitem_cacher.get_cached_item(self.connection) if listitem_cacher else None
-                    for listitem_config, listitem_cacher in items
-                ]
-
-            uncached_items = [
-                items[x] for x, i in enumerate(previously_cached_items)
-                if i is None and items[x] and items[x][1]
-            ]
-
-        def _configure_list(cache_items):
-            return [
-                listitem_config.get_configured_listitem(cache_items[x] if listitem_cacher else None)
-                if listitem_config.__class__.__name__ == 'ListItemConfig' else listitem_config
-                for x, (listitem_config, listitem_cacher) in enumerate(items) if listitem_config
-            ]
+                cached_data = _get_cached_data()
+            uncached_items = _get_uncached_items()
 
         if not uncached_items or self.cache_refresh == 'never':
-            return _configure_list(previously_cached_items)
+            return _get_configured_list()
 
-        def _queued_data(i):
-            if not i or not i[1]:
-                return
-            return i[1].try_queued_data()
+        def _queued_data(listitem_config):
+            return listitem_config.try_queued_data()
 
         with TimerList(self.timer_lists, ' - online', log_threshold=0.05, logging=self.log_timers):
             with ParallelThread(uncached_items, _queued_data) as pt:
                 item_queue = pt.queue
 
-        func_queue = []
-        for i in item_queue:
-            if not i:
-                continue
-            func_queue.extend(i)
+        func_queue = list(itertools.chain.from_iterable((i for i in item_queue if i)))
 
         if not func_queue:
-            return _configure_list(previously_cached_items)
+            return _get_configured_list()
 
-        # from tmdbhelper.lib.addon.logger import CProfiler
-        # with CProfiler('profilers'):
         with self.connection.open():
             self.connection.open_connection.execute('BEGIN')
             with TimerList(self.timer_lists, ' - writer', log_threshold=0.05, logging=self.log_timers):
@@ -238,9 +244,6 @@ class ListItemDetails:
             with TimerList(self.timer_lists, ' - commit', log_threshold=0.05, logging=self.log_timers):
                 self.connection.open_connection.execute('COMMIT')
             with TimerList(self.timer_lists, ' - return', log_threshold=0.05, logging=self.log_timers):
-                previously_cached_items = [
-                    listitem_cacher.get_cached_item(self.connection) if listitem_cacher else None
-                    for listitem_config, listitem_cacher in items
-                ]
+                cached_data = _get_cached_data()
 
-        return _configure_list(previously_cached_items)
+        return _get_configured_list()
