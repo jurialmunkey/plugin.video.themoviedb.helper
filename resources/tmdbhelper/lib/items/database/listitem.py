@@ -13,11 +13,10 @@ import itertools
 class ListItemConfig:
     listitem_cacher_permitted_types = ('movie', 'tvshow', 'season', 'episode', 'person')
 
-    def __init__(self, parent, item, pagination=False):
+    def __init__(self, parent, item):
         if parent.__class__.__name__ != 'ListItemDetails':
             raise Exception(f'Requires ListItemDetails parent but {parent.__class__.__name__} given')
         self.item = item
-        self.pagination = pagination
         self.next_page = bool('next_page' in item)
         self.parent = parent
         self.item['parent_params'] = self.parent.parent_params
@@ -45,6 +44,8 @@ class ListItemConfig:
         return ListItem(**self.item)
 
     def get_configured_listitem(self, data):
+        if self.next_page and not self.parent.pagination:
+            return
         self.listitem.set_details(data, override=True) if data else None
         return self.listitem
 
