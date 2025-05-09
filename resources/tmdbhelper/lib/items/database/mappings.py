@@ -654,6 +654,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'status': ('item', 'status'),
             'season_number': ('item', 'season'),
             'episode_number': ('item', 'episode'),
+            'number_of_seasons': ('item', 'totalseasons'),
+            'number_of_episodes': ('item', 'totalepisodes'),
             'episode_type': ('item', 'status'),
             'biography': ('item', 'biography'),
             'birthday': ('item', 'birthday'),

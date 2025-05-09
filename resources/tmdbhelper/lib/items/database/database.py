@@ -10,12 +10,13 @@ class ItemDetailsDatabase(Database):
         super().__init__(filename=self.cache_filename)
 
     # DB version must be max of table_version
-    database_version = 20
+    database_version = 21
 
     database_changes = {
-        # 17: (
-        #     'ALTER TABLE baseitem ADD datalevel INTEGER',
-        # ),
+        21: (
+            'ALTER TABLE tvshow ADD totalseasons INTEGER',
+            'ALTER TABLE tvshow ADD totalepisodes INTEGER',
+        ),
     }
 
     baseitem_columns = {
@@ -134,6 +135,12 @@ class ItemDetailsDatabase(Database):
         },
         'next_episode_to_air_id': {
             'data': 'TEXT',
+        },
+        'totalseasons': {
+            'data': 'INTEGER',
+        },
+        'totalepisodes': {
+            'data': 'INTEGER',
         },
     }
 

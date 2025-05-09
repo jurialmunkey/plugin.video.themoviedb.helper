@@ -19,6 +19,12 @@ class Tvshow(MediaItem):
         }
     )
 
+    def get_infolabels_details(self):
+        infolabels = super().get_infolabels_details()
+        infolabels['season'] = self.data[0]['totalseasons']
+        infolabels['episode'] = self.data[0]['totalepisodes']
+        return infolabels
+
     def get_infolabels_special(self, infolabels):
         try:
             infolabels['tvshowtitle'] = self.data[0]['title']
@@ -29,6 +35,8 @@ class Tvshow(MediaItem):
     def get_infoproperties_special(self, infoproperties):
         infoproperties = self.get_infoproperties_custom(infoproperties)
         try:
+            infoproperties['totalseasons'] = self.data[0]['totalseasons']
+            infoproperties['totalepisodes'] = infoproperties['unwatchedepisodes'] = self.data[0]['totalepisodes']
             infoproperties['next_episode_to_air_id'] = self.data[0]['next_episode_to_air_id']
         except (TypeError, KeyError, IndexError):
             pass

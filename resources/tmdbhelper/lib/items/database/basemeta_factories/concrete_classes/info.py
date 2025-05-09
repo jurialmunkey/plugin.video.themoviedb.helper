@@ -117,7 +117,7 @@ class Movie(ItemDetailsList):
 
 class Tvshow(ItemDetailsList):
     table = 'tvshow'
-    keys = ('id', 'tmdb_id', 'year', 'premiered', 'plot', 'title', 'originaltitle', 'rating', 'votes', 'popularity')
+    keys = ('id', 'tmdb_id', 'year', 'premiered', 'plot', 'title', 'originaltitle', 'rating', 'votes', 'popularity', 'totalseasons', 'totalepisodes')
 
 
 class Season(ItemDetailsList):
