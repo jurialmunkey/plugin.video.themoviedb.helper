@@ -184,7 +184,7 @@ msgstr ""
 
 #: /resources/tmdbhelper/lib/script/method/trakt.py
 msgctxt "#32036"
-msgid "Hidden and dropped"
+msgid "Dropped"
 msgstr ""
 
 msgctxt "#30024"
