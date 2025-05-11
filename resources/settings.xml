@@ -531,6 +531,11 @@
                         <popup>false</popup>
                     </control>
                 </setting>
+                <setting id="trakt_cacheownlists" type="boolean" label="32463" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle" />
+                </setting>
                 <setting id="trakt_scrobbling" type="boolean" label="32529" help="">
                     <level>0</level>
                     <default>true</default>
@@ -539,13 +544,18 @@
                 <setting id="trakt_watchedindicators" type="boolean" label="32013" help="">
                     <level>0</level>
                     <default>false</default>
-                    <control type="toggle"/>
+                    <control type="toggle" />
                 </setting>
-                <setting id="trakt_cacheownlists" type="boolean" label="32463" help="">
+                <setting id="invalidate_trakt_sync" type="string" label="32022" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="action">
+                        <data>RunScript(plugin.video.themoviedb.helper, invalidate_trakt_sync)</data>
+                    </control>
                 </setting>
+
             </group>
         </category>
         <category id="players" label="32014" help="">

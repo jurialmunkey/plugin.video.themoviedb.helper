@@ -121,6 +121,11 @@ msgctxt "#30014"
 msgid "English (Canada)"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32022"
+msgid "Clear sync data"
+msgstr ""
+
 msgctxt "#30015"
 msgid "English (United Kingdom)"
 msgstr ""
@@ -131,6 +136,21 @@ msgstr ""
 
 msgctxt "#30017"
 msgid "English (New Zealand)"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32026"
+msgid "Invalidate Sync Data"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32027"
+msgid "Successfully cleared {} sync data"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32028"
+msgid "Ratings"
 msgstr ""
 
 msgctxt "#30018"
@@ -155,6 +175,16 @@ msgstr ""
 
 msgctxt "#30023"
 msgid "Basque (Spain)"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32035"
+msgid "Progress"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32036"
+msgid "Hidden and dropped"
 msgstr ""
 
 msgctxt "#30024"

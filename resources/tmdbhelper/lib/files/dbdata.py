@@ -220,10 +220,10 @@ class DatabaseStatements:
 
     @staticmethod
     def delete_keys(table, keys, conditions='item_type=?'):
-        return 'UPDATE {table} SET {keys} WHERE {conditions}'.format(
+        return 'UPDATE {table} SET {keys} {conditions}'.format(
             table=table,
             keys=', '.join([f'{k}=NULL' for k in keys]),
-            conditions=conditions)
+            conditions=f'WHERE {conditions}' if conditions else '')
 
     @staticmethod
     def delete_item(table, conditions='id=?'):
@@ -326,8 +326,10 @@ class DatabaseMethod:
 
     def del_column_values(self, table=DEFAULT_TABLE, keys=(), item_type=None, connection=None):
         cursor = self.execute_sql(
-            DatabaseStatements.delete_keys(table, keys),
-            data=(item_type, ),
+            DatabaseStatements.delete_keys(
+                table, keys,
+                conditions=None if item_type is None else 'item_type=?'),
+            data=None if item_type is None else (item_type, ),
             connection=connection)
         if not connection and cursor:
             cursor.close()
