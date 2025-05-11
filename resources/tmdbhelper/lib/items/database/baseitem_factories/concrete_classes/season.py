@@ -68,8 +68,13 @@ class Season(Tvshow):
     @property
     def cached_data_keys(self):
         """ SELECT """
-        additional_keys = ['tvshow.title AS tvshowtitle', 'tvshow.tagline as tagline']
-        return tuple([f'{self.table}.{k}' for k in self.keys] + additional_keys)
+        deniedlist_keys = ('plot', )
+        additional_keys = [
+            'tvshow.title AS tvshowtitle',
+            'tvshow.tagline as tagline',
+            'ifnull(season.plot, tvshow.plot) as plot',
+        ]
+        return tuple([f'{self.table}.{k}' for k in self.keys if k not in deniedlist_keys] + additional_keys)
 
     @cached_property
     def db_table_caches(self):
