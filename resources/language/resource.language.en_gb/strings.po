@@ -195,6 +195,11 @@ msgctxt "#30025"
 msgid "Finnish (Finland)"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32039"
+msgid "Prefer fanart.tv artwork"
+msgstr ""
+
 msgctxt "#30026"
 msgid "French (Canada)"
 msgstr ""

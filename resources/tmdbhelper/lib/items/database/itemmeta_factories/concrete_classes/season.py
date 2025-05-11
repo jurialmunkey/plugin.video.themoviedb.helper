@@ -1,4 +1,5 @@
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem
+from tmdbhelper.lib.addon.plugin import get_setting
 
 
 class Season(MediaItem):
@@ -7,20 +8,35 @@ class Season(MediaItem):
         (('video', None), 'path', 'trailer'),
     )
 
-    art_dbclist_routes = (
-        *MediaItem.art_dbclist_routes,
-        (('art_poster', 'tvshow'), 'poster'),
-        (('art_fanart', 'tvshow'), 'fanart'),
-        (('art_landscape', 'tvshow'), 'landscape'),
-        (('art_clearlogo', 'tvshow'), 'clearlogo'),
-        (('art_extrafanart', 'tvshow'), 'fanart'),
-        (('fanart_tv_poster', 'tvshow'), 'poster'),
-        (('fanart_tv_fanart', 'tvshow'), 'fanart'),
-        (('fanart_tv_landscape', 'tvshow'), 'landscape'),
-        (('fanart_tv_clearlogo', 'tvshow'), 'clearlogo'),
-        (('fanart_tv_clearart', 'tvshow'), 'clearart'),
-        (('fanart_tv_banner', 'tvshow'), 'banner'),
-    )
+    @property
+    def art_dbclist_routes(self):
+        return (
+            *super().art_dbclist_routes,
+            (('art_poster', 'tvshow'), 'poster'),
+            (('art_fanart', 'tvshow'), 'fanart'),
+            (('art_landscape', 'tvshow'), 'landscape'),
+            (('art_clearlogo', 'tvshow'), 'clearlogo'),
+            (('art_extrafanart', 'tvshow'), 'fanart'),
+            (('fanart_tv_poster', 'tvshow'), 'poster'),
+            (('fanart_tv_fanart', 'tvshow'), 'fanart'),
+            (('fanart_tv_landscape', 'tvshow'), 'landscape'),
+            (('fanart_tv_clearlogo', 'tvshow'), 'clearlogo'),
+            (('fanart_tv_clearart', 'tvshow'), 'clearart'),
+            (('fanart_tv_banner', 'tvshow'), 'banner'),
+        ) if not get_setting('fanarttv_prefer') else (
+            *super().art_dbclist_routes,
+            (('fanart_tv_poster', 'tvshow'), 'poster'),
+            (('fanart_tv_fanart', 'tvshow'), 'fanart'),
+            (('fanart_tv_landscape', 'tvshow'), 'landscape'),
+            (('fanart_tv_clearlogo', 'tvshow'), 'clearlogo'),
+            (('fanart_tv_clearart', 'tvshow'), 'clearart'),
+            (('fanart_tv_banner', 'tvshow'), 'banner'),
+            (('art_poster', 'tvshow'), 'poster'),
+            (('art_fanart', 'tvshow'), 'fanart'),
+            (('art_landscape', 'tvshow'), 'landscape'),
+            (('art_clearlogo', 'tvshow'), 'clearlogo'),
+            (('art_extrafanart', 'tvshow'), 'fanart'),
+        )
 
     infoproperties_dbclist_routes = (
         *MediaItem.infoproperties_dbclist_routes,

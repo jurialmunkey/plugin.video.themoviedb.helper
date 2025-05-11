@@ -1,23 +1,41 @@
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseclass import BaseItem
+from tmdbhelper.lib.addon.plugin import get_setting
 
 
 class MediaItem(BaseItem):
-    art_dbclist_routes = (
-        (('art_poster', None), 'poster'),
-        (('art_fanart', None), 'fanart'),
-        (('art_landscape', None), 'landscape'),
-        (('art_thumbs', None), 'thumb'),
-        (('art_clearlogo', None), 'clearlogo'),
-        (('art_extrafanart', None), 'fanart'),
-        (('fanart_tv_poster', None), 'poster'),
-        (('fanart_tv_fanart', None), 'fanart'),
-        (('fanart_tv_landscape', None), 'landscape'),
-        (('fanart_tv_clearlogo', None), 'clearlogo'),
-        (('fanart_tv_clearart', None), 'clearart'),
-        (('fanart_tv_banner', None), 'banner'),
-        (('fanart_tv_discart', None), 'discart'),
-    )
+
+    @property
+    def art_dbclist_routes(self):
+        return (
+            (('art_poster', None), 'poster'),
+            (('art_fanart', None), 'fanart'),
+            (('art_landscape', None), 'landscape'),
+            (('art_thumbs', None), 'thumb'),
+            (('art_clearlogo', None), 'clearlogo'),
+            (('art_extrafanart', None), 'fanart'),
+            (('fanart_tv_poster', None), 'poster'),
+            (('fanart_tv_fanart', None), 'fanart'),
+            (('fanart_tv_landscape', None), 'landscape'),
+            (('fanart_tv_clearlogo', None), 'clearlogo'),
+            (('fanart_tv_clearart', None), 'clearart'),
+            (('fanart_tv_banner', None), 'banner'),
+            (('fanart_tv_discart', None), 'discart'),
+        ) if not get_setting('fanarttv_prefer') else (
+            (('fanart_tv_poster', None), 'poster'),
+            (('fanart_tv_fanart', None), 'fanart'),
+            (('fanart_tv_landscape', None), 'landscape'),
+            (('fanart_tv_clearlogo', None), 'clearlogo'),
+            (('fanart_tv_clearart', None), 'clearart'),
+            (('fanart_tv_banner', None), 'banner'),
+            (('fanart_tv_discart', None), 'discart'),
+            (('art_poster', None), 'poster'),
+            (('art_fanart', None), 'fanart'),
+            (('art_landscape', None), 'landscape'),
+            (('art_thumbs', None), 'thumb'),
+            (('art_clearlogo', None), 'clearlogo'),
+            (('art_extrafanart', None), 'fanart'),
+        )
 
     infolabels_dbclist_routes = (
         (('genre', None), 'name', 'genre'),

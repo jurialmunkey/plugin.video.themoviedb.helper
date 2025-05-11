@@ -413,6 +413,14 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="fanarttv_prefer" type="boolean" label="32039" help="" parent="fanarttv_clientkey">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" operator="is" setting="fanarttv_lookup">true</dependency>
+                    </dependencies>
+                </setting>
                 <setting id="fanarttv_clientkey_access" type="boolean" label="32483" help="" parent="fanarttv_clientkey">
                     <level>0</level>
                     <default>false</default>
