@@ -1,6 +1,33 @@
-from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem
+from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem, MediaItemArtworkRoutes
 from tmdbhelper.lib.addon.tmdate import is_future_timestamp
 from tmdbhelper.lib.addon.plugin import get_setting
+
+
+class EpisodeItemArtworkRoutes:
+    art_dbclist_routes_fanart_tv = (
+        (('fanart_tv_poster', 'season'), 'poster'),
+        (('fanart_tv_fanart', 'season'), 'fanart'),
+        (('fanart_tv_landscape', 'season'), 'landscape'),
+        (('fanart_tv_banner', 'season'), 'banner'),
+        (('fanart_tv_poster', 'tvshow'), 'poster'),
+        (('fanart_tv_fanart', 'tvshow'), 'fanart'),
+        (('fanart_tv_landscape', 'tvshow'), 'landscape'),
+        (('fanart_tv_clearlogo', 'tvshow'), 'clearlogo'),
+        (('fanart_tv_clearart', 'tvshow'), 'clearart'),
+        (('fanart_tv_banner', 'tvshow'), 'banner'),
+    )
+
+    art_dbclist_routes_tmdb = (
+        (('art_poster', 'season'), 'poster'),
+        (('art_fanart', 'season'), 'fanart'),
+        (('art_clearlogo', 'season'), 'clearlogo'),
+        (('art_landscape', 'season'), 'landscape'),
+        (('art_poster', 'tvshow'), 'poster'),
+        (('art_fanart', 'tvshow'), 'fanart'),
+        (('art_landscape', 'tvshow'), 'landscape'),
+        (('art_clearlogo', 'tvshow'), 'clearlogo'),
+        (('art_extrafanart', 'tvshow'), 'fanart'),
+    )
 
 
 class Episode(MediaItem):
@@ -12,48 +39,19 @@ class Episode(MediaItem):
 
     @property
     def art_dbclist_routes(self):
-        return (
-            *super().art_dbclist_routes,
-            (('art_poster', 'season'), 'poster'),
-            (('art_fanart', 'season'), 'fanart'),
-            (('art_clearlogo', 'season'), 'clearlogo'),
-            (('art_landscape', 'season'), 'landscape'),
-            (('art_poster', 'tvshow'), 'poster'),
-            (('art_fanart', 'tvshow'), 'fanart'),
-            (('art_landscape', 'tvshow'), 'landscape'),
-            (('art_clearlogo', 'tvshow'), 'clearlogo'),
-            (('art_extrafanart', 'tvshow'), 'fanart'),
-            (('fanart_tv_poster', 'season'), 'poster'),
-            (('fanart_tv_fanart', 'season'), 'fanart'),
-            (('fanart_tv_landscape', 'season'), 'landscape'),
-            (('fanart_tv_banner', 'season'), 'banner'),
-            (('fanart_tv_poster', 'tvshow'), 'poster'),
-            (('fanart_tv_fanart', 'tvshow'), 'fanart'),
-            (('fanart_tv_landscape', 'tvshow'), 'landscape'),
-            (('fanart_tv_clearlogo', 'tvshow'), 'clearlogo'),
-            (('fanart_tv_clearart', 'tvshow'), 'clearart'),
-            (('fanart_tv_banner', 'tvshow'), 'banner'),
+        return(
+            *MediaItemArtworkRoutes.art_dbclist_routes_tmdb,
+            *EpisodeItemArtworkRoutes.art_dbclist_routes_tmdb,
+        ) if not get_setting('fanarttv_lookup') else (
+            *MediaItemArtworkRoutes.art_dbclist_routes_tmdb,
+            *MediaItemArtworkRoutes.art_dbclist_routes_fanart_tv,
+            *EpisodeItemArtworkRoutes.art_dbclist_routes_tmdb,
+            *EpisodeItemArtworkRoutes.art_dbclist_routes_fanart_tv,
         ) if not get_setting('fanarttv_prefer') else (
-            *super().art_dbclist_routes,
-            (('fanart_tv_poster', 'season'), 'poster'),
-            (('fanart_tv_fanart', 'season'), 'fanart'),
-            (('fanart_tv_landscape', 'season'), 'landscape'),
-            (('fanart_tv_banner', 'season'), 'banner'),
-            (('fanart_tv_poster', 'tvshow'), 'poster'),
-            (('fanart_tv_fanart', 'tvshow'), 'fanart'),
-            (('fanart_tv_landscape', 'tvshow'), 'landscape'),
-            (('fanart_tv_clearlogo', 'tvshow'), 'clearlogo'),
-            (('fanart_tv_clearart', 'tvshow'), 'clearart'),
-            (('fanart_tv_banner', 'tvshow'), 'banner'),
-            (('art_poster', 'season'), 'poster'),
-            (('art_fanart', 'season'), 'fanart'),
-            (('art_clearlogo', 'season'), 'clearlogo'),
-            (('art_landscape', 'season'), 'landscape'),
-            (('art_poster', 'tvshow'), 'poster'),
-            (('art_fanart', 'tvshow'), 'fanart'),
-            (('art_landscape', 'tvshow'), 'landscape'),
-            (('art_clearlogo', 'tvshow'), 'clearlogo'),
-            (('art_extrafanart', 'tvshow'), 'fanart'),
+            *MediaItemArtworkRoutes.art_dbclist_routes_fanart_tv,
+            *MediaItemArtworkRoutes.art_dbclist_routes_tmdb,
+            *EpisodeItemArtworkRoutes.art_dbclist_routes_fanart_tv,
+            *EpisodeItemArtworkRoutes.art_dbclist_routes_tmdb,
         )
 
     infoproperties_dbclist_routes = (

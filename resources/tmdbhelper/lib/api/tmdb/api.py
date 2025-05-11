@@ -40,6 +40,9 @@ class TMDbAPI(RequestAPI):
         req_strip_add = [
             (self.append_to_response, 'standard'),
             (self.append_to_response_person, 'person'),
+            (self.append_to_response_tvshow, 'tvshow'),
+            (self.append_to_response_tvshow_simple, 'tvshow_simple'),
+            (self.append_to_response_movies_simple, 'movies_simple'),
             (self.req_language, f'{self.iso_language}_en')
         ]
         try:

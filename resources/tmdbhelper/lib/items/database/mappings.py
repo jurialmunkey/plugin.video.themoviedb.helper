@@ -3,15 +3,14 @@
 from tmdbhelper.lib.api.mapping import _ItemMapper
 
 
+def get_blanks_none(i):
+    """
+    Convert empty strings to nulls
+    """
+    return i if i or i == 0 else None
+
+
 class ItemMapperMethods:
-
-    @staticmethod
-    def get_blanks_none(i):
-        """
-        Convert empty strings to nulls
-        """
-        return i if i or i == 0 else None
-
     @staticmethod
     def get_runtime(v, *args, **kwargs):
         if isinstance(v, list):
@@ -44,7 +43,7 @@ class ItemMapperMethods:
                 return
 
         def get_configured_item(i, v):
-            return ItemMapperMethods.get_blanks_none(get_item(i, v))
+            return get_blanks_none(get_item(i, v))
 
         def check_item(i):
             for k in haskeys:
@@ -74,15 +73,15 @@ class ItemMapperMethods:
                     if service:
                         item = {
                             'iso_country': iso,
-                            'display_priority': ItemMapperMethods.get_blanks_none(provider.get('display_priority')),
-                            'name': ItemMapperMethods.get_blanks_none(provider.get('provider_name')),
-                            'logo': ItemMapperMethods.get_blanks_none(provider.get('logo_path')),
-                            'tmdb_id': ItemMapperMethods.get_blanks_none(provider.get('provider_id')),
+                            'display_priority': get_blanks_none(provider.get('display_priority')),
+                            'name': get_blanks_none(provider.get('provider_name')),
+                            'logo': get_blanks_none(provider.get('logo_path')),
+                            'tmdb_id': get_blanks_none(provider.get('provider_id')),
                         }
                     else:
                         item = {
-                            'availability': ItemMapperMethods.get_blanks_none(availability),
-                            'tmdb_id': ItemMapperMethods.get_blanks_none(provider.get('provider_id')),
+                            'availability': get_blanks_none(availability),
+                            'tmdb_id': get_blanks_none(provider.get('provider_id')),
                         }
                     data.append(item)
         return data
@@ -100,11 +99,11 @@ class ItemMapperMethods:
             iso_country = release_country['iso_3166_1']
             for release in (release_country.get('release_dates') or ()):
                 data.append({
-                    'name': ItemMapperMethods.get_blanks_none(release['certification']),
-                    'iso_country': ItemMapperMethods.get_blanks_none(iso_country),
-                    'iso_language': ItemMapperMethods.get_blanks_none(release['iso_639_1']),
-                    'release_date': ItemMapperMethods.get_blanks_none(release['release_date']),
-                    'release_type': ItemMapperMethods.get_blanks_none(tmdb_release_types.get(release['type'])),
+                    'name': get_blanks_none(release['certification']),
+                    'iso_country': get_blanks_none(iso_country),
+                    'iso_language': get_blanks_none(release['iso_639_1']),
+                    'release_date': get_blanks_none(release['release_date']),
+                    'release_type': get_blanks_none(tmdb_release_types.get(release['type'])),
                 })
         return data
 
@@ -148,12 +147,12 @@ class ItemMapperMethods:
             for art_item in art_list:
                 path = art_item['url']
                 item = {
-                    'icon': ItemMapperMethods.get_blanks_none(path),
-                    'iso_language': ItemMapperMethods.get_blanks_none(art_item.get('lang')),
-                    'likes': ItemMapperMethods.get_blanks_none(art_item.get('likes')),
-                    'type': ItemMapperMethods.get_blanks_none(art_type),
-                    'quality': ItemMapperMethods.get_blanks_none(quality),
-                    'extension': ItemMapperMethods.get_blanks_none(path.split('.')[-1] if path else None),
+                    'icon': get_blanks_none(path),
+                    'iso_language': get_blanks_none(art_item.get('lang')),
+                    'likes': get_blanks_none(art_item.get('likes')),
+                    'type': get_blanks_none(art_type),
+                    'quality': get_blanks_none(quality),
+                    'extension': get_blanks_none(path.split('.')[-1] if path else None),
                 }
 
                 if art_has_seasons:
@@ -182,12 +181,12 @@ class ItemMapperMethods:
             if video['site'] != 'YouTube':
                 continue
             data.append({
-                'name': ItemMapperMethods.get_blanks_none(video['name']),
-                'iso_country': ItemMapperMethods.get_blanks_none(video['iso_3166_1']),
-                'iso_language': ItemMapperMethods.get_blanks_none(video['iso_639_1']),
-                'release_date': ItemMapperMethods.get_blanks_none(video['published_at']),
-                'key': ItemMapperMethods.get_blanks_none(video['key']),
-                'content': ItemMapperMethods.get_blanks_none(video['type']),
+                'name': get_blanks_none(video['name']),
+                'iso_country': get_blanks_none(video['iso_3166_1']),
+                'iso_language': get_blanks_none(video['iso_639_1']),
+                'release_date': get_blanks_none(video['published_at']),
+                'key': get_blanks_none(video['key']),
+                'content': get_blanks_none(video['type']),
                 'path': f"plugin://plugin.video.youtube/play/?video_id={video['key']}",
             })
         return data
@@ -219,12 +218,12 @@ class ItemMapperMethods:
                 data.append({
                     'aspect_ratio': ItemMapperMethods.get_aspect_ratio(artwork['aspect_ratio']),
                     'quality': int((artwork['width'] * artwork['height']) // 200000),  # Quality integer to nearest fifth of a megapixel
-                    'iso_language': ItemMapperMethods.get_blanks_none(artwork['iso_639_1']),
-                    'icon': ItemMapperMethods.get_blanks_none(path),
-                    'type': ItemMapperMethods.get_blanks_none(artwork_type),
-                    'extension': ItemMapperMethods.get_blanks_none(path.split('.')[-1] if path else None),
+                    'iso_language': get_blanks_none(artwork['iso_639_1']),
+                    'icon': get_blanks_none(path),
+                    'type': get_blanks_none(artwork_type),
+                    'extension': get_blanks_none(path.split('.')[-1] if path else None),
                     'rating': int(artwork['vote_average'] * 100),
-                    'votes': ItemMapperMethods.get_blanks_none(artwork['vote_count']),
+                    'votes': get_blanks_none(artwork['vote_count']),
                 })
 
         return data
@@ -235,8 +234,8 @@ class ItemMapperMethods:
             return
         return [
             {
-                'key': ItemMapperMethods.get_blanks_none(('tmdb_id' if k == 'id' else k).replace('_id', '')),
-                'value': ItemMapperMethods.get_blanks_none(f'{v}')
+                'key': get_blanks_none(('tmdb_id' if k == 'id' else k).replace('_id', '')),
+                'value': get_blanks_none(f'{v}')
             }
             for k, v in results.items()
         ]

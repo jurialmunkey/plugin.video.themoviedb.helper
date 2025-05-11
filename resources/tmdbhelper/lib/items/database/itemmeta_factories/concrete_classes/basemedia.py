@@ -3,38 +3,39 @@ from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseclass
 from tmdbhelper.lib.addon.plugin import get_setting
 
 
+class MediaItemArtworkRoutes:
+    art_dbclist_routes_fanart_tv = (
+        (('fanart_tv_poster', None), 'poster'),
+        (('fanart_tv_fanart', None), 'fanart'),
+        (('fanart_tv_landscape', None), 'landscape'),
+        (('fanart_tv_clearlogo', None), 'clearlogo'),
+        (('fanart_tv_clearart', None), 'clearart'),
+        (('fanart_tv_banner', None), 'banner'),
+        (('fanart_tv_discart', None), 'discart'),
+    )
+
+    art_dbclist_routes_tmdb = (
+        (('art_poster', None), 'poster'),
+        (('art_fanart', None), 'fanart'),
+        (('art_landscape', None), 'landscape'),
+        (('art_thumbs', None), 'thumb'),
+        (('art_clearlogo', None), 'clearlogo'),
+        (('art_extrafanart', None), 'fanart'),
+    )
+
+
 class MediaItem(BaseItem):
 
     @property
     def art_dbclist_routes(self):
-        return (
-            (('art_poster', None), 'poster'),
-            (('art_fanart', None), 'fanart'),
-            (('art_landscape', None), 'landscape'),
-            (('art_thumbs', None), 'thumb'),
-            (('art_clearlogo', None), 'clearlogo'),
-            (('art_extrafanart', None), 'fanart'),
-            (('fanart_tv_poster', None), 'poster'),
-            (('fanart_tv_fanart', None), 'fanart'),
-            (('fanart_tv_landscape', None), 'landscape'),
-            (('fanart_tv_clearlogo', None), 'clearlogo'),
-            (('fanart_tv_clearart', None), 'clearart'),
-            (('fanart_tv_banner', None), 'banner'),
-            (('fanart_tv_discart', None), 'discart'),
+        return(
+            *MediaItemArtworkRoutes.art_dbclist_routes_tmdb,
+        ) if not get_setting('fanarttv_lookup') else (
+            *MediaItemArtworkRoutes.art_dbclist_routes_tmdb,
+            *MediaItemArtworkRoutes.art_dbclist_routes_fanart_tv,
         ) if not get_setting('fanarttv_prefer') else (
-            (('fanart_tv_poster', None), 'poster'),
-            (('fanart_tv_fanart', None), 'fanart'),
-            (('fanart_tv_landscape', None), 'landscape'),
-            (('fanart_tv_clearlogo', None), 'clearlogo'),
-            (('fanart_tv_clearart', None), 'clearart'),
-            (('fanart_tv_banner', None), 'banner'),
-            (('fanart_tv_discart', None), 'discart'),
-            (('art_poster', None), 'poster'),
-            (('art_fanart', None), 'fanart'),
-            (('art_landscape', None), 'landscape'),
-            (('art_thumbs', None), 'thumb'),
-            (('art_clearlogo', None), 'clearlogo'),
-            (('art_extrafanart', None), 'fanart'),
+            *MediaItemArtworkRoutes.art_dbclist_routes_fanart_tv,
+            *MediaItemArtworkRoutes.art_dbclist_routes_tmdb,
         )
 
     infolabels_dbclist_routes = (

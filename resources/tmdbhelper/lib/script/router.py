@@ -26,6 +26,16 @@ def test_func(test_func, **kwargs):
         data = TMDb().get_response_json(path, **kwargs)
         return finalise(head, data)
 
+    def test_func_fanarttv(ftv_type, ftv_id, **kwargs):
+        from tmdbhelper.lib.api.fanarttv.api import FanartTV
+        data = FanartTV().get_request(
+            ftv_type, ftv_id,
+            cache_force=7,  # Force dummy request caching to prevent rerequesting 404s
+            cache_fallback={'dummy': None},
+            cache_days=30)
+        head = f'{ftv_type} {ftv_id}'
+        return finalise(head, data)
+
     def test_func_baseitem_factory(mediatype, tmdb_id, season=None, episode=None, cache_refresh=None, del_database_init=False, attr='data'):
         from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
         sync = BaseItemFactory(mediatype)
@@ -57,6 +67,7 @@ def test_func(test_func, **kwargs):
         'baseitem_factory': test_func_baseitem_factory,
         'baseview_factory': test_func_baseview_factory,
         'tmdb_database': test_func_tmdb_database,
+        'fanarttv': test_func_fanarttv,
     }
 
     return routes[test_func](**kwargs)
