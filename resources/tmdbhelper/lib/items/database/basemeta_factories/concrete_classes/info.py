@@ -22,7 +22,7 @@ class Certification(ItemDetailsList):
 
     @property
     def values(self):  # WHERE conditions values for ?
-        return (self.item_id, self.common_apis.tmdb_api.iso_country)
+        return (self.parent_id, self.common_apis.tmdb_api.iso_country)
 
 
 class Video(ItemDetailsList):
@@ -32,7 +32,7 @@ class Video(ItemDetailsList):
 
     @property
     def values(self):  # WHERE conditions values for ?
-        return (self.item_id, 'Trailer', self.common_apis.tmdb_api.iso_language)
+        return (self.parent_id, 'Trailer', self.common_apis.tmdb_api.iso_language)
 
 
 class Country(ItemDetailsList):

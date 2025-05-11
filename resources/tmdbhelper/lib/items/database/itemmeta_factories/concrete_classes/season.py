@@ -2,6 +2,11 @@ from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia
 
 
 class Season(MediaItem):
+    infolabels_dbcitem_routes = (
+        (('certification', None), 'name', 'mpaa'),
+        (('video', None), 'path', 'trailer'),
+    )
+
     art_dbclist_routes = (
         *MediaItem.art_dbclist_routes,
         (('art_poster', 'tvshow'), 'poster'),
