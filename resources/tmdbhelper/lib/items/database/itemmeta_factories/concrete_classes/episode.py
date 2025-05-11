@@ -45,7 +45,7 @@ class Episode(MediaItem):
     @property
     def infolabels_dbclist_routes(self):
         return (
-            *super().infolabels_dbcitem_routes,
+            *super().infolabels_dbclist_routes,
             (('network', None), 'name', 'studio'),
         )
 
