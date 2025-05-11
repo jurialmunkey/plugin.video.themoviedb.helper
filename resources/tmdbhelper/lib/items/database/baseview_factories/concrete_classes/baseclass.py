@@ -29,6 +29,8 @@ class BaseList(ItemDetailsDatabaseAccess):
         """ WHERE condition ? ? ? ? = value, value, value, value """
         if self.cache_refresh == 'never':
             return (self.item_id, 0, )
+        if self.cache_refresh == 'basic':
+            return (self.item_id, 1, )
         return (self.item_id, self.current_time, )
 
     def configure_mapped_data(self, data):

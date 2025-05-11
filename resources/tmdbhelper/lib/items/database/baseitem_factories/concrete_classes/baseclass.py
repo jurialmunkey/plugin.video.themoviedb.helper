@@ -47,6 +47,8 @@ class BaseItem(ItemDetailsDatabaseAccess):
 
     @property
     def online_data_kwgs(self):
+        if self.cache_refresh == 'basic':
+            return {'append_to_response': self.common_apis.tmdb_api.append_to_response_movies_simple}
         return {'append_to_response': self.common_apis.tmdb_api.append_to_response}
 
     @cached_property
@@ -78,6 +80,8 @@ class BaseItem(ItemDetailsDatabaseAccess):
         """ WHERE condition ? ? ? ? = value, value, value, value """
         if self.cache_refresh == 'never':
             return (self.item_id, 0, )
+        if self.cache_refresh == 'basic':
+            return (self.item_id, 1, )
         return (self.item_id, self.current_time)
 
     @property

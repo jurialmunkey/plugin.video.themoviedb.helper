@@ -30,6 +30,10 @@ class ItemDetailsDatabaseAccess(DatabaseAccess):
 
     @property
     def expiry(self):
+        if self.cache_refresh == 'basic':
+            return 1
+        if self.cache_refresh == 'never':
+            return 0
         return self.current_time + self.expiry_time
 
     @property
