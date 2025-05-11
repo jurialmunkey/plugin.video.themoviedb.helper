@@ -1,18 +1,27 @@
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.basemedia import MediaList
+from tmdbhelper.lib.items.database.baseitem_factories.concrete_classes.episode import Episode
 
 
 class EpisodeMediaList(MediaList):
     table = 'episode'
     cached_data_conditions_base = 'season_id=? ORDER BY episode ASC'
     cached_data_check_key = 'episode'
-    keys = ('episode', 'year', 'plot', 'title', 'premiered', 'rating', 'votes')
     item_mediatype = 'episode'
     item_tmdb_type = 'tv'
     item_label_key = 'title'
 
-    cached_data_table = 'episode INNER JOIN season ON season.id = episode.season_id INNER JOIN tvshow ON tvshow.id = episode.tvshow_id'
-    cached_data_keys = ('episode', 'episode.year as year', 'ifnull(ifnull(episode.plot, season.plot), tvshow.plot) as plot', 'episode.title as title', 'episode.premiered as premiered', 'episode.rating as rating', 'tvshow.title as tvshowtitle')
+    @property
+    def keys(self):
+        return Episode.get_keys(self)
+
+    @property
+    def cached_data_keys(self):
+        return Episode.get_cached_data_keys(self)
+
+    @property
+    def cached_data_table(self):
+        return Episode.get_cached_data_table(self)
 
     def map_item_infolabels(self, i):
         infolabels = super().map_item_infolabels(i)
