@@ -35,12 +35,19 @@ class Episode(MediaItem):
     infoproperties_dbclist_routes = (
         *MediaItem.infoproperties_dbclist_routes,
         {
-            'instance': ('studio', None),
-            'mappings': {'name': 'name', 'tmdb_id': 'tmdb_id', 'logo': 'logo', 'country': 'country'},
-            'propname': ('network', ),  # For backwards compatibility also set studio to network
+            'instance': ('network', None),
+            'mappings': {'name': 'name', 'tmdb_id': 'tmdb_id', 'icon': 'logo', 'country': 'country'},
+            'propname': ('network', ),
             'joinings': None
         }
     )
+
+    @property
+    def infolabels_dbclist_routes(self):
+        return (
+            *super().infolabels_dbcitem_routes,
+            (('network', None), 'name', 'studio'),
+        )
 
     def get_premiered_status(self):
         premiered = self.get_data_value('premiered')

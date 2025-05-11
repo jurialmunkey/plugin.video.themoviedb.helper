@@ -4,15 +4,28 @@ from tmdbhelper.lib.files.ftools import cached_property
 
 class Studio(ItemDetailsList):
     table = 'studio'
+    cached_data_parent_table = 'company'
     keys = ('tmdb_id', 'parent_id')
-    cached_data_keys = ('company.name', 'company.tmdb_id', 'company.logo', 'company.country')
+
+    @property
+    def cached_data_keys(self):
+        cached_data_keys = ('name', 'tmdb_id', 'logo', 'country')
+        return tuple((f'{self.cached_data_parent_table}.{k}' for k in cached_data_keys))
 
     def image_path_func(self, v):
         return self.common_apis.tmdb_imagepath.get_imagepath_thumbs(v)
 
     @property
     def cached_data_table(self):
-        return f'{self.table} INNER JOIN company ON company.tmdb_id = {self.table}.tmdb_id'
+        return (
+            f'{self.table} INNER JOIN {self.cached_data_parent_table} '
+            f'ON {self.cached_data_parent_table}.tmdb_id = {self.table}.tmdb_id'
+        )
+
+
+class Network(Studio):
+    table = 'network'
+    cached_data_parent_table = 'broadcaster'
 
 
 class Certification(ItemDetailsList):
@@ -103,6 +116,10 @@ class Company(ItemDetailsList):
 
     def image_path_func(self, v):
         return self.common_apis.tmdb_imagepath.get_imagepath_thumbs(v)
+
+
+class Broadcaster(Company):
+    table = 'broadcaster'
 
 
 class Base(ItemDetailsList):

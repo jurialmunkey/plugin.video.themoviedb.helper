@@ -22,7 +22,6 @@ class MediaItem(BaseItem):
     infolabels_dbclist_routes = (
         (('genre', None), 'name', 'genre'),
         (('country', None), 'name', 'country'),
-        (('studio', None), 'name', 'studio'),
         (('director', None), 'name', 'director'),
         (('writer', None), 'name', 'writer'),
     )

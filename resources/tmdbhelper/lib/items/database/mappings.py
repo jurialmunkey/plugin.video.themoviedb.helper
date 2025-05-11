@@ -462,7 +462,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'func': self.split_array,
                 'kwargs': {'tmdb_id': 'id'}}, {
                 # ---
-                'keys': [('company', None)],
+                'keys': [('broadcaster', None)],
                 'extend': True,
                 'func': self.split_array,
                 'kwargs': {'tmdb_id': 'id', 'name': 'name', 'logo': 'logo_path', 'country': 'origin_country'}
@@ -776,6 +776,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'country': (),
             'company': [],
             'studio': (),
+            'broadcaster': [],
             'network': (),
             'provider': (),
             'certification': (),

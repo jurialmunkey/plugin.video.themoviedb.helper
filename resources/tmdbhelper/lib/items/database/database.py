@@ -10,12 +10,17 @@ class ItemDetailsDatabase(Database):
         super().__init__(filename=self.cache_filename)
 
     # DB version must be max of table_version
-    database_version = 21
+    database_version = 22
 
     database_changes = {
         21: (
             'ALTER TABLE tvshow ADD totalseasons INTEGER',
             'ALTER TABLE tvshow ADD totalepisodes INTEGER',
+        ),
+        22: (
+            'DROP TABLE IF EXISTS studio',
+            'DROP TABLE IF EXISTS network',
+            'DROP TABLE IF EXISTS company',
         ),
     }
 
@@ -524,7 +529,7 @@ class ItemDetailsDatabase(Database):
         'tmdb_id': {
             'data': 'INTEGER',
             'unique': True,
-            'foreign_key': 'company(tmdb_id)',
+            'foreign_key': 'broadcaster(tmdb_id)',
         },
         'parent_id': {
             'data': 'TEXT',
@@ -535,6 +540,22 @@ class ItemDetailsDatabase(Database):
     }
 
     company_columns = {
+        'tmdb_id': {
+            'data': 'INTEGER PRIMARY KEY',
+            'indexed': True
+        },
+        'name': {
+            'data': 'TEXT',
+        },
+        'logo': {
+            'data': 'TEXT',
+        },
+        'country': {
+            'data': 'TEXT',
+        },
+    }
+
+    broadcaster_columns = {
         'tmdb_id': {
             'data': 'INTEGER PRIMARY KEY',
             'indexed': True
@@ -957,8 +978,9 @@ class ItemDetailsDatabase(Database):
             'genre': self.genre_columns,
             'country': self.country_columns,
             'studio': self.studio_columns,
-            'network': self.network_columns,
             'company': self.company_columns,
+            'network': self.network_columns,
+            'broadcaster': self.broadcaster_columns,
             'video': self.video_columns,
             'certification': self.certification_columns,
             'crewmember': self.crewmember_columns,

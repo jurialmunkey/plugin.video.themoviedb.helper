@@ -8,6 +8,13 @@ class Movie(MediaItem):
         (('playcount', None), 'plays', 'playcount'),
     )
 
+    @property
+    def infolabels_dbclist_routes(self):
+        return (
+            *super().infolabels_dbcitem_routes,
+            (('studio', None), 'name', 'studio'),
+        )
+
     def get_infolabels_special(self, infolabels):
         try:
             infolabels['set'] = self.data[0]['collection_title']
