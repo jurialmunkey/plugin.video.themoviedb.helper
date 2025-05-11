@@ -57,7 +57,7 @@ class Episode(Season):
     def online_data_kwgs(self):
         if self.cache_refresh == 'basic':
             return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow_simple}
-        return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow}
+        return {'append_to_response': self.common_apis.tmdb_api.append_to_response}
 
     @cached_property
     def online_data(self):
