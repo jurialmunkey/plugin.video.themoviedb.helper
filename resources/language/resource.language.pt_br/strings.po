@@ -27,7 +27,7 @@ msgstr "Arábico (Arábia Saudita)"
 #: /resources/tmdbhelper/lib/api/tmdb/methods/lists.py
 msgctxt "#32000"
 msgid "Unaired"
-msgstr "Não Exibido"
+msgstr "Não exibido"
 
 msgctxt "#30002"
 msgid "Belarusian (Belarus)"
@@ -59,6 +59,16 @@ msgctxt "#30006"
 msgid "Chamorro (Guam)"
 msgstr "Chamorro (Guam)"
 
+#: /resources/settings.xml
+msgctxt "#32008"
+msgid "Low"
+msgstr "Baixo"
+
+#: /resources/settings.xml
+msgctxt "#32009"
+msgid "High"
+msgstr "Alto"
+
 msgctxt "#30007"
 msgid "Czech (Czech Republic)"
 msgstr "Tcheco (República Tcheca)"
@@ -71,9 +81,19 @@ msgctxt "#30009"
 msgid "German (Austria)"
 msgstr "Alemão (Áustria)"
 
+#: /resources/settings.xml
+msgctxt "#32013"
+msgid "Get watched indicators, episode counts, and resume points"
+msgstr "Obter indicadores de assistidos, número de episódios e pontos de resumo"
+
 msgctxt "#30010"
 msgid "German (Switzerland)"
 msgstr "Alemão (Suíça)"
+
+#: /resources/settings.xml
+msgctxt "#32015"
+msgid "Additional season: Up next"
+msgstr "Temporada adicional: A seguir"
 
 msgctxt "#30011"
 msgid "German (Germany)"
@@ -83,13 +103,28 @@ msgctxt "#30012"
 msgid "Greek (Greece)"
 msgstr "Grego (Grécia)"
 
+#: /resources/settings.xml
+msgctxt "#32018"
+msgid "Additional season: Anticipated"
+msgstr "Temporada adicional: Antecipado"
+
 msgctxt "#30013"
 msgid "English (Australia)"
 msgstr "Inglês (Austrália)"
 
+#: /resources/settings.xml
+msgctxt "#32020"
+msgid "Additional season: Specials"
+msgstr "Temporada adicional: Especiais"
+
 msgctxt "#30014"
 msgid "English (Canada)"
 msgstr "Inglês (Canadá)"
+
+#: /resources/settings.xml
+msgctxt "#32022"
+msgid "Clear sync data"
+msgstr "Limpar dados de sincronização"
 
 msgctxt "#30015"
 msgid "English (United Kingdom)"
@@ -102,6 +137,21 @@ msgstr "Inglês (Irlanda)"
 msgctxt "#30017"
 msgid "English (New Zealand)"
 msgstr "Inglês (Nova Zelândia)"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32026"
+msgid "Invalidate Sync Data"
+msgstr "Invalidar Dados de Sincronização"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32027"
+msgid "Successfully cleared {} sync data"
+msgstr "Dados de sincronização {} limpos com sucesso"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32028"
+msgid "Ratings"
+msgstr "Avaliações"
 
 msgctxt "#30018"
 msgid "English (United States of America)"
@@ -126,6 +176,16 @@ msgstr "Estoniano (Estônia)"
 msgctxt "#30023"
 msgid "Basque (Spain)"
 msgstr "Basco (Espanha)"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32035"
+msgid "Progress"
+msgstr "Progresso"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32036"
+msgid "Dropped"
+msgstr "Dropado"
 
 msgctxt "#30024"
 msgid "Persian (Iran)"
@@ -662,7 +722,7 @@ msgstr "Redes de TV"
 #: /resources/lib/plugin.py
 msgctxt "#32190"
 msgid "Movie Studios"
-msgstr "Estúdios de Cinema"
+msgstr "Estúdios de cinema"
 
 #: /resources/lib/plugin.py
 msgctxt "#32191"
@@ -2237,7 +2297,7 @@ msgstr "Forçar ressincronização"
 #: /resources/settings.xml
 msgctxt "#32534"
 msgid "Trakt sync progress notifications"
-msgstr "Notificações de progresso de sincronização de trakt"
+msgstr "Notificações de progresso da sincronização do Trakt"
 
 #: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
 msgctxt "#32535"
