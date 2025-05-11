@@ -59,14 +59,20 @@ class Season(Tvshow):
 
     @property
     def cached_data_table(self):
+        return self.get_cached_data_table()
+
+    @property
+    def cached_data_keys(self):
+        return self.get_cached_data_keys()
+
+    def get_cached_data_table(self):
         """ FROM """
         return (
             f'baseitem LEFT JOIN {self.table} ON {self.table}.id = baseitem.id'
             ' LEFT JOIN tvshow ON tvshow.id = season.tvshow_id'
         )
 
-    @property
-    def cached_data_keys(self):
+    def get_cached_data_keys(self):
         """ SELECT """
         deniedlist_keys = ('plot', )
         additional_keys = [
