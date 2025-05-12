@@ -39,7 +39,6 @@ msgid "Bulgarian (Bulgaria)"
 msgstr "Болгарский (Болгария)"
 
 #: /resources/settings.xml
-#, fuzzy
 msgctxt "#32003"
 msgid "Preferred"
 msgstr "Предпочтительно"
@@ -84,7 +83,6 @@ msgid "German (Austria)"
 msgstr "Немецкий (Австрия)"
 
 #: /resources/settings.xml
-#, fuzzy
 msgctxt "#32013"
 msgid "Get watched indicators, episode counts, and resume points"
 msgstr ""
@@ -95,7 +93,6 @@ msgid "German (Switzerland)"
 msgstr "Немецкий (Швейцария)"
 
 #: /resources/settings.xml
-#, fuzzy
 msgctxt "#32015"
 msgid "Additional season: Up next"
 msgstr "Дополнительный сезон: Далее"
@@ -109,7 +106,6 @@ msgid "Greek (Greece)"
 msgstr "Греческий (Греция)"
 
 #: /resources/settings.xml
-#, fuzzy
 msgctxt "#32018"
 msgid "Additional season: Anticipated"
 msgstr "Дополнительный сезон: Ожидается"
@@ -119,7 +115,6 @@ msgid "English (Australia)"
 msgstr "Английский (Австралия)"
 
 #: /resources/settings.xml
-#, fuzzy
 msgctxt "#32020"
 msgid "Additional season: Specials"
 msgstr "Дополнительный сезон: Спецвыпуски"
@@ -127,6 +122,11 @@ msgstr "Дополнительный сезон: Спецвыпуски"
 msgctxt "#30014"
 msgid "English (Canada)"
 msgstr "Английский (Канада)"
+
+#: /resources/settings.xml
+msgctxt "#32022"
+msgid "Clear sync data"
+msgstr "Очистить данные синхронизации"
 
 msgctxt "#30015"
 msgid "English (United Kingdom)"
@@ -139,6 +139,24 @@ msgstr "Английский (Ирландия)"
 msgctxt "#30017"
 msgid "English (New Zealand)"
 msgstr "Английский (Новая Зеландия)"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+#, fuzzy
+msgctxt "#32026"
+msgid "Invalidate Sync Data"
+msgstr "Аннулировать данные синхронизации"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+#, fuzzy
+msgctxt "#32027"
+msgid "Successfully cleared {} sync data"
+msgstr "Успешно очищены данные синхронизации {}"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+#, fuzzy
+msgctxt "#32028"
+msgid "Ratings"
+msgstr "Рейтинги"
 
 msgctxt "#30018"
 msgid "English (United States of America)"
@@ -164,6 +182,17 @@ msgctxt "#30023"
 msgid "Basque (Spain)"
 msgstr "Баскский (Испания)"
 
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32035"
+msgid "Progress"
+msgstr "Прогресс"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+#, fuzzy
+msgctxt "#32036"
+msgid "Dropped"
+msgstr "Пропущен"
+
 msgctxt "#30024"
 msgid "Persian (Iran)"
 msgstr "Персидский (Иран)"
@@ -171,6 +200,11 @@ msgstr "Персидский (Иран)"
 msgctxt "#30025"
 msgid "Finnish (Finland)"
 msgstr "Финский (Финляндия)"
+
+#: /resources/settings.xml
+msgctxt "#32039"
+msgid "Prefer fanart.tv artwork"
+msgstr "Предпочитать иллюстрации fanart.tv"
 
 msgctxt "#30026"
 msgid "French (Canada)"
@@ -2290,13 +2324,11 @@ msgid "TMDb user options"
 msgstr "Опции пользователя TMDb"
 
 #: /resources/tmdbhelper/lib/script/method/tmdb.py
-#, fuzzy
 msgctxt "#32523"
 msgid "Add/Remove from TMDb user list"
 msgstr "Удалить из TMDb списка пользователя"
 
 #: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
-#, fuzzy
 msgctxt "#32524"
 msgid "User lists"
 msgstr "Списки пользователя"
@@ -2310,7 +2342,7 @@ msgstr "Добавить/удалить из избранного TMDb"
 #, fuzzy
 msgctxt "#32526"
 msgid "Add/Remove from TMDb watchlist"
-msgstr "Добавить/удалить из Watchlist списка TMDb"
+msgstr "Добавить/удалить из списка наблюдения TMDb"
 
 #: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
 msgctxt "#32527"
@@ -2323,7 +2355,6 @@ msgid "Add to {}"
 msgstr "Добавить в {}"
 
 #: /resources/settings.xml
-#, fuzzy
 msgctxt "#32529"
 msgid "Scrobble items played via TMDbHelper"
 msgstr "Скробблинг воспроизводимого через TMDbHelper"
@@ -2354,13 +2385,13 @@ msgstr "Уведомления о ходе синхронизации Trakt"
 #, fuzzy
 msgctxt "#32535"
 msgid "Non-binary"
-msgstr "Не бинарный"
+msgstr "Небинарный"
 
 #: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
 #, fuzzy
 msgctxt "#32536"
 msgid "Unspecified"
-msgstr "Не указано"
+msgstr "Не определено"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
