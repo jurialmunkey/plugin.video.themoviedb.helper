@@ -4,7 +4,7 @@ from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.baseclass
 class CastMember(ItemDetailsList):
     table = 'castmember'
     keys = ('tmdb_id', 'role', 'ordering', 'appearances', 'parent_id')
-    conditions = 'parent_id=? ORDER BY ordering ASC NULLS LAST LIMIT 100'  # WHERE conditions  # TODO: Move limit to settings ???
+    conditions = 'parent_id=? ORDER BY IFNULL(ordering, 9999) ASC LIMIT 100'  # WHERE conditions  # TODO: Move limit to settings ???
     cached_data_keys = (
         'castmember.tmdb_id', 'role', 'ordering', 'appearances',
         'thumb', 'name', 'gender', 'biography', 'known_for_department')
@@ -20,7 +20,7 @@ class CastMember(ItemDetailsList):
 class CrewMember(CastMember):
     table = 'crewmember'
     keys = ('tmdb_id', 'role', 'department', 'appearances', 'parent_id')
-    conditions = 'parent_id=? ORDER BY appearances ASC NULLS LAST LIMIT 100'
+    conditions = 'parent_id=? ORDER BY appearances DESC LIMIT 100'
     cached_data_keys = (
         'crewmember.tmdb_id', 'role', 'department', 'appearances',
         'thumb', 'name', 'gender', 'biography', 'known_for_department')

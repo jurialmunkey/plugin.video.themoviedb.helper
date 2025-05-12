@@ -4,7 +4,7 @@ from tmdbhelper.lib.files.ftools import cached_property
 
 class CastMemberMediaList(MediaList):
     table = 'castmember'
-    cached_data_conditions_base = 'parent_id=? GROUP BY castmember.tmdb_id ORDER BY ordering ASC NULLS LAST'  # WHERE conditions
+    cached_data_conditions_base = 'parent_id=? GROUP BY castmember.tmdb_id ORDER BY IFNULL(ordering, 9999) ASC'  # WHERE conditions
     cached_data_check_key = 'parent_id'
     keys = ('GROUP_CONCAT(role, " / ") as role', 'ordering', 'appearances', 'parent_id')
     item_mediatype = 'person'

@@ -31,7 +31,7 @@ class Network(Studio):
 class Certification(ItemDetailsList):
     table = 'certification'
     keys = ('name', 'iso_country', 'iso_language', 'release_date', 'release_type', 'parent_id', )
-    conditions = 'parent_id=? AND iso_country=? AND name IS NOT NULL AND name != "" ORDER BY release_date ASC NULLS LAST LIMIT 1'  # WHERE conditions
+    conditions = 'parent_id=? AND iso_country=? AND name IS NOT NULL AND name != "" ORDER BY IFNULL(release_date, "9999-99-99") ASC LIMIT 1'  # WHERE conditions
 
     @property
     def values(self):  # WHERE conditions values for ?
@@ -99,7 +99,7 @@ class Provider(ItemDetailsList):
 
     @property
     def conditions(self):
-        return f'{self.provider_allowlist}parent_id=? AND iso_country=? ORDER BY display_priority ASC NULLS LAST'
+        return f'{self.provider_allowlist}parent_id=? AND iso_country=? ORDER BY IFNULL(display_priority, 9999) ASC'
 
     @property
     def values(self):  # WHERE conditions values for ?
