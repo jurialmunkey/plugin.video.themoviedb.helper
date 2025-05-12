@@ -150,7 +150,7 @@ msgstr "Аннулировать данные синхронизации"
 #, fuzzy
 msgctxt "#32027"
 msgid "Successfully cleared {} sync data"
-msgstr "Успешно очищены данные синхронизации {}"
+msgstr "Успешно очищены данные синхронизации для {}"
 
 #: /resources/tmdbhelper/lib/script/method/trakt.py
 #, fuzzy
@@ -188,10 +188,9 @@ msgid "Progress"
 msgstr "Прогресс"
 
 #: /resources/tmdbhelper/lib/script/method/trakt.py
-#, fuzzy
 msgctxt "#32036"
 msgid "Dropped"
-msgstr "Пропущен"
+msgstr ""
 
 msgctxt "#30024"
 msgid "Persian (Iran)"
