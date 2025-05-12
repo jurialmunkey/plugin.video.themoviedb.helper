@@ -1962,7 +1962,7 @@ msgstr "Добавить новое правило"
 #: /resources/lib/player/configure.py
 msgctxt "#32443"
 msgid "Select value to match against {}"
-msgstr "Выберать значение для подбора {}"
+msgstr "Выберите значение для сопоставления с {}"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32444"
@@ -2002,7 +2002,7 @@ msgstr "Самое низкое"
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32452"
 msgid "Highest"
-msgstr "Самый высокое"
+msgstr "Самое высокое"
 
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32453"
