@@ -1,12 +1,13 @@
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.database.basedata import ItemDetailsDatabaseAccess
+from tmdbhelper.lib.addon.consts import DATALEVEL_OFF, DATALEVEL_MAX
 
 
 class BaseList(ItemDetailsDatabaseAccess):
     cached_data_check_key = 'expiry'
     cache_refresh = None  # Set to "never" for cache only, or "force" for forced refresh
     cached_data_table = table = 'baseitem'
-    cached_data_conditions = 'id=? AND expiry>=?'
+    cached_data_conditions = 'id=? AND expiry>=? AND datalevel>=?'
     season = None
     episode = None
 
@@ -27,23 +28,12 @@ class BaseList(ItemDetailsDatabaseAccess):
     @property
     def cached_data_values(self):
         """ WHERE condition ? ? ? ? = value, value, value, value """
-        if self.cache_refresh == 'never':
-            return (self.item_id, 0, )
-        if self.cache_refresh == 'basic':
-            return (self.item_id, 1, )
-        return (self.item_id, self.current_time, )
+        # if self.cache_refresh == 'never':
+        #     return (self.item_id, 0, DATALEVEL_OFF)
+        return (self.item_id, self.current_time, DATALEVEL_MAX)
 
     def configure_mapped_data(self, data):
-        def get_value(k):
-            if k == 'id':
-                return self.item_id
-            if k == 'expiry':
-                return self.expiry
-            try:
-                return data[k]
-            except (TypeError, KeyError, IndexError, ValueError):
-                return
-        return [get_value(k) for k in self.keys]
+        raise Exception(f'Method configure_mapped_data not applicable for {self.__class__.__name__}')
 
     @cached_property
     def parent_item_data(self):

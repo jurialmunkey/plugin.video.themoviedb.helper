@@ -10,7 +10,7 @@ class ItemDetailsDatabase(Database):
         super().__init__(filename=self.cache_filename)
 
     # DB version must be max of table_version
-    database_version = 22
+    database_version = 23
 
     database_changes = {
         21: (
@@ -22,6 +22,10 @@ class ItemDetailsDatabase(Database):
             'DROP TABLE IF EXISTS network',
             'DROP TABLE IF EXISTS company',
         ),
+        23: (
+            'ALTER TABLE baseitem ADD datalevel INTEGER DEFAULT 0 NOT NULL',
+            'ALTER TABLE ratings ADD datalevel INTEGER DEFAULT 0 NOT NULL',
+        )
     }
 
     baseitem_columns = {
@@ -34,6 +38,10 @@ class ItemDetailsDatabase(Database):
         },
         'expiry': {
             'data': 'INTEGER',
+            'indexed': True
+        },
+        'datalevel': {
+            'data': 'INTEGER DEFAULT 0 NOT NULL',
             'indexed': True
         },
     }
@@ -365,6 +373,10 @@ class ItemDetailsDatabase(Database):
             'data': 'INTEGER',
         },
         'expiry': {
+            'data': 'INTEGER',
+            'indexed': True
+        },
+        'datalevel': {
             'data': 'INTEGER',
             'indexed': True
         },
