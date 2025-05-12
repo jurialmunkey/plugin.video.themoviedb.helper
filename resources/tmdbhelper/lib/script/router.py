@@ -62,12 +62,20 @@ def test_func(test_func, **kwargs):
         head = import_attr
         return finalise(head, data)
 
+    def test_func_get_next_episodes(tmdb_id, season, episode, player=None, **kwargs):
+        import xbmcgui
+        from tmdbhelper.lib.player.details import get_next_episodes
+        data = get_next_episodes(tmdb_id, season, episode, player)
+        head = f'{(tmdb_id, season, episode)}'
+        xbmcgui.Dialog().select(head, data, useDetails=True)
+
     routes = {
         'response': test_func_response,
         'baseitem_factory': test_func_baseitem_factory,
         'baseview_factory': test_func_baseview_factory,
         'tmdb_database': test_func_tmdb_database,
         'fanarttv': test_func_fanarttv,
+        'get_next_episodes': test_func_get_next_episodes,
     }
 
     return routes[test_func](**kwargs)

@@ -84,35 +84,8 @@ class ListFlatSeasons(ContainerDirectory):
     is_cacheonly = False
 
     def get_items(self, tmdb_id, limit=None, **kwargs):
-
-        def pre_sync_parent(tvshow_sync, season):
-            mediatype = 'season'
-            base_dbc = BaseItemFactory(mediatype)
-            base_dbc.mediatype = mediatype
-            base_dbc.tmdb_id = try_int(tmdb_id)
-            base_dbc.tmdb_type = 'tv'
-            base_dbc.season = season
-            base_dbc.cache_only = None
-            base_dbc.common_apis = tvshow_sync.common_apis
-            return base_dbc.data
-
-        tvshow_sync = BaseViewFactory('seasons', 'tv', tmdb_id)
-
-        for season in tvshow_sync.data:
-            try:
-                pre_sync_parent(tvshow_sync, season['infolabels']['season'])
-            except (AttributeError, TypeError, KeyError):
-                continue
-
-        filters = {
-            'filter_key': 'season',
-            'filter_operator': 'gt',
-            'filter_value': 0,
-        } if not get_setting('seasons_specials') else {}
-
         sync = BaseViewFactory('flatseasons', 'tv', tmdb_id, filters=filters, limit=limit)
         self.container_content = convert_type('episode', 'container')
-
         return sync.data
 
 
