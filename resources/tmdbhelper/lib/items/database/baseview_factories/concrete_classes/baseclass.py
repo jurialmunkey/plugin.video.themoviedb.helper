@@ -1,6 +1,6 @@
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.database.basedata import ItemDetailsDatabaseAccess
-from tmdbhelper.lib.addon.consts import DATALEVEL_OFF, DATALEVEL_MAX
+from tmdbhelper.lib.addon.consts import DATALEVEL_MAX
 
 
 class BaseList(ItemDetailsDatabaseAccess):
@@ -28,8 +28,6 @@ class BaseList(ItemDetailsDatabaseAccess):
     @property
     def cached_data_values(self):
         """ WHERE condition ? ? ? ? = value, value, value, value """
-        # if self.cache_refresh == 'never':
-        #     return (self.item_id, 0, DATALEVEL_OFF)
         return (self.item_id, self.current_time, DATALEVEL_MAX)
 
     def configure_mapped_data(self, data):

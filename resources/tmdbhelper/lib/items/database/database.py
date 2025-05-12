@@ -24,7 +24,6 @@ class ItemDetailsDatabase(Database):
         ),
         23: (
             'ALTER TABLE baseitem ADD datalevel INTEGER DEFAULT 0 NOT NULL',
-            'ALTER TABLE ratings ADD datalevel INTEGER DEFAULT 0 NOT NULL',
         )
     }
 
@@ -373,10 +372,6 @@ class ItemDetailsDatabase(Database):
             'data': 'INTEGER',
         },
         'expiry': {
-            'data': 'INTEGER',
-            'indexed': True
-        },
-        'datalevel': {
             'data': 'INTEGER',
             'indexed': True
         },

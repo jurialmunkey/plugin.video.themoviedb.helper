@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from tmdbhelper.lib.api.mapping import _ItemMapper
-from tmdbhelper.lib.addon.consts import DATALEVEL_OFF
 
 
 def get_blanks_none(i):
