@@ -84,7 +84,7 @@ class ListFlatSeasons(ContainerDirectory):
     is_cacheonly = False
 
     def get_items(self, tmdb_id, limit=None, **kwargs):
-        sync = BaseViewFactory('flatseasons', 'tv', tmdb_id, filters=filters, limit=limit)
+        sync = BaseViewFactory('flatseasons', 'tv', tmdb_id, filters=self.filters, limit=limit)
         self.container_content = convert_type('episode', 'container')
         return sync.data
 
