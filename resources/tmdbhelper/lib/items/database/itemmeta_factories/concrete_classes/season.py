@@ -29,7 +29,7 @@ class Season(MediaItem):
 
     @property
     def art_dbclist_routes(self):
-        return(
+        return (
             *MediaItemArtworkRoutes.art_dbclist_routes_tmdb,
             *SeasonItemArtworkRoutes.art_dbclist_routes_tmdb,
         ) if not get_setting('fanarttv_lookup') else (

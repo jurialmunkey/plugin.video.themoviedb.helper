@@ -149,9 +149,8 @@ class BaseItem(ItemDetailsDatabaseAccess):
                 return
             return self.get_item_meta(data)
 
-    def set_cached_data(self, item_id, mediatype, expiry, datalevel, table, keys, mapped_data, return_data=False):
-        if not return_data:
-            self.del_cached('baseitem', item_id)
+    def set_cached_data(self, item_id, mediatype, expiry, datalevel, table, keys, mapped_data, delete_cascade=False):
+        self.del_cached('baseitem', item_id) if delete_cascade else None
         self.set_cached_values('baseitem', item_id, keys=('mediatype', 'expiry', 'datalevel'), values=(mediatype, expiry, datalevel))
         self.set_cached_many(table, keys, mapped_data)
 
@@ -168,7 +167,7 @@ class BaseItem(ItemDetailsDatabaseAccess):
         args = (
             self.item_id, self.mediatype, self.expiry, self.datalevel, self.table, self.keys,
             self.configure_mapped_data(online_data_mapped))
-        kwgs = {'return_data': return_data}
+        kwgs = {'delete_cascade': bool(self.cache_refresh == 'force')}
 
         queue = []
         queue.append((func, args, kwgs))
