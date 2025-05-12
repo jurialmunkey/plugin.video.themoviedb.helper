@@ -81,9 +81,19 @@ msgctxt "#30009"
 msgid "German (Austria)"
 msgstr "Allemand (Autriche)"
 
+#: /resources/settings.xml
+msgctxt "#32013"
+msgid "Get watched indicators, episode counts, and resume points"
+msgstr "Obtenir des indicateurs de visionnage, le nombre d'épisodes et les points de reprise"
+
 msgctxt "#30010"
 msgid "German (Switzerland)"
 msgstr "Allemand (Suisse)"
+
+#: /resources/settings.xml
+msgctxt "#32015"
+msgid "Additional season: Up next"
+msgstr "Saison supplémentaire : À suivre""
 
 msgctxt "#30011"
 msgid "German (Germany)"
@@ -93,13 +103,28 @@ msgctxt "#30012"
 msgid "Greek (Greece)"
 msgstr "Grec (Grèce)"
 
+#: /resources/settings.xml
+msgctxt "#32018"
+msgid "Additional season: Anticipated"
+msgstr "Saison supplémentaire : Prévue"
+
 msgctxt "#30013"
 msgid "English (Australia)"
 msgstr "Anglais (Australie)"
 
+#: /resources/settings.xml
+msgctxt "#32020"
+msgid "Additional season: Specials"
+msgstr "Saison supplémentaire : Spéciales"
+
 msgctxt "#30014"
 msgid "English (Canada)"
 msgstr "Anglais (Canada)"
+
+#: /resources/settings.xml
+msgctxt "#32022"
+msgid "Clear sync data"
+msgstr "Effacer les données de synchronisation"
 
 msgctxt "#30015"
 msgid "English (United Kingdom)"
@@ -112,6 +137,21 @@ msgstr "English (Ireland)"
 msgctxt "#30017"
 msgid "English (New Zealand)"
 msgstr "Anglais (Nouvelle-Zélande)"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32026"
+msgid "Invalidate Sync Data"
+msgstr "Invalider les données de synchronisation"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32027"
+msgid "Successfully cleared {} sync data"
+msgstr "Invalider les données de synchronisation {}"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32028"
+msgid "Ratings"
+msgstr "Notes"
 
 msgctxt "#30018"
 msgid "English (United States of America)"
@@ -137,6 +177,16 @@ msgctxt "#30023"
 msgid "Basque (Spain)"
 msgstr "Basque (Espagne)"
 
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32035"
+msgid "Progress"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32036"
+msgid "Dropped"
+msgstr "Abandonné"
+
 msgctxt "#30024"
 msgid "Persian (Iran)"
 msgstr "Persan (Iran)"
@@ -144,6 +194,11 @@ msgstr "Persan (Iran)"
 msgctxt "#30025"
 msgid "Finnish (Finland)"
 msgstr "Finlandais (Finlande)"
+
+#: /resources/settings.xml
+msgctxt "#32039"
+msgid "Prefer fanart.tv artwork"
+msgstr "Préférer les illustrations de fanart.tv"
 
 msgctxt "#30026"
 msgid "French (Canada)"
@@ -2490,9 +2545,3 @@ msgstr "Lecteur par défaut pour les films"
 msgctxt "#32025"
 msgid "Default player for episodes"
 msgstr "Lecteur par défaut pour les épisodes"
-
-#: /resources/settings.xml
-
-msgctxt "#32027"
-msgid "Clear default players"
-msgstr "Effacer les lecteurs par défaut"
