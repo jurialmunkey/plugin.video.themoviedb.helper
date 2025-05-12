@@ -1,6 +1,5 @@
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.basemedia import MediaList
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.seasons import SeasonMediaList
-from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
 from tmdbhelper.lib.addon.consts import DATALEVEL_MAX
 from tmdbhelper.lib.files.ftools import cached_property
 
@@ -45,21 +44,6 @@ class FlatSeasonMediaList(MediaList):
             for season in self.parent_season_media_list
             if season and 'infolabels' in season and season['infolabels'].get('season')
         ]
-
-    def get_parent_data(self, mediatype, season=None, episode=None):
-        try:
-            base_dbc = BaseItemFactory(mediatype)
-            base_dbc.mediatype = mediatype
-            base_dbc.tmdb_id = self.tmdb_id
-            base_dbc.tmdb_type = self.tmdb_type
-            base_dbc.season = season
-            base_dbc.episode = episode
-            base_dbc.common_apis = self.common_apis
-            base_dbc.connection = self.connection
-            base_dbc.cache = self.cache
-        except (TypeError, KeyError, IndexError, ValueError):
-            return
-        return base_dbc.data
 
     @property
     def data_cond(self):
