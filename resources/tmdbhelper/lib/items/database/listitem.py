@@ -173,7 +173,7 @@ class ListItemCacher:
         if not self.baseitem_db_cache:
             return
         # self.baseitem_db_cache.connection = connection
-        self.baseitem_db_cache.cache_refresh = None
+        self.baseitem_db_cache.cache_refresh = 'basic' if self.parent.cache_refresh == 'basic' else None
         return self.baseitem_db_cache.try_cached_data(return_queue=True)
 
 

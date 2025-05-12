@@ -315,14 +315,23 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
 
 
 class ContainerDirectory(ContainerDirectoryCommon):
+
+    @cached_property
+    def lidc_cache_refresh(self):
+        if self.is_cacheonly:
+            return 'never'
+        if self.is_detailed:
+            return None
+        return 'basic'
+
     @cached_property
     def lidc(self):
         from tmdbhelper.lib.items.database.listitem import ListItemDetails
         lidc = ListItemDetails(self)
         lidc.parent_params = self.parent_params
         lidc.pagination = self.pagination
-        lidc.cache_refresh = 'never' if self.is_cacheonly else None
-        lidc.extendedinfo = True if self.is_detailed else False
+        lidc.cache_refresh = self.lidc_cache_refresh
+        lidc.extendedinfo = self.is_detailed
         lidc.timer_lists = self.timer_lists
         lidc.log_timers = self.log_timers
         return lidc

@@ -3,21 +3,7 @@ from tmdbhelper.lib.items.database.baseitem_factories.concrete_classes.baseclass
 
 
 class MediaItem(BaseItem):
-    db_studio_table = 'studio'
     ftv_type = None
-
-    def config_basemeta_db_studio(self, database_obj):
-        """ Special function to configure studio cache to switch between studios and networks depending on content type """
-        database_obj = self.config_basemeta_db(database_obj)
-        database_obj.table = self.db_studio_table
-        return database_obj
-
-    @cached_property
-    def routes_basemeta_db(self):
-        """ Database tables to get additional data from as part of cache getter """
-        return {
-            'basemeta_db_studio': self.config_basemeta_db_studio
-        }
 
     @cached_property
     def db_table_caches(self):

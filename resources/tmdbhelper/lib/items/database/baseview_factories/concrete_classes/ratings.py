@@ -7,6 +7,12 @@ from jurialmunkey.parser import try_int
 class RatingsDict(BaseList):
     expiry_time = 7 * 86400
     cached_data_table = table = 'ratings'
+    cached_data_conditions = 'id=? AND expiry>=?'
+
+    @property
+    def cached_data_values(self):
+        """ WHERE condition ? ? ? ? = value, value, value, value """
+        return (self.item_id, self.current_time, )
 
     @cached_property
     def mediatype(self):

@@ -5,11 +5,12 @@ from tmdbhelper.lib.files.ftools import cached_property
 class Tvshow(MediaItem):
     table = 'tvshow'
     tmdb_type = 'tv'
-    db_studio_table = 'network'
     ftv_type = 'tv'
 
     @property
     def online_data_kwgs(self):
+        if self.cache_refresh == 'basic':
+            return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow_simple}
         return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow}
 
     def config_basemeta_db_tvshow(self, database_obj):
@@ -30,7 +31,6 @@ class Tvshow(MediaItem):
     @cached_property
     def routes_basemeta_db(self):
         return {
-            'basemeta_db_studio': self.config_basemeta_db_studio,
             'basemeta_db_fanart_tv_poster_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_fanart_tv_fanart_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_fanart_tv_landscape_tvshow': self.config_basemeta_db_tvshow,
@@ -68,6 +68,8 @@ class Tvshow(MediaItem):
             self.return_basemeta_db('video'),
             self.return_basemeta_db('company'),
             self.return_basemeta_db('studio'),
+            self.return_basemeta_db('broadcaster'),
+            self.return_basemeta_db('network'),
             self.return_basemeta_db('service'),
             self.return_basemeta_db('provider'),
             self.return_basemeta_db('person'),

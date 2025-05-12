@@ -26,6 +26,16 @@ def test_func(test_func, **kwargs):
         data = TMDb().get_response_json(path, **kwargs)
         return finalise(head, data)
 
+    def test_func_fanarttv(ftv_type, ftv_id, **kwargs):
+        from tmdbhelper.lib.api.fanarttv.api import FanartTV
+        data = FanartTV().get_request(
+            ftv_type, ftv_id,
+            cache_force=7,  # Force dummy request caching to prevent rerequesting 404s
+            cache_fallback={'dummy': None},
+            cache_days=30)
+        head = f'{ftv_type} {ftv_id}'
+        return finalise(head, data)
+
     def test_func_baseitem_factory(mediatype, tmdb_id, season=None, episode=None, cache_refresh=None, del_database_init=False, attr='data'):
         from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
         sync = BaseItemFactory(mediatype)
@@ -57,6 +67,7 @@ def test_func(test_func, **kwargs):
         'baseitem_factory': test_func_baseitem_factory,
         'baseview_factory': test_func_baseview_factory,
         'tmdb_database': test_func_tmdb_database,
+        'fanarttv': test_func_fanarttv,
     }
 
     return routes[test_func](**kwargs)
@@ -114,14 +125,14 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'sync_trakt')(**kwargs),
         'sort_list':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'sort_list')(**kwargs),
-        'refresh_trakt_sync':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'refresh_trakt_sync')(**kwargs),
+        'invalidate_trakt_sync':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'invalidate_trakt_sync')(**kwargs),
         'get_trakt_stats':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'get_stats')(**kwargs),
         'authenticate_trakt':
-            lambda **kwargs: importmodule('tmdbhelper.lib.api.trakt.api', 'TraktAPI')(force=True),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'authenticate_trakt')(**kwargs),
         'revoke_trakt':
-            lambda **kwargs: importmodule('tmdbhelper.lib.api.trakt.api', 'TraktAPI')().logout(),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'revoke_trakt')(**kwargs),
 
         # Image Functions
         'blur_image':

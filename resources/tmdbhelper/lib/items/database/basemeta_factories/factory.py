@@ -152,6 +152,11 @@ def import_company():
     return Company
 
 
+def import_broadcaster():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Broadcaster
+    return Broadcaster
+
+
 def import_service():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Service
     return Service
@@ -160,6 +165,11 @@ def import_service():
 def import_studio():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Studio
     return Studio
+
+
+def import_network():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Network
+    return Network
 
 
 def import_provider():
@@ -292,7 +302,9 @@ FACTORY_ROUTES = {
     'video': import_video,
     'certification': import_certification,
     'company': import_company,
+    'broadcaster': import_broadcaster,
     'service': import_service,
+    'network': import_network,
     'studio': import_studio,
     'provider': import_provider,
     'fanart_tv': import_fanart_tv,

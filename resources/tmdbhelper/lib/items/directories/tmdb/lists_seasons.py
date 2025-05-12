@@ -92,6 +92,7 @@ class ListFlatSeasons(ContainerDirectory):
             base_dbc.tmdb_id = try_int(tmdb_id)
             base_dbc.tmdb_type = 'tv'
             base_dbc.season = season
+            base_dbc.cache_only = None
             base_dbc.common_apis = tvshow_sync.common_apis
             return base_dbc.data
 
@@ -120,6 +121,20 @@ class ListEpisodes(ContainerDirectory):
     is_cacheonly = False
 
     def get_items(self, tmdb_id, season, limit=None, **kwargs):
+
+        # Precache parent data
+        try:
+            base_dbc = BaseItemFactory('tvshow')
+            base_dbc.mediatype = 'tvshow'
+            base_dbc.tmdb_id = try_int(tmdb_id)
+            base_dbc.tmdb_type = 'tv'
+            base_dbc.cache_only = None
+            base_dbc.common_apis = self
+            if not base_dbc.data:
+                return
+        except (AttributeError, TypeError, KeyError):
+            return
+
         try:
             sync = BaseViewFactory('episodes', 'tv', tmdb_id, season=season, filters=self.filters, limit=limit)
         except TypeError:

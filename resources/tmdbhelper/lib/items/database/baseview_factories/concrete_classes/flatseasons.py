@@ -1,9 +1,10 @@
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.basemedia import MediaList
+from tmdbhelper.lib.addon.consts import DATALEVEL_MAX
 
 
 class FlatSeasonMediaList(MediaList):
     table = 'episode'
-    cached_data_conditions_base = 'episode.tvshow_id=? AND baseitem.expiry>=? ORDER BY season=0, season ASC, episode ASC'
+    cached_data_conditions_base = 'episode.tvshow_id=? AND baseitem.expiry>=? AND baseitem.datalevel>=? ORDER BY season=0, season ASC, episode ASC'
     cached_data_check_key = 'episode'
     keys = ()
     item_mediatype = 'episode'
@@ -38,7 +39,7 @@ class FlatSeasonMediaList(MediaList):
 
     @property
     def cached_data_values(self):
-        return (self.item_id, self.current_time)
+        return (self.item_id, self.current_time, DATALEVEL_MAX)
 
     def map_item_unique_ids(self, i):
         return {

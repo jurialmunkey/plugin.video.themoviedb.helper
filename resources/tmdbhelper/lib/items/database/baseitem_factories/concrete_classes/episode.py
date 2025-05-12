@@ -55,6 +55,8 @@ class Episode(Season):
 
     @property
     def online_data_kwgs(self):
+        if self.cache_refresh == 'basic':
+            return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow_simple}
         return {'append_to_response': self.common_apis.tmdb_api.append_to_response}
 
     @cached_property
@@ -78,6 +80,13 @@ class Episode(Season):
 
     @property
     def cached_data_table(self):
+        return self.get_cached_data_table()
+
+    @property
+    def cached_data_keys(self):
+        return self.get_cached_data_keys()
+
+    def get_cached_data_table(self):
         """ FROM """
         return (
             f'baseitem LEFT JOIN {self.table} ON {self.table}.id = baseitem.id '
@@ -85,8 +94,7 @@ class Episode(Season):
             'LEFT JOIN tvshow ON tvshow.id = episode.tvshow_id '
         )
 
-    @property
-    def cached_data_keys(self):
+    def get_cached_data_keys(self):
         """ SELECT """
         additional_keys = ['tvshow.title AS tvshowtitle', 'season.season AS season', 'tvshow.tagline as tagline']
         return tuple([f'{self.table}.{k}' for k in self.keys] + additional_keys)

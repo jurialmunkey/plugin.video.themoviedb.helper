@@ -1,14 +1,26 @@
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.basemedia import MediaList
+from tmdbhelper.lib.items.database.baseitem_factories.concrete_classes.season import Season
 
 
 class SeasonMediaList(MediaList):
-    cached_data_table = table = 'season'
+    table = 'season'
     cached_data_conditions_base = 'tvshow_id=? ORDER BY season=0, season ASC'
     cached_data_check_key = 'season'
-    keys = ('season', 'year', 'plot', 'title', 'premiered', 'rating')
     item_mediatype = 'season'
     item_tmdb_type = 'tv'
     item_label_key = 'title'
+
+    @property
+    def keys(self):
+        return Season.get_keys(self)
+
+    @property
+    def cached_data_keys(self):
+        return Season.get_cached_data_keys(self)
+
+    @property
+    def cached_data_table(self):
+        return Season.get_cached_data_table(self)
 
     filter_key_map = {
         'season': 'season',
