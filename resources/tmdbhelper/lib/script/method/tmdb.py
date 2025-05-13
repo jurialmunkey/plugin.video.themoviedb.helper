@@ -43,18 +43,29 @@ def sync_tmdb_item(tmdb_type=None, tmdb_id=None, season=None, episode=None, sync
 
 
 def refresh_item(tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
+    import xbmcgui
+    from tmdbhelper.lib.addon.dialog import BusyDialog
     from tmdbhelper.lib.script.method.kodi_utils import container_refresh
     from tmdbhelper.lib.addon.plugin import get_localized, convert_type
     from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
-    mediatype = convert_type(tmdb_type, 'dbtype', season, episode)
-    sync = BaseItemFactory(mediatype)
-    sync.tmdb_id = tmdb_id
-    sync.season = season
-    sync.episode = episode
-    sync.cache_refresh = 'force'
-    sync.data
 
-    import xbmcgui
-    xbmcgui.Dialog().ok(get_localized(32233), f'{sync.item_id}')
+    def refresh_item_factory(season=None, episode=None):
+        mediatype = convert_type(tmdb_type, 'dbtype', season, episode)
+        sync = BaseItemFactory(mediatype)
+        sync.tmdb_id = tmdb_id
+        sync.season = season
+        sync.episode = episode
+        sync.cache_refresh = 'force'
+        sync.data
 
+    with BusyDialog():
+        refresh_item_factory(season, episode)
+
+        if episode is not None:
+            refresh_item_factory(season)
+
+        if season is not None:
+            refresh_item_factory()
+
+    xbmcgui.Dialog().ok(get_localized(32233), f'{tmdb_type} {tmdb_id} {season if season else ""} {episode if episode else ""}')
     container_refresh()
