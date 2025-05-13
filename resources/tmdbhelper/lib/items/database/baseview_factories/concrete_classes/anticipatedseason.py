@@ -7,6 +7,9 @@ from tmdbhelper.lib.files.ftools import cached_property
 class AnticipatedSeasonMediaListMixin(FlatSeasonMediaListMixin):
     @cached_property
     def parent_precache_season(self):
+        return self.get_parent_precache_season()
+
+    def get_parent_precache_season(self):
         if not self.parent_season_media_list:
             return []
         season_numbers = [

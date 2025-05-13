@@ -1,6 +1,7 @@
 from tmdbhelper.lib.items.database.baseitem_factories.concrete_classes.tvshow import Tvshow
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.consts import SHORTER_EXPIRY
+from tmdbhelper.lib.files.locker import mutexlock
 
 
 class Season(Tvshow):
@@ -36,6 +37,14 @@ class Season(Tvshow):
 
     @cached_property
     def parent_item_data(self):
+        return self.get_parent_item_data()
+
+    @property
+    def mutex_lockname(self):
+        return f'Database.ItemDetails.tv.{self.tmdb_id}.lockfile'
+
+    @mutexlock
+    def get_parent_item_data(self):
         try:
             base_dbc = Tvshow()
             base_dbc.mediatype = 'tvshow'
