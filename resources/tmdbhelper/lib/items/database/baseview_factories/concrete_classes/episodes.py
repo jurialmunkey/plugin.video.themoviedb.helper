@@ -36,6 +36,19 @@ class EpisodeMediaList(MediaList):
     def cached_data_values(self):
         return (self.item_id, )
 
+    @cached_property
+    def parent_precache_tvshow(self):
+        return self.get_parent_data('tvshow')
+
+    @property
+    def data_cond(self):
+        """ Determines if any data is returned """
+        if not self.tmdb_id:
+            return False
+        if not self.parent_precache_tvshow:  # Do some precaching here as we need this data to join
+            return False
+        return True
+
     def map_item_unique_ids(self, i):
         return {
             'tmdb': self.tmdb_id,
