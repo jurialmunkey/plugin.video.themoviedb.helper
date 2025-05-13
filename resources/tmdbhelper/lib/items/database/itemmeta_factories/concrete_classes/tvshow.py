@@ -5,8 +5,8 @@ class Tvshow(MediaItem):
     infolabels_dbcitem_routes = (
         MediaItemInfoLabelItemRoutes.certification,
         MediaItemInfoLabelItemRoutes.trailer,
-        (('watchedcount', None), 'watched_episodes', 'playcount'),
-        (('airedcount', None), 'aired_episodes', 'episode'),
+        MediaItemInfoLabelItemRoutes.watchedcount,
+        MediaItemInfoLabelItemRoutes.episodecount,
     )
 
     @property

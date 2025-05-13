@@ -25,7 +25,7 @@ class Season(MediaItem):
     infolabels_dbcitem_routes = (
         MediaItemInfoLabelItemRoutes.certification,
         MediaItemInfoLabelItemRoutes.trailer,
-        (('watchedcount', None), 'watched_episodes', 'playcount'),
+        MediaItemInfoLabelItemRoutes.watchedcount,
     )
 
     @property

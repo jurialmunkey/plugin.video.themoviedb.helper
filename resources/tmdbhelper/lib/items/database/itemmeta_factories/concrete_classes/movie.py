@@ -5,7 +5,7 @@ class Movie(MediaItem):
     infolabels_dbcitem_routes = (
         MediaItemInfoLabelItemRoutes.certification,
         MediaItemInfoLabelItemRoutes.trailer,
-        (('playcount', None), 'plays', 'playcount'),
+        MediaItemInfoLabelItemRoutes.playcount,
     )
 
     @property
