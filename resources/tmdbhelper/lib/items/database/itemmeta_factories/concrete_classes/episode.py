@@ -1,4 +1,5 @@
-from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem, MediaItemArtworkRoutes, MediaItemInfoLabelItemRoutes
+from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem, MediaItemArtworkRoutes
+from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseroutes import MediaItemInfoLabelItemRoutes
 from tmdbhelper.lib.addon.tmdate import is_future_timestamp
 from tmdbhelper.lib.addon.plugin import get_setting
 

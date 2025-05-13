@@ -1,4 +1,5 @@
-from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem, MediaItemInfoLabelItemRoutes
+from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem
+from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseroutes import MediaItemInfoLabelItemRoutes
 
 
 class Tvshow(MediaItem):

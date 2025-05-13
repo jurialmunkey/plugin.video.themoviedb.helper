@@ -1,24 +1,7 @@
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseclass import BaseItem
+from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseroutes import MediaItemInfoLabelItemRoutes
 from tmdbhelper.lib.addon.plugin import get_setting, get_mpaa_prefix
-
-
-class MediaItemInfoLabelItemMethod:
-
-    @staticmethod
-    def certification(i):
-        certification_prefix = get_mpaa_prefix()
-        if not certification_prefix:
-            return i['name']
-        return f"{certification_prefix}{i['name']}"
-
-
-class MediaItemInfoLabelItemRoutes:
-    certification = (('certification', None), MediaItemInfoLabelItemMethod.certification, 'mpaa')
-    trailer = (('video', None), 'path', 'trailer')
-    watchedcount = (('watchedcount', None), 'watched_episodes', 'playcount')
-    episodecount = (('airedcount', None), 'aired_episodes', 'episode')
-    playcount = (('playcount', None), 'plays', 'playcount')
 
 
 class MediaItemArtworkRoutes:
