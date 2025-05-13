@@ -33,7 +33,7 @@ class EpisodeItemArtworkRoutes:
 class Episode(MediaItem):
     infolabels_dbcitem_routes = (
         MediaItemInfoLabelItemRoutes.certification,
-        (('video', None), 'path', 'trailer'),
+        MediaItemInfoLabelItemRoutes.trailer,
         (('playcount', None), 'plays', 'playcount'),
     )
 

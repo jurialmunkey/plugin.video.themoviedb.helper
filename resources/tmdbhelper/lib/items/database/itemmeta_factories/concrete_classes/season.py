@@ -24,7 +24,7 @@ class SeasonItemArtworkRoutes:
 class Season(MediaItem):
     infolabels_dbcitem_routes = (
         MediaItemInfoLabelItemRoutes.certification,
-        (('video', None), 'path', 'trailer'),
+        MediaItemInfoLabelItemRoutes.trailer,
         (('watchedcount', None), 'watched_episodes', 'playcount'),
     )
 

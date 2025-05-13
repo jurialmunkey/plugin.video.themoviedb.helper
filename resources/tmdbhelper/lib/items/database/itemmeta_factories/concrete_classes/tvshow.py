@@ -4,7 +4,7 @@ from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia
 class Tvshow(MediaItem):
     infolabels_dbcitem_routes = (
         MediaItemInfoLabelItemRoutes.certification,
-        (('video', None), 'path', 'trailer'),
+        MediaItemInfoLabelItemRoutes.trailer,
         (('watchedcount', None), 'watched_episodes', 'playcount'),
         (('airedcount', None), 'aired_episodes', 'episode'),
     )

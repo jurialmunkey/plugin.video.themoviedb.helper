@@ -15,6 +15,7 @@ class MediaItemInfoLabelItemMethod:
 
 class MediaItemInfoLabelItemRoutes:
     certification = (('certification', None), MediaItemInfoLabelItemMethod.certification, 'mpaa')
+    trailer = (('video', None), 'path', 'trailer')
 
 
 class MediaItemArtworkRoutes:
@@ -61,7 +62,7 @@ class MediaItem(BaseItem):
 
     infolabels_dbcitem_routes = (
         MediaItemInfoLabelItemRoutes.certification,
-        (('video', None), 'path', 'trailer'),
+        MediaItemInfoLabelItemRoutes.trailer,
     )
 
     """
