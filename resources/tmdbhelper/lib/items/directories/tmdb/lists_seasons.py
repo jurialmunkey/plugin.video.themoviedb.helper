@@ -14,25 +14,16 @@ class ListSeasons(ContainerDirectory):
         items = []
 
         # Up Next
-        # if get_setting('seasons_upnext') and get_property('TraktIsAuth') == 'True':
-        #     upnext_item = self.tmdb_api.mapper.get_info(
-        #         info_item={'title': get_localized(32043)},
-        #         tmdb_type='season',
-        #         base_item=base_item,
-        #         tmdb_id=tmdb_id,
-        #         definition={
-        #             'info': 'trakt_upnext',
-        #             'tmdb_type': 'tv',
-        #             'tmdb_id': str(tmdb_id),
-        #             'hide_unaired': 'true'
-        #         }
-        #     )
-        #     upnext_item['art']['thumb'] = upnext_item['art']['poster'] = f'{ADDONPATH}/resources/icons/trakt/up-next.png'
-        #     upnext_item['infolabels']['season'] = -1
-        #     upnext_item['infoproperties']['specialseason'] = get_localized(32043)
-        #     upnext_item['infoproperties']['IsSpecial'] = 'true'
-        #     items.append(upnext_item)
+        if get_setting('seasons_upnext') and get_property('TraktIsAuth') == 'True':
+            sync = BaseViewFactory('upnextseason', 'tv', tmdb_id)
 
+            try:
+                if sync.data[0]['infoproperties']['totalepisodes']:
+                    items.append(sync.data[0])
+            except (KeyError, TypeError, AttributeError):
+                pass
+
+        # Anticipated
         if get_setting('seasons_anticipated'):
             sync = BaseViewFactory('anticipatedseason', 'tv', tmdb_id)
 

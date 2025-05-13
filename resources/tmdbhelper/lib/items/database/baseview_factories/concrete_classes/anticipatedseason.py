@@ -33,25 +33,24 @@ class AnticipatedSeasonMediaListMixin(FlatSeasonMediaListMixin):
 
 class AnticipatedSeasonMediaList(AnticipatedSeasonMediaListMixin, SeasonMediaList):
     table = 'season'
+    item_specialseason = get_localized(32206)
     cached_data_conditions_base = 'season.tvshow_id=? AND totalepisodes>0 ORDER BY season DESC LIMIT 1'
 
-    @staticmethod
-    def map_label(i):
-        return get_localized(32206)
+    def map_label(self, i):
+        return self.item_specialseason
 
     def map_item_infolabels(self, i):
         infolabels = super().map_item_infolabels(i)
-        infolabels['title'] = get_localized(32206)
+        infolabels['title'] = self.item_specialseason
         infolabels['episode'] = i['totalepisodes']
         infolabels['season'] = -1
         return infolabels
 
-    @staticmethod
-    def map_item_infoproperties(i):
+    def map_item_infoproperties(self, i):
         return {
             'totalepisodes': i['totalepisodes'],
             'unwatchedepisodes': i['totalepisodes'],
-            'specialseason': get_localized(32206),
+            'specialseason': self.item_specialseason,
             'IsSpecial': 'true'
         }
 
