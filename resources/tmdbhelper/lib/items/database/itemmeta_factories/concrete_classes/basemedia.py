@@ -1,7 +1,7 @@
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseclass import BaseItem
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseroutes import MediaItemInfoLabelItemRoutes
-from tmdbhelper.lib.addon.plugin import get_setting, get_mpaa_prefix
+from tmdbhelper.lib.addon.plugin import get_setting
 
 
 class MediaItemArtworkRoutes:
