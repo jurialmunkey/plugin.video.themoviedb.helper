@@ -132,7 +132,7 @@ class TMDb(TMDbAPI):
 
     @property
     def get_tmdb_id(self):
-        return self.tmdb_api.tmdb_database.get_tmdb_id
+        return self.tmdb_database.get_tmdb_id
 
     @cached_property
     def genres(self):
