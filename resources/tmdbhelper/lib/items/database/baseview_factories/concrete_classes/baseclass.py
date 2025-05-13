@@ -1,6 +1,7 @@
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.database.basedata import ItemDetailsDatabaseAccess
 from tmdbhelper.lib.addon.consts import DATALEVEL_MAX
+from jurialmunkey.locker import MutexPropLock
 
 
 class BaseList(ItemDetailsDatabaseAccess):
@@ -35,20 +36,26 @@ class BaseList(ItemDetailsDatabaseAccess):
 
     @cached_property
     def parent_item_data(self):
+        return self.get_parent_data(self.mediatype, self.season, self.episode)
+
+    def get_parent_data(self, mediatype, season=None, episode=None, cache_refresh=None):
         from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
-        try:
-            base_dbc = BaseItemFactory(self.mediatype)
-            base_dbc.mediatype = self.mediatype
-            base_dbc.tmdb_id = self.tmdb_id
-            base_dbc.tmdb_type = self.tmdb_type
-            base_dbc.season = self.season
-            base_dbc.episode = self.episode
-            base_dbc.common_apis = self.common_apis
-            base_dbc.connection = self.connection
-            base_dbc.cache = self.cache
-        except (TypeError, KeyError, IndexError, ValueError):
-            return
-        return base_dbc.data
+        lockname = '.'.join([f'{i}' for i in (self.tmdb_type, self.tmdb_id, season, episode) if i is not None])
+        with MutexPropLock(f'Database.ItemDetails.{lockname}.lockfile'):
+            try:
+                base_dbc = BaseItemFactory(mediatype)
+                base_dbc.mediatype = mediatype
+                base_dbc.tmdb_id = self.tmdb_id
+                base_dbc.tmdb_type = self.tmdb_type
+                base_dbc.season = season
+                base_dbc.episode = episode
+                base_dbc.cache_refresh = cache_refresh
+                base_dbc.common_apis = self.common_apis
+                base_dbc.connection = self.connection
+                base_dbc.cache = self.cache
+            except (TypeError, KeyError, IndexError, ValueError):
+                return
+            return base_dbc.data
 
     def get_unmapped_data(self):
         with self.connection.open():

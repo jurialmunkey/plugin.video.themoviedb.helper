@@ -1,12 +1,13 @@
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem
+from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseroutes import MediaItemInfoLabelItemRoutes
 
 
 class Tvshow(MediaItem):
     infolabels_dbcitem_routes = (
-        (('certification', None), 'name', 'mpaa'),
-        (('video', None), 'path', 'trailer'),
-        (('watchedcount', None), 'watched_episodes', 'playcount'),  # TODO: FIX FOR SEASONS AS NOT SYNCED AIRED COUNT
-        (('airedcount', None), 'aired_episodes', 'episode'),  # TODO: FIX FOR SEASONS AS NOT SYNCED AIRED COUNT
+        MediaItemInfoLabelItemRoutes.certification,
+        MediaItemInfoLabelItemRoutes.trailer,
+        MediaItemInfoLabelItemRoutes.watchedcount,
+        MediaItemInfoLabelItemRoutes.episodecount,
     )
 
     @property
@@ -28,8 +29,8 @@ class Tvshow(MediaItem):
 
     def get_infolabels_details(self):
         infolabels = super().get_infolabels_details()
-        infolabels['season'] = self.data[0]['totalseasons']
-        infolabels['episode'] = self.data[0]['totalepisodes']
+        infolabels['season'] = self.get_data_value('totalseasons')
+        infolabels['episode'] = self.get_data_value('totalepisodes')
         return infolabels
 
     def get_infolabels_special(self, infolabels):
@@ -42,9 +43,9 @@ class Tvshow(MediaItem):
     def get_infoproperties_special(self, infoproperties):
         infoproperties = self.get_infoproperties_custom(infoproperties)
         try:
-            infoproperties['totalseasons'] = self.data[0]['totalseasons']
-            infoproperties['totalepisodes'] = infoproperties['unwatchedepisodes'] = self.data[0]['totalepisodes']
-            infoproperties['next_episode_to_air_id'] = self.data[0]['next_episode_to_air_id']
+            infoproperties['totalseasons'] = self.get_data_value('totalseasons')
+            infoproperties['totalepisodes'] = infoproperties['unwatchedepisodes'] = self.get_data_value('totalepisodes')
+            infoproperties['next_episode_to_air_id'] = self.get_data_value('next_episode_to_air_id')
         except (TypeError, KeyError, IndexError):
             pass
         return infoproperties

@@ -200,6 +200,11 @@ msgctxt "#32039"
 msgid "Prefer fanart.tv artwork"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_seasons.py
+msgctxt "#32040"
+msgid "All seasons"
+msgstr ""
+
 msgctxt "#30026"
 msgid "French (Canada)"
 msgstr ""

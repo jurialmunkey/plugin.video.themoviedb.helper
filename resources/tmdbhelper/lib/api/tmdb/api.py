@@ -1,4 +1,4 @@
-from tmdbhelper.lib.addon.plugin import get_mpaa_prefix, get_language, get_setting
+from tmdbhelper.lib.addon.plugin import get_language, get_setting
 from tmdbhelper.lib.api.request import RequestAPI
 from tmdbhelper.lib.api.tmdb.mapping import ItemMapper
 from tmdbhelper.lib.api.api_keys.tmdb import API_KEY
@@ -20,7 +20,6 @@ class TMDbAPI(RequestAPI):
             self,
             api_key=None,
             language=get_language(),
-            mpaa_prefix=get_mpaa_prefix(),
             page_length=1):
         api_key = api_key or self.api_key
         api_url = self.api_url
@@ -31,7 +30,6 @@ class TMDbAPI(RequestAPI):
             req_api_url=api_url,
             req_api_key=f'api_key={api_key}')
         self.language = language
-        self.mpaa_prefix = mpaa_prefix
         self.page_length = max(get_setting('pagemulti_tmdb', 'int'), page_length)
         TMDb.api_key = api_key
 
@@ -81,7 +79,7 @@ class TMDbAPI(RequestAPI):
         try:
             return self._mapper
         except AttributeError:
-            self._mapper = ItemMapper(self.language, self.mpaa_prefix, self.genres)
+            self._mapper = ItemMapper(self.language, self.genres)
             return self._mapper
 
     @staticmethod
@@ -131,6 +129,10 @@ class TMDb(TMDbAPI):
         tmdb_database = TMDbDatabase()
         tmdb_database.tmdb_api = self
         return tmdb_database
+
+    @property
+    def get_tmdb_id(self):
+        return self.tmdb_api.tmdb_database.get_tmdb_id
 
     @cached_property
     def genres(self):
