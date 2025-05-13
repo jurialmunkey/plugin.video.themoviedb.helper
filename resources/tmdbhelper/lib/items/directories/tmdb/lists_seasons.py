@@ -50,10 +50,9 @@ class ListSeasons(ContainerDirectory):
                 base_item=base_item,
                 tmdb_id=tmdb_id,
                 definition={
-                    'info': 'flatseasons',
+                    'info': 'anticipated_episodes',
                     'tmdb_type': 'tv',
                     'tmdb_id': str(tmdb_id),
-                    'only_unaired': 'true'
                 }
             )
             unaired_item['art']['thumb'] = unaired_item['art']['poster'] = f'{ADDONPATH}/resources/icons/themoviedb/episodes.png'
@@ -85,6 +84,17 @@ class ListFlatSeasons(ContainerDirectory):
 
     def get_items(self, tmdb_id, limit=None, **kwargs):
         sync = BaseViewFactory('flatseasons', 'tv', tmdb_id, filters=self.filters, limit=limit)
+        self.kodi_db = self.get_kodi_database('tv')
+        self.container_content = convert_type('episode', 'container')
+        self.plugin_category = get_localized(32040)
+        return sync.data
+
+
+class ListAnticipatedEpisodes(ContainerDirectory):
+    is_cacheonly = False
+
+    def get_items(self, tmdb_id, limit=None, **kwargs):
+        sync = BaseViewFactory('anticipatedepisodes', 'tv', tmdb_id, filters=self.filters, limit=limit)
         self.kodi_db = self.get_kodi_database('tv')
         self.container_content = convert_type('episode', 'container')
         self.plugin_category = get_localized(32040)

@@ -40,7 +40,7 @@ class FlatSeasonMediaList(MediaList):
         if not self.parent_season_media_list:
             return []
         return [
-            self.get_parent_data('season', season['infolabels']['season'])
+            self.get_parent_data('season', season['infolabels']['season'], cache_refresh='basic')
             for season in self.parent_season_media_list
             if season and 'infolabels' in season and season['infolabels'].get('season')
         ]

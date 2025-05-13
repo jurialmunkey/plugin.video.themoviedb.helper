@@ -616,6 +616,9 @@ ROUTE_TMDBID = {
     'flatseasons': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_seasons',
         'import_attr': 'ListFlatSeasons'}},
+    'anticipated_episodes': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_seasons',
+        'import_attr': 'ListAnticipatedEpisodes'}},
     'episodes': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_seasons',
         'import_attr': 'ListEpisodes'}},

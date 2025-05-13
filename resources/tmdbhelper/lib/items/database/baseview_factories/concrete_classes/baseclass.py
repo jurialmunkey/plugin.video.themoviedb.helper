@@ -37,7 +37,7 @@ class BaseList(ItemDetailsDatabaseAccess):
     def parent_item_data(self):
         return self.get_parent_data(self.mediatype, self.season, self.episode)
 
-    def get_parent_data(self, mediatype, season=None, episode=None):
+    def get_parent_data(self, mediatype, season=None, episode=None, cache_refresh=None):
         from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
         try:
             base_dbc = BaseItemFactory(mediatype)
@@ -46,6 +46,7 @@ class BaseList(ItemDetailsDatabaseAccess):
             base_dbc.tmdb_type = self.tmdb_type
             base_dbc.season = season
             base_dbc.episode = episode
+            base_dbc.cache_refresh = cache_refresh
             base_dbc.common_apis = self.common_apis
             base_dbc.connection = self.connection
             base_dbc.cache = self.cache
