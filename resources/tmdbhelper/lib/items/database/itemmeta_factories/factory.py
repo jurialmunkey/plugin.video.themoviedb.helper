@@ -44,5 +44,6 @@ FACTORY_ROUTES = {
 
 def ItemMetaFactory(parent_db_cache, data):
     class_obj = FACTORY_ROUTES[parent_db_cache.mediatype]()(parent_db_cache)
+    class_obj.mediatype = parent_db_cache.mediatype
     class_obj.data = data
     return class_obj

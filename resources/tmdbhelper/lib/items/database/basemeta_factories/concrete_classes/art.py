@@ -38,6 +38,9 @@ class ArtThumbs(ArtType):
     def image_path_func(self, v):
         return self.common_apis.tmdb_imagepath.get_imagepath_thumbs(v)
 
+    def get_cached_data(self):
+        return self.get_cached_data_by_null()
+
 
 class ArtFanart(ArtType):
     conditions = 'parent_id=? AND type=? ORDER BY rating DESC LIMIT 1'  # WHERE conditions
@@ -53,21 +56,17 @@ class ArtFanart(ArtType):
         return self.get_cached_data_by_null()
 
 
-class ArtExtraFanart(ArtType):
+class ArtExtraFanart(ArtFanart):
     conditions = 'parent_id=? AND type=? ORDER BY rating DESC LIMIT 10 OFFSET 1'  # WHERE conditions
-
-    @property
-    def values(self):  # WHERE conditions values for ?
-        return (self.item_id, 'backdrops', )
-
-    def image_path_func(self, v):
-        return self.common_apis.tmdb_imagepath.get_imagepath_fanart(v)
-
-    def get_cached_data(self):
-        return self.get_cached_data_by_null()
 
 
 class ArtLandscape(ArtFanart):
+    conditions = 'parent_id=? AND (type=? OR type=?) ORDER BY rating DESC LIMIT 1'  # WHERE conditions
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, 'backdrops', 'stills')
+
     def get_cached_data(self):
         return self.get_cached_data_by_language() or self.get_cached_data_by_english()
 

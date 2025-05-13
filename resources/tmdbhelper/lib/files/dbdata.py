@@ -16,7 +16,7 @@ class DatabaseCore:
     _db_timeout = 60.0
     _db_read_timeout = 1.0
     database_version = 1
-    table_version = {}
+    database_changes = {}
 
     def __init__(self, folder=None, filename=None):
         '''Initialize our caching class'''
@@ -157,13 +157,16 @@ class DatabaseCore:
         cursor = connection.cursor()
         this_database_version = cursor.execute("PRAGMA user_version").fetchone()[0]
 
-        # OLD DATABASE SCHEME DROP ALL TABLES AND RESTART
+        # OLD DATABASE SCHEME: APPLY MODIFICATIONS
         if this_database_version and this_database_version < self.database_version:
-            import xbmcvfs
-            cursor.close()
-            connection.close()
-            xbmcvfs.delete(self._db_file)
-            return self.create_database()
+            for version, changes in self.database_changes.items():
+                if version <= this_database_version:
+                    continue
+                for query in changes:
+                    try:
+                        cursor.execute(query)
+                    except Exception as error:
+                        self.kodi_log(f'CACHE: Exception while initializing _database: {error}\n{self._sc_name} - {query}', 1)
 
         # CREATE TABLES IF NOT EXISTS
         for table, columns in self.database_tables.items():
@@ -217,10 +220,10 @@ class DatabaseStatements:
 
     @staticmethod
     def delete_keys(table, keys, conditions='item_type=?'):
-        return 'UPDATE {table} SET {keys} WHERE {conditions}'.format(
+        return 'UPDATE {table} SET {keys} {conditions}'.format(
             table=table,
             keys=', '.join([f'{k}=NULL' for k in keys]),
-            conditions=conditions)
+            conditions=f'WHERE {conditions}' if conditions else '')
 
     @staticmethod
     def delete_item(table, conditions='id=?'):
@@ -323,8 +326,10 @@ class DatabaseMethod:
 
     def del_column_values(self, table=DEFAULT_TABLE, keys=(), item_type=None, connection=None):
         cursor = self.execute_sql(
-            DatabaseStatements.delete_keys(table, keys),
-            data=(item_type, ),
+            DatabaseStatements.delete_keys(
+                table, keys,
+                conditions=None if item_type is None else 'item_type=?'),
+            data=None if item_type is None else (item_type, ),
             connection=connection)
         if not connection and cursor:
             cursor.close()

@@ -2,7 +2,7 @@ from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp
 from tmdbhelper.lib.api.trakt.sync.activity import SyncLastActivities
 from tmdbhelper.lib.files.locker import mutexlock
-from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY, SHORTER_EXPIRY
+from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY, HALFDAY_EXPIRY
 
 
 def timerlock(func):
@@ -239,7 +239,7 @@ class SyncAllNextEpisodes(DataTypeEpisodes):
     keys = ('upnext_episode_id', )
     last_activities_key = 'watched_at'
     method = 'all_next_episodes'
-    expiry_time = SHORTER_EXPIRY
+    expiry_time = HALFDAY_EXPIRY
 
     def get_all_next_episodes(self, response, tmdb_id):
         # For list of episodes we need to build them by comparing against the reset_at date
@@ -300,7 +300,7 @@ class SyncNextEpisodes(SyncAllNextEpisodes):
     keys = ('next_episode_id', )
     last_activities_key = 'watched_at'
     method = 'nextup'
-    expiry_time = SHORTER_EXPIRY
+    expiry_time = HALFDAY_EXPIRY
 
     def get_next_episode(self, tmdb_id, trakt_id):
         response = self.get_next_episodes_response(trakt_id)

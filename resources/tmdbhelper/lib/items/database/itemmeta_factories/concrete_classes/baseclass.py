@@ -55,7 +55,9 @@ class BaseItem:
         return infolabels
 
     def get_infolabels_details(self):
-        return {k: self.data[0][k] for k in self.data[0].keys() if k in self.parent_db_cache.allowlist_infolabel_keys}
+        infolabels = {'mediatype': self.mediatype}
+        infolabels.update({k: self.data[0][k] for k in self.data[0].keys() if k in self.parent_db_cache.allowlist_infolabel_keys})
+        return infolabels
 
     def get_infoproperties_dbclist(self, infoproperties):
         for d in self.infoproperties_dbclist_routes:
@@ -108,7 +110,8 @@ class BaseItem:
                 if not subtype:
                     continue
 
-                art[f'{subtype}.{this_dkey}'] = url
+                subtype_dkey = f'{subtype}.{this_dkey}'
+                art[subtype_dkey] = art.get(subtype_dkey) or url
 
         return art
 
@@ -149,6 +152,7 @@ class BaseItem:
     @cached_property
     def item(self):
         return {
+            'mediatype': self.mediatype,
             'infolabels': self.infolabels,
             'infoproperties': self.infoproperties,
             'cast': self.cast,

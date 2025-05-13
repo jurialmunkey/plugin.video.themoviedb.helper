@@ -31,8 +31,8 @@ class DialogProgressSyncBG:
 
     @threaded_cached_property
     def dialog_progress_bg(self):
-        # if not self.dialog_progress_bg_enabled:
-        #     return
+        if not self.dialog_progress_bg_enabled:
+            return
         from xbmcgui import DialogProgressBG
         return DialogProgressBG()
 

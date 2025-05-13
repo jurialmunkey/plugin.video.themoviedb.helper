@@ -7,9 +7,12 @@ class Season(Tvshow):
     table = 'season'
     cached_data_check_key = 'tvshow_id'
     expiry_time = SHORTER_EXPIRY  # Refresh weekly in case of new episodes
+    ftv_type = None
 
     @property
     def online_data_kwgs(self):
+        if self.cache_refresh == 'basic':
+            return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow_simple}
         return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow}
 
     @property
@@ -22,6 +25,27 @@ class Season(Tvshow):
         if int(self.season) < 0:
             return False
         return True
+
+    @property
+    def online_data_cond(self):
+        if not self.data_cond:
+            return False
+        if not self.parent_item_data:
+            return False
+        return True
+
+    @cached_property
+    def parent_item_data(self):
+        try:
+            base_dbc = Tvshow()
+            base_dbc.mediatype = 'tvshow'
+            base_dbc.tmdb_type = 'tv'
+            base_dbc.tmdb_id = self.tmdb_id
+            base_dbc.common_apis = self.common_apis
+            base_dbc.cache = self.cache
+        except (TypeError, KeyError, IndexError, ValueError):
+            return
+        return base_dbc.data
 
     @property
     def item_id(self):
@@ -37,25 +61,28 @@ class Season(Tvshow):
 
     @property
     def cached_data_table(self):
+        return self.get_cached_data_table()
+
+    @property
+    def cached_data_keys(self):
+        return self.get_cached_data_keys()
+
+    def get_cached_data_table(self):
         """ FROM """
         return (
             f'baseitem LEFT JOIN {self.table} ON {self.table}.id = baseitem.id'
             ' LEFT JOIN tvshow ON tvshow.id = season.tvshow_id'
         )
 
-    @property
-    def cached_data_keys(self):
+    def get_cached_data_keys(self):
         """ SELECT """
-        additional_keys = ['tvshow.title AS tvshowtitle', 'tvshow.tagline as tagline']
-        return tuple([f'{self.table}.{k}' for k in self.keys] + additional_keys)
-
-    def db_baseitem_cache_get_parent_data(self):
-        base_dbc = Tvshow()
-        base_dbc.common_apis = self.common_apis
-        base_dbc.connection = self.connection
-        base_dbc.mediatype = 'tvshow'
-        base_dbc.tmdb_id = self.tmdb_id
-        return base_dbc.data
+        deniedlist_keys = ('plot', )
+        additional_keys = [
+            'tvshow.title AS tvshowtitle',
+            'tvshow.tagline as tagline',
+            'ifnull(season.plot, tvshow.plot) as plot',
+        ]
+        return tuple([f'{self.table}.{k}' for k in self.keys if k not in deniedlist_keys] + additional_keys)
 
     @cached_property
     def db_table_caches(self):

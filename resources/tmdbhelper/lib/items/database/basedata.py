@@ -38,6 +38,9 @@ class ItemDetailsDatabaseAccess(DatabaseAccess):
 
     @cached_property
     def keys(self):
+        return self.get_keys()
+
+    def get_keys(self):
         return [k for k in getattr(self.cache, f'{self.table}_columns').keys()]
 
     @staticmethod

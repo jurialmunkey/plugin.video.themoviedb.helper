@@ -1,5 +1,5 @@
-from tmdbhelper.lib.items.container import ContainerDirectory, use_item_cache
-from tmdbhelper.lib.addon.plugin import convert_type, get_localized, get_setting
+from tmdbhelper.lib.items.container import ContainerDefaultCacheDirectory, use_item_cache
+from tmdbhelper.lib.addon.plugin import convert_type, get_localized, get_setting, get_condvisibility
 from tmdbhelper.lib.items.filters import is_excluded
 from jurialmunkey.parser import try_int
 
@@ -8,8 +8,7 @@ ITEMS_LENGTH = 20
 PAGES_LENGTH = get_setting('pagemulti_tmdb', 'int') or 1
 
 
-class ListStandard(ContainerDirectory):
-    default_cacheonly = True  # TMDb lists can rely on data from list directly TODO: Decide if on or off by default
+class ListStandard(ContainerDefaultCacheDirectory):
     item_list_request_url = ''  # PATH to request
     item_list_results_key = 'results'  # KEY in RESPONSE from PATH holding ITEMS
     item_list_plugin_name = '{localized} {plural}'

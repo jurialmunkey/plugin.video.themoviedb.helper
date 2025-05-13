@@ -35,7 +35,6 @@ class ItemDetailsList(ItemDetailsDatabaseAccess):
         return [tuple([self.get_configure_mapped_data_list(i, k) for k in self.keys]) for i in data[self.table]]
 
     def try_cached_data(self, online_data_mapped):
-        # TODO: Better queuing function
         args = (self.table, self.keys, self.configure_mapped_data_list(online_data_mapped))
         return (self.set_cached_list_values, args, {})
 

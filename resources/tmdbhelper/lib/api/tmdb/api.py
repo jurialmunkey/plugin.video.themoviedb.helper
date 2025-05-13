@@ -40,6 +40,9 @@ class TMDbAPI(RequestAPI):
         req_strip_add = [
             (self.append_to_response, 'standard'),
             (self.append_to_response_person, 'person'),
+            (self.append_to_response_tvshow, 'tvshow'),
+            (self.append_to_response_tvshow_simple, 'tvshow_simple'),
+            (self.append_to_response_movies_simple, 'movies_simple'),
             (self.req_language, f'{self.iso_language}_en')
         ]
         try:
@@ -110,13 +113,16 @@ class TMDbAPI(RequestAPI):
 
     def get_response_json(self, *args, postdata=None, headers=None, method=None, **kwargs):
         kwargs = self.configure_request_kwargs(kwargs)
-        return self.get_api_request_json(self.get_request_url(*args, **kwargs), postdata=postdata, headers=headers, method=method)
+        requrl = self.get_request_url(*args, **kwargs)
+        return self.get_api_request_json(requrl, postdata=postdata, headers=headers, method=method)
 
 
 class TMDb(TMDbAPI):
-    append_to_response = 'credits,images,release_dates,content_ratings,external_ids,keywords,reviews,videos,watch/providers'
-    append_to_response_tvshow = 'aggregate_credits,images,release_dates,content_ratings,external_ids,keywords,reviews,videos,watch/providers'
+    append_to_response = 'credits,images,release_dates,external_ids,keywords,reviews,videos,watch/providers'
+    append_to_response_tvshow = 'aggregate_credits,images,content_ratings,external_ids,keywords,reviews,videos,watch/providers'
     append_to_response_person = 'images,external_ids,movie_credits,tv_credits'
+    append_to_response_movies_simple = 'images,external_ids,release_dates'
+    append_to_response_tvshow_simple = 'images,external_ids,content_ratings'
     api_name = 'TMDb'
 
     @property

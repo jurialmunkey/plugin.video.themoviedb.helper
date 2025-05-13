@@ -4,25 +4,38 @@ from tmdbhelper.lib.files.ftools import cached_property
 
 class Studio(ItemDetailsList):
     table = 'studio'
+    cached_data_parent_table = 'company'
     keys = ('tmdb_id', 'parent_id')
-    cached_data_keys = ('company.name', 'company.tmdb_id', 'company.logo', 'company.country')
+
+    @property
+    def cached_data_keys(self):
+        cached_data_keys = ('name', 'tmdb_id', 'logo', 'country')
+        return tuple((f'{self.cached_data_parent_table}.{k}' for k in cached_data_keys))
 
     def image_path_func(self, v):
         return self.common_apis.tmdb_imagepath.get_imagepath_thumbs(v)
 
     @property
     def cached_data_table(self):
-        return f'{self.table} INNER JOIN company ON company.tmdb_id = {self.table}.tmdb_id'
+        return (
+            f'{self.table} INNER JOIN {self.cached_data_parent_table} '
+            f'ON {self.cached_data_parent_table}.tmdb_id = {self.table}.tmdb_id'
+        )
+
+
+class Network(Studio):
+    table = 'network'
+    cached_data_parent_table = 'broadcaster'
 
 
 class Certification(ItemDetailsList):
     table = 'certification'
     keys = ('name', 'iso_country', 'iso_language', 'release_date', 'release_type', 'parent_id', )
-    conditions = 'parent_id=? AND iso_country=? ORDER BY release_date ASC NULLS LAST LIMIT 1'  # WHERE conditions
+    conditions = 'parent_id=? AND iso_country=? AND name IS NOT NULL AND name != "" ORDER BY IFNULL(release_date, "9999-99-99") ASC LIMIT 1'  # WHERE conditions
 
     @property
     def values(self):  # WHERE conditions values for ?
-        return (self.item_id, self.common_apis.tmdb_api.iso_country)
+        return (self.parent_id, self.common_apis.tmdb_api.iso_country)
 
 
 class Video(ItemDetailsList):
@@ -32,7 +45,7 @@ class Video(ItemDetailsList):
 
     @property
     def values(self):  # WHERE conditions values for ?
-        return (self.item_id, 'Trailer', self.common_apis.tmdb_api.iso_language)
+        return (self.parent_id, 'Trailer', self.common_apis.tmdb_api.iso_language)
 
 
 class Country(ItemDetailsList):
@@ -86,7 +99,7 @@ class Provider(ItemDetailsList):
 
     @property
     def conditions(self):
-        return f'{self.provider_allowlist}parent_id=? AND iso_country=? ORDER BY display_priority ASC NULLS LAST'
+        return f'{self.provider_allowlist}parent_id=? AND iso_country=? ORDER BY IFNULL(display_priority, 9999) ASC'
 
     @property
     def values(self):  # WHERE conditions values for ?
@@ -105,6 +118,10 @@ class Company(ItemDetailsList):
         return self.common_apis.tmdb_imagepath.get_imagepath_thumbs(v)
 
 
+class Broadcaster(Company):
+    table = 'broadcaster'
+
+
 class Base(ItemDetailsList):
     table = 'baseitem'
     keys = ('id', 'mediatype', 'expiry', )
@@ -117,7 +134,7 @@ class Movie(ItemDetailsList):
 
 class Tvshow(ItemDetailsList):
     table = 'tvshow'
-    keys = ('id', 'tmdb_id', 'year', 'premiered', 'plot', 'title', 'originaltitle', 'rating', 'votes', 'popularity')
+    keys = ('id', 'tmdb_id', 'year', 'premiered', 'plot', 'title', 'originaltitle', 'rating', 'votes', 'popularity', 'totalseasons', 'totalepisodes')
 
 
 class Season(ItemDetailsList):

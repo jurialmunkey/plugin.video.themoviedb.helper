@@ -58,6 +58,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         }
 
         self.sort_methods = []  # List of kwargs dictionaries [{'sortMethod': SORT_METHOD_UNSORTED}]
+        self.property_params = {}
 
     @cached_property
     def is_widget(self):
@@ -93,7 +94,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         from tmdbhelper.lib.items.trakt import TraktPlayData
         return TraktPlayData(
             watchedindicators=get_setting('trakt_watchedindicators'),
-            pauseplayprogress=get_setting('trakt_playprogress'))
+            pauseplayprogress=get_setting('trakt_watchedindicators'))
 
     @cached_property
     def page_length(self):
@@ -167,8 +168,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
             li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
             li.set_thumb_to_art(self.thumb_override == 2) if self.thumb_override else None  # Special override for calendars to prevent thumb spoilers
             li.set_params_reroute(self.params.get('extended'), self.is_cacheonly)  # Reroute details to proper end point
-            li.set_params_to_info(self.plugin_category)  # Set path params to properties for use in skins
-            li.infoproperties.update(self.property_params or {})
+            li.set_params_to_info(widget=self.plugin_category, **self.property_params)  # Set path params to properties for use in skins
             if self.thumb_override:
                 li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb to prevent Kodi overwriting
             if li.next_page:
@@ -238,7 +238,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
             self.kodi_db = self.get_kodi_database('tv')
 
     def set_params_to_container(self):
-        params = {f'Param.{k}': f'{v}' for k, v in self.params.items() if k and v}
+        params = {f'param.{k}': f'{v}' for k, v in self.params.items() if k and v}
         if self.handle == -1:
             return params
         from xbmcplugin import setProperty
@@ -292,7 +292,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
                 return
             if not build_items:
                 return items
-            self.property_params = self.set_params_to_container()
+            self.property_params.update(self.set_params_to_container())
             self.plugin_category = self.params.get('plugin_category') or self.plugin_category
             with TimerList(self.timer_lists, '--sync', log_threshold=0.05, logging=self.log_timers):
                 self.trakt_playdata.pre_sync_join()
@@ -315,14 +315,25 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
 
 
 class ContainerDirectory(ContainerDirectoryCommon):
+
+    @cached_property
+    def lidc_cache_refresh(self):
+        if self.is_cacheonly:
+            return 'never'
+        if self.is_detailed:
+            return None
+        return 'basic'
+
     @cached_property
     def lidc(self):
         from tmdbhelper.lib.items.database.listitem import ListItemDetails
         lidc = ListItemDetails(self)
         lidc.parent_params = self.parent_params
         lidc.pagination = self.pagination
-        lidc.cache_refresh = 'never' if self.is_cacheonly else None
-        lidc.extendedinfo = True if self.is_detailed else False
+        lidc.cache_refresh = self.lidc_cache_refresh
+        lidc.extendedinfo = self.is_detailed
+        lidc.timer_lists = self.timer_lists
+        lidc.log_timers = self.log_timers
         return lidc
 
     def build_detailed_item(self, li):
@@ -334,3 +345,15 @@ class ContainerDirectory(ContainerDirectoryCommon):
         with TimerList(self.timer_lists, '--build', log_threshold=0.05, logging=self.log_timers):
             items = self.lidc.configure_listitems_threaded(items)
             return [i for i in (self.build_detailed_item(li) for li in items if li) if i]
+
+
+class ContainerDefaultCacheDirectory(ContainerDirectory):
+    @property
+    def default_cacheonly(self):
+        if get_condvisibility('Skin.HasSetting(TMDbHelper.DisableDefaultCacheOnly)'):
+            return False
+        return True
+
+
+class ContainerCacheOnlyDirectory(ContainerDirectory):
+    default_cacheonly = True

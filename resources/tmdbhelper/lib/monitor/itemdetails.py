@@ -4,7 +4,6 @@ from tmdbhelper.lib.monitor.images import ImageManipulations
 from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.api.mapping import get_empty_item
 from collections import namedtuple
-from copy import deepcopy
 
 
 CV_USE_MULTI_TYPE = ""\

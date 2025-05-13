@@ -12,103 +12,73 @@ REGEX_WINPROP_FINDALL = r'\$WINPROP\[(.*?)\]'  # $WINPROP[key] = Window(10000).g
 REGEX_WINPROP_SUB = r'\$WINPROP\[{}\]'
 
 
-def test_func():
-    import xbmcgui
-    from tmdbhelper.lib.api.tmdb.api import TMDb
-    from tmdbhelper.lib.api.trakt.api import TraktAPI
-    from tmdbhelper.lib.files.futils import dumps_to_file
-    from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
-    from tmdbhelper.lib.addon.plugin import get_version
-    head = ''
-    data = ''
+def test_func(test_func, **kwargs):
 
-    # data = get_version()
+    def finalise(head='', data=''):
+        import xbmcgui
+        from tmdbhelper.lib.files.futils import dumps_to_file
+        xbmcgui.Dialog().textviewer(f'{head}', f'{data}')
+        dumps_to_file(data, 'log_data', f'test_func_{test_func}.json', join_addon_data=True)
 
-    # from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
-    # iddb = ItemDetailsDatabase()
-    # iddb.clean_expired_items()
+    def test_func_response(path, **kwargs):
+        from tmdbhelper.lib.api.tmdb.api import TMDb
+        head = path
+        data = TMDb().get_response_json(path, **kwargs)
+        return finalise(head, data)
 
-    tmdb_api = TMDb()
-    # data = tmdb_api.tmdb_database.get_nextaired(100088)
-    # data = tmdb_api.tmdb_database.get_tmdb_id('movie', imdb_id='tt0078748')
-    # data = tmdb_api.tmdb_database.get_tmdb_id('tv', tvdb_id=81189)
-    # data = tmdb_api.tmdb_database.get_tmdb_id('tv', imdb_id='tt0903747')
-    # data = tmdb_api.tmdb_database.get_tmdb_id('movie', title='aLIEN', year=1979)
-    # data = tmdb_api.tmdb_database.get_tmdb_id('tv', title='Breaking Bad', year=2008)
-    # data = tmdb_api.tmdb_database.get_tmdb_id('collection', title='Alien Collection')
-    # data = tmdb_api.tmdb_database.get_tmdb_id('company', title='Netflix')
-    # data = tmdb_api.tmdb_database.get_tmdb_id('keyword', title='aliens')
-    # data = tmdb_api.tmdb_database.get_tmdb_id('person', title='danny devito')
-    # data = tmdb_api.tmdb_database.get_tmdb_id_from_query('person', 'danny dev', use_details=True)
-    # data = tmdb_api.tmdb_database.get_watch_providers('tv', 'AU')
-    # data = tmdb_api.tmdb_database.get_certification('tv', 'AU')
-    # data = tmdb_api.tmdb_database.get_tmdb_id(query='the Terminator', use_multisearch=True)
-    # data = tmdb_api.tmdb_database.get_watch_providers('movie', 'AU')
-    # data = tmdb_api.tmdb_database.get_keywords()
+    def test_func_fanarttv(ftv_type, ftv_id, **kwargs):
+        from tmdbhelper.lib.api.fanarttv.api import FanartTV
+        data = FanartTV().get_request(
+            ftv_type, ftv_id,
+            cache_force=7,  # Force dummy request caching to prevent rerequesting 404s
+            cache_fallback={'dummy': None},
+            cache_days=30)
+        head = f'{ftv_type} {ftv_id}'
+        return finalise(head, data)
 
-    data = tmdb_api.get_response_json('find', 'tt20603288', external_source='imdb_id')
+    def test_func_baseitem_factory(mediatype, tmdb_id, season=None, episode=None, cache_refresh=None, del_database_init=False, attr='data'):
+        from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
+        sync = BaseItemFactory(mediatype)
+        sync.tmdb_id = int(tmdb_id)
+        sync.season = int(season) if season is not None else None
+        sync.episode = int(episode) if episode is not None else None
+        sync.cache_refresh = cache_refresh
+        sync.cache.del_database_init() if del_database_init else None
+        data = getattr(sync, attr)
+        head = f'{mediatype} {tmdb_id} {season} {episode}'
+        return finalise(head, data)
 
-    # trakt_api = TraktAPI()
-    # path = trakt_api.get_request_url('users/hidden/dropped')
-    # data = trakt_api.get_api_request(path, headers=trakt_api.headers).json()
+    def test_func_baseview_factory(import_attr, tmdb_type, tmdb_id, season=None, episode=None, filters=None, limit=None):
+        from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
+        sync = BaseViewFactory(import_attr, tmdb_type, int(tmdb_id), season, episode, filters, limit)
+        data = sync.data
+        head = f'{(import_attr, tmdb_type, int(tmdb_id))}'
+        return finalise(head, data)
 
-    # sync = BaseItemFactory('season')
-    # sync.tmdb_id = 79744
-    # sync.season = 2
-    # sync.cache_refresh = 'force'
-    # sync.cache.del_database_init()
-    # data = sync.data
+    def test_func_tmdb_database(import_attr, **kwargs):
+        from tmdbhelper.lib.api.tmdb.api import TMDb
+        tmdb_database = TMDb().tmdb_database
+        data = getattr(tmdb_database, import_attr)(**kwargs)
+        head = import_attr
+        return finalise(head, data)
 
-    # sync = BaseItemFactory('episode')
-    # sync.tmdb_id = 1399
-    # sync.season = 2
-    # sync.episode = 3
+    def test_func_get_next_episodes(tmdb_id, season, episode, player=None, **kwargs):
+        import xbmcgui
+        from tmdbhelper.lib.player.details import get_next_episodes
+        data = get_next_episodes(tmdb_id, season, episode, player)
+        head = f'{(tmdb_id, season, episode)}'
+        xbmcgui.Dialog().select(head, data, useDetails=True)
 
-    # sync = BaseItemFactory('video')
-    # sync.tmdb_id = 17419
+    routes = {
+        'response': test_func_response,
+        'baseitem_factory': test_func_baseitem_factory,
+        'baseview_factory': test_func_baseview_factory,
+        'tmdb_database': test_func_tmdb_database,
+        'fanarttv': test_func_fanarttv,
+        'get_next_episodes': test_func_get_next_episodes,
+    }
 
-    # sync = BaseItemFactory('movie')
-    # sync.tmdb_id = 348
-    # data = sync.data['infoproperties']['set.tmdb_id']
-    # head = sync.item_id
-
-    # from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
-    # sync = BaseViewFactory('episodes', 'tv', 1396, season=2)
-    # data = sync.data
-
-    # sync.cache_refresh = 'never'
-    # data = sync.return_basemeta_db('art_poster').item_id
-
-    # from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
-    # sync = BaseViewFactory('crewedmovies', 'person', 138)
-    # data = sync.data
-
-    # sync.extendedinfo = True
-
-    # head = sync.item_id
-
-    # tmdb = TMDb()
-    # data = tmdb.genres
-    # data = tmdb.get_response_json('configuration')
-    # data = tmdb.get_response_json('tv', 249042, append_to_response=tmdb.append_to_response)
-
-    # from tmdbhelper.lib.api.kodi.rpc import get_jsonrpc
-    # method = 'VideoLibrary.GetMovies'
-    # params = {
-    #     'properties': [
-    #         'title', 'year'
-    #     ],
-    #     'filter': {
-    #         'and': [
-    #             {'field': 'title', 'operator': 'is', 'value': 'Alien'},
-    #             {'field': 'year', 'operator': 'is', 'value': '1979'}
-    #         ]
-    #     }
-    # }
-    # data = get_jsonrpc(method, params)
-
-    xbmcgui.Dialog().textviewer(f'{head}', f'{data}')
-    dumps_to_file(data, 'log_data', 'test_func.json', join_addon_data=True)
+    return routes[test_func](**kwargs)
 
 
 class Script(object):
@@ -130,7 +100,7 @@ class Script(object):
 
     routing_table = {
         'test_func':
-            lambda **kwargs: test_func(),
+            lambda **kwargs: test_func(**kwargs),
 
         # Node Maker
         'make_node':
@@ -163,14 +133,14 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'sync_trakt')(**kwargs),
         'sort_list':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'sort_list')(**kwargs),
-        'refresh_trakt_sync':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'refresh_trakt_sync')(**kwargs),
+        'invalidate_trakt_sync':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'invalidate_trakt_sync')(**kwargs),
         'get_trakt_stats':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'get_stats')(**kwargs),
         'authenticate_trakt':
-            lambda **kwargs: importmodule('tmdbhelper.lib.api.trakt.api', 'TraktAPI')(force=True),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'authenticate_trakt')(**kwargs),
         'revoke_trakt':
-            lambda **kwargs: importmodule('tmdbhelper.lib.api.trakt.api', 'TraktAPI')().logout(),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'revoke_trakt')(**kwargs),
 
         # Image Functions
         'blur_image':

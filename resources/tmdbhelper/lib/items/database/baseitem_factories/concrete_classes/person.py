@@ -7,7 +7,7 @@ class Person(BaseItem):
     ftv_id = None
 
     @staticmethod
-    def unaired_expiry(*args, **kwargs):
+    def set_unaired_expiry(*args, **kwargs):
         return  # People dont have premiered dates so we dont modify expiry time
 
     @property

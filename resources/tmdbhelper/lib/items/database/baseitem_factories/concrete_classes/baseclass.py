@@ -5,9 +5,8 @@ from tmdbhelper.lib.items.database.basedata import ItemDetailsDatabaseAccess
 from tmdbhelper.lib.items.database.basemeta_factories.factory import BaseMetaFactory
 from tmdbhelper.lib.items.database.itemmeta_factories.factory import ItemMetaFactory
 from infotagger.listitem import _ListItemInfoTagVideo
-from tmdbhelper.lib.files.dbfunc import database_connection
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_days_to_air
-from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY, SHORTER_EXPIRY, DAY_IN_SECONDS
+from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY, SHORTER_EXPIRY, DAY_IN_SECONDS, DATALEVEL_OFF, DATALEVEL_MIN, DATALEVEL_MAX
 
 
 class BaseItem(ItemDetailsDatabaseAccess):
@@ -39,12 +38,10 @@ class BaseItem(ItemDetailsDatabaseAccess):
         return item_mapper
 
     @property
-    def has_fanart_tv(self):
-        if not self.common_apis.ftv_api:
-            return False
-        if not self.ftv_id:
-            return False
-        return True
+    def datalevel(self):
+        if self.cache_refresh == 'basic':
+            return DATALEVEL_MIN
+        return DATALEVEL_MAX
 
     @property
     def online_data_func(self):  # The function to get data e.g. get_response_json
@@ -56,6 +53,8 @@ class BaseItem(ItemDetailsDatabaseAccess):
 
     @property
     def online_data_kwgs(self):
+        if self.cache_refresh == 'basic':
+            return {'append_to_response': self.common_apis.tmdb_api.append_to_response_movies_simple}
         return {'append_to_response': self.common_apis.tmdb_api.append_to_response}
 
     @cached_property
@@ -80,17 +79,16 @@ class BaseItem(ItemDetailsDatabaseAccess):
     @property
     def cached_data_conditions(self):
         """ WHERE """
-        return 'baseitem.id=? AND baseitem.expiry>=?'
+        return 'baseitem.id=? AND baseitem.expiry>=? AND baseitem.datalevel>=?'
 
     @property
     def cached_data_values(self):
         """ WHERE condition ? ? ? ? = value, value, value, value """
         if self.cache_refresh == 'never':
-            return (self.item_id, 0, )
-        return (self.item_id, self.current_time, )
-
-    def db_baseitem_cache_get_parent_data(self):
-        return
+            return (self.item_id, 0, DATALEVEL_OFF)
+        if self.cache_refresh == 'basic':
+            return (self.item_id, self.current_time, DATALEVEL_MIN)
+        return (self.item_id, self.current_time, DATALEVEL_MAX)
 
     @property
     def db_table_caches(self):
@@ -112,9 +110,6 @@ class BaseItem(ItemDetailsDatabaseAccess):
         with contextlib.suppress(AttributeError):
             return getattr(self, attr)
 
-        if route.startswith('fanart_tv') and not self.has_fanart_tv:
-            return
-
         configurator = self.routes_basemeta_db.get(attr) or self.config_basemeta_db
         database_obj = configurator(BaseMetaFactory(route))
 
@@ -127,53 +122,52 @@ class BaseItem(ItemDetailsDatabaseAccess):
         imc.extendedinfo = self.extendedinfo
         return imc.item
 
-    def unaired_expiry(self, premiered=None, next_episode_to_air_id=None):
+    def set_unaired_expiry(self, premiered=None, next_episode_to_air_id=None):
         if not premiered:
             self.expiry_time = SHORTER_EXPIRY
             return
+
         premiered = convert_timestamp(premiered, time_fmt="%Y-%m-%d", time_lim=10, utc_convert=False)
+
         if not premiered:
             self.expiry_time = SHORTER_EXPIRY
             return
+
         days_to_air, is_aired = get_days_to_air(premiered)
+
         if is_aired or not days_to_air:
             if next_episode_to_air_id:
                 self.expiry_time = SHORTER_EXPIRY
             return
+
         self.expiry_time = ((days_to_air // 2) + 1) * DAY_IN_SECONDS  # Refresh in half number of days (rounded + 1)
 
-    @database_connection
     def get_cached_data(self):
-        data = self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, self.cached_data_values, self.cached_data_conditions)
+        with self.connection.open():
+            data = self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, self.cached_data_values, self.cached_data_conditions)
+            if not data or not data[0] or not data[0][self.cached_data_check_key]:
+                return
+            return self.get_item_meta(data)
 
-        if not data or not data[0] or not data[0][self.cached_data_check_key]:
-            return
-
-        return self.get_item_meta(data)
-
-    def set_cached_data(self, item_id, mediatype, expiry, table, keys, mapped_data, return_data=False):
-        if not return_data:
-            self.del_cached('baseitem', item_id)
-        self.set_cached_values('baseitem', item_id, keys=('mediatype', 'expiry'), values=(mediatype, expiry))
+    def set_cached_data(self, item_id, mediatype, expiry, datalevel, table, keys, mapped_data, delete_cascade=False):
+        self.del_cached('baseitem', item_id) if delete_cascade else None
+        self.set_cached_values('baseitem', item_id, keys=('mediatype', 'expiry', 'datalevel'), values=(mediatype, expiry, datalevel))
         self.set_cached_many(table, keys, mapped_data)
 
-    def try_cached_data(self, return_data=False):
+    def try_cached_data(self, return_data=False, return_queue=False):
         online_data_mapped = self.online_data_mapped
         if not online_data_mapped:
             return
 
-        # Check for parent data (if needed)
-        self.db_baseitem_cache_get_parent_data()
-
         # Check for future items to lower expiry and refresh more frequently closer to premiere
-        self.unaired_expiry(online_data_mapped['item'].get('premiered'), online_data_mapped['item'].get('next_episode_to_air_id'))
+        self.set_unaired_expiry(online_data_mapped['item'].get('premiered'), online_data_mapped['item'].get('next_episode_to_air_id'))
 
         # TODO: A better queuing method
         func = self.set_cached_data
         args = (
-            self.item_id, self.mediatype, self.expiry, self.table, self.keys,
+            self.item_id, self.mediatype, self.expiry, self.datalevel, self.table, self.keys,
             self.configure_mapped_data(online_data_mapped))
-        kwgs = {'return_data': return_data}
+        kwgs = {'delete_cascade': bool(self.cache_refresh == 'force')}
 
         queue = []
         queue.append((func, args, kwgs))
@@ -183,14 +177,22 @@ class BaseItem(ItemDetailsDatabaseAccess):
                 qitem = db_cache.try_cached_data(online_data_mapped)
                 queue.append(qitem)
 
-        with self.connection.open(self.cache):
+        if return_queue:
+            return queue
+
+        self.write_data_queue(queue)
+
+        if not return_data:
+            return
+
+        return self.get_cached_data()
+
+    def write_data_queue(self, queue):
+        with self.connection.open():
             self.connection.open_connection.execute('BEGIN')
             for func, args, kwgs in queue:
                 func(*args, **kwgs)
             self.connection.open_connection.execute('COMMIT')
-        if not return_data:
-            return
-        return self.get_cached_data()
 
     @cached_property
     def data(self):

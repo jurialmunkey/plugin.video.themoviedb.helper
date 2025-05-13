@@ -118,10 +118,10 @@
                     <default>0</default>
                     <constraints>
                         <options>
-                            <option label="1421">0</option>
-                            <option label="419">1</option>
+                            <option label="32452">0</option>
+                            <option label="32009">1</option>
                             <option label="32398">2</option>
-                            <option label="418">3</option>
+                            <option label="32008">3</option>
                             <option label="32397">4</option>
                         </options>
                     </constraints>
@@ -133,6 +133,26 @@
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
+                </setting>
+                <setting id="seasons_specials" type="boolean" label="32020" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="seasons_anticipated" type="boolean" label="32018" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="seasons_upnext" type="boolean" label="32015" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition operator="!is" setting="trakt_token"/>
+                        </dependency>
+                    </dependencies>
                 </setting>
             </group>
         </category>
@@ -393,6 +413,14 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="fanarttv_prefer" type="boolean" label="32039" help="" parent="fanarttv_clientkey">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" operator="is" setting="fanarttv_lookup">true</dependency>
+                    </dependencies>
+                </setting>
                 <setting id="fanarttv_clientkey_access" type="boolean" label="32483" help="" parent="fanarttv_clientkey">
                     <level>0</level>
                     <default>false</default>
@@ -511,26 +539,31 @@
                         <popup>false</popup>
                     </control>
                 </setting>
+                <setting id="trakt_cacheownlists" type="boolean" label="32463" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle" />
+                </setting>
                 <setting id="trakt_scrobbling" type="boolean" label="32529" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="trakt_watchedindicators" type="boolean" label="32034" help="">
+                <setting id="trakt_watchedindicators" type="boolean" label="32013" help="">
                     <level>0</level>
                     <default>false</default>
-                    <control type="toggle"/>
+                    <control type="toggle" />
                 </setting>
-                <setting id="trakt_playprogress" type="boolean" label="32407" help="">
+                <setting id="invalidate_trakt_sync" type="string" label="32022" help="">
                     <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="action">
+                        <data>RunScript(plugin.video.themoviedb.helper, invalidate_trakt_sync)</data>
+                    </control>
                 </setting>
-                <setting id="trakt_cacheownlists" type="boolean" label="32463" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
+
             </group>
         </category>
         <category id="players" label="32014" help="">

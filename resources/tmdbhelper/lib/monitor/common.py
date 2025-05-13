@@ -31,6 +31,7 @@ class CommonMonitorDetails(CommonContainerAPIs):
         lidc = ListItemDetails(self)
         lidc.cache_refresh = None
         lidc.extendedinfo = True
+        lidc.parent_params = {}
         return lidc
 
     def get_awards_data(self):

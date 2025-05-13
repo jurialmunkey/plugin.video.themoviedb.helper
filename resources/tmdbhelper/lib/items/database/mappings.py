@@ -3,8 +3,14 @@
 from tmdbhelper.lib.api.mapping import _ItemMapper
 
 
-class ItemMapperMethods:
+def get_blanks_none(i):
+    """
+    Convert empty strings to nulls
+    """
+    return i if i or i == 0 else None
 
+
+class ItemMapperMethods:
     @staticmethod
     def get_runtime(v, *args, **kwargs):
         if isinstance(v, list):
@@ -36,6 +42,9 @@ class ItemMapperMethods:
             except (TypeError, KeyError, IndexError, ValueError):
                 return
 
+        def get_configured_item(i, v):
+            return get_blanks_none(get_item(i, v))
+
         def check_item(i):
             for k in haskeys:
                 try:
@@ -46,7 +55,7 @@ class ItemMapperMethods:
             return i
 
         items = [i for i in items if check_item(i)] if haskeys else items
-        return [{k: get_item(i, v) for k, v in kwargs.items()} for i in items]
+        return [{k: get_configured_item(i, v) for k, v in kwargs.items()} for i in items]
 
     @staticmethod
     def get_providers(items, service=False, **kwargs):
@@ -64,15 +73,15 @@ class ItemMapperMethods:
                     if service:
                         item = {
                             'iso_country': iso,
-                            'display_priority': provider.get('display_priority'),
-                            'name': provider.get('provider_name'),
-                            'logo': provider.get('logo_path'),
-                            'tmdb_id': provider.get('provider_id'),
+                            'display_priority': get_blanks_none(provider.get('display_priority')),
+                            'name': get_blanks_none(provider.get('provider_name')),
+                            'logo': get_blanks_none(provider.get('logo_path')),
+                            'tmdb_id': get_blanks_none(provider.get('provider_id')),
                         }
                     else:
                         item = {
-                            'availability': availability,
-                            'tmdb_id': provider.get('provider_id'),
+                            'availability': get_blanks_none(availability),
+                            'tmdb_id': get_blanks_none(provider.get('provider_id')),
                         }
                     data.append(item)
         return data
@@ -90,38 +99,40 @@ class ItemMapperMethods:
             iso_country = release_country['iso_3166_1']
             for release in (release_country.get('release_dates') or ()):
                 data.append({
-                    'name': release['certification'],
-                    'iso_country': iso_country,
-                    'iso_language': release['iso_639_1'],
-                    'release_date': release['release_date'],
-                    'release_type': tmdb_release_types.get(release['type']),
+                    'name': get_blanks_none(release['certification']),
+                    'iso_country': get_blanks_none(iso_country),
+                    'iso_language': get_blanks_none(release['iso_639_1']),
+                    'release_date': get_blanks_none(release['release_date']),
+                    'release_type': get_blanks_none(tmdb_release_types.get(release['type'])),
                 })
         return data
 
-    @staticmethod
-    def get_fanart_tv(items, **kwargs):
+    def get_fanart_tv(self, items, **kwargs):
         if not items:
             return
 
         art_types = {
-            'movieposter': 'poster',
-            'moviebackground': 'fanart',
-            'moviethumb': 'landscape',
-            'moviebanner': 'banner',
-            'hdmovieclearart': 'clearart',
-            'movieclearart': 'clearart',
-            'hdmovielogo': 'clearlogo',
-            'movielogo': 'clearlogo',
-            'moviedisc': 'discart',
-            'tvposter': 'poster',
-            'showbackground': 'fanart',
-            'tvthumb': 'landscape',
-            'tvbanner': 'banner',
-            'hdclearart': 'clearart',
-            'clearart': 'clearart',
-            'hdtvlogo': 'clearlogo',
-            'clearlogo': 'clearlogo',
-            'characterart': 'characterart',
+            'movieposter': ('poster', False),
+            'moviebackground': ('fanart', False),
+            'moviethumb': ('landscape', False),
+            'moviebanner': ('banner', False),
+            'hdmovieclearart': ('clearart', False),
+            'movieclearart': ('clearart', False),
+            'hdmovielogo': ('clearlogo', False),
+            'movielogo': ('clearlogo', False),
+            'moviedisc': ('discart', False),
+            'tvposter': ('poster', False),
+            'tvthumb': ('landscape', False),
+            'tvbanner': ('banner', False),
+            'hdclearart': ('clearart', False),
+            'clearart': ('clearart', False),
+            'hdtvlogo': ('clearlogo', False),
+            'clearlogo': ('clearlogo', False),
+            'characterart': ('characterart', False),
+            'showbackground': ('fanart', True),
+            'seasonposter': ('poster', True),
+            'seasonbanner': ('banner', True),
+            'seasonthumb': ('landscape', True),
         }
 
         data = []
@@ -132,16 +143,30 @@ class ItemMapperMethods:
             art_type = art_types.get(art_type)
             if not art_type:
                 continue
+            art_type, art_has_seasons = art_type
             for art_item in art_list:
                 path = art_item['url']
-                data.append({
-                    'icon': path,
-                    'iso_language': art_item.get('lang'),
-                    'likes': art_item.get('likes'),
-                    'type': art_type,
-                    'quality': quality,
-                    'extension': path.split('.')[-1] if path else None,
-                })
+                item = {
+                    'icon': get_blanks_none(path),
+                    'iso_language': get_blanks_none(art_item.get('lang')),
+                    'likes': get_blanks_none(art_item.get('likes')),
+                    'type': get_blanks_none(art_type),
+                    'quality': get_blanks_none(quality),
+                    'extension': get_blanks_none(path.split('.')[-1] if path else None),
+                }
+
+                if art_has_seasons:
+                    snum = (art_item.get('season') or 'all')
+                    if snum != 'all':
+                        item['parent_id'] = f'tv.{self.tmdb_id}.{snum}'
+                        self.item['baseitem'].append({
+                            'id': f'tv.{self.tmdb_id}.{snum}',
+                            'mediatype': 'season',
+                            'expiry': 0,
+                        })
+
+                data.append(item)
+
         return data
 
     @staticmethod
@@ -156,12 +181,12 @@ class ItemMapperMethods:
             if video['site'] != 'YouTube':
                 continue
             data.append({
-                'name': video['name'],
-                'iso_country': video['iso_3166_1'],
-                'iso_language': video['iso_639_1'],
-                'release_date': video['published_at'],
-                'key': video['key'],
-                'content': video['type'],
+                'name': get_blanks_none(video['name']),
+                'iso_country': get_blanks_none(video['iso_3166_1']),
+                'iso_language': get_blanks_none(video['iso_639_1']),
+                'release_date': get_blanks_none(video['published_at']),
+                'key': get_blanks_none(video['key']),
+                'content': get_blanks_none(video['type']),
                 'path': f"plugin://plugin.video.youtube/play/?video_id={video['key']}",
             })
         return data
@@ -193,12 +218,12 @@ class ItemMapperMethods:
                 data.append({
                     'aspect_ratio': ItemMapperMethods.get_aspect_ratio(artwork['aspect_ratio']),
                     'quality': int((artwork['width'] * artwork['height']) // 200000),  # Quality integer to nearest fifth of a megapixel
-                    'iso_language': artwork['iso_639_1'],
-                    'icon': path,
-                    'type': artwork_type,
-                    'extension': path.split('.')[-1] if path else None,
+                    'iso_language': get_blanks_none(artwork['iso_639_1']),
+                    'icon': get_blanks_none(path),
+                    'type': get_blanks_none(artwork_type),
+                    'extension': get_blanks_none(path.split('.')[-1] if path else None),
                     'rating': int(artwork['vote_average'] * 100),
-                    'votes': artwork['vote_count'],
+                    'votes': get_blanks_none(artwork['vote_count']),
                 })
 
         return data
@@ -207,7 +232,13 @@ class ItemMapperMethods:
     def get_unique_ids(results, **kwargs):
         if not results:
             return
-        return [{'key': ('tmdb_id' if k == 'id' else k).replace('_id', ''), 'value': f'{v}'} for k, v in results.items()]
+        return [
+            {
+                'key': get_blanks_none(('tmdb_id' if k == 'id' else k).replace('_id', '')),
+                'value': get_blanks_none(f'{v}')
+            }
+            for k, v in results.items()
+        ]
 
     @staticmethod
     def get_episode_to_air(v, name):
@@ -430,7 +461,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'func': self.split_array,
                 'kwargs': {'tmdb_id': 'id'}}, {
                 # ---
-                'keys': [('company', None)],
+                'keys': [('broadcaster', None)],
                 'extend': True,
                 'func': self.split_array,
                 'kwargs': {'tmdb_id': 'id', 'name': 'name', 'logo': 'logo_path', 'country': 'origin_country'}
@@ -456,6 +487,30 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'videos': [{
                 'keys': [('video', None)],
                 'func': self.get_video,
+            }],
+            'created_by': [{
+                'keys': [('baseitem', None)],
+                'extend': True,
+                'func': self.split_array,
+                'kwargs': {
+                    'id': lambda i: f'person.{i["id"]}',
+                    'mediatype': lambda _: 'person',
+                    'expiry': lambda _: 0}}, {
+                # ---
+                'keys': [('crewmember', None)],
+                'extend': True,
+                'func': self.split_array,
+                'kwargs': {
+                    'tmdb_id': 'id',
+                    'role': lambda _: 'Creator',
+                    'department': lambda _: 'Creator'}}, {
+                # ---
+                'keys': [('person', None)],
+                'extend': True,
+                'func': self.split_array,
+                'kwargs': {
+                    'id': lambda i: f'person.{i["id"]}',
+                    'tmdb_id': 'id', 'thumb': 'profile_path', 'name': 'name', 'gender': 'gender'}
             }],
             'credits': [{
                 'keys': [('baseitem', None)],
@@ -603,6 +658,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'func': lambda v: [{'key': 'revenue', 'value': f'${float(v):0,.0f}'}]
             }],
         }
+
         self.standard_map = {
             'id': ('item', 'tmdb_id'),
             'title': ('item', 'title'),
@@ -613,6 +669,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'status': ('item', 'status'),
             'season_number': ('item', 'season'),
             'episode_number': ('item', 'episode'),
+            'number_of_seasons': ('item', 'totalseasons'),
+            'number_of_episodes': ('item', 'totalepisodes'),
             'episode_type': ('item', 'status'),
             'biography': ('item', 'biography'),
             'birthday': ('item', 'birthday'),
@@ -717,6 +775,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'country': (),
             'company': [],
             'studio': (),
+            'broadcaster': [],
             'network': (),
             'provider': (),
             'certification': (),
@@ -738,6 +797,6 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
         }
 
     def get_info(self, data, **kwargs):
-        item = self.get_empty_item()
-        item = self.map_item(item, data)
-        return item
+        self.item = self.get_empty_item()
+        self.item = self.map_item(self.item, data)
+        return self.item
