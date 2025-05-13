@@ -1,9 +1,7 @@
-from tmdbhelper.lib.addon.plugin import convert_type, get_localized, get_setting, ADDONPATH
-from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
+from tmdbhelper.lib.addon.plugin import convert_type, get_localized, get_setting
 from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
 from tmdbhelper.lib.items.container import ContainerDirectory
 from jurialmunkey.window import get_property
-from jurialmunkey.parser import try_int
 
 
 class ListSeasons(ContainerDirectory):

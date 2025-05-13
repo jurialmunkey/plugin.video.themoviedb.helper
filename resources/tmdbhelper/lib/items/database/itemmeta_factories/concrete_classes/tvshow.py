@@ -5,8 +5,8 @@ class Tvshow(MediaItem):
     infolabels_dbcitem_routes = (
         (('certification', None), 'name', 'mpaa'),
         (('video', None), 'path', 'trailer'),
-        (('watchedcount', None), 'watched_episodes', 'playcount'),  # TODO: FIX FOR SEASONS AS NOT SYNCED AIRED COUNT
-        (('airedcount', None), 'aired_episodes', 'episode'),  # TODO: FIX FOR SEASONS AS NOT SYNCED AIRED COUNT
+        (('watchedcount', None), 'watched_episodes', 'playcount'),
+        (('airedcount', None), 'aired_episodes', 'episode'),
     )
 
     @property
