@@ -61,6 +61,11 @@ class Season(MediaItem):
             (('network', None), 'name', 'studio'),
         )
 
+    def get_infolabels_details(self):
+        infolabels = super().get_infolabels_details()
+        infolabels['episode'] = self.get_data_value('totalepisodes')
+        return infolabels
+
     def get_infoproperties_custom(self, infoproperties):
         infoproperties = super().get_infoproperties_custom(infoproperties)
         for i in self.parent_db_cache.return_basemeta_db('custom', 'tvshow').cached_data:
@@ -76,4 +81,8 @@ class Season(MediaItem):
 
     def get_infoproperties_special(self, infoproperties):
         infoproperties = self.get_infoproperties_custom(infoproperties)
+        try:
+            infoproperties['totalepisodes'] = infoproperties['unwatchedepisodes'] = self.get_data_value('totalepisodes')
+        except (TypeError, KeyError, IndexError):
+            pass
         return infoproperties
