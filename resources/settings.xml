@@ -5,7 +5,7 @@
             <group id="1" label="248">
                 <setting id="mpaa_prefix" type="string" label="32004" help="32418">
                     <level>0</level>
-                    <default>Rated</default>
+                    <default></default>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>

@@ -1,9 +1,9 @@
-from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem
+from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem, MediaItemInfoLabelItemRoutes
 
 
 class Movie(MediaItem):
     infolabels_dbcitem_routes = (
-        (('certification', None), 'name', 'mpaa'),
+        MediaItemInfoLabelItemRoutes.certification,
         (('video', None), 'path', 'trailer'),
         (('playcount', None), 'plays', 'playcount'),
     )

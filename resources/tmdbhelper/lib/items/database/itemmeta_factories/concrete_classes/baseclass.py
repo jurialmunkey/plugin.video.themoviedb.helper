@@ -46,7 +46,7 @@ class BaseItem:
         for instance, ikey, dkey in self.infolabels_dbcitem_routes:
             instance = self.parent_db_cache.return_basemeta_db(*instance)
             try:
-                infolabels[dkey] = instance.cached_data[0][ikey]
+                infolabels[dkey] = ikey(instance.cached_data[0]) if callable(ikey) else instance.cached_data[0][ikey]
             except(KeyError, TypeError, IndexError, AttributeError):
                 pass
         return infolabels
