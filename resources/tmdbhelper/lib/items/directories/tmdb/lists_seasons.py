@@ -13,54 +13,34 @@ class ListSeasons(ContainerDirectory):
     def get_special_seasons(self, tmdb_id):
         items = []
 
-        sync = BaseItemFactory('tvshow')
-        sync.tmdb_id = try_int(tmdb_id)
-        sync.tmdb_type = 'tv'
-        sync.common_apis = self
-        base_item = sync.data
-
-        if not base_item:
-            return items
-
         # Up Next
-        if get_setting('seasons_upnext') and get_property('TraktIsAuth') == 'True':
-            upnext_item = self.tmdb_api.mapper.get_info(
-                info_item={'title': get_localized(32043)},
-                tmdb_type='season',
-                base_item=base_item,
-                tmdb_id=tmdb_id,
-                definition={
-                    'info': 'trakt_upnext',
-                    'tmdb_type': 'tv',
-                    'tmdb_id': str(tmdb_id),
-                    'hide_unaired': 'true'
-                }
-            )
-            upnext_item['art']['thumb'] = upnext_item['art']['poster'] = f'{ADDONPATH}/resources/icons/trakt/up-next.png'
-            upnext_item['infolabels']['season'] = -1
-            upnext_item['infolabels']['episode'] = 0
-            upnext_item['infoproperties']['specialseason'] = get_localized(32043)
-            upnext_item['infoproperties']['IsSpecial'] = 'true'
-            items.append(upnext_item)
+        # if get_setting('seasons_upnext') and get_property('TraktIsAuth') == 'True':
+        #     upnext_item = self.tmdb_api.mapper.get_info(
+        #         info_item={'title': get_localized(32043)},
+        #         tmdb_type='season',
+        #         base_item=base_item,
+        #         tmdb_id=tmdb_id,
+        #         definition={
+        #             'info': 'trakt_upnext',
+        #             'tmdb_type': 'tv',
+        #             'tmdb_id': str(tmdb_id),
+        #             'hide_unaired': 'true'
+        #         }
+        #     )
+        #     upnext_item['art']['thumb'] = upnext_item['art']['poster'] = f'{ADDONPATH}/resources/icons/trakt/up-next.png'
+        #     upnext_item['infolabels']['season'] = -1
+        #     upnext_item['infoproperties']['specialseason'] = get_localized(32043)
+        #     upnext_item['infoproperties']['IsSpecial'] = 'true'
+        #     items.append(upnext_item)
 
-        if get_setting('seasons_anticipated') and base_item['infolabels'].get('status') not in ('Ended', 'Canceled') and base_item['infoproperties'].get('next_episode_to_air_id'):
-            unaired_item = self.tmdb_api.mapper.get_info(
-                info_item={'title': get_localized(32206)},
-                tmdb_type='season',
-                base_item=base_item,
-                tmdb_id=tmdb_id,
-                definition={
-                    'info': 'anticipated_episodes',
-                    'tmdb_type': 'tv',
-                    'tmdb_id': str(tmdb_id),
-                }
-            )
-            unaired_item['art']['thumb'] = unaired_item['art']['poster'] = f'{ADDONPATH}/resources/icons/themoviedb/episodes.png'
-            unaired_item['infolabels']['season'] = -1
-            unaired_item['infolabels']['episode'] = 0
-            unaired_item['infoproperties']['specialseason'] = get_localized(32206)
-            unaired_item['infoproperties']['IsSpecial'] = 'true'
-            items.append(unaired_item)
+        if get_setting('seasons_anticipated'):
+            sync = BaseViewFactory('anticipatedseason', 'tv', tmdb_id)
+
+            try:
+                if sync.data[0]['infoproperties']['totalepisodes']:
+                    items.append(sync.data[0])
+            except (KeyError, TypeError, AttributeError):
+                pass
 
         return items
 

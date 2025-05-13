@@ -4,7 +4,21 @@ from tmdbhelper.lib.addon.consts import DATALEVEL_MAX
 from tmdbhelper.lib.files.ftools import cached_property
 
 
-class FlatSeasonMediaList(MediaList):
+class FlatSeasonMediaListMixin:
+    @cached_property
+    def parent_precache_tvshow(self):
+        return self.get_parent_data('tvshow')
+
+    @cached_property
+    def parent_season_media_list(self):
+        season_media_list = SeasonMediaList()
+        season_media_list.mediatype = 'tvshow'
+        season_media_list.tmdb_id = self.tmdb_id
+        season_media_list.tmdb_type = self.tmdb_type
+        return season_media_list.data
+
+
+class FlatSeasonMediaList(FlatSeasonMediaListMixin, MediaList):
     table = 'episode'
     cached_data_conditions_base = 'episode.tvshow_id=? AND baseitem.expiry>=? AND baseitem.datalevel>=? ORDER BY season=0, season ASC, episode ASC'
     cached_data_check_key = 'episode'
@@ -22,18 +36,6 @@ class FlatSeasonMediaList(MediaList):
         'premiered': 'premiered',
         'rating': 'rating',
     }
-
-    @cached_property
-    def parent_precache_tvshow(self):
-        return self.get_parent_data('tvshow')
-
-    @cached_property
-    def parent_season_media_list(self):
-        season_media_list = SeasonMediaList()
-        season_media_list.mediatype = 'tvshow'
-        season_media_list.tmdb_id = self.tmdb_id
-        season_media_list.tmdb_type = self.tmdb_type
-        return season_media_list.data
 
     @cached_property
     def parent_precache_seasons(self):
