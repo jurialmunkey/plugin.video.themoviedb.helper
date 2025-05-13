@@ -195,6 +195,16 @@ msgctxt "#30025"
 msgid "Finnish (Finland)"
 msgstr "Finlandês (Finlândia)"
 
+#: /resources/settings.xml
+msgctxt "#32039"
+msgid "Prefer fanart.tv artwork"
+msgstr "Preferir arte de fanart.tv"
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_seasons.py
+msgctxt "#32040"
+msgid "All seasons"
+msgstr "Todas as temporadas"
+
 msgctxt "#30026"
 msgid "French (Canada)"
 msgstr "Francês (Canadá)"
