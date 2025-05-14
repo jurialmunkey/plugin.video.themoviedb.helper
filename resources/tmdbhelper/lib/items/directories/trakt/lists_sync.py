@@ -224,7 +224,7 @@ class ListInProgress(ListOnDeck):
                 }
             }
             self.item_list_localize = 32041
-        else:
-            self.item_list_localize = 32045
+            return super(ListOnDeck, self).get_items(tmdb_type=tmdb_type, **kwargs)
 
+        self.item_list_localize = 32045
         return super().get_items(tmdb_type=tmdb_type, **kwargs)
