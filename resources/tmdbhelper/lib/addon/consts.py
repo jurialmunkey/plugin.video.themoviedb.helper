@@ -366,58 +366,6 @@ TRAKT_BASIC_LISTS = {
 }
 
 
-TRAKT_SYNC_LISTS = {
-    'trakt_collection': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
-            'import_attr': 'ListCollection'
-        },
-    },
-    'trakt_watchlist': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
-            'import_attr': 'ListWatchlist'
-        },
-    },
-    'trakt_watchlist_released': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
-            'import_attr': 'ListWatchlistReleased'
-        },
-    },
-    'trakt_watchlist_anticipated': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
-            'import_attr': 'ListWatchlistAnticipated'
-        },
-    },
-    'trakt_history': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
-            'import_attr': 'ListHistory'
-        },
-    },
-    'trakt_mostwatched': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
-            'import_attr': 'ListMostWatched'
-        },
-    },
-    'trakt_inprogress': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
-            'import_attr': 'ListPlaybackProgress'
-        },
-    },
-    'trakt_favorites': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
-            'import_attr': 'ListFavorites'
-        },
-    }
-}
-
-
 TRAKT_LIST_OF_LISTS_ROUTE = {
     'module_name': 'tmdbhelper.lib.items.directories.lists_trakt',
     'import_attr': 'ListLists'}
@@ -510,6 +458,27 @@ ROUTE_NOID = {
     'trakt_airingnext': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_airingnext',
         'import_attr': 'ListTraktAiringNext'}},
+    'trakt_collection': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+        'import_attr': 'ListCollection'}},
+    'trakt_watchlist': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+        'import_attr': 'ListWatchlist'}},
+    'trakt_watchlist_released': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+        'import_attr': 'ListWatchlistReleased'}},
+    'trakt_watchlist_anticipated': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+        'import_attr': 'ListWatchlistAnticipated'}},
+    'trakt_history': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+        'import_attr': 'ListHistory'}},
+    'trakt_mostwatched': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+        'import_attr': 'ListMostWatched'}},
+    'trakt_favorites': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+        'import_attr': 'ListFavorites'}},
     'trakt_inprogress': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
         'import_attr': 'ListInProgress'}},
