@@ -298,7 +298,14 @@ class SyncDataGetterAllUnHiddenShowsInProgress:
 
     def get_items(self):
         sd = self.parent_getter
-        return [i for i in sd.items if self.is_inprogress_show(i['tmdb_id'], i['aired_episodes'], i['watched_episodes'])]
+        return [
+            i for i in sd.items
+            if self.is_inprogress_show(
+                i['tmdb_id'],
+                i['aired_episodes'],
+                i['watched_episodes']
+            )
+        ]
 
 
 class SyncDataGetters:
