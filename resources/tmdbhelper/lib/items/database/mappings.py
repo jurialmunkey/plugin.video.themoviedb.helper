@@ -46,6 +46,19 @@ class ItemMapperMethods:
 
         return art
 
+    def add_seasons_art(self, v, **kwargs):
+        art = []
+
+        for i in v:
+            if 'poster_path' in i:
+                art.append(self.add_art_type(
+                    item_id=f'tv.{self.tmdb_id}.{i["season_number"]}',
+                    path=i['poster_path'],
+                    art_type='posters',
+                    aspect_ratio='poster'))
+
+        return art
+
     @staticmethod
     def split_array(items, subkeys=(), haskeys=(), **kwargs):
         if not items:
@@ -410,7 +423,11 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'kwargs': {
                     'id': lambda i: f'tv.{self.tmdb_id}.{i["season_number"]}',
                     'mediatype': lambda _: 'season',
-                    'expiry': lambda _: 0}
+                    'expiry': lambda _: 0}}, {
+                # ---
+                'keys': [('art', None)],
+                'extend': True,
+                'func': self.add_seasons_art
             }],
             'episodes': [{
                 'keys': [('episode', None)],
