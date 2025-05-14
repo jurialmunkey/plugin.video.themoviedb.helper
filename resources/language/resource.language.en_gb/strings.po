@@ -237,6 +237,11 @@ msgctxt "#32047"
 msgid "Undrop TV show"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32048"
+msgid "Dropped TV Shows"
+msgstr ""
+
 msgctxt "#30029"
 msgid "Hebrew (Israel)"
 msgstr ""

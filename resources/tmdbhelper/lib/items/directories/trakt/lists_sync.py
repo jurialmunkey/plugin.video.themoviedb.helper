@@ -152,6 +152,12 @@ class ListFavorites(ListStandardSync):
     item_list_localize = 1036
 
 
+class ListDropped(ListStandardSync):
+    item_list_sync_type = 'dropped'
+    item_list_sync_sort_by = 'unsorted'
+    item_list_localize = 32048
+
+
 class ListToWatch(ListStandardSync):
     item_list_sync_type = 'towatch'
     item_list_localize = 32078

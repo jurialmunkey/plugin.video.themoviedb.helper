@@ -479,6 +479,9 @@ ROUTE_NOID = {
     'trakt_favorites': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
         'import_attr': 'ListFavorites'}},
+    'trakt_dropped': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+        'import_attr': 'ListDropped'}},
     'trakt_inprogress': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
         'import_attr': 'ListInProgress'}},
