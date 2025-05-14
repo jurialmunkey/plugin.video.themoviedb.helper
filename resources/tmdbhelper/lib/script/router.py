@@ -14,11 +14,11 @@ REGEX_WINPROP_SUB = r'\$WINPROP\[{}\]'
 
 def test_func(test_func, **kwargs):
 
-    def finalise(head='', data=''):
+    def finalise(head='', data='', affix=''):
         import xbmcgui
         from tmdbhelper.lib.files.futils import dumps_to_file
         xbmcgui.Dialog().textviewer(f'{head}', f'{data}')
-        dumps_to_file(data, 'log_data', f'test_func_{test_func}.json', join_addon_data=True)
+        dumps_to_file(data, 'log_data', f'test_func_{test_func}{affix}.json', join_addon_data=True)
 
     def test_func_response(path, **kwargs):
         from tmdbhelper.lib.api.tmdb.api import TMDb
@@ -78,6 +78,15 @@ def test_func(test_func, **kwargs):
         func = getattr(sync, import_attr)
         head = import_attr
         data = func(**kwargs)
+        return finalise(head, data, affix=import_attr)
+
+    def test_func_get_response_sync(path, **kwargs):
+        from tmdbhelper.lib.api.trakt.api import TraktAPI
+        trakt_api = TraktAPI()
+        path = trakt_api.get_request_url(path, **kwargs)
+        data = trakt_api.get_api_request(path, headers=trakt_api.headers)
+        data = data.json()
+        head = path
         return finalise(head, data)
 
     routes = {
@@ -88,6 +97,7 @@ def test_func(test_func, **kwargs):
         'fanarttv': test_func_fanarttv,
         'get_next_episodes': test_func_get_next_episodes,
         'sync_next_episodes': test_func_sync_next_episodes,
+        'get_response_sync': test_func_get_response_sync,
     }
 
     return routes[test_func](**kwargs)
