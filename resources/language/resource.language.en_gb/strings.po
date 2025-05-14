@@ -227,6 +227,16 @@ msgctxt "#32045"
 msgid "Your In-Progress Movies"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32046"
+msgid "Drop TV show"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32047"
+msgid "Undrop TV show"
+msgstr ""
+
 msgctxt "#30029"
 msgid "Hebrew (Israel)"
 msgstr ""
