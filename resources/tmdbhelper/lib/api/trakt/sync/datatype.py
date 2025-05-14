@@ -1,5 +1,5 @@
 from tmdbhelper.lib.files.ftools import cached_property
-from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp, convert_timestamp
+from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp, convert_timestamp, is_unaired_timestamp
 from tmdbhelper.lib.api.trakt.sync.activity import SyncLastActivities
 from tmdbhelper.lib.files.locker import mutexlock
 from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY, HALFDAY_EXPIRY
@@ -273,6 +273,10 @@ class SyncNextEpisodeItem:
         return self.response.get('next_episode')
 
     @cached_property
+    def next_episode_is_unaired(self):
+        return is_unaired_timestamp(self.next_episode['first_aired'])
+
+    @cached_property
     def next_episode_season(self):
         return self.next_episode['season']
 
@@ -322,7 +326,7 @@ class SyncNextEpisodeItem:
     def next_episode_id(self):
         if not self.response:
             return
-        if not self.reset_at and self.next_episode:
+        if not self.reset_at and self.next_episode and not self.next_episode_is_unaired:
             return self.get_next_episode_id(self.next_episode_season, self.next_episode_number)
         try:
             return next(self.all_next_episodes)
