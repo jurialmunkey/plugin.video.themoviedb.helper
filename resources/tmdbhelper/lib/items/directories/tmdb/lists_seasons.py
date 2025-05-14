@@ -1,12 +1,11 @@
 from tmdbhelper.lib.addon.plugin import convert_type, get_localized, get_setting
 from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
-from tmdbhelper.lib.items.container import ContainerDirectory
+from tmdbhelper.lib.items.container import ContainerDirectory, ContainerCacheOnlyDirectory
 from jurialmunkey.window import get_property
 
 
 class ListSeasons(ContainerDirectory):
     hide_unaired = True
-    is_cacheonly = False
 
     def get_special_seasons(self, tmdb_id):
         items = []
@@ -48,9 +47,7 @@ class ListSeasons(ContainerDirectory):
             return []
 
 
-class ListFlatSeasons(ContainerDirectory):
-    is_cacheonly = False
-
+class ListFlatSeasons(ContainerCacheOnlyDirectory):
     def get_items(self, tmdb_id, limit=None, **kwargs):
         sync = BaseViewFactory('flatseasons', 'tv', tmdb_id, filters=self.filters, limit=limit)
         self.kodi_db = self.get_kodi_database('tv')
@@ -59,9 +56,7 @@ class ListFlatSeasons(ContainerDirectory):
         return sync.data
 
 
-class ListAnticipatedEpisodes(ContainerDirectory):
-    is_cacheonly = False
-
+class ListAnticipatedEpisodes(ContainerCacheOnlyDirectory):
     def get_items(self, tmdb_id, limit=None, **kwargs):
         sync = BaseViewFactory('anticipatedepisodes', 'tv', tmdb_id, filters=self.filters, limit=limit)
         self.kodi_db = self.get_kodi_database('tv')
@@ -70,9 +65,8 @@ class ListAnticipatedEpisodes(ContainerDirectory):
         return sync.data
 
 
-class ListEpisodes(ContainerDirectory):
+class ListEpisodes(ContainerCacheOnlyDirectory):
     hide_unaired = True
-    is_cacheonly = False
 
     def get_items(self, tmdb_id, season, limit=None, **kwargs):
         sync = BaseViewFactory('episodes', 'tv', tmdb_id, season=season, filters=self.filters, limit=limit)

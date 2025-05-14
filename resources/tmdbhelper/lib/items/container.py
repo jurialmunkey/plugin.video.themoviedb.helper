@@ -348,12 +348,11 @@ class ContainerDirectory(ContainerDirectoryCommon):
 
 
 class ContainerDefaultCacheDirectory(ContainerDirectory):
-    default_cacheonly = False
-    # @property
-    # def default_cacheonly(self):
-    #     if get_condvisibility('Skin.HasSetting(TMDbHelper.DisableDefaultCacheOnly)'):
-    #         return False
-    #     return True
+    @property
+    def default_cacheonly(self):
+        if get_condvisibility('Skin.HasSetting(TMDbHelper.DisableDefaultCacheOnly)'):
+            return False
+        return True
 
 
 class ContainerCacheOnlyDirectory(ContainerDirectory):
