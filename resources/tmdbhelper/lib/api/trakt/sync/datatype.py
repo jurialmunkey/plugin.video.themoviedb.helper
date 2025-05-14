@@ -1,5 +1,5 @@
 from tmdbhelper.lib.files.ftools import cached_property
-from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp
+from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp, convert_timestamp
 from tmdbhelper.lib.api.trakt.sync.activity import SyncLastActivities
 from tmdbhelper.lib.files.locker import mutexlock
 from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY, HALFDAY_EXPIRY
@@ -235,39 +235,126 @@ class SyncCollection(DataTypeEpisodes):
     key_prefix = 'collection'
 
 
+class SyncNextEpisodeItem:
+    def __init__(self, parent, item):
+        self.parent = parent  # SyncAllNextEpisodes SyncNextEpisodes class
+        self.item = item
+
+    @cached_property
+    def tmdb_id(self):
+        try:
+            return self.item['tmdb_id']
+        except (KeyError, TypeError, NameError):
+            return
+
+    @cached_property
+    def trakt_id(self):
+        try:
+            return self.item['trakt_id']
+        except (KeyError, TypeError, NameError):
+            return
+
+    @property
+    def get_response_sync(self):
+        return self.parent.get_response_sync
+
+    @cached_property
+    def reset_at(self):
+        return self.response.get('reset_at')
+
+    @cached_property
+    def reset_at_datetime_obj(self):
+        if not self.reset_at:
+            return
+        return convert_timestamp(self.reset_at)
+
+    @cached_property
+    def next_episode(self):
+        return self.response.get('next_episode')
+
+    @cached_property
+    def next_episode_season(self):
+        return self.next_episode['season']
+
+    @cached_property
+    def next_episode_number(self):
+        return self.next_episode['number']
+
+    def get_next_episode_id(self, season, number):
+        return f'tv.{self.tmdb_id}.{season}.{number}'
+
+    def is_next_episode(self, episode):
+        if not episode.get('completed'):
+            return True
+        if not self.reset_at_datetime_obj:
+            return False
+        if convert_timestamp(episode.get('last_watched_at')) < self.reset_at_datetime_obj:
+            return True
+        return False
+
+    @cached_property
+    def all_next_episodes(self):
+        """
+        Returns a generator of all next episodes by comparing againt reset_at date and timestamps
+        """
+        if not self.response:
+            return
+
+        return (
+            self.get_next_episode_id(season['number'], episode['number'])
+            for season in self.response_seasons for episode in (season.get('episodes') or [])
+            if self.is_next_episode(episode)
+        )
+
+    @cached_property
+    def response(self):
+        if not self.trakt_id:
+            return
+        return self.get_response_sync(
+            f'shows/{self.trakt_id}/progress/watched',
+            extended='full')
+
+    @cached_property
+    def response_seasons(self):
+        return self.response.get('seasons') or []
+
+    @cached_property
+    def next_episode_id(self):
+        if not self.response:
+            return
+        if not self.reset_at and self.next_episode:
+            return self.get_next_episode_id(self.next_episode_season, self.next_episode_number)
+        try:
+            return next(self.all_next_episodes)
+        except StopIteration:
+            return
+
+    @cached_property
+    def next_episode_id_dictionary(self):
+        if not self.next_episode_id:
+            return {}
+        return {
+            "next_episode_id": self.next_episode_id,
+            "show": {
+                "ids": {
+                    "tmdb": self.tmdb_id,
+                    "trakt": self.trakt_id
+                }
+            }
+        }
+
+
 class SyncAllNextEpisodes(DataTypeEpisodes):
     keys = ('upnext_episode_id', )
     last_activities_key = 'watched_at'
     method = 'all_next_episodes'
     expiry_time = HALFDAY_EXPIRY
 
-    def get_all_next_episodes(self, response, tmdb_id):
-        # For list of episodes we need to build them by comparing against the reset_at date
-        from tmdbhelper.lib.addon.tmdate import convert_timestamp
-        reset_at = convert_timestamp(response['reset_at']) if response.get('reset_at') else None
-        return (
-            f'tv.{tmdb_id}.{season["number"]}.{episode["number"]}'
-            for season in response.get('seasons', []) for episode in season.get('episodes', [])
-            if not episode.get('completed') or (reset_at and convert_timestamp(episode.get('last_watched_at')) < reset_at))
-
-    def get_next_episodes_response(self, trakt_id):
-        if not trakt_id:
-            return
-        return self.get_response_sync('shows', trakt_id, 'progress/watched')
-
-    def get_next_episodes(self, tmdb_id, trakt_id):
-        response = self.get_next_episodes_response(trakt_id)
-        if not response:
-            return
-        return self.get_all_next_episodes(response, tmdb_id)
-
     @timerlock
     def sync_func(self):
         """ Get next episodes on Trakt """
         from tmdbhelper.lib.addon.thread import ParallelThread
         from tmdbhelper.lib.addon.logger import TimerFunc
-
-        dpro = self.dialog_progress_bg
 
         def get_item(i, item_id):
             tmdb_type, tmdb_id, season_number, episode_number = item_id.split('.')
@@ -277,23 +364,32 @@ class SyncAllNextEpisodes(DataTypeEpisodes):
             item['episode'] = {'season': season_number, 'number': episode_number}
             return item
 
-        def get_items(i):
-            next_episodes = self.get_next_episodes(i["tmdb_id"], i["trakt_id"])
-            dpro.increment()
-            if not next_episodes:
-                dpro.set_message(f'Skip: {i["tmdb_id"]} {i["trakt_id"]}')
-                return
-            dpro.set_message(f'Sync: {i["tmdb_id"]} {i["trakt_id"]}')
-            return [get_item(i, item_id) for item_id in next_episodes]
+        def update_dialog_progress(sync):
+            self.dialog_progress_bg.increment()
+            self.dialog_progress_bg.set_message((
+                f'Skip: {sync.tmdb_id} {sync.trakt_id}'
+                if not sync.all_next_episodes
+                else f'Sync: {sync.tmdb_id} {sync.trakt_id}'
+            ))
 
-        with TimerFunc(f'Sync: {self.method} {self.item_type}', inline=True, log_threshold=0.001):
-            sd = self._class_instance_syncdata.get_all_unhidden_shows_inprogress_getter()
-            sd.additional_keys = ('trakt_id', )
-            dpro.max_value = len(sd.items)
+        def get_items(i):
+            sync = SyncNextEpisodeItem(self, i)
+            update_dialog_progress(sync)
+            return [get_item(i, item_id) for item_id in sync.all_next_episodes]
+
+        def get_meta(sd):
+            self.dialog_progress_bg.max_value = len(sd.items)
             with ParallelThread(sd.items, get_items) as pt:
                 item_queue = pt.queue
-            meta = [i for items in item_queue for i in items if i]
-        return meta
+            return [i for items in item_queue for i in items if i]
+
+        def get_sd():
+            sd = self._class_instance_syncdata.get_all_unhidden_shows_inprogress_getter()
+            sd.additional_keys = ('trakt_id', )
+            return sd
+
+        with TimerFunc(f'Sync: {self.method} {self.item_type}', inline=True, log_threshold=0.001):
+            return get_meta(get_sd())
 
 
 class SyncNextEpisodes(SyncAllNextEpisodes):
@@ -302,42 +398,35 @@ class SyncNextEpisodes(SyncAllNextEpisodes):
     method = 'nextup'
     expiry_time = HALFDAY_EXPIRY
 
-    def get_next_episode(self, tmdb_id, trakt_id):
-        response = self.get_next_episodes_response(trakt_id)
-        if not response:
-            return
-        if not response.get('reset_at') and response.get('next_episode'):
-            return f'tv.{tmdb_id}.{response["next_episode"]["season"]}.{response["next_episode"]["number"]}'
-
-        # Get a next item generator to only check for one next episode not all
-        items = self.get_all_next_episodes(response, tmdb_id)
-        try:
-            return next(items)
-        except StopIteration:
-            return
-
     @timerlock
     def sync_func(self):
         """ Get next episodes on Trakt """
         from tmdbhelper.lib.addon.thread import ParallelThread
         from tmdbhelper.lib.addon.logger import TimerFunc
 
-        dpro = self.dialog_progress_bg
+        def update_dialog_progress(sync):
+            self.dialog_progress_bg.increment()
+            self.dialog_progress_bg.set_message((
+                f'Skip: {sync.next_episode_id}'
+                if not sync.next_episode_id
+                else f'Sync: {sync.next_episode_id}'
+            ))
 
         def get_item(i):
-            next_episode_id = self.get_next_episode(i["tmdb_id"], i["trakt_id"])
-            dpro.increment()
-            if not next_episode_id:
-                dpro.set_message(f'Skip: {next_episode_id}')
-                return
-            dpro.set_message(f'Sync: {next_episode_id}')
-            return {"next_episode_id": next_episode_id, "show": {"ids": {"tmdb": i["tmdb_id"], "trakt": i["trakt_id"]}}}
+            sync = SyncNextEpisodeItem(self, i)
+            update_dialog_progress(sync)
+            return sync.next_episode_id_dictionary
 
-        with TimerFunc(f'Sync: {self.method} {self.item_type}', inline=True, log_threshold=0.001):
-            sd = self._class_instance_syncdata.get_all_unhidden_shows_inprogress_getter()
-            sd.additional_keys = ('trakt_id', )
-            dpro.max_value = len(sd.items)
+        def get_meta(sd):
+            self.dialog_progress_bg.max_value = len(sd.items)
             with ParallelThread(sd.items, get_item) as pt:
                 item_queue = pt.queue
-            meta = [i for i in item_queue if i]
-        return meta
+            return [i for i in item_queue if i]
+
+        def get_sd():
+            sd = self._class_instance_syncdata.get_all_unhidden_shows_inprogress_getter()
+            sd.additional_keys = ('trakt_id', )
+            return sd
+
+        with TimerFunc(f'Sync: {self.method} {self.item_type}', inline=True, log_threshold=0.001):
+            return get_meta(get_sd())
