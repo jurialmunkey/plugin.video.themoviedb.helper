@@ -72,8 +72,6 @@ def test_func(test_func, **kwargs):
     def test_func_sync_next_episodes(import_attr, **kwargs):
         from tmdbhelper.lib.api.trakt.api import TraktAPI
         from tmdbhelper.lib.api.trakt.sync.datatype import SyncNextEpisodes
-        # import_attr = get_response_sync
-        # path = 'shows/2177/progress/watched'
         sync = SyncNextEpisodes(TraktAPI().trakt_syncdata, 'show')
         func = getattr(sync, import_attr)
         head = import_attr
