@@ -1,5 +1,6 @@
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseclass import BaseItem
+from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseroutes import MediaItemInfoLabelItemRoutes
 from tmdbhelper.lib.addon.plugin import get_setting
 
 
@@ -46,8 +47,8 @@ class MediaItem(BaseItem):
     )
 
     infolabels_dbcitem_routes = (
-        (('certification', None), 'name', 'mpaa'),
-        (('video', None), 'path', 'trailer'),
+        MediaItemInfoLabelItemRoutes.certification,
+        MediaItemInfoLabelItemRoutes.trailer,
     )
 
     """

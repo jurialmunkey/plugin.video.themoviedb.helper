@@ -1,4 +1,5 @@
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem, MediaItemArtworkRoutes
+from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseroutes import MediaItemInfoLabelItemRoutes
 from tmdbhelper.lib.addon.plugin import get_setting
 
 
@@ -23,9 +24,9 @@ class SeasonItemArtworkRoutes:
 
 class Season(MediaItem):
     infolabels_dbcitem_routes = (
-        (('certification', None), 'name', 'mpaa'),
-        (('video', None), 'path', 'trailer'),
-        (('watchedcount', None), 'watched_episodes', 'playcount'),
+        MediaItemInfoLabelItemRoutes.certification,
+        MediaItemInfoLabelItemRoutes.trailer,
+        MediaItemInfoLabelItemRoutes.watchedcount,
     )
 
     @property
