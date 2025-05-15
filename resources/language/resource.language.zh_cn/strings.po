@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-05-07 17:36+0800\n"
-"Last-Translator: Wabisabi\n"
+"PO-Revision-Date: 2025-05-15 10:30+0800\n"
+"Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -82,9 +82,19 @@ msgctxt "#30009"
 msgid "German (Austria)"
 msgstr "德语（奥地利）"
 
+#: /resources/settings.xml
+msgctxt "#32013"
+msgid "Get watched indicators, episode counts, and resume points"
+msgstr "获取已观看标识、剧集计数和续播点。"
+
 msgctxt "#30010"
 msgid "German (Switzerland)"
 msgstr "德语（瑞士）"
+
+#: /resources/settings.xml
+msgctxt "#32015"
+msgid "Additional season: Up next"
+msgstr "更多季：即将显示"
 
 msgctxt "#30011"
 msgid "German (Germany)"
@@ -94,13 +104,28 @@ msgctxt "#30012"
 msgid "Greek (Greece)"
 msgstr "希腊语（希腊）"
 
+#: /resources/settings.xml
+msgctxt "#32018"
+msgid "Additional season: Anticipated"
+msgstr "更多季：预期"
+
 msgctxt "#30013"
 msgid "English (Australia)"
 msgstr "英语（澳大利亚）"
 
+#: /resources/settings.xml
+msgctxt "#32020"
+msgid "Additional season: Specials"
+msgstr "更多季：特别篇"
+
 msgctxt "#30014"
 msgid "English (Canada)"
 msgstr "英语（加拿大）"
+
+#: /resources/settings.xml
+msgctxt "#32022"
+msgid "Clear sync data"
+msgstr "清除同步数据"
 
 msgctxt "#30015"
 msgid "English (United Kingdom)"
@@ -113,6 +138,21 @@ msgstr "英语（爱尔兰）"
 msgctxt "#30017"
 msgid "English (New Zealand)"
 msgstr "英语（新西兰）"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32026"
+msgid "Invalidate Sync Data"
+msgstr "同步数据失效"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32027"
+msgid "Successfully cleared {} sync data"
+msgstr "已成功清除 {} 同步数据"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32028"
+msgid "Ratings"
+msgstr "评分"
 
 msgctxt "#30018"
 msgid "English (United States of America)"
@@ -138,6 +178,16 @@ msgctxt "#30023"
 msgid "Basque (Spain)"
 msgstr "巴斯克（西班牙）"
 
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32035"
+msgid "Progress"
+msgstr "播放进度"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32036"
+msgid "Dropped"
+msgstr "已丢弃"
+
 msgctxt "#30024"
 msgid "Persian (Iran)"
 msgstr "波斯语（伊朗）"
@@ -145,6 +195,21 @@ msgstr "波斯语（伊朗）"
 msgctxt "#30025"
 msgid "Finnish (Finland)"
 msgstr "芬兰语（芬兰）"
+
+#: /resources/settings.xml
+msgctxt "#32039"
+msgid "Prefer fanart.tv artwork"
+msgstr "首选 fanart.tv 艺术作品"
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_seasons.py
+msgctxt "#32040"
+msgid "All seasons"
+msgstr "所有季"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32041"
+msgid "Your In-Progress TV Shows"
+msgstr "你正在观看的电视剧"
 
 msgctxt "#30026"
 msgid "French (Canada)"
@@ -157,6 +222,31 @@ msgstr "法语（法国）"
 msgctxt "#30028"
 msgid "Galician (Spain)"
 msgstr "加利西亚语（西班牙）"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32045"
+msgid "Your In-Progress Movies"
+msgstr "你尚未追完的电影"
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32046"
+msgid "Drop TV show"
+msgstr "已弃的电视剧"
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32047"
+msgid "Undrop TV show"
+msgstr "重追的电视剧"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32048"
+msgid "Dropped TV Shows"
+msgstr "已弃的电视剧"
+
+#: /resources/settings.xml
+msgctxt "#32049"
+msgid "Sort order of Your Next Episodes list. By airdate sorts episodes by premiere date. By recentlywatched sorts episodes by most recently watched tvshow. By todays is recentlywatched with episodes airing today at the front. By lastweek is recentlywatched with episodes airing in the past week sorted by airdate at the front."
+msgstr ""
 
 msgctxt "#30029"
 msgid "Hebrew (Israel)"
@@ -1548,7 +1638,7 @@ msgstr "背景图"
 #: /resources/settings.xml
 msgctxt "#32373"
 msgid "Restrict to library strm"
-msgstr "仅处理.strm文件"
+msgstr "仅处理 .strm 文件"
 
 #: /resources/lib/player/players.py
 msgctxt "#32374"
@@ -2155,7 +2245,7 @@ msgstr "在配置播放器插件时强制更新媒体库元数据缓存"
 #: /resources/settings.xml
 msgctxt "#32509"
 msgid "Use alternative TMDb API url"
-msgstr "使用备用TMDb API url"
+msgstr "使用备用 TMDb API url"
 
 #: /resources/settings.xml
 msgctxt "#32514"
@@ -2428,7 +2518,7 @@ msgstr "缓存详细信息的天数"
 #: /resources/settings.xml
 msgctxt "#32004"
 msgid "MPAA rating prefix"
-msgstr "MPAA 评级前缀"
+msgstr "MPAA 分级前缀"
 
 #: /resources/settings.xml
 msgctxt "#32005"
