@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from tmdbhelper.lib.api.mapping import _ItemMapper
+from jurialmunkey.parser import try_int
 
 
 def get_blanks_none(i):
@@ -444,7 +445,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                     'plot': 'overview',
                     'rating': 'vote_average',
                     'votes': 'vote_count',
-                    'duration': 'runtime'}}, {
+                    'duration': lambda i: try_int(i['runtime']) * 60}}, {
                 # ---
                 'keys': [('baseitem', None)],
                 'extend': True,
@@ -472,7 +473,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                     'plot': 'overview',
                     'rating': 'vote_average',
                     'votes': 'vote_count',
-                    'duration': 'runtime'}}, {
+                    'duration': lambda i: try_int(i['runtime']) * 60}}, {
                 # ---
                 'keys': [('season', None)],
                 'func': self.split_array,
