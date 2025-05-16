@@ -247,6 +247,11 @@ msgctxt "#32049"
 msgid "Sort order of Your Next Episodes list. By airdate sorts episodes by premiere date. By recentlywatched sorts episodes by most recently watched tvshow. By todays is recentlywatched with episodes airing today at the front. By lastweek is recentlywatched with episodes airing in the past week sorted by airdate at the front."
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32050"
+msgid "Prefer artwork in your language"
+msgstr ""
+
 msgctxt "#30029"
 msgid "Hebrew (Israel)"
 msgstr ""

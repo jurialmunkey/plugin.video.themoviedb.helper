@@ -25,6 +25,21 @@ class FanartTVPoster(FanartTVType):
         return (self.item_id, 'posters')
 
 
+class FanartTVPosterLanguage(FanartTVPoster):
+    def get_cached_data(self):
+        return self.get_cached_data_by_language()
+
+
+class FanartTVPosterEnglish(FanartTVPoster):
+    def get_cached_data(self):
+        return self.get_cached_data_by_english()
+
+
+class FanartTVPosterNull(FanartTVPoster):
+    def get_cached_data(self):
+        return self.get_cached_data_by_null()
+
+
 class FanartTVFanart(FanartTVType):
     @property
     def values(self):  # WHERE conditions values for ?
@@ -37,10 +52,35 @@ class FanartTVLandscape(FanartTVType):
         return (self.item_id, 'landscape',)
 
 
+class FanartTVLandscapeLanguage(FanartTVLandscape):
+    def get_cached_data(self):
+        return self.get_cached_data_by_language()
+
+
+class FanartTVLandscapeEnglish(FanartTVLandscape):
+    def get_cached_data(self):
+        return self.get_cached_data_by_english()
+
+
 class FanartTVClearlogo(FanartTVType):
     @property
     def values(self):  # WHERE conditions values for ?
         return (self.item_id, 'clearlogo')
+
+
+class FanartTVClearlogoLanguage(FanartTVClearlogo):
+    def get_cached_data(self):
+        return self.get_cached_data_by_language()
+
+
+class FanartTVClearlogoEnglish(FanartTVClearlogo):
+    def get_cached_data(self):
+        return self.get_cached_data_by_english()
+
+
+class FanartTVClearlogoNull(FanartTVClearlogo):
+    def get_cached_data(self):
+        return self.get_cached_data_by_null()
 
 
 class FanartTVClearart(FanartTVType):

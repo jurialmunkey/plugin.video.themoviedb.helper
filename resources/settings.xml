@@ -421,6 +421,14 @@
                         <dependency type="visible" operator="is" setting="fanarttv_lookup">true</dependency>
                     </dependencies>
                 </setting>
+                <setting id="language_lookup" type="boolean" label="32050" help="" parent="fanarttv_clientkey">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" operator="is" setting="fanarttv_lookup">true</dependency>
+                    </dependencies>
+                </setting>
                 <setting id="fanarttv_clientkey_access" type="boolean" label="32483" help="" parent="fanarttv_clientkey">
                     <level>0</level>
                     <default>false</default>
