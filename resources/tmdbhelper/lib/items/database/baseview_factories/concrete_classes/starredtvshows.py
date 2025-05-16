@@ -26,7 +26,7 @@ class StarredTvshowsMediaList(StarredMoviesMediaList):
     def map_item_infoproperties(i):
         return {
             'role': i['role'],
-            'chracter': i['role'],
+            'character': i['role'],
             'popularity': i['popularity'],
             'episodes': i['appearances'],
             'tmdb_id': i['tmdb_id'],
