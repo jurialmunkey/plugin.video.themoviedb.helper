@@ -25,7 +25,7 @@ class MonitorItemDetails(ImageManipulations):
     def __init__(self, parent, position=0):
         self.parent = parent  # ListItemMonitorFunctions
         self.position = position
-        self.configure()
+        self.identifier  # Set this immediately so we have a reference point
 
     def configure(self):
         """
@@ -76,6 +76,23 @@ class MonitorItemDetails(ImageManipulations):
     def infolabel_uniqueid_imdb(self):
         infolabel_uniqueid_imdb = self.get_infolabel('UniqueId(imdb)') or self.get_infolabel('IMDBNumber') or ''
         return infolabel_uniqueid_imdb if infolabel_uniqueid_imdb.startswith('tt') else ''
+
+    """
+    item id
+    """
+
+    @cached_property
+    def identifier(self):
+        return self.get_identifier()
+
+    def get_identifier(self):
+        return '.'.join((
+            self.get_infolabel('path'),
+            self.get_infolabel('folderpath'),
+            self.get_infolabel('filenameandpath'),
+            self.get_infolabel('label'),
+            self.get_infolabel('dbtype'),
+        ))
 
     """
     conditions
@@ -266,8 +283,14 @@ class MonitorItemDetails(ImageManipulations):
         for k, v in infoproperties.items():
             self.item['infoproperties'][k] = v
 
+    @property
+    def is_same_item(self):
+        return self.get_identifier() == self.identifier
+
     @cached_property
     def item(self):
+        if not self.is_same_item:
+            return self.set_blank_itemdetails()
         if not self.tmdb_id or not self.tmdb_type:
             return self.set_blank_itemdetails()
         if not self.lidc_item or 'art' not in self.lidc_item:
