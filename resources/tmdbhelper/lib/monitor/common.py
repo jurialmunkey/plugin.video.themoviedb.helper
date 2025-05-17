@@ -3,7 +3,6 @@ from tmdbhelper.lib.addon.plugin import get_infolabel
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_region_date
 from tmdbhelper.lib.addon.logger import kodi_try_except, kodi_log
 from tmdbhelper.lib.files.futils import validate_join
-from tmdbhelper.lib.api.kodi.rpc import get_person_stats
 from tmdbhelper.lib.api.contains import CommonContainerAPIs
 from tmdbhelper.lib.addon.thread import ParallelThread
 from jurialmunkey.window import WindowPropertySetter
@@ -123,18 +122,6 @@ class CommonMonitorDetails(CommonContainerAPIs):
             pass
 
         return info
-
-    def get_person_stats(self, item, tmdb_type, tmdb_id):
-        if tmdb_type != 'person':
-            return item
-
-            return item
-        try:
-            name = item['infolabels']['title']
-        except (KeyError, AttributeError, NameError):
-            return item
-        item.setdefault('infoproperties', {}).update(get_person_stats(name) or {})
-        return item
 
 
 class CommonMonitorItem:

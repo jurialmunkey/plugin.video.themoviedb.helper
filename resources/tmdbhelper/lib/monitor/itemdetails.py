@@ -1,209 +1,299 @@
 from tmdbhelper.lib.addon.plugin import get_condvisibility, get_infolabel, convert_media_type, convert_type, get_setting
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_region_date
+from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.monitor.images import ImageManipulations
 from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.api.mapping import get_empty_item
-from collections import namedtuple
 
 
-CV_USE_MULTI_TYPE = ""\
-    "Window.IsVisible(DialogPVRInfo.xml) | "\
-    "Window.IsVisible(MyPVRChannels.xml) | " \
-    "Window.IsVisible(MyPVRRecordings.xml) | "\
-    "Window.IsVisible(MyPVRSearch.xml) | "\
-    "Window.IsVisible(MyPVRGuide.xml)"
-
-ItemDetails = namedtuple("ItemDetails", "tmdb_type tmdb_id listitem artwork")
-
-EXTENDED_PROPERTIES = ""\
-    "!Skin.HasSetting(TMDbHelper.DisableExtendedProperties) | "\
-    "!String.IsEmpty(Window.Property(TMDbHelper.EnableExtendedProperties))"
+EXTENDED_PROPERTIES = (
+    '!Skin.HasSetting(TMDbHelper.DisableExtendedProperties) | '
+    '!String.IsEmpty(Window.Property(TMDbHelper.EnableExtendedProperties))'
+)
 
 
-class ListItemDetails(ImageManipulations):
+class MonitorItemDetails(ImageManipulations):
+
+    allow_tvshowtitle_query = ('seasons', 'episodes', 'multi')
+    allow_title_query = ('movies', 'tvshows', 'actors', 'sets', 'multi')
+    allow_label_query = ('movies', 'tvshows', 'actors', 'sets', 'multi')
+    allow_episode = ('episodes', 'multi')
+    allow_season = ('seasons', 'episodes', 'multi')
+    allow_base_id = ('movies', 'tvshows')
+    allow_year = ('movies', )
+
     def __init__(self, parent, position=0):
-        self._parent = parent
-        self._position = position
-        self._season = None
-        self._episode = None
-        self._itemdetails = None
+        self.parent = parent  # ListItemMonitorFunctions
+        self.position = position
+        self.configure()
 
-    @property
-    def dbtype(self):
-        if self.get_infolabel('Property(tmdb_type)') == 'person':
-            return 'actors'
+    def configure(self):
+        """
+        Attributes that should be called immediately to do lookup now
+        """
+        self.item
+        self.folderpath
+        self.filenameandpath
+        self.person_stats
 
-        def _get_fallback():
-            if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisablePVR)"):
-                if get_condvisibility(CV_USE_MULTI_TYPE):
-                    return 'multi'
-                if self.get_infolabel('ChannelNumberLabel'):
-                    return 'multi'
-                if self.get_infolabel('Path') == 'pvr://channels/tv/':
-                    return 'multi'
-            if self._parent._container == 'Container.' and get_setting('service_container_content_fallback'):
-                return get_infolabel('Container.Content') or ''
+    """
+    infolabels
+    """
+
+    @cached_property
+    def infolabel_property_tmdb_type(self):
+        return self.get_infolabel('Property(tmdb_type)')
+
+    @cached_property
+    def infolabel_channel_number_label(self):
+        return self.get_infolabel('ChannelNumberLabel')
+
+    @cached_property
+    def infolabel_path(self):
+        return self.get_infolabel('path')
+
+    @cached_property
+    def infolabel_dbtype(self):
+        return self.get_infolabel('dbtype')
+
+    @cached_property
+    def infolabel_folderpath(self):
+        return self.get_infolabel('folderpath')
+
+    @cached_property
+    def infolabel_filenameandpath(self):
+        return self.get_infolabel('filenameandpath')
+
+    @cached_property
+    def infolabel_uniqueid_tmdb(self):
+        return self.get_infolabel('UniqueId(tmdb)')
+
+    @cached_property
+    def infolabel_uniqueid_tvshow_tmdb(self):
+        return self.get_infolabel('UniqueId(tvshow.tmdb)')
+
+    @cached_property
+    def infolabel_uniqueid_imdb(self):
+        infolabel_uniqueid_imdb = self.get_infolabel('UniqueId(imdb)') or self.get_infolabel('IMDBNumber') or ''
+        return infolabel_uniqueid_imdb if infolabel_uniqueid_imdb.startswith('tt') else ''
+
+    """
+    conditions
+    """
+
+    @cached_property
+    def is_pvr_window(self):
+        return get_condvisibility((
+            'Window.IsVisible(DialogPVRInfo.xml) | '
+            'Window.IsVisible(MyPVRChannels.xml) | '
+            'Window.IsVisible(MyPVRRecordings.xml) | '
+            'Window.IsVisible(MyPVRSearch.xml) | '
+            'Window.IsVisible(MyPVRGuide.xml)'
+        ))
+
+    @cached_property
+    def is_pvr_lookups(self):
+        return get_condvisibility("!Skin.HasSetting(TMDbHelper.DisablePVR)")
+
+    @cached_property
+    def is_container_content_lookups(self):
+        if self.parent._container != 'Container.':
+            return False
+        if not get_setting('service_container_content_fallback'):
+            return False
+        return True
+
+    """
+    properties
+    """
+
+    @cached_property
+    def container_content_fallback(self):
+        if not self.is_container_content_lookups:
             return ''
+        return self.get_infolabel('Container.Content') or ''
 
-        dbtype = self.get_infolabel('dbtype')
-        return f'{dbtype}s' if dbtype else _get_fallback()
+    @cached_property
+    def fuzzy_dbtype(self):
+        if self.is_pvr_lookups:
+            if self.is_pvr_window:
+                return 'multi'
+            if self.infolabel_channel_number_label:
+                return 'multi'
+            if self.infolabel_path == 'pvr://channels/tv/':
+                return 'multi'
+        return self.container_content_fallback
 
-    @property
+    @cached_property
+    def dbtype(self):
+        if self.infolabel_property_tmdb_type == 'person':
+            return 'actors'
+        if self.infolabel_dbtype:
+            return f'{self.infolabel_dbtype}s'
+        return self.fuzzy_dbtype
+
+    @cached_property
     def query(self):
-        query = self.get_infolabel('TvShowTitle')
-        if not query and self._dbtype in ['movies', 'tvshows', 'actors', 'sets', 'multi']:
-            query = self.get_infolabel('Title') or self.get_infolabel('Label')
+        query = ''
+        if not query and self.dbtype in self.allow_tvshowtitle_query:
+            query = self.get_infolabel('tvshowtitle')
+        if not query and self.dbtype in self.allow_title_query:
+            query = self.get_infolabel('title')
+        if not query and self.dbtype in self.allow_label_query:
+            query = self.get_infolabel('label')
         return query
 
-    @property
+    @cached_property
     def year(self):
+        if self.dbtype not in self.allow_year:
+            return
         return self.get_infolabel('year')
 
-    @property
+    @cached_property
     def season(self):
-        if self._dbtype not in ['seasons', 'episodes', 'multi']:
+        if self.dbtype not in self.allow_season:
             return
-        return self.get_infolabel('Season') or None
+        return self.get_infolabel('season')
 
-    @property
+    @cached_property
     def episode(self):
-        if self._dbtype not in ['episodes', 'multi']:
+        if self.dbtype not in self.allow_episode:
             return
-        return self.get_infolabel('Episode') or None
+        return self.get_infolabel('episode')
 
-    @property
+    @cached_property
     def imdb_id(self):
-        if self._season:
+        if self.dbtype not in self.allow_base_id:
             return
-        if self._dbtype not in ['movies', 'tvshows']:
-            return
-        imdb_id = self.get_infolabel('UniqueId(imdb)') or self.get_infolabel('IMDBNumber') or ''
-        return imdb_id if imdb_id.startswith('tt') else ''
+        return self.infolabel_uniqueid_imdb
 
-    @property
+    @cached_property
+    def parent_tvshow_tmdb_id(self):
+        return self.parent.get_tmdb_id_parent(
+            tmdb_id=self.infolabel_uniqueid_tmdb,
+            trakt_type='episode',
+            season_episode_check=(self.season, self.episode,))
+
+    @cached_property
+    def parent_tmdb_id(self):
+        return self.parent.get_tmdb_id(
+            tmdb_type=self.tmdb_type,
+            query=self.query,
+            imdb_id=self.imdb_id,
+            year=self.year,
+        )
+
+    @cached_property
+    def multi_tmdb_id(self):
+        tmdb_id, tmdb_type = self.parent.get_tmdb_id_multi(
+            tmdb_type='tv' if self.season or self.episode else None,
+            query=self.query,
+            imdb_id=self.imdb_id
+        )
+        self.tmdb_type = tmdb_type  # Also update tmdb_type with new type
+        self.dbtype = convert_type(tmdb_type, 'dbtype')  # Also update dbtype with new type
+        return tmdb_id
+
+    @cached_property
     def tmdb_id(self):
-        if self._dbtype in ['movies', 'tvshows']:
-            return self.get_infolabel('UniqueId(tmdb)')
+        if self.dbtype in self.allow_base_id:
+            return self.infolabel_uniqueid_tmdb or self.parent_tmdb_id
 
-        if self._dbtype == 'seasons':
-            # TODO: Trakt lookup of TMDb ID for season similar to episodes
-            return self.get_infolabel('UniqueId(tvshow.tmdb)')
+        if self.dbtype == 'seasons':
+            return self.infolabel_uniqueid_tvshow_tmdb or self.parent_tmdb_id  # TODO: Additional fallback check for parent_tvshow first?
 
-        if self._dbtype == 'episodes':
-            return self.get_infolabel('UniqueId(tvshow.tmdb)') or self._parent.get_tmdb_id_parent(
-                tmdb_id=self.get_infolabel('UniqueId(tmdb)'),
-                trakt_type='episode',
-                season_episode_check=(self._season, self._episode,))
+        if self.dbtype == 'episodes':
+            return self.infolabel_uniqueid_tvshow_tmdb or self.parent_tvshow_tmdb_id or self.parent_tmdb_id
 
-    @property
+        if self.dbtype == 'multi':
+            return self.multi_tmdb_id
+
+    @cached_property
     def tmdb_type(self):
-        if self._dbtype == 'multi':
-            return 'multi'
-        return convert_media_type(self._dbtype, 'tmdb', strip_plural=True, parent_type=True)
-
-    def setup_current_listitem(self):
-        """ Cache property getter return values for performance """
-        self._dbtype = self.dbtype
-        self._query = self.query
-        self._year = self.year
-        self._season = self.season
-        self._episode = self.episode
-        self._imdb_id = self.imdb_id
-        self._tmdb_id = self.tmdb_id
+        if self.dbtype == 'multi':
+            return
+        return convert_media_type(self.dbtype, 'tmdb', strip_plural=True, parent_type=True)
 
     def get_infolabel(self, info):
-        return self._parent.get_infolabel(info, self._position)
+        return self.parent.get_infolabel(info, self.position)
 
-    def get_person_stats(self):
-        if not self._itemdetails or not self._itemdetails.listitem:
+    @cached_property
+    def person_stats(self):
+        if get_condvisibility("Skin.HasSetting(TMDbHelper.DisablePersonStats)"):
+            return {}
+        if not self.item:
+            return {}
+        if self.tmdb_type != 'person':
+            return {}
+        try:
+            query = self.item['infolabels']['title']
+        except (KeyError, AttributeError, NameError):
+            return {}
+        from tmdbhelper.lib.api.kodi.rpc import get_person_stats
+        person_stats = get_person_stats(query)
+        if not person_stats:
+            return {}
+        self.item.setdefault('infoproperties', {}).update(person_stats)
+        return person_stats
+
+    @cached_property
+    def all_ratings(self):
+        if self.tmdb_type not in ('movie', 'tv'):
+            return {}
+        if not self.item:
+            return {}
+        return self.parent.get_all_ratings(self.tmdb_type, self.tmdb_id, self.season, self.episode) or {}
+
+    @cached_property
+    def folderpath(self):
+        if not self.item:
             return
-        return self._parent.get_person_stats(
-            self._itemdetails.listitem, self._itemdetails.tmdb_type, self._itemdetails.tmdb_id)
+        self.item['folderpath'] = self.item['infoproperties']['folderpath'] = self.infolabel_folderpath
+        return self.infolabel_folderpath
 
-    def get_all_ratings(self):
-        if self._itemdetails.tmdb_type not in ['movie', 'tv']:
-            return {}
-        if not self._itemdetails or not self._itemdetails.listitem:
-            return {}
-        return self._parent.get_all_ratings(self._itemdetails.tmdb_type, self._itemdetails.tmdb_id, self._season, self._episode) or {}
-
-    def get_nextaired(self):
-        if not self._itemdetails or not self._itemdetails.listitem:
-            return {}
-        if self._itemdetails.tmdb_type != 'tv':
-            return self._itemdetails.listitem
-        return self._parent.get_nextaired(self._itemdetails.tmdb_type, self._itemdetails.tmdb_id)
-
-    def get_additional_properties(self, infoproperties=None):
-        if not self._itemdetails:
+    @cached_property
+    def filenameandpath(self):
+        if not self.item:
             return
-        self._itemdetails.listitem['folderpath'] = self._itemdetails.listitem['infoproperties']['folderpath'] = self.get_infolabel('folderpath')
-        self._itemdetails.listitem['filenameandpath'] = self._itemdetails.listitem['infoproperties']['filenameandpath'] = self.get_infolabel('filenameandpath')
+        self.item['filenameandpath'] = self.item['infoproperties']['filenameandpath'] = self.infolabel_filenameandpath
+        return self.infolabel_filenameandpath
+
+    def set_additional_properties(self, infoproperties=None):
+        if not self.item:
+            return
         if not infoproperties:
             return
         for k, v in infoproperties.items():
-            self._itemdetails.listitem['infoproperties'][k] = v
+            self.item['infoproperties'][k] = v
 
-    def get_itemtypeid(self, tmdb_type):
-        li_year = None
-        multi_t = None
+    @cached_property
+    def item(self):
+        if not self.tmdb_id or not self.tmdb_type:
+            return self.set_blank_itemdetails()
+        if not self.lidc_item or 'art' not in self.lidc_item:
+            return self.set_blank_itemdetails()
+        return self.lidc_item
 
-        if tmdb_type == 'movie':
-            li_year = self._year
+    @cached_property
+    def lidc_item(self):
+        self.parent.lidc.extendedinfo = get_condvisibility(EXTENDED_PROPERTIES)
+        return self.parent.lidc.get_item(self.tmdb_type, self.tmdb_id, self.season, self.episode)
 
-        if self._episode or self._season:
-            multi_t = 'tv'
-
-        if tmdb_type == 'multi':
-            tmdb_id, tmdb_type = self._parent.get_tmdb_id_multi(
-                tmdb_type=multi_t,
-                query=self._query,
-                imdb_id=self._imdb_id,
-                year=li_year,
-            )
-            self._dbtype = convert_type(tmdb_type, 'dbtype')
-
-        elif self._tmdb_id:
-            tmdb_id = self._tmdb_id
-
-        else:
-            tmdb_id = self._parent.get_tmdb_id(
-                tmdb_type=tmdb_type,
-                query=self._query,
-                imdb_id=self._imdb_id,
-                year=li_year,
-            )
-
-        return (tmdb_type, tmdb_id)
-
-    def get_itemdetails(self):
-        """ Use itemdetails cache to return a named tuple of tmdb_type, tmdb_id, listitem, artwork
-        Runs func(*args, **kwargs) after retrieving a new uncached item for early code execution
-        """
-        if not self.tmdb_type:
-            self._itemdetails = self.get_itemdetails_blank()
-            return self.get_itemdetails_blank()
-        try:
-            tmdb_type, tmdb_id = self.get_itemtypeid(self.tmdb_type)
-            self._parent.lidc.extendedinfo = get_condvisibility(EXTENDED_PROPERTIES)
-            item_data = self._parent.lidc.get_item(tmdb_type, tmdb_id, self._season, self._episode)
-            self._itemdetails = ItemDetails(tmdb_type, tmdb_id, item_data, item_data['art'])
-        except (KeyError, AttributeError, TypeError):
-            self._itemdetails = self.get_itemdetails_blank()
-
-        return self._itemdetails
-
-    @staticmethod
-    def get_itemdetails_blank():
-        return ItemDetails(None, None, get_empty_item(), {})
-
-    def get_builtartwork(self):
-        if not self._itemdetails or not self._itemdetails.artwork:
+    @cached_property
+    def artwork(self):
+        if not self.item or 'art' not in self.item:
             return {}
-        return self._itemdetails.artwork
+        return self.item['art']
 
-    def get_builtitem(self):
-        if not self._itemdetails:
+    def set_blank_itemdetails(self):
+        self.tmdb_id = None
+        self.tmdb_type = None
+        self.artwork = {}
+        return get_empty_item()
+
+    @cached_property
+    def listitem(self):
+        if not self.item:
             return ListItem().get_listitem()
 
         def set_time_properties(li):
@@ -225,7 +315,7 @@ class ListItemDetails(ImageManipulations):
             li.infoproperties['Premiered_Long'] = get_region_date(date_obj, 'datelong')
             li.infoproperties['Premiered_Custom'] = date_obj.strftime(get_infolabel('Skin.String(TMDbHelper.Date.Format)') or '%d %b %Y')
 
-        li = ListItem(**self._itemdetails.listitem)
+        li = ListItem(**self.item)
         set_time_properties(li)
         set_date_properties(li)
 

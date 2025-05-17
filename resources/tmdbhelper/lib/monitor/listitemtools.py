@@ -3,7 +3,7 @@ from tmdbhelper.lib.addon.plugin import get_infolabel, get_condvisibility, get_l
 from tmdbhelper.lib.addon.logger import kodi_try_except
 from jurialmunkey.window import get_property, get_current_window
 from tmdbhelper.lib.monitor.common import CommonMonitorFunctions
-from tmdbhelper.lib.monitor.itemdetails import ListItemDetails
+from tmdbhelper.lib.monitor.itemdetails import MonitorItemDetails
 from tmdbhelper.lib.monitor.baseitem import BaseItemSkinDefaults
 from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.addon.thread import SafeThread
@@ -166,8 +166,7 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         self._listcontainer = self.listcontainer
 
     def setup_current_item(self):
-        self._item = ListItemDetails(self, position=0)
-        self._item.setup_current_listitem()
+        self._item = MonitorItemDetails(self, position=0)
 
     # =========
     # FUNCTIONS
@@ -195,8 +194,8 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         Processing of artwork and ratings is done in a background thread to avoid locking main loop
         """
         _item = self._item
-        _item.get_additional_properties(self.baseitem_properties)
-        _listitem = self._last_listitem = _item.get_builtitem()
+        _item.set_additional_properties(self.baseitem_properties)
+        _listitem = self._last_listitem = _item.listitem
         _pre_item = self._pre_item
         _detailed = {'artwork': None, 'ratings': None}
 
@@ -206,12 +205,12 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         self.add_item_listcontainer(_listitem)
 
         def _process_artwork():
-            _artwork = _item.get_builtartwork()
+            _artwork = _item.artwork
             _artwork.update(_item.get_image_manipulations(built_artwork=_artwork, use_winprops=True))
             _detailed['artwork'] = _artwork
 
         def _process_ratings():
-            _ratings = _item.get_all_ratings() or {}
+            _ratings = _item.all_ratings
             _detailed['ratings'] = _ratings
 
         def _process_artwork_ratings():
@@ -244,14 +243,14 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
 
     def on_finalise_winproperties(self, process_artwork=True, process_ratings=True):
         _item = self._item
-        _item.get_additional_properties(self.baseitem_properties)
+        _item.set_additional_properties(self.baseitem_properties)
         _pre_item = self._pre_item
 
         if _pre_item != self.cur_item:
             return
 
         def process_ratings():
-            ratings_item = {'ratings': _item.get_all_ratings() or {}}
+            ratings_item = {'ratings': _item.all_ratings}
 
             if _pre_item != self.cur_item:
                 return
@@ -271,12 +270,12 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
 
         with self._parent.mutex_lock:
             # Add remote artwork to artwork monitor and update in case local items doesn't have some artwork types
-            if process_artwork and _item._itemdetails.artwork:
-                self._parent.images_monitor.remote_artwork[_pre_item] = _item._itemdetails.artwork.copy()
+            if process_artwork and _item.artwork:
+                self._parent.images_monitor.remote_artwork[_pre_item] = _item.artwork.copy()
                 self._parent.images_monitor.update_artwork(forced=True)
 
             # Set the main properties
-            self.set_properties(_item._itemdetails.listitem)
+            self.set_properties(_item.item)
 
     def on_finalise(self):
         func = self.on_finalise_listcontainer if self._listcontainer else self.on_finalise_winproperties
@@ -306,13 +305,6 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
 
         # Get the current listitem details for the details lookup
         self.setup_current_item()
-
-        # Get item details
-        self._item.get_itemdetails()
-
-        # Get library stats for person
-        if get_condvisibility("!Skin.HasSetting(TMDbHelper.DisablePersonStats)"):
-            self._item.get_person_stats()
 
         # Finish up setting our details to the container/window
         self.on_finalise()
