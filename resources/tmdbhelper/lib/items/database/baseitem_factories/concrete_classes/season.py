@@ -21,7 +21,7 @@ class Season(Tvshow):
         """ Determines if any data is returned """
         if not self.tmdb_id:
             return False
-        if self.season is None:
+        if self.season in (None, ''):
             return False
         if int(self.season) < 0:
             return False
