@@ -327,28 +327,4 @@ class MonitorItemDetails(ImageManipulations):
     def listitem(self):
         if not self.item:
             return ListItem().get_listitem()
-
-        def set_time_properties(li):
-            duration = li.infolabels.get('duration') or 0
-            hours = duration // 60 // 60
-            minutes = duration // 60 % 60
-            totalmin = duration // 60
-            li.infoproperties['Duration'] = totalmin
-            li.infoproperties['Duration_H'] = hours
-            li.infoproperties['Duration_M'] = minutes
-            li.infoproperties['Duration_HHMM'] = f'{hours:02d}:{minutes:02d}'
-
-        def set_date_properties(li):
-            premiered = li.infolabels.get('premiered')
-            date_obj = convert_timestamp(premiered, time_fmt="%Y-%m-%d", time_lim=10)
-            if not date_obj:
-                return
-            li.infoproperties['Premiered'] = get_region_date(date_obj, 'dateshort')
-            li.infoproperties['Premiered_Long'] = get_region_date(date_obj, 'datelong')
-            li.infoproperties['Premiered_Custom'] = date_obj.strftime(get_infolabel('Skin.String(TMDbHelper.Date.Format)') or '%d %b %Y')
-
-        li = ListItem(**self.item)
-        set_time_properties(li)
-        set_date_properties(li)
-
-        return li.get_listitem()
+        return ListItem(**self.item).get_listitem()

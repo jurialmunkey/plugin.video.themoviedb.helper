@@ -281,21 +281,56 @@ class ItemMapperMethods:
         ]
 
     @staticmethod
+    def get_custom_time(duration, name='duration'):
+        if not duration:
+            return {}
+        minutes = duration // 60 % 60
+        hours = duration // 60 // 60
+        totalmin = duration // 60
+        return {
+            f'{name}_H': hours,
+            f'{name}_M': minutes,
+            f'{name}_mins': totalmin,
+            f'{name}_HHMM': f'{hours:02d}:{minutes:02d}',
+        }
+
+    @staticmethod
+    def get_custom_date(air_date, name):
+        from tmdbhelper.lib.addon.plugin import get_infolabel
+        from tmdbhelper.lib.addon.tmdate import format_date_obj, convert_timestamp, get_days_to_air
+        air_date_obj = convert_timestamp(air_date, time_fmt="%Y-%m-%d", time_lim=10, utc_convert=False)
+
+        if not air_date_obj:
+            return {}
+
+        infoproperties = {
+            f'{name}': format_date_obj(air_date_obj, region_fmt='dateshort'),
+            f'{name}_long': format_date_obj(air_date_obj, region_fmt='datelong'),
+            f'{name}_short': format_date_obj(air_date_obj, "%d %b"),
+            f'{name}_day': format_date_obj(air_date_obj, "%A"),
+            f'{name}_day_short': format_date_obj(air_date_obj, "%a"),
+            f'{name}_year': format_date_obj(air_date_obj, "%Y"),
+            f'{name}_custom': format_date_obj(air_date_obj, get_infolabel('Skin.String(TMDbHelper.Date.Format)') or '%d %b %Y'),
+            f'{name}_original': air_date,
+        }
+
+        days_to_air, is_aired = get_days_to_air(air_date_obj)
+        days_to_air_name = f'{name}_days_from_aired' if is_aired else f'{name}_days_until_aired'
+
+        infoproperties[days_to_air_name] = str(days_to_air)
+
+        return infoproperties
+
+    @staticmethod
     def get_episode_to_air(v, name):
         from jurialmunkey.parser import try_float
-        from tmdbhelper.lib.addon.tmdate import format_date_obj, convert_timestamp, get_days_to_air
         from tmdbhelper.lib.api.tmdb.images import TMDbImagePath
 
         i = v or {}
         air_date = i.get('air_date')
-        air_date_obj = convert_timestamp(air_date, time_fmt="%Y-%m-%d", time_lim=10, utc_convert=False)
-        infoproperties = {}
-        infoproperties[f'{name}'] = format_date_obj(air_date_obj, region_fmt='dateshort')
-        infoproperties[f'{name}_long'] = format_date_obj(air_date_obj, region_fmt='datelong')
-        infoproperties[f'{name}_short'] = format_date_obj(air_date_obj, "%d %b")
-        infoproperties[f'{name}_day'] = format_date_obj(air_date_obj, "%A")
-        infoproperties[f'{name}_day_short'] = format_date_obj(air_date_obj, "%a")
-        infoproperties[f'{name}_year'] = format_date_obj(air_date_obj, "%Y")
+
+        infoproperties = ItemMapperMethods.get_custom_date(air_date, name)
+
         infoproperties[f'{name}_episode'] = i.get('episode_number')
         infoproperties[f'{name}_name'] = i.get('name')
         infoproperties[f'{name}_tmdb_id'] = i.get('id')
@@ -304,11 +339,6 @@ class ItemMapperMethods:
         infoproperties[f'{name}_rating'] = f'{try_float(i.get("vote_average")):0,.1f}'
         infoproperties[f'{name}_votes'] = i.get('vote_count')
         infoproperties[f'{name}_thumb'] = TMDbImagePath().get_imagepath_thumbs(i.get('still_path'))
-        infoproperties[f'{name}_original'] = air_date
-
-        if air_date_obj:
-            days_to_air, is_aired = get_days_to_air(air_date_obj)
-            infoproperties[f'{name}_days_from_aired' if is_aired else f'{name}_days_until_aired'] = str(days_to_air)
 
         return infoproperties
 

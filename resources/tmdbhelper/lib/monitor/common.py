@@ -177,27 +177,6 @@ class CommonMonitorItem:
     def premiered(self):
         return self.infolabels.get('premiered')
 
-    def set_time_properties(self):
-        if not self.duration:
-            return
-        minutes = self.duration // 60 % 60
-        hours = self.duration // 60 // 60
-        totalmin = self.duration // 60
-        self.set_property('Duration', totalmin)
-        self.set_property('Duration_H', hours)
-        self.set_property('Duration_M', minutes)
-        self.set_property('Duration_HHMM', f'{hours:02d}:{minutes:02d}')
-
-    def set_date_properties(self):
-        if not self.premiered:
-            return
-        date_obj = convert_timestamp(self.premiered, time_fmt="%Y-%m-%d", time_lim=10)
-        if not date_obj:
-            return
-        self.set_property('Premiered', get_region_date(date_obj, 'dateshort'))
-        self.set_property('Premiered_Long', get_region_date(date_obj, 'datelong'))
-        self.set_property('Premiered_Custom', date_obj.strftime(get_infolabel('Skin.String(TMDbHelper.Date.Format)') or '%d %b %Y'))
-
     def set_info_properties(self, dictionary: dict, affix=None):
         if not dictionary:
             return
@@ -236,8 +215,6 @@ class CommonMonitorItem:
         self.set_info_properties(self.unique_ids, affix='id')
         self.set_info_properties(self.infolabels)
         self.set_info_properties(self.infoproperties)
-        self.set_time_properties()
-        self.set_date_properties()
 
     def clear_properties(self, ignore_keys=None):
         for k in self.properties - (ignore_keys or set()):

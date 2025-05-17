@@ -1,4 +1,5 @@
 from tmdbhelper.lib.files.ftools import cached_property
+from tmdbhelper.lib.items.database.mappings import ItemMapperMethods
 
 
 class BaseItem:
@@ -81,6 +82,11 @@ class BaseItem:
     def get_infoproperties_special(self, infoproperties):
         return infoproperties
 
+    def get_infoproperties_airdate(self, infoproperties):
+        infoproperties.update(ItemMapperMethods.get_custom_time(self.get_data_value('duration'), name='duration'))
+        infoproperties.update(ItemMapperMethods.get_custom_date(self.get_data_value('premiered'), name='premiered'))
+        return infoproperties
+
     def get_art_dbclist(self, art):
         for instance, dkey in self.art_dbclist_routes:
             attr, subtype = instance
@@ -131,6 +137,7 @@ class BaseItem:
         infoproperties = {}
         infoproperties = self.get_infoproperties_dbclist(infoproperties) if self.extendedinfo else {}
         infoproperties = self.get_infoproperties_special(infoproperties)
+        infoproperties = self.get_infoproperties_airdate(infoproperties)
         return infoproperties
 
     @cached_property
