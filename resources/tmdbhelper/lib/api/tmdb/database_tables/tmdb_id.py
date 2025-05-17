@@ -265,7 +265,7 @@ class TMDbDatabaseTMDbID:
 
         tmdb_id = try_imdb_id() or try_tvdb_id() or try_name_id()
         if not tmdb_id:
-            return
+            return (None, None) if use_multisearch else None
         return (tmdb_id, tmdb_type) if use_multisearch else tmdb_id
 
     def get_tmdb_id_from_query(self, tmdb_type, query, header=None, use_details=False, get_listitem=False, auto_single=False):
