@@ -87,7 +87,7 @@ class StarredMoviesMediaList(MediaList):
 
     @property
     def cached_data_conditions_sort_fallback(self):
-        return f'{self.cached_data_innertable}.votes {self.cached_data_conditions_how}'
+        return f'votes {self.cached_data_conditions_how}'
 
     @property
     def cached_data_conditions_how(self):

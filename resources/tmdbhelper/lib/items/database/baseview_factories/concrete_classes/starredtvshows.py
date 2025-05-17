@@ -14,7 +14,7 @@ class StarredTvshowsMediaList(StarredMoviesMediaList):
 
     @property
     def cached_data_conditions_sort_fallback(self):
-        return f'{self.cached_data_innertable}.appearances {self.cached_data_conditions_how}'
+        return f'appearances {self.cached_data_conditions_how}'
 
     item_mediatype = 'tvshow'
     item_tmdb_type = 'tv'

@@ -1,5 +1,4 @@
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.starredcombined import StarredCombinedMediaList
-from tmdbhelper.lib.addon.consts import DATALEVEL_MAX
 
 
 class CrewedCombinedMediaList(StarredCombinedMediaList):

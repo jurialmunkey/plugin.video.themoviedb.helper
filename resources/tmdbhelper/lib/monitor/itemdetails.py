@@ -1,4 +1,4 @@
-from tmdbhelper.lib.addon.plugin import get_condvisibility, get_infolabel, convert_media_type, convert_type, get_setting
+from tmdbhelper.lib.addon.plugin import get_condvisibility, get_infolabel, convert_type, get_setting
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_region_date
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.monitor.images import ImageManipulations
@@ -19,8 +19,17 @@ class MonitorItemDetails(ImageManipulations):
     allow_label_query = ('movies', 'tvshows', 'actors', 'sets', 'multi')
     allow_episode = ('episodes', 'multi')
     allow_season = ('seasons', 'episodes', 'multi')
-    allow_base_id = ('movies', 'tvshows')
+    allow_base_id = ('movies', 'tvshows', 'actors')
     allow_year = ('movies', )
+
+    container_dbtype_to_tmdb_type = {
+        'movies': 'movie',
+        'tvshows': 'tv',
+        'seasons': 'tv',
+        'episodes': 'tv',
+        'actors': 'person',
+        'sets': 'collection'
+    }
 
     def __init__(self, parent, position=0):
         self.parent = parent  # ListItemMonitorFunctions
@@ -66,11 +75,11 @@ class MonitorItemDetails(ImageManipulations):
 
     @cached_property
     def infolabel_uniqueid_tmdb(self):
-        return self.get_infolabel('UniqueId(tmdb)')
+        return self.get_infolabel('UniqueId(tmdb)') or self.get_infolabel('Property(tmdb_id)')
 
     @cached_property
     def infolabel_uniqueid_tvshow_tmdb(self):
-        return self.get_infolabel('UniqueId(tvshow.tmdb)')
+        return self.get_infolabel('UniqueId(tvshow.tmdb)') or self.get_infolabel('Property(tvshow.tmdb_id)')
 
     @cached_property
     def infolabel_uniqueid_imdb(self):
@@ -227,9 +236,7 @@ class MonitorItemDetails(ImageManipulations):
 
     @cached_property
     def tmdb_type(self):
-        if self.dbtype == 'multi':
-            return
-        return convert_media_type(self.dbtype, 'tmdb', strip_plural=True, parent_type=True)
+        return self.container_dbtype_to_tmdb_type.get(self.dbtype)
 
     def get_infolabel(self, info):
         return self.parent.get_infolabel(info, self.position)
@@ -291,9 +298,11 @@ class MonitorItemDetails(ImageManipulations):
     def item(self):
         if not self.is_same_item:
             return self.set_blank_itemdetails()
-        if not self.tmdb_id or not self.tmdb_type:
+        if not self.tmdb_id:
             return self.set_blank_itemdetails()
-        if not self.lidc_item or 'art' not in self.lidc_item:
+        if not self.tmdb_type:
+            return self.set_blank_itemdetails()
+        if not self.lidc_item:  # or 'art' not in self.lidc_item:
             return self.set_blank_itemdetails()
         return self.lidc_item
 
