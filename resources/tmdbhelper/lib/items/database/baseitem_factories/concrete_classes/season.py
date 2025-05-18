@@ -91,10 +91,11 @@ class Season(Tvshow):
 
     def get_cached_data_keys(self):
         """ SELECT """
-        cached_data_keys = [f'{self.table}.{k}' for k in self.keys if k != 'plot']
+        cached_data_keys = [f'{self.table}.{k}' for k in self.keys if k not in ('plot', 'status')]
         cached_data_keys.extend([
             'tvshow.title AS tvshowtitle',
             'tvshow.tagline as tagline',
+            'tvshow.status AS status',
             'ifnull(season.plot, tvshow.plot) as plot',
             (
                 '(    SELECT COUNT(episode.season_id) '
@@ -104,6 +105,7 @@ class Season(Tvshow):
                 ') as totalepisodes'
             )
         ])
+
         cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('next_aired'))
         cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('last_aired'))
         return tuple(cached_data_keys)
