@@ -5,7 +5,7 @@ from tmdbhelper.lib.addon.plugin import get_localized, ADDONPATH
 class UpNextSeason(AnticipatedSeasonMediaList):
     table = 'season'
     item_specialseason = get_localized(32043)
-    cached_data_conditions_base = 'season.tvshow_id=? AND totalepisodes>0 ORDER BY season DESC LIMIT 1'
+    cached_data_conditions_base = 'season.tvshow_id=? AND totalepisodes>0 ORDER BY season.season DESC LIMIT 1'
 
     def map_item_art(self, i):
         map_item_art = self.parent_item_data['art']
@@ -15,8 +15,8 @@ class UpNextSeason(AnticipatedSeasonMediaList):
 
     def get_cached_data_keys(self):
         """ SELECT """
-        deniedlist_keys = ('plot', )
-        additional_keys = [
+        cached_data_keys = [f'{self.table}.{k}' for k in self.keys if k != 'plot']
+        cached_data_keys.extend([
             'tvshow.title AS tvshowtitle',
             'tvshow.tagline as tagline',
             'ifnull(season.plot, tvshow.plot) as plot',
@@ -28,8 +28,10 @@ class UpNextSeason(AnticipatedSeasonMediaList):
                 '     GROUP BY simplecache.item_type'
                 ') as totalepisodes'
             )
-        ]
-        return tuple([f'{self.table}.{k}' for k in self.keys if k not in deniedlist_keys] + additional_keys)
+        ])
+        cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('next_aired'))
+        cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('last_aired'))
+        return tuple(cached_data_keys)
 
     def map_item_params(self, i):
         return {

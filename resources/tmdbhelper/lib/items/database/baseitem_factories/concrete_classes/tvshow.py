@@ -8,6 +8,38 @@ class Tvshow(MediaItem):
     ftv_type = 'tv'
 
     @property
+    def cached_data_table(self):
+        """ FROM """
+        return (
+            f'baseitem LEFT JOIN {self.table} ON {self.table}.id = baseitem.id '
+            f'LEFT JOIN episode next_aired ON next_aired.id = {self.table}.next_episode_to_air_id '
+            f'LEFT JOIN episode last_aired ON last_aired.id = {self.table}.last_episode_to_air_id '
+        )
+
+    @staticmethod
+    def cached_data_keys_episode_to_air(prefix='next_aired'):
+        return [
+            f'{prefix}.id AS {prefix}_id',
+            f'{prefix}.episode AS {prefix}_episode',
+            f'{prefix}.year AS {prefix}_year',
+            f'{prefix}.premiered AS {prefix}_premiered',
+            f'{prefix}.duration AS {prefix}_duration',  # TODO: FORMAT THESE TOO!
+            f'{prefix}.rating AS {prefix}_rating',
+            f'{prefix}.votes AS {prefix}_votes',
+            f'{prefix}.popularity AS {prefix}_popularity',
+            f'{prefix}.title AS {prefix}_title',
+            f'{prefix}.plot AS {prefix}_plot',
+        ]
+
+    @property
+    def cached_data_keys(self):
+        """ SELECT """
+        cached_data_keys = [f'{self.table}.{k}' for k in self.keys]
+        cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('next_aired'))
+        cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('last_aired'))
+        return tuple(cached_data_keys)
+
+    @property
     def online_data_kwgs(self):
         if self.cache_refresh == 'basic':
             return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow_simple}

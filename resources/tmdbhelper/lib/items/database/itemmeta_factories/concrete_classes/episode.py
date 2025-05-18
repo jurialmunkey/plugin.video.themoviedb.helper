@@ -45,10 +45,6 @@ class Episode(MediaItem):
             return 'Airing'
         return 'Released'
 
-    def get_infolabels_special(self, infolabels):
-        infolabels['status'] = self.get_premiered_status()
-        return infolabels
-
     def get_unique_ids(self, unique_ids):
         unique_ids = super().get_unique_ids(unique_ids)
         for i in self.parent_db_cache.return_basemeta_db('unique_id', 'season').cached_data:
@@ -67,11 +63,13 @@ class Episode(MediaItem):
         return infoproperties
 
     def get_infoproperties_episode_type(self, infoproperties):
-        infoproperties['episode_type'] = self.get_data_value('status')
+        infoproperties['episode_type'] = self.get_data_value('episode_type')
+        infoproperties['episode_status'] = self.get_premiered_status()
         return infoproperties
 
     def get_infoproperties_special(self, infoproperties):
         infoproperties = self.get_infoproperties_custom(infoproperties)
         infoproperties = self.get_infoproperties_episode_type(infoproperties)
         infoproperties = self.get_infoproperties_progress(infoproperties)
+        infoproperties = self.get_infoproperties_next_ep(infoproperties)
         return infoproperties

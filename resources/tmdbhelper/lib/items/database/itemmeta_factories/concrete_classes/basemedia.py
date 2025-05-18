@@ -1,4 +1,5 @@
 from tmdbhelper.lib.files.ftools import cached_property
+from tmdbhelper.lib.items.database.mappings import ItemMapperMethods
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseclass import BaseItem
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseroutes import MediaItemInfoLabelItemRoutes
 from tmdbhelper.lib.addon.plugin import get_setting
@@ -295,6 +296,46 @@ class MediaItem(BaseItem):
 
         infoproperties['ResumeTime'] = int(duration * progress // 100)
         infoproperties['TotalTime'] = int(duration)
+        return infoproperties
+
+    def get_infoproperties_next_ep(self, infoproperties):
+
+        try:
+            for column in ('next_aired', 'last_aired'):
+
+                episode_id = self.get_data_value(f'{column}_id')
+
+                if not episode_id:
+                    continue
+
+                for affix in (
+                    'id', 'episode', 'year', 'premiered', 'duration',
+                    'rating', 'votes', 'popularity', 'title', 'plot'
+                ):
+                    infoproperties[f'{column}.{affix}'] = self.get_data_value(f'{column}_{affix}')
+
+                id_split = episode_id.split('.')
+
+                infoproperties.update({
+                    f'{column}.tmdb_type': id_split[0],
+                    f'{column}.tmdb_id': id_split[1],
+                    f'{column}.season': id_split[2],
+                    f'{column}.episode': id_split[3],
+                })
+
+                infoproperties.update(
+                    ItemMapperMethods.get_custom_date(
+                        self.get_data_value(f'{column}_premiered'), name=column
+                    )
+                )
+
+                infoproperties.update(
+                    ItemMapperMethods.get_custom_time(
+                        self.get_data_value(f'{column}_duration'), name='duration'))
+
+        except (TypeError, KeyError, IndexError):
+            pass
+
         return infoproperties
 
     def get_unique_ids(self, unique_ids):

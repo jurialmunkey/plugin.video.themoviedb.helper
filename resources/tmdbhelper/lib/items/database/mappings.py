@@ -2,6 +2,10 @@
 # -*- coding: utf-8 -*-
 from tmdbhelper.lib.api.mapping import _ItemMapper
 from jurialmunkey.parser import try_int
+from collections import namedtuple
+
+
+ExtendedMap = namedtuple("ExtendedMap", "base unique_id overwrite data")
 
 
 def get_blanks_none(i):
@@ -21,7 +25,8 @@ class ItemMapperMethods:
         except (TypeError, ValueError):
             return 0
 
-    def add_art_type(self, item_id, path, art_type, aspect_ratio):
+    @staticmethod
+    def add_art_type(item_id, path, art_type, aspect_ratio):
         from tmdbhelper.lib.addon.consts import IMAGEPATH_ASPECTRATIO
         return {
             'parent_id': item_id,
@@ -34,31 +39,18 @@ class ItemMapperMethods:
             'votes': 0,
         }
 
-    def add_season_episodes_art(self, v, **kwargs):
-        art = []
+    @staticmethod
+    def get_configured_item(i, **kwargs):
 
-        for i in v:
-            if 'still_path' in i:
-                art.append(self.add_art_type(
-                    item_id=f'tv.{self.tmdb_id}.{i["season_number"]}.{i["episode_number"]}',
-                    path=i['still_path'],
-                    art_type='stills',
-                    aspect_ratio='landscape'))
+        def get_item(i, v):
+            try:
+                if not callable(v):
+                    return i.get(v)
+                return v(i)
+            except (TypeError, KeyError, IndexError, ValueError):
+                return
 
-        return art
-
-    def add_seasons_art(self, v, **kwargs):
-        art = []
-
-        for i in v:
-            if 'poster_path' in i:
-                art.append(self.add_art_type(
-                    item_id=f'tv.{self.tmdb_id}.{i["season_number"]}',
-                    path=i['poster_path'],
-                    art_type='posters',
-                    aspect_ratio='poster'))
-
-        return art
+        return {k: get_blanks_none(get_item(i, v)) for k, v in kwargs.items()}
 
     @staticmethod
     def split_array(items, subkeys=(), haskeys=(), **kwargs):
@@ -74,17 +66,6 @@ class ItemMapperMethods:
         if not isinstance(items, list):
             return []
 
-        def get_item(i, v):
-            try:
-                if not callable(v):
-                    return i.get(v)
-                return v(i)
-            except (TypeError, KeyError, IndexError, ValueError):
-                return
-
-        def get_configured_item(i, v):
-            return get_blanks_none(get_item(i, v))
-
         def check_item(i):
             for k in haskeys:
                 try:
@@ -95,7 +76,22 @@ class ItemMapperMethods:
             return i
 
         items = [i for i in items if check_item(i)] if haskeys else items
-        return [{k: get_configured_item(i, v) for k, v in kwargs.items()} for i in items]
+        return [ItemMapperMethods.get_configured_item(i, **kwargs) for i in items]
+
+    @staticmethod
+    def get_episode_type(i, **kwargs):
+        episode_type = i['episode_type']
+        season_number = i['season_number']
+        episode_number = i['episode_number']
+        if season_number == 0:
+            return 'special'
+        if episode_number == 1:
+            return 'series_premiere' if season_number == 1 else 'season_premiere'
+        if episode_type == 'finale':
+            return 'season_finale'  # TODO: Series finale currently calculated as part of last_aired (checks status as cancelled/ended and assumes last_aired episode is finale)
+        if episode_type == 'mid_season':
+            return 'mid_season_finale'  # TODO: Calculate mid season premiere (might be a real pain to do)
+        return 'standard'
 
     @staticmethod
     def get_providers(items, service=False, **kwargs):
@@ -147,6 +143,314 @@ class ItemMapperMethods:
                 })
         return data
 
+    @staticmethod
+    def get_collection(v, **kwargs):
+        data = []
+
+        item_id = f"collection.{v['id']}"
+
+        collection_item = ItemMapperMethods.get_configured_item(v, **{
+            'tmdb_id': 'id',
+            'title': 'name',
+            'poster': 'poster_path',
+            'fanart': 'backdrop_path',
+        })
+        collection_item['id'] = item_id
+
+        data.append(ExtendedMap('collection', item_id, False, collection_item))
+
+        data.append(ExtendedMap('baseitem', item_id, False, {
+            'id': item_id,
+            'mediatype': 'collection',
+            'expiry': 0,
+        }))
+
+        return data
+
+    @staticmethod
+    def get_creators(items, **kwargs):
+        data = []
+
+        for i in items:
+            item_id = f'person.{i["id"]}'
+            tmdb_id = i['id']
+
+            data.append(ExtendedMap('crewmember', item_id, False, {
+                'tmdb_id': tmdb_id,
+                'role': 'Creator',
+                'department': 'Creator',
+            }))
+
+            person_item = ItemMapperMethods.get_configured_item(i, **{
+                'name': 'name',
+                'thumb': 'profile_path',
+                'gender': 'gender',
+            })
+            person_item['id'] = item_id
+            person_item['tmdb_id'] = tmdb_id
+
+            data.append(ExtendedMap('person', item_id, False, person_item))
+
+            data.append(ExtendedMap('baseitem', item_id, False, {
+                'id': item_id,
+                'mediatype': 'person',
+                'expiry': 0,
+            }))
+
+        return data
+
+    def get_episode_to_air(self, i, **kwargs):
+        data = []
+
+        item_id = f'tv.{self.tmdb_id}.{i["season_number"]}.{i["episode_number"]}'
+        season_id = f'tv.{self.tmdb_id}.{i["season_number"]}'
+        tvshow_id = f'tv.{self.tmdb_id}'
+
+        tvshow_status = self.data.get('status')
+
+        episode_item = ItemMapperMethods.get_configured_item(i, **{
+            'episode': 'episode_number',
+            'premiered': 'air_date',
+            'title': 'name',
+            'plot': 'overview',
+            'rating': 'vote_average',
+            'votes': 'vote_count',
+            'duration': lambda i: try_int(i['runtime']) * 60
+        })
+        episode_item['id'] = item_id
+        episode_item['season_id'] = season_id
+        episode_item['tvshow_id'] = tvshow_id
+
+        if tvshow_status in ('Ended', 'Cancelled'):
+            episode_item['status'] = 'series_finale'
+
+        data.append(ExtendedMap('episode', item_id, False, episode_item))
+
+        data.append(ExtendedMap('season', season_id, False, {
+            'id': season_id,
+            'tvshow_id': tvshow_id,
+            'season': i['season_number'],
+        }))
+
+        data.append(ExtendedMap('baseitem', item_id, False, {
+            'id': item_id,
+            'mediatype': 'episode',
+            'expiry': 0,
+        }))
+
+        data.append(ExtendedMap('baseitem', season_id, False, {
+            'id': season_id,
+            'mediatype': 'season',
+            'expiry': 0,
+        }))
+
+        if i.get('still_path'):
+            artwork = self.add_art_type(
+                item_id=item_id,
+                path=i['still_path'],
+                art_type='stills',
+                aspect_ratio='landscape')
+            data.append(ExtendedMap('art', artwork['icon'], False, artwork))
+
+        return data
+
+    @staticmethod
+    def get_credits(items, **kwargs):
+        mappings = (
+            ('cast', 'castmember', {'ordering': 'order', 'role': 'character'}),
+            ('crew', 'crewmember', {'department': 'department', 'role': 'job'}),
+            ('guest_stars', 'cast', {'ordering': 'order', 'role': 'character'}),
+        )
+        return ItemMapperMethods.get_credits_data(items, mappings)
+
+    @staticmethod
+    def get_aggregate_credits(items, **kwargs):
+        mappings = (
+            ('cast', 'castmember', {
+                'role': lambda i: ' / '.join([j['character'] for j in i['roles']]),
+                'ordering': 'order',
+                'appearances': 'total_episode_count',
+            }),
+            ('crew', 'crewmember', {
+                'role': lambda i: ' / '.join([j['job'] for j in i['jobs']]),
+                'ordering': 'order',
+                'department': 'department',
+                'appearances': 'total_episode_count'
+            }),
+        )
+        return ItemMapperMethods.get_credits_data(items, mappings)
+
+    @staticmethod
+    def get_credits_data(items, mappings):
+        data = []
+        for subkey, mapkey, config in mappings:
+
+            for i in (items.get(subkey) or []):
+                item_id = f'person.{i["id"]}'
+                tmdb_id = i['id']
+
+                data.append(ExtendedMap('baseitem', item_id, False, {
+                    'id': item_id,
+                    'mediatype': 'person',
+                    'expiry': 0,
+                }))
+
+                credit_item = ItemMapperMethods.get_configured_item(i, **config)
+                credit_item['tmdb_id'] = tmdb_id
+                data.append(ExtendedMap(mapkey, item_id, False, credit_item))
+
+                person_item = ItemMapperMethods.get_configured_item(i, **{
+                    'name': 'name',
+                    'thumb': 'profile_path',
+                    'gender': 'gender',
+                    'known_for_department': 'known_for_department',
+                })
+                person_item['id'] = item_id
+                person_item['tmdb_id'] = tmdb_id
+                data.append(ExtendedMap('person', item_id, False, person_item))
+        return data
+
+    def get_person_movie_credits_data(self, items):
+        return self.get_person_credits_data(items, 'movie')
+
+    def get_person_tv_credits_data(self, items):
+        return self.get_person_credits_data(items, 'tvshow')
+
+    def get_person_credits_data(self, items, tmdb_type='movie'):
+        data = []
+
+        mappings = (
+            ('cast', 'castmember', {'ordering': 'order', 'role': 'character'}),
+            ('crew', 'crewmember', {'department': 'department', 'role': 'job'}),
+        )
+
+        for subkey, mapkey, config in mappings:
+            credits = items.get(subkey) or []
+            for i in credits:
+
+                item_id = f'{tmdb_type}.{i["id"]}'
+
+                mediatype = 'movie' if tmdb_type == 'movie' else 'tvshow'
+                premiered = 'release_date' if mediatype == 'movie' else 'first_air_date'
+                titlename = 'title' if mediatype == 'movie' else 'name'
+
+                media_item = ItemMapperMethods.get_configured_item(i, **{
+                    'year': lambda i: int(i[premiered][0:4]),
+                    'premiered': premiered,
+                    'plot': 'overview',
+                    'title': titlename,
+                    'originaltitle': 'original_title',
+                    'rating': 'vote_average',
+                    'votes': 'vote_count',
+                    'popularity': 'popularity'
+
+                })
+                media_item['id'] = item_id
+                media_item['tmdb_id'] = i['id']
+                data.append(ExtendedMap(mediatype, item_id, False, media_item))
+
+                credit_item = ItemMapperMethods.get_configured_item(i, **config)
+                credit_item['parent_id'] = item_id
+                credit_item['tmdb_id'] = self.tmdb_id
+                data.append(ExtendedMap(mapkey, item_id, False, credit_item))
+
+                data.append(ExtendedMap('baseitem', item_id, False, {
+                    'id': item_id,
+                    'mediatype': mediatype,
+                    'expiry': 0,
+                }))
+
+                for icon_type, aspect in (('poster_path', 'posters'), ('backdrop_path', 'backdrops')):
+                    icon = i.get(icon_type)
+                    if not icon:
+                        continue
+                    data.append(ExtendedMap('art', icon, False, {
+                        'parent_id': item_id,
+                        'icon': icon,
+                        'type': aspect,
+                        'aspect_ratio': aspect,
+                        'extension': icon.split('.')[-1],
+                    }))
+
+        return data
+
+    def get_episodes(self, items, **kwargs):
+        data = []
+
+        for i in items:
+            item_id = f'tv.{self.tmdb_id}.{i["season_number"]}.{i["episode_number"]}'
+            season_id = f'tv.{self.tmdb_id}.{i["season_number"]}'
+            tvshow_id = f'tv.{self.tmdb_id}'
+
+            episode_item = ItemMapperMethods.get_configured_item(i, **{
+                'episode': 'episode_number',
+                'year': lambda i: int(i['air_date'][0:4]),
+                'premiered': 'air_date',
+                'title': 'name',
+                'plot': 'overview',
+                'rating': 'vote_average',
+                'votes': 'vote_count',
+                'status': lambda i: self.get_episode_type(i),
+                'duration': lambda i: try_int(i['runtime']) * 60
+            })
+            episode_item['id'] = item_id
+            episode_item['season_id'] = season_id
+            episode_item['tvshow_id'] = tvshow_id
+
+            data.append(ExtendedMap('episode', item_id, True, episode_item))
+
+            if i.get('still_path'):
+                artwork = self.add_art_type(
+                    item_id=item_id,
+                    path=i['still_path'],
+                    art_type='stills',
+                    aspect_ratio='landscape')
+                data.append(ExtendedMap('art', artwork['icon'], False, artwork))
+
+            data.append(ExtendedMap('baseitem', item_id, False, {
+                'id': item_id,
+                'mediatype': 'episode',
+                'expiry': 0,
+            }))
+
+        return data
+
+    def get_seasons(self, items, **kwargs):
+        data = []
+
+        for i in items:
+            item_id = f'tv.{self.tmdb_id}.{i["season_number"]}'
+            tvshow_id = f'tv.{self.tmdb_id}'
+
+            season_item = ItemMapperMethods.get_configured_item(i, **{
+                'season': 'season_number',
+                'year': lambda i: int(i['air_date'][0:4]),
+                'premiered': 'air_date',
+                'title': 'name',
+                'plot': 'overview',
+                'rating': 'vote_average',
+            })
+            season_item['id'] = item_id
+            season_item['tvshow_id'] = tvshow_id
+
+            data.append(ExtendedMap('season', item_id, True, season_item))
+
+            if i.get('poster_path'):
+                artwork = self.add_art_type(
+                    item_id=item_id,
+                    path=i['poster_path'],
+                    art_type='posters',
+                    aspect_ratio='poster')
+                data.append(ExtendedMap('art', artwork['icon'], False, artwork))
+
+            data.append(ExtendedMap('baseitem', item_id, False, {
+                'id': item_id,
+                'mediatype': 'season',
+                'expiry': 0,
+            }))
+
+        return data
+
     def get_fanart_tv(self, items, **kwargs):
         if not items:
             return
@@ -177,35 +481,48 @@ class ItemMapperMethods:
 
         data = []
         for art_type, art_list in items.items():
+
             if not isinstance(art_list, list):
                 continue
+
             quality = 1 if art_type.startswith('hd') else 0
+
             art_type = art_types.get(art_type)
             if not art_type:
                 continue
+
             art_type, art_has_seasons = art_type
+
             for art_item in art_list:
-                path = art_item['url']
+                icon = get_blanks_none(art_item['url'])
+
+                if not icon:
+                    continue
+
                 item = {
-                    'icon': get_blanks_none(path),
+                    'icon': icon,
                     'iso_language': get_blanks_none(art_item.get('lang')),
                     'likes': get_blanks_none(art_item.get('likes')),
                     'type': get_blanks_none(art_type),
                     'quality': get_blanks_none(quality),
-                    'extension': get_blanks_none(path.split('.')[-1] if path else None),
+                    'extension': get_blanks_none(icon.split('.')[-1] if icon else None),
                 }
 
                 if art_has_seasons:
                     snum = (art_item.get('season') or 'all')
+
                     if snum != 'all':
-                        item['parent_id'] = f'tv.{self.tmdb_id}.{snum}'
-                        self.item['baseitem'].append({
-                            'id': f'tv.{self.tmdb_id}.{snum}',
+                        parent_id = f'tv.{self.tmdb_id}.{snum}'
+
+                        item['parent_id'] = parent_id
+
+                        data.append(ExtendedMap('baseitem', parent_id, False, {
+                            'id': parent_id,
                             'mediatype': 'season',
                             'expiry': 0,
-                        })
+                        }))
 
-                data.append(item)
+                data.append(ExtendedMap('fanart_tv', icon, True, item))
 
         return data
 
@@ -249,22 +566,25 @@ class ItemMapperMethods:
     @staticmethod
     def get_art(items, **kwargs):
         if not items:
-            return
+            return []
+
         data = []
 
         for artwork_type, artworks in items.items():
             for artwork in artworks:
                 path = artwork['file_path']
-                data.append({
-                    'aspect_ratio': ItemMapperMethods.get_aspect_ratio(artwork['aspect_ratio']),
-                    'quality': int((artwork['width'] * artwork['height']) // 200000),  # Quality integer to nearest fifth of a megapixel
-                    'iso_language': get_blanks_none(artwork['iso_639_1']),
-                    'icon': get_blanks_none(path),
-                    'type': get_blanks_none(artwork_type),
-                    'extension': get_blanks_none(path.split('.')[-1] if path else None),
-                    'rating': int(artwork['vote_average'] * 100),
-                    'votes': get_blanks_none(artwork['vote_count']),
-                })
+                data.append(
+                    ExtendedMap('art', get_blanks_none(path), True, {
+                        'aspect_ratio': ItemMapperMethods.get_aspect_ratio(artwork['aspect_ratio']),
+                        'quality': int((artwork['width'] * artwork['height']) // 200000),  # Quality integer to nearest fifth of a megapixel
+                        'iso_language': get_blanks_none(artwork['iso_639_1']),
+                        'icon': get_blanks_none(path),
+                        'type': get_blanks_none(artwork_type),
+                        'extension': get_blanks_none(path.split('.')[-1] if path else None),
+                        'rating': int(artwork['vote_average'] * 100),
+                        'votes': get_blanks_none(artwork['vote_count'])
+                    })
+                )
 
         return data
 
@@ -287,12 +607,13 @@ class ItemMapperMethods:
         minutes = duration // 60 % 60
         hours = duration // 60 // 60
         totalmin = duration // 60
-        return {
-            f'{name}_H': hours,
-            f'{name}_M': minutes,
-            f'{name}_mins': totalmin,
-            f'{name}_HHMM': f'{hours:02d}:{minutes:02d}',
+        infoproperties = {
+            f'{name}.H': hours,
+            f'{name}.M': minutes,
+            f'{name}.mins': totalmin,
+            f'{name}.HHMM': f'{hours:02d}:{minutes:02d}',
         }
+        return infoproperties
 
     @staticmethod
     def get_custom_date(air_date, name):
@@ -305,41 +626,19 @@ class ItemMapperMethods:
 
         infoproperties = {
             f'{name}': format_date_obj(air_date_obj, region_fmt='dateshort'),
-            f'{name}_long': format_date_obj(air_date_obj, region_fmt='datelong'),
-            f'{name}_short': format_date_obj(air_date_obj, "%d %b"),
-            f'{name}_day': format_date_obj(air_date_obj, "%A"),
-            f'{name}_day_short': format_date_obj(air_date_obj, "%a"),
-            f'{name}_year': format_date_obj(air_date_obj, "%Y"),
-            f'{name}_custom': format_date_obj(air_date_obj, get_infolabel('Skin.String(TMDbHelper.Date.Format)') or '%d %b %Y'),
-            f'{name}_original': air_date,
+            f'{name}.long': format_date_obj(air_date_obj, region_fmt='datelong'),
+            f'{name}.short': format_date_obj(air_date_obj, "%d %b"),
+            f'{name}.day': format_date_obj(air_date_obj, "%A"),
+            f'{name}.day_short': format_date_obj(air_date_obj, "%a"),
+            f'{name}.year': format_date_obj(air_date_obj, "%Y"),
+            f'{name}.custom': format_date_obj(air_date_obj, get_infolabel('Skin.String(TMDbHelper.Date.Format)') or '%d %b %Y'),
+            f'{name}.original': air_date,
         }
 
         days_to_air, is_aired = get_days_to_air(air_date_obj)
-        days_to_air_name = f'{name}_days_from_aired' if is_aired else f'{name}_days_until_aired'
+        days_to_air_name = f'{name}.days_from_aired' if is_aired else f'{name}.days_until_aired'
 
         infoproperties[days_to_air_name] = str(days_to_air)
-
-        return infoproperties
-
-    @staticmethod
-    def get_episode_to_air(v, name):
-        from jurialmunkey.parser import try_float
-        from tmdbhelper.lib.api.tmdb.images import TMDbImagePath
-
-        i = v or {}
-        air_date = i.get('air_date')
-
-        infoproperties = ItemMapperMethods.get_custom_date(air_date, name)
-
-        infoproperties[f'{name}_episode'] = i.get('episode_number')
-        infoproperties[f'{name}_name'] = i.get('name')
-        infoproperties[f'{name}_tmdb_id'] = i.get('id')
-        infoproperties[f'{name}_plot'] = i.get('overview')
-        infoproperties[f'{name}_season'] = i.get('season_number')
-        infoproperties[f'{name}_rating'] = f'{try_float(i.get("vote_average")):0,.1f}'
-        infoproperties[f'{name}_votes'] = i.get('vote_count')
-        infoproperties[f'{name}_thumb'] = TMDbImagePath().get_imagepath_thumbs(i.get('still_path'))
-
         return infoproperties
 
 
@@ -389,26 +688,6 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'keys': [('item', 'duration')],
                 'func': self.get_runtime
             }],
-            'belongs_to_collection': [{
-                'keys': [('baseitem', None)],
-                'extend': True,
-                'func': lambda v: [{
-                    'id': f"collection.{v['id']}",
-                    'mediatype': 'collection',
-                    'expiry': 0}]}, {
-                # ---
-                'keys': [('collection', None)],
-                'extend': True,
-                'func': lambda v: [{
-                    'id': f"collection.{v['id']}",
-                    'tmdb_id': v['id'],
-                    'title': v['name'],
-                    'poster': v.get('poster_path'),
-                    'fanart': v.get('backdrop_path')}]}, {
-                # ---
-                'keys': [('item', 'collection_id')],
-                'func': lambda v: f"collection.{v['id']}"
-            }],
             'runtime': [{
                 'keys': [('item', 'duration')],
                 'func': self.get_runtime
@@ -434,103 +713,12 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'func': self.split_array,
                 'kwargs': {'name': 'name', 'iso_country': 'iso_3166_1'}
             }],
-            'seasons': [{
-                'keys': [('season', None)],
-                'func': self.split_array,
-                'extend': True,
-                'kwargs': {
-                    'id': lambda i: f'tv.{self.tmdb_id}.{i["season_number"]}',
-                    'tvshow_id': lambda i: f'tv.{self.tmdb_id}',
-                    'season': 'season_number',
-                    'year': lambda i: int(i['air_date'][0:4]),
-                    'premiered': 'air_date',
-                    'title': 'name',
-                    'plot': 'overview',
-                    'rating': 'vote_average'}}, {
-                # ---
-                'keys': [('baseitem', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'id': lambda i: f'tv.{self.tmdb_id}.{i["season_number"]}',
-                    'mediatype': lambda _: 'season',
-                    'expiry': lambda _: 0}}, {
-                # ---
-                'keys': [('art', None)],
-                'extend': True,
-                'func': self.add_seasons_art
-            }],
-            'episodes': [{
-                'keys': [('episode', None)],
-                'func': self.split_array,
-                'extend': True,
-                'kwargs': {
-                    'id': lambda i: f'tv.{self.tmdb_id}.{i["season_number"]}.{i["episode_number"]}',
-                    'season_id': lambda i: f'tv.{self.tmdb_id}.{i["season_number"]}',
-                    'tvshow_id': lambda i: f'tv.{self.tmdb_id}',
-                    'episode': 'episode_number',
-                    'year': lambda i: int(i['air_date'][0:4]),
-                    'premiered': 'air_date',
-                    'title': 'name',
-                    'plot': 'overview',
-                    'rating': 'vote_average',
-                    'votes': 'vote_count',
-                    'duration': lambda i: try_int(i['runtime']) * 60}}, {
-                # ---
-                'keys': [('baseitem', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'id': lambda i: f'tv.{self.tmdb_id}.{i["season_number"]}.{i["episode_number"]}',
-                    'mediatype': lambda _: 'episode',
-                    'expiry': lambda _: 0}}, {
-                # ---
-                'keys': [('art', None)],
-                'extend': True,
-                'func': self.add_season_episodes_art
-            }],
-            'next_episode_to_air': [{
-                'keys': [('episode', None)],
-                'func': self.split_array,
-                'extend': True,
-                'kwargs': {
-                    'id': lambda i: f'tv.{self.tmdb_id}.{i["season_number"]}.{i["episode_number"]}',
-                    'season_id': lambda i: f'tv.{self.tmdb_id}.{i["season_number"]}',
-                    'tvshow_id': lambda i: f'tv.{self.tmdb_id}',
-                    'episode': 'episode_number',
-                    'premiered': 'air_date',
-                    'title': 'name',
-                    'plot': 'overview',
-                    'rating': 'vote_average',
-                    'votes': 'vote_count',
-                    'duration': lambda i: try_int(i['runtime']) * 60}}, {
-                # ---
-                'keys': [('season', None)],
-                'func': self.split_array,
-                'extend': True,
-                'kwargs': {
-                    'id': lambda i: f'tv.{self.tmdb_id}.{i["season_number"]}',
-                    'tvshow_id': lambda i: f'tv.{self.tmdb_id}',
-                    'season': 'season_number'}}, {
-                # ---
-                'keys': [('item', 'next_episode_to_air_id')],
-                'func': lambda v: f'tv.{self.tmdb_id}.{v["season_number"]}'}, {
-                # ---
-                'keys': [('baseitem', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'id': lambda i: f'tv.{self.tmdb_id}.{i["season_number"]}.{i["episode_number"]}',
-                    'mediatype': lambda _: 'episode',
-                    'expiry': lambda _: 0}
-            }],
             'production_companies': [{
                 'keys': [('studio', None)],
                 'func': self.split_array,
                 'kwargs': {'tmdb_id': 'id'}}, {
                 # ---
                 'keys': [('company', None)],
-                'extend': True,
                 'func': self.split_array,
                 'kwargs': {'tmdb_id': 'id', 'name': 'name', 'logo': 'logo_path', 'country': 'origin_country'}
             }],
@@ -540,7 +728,6 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'kwargs': {'tmdb_id': 'id'}}, {
                 # ---
                 'keys': [('broadcaster', None)],
-                'extend': True,
                 'func': self.split_array,
                 'kwargs': {'tmdb_id': 'id', 'name': 'name', 'logo': 'logo_path', 'country': 'origin_country'}
             }],
@@ -549,14 +736,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'func': self.get_providers}, {
                 # ---
                 'keys': [('service', None)],
-                'extend': True,
                 'func': self.get_providers,
                 'kwargs': {'service': True}
-            }],
-            'images': [{
-                'keys': [('art', None)],
-                'extend': True,
-                'func': self.get_art,
             }],
             'external_ids': [{
                 'keys': [('unique_id', None)],
@@ -566,175 +747,47 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'keys': [('video', None)],
                 'func': self.get_video,
             }],
-            'created_by': [{
-                'keys': [('baseitem', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'id': lambda i: f'person.{i["id"]}',
-                    'mediatype': lambda _: 'person',
-                    'expiry': lambda _: 0}}, {
-                # ---
-                'keys': [('crewmember', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'tmdb_id': 'id',
-                    'role': lambda _: 'Creator',
-                    'department': lambda _: 'Creator'}}, {
-                # ---
-                'keys': [('person', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'id': lambda i: f'person.{i["id"]}',
-                    'tmdb_id': 'id', 'thumb': 'profile_path', 'name': 'name', 'gender': 'gender'}
+            'belongs_to_collection': [{
+                'keys': [('item', 'collection_id')],
+                'func': lambda i: f"collection.{i['id']}"
             }],
-            'credits': [{
-                'keys': [('baseitem', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'subkeys': ('cast', ),
-                    'id': lambda i: f'person.{i["id"]}',
-                    'mediatype': lambda _: 'person',
-                    'expiry': lambda _: 0}}, {
-                # ---
-                'keys': [('castmember', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'subkeys': ('cast', ),
-                    'tmdb_id': 'id', 'role': 'character', 'ordering': 'order'}}, {
-                # ---
-                'keys': [('person', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'subkeys': ('cast', ),
-                    'id': lambda i: f'person.{i["id"]}',
-                    'tmdb_id': 'id', 'thumb': 'profile_path', 'name': 'name', 'gender': 'gender', 'known_for_department': 'known_for_department'}}, {
-                # ---
-                'keys': [('baseitem', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'subkeys': ('crew', ),
-                    'id': lambda i: f'person.{i["id"]}',
-                    'mediatype': lambda _: 'person',
-                    'expiry': lambda _: 0}}, {
-                # ---
-                'keys': [('crewmember', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'subkeys': ('crew', ),
-                    'tmdb_id': 'id', 'role': 'job', 'department': 'department'}}, {
-                # ---
-                'keys': [('person', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'subkeys': ('crew', ),
-                    'id': lambda i: f'person.{i["id"]}',
-                    'tmdb_id': 'id', 'thumb': 'profile_path', 'name': 'name', 'gender': 'gender', 'known_for_department': 'known_for_department'}}, {
-                # ---
-                'keys': [('baseitem', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'subkeys': ('guest_stars', ),
-                    'id': lambda i: f'person.{i["id"]}',
-                    'mediatype': lambda _: 'person',
-                    'expiry': lambda _: 0}}, {
-                # ---
-                'keys': [('castmember', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'subkeys': ('guest_stars', ),
-                    'tmdb_id': 'id', 'role': 'character', 'ordering': 'order'}}, {
-                # ---
-                'keys': [('person', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'subkeys': ('guest_stars', ),
-                    'id': lambda i: f'person.{i["id"]}',
-                    'tmdb_id': 'id', 'thumb': 'profile_path', 'name': 'name', 'gender': 'gender', 'known_for_department': 'known_for_department'}
+            'last_episode_to_air': [{
+                'keys': [('item', f'last_episode_to_air_id')],
+                'func': lambda i: f'tv.{self.tmdb_id}.{i["season_number"]}.{i["episode_number"]}'
             }],
-            'aggregate_credits': [{
-                'keys': [('baseitem', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'subkeys': ('cast', ),
-                    'id': lambda i: f'person.{i["id"]}',
-                    'mediatype': lambda _: 'person',
-                    'expiry': lambda _: 0}}, {
-                # ---
-                'keys': [('castmember', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'subkeys': ('cast', ),
-                    'tmdb_id': 'id',
-                    'role': lambda i: ' / '.join([j['character'] for j in i['roles']]),
-                    'ordering': 'order',
-                    'appearances': 'total_episode_count'}}, {
-                # ---
-                'keys': [('person', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'subkeys': ('cast', ),
-                    'id': lambda i: f'person.{i["id"]}',
-                    'tmdb_id': 'id', 'thumb': 'profile_path', 'name': 'name', 'gender': 'gender', 'known_for_department': 'known_for_department'}}, {
-                # ---
-                'keys': [('baseitem', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'subkeys': ('crew', ),
-                    'id': lambda i: f'person.{i["id"]}',
-                    'mediatype': lambda _: 'person',
-                    'expiry': lambda _: 0}}, {
-                # ---
-                'keys': [('crewmember', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'subkeys': ('crew', ),
-                    'tmdb_id': 'id',
-                    'role': lambda i: ' / '.join([j['job'] for j in i['jobs']]),
-                    'ordering': 'order',
-                    'department': 'department',
-                    'appearances': 'total_episode_count'}}, {
-                # ---
-                'keys': [('person', None)],
-                'extend': True,
-                'func': self.split_array,
-                'kwargs': {
-                    'subkeys': ('crew', ),
-                    'id': lambda i: f'person.{i["id"]}',
-                    'tmdb_id': 'id', 'thumb': 'profile_path', 'name': 'name', 'gender': 'gender', 'known_for_department': 'known_for_department'}
+            'next_episode_to_air': [{
+                'keys': [('item', f'next_episode_to_air_id')],
+                'func': lambda i: f'tv.{self.tmdb_id}.{i["season_number"]}.{i["episode_number"]}'
             }],
-            'movie_credits': self.list_person_credits('movie'),
-            'tv_credits': self.list_person_credits('tv'),
-            'fanart_tv': [{
-                'keys': [('fanart_tv', None)],
-                'func': self.get_fanart_tv,
-            }],
-            'budget': [{
-                'keys': [('custom', None)],
-                'extend': True,
-                'func': lambda v: [{'key': 'budget', 'value': f'${float(v):0,.0f}'}]
-            }],
-            'revenue': [{
-                'keys': [('custom', None)],
-                'extend': True,
-                'func': lambda v: [{'key': 'revenue', 'value': f'${float(v):0,.0f}'}]
-            }],
+        }
+
+        self.extended_map = {
+            'budget': lambda v: [
+                ExtendedMap('custom', 'budget', False, {
+                    'key': 'budget',
+                    'value': f'${float(v):0,.0f}'
+                })
+            ],
+
+            'revenue': lambda v: [
+                ExtendedMap('custom', 'revenue', False, {
+                    'key': 'revenue',
+                    'value': f'${float(v):0,.0f}'
+                })
+            ],
+
+            'images': self.get_art,
+            'fanart_tv': self.get_fanart_tv,
+            'belongs_to_collection': self.get_collection,  # Also mapped in advanced properties for item id
+            'seasons': self.get_seasons,
+            'episodes': self.get_episodes,
+            'created_by': self.get_creators,
+            'credits': self.get_credits,
+            'aggregate_credits': self.get_aggregate_credits,
+            'last_episode_to_air': self.get_episode_to_air,  # Also mapped in advanced properties for item id
+            'next_episode_to_air': self.get_episode_to_air,  # Also mapped in advanced properties for item id
+            'movie_credits': self.get_person_movie_credits_data,
+            'tv_credits': self.get_person_tv_credits_data,
         }
 
         self.standard_map = {
@@ -749,7 +802,6 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'episode_number': ('item', 'episode'),
             'number_of_seasons': ('item', 'totalseasons'),
             'number_of_episodes': ('item', 'totalepisodes'),
-            'episode_type': ('item', 'status'),
             'biography': ('item', 'biography'),
             'birthday': ('item', 'birthday'),
             'deathday': ('item', 'deathday'),
@@ -762,119 +814,90 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'popularity': ('item', 'popularity')
         }
 
-    def dict_person_credits_art(self, tmdb_type, subkey, artkey, aspect):
-        return {
-            'keys': [('art', None)],
-            'extend': True,
-            'func': self.split_array,
-            'kwargs': {
-                'subkeys': (subkey, ),
-                'haskeys': (artkey, ),
-                'parent_id': lambda i: f'{tmdb_type}.{i["id"]}',
-                'icon': artkey,
-                'type': lambda _: aspect,
-                'aspect_ratio': lambda _: aspect,
-                'extension': lambda i: i[artkey].split('.')[-1]}
-        }
+    def map_dict(self, item, data):
 
-    def dict_person_credits_member(self, tmdb_type, subkey):
-        kwargs = {
-            'subkeys': (subkey, ),
-            'parent_id': lambda i: f'{tmdb_type}.{i["id"]}',
-            'tmdb_id': lambda _: self.tmdb_id}
+        map_dict = {}
 
-        if subkey == 'cast':
-            kwargs['role'] = 'character'
-            kwargs['ordering'] = 'order'
+        for k, v in data.items():
 
-        if subkey == 'crew':
-            kwargs['role'] = 'job'
-            kwargs['department'] = 'department'
+            # Skip blank values
+            if v in (None, ''):
+                continue
 
-        return {
-            'keys': [(f'{subkey}member', None)],
-            'extend': True,
-            'func': self.split_array,
-            'kwargs': kwargs
-        }
+            # Only some values need extended mappings
+            if k not in self.extended_map:
+                continue
 
-    def dict_person_credits_baseitem(self, tmdb_type, subkey):
-        return {
-            'keys': [('baseitem', None)],
-            'extend': True,
-            'func': self.split_array,
-            'kwargs': {
-                'subkeys': (subkey, ),
-                'id': lambda i: f'{tmdb_type}.{i["id"]}',
-                'mediatype': lambda _: 'movie' if tmdb_type == 'movie' else 'tvshow',
-                'expiry': lambda _: 0}
-        }
+            # Make sure the function outputs data
+            output = self.extended_map[k](v)
+            if not output:
+                continue
 
-    def dict_person_credits_tmdbtype(self, tmdb_type, subkey):
-        mediatype = 'movie' if tmdb_type == 'movie' else 'tvshow'
-        premiered = 'release_date' if mediatype == 'movie' else 'first_air_date'
-        titlename = 'title' if mediatype == 'movie' else 'name'
-        return {
-            'keys': [(mediatype, None)],
-            'extend': True,
-            'func': self.split_array,
-            'kwargs': {
-                'subkeys': (subkey, ),
-                'id': lambda i: f'{tmdb_type}.{i["id"]}',
-                'tmdb_id': 'id',
-                'year': lambda i: int(i[premiered][0:4]),
-                'premiered': premiered,
-                'plot': 'overview',
-                'title': titlename,
-                'originaltitle': 'original_title',
-                'rating': 'vote_average',
-                'votes': 'vote_count',
-                'popularity': 'popularity'
-            }
-        }
+            for i in output:
 
-    def list_person_credits_subkey(self, tmdb_type, subkey):
-        return [
-            self.dict_person_credits_member(tmdb_type, subkey),
-            self.dict_person_credits_baseitem(tmdb_type, subkey),
-            self.dict_person_credits_tmdbtype(tmdb_type, subkey),
-            self.dict_person_credits_art(tmdb_type, subkey, 'poster_path', 'posters'),
-            self.dict_person_credits_art(tmdb_type, subkey, 'backdrop_path', 'backdrops'),
-        ]
+                # Make sure unique_id has a value we can use as an ID
+                if not i.unique_id:
+                    continue
 
-    def list_person_credits(self, tmdb_type):
-        return self.list_person_credits_subkey(tmdb_type, 'cast') + self.list_person_credits_subkey(tmdb_type, 'crew')
+                dictionary = map_dict.setdefault(i.base, {})
+
+                # Overwrite set so just overwrite and move on
+                if i.overwrite:
+                    dictionary[i.unique_id] = i.data
+                    continue
+
+                # ID not mapped yet so write it and move on
+                if i.unique_id not in dictionary:
+                    dictionary[i.unique_id] = i.data
+                    continue
+
+                # Only write new values
+                for ik, iv in i.data.items():
+                    if not dictionary[i.unique_id].get(ik):  # Dont write over existing values
+                        continue
+                    dictionary[i.unique_id][ik] = iv  # No value set so update it
+
+        for key, dictionary in map_dict.items():
+            item[key] = tuple([d for d in dictionary.values()])
+
+        return item
 
     @staticmethod
     def get_empty_item():
         return {
+
+            # Default mappings
             'item': BlankNoneDict(),
             'genre': (),
             'country': (),
-            'company': [],
+            'company': (),
             'studio': (),
-            'broadcaster': [],
+            'broadcaster': (),
             'network': (),
             'provider': (),
             'certification': (),
-            'service': [],
+            'service': (),
             'video': (),
-            'baseitem': [],
-            'movie': [],
-            'tvshow': [],
-            'season': [],
-            'episode': [],
-            'collection': [],
-            'castmember': [],
-            'crewmember': [],
-            'unique_id': [],
-            'custom': [],
-            'person': [],
-            'fanart_tv': [],
-            'art': [],
+            'unique_id': (),
+
+            # Dictionary mappings
+            'custom': (),
+            'art': (),
+            'baseitem': (),
+            'fanart_tv': (),
+            'collection': (),
+            'movie': (),
+            'tvshow': (),
+            'season': (),
+            'episode': (),
+            'person': (),
+            'crewmember': (),
+            'castmember': (),
         }
 
     def get_info(self, data, **kwargs):
+        self.data = data
         self.item = self.get_empty_item()
         self.item = self.map_item(self.item, data)
+        self.item = self.map_dict(self.item, data)
         return self.item

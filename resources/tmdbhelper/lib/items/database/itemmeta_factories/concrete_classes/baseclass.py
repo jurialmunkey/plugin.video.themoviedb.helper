@@ -55,6 +55,11 @@ class BaseItem:
     def get_infolabels_special(self, infolabels):
         return infolabels
 
+    def get_infoproperties_airdate(self, infoproperties):
+        infoproperties.update(ItemMapperMethods.get_custom_time(self.get_data_value('duration'), name='duration'))
+        infoproperties.update(ItemMapperMethods.get_custom_date(self.get_data_value('premiered'), name='premiered'))
+        return infoproperties
+
     def get_infolabels_details(self):
         infolabels = {'mediatype': self.mediatype}
         infolabels.update({k: self.data[0][k] for k in self.data[0].keys() if k in self.parent_db_cache.allowlist_infolabel_keys})
@@ -80,11 +85,6 @@ class BaseItem:
         return infoproperties
 
     def get_infoproperties_special(self, infoproperties):
-        return infoproperties
-
-    def get_infoproperties_airdate(self, infoproperties):
-        infoproperties.update(ItemMapperMethods.get_custom_time(self.get_data_value('duration'), name='duration'))
-        infoproperties.update(ItemMapperMethods.get_custom_date(self.get_data_value('premiered'), name='premiered'))
         return infoproperties
 
     def get_art_dbclist(self, art):

@@ -1,6 +1,4 @@
 from tmdbhelper.lib.files.ftools import cached_property
-from tmdbhelper.lib.addon.plugin import get_infolabel
-from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_region_date
 from tmdbhelper.lib.addon.logger import kodi_try_except, kodi_log
 from tmdbhelper.lib.files.futils import validate_join
 from tmdbhelper.lib.api.contains import CommonContainerAPIs
@@ -90,11 +88,6 @@ class CommonMonitorDetails(CommonContainerAPIs):
                 info[f'{t}_cr'] = '[CR]'.join(all_awards_cr)
         return info
 
-    def get_nextaired(self, tmdb_type, tmdb_id):
-        if tmdb_type != 'tv':
-            return {}
-        return self.tmdb_api.tmdb_database.get_nextaired_formatted(tmdb_id)
-
     def get_detailed_ratings(self, tmdb_type, tmdb_id):
         from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings import RatingsDict
         sync = RatingsDict()
@@ -115,7 +108,6 @@ class CommonMonitorDetails(CommonContainerAPIs):
         funcs = (
             self.get_detailed_ratings,
             self.get_tvdb_awards,
-            self.get_nextaired,
         )
 
         with ParallelThread(funcs, get_data_func):
@@ -158,7 +150,6 @@ class CommonMonitorItem:
     @cached_property
     def infolabels(self):
         infolabels = self.item.get('infolabels') or {}
-        infolabels.pop('status', None)
         return infolabels
 
     @cached_property
