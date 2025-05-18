@@ -1,4 +1,5 @@
 from tmdbhelper.lib.files.ftools import cached_property
+from tmdbhelper.lib.items.database.mappings import ItemMapperMethods
 
 
 class BaseItem:
@@ -46,7 +47,7 @@ class BaseItem:
         for instance, ikey, dkey in self.infolabels_dbcitem_routes:
             instance = self.parent_db_cache.return_basemeta_db(*instance)
             try:
-                infolabels[dkey] = instance.cached_data[0][ikey]
+                infolabels[dkey] = ikey(instance.cached_data[0]) if callable(ikey) else instance.cached_data[0][ikey]
             except(KeyError, TypeError, IndexError, AttributeError):
                 pass
         return infolabels
@@ -79,6 +80,11 @@ class BaseItem:
         return infoproperties
 
     def get_infoproperties_special(self, infoproperties):
+        return infoproperties
+
+    def get_infoproperties_airdate(self, infoproperties):
+        infoproperties.update(ItemMapperMethods.get_custom_time(self.get_data_value('duration'), name='duration'))
+        infoproperties.update(ItemMapperMethods.get_custom_date(self.get_data_value('premiered'), name='premiered'))
         return infoproperties
 
     def get_art_dbclist(self, art):
@@ -131,6 +137,7 @@ class BaseItem:
         infoproperties = {}
         infoproperties = self.get_infoproperties_dbclist(infoproperties) if self.extendedinfo else {}
         infoproperties = self.get_infoproperties_special(infoproperties)
+        infoproperties = self.get_infoproperties_airdate(infoproperties)
         return infoproperties
 
     @cached_property

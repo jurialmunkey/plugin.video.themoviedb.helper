@@ -5,7 +5,7 @@
             <group id="1" label="248">
                 <setting id="mpaa_prefix" type="string" label="32004" help="32418">
                     <level>0</level>
-                    <default>Rated</default>
+                    <default></default>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
@@ -187,7 +187,7 @@
                     </constraints>
                     <control type="spinner" format="string"/>
                 </setting>
-                <setting id="trakt_nextepisodesort" type="string" label="32093" help="">
+                <setting id="trakt_nextepisodesort" type="string" label="32093" help="32049">
                     <level>0</level>
                     <default>airdate</default>
                     <constraints>
@@ -414,6 +414,14 @@
                     <control type="toggle"/>
                 </setting>
                 <setting id="fanarttv_prefer" type="boolean" label="32039" help="" parent="fanarttv_clientkey">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" operator="is" setting="fanarttv_lookup">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="language_lookup" type="boolean" label="32050" help="" parent="fanarttv_clientkey">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>

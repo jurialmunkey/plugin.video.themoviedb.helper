@@ -152,6 +152,12 @@ class ListFavorites(ListStandardSync):
     item_list_localize = 1036
 
 
+class ListDropped(ListStandardSync):
+    item_list_sync_type = 'dropped'
+    item_list_sync_sort_by = 'unsorted'
+    item_list_localize = 32048
+
+
 class ListToWatch(ListStandardSync):
     item_list_sync_type = 'towatch'
     item_list_localize = 32078
@@ -223,5 +229,8 @@ class ListInProgress(ListOnDeck):
                     'tmdb_id': '{tmdb_id}'
                 }
             }
+            self.item_list_localize = 32041
+            return super(ListOnDeck, self).get_items(tmdb_type=tmdb_type, **kwargs)
 
+        self.item_list_localize = 32045
         return super().get_items(tmdb_type=tmdb_type, **kwargs)

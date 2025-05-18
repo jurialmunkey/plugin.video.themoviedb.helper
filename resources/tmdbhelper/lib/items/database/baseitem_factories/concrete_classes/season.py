@@ -1,6 +1,7 @@
 from tmdbhelper.lib.items.database.baseitem_factories.concrete_classes.tvshow import Tvshow
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.consts import SHORTER_EXPIRY
+from tmdbhelper.lib.files.locker import mutexlock
 
 
 class Season(Tvshow):
@@ -20,7 +21,7 @@ class Season(Tvshow):
         """ Determines if any data is returned """
         if not self.tmdb_id:
             return False
-        if self.season is None:
+        if self.season in (None, ''):
             return False
         if int(self.season) < 0:
             return False
@@ -36,6 +37,14 @@ class Season(Tvshow):
 
     @cached_property
     def parent_item_data(self):
+        return self.get_parent_item_data()
+
+    @property
+    def mutex_lockname(self):
+        return f'Database.ItemDetails.tv.{self.tmdb_id}.lockfile'
+
+    @mutexlock
+    def get_parent_item_data(self):
         try:
             base_dbc = Tvshow()
             base_dbc.mediatype = 'tvshow'
@@ -67,10 +76,14 @@ class Season(Tvshow):
     def cached_data_keys(self):
         return self.get_cached_data_keys()
 
+    @property
+    def cached_data_conditions(self):
+        return f'{super().cached_data_conditions}'
+
     def get_cached_data_table(self):
         """ FROM """
         return (
-            f'baseitem LEFT JOIN {self.table} ON {self.table}.id = baseitem.id'
+            f'baseitem INNER JOIN {self.table} ON {self.table}.id = baseitem.id'
             ' LEFT JOIN tvshow ON tvshow.id = season.tvshow_id'
         )
 
@@ -81,6 +94,13 @@ class Season(Tvshow):
             'tvshow.title AS tvshowtitle',
             'tvshow.tagline as tagline',
             'ifnull(season.plot, tvshow.plot) as plot',
+            (
+                '(    SELECT COUNT(episode.season_id) '
+                '     FROM episode WHERE episode.season_id=season.id '
+                '                    AND episode.premiered<=DATE("now")'
+                '     GROUP BY episode.season_id'
+                ') as totalepisodes'
+            )
         ]
         return tuple([f'{self.table}.{k}' for k in self.keys if k not in deniedlist_keys] + additional_keys)
 

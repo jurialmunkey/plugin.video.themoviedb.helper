@@ -182,6 +182,10 @@ class SyncDataGetterAllItemsFavorites(SyncDataGetterAllItems):
     clause_keys = ('favorites_listed_at', )
 
 
+class SyncDataGetterAllItemsDropped(SyncDataGetterAllItems):
+    clause_keys = ('dropped_hidden_at', )
+
+
 class SyncDataGetterAllItemsWatched(SyncDataGetterAllItems):
     clause_keys = ('last_watched_at', )
 
@@ -298,7 +302,14 @@ class SyncDataGetterAllUnHiddenShowsInProgress:
 
     def get_items(self):
         sd = self.parent_getter
-        return [i for i in sd.items if self.is_inprogress_show(i['tmdb_id'], i['aired_episodes'], i['watched_episodes'])]
+        return [
+            i for i in sd.items
+            if self.is_inprogress_show(
+                i['tmdb_id'],
+                i['aired_episodes'],
+                i['watched_episodes']
+            )
+        ]
 
 
 class SyncDataGetters:
@@ -321,6 +332,11 @@ class SyncDataGetters:
 
     def get_all_unhidden_shows_inprogress_getter(self):
         return SyncDataGetterAllUnHiddenShowsInProgress(self)
+
+    def get_all_dropped_shows_getter(self, item_type):
+        sd = SyncDataGetterAllItemsDropped(self)
+        sd.item_type = item_type
+        return sd
 
     def get_all_collected_getter(self, item_type):
         sd = SyncDataGetterAllItemsCollected(self)

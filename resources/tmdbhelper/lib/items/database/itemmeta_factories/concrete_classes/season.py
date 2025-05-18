@@ -1,47 +1,19 @@
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem, MediaItemArtworkRoutes
-from tmdbhelper.lib.addon.plugin import get_setting
-
-
-class SeasonItemArtworkRoutes:
-    art_dbclist_routes_fanart_tv = (
-        (('fanart_tv_poster', 'tvshow'), 'poster'),
-        (('fanart_tv_fanart', 'tvshow'), 'fanart'),
-        (('fanart_tv_landscape', 'tvshow'), 'landscape'),
-        (('fanart_tv_clearlogo', 'tvshow'), 'clearlogo'),
-        (('fanart_tv_clearart', 'tvshow'), 'clearart'),
-        (('fanart_tv_banner', 'tvshow'), 'banner'),
-    )
-
-    art_dbclist_routes_tmdb = (
-        (('art_poster', 'tvshow'), 'poster'),
-        (('art_fanart', 'tvshow'), 'fanart'),
-        (('art_landscape', 'tvshow'), 'landscape'),
-        (('art_clearlogo', 'tvshow'), 'clearlogo'),
-        (('art_extrafanart', 'tvshow'), 'fanart'),
-    )
+from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseroutes import MediaItemInfoLabelItemRoutes
 
 
 class Season(MediaItem):
     infolabels_dbcitem_routes = (
-        (('certification', None), 'name', 'mpaa'),
-        (('video', None), 'path', 'trailer'),
+        MediaItemInfoLabelItemRoutes.certification,
+        MediaItemInfoLabelItemRoutes.trailer,
+        MediaItemInfoLabelItemRoutes.watchedcount,
     )
 
     @property
     def art_dbclist_routes(self):
         return (
-            *MediaItemArtworkRoutes.art_dbclist_routes_tmdb,
-            *SeasonItemArtworkRoutes.art_dbclist_routes_tmdb,
-        ) if not get_setting('fanarttv_lookup') else (
-            *MediaItemArtworkRoutes.art_dbclist_routes_tmdb,
-            *MediaItemArtworkRoutes.art_dbclist_routes_fanart_tv,
-            *SeasonItemArtworkRoutes.art_dbclist_routes_tmdb,
-            *SeasonItemArtworkRoutes.art_dbclist_routes_fanart_tv,
-        ) if not get_setting('fanarttv_prefer') else (
-            *MediaItemArtworkRoutes.art_dbclist_routes_fanart_tv,
-            *MediaItemArtworkRoutes.art_dbclist_routes_tmdb,
-            *SeasonItemArtworkRoutes.art_dbclist_routes_fanart_tv,
-            *SeasonItemArtworkRoutes.art_dbclist_routes_tmdb,
+            MediaItemArtworkRoutes().configured_routes
+            + MediaItemArtworkRoutes('tvshow').configured_routes
         )
 
     infoproperties_dbclist_routes = (
@@ -61,6 +33,11 @@ class Season(MediaItem):
             (('network', None), 'name', 'studio'),
         )
 
+    def get_infolabels_details(self):
+        infolabels = super().get_infolabels_details()
+        infolabels['episode'] = self.get_data_value('totalepisodes')
+        return infolabels
+
     def get_infoproperties_custom(self, infoproperties):
         infoproperties = super().get_infoproperties_custom(infoproperties)
         for i in self.parent_db_cache.return_basemeta_db('custom', 'tvshow').cached_data:
@@ -76,4 +53,8 @@ class Season(MediaItem):
 
     def get_infoproperties_special(self, infoproperties):
         infoproperties = self.get_infoproperties_custom(infoproperties)
+        try:
+            infoproperties['totalepisodes'] = infoproperties['unwatchedepisodes'] = self.get_data_value('totalepisodes')
+        except (TypeError, KeyError, IndexError):
+            pass
         return infoproperties

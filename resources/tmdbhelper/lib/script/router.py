@@ -14,11 +14,11 @@ REGEX_WINPROP_SUB = r'\$WINPROP\[{}\]'
 
 def test_func(test_func, **kwargs):
 
-    def finalise(head='', data=''):
+    def finalise(head='', data='', affix=''):
         import xbmcgui
         from tmdbhelper.lib.files.futils import dumps_to_file
         xbmcgui.Dialog().textviewer(f'{head}', f'{data}')
-        dumps_to_file(data, 'log_data', f'test_func_{test_func}.json', join_addon_data=True)
+        dumps_to_file(data, 'log_data', f'test_func_{test_func}{affix}.json', join_addon_data=True)
 
     def test_func_response(path, **kwargs):
         from tmdbhelper.lib.api.tmdb.api import TMDb
@@ -62,12 +62,40 @@ def test_func(test_func, **kwargs):
         head = import_attr
         return finalise(head, data)
 
+    def test_func_get_next_episodes(tmdb_id, season, episode, player=None, **kwargs):
+        import xbmcgui
+        from tmdbhelper.lib.player.details import get_next_episodes
+        data = get_next_episodes(tmdb_id, season, episode, player)
+        head = f'{(tmdb_id, season, episode)}'
+        xbmcgui.Dialog().select(head, data, useDetails=True)
+
+    def test_func_sync_next_episodes(import_attr, **kwargs):
+        from tmdbhelper.lib.api.trakt.api import TraktAPI
+        from tmdbhelper.lib.api.trakt.sync.datatype import SyncNextEpisodes
+        sync = SyncNextEpisodes(TraktAPI().trakt_syncdata, 'show')
+        func = getattr(sync, import_attr)
+        head = import_attr
+        data = func(**kwargs)
+        return finalise(head, data, affix=import_attr)
+
+    def test_func_get_response_sync(path, **kwargs):
+        from tmdbhelper.lib.api.trakt.api import TraktAPI
+        trakt_api = TraktAPI()
+        path = trakt_api.get_request_url(path, **kwargs)
+        data = trakt_api.get_api_request(path, headers=trakt_api.headers)
+        data = data.json()
+        head = path
+        return finalise(head, data)
+
     routes = {
         'response': test_func_response,
         'baseitem_factory': test_func_baseitem_factory,
         'baseview_factory': test_func_baseview_factory,
         'tmdb_database': test_func_tmdb_database,
         'fanarttv': test_func_fanarttv,
+        'get_next_episodes': test_func_get_next_episodes,
+        'sync_next_episodes': test_func_sync_next_episodes,
+        'get_response_sync': test_func_get_response_sync,
     }
 
     return routes[test_func](**kwargs)

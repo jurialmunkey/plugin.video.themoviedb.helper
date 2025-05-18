@@ -1011,7 +1011,8 @@ class ListDiscover(ListStandard):
 
         # Encode paramstring
         request_url = self.item_list_request_url.format(tmdb_type=tmdb_type)
-        paramstring = f'?{urlencode(kwargs)}' if kwargs else ''
+        paramstring = f'?{"&".join([f"{k}={v}" for k, v in kwargs.items()])}' if kwargs else ''
+        # paramstring = f'?{urlencode(kwargs)}' if kwargs else ''
         return f'{request_url}{paramstring}'
 
 

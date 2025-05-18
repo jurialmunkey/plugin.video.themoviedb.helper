@@ -261,8 +261,9 @@ class ListItemDetails:
     pagination = False
     cache_refresh = None
     extendedinfo = False
+    parent_params = {}
     timer_lists = {}
-    timer_log = False
+    log_timers = False
 
     def __init__(self, common_apis=None):
         self.common_apis = common_apis or CommonContainerAPIs()

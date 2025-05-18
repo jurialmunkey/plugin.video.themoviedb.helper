@@ -1,6 +1,6 @@
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.dialog import BusyDialog
-from tmdbhelper.lib.script.sync.basic import ItemWatched, ItemUnwatched, ItemWatchlist, ItemCollection, ItemFavorites
+from tmdbhelper.lib.script.sync.basic import ItemWatched, ItemUnwatched, ItemWatchlist, ItemCollection, ItemFavorites, ItemDropped
 from tmdbhelper.lib.script.sync.rating import ItemRating
 from tmdbhelper.lib.script.sync.comments import ItemComments
 from tmdbhelper.lib.script.sync.userlist import ItemUserList, ItemMDbList
@@ -52,6 +52,7 @@ class Menu(MenuAttributes):
         'mdblistuser': ItemMDbList,
         'progress': ItemProgress,
         'comments': ItemComments,
+        'dropped': ItemDropped,
         'rating': ItemRating,
     }
 

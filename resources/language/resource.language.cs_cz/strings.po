@@ -228,11 +228,6 @@ msgid "Cache Refresh"
 msgstr "Obnovení cache paměti"
 
 #: /resources/lib/container.py
-msgctxt "#32046"
-msgid "Cached details were refreshed"
-msgstr "Detaily v cache paměti byly obnoveny"
-
-#: /resources/lib/container.py
 msgctxt "#32047"
 msgid "Remove from Trakt Collection"
 msgstr "Odebrat ze sbírky Trakt"

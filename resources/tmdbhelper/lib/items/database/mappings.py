@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from tmdbhelper.lib.api.mapping import _ItemMapper
+from jurialmunkey.parser import try_int
 
 
 def get_blanks_none(i):
@@ -19,6 +20,45 @@ class ItemMapperMethods:
             return int(v) * 60
         except (TypeError, ValueError):
             return 0
+
+    def add_art_type(self, item_id, path, art_type, aspect_ratio):
+        from tmdbhelper.lib.addon.consts import IMAGEPATH_ASPECTRATIO
+        return {
+            'parent_id': item_id,
+            'aspect_ratio': IMAGEPATH_ASPECTRATIO.index(aspect_ratio),
+            'quality': 0,
+            'icon': get_blanks_none(path),
+            'type': art_type,
+            'extension': get_blanks_none(path.split('.')[-1] if path else None),
+            'rating': 0,
+            'votes': 0,
+        }
+
+    def add_season_episodes_art(self, v, **kwargs):
+        art = []
+
+        for i in v:
+            if 'still_path' in i:
+                art.append(self.add_art_type(
+                    item_id=f'tv.{self.tmdb_id}.{i["season_number"]}.{i["episode_number"]}',
+                    path=i['still_path'],
+                    art_type='stills',
+                    aspect_ratio='landscape'))
+
+        return art
+
+    def add_seasons_art(self, v, **kwargs):
+        art = []
+
+        for i in v:
+            if 'poster_path' in i:
+                art.append(self.add_art_type(
+                    item_id=f'tv.{self.tmdb_id}.{i["season_number"]}',
+                    path=i['poster_path'],
+                    art_type='posters',
+                    aspect_ratio='poster'))
+
+        return art
 
     @staticmethod
     def split_array(items, subkeys=(), haskeys=(), **kwargs):
@@ -241,21 +281,56 @@ class ItemMapperMethods:
         ]
 
     @staticmethod
+    def get_custom_time(duration, name='duration'):
+        if not duration:
+            return {}
+        minutes = duration // 60 % 60
+        hours = duration // 60 // 60
+        totalmin = duration // 60
+        return {
+            f'{name}_H': hours,
+            f'{name}_M': minutes,
+            f'{name}_mins': totalmin,
+            f'{name}_HHMM': f'{hours:02d}:{minutes:02d}',
+        }
+
+    @staticmethod
+    def get_custom_date(air_date, name):
+        from tmdbhelper.lib.addon.plugin import get_infolabel
+        from tmdbhelper.lib.addon.tmdate import format_date_obj, convert_timestamp, get_days_to_air
+        air_date_obj = convert_timestamp(air_date, time_fmt="%Y-%m-%d", time_lim=10, utc_convert=False)
+
+        if not air_date_obj:
+            return {}
+
+        infoproperties = {
+            f'{name}': format_date_obj(air_date_obj, region_fmt='dateshort'),
+            f'{name}_long': format_date_obj(air_date_obj, region_fmt='datelong'),
+            f'{name}_short': format_date_obj(air_date_obj, "%d %b"),
+            f'{name}_day': format_date_obj(air_date_obj, "%A"),
+            f'{name}_day_short': format_date_obj(air_date_obj, "%a"),
+            f'{name}_year': format_date_obj(air_date_obj, "%Y"),
+            f'{name}_custom': format_date_obj(air_date_obj, get_infolabel('Skin.String(TMDbHelper.Date.Format)') or '%d %b %Y'),
+            f'{name}_original': air_date,
+        }
+
+        days_to_air, is_aired = get_days_to_air(air_date_obj)
+        days_to_air_name = f'{name}_days_from_aired' if is_aired else f'{name}_days_until_aired'
+
+        infoproperties[days_to_air_name] = str(days_to_air)
+
+        return infoproperties
+
+    @staticmethod
     def get_episode_to_air(v, name):
         from jurialmunkey.parser import try_float
-        from tmdbhelper.lib.addon.tmdate import format_date_obj, convert_timestamp, get_days_to_air
         from tmdbhelper.lib.api.tmdb.images import TMDbImagePath
 
         i = v or {}
         air_date = i.get('air_date')
-        air_date_obj = convert_timestamp(air_date, time_fmt="%Y-%m-%d", time_lim=10, utc_convert=False)
-        infoproperties = {}
-        infoproperties[f'{name}'] = format_date_obj(air_date_obj, region_fmt='dateshort')
-        infoproperties[f'{name}_long'] = format_date_obj(air_date_obj, region_fmt='datelong')
-        infoproperties[f'{name}_short'] = format_date_obj(air_date_obj, "%d %b")
-        infoproperties[f'{name}_day'] = format_date_obj(air_date_obj, "%A")
-        infoproperties[f'{name}_day_short'] = format_date_obj(air_date_obj, "%a")
-        infoproperties[f'{name}_year'] = format_date_obj(air_date_obj, "%Y")
+
+        infoproperties = ItemMapperMethods.get_custom_date(air_date, name)
+
         infoproperties[f'{name}_episode'] = i.get('episode_number')
         infoproperties[f'{name}_name'] = i.get('name')
         infoproperties[f'{name}_tmdb_id'] = i.get('id')
@@ -264,11 +339,6 @@ class ItemMapperMethods:
         infoproperties[f'{name}_rating'] = f'{try_float(i.get("vote_average")):0,.1f}'
         infoproperties[f'{name}_votes'] = i.get('vote_count')
         infoproperties[f'{name}_thumb'] = TMDbImagePath().get_imagepath_thumbs(i.get('still_path'))
-        infoproperties[f'{name}_original'] = air_date
-
-        if air_date_obj:
-            days_to_air, is_aired = get_days_to_air(air_date_obj)
-            infoproperties[f'{name}_days_from_aired' if is_aired else f'{name}_days_until_aired'] = str(days_to_air)
 
         return infoproperties
 
@@ -384,7 +454,11 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'kwargs': {
                     'id': lambda i: f'tv.{self.tmdb_id}.{i["season_number"]}',
                     'mediatype': lambda _: 'season',
-                    'expiry': lambda _: 0}
+                    'expiry': lambda _: 0}}, {
+                # ---
+                'keys': [('art', None)],
+                'extend': True,
+                'func': self.add_seasons_art
             }],
             'episodes': [{
                 'keys': [('episode', None)],
@@ -401,7 +475,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                     'plot': 'overview',
                     'rating': 'vote_average',
                     'votes': 'vote_count',
-                    'duration': 'runtime'}}, {
+                    'duration': lambda i: try_int(i['runtime']) * 60}}, {
                 # ---
                 'keys': [('baseitem', None)],
                 'extend': True,
@@ -409,7 +483,11 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'kwargs': {
                     'id': lambda i: f'tv.{self.tmdb_id}.{i["season_number"]}.{i["episode_number"]}',
                     'mediatype': lambda _: 'episode',
-                    'expiry': lambda _: 0}
+                    'expiry': lambda _: 0}}, {
+                # ---
+                'keys': [('art', None)],
+                'extend': True,
+                'func': self.add_season_episodes_art
             }],
             'next_episode_to_air': [{
                 'keys': [('episode', None)],
@@ -425,7 +503,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                     'plot': 'overview',
                     'rating': 'vote_average',
                     'votes': 'vote_count',
-                    'duration': 'runtime'}}, {
+                    'duration': lambda i: try_int(i['runtime']) * 60}}, {
                 # ---
                 'keys': [('season', None)],
                 'func': self.split_array,

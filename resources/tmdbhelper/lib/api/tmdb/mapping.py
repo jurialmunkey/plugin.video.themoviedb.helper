@@ -83,9 +83,9 @@ class ItemMapperMethods:
 
 
 class ItemMapper(_ItemMapper, ItemMapperMethods):
-    def __init__(self, language=None, mpaa_prefix=None, genres=None):
+    def __init__(self, language=None, genres=None):
         self.language = language or get_language()
-        self.mpaa_prefix = mpaa_prefix or get_mpaa_prefix()
+        self.mpaa_prefix = get_mpaa_prefix()
         self.iso_language = language[:2]
         self.iso_country = language[-2:]
         self.genres = genres or {}

@@ -4,6 +4,8 @@ from infotagger.listitem import _ListItemInfoTagVideo
 
 class MediaList(BaseList):
     filters = {}
+    sort_by = None
+    sort_how = None
     cached_data_conditions_base = 'parent_id=?'
     item_mediatype = ''
     item_tmdb_type = ''
@@ -59,7 +61,7 @@ class MediaList(BaseList):
         infolabels = {k: i[k] for k in i.keys() if k in self.allowlist_infolabel_keys}
         infolabels.update({
             'title': i[self.item_label_key],
-            'mediatype': self.item_mediatype,
+            'mediatype': self.map_mediatype(i),
         })
         return infolabels
 
@@ -84,11 +86,14 @@ class MediaList(BaseList):
             'tmdb_id': i['tmdb_id'],
         }
 
+    def map_mediatype(self, i):
+        return self.item_mediatype
+
     def map_item(self, i):
         return {
             'label': self.map_label(i),
             'label2': self.map_label2(i),
-            'mediatype': self.item_mediatype,
+            'mediatype': self.map_mediatype(i),
             'infolabels': self.map_item_infolabels(i),
             'infoproperties': self.map_item_infoproperties(i),
             'unique_ids': self.map_item_unique_ids(i),
