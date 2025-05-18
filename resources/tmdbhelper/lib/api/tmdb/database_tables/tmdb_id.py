@@ -243,7 +243,7 @@ class TMDbDatabaseTMDbID:
         if use_multisearch or tmdb_type is None:
             if not use_multisearch:
                 return
-            return table_obj.get_multisearch_query() or table_obj.set_multisearch_query()
+            return table_obj.get_multisearch_query() or table_obj.set_multisearch_query() or (None, None)
 
         def try_imdb_id():
             if not imdb_id:
