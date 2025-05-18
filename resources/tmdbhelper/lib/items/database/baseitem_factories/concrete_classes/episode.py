@@ -93,8 +93,11 @@ class Episode(Season):
         cached_data_keys.extend([
             'episode.status AS episode_type',
             'tvshow.title AS tvshowtitle',
+            'tvshow.originaltitle AS tvshow_originaltitle',
             'tvshow.tagline AS tagline',
             'tvshow.status AS status',
+            'tvshow.premiered AS tvshow_premiered',
+            'tvshow.year AS tvshow_year',
             'season.season AS season',
         ])
         cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('next_aired'))

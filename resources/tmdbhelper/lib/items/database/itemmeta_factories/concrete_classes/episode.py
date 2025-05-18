@@ -1,5 +1,6 @@
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem, MediaItemArtworkRoutes
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseroutes import MediaItemInfoLabelItemRoutes
+from tmdbhelper.lib.items.database.mappings import ItemMapperMethods
 from tmdbhelper.lib.addon.tmdate import is_future_timestamp
 
 
@@ -67,9 +68,18 @@ class Episode(MediaItem):
         infoproperties['episode_status'] = self.get_premiered_status()
         return infoproperties
 
+    def get_infoproperties_tvshow(self, infoproperties):
+        infoproperties['tvshow.originaltitle'] = self.get_data_value('tvshow_originaltitle')
+        infoproperties['tvshow.year'] = self.get_data_value('tvshow_year')
+        infoproperties.update(ItemMapperMethods.get_custom_date(
+            self.get_data_value('tvshow_premiered'), name='tvshow.premiered'
+        ))
+        return infoproperties
+
     def get_infoproperties_special(self, infoproperties):
         infoproperties = self.get_infoproperties_custom(infoproperties)
         infoproperties = self.get_infoproperties_episode_type(infoproperties)
         infoproperties = self.get_infoproperties_progress(infoproperties)
+        infoproperties = self.get_infoproperties_tvshow(infoproperties)
         infoproperties = self.get_infoproperties_next_ep(infoproperties)
         return infoproperties
