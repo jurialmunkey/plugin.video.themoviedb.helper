@@ -108,6 +108,7 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         self._pre_artwork_thread = None
         self._baseitem_skindefaults = BaseItemSkinDefaults()
         self._parent = parent
+        self.process_thread = None
 
     # ==========
     # PROPERTIES
@@ -225,9 +226,13 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
             _listitem.setArt(_detailed['artwork'] or {}) if process_artwork else None
             _listitem.setProperties(_detailed['ratings'] or {}) if process_ratings else None
 
+        if self.process_thread:
+            self.process_thread.join()
+            self.process_thread = None
+
         if process_artwork or process_ratings:
-            t = SafeThread(target=_process_artwork_ratings)
-            t.start()
+            self.process_thread = SafeThread(target=_process_artwork_ratings)
+            self.process_thread.start()
 
     def on_finalise_winproperties(self, process_artwork=True, process_ratings=True):
         _item = self._item
@@ -250,10 +255,14 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
             process_ratings()
             self.get_property('IsUpdatingRatings', clear_property=True)
 
+        if self.process_thread:
+            self.process_thread.join()
+            self.process_thread = None
+
         # Process ratings in thread to avoid holding up main loop
         if process_ratings:
-            t = SafeThread(target=process_ratings_thread)
-            t.start()
+            self.process_thread = SafeThread(target=process_ratings_thread)
+            self.process_thread.start()
 
         with self._parent.mutex_lock:
             # Add remote artwork to artwork monitor and update in case local items doesn't have some artwork types
