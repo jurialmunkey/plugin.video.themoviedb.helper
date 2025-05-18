@@ -270,7 +270,7 @@ class ItemSync(ItemSyncGetters, ItemSyncCachedProperties):
     def __init__(self, tmdb_type, tmdb_id, season=None, episode=None):
         self.tmdb_type = tmdb_type
         self.tmdb_id = tmdb_id
-        self.season = None if self.convert_seasons else episode
+        self.season = None if self.convert_seasons else season
         self.episode = None if self.convert_episodes else episode
 
     def refresh_containers(self):
