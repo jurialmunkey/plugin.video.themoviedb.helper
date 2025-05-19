@@ -314,7 +314,7 @@ class ItemMapperMethods:
         return self.get_person_credits_data(items, 'movie')
 
     def get_person_tv_credits_data(self, items):
-        return self.get_person_credits_data(items, 'tvshow')
+        return self.get_person_credits_data(items, 'tv')
 
     def get_person_credits_data(self, items, tmdb_type='movie'):
         data = []
