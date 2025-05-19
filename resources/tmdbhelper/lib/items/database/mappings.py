@@ -206,8 +206,6 @@ class ItemMapperMethods:
         season_id = f'tv.{self.tmdb_id}.{i["season_number"]}'
         tvshow_id = f'tv.{self.tmdb_id}'
 
-        tvshow_status = self.data.get('status')
-
         episode_item = ItemMapperMethods.get_configured_item(i, **{
             'episode': 'episode_number',
             'premiered': 'air_date',
@@ -221,7 +219,7 @@ class ItemMapperMethods:
         episode_item['season_id'] = season_id
         episode_item['tvshow_id'] = tvshow_id
 
-        if tvshow_status in ('Ended', 'Cancelled'):
+        if not self.data.get('in_production') and not self.data.get('next_episode_to_air'):
             episode_item['status'] = 'series_finale'
 
         data.append(ExtendedMap('episode', item_id, False, episode_item))
