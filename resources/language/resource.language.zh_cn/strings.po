@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-05-15 10:30+0800\n"
+"PO-Revision-Date: 2025-05-19 13:38+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -85,7 +85,7 @@ msgstr "德语（奥地利）"
 #: /resources/settings.xml
 msgctxt "#32013"
 msgid "Get watched indicators, episode counts, and resume points"
-msgstr "获取已观看标识、剧集计数和续播点"
+msgstr "获取已观看标识、剧集计数和续播点。"
 
 msgctxt "#30010"
 msgid "German (Switzerland)"
@@ -226,27 +226,32 @@ msgstr "加利西亚语（西班牙）"
 #: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
 msgctxt "#32045"
 msgid "Your In-Progress Movies"
-msgstr "你尚未追完的电影"
+msgstr "你正在观看的电影"
 
 #: /resources/tmdbhelper/lib/script/sync/basic.py
 msgctxt "#32046"
 msgid "Drop TV show"
-msgstr "已弃的电视剧"
+msgstr "移除电视剧"
 
 #: /resources/tmdbhelper/lib/script/sync/basic.py
 msgctxt "#32047"
 msgid "Undrop TV show"
-msgstr "重追的电视剧"
+msgstr "恢复关注电视剧"
 
 #: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
 msgctxt "#32048"
 msgid "Dropped TV Shows"
-msgstr "已弃的电视剧"
+msgstr "已移除的电视剧"
 
 #: /resources/settings.xml
 msgctxt "#32049"
 msgid "Sort order of Your Next Episodes list. By airdate sorts episodes by premiere date. By recentlywatched sorts episodes by most recently watched tvshow. By todays is recentlywatched with episodes airing today at the front. By lastweek is recentlywatched with episodes airing in the past week sorted by airdate at the front."
-msgstr ""
+msgstr "排序方式：你的下一集列表。按播出日期：按剧集首播日期排序。按最近观看：按最近观看的电视剧排序。按今日剧集：优先显示今日播出的剧集（其余按最近观看排序）。按上周剧集：优先显示过去一周内播出的剧集（按播出日期排序，其余按最近观看排序）。"
+
+#: /resources/settings.xml
+msgctxt "#32050"
+msgid "Prefer artwork in your language"
+msgstr "首选使用您语言的艺术作品"
 
 msgctxt "#30029"
 msgid "Hebrew (Israel)"
@@ -1638,7 +1643,7 @@ msgstr "背景图"
 #: /resources/settings.xml
 msgctxt "#32373"
 msgid "Restrict to library strm"
-msgstr "仅处理 .strm 文件"
+msgstr "仅处理.strm文件"
 
 #: /resources/lib/player/players.py
 msgctxt "#32374"
@@ -2245,7 +2250,7 @@ msgstr "在配置播放器插件时强制更新媒体库元数据缓存"
 #: /resources/settings.xml
 msgctxt "#32509"
 msgid "Use alternative TMDb API url"
-msgstr "使用备用 TMDb API url"
+msgstr "使用备用TMDb API url"
 
 #: /resources/settings.xml
 msgctxt "#32514"
@@ -2518,7 +2523,7 @@ msgstr "缓存详细信息的天数"
 #: /resources/settings.xml
 msgctxt "#32004"
 msgid "MPAA rating prefix"
-msgstr "MPAA 分级前缀"
+msgstr "MPAA 评级前缀"
 
 #: /resources/settings.xml
 msgctxt "#32005"
