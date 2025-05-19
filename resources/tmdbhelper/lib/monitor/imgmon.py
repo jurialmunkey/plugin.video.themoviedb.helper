@@ -63,12 +63,14 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
     """
 
     def is_next_refresh(self):
+        self.setup_current_item()
+
         # Always refresh our artwork if window changed
         if not self.is_same_window(update=True):
             return True
 
         # Always refresh our artwork if the item changed
-        if not self.is_same_item(update=True, setup=True):
+        if not self.is_same_item(update=True):
             return True
 
         # Set refresh time if not set yet and still on same item

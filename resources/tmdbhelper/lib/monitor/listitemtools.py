@@ -63,9 +63,7 @@ class ListItemInfoGetter():
     # COMPARISON METHODS
     # ==================
 
-    def is_same_item(self, update=False, setup=False):
-        if setup:
-            self.setup_current_item()
+    def is_same_item(self, update=False):
         self._cur_item = self.cur_item
         if self._cur_item == self._pre_item:
             return self._cur_item
@@ -90,8 +88,8 @@ class ListItemInfoGetter():
         self._container = self.container
         self._container_item = self.container_item
 
-    def setup_current_item(self):
-        self._item = MonitorItemDetails(self, position=0)
+    def setup_current_item(self, level=1):
+        self._item = MonitorItemDetails(self, position=0, level=level)
 
 
 class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
@@ -299,13 +297,14 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
     @kodi_try_except('lib.monitor.listitem.on_listitem')
     def on_listitem(self):
         self.setup_current_container()
+        self.setup_current_item(2 if self._listcontainer else 1)
 
         # We want to set a special container but it doesn't exist so exit
         if self._listcontainer == -1:
             return
 
         # Check if the item has changed before retrieving details again
-        if self.is_same_item(update=True, setup=True) and self.is_same_window(update=True):
+        if self.is_same_item(update=True) and self.is_same_window(update=True):
             return
 
         # Configure the item to retrieve details
