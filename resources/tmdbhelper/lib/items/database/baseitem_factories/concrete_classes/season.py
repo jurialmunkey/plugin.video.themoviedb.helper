@@ -103,6 +103,13 @@ class Season(Tvshow):
                 '                    AND episode.premiered<=DATE("now")'
                 '     GROUP BY episode.season_id'
                 ') as totalepisodes'
+            ),
+            (
+                '(    SELECT CAST(AVG(episode.duration) as INTEGER) '
+                '     FROM episode WHERE episode.season_id=season.id '
+                '                    AND episode.premiered<=DATE("now")'
+                '     GROUP BY episode.season_id'
+                ') as duration'
             )
         ])
 
