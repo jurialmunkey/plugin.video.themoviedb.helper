@@ -900,4 +900,10 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
         self.item = self.get_empty_item()
         self.item = self.map_item(self.item, data)
         self.item = self.map_dict(self.item, data)
+
+        # from tmdbhelper.lib.files.futils import dumps_to_file
+        # dumps_to_file(
+        #     {'data': self.data, 'item': self.item},
+        #     'log_data', f'mappings_{self.tmdb_id}_{data["name"]}.json', join_addon_data=True)
+
         return self.item
