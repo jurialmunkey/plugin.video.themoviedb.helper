@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-05-19 13:38+0800\n"
+"PO-Revision-Date: 2025-05-19 17:47+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -252,6 +252,21 @@ msgstr "排序方式：你的下一集列表。按播出日期：按剧集首播
 msgctxt "#32050"
 msgid "Prefer artwork in your language"
 msgstr "首选使用您语言的艺术作品"
+
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+msgctxt "#32051"
+msgid "Deleted cached {} items"
+msgstr "删除缓存的 {} 项目"
+
+#: /resources/settings.xml
+msgctxt "#32052"
+msgid "Delete TMDb cached item details"
+msgstr "删除 TMDb 缓存项目详情"
+
+#: /resources/settings.xml
+msgctxt "#32053"
+msgid "TMDbHelper automatically performs regular cache maintenance. You should only delete the cache when instructed to troubleshoot issues. TMDbHelper relies on having cached items to perform well. Unnecessarily deleting the cache on a regular basis will degrade performance and places excessive strain on the free services providing this data."
+msgstr "TMDbHelper 会自动执行定期缓存维护。只有在接到排除故障的指示时，才应删除缓存。TMDbHelper 依靠缓存项目来实现良好性能。不必要地定期删除缓存会降低性能，并对提供这些数据的免费服务造成过大压力。"
 
 msgctxt "#30029"
 msgid "Hebrew (Israel)"
