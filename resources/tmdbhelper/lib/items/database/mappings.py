@@ -259,7 +259,7 @@ class ItemMapperMethods:
         mappings = (
             ('cast', 'castmember', {'ordering': 'order', 'role': 'character'}),
             ('crew', 'crewmember', {'department': 'department', 'role': 'job'}),
-            ('guest_stars', 'cast', {'ordering': 'order', 'role': 'character'}),
+            ('guest_stars', 'castmember', {'ordering': 'order', 'role': 'character'}),
         )
         return ItemMapperMethods.get_credits_data(items, mappings)
 
