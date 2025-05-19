@@ -25,6 +25,14 @@ class ItemWatchlist(ItemSync):
     trakt_sync_key = 'watchlist_listed_at'
     trakt_sync_url = 'watchlist'
 
+    def reset_lastactivities(self):
+        if not self.is_successful_sync:
+            return
+        self.trakt_syncdata.cache.del_item(table='lactivities', item_id='show.watchlist')
+        self.trakt_syncdata.cache.del_item(table='lactivities', item_id='movie.watchlist')
+        self.trakt_syncdata.reset_lastactivities()
+        self.get_trakt_sync_value()
+
 
 class ItemCollection(ItemSync):
     localized_name_add = 32289
@@ -33,12 +41,28 @@ class ItemCollection(ItemSync):
     trakt_sync_key = 'collection_last_collected_at'
     trakt_sync_url = 'collection'
 
+    def reset_lastactivities(self):
+        if not self.is_successful_sync:
+            return
+        self.trakt_syncdata.cache.del_item(table='lactivities', item_id='show.collection')
+        self.trakt_syncdata.cache.del_item(table='lactivities', item_id='movie.collection')
+        self.trakt_syncdata.reset_lastactivities()
+        self.get_trakt_sync_value()
+
 
 class ItemFavorites(ItemSync):
     localized_name_add = 32490
     localized_name_rem = 32491
     trakt_sync_key = 'favorites_listed_at'
     trakt_sync_url = 'favorites'
+
+    def reset_lastactivities(self):
+        if not self.is_successful_sync:
+            return
+        self.trakt_syncdata.cache.del_item(table='lactivities', item_id='show.favorites')
+        self.trakt_syncdata.cache.del_item(table='lactivities', item_id='movie.favorites')
+        self.trakt_syncdata.reset_lastactivities()
+        self.get_trakt_sync_value()
 
 
 class ItemDropped(ItemSync):

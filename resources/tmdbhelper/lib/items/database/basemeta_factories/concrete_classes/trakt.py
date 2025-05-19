@@ -24,3 +24,15 @@ class AiredCount(SimpleCache):
 
 class PlayProgress(SimpleCache):
     keys = ('playback_progress', )
+
+
+class FavoritesRank(SimpleCache):
+    keys = ('favorites_rank', )
+
+
+class WatchlistRank(SimpleCache):
+    keys = ('watchlist_rank', )
+
+
+class CollectedDate(SimpleCache):
+    keys = ('collection_last_collected_at', )
