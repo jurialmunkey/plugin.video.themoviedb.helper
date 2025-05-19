@@ -69,3 +69,43 @@ def refresh_item(tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
 
     xbmcgui.Dialog().ok(get_localized(32233), f'{tmdb_type} {tmdb_id} {season if season else ""} {episode if episode else ""}')
     container_refresh()
+
+
+def delete_itemtype(mediatype=None, confirmation=True, **kwargs):
+    from xbmcgui import Dialog
+    from tmdbhelper.lib.addon.dialog import BusyDialog
+    from tmdbhelper.lib.addon.logger import TimerFunc
+    from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
+
+    routes = {
+        'movie': ('movie', 'collection', ),
+        'tvshow': ('tvshow', 'season', 'episode', ),
+        'season': ('tvshow', 'season', 'episode', ),
+        'episode': ('tvshow', 'season', 'episode', ),
+        'person': ('person', ),
+    }
+
+    if not Dialog().yesno(get_localized(19194), f'[B][COLOR=red][UPPERCASE]{get_localized(14117)}[/UPPERCASE][/COLOR][/B] - {get_localized(32053)}'):
+        return
+
+    if not mediatype:
+        choices = [i for i in routes.keys()]
+        x = Dialog().select('Choose mediatype', choices)
+        if x == -1:
+            return
+        mediatype = choices[x]
+
+    if mediatype not in routes:
+        raise Exception(f'The mediatype {mediatype} is not valid!')
+
+    with BusyDialog():
+        database = ItemDetailsDatabase()
+        with TimerFunc(f'Deleting items of mediatype {mediatype}:', inline=True):
+            for i in routes[mediatype]:
+                database.execute_sql(f'DELETE FROM baseitem WHERE mediatype="{i}"')
+            database.execute_sql('VACUUM')
+
+    if confirmation:
+        head = get_localized(32387).format(mediatype.capitalize())
+        data = get_localized(32051)
+        Dialog().ok(head, data)

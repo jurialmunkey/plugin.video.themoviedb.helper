@@ -252,6 +252,21 @@ msgctxt "#32050"
 msgid "Prefer artwork in your language"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+msgctxt "#32051"
+msgid "Deleted all cached {} items"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32052"
+msgid "Delete TMDb cached item details"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32053"
+msgid "TMDbHelper automatically performs regular cache maintenance. You should only delete the cache when instructed to troubleshoot issues. TMDbHelper relies on having cached items to perform well. Unnecessarily deleting the cache on a regular basis will degrade performance and places excessive strain on the free services providing this data."
+msgstr ""
+
 msgctxt "#30029"
 msgid "Hebrew (Israel)"
 msgstr ""
