@@ -276,6 +276,7 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         def process_detailed_item():
             _item.level = 2
             _item.update_item()
+            _item.set_additional_properties(self.baseitem_properties)
 
             if not _item.is_same_item:
                 return
