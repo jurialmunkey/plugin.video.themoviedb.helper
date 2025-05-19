@@ -1,15 +1,8 @@
-from tmdbhelper.lib.addon.plugin import get_condvisibility, get_infolabel, convert_type, get_setting
-from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_region_date
+from tmdbhelper.lib.addon.plugin import get_condvisibility, convert_type, get_setting
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.monitor.images import ImageManipulations
 from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.api.mapping import get_empty_item
-
-
-EXTENDED_PROPERTIES = (
-    '!Skin.HasSetting(TMDbHelper.DisableExtendedProperties) | '
-    '!String.IsEmpty(Window.Property(TMDbHelper.EnableExtendedProperties))'
-)
 
 
 class MonitorItemDetails(ImageManipulations):
@@ -31,10 +24,11 @@ class MonitorItemDetails(ImageManipulations):
         'sets': 'collection'
     }
 
-    def __init__(self, parent, position=0):
+    def __init__(self, parent, position=0, level=1):
         self.parent = parent  # ListItemMonitorFunctions
         self.position = position
         self.identifier  # Set this immediately so we have a reference point
+        self.level = level  # Set as 1 for basic, or 2 for detailed
 
     def configure(self):
         """
@@ -48,6 +42,23 @@ class MonitorItemDetails(ImageManipulations):
     """
     infolabels
     """
+
+    @property
+    def is_extended(self):
+        if self.level < 2:
+            return False
+        return get_condvisibility((
+            '!Skin.HasSetting(TMDbHelper.DisableExtendedProperties) | '
+            '!String.IsEmpty(Window.Property(TMDbHelper.EnableExtendedProperties))'
+        ))
+
+    @property
+    def is_detailed(self):
+        if self.is_extended:
+            return True
+        if self.level > 1:
+            return True
+        return False
 
     @cached_property
     def infolabel_property_tmdb_type(self):
@@ -295,23 +306,6 @@ class MonitorItemDetails(ImageManipulations):
         return self.get_identifier() == self.identifier
 
     @cached_property
-    def item(self):
-        if not self.is_same_item:
-            return self.set_blank_itemdetails()
-        if not self.tmdb_id:
-            return self.set_blank_itemdetails()
-        if not self.tmdb_type:
-            return self.set_blank_itemdetails()
-        if not self.lidc_item:  # or 'art' not in self.lidc_item:
-            return self.set_blank_itemdetails()
-        return self.lidc_item
-
-    @cached_property
-    def lidc_item(self):
-        self.parent.lidc.extendedinfo = get_condvisibility(EXTENDED_PROPERTIES)
-        return self.parent.lidc.get_item(self.tmdb_type, self.tmdb_id, self.season, self.episode)
-
-    @cached_property
     def artwork(self):
         if not self.item or 'art' not in self.item:
             return {}
@@ -324,7 +318,48 @@ class MonitorItemDetails(ImageManipulations):
         return get_empty_item()
 
     @cached_property
+    def lidc_item(self):
+        return self.get_lidc_item()
+
+    def get_lidc_item(self):
+        self.parent.lidc.extendedinfo = self.is_extended
+        self.parent.lidc.cache_refresh = None if self.is_detailed else 'basic'
+        return self.parent.lidc.get_item(self.tmdb_type, self.tmdb_id, self.season, self.episode)
+
+    def update_lidc_item(self):
+        self.lidc_item = self.get_lidc_item()
+        return self.lidc_item
+
+    @cached_property
+    def item(self):
+        return self.get_item()
+
+    def get_item(self):
+        if not self.is_same_item:
+            return self.set_blank_itemdetails()
+        if not self.tmdb_id:
+            return self.set_blank_itemdetails()
+        if not self.tmdb_type:
+            return self.set_blank_itemdetails()
+        if not self.lidc_item:  # or 'art' not in self.lidc_item:
+            return self.set_blank_itemdetails()
+        return self.lidc_item
+
+    def update_item(self):
+        self.update_lidc_item()
+        self.item = self.get_item()
+        return self.item
+
+    @cached_property
     def listitem(self):
+        return self.get_listitem()
+
+    def get_listitem(self):
         if not self.item:
             return ListItem().get_listitem()
         return ListItem(**self.item).get_listitem()
+
+    def update_listitem(self):
+        self.update_item()
+        self.listitem = self.get_listitem()
+        return self.listitem

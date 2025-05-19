@@ -273,6 +273,21 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
             # Set the main properties
             self.set_properties(_item.item)
 
+        def process_detailed_item():
+            _item.level = 2
+            _item.update_item()
+
+            if not _item.is_same_item:
+                return
+
+            with self._parent.mutex_lock:
+                self.set_properties(_item.item)
+
+        # Get higher level details after main thread
+        self.get_property('IsUpdatingDetails', 'True')
+        process_detailed_item()
+        self.get_property('IsUpdatingDetails', clear_property=True)
+
     def on_finalise(self):
         func = self.on_finalise_listcontainer if self._listcontainer else self.on_finalise_winproperties
         func(
