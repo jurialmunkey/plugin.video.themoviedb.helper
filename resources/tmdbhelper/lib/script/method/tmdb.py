@@ -78,15 +78,27 @@ def delete_itemtype(mediatype=None, confirmation=True, **kwargs):
     from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
 
     routes = {
-        'movie': ('movie', 'collection', ),
-        'tvshow': ('tvshow', 'season', 'episode', ),
-        'season': ('tvshow', 'season', 'episode', ),
-        'episode': ('tvshow', 'season', 'episode', ),
-        'person': ('person', ),
+        'movie': {
+            'baseitems': ('movie', 'collection', ),
+            'tables': (),
+        },
+        'tvshow': {
+            'baseitems': ('tvshow', 'season', 'episode', ),
+            'tables': (),
+        },
+        'season': {
+            'baseitems': ('tvshow', 'season', 'episode', ),
+            'tables': (),
+        },
+        'episode': {
+            'baseitems': ('tvshow', 'season', 'episode', ),
+            'tables': (),
+        },
+        'all': {
+            'baseitems': ('person', 'tvshow', 'season', 'episode', 'movie', 'collection', ),
+            'tables': (),
+        },
     }
-
-    if not Dialog().yesno(get_localized(19194), f'[B][COLOR=red][UPPERCASE]{get_localized(14117)}[/UPPERCASE][/COLOR][/B] - {get_localized(32053)}'):
-        return
 
     if not mediatype:
         choices = [i for i in routes.keys()]
@@ -98,14 +110,28 @@ def delete_itemtype(mediatype=None, confirmation=True, **kwargs):
     if mediatype not in routes:
         raise Exception(f'The mediatype {mediatype} is not valid!')
 
+    if not Dialog().yesno(
+        (
+            f'{get_localized(32387).format(mediatype.capitalize())}: '
+            f'{get_localized(19194)}'
+        ),
+        (
+            f'[B][COLOR=red][UPPERCASE]{get_localized(14117)}[/UPPERCASE][/COLOR][/B] - '
+            f'{get_localized(32053)}'
+        )
+    ):
+        return
+
     with BusyDialog():
         database = ItemDetailsDatabase()
-        with TimerFunc(f'Deleting items of mediatype {mediatype}:', inline=True):
-            for i in routes[mediatype]:
+        with TimerFunc(f'Deleting mediatype {mediatype}:', inline=True):
+            for i in routes[mediatype]['baseitems']:
                 database.execute_sql(f'DELETE FROM baseitem WHERE mediatype="{i}"')
+            for i in routes[mediatype]['tables']:
+                database.execute_sql(f'DELETE FROM {i}')
             database.execute_sql('VACUUM')
 
     if confirmation:
         head = get_localized(32387).format(mediatype.capitalize())
-        data = get_localized(32051)
+        data = get_localized(32051).format(mediatype)
         Dialog().ok(head, data)

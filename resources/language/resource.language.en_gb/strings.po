@@ -254,7 +254,7 @@ msgstr ""
 
 #: /resources/tmdbhelper/lib/script/method/tmdb.py
 msgctxt "#32051"
-msgid "Deleted all cached {} items"
+msgid "Deleted cached {} items"
 msgstr ""
 
 #: /resources/settings.xml
