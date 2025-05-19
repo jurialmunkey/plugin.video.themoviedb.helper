@@ -85,7 +85,7 @@ msgstr "德语（奥地利）"
 #: /resources/settings.xml
 msgctxt "#32013"
 msgid "Get watched indicators, episode counts, and resume points"
-msgstr "获取已观看标识、剧集计数和续播点。"
+msgstr "获取已观看标识、剧集计数和续播点"
 
 msgctxt "#30010"
 msgid "German (Switzerland)"
