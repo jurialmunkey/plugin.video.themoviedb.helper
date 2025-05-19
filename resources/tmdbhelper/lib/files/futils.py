@@ -22,6 +22,19 @@ get_write_path = FILEUTILS.get_write_path
 dumps_to_file = FILEUTILS.dumps_to_file
 
 
+def create_qrcode(url, filename, folder='qrcode'):
+    import qrcode
+    filepath = get_file_path(folder, f'{filename}.png')
+    qr_image = qrcode.make(url)
+    with xbmcvfs.File(filepath, 'wb') as f:
+        qr_image.save(f, 'PNG')
+    return filepath
+
+
+def delete_qrcode(filename, folder='qrcode'):
+    delete_file(folder, f'{filename}.png')
+
+
 def normalise_filesize(filesize):
     filesize = try_int(filesize)
     i_flt = 1024.0

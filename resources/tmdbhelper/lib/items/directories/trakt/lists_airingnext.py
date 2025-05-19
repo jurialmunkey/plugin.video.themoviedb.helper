@@ -10,13 +10,24 @@ class ListAiringNext(ContainerDirectory):
         from tmdbhelper.lib.addon.thread import ParallelThread
         from tmdbhelper.lib.addon.tmdate import is_future_timestamp
         from tmdbhelper.lib.api.mapping import get_empty_item
+        from tmdbhelper.lib.items.database.listitem import ListItemDetails
 
         self.dialog_progress_bg.update(0, message=f'Initialising')
         self._get_list_items_progress_max = len(seed_items)
         self._get_list_items_progress_now = 0
 
+        def _get_lidc():
+            lidc = ListItemDetails(self)
+            lidc.extendedinfo = False
+            return lidc
+
+        def _get_lidc_data(tmdb_id):
+            data = _get_lidc().get_item('tv', tmdb_id)
+            return data.get('infoproperties') or {}
+
         def _get_nextaired_item(tmdb_id):
-            ip = self.tmdb_api.tmdb_database.get_nextaired_formatted(tmdb_id)
+            ip = _get_lidc_data(tmdb_id)
+
             try:
                 item = get_empty_item()
                 item['infoproperties'] = ip
@@ -43,8 +54,12 @@ class ListAiringNext(ContainerDirectory):
 
         def _get_nextaired_item_thread(i):
             tmdb_id = i.get('tmdb_id') or self.tmdb_api.tmdb_database.get_tmdb_id(
-                tmdb_type='tv', imdb_id=i.get('imdb_id'), tvdb_id=i.get('tvdb_id'),
-                query=i.get('showtitle') or i.get('title'), year=i.get('year'))
+                tmdb_type='tv',
+                imdb_id=i.get('imdb_id'),
+                tvdb_id=i.get('tvdb_id'),
+                query=i.get('showtitle') or i.get('title'),
+                year=i.get('year')
+            )
 
             if not tmdb_id:
                 self._get_list_items_progress_now += 1

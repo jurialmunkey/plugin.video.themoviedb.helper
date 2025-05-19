@@ -30,6 +30,21 @@ class ArtPoster(ArtType):
         return self.common_apis.tmdb_imagepath.get_imagepath_poster(v)
 
 
+class ArtPosterLanguage(ArtPoster):
+    def get_cached_data(self):
+        return self.get_cached_data_by_language()
+
+
+class ArtPosterEnglish(ArtPoster):
+    def get_cached_data(self):
+        return self.get_cached_data_by_english()
+
+
+class ArtPosterNull(ArtPoster):
+    def get_cached_data(self):
+        return self.get_cached_data_by_null()
+
+
 class ArtThumbs(ArtType):
     @property
     def values(self):  # WHERE conditions values for ?
@@ -71,6 +86,16 @@ class ArtLandscape(ArtFanart):
         return self.get_cached_data_by_language() or self.get_cached_data_by_english()
 
 
+class ArtLandscapeLanguage(ArtLandscape):
+    def get_cached_data(self):
+        return self.get_cached_data_by_language()
+
+
+class ArtLandscapeEnglish(ArtLandscape):
+    def get_cached_data(self):
+        return self.get_cached_data_by_english()
+
+
 class ArtClearlogo(ArtType):
     conditions = 'parent_id=? AND type=? AND extension=? ORDER BY rating DESC LIMIT 1'  # WHERE conditions
 
@@ -80,3 +105,18 @@ class ArtClearlogo(ArtType):
 
     def image_path_func(self, v):
         return self.common_apis.tmdb_imagepath.get_imagepath_clogos(v)
+
+
+class ArtClearlogoLanguage(ArtClearlogo):
+    def get_cached_data(self):
+        return self.get_cached_data_by_language()
+
+
+class ArtClearlogoEnglish(ArtClearlogo):
+    def get_cached_data(self):
+        return self.get_cached_data_by_english()
+
+
+class ArtClearlogoNull(ArtClearlogo):
+    def get_cached_data(self):
+        return self.get_cached_data_by_english()

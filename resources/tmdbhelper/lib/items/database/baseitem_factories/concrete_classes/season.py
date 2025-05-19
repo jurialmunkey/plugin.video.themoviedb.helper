@@ -21,7 +21,7 @@ class Season(Tvshow):
         """ Determines if any data is returned """
         if not self.tmdb_id:
             return False
-        if self.season is None:
+        if self.season in (None, ''):
             return False
         if int(self.season) < 0:
             return False
@@ -85,14 +85,17 @@ class Season(Tvshow):
         return (
             f'baseitem INNER JOIN {self.table} ON {self.table}.id = baseitem.id'
             ' LEFT JOIN tvshow ON tvshow.id = season.tvshow_id'
+            ' LEFT JOIN episode next_aired ON next_aired.id = tvshow.next_episode_to_air_id'
+            ' LEFT JOIN episode last_aired ON last_aired.id = tvshow.last_episode_to_air_id'
         )
 
     def get_cached_data_keys(self):
         """ SELECT """
-        deniedlist_keys = ('plot', )
-        additional_keys = [
+        cached_data_keys = [f'{self.table}.{k}' for k in self.keys if k not in ('plot', 'status')]
+        cached_data_keys.extend([
             'tvshow.title AS tvshowtitle',
             'tvshow.tagline as tagline',
+            'tvshow.status AS status',
             'ifnull(season.plot, tvshow.plot) as plot',
             (
                 '(    SELECT COUNT(episode.season_id) '
@@ -101,8 +104,11 @@ class Season(Tvshow):
                 '     GROUP BY episode.season_id'
                 ') as totalepisodes'
             )
-        ]
-        return tuple([f'{self.table}.{k}' for k in self.keys if k not in deniedlist_keys] + additional_keys)
+        ])
+
+        cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('next_aired'))
+        cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('last_aired'))
+        return tuple(cached_data_keys)
 
     @cached_property
     def db_table_caches(self):

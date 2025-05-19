@@ -187,6 +187,21 @@ def import_fanart_tv_poster():
     return FanartTVPoster
 
 
+def import_fanart_tv_poster_language():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.fanart_tv import FanartTVPosterLanguage
+    return FanartTVPosterLanguage
+
+
+def import_fanart_tv_poster_english():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.fanart_tv import FanartTVPosterEnglish
+    return FanartTVPosterEnglish
+
+
+def import_fanart_tv_poster_null():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.fanart_tv import FanartTVPosterNull
+    return FanartTVPosterNull
+
+
 def import_fanart_tv_fanart():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.fanart_tv import FanartTVFanart
     return FanartTVFanart
@@ -197,9 +212,34 @@ def import_fanart_tv_landscape():
     return FanartTVLandscape
 
 
+def import_fanart_tv_landscape_language():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.fanart_tv import FanartTVLandscapeLanguage
+    return FanartTVLandscapeLanguage
+
+
+def import_fanart_tv_landscape_english():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.fanart_tv import FanartTVLandscapeEnglish
+    return FanartTVLandscapeEnglish
+
+
 def import_fanart_tv_clearlogo():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.fanart_tv import FanartTVClearlogo
     return FanartTVClearlogo
+
+
+def import_fanart_tv_clearlogo_language():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.fanart_tv import FanartTVClearlogoLanguage
+    return FanartTVClearlogoLanguage
+
+
+def import_fanart_tv_clearlogo_english():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.fanart_tv import FanartTVClearlogoEnglish
+    return FanartTVClearlogoEnglish
+
+
+def import_fanart_tv_clearlogo_null():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.fanart_tv import FanartTVClearlogoNull
+    return FanartTVClearlogoNull
 
 
 def import_fanart_tv_clearart():
@@ -227,6 +267,21 @@ def import_art_poster():
     return ArtPoster
 
 
+def import_art_poster_language():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtPosterLanguage
+    return ArtPosterLanguage
+
+
+def import_art_poster_english():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtPosterEnglish
+    return ArtPosterEnglish
+
+
+def import_art_poster_null():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtPosterNull
+    return ArtPosterNull
+
+
 def import_art_fanart():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtFanart
     return ArtFanart
@@ -242,6 +297,16 @@ def import_art_landscape():
     return ArtLandscape
 
 
+def import_art_landscape_language():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtLandscapeLanguage
+    return ArtLandscapeLanguage
+
+
+def import_art_landscape_english():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtLandscapeEnglish
+    return ArtLandscapeEnglish
+
+
 def import_art_thumbs():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtThumbs
     return ArtThumbs
@@ -250,6 +315,21 @@ def import_art_thumbs():
 def import_art_clearlogo():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtClearlogo
     return ArtClearlogo
+
+
+def import_art_clearlogo_language():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtClearlogoLanguage
+    return ArtClearlogoLanguage
+
+
+def import_art_clearlogo_english():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtClearlogoEnglish
+    return ArtClearlogoEnglish
+
+
+def import_art_clearlogo_null():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtClearlogoNull
+    return ArtClearlogoNull
 
 
 def import_playcount():
@@ -309,19 +389,35 @@ FACTORY_ROUTES = {
     'provider': import_provider,
     'fanart_tv': import_fanart_tv,
     'fanart_tv_poster': import_fanart_tv_poster,
+    'fanart_tv_poster_language': import_fanart_tv_poster_language,
+    'fanart_tv_poster_english': import_fanart_tv_poster_english,
+    'fanart_tv_poster_null': import_fanart_tv_poster_null,
     'fanart_tv_fanart': import_fanart_tv_fanart,
     'fanart_tv_landscape': import_fanart_tv_landscape,
+    'fanart_tv_landscape_language': import_fanart_tv_landscape_language,
+    'fanart_tv_landscape_english': import_fanart_tv_landscape_english,
     'fanart_tv_clearlogo': import_fanart_tv_clearlogo,
+    'fanart_tv_clearlogo_language': import_fanart_tv_clearlogo_language,
+    'fanart_tv_clearlogo_english': import_fanart_tv_clearlogo_english,
+    'fanart_tv_clearlogo_null': import_fanart_tv_clearlogo_null,
     'fanart_tv_clearart': import_fanart_tv_clearart,
     'fanart_tv_banner': import_fanart_tv_banner,
     'fanart_tv_discart': import_fanart_tv_discart,
     'art': import_art,
     'art_poster': import_art_poster,
+    'art_poster_language': import_art_poster_language,
+    'art_poster_english': import_art_poster_english,
+    'art_poster_null': import_art_poster_null,
     'art_fanart': import_art_fanart,
     'art_extrafanart': import_art_extrafanart,
     'art_landscape': import_art_landscape,
+    'art_landscape_language': import_art_landscape_language,
+    'art_landscape_english': import_art_landscape_english,
     'art_thumbs': import_art_thumbs,
     'art_clearlogo': import_art_clearlogo,
+    'art_clearlogo_language': import_art_clearlogo_language,
+    'art_clearlogo_english': import_art_clearlogo_english,
+    'art_clearlogo_null': import_art_clearlogo_null,
     'playcount': import_playcount,
     'watchedcount': import_watchedcount,
     'airedcount': import_airedcount,

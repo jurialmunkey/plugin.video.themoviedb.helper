@@ -1,9 +1,6 @@
 from tmdbhelper.lib.files.ftools import cached_property
-from tmdbhelper.lib.addon.plugin import get_infolabel
-from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_region_date
 from tmdbhelper.lib.addon.logger import kodi_try_except, kodi_log
 from tmdbhelper.lib.files.futils import validate_join
-from tmdbhelper.lib.api.kodi.rpc import get_person_stats
 from tmdbhelper.lib.api.contains import CommonContainerAPIs
 from tmdbhelper.lib.addon.thread import ParallelThread
 from jurialmunkey.window import WindowPropertySetter
@@ -91,11 +88,6 @@ class CommonMonitorDetails(CommonContainerAPIs):
                 info[f'{t}_cr'] = '[CR]'.join(all_awards_cr)
         return info
 
-    def get_nextaired(self, tmdb_type, tmdb_id):
-        if tmdb_type != 'tv':
-            return {}
-        return self.tmdb_api.tmdb_database.get_nextaired_formatted(tmdb_id)
-
     def get_detailed_ratings(self, tmdb_type, tmdb_id):
         from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings import RatingsDict
         sync = RatingsDict()
@@ -116,25 +108,12 @@ class CommonMonitorDetails(CommonContainerAPIs):
         funcs = (
             self.get_detailed_ratings,
             self.get_tvdb_awards,
-            self.get_nextaired,
         )
 
         with ParallelThread(funcs, get_data_func):
             pass
 
         return info
-
-    def get_person_stats(self, item, tmdb_type, tmdb_id):
-        if tmdb_type != 'person':
-            return item
-
-            return item
-        try:
-            name = item['infolabels']['title']
-        except (KeyError, AttributeError, NameError):
-            return item
-        item.setdefault('infoproperties', {}).update(get_person_stats(name) or {})
-        return item
 
 
 class CommonMonitorItem:
@@ -171,7 +150,6 @@ class CommonMonitorItem:
     @cached_property
     def infolabels(self):
         infolabels = self.item.get('infolabels') or {}
-        infolabels.pop('status', None)
         return infolabels
 
     @cached_property
@@ -189,27 +167,6 @@ class CommonMonitorItem:
     @cached_property
     def premiered(self):
         return self.infolabels.get('premiered')
-
-    def set_time_properties(self):
-        if not self.duration:
-            return
-        minutes = self.duration // 60 % 60
-        hours = self.duration // 60 // 60
-        totalmin = self.duration // 60
-        self.set_property('Duration', totalmin)
-        self.set_property('Duration_H', hours)
-        self.set_property('Duration_M', minutes)
-        self.set_property('Duration_HHMM', f'{hours:02d}:{minutes:02d}')
-
-    def set_date_properties(self):
-        if not self.premiered:
-            return
-        date_obj = convert_timestamp(self.premiered, time_fmt="%Y-%m-%d", time_lim=10)
-        if not date_obj:
-            return
-        self.set_property('Premiered', get_region_date(date_obj, 'dateshort'))
-        self.set_property('Premiered_Long', get_region_date(date_obj, 'datelong'))
-        self.set_property('Premiered_Custom', date_obj.strftime(get_infolabel('Skin.String(TMDbHelper.Date.Format)') or '%d %b %Y'))
 
     def set_info_properties(self, dictionary: dict, affix=None):
         if not dictionary:
@@ -249,8 +206,6 @@ class CommonMonitorItem:
         self.set_info_properties(self.unique_ids, affix='id')
         self.set_info_properties(self.infolabels)
         self.set_info_properties(self.infoproperties)
-        self.set_time_properties()
-        self.set_date_properties()
 
     def clear_properties(self, ignore_keys=None):
         for k in self.properties - (ignore_keys or set()):

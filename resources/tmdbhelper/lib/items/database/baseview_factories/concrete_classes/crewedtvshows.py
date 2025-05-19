@@ -9,8 +9,12 @@ class CrewedTvshowsMediaList(CrewedMoviesMediaList):
         return (
             f'{self.table}.tmdb_id=? AND baseitem.expiry>=? AND baseitem.datalevel>=? '
             f'GROUP BY {self.table}.parent_id '
-            f'ORDER BY {self.table}.appearances DESC'
+            f'ORDER BY {self.cached_data_conditions_sort}'
         )
+
+    @property
+    def cached_data_conditions_sort_fallback(self):
+        return f'appearances {self.cached_data_conditions_how}'
 
     item_mediatype = 'tvshow'
     item_tmdb_type = 'tv'

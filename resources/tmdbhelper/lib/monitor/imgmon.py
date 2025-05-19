@@ -68,7 +68,7 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
             return True
 
         # Always refresh our artwork if the item changed
-        if not self.is_same_item(update=True):
+        if not self.is_same_item(update=True, setup=True):
             return True
 
         # Set refresh time if not set yet and still on same item

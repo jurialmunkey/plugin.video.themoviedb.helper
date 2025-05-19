@@ -218,7 +218,7 @@ def set_detailed_item(tmdb_type, tmdb_id, season=None, episode=None, details=Non
     item['slug'] = details.unique_ids.get('slug')
     item['season'] = season
     item['episode'] = episode
-    item['originaltitle'] = details.infolabels.get('originaltitle')
+    item['originaltitle'] = details.infoproperties.get('tvshow.originaltitle') or details.infolabels.get('originaltitle')
     item['title'] = details.infolabels.get('tvshowtitle') or details.infolabels.get('title')
     item['showname'] = item['clearname'] = item['tvshowtitle'] = item.get('title')
     item['year'] = details.infolabels.get('year')

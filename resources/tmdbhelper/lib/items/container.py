@@ -119,7 +119,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
     def get_kodi_database(self, tmdb_type):
         if get_setting('use_kodi_local_db', 'int') == 0:
             return
-        with TimerList(self.timer_lists, 'get_kodi', log_threshold=0.05, logging=self.log_timers):
+        with TimerList(self.timer_lists, 'get_kodi', log_threshold=0.01, logging=self.log_timers):
             from tmdbhelper.lib.items.kodi import KodiDb
             return KodiDb(tmdb_type)
 
@@ -139,7 +139,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         if not li:
             return
 
-        with TimerList(self.timer_lists, 'item_abc', log_threshold=0.05, logging=self.log_timers):
+        with TimerList(self.timer_lists, 'item_abc', log_threshold=0.01, logging=self.log_timers):
 
             # Reformat ListItem.Label for episodes to match Kodi default 1x01.Title
             li.set_episode_label()
@@ -162,7 +162,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
             if not li.next_page and self.is_excluded(li, is_listitem=True, **self.filters):
                 return
 
-        with TimerList(self.timer_lists, 'item_xyz', log_threshold=0.05, logging=self.log_timers):
+        with TimerList(self.timer_lists, 'item_xyz', log_threshold=0.01, logging=self.log_timers):
             li.set_playcount(li.infolabels.get('playcount'))
             li.set_context_menu(additions=self.context_additions)  # Set the context menu items
             li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
@@ -198,15 +198,15 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         items = self.build_detailed_items(items)
 
         # Finalise listitems in parallel threads
-        with TimerList(self.timer_lists, '--make', log_threshold=0.05, logging=self.log_timers):
+        with TimerList(self.timer_lists, '--make', log_threshold=0.01, logging=self.log_timers):
             items = self.make_items(items)
 
         return items
 
     def add_items(self, items):
-        with TimerList(self.timer_lists, '--add_a', log_threshold=0.05, logging=self.log_timers):
+        with TimerList(self.timer_lists, '--add_a', log_threshold=0.01, logging=self.log_timers):
             items = [(li.get_url(), li.get_listitem(), li.is_folder) for li in items if li]
-        with TimerList(self.timer_lists, '--add_z', log_threshold=0.05, logging=self.log_timers):
+        with TimerList(self.timer_lists, '--add_z', log_threshold=0.01, logging=self.log_timers):
             from xbmcplugin import addDirectoryItems
             addDirectoryItems(self.handle, items)
 
@@ -294,7 +294,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
                 return items
             self.property_params.update(self.set_params_to_container())
             self.plugin_category = self.params.get('plugin_category') or self.plugin_category
-            with TimerList(self.timer_lists, '--sync', log_threshold=0.05, logging=self.log_timers):
+            with TimerList(self.timer_lists, '--sync', log_threshold=0.01, logging=self.log_timers):
                 self.trakt_playdata.pre_sync_join()
             with TimerList(self.timer_lists, 'add_items', logging=self.log_timers):
                 items = self.build_items(items)
@@ -342,17 +342,13 @@ class ContainerDirectory(ContainerDirectoryCommon):
         return li
 
     def build_detailed_items(self, items):
-        with TimerList(self.timer_lists, '--build', log_threshold=0.05, logging=self.log_timers):
+        with TimerList(self.timer_lists, '--build', log_threshold=0.01, logging=self.log_timers):
             items = self.lidc.configure_listitems_threaded(items)
             return [i for i in (self.build_detailed_item(li) for li in items if li) if i]
 
 
 class ContainerDefaultCacheDirectory(ContainerDirectory):
-    @property
-    def default_cacheonly(self):
-        if get_condvisibility('Skin.HasSetting(TMDbHelper.DisableDefaultCacheOnly)'):
-            return False
-        return True
+    default_cacheonly = False
 
 
 class ContainerCacheOnlyDirectory(ContainerDirectory):

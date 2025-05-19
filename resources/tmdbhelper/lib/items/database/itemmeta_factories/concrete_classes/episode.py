@@ -1,34 +1,7 @@
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem, MediaItemArtworkRoutes
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseroutes import MediaItemInfoLabelItemRoutes
+from tmdbhelper.lib.items.database.mappings import ItemMapperMethods
 from tmdbhelper.lib.addon.tmdate import is_future_timestamp
-from tmdbhelper.lib.addon.plugin import get_setting
-
-
-class EpisodeItemArtworkRoutes:
-    art_dbclist_routes_fanart_tv = (
-        (('fanart_tv_poster', 'season'), 'poster'),
-        (('fanart_tv_fanart', 'season'), 'fanart'),
-        (('fanart_tv_landscape', 'season'), 'landscape'),
-        (('fanart_tv_banner', 'season'), 'banner'),
-        (('fanart_tv_poster', 'tvshow'), 'poster'),
-        (('fanart_tv_fanart', 'tvshow'), 'fanart'),
-        (('fanart_tv_landscape', 'tvshow'), 'landscape'),
-        (('fanart_tv_clearlogo', 'tvshow'), 'clearlogo'),
-        (('fanart_tv_clearart', 'tvshow'), 'clearart'),
-        (('fanart_tv_banner', 'tvshow'), 'banner'),
-    )
-
-    art_dbclist_routes_tmdb = (
-        (('art_poster', 'season'), 'poster'),
-        (('art_fanart', 'season'), 'fanart'),
-        (('art_clearlogo', 'season'), 'clearlogo'),
-        (('art_landscape', 'season'), 'landscape'),
-        (('art_poster', 'tvshow'), 'poster'),
-        (('art_fanart', 'tvshow'), 'fanart'),
-        (('art_landscape', 'tvshow'), 'landscape'),
-        (('art_clearlogo', 'tvshow'), 'clearlogo'),
-        (('art_extrafanart', 'tvshow'), 'fanart'),
-    )
 
 
 class Episode(MediaItem):
@@ -41,18 +14,9 @@ class Episode(MediaItem):
     @property
     def art_dbclist_routes(self):
         return (
-            *MediaItemArtworkRoutes.art_dbclist_routes_tmdb,
-            *EpisodeItemArtworkRoutes.art_dbclist_routes_tmdb,
-        ) if not get_setting('fanarttv_lookup') else (
-            *MediaItemArtworkRoutes.art_dbclist_routes_tmdb,
-            *MediaItemArtworkRoutes.art_dbclist_routes_fanart_tv,
-            *EpisodeItemArtworkRoutes.art_dbclist_routes_tmdb,
-            *EpisodeItemArtworkRoutes.art_dbclist_routes_fanart_tv,
-        ) if not get_setting('fanarttv_prefer') else (
-            *MediaItemArtworkRoutes.art_dbclist_routes_fanart_tv,
-            *MediaItemArtworkRoutes.art_dbclist_routes_tmdb,
-            *EpisodeItemArtworkRoutes.art_dbclist_routes_fanart_tv,
-            *EpisodeItemArtworkRoutes.art_dbclist_routes_tmdb,
+            MediaItemArtworkRoutes().configured_routes
+            + MediaItemArtworkRoutes('season').configured_routes
+            + MediaItemArtworkRoutes('tvshow').configured_routes
         )
 
     infoproperties_dbclist_routes = (
@@ -82,10 +46,6 @@ class Episode(MediaItem):
             return 'Airing'
         return 'Released'
 
-    def get_infolabels_special(self, infolabels):
-        infolabels['status'] = self.get_premiered_status()
-        return infolabels
-
     def get_unique_ids(self, unique_ids):
         unique_ids = super().get_unique_ids(unique_ids)
         for i in self.parent_db_cache.return_basemeta_db('unique_id', 'season').cached_data:
@@ -104,11 +64,22 @@ class Episode(MediaItem):
         return infoproperties
 
     def get_infoproperties_episode_type(self, infoproperties):
-        infoproperties['episode_type'] = self.get_data_value('status')
+        infoproperties['episode_type'] = self.get_data_value('episode_type')
+        infoproperties['episode_status'] = self.get_premiered_status()
+        return infoproperties
+
+    def get_infoproperties_tvshow(self, infoproperties):
+        infoproperties['tvshow.originaltitle'] = self.get_data_value('tvshow_originaltitle')
+        infoproperties['tvshow.year'] = self.get_data_value('tvshow_year')
+        infoproperties.update(ItemMapperMethods.get_custom_date(
+            self.get_data_value('tvshow_premiered'), name='tvshow.premiered'
+        ))
         return infoproperties
 
     def get_infoproperties_special(self, infoproperties):
         infoproperties = self.get_infoproperties_custom(infoproperties)
         infoproperties = self.get_infoproperties_episode_type(infoproperties)
         infoproperties = self.get_infoproperties_progress(infoproperties)
+        infoproperties = self.get_infoproperties_tvshow(infoproperties)
+        infoproperties = self.get_infoproperties_next_ep(infoproperties)
         return infoproperties

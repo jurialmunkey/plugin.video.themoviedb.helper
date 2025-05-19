@@ -1,4 +1,5 @@
 from tmdbhelper.lib.items.database.baseitem_factories.concrete_classes.season import Season
+from tmdbhelper.lib.items.database.baseitem_factories.concrete_classes.tvshow import Tvshow
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.files.locker import mutexlock
 
@@ -12,7 +13,7 @@ class Episode(Season):
         """ Determines if any data is returned """
         if not self.tmdb_id:
             return False
-        if self.season is None:
+        if self.season in (None, ''):
             return False
         if int(self.season) < 0:
             return False
@@ -68,25 +69,6 @@ class Episode(Season):
             return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow_simple}
         return {'append_to_response': self.common_apis.tmdb_api.append_to_response}
 
-    @cached_property
-    def online_data(self):
-        """ cache online data from func to property """
-        if not self.online_data_cond:
-            return
-        # kodi_log(f'SYNC CACHE: {self.online_data_args}', 2)
-        tmdb_data = self.online_data_func(*self.online_data_args, **self.online_data_kwgs)
-
-        trakt_id = self.common_apis.trakt_api.get_id(self.tmdb_id, 'tmdb', 'show', 'trakt')
-        if not trakt_id:
-            return tmdb_data
-
-        trakt_data = self.common_apis.trakt_api.get_request_sc('shows', trakt_id, 'seasons', self.season, 'episodes', self.episode, extended='full')
-        if not trakt_data:
-            return tmdb_data
-
-        trakt_data.update(tmdb_data)
-        return trakt_data
-
     @property
     def cached_data_table(self):
         return self.get_cached_data_table()
@@ -99,14 +81,28 @@ class Episode(Season):
         """ FROM """
         return (
             f'baseitem LEFT JOIN {self.table} ON {self.table}.id = baseitem.id '
-            'LEFT JOIN season ON season.id = episode.season_id '
-            'LEFT JOIN tvshow ON tvshow.id = episode.tvshow_id '
+            ' LEFT JOIN season ON season.id = episode.season_id'
+            ' LEFT JOIN tvshow ON tvshow.id = episode.tvshow_id'
+            ' LEFT JOIN episode next_aired ON next_aired.id = tvshow.next_episode_to_air_id'
+            ' LEFT JOIN episode last_aired ON last_aired.id = tvshow.last_episode_to_air_id'
         )
 
     def get_cached_data_keys(self):
         """ SELECT """
-        additional_keys = ['tvshow.title AS tvshowtitle', 'season.season AS season', 'tvshow.tagline as tagline']
-        return tuple([f'{self.table}.{k}' for k in self.keys] + additional_keys)
+        cached_data_keys = [f'{self.table}.{k}' for k in self.keys if k != 'status']
+        cached_data_keys.extend([
+            'episode.status AS episode_type',
+            'tvshow.title AS tvshowtitle',
+            'tvshow.originaltitle AS tvshow_originaltitle',
+            'tvshow.tagline AS tagline',
+            'tvshow.status AS status',
+            'tvshow.premiered AS tvshow_premiered',
+            'tvshow.year AS tvshow_year',
+            'season.season AS season',
+        ])
+        cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('next_aired'))
+        cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('last_aired'))
+        return tuple(cached_data_keys)
 
     @property
     def db_table_caches(self):

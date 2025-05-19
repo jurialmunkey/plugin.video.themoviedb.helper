@@ -45,7 +45,8 @@ class Tvshow(MediaItem):
         try:
             infoproperties['totalseasons'] = self.get_data_value('totalseasons')
             infoproperties['totalepisodes'] = infoproperties['unwatchedepisodes'] = self.get_data_value('totalepisodes')
-            infoproperties['next_episode_to_air_id'] = self.get_data_value('next_episode_to_air_id')
         except (TypeError, KeyError, IndexError):
             pass
+
+        infoproperties = self.get_infoproperties_next_ep(infoproperties)
         return infoproperties

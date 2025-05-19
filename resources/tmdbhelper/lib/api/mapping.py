@@ -1,4 +1,5 @@
 from jurialmunkey.parser import try_type
+from tmdbhelper.lib.addon.logger import kodi_log
 
 UPDATE_BASEKEY = 1
 
@@ -90,14 +91,8 @@ class _ItemMapper(object):
                     if c == UPDATE_BASEKEY:
                         item[p].update(v)
                         continue
-                    if c is None and 'extend' in d and isinstance(item[p], list) and isinstance(v, list):
-                        item[p] += v
-                        continue
                     if c is None:
                         item[p] = v
-                        continue
-                    if 'extend' in d and isinstance(item[p].get(c), list) and isinstance(v, list):
-                        item[p][c] += v
                         continue
                     item[p][c] = v
         return item

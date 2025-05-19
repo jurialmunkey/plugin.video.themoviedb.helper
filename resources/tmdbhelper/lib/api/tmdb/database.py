@@ -4,7 +4,6 @@ from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.tmdate import set_timestamp
 from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY
 from tmdbhelper.lib.api.tmdb.database_tables.genres import TMDbDatabaseGenres
-from tmdbhelper.lib.api.tmdb.database_tables.nextaired import TMDbDatabaseNextAired
 from tmdbhelper.lib.api.tmdb.database_tables.tmdb_id import TMDbDatabaseTMDbID
 from tmdbhelper.lib.api.tmdb.database_tables.certification import TMDbDatabaseCertification
 from tmdbhelper.lib.api.tmdb.database_tables.provider_regions import TMDbDatabaseProviderRegions
@@ -18,7 +17,6 @@ from tmdbhelper.lib.api.tmdb.database_tables.networks import TMDbDatabaseNetwork
 class TMDbDatabase(
     Database,
     TMDbDatabaseGenres,
-    TMDbDatabaseNextAired,
     TMDbDatabaseTMDbID,
     TMDbDatabaseCertification,
     TMDbDatabaseProviderRegions,
@@ -45,7 +43,6 @@ class TMDbDatabase(
         return {
             'expiry': self.expiry_columns,
             'genres': self.genres_columns,
-            'nextaired': self.nextaired_columns,
             'tmdb_id': self.tmdb_id_columns,
             'certification': self.certification_columns,
             'provider_regions': self.provider_regions_columns,
