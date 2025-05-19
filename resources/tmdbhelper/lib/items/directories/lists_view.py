@@ -67,8 +67,11 @@ class ListStarredCombined(ContainerDefaultCacheDirectory):
 
     def get_items(self, tmdb_id, limit=None, sort_by=None, sort_how=None, **kwargs):
         sync = BaseViewFactory('starredcombined', 'person', tmdb_id, filters=self.filters, limit=limit, sort_by=sort_by, sort_how=sort_how)
-        movie_count = len([i for i in sync.data if i and i['infoproperties']['tmdb_type'] == 'movie'])
-        shows_count = len(sync.data) - movie_count
+        try:
+            movie_count = len([i for i in sync.data if i and i['infoproperties']['tmdb_type'] == 'movie'])
+            shows_count = len(sync.data) - movie_count
+        except TypeError:
+            return
         self.kodi_db = self.get_kodi_database('both')
         self.container_content = convert_type('tv', 'container') if shows_count > movie_count else convert_type('movie', 'container')
         return sync.data
@@ -96,8 +99,11 @@ class ListCrewedCombined(ContainerDefaultCacheDirectory):
 
     def get_items(self, tmdb_id, limit=None, sort_by=None, sort_how=None, **kwargs):
         sync = BaseViewFactory('crewedcombined', 'person', tmdb_id, filters=self.filters, limit=limit, sort_by=sort_by, sort_how=sort_how)
-        movie_count = len([i for i in sync.data if i and i['infoproperties']['tmdb_type'] == 'movie'])
-        shows_count = len(sync.data) - movie_count
+        try:
+            movie_count = len([i for i in sync.data if i and i['infoproperties']['tmdb_type'] == 'movie'])
+            shows_count = len(sync.data) - movie_count
+        except TypeError:
+            return
         self.kodi_db = self.get_kodi_database('both')
         self.container_content = convert_type('tv', 'container') if shows_count > movie_count else convert_type('movie', 'container')
         return sync.data
