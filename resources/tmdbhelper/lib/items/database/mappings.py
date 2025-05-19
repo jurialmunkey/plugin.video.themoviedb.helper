@@ -213,7 +213,7 @@ class ItemMapperMethods:
             'plot': 'overview',
             'rating': 'vote_average',
             'votes': 'vote_count',
-            'duration': lambda i: try_int(i['runtime']) * 60
+            'duration': lambda i: self.get_runtime(i['runtime'])
         })
         episode_item['id'] = item_id
         episode_item['season_id'] = season_id
@@ -249,6 +249,10 @@ class ItemMapperMethods:
                 art_type='stills',
                 aspect_ratio='landscape')
             data.append(ExtendedMap('art', artwork['icon'], False, artwork))
+
+        # Use last/next aired duration if available for tvshow duration
+        if episode_item.get('duration') and not self.item['item'].get('duration'):
+            self.item['item']['duration'] = episode_item['duration']
 
         return data
 
@@ -389,7 +393,7 @@ class ItemMapperMethods:
                 'rating': 'vote_average',
                 'votes': 'vote_count',
                 'status': lambda i: self.get_episode_type(i),
-                'duration': lambda i: try_int(i['runtime']) * 60
+                'duration': lambda i: self.get_runtime(i['runtime'])
             })
             episode_item['id'] = item_id
             episode_item['season_id'] = season_id
