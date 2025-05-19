@@ -298,6 +298,22 @@ class MediaItem(BaseItem):
         infoproperties['TotalTime'] = int(duration)
         return infoproperties
 
+    def get_infoproperties_ranks(self, infoproperties):
+        func_get = self.get_instance_cached_data_value
+        func_dbc = self.parent_db_cache.return_basemeta_db
+
+        for database, column, name, func in (
+            ('favorites_rank', 'favorites_rank', 'favorites_rank', None),
+            ('watchlist_rank', 'watchlist_rank', 'watchlist_rank', None),
+            ('collected_date', 'collection_last_collected_at', 'collected_date', lambda i: i[:10]),
+        ):
+            rank = func_get(func_dbc(database), column)
+            if not rank:
+                continue
+            infoproperties[name] = func(rank) if func else rank
+
+        return infoproperties
+
     def get_infoproperties_next_ep(self, infoproperties):
 
         try:

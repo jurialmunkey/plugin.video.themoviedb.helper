@@ -352,6 +352,21 @@ def import_playprogress():
     return PlayProgress
 
 
+def import_favorites_rank():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import FavoritesRank
+    return FavoritesRank
+
+
+def import_watchlist_rank():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import WatchlistRank
+    return WatchlistRank
+
+
+def import_collected_date():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import CollectedDate
+    return CollectedDate
+
+
 FACTORY_ROUTES = {
     'crewmember': import_crewmember,
     'castmember': import_castmember,
@@ -422,6 +437,9 @@ FACTORY_ROUTES = {
     'watchedcount': import_watchedcount,
     'airedcount': import_airedcount,
     'playprogress': import_playprogress,
+    'favorites_rank': import_favorites_rank,
+    'watchlist_rank': import_watchlist_rank,
+    'collected_date': import_collected_date,
 }
 
 

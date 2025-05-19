@@ -34,7 +34,16 @@ class Tvshow(MediaItem):
     @property
     def cached_data_keys(self):
         """ SELECT """
-        cached_data_keys = [f'{self.table}.{k}' for k in self.keys]
+        cached_data_keys = [f'{self.table}.{k}' for k in self.keys if k != 'duration']
+        cached_data_keys.extend([(
+            'ifnull('
+            '(    SELECT CAST(AVG(episode.duration) as INTEGER) '
+            '     FROM episode WHERE episode.tvshow_id=tvshow.id '
+            '                    AND episode.premiered<=DATE("now")'
+            '                    AND episode.status!="special"'
+            '     GROUP BY episode.tvshow_id'
+            '), tvshow.duration) as duration'
+        )])
         cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('next_aired'))
         cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('last_aired'))
         return tuple(cached_data_keys)

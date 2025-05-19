@@ -190,13 +190,14 @@ class MonitorItemDetails(ImageManipulations):
     def season(self):
         if self.dbtype not in self.allow_season:
             return
-        return self.get_infolabel('season')
+        season = self.get_infolabel('season')
+        return season if season or season == 0 else None
 
     @cached_property
     def episode(self):
         if self.dbtype not in self.allow_episode:
             return
-        return self.get_infolabel('episode')
+        return self.get_infolabel('episode') or None
 
     @cached_property
     def imdb_id(self):
@@ -228,7 +229,21 @@ class MonitorItemDetails(ImageManipulations):
             imdb_id=self.imdb_id
         )
         self.tmdb_type = tmdb_type  # Also update tmdb_type with new type
-        self.dbtype = convert_type(tmdb_type, 'dbtype')  # Also update dbtype with new type
+
+        def container_type():
+            if self.tmdb_type == 'movie':
+                return 'movies'
+            if self.season and self.episode:
+                return 'episodes'
+            if self.season:
+                return 'seasons'
+            if self.tmdb_type == 'tv':
+                return 'tvshows'
+            if self.tmdb_type == 'person':
+                return 'actors'
+
+        self.dbtype = container_type()
+
         return tmdb_id
 
     @cached_property
