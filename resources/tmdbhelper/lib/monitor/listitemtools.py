@@ -105,6 +105,10 @@ class ListItemMonitorFinaliser:
     def artwork_enabled(self):
         return get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)")
 
+    @cached_property
+    def processed_artwork(self):
+        return {}
+
     @property
     def baseitem_properties(self):
         return self.parent.baseitem_properties
@@ -145,7 +149,12 @@ class ListItemMonitorFinaliser:
         self.set_ratings()
 
     def details(self):
-        return
+        self.item.level = 2
+        self.item.update_item()
+        self.item.set_additional_properties(self.baseitem_properties)
+        if not self.item.is_same_item:
+            return
+        self.set_details()
 
     def artwork(self):
         self.images_monitor.remote_artwork[self.item.identifier] = self.item.artwork.copy()
@@ -241,6 +250,9 @@ class ListItemMonitorFinaliserContainerMethod(ListItemMonitorFinaliser):
     def set_ratings(self):
         self.listitem.setProperties(self.item.all_ratings)
 
+    def set_details(self):
+        ListItem(**self.item.item).set_listitem(self.listitem)
+
     def initial_checks(self):
         if not self.item:
             return False
@@ -253,26 +265,21 @@ class ListItemMonitorFinaliserContainerMethod(ListItemMonitorFinaliser):
 
 class ListItemMonitorFinaliserWindowMethod(ListItemMonitorFinaliser):
 
-    def initial_checks(self):
-        if not self.item:
-            return False
-        if not self.item.is_same_item:  # Check that we are still on the same item after building
-            return False
-        return True
-
     def start_process_default(self):
         self.set_properties(self.item.item)  # Set the main properties  CHECK: do we need to lock with this?
 
     def set_ratings(self):
         self.set_ratings_properties({'ratings': self.item.all_ratings})
 
-    def details(self):
-        self.item.level = 2
-        self.item.update_item()
-        self.item.set_additional_properties(self.baseitem_properties)
-        if not self.item.is_same_item:
-            return
+    def set_details(self):
         self.set_properties(self.item.item)
+
+    def initial_checks(self):
+        if not self.item:
+            return False
+        if not self.item.is_same_item:  # Check that we are still on the same item after building
+            return False
+        return True
 
 
 class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
@@ -369,7 +376,7 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
     @kodi_try_except('lib.monitor.listitem.on_listitem')
     def on_listitem(self):
         self.setup_current_container()
-        self.setup_current_item(2 if self._listcontainer else 1)
+        self.setup_current_item()
 
         # We want to set a special container but it doesn't exist so exit
         if self._listcontainer == -1:

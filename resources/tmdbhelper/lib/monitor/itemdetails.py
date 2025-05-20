@@ -1,4 +1,4 @@
-from tmdbhelper.lib.addon.plugin import get_condvisibility, convert_type, get_setting
+from tmdbhelper.lib.addon.plugin import get_condvisibility, get_setting
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.monitor.images import ImageManipulations
 from tmdbhelper.lib.items.listitem import ListItem
