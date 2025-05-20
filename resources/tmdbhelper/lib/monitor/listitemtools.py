@@ -5,6 +5,7 @@ from jurialmunkey.window import get_property, get_current_window
 from tmdbhelper.lib.monitor.common import CommonMonitorFunctions
 from tmdbhelper.lib.monitor.itemdetails import MonitorItemDetails
 from tmdbhelper.lib.monitor.baseitem import BaseItemSkinDefaults
+from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.addon.thread import SafeThread
 
@@ -90,6 +91,151 @@ class ListItemInfoGetter():
 
     def setup_current_item(self, level=1):
         self._item = MonitorItemDetails(self, position=0, level=level)
+
+
+class ListItemMonitorFinaliser:
+    def __init__(self, parent):
+        self.parent = parent  # ListItemMonitorFunctions
+
+    @cached_property
+    def ratings_enabled(self):
+        return get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)")
+
+    @cached_property
+    def artwork_enabled(self):
+        return get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)")
+
+    @property
+    def baseitem_properties(self):
+        return self.parent.baseitem_properties
+
+    @property
+    def get_property(self):
+        return self.parent.get_property
+
+    @property
+    def set_properties(self):
+        return self.parent.set_properties
+
+    @property
+    def set_ratings_properties(self):
+        return self.parent.set_ratings_properties
+
+    @property
+    def grandparent(self):
+        return self.parent._parent
+
+    @property
+    def mutex_lock(self):
+        return self.grandparent.mutex_lock
+
+    @property
+    def images_monitor(self):
+        return self.grandparent.images_monitor
+
+    def artwork(self):
+        self.images_monitor.remote_artwork[self.item.identifier] = self.item.artwork.copy()
+        self.images_monitor.update_artwork(forced=True)
+
+    def process_artwork(self):
+        self.get_property('IsUpdatingArtwork', 'True')
+        self.artwork()
+        self.get_property('IsUpdatingArtwork', clear_property=True)
+
+    def process_details(self):
+        self.get_property('IsUpdatingDetails', 'True')
+        self.details()
+        self.get_property('IsUpdatingDetails', clear_property=True)
+
+    def process_ratings(self):
+        self.get_property('IsUpdatingRatings', 'True')
+        self.ratings()
+        self.get_property('IsUpdatingRatings', clear_property=True)
+
+    def start_process_artwork(self, threaded=False):
+        if not self.artwork_enabled:
+            return
+        if not self.item.artwork:
+            return
+        if not threaded:
+            self.process_artwork()
+        self.process_thread = SafeThread(target=self.process_artwork)
+        self.process_thread.start()
+
+    def start_process_ratings(self, threaded=False):
+        if not self.ratings_enabled:
+            return
+        if not threaded:
+            self.process_rating()
+            return
+        self.process_thread = SafeThread(target=self.process_ratings)
+        self.process_thread.start()
+
+    @property
+    def process_thread(self):
+        return self.parent.process_thread
+
+    @process_thread.setter
+    def process_thread(self, value):
+        self.parent.process_thread = value
+
+    def aquire_process_thread(self):
+        if not self.process_thread:
+            return
+        self.process_thread.join()
+        self.process_thread = None
+
+    @cached_property
+    def item(self):
+        item = self.parent._item
+        item.set_additional_properties(self.baseitem_properties)
+        return item
+
+    @cached_property
+    def listitem(self):
+        listitem = self.parent._last_listitem = self.item.listitem
+        return listitem
+
+
+class ListItemMonitorFinaliserWindowMethod(ListItemMonitorFinaliser):
+
+    def finalise(self):
+        # Check we have an item
+        if not self.item:
+            return
+
+        # Check we are on the same item still
+        if not self.item.is_same_item:
+            return
+
+        # Set some basic details first
+        self.start_process_default()
+
+        # Wait for previous ratings process to complete before starting a new one
+        self.aquire_process_thread()
+
+        # Process ratings in thread to avoid holding up main loop
+        self.start_process_ratings(threaded=True)
+
+    def start_process_default(self):
+        with self.mutex_lock:  # Lock to avoid race with artwork monitor
+            self.start_process_artwork()  # Add remote artwork to artwork monitor and update
+        self.set_properties(self.item.item)  # Set the main properties  CHECK: do we need to lock with this?
+
+    def ratings(self):
+        ratings = self.item.all_ratings
+        if not self.item.is_same_item:
+            return
+        self.set_ratings_properties({'ratings': ratings})
+
+    def details(self):
+        self.item.level = 2
+        self.item.update_item()
+        self.item.set_additional_properties(self.baseitem_properties)
+        if not self.item.is_same_item:
+            return
+        # with self.mutex_lock:  # Dont think we need to lock here but double check
+        self.set_properties(self.item.item)
 
 
 class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
@@ -288,11 +434,13 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         self.get_property('IsUpdatingDetails', clear_property=True)
 
     def on_finalise(self):
-        func = self.on_finalise_listcontainer if self._listcontainer else self.on_finalise_winproperties
-        func(
+        if not self._listcontainer:
+            ListItemMonitorFinaliserWindowMethod(self).finalise()
+            return
+
+        self.on_finalise_listcontainer(
             process_artwork=get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"),
             process_ratings=get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"))
-        self.get_property('IsUpdating', clear_property=True)
 
     @kodi_try_except('lib.monitor.listitem.on_listitem')
     def on_listitem(self):
@@ -307,9 +455,6 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         if self.is_same_item(update=True) and self.is_same_window(update=True):
             return
 
-        # Configure the item to retrieve details
-        self._item.configure()
-
         # Ignore some special folders like next page and parent folder
         if (self.get_infolabel('Label') or '').lower().split(' (', 1)[0] in self._ignored_labels:
             return self.on_exit()
@@ -317,8 +462,14 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         # Set a property for skins to check if item details are updating
         self.get_property('IsUpdating', 'True')
 
+        # Configure the item to retrieve details
+        self._item.configure()
+
         # Finish up setting our details to the container/window
         self.on_finalise()
+
+        # Clear property for skins to check if item details are updating
+        self.get_property('IsUpdating', clear_property=True)
 
     @kodi_try_except('lib.monitor.listitem.on_context_listitem')
     def on_context_listitem(self):
