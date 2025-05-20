@@ -122,6 +122,10 @@ class ListItemMonitorFinaliser:
         return self.parent.set_ratings_properties
 
     @property
+    def add_item_listcontainer(self):
+        return self.parent.add_item_listcontainer
+
+    @property
     def grandparent(self):
         return self.parent._parent
 
@@ -133,9 +137,19 @@ class ListItemMonitorFinaliser:
     def images_monitor(self):
         return self.grandparent.images_monitor
 
+    def ratings(self):
+        if not self.item.all_ratings:
+            return
+        if not self.item.is_same_item:
+            return
+        self.set_ratings()
+
+    def details(self):
+        return
+
     def artwork(self):
         self.images_monitor.remote_artwork[self.item.identifier] = self.item.artwork.copy()
-        self.images_monitor.update_artwork(forced=True)
+        self.processed_artwork = self.images_monitor.update_artwork(forced=True) or {}
 
     def process_artwork(self):
         self.get_property('IsUpdatingArtwork', 'True')
@@ -152,15 +166,16 @@ class ListItemMonitorFinaliser:
         self.ratings()
         self.get_property('IsUpdatingRatings', clear_property=True)
 
-    def start_process_artwork(self, threaded=False):
+    def start_process_details(self):
+        self.process_details()
+
+    def start_process_artwork(self):
         if not self.artwork_enabled:
             return
         if not self.item.artwork:
             return
-        if not threaded:
+        with self.mutex_lock:  # Lock to avoid race with artwork monitor
             self.process_artwork()
-        self.process_thread = SafeThread(target=self.process_artwork)
-        self.process_thread.start()
 
     def start_process_ratings(self, threaded=False):
         if not self.ratings_enabled:
@@ -196,19 +211,15 @@ class ListItemMonitorFinaliser:
         listitem = self.parent._last_listitem = self.item.listitem
         return listitem
 
-
-class ListItemMonitorFinaliserWindowMethod(ListItemMonitorFinaliser):
-
     def finalise(self):
-        # Check we have an item
-        if not self.item:
+        # Initial checks for item
+        if not self.initial_checks():
             return
 
-        # Check we are on the same item still
-        if not self.item.is_same_item:
-            return
+        # Set artwork to monitor as priority
+        self.start_process_artwork()
 
-        # Set some basic details first
+        # Set some basic details next
         self.start_process_default()
 
         # Wait for previous ratings process to complete before starting a new one
@@ -217,16 +228,43 @@ class ListItemMonitorFinaliserWindowMethod(ListItemMonitorFinaliser):
         # Process ratings in thread to avoid holding up main loop
         self.start_process_ratings(threaded=True)
 
+        # Add some additional details
+        self.start_process_details()
+
+
+class ListItemMonitorFinaliserContainerMethod(ListItemMonitorFinaliser):
+
     def start_process_default(self):
-        with self.mutex_lock:  # Lock to avoid race with artwork monitor
-            self.start_process_artwork()  # Add remote artwork to artwork monitor and update
+        self.listitem.setArt(self.processed_artwork)
+        self.add_item_listcontainer(self.listitem)  # Add item to container
+
+    def set_ratings(self):
+        self.listitem.setProperties(self.item.all_ratings)
+
+    def initial_checks(self):
+        if not self.item:
+            return False
+        if not self.listitem:
+            return False
+        if not self.item.is_same_item:  # Check that we are still on the same item after building
+            return False
+        return True
+
+
+class ListItemMonitorFinaliserWindowMethod(ListItemMonitorFinaliser):
+
+    def initial_checks(self):
+        if not self.item:
+            return False
+        if not self.item.is_same_item:  # Check that we are still on the same item after building
+            return False
+        return True
+
+    def start_process_default(self):
         self.set_properties(self.item.item)  # Set the main properties  CHECK: do we need to lock with this?
 
-    def ratings(self):
-        ratings = self.item.all_ratings
-        if not self.item.is_same_item:
-            return
-        self.set_ratings_properties({'ratings': ratings})
+    def set_ratings(self):
+        self.set_ratings_properties({'ratings': self.item.all_ratings})
 
     def details(self):
         self.item.level = 2
@@ -234,7 +272,6 @@ class ListItemMonitorFinaliserWindowMethod(ListItemMonitorFinaliser):
         self.item.set_additional_properties(self.baseitem_properties)
         if not self.item.is_same_item:
             return
-        # with self.mutex_lock:  # Dont think we need to lock here but double check
         self.set_properties(self.item.item)
 
 
@@ -321,126 +358,13 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
     # ACTIONS
     # =======
 
-    def on_finalise_listcontainer(self, process_artwork=True, process_ratings=True):
-        """ Constructs ListItem adds to hidden container
-        process_artwork=True: Optional bool to process artwork
-        process_ratings=True: Optional bool to process ratings
-        Processing of artwork and ratings is done in a background thread to avoid locking main loop
-        """
-        _item = self._item
-        _item.set_additional_properties(self.baseitem_properties)
-        _listitem = self._last_listitem = _item.listitem
-        _detailed = {'artwork': None, 'ratings': None}
-
-        if not _item.is_same_item:
-            return
-
-        self.add_item_listcontainer(_listitem)
-
-        def _process_artwork():
-            _artwork = _item.artwork
-            _artwork.update(_item.get_image_manipulations(built_artwork=_artwork, use_winprops=True))
-            _detailed['artwork'] = _artwork
-
-        def _process_ratings():
-            _ratings = _item.all_ratings
-            _detailed['ratings'] = _ratings
-
-        def _process_artwork_ratings():
-            self.get_property('IsUpdatingRatings', 'True')
-
-            # Thread ratings and artwork processing
-            t_artwork = SafeThread(target=_process_artwork) if process_artwork else None
-            t_ratings = SafeThread(target=_process_ratings) if process_ratings else None
-            t_artwork.start() if t_artwork else None
-            t_ratings.start() if t_ratings else None
-
-            # Wait for threads to join before readding listitem
-            t_artwork.join() if t_artwork else None
-            t_ratings.join() if t_ratings else None
-
-            self.get_property('IsUpdatingRatings', clear_property=True)
-
-            # Check focused item is still the same before updating
-            if not _item.is_same_item:
-                return
-
-            self._parent.images_monitor._pre_item = _item.identifier
-
-            _listitem.setArt(_detailed['artwork'] or {}) if process_artwork else None
-            _listitem.setProperties(_detailed['ratings'] or {}) if process_ratings else None
-
-        if self.process_thread:
-            self.process_thread.join()
-            self.process_thread = None
-
-        if process_artwork or process_ratings:
-            self.process_thread = SafeThread(target=_process_artwork_ratings)
-            self.process_thread.start()
-
-    def on_finalise_winproperties(self, process_artwork=True, process_ratings=True):
-        _item = self._item
-        _item.set_additional_properties(self.baseitem_properties)
-
-        if not _item.is_same_item:
-            return
-
-        def process_ratings():
-            ratings_item = {'ratings': _item.all_ratings}
-
-            if not _item.is_same_item:
-                return
-
-            with self._parent.mutex_lock:
-                self.set_ratings_properties(ratings_item)
-
-        def process_ratings_thread():
-            self.get_property('IsUpdatingRatings', 'True')
-            process_ratings()
-            self.get_property('IsUpdatingRatings', clear_property=True)
-
-        if self.process_thread:
-            self.process_thread.join()
-            self.process_thread = None
-
-        # Process ratings in thread to avoid holding up main loop
-        if process_ratings:
-            self.process_thread = SafeThread(target=process_ratings_thread)
-            self.process_thread.start()
-
-        with self._parent.mutex_lock:
-            # Add remote artwork to artwork monitor and update in case local items doesn't have some artwork types
-            if process_artwork and _item.artwork:
-                self._parent.images_monitor.remote_artwork[_item.identifier] = _item.artwork.copy()
-                self._parent.images_monitor.update_artwork(forced=True)
-
-            # Set the main properties
-            self.set_properties(_item.item)
-
-        def process_detailed_item():
-            _item.level = 2
-            _item.update_item()
-            _item.set_additional_properties(self.baseitem_properties)
-
-            if not _item.is_same_item:
-                return
-
-            with self._parent.mutex_lock:
-                self.set_properties(_item.item)
-
-        # Get higher level details after main thread
-        self.get_property('IsUpdatingDetails', 'True')
-        process_detailed_item()
-        self.get_property('IsUpdatingDetails', clear_property=True)
-
     def on_finalise(self):
-        if not self._listcontainer:
-            ListItemMonitorFinaliserWindowMethod(self).finalise()
-            return
-
-        self.on_finalise_listcontainer(
-            process_artwork=get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)"),
-            process_ratings=get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)"))
+        func = (
+            ListItemMonitorFinaliserContainerMethod
+            if self._listcontainer else
+            ListItemMonitorFinaliserWindowMethod
+        )
+        func(self).finalise()
 
     @kodi_try_except('lib.monitor.listitem.on_listitem')
     def on_listitem(self):
