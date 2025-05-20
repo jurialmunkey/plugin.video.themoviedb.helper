@@ -38,7 +38,6 @@ class ListAiringNext(ContainerDirectory):
                 item['infolabels']['plot'] = ip.get(f'{prefix}.plot')
                 item['infolabels']['year'] = ip.get(f'{prefix}.year')
                 item['infolabels']['premiered'] = ip.get(f'{prefix}.original')
-                item['art']['thumb'] = ip.get(f'{prefix}.thumb')
                 item['label'] = f"{item['infolabels']['title']} ({ip.get(f'{prefix}.original')})"
                 item['infoproperties']['tmdb_type'] = 'episode'
                 item['infoproperties']['tmdb_id'] = item['unique_ids']['tvshow.tmdb'] = tmdb_id
