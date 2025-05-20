@@ -299,7 +299,7 @@ class ItemMapperMethods:
 
                 credit_item = ItemMapperMethods.get_configured_item(i, **config)
                 credit_item['tmdb_id'] = tmdb_id
-                data.append(ExtendedMap(mapkey, item_id, False, credit_item))
+                data.append(ExtendedMap(mapkey, i.get('credit_id'), False, credit_item))
 
                 person_item = ItemMapperMethods.get_configured_item(i, **{
                     'name': 'name',
@@ -354,7 +354,7 @@ class ItemMapperMethods:
                 credit_item = ItemMapperMethods.get_configured_item(i, **config)
                 credit_item['parent_id'] = item_id
                 credit_item['tmdb_id'] = self.tmdb_id
-                data.append(ExtendedMap(mapkey, item_id, False, credit_item))
+                data.append(ExtendedMap(mapkey, i.get('credit_id'), False, credit_item))
 
                 data.append(ExtendedMap('baseitem', item_id, False, {
                     'id': item_id,
