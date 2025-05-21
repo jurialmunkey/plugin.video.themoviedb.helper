@@ -142,8 +142,6 @@ class ListItemMonitorFinaliser:
         return self.grandparent.images_monitor
 
     def ratings(self):
-        if not self.item.all_ratings:
-            return
         if not self.item.is_same_item:
             return
         self.set_ratings()
