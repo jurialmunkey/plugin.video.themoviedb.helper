@@ -40,7 +40,7 @@ class ItemMapperMethods:
         }
 
     @staticmethod
-    def get_configured_item(i, **kwargs):
+    def get_configured_item(i, blanks=True, **kwargs):
 
         def get_item(i, v):
             try:
@@ -50,7 +50,8 @@ class ItemMapperMethods:
             except (TypeError, KeyError, IndexError, ValueError):
                 return
 
-        return {k: get_blanks_none(get_item(i, v)) for k, v in kwargs.items()}
+        configured_items = {k: get_blanks_none(get_item(i, v)) for k, v in kwargs.items()}
+        return configured_items if blanks else {k: v for k, v in configured_items.items() if k and v}
 
     @staticmethod
     def split_array(items, subkeys=(), haskeys=(), **kwargs):
@@ -256,36 +257,24 @@ class ItemMapperMethods:
 
         return data
 
+    credits_mappings = (
+        ('cast', 'castmember', {'ordering': 'order', 'role': 'character', 'appearances': 'total_episode_count'}, 'roles'),
+        ('crew', 'crewmember', {'department': 'department', 'role': 'job', 'appearances': 'total_episode_count'}, 'jobs'),
+        ('guest_stars', 'castmember', {'ordering': 'order', 'role': 'character', 'appearances': 'total_episode_count'}, 'roles'),
+    )
+
     @staticmethod
     def get_credits(items, **kwargs):
-        mappings = (
-            ('cast', 'castmember', {'ordering': 'order', 'role': 'character'}),
-            ('crew', 'crewmember', {'department': 'department', 'role': 'job'}),
-            ('guest_stars', 'castmember', {'ordering': 'order', 'role': 'character'}),
-        )
-        return ItemMapperMethods.get_credits_data(items, mappings)
+        return ItemMapperMethods.get_credits_data(items, False)
 
     @staticmethod
     def get_aggregate_credits(items, **kwargs):
-        mappings = (
-            ('cast', 'castmember', {
-                'role': lambda i: ' / '.join([j['character'] for j in i['roles']]),
-                'ordering': 'order',
-                'appearances': 'total_episode_count',
-            }),
-            ('crew', 'crewmember', {
-                'role': lambda i: ' / '.join([j['job'] for j in i['jobs']]),
-                'ordering': 'order',
-                'department': 'department',
-                'appearances': 'total_episode_count'
-            }),
-        )
-        return ItemMapperMethods.get_credits_data(items, mappings)
+        return ItemMapperMethods.get_credits_data(items, True)
 
     @staticmethod
-    def get_credits_data(items, mappings):
+    def get_credits_data(items, aggregrate=False):
         data = []
-        for subkey, mapkey, config in mappings:
+        for subkey, mapkey, config, jobkey in ItemMapperMethods.credits_mappings:
 
             for i in (items.get(subkey) or []):
                 item_id = f'person.{i["id"]}'
@@ -297,9 +286,13 @@ class ItemMapperMethods:
                     'expiry': 0,
                 }))
 
-                credit_item = ItemMapperMethods.get_configured_item(i, **config)
-                credit_item['tmdb_id'] = tmdb_id
-                data.append(ExtendedMap(mapkey, i.get('credit_id'), False, credit_item))
+                jobs = (i.get(jobkey) or []) if aggregrate else [i]
+
+                for j in jobs:
+                    credit_item = ItemMapperMethods.get_configured_item(i, **config)
+                    credit_item.update(ItemMapperMethods.get_configured_item(j, blanks=False, **config))
+                    credit_item['tmdb_id'] = tmdb_id
+                    data.append(ExtendedMap(mapkey, j.get('credit_id'), False, credit_item))
 
                 person_item = ItemMapperMethods.get_configured_item(i, **{
                     'name': 'name',
