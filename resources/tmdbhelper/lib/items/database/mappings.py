@@ -214,6 +214,7 @@ class ItemMapperMethods:
             'plot': 'overview',
             'rating': 'vote_average',
             'votes': 'vote_count',
+            'status': lambda i: self.get_episode_type(i),
             'duration': lambda i: self.get_runtime(i['runtime'])
         })
         episode_item['id'] = item_id
