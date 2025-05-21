@@ -30,7 +30,7 @@ body:
       Tip: You can attach files by clicking this area to highlight it and then dragging files in.
       https://kodi.wiki/view/Log_file#Log_file_location
   validations:
-    required: false
+    required: true
 - type: textarea
   attributes:
     label: Screenshots and Additional Info
@@ -52,4 +52,4 @@ body:
     - label: I have described the bug and included steps to reproduce the issue
       required: true
     - label: I have uploaded my debug log.
-      required: false
+      required: true
