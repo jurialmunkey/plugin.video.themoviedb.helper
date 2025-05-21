@@ -943,10 +943,12 @@ def _get_tmdb_id_list(items, tmdb_type=None, separator=None):
     separator = tmdb_api.get_url_separator(separator)
     temp_list = ''
     for item in items:
-        if tmdb_type:
-            item_id = tmdb_api.tmdb_database.get_tmdb_id(tmdb_type=tmdb_type, query=item)
-        else:
-            item_id = item
+        item_id = (
+            tmdb_api.tmdb_database.genres.get(item)
+            if tmdb_type == 'genre' else
+            tmdb_api.tmdb_database.get_tmdb_id(tmdb_type=tmdb_type, query=item)
+        ) if tmdb_type else item
+
         if not item_id:
             continue
         if separator:  # If we've got a url separator then concatinate the list with it
@@ -960,7 +962,7 @@ def _get_tmdb_id_list(items, tmdb_type=None, separator=None):
 
 def _translate_discover_params(tmdb_type, params):
     separator = params.get('with_separator')
-    lookup_id = False if params.get('with_id') else True
+    lookup_id = bool(not params.get('with_id'))
     for k, v in TRANSLATE_PARAMS.items():
         if not params.get(k):
             continue
