@@ -527,7 +527,7 @@ def _get_basedir_trakt():
                 'icon': f'{ADDONPATH}/resources/icons/trakt/watchlist.png'}},
         {
             'label': u'{}{{space}}{{item_type}}'.format(get_localized(32194)),
-            'types': ['movie', 'tv', 'both'],
+            'types': ['movie', 'tv', 'episode', 'both'],
             'params': {'info': 'trakt_history'},
             'path': PLUGINPATH,
             'art': {
@@ -535,7 +535,7 @@ def _get_basedir_trakt():
                 'icon': f'{ADDONPATH}/resources/icons/trakt/recentlywatched.png'}},
         {
             'label': u'{}{{space}}{{item_type}}'.format(get_localized(32195)),
-            'types': ['movie', 'tv'],
+            'types': ['movie', 'tv', 'episode'],
             'params': {'info': 'trakt_mostwatched'},
             'path': PLUGINPATH,
             'art': {
