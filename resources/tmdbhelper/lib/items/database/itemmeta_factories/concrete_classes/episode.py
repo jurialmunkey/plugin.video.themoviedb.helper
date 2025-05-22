@@ -79,6 +79,7 @@ class Episode(MediaItem):
     def get_infoproperties_special(self, infoproperties):
         infoproperties = self.get_infoproperties_custom(infoproperties)
         infoproperties = self.get_infoproperties_episode_type(infoproperties)
+        infoproperties = self.get_infoproperties_lastplayed(infoproperties)
         infoproperties = self.get_infoproperties_progress(infoproperties)
         infoproperties = self.get_infoproperties_tvshow(infoproperties)
         infoproperties = self.get_infoproperties_next_ep(infoproperties)

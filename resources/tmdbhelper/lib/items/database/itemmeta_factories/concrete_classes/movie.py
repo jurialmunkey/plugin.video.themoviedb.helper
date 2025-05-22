@@ -26,6 +26,7 @@ class Movie(MediaItem):
     def get_infoproperties_special(self, infoproperties):
         infoproperties = self.get_infoproperties_custom(infoproperties)
         infoproperties = self.get_infoproperties_progress(infoproperties)
+        infoproperties = self.get_infoproperties_lastplayed(infoproperties)
         infoproperties = self.get_infoproperties_ranks(infoproperties)
         infoproperties = self.get_infoproperties_collection(infoproperties)
         return infoproperties

@@ -367,6 +367,11 @@ def import_collected_date():
     return CollectedDate
 
 
+def import_lastplayed():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import LastPlayed
+    return LastPlayed
+
+
 FACTORY_ROUTES = {
     'crewmember': import_crewmember,
     'castmember': import_castmember,
@@ -440,6 +445,7 @@ FACTORY_ROUTES = {
     'favorites_rank': import_favorites_rank,
     'watchlist_rank': import_watchlist_rank,
     'collected_date': import_collected_date,
+    'lastplayed': import_lastplayed,
 }
 
 
