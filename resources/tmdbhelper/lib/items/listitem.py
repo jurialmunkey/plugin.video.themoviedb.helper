@@ -215,6 +215,9 @@ class _ListItem(object):
         self.infolabels['path'] = self.get_url()
 
         listitem = KodiListItem(label=self.label, label2=self.label2, path=self.infolabels['path'], offscreen=offscreen)
+        return self.set_listitem(listitem)
+
+    def set_listitem(self, listitem):
         listitem.setLabel2(self.label2)
         listitem.setArt(self.set_art_fallbacks())
 
