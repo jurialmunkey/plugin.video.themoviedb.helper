@@ -28,17 +28,20 @@ class ListAiringNext(ContainerDirectory):
         def _get_nextaired_item(tmdb_id):
             ip = _get_lidc_data(tmdb_id)
 
+            premiered = ip.get(f'{prefix}.original')
+            if not is_future_timestamp(premiered, time_fmt="%Y-%m-%d", time_lim=10, days=-1):
+                return
+
             try:
                 item = get_empty_item()
-                item['infoproperties'] = ip
+                item['label'] = f"{ip.get(f'{prefix}.name')} ({premiered})"
                 item['infolabels']['mediatype'] = 'episode'
                 item['infolabels']['title'] = ip.get(f'{prefix}.name')
                 item['infolabels']['episode'] = ip.get(f'{prefix}.episode')
                 item['infolabels']['season'] = ip.get(f'{prefix}.season')
                 item['infolabels']['plot'] = ip.get(f'{prefix}.plot')
                 item['infolabels']['year'] = ip.get(f'{prefix}.year')
-                item['infolabels']['premiered'] = ip.get(f'{prefix}.original')
-                item['label'] = f"{item['infolabels']['title']} ({ip.get(f'{prefix}.original')})"
+                item['infolabels']['premiered'] = premiered
                 item['infoproperties']['tmdb_type'] = 'episode'
                 item['infoproperties']['tmdb_id'] = item['unique_ids']['tvshow.tmdb'] = tmdb_id
                 item['params'] = {
@@ -49,6 +52,7 @@ class ListAiringNext(ContainerDirectory):
                     'season': item['infolabels']['season']}
             except (TypeError, KeyError, AttributeError):
                 return
+
             return item
 
         def _get_nextaired_item_thread(i):
@@ -70,26 +74,15 @@ class ListAiringNext(ContainerDirectory):
                 int((self._get_list_items_progress_now / self._get_list_items_progress_max) * 100),
                 message=f'{tmdb_id} - Checking TMDb ID')
 
-            if not item:
-                self._get_list_items_progress_now += 1
-                return
-
             self._get_list_items_progress_now += 1
-            item['infolabels']['tvshowtitle'] = i.get('showtitle') or i.get('title')
-            return item
+            return item or None
 
         with ParallelThread(seed_items, _get_nextaired_item_thread) as pt:
             item_queue = pt.queue
 
-        self.dialog_progress_bg.update(99, message=f'Sorting items')
-
-        items = [
-            i for i in item_queue if i
-            and is_future_timestamp(
-                i['infoproperties'].get(f'{prefix}.original'),
-                time_fmt="%Y-%m-%d", time_lim=10, days=-1)]
-
-        return sorted(items, key=lambda i: i['infoproperties'][f'{prefix}.original'], reverse=reverse)
+        items = [i for i in item_queue if i]
+        items = sorted(items, key=lambda i: i['infolabels']['premiered'], reverse=reverse)
+        return items
 
 
 class ListLibraryAiringNext(ListAiringNext):
