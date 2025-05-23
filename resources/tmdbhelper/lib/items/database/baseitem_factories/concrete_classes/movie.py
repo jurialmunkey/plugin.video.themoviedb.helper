@@ -18,13 +18,15 @@ class Movie(MediaItem):
     @property
     def cached_data_keys(self):
         """ SELECT """
-        additional_keys = [
+        cached_data_keys = [f'{self.table}.{k}' for k in self.keys]
+        cached_data_keys.extend([
             'collection.title AS collection_title',
             'collection.poster AS collection_poster',
             'collection.fanart AS collection_fanart',
             'collection.tmdb_id AS collection_tmdb_id',
-        ]
-        return tuple([f'{self.table}.{k}' for k in self.keys] + additional_keys)
+            'collection.id AS collection_id',
+        ])
+        return tuple(cached_data_keys)
 
     @cached_property
     def db_table_caches(self):
