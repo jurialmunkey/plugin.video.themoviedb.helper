@@ -1,11 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from tmdbhelper.lib.api.mapping import _ItemMapper
-from jurialmunkey.parser import try_int
 from collections import namedtuple
 
 
 ExtendedMap = namedtuple("ExtendedMap", "base unique_id overwrite data")
+
+
+# Consts for wrangling FTV artwork into shape
+FTV_WITHOUT_SEASONS = 0
+FTV_TVSHOWS_SEASONS = 1
+FTV_SEASONS_SEASONS = 2
 
 
 def get_blanks_none(i):
@@ -451,28 +456,31 @@ class ItemMapperMethods:
         if not items:
             return
 
+        # FTV artwork key name, type to map it to, art_has_seasons
+        # Set art_has_seasons to FTV_TVSHOWS_SEASONS for artwork where fanarttv intends "season=all" to be "tvshow" artwork
+        # Set art_has_seasons to FTV_SEASONS_SEASONS for artwork where fanarttv intends "season=all" to be "season" artwork
         art_types = {
-            'movieposter': ('poster', False),
-            'moviebackground': ('fanart', False),
-            'moviethumb': ('landscape', False),
-            'moviebanner': ('banner', False),
-            'hdmovieclearart': ('clearart', False),
-            'movieclearart': ('clearart', False),
-            'hdmovielogo': ('clearlogo', False),
-            'movielogo': ('clearlogo', False),
-            'moviedisc': ('discart', False),
-            'tvposter': ('poster', False),
-            'tvthumb': ('landscape', False),
-            'tvbanner': ('banner', False),
-            'hdclearart': ('clearart', False),
-            'clearart': ('clearart', False),
-            'hdtvlogo': ('clearlogo', False),
-            'clearlogo': ('clearlogo', False),
-            'characterart': ('characterart', False),
-            'showbackground': ('fanart', True),
-            'seasonposter': ('poster', True),
-            'seasonbanner': ('banner', True),
-            'seasonthumb': ('landscape', True),
+            'movieposter': ('poster', FTV_WITHOUT_SEASONS),
+            'moviebackground': ('fanart', FTV_WITHOUT_SEASONS),
+            'moviethumb': ('landscape', FTV_WITHOUT_SEASONS),
+            'moviebanner': ('banner', FTV_WITHOUT_SEASONS),
+            'hdmovieclearart': ('clearart', FTV_WITHOUT_SEASONS),
+            'movieclearart': ('clearart', FTV_WITHOUT_SEASONS),
+            'hdmovielogo': ('clearlogo', FTV_WITHOUT_SEASONS),
+            'movielogo': ('clearlogo', FTV_WITHOUT_SEASONS),
+            'moviedisc': ('discart', FTV_WITHOUT_SEASONS),
+            'tvposter': ('poster', FTV_WITHOUT_SEASONS),
+            'tvthumb': ('landscape', FTV_WITHOUT_SEASONS),
+            'tvbanner': ('banner', FTV_WITHOUT_SEASONS),
+            'hdclearart': ('clearart', FTV_WITHOUT_SEASONS),
+            'clearart': ('clearart', FTV_WITHOUT_SEASONS),
+            'hdtvlogo': ('clearlogo', FTV_WITHOUT_SEASONS),
+            'clearlogo': ('clearlogo', FTV_WITHOUT_SEASONS),
+            'characterart': ('characterart', FTV_WITHOUT_SEASONS),
+            'showbackground': ('fanart', FTV_TVSHOWS_SEASONS),
+            'seasonposter': ('poster', FTV_SEASONS_SEASONS),
+            'seasonbanner': ('banner', FTV_SEASONS_SEASONS),
+            'seasonthumb': ('landscape', FTV_SEASONS_SEASONS),
         }
 
         data = []
@@ -505,8 +513,16 @@ class ItemMapperMethods:
                 }
 
                 if art_has_seasons:
+                    # Some artwork on FanartTV uses season=all to indicate tvshow artwork
+                    # While other artwork types use season=all to indicate season artwork for an "all" season...
+                    # Do some gymnastics here to workaround this mess of conflated types
                     snum = (art_item.get('season') or 'all')
 
+                    # Set "All Seasons" artwork to -1 season so we dont pull it in for a tvshow if it is really intended to be an "all" season type
+                    if snum == 'all' and art_has_seasons == FTV_SEASONS_SEASONS:
+                        snum = -1
+
+                    # Set season artwork with a number ot season type
                     if snum != 'all':
                         parent_id = f'tv.{self.tmdb_id}.{snum}'
 
