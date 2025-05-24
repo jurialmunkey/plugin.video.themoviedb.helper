@@ -189,7 +189,7 @@ class ListItemThread:
 
     @cached_property
     def cached_data(self):
-        with TimerList(self.timer_lists, ' - cached', log_threshold=0.05, logging=self.log_timers):
+        with TimerList(self.timer_lists, ' - cached', log_threshold=0.001, logging=self.log_timers):
             with self.connection.open():
                 return self.get_cached_data()
 
@@ -221,7 +221,7 @@ class ListItemThread:
 
     @cached_property
     def func_queue(self):
-        with TimerList(self.timer_lists, ' - online', log_threshold=0.05, logging=self.log_timers):
+        with TimerList(self.timer_lists, ' - online', log_threshold=0.001, logging=self.log_timers):
             return self.get_func_queue()
 
     def get_func_queue(self):
@@ -236,12 +236,12 @@ class ListItemThread:
 
     def set_func_queue(self):
         self.connection.open_connection.execute('BEGIN')
-        with TimerList(self.timer_lists, ' - writer', log_threshold=0.05, logging=self.log_timers):
+        with TimerList(self.timer_lists, ' - writer', log_threshold=0.001, logging=self.log_timers):
             for func, args, kwgs in self.func_queue:
                 func(*args, **kwgs)
-        with TimerList(self.timer_lists, ' - commit', log_threshold=0.05, logging=self.log_timers):
+        with TimerList(self.timer_lists, ' - commit', log_threshold=0.001, logging=self.log_timers):
             self.connection.open_connection.execute('COMMIT')
-        with TimerList(self.timer_lists, ' - return', log_threshold=0.05, logging=self.log_timers):
+        with TimerList(self.timer_lists, ' - return', log_threshold=0.001, logging=self.log_timers):
             self.cached_data = self.get_cached_data()
 
     @cached_property

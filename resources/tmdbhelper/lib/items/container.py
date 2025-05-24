@@ -119,7 +119,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
     def get_kodi_database(self, tmdb_type):
         if get_setting('use_kodi_local_db', 'int') == 0:
             return
-        with TimerList(self.timer_lists, 'get_kodi', log_threshold=0.01, logging=self.log_timers):
+        with TimerList(self.timer_lists, 'get_kodi', log_threshold=0.001, logging=self.log_timers):
             from tmdbhelper.lib.items.kodi import KodiDb
             return KodiDb(tmdb_type)
 
@@ -139,46 +139,44 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         if not li:
             return
 
-        with TimerList(self.timer_lists, 'item_abc', log_threshold=0.01, logging=self.log_timers):
+        # Reformat ListItem.Label for episodes to match Kodi default 1x01.Title
+        li.set_episode_label()
 
-            # Reformat ListItem.Label for episodes to match Kodi default 1x01.Title
-            li.set_episode_label()
-
-            # Check if unaired and either apply special formatting or hide item depending on user settings
-            if self.format_unaired_labels and not li.infoproperties.get('specialseason'):
-                unaired = li.format_unaired_label()
-                if self.hide_unaired and unaired:
-                    return
-                if self.only_unaired and not unaired:
-                    return
-
-            # Add details from Kodi library
-            try:
-                li.set_details(details=self.kodi_db.get_kodi_details(li), reverse=self.kodi_db_preferred)
-            except AttributeError:
-                pass
-
-            # Filter out items that are excluded (done after adding Kodi details so can filter against them)
-            if not li.next_page and self.is_excluded(li, is_listitem=True, **self.filters):
+        # Check if unaired and either apply special formatting or hide item depending on user settings
+        if self.format_unaired_labels and not li.infoproperties.get('specialseason'):
+            unaired = li.format_unaired_label()
+            if self.hide_unaired and unaired:
+                return
+            if self.only_unaired and not unaired:
                 return
 
-        with TimerList(self.timer_lists, 'item_xyz', log_threshold=0.01, logging=self.log_timers):
-            li.set_playcount(li.infolabels.get('playcount'))
-            li.set_context_menu(additions=self.context_additions)  # Set the context menu items
-            li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
-            li.set_thumb_to_art(self.thumb_override == 2) if self.thumb_override else None  # Special override for calendars to prevent thumb spoilers
-            li.set_params_reroute(self.params.get('extended'), self.is_cacheonly)  # Reroute details to proper end point
-            li.set_params_to_info(widget=self.plugin_category, **self.property_params)  # Set path params to properties for use in skins
-            if self.thumb_override:
-                li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb to prevent Kodi overwriting
-            if li.next_page:
-                li.params['plugin_category'] = self.plugin_category  # Carry the plugin category to next page in plugin:// path
-            return li
+        # Add details from Kodi library
+        try:
+            li.set_details(details=self.kodi_db.get_kodi_details(li), reverse=self.kodi_db_preferred)
+        except AttributeError:
+            pass
+
+        # Filter out items that are excluded (done after adding Kodi details so can filter against them)
+        if not li.next_page and self.is_excluded(li, is_listitem=True, **self.filters):
+            return
+
+        li.set_playcount(li.infolabels.get('playcount'))
+        li.set_context_menu(additions=self.context_additions)  # Set the context menu items
+        li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
+        li.set_thumb_to_art(self.thumb_override == 2) if self.thumb_override else None  # Special override for calendars to prevent thumb spoilers
+        li.set_params_reroute(self.params.get('extended'), self.is_cacheonly)  # Reroute details to proper end point
+        li.set_params_to_info(widget=self.plugin_category, **self.property_params)  # Set path params to properties for use in skins
+        if self.thumb_override:
+            li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb to prevent Kodi overwriting
+        if li.next_page:
+            li.params['plugin_category'] = self.plugin_category  # Carry the plugin category to next page in plugin:// path
+        return li
 
     def make_items(self, items):
-        from tmdbhelper.lib.addon.thread import ParallelThread
-        with ParallelThread(items, self.make_item) as pt:
-            item_queue = pt.queue
+        # from tmdbhelper.lib.addon.thread import ParallelThread
+        # with ParallelThread(items, self.make_item) as pt:
+        #     item_queue = pt.queue
+        item_queue = [self.make_item(i) for i in items if i]
         return self.sort_items_by_dbid(item_queue)
 
     def sort_items_by_dbid(self, items):
@@ -198,15 +196,15 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         items = self.build_detailed_items(items)
 
         # Finalise listitems in parallel threads
-        with TimerList(self.timer_lists, '--make', log_threshold=0.01, logging=self.log_timers):
+        with TimerList(self.timer_lists, '--make', log_threshold=0.001, logging=self.log_timers):
             items = self.make_items(items)
 
         return items
 
     def add_items(self, items):
-        with TimerList(self.timer_lists, '--add_a', log_threshold=0.01, logging=self.log_timers):
+        with TimerList(self.timer_lists, '--list', log_threshold=0.001, logging=self.log_timers):
             items = [(li.get_url(), li.get_listitem(), li.is_folder) for li in items if li]
-        with TimerList(self.timer_lists, '--add_z', log_threshold=0.01, logging=self.log_timers):
+        with TimerList(self.timer_lists, '--dirs', log_threshold=0.001, logging=self.log_timers):
             from xbmcplugin import addDirectoryItems
             addDirectoryItems(self.handle, items)
 
@@ -294,7 +292,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
                 return items
             self.property_params.update(self.set_params_to_container())
             self.plugin_category = self.params.get('plugin_category') or self.plugin_category
-            with TimerList(self.timer_lists, '--sync', log_threshold=0.01, logging=self.log_timers):
+            with TimerList(self.timer_lists, '--sync', log_threshold=0.001, logging=self.log_timers):
                 self.trakt_playdata.pre_sync_join()
             with TimerList(self.timer_lists, 'add_items', logging=self.log_timers):
                 items = self.build_items(items)
@@ -342,7 +340,7 @@ class ContainerDirectory(ContainerDirectoryCommon):
         return li
 
     def build_detailed_items(self, items):
-        with TimerList(self.timer_lists, '--build', log_threshold=0.01, logging=self.log_timers):
+        with TimerList(self.timer_lists, '--build', log_threshold=0.001, logging=self.log_timers):
             items = self.lidc.configure_listitems_threaded(items)
             return [i for i in (self.build_detailed_item(li) for li in items if li) if i]
 
