@@ -86,14 +86,6 @@ def delete_itemtype(mediatype=None, confirmation=True, **kwargs):
             'baseitems': ('tvshow', 'season', 'episode', ),
             'tables': (),
         },
-        'season': {
-            'baseitems': ('tvshow', 'season', 'episode', ),
-            'tables': (),
-        },
-        'episode': {
-            'baseitems': ('tvshow', 'season', 'episode', ),
-            'tables': (),
-        },
         'all': {
             'baseitems': ('person', 'tvshow', 'season', 'episode', 'movie', 'collection', ),
             'tables': (),
