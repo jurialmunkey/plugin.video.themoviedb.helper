@@ -41,7 +41,7 @@ class ItemDetailsDatabaseAccess(DatabaseAccess):
         return self.get_keys()
 
     def get_keys(self):
-        return [k for k in getattr(self.cache, f'{self.table}_columns').keys()]
+        return tuple(getattr(self.cache, f'{self.table}_columns').keys())
 
     @staticmethod
     def get_base_id(tmdb_type, tmdb_id):
