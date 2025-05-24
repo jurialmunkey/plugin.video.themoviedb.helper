@@ -1,7 +1,6 @@
 from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.baseclass import ItemDetailsList
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.database.tabledef import (
-    BASEITEM_COLUMNS,
     MOVIE_COLUMNS,
     TVSHOW_COLUMNS,
     SEASON_COLUMNS,
@@ -147,7 +146,7 @@ class Broadcaster(Company):
 
 class Base(ItemDetailsList):
     table = 'baseitem'
-    keys = tuple(BASEITEM_COLUMNS.keys())
+    keys = ('id', 'mediatype', 'expiry')
 
 
 class Movie(ItemDetailsList):
