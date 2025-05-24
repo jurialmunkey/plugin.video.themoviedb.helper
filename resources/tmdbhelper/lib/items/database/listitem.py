@@ -206,7 +206,7 @@ class ListItemThread:
     def get_uncached_items(self):
         return [
             self.items[x] for x, cached_item in enumerate(self.cached_data)
-            if cached_item is None
+            if cached_item is None and not self.items[x].next_page
         ]
 
     @cached_property
