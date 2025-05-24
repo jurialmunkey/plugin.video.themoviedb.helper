@@ -1,5 +1,5 @@
-from jurialmunkey.parser import try_int, try_float, get_params, IterProps
-from tmdbhelper.lib.api.mapping import UPDATE_BASEKEY, _ItemMapper, get_empty_item
+from jurialmunkey.parser import try_int, get_params, IterProps
+from tmdbhelper.lib.api.mapping import _ItemMapper, get_empty_item
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type, get_localized
 from tmdbhelper.lib.addon.consts import ITER_PROPS_MAX
@@ -25,61 +25,6 @@ class ItemMapperMethods:
         if isinstance(v, list):
             v = v[0]
         return try_int(v) * 60
-
-    """
-    COLLECTION
-    """
-
-    def get_collection(self, v):
-        infoproperties = {}
-        infoproperties['set.tmdb_id'] = v.get('id')
-        infoproperties['set.name'] = v.get('name')
-        infoproperties['set.poster'] = self.tmdb_imagepath.get_imagepath_poster(v.get('poster_path'))
-        infoproperties['set.fanart'] = self.tmdb_imagepath.get_imagepath_fanart(v.get('backdrop_path'))
-        return infoproperties
-
-    def get_collection_properties(self, v):
-        ratings = []
-        infoproperties = {}
-        year_l, year_h, votes = 9999, 0, 0
-        genres = set()
-        for p, i in enumerate(v, start=1):
-            genre = self.get_genres_by_id(i.get('genre_ids'))
-            genres.update(genre)
-
-            infoproperties[f'set.{p}.genre'] = ' / '.join(genre)
-            infoproperties[f'set.{p}.title'] = i.get('title', '')
-            infoproperties[f'set.{p}.tmdb_id'] = i.get('id', '')
-            infoproperties[f'set.{p}.originaltitle'] = i.get('original_title', '')
-            infoproperties[f'set.{p}.plot'] = i.get('overview', '')
-            infoproperties[f'set.{p}.premiered'] = i.get('release_date', '')
-            infoproperties[f'set.{p}.year'] = i.get('release_date', '')[:4]
-            infoproperties[f'set.{p}.rating'] = f'{try_float(i.get("vote_average")):0,.1f}'
-            infoproperties[f'set.{p}.votes'] = i.get('vote_count', '')
-            infoproperties[f'set.{p}.poster'] = self.tmdb_imagepath.get_imagepath_poster(i.get('poster_path', ''))
-            infoproperties[f'set.{p}.fanart'] = self.tmdb_imagepath.get_imagepath_fanart(i.get('backdrop_path', ''))
-
-            year_l = min(try_int(i.get('release_date', '')[:4]), year_l)
-            year_h = max(try_int(i.get('release_date', '')[:4]), year_h)
-            if i.get('vote_average'):
-                ratings.append(i['vote_average'])
-            votes += try_int(i.get('vote_count', 0))
-        if year_l == 9999:
-            year_l = None
-        if year_l:
-            infoproperties['set.year.first'] = year_l
-        if year_h:
-            infoproperties['set.year.last'] = year_h
-        if year_l and year_h:
-            infoproperties['set.years'] = f'{year_l} - {year_h}'
-        if len(ratings):
-            infoproperties['set.rating'] = infoproperties['tmdb_rating'] = f'{sum(ratings) / len(ratings):0,.1f}'
-        if votes:
-            infoproperties['set.votes'] = infoproperties['tmdb_votes'] = f'{votes:0,.0f}'
-        if genres:
-            infoproperties['set.genres'] = ' / '.join(genres)
-        infoproperties['set.numitems'] = p
-        return infoproperties
 
 
 class ItemMapper(_ItemMapper, ItemMapperMethods):
@@ -184,26 +129,6 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'also_known_as': [{
                 'keys': [('infoproperties', 'aliases')],
                 'func': lambda v: ' / '.join([x for x in v or [] if x])
-            }],
-            'known_for': [{
-                'keys': [('infoproperties', UPDATE_BASEKEY)],
-                'func': self.iter_props,
-                'args': ['known_for'],
-                'kwargs': {'title': 'title', 'tmdb_id': 'id', 'rating': 'vote_average', 'tmdb_type': 'media_type'}}, {
-                # ---
-                'keys': [('infoproperties', 'known_for')],
-                'func': lambda v: ' / '.join([x['title'] for x in v or [] if x.get('title')])
-            }],
-            'parts': [{
-                'keys': [('infoproperties', UPDATE_BASEKEY)],
-                'func': self.get_collection_properties
-            }],
-            'belongs_to_collection': [{
-                'keys': [('infoproperties', UPDATE_BASEKEY)],
-                'func': self.get_collection}, {
-                # ---
-                'keys': [('infolabels', 'set')],
-                'subkeys': ['name']
             }],
             'episode_run_time': [{
                 'keys': [('infolabels', 'duration')],
