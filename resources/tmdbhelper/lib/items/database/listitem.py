@@ -22,14 +22,20 @@ class ListItemConfig:
         self.item['parent_params'] = self.parent.parent_params
 
     @cached_property
-    def listitem_cacher(self):
+    def is_cacheable(self):
         if self.next_page:
-            return
+            return False
         if self.mediatype not in self.listitem_cacher_permitted_types:
-            return
+            return False
         if not self.tmdb_id:
-            return
+            return False
         if not self.tmdb_type:
+            return False
+        return True
+
+    @cached_property
+    def listitem_cacher(self):
+        if not self.is_cacheable:
             return
         return ListItemCacher(
             self.parent,
@@ -206,7 +212,7 @@ class ListItemThread:
     def get_uncached_items(self):
         return [
             self.items[x] for x, cached_item in enumerate(self.cached_data)
-            if cached_item is None and not self.items[x].next_page
+            if cached_item is None and self.items[x].is_cacheable
         ]
 
     @cached_property
