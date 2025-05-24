@@ -167,7 +167,7 @@ class ItemMapperMethods:
 
         data.append(ExtendedMap('baseitem', item_id, False, {
             'id': item_id,
-            'mediatype': 'collection',
+            'mediatype': 'set',
             'expiry': 0,
         }))
 
@@ -183,6 +183,19 @@ class ItemMapperMethods:
         collection_id = f"collection.{collection_object['id']}"
 
         for i in (collection_object.get('parts') or []):
+            data.extend(ItemMapperMethods.get_media_item_data(i, 'movie', collection_id=collection_id))
+
+        return data
+
+    def get_parts(self, parts, **kwargs):
+        data = []
+
+        if not parts:
+            return data
+
+        collection_id = f"collection.{self.tmdb_id}"
+
+        for i in parts:
             data.extend(ItemMapperMethods.get_media_item_data(i, 'movie', collection_id=collection_id))
 
         return data
@@ -813,6 +826,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'fanart_tv': self.get_fanart_tv,
             'belongs_to_collection': self.get_belongs_to_collection,  # Also mapped in advanced properties for item id
             'collection': self.get_collection,  # Also mapped in advanced properties for item id
+            'parts': self.get_parts,  # Also mapped in advanced properties for item id
             'seasons': self.get_seasons,
             'episodes': self.get_episodes,
             'created_by': self.get_creators,
