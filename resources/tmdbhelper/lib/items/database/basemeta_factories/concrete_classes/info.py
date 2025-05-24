@@ -7,8 +7,6 @@ from tmdbhelper.lib.items.database.tabledef import (
     SEASON_COLUMNS,
     EPISODE_COLUMNS,
     COLLECTION_COLUMNS,
-    RATINGS_COLUMNS,
-    PERSON_COLUMNS,
     CERTIFICATION_COLUMNS,
     VIDEO_COLUMNS,
     GENRE_COLUMNS,
@@ -17,23 +15,17 @@ from tmdbhelper.lib.items.database.tabledef import (
     NETWORK_COLUMNS,
     COMPANY_COLUMNS,
     BROADCASTER_COLUMNS,
-    CREWMEMBER_COLUMNS,
-    CASTMEMBER_COLUMNS,
     CUSTOM_COLUMNS,
     PROVIDER_COLUMNS,
     SERVICE_COLUMNS,
-    ART_COLUMNS,
-    FANART_TV_COLUMNS,
     UNIQUE_ID_COLUMNS,
-    SIMPLECACHE_COLUMNS,
-    LACTIVITIES_COLUMNS,
 )
 
 
 class Studio(ItemDetailsList):
     table = 'studio'
     cached_data_parent_table = 'company'
-    keys = ('tmdb_id', 'parent_id')
+    keys = tuple(STUDIO_COLUMNS.keys())
 
     @property
     def cached_data_keys(self):
@@ -54,11 +46,12 @@ class Studio(ItemDetailsList):
 class Network(Studio):
     table = 'network'
     cached_data_parent_table = 'broadcaster'
+    keys = tuple(NETWORK_COLUMNS.keys())
 
 
 class Certification(ItemDetailsList):
     table = 'certification'
-    keys = ('name', 'iso_country', 'iso_language', 'release_date', 'release_type', 'parent_id', )
+    keys = tuple(CERTIFICATION_COLUMNS.keys())
     conditions = 'parent_id=? AND iso_country=? AND name IS NOT NULL AND name != "" ORDER BY IFNULL(release_date, "9999-99-99") ASC LIMIT 1'  # WHERE conditions
 
     @property
@@ -68,7 +61,7 @@ class Certification(ItemDetailsList):
 
 class Video(ItemDetailsList):
     table = 'video'
-    keys = ('name', 'iso_country', 'iso_language', 'release_date', 'path', 'content', 'key', 'parent_id', )
+    keys = tuple(VIDEO_COLUMNS.keys())
     conditions = 'parent_id=? AND content=? ORDER BY iso_language=?, release_date DESC LIMIT 1'  # WHERE conditions
 
     @property
@@ -78,17 +71,17 @@ class Video(ItemDetailsList):
 
 class Country(ItemDetailsList):
     table = 'country'
-    keys = ('name', 'iso_country', 'parent_id', )
+    keys = tuple(COUNTRY_COLUMNS.keys())
 
 
 class Genre(ItemDetailsList):
     table = 'genre'
-    keys = ('name', 'tmdb_id', 'parent_id', )
+    keys = tuple(GENRE_COLUMNS.keys())
 
 
 class UniqueId(ItemDetailsList):
     table = 'unique_id'
-    keys = ('key', 'value', 'parent_id', )
+    keys = tuple(UNIQUE_ID_COLUMNS.keys())
 
     @property
     def values(self):  # WHERE conditions values for ?
@@ -97,11 +90,12 @@ class UniqueId(ItemDetailsList):
 
 class Custom(UniqueId):
     table = 'custom'
+    keys = tuple(CUSTOM_COLUMNS.keys())
 
 
 class Service(ItemDetailsList):
     table = 'service'
-    keys = ('tmdb_id', 'name', 'display_priority', 'iso_country', 'logo')
+    keys = tuple(SERVICE_COLUMNS.keys())
     conditions = 'tmdb_id=?'
 
     def image_path_func(self, v):
@@ -110,7 +104,7 @@ class Service(ItemDetailsList):
 
 class Provider(ItemDetailsList):
     table = 'provider'
-    keys = ('tmdb_id', 'availability', 'parent_id')
+    keys = tuple(PROVIDER_COLUMNS.keys())
 
     cached_data_keys = ('provider.tmdb_id', 'availability', 'name', 'display_priority', 'iso_country', 'logo')
     cached_data_table = 'provider INNER JOIN service ON service.tmdb_id = provider.tmdb_id'
@@ -139,7 +133,7 @@ class Provider(ItemDetailsList):
 
 class Company(ItemDetailsList):
     table = 'company'
-    keys = ('tmdb_id', 'name', 'logo', 'country')
+    keys = tuple(COMPANY_COLUMNS.keys())
     conditions = 'tmdb_id=?'
 
     def image_path_func(self, v):
@@ -148,11 +142,12 @@ class Company(ItemDetailsList):
 
 class Broadcaster(Company):
     table = 'broadcaster'
+    keys = tuple(BROADCASTER_COLUMNS.keys())
 
 
 class Base(ItemDetailsList):
     table = 'baseitem'
-    keys = ('id', 'mediatype', 'expiry', )
+    keys = tuple(BASEITEM_COLUMNS.keys())
 
 
 class Movie(ItemDetailsList):
@@ -162,19 +157,19 @@ class Movie(ItemDetailsList):
 
 class Tvshow(ItemDetailsList):
     table = 'tvshow'
-    keys = ('id', 'tmdb_id', 'year', 'premiered', 'plot', 'title', 'originaltitle', 'rating', 'votes', 'popularity', 'totalseasons', 'totalepisodes')
+    keys = tuple(TVSHOW_COLUMNS.keys())
 
 
 class Season(ItemDetailsList):
     table = 'season'
-    keys = ('id', 'season', 'year', 'plot', 'title', 'originaltitle', 'premiered', 'status', 'rating', 'votes', 'popularity', 'tvshow_id')
+    keys = tuple(SEASON_COLUMNS.keys())
 
 
 class Episode(ItemDetailsList):
     table = 'episode'
-    keys = ('id', 'episode', 'year', 'plot', 'title', 'originaltitle', 'premiered', 'duration', 'status', 'rating', 'votes', 'popularity', 'season_id', 'tvshow_id')
+    keys = tuple(EPISODE_COLUMNS.keys())
 
 
 class MovieCollection(ItemDetailsList):
     table = 'collection'
-    keys = ('id', 'tmdb_id', 'title', 'plot', 'poster', 'fanart')
+    keys = tuple(COLLECTION_COLUMNS.keys())
