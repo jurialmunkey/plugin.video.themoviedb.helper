@@ -245,12 +245,6 @@ TMDB_BASIC_LISTS = {
             'import_attr': 'ListReviews'
         },
     },
-    'collection': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_related',
-            'import_attr': 'ListCollection'
-        },
-    },
     'movie_keywords': {
         'route': {
             'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_related',
@@ -558,6 +552,9 @@ ROUTE_TMDBID = {
     'crew': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.lists_view',
         'import_attr': 'ListCrew'}},
+    'collection': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'import_attr': 'ListSeries'}},
     'stars_in_movies': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.lists_view',
         'import_attr': 'ListStarredMovies'}},

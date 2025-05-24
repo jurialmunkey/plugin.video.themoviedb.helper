@@ -45,6 +45,15 @@ class ListCrew(ContainerCacheOnlyDirectory):
         return sync.data
 
 
+class ListSeries(ContainerDefaultCacheDirectory):
+    # @timer_method
+    def get_items(self, tmdb_id, limit=None, sort_by=None, sort_how=None, **kwargs):
+        sync = BaseViewFactory('seriesmovies', 'collection', tmdb_id, filters=self.filters, limit=limit, sort_by=sort_by, sort_how=sort_how)
+        self.kodi_db = self.get_kodi_database('movie')
+        self.container_content = convert_type('movie', 'container')
+        return sync.data
+
+
 class ListStarredMovies(ContainerDefaultCacheDirectory):
     # @timer_method
     def get_items(self, tmdb_id, limit=None, sort_by=None, sort_how=None, **kwargs):

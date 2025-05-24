@@ -23,23 +23,6 @@ class ListSimilar(ListRelated):
     item_list_localize = 32224
 
 
-class ListCollection(ListRelated):
-    # TODO: Move this to a BaseView instead of a lookup
-    item_list_plugin_name = '{localized}'
-    item_list_request_url = 'collection/{tmdb_id}'
-    item_list_results_key = 'parts'
-    item_list_tmdb_type = 'movie'
-    item_list_localize = 32192
-    item_list_length = 1  # Collections come as one page
-
-    @staticmethod
-    def item_list_sorted_function(i):
-        try:
-            return i['infolabels']['premiered']
-        except (KeyError, AttributeError, TypeError):
-            return ''
-
-
 class ListReviews(ListRelated):
     item_list_plugin_name = '{localized}'  # TODO: BASED ON {item}
     item_list_dbid_sorted = True

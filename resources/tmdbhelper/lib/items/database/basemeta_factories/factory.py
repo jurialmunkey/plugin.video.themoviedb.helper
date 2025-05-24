@@ -93,8 +93,8 @@ def import_base():
 
 
 def import_collection():
-    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import MovieCollection
-    return MovieCollection
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Series
+    return Series
 
 
 def import_movie():

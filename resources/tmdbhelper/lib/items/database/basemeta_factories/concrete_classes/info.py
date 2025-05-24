@@ -169,6 +169,6 @@ class Episode(ItemDetailsList):
     keys = tuple(EPISODE_COLUMNS.keys())
 
 
-class MovieCollection(ItemDetailsList):
+class Series(ItemDetailsList):
     table = 'collection'
     keys = tuple(COLLECTION_COLUMNS.keys())

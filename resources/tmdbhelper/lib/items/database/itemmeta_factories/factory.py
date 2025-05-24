@@ -33,12 +33,18 @@ def import_person():
     return Person
 
 
+def import_set():
+    from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.series import Series
+    return Series
+
+
 FACTORY_ROUTES = {
     'movie': import_movie,
     'tvshow': import_tvshow,
     'season': import_season,
     'episode': import_episode,
     'person': import_person,
+    'set': import_set,
 }
 
 
