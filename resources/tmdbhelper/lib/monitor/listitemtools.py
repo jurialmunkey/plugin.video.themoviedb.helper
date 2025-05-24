@@ -181,16 +181,16 @@ class ListItemMonitorFinaliser:
         with self.mutex_lock:  # Lock to avoid race with artwork monitor
             self.process_artwork()
 
-    def process_threads(self):
-        if self.ratings_enabled:
-            self.process_ratings()
-        self.process_details()
-
-    def start_process_threads(self):
-        self.process_thread.append(SafeThread(target=self.process_threads))
+    def start_process_ratings(self):
+        if not self.ratings_enabled:
+            return
+        self.process_thread.append(SafeThread(target=self.process_ratings))
         if self.process_mutex:  # Already have one thread running a loop to clear out the queue
             return
         self.aquire_process_thread()
+
+    def start_process_details(self):
+        self.process_details()
 
     def aquire_process_thread(self):
         self.process_mutex = True
@@ -238,8 +238,11 @@ class ListItemMonitorFinaliser:
         self.start_process_default()
 
         # Process ratings in thread to avoid holding up main loop
-        t = SafeThread(target=self.start_process_threads)
+        t = SafeThread(target=self.start_process_ratings)
         t.start()
+
+        # Finalise with extended set_details
+        self.start_process_details()
 
 
 class ListItemMonitorFinaliserContainerMethod(ListItemMonitorFinaliser):
