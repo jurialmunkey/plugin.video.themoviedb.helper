@@ -1,7 +1,7 @@
 from xbmcgui import ListItem as KodiListItem
 from jurialmunkey.parser import try_int, merge_two_dicts
 from infotagger.listitem import ListItemInfoTag
-from tmdbhelper.lib.addon.consts import ACCEPTED_MEDIATYPES, PARAM_WIDGETS_RELOAD, PARAM_WIDGETS_RELOAD_FORCED
+from tmdbhelper.lib.addon.consts import PARAM_WIDGETS_RELOAD, PARAM_WIDGETS_RELOAD_FORCED
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_media_type, get_condvisibility, get_localized, encode_url, get_flatseasons_info_param, GlobalSettingsDict
 from tmdbhelper.lib.addon.tmdate import is_unaired_timestamp
 from jurialmunkey.window import get_property
@@ -30,12 +30,18 @@ def ListItem(*args, **kwargs):
         'set': _Collection,
         'studio': _Studio,
         'keyword': _Keyword,
-        'person': _Person}
+        'person': _Person
+    }
+
+    try:
+        mediatype = kwargs['infolabels'].pop('mediatype')
+    except (KeyError, AttributeError, TypeError):
+        mediatype = None
+
     if kwargs.get('next_page'):
-        return _NextPage(*args, **kwargs)._configure()
+        return _NextPage(*args, **kwargs)
     if kwargs.get('infoproperties', {}).get('tmdb_type') == 'person':
         return _Person(*args, **kwargs)
-    mediatype = kwargs.get('infolabels', {}).get('mediatype')
     try:
         return factory[mediatype](*args, **kwargs)
     except KeyError:
@@ -43,6 +49,11 @@ def ListItem(*args, **kwargs):
 
 
 class _ListItem(object):
+
+    mediatype = None
+    context_additions = None
+    playcount = None
+
     def __init__(
             self, label=None, label2=None, path=None, library=None, is_folder=True, params=None, next_page=None,
             parent_params=None, infolabels=None, infoproperties=None, art=None, cast=None,
@@ -55,46 +66,83 @@ class _ListItem(object):
         self.parent_params = parent_params or {}
         self.library = library or 'video'
         self.is_folder = is_folder
-        self.infolabels = infolabels or {}
-        self.infoproperties = infoproperties or {}
-        self.art = art or {}
-        self.cast = cast or []
-        self.context_menu = context_menu or []
-        self.stream_details = stream_details or {}
-        self.unique_ids = unique_ids or {}
         self.next_page = next_page
 
-    def set_art_fallbacks(self):
-        if not self.art.get('icon'):
-            self.art['icon'] = self.art.get('poster') or f'{ADDONPATH}/resources/icons/themoviedb/default.png'
+        self.infolabels = self.init_infolabels(infolabels)
+        self.infoproperties = self.init_infoproperties(infoproperties)
+        self.art = self.init_art(art)
+        self.cast = self.init_cast(cast)
+        self.context_menu = self.init_context_menu(context_menu)
+        self.stream_details = self.init_stream_details(stream_details)
+        self.unique_ids = self.init_unique_ids(unique_ids)
+
+    @staticmethod
+    def init_unique_ids(unique_ids):
+        unique_ids = unique_ids or {}
+        return unique_ids
+
+    @staticmethod
+    def init_stream_details(stream_details):
+        stream_details = stream_details or {}
+        return stream_details
+
+    @staticmethod
+    def init_context_menu(context_menu):
+        context_menu = context_menu or []
+        return context_menu
+
+    @staticmethod
+    def init_cast(cast):
+        cast = cast or []
+        return cast
+
+    @staticmethod
+    def init_art(art):
+        art = art or {}
+        return art
+
+    @staticmethod
+    def init_infoproperties(infoproperties):
+        infoproperties = infoproperties or {}
+        return infoproperties
+
+    def init_infolabels(self, infolabels):
+        infolabels = infolabels or {}
+        infolabels['mediatype'] = self.mediatype
+        return infolabels
+
+    @property
+    def finalised_infolabels(self):
+        self.infolabels['playcount'] = self.playcount
+        return self.infolabels
+
+    @property
+    def finalised_infoproperties(self):
+        return self.infoproperties
+
+    @property
+    def finalised_art(self):
+        self.art['icon'] = self.finalised_icon
         return self.art
 
-    def set_thumb_to_art(self, prefer_landscape=False):
-        if prefer_landscape:
-            if self.art.get('landscape'):
-                self.art['thumb'] = self.art['landscape']
-                return self.art['landscape']
-            if self.art.get('tvshow.landscape'):
-                self.art['thumb'] = self.art['tvshow.landscape']
-                return self.art['tvshow.landscape']
-        if self.art.get('fanart'):
-            self.art['thumb'] = self.art['fanart']
-            return self.art['fanart']
-        if self.art.get('tvshow.fanart'):
-            self.art['thumb'] = self.art['tvshow.fanart']
-            return self.art['tvshow.fanart']
+    @property
+    def finalised_icon(self):
+        icon = self.art.get('icon')
+        icon = icon or self.art.get('poster')
+        icon = icon or f'{ADDONPATH}/resources/icons/themoviedb/default.png'
+        return icon
 
     @property
     def trakt_type(self):
-        return convert_media_type(self.infolabels.get('mediatype'), 'trakt')
+        return convert_media_type(self.mediatype, 'trakt')
 
     @property
     def tmdb_type(self):
-        return convert_media_type(self.infolabels.get('mediatype'), 'tmdb', parent_type=True)
+        return convert_media_type(self.mediatype, 'tmdb', parent_type=True)
 
     @property
     def ftv_type(self):
-        return convert_media_type(self.infolabels.get('mediatype'), 'ftv')
+        return convert_media_type(self.mediatype, 'ftv')
 
     @property
     def ftv_id(self):
@@ -113,16 +161,6 @@ class _ListItem(object):
         return
 
     def format_unaired_label(self, format_label=None, no_date=True):
-        return
-
-    def set_context_menu(self, additions=None):
-        from tmdbhelper.lib.items.context import ContextMenu
-        self.context_menu += ContextMenu(self).get()
-        if not additions:
-            return
-        self.context_menu += additions
-
-    def set_playcount(self, playcount):
         return
 
     def set_details(self, details=None, reverse=False, override=False):
@@ -208,36 +246,55 @@ class _ListItem(object):
         return _get_url(self.path, **self.params)
 
     def get_listitem(self, offscreen=True):
-        if self.infolabels.get('mediatype') == 'person':
-            self.infolabels['mediatype'] = 'video'
-        if self.infolabels.get('mediatype') not in ACCEPTED_MEDIATYPES:
-            self.infolabels.pop('mediatype', None)
         self.infolabels['path'] = self.get_url()
-
         listitem = KodiListItem(label=self.label, label2=self.label2, path=self.infolabels['path'], offscreen=offscreen)
         return self.set_listitem(listitem)
 
-    def set_listitem(self, listitem):
-        listitem.setLabel2(self.label2)
-        listitem.setArt(self.set_art_fallbacks())
+    @property
+    def finalised_context_menu(self):
+        from tmdbhelper.lib.items.context import ContextMenu
+        self.context_menu += ContextMenu(self).get()
+        self.context_menu += self.context_additions or []
+        return self.context_menu
 
+    def set_infotag(self, listitem):
         if self.library != 'pictures':
             info_tag = ListItemInfoTag(listitem)
-            info_tag.set_info(self.infolabels)
+            info_tag.set_info(self.finalised_infolabels)
             info_tag.set_unique_ids(self.unique_ids)
             info_tag.set_cast(self.cast)
             info_tag.set_stream_details(self.stream_details)
             info_tag.set_resume_point(self.infoproperties)
+        return listitem
 
-        listitem.setProperties(self.infoproperties)
-        listitem.addContextMenuItems(self.context_menu)
+    def set_properties(self, listitem):
+        listitem.setProperties(self.finalised_infoproperties)
+        return listitem
 
+    def set_label2(self, listitem):
+        listitem.setLabel2(self.label2)
+        return listitem
+
+    def set_art(self, listitem):
+        listitem.setArt(self.finalised_art)
+        return listitem
+
+    def set_context_menu(self, listitem):
+        listitem.addContextMenuItems(self.finalised_context_menu)
+        return listitem
+
+    def set_listitem(self, listitem):
+        listitem = self.set_label2(listitem)
+        listitem = self.set_art(listitem)
+        listitem = self.set_infotag(listitem)
+        listitem = self.set_properties(listitem)
+        listitem = self.set_context_menu(listitem)
         return listitem
 
 
 class _NextPage(_ListItem):
-    def _configure(self):
-        """ Run at class initialisation to configure next_page item. Returns self """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.label = get_localized(33078)
         self.art['icon'] = f'{ADDONPATH}/resources/icons/themoviedb/nextpage.png'
         self.art['landscape'] = f'{ADDONPATH}/resources/icons/themoviedb/nextpage_wide.png'
@@ -247,7 +304,6 @@ class _NextPage(_ListItem):
         self.params.pop('update_listing', None)  # Just in case we updated the listing for search results
         self.path = PLUGINPATH
         self.is_folder = True
-        return self
 
 
 class _Keyword(_ListItem):
@@ -269,6 +325,9 @@ class _Studio(_ListItem):
 
 
 class _Person(_ListItem):
+
+    mediatype = 'video'  # Need to hack as video to allow info dialog
+
     def _set_params_reroute_details(self):
         self.params['info'] = 'related'
         self.params['tmdb_type'] = 'person'
@@ -281,11 +340,17 @@ class _Person(_ListItem):
 
 
 class _Collection(_ListItem):
+
+    mediatype = 'set'
+
     def _set_params_reroute_details(self):
         self.params['info'] = 'collection'
 
 
 class _Video(_ListItem):
+
+    mediatype = 'video'
+
     def format_unaired_label(self, format_label=u'[COLOR=ffcc0000][I]{}[/I][/COLOR]', no_date=True):
         if not format_label:
             return
@@ -321,12 +386,16 @@ class _Video(_ListItem):
 
 
 class _Movie(_Video):
+
+    mediatype = 'movie'
+
     @property
     def ftv_id(self):
         return self.unique_ids.get('tmdb')
 
-    def set_playcount(self, playcount):
-        self.infolabels['playcount'] = try_int(playcount)
+    @property
+    def playcount(self):
+        return try_int(self.infolabels.get('playcount'), fallback=None)
 
     def _set_params_reroute_details(self):
         self._set_contextmenu_choosedefault('movie', self.unique_ids.get('tmdb'))
@@ -334,31 +403,54 @@ class _Movie(_Video):
 
 
 class _Tvshow(_Video):
+
+    mediatype = 'tvshow'
+
     @property
     def ftv_id(self):
         return self.unique_ids.get('tvdb')
 
-    def _set_playcount(self, playcount):
-        ip, il = self.infoproperties, self.infolabels
-        totalepisodes = try_int(il.get('episode'))
-        if not totalepisodes:
-            return
-        ip['totalepisodes'] = totalepisodes
-        if playcount is None:  # Check None instead of "if not playcount" because 0 is valid value
-            return
-        playcount = try_int(playcount)
-        ip['watchedepisodes'] = playcount
-        ip['unwatchedepisodes'] = totalepisodes - playcount
-        ip['watchedprogress'] = int(playcount * 100 / totalepisodes)
-        if ip['unwatchedepisodes']:
-            playcount = 0
-        il['playcount'] = playcount
+    @property
+    def playcount(self):
+        return try_int(self.infolabels.get('playcount'), fallback=None)
 
-    def set_playcount(self, playcount):
-        self._set_playcount(playcount)
-        season_count = try_int(self.infolabels.get('season'))
-        if season_count > 0:
-            self.infoproperties['totalseasons'] = season_count
+    @property
+    def totalepisodes(self):
+        return try_int(self.infolabels.get('episode'), fallback=None)
+
+    @property
+    def totalseasons(self):
+        return try_int(self.infolabels.get('season'), fallback=None)
+
+    @property
+    def watchedepisodes(self):
+        if self.totalepisodes is None:
+            return
+        return try_int(self.infolabels.get('playcount'), fallback=None)
+
+    @property
+    def unwatchedepisodes(self):
+        if self.watchedepisodes is None:
+            return
+        return self.totalepisodes - self.watchedepisodes
+
+    @property
+    def watchedprogress(self):
+        if self.watchedepisodes is None:
+            return
+        return int(self.watchedepisodes * 100 / self.totalepisodes)
+
+    @property
+    def finalised_infoproperties(self):
+        self.infoproperties['totalepisodes'] = self.totalepisodes
+        self.infoproperties['watchedepisodes'] = self.watchedepisodes
+        self.infoproperties['unwatchedepisodes'] = self.unwatchedepisodes
+        self.infoproperties['watchedprogress'] = self.watchedprogress
+        self.infoproperties['totalseasons'] = self.totalseasons
+        return self.infoproperties
+        # if ip['unwatchedepisodes']:
+        #     playcount = 0
+        # il['playcount'] = playcount
 
     def _set_params_reroute_details(self):
         self._set_contextmenu_choosedefault('tv', self.unique_ids.get('tmdb'))
@@ -366,6 +458,17 @@ class _Tvshow(_Video):
 
 
 class _Season(_Tvshow):
+
+    mediatype = 'season'
+
+    @property
+    def finalised_infoproperties(self):
+        self.infoproperties['totalepisodes'] = self.totalepisodes
+        self.infoproperties['watchedepisodes'] = self.watchedepisodes
+        self.infoproperties['unwatchedepisodes'] = self.unwatchedepisodes
+        self.infoproperties['watchedprogress'] = self.watchedprogress
+        return self.infoproperties
+
     @property
     def ftv_id(self):
         return self.unique_ids.get('tvshow.tvdb')
@@ -382,11 +485,34 @@ class _Season(_Tvshow):
         self._set_contextmenu_choosedefault('tv', self.unique_ids.get('tvshow.tmdb'), season=self.infolabels.get('season'))
         self.params['info'] = 'episodes'
 
-    def set_playcount(self, playcount):
-        self._set_playcount(playcount)
-
 
 class _Episode(_Tvshow):
+
+    mediatype = 'episode'
+    thumb_override = 0
+
+    @property
+    def landscape(self):
+        return self.art.get('landscape') or self.art.get('tvshow.landscape')
+
+    @property
+    def fanart(self):
+        return self.art.get('fanart') or self.art.get('tvshow.fanart')
+
+    @property
+    def thumb(self):
+        if self.thumb_override == 2:
+            return self.landscape or self.fanart
+        if self.thumb_override == 1:
+            return self.fanart
+        return self.art.get('thumb')
+
+    @property
+    def finalised_art(self):
+        self.art = super().finalised_art
+        self.art['thumb'] = self.thumb
+        return self.art
+
     @property
     def ftv_id(self):
         return self.unique_ids.get('tvshow.tvdb')
@@ -403,13 +529,9 @@ class _Episode(_Tvshow):
     def episode(self):
         return self.infolabels.get('episode')
 
-    def set_playcount(self, playcount):
-        playcount = try_int(playcount)
-        # Setting playcount to 0 overrides internal playcount from Kodi to allow Trakt to set unwatched
-        # Not setting playcount at all will allow Kodi to manage internally instead
-        if not global_setting['trakt_watchedindicators'] and not playcount:
-            return
-        self.infolabels['playcount'] = playcount
+    @property
+    def finalised_infoproperties(self):
+        return self.infoproperties
 
     def _set_params_reroute_details(self):
         self._set_contextmenu_choosedefault(

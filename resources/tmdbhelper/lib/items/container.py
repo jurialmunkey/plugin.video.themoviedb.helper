@@ -160,16 +160,16 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         if not li.next_page and self.is_excluded(li, is_listitem=True, **self.filters):
             return
 
-        li.set_playcount(li.infolabels.get('playcount'))
-        li.set_context_menu(additions=self.context_additions)  # Set the context menu items
+        li.context_additions = self.context_additions
+        li.thumb_override = self.thumb_override
+
         li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
-        li.set_thumb_to_art(self.thumb_override == 2) if self.thumb_override else None  # Special override for calendars to prevent thumb spoilers
         li.set_params_reroute(self.params.get('extended'), self.is_cacheonly)  # Reroute details to proper end point
         li.set_params_to_info(widget=self.plugin_category, **self.property_params)  # Set path params to properties for use in skins
-        if self.thumb_override:
-            li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb to prevent Kodi overwriting
+
         if li.next_page:
             li.params['plugin_category'] = self.plugin_category  # Carry the plugin category to next page in plugin:// path
+
         return li
 
     def make_items(self, items):
