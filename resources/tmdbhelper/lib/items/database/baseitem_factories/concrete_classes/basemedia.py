@@ -32,10 +32,10 @@ class MediaItem(BaseItem):
     def online_data_ftv(self):
         """ Get data from fanart tv if enabled """
         if not self.common_apis.ftv_api:
-            return
+            return {}
 
         if not self.ftv_type:
-            return
+            return {}
 
         if self.ftv_type == 'tv':
             try:
@@ -46,7 +46,7 @@ class MediaItem(BaseItem):
             ftv_id = self.tmdb_id
 
         if not ftv_id:
-            return
+            return {}
 
         data = self.common_apis.ftv_api.get_request(
             self.ftv_type, ftv_id,
@@ -55,10 +55,10 @@ class MediaItem(BaseItem):
             cache_days=30)
 
         if not data:
-            return
+            return {}
 
         if 'dummy' in data:
-            return
+            return {}
 
         return data
 
@@ -69,13 +69,16 @@ class MediaItem(BaseItem):
         return self.online_data_func(*self.online_data_args, **self.online_data_kwgs)
 
     @cached_property
+    def online_data_combined(self):
+        data = self.online_data_tmdb
+        data['fanart_tv'] = self.online_data_ftv
+        return data
+
+    @cached_property
     def online_data(self):
         """ Get data from online source """
         if not self.online_data_cond:
             return
         if not self.online_data_tmdb:
             return {}
-        if not self.online_data_ftv:
-            return self.online_data_tmdb
-        self.online_data_tmdb['fanart_tv'] = self.online_data_ftv
-        return self.online_data_tmdb
+        return self.online_data_combined

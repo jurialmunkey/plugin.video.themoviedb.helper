@@ -22,11 +22,11 @@ def get_blanks_none(i):
 
 class ItemMapperMethods:
     @staticmethod
-    def get_runtime(v, *args, **kwargs):
-        if isinstance(v, list):
-            v = v[0]
+    def get_runtime(i, *args, **kwargs):
+        if isinstance(i, list):
+            i = i[0]
         try:
-            return int(v) * 60
+            return int(i) * 60
         except (TypeError, ValueError):
             return 0
 
@@ -150,12 +150,12 @@ class ItemMapperMethods:
         return data
 
     @staticmethod
-    def get_collection(v, **kwargs):
+    def get_belongs_to_collection(i, **kwargs):
         data = []
 
-        item_id = f"collection.{v['id']}"
+        item_id = f"collection.{i['id']}"
 
-        collection_item = ItemMapperMethods.get_configured_item(v, **{
+        collection_item = ItemMapperMethods.get_configured_item(i, **{
             'tmdb_id': 'id',
             'title': 'name',
             'poster': 'poster_path',
@@ -170,6 +170,20 @@ class ItemMapperMethods:
             'mediatype': 'collection',
             'expiry': 0,
         }))
+
+        return data
+
+    @staticmethod
+    def get_collection(collection_object, **kwargs):
+        data = []
+
+        if not collection_object:
+            return data
+
+        collection_id = f"collection.{collection_object['id']}"
+
+        for i in (collection_object.get('parts') or []):
+            data.extend(ItemMapperMethods.get_media_item_data(i, 'movie', collection_id=collection_id))
 
         return data
 
@@ -328,51 +342,58 @@ class ItemMapperMethods:
         for subkey, mapkey, config in mappings:
             credits = items.get(subkey) or []
             for i in credits:
-
-                item_id = f'{tmdb_type}.{i["id"]}'
-
-                mediatype = 'movie' if tmdb_type == 'movie' else 'tvshow'
-                premiered = 'release_date' if mediatype == 'movie' else 'first_air_date'
-                titlename = 'title' if mediatype == 'movie' else 'name'
-
-                media_item = ItemMapperMethods.get_configured_item(i, **{
-                    'year': lambda i: int(i[premiered][0:4]),
-                    'premiered': premiered,
-                    'plot': 'overview',
-                    'title': titlename,
-                    'originaltitle': 'original_title',
-                    'rating': 'vote_average',
-                    'votes': 'vote_count',
-                    'popularity': 'popularity'
-
-                })
-                media_item['id'] = item_id
-                media_item['tmdb_id'] = i['id']
-                data.append(ExtendedMap(mediatype, item_id, False, media_item))
+                data.extend(ItemMapperMethods.get_media_item_data(i, tmdb_type))
 
                 credit_item = ItemMapperMethods.get_configured_item(i, **config)
-                credit_item['parent_id'] = item_id
+                credit_item['parent_id'] = f'{tmdb_type}.{i["id"]}'
                 credit_item['tmdb_id'] = self.tmdb_id
                 data.append(ExtendedMap(mapkey, i.get('credit_id'), False, credit_item))
 
-                data.append(ExtendedMap('baseitem', item_id, False, {
-                    'id': item_id,
-                    'mediatype': mediatype,
-                    'expiry': 0,
-                }))
+        return data
 
-                for icon_type, aspect in (('poster_path', 'posters'), ('backdrop_path', 'backdrops')):
-                    icon = i.get(icon_type)
-                    if not icon:
-                        continue
-                    data.append(ExtendedMap('art', icon, False, {
-                        'parent_id': item_id,
-                        'icon': icon,
-                        'type': aspect,
-                        'aspect_ratio': aspect,
-                        'extension': icon.split('.')[-1],
-                    }))
+    @staticmethod
+    def get_media_item_data(i, tmdb_type, **additional_params):
+        data = []
 
+        item_id = f'{tmdb_type}.{i["id"]}'
+
+        mediatype = 'movie' if tmdb_type == 'movie' else 'tvshow'
+        premiered = 'release_date' if mediatype == 'movie' else 'first_air_date'
+        titlename = 'title' if mediatype == 'movie' else 'name'
+
+        media_item = ItemMapperMethods.get_configured_item(i, **{
+            'year': lambda i: int(i[premiered][0:4]),
+            'premiered': premiered,
+            'plot': 'overview',
+            'title': titlename,
+            'originaltitle': 'original_title',
+            'rating': 'vote_average',
+            'votes': 'vote_count',
+            'popularity': 'popularity'
+
+        })
+        media_item['id'] = item_id
+        media_item['tmdb_id'] = i['id']
+        media_item.update(additional_params)
+        data.append(ExtendedMap(mediatype, item_id, False, media_item))
+
+        data.append(ExtendedMap('baseitem', item_id, False, {
+            'id': item_id,
+            'mediatype': mediatype,
+            'expiry': 0,
+        }))
+
+        for icon_type, aspect in (('poster_path', 'posters'), ('backdrop_path', 'backdrops')):
+            icon = i.get(icon_type)
+            if not icon:
+                continue
+            data.append(ExtendedMap('art', icon, False, {
+                'parent_id': item_id,
+                'icon': icon,
+                'type': aspect,
+                'aspect_ratio': aspect,
+                'extension': icon.split('.')[-1],
+            }))
         return data
 
     def get_episodes(self, items, **kwargs):
@@ -790,7 +811,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
 
             'images': self.get_art,
             'fanart_tv': self.get_fanart_tv,
-            'belongs_to_collection': self.get_collection,  # Also mapped in advanced properties for item id
+            'belongs_to_collection': self.get_belongs_to_collection,  # Also mapped in advanced properties for item id
+            'collection': self.get_collection,  # Also mapped in advanced properties for item id
             'seasons': self.get_seasons,
             'episodes': self.get_episodes,
             'created_by': self.get_creators,
@@ -916,6 +938,6 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
         # from tmdbhelper.lib.files.futils import dumps_to_file
         # dumps_to_file(
         #     {'data': self.data, 'item': self.item},
-        #     'log_data', f'mappings_{self.tmdb_id}_{data["name"]}.json', join_addon_data=True)
+        #     'log_data', f'mappings_{self.tmdb_id}_{data["title"]}.json', join_addon_data=True)
 
         return self.item

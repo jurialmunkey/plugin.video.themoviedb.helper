@@ -1,5 +1,33 @@
 from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.baseclass import ItemDetailsList
 from tmdbhelper.lib.files.ftools import cached_property
+from tmdbhelper.lib.items.database.tabledef import (
+    BASEITEM_COLUMNS,
+    MOVIE_COLUMNS,
+    TVSHOW_COLUMNS,
+    SEASON_COLUMNS,
+    EPISODE_COLUMNS,
+    COLLECTION_COLUMNS,
+    RATINGS_COLUMNS,
+    PERSON_COLUMNS,
+    CERTIFICATION_COLUMNS,
+    VIDEO_COLUMNS,
+    GENRE_COLUMNS,
+    COUNTRY_COLUMNS,
+    STUDIO_COLUMNS,
+    NETWORK_COLUMNS,
+    COMPANY_COLUMNS,
+    BROADCASTER_COLUMNS,
+    CREWMEMBER_COLUMNS,
+    CASTMEMBER_COLUMNS,
+    CUSTOM_COLUMNS,
+    PROVIDER_COLUMNS,
+    SERVICE_COLUMNS,
+    ART_COLUMNS,
+    FANART_TV_COLUMNS,
+    UNIQUE_ID_COLUMNS,
+    SIMPLECACHE_COLUMNS,
+    LACTIVITIES_COLUMNS,
+)
 
 
 class Studio(ItemDetailsList):
@@ -129,7 +157,7 @@ class Base(ItemDetailsList):
 
 class Movie(ItemDetailsList):
     table = 'movie'
-    keys = ('id', 'tmdb_id', 'year', 'premiered', 'plot', 'title', 'originaltitle', 'rating', 'votes', 'popularity')
+    keys = tuple(MOVIE_COLUMNS.keys())
 
 
 class Tvshow(ItemDetailsList):

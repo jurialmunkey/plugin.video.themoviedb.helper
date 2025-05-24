@@ -7,6 +7,24 @@ class Movie(MediaItem):
     tmdb_type = 'movie'
     ftv_type = 'movies'
 
+    @cached_property
+    def online_data_collection(self):
+        if self.cache_refresh == 'basic':
+            return {}
+        if not self.online_data_tmdb:
+            return {}
+        if not self.online_data_tmdb.get('belongs_to_collection'):
+            return {}
+        args = ('collection', self.online_data_tmdb['belongs_to_collection']['id'])
+        return self.online_data_func(*args) or {}
+
+    @cached_property
+    def online_data_combined(self):
+        data = self.online_data_tmdb
+        data['fanart_tv'] = self.online_data_ftv
+        data['collection'] = self.online_data_collection
+        return data
+
     @property
     def cached_data_table(self):
         """ FROM """
@@ -34,6 +52,7 @@ class Movie(MediaItem):
         return (
             self.return_basemeta_db('base'),
             self.return_basemeta_db('collection'),
+            self.return_basemeta_db('movie'),
             self.return_basemeta_db('genre'),
             self.return_basemeta_db('country'),
             self.return_basemeta_db('certification'),
