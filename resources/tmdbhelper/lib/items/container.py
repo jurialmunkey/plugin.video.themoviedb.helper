@@ -270,40 +270,46 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
 
     def get_items(self, **kwargs):
         """ Abstract method for getting items
-        TODO: abc.abstractmethod to force ???
         """
         return
 
     def get_directory(self, items_only=False, build_items=True):
-        # from urllib.parse import urlencode
-        # from tmdbhelper.lib.addon.logger import CProfiler
-        # with CProfiler(urlencode(self.params).replace('&', '_')):
+
         with TimerList(self.timer_lists, 'total', logging=self.log_timers):
             self.trakt_playdata.pre_sync_start(**self.params)
+
             with TimerList(self.timer_lists, 'get_list', logging=self.log_timers):
                 items = self.get_items(**self.params)
+
             if not items:
                 return
+
             if not build_items:
                 return items
+
             self.property_params.update(self.set_params_to_container())
             self.plugin_category = self.params.get('plugin_category') or self.plugin_category
+
             with TimerList(self.timer_lists, '--sync', log_threshold=0.001, logging=self.log_timers):
                 self.trakt_playdata.pre_sync_join()
+
             with TimerList(self.timer_lists, 'add_items', logging=self.log_timers):
                 items = self.build_items(items)
                 if items_only:
                     return items
                 self.add_items(items)
             self.finish_container()
+
         if self.log_timers:
             from tmdbhelper.lib.files.futils import write_to_file
             from tmdbhelper.lib.addon.logger import log_timer_report
             from tmdbhelper.lib.addon.tmdate import get_todays_date
             report_data = log_timer_report(self.timer_lists, self.paramstring, logging=False)
             write_to_file(''.join(report_data), 'timer_report', f'{get_todays_date()}.txt', join_addon_data=True, append_to_file=True)
+
         if self.container_update:
             executebuiltin(f'Container.Update({self.container_update})')
+
         if self.container_refresh:
             executebuiltin('Container.Refresh')
 
