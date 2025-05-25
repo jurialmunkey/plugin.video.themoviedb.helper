@@ -5,7 +5,11 @@ from tmdbhelper.lib.files.ftools import cached_property
 
 class ListAuthenticated(ListStandard):
     default_cacheonly = False
-    item_list_dbid_sorted = True
+
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.dbid_sorted = True
+        return list_properties
 
     @cached_property
     def tmdb_user_api(self):
@@ -28,36 +32,54 @@ class ListAuthenticatedNoCache(ListAuthenticated):
 
 
 class ListRecommendations(ListAuthenticated):
-    item_list_request_url = 'account/{{account_id}}/{tmdb_type}/recommendations'
-    item_list_localize = 32223
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = 'account/{{account_id}}/{tmdb_type}/recommendations'
+        list_properties.localize = 32223
+        return list_properties
 
 
 class ListFavourites(ListAuthenticatedNoCache):
-    item_list_request_url = 'account/{{account_id}}/{tmdb_type}/favorites'
-    item_list_localize = 1036
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = 'account/{{account_id}}/{tmdb_type}/favorites'
+        list_properties.localize = 1036
+        return list_properties
 
 
 class ListWatchlist(ListAuthenticatedNoCache):
-    item_list_request_url = 'account/{{account_id}}/{tmdb_type}/watchlist'
-    item_list_localize = 32193
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = 'account/{{account_id}}/{tmdb_type}/watchlist'
+        list_properties.localize = 32193
+        return list_properties
 
 
 class ListRated(ListAuthenticatedNoCache):
-    item_list_request_url = 'account/{{account_id}}/{tmdb_type}/rated'
-    item_list_localize = 32521
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = 'account/{{account_id}}/{tmdb_type}/rated'
+        list_properties.localize = 32521
+        return list_properties
 
 
 class ListList(ListAuthenticatedNoCache):
-    item_list_request_url = 'list/{list_id}'
-    item_list_localize = 32211
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = 'list/{list_id}'
+        list_properties.localize = 32211
+        return list_properties
 
     def get_request_url(self, list_id, **kwargs):
-        return self.item_list_request_url.format(list_id=list_id)
+        return self.list_properties.request_url.format(list_id=list_id)
 
 
 class ListLists(ListAuthenticatedNoCache):
-    item_list_request_url = 'account/{{account_id}}/lists'
-    item_list_localize = 32211
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = 'account/{{account_id}}/lists'
+        list_properties.localize = 32211
+        return list_properties
 
     def get_mapped_item(self, item, tmdb_type, add_infoproperties=None):
         list_id = str(item.get('id') or '')

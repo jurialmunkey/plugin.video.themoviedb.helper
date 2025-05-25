@@ -11,55 +11,85 @@ class ListStandard(ListDefault):
 
 
 class ListPopular(ListStandard):
-    item_list_request_url = '{tmdb_type}/popular'
-    item_list_localize = 32175
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = '{tmdb_type}/popular'
+        list_properties.localize = 32175
+        return list_properties
 
 
 class ListTopRated(ListStandard):
-    item_list_request_url = '{tmdb_type}/top_rated'
-    item_list_localize = 32176
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = '{tmdb_type}/top_rated'
+        list_properties.localize = 32176
+        return list_properties
 
 
 class ListUpcoming(ListStandard):
-    item_list_request_url = '{tmdb_type}/upcoming'
-    item_list_localize = 32177
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = '{tmdb_type}/upcoming'
+        list_properties.localize = 32177
+        return list_properties
 
 
 class ListTrendingDay(ListStandard):
-    item_list_request_url = 'trending/{tmdb_type}/day'
-    item_list_plugin_name = '{plural} {localized}'
-    item_list_localize = 32178
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = 'trending/{tmdb_type}/day'
+        list_properties.plugin_name = '{plural} {localized}'
+        list_properties.localize = 32178
+        return list_properties
 
 
 class ListTrendingWeek(ListStandard):
-    item_list_request_url = 'trending/{tmdb_type}/week'
-    item_list_plugin_name = '{plural} {localized}'
-    item_list_localize = 32179
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = 'trending/{tmdb_type}/week'
+        list_properties.plugin_name = '{plural} {localized}'
+        list_properties.localize = 32179
+        return list_properties
 
 
 class ListInTheatres(ListStandard):
-    item_list_request_url = '{tmdb_type}/now_playing'
-    item_list_plugin_name = '{localized}'
-    item_list_localize = 32180
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = '{tmdb_type}/now_playing'
+        list_properties.plugin_name = '{localized}'
+        list_properties.localize = 32180
+        return list_properties
 
 
 class ListAiringToday(ListStandard):
-    item_list_request_url = '{tmdb_type}/airing_today'
-    item_list_plugin_name = '{localized}'
-    item_list_localize = 32181
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = '{tmdb_type}/airing_today'
+        list_properties.plugin_name = '{localized}'
+        list_properties.localize = 32181
+        return list_properties
 
 
 class ListCurrentlyAiring(ListStandard):
-    item_list_request_url = '{tmdb_type}/on_the_air'
-    item_list_plugin_name = '{localized}'
-    item_list_localize = 32182
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = '{tmdb_type}/on_the_air'
+        list_properties.plugin_name = '{localized}'
+        list_properties.localize = 32182
+        return list_properties
 
 
 class ListRevenue(ListStandard):
-    item_list_request_url = 'discover/{tmdb_type}?sort_by=revenue.desc'
-    item_list_localize = 32184
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = 'discover/{tmdb_type}?sort_by=revenue.desc'
+        list_properties.localize = 32184
+        return list_properties
 
 
 class ListMostVoted(ListStandard):
-    item_list_request_url = 'discover/{tmdb_type}?sort_by=vote_count.desc'
-    item_list_localize = 32185
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = 'discover/{tmdb_type}?sort_by=vote_count.desc'
+        list_properties.localize = 32185
+        return list_properties

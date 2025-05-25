@@ -11,12 +11,13 @@ PAGES_LENGTH = get_setting('pagemulti_tmdb', 'int') or 1
 
 class ListProperties:
 
-    plugin_name = ''  # item_list_plugin_name
-    localize = None  # item_list_localize
+    plugin_name = ''
+    localize = None
     tmdb_type = None
     items = None
     url = None
     params = {}
+    filters = {}
 
     @cached_property
     def plural(self):
@@ -34,28 +35,40 @@ class ListProperties:
     def container_content(self):
         return convert_type(self.tmdb_type, 'container', items=self.items)
 
+    @cached_property
+    def filtered_items(self):
+        if not self.filters:
+            return self.items
+        return [
+            i for i in self.items
+            if not is_excluded(i, **self.filters)
+        ]
+
+    @cached_property
+    def sorted_items(self):
+        if not self.sorted_function:
+            return self.filtered_items
+        return sorted(self.filtered_items, key=self.sorted_function, reverse=self.sorted_reversed)
+
 
 class ListDefault(ContainerDefaultCacheDirectory):
-    item_list_request_url = ''  # PATH to request
-    item_list_results_key = 'results'  # KEY in RESPONSE from PATH holding ITEMS
-    item_list_plugin_name = '{localized} {plural}'
-    item_list_dbid_sorted = False
-    item_list_localize = None
-    item_list_sorted_reversed = False
-    item_list_sorted_function = None
-    item_list_length = None  # Override user setting for length
-
-    @cached_property
-    def item_list_tmdb_type(self):  # Override type for items (e.g. for related lists that get a different type to source)
-        return self.params.get('tmdb_type')
-
     @cached_property
     def list_properties(self):
-        lp = ListProperties()
-        lp.plugin_name = self.item_list_plugin_name
-        lp.localize = self.item_list_localize
-        lp.tmdb_type = self.item_list_tmdb_type
-        return lp
+        list_properties = ListProperties()
+        return self.configure_list_properties(list_properties)
+
+    def configure_list_properties(self, list_properties):
+        list_properties.plugin_name = '{localized} {plural}'
+        list_properties.localize = None
+        list_properties.tmdb_type = self.params.get('tmdb_type')
+        list_properties.request_url = ''  # PATH to request
+        list_properties.results_key = 'results'  # KEY in RESPONSE from PATH holding ITEMS
+        list_properties.dbid_sorted = False
+        list_properties.sorted_reversed = False
+        list_properties.sorted_function = None
+        list_properties.length = None  # Override user setting for length
+        list_properties.filters = self.filters
+        return list_properties
 
     @staticmethod
     def paginated_items(items, page=1, length=PAGES_LENGTH, total_pages=None):
@@ -79,7 +92,7 @@ class ListDefault(ContainerDefaultCacheDirectory):
             }
 
         try:
-            results = response[self.item_list_results_key]
+            results = response[self.list_properties.results_key]
         except (TypeError, KeyError):
             return items_page()
         try:
@@ -132,27 +145,26 @@ class ListDefault(ContainerDefaultCacheDirectory):
         return self.paginated_items(items, page, length, pages)
 
     def get_request_url(self, tmdb_type, **kwargs):
-        return self.item_list_request_url.format(tmdb_type=tmdb_type)
+        return self.list_properties.request_url.format(tmdb_type=tmdb_type)
 
     def get_items(self, page=1, length=PAGES_LENGTH, **kwargs):
         self.list_properties.url = self.get_request_url(**kwargs)
         self.list_properties.page = try_int(page) or 1
-        self.list_properties.length = self.item_list_length or try_int(length) or PAGES_LENGTH
-
-        items = self.get_cached_items(
+        self.list_properties.length = self.list_properties.length or try_int(length) or PAGES_LENGTH
+        self.list_properties.items = self.get_cached_items(
             self.list_properties.url,
             self.list_properties.tmdb_type,
             page=self.list_properties.page,
             length=self.list_properties.length,
-            paginated=self.pagination)
-
-        return self.get_items_finalised(items, self.list_properties.tmdb_type)
+            paginated=self.pagination
+        )
+        return self.get_items_finalised()
 
     @cached_property
     def sort_by_dbid(self):
         if not self.kodi_db:
             return False
-        if not self.item_list_dbid_sorted:
+        if not self.list_properties.dbid_sorted:
             return False
         return True
 
@@ -160,11 +172,7 @@ class ListDefault(ContainerDefaultCacheDirectory):
     def kodi_db(self):
         return self.get_kodi_database(self.list_properties.tmdb_type)
 
-    def get_items_finalised(self, items, tmdb_type):
-        self.list_properties.items = items
+    def get_items_finalised(self):
         self.container_content = self.list_properties.container_content
         self.plugin_category = self.list_properties.plugin_category
-        items = [i for i in items if not is_excluded(i, **self.filters)] if self.filters else items
-        if not self.item_list_sorted_function:
-            return items
-        return sorted(items, key=self.item_list_sorted_function, reverse=self.item_list_sorted_reversed)
+        return self.list_properties.sorted_items

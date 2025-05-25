@@ -989,7 +989,10 @@ def _translate_discover_params(tmdb_type, params):
 
 
 class ListDiscover(ListStandard):
-    item_list_request_url = 'discover/{tmdb_type}'
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = 'discover/{tmdb_type}'
+        return list_properties
 
     def get_request_url(self, tmdb_type, **kwargs):
         # TODO: [OLD MSG] Check what regions etc we need to have
@@ -1012,7 +1015,7 @@ class ListDiscover(ListStandard):
             kwargs.pop(k, None)
 
         # Encode paramstring
-        request_url = self.item_list_request_url.format(tmdb_type=tmdb_type)
+        request_url = self.list_properties.request_url.format(tmdb_type=tmdb_type)
         paramstring = f'?{"&".join([f"{k}={v}" for k, v in kwargs.items()])}' if kwargs else ''
         # paramstring = f'?{urlencode(kwargs)}' if kwargs else ''
         return f'{request_url}{paramstring}'
