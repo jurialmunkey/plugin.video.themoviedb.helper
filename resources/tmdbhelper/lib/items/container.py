@@ -172,9 +172,6 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         return finalise_next_page() if li.next_page else finalise_mediaitem()
 
     def make_items(self, items):
-        # from tmdbhelper.lib.addon.thread import ParallelThread
-        # with ParallelThread(items, self.make_item) as pt:
-        #     item_queue = pt.queue
         item_queue = [self.make_item(i) for i in items if i]
         return self.sort_items_by_dbid(item_queue)
 
@@ -202,7 +199,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
 
     def add_items(self, items):
         with TimerList(self.timer_lists, '--list', log_threshold=0.001, logging=self.log_timers):
-            items = [(li.get_url(), li.get_listitem(), li.is_folder) for li in items if li]
+            items = [(li.url, li.get_listitem(), li.is_folder) for li in items if li]
         with TimerList(self.timer_lists, '--dirs', log_threshold=0.001, logging=self.log_timers):
             from xbmcplugin import addDirectoryItems
             addDirectoryItems(self.handle, items)

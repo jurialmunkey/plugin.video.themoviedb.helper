@@ -49,6 +49,34 @@ def ListItem(*args, **kwargs):
         return _ListItem(*args, **kwargs)
 
 
+class BuildURL:
+    def __init__(self, path, reload=None, widget=None, **params):
+        self.path = path
+        self.reload = reload
+        self.widget = boolean(widget)
+        self.params = params
+
+    @cached_property
+    def params_reload(self):
+        if self.widget:
+            return {'reload': PARAM_WIDGETS_RELOAD.split('=')[1]}
+        if self.reload == 'forced':
+            return {'reload': PARAM_WIDGETS_RELOAD_FORCED.split('=')[1]}
+        return {}
+
+    @cached_property
+    def params_widget(self):
+        if not self.widget:
+            return {}
+        return {'widget': 'true'}
+
+    @property
+    def url(self):
+        self.params.update(self.params_reload)
+        self.params.update(self.params_widget)
+        return encode_url(self.path, **self.params)
+
+
 class _ListItem(object):
 
     mediatype = None
@@ -137,6 +165,7 @@ class _ListItem(object):
         return True
 
     def finalise_infolabels(self):
+        self.infolabels['path'] = self.url
         self.infolabels['playcount'] = self.playcount
         return self.infolabels
 
@@ -232,20 +261,11 @@ class _ListItem(object):
         self.infolabels['title'] = details.get('infolabels', {}).get('title') or self.infolabels.get('title')
         self.infolabels['tvshowtitle'] = details.get('infolabels', {}).get('tvshowtitle') or self.infolabels.get('tvshowtitle')
 
-    def get_url(self):
-        def _get_url(path, reload=None, widget=None, **params):
-            url = encode_url(path, **params)
-            reload_param = PARAM_WIDGETS_RELOAD_FORCED if reload == 'forced' else None  # Note reload not std builtin but param absorbed in kwargs
-            if widget and widget.lower() == 'true':
-                reload_param = PARAM_WIDGETS_RELOAD
-                url = f'{url}&widget=true&{PARAM_WIDGETS_RELOAD}'
-            if reload_param:
-                url = f'{url}&{reload_param}'
-            return url
-        return _get_url(self.path, **self.params)
+    @cached_property
+    def url(self):
+        return BuildURL(self.path, **self.params).url
 
     def get_listitem(self, offscreen=True):
-        self.infolabels['path'] = self.get_url()
         listitem = KodiListItem(label=self.label, label2=self.label2, path=self.infolabels['path'], offscreen=offscreen)
         return self.set_listitem(listitem)
 
@@ -382,7 +402,7 @@ class _Video(_ListItem):
     @property
     def context_menu_selectplayer(self):
         head = '$ADDON[plugin.video.themoviedb.helper 32322]'
-        path = f'RunPlugin({self.get_url()}&ignore_default=true)'
+        path = f'RunPlugin({self.url}&ignore_default=true)'
         return (head, path)
 
     @property

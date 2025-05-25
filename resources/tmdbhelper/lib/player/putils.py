@@ -15,7 +15,7 @@ def make_upnext(current_episode, next_episode):
     next_info = {
         'current_episode': {k: v(current_episode) for k, v in UPNEXT_EPISODE.items()},
         'next_episode': {k: v(next_episode) for k, v in UPNEXT_EPISODE.items()},
-        'play_url': next_episode.get_url()}
+        'play_url': next_episode.url}
     AddonSignals.sendSignal('upnext_data', next_info, source_id='plugin.video.themoviedb.helper')
 
 
