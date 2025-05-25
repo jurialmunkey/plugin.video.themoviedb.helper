@@ -1,13 +1,18 @@
-from tmdbhelper.lib.items.container import use_item_cache
 from tmdbhelper.lib.items.directories.lists_default import ListDefault
 from tmdbhelper.lib.addon.plugin import get_setting
+from jurialmunkey.parser import try_int
 
 
-ITEMS_LENGTH = 20
 PAGES_LENGTH = get_setting('pagemulti_tmdb', 'int') or 1
 
 
 class ListStandard(ListDefault):
+
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.length = try_int(self.params.get('length')) or PAGES_LENGTH
+        return list_properties
+
     def _get_cached_items(self, request_url, tmdb_type, page=1, length=PAGES_LENGTH, paginated=True):
         items = []
         pages = 0
@@ -21,10 +26,6 @@ class ListStandard(ListDefault):
             return items
 
         return self.paginated_items(items, page, length, pages)
-
-    @use_item_cache('ItemContainer.db')
-    def get_cached_items_page(self, *args, **kwargs):
-        return self._get_cached_items_page(*args, **kwargs)
 
     def _get_cached_items_page(self, request_url, tmdb_type, page=1):
         response = self.tmdb_api.get_response_json(request_url, page=page)

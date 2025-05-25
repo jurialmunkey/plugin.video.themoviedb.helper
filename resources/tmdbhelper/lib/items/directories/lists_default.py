@@ -1,12 +1,8 @@
 from tmdbhelper.lib.items.container import ContainerDefaultCacheDirectory, use_item_cache
 from tmdbhelper.lib.files.ftools import cached_property
-from tmdbhelper.lib.addon.plugin import convert_type, get_localized, get_setting
+from tmdbhelper.lib.addon.plugin import convert_type, get_localized
 from tmdbhelper.lib.items.filters import is_excluded
 from jurialmunkey.parser import try_int
-
-
-ITEMS_LENGTH = 20
-PAGES_LENGTH = get_setting('pagemulti_tmdb', 'int') or 1
 
 
 class ListProperties:
@@ -66,7 +62,8 @@ class ListDefault(ContainerDefaultCacheDirectory):
         list_properties.dbid_sorted = False
         list_properties.sorted_reversed = False
         list_properties.sorted_function = None
-        list_properties.length = None  # Override user setting for length
+        list_properties.length = try_int(self.params.get('length')) or 1
+        list_properties.page = try_int(self.params.get('page')) or 1
         list_properties.filters = self.filters
         return list_properties
 
@@ -77,13 +74,18 @@ class ListDefault(ContainerDefaultCacheDirectory):
     def _get_cached_items(self, *args, **kwargs):
         return
 
+    @use_item_cache('ItemContainer.db')
+    def get_cached_items_page(self, *args, **kwargs):
+        return self._get_cached_items_page(*args, **kwargs)
+
+    def _get_cached_items_page(self, *args, **kwargs):
+        return
+
     def get_request_url(self, tmdb_type, **kwargs):
         return self.list_properties.request_url.format(tmdb_type=tmdb_type)
 
-    def get_items(self, page=1, length=PAGES_LENGTH, **kwargs):
+    def get_items(self, **kwargs):
         self.list_properties.url = self.get_request_url(**kwargs)
-        self.list_properties.page = try_int(page) or 1
-        self.list_properties.length = self.list_properties.length or try_int(length) or PAGES_LENGTH
         self.list_properties.items = self.get_cached_items(
             self.list_properties.url,
             self.list_properties.tmdb_type,
