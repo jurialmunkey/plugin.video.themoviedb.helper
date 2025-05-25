@@ -563,9 +563,8 @@ class _Episode(_Video):
             return self.fanart
         return self.art.get('thumb')
 
-    @property
-    def finalised_art(self):
-        self.art = super().finalised_art
+    def finalise_art(self):
+        self.art = super().finalise_art()
         self.art['thumb'] = self.thumb
         return self.art
 
