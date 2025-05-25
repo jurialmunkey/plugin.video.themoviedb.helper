@@ -611,6 +611,7 @@ CASTMEMBER_COLUMNS = {
 CUSTOM_COLUMNS = {
     'key': {
         'data': 'TEXT',
+        'unique': True
     },
     'value': {
         'data': 'TEXT',
@@ -618,7 +619,8 @@ CUSTOM_COLUMNS = {
     'parent_id': {
         'data': 'TEXT',
         'foreign_key': 'baseitem(id)',
-        'indexed': True
+        'indexed': True,
+        'unique': True
     },
 }
 

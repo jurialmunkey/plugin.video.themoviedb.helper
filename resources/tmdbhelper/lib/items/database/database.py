@@ -38,7 +38,7 @@ class ItemDetailsDatabase(Database):
         super().__init__(filename=self.cache_filename)
 
     # DB version must be max of table_version
-    database_version = 24
+    database_version = 25
 
     database_changes = {
         21: (
@@ -55,7 +55,10 @@ class ItemDetailsDatabase(Database):
         ),
         24: (
             'ALTER TABLE tvshow ADD last_episode_to_air_id TEXT',
-        )
+        ),
+        25: (
+            'DROP TABLE custom',
+        ),
     }
 
     baseitem_columns = BASEITEM_COLUMNS
