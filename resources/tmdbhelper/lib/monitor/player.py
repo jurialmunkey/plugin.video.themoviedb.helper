@@ -6,7 +6,6 @@ from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.monitor.images import ImageFunctions
 from tmdbhelper.lib.monitor.common import CommonMonitorFunctions
 from tmdbhelper.lib.addon.plugin import get_condvisibility, get_infolabel, get_setting
-from tmdbhelper.lib.addon.logger import kodi_log
 
 
 class PlayerScrobbler():
@@ -402,6 +401,10 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         if not self.scrobbler:
             return
         self.scrobbler.update_time(self.tmdb_type, self.tmdb_id, self.getTime())
+
+    @cached_property
+    def player_item(self):
+        return PlayerItem(self)
 
     @property
     def details(self):

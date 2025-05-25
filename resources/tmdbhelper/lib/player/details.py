@@ -58,7 +58,7 @@ class PlayerNextEpisodes:
         return True
 
     def finalise_item(self, li):
-        li.set_params_reroute()
+        li.finalise()
         if not self.player:
             return li
         li.params['player'] = self.player

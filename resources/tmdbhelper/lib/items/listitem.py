@@ -1,8 +1,9 @@
 from xbmcgui import ListItem as KodiListItem
-from jurialmunkey.parser import try_int, merge_two_dicts
+from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.parser import try_int, merge_two_dicts, boolean
 from infotagger.listitem import ListItemInfoTag
 from tmdbhelper.lib.addon.consts import PARAM_WIDGETS_RELOAD, PARAM_WIDGETS_RELOAD_FORCED
-from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_media_type, get_condvisibility, get_localized, encode_url, get_flatseasons_info_param, GlobalSettingsDict
+from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, get_condvisibility, get_localized, encode_url, get_flatseasons_info_param, GlobalSettingsDict
 from tmdbhelper.lib.addon.tmdate import is_unaired_timestamp
 from jurialmunkey.window import get_property
 
@@ -51,20 +52,28 @@ def ListItem(*args, **kwargs):
 class _ListItem(object):
 
     mediatype = None
-    context_additions = None
+    trakt_type = None
+    tmdb_type = None
+    ftv_type = None
     playcount = None
+    library = 'video'
+    is_unaired = False
+
+    context_additions = None
+    infoproperties_additions = {}
+    format_unaired_labels = False
+    label_format_unaired = '{}'
 
     def __init__(
-            self, label=None, label2=None, path=None, library=None, is_folder=True, params=None, next_page=None,
-            parent_params=None, infolabels=None, infoproperties=None, art=None, cast=None,
-            context_menu=None, stream_details=None, unique_ids=None,
+            self, label=None, label2=None, path=None, is_folder=True,
+            params=None, next_page=None, context_menu=None,
+            infolabels=None, infoproperties=None, art=None, cast=None,
+            stream_details=None, unique_ids=None,
             **kwargs):
+
         self.label = label or ''
         self.label2 = label2 or ''
         self.path = path or PLUGINPATH
-        self.params = params or {}
-        self.parent_params = parent_params or {}
-        self.library = library or 'video'
         self.is_folder = is_folder
         self.next_page = next_page
 
@@ -75,6 +84,12 @@ class _ListItem(object):
         self.context_menu = self.init_context_menu(context_menu)
         self.stream_details = self.init_stream_details(stream_details)
         self.unique_ids = self.init_unique_ids(unique_ids)
+        self.params = self.init_params(params)
+
+    @staticmethod
+    def init_params(params):
+        params = params or {}
+        return params
 
     @staticmethod
     def init_unique_ids(unique_ids):
@@ -112,37 +127,75 @@ class _ListItem(object):
         return infolabels
 
     @property
-    def finalised_infolabels(self):
+    def is_resolvable(self):
+        if self.is_folder:
+            return False
+        if self.params.get('info') != 'play':
+            return False
+        if global_setting['only_resolve_strm']:
+            return False
+        return True
+
+    def finalise_infolabels(self):
         self.infolabels['playcount'] = self.playcount
         return self.infolabels
 
-    @property
-    def finalised_infoproperties(self):
+    def finalise_infoproperties(self):
+        self.infoproperties.update({f'{k}_id': v for k, v in self.unique_ids.items() if v})  # Set UIDs to infoproperties
+        self.infoproperties.update({f'item.{k}': v for k, v in self.params.items() if k and v})  # Set params to infoproperties
+        self.infoproperties.update(self.infoproperties_additions)
+        self.infoproperties['isPlayable'] = 'true' if self.is_resolvable else None
         return self.infoproperties
 
-    @property
-    def finalised_art(self):
-        self.art['icon'] = self.finalised_icon
+    def finalise_context_menu(self):
+        from tmdbhelper.lib.items.context import ContextMenu
+        self.context_menu += ContextMenu(self).get()
+        self.context_menu += self.context_additions or []
+        return self.context_menu
+
+    def finalise_art(self):
+        self.art['icon'] = self.art.get('icon') or f'{ADDONPATH}/resources/icons/themoviedb/default.png'
         return self.art
 
-    @property
-    def finalised_icon(self):
-        icon = self.art.get('icon')
-        icon = icon or self.art.get('poster')
-        icon = icon or f'{ADDONPATH}/resources/icons/themoviedb/default.png'
-        return icon
+    def finalise_label(self):
+        if self.format_unaired_labels and self.is_unaired:
+            self.label = self.label_format_unaired.format(self.label)
+        return self.label
 
-    @property
-    def trakt_type(self):
-        return convert_media_type(self.mediatype, 'trakt')
+    def finalise_params(self):
+        if not self.path.startswith(PLUGINPATH):
+            return self.params
 
-    @property
-    def tmdb_type(self):
-        return convert_media_type(self.mediatype, 'tmdb', parent_type=True)
+        if global_setting['is_skinshortcuts']:
+            self.finalise_params_skinshortcuts()
 
-    @property
-    def ftv_type(self):
-        return convert_media_type(self.mediatype, 'ftv')
+        if self.params.get('info') == 'details':
+            return self.finalise_params_details()
+
+        return self.params
+
+    def finalise_params_details(self):
+        return self.params
+
+    def finalise_params_skinshortcuts(self):
+        if not global_setting['is_skinshortcuts_standard']:
+            self.params['widget'] = 'true'
+
+        if self.infoproperties.get('is_sortable'):
+            self.params['parent_info'] = self.params['info']
+            self.params['info'] = 'trakt_sortby'  # Reroute sortable lists to display options in skinshortcuts
+
+        if self.params.get('info') == 'search' and not self.params.get('query'):
+            self.params['reload'] = 'forced'  # Add param to empty search to ensure reloads
+
+    def finalise(self):
+        self.finalise_params()
+        self.finalise_infolabels()
+        self.finalise_infoproperties()
+        self.finalise_context_menu()
+        self.finalise_art()
+        self.finalise_label()
+        return self
 
     @property
     def ftv_id(self):
@@ -160,8 +213,9 @@ class _ListItem(object):
     def episode(self):
         return
 
-    def format_unaired_label(self, format_label=None, no_date=True):
-        return
+    @property
+    def title(self):
+        return self.label
 
     def set_details(self, details=None, reverse=False, override=False):
         if not details:
@@ -177,61 +231,6 @@ class _ListItem(object):
         self.label = details.get('label') or self.label
         self.infolabels['title'] = details.get('infolabels', {}).get('title') or self.infolabels.get('title')
         self.infolabels['tvshowtitle'] = details.get('infolabels', {}).get('tvshowtitle') or self.infolabels.get('tvshowtitle')
-
-    def _set_params_reroute_skinshortcuts(self):
-        if not global_setting['is_skinshortcuts_standard']:
-            self.params['widget'] = 'true'
-        # Reroute sortable lists to display options in skinshortcuts
-        if self.infoproperties.get('is_sortable'):
-            self.params['parent_info'] = self.params['info']
-            self.params['info'] = 'trakt_sortby'
-        # Add param to empty search to ensure reloads
-        if self.params.get('info') == 'search' and not self.params.get('query'):
-            self.params['reload'] = 'forced'
-
-    def set_params_reroute(self, extended=None, is_cacheonly=False):
-        if not self.path.startswith(PLUGINPATH):
-            return
-
-        if global_setting['is_skinshortcuts']:
-            self._set_params_reroute_skinshortcuts()
-
-        # Reroute for extended sorting of trakt list by inprogress to open up next folder
-        if extended == 'inprogress':
-            self.params['info'] = 'trakt_upnext'
-
-        # Reconfigure details item into play/browse etc.
-        if self.params.get('info') == 'details':
-            return self._set_params_reroute_details()
-
-        # Copy some params to next folder path
-        if not self.is_folder:
-            return
-        if is_cacheonly:
-            self.params['cacheonly'] = is_cacheonly
-            return
-
-    def _set_params_reroute_details(self):
-        return  # Done in child class
-
-    def set_episode_label(self, format_label=None):
-        return  # Done in child class
-
-    def set_uids_to_info(self):
-        for k, v in self.unique_ids.items():
-            if not v:
-                continue
-            self.infoproperties[f'{k}_id'] = v
-
-    def set_params_to_info(self, **kwargs):
-        for k, v in self.params.items():
-            if not k or not v:
-                continue
-            self.infoproperties[f'item.{k}'] = v
-        if self.params.get('tmdb_type'):
-            self.infoproperties['item.type'] = self.params['tmdb_type']
-        for k, v in kwargs.items():
-            self.infoproperties[k] = v
 
     def get_url(self):
         def _get_url(path, reload=None, widget=None, **params):
@@ -250,25 +249,17 @@ class _ListItem(object):
         listitem = KodiListItem(label=self.label, label2=self.label2, path=self.infolabels['path'], offscreen=offscreen)
         return self.set_listitem(listitem)
 
-    @property
-    def finalised_context_menu(self):
-        from tmdbhelper.lib.items.context import ContextMenu
-        self.context_menu += ContextMenu(self).get()
-        self.context_menu += self.context_additions or []
-        return self.context_menu
-
     def set_infotag(self, listitem):
-        if self.library != 'pictures':
-            info_tag = ListItemInfoTag(listitem)
-            info_tag.set_info(self.finalised_infolabels)
-            info_tag.set_unique_ids(self.unique_ids)
-            info_tag.set_cast(self.cast)
-            info_tag.set_stream_details(self.stream_details)
-            info_tag.set_resume_point(self.infoproperties)
+        info_tag = ListItemInfoTag(listitem)
+        info_tag.set_info(self.infolabels)
+        info_tag.set_unique_ids(self.unique_ids)
+        info_tag.set_cast(self.cast)
+        info_tag.set_stream_details(self.stream_details)
+        info_tag.set_resume_point(self.infoproperties)
         return listitem
 
     def set_properties(self, listitem):
-        listitem.setProperties(self.finalised_infoproperties)
+        listitem.setProperties(self.infoproperties)
         return listitem
 
     def set_label2(self, listitem):
@@ -276,11 +267,11 @@ class _ListItem(object):
         return listitem
 
     def set_art(self, listitem):
-        listitem.setArt(self.finalised_art)
+        listitem.setArt(self.art)
         return listitem
 
     def set_context_menu(self, listitem):
-        listitem.addContextMenuItems(self.finalised_context_menu)
+        listitem.addContextMenuItems(self.context_menu)
         return listitem
 
     def set_listitem(self, listitem):
@@ -296,98 +287,122 @@ class _NextPage(_ListItem):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.label = get_localized(33078)
-        self.art['icon'] = f'{ADDONPATH}/resources/icons/themoviedb/nextpage.png'
-        self.art['landscape'] = f'{ADDONPATH}/resources/icons/themoviedb/nextpage_wide.png'
-        self.infoproperties['specialsort'] = 'bottom'
-        self.params = self.parent_params.copy()
-        self.params['page'] = self.next_page
-        self.params.pop('update_listing', None)  # Just in case we updated the listing for search results
+        self.params = self.init_params((kwargs.get('parent_params') or {}).copy())
         self.path = PLUGINPATH
         self.is_folder = True
 
+    def finalise_infoproperties(self):
+        super().finalise_infoproperties()
+        self.infoproperties['specialsort'] = 'bottom'
+        return self.infoproperties
+
+    def finalise_art(self):
+        self.art['icon'] = f'{ADDONPATH}/resources/icons/themoviedb/nextpage.png'
+        self.art['landscape'] = f'{ADDONPATH}/resources/icons/themoviedb/nextpage_wide.png'
+        return self.art
+
+    def finalise_params(self):
+        self.params['page'] = self.next_page
+        self.params.pop('update_listing', None)  # Just in case we updated the listing for search results
+        return self.params
+
 
 class _Keyword(_ListItem):
-    def _set_params_reroute_details(self):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.is_folder = True
+
+    def finalise_params_details(self):
         self.params['info'] = 'discover'
         self.params['tmdb_type'] = 'movie'
         self.params['with_keywords'] = self.unique_ids.get('tmdb')
         self.params['with_id'] = 'True'
-        self.is_folder = True
+        return self.params
 
 
 class _Studio(_ListItem):
-    def _set_params_reroute_details(self):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.is_folder = True
+
+    def finalise_params_details(self):
         self.params['info'] = 'discover'
         self.params['tmdb_type'] = 'movie'
         self.params['with_companies'] = self.unique_ids.get('tmdb')
         self.params['with_id'] = 'True'
-        self.is_folder = True
+        return self.params
 
 
 class _Person(_ListItem):
 
     mediatype = 'video'  # Need to hack as video to allow info dialog
+    tmdb_type = 'person'
 
-    def _set_params_reroute_details(self):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.is_folder = True
+
+    def finalise_params_details(self):
         self.params['info'] = 'related'
         self.params['tmdb_type'] = 'person'
         self.params['tmdb_id'] = self.unique_ids.get('tmdb')
-        self.is_folder = False
-
-    @property
-    def tmdb_type(self):
-        return 'person'
+        return self.params
 
 
 class _Collection(_ListItem):
 
     mediatype = 'set'
+    tmdb_type = 'collection'
 
-    def _set_params_reroute_details(self):
+    def finalise_params_details(self):
         self.params['info'] = 'collection'
+        return self.params
 
 
 class _Video(_ListItem):
 
     mediatype = 'video'
+    format_unaired_labels = True
+    label_format_unaired = '[COLOR=ffcc0000][I]{}[/I][/COLOR]'
 
-    def format_unaired_label(self, format_label=u'[COLOR=ffcc0000][I]{}[/I][/COLOR]', no_date=True):
-        if not format_label:
-            return
-        if not is_unaired_timestamp(self.infolabels.get('premiered'), no_date):
-            return
-        self.label = format_label.format(self.label)
-        return self.label
+    @cached_property
+    def is_unaired(self):
+        return is_unaired_timestamp(self.infolabels.get('premiered'), True)
 
-    def _set_params_reroute_default(self):
+    def finalise_params_details(self):
         self.params['info'] = 'play'
-        if not global_setting['only_resolve_strm']:
-            self.infoproperties['isPlayable'] = 'true'
         self.is_folder = False
-        self.context_menu.insert(0, (
-            '$ADDON[plugin.video.themoviedb.helper 32322]',
-            f'RunPlugin({self.get_url()}&ignore_default=true)',))
+        return self.params
 
-    def _set_params_reroute_details(self):
-        self._set_params_reroute_default()
+    def finalise_context_menu(self):
+        if not self.is_folder and self.params.get('info') == 'play':
+            self.context_menu.insert(0, self.context_menu_selectplayer)
+        return super().finalise_context_menu()
 
-    def _set_contextmenu_choosedefault(self, tmdb_type, tmdb_id, season=None, episode=None):
-        name = self.infolabels.get('tvshowtitle') or self.infolabels.get('title') or self.label
-        path = f'set_chosenplayer={name},tmdb_type={tmdb_type},tmdb_id={tmdb_id}'
+    @property
+    def context_menu_selectplayer(self):
+        head = '$ADDON[plugin.video.themoviedb.helper 32322]'
+        path = f'RunPlugin({self.get_url()}&ignore_default=true)'
+        return (head, path)
 
-        if season is not None:
-            path = f'{path},season={season}'
-            if episode is not None:
-                path = f'{path},episode={episode}'
+    @property
+    def context_menu_choosedefault_paramstring(self):
+        path = f'set_chosenplayer={self.title},tmdb_type={self.tmdb_type},tmdb_id={self.tmdb_id}'
+        return path
 
-        self.context_menu.append((
-            '$ADDON[plugin.video.themoviedb.helper 32476]',
-            f'Runscript(plugin.video.themoviedb.helper,{path})',))
+    @property
+    def context_menu_choosedefault(self):
+        head = '$ADDON[plugin.video.themoviedb.helper 32476]'
+        path = f'Runscript(plugin.video.themoviedb.helper,{self.context_menu_choosedefault_paramstring})'
+        return (head, path)
 
 
 class _Movie(_Video):
 
     mediatype = 'movie'
+    trakt_type = 'movie'
+    tmdb_type = 'movie'
+    ftv_type = 'movies'
 
     @property
     def ftv_id(self):
@@ -397,14 +412,17 @@ class _Movie(_Video):
     def playcount(self):
         return try_int(self.infolabels.get('playcount'), fallback=None)
 
-    def _set_params_reroute_details(self):
-        self._set_contextmenu_choosedefault('movie', self.unique_ids.get('tmdb'))
-        self._set_params_reroute_default()
+    def finalise_context_menu(self):
+        self.context_menu.append(self.context_menu_choosedefault)
+        return super().finalise_context_menu()
 
 
 class _Tvshow(_Video):
 
     mediatype = 'tvshow'
+    trakt_type = 'show'
+    tmdb_type = 'tv'
+    ftv_type = 'tv'
 
     @property
     def ftv_id(self):
@@ -440,29 +458,27 @@ class _Tvshow(_Video):
             return
         return int(self.watchedepisodes * 100 / self.totalepisodes)
 
-    @property
-    def finalised_infoproperties(self):
+    def finalise_infoproperties(self):
+        super().finalise_infoproperties()
         self.infoproperties['totalepisodes'] = self.totalepisodes
         self.infoproperties['watchedepisodes'] = self.watchedepisodes
         self.infoproperties['unwatchedepisodes'] = self.unwatchedepisodes
         self.infoproperties['watchedprogress'] = self.watchedprogress
         self.infoproperties['totalseasons'] = self.totalseasons
         return self.infoproperties
-        # if ip['unwatchedepisodes']:
-        #     playcount = 0
-        # il['playcount'] = playcount
 
-    def _set_params_reroute_details(self):
-        self._set_contextmenu_choosedefault('tv', self.unique_ids.get('tmdb'))
+    def finalise_params_details(self):
         self.params['info'] = global_setting['flatseasons_info_param']
+        return self.params
 
 
 class _Season(_Tvshow):
 
     mediatype = 'season'
+    trakt_type = 'season'
 
-    @property
-    def finalised_infoproperties(self):
+    def finalise_infoproperties(self):
+        super(_Tvshow, self).finalise_infoproperties()  # Skip TV Show additions
         self.infoproperties['totalepisodes'] = self.totalepisodes
         self.infoproperties['watchedepisodes'] = self.watchedepisodes
         self.infoproperties['unwatchedepisodes'] = self.unwatchedepisodes
@@ -481,15 +497,35 @@ class _Season(_Tvshow):
     def season(self):
         return self.infolabels.get('season')
 
-    def _set_params_reroute_details(self):
-        self._set_contextmenu_choosedefault('tv', self.unique_ids.get('tvshow.tmdb'), season=self.infolabels.get('season'))
+    @property
+    def context_menu_choosedefault_paramstring(self):
+        path = f'set_chosenplayer={self.title},tmdb_type={self.tmdb_type},tmdb_id={self.tmdb_id}'
+        path = f'{path},season={self.season}'
+        return path
+
+    def finalise_params_details(self):
         self.params['info'] = 'episodes'
+        return self.params
 
 
-class _Episode(_Tvshow):
+class _Episode(_Video):
 
     mediatype = 'episode'
+    trakt_type = 'episode'
+    tmdb_type = 'tv'
+    ftv_type = 'tv'
     thumb_override = 0
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.label_format = self.init_label_format()
+
+    def init_label_format(self):
+        if boolean(self.infoproperties.pop('no_label_formatting', False)):
+            return '{label}'
+        if not self.episode or self.season is None:
+            return '{label}'
+        return '{season}x{episode:0>2}. {label}'
 
     @property
     def landscape(self):
@@ -530,28 +566,24 @@ class _Episode(_Tvshow):
         return self.infolabels.get('episode')
 
     @property
-    def finalised_infoproperties(self):
-        return self.infoproperties
+    def title(self):
+        return self.infolabels.get('title') or self.label
 
-    def _set_params_reroute_details(self):
-        self._set_contextmenu_choosedefault(
-            'tv', self.unique_ids.get('tvshow.tmdb'),
-            season=self.infolabels.get('season'),
-            episode=self.infolabels.get('episode'))
-        if (self.parent_params.get('info') == 'library_nextaired'
-                and global_setting['nextaired_linklibrary']
-                and self.infoproperties.get('tvshow.dbid')):
-            self.path = f'videodb://tvshows/titles/{self.infoproperties["tvshow.dbid"]}/'
-            self.params = {}
-            self.is_folder = True
-            return
-        self._set_params_reroute_default()
+    def finalise_label(self):
+        self.label = self.label_format.format(season=self.season, episode=self.episode, label=self.title)
+        self.label = super().finalise_label()
+        return self.label
 
-    def set_episode_label(self, format_label=u'{season}x{episode:0>2}. {label}'):
-        if self.infoproperties.pop('no_label_formatting', None):
-            return
-        season = try_int(self.infolabels.get('season', 0))
-        episode = try_int(self.infolabels.get('episode', 0))
-        if not episode:
-            return
-        self.label = format_label.format(season=season, episode=episode, label=self.infolabels.get('title', ''))
+    @property
+    def context_menu_choosedefault_paramstring(self):
+        path = f'set_chosenplayer={self.title},tmdb_type={self.tmdb_type},tmdb_id={self.tmdb_id}'
+        path = f'{path},season={self.season},episode={self.episode}'
+        return path
+
+        # if (self.parent_params.get('info') == 'library_nextaired'
+        #         and global_setting['nextaired_linklibrary']
+        #         and self.infoproperties.get('tvshow.dbid')):
+        #     self.path = f'videodb://tvshows/titles/{self.infoproperties["tvshow.dbid"]}/'
+        #     self.params = {}
+        #     self.is_folder = True
+        #     return

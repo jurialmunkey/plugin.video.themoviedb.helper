@@ -139,38 +139,37 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         if not li:
             return
 
-        # Reformat ListItem.Label for episodes to match Kodi default 1x01.Title
-        li.set_episode_label()
-
-        # Check if unaired and either apply special formatting or hide item depending on user settings
-        if self.format_unaired_labels and not li.infoproperties.get('specialseason'):
-            unaired = li.format_unaired_label()
-            if self.hide_unaired and unaired:
-                return
-            if self.only_unaired and not unaired:
-                return
-
-        # Add details from Kodi library
-        try:
-            li.set_details(details=self.kodi_db.get_kodi_details(li), reverse=self.kodi_db_preferred)
-        except AttributeError:
-            pass
-
-        # Filter out items that are excluded (done after adding Kodi details so can filter against them)
-        if not li.next_page and self.is_excluded(li, is_listitem=True, **self.filters):
-            return
-
-        li.context_additions = self.context_additions
-        li.thumb_override = self.thumb_override
-
-        li.set_uids_to_info()  # Add unique ids to properties so accessible in skins
-        li.set_params_reroute(self.params.get('extended'), self.is_cacheonly)  # Reroute details to proper end point
-        li.set_params_to_info(widget=self.plugin_category, **self.property_params)  # Set path params to properties for use in skins
-
-        if li.next_page:
+        def finalise_next_page():
+            li.params['is_cacheonly'] = self.is_cacheonly
             li.params['plugin_category'] = self.plugin_category  # Carry the plugin category to next page in plugin:// path
+            return li.finalise()
 
-        return li
+        def finalise_mediaitem():
+            # Check if unaired and either apply special formatting or hide item depending on user settings
+            li.format_unaired_labels = bool(self.format_unaired_labels and not li.infoproperties.get('specialseason'))
+            if li.format_unaired_labels and self.hide_unaired and li.is_unaired:
+                return
+            if li.format_unaired_labels and self.only_unaired and not li.is_unaired:
+                return
+
+            # Add details from Kodi library
+            try:
+                li.set_details(details=self.kodi_db.get_kodi_details(li), reverse=self.kodi_db_preferred)
+            except AttributeError:
+                pass
+
+            # Filter out items that are excluded (done after adding Kodi details so can filter against them)
+            if self.is_excluded(li, is_listitem=True, **self.filters):
+                return
+
+            li.context_additions = self.context_additions
+            li.thumb_override = self.thumb_override
+            li.infoproperties_additions['widget'] = self.plugin_category
+            li.infoproperties_additions.update(self.property_params)
+
+            return li.finalise()
+
+        return finalise_next_page() if li.next_page else finalise_mediaitem()
 
     def make_items(self, items):
         # from tmdbhelper.lib.addon.thread import ParallelThread
