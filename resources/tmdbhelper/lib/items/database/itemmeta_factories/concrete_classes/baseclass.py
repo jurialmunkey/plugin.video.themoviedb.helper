@@ -6,6 +6,7 @@ class BaseItem:
     art_dbclist_routes = ()
     infolabels_dbclist_routes = ()
     infolabels_dbcitem_routes = ()
+    infoproperties_dbcitem_routes = ()
     infoproperties_dbclist_routes = ()
     extendedinfo = False
     parent_db_cache = None
@@ -84,6 +85,15 @@ class BaseItem:
             infoproperties[f'{joinings[0]}_CR'] = '[CR]'.join(join_data)
         return infoproperties
 
+    def get_infoproperties_dbcitem(self, infoproperties):
+        for instance, ikey, dkey in self.infoproperties_dbcitem_routes:
+            instance = self.parent_db_cache.return_basemeta_db(*instance)
+            try:
+                infoproperties[dkey] = ikey(instance.cached_data[0]) if callable(ikey) else instance.cached_data[0][ikey]
+            except(KeyError, TypeError, IndexError, AttributeError):
+                pass
+        return infoproperties
+
     def get_infoproperties_special(self, infoproperties):
         return infoproperties
 
@@ -134,8 +144,8 @@ class BaseItem:
 
     @cached_property
     def infoproperties(self):
-        infoproperties = {}
-        infoproperties = self.get_infoproperties_dbclist(infoproperties) if self.extendedinfo else {}
+        infoproperties = self.get_infoproperties_dbclist({}) if self.extendedinfo else {}
+        infoproperties = self.get_infoproperties_dbcitem(infoproperties)
         infoproperties = self.get_infoproperties_special(infoproperties)
         infoproperties = self.get_infoproperties_airdate(infoproperties)
         return infoproperties

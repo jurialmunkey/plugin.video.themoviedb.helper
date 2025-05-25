@@ -1,12 +1,11 @@
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem
-from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseroutes import MediaItemInfoLabelItemRoutes
+from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseroutes import MediaItemInfoLabelItemRoutes, MediaItemInfoPropertyItemRoutes
 
 
 class Tvshow(MediaItem):
     infolabels_dbcitem_routes = (
         MediaItemInfoLabelItemRoutes.certification,
         MediaItemInfoLabelItemRoutes.trailer,
-        MediaItemInfoLabelItemRoutes.watchedcount,
         MediaItemInfoLabelItemRoutes.episodecount,
     )
 
@@ -16,6 +15,10 @@ class Tvshow(MediaItem):
             *super().infolabels_dbclist_routes,
             (('network', None), 'name', 'studio'),
         )
+
+    infoproperties_dbcitem_routes = (
+        MediaItemInfoPropertyItemRoutes.watchedcount,
+    )
 
     infoproperties_dbclist_routes = (
         *MediaItem.infoproperties_dbclist_routes,

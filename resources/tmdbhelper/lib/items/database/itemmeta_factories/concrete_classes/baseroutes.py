@@ -14,6 +14,9 @@ class MediaItemInfoLabelItemMethod:
 class MediaItemInfoLabelItemRoutes:
     certification = (('certification', None), MediaItemInfoLabelItemMethod.certification, 'mpaa')
     trailer = (('video', None), 'path', 'trailer')
-    watchedcount = (('watchedcount', None), 'watched_episodes', 'playcount')
     episodecount = (('airedcount', None), 'aired_episodes', 'episode')
     playcount = (('playcount', None), 'plays', 'playcount')
+
+
+class MediaItemInfoPropertyItemRoutes:
+    watchedcount = (('watchedcount', None), 'watched_episodes', 'watchedepisodes')
