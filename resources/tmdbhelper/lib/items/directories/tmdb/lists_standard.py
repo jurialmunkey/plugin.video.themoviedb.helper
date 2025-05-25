@@ -8,12 +8,10 @@ PAGES_LENGTH = get_setting('pagemulti_tmdb', 'int') or 1
 
 class ListStandard(ListDefault):
 
-    def configure_list_properties(self, list_properties):
-        list_properties = super().configure_list_properties(list_properties)
-        list_properties.length = try_int(self.params.get('length')) or PAGES_LENGTH
-        return list_properties
+    def get_items(self, *args, length=None, **kwargs):
+        return super().get_items(*args, length=try_int(length) or PAGES_LENGTH, **kwargs)
 
-    def _get_cached_items(self, request_url, tmdb_type, page=1, length=PAGES_LENGTH, paginated=True):
+    def _get_cached_items(self, request_url, tmdb_type, page=1, length=None, paginated=True):
         items = []
         pages = 0
 
@@ -32,7 +30,7 @@ class ListStandard(ListDefault):
         return self.get_cached_items_page_configured(response, tmdb_type)
 
     @staticmethod
-    def paginated_items(items, page=1, length=PAGES_LENGTH, total_pages=None):
+    def paginated_items(items, page=1, length=None, total_pages=None):
         if total_pages and (page + length - 1) < total_pages:
             items.append({'next_page': page + length})
             return items

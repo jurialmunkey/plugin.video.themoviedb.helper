@@ -56,14 +56,11 @@ class ListDefault(ContainerDefaultCacheDirectory):
     def configure_list_properties(self, list_properties):
         list_properties.plugin_name = '{localized} {plural}'
         list_properties.localize = None
-        list_properties.tmdb_type = self.params.get('tmdb_type')
         list_properties.request_url = ''  # PATH to request
         list_properties.results_key = 'results'  # KEY in RESPONSE from PATH holding ITEMS
         list_properties.dbid_sorted = False
         list_properties.sorted_reversed = False
         list_properties.sorted_function = None
-        list_properties.length = try_int(self.params.get('length')) or 1
-        list_properties.page = try_int(self.params.get('page')) or 1
         list_properties.filters = self.filters
         return list_properties
 
@@ -84,8 +81,11 @@ class ListDefault(ContainerDefaultCacheDirectory):
     def get_request_url(self, tmdb_type, **kwargs):
         return self.list_properties.request_url.format(tmdb_type=tmdb_type)
 
-    def get_items(self, **kwargs):
-        self.list_properties.url = self.get_request_url(**kwargs)
+    def get_items(self, tmdb_type, page=1, length=None, **kwargs):
+        self.list_properties.url = self.get_request_url(tmdb_type=tmdb_type, **kwargs)
+        self.list_properties.tmdb_type = tmdb_type
+        self.list_properties.length = try_int(length) or 1
+        self.list_properties.page = try_int(page) or 1
         self.list_properties.items = self.get_cached_items(
             self.list_properties.url,
             self.list_properties.tmdb_type,

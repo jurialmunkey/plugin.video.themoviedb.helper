@@ -92,24 +92,25 @@ class ListSearch(ListStandard):
         list_properties.length = None
         list_properties.request_url = 'search/{tmdb_type}?{paramstring}'
         list_properties.localize = 137
-        list_properties.original_query = self.params.pop('query', '')
-        list_properties.query = list_properties.original_query
         return list_properties
 
-    def get_search_query(self, **kwargs):
+    def get_search_query(self, reload=False, **kwargs):
         if self.list_properties.query:
             return self.list_properties.query
 
         from tmdbhelper.lib.addon.consts import PARAM_WIDGETS_RELOAD_FORCED
-        if kwargs.get('reload') == PARAM_WIDGETS_RELOAD_FORCED:
+        if reload == PARAM_WIDGETS_RELOAD_FORCED:
             return
 
         return set_search_history(
             query=Dialog().input(get_localized(32044), type=INPUT_ALPHANUM),
             tmdb_type=self.list_properties.tmdb_type)
 
-    def get_items(self, page=1, length=PAGES_LENGTH, update_listing=False, **kwargs):
+    def get_items(self, query=None, page=1, length=PAGES_LENGTH, update_listing=False, **kwargs):
         from urllib.parse import quote_plus
+
+        self.list_properties.original_query = query or ''
+        self.list_properties.query = self.list_properties.original_query
 
         # QUERY new query from keyboard if we dont have one
         self.list_properties.query = self.get_search_query(**kwargs)
