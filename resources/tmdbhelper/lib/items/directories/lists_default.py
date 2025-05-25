@@ -70,79 +70,12 @@ class ListDefault(ContainerDefaultCacheDirectory):
         list_properties.filters = self.filters
         return list_properties
 
-    @staticmethod
-    def paginated_items(items, page=1, length=PAGES_LENGTH, total_pages=None):
-        if total_pages and (page + length - 1) < total_pages:
-            items.append({'next_page': page + length})
-            return items
-        return items
-
-    def get_mapped_item(self, item, tmdb_type, add_infoproperties=None):
-        return self.tmdb_api.mapper.get_info(
-            item,
-            item.get('media_type') or tmdb_type,
-            add_infoproperties=add_infoproperties)
-
-    def get_cached_items_page_configured(self, response, tmdb_type):
-        def items_page(items=None, pages=None, total=None):
-            return {
-                'items': items or [],
-                'pages': pages,
-                'total': total
-            }
-
-        try:
-            results = response[self.list_properties.results_key]
-        except (TypeError, KeyError):
-            return items_page()
-        try:
-            pages = response['total_pages']
-            total = response['total_results']
-        except (TypeError, KeyError):
-            pages, total = None, None
-
-        add_infoproperties = [
-            ('total_pages', pages),
-            ('total_results', total),
-        ]
-
-        if not results:
-            return items_page()
-
-        return items_page(
-            items=[
-                self.get_mapped_item(i, tmdb_type, add_infoproperties=add_infoproperties)
-                for i in results if i
-            ],
-            pages=pages,
-            total=total,
-        )
-
-    @use_item_cache('ItemContainer.db')
-    def get_cached_items_page(self, *args, **kwargs):
-        return self._get_cached_items_page(*args, **kwargs)
-
-    def _get_cached_items_page(self, request_url, tmdb_type, page=1):
-        response = self.tmdb_api.get_response_json(request_url, page=page)
-        return self.get_cached_items_page_configured(response, tmdb_type)
-
     @use_item_cache('ItemContainer.db')
     def get_cached_items(self, *args, **kwargs):
         return self._get_cached_items(*args, **kwargs)
 
-    def _get_cached_items(self, request_url, tmdb_type, page=1, length=PAGES_LENGTH, paginated=True):
-        items = []
-        pages = 0
-
-        for x in range(page, page + length):
-            ipage = self.get_cached_items_page(request_url, tmdb_type, x)
-            pages = ipage['pages']
-            items.extend(ipage['items'])
-
-        if not paginated:
-            return items
-
-        return self.paginated_items(items, page, length, pages)
+    def _get_cached_items(self, *args, **kwargs):
+        return
 
     def get_request_url(self, tmdb_type, **kwargs):
         return self.list_properties.request_url.format(tmdb_type=tmdb_type)
