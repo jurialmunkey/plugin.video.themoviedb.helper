@@ -262,6 +262,11 @@ def import_art():
     return Art
 
 
+def import_art_profile():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtProfile
+    return ArtProfile
+
+
 def import_art_poster():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtPoster
     return ArtPoster
@@ -424,6 +429,7 @@ FACTORY_ROUTES = {
     'fanart_tv_banner': import_fanart_tv_banner,
     'fanart_tv_discart': import_fanart_tv_discart,
     'art': import_art,
+    'art_profile': import_art_profile,
     'art_poster': import_art_poster,
     'art_poster_language': import_art_poster_language,
     'art_poster_english': import_art_poster_english,

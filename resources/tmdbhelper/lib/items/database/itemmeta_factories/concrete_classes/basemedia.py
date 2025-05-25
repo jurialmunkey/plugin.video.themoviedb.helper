@@ -83,6 +83,12 @@ class MediaItemArtworkRoutes:
             'parents': (None, ),
             'ftv_api': False,
         },
+        'art_profile': {
+            'affixes': (None, ),
+            'outputs': 'thumb',
+            'parents': (None, ),
+            'ftv_api': False,
+        },
         'art_extrafanart': {
             'affixes': (None, ),
             'outputs': 'fanart',

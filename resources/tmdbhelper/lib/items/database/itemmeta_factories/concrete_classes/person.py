@@ -8,7 +8,7 @@ class Person(BaseItem):
     get_unique_ids = MediaItem.get_unique_ids
 
     art_dbclist_routes = (
-        (('art_poster', None), 'poster'),
+        (('art_profile', None), 'thumb'),
         (('art_fanart', None), 'fanart'),
     )
 
