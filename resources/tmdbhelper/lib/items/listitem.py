@@ -266,7 +266,7 @@ class _ListItem(object):
         return BuildURL(self.path, **self.params).url
 
     def get_listitem(self, offscreen=True):
-        listitem = KodiListItem(label=self.label, label2=self.label2, path=self.infolabels['path'], offscreen=offscreen)
+        listitem = KodiListItem(label=self.label, label2=self.label2, path=self.url, offscreen=offscreen)
         return self.set_listitem(listitem)
 
     def set_infotag(self, listitem):
