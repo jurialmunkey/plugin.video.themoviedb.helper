@@ -450,7 +450,17 @@ class _Tvshow(_Video):
 
     @property
     def playcount(self):
-        return try_int(self.infolabels.get('playcount'), fallback=None)
+        """
+        For tvshows and seasons have to hardcode playcount as a 0|1 boolean
+        because Kodi treats it as watched/unwatched boolean for whole show
+        """
+        if not self.totalepisodes:
+            return 0
+        if not self.watchedepisodes:
+            return 0
+        if self.totalepisodes > self.watchedepisodes:
+            return 0
+        return 1
 
     @property
     def totalepisodes(self):
@@ -546,6 +556,10 @@ class _Episode(_Video):
         if not self.episode or self.season is None:
             return '{label}'
         return '{season}x{episode:0>2}. {label}'
+
+    @property
+    def playcount(self):
+        return try_int(self.infolabels.get('playcount'), fallback=None)
 
     @property
     def landscape(self):
