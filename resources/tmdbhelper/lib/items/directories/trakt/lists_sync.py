@@ -48,6 +48,7 @@ class ListStandardSync(ListDefault):
         list_properties.filters = None  # Filters for pre-pagination
         list_properties.item_keys = None  # Extra keys for filters
         list_properties.plugin_name = '{plural} {localized}'
+        list_properties.dbid_sorted = True
         list_properties.localize = None
         list_properties.params_def = None
         return list_properties
