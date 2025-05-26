@@ -31,6 +31,7 @@ def ListItem(*args, **kwargs):
         'set': _Collection,
         'studio': _Studio,
         'keyword': _Keyword,
+        'image': _Image,
         'person': _Person
     }
 
@@ -325,6 +326,22 @@ class _NextPage(_ListItem):
         self.params['page'] = self.next_page
         self.params.pop('update_listing', None)  # Just in case we updated the listing for search results
         return self.params
+
+
+class _Image(_ListItem):
+
+    mediatype = 'image'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.is_folder = False
+
+    def set_infotag(self, listitem):
+        listitem.setInfo('pictures', {
+            'title': self.label,
+            'picturepath': self.url,
+        })
+        return listitem
 
 
 class _Keyword(_ListItem):

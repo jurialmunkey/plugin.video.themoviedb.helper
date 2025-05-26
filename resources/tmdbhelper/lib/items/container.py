@@ -33,7 +33,6 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
     container_content = ''  # Container.Content({})
     container_update = ''  # Add path to call Containr.Update({}) at end of directory
     container_refresh = False  # True call Container.Refresh at end of directory
-    library = None  # TODO: FIX -- Currently broken -- SetInfo(library, info)
     sort_by_dbid = False
     kodi_db = None
     thumb_override = 0
