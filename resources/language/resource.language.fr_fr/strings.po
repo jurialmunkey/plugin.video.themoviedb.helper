@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-05-06 12:00+0100\n"
+"PO-Revision-Date: 2025-05-13 12:00+0100\n"
 "Last-Translator: Bindou <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE\n"
 "MIME-Version: 1.0\n"
@@ -93,7 +93,7 @@ msgstr "Allemand (Suisse)"
 #: /resources/settings.xml
 msgctxt "#32015"
 msgid "Additional season: Up next"
-msgstr "Saison supplémentaire : À suivre""
+msgstr "Saison supplémentaire : À suivre"
 
 msgctxt "#30011"
 msgid "German (Germany)"
@@ -115,7 +115,7 @@ msgstr "Anglais (Australie)"
 #: /resources/settings.xml
 msgctxt "#32020"
 msgid "Additional season: Specials"
-msgstr "Saison supplémentaire : Spéciales"
+msgstr "Saison supplémentaire : Spéciale"
 
 msgctxt "#30014"
 msgid "English (Canada)"
@@ -198,7 +198,12 @@ msgstr "Finlandais (Finlande)"
 #: /resources/settings.xml
 msgctxt "#32039"
 msgid "Prefer fanart.tv artwork"
-msgstr "Préférer les illustrations de fanart.tv"
+msgstr "Préférer les illustrations de Fanart.tv"
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_seasons.py
+msgctxt "#32040"
+msgid "All seasons"
+msgstr "Toutes les saisons"
 
 msgctxt "#30026"
 msgid "French (Canada)"
@@ -289,7 +294,7 @@ msgstr "Le nom d'utilisateur ou le mot de passe ne sont pas valides. Voulez-vous
 #: /resources/lib/downloader.py
 msgctxt "#32057"
 msgid "Retry"
-msgstr "Réessayez"
+msgstr "Réessayer"
 
 #: /resources/lib/downloader.py 
 msgctxt "#32058"
@@ -364,7 +369,7 @@ msgstr "Autre"
 #: /resources/settings.xml
 msgctxt "#32081"
 msgid "Next page item"
-msgstr "Page suivante d'élément"
+msgstr "Élément "Page suivante""
 
 #: /resources/settings.xml
 msgctxt "#32084"
@@ -573,7 +578,7 @@ msgstr "Mettre à jour la médiathèque maintenant"
 #: /resources/settings.xml
 msgctxt "#32156"
 msgid "Next aired library calendar links to local tvshow"
-msgstr "Le calendrier de la médiathèque prochainement diffusé est lié à une série TV locale"
+msgstr "Relier le calendrier des épisodes prochainement diffusés aux séries TV locales de la médiathèque"
 
 #: /resources/lib/context.py 
 msgctxt "#32160"
@@ -593,7 +598,7 @@ msgstr "Lecture automatique des fichiers locaux"
 #: /resources/settings.xml
 msgctxt "#32163"
 msgid "Use fanart.tv for service monitor artwork"
-msgstr "Utiliser fanart.tv pour les illustrations des moniteurs de service"
+msgstr "Utiliser Fanart.tv pour les illustrations des moniteurs de service"
 
 #: /resources/lib/context.py 
 msgctxt "#32164"
@@ -907,7 +912,7 @@ msgstr "Équipe dans les séries TV"
 #: /resources/lib/plugin.py
 msgctxt "#32231"
 msgid "Thumbs"
-msgstr "Vignette"
+msgstr "Vignettes"
 
 #: /resources/lib/plugin.py
 msgctxt "#32232"
@@ -1581,7 +1586,7 @@ msgstr "Prochaines diffusions / Prochains épisodes"
 #: /resources/settings.xml
 msgctxt "#32369"
 msgid "thumbs"
-msgstr "Vignettes"
+msgstr "vignettes"
 
 #: /resources/settings.xml
 msgctxt "#32370"
@@ -1889,7 +1894,7 @@ msgctxt "#32439"
 msgid "The provider allowlist has been updated."
 msgstr "La liste autorisée des fournisseurs a été mise à jour."
 
-#: /resources/lib/script/method.py
+#: /resources/lib/player/configure.py
 msgctxt "#32440"
 msgid "Edit steps"
 msgstr "Modifier les étapes"
@@ -2529,7 +2534,7 @@ msgstr "Clé client Fanart.tv"
 #: /resources/settings.xml
 msgctxt "#32021"
 msgid "Use fanart.tv for plugin artwork (slower)"
-msgstr "Utiliser fanart.tv pour les illustrations du plugin (plus lent)"
+msgstr "Utiliser Fanart.tv pour les illustrations du plugin (plus lent)"
 
 #: /resources/settings.xml
 msgctxt "#32023"
