@@ -822,6 +822,13 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 })
             ],
 
+            'original_language': lambda v: [
+                ExtendedMap('custom', 'original_language', False, {
+                    'key': 'original_language',
+                    'value': v
+                })
+            ],
+
             'images': self.get_art,
             'fanart_tv': self.get_fanart_tv,
             'belongs_to_collection': self.get_belongs_to_collection,  # Also mapped in advanced properties for item id
