@@ -36,3 +36,8 @@ class WatchlistRank(SimpleCache):
 
 class CollectedDate(SimpleCache):
     keys = ('collection_last_collected_at', )
+
+
+class LastPlayed(SimpleCache):
+    keys = ('last_watched_at', 'playback_paused_at')
+    cached_data_keys = ('MAX(ifnull(last_watched_at, ""), ifnull(playback_paused_at, "")) as lastplayed', )

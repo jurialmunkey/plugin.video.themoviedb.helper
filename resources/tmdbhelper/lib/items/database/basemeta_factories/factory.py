@@ -93,8 +93,8 @@ def import_base():
 
 
 def import_collection():
-    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import MovieCollection
-    return MovieCollection
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Series
+    return Series
 
 
 def import_movie():
@@ -262,6 +262,11 @@ def import_art():
     return Art
 
 
+def import_art_profile():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtProfile
+    return ArtProfile
+
+
 def import_art_poster():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtPoster
     return ArtPoster
@@ -367,6 +372,11 @@ def import_collected_date():
     return CollectedDate
 
 
+def import_lastplayed():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import LastPlayed
+    return LastPlayed
+
+
 FACTORY_ROUTES = {
     'crewmember': import_crewmember,
     'castmember': import_castmember,
@@ -419,6 +429,7 @@ FACTORY_ROUTES = {
     'fanart_tv_banner': import_fanart_tv_banner,
     'fanart_tv_discart': import_fanart_tv_discart,
     'art': import_art,
+    'art_profile': import_art_profile,
     'art_poster': import_art_poster,
     'art_poster_language': import_art_poster_language,
     'art_poster_english': import_art_poster_english,
@@ -440,6 +451,7 @@ FACTORY_ROUTES = {
     'favorites_rank': import_favorites_rank,
     'watchlist_rank': import_watchlist_rank,
     'collected_date': import_collected_date,
+    'lastplayed': import_lastplayed,
 }
 
 

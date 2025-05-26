@@ -83,6 +83,12 @@ class MediaItemArtworkRoutes:
             'parents': (None, ),
             'ftv_api': False,
         },
+        'art_profile': {
+            'affixes': (None, ),
+            'outputs': 'thumb',
+            'parents': (None, ),
+            'ftv_api': False,
+        },
         'art_extrafanart': {
             'affixes': (None, ),
             'outputs': 'fanart',
@@ -296,6 +302,17 @@ class MediaItem(BaseItem):
 
         infoproperties['ResumeTime'] = int(duration * progress // 100)
         infoproperties['TotalTime'] = int(duration)
+        return infoproperties
+
+    def get_infoproperties_lastplayed(self, infoproperties):
+        func_get = self.get_instance_cached_data_value
+        func_dbc = self.parent_db_cache.return_basemeta_db
+        lastplayed_timestamp = func_get(func_dbc('lastplayed'), 'lastplayed')
+        if not lastplayed_timestamp:
+            return infoproperties
+        infoproperties.update(ItemMapperMethods.get_custom_date(
+            lastplayed_timestamp, name='lastplayed'
+        ))
         return infoproperties
 
     def get_infoproperties_ranks(self, infoproperties):

@@ -22,14 +22,20 @@ class ListItemConfig:
         self.item['parent_params'] = self.parent.parent_params
 
     @cached_property
-    def listitem_cacher(self):
+    def is_cacheable(self):
         if self.next_page:
-            return
+            return False
         if self.mediatype not in self.listitem_cacher_permitted_types:
-            return
+            return False
         if not self.tmdb_id:
-            return
+            return False
         if not self.tmdb_type:
+            return False
+        return True
+
+    @cached_property
+    def listitem_cacher(self):
+        if not self.is_cacheable:
             return
         return ListItemCacher(
             self.parent,
@@ -189,7 +195,7 @@ class ListItemThread:
 
     @cached_property
     def cached_data(self):
-        with TimerList(self.timer_lists, ' - cached', log_threshold=0.05, logging=self.log_timers):
+        with TimerList(self.timer_lists, ' - cached', log_threshold=0.001, logging=self.log_timers):
             with self.connection.open():
                 return self.get_cached_data()
 
@@ -206,7 +212,7 @@ class ListItemThread:
     def get_uncached_items(self):
         return [
             self.items[x] for x, cached_item in enumerate(self.cached_data)
-            if cached_item is None
+            if cached_item is None and self.items[x].is_cacheable
         ]
 
     @cached_property
@@ -221,7 +227,7 @@ class ListItemThread:
 
     @cached_property
     def func_queue(self):
-        with TimerList(self.timer_lists, ' - online', log_threshold=0.05, logging=self.log_timers):
+        with TimerList(self.timer_lists, ' - online', log_threshold=0.001, logging=self.log_timers):
             return self.get_func_queue()
 
     def get_func_queue(self):
@@ -236,12 +242,12 @@ class ListItemThread:
 
     def set_func_queue(self):
         self.connection.open_connection.execute('BEGIN')
-        with TimerList(self.timer_lists, ' - writer', log_threshold=0.05, logging=self.log_timers):
+        with TimerList(self.timer_lists, ' - writer', log_threshold=0.001, logging=self.log_timers):
             for func, args, kwgs in self.func_queue:
                 func(*args, **kwgs)
-        with TimerList(self.timer_lists, ' - commit', log_threshold=0.05, logging=self.log_timers):
+        with TimerList(self.timer_lists, ' - commit', log_threshold=0.001, logging=self.log_timers):
             self.connection.open_connection.execute('COMMIT')
-        with TimerList(self.timer_lists, ' - return', log_threshold=0.05, logging=self.log_timers):
+        with TimerList(self.timer_lists, ' - return', log_threshold=0.001, logging=self.log_timers):
             self.cached_data = self.get_cached_data()
 
     @cached_property

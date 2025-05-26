@@ -1,12 +1,11 @@
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem, MediaItemArtworkRoutes
-from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseroutes import MediaItemInfoLabelItemRoutes
+from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseroutes import MediaItemInfoLabelItemRoutes, MediaItemInfoPropertyItemRoutes
 
 
 class Season(MediaItem):
     infolabels_dbcitem_routes = (
         MediaItemInfoLabelItemRoutes.certification,
         MediaItemInfoLabelItemRoutes.trailer,
-        MediaItemInfoLabelItemRoutes.watchedcount,
     )
 
     @property
@@ -15,6 +14,10 @@ class Season(MediaItem):
             MediaItemArtworkRoutes().configured_routes
             + MediaItemArtworkRoutes('tvshow').configured_routes
         )
+
+    infoproperties_dbcitem_routes = (
+        MediaItemInfoPropertyItemRoutes.watchedcount,
+    )
 
     infoproperties_dbclist_routes = (
         *MediaItem.infoproperties_dbclist_routes,

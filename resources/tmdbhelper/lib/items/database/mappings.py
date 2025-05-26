@@ -1,11 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from tmdbhelper.lib.api.mapping import _ItemMapper
-from jurialmunkey.parser import try_int
 from collections import namedtuple
 
 
 ExtendedMap = namedtuple("ExtendedMap", "base unique_id overwrite data")
+
+
+# Consts for wrangling FTV artwork into shape
+FTV_WITHOUT_SEASONS = 0
+FTV_TVSHOWS_SEASONS = 1
+FTV_SEASONS_SEASONS = 2
 
 
 def get_blanks_none(i):
@@ -17,11 +22,11 @@ def get_blanks_none(i):
 
 class ItemMapperMethods:
     @staticmethod
-    def get_runtime(v, *args, **kwargs):
-        if isinstance(v, list):
-            v = v[0]
+    def get_runtime(i, *args, **kwargs):
+        if isinstance(i, list):
+            i = i[0]
         try:
-            return int(v) * 60
+            return int(i) * 60
         except (TypeError, ValueError):
             return 0
 
@@ -145,12 +150,12 @@ class ItemMapperMethods:
         return data
 
     @staticmethod
-    def get_collection(v, **kwargs):
+    def get_belongs_to_collection(i, **kwargs):
         data = []
 
-        item_id = f"collection.{v['id']}"
+        item_id = f"collection.{i['id']}"
 
-        collection_item = ItemMapperMethods.get_configured_item(v, **{
+        collection_item = ItemMapperMethods.get_configured_item(i, **{
             'tmdb_id': 'id',
             'title': 'name',
             'poster': 'poster_path',
@@ -162,9 +167,36 @@ class ItemMapperMethods:
 
         data.append(ExtendedMap('baseitem', item_id, False, {
             'id': item_id,
-            'mediatype': 'collection',
+            'mediatype': 'set',
             'expiry': 0,
         }))
+
+        return data
+
+    @staticmethod
+    def get_collection(collection_object, **kwargs):
+        data = []
+
+        if not collection_object:
+            return data
+
+        collection_id = f"collection.{collection_object['id']}"
+
+        for i in (collection_object.get('parts') or []):
+            data.extend(ItemMapperMethods.get_media_item_data(i, 'movie', collection_id=collection_id))
+
+        return data
+
+    def get_parts(self, parts, **kwargs):
+        data = []
+
+        if not parts:
+            return data
+
+        collection_id = f"collection.{self.tmdb_id}"
+
+        for i in parts:
+            data.extend(ItemMapperMethods.get_media_item_data(i, 'movie', collection_id=collection_id))
 
         return data
 
@@ -323,51 +355,58 @@ class ItemMapperMethods:
         for subkey, mapkey, config in mappings:
             credits = items.get(subkey) or []
             for i in credits:
-
-                item_id = f'{tmdb_type}.{i["id"]}'
-
-                mediatype = 'movie' if tmdb_type == 'movie' else 'tvshow'
-                premiered = 'release_date' if mediatype == 'movie' else 'first_air_date'
-                titlename = 'title' if mediatype == 'movie' else 'name'
-
-                media_item = ItemMapperMethods.get_configured_item(i, **{
-                    'year': lambda i: int(i[premiered][0:4]),
-                    'premiered': premiered,
-                    'plot': 'overview',
-                    'title': titlename,
-                    'originaltitle': 'original_title',
-                    'rating': 'vote_average',
-                    'votes': 'vote_count',
-                    'popularity': 'popularity'
-
-                })
-                media_item['id'] = item_id
-                media_item['tmdb_id'] = i['id']
-                data.append(ExtendedMap(mediatype, item_id, False, media_item))
+                data.extend(ItemMapperMethods.get_media_item_data(i, tmdb_type))
 
                 credit_item = ItemMapperMethods.get_configured_item(i, **config)
-                credit_item['parent_id'] = item_id
+                credit_item['parent_id'] = f'{tmdb_type}.{i["id"]}'
                 credit_item['tmdb_id'] = self.tmdb_id
                 data.append(ExtendedMap(mapkey, i.get('credit_id'), False, credit_item))
 
-                data.append(ExtendedMap('baseitem', item_id, False, {
-                    'id': item_id,
-                    'mediatype': mediatype,
-                    'expiry': 0,
-                }))
+        return data
 
-                for icon_type, aspect in (('poster_path', 'posters'), ('backdrop_path', 'backdrops')):
-                    icon = i.get(icon_type)
-                    if not icon:
-                        continue
-                    data.append(ExtendedMap('art', icon, False, {
-                        'parent_id': item_id,
-                        'icon': icon,
-                        'type': aspect,
-                        'aspect_ratio': aspect,
-                        'extension': icon.split('.')[-1],
-                    }))
+    @staticmethod
+    def get_media_item_data(i, tmdb_type, **additional_params):
+        data = []
 
+        item_id = f'{tmdb_type}.{i["id"]}'
+
+        mediatype = 'movie' if tmdb_type == 'movie' else 'tvshow'
+        premiered = 'release_date' if mediatype == 'movie' else 'first_air_date'
+        titlename = 'title' if mediatype == 'movie' else 'name'
+
+        media_item = ItemMapperMethods.get_configured_item(i, **{
+            'year': lambda i: int(i[premiered][0:4]),
+            'premiered': premiered,
+            'plot': 'overview',
+            'title': titlename,
+            'originaltitle': 'original_title',
+            'rating': 'vote_average',
+            'votes': 'vote_count',
+            'popularity': 'popularity'
+
+        })
+        media_item['id'] = item_id
+        media_item['tmdb_id'] = i['id']
+        media_item.update(additional_params)
+        data.append(ExtendedMap(mediatype, item_id, False, media_item))
+
+        data.append(ExtendedMap('baseitem', item_id, False, {
+            'id': item_id,
+            'mediatype': mediatype,
+            'expiry': 0,
+        }))
+
+        for icon_type, aspect in (('poster_path', 'posters'), ('backdrop_path', 'backdrops')):
+            icon = i.get(icon_type)
+            if not icon:
+                continue
+            data.append(ExtendedMap('art', icon, False, {
+                'parent_id': item_id,
+                'icon': icon,
+                'type': aspect,
+                'aspect_ratio': aspect,
+                'extension': icon.split('.')[-1],
+            }))
         return data
 
     def get_episodes(self, items, **kwargs):
@@ -451,28 +490,31 @@ class ItemMapperMethods:
         if not items:
             return
 
+        # FTV artwork key name, type to map it to, art_has_seasons
+        # Set art_has_seasons to FTV_TVSHOWS_SEASONS for artwork where fanarttv intends "season=all" to be "tvshow" artwork
+        # Set art_has_seasons to FTV_SEASONS_SEASONS for artwork where fanarttv intends "season=all" to be "season" artwork
         art_types = {
-            'movieposter': ('poster', False),
-            'moviebackground': ('fanart', False),
-            'moviethumb': ('landscape', False),
-            'moviebanner': ('banner', False),
-            'hdmovieclearart': ('clearart', False),
-            'movieclearart': ('clearart', False),
-            'hdmovielogo': ('clearlogo', False),
-            'movielogo': ('clearlogo', False),
-            'moviedisc': ('discart', False),
-            'tvposter': ('poster', False),
-            'tvthumb': ('landscape', False),
-            'tvbanner': ('banner', False),
-            'hdclearart': ('clearart', False),
-            'clearart': ('clearart', False),
-            'hdtvlogo': ('clearlogo', False),
-            'clearlogo': ('clearlogo', False),
-            'characterart': ('characterart', False),
-            'showbackground': ('fanart', True),
-            'seasonposter': ('poster', True),
-            'seasonbanner': ('banner', True),
-            'seasonthumb': ('landscape', True),
+            'movieposter': ('poster', FTV_WITHOUT_SEASONS),
+            'moviebackground': ('fanart', FTV_WITHOUT_SEASONS),
+            'moviethumb': ('landscape', FTV_WITHOUT_SEASONS),
+            'moviebanner': ('banner', FTV_WITHOUT_SEASONS),
+            'hdmovieclearart': ('clearart', FTV_WITHOUT_SEASONS),
+            'movieclearart': ('clearart', FTV_WITHOUT_SEASONS),
+            'hdmovielogo': ('clearlogo', FTV_WITHOUT_SEASONS),
+            'movielogo': ('clearlogo', FTV_WITHOUT_SEASONS),
+            'moviedisc': ('discart', FTV_WITHOUT_SEASONS),
+            'tvposter': ('poster', FTV_WITHOUT_SEASONS),
+            'tvthumb': ('landscape', FTV_WITHOUT_SEASONS),
+            'tvbanner': ('banner', FTV_WITHOUT_SEASONS),
+            'hdclearart': ('clearart', FTV_WITHOUT_SEASONS),
+            'clearart': ('clearart', FTV_WITHOUT_SEASONS),
+            'hdtvlogo': ('clearlogo', FTV_WITHOUT_SEASONS),
+            'clearlogo': ('clearlogo', FTV_WITHOUT_SEASONS),
+            'characterart': ('characterart', FTV_WITHOUT_SEASONS),
+            'showbackground': ('fanart', FTV_TVSHOWS_SEASONS),
+            'seasonposter': ('poster', FTV_SEASONS_SEASONS),
+            'seasonbanner': ('banner', FTV_SEASONS_SEASONS),
+            'seasonthumb': ('landscape', FTV_SEASONS_SEASONS),
         }
 
         data = []
@@ -505,8 +547,16 @@ class ItemMapperMethods:
                 }
 
                 if art_has_seasons:
+                    # Some artwork on FanartTV uses season=all to indicate tvshow artwork
+                    # While other artwork types use season=all to indicate season artwork for an "all" season...
+                    # Do some gymnastics here to workaround this mess of conflated types
                     snum = (art_item.get('season') or 'all')
 
+                    # Set "All Seasons" artwork to -1 season so we dont pull it in for a tvshow if it is really intended to be an "all" season type
+                    if snum == 'all' and art_has_seasons == FTV_SEASONS_SEASONS:
+                        snum = -1
+
+                    # Set season artwork with a number ot season type
                     if snum != 'all':
                         parent_id = f'tv.{self.tmdb_id}.{snum}'
 
@@ -637,6 +687,10 @@ class ItemMapperMethods:
         infoproperties[days_to_air_name] = str(days_to_air)
         return infoproperties
 
+    @staticmethod
+    def get_custom_property(key, value):
+        return [ExtendedMap('custom', key, False, {'key': key, 'value': value})]
+
 
 class BlankNoneDict(dict):
     def __missing__(self, key):
@@ -758,23 +812,15 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
         }
 
         self.extended_map = {
-            'budget': lambda v: [
-                ExtendedMap('custom', 'budget', False, {
-                    'key': 'budget',
-                    'value': f'${float(v):0,.0f}'
-                })
-            ],
-
-            'revenue': lambda v: [
-                ExtendedMap('custom', 'revenue', False, {
-                    'key': 'revenue',
-                    'value': f'${float(v):0,.0f}'
-                })
-            ],
-
+            'budget': lambda v: self.get_custom_property('budget', f'${float(v):0,.0f}'),
+            'revenue': lambda v: self.get_custom_property('revenue', f'${float(v):0,.0f}'),
+            'original_language': lambda v: self.get_custom_property('original_language', v),
+            'homepage': lambda v: self.get_custom_property('homepage', v),
             'images': self.get_art,
             'fanart_tv': self.get_fanart_tv,
-            'belongs_to_collection': self.get_collection,  # Also mapped in advanced properties for item id
+            'belongs_to_collection': self.get_belongs_to_collection,  # Also mapped in advanced properties for item id
+            'collection': self.get_collection,  # Also mapped in advanced properties for item id
+            'parts': self.get_parts,  # Also mapped in advanced properties for item id
             'seasons': self.get_seasons,
             'episodes': self.get_episodes,
             'created_by': self.get_creators,
@@ -900,6 +946,6 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
         # from tmdbhelper.lib.files.futils import dumps_to_file
         # dumps_to_file(
         #     {'data': self.data, 'item': self.item},
-        #     'log_data', f'mappings_{self.tmdb_id}_{data["name"]}.json', join_addon_data=True)
+        #     'log_data', f'mappings_{self.tmdb_id}_{data["title"]}.json', join_addon_data=True)
 
         return self.item

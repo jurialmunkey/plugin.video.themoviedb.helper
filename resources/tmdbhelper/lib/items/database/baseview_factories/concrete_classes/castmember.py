@@ -37,7 +37,7 @@ class CastMemberMediaList(MediaList):
 
     def map_item_art(self, i):
         return {
-            'poster': self.image_path_func(i['thumb'])
+            'thumb': self.image_path_func(i['thumb'])
         }
 
     @staticmethod

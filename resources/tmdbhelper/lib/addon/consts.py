@@ -15,9 +15,6 @@ TVDB_DISCLAIMER = 'Information provided by TheTVDB.com. Please consider supporti
 
 NODE_BASEDIR = 'special://profile/addon_data/plugin.video.themoviedb.helper/nodes/'
 
-ACCEPTED_MEDIATYPES = (
-    'video', 'movie', 'tvshow', 'season', 'episode', 'musicvideo', 'music', 'song', 'album', 'artist', 'set')
-
 LANGUAGES = (
     'ar-AE', 'ar-SA', 'be-BY', 'bg-BG', 'bn-BD', 'ca-ES', 'ch-GU', 'cs-CZ', 'da-DK', 'de-AT', 'de-CH',
     'de-DE', 'el-GR', 'en-AU', 'en-CA', 'en-GB', 'en-IE', 'en-NZ', 'en-US', 'eo-EO', 'es-ES', 'es-MX',
@@ -243,12 +240,6 @@ TMDB_BASIC_LISTS = {
         'route': {
             'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_related',
             'import_attr': 'ListReviews'
-        },
-    },
-    'collection': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_related',
-            'import_attr': 'ListCollection'
         },
     },
     'movie_keywords': {
@@ -558,6 +549,9 @@ ROUTE_TMDBID = {
     'crew': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.lists_view',
         'import_attr': 'ListCrew'}},
+    'collection': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'import_attr': 'ListSeries'}},
     'stars_in_movies': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.lists_view',
         'import_attr': 'ListStarredMovies'}},

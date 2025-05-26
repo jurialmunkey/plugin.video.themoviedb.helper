@@ -16,7 +16,7 @@ def BaseViewFactory(import_attr, tmdb_type, tmdb_id, season=None, episode=None, 
     mediatype = convert_type(tmdb_type, 'dbtype', season=season, episode=episode)
     clsimport = importmodule(
         module_name=f'tmdbhelper.lib.items.database.baseview_factories.concrete_classes.{import_attr}',
-        import_attr=f'{mediatype.capitalize()}'
+        import_attr=f'{mediatype.capitalize()}' if mediatype != 'set' else 'Series'
     )
     obj = clsimport()
     obj.mediatype = mediatype

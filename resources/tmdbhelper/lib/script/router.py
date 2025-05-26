@@ -26,6 +26,13 @@ def test_func(test_func, **kwargs):
         data = TMDb().get_response_json(path, **kwargs)
         return finalise(head, data)
 
+    def test_func_trakt_response(path, **kwargs):
+        from tmdbhelper.lib.api.trakt.api import TraktAPI
+        head = path
+        data = TraktAPI().get_response(path, **kwargs)
+        data = {'headers': dict(data.headers), 'request': data.json()}
+        return finalise(head, data)
+
     def test_func_fanarttv(ftv_type, ftv_id, **kwargs):
         from tmdbhelper.lib.api.fanarttv.api import FanartTV
         data = FanartTV().get_request(
@@ -89,6 +96,7 @@ def test_func(test_func, **kwargs):
 
     routes = {
         'response': test_func_response,
+        'trakt_response': test_func_trakt_response,
         'baseitem_factory': test_func_baseitem_factory,
         'baseview_factory': test_func_baseview_factory,
         'tmdb_database': test_func_tmdb_database,

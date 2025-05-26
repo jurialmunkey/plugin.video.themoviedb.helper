@@ -173,9 +173,6 @@ class ListItemMonitorFinaliser:
         self.ratings()
         self.get_property('IsUpdatingRatings', clear_property=True)
 
-    def start_process_details(self):
-        self.process_details()
-
     def start_process_artwork(self):
         if not self.artwork_enabled:
             return
@@ -184,28 +181,39 @@ class ListItemMonitorFinaliser:
         with self.mutex_lock:  # Lock to avoid race with artwork monitor
             self.process_artwork()
 
-    def start_process_ratings(self, threaded=False):
+    def start_process_ratings(self):
         if not self.ratings_enabled:
             return
-        if not threaded:
-            self.process_rating()
+        self.process_thread.append(SafeThread(target=self.process_ratings))
+        if self.process_mutex:  # Already have one thread running a loop to clear out the queue
             return
-        self.process_thread = SafeThread(target=self.process_ratings)
-        self.process_thread.start()
+        self.aquire_process_thread()
+
+    def start_process_details(self):
+        self.process_details()
+
+    def aquire_process_thread(self):
+        self.process_mutex = True
+        try:
+            process_thread = self.process_thread.pop(0)
+        except IndexError:
+            self.process_mutex = False
+            return
+        process_thread.start()
+        process_thread.join()
+        return self.aquire_process_thread()
 
     @property
     def process_thread(self):
         return self.parent.process_thread
 
-    @process_thread.setter
-    def process_thread(self, value):
-        self.parent.process_thread = value
+    @property
+    def process_mutex(self):
+        return self.parent.process_mutex
 
-    def aquire_process_thread(self):
-        if not self.process_thread:
-            return
-        self.process_thread.join()
-        self.process_thread = None
+    @process_mutex.setter
+    def process_mutex(self, value):
+        self.parent.process_mutex = value
 
     @cached_property
     def item(self):
@@ -229,13 +237,11 @@ class ListItemMonitorFinaliser:
         # Set some basic details next
         self.start_process_default()
 
-        # Wait for previous ratings process to complete before starting a new one
-        self.aquire_process_thread()
-
         # Process ratings in thread to avoid holding up main loop
-        self.start_process_ratings(threaded=True)
+        t = SafeThread(target=self.start_process_ratings)
+        t.start()
 
-        # Add some additional details
+        # Finalise with extended set_details
         self.start_process_details()
 
 
@@ -294,7 +300,8 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         self._pre_artwork_thread = None
         self._baseitem_skindefaults = BaseItemSkinDefaults()
         self._parent = parent
-        self.process_thread = None
+        self.process_thread = []
+        self.process_mutex = False
 
     # ==========
     # PROPERTIES

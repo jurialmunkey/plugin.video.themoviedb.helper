@@ -87,55 +87,70 @@ class ListMultiSearchDir(ListSearchDir):
 
 
 class ListSearch(ListStandard):
-    item_list_length = None
-    item_list_request_url = 'search/{tmdb_type}?{paramstring}'
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.length = None
+        list_properties.request_url = 'search/{tmdb_type}?{paramstring}'
+        list_properties.localize = 137
+        return list_properties
 
-    @staticmethod
-    def get_search_query(tmdb_type, **kwargs):
+    def get_search_query(self, reload=False, **kwargs):
+        if self.list_properties.query:
+            return self.list_properties.query
+
         from tmdbhelper.lib.addon.consts import PARAM_WIDGETS_RELOAD_FORCED
-        if kwargs.get('reload') == PARAM_WIDGETS_RELOAD_FORCED:
+        if reload == PARAM_WIDGETS_RELOAD_FORCED:
             return
+
         return set_search_history(
             query=Dialog().input(get_localized(32044), type=INPUT_ALPHANUM),
-            tmdb_type=tmdb_type)
+            tmdb_type=self.list_properties.tmdb_type)
 
-    def get_items(self, tmdb_type, query=None, page=1, length=PAGES_LENGTH, update_listing=False, **kwargs):
+    def get_items(self, query=None, page=1, length=PAGES_LENGTH, update_listing=False, **kwargs):
         from urllib.parse import quote_plus
-        original_query = query
+
+        self.list_properties.original_query = query or ''
+        self.list_properties.query = self.list_properties.original_query
 
         # QUERY new query from keyboard if we dont have one
-        query = query or self.get_search_query(tmdb_type, **kwargs)
-
-        if not query:
+        self.list_properties.query = self.get_search_query(**kwargs)
+        if not self.list_properties.query:
             return
 
         # FORCE history to be saved
-        if query and kwargs.get('history', '').lower() == 'true':  # Force saving history
-            set_search_history(query=query, tmdb_type=tmdb_type)
+        if self.list_properties.query and kwargs.get('history', '').lower() == 'true':  # Force saving history
+            set_search_history(
+                query=self.list_properties.query,
+                tmdb_type=self.list_properties.tmdb_type)
 
         request_kwgs = {
-            'query': quote_plus(query),
+            'query': quote_plus(self.list_properties.query),
             'year': kwargs.get('year'),
             'first_air_date_year': kwargs.get('first_air_date_year'),
             'primary_release_year': kwargs.get('primary_release_year')
         }
 
         # MULTI search if searching for both movies and tv
-        request_url = self.item_list_request_url.format(
-            tmdb_type='multi' if tmdb_type == 'both' else tmdb_type,
+        self.list_properties.url = self.list_properties.request_url.format(
+            tmdb_type='multi' if self.list_properties.tmdb_type == 'both' else self.list_properties.tmdb_type,
             paramstring=urlencode(request_kwgs)
         )
 
-        items = self.get_cached_items(
-            request_url,
-            tmdb_type,
-            page=try_int(page) or 1,
-            length=self.item_list_length or try_int(length) or PAGES_LENGTH,
+        self.list_properties.page = try_int(page) or 1
+        self.list_properties.length = self.list_properties.length or try_int(length) or PAGES_LENGTH
+        self.list_properties.items = self.get_cached_items(
+            self.list_properties.url,
+            self.list_properties.tmdb_type,
+            page=self.list_properties.page,
+            length=self.list_properties.length,
             paginated=self.pagination)
 
-        if not original_query:
+        if not self.list_properties.original_query:
             params = merge_two_dicts(kwargs, {
-                'info': 'search', 'tmdb_type': tmdb_type, 'page': page, 'query': query,
+                'info': 'search',
+                'tmdb_type': self.list_properties.tmdb_type,
+                'page': self.list_properties.page,
+                'query': self.list_properties.query,
                 'update_listing': 'True'})
             self.container_update = f'{PLUGINPATH}?{urlencode(params)}'
             self.parent_params = params
@@ -143,7 +158,5 @@ class ListSearch(ListStandard):
             # Prevents onback from re-prompting for user input by re-writing path
 
         self.update_listing = True if update_listing else False
-        self.container_content = convert_type(tmdb_type, 'container', items=items)
-        self.kodi_db = self.get_kodi_database(tmdb_type)
-        self.plugin_category = f'{get_localized(137)} - {query} ({tmdb_type})'
-        return self.get_items_finalised(items, tmdb_type)
+        self.list_properties.plugin_name = f'{{localized}} - {self.list_properties.query.capitalize()} ({{plural}})'
+        return self.get_items_finalised()
