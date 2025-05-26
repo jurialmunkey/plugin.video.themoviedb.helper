@@ -815,6 +815,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'budget': lambda v: self.get_custom_property('budget', f'${float(v):0,.0f}'),
             'revenue': lambda v: self.get_custom_property('revenue', f'${float(v):0,.0f}'),
             'original_language': lambda v: self.get_custom_property('original_language', v),
+            'homepage': lambda v: self.get_custom_property('homepage', v),
             'images': self.get_art,
             'fanart_tv': self.get_fanart_tv,
             'belongs_to_collection': self.get_belongs_to_collection,  # Also mapped in advanced properties for item id
