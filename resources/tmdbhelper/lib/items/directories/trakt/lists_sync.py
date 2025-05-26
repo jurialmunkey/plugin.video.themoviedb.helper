@@ -8,6 +8,15 @@ from jurialmunkey.parser import try_int
 
 class ListSyncProperties(ListProperties):
 
+    next_page = True
+    sync_type = ''  # ItemListSyncDataFactory type
+    item_type = None  # Conversion to type
+    item_keys = None  # Extra keys for filters
+    filters = None
+    sort_by = None
+    sort_how = None
+    params_def = None
+
     @cached_property
     def response(self):
         if not self.sync_data:
@@ -39,17 +48,8 @@ class ListStandardSync(ListDefault):
     list_properties_class = ListSyncProperties
 
     def configure_list_properties(self, list_properties):
-        list_properties.next_page = True
         list_properties.limit = 20 * max(get_setting('pagemulti_sync', 'int'), 1)
-        list_properties.sync_type = ''  # ItemListSyncDataFactory type
-        list_properties.sort_by = None
-        list_properties.sort_how = None
-        list_properties.item_type = None
-        list_properties.filters = None  # Filters for pre-pagination
-        list_properties.item_keys = None  # Extra keys for filters
         list_properties.plugin_name = '{plural} {localized}'
-        list_properties.localize = None
-        list_properties.params_def = None
         return list_properties
 
     def get_items_sync_list_fallback(self, **kwargs):

@@ -15,7 +15,8 @@ class ListProperties:
     params = {}
     filters = {}
     sorted_function = None
-    sorted_reversed = None
+    sorted_reversed = False
+    dbid_sorted = False
 
     @cached_property
     def plural(self):
@@ -64,12 +65,8 @@ class ListDefault(ContainerDefaultCacheDirectory):
 
     def configure_list_properties(self, list_properties):
         list_properties.plugin_name = '{localized} {plural}'
-        list_properties.localize = None
         list_properties.request_url = ''  # PATH to request
         list_properties.results_key = 'results'  # KEY in RESPONSE from PATH holding ITEMS
-        list_properties.dbid_sorted = False
-        list_properties.sorted_reversed = False
-        list_properties.sorted_function = None
         list_properties.filters = self.filters
         return list_properties
 
