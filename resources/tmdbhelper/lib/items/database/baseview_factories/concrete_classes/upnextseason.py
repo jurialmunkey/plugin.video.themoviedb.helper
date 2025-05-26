@@ -24,13 +24,11 @@ class UpNextSeason(AnticipatedSeasonMediaList):
                 '(    SELECT COUNT(simplecache.item_type) '
                 '     FROM simplecache WHERE simplecache.id LIKE season.tvshow_id || ".%"'
                 '                        AND simplecache.last_watched_at IS NULL'
-                '                        AND simplecache.item_type = "episode"'
+                '                        AND simplecache.item_type = \'episode\''
                 '     GROUP BY simplecache.item_type'
                 ') as totalepisodes'
             )
         ])
-        cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('next_aired'))
-        cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('last_aired'))
         return tuple(cached_data_keys)
 
     def map_item_params(self, i):
