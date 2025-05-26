@@ -687,6 +687,10 @@ class ItemMapperMethods:
         infoproperties[days_to_air_name] = str(days_to_air)
         return infoproperties
 
+    @staticmethod
+    def get_custom_property(key, value):
+        return [ExtendedMap('custom', key, False, {'key': key, 'value': value})]
+
 
 class BlankNoneDict(dict):
     def __missing__(self, key):
@@ -808,27 +812,9 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
         }
 
         self.extended_map = {
-            'budget': lambda v: [
-                ExtendedMap('custom', 'budget', False, {
-                    'key': 'budget',
-                    'value': f'${float(v):0,.0f}'
-                })
-            ],
-
-            'revenue': lambda v: [
-                ExtendedMap('custom', 'revenue', False, {
-                    'key': 'revenue',
-                    'value': f'${float(v):0,.0f}'
-                })
-            ],
-
-            'original_language': lambda v: [
-                ExtendedMap('custom', 'original_language', False, {
-                    'key': 'original_language',
-                    'value': v
-                })
-            ],
-
+            'budget': lambda v: self.get_custom_property('budget', f'${float(v):0,.0f}'),
+            'revenue': lambda v: self.get_custom_property('revenue', f'${float(v):0,.0f}'),
+            'original_language': lambda v: self.get_custom_property('original_language', v),
             'images': self.get_art,
             'fanart_tv': self.get_fanart_tv,
             'belongs_to_collection': self.get_belongs_to_collection,  # Also mapped in advanced properties for item id
