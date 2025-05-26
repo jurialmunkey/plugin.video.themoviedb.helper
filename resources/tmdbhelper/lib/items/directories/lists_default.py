@@ -14,6 +14,8 @@ class ListProperties:
     url = None
     params = {}
     filters = {}
+    sorted_function = None
+    sorted_reversed = None
 
     @cached_property
     def plural(self):
@@ -46,11 +48,18 @@ class ListProperties:
             return self.filtered_items
         return sorted(self.filtered_items, key=self.sorted_function, reverse=self.sorted_reversed)
 
+    @property
+    def finalised_items(self):
+        return self.sorted_items
+
 
 class ListDefault(ContainerDefaultCacheDirectory):
+
+    list_properties_class = ListProperties
+
     @cached_property
     def list_properties(self):
-        list_properties = ListProperties()
+        list_properties = self.list_properties_class()
         return self.configure_list_properties(list_properties)
 
     def configure_list_properties(self, list_properties):
@@ -63,6 +72,18 @@ class ListDefault(ContainerDefaultCacheDirectory):
         list_properties.sorted_function = None
         list_properties.filters = self.filters
         return list_properties
+
+    @cached_property
+    def sort_by_dbid(self):
+        if not self.kodi_db:
+            return False
+        if not self.list_properties.dbid_sorted:
+            return False
+        return True
+
+    @cached_property
+    def kodi_db(self):
+        return self.get_kodi_database(self.list_properties.tmdb_type)
 
     @use_item_cache('ItemContainer.db')
     def get_cached_items(self, *args, **kwargs):
@@ -95,19 +116,7 @@ class ListDefault(ContainerDefaultCacheDirectory):
         )
         return self.get_items_finalised()
 
-    @cached_property
-    def sort_by_dbid(self):
-        if not self.kodi_db:
-            return False
-        if not self.list_properties.dbid_sorted:
-            return False
-        return True
-
-    @cached_property
-    def kodi_db(self):
-        return self.get_kodi_database(self.list_properties.tmdb_type)
-
     def get_items_finalised(self):
         self.container_content = self.list_properties.container_content
         self.plugin_category = self.list_properties.plugin_category
-        return self.list_properties.sorted_items
+        return self.list_properties.finalised_items
