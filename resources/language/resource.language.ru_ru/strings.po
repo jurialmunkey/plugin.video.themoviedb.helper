@@ -147,10 +147,9 @@ msgid "Invalidate Sync Data"
 msgstr "Аннулировать данные синхронизации"
 
 #: /resources/tmdbhelper/lib/script/method/trakt.py
-#, fuzzy
 msgctxt "#32027"
 msgid "Successfully cleared {} sync data"
-msgstr "Успешно очищены данные синхронизации для {}"
+msgstr "Успешно очищены данные синхронизации - {}"
 
 #: /resources/tmdbhelper/lib/script/method/trakt.py
 #, fuzzy
@@ -205,6 +204,17 @@ msgctxt "#32039"
 msgid "Prefer fanart.tv artwork"
 msgstr "Предпочитать иллюстрации fanart.tv"
 
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_seasons.py
+msgctxt "#32040"
+msgid "All seasons"
+msgstr "Все сезоны"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+#, fuzzy
+msgctxt "#32041"
+msgid "Your In-Progress TV Shows"
+msgstr "Продолжить просмотр (Сериалы)"
+
 msgctxt "#30026"
 msgid "French (Canada)"
 msgstr "Французский (Канада)"
@@ -216,6 +226,51 @@ msgstr "Французский (Франция)"
 msgctxt "#30028"
 msgid "Galician (Spain)"
 msgstr "Галисийский (Испания)"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+#, fuzzy
+msgctxt "#32045"
+msgid "Your In-Progress Movies"
+msgstr "Продолжить просмотр (Фильмы)"
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32046"
+msgid "Drop TV show"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32047"
+msgid "Undrop TV show"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32048"
+msgid "Dropped TV Shows"
+msgstr ""
+
+#: /resources/settings.xml
+#, fuzzy
+msgctxt "#32049"
+msgid ""
+"Sort order of Your Next Episodes list. By airdate sorts episodes by premiere "
+"date. By recentlywatched sorts episodes by most recently watched tvshow. By "
+"todays is recentlywatched with episodes airing today at the front. By "
+"lastweek is recentlywatched with episodes airing in the past week sorted by "
+"airdate at the front."
+msgstr ""
+"Порядок сортировки списка «Ваши следующие серии». По дате выхода в эфир "
+"(airdate) сортирует серии по дате премьеры. По недавно просмотренным "
+"(recentlywatched) сортирует серии по последним просмотренным сериалам. По "
+"сегодняшним (todays) - это недавно просмотренные, с сериями, которые выходят "
+"в эфир сегодня в начале. По прошлой неделе (lastweek) - это недавно "
+"просмотренные серии, вышедшие в эфир на прошлой неделе, отсортированные по "
+"дате выхода в эфир в начале."
+
+#: /resources/settings.xml
+#, fuzzy
+msgctxt "#32050"
+msgid "Prefer artwork in your language"
+msgstr "Предпочитать иллюстрации на вашем языке"
 
 msgctxt "#30029"
 msgid "Hebrew (Israel)"
@@ -2359,7 +2414,6 @@ msgid "Scrobble items played via TMDbHelper"
 msgstr "Скробблинг воспроизводимого через TMDbHelper"
 
 #: /resources/tmdbhelper/lib/script/sync.py
-#, fuzzy
 msgctxt "#32530"
 msgid "Remove rating"
 msgstr "Удалить оценку"

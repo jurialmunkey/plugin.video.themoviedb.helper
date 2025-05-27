@@ -1,6 +1,6 @@
 name: Bug report
 description: Create a report to help us improve
-title: "[BUG] Description"
+title: ":bug: Description"
 labels: bug
 body:
 - type: textarea
@@ -12,7 +12,10 @@ body:
 - type: textarea
   attributes:
     label: Steps To Reproduce
-    description: Steps to reproduce the behavior. Failing to complete this section correctly will result in your issue being closed.
+    description: |
+      Steps to reproduce the behavior.
+      If the issue is skinning related, please provide full plugin:// path and/or the specific $INFO[] values not working.
+      If the issues is user related, please provide exact steps to reproduce the issue including relevant settings.
     placeholder: |
       1. Go to ...
       2. Click on ...

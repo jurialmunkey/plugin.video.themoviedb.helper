@@ -66,8 +66,9 @@ class AnticipatedSeasonMediaList(AnticipatedSeasonMediaListMixin, SeasonMediaLis
 
     def get_cached_data_keys(self):
         """ SELECT """
-        deniedlist_keys = ('plot', )
-        additional_keys = [
+
+        cached_data_keys = [f'{self.table}.{k}' for k in self.keys if k != 'plot']
+        cached_data_keys.extend([
             'tvshow.title AS tvshowtitle',
             'tvshow.tagline as tagline',
             'ifnull(season.plot, tvshow.plot) as plot',
@@ -78,8 +79,8 @@ class AnticipatedSeasonMediaList(AnticipatedSeasonMediaListMixin, SeasonMediaLis
                 '     GROUP BY episode.season_id'
                 ') as totalepisodes'
             )
-        ]
-        return tuple([f'{self.table}.{k}' for k in self.keys if k not in deniedlist_keys] + additional_keys)
+        ])
+        return tuple(cached_data_keys)
 
     def map_item_params(self, i):
         return {

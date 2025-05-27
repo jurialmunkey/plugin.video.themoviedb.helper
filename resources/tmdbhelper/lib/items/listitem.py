@@ -489,7 +489,7 @@ class _Tvshow(_Video):
 
     @property
     def watchedepisodes(self):
-        if self.totalepisodes is None:
+        if not self.totalepisodes:
             return
         return try_int(self.infoproperties.get('watchedepisodes'), fallback=None)
 
@@ -501,6 +501,8 @@ class _Tvshow(_Video):
 
     @property
     def watchedprogress(self):
+        if not self.totalepisodes:
+            return
         if self.watchedepisodes is None:
             return
         return int(self.watchedepisodes * 100 / self.totalepisodes)

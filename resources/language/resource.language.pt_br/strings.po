@@ -195,6 +195,21 @@ msgctxt "#30025"
 msgid "Finnish (Finland)"
 msgstr "Finlandês (Finlândia)"
 
+#: /resources/settings.xml
+msgctxt "#32039"
+msgid "Prefer fanart.tv artwork"
+msgstr "Prefirir artes do fanart.tv"
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_seasons.py
+msgctxt "#32040"
+msgid "All seasons"
+msgstr "Todas as temporadas"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32041"
+msgid "Your In-Progress TV Shows"
+msgstr "Seus Seriados em Andamento"
+
 msgctxt "#30026"
 msgid "French (Canada)"
 msgstr "Francês (Canadá)"
@@ -206,6 +221,36 @@ msgstr "Francês (França)"
 msgctxt "#30028"
 msgid "Galician (Spain)"
 msgstr "Galego (Espanha)"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32045"
+msgid "Your In-Progress Movies"
+msgstr "Seus Filmes em Andamento"
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32046"
+msgid "Drop TV show"
+msgstr "Abandonar Seriado"
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32047"
+msgid "Undrop TV show"
+msgstr "Desabandonar Seriado"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32048"
+msgid "Dropped TV Shows"
+msgstr "Seriados Abandonados"
+
+#: /resources/settings.xml
+msgctxt "#32049"
+msgid "Sort order of Your Next Episodes list. By airdate sorts episodes by premiere date. By recentlywatched sorts episodes by most recently watched tvshow. By todays is recentlywatched with episodes airing today at the front. By lastweek is recentlywatched with episodes airing in the past week sorted by airdate at the front."
+msgstr "Ordem de classificação da lista Seus Próximos Episódios. Por data de exibição classifica os episódios por data de estreia. Por episódios de tipos assistidos recentemente por seriado assistido mais recentemente. Por hoje é recentemente assistido com episódios que vão ao ar hoje na frente. Na semana passada é assistido recentemente com episódios que foram ao ar na semana passada classificados por data de exibição na frente."
+
+#: /resources/settings.xml
+msgctxt "#32050"
+msgid "Prefer artwork in your language"
+msgstr "Prefirir artes no seu idioma"
 
 msgctxt "#30029"
 msgid "Hebrew (Israel)"

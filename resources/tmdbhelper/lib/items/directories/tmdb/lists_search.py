@@ -106,9 +106,9 @@ class ListSearch(ListStandard):
             query=Dialog().input(get_localized(32044), type=INPUT_ALPHANUM),
             tmdb_type=self.list_properties.tmdb_type)
 
-    def get_items(self, query=None, page=1, length=PAGES_LENGTH, update_listing=False, **kwargs):
+    def get_items(self, tmdb_type, query=None, page=1, length=PAGES_LENGTH, update_listing=False, **kwargs):
         from urllib.parse import quote_plus
-
+        self.list_properties.tmdb_type = tmdb_type
         self.list_properties.original_query = query or ''
         self.list_properties.query = self.list_properties.original_query
 
