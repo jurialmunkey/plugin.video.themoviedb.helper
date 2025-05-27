@@ -1,6 +1,6 @@
 name: Feature request
 description: Suggest an idea for this project
-title: "[Feature] Description"
+title: ":sparkles: Description"
 labels: enhancement
 body:
 - type: textarea
