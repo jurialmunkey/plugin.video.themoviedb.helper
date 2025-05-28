@@ -229,7 +229,7 @@ class ItemCollections(ItemViews):
 
 
 class ListCollections(ContainerDirectory):
-    def get_items(self, limit=250, page=1, **kwargs):
+    def get_items(self, limit=20, page=1, **kwargs):
         items = self.tmdb_api.tmdb_database.get_collections(limit=int(limit), page=int(page))
         items = [ItemCollections(i).item for i in items]
         items.append({'next_page': int(page) + 1})

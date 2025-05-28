@@ -43,7 +43,7 @@ class TMDbDatabaseCollections:
         },
     }
 
-    def get_collections(self, limit=250, page=1):
+    def get_collections(self, limit=20, page=1):
         daily_export = TableDailyExport(self)
         daily_export.table = 'collections'
         daily_export.keys = ('id', 'name', )
