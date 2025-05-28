@@ -12,7 +12,7 @@ class MonitorItemDetails(ImageManipulations):
     allow_label_query = ('movies', 'tvshows', 'actors', 'sets', 'multi')
     allow_episode = ('episodes', 'multi')
     allow_season = ('seasons', 'episodes', 'multi')
-    allow_base_id = ('movies', 'tvshows', 'actors')
+    allow_base_id = ('movies', 'tvshows', 'actors', 'sets')
     allow_year = ('movies', )
 
     container_dbtype_to_tmdb_type = {
