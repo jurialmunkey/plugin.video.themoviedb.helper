@@ -268,7 +268,7 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         self._pre_item = 1
         self._cur_window = 0
         self._pre_window = 1
-        self._ignored_labels = ['..', get_localized(33078).lower(), get_localized(209).lower()]
+        self._ignored_labels = ('..', get_localized(33078).lower(), get_localized(209).lower())
         self._listcontainer = None
         self._last_listitem = None
         self.property_prefix = 'ListItem'

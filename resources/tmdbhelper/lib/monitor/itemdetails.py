@@ -302,8 +302,7 @@ class MonitorItemDetails(ImageManipulations):
             return
         if not infoproperties:
             return
-        for k, v in infoproperties.items():
-            self.item['infoproperties'][k] = v
+        self.item['infoproperties'].update(infoproperties or {})
 
     @property
     def is_same_item(self):
