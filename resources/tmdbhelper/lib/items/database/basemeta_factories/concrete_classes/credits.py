@@ -7,7 +7,14 @@ class CastMember(ItemDetailsList):
     conditions = 'parent_id=? ORDER BY IFNULL(ordering, 9999) ASC LIMIT 100'  # WHERE conditions  # TODO: Move limit to settings ???
     cached_data_keys = (
         'castmember.tmdb_id', 'role', 'ordering', 'appearances',
-        'thumb', 'name', 'gender', 'biography', 'known_for_department')
+        'name', 'gender', 'biography', 'known_for_department',
+        (
+            '(    SELECT art.icon FROM art'
+            '     WHERE art.parent_id=\'person.\' || castmember.tmdb_id AND art.type=\'profiles\' '
+            '     ORDER BY art.rating DESC LIMIT 1'
+            ') as thumb'
+        ),
+    )
 
     def image_path_func(self, v):
         return self.common_apis.tmdb_imagepath.get_imagepath_poster(v)
@@ -23,7 +30,14 @@ class CrewMember(CastMember):
     conditions = 'parent_id=? ORDER BY appearances DESC LIMIT 100'
     cached_data_keys = (
         'crewmember.tmdb_id', 'role', 'department', 'appearances',
-        'thumb', 'name', 'gender', 'biography', 'known_for_department')
+        'name', 'gender', 'biography', 'known_for_department',
+        (
+            '(    SELECT art.icon FROM art'
+            '     WHERE art.parent_id=\'person.\' || crewmember.tmdb_id AND art.type=\'profiles\' '
+            '     ORDER BY art.rating DESC LIMIT 1'
+            ') as thumb'
+        ),
+    )
 
 
 class Creator(CrewMember):
@@ -100,5 +114,5 @@ class Editor(CrewMember):
 
 class Person(ItemDetailsList):
     table = 'person'
-    keys = ('id', 'tmdb_id', 'thumb', 'name', 'gender', 'biography', 'known_for_department')
+    keys = ('id', 'tmdb_id', 'name', 'gender', 'biography', 'known_for_department')
     conditions = 'tmdb_id=?'

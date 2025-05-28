@@ -39,10 +39,25 @@ class Movie(MediaItem):
         cached_data_keys = [f'{self.table}.{k}' for k in self.keys]
         cached_data_keys.extend([
             'collection.title AS collection_title',
-            'collection.poster AS collection_poster',
-            'collection.fanart AS collection_fanart',
             'collection.tmdb_id AS collection_tmdb_id',
             'collection.id AS collection_id',
+            (
+                '(  SELECT art.icon FROM art'
+                '   WHERE art.parent_id=collection_id AND type=\'posters\' '
+                '   ORDER BY '
+                f'           iso_language=\'{self.common_apis.tmdb_api.iso_language}\' DESC, '
+                '            iso_language=\'en\' DESC, '
+                '            iso_language IS NULL DESC, '
+                '            rating DESC'
+                '   LIMIT 1'
+                ') as collection_poster'
+            ),
+            (
+                '(  SELECT art.icon FROM art'
+                '   WHERE art.parent_id=collection_id AND type=\'backdrops\' AND iso_language IS NULL'
+                '   ORDER BY rating DESC LIMIT 1'
+                ') as collection_fanart'
+            ),
         ])
         return tuple(cached_data_keys)
 

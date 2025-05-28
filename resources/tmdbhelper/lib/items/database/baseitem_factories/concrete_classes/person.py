@@ -45,6 +45,12 @@ class Person(BaseItem):
                 '     WHERE crewmember.tmdb_id=person.tmdb_id '
                 ') as total_tvshows_crew'
             ),
+            (
+                '(    SELECT art.icon FROM art'
+                '     WHERE art.parent_id=person.id AND type=\'profiles\' '
+                '     ORDER BY rating DESC LIMIT 1'
+                ') as thumb'
+            ),
         ])
         return cached_data_keys
 

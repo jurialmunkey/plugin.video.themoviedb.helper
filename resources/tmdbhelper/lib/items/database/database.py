@@ -38,7 +38,7 @@ class ItemDetailsDatabase(Database):
         super().__init__(filename=self.cache_filename)
 
     # DB version must be max of table_version
-    database_version = 25
+    database_version = 26
 
     database_changes = {
         21: (
@@ -58,6 +58,15 @@ class ItemDetailsDatabase(Database):
         ),
         25: (
             'DROP TABLE custom',
+        ),
+        26: (
+            'DROP TABLE collection',
+            'DROP TABLE video',
+            'DROP TABLE unique_id',
+            'DROP TABLE art',
+            'DROP TABLE fanart_tv',
+            'DROP TABLE person',
+            'DROP TABLE baseitem',
         ),
     }
 
