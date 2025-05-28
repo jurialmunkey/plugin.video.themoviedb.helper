@@ -175,16 +175,6 @@ class CommonMonitorItem:
         if not isinstance(dictionary, dict):
             return
 
-        def get_list(key, value):
-            slashed_values = ' / '.join(value)
-            newline_values = '[CR]'.join(value)
-            indexed_values = [(f'{key}.{x}', i) for x, i in enumerate(value, 1)]
-            return ((key, slashed_values), (f'{key}_CR', newline_values), *indexed_values)
-
-        def set_list(key, value):
-            for k, v in get_list(key, value):
-                self.set_property(k, v)
-
         for k, v in dictionary.items():
             if v is None:
                 continue
@@ -193,7 +183,7 @@ class CommonMonitorItem:
                 k = f'{k}_{affix}'
 
             if isinstance(v, list):
-                set_list(k, v)
+                self.set_property(k, ' / '.join(v))
                 continue
 
             if isinstance(v, dict):
