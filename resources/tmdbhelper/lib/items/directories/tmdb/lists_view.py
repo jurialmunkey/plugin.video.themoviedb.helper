@@ -90,7 +90,7 @@ Keywords
 
 class ItemKeywords(ItemViews):
 
-    item_mediatype = 'keyword'
+    item_mediatype = 'tag'
 
     def __init__(self, meta):
         self.meta = meta
@@ -110,11 +110,12 @@ class ItemKeywords(ItemViews):
 
 
 class ListKeywords(ContainerDirectory):
-    def get_items(self, **kwargs):
-        items = self.tmdb_api.tmdb_database.get_keywords()
+    def get_items(self, limit=250, page=1, **kwargs):
+        items = self.tmdb_api.tmdb_database.get_keywords(limit=int(limit), page=int(page))
         items = [ItemKeywords(i).item for i in items]
+        items.append({'next_page': int(page) + 1})
         self.kodi_db = None
-        self.container_content = ''
+        self.container_content = 'tags'
         # self.plugin_category = get_localized(135)  # convert_type(tmdb_type, 'plural')
         return items
 
@@ -126,7 +127,7 @@ Networks
 
 class ItemNetworks(ItemViews):
 
-    item_mediatype = 'keyword'
+    item_mediatype = 'studio'
 
     def __init__(self, meta):
         self.meta = meta
@@ -146,11 +147,12 @@ class ItemNetworks(ItemViews):
 
 
 class ListNetworks(ContainerDirectory):
-    def get_items(self, **kwargs):
-        items = self.tmdb_api.tmdb_database.get_networks()
+    def get_items(self, limit=250, page=1, **kwargs):
+        items = self.tmdb_api.tmdb_database.get_networks(limit=int(limit), page=int(page))
         items = [ItemNetworks(i).item for i in items]
+        items.append({'next_page': int(page) + 1})
         self.kodi_db = None
-        self.container_content = ''
+        self.container_content = 'studios'
         # self.plugin_category = get_localized(135)  # convert_type(tmdb_type, 'plural')
         return items
 
@@ -162,7 +164,7 @@ Studios
 
 class ItemStudios(ItemViews):
 
-    item_mediatype = 'keyword'
+    item_mediatype = 'studio'
 
     def __init__(self, meta):
         self.meta = meta
@@ -182,11 +184,48 @@ class ItemStudios(ItemViews):
 
 
 class ListStudios(ContainerDirectory):
-    def get_items(self, **kwargs):
-        items = self.tmdb_api.tmdb_database.get_studios()
+    def get_items(self, limit=250, page=1, **kwargs):
+        items = self.tmdb_api.tmdb_database.get_studios(limit=int(limit), page=int(page))
         items = [ItemStudios(i).item for i in items]
+        items.append({'next_page': int(page) + 1})
         self.kodi_db = None
-        self.container_content = ''
+        self.container_content = 'studios'
+        # self.plugin_category = get_localized(135)  # convert_type(tmdb_type, 'plural')
+        return items
+
+
+"""
+Collections
+"""
+
+
+class ItemCollections(ItemViews):
+
+    item_mediatype = 'set'
+
+    def __init__(self, meta):
+        self.meta = meta
+        self.label = self.meta['name']
+        self.tmdb_id = self.meta['id']
+        self.tmdb_type = 'collection'
+
+    @cached_property
+    def params(self):
+        return {
+            'info': 'collection',
+            'tmdb_type': self.tmdb_type,
+            'tmdb_id': self.tmdb_id,
+            'plugin_category': self.label,
+        }
+
+
+class ListCollections(ContainerDirectory):
+    def get_items(self, limit=250, page=1, **kwargs):
+        items = self.tmdb_api.tmdb_database.get_collections(limit=int(limit), page=int(page))
+        items = [ItemCollections(i).item for i in items]
+        items.append({'next_page': int(page) + 1})
+        self.kodi_db = None
+        self.container_content = 'sets'
         # self.plugin_category = get_localized(135)  # convert_type(tmdb_type, 'plural')
         return items
 
