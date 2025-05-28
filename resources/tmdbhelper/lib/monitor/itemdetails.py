@@ -24,11 +24,10 @@ class MonitorItemDetails(ImageManipulations):
         'sets': 'collection'
     }
 
-    def __init__(self, parent, position=0, level=1):
+    def __init__(self, parent, position=0):
         self.parent = parent  # ListItemMonitorFunctions
         self.position = position
         self.identifier  # Set this immediately so we have a reference point
-        self.level = level  # Set as 1 for basic, or 2 for detailed
 
     def configure(self):
         """
@@ -45,20 +44,10 @@ class MonitorItemDetails(ImageManipulations):
 
     @property
     def is_extended(self):
-        if self.level < 2:
-            return False
         return get_condvisibility((
             '!Skin.HasSetting(TMDbHelper.DisableExtendedProperties) | '
             '!String.IsEmpty(Window.Property(TMDbHelper.EnableExtendedProperties))'
         ))
-
-    @property
-    def is_detailed(self):
-        if self.is_extended:
-            return True
-        if self.level > 1:
-            return True
-        return False
 
     @cached_property
     def infolabel_property_tmdb_type(self):
@@ -338,7 +327,7 @@ class MonitorItemDetails(ImageManipulations):
 
     def get_lidc_item(self):
         self.parent.lidc.extendedinfo = self.is_extended
-        self.parent.lidc.cache_refresh = None if self.is_detailed else 'basic'
+        self.parent.lidc.cache_refresh = None
         return self.parent.lidc.get_item(self.tmdb_type, self.tmdb_id, self.season, self.episode)
 
     def update_lidc_item(self):
