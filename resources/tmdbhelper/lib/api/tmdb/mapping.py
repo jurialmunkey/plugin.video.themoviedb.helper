@@ -60,23 +60,23 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'func': self.tmdb_imagepath.get_imagepath_poster
             }],
             'profile_path': [{
-                'keys': [('art', 'poster'), ('art', 'profile')],
+                'keys': [('art', 'thumb')],
                 'func': self.tmdb_imagepath.get_imagepath_poster
             }],
             'file_path': [{
-                'keys': [('art', 'poster'), ('art', 'file')],
+                'keys': [('art', 'thumb')],
                 'func': self.tmdb_imagepath.get_imagepath_origin
             }],
             'still_path': [{
-                'keys': [('art', 'thumb'), ('art', 'still')],
+                'keys': [('art', 'thumb')],
                 'func': self.tmdb_imagepath.get_imagepath_thumbs
             }],
             'logo_path': [{
-                'keys': [('art', 'thumb'), ('art', 'logo')],
+                'keys': [('art', 'thumb')],
                 'func': self.tmdb_imagepath.get_imagepath_origin
             }],
             'backdrop_path': [{
-                'keys': [('art', 'fanart'), ('art', 'backdrop')],
+                'keys': [('art', 'fanart')],
                 'func': self.tmdb_imagepath.get_imagepath_fanart
             }],
             'release_date': [{
