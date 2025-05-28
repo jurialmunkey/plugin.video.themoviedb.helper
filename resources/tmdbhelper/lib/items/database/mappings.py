@@ -691,6 +691,14 @@ class ItemMapperMethods:
     def get_custom_property(key, value):
         return [ExtendedMap('custom', key, False, {'key': key, 'value': value})]
 
+    @staticmethod
+    def get_art_property(path, art_type):
+        return [ExtendedMap('art', path, False, {
+            'icon': path,
+            'type': art_type,
+            'extension': path.split('.')[-1] if path else None
+        })]
+
 
 class BlankNoneDict(dict):
     def __missing__(self, key):
@@ -816,6 +824,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'revenue': lambda v: self.get_custom_property('revenue', f'${float(v):0,.0f}'),
             'original_language': lambda v: self.get_custom_property('original_language', v),
             'homepage': lambda v: self.get_custom_property('homepage', v),
+            'poster_path': lambda v: self.get_art_property(v, 'posters'),
+            'backdrop_path': lambda v: self.get_art_property(v, 'backdrops'),
             'images': self.get_art,
             'fanart_tv': self.get_fanart_tv,
             'belongs_to_collection': self.get_belongs_to_collection,  # Also mapped in advanced properties for item id
@@ -946,6 +956,6 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
         # from tmdbhelper.lib.files.futils import dumps_to_file
         # dumps_to_file(
         #     {'data': self.data, 'item': self.item},
-        #     'log_data', f'mappings_{self.tmdb_id}_{data["title"]}.json', join_addon_data=True)
+        #     'log_data', f'mappings_{self.tmdb_id}_{data["name"]}.json', join_addon_data=True)
 
         return self.item

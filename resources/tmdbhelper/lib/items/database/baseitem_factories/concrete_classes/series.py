@@ -6,7 +6,7 @@ class Series(BaseItem):
     tmdb_type = 'collection'
     ftv_id = None
 
-    online_data_kwgs = {}
+    # online_data_kwgs = {}
 
     @property
     def cached_data_keys(self):
