@@ -11,7 +11,7 @@ import itertools
 
 
 class ListItemConfig:
-    listitem_cacher_permitted_types = ('movie', 'tvshow', 'season', 'episode', 'person')
+    listitem_cacher_permitted_types = ('movie', 'tvshow', 'season', 'episode', 'person', 'set')
 
     def __init__(self, parent, item):
         if parent.__class__.__name__ != 'ListItemDetails':
@@ -73,6 +73,8 @@ class ListItemConfig:
             return self.listitem.unique_ids.get('tvshow.tmdb')
         if self.mediatype == 'person':
             return self.listitem.unique_ids.get('tmdb') or self.listitem.infoproperties.get('tmdb_id')
+        if self.mediatype == 'set':
+            return self.listitem.unique_ids.get('tmdb')
         return
 
     @cached_property
@@ -87,6 +89,8 @@ class ListItemConfig:
             return 'tv'
         if self.mediatype == 'person':
             return 'person'
+        if self.mediatype == 'set':
+            return 'collection'
         return
 
     @cached_property

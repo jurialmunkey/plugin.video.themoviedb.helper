@@ -28,6 +28,14 @@ class ItemViews:
         }
 
     @cached_property
+    def infoproperties(self):
+        return {}
+
+    @cached_property
+    def unique_ids(self):
+        return {'tmdb': self.tmdb_id}
+
+    @cached_property
     def icon(self):
         if not self.item_icon_location:
             return self.item_icon_default
@@ -45,9 +53,10 @@ class ItemViews:
         return {
             'label': self.label,
             'infolabels': self.infolabels,
-            'infoproperties': {},
+            'infoproperties': self.infoproperties,
             'art': self.art,
-            'params': self.params
+            'params': self.params,
+            'unique_ids': self.unique_ids
         }
 
 
