@@ -218,22 +218,25 @@ class ListItemMonitorFinaliser:
         # Set artwork to monitor as priority
         self.start_process_artwork()
 
-        # Set some basic details next
-        self.start_process_default()
-
         # Process ratings in thread to avoid holding up main loop
         t = SafeThread(target=self.start_process_ratings)
         t.start()
+
+        # Set some basic details next
+        self.start_process_default()
 
 
 class ListItemMonitorFinaliserContainerMethod(ListItemMonitorFinaliser):
 
     def start_process_default(self):
-        self.listitem.setArt(self.processed_artwork)
-        self.add_item_listcontainer(self.listitem)  # Add item to container
+        with self.mutex_lock:
+            self.listitem.setArt(self.processed_artwork)
+            self.add_item_listcontainer(self.listitem)  # Add item to container
 
     def set_ratings(self):
-        self.listitem.setProperties(self.item.all_ratings)
+        ratings = self.item.all_ratings
+        with self.mutex_lock:
+            self.listitem.setProperties(ratings)
 
     def initial_checks(self):
         if not self.item:
@@ -372,9 +375,6 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
 
         # Set a property for skins to check if item details are updating
         self.get_property('IsUpdating', 'True')
-
-        # Configure the item to retrieve details
-        self._item.configure()
 
         # Finish up setting our details to the container/window
         self.on_finalise()

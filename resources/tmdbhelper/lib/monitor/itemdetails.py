@@ -29,15 +29,6 @@ class MonitorItemDetails(ImageManipulations):
         self.position = position
         self.identifier  # Set this immediately so we have a reference point
 
-    def configure(self):
-        """
-        Attributes that should be called immediately to do lookup now
-        """
-        self.item
-        self.folderpath
-        self.filenameandpath
-        self.person_stats
-
     """
     infolabels
     """
@@ -257,25 +248,6 @@ class MonitorItemDetails(ImageManipulations):
         return self.parent.get_infolabel(info, self.position)
 
     @cached_property
-    def person_stats(self):
-        if get_condvisibility("Skin.HasSetting(TMDbHelper.DisablePersonStats)"):
-            return {}
-        if not self.item:
-            return {}
-        if self.tmdb_type != 'person':
-            return {}
-        try:
-            query = self.item['infolabels']['title']
-        except (KeyError, AttributeError, NameError):
-            return {}
-        from tmdbhelper.lib.api.kodi.rpc import get_person_stats
-        person_stats = get_person_stats(query)
-        if not person_stats:
-            return {}
-        self.item.setdefault('infoproperties', {}).update(person_stats)
-        return person_stats
-
-    @cached_property
     def all_ratings(self):
         if self.tmdb_type not in ('movie', 'tv'):
             return {}
@@ -283,26 +255,14 @@ class MonitorItemDetails(ImageManipulations):
             return {}
         return self.parent.get_all_ratings(self.tmdb_type, self.tmdb_id, self.season, self.episode) or {}
 
-    @cached_property
-    def folderpath(self):
-        if not self.item:
-            return
-        self.item['folderpath'] = self.item['infoproperties']['folderpath'] = self.infolabel_folderpath
-        return self.infolabel_folderpath
-
-    @cached_property
-    def filenameandpath(self):
-        if not self.item:
-            return
-        self.item['filenameandpath'] = self.item['infoproperties']['filenameandpath'] = self.infolabel_filenameandpath
-        return self.infolabel_filenameandpath
-
     def set_additional_properties(self, infoproperties=None):
         if not self.item:
             return
         if not infoproperties:
             return
         self.item['infoproperties'].update(infoproperties or {})
+        self.item['folderpath'] = self.item['infoproperties']['folderpath'] = self.infolabel_folderpath
+        self.item['filenameandpath'] = self.item['infoproperties']['filenameandpath'] = self.infolabel_filenameandpath
 
     @property
     def is_same_item(self):
