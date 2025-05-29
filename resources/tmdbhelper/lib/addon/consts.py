@@ -260,6 +260,30 @@ TMDB_BASIC_LISTS = {
             'import_attr': 'ListProviders'
         },
     },
+    'all_studios': {
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+            'import_attr': 'ListStudios'
+        },
+    },
+    'all_networks': {
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+            'import_attr': 'ListNetworks'
+        },
+    },
+    'all_collections': {
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+            'import_attr': 'ListCollections'
+        },
+    },
+    'all_keywords': {
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+            'import_attr': 'ListKeywords'
+        },
+    },
     'tmdb_v4_recommendations': {
         'route': {
             'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',

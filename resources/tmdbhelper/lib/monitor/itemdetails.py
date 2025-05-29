@@ -12,7 +12,7 @@ class MonitorItemDetails(ImageManipulations):
     allow_label_query = ('movies', 'tvshows', 'actors', 'sets', 'multi')
     allow_episode = ('episodes', 'multi')
     allow_season = ('seasons', 'episodes', 'multi')
-    allow_base_id = ('movies', 'tvshows', 'actors')
+    allow_base_id = ('movies', 'tvshows', 'actors', 'sets')
     allow_year = ('movies', )
 
     container_dbtype_to_tmdb_type = {
@@ -24,20 +24,10 @@ class MonitorItemDetails(ImageManipulations):
         'sets': 'collection'
     }
 
-    def __init__(self, parent, position=0, level=1):
+    def __init__(self, parent, position=0):
         self.parent = parent  # ListItemMonitorFunctions
         self.position = position
         self.identifier  # Set this immediately so we have a reference point
-        self.level = level  # Set as 1 for basic, or 2 for detailed
-
-    def configure(self):
-        """
-        Attributes that should be called immediately to do lookup now
-        """
-        self.item
-        self.folderpath
-        self.filenameandpath
-        self.person_stats
 
     """
     infolabels
@@ -45,20 +35,10 @@ class MonitorItemDetails(ImageManipulations):
 
     @property
     def is_extended(self):
-        if self.level < 2:
-            return False
         return get_condvisibility((
             '!Skin.HasSetting(TMDbHelper.DisableExtendedProperties) | '
             '!String.IsEmpty(Window.Property(TMDbHelper.EnableExtendedProperties))'
         ))
-
-    @property
-    def is_detailed(self):
-        if self.is_extended:
-            return True
-        if self.level > 1:
-            return True
-        return False
 
     @cached_property
     def infolabel_property_tmdb_type(self):
@@ -268,25 +248,6 @@ class MonitorItemDetails(ImageManipulations):
         return self.parent.get_infolabel(info, self.position)
 
     @cached_property
-    def person_stats(self):
-        if get_condvisibility("Skin.HasSetting(TMDbHelper.DisablePersonStats)"):
-            return {}
-        if not self.item:
-            return {}
-        if self.tmdb_type != 'person':
-            return {}
-        try:
-            query = self.item['infolabels']['title']
-        except (KeyError, AttributeError, NameError):
-            return {}
-        from tmdbhelper.lib.api.kodi.rpc import get_person_stats
-        person_stats = get_person_stats(query)
-        if not person_stats:
-            return {}
-        self.item.setdefault('infoproperties', {}).update(person_stats)
-        return person_stats
-
-    @cached_property
     def all_ratings(self):
         if self.tmdb_type not in ('movie', 'tv'):
             return {}
@@ -294,27 +255,14 @@ class MonitorItemDetails(ImageManipulations):
             return {}
         return self.parent.get_all_ratings(self.tmdb_type, self.tmdb_id, self.season, self.episode) or {}
 
-    @cached_property
-    def folderpath(self):
-        if not self.item:
-            return
-        self.item['folderpath'] = self.item['infoproperties']['folderpath'] = self.infolabel_folderpath
-        return self.infolabel_folderpath
-
-    @cached_property
-    def filenameandpath(self):
-        if not self.item:
-            return
-        self.item['filenameandpath'] = self.item['infoproperties']['filenameandpath'] = self.infolabel_filenameandpath
-        return self.infolabel_filenameandpath
-
     def set_additional_properties(self, infoproperties=None):
         if not self.item:
             return
         if not infoproperties:
             return
-        for k, v in infoproperties.items():
-            self.item['infoproperties'][k] = v
+        self.item['infoproperties'].update(infoproperties or {})
+        self.item['folderpath'] = self.item['infoproperties']['folderpath'] = self.infolabel_folderpath
+        self.item['filenameandpath'] = self.item['infoproperties']['filenameandpath'] = self.infolabel_filenameandpath
 
     @property
     def is_same_item(self):
@@ -338,7 +286,7 @@ class MonitorItemDetails(ImageManipulations):
 
     def get_lidc_item(self):
         self.parent.lidc.extendedinfo = self.is_extended
-        self.parent.lidc.cache_refresh = None if self.is_detailed else 'basic'
+        self.parent.lidc.cache_refresh = None
         return self.parent.lidc.get_item(self.tmdb_type, self.tmdb_id, self.season, self.episode)
 
     def update_lidc_item(self):

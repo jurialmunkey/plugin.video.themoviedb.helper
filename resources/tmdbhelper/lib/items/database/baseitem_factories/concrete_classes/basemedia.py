@@ -10,6 +10,7 @@ class MediaItem(BaseItem):
         """ Database tables that will have data set as part of cache setter """
         return (
             self.return_basemeta_db('base'),
+            self.return_basemeta_db('belongs'),
             self.return_basemeta_db('genre'),
             self.return_basemeta_db('country'),
             self.return_basemeta_db('certification'),

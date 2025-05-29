@@ -30,7 +30,8 @@ class Movie(MediaItem):
         """ FROM """
         return (
             f'baseitem LEFT JOIN {self.table} ON {self.table}.id = baseitem.id '
-            f'LEFT JOIN collection ON collection.id = {self.table}.collection_id '
+            f'LEFT JOIN belongs ON belongs.id = {self.table}.id '
+            f'LEFT JOIN collection ON collection.id = belongs.parent_id '
         )
 
     @property
@@ -39,10 +40,25 @@ class Movie(MediaItem):
         cached_data_keys = [f'{self.table}.{k}' for k in self.keys]
         cached_data_keys.extend([
             'collection.title AS collection_title',
-            'collection.poster AS collection_poster',
-            'collection.fanart AS collection_fanart',
             'collection.tmdb_id AS collection_tmdb_id',
             'collection.id AS collection_id',
+            (
+                '(  SELECT art.icon FROM art'
+                '   WHERE art.parent_id=collection.id AND type=\'posters\' '
+                '   ORDER BY '
+                f'           iso_language=\'{self.common_apis.tmdb_api.iso_language}\' DESC, '
+                '            iso_language=\'en\' DESC, '
+                '            iso_language IS NULL DESC, '
+                '            rating DESC'
+                '   LIMIT 1'
+                ') as collection_poster'
+            ),
+            (
+                '(  SELECT art.icon FROM art'
+                '   WHERE art.parent_id=collection.id AND type=\'backdrops\' AND iso_language IS NULL'
+                '   ORDER BY rating DESC LIMIT 1'
+                ') as collection_fanart'
+            ),
         ])
         return tuple(cached_data_keys)
 
@@ -51,6 +67,7 @@ class Movie(MediaItem):
         """ Database tables that will have data set as part of cache setter """
         return (
             self.return_basemeta_db('base'),
+            self.return_basemeta_db('belongs'),
             self.return_basemeta_db('collection'),
             self.return_basemeta_db('movie'),
             self.return_basemeta_db('genre'),

@@ -97,6 +97,11 @@ def import_collection():
     return Series
 
 
+def import_belongs():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Belongs
+    return Belongs
+
+
 def import_movie():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Movie
     return Movie
@@ -399,6 +404,7 @@ FACTORY_ROUTES = {
     'tvshow': import_tvshow,
     'season': import_season,
     'episode': import_episode,
+    'belongs': import_belongs,
     'collection': import_collection,
     'unique_id': import_unique_id,
     'custom': import_custom,

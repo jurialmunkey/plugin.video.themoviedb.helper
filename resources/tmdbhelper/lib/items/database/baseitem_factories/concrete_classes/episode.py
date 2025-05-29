@@ -108,6 +108,7 @@ class Episode(Season):
     def db_table_caches(self):
         return (
             self.return_basemeta_db('base'),
+            self.return_basemeta_db('belongs'),
             self.return_basemeta_db('service'),
             self.return_basemeta_db('provider'),
             self.return_basemeta_db('person'),

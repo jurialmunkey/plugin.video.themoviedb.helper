@@ -121,6 +121,7 @@ class Season(Tvshow):
     def db_table_caches(self):
         return (
             self.return_basemeta_db('base'),
+            self.return_basemeta_db('belongs'),
             self.return_basemeta_db('episode'),
             self.return_basemeta_db('service'),
             self.return_basemeta_db('provider'),

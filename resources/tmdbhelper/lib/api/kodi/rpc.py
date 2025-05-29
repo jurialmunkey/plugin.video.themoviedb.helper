@@ -3,7 +3,6 @@ from tmdbhelper.lib.addon.thread import use_thread_lock
 import jurialmunkey.jsnrpc as jurialmunkey_jsnrpc
 
 get_library = jurialmunkey_jsnrpc.get_library
-get_num_credits = jurialmunkey_jsnrpc.get_num_credits
 set_tags = jurialmunkey_jsnrpc.set_tags
 set_watched = jurialmunkey_jsnrpc.set_watched
 set_playprogress = jurialmunkey_jsnrpc.set_playprogress
@@ -23,18 +22,6 @@ def get_kodi_library(tmdb_type, tvshowid=None, cache_refresh=False):
         return KodiLibrary(dbtype=tmdb_type, tvshowid=tvshowid, cache_refresh=cache_refresh)
     if tmdb_type == 'both':
         return KodiLibrary(dbtype='both', cache_refresh=cache_refresh)
-
-
-def get_person_stats(person):
-    infoproperties = {}
-    infoproperties['numitems.dbid.movies'] = get_num_credits('movie', person)
-    infoproperties['numitems.dbid.tvshows'] = get_num_credits('tvshow', person)
-    infoproperties['numitems.dbid.episodes'] = get_num_credits('episode', person)
-    infoproperties['numitems.dbid.total'] = (
-        try_int(infoproperties.get('numitems.dbid.movies'))
-        + try_int(infoproperties.get('numitems.dbid.tvshows'))
-        + try_int(infoproperties.get('numitems.dbid.episodes')))
-    return infoproperties
 
 
 def get_item_details(dbid=None, method=None, key=None, properties=None):

@@ -14,6 +14,8 @@ class CrewMemberMediaList(CastMemberMediaList):
             'role': i['role'],
             'job': i['role'],
             'department': i['department'],
+            'tmdb_id': i['tmdb_id'],
+            'tmdb_type': 'person',
         }
 
 

@@ -22,8 +22,15 @@ class CastMemberMediaList(MediaList):
     def cached_data_keys(self):
         return (
             *self.keys,
-            'creditedperson.tmdb_id', 'creditedperson.thumb', 'creditedperson.name', 'creditedperson.gender',
-            'creditedperson.biography', 'creditedperson.known_for_department')
+            'creditedperson.tmdb_id', 'creditedperson.name', 'creditedperson.gender',
+            'creditedperson.biography', 'creditedperson.known_for_department',
+            (
+                '(    SELECT art.icon FROM art'
+                '     WHERE art.parent_id=person.id AND type=\'profiles\' '
+                '     ORDER BY rating DESC LIMIT 1'
+                ') as thumb'
+            ),
+        )
 
     @staticmethod
     def map_item_infoproperties(i):

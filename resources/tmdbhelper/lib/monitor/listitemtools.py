@@ -89,8 +89,8 @@ class ListItemInfoGetter():
         self._container = self.container
         self._container_item = self.container_item
 
-    def setup_current_item(self, level=1):
-        self._item = MonitorItemDetails(self, position=0, level=level)
+    def setup_current_item(self):
+        self._item = MonitorItemDetails(self, position=0)
 
 
 class ListItemMonitorFinaliser:
@@ -146,14 +146,6 @@ class ListItemMonitorFinaliser:
             return
         self.set_ratings()
 
-    def details(self):
-        self.item.level = 2
-        self.item.update_item()
-        self.item.set_additional_properties(self.baseitem_properties)
-        if not self.item.is_same_item:
-            return
-        self.set_details()
-
     def artwork(self):
         self.images_monitor.remote_artwork[self.item.identifier] = self.item.artwork.copy()
         self.processed_artwork = self.images_monitor.update_artwork(forced=True) or {}
@@ -162,11 +154,6 @@ class ListItemMonitorFinaliser:
         self.get_property('IsUpdatingArtwork', 'True')
         self.artwork()
         self.get_property('IsUpdatingArtwork', clear_property=True)
-
-    def process_details(self):
-        self.get_property('IsUpdatingDetails', 'True')
-        self.details()
-        self.get_property('IsUpdatingDetails', clear_property=True)
 
     def process_ratings(self):
         self.get_property('IsUpdatingRatings', 'True')
@@ -188,9 +175,6 @@ class ListItemMonitorFinaliser:
         if self.process_mutex:  # Already have one thread running a loop to clear out the queue
             return
         self.aquire_process_thread()
-
-    def start_process_details(self):
-        self.process_details()
 
     def aquire_process_thread(self):
         self.process_mutex = True
@@ -234,28 +218,25 @@ class ListItemMonitorFinaliser:
         # Set artwork to monitor as priority
         self.start_process_artwork()
 
-        # Set some basic details next
-        self.start_process_default()
-
         # Process ratings in thread to avoid holding up main loop
         t = SafeThread(target=self.start_process_ratings)
         t.start()
 
-        # Finalise with extended set_details
-        self.start_process_details()
+        # Set some basic details next
+        self.start_process_default()
 
 
 class ListItemMonitorFinaliserContainerMethod(ListItemMonitorFinaliser):
 
     def start_process_default(self):
-        self.listitem.setArt(self.processed_artwork)
-        self.add_item_listcontainer(self.listitem)  # Add item to container
+        with self.mutex_lock:
+            self.listitem.setArt(self.processed_artwork)
+            self.add_item_listcontainer(self.listitem)  # Add item to container
 
     def set_ratings(self):
-        self.listitem.setProperties(self.item.all_ratings)
-
-    def set_details(self):
-        ListItem(**self.item.item).set_listitem(self.listitem)
+        ratings = self.item.all_ratings
+        with self.mutex_lock:
+            self.listitem.setProperties(ratings)
 
     def initial_checks(self):
         if not self.item:
@@ -270,18 +251,15 @@ class ListItemMonitorFinaliserContainerMethod(ListItemMonitorFinaliser):
 class ListItemMonitorFinaliserWindowMethod(ListItemMonitorFinaliser):
 
     def start_process_default(self):
-        self.set_properties(self.item.item)  # Set the main properties  CHECK: do we need to lock with this?
+        self.set_properties(self.item.item)
 
     def set_ratings(self):
         self.set_ratings_properties({'ratings': self.item.all_ratings})
 
-    def set_details(self):
-        self.set_properties(self.item.item)
-
     def initial_checks(self):
         if not self.item:
             return False
-        if not self.item.is_same_item:  # Check that we are still on the same item after building
+        if not self.item.is_same_item:
             return False
         return True
 
@@ -293,7 +271,7 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         self._pre_item = 1
         self._cur_window = 0
         self._pre_window = 1
-        self._ignored_labels = ['..', get_localized(33078).lower(), get_localized(209).lower()]
+        self._ignored_labels = ('..', get_localized(33078).lower(), get_localized(209).lower())
         self._listcontainer = None
         self._last_listitem = None
         self.property_prefix = 'ListItem'
@@ -397,9 +375,6 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
 
         # Set a property for skins to check if item details are updating
         self.get_property('IsUpdating', 'True')
-
-        # Configure the item to retrieve details
-        self._item.configure()
 
         # Finish up setting our details to the container/window
         self.on_finalise()

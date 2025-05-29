@@ -149,24 +149,38 @@ class ItemMapperMethods:
                 })
         return data
 
-    @staticmethod
-    def get_belongs_to_collection(i, **kwargs):
+    def get_belongs_to_collection(self, i, **kwargs):
         data = []
 
-        item_id = f"collection.{i['id']}"
+        item_id = f"movie.{self.tmdb_id}"
+        collection_id = f"collection.{i['id']}"
 
         collection_item = ItemMapperMethods.get_configured_item(i, **{
             'tmdb_id': 'id',
             'title': 'name',
-            'poster': 'poster_path',
-            'fanart': 'backdrop_path',
         })
-        collection_item['id'] = item_id
+        collection_item['id'] = collection_id
+        data.append(ExtendedMap('collection', collection_id, False, collection_item))
 
-        data.append(ExtendedMap('collection', item_id, False, collection_item))
+        for icon_type, aspect in (('poster_path', 'posters'), ('backdrop_path', 'backdrops')):
+            icon = i.get(icon_type)
+            if not icon:
+                continue
+            data.append(ExtendedMap('art', icon, False, {
+                'parent_id': collection_id,
+                'icon': icon,
+                'type': aspect,
+                'aspect_ratio': aspect,
+                'extension': icon.split('.')[-1],
+            }))
 
-        data.append(ExtendedMap('baseitem', item_id, False, {
+        data.append(ExtendedMap('belongs', item_id, False, {
             'id': item_id,
+            'parent_id': collection_id,
+        }))
+
+        data.append(ExtendedMap('baseitem', collection_id, False, {
+            'id': collection_id,
             'mediatype': 'set',
             'expiry': 0,
         }))
@@ -183,7 +197,11 @@ class ItemMapperMethods:
         collection_id = f"collection.{collection_object['id']}"
 
         for i in (collection_object.get('parts') or []):
-            data.extend(ItemMapperMethods.get_media_item_data(i, 'movie', collection_id=collection_id))
+            data.extend(ItemMapperMethods.get_media_item_data(i, 'movie'))
+            data.append(ExtendedMap('belongs', f'movie.{i["id"]}', False, {
+                'id': f'movie.{i["id"]}',
+                'parent_id': collection_id,
+            }))
 
         return data
 
@@ -196,12 +214,15 @@ class ItemMapperMethods:
         collection_id = f"collection.{self.tmdb_id}"
 
         for i in parts:
-            data.extend(ItemMapperMethods.get_media_item_data(i, 'movie', collection_id=collection_id))
+            data.extend(ItemMapperMethods.get_media_item_data(i, 'movie'))
+            data.append(ExtendedMap('belongs', f'movie.{i["id"]}', False, {
+                'id': f'movie.{i["id"]}',
+                'parent_id': collection_id,
+            }))
 
         return data
 
-    @staticmethod
-    def get_creators(items, **kwargs):
+    def get_creators(self, items, **kwargs):
         data = []
 
         for i in items:
@@ -216,13 +237,19 @@ class ItemMapperMethods:
 
             person_item = ItemMapperMethods.get_configured_item(i, **{
                 'name': 'name',
-                'thumb': 'profile_path',
                 'gender': 'gender',
             })
             person_item['id'] = item_id
             person_item['tmdb_id'] = tmdb_id
-
             data.append(ExtendedMap('person', item_id, False, person_item))
+
+            if i.get('profile_path'):
+                artwork = self.add_art_type(
+                    item_id=item_id,
+                    path=i['profile_path'],
+                    art_type='profiles',
+                    aspect_ratio='poster')
+                data.append(ExtendedMap('art', artwork['icon'], False, artwork))
 
             data.append(ExtendedMap('baseitem', item_id, False, {
                 'id': item_id,
@@ -296,18 +323,15 @@ class ItemMapperMethods:
         ('guest_stars', 'castmember', {'ordering': 'order', 'role': 'character', 'appearances': 'total_episode_count'}, 'roles'),
     )
 
-    @staticmethod
-    def get_credits(items, **kwargs):
-        return ItemMapperMethods.get_credits_data(items, False)
+    def get_credits(self, items, **kwargs):
+        return self.get_credits_data(items, False)
 
-    @staticmethod
-    def get_aggregate_credits(items, **kwargs):
-        return ItemMapperMethods.get_credits_data(items, True)
+    def get_aggregate_credits(self, items, **kwargs):
+        return self.get_credits_data(items, True)
 
-    @staticmethod
-    def get_credits_data(items, aggregrate=False):
+    def get_credits_data(self, items, aggregrate=False):
         data = []
-        for subkey, mapkey, config, jobkey in ItemMapperMethods.credits_mappings:
+        for subkey, mapkey, config, jobkey in self.credits_mappings:
 
             for i in (items.get(subkey) or []):
                 item_id = f'person.{i["id"]}'
@@ -329,13 +353,21 @@ class ItemMapperMethods:
 
                 person_item = ItemMapperMethods.get_configured_item(i, **{
                     'name': 'name',
-                    'thumb': 'profile_path',
                     'gender': 'gender',
                     'known_for_department': 'known_for_department',
                 })
                 person_item['id'] = item_id
                 person_item['tmdb_id'] = tmdb_id
                 data.append(ExtendedMap('person', item_id, False, person_item))
+
+                if i.get('profile_path'):
+                    artwork = self.add_art_type(
+                        item_id=item_id,
+                        path=i['profile_path'],
+                        art_type='profiles',
+                        aspect_ratio='poster')
+                    data.append(ExtendedMap('art', artwork['icon'], False, artwork))
+
         return data
 
     def get_person_movie_credits_data(self, items):
@@ -691,6 +723,14 @@ class ItemMapperMethods:
     def get_custom_property(key, value):
         return [ExtendedMap('custom', key, False, {'key': key, 'value': value})]
 
+    @staticmethod
+    def get_art_property(path, art_type):
+        return [ExtendedMap('art', path, False, {
+            'icon': path,
+            'type': art_type,
+            'extension': path.split('.')[-1] if path else None
+        })]
+
 
 class BlankNoneDict(dict):
     def __missing__(self, key):
@@ -797,10 +837,6 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'keys': [('video', None)],
                 'func': self.get_video,
             }],
-            'belongs_to_collection': [{
-                'keys': [('item', 'collection_id')],
-                'func': lambda i: f"collection.{i['id']}"
-            }],
             'last_episode_to_air': [{
                 'keys': [('item', f'last_episode_to_air_id')],
                 'func': lambda i: f'tv.{self.tmdb_id}.{i["season_number"]}.{i["episode_number"]}'
@@ -816,11 +852,14 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'revenue': lambda v: self.get_custom_property('revenue', f'${float(v):0,.0f}'),
             'original_language': lambda v: self.get_custom_property('original_language', v),
             'homepage': lambda v: self.get_custom_property('homepage', v),
+            'poster_path': lambda v: self.get_art_property(v, 'posters'),
+            'backdrop_path': lambda v: self.get_art_property(v, 'backdrops'),
+            'profile_path': lambda v: self.get_art_property(v, 'profiles'),
             'images': self.get_art,
             'fanart_tv': self.get_fanart_tv,
-            'belongs_to_collection': self.get_belongs_to_collection,  # Also mapped in advanced properties for item id
-            'collection': self.get_collection,  # Also mapped in advanced properties for item id
-            'parts': self.get_parts,  # Also mapped in advanced properties for item id
+            'belongs_to_collection': self.get_belongs_to_collection,
+            'collection': self.get_collection,
+            'parts': self.get_parts,
             'seasons': self.get_seasons,
             'episodes': self.get_episodes,
             'created_by': self.get_creators,
@@ -850,7 +889,6 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'gender': ('item', 'gender'),
             'known_for_department': ('item', 'known_for_department'),
             'place_of_birth': ('item', 'place_of_birth'),
-            'profile_path': ('item', 'thumb'),
             'vote_average': ('item', 'rating'),
             'vote_count': ('item', 'votes'),
             'popularity': ('item', 'popularity')
@@ -935,6 +973,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'person': (),
             'crewmember': (),
             'castmember': (),
+            'belongs': (),
         }
 
     def get_info(self, data, **kwargs):
@@ -946,6 +985,6 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
         # from tmdbhelper.lib.files.futils import dumps_to_file
         # dumps_to_file(
         #     {'data': self.data, 'item': self.item},
-        #     'log_data', f'mappings_{self.tmdb_id}_{data["title"]}.json', join_addon_data=True)
+        #     'log_data', f'mappings_{self.tmdb_id}_{data["name"]}.json', join_addon_data=True)
 
         return self.item

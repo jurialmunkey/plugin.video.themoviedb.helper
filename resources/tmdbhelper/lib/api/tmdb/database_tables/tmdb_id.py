@@ -1,14 +1,16 @@
 from tmdbhelper.lib.files.dbdata import DatabaseStatements
+from tmdbhelper.lib.files.ftools import cached_property
 
 
-class TableTMDbID:
+class TableID:
+
     table = 'tmdb_id'
-    tmdb_type = None
-    imdb_id = None
-    tvdb_id = None
-    query = None
-    year = None
-    raw_data = False
+    values = None
+    conditions = None
+    keys = ('tmdb_id', )
+
+    update_keys = ()
+    update_values = ()
 
     def __init__(self, parent):
         self.parent = parent
@@ -25,178 +27,257 @@ class TableTMDbID:
     def func(self):
         return self.tmdb_api.get_response_json
 
-    def get_id(self, values, conditions, keys=None):
-        with self.access.connection.open():
-            data = self.access.get_cached_list_values(
-                self.table,
-                keys=('tmdb_id', ) if not keys else keys,
-                values=values,
-                conditions=conditions)
-        if not data:
+    def get_id_results(self, data):
+        try:
+            return data[0]['tmdb_id']  # return data[0] for multi
+        except (AttributeError, KeyError, TypeError, IndexError):
             return
-        return data[0]['tmdb_id'] if not keys else data[0]
 
-    def set_id(self, data_id, external_source, tmdb_id):
+    def get_id(self):
+        with self.access.connection.open():
+            return self.get_id_results(self.access.get_cached_list_values(
+                self.table,
+                keys=self.keys,
+                values=self.values,
+                conditions=self.conditions))
+
+    def set_id(self):
+        if not self.tmdb_id or not self.tmdb_type:
+            return
+
         statement_insert = DatabaseStatements.insert_or_ignore(self.table, ('tmdb_id', 'tmdb_type'))
         statement_update = DatabaseStatements.update_if_null(
-            self.table, (external_source, ), conditions="tmdb_type=? AND tmdb_id=?")
+            self.table, self.update_keys, conditions="tmdb_type=? AND tmdb_id=?")
 
         with self.access.connection.open() as connection:
             connection.execute('BEGIN')
-            connection.execute(statement_insert, (tmdb_id, self.tmdb_type))
-            connection.execute(statement_update, (data_id, self.tmdb_type, tmdb_id, ))
+            connection.execute(statement_insert, (self.tmdb_id, self.tmdb_type))
+            connection.execute(statement_update, self.update_values)
             connection.execute('COMMIT')
 
-    def find_id(self, data_id, external_source):
+        return self.get_id()
+
+
+class TableFindID(TableID):
+
+    external_source = None
+    data_id = None
+
+    def __init__(self, tmdb_type, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.tmdb_type = tmdb_type
+
+    @property
+    def update_keys(self):
+        return (self.external_source, )
+
+    @property
+    def update_values(self):
+        return (self.data_id, self.tmdb_type, self.tmdb_id, )
+
+    @property
+    def func_args(self):
+        return ('find', self.data_id)
+
+    @property
+    def func_kwgs(self):
+        return {'language': self.tmdb_api.req_language, 'external_source': self.external_source}
+
+    @cached_property
+    def func_data(self):
+        return self.func(*self.func_args, **self.func_kwgs)
+
+    @cached_property
+    def func_base_id(self):
         try:
-            data = self.func('find', data_id, language=self.tmdb_api.req_language, external_source=external_source)
-            return data[f'{self.tmdb_type}_results'][0]['id']
+            return self.func_data[f'{self.tmdb_type}_results'][0]['id']
         except (AttributeError, KeyError, TypeError, IndexError):
             pass
+
+    @cached_property
+    def func_show_id(self):
         if self.tmdb_type != 'tv':
             return
         try:
-            return data['tv_episode_results'][0]['show_id']
+            return self.func_data['tv_episode_results'][0]['show_id']
         except (AttributeError, KeyError, TypeError, IndexError):
             return
 
-    def get_imdb_id(self):
-        return self.get_id((self.tmdb_type, self.imdb_id), 'tmdb_type=? AND imdb_id=?')
+    @cached_property
+    def tmdb_id(self):
+        return self.func_base_id or self.func_show_id
 
-    def set_imdb_id(self):
-        tmdb_id = self.find_id(self.imdb_id, external_source='imdb_id')
-        if not tmdb_id:
-            return
-        self.set_id(self.imdb_id, external_source='imdb_id', tmdb_id=tmdb_id)
-        return self.get_imdb_id()
+    @property
+    def values(self):
+        return (self.tmdb_type, self.data_id)
 
-    def get_tvdb_id(self):
-        return self.get_id((self.tmdb_type, self.tvdb_id), 'tmdb_type=? AND tvdb_id=?')
 
-    def set_tvdb_id(self):
-        tmdb_id = self.find_id(self.tvdb_id, external_source='tvdb_id')
-        if not tmdb_id:
-            return
-        self.set_id(self.tvdb_id, external_source='tvdb_id', tmdb_id=tmdb_id)
-        return self.get_tvdb_id()
+class TableIMDbID(TableFindID):
+    conditions = 'tmdb_type=? AND imdb_id=?'
+    external_source = 'imdb_id'
 
-    def find_query(self):
+
+class TableTVDbID(TableFindID):
+    conditions = 'tmdb_type=? AND tvdb_id=?'
+    external_source = 'tvdb_id'
+
+
+class TableSearchID(TableID):
+
+    year = None
+    update_keys = ('title', 'year')
+
+    @property
+    def update_values(self):
+        return (self.query, self.year, self.tmdb_type, self.tmdb_id, )
+
+    @property
+    def func_args(self):
+        return ('search', self.tmdb_type)
+
+    @property
+    def func_additional_kwgs(self):
+        if not self.year:
+            return {}
+        if self.tmdb_type == 'movie':
+            return {'year': self.year}
+        if self.tmdb_type == 'tv':
+            return {'first_air_date_year': self.year}
+        return {}
+
+    @property
+    def func_kwgs(self):
         from urllib.parse import quote_plus
-        args = ('search', self.tmdb_type)
-        kwgs = {'language': self.tmdb_api.req_language, 'query': quote_plus(self.query)}
+        func_kwgs = {'language': self.tmdb_api.req_language, 'query': quote_plus(self.query)}
+        func_kwgs.update(self.func_additional_kwgs)
+        return func_kwgs
 
-        def configure_find_query_kwgs():
-            if not self.year:
-                return kwgs
-            if self.tmdb_type == 'tv':
-                kwgs['first_air_date_year'] = self.year
-                return kwgs
-            if self.tmdb_type == 'movie':
-                kwgs['year'] = self.year
-                return kwgs
+    @cached_property
+    def func_data(self):
+        return self.func(*self.func_args, **self.func_kwgs)
 
-        kwgs = configure_find_query_kwgs()
-
+    @cached_property
+    def func_data_results(self):
         try:
-            data = self.func(*args, **kwgs)
-            data = data['results']
+            return self.func_data['results']
         except (TypeError, KeyError):
             return
-        if not data:
-            return
-        if self.raw_data:
-            return data
 
-        def return_next_matching_result():
-            if self.year and self.tmdb_type == 'movie':
-                return next((
-                    i['id'] for i in data
-                    if (i['title'] or '').casefold() == self.query and (i['release_date'] or '').startswith(str(self.year))), None)
-            if self.year and self.tmdb_type == 'tv':
-                return next((
-                    i['id'] for i in data
-                    if (i['name'] or '').casefold() == self.query and (i['first_air_date'] or '').startswith(str(self.year))), None)
-            return next((
-                i['id'] for i in data
-                if (i.get('name') or i.get('title') or '').casefold() == self.query), None)
-
-        return return_next_matching_result()
-
-    def find_multisearch_query(self):
-        from urllib.parse import quote_plus
-        args = ('search', 'multi')
-        kwgs = {'language': self.tmdb_api.req_language, 'query': quote_plus(self.query)}
-        try:
-            data = self.func(*args, **kwgs)
-            data = data['results']
-        except (TypeError, KeyError):
-            return
-        if not data:
-            return
-        return next(
+    @cached_property
+    def func_data_id_generator(self):
+        return (
             (
-                {'tmdb_id': i['id'], 'tmdb_type': i['media_type']} for i in data
-                if i.get('media_type') in (self.tmdb_type or 'movie', self.tmdb_type or 'tv')  # If we've got a tmdb_type we only check that otherwise fallback to movie/tv
-                and (
-                    (i.get('name') or '').casefold() == self.query
-                    or (i.get('title') or '').casefold() == self.query
-                    or (i.get('original_name') or '').casefold() == self.query
-                    or (i.get('original_title') or '').casefold() == self.query
-                )
-            ),
-            None
+                i['id'] for i in self.func_data_results
+                if (i['title'] or '').casefold() == self.query
+                and (i['release_date'] or '').startswith(str(self.year))
+            )
+            if self.year and self.tmdb_type == 'movie' else
+            (
+                i['id'] for i in self.func_data_results
+                if (i['name'] or '').casefold() == self.query
+                and (i['first_air_date'] or '').startswith(str(self.year))
+            )
+            if self.year and self.tmdb_type == 'tv' else
+            (
+                i['id'] for i in self.func_data_results
+                if (i.get('name') or i.get('title') or '').casefold() == self.query
+            )
         )
 
-    def get_name_id(self):
-        if not self.year:
-            return self.get_id((self.tmdb_type, self.query), 'tmdb_type=? AND title=?')
-        return self.get_id((self.tmdb_type, self.query, self.year), 'tmdb_type=? AND title=? AND year=?')
+    @cached_property
+    def func_data_id_generator_results(self):
+        if not self.func_data_results:
+            return
+        return next(self.func_data_id_generator, None)
 
-    def set_name_id(self):
-        tmdb_id = self.find_query()
-        if not tmdb_id:
+    @cached_property
+    def tmdb_id(self):
+        return self.func_data_id_generator_results
+
+    @property
+    def values(self):
+        return (
+            (self.tmdb_type, self.query)
+            if not self.year else
+            (self.tmdb_type, self.query, self.year)
+        )
+
+    @property
+    def conditions(self):
+        return (
+            'tmdb_type=? AND title=?'
+            if not self.year else
+            'tmdb_type=? AND title=? AND year=?'
+        )
+
+
+class TableNameID(TableSearchID):
+    def __init__(self, tmdb_type, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.tmdb_type = tmdb_type
+
+
+class TableMultiSearchID(TableSearchID):
+    def __init__(self, tmdb_type, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.init_tmdb_type(tmdb_type)
+
+    allowed_media_types = ('movie', 'tv')
+
+    def init_tmdb_type(self, tmdb_type):
+        if not tmdb_type:  # Check first as we want to keep cached_property getter intact otherwise
+            return
+        self.tmdb_type = tmdb_type
+        self.allowed_media_types = (tmdb_type, tmdb_type)
+
+    keys = ('tmdb_id', 'tmdb_type')
+    conditions = 'title=? AND (tmdb_type=? OR tmdb_type=?)'
+
+    @property
+    def values(self):
+        return (self.query, *self.allowed_media_types)
+
+    update_keys = ('title', )
+
+    @property
+    def update_values(self):
+        return (self.query, self.tmdb_type, self.tmdb_id, )
+
+    @cached_property
+    def func_data_id_generator(self):
+        return (
+            {'tmdb_id': i['id'], 'tmdb_type': i['media_type']} for i in self.func_data_results
+            if i.get('media_type') in self.allowed_media_types  # If we've got a tmdb_type we only check that otherwise fallback to movie/tv
+            and (
+                (i.get('name') or '').casefold() == self.query
+                or (i.get('title') or '').casefold() == self.query
+                or (i.get('original_name') or '').casefold() == self.query
+                or (i.get('original_title') or '').casefold() == self.query
+            )
+        )
+
+    func_args = ('search', 'multi')
+    func_additional_kwgs = {}
+
+    def get_id_results(self, data):
+        try:
+            return (data[0]['tmdb_id'], data[0]['tmdb_type'])
+        except (AttributeError, KeyError, TypeError, IndexError):
             return
 
-        statement_insert = DatabaseStatements.insert_or_ignore(self.table, ('tmdb_id', 'tmdb_type'))
-        statement_update = DatabaseStatements.update_if_null(
-            self.table, ('title', 'year'), conditions="tmdb_type=? AND tmdb_id=?")
-
-        with self.access.connection.open() as connection:
-            connection.execute('BEGIN')
-            connection.execute(statement_insert, (tmdb_id, self.tmdb_type))
-            connection.execute(statement_update, (self.query, self.year, self.tmdb_type, tmdb_id, ))
-            connection.execute('COMMIT')
-
-        return self.get_name_id()
-
-    def get_multisearch_query(self):
-        lookup = self.get_id(
-            (self.query, self.tmdb_type or 'movie', self.tmdb_type or 'tv'),  # IF we've got a tmdb_type only use that otherwise fallback to using movie/tv
-            'title=? AND (tmdb_type=? OR tmdb_type=?)',
-            keys=('tmdb_id', 'tmdb_type'))
-        if not lookup:
-            return
-        return (lookup['tmdb_id'], lookup['tmdb_type'])
-
-    def set_multisearch_query(self):
-        lookup = self.find_multisearch_query()
-        if not lookup:
+    @cached_property
+    def tmdb_id(self):
+        try:
+            return self.func_data_id_generator_results['tmdb_id']
+        except (AttributeError, KeyError, TypeError, IndexError):
             return
 
-        tmdb_id = lookup['tmdb_id']
-        tmdb_type = lookup['tmdb_type']
-
-        statement_insert = DatabaseStatements.insert_or_ignore(self.table, ('tmdb_id', 'tmdb_type'))
-        statement_update = DatabaseStatements.update_if_null(
-            self.table, ('title', ), conditions="tmdb_type=? AND tmdb_id=?")
-
-        with self.access.connection.open() as connection:
-            connection.execute('BEGIN')
-            connection.execute(statement_insert, (tmdb_id, tmdb_type))
-            connection.execute(statement_update, (self.query, tmdb_type, tmdb_id, ))
-            connection.execute('COMMIT')
-
-        return self.get_multisearch_query()
+    @cached_property
+    def tmdb_type(self):
+        try:
+            return self.func_data_id_generator_results['tmdb_type']
+        except (AttributeError, KeyError, TypeError, IndexError):
+            return
 
 
 class TMDbDatabaseTMDbID:
@@ -232,41 +313,40 @@ class TMDbDatabaseTMDbID:
     tmdb_id
     """
 
-    def get_tmdb_id(self, tmdb_type=None, imdb_id=None, tvdb_id=None, query=None, year=None, raw_data=False, use_multisearch=False, **kwargs):
-        table_obj = TableTMDbID(self)
-        table_obj.tmdb_type = tmdb_type
-        table_obj.imdb_id = imdb_id
-        table_obj.query = (query or '').casefold()  # Case fold query to avoid case sensitivity issues
-        table_obj.year = year
-        table_obj.raw_data = raw_data
+    def get_tmdb_id(self, tmdb_type=None, imdb_id=None, tvdb_id=None, query=None, year=None, use_multisearch=False, **kwargs):
 
-        if use_multisearch or tmdb_type is None:
-            if not use_multisearch:
-                return
-            return table_obj.get_multisearch_query() or table_obj.set_multisearch_query() or (None, None)
+        if tmdb_type is None and not use_multisearch:
+            return
+
+        if use_multisearch:
+            table_obj = TableMultiSearchID(parent=self, tmdb_type=tmdb_type)
+            table_obj.query = (query or '').casefold()  # Case fold query to avoid case sensitivity issues
+            table_obj.year = year
+            return table_obj.get_id() or table_obj.set_id() or (None, None)
 
         def try_imdb_id():
             if not imdb_id:
                 return
-            return table_obj.get_imdb_id() or table_obj.set_imdb_id()
+            table_obj = TableIMDbID(parent=self, tmdb_type=tmdb_type)
+            table_obj.data_id = imdb_id
+            return table_obj.get_id() or table_obj.set_id()
 
         def try_tvdb_id():
             if not tvdb_id:
                 return
-            return table_obj.get_tvdb_id() or table_obj.set_tvdb_id()
+            table_obj = TableTVDbID(parent=self, tmdb_type=tmdb_type)
+            table_obj.data_id = tvdb_id
+            return table_obj.get_id() or table_obj.set_id()
 
         def try_name_id():
             if not query:
                 return
-            return table_obj.get_name_id() or table_obj.set_name_id()
+            table_obj = TableNameID(parent=self, tmdb_type=tmdb_type)
+            table_obj.query = (query or '').casefold()  # Case fold query to avoid case sensitivity issues
+            table_obj.year = year
+            return table_obj.get_id() or table_obj.set_id()
 
-        if raw_data and query:
-            return table_obj.find_query()
-
-        tmdb_id = try_imdb_id() or try_tvdb_id() or try_name_id()
-        if not tmdb_id:
-            return (None, None) if use_multisearch else None
-        return (tmdb_id, tmdb_type) if use_multisearch else tmdb_id
+        return try_imdb_id() or try_tvdb_id() or try_name_id() or None
 
     def get_tmdb_id_from_query(self, tmdb_type, query, header=None, use_details=False, get_listitem=False, auto_single=False):
         """
@@ -274,17 +354,25 @@ class TMDbDatabaseTMDbID:
         """
         from xbmcgui import Dialog
         from tmdbhelper.lib.items.listitem import ListItem
+
         if not query or not tmdb_type:
             return
-        response = self.get_tmdb_id(tmdb_type, query=query, raw_data=True)
+
+        table_obj = TableNameID(parent=self, tmdb_type=tmdb_type)
+        table_obj.query = (query or '').casefold()  # Case fold query to avoid case sensitivity issues
+
+        response = table_obj.func_data_results
         if not response:
             return
+
         items = [ListItem(**self.tmdb_api.mapper.get_info(i, tmdb_type)).get_listitem() for i in response]
         if not items:
             return
+
         x = 0
         if not auto_single or len(items) != 1:
-            x = Dialog().select(header, items, useDetails=use_details)
+            x = Dialog().select(header, items, useDetails=bool(use_details))
         if x == -1:
             return
+
         return items[x] if get_listitem else items[x].getUniqueID('tmdb')

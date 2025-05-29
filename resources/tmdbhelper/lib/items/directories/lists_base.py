@@ -911,6 +911,38 @@ def _get_basedir_tmdb():
             'path': PLUGINPATH,
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'}},
+        {
+            'label': u'{} {}'.format(get_localized(593), get_localized(20388)),
+            'types': ['movie'],
+            'params': {'info': 'all_studios'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'}},
+        {
+            'label': u'{} {}'.format(get_localized(593), get_localized(32062)),
+            'types': ['tv'],
+            'params': {'info': 'all_networks'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'}},
+        {
+            'label': u'{} {}'.format(get_localized(593), get_localized(32187)),
+            'types': ['movie'],
+            'params': {'info': 'all_collections'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'}},
+        {
+            'label': u'{} {}'.format(get_localized(593), get_localized(21861)),
+            'types': ['movie'],
+            'params': {'info': 'all_keywords'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'}}]
 
 

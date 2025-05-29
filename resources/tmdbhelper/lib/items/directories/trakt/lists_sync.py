@@ -52,9 +52,6 @@ class ListStandardSync(ListDefault):
         list_properties.plugin_name = '{plural} {localized}'
         return list_properties
 
-    def get_items_sync_list_fallback(self, **kwargs):
-        return
-
     def get_items(self, tmdb_type, page=1, sort_by=None, sort_how=None, tmdb_id=None, **kwargs):
         self.list_properties.tmdb_id = tmdb_id
         self.list_properties.tmdb_type = tmdb_type
@@ -62,22 +59,14 @@ class ListStandardSync(ListDefault):
         self.list_properties.page = try_int(page) or 1
         self.list_properties.sort_by = sort_by or self.list_properties.sort_by
         self.list_properties.sort_how = sort_how or self.list_properties.sort_how
-        self.list_properties.sync_data = (
-            ItemListSyncDataFactory(
-                self.list_properties.sync_type,
-                self.trakt_api,
-                sort_by=self.list_properties.sort_by,
-                sort_how=self.list_properties.sort_how,
-                item_type=self.list_properties.item_type,
-                item_keys=self.list_properties.item_keys,
-                tmdb_id=self.list_properties.tmdb_id).items
-            or self.get_items_sync_list_fallback(
-                sort_by=self.list_properties.sort_by,
-                sort_how=self.list_properties.sort_how,
-                item_type=self.list_properties.item_type,
-                item_keys=self.list_properties.item_keys,
-                tmdb_id=self.list_properties.tmdb_id)
-        )
+        self.list_properties.sync_data = ItemListSyncDataFactory(
+            self.list_properties.sync_type,
+            self.trakt_api,
+            sort_by=self.list_properties.sort_by,
+            sort_how=self.list_properties.sort_how,
+            item_type=self.list_properties.item_type,
+            item_keys=self.list_properties.item_keys,
+            tmdb_id=self.list_properties.tmdb_id).items
 
         return self.get_items_finalised()
 
@@ -228,16 +217,6 @@ class ListUpNext(ListStandardSync):
         list_properties.item_type = 'episode'
         list_properties.container_content = 'episodes'
         return list_properties
-
-    def get_items_sync_list_fallback(self, item_type, sort_by=None, sort_how=None, tmdb_id=None, **kwargs):
-        from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
-        try:
-            items = BaseViewFactory('episodes', 'tv', tmdb_id, season=1).data
-        except TypeError:
-            return
-        self.kodi_db = self.get_kodi_database('tv')
-        self.list_properties.container_content = 'episodes'
-        return items
 
 
 class ListOnDeck(ListStandardSync):

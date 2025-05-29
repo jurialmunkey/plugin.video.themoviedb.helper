@@ -8,7 +8,8 @@ class SeriesMoviesMediaList(MediaList):
     cached_data_table = (
         'baseitem '
         'INNER JOIN collection ON collection.id = baseitem.id '
-        'INNER JOIN movie ON movie.collection_id = collection.id'
+        'INNER JOIN belongs ON belongs.parent_id = collection.id '
+        'INNER JOIN movie ON movie.id = belongs.id '
     )
 
     cached_data_keys = (
