@@ -22,6 +22,7 @@ class Series(BaseItem):
     def db_table_caches(self):
         return (
             self.return_basemeta_db('base'),
+            self.return_basemeta_db('belongs'),
             self.return_basemeta_db('collection'),
             self.return_basemeta_db('movie'),
             self.return_basemeta_db('unique_id'),

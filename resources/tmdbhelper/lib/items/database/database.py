@@ -7,6 +7,7 @@ from tmdbhelper.lib.items.database.tabledef import (
     TVSHOW_COLUMNS,
     SEASON_COLUMNS,
     EPISODE_COLUMNS,
+    BELONGS_COLUMNS,
     COLLECTION_COLUMNS,
     RATINGS_COLUMNS,
     PERSON_COLUMNS,
@@ -75,6 +76,7 @@ class ItemDetailsDatabase(Database):
     tvshow_columns = TVSHOW_COLUMNS
     season_columns = SEASON_COLUMNS
     episode_columns = EPISODE_COLUMNS
+    belongs_columns = BELONGS_COLUMNS
     collection_columns = COLLECTION_COLUMNS
     ratings_columns = RATINGS_COLUMNS
     person_columns = PERSON_COLUMNS
@@ -101,6 +103,7 @@ class ItemDetailsDatabase(Database):
     def database_tables(self):
         return {
             'baseitem': self.baseitem_columns,
+            'belongs': self.belongs_columns,
             'collection': self.collection_columns,
             'movie': self.movie_columns,
             'tvshow': self.tvshow_columns,

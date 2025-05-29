@@ -8,7 +8,7 @@ class SeriesItem:
         if collection_id:
 
             data_list = self.parent_db_cache.get_cached_list_values(
-                table='movie',
+                table='movie INNER JOIN belongs ON belongs.id = movie.id',
                 keys=(
                     'ROUND(AVG(rating), 1) as rating',
                     'SUM(votes) as votes',
@@ -17,7 +17,7 @@ class SeriesItem:
                     'MIN(year) as year_first',
                 ),
                 values=(collection_id,),
-                conditions='movie.collection_id=? GROUP BY movie.collection_id')
+                conditions='belongs.parent_id=? GROUP BY belongs.parent_id')
 
             try:
                 infoproperties['set.rating'] = data_list[0]['rating']
@@ -37,10 +37,10 @@ class SeriesItem:
                 'rating', 'votes', 'popularity', 'tmdb_id', 'originaltitle',
             )
             data_list = self.parent_db_cache.get_cached_list_values(
-                table='movie',
+                table='movie INNER JOIN belongs ON belongs.id = movie.id',
                 keys=data_keys,
                 values=(collection_id,),
-                conditions='movie.collection_id=? ORDER BY year')
+                conditions='belongs.parent_id=? ORDER BY year')
 
             try:
                 for x, i in enumerate(data_list, 1):

@@ -67,10 +67,6 @@ MOVIE_COLUMNS = {
         'data': 'INTEGER',
         'indexed': True
     },
-    'collection_id': {
-        'data': 'TEXT',
-        'indexed': True
-    },
 }
 
 TVSHOW_COLUMNS = {
@@ -235,6 +231,23 @@ EPISODE_COLUMNS = {
         'indexed': True
     },
 }
+
+
+BELONGS_COLUMNS = {
+    'id': {
+        'data': 'TEXT',
+        'foreign_key': 'baseitem(id)',
+        'indexed': True,
+        'unique': True,
+    },
+    'parent_id': {
+        'data': 'TEXT',
+        'foreign_key': 'baseitem(id)',
+        'indexed': True,
+        'unique': True,
+    },
+}
+
 
 COLLECTION_COLUMNS = {
     'id': {

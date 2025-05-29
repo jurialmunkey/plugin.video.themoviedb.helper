@@ -30,7 +30,8 @@ class Movie(MediaItem):
         """ FROM """
         return (
             f'baseitem LEFT JOIN {self.table} ON {self.table}.id = baseitem.id '
-            f'LEFT JOIN collection ON collection.id = {self.table}.collection_id '
+            f'LEFT JOIN belongs ON belongs.id = {self.table}.id '
+            f'LEFT JOIN collection ON collection.id = belongs.parent_id '
         )
 
     @property
@@ -43,7 +44,7 @@ class Movie(MediaItem):
             'collection.id AS collection_id',
             (
                 '(  SELECT art.icon FROM art'
-                '   WHERE art.parent_id=collection_id AND type=\'posters\' '
+                '   WHERE art.parent_id=collection.id AND type=\'posters\' '
                 '   ORDER BY '
                 f'           iso_language=\'{self.common_apis.tmdb_api.iso_language}\' DESC, '
                 '            iso_language=\'en\' DESC, '
@@ -54,7 +55,7 @@ class Movie(MediaItem):
             ),
             (
                 '(  SELECT art.icon FROM art'
-                '   WHERE art.parent_id=collection_id AND type=\'backdrops\' AND iso_language IS NULL'
+                '   WHERE art.parent_id=collection.id AND type=\'backdrops\' AND iso_language IS NULL'
                 '   ORDER BY rating DESC LIMIT 1'
                 ') as collection_fanart'
             ),
@@ -66,6 +67,7 @@ class Movie(MediaItem):
         """ Database tables that will have data set as part of cache setter """
         return (
             self.return_basemeta_db('base'),
+            self.return_basemeta_db('belongs'),
             self.return_basemeta_db('collection'),
             self.return_basemeta_db('movie'),
             self.return_basemeta_db('genre'),

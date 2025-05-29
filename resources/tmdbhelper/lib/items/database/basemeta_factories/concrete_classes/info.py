@@ -5,6 +5,7 @@ from tmdbhelper.lib.items.database.tabledef import (
     TVSHOW_COLUMNS,
     SEASON_COLUMNS,
     EPISODE_COLUMNS,
+    BELONGS_COLUMNS,
     COLLECTION_COLUMNS,
     CERTIFICATION_COLUMNS,
     VIDEO_COLUMNS,
@@ -147,6 +148,11 @@ class Broadcaster(Company):
 class Base(ItemDetailsList):
     table = 'baseitem'
     keys = ('id', 'mediatype', 'expiry')
+
+
+class Belongs(ItemDetailsList):
+    table = 'belongs'
+    keys = tuple(BELONGS_COLUMNS.keys())
 
 
 class Movie(ItemDetailsList):

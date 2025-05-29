@@ -130,6 +130,7 @@ class Tvshow(MediaItem):
         """ Database tables that will have data set as part of cache setter """
         return (
             self.return_basemeta_db('base'),
+            self.return_basemeta_db('belongs'),
             self.return_basemeta_db('season'),
             self.return_basemeta_db('episode'),
             self.return_basemeta_db('genre'),
