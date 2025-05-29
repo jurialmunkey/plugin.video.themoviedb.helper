@@ -12,13 +12,24 @@ REGEX_WINPROP_FINDALL = r'\$WINPROP\[(.*?)\]'  # $WINPROP[key] = Window(10000).g
 REGEX_WINPROP_SUB = r'\$WINPROP\[{}\]'
 
 
-def test_func(test_func, **kwargs):
+def test_func(test_func, dialog_output=False, **kwargs):
+
+    from timeit import default_timer as timer
+    start_time = timer()
 
     def finalise(head='', data='', affix=''):
+        total_time = timer() - start_time
         import xbmcgui
         from tmdbhelper.lib.files.futils import dumps_to_file
-        xbmcgui.Dialog().textviewer(f'{head}', f'{data}')
-        dumps_to_file(data, 'log_data', f'test_func_{test_func}{affix}.json', join_addon_data=True)
+        xbmcgui.Dialog().textviewer(f'{head}', f'{data if dialog_output else bool(data)}')
+        dump_data = {
+            'func': test_func,
+            'kwgs': kwargs,
+            'time': f'{total_time:.3f} sec',
+            'data': data,
+        },
+        dump_name = f'test_func_{test_func}{affix}.json'
+        dumps_to_file(dump_data, 'log_data', dump_name, join_addon_data=True)
 
     def test_func_response(path, **kwargs):
         from tmdbhelper.lib.api.tmdb.api import TMDb
