@@ -52,9 +52,11 @@ class DataType:
     def window(self):
         return self._class_instance_syncdata.window
 
-    @property
+    @cached_property
     def item_type(self):
-        return self._item_type
+        if self._item_type in ('movie', 'show', 'season', 'episode'):
+            return self._item_type
+        raise ValueError(f'Invalid item_type {self._item_type} for {self.method}')
 
     @property
     def get_response_json(self):
@@ -145,6 +147,15 @@ class DataType:
 
 
 class DataTypeEpisodes(DataType):
+
+    @cached_property
+    def item_type(self):
+        if self._item_type in ('show', 'season', 'episode'):
+            return 'show'
+        if self._item_type == 'movie':
+            return 'movie'
+        raise ValueError(f'Invalid item_type {self._item_type} for {self.method}')
+
     def clear_child_columns(self, keys):
         if self.item_type == 'show':
             self.cache.del_column_values(keys=keys, item_type='season')
