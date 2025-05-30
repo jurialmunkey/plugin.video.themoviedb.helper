@@ -107,7 +107,6 @@ class ListSearch(ListStandard):
             tmdb_type=self.list_properties.tmdb_type)
 
     def get_items(self, tmdb_type, query=None, page=1, length=PAGES_LENGTH, update_listing=False, **kwargs):
-        from urllib.parse import quote_plus
         self.list_properties.tmdb_type = tmdb_type
         self.list_properties.original_query = query or ''
         self.list_properties.query = self.list_properties.original_query
@@ -124,7 +123,7 @@ class ListSearch(ListStandard):
                 tmdb_type=self.list_properties.tmdb_type)
 
         request_kwgs = {
-            'query': quote_plus(self.list_properties.query),
+            'query': self.list_properties.query,
             'year': kwargs.get('year'),
             'first_air_date_year': kwargs.get('first_air_date_year'),
             'primary_release_year': kwargs.get('primary_release_year')

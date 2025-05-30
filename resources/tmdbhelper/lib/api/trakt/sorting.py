@@ -4,6 +4,9 @@ from tmdbhelper.lib.addon.plugin import get_localized
 def get_sort_methods(info=None):
     items = [
         {
+            'name': f'{get_localized(32287)}: {get_localized(571)}',
+            'params': {}},
+        {
             'name': f'{get_localized(32287)}: {get_localized(32451)} {get_localized(32286)}',
             'params': {'sort_by': 'rank', 'sort_how': 'asc'},
             'blocklist': ('trakt_inprogress',)},

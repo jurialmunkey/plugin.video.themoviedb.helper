@@ -52,9 +52,11 @@ class DataType:
     def window(self):
         return self._class_instance_syncdata.window
 
-    @property
+    @cached_property
     def item_type(self):
-        return self._item_type
+        if self._item_type in ('movie', 'show', 'season', 'episode'):
+            return self._item_type
+        raise ValueError(f'Invalid item_type {self._item_type} for {self.method}')
 
     @property
     def get_response_json(self):
@@ -109,7 +111,7 @@ class DataType:
     @timerlock
     def sync_func(self):
         from tmdbhelper.lib.addon.logger import TimerFunc
-        with TimerFunc(f'Sync: {self.method} {self.item_type}', inline=True, log_threshold=0.001):
+        with TimerFunc(f'Sync: {self.__class__.__name__} get_response_sync {self.method} {self.item_type}', inline=True, log_threshold=0.001):
             return self.get_response_sync('sync', self.method, f'{self.item_type}s', **self.sync_kwgs)
 
     @progress_bg
@@ -145,6 +147,15 @@ class DataType:
 
 
 class DataTypeEpisodes(DataType):
+
+    @cached_property
+    def item_type(self):
+        if self._item_type in ('show', 'season', 'episode'):
+            return 'show'
+        if self._item_type == 'movie':
+            return 'movie'
+        raise ValueError(f'Invalid item_type {self._item_type} for {self.method}')
+
     def clear_child_columns(self, keys):
         if self.item_type == 'show':
             self.cache.del_column_values(keys=keys, item_type='season')
@@ -167,7 +178,7 @@ class SyncHiddenProgressWatched(DataType):
     def sync_func(self):
         """ Get items that are hidden on Trakt """
         from tmdbhelper.lib.addon.logger import TimerFunc
-        with TimerFunc(f'Sync: {self.method} {self.item_type}', inline=True, log_threshold=0.001):
+        with TimerFunc(f'Sync: {self.__class__.__name__} get_response_sync users {self.method} {self.item_type}', inline=True, log_threshold=0.001):
             response = []
             response += self.get_response_sync('users', self.method, type=f'{self.item_type}s', limit=4095) or []
             return response
@@ -392,7 +403,7 @@ class SyncAllNextEpisodes(DataTypeEpisodes):
             sd.additional_keys = ('trakt_id', )
             return sd
 
-        with TimerFunc(f'Sync: {self.method} {self.item_type}', inline=True, log_threshold=0.001):
+        with TimerFunc(f'Sync: {self.__class__.__name__} get_meta {self.method} {self.item_type}', inline=True, log_threshold=0.001):
             return get_meta(get_sd())
 
 
@@ -432,5 +443,5 @@ class SyncNextEpisodes(SyncAllNextEpisodes):
             sd.additional_keys = ('trakt_id', )
             return sd
 
-        with TimerFunc(f'Sync: {self.method} {self.item_type}', inline=True, log_threshold=0.001):
+        with TimerFunc(f'Sync: {self.__class__.__name__} get_meta {self.method} {self.item_type}', inline=True, log_threshold=0.001):
             return get_meta(get_sd())

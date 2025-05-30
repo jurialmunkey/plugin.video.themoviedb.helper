@@ -39,7 +39,7 @@ class ItemDetailsDatabase(Database):
         super().__init__(filename=self.cache_filename)
 
     # DB version must be max of table_version
-    database_version = 26
+    database_version = 27
 
     database_changes = {
         21: (
@@ -58,16 +58,35 @@ class ItemDetailsDatabase(Database):
             'ALTER TABLE tvshow ADD last_episode_to_air_id TEXT',
         ),
         25: (
-            'DROP TABLE custom',
+            'DROP TABLE IF EXISTS custom',
         ),
-        26: (
-            'DROP TABLE collection',
-            'DROP TABLE video',
-            'DROP TABLE unique_id',
-            'DROP TABLE art',
-            'DROP TABLE fanart_tv',
-            'DROP TABLE person',
-            'DROP TABLE baseitem',
+        26: (),
+        27: (
+            'DROP TABLE IF EXISTS unique_id',
+            'DROP TABLE IF EXISTS fanart_tv',
+            'DROP TABLE IF EXISTS art',
+            'DROP TABLE IF EXISTS service',
+            'DROP TABLE IF EXISTS provider',
+            'DROP TABLE IF EXISTS custom',
+            'DROP TABLE IF EXISTS castmember',
+            'DROP TABLE IF EXISTS crewmember',
+            'DROP TABLE IF EXISTS broadcaster',
+            'DROP TABLE IF EXISTS company',
+            'DROP TABLE IF EXISTS network',
+            'DROP TABLE IF EXISTS studio',
+            'DROP TABLE IF EXISTS country',
+            'DROP TABLE IF EXISTS genre',
+            'DROP TABLE IF EXISTS video',
+            'DROP TABLE IF EXISTS certification',
+            'DROP TABLE IF EXISTS person',
+            'DROP TABLE IF EXISTS ratings',
+            'DROP TABLE IF EXISTS collection',
+            'DROP TABLE IF EXISTS belongs',
+            'DROP TABLE IF EXISTS episode',
+            'DROP TABLE IF EXISTS season',
+            'DROP TABLE IF EXISTS tvshow',
+            'DROP TABLE IF EXISTS movie',
+            'DROP TABLE IF EXISTS baseitem',
         ),
     }
 
