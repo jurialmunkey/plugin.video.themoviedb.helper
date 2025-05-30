@@ -46,20 +46,14 @@ class ItemDetailsDatabase(Database):
             'ALTER TABLE tvshow ADD totalseasons INTEGER',
             'ALTER TABLE tvshow ADD totalepisodes INTEGER',
         ),
-        22: (
-            'DROP TABLE IF EXISTS studio',
-            'DROP TABLE IF EXISTS network',
-            'DROP TABLE IF EXISTS company',
-        ),
+        22: (),
         23: (
             'ALTER TABLE baseitem ADD datalevel INTEGER DEFAULT 0 NOT NULL',
         ),
         24: (
             'ALTER TABLE tvshow ADD last_episode_to_air_id TEXT',
         ),
-        25: (
-            'DROP TABLE IF EXISTS custom',
-        ),
+        25: (),
         26: (),
         27: (),
         28: (
