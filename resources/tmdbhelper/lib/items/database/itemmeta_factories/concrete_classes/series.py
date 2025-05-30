@@ -8,14 +8,13 @@ class SeriesItem:
         if collection_id:
 
             data_list = self.parent_db_cache.get_cached_list_values(
-                table='movie INNER JOIN belongs ON belongs.id = movie.id INNER JOIN genre ON genre.parent_id = belongs.id',
+                table='movie INNER JOIN belongs ON belongs.id = movie.id',
                 keys=(
                     'ROUND(AVG(rating), 1) as rating',
                     'SUM(votes) as votes',
                     'COUNT(movie.tmdb_id) as numitems',
                     'MAX(year) as year_last',
                     'MIN(year) as year_first',
-                    'replace(group_concat(DISTINCT genre.name), \',\', \' / \') as genres'
                 ),
                 values=(collection_id,),
                 conditions='belongs.parent_id=? GROUP BY belongs.parent_id')
@@ -27,7 +26,6 @@ class SeriesItem:
                 infoproperties['set.year.last'] = data_list[0]['year_last']
                 infoproperties['set.year.first'] = data_list[0]['year_first']
                 infoproperties['set.years'] = f"{data_list[0]['year_first']} - {data_list[0]['year_last']}"
-                infoproperties['set.genres'] = data_list[0]['genres']
             except IndexError:
                 pass
 
