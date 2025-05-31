@@ -43,13 +43,13 @@ class Season(MediaItem):
 
     def get_infoproperties_custom(self, infoproperties):
         infoproperties = super().get_infoproperties_custom(infoproperties)
-        for i in self.parent_db_cache.return_basemeta_db('custom', 'tvshow').cached_data:
+        for i in self.return_basemeta_db('custom', 'tvshow').cached_data:
             infoproperties[f"tvshow.{i['key']}"] = i['value']
         return infoproperties
 
     def get_unique_ids(self, unique_ids):
         unique_ids = super().get_unique_ids(unique_ids)
-        for i in self.parent_db_cache.return_basemeta_db('unique_id', 'tvshow').cached_data:
+        for i in self.return_basemeta_db('unique_id', 'tvshow').cached_data:
             unique_ids[f"tvshow.{i['key']}"] = i['value']
         unique_ids['tmdb'] = unique_ids['tvshow.tmdb'] = self.parent_db_cache.tmdb_id
         return unique_ids

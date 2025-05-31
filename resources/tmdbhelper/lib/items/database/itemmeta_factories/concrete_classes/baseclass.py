@@ -15,6 +15,9 @@ class BaseItem:
     def __init__(self, parent_db_cache):
         self.parent_db_cache = parent_db_cache
 
+    def return_basemeta_db(self, *args, **kwargs):
+        return self.parent_db_cache.return_basemeta_db(*args, **kwargs)
+
     @staticmethod
     def get_configured_item_value(i, ikey, instance):
         if ikey == 'backdrop':
@@ -37,7 +40,7 @@ class BaseItem:
 
     def get_infolabels_dbclist(self, infolabels):
         for instance, ikey, dkey in self.infolabels_dbclist_routes:
-            instance = self.parent_db_cache.return_basemeta_db(*instance)
+            instance = self.return_basemeta_db(*instance)
             try:
                 infolabels[dkey] = [i[ikey] for i in instance.cached_data]
             except(KeyError, TypeError, IndexError, AttributeError):
@@ -46,7 +49,7 @@ class BaseItem:
 
     def get_infolabels_dbcitem(self, infolabels):
         for instance, ikey, dkey in self.infolabels_dbcitem_routes:
-            instance = self.parent_db_cache.return_basemeta_db(*instance)
+            instance = self.return_basemeta_db(*instance)
             try:
                 infolabels[dkey] = ikey(instance.cached_data[0]) if callable(ikey) else instance.cached_data[0][ikey]
             except(KeyError, TypeError, IndexError, AttributeError):
@@ -72,7 +75,7 @@ class BaseItem:
             mappings = d['mappings']
             propname = d['propname']
             joinings = d['joinings']
-            instance = self.parent_db_cache.return_basemeta_db(*instance)
+            instance = self.return_basemeta_db(*instance)
             for x, i in enumerate(instance.cached_data, 1):
                 for dkey, ikey in mappings.items():
                     v = self.get_configured_item_value(i, ikey, instance)
@@ -87,7 +90,7 @@ class BaseItem:
 
     def get_infoproperties_dbcitem(self, infoproperties):
         for instance, ikey, dkey in self.infoproperties_dbcitem_routes:
-            instance = self.parent_db_cache.return_basemeta_db(*instance)
+            instance = self.return_basemeta_db(*instance)
             try:
                 infoproperties[dkey] = ikey(instance.cached_data[0]) if callable(ikey) else instance.cached_data[0][ikey]
             except(KeyError, TypeError, IndexError, AttributeError):
@@ -100,7 +103,7 @@ class BaseItem:
     def get_art_dbclist(self, art):
         for instance, dkey in self.art_dbclist_routes:
             attr, subtype = instance
-            instance = self.parent_db_cache.return_basemeta_db(attr, subtype)
+            instance = self.return_basemeta_db(attr, subtype)
 
             try:
                 datalist = instance.cached_data if attr == 'art_extrafanart' else [instance.cached_data[0]]

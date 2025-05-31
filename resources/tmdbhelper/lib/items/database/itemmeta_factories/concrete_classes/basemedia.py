@@ -287,7 +287,7 @@ class MediaItem(BaseItem):
     )
 
     def get_infoproperties_custom(self, infoproperties):
-        for i in self.parent_db_cache.return_basemeta_db('custom').cached_data:
+        for i in self.return_basemeta_db('custom').cached_data:
             infoproperties[i['key']] = i['value']
         return infoproperties
 
@@ -296,7 +296,7 @@ class MediaItem(BaseItem):
         if not duration:
             return infoproperties
 
-        progress = self.get_instance_cached_data_value(self.parent_db_cache.return_basemeta_db('playprogress'), 'playback_progress')
+        progress = self.get_instance_cached_data_value(self.return_basemeta_db('playprogress'), 'playback_progress')
         if not progress or progress < 4 or progress > 96:
             progress = 0
 
@@ -306,7 +306,7 @@ class MediaItem(BaseItem):
 
     def get_infoproperties_lastplayed(self, infoproperties):
         func_get = self.get_instance_cached_data_value
-        func_dbc = self.parent_db_cache.return_basemeta_db
+        func_dbc = self.return_basemeta_db
         lastplayed_timestamp = func_get(func_dbc('lastplayed'), 'lastplayed')
         if not lastplayed_timestamp:
             return infoproperties
@@ -317,7 +317,7 @@ class MediaItem(BaseItem):
 
     def get_infoproperties_ranks(self, infoproperties):
         func_get = self.get_instance_cached_data_value
-        func_dbc = self.parent_db_cache.return_basemeta_db
+        func_dbc = self.return_basemeta_db
 
         for database, column, name, func in (
             ('favorites_rank', 'favorites_rank', 'favorites_rank', None),
@@ -372,7 +372,7 @@ class MediaItem(BaseItem):
         return infoproperties
 
     def get_unique_ids(self, unique_ids):
-        for i in (self.parent_db_cache.return_basemeta_db('unique_id').cached_data or ()):
+        for i in (self.return_basemeta_db('unique_id').cached_data or ()):
             unique_ids[i['key']] = i['value']
         unique_ids['tmdb'] = self.parent_db_cache.tmdb_id
         return unique_ids
@@ -386,5 +386,5 @@ class MediaItem(BaseItem):
                 'order': i['ordering'] or 999999,
                 'thumbnail': self.parent_db_cache.common_apis.tmdb_imagepath.get_imagepath_poster(i['thumb'])
             }
-            for i in self.parent_db_cache.return_basemeta_db('castmember').cached_data
+            for i in self.return_basemeta_db('castmember').cached_data
         ]
