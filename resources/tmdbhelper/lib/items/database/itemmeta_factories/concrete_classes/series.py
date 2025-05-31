@@ -8,7 +8,6 @@ class SeriesItem:
         if collection_id:
 
             data_list = self.parent_db_cache.get_cached_list_values(
-                table='movie INNER JOIN belongs ON belongs.id = movie.id',
                 keys=(
                     'ROUND(AVG(rating), 1) as rating',
                     'SUM(votes) as votes',
@@ -16,8 +15,10 @@ class SeriesItem:
                     'MAX(year) as year_last',
                     'MIN(year) as year_first',
                 ),
+                table='movie INNER JOIN belongs ON belongs.id = movie.id',
+                conditions='belongs.parent_id=? GROUP BY belongs.parent_id',
                 values=(collection_id,),
-                conditions='belongs.parent_id=? GROUP BY belongs.parent_id')
+            )
 
             try:
                 infoproperties['set.rating'] = data_list[0]['rating']
@@ -29,6 +30,18 @@ class SeriesItem:
             except IndexError:
                 pass
 
+            data_list = self.parent_db_cache.get_cached_list_values(
+                keys=('DISTINCT name',),
+                table='genre INNER JOIN belongs ON genre.parent_id = belongs.id',
+                conditions='belongs.parent_id=? ORDER BY name',
+                values=(collection_id,),
+            )
+
+            try:
+                infoproperties['set.genres'] = ' / '.join(tuple((i['name'] for i in data_list)))
+            except IndexError:
+                pass
+
             if not self.parent_db_cache.extendedinfo:
                 return infoproperties
 
@@ -37,10 +50,10 @@ class SeriesItem:
                 'rating', 'votes', 'popularity', 'tmdb_id', 'originaltitle',
             )
             data_list = self.parent_db_cache.get_cached_list_values(
-                table='movie INNER JOIN belongs ON belongs.id = movie.id',
                 keys=data_keys,
-                values=(collection_id,),
-                conditions='belongs.parent_id=? ORDER BY year')
+                table='movie INNER JOIN belongs ON belongs.id = movie.id',
+                conditions='belongs.parent_id=? ORDER BY year',
+                values=(collection_id,),)
 
             try:
                 for x, i in enumerate(data_list, 1):
