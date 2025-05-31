@@ -39,29 +39,24 @@ class ItemDetailsDatabase(Database):
         super().__init__(filename=self.cache_filename)
 
     # DB version must be max of table_version
-    database_version = 27
+    database_version = 28
 
     database_changes = {
         21: (
             'ALTER TABLE tvshow ADD totalseasons INTEGER',
             'ALTER TABLE tvshow ADD totalepisodes INTEGER',
         ),
-        22: (
-            'DROP TABLE IF EXISTS studio',
-            'DROP TABLE IF EXISTS network',
-            'DROP TABLE IF EXISTS company',
-        ),
+        22: (),
         23: (
             'ALTER TABLE baseitem ADD datalevel INTEGER DEFAULT 0 NOT NULL',
         ),
         24: (
             'ALTER TABLE tvshow ADD last_episode_to_air_id TEXT',
         ),
-        25: (
-            'DROP TABLE IF EXISTS custom',
-        ),
+        25: (),
         26: (),
-        27: (
+        27: (),
+        28: (
             'DROP TABLE IF EXISTS unique_id',
             'DROP TABLE IF EXISTS fanart_tv',
             'DROP TABLE IF EXISTS art',

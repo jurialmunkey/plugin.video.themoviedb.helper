@@ -679,7 +679,6 @@ ART_COLUMNS = {
     'iso_language': {
         'data': 'TEXT',
         'indexed': True,
-        'unique': True,
     },
     'icon': {
         'data': 'TEXT',
@@ -715,7 +714,6 @@ FANART_TV_COLUMNS = {
     'iso_language': {
         'data': 'TEXT',
         'indexed': True,
-        'unique': True,
     },
     'likes': {
         'data': 'INTEGER',
