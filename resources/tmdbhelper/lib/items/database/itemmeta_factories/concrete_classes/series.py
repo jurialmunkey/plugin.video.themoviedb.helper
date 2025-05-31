@@ -52,6 +52,22 @@ class Series(BaseItem):
     infoproperties_dbclist_routes = ()
 
     @property
+    def infolabels_dbclist_routes(self):
+        return (
+            *super().infolabels_dbclist_routes,
+            (('series_genre', None), 'name', 'genre'),
+        )
+
+    @property
+    def infolabels_dbcitem_routes(self):
+        return (
+            *super().infolabels_dbcitem_routes,
+            (('series_stats', None), 'rating', 'rating'),
+            (('series_stats', None), 'votes', 'votes'),
+            (('series_stats', None), 'year_first', 'year'),
+        )
+
+    @property
     def collection_id(self):
         return self.parent_db_cache.parent_id
 
