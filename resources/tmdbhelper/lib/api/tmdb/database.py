@@ -12,6 +12,8 @@ from tmdbhelper.lib.api.tmdb.database_tables.collections import TMDbDatabaseColl
 from tmdbhelper.lib.api.tmdb.database_tables.keywords import TMDbDatabaseKeywords
 from tmdbhelper.lib.api.tmdb.database_tables.studios import TMDbDatabaseStudios
 from tmdbhelper.lib.api.tmdb.database_tables.networks import TMDbDatabaseNetworks
+from tmdbhelper.lib.api.tmdb.database_tables.movies import TMDbDatabaseMovies
+from tmdbhelper.lib.api.tmdb.database_tables.tvshows import TMDbDatabaseTvshows
 
 
 class TMDbDatabase(
@@ -24,7 +26,9 @@ class TMDbDatabase(
     TMDbDatabaseCollections,
     TMDbDatabaseKeywords,
     TMDbDatabaseStudios,
-    TMDbDatabaseNetworks
+    TMDbDatabaseNetworks,
+    TMDbDatabaseMovies,
+    TMDbDatabaseTvshows,
 ):
     cache_filename = 'LookupTMDb.db'
 
@@ -52,6 +56,8 @@ class TMDbDatabase(
             'keywords': self.keywords_columns,
             'studios': self.studios_columns,
             'networks': self.networks_columns,
+            'movies': self.movies_columns,
+            'tvshows': self.tvshows_columns,
         }
 
     def __init__(self):

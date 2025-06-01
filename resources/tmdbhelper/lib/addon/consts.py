@@ -284,6 +284,18 @@ TMDB_BASIC_LISTS = {
             'import_attr': 'ListKeywords'
         },
     },
+    'all_movies': {
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+            'import_attr': 'ListMovies'
+        },
+    },
+    'all_tvshows': {
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+            'import_attr': 'ListTvshows'
+        },
+    },
     'tmdb_v4_recommendations': {
         'route': {
             'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',

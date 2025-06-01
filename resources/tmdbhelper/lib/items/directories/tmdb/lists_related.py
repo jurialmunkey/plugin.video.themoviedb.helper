@@ -1,6 +1,5 @@
 from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard
-from tmdbhelper.lib.items.directories.tmdb.lists_view import ItemViews
-from tmdbhelper.lib.files.ftools import cached_property
+from tmdbhelper.lib.items.directories.tmdb.lists_view import ItemKeywords, ItemReviews
 
 
 class ListRelated(ListStandard):
@@ -42,24 +41,8 @@ class ListReviews(ListRelated):
         list_properties.localize = 32188
         return list_properties
 
-
-class ItemKeywords(ItemViews):
-    item_mediatype = 'keyword'
-    tmdb_type = 'movie'
-
-    def __init__(self, meta):
-        self.meta = meta
-        self.label = self.meta['name']
-        self.tmdb_id = self.meta['id']
-
-    @cached_property
-    def params(self):
-        return {
-            'info': 'discover',
-            'tmdb_type': self.tmdb_type,
-            'with_keywords': self.tmdb_id,
-            'with_id': 'True'
-        }
+    def get_mapped_item(self, item, *args, **kwargs):
+        return ItemReviews(**item).item
 
 
 class ListKeywords(ListRelated):
@@ -74,4 +57,4 @@ class ListKeywords(ListRelated):
         return list_properties
 
     def get_mapped_item(self, item, *args, **kwargs):
-        return ItemKeywords(item).item
+        return ItemKeywords(**item).item

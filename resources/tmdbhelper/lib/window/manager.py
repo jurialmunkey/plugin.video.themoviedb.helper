@@ -1,7 +1,7 @@
 from xbmc import Monitor
 from xbmcgui import Dialog, Window
 import jurialmunkey.window as window
-from jurialmunkey.parser import try_int
+from jurialmunkey.parser import try_int, parse_paramstring, reconfigure_legacy_params
 from tmdbhelper.lib.addon.plugin import get_condvisibility, get_localized, executebuiltin
 from tmdbhelper.lib.addon.dialog import BusyDialog
 from tmdbhelper.lib.api.tmdb.api import TMDb
@@ -20,11 +20,20 @@ ID_VIDEOINFO = 12003
 CONTAINER_ID = 9999
 
 
-def _configure_path(path):
-    path = path.replace('info=play', 'info=details')
-    path = path.replace('info=seasons', 'info=details')
-    path = path.replace('info=related', 'info=details')
-    return path
+def construct_path(tmdb_type=None, tmdb_id=None, **kwargs):
+    if not tmdb_type or not tmdb_id:
+        return ''
+    return f'plugin://plugin.video.themoviedb.helper/?info=details&tmdb_type={tmdb_type}&tmdb_id={tmdb_id}'
+
+
+def configure_path(path):
+    try:
+        paramstring = path.split('?')[1]
+    except (AttributeError, IndexError):
+        return
+    if not paramstring:
+        return
+    return construct_path(**reconfigure_legacy_params(**parse_paramstring(paramstring)))
 
 
 SV_ROUTES = {
@@ -57,7 +66,6 @@ def get_listitem(path):
 
         if base == 'plugin://script.skinvariables/':
             from jurialmunkey.modimp import importmodule
-            from jurialmunkey.parser import parse_paramstring
             pstr, *_ = pstr.split('&&')
             prms = parse_paramstring(pstr)
             return importmodule(** SV_ROUTES[prms['info']])(-1, pstr, **prms).get_items(**prms)[0][1]
@@ -286,10 +294,8 @@ class WindowManager(_EventLoop):
     def add_origin(self, tmdb_type, tmdb_id):
         if not tmdb_type or not tmdb_id:
             return
-        path = f'plugin://plugin.video.themoviedb.helper/?info=details&tmdb_type={tmdb_type}&tmdb_id={tmdb_id}'
-        path = _configure_path(path)
         self.position += 1
-        self.set_properties(self.position, path)
+        self.set_properties(self.position, construct_path(tmdb_type, tmdb_id))
         self.params['return'] = True
 
     def call_auto(self):
@@ -308,10 +314,10 @@ class WindowManager(_EventLoop):
         return self.event_loop()
 
     def add_path(self, path):
-        path = _configure_path(path)
+        path = configure_path(path)
 
         # Check that user didn't click twice by accident
-        if path == window.get_property(PREFIX_CURRENT):
+        if not path or path == window.get_property(PREFIX_CURRENT):
             return
 
         # Set our path to the window property so we can add it
