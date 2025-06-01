@@ -219,6 +219,88 @@ class ListCollections(ContainerDirectory):
 
 
 """
+Movies
+"""
+
+
+class ItemMovies(ItemViews):
+
+    item_mediatype = 'movie'
+    tmdb_type = 'movie'
+
+    def __init__(self, original_title, id, popularity, **kwargs):
+        self.label = original_title
+        self.popularity = popularity
+        self.tmdb_id = id
+
+    @cached_property
+    def infoproperties(self):
+        return {
+            'popularity': self.popularity,
+        }
+
+    @cached_property
+    def params(self):
+        return {
+            'info': 'details',
+            'tmdb_type': self.tmdb_type,
+            'tmdb_id': self.tmdb_id,
+            'plugin_category': self.label,
+        }
+
+
+class ListMovies(ContainerDirectory):
+    def get_items(self, limit=20, page=1, **kwargs):
+        items = self.tmdb_api.tmdb_database.get_movies(limit=int(limit), page=int(page))
+        items = [ItemMovies(**i).item for i in items]
+        items.append({'next_page': int(page) + 1})
+        self.kodi_db = None
+        self.container_content = 'movies'
+        return items
+
+
+"""
+Tvshows
+"""
+
+
+class ItemTvshows(ItemViews):
+
+    item_mediatype = 'tvshow'
+    tmdb_type = 'tvshow'
+
+    def __init__(self, original_name, id, popularity, **kwargs):
+        self.label = original_name
+        self.popularity = popularity
+        self.tmdb_id = id
+
+    @cached_property
+    def infoproperties(self):
+        return {
+            'popularity': self.popularity,
+        }
+
+    @cached_property
+    def params(self):
+        return {
+            'info': 'details',
+            'tmdb_type': self.tmdb_type,
+            'tmdb_id': self.tmdb_id,
+            'plugin_category': self.label,
+        }
+
+
+class ListTvshows(ContainerDirectory):
+    def get_items(self, limit=20, page=1, **kwargs):
+        items = self.tmdb_api.tmdb_database.get_tvshows(limit=int(limit), page=int(page))
+        items = [ItemTvshows(**i).item for i in items]
+        items.append({'next_page': int(page) + 1})
+        self.kodi_db = None
+        self.container_content = 'tvshows'
+        return items
+
+
+"""
 PROVIDERS
 """
 

@@ -1,4 +1,4 @@
-from tmdbhelper.lib.api.tmdb.database_tables.collections import TableDailyExport
+from tmdbhelper.lib.api.tmdb.database_tables.daily_export import TableDailyExport
 
 
 class TMDbDatabaseStudios:
