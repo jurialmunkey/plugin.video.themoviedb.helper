@@ -383,6 +383,8 @@ class _Person(_ListItem):
         self.params['info'] = 'credits_in_both'
         self.params['tmdb_type'] = 'person'
         self.params['tmdb_id'] = self.unique_ids.get('tmdb')
+        self.params['cacheonly'] = 'true'
+        self.params['limit'] = 250
         return self.params
 
 
