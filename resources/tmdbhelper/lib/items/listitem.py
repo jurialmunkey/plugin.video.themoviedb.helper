@@ -380,7 +380,7 @@ class _Person(_ListItem):
         self.is_folder = True
 
     def finalise_params_details(self):
-        self.params['info'] = 'related'
+        self.params['info'] = 'credits_in_both'
         self.params['tmdb_type'] = 'person'
         self.params['tmdb_id'] = self.unique_ids.get('tmdb')
         return self.params
