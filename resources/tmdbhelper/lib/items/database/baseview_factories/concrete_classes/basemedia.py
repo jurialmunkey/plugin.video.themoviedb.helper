@@ -25,12 +25,14 @@ class MediaList(BaseList):
     }
     allowlist_infolabel_keys = _ListItemInfoTagVideo._tag_attr
     limit = None
+    offset = None
 
     @property
     def cached_data_conditions(self):  # WHERE CONDITIONS
         condition = self.cached_data_conditions_base
         condition = self.configure_filter_conditions(condition, **self.filters) if self.filters else condition
         condition = f'{condition} LIMIT {self.limit}' if self.limit else condition
+        condition = f'{condition} OFFSET {self.offset}' if self.offset else condition
         return condition
 
     def configure_filter_conditions(self, condition, filter_key=None, filter_value=None, filter_operator=None, **kwargs):
