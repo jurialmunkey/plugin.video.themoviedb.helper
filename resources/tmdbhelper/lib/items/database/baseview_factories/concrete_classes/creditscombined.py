@@ -4,19 +4,30 @@ from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.starredco
 class CreditsCombinedMediaList(StarredCombinedMediaList):
 
     cached_data_table = """
-        baseitem INNER JOIN person ON baseitem.id = person.id
-        LEFT JOIN castmember ON person.tmdb_id = castmember.tmdb_id
-        LEFT JOIN crewmember ON person.tmdb_id = crewmember.tmdb_id
-        LEFT JOIN movie ON movie.id = IFNULL(castmember.parent_id, crewmember.parent_id)
-        LEFT JOIN tvshow ON tvshow.id = IFNULL(castmember.parent_id, crewmember.parent_id)
+        baseitem INNER JOIN person ON person.id = baseitem.id
+        INNER JOIN
+        (
+            SELECT tmdb_id, role, appearances, 'Acting' as department, parent_id
+            FROM castmember
+            UNION
+            SELECT tmdb_id, role, appearances, department, parent_id
+            FROM crewmember
+        ) credits ON credits.tmdb_id = person.tmdb_id
+        INNER JOIN
+        (
+            SELECT tmdb_id, title, year, premiered, status, votes, rating, popularity, id
+            FROM movie
+            UNION
+            SELECT tmdb_id, title, year, premiered, status, votes, rating, popularity, id
+            FROM tvshow
+        ) media ON media.id = credits.parent_id
     """
 
     cached_data_base_conditions = """
         person.tmdb_id=? AND baseitem.expiry>=? AND baseitem.datalevel>=?
-        AND IFNULL(movie.id, tvshow.id) IS NOT NULL
     """
 
-    group_by = 'IFNULL(movie.id, tvshow.id)'
+    group_by = 'media.id'
 
     @staticmethod
     def map_item_infoproperties(i):
@@ -32,17 +43,17 @@ class CreditsCombinedMediaList(StarredCombinedMediaList):
     @property
     def cached_data_keys(self):
         return (
-            'IFNULL(movie.id, tvshow.id) as parent_id',
-            'GROUP_CONCAT(DISTINCT IFNULL(castmember.role, crewmember.role)) as role',
-            'GROUP_CONCAT(DISTINCT crewmember.department) as department',
-            'IFNULL(movie.tmdb_id, tvshow.tmdb_id) as tmdb_id',
-            'IFNULL(movie.title, tvshow.title) as title',
-            'IFNULL(movie.year, tvshow.year) as year',
-            'IFNULL(movie.premiered, tvshow.premiered) as premiered',
-            'IFNULL(movie.status, tvshow.status) as status',
-            'IFNULL(movie.votes, tvshow.votes) as votes',
-            'IFNULL(movie.rating, tvshow.rating) as rating',
-            'IFNULL(movie.popularity, tvshow.popularity) as popularity'
+            'media.id as parent_id',
+            'media.tmdb_id as tmdb_id',
+            'media.title as title',
+            'media.year as year',
+            'media.premiered as premiered',
+            'media.status as status',
+            'media.votes as votes',
+            'media.rating as rating',
+            'media.popularity as popularity',
+            'GROUP_CONCAT(DISTINCT credits.role) as role',
+            'GROUP_CONCAT(DISTINCT credits.department) as department',
         )
 
 
