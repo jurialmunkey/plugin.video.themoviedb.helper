@@ -24,10 +24,13 @@ class UpNextSeason(AnticipatedSeasonMediaList):
             'tvshow.tagline as tagline',
             'ifnull(season.plot, tvshow.plot) as plot',
             (
-                '(    SELECT COUNT(simplecache.item_type) '
-                '     FROM simplecache WHERE simplecache.id LIKE season.tvshow_id || ".%"'
-                '                        AND simplecache.last_watched_at IS NULL'
-                '                        AND simplecache.item_type = \'episode\''
+                '(    SELECT COUNT(simplecache.item_type)'
+                '     FROM simplecache'
+                '     INNER JOIN simplecache simplecache_tvshow ON \'tv.\' || simplecache.tmdb_id = simplecache_tvshow.id'
+                '        WHERE simplecache.id LIKE season.tvshow_id || ".%"'
+                '          AND simplecache.last_watched_at IS NULL'
+                '          AND simplecache.item_type = \'episode\''
+                '          AND simplecache_tvshow.dropped_hidden_at IS NULL'
                 '     GROUP BY simplecache.item_type'
                 ') as totalepisodes'
             )
