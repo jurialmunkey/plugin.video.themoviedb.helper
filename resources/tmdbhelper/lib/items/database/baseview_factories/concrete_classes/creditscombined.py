@@ -4,8 +4,7 @@ from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.starredco
 class CreditsCombinedMediaList(StarredCombinedMediaList):
 
     cached_data_table = """
-        baseitem
-        INNER JOIN person ON baseitem.id = person.id
+        baseitem INNER JOIN person ON baseitem.id = person.id
         LEFT JOIN castmember ON person.tmdb_id = castmember.tmdb_id
         LEFT JOIN crewmember ON person.tmdb_id = crewmember.tmdb_id
         LEFT JOIN movie ON movie.id = IFNULL(castmember.parent_id, crewmember.parent_id)
