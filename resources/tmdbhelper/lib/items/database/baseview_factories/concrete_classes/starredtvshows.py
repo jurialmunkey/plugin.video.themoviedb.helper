@@ -12,8 +12,8 @@ class StarredTvshowsMediaList(StarredMoviesMediaList):
     def group_by(self):
         return f'{self.table}.parent_id'
 
-    order_by_fallback = 'appearances'
-    order_how_fallback = 'DESC'
+    sort_by_fallback = 'appearances'
+    order_by_direction_fallback = 'DESC'
 
     item_mediatype = 'tvshow'
     item_tmdb_type = 'tv'

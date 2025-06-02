@@ -11,8 +11,7 @@ class MediaList(BaseList):
     item_tmdb_type = ''
     item_label_key = 'name'
     item_alter_key = ''
-    sort_by_map = {}
-    sort_how_map = {}
+    sort_direction = {}
     filter_key_map = {}
     filter_operator_map = {
         'lt': '<',
@@ -55,20 +54,20 @@ class MediaList(BaseList):
     @property
     def order_by(self):
         try:
-            return f'{self.sort_by_map[self.sort_by]} {self.order_how}'
+            return f'{self.filter_key_map[self.sort_by]} {self.order_by_direction}'
         except (KeyError, TypeError, NameError):
-            return f'{self.order_by_fallback} {self.order_how}' if self.order_by_fallback else None
+            return f'{self.sort_by_fallback} {self.order_by_direction}' if self.sort_by_fallback else None
 
-    order_by_fallback = None
+    sort_by_fallback = None
 
     @property
-    def order_how(self):
+    def order_by_direction(self):
         try:
-            return self.sort_how or self.sort_how_map[self.sort_by]
+            return self.sort_how or self.sort_direction[self.sort_by]
         except (KeyError, TypeError, NameError):
-            return self.sort_how or self.order_how_fallback
+            return self.sort_how or self.order_by_direction_fallback
 
-    order_how_fallback = 'DESC'
+    order_by_direction_fallback = 'DESC'
 
     def image_path_func(self, v):
         return self.common_apis.tmdb_imagepath.get_imagepath_poster(v)

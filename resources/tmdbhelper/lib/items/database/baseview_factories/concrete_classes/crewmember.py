@@ -7,8 +7,18 @@ class CrewMemberMediaList(CastMemberMediaList):
     cached_data_base_conditions = 'parent_id=? AND expiry>=? AND datalevel>=?'  # WHERE conditions
     cached_data_check_key = 'parent_id'
     group_by = 'crewmember.tmdb_id'
-    order_by = None
     keys = ('GROUP_CONCAT(role, " / ") as role', 'department', 'appearances', 'parent_id')
+
+    sort_by_fallback = None
+    order_by_direction_fallback = 'ASC'
+
+    filter_key_map = {
+        'role': 'role',
+        'department': 'department',
+        'appearances': 'appearances',
+        'title': 'creditedperson.name',
+        'gender': 'creditedperson.gender',
+    }
 
     @staticmethod
     def map_item_infoproperties(i):

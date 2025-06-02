@@ -11,8 +11,22 @@ class FanartMediaList(MediaList):
     item_label_key = 'icon'
     item_alter_key = ''
 
-    order_by_fallback = 'rating'
-    order_how_fallback = 'DESC'
+    sort_by_fallback = 'rating'
+    order_by_direction_fallback = 'DESC'
+
+    filter_key_map = {
+        'iso_language': 'iso_language',
+        'rating': 'rating',
+        'votes': 'votes',
+        'aspect_ratio': 'aspect_ratio',
+        'quality': 'quality',
+        'type': 'type',
+        'extension': 'extension',
+    }
+
+    sort_direction = {
+        'appearances': 'DESC',
+    }
 
     @property
     def cached_data_values(self):

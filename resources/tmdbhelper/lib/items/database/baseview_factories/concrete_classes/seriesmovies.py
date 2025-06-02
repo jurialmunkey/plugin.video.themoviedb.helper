@@ -47,24 +47,15 @@ class SeriesMoviesMediaList(MediaList):
         'popularity': 'movie.popularity',
     }
 
-    sort_by_map = {
-        'popularity': 'movie.popularity',
-        'rating': 'movie.rating',
-        'votes': 'movie.votes',
-        'premiered': 'movie.premiered',
-        'year': 'movie.year',
-        'title': 'movie.title',
-    }
-
     # Since our default sort is year ASC unlike most with DESC we need to map DESC instead
-    sort_how_map = {
+    sort_direction = {
         'popularity': 'DESC',
         'rating': 'DESC',
         'votes': 'DESC'
     }
 
-    order_by_fallback = 'year'
-    order_how_fallback = 'ASC'
+    sort_by_fallback = 'year'
+    order_by_direction_fallback = 'ASC'
 
     @staticmethod
     def map_item_infoproperties(i):

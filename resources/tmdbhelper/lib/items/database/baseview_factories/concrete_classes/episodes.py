@@ -11,8 +11,8 @@ class EpisodeMediaList(MediaList):
     item_tmdb_type = 'tv'
     item_label_key = 'title'
 
-    order_by_fallback = 'episode.episode'
-    order_how_fallback = 'ASC'
+    sort_by_fallback = 'episode.episode'
+    order_by_direction_fallback = 'ASC'
 
     @property
     def keys(self):

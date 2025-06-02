@@ -12,7 +12,7 @@ class CrewedTvshowsMediaList(CrewedMoviesMediaList):
     def group_by(self):
         return f'{self.table}.parent_id'
 
-    order_by_fallback = 'appearances'
+    sort_by_fallback = 'appearances'
 
     item_mediatype = 'tvshow'
     item_tmdb_type = 'tv'

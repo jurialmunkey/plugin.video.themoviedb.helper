@@ -7,7 +7,7 @@ class CrewedMoviesMediaList(StarredMoviesMediaList):
     item_mediatype = 'movie'
     item_tmdb_type = 'movie'
 
-    filter_key_map = {
+    filter_key_map = sort_key_map = {
         'job': 'role',
         'role': 'role',
         'department': 'department',

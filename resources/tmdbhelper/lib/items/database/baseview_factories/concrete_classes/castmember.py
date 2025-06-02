@@ -12,7 +12,19 @@ class CastMemberMediaList(MediaList):
 
     cached_data_base_conditions = 'parent_id=? AND expiry>=? AND datalevel>=?'  # WHERE conditions
     group_by = 'castmember.tmdb_id'
-    order_by = 'IFNULL(ordering, 9999) ASC'
+    sort_by_fallback = 'IFNULL(ordering, 9999)'
+    order_by_direction_fallback = 'ASC'
+
+    filter_key_map = {
+        'role': 'role',
+        'appearances': 'appearances',
+        'title': 'creditedperson.name',
+        'gender': 'creditedperson.gender',
+    }
+
+    sort_direction = {
+        'appearances': 'DESC',
+    }
 
     @property
     def cached_data_values(self):

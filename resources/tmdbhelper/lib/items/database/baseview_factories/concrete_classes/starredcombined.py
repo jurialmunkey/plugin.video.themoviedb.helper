@@ -52,9 +52,7 @@ class StarredCombinedMediaList(MediaList):
     item_label_key = 'title'
     item_alter_key = 'role'
 
-    filter_key_map = {}
-
-    sort_by_map = {
+    filter_key_map = {
         'popularity': 'popularity',
         'vote_average': 'rating',
         'rating': 'rating',
@@ -67,12 +65,12 @@ class StarredCombinedMediaList(MediaList):
         'title': 'title',
     }
 
-    sort_how_map = {
+    sort_direction = {
         'title': 'ASC'
     }
 
-    order_by_fallback = 'votes'
-    order_how_fallback = 'DESC'
+    sort_by_fallback = 'votes'
+    order_by_direction_fallback = 'DESC'
 
     @staticmethod
     def map_item_infoproperties(i):

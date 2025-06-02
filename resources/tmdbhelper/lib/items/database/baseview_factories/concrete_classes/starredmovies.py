@@ -58,27 +58,12 @@ class StarredMoviesMediaList(MediaList):
             'popularity': f'{self.cached_data_innertable}.popularity',
         }
 
-    @property
-    def sort_by_map(self):
-        return {
-            'popularity': f'{self.cached_data_innertable}.popularity',
-            'vote_average': f'{self.cached_data_innertable}.rating',
-            'rating': f'{self.cached_data_innertable}.rating',
-            'vote_count': f'{self.cached_data_innertable}.votes',
-            'votes': f'{self.cached_data_innertable}.votes',
-            'release_date': f'{self.cached_data_innertable}.premiered',
-            'first_air_date': f'{self.cached_data_innertable}.premiered',
-            'premiered': f'{self.cached_data_innertable}.premiered',
-            'year': f'{self.cached_data_innertable}.year',
-            'title': f'{self.cached_data_innertable}.title',
-        }
-
-    sort_how_map = {
+    sort_direction = {
         'title': 'ASC'
     }
 
-    order_by_fallback = 'votes'
-    order_how_fallback = 'DESC'
+    sort_by_fallback = 'votes'
+    order_by_direction_fallback = 'DESC'
 
     @staticmethod
     def map_item_infoproperties(i):
