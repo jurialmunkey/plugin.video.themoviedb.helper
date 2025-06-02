@@ -3,13 +3,16 @@ from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.basemedia
 
 class FanartMediaList(MediaList):
     cached_data_table = table = 'art'
-    cached_data_conditions_base = 'parent_id=? AND type=? ORDER BY rating DESC'
+    cached_data_base_conditions = 'parent_id=? AND type=?'
     cached_data_check_key = 'parent_id'
     keys = ('icon', 'iso_language', 'rating', 'parent_id')
     item_mediatype = 'image'
     item_tmdb_type = 'image'
     item_label_key = 'icon'
     item_alter_key = ''
+
+    order_by_fallback = 'rating'
+    order_how_fallback = 'DESC'
 
     @property
     def cached_data_values(self):

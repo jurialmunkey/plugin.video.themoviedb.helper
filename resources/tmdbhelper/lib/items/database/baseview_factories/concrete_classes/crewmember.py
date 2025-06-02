@@ -4,8 +4,10 @@ from tmdbhelper.lib.files.ftools import cached_property
 
 class CrewMemberMediaList(CastMemberMediaList):
     table = 'crewmember'
-    cached_data_conditions_base = 'parent_id=? AND expiry>=? AND datalevel>=? GROUP BY crewmember.tmdb_id'  # WHERE conditions
+    cached_data_base_conditions = 'parent_id=? AND expiry>=? AND datalevel>=?'  # WHERE conditions
     cached_data_check_key = 'parent_id'
+    group_by = 'crewmember.tmdb_id'
+    order_by = None
     keys = ('GROUP_CONCAT(role, " / ") as role', 'department', 'appearances', 'parent_id')
 
     @staticmethod

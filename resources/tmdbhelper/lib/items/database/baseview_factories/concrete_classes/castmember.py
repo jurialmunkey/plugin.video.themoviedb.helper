@@ -10,7 +10,9 @@ class CastMemberMediaList(MediaList):
     item_mediatype = 'person'
     item_tmdb_type = 'person'
 
-    cached_data_conditions_base = 'parent_id=? AND expiry>=? AND datalevel>=? GROUP BY castmember.tmdb_id ORDER BY IFNULL(ordering, 9999) ASC'  # WHERE conditions
+    cached_data_base_conditions = 'parent_id=? AND expiry>=? AND datalevel>=?'  # WHERE conditions
+    group_by = 'castmember.tmdb_id'
+    order_by = 'IFNULL(ordering, 9999) ASC'
 
     @property
     def cached_data_values(self):

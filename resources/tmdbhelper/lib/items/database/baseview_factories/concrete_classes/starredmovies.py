@@ -30,12 +30,8 @@ class StarredMoviesMediaList(MediaList):
         )
 
     @property
-    def cached_data_conditions_base(self):  # WHERE conditions
-        return (
-            f'{self.table}.tmdb_id=? AND baseitem.expiry>=? AND baseitem.datalevel>=? '
-            f'GROUP BY {self.table}.parent_id '
-            f'ORDER BY {self.cached_data_conditions_sort}'
-        )
+    def group_by(self):
+        return f'{self.table}.parent_id'
 
     @property
     def cached_data_values(self):
@@ -48,53 +44,41 @@ class StarredMoviesMediaList(MediaList):
     item_label_key = 'title'
     item_alter_key = 'role'
 
-    filter_key_map = {
-        'role': 'role',
-        'character': 'role',
-        'title': 'title',
-        'year': 'year',
-        'premiered': 'premiered',
-        'status': 'status',
-        'votes': 'votes',
-        'rating': 'rating',
-        'popularity': 'popularity',
-    }
+    @property
+    def filter_key_map(self):
+        return {
+            'role': f'{self.cached_data_innertable}.role',
+            'character': f'{self.cached_data_innertable}.role',
+            'title': f'{self.cached_data_innertable}.title',
+            'year': f'{self.cached_data_innertable}.year',
+            'premiered': f'{self.cached_data_innertable}.premiered',
+            'status': f'{self.cached_data_innertable}.status',
+            'votes': f'{self.cached_data_innertable}.votes',
+            'rating': f'{self.cached_data_innertable}.rating',
+            'popularity': f'{self.cached_data_innertable}.popularity',
+        }
 
-    sort_key_map = {
-        'popularity': 'popularity',
-        'vote_average': 'rating',
-        'rating': 'rating',
-        'vote_count': 'votes',
-        'votes': 'votes',
-        'release_date': 'premiered',
-        'first_air_date': 'premiered',
-        'premiered': 'premiered',
-        'year': 'year',
-        'title': 'title',
-    }
+    @property
+    def sort_by_map(self):
+        return {
+            'popularity': f'{self.cached_data_innertable}.popularity',
+            'vote_average': f'{self.cached_data_innertable}.rating',
+            'rating': f'{self.cached_data_innertable}.rating',
+            'vote_count': f'{self.cached_data_innertable}.votes',
+            'votes': f'{self.cached_data_innertable}.votes',
+            'release_date': f'{self.cached_data_innertable}.premiered',
+            'first_air_date': f'{self.cached_data_innertable}.premiered',
+            'premiered': f'{self.cached_data_innertable}.premiered',
+            'year': f'{self.cached_data_innertable}.year',
+            'title': f'{self.cached_data_innertable}.title',
+        }
 
     sort_how_map = {
         'title': 'ASC'
     }
 
-    @property
-    def cached_data_conditions_sort(self):
-        """ ORDER BY """
-        try:
-            return f'{self.cached_data_innertable}.{self.sort_key_map[self.sort_by]} {self.cached_data_conditions_how}'
-        except (KeyError, TypeError, NameError):
-            return self.cached_data_conditions_sort_fallback
-
-    @property
-    def cached_data_conditions_sort_fallback(self):
-        return f'votes {self.cached_data_conditions_how}'
-
-    @property
-    def cached_data_conditions_how(self):
-        try:
-            return self.sort_how or self.sort_how_map[self.sort_by]
-        except (KeyError, TypeError, NameError):
-            return self.sort_how or 'DESC'
+    order_by_fallback = 'votes'
+    order_how_fallback = 'DESC'
 
     @staticmethod
     def map_item_infoproperties(i):

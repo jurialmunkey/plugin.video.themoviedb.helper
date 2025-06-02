@@ -5,7 +5,10 @@ from tmdbhelper.lib.addon.plugin import get_localized, ADDONPATH
 class UpNextSeason(AnticipatedSeasonMediaList):
     table = 'season'
     item_specialseason = get_localized(32043)
-    cached_data_conditions_base = 'season.tvshow_id=? AND totalepisodes>0 ORDER BY season.season DESC LIMIT 1'
+    cached_data_base_conditions = 'season.tvshow_id=? AND totalepisodes>0'
+
+    order_by = 'season.season DESC'
+    limit = '1'
 
     def map_item_art(self, i):
         map_item_art = self.parent_item_data['art']

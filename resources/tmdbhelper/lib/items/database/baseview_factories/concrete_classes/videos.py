@@ -3,13 +3,15 @@ from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.basemedia
 
 class VideoMediaList(MediaList):
     cached_data_table = table = 'video'
-    cached_data_conditions_base = 'parent_id=? ORDER BY content="Trailer" DESC'
+    cached_data_base_conditions = 'parent_id=?'
     cached_data_check_key = 'parent_id'
     keys = ('name', 'iso_language', 'iso_country', 'key', 'release_date as premiered', 'path', 'content', 'parent_id')
     item_mediatype = 'video'
     item_tmdb_type = 'video'
     item_label_key = 'name'
     item_alter_key = ''
+
+    order_by = 'content="Trailer" DESC'
 
     @property
     def cached_data_values(self):

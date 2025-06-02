@@ -31,13 +31,15 @@ class StarredCombinedMediaList(MediaList):
         )
 
     @property
-    def cached_data_conditions_base(self):  # WHERE conditions
+    def cached_data_base_conditions(self):  # WHERE conditions
         return (
             f'{self.table}.tmdb_id=? AND baseitem.expiry>=? AND baseitem.datalevel>=? '
-            f'AND IFNULL(movie.id, tvshow.id) IS NOT NULL '
-            f'GROUP BY {self.table}.parent_id '
-            f'ORDER BY {self.cached_data_conditions_sort}'
+            'AND IFNULL(movie.id, tvshow.id) IS NOT NULL '
         )
+
+    @property
+    def group_by(self):
+        return f'{self.table}.parent_id'
 
     @property
     def cached_data_values(self):
@@ -52,7 +54,7 @@ class StarredCombinedMediaList(MediaList):
 
     filter_key_map = {}
 
-    sort_key_map = {
+    sort_by_map = {
         'popularity': 'popularity',
         'vote_average': 'rating',
         'rating': 'rating',
@@ -69,24 +71,8 @@ class StarredCombinedMediaList(MediaList):
         'title': 'ASC'
     }
 
-    @property
-    def cached_data_conditions_sort(self):
-        """ ORDER BY """
-        try:
-            return f'{self.sort_key_map[self.sort_by]} {self.cached_data_conditions_how}'
-        except (KeyError, TypeError, NameError):
-            return self.cached_data_conditions_sort_fallback
-
-    @property
-    def cached_data_conditions_sort_fallback(self):
-        return f'votes {self.cached_data_conditions_how}'
-
-    @property
-    def cached_data_conditions_how(self):
-        try:
-            return self.sort_how or self.sort_how_map[self.sort_by]
-        except (KeyError, TypeError, NameError):
-            return self.sort_how or 'DESC'
+    order_by_fallback = 'votes'
+    order_how_fallback = 'DESC'
 
     @staticmethod
     def map_item_infoproperties(i):

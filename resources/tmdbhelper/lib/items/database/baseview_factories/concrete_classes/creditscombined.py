@@ -12,14 +12,12 @@ class CreditsCombinedMediaList(StarredCombinedMediaList):
         LEFT JOIN tvshow ON tvshow.id = IFNULL(castmember.parent_id, crewmember.parent_id)
     """
 
-    @property
-    def cached_data_conditions_base(self):  # WHERE conditions
-        return (
-            'person.tmdb_id=? AND baseitem.expiry>=? AND baseitem.datalevel>=? '
-            'AND IFNULL(movie.id, tvshow.id) IS NOT NULL '
-            'GROUP BY IFNULL(movie.id, tvshow.id) '
-            f'ORDER BY {self.cached_data_conditions_sort}'
-        )
+    cached_data_base_conditions = """
+        person.tmdb_id=? AND baseitem.expiry>=? AND baseitem.datalevel>=?
+        AND IFNULL(movie.id, tvshow.id) IS NOT NULL
+    """
+
+    group_by = 'IFNULL(movie.id, tvshow.id)'
 
     @staticmethod
     def map_item_infoproperties(i):

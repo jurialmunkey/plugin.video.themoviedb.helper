@@ -6,11 +6,13 @@ class MediaList(BaseList):
     filters = {}
     sort_by = None
     sort_how = None
-    cached_data_conditions_base = 'parent_id=?'
+    cached_data_base_conditions = 'parent_id=?'
     item_mediatype = ''
     item_tmdb_type = ''
     item_label_key = 'name'
     item_alter_key = ''
+    sort_by_map = {}
+    sort_how_map = {}
     filter_key_map = {}
     filter_operator_map = {
         'lt': '<',
@@ -26,11 +28,14 @@ class MediaList(BaseList):
     allowlist_infolabel_keys = _ListItemInfoTagVideo._tag_attr
     limit = None
     offset = None
+    group_by = None
 
     @property
     def cached_data_conditions(self):  # WHERE CONDITIONS
-        condition = self.cached_data_conditions_base
+        condition = self.cached_data_base_conditions
         condition = self.configure_filter_conditions(condition, **self.filters) if self.filters else condition
+        condition = f'{condition} GROUP BY {self.group_by}' if self.group_by else condition
+        condition = f'{condition} ORDER BY {self.order_by}' if self.order_by else condition
         condition = f'{condition} LIMIT {self.limit}' if self.limit else condition
         condition = f'{condition} OFFSET {self.offset}' if self.offset else condition
         return condition
@@ -46,6 +51,24 @@ class MediaList(BaseList):
         if not filter_operator:
             return f'{self.filter_key_map[filter_key]} LIKE "%{filter_value}%" AND {condition}'
         return f'{self.filter_key_map[filter_key]}{filter_operator}"{filter_value}" AND {condition}'
+
+    @property
+    def order_by(self):
+        try:
+            return f'{self.sort_by_map[self.sort_by]} {self.order_how}'
+        except (KeyError, TypeError, NameError):
+            return f'{self.order_by_fallback} {self.order_how}' if self.order_by_fallback else None
+
+    order_by_fallback = None
+
+    @property
+    def order_how(self):
+        try:
+            return self.sort_how or self.sort_how_map[self.sort_by]
+        except (KeyError, TypeError, NameError):
+            return self.sort_how or self.order_how_fallback
+
+    order_how_fallback = 'DESC'
 
     def image_path_func(self, v):
         return self.common_apis.tmdb_imagepath.get_imagepath_poster(v)

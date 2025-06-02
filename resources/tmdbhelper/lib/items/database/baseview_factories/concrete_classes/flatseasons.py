@@ -20,12 +20,14 @@ class FlatSeasonMediaListMixin:
 
 class FlatSeasonMediaList(FlatSeasonMediaListMixin, MediaList):
     table = 'episode'
-    cached_data_conditions_base = 'episode.tvshow_id=? AND baseitem.expiry>=? AND baseitem.datalevel>=? ORDER BY season.season=0, season.season ASC, episode.episode ASC'
+    cached_data_base_conditions = 'episode.tvshow_id=? AND baseitem.expiry>=? AND baseitem.datalevel>=?'
     cached_data_check_key = 'episode'
     keys = ()
     item_mediatype = 'episode'
     item_tmdb_type = 'tv'
     item_label_key = 'title'
+
+    order_by = 'season.season=0, season.season ASC, episode.episode ASC'
 
     filter_key_map = {
         'season': 'season',
