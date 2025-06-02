@@ -7,6 +7,10 @@ class StarredMoviesMediaList(MediaList):
     cached_data_innertable = 'movie'
 
     @property
+    def cached_data_base_conditions(self):  # WHERE conditions
+        return f'{self.table}.tmdb_id=? AND baseitem.expiry>=? AND baseitem.datalevel>=? '
+
+    @property
     def cached_data_table(self):
         return (
             'baseitem '
