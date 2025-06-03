@@ -410,7 +410,7 @@ class WindowManager(_EventLoop):
         with suppress(KeyError):
             return self.add_tmdb(self.params['add_tmdb'], self.params['tmdb_type'])
         with suppress(KeyError):
-            return self.add_path(self.params['add_query'], self.params['tmdb_type'])
+            return self.add_query(self.params['add_query'], self.params['tmdb_type'])
         if self.params.get('close_dialog') or self.params.get('reset_path'):
             return self.close_dialog()
         return self.call_window()
