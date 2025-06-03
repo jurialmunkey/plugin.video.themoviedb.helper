@@ -32,13 +32,13 @@ class ListProperties:
 
     @cached_property
     def cache_name(self):
-        return '_'.join((
+        return '_'.join(map(str, (
             self.class_name,
             self.tmdb_type,
             self.page,
             self.length,
             self.pagination,
-        ))
+        )))
 
     @cached_property
     def items(self):
