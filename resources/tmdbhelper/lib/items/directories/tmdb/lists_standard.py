@@ -21,7 +21,7 @@ class UncachedItemsPage:
         try:
             results = self.response[self.outer_class.results_key]
         except (TypeError, KeyError):
-            return
+            return []
         try:
             self.outer_class.total_pages = self.response['total_pages']
             self.outer_class.total_items = self.response['total_results']
