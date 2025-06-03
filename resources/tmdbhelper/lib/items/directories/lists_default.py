@@ -5,7 +5,7 @@ from tmdbhelper.lib.items.filters import is_excluded
 from jurialmunkey.parser import try_int
 
 
-class use_item_cache:
+class ItemCache:
     def __init__(self, filename):
         from tmdbhelper.lib.files.bcache import BasicCache
         self.cache = BasicCache(filename=filename)
@@ -27,20 +27,24 @@ class ListProperties:
     params = {}
     filters = {}
     cache_days = 0.25  # 6 hours default cache
-    sorted_function = None
-    sorted_reversed = False
     dbid_sorted = False
     pagination = False
 
     @cached_property
     def cache_name(self):
-        return f'{self.class_name}_{self.tmdb_type}_{self.page}_{self.length}_{self.pagination}'
+        return '_'.join((
+            self.class_name,
+            self.tmdb_type,
+            self.page,
+            self.length,
+            self.pagination,
+        ))
 
     @cached_property
     def items(self):
         return self.get_cached_items()
 
-    @use_item_cache('ItemContainer.db')
+    @ItemCache('ItemContainer.db')
     def get_cached_items(self, *args, **kwargs):
         return self.get_uncached_items(*args, **kwargs)
 
@@ -78,12 +82,12 @@ class ListProperties:
 
     @cached_property
     def sorted_items(self):
-        if not self.sorted_function:
-            return self.filtered_items
-        return sorted(self.filtered_items, key=self.sorted_function, reverse=self.sorted_reversed)
+        return self.filtered_items
 
-    @property
+    @cached_property
     def finalised_items(self):
+        if not self.pagination and self.total_pages and self.next_page <= self.total_pages:
+            self.sorted_items.append({'next_page': self.next_page})
         return self.sorted_items
 
 

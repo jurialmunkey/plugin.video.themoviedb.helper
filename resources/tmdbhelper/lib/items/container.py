@@ -171,12 +171,11 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         return finalise_next_page() if li.next_page else finalise_mediaitem()
 
     def make_items(self, items):
-        item_queue = [self.make_item(i) for i in items if i]
-        return self.sort_items_by_dbid(item_queue)
+        make_items = [self.make_item(i) for i in items if i]
+        make_items = self.sort_items_by_dbid(make_items) if self.sort_by_dbid else make_items
+        return make_items
 
     def sort_items_by_dbid(self, items):
-        if not self.sort_by_dbid:
-            return items
         items_dbid = [li for li in items if li and li.infolabels.get('dbid')]
         items_tmdb = [li for li in items if li and not li.infolabels.get('dbid')]
         return items_dbid + items_tmdb

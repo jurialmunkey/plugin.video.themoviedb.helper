@@ -1,66 +1,67 @@
 from tmdbhelper.lib.items.directories.lists_default import ListDefault, ListProperties
 from tmdbhelper.lib.addon.plugin import get_setting
+from tmdbhelper.lib.files.ftools import cached_property
 from jurialmunkey.parser import try_int
 
 
 PAGES_LENGTH = get_setting('pagemulti_tmdb', 'int') or 1
 
 
+class UncachedItemsPage:
+    def __init__(self, outer_class, page):
+        self.outer_class = outer_class
+        self.page = page
+
+    @cached_property
+    def response(self):
+        return self.outer_class.get_uncached_response(self.page)
+
+    @cached_property
+    def results(self):
+        try:
+            results = self.response[self.outer_class.results_key]
+        except (TypeError, KeyError):
+            return
+        try:
+            self.outer_class.total_pages = self.response['total_pages']
+            self.outer_class.total_items = self.response['total_results']
+        except (TypeError, KeyError):
+            self.outer_class.total_pages = 0
+            self.outer_class.total_items = 0
+        return results
+
+    @cached_property
+    def add_infoproperties(self):
+        return [
+            ('total_pages', self.outer_class.total_pages),
+            ('total_results', self.outer_class.total_items),
+        ]
+
+    @cached_property
+    def items(self):
+        return [
+            self.outer_class.get_mapped_item(i, add_infoproperties=self.add_infoproperties)
+            for i in self.results if i
+        ]
+
+
 class ListStandardProperties(ListProperties):
+
+    total_pages = 0
+    total_items = 0
+
+    @property
+    def next_page(self):
+        return self.page + self.length
 
     def get_uncached_response(self, page=1):
         return self.tmdb_api.get_response_json(self.url, page=page)
 
     def get_uncached_items(self):
-        items = []
-        pages = 0
-
-        for xpage in range(self.page, self.page + self.length):
-            ipage = self.get_uncached_items_page(xpage)
-            pages = ipage['pages']
-            items.extend(ipage['items'])
-
-        if self.pagination and pages and (self.page + self.length - 1) < pages:
-            items.append({'next_page': self.page + self.length})
-
-        return items
-
-    def get_uncached_items_page(self, page=1):
-        response = self.get_uncached_response(page)
-
-        def items_page(items=None, pages=None, total=None):
-            return {
-                'items': items or [],
-                'pages': pages,
-                'total': total
-            }
-
-        try:
-            results = response[self.results_key]
-        except (TypeError, KeyError):
-            return items_page()
-        try:
-            pages = response['total_pages']
-            total = response['total_results']
-        except (TypeError, KeyError):
-            pages, total = None, None
-
-        add_infoproperties = [
-            ('total_pages', pages),
-            ('total_results', total),
+        return [
+            i for xpage in range(self.page, self.next_page)
+            for i in UncachedItemsPage(self, xpage).items
         ]
-
-        if not results:
-            return items_page()
-
-        return items_page(
-            items=[
-                self.get_mapped_item(i, add_infoproperties=add_infoproperties)
-                for i in results if i
-            ],
-            pages=pages,
-            total=total,
-        )
 
     def get_mapped_item(self, item, add_infoproperties=None):
         return self.tmdb_api.mapper.get_info(
