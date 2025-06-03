@@ -1,34 +1,39 @@
-from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard
+from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties
 from tmdbhelper.lib.api.tmdb.users import TMDbUser
 from tmdbhelper.lib.files.ftools import cached_property
 
 
+class ListAuthenticatedProperties(ListStandardProperties):
+
+    @cached_property
+    def url(self):
+        url = self.request_url.format(tmdb_type=self.tmdb_type)
+        url = self.tmdb_user_api.format_authorised_path(url)
+        return url
+
+    def get_uncached_response(self, page=1):
+        return self.tmdb_user_api.get_authorised_response_json(self.url, page=page)
+
+
+class ListAuthenticatedNoCacheProperties(ListAuthenticatedProperties):
+    @cached_property
+    def items(self):
+        return self.get_uncached_items()
+
+
 class ListAuthenticated(ListStandard):
     default_cacheonly = False
+    list_properties_class = ListAuthenticatedProperties
 
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.dbid_sorted = True
+        list_properties.tmdb_user_api = TMDbUser()
         return list_properties
-
-    @cached_property
-    def tmdb_user_api(self):
-        return TMDbUser()
-
-    def _get_cached_items_page(self, request_url, tmdb_type, page=1):
-        request_url = self.tmdb_user_api.format_authorised_path(request_url)
-        response = self.tmdb_user_api.get_authorised_response_json(request_url, page=page)
-        return self.get_cached_items_page_configured(response, tmdb_type)
 
 
 class ListAuthenticatedNoCache(ListAuthenticated):
-    def get_cached_items_page(self, *args, **kwargs):
-        """ Override default caching method to prevent caching """
-        return self._get_cached_items_page(*args, **kwargs)
-
-    def get_cached_items(self, *args, **kwargs):
-        """ Override default caching method to prevent caching """
-        return self._get_cached_items(*args, **kwargs)
+    list_properties_class = ListAuthenticatedNoCacheProperties
 
 
 class ListRecommendations(ListAuthenticated):

@@ -1,8 +1,22 @@
-from tmdbhelper.lib.items.container import ContainerDefaultCacheDirectory, use_item_cache
+from tmdbhelper.lib.items.container import ContainerDefaultCacheDirectory
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import convert_type, get_localized
 from tmdbhelper.lib.items.filters import is_excluded
 from jurialmunkey.parser import try_int
+
+
+class use_item_cache:
+    def __init__(self, filename):
+        from tmdbhelper.lib.files.bcache import BasicCache
+        self.cache = BasicCache(filename=filename)
+
+    def __call__(self, function):
+        def wrapper(instance, *args, **kwargs):
+            kwargs['cache_days'] = instance.cache_days
+            kwargs['cache_name'] = instance.cache_name
+            kwargs['cache_combine_name'] = True
+            return self.cache.use_cache(function, instance, *args, **kwargs)
+        return wrapper
 
 
 class ListProperties:
@@ -10,13 +24,32 @@ class ListProperties:
     plugin_name = ''
     localize = None
     tmdb_type = None
-    items = None
-    url = None
     params = {}
     filters = {}
+    cache_days = 0.25  # 6 hours default cache
     sorted_function = None
     sorted_reversed = False
     dbid_sorted = False
+    pagination = False
+
+    @cached_property
+    def cache_name(self):
+        return f'{self.class_name}_{self.tmdb_type}_{self.page}_{self.length}_{self.pagination}'
+
+    @cached_property
+    def items(self):
+        return self.get_cached_items()
+
+    @use_item_cache('ItemContainer.db')
+    def get_cached_items(self, *args, **kwargs):
+        return self.get_uncached_items(*args, **kwargs)
+
+    def get_uncached_items(self, *args, **kwargs):
+        return
+
+    @cached_property
+    def url(self):
+        return self.request_url.format(tmdb_type=self.tmdb_type)
 
     @cached_property
     def plural(self):
@@ -65,9 +98,11 @@ class ListDefault(ContainerDefaultCacheDirectory):
 
     def configure_list_properties(self, list_properties):
         list_properties.plugin_name = '{localized} {plural}'
-        list_properties.request_url = ''  # PATH to request
         list_properties.results_key = 'results'  # KEY in RESPONSE from PATH holding ITEMS
         list_properties.filters = self.filters
+        list_properties.pagination = self.pagination
+        list_properties.tmdb_api = self.tmdb_api
+        list_properties.class_name = f'{self.__class__.__name__}'
         return list_properties
 
     @cached_property
@@ -82,35 +117,10 @@ class ListDefault(ContainerDefaultCacheDirectory):
     def kodi_db(self):
         return self.get_kodi_database(self.list_properties.tmdb_type)
 
-    @use_item_cache('ItemContainer.db')
-    def get_cached_items(self, *args, **kwargs):
-        return self._get_cached_items(*args, **kwargs)
-
-    def _get_cached_items(self, *args, **kwargs):
-        return
-
-    @use_item_cache('ItemContainer.db')
-    def get_cached_items_page(self, *args, **kwargs):
-        return self._get_cached_items_page(*args, **kwargs)
-
-    def _get_cached_items_page(self, *args, **kwargs):
-        return
-
-    def get_request_url(self, tmdb_type, **kwargs):
-        return self.list_properties.request_url.format(tmdb_type=tmdb_type)
-
     def get_items(self, tmdb_type, page=1, length=None, **kwargs):
-        self.list_properties.url = self.get_request_url(tmdb_type=tmdb_type, **kwargs)
         self.list_properties.tmdb_type = tmdb_type
         self.list_properties.length = try_int(length) or 1
         self.list_properties.page = try_int(page) or 1
-        self.list_properties.items = self.get_cached_items(
-            self.list_properties.url,
-            self.list_properties.tmdb_type,
-            page=self.list_properties.page,
-            length=self.list_properties.length,
-            paginated=self.pagination
-        )
         return self.get_items_finalised()
 
     def get_items_finalised(self):
