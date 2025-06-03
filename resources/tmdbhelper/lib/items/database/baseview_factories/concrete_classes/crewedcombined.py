@@ -15,21 +15,19 @@ class CrewedCombinedMediaList(StarredCombinedMediaList):
             'tmdb_type': 'movie',
         }
 
-    @property
-    def cached_data_keys(self):
-        return (
-            'parent_id',
-            'GROUP_CONCAT(role, " / ") as role',
-            'GROUP_CONCAT(department, " / ") as department',
-            f'IFNULL(movie.tmdb_id, tvshow.tmdb_id) as tmdb_id',
-            f'IFNULL(movie.title, tvshow.title) as title',
-            f'IFNULL(movie.year, tvshow.year) as year',
-            f'IFNULL(movie.premiered, tvshow.premiered) as premiered',
-            f'IFNULL(movie.status, tvshow.status) as status',
-            f'IFNULL(movie.votes, tvshow.votes) as votes',
-            f'IFNULL(movie.rating, tvshow.rating) as rating',
-            f'IFNULL(movie.popularity, tvshow.popularity) as popularity'
-        )
+    cached_data_keys = (
+        'media.id as parent_id',
+        'GROUP_CONCAT(role, " / ") as role',
+        'GROUP_CONCAT(department, " / ") as department',
+        'media.tmdb_id as tmdb_id',
+        'media.title as title',
+        'media.year as year',
+        'media.premiered as premiered',
+        'media.status as status',
+        'media.votes as votes',
+        'media.rating as rating',
+        'media.popularity as popularity',
+    )
 
 
 class Person(CrewedCombinedMediaList):

@@ -1,22 +1,45 @@
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.basemedia import MediaList
+from tmdbhelper.lib.addon.consts import DATALEVEL_MAX
 from tmdbhelper.lib.files.ftools import cached_property
 
 
 class CastMemberMediaList(MediaList):
     table = 'castmember'
-    cached_data_conditions_base = 'parent_id=? GROUP BY castmember.tmdb_id ORDER BY IFNULL(ordering, 9999) ASC'  # WHERE conditions
     cached_data_check_key = 'parent_id'
     keys = ('GROUP_CONCAT(role, " / ") as role', 'ordering', 'appearances', 'parent_id')
     item_mediatype = 'person'
     item_tmdb_type = 'person'
 
+    cached_data_base_conditions = 'parent_id=? AND expiry>=? AND datalevel>=?'  # WHERE conditions
+    group_by = 'castmember.tmdb_id'
+    sort_by_fallback = 'IFNULL(ordering, 9999)'
+    order_by_direction_fallback = 'ASC'
+
+    filter_key_map = {
+        'role': 'role',
+        'appearances': 'appearances',
+        'title': 'creditedperson.name',
+        'gender': 'creditedperson.gender',
+    }
+
+    sort_direction = {
+        'appearances': 'DESC',
+    }
+
+    @property
+    def cached_data_values(self):
+        """ WHERE condition ? ? ? ? = value, value, value, value """
+        return (self.item_id, self.current_time, DATALEVEL_MAX)
+
     @property
     def cached_data_table(self):
-        table = ' '.join((
-            f'{self.table}',
-            f'INNER JOIN person ON person.tmdb_id = {self.table}.tmdb_id'
-        ))
-        return f'({table}) as creditedperson'
+        cached_data_table = (
+            f'{self.table} INNER JOIN person ON person.tmdb_id = {self.table}.tmdb_id '
+            f'INNER JOIN baseitem ON {self.table}.parent_id = baseitem.id'
+
+        )
+        cached_data_table = f'({cached_data_table}) as creditedperson'
+        return cached_data_table
 
     @property
     def cached_data_keys(self):

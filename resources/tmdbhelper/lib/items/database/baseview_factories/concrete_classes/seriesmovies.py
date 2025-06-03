@@ -24,11 +24,8 @@ class SeriesMoviesMediaList(MediaList):
     )
 
     @property
-    def cached_data_conditions_base(self):  # WHERE conditions
-        return (
-            f'{self.table}.tmdb_id=? AND baseitem.expiry>=? AND baseitem.datalevel>=? '
-            f'ORDER BY {self.cached_data_conditions_sort}'
-        )
+    def cached_data_base_conditions(self):  # WHERE conditions
+        return f'{self.table}.tmdb_id=? AND baseitem.expiry>=? AND baseitem.datalevel>=? '
 
     @property
     def cached_data_values(self):
@@ -41,49 +38,24 @@ class SeriesMoviesMediaList(MediaList):
     item_label_key = 'title'
 
     filter_key_map = {
-        'title': 'title',
-        'year': 'year',
-        'premiered': 'premiered',
-        'status': 'status',
-        'votes': 'votes',
-        'rating': 'rating',
-        'popularity': 'popularity',
-    }
-
-    sort_key_map = {
-        'popularity': 'popularity',
-        'rating': 'rating',
-        'votes': 'votes',
-        'premiered': 'premiered',
-        'year': 'year',
-        'title': 'title',
+        'title': 'movie.title',
+        'year': 'movie.year',
+        'premiered': 'movie.premiered',
+        'status': 'movie.status',
+        'votes': 'movie.votes',
+        'rating': 'movie.rating',
+        'popularity': 'movie.popularity',
     }
 
     # Since our default sort is year ASC unlike most with DESC we need to map DESC instead
-    sort_how_map = {
+    sort_direction = {
         'popularity': 'DESC',
         'rating': 'DESC',
         'votes': 'DESC'
     }
 
-    @property
-    def cached_data_conditions_sort(self):
-        """ ORDER BY """
-        try:
-            return f'movie.{self.sort_key_map[self.sort_by]} {self.cached_data_conditions_how}'
-        except (KeyError, TypeError, NameError):
-            return self.cached_data_conditions_sort_fallback
-
-    @property
-    def cached_data_conditions_sort_fallback(self):
-        return f'year {self.cached_data_conditions_how}'
-
-    @property
-    def cached_data_conditions_how(self):
-        try:
-            return self.sort_how or self.sort_how_map[self.sort_by]
-        except (KeyError, TypeError, NameError):
-            return self.sort_how or 'ASC'
+    sort_by_fallback = 'year'
+    order_by_direction_fallback = 'ASC'
 
     @staticmethod
     def map_item_infoproperties(i):

@@ -7,37 +7,37 @@ class StarredCombinedMediaList(MediaList):
 
     @property
     def cached_data_table(self):
-        return (
-            'baseitem '
-            'INNER JOIN person ON person.id = baseitem.id '
-            f'INNER JOIN {self.table} ON {self.table}.tmdb_id = person.tmdb_id '
-            f'LEFT JOIN movie ON movie.id = {self.table}.parent_id '
-            f'LEFT JOIN tvshow ON tvshow.id = {self.table}.parent_id'
-        )
+        return """
+        baseitem INNER JOIN person ON person.id = baseitem.id
+        INNER JOIN {table} ON {table}.tmdb_id = person.tmdb_id
+        INNER JOIN
+        (
+            SELECT tmdb_id, title, year, premiered, status, votes, rating, popularity, id
+            FROM movie
+            UNION
+            SELECT tmdb_id, title, year, premiered, status, votes, rating, popularity, id
+            FROM tvshow
+        ) media ON media.id = {table}.parent_id
+        """.format(table=self.table)
+
+    group_by = 'media.id'
+
+    cached_data_keys = (
+        'media.id as parent_id',
+        'GROUP_CONCAT(role, " / ") as role',
+        'media.tmdb_id as tmdb_id',
+        'media.title as title',
+        'media.year as year',
+        'media.premiered as premiered',
+        'media.status as status',
+        'media.votes as votes',
+        'media.rating as rating',
+        'media.popularity as popularity',
+    )
 
     @property
-    def cached_data_keys(self):
-        return (
-            'parent_id',
-            'GROUP_CONCAT(role, " / ") as role',
-            f'IFNULL(movie.tmdb_id, tvshow.tmdb_id) as tmdb_id',
-            f'IFNULL(movie.title, tvshow.title) as title',
-            f'IFNULL(movie.year, tvshow.year) as year',
-            f'IFNULL(movie.premiered, tvshow.premiered) as premiered',
-            f'IFNULL(movie.status, tvshow.status) as status',
-            f'IFNULL(movie.votes, tvshow.votes) as votes',
-            f'IFNULL(movie.rating, tvshow.rating) as rating',
-            f'IFNULL(movie.popularity, tvshow.popularity) as popularity'
-        )
-
-    @property
-    def cached_data_conditions_base(self):  # WHERE conditions
-        return (
-            f'{self.table}.tmdb_id=? AND baseitem.expiry>=? AND baseitem.datalevel>=? '
-            f'AND IFNULL(movie.id, tvshow.id) IS NOT NULL '
-            f'GROUP BY {self.table}.parent_id '
-            f'ORDER BY {self.cached_data_conditions_sort}'
-        )
+    def cached_data_base_conditions(self):
+        return f'{self.table}.tmdb_id=? AND baseitem.expiry>=? AND baseitem.datalevel>=?'
 
     @property
     def cached_data_values(self):
@@ -50,9 +50,7 @@ class StarredCombinedMediaList(MediaList):
     item_label_key = 'title'
     item_alter_key = 'role'
 
-    filter_key_map = {}
-
-    sort_key_map = {
+    filter_key_map = {
         'popularity': 'popularity',
         'vote_average': 'rating',
         'rating': 'rating',
@@ -65,28 +63,12 @@ class StarredCombinedMediaList(MediaList):
         'title': 'title',
     }
 
-    sort_how_map = {
+    sort_direction = {
         'title': 'ASC'
     }
 
-    @property
-    def cached_data_conditions_sort(self):
-        """ ORDER BY """
-        try:
-            return f'{self.sort_key_map[self.sort_by]} {self.cached_data_conditions_how}'
-        except (KeyError, TypeError, NameError):
-            return self.cached_data_conditions_sort_fallback
-
-    @property
-    def cached_data_conditions_sort_fallback(self):
-        return f'votes {self.cached_data_conditions_how}'
-
-    @property
-    def cached_data_conditions_how(self):
-        try:
-            return self.sort_how or self.sort_how_map[self.sort_by]
-        except (KeyError, TypeError, NameError):
-            return self.sort_how or 'DESC'
+    sort_by_fallback = 'votes'
+    order_by_direction_fallback = 'DESC'
 
     @staticmethod
     def map_item_infoproperties(i):

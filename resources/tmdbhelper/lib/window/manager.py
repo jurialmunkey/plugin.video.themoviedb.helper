@@ -1,5 +1,6 @@
 from xbmc import Monitor
 from xbmcgui import Dialog, Window
+from contextlib import suppress
 import jurialmunkey.window as window
 from jurialmunkey.parser import try_int, parse_paramstring, reconfigure_legacy_params
 from tmdbhelper.lib.addon.plugin import get_condvisibility, get_localized, executebuiltin
@@ -20,22 +21,6 @@ ID_VIDEOINFO = 12003
 CONTAINER_ID = 9999
 
 
-def construct_path(tmdb_type=None, tmdb_id=None, **kwargs):
-    if not tmdb_type or not tmdb_id:
-        return ''
-    return f'plugin://plugin.video.themoviedb.helper/?info=details&tmdb_type={tmdb_type}&tmdb_id={tmdb_id}'
-
-
-def configure_path(path):
-    try:
-        paramstring = path.split('?')[1]
-    except (AttributeError, IndexError):
-        return
-    if not paramstring:
-        return
-    return construct_path(**reconfigure_legacy_params(**parse_paramstring(paramstring)))
-
-
 SV_ROUTES = {
     'get_dbitem_movieset_details': {
         'module_name': 'jurialmunkey.jrpcid',
@@ -53,6 +38,35 @@ SV_ROUTES = {
         'module_name': 'jurialmunkey.jrpcid',
         'import_attr': 'ListGetEpisodeDetails'},
 }
+
+
+TMDB_TO_SV_CONVERSION = {
+    'collection': 'get_dbitem_movieset_details',
+    'movie': 'get_dbitem_movie_details',
+    'tv': 'get_dbitem_tvshow_details',
+    'season': 'get_dbitem_season_details',
+    'episode': 'get_dbitem_episode_details',
+}
+
+
+def construct_path(tmdb_type=None, tmdb_id=None, info=None, dbid=None, **kwargs):
+    if info in SV_ROUTES.keys() and dbid:
+        return f'plugin://script.skinvariables/?info={info}&dbid={dbid}'
+    if tmdb_type and tmdb_id:
+        return f'plugin://plugin.video.themoviedb.helper/?info=details&tmdb_type={tmdb_type}&tmdb_id={tmdb_id}'
+    return ''
+
+
+def configure_path(path):
+    try:
+        base, pstr = path.split('?')
+    except (AttributeError, IndexError):
+        return
+    if not pstr:
+        return
+    prms = parse_paramstring(pstr)
+    prms = reconfigure_legacy_params(**prms)
+    return construct_path(**prms)
 
 
 def get_listitem(path):
@@ -324,6 +338,18 @@ class WindowManager(_EventLoop):
         window.wait_for_property(PREFIX_ADDPATH, path, True, poll=0.3)
         self.call_auto()
 
+    def add_tmdb(self, tmdb_id, tmdb_type):
+        path = construct_path(tmdb_id=tmdb_id, tmdb_type=tmdb_type)
+        if not path:
+            return
+        return self.add_path(path)
+
+    def add_dbid(self, dbid, tmdb_type):
+        path = construct_path(dbid=dbid, info=TMDB_TO_SV_CONVERSION.get(tmdb_type))
+        if not path:
+            return
+        return self.add_path(path)
+
     def make_query(self, query, tmdb_type, separator=' / '):
         if separator and separator in query:
             split_str = query.split(separator)
@@ -377,10 +403,14 @@ class WindowManager(_EventLoop):
             return executebuiltin(f'Container.Update({self.params["call_update"]})')
 
     def router(self):
-        if self.params.get('add_path'):
+        with suppress(KeyError):
             return self.add_path(self.params['add_path'])
-        if self.params.get('add_query') and self.params.get('tmdb_type'):
+        with suppress(KeyError):
+            return self.add_dbid(self.params['add_dbid'], self.params['tmdb_type'])
+        with suppress(KeyError):
+            return self.add_tmdb(self.params['add_tmdb'], self.params['tmdb_type'])
+        with suppress(KeyError):
             return self.add_query(self.params['add_query'], self.params['tmdb_type'])
         if self.params.get('close_dialog') or self.params.get('reset_path'):
             return self.close_dialog()
-        self.call_window()
+        return self.call_window()

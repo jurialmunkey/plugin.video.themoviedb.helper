@@ -5,16 +5,14 @@ class CrewedTvshowsMediaList(CrewedMoviesMediaList):
     cached_data_innertable = 'tvshow'
 
     @property
-    def cached_data_conditions_base(self):  # WHERE conditions
-        return (
-            f'{self.table}.tmdb_id=? AND baseitem.expiry>=? AND baseitem.datalevel>=? '
-            f'GROUP BY {self.table}.parent_id '
-            f'ORDER BY {self.cached_data_conditions_sort}'
-        )
+    def cached_data_base_conditions(self):  # WHERE conditions
+        return f'{self.table}.tmdb_id=? AND baseitem.expiry>=? AND baseitem.datalevel>=? '
 
     @property
-    def cached_data_conditions_sort_fallback(self):
-        return f'appearances {self.cached_data_conditions_how}'
+    def group_by(self):
+        return f'{self.table}.parent_id'
+
+    sort_by_fallback = 'appearances'
 
     item_mediatype = 'tvshow'
     item_tmdb_type = 'tv'
