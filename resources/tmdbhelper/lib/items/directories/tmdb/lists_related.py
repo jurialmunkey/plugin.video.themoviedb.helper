@@ -8,6 +8,16 @@ class ListRelatedProperties(ListStandardProperties):
     def url(self):
         return self.request_url.format(tmdb_type=self.tmdb_type, tmdb_id=self.tmdb_id)
 
+    @cached_property
+    def cache_name(self):
+        return '_'.join(map(str, (
+            self.class_name,
+            self.tmdb_type,
+            self.tmdb_id,
+            self.page,
+            self.length
+        )))
+
 
 class ListRelated(ListStandard):
     list_properties_class = ListRelatedProperties
