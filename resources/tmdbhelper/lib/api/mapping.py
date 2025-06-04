@@ -1,5 +1,4 @@
 from jurialmunkey.parser import try_type
-from tmdbhelper.lib.addon.logger import kodi_log
 
 UPDATE_BASEKEY = 1
 

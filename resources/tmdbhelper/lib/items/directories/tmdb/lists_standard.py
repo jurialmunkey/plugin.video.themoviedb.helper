@@ -31,17 +31,14 @@ class UncachedItemsPage:
         return results
 
     @cached_property
-    def add_infoproperties(self):
-        return [
-            ('total_pages', self.outer_class.total_pages),
-            ('total_results', self.outer_class.total_items),
-        ]
-
-    @cached_property
     def items(self):
         return [
-            self.outer_class.get_mapped_item(i, add_infoproperties=self.add_infoproperties)
-            for i in self.results if i
+            self.outer_class.get_mapped_item(i, add_infoproperties=(
+                ('total_pages', self.outer_class.total_pages),
+                ('total_results', self.outer_class.total_items),
+                ('rank', x),
+            ))
+            for x, i in enumerate(self.results, 1) if i
         ]
 
 
@@ -49,6 +46,7 @@ class ListStandardProperties(ListProperties):
 
     total_pages = 0
     total_items = 0
+    class_pages = UncachedItemsPage
 
     @property
     def next_page(self):
@@ -61,7 +59,7 @@ class ListStandardProperties(ListProperties):
         return {
             'items': [
                 i for xpage in range(self.page, self.next_page)
-                for i in UncachedItemsPage(self, xpage).items
+                for i in self.class_pages(self, xpage).items
             ],
             'pages': self.total_pages,
             'count': self.total_items,
