@@ -62,6 +62,7 @@ class ListAuthenticated(ListStandard):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.dbid_sorted = True
         list_properties.tmdb_user_api = TMDbUser()
+        list_properties.tmdb_imagepath = self.tmdb_imagepath
         return list_properties
 
 
@@ -71,11 +72,6 @@ class ListAuthenticatedNoCache(ListAuthenticated):
 
 class ListAuthenticatedNoCacheListLists(ListAuthenticated):
     list_properties_class = ListAuthenticatedNoCacheListListsProperties
-
-    def configure_list_properties(self, list_properties):
-        list_properties = super().configure_list_properties(list_properties)
-        list_properties.tmdb_imagepath = self.tmdb_imagepath
-        return list_properties
 
 
 class ListRecommendations(ListAuthenticated):
@@ -113,12 +109,12 @@ class ListRated(ListAuthenticatedNoCache):
 class ListList(ListAuthenticatedNoCache):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
-        list_properties.request_url = 'list/{list_id}'
         list_properties.localize = 32211
         return list_properties
 
-    def get_request_url(self, list_id, **kwargs):
-        return self.list_properties.request_url.format(list_id=list_id)
+    def get_items(self, *args, list_id=None, **kwargs):
+        self.list_properties.request_url = f'list/{list_id}'
+        return super().get_items(*args, **kwargs)
 
 
 class ListLists(ListAuthenticatedNoCacheListLists):
