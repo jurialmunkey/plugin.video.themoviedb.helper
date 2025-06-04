@@ -478,6 +478,30 @@ def _get_basedir_mdblist():
                 'icon': f'{ADDONPATH}/resources/icons/mdblist/mdblist.png'}}]
 
 
+def _get_trakt_popular_years(year=1970):
+    return {
+        'label': u'{}{{space}}{{item_type}} {}s'.format(get_localized(32175), year),
+        'types': ['movie', 'tv'],
+        'params': {'info': 'trakt_popular', 'years': f'{year}-{year + 9}'},
+        'filters': True,
+        'path': PLUGINPATH,
+        'art': {
+            'landscape': f'{ADDONPATH}/fanart.jpg',
+            'icon': f'{ADDONPATH}/resources/icons/trakt/calendar.png'}}
+
+
+def _get_trakt_popular_movies_certifications(certifications='g'):
+    return {
+        'label': u'{} {} Rated{{space}}{{item_type}}'.format(get_localized(32175), certifications.upper()),
+        'types': ['movie'],
+        'params': {'info': 'trakt_popular', 'certifications': certifications},
+        'filters': True,
+        'path': PLUGINPATH,
+        'art': {
+            'landscape': f'{ADDONPATH}/fanart.jpg',
+            'icon': f'{ADDONPATH}/resources/icons/trakt/popular.png'}}
+
+
 def _get_basedir_trakt():
     return [
         {
@@ -748,6 +772,17 @@ def _get_basedir_trakt():
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/trakt/boxoffice.png'}},
+        _get_trakt_popular_years(1970),
+        _get_trakt_popular_years(1980),
+        _get_trakt_popular_years(1990),
+        _get_trakt_popular_years(2000),
+        _get_trakt_popular_years(2010),
+        _get_trakt_popular_years(2020),
+        _get_trakt_popular_movies_certifications('g'),
+        _get_trakt_popular_movies_certifications('pg'),
+        _get_trakt_popular_movies_certifications('pg-13'),
+        _get_trakt_popular_movies_certifications('r'),
+        _get_trakt_popular_movies_certifications('nr'),
         {
             'label': get_localized(32208),
             'types': ['both'],
@@ -787,7 +822,8 @@ def _get_basedir_trakt():
             'path': PLUGINPATH,
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',
-                'icon': f'{ADDONPATH}/resources/icons/trakt/mylist.png'}}]
+                'icon': f'{ADDONPATH}/resources/icons/trakt/mylist.png'}},
+    ]
 
 
 def _get_basedir_tmdb():
