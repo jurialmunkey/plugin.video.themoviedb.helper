@@ -990,7 +990,7 @@ class ListDiscoverProperties(ListStandardProperties):
             for item in items
         )
         tmdb_id_list = (i for i in tmdb_id_list if i)
-        tmdb_id_list = separator.join(map(str, tuple(tmdb_id_list))) if separator else str(next(tmdb_id_list), '')
+        tmdb_id_list = separator.join(map(str, tuple(tmdb_id_list))) if separator else str(next(tmdb_id_list, ''))
         tmdb_id_list = tmdb_id_list or 'null'
         return tmdb_id_list
 
