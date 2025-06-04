@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from xbmcgui import Dialog, ListItem, INPUT_NUMERIC
 from jurialmunkey.parser import try_int, merge_two_dicts, split_items
-from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard
+from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties
 from tmdbhelper.lib.items.container import ContainerDirectory
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized, encode_url
 from tmdbhelper.lib.addon.tmdate import get_datetime_now, get_timedelta
@@ -9,6 +9,7 @@ from jurialmunkey.window import get_property
 
 from tmdbhelper.lib.files.hcache import set_search_history, get_search_history
 from tmdbhelper.lib.api.tmdb.api import TMDb
+from tmdbhelper.lib.files.ftools import cached_property
 from urllib.parse import urlencode
 
 
@@ -988,37 +989,58 @@ def _translate_discover_params(tmdb_type, params):
     return params
 
 
+class ListDiscoverProperties(ListStandardProperties):
+    @cached_property
+    def url(self):
+        url = self.request_url.format(tmdb_type=self.tmdb_type)
+        url = f'{url}{self.url_paramstring}'
+        return url
+
+    @cached_property
+    def cache_name(self):
+        return '_'.join(map(str, self.cache_name_tuple))
+
+    @cached_property
+    def cache_name_tuple(self):
+        cache_name_tuple = [f'{k}={v}' for k, v in self.translated_discover_params.items()]
+        cache_name_tuple = sorted(cache_name_tuple)
+        cache_name_tuple = [self.class_name, self.tmdb_type] + cache_name_tuple
+        cache_name_tuple = cache_name_tuple + [self.page, self.length]
+        return tuple(cache_name_tuple)
+
+    discover_params_to_del = (
+        'with_id', 'with_separator', 'cacheonly', 'nextpage', 'widget', 'plugin_category',
+        'tmdb_type', 'tmdb_id', 'page', 'limit', 'length', 'info')
+
+    @cached_property
+    def translated_discover_params(self):
+        # Convert to kwargs for use in URL encoded string
+        translated_discover_params = _translate_discover_params(self.tmdb_type, self.discover_params)
+        translated_discover_params = {
+            k: v for k, v in translated_discover_params.items()
+            if k not in self.discover_params_to_del
+        }
+        return translated_discover_params
+
+    @cached_property
+    def url_paramstring(self):
+        if not self.translated_discover_params:
+            return ''
+        return f'?{"&".join([f"{k}={v}" for k, v in self.translated_discover_params.items()])}'
+
+
 class ListDiscover(ListStandard):
+
+    list_properties_class = ListDiscoverProperties
+
+    def get_items(self, *args, **kwargs):
+        self.list_properties.discover_params = kwargs
+        return super().get_items(*args, **kwargs)
+
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.request_url = 'discover/{tmdb_type}'
         return list_properties
-
-    def get_request_url(self, tmdb_type, **kwargs):
-        # TODO: [OLD MSG] Check what regions etc we need to have
-
-        # Convert to kwargs for use in URL encoded string
-        kwargs = _translate_discover_params(tmdb_type, kwargs)
-
-        # Check that we actually have params to build a discover list with (not just config kwargs)
-        to_del = ('with_id', 'with_separator', 'cacheonly', 'nextpage', 'widget')
-        for k, v in kwargs.items():
-            if k in to_del:
-                continue
-            if k in ['page', 'limit']:
-                continue
-            if k and v:
-                break
-        else:  # Only build discover list if we have params to pass
-            return
-        for k in to_del:  # Remove the config params
-            kwargs.pop(k, None)
-
-        # Encode paramstring
-        request_url = self.list_properties.request_url.format(tmdb_type=tmdb_type)
-        paramstring = f'?{"&".join([f"{k}={v}" for k, v in kwargs.items()])}' if kwargs else ''
-        # paramstring = f'?{urlencode(kwargs)}' if kwargs else ''
-        return f'{request_url}{paramstring}'
 
 
 class ListDiscoverDir(ContainerDirectory):

@@ -139,7 +139,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
             return
 
         def finalise_next_page():
-            li.params['is_cacheonly'] = self.is_cacheonly
+            li.params['cacheonly'] = self.is_cacheonly
             li.params['plugin_category'] = self.plugin_category  # Carry the plugin category to next page in plugin:// path
             return li.finalise()
 
