@@ -1,5 +1,4 @@
 from tmdbhelper.lib.api.mapping import _ItemMapper, get_empty_item, UPDATE_BASEKEY
-from tmdbhelper.lib.api.mapping import _ItemMapper, get_empty_item, UPDATE_BASEKEY
 
 
 PARAMS_DEF = {
