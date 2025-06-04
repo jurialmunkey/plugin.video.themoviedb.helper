@@ -96,7 +96,6 @@ class ListSearchProperties(ListStandardProperties):
             self.tmdb_type,
             self.page,
             self.length,
-            self.pagination,
         )))
 
     def get_search_query(self):

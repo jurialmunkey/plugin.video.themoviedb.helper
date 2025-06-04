@@ -36,13 +36,24 @@ class ListProperties:
             self.class_name,
             self.tmdb_type,
             self.page,
-            self.length,
-            self.pagination,
+            self.length
         )))
 
     @cached_property
+    def unconfigured_item_data(self):
+        return self.get_cached_items() or {}
+
+    @cached_property
     def items(self):
-        return self.get_cached_items()
+        return self.unconfigured_item_data.get('items') or []
+
+    @cached_property
+    def pages(self):
+        return self.unconfigured_item_data.get('pages') or 0
+
+    @cached_property
+    def count(self):
+        return self.unconfigured_item_data.get('count') or 0
 
     @ItemCache('ItemContainer.db')
     def get_cached_items(self, *args, **kwargs):
@@ -86,7 +97,7 @@ class ListProperties:
 
     @cached_property
     def finalised_items(self):
-        if not self.pagination and self.total_pages and self.next_page <= self.total_pages:
+        if self.pagination and self.pages and self.next_page <= self.pages:
             self.sorted_items.append({'next_page': self.next_page})
         return self.sorted_items
 

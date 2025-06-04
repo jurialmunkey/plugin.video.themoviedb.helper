@@ -58,10 +58,14 @@ class ListStandardProperties(ListProperties):
         return self.tmdb_api.get_response_json(self.url, page=page)
 
     def get_uncached_items(self):
-        return [
-            i for xpage in range(self.page, self.next_page)
-            for i in UncachedItemsPage(self, xpage).items
-        ]
+        return {
+            'items': [
+                i for xpage in range(self.page, self.next_page)
+                for i in UncachedItemsPage(self, xpage).items
+            ],
+            'pages': self.total_pages,
+            'count': self.total_items,
+        }
 
     def get_mapped_item(self, item, add_infoproperties=None):
         return self.tmdb_api.mapper.get_info(
