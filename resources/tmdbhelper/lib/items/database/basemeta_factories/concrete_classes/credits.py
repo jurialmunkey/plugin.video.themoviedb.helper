@@ -4,10 +4,17 @@ from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.baseclass
 class CastMember(ItemDetailsList):
     table = 'castmember'
     keys = ('tmdb_id', 'role', 'ordering', 'appearances', 'parent_id')
-    conditions = 'parent_id=? ORDER BY ordering ASC NULLS LAST LIMIT 100'  # WHERE conditions  # TODO: Move limit to settings ???
+    conditions = 'parent_id=? ORDER BY IFNULL(ordering, 9999) ASC LIMIT 100'  # WHERE conditions  # TODO: Move limit to settings ???
     cached_data_keys = (
         'castmember.tmdb_id', 'role', 'ordering', 'appearances',
-        'thumb', 'name', 'gender', 'biography', 'known_for_department')
+        'name', 'gender', 'biography', 'known_for_department',
+        (
+            '(    SELECT art.icon FROM art'
+            '     WHERE art.parent_id=\'person.\' || castmember.tmdb_id AND art.type=\'profiles\' '
+            '     ORDER BY art.rating DESC LIMIT 1'
+            ') as thumb'
+        ),
+    )
 
     def image_path_func(self, v):
         return self.common_apis.tmdb_imagepath.get_imagepath_poster(v)
@@ -20,10 +27,17 @@ class CastMember(ItemDetailsList):
 class CrewMember(CastMember):
     table = 'crewmember'
     keys = ('tmdb_id', 'role', 'department', 'appearances', 'parent_id')
-    conditions = 'parent_id=? ORDER BY appearances ASC NULLS LAST LIMIT 100'
+    conditions = 'parent_id=? ORDER BY appearances DESC LIMIT 100'
     cached_data_keys = (
         'crewmember.tmdb_id', 'role', 'department', 'appearances',
-        'thumb', 'name', 'gender', 'biography', 'known_for_department')
+        'name', 'gender', 'biography', 'known_for_department',
+        (
+            '(    SELECT art.icon FROM art'
+            '     WHERE art.parent_id=\'person.\' || crewmember.tmdb_id AND art.type=\'profiles\' '
+            '     ORDER BY art.rating DESC LIMIT 1'
+            ') as thumb'
+        ),
+    )
 
 
 class Creator(CrewMember):
@@ -31,7 +45,7 @@ class Creator(CrewMember):
 
     @property
     def values(self):  # WHERE conditions values for ?
-        return (self.item_id, 'Creator',)
+        return (self.parent_id, 'Creator',)  # Creator is for TV Show so get parent for season/episode
 
 
 class Director(CrewMember):
@@ -100,5 +114,5 @@ class Editor(CrewMember):
 
 class Person(ItemDetailsList):
     table = 'person'
-    keys = ('id', 'tmdb_id', 'thumb', 'name', 'gender', 'biography', 'known_for_department')
+    keys = ('id', 'tmdb_id', 'name', 'gender', 'biography', 'known_for_department')
     conditions = 'tmdb_id=?'

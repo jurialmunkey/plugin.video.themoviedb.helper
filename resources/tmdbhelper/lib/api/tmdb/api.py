@@ -1,4 +1,4 @@
-from tmdbhelper.lib.addon.plugin import get_mpaa_prefix, get_language, get_setting
+from tmdbhelper.lib.addon.plugin import get_language, get_setting
 from tmdbhelper.lib.api.request import RequestAPI
 from tmdbhelper.lib.api.tmdb.mapping import ItemMapper
 from tmdbhelper.lib.api.api_keys.tmdb import API_KEY
@@ -20,7 +20,6 @@ class TMDbAPI(RequestAPI):
             self,
             api_key=None,
             language=get_language(),
-            mpaa_prefix=get_mpaa_prefix(),
             page_length=1):
         api_key = api_key or self.api_key
         api_url = self.api_url
@@ -31,7 +30,6 @@ class TMDbAPI(RequestAPI):
             req_api_url=api_url,
             req_api_key=f'api_key={api_key}')
         self.language = language
-        self.mpaa_prefix = mpaa_prefix
         self.page_length = max(get_setting('pagemulti_tmdb', 'int'), page_length)
         TMDb.api_key = api_key
 
@@ -40,6 +38,9 @@ class TMDbAPI(RequestAPI):
         req_strip_add = [
             (self.append_to_response, 'standard'),
             (self.append_to_response_person, 'person'),
+            (self.append_to_response_tvshow, 'tvshow'),
+            (self.append_to_response_tvshow_simple, 'tvshow_simple'),
+            (self.append_to_response_movies_simple, 'movies_simple'),
             (self.req_language, f'{self.iso_language}_en')
         ]
         try:
@@ -78,7 +79,7 @@ class TMDbAPI(RequestAPI):
         try:
             return self._mapper
         except AttributeError:
-            self._mapper = ItemMapper(self.language, self.mpaa_prefix, self.genres)
+            self._mapper = ItemMapper(self.language, self.genres)
             return self._mapper
 
     @staticmethod
@@ -110,13 +111,16 @@ class TMDbAPI(RequestAPI):
 
     def get_response_json(self, *args, postdata=None, headers=None, method=None, **kwargs):
         kwargs = self.configure_request_kwargs(kwargs)
-        return self.get_api_request_json(self.get_request_url(*args, **kwargs), postdata=postdata, headers=headers, method=method)
+        requrl = self.get_request_url(*args, **kwargs)
+        return self.get_api_request_json(requrl, postdata=postdata, headers=headers, method=method)
 
 
 class TMDb(TMDbAPI):
-    append_to_response = 'credits,images,release_dates,content_ratings,external_ids,keywords,reviews,videos,watch/providers'
-    append_to_response_tvshow = 'aggregate_credits,images,release_dates,content_ratings,external_ids,keywords,reviews,videos,watch/providers'
+    append_to_response = 'credits,images,release_dates,external_ids,keywords,reviews,videos,watch/providers'
+    append_to_response_tvshow = 'aggregate_credits,images,content_ratings,external_ids,keywords,reviews,videos,watch/providers'
     append_to_response_person = 'images,external_ids,movie_credits,tv_credits'
+    append_to_response_movies_simple = 'images,external_ids,release_dates'
+    append_to_response_tvshow_simple = 'images,external_ids,content_ratings'
     api_name = 'TMDb'
 
     @property
@@ -125,6 +129,10 @@ class TMDb(TMDbAPI):
         tmdb_database = TMDbDatabase()
         tmdb_database.tmdb_api = self
         return tmdb_database
+
+    @property
+    def get_tmdb_id(self):
+        return self.tmdb_database.get_tmdb_id
 
     @cached_property
     def genres(self):

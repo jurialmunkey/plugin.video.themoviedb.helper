@@ -1,35 +1,190 @@
 from tmdbhelper.lib.files.ftools import cached_property
+from tmdbhelper.lib.items.database.mappings import ItemMapperMethods
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseclass import BaseItem
+from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseroutes import MediaItemInfoLabelItemRoutes
+from tmdbhelper.lib.addon.plugin import get_setting
+
+
+class MediaItemArtworkRoutes:
+
+    def __init__(self, parent_type=None):
+        self.parent_type = parent_type
+
+    routes = {
+        'fanart_tv_poster': {
+            'affixes': (None, 'language', 'english', 'null'),
+            'outputs': 'poster',
+            'parents': (None, 'tvshow', 'season'),
+            'ftv_api': True,
+        },
+        'fanart_tv_landscape': {
+            'affixes': (None, 'language', 'english'),
+            'outputs': 'landscape',
+            'parents': (None, 'tvshow', 'season'),
+            'ftv_api': True,
+        },
+        'fanart_tv_clearlogo': {
+            'affixes': (None, 'language', 'english', 'null'),
+            'outputs': 'clearlogo',
+            'parents': (None, 'tvshow', 'season'),
+            'ftv_api': True,
+        },
+        'fanart_tv_fanart': {
+            'affixes': (None, ),
+            'outputs': 'fanart',
+            'parents': (None, 'tvshow', 'season'),
+            'ftv_api': True,
+        },
+        'fanart_tv_clearart': {
+            'affixes': (None, ),
+            'outputs': 'clearart',
+            'parents': (None, 'tvshow', 'season'),
+            'ftv_api': True,
+        },
+        'fanart_tv_discart': {
+            'affixes': (None, ),
+            'outputs': 'discart',
+            'parents': (None, ),
+            'ftv_api': True,
+        },
+        'fanart_tv_banner': {
+            'affixes': (None, ),
+            'outputs': 'banner',
+            'parents': (None, 'tvshow', 'season'),
+            'ftv_api': True,
+        },
+        'art_poster': {
+            'affixes': (None, 'language', 'english', 'null'),
+            'outputs': 'poster',
+            'parents': (None, 'tvshow', 'season'),
+            'ftv_api': False,
+        },
+        'art_landscape': {
+            'affixes': (None, 'language', 'english'),
+            'outputs': 'landscape',
+            'parents': (None, 'tvshow', 'season'),
+            'ftv_api': False,
+        },
+        'art_clearlogo': {
+            'affixes': (None, 'language', 'english', 'null'),
+            'outputs': 'clearlogo',
+            'parents': (None, 'tvshow', 'season'),
+            'ftv_api': False,
+        },
+        'art_fanart': {
+            'affixes': (None, ),
+            'outputs': 'fanart',
+            'parents': (None, 'tvshow', 'season'),
+            'ftv_api': False,
+        },
+        'art_thumbs': {
+            'affixes': (None, ),
+            'outputs': 'thumb',
+            'parents': (None, ),
+            'ftv_api': False,
+        },
+        'art_profile': {
+            'affixes': (None, ),
+            'outputs': 'thumb',
+            'parents': (None, ),
+            'ftv_api': False,
+        },
+        'art_extrafanart': {
+            'affixes': (None, ),
+            'outputs': 'fanart',
+            'parents': (None, ),
+            'ftv_api': False,
+        },
+    }
+
+    def get_art_list(self, affix=None, allow_ftv=False, allow_tmdb=False, no_affix=False):
+
+        def get_art_tuple(route):
+            definition = self.routes[route]
+            if not allow_ftv and definition['ftv_api']:
+                return
+            if not allow_tmdb and not definition['ftv_api']:
+                return
+            if no_affix and len(definition['affixes']) != 1:
+                return
+            if affix not in definition['affixes']:
+                return
+            if self.parent_type not in definition['parents']:
+                return
+            art_route = f'{route}_{affix}' if affix is not None else route
+            return ((art_route, self.parent_type), definition['outputs'])
+
+        return [
+            i for i in (
+                get_art_tuple(route)
+                for route in self.routes.keys())
+            if i]
+
+    def get_art_list_language(self, allow_ftv=False, allow_tmdb=False):
+        return self.get_art_list('language', allow_ftv=allow_ftv, allow_tmdb=allow_tmdb)
+
+    def get_art_list_english(self, allow_ftv=False, allow_tmdb=False):
+        return self.get_art_list('english', allow_ftv=allow_ftv, allow_tmdb=allow_tmdb)
+
+    def get_art_list_null(self, allow_ftv=False, allow_tmdb=False):
+        return self.get_art_list('null', allow_ftv=allow_ftv, allow_tmdb=allow_tmdb)
+
+    def get_art_list_extra(self, allow_ftv=False, allow_tmdb=False):
+        return self.get_art_list(None, allow_ftv=allow_ftv, allow_tmdb=allow_tmdb, no_affix=True)
+
+    def get_art_list_tmdb_preferred(self, affix=None):
+        return self.get_art_list(affix, allow_tmdb=True) + self.get_art_list(affix, allow_ftv=True)
+
+    def get_art_list_ftv_preferred(self, affix=None):
+        return self.get_art_list(affix, allow_ftv=True) + self.get_art_list(affix, allow_tmdb=True)
+
+    def get_art_list_tmdb_language(self):
+        return self.get_art_list_extra(allow_ftv=True, allow_tmdb=True) \
+            + self.get_art_list_language(allow_tmdb=True) \
+            + self.get_art_list_language(allow_ftv=True) \
+            + self.get_art_list_english(allow_tmdb=True) \
+            + self.get_art_list_english(allow_ftv=True) \
+            + self.get_art_list_null(allow_tmdb=True) \
+            + self.get_art_list_null(allow_ftv=True)
+
+    def get_art_list_ftv_language(self):
+        return self.get_art_list_extra(allow_ftv=True, allow_tmdb=True) \
+            + self.get_art_list_language(allow_ftv=True) \
+            + self.get_art_list_language(allow_tmdb=True) \
+            + self.get_art_list_english(allow_ftv=True) \
+            + self.get_art_list_english(allow_tmdb=True) \
+            + self.get_art_list_null(allow_ftv=True) \
+            + self.get_art_list_null(allow_tmdb=True)
+
+    @property
+    def configured_routes(self):
+        if not get_setting('fanarttv_lookup'):
+            return self.get_art_list(allow_tmdb=True)
+        if not get_setting('language_lookup'):
+            if get_setting('fanarttv_prefer'):
+                return self.get_art_list_ftv_preferred()
+            return self.get_art_list_tmdb_preferred()
+        if not get_setting('fanarttv_prefer'):
+            return self.get_art_list_tmdb_language()
+        return self.get_art_list_ftv_language()
 
 
 class MediaItem(BaseItem):
-    art_dbclist_routes = (
-        (('art_poster', None), 'poster'),
-        (('art_fanart', None), 'fanart'),
-        (('art_landscape', None), 'landscape'),
-        (('art_thumbs', None), 'thumb'),
-        (('art_clearlogo', None), 'clearlogo'),
-        (('art_extrafanart', None), 'fanart'),
-        (('fanart_tv_poster', None), 'poster'),
-        (('fanart_tv_fanart', None), 'fanart'),
-        (('fanart_tv_landscape', None), 'landscape'),
-        (('fanart_tv_clearlogo', None), 'clearlogo'),
-        (('fanart_tv_clearart', None), 'clearart'),
-        (('fanart_tv_banner', None), 'banner'),
-        (('fanart_tv_discart', None), 'discart'),
-    )
+
+    @property
+    def art_dbclist_routes(self):
+        return MediaItemArtworkRoutes().configured_routes
 
     infolabels_dbclist_routes = (
         (('genre', None), 'name', 'genre'),
         (('country', None), 'name', 'country'),
-        (('studio', None), 'name', 'studio'),
         (('director', None), 'name', 'director'),
         (('writer', None), 'name', 'writer'),
     )
 
     infolabels_dbcitem_routes = (
-        (('certification', None), 'name', 'mpaa'),
-        (('video', None), 'path', 'trailer'),
+        MediaItemInfoLabelItemRoutes.certification,
+        MediaItemInfoLabelItemRoutes.trailer,
     )
 
     """
@@ -132,7 +287,7 @@ class MediaItem(BaseItem):
     )
 
     def get_infoproperties_custom(self, infoproperties):
-        for i in self.parent_db_cache.return_basemeta_db('custom').cached_data:
+        for i in self.return_basemeta_db('custom').cached_data:
             infoproperties[i['key']] = i['value']
         return infoproperties
 
@@ -141,7 +296,7 @@ class MediaItem(BaseItem):
         if not duration:
             return infoproperties
 
-        progress = self.get_instance_cached_data_value(self.parent_db_cache.return_basemeta_db('playprogress'), 'playback_progress')
+        progress = self.get_instance_cached_data_value(self.return_basemeta_db('playprogress'), 'playback_progress')
         if not progress or progress < 4 or progress > 96:
             progress = 0
 
@@ -149,8 +304,75 @@ class MediaItem(BaseItem):
         infoproperties['TotalTime'] = int(duration)
         return infoproperties
 
+    def get_infoproperties_lastplayed(self, infoproperties):
+        func_get = self.get_instance_cached_data_value
+        func_dbc = self.return_basemeta_db
+        lastplayed_timestamp = func_get(func_dbc('lastplayed'), 'lastplayed')
+        if not lastplayed_timestamp:
+            return infoproperties
+        infoproperties.update(ItemMapperMethods.get_custom_date(
+            lastplayed_timestamp, name='lastplayed'
+        ))
+        return infoproperties
+
+    def get_infoproperties_ranks(self, infoproperties):
+        func_get = self.get_instance_cached_data_value
+        func_dbc = self.return_basemeta_db
+
+        for database, column, name, func in (
+            ('favorites_rank', 'favorites_rank', 'favorites_rank', None),
+            ('watchlist_rank', 'watchlist_rank', 'watchlist_rank', None),
+            ('collected_date', 'collection_last_collected_at', 'collected_date', lambda i: i[:10]),
+        ):
+            rank = func_get(func_dbc(database), column)
+            if not rank:
+                continue
+            infoproperties[name] = func(rank) if func else rank
+
+        return infoproperties
+
+    def get_infoproperties_next_ep(self, infoproperties):
+
+        try:
+            for column in ('next_aired', 'last_aired'):
+
+                episode_id = self.get_data_value(f'{column}_id')
+
+                if not episode_id:
+                    continue
+
+                for affix in (
+                    'id', 'episode', 'year', 'premiered', 'duration',
+                    'rating', 'votes', 'popularity', 'title', 'plot'
+                ):
+                    infoproperties[f'{column}.{affix}'] = self.get_data_value(f'{column}_{affix}')
+
+                id_split = episode_id.split('.')
+
+                infoproperties.update({
+                    f'{column}.tmdb_type': id_split[0],
+                    f'{column}.tmdb_id': id_split[1],
+                    f'{column}.season': id_split[2],
+                    f'{column}.episode': id_split[3],
+                })
+
+                infoproperties.update(
+                    ItemMapperMethods.get_custom_date(
+                        self.get_data_value(f'{column}_premiered'), name=column
+                    )
+                )
+
+                infoproperties.update(
+                    ItemMapperMethods.get_custom_time(
+                        self.get_data_value(f'{column}_duration'), name='duration'))
+
+        except (TypeError, KeyError, IndexError):
+            pass
+
+        return infoproperties
+
     def get_unique_ids(self, unique_ids):
-        for i in (self.parent_db_cache.return_basemeta_db('unique_id').cached_data or ()):
+        for i in (self.return_basemeta_db('unique_id').cached_data or ()):
             unique_ids[i['key']] = i['value']
         unique_ids['tmdb'] = self.parent_db_cache.tmdb_id
         return unique_ids
@@ -164,5 +386,5 @@ class MediaItem(BaseItem):
                 'order': i['ordering'] or 999999,
                 'thumbnail': self.parent_db_cache.common_apis.tmdb_imagepath.get_imagepath_poster(i['thumb'])
             }
-            for i in self.parent_db_cache.return_basemeta_db('castmember').cached_data
+            for i in self.return_basemeta_db('castmember').cached_data
         ]

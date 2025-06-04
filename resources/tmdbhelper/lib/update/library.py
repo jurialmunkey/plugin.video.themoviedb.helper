@@ -44,8 +44,7 @@ class LibraryAdder(LibraryCommonFunctions):
         self._log = _LibraryLogger()
         self.tv = None
         self.hide_unaired = True
-        self.hide_nodate = False
-        # self.debug_logging = get_setting('debug_logging')
+        self.hide_nodate = True
         self.debug_logging = True
         self.clean_library = False
         self._msg_start = get_localized(32166)

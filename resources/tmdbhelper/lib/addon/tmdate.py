@@ -24,6 +24,10 @@ def get_datetime_now():
     return datetime.datetime.now()
 
 
+def get_datetime_utcnow():
+    return datetime.datetime.utcnow()
+
+
 def get_datetime_today():
     return datetime.datetime.today()
 

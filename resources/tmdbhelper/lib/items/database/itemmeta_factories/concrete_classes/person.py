@@ -8,7 +8,7 @@ class Person(BaseItem):
     get_unique_ids = MediaItem.get_unique_ids
 
     art_dbclist_routes = (
-        (('art_poster', None), 'poster'),
+        (('art_profile', None), 'thumb'),
         (('art_fanart', None), 'fanart'),
     )
 
@@ -19,6 +19,12 @@ class Person(BaseItem):
         ('aliases', 'also_known_as'),
         ('born', 'place_of_birth'),
         ('biography', 'biography'),
+        ('numitems.tmdb.cast', 'total_cast'),
+        ('numitems.tmdb.movies.cast', 'total_movies_cast'),
+        ('numitems.tmdb.tvshows.cast', 'total_tvshows_cast'),
+        ('numitems.tmdb.crew', 'total_crew'),
+        ('numitems.tmdb.movies.crew', 'total_movies_crew'),
+        ('numitems.tmdb.tvshows.crew', 'total_tvshows_crew'),
     )
 
     """
@@ -70,7 +76,8 @@ class Person(BaseItem):
     def get_infolabels_details(self):
         return {
             'title': self.data[0]['name'],
-            'plot': self.data[0]['biography']
+            'plot': self.data[0]['biography'],
+            'mediatype': 'person',
         }
 
     def get_infoproperties_person(self, infoproperties):

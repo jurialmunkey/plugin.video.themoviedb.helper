@@ -61,34 +61,107 @@ def sort_list(**kwargs):
     executebuiltin(format_folderpath(encode_url(**kwargs)))
 
 
-def refresh_trakt_sync(**kwargs):
+def invalidate_trakt_sync(invalidate_trakt_sync, notification=True, **kwargs):
+    import itertools
     from xbmcgui import Dialog
-    from tmdbhelper.lib.addon.plugin import get_localized, executebuiltin
-    from jurialmunkey.window import get_property
-    from tmdbhelper.lib.addon.tmdate import set_timestamp
-    from tmdbhelper.lib.api.trakt.api import TraktAPI
-    from tmdbhelper.lib.api.trakt.sync.datasync import SyncData
-
-    choices = (
-        # TODO FIX HIDDEN AT
-        (get_localized(19022), 'hidden_at', ('movie', 'show', )),
-        (get_localized(16102), 'last_watched_at', ('movie', 'show', 'episode', )),
-        (get_localized(14086), 'playback_paused_at', ('movie', 'episode', )),
-        (get_localized(563), 'rated_at', ('movie', 'show', 'season', 'episode', )),
-        (get_localized(1036), 'favorites_listed_at', ('movie', 'show', )),
-        (get_localized(32193), 'watchlist_listed_at', ('movie', 'show', 'season', 'episode', )),
-        (get_localized(32192), 'collection_last_collected_at', ('movie', 'show', )),
+    from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
+    from tmdbhelper.lib.addon.plugin import get_localized
+    from tmdbhelper.lib.api.trakt.sync.datatype import (
+        SyncWatched, SyncPlayback, SyncNextEpisodes, SyncAllNextEpisodes,
+        SyncCollection, SyncWatchlist, SyncFavorites, SyncRatings,
+        SyncHiddenProgressWatched, SyncHiddenProgressCollected,
+        SyncHiddenCalendar, SyncHiddenDropped,
     )
-    x = Dialog().select(get_localized(32532), [i[0] for i in choices])
-    if x == -1:
-        return
 
-    keys = (choices[x][1], )
-    trakt_api = TraktAPI()
-    for item_type in choices[x][2]:
-        SyncData(trakt_api).sync(item_type, keys, forced=True)
-    executebuiltin('Container.Refresh')
-    get_property('Widgets.Reload', set_property=f'{set_timestamp(0, True)}')
+    def _build_keys(datatype):
+        return tuple((
+            f'{datatype.key_prefix}_{k}' if datatype.key_prefix else k
+            for k in datatype.keys
+        ))
+
+    def _build_lactivities_ids(datatype, item_types=('movie', 'show', 'episode')):
+        return tuple((f'{item_type}.{datatype.method}' for item_type in item_types))
+
+    routes = {
+        'watchedprogress': {
+            'name': get_localized(32035),
+            'data': (SyncWatched, SyncPlayback, SyncNextEpisodes, SyncAllNextEpisodes),
+        },
+        'collection': {
+            'name': get_localized(32192),
+            'data': (SyncCollection, ),
+        },
+        'watchlist': {
+            'name': get_localized(32193),
+            'data': (SyncWatchlist, ),
+        },
+        'favorites': {
+            'name': get_localized(1036),
+            'data': (SyncFavorites, ),
+        },
+        'ratings': {
+            'name': get_localized(32028),
+            'data': (SyncRatings, ),
+        },
+        'hidden': {
+            'name': get_localized(32036),
+            'data': (
+                SyncHiddenProgressWatched, SyncHiddenProgressCollected,
+                SyncHiddenCalendar, SyncHiddenDropped,
+            ),
+        },
+        'all': {
+            'name': get_localized(593),
+            'data': (
+                SyncWatched, SyncPlayback, SyncNextEpisodes, SyncAllNextEpisodes,
+                SyncCollection, SyncWatchlist, SyncFavorites, SyncRatings,
+                SyncHiddenProgressWatched, SyncHiddenProgressCollected,
+                SyncHiddenCalendar, SyncHiddenDropped,
+            ),
+        },
+    }
+
+    # ask user to choose route if not specified
+    try:
+        route = routes[invalidate_trakt_sync]
+    except KeyError:
+        route_keys = [k for k in routes.keys()]
+        route_list = [v['name'] for k, v in routes.items()]
+        x = Dialog().select('Sync', route_list)
+        if x == -1:
+            return
+        route = routes[route_keys[x]]
+
+    # init database
+    database = ItemDetailsDatabase()
+
+    # delete column data for datatypes
+    database_keys = tuple((_build_keys(i) for i in route['data']))
+    database_keys = tuple(itertools.chain.from_iterable(database_keys))
+    database.del_column_values(table='simplecache', keys=database_keys)
+
+    # clean up corresponding last activity values
+    database_lactivities_ids = tuple((_build_lactivities_ids(i) for i in route['data']))
+    database_lactivities_ids = tuple(itertools.chain.from_iterable(database_lactivities_ids))
+    for x, item_id in enumerate(database_lactivities_ids, 1):
+        database.del_item(table='lactivities', item_id=item_id)
+
+    # notify of success
+    if not notification:
+        return
+    Dialog().ok(get_localized(32026), get_localized(32027).format(route['name'].lower()))
+
+
+def authenticate_trakt(**kwargs):
+    from tmdbhelper.lib.api.trakt.api import TraktAPI
+    TraktAPI(force=True)
+    invalidate_trakt_sync('all', notification=False)
+
+
+def revoke_trakt(**kwargs):
+    from tmdbhelper.lib.api.trakt.api import TraktAPI
+    TraktAPI().logout()
+    invalidate_trakt_sync('all', notification=False)
 
 
 def get_stats(**kwargs):

@@ -1,10 +1,14 @@
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.basemedia import MediaList
+from tmdbhelper.lib.addon.consts import DATALEVEL_MAX
 
 
 class StarredMoviesMediaList(MediaList):
     table = 'castmember'
-
     cached_data_innertable = 'movie'
+
+    @property
+    def cached_data_base_conditions(self):  # WHERE conditions
+        return f'{self.table}.tmdb_id=? AND baseitem.expiry>=? AND baseitem.datalevel>=? '
 
     @property
     def cached_data_table(self):
@@ -30,17 +34,13 @@ class StarredMoviesMediaList(MediaList):
         )
 
     @property
-    def cached_data_conditions_base(self):  # WHERE conditions
-        return (
-            f'{self.table}.tmdb_id=? AND baseitem.expiry>=? '
-            f'GROUP BY {self.table}.parent_id '
-            f'ORDER BY {self.cached_data_innertable}.votes DESC'
-        )
+    def group_by(self):
+        return f'{self.table}.parent_id'
 
     @property
     def cached_data_values(self):
         """ WHERE condition ? ? ? ? = value, value, value, value """
-        return (self.tmdb_id, self.current_time)
+        return (self.tmdb_id, self.current_time, DATALEVEL_MAX)
 
     cached_data_check_key = 'tmdb_id'
     item_mediatype = 'movie'
@@ -48,23 +48,32 @@ class StarredMoviesMediaList(MediaList):
     item_label_key = 'title'
     item_alter_key = 'role'
 
-    filter_key_map = {
-        'role': 'role',
-        'character': 'role',
-        'title': 'title',
-        'year': 'year',
-        'premiered': 'premiered',
-        'status': 'status',
-        'votes': 'votes',
-        'rating': 'rating',
-        'popularity': 'popularity',
+    @property
+    def filter_key_map(self):
+        return {
+            'role': f'{self.cached_data_innertable}.role',
+            'character': f'{self.cached_data_innertable}.role',
+            'title': f'{self.cached_data_innertable}.title',
+            'year': f'{self.cached_data_innertable}.year',
+            'premiered': f'{self.cached_data_innertable}.premiered',
+            'status': f'{self.cached_data_innertable}.status',
+            'votes': f'{self.cached_data_innertable}.votes',
+            'rating': f'{self.cached_data_innertable}.rating',
+            'popularity': f'{self.cached_data_innertable}.popularity',
+        }
+
+    sort_direction = {
+        'title': 'ASC'
     }
+
+    sort_by_fallback = 'votes'
+    order_by_direction_fallback = 'DESC'
 
     @staticmethod
     def map_item_infoproperties(i):
         return {
             'role': i['role'],
-            'chracter': i['role'],
+            'character': i['role'],
             'popularity': i['popularity'],
             'tmdb_id': i['tmdb_id'],
             'tmdb_type': 'movie',

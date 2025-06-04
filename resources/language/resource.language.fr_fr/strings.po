@@ -7,14 +7,14 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2023-11-01 12:00+0100\n"
+"PO-Revision-Date: 2025-05-13 12:00+0100\n"
+"Last-Translator: Bindou <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE\n"
-"Language: fr_FR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: fr_FR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 3.4.1\n"
 
 msgctxt "#30000"
 msgid "Arabic (United Arab Emirates)"
@@ -24,6 +24,11 @@ msgctxt "#30001"
 msgid "Arabic (Saudi Arabia)"
 msgstr "Arabe (Arabie Saoudite)"
 
+#: /resources/tmdbhelper/lib/api/tmdb/methods/lists.py
+msgctxt "#32000"
+msgid "Unaired"
+msgstr "Non diffusé"
+
 msgctxt "#30002"
 msgid "Belarusian (Belarus)"
 msgstr "Biélorusse (Biélorussie)"
@@ -31,6 +36,11 @@ msgstr "Biélorusse (Biélorussie)"
 msgctxt "#30003"
 msgid "Bulgarian (Bulgaria)"
 msgstr "Bulgare (Bulgarie)"
+
+#: /resources/settings.xml
+msgctxt "#32003"
+msgid "Preferred"
+msgstr "Préféré"
 
 msgctxt "#30004"
 msgid "Bengali (Bangladesh)"
@@ -40,9 +50,24 @@ msgctxt "#30005"
 msgid "Catalan (Spain)"
 msgstr "Catalan (Espagne)"
 
+#: /resources/settings.xml
+msgctxt "#32006"
+msgid "Supplement"
+msgstr "Supplément"
+
 msgctxt "#30006"
 msgid "Chamorro (Guam)"
 msgstr "Chamorro (Guam)"
+
+#: /resources/settings.xml
+msgctxt "#32008"
+msgid "Low"
+msgstr "Faible"
+
+#: /resources/settings.xml
+msgctxt "#32009"
+msgid "High"
+msgstr "Élevé"
 
 msgctxt "#30007"
 msgid "Czech (Czech Republic)"
@@ -56,9 +81,19 @@ msgctxt "#30009"
 msgid "German (Austria)"
 msgstr "Allemand (Autriche)"
 
+#: /resources/settings.xml
+msgctxt "#32013"
+msgid "Get watched indicators, episode counts, and resume points"
+msgstr "Obtenir des indicateurs de visionnage, le nombre d'épisodes et les points de reprise"
+
 msgctxt "#30010"
 msgid "German (Switzerland)"
 msgstr "Allemand (Suisse)"
+
+#: /resources/settings.xml
+msgctxt "#32015"
+msgid "Additional season: Up next"
+msgstr "Saison supplémentaire : À suivre"
 
 msgctxt "#30011"
 msgid "German (Germany)"
@@ -68,13 +103,28 @@ msgctxt "#30012"
 msgid "Greek (Greece)"
 msgstr "Grec (Grèce)"
 
+#: /resources/settings.xml
+msgctxt "#32018"
+msgid "Additional season: Anticipated"
+msgstr "Saison supplémentaire : Prévue"
+
 msgctxt "#30013"
 msgid "English (Australia)"
 msgstr "Anglais (Australie)"
 
+#: /resources/settings.xml
+msgctxt "#32020"
+msgid "Additional season: Specials"
+msgstr "Saison supplémentaire : Spéciale"
+
 msgctxt "#30014"
 msgid "English (Canada)"
 msgstr "Anglais (Canada)"
+
+#: /resources/settings.xml
+msgctxt "#32022"
+msgid "Clear sync data"
+msgstr "Effacer les données de synchronisation"
 
 msgctxt "#30015"
 msgid "English (United Kingdom)"
@@ -87,6 +137,21 @@ msgstr "English (Ireland)"
 msgctxt "#30017"
 msgid "English (New Zealand)"
 msgstr "Anglais (Nouvelle-Zélande)"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32026"
+msgid "Invalidate Sync Data"
+msgstr "Invalider les données de synchronisation"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32027"
+msgid "Successfully cleared {} sync data"
+msgstr "Invalider les données de synchronisation {}"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32028"
+msgid "Ratings"
+msgstr "Notes"
 
 msgctxt "#30018"
 msgid "English (United States of America)"
@@ -112,6 +177,16 @@ msgctxt "#30023"
 msgid "Basque (Spain)"
 msgstr "Basque (Espagne)"
 
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32035"
+msgid "Progress"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32036"
+msgid "Dropped"
+msgstr "Abandonné"
+
 msgctxt "#30024"
 msgid "Persian (Iran)"
 msgstr "Persan (Iran)"
@@ -119,6 +194,16 @@ msgstr "Persan (Iran)"
 msgctxt "#30025"
 msgid "Finnish (Finland)"
 msgstr "Finlandais (Finlande)"
+
+#: /resources/settings.xml
+msgctxt "#32039"
+msgid "Prefer fanart.tv artwork"
+msgstr "Préférer les illustrations de Fanart.tv"
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_seasons.py
+msgctxt "#32040"
+msgid "All seasons"
+msgstr "Toutes les saisons"
 
 msgctxt "#30026"
 msgid "French (Canada)"
@@ -163,8 +248,8 @@ msgstr "Lecteur par défaut"
 
 #: /resources/settings.xml
 msgctxt "#32034"
-msgid "Get watched indicators and episode counts (slower)"
-msgstr "Obtenir les indicateurs Vus des épisodes télé (plus lent)"
+msgid "Get watched indicators and episode counts"
+msgstr "Obtenir des indicateurs de visionnage et le nombre d'épisodes"
 
 #: /resources/settings.xml
 msgctxt "#32037"
@@ -174,7 +259,7 @@ msgstr "Utiliser des lecteurs groupés"
 #: /resources/settings.xml
 msgctxt "#32038"
 msgid "Get additional details from the local Kodi library database"
-msgstr "Obtenir des informations supplémentaires depuis votre médiathèque locale kodi"
+msgstr "Obtenir des informations depuis votre médiathèque locale kodi"
 
 #: /resources/settings.xml
 msgctxt "#32042"
@@ -209,7 +294,7 @@ msgstr "Le nom d'utilisateur ou le mot de passe ne sont pas valides. Voulez-vous
 #: /resources/lib/downloader.py
 msgctxt "#32057"
 msgid "Retry"
-msgstr "Réessayez"
+msgstr "Réessayer"
 
 #: /resources/lib/downloader.py 
 msgctxt "#32058"
@@ -284,7 +369,7 @@ msgstr "Autre"
 #: /resources/settings.xml
 msgctxt "#32081"
 msgid "Next page item"
-msgstr "Page suivante d'élément"
+msgstr "Élément "Page suivante""
 
 #: /resources/settings.xml
 msgctxt "#32084"
@@ -493,7 +578,7 @@ msgstr "Mettre à jour la médiathèque maintenant"
 #: /resources/settings.xml
 msgctxt "#32156"
 msgid "Next aired library calendar links to local tvshow"
-msgstr "Le calendrier de la médiathèque prochainement diffusé est lié à une série TV locale"
+msgstr "Relier le calendrier des épisodes prochainement diffusés aux séries TV locales de la médiathèque"
 
 #: /resources/lib/context.py 
 msgctxt "#32160"
@@ -513,7 +598,7 @@ msgstr "Lecture automatique des fichiers locaux"
 #: /resources/settings.xml
 msgctxt "#32163"
 msgid "Use fanart.tv for service monitor artwork"
-msgstr "Utiliser fanart.tv pour les illustrations des moniteurs de service"
+msgstr "Utiliser Fanart.tv pour les illustrations des moniteurs de service"
 
 #: /resources/lib/context.py 
 msgctxt "#32164"
@@ -827,7 +912,7 @@ msgstr "Équipe dans les séries TV"
 #: /resources/lib/plugin.py
 msgctxt "#32231"
 msgid "Thumbs"
-msgstr "Vignette"
+msgstr "Vignettes"
 
 #: /resources/lib/plugin.py
 msgctxt "#32232"
@@ -1501,7 +1586,7 @@ msgstr "Prochaines diffusions / Prochains épisodes"
 #: /resources/settings.xml
 msgctxt "#32369"
 msgid "thumbs"
-msgstr "Vignettes"
+msgstr "vignettes"
 
 #: /resources/settings.xml
 msgctxt "#32370"
@@ -1805,6 +1890,11 @@ msgid "Provider allowlist updated"
 msgstr "Liste des diffuseurs mise à jour"
 
 #: /resources/lib/script/method.py
+msgctxt "#32439"
+msgid "The provider allowlist has been updated."
+msgstr "La liste autorisée des fournisseurs a été mise à jour."
+
+#: /resources/lib/player/configure.py
 msgctxt "#32440"
 msgid "Edit steps"
 msgstr "Modifier les étapes"
@@ -2194,6 +2284,41 @@ msgctxt "#32528"
 msgid "Add to {}"
 msgstr "Ajouter à {}"
 
+#: /resources/settings.xml
+msgctxt "#32529"
+msgid "Scrobble items played via TMDbHelper"
+msgstr "Éléments Scrobble joués via TMDbHelper"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32530"
+msgid "Remove rating"
+msgstr "Supprimer l'évaluation"
+
+#: /resources/tmdbhelper/lib/script/sync/item.py
+msgctxt "#32531"
+msgid "Method only available for VIP accounts."
+msgstr "Méthode disponible uniquement pour les comptes VIP."
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32532"
+msgid "Force resync"
+msgstr "Forcer la resynchronisation"
+
+#: /resources/settings.xml
+msgctxt "#32534"
+msgid "Trakt sync progress notifications"
+msgstr "Notifications de progression de la synchronisation Trakt"
+
+#: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
+msgctxt "#32535"
+msgid "Non-binary"
+msgstr "Non binaire"
+
+#: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
+msgctxt "#32536"
+msgid "Unspecified"
+msgstr "Non spécifié"
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr "Hindi (Inde)"
@@ -2409,7 +2534,7 @@ msgstr "Clé client Fanart.tv"
 #: /resources/settings.xml
 msgctxt "#32021"
 msgid "Use fanart.tv for plugin artwork (slower)"
-msgstr "Utiliser fanart.tv pour les illustrations du plugin (plus lent)"
+msgstr "Utiliser Fanart.tv pour les illustrations du plugin (plus lent)"
 
 #: /resources/settings.xml
 msgctxt "#32023"
@@ -2425,9 +2550,3 @@ msgstr "Lecteur par défaut pour les films"
 msgctxt "#32025"
 msgid "Default player for episodes"
 msgstr "Lecteur par défaut pour les épisodes"
-
-#: /resources/settings.xml
-
-msgctxt "#32027"
-msgid "Clear default players"
-msgstr "Effacer les lecteurs par défaut"

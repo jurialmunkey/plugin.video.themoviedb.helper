@@ -25,7 +25,7 @@ def play_using(play_using, mode='play', **kwargs):
         params = {}
         if url.startswith('plugin://plugin.video.themoviedb.helper/?'):
             params = parse_paramstring(url.replace('plugin://plugin.video.themoviedb.helper/?', ''))
-        if params.pop('info', None) in ['play', 'related']:
+        if params.pop('info', None) == 'play':
             dictionary.update(params)
         if dictionary.get('tmdb_type'):
             return dictionary

@@ -4,7 +4,6 @@ from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.tmdate import set_timestamp
 from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY
 from tmdbhelper.lib.api.tmdb.database_tables.genres import TMDbDatabaseGenres
-from tmdbhelper.lib.api.tmdb.database_tables.nextaired import TMDbDatabaseNextAired
 from tmdbhelper.lib.api.tmdb.database_tables.tmdb_id import TMDbDatabaseTMDbID
 from tmdbhelper.lib.api.tmdb.database_tables.certification import TMDbDatabaseCertification
 from tmdbhelper.lib.api.tmdb.database_tables.provider_regions import TMDbDatabaseProviderRegions
@@ -13,12 +12,13 @@ from tmdbhelper.lib.api.tmdb.database_tables.collections import TMDbDatabaseColl
 from tmdbhelper.lib.api.tmdb.database_tables.keywords import TMDbDatabaseKeywords
 from tmdbhelper.lib.api.tmdb.database_tables.studios import TMDbDatabaseStudios
 from tmdbhelper.lib.api.tmdb.database_tables.networks import TMDbDatabaseNetworks
+from tmdbhelper.lib.api.tmdb.database_tables.movies import TMDbDatabaseMovies
+from tmdbhelper.lib.api.tmdb.database_tables.tvshows import TMDbDatabaseTvshows
 
 
 class TMDbDatabase(
     Database,
     TMDbDatabaseGenres,
-    TMDbDatabaseNextAired,
     TMDbDatabaseTMDbID,
     TMDbDatabaseCertification,
     TMDbDatabaseProviderRegions,
@@ -26,7 +26,9 @@ class TMDbDatabase(
     TMDbDatabaseCollections,
     TMDbDatabaseKeywords,
     TMDbDatabaseStudios,
-    TMDbDatabaseNetworks
+    TMDbDatabaseNetworks,
+    TMDbDatabaseMovies,
+    TMDbDatabaseTvshows,
 ):
     cache_filename = 'LookupTMDb.db'
 
@@ -45,7 +47,6 @@ class TMDbDatabase(
         return {
             'expiry': self.expiry_columns,
             'genres': self.genres_columns,
-            'nextaired': self.nextaired_columns,
             'tmdb_id': self.tmdb_id_columns,
             'certification': self.certification_columns,
             'provider_regions': self.provider_regions_columns,
@@ -55,6 +56,8 @@ class TMDbDatabase(
             'keywords': self.keywords_columns,
             'studios': self.studios_columns,
             'networks': self.networks_columns,
+            'movies': self.movies_columns,
+            'tvshows': self.tvshows_columns,
         }
 
     def __init__(self):
@@ -87,7 +90,7 @@ class TMDbDatabase(
 
     def get_cached_item_values(self, table, item_id, keys, mapping_function=None):
         data = None
-        with self.access.connection.open(self):
+        with self.access.connection.open():
             if not self.is_expired(f'{table}.{item_id}'):
                 data = self.get_item_values(table, item_id, keys=keys)
         return mapping_function(data) if mapping_function else data
@@ -97,7 +100,7 @@ class TMDbDatabase(
 
     def get_cached_values(self, table, keys, mapping_function=None, values=None, conditions=None):
         data = None
-        with self.access.connection.open(self):
+        with self.access.connection.open():
             if not self.is_expired(table):
                 data = self.get_all_values(
                     table,
@@ -107,7 +110,7 @@ class TMDbDatabase(
         return mapping_function(data) if mapping_function else data
 
     def set_cached_values(self, table, keys, values, item_id=None, expiry=DEFAULT_EXPIRY, overwrite=True):
-        with self.access.connection.open(self) as connection:
+        with self.access.connection.open() as connection:
             connection.execute('BEGIN')
             self.set_expiry(f'{table}.{item_id}' if item_id else table, expiry=expiry) if expiry else None
             self.access.set_cached_list_values(table, keys=keys, values=values, overwrite=overwrite)

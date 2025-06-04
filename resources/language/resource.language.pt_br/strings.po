@@ -24,6 +24,11 @@ msgctxt "#30001"
 msgid "Arabic (Saudi Arabia)"
 msgstr "Arábico (Arábia Saudita)"
 
+#: /resources/tmdbhelper/lib/api/tmdb/methods/lists.py
+msgctxt "#32000"
+msgid "Unaired"
+msgstr "Não exibido"
+
 msgctxt "#30002"
 msgid "Belarusian (Belarus)"
 msgstr "Bielorrusso (Bielorrússia)"
@@ -31,6 +36,11 @@ msgstr "Bielorrusso (Bielorrússia)"
 msgctxt "#30003"
 msgid "Bulgarian (Bulgaria)"
 msgstr "Búlgaro (Bulgária)"
+
+#: /resources/settings.xml
+msgctxt "#32003"
+msgid "Preferred"
+msgstr "Preferido"
 
 msgctxt "#30004"
 msgid "Bengali (Bangladesh)"
@@ -40,9 +50,24 @@ msgctxt "#30005"
 msgid "Catalan (Spain)"
 msgstr "Catalão (Espanha)"
 
+#: /resources/settings.xml
+msgctxt "#32006"
+msgid "Supplement"
+msgstr "Suplemento"
+
 msgctxt "#30006"
 msgid "Chamorro (Guam)"
 msgstr "Chamorro (Guam)"
+
+#: /resources/settings.xml
+msgctxt "#32008"
+msgid "Low"
+msgstr "Baixo"
+
+#: /resources/settings.xml
+msgctxt "#32009"
+msgid "High"
+msgstr "Alto"
 
 msgctxt "#30007"
 msgid "Czech (Czech Republic)"
@@ -56,9 +81,19 @@ msgctxt "#30009"
 msgid "German (Austria)"
 msgstr "Alemão (Áustria)"
 
+#: /resources/settings.xml
+msgctxt "#32013"
+msgid "Get watched indicators, episode counts, and resume points"
+msgstr "Obter indicadores de assistidos, número de episódios e pontos de resumo"
+
 msgctxt "#30010"
 msgid "German (Switzerland)"
 msgstr "Alemão (Suíça)"
+
+#: /resources/settings.xml
+msgctxt "#32015"
+msgid "Additional season: Up next"
+msgstr "Temporada adicional: A seguir"
 
 msgctxt "#30011"
 msgid "German (Germany)"
@@ -68,13 +103,28 @@ msgctxt "#30012"
 msgid "Greek (Greece)"
 msgstr "Grego (Grécia)"
 
+#: /resources/settings.xml
+msgctxt "#32018"
+msgid "Additional season: Anticipated"
+msgstr "Temporada adicional: Antecipado"
+
 msgctxt "#30013"
 msgid "English (Australia)"
 msgstr "Inglês (Austrália)"
 
+#: /resources/settings.xml
+msgctxt "#32020"
+msgid "Additional season: Specials"
+msgstr "Temporada adicional: Especiais"
+
 msgctxt "#30014"
 msgid "English (Canada)"
 msgstr "Inglês (Canadá)"
+
+#: /resources/settings.xml
+msgctxt "#32022"
+msgid "Clear sync data"
+msgstr "Limpar dados de sincronização"
 
 msgctxt "#30015"
 msgid "English (United Kingdom)"
@@ -87,6 +137,21 @@ msgstr "Inglês (Irlanda)"
 msgctxt "#30017"
 msgid "English (New Zealand)"
 msgstr "Inglês (Nova Zelândia)"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32026"
+msgid "Invalidate Sync Data"
+msgstr "Invalidar Dados de Sincronização"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32027"
+msgid "Successfully cleared {} sync data"
+msgstr "Dados de sincronização {} limpos com sucesso"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32028"
+msgid "Ratings"
+msgstr "Avaliações"
 
 msgctxt "#30018"
 msgid "English (United States of America)"
@@ -112,6 +177,16 @@ msgctxt "#30023"
 msgid "Basque (Spain)"
 msgstr "Basco (Espanha)"
 
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32035"
+msgid "Progress"
+msgstr "Progresso"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32036"
+msgid "Dropped"
+msgstr "Dropado"
+
 msgctxt "#30024"
 msgid "Persian (Iran)"
 msgstr "Persa (Irã)"
@@ -119,6 +194,21 @@ msgstr "Persa (Irã)"
 msgctxt "#30025"
 msgid "Finnish (Finland)"
 msgstr "Finlandês (Finlândia)"
+
+#: /resources/settings.xml
+msgctxt "#32039"
+msgid "Prefer fanart.tv artwork"
+msgstr "Prefirir artes do fanart.tv"
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_seasons.py
+msgctxt "#32040"
+msgid "All seasons"
+msgstr "Todas as temporadas"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32041"
+msgid "Your In-Progress TV Shows"
+msgstr "Seus Seriados em Andamento"
 
 msgctxt "#30026"
 msgid "French (Canada)"
@@ -131,6 +221,36 @@ msgstr "Francês (França)"
 msgctxt "#30028"
 msgid "Galician (Spain)"
 msgstr "Galego (Espanha)"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32045"
+msgid "Your In-Progress Movies"
+msgstr "Seus Filmes em Andamento"
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32046"
+msgid "Drop TV show"
+msgstr "Abandonar Seriado"
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32047"
+msgid "Undrop TV show"
+msgstr "Desabandonar Seriado"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32048"
+msgid "Dropped TV Shows"
+msgstr "Seriados Abandonados"
+
+#: /resources/settings.xml
+msgctxt "#32049"
+msgid "Sort order of Your Next Episodes list. By airdate sorts episodes by premiere date. By recentlywatched sorts episodes by most recently watched tvshow. By todays is recentlywatched with episodes airing today at the front. By lastweek is recentlywatched with episodes airing in the past week sorted by airdate at the front."
+msgstr "Ordem de classificação da lista Seus Próximos Episódios. Por data de exibição classifica os episódios por data de estreia. Por episódios de tipos assistidos recentemente por seriado assistido mais recentemente. Por hoje é recentemente assistido com episódios que vão ao ar hoje na frente. Na semana passada é assistido recentemente com episódios que foram ao ar na semana passada classificados por data de exibição na frente."
+
+#: /resources/settings.xml
+msgctxt "#32050"
+msgid "Prefer artwork in your language"
+msgstr "Prefirir artes no seu idioma"
 
 msgctxt "#30029"
 msgid "Hebrew (Israel)"
@@ -1539,11 +1659,6 @@ msgid "Building Player Dialog"
 msgstr "Criando Caixa de Diálogo do Player"
 
 #: /resources/lib/trakt/api.py
-msgctxt "#32377"
-msgid "Playcount"
-msgstr "Número de Reproduções"
-
-#: /resources/settings.xml
 msgctxt "#32378"
 msgid "Show All"
 msgstr "Mostrar Tudo"
@@ -1584,11 +1699,6 @@ msgid "Hide All"
 msgstr "Ocultar Todos"
 
 #: /resources/settings.xml
-msgctxt "#32386"
-msgid "Delete cache"
-msgstr "Excluir cache"
-
-#: /resources/lib/script/router.py
 msgctxt "#32387"
 msgid "Delete {} Cache"
 msgstr "Excluir {} Cache"
@@ -1815,6 +1925,11 @@ msgid "Provider allowlist updated"
 msgstr "Lista de permissões do provedor atualizada"
 
 #: /resources/lib/script/method.py
+msgctxt "#32439"
+msgid "The provider allowlist has been updated."
+msgstr "A lista de permissões do provedor foi atualizada."
+
+#: /resources/lib/player/configure.py
 msgctxt "#32440"
 msgid "Edit steps"
 msgstr "Editar passos"
@@ -2204,6 +2319,41 @@ msgctxt "#32528"
 msgid "Add to {}"
 msgstr "Adicionar a {}"
 
+#: /resources/settings.xml
+msgctxt "#32529"
+msgid "Scrobble items played via TMDbHelper"
+msgstr "Itens scrobble reproduzidos via TMDbHelper"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32530"
+msgid "Remove rating"
+msgstr "Remover avaliação"
+
+#: /resources/tmdbhelper/lib/script/sync/item.py
+msgctxt "#32531"
+msgid "Method only available for VIP accounts."
+msgstr "Método disponível apenas para contas VIP."
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32532"
+msgid "Force resync"
+msgstr "Forçar ressincronização"
+
+#: /resources/settings.xml
+msgctxt "#32534"
+msgid "Trakt sync progress notifications"
+msgstr "Notificações de progresso da sincronização do Trakt"
+
+#: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
+msgctxt "#32535"
+msgid "Non-binary"
+msgstr "Não binário"
+
+#: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
+msgctxt "#32536"
+msgid "Unspecified"
+msgstr "Não especificado"
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr "Hindi (Índia)"
@@ -2435,8 +2585,3 @@ msgstr "Player padrão para filmes"
 msgctxt "#32025"
 msgid "Default player for episodes"
 msgstr "Player padrão para episódios"
-
-#: /resources/settings.xml
-msgctxt "#32027"
-msgid "Clear default players"
-msgstr "Limpar players padrões"

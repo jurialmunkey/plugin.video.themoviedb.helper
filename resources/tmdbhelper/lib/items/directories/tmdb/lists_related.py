@@ -1,78 +1,70 @@
-from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard
-from tmdbhelper.lib.items.directories.tmdb.lists_view import ItemViews
+from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties
+from tmdbhelper.lib.items.directories.tmdb.lists_view import ItemKeywords, ItemReviews
 from tmdbhelper.lib.files.ftools import cached_property
 
 
+class ListRelatedProperties(ListStandardProperties):
+    @cached_property
+    def url(self):
+        return self.request_url.format(tmdb_type=self.tmdb_type, tmdb_id=self.tmdb_id)
+
+
 class ListRelated(ListStandard):
-    def get_request_url(self, tmdb_type, tmdb_id, **kwargs):
-        return self.item_list_request_url.format(tmdb_type=tmdb_type, tmdb_id=tmdb_id)
+    list_properties_class = ListRelatedProperties
+
+    def get_items(self, *args, tmdb_id=None, **kwargs):
+        self.list_properties.tmdb_id = tmdb_id
+        return super().get_items(*args, **kwargs)
 
 
 class ListRecommendations(ListRelated):
-    item_list_plugin_name = '{localized}'  # TODO: BASED ON {item}
-    item_list_dbid_sorted = True
-    item_list_request_url = '{tmdb_type}/{tmdb_id}/recommendations'
-    item_list_localize = 32223
-    item_list_length = 2  # Recommendations only have 2 pages
+
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.plugin_name = '{localized}'  # TODO: BASED ON {item}
+        list_properties.dbid_sorted = True
+        list_properties.request_url = '{tmdb_type}/{tmdb_id}/recommendations'
+        list_properties.localize = 32223
+        list_properties.length = 2  # Recommendations only have 2 pages
+        return list_properties
 
 
 class ListSimilar(ListRelated):
-    item_list_plugin_name = '{localized}'  # TODO: BASED ON {item}
-    item_list_dbid_sorted = True
-    item_list_request_url = '{tmdb_type}/{tmdb_id}/similar'
-    item_list_localize = 32224
 
-
-class ListCollection(ListRelated):
-    # TODO: Move this to a BaseView instead of a lookup
-    item_list_plugin_name = '{localized}'
-    item_list_request_url = 'collection/{tmdb_id}'
-    item_list_results_key = 'parts'
-    item_list_tmdb_type = 'movie'
-    item_list_localize = 32192
-    item_list_length = 1  # Collections come as one page
-
-    @staticmethod
-    def item_list_sorted_function(i):
-        try:
-            return i['infolabels']['premiered']
-        except (KeyError, AttributeError, TypeError):
-            return ''
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.plugin_name = '{localized}'  # TODO: BASED ON {item}
+        list_properties.dbid_sorted = True
+        list_properties.request_url = '{tmdb_type}/{tmdb_id}/similar'
+        list_properties.localize = 32224
+        return list_properties
 
 
 class ListReviews(ListRelated):
-    item_list_plugin_name = '{localized}'  # TODO: BASED ON {item}
-    item_list_dbid_sorted = True
-    item_list_request_url = '{tmdb_type}/{tmdb_id}/reviews'
-    item_list_tmdb_type = 'review'
-    item_list_localize = 32188
 
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.plugin_name = '{localized}'  # TODO: BASED ON {item}
+        list_properties.dbid_sorted = True
+        list_properties.request_url = '{tmdb_type}/{tmdb_id}/reviews'
+        list_properties.tmdb_type = 'review'
+        list_properties.localize = 32188
+        return list_properties
 
-class ItemKeywords(ItemViews):
-    item_mediatype = 'keyword'
-    tmdb_type = 'movie'
-
-    def __init__(self, meta):
-        self.meta = meta
-        self.label = self.meta['name']
-        self.tmdb_id = self.meta['id']
-
-    @cached_property
-    def params(self):
-        return {
-            'info': 'discover',
-            'tmdb_type': self.tmdb_type,
-            'with_keywords': self.tmdb_id,
-            'with_id': 'True'
-        }
+    def get_mapped_item(self, item, *args, **kwargs):
+        return ItemReviews(**item).item
 
 
 class ListKeywords(ListRelated):
-    item_list_plugin_name = '{localized}'  # TODO: BASED ON {item}
-    item_list_request_url = 'movie/{tmdb_id}/keywords'
-    item_list_results_key = 'keywords'
-    item_list_tmdb_type = 'keyword'
-    item_list_localize = 21861
+
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.plugin_name = '{localized}'  # TODO: BASED ON {item}
+        list_properties.request_url = 'movie/{tmdb_id}/keywords'
+        list_properties.results_key = 'keywords'
+        list_properties.tmdb_type = 'keyword'
+        list_properties.localize = 21861
+        return list_properties
 
     def get_mapped_item(self, item, *args, **kwargs):
-        return ItemKeywords(item).item
+        return ItemKeywords(**item).item

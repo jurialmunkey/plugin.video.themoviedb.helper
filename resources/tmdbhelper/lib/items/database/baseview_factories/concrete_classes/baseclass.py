@@ -1,13 +1,16 @@
 from tmdbhelper.lib.files.ftools import cached_property
-from tmdbhelper.lib.files.dbfunc import database_connection
 from tmdbhelper.lib.items.database.basedata import ItemDetailsDatabaseAccess
+from tmdbhelper.lib.addon.consts import DATALEVEL_MAX
+from jurialmunkey.locker import MutexPropLock
 
 
 class BaseList(ItemDetailsDatabaseAccess):
     cached_data_check_key = 'expiry'
     cache_refresh = None  # Set to "never" for cache only, or "force" for forced refresh
     cached_data_table = table = 'baseitem'
-    cached_data_conditions = 'id=? AND expiry>=?'
+    cached_data_conditions = 'id=? AND expiry>=? AND datalevel>=?'
+    season = None
+    episode = None
 
     @property
     def data_cond(self):
@@ -26,43 +29,42 @@ class BaseList(ItemDetailsDatabaseAccess):
     @property
     def cached_data_values(self):
         """ WHERE condition ? ? ? ? = value, value, value, value """
-        if self.cache_refresh == 'never':
-            return (self.item_id, 0, )
-        return (self.item_id, self.current_time, )
+        return (self.item_id, self.current_time, DATALEVEL_MAX)
 
     def configure_mapped_data(self, data):
-        def get_value(k):
-            if k == 'id':
-                return self.item_id
-            if k == 'expiry':
-                return self.expiry
+        raise Exception(f'Method configure_mapped_data not applicable for {self.__class__.__name__}')
+
+    @cached_property
+    def parent_item_data(self):
+        return self.get_parent_data(self.mediatype, self.season, self.episode)
+
+    def get_parent_data(self, mediatype, season=None, episode=None, cache_refresh=None):
+        from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
+        lockname = '.'.join([f'{i}' for i in (self.tmdb_type, self.tmdb_id, season, episode) if i is not None])
+        with MutexPropLock(f'Database.ItemDetails.{lockname}.lockfile'):
             try:
-                return data[k]
+                base_dbc = BaseItemFactory(mediatype)
+                base_dbc.mediatype = mediatype
+                base_dbc.tmdb_id = self.tmdb_id
+                base_dbc.tmdb_type = self.tmdb_type
+                base_dbc.season = season
+                base_dbc.episode = episode
+                base_dbc.cache_refresh = cache_refresh
+                base_dbc.common_apis = self.common_apis
+                base_dbc.connection = self.connection
+                base_dbc.cache = self.cache
             except (TypeError, KeyError, IndexError, ValueError):
                 return
-        return [get_value(k) for k in self.keys]
+            return base_dbc.data
 
-    def db_baseitem_cache_get_parent_data(self):
-        from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
-        base_dbc = BaseItemFactory(self.mediatype)
-        base_dbc.mediatype = self.mediatype
-        base_dbc.tmdb_id = self.tmdb_id
-        base_dbc.tmdb_type = self.tmdb_type
-        base_dbc.season = self.season
-        base_dbc.episode = self.episode
-        base_dbc.common_apis = self.common_apis
-        base_dbc.connection = self.connection
-        base_dbc.tmdb_id = self.tmdb_id
-        return base_dbc.data
-
-    @database_connection
     def get_unmapped_data(self):
-        data = self.get_cached_list_values(
-            self.cached_data_table,
-            self.cached_data_keys,
-            self.cached_data_values,
-            self.cached_data_conditions
-        )
+        with self.connection.open():
+            data = self.get_cached_list_values(
+                self.cached_data_table,
+                self.cached_data_keys,
+                self.cached_data_values,
+                self.cached_data_conditions
+            )
         try:
             data_check = data[0][self.cached_data_check_key]
         except(TypeError, KeyError, AttributeError, IndexError):
@@ -82,7 +84,8 @@ class BaseList(ItemDetailsDatabaseAccess):
         return [self.map_item(i) for i in data]
 
     def try_cached_data(self, return_data=False):
-        self.db_baseitem_cache_get_parent_data()
+        if not self.parent_item_data:
+            return
         if not return_data:
             return
         return self.get_cached_data()

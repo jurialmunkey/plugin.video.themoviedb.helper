@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 3.6\n"
 
 msgctxt "#30000"
 msgid "Arabic (United Arab Emirates)"
@@ -25,6 +25,11 @@ msgctxt "#30001"
 msgid "Arabic (Saudi Arabia)"
 msgstr "Арабский (Саудовская Аравия)"
 
+#: /resources/tmdbhelper/lib/api/tmdb/methods/lists.py
+msgctxt "#32000"
+msgid "Unaired"
+msgstr "Не вышел"
+
 msgctxt "#30002"
 msgid "Belarusian (Belarus)"
 msgstr "Белорусский (Белоруссия)"
@@ -32,6 +37,11 @@ msgstr "Белорусский (Белоруссия)"
 msgctxt "#30003"
 msgid "Bulgarian (Bulgaria)"
 msgstr "Болгарский (Болгария)"
+
+#: /resources/settings.xml
+msgctxt "#32003"
+msgid "Preferred"
+msgstr "Предпочтительно"
 
 msgctxt "#30004"
 msgid "Bengali (Bangladesh)"
@@ -41,9 +51,24 @@ msgctxt "#30005"
 msgid "Catalan (Spain)"
 msgstr "Каталонский (Испания)"
 
+#: /resources/settings.xml
+msgctxt "#32006"
+msgid "Supplement"
+msgstr "Добавление"
+
 msgctxt "#30006"
 msgid "Chamorro (Guam)"
 msgstr "Чаморро (Гуам)"
+
+#: /resources/settings.xml
+msgctxt "#32008"
+msgid "Low"
+msgstr "Низкое"
+
+#: /resources/settings.xml
+msgctxt "#32009"
+msgid "High"
+msgstr "Высокое"
 
 msgctxt "#30007"
 msgid "Czech (Czech Republic)"
@@ -57,9 +82,20 @@ msgctxt "#30009"
 msgid "German (Austria)"
 msgstr "Немецкий (Австрия)"
 
+#: /resources/settings.xml
+msgctxt "#32013"
+msgid "Get watched indicators, episode counts, and resume points"
+msgstr ""
+"Получать индикаторы просмотреннного, счетчики серий и точки возобновления"
+
 msgctxt "#30010"
 msgid "German (Switzerland)"
 msgstr "Немецкий (Швейцария)"
+
+#: /resources/settings.xml
+msgctxt "#32015"
+msgid "Additional season: Up next"
+msgstr "Дополнительный сезон: Далее"
 
 msgctxt "#30011"
 msgid "German (Germany)"
@@ -69,13 +105,28 @@ msgctxt "#30012"
 msgid "Greek (Greece)"
 msgstr "Греческий (Греция)"
 
+#: /resources/settings.xml
+msgctxt "#32018"
+msgid "Additional season: Anticipated"
+msgstr "Дополнительный сезон: Ожидается"
+
 msgctxt "#30013"
 msgid "English (Australia)"
 msgstr "Английский (Австралия)"
 
+#: /resources/settings.xml
+msgctxt "#32020"
+msgid "Additional season: Specials"
+msgstr "Дополнительный сезон: Спецвыпуски"
+
 msgctxt "#30014"
 msgid "English (Canada)"
 msgstr "Английский (Канада)"
+
+#: /resources/settings.xml
+msgctxt "#32022"
+msgid "Clear sync data"
+msgstr "Очистить данные синхронизации"
 
 msgctxt "#30015"
 msgid "English (United Kingdom)"
@@ -88,6 +139,23 @@ msgstr "Английский (Ирландия)"
 msgctxt "#30017"
 msgid "English (New Zealand)"
 msgstr "Английский (Новая Зеландия)"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+#, fuzzy
+msgctxt "#32026"
+msgid "Invalidate Sync Data"
+msgstr "Аннулировать данные синхронизации"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32027"
+msgid "Successfully cleared {} sync data"
+msgstr "Успешно очищены данные синхронизации - {}"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+#, fuzzy
+msgctxt "#32028"
+msgid "Ratings"
+msgstr "Рейтинги"
 
 msgctxt "#30018"
 msgid "English (United States of America)"
@@ -113,6 +181,16 @@ msgctxt "#30023"
 msgid "Basque (Spain)"
 msgstr "Баскский (Испания)"
 
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32035"
+msgid "Progress"
+msgstr "Прогресс"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32036"
+msgid "Dropped"
+msgstr ""
+
 msgctxt "#30024"
 msgid "Persian (Iran)"
 msgstr "Персидский (Иран)"
@@ -120,6 +198,22 @@ msgstr "Персидский (Иран)"
 msgctxt "#30025"
 msgid "Finnish (Finland)"
 msgstr "Финский (Финляндия)"
+
+#: /resources/settings.xml
+msgctxt "#32039"
+msgid "Prefer fanart.tv artwork"
+msgstr "Предпочитать иллюстрации fanart.tv"
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_seasons.py
+msgctxt "#32040"
+msgid "All seasons"
+msgstr "Все сезоны"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+#, fuzzy
+msgctxt "#32041"
+msgid "Your In-Progress TV Shows"
+msgstr "Продолжить просмотр (Сериалы)"
 
 msgctxt "#30026"
 msgid "French (Canada)"
@@ -132,6 +226,51 @@ msgstr "Французский (Франция)"
 msgctxt "#30028"
 msgid "Galician (Spain)"
 msgstr "Галисийский (Испания)"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+#, fuzzy
+msgctxt "#32045"
+msgid "Your In-Progress Movies"
+msgstr "Продолжить просмотр (Фильмы)"
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32046"
+msgid "Drop TV show"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32047"
+msgid "Undrop TV show"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32048"
+msgid "Dropped TV Shows"
+msgstr ""
+
+#: /resources/settings.xml
+#, fuzzy
+msgctxt "#32049"
+msgid ""
+"Sort order of Your Next Episodes list. By airdate sorts episodes by premiere "
+"date. By recentlywatched sorts episodes by most recently watched tvshow. By "
+"todays is recentlywatched with episodes airing today at the front. By "
+"lastweek is recentlywatched with episodes airing in the past week sorted by "
+"airdate at the front."
+msgstr ""
+"Порядок сортировки списка «Ваши следующие серии». По дате выхода в эфир "
+"(airdate) сортирует серии по дате премьеры. По недавно просмотренным "
+"(recentlywatched) сортирует серии по последним просмотренным сериалам. По "
+"сегодняшним (todays) - это недавно просмотренные, с сериями, которые выходят "
+"в эфир сегодня в начале. По прошлой неделе (lastweek) - это недавно "
+"просмотренные серии, вышедшие в эфир на прошлой неделе, отсортированные по "
+"дате выхода в эфир в начале."
+
+#: /resources/settings.xml
+#, fuzzy
+msgctxt "#32050"
+msgid "Prefer artwork in your language"
+msgstr "Предпочитать иллюстрации на вашем языке"
 
 msgctxt "#30029"
 msgid "Hebrew (Israel)"
@@ -164,8 +303,8 @@ msgstr "Проигрыватели по умолчанию"
 
 #: /resources/settings.xml
 msgctxt "#32034"
-msgid "Get watched indicators and episode counts (slower)"
-msgstr "Получать индикаторы просмотренного и счетчики серий (медленнее)"
+msgid "Get watched indicators and episode counts"
+msgstr "Получать индикаторы просмотренного и счетчики серий"
 
 #: /resources/settings.xml
 msgctxt "#32037"
@@ -491,7 +630,7 @@ msgstr "Обновить медиатеку из списков Trakt сейча
 #: /resources/lib/script.py
 msgctxt "#32133"
 msgid "Select List(s)"
-msgstr "Выбрать списки"
+msgstr "Выберите список (списки)"
 
 #: /resources/settings.xml
 msgctxt "#32142"
@@ -1492,7 +1631,7 @@ msgstr "Компании"
 #: /resources/lib/container/basedir.py
 msgctxt "#32361"
 msgid "Search Lists"
-msgstr "Списки поиска"
+msgstr "Поиск списков"
 
 #: /resources/lib/script/sync.py
 msgctxt "#32362"
@@ -1570,11 +1709,6 @@ msgid "Building Player Dialog"
 msgstr "Построение окна проигрывателя"
 
 #: /resources/lib/trakt/api.py
-msgctxt "#32377"
-msgid "Playcount"
-msgstr "Счетчик воспроизведений"
-
-#: /resources/settings.xml
 msgctxt "#32378"
 msgid "Show All"
 msgstr "Показать все"
@@ -1615,11 +1749,6 @@ msgid "Hide All"
 msgstr "Скрыть все"
 
 #: /resources/settings.xml
-msgctxt "#32386"
-msgid "Delete cache"
-msgstr "Удалить кэш"
-
-#: /resources/lib/script/router.py
 msgctxt "#32387"
 msgid "Delete {} Cache"
 msgstr "Удалить кэш {}"
@@ -1865,6 +1994,11 @@ msgid "Provider allowlist updated"
 msgstr "Список разрешенных провайдеров обновлен"
 
 #: /resources/lib/script/method.py
+msgctxt "#32439"
+msgid "The provider allowlist has been updated."
+msgstr "Список разрешенных провайдеров обновлен."
+
+#: /resources/lib/player/configure.py
 msgctxt "#32440"
 msgid "Edit steps"
 msgstr "Изменить шаги"
@@ -1882,7 +2016,7 @@ msgstr "Добавить новое правило"
 #: /resources/lib/player/configure.py
 msgctxt "#32443"
 msgid "Select value to match against {}"
-msgstr "Выберать значение для подбора {}"
+msgstr "Выберите значение для сопоставления с {}"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32444"
@@ -1917,12 +2051,12 @@ msgstr "Игнорировать фильтр региона релиза"
 #: /resources/settings.xml
 msgctxt "#32451"
 msgid "Lowest"
-msgstr "Самый низкий"
+msgstr "Самое низкое"
 
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32452"
 msgid "Highest"
-msgstr "Самый высокий"
+msgstr "Самое высокое"
 
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32453"
@@ -2198,6 +2332,120 @@ msgid "Recache Kodi Library details when building players"
 msgstr ""
 "Обновить кэшированные данные медиатеки Kodi при построении проигрывателей"
 
+#: /resources/settings.xml
+msgctxt "#32509"
+msgid "Use alternative TMDb API url"
+msgstr "Использовать альтернативный URL-адрес TMDb API"
+
+#: /resources/settings.xml
+msgctxt "#32514"
+msgid "Add to MDbList list"
+msgstr "Добавить в список MDbList"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32516"
+msgid "MDbList API credentials not found."
+msgstr "Учетные данные MDbList API не найдены."
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32517"
+msgid "Add your personal MDbList API key in TMDbHelper settings."
+msgstr "Добавьте персональный ключ MDbList API в настройки TMDbHelper."
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32518"
+msgid "No static lists found for current MDbList user."
+msgstr "Для текущего пользователя MDbList статические списки не найдены."
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32519"
+msgid "Remove from MDbList list"
+msgstr "Удалить из списка MDbList"
+
+#: /resources/settings.xml
+msgctxt "#32520"
+msgid "TMDb"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32521"
+msgid "Rated"
+msgstr "Рейтинговые"
+
+#: /resources/settings.xml
+msgctxt "#32522"
+msgid "TMDb user options"
+msgstr "Опции пользователя TMDb"
+
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+msgctxt "#32523"
+msgid "Add/Remove from TMDb user list"
+msgstr "Удалить из TMDb списка пользователя"
+
+#: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
+msgctxt "#32524"
+msgid "User lists"
+msgstr "Списки пользователя"
+
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+msgctxt "#32525"
+msgid "Add/Remove from TMDb favourites"
+msgstr "Добавить/удалить из избранного TMDb"
+
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+#, fuzzy
+msgctxt "#32526"
+msgid "Add/Remove from TMDb watchlist"
+msgstr "Добавить/удалить из списка наблюдения TMDb"
+
+#: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
+msgctxt "#32527"
+msgid "Remove from {}"
+msgstr "Удалить из {}"
+
+#: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
+msgctxt "#32528"
+msgid "Add to {}"
+msgstr "Добавить в {}"
+
+#: /resources/settings.xml
+msgctxt "#32529"
+msgid "Scrobble items played via TMDbHelper"
+msgstr "Скробблинг воспроизводимого через TMDbHelper"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32530"
+msgid "Remove rating"
+msgstr "Удалить оценку"
+
+#: /resources/tmdbhelper/lib/script/sync/item.py
+msgctxt "#32531"
+msgid "Method only available for VIP accounts."
+msgstr "Метод доступен только для VIP аккаунтов."
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+#, fuzzy
+msgctxt "#32532"
+msgid "Force resync"
+msgstr "Принудительная повторная синхронизация"
+
+#: /resources/settings.xml
+msgctxt "#32534"
+msgid "Trakt sync progress notifications"
+msgstr "Уведомления о ходе синхронизации Trakt"
+
+#: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
+#, fuzzy
+msgctxt "#32535"
+msgid "Non-binary"
+msgstr "Небинарный"
+
+#: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
+#, fuzzy
+msgctxt "#32536"
+msgid "Unspecified"
+msgstr "Не определено"
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr "Хинди (Индия)"
@@ -2432,7 +2680,19 @@ msgctxt "#32025"
 msgid "Default player for episodes"
 msgstr "Проигрыватель по умолчанию для сериалов"
 
-#: /resources/settings.xml
-msgctxt "#32027"
-msgid "Clear default players"
-msgstr "Очистить проигрыватели по умолчанию"
+#, fuzzy
+#~ msgctxt "#32145"
+#~ msgid "TMDbHelper Options"
+#~ msgstr "TMDbHelper Меню..."
+
+#~ msgctxt "#32377"
+#~ msgid "Playcount"
+#~ msgstr "Счетчик воспроизведений"
+
+#~ msgctxt "#32386"
+#~ msgid "Delete cache"
+#~ msgstr "Удалить кэш"
+
+#~ msgctxt "#32027"
+#~ msgid "Clear default players"
+#~ msgstr "Очистить проигрыватели по умолчанию"

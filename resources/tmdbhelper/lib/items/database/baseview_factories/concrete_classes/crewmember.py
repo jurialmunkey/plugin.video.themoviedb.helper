@@ -4,9 +4,21 @@ from tmdbhelper.lib.files.ftools import cached_property
 
 class CrewMemberMediaList(CastMemberMediaList):
     table = 'crewmember'
-    cached_data_conditions_base = 'parent_id=? GROUP BY crewmember.tmdb_id '
+    cached_data_base_conditions = 'parent_id=? AND expiry>=? AND datalevel>=?'  # WHERE conditions
     cached_data_check_key = 'parent_id'
+    group_by = 'crewmember.tmdb_id'
     keys = ('GROUP_CONCAT(role, " / ") as role', 'department', 'appearances', 'parent_id')
+
+    sort_by_fallback = None
+    order_by_direction_fallback = 'ASC'
+
+    filter_key_map = {
+        'role': 'role',
+        'department': 'department',
+        'appearances': 'appearances',
+        'title': 'creditedperson.name',
+        'gender': 'creditedperson.gender',
+    }
 
     @staticmethod
     def map_item_infoproperties(i):
@@ -14,6 +26,8 @@ class CrewMemberMediaList(CastMemberMediaList):
             'role': i['role'],
             'job': i['role'],
             'department': i['department'],
+            'tmdb_id': i['tmdb_id'],
+            'tmdb_type': 'person',
         }
 
 

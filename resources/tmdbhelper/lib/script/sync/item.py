@@ -147,14 +147,14 @@ class ItemSyncGetters:
         return False
 
     def get_is_allowed_type(self):
-        if self.season is None:
-            return True
-        if self.episode is None:
-            if self.allow_seasons:
-                return True
-            return False
-        if self.allow_episodes:
-            return True
+        if self.trakt_type == 'episode':
+            return bool(self.allow_episodes)
+        if self.trakt_type == 'season':
+            return bool(self.allow_seasons)
+        if self.trakt_type == 'show':
+            return bool(self.allow_shows)
+        if self.trakt_type == 'movie':
+            return bool(self.allow_movies)
         return False
 
     def get_method(self):
@@ -255,6 +255,8 @@ class ItemSyncGetters:
 
 class ItemSync(ItemSyncGetters, ItemSyncCachedProperties):
     preconfigured = False
+    allow_movies = True
+    allow_shows = True
     allow_seasons = False
     allow_episodes = False
     localized_name_add = None
@@ -262,12 +264,14 @@ class ItemSync(ItemSyncGetters, ItemSyncCachedProperties):
     localized_name = None
     trakt_sync_key = None
     trakt_sync_url = None
+    convert_episodes = False
+    convert_seasons = False
 
     def __init__(self, tmdb_type, tmdb_id, season=None, episode=None):
         self.tmdb_type = tmdb_type
         self.tmdb_id = tmdb_id
-        self.season = season
-        self.episode = episode
+        self.season = None if self.convert_seasons else season
+        self.episode = None if self.convert_episodes else episode
 
     def refresh_containers(self):
         if not self.is_successful_sync:

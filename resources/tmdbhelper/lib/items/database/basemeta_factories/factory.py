@@ -93,8 +93,13 @@ def import_base():
 
 
 def import_collection():
-    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import MovieCollection
-    return MovieCollection
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Series
+    return Series
+
+
+def import_belongs():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Belongs
+    return Belongs
 
 
 def import_movie():
@@ -152,6 +157,11 @@ def import_company():
     return Company
 
 
+def import_broadcaster():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Broadcaster
+    return Broadcaster
+
+
 def import_service():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Service
     return Service
@@ -160,6 +170,11 @@ def import_service():
 def import_studio():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Studio
     return Studio
+
+
+def import_network():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Network
+    return Network
 
 
 def import_provider():
@@ -177,6 +192,21 @@ def import_fanart_tv_poster():
     return FanartTVPoster
 
 
+def import_fanart_tv_poster_language():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.fanart_tv import FanartTVPosterLanguage
+    return FanartTVPosterLanguage
+
+
+def import_fanart_tv_poster_english():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.fanart_tv import FanartTVPosterEnglish
+    return FanartTVPosterEnglish
+
+
+def import_fanart_tv_poster_null():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.fanart_tv import FanartTVPosterNull
+    return FanartTVPosterNull
+
+
 def import_fanart_tv_fanart():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.fanart_tv import FanartTVFanart
     return FanartTVFanart
@@ -187,9 +217,34 @@ def import_fanart_tv_landscape():
     return FanartTVLandscape
 
 
+def import_fanart_tv_landscape_language():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.fanart_tv import FanartTVLandscapeLanguage
+    return FanartTVLandscapeLanguage
+
+
+def import_fanart_tv_landscape_english():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.fanart_tv import FanartTVLandscapeEnglish
+    return FanartTVLandscapeEnglish
+
+
 def import_fanart_tv_clearlogo():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.fanart_tv import FanartTVClearlogo
     return FanartTVClearlogo
+
+
+def import_fanart_tv_clearlogo_language():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.fanart_tv import FanartTVClearlogoLanguage
+    return FanartTVClearlogoLanguage
+
+
+def import_fanart_tv_clearlogo_english():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.fanart_tv import FanartTVClearlogoEnglish
+    return FanartTVClearlogoEnglish
+
+
+def import_fanart_tv_clearlogo_null():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.fanart_tv import FanartTVClearlogoNull
+    return FanartTVClearlogoNull
 
 
 def import_fanart_tv_clearart():
@@ -212,9 +267,29 @@ def import_art():
     return Art
 
 
+def import_art_profile():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtProfile
+    return ArtProfile
+
+
 def import_art_poster():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtPoster
     return ArtPoster
+
+
+def import_art_poster_language():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtPosterLanguage
+    return ArtPosterLanguage
+
+
+def import_art_poster_english():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtPosterEnglish
+    return ArtPosterEnglish
+
+
+def import_art_poster_null():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtPosterNull
+    return ArtPosterNull
 
 
 def import_art_fanart():
@@ -232,6 +307,16 @@ def import_art_landscape():
     return ArtLandscape
 
 
+def import_art_landscape_language():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtLandscapeLanguage
+    return ArtLandscapeLanguage
+
+
+def import_art_landscape_english():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtLandscapeEnglish
+    return ArtLandscapeEnglish
+
+
 def import_art_thumbs():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtThumbs
     return ArtThumbs
@@ -240,6 +325,21 @@ def import_art_thumbs():
 def import_art_clearlogo():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtClearlogo
     return ArtClearlogo
+
+
+def import_art_clearlogo_language():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtClearlogoLanguage
+    return ArtClearlogoLanguage
+
+
+def import_art_clearlogo_english():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtClearlogoEnglish
+    return ArtClearlogoEnglish
+
+
+def import_art_clearlogo_null():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtClearlogoNull
+    return ArtClearlogoNull
 
 
 def import_playcount():
@@ -260,6 +360,41 @@ def import_airedcount():
 def import_playprogress():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import PlayProgress
     return PlayProgress
+
+
+def import_favorites_rank():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import FavoritesRank
+    return FavoritesRank
+
+
+def import_watchlist_rank():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import WatchlistRank
+    return WatchlistRank
+
+
+def import_collected_date():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import CollectedDate
+    return CollectedDate
+
+
+def import_lastplayed():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import LastPlayed
+    return LastPlayed
+
+
+def import_series_genre():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.series import SeriesGenre
+    return SeriesGenre
+
+
+def import_series_movie():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.series import SeriesMovie
+    return SeriesMovie
+
+
+def import_series_stats():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.series import SeriesStats
+    return SeriesStats
 
 
 FACTORY_ROUTES = {
@@ -284,6 +419,7 @@ FACTORY_ROUTES = {
     'tvshow': import_tvshow,
     'season': import_season,
     'episode': import_episode,
+    'belongs': import_belongs,
     'collection': import_collection,
     'unique_id': import_unique_id,
     'custom': import_custom,
@@ -292,28 +428,54 @@ FACTORY_ROUTES = {
     'video': import_video,
     'certification': import_certification,
     'company': import_company,
+    'broadcaster': import_broadcaster,
     'service': import_service,
+    'network': import_network,
     'studio': import_studio,
     'provider': import_provider,
     'fanart_tv': import_fanart_tv,
     'fanart_tv_poster': import_fanart_tv_poster,
+    'fanart_tv_poster_language': import_fanart_tv_poster_language,
+    'fanart_tv_poster_english': import_fanart_tv_poster_english,
+    'fanart_tv_poster_null': import_fanart_tv_poster_null,
     'fanart_tv_fanart': import_fanart_tv_fanart,
     'fanart_tv_landscape': import_fanart_tv_landscape,
+    'fanart_tv_landscape_language': import_fanart_tv_landscape_language,
+    'fanart_tv_landscape_english': import_fanart_tv_landscape_english,
     'fanart_tv_clearlogo': import_fanart_tv_clearlogo,
+    'fanart_tv_clearlogo_language': import_fanart_tv_clearlogo_language,
+    'fanart_tv_clearlogo_english': import_fanart_tv_clearlogo_english,
+    'fanart_tv_clearlogo_null': import_fanart_tv_clearlogo_null,
     'fanart_tv_clearart': import_fanart_tv_clearart,
     'fanart_tv_banner': import_fanart_tv_banner,
     'fanart_tv_discart': import_fanart_tv_discart,
     'art': import_art,
+    'art_profile': import_art_profile,
     'art_poster': import_art_poster,
+    'art_poster_language': import_art_poster_language,
+    'art_poster_english': import_art_poster_english,
+    'art_poster_null': import_art_poster_null,
     'art_fanart': import_art_fanart,
     'art_extrafanart': import_art_extrafanart,
     'art_landscape': import_art_landscape,
+    'art_landscape_language': import_art_landscape_language,
+    'art_landscape_english': import_art_landscape_english,
     'art_thumbs': import_art_thumbs,
     'art_clearlogo': import_art_clearlogo,
+    'art_clearlogo_language': import_art_clearlogo_language,
+    'art_clearlogo_english': import_art_clearlogo_english,
+    'art_clearlogo_null': import_art_clearlogo_null,
     'playcount': import_playcount,
     'watchedcount': import_watchedcount,
     'airedcount': import_airedcount,
     'playprogress': import_playprogress,
+    'favorites_rank': import_favorites_rank,
+    'watchlist_rank': import_watchlist_rank,
+    'collected_date': import_collected_date,
+    'lastplayed': import_lastplayed,
+    'series_genre': import_series_genre,
+    'series_movie': import_series_movie,
+    'series_stats': import_series_stats,
 }
 
 

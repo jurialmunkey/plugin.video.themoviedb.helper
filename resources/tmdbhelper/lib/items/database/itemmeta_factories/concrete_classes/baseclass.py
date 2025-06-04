@@ -1,10 +1,12 @@
 from tmdbhelper.lib.files.ftools import cached_property
+from tmdbhelper.lib.items.database.mappings import ItemMapperMethods
 
 
 class BaseItem:
     art_dbclist_routes = ()
     infolabels_dbclist_routes = ()
     infolabels_dbcitem_routes = ()
+    infoproperties_dbcitem_routes = ()
     infoproperties_dbclist_routes = ()
     extendedinfo = False
     parent_db_cache = None
@@ -12,6 +14,9 @@ class BaseItem:
 
     def __init__(self, parent_db_cache):
         self.parent_db_cache = parent_db_cache
+
+    def return_basemeta_db(self, *args, **kwargs):
+        return self.parent_db_cache.return_basemeta_db(*args, **kwargs)
 
     @staticmethod
     def get_configured_item_value(i, ikey, instance):
@@ -35,7 +40,7 @@ class BaseItem:
 
     def get_infolabels_dbclist(self, infolabels):
         for instance, ikey, dkey in self.infolabels_dbclist_routes:
-            instance = self.parent_db_cache.return_basemeta_db(*instance)
+            instance = self.return_basemeta_db(*instance)
             try:
                 infolabels[dkey] = [i[ikey] for i in instance.cached_data]
             except(KeyError, TypeError, IndexError, AttributeError):
@@ -44,9 +49,9 @@ class BaseItem:
 
     def get_infolabels_dbcitem(self, infolabels):
         for instance, ikey, dkey in self.infolabels_dbcitem_routes:
-            instance = self.parent_db_cache.return_basemeta_db(*instance)
+            instance = self.return_basemeta_db(*instance)
             try:
-                infolabels[dkey] = instance.cached_data[0][ikey]
+                infolabels[dkey] = ikey(instance.cached_data[0]) if callable(ikey) else instance.cached_data[0][ikey]
             except(KeyError, TypeError, IndexError, AttributeError):
                 pass
         return infolabels
@@ -54,8 +59,15 @@ class BaseItem:
     def get_infolabels_special(self, infolabels):
         return infolabels
 
+    def get_infoproperties_airdate(self, infoproperties):
+        infoproperties.update(ItemMapperMethods.get_custom_time(self.get_data_value('duration'), name='duration'))
+        infoproperties.update(ItemMapperMethods.get_custom_date(self.get_data_value('premiered'), name='premiered'))
+        return infoproperties
+
     def get_infolabels_details(self):
-        return {k: self.data[0][k] for k in self.data[0].keys() if k in self.parent_db_cache.allowlist_infolabel_keys}
+        infolabels = {'mediatype': self.mediatype}
+        infolabels.update({k: self.data[0][k] for k in self.data[0].keys() if k in self.parent_db_cache.allowlist_infolabel_keys})
+        return infolabels
 
     def get_infoproperties_dbclist(self, infoproperties):
         for d in self.infoproperties_dbclist_routes:
@@ -63,7 +75,7 @@ class BaseItem:
             mappings = d['mappings']
             propname = d['propname']
             joinings = d['joinings']
-            instance = self.parent_db_cache.return_basemeta_db(*instance)
+            instance = self.return_basemeta_db(*instance)
             for x, i in enumerate(instance.cached_data, 1):
                 for dkey, ikey in mappings.items():
                     v = self.get_configured_item_value(i, ikey, instance)
@@ -76,13 +88,22 @@ class BaseItem:
             infoproperties[f'{joinings[0]}_CR'] = '[CR]'.join(join_data)
         return infoproperties
 
+    def get_infoproperties_dbcitem(self, infoproperties):
+        for instance, ikey, dkey in self.infoproperties_dbcitem_routes:
+            instance = self.return_basemeta_db(*instance)
+            try:
+                infoproperties[dkey] = ikey(instance.cached_data[0]) if callable(ikey) else instance.cached_data[0][ikey]
+            except(KeyError, TypeError, IndexError, AttributeError):
+                pass
+        return infoproperties
+
     def get_infoproperties_special(self, infoproperties):
         return infoproperties
 
     def get_art_dbclist(self, art):
         for instance, dkey in self.art_dbclist_routes:
             attr, subtype = instance
-            instance = self.parent_db_cache.return_basemeta_db(attr, subtype)
+            instance = self.return_basemeta_db(attr, subtype)
 
             try:
                 datalist = instance.cached_data if attr == 'art_extrafanart' else [instance.cached_data[0]]
@@ -108,7 +129,8 @@ class BaseItem:
                 if not subtype:
                     continue
 
-                art[f'{subtype}.{this_dkey}'] = url
+                subtype_dkey = f'{subtype}.{this_dkey}'
+                art[subtype_dkey] = art.get(subtype_dkey) or url
 
         return art
 
@@ -125,9 +147,10 @@ class BaseItem:
 
     @cached_property
     def infoproperties(self):
-        infoproperties = {}
-        infoproperties = self.get_infoproperties_dbclist(infoproperties) if self.extendedinfo else {}
+        infoproperties = self.get_infoproperties_dbclist({}) if self.extendedinfo else {}
+        infoproperties = self.get_infoproperties_dbcitem(infoproperties)
         infoproperties = self.get_infoproperties_special(infoproperties)
+        infoproperties = self.get_infoproperties_airdate(infoproperties)
         return infoproperties
 
     @cached_property
@@ -149,6 +172,7 @@ class BaseItem:
     @cached_property
     def item(self):
         return {
+            'mediatype': self.mediatype,
             'infolabels': self.infolabels,
             'infoproperties': self.infoproperties,
             'cast': self.cast,

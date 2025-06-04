@@ -38,7 +38,10 @@ class ItemDetailsDatabaseAccess(DatabaseAccess):
 
     @cached_property
     def keys(self):
-        return [k for k in getattr(self.cache, f'{self.table}_columns').keys()]
+        return self.get_keys()
+
+    def get_keys(self):
+        return tuple(getattr(self.cache, f'{self.table}_columns').keys())
 
     @staticmethod
     def get_base_id(tmdb_type, tmdb_id):
@@ -62,7 +65,6 @@ class ItemDetailsDatabaseAccess(DatabaseAccess):
         """ cache online data from func to property """
         if not self.online_data_cond:
             return
-        # kodi_log(f'SYNC CACHE: {self.online_data_args}', 2)
         return self.online_data_func(*self.online_data_args, **self.online_data_kwgs)
 
     def get_online_data(self):

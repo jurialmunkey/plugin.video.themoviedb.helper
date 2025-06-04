@@ -527,7 +527,7 @@ def _get_basedir_trakt():
                 'icon': f'{ADDONPATH}/resources/icons/trakt/watchlist.png'}},
         {
             'label': u'{}{{space}}{{item_type}}'.format(get_localized(32194)),
-            'types': ['movie', 'tv', 'both'],
+            'types': ['movie', 'tv', 'episode', 'both'],
             'params': {'info': 'trakt_history'},
             'path': PLUGINPATH,
             'art': {
@@ -535,7 +535,7 @@ def _get_basedir_trakt():
                 'icon': f'{ADDONPATH}/resources/icons/trakt/recentlywatched.png'}},
         {
             'label': u'{}{{space}}{{item_type}}'.format(get_localized(32195)),
-            'types': ['movie', 'tv'],
+            'types': ['movie', 'tv', 'episode'],
             'params': {'info': 'trakt_mostwatched'},
             'path': PLUGINPATH,
             'art': {
@@ -590,6 +590,15 @@ def _get_basedir_trakt():
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/trakt/inprogress.png'}},
+        {
+            'label': get_localized(32048),
+            'types': ['tv'],
+            'params': {'info': 'trakt_dropped'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/inprogress.png'}},
+
         {
             'label': u'{{item_type}}{{space}}{}'.format(get_localized(32198)),
             'types': ['movie', 'tv'],
@@ -899,6 +908,38 @@ def _get_basedir_tmdb():
             'label': u'{}{{space}}{{item_type}}'.format(get_localized(32185)),
             'types': ['movie', 'tv'],
             'params': {'info': 'most_voted'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'}},
+        {
+            'label': u'{} {}'.format(get_localized(593), get_localized(20388)),
+            'types': ['movie'],
+            'params': {'info': 'all_studios'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'}},
+        {
+            'label': u'{} {}'.format(get_localized(593), get_localized(32062)),
+            'types': ['tv'],
+            'params': {'info': 'all_networks'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'}},
+        {
+            'label': u'{} {}'.format(get_localized(593), get_localized(32187)),
+            'types': ['movie'],
+            'params': {'info': 'all_collections'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/themoviedb/default.png'}},
+        {
+            'label': u'{} {}'.format(get_localized(593), get_localized(21861)),
+            'types': ['movie'],
+            'params': {'info': 'all_keywords'},
             'path': PLUGINPATH,
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',

@@ -1,178 +1,167 @@
-from tmdbhelper.lib.items.container import ContainerDirectory, use_item_cache
-from tmdbhelper.lib.addon.plugin import convert_type, get_localized, get_setting
-from tmdbhelper.lib.items.filters import is_excluded
+from tmdbhelper.lib.items.directories.lists_default import ListDefault, ListProperties
+from tmdbhelper.lib.addon.plugin import get_setting
+from tmdbhelper.lib.files.ftools import cached_property
 from jurialmunkey.parser import try_int
 
 
-ITEMS_LENGTH = 20
 PAGES_LENGTH = get_setting('pagemulti_tmdb', 'int') or 1
 
 
-class ListStandard(ContainerDirectory):
-    default_cacheonly = True  # TMDb lists can rely on data from list directly TODO: Decide if on or off by default
-    item_list_request_url = ''  # PATH to request
-    item_list_results_key = 'results'  # KEY in RESPONSE from PATH holding ITEMS
-    item_list_plugin_name = '{localized} {plural}'
-    item_list_dbid_sorted = False
-    item_list_localize = None
-    item_list_sorted_reversed = False
-    item_list_sorted_function = None
-    item_list_length = None  # Override user setting for length
-    item_list_tmdb_type = None  # Override type for items (e.g. for related lists that get a different type to source)
+class UncachedItemsPage:
+    def __init__(self, outer_class, page):
+        self.outer_class = outer_class
+        self.page = page
 
-    def get_plugin_category(self, plural=''):
-        localized = get_localized(self.item_list_localize) if self.item_list_localize else ''
-        return self.item_list_plugin_name.format(localized=localized, plural=plural)
+    @cached_property
+    def response(self):
+        return self.outer_class.get_uncached_response(self.page)
 
-    @staticmethod
-    def paginated_items(items, page=1, length=PAGES_LENGTH, total_pages=None):
-        if total_pages and (page + length - 1) < total_pages:
-            items.append({'next_page': page + length})
-            return items
-
-        return items
-
-    def get_mapped_item(self, item, tmdb_type, add_infoproperties=None):
-        return self.tmdb_api.mapper.get_info(
-            item,
-            item.get('media_type') or tmdb_type,
-            add_infoproperties=add_infoproperties)
-
-    def get_cached_items_page_configured(self, response, tmdb_type):
-        def items_page(items=None, pages=None, total=None):
-            return {
-                'items': items or [],
-                'pages': pages,
-                'total': total
-            }
-
+    @cached_property
+    def results(self):
         try:
-            results = response[self.item_list_results_key]
+            results = self.response[self.outer_class.results_key]
         except (TypeError, KeyError):
-            return items_page()
+            return []
         try:
-            pages = response['total_pages']
-            total = response['total_results']
+            self.outer_class.total_pages = self.response['total_pages']
+            self.outer_class.total_items = self.response['total_results']
         except (TypeError, KeyError):
-            pages, total = None, None
+            self.outer_class.total_pages = 0
+            self.outer_class.total_items = 0
+        return results
 
-        add_infoproperties = [
-            ('total_pages', pages),
-            ('total_results', total),
+    @cached_property
+    def add_infoproperties(self):
+        return [
+            ('total_pages', self.outer_class.total_pages),
+            ('total_results', self.outer_class.total_items),
         ]
 
-        if not results:
-            return items_page()
+    @cached_property
+    def items(self):
+        return [
+            self.outer_class.get_mapped_item(i, add_infoproperties=self.add_infoproperties)
+            for i in self.results if i
+        ]
 
-        return items_page(
-            items=[
-                self.get_mapped_item(i, tmdb_type, add_infoproperties=add_infoproperties)
-                for i in results if i
+
+class ListStandardProperties(ListProperties):
+
+    total_pages = 0
+    total_items = 0
+
+    @property
+    def next_page(self):
+        return self.page + self.length
+
+    def get_uncached_response(self, page=1):
+        return self.tmdb_api.get_response_json(self.url, page=page)
+
+    def get_uncached_items(self):
+        return {
+            'items': [
+                i for xpage in range(self.page, self.next_page)
+                for i in UncachedItemsPage(self, xpage).items
             ],
-            pages=pages,
-            total=total,
-        )
+            'pages': self.total_pages,
+            'count': self.total_items,
+        }
 
-    @use_item_cache('ItemContainer.db')
-    def get_cached_items_page(self, *args, **kwargs):
-        return self._get_cached_items_page(*args, **kwargs)
+    def get_mapped_item(self, item, add_infoproperties=None):
+        return self.tmdb_api.mapper.get_info(
+            item,
+            item.get('media_type') or self.tmdb_type,
+            add_infoproperties=add_infoproperties)
 
-    def _get_cached_items_page(self, request_url, tmdb_type, page=1):
-        response = self.tmdb_api.get_response_json(request_url, page=page)
-        return self.get_cached_items_page_configured(response, tmdb_type)
 
-    @use_item_cache('ItemContainer.db')
-    def get_cached_items(self, *args, **kwargs):
-        return self._get_cached_items(*args, **kwargs)
+class ListStandard(ListDefault):
 
-    def _get_cached_items(self, request_url, tmdb_type, page=1, length=PAGES_LENGTH, paginated=True):
-        items = []
-        pages = 0
+    list_properties_class = ListStandardProperties
 
-        for x in range(page, page + length):
-            ipage = self.get_cached_items_page(request_url, tmdb_type, x)
-            pages = ipage['pages']
-            items.extend(ipage['items'])
-
-        if not paginated:
-            return items
-
-        return self.paginated_items(items, page, length, pages)
-
-    def get_request_url(self, tmdb_type, **kwargs):
-        return self.item_list_request_url.format(tmdb_type=tmdb_type)
-
-    def get_items(self, tmdb_type, page=1, length=PAGES_LENGTH, **kwargs):
-        request_url = self.get_request_url(tmdb_type=tmdb_type, **kwargs)
-        items = self.get_cached_items(
-            request_url,
-            self.item_list_tmdb_type or tmdb_type,
-            page=try_int(page) or 1,
-            length=self.item_list_length or try_int(length) or PAGES_LENGTH,
-            paginated=self.pagination)
-        return self.get_items_finalised(items, self.item_list_tmdb_type or tmdb_type)
-
-    def get_items_finalised(self, items, tmdb_type):
-        self.kodi_db = self.get_kodi_database(tmdb_type)
-        self.container_content = convert_type(tmdb_type, 'container', items=items)
-        self.plugin_category = self.get_plugin_category(convert_type(tmdb_type, 'plural'))
-        self.sort_by_dbid = True if self.kodi_db and self.item_list_dbid_sorted else False
-        items = [i for i in items if not is_excluded(i, **self.filters)] if self.filters else items
-        if not self.item_list_sorted_function:
-            return items
-        return sorted(items, key=self.item_list_sorted_function, reverse=self.item_list_sorted_reversed)
+    def get_items(self, *args, length=None, **kwargs):
+        return super().get_items(*args, length=try_int(length) or PAGES_LENGTH, **kwargs)
 
 
 class ListPopular(ListStandard):
-    item_list_request_url = '{tmdb_type}/popular'
-    item_list_localize = 32175
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = '{tmdb_type}/popular'
+        list_properties.localize = 32175
+        return list_properties
 
 
 class ListTopRated(ListStandard):
-    item_list_request_url = '{tmdb_type}/top_rated'
-    item_list_localize = 32176
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = '{tmdb_type}/top_rated'
+        list_properties.localize = 32176
+        return list_properties
 
 
 class ListUpcoming(ListStandard):
-    item_list_request_url = '{tmdb_type}/upcoming'
-    item_list_localize = 32177
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = '{tmdb_type}/upcoming'
+        list_properties.localize = 32177
+        return list_properties
 
 
 class ListTrendingDay(ListStandard):
-    item_list_request_url = 'trending/{tmdb_type}/day'
-    item_list_plugin_name = '{plural} {localized}'
-    item_list_localize = 32178
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = 'trending/{tmdb_type}/day'
+        list_properties.plugin_name = '{plural} {localized}'
+        list_properties.localize = 32178
+        return list_properties
 
 
 class ListTrendingWeek(ListStandard):
-    item_list_request_url = 'trending/{tmdb_type}/week'
-    item_list_plugin_name = '{plural} {localized}'
-    item_list_localize = 32179
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = 'trending/{tmdb_type}/week'
+        list_properties.plugin_name = '{plural} {localized}'
+        list_properties.localize = 32179
+        return list_properties
 
 
 class ListInTheatres(ListStandard):
-    item_list_request_url = '{tmdb_type}/now_playing'
-    item_list_plugin_name = '{localized}'
-    item_list_localize = 32180
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = '{tmdb_type}/now_playing'
+        list_properties.plugin_name = '{localized}'
+        list_properties.localize = 32180
+        return list_properties
 
 
 class ListAiringToday(ListStandard):
-    item_list_request_url = '{tmdb_type}/airing_today'
-    item_list_plugin_name = '{localized}'
-    item_list_localize = 32181
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = '{tmdb_type}/airing_today'
+        list_properties.plugin_name = '{localized}'
+        list_properties.localize = 32181
+        return list_properties
 
 
 class ListCurrentlyAiring(ListStandard):
-    item_list_request_url = '{tmdb_type}/on_the_air'
-    item_list_plugin_name = '{localized}'
-    item_list_localize = 32182
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = '{tmdb_type}/on_the_air'
+        list_properties.plugin_name = '{localized}'
+        list_properties.localize = 32182
+        return list_properties
 
 
 class ListRevenue(ListStandard):
-    item_list_request_url = 'discover/{tmdb_type}?sort_by=revenue.desc'
-    item_list_localize = 32184
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = 'discover/{tmdb_type}?sort_by=revenue.desc'
+        list_properties.localize = 32184
+        return list_properties
 
 
 class ListMostVoted(ListStandard):
-    item_list_request_url = 'discover/{tmdb_type}?sort_by=vote_count.desc'
-    item_list_localize = 32185
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = 'discover/{tmdb_type}?sort_by=vote_count.desc'
+        list_properties.localize = 32185
+        return list_properties

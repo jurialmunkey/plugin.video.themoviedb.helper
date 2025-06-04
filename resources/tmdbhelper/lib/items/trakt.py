@@ -26,7 +26,7 @@ class TraktPlayData():
         return self.trakt_api.trakt_syncdata
 
     @is_sync
-    def pre_sync(self, info=None, tmdb_id=None, tmdb_type=None, season=None, **kwargs):
+    def pre_sync(self, info=None, tmdb_type=None, **kwargs):
         info_movies = ('stars_in_movies', 'crew_in_movies', 'trakt_userlist', 'stars_in_both', 'crew_in_both',)
         if tmdb_type in ('movie', 'both',) or info in info_movies:
             if self._watchedindicators:
@@ -38,7 +38,7 @@ class TraktPlayData():
         if tmdb_type in ('tv', 'season', 'both',) or info in info_tvshow:
             if self._watchedindicators:
                 self.trakt_syncdata.sync('show', ('plays', 'watched_episodes', 'aired_episodes', ))
-            if self._pauseplayprogress and tmdb_id is not None and season is not None:
+            if self._pauseplayprogress:
                 self.trakt_syncdata.sync('show', ('playback_progress', ))
 
     @is_sync
