@@ -93,42 +93,22 @@ class ListWatchlist(ListStandardSync):
 class ListWatchlistReleased(ListStandardSync):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
-        list_properties.sync_type = 'watchlist'
+        list_properties.sync_type = 'watchlistreleased'
         list_properties.sort_by = 'released'
         list_properties.sort_how = 'desc'
         list_properties.localize = 32456
         list_properties.item_keys = ('premiered', )
-        list_properties.filters = {
-            'filter_key': 'premiered',
-            'filter_value': {
-                'module': 'tmdbhelper.lib.addon.tmdate',
-                'method': 'get_todays_date',
-                'kwargs': {}
-            },
-            'filter_operator': 'lt',
-            'exclude_key': 'premiered',
-            'exclude_value': 'is_empty'
-        }
         return list_properties
 
 
 class ListWatchlistAnticipated(ListStandardSync):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
-        list_properties.sync_type = 'watchlist'
+        list_properties.sync_type = 'watchlistanticipated'
         list_properties.sort_by = 'released'
         list_properties.sort_how = 'asc'
         list_properties.localize = 32457
         list_properties.item_keys = ('premiered', )
-        list_properties.filters = {
-            'exclude_key': 'premiered',
-            'exclude_value': {
-                'module': 'tmdbhelper.lib.addon.tmdate',
-                'method': 'get_todays_date',
-                'kwargs': {}
-            },
-            'exclude_operator': 'lt'
-        }
         return list_properties
 
 

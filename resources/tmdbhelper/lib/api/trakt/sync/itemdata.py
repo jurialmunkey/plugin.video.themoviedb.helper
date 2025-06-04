@@ -285,10 +285,13 @@ class SyncItemData:
         return self.get_premiered()
 
     def get_premiered(self):
-        if 'show' in self.item.keys():
-            return self.item['show'].get('first_aired')
-        if 'movie' in self.item.keys():
-            return self.item['movie'].get('released')
+        try:
+            if 'show' in self.item.keys():
+                return self.item['show']['first_aired'][:10]
+            if 'movie' in self.item.keys():
+                return self.item['movie']['released'][:10]
+        except (AttributeError, KeyError, TypeError):
+            return
 
     """
     year
