@@ -16,9 +16,8 @@ class ListAuthenticatedProperties(ListStandardProperties):
 
 
 class ListAuthenticatedNoCacheProperties(ListAuthenticatedProperties):
-    @cached_property
-    def items(self):
-        return self.get_uncached_items()
+    def get_cached_items(self, *args, **kwargs):
+        return self.get_uncached_items(*args, **kwargs)
 
 
 class ListAuthenticated(ListStandard):
