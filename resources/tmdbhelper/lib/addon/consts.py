@@ -143,25 +143,37 @@ RANDOMISED_LISTS = {
         'params': {'info': 'trakt_mylists'},
         'route': RANDOMISED_LISTS_ROUTE}}
 
-RANDOMISED_TRAKT_ROUTE = {
-    'module_name': 'tmdbhelper.lib.items.directories.lists_random',
-    'import_attr': 'ListTraktRandom'}
 RANDOMISED_TRAKT = {
     'random_trending': {
-        'info': 'trakt_trending',
-        'route': RANDOMISED_TRAKT_ROUTE},
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
+            'import_attr': 'ListTraktTrendingRandomised'
+        }
+    },
     'random_popular': {
-        'info': 'trakt_popular',
-        'route': RANDOMISED_TRAKT_ROUTE},
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
+            'import_attr': 'ListTraktPopularRandomised'
+        }
+    },
     'random_mostplayed': {
-        'info': 'trakt_mostplayed',
-        'route': RANDOMISED_TRAKT_ROUTE},
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
+            'import_attr': 'ListTraktMostPlayedRandomised'
+        }
+    },
     'random_mostviewers': {
-        'info': 'trakt_mostviewers',
-        'route': RANDOMISED_TRAKT_ROUTE},
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
+            'import_attr': 'ListTraktMostWatchedRandomised'
+        }
+    },
     'random_anticipated': {
-        'info': 'trakt_anticipated',
-        'route': RANDOMISED_TRAKT_ROUTE}}
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
+            'import_attr': 'ListTraktAnticipatedRandomised'
+        }
+    }}
 
 TMDB_BASIC_LISTS = {
     'popular': {

@@ -1,5 +1,5 @@
 from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties, UncachedItemsPage
-from tmdbhelper.lib.addon.plugin import get_setting
+from tmdbhelper.lib.addon.plugin import get_setting, convert_type
 from tmdbhelper.lib.files.ftools import cached_property
 from jurialmunkey.parser import try_int
 
@@ -52,10 +52,7 @@ class ListTraktStandardProperties(ListStandardProperties):
 
     @cached_property
     def trakt_type(self):
-        try:
-            return self.sub_type_map[self.tmdb_type]
-        except KeyError:
-            return
+        return self.sub_type_map[self.tmdb_type]
 
     @cached_property
     def url(self):
@@ -82,12 +79,35 @@ class ListTraktStandardProperties(ListStandardProperties):
             add_infoproperties=add_infoproperties)
 
 
+class ListTraktRandomisedProperties(ListTraktStandardProperties):
+    @property
+    def next_page(self):
+        return self.page + (self.length * 3)
+
+    @cached_property
+    def sorted_items(self):
+        import random
+        return random.sample(self.filtered_items, min((self.length * 20), len(self.filtered_items)))
+
+
 class ListTraktStandard(ListStandard):
 
     list_properties_class = ListTraktStandardProperties
 
-    def get_items(self, *args, length=None, **kwargs):
-        return super().get_items(*args, length=try_int(length) or PAGES_LENGTH, **kwargs)
+    def get_items(self, *args, length=None, tmdb_type=None, **kwargs):
+        length = try_int(length) or PAGES_LENGTH
+
+        if tmdb_type == 'both':  # Only used for randomised so combine randomised then resample
+            import random
+            items = super().get_items(*args, length=length, tmdb_type='movie', **kwargs) or []
+            self.list_properties = self.configure_list_properties(self.list_properties_class())
+            items += super().get_items(*args, length=length, tmdb_type='tv', **kwargs) or []
+            items = random.sample(items, min((self.list_properties.length * 20), len(items)))
+            self.plugin_category = self.list_properties.plugin_name.format(localized=self.list_properties.localized, plural=convert_type('both', 'plural'))
+            self.container_content = convert_type('both', 'container', items=items)
+            return items
+
+        return super().get_items(*args, length=length, tmdb_type=tmdb_type, **kwargs)
 
 
 class ListTraktUnPaginated(ListTraktStandard):
@@ -156,6 +176,11 @@ class ListTraktTrending(ListTraktFiltered):
         return list_properties
 
 
+class ListTraktTrendingRandomised(ListTraktTrending):
+    list_properties_class = ListTraktRandomisedProperties
+    pagination = False
+
+
 class ListTraktPopular(ListTraktFiltered):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
@@ -163,6 +188,11 @@ class ListTraktPopular(ListTraktFiltered):
         list_properties.localize = 32175
         list_properties.sub_type = False
         return list_properties
+
+
+class ListTraktPopularRandomised(ListTraktPopular):
+    list_properties_class = ListTraktRandomisedProperties
+    pagination = False
 
 
 class ListTraktMostPlayed(ListTraktFiltered):
@@ -174,6 +204,11 @@ class ListTraktMostPlayed(ListTraktFiltered):
         return list_properties
 
 
+class ListTraktMostPlayedRandomised(ListTraktMostPlayed):
+    list_properties_class = ListTraktRandomisedProperties
+    pagination = False
+
+
 class ListTraktMostWatched(ListTraktFiltered):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
@@ -183,6 +218,11 @@ class ListTraktMostWatched(ListTraktFiltered):
         return list_properties
 
 
+class ListTraktMostWatchedRandomised(ListTraktMostWatched):
+    list_properties_class = ListTraktRandomisedProperties
+    pagination = False
+
+
 class ListTraktAnticipated(ListTraktFiltered):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
@@ -190,6 +230,11 @@ class ListTraktAnticipated(ListTraktFiltered):
         list_properties.localize = 32206
         list_properties.sub_type = True
         return list_properties
+
+
+class ListTraktAnticipatedRandomised(ListTraktAnticipated):
+    list_properties_class = ListTraktRandomisedProperties
+    pagination = False
 
 
 class ListTraktBoxOffice(ListTraktUnPaginated):  # Box Office doesn't support filters or pagination
