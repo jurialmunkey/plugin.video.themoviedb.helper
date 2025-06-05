@@ -4,15 +4,6 @@ from tmdbhelper.lib.addon.consts import CACHE_SHORT
 
 
 @use_simple_cache(cache_days=CACHE_SHORT)
-def get_simple_list(self, *args, trakt_type=None, **kwargs):
-    response = self.get_response(*args, **kwargs)
-    if not response:
-        return
-    from tmdbhelper.lib.api.trakt.items import TraktItems
-    return TraktItems(response.json(), headers=response.headers, trakt_type=trakt_type).configure_items()
-
-
-@use_simple_cache(cache_days=CACHE_SHORT)
 def get_sorted_list(
         self, path, sort_by=None, sort_how=None, extended=None, trakt_type=None, permitted_types=None, cache_refresh=False, cache_only=False,
         genres=None, years=None, query=None, languages=None, countries=None, runtimes=None, studio_ids=None
@@ -39,108 +30,6 @@ def get_sorted_list(
         sort_by=sort_by or response.headers.get('x-sort-by'),
         sort_how=sort_how or response.headers.get('x-sort-how'),
         permitted_types=permitted_types)
-
-
-@is_authorized
-def get_mixed_list(
-        self, path, trakt_types: list, limit: int = None, extended: str = None, authorize=False, cache_only=False,
-        genres=None, years=None, query=None, languages=None, countries=None, runtimes=None, studio_ids=None
-):
-    """ Returns a randomised simple list which combines movies and shows
-    path uses {trakt_type} as format substitution for trakt_type in trakt_types
-    """
-    items = []
-    limit = limit or self.item_limit
-
-    for trakt_type in trakt_types:
-        response = self.get_simple_list(
-            path.format(trakt_type=trakt_type),
-            extended=extended, page=1, limit=limit * 2, trakt_type=trakt_type, cache_only=cache_only,
-            genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids
-        ) or {}
-        items += response.get('items') or []
-
-    if not items:
-        return
-
-    if len(items) <= limit:
-        return items
-
-    import random
-    return random.sample(items, limit)
-
-
-@is_authorized
-def get_basic_list(
-        self, path, trakt_type, page: int = 1, limit: int = None, params=None,
-        sort_by=None, sort_how=None, extended=None, authorize=False, cache_only=False, randomise=False, always_refresh=True,
-        genres=None, years=None, query=None, languages=None, countries=None, runtimes=None, studio_ids=None
-):
-
-    from jurialmunkey.parser import try_int
-    cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
-    limit = limit or self.item_limit
-
-    if randomise:
-        response = self.get_simple_list(
-            path, extended=extended, page=1, limit=limit * 2, trakt_type=trakt_type, cache_only=cache_only,
-            genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids
-        )
-
-    elif sort_by is not None:  # Sorted list manually paginated because need to sort first
-        from tmdbhelper.lib.items.pages import PaginatedItems
-        response = self.get_sorted_list(
-            path, sort_by, sort_how, extended, cache_refresh=cache_refresh, cache_only=cache_only,
-            genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids
-        )
-        response = PaginatedItems(items=response['items'], page=page, limit=limit).get_dict()
-
-    else:  # Unsorted lists can be paginated by the API
-        response = self.get_simple_list(
-            path, extended=extended, page=page, limit=limit, trakt_type=trakt_type, cache_only=cache_only,
-            genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids
-        )
-
-    if not response:
-        return
-
-    if randomise and len(response['items']) > limit:
-        import random
-        return random.sample(response['items'], limit)
-
-    from tmdbhelper.lib.items.pages import get_next_page
-    return response['items'] + get_next_page(response['headers'])
-
-
-@is_authorized
-def get_stacked_list(
-        self, path, trakt_type, page: int = 1, limit: int = None, params=None, sort_by=None, sort_how=None,
-        extended=None, authorize=False, always_refresh=True, cache_only=False,
-        genres=None, years=None, query=None, languages=None, countries=None, runtimes=None, studio_ids=None,
-        **kwargs
-):
-    """ Get Basic list but stack repeat TV Shows """
-    from jurialmunkey.parser import try_int
-    limit = limit or self.item_limit
-    cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
-
-    response = self.get_simple_list(
-        path, extended=extended, limit=4095, trakt_type=trakt_type, cache_refresh=cache_refresh, cache_only=cache_only,
-        genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids
-    )
-
-    if not response:
-        return
-
-    from tmdbhelper.lib.items.pages import PaginatedItems
-    response['items'] = self.stack_calendar_tvshows(response['items'])
-    response = PaginatedItems(items=response['items'], page=page, limit=limit).get_dict()
-
-    if not response:
-        return
-
-    from tmdbhelper.lib.items.pages import get_next_page
-    return response['items'] + get_next_page(response['headers'])
 
 
 @is_authorized
