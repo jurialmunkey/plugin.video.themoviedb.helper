@@ -346,10 +346,6 @@ TMDB_BASIC_LISTS = {
     },
 }
 
-
-TRAKT_BASIC_LISTS_ROUTE = {
-    'module_name': 'tmdbhelper.lib.items.directories.lists_trakt',
-    'import_attr': 'ListBasic'}
 TRAKT_BASIC_LISTS = {
     'trakt_trending': {
         'route': {
