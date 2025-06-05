@@ -388,11 +388,10 @@ TRAKT_BASIC_LISTS = {
         }
     },
     'trakt_recommendations': {
-        'path': 'recommendations/{trakt_type}s?ignore_collected=true',
-        'authorize': True,
-        'route': TRAKT_BASIC_LISTS_ROUTE,
-        'plugin_category': '{plural} {localized}',
-        'localized': 32198
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
+            'import_attr': 'ListTraktRecommendations'
+        }
     },
     'trakt_myairing': {
         'path': 'calendars/my/{trakt_type}s',

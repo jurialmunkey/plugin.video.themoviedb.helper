@@ -31,12 +31,21 @@ class ListTraktStandardProperties(ListStandardProperties):
 
     class_pages = UncachedTraktItemsPage
     trakt_filters = {}
+    trakt_authorization = False
 
     sub_type = False
     sub_type_map = {
         'movie': 'movie',
         'tv': 'show',
     }
+
+    @property
+    def next_page(self):
+        return self.page + 1
+
+    @cached_property
+    def limit(self):
+        return self.length * 20
 
     @cached_property
     def cache_name(self):
@@ -47,7 +56,7 @@ class ListTraktStandardProperties(ListStandardProperties):
         cache_name_tuple = [f'{k}={v}' for k, v in self.trakt_filters.items()]
         cache_name_tuple = sorted(cache_name_tuple)
         cache_name_tuple = [self.class_name, self.tmdb_type] + cache_name_tuple
-        cache_name_tuple = cache_name_tuple + [self.page, self.length]
+        cache_name_tuple = cache_name_tuple + [self.page, self.limit]
         return tuple(cache_name_tuple)
 
     @cached_property
@@ -63,8 +72,18 @@ class ListTraktStandardProperties(ListStandardProperties):
         from tmdbhelper.lib.api.trakt.mapping import ItemMapper
         return ItemMapper()
 
+    def get_uncached_items(self):
+        return {
+            'items': self.class_pages(self, self.page).items,
+            'pages': self.total_pages,
+            'count': self.total_items,
+        }
+
     def get_uncached_response(self, page=1):
-        return self.trakt_api.get_response(self.url, page=page, limit=20, **self.trakt_filters)
+        if self.trakt_authorization and not self.trakt_api.authorization:
+            if self.trakt_api.attempted_login or not self.trakt_api.authorize(login=True):
+                return
+        return self.trakt_api.get_response(self.url, page=page, limit=self.limit, **self.trakt_filters)
 
     def get_sub_typed_item(self, item):
         if not self.sub_type:
@@ -80,14 +99,19 @@ class ListTraktStandardProperties(ListStandardProperties):
 
 
 class ListTraktRandomisedProperties(ListTraktStandardProperties):
-    @property
-    def next_page(self):
-        return self.page + (self.length * 3)
+
+    @cached_property
+    def limit(self):
+        return self.length * 40  # Use double normal limit to get a decent sample size
+
+    @cached_property
+    def sample_limit(self):
+        return min((self.length * 20), len(self.filtered_items))  # Make sure we dont try to sample more items than we have
 
     @cached_property
     def sorted_items(self):
         import random
-        return random.sample(self.filtered_items, min((self.length * 20), len(self.filtered_items)))
+        return random.sample(self.filtered_items, self.sample_limit)
 
 
 class ListTraktStandard(ListStandard):
@@ -108,11 +132,6 @@ class ListTraktStandard(ListStandard):
             return items
 
         return super().get_items(*args, length=length, tmdb_type=tmdb_type, **kwargs)
-
-
-class ListTraktUnPaginated(ListTraktStandard):
-    def get_items(self, *args, length=None, **kwargs):
-        return super().get_items(*args, length=1, **kwargs)
 
 
 class ListTraktFiltered(ListTraktStandard):
@@ -237,10 +256,24 @@ class ListTraktAnticipatedRandomised(ListTraktAnticipated):
     pagination = False
 
 
-class ListTraktBoxOffice(ListTraktUnPaginated):  # Box Office doesn't support filters or pagination
+class ListTraktBoxOffice(ListTraktStandard):  # Box Office doesn't support filters or pagination
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.request_url = '{trakt_type}s/boxoffice'
         list_properties.localize = 32207
+        list_properties.sub_type = True
+        return list_properties
+
+
+class ListTraktRecommendations(ListTraktStandard):  # Box Office doesn't support filters or pagination
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.trakt_authorization = True
+        list_properties.trakt_filters = {
+            'ignore_collected': 'true',
+            'ignore_watchlisted': 'true'
+        }
+        list_properties.request_url = 'recommendations/{trakt_type}s'
+        list_properties.localize = 32198
         list_properties.sub_type = True
         return list_properties
