@@ -394,13 +394,11 @@ TRAKT_BASIC_LISTS = {
         }
     },
     'trakt_myairing': {
-        'path': 'calendars/my/{trakt_type}s',
-        'authorize': True,
-        'stacked': True,
-        'route': TRAKT_BASIC_LISTS_ROUTE,
-        'plugin_category': '{localized}',
-        'localized': 32405
-    }
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
+            'import_attr': 'ListTraktMyCalendars'
+        }
+    },
 }
 
 
