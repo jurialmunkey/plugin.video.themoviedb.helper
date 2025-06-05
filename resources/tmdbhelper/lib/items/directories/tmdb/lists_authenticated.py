@@ -16,9 +16,42 @@ class ListAuthenticatedProperties(ListStandardProperties):
 
 
 class ListAuthenticatedNoCacheProperties(ListAuthenticatedProperties):
-    @cached_property
-    def items(self):
-        return self.get_uncached_items()
+    def get_cached_items(self, *args, **kwargs):
+        return self.get_uncached_items(*args, **kwargs)
+
+
+class ListAuthenticatedNoCacheListListsProperties(ListAuthenticatedNoCacheProperties):
+    def get_mapped_item(self, item, add_infoproperties=None):
+        list_id = str(item.get('id') or '')
+        user_id = self.tmdb_user_api.authenticator.authorised_access.get('account_id')
+
+        return {
+            'label': item.get('name') or '',
+            'infolabels': {
+                'plot': item.get('description'),
+            },
+            'infoproperties': {
+                k: v for k, v in item.items()
+                if v and type(v) not in [list, dict]
+            },
+            'art': {
+                'icon': self.tmdb_imagepath.get_imagepath_fanart(item.get('backdrop_path')),
+                'fanart': self.tmdb_imagepath.get_imagepath_fanart(item.get('backdrop_path')),
+            },
+            'params': {
+                'info': 'tmdb_v4_list',
+                'tmdb_type': 'both',
+                'list_name': item.get('name') or '',
+                'list_id': list_id,
+                'user_id': user_id,
+                'plugin_category': item.get('name') or '',
+            },
+            'unique_ids': {
+                'list': list_id,
+                'user': user_id,
+            },
+            'context_menu': []
+        }
 
 
 class ListAuthenticated(ListStandard):
@@ -29,11 +62,16 @@ class ListAuthenticated(ListStandard):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.dbid_sorted = True
         list_properties.tmdb_user_api = TMDbUser()
+        list_properties.tmdb_imagepath = self.tmdb_imagepath
         return list_properties
 
 
 class ListAuthenticatedNoCache(ListAuthenticated):
     list_properties_class = ListAuthenticatedNoCacheProperties
+
+
+class ListAuthenticatedNoCacheListLists(ListAuthenticated):
+    list_properties_class = ListAuthenticatedNoCacheListListsProperties
 
 
 class ListRecommendations(ListAuthenticated):
@@ -71,49 +109,17 @@ class ListRated(ListAuthenticatedNoCache):
 class ListList(ListAuthenticatedNoCache):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
-        list_properties.request_url = 'list/{list_id}'
         list_properties.localize = 32211
         return list_properties
 
-    def get_request_url(self, list_id, **kwargs):
-        return self.list_properties.request_url.format(list_id=list_id)
+    def get_items(self, *args, list_id=None, **kwargs):
+        self.list_properties.request_url = f'list/{list_id}'
+        return super().get_items(*args, **kwargs)
 
 
-class ListLists(ListAuthenticatedNoCache):
+class ListLists(ListAuthenticatedNoCacheListLists):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.request_url = 'account/{{account_id}}/lists'
         list_properties.localize = 32211
         return list_properties
-
-    def get_mapped_item(self, item, tmdb_type, add_infoproperties=None):
-        list_id = str(item.get('id') or '')
-        user_id = self.tmdb_user_api.authenticator.authorised_access.get('account_id')
-
-        return {
-            'label': item.get('name') or '',
-            'infolabels': {
-                'plot': item.get('description'),
-            },
-            'infoproperties': {
-                k: v for k, v in item.items()
-                if v and type(v) not in [list, dict]
-            },
-            'art': {
-                'icon': self.tmdb_imagepath.get_imagepath_fanart(item.get('backdrop_path')),
-                'fanart': self.tmdb_imagepath.get_imagepath_fanart(item.get('backdrop_path')),
-            },
-            'params': {
-                'info': 'tmdb_v4_list',
-                'tmdb_type': 'both',
-                'list_name': item.get('name') or '',
-                'list_id': list_id,
-                'user_id': user_id,
-                'plugin_category': item.get('name') or '',
-            },
-            'unique_ids': {
-                'list': list_id,
-                'user': user_id,
-            },
-            'context_menu': []
-        }

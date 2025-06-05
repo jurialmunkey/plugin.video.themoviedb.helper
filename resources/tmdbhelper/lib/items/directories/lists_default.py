@@ -5,7 +5,7 @@ from tmdbhelper.lib.items.filters import is_excluded
 from jurialmunkey.parser import try_int
 
 
-class use_item_cache:
+class ItemCache:
     def __init__(self, filename):
         from tmdbhelper.lib.files.bcache import BasicCache
         self.cache = BasicCache(filename=filename)
@@ -27,20 +27,35 @@ class ListProperties:
     params = {}
     filters = {}
     cache_days = 0.25  # 6 hours default cache
-    sorted_function = None
-    sorted_reversed = False
     dbid_sorted = False
     pagination = False
 
     @cached_property
     def cache_name(self):
-        return f'{self.class_name}_{self.tmdb_type}_{self.page}_{self.length}_{self.pagination}'
+        return '_'.join(map(str, (
+            self.class_name,
+            self.tmdb_type,
+            self.page,
+            self.length
+        )))
+
+    @cached_property
+    def unconfigured_item_data(self):
+        return self.get_cached_items() or {}
 
     @cached_property
     def items(self):
-        return self.get_cached_items()
+        return self.unconfigured_item_data.get('items') or []
 
-    @use_item_cache('ItemContainer.db')
+    @cached_property
+    def pages(self):
+        return self.unconfigured_item_data.get('pages') or 0
+
+    @cached_property
+    def count(self):
+        return self.unconfigured_item_data.get('count') or 0
+
+    @ItemCache('ItemContainer.db')
     def get_cached_items(self, *args, **kwargs):
         return self.get_uncached_items(*args, **kwargs)
 
@@ -78,12 +93,12 @@ class ListProperties:
 
     @cached_property
     def sorted_items(self):
-        if not self.sorted_function:
-            return self.filtered_items
-        return sorted(self.filtered_items, key=self.sorted_function, reverse=self.sorted_reversed)
+        return self.filtered_items
 
-    @property
+    @cached_property
     def finalised_items(self):
+        if self.pagination and self.pages and self.next_page <= self.pages:
+            self.sorted_items.append({'next_page': self.next_page})
         return self.sorted_items
 
 
@@ -102,6 +117,7 @@ class ListDefault(ContainerDefaultCacheDirectory):
         list_properties.filters = self.filters
         list_properties.pagination = self.pagination
         list_properties.tmdb_api = self.tmdb_api
+        list_properties.trakt_api = self.trakt_api
         list_properties.class_name = f'{self.__class__.__name__}'
         return list_properties
 

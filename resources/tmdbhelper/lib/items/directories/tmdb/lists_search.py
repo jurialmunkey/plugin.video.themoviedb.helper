@@ -1,8 +1,9 @@
 from xbmcgui import Dialog, INPUT_ALPHANUM
-from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, PAGES_LENGTH
+from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties, PAGES_LENGTH
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized
 from tmdbhelper.lib.files.hcache import set_search_history, get_search_history
 from tmdbhelper.lib.items.container import ContainerDirectory
+from tmdbhelper.lib.files.ftools import cached_property
 from jurialmunkey.parser import merge_two_dicts, try_int
 from urllib.parse import urlencode
 
@@ -86,7 +87,39 @@ class ListMultiSearchDir(ListSearchDir):
         self.container_refresh = True
 
 
+class ListSearchProperties(ListStandardProperties):
+    @cached_property
+    def cache_name(self):
+        return '_'.join(map(str, (
+            self.class_name,
+            self.query,
+            self.tmdb_type,
+            self.page,
+            self.length,
+        )))
+
+    def get_search_query(self):
+        from tmdbhelper.lib.addon.consts import PARAM_WIDGETS_RELOAD_FORCED
+
+        if self.reload == PARAM_WIDGETS_RELOAD_FORCED:
+            return
+
+        return set_search_history(
+            query=Dialog().input(get_localized(32044), type=INPUT_ALPHANUM),
+            tmdb_type=self.tmdb_type)
+
+    def set_search_query(self):
+        set_search_history(query=self.query, tmdb_type=self.tmdb_type)
+
+    @cached_property
+    def query(self):
+        return self.original_query or self.get_search_query()  # QUERY new query from keyboard if we dont have one
+
+
 class ListSearch(ListStandard):
+
+    list_properties_class = ListSearchProperties
+
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.length = None
@@ -94,33 +127,17 @@ class ListSearch(ListStandard):
         list_properties.localize = 137
         return list_properties
 
-    def get_search_query(self, reload=False, **kwargs):
-        if self.list_properties.query:
-            return self.list_properties.query
-
-        from tmdbhelper.lib.addon.consts import PARAM_WIDGETS_RELOAD_FORCED
-        if reload == PARAM_WIDGETS_RELOAD_FORCED:
-            return
-
-        return set_search_history(
-            query=Dialog().input(get_localized(32044), type=INPUT_ALPHANUM),
-            tmdb_type=self.list_properties.tmdb_type)
-
     def get_items(self, tmdb_type, query=None, page=1, length=PAGES_LENGTH, update_listing=False, **kwargs):
         self.list_properties.tmdb_type = tmdb_type
         self.list_properties.original_query = query or ''
-        self.list_properties.query = self.list_properties.original_query
+        self.list_properties.reload = kwargs.get('reload')
 
-        # QUERY new query from keyboard if we dont have one
-        self.list_properties.query = self.get_search_query(**kwargs)
         if not self.list_properties.query:
             return
 
         # FORCE history to be saved
-        if self.list_properties.query and kwargs.get('history', '').lower() == 'true':  # Force saving history
-            set_search_history(
-                query=self.list_properties.query,
-                tmdb_type=self.list_properties.tmdb_type)
+        if self.list_properties.query and kwargs.get('history', '').lower() == 'true':
+            self.list_properties.set_search_query()
 
         request_kwgs = {
             'query': self.list_properties.query,
@@ -137,12 +154,6 @@ class ListSearch(ListStandard):
 
         self.list_properties.page = try_int(page) or 1
         self.list_properties.length = self.list_properties.length or try_int(length) or PAGES_LENGTH
-        self.list_properties.items = self.get_cached_items(
-            self.list_properties.url,
-            self.list_properties.tmdb_type,
-            page=self.list_properties.page,
-            length=self.list_properties.length,
-            paginated=self.pagination)
 
         if not self.list_properties.original_query:
             params = merge_two_dicts(kwargs, {

@@ -170,11 +170,35 @@ class SyncDataGetterAllUnwatchedItems(SyncDataGetterAll):
         return (self.item_type, )
 
 
+class SyncDataGetterAllReleasedItems(SyncDataGetterAll):
+    query_clauses = ('item_type=?', 'premiered < date(\'now\')', 'premiered IS NOT NULL')  # WHERE {query_clauses}
+
+    @property
+    def query_values(self):
+        return (self.item_type, )
+
+
+class SyncDataGetterAllAnticipatedItems(SyncDataGetterAll):
+    query_clauses = ('item_type=?', '(premiered >= date(\'now\') OR premiered IS NULL)')  # WHERE {query_clauses}
+
+    @property
+    def query_values(self):
+        return (self.item_type, )
+
+
 class SyncDataGetterAllItemsCollected(SyncDataGetterAllItems):
     clause_keys = ('collection_last_collected_at', )
 
 
 class SyncDataGetterAllItemsWatchlist(SyncDataGetterAllItems):
+    clause_keys = ('watchlist_listed_at', )
+
+
+class SyncDataGetterAllReleasedItemsWatchlist(SyncDataGetterAllReleasedItems):
+    clause_keys = ('watchlist_listed_at', )
+
+
+class SyncDataGetterAllAnticipatedItemsWatchlist(SyncDataGetterAllAnticipatedItems):
     clause_keys = ('watchlist_listed_at', )
 
 
@@ -333,45 +357,45 @@ class SyncDataGetters:
     def get_all_unhidden_shows_inprogress_getter(self):
         return SyncDataGetterAllUnHiddenShowsInProgress(self)
 
-    def get_all_dropped_shows_getter(self, item_type):
-        sd = SyncDataGetterAllItemsDropped(self)
+    def get_item_type_getter(self, sync_data_class, item_type):
+        sd = sync_data_class(self)
         sd.item_type = item_type
         return sd
+
+    def get_all_dropped_shows_getter(self, item_type):
+        return self.get_item_type_getter(SyncDataGetterAllItemsDropped, item_type)
 
     def get_all_collected_getter(self, item_type):
-        sd = SyncDataGetterAllItemsCollected(self)
-        sd.item_type = item_type
-        return sd
+        return self.get_item_type_getter(SyncDataGetterAllItemsCollected, item_type)
 
     def get_all_watchlist_getter(self, item_type):
-        sd = SyncDataGetterAllItemsWatchlist(self)
-        sd.item_type = item_type
-        return sd
+        return self.get_item_type_getter(SyncDataGetterAllItemsWatchlist, item_type)
+
+    def get_all_released_watchlist_getter(self, item_type):
+        return self.get_item_type_getter(SyncDataGetterAllReleasedItemsWatchlist, item_type)
+
+    def get_all_anticipated_watchlist_getter(self, item_type):
+        return self.get_item_type_getter(SyncDataGetterAllAnticipatedItemsWatchlist, item_type)
 
     def get_all_favorites_getter(self, item_type):
-        sd = SyncDataGetterAllItemsFavorites(self)
-        sd.item_type = item_type
-        return sd
+        return self.get_item_type_getter(SyncDataGetterAllItemsFavorites, item_type)
 
     def get_all_watched_getter(self, item_type):
-        sd = SyncDataGetterAllItemsWatched(self)
-        sd.item_type = item_type
-        return sd
+        return self.get_item_type_getter(SyncDataGetterAllItemsWatched, item_type)
 
     def get_all_playback_getter(self, item_type):
-        sd = SyncDataGetterAllItemsPlayback(self)
-        sd.item_type = item_type
-        return sd
+        return self.get_item_type_getter(SyncDataGetterAllItemsPlayback, item_type)
 
     def get_all_unwatched_playback_getter(self, item_type):
-        sd = SyncDataGetterAllUnwatchedItemsPlayback(self)
-        sd.item_type = item_type
+        return self.get_item_type_getter(SyncDataGetterAllUnwatchedItemsPlayback, item_type)
+
+    def get_tmdb_id_getter(self, sync_data_class, tmdb_id):
+        sd = sync_data_class(self)
+        sd.tmdb_id = tmdb_id
         return sd
 
     def get_unhidden_show_episodes_upnext(self, tmdb_id):
-        sd = SyncDataGetterUnHiddenShowEpisodesUpNext(self)
-        sd.tmdb_id = tmdb_id
-        return sd
+        return self.get_tmdb_id_getter(SyncDataGetterUnHiddenShowEpisodesUpNext, tmdb_id)
 
     def get_movie_playcount(self, tmdb_id):
         return self.get_value('movie', tmdb_id, key='plays')

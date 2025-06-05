@@ -1,16 +1,8 @@
 import random
 from tmdbhelper.lib.items.container import ContainerDirectory
-from tmdbhelper.lib.addon.consts import RANDOMISED_LISTS, RANDOMISED_TRAKT
+from tmdbhelper.lib.addon.consts import RANDOMISED_LISTS
 from jurialmunkey.parser import merge_two_dicts
 from tmdbhelper.lib.items.routes import get_container
-
-
-class ListTraktRandom(ContainerDirectory):
-    def get_items(self, **kwargs):
-        kwargs['info'] = RANDOMISED_TRAKT.get(kwargs.get('info'), {}).get('info')
-        kwargs['randomise'] = True
-        self.parent_params = kwargs
-        return get_container(kwargs['info']).get_items(self, **kwargs)
 
 
 class ListRandom(ContainerDirectory):
