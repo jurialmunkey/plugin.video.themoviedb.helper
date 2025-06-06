@@ -3,54 +3,6 @@ from tmdbhelper.lib.addon.plugin import convert_type, PLUGINPATH, get_plugin_cat
 from tmdbhelper.lib.items.container import ContainerDirectory
 
 
-class ListBasic(ContainerDirectory):
-    def get_items(
-            self, info, tmdb_type, page=None, randomise=False, limit=None,
-            genres=None, years=None, query=None, languages=None, countries=None, runtimes=None, studio_ids=None,
-            **kwargs
-    ):
-
-        from tmdbhelper.lib.addon.consts import TRAKT_BASIC_LISTS
-
-        def _get_items_both():
-            info_model = TRAKT_BASIC_LISTS.get(info)
-            items = self.trakt_api.get_mixed_list(
-                path=info_model.get('path', ''),
-                trakt_types=['movie', 'show'],
-                authorize=info_model.get('authorize', False),
-                extended=info_model.get('extended', None),
-                genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids
-            )
-            self.container_content = 'movies'
-            self.kodi_db = self.get_kodi_database('both')
-            return items
-
-        if tmdb_type == 'both':
-            return _get_items_both()
-        info_model = TRAKT_BASIC_LISTS.get(info)
-        info_tmdb_type = info_model.get('tmdb_type') or tmdb_type
-        trakt_type = convert_type(tmdb_type, 'trakt')
-        func = self.trakt_api.get_stacked_list if info_model.get('stacked') else self.trakt_api.get_basic_list
-        items = func(
-            path=info_model.get('path', '').format(trakt_type=trakt_type, **kwargs),
-            trakt_type=trakt_type,
-            params=info_model.get('params'),
-            page=page,
-            limit=limit,
-            authorize=info_model.get('authorize', False),
-            sort_by=info_model.get('sort_by', None),
-            sort_how=info_model.get('sort_how', None),
-            extended=info_model.get('extended', None),
-            randomise=randomise,
-            genres=genres, years=years, query=query, languages=languages, countries=countries, runtimes=runtimes, studio_ids=studio_ids,
-            always_refresh=False   # Basic lists don't need updating more than once per day
-        )
-        self.kodi_db = self.get_kodi_database(info_tmdb_type)
-        self.container_content = convert_type(info_tmdb_type, 'container')
-        self.plugin_category = get_plugin_category(info_model, convert_type(info_tmdb_type, 'plural'))
-        return items
-
-
 class ListComments(ContainerDirectory):
     def get_items(self, info, tmdb_type, tmdb_id, sort=None, **kwargs):
         """ Get a mix of watchlisted and inprogress """

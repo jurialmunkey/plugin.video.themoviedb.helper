@@ -112,7 +112,10 @@ class ItemListSyncDataMethods:
         if i.mediatype == 'episode':
             item['episode'] = i.episode_number if 'episode_number' in i._fields else i.item['episode_number']
         for k in (self.item_keys or ()):
-            item.setdefault('infoproperties', {})[k] = i.item[k]
+            try:
+                item.setdefault('infoproperties', {})[k] = i.item[k]
+            except IndexError:
+                pass
         if detailed_item:
             item = self.make_detailed_item(item)
         return item

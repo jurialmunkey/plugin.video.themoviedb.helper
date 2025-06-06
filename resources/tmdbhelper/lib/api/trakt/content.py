@@ -12,38 +12,6 @@ class TraktContent():
             self._get_sorted_list = get_sorted_list
             return self._get_sorted_list(self, *args, **kwargs)
 
-    def get_simple_list(self, *args, **kwargs):
-        try:
-            return self._get_simple_list(self, *args, **kwargs)
-        except AttributeError:
-            from tmdbhelper.lib.api.trakt.methods.lists import get_simple_list
-            self._get_simple_list = get_simple_list
-            return self._get_simple_list(self, *args, **kwargs)
-
-    def get_mixed_list(self, *args, **kwargs):
-        try:
-            return self._get_mixed_list(self, *args, **kwargs)
-        except AttributeError:
-            from tmdbhelper.lib.api.trakt.methods.lists import get_mixed_list
-            self._get_mixed_list = get_mixed_list
-            return self._get_mixed_list(self, *args, **kwargs)
-
-    def get_basic_list(self, *args, **kwargs):
-        try:
-            return self._get_basic_list(self, *args, **kwargs)
-        except AttributeError:
-            from tmdbhelper.lib.api.trakt.methods.lists import get_basic_list
-            self._get_basic_list = get_basic_list
-            return self._get_basic_list(self, *args, **kwargs)
-
-    def get_stacked_list(self, *args, **kwargs):
-        try:
-            return self._get_stacked_list(self, *args, **kwargs)
-        except AttributeError:
-            from tmdbhelper.lib.api.trakt.methods.lists import get_stacked_list
-            self._get_stacked_list = get_stacked_list
-            return self._get_stacked_list(self, *args, **kwargs)
-
     def get_custom_list(self, *args, **kwargs):
         try:
             return self._get_custom_list(self, *args, **kwargs)
