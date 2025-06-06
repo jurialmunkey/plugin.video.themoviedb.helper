@@ -1,7 +1,79 @@
 import random
-from tmdbhelper.lib.addon.plugin import get_setting, get_localized
+from jurialmunkey.parser import try_int
+from tmdbhelper.lib.files.ftools import cached_property
+from tmdbhelper.lib.addon.plugin import get_setting, get_localized, convert_type
 from tmdbhelper.lib.items.directories.tmdb.lists_related import ListRecommendations
 from tmdbhelper.lib.items.directories.trakt.lists_sync import ListMostWatched, ListHistory
+from tmdbhelper.lib.items.directories.trakt.lists_filtered import (
+    ListTraktTrending,
+    ListTraktPopular,
+    ListTraktMostPlayed,
+    ListTraktMostWatched,
+    ListTraktAnticipated,
+)
+from tmdbhelper.lib.items.directories.trakt.lists_standard import (
+    ListTraktStandard,
+    ListTraktStandardProperties,
+    PAGES_LENGTH
+)
+
+
+class ListTraktRandomisedProperties(ListTraktStandardProperties):
+
+    @cached_property
+    def limit(self):
+        return self.length * 40  # Use double normal limit to get a decent sample size
+
+    @cached_property
+    def sample_limit(self):
+        return min((self.length * 20), len(self.filtered_items))  # Make sure we dont try to sample more items than we have
+
+    @cached_property
+    def sorted_items(self):
+        import random
+        return random.sample(self.filtered_items, self.sample_limit)
+
+
+class ListTraktRandomised(ListTraktStandard):
+
+    list_properties_class = ListTraktRandomisedProperties
+    pagination = False
+
+    def get_items(self, *args, length=None, tmdb_type=None, **kwargs):
+        length = try_int(length) or PAGES_LENGTH
+
+        if tmdb_type == 'both':
+            import random
+            items = []
+            items += super().get_items(*args, length=length, tmdb_type='movie', **kwargs) or []
+            self.list_properties = self.configure_list_properties(self.list_properties_class())
+            items += super().get_items(*args, length=length, tmdb_type='tv', **kwargs) or []
+            items = random.sample(items, min((length * 20), len(items)))
+            self.plugin_category = self.list_properties.plugin_name.format(localized=self.list_properties.localized, plural=convert_type('both', 'plural'))
+            self.container_content = convert_type('both', 'container', items=items)
+            return items
+
+        return super().get_items(*args, length=length, tmdb_type=tmdb_type, **kwargs)
+
+
+class ListTraktTrendingRandomised(ListTraktRandomised, ListTraktTrending):
+    pass
+
+
+class ListTraktPopularRandomised(ListTraktRandomised, ListTraktPopular):
+    pass
+
+
+class ListTraktMostPlayedRandomised(ListTraktRandomised, ListTraktMostPlayed):
+    pass
+
+
+class ListTraktMostWatchedRandomised(ListTraktRandomised, ListTraktMostWatched):
+    pass
+
+
+class ListTraktAnticipatedRandomised(ListTraktRandomised, ListTraktAnticipated):
+    pass
 
 
 class ListRandomBecauseYouWatched(ListRecommendations):

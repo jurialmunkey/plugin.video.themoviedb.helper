@@ -146,31 +146,31 @@ RANDOMISED_LISTS = {
 RANDOMISED_TRAKT = {
     'random_trending': {
         'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
             'import_attr': 'ListTraktTrendingRandomised'
         }
     },
     'random_popular': {
         'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
             'import_attr': 'ListTraktPopularRandomised'
         }
     },
     'random_mostplayed': {
         'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
             'import_attr': 'ListTraktMostPlayedRandomised'
         }
     },
     'random_mostviewers': {
         'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
             'import_attr': 'ListTraktMostWatchedRandomised'
         }
     },
     'random_anticipated': {
         'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
             'import_attr': 'ListTraktAnticipatedRandomised'
         }
     }}
@@ -349,32 +349,38 @@ TMDB_BASIC_LISTS = {
 TRAKT_BASIC_LISTS = {
     'trakt_trending': {
         'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
             'import_attr': 'ListTraktTrending'
         }
     },
     'trakt_popular': {
         'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
             'import_attr': 'ListTraktPopular'
         }
     },
     'trakt_mostplayed': {
         'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
             'import_attr': 'ListTraktMostPlayed'
         }
     },
     'trakt_mostviewers': {
         'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
             'import_attr': 'ListTraktMostWatched'
         }
     },
     'trakt_anticipated': {
         'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
             'import_attr': 'ListTraktAnticipated'
+        }
+    },
+    'trakt_myairing': {
+        'route': {
+            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
+            'import_attr': 'ListTraktMyCalendars'
         }
     },
     'trakt_boxoffice': {
@@ -387,12 +393,6 @@ TRAKT_BASIC_LISTS = {
         'route': {
             'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
             'import_attr': 'ListTraktRecommendations'
-        }
-    },
-    'trakt_myairing': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
-            'import_attr': 'ListTraktMyCalendars'
         }
     },
 }
