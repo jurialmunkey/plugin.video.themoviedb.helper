@@ -1,57 +1,169 @@
 from tmdbhelper.lib.items.directories.trakt.lists_standard import ListTraktStandard, ListTraktStandardProperties
-# from tmdbhelper.lib.files.ftools import cached_property
+from tmdbhelper.lib.files.ftools import cached_property
+from tmdbhelper.lib.addon.plugin import get_localized
 from jurialmunkey.parser import try_int
+from contextlib import suppress
+
+
+RUNSCRIPT = 'Runscript(plugin.video.themoviedb.helper,{})'
+
+
+class StaticItemMapper:
+    def __init__(self, meta, add_infoproperties):
+        self.add_infoproperties = add_infoproperties
+        self.meta = meta
+
+    @cached_property
+    def list_type(self):
+        with suppress(KeyError):
+            return self.meta['list']['type']
+
+    @cached_property
+    def list_slug(self):
+        with suppress(KeyError):
+            return self.meta['list']['ids']['slug']
+
+    @cached_property
+    def user_slug(self):
+        if self.list_type == 'official':
+            return 'official'
+        with suppress(KeyError):
+            return self.meta['list']['user']['ids']['slug']
+
+    @cached_property
+    def list_name(self):
+        with suppress(KeyError):
+            return self.meta['list'].get('name') or ''
+
+    @cached_property
+    def user_name(self):
+        with suppress(KeyError):
+            return self.meta['list']['user'].get('name') or self.user_slug or ''
+
+    @cached_property
+    def list_description(self):
+        with suppress(KeyError):
+            return self.meta['list'].get('description')
+
+    @cached_property
+    def params(self):
+        params = {
+            'info': 'trakt_userlist',
+            'tmdb_type': 'both',
+            'list_name': self.list_name,
+            'list_slug': self.list_slug,
+            'user_slug': self.user_slug,
+            'plugin_category': self.list_name,
+        }
+        return params
+
+    @cached_property
+    def infolabels(self):
+        infolabels = {
+            'plot': self.list_description,
+            'studio': self.user_name,
+        }
+        return infolabels
+
+    @cached_property
+    def infoproperties(self):
+        infoproperties = {
+            k: v for k, v in self.meta['list'].items()
+            if v and type(v) not in [list, dict]
+        }
+        infoproperties.update({'is_sortable': 'True'})
+        return infoproperties
+
+    @cached_property
+    def unique_ids(self):
+        unique_ids = {
+            'slug': self.list_slug,
+            'user': self.user_slug,
+        }
+        return unique_ids
+
+    art = {}
+
+    @cached_property
+    def context_menu(self):
+        return self.get_context_menu()
+
+    def get_context_menu(self):
+        return [
+            (
+                get_localized(32309),
+                RUNSCRIPT.format('sort_list,{}'.format(','.join(f'{k}={v}' for k, v in self.params.items())))
+            ),
+            (
+                get_localized(20444),
+                RUNSCRIPT.format('user_list={list_slug},user_slug={user_slug}'.format(**self.params))
+            ),
+        ]
+
+    @cached_property
+    def item(self):
+        return {
+            'label': self.list_name,
+            'label2': self.user_name,
+            'infolabels': self.infolabels,
+            'infoproperties': self.infoproperties,
+            'art': self.art,
+            'params': self.params,
+            'unique_ids': self.unique_ids,
+            'context_menu': self.context_menu
+        }
+
+
+class StaticLikedItemMapper(StaticItemMapper):
+    def get_context_menu(self):
+        context_menu = super().get_context_menu()
+        context_menu = context_menu + [
+            (
+                get_localized(32319),
+                RUNSCRIPT.format('like_list={list_slug},user_slug={user_slug},delete'.format(**self.params))
+            )
+        ]
+        return context_menu
+
+
+class StaticUnLikedItemMapper(StaticItemMapper):
+    def get_context_menu(self):
+        context_menu = super().get_context_menu()
+        context_menu = context_menu + [
+            (
+                get_localized(32315),
+                RUNSCRIPT.format('like_list={list_slug},user_slug={user_slug}'.format(**self.params))
+            )
+        ]
+        return context_menu
+
+
+class StaticOwnedItemMapper(StaticItemMapper):
+    def get_context_menu(self):
+        context_menu = super().get_context_menu()
+        context_menu = context_menu + [
+            (
+                get_localized(118),
+                RUNSCRIPT.format('rename_list={list_slug}'.format(**self.params))
+            ),
+            (
+                get_localized(117),
+                RUNSCRIPT.format('delete_list={list_slug}'.format(**self.params))
+            )
+        ]
+        return context_menu
 
 
 class ListTraktStaticProperties(ListTraktStandardProperties):
+
+    item_mapper_class = StaticItemMapper
+
     @property
     def url(self):
         return self.request_url
 
     def get_mapped_item(self, item, add_infoproperties=None):
-
-        try:
-            list_slug = item['list']['ids']['slug']
-            user_slug = item['list']['user']['ids']['slug'] if item['list']['type'] != 'official' else 'official'
-        except KeyError:
-            return
-
-        list_name = item['list'].get('name') or ''
-        user_name = item['list']['user'].get('name') or user_slug or ''
-
-        infolabels = {
-            'plot': item['list'].get('description'),
-            'studio': user_name,
-        }
-
-        infoproperties = {
-            k: v for k, v in item['list'].items()
-            if v and type(v) not in [list, dict]
-        }
-        infoproperties.update({
-            'is_sortable': 'True'
-        })
-
-        return {
-            'label': list_name,
-            'label2': user_name,
-            'infolabels': infolabels,
-            'infoproperties': infoproperties,
-            'art': {},
-            'params': {
-                'info': 'trakt_userlist',
-                'tmdb_type': 'both',
-                'list_name': list_name,
-                'list_slug': list_slug,
-                'user_slug': user_slug,
-                'plugin_category': list_name,
-            },
-            'unique_ids': {
-                'slug': list_slug,
-                'user': user_slug,
-            },
-            'context_menu': []
-        }
+        return self.item_mapper_class(item, add_infoproperties).item
 
 
 class ListTraktStaticNoCacheProperties(ListTraktStaticProperties):
@@ -92,6 +204,7 @@ class ListTraktStaticOwnedNoCache(ListTraktStatic):
 class ListTraktStaticTrending(ListTraktStatic):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
+        list_properties.item_mapper_class = StaticUnLikedItemMapper
         list_properties.request_url = 'lists/trending'
         list_properties.plugin_name = '{localized}'
         list_properties.localize = 32208
@@ -101,6 +214,7 @@ class ListTraktStaticTrending(ListTraktStatic):
 class ListTraktStaticPopular(ListTraktStatic):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
+        list_properties.item_mapper_class = StaticUnLikedItemMapper
         list_properties.request_url = 'lists/popular'
         list_properties.plugin_name = '{localized}'
         list_properties.localize = 32209
@@ -110,6 +224,7 @@ class ListTraktStaticPopular(ListTraktStatic):
 class ListTraktStaticLiked(ListTraktStaticNoCache):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
+        list_properties.item_mapper_class = StaticLikedItemMapper
         list_properties.trakt_authorization = True
         list_properties.request_url = 'users/likes/lists'
         list_properties.plugin_name = '{localized}'
@@ -120,6 +235,7 @@ class ListTraktStaticLiked(ListTraktStaticNoCache):
 class ListTraktStaticOwned(ListTraktStaticOwnedNoCache):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
+        list_properties.item_mapper_class = StaticOwnedItemMapper
         list_properties.trakt_authorization = True
         list_properties.request_url = 'users/me/lists'
         list_properties.plugin_name = '{localized}'

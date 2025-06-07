@@ -432,28 +432,6 @@ TRAKT_LIST_OF_LISTS = {
             'import_attr': 'ListTraktStaticOwned'
         }
     },
-    # 'trakt_trendinglists': {
-    #     'path': 'lists/trending',
-    #     'route': TRAKT_LIST_OF_LISTS_ROUTE,
-    #     'plugin_category': '{localized}',
-    #     'localized': 32208},
-    # 'trakt_popularlists': {
-    #     'path': 'lists/popular',
-    #     'route': TRAKT_LIST_OF_LISTS_ROUTE,
-    #     'plugin_category': '{localized}',
-    #     'localized': 32209},
-    # 'trakt_likedlists': {
-    #     'path': 'users/likes/lists',
-    #     'authorize': True,
-    #     'route': TRAKT_LIST_OF_LISTS_ROUTE,
-    #     'plugin_category': '{localized}',
-    #     'localized': 32210},
-    # 'trakt_mylists': {
-    #     'path': 'users/me/lists',
-    #     'authorize': True,
-    #     'route': TRAKT_LIST_OF_LISTS_ROUTE,
-    #     'plugin_category': '{localized}',
-    #     'localized': 32211}
 }
 
 
