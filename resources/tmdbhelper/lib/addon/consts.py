@@ -294,8 +294,8 @@ ROUTE_NOID = {
         'module_name': 'tmdbhelper.lib.items.directories.lists_trakt',
         'import_attr': 'ListGenres'}},
     'mdblist_locallist': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_mdblist',
-        'import_attr': 'ListLocal'}},
+        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_local',
+        'import_attr': 'ListMDbListLocal'}},
     'mdblist_userlist': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.lists_mdblist',
         'import_attr': 'ListCustom'}},

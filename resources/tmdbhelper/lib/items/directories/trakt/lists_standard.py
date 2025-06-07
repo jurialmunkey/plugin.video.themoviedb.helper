@@ -75,11 +75,6 @@ class ListTraktStandardProperties(ListStandardProperties):
     def url(self):
         return self.request_url.format(trakt_type=self.trakt_type)
 
-    @cached_property
-    def mapper(self):
-        from tmdbhelper.lib.api.trakt.mapping import ItemMapper
-        return ItemMapper()
-
     def get_uncached_items(self):
         return {
             'items': self.class_pages(self, self.page).items,
