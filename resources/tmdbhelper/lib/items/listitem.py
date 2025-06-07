@@ -174,7 +174,7 @@ class _ListItem(object):
         self.infoproperties.update({f'{k}_id': v for k, v in self.unique_ids.items() if v})  # Set UIDs to infoproperties
         self.infoproperties.update({f'item.{k}': v for k, v in self.params.items() if k and v})  # Set params to infoproperties
         self.infoproperties.update(self.infoproperties_additions)
-        self.infoproperties['isPlayable'] = 'true' if self.is_resolvable else None
+        self.infoproperties.update({'isPlayable': 'true'}) if self.is_resolvable else None
         return self.infoproperties
 
     def finalise_context_menu(self):
@@ -280,7 +280,7 @@ class _ListItem(object):
         return listitem
 
     def set_properties(self, listitem):
-        listitem.setProperties(self.infoproperties)
+        listitem.setProperties({k: f'{v}' for k, v in self.infoproperties.items() if v not in (None, '')})
         return listitem
 
     def set_label2(self, listitem):
