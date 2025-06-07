@@ -4,7 +4,6 @@ from tmdbhelper.lib.addon.dialog import BusyDialog
 from tmdbhelper.lib.addon.plugin import get_setting, get_localized, set_setting
 from tmdbhelper.lib.update.library import add_to_library
 from tmdbhelper.lib.update.update import get_userlist
-from tmdbhelper.lib.api.trakt.api import TraktAPI
 from tmdbhelper.lib.api.mdblist.api import MDbList
 from tmdbhelper.lib.addon.logger import kodi_log
 

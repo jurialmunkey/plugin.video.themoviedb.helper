@@ -53,11 +53,18 @@ class ListTraktStandardProperties(ListStandardProperties):
 
     @cached_property
     def cache_name_tuple(self):
-        cache_name_tuple = [f'{k}={v}' for k, v in self.trakt_filters.items()]
-        cache_name_tuple = sorted(cache_name_tuple)
-        cache_name_tuple = [self.class_name, self.tmdb_type] + cache_name_tuple
+        cache_name_tuple = self.get_cache_name_list_filter()
+        cache_name_tuple = self.get_cache_name_list_prefix() + cache_name_tuple
         cache_name_tuple = cache_name_tuple + [self.page, self.limit]
         return tuple(cache_name_tuple)
+
+    def get_cache_name_list_filter(self):
+        cache_name_list = [f'{k}={v}' for k, v in self.trakt_filters.items()]
+        cache_name_list = sorted(cache_name_list)
+        return cache_name_list
+
+    def get_cache_name_list_prefix(self):
+        return [self.class_name, self.tmdb_type]
 
     @cached_property
     def trakt_type(self):

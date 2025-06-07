@@ -347,19 +347,6 @@ TMDB_BASIC_LISTS = {
 }
 
 
-TRAKT_LIST_OF_LISTS_ROUTE = {
-    'module_name': 'tmdbhelper.lib.items.directories.lists_trakt',
-    'import_attr': 'ListLists'}
-TRAKT_LIST_OF_LISTS = {
-    'trakt_inlists': {
-        'path': '{trakt_type}s/{trakt_id}/lists/personal/popular',
-        'route': TRAKT_LIST_OF_LISTS_ROUTE,
-        'get_trakt_id': True,
-        'plugin_category': '{localized}',
-        'localized': 32232},
-}
-
-
 MDBLIST_LIST_OF_LISTS_ROUTE = {
     'module_name': 'tmdbhelper.lib.items.directories.lists_mdblist',
     'import_attr': 'ListLists'}
@@ -468,6 +455,9 @@ ROUTE_NOID = {
     'trakt_mylists': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_static',
         'import_attr': 'ListTraktStaticOwned'}},
+    'trakt_inlists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_static',
+        'import_attr': 'ListTraktStaticListed'}},
     'trakt_trending': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
         'import_attr': 'ListTraktTrending'}},
