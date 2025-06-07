@@ -12,10 +12,10 @@ class StarredCombinedMediaList(MediaList):
         INNER JOIN {table} ON {table}.tmdb_id = person.tmdb_id
         INNER JOIN
         (
-            SELECT tmdb_id, title, year, premiered, status, votes, rating, popularity, id
+            SELECT tmdb_id, title, year, premiered, status, votes, rating, popularity, id, "movie" as tmdb_type, "movie" as mediatype
             FROM movie
             UNION
-            SELECT tmdb_id, title, year, premiered, status, votes, rating, popularity, id
+            SELECT tmdb_id, title, year, premiered, status, votes, rating, popularity, id, "tv" as tmdb_type, "tvshow" as mediatype
             FROM tvshow
         ) media ON media.id = {table}.parent_id
         """.format(table=self.table)
@@ -26,6 +26,8 @@ class StarredCombinedMediaList(MediaList):
         'media.id as parent_id',
         'GROUP_CONCAT(role, " / ") as role',
         'media.tmdb_id as tmdb_id',
+        'media.tmdb_type as tmdb_type',
+        'media.mediatype as mediatype',
         'media.title as title',
         'media.year as year',
         'media.premiered as premiered',
@@ -77,20 +79,17 @@ class StarredCombinedMediaList(MediaList):
             'character': i['role'],
             'popularity': i['popularity'],
             'tmdb_id': i['tmdb_id'],
-            'tmdb_type': 'movie',
         }
 
     def map_item_params(self, i):
         return {
             'info': 'details',
-            'tmdb_type': 'movie' if self.map_mediatype(i) == 'movie' else 'tv',
+            'tmdb_type': i['tmdb_type'],
             'tmdb_id': i['tmdb_id'],
         }
 
     def map_mediatype(self, i):
-        if i['parent_id'].startswith('movie'):
-            return 'movie'
-        return 'tvshow'
+        return i['mediatype']
 
 
 class Person(StarredCombinedMediaList):
