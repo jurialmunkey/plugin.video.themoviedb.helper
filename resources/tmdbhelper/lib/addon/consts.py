@@ -346,57 +346,6 @@ TMDB_BASIC_LISTS = {
     },
 }
 
-TRAKT_BASIC_LISTS = {
-    'trakt_trending': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
-            'import_attr': 'ListTraktTrending'
-        }
-    },
-    'trakt_popular': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
-            'import_attr': 'ListTraktPopular'
-        }
-    },
-    'trakt_mostplayed': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
-            'import_attr': 'ListTraktMostPlayed'
-        }
-    },
-    'trakt_mostviewers': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
-            'import_attr': 'ListTraktMostWatched'
-        }
-    },
-    'trakt_anticipated': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
-            'import_attr': 'ListTraktAnticipated'
-        }
-    },
-    'trakt_myairing': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
-            'import_attr': 'ListTraktMyCalendars'
-        }
-    },
-    'trakt_boxoffice': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
-            'import_attr': 'ListTraktBoxOffice'
-        }
-    },
-    'trakt_recommendations': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
-            'import_attr': 'ListTraktRecommendations'
-        }
-    },
-}
-
 
 TRAKT_LIST_OF_LISTS_ROUTE = {
     'module_name': 'tmdbhelper.lib.items.directories.lists_trakt',
@@ -408,30 +357,6 @@ TRAKT_LIST_OF_LISTS = {
         'get_trakt_id': True,
         'plugin_category': '{localized}',
         'localized': 32232},
-    'trakt_trendinglists': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_static',
-            'import_attr': 'ListTraktStaticTrending'
-        }
-    },
-    'trakt_popularlists': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_static',
-            'import_attr': 'ListTraktStaticPopular'
-        }
-    },
-    'trakt_likedlists': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_static',
-            'import_attr': 'ListTraktStaticLiked'
-        }
-    },
-    'trakt_mylists': {
-        'route': {
-            'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_static',
-            'import_attr': 'ListTraktStaticOwned'
-        }
-    },
 }
 
 
@@ -528,12 +453,48 @@ ROUTE_NOID = {
     'trakt_nextepisodes': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
         'import_attr': 'ListNextEpisodes'}},
+    'trakt_searchlists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_static',
+        'import_attr': 'ListTraktStaticSearch'}},
+    'trakt_trendinglists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_static',
+        'import_attr': 'ListTraktStaticTrending'}},
+    'trakt_popularlists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_static',
+        'import_attr': 'ListTraktStaticPopular'}},
+    'trakt_likedlists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_static',
+        'import_attr': 'ListTraktStaticLiked'}},
+    'trakt_mylists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_static',
+        'import_attr': 'ListTraktStaticOwned'}},
+    'trakt_trending': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
+        'import_attr': 'ListTraktTrending'}},
+    'trakt_popular': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
+        'import_attr': 'ListTraktPopular'}},
+    'trakt_mostplayed': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
+        'import_attr': 'ListTraktMostPlayed'}},
+    'trakt_mostviewers': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
+        'import_attr': 'ListTraktMostWatched'}},
+    'trakt_anticipated': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
+        'import_attr': 'ListTraktAnticipated'}},
+    'trakt_myairing': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
+        'import_attr': 'ListTraktMyCalendars'}},
+    'trakt_boxoffice': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
+        'import_attr': 'ListTraktBoxOffice'}},
+    'trakt_recommendations': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
+        'import_attr': 'ListTraktRecommendations'}},
     'trakt_userlist': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.lists_trakt',
         'import_attr': 'ListCustom'}},
-    'trakt_searchlists': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_trakt',
-        'import_attr': 'ListCustomSearch'}},
     'trakt_sortby': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.lists_trakt',
         'import_attr': 'ListSortBy'}},

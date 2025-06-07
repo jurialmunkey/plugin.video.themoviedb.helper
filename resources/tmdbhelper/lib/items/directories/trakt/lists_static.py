@@ -157,13 +157,18 @@ class StaticOwnedItemMapper(StaticItemMapper):
 class ListTraktStaticProperties(ListTraktStandardProperties):
 
     item_mapper_class = StaticItemMapper
+    query = None
 
     @property
     def url(self):
-        return self.request_url
+        return self.request_url.format(query=self.query)
 
     def get_mapped_item(self, item, add_infoproperties=None):
         return self.item_mapper_class(item, add_infoproperties).item
+
+    @cached_property
+    def plugin_category(self):
+        return self.plugin_name.format(localized=self.localized, plural=self.plural, query=self.query)
 
 
 class ListTraktStaticNoCacheProperties(ListTraktStaticProperties):
@@ -241,3 +246,19 @@ class ListTraktStaticOwned(ListTraktStaticOwnedNoCache):
         list_properties.plugin_name = '{localized}'
         list_properties.localize = 32211
         return list_properties
+
+
+class ListTraktStaticSearch(ListTraktStaticNoCache):
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.item_mapper_class = StaticUnLikedItemMapper
+        list_properties.trakt_authorization = True
+        list_properties.request_url = 'search/list?query={query}&fields=name'
+        list_properties.plugin_name = '{localized} ({query})'
+        list_properties.localize = 32361
+        return list_properties
+
+    def get_items(self, *args, query=None, **kwargs):
+        from xbmcgui import Dialog
+        self.list_properties.query = query or Dialog().input(get_localized(32044))
+        return super().get_items(*args, **kwargs)
