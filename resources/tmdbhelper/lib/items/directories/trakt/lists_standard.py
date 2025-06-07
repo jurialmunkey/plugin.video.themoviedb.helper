@@ -1,4 +1,5 @@
 from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties, UncachedItemsPage
+from tmdbhelper.lib.items.directories.trakt.mapper_standard import FactoryItemMapper
 from tmdbhelper.lib.addon.plugin import get_setting
 from tmdbhelper.lib.files.ftools import cached_property
 from jurialmunkey.parser import try_int
@@ -68,7 +69,7 @@ class ListTraktStandardProperties(ListStandardProperties):
 
     @cached_property
     def trakt_type(self):
-        return self.sub_type_map[self.tmdb_type]
+        return self.sub_type_map.get(self.tmdb_type)
 
     @cached_property
     def url(self):
@@ -92,17 +93,8 @@ class ListTraktStandardProperties(ListStandardProperties):
                 return
         return self.trakt_api.get_response(self.url, page=page, limit=self.limit, **self.trakt_filters)
 
-    def get_sub_typed_item(self, item):
-        if not self.sub_type:
-            return item
-        item.update(item.pop(self.trakt_type, {}))
-        return item
-
     def get_mapped_item(self, item, add_infoproperties=None):
-        return self.mapper.get_info(
-            self.get_sub_typed_item(item),
-            self.tmdb_type,
-            add_infoproperties=add_infoproperties)
+        return FactoryItemMapper(item, add_infoproperties, trakt_type=self.trakt_type, sub_type=self.sub_type).item
 
 
 class ListTraktStandard(ListStandard):
