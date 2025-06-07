@@ -28,14 +28,6 @@ class TraktContent():
             self._get_list_of_genres = get_list_of_genres
             return self._get_list_of_genres(self, *args, **kwargs)
 
-    def get_list_of_lists(self, *args, **kwargs):
-        try:
-            return self._get_list_of_lists(self, *args, **kwargs)
-        except AttributeError:
-            from tmdbhelper.lib.api.trakt.methods.lists import get_list_of_lists
-            self._get_list_of_lists = get_list_of_lists
-            return self._get_list_of_lists(self, *args, **kwargs)
-
     def merge_sync_sort(self, *args, **kwargs):
         try:
             return self._merge_sync_sort(self, *args, **kwargs)

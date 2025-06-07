@@ -45,8 +45,10 @@ def monitor_userlist():
                 'params': {'user_slug': 'me', 'list_slug': 'watchlist/movies'}},
             {'label': f'{get_localized(32193)} {get_localized(20343)}',
                 'params': {'user_slug': 'me', 'list_slug': 'watchlist/shows'}}]
-        user_lists += TraktAPI().get_list_of_lists('users/me/lists', authorize=True, next_page=False) or []
-        user_lists += TraktAPI().get_list_of_lists('users/likes/lists', authorize=True, next_page=False) or []
+
+        from tmdbhelper.lib.items.directories.trakt.lists_static import ListTraktStaticOwned, ListTraktStaticLiked
+        user_lists += ListTraktStaticOwned(-1, '').get_items() or []
+        user_lists += ListTraktStaticLiked(-1, '').get_items() or []
         user_lists += get_mdblist_lists()
 
         saved_lists = get_monitor_userlists()

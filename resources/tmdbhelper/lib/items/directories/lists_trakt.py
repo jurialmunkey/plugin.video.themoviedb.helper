@@ -72,27 +72,6 @@ class ListGenres(ContainerDirectory):
         return items
 
 
-class ListLists(ContainerDirectory):
-    def get_items(self, info, page=None, **kwargs):
-        from xbmcplugin import SORT_METHOD_UNSORTED
-        from tmdbhelper.lib.addon.consts import TRAKT_LIST_OF_LISTS
-
-        info_model = TRAKT_LIST_OF_LISTS.get(info)
-
-        if info_model.get('get_trakt_id'):
-            kwargs['trakt_type'] = {'movie': 'movie', 'tv': 'show'}[kwargs['tmdb_type']]
-            kwargs['trakt_id'] = self.trakt_api.get_id(kwargs['tmdb_id'], 'tmdb', trakt_type=kwargs['trakt_type'], output_type='trakt')
-
-        items = self.trakt_api.get_list_of_lists(
-            path=info_model.get('path', '').format(**kwargs),
-            page=page,
-            authorize=info_model.get('authorize', False))
-
-        self.plugin_category = get_plugin_category(info_model)
-        self.sort_methods = [{'sortMethod': SORT_METHOD_UNSORTED, 'label2Mask': '%U'}]  # Label2 Mask by Studio (i.e. User Name)
-        return items
-
-
 class ListCustom(ContainerDirectory):
     def get_items(
             self, list_slug, user_slug=None, page=None,
@@ -112,18 +91,6 @@ class ListCustom(ContainerDirectory):
             return []
         self.set_mixed_content(response)
         return response.get('items', []) + response.get('next_page', [])
-
-
-class ListCustomSearch(ContainerDirectory):
-    def get_items(self, query=None, **kwargs):
-        from xbmcgui import Dialog
-        if not query:
-            kwargs['query'] = query = Dialog().input(get_localized(32044))
-            if not kwargs['query']:
-                return
-            self.container_update = f'{encode_url(PLUGINPATH, **kwargs)},replace'
-        items = self.trakt_api.get_list_of_lists(path=f'search/list?query={query}&fields=name', sort_likes=True, authorize=False)
-        return items
 
 
 class ListSortBy(ContainerDirectory):
