@@ -145,93 +145,6 @@ RANDOMISED_TRAKT = {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
         'import_attr': 'ListTraktAnticipatedRandomised'}}}
 
-TMDB_BASIC_LISTS = {
-    'popular': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
-        'import_attr': 'ListPopular'}},
-    'top_rated': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
-        'import_attr': 'ListTopRated'}},
-    'upcoming': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
-        'import_attr': 'ListUpcoming'}},
-    'trending_day': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
-        'import_attr': 'ListTrendingDay'}},
-    'trending_week': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
-        'import_attr': 'ListTrendingWeek'}},
-    'now_playing': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
-        'import_attr': 'ListInTheatres'}},
-    'airing_today': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
-        'import_attr': 'ListAiringToday'}},
-    'on_the_air': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
-        'import_attr': 'ListCurrentlyAiring'}},
-    'revenue_movies': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
-        'import_attr': 'ListRevenue'}},
-    'most_voted': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
-        'import_attr': 'ListMostVoted'}},
-    'recommendations': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_related',
-        'import_attr': 'ListRecommendations'}},
-    'similar': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_related',
-        'import_attr': 'ListSimilar'}},
-    'reviews': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_related',
-        'import_attr': 'ListReviews'}},
-    'movie_keywords': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_related',
-        'import_attr': 'ListKeywords'}},
-    'genres': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
-        'import_attr': 'ListGenres'}},
-    'watch_providers': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
-        'import_attr': 'ListProviders'}},
-    'all_studios': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
-        'import_attr': 'ListStudios'}},
-    'all_networks': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
-        'import_attr': 'ListNetworks'}},
-    'all_collections': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
-        'import_attr': 'ListCollections'}},
-    'all_keywords': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
-        'import_attr': 'ListKeywords'}},
-    'all_movies': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
-        'import_attr': 'ListMovies'}},
-    'all_tvshows': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
-        'import_attr': 'ListTvshows'}},
-    'tmdb_v4_recommendations': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
-        'import_attr': 'ListRecommendations'}},
-    'tmdb_v4_favorites': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
-        'import_attr': 'ListFavourites'}},
-    'tmdb_v4_watchlist': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
-        'import_attr': 'ListWatchlist'}},
-    'tmdb_v4_rated': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
-        'import_attr': 'ListRated'}},
-    'tmdb_v4_list': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
-        'import_attr': 'ListList'}},
-    'tmdb_v4_lists': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
-        'import_attr': 'ListLists'}},
-}
-
 
 MDBLIST_LIST_OF_LISTS_ROUTE = {
     'module_name': 'tmdbhelper.lib.items.directories.lists_mdblist',
@@ -404,6 +317,78 @@ ROUTE_NOID = {
     'tvdb_genre': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tvdb.lists_genres',
         'import_attr': 'ListGenre'}},
+    'popular': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
+        'import_attr': 'ListPopular'}},
+    'top_rated': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
+        'import_attr': 'ListTopRated'}},
+    'upcoming': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
+        'import_attr': 'ListUpcoming'}},
+    'trending_day': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
+        'import_attr': 'ListTrendingDay'}},
+    'trending_week': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
+        'import_attr': 'ListTrendingWeek'}},
+    'now_playing': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
+        'import_attr': 'ListInTheatres'}},
+    'airing_today': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
+        'import_attr': 'ListAiringToday'}},
+    'on_the_air': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
+        'import_attr': 'ListCurrentlyAiring'}},
+    'revenue_movies': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
+        'import_attr': 'ListRevenue'}},
+    'most_voted': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
+        'import_attr': 'ListMostVoted'}},
+    'genres': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'import_attr': 'ListGenres'}},
+    'watch_providers': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'import_attr': 'ListProviders'}},
+    'all_studios': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'import_attr': 'ListStudios'}},
+    'all_networks': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'import_attr': 'ListNetworks'}},
+    'all_collections': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'import_attr': 'ListCollections'}},
+    'all_keywords': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'import_attr': 'ListKeywords'}},
+    'all_movies': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'import_attr': 'ListMovies'}},
+    'all_tvshows': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'import_attr': 'ListTvshows'}},
+    'tmdb_v4_recommendations': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
+        'import_attr': 'ListRecommendations'}},
+    'tmdb_v4_favorites': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
+        'import_attr': 'ListFavourites'}},
+    'tmdb_v4_watchlist': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
+        'import_attr': 'ListWatchlist'}},
+    'tmdb_v4_rated': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
+        'import_attr': 'ListRated'}},
+    'tmdb_v4_list': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
+        'import_attr': 'ListList'}},
+    'tmdb_v4_lists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
+        'import_attr': 'ListLists'}},
 }
 
 
@@ -474,4 +459,16 @@ ROUTE_TMDBID = {
     'trakt_upnext': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
         'import_attr': 'ListUpNext'}},
+    'recommendations': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_related',
+        'import_attr': 'ListRecommendations'}},
+    'similar': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_related',
+        'import_attr': 'ListSimilar'}},
+    'reviews': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_related',
+        'import_attr': 'ListReviews'}},
+    'movie_keywords': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_related',
+        'import_attr': 'ListKeywords'}},
 }
