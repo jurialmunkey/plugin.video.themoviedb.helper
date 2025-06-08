@@ -6,6 +6,7 @@ from tmdbhelper.lib.items.directories.trakt.lists_standard import ListTraktStand
 from tmdbhelper.lib.items.directories.trakt.lists_filtered import ListTraktFiltered
 from tmdbhelper.lib.items.directories.trakt.mapper_calendar import FactoryCalendarEpisodeItemMapper
 from tmdbhelper.lib.items.directories.mdblist.lists_local import UncachedMDbListItemsPage, UncachedMDbListLocalData
+from tmdbhelper.lib.items.directories.lists_default import ItemCache
 
 
 class ListTraktMyAiring(ListTraktFiltered):
@@ -21,6 +22,31 @@ class ListTraktMyAiring(ListTraktFiltered):
         list_properties.localize = 32202
         list_properties.sub_type = True
         return list_properties
+
+
+class CachedResponse:
+    def __init__(self, trakt_api, url, trakt_filters):
+        self.trakt_filters = trakt_filters
+        self.trakt_api = trakt_api
+        self.url = url
+
+    cache_days = 0.25
+
+    @cached_property
+    def cache_name(self):
+        cache_name_list = [f'{k}={v}' for k, v in self.trakt_filters.items()]
+        cache_name_list = sorted(cache_name_list)
+        cache_name_list = ['TraktData', self.url] + cache_name_list
+        return '_'.join(cache_name_list)
+
+    @ItemCache('ItemContainer.db')
+    def get_cached_response(self):
+        data = self.trakt_api.get_response(self.url, **self.trakt_filters)
+        return data.json() if data else None
+
+    @cached_property
+    def json(self):
+        return self.get_cached_response()
 
 
 class ListTraktCalendarProperties(ListTraktStandardProperties):
@@ -76,8 +102,8 @@ class ListTraktCalendarProperties(ListTraktStandardProperties):
     def get_uncached_response(self, page=1):
         if not self.is_authorized:
             return
-        response = self.trakt_api.get_response(self.url, **self.trakt_filters)
-        return UncachedMDbListLocalData(response.json(), self.page, self.limit).data if response else None
+        data = CachedResponse(self.trakt_api, self.url, self.trakt_filters).json
+        return UncachedMDbListLocalData(data, self.page, self.limit).data if data else None
 
     def get_mapped_item(self, item, add_infoproperties=None):
         return FactoryCalendarEpisodeItemMapper(item, add_infoproperties).item
