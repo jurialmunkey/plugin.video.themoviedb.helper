@@ -1,5 +1,5 @@
 from jurialmunkey.parser import try_int
-from tmdbhelper.lib.addon.plugin import convert_type, PLUGINPATH, get_plugin_category, get_localized, get_setting, encode_url
+from tmdbhelper.lib.addon.plugin import convert_type, get_localized, get_setting
 from tmdbhelper.lib.items.container import ContainerDirectory
 
 
@@ -81,8 +81,7 @@ class ListSortBy(ContainerDirectory):
             item = get_empty_item()
             item['label'] = item['infolabels']['title'] = f'{params.get("list_name")} - {i["name"]}'
             item['params'] = params
-            for k, v in i['params'].items():
-                item['params'][k] = v
+            item['params'].update(i['params'])
             return item
 
         kwargs['info'] = kwargs.pop('parent_info', None)
