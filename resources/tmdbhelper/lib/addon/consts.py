@@ -287,9 +287,6 @@ ROUTE_NOID = {
     'trakt_sortby': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.lists_trakt',
         'import_attr': 'ListSortBy'}},
-    'trakt_comments': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_trakt',
-        'import_attr': 'ListComments'}},
     'trakt_genres': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.lists_trakt',
         'import_attr': 'ListGenres'}},
@@ -462,6 +459,9 @@ ROUTE_TMDBID = {
     'trakt_related': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_related',
         'import_attr': 'ListTraktRelated'}},
+    'trakt_comments': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_related',
+        'import_attr': 'ListTraktComments'}},
     'recommendations': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_related',
         'import_attr': 'ListRecommendations'}},

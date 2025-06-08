@@ -129,7 +129,7 @@ class StaticItemMapper(ItemMapper):
     def get_infolabels(self):
         infolabels = {
             'plot': self.list_description,
-            'studio': self.user_name,
+            'studio': [self.user_name],
         }
         return infolabels
 
