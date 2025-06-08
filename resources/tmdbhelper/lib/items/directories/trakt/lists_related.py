@@ -1,6 +1,7 @@
 from jurialmunkey.parser import try_int
 from tmdbhelper.lib.files.ftools import cached_property
-from tmdbhelper.lib.items.directories.trakt.mapper_comments import CommentItemMapper
+from tmdbhelper.lib.items.directories.trakt.mapper_comments import CommentsItemMapper
+from tmdbhelper.lib.items.directories.trakt.mapper_watchers import WatchersItemMapper
 from tmdbhelper.lib.items.directories.trakt.lists_standard import (
     ListTraktStandard,
     ListTraktStandardProperties,
@@ -29,8 +30,21 @@ class ListTraktRelatedProperties(ListTraktStandardProperties):
 
 
 class ListTraktRelatedCommentsProperties(ListTraktRelatedProperties):
+    container_content = ''
+
     def get_mapped_item(self, item, add_infoproperties=None):
-        return CommentItemMapper(item, add_infoproperties).item
+        return CommentsItemMapper(item, add_infoproperties).item
+
+
+class ListTraktRelatedWatchersProperties(ListTraktRelatedProperties):
+    container_content = ''
+
+    @cached_property
+    def unconfigured_item_data(self):
+        return self.get_uncached_items() or {}
+
+    def get_mapped_item(self, item, add_infoproperties=None):
+        return WatchersItemMapper(item, add_infoproperties).item
 
 
 class ListTraktRelatedID(ListTraktStandard):
@@ -62,4 +76,18 @@ class ListTraktComments(ListTraktRelatedID):
 
     def get_items(self, *args, sort_by=None, length=None, **kwargs):
         self.list_properties.trakt_sort = sort_by or 'newest'
+        return super().get_items(*args, length=try_int(length) or 10, **kwargs)
+
+
+class ListTraktWatchers(ListTraktRelatedID):
+    list_properties_class = ListTraktRelatedWatchersProperties
+
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = '{trakt_type}s/{trakt_slug}/watching'
+        list_properties.localize = 32065
+        list_properties.sub_type = False
+        return list_properties
+
+    def get_items(self, *args, length=None, **kwargs):
         return super().get_items(*args, length=try_int(length) or 10, **kwargs)

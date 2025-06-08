@@ -17,7 +17,7 @@ class UncachedTraktItemsPage(UncachedItemsPage):
     def results(self):
         try:
             results = self.response.json()
-        except (TypeError, KeyError):
+        except (TypeError, KeyError, AttributeError):
             return []
         try:
             self.outer_class.total_pages = try_int(self.response.headers.get('x-pagination-page-count', 0))

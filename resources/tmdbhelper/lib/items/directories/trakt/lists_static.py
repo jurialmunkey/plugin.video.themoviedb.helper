@@ -15,6 +15,7 @@ from jurialmunkey.parser import try_int
 
 class ListTraktStaticProperties(ListTraktStandardProperties):
 
+    container_content = ''
     item_mapper_class = StaticItemMapper
     query = None
 
@@ -104,6 +105,21 @@ class ListTraktStaticPopular(ListTraktStatic):
         list_properties.plugin_name = '{localized}'
         list_properties.localize = 32209
         return list_properties
+
+
+class ListTraktStaticUsers(ListTraktStaticOwnedNoCache):
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.item_mapper_class = StaticOwnedItemMapper
+        list_properties.request_url = 'users/{user_slug}/lists'
+        list_properties.plugin_name = '{localized}'
+        list_properties.localize = 32524
+        return list_properties
+
+    def get_items(self, *args, user_slug=None, **kwargs):
+        self.list_properties.request_url = f'users/{user_slug}/lists'
+        self.list_properties.plugin_name = f'{{localized}} ({user_slug})'
+        return super().get_items(*args, **kwargs)
 
 
 class ListTraktStaticLiked(ListTraktStaticNoCache):

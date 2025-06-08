@@ -3,7 +3,7 @@ from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.files.ftools import cached_property
 
 
-class CommentItemMapper(ItemMapper):
+class CommentsItemMapper(ItemMapper):
     @cached_property
     def label(self):
         return self.user.get('name') or self.user.get('username') or ''
@@ -73,7 +73,6 @@ class CommentItemMapper(ItemMapper):
 
     def get_params(self):
         params = {
-            'info': 'trakt_userlist',
             'comment_id': self.comment_id,
             'parent_id': self.parent_id,
             'user_slug': self.user_slug,

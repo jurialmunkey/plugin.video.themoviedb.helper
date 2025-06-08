@@ -156,6 +156,22 @@ def _get_basedir_details():
                 'landscape': f'{ADDONPATH}/fanart.jpg'},
             'types': ['movie', 'tv', 'episode']},
         {
+            'label': get_localized(32305),
+            'params': {'info': 'trakt_comments'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/mylists.png'},
+            'types': ['movie', 'tv', 'episode']},
+        {
+            'label': get_localized(32065),
+            'params': {'info': 'trakt_watchers'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/popularlist.png'},
+            'types': ['movie', 'tv', 'episode']},
+        {
             'label': get_localized(32227),
             'params': {'info': 'stars_in_movies', 'cacheonly': 'true', 'limit': 250},
             'path': PLUGINPATH,
