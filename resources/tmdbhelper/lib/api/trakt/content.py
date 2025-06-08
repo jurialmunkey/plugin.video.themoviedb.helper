@@ -12,14 +12,6 @@ class TraktContent():
             self._get_sorted_list = get_sorted_list
             return self._get_sorted_list(self, *args, **kwargs)
 
-    def get_custom_list(self, *args, **kwargs):
-        try:
-            return self._get_custom_list(self, *args, **kwargs)
-        except AttributeError:
-            from tmdbhelper.lib.api.trakt.methods.lists import get_custom_list
-            self._get_custom_list = get_custom_list
-            return self._get_custom_list(self, *args, **kwargs)
-
     def get_list_of_genres(self, *args, **kwargs):
         try:
             return self._get_list_of_genres(self, *args, **kwargs)

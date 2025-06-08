@@ -32,41 +32,6 @@ def get_sorted_list(
         permitted_types=permitted_types)
 
 
-@is_authorized
-def get_custom_list(
-        self, list_slug, user_slug=None, page: int = 1, limit: int = None, params=None, authorize=False,
-        sort_by=None, sort_how=None, extended=None, owner=False, always_refresh=True, cache_only=False
-):
-
-    limit = limit or self.item_limit
-
-    if user_slug == 'official':
-        path = f'lists/{list_slug}/items'
-    else:
-        path = f'users/{user_slug or "me"}/lists/{list_slug}/items'
-
-    # Refresh cache on first page for user list because it might've changed
-    from jurialmunkey.parser import try_int
-    cache_refresh = True if always_refresh and try_int(page, fallback=1) == 1 else False
-
-    sorted_items = self.get_sorted_list(
-        path, sort_by, sort_how, extended,
-        permitted_types=['movie', 'show', 'person', 'episode'],
-        cache_refresh=cache_refresh, cache_only=cache_only
-    ) or {}
-
-    from tmdbhelper.lib.items.pages import PaginatedItems
-    paginated_items = PaginatedItems(
-        items=sorted_items.get('items', []), page=page, limit=limit)
-
-    return {
-        'items': paginated_items.items,
-        'movies': sorted_items.get('movies', []),
-        'shows': sorted_items.get('shows', []),
-        'persons': sorted_items.get('persons', []),
-        'next_page': paginated_items.next_page}
-
-
 def get_list_of_genres(self, trakt_type):
     if trakt_type not in ['movie', 'show']:
         return

@@ -311,6 +311,11 @@ msgctxt "#32062"
 msgid "Networks"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/api/trakt/sorting.py
+msgctxt "#32063"
+msgid "Added"
+msgstr ""
+
 #: /resources/settings.xml
 msgctxt "#32038"
 msgid "Get additional details from the local Kodi library database"

@@ -1,4 +1,5 @@
 from jurialmunkey.parser import try_int, boolean
+from tmdbhelper.lib.addon.plugin import get_setting
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.directories.trakt.lists_standard import (
     ListTraktStandard,
@@ -9,6 +10,7 @@ from tmdbhelper.lib.items.directories.trakt.lists_standard import (
 
 class ListTraktCustomProperties(ListTraktStandardProperties):
 
+    list_type = 'movie,show,season,episode'
     list_sort_default = 'rank'
     list_sort_map = {
         'rank': 'asc',
@@ -24,8 +26,14 @@ class ListTraktCustomProperties(ListTraktStandardProperties):
         'collected': 'desc',
     }
 
+    @cached_property
+    def unconfigured_item_data(self):
+        if not self.owner or get_setting('trakt_cacheownlists'):
+            return self.get_cached_items() or {}
+        return self.get_uncached_items() or {}
+
     def get_cache_name_list_prefix(self):
-        return [self.class_name, self.tmdb_type, self.list_slug, self.user_slug, self.list_sort]
+        return [self.class_name, self.tmdb_type, self.user_slug, self.list_slug, self.list_type, self.list_sort]
 
     @cached_property
     def list_sort(self):
@@ -38,11 +46,11 @@ class ListTraktCustomProperties(ListTraktStandardProperties):
     @property
     def url(self):
         url = (
-            'lists/{list_slug}/items/{list_sort}'
+            'lists/{list_slug}/items/{list_type}/{list_sort}'
             if self.user_slug == 'official' else
-            'users/{user_slug}/lists/{list_slug}/items/{list_sort}'
+            'users/{user_slug}/lists/{list_slug}/items/{list_type}/{list_sort}'
         )
-        return url.format(list_slug=self.list_slug, user_slug=self.user_slug, list_sort=self.list_sort)
+        return url.format(list_slug=self.list_slug, user_slug=self.user_slug, list_sort=self.list_sort, list_type=self.list_type)
 
 
 class ListTraktCustom(ListTraktStandard):

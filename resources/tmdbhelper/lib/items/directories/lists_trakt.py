@@ -72,27 +72,6 @@ class ListGenres(ContainerDirectory):
         return items
 
 
-class ListCustom(ContainerDirectory):
-    def get_items(
-            self, list_slug, user_slug=None, page=None,
-            **kwargs
-    ):
-        from jurialmunkey.parser import boolean
-        response = self.trakt_api.get_custom_list(
-            page=page or 1,
-            list_slug=list_slug,
-            user_slug=user_slug,
-            sort_by=kwargs.get('sort_by', None),
-            sort_how=kwargs.get('sort_how', None),
-            extended=kwargs.get('extended', None),
-            authorize=False if user_slug and not boolean(kwargs.get('owner', False)) else True,
-            always_refresh=True if not get_setting('trakt_cacheownlists') and boolean(kwargs.get('owner', False)) else False)
-        if not response:
-            return []
-        self.set_mixed_content(response)
-        return response.get('items', []) + response.get('next_page', [])
-
-
 class ListSortBy(ContainerDirectory):
     def get_items(self, info, **kwargs):
         from tmdbhelper.lib.api.trakt.sorting import get_sort_methods
