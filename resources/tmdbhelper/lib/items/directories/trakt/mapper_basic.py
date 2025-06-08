@@ -5,6 +5,12 @@ from contextlib import suppress
 RUNSCRIPT = 'Runscript(plugin.video.themoviedb.helper,{})'
 
 
+class NullItemMapper:
+    @cached_property
+    def item(self):
+        return {}
+
+
 class ItemMapper:
     def __init__(self, meta, add_infoproperties):
         self.add_infoproperties = add_infoproperties

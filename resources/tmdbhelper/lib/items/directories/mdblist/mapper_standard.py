@@ -1,4 +1,5 @@
-from tmdbhelper.lib.items.directories.trakt.mapper_standard import ItemMapper, MediaItemMapper
+from tmdbhelper.lib.items.directories.trakt.mapper_standard import MediaItemMapper
+from tmdbhelper.lib.items.directories.trakt.mapper_basic import NullItemMapper
 from tmdbhelper.lib.files.ftools import cached_property
 
 
@@ -75,4 +76,4 @@ def FactoryMDbListItemMapper(meta, add_infoproperties=None):
         mediatype = meta['mediatype']
         return routes[mediatype](meta, add_infoproperties)
     except KeyError:
-        return ItemMapper()
+        return NullItemMapper()

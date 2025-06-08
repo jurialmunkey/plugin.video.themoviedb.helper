@@ -49,11 +49,11 @@ class ListTraktStaticListedProperties(ListTraktStaticProperties):
         return self.request_url.format(
             trakt_type=self.trakt_type,
             trakt_slug=self.trakt_slug,
-            trakt_lists_sort_by=self.trakt_lists_sort_by
+            trakt_sort=self.trakt_sort
         )
 
     def get_cache_name_list_prefix(self):
-        return [self.class_name, self.tmdb_type, self.tmdb_id, self.trakt_lists_sort_by]
+        return [self.class_name, self.tmdb_type, self.tmdb_id, self.trakt_sort]
 
     @cached_property
     def trakt_slug(self):
@@ -151,13 +151,13 @@ class ListTraktStaticListed(ListTraktStatic):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.item_mapper_class = StaticUnLikedItemMapper
-        list_properties.request_url = '{trakt_type}s/{trakt_slug}/lists/personal/{trakt_lists_sort_by}'
+        list_properties.request_url = '{trakt_type}s/{trakt_slug}/lists/personal/{trakt_sort}'
         list_properties.plugin_name = '{localized}'
         list_properties.localize = 32232
         return list_properties
 
     def get_items(self, *args, tmdb_id, sort_by=None, **kwargs):
         self.list_properties.tmdb_id = tmdb_id
-        self.list_properties.trakt_lists_sort_by = sort_by or 'popular'
+        self.list_properties.trakt_sort = sort_by or 'popular'
         self.list_properties.container_content = ''
         return super().get_items(*args, **kwargs)

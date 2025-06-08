@@ -1,4 +1,4 @@
-from tmdbhelper.lib.items.directories.trakt.mapper_basic import ItemMapper
+from tmdbhelper.lib.items.directories.trakt.mapper_basic import ItemMapper, NullItemMapper
 from tmdbhelper.lib.files.ftools import cached_property
 
 
@@ -6,6 +6,11 @@ class MediaItemMapper(ItemMapper):
 
     tmdb_type = ''
     mediatype = ''
+
+    def __init__(self, meta, add_infoproperties, sub_type=False):
+        self.add_infoproperties = add_infoproperties
+        self.meta = meta
+        self.meta.update(self.meta.pop(sub_type, {})) if sub_type else None
 
     @cached_property
     def label(self):
@@ -34,6 +39,9 @@ class MediaItemMapper(ItemMapper):
         'play_count': 'plays',
         'collected_count': 'collectors',
         'list_count': 'lists',
+        'rank': 'rank',
+        'notes': 'notes',
+        'listed_at': 'listed_at',
     }
 
     def get_infoproperties(self):
@@ -71,15 +79,50 @@ class TVShowItemMapper(MediaItemMapper):
     mediatype = 'tvshow'
 
 
+class SeasonItemMapper(MediaItemMapper):
+    tmdb_type = 'tv'
+    mediatype = 'season'
+
+    @cached_property
+    def tvshow_meta(self):
+        return self.meta.get('show') or {}
+
+    def get_unique_ids(self):
+        unique_ids = {}
+        unique_ids = {f'tvshow.{k}': v for k, v in (self.tvshow_meta.get('ids') or {}).items()}
+        unique_ids.update(self.meta.get('ids') or {})
+        unique_ids['tmdb'] = unique_ids.get('tvshow.tmdb')
+        return unique_ids
+
+    def get_infolabels(self):
+        infolabels = super().get_infolabels()
+        infolabels['tvshowtitle'] = self.tvshow_meta.get('title')
+        infolabels['season'] = self.meta.get('number')
+        return infolabels
+
+
+class EpisodeItemMapper(SeasonItemMapper):
+    tmdb_type = 'tv'
+    mediatype = 'episode'
+
+    def get_infolabels(self):
+        infolabels = super().get_infolabels()
+        infolabels['tvshowtitle'] = self.tvshow_meta.get('title')
+        infolabels['season'] = self.meta.get('season')
+        infolabels['episode'] = self.meta.get('number')
+        return infolabels
+
+
 def FactoryItemMapper(meta, add_infoproperties=None, trakt_type=None, sub_type=False):
     routes = {
         'movie': MovieItemMapper,
         'show': TVShowItemMapper,
+        'season': SeasonItemMapper,
+        'episode': EpisodeItemMapper,
     }
 
     try:
         trakt_type = trakt_type or meta['type']
-        meta.update(meta.pop(trakt_type, {})) if sub_type else None
-        return routes[trakt_type](meta, add_infoproperties)
+        return routes[trakt_type](meta, add_infoproperties, sub_type=trakt_type if sub_type else None)
     except KeyError:
-        return ItemMapper()
+        return NullItemMapper()
