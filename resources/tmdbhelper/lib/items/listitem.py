@@ -51,8 +51,9 @@ def ListItem(*args, **kwargs):
 
 
 class BuildURL:
-    def __init__(self, path, reload=None, widget=None, **params):
+    def __init__(self, path, reload=None, widget=None, paths=None, **params):
         self.path = path
+        self.path_x = paths
         self.reload = reload
         self.widget = boolean(widget)
         self.params = params
@@ -71,10 +72,17 @@ class BuildURL:
             return {}
         return {'widget': 'true'}
 
+    @cached_property
+    def params_path_x(self):
+        if not self.path_x:
+            return {}
+        return {f'paths_{x}': i for x, i in enumerate(self.path_x) if i}
+
     @property
     def url(self):
         self.params.update(self.params_reload)
         self.params.update(self.params_widget)
+        self.params.update(self.params_path_x)
         return encode_url(self.path, **self.params)
 
 

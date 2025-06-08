@@ -1,3 +1,4 @@
+from urllib.parse import unquote_plus
 from tmdbhelper.lib.addon.logger import kodi_log
 from jurialmunkey.parser import parse_paramstring, reconfigure_legacy_params
 
@@ -8,10 +9,12 @@ class Router():
         self.handle = handle  # plugin:// handle
         self.paramstring, *secondary_params = paramstring.split('&&')  # plugin://plugin.video.themoviedb.helper?paramstring
         self.params = reconfigure_legacy_params(**parse_paramstring(self.paramstring))  # paramstring dictionary
-        if not secondary_params:
-            return
-        from urllib.parse import unquote_plus
-        self.params['paths'] = [unquote_plus(i) for i in secondary_params]
+        self.params.update(self.configure_paths(secondary_params))
+
+    def configure_paths(self, secondary_params):
+        paths = [unquote_plus(self.params.pop(k)) for k in tuple(self.params.keys()) if k.startswith('paths')]
+        paths.extend([unquote_plus(i) for i in secondary_params])
+        return {'paths': paths} if paths else {}
 
     def play_external(self):
         from tmdbhelper.lib.player.players import Players
