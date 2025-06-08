@@ -18,7 +18,7 @@ class MediaItemMapper(ItemMapper):
 
     @cached_property
     def tmdb_id(self):
-        return self.unique_ids['tmdb']
+        return self.unique_ids.get('tmdb')
 
     infolabels_map = {
         'year': 'year',

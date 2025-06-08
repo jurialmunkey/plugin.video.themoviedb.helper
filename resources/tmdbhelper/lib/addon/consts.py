@@ -191,9 +191,6 @@ ROUTE_NOID = {
     'trakt_becausemostwatched': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
         'import_attr': 'ListRandomBecauseYouWatched'}},
-    'trakt_calendar': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_trakt',
-        'import_attr': 'ListCalendar'}},
     'library_nextaired': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.lists_trakt',
         'import_attr': 'ListLibraryCalendar'}},
@@ -276,8 +273,11 @@ ROUTE_NOID = {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
         'import_attr': 'ListTraktAnticipated'}},
     'trakt_myairing': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_filtered',
-        'import_attr': 'ListTraktMyCalendars'}},
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_calendar',
+        'import_attr': 'ListTraktMyAiring'}},
+    'trakt_calendar': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_calendar',
+        'import_attr': 'ListTraktCalendar'}},
     'trakt_boxoffice': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
         'import_attr': 'ListTraktBoxOffice'}},

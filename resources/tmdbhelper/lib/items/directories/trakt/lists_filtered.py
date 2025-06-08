@@ -101,14 +101,3 @@ class ListTraktAnticipated(ListTraktFiltered):
         list_properties.localize = 32206
         list_properties.sub_type = True
         return list_properties
-
-
-class ListTraktMyCalendars(ListTraktFiltered):
-    def configure_list_properties(self, list_properties):
-        list_properties = super().configure_list_properties(list_properties)
-        list_properties.trakt_authorization = True
-        list_properties.request_url = 'calendars/my/{trakt_type}s'
-        list_properties.plugin_name = f'{get_localized(32201)} {{plural}} {{localized}}'
-        list_properties.localize = 32202
-        list_properties.sub_type = True
-        return list_properties

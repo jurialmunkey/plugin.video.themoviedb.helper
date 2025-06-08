@@ -75,6 +75,12 @@ class ListTraktStandardProperties(ListStandardProperties):
     def url(self):
         return self.request_url.format(trakt_type=self.trakt_type)
 
+    def is_authorized(self):
+        if self.trakt_authorization and not self.trakt_api.authorization:
+            if self.trakt_api.attempted_login or not self.trakt_api.authorize(login=True):
+                return False
+        return True
+
     def get_uncached_items(self):
         return {
             'items': self.class_pages(self, self.page).items,
@@ -83,9 +89,8 @@ class ListTraktStandardProperties(ListStandardProperties):
         }
 
     def get_uncached_response(self, page=1):
-        if self.trakt_authorization and not self.trakt_api.authorization:
-            if self.trakt_api.attempted_login or not self.trakt_api.authorize(login=True):
-                return
+        if not self.is_authorized:
+            return
         return self.trakt_api.get_response(self.url, page=page, limit=self.limit, **self.trakt_filters)
 
     def get_mapped_item(self, item, add_infoproperties=None):

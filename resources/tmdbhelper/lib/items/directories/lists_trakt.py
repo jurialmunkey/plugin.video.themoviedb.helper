@@ -3,36 +3,6 @@ from tmdbhelper.lib.addon.plugin import convert_type, get_localized, get_setting
 from tmdbhelper.lib.items.container import ContainerDirectory
 
 
-class ListComments(ContainerDirectory):
-    def get_items(self, info, tmdb_type, tmdb_id, sort=None, **kwargs):
-        """ Get a mix of watchlisted and inprogress """
-        from tmdbhelper.lib.api.mapping import get_empty_item
-
-        if tmdb_type not in ['movie', 'tv']:
-            return
-        trakt_type = convert_type(tmdb_type, 'trakt')
-        slug = self.trakt_api.get_id(tmdb_id, 'tmdb', trakt_type, 'slug')
-        items = self.trakt_api.get_request_sc(f'{trakt_type}s', slug, 'comments', sort, limit=50)
-
-        def _map_item(i):
-            item = get_empty_item()
-            plot = i.get('comment') or ''
-            rate = i.get('user_stats', {}).get('rating')
-            date = i.get('created_at')[:10]
-            plot = f'{plot}\n{get_localized(563)} {rate}/10' if rate else plot
-            plot = f'{plot}\n{date}'
-            item['infolabels']['plot'] = plot
-            item['label'] = item['infolabels']['title'] = i.get('user', {}).get('name') or i.get('user', {}).get('username')
-            item['infolabels']['premiered'] = date
-            item['infolabels']['rating'] = rate
-            item['params'] = {'comment_id': i.get('id'), 'parent_id': i.get('parent_id'), 'user_slug': i.get('user', {}).get('ids', {}).get('slug')}
-            return item
-
-        items = [_map_item(i) for i in items if i]
-
-        return items
-
-
 class ListCalendar(ContainerDirectory):
     def _get_calendar_items(self, info, startdate, days, page=None, kodi_db=None, endpoint=None, user=True, **kwargs):
         from tmdbhelper.lib.addon.tmdate import get_calendar_name
