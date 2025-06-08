@@ -1,5 +1,4 @@
 from jurialmunkey.parser import try_int
-from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.items.directories.trakt.lists_standard import (
     ListTraktStandard,
     PAGES_LENGTH
