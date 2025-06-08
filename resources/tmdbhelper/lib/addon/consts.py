@@ -459,6 +459,9 @@ ROUTE_TMDBID = {
     'trakt_upnext': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
         'import_attr': 'ListUpNext'}},
+    'trakt_related': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_related',
+        'import_attr': 'ListTraktRelated'}},
     'recommendations': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_related',
         'import_attr': 'ListRecommendations'}},

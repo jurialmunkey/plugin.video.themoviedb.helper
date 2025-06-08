@@ -100,6 +100,14 @@ def _get_basedir_details():
                 'icon': f'{ADDONPATH}/resources/icons/themoviedb/recommended.png'},
             'types': ['movie', 'tv', 'episode']},
         {
+            'label': get_localized(32064),
+            'params': {'info': 'trakt_related'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/popular.png'},
+            'types': ['movie', 'tv', 'episode']},
+        {
             'label': get_localized(32224),
             'params': {'info': 'similar', 'cacheonly': 'true'},
             'path': PLUGINPATH,
