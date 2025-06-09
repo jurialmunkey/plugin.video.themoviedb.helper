@@ -147,8 +147,11 @@ class DataType:
     def sync(self, forced=False):
         if not forced and not self.is_expired:
             return
-        if not self.sync_data():
-            return
+        # Need a better way to check if sync was successful vs. just not having data of that type
+        # e.g. no inprogress movies vs failed sync of inprogress movies
+        # if not self.sync_data():
+        #     return
+        self.sync_data()
         self.store_last_activity()
 
 
