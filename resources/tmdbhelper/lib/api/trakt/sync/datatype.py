@@ -86,7 +86,12 @@ class DataType:
         return SyncLastActivities(self._class_instance_syncdata)
 
     def store_last_activity(self):
-        self.cache.set_activity(self.item_type, self.method, self.last_activities.json.get('all') or '2000-01-01T00:00:00.000Z', set_timestamp(self.expiry_time, set_int=True))
+        self.cache.set_activity(
+            self.item_type,
+            self.method,
+            self.last_activities.json.get('all') or '2000-01-01T00:00:00.000Z',
+            set_timestamp(self.expiry_time, set_int=True)
+        )
 
     @property
     def last_activities_item_type(self):
