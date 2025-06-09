@@ -88,13 +88,31 @@ class CommonMonitorDetails(CommonContainerAPIs):
                 info[f'{t}_cr'] = '[CR]'.join(all_awards_cr)
         return info
 
+    def get_imdb_top250_list(self, tmdb_type):
+        return self.query_database.get_imdb_top250_list_cached(tmdb_type)
+
+    @cached_property
+    def imdb_top250_list_movie(self):
+        return self.get_imdb_top250_list('movie')
+
+    @cached_property
+    def imdb_top250_list_tv(self):
+        return self.get_imdb_top250_list('tv')
+
+    def return_imdb_top250_list(self, tmdb_type):
+        if tmdb_type == 'movie':
+            return self.imdb_top250_list_movie
+        if tmdb_type == 'tv':
+            return self.imdb_top250_list_tv
+
     def get_detailed_ratings(self, tmdb_type, tmdb_id):
         from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings import RatingsDict
         sync = RatingsDict()
-        sync.mdblist_api = self.mdblist_api
-        sync.trakt_api = self.trakt_api
-        sync.tmdb_api = self.tmdb_api
-        sync.omdb_api = self.omdb_api
+        sync.common_apis.mdblist_api = self.mdblist_api
+        sync.common_apis.trakt_api = self.trakt_api
+        sync.common_apis.tmdb_api = self.tmdb_api
+        sync.common_apis.omdb_api = self.omdb_api
+        sync.imdb_top250_list = self.return_imdb_top250_list(tmdb_type)
         sync.tmdb_type = tmdb_type
         sync.tmdb_id = tmdb_id
         return sync.data or {}

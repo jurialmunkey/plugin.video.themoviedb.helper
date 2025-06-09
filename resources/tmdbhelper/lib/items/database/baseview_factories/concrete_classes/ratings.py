@@ -1,5 +1,6 @@
-from tmdbhelper.lib.files.ftools import cached_property, threaded_cached_property
+from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.baseclass import BaseList
+from tmdbhelper.lib.query.database.database import FindQueriesDatabase
 from tmdbhelper.lib.addon.thread import ParallelThread
 from jurialmunkey.parser import try_int
 
@@ -14,23 +15,39 @@ class RatingsDict(BaseList):
         """ WHERE condition ? ? ? ? = value, value, value, value """
         return (self.item_id, self.current_time, )
 
-    @threaded_cached_property
+    @cached_property
     def mediatype(self):
+        return self.get_mediatype()
+
+    @cached_property
+    def trakt_type(self):
+        return self.get_trakt_type()
+
+    @cached_property
+    def imdb_id(self):
+        return self.get_imdb_id()
+
+    @cached_property
+    def imdb_top250_list(self):
+        return self.get_imdb_top250_list()
+
+    def get_mediatype(self):
         if self.tmdb_type == 'movie':
             return 'movie'
         if self.tmdb_type == 'tv':
             return 'tvshow'
 
-    @threaded_cached_property
-    def trakt_type(self):
+    def get_trakt_type(self):
         if self.tmdb_type == 'movie':
             return 'movie'
         if self.tmdb_type == 'tv':
             return 'show'
 
-    @threaded_cached_property
-    def imdb_id(self):
-        return self.common_apis.query_database.get_trakt_id(self.tmdb_id, 'tmdb', self.trakt_type, 'imdb')
+    def get_imdb_id(self):
+        return FindQueriesDatabase().get_trakt_id(self.tmdb_id, 'tmdb', self.trakt_type, 'imdb')
+
+    def get_imdb_top250_list(self):
+        return FindQueriesDatabase().get_imdb_top250_list_cached(self.tmdb_type)
 
     @cached_property
     def mdblist_ratings(self):
@@ -41,8 +58,7 @@ class RatingsDict(BaseList):
     @cached_property
     def imdb_top250(self):
         try:
-            imdb_top250 = self.common_apis.query_database.get_imdb_top250_list_cached(self.tmdb_type)
-            return {'top250': imdb_top250.index(try_int(self.tmdb_id)) + 1}  # Must be an int to match
+            return {'top250': self.imdb_top250_list.index(try_int(self.tmdb_id)) + 1}  # Must be an int to match
         except (KeyError, TypeError, IndexError, ValueError):
             return {}
 
@@ -59,7 +75,7 @@ class RatingsDict(BaseList):
     def trakt_ratings(self):
         if not self.common_apis.trakt_api or not self.common_apis.trakt_api.authorization or not self.imdb_id:
             return {}
-        data = self.trakt_api.get_response_json(f'{self.trakt_type}s/{self.imdb_id}/ratings')
+        data = self.common_apis.trakt_api.get_response_json(f'{self.trakt_type}s/{self.imdb_id}/ratings')
         if not data:
             return {}
         try:
@@ -98,6 +114,10 @@ class RatingsDict(BaseList):
             'tmdb_ratings',
             'imdb_top250',
         )
+
+        self.mediatype = self.get_mediatype()
+        self.trakt_type = self.get_trakt_type()
+        self.imdb_id = self.get_imdb_id()
 
         with ParallelThread(attribs, get_data_attr):
             pass
