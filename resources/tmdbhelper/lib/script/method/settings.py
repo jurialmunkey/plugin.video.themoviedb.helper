@@ -7,13 +7,14 @@ def configure_provider_allowlist():
     from xbmcgui import Dialog
     from tmdbhelper.lib.api.tmdb.api import TMDb
     from tmdbhelper.lib.addon.plugin import get_localized, get_setting, set_setting
+    from tmdbhelper.lib.query.database.database import FindQueriesDatabase
     tmdb_api = TMDb()
 
     def _get_available_providers():
         available_providers = set()
         for tmdb_type in ['movie', 'tv']:
 
-            data = tmdb_api.tmdb_database.get_watch_providers(tmdb_type, tmdb_api.iso_country)
+            data = FindQueriesDatabase().get_watch_providers(tmdb_type, tmdb_api.iso_country)
             if not data:
                 continue
             available_providers |= {i.get('provider_name') for i in data}

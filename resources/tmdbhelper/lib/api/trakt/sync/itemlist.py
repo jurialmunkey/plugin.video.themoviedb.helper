@@ -3,6 +3,7 @@
 from tmdbhelper.lib.files.ftools import cached_property
 from collections import namedtuple
 from tmdbhelper.lib.addon.thread import ParallelThread
+from tmdbhelper.lib.query.database.database import FindQueriesDatabase
 
 
 class ItemListSyncDataProperties:
@@ -82,7 +83,7 @@ class ItemListSyncDataMethods:
     def make_detailed_item(self, i, item_type='show'):
         if not i['id']:
             return i
-        trakt_id = self._class_instance_trakt_api.query_database.get_trakt_id(id_value=i['id'], id_type='tmdb', item_type=item_type, output_type='trakt')
+        trakt_id = FindQueriesDatabase().get_trakt_id(id_value=i['id'], id_type='tmdb', item_type=item_type, output_type='trakt')
         if not trakt_id:
             return i
         item = self._class_instance_trakt_api.get_details(item_type, trakt_id, season=i.get('season'), episode=i.get('episode'))

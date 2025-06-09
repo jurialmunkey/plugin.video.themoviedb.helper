@@ -90,12 +90,14 @@ def get_next_episodes(tmdb_id, season, episode, player=None):
 
 def get_external_ids(tmdb_type, tmdb_id, season=None, episode=None):
     from tmdbhelper.lib.api.trakt.api import TraktAPI
+    from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+
     trakt_api = TraktAPI()
     trakt_type = 'movie' if tmdb_type == 'movie' else 'show'
     if not tmdb_id or not trakt_type:
         return
 
-    trakt_id = trakt_api.query_database.get_trakt_id(id_type='tmdb', id_value=tmdb_id, item_type=trakt_type, output_type='trakt')
+    trakt_id = FindQueriesDatabase().get_trakt_id(id_type='tmdb', id_value=tmdb_id, item_type=trakt_type, output_type='trakt')
     if not trakt_id:
         return
 

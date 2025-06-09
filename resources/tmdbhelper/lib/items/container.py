@@ -250,7 +250,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         try:
             from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
             sync = BaseItemFactory('movie')
-            sync.tmdb_id = tmdb_id or self.tmdb_api.tmdb_database.get_tmdb_id(**kwargs)
+            sync.tmdb_id = tmdb_id or self.query_database.get_tmdb_id(**kwargs)
             return sync.data['infoproperties']['set.tmdb_id']
         except (KeyError, TypeError, AttributeError):
             pass
@@ -264,7 +264,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         if self.params.get('tmdb_id'):
             return
 
-        self.params['tmdb_id'] = self.tmdb_api.tmdb_database.get_tmdb_id(**self.params)
+        self.params['tmdb_id'] = self.query_database.get_tmdb_id(**self.params)
 
     def get_items(self, **kwargs):
         """ Abstract method for getting items

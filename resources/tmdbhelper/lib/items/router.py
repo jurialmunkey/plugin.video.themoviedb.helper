@@ -18,10 +18,10 @@ class Router():
 
     def play_external(self):
         from tmdbhelper.lib.player.players import Players
-        from tmdbhelper.lib.api.tmdb.api import TMDb
+        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
         kodi_log(['lib.container.router - Attempting to play item\n', self.params], 1)
         if not self.params.get('tmdb_id'):
-            self.params['tmdb_id'] = TMDb().tmdb_database.get_tmdb_id(**self.params)
+            self.params['tmdb_id'] = FindQueriesDatabase().get_tmdb_id(**self.params)
         Players(**self.params).play(handle=self.handle if self.handle != -1 else None)
 
     def get_directory(self, items_only=False, build_items=True):

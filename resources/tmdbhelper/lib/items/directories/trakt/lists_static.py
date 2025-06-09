@@ -58,7 +58,7 @@ class ListTraktStaticListedProperties(ListTraktStaticProperties):
 
     @cached_property
     def trakt_slug(self):
-        return self.trakt_api.query_database.get_trakt_id(self.tmdb_id, 'tmdb', item_type=self.trakt_type, output_type='slug')
+        return self.query_database.get_trakt_id(self.tmdb_id, 'tmdb', item_type=self.trakt_type, output_type='slug')
 
     def get_mapped_item(self, item, add_infoproperties=None):
         """ Listed lists are flatter so need to reconfigure to match config of other types """

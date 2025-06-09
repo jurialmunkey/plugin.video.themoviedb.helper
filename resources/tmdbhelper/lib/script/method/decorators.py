@@ -38,10 +38,10 @@ def get_tmdb_id(func):
     """ Decorator to get tmdb_id if not in kwargs """
     def wrapper(*args, **kwargs):
         from tmdbhelper.lib.addon.dialog import BusyDialog
-        from tmdbhelper.lib.api.tmdb.api import TMDb
+        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
         with BusyDialog():
             if not kwargs.get('tmdb_id'):
-                kwargs['tmdb_id'] = TMDb().tmdb_database.get_tmdb_id(**kwargs)
+                kwargs['tmdb_id'] = FindQueriesDatabase().get_tmdb_id(**kwargs)
                 if not kwargs['tmdb_id']:
                     return
         return func(*args, **kwargs)

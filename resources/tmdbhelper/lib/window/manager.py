@@ -5,9 +5,9 @@ import jurialmunkey.window as window
 from jurialmunkey.parser import try_int, parse_paramstring, reconfigure_legacy_params
 from tmdbhelper.lib.addon.plugin import get_condvisibility, get_localized, executebuiltin
 from tmdbhelper.lib.addon.dialog import BusyDialog
-from tmdbhelper.lib.api.tmdb.api import TMDb
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.thread import SafeThread
+from tmdbhelper.lib.query.database.database import FindQueriesDatabase
 
 
 PREFIX_PATH = 'Path.'
@@ -358,7 +358,7 @@ class WindowManager(_EventLoop):
                 return
             query = split_str[x]
         with BusyDialog():
-            tmdb_id = TMDb().tmdb_database.get_tmdb_id_from_query(tmdb_type, query, header=query, use_details=True, auto_single=True)
+            tmdb_id = FindQueriesDatabase().get_tmdb_id_from_query(tmdb_type, query, header=query, use_details=True, auto_single=True)
         if not tmdb_id:
             Dialog().notification('TMDbHelper', get_localized(32310).format(query))
             return

@@ -31,6 +31,11 @@ class ListProperties:
     pagination = False
 
     @cached_property
+    def query_database(self):
+        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+        return FindQueriesDatabase()
+
+    @cached_property
     def cache_name(self):
         return '_'.join(map(str, (
             self.class_name,

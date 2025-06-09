@@ -3,21 +3,18 @@ from tmdbhelper.lib.items.container import ContainerDirectory
 
 class ListListItems(ContainerDirectory):
     def _get_item_tmdb_id(self, item, tmdb_type):
-
-        tmdb_database = self.tmdb_api.tmdb_database
-
         if tmdb_type == 'tv':
-            tv_tmdb_id = tmdb_database.get_tmdb_id(
+            tv_tmdb_id = self.query_database.get_tmdb_id(
                 tmdb_type=tmdb_type,
                 tvdb_id=item['unique_ids'].get('tvdb'))
             if not tv_tmdb_id:
-                tv_tmdb_id = tmdb_database.get_tmdb_id(
+                tv_tmdb_id = self.query_database.get_tmdb_id(
                     tmdb_type=tmdb_type,
                     query=item['infolabels'].get('originaltitle'),
                     year=item['infolabels'].get('year'))
             item['unique_ids']['tvshow.tmdb'] = item['unique_ids']['tmdb'] = tv_tmdb_id
         elif tmdb_type == 'movie':
-            item['unique_ids']['tmdb'] = tmdb_database.get_tmdb_id(
+            item['unique_ids']['tmdb'] = self.query_database.get_tmdb_id(
                 tmdb_type=tmdb_type,
                 query=item['infolabels'].get('originaltitle'),
                 year=item['infolabels'].get('year'))

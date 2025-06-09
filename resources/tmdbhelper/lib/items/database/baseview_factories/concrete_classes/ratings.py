@@ -1,4 +1,4 @@
-from tmdbhelper.lib.files.ftools import cached_property
+from tmdbhelper.lib.files.ftools import cached_property, threaded_cached_property
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.baseclass import BaseList
 from tmdbhelper.lib.addon.thread import ParallelThread
 from jurialmunkey.parser import try_int
@@ -14,21 +14,21 @@ class RatingsDict(BaseList):
         """ WHERE condition ? ? ? ? = value, value, value, value """
         return (self.item_id, self.current_time, )
 
-    @cached_property
+    @threaded_cached_property
     def mediatype(self):
         if self.tmdb_type == 'movie':
             return 'movie'
         if self.tmdb_type == 'tv':
             return 'tvshow'
 
-    @cached_property
+    @threaded_cached_property
     def trakt_type(self):
         if self.tmdb_type == 'movie':
             return 'movie'
         if self.tmdb_type == 'tv':
             return 'show'
 
-    @cached_property
+    @threaded_cached_property
     def imdb_id(self):
         return self.common_apis.query_database.get_trakt_id(self.tmdb_id, 'tmdb', self.trakt_type, 'imdb')
 

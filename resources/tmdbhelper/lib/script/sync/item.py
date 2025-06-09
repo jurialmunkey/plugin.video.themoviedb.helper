@@ -14,6 +14,10 @@ class ItemSyncCachedProperties:
         return self.get_trakt_api()
 
     @cached_property
+    def query_database(self):
+        return self.get_query_database()
+
+    @cached_property
     def trakt_syncdata(self):
         return self.get_trakt_syncdata()
 
@@ -111,6 +115,10 @@ class ItemSyncGetters:
         from tmdbhelper.lib.api.trakt.api import TraktAPI
         return TraktAPI()
 
+    def get_query_database(self):
+        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+        return FindQueriesDatabase()
+
     def get_trakt_syncdata(self):
         return self.trakt_api.trakt_syncdata
 
@@ -195,7 +203,7 @@ class ItemSyncGetters:
         return dialog_message.format(self.dialog_header, self.tmdb_type, 'TMDb', self.item_id)
 
     def get_trakt_id(self):
-        return self.trakt_api.query_database.get_trakt_id(self.tmdb_id, 'tmdb', self.base_trakt_type, output_type='trakt')
+        return self.query_database.get_trakt_id(self.tmdb_id, 'tmdb', self.base_trakt_type, output_type='trakt')
 
     def get_sync_response(self):
         """ Called after user selects choice """
