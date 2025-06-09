@@ -73,10 +73,10 @@ def test_func(test_func, dialog_output=False, **kwargs):
         head = f'{(import_attr, tmdb_type, int(tmdb_id))}'
         return finalise(head, data)
 
-    def test_func_tmdb_database(import_attr, **kwargs):
-        from tmdbhelper.lib.api.tmdb.api import TMDb
-        tmdb_database = TMDb().tmdb_database
-        data = getattr(tmdb_database, import_attr)(**kwargs)
+    def test_func_query_database(import_attr, **kwargs):
+        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+        query_database = FindQueriesDatabase()
+        data = getattr(query_database, import_attr)(**kwargs)
         head = import_attr
         return finalise(head, data)
 
@@ -110,7 +110,7 @@ def test_func(test_func, dialog_output=False, **kwargs):
         'trakt_response': test_func_trakt_response,
         'baseitem_factory': test_func_baseitem_factory,
         'baseview_factory': test_func_baseview_factory,
-        'tmdb_database': test_func_tmdb_database,
+        'query_database': test_func_query_database,
         'fanarttv': test_func_fanarttv,
         'get_next_episodes': test_func_get_next_episodes,
         'sync_next_episodes': test_func_sync_next_episodes,

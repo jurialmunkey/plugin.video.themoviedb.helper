@@ -36,14 +36,6 @@ class TraktContent():
             self._filter_inprogress = filter_inprogress
             return self._filter_inprogress(self, *args, **kwargs)
 
-    def get_imdb_top250(self, *args, **kwargs):
-        try:
-            return self._get_imdb_top250(self, *args, **kwargs)
-        except AttributeError:
-            from tmdbhelper.lib.api.trakt.methods.lists import get_imdb_top250
-            self._get_imdb_top250 = get_imdb_top250
-            return self._get_imdb_top250(self, *args, **kwargs)
-
     """
     TRAKT DETAILS METHODS
     """

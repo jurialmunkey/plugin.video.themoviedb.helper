@@ -41,7 +41,7 @@ class RatingsDict(BaseList):
     @cached_property
     def imdb_top250(self):
         try:
-            imdb_top250 = self.common_apis.trakt_api.get_imdb_top250(id_type='tmdb', trakt_type=self.trakt_type)
+            imdb_top250 = self.common_apis.query_database.get_imdb_top250_list_cached(self.tmdb_type)
             return {'top250': imdb_top250.index(try_int(self.tmdb_id)) + 1}  # Must be an int to match
         except (KeyError, TypeError, IndexError, ValueError):
             return {}

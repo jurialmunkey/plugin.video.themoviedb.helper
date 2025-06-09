@@ -95,17 +95,3 @@ def filter_inprogress(self, items):
         return
     items = [i for i in items if i.get('show', {}).get('ids', {}).get('slug') in inprogress]
     return items
-
-
-@use_simple_cache(cache_days=CACHE_SHORT)
-def get_imdb_top250(self, id_type=None, trakt_type='movie'):
-    paths = {
-        'movie': 'users/justin/lists/imdb-top-rated-movies/items',
-        'show': 'users/justin/lists/imdb-top-rated-tv-shows/items'}
-    try:
-        response = self.get_response(paths[trakt_type], limit=4095)
-        from tmdbhelper.lib.api.trakt.items import TraktItems
-        sorted_items = TraktItems(response.json() if response else []).sort_items('rank', 'asc') or []
-        return [i[trakt_type]['ids'][id_type] for i in sorted_items]
-    except KeyError:
-        return []
