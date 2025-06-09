@@ -12,23 +12,6 @@ from tmdbhelper.lib.api.trakt.content import TraktContent
 API_URL = 'https://api.trakt.tv/'
 
 
-def is_authorized(func):
-
-    def wrapper(self, *args, **kwargs):
-
-        # Set authorize=False to skip authorization for that method
-        if not kwargs.get('authorize', True):
-            return func(self, *args, **kwargs)
-        # Authorization already granted in this instance
-        if self.authorization:
-            return func(self, *args, **kwargs)
-        # Authorization required ask for login if no token
-        if not self.attempted_login and self.authorize(login=True):
-            return func(self, *args, **kwargs)
-
-    return wrapper
-
-
 class TraktSync:
     @property
     def trakt_syncdata(self):
@@ -38,8 +21,9 @@ class TraktSync:
             self._trakt_syncdata = self.get_trakt_syncdata()
             return self._trakt_syncdata
 
-    @is_authorized
     def get_trakt_syncdata(self):
+        if not self.is_authorized:
+            return
         from tmdbhelper.lib.api.trakt.sync.datasync import SyncData
         return SyncData(self)
 
@@ -72,6 +56,14 @@ class TraktAPI(RequestAPI, TraktContent, TraktSync):
         self.sync_item_limit = 20 * max(get_setting('pagemulti_sync', 'int'), page_length)
         self.item_limit = 20 * max(get_setting('pagemulti_trakt', 'int'), page_length)
         self.login() if force else self.authorize()
+
+    @property
+    def is_authorized(self):
+        if self.authorization:
+            return True
+        if not self.attempted_login and self.authorize(login=True):
+            return True
+        return False
 
     def authorize(self, login=False, confirmation=False):
         # Already got authorization so return credentials

@@ -108,7 +108,7 @@ class ListTraktCalendarProperties(ListTraktStandardProperties):
         return self.get_api_response_json()
 
     def get_api_response_json(self):
-        if not self.is_authorized:
+        if self.trakt_authorization and not self.trakt_api.is_authorized:
             return
         return CachedResponse(self.trakt_api, self.url, self.trakt_filters).json
 

@@ -1,4 +1,3 @@
-from tmdbhelper.lib.api.trakt.api import is_authorized
 from tmdbhelper.lib.files.bcache import use_simple_cache
 from tmdbhelper.lib.addon.consts import CACHE_SHORT
 
