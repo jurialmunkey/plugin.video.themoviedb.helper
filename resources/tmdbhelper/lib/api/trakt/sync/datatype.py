@@ -147,8 +147,9 @@ class DataType:
     def sync(self, forced=False):
         if not forced and not self.is_expired:
             return
+        if not self.sync_data():
+            return
         self.store_last_activity()
-        self.sync_data()
 
 
 class DataTypeEpisodes(DataType):
