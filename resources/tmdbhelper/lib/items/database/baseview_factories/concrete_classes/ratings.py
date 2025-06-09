@@ -59,13 +59,16 @@ class RatingsDict(BaseList):
     def trakt_ratings(self):
         if not self.common_apis.trakt_api or not self.common_apis.trakt_api.authorization or not self.imdb_id:
             return {}
-        trakt_rating, trakt_votes = self.common_apis.trakt_api.get_ratings(self.trakt_type, self.imdb_id)
-        data = {}
-        if trakt_rating:
-            data['trakt_rating'] = int(float(trakt_rating) * 10)  # Convert /10 float to /100 int
-        if trakt_votes:
-            data['trakt_votes'] = int(trakt_votes)
-        return data
+        data = self.trakt_api.get_response_json(f'{self.trakt_type}s/{self.imdb_id}/ratings')
+        if not data:
+            return {}
+        try:
+            return {
+                'trakt_rating': int(float(data['rating']) * 10),  # Convert /10 float to /100 int
+                'trakt_votes': int(data['votes']),
+            }
+        except (KeyError, TypeError, IndexError, ValueError):
+            return {}
 
     @cached_property
     def tmdb_ratings(self):
@@ -73,7 +76,10 @@ class RatingsDict(BaseList):
         if not data:
             return {}
         try:
-            return {'tmdb_rating': int(data['vote_average'] * 10), 'tmdb_votes': data['vote_count']}
+            return {
+                'tmdb_rating': int(data['vote_average'] * 10),
+                'tmdb_votes': data['vote_count']
+            }
         except (KeyError, TypeError, IndexError, ValueError):
             return {}
 
