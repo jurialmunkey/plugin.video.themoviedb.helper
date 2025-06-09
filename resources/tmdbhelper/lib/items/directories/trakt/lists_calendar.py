@@ -99,14 +99,60 @@ class ListTraktCalendarProperties(ListTraktStandardProperties):
         """
         return self.filtered_items[::-1] if self.trakt_date < -1 else self.filtered_items
 
-    def get_uncached_response(self, page=1):
+    @cached_property
+    def api_response_json(self):
+        return self.get_api_response_json()
+
+    def get_api_response_json(self):
         if not self.is_authorized:
             return
-        data = CachedResponse(self.trakt_api, self.url, self.trakt_filters).json
-        return UncachedMDbListLocalData(data, self.page, self.limit).data if data else None
+        return CachedResponse(self.trakt_api, self.url, self.trakt_filters).json
+
+    def get_api_response(self, page=1):
+        if not self.api_response_json:
+            return
+        return UncachedMDbListLocalData(self.api_response_json, self.page, self.limit).data
 
     def get_mapped_item(self, item, add_infoproperties=None):
         return FactoryCalendarEpisodeItemMapper(item, add_infoproperties).item
+
+
+class ListLocalCalendarProperties(ListTraktCalendarProperties):
+
+    @cached_property
+    def kodi_db(self):
+        from tmdbhelper.lib.api.kodi.rpc import get_kodi_library
+        return get_kodi_library('tv')
+
+    def is_kodi_dbid(self, i):
+        if not self.kodi_db:
+            return False
+
+        try:
+            uids = i['show']['ids']
+        except KeyError:
+            return False
+
+        if not self.kodi_db.get_info(
+            info='dbid',
+            tmdb_id=uids.get('tmdb'),
+            tvdb_id=uids.get('tvdb'),
+            imdb_id=uids.get('imdb')
+        ):
+            return False
+
+        return True
+
+    @cached_property
+    def api_response_json(self):
+        api_response_json = self.get_api_response_json() or []
+        api_response_json = [i for i in api_response_json if self.is_kodi_dbid(i)]
+        return api_response_json
+
+    def get_api_response(self, page=1):
+        if not self.api_response_json:
+            return
+        return UncachedMDbListLocalData(self.api_response_json, self.page, self.limit).data
 
 
 class ListTraktCalendar(ListTraktFiltered):
@@ -126,3 +172,10 @@ class ListTraktCalendar(ListTraktFiltered):
         self.list_properties.trakt_days = try_int(days)
         self.list_properties.trakt_path = f'{endpoint}/' if endpoint else ''
         return super().get_items(*args, tmdb_type=tmdb_type, **kwargs)
+
+
+class ListLocalCalendar(ListTraktCalendar):
+    list_properties_class = ListLocalCalendarProperties
+
+    def get_items(self, *args, user=True, **kwargs):  # Absorb user param
+        return super().get_items(*args, user=False, **kwargs)  # Force user to be False since we need to check library against all items

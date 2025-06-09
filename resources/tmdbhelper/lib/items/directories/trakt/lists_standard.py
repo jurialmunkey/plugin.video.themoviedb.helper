@@ -88,7 +88,7 @@ class ListTraktStandardProperties(ListStandardProperties):
             'count': self.total_items,
         }
 
-    def get_uncached_response(self, page=1):
+    def get_api_response(self, page=1):
         if not self.is_authorized:
             return
         return self.trakt_api.get_response(self.url, page=page, limit=self.limit, **self.trakt_filters)

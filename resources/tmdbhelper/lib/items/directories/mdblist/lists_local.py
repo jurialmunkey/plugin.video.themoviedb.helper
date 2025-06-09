@@ -124,7 +124,7 @@ class ListMDbListLocalProperties(ListStandardProperties):
             'count': self.total_items,
         }
 
-    def get_uncached_response(self, page=1):
+    def get_api_response(self, page=1):
         import json
         import xbmcvfs
         import contextlib

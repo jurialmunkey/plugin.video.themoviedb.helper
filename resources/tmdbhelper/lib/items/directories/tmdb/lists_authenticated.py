@@ -11,7 +11,7 @@ class ListAuthenticatedProperties(ListStandardProperties):
         url = self.tmdb_user_api.format_authorised_path(url)
         return url
 
-    def get_uncached_response(self, page=1):
+    def get_api_response(self, page=1):
         return self.tmdb_user_api.get_authorised_response_json(self.url, page=page)
 
 

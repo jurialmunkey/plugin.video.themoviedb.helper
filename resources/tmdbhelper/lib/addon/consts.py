@@ -192,8 +192,8 @@ ROUTE_NOID = {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
         'import_attr': 'ListRandomBecauseYouWatched'}},
     'library_nextaired': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_trakt',
-        'import_attr': 'ListLibraryCalendar'}},
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_calendar',
+        'import_attr': 'ListLocalCalendar'}},
     'library_airingnext': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_airingnext',
         'import_attr': 'ListLibraryAiringNext'}},

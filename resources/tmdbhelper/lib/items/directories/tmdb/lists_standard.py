@@ -14,7 +14,7 @@ class UncachedItemsPage:
 
     @cached_property
     def response(self):
-        return self.outer_class.get_uncached_response(self.page)
+        return self.outer_class.get_api_response(self.page)
 
     @cached_property
     def results(self):
@@ -52,7 +52,7 @@ class ListStandardProperties(ListProperties):
     def next_page(self):
         return self.page + self.length
 
-    def get_uncached_response(self, page=1):
+    def get_api_response(self, page=1):
         return self.tmdb_api.get_response_json(self.url, page=page)
 
     def get_uncached_items(self):
