@@ -26,7 +26,7 @@ class ListTraktRelatedProperties(ListTraktStandardProperties):
 
     @cached_property
     def trakt_slug(self):
-        return self.trakt_api.get_id(self.tmdb_id, 'tmdb', trakt_type=self.trakt_type, output_type='slug')
+        return self.trakt_api.query_database.get_trakt_id(self.tmdb_id, 'tmdb', item_type=self.trakt_type, output_type='slug')
 
 
 class ListTraktRelatedCommentsProperties(ListTraktRelatedProperties):

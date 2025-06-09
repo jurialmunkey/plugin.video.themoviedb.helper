@@ -11,6 +11,7 @@ class FindQueriesDatabaseIMDbTop250:
         'tmdb_type': {
             'data': 'TEXT',
             'unique': True,
+            'indexed': True,
         },
         'tmdb_id': {
             'data': 'INTEGER'
@@ -47,12 +48,12 @@ class FindQueriesDatabaseIMDbTop250:
     def get_imdb_top250(self, tmdb_type, output_key='tmdb_id'):
         table = 'imdb_top250'
 
-        def configure_list(data):
+        def mapping_function(data):
             return [i[output_key] for i in data] if data else []
 
         def get_cached():
             kwgs = {'values': (tmdb_type,), 'conditions': 'tmdb_type=? ORDER BY rank ASC'} if tmdb_type else {}
-            return self.get_cached_values(table, (output_key, ), configure_list, **kwgs)
+            return self.get_cached_values(table, (output_key, ), mapping_function, **kwgs)
 
         def set_cached():
             sync = GetIMDbTop250Request(tmdb_type, self.trakt_api)

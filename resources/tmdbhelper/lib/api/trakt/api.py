@@ -27,6 +27,13 @@ class TraktSync:
         from tmdbhelper.lib.api.trakt.sync.datasync import SyncData
         return SyncData(self)
 
+    @property
+    def query_database(self):
+        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+        query_database = FindQueriesDatabase()
+        query_database.trakt_api = self  # Must override attribute to avoid circular import
+        return query_database
+
 
 class TraktAPI(RequestAPI, TraktContent, TraktSync):
 

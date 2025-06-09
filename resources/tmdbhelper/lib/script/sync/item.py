@@ -195,7 +195,7 @@ class ItemSyncGetters:
         return dialog_message.format(self.dialog_header, self.tmdb_type, 'TMDb', self.item_id)
 
     def get_trakt_id(self):
-        return self.trakt_api.get_id(self.tmdb_id, 'tmdb', self.base_trakt_type, output_type='trakt')
+        return self.trakt_api.query_database.get_trakt_id(self.tmdb_id, 'tmdb', self.base_trakt_type, output_type='trakt')
 
     def get_sync_response(self):
         """ Called after user selects choice """

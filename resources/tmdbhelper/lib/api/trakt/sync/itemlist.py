@@ -82,7 +82,7 @@ class ItemListSyncDataMethods:
     def make_detailed_item(self, i, item_type='show'):
         if not i['id']:
             return i
-        trakt_id = self._class_instance_trakt_api.get_id(unique_id=i['id'], id_type='tmdb', trakt_type=item_type, output_type='trakt')
+        trakt_id = self._class_instance_trakt_api.query_database.get_trakt_id(id_value=i['id'], id_type='tmdb', item_type=item_type, output_type='trakt')
         if not trakt_id:
             return i
         item = self._class_instance_trakt_api.get_details(item_type, trakt_id, season=i.get('season'), episode=i.get('episode'))

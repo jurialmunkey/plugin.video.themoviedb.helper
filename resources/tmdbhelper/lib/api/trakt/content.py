@@ -47,19 +47,3 @@ class TraktContent():
             from tmdbhelper.lib.api.trakt.methods.details import get_details
             self._get_details = get_details
             return self._get_details(self, *args, **kwargs)
-
-    def get_id(self, *args, **kwargs):
-        try:
-            return self._get_id(self, *args, **kwargs)
-        except AttributeError:
-            from tmdbhelper.lib.api.trakt.methods.details import get_id
-            self._get_id = get_id
-            return self._get_id(self, *args, **kwargs)
-
-    def get_id_search(self, *args, **kwargs):
-        try:
-            return self._get_id_search(self, *args, **kwargs)
-        except AttributeError:
-            from tmdbhelper.lib.api.trakt.methods.details import get_id_search
-            self._get_id_search = get_id_search
-            return self._get_id_search(self, *args, **kwargs)

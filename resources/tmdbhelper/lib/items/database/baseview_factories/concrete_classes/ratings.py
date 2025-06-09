@@ -30,7 +30,7 @@ class RatingsDict(BaseList):
 
     @cached_property
     def imdb_id(self):
-        return self.common_apis.trakt_api.get_id(self.tmdb_id, 'tmdb', self.trakt_type, 'imdb')
+        return self.common_apis.query_database.get_trakt_id(self.tmdb_id, 'tmdb', self.trakt_type, 'imdb')
 
     @cached_property
     def mdblist_ratings(self):

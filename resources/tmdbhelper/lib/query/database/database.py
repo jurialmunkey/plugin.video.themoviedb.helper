@@ -15,6 +15,7 @@ from tmdbhelper.lib.query.database.networks import FindQueriesDatabaseNetworks
 from tmdbhelper.lib.query.database.movies import FindQueriesDatabaseMovies
 from tmdbhelper.lib.query.database.tvshows import FindQueriesDatabaseTvshows
 from tmdbhelper.lib.query.database.imdb_top250 import FindQueriesDatabaseIMDbTop250
+from tmdbhelper.lib.query.database.trakt_id import FindQueriesDatabaseTraktID
 
 
 class FindQueriesDatabase(
@@ -31,6 +32,7 @@ class FindQueriesDatabase(
     FindQueriesDatabaseMovies,
     FindQueriesDatabaseTvshows,
     FindQueriesDatabaseIMDbTop250,
+    FindQueriesDatabaseTraktID
 ):
     cache_filename = 'ItemQueries.db'
 
@@ -61,6 +63,7 @@ class FindQueriesDatabase(
             'movies': self.movies_columns,
             'tvshows': self.tvshows_columns,
             'imdb_top250': self.imdb_top250_columns,
+            'trakt_id': self.trakt_id_columns,
         }
 
     def __init__(self):

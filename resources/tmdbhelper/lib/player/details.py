@@ -95,7 +95,7 @@ def get_external_ids(tmdb_type, tmdb_id, season=None, episode=None):
     if not tmdb_id or not trakt_type:
         return
 
-    trakt_id = trakt_api.get_id(id_type='tmdb', unique_id=tmdb_id, trakt_type=trakt_type, output_type='trakt')
+    trakt_id = trakt_api.query_database.get_trakt_id(id_type='tmdb', id_value=tmdb_id, item_type=trakt_type, output_type='trakt')
     if not trakt_id:
         return
 
