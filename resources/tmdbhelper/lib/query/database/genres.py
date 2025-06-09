@@ -1,7 +1,7 @@
 from tmdbhelper.lib.files.ftools import cached_property
 
 
-class TMDbDatabaseGenres:
+class FindQueriesDatabaseGenres:
 
     genres_columns = {
         'id': {

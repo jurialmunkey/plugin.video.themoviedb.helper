@@ -280,7 +280,7 @@ class TableMultiSearchID(TableSearchID):
             return
 
 
-class TMDbDatabaseTMDbID:
+class FindQueriesDatabaseTMDbID:
     tmdb_id_columns = {
         'tmdb_id': {
             'data': 'INTEGER',

@@ -7,7 +7,7 @@ import sqlite3
 
 
 DEFAULT_TABLE = 'simplecache'
-DATABASE_NAME = 'database_v7'
+DATABASE_NAME = 'database_07'
 
 
 class DatabaseCore:

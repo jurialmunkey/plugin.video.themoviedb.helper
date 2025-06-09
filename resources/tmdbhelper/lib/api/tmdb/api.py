@@ -125,9 +125,9 @@ class TMDb(TMDbAPI):
 
     @property
     def tmdb_database(self):
-        from tmdbhelper.lib.api.tmdb.database import TMDbDatabase
-        tmdb_database = TMDbDatabase()
-        tmdb_database.tmdb_api = self
+        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+        tmdb_database = FindQueriesDatabase()
+        tmdb_database.tmdb_api = self  # Must override attribute to avoid circular import
         return tmdb_database
 
     @property

@@ -1,7 +1,7 @@
-from tmdbhelper.lib.api.tmdb.database_tables.table import TMDbDatabaseTable
+from tmdbhelper.lib.query.database.table import FindQueriesDatabaseTable
 
 
-class TMDbDatabaseTableCertification(TMDbDatabaseTable):
+class FindQueriesDatabaseTableCertification(FindQueriesDatabaseTable):
     table = 'certification'
     keys = ('iso_country', 'certification', 'tmdb_type', 'meaning', 'ordering')
     response_key = 'certifications'
@@ -44,7 +44,7 @@ class TMDbDatabaseTableCertification(TMDbDatabaseTable):
                     connection.execute(statement, self.insert_statements[x].mapping(i, iso_country))
 
 
-class TMDbDatabaseCertification:
+class FindQueriesDatabaseCertification:
     certification_columns = {
         'iso_country': {
             'data': 'TEXT',
@@ -75,7 +75,7 @@ class TMDbDatabaseCertification:
     """
 
     def get_certification(self, tmdb_type, iso_country=None):
-        database_table = TMDbDatabaseTableCertification(self)
+        database_table = FindQueriesDatabaseTableCertification(self)
         database_table.tmdb_type = tmdb_type
         database_table.iso_country = iso_country
         return database_table.use()

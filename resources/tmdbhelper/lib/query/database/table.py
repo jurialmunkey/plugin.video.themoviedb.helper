@@ -5,7 +5,7 @@ from collections import namedtuple
 InsertStatement = namedtuple("InsertStatement", "statement table keys mapping")
 
 
-class TMDbDatabaseTable:
+class FindQueriesDatabaseTable:
     keys = ()  # SELECT keys
     table = ''  # FROM table
     conditions = ''  # WHERE conditions
