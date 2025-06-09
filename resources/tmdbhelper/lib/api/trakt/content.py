@@ -87,23 +87,3 @@ class TraktContent():
             from tmdbhelper.lib.api.trakt.methods.details import get_ratings
             self._get_ratings = get_ratings
             return self._get_ratings(self, *args, **kwargs)
-
-    """
-    TRAKT CALENDAR METHODS
-    """
-
-    def get_calendar(self, *args, **kwargs):
-        try:
-            return self._get_calendar(self, *args, **kwargs)
-        except AttributeError:
-            from tmdbhelper.lib.api.trakt.methods.calendar import get_calendar
-            self._get_calendar = get_calendar
-            return self._get_calendar(self, *args, **kwargs)
-
-    def get_calendar_episodes(self, *args, **kwargs):
-        try:
-            return self._get_calendar_episodes(self, *args, **kwargs)
-        except AttributeError:
-            from tmdbhelper.lib.api.trakt.methods.calendar import get_calendar_episodes
-            self._get_calendar_episodes = get_calendar_episodes
-            return self._get_calendar_episodes(self, *args, **kwargs)

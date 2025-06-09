@@ -55,6 +55,10 @@ class ListTraktCalendarProperties(ListTraktStandardProperties):
     """
 
     class_pages = UncachedMDbListItemsPage
+    trakt_path = ''
+    trakt_user = 'my'
+    trakt_authorization = True
+    request_url = 'calendars/{trakt_user}/shows/{trakt_path}{start_date}/{total_days}'
 
     def get_cache_name_list_prefix(self):
         return [

@@ -252,8 +252,13 @@ class SyncDataGetterAllUnHiddenShowsInProgress:
         return self.get_calendar_data()
 
     def get_calendar_data(self):
-        return self._class_instance_syncdata._class_instance_trakt_api.get_calendar_episodes(
-            startdate=self.calendar_startdate, days=self.calendar_days)
+        from tmdbhelper.lib.items.directories.trakt.lists_calendar import ListTraktCalendarProperties
+        list_properties = ListTraktCalendarProperties()
+        list_properties.trakt_api = self._class_instance_syncdata._class_instance_trakt_api
+        list_properties.trakt_date = self.calendar_startdate
+        list_properties.trakt_days = self.calendar_days
+        list_properties.trakt_type = 'episode'
+        return list_properties.api_response_json
 
     @cached_property
     def calendar_episodes(self):
@@ -262,21 +267,36 @@ class SyncDataGetterAllUnHiddenShowsInProgress:
     def get_calendar_episodes(self):
         from tmdbhelper.lib.addon.tmdate import date_in_range
         from tmdbhelper.lib.addon.plugin import get_setting
+
         if not get_setting('nextepisodes_usecalendar'):
             return
+
         if not self.calendar_data:
             return
+
         calendar = {}
+
         for i in self.calendar_data:
             try:
-                if not date_in_range(i['first_aired'], utc_convert=True, start_date=self.calendar_startdate, days=self.calendar_days):
+                # Check that date is still in range once utc_converted
+                if not date_in_range(
+                    i['first_aired'],
+                    utc_convert=True,
+                    start_date=self.calendar_startdate,
+                    days=self.calendar_days
+                ):
                     continue
-                if i['episode']['season'] == 0:  # Ignore specials
+
+                # Ignore specials
+                if i['episode']['season'] == 0:
                     continue
+
                 show = calendar.setdefault(i['show']['ids']['tmdb'], {})
                 show.setdefault(i['episode']['season'], []).append(i['episode']['number'])
+
             except KeyError:
                 continue
+
         return calendar
 
     def is_calendar_watched(self, tmdb_id):
