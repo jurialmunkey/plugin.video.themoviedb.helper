@@ -7,19 +7,16 @@ from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.thread import has_property_lock
 from tmdbhelper.lib.api.api_keys.trakt import CLIENT_ID, CLIENT_SECRET, USER_TOKEN
 from tmdbhelper.lib.api.trakt.content import TraktContent
+from tmdbhelper.lib.files.ftools import cached_property
 
 
 API_URL = 'https://api.trakt.tv/'
 
 
 class TraktSync:
-    @property
+    @cached_property
     def trakt_syncdata(self):
-        try:
-            return self._trakt_syncdata
-        except AttributeError:
-            self._trakt_syncdata = self.get_trakt_syncdata()
-            return self._trakt_syncdata
+        return self.get_trakt_syncdata()
 
     def get_trakt_syncdata(self):
         if not self.is_authorized:

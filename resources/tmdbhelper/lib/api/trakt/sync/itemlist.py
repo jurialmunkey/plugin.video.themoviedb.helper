@@ -43,7 +43,7 @@ class ItemListSyncDataProperties:
 
     @property
     def trakt_syncdata(self):
-        return self._class_instance_trakt_api.trakt_syncdata
+        return self.trakt_api.trakt_syncdata
 
     @cached_property
     def namedtuple_basic(self):
@@ -86,7 +86,7 @@ class ItemListSyncDataMethods:
         trakt_id = FindQueriesDatabase().get_trakt_id(id_value=i['id'], id_type='tmdb', item_type=item_type, output_type='trakt')
         if not trakt_id:
             return i
-        item = self._class_instance_trakt_api.get_details(item_type, trakt_id, season=i.get('season'), episode=i.get('episode'))
+        item = self.trakt_api.get_details(item_type, trakt_id, season=i.get('season'), episode=i.get('episode'))
         if not item:
             return i
         item.pop('ids', None)
@@ -140,8 +140,8 @@ class ItemListSyncData(ItemListSyncDataProperties, ItemListSyncDataMethods):
         'lastweek': ('last_watched_at', True, '', ),
     }
 
-    def __init__(self, class_instance_trakt_api, item_type=None, sort_by=None, sort_how=None, item_keys=None, tmdb_id=None):
-        self._class_instance_trakt_api = class_instance_trakt_api
+    def __init__(self, trakt_api, item_type=None, sort_by=None, sort_how=None, item_keys=None, tmdb_id=None):
+        self.trakt_api = trakt_api
         self.sort_by, self.sort_how = sort_by, sort_how
         self.item_keys = item_keys or ()
         self.item_type = item_type

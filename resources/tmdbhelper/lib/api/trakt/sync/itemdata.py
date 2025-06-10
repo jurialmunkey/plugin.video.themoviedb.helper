@@ -420,30 +420,14 @@ class SyncItem:
     )
 
     def __init__(self, item_type, meta, keys, key_prefix=None):
-        self._meta = meta
-        self._base_keys = keys
-        self._item_type = item_type
-        self._key_prefix = key_prefix
+        self.meta = meta
+        self.base_keys = keys
+        self.item_type = item_type
+        self.key_prefix = key_prefix
 
     @cached_property
     def data(self):
         return self.get_data()
-
-    @property
-    def meta(self):
-        return self._meta
-
-    @property
-    def item_type(self):
-        return self._item_type
-
-    @property
-    def key_prefix(self):
-        return self._key_prefix
-
-    @property
-    def base_keys(self):
-        return self._base_keys
 
     @property
     def additional_keys(self):

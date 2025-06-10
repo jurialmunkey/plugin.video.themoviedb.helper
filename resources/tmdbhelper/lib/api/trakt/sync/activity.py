@@ -1,3 +1,4 @@
+from tmdbhelper.lib.api.trakt.sync.property_mixins import SyncDataParentProperties
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.files.futils import json_loads as data_loads
 from tmdbhelper.lib.files.futils import json_dumps as data_dumps
@@ -9,21 +10,9 @@ from tmdbhelper.lib.files.locker import mutexlock
 LASTACTIVITIES_EXPIRY = 600
 
 
-class SyncLastActivitiesSyndDataProperties:
-    def __init__(self, class_instance_syncdata):
-        self.class_instance_syncdata = class_instance_syncdata
-
-    @property
-    def cache(self):
-        return self.class_instance_syncdata.cache
-
-    @property
-    def window(self):
-        return self.class_instance_syncdata.window
-
-    @property
-    def get_response_json(self):
-        return self.class_instance_syncdata.get_response_json
+class SyncLastActivitiesSyndDataProperties(SyncDataParentProperties):
+    def __init__(self, instance_syncdata):
+        self.instance_syncdata = instance_syncdata
 
 
 class SyncLastActivities(SyncLastActivitiesSyndDataProperties):

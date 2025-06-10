@@ -59,8 +59,8 @@ class SyncDataGetterAll:
     additional_keys = ()  # Additional keys to retrieve values for
     query_value_item_argx = 0  # Query value to use as sync item_type (normally item_type query is first ie 0 index)
 
-    def __init__(self, class_instance_syncdata):
-        self._class_instance_syncdata = class_instance_syncdata  # The SyncData object sync called from
+    def __init__(self, instance_syncdata):
+        self.instance_syncdata = instance_syncdata  # The SyncData object sync called from
 
     @cached_property
     def item_type(self):
@@ -103,8 +103,8 @@ class SyncDataGetterAll:
         return self.get_items()
 
     def get_items(self):
-        self._class_instance_syncdata.sync(self.item_type, self.keys)
-        return self._class_instance_syncdata.cache.get_list_values(keys=self.keys, values=self.query_values, conditions=self.clause)
+        self.instance_syncdata.sync(self.item_type, self.keys)
+        return self.instance_syncdata.cache.get_list_values(keys=self.keys, values=self.query_values, conditions=self.clause)
 
 
 class SyncDataGetterProgressWatchedUnHidden(SyncDataGetterAll):
@@ -236,16 +236,16 @@ class SyncDataGetterAllUnHiddenShowsInProgress:
     calendar_days = 15
     additional_keys = ()
 
-    def __init__(self, class_instance_syncdata):
-        self._class_instance_syncdata = class_instance_syncdata
+    def __init__(self, instance_syncdata):
+        self.instance_syncdata = instance_syncdata
 
     @property
     def get_episode_watchedcount(self):
-        return self._class_instance_syncdata.get_episode_watchedcount
+        return self.instance_syncdata.get_episode_watchedcount
 
     @property
     def get_episode_playcount(self):
-        return self._class_instance_syncdata.get_episode_playcount
+        return self.instance_syncdata.get_episode_playcount
 
     @cached_property
     def calendar_data(self):
@@ -254,7 +254,7 @@ class SyncDataGetterAllUnHiddenShowsInProgress:
     def get_calendar_data(self):
         from tmdbhelper.lib.items.directories.trakt.lists_calendar import ListTraktCalendarProperties
         list_properties = ListTraktCalendarProperties()
-        list_properties.trakt_api = self._class_instance_syncdata._class_instance_trakt_api
+        list_properties.trakt_api = self.instance_syncdata.trakt_api
         list_properties.trakt_date = self.calendar_startdate
         list_properties.trakt_days = self.calendar_days
         list_properties.trakt_type = 'episode'
@@ -325,7 +325,7 @@ class SyncDataGetterAllUnHiddenShowsInProgress:
         return self.get_parent_getter()
 
     def get_parent_getter(self):
-        sd = self._class_instance_syncdata.get_all_unhidden_shows_started_getter()
+        sd = self.instance_syncdata.get_all_unhidden_shows_started_getter()
         sd.additional_keys = self.parent_additional_keys
         return sd
 
@@ -444,17 +444,17 @@ class SyncDataGetters:
 
 class SyncData(SyncDataGetters):
 
-    def __init__(self, class_instance_trakt_api):
-        self._class_instance_trakt_api = class_instance_trakt_api  # The TraktAPI object sync called from
+    def __init__(self, trakt_api):
+        self.trakt_api = trakt_api  # The TraktAPI object sync called from
 
     def delete_response(self, *args, **kwargs):
-        return self._class_instance_trakt_api.delete_response(*args, **kwargs)
+        return self.trakt_api.delete_response(*args, **kwargs)
 
     def post_response(self, *args, **kwargs):
-        return self._class_instance_trakt_api.post_response(*args, **kwargs)
+        return self.trakt_api.post_response(*args, **kwargs)
 
     def get_response_json(self, *args, **kwargs):
-        return self._class_instance_trakt_api.get_response_json(*args, **kwargs)
+        return self.trakt_api.get_response_json(*args, **kwargs)
 
     @cached_property
     def routes(self):
