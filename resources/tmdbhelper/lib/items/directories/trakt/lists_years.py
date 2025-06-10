@@ -15,7 +15,8 @@ def get_year_directory_item(x, tmdb_type):
 
 class ListTraktYears(ContainerDirectory):
     def get_items(self, tmdb_type, **kwargs):
+        from tmdbhelper.lib.addon.tmdate import get_datetime_today
         return [
             get_year_directory_item(x, tmdb_type)
-            for x in range(1900, 2030)
+            for x in reversed(range(1900, int(get_datetime_today().strftime("%Y")) + 1))
         ]
