@@ -1,6 +1,6 @@
 from tmdbhelper.lib.items.directories.trakt.mapper_basic import ItemMapper
 from tmdbhelper.lib.files.ftools import cached_property
-from tmdbhelper.lib.addon.plugin import get_localized
+from tmdbhelper.lib.addon.plugin import get_localized, get_setting, ADDONPATH
 from contextlib import suppress
 
 RUNSCRIPT = 'Runscript(plugin.video.themoviedb.helper,{})'
@@ -127,3 +127,48 @@ class StaticOwnedItemMapper(StaticItemMapper):
             )
         ]
         return context_menu
+
+
+class StaticGenresItemMapper(ItemMapper):
+
+    def __init__(self, *args, tmdb_type, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.tmdb_type = tmdb_type
+
+    @cached_property
+    def label(self):
+        return self.meta['name']
+
+    @cached_property
+    def slug(self):
+        return self.meta['slug']
+
+    @cached_property
+    def icon_path(self):
+        return get_setting('trakt_genre_icon_location', 'str')
+
+    @cached_property
+    def custom_icon(self):
+        import xbmcvfs
+        custom_icon = xbmcvfs.validatePath(xbmcvfs.translatePath(f'{self.icon_path}/{self.slug}.png'))
+        custom_icon = custom_icon if custom_icon and xbmcvfs.exists(custom_icon) else None
+        return custom_icon
+
+    @cached_property
+    def icon(self):
+        icon = self.custom_icon if self.icon_path else None
+        icon = icon or f'{ADDONPATH}/resources/icons/trakt/genres.png'
+        return icon
+
+    def get_art(self):
+        return {'icon': self.icon}
+
+    def get_unique_ids(self):
+        return {'slug': self.slug}
+
+    def get_params(self):
+        return {
+            'info': 'dir_trakt_genre',
+            'genre': self.slug,
+            'tmdb_type': self.tmdb_type,
+        }

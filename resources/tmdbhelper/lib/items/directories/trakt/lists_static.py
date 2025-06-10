@@ -6,7 +6,8 @@ from tmdbhelper.lib.items.directories.trakt.mapper_static import (
     StaticItemMapper,
     StaticUnLikedItemMapper,
     StaticLikedItemMapper,
-    StaticOwnedItemMapper
+    StaticOwnedItemMapper,
+    StaticGenresItemMapper
 )
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
@@ -63,6 +64,15 @@ class ListTraktStaticListedProperties(ListTraktStaticProperties):
     def get_mapped_item(self, item, add_infoproperties=None):
         """ Listed lists are flatter so need to reconfigure to match config of other types """
         return super().get_mapped_item({'list': item}, add_infoproperties=add_infoproperties)
+
+
+class ListTraktStaticGenresProperties(ListTraktStaticProperties):
+    @property
+    def url(self):
+        return self.request_url.format(trakt_type=self.trakt_type)
+
+    def get_mapped_item(self, item, add_infoproperties=None):
+        return self.item_mapper_class(item, add_infoproperties, tmdb_type=self.tmdb_type).item
 
 
 class ListTraktStatic(ListTraktStandard):
@@ -175,5 +185,17 @@ class ListTraktStaticListed(ListTraktStatic):
     def get_items(self, *args, tmdb_id, sort_by=None, **kwargs):
         self.list_properties.tmdb_id = tmdb_id
         self.list_properties.trakt_sort = sort_by or 'popular'
-        self.list_properties.container_content = ''
         return super().get_items(*args, **kwargs)
+
+
+class ListTraktStaticGenres(ListTraktStatic):
+
+    list_properties_class = ListTraktStaticGenresProperties
+
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.item_mapper_class = StaticGenresItemMapper
+        list_properties.request_url = 'genres/{trakt_type}s'
+        list_properties.plugin_name = '{localized}'
+        list_properties.localize = 135
+        return list_properties

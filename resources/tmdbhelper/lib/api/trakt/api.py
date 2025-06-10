@@ -6,7 +6,6 @@ from tmdbhelper.lib.api.request import RequestAPI
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.thread import has_property_lock
 from tmdbhelper.lib.api.api_keys.trakt import CLIENT_ID, CLIENT_SECRET, USER_TOKEN
-from tmdbhelper.lib.api.trakt.content import TraktContent
 from tmdbhelper.lib.files.ftools import cached_property
 
 
@@ -25,7 +24,7 @@ class TraktSync:
         return SyncData(self)
 
 
-class TraktAPI(RequestAPI, TraktContent, TraktSync):
+class TraktAPI(RequestAPI, TraktSync):
 
     client_id = CLIENT_ID
     client_secret = CLIENT_SECRET
