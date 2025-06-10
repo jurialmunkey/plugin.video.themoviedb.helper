@@ -288,8 +288,8 @@ ROUTE_NOID = {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_custom',
         'import_attr': 'ListTraktCustom'}},
     'trakt_sortby': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_trakt',
-        'import_attr': 'ListSortBy'}},
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sorting',
+        'import_attr': 'ListTraktSortBy'}},
     'trakt_genres': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_static',
         'import_attr': 'ListTraktStaticGenres'}},
