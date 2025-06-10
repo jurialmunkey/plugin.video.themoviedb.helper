@@ -744,6 +744,14 @@ def _get_basedir_trakt():
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/trakt/genres.png'}},
         {
+            'label': u'{{item_type}}{{space}}{}'.format(get_localized(652)),
+            'types': ['movie', 'tv'],
+            'params': {'info': 'trakt_years'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/calendar.png'}},
+        {
             'label': u'{}{{space}}{{item_type}}'.format(get_localized(32204)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_trending'},
@@ -796,6 +804,13 @@ def _get_basedir_trakt():
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/trakt/boxoffice.png'}},
+        _get_trakt_popular_years(1900),
+        _get_trakt_popular_years(1910),
+        _get_trakt_popular_years(1920),
+        _get_trakt_popular_years(1930),
+        _get_trakt_popular_years(1940),
+        _get_trakt_popular_years(1950),
+        _get_trakt_popular_years(1960),
         _get_trakt_popular_years(1970),
         _get_trakt_popular_years(1980),
         _get_trakt_popular_years(1990),

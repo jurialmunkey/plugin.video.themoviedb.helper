@@ -114,17 +114,15 @@ def get_sort_methods(info=None):
         )]
 
 
+def get_sort_directory_item(i, **params):
+    item = get_empty_item()
+    item['label'] = f'{params.get("list_name")} - {i["name"]}'
+    item['params'] = params
+    item['params'].update(i['params'])
+    return item
+
+
 class ListTraktSortBy(ContainerDirectory):
-    def get_items(self, info, **kwargs):
-
-        def _listsortby_item(i, **params):
-            item = get_empty_item()
-            item['label'] = item['infolabels']['title'] = f'{params.get("list_name")} - {i["name"]}'
-            item['params'] = params
-            item['params'].update(i['params'])
-            return item
-
-        kwargs['info'] = kwargs.pop('parent_info', None)
-        items = get_sort_methods(kwargs['info'])
-        items = [_listsortby_item(i, **kwargs) for i in items]
+    def get_items(self, info, parent_info=None, **kwargs):
+        items = [get_sort_directory_item(i, info=parent_info, **kwargs) for i in get_sort_methods(parent_info)]
         return items

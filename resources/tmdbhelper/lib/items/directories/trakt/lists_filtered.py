@@ -1,11 +1,24 @@
 from jurialmunkey.parser import try_int
+from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.directories.trakt.lists_standard import (
+    ListTraktStandardProperties,
     ListTraktStandard,
     PAGES_LENGTH
 )
 
 
+class ListTraktFilteredProperties(ListTraktStandardProperties):
+    @cached_property
+    def plugin_category(self):
+        plugin_category = self.plugin_name.format(localized=self.localized, plural=self.plural)
+        plugin_category = f'{plugin_category} ({" ".join([f"{v}".capitalize() for v in self.trakt_filters.values()])})' if self.trakt_filters else plugin_category
+        return plugin_category
+
+
 class ListTraktFiltered(ListTraktStandard):
+
+    list_properties_class = ListTraktFilteredProperties
+
     def get_items(
         self, *args, length=None,
         genres=None,

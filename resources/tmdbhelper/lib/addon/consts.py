@@ -293,6 +293,9 @@ ROUTE_NOID = {
     'trakt_genres': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_static',
         'import_attr': 'ListTraktStaticGenres'}},
+    'trakt_years': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_years',
+        'import_attr': 'ListTraktYears'}},
     'mdblist_locallist': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_local',
         'import_attr': 'ListMDbListLocal'}},
