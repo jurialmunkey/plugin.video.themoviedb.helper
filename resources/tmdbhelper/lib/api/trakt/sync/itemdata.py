@@ -57,16 +57,16 @@ class SyncItemData:
             return 'movie'
 
     """
-    trakt_id
+    trakt_slug
     """
     @cached_property
-    def trakt_id(self):
-        return self.get_trakt_id()
+    def trakt_slug(self):
+        return self.get_trakt_slug()
 
-    def get_trakt_id(self):
+    def get_trakt_slug(self):
         if self.parent_item_type not in self.item:
             return
-        return self.item[self.parent_item_type]['ids']['trakt']
+        return self.item[self.parent_item_type]['ids']['slug']
 
     """
     item_id
@@ -415,7 +415,7 @@ class SyncItem:
 
     _additional_keys = (
         'item_type', 'tmdb_type', 'tmdb_id', 'season_number', 'episode_number',
-        'trakt_id', 'premiered', 'year', 'title', 'status', 'country', 'certification', 'runtime',
+        'trakt_slug', 'premiered', 'year', 'title', 'status', 'country', 'certification', 'runtime',
         'trakt_rating', 'trakt_votes',
     )
 

@@ -83,14 +83,15 @@ class ItemListSyncDataMethods:
     def make_detailed_item(self, i, item_type='show'):
         if not i['id']:
             return i
-        trakt_id = FindQueriesDatabase().get_trakt_id(id_value=i['id'], id_type='tmdb', item_type=item_type, output_type='trakt')
-        if not trakt_id:
+
+        trakt_slug = FindQueriesDatabase().get_trakt_id(id_value=i['id'], id_type='tmdb', item_type=item_type, output_type='slug')
+        if not trakt_slug:
             return i
 
         snum = i.get('season')
         enum = i.get('episode')
         args = ['seasons', snum, 'episode', enum] if snum is not None and enum is not None else []
-        args = [item_type, trakt_id] + args
+        args = [item_type, trakt_slug] + args
         item = self.trakt_api.get_response_json(*args)
 
         if not item:

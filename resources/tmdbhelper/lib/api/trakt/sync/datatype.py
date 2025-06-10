@@ -251,9 +251,9 @@ class SyncNextEpisodeItem:
             return
 
     @cached_property
-    def trakt_id(self):
+    def trakt_slug(self):
         try:
-            return self.item['trakt_id']
+            return self.item['trakt_slug']
         except (KeyError, TypeError, NameError):
             return
 
@@ -315,10 +315,10 @@ class SyncNextEpisodeItem:
 
     @cached_property
     def response(self):
-        if not self.trakt_id:
+        if not self.trakt_slug:
             return
         return self.get_response_sync(
-            f'shows/{self.trakt_id}/progress/watched',
+            f'shows/{self.trakt_slug}/progress/watched',
             extended='full')
 
     @cached_property
@@ -345,7 +345,7 @@ class SyncNextEpisodeItem:
             "show": {
                 "ids": {
                     "tmdb": self.tmdb_id,
-                    "trakt": self.trakt_id
+                    "trakt": self.trakt_slug
                 }
             }
         }
@@ -365,7 +365,7 @@ class SyncAllNextEpisodes(DataTypeEpisodes):
 
         def get_item(i, item_id):
             tmdb_type, tmdb_id, season_number, episode_number = item_id.split('.')
-            item = {"show": {"ids": {"tmdb": i["tmdb_id"], "trakt": i["trakt_id"]}}}
+            item = {"show": {"ids": {"tmdb": i["tmdb_id"], "trakt": i["trakt_slug"]}}}
             item['upnext_episode_id'] = item_id
             item['type'] = 'episode'
             item['episode'] = {'season': season_number, 'number': episode_number}
@@ -374,9 +374,9 @@ class SyncAllNextEpisodes(DataTypeEpisodes):
         def update_dialog_progress(sync):
             self.dialog_progress_bg.increment()
             self.dialog_progress_bg.set_message((
-                f'Skip: {sync.tmdb_id} {sync.trakt_id}'
+                f'Skip: {sync.tmdb_id} {sync.trakt_slug}'
                 if not sync.all_next_episodes
-                else f'Sync: {sync.tmdb_id} {sync.trakt_id}'
+                else f'Sync: {sync.tmdb_id} {sync.trakt_slug}'
             ))
 
         def get_items(i):
@@ -392,7 +392,7 @@ class SyncAllNextEpisodes(DataTypeEpisodes):
 
         def get_sd():
             sd = self.instance_syncdata.get_all_unhidden_shows_inprogress_getter()
-            sd.additional_keys = ('trakt_id', )
+            sd.additional_keys = ('trakt_slug', )
             return sd
 
         with TimerFunc(f'Sync: {self.__class__.__name__} get_meta {self.method} {self.item_type}', inline=True, log_threshold=0.001):
@@ -432,7 +432,7 @@ class SyncNextEpisodes(SyncAllNextEpisodes):
 
         def get_sd():
             sd = self.instance_syncdata.get_all_unhidden_shows_inprogress_getter()
-            sd.additional_keys = ('trakt_id', )
+            sd.additional_keys = ('trakt_slug', )
             return sd
 
         with TimerFunc(f'Sync: {self.__class__.__name__} get_meta {self.method} {self.item_type}', inline=True, log_threshold=0.001):

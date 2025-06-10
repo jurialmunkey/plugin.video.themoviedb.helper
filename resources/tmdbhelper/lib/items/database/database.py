@@ -83,6 +83,10 @@ class ItemDetailsDatabase(Database):
             'DROP TABLE IF EXISTS movie',
             'DROP TABLE IF EXISTS baseitem',
         ),
+        29: (
+            'DROP TABLE IF EXISTS simplecache',
+            'DROP TABLE IF EXISTS lactivities',
+        )
     }
 
     baseitem_columns = BASEITEM_COLUMNS

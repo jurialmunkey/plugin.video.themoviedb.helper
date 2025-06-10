@@ -781,8 +781,8 @@ SIMPLECACHE_COLUMNS = {
         'data': 'INTEGER',
         'sync': None
     },
-    'trakt_id': {
-        'data': 'INTEGER',
+    'trakt_slug': {
+        'data': 'TEXT',
         'sync': None
     },
     'premiered': {
