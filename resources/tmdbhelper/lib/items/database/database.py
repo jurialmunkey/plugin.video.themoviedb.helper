@@ -39,7 +39,7 @@ class ItemDetailsDatabase(Database):
         super().__init__(filename=self.cache_filename)
 
     # DB version must be max of table_version
-    database_version = 28
+    database_version = 29
 
     database_changes = {
         21: (

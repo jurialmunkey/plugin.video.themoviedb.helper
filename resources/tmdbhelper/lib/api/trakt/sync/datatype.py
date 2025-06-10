@@ -345,7 +345,7 @@ class SyncNextEpisodeItem:
             "show": {
                 "ids": {
                     "tmdb": self.tmdb_id,
-                    "trakt": self.trakt_slug
+                    "slug": self.trakt_slug
                 }
             }
         }
@@ -365,7 +365,7 @@ class SyncAllNextEpisodes(DataTypeEpisodes):
 
         def get_item(i, item_id):
             tmdb_type, tmdb_id, season_number, episode_number = item_id.split('.')
-            item = {"show": {"ids": {"tmdb": i["tmdb_id"], "trakt": i["trakt_slug"]}}}
+            item = {"show": {"ids": {"tmdb": i["tmdb_id"], "slug": i["trakt_slug"]}}}
             item['upnext_episode_id'] = item_id
             item['type'] = 'episode'
             item['episode'] = {'season': season_number, 'number': episode_number}

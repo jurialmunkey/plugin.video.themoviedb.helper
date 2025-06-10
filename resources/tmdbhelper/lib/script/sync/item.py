@@ -230,8 +230,8 @@ class ItemSyncGetters:
         if self.season is None:
             return self.trakt_api.get_response_json(f'{self.base_trakt_type}s', self.trakt_slug)
         if self.episode is None:
-            return self.trakt_api.get_response_json(f'{self.base_trakt_type}s', self.trakt_slug, 'seasons', self.season)
-        return self.trakt_api.get_response_json(f'{self.base_trakt_type}s', self.trakt_slug, 'seasons', self.season, 'episodes', self.episode)
+            return self.trakt_api.get_response_json('shows', self.trakt_slug, 'seasons', self.season)
+        return self.trakt_api.get_response_json('shows', self.trakt_slug, 'seasons', self.season, 'episodes', self.episode)
 
     def get_is_successful_sync(self):
         if not self.sync_response:

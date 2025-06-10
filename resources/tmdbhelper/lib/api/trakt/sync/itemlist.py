@@ -90,8 +90,8 @@ class ItemListSyncDataMethods:
 
         snum = i.get('season')
         enum = i.get('episode')
-        args = ['seasons', snum, 'episode', enum] if snum is not None and enum is not None else []
-        args = [item_type, trakt_slug] + args
+        args = ['seasons', snum, 'episodes', enum] if snum is not None and enum is not None else []
+        args = [f'{item_type}s', trakt_slug] + args
         item = self.trakt_api.get_response_json(*args)
 
         if not item:
