@@ -101,13 +101,13 @@ def get_external_ids(tmdb_type, tmdb_id, season=None, episode=None):
     if not trakt_id:
         return
 
-    details = trakt_api.get_details(trakt_type, trakt_id, extended=None)
+    details = trakt_api.get_response_json(trakt_type, trakt_id)
     if not details or not details.get('ids'):
         return
 
     if episode is not None:
         _uids = {f'tvshow.{i}': details['ids'][i] for i in EXTERNAL_ID_TYPES if details['ids'].get(i)}
-        _episode_details_ids = trakt_api.get_details(trakt_type, trakt_id, season=season, episode=episode, extended=None).get('ids') or {}
+        _episode_details_ids = trakt_api.get_response_json(trakt_type, trakt_id, 'seasons', season, 'episode', episode).get('ids') or {}
         _uids.update({f'{i}': _episode_details_ids[i] for i in EXTERNAL_ID_TYPES if _episode_details_ids.get(i)})
         _uids['tvshow.tmdb'] = tmdb_id
     else:

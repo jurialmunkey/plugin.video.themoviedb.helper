@@ -86,11 +86,19 @@ class ItemListSyncDataMethods:
         trakt_id = FindQueriesDatabase().get_trakt_id(id_value=i['id'], id_type='tmdb', item_type=item_type, output_type='trakt')
         if not trakt_id:
             return i
-        item = self.trakt_api.get_details(item_type, trakt_id, season=i.get('season'), episode=i.get('episode'))
+
+        snum = i.get('season')
+        enum = i.get('episode')
+        args = ['seasons', snum, 'episode', enum] if snum is not None and enum is not None else []
+        args = [item_type, trakt_id] + args
+        item = self.trakt_api.get_response_json(*args)
+
         if not item:
             return i
+
         item.pop('ids', None)
         item.update(i)
+
         return item
 
     def make_list(self, sd_func):

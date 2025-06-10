@@ -35,15 +35,3 @@ class TraktContent():
             from tmdbhelper.lib.api.trakt.methods.lists import filter_inprogress
             self._filter_inprogress = filter_inprogress
             return self._filter_inprogress(self, *args, **kwargs)
-
-    """
-    TRAKT DETAILS METHODS
-    """
-
-    def get_details(self, *args, **kwargs):
-        try:
-            return self._get_details(self, *args, **kwargs)
-        except AttributeError:
-            from tmdbhelper.lib.api.trakt.methods.details import get_details
-            self._get_details = get_details
-            return self._get_details(self, *args, **kwargs)
