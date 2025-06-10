@@ -165,43 +165,37 @@ def revoke_trakt(**kwargs):
 
 
 def get_stats(**kwargs):
-    from tmdbhelper.lib.api.trakt.api import TraktAPI
+    from tmdbhelper.lib.query.database.database import FindQueriesDatabase
     from jurialmunkey.window import get_property
 
-    response = TraktAPI().get_request('users/me/stats', cache_days=0.015)
-    if not response:
+    stats = FindQueriesDatabase().get_trakt_stats()
+    if not stats:
         return
 
     combined_stats = {}
 
-    def _set_property(name, value, key):
-        get_property(name, set_property=f'{value}')
-        if not isinstance(value, int):
-            return
-        combined_stats.setdefault(key, 0)
-        combined_stats[key] += value
+    def set_proptime(prop_name, v):
+        days, minutes = divmod(int(v), 60 * 24)
+        hour, minutes = divmod(int(minutes), 60)
+        get_property(f'{prop_name}_d', set_property=f'{days}')
+        get_property(f'{prop_name}_h', set_property=f'{hour}')
+        get_property(f'{prop_name}_mm', set_property=f'{minutes}')
 
-    def _set_stats(d, prop):
+    def set_property(base_name, stat_name, stat_type, v):
+        prop_name = f'{base_name}.{stat_type}.{stat_name}'
+        get_property(prop_name, set_property=f'{v}')
+        set_proptime(prop_name, v) if stat_name == 'minutes' else None
+
+    def set_combined(stat_name, v):
+        stat_name = f'{stat_name}_total'
+        combined_stats.setdefault(stat_name, 0)
+        combined_stats[stat_name] += v
+
+    def set_allstats(d, base_name, update_combined=True):
         for k, v in d.items():
-            name = f'{prop}.{k}'
-            if isinstance(v, dict):
-                _set_stats(v, name)
-                continue
-            _set_property(name, v, key=k)
-            if k == 'minutes':
-                days, minutes = divmod(int(v), 60 * 24)
-                hours, minutes = divmod(int(minutes), 60)
-                _set_property(f'{name}_d', days, key=k)
-                _set_property(f'{name}_h', hours, key=k)
-                _set_property(f'{name}_mm', minutes, key=k)
+            stat_name, stat_type = k.split('_')
+            set_property(base_name, stat_name, stat_type, v)
+            set_combined(stat_name, v) if update_combined else None
 
-    _set_stats(response, 'TraktStats')
-    _set_stats(combined_stats, 'TraktStats.Total')
-
-    for i in ('movie', 'episode', ''):
-        path = f'users/me/history/{i}s' if i else 'users/me/history'
-        response = TraktAPI().get_request(path, cache_days=0.015, limit=1)
-        if not response:
-            continue
-        for x, j in enumerate(response):
-            _set_stats(j, f'TraktStats.Recent{i}.{x}')
+    set_allstats(stats, 'TraktStats')
+    set_allstats(combined_stats, 'TraktStats', update_combined=False)
