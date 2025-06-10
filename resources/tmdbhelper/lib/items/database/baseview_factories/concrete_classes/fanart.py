@@ -1,9 +1,12 @@
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.basemedia import MediaList
+from tmdbhelper.lib.addon.consts import DATALEVEL_MIN
 
 
 class FanartMediaList(MediaList):
-    cached_data_table = table = 'art'
-    cached_data_base_conditions = 'parent_id=? AND type=?'
+    table = 'art'
+    cached_data_table = 'baseitem INNER JOIN art ON art.parent_id = baseitem.id'
+    cached_data_base_conditions = 'parent_id=? AND type=? AND baseitem.expiry>=? AND baseitem.datalevel>=?'
+    cached_data_value_type = 'backdrops'
     cached_data_check_key = 'parent_id'
     keys = ('icon', 'iso_language', 'rating', 'parent_id')
     item_mediatype = 'image'
@@ -30,7 +33,7 @@ class FanartMediaList(MediaList):
 
     @property
     def cached_data_values(self):
-        return (self.item_id, 'backdrops')
+        return (self.item_id, self.cached_data_value_type, self.current_time, DATALEVEL_MIN)
 
     def image_path_func(self, v):
         return self.common_apis.tmdb_imagepath.get_imagepath_fanart(v)
