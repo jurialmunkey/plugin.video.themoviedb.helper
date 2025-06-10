@@ -2,7 +2,7 @@ from xbmcgui import Dialog, DialogProgress
 from jurialmunkey.parser import try_int, boolean
 from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.plugin import get_localized, get_setting, ADDONPATH
-from tmdbhelper.lib.api.request import RequestAPI
+from tmdbhelper.lib.api.request import NoCacheRequestAPI
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.thread import has_property_lock
 from tmdbhelper.lib.api.api_keys.trakt import CLIENT_ID, CLIENT_SECRET, USER_TOKEN
@@ -24,7 +24,7 @@ class TraktSync:
         return SyncData(self)
 
 
-class TraktAPI(RequestAPI, TraktSync):
+class TraktAPI(NoCacheRequestAPI, TraktSync):
 
     client_id = CLIENT_ID
     client_secret = CLIENT_SECRET
