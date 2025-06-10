@@ -101,7 +101,7 @@ def get_external_ids(tmdb_type, tmdb_id, season=None, episode=None):
     if not trakt_slug:
         return
 
-    details = trakt_api.get_response_json(trakt_type, trakt_slug)
+    details = trakt_api.get_response_json(f'{trakt_type}s', trakt_slug)
     if not details or not details.get('ids'):
         return
 
