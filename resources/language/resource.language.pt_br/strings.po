@@ -306,6 +306,26 @@ msgctxt "#32037"
 msgid "Use bundled players"
 msgstr "Usar players embutidos"
 
+#: /resources/tmdbhelper/lib/items/directories/lists_base.py
+msgctxt "#32062"
+msgid "Networks"
+msgstr "Emissoras"
+
+#: /resources/tmdbhelper/lib/api/trakt/sorting.py
+msgctxt "#32063"
+msgid "Added"
+msgstr "Relacionado"
+
+#: /resources/tmdbhelper/lib/items/directories/lists_base.py
+msgctxt "#32064"
+msgid "Related"
+msgstr "Relacionado"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_related.py
+msgctxt "#32065"
+msgid "Watchers"
+msgstr "Observadores"
+
 #: /resources/settings.xml
 msgctxt "#32038"
 msgid "Get additional details from the local Kodi library database"
