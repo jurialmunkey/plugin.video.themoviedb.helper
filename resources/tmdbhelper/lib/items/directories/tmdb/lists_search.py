@@ -89,14 +89,14 @@ class ListMultiSearchDir(ListSearchDir):
 
 class ListSearchProperties(ListStandardProperties):
     @cached_property
-    def cache_name(self):
-        return '_'.join(map(str, (
+    def cache_name_tuple(self):
+        return (
             self.class_name,
             self.query,
             self.tmdb_type,
             self.page,
             self.length,
-        )))
+        )
 
     def get_search_query(self):
         from tmdbhelper.lib.addon.consts import PARAM_WIDGETS_RELOAD_FORCED

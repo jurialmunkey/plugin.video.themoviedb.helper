@@ -40,6 +40,16 @@ class UncachedMDbListCustomData(UncachedMDbListLocalData):
 class ListMDbListCustomProperties(ListMDbListLocalProperties):
 
     @cached_property
+    def cache_name_tuple(self):
+        return (
+            self.class_name,
+            self.list_id,
+            self.tmdb_type,
+            self.page,
+            self.length,
+        )
+
+    @cached_property
     def url(self):
         return self.request_url.format(list_id=self.list_id)
 

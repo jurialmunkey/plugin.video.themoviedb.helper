@@ -49,10 +49,6 @@ class ListTraktStandardProperties(ListStandardProperties):
         return self.length * 20
 
     @cached_property
-    def cache_name(self):
-        return '_'.join(map(str, self.cache_name_tuple))
-
-    @cached_property
     def cache_name_tuple(self):
         cache_name_tuple = self.get_cache_name_list_filter()
         cache_name_tuple = self.get_cache_name_list_prefix() + cache_name_tuple

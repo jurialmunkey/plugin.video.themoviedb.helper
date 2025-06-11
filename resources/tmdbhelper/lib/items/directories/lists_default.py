@@ -37,12 +37,16 @@ class ListProperties:
 
     @cached_property
     def cache_name(self):
-        return '_'.join(map(str, (
+        return '_'.join(map(str, self.cache_name_tuple))
+
+    @cached_property
+    def cache_name_tuple(self):
+        return (
             self.class_name,
             self.tmdb_type,
             self.page,
             self.length
-        )))
+        )
 
     @cached_property
     def unconfigured_item_data(self):

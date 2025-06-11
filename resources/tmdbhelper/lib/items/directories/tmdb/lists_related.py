@@ -9,14 +9,14 @@ class ListRelatedProperties(ListStandardProperties):
         return self.request_url.format(tmdb_type=self.tmdb_type, tmdb_id=self.tmdb_id)
 
     @cached_property
-    def cache_name(self):
-        return '_'.join(map(str, (
+    def cache_name_tuple(self):
+        return (
             self.class_name,
             self.tmdb_type,
             self.tmdb_id,
             self.page,
             self.length
-        )))
+        )
 
 
 class ListRelated(ListStandard):
