@@ -62,6 +62,7 @@ class ListTraktCustom(ListTraktStandard):
         user_slug=None,
         sort_by=None,
         sort_how=None,
+        tmdb_type=None,
         owner=False,
         **kwargs
     ):
@@ -71,7 +72,7 @@ class ListTraktCustom(ListTraktStandard):
         self.list_properties.sort_how = sort_how
         self.list_properties.owner = boolean(owner)
         self.list_properties.trakt_authorization = bool(self.list_properties.owner or self.list_properties.user_slug == 'me')
-        return super().get_items(*args, **kwargs)
+        return super().get_items(*args, tmdb_type=tmdb_type, **kwargs)
 
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
