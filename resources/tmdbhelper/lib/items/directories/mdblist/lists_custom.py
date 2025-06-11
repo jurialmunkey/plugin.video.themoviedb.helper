@@ -22,9 +22,7 @@ class UncachedMDbListCustomData(UncachedMDbListLocalData):
 
     @cached_property
     def json(self):
-        json = self.response.json() or {}
-        json = [i for _, medialist in json.items() for i in medialist]
-        return json
+        return self.response.json() or {}
 
     @cached_property
     def data(self):
@@ -39,15 +37,20 @@ class UncachedMDbListCustomData(UncachedMDbListLocalData):
 
 class ListMDbListCustomProperties(ListMDbListLocalProperties):
 
+    genre = None
+    sort_by = None
+    sort_how = None
+
     @cached_property
     def cache_name_tuple(self):
-        return (
+        cache_name_tuple = [
             self.class_name,
             self.list_id,
-            self.tmdb_type,
-            self.page,
-            self.length,
-        )
+            self.tmdb_type
+        ] + sorted([
+            f'{k}={v}' for k, v in self.response_kwgs.items()
+        ])
+        return tuple(cache_name_tuple)
 
     @cached_property
     def url(self):
@@ -57,8 +60,21 @@ class ListMDbListCustomProperties(ListMDbListLocalProperties):
     def offset(self):
         return ((self.page - 1) * 20)
 
+    @cached_property
+    def response_kwgs(self):
+        return {
+            k: v for k, v in (
+                ('sort', self.sort_by),
+                ('order', self.sort_how),
+                ('limit', self.limit),
+                ('offset', self.offset),
+                ('filter_genre', self.genre),
+                ('unified', 'true'),
+            ) if v
+        }
+
     def get_api_response(self, page=1):
-        response = self.mdblist_api.get_response(self.url, limit=self.limit, offset=self.offset)
+        response = self.mdblist_api.get_response(self.url, **self.response_kwgs)
         return UncachedMDbListCustomData(response, self.page, self.limit).data
 
 
@@ -73,9 +89,22 @@ class ListMDbListCustom(ListStandard):
         list_properties.mdblist_api = self.mdblist_api
         return list_properties
 
-    def get_items(self, *args, list_id, length=None, tmdb_type=None, **kwargs):
+    def get_items(
+        self,
+        *args,
+        list_id,
+        length=None,
+        genre=None,
+        tmdb_type=None,
+        sort_by=None,
+        sort_how=None,
+        **kwargs
+    ):
         self.list_properties.list_id = list_id
+        self.list_properties.genre = genre
         self.list_properties.tmdb_type = tmdb_type or 'both'
+        self.list_properties.sort_by = sort_by
+        self.list_properties.sort_how = sort_how
         return super().get_items(
             *args,
             length=try_int(length) or PAGES_LENGTH,
