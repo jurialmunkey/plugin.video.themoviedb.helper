@@ -73,7 +73,7 @@ def refresh_item(tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
 
 def delete_itemtype(mediatype=None, confirmation=True, **kwargs):
     from xbmcgui import Dialog
-    from tmdbhelper.lib.addon.dialog import BusyDialog
+    from tmdbhelper.lib.addon.dialog import ProgressDialog
     from tmdbhelper.lib.addon.logger import TimerFunc
     from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
 
@@ -114,13 +114,22 @@ def delete_itemtype(mediatype=None, confirmation=True, **kwargs):
     ):
         return
 
-    with BusyDialog():
+    with ProgressDialog(
+        title=f'{get_localized(32387).format(mediatype.capitalize())}',
+        total=(len(routes[mediatype]['baseitems']) + len(routes[mediatype]['tables']) + 1),
+        background=False,
+    ) as progress_dialog:
         database = ItemDetailsDatabase()
         with TimerFunc(f'Deleting mediatype {mediatype}:', inline=True):
             for i in routes[mediatype]['baseitems']:
-                database.execute_sql(f'DELETE FROM baseitem WHERE mediatype="{i}"')
+                statement = f'DELETE FROM baseitem WHERE mediatype="{i}"'
+                progress_dialog.update(statement)
+                database.execute_sql(statement)
             for i in routes[mediatype]['tables']:
-                database.execute_sql(f'DELETE FROM {i}')
+                statement = f'DELETE FROM {i}'
+                progress_dialog.update(statement)
+                database.execute_sql(statement)
+            progress_dialog.update('Vacuuming database...')
             database.execute_sql('VACUUM')
 
     if confirmation:

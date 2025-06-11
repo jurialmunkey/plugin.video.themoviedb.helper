@@ -64,6 +64,7 @@ def sort_list(**kwargs):
 def invalidate_trakt_sync(invalidate_trakt_sync, notification=True, **kwargs):
     import itertools
     from xbmcgui import Dialog
+    from tmdbhelper.lib.addon.dialog import ProgressDialog
     from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
     from tmdbhelper.lib.addon.plugin import get_localized
     from tmdbhelper.lib.api.trakt.sync.datatype import (
@@ -132,24 +133,38 @@ def invalidate_trakt_sync(invalidate_trakt_sync, notification=True, **kwargs):
             return
         route = routes[route_keys[x]]
 
-    # init database
-    database = ItemDetailsDatabase()
+    def invalidate_sync(progress_dialog=None):
+        # init database
+        progress_dialog.update('Initialise database') if progress_dialog else None
+        database = ItemDetailsDatabase()
 
-    # delete column data for datatypes
-    database_keys = tuple((_build_keys(i) for i in route['data']))
-    database_keys = tuple(itertools.chain.from_iterable(database_keys))
-    database.del_column_values(table='simplecache', keys=database_keys)
+        # delete column data for datatypes
+        database_keys = tuple((_build_keys(i) for i in route['data']))
+        database_keys = tuple(itertools.chain.from_iterable(database_keys))
+        progress_dialog.update(f'Deleting simplecache keys: {database_keys}') if progress_dialog else None
+        database.del_column_values(table='simplecache', keys=database_keys)
 
-    # clean up corresponding last activity values
-    database_lactivities_ids = tuple((_build_lactivities_ids(i) for i in route['data']))
-    database_lactivities_ids = tuple(itertools.chain.from_iterable(database_lactivities_ids))
-    for x, item_id in enumerate(database_lactivities_ids, 1):
-        database.del_item(table='lactivities', item_id=item_id)
+        # clean up corresponding last activity values
+        database_lactivities_ids = tuple((_build_lactivities_ids(i) for i in route['data']))
+        database_lactivities_ids = tuple(itertools.chain.from_iterable(database_lactivities_ids))
+        progress_dialog.update(f'Deleting last activities keys: {database_lactivities_ids}') if progress_dialog else None
+        for x, item_id in enumerate(database_lactivities_ids, 1):
+            database.del_item(table='lactivities', item_id=item_id)
 
-    # notify of success
+    # show dialog or not
     if not notification:
+        invalidate_sync()
         return
-    Dialog().ok(get_localized(32026), get_localized(32027).format(route['name'].lower()))
+
+    with ProgressDialog(
+        title=get_localized(32022),
+        total=4,
+    ) as progress_dialog:
+        invalidate_sync(progress_dialog)
+    Dialog().ok(
+        get_localized(32026),
+        get_localized(32027).format(route['name'].lower())
+    )
 
 
 def authenticate_trakt(**kwargs):
