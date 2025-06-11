@@ -1,10 +1,9 @@
-from jurialmunkey.parser import try_int, boolean
+from jurialmunkey.parser import boolean
 from tmdbhelper.lib.addon.plugin import get_setting
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.directories.trakt.lists_standard import (
     ListTraktStandard,
     ListTraktStandardProperties,
-    PAGES_LENGTH
 )
 
 
@@ -59,7 +58,6 @@ class ListTraktCustom(ListTraktStandard):
 
     def get_items(
         self, *args,
-        length=None,
         list_slug=None,
         user_slug=None,
         sort_by=None,
@@ -73,7 +71,7 @@ class ListTraktCustom(ListTraktStandard):
         self.list_properties.sort_how = sort_how
         self.list_properties.owner = boolean(owner)
         self.list_properties.trakt_authorization = bool(self.list_properties.owner or self.list_properties.user_slug == 'me')
-        return super().get_items(*args, length=try_int(length) or PAGES_LENGTH, **kwargs)
+        return super().get_items(*args, **kwargs)
 
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)

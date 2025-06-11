@@ -1,10 +1,6 @@
 from tmdbhelper.lib.items.directories.lists_default import ListDefault, ListProperties
 from tmdbhelper.lib.addon.plugin import get_setting
 from tmdbhelper.lib.files.ftools import cached_property
-from jurialmunkey.parser import try_int
-
-
-PAGES_LENGTH = get_setting('pagemulti_tmdb', 'int') or 1
 
 
 class UncachedItemsPage:
@@ -50,7 +46,7 @@ class ListStandardProperties(ListProperties):
 
     @property
     def next_page(self):
-        return self.page + self.length
+        return self.page + self.pmax
 
     def get_api_response(self, page=1):
         return self.tmdb_api.get_response_json(self.url, page=page)
@@ -73,11 +69,12 @@ class ListStandardProperties(ListProperties):
 
 
 class ListStandard(ListDefault):
-
     list_properties_class = ListStandardProperties
 
-    def get_items(self, *args, length=None, **kwargs):
-        return super().get_items(*args, length=try_int(length) or PAGES_LENGTH, **kwargs)
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.page_length = get_setting('pagemulti_tmdb', 'int') or 1
+        return list_properties
 
 
 class ListPopular(ListStandard):

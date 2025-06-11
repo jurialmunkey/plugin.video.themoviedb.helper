@@ -678,18 +678,6 @@
                 </setting>
             </group>
             <group id="2" label="32499">
-                <setting id="pagemulti_library" type="integer" label="32503" help="">
-                    <level>0</level>
-                    <default>2</default>
-                    <constraints>
-                        <minimum>1</minimum>
-                        <step>1</step>
-                        <maximum>8</maximum>
-                    </constraints>
-                    <control type="slider" format="integer">
-                        <popup>false</popup>
-                    </control>
-                </setting>
                 <setting id="pagemulti_tmdb" type="integer" label="32500" help="">
                     <level>0</level>
                     <default>1</default>
@@ -702,7 +690,7 @@
                         <popup>false</popup>
                     </control>
                 </setting>
-                <setting id="pagemulti_trakt" type="integer" label="32501" help="">
+                <setting id="pagemulti_trakt" type="integer" label="32082" help="">
                     <level>0</level>
                     <default>1</default>
                     <constraints>
@@ -714,7 +702,7 @@
                         <popup>false</popup>
                     </control>
                 </setting>
-                <setting id="pagemulti_sync" type="integer" label="32502" help="">
+                <setting id="pagemulti_sync" type="integer" label="32083" help="">
                     <level>0</level>
                     <default>1</default>
                     <constraints>

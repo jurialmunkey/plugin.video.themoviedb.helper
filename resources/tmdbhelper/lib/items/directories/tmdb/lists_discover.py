@@ -950,7 +950,7 @@ class ListDiscoverProperties(ListStandardProperties):
         cache_name_tuple = [f'{k}={v}' for k, v in self.translated_discover_params.items()]
         cache_name_tuple = sorted(cache_name_tuple)
         cache_name_tuple = [self.class_name, self.tmdb_type] + cache_name_tuple
-        cache_name_tuple = cache_name_tuple + [self.page, self.length]
+        cache_name_tuple = cache_name_tuple + [self.page, self.pmax]
         return tuple(cache_name_tuple)
 
     discover_params_to_del = (

@@ -1,9 +1,7 @@
-from jurialmunkey.parser import try_int
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.directories.trakt.lists_standard import (
     ListTraktStandardProperties,
     ListTraktStandard,
-    PAGES_LENGTH
 )
 
 
@@ -20,7 +18,7 @@ class ListTraktFiltered(ListTraktStandard):
     list_properties_class = ListTraktFilteredProperties
 
     def get_items(
-        self, *args, length=None,
+        self, *args,
         genres=None,
         query=None,
         years=None,
@@ -67,7 +65,7 @@ class ListTraktFiltered(ListTraktStandard):
             ) if k and v
         }
 
-        return super().get_items(*args, length=try_int(length) or PAGES_LENGTH, **kwargs)
+        return super().get_items(*args, **kwargs)
 
 
 class ListTraktTrending(ListTraktFiltered):

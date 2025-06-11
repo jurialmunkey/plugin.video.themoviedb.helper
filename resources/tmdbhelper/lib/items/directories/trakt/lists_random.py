@@ -14,7 +14,6 @@ from tmdbhelper.lib.items.directories.trakt.lists_filtered import (
 from tmdbhelper.lib.items.directories.trakt.lists_standard import (
     ListTraktStandard,
     ListTraktStandardProperties,
-    PAGES_LENGTH
 )
 
 
@@ -22,11 +21,11 @@ class ListTraktRandomisedProperties(ListTraktStandardProperties):
 
     @cached_property
     def limit(self):
-        return self.length * 40  # Use double normal limit to get a decent sample size
+        return self.pmax * 40  # Use double normal limit to get a decent sample size
 
     @cached_property
     def sample_limit(self):
-        return min((self.length * 20), len(self.filtered_items))  # Make sure we dont try to sample more items than we have
+        return min((self.pmax * 20), len(self.filtered_items))  # Make sure we dont try to sample more items than we have
 
     @cached_property
     def sorted_items(self):
@@ -40,7 +39,7 @@ class ListTraktRandomised(ListTraktStandard):
     pagination = False
 
     def get_items(self, *args, length=None, tmdb_type=None, **kwargs):
-        length = try_int(length) or PAGES_LENGTH
+        length = try_int(length)
 
         if tmdb_type == 'both':
             import random

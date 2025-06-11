@@ -96,12 +96,6 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
             pauseplayprogress=get_setting('trakt_watchedindicators'))
 
     @cached_property
-    def page_length(self):
-        if self.is_widget or not get_condvisibility('Window.IsVisible(MyVideoNav.xml)'):
-            return 1
-        return get_setting('pagemulti_library', 'int')
-
-    @cached_property
     def pagination(self):
         if not boolean(self.params.get('nextpage', True)):
             return False

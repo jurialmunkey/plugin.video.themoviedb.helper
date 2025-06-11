@@ -11,7 +11,6 @@ from tmdbhelper.lib.items.directories.trakt.mapper_static import (
 )
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
-from jurialmunkey.parser import try_int
 
 
 class ListTraktStaticProperties(ListTraktStandardProperties):
@@ -79,9 +78,10 @@ class ListTraktStatic(ListTraktStandard):
     default_cacheonly = True
     list_properties_class = ListTraktStaticProperties
 
-    def get_items(self, *args, length=None, **kwargs):
-        length = try_int(length) or 5
-        return super().get_items(*args, length=length, **kwargs)
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.page_length = 5
+        return list_properties
 
     def get_items_finalised(self):
         from xbmcplugin import SORT_METHOD_UNSORTED

@@ -5,10 +5,6 @@ from tmdbhelper.lib.items.directories.mdblist.lists_local import (
 )
 from tmdbhelper.lib.addon.plugin import get_setting
 from tmdbhelper.lib.files.ftools import cached_property
-from jurialmunkey.parser import try_int
-
-
-PAGES_LENGTH = get_setting('pagemulti_trakt', 'int') or 1
 
 
 class UncachedMDbListCustomData(UncachedMDbListLocalData):
@@ -87,13 +83,13 @@ class ListMDbListCustom(ListStandard):
         list_properties.plugin_name = 'TMDbHelper'
         list_properties.request_url = 'lists/{list_id}/items'
         list_properties.mdblist_api = self.mdblist_api
+        list_properties.page_length = get_setting('pagemulti_trakt', 'int') or 1
         return list_properties
 
     def get_items(
         self,
         *args,
         list_id,
-        length=None,
         genre=None,
         tmdb_type=None,
         sort_by=None,
@@ -105,9 +101,4 @@ class ListMDbListCustom(ListStandard):
         self.list_properties.tmdb_type = tmdb_type or 'both'
         self.list_properties.sort_by = sort_by
         self.list_properties.sort_how = sort_how
-        return super().get_items(
-            *args,
-            length=try_int(length) or PAGES_LENGTH,
-            tmdb_type=tmdb_type or 'both',
-            **kwargs
-        )
+        return super().get_items(*args, tmdb_type=tmdb_type or 'both', **kwargs)

@@ -40,12 +40,18 @@ class ListProperties:
         return '_'.join(map(str, self.cache_name_tuple))
 
     @cached_property
+    def pmax(self):
+        pmax = self.length or self.page_length or 1
+        pmax = min(pmax, self.page_length)
+        return pmax
+
+    @cached_property
     def cache_name_tuple(self):
         return (
             self.class_name,
             self.tmdb_type,
             self.page,
-            self.length
+            self.pmax,
         )
 
     @cached_property
@@ -131,6 +137,7 @@ class ListDefault(ContainerDefaultCacheDirectory):
         list_properties.pagination = self.pagination
         list_properties.tmdb_api = self.tmdb_api
         list_properties.trakt_api = self.trakt_api
+        list_properties.is_cacheonly = self.is_cacheonly
         list_properties.class_name = f'{self.__class__.__name__}'
         return list_properties
 
@@ -148,7 +155,7 @@ class ListDefault(ContainerDefaultCacheDirectory):
 
     def get_items(self, tmdb_type, page=1, length=None, **kwargs):
         self.list_properties.tmdb_type = tmdb_type
-        self.list_properties.length = try_int(length) or 1
+        self.list_properties.length = try_int(length)
         self.list_properties.page = try_int(page) or 1
         return self.get_items_finalised()
 

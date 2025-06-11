@@ -19,8 +19,7 @@ class TMDbAPI(NoCacheRequestAPI):
     def __init__(
             self,
             api_key=None,
-            language=get_language(),
-            page_length=1):
+            language=get_language()):
         api_key = api_key or self.api_key
         api_url = self.api_url
         api_name = self.api_name
@@ -30,7 +29,6 @@ class TMDbAPI(NoCacheRequestAPI):
             req_api_url=api_url,
             req_api_key=f'api_key={api_key}')
         self.language = language
-        self.page_length = max(get_setting('pagemulti_tmdb', 'int'), page_length)
         TMDb.api_key = api_key
 
     @property

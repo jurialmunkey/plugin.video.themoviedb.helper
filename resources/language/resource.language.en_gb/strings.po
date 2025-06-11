@@ -406,6 +406,16 @@ msgctxt "#32060"
 msgid "files extracted"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32082"
+msgid "Page multiplier (Other basic lists)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32083"
+msgid "Page multiplier (Database sync lists)"
+msgstr ""
+
 #: /resources/lib/player.py
 msgctxt "#32061"
 msgid "Play with"
