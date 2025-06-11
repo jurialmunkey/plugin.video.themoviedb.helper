@@ -1,4 +1,5 @@
 from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties, UncachedItemsPage
+from tmdbhelper.lib.items.directories.trakt.mapper_standard import FactoryItemMapper
 from tmdbhelper.lib.addon.plugin import get_setting
 from tmdbhelper.lib.files.ftools import cached_property
 from jurialmunkey.parser import try_int
@@ -16,7 +17,7 @@ class UncachedTraktItemsPage(UncachedItemsPage):
     def results(self):
         try:
             results = self.response.json()
-        except (TypeError, KeyError):
+        except (TypeError, KeyError, AttributeError):
             return []
         try:
             self.outer_class.total_pages = try_int(self.response.headers.get('x-pagination-page-count', 0))
@@ -53,24 +54,26 @@ class ListTraktStandardProperties(ListStandardProperties):
 
     @cached_property
     def cache_name_tuple(self):
-        cache_name_tuple = [f'{k}={v}' for k, v in self.trakt_filters.items()]
-        cache_name_tuple = sorted(cache_name_tuple)
-        cache_name_tuple = [self.class_name, self.tmdb_type] + cache_name_tuple
+        cache_name_tuple = self.get_cache_name_list_filter()
+        cache_name_tuple = self.get_cache_name_list_prefix() + cache_name_tuple
         cache_name_tuple = cache_name_tuple + [self.page, self.limit]
         return tuple(cache_name_tuple)
 
+    def get_cache_name_list_filter(self):
+        cache_name_list = [f'{k}={v}' for k, v in self.trakt_filters.items()]
+        cache_name_list = sorted(cache_name_list)
+        return cache_name_list
+
+    def get_cache_name_list_prefix(self):
+        return [self.class_name, self.tmdb_type]
+
     @cached_property
     def trakt_type(self):
-        return self.sub_type_map[self.tmdb_type]
+        return self.sub_type_map.get(self.tmdb_type)
 
     @cached_property
     def url(self):
         return self.request_url.format(trakt_type=self.trakt_type)
-
-    @cached_property
-    def mapper(self):
-        from tmdbhelper.lib.api.trakt.mapping import ItemMapper
-        return ItemMapper()
 
     def get_uncached_items(self):
         return {
@@ -79,23 +82,13 @@ class ListTraktStandardProperties(ListStandardProperties):
             'count': self.total_items,
         }
 
-    def get_uncached_response(self, page=1):
-        if self.trakt_authorization and not self.trakt_api.authorization:
-            if self.trakt_api.attempted_login or not self.trakt_api.authorize(login=True):
-                return
+    def get_api_response(self, page=1):
+        if self.trakt_authorization and not self.trakt_api.is_authorized:
+            return
         return self.trakt_api.get_response(self.url, page=page, limit=self.limit, **self.trakt_filters)
 
-    def get_sub_typed_item(self, item):
-        if not self.sub_type:
-            return item
-        item.update(item.pop(self.trakt_type, {}))
-        return item
-
     def get_mapped_item(self, item, add_infoproperties=None):
-        return self.mapper.get_info(
-            self.get_sub_typed_item(item),
-            self.tmdb_type,
-            add_infoproperties=add_infoproperties)
+        return FactoryItemMapper(item, add_infoproperties, trakt_type=self.trakt_type, sub_type=self.sub_type).item
 
 
 class ListTraktStandard(ListStandard):

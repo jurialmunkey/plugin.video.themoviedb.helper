@@ -2,9 +2,7 @@ from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.fanart im
 
 
 class PosterMediaList(FanartMediaList):
-    @property
-    def cached_data_values(self):
-        return (self.item_id, 'posters')
+    cached_data_value_type = 'posters'
 
     def image_path_func(self, v):
         return self.common_apis.tmdb_imagepath.get_imagepath_poster(v)

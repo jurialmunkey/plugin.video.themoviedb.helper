@@ -1,8 +1,8 @@
 from tmdbhelper.lib.files.dbdata import DatabaseStatements
-from tmdbhelper.lib.api.tmdb.database_tables.table import InsertStatement, TMDbDatabaseTable
+from tmdbhelper.lib.query.database.table import InsertStatement, FindQueriesDatabaseTable
 
 
-class TMDbDatabaseTableWatchProviders(TMDbDatabaseTable):
+class FindQueriesDatabaseTableWatchProviders(FindQueriesDatabaseTable):
     table = 'watch_providers INNER JOIN watch_providers_details ON watch_providers_details.provider_id = watch_providers.provider_id'
     keys = ('iso_country', 'tmdb_type', 'watch_providers.provider_id', 'provider_name', 'logo_path', 'display_priority')
     conditions = 'iso_country=? AND tmdb_type=? ORDER BY display_priority'
@@ -58,7 +58,7 @@ class TMDbDatabaseTableWatchProviders(TMDbDatabaseTable):
         )
 
 
-class TMDbDatabaseWatchProviders:
+class FindQueriesDatabaseWatchProviders:
     watch_providers_columns = {
         'iso_country': {
             'data': 'TEXT',
@@ -110,7 +110,7 @@ class TMDbDatabaseWatchProviders:
         return provider_allowlist
 
     def get_watch_providers(self, tmdb_type, iso_country, allowlist_only=False):
-        database_table = TMDbDatabaseTableWatchProviders(self)
+        database_table = FindQueriesDatabaseTableWatchProviders(self)
         database_table.tmdb_type = tmdb_type
         database_table.iso_country = iso_country
         database_table.conditions = f'{self.get_provider_allowlist()}{database_table.conditions}' if allowlist_only else database_table.conditions

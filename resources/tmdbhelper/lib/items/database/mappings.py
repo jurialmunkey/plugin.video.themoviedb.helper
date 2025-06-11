@@ -31,15 +31,15 @@ class ItemMapperMethods:
             return 0
 
     @staticmethod
-    def add_art_type(item_id, path, art_type, aspect_ratio):
+    def add_art_type(item_id, image_path, image_type, ratio_type):
         from tmdbhelper.lib.addon.consts import IMAGEPATH_ASPECTRATIO
         return {
             'parent_id': item_id,
-            'aspect_ratio': IMAGEPATH_ASPECTRATIO.index(aspect_ratio),
+            'aspect_ratio': IMAGEPATH_ASPECTRATIO.index(ratio_type),
             'quality': 0,
-            'icon': get_blanks_none(path),
-            'type': art_type,
-            'extension': get_blanks_none(path.split('.')[-1] if path else None),
+            'icon': get_blanks_none(image_path),
+            'type': image_type,
+            'extension': get_blanks_none(image_path.split('.')[-1] if image_path else None),
             'rating': 0,
             'votes': 0,
         }
@@ -162,17 +162,20 @@ class ItemMapperMethods:
         collection_item['id'] = collection_id
         data.append(ExtendedMap('collection', collection_id, False, collection_item))
 
-        for icon_type, aspect in (('poster_path', 'posters'), ('backdrop_path', 'backdrops')):
-            icon = i.get(icon_type)
-            if not icon:
+        for image_path, image_type, ratio_type in (
+            ('poster_path', 'posters', 'poster'),
+            ('backdrop_path', 'backdrops', 'landscape')
+        ):
+            image_path = i.get(image_path)
+            if not image_path:
                 continue
-            data.append(ExtendedMap('art', icon, False, {
-                'parent_id': collection_id,
-                'icon': icon,
-                'type': aspect,
-                'aspect_ratio': aspect,
-                'extension': icon.split('.')[-1],
-            }))
+
+            data.append(ExtendedMap('art', image_path, False, ItemMapperMethods.add_art_type(
+                item_id=item_id,
+                image_path=image_path,
+                image_type=image_type,
+                ratio_type=ratio_type
+            )))
 
         data.append(ExtendedMap('belongs', item_id, False, {
             'id': item_id,
@@ -244,11 +247,11 @@ class ItemMapperMethods:
             data.append(ExtendedMap('person', item_id, False, person_item))
 
             if i.get('profile_path'):
-                artwork = self.add_art_type(
+                artwork = ItemMapperMethods.add_art_type(
                     item_id=item_id,
-                    path=i['profile_path'],
-                    art_type='profiles',
-                    aspect_ratio='poster')
+                    image_path=i['profile_path'],
+                    image_type='profiles',
+                    ratio_type='poster')
                 data.append(ExtendedMap('art', artwork['icon'], False, artwork))
 
             data.append(ExtendedMap('baseitem', item_id, False, {
@@ -304,11 +307,11 @@ class ItemMapperMethods:
         }))
 
         if i.get('still_path'):
-            artwork = self.add_art_type(
+            artwork = ItemMapperMethods.add_art_type(
                 item_id=item_id,
-                path=i['still_path'],
-                art_type='stills',
-                aspect_ratio='landscape')
+                image_path=i['still_path'],
+                image_type='stills',
+                ratio_type='landscape')
             data.append(ExtendedMap('art', artwork['icon'], False, artwork))
 
         # Use last/next aired duration if available for tvshow duration
@@ -361,11 +364,11 @@ class ItemMapperMethods:
                 data.append(ExtendedMap('person', item_id, False, person_item))
 
                 if i.get('profile_path'):
-                    artwork = self.add_art_type(
+                    artwork = ItemMapperMethods.add_art_type(
                         item_id=item_id,
-                        path=i['profile_path'],
-                        art_type='profiles',
-                        aspect_ratio='poster')
+                        image_path=i['profile_path'],
+                        image_type='profiles',
+                        ratio_type='poster')
                     data.append(ExtendedMap('art', artwork['icon'], False, artwork))
 
         return data
@@ -428,17 +431,19 @@ class ItemMapperMethods:
             'expiry': 0,
         }))
 
-        for icon_type, aspect in (('poster_path', 'posters'), ('backdrop_path', 'backdrops')):
-            icon = i.get(icon_type)
-            if not icon:
+        for image_path, image_type, ratio_type in (
+            ('poster_path', 'posters', 'poster'),
+            ('backdrop_path', 'backdrops', 'landscape')
+        ):
+            image_path = i.get(image_path)
+            if not image_path:
                 continue
-            data.append(ExtendedMap('art', icon, False, {
-                'parent_id': item_id,
-                'icon': icon,
-                'type': aspect,
-                'aspect_ratio': aspect,
-                'extension': icon.split('.')[-1],
-            }))
+            data.append(ExtendedMap('art', image_path, False, ItemMapperMethods.add_art_type(
+                item_id=item_id,
+                image_path=image_path,
+                image_type=image_type,
+                ratio_type=ratio_type
+            )))
         return data
 
     def get_episodes(self, items, **kwargs):
@@ -467,11 +472,11 @@ class ItemMapperMethods:
             data.append(ExtendedMap('episode', item_id, True, episode_item))
 
             if i.get('still_path'):
-                artwork = self.add_art_type(
+                artwork = ItemMapperMethods.add_art_type(
                     item_id=item_id,
-                    path=i['still_path'],
-                    art_type='stills',
-                    aspect_ratio='landscape')
+                    image_path=i['still_path'],
+                    image_type='stills',
+                    ratio_type='landscape')
                 data.append(ExtendedMap('art', artwork['icon'], False, artwork))
 
             data.append(ExtendedMap('baseitem', item_id, False, {
@@ -503,11 +508,11 @@ class ItemMapperMethods:
             data.append(ExtendedMap('season', item_id, True, season_item))
 
             if i.get('poster_path'):
-                artwork = self.add_art_type(
+                artwork = ItemMapperMethods.add_art_type(
                     item_id=item_id,
-                    path=i['poster_path'],
-                    art_type='posters',
-                    aspect_ratio='poster')
+                    image_path=i['poster_path'],
+                    image_type='posters',
+                    ratio_type='poster')
                 data.append(ExtendedMap('art', artwork['icon'], False, artwork))
 
             data.append(ExtendedMap('baseitem', item_id, False, {

@@ -100,6 +100,14 @@ def _get_basedir_details():
                 'icon': f'{ADDONPATH}/resources/icons/themoviedb/recommended.png'},
             'types': ['movie', 'tv', 'episode']},
         {
+            'label': get_localized(32064),
+            'params': {'info': 'trakt_related'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/popular.png'},
+            'types': ['movie', 'tv', 'episode']},
+        {
             'label': get_localized(32224),
             'params': {'info': 'similar', 'cacheonly': 'true'},
             'path': PLUGINPATH,
@@ -146,6 +154,22 @@ def _get_basedir_details():
             'art': {
                 'icon': f'{ADDONPATH}/resources/icons/themoviedb/reviews.png',
                 'landscape': f'{ADDONPATH}/fanart.jpg'},
+            'types': ['movie', 'tv', 'episode']},
+        {
+            'label': get_localized(32305),
+            'params': {'info': 'trakt_comments'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/mylists.png'},
+            'types': ['movie', 'tv', 'episode']},
+        {
+            'label': get_localized(32065),
+            'params': {'info': 'trakt_watchers'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/popularlist.png'},
             'types': ['movie', 'tv', 'episode']},
         {
             'label': get_localized(32227),
@@ -720,6 +744,14 @@ def _get_basedir_trakt():
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/trakt/genres.png'}},
         {
+            'label': u'{{item_type}}{{space}}{}'.format(get_localized(652)),
+            'types': ['movie', 'tv'],
+            'params': {'info': 'trakt_years'},
+            'path': PLUGINPATH,
+            'art': {
+                'landscape': f'{ADDONPATH}/fanart.jpg',
+                'icon': f'{ADDONPATH}/resources/icons/trakt/calendar.png'}},
+        {
             'label': u'{}{{space}}{{item_type}}'.format(get_localized(32204)),
             'types': ['movie', 'tv'],
             'params': {'info': 'trakt_trending'},
@@ -772,12 +804,19 @@ def _get_basedir_trakt():
             'art': {
                 'landscape': f'{ADDONPATH}/fanart.jpg',
                 'icon': f'{ADDONPATH}/resources/icons/trakt/boxoffice.png'}},
-        _get_trakt_popular_years(1970),
-        _get_trakt_popular_years(1980),
-        _get_trakt_popular_years(1990),
-        _get_trakt_popular_years(2000),
-        _get_trakt_popular_years(2010),
         _get_trakt_popular_years(2020),
+        _get_trakt_popular_years(2010),
+        _get_trakt_popular_years(2000),
+        _get_trakt_popular_years(1990),
+        _get_trakt_popular_years(1980),
+        _get_trakt_popular_years(1970),
+        _get_trakt_popular_years(1960),
+        _get_trakt_popular_years(1950),
+        _get_trakt_popular_years(1940),
+        _get_trakt_popular_years(1930),
+        _get_trakt_popular_years(1920),
+        _get_trakt_popular_years(1910),
+        _get_trakt_popular_years(1900),
         _get_trakt_popular_movies_certifications('g'),
         _get_trakt_popular_movies_certifications('pg'),
         _get_trakt_popular_movies_certifications('pg-13'),

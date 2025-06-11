@@ -2,49 +2,29 @@ from xbmcgui import Dialog, DialogProgress
 from jurialmunkey.parser import try_int, boolean
 from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.plugin import get_localized, get_setting, ADDONPATH
-from tmdbhelper.lib.api.request import RequestAPI
+from tmdbhelper.lib.api.request import NoCacheRequestAPI
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.thread import has_property_lock
 from tmdbhelper.lib.api.api_keys.trakt import CLIENT_ID, CLIENT_SECRET, USER_TOKEN
-from tmdbhelper.lib.api.trakt.content import TraktContent
+from tmdbhelper.lib.files.ftools import cached_property
 
 
 API_URL = 'https://api.trakt.tv/'
 
 
-def is_authorized(func):
-
-    def wrapper(self, *args, **kwargs):
-
-        # Set authorize=False to skip authorization for that method
-        if not kwargs.get('authorize', True):
-            return func(self, *args, **kwargs)
-        # Authorization already granted in this instance
-        if self.authorization:
-            return func(self, *args, **kwargs)
-        # Authorization required ask for login if no token
-        if not self.attempted_login and self.authorize(login=True):
-            return func(self, *args, **kwargs)
-
-    return wrapper
-
-
 class TraktSync:
-    @property
+    @cached_property
     def trakt_syncdata(self):
-        try:
-            return self._trakt_syncdata
-        except AttributeError:
-            self._trakt_syncdata = self.get_trakt_syncdata()
-            return self._trakt_syncdata
+        return self.get_trakt_syncdata()
 
-    @is_authorized
     def get_trakt_syncdata(self):
+        if not self.is_authorized:
+            return
         from tmdbhelper.lib.api.trakt.sync.datasync import SyncData
         return SyncData(self)
 
 
-class TraktAPI(RequestAPI, TraktContent, TraktSync):
+class TraktAPI(NoCacheRequestAPI, TraktSync):
 
     client_id = CLIENT_ID
     client_secret = CLIENT_SECRET
@@ -72,6 +52,14 @@ class TraktAPI(RequestAPI, TraktContent, TraktSync):
         self.sync_item_limit = 20 * max(get_setting('pagemulti_sync', 'int'), page_length)
         self.item_limit = 20 * max(get_setting('pagemulti_trakt', 'int'), page_length)
         self.login() if force else self.authorize()
+
+    @property
+    def is_authorized(self):
+        if self.authorization:
+            return True
+        if not self.attempted_login and self.authorize(login=True):
+            return True
+        return False
 
     def authorize(self, login=False, confirmation=False):
         # Already got authorization so return credentials

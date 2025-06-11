@@ -56,7 +56,7 @@ class ListAiringNext(ContainerDirectory):
             return item
 
         def _get_nextaired_item_thread(i):
-            tmdb_id = i.get('tmdb_id') or self.tmdb_api.tmdb_database.get_tmdb_id(
+            tmdb_id = i.get('tmdb_id') or self.query_database.get_tmdb_id(
                 tmdb_type='tv',
                 imdb_id=i.get('imdb_id'),
                 tvdb_id=i.get('tvdb_id'),

@@ -14,6 +14,10 @@ class ItemSyncCachedProperties:
         return self.get_trakt_api()
 
     @cached_property
+    def query_database(self):
+        return self.get_query_database()
+
+    @cached_property
     def trakt_syncdata(self):
         return self.get_trakt_syncdata()
 
@@ -66,8 +70,8 @@ class ItemSyncCachedProperties:
         return self.get_dialog_message()
 
     @cached_property
-    def trakt_id(self):
-        return self.get_trakt_id()
+    def trakt_slug(self):
+        return self.get_trakt_slug()
 
     @cached_property
     def sync_response(self):
@@ -110,6 +114,10 @@ class ItemSyncGetters:
     def get_trakt_api(self):
         from tmdbhelper.lib.api.trakt.api import TraktAPI
         return TraktAPI()
+
+    def get_query_database(self):
+        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+        return FindQueriesDatabase()
 
     def get_trakt_syncdata(self):
         return self.trakt_api.trakt_syncdata
@@ -194,8 +202,8 @@ class ItemSyncGetters:
             dialog_message = get_localized(32297)
         return dialog_message.format(self.dialog_header, self.tmdb_type, 'TMDb', self.item_id)
 
-    def get_trakt_id(self):
-        return self.trakt_api.get_id(self.tmdb_id, 'tmdb', self.base_trakt_type, output_type='trakt')
+    def get_trakt_slug(self):
+        return self.query_database.get_trakt_id(self.tmdb_id, 'tmdb', self.base_trakt_type, output_type='slug')
 
     def get_sync_response(self):
         """ Called after user selects choice """
@@ -220,10 +228,10 @@ class ItemSyncGetters:
 
     def get_sync_item(self):
         if self.season is None:
-            return self.trakt_api.get_request_lc(f'{self.base_trakt_type}s', self.trakt_id)
+            return self.trakt_api.get_response_json(f'{self.base_trakt_type}s', self.trakt_slug)
         if self.episode is None:
-            return self.trakt_api.get_request_lc(f'{self.base_trakt_type}s', self.trakt_id, 'seasons', self.season)
-        return self.trakt_api.get_request_lc(f'{self.base_trakt_type}s', self.trakt_id, 'seasons', self.season, 'episodes', self.episode)
+            return self.trakt_api.get_response_json('shows', self.trakt_slug, 'seasons', self.season)
+        return self.trakt_api.get_response_json('shows', self.trakt_slug, 'seasons', self.season, 'episodes', self.episode)
 
     def get_is_successful_sync(self):
         if not self.sync_response:

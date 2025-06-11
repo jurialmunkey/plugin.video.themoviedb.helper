@@ -53,3 +53,8 @@ class CommonContainerAPIs():
         if not get_setting('omdb_apikey', 'str'):
             return
         return OMDb()
+
+    @cached_property
+    def query_database(self):
+        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+        return FindQueriesDatabase()

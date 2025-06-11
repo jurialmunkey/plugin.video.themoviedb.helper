@@ -1,12 +1,24 @@
 from jurialmunkey.parser import try_int
-from tmdbhelper.lib.addon.plugin import get_localized
+from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.directories.trakt.lists_standard import (
+    ListTraktStandardProperties,
     ListTraktStandard,
     PAGES_LENGTH
 )
 
 
+class ListTraktFilteredProperties(ListTraktStandardProperties):
+    @cached_property
+    def plugin_category(self):
+        plugin_category = self.plugin_name.format(localized=self.localized, plural=self.plural)
+        plugin_category = f'{plugin_category} ({" ".join([f"{v}".capitalize() for v in self.trakt_filters.values()])})' if self.trakt_filters else plugin_category
+        return plugin_category
+
+
 class ListTraktFiltered(ListTraktStandard):
+
+    list_properties_class = ListTraktFilteredProperties
+
     def get_items(
         self, *args, length=None,
         genres=None,
@@ -99,16 +111,5 @@ class ListTraktAnticipated(ListTraktFiltered):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.request_url = '{trakt_type}s/anticipated'
         list_properties.localize = 32206
-        list_properties.sub_type = True
-        return list_properties
-
-
-class ListTraktMyCalendars(ListTraktFiltered):
-    def configure_list_properties(self, list_properties):
-        list_properties = super().configure_list_properties(list_properties)
-        list_properties.trakt_authorization = True
-        list_properties.request_url = 'calendars/my/{trakt_type}s'
-        list_properties.plugin_name = f'{get_localized(32201)} {{plural}} {{localized}}'
-        list_properties.localize = 32202
         list_properties.sub_type = True
         return list_properties

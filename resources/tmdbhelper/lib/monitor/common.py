@@ -42,7 +42,7 @@ class CommonMonitorDetails(CommonContainerAPIs):
 
     @kodi_try_except('lib.monitor.common get_tmdb_id')
     def get_tmdb_id(self, tmdb_type, imdb_id=None, query=None, year=None):
-        return self.tmdb_api.tmdb_database.get_tmdb_id(
+        return self.query_database.get_tmdb_id(
             tmdb_type=tmdb_type,
             imdb_id=imdb_id if imdb_id and imdb_id.startswith('tt') else None,
             query=query,
@@ -51,7 +51,7 @@ class CommonMonitorDetails(CommonContainerAPIs):
 
     @kodi_try_except('lib.monitor.common get_tmdb_id_multi')
     def get_tmdb_id_multi(self, tmdb_type=None, imdb_id=None, query=None, year=None):
-        return self.tmdb_api.tmdb_database.get_tmdb_id(
+        return self.query_database.get_tmdb_id(
             tmdb_type=tmdb_type,
             imdb_id=imdb_id if imdb_id and imdb_id.startswith('tt') else None,
             query=query,
@@ -61,7 +61,7 @@ class CommonMonitorDetails(CommonContainerAPIs):
 
     @kodi_try_except('lib.monitor.common get_tmdb_id_parent')
     def get_tmdb_id_parent(self, tmdb_id, trakt_type, season_episode_check=None):
-        return self.trakt_api.get_id(tmdb_id, 'tmdb', trakt_type, output_type='tmdb', output_trakt_type='show', season_episode_check=season_episode_check)
+        return self.query_database.get_trakt_id(tmdb_id, 'tmdb', trakt_type, output_type='tmdb')
 
     def get_tvdb_awards(self, tmdb_type, tmdb_id):
         info = {}
@@ -88,13 +88,31 @@ class CommonMonitorDetails(CommonContainerAPIs):
                 info[f'{t}_cr'] = '[CR]'.join(all_awards_cr)
         return info
 
+    def get_imdb_top250_list(self, tmdb_type):
+        return self.query_database.get_imdb_top250_list_cached(tmdb_type)
+
+    @cached_property
+    def imdb_top250_list_movie(self):
+        return self.get_imdb_top250_list('movie')
+
+    @cached_property
+    def imdb_top250_list_tv(self):
+        return self.get_imdb_top250_list('tv')
+
+    def return_imdb_top250_list(self, tmdb_type):
+        if tmdb_type == 'movie':
+            return self.imdb_top250_list_movie
+        if tmdb_type == 'tv':
+            return self.imdb_top250_list_tv
+
     def get_detailed_ratings(self, tmdb_type, tmdb_id):
         from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings import RatingsDict
         sync = RatingsDict()
-        sync.mdblist_api = self.mdblist_api
-        sync.trakt_api = self.trakt_api
-        sync.tmdb_api = self.tmdb_api
-        sync.omdb_api = self.omdb_api
+        sync.common_apis.mdblist_api = self.mdblist_api
+        sync.common_apis.trakt_api = self.trakt_api
+        sync.common_apis.tmdb_api = self.tmdb_api
+        sync.common_apis.omdb_api = self.omdb_api
+        sync.imdb_top250_list = self.return_imdb_top250_list(tmdb_type)
         sync.tmdb_type = tmdb_type
         sync.tmdb_id = tmdb_id
         return sync.data or {}

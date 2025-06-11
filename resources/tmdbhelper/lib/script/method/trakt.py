@@ -51,7 +51,7 @@ def rename_list(rename_list=None, **kwargs):
 def sort_list(**kwargs):
     from xbmcgui import Dialog
     from tmdbhelper.lib.addon.plugin import executebuiltin, format_folderpath, encode_url
-    from tmdbhelper.lib.api.trakt.sorting import get_sort_methods
+    from tmdbhelper.lib.items.directories.trakt.lists_sorting import get_sort_methods
     sort_methods = get_sort_methods(kwargs['info'])
     x = Dialog().contextmenu([i['name'] for i in sort_methods])
     if x == -1:
@@ -64,6 +64,7 @@ def sort_list(**kwargs):
 def invalidate_trakt_sync(invalidate_trakt_sync, notification=True, **kwargs):
     import itertools
     from xbmcgui import Dialog
+    from tmdbhelper.lib.addon.dialog import ProgressDialog
     from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
     from tmdbhelper.lib.addon.plugin import get_localized
     from tmdbhelper.lib.api.trakt.sync.datatype import (
@@ -132,24 +133,38 @@ def invalidate_trakt_sync(invalidate_trakt_sync, notification=True, **kwargs):
             return
         route = routes[route_keys[x]]
 
-    # init database
-    database = ItemDetailsDatabase()
+    def invalidate_sync(progress_dialog=None):
+        # init database
+        progress_dialog.update('Initialise database') if progress_dialog else None
+        database = ItemDetailsDatabase()
 
-    # delete column data for datatypes
-    database_keys = tuple((_build_keys(i) for i in route['data']))
-    database_keys = tuple(itertools.chain.from_iterable(database_keys))
-    database.del_column_values(table='simplecache', keys=database_keys)
+        # delete column data for datatypes
+        database_keys = tuple((_build_keys(i) for i in route['data']))
+        database_keys = tuple(itertools.chain.from_iterable(database_keys))
+        progress_dialog.update(f'Deleting simplecache keys: {database_keys}') if progress_dialog else None
+        database.del_column_values(table='simplecache', keys=database_keys)
 
-    # clean up corresponding last activity values
-    database_lactivities_ids = tuple((_build_lactivities_ids(i) for i in route['data']))
-    database_lactivities_ids = tuple(itertools.chain.from_iterable(database_lactivities_ids))
-    for x, item_id in enumerate(database_lactivities_ids, 1):
-        database.del_item(table='lactivities', item_id=item_id)
+        # clean up corresponding last activity values
+        database_lactivities_ids = tuple((_build_lactivities_ids(i) for i in route['data']))
+        database_lactivities_ids = tuple(itertools.chain.from_iterable(database_lactivities_ids))
+        progress_dialog.update(f'Deleting last activities keys: {database_lactivities_ids}') if progress_dialog else None
+        for x, item_id in enumerate(database_lactivities_ids, 1):
+            database.del_item(table='lactivities', item_id=item_id)
 
-    # notify of success
+    # show dialog or not
     if not notification:
+        invalidate_sync()
         return
-    Dialog().ok(get_localized(32026), get_localized(32027).format(route['name'].lower()))
+
+    with ProgressDialog(
+        title=get_localized(32022),
+        total=4,
+    ) as progress_dialog:
+        invalidate_sync(progress_dialog)
+    Dialog().ok(
+        get_localized(32026),
+        get_localized(32027).format(route['name'].lower())
+    )
 
 
 def authenticate_trakt(**kwargs):
@@ -165,43 +180,37 @@ def revoke_trakt(**kwargs):
 
 
 def get_stats(**kwargs):
-    from tmdbhelper.lib.api.trakt.api import TraktAPI
+    from tmdbhelper.lib.query.database.database import FindQueriesDatabase
     from jurialmunkey.window import get_property
 
-    response = TraktAPI().get_request('users/me/stats', cache_days=0.015)
-    if not response:
+    stats = FindQueriesDatabase().get_trakt_stats()
+    if not stats:
         return
 
     combined_stats = {}
 
-    def _set_property(name, value, key):
-        get_property(name, set_property=f'{value}')
-        if not isinstance(value, int):
-            return
-        combined_stats.setdefault(key, 0)
-        combined_stats[key] += value
+    def set_proptime(prop_name, v):
+        days, minutes = divmod(int(v), 60 * 24)
+        hour, minutes = divmod(int(minutes), 60)
+        get_property(f'{prop_name}_d', set_property=f'{days}')
+        get_property(f'{prop_name}_h', set_property=f'{hour}')
+        get_property(f'{prop_name}_mm', set_property=f'{minutes}')
 
-    def _set_stats(d, prop):
+    def set_property(base_name, stat_name, stat_type, v):
+        prop_name = f'{base_name}.{stat_type}.{stat_name}'
+        get_property(prop_name, set_property=f'{v}')
+        set_proptime(prop_name, v) if stat_name == 'minutes' else None
+
+    def set_combined(stat_name, v):
+        stat_name = f'{stat_name}_total'
+        combined_stats.setdefault(stat_name, 0)
+        combined_stats[stat_name] += v
+
+    def set_allstats(d, base_name, update_combined=True):
         for k, v in d.items():
-            name = f'{prop}.{k}'
-            if isinstance(v, dict):
-                _set_stats(v, name)
-                continue
-            _set_property(name, v, key=k)
-            if k == 'minutes':
-                days, minutes = divmod(int(v), 60 * 24)
-                hours, minutes = divmod(int(minutes), 60)
-                _set_property(f'{name}_d', days, key=k)
-                _set_property(f'{name}_h', hours, key=k)
-                _set_property(f'{name}_mm', minutes, key=k)
+            stat_name, stat_type = k.split('_')
+            set_property(base_name, stat_name, stat_type, v)
+            set_combined(stat_name, v) if update_combined else None
 
-    _set_stats(response, 'TraktStats')
-    _set_stats(combined_stats, 'TraktStats.Total')
-
-    for i in ('movie', 'episode', ''):
-        path = f'users/me/history/{i}s' if i else 'users/me/history'
-        response = TraktAPI().get_request(path, cache_days=0.015, limit=1)
-        if not response:
-            continue
-        for x, j in enumerate(response):
-            _set_stats(j, f'TraktStats.Recent{i}.{x}')
+    set_allstats(stats, 'TraktStats')
+    set_allstats(combined_stats, 'TraktStats', update_combined=False)

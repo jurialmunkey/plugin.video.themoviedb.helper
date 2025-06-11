@@ -177,7 +177,8 @@ class ItemUserList(ItemSync):
                 get_infolabel("ListItem.Property(param.list_slug)"),
                 get_infolabel("ListItem.Property(param.user_slug)"))
         with BusyDialog():
-            list_sync = self.trakt_api.get_list_of_lists('users/me/lists') or []
+            from tmdbhelper.lib.items.directories.trakt.lists_static import ListTraktStaticOwned
+            list_sync = ListTraktStaticOwned(-1, '').get_items() or []
             list_sync.append({'label': get_localized(32299)})
         x = Dialog().contextmenu([i.get('label') for i in list_sync])
         if x == -1:

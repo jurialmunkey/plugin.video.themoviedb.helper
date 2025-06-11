@@ -51,8 +51,9 @@ def ListItem(*args, **kwargs):
 
 
 class BuildURL:
-    def __init__(self, path, reload=None, widget=None, **params):
+    def __init__(self, path, reload=None, widget=None, paths=None, **params):
         self.path = path
+        self.path_x = paths
         self.reload = reload
         self.widget = boolean(widget)
         self.params = params
@@ -71,10 +72,17 @@ class BuildURL:
             return {}
         return {'widget': 'true'}
 
+    @cached_property
+    def params_path_x(self):
+        if not self.path_x:
+            return {}
+        return {f'paths_{x}': i for x, i in enumerate(self.path_x) if i}
+
     @property
     def url(self):
         self.params.update(self.params_reload)
         self.params.update(self.params_widget)
+        self.params.update(self.params_path_x)
         return encode_url(self.path, **self.params)
 
 
@@ -174,7 +182,7 @@ class _ListItem(object):
         self.infoproperties.update({f'{k}_id': v for k, v in self.unique_ids.items() if v})  # Set UIDs to infoproperties
         self.infoproperties.update({f'item.{k}': v for k, v in self.params.items() if k and v})  # Set params to infoproperties
         self.infoproperties.update(self.infoproperties_additions)
-        self.infoproperties['isPlayable'] = 'true' if self.is_resolvable else None
+        self.infoproperties.update({'isPlayable': 'true'}) if self.is_resolvable else None
         return self.infoproperties
 
     def finalise_context_menu(self):
@@ -280,7 +288,7 @@ class _ListItem(object):
         return listitem
 
     def set_properties(self, listitem):
-        listitem.setProperties(self.infoproperties)
+        listitem.setProperties({k: f'{v}' for k, v in self.infoproperties.items() if v not in (None, '')})
         return listitem
 
     def set_label2(self, listitem):
@@ -422,10 +430,16 @@ class _Video(_ListItem):
         path = f'RunPlugin({self.url}&ignore_default=true)'
         return (head, path)
 
+    def get_context_menu_choosedefault_params(self):
+        return [
+            ('set_chosenplayer', self.title),
+            ('tmdb_type', self.tmdb_type),
+            ('tmdb_id', self.tmdb_id)
+        ]
+
     @property
     def context_menu_choosedefault_paramstring(self):
-        path = f'set_chosenplayer={self.title},tmdb_type={self.tmdb_type},tmdb_id={self.tmdb_id}'
-        return path
+        return ','.join([f'{k}={v}' for k, v in self.get_context_menu_choosedefault_params()])
 
     @property
     def context_menu_choosedefault(self):
@@ -520,6 +534,10 @@ class _Tvshow(_Video):
         self.params['info'] = global_setting['flatseasons_info_param']
         return self.params
 
+    def finalise_context_menu(self):
+        self.context_menu.append(self.context_menu_choosedefault)
+        return super().finalise_context_menu()
+
 
 class _Season(_Tvshow):
 
@@ -546,11 +564,12 @@ class _Season(_Tvshow):
     def season(self):
         return self.infolabels.get('season')
 
-    @property
-    def context_menu_choosedefault_paramstring(self):
-        path = f'set_chosenplayer={self.title},tmdb_type={self.tmdb_type},tmdb_id={self.tmdb_id}'
-        path = f'{path},season={self.season}'
-        return path
+    def get_context_menu_choosedefault_params(self):
+        params = super().get_context_menu_choosedefault_params()
+        params.extend([
+            ('season', self.season)
+        ])
+        return params
 
     def finalise_params_details(self):
         self.params['info'] = 'episodes'
@@ -626,11 +645,13 @@ class _Episode(_Video):
         self.label = super().finalise_label()
         return self.label
 
-    @property
-    def context_menu_choosedefault_paramstring(self):
-        path = f'set_chosenplayer={self.title},tmdb_type={self.tmdb_type},tmdb_id={self.tmdb_id}'
-        path = f'{path},season={self.season},episode={self.episode}'
-        return path
+    def get_context_menu_choosedefault_params(self):
+        params = super().get_context_menu_choosedefault_params()
+        params.extend([
+            ('season', self.season),
+            ('episode', self.episode)
+        ])
+        return params
 
         # if (self.parent_params.get('info') == 'library_nextaired'
         #         and global_setting['nextaired_linklibrary']

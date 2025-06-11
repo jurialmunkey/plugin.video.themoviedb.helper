@@ -1,3 +1,4 @@
+from tmdbhelper.lib.api.trakt.sync.property_mixins import SyncDataParentProperties
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp, convert_timestamp, is_unaired_timestamp
 from tmdbhelper.lib.api.trakt.sync.activity import SyncLastActivities
@@ -30,37 +31,25 @@ def progress_bg(func):
     return wrapper
 
 
-class DataType:
+class DataType(SyncDataParentProperties):
     sync_kwgs = {}
     lock_name = 'sync_trakt'
     key_prefix = None
     expiry_time = DEFAULT_EXPIRY
 
-    def __init__(self, class_instance_syncdata, item_type):
-        self._class_instance_syncdata = class_instance_syncdata
+    def __init__(self, instance_syncdata, item_type):
+        self.instance_syncdata = instance_syncdata
         self._item_type = item_type
 
     @property
     def mutex_lockname(self):
         return f'{self.cache._db_file}.{self.lock_name}.{self.item_type}.{self.method}.lockfile'
 
-    @property
-    def cache(self):
-        return self._class_instance_syncdata.cache
-
-    @property
-    def window(self):
-        return self._class_instance_syncdata.window
-
     @cached_property
     def item_type(self):
         if self._item_type in ('movie', 'show', 'season', 'episode'):
             return self._item_type
         raise ValueError(f'Invalid item_type {self._item_type} for {self.method}')
-
-    @property
-    def get_response_json(self):
-        return self._class_instance_syncdata.get_response_json
 
     def get_response_sync(self, *args, **kwargs):
         path = self.trakt_api.get_request_url(*args, **kwargs)
@@ -74,19 +63,20 @@ class DataType:
         except AttributeError:
             return
 
-    @property
-    def trakt_api(self):
-        return self._class_instance_syncdata._class_instance_trakt_api
-
     @cached_property
     def last_activities(self):
         return self.get_last_activities()
 
     def get_last_activities(self):
-        return SyncLastActivities(self._class_instance_syncdata)
+        return SyncLastActivities(self.instance_syncdata)
 
     def store_last_activity(self):
-        self.cache.set_activity(self.item_type, self.method, self.last_activities.json.get('all') or '2000-01-01T00:00:00.000Z', set_timestamp(self.expiry_time, set_int=True))
+        self.cache.set_activity(
+            self.item_type,
+            self.method,
+            self.last_activities.json.get('all') or '2000-01-01T00:00:00.000Z',
+            set_timestamp(self.expiry_time, set_int=True)
+        )
 
     @property
     def last_activities_item_type(self):
@@ -118,8 +108,10 @@ class DataType:
     def sync_data(self, **kwargs):
         self.dialog_progress_bg.update(20, message='Refreshing Data')
         meta = self.sync_func()
+
+        # Failed sync returns None
         if meta is None:
-            return
+            return False
 
         from tmdbhelper.lib.api.trakt.sync.itemdata import SyncItem
         item = SyncItem(self.item_type, meta, self.keys, key_prefix=self.key_prefix)
@@ -127,8 +119,9 @@ class DataType:
         self.dialog_progress_bg.update(40, message='Cleaning Data')
         self.clear_columns(item.base_table_keys)
 
+        # Successful sync without items returns an empty list
         if not meta:
-            return
+            return True
 
         self.dialog_progress_bg.update(60, message='Configuring Data')
         data = item.data
@@ -136,14 +129,15 @@ class DataType:
         self.dialog_progress_bg.update(80, message='Updating Data')
         self.cache.set_many_values(keys=item.table_keys, data=data)
 
-        return (item.table_keys, data, )
+        return True
 
     @mutexlock
     def sync(self, forced=False):
         if not forced and not self.is_expired:
             return
+        if not self.sync_data():
+            return
         self.store_last_activity()
-        self.sync_data()
 
 
 class DataTypeEpisodes(DataType):
@@ -179,9 +173,7 @@ class SyncHiddenProgressWatched(DataType):
         """ Get items that are hidden on Trakt """
         from tmdbhelper.lib.addon.logger import TimerFunc
         with TimerFunc(f'Sync: {self.__class__.__name__} get_response_sync users {self.method} {self.item_type}', inline=True, log_threshold=0.001):
-            response = []
-            response += self.get_response_sync('users', self.method, type=f'{self.item_type}s', limit=4095) or []
-            return response
+            return self.get_response_sync('users', self.method, type=f'{self.item_type}s', limit=4095)
 
 
 class SyncHiddenProgressCollected(SyncHiddenProgressWatched):
@@ -259,9 +251,9 @@ class SyncNextEpisodeItem:
             return
 
     @cached_property
-    def trakt_id(self):
+    def trakt_slug(self):
         try:
-            return self.item['trakt_id']
+            return self.item['trakt_slug']
         except (KeyError, TypeError, NameError):
             return
 
@@ -323,10 +315,10 @@ class SyncNextEpisodeItem:
 
     @cached_property
     def response(self):
-        if not self.trakt_id:
+        if not self.trakt_slug:
             return
         return self.get_response_sync(
-            f'shows/{self.trakt_id}/progress/watched',
+            f'shows/{self.trakt_slug}/progress/watched',
             extended='full')
 
     @cached_property
@@ -353,7 +345,7 @@ class SyncNextEpisodeItem:
             "show": {
                 "ids": {
                     "tmdb": self.tmdb_id,
-                    "trakt": self.trakt_id
+                    "slug": self.trakt_slug
                 }
             }
         }
@@ -373,7 +365,7 @@ class SyncAllNextEpisodes(DataTypeEpisodes):
 
         def get_item(i, item_id):
             tmdb_type, tmdb_id, season_number, episode_number = item_id.split('.')
-            item = {"show": {"ids": {"tmdb": i["tmdb_id"], "trakt": i["trakt_id"]}}}
+            item = {"show": {"ids": {"tmdb": i["tmdb_id"], "slug": i["trakt_slug"]}}}
             item['upnext_episode_id'] = item_id
             item['type'] = 'episode'
             item['episode'] = {'season': season_number, 'number': episode_number}
@@ -382,9 +374,9 @@ class SyncAllNextEpisodes(DataTypeEpisodes):
         def update_dialog_progress(sync):
             self.dialog_progress_bg.increment()
             self.dialog_progress_bg.set_message((
-                f'Skip: {sync.tmdb_id} {sync.trakt_id}'
+                f'Skip: {sync.tmdb_id} {sync.trakt_slug}'
                 if not sync.all_next_episodes
-                else f'Sync: {sync.tmdb_id} {sync.trakt_id}'
+                else f'Sync: {sync.tmdb_id} {sync.trakt_slug}'
             ))
 
         def get_items(i):
@@ -399,8 +391,8 @@ class SyncAllNextEpisodes(DataTypeEpisodes):
             return [i for items in item_queue for i in items if i]
 
         def get_sd():
-            sd = self._class_instance_syncdata.get_all_unhidden_shows_inprogress_getter()
-            sd.additional_keys = ('trakt_id', )
+            sd = self.instance_syncdata.get_all_unhidden_shows_inprogress_getter()
+            sd.additional_keys = ('trakt_slug', )
             return sd
 
         with TimerFunc(f'Sync: {self.__class__.__name__} get_meta {self.method} {self.item_type}', inline=True, log_threshold=0.001):
@@ -439,8 +431,8 @@ class SyncNextEpisodes(SyncAllNextEpisodes):
             return [i for i in item_queue if i]
 
         def get_sd():
-            sd = self._class_instance_syncdata.get_all_unhidden_shows_inprogress_getter()
-            sd.additional_keys = ('trakt_id', )
+            sd = self.instance_syncdata.get_all_unhidden_shows_inprogress_getter()
+            sd.additional_keys = ('trakt_slug', )
             return sd
 
         with TimerFunc(f'Sync: {self.__class__.__name__} get_meta {self.method} {self.item_type}', inline=True, log_threshold=0.001):

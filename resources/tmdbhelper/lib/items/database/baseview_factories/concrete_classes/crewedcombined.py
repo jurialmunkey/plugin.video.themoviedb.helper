@@ -12,7 +12,7 @@ class CrewedCombinedMediaList(StarredCombinedMediaList):
             'department': i['department'],
             'popularity': i['popularity'],
             'tmdb_id': i['tmdb_id'],
-            'tmdb_type': 'movie',
+            'tmdb_type': i['tmdb_type'],
         }
 
     cached_data_keys = (
@@ -20,6 +20,8 @@ class CrewedCombinedMediaList(StarredCombinedMediaList):
         'GROUP_CONCAT(role, " / ") as role',
         'GROUP_CONCAT(department, " / ") as department',
         'media.tmdb_id as tmdb_id',
+        'media.tmdb_type as tmdb_type',
+        'media.mediatype as mediatype',
         'media.title as title',
         'media.year as year',
         'media.premiered as premiered',

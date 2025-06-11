@@ -30,6 +30,6 @@ class ItemComments(ItemSync):
 
     def sync(self):
         with BusyDialog():
-            comments = self.trakt_api.get_response_json(f'{self.trakt_type}s', self.trakt_id, 'comments', limit=50) or []
+            comments = self.trakt_api.get_response_json(f'{self.trakt_type}s', self.trakt_slug, 'comments', limit=50) or []
             itemlist = [i.get('comment', '').replace('\n', ' ') for i in comments]
         self.select_comment(itemlist, comments)

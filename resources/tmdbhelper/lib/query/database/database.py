@@ -3,34 +3,40 @@ from tmdbhelper.lib.files.dbfunc import DatabaseAccess
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.tmdate import set_timestamp
 from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY
-from tmdbhelper.lib.api.tmdb.database_tables.genres import TMDbDatabaseGenres
-from tmdbhelper.lib.api.tmdb.database_tables.tmdb_id import TMDbDatabaseTMDbID
-from tmdbhelper.lib.api.tmdb.database_tables.certification import TMDbDatabaseCertification
-from tmdbhelper.lib.api.tmdb.database_tables.provider_regions import TMDbDatabaseProviderRegions
-from tmdbhelper.lib.api.tmdb.database_tables.watch_providers import TMDbDatabaseWatchProviders
-from tmdbhelper.lib.api.tmdb.database_tables.collections import TMDbDatabaseCollections
-from tmdbhelper.lib.api.tmdb.database_tables.keywords import TMDbDatabaseKeywords
-from tmdbhelper.lib.api.tmdb.database_tables.studios import TMDbDatabaseStudios
-from tmdbhelper.lib.api.tmdb.database_tables.networks import TMDbDatabaseNetworks
-from tmdbhelper.lib.api.tmdb.database_tables.movies import TMDbDatabaseMovies
-from tmdbhelper.lib.api.tmdb.database_tables.tvshows import TMDbDatabaseTvshows
+from tmdbhelper.lib.query.database.genres import FindQueriesDatabaseGenres
+from tmdbhelper.lib.query.database.tmdb_id import FindQueriesDatabaseTMDbID
+from tmdbhelper.lib.query.database.certification import FindQueriesDatabaseCertification
+from tmdbhelper.lib.query.database.provider_regions import FindQueriesDatabaseProviderRegions
+from tmdbhelper.lib.query.database.watch_providers import FindQueriesDatabaseWatchProviders
+from tmdbhelper.lib.query.database.collections import FindQueriesDatabaseCollections
+from tmdbhelper.lib.query.database.keywords import FindQueriesDatabaseKeywords
+from tmdbhelper.lib.query.database.studios import FindQueriesDatabaseStudios
+from tmdbhelper.lib.query.database.networks import FindQueriesDatabaseNetworks
+from tmdbhelper.lib.query.database.movies import FindQueriesDatabaseMovies
+from tmdbhelper.lib.query.database.tvshows import FindQueriesDatabaseTvshows
+from tmdbhelper.lib.query.database.imdb_top250 import FindQueriesDatabaseIMDbTop250
+from tmdbhelper.lib.query.database.trakt_id import FindQueriesDatabaseTraktID
+from tmdbhelper.lib.query.database.trakt_stats import FindQueriesDatabaseTraktStats
 
 
-class TMDbDatabase(
+class FindQueriesDatabase(
     Database,
-    TMDbDatabaseGenres,
-    TMDbDatabaseTMDbID,
-    TMDbDatabaseCertification,
-    TMDbDatabaseProviderRegions,
-    TMDbDatabaseWatchProviders,
-    TMDbDatabaseCollections,
-    TMDbDatabaseKeywords,
-    TMDbDatabaseStudios,
-    TMDbDatabaseNetworks,
-    TMDbDatabaseMovies,
-    TMDbDatabaseTvshows,
+    FindQueriesDatabaseGenres,
+    FindQueriesDatabaseTMDbID,
+    FindQueriesDatabaseCertification,
+    FindQueriesDatabaseProviderRegions,
+    FindQueriesDatabaseWatchProviders,
+    FindQueriesDatabaseCollections,
+    FindQueriesDatabaseKeywords,
+    FindQueriesDatabaseStudios,
+    FindQueriesDatabaseNetworks,
+    FindQueriesDatabaseMovies,
+    FindQueriesDatabaseTvshows,
+    FindQueriesDatabaseIMDbTop250,
+    FindQueriesDatabaseTraktID,
+    FindQueriesDatabaseTraktStats
 ):
-    cache_filename = 'LookupTMDb.db'
+    cache_filename = 'ItemQueries.db'
 
     expiry_columns = {
         'id': {
@@ -58,6 +64,9 @@ class TMDbDatabase(
             'networks': self.networks_columns,
             'movies': self.movies_columns,
             'tvshows': self.tvshows_columns,
+            'imdb_top250': self.imdb_top250_columns,
+            'trakt_id': self.trakt_id_columns,
+            'trakt_stats': self.trakt_stats_columns,
         }
 
     def __init__(self):
@@ -67,6 +76,11 @@ class TMDbDatabase(
     def tmdb_api(self):
         from tmdbhelper.lib.api.tmdb.api import TMDb
         return TMDb()
+
+    @cached_property
+    def trakt_api(self):
+        from tmdbhelper.lib.api.trakt.api import TraktAPI
+        return TraktAPI()
 
     @cached_property
     def access(self):

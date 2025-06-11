@@ -88,7 +88,7 @@ class ItemGenres(ItemViews):
 
 class ListGenres(ContainerDirectory):
     def get_items(self, tmdb_type, **kwargs):
-        items = self.tmdb_api.tmdb_database.get_genres(tmdb_type)
+        items = self.query_database.get_genres(tmdb_type)
         items = [ItemGenres(name, tmdb_id, tmdb_type).item for name, tmdb_id in items.items()]
         self.kodi_db = None
         self.container_content = 'genres'
@@ -119,7 +119,7 @@ class ItemStudios(ItemViews):
 
 class ListStudios(ContainerDirectory):
     def get_items(self, limit=250, page=1, **kwargs):
-        items = self.tmdb_api.tmdb_database.get_studios(limit=int(limit), page=int(page))
+        items = self.query_database.get_studios(limit=int(limit), page=int(page))
         items = [ItemStudios(**i).item for i in items]
         items.append({'next_page': int(page) + 1})
         self.kodi_db = None
@@ -149,7 +149,7 @@ class ItemNetworks(ItemViews):
 
 class ListNetworks(ContainerDirectory):
     def get_items(self, limit=250, page=1, **kwargs):
-        items = self.tmdb_api.tmdb_database.get_networks(limit=int(limit), page=int(page))
+        items = self.query_database.get_networks(limit=int(limit), page=int(page))
         items = [ItemNetworks(**i).item for i in items]
         items.append({'next_page': int(page) + 1})
         self.kodi_db = None
@@ -180,7 +180,7 @@ class ItemKeywords(ItemViews):
 
 class ListKeywords(ContainerDirectory):
     def get_items(self, limit=250, page=1, **kwargs):
-        items = self.tmdb_api.tmdb_database.get_keywords(limit=int(limit), page=int(page))
+        items = self.query_database.get_keywords(limit=int(limit), page=int(page))
         items = [ItemKeywords(**item).item for item in items]
         items.append({'next_page': int(page) + 1})
         self.kodi_db = None
@@ -210,7 +210,7 @@ class ItemCollections(ItemViews):
 
 class ListCollections(ContainerDirectory):
     def get_items(self, limit=20, page=1, **kwargs):
-        items = self.tmdb_api.tmdb_database.get_collections(limit=int(limit), page=int(page))
+        items = self.query_database.get_collections(limit=int(limit), page=int(page))
         items = [ItemCollections(**i).item for i in items]
         items.append({'next_page': int(page) + 1})
         self.kodi_db = None
@@ -251,7 +251,7 @@ class ItemMovies(ItemViews):
 
 class ListMovies(ContainerDirectory):
     def get_items(self, limit=20, page=1, **kwargs):
-        items = self.tmdb_api.tmdb_database.get_movies(limit=int(limit), page=int(page))
+        items = self.query_database.get_movies(limit=int(limit), page=int(page))
         items = [ItemMovies(**i).item for i in items]
         items.append({'next_page': int(page) + 1})
         self.kodi_db = None
@@ -292,7 +292,7 @@ class ItemTvshows(ItemViews):
 
 class ListTvshows(ContainerDirectory):
     def get_items(self, limit=20, page=1, **kwargs):
-        items = self.tmdb_api.tmdb_database.get_tvshows(limit=int(limit), page=int(page))
+        items = self.query_database.get_tvshows(limit=int(limit), page=int(page))
         items = [ItemTvshows(**i).item for i in items]
         items.append({'next_page': int(page) + 1})
         self.kodi_db = None
@@ -334,7 +334,7 @@ class ItemProviders(ItemViews):
 
 class ListProviders(ContainerDirectory):
     def get_items(self, tmdb_type, **kwargs):
-        items = self.tmdb_api.tmdb_database.get_watch_providers(tmdb_type, self.tmdb_api.iso_country, allowlist_only=True)
+        items = self.query_database.get_watch_providers(tmdb_type, self.tmdb_api.iso_country, allowlist_only=True)
         items = [ItemProviders(**i).item for i in items]
         self.kodi_db = None
         self.container_content = ''

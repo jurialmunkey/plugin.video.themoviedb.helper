@@ -1,7 +1,7 @@
 from tmdbhelper.lib.files.ftools import cached_property
 
 
-class TMDbDatabaseProviderRegions:
+class FindQueriesDatabaseProviderRegions:
 
     provider_regions_columns = {
         'iso_3166_1': {

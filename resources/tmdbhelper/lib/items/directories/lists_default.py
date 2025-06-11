@@ -31,6 +31,11 @@ class ListProperties:
     pagination = False
 
     @cached_property
+    def query_database(self):
+        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+        return FindQueriesDatabase()
+
+    @cached_property
     def cache_name(self):
         return '_'.join(map(str, (
             self.class_name,
@@ -96,9 +101,13 @@ class ListProperties:
         return self.filtered_items
 
     @cached_property
+    def next_page_item(self):
+        return {'next_page': self.next_page}
+
+    @cached_property
     def finalised_items(self):
         if self.pagination and self.pages and self.next_page <= self.pages:
-            self.sorted_items.append({'next_page': self.next_page})
+            self.sorted_items.append(self.next_page_item)
         return self.sorted_items
 
 

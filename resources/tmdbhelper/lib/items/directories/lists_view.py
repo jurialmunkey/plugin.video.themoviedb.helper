@@ -134,7 +134,7 @@ class ListStarredCombined(ContainerDefaultCacheDirectory):
     def get_items(self, tmdb_id, limit=None, sort_by=None, sort_how=None, offset=None, **kwargs):
         sync = BaseViewFactory('starredcombined', 'person', tmdb_id, filters=self.filters, limit=limit, offset=offset, sort_by=sort_by, sort_how=sort_how)
         try:
-            movie_count = len([i for i in sync.data if i and i['infoproperties']['tmdb_type'] == 'movie'])
+            movie_count = len([i for i in sync.data if i and i['infoproperties'].get('tmdb_type') == 'movie'])
             shows_count = len(sync.data) - movie_count
         except TypeError:
             return
@@ -169,7 +169,7 @@ class ListCrewedCombined(ContainerDefaultCacheDirectory):
     def get_items(self, tmdb_id, limit=None, sort_by=None, sort_how=None, offset=None, **kwargs):
         sync = BaseViewFactory('crewedcombined', 'person', tmdb_id, filters=self.filters, limit=limit, offset=offset, sort_by=sort_by, sort_how=sort_how)
         try:
-            movie_count = len([i for i in sync.data if i and i['infoproperties']['tmdb_type'] == 'movie'])
+            movie_count = len([i for i in sync.data if i and i['infoproperties'].get('tmdb_type') == 'movie'])
             shows_count = len(sync.data) - movie_count
         except TypeError:
             return
@@ -185,7 +185,7 @@ class ListCreditsCombined(ContainerDefaultCacheDirectory):
         sync = BaseViewFactory('creditscombined', 'person', tmdb_id, filters=self.filters, limit=limit, offset=offset, sort_by=sort_by, sort_how=sort_how)
 
         try:
-            movie_count = len([i for i in sync.data if i and i['infoproperties']['tmdb_type'] == 'movie'])
+            movie_count = len([i for i in sync.data if i and i['infoproperties'].get('tmdb_type') == 'movie'])
             shows_count = len(sync.data) - movie_count
         except TypeError:
             return

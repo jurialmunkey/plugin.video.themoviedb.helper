@@ -4,13 +4,13 @@
 # Addon Provider: jurialmunkey
 msgid ""
 msgstr ""
-"Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
-"POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2024-10-07 17:03+0200\n"
-"Last-Translator: Peat80 <>\n"
-"Language-Team: LANGUAGE\n"
-"Language: de_DE\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: jamal2362\n"
+"Language-Team: \n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -25,6 +25,11 @@ msgctxt "#30001"
 msgid "Arabic (Saudi Arabia)"
 msgstr "Arabisch (Saudi-Arabien)"
 
+#: /resources/tmdbhelper/lib/api/tmdb/methods/lists.py
+msgctxt "#32000"
+msgid "Unaired"
+msgstr "Unveröffentlicht"
+
 msgctxt "#30002"
 msgid "Belarusian (Belarus)"
 msgstr "Weißrussisch (Weißrussland)"
@@ -32,6 +37,11 @@ msgstr "Weißrussisch (Weißrussland)"
 msgctxt "#30003"
 msgid "Bulgarian (Bulgaria)"
 msgstr "Bulgarisch (Bulgarien)"
+
+#: /resources/settings.xml
+msgctxt "#32003"
+msgid "Preferred"
+msgstr "Bevorzugt"
 
 msgctxt "#30004"
 msgid "Bengali (Bangladesh)"
@@ -41,9 +51,24 @@ msgctxt "#30005"
 msgid "Catalan (Spain)"
 msgstr "Katalanisch (Spanien)"
 
+#: /resources/settings.xml
+msgctxt "#32006"
+msgid "Supplement"
+msgstr "Ergänzung"
+
 msgctxt "#30006"
 msgid "Chamorro (Guam)"
 msgstr "Chamorro (Guam)"
+
+#: /resources/settings.xml
+msgctxt "#32008"
+msgid "Low"
+msgstr "Niedrig"
+
+#: /resources/settings.xml
+msgctxt "#32009"
+msgid "High"
+msgstr "Hoch"
 
 msgctxt "#30007"
 msgid "Czech (Czech Republic)"
@@ -57,9 +82,19 @@ msgctxt "#30009"
 msgid "German (Austria)"
 msgstr "Deutsch (Österreich)"
 
+#: /resources/settings.xml
+msgctxt "#32013"
+msgid "Get watched indicators, episode counts, and resume points"
+msgstr "Indikatoren zur Beobachtung, Episodenanzahl und Fortsetzungspunkte erhalten"
+
 msgctxt "#30010"
 msgid "German (Switzerland)"
 msgstr "Deutsch (Schweiz)"
+
+#: /resources/settings.xml
+msgctxt "#32015"
+msgid "Additional season: Up next"
+msgstr "Zusätzliche Staffel: Als Nächstes"
 
 msgctxt "#30011"
 msgid "German (Germany)"
@@ -69,13 +104,28 @@ msgctxt "#30012"
 msgid "Greek (Greece)"
 msgstr "Griechisch (Griechenland)"
 
+#: /resources/settings.xml
+msgctxt "#32018"
+msgid "Additional season: Anticipated"
+msgstr "Zusätzliche Staffel: Erwartete"
+
 msgctxt "#30013"
 msgid "English (Australia)"
 msgstr "Englisch (Australien)"
 
+#: /resources/settings.xml
+msgctxt "#32020"
+msgid "Additional season: Specials"
+msgstr "Zusätzliche Staffel: Specials"
+
 msgctxt "#30014"
 msgid "English (Canada)"
 msgstr "Englisch (Kanada)"
+
+#: /resources/settings.xml
+msgctxt "#32022"
+msgid "Clear sync data"
+msgstr "Synchronisationsdaten löschen"
 
 msgctxt "#30015"
 msgid "English (United Kingdom)"
@@ -88,6 +138,21 @@ msgstr "Englisch (Irland)"
 msgctxt "#30017"
 msgid "English (New Zealand)"
 msgstr "Englisch (Neuseeland)"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32026"
+msgid "Invalidate Sync Data"
+msgstr "Synchronisationsdaten ungültig machen"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32027"
+msgid "Successfully cleared {} sync data"
+msgstr "Synchronisationsdaten {} erfolgreich gelöscht"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32028"
+msgid "Ratings"
+msgstr "Bewertungen"
 
 msgctxt "#30018"
 msgid "English (United States of America)"
@@ -113,6 +178,16 @@ msgctxt "#30023"
 msgid "Basque (Spain)"
 msgstr "Baskisch (Spanien)"
 
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32035"
+msgid "Progress"
+msgstr "Fortschritt"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32036"
+msgid "Dropped"
+msgstr "Abgebrochen"
+
 msgctxt "#30024"
 msgid "Persian (Iran)"
 msgstr "Persisch (Iran)"
@@ -120,6 +195,21 @@ msgstr "Persisch (Iran)"
 msgctxt "#30025"
 msgid "Finnish (Finland)"
 msgstr "Finnisch (Finnland)"
+
+#: /resources/settings.xml
+msgctxt "#32039"
+msgid "Prefer fanart.tv artwork"
+msgstr "fanart.tv Artwork bevorzugen"
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_seasons.py
+msgctxt "#32040"
+msgid "All seasons"
+msgstr "Alle Staffeln"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32041"
+msgid "Your In-Progress TV Shows"
+msgstr "Deine laufenden Serien"
 
 msgctxt "#30026"
 msgid "French (Canada)"
@@ -132,6 +222,51 @@ msgstr "Französisch (Frankreich)"
 msgctxt "#30028"
 msgid "Galician (Spain)"
 msgstr "Galizisch (Spanien)"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32045"
+msgid "Your In-Progress Movies"
+msgstr "Deine laufenden Filme"
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32046"
+msgid "Drop TV show"
+msgstr "Serie abbrechen"
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32047"
+msgid "Undrop TV show"
+msgstr "Serie reaktivieren"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32048"
+msgid "Dropped TV Shows"
+msgstr "Abgebrochene Serien"
+
+#: /resources/settings.xml
+msgctxt "#32049"
+msgid "Sort order of Your Next Episodes list. By airdate sorts episodes by premiere date. By recentlywatched sorts episodes by most recently watched tvshow. By todays is recentlywatched with episodes airing today at the front. By lastweek is recentlywatched with episodes airing in the past week sorted by airdate at the front."
+msgstr "Sortierreihenfolge deiner \"Nächste Episoden\"-Liste. \"Nach Ausstrahlungsdatum\" sortiert Episoden nach dem Premierendatum. \"Nach zuletzt gesehen\" sortiert Episoden nach der zuletzt angesehenen Serie. \"Nach heute\" ist wie \"zuletzt gesehen\", aber mit Episoden, die heute ausgestrahlt werden, ganz vorne. \"Nach letzter Woche\" ist wie \"zuletzt gesehen\", aber mit Episoden, die in der letzten Woche ausgestrahlt wurden, sortiert nach Ausstrahlungsdatum, ganz vorne."
+
+#: /resources/settings.xml
+msgctxt "#32050"
+msgid "Prefer artwork in your language"
+msgstr "Bevorzuge Artworks in meiner Sprache"
+
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+msgctxt "#32051"
+msgid "Deleted cached {} items"
+msgstr "Zwischengespeicherte {} Cache-Elemente löschen"
+
+#: /resources/settings.xml
+msgctxt "#32052"
+msgid "Delete TMDb cached item details"
+msgstr "TMDb-Details aus dem Cache löschen"
+
+#: /resources/settings.xml
+msgctxt "#32053"
+msgid "TMDbHelper automatically performs regular cache maintenance. You should only delete the cache when instructed to troubleshoot issues. TMDbHelper relies on having cached items to perform well. Unnecessarily deleting the cache on a regular basis will degrade performance and places excessive strain on the free services providing this data."
+msgstr "TMDbHelper führt automatisch eine regelmäßige Wartung des Caches durch. Du solltest den Cache nur dann löschen, wenn du dazu aufgefordert wirst, um Probleme zu beheben. TMDbHelper ist auf zwischengespeicherte Daten angewiesen, um eine gute Leistung zu erzielen. Das unnötige regelmäßige Löschen des Caches verschlechtert die Leistung und belastet die kostenlosen Dienste, die diese Daten bereitstellen, übermäßig."
 
 msgctxt "#30029"
 msgid "Hebrew (Israel)"
@@ -171,6 +306,26 @@ msgstr "Indikatoren für Gesehen & Episodenanzahl von Trakt herunterladen (langs
 msgctxt "#32037"
 msgid "Use bundled players"
 msgstr "Mitgelieferte Player verwenden"
+
+#: /resources/tmdbhelper/lib/items/directories/lists_base.py
+msgctxt "#32062"
+msgid "Networks"
+msgstr "Netzwerke"
+
+#: /resources/tmdbhelper/lib/api/trakt/sorting.py
+msgctxt "#32063"
+msgid "Added"
+msgstr "Hinzugefügt"
+
+#: /resources/tmdbhelper/lib/items/directories/lists_base.py
+msgctxt "#32064"
+msgid "Related"
+msgstr "Ähnlich"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_related.py
+msgctxt "#32065"
+msgid "Watchers"
+msgstr "Beobachter"
 
 #: /resources/settings.xml
 msgctxt "#32038"
@@ -1806,6 +1961,11 @@ msgid "Provider allowlist updated"
 msgstr "Liste erlaubter Provider aktualisiert"
 
 #: /resources/lib/script/method.py
+msgctxt "#32439"
+msgid "The provider allowlist has been updated."
+msgstr "Die Liste der Provider wurde aktualisiert."
+
+#: /resources/lib/player/configure.py
 msgctxt "#32440"
 msgid "Edit steps"
 msgstr "Schritte bearbeiten"
@@ -2150,6 +2310,86 @@ msgctxt "#32519"
 msgid "Remove from MDbList list"
 msgstr "Aus MDbList-Liste entfernen"
 
+#: /resources/settings.xml
+msgctxt "#32520"
+msgid "TMDb"
+msgstr "TMDb"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32521"
+msgid "Rated"
+msgstr "Bewertung"
+
+#: /resources/settings.xml
+msgctxt "#32522"
+msgid "TMDb user options"
+msgstr "TMDb-Benutzeroptionen"
+
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+msgctxt "#32523"
+msgid "Add/Remove from TMDb user list"
+msgstr "Hinzufügen/Entfernen aus der TMDb-Benutzerliste"
+
+#: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
+msgctxt "#32524"
+msgid "User lists"
+msgstr "Benutzerlisten"
+
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+msgctxt "#32525"
+msgid "Add/Remove from TMDb favourites"
+msgstr "Hinzufügen/Entfernen aus TMDb-Favoriten"
+
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+msgctxt "#32526"
+msgid "Add/Remove from TMDb watchlist"
+msgstr "Hinzufügen/Entfernen von der TMDb-Beobachtungsliste"
+
+#: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
+msgctxt "#32527"
+msgid "Remove from {}"
+msgstr "Von {} entfernen"
+
+#: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
+msgctxt "#32528"
+msgid "Add to {}"
+msgstr "Zu {} hinzufügen"
+
+#: /resources/settings.xml
+msgctxt "#32529"
+msgid "Scrobble items played via TMDbHelper"
+msgstr "Elemente, die über TMDbHelper abgespielt wurden, automatisch protokollieren (scrobbeln)"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32530"
+msgid "Remove rating"
+msgstr "Bewertung entfernen"
+
+#: /resources/tmdbhelper/lib/script/sync/item.py
+msgctxt "#32531"
+msgid "Method only available for VIP accounts."
+msgstr "Diese Methode ist nur für VIP-Konten verfügbar."
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32532"
+msgid "Force resync"
+msgstr "Neusynchronisierung erzwingen"
+
+#: /resources/settings.xml
+msgctxt "#32534"
+msgid "Trakt sync progress notifications"
+msgstr "Benachrichtigungen über den Fortschritt der Trakt-Synchronisation"
+
+#: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
+msgctxt "#32535"
+msgid "Non-binary"
+msgstr "Nicht binär"
+
+#: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
+msgctxt "#32536"
+msgid "Unspecified"
+msgstr "Nicht angegeben"
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr "Hindi (Indien)"
@@ -2381,8 +2621,3 @@ msgstr "Standard-Player (Filme)"
 msgctxt "#32025"
 msgid "Default player for episodes"
 msgstr "Standard-Player (Episoden)"
-
-#: /resources/settings.xml
-msgctxt "#32027"
-msgid "Clear default players"
-msgstr "Standard-Player löschen"

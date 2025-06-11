@@ -1,9 +1,9 @@
-from tmdbhelper.lib.api.tmdb.database_tables.daily_export import TableDailyExport
+from tmdbhelper.lib.query.database.daily_export import TableDailyExport
 
 
-class TMDbDatabaseKeywords:
+class FindQueriesDatabaseCollections:
 
-    keywords_columns = {
+    collections_columns = {
         'id': {
             'data': 'INTEGER PRIMARY KEY',
             'indexed': True
@@ -13,11 +13,11 @@ class TMDbDatabaseKeywords:
         },
     }
 
-    def get_keywords(self, limit=250, page=1):
+    def get_collections(self, limit=20, page=1):
         daily_export = TableDailyExport(self)
-        daily_export.table = 'keywords'
+        daily_export.table = 'collections'
         daily_export.keys = ('id', 'name', )
-        daily_export.export_list = 'keyword'
+        daily_export.export_list = 'collection'
         daily_export.conditions = f'name IS NOT NULL ORDER BY id LIMIT {limit}'
         daily_export.conditions = f'{daily_export.conditions} OFFSET {((limit * page) - limit)}'
         return daily_export.get_cached() or daily_export.set_cached()

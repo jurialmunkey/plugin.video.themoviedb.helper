@@ -6,7 +6,7 @@ from tmdbhelper.lib.items.container import ContainerDirectory
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized, encode_url
 from tmdbhelper.lib.addon.tmdate import get_datetime_now, get_timedelta
 from jurialmunkey.window import get_property
-
+from tmdbhelper.lib.query.database.database import FindQueriesDatabase
 from tmdbhelper.lib.files.hcache import set_search_history, get_search_history
 from tmdbhelper.lib.api.tmdb.api import TMDb
 from tmdbhelper.lib.files.ftools import cached_property
@@ -653,7 +653,7 @@ def _confirm_add(method):
 
 
 def _get_query(tmdb_type, method, query=None, header=None, use_details=False):
-    item = TMDb().tmdb_database.get_tmdb_id_from_query(
+    item = FindQueriesDatabase().get_tmdb_id_from_query(
         tmdb_type=tmdb_type,
         query=query or Dialog().input(header),
         header=header or f'{get_localized(32276)} {tmdb_type}',
@@ -731,7 +731,7 @@ def _select_properties(data_list, method, header=None, multiselect=True, separat
 
 
 def _get_genre(tmdb_type, method):
-    data_list = TMDb().tmdb_database.get_genres(tmdb_type)
+    data_list = FindQueriesDatabase().get_genres(tmdb_type)
     if not data_list:
         return
     data_list = [{'name': k, 'id': v} for k, v in data_list.items()]
@@ -774,10 +774,11 @@ def _get_certification(method='certification'):
     iso_country = _win_prop('certification_country')
 
     tmdb = TMDb()
+    query_database = FindQueriesDatabase()
 
     # Ask for iso country
     if not iso_country:
-        all_certifications = tmdb.tmdb_database.get_certification('movie')
+        all_certifications = query_database.get_certification('movie')
         all_certifications = [i['iso_country'] for i in all_certifications]
 
         try:
@@ -791,7 +792,7 @@ def _get_certification(method='certification'):
         iso_country = all_certifications[x]
 
     # Get certifications for region
-    region_certifications = tmdb.tmdb_database.get_certification('movie', iso_country)
+    region_certifications = query_database.get_certification('movie', iso_country)
     gui_items = [i.get('certification') for i in region_certifications]
 
     x = Dialog().select(get_localized(32486), gui_items)
@@ -819,10 +820,11 @@ def _get_watch_provider(tmdb_type):
     iso_c_label = _win_prop('watch_region', 'Label')
 
     tmdb = TMDb()
+    query_database = FindQueriesDatabase()
 
     # Get valid provider regions from TMDb
     if not iso_country:
-        regions = tmdb.tmdb_database.provider_regions
+        regions = query_database.provider_regions
         iso_regions = [k for k in regions.keys()]
         region_list = [f'{k} - {regions[k]}' for k in iso_regions]
         x = Dialog().select(
@@ -839,7 +841,7 @@ def _get_watch_provider(tmdb_type):
 
     # Get providers for region
 
-    providers = tmdb.tmdb_database.get_watch_providers(tmdb_type, iso_country)
+    providers = query_database.get_watch_providers(tmdb_type, iso_country)
     gui_items = []
     for i in providers:
         li = ListItem(i.get('provider_name'), f"{iso_c_label} ({iso_country}) - ID #{i.get('provider_id')}")

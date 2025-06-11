@@ -15,10 +15,10 @@ class CreditsCombinedMediaList(StarredCombinedMediaList):
         ) credits ON credits.tmdb_id = person.tmdb_id
         INNER JOIN
         (
-            SELECT tmdb_id, title, year, premiered, status, votes, rating, popularity, id
+            SELECT tmdb_id, title, year, premiered, status, votes, rating, popularity, id, "movie" as tmdb_type, "movie" as mediatype
             FROM movie
             UNION
-            SELECT tmdb_id, title, year, premiered, status, votes, rating, popularity, id
+            SELECT tmdb_id, title, year, premiered, status, votes, rating, popularity, id, "tv" as tmdb_type, "tvshow" as mediatype
             FROM tvshow
         ) media ON media.id = credits.parent_id
     """
@@ -37,7 +37,7 @@ class CreditsCombinedMediaList(StarredCombinedMediaList):
             'department': i['department'],
             'popularity': i['popularity'],
             'tmdb_id': i['tmdb_id'],
-            'tmdb_type': 'movie',
+            'tmdb_type': i['tmdb_type'],
         }
 
     @property
@@ -45,6 +45,8 @@ class CreditsCombinedMediaList(StarredCombinedMediaList):
         return (
             'media.id as parent_id',
             'media.tmdb_id as tmdb_id',
+            'media.tmdb_type as tmdb_type',
+            'media.mediatype as mediatype',
             'media.title as title',
             'media.year as year',
             'media.premiered as premiered',

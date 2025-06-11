@@ -1,7 +1,7 @@
-from tmdbhelper.lib.api.tmdb.database_tables.daily_export import TableDailyExport
+from tmdbhelper.lib.query.database.daily_export import TableDailyExport
 
 
-class TMDbDatabaseStudios:
+class FindQueriesDatabaseStudios:
 
     studios_columns = {
         'id': {

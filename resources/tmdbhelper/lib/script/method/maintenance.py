@@ -5,18 +5,17 @@
 def vacuum_databases():
     from tmdbhelper.lib.addon.logger import TimerFunc
     from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
-    from tmdbhelper.lib.api.tmdb.database import TMDbDatabase
+    from tmdbhelper.lib.query.database.database import FindQueriesDatabase
     with TimerFunc('Vacuuming databases:', inline=True):
         ItemDetailsDatabase().execute_sql("VACUUM")
-        TMDbDatabase().execute_sql("VACUUM")
+        FindQueriesDatabase().execute_sql("VACUUM")
 
 
 def clean_old_databases():
     """ Once-off routine to delete old unused database versions to avoid wasting disk space """
     from tmdbhelper.lib.files.futils import delete_folder
     from tmdbhelper.lib.addon.plugin import get_setting
-    # databases = ['database', 'database_v2', 'database_v3', 'database_v4', 'database_v5', 'database_v6']
-    databases = ['database', 'database_v2', 'database_v3', 'database_v4', 'database_v5']
+    databases = ['database', 'database_v2', 'database_v3', 'database_v4', 'database_v5', 'database_v6', 'database_v7']
     for f in databases:
         delete_folder(f, force=True, check_exists=True)
     save_path = get_setting('image_location', 'str')
