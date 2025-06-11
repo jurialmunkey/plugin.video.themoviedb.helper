@@ -29,6 +29,7 @@ class ListProperties:
     cache_days = 0.25  # 6 hours default cache
     dbid_sorted = False
     pagination = False
+    is_cacheonly = True
 
     @cached_property
     def query_database(self):
@@ -42,7 +43,7 @@ class ListProperties:
     @cached_property
     def pmax(self):
         pmax = self.length or self.page_length or 1
-        pmax = min(pmax, self.page_length)
+        pmax = min(pmax, 8 if self.is_cacheonly else self.page_length)
         return pmax
 
     @cached_property
