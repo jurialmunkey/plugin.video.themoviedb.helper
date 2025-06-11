@@ -276,8 +276,12 @@ class SyncNextEpisodeItem:
         return self.response.get('next_episode')
 
     @cached_property
+    def next_episode_aired_at(self):
+        return self.next_episode['first_aired']
+
+    @cached_property
     def next_episode_is_unaired(self):
-        return is_unaired_timestamp(self.next_episode['first_aired'])
+        return is_unaired_timestamp(self.next_episode_aired_at)
 
     @cached_property
     def next_episode_season(self):
@@ -342,6 +346,7 @@ class SyncNextEpisodeItem:
             return {}
         return {
             "next_episode_id": self.next_episode_id,
+            "next_episode_aired_at": self.next_episode_aired_at,
             "show": {
                 "ids": {
                     "tmdb": self.tmdb_id,
@@ -365,11 +370,20 @@ class SyncAllNextEpisodes(DataTypeEpisodes):
 
         def get_item(i, item_id):
             tmdb_type, tmdb_id, season_number, episode_number = item_id.split('.')
-            item = {"show": {"ids": {"tmdb": i["tmdb_id"], "slug": i["trakt_slug"]}}}
-            item['upnext_episode_id'] = item_id
-            item['type'] = 'episode'
-            item['episode'] = {'season': season_number, 'number': episode_number}
-            return item
+            return {
+                "show": {
+                    "ids": {
+                        "tmdb": i["tmdb_id"],
+                        "slug": i["trakt_slug"]
+                    }
+                },
+                "upnext_episode_id": item_id,
+                "type": "episode",
+                "episode": {
+                    "season": season_number,
+                    "number": episode_number,
+                }
+            }
 
         def update_dialog_progress(sync):
             self.dialog_progress_bg.increment()
@@ -400,7 +414,7 @@ class SyncAllNextEpisodes(DataTypeEpisodes):
 
 
 class SyncNextEpisodes(SyncAllNextEpisodes):
-    keys = ('next_episode_id', )
+    keys = ('next_episode_id', 'next_episode_aired_at')
     last_activities_key = 'watched_at'
     method = 'nextup'
     expiry_time = HALFDAY_EXPIRY

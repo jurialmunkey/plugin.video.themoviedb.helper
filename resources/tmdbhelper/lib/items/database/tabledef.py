@@ -943,6 +943,11 @@ SIMPLECACHE_COLUMNS = {
         'sync': ('tmdbhelper.lib.api.trakt.sync.datatype', 'SyncNextEpisodes', ),
         'indexed': True
     },
+    'next_episode_aired_at': {
+        'data': 'TEXT',
+        'sync': ('tmdbhelper.lib.api.trakt.sync.datatype', 'SyncNextEpisodes', ),
+        'indexed': True
+    },
     'upnext_episode_id': {
         'data': 'TEXT',
         'sync': ('tmdbhelper.lib.api.trakt.sync.datatype', 'SyncAllNextEpisodes', ),

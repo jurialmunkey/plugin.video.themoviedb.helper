@@ -268,6 +268,16 @@ class SyncItemData:
         return self.item.get('next_episode_id')
 
     """
+    next_episode_aired_at
+    """
+    @cached_property
+    def next_episode_aired_at(self):
+        return self.get_next_episode_aired_at()
+
+    def get_next_episode_aired_at(self):
+        return self.item.get('next_episode_aired_at')
+
+    """
     upnext_episode_id
     """
     @cached_property
