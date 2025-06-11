@@ -67,7 +67,7 @@ class EpisodeMDbListItemMapper(MediaMDbListItemMapper):
 def FactoryMDbListItemMapper(meta, add_infoproperties=None):
     routes = {
         'movie': MovieMDbListItemMapper,
-        'tvshow': TVShowMDbListItemMapper,
+        'show': TVShowMDbListItemMapper,
         'season': SeasonMDbListItemMapper,
         'episode': EpisodeMDbListItemMapper,
     }

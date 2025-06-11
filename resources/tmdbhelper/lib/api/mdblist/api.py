@@ -126,5 +126,8 @@ class MDbList(RequestAPI):
         response = self.get_paginated(response, page=page, limit=limit)
         return response
 
+    def get_response(self, *args, **kwargs):
+        return self.get_api_request(self.get_request_url(*args, **kwargs), headers=self.headers)
+
     def get_paginated(self, response, page=1, limit: int = None, permitted_types: tuple = None, trakt_style=False):
         return ItemListPagination(response or {}, page=page, limit=limit, permitted_types=permitted_types, trakt_style=trakt_style)

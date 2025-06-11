@@ -114,9 +114,6 @@ class ListMDbListLocalProperties(ListStandardProperties):
     def next_page_item(self):
         return {'next_page': self.next_page}
 
-    def get_cached_items(self, *args, **kwargs):  # Override caching
-        return self.get_uncached_items(*args, **kwargs)
-
     def get_uncached_items(self):
         return {
             'items': self.class_pages(self, self.page).items,
@@ -147,9 +144,14 @@ class ListMDbListLocalProperties(ListStandardProperties):
         return FactoryMDbListItemMapper(item, add_infoproperties).item
 
 
+class ListMDbListLocalNoCacheProperties(ListMDbListLocalProperties):
+    def get_cached_items(self, *args, **kwargs):  # Override caching
+        return self.get_uncached_items(*args, **kwargs)
+
+
 class ListMDbListLocal(ListStandard):
 
-    list_properties_class = ListMDbListLocalProperties
+    list_properties_class = ListMDbListLocalNoCacheProperties  # Don't cache filepath items
 
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)

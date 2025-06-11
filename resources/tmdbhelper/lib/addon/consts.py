@@ -300,8 +300,8 @@ ROUTE_NOID = {
         'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_local',
         'import_attr': 'ListMDbListLocal'}},
     'mdblist_userlist': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_mdblist',
-        'import_attr': 'ListCustom'}},
+        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_custom',
+        'import_attr': 'ListMDbListCustom'}},
     'mdblist_searchlists': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.lists_mdblist',
         'import_attr': 'ListCustomSearch'}},
