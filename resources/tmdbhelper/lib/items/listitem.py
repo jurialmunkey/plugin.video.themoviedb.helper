@@ -221,7 +221,7 @@ class _ListItem(object):
 
         if self.infoproperties.get('is_sortable'):
             self.params['parent_info'] = self.params['info']
-            self.params['info'] = 'trakt_sortby'  # Reroute sortable lists to display options in skinshortcuts
+            self.params['info'] = 'mdblist_sortby' if self.infoproperties['is_sortable'] == 'mdblist' else 'trakt_sortby'  # Reroute sortable lists to display options in skinshortcuts
 
         if self.params.get('info') == 'search' and not self.params.get('query'):
             self.params['reload'] = 'forced'  # Add param to empty search to ensure reloads

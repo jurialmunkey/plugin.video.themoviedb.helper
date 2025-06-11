@@ -296,6 +296,9 @@ ROUTE_NOID = {
     'trakt_years': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_years',
         'import_attr': 'ListTraktYears'}},
+    'mdblist_sortby': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_sorting',
+        'import_attr': 'ListMDbListSortBy'}},
     'mdblist_locallist': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_local',
         'import_attr': 'ListMDbListLocal'}},
