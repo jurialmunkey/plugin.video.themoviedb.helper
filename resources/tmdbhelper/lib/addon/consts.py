@@ -14,6 +14,7 @@ DATALEVEL_MAX = 5
 TVDB_DISCLAIMER = 'Information provided by TheTVDB.com. Please consider supporting them. https://thetvdb.com/subscribe'
 
 NODE_BASEDIR = 'special://profile/addon_data/plugin.video.themoviedb.helper/nodes/'
+RUNSCRIPT = 'Runscript(plugin.video.themoviedb.helper,{})'
 
 LANGUAGES = (
     'ar-AE', 'ar-SA', 'be-BY', 'bg-BG', 'bn-BD', 'ca-ES', 'ch-GU', 'cs-CZ', 'da-DK', 'de-AT', 'de-CH',
@@ -144,23 +145,6 @@ RANDOMISED_TRAKT = {
     'random_anticipated': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
         'import_attr': 'ListTraktAnticipatedRandomised'}}}
-
-
-MDBLIST_LIST_OF_LISTS_ROUTE = {
-    'module_name': 'tmdbhelper.lib.items.directories.lists_mdblist',
-    'import_attr': 'ListLists'}
-MDBLIST_LIST_OF_LISTS = {
-    'mdblist_toplists': {
-        'path': 'lists/top',
-        'route': MDBLIST_LIST_OF_LISTS_ROUTE,
-        'plugin_category': '{localized}',
-        'localized': 32421},
-    'mdblist_yourlists': {
-        'path': 'lists/user',
-        'route': MDBLIST_LIST_OF_LISTS_ROUTE,
-        'plugin_category': '{localized}',
-        'localized': 32211},
-}
 
 
 ROUTE_NOID = {
@@ -305,9 +289,15 @@ ROUTE_NOID = {
     'mdblist_userlist': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_custom',
         'import_attr': 'ListMDbListCustom'}},
+    'mdblist_toplists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
+        'import_attr': 'ListMDbListListsTop'}},
+    'mdblist_yourlists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
+        'import_attr': 'ListMDbListListsUser'}},
     'mdblist_searchlists': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_mdblist',
-        'import_attr': 'ListCustomSearch'}},
+        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
+        'import_attr': 'ListMDbListListsSearch'}},
     'dir_tvdb_awards': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tvdb.lists_awards',
         'import_attr': 'ListAwards'}},
