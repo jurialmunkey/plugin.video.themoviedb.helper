@@ -5,9 +5,6 @@ from tmdbhelper.lib.files.ftools import cached_property
 from jurialmunkey.parser import try_int
 
 
-PAGES_LENGTH = get_setting('pagemulti_trakt', 'int') or 1
-
-
 class UncachedMDbListLocalData:
     def __init__(self, response, page=1, limit=20):
         self.response = response
@@ -108,14 +105,11 @@ class ListMDbListLocalProperties(ListStandardProperties):
 
     @cached_property
     def limit(self):
-        return self.length * 20
+        return self.pmax * 20
 
     @cached_property
     def next_page_item(self):
         return {'next_page': self.next_page}
-
-    def get_cached_items(self, *args, **kwargs):  # Override caching
-        return self.get_uncached_items(*args, **kwargs)
 
     def get_uncached_items(self):
         return {
@@ -147,18 +141,23 @@ class ListMDbListLocalProperties(ListStandardProperties):
         return FactoryMDbListItemMapper(item, add_infoproperties).item
 
 
+class ListMDbListLocalNoCacheProperties(ListMDbListLocalProperties):
+    def get_cached_items(self, *args, **kwargs):  # Override caching
+        return self.get_uncached_items(*args, **kwargs)
+
+
 class ListMDbListLocal(ListStandard):
 
-    list_properties_class = ListMDbListLocalProperties
+    list_properties_class = ListMDbListLocalNoCacheProperties  # Don't cache filepath items
 
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.plugin_name = 'TMDbHelper'
+        list_properties.page_length = get_setting('pagemulti_trakt', 'int') or 1
         return list_properties
 
-    def get_items(self, *args, paths, length=None, tmdb_type=None, **kwargs):
+    def get_items(self, *args, paths, tmdb_type=None, **kwargs):
         if not paths or not isinstance(paths, list):
             return
         self.list_properties.filepath = paths[0]
-        length = try_int(length) or PAGES_LENGTH
-        return super().get_items(*args, length=length, tmdb_type=tmdb_type, **kwargs)
+        return super().get_items(*args, tmdb_type=tmdb_type, **kwargs)

@@ -5,9 +5,6 @@ from tmdbhelper.lib.files.ftools import cached_property
 from jurialmunkey.parser import try_int
 
 
-PAGES_LENGTH = get_setting('pagemulti_trakt', 'int') or 1
-
-
 class UncachedTraktItemsPage(UncachedItemsPage):
     def __init__(self, outer_class, page):
         self.outer_class = outer_class
@@ -46,11 +43,7 @@ class ListTraktStandardProperties(ListStandardProperties):
 
     @cached_property
     def limit(self):
-        return self.length * 20
-
-    @cached_property
-    def cache_name(self):
-        return '_'.join(map(str, self.cache_name_tuple))
+        return self.pmax * 20
 
     @cached_property
     def cache_name_tuple(self):
@@ -95,9 +88,10 @@ class ListTraktStandard(ListStandard):
 
     list_properties_class = ListTraktStandardProperties
 
-    def get_items(self, *args, length=None, tmdb_type=None, **kwargs):
-        length = try_int(length) or PAGES_LENGTH
-        return super().get_items(*args, length=length, tmdb_type=tmdb_type, **kwargs)
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.page_length = get_setting('pagemulti_trakt', 'int') or 1
+        return list_properties
 
 
 class ListTraktBoxOffice(ListTraktStandard):  # Box Office doesn't support filters or pagination

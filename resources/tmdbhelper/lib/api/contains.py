@@ -3,17 +3,13 @@ from tmdbhelper.lib.files.ftools import cached_property
 
 class CommonContainerAPIs():
     @cached_property
-    def page_length(self):
-        return 1
-
-    @cached_property
     def all_awards(self):
         return self.get_awards_data()
 
     @cached_property
     def tmdb_api(self):
         from tmdbhelper.lib.api.tmdb.api import TMDb
-        return TMDb(page_length=self.page_length)
+        return TMDb()
 
     @cached_property
     def tmdb_imagepath(self):
@@ -23,7 +19,7 @@ class CommonContainerAPIs():
     @cached_property
     def trakt_api(self):
         from tmdbhelper.lib.api.trakt.api import TraktAPI
-        return TraktAPI(page_length=self.page_length)
+        return TraktAPI()
 
     @cached_property
     def ftv_api(self):

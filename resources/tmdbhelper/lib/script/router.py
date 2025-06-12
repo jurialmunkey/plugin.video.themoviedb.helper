@@ -44,6 +44,13 @@ def test_func(test_func, dialog_output=False, **kwargs):
         data = {'headers': dict(data.headers), 'request': data.json()}
         return finalise(head, data)
 
+    def test_func_mdblist_response(path, **kwargs):
+        from tmdbhelper.lib.api.mdblist.api import MDbList
+        head = path
+        data = MDbList().get_response(path, **kwargs)
+        data = {'headers': dict(data.headers), 'request': data.json()}
+        return finalise(head, data)
+
     def test_func_fanarttv(ftv_type, ftv_id, **kwargs):
         from tmdbhelper.lib.api.fanarttv.api import FanartTV
         data = FanartTV().get_request(
@@ -108,6 +115,7 @@ def test_func(test_func, dialog_output=False, **kwargs):
     routes = {
         'response': test_func_response,
         'trakt_response': test_func_trakt_response,
+        'mdblist_response': test_func_mdblist_response,
         'baseitem_factory': test_func_baseitem_factory,
         'baseview_factory': test_func_baseview_factory,
         'query_database': test_func_query_database,
@@ -174,6 +182,8 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'sync_trakt')(**kwargs),
         'sort_list':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'sort_list')(**kwargs),
+        'sort_mdblist':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'sort_mdblist')(**kwargs),
         'invalidate_trakt_sync':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'invalidate_trakt_sync')(**kwargs),
         'get_trakt_stats':

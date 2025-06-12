@@ -9,14 +9,14 @@ class ListRelatedProperties(ListStandardProperties):
         return self.request_url.format(tmdb_type=self.tmdb_type, tmdb_id=self.tmdb_id)
 
     @cached_property
-    def cache_name(self):
-        return '_'.join(map(str, (
+    def cache_name_tuple(self):
+        return (
             self.class_name,
             self.tmdb_type,
             self.tmdb_id,
             self.page,
-            self.length
-        )))
+            self.pmax
+        )
 
 
 class ListRelated(ListStandard):
@@ -35,7 +35,8 @@ class ListRecommendations(ListRelated):
         list_properties.dbid_sorted = True
         list_properties.request_url = '{tmdb_type}/{tmdb_id}/recommendations'
         list_properties.localize = 32223
-        list_properties.length = 2  # Recommendations only have 2 pages
+        list_properties.page_length = 2  # Recommendations only have 2 pages
+        list_properties.length = 2
         return list_properties
 
 

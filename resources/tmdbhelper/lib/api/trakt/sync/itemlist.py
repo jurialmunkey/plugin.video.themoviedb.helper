@@ -56,14 +56,6 @@ class ItemListSyncDataProperties:
         return EpisodeTuple
 
     @property
-    def detailed_item(self):
-        if self.item_type != 'episode':
-            return False
-        if self.sort_by not in ('airdate', 'todays', 'lastweek', ):
-            return False
-        return True
-
-    @property
     def item_types(self):
         if self.item_type == 'both':
             return ('movie', 'show', )
@@ -80,28 +72,6 @@ class ItemListSyncDataMethods:
             return data
         return sorted(data, key=lambda x: x[0][self.sort_key] if x[0][self.sort_key] is not None else self.nonetype, reverse=self.reverse)
 
-    def make_detailed_item(self, i, item_type='show'):
-        if not i['id']:
-            return i
-
-        trakt_slug = FindQueriesDatabase().get_trakt_id(id_value=i['id'], id_type='tmdb', item_type=item_type, output_type='slug')
-        if not trakt_slug:
-            return i
-
-        snum = i.get('season')
-        enum = i.get('episode')
-        args = ['seasons', snum, 'episodes', enum] if snum is not None and enum is not None else []
-        args = [f'{item_type}s', trakt_slug] + args
-        item = self.trakt_api.get_response_json(*args)
-
-        if not item:
-            return i
-
-        item.pop('ids', None)
-        item.update(i)
-
-        return item
-
     def make_list(self, sd_func):
         data = []
         for item_type in self.item_types:
@@ -115,7 +85,7 @@ class ItemListSyncDataMethods:
         data = sorted(data, key=lambda x: x.item[sd.clause_keys[0]], reverse=True)
         return [self.make_item(i) for i in self.sort_data(data) if i]
 
-    def make_item(self, i, detailed_item=False):
+    def make_item(self, i):
         item = {'id': i.item['tmdb_id'], 'mediatype': i.mediatype, 'title': i.item['title']}
         if i.mediatype in ('season', 'episode', ):
             item['season'] = i.season_number if 'season_number' in i._fields else i.item['season_number']
@@ -126,8 +96,6 @@ class ItemListSyncDataMethods:
                 item.setdefault('infoproperties', {})[k] = i.item[k]
             except IndexError:
                 pass
-        if detailed_item:
-            item = self.make_detailed_item(item)
         return item
 
 
@@ -303,35 +271,60 @@ class ItemListSyncDataNextUp(ItemListSyncData):
 
     def get_syncdata_getter(self):
         sd = self.trakt_syncdata.get_all_unhidden_shows_nextepisode_getter()
-        sd.additional_keys = self.additional_keys
+        sd.additional_keys = ('next_episode_aired_at', *self.additional_keys)
         return sd
 
     def get_presorted_items(self):
-        # configure items
-        data = [self.namedtuple_episode(i, 'episode', i['next_episode_id'].split('.')[2], i['next_episode_id'].split('.')[3], ) for i in self.syncdata_getter.items]
-        data = [i for i in self.sort_data(data) if i]
-        with ParallelThread(data, self.make_item, detailed_item=self.detailed_item) as pt:
-            item_queue = pt.queue
-        return [i for i in item_queue if i]
+        key_presorted = 'next_episode_aired_at' if self.sort_by == 'airdate' else 'last_watched_at'
+        return sorted(self.syncdata_getter.items, key=lambda x: x[key_presorted], reverse=True)
 
-    def get_special_sort(self):
+    @cached_property
+    def sort_by_days(self):
+        return -1 if self.sort_by == 'todays' else -7
+
+    def get_special_sorted_item_tuple(self, item):
         from tmdbhelper.lib.addon.tmdate import is_future_timestamp
-        days = -1 if self.sort_by == 'todays' else -7
-        recent, remainder = [], []
-        for i in self.presorted_items:
-            first_aired = i.get('first_aired')
-            if first_aired and is_future_timestamp(first_aired, "%Y-%m-%d", 10, use_today=True, days=days):
-                recent.append(i)
-                continue
-            remainder.append(i)
-        return sorted(recent, key=lambda x: x['first_aired'], reverse=True) + remainder
+        if not item['next_episode_aired_at']:
+            return (None, item)
+        if not is_future_timestamp(
+            item['next_episode_aired_at'],
+            time_fmt="%Y-%m-%d",
+            time_lim=10,
+            use_today=True,
+            days=self.sort_by_days
+        ):
+            return (None, item)
+        return (item, None)
+
+    @cached_property
+    def airsorted_items(self):
+        items_a, items_z = zip(*[
+            self.get_special_sorted_item_tuple(i)
+            for i in self.presorted_items
+        ])
+        items_a = [i for i in items_a if i]
+        items_z = [i for i in items_z if i]
+        items_a = sorted(items_a, key=lambda x: x['next_episode_aired_at'], reverse=True)
+        return items_a + items_z
+
+    def get_namedtupled_items(self, data):
+        return [
+            self.make_item(j)
+            for j in (
+                self.namedtuple_episode(
+                    i,
+                    'episode',
+                    i['next_episode_id'].split('.')[2],
+                    i['next_episode_id'].split('.')[3],
+                ) for i in data
+            ) if j
+        ]
 
     def get_items(self):
-        if self.sort_by == 'airdate':
-            return sorted(self.presorted_items, key=lambda x: x.get('first_aired') or '0', reverse=True)
-        if self.sort_by in ('todays', 'lastweek', ):
-            return self.get_special_sort()
-        return self.presorted_items
+        if self.sort_by in ('todays', 'lastweek'):
+            return self.get_namedtupled_items(self.airsorted_items)
+        if self.sort_by in ('airdate', 'recentlywatched'):
+            return self.get_namedtupled_items(self.presorted_items)
 
 
 class ItemListSyncDataUpNext(ItemListSyncData):

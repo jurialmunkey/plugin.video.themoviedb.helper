@@ -1,6 +1,6 @@
 from xbmcgui import Dialog, INPUT_ALPHANUM
-from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties, PAGES_LENGTH
-from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized
+from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties
+from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized, get_setting
 from tmdbhelper.lib.files.hcache import set_search_history, get_search_history
 from tmdbhelper.lib.items.container import ContainerDirectory
 from tmdbhelper.lib.files.ftools import cached_property
@@ -89,14 +89,14 @@ class ListMultiSearchDir(ListSearchDir):
 
 class ListSearchProperties(ListStandardProperties):
     @cached_property
-    def cache_name(self):
-        return '_'.join(map(str, (
+    def cache_name_tuple(self):
+        return (
             self.class_name,
             self.query,
             self.tmdb_type,
             self.page,
-            self.length,
-        )))
+            self.pmax,
+        )
 
     def get_search_query(self):
         from tmdbhelper.lib.addon.consts import PARAM_WIDGETS_RELOAD_FORCED
@@ -122,12 +122,12 @@ class ListSearch(ListStandard):
 
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
-        list_properties.length = None
         list_properties.request_url = 'search/{tmdb_type}?{paramstring}'
         list_properties.localize = 137
+        list_properties.page_length = get_setting('pagemulti_tmdb', 'int') or 1
         return list_properties
 
-    def get_items(self, tmdb_type, query=None, page=1, length=PAGES_LENGTH, update_listing=False, **kwargs):
+    def get_items(self, tmdb_type, query=None, page=1, length=None, update_listing=False, **kwargs):
         self.list_properties.tmdb_type = tmdb_type
         self.list_properties.original_query = query or ''
         self.list_properties.reload = kwargs.get('reload')
@@ -153,7 +153,7 @@ class ListSearch(ListStandard):
         )
 
         self.list_properties.page = try_int(page) or 1
-        self.list_properties.length = self.list_properties.length or try_int(length) or PAGES_LENGTH
+        self.list_properties.length = try_int(length)
 
         if not self.list_properties.original_query:
             params = merge_two_dicts(kwargs, {

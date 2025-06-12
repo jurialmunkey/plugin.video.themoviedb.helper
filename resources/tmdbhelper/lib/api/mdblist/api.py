@@ -1,8 +1,10 @@
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.api.request import RequestAPI
 from tmdbhelper.lib.api.api_keys.mdblist import API_KEY
-from tmdbhelper.lib.addon.plugin import ADDONPATH
+from tmdbhelper.lib.addon.plugin import ADDONPATH, get_localized
 from tmdbhelper.lib.items.itemlist import ItemListPagination, ItemListPaginationBasic
+
+RUNSCRIPT = 'Runscript(plugin.video.themoviedb.helper,{})'
 
 
 class MDbListPaginationLists(ItemListPaginationBasic):
@@ -25,6 +27,15 @@ class MDbListPaginationLists(ItemListPaginationBasic):
             'user': i.get('user_id')}
         if i.get('dynamic'):
             item['params']['dynamic'] = 'true'
+        item['context_menu'] = [
+            (
+                get_localized(32309),
+                RUNSCRIPT.format('sort_mdblist,{}'.format(','.join(f'{k}={v}' for k, v in item['params'].items())))
+            )
+        ]
+        item['infoproperties'] = {
+            'is_sortable': 'mdblist'
+        }
         return item
 
     @cached_property
@@ -125,6 +136,9 @@ class MDbList(RequestAPI):
         response = self.get_request_sc(path, cache_refresh=True if page == 1 else False)
         response = self.get_paginated(response, page=page, limit=limit)
         return response
+
+    def get_response(self, *args, **kwargs):
+        return self.get_api_request(self.get_request_url(*args, **kwargs), headers=self.headers)
 
     def get_paginated(self, response, page=1, limit: int = None, permitted_types: tuple = None, trakt_style=False):
         return ItemListPagination(response or {}, page=page, limit=limit, permitted_types=permitted_types, trakt_style=trakt_style)
