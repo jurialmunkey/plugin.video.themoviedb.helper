@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-06-11 10:59+0800\n"
+"PO-Revision-Date: 2025-06-12 14:14+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -332,6 +332,21 @@ msgctxt "#32038"
 msgid "Get additional details from the local Kodi library database"
 msgstr "从 Kodi 本地媒体库数据库获取扩展元数据"
 
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32067"
+msgid "Budget"
+msgstr "票房"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32068"
+msgid "Revenue"
+msgstr "收益"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32069"
+msgid "Last Air Date"
+msgstr "最后播出日期"
+
 #: /resources/settings.xml
 msgctxt "#32042"
 msgid "Choose Action"
@@ -341,6 +356,11 @@ msgstr "选择操作"
 msgctxt "#32043"
 msgid "Up Next"
 msgstr "下一个"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32072"
+msgid "Score"
+msgstr "评分"
 
 #: /resources/lib/container.py
 msgctxt "#32044"
@@ -372,6 +392,11 @@ msgctxt "#32058"
 msgid "The provided URL is either invalid or inaccesible."
 msgstr "提供的 URL 无效或不可访问。"
 
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32079"
+msgid "User"
+msgstr "用户"
+
 #: /resources/lib/downloader.py
 msgctxt "#32059"
 msgid "Success!"
@@ -381,6 +406,16 @@ msgstr "成功！"
 msgctxt "#32060"
 msgid "files extracted"
 msgstr "提取文件"
+
+#: /resources/settings.xml
+msgctxt "#32082"
+msgid "Page multiplier (Other basic lists)"
+msgstr "页面乘数（其他基本列表）"
+
+#: /resources/settings.xml
+msgctxt "#32083"
+msgid "Page multiplier (Database sync lists)"
+msgstr "页面乘数（数据库同步列表）"
 
 #: /resources/lib/player.py
 msgctxt "#32061"
