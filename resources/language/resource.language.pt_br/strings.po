@@ -331,6 +331,21 @@ msgctxt "#32038"
 msgid "Get additional details from the local Kodi library database"
 msgstr "Obtenha detalhes adicionais do banco de dados da biblioteca Kodi local"
 
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32067"
+msgid "Budget"
+msgstr "Orçamento"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32068"
+msgid "Revenue"
+msgstr "Receita"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32069"
+msgid "Last Air Date"
+msgstr "Data da Última Exibição"
+
 #: /resources/settings.xml
 msgctxt "#32042"
 msgid "Choose Action"
@@ -340,6 +355,11 @@ msgstr "Escolher Ação"
 msgctxt "#32043"
 msgid "Up Next"
 msgstr "A Seguir"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32072"
+msgid "Score"
+msgstr "Avaliação"
 
 #: /resources/lib/container.py
 msgctxt "#32044"
@@ -371,6 +391,11 @@ msgctxt "#32058"
 msgid "The provided URL is either invalid or inaccesible."
 msgstr "O URL fornecido é inválido ou inacessível."
 
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32079"
+msgid "User"
+msgstr "Usuário"
+
 #: /resources/lib/downloader.py
 msgctxt "#32059"
 msgid "Success!"
@@ -380,6 +405,16 @@ msgstr "Sucesso!"
 msgctxt "#32060"
 msgid "files extracted"
 msgstr "arquivos extraídos"
+
+#: /resources/settings.xml
+msgctxt "#32082"
+msgid "Page multiplier (Other basic lists)"
+msgstr "Multiplicador de páginas (Outras listas básicas)"
+
+#: /resources/settings.xml
+msgctxt "#32083"
+msgid "Page multiplier (Database sync lists)"
+msgstr "Multiplicador de páginas (listas de sincronização de banco de dados)"
 
 #: /resources/lib/player.py
 msgctxt "#32061"
