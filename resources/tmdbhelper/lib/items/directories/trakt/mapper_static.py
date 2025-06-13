@@ -1,9 +1,8 @@
 from tmdbhelper.lib.items.directories.trakt.mapper_basic import ItemMapper
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized, get_setting, ADDONPATH
+from tmdbhelper.lib.addon.consts import RUNSCRIPT
 from contextlib import suppress
-
-RUNSCRIPT = 'Runscript(plugin.video.themoviedb.helper,{})'
 
 
 class StaticItemMapper(ItemMapper):
