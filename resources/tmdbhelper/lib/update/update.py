@@ -5,7 +5,7 @@ from tmdbhelper.lib.addon.plugin import get_setting, get_localized
 from jurialmunkey.parser import try_int
 from tmdbhelper.lib.files.futils import validify_filename, make_path, write_to_file, get_tmdb_id_nfo
 from tmdbhelper.lib.api.trakt.api import TraktAPI
-from tmdbhelper.lib.api.mdblist.api import MDbList
+from tmdbhelper.lib.items.directories.mdblist.lists_custom import ListMDbListCustom
 from tmdbhelper.lib.addon.logger import kodi_log
 
 
@@ -133,7 +133,7 @@ def get_userlist(user_slug=None, list_slug=None, confirm=True, busy_spinner=True
 
     def get_userlist_list():
         if user_slug == '__api_mdblist__':
-            return MDbList().get_custom_trakt_style_list(list_slug).items
+            return ListMDbListCustom(-1, '').get_items(list_id=list_slug)
         return TraktAPI().get_response_json(*get_userlist_path())
 
     with BusyDialog(is_enabled=busy_spinner):
