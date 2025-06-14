@@ -1,6 +1,6 @@
 from jurialmunkey.parser import try_int
 from tmdbhelper.lib.items.container import ContainerDirectory
-from tmdbhelper.lib.items.directories.lists_view import ListSeries
+from tmdbhelper.lib.items.directories.tmdb.lists_view_db import ListSeries
 from tmdbhelper.lib.items.directories.tmdb.lists_related import ListRecommendations
 from tmdbhelper.lib.items.directories.tmdb.lists_seasons import ListFlatSeasons
 

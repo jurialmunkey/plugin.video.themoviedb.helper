@@ -344,28 +344,28 @@ ROUTE_NOID = {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
         'import_attr': 'ListMostVoted'}},
     'genres': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_allitems',
         'import_attr': 'ListGenres'}},
     'watch_providers': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_allitems',
         'import_attr': 'ListProviders'}},
     'all_studios': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_allitems',
         'import_attr': 'ListStudios'}},
     'all_networks': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_allitems',
         'import_attr': 'ListNetworks'}},
     'all_collections': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_allitems',
         'import_attr': 'ListCollections'}},
     'all_keywords': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_allitems',
         'import_attr': 'ListKeywords'}},
     'all_movies': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_allitems',
         'import_attr': 'ListMovies'}},
     'all_tvshows': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_allitems',
         'import_attr': 'ListTvshows'}},
     'tmdb_v4_recommendations': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
@@ -393,49 +393,49 @@ ROUTE_TMDBID = {
         'module_name': 'tmdbhelper.lib.items.directories.lists_base',
         'import_attr': 'ListDetails'}},
     'fanart': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListFanart'}},
     'posters': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListPoster'}},
     'images': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListImage'}},
     'episode_thumbs': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListThumb'}},
     'cast': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListCast'}},
     'crew': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListCrew'}},
     'collection': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListSeries'}},
     'stars_in_movies': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListStarredMovies'}},
     'stars_in_tvshows': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListStarredTvshows'}},
     'stars_in_both': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListStarredCombined'}},
     'crew_in_movies': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListCrewedMovies'}},
     'crew_in_tvshows': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListCrewedTvshows'}},
     'crew_in_both': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListCrewedCombined'}},
     'credits_in_both': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListCreditsCombined'}},
     'videos': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListVideos'}},
     'seasons': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_seasons',
