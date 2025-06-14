@@ -60,7 +60,8 @@ class FindQueriesDatabaseGenres:
                         GENRE_TYPES['both']
                         if tmdb_id in genres_both else
                         GENRE_TYPES['tv']
-                        if tmdb_id in genres_tv else GENRE_TYPES['movie']
+                        if tmdb_id in genres_tv else
+                        GENRE_TYPES['movie']
                     ),  # TYPE
                 )
                 for tmdb_id in set().union(genres_tv, genres_movies)
