@@ -47,7 +47,7 @@ class ListTraktRandomised(ListTraktStandard):
             items += super().get_items(*args, length=length, tmdb_type='movie', **kwargs) or []
             self.list_properties = self.configure_list_properties(self.list_properties_class())
             items += super().get_items(*args, length=length, tmdb_type='tv', **kwargs) or []
-            items = random.sample(items, min((length * 20), len(items)))
+            items = random.sample(items, self.list_properties.sample_limit)
             self.plugin_category = self.list_properties.plugin_name.format(localized=self.list_properties.localized, plural=convert_type('both', 'plural'))
             self.container_content = convert_type('both', 'container', items=items)
             return items
