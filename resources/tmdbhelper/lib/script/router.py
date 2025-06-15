@@ -37,6 +37,12 @@ def test_func(test_func, dialog_output=False, **kwargs):
         data = TMDb().get_response_json(path, **kwargs)
         return finalise(head, data)
 
+    def test_func_tmdbuser_response(path, **kwargs):
+        from tmdbhelper.lib.api.tmdb.users import TMDbUser
+        head = path
+        data = TMDbUser().get_authorised_response_json(path, **kwargs)
+        return finalise(head, data)
+
     def test_func_trakt_response(path, **kwargs):
         from tmdbhelper.lib.api.trakt.api import TraktAPI
         head = path
@@ -115,6 +121,7 @@ def test_func(test_func, dialog_output=False, **kwargs):
     routes = {
         'response': test_func_response,
         'trakt_response': test_func_trakt_response,
+        'tmdbuser_response': test_func_tmdbuser_response,
         'mdblist_response': test_func_mdblist_response,
         'baseitem_factory': test_func_baseitem_factory,
         'baseview_factory': test_func_baseview_factory,
