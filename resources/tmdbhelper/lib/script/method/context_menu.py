@@ -12,24 +12,21 @@ class _RelatedLists:
         tmdb_type=None,
         season=None,
         episode=None,
-        include_play=False,
         **kwargs
     ):
         self.tmdb_id = tmdb_id
         self.tmdb_type = tmdb_type
         self.season = season
         self.episode = episode
-        self.include_play = include_play
 
     @cached_property
     def items(self):
-        from tmdbhelper.lib.items.directories.lists_base import get_basedir_details
-        return get_basedir_details(
+        from tmdbhelper.lib.items.directories.base.lists_base import ListRelatedBaseDir
+        return ListRelatedBaseDir(-1, '').get_items(
             tmdb_type=self.tmdb_type,
             tmdb_id=self.tmdb_id,
             season=self.season,
             episode=self.episode,
-            include_play=self.include_play,
         )
 
     @cached_property

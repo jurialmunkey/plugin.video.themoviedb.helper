@@ -390,7 +390,7 @@ ROUTE_NOID = {
 
 ROUTE_TMDBID = {
     'details': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_base',
+        'module_name': 'tmdbhelper.lib.items.directories.base.lists_base',
         'import_attr': 'ListDetails'}},
     'fanart': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
