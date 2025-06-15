@@ -211,6 +211,4 @@ class BaseItem(ItemDetailsDatabaseAccess):
             return self.try_cached_data()
         if self.cache_refresh == 'never':
             return self.get_cached_data()
-        if self.cache_refresh == 'check':
-            return self.get_cached_data() or self.try_cached_data()
         return self.get_cached_data() or self.try_cached_data(True)

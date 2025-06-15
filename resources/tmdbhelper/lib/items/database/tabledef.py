@@ -232,7 +232,6 @@ EPISODE_COLUMNS = {
     },
 }
 
-
 BELONGS_COLUMNS = {
     'id': {
         'data': 'TEXT',
@@ -247,7 +246,6 @@ BELONGS_COLUMNS = {
         'unique': True,
     },
 }
-
 
 COLLECTION_COLUMNS = {
     'id': {

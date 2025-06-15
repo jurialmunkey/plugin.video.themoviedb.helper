@@ -1,5 +1,5 @@
 from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties
-from tmdbhelper.lib.items.directories.tmdb.lists_view import ItemKeywords, ItemReviews
+from tmdbhelper.lib.items.directories.tmdb.lists_allitems import ItemKeywords, ItemReviews
 from tmdbhelper.lib.files.ftools import cached_property
 
 

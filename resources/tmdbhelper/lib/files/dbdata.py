@@ -219,6 +219,19 @@ class DatabaseStatements:
             values=', '.join(['?' for _ in keys]))
 
     @staticmethod
+    def insert_or_update_if_null(table, keys=('id', ), conflict_constraint='id'):
+        return (
+            'INSERT INTO {table}({keys}) VALUES ({values}) '
+            'ON CONFLICT ({conflict_constraint}) DO UPDATE SET {update_keys} '
+        ).format(
+            table=table,
+            keys=', '.join(keys),
+            values=', '.join(['?' for _ in keys]),
+            conflict_constraint=conflict_constraint,
+            update_keys=', '.join([f'{k}=ifnull({k},excluded.{k})' for k in keys])
+        )
+
+    @staticmethod
     def delete_keys(table, keys, conditions='item_type=?'):
         return 'UPDATE {table} SET {keys} {conditions}'.format(
             table=table,
@@ -254,7 +267,11 @@ class DatabaseMethod:
     def set_list_values(self, table=DEFAULT_TABLE, keys=(), values=(), overwrite=False, connection=None):
         if not values:
             return
-        statement = DatabaseStatements.insert_or_replace if overwrite else DatabaseStatements.insert_or_ignore
+        statement = (
+            DatabaseStatements.insert_or_ignore
+            if not overwrite else
+            DatabaseStatements.insert_or_replace
+        )
         cursor = self.execute_sql(
             statement(table, keys),
             values,
@@ -277,6 +294,17 @@ class DatabaseMethod:
             cursor.close()
 
         return data
+
+    def set_or_update_null_list_values(self, table=DEFAULT_TABLE, keys=(), values=(), conflict_constraint='id', connection=None):
+        if not values:
+            return
+        statement = DatabaseStatements.insert_or_update_if_null
+        cursor = self.execute_sql(
+            statement(table, keys, conflict_constraint=conflict_constraint),
+            values,
+            connection=connection)
+        if not connection and cursor:
+            cursor.close()
 
     def get_values(self, table=DEFAULT_TABLE, item_id=None, keys=(), connection=None):
         cursor = self.execute_sql(

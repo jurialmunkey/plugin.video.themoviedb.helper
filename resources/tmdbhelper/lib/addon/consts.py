@@ -96,56 +96,6 @@ UPNEXT_EPISODE = {
     'runtime': lambda li: li.infolabels.get('duration') or 0,
 }
 
-RANDOMISED_LISTS_ROUTE = {
-    'module_name': 'tmdbhelper.lib.items.directories.lists_random',
-    'import_attr': 'ListRandom'}
-RANDOMISED_LISTS = {
-    'random_genres': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
-        'import_attr': 'ListRandomGenre'}},
-    'random_providers': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
-        'import_attr': 'ListRandomProvider'}},
-    'random_keywords': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
-        'import_attr': 'ListRandomKeyword'}},
-    'random_networks': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
-        'import_attr': 'ListRandomNetwork'}},
-    'random_studios': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
-        'import_attr': 'ListRandomStudio'}},
-
-    'random_trendinglists': {
-        'params': {'info': 'trakt_trendinglists'},
-        'route': RANDOMISED_LISTS_ROUTE},
-    'random_popularlists': {
-        'params': {'info': 'trakt_popularlists'},
-        'route': RANDOMISED_LISTS_ROUTE},
-    'random_likedlists': {
-        'params': {'info': 'trakt_likedlists'},
-        'route': RANDOMISED_LISTS_ROUTE},
-    'random_mylists': {
-        'params': {'info': 'trakt_mylists'},
-        'route': RANDOMISED_LISTS_ROUTE}}
-
-RANDOMISED_TRAKT = {
-    'random_trending': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
-        'import_attr': 'ListTraktTrendingRandomised'}},
-    'random_popular': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
-        'import_attr': 'ListTraktPopularRandomised'}},
-    'random_mostplayed': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
-        'import_attr': 'ListTraktMostPlayedRandomised'}},
-    'random_mostviewers': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
-        'import_attr': 'ListTraktMostWatchedRandomised'}},
-    'random_anticipated': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
-        'import_attr': 'ListTraktAnticipatedRandomised'}}}
-
 
 ROUTE_NOID = {
     'dir_search': {'route': {
@@ -262,6 +212,12 @@ ROUTE_NOID = {
     'trakt_calendar': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_calendar',
         'import_attr': 'ListTraktCalendar'}},
+    'trakt_moviecalendar': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_calendar',
+        'import_attr': 'ListTraktMoviesCalendar'}},
+    'trakt_dvdcalendar': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_calendar',
+        'import_attr': 'ListTraktDVDsCalendar'}},
     'trakt_boxoffice': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
         'import_attr': 'ListTraktBoxOffice'}},
@@ -344,28 +300,28 @@ ROUTE_NOID = {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_standard',
         'import_attr': 'ListMostVoted'}},
     'genres': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_allitems',
         'import_attr': 'ListGenres'}},
     'watch_providers': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_allitems',
         'import_attr': 'ListProviders'}},
     'all_studios': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_allitems',
         'import_attr': 'ListStudios'}},
     'all_networks': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_allitems',
         'import_attr': 'ListNetworks'}},
     'all_collections': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_allitems',
         'import_attr': 'ListCollections'}},
     'all_keywords': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_allitems',
         'import_attr': 'ListKeywords'}},
     'all_movies': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_allitems',
         'import_attr': 'ListMovies'}},
     'all_tvshows': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_allitems',
         'import_attr': 'ListTvshows'}},
     'tmdb_v4_recommendations': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
@@ -385,57 +341,99 @@ ROUTE_NOID = {
     'tmdb_v4_lists': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
         'import_attr': 'ListLists'}},
+    'random_genres': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
+        'import_attr': 'ListRandomGenre'}},
+    'random_providers': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
+        'import_attr': 'ListRandomProvider'}},
+    'random_keywords': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
+        'import_attr': 'ListRandomKeyword'}},
+    'random_networks': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
+        'import_attr': 'ListRandomNetwork'}},
+    'random_studios': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
+        'import_attr': 'ListRandomStudio'}},
+    'random_trendinglists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
+        'import_attr': 'ListTraktStaticTrendingRandomised'}},
+    'random_popularlists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
+        'import_attr': 'ListTraktStaticPopularRandomised'}},
+    'random_likedlists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
+        'import_attr': 'ListTraktStaticLikedRandomised'}},
+    'random_mylists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
+        'import_attr': 'ListTraktStaticOwnedRandomised'}},
+    'random_trending': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
+        'import_attr': 'ListTraktTrendingRandomised'}},
+    'random_popular': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
+        'import_attr': 'ListTraktPopularRandomised'}},
+    'random_mostplayed': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
+        'import_attr': 'ListTraktMostPlayedRandomised'}},
+    'random_mostviewers': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
+        'import_attr': 'ListTraktMostWatchedRandomised'}},
+    'random_anticipated': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
+        'import_attr': 'ListTraktAnticipatedRandomised'}},
 }
 
 
 ROUTE_TMDBID = {
     'details': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_base',
+        'module_name': 'tmdbhelper.lib.items.directories.base.lists_base',
         'import_attr': 'ListDetails'}},
     'fanart': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListFanart'}},
     'posters': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListPoster'}},
     'images': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListImage'}},
     'episode_thumbs': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListThumb'}},
     'cast': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListCast'}},
     'crew': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListCrew'}},
     'collection': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListSeries'}},
     'stars_in_movies': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListStarredMovies'}},
     'stars_in_tvshows': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListStarredTvshows'}},
     'stars_in_both': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListStarredCombined'}},
     'crew_in_movies': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListCrewedMovies'}},
     'crew_in_tvshows': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListCrewedTvshows'}},
     'crew_in_both': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListCrewedCombined'}},
     'credits_in_both': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListCreditsCombined'}},
     'videos': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_view',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_view_db',
         'import_attr': 'ListVideos'}},
     'seasons': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_seasons',

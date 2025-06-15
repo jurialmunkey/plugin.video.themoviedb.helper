@@ -6,6 +6,7 @@ class Art(ItemDetailsList):
     table = 'art'
     keys = ('aspect_ratio', 'quality', 'iso_language', 'icon', 'type', 'extension', 'rating', 'votes', 'parent_id',)
     conditions = 'parent_id=? ORDER BY rating DESC'  # WHERE conditions
+    conflict_constraint = 'icon, type, parent_id'
 
     @property
     def values(self):  # WHERE conditions values for ?

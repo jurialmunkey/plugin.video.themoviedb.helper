@@ -5,6 +5,8 @@ from tmdbhelper.lib.files.ftools import cached_property
 
 class ListAuthenticatedProperties(ListStandardProperties):
 
+    request_kwgs = {}
+
     @cached_property
     def url(self):
         url = self.request_url.format(tmdb_type=self.tmdb_type)
@@ -12,7 +14,7 @@ class ListAuthenticatedProperties(ListStandardProperties):
         return url
 
     def get_api_response(self, page=1):
-        return self.tmdb_user_api.get_authorised_response_json(self.url, page=page)
+        return self.tmdb_user_api.get_authorised_response_json(self.url, page=page, **self.request_kwgs)
 
 
 class ListAuthenticatedNoCacheProperties(ListAuthenticatedProperties):
@@ -86,6 +88,7 @@ class ListFavourites(ListAuthenticatedNoCache):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.request_url = 'account/{{account_id}}/{tmdb_type}/favorites'
+        list_properties.request_kwgs = {'sort_by': 'created_at.desc'}
         list_properties.localize = 1036
         return list_properties
 
@@ -94,6 +97,7 @@ class ListWatchlist(ListAuthenticatedNoCache):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.request_url = 'account/{{account_id}}/{tmdb_type}/watchlist'
+        list_properties.request_kwgs = {'sort_by': 'created_at.desc'}
         list_properties.localize = 32193
         return list_properties
 
@@ -102,6 +106,7 @@ class ListRated(ListAuthenticatedNoCache):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.request_url = 'account/{{account_id}}/{tmdb_type}/rated'
+        list_properties.request_kwgs = {'sort_by': 'created_at.desc'}
         list_properties.localize = 32521
         return list_properties
 

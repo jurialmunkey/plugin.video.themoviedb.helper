@@ -90,6 +90,9 @@ class DatabaseAccess:
     def set_cached_list_values(self, table, keys, values, overwrite=False):
         self.cache.set_list_values(table, keys, values, overwrite=overwrite, connection=self.open_connection)
 
+    def set_or_update_null_cached_list_values(self, table, keys, values, conflict_constraint='id'):
+        self.cache.set_or_update_null_list_values(table, keys, values, conflict_constraint=conflict_constraint, connection=self.open_connection)
+
     def set_cached_many(self, table, keys, data):
         self.cache.set_many_values(table, keys, data, connection=self.open_connection)
 

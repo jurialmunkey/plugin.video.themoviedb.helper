@@ -26,6 +26,7 @@ class Studio(ItemDetailsList):
     table = 'studio'
     cached_data_parent_table = 'company'
     keys = tuple(STUDIO_COLUMNS.keys())
+    conflict_constraint = 'tmdb_id, parent_id'
 
     @property
     def cached_data_keys(self):
@@ -47,12 +48,14 @@ class Network(Studio):
     table = 'network'
     cached_data_parent_table = 'broadcaster'
     keys = tuple(NETWORK_COLUMNS.keys())
+    conflict_constraint = 'tmdb_id, parent_id'
 
 
 class Certification(ItemDetailsList):
     table = 'certification'
     keys = tuple(CERTIFICATION_COLUMNS.keys())
     conditions = 'parent_id=? AND iso_country=? AND name IS NOT NULL AND name != "" ORDER BY IFNULL(release_date, "9999-99-99") ASC LIMIT 1'  # WHERE conditions
+    conflict_constraint = 'iso_country, iso_language, release_date, release_type, parent_id'
 
     @property
     def values(self):  # WHERE conditions values for ?
@@ -63,6 +66,7 @@ class Video(ItemDetailsList):
     table = 'video'
     keys = tuple(VIDEO_COLUMNS.keys())
     conditions = 'parent_id=? AND content=? ORDER BY iso_language=?, release_date DESC LIMIT 1'  # WHERE conditions
+    conflict_constraint = 'path, parent_id'
 
     @property
     def values(self):  # WHERE conditions values for ?
@@ -72,16 +76,19 @@ class Video(ItemDetailsList):
 class Country(ItemDetailsList):
     table = 'country'
     keys = tuple(COUNTRY_COLUMNS.keys())
+    conflict_constraint = 'iso_country, parent_id'
 
 
 class Genre(ItemDetailsList):
     table = 'genre'
     keys = tuple(GENRE_COLUMNS.keys())
+    conflict_constraint = 'tmdb_id, parent_id'
 
 
 class UniqueId(ItemDetailsList):
     table = 'unique_id'
     keys = tuple(UNIQUE_ID_COLUMNS.keys())
+    conflict_constraint = 'key, parent_id'
 
     @property
     def values(self):  # WHERE conditions values for ?
@@ -91,12 +98,14 @@ class UniqueId(ItemDetailsList):
 class Custom(UniqueId):
     table = 'custom'
     keys = tuple(CUSTOM_COLUMNS.keys())
+    conflict_constraint = 'key, parent_id'
 
 
 class Service(ItemDetailsList):
     table = 'service'
     keys = tuple(SERVICE_COLUMNS.keys())
     conditions = 'tmdb_id=?'
+    conflict_constraint = 'tmdb_id'
 
     def image_path_func(self, v):
         return self.common_apis.tmdb_imagepath.get_imagepath_thumbs(v)
@@ -105,6 +114,7 @@ class Service(ItemDetailsList):
 class Provider(ItemDetailsList):
     table = 'provider'
     keys = tuple(PROVIDER_COLUMNS.keys())
+    conflict_constraint = 'tmdb_id, parent_id'
 
     cached_data_keys = ('provider.tmdb_id', 'availability', 'name', 'display_priority', 'iso_country', 'logo')
     cached_data_table = 'provider INNER JOIN service ON service.tmdb_id = provider.tmdb_id'
@@ -135,6 +145,7 @@ class Company(ItemDetailsList):
     table = 'company'
     keys = tuple(COMPANY_COLUMNS.keys())
     conditions = 'tmdb_id=?'
+    conflict_constraint = 'tmdb_id'
 
     def image_path_func(self, v):
         return self.common_apis.tmdb_imagepath.get_imagepath_thumbs(v)
@@ -143,6 +154,7 @@ class Company(ItemDetailsList):
 class Broadcaster(Company):
     table = 'broadcaster'
     keys = tuple(BROADCASTER_COLUMNS.keys())
+    conflict_constraint = 'tmdb_id'
 
 
 class Base(ItemDetailsList):
@@ -153,6 +165,7 @@ class Base(ItemDetailsList):
 class Belongs(ItemDetailsList):
     table = 'belongs'
     keys = tuple(BELONGS_COLUMNS.keys())
+    conflict_constraint = 'id, parent_id'
 
 
 class Movie(ItemDetailsList):
@@ -178,3 +191,4 @@ class Episode(ItemDetailsList):
 class Series(ItemDetailsList):
     table = 'collection'
     keys = tuple(COLLECTION_COLUMNS.keys())
+    conflict_constraint = 'id'

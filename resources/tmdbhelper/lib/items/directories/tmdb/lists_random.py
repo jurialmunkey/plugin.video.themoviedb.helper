@@ -5,7 +5,7 @@ from tmdbhelper.lib.items.directories.tmdb.lists_discover import ListDiscover
 
 class ListRandomGenre(ListDiscover):
     def get_items(self, **kwargs):
-        from tmdbhelper.lib.items.directories.tmdb.lists_view import ListGenres as ListAllGenres
+        from tmdbhelper.lib.items.directories.tmdb.lists_allitems import ListGenres as ListAllGenres
         item = random.choice(ListAllGenres(self.handle, self.paramstring).get_items(**kwargs))
         kwargs.update(item['params'])
         items = super().get_items(**kwargs)
@@ -15,7 +15,7 @@ class ListRandomGenre(ListDiscover):
 
 class ListRandomProvider(ListDiscover):
     def get_items(self, **kwargs):
-        from tmdbhelper.lib.items.directories.tmdb.lists_view import ListProviders as ListAllProviders
+        from tmdbhelper.lib.items.directories.tmdb.lists_allitems import ListProviders as ListAllProviders
         item = random.choice(ListAllProviders(self.handle, self.paramstring).get_items(**kwargs))
         kwargs.update(item['params'])
         items = super().get_items(**kwargs)
@@ -25,7 +25,7 @@ class ListRandomProvider(ListDiscover):
 
 class ListRandomKeyword(ListDiscover):
     def get_items(self, **kwargs):
-        from tmdbhelper.lib.items.directories.tmdb.lists_view import ListKeywords as ListAllKeywords
+        from tmdbhelper.lib.items.directories.tmdb.lists_allitems import ListKeywords as ListAllKeywords
         item = random.choice(ListAllKeywords(self.handle, self.paramstring).get_items())
         kwargs.update(item['params'])
         items = super().get_items(**kwargs)
@@ -35,7 +35,7 @@ class ListRandomKeyword(ListDiscover):
 
 class ListRandomNetwork(ListDiscover):
     def get_items(self, **kwargs):
-        from tmdbhelper.lib.items.directories.tmdb.lists_view import ListNetworks as ListAllNetworks
+        from tmdbhelper.lib.items.directories.tmdb.lists_allitems import ListNetworks as ListAllNetworks
         item = random.choice(ListAllNetworks(self.handle, self.paramstring).get_items())
         kwargs.update(item['params'])
         items = super().get_items(**kwargs)
@@ -45,7 +45,7 @@ class ListRandomNetwork(ListDiscover):
 
 class ListRandomStudio(ListDiscover):
     def get_items(self, **kwargs):
-        from tmdbhelper.lib.items.directories.tmdb.lists_view import ListStudios as ListAllStudios
+        from tmdbhelper.lib.items.directories.tmdb.lists_allitems import ListStudios as ListAllStudios
         item = random.choice(ListAllStudios(self.handle, self.paramstring).get_items())
         kwargs.update(item['params'])
         items = super().get_items(**kwargs)

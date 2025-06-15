@@ -4,8 +4,14 @@ from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.tmdate import get_datetime_today, get_timedelta, get_calendar_name
 from tmdbhelper.lib.items.directories.trakt.lists_standard import ListTraktStandardProperties
 from tmdbhelper.lib.items.directories.trakt.lists_filtered import ListTraktFiltered
-from tmdbhelper.lib.items.directories.trakt.mapper_calendar import FactoryCalendarEpisodeItemMapper
-from tmdbhelper.lib.items.directories.mdblist.lists_local import UncachedMDbListItemsPage, UncachedMDbListLocalData
+from tmdbhelper.lib.items.directories.trakt.mapper_calendar import (
+    FactoryCalendarEpisodeItemMapper,
+    FactoryCalendarMovieItemMapper,
+)
+from tmdbhelper.lib.items.directories.mdblist.lists_local import (
+    UncachedMDbListItemsPage,
+    UncachedMDbListLocalData,
+)
 from tmdbhelper.lib.items.directories.lists_default import ItemCache
 
 
@@ -121,6 +127,11 @@ class ListTraktCalendarProperties(ListTraktStandardProperties):
         return FactoryCalendarEpisodeItemMapper(item, add_infoproperties).item
 
 
+class ListTraktCalendarMovieProperties(ListTraktCalendarProperties):
+    def get_mapped_item(self, item, add_infoproperties=None):
+        return FactoryCalendarMovieItemMapper(item, add_infoproperties).item
+
+
 class ListLocalCalendarProperties(ListTraktCalendarProperties):
 
     @cached_property
@@ -176,6 +187,32 @@ class ListTraktCalendar(ListTraktFiltered):
         self.list_properties.trakt_days = try_int(days)
         self.list_properties.trakt_path = f'{endpoint}/' if endpoint else ''
         return super().get_items(*args, tmdb_type=tmdb_type, **kwargs)
+
+
+class ListTraktMoviesCalendar(ListTraktFiltered):
+
+    list_properties_class = ListTraktCalendarMovieProperties
+
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.trakt_authorization = True
+        list_properties.request_url = 'calendars/{trakt_user}/movies/{start_date}/{total_days}'
+        list_properties.container_content = 'movies'
+        list_properties.trakt_type = 'movie'
+        return list_properties
+
+    def get_items(self, *args, startdate, days, user=True, tmdb_type='movie', **kwargs):
+        self.list_properties.trakt_user = 'my' if boolean(user) else 'all'
+        self.list_properties.trakt_date = try_int(startdate)
+        self.list_properties.trakt_days = try_int(days)
+        return super().get_items(*args, tmdb_type=tmdb_type, **kwargs)
+
+
+class ListTraktDVDsCalendar(ListTraktMoviesCalendar):
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = 'calendars/{trakt_user}/dvd/{start_date}/{total_days}'
+        return list_properties
 
 
 class ListLocalCalendar(ListTraktCalendar):

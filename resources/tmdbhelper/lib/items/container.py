@@ -1,7 +1,7 @@
 from jurialmunkey.parser import boolean
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.consts import NO_UNAIRED_LABEL
-from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin, get_localized, get_condvisibility
+from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin, get_localized
 from tmdbhelper.lib.api.contains import CommonContainerAPIs
 from tmdbhelper.lib.addon.logger import TimerList
 
@@ -11,7 +11,7 @@ from tmdbhelper.lib.items.kodi import KodiDb
 """
 
 
-class use_item_cache:
+class ItemCache:
     def __init__(self, filename, cache_days=0.25):  # 6 hours default cache
         from tmdbhelper.lib.files.bcache import BasicCache
         self.cache = BasicCache(filename=filename)
@@ -24,6 +24,9 @@ class use_item_cache:
             kwargs['cache_combine_name'] = True
             return self.cache.use_cache(function, instance, *args, **kwargs)
         return wrapper
+
+
+use_item_cache = ItemCache
 
 
 class ContainerDirectoryCommon(CommonContainerAPIs):
