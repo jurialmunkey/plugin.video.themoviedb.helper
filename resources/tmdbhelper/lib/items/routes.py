@@ -2,14 +2,10 @@ from jurialmunkey.modimp import importmodule
 from tmdbhelper.lib.addon.consts import (
     ROUTE_NOID,
     ROUTE_TMDBID,
-    RANDOMISED_LISTS,
-    RANDOMISED_TRAKT
 )
 
 ALL_ROUTES = [
     ROUTE_NOID,
-    RANDOMISED_LISTS,
-    RANDOMISED_TRAKT,
     ROUTE_TMDBID
 ]
 

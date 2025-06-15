@@ -15,6 +15,13 @@ from tmdbhelper.lib.items.directories.trakt.lists_standard import (
     ListTraktStandard,
     ListTraktStandardProperties,
 )
+from tmdbhelper.lib.items.directories.trakt.lists_custom import ListTraktCustom
+from tmdbhelper.lib.items.directories.trakt.lists_static import (
+    ListTraktStaticTrending,
+    ListTraktStaticPopular,
+    ListTraktStaticLiked,
+    ListTraktStaticOwned,
+)
 
 
 class ListTraktRandomisedProperties(ListTraktStandardProperties):
@@ -73,6 +80,26 @@ class ListTraktMostWatchedRandomised(ListTraktRandomised, ListTraktMostWatched):
 
 class ListTraktAnticipatedRandomised(ListTraktRandomised, ListTraktAnticipated):
     pass
+
+
+class ListTraktStaticTrendingRandomised(ListTraktCustom):
+    sample_class = ListTraktStaticTrending
+
+    def get_items(self, *args, tmdb_type=None, **kwargs):
+        item = random.choice(self.sample_class(-1, 'nextpage=false').get_items(tmdb_type='both'))
+        return super().get_items(**item['params'])
+
+
+class ListTraktStaticPopularRandomised(ListTraktStaticTrendingRandomised):
+    sample_class = ListTraktStaticPopular
+
+
+class ListTraktStaticLikedRandomised(ListTraktStaticTrendingRandomised):
+    sample_class = ListTraktStaticLiked
+
+
+class ListTraktStaticOwnedRandomised(ListTraktStaticTrendingRandomised):
+    sample_class = ListTraktStaticOwned
 
 
 class ListRandomBecauseYouWatched(ListRecommendations):

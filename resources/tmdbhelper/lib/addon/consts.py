@@ -96,56 +96,6 @@ UPNEXT_EPISODE = {
     'runtime': lambda li: li.infolabels.get('duration') or 0,
 }
 
-RANDOMISED_LISTS_ROUTE = {
-    'module_name': 'tmdbhelper.lib.items.directories.lists_random',
-    'import_attr': 'ListRandom'}
-RANDOMISED_LISTS = {
-    'random_genres': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
-        'import_attr': 'ListRandomGenre'}},
-    'random_providers': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
-        'import_attr': 'ListRandomProvider'}},
-    'random_keywords': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
-        'import_attr': 'ListRandomKeyword'}},
-    'random_networks': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
-        'import_attr': 'ListRandomNetwork'}},
-    'random_studios': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
-        'import_attr': 'ListRandomStudio'}},
-
-    'random_trendinglists': {
-        'params': {'info': 'trakt_trendinglists'},
-        'route': RANDOMISED_LISTS_ROUTE},
-    'random_popularlists': {
-        'params': {'info': 'trakt_popularlists'},
-        'route': RANDOMISED_LISTS_ROUTE},
-    'random_likedlists': {
-        'params': {'info': 'trakt_likedlists'},
-        'route': RANDOMISED_LISTS_ROUTE},
-    'random_mylists': {
-        'params': {'info': 'trakt_mylists'},
-        'route': RANDOMISED_LISTS_ROUTE}}
-
-RANDOMISED_TRAKT = {
-    'random_trending': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
-        'import_attr': 'ListTraktTrendingRandomised'}},
-    'random_popular': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
-        'import_attr': 'ListTraktPopularRandomised'}},
-    'random_mostplayed': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
-        'import_attr': 'ListTraktMostPlayedRandomised'}},
-    'random_mostviewers': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
-        'import_attr': 'ListTraktMostWatchedRandomised'}},
-    'random_anticipated': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
-        'import_attr': 'ListTraktAnticipatedRandomised'}}}
-
 
 ROUTE_NOID = {
     'dir_search': {'route': {
@@ -385,6 +335,48 @@ ROUTE_NOID = {
     'tmdb_v4_lists': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
         'import_attr': 'ListLists'}},
+    'random_genres': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
+        'import_attr': 'ListRandomGenre'}},
+    'random_providers': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
+        'import_attr': 'ListRandomProvider'}},
+    'random_keywords': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
+        'import_attr': 'ListRandomKeyword'}},
+    'random_networks': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
+        'import_attr': 'ListRandomNetwork'}},
+    'random_studios': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
+        'import_attr': 'ListRandomStudio'}},
+    'random_trendinglists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
+        'import_attr': 'ListTraktStaticTrendingRandomised'}},
+    'random_popularlists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
+        'import_attr': 'ListTraktStaticPopularRandomised'}},
+    'random_likedlists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
+        'import_attr': 'ListTraktStaticLikedRandomised'}},
+    'random_mylists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
+        'import_attr': 'ListTraktStaticOwnedRandomised'}},
+    'random_trending': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
+        'import_attr': 'ListTraktTrendingRandomised'}},
+    'random_popular': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
+        'import_attr': 'ListTraktPopularRandomised'}},
+    'random_mostplayed': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
+        'import_attr': 'ListTraktMostPlayedRandomised'}},
+    'random_mostviewers': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
+        'import_attr': 'ListTraktMostWatchedRandomised'}},
+    'random_anticipated': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
+        'import_attr': 'ListTraktAnticipatedRandomised'}},
 }
 
 

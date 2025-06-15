@@ -8,6 +8,9 @@ from tmdbhelper.lib.items.directories.trakt.lists_standard import (
 
 
 class ListTraktCustomProperties(ListTraktStandardProperties):
+    @cached_property
+    def plugin_category(self):
+        return self.plugin_name.format(list_name=self.list_name)
 
     list_type = 'movie,show,season,episode'
     list_sort_map = {
@@ -59,6 +62,7 @@ class ListTraktCustom(ListTraktStandard):
         self, *args,
         list_slug=None,
         user_slug=None,
+        list_name=None,
         sort_by=None,
         sort_how=None,
         tmdb_type=None,
@@ -67,6 +71,7 @@ class ListTraktCustom(ListTraktStandard):
     ):
         self.list_properties.list_slug = list_slug
         self.list_properties.user_slug = user_slug or 'me'
+        self.list_properties.list_name = list_name or list_slug or ''
         self.list_properties.sort_by = sort_by
         self.list_properties.sort_how = sort_how
         self.list_properties.owner = boolean(owner)
@@ -75,6 +80,6 @@ class ListTraktCustom(ListTraktStandard):
 
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
-        list_properties.localize = 32204
+        list_properties.plugin_name = '{list_name}'
         list_properties.sub_type = True
         return list_properties
