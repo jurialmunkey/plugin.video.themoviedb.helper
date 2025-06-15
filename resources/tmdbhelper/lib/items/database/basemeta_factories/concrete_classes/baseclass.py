@@ -3,6 +3,7 @@ from tmdbhelper.lib.items.database.basedata import ItemDetailsDatabaseAccess
 
 
 class ItemDetailsList(ItemDetailsDatabaseAccess):
+    conflict_constraint = 'id'
     conditions = 'parent_id=?'  # WHERE conditions
     keys = ()
 
@@ -35,8 +36,11 @@ class ItemDetailsList(ItemDetailsDatabaseAccess):
         return [tuple([self.get_configure_mapped_data_list(i, k) for k in self.keys]) for i in data[self.table]]
 
     def try_cached_data(self, online_data_mapped):
+        kwgs = {'conflict_constraint': self.conflict_constraint}
         args = (self.table, self.keys, self.configure_mapped_data_list(online_data_mapped))
-        return (self.set_cached_list_values, args, {})
+        return (self.set_or_update_null_cached_list_values, args, kwgs)
+        # args = (self.table, self.keys, self.configure_mapped_data_list(online_data_mapped))
+        # return (self.set_cached_list_values, args, {})
 
 
 class ArtworkDetailsMixin:

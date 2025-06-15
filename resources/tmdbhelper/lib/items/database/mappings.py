@@ -36,12 +36,9 @@ class ItemMapperMethods:
         return {
             'parent_id': item_id,
             'aspect_ratio': IMAGEPATH_ASPECTRATIO.index(ratio_type),
-            'quality': 0,
             'icon': get_blanks_none(image_path),
             'type': image_type,
             'extension': get_blanks_none(image_path.split('.')[-1] if image_path else None),
-            'rating': 0,
-            'votes': 0,
         }
 
     @staticmethod

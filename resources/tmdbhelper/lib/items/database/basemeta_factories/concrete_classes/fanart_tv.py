@@ -5,6 +5,7 @@ class FanartTV(ItemDetailsList):
     table = 'fanart_tv'
     keys = ('icon', 'iso_language', 'likes', 'quality', 'type', 'extension', 'parent_id',)
     conditions = 'parent_id=? ORDER BY likes DESC'  # WHERE conditions
+    conflict_constraint = 'icon, type, parent_id'
 
     @property
     def values(self):  # WHERE conditions values for ?
