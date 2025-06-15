@@ -1,12 +1,9 @@
-from tmdbhelper.lib.items.directories.trakt.mapper_standard import EpisodeItemMapper
+from tmdbhelper.lib.items.directories.trakt.mapper_standard import EpisodeItemMapper, MovieItemMapper
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_region_date
 from tmdbhelper.lib.files.ftools import cached_property
 
 
-class CalendarEpisodeItemMapper(EpisodeItemMapper):
-    tmdb_type = 'tv'
-    mediatype = 'episode'
-
+class CalendarItemMapper:
     @cached_property
     def air_date(self):
         try:
@@ -29,6 +26,27 @@ class CalendarEpisodeItemMapper(EpisodeItemMapper):
         infolabels = super().get_infolabels()
         infolabels['premiered'] = self.air_date.strftime('%Y-%m-%d')
         return infolabels
+
+
+class CalendarEpisodeItemMapper(CalendarItemMapper, EpisodeItemMapper):
+    tmdb_type = 'tv'
+    mediatype = 'episode'
+
+
+class CalendarMovieItemMapper(CalendarItemMapper, MovieItemMapper):
+    tmdb_type = 'movie'
+    mediatype = 'movie'
+
+    @cached_property
+    def air_date(self):
+        try:
+            return convert_timestamp(self.meta['released'], utc_convert=True, time_fmt="%Y-%m-%d", time_lim=10)
+        except (KeyError, TypeError, AttributeError):
+            return
+
+
+def FactoryCalendarMovieItemMapper(meta, add_infoproperties=None):
+    return CalendarMovieItemMapper(meta, add_infoproperties, sub_type='movie')
 
 
 def FactoryCalendarEpisodeItemMapper(meta, add_infoproperties=None):

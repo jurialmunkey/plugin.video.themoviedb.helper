@@ -212,6 +212,26 @@ class BaseDirItemTraktCalendarDir(BaseDirItem):
         return get_localized(32203)
 
 
+class BaseDirItemTraktMovieCalendarDir(BaseDirItemTraktCalendarDir):
+    priority = 291
+    types = ('movie', )
+    params = {'info': 'dir_calendar_movie'}
+
+    @cached_property
+    def label_append(self):
+        return f'{get_localized(32416)} {get_localized(32203)}'
+
+
+class BaseDirItemTraktDVDCalendarDir(BaseDirItemTraktCalendarDir):
+    priority = 292
+    types = ('movie', )
+    params = {'info': 'dir_calendar_dvd'}
+
+    @cached_property
+    def label_prefix(self):
+        return f'{get_localized(32201)} DVD'
+
+
 class BaseDirItemTraktCalendarPremieresDir(BaseDirItemTraktCalendarDir):
     priority = 300
     params = {'info': 'dir_calendar_trakt', 'endpoint': 'premieres'}
@@ -282,6 +302,30 @@ class BaseDirItemTraktCalendarPremieresAllDir(BaseDirItemTraktCalendarPremieresD
     @cached_property
     def label_suffix(self):
         return get_localized(32416)
+
+
+class BaseDirItemTraktMovieCalendarAllDir(BaseDirItemTraktCalendarDir):
+    priority = 331
+    types = ('movie', )
+    params = {'info': 'dir_calendar_movie', 'user': 'false'}
+
+    @cached_property
+    def label_prefix(self):
+        return get_localized(32186)
+
+    @cached_property
+    def label_append(self):
+        return f'{get_localized(32416)} {get_localized(32203)}'
+
+
+class BaseDirItemTraktDVDCalendarAllDir(BaseDirItemTraktCalendarDir):
+    priority = 332
+    types = ('movie', )
+    params = {'info': 'dir_calendar_dvd', 'user': 'false'}
+
+    @cached_property
+    def label_prefix(self):
+        return f'{get_localized(32186)} DVD'
 
 
 class BaseDirItemTraktCalendarNewAllDir(BaseDirItemTraktCalendarPremieresAllDir):

@@ -212,6 +212,12 @@ ROUTE_NOID = {
     'trakt_calendar': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_calendar',
         'import_attr': 'ListTraktCalendar'}},
+    'trakt_moviecalendar': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_calendar',
+        'import_attr': 'ListTraktMoviesCalendar'}},
+    'trakt_dvdcalendar': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_calendar',
+        'import_attr': 'ListTraktDVDsCalendar'}},
     'trakt_boxoffice': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_standard',
         'import_attr': 'ListTraktBoxOffice'}},

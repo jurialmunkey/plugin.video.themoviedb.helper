@@ -104,9 +104,9 @@ class BaseDirList:
 class ListBaseDir(ContainerDirectory):
 
     @staticmethod
-    def get_trakt_calendar_item(endpoint=None, user=None, **kwargs):
+    def get_trakt_calendar_item(endpoint=None, user=None, info='trakt_calendar', **kwargs):
         return {k: v for k, v in (
-            ('info', 'trakt_calendar'),
+            ('info', info),
             ('endpoint', endpoint),
             ('user', user),
         ) if v}
@@ -125,6 +125,8 @@ class ListBaseDir(ContainerDirectory):
             'dir_mdblist': lambda: BaseDirList(mdblist=True).build_basedir(),
             'dir_tvdb': lambda: BaseDirList(tvdb=True).build_basedir(),
             'dir_random': lambda: BaseDirList(random=True).build_basedir(),
+            'dir_calendar_dvd': lambda: BaseDirList(calendar=ListBaseDir.get_trakt_calendar_item(info='trakt_dvdcalendar', **kwargs)).build_basedir(),
+            'dir_calendar_movie': lambda: BaseDirList(calendar=ListBaseDir.get_trakt_calendar_item(info='trakt_moviecalendar', **kwargs)).build_basedir(),
             'dir_calendar_trakt': lambda: BaseDirList(calendar=ListBaseDir.get_trakt_calendar_item(**kwargs)).build_basedir(),
             'dir_calendar_library': lambda: BaseDirList(calendar=ListBaseDir.get_library_calendar_item()).build_basedir(),
             'dir_custom_node': lambda: BaseDirNode(**kwargs).build_basedir(),
