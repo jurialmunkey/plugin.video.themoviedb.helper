@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-06-12 14:14+0800\n"
+"PO-Revision-Date: 2025-06-18 10:20+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -199,7 +199,7 @@ msgstr "芬兰语（芬兰）"
 #: /resources/settings.xml
 msgctxt "#32039"
 msgid "Prefer fanart.tv artwork"
-msgstr "首选 fanart.tv 艺术作品"
+msgstr "首选 fanart.tv 艺术图"
 
 #: /resources/tmdbhelper/lib/items/directories/tmdb/lists_seasons.py
 msgctxt "#32040"
@@ -251,7 +251,7 @@ msgstr "排序方式：你的下一集列表。按播出日期：按剧集首播
 #: /resources/settings.xml
 msgctxt "#32050"
 msgid "Prefer artwork in your language"
-msgstr "首选使用您语言的艺术作品"
+msgstr "首选使用您语言的艺术图"
 
 #: /resources/tmdbhelper/lib/script/method/tmdb.py
 msgctxt "#32051"
@@ -516,7 +516,7 @@ msgstr "剧集特别篇文件夹"
 #: /resources/settings.xml
 msgctxt "#32092"
 msgid "Widgets"
-msgstr "小组件"
+msgstr "小部件"
 
 #: /resources/settings.xml
 msgctxt "#32093"
@@ -705,7 +705,7 @@ msgstr "自动播放本地文件"
 #: /resources/settings.xml
 msgctxt "#32163"
 msgid "Use fanart.tv for service monitor artwork"
-msgstr "使用 fanart.tv 获取艺术作品"
+msgstr "使用 fanart.tv 获取艺术图"
 
 #: /resources/lib/context.py
 msgctxt "#32164"
@@ -969,12 +969,12 @@ msgstr "注销失败！"
 #: /resources/lib/traktapi.py
 msgctxt "#32216"
 msgid "Successfully logged out of Trakt user account"
-msgstr "成功注销Trakt用户帐户"
+msgstr "成功注销 Trakt 用户帐户"
 
 #: /resources/lib/script.py
 msgctxt "#32222"
 msgid "Manage artwork"
-msgstr "管理艺术作品"
+msgstr "管理艺术图"
 
 #: /resources/lib/plugin.py
 msgctxt "#32223"
@@ -1703,17 +1703,17 @@ msgstr "横向展示模式"
 #: /resources/settings.xml
 msgctxt "#32371"
 msgid "Preferred artwork for thumbs"
-msgstr "首选艺术作品缩略图"
+msgstr "首选艺术图片缩略图"
 
 #: /resources/settings.xml
 msgctxt "#32372"
 msgid "fanart"
-msgstr "背景图"
+msgstr "同人画"
 
 #: /resources/settings.xml
 msgctxt "#32373"
 msgid "Restrict to library strm"
-msgstr "仅处理.strm文件"
+msgstr "仅处理 .strm 文件"
 
 #: /resources/lib/player/players.py
 msgctxt "#32374"
@@ -1904,7 +1904,7 @@ msgstr "从 TMDb 和 Trakt API 查找数据时使用的语言和国家/地区设
 #: /resources/settings.xml
 msgctxt "#32420"
 msgid "TMDb artwork quality"
-msgstr "TMDb 艺术作品质量"
+msgstr "TMDb 艺术图质量"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32421"
@@ -2643,7 +2643,7 @@ msgstr "Fanart.tv client 密钥"
 #: /resources/settings.xml
 msgctxt "#32021"
 msgid "Use fanart.tv for plugin artwork (slower)"
-msgstr "将 fanart.tv 用于艺术作品（较慢）"
+msgstr "将 fanart.tv 用于艺术图（较慢）"
 
 #: /resources/settings.xml
 msgctxt "#32023"
