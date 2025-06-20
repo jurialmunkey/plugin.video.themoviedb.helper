@@ -140,6 +140,16 @@ class CommonMonitorItem:
         self.properties = set()
         self.item = item
 
+    def set_single_property(self, key, dictionary):
+        if not isinstance(dictionary, dict):
+            return
+        if key not in dictionary:
+            return
+        if dictionary[key] in (None, ''):
+            return
+        self.common_monitor_functions_instance.set_property(key, dictionary[key])
+        self.properties.add(key)
+
     def update_property(self, key, value):
         self.common_monitor_functions_instance.set_property(key, value)
         self.properties.add(key)
@@ -212,6 +222,7 @@ class CommonMonitorItem:
     def set_properties(self):
         self.set_info_properties(self.art)
         self.set_info_properties(self.unique_ids, affix='id')
+        self.set_single_property('premiered', self.infoproperties)  # Set Premiered first from infoproperties to ensure correct formatting for shortdate
         self.set_info_properties(self.infolabels)
         self.set_info_properties(self.infoproperties)
 
