@@ -41,15 +41,4 @@ provider-name="jurialmunkey">
     <screenshot>resources/screenshot-02.jpg</screenshot>
   </assets>
 </extension>
-<extension point="kodi.context.item">
-  <menu id="kodi.core.main">
-    <menu>
-    <label>TMDbHelper $LOCALIZE[33063]</label>
-      <item library="resources/contextmenu_modifyservice.py">
-        <label>$ADDON[plugin.video.themoviedb.helper 32105]</label>
-        <visible>Skin.HasSetting(TMDbHelper.Service)</visible>
-      </item>
-    </menu>
-  </menu>
-</extension>
 </addon>

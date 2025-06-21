@@ -521,11 +521,6 @@ msgctxt "#32090"
 msgid "Content"
 msgstr ""
 
-#: /addon.xml
-msgctxt "#32105"
-msgid "Manage service monitor item"
-msgstr ""
-
 #: /resources/settings.xml
 msgctxt "#32091"
 msgid "Special season folders"
