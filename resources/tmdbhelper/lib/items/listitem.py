@@ -192,7 +192,12 @@ class _ListItem(object):
         return self.context_menu
 
     def finalise_art(self):
-        self.art['icon'] = self.art.get('icon') or f'{ADDONPATH}/resources/icons/themoviedb/default.png'
+        self.art['icon'] = (
+            self.art.get('icon')
+            or self.art.get('poster')
+            or self.art.get('thumb')
+            or f'{ADDONPATH}/resources/icons/themoviedb/default.png'
+        )
         return self.art
 
     def finalise_label(self):
@@ -274,7 +279,8 @@ class _ListItem(object):
     def url(self):
         return BuildURL(self.path, **self.params).url
 
-    def get_listitem(self, offscreen=True):
+    def get_listitem(self, offscreen=True, finalise=False):
+        self.finalise() if finalise else None
         listitem = KodiListItem(label=self.label, label2=self.label2, path=self.url, offscreen=offscreen)
         return self.set_listitem(listitem)
 

@@ -3,6 +3,7 @@ from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.monitor.images import ImageManipulations
 from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.api.mapping import get_empty_item
+from tmdbhelper.lib.query.database.identifier import make_identifier_id
 
 
 class MonitorItemDetails(ImageManipulations):
@@ -93,6 +94,7 @@ class MonitorItemDetails(ImageManipulations):
             self.get_infolabel('filenameandpath'),
             self.get_infolabel('label'),
             self.get_infolabel('dbtype'),
+            self.get_property('Service.Reload'),
         ))
 
     """
@@ -237,7 +239,32 @@ class MonitorItemDetails(ImageManipulations):
         return tmdb_id
 
     @cached_property
+    def identifier_id(self):
+        return make_identifier_id(
+            dbtype=self.dbtype,
+            query=self.query,
+            season=self.season,
+            episode=self.episode,
+            imdb_id=self.imdb_id,
+            year=self.year,
+            episode_year=self.episode_year,
+            infolabel_uniqueid_tmdb=self.infolabel_uniqueid_tmdb,
+            infolabel_uniqueid_tvshow_tmdb=self.infolabel_uniqueid_tvshow_tmdb,
+        )
+
+    @cached_property
     def tmdb_id(self):
+        identifier_details = self.parent.get_identifier_details(self.identifier_id)
+        identifier_details = identifier_details or self.parent.set_identifier_details(
+            self.identifier_id,
+            self.get_tmdb_id(),
+            self.tmdb_type
+        )
+        if identifier_details:
+            self.tmdb_type = identifier_details.tmdb_type
+            return identifier_details.tmdb_id
+
+    def get_tmdb_id(self):
         if self.dbtype in self.allow_base_id:
             return self.infolabel_uniqueid_tmdb or self.parent_tmdb_id
 
