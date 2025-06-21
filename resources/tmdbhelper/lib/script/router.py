@@ -6,6 +6,7 @@ from jurialmunkey.window import get_property
 from jurialmunkey.parser import reconfigure_legacy_params
 from tmdbhelper.lib.addon.logger import kodi_log
 from jurialmunkey.modimp import importmodule
+from tmdbhelper.lib.addon.plugin import ADDON
 
 
 REGEX_WINPROP_FINDALL = r'\$WINPROP\[(.*?)\]'  # $WINPROP[key] = Window(10000).getProperty(TMDbHelper.WinProp.{key})
@@ -149,6 +150,8 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.monitor.service', 'restart_service_monitor')(),
         'test_func':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.test', 'test_func')(**kwargs),
+        'open_settings':
+            lambda **kwargs: ADDON.openSettings(),
     }
 
     def router(self):

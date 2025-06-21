@@ -192,7 +192,7 @@ class _ListItem(object):
         return self.context_menu
 
     def finalise_art(self):
-        self.art['icon'] = self.art['thumb'] = (
+        self.art['icon'] = (
             self.art.get('icon')
             or self.art.get('poster')
             or self.art.get('thumb')
@@ -623,7 +623,7 @@ class _Episode(_Video):
 
     def finalise_art(self):
         self.art = super().finalise_art()
-        self.art['thumb'] = self.thumb or self.art.get('icon')
+        self.art['thumb'] = self.thumb
         return self.art
 
     @property
