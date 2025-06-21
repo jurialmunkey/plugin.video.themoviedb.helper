@@ -13,7 +13,8 @@ class MonitorItemDetails(ImageManipulations):
     allow_episode = ('episodes', 'multi')
     allow_season = ('seasons', 'episodes', 'multi')
     allow_base_id = ('movies', 'tvshows', 'actors', 'sets')
-    allow_year = ('movies', )
+    allow_episode_year = ('seasons', 'episodes', )
+    allow_year = ('movies', 'tvshows', )
 
     container_dbtype_to_tmdb_type = {
         'movies': 'movie',
@@ -167,6 +168,12 @@ class MonitorItemDetails(ImageManipulations):
         return self.get_infolabel('year')
 
     @cached_property
+    def episode_year(self):
+        if self.dbtype not in self.allow_episode_year:
+            return
+        return self.get_infolabel('year')
+
+    @cached_property
     def season(self):
         if self.dbtype not in self.allow_season:
             return
@@ -199,6 +206,7 @@ class MonitorItemDetails(ImageManipulations):
             query=self.query,
             imdb_id=self.imdb_id,
             year=self.year,
+            episode_year=self.episode_year,
         )
 
     @cached_property

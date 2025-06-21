@@ -41,21 +41,23 @@ class CommonMonitorDetails(CommonContainerAPIs):
             return {'movie': {}, 'tv': {}}
 
     @kodi_try_except('lib.monitor.common get_tmdb_id')
-    def get_tmdb_id(self, tmdb_type, imdb_id=None, query=None, year=None):
-        return self.query_database.get_tmdb_id(
-            tmdb_type=tmdb_type,
-            imdb_id=imdb_id if imdb_id and imdb_id.startswith('tt') else None,
-            query=query,
-            year=year
-        )
-
-    @kodi_try_except('lib.monitor.common get_tmdb_id_multi')
-    def get_tmdb_id_multi(self, tmdb_type=None, imdb_id=None, query=None, year=None):
+    def get_tmdb_id(self, tmdb_type, imdb_id=None, query=None, year=None, episode_year=None):
         return self.query_database.get_tmdb_id(
             tmdb_type=tmdb_type,
             imdb_id=imdb_id if imdb_id and imdb_id.startswith('tt') else None,
             query=query,
             year=year,
+            episode_year=episode_year,
+        )
+
+    @kodi_try_except('lib.monitor.common get_tmdb_id_multi')
+    def get_tmdb_id_multi(self, tmdb_type=None, imdb_id=None, query=None, year=None, episode_year=None):
+        return self.query_database.get_tmdb_id(
+            tmdb_type=tmdb_type,
+            imdb_id=imdb_id if imdb_id and imdb_id.startswith('tt') else None,
+            query=query,
+            year=year,
+            episode_year=episode_year,
             use_multisearch=True
         )
 

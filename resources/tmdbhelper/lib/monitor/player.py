@@ -285,6 +285,12 @@ class PlayerItem():
         return self.meta.get('Year')
 
     @property
+    def episode_year(self):
+        if self.dbtype != 'episode':
+            return
+        return self.meta.get('Year')
+
+    @property
     def season(self):
         if self.dbtype != 'episode':
             return
@@ -330,10 +336,11 @@ class PlayerItem():
         tmdb_id = self.get_tmdb_id_parent()
 
         return tmdb_id or self._parent.get_tmdb_id(
-            self.tmdb_type,
-            self.imdb_id,
-            self.query,
-            self.year,
+            tmdb_type=self.tmdb_type,
+            query=self.query,
+            imdb_id=self.imdb_id,
+            year=self.year,
+            episode_year=self.episode_year,
         )
 
     def get_ratings(self):
