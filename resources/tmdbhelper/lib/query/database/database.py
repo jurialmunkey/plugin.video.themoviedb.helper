@@ -48,11 +48,15 @@ class FindQueriesDatabase(
         },
     }
 
-    database_version = 2
+    database_version = 4
 
     database_changes = {
         2: (
             'DROP TABLE IF EXISTS genres',
+        ),
+        3: (),
+        4: (
+            'DROP TABLE IF EXISTS trakt_id',
         )
     }
 

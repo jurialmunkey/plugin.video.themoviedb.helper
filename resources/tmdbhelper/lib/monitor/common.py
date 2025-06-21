@@ -41,27 +41,36 @@ class CommonMonitorDetails(CommonContainerAPIs):
             return {'movie': {}, 'tv': {}}
 
     @kodi_try_except('lib.monitor.common get_tmdb_id')
-    def get_tmdb_id(self, tmdb_type, imdb_id=None, query=None, year=None):
-        return self.query_database.get_tmdb_id(
-            tmdb_type=tmdb_type,
-            imdb_id=imdb_id if imdb_id and imdb_id.startswith('tt') else None,
-            query=query,
-            year=year
-        )
-
-    @kodi_try_except('lib.monitor.common get_tmdb_id_multi')
-    def get_tmdb_id_multi(self, tmdb_type=None, imdb_id=None, query=None, year=None):
+    def get_tmdb_id(self, tmdb_type, imdb_id=None, query=None, year=None, episode_year=None):
         return self.query_database.get_tmdb_id(
             tmdb_type=tmdb_type,
             imdb_id=imdb_id if imdb_id and imdb_id.startswith('tt') else None,
             query=query,
             year=year,
+            episode_year=episode_year,
+        )
+
+    @kodi_try_except('lib.monitor.common get_tmdb_id_multi')
+    def get_tmdb_id_multi(self, tmdb_type=None, imdb_id=None, query=None, year=None, episode_year=None):
+        return self.query_database.get_tmdb_id(
+            tmdb_type=tmdb_type,
+            imdb_id=imdb_id if imdb_id and imdb_id.startswith('tt') else None,
+            query=query,
+            year=year,
+            episode_year=episode_year,
             use_multisearch=True
         )
 
     @kodi_try_except('lib.monitor.common get_tmdb_id_parent')
-    def get_tmdb_id_parent(self, tmdb_id, trakt_type, season_episode_check=None):
-        return self.query_database.get_trakt_id(tmdb_id, 'tmdb', trakt_type, output_type='tmdb')
+    def get_tmdb_id_parent(self, tmdb_id, item_type, season=None, episode=None):
+        return self.query_database.get_trakt_id(
+            id_value=tmdb_id,
+            id_type='tmdb',
+            item_type=item_type,
+            output_type='tmdb',
+            season=season,
+            episode=episode
+        )
 
     def get_tvdb_awards(self, tmdb_type, tmdb_id):
         info = {}
@@ -140,6 +149,16 @@ class CommonMonitorItem:
         self.properties = set()
         self.item = item
 
+    def set_single_property(self, key, dictionary):
+        if not isinstance(dictionary, dict):
+            return
+        if key not in dictionary:
+            return
+        if dictionary[key] in (None, ''):
+            return
+        self.common_monitor_functions_instance.set_property(key, dictionary[key])
+        self.properties.add(key)
+
     def update_property(self, key, value):
         self.common_monitor_functions_instance.set_property(key, value)
         self.properties.add(key)
@@ -212,6 +231,7 @@ class CommonMonitorItem:
     def set_properties(self):
         self.set_info_properties(self.art)
         self.set_info_properties(self.unique_ids, affix='id')
+        self.set_single_property('premiered', self.infoproperties)  # Set Premiered first from infoproperties to ensure correct formatting for shortdate
         self.set_info_properties(self.infolabels)
         self.set_info_properties(self.infoproperties)
 

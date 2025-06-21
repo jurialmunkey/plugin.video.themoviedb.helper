@@ -1,3 +1,4 @@
+import operator
 from tmdbhelper.lib.files.dbdata import DatabaseStatements
 from tmdbhelper.lib.files.ftools import cached_property
 
@@ -125,11 +126,12 @@ class TableTVDbID(TableFindID):
 class TableSearchID(TableID):
 
     year = None
+    episode_year = None
     update_keys = ('title', 'year')
 
     @property
     def update_values(self):
-        return (self.query, self.year, self.tmdb_type, self.tmdb_id, )
+        return (self.query, self.tmdb_year, self.tmdb_type, self.tmdb_id, )
 
     @property
     def func_args(self):
@@ -137,12 +139,23 @@ class TableSearchID(TableID):
 
     @property
     def func_additional_kwgs(self):
-        if not self.year:
-            return {}
+
         if self.tmdb_type == 'movie':
-            return {'year': self.year}
+            return (
+                {'year': self.year}
+                if self.year else
+                {}
+            )
+
         if self.tmdb_type == 'tv':
-            return {'first_air_date_year': self.year}
+            return (
+                {'first_air_date_year': self.year}  # Search specific year for tvshow
+                if self.year else
+                {'year': self.episode_year}  # Search all episode years
+                if self.episode_year else
+                {}
+            )
+
         return {}
 
     @property
@@ -163,23 +176,34 @@ class TableSearchID(TableID):
         except (TypeError, KeyError):
             return
 
+    @staticmethod
+    def func_data_id_year_comparison(item, key, value, operator_type='eq'):
+        comparison = getattr(operator, operator_type)
+        return comparison(int((item[key] or '9999')[:4]), int(value))
+
     @cached_property
     def func_data_id_generator(self):
         return (
             (
-                i['id'] for i in self.func_data_results
+                i for i in self.func_data_results
                 if (i['title'] or '').casefold() == self.query
-                and (i['release_date'] or '').startswith(str(self.year))
+                and self.func_data_id_year_comparison(i, 'release_date', self.year)
             )
             if self.year and self.tmdb_type == 'movie' else
             (
-                i['id'] for i in self.func_data_results
+                i for i in self.func_data_results
                 if (i['name'] or '').casefold() == self.query
-                and (i['first_air_date'] or '').startswith(str(self.year))
+                and self.func_data_id_year_comparison(i, 'first_air_date', self.year)
             )
             if self.year and self.tmdb_type == 'tv' else
             (
-                i['id'] for i in self.func_data_results
+                i for i in self.func_data_results
+                if (i['name'] or '').casefold() == self.query
+                and self.func_data_id_year_comparison(i, 'first_air_date', self.episode_year, operator_type='le')
+            )
+            if self.episode_year and self.tmdb_type == 'tv' else
+            (
+                i for i in self.func_data_results
                 if (i.get('name') or i.get('title') or '').casefold() == self.query
             )
         )
@@ -192,22 +216,41 @@ class TableSearchID(TableID):
 
     @cached_property
     def tmdb_id(self):
-        return self.func_data_id_generator_results
+        try:
+            return self.func_data_id_generator_results['id']
+        except (KeyError, TypeError):
+            return
+
+    @cached_property
+    def tmdb_year(self):
+        try:
+            return self.func_data_id_generator_results['release_date'][:4]
+        except (KeyError, TypeError):
+            pass
+        try:
+            return self.func_data_id_generator_results['first_air_date'][:4]
+        except (KeyError, TypeError):
+            pass
 
     @property
     def values(self):
         return (
-            (self.tmdb_type, self.query)
-            if not self.year else
+
             (self.tmdb_type, self.query, self.year)
+            if self.year else
+            (self.tmdb_type, self.query, self.episode_year)
+            if self.episode_year else
+            (self.tmdb_type, self.query)
         )
 
     @property
     def conditions(self):
         return (
-            'tmdb_type=? AND title=?'
-            if not self.year else
             'tmdb_type=? AND title=? AND year=?'
+            if self.year else
+            'tmdb_type=? AND title=? AND year<=?'
+            if self.episode_year else
+            'tmdb_type=? AND title=?'
         )
 
 
@@ -237,16 +280,10 @@ class TableMultiSearchID(TableSearchID):
     def values(self):
         return (self.query, *self.allowed_media_types)
 
-    update_keys = ('title', )
-
-    @property
-    def update_values(self):
-        return (self.query, self.tmdb_type, self.tmdb_id, )
-
     @cached_property
     def func_data_id_generator(self):
         return (
-            {'tmdb_id': i['id'], 'tmdb_type': i['media_type']} for i in self.func_data_results
+            i for i in self.func_data_results
             if i.get('media_type') in self.allowed_media_types  # If we've got a tmdb_type we only check that otherwise fallback to movie/tv
             and (
                 (i.get('name') or '').casefold() == self.query
@@ -268,14 +305,14 @@ class TableMultiSearchID(TableSearchID):
     @cached_property
     def tmdb_id(self):
         try:
-            return self.func_data_id_generator_results['tmdb_id']
+            return self.func_data_id_generator_results['id']
         except (AttributeError, KeyError, TypeError, IndexError):
             return
 
     @cached_property
     def tmdb_type(self):
         try:
-            return self.func_data_id_generator_results['tmdb_type']
+            return self.func_data_id_generator_results['media_type']
         except (AttributeError, KeyError, TypeError, IndexError):
             return
 
@@ -313,7 +350,7 @@ class FindQueriesDatabaseTMDbID:
     tmdb_id
     """
 
-    def get_tmdb_id(self, tmdb_type=None, imdb_id=None, tvdb_id=None, query=None, year=None, use_multisearch=False, **kwargs):
+    def get_tmdb_id(self, tmdb_type=None, imdb_id=None, tvdb_id=None, query=None, year=None, episode_year=None, use_multisearch=False, **kwargs):
 
         if tmdb_type is None and not use_multisearch:
             return
@@ -322,6 +359,7 @@ class FindQueriesDatabaseTMDbID:
             table_obj = TableMultiSearchID(parent=self, tmdb_type=tmdb_type)
             table_obj.query = (query or '').casefold()  # Case fold query to avoid case sensitivity issues
             table_obj.year = year
+            table_obj.episode_year = episode_year
             return table_obj.get_id() or table_obj.set_id() or (None, None)
 
         def try_imdb_id():
@@ -344,6 +382,7 @@ class FindQueriesDatabaseTMDbID:
             table_obj = TableNameID(parent=self, tmdb_type=tmdb_type)
             table_obj.query = (query or '').casefold()  # Case fold query to avoid case sensitivity issues
             table_obj.year = year
+            table_obj.episode_year = episode_year
             return table_obj.get_id() or table_obj.set_id()
 
         return try_imdb_id() or try_tvdb_id() or try_name_id() or None
