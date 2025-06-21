@@ -332,6 +332,21 @@ msgctxt "#32038"
 msgid "Get additional details from the local Kodi library database"
 msgstr "Zusätzliche Details aus der lokalen Kodi-Bibliothek laden"
 
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32067"
+msgid "Budget"
+msgstr "Budget"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32068"
+msgid "Revenue"
+msgstr "Einnahmen"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32069"
+msgid "Last Air Date"
+msgstr "Letztes Sendedatum"
+
 #: /resources/settings.xml
 msgctxt "#32042"
 msgid "Choose Action"
@@ -341,6 +356,11 @@ msgstr "Aktion wählen"
 msgctxt "#32043"
 msgid "Up Next"
 msgstr "Als Nächstes"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32072"
+msgid "Score"
+msgstr "Punktezahl"
 
 #: /resources/lib/container.py
 msgctxt "#32044"
@@ -372,6 +392,11 @@ msgctxt "#32058"
 msgid "The provided URL is either invalid or inaccesible."
 msgstr "Die angegebene URL ist entweder ungültig oder nicht zugänglich."
 
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32079"
+msgid "User"
+msgstr "Nutzer"
+
 #: /resources/lib/downloader.py
 msgctxt "#32059"
 msgid "Success!"
@@ -381,6 +406,16 @@ msgstr "Erfolg!"
 msgctxt "#32060"
 msgid "files extracted"
 msgstr "Dateien extrahiert"
+
+#: /resources/settings.xml
+msgctxt "#32082"
+msgid "Page multiplier (Other basic lists)"
+msgstr "Seitenmultiplikator (Andere Basislisten)"
+
+#: /resources/settings.xml
+msgctxt "#32083"
+msgid "Page multiplier (Database sync lists)"
+msgstr "Seitenmultiplikator (Datenbank-Synchronisationslisten)"
 
 #: /resources/lib/player.py
 msgctxt "#32061"
@@ -396,6 +431,11 @@ msgstr "Debugprotokollierung"
 msgctxt "#32070"
 msgid "Male"
 msgstr "Männlich"
+
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32087"
+msgid "Search for TMDb ID or input manually?"
+msgstr "Nach TMDb ID suchen oder manuell eingeben?"
 
 #: /resources/lib/tmdb.py
 msgctxt "#32071"
@@ -427,6 +467,11 @@ msgctxt "#32077"
 msgid "Ignore folder creation checks"
 msgstr "Überprüfung der Ordnererstellung ignorieren"
 
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32094"
+msgid "Select TMDb type"
+msgstr "TMDb-Typ auswählen"
+
 #: /resources/lib/container/basedir.py
 msgctxt "#32078"
 msgid "Still to Watch"
@@ -441,6 +486,11 @@ msgstr "Sonstiges"
 msgctxt "#32081"
 msgid "Next page item"
 msgstr "Eintrag \"Nächste Seite\" anzeigen"
+
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32098"
+msgid "Updated"
+msgstr "Aktualisiert"
 
 #: /resources/settings.xml
 msgctxt "#32084"
