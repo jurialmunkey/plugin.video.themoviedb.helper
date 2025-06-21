@@ -72,6 +72,14 @@ class CommonMonitorDetails(CommonContainerAPIs):
             episode=episode
         )
 
+    @kodi_try_except('lib.monitor.common get_identifier_details')
+    def get_identifier_details(self, identifier):
+        return self.query_database.get_identifier(identifier)
+
+    @kodi_try_except('lib.monitor.common set_identifier_details')
+    def set_identifier_details(self, identifier, tmdb_id, tmdb_type):
+        return self.query_database.set_identifier(identifier, tmdb_id, tmdb_type)
+
     def get_tvdb_awards(self, tmdb_type, tmdb_id):
         info = {}
         try:
