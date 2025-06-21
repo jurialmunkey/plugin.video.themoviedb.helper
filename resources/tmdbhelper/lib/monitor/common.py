@@ -62,8 +62,15 @@ class CommonMonitorDetails(CommonContainerAPIs):
         )
 
     @kodi_try_except('lib.monitor.common get_tmdb_id_parent')
-    def get_tmdb_id_parent(self, tmdb_id, trakt_type, season_episode_check=None):
-        return self.query_database.get_trakt_id(tmdb_id, 'tmdb', trakt_type, output_type='tmdb')
+    def get_tmdb_id_parent(self, tmdb_id, item_type, season=None, episode=None):
+        return self.query_database.get_trakt_id(
+            id_value=tmdb_id,
+            id_type='tmdb',
+            item_type=item_type,
+            output_type='tmdb',
+            season=season,
+            episode=episode
+        )
 
     def get_tvdb_awards(self, tmdb_type, tmdb_id):
         info = {}

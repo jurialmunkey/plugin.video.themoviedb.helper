@@ -322,11 +322,9 @@ class PlayerItem():
 
         return tmdb_id or self._parent.get_tmdb_id_parent(
             tmdb_id=self.meta.get('UniqueID.tmdb'),
-            trakt_type='episode',
-            season_episode_check=(
-                self.season,
-                self.episode,
-            )
+            item_type='episode',
+            season=self.season,
+            episode=self.episode,
         )
 
     def get_tmdb_id(self):

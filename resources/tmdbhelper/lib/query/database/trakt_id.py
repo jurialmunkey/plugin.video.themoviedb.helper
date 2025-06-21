@@ -15,24 +15,28 @@ class FindQueriesDatabaseTraktID:
             'data': 'TEXT',
             'indexed': True,
         },
-        'tmdb': {
+        'tmdb_id': {
             'data': 'INTEGER',
             'indexed': True,
         },
-        'tvdb': {
+        'tmdb_ep': {
             'data': 'INTEGER',
             'indexed': True,
         },
-        'imdb': {
+        'tvdb_id': {
+            'data': 'INTEGER',
+            'indexed': True,
+        },
+        'imdb_id': {
             'data': 'TEXT',
             'indexed': True,
         },
-        'trakt': {
-            'data': 'INTEGER',
+        'slug_id': {
+            'data': 'TEXT',
             'indexed': True,
         },
-        'slug': {
-            'data': 'TEXT',
+        'trakt_id': {
+            'data': 'INTEGER',
             'indexed': True,
         },
         'season': {
@@ -49,16 +53,40 @@ class FindQueriesDatabaseTraktID:
     trakt_id
     """
 
-    def get_trakt_id(self, id_value, id_type='tmdb', item_type=None, output_type='slug'):
+    def get_trakt_id(self, id_value, id_type='tmdb', item_type=None, output_type='slug', season=None, episode=None):
         table = 'trakt_id'
-        item_id = f'{id_type}_{id_value}'
+        item_id = f'{id_type}_{id_value}_{item_type}'
+        output_type = f'{output_type}_id'
+
+        def get_kwgs():
+
+            kwgs = (
+                {
+                    'values': (id_value, id_value, item_type, ),
+                    'conditions': '(tmdb_id=? OR tmdb_ep=?) AND item_type=?'
+                }
+                if id_type == 'tmdb' and item_type == 'episode' else
+                {
+                    'values': (id_value, item_type, ),
+                    'conditions': f'{id_type}_id=? AND item_type=?'
+                }
+            )
+
+            if season is not None:
+                kwgs['values'] = (*kwgs['values'], int(season))
+                kwgs['conditions'] = f"{kwgs['conditions']} AND season=?"
+
+            if episode is not None:
+                kwgs['values'] = (*kwgs['values'], int(episode))
+                kwgs['conditions'] = f"{kwgs['conditions']} AND episode=?"
+
+            return kwgs
 
         def mapping_function(data):
             return data[0][output_type] if data and data[0] else None
 
         def get_cached():
-            kwgs = {'values': (id_value, item_type, ), 'conditions': f'{id_type}=? AND item_type=?'}
-            return self.get_cached_values(table, (output_type, ), mapping_function, **kwgs)
+            return self.get_cached_values(table, (output_type, ), mapping_function, **get_kwgs())
 
         def set_cached():
             if not self.is_expired(f'{table}.{item_id}'):
@@ -81,6 +109,7 @@ class GetTraktIDMovie:
     tmdb_type = 'movie'
     season = None
     episode = None
+    tmdb_ep = None
 
     @staticmethod
     def get_value(dictionary, key):
@@ -133,11 +162,12 @@ class GetTraktIDMovie:
             'id': self.item_id,
             'item_type': self.item_type,
             'query': self.query,
-            'tmdb': self.tmdb_id,
-            'tvdb': self.tvdb_id,
-            'imdb': self.imdb_id,
-            'slug': self.slug_id,
-            'trakt': self.trakt_id,
+            'tmdb_id': self.tmdb_id,
+            'tmdb_ep': self.tmdb_ep,
+            'tvdb_id': self.tvdb_id,
+            'imdb_id': self.imdb_id,
+            'slug_id': self.slug_id,
+            'trakt_id': self.trakt_id,
             'season': self.season,
             'episode': self.episode,
         }
@@ -167,6 +197,10 @@ class GetTraktIDEpisode(GetTraktIDShow):
     @cached_property
     def tmdb_id(self):
         return self.get_value(self.show_meta_ids, 'tmdb')
+
+    @cached_property
+    def tmdb_ep(self):
+        return self.get_value(self.item_meta_ids, 'tmdb')
 
     @cached_property
     def slug_id(self):

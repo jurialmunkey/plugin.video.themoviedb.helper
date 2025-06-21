@@ -196,8 +196,10 @@ class MonitorItemDetails(ImageManipulations):
     def parent_tvshow_tmdb_id(self):
         return self.parent.get_tmdb_id_parent(
             tmdb_id=self.infolabel_uniqueid_tmdb,
-            trakt_type='episode',
-            season_episode_check=(self.season, self.episode,))
+            item_type='episode',
+            season=self.season,
+            episode=self.episode,
+        )
 
     @cached_property
     def parent_tmdb_id(self):
