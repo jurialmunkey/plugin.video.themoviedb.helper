@@ -431,6 +431,11 @@ msgctxt "#32070"
 msgid "Male"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32087"
+msgid "Search for TMDb ID or input manually?"
+msgstr ""
+
 #: /resources/lib/tmdb.py
 msgctxt "#32071"
 msgid "Female"
@@ -461,6 +466,11 @@ msgctxt "#32077"
 msgid "Ignore folder creation checks"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32094"
+msgid "Select TMDb type"
+msgstr ""
+
 #: /resources/lib/container/basedir.py
 msgctxt "#32078"
 msgid "Still to Watch"
@@ -474,6 +484,11 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32081"
 msgid "Next page item"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32098"
+msgid "Updated"
 msgstr ""
 
 #: /resources/settings.xml
@@ -504,6 +519,11 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32090"
 msgid "Content"
+msgstr ""
+
+#: /addon.xml
+msgctxt "#32105"
+msgid "Manage service monitor item"
 msgstr ""
 
 #: /resources/settings.xml

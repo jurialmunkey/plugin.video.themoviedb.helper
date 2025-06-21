@@ -80,6 +80,10 @@ class CommonMonitorDetails(CommonContainerAPIs):
     def set_identifier_details(self, identifier, tmdb_id, tmdb_type):
         return self.query_database.set_identifier(identifier, tmdb_id, tmdb_type)
 
+    @kodi_try_except('lib.monitor.common del_identifier_details')
+    def del_identifier_details(self, identifier):
+        return self.query_database.del_identifier(identifier)
+
     def get_tvdb_awards(self, tmdb_type, tmdb_id):
         info = {}
         try:

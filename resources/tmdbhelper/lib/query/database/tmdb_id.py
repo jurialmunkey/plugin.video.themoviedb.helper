@@ -404,7 +404,7 @@ class FindQueriesDatabaseTMDbID:
         if not response:
             return
 
-        items = [ListItem(**self.tmdb_api.mapper.get_info(i, tmdb_type)).get_listitem() for i in response]
+        items = [ListItem(**self.tmdb_api.mapper.get_info(i, tmdb_type)).get_listitem(finalise=True) for i in response]
         if not items:
             return
 

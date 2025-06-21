@@ -94,6 +94,7 @@ class MonitorItemDetails(ImageManipulations):
             self.get_infolabel('filenameandpath'),
             self.get_infolabel('label'),
             self.get_infolabel('dbtype'),
+            self.get_property('Service.Reload'),
         ))
 
     """

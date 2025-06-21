@@ -1,27 +1,14 @@
 import xbmcgui
+import tmdbhelper.lib.monitor.utils as monitor_utils
 from tmdbhelper.lib.addon.plugin import get_infolabel, get_condvisibility, get_localized, get_skindir
 from tmdbhelper.lib.addon.logger import kodi_try_except
-from jurialmunkey.window import get_property, get_current_window
+from jurialmunkey.window import get_current_window
 from tmdbhelper.lib.monitor.common import CommonMonitorFunctions
 from tmdbhelper.lib.monitor.itemdetails import MonitorItemDetails
 from tmdbhelper.lib.monitor.baseitem import BaseItemSkinDefaults
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.addon.thread import SafeThread
-
-CV_USE_LISTITEM = (
-    "!Skin.HasSetting(TMDbHelper.ForceWidgetContainer) + "
-    "!Window.IsActive(script-tmdbhelper-recommendations.xml) + ["
-    "!Skin.HasSetting(TMDbHelper.UseLocalWidgetContainer) | String.IsEmpty(Window.Property(TMDbHelper.WidgetContainer))] + ["
-    "Window.IsVisible(movieinformation) | "
-    "Window.IsVisible(musicinformation) | "
-    "Window.IsVisible(songinformation) | "
-    "Window.IsVisible(addoninformation) | "
-    "Window.IsVisible(pvrguideinfo) | "
-    "Window.IsVisible(tvchannels) | "
-    "Window.IsVisible(tvguide)]")
-
-CV_USE_LOCAL_CONTAINER = "Skin.HasSetting(TMDbHelper.UseLocalWidgetContainer)"
 
 
 class ListItemInfoGetter():
@@ -45,16 +32,15 @@ class ListItemInfoGetter():
 
     @property  # CHANGED _cur_window
     def widget_id(self):
-        window_id = self._cur_window if get_condvisibility(CV_USE_LOCAL_CONTAINER) else None
-        return get_property('WidgetContainer', window_id=window_id, is_type=int)
+        return monitor_utils.widget_id(self._cur_window)
 
     @property  # CHANGED _widget_id and assign
     def container(self):
-        return f'Container({self._widget_id}).' if self._widget_id else 'Container.'
+        return monitor_utils.container(self._widget_id)
 
     @property  # CHANGED _container
     def container_item(self):
-        return 'ListItem.' if get_condvisibility(CV_USE_LISTITEM) else f'{self._container}ListItem({{}}).'
+        return monitor_utils.container_item(self._container)
 
     @property
     def container_content(self):
@@ -94,8 +80,8 @@ class ListItemInfoGetter():
 
 
 class ListItemMonitorFinaliser:
-    def __init__(self, parent):
-        self.parent = parent  # ListItemMonitorFunctions
+    def __init__(self, listitem_monitor_functions):
+        self.listitem_monitor_functions = listitem_monitor_functions  # ListItemMonitorFunctions
 
     @cached_property
     def ratings_enabled(self):
@@ -111,35 +97,35 @@ class ListItemMonitorFinaliser:
 
     @property
     def baseitem_properties(self):
-        return self.parent.baseitem_properties
+        return self.listitem_monitor_functions.baseitem_properties
 
     @property
     def get_property(self):
-        return self.parent.get_property
+        return self.listitem_monitor_functions.get_property
 
     @property
     def set_properties(self):
-        return self.parent.set_properties
+        return self.listitem_monitor_functions.set_properties
 
     @property
     def set_ratings_properties(self):
-        return self.parent.set_ratings_properties
+        return self.listitem_monitor_functions.set_ratings_properties
 
     @property
     def add_item_listcontainer(self):
-        return self.parent.add_item_listcontainer
+        return self.listitem_monitor_functions.add_item_listcontainer
 
     @property
-    def grandparent(self):
-        return self.parent._parent
+    def service_monitor(self):
+        return self.listitem_monitor_functions.service_monitor
 
     @property
     def mutex_lock(self):
-        return self.grandparent.mutex_lock
+        return self.service_monitor.mutex_lock
 
     @property
     def images_monitor(self):
-        return self.grandparent.images_monitor
+        return self.service_monitor.images_monitor
 
     def ratings(self):
         if not self.item.is_same_item:
@@ -189,25 +175,25 @@ class ListItemMonitorFinaliser:
 
     @property
     def process_thread(self):
-        return self.parent.process_thread
+        return self.listitem_monitor_functions.process_thread
 
     @property
     def process_mutex(self):
-        return self.parent.process_mutex
+        return self.listitem_monitor_functions.process_mutex
 
     @process_mutex.setter
     def process_mutex(self, value):
-        self.parent.process_mutex = value
+        self.listitem_monitor_functions.process_mutex = value
 
     @cached_property
     def item(self):
-        item = self.parent._item
+        item = self.listitem_monitor_functions._item
         item.set_additional_properties(self.baseitem_properties)
         return item
 
     @cached_property
     def listitem(self):
-        listitem = self.parent._last_listitem = self.item.listitem
+        listitem = self.listitem_monitor_functions._last_listitem = self.item.listitem
         return listitem
 
     def finalise(self):
@@ -265,7 +251,7 @@ class ListItemMonitorFinaliserWindowMethod(ListItemMonitorFinaliser):
 
 
 class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
-    def __init__(self, parent):
+    def __init__(self, service_monitor=None):
         super(ListItemMonitorFunctions, self).__init__()
         self._cur_item = 0
         self._pre_item = 1
@@ -277,7 +263,7 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         self.property_prefix = 'ListItem'
         self._pre_artwork_thread = None
         self._baseitem_skindefaults = BaseItemSkinDefaults()
-        self._parent = parent
+        self.service_monitor = service_monitor  # ServiceMonitor
         self.process_thread = []
         self.process_mutex = False
 

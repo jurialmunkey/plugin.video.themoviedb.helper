@@ -74,6 +74,10 @@ class Script(object):
         'revoke_trakt':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'revoke_trakt')(**kwargs),
 
+        # Modify Functions
+        'modify_identifier':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.modify_identifier', 'modify_identifier')(**kwargs),
+
         # Image Functions
         'blur_image':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.image_functions', 'blur_image')(**kwargs),

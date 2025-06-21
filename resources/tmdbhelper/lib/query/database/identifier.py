@@ -62,3 +62,9 @@ class FindQueriesDatabaseIdentifier:
         identifier_tuple = IdentifierTuple(item_id, tmdb_id, tmdb_type)
         self.set_cached_values(TABLE, KEYS, [identifier_tuple])
         return identifier_tuple
+
+    def del_identifier(self, item_id):
+        with self.access.connection.open() as connection:
+            connection.execute('BEGIN')
+            self.access.del_cached(TABLE, item_id, children=False)
+            connection.execute('COMMIT')
