@@ -618,6 +618,11 @@ msgctxt "#32108"
 msgid "Choose matching method for parameters with multiple values."
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32124"
+msgid "RatingPosterDB API"
+msgstr ""
+
 #: /resources/lib/container.py
 msgctxt "#32109"
 msgid "Match ANY Value"
@@ -626,6 +631,11 @@ msgstr ""
 #: /resources/lib/container.py
 msgctxt "#32110"
 msgid "Match ALL Values"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32127"
+msgid "RatingPosterDB API key"
 msgstr ""
 
 #: /resources/lib/container.py
