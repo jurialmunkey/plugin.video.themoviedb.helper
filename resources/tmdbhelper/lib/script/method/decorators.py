@@ -40,9 +40,8 @@ def get_tmdb_id(func):
         from tmdbhelper.lib.addon.dialog import BusyDialog
         from tmdbhelper.lib.query.database.database import FindQueriesDatabase
         with BusyDialog():
-            if not kwargs.get('tmdb_id'):
-                kwargs['tmdb_id'] = FindQueriesDatabase().get_tmdb_id(**kwargs)
-                if not kwargs['tmdb_id']:
-                    return
+            kwargs['tmdb_id'] = kwargs.get('tmdb_id') or FindQueriesDatabase().get_tmdb_id(**kwargs)
+            if not kwargs['tmdb_id']:
+                return
         return func(*args, **kwargs)
     return wrapper
