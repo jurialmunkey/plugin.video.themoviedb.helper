@@ -342,6 +342,26 @@ def import_art_clearlogo_null():
     return ArtClearlogoNull
 
 
+def import_user_art_poster():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.user_art import UserArtPoster
+    return UserArtPoster
+
+
+def import_user_art_fanart():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.user_art import UserArtFanart
+    return UserArtFanart
+
+
+def import_user_art_landscape():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.user_art import UserArtLandscape
+    return UserArtLandscape
+
+
+def import_user_art_clearlogo():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.user_art import UserArtClearlogo
+    return UserArtClearlogo
+
+
 def import_playcount():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import PlayCount
     return PlayCount
@@ -465,6 +485,10 @@ FACTORY_ROUTES = {
     'art_clearlogo_language': import_art_clearlogo_language,
     'art_clearlogo_english': import_art_clearlogo_english,
     'art_clearlogo_null': import_art_clearlogo_null,
+    'user_art_poster': import_user_art_poster,
+    'user_art_fanart': import_user_art_fanart,
+    'user_art_landscape': import_user_art_landscape,
+    'user_art_clearlogo': import_user_art_clearlogo,
     'playcount': import_playcount,
     'watchedcount': import_watchedcount,
     'airedcount': import_airedcount,

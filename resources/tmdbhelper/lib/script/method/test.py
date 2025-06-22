@@ -109,6 +109,16 @@ def test_func(test_func, dialog_output=False, **kwargs):
         head = path
         return finalise(head, data)
 
+    def test_func_write_user_art(aspect, icon, parent_id, **kwargs):
+        from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
+        iddb = ItemDetailsDatabase()
+        iddb.set_list_values(
+            table='user_art',
+            keys=('type', 'icon', 'parent_id'),
+            values=(aspect, icon, parent_id),
+            overwrite=True
+        )
+
     routes = {
         'response': test_func_response,
         'trakt_response': test_func_trakt_response,
@@ -121,6 +131,7 @@ def test_func(test_func, dialog_output=False, **kwargs):
         'get_next_episodes': test_func_get_next_episodes,
         'sync_next_episodes': test_func_sync_next_episodes,
         'get_response_sync': test_func_get_response_sync,
+        'write_user_art': test_func_write_user_art,
     }
 
     return routes[test_func](**kwargs)

@@ -736,6 +736,11 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="contextmenu_modify_artwork" type="boolean" label="32118" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="contextmenu_add_to_library" type="boolean" label="20444" help="">
                     <level>0</level>
                     <default>true</default>

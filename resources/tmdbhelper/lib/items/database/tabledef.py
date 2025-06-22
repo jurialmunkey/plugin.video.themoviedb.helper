@@ -735,6 +735,22 @@ FANART_TV_COLUMNS = {
     },
 }
 
+USER_ART_COLUMNS = {
+    'type': {
+        'data': 'TEXT',
+        'unique': True,
+    },
+    'icon': {
+        'data': 'TEXT',
+    },
+    'parent_id': {
+        'data': 'TEXT',
+        'foreign_key': 'baseitem(id)',
+        'indexed': True,
+        'unique': True,
+    },
+}
+
 UNIQUE_ID_COLUMNS = {
     'key': {
         'data': 'TEXT',

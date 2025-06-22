@@ -284,10 +284,8 @@ class ItemSync(ItemSyncGetters, ItemSyncCachedProperties):
     def refresh_containers(self):
         if not self.is_successful_sync:
             return
-        from jurialmunkey.window import get_property
-        from tmdbhelper.lib.addon.tmdate import set_timestamp
-        executebuiltin('Container.Refresh')
-        get_property('Widgets.Reload', set_property=f'{set_timestamp(0, True)}')
+        from tmdbhelper.lib.script.method.kodi_utils import container_refresh
+        container_refresh()
 
     def display_dialog(self):
         if not self.dialog_message:
