@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-06-18 10:20+0800\n"
+"PO-Revision-Date: 2025-06-22 17:51+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -432,6 +432,11 @@ msgctxt "#32070"
 msgid "Male"
 msgstr "男"
 
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32087"
+msgid "Search for TMDb ID or input manually?"
+msgstr "搜索 TMDb ID 还是手动输入？"
+
 #: /resources/lib/tmdb.py
 msgctxt "#32071"
 msgid "Female"
@@ -462,6 +467,11 @@ msgctxt "#32077"
 msgid "Ignore folder creation checks"
 msgstr "忽略文件夹检查"
 
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32094"
+msgid "Select TMDb type"
+msgstr "选择 TMDb 类型"
+
 #: /resources/lib/container/basedir.py
 msgctxt "#32078"
 msgid "Still to Watch"
@@ -476,6 +486,11 @@ msgstr "其他"
 msgctxt "#32081"
 msgid "Next page item"
 msgstr "下一页项目"
+
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32098"
+msgid "Updated"
+msgstr "已更新"
 
 #: /resources/settings.xml
 msgctxt "#32084"
