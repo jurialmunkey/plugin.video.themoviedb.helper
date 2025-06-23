@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-06-22 17:51+0800\n"
+"PO-Revision-Date: 2025-06-23 14:34+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -523,6 +523,16 @@ msgctxt "#32090"
 msgid "Content"
 msgstr "内容"
 
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32105"
+msgid "leave blank to delete"
+msgstr "留空即删除"
+
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32106"
+msgid "Enter {} URL"
+msgstr "输入 {} URL"
+
 #: /resources/settings.xml
 msgctxt "#32091"
 msgid "Special season folders"
@@ -563,10 +573,25 @@ msgctxt "#32100"
 msgid "Do you wish to clear the existing items or add more?"
 msgstr "您希望清除现有项目还是添加更多项目？"
 
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32115"
+msgid "Reset {} artwork to default?"
+msgstr "将 {} 艺术图重置为默认值？"
+
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32116"
+msgid "Remove user artwork override and reset artwork to default artwork selection as defined in the settings."
+msgstr "删除用户艺术图覆盖，并将艺术图重置为设置中定义的默认艺术图选择。"
+
 #: /resources/lib/container.py
 msgctxt "#32101"
 msgid "Clear Items"
 msgstr "清理项目"
+
+#: /resources/tmdbhelper/lib/items/context.py
+msgctxt "#32118"
+msgid "Modify artwork"
+msgstr "修改艺术图"
 
 #: /resources/lib/container.py
 msgctxt "#32102"
