@@ -15,95 +15,121 @@ class MediaItemArtworkRoutes:
             'affixes': (None, 'language', 'english', 'null'),
             'outputs': 'poster',
             'parents': (None, 'tvshow', 'season'),
-            'ftv_api': True,
+            'art_api': 'ftv',
         },
         'fanart_tv_landscape': {
             'affixes': (None, 'language', 'english'),
             'outputs': 'landscape',
             'parents': (None, 'tvshow', 'season'),
-            'ftv_api': True,
+            'art_api': 'ftv',
         },
         'fanart_tv_clearlogo': {
             'affixes': (None, 'language', 'english', 'null'),
             'outputs': 'clearlogo',
             'parents': (None, 'tvshow', 'season'),
-            'ftv_api': True,
+            'art_api': 'ftv',
         },
         'fanart_tv_fanart': {
             'affixes': (None, ),
             'outputs': 'fanart',
             'parents': (None, 'tvshow', 'season'),
-            'ftv_api': True,
+            'art_api': 'ftv',
         },
         'fanart_tv_clearart': {
             'affixes': (None, ),
             'outputs': 'clearart',
             'parents': (None, 'tvshow', 'season'),
-            'ftv_api': True,
+            'art_api': 'ftv',
         },
         'fanart_tv_discart': {
             'affixes': (None, ),
             'outputs': 'discart',
             'parents': (None, ),
-            'ftv_api': True,
+            'art_api': 'ftv',
         },
         'fanart_tv_banner': {
             'affixes': (None, ),
             'outputs': 'banner',
             'parents': (None, 'tvshow', 'season'),
-            'ftv_api': True,
+            'art_api': 'ftv',
         },
         'art_poster': {
             'affixes': (None, 'language', 'english', 'null'),
             'outputs': 'poster',
             'parents': (None, 'tvshow', 'season'),
-            'ftv_api': False,
+            'art_api': 'tmdb',
         },
         'art_landscape': {
             'affixes': (None, 'language', 'english'),
             'outputs': 'landscape',
             'parents': (None, 'tvshow', 'season'),
-            'ftv_api': False,
+            'art_api': 'tmdb',
         },
         'art_clearlogo': {
             'affixes': (None, 'language', 'english', 'null'),
             'outputs': 'clearlogo',
             'parents': (None, 'tvshow', 'season'),
-            'ftv_api': False,
+            'art_api': 'tmdb',
         },
         'art_fanart': {
             'affixes': (None, ),
             'outputs': 'fanart',
             'parents': (None, 'tvshow', 'season'),
-            'ftv_api': False,
+            'art_api': 'tmdb',
         },
         'art_thumbs': {
             'affixes': (None, ),
             'outputs': 'thumb',
             'parents': (None, ),
-            'ftv_api': False,
+            'art_api': 'tmdb',
         },
         'art_profile': {
             'affixes': (None, ),
             'outputs': 'thumb',
             'parents': (None, ),
-            'ftv_api': False,
+            'art_api': 'tmdb',
         },
         'art_extrafanart': {
             'affixes': (None, ),
             'outputs': 'fanart',
             'parents': (None, ),
-            'ftv_api': False,
+            'art_api': 'tmdb',
+        },
+        'user_art_poster': {
+            'affixes': (None, ),
+            'outputs': 'poster',
+            'parents': (None, 'tvshow', 'season'),
+            'art_api': 'user',
+        },
+        'user_art_landscape': {
+            'affixes': (None, ),
+            'outputs': 'landscape',
+            'parents': (None, 'tvshow', 'season'),
+            'art_api': 'user',
+        },
+        'user_art_clearlogo': {
+            'affixes': (None, ),
+            'outputs': 'clearlogo',
+            'parents': (None, 'tvshow', 'season'),
+            'art_api': 'user',
+        },
+        'user_art_fanart': {
+            'affixes': (None, ),
+            'outputs': 'fanart',
+            'parents': (None, 'tvshow', 'season'),
+            'art_api': 'user',
         },
     }
 
-    def get_art_list(self, affix=None, allow_ftv=False, allow_tmdb=False, no_affix=False):
+    def get_art_list(self, affix=None, allow_ftv=False, allow_tmdb=False, allow_user=False, no_affix=False):
 
         def get_art_tuple(route):
             definition = self.routes[route]
-            if not allow_ftv and definition['ftv_api']:
+            if not allow_ftv and definition['art_api'] == 'ftv':
                 return
-            if not allow_tmdb and not definition['ftv_api']:
+            if not allow_tmdb and definition['art_api'] == 'tmdb':
+                return
+            if not allow_user and definition['art_api'] == 'user':
                 return
             if no_affix and len(definition['affixes']) != 1:
                 return
@@ -157,7 +183,7 @@ class MediaItemArtworkRoutes:
             + self.get_art_list_null(allow_tmdb=True)
 
     @property
-    def configured_routes(self):
+    def base_configured_routes(self):
         if not get_setting('fanarttv_lookup'):
             return self.get_art_list(allow_tmdb=True)
         if not get_setting('language_lookup'):
@@ -167,6 +193,14 @@ class MediaItemArtworkRoutes:
         if not get_setting('fanarttv_prefer'):
             return self.get_art_list_tmdb_language()
         return self.get_art_list_ftv_language()
+
+    @property
+    def user_configured_routes(self):
+        return self.get_art_list(allow_user=True)
+
+    @property
+    def configured_routes(self):
+        return self.user_configured_routes + self.base_configured_routes
 
 
 class MediaItem(BaseItem):

@@ -52,7 +52,7 @@ class ListItemConfig:
     def get_configured_listitem(self, data):
         if self.next_page and not self.parent.pagination:
             return
-        self.listitem.set_details(data, override=True) if data else None
+        self.listitem.set_details(data, override=True, reverse_artwork=True) if data else None
         return self.listitem
 
     @cached_property

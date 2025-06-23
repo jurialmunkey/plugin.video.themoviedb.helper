@@ -35,6 +35,14 @@ CONTEXT_MENU_ITEMS = {
         'season': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}'},
         'other': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'}
     },
+    # Modify Artwork
+    '$ADDON[plugin.video.themoviedb.helper 32118]': {
+        'command': 'RunScript(plugin.video.themoviedb.helper,modify_artwork,{})',
+        'setting': 'contextmenu_modify_artwork',
+        'episode': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}', 'episode': '{episode}'},
+        'season': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}'},
+        'other': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'}
+    },
     # Add to Library
     '$LOCALIZE[20444]': {
         'command': 'RunScript(plugin.video.themoviedb.helper,add_to_library,{})',

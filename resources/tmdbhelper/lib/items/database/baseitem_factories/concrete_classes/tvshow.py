@@ -95,6 +95,7 @@ class Tvshow(MediaItem):
             'basemeta_db_fanart_tv_landscape_language_season': self.config_basemeta_db_season,
             'basemeta_db_fanart_tv_landscape_english_season': self.config_basemeta_db_season,
             'basemeta_db_fanart_tv_banner_season': self.config_basemeta_db_season,
+
             'basemeta_db_art_poster_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_art_poster_language_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_art_poster_english_tvshow': self.config_basemeta_db_tvshow,
@@ -119,6 +120,16 @@ class Tvshow(MediaItem):
             'basemeta_db_art_clearlogo_language_season': self.config_basemeta_db_season,
             'basemeta_db_art_clearlogo_english_season': self.config_basemeta_db_season,
             'basemeta_db_art_clearlogo_null_season': self.config_basemeta_db_season,
+
+            'basemeta_db_user_art_poster_tvshow': self.config_basemeta_db_tvshow,
+            'basemeta_db_user_art_fanart_tvshow': self.config_basemeta_db_tvshow,
+            'basemeta_db_user_art_landscape_tvshow': self.config_basemeta_db_tvshow,
+            'basemeta_db_user_art_clearlogo_tvshow': self.config_basemeta_db_tvshow,
+            'basemeta_db_user_art_poster_season': self.config_basemeta_db_season,
+            'basemeta_db_user_art_fanart_season': self.config_basemeta_db_season,
+            'basemeta_db_user_art_landscape_season': self.config_basemeta_db_season,
+            'basemeta_db_user_art_clearlogo_season': self.config_basemeta_db_season,
+
             'basemeta_db_unique_id_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_unique_id_season': self.config_basemeta_db_season,
             'basemeta_db_custom_tvshow': self.config_basemeta_db_tvshow,

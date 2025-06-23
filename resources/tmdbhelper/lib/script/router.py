@@ -78,6 +78,8 @@ class Script(object):
         # Modify Functions
         'modify_identifier':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.modify_identifier', 'modify_identifier')(**kwargs),
+        'modify_artwork':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.modify_artwork', 'modify_artwork')(**kwargs),
 
         # Image Functions
         'blur_image':

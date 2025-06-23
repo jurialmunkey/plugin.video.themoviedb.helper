@@ -15,11 +15,8 @@ class TMDbUserItemMethods():
     def refresh_listing(response, remove=False):
         if not remove or not response or not response.get('success'):
             return  # Only refresh if removing from a list as thats when we're likely to be inside the list
-        from jurialmunkey.window import get_property
-        from tmdbhelper.lib.addon.plugin import executebuiltin
-        from tmdbhelper.lib.addon.tmdate import set_timestamp
-        get_property('Widgets.Reload', set_property=f'{set_timestamp(0, True)}')
-        executebuiltin('Container.Refresh')
+        from tmdbhelper.lib.script.method.kodi_utils import container_refresh
+        container_refresh()
 
     def sync_item(self, route, tmdb_type, tmdb_id, *args, confirmation=True, remove=False, **kwargs):
         from tmdbhelper.lib.addon.plugin import get_localized

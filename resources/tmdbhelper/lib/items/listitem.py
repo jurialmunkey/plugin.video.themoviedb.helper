@@ -260,13 +260,13 @@ class _ListItem(object):
     def title(self):
         return self.label
 
-    def set_details(self, details=None, reverse=False, override=False):
+    def set_details(self, details=None, reverse=False, override=False, reverse_artwork=False):
         if not details:
             return
         self.stream_details = merge_two_dicts(details.get('stream_details', {}), self.stream_details, reverse=reverse)
         self.infolabels = merge_two_dicts(details.get('infolabels', {}), self.infolabels, reverse=reverse)
         self.infoproperties = merge_two_dicts(details.get('infoproperties', {}), self.infoproperties, reverse=reverse)
-        self.art = merge_two_dicts(details.get('art', {}), self.art, reverse=reverse)
+        self.art = merge_two_dicts(details.get('art', {}), self.art, reverse=bool(reverse or reverse_artwork))
         self.unique_ids = merge_two_dicts(details.get('unique_ids', {}), self.unique_ids, reverse=reverse)
         self.cast = self.cast or details.get('cast', [])
         if not override:

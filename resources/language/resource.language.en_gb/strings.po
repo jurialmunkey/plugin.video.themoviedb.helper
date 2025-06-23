@@ -521,6 +521,16 @@ msgctxt "#32090"
 msgid "Content"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32105"
+msgid "leave blank to delete"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32106"
+msgid "Enter {} URL"
+msgstr ""
+
 #: /resources/settings.xml
 msgctxt "#32091"
 msgid "Special season folders"
@@ -561,9 +571,24 @@ msgctxt "#32100"
 msgid "Do you wish to clear the existing items or add more?"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32115"
+msgid "Reset {} artwork to default?"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32116"
+msgid "Remove user artwork override and reset artwork to default artwork selection as defined in the settings."
+msgstr ""
+
 #: /resources/lib/container.py
 msgctxt "#32101"
 msgid "Clear Items"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/items/context.py
+msgctxt "#32118"
+msgid "Modify artwork"
 msgstr ""
 
 #: /resources/lib/container.py
@@ -593,6 +618,11 @@ msgctxt "#32108"
 msgid "Choose matching method for parameters with multiple values."
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32124"
+msgid "RatingPosterDB API"
+msgstr ""
+
 #: /resources/lib/container.py
 msgctxt "#32109"
 msgid "Match ANY Value"
@@ -601,6 +631,11 @@ msgstr ""
 #: /resources/lib/container.py
 msgctxt "#32110"
 msgid "Match ALL Values"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32127"
+msgid "RatingPosterDB API key"
 msgstr ""
 
 #: /resources/lib/container.py
