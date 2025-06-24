@@ -11,6 +11,12 @@ def container_refresh():
     get_property('Widgets.Reload', set_property=f'{set_timestamp(0, True)}')
 
 
+def service_refresh():
+    from tmdbhelper.lib.addon.tmdate import set_timestamp
+    from jurialmunkey.window import get_property
+    get_property('Service.Reload', set_property=f'{set_timestamp(0, True)}')
+
+
 def split_value(split_value, separator=None, **kwargs):
     """ Split string values and output to window properties """
     from jurialmunkey.window import get_property

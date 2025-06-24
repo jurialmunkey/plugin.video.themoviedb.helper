@@ -6,7 +6,7 @@ from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.monitor.listitemtools import ListItemMonitorFunctions
 from tmdbhelper.lib.query.database.database import FindQueriesDatabase
-from tmdbhelper.lib.monitor.utils import refresh_service_item
+from tmdbhelper.lib.script.method.kodi_utils import service_refresh
 
 
 class ModifyIdentifier:
@@ -34,7 +34,7 @@ class ModifyIdentifier:
             header,
             f'{self.tmdb_type} {self.tmdb_id}\n\nMonitor ID\n{self.identifier_id}'
         )
-        refresh_service_item()
+        service_refresh()
 
     def reset_details(self):
         self.del_identifier_details(self.identifier_id)

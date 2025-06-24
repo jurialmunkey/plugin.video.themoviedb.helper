@@ -4,7 +4,7 @@
 import xbmcgui
 from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.files.ftools import cached_property
-from tmdbhelper.lib.script.method.kodi_utils import container_refresh
+from tmdbhelper.lib.script.method.kodi_utils import container_refresh, service_refresh
 from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
 from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
 from tmdbhelper.lib.items.listitem import ListItem
@@ -245,3 +245,4 @@ def modify_artwork(*args, aspect=None, url=None, **kwargs):
     if not modify_artwork.modified:
         return
     container_refresh()
+    service_refresh()
