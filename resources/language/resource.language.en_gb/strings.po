@@ -638,16 +638,6 @@ msgctxt "#32127"
 msgid "RatingPosterDB API key"
 msgstr ""
 
-#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
-msgctxt "#32128"
-msgid "Select an image URL from the API images, browse for a local file path on your device, or enter a file path or URL manually"
-msgstr ""
-
-#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
-msgctxt "#32129"
-msgid "Enter a blank path manually to reset to default"
-msgstr ""
-
 #: /resources/lib/container.py
 msgctxt "#32111"
 msgid "Select Items"

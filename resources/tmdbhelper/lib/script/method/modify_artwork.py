@@ -54,21 +54,28 @@ class ModifyArtwork:
             return ''
 
     @cached_property
+    def url_routes(self):
+        url_routes = [
+            {'func': self.get_browse_url, 'name': get_localized(1024)},
+            {'func': self.get_select_url, 'name': get_localized(424)},
+            {'func': self.get_manual_url, 'name': get_localized(413)},
+        ]
+        if not self.current_url:
+            return url_routes
+        url_routes += [
+            {'func': self.get_delete_url, 'name': get_localized(1210)}
+        ]
+        return url_routes
+
+    @cached_property
     def url(self):
-        x = xbmcgui.Dialog().yesnocustom(
-            f'{get_localized(39123)} URL',
-            f'{get_localized(32128)}. {get_localized(32129)}.',
-            yeslabel=get_localized(424),
-            nolabel=get_localized(1024),
-            customlabel=get_localized(413),
+        x = xbmcgui.Dialog().select(
+            heading=f'{get_localized(39123)} URL',
+            list=[i['name'] for i in self.url_routes]
         )
         if x == -1:
             return
-        func = (
-            self.get_browse_url,
-            self.get_select_url,
-            self.get_manual_url,
-        )[x]
+        func = self.url_routes[x]['func']
         return func()
 
     @cached_property
@@ -89,6 +96,9 @@ class ModifyArtwork:
     def configured_listitems(self):
         return [ListItem(**i).get_listitem() for i in self.sync_data]
 
+    def get_delete_url(self):
+        return ''  # Empty string prompts option to delete
+
     def get_select_url(self):
         x = xbmcgui.Dialog().select(
             heading=get_localized(13511),
@@ -107,7 +117,7 @@ class ModifyArtwork:
             useThumbs=True,
             mask='.jpg|.png|.gif|.bmp|.tif|.jpeg|.tga|.tiff|.webp',
             defaultt=self.current_url,
-        )
+        ) or None
 
     def get_manual_url(self):
         return xbmcgui.Dialog().input(
@@ -118,7 +128,10 @@ class ModifyArtwork:
     @cached_property
     def artwork_aspects_listitems(self):
         return [
-            ListItem(label=i, art={'icon': self.get_current_url(i)}).get_listitem()
+            ListItem(
+                label=i,
+                art={'icon': self.get_current_url(i) or 'DefaultAddonImages.png'}
+            ).get_listitem()
             for i in self.accepted_aspects
         ]
 
@@ -128,6 +141,21 @@ class ModifyArtwork:
         if x == -1:
             return -1
         return self.accepted_aspects[x]
+
+    def del_item(self):
+        self.database.del_list_values(
+            table='user_art',
+            values=(self.aspect, self.item_id),
+            conditions='type=? AND parent_id=?',
+        )
+
+    def set_item(self):
+        self.database.set_list_values(
+            table='user_art',
+            keys=('type', 'icon', 'parent_id'),
+            values=(self.aspect, self.url or None, self.item_id),
+            overwrite=True
+        )
 
     def run(self, aspect=None, url=None):
         if aspect is not None:
@@ -143,12 +171,10 @@ class ModifyArtwork:
             return False
         if self.url is None:
             return False
-        self.database.set_list_values(
-            table='user_art',
-            keys=('type', 'icon', 'parent_id'),
-            values=(self.aspect, self.url or None, self.item_id),
-            overwrite=True
-        )
+        if self.url == '':
+            self.del_item()
+            return True
+        self.set_item()
         return True
 
 
