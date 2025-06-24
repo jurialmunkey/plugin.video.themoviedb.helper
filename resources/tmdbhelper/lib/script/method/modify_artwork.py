@@ -8,6 +8,7 @@ from tmdbhelper.lib.script.method.kodi_utils import container_refresh, service_r
 from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
 from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
 from tmdbhelper.lib.items.listitem import ListItem
+from tmdbhelper.lib.script.method.decorators import is_in_kwargs, get_tmdb_id
 
 
 class ModifyArtwork:
@@ -239,6 +240,8 @@ class ModifyArtworkFactory:
         return self.run()
 
 
+@is_in_kwargs({'tmdb_type': True})
+@get_tmdb_id
 def modify_artwork(*args, aspect=None, url=None, **kwargs):
     modify_artwork = ModifyArtworkFactory(*args, **kwargs)
     modify_artwork.run()
