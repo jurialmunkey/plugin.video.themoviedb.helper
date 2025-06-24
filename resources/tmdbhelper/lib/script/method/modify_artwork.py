@@ -89,9 +89,21 @@ class ModifyArtwork:
         }[self.aspect]
 
     @cached_property
+    def factory_fanarttv_type(self):
+        return {
+            'fanart': 'ftv_fanart',
+            'landscape': 'ftv_landscape',
+            'poster': 'ftv_poster',
+            'clearlogo': 'ftv_clearlogo',
+        }[self.aspect]
+
+    @cached_property
     def sync_data(self):
         sync = BaseViewFactory(self.factory_art_type, self.tmdb_type, self.tmdb_id, self.season, self.episode)
-        return sync.data
+        data = sync.data or []
+        sync = BaseViewFactory(self.factory_fanarttv_type, self.tmdb_type, self.tmdb_id, self.season, self.episode)
+        data = data + (sync.data or [])
+        return data
 
     @cached_property
     def configured_listitems(self):

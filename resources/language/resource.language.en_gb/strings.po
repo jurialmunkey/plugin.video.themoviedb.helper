@@ -638,6 +638,11 @@ msgctxt "#32127"
 msgid "RatingPosterDB API key"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/items/database/baseview_factories/concrete_classes/ftv_fanart.py
+msgctxt "#32128"
+msgid "Likes"
+msgstr ""
+
 #: /resources/lib/container.py
 msgctxt "#32111"
 msgid "Select Items"
