@@ -295,6 +295,14 @@ class DatabaseMethod:
 
         return data
 
+    def del_list_values(self, table=DEFAULT_TABLE, values=(), conditions=None, connection=None):
+        cursor = self.execute_sql(
+            DatabaseStatements.delete_item(table, conditions),
+            data=values,
+            connection=connection)
+        if not connection and cursor:
+            cursor.close()
+
     def set_or_update_null_list_values(self, table=DEFAULT_TABLE, keys=(), values=(), conflict_constraint='id', connection=None):
         if not values:
             return
