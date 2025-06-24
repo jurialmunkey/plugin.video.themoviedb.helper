@@ -164,9 +164,11 @@ class ModifyArtwork:
             self.url = url
         if self.aspect not in self.accepted_aspects:
             return -1
-        if self.url == '' and not xbmcgui.Dialog().yesno(
-            get_localized(32115).format(self.aspect),
-            get_localized(32116)
+        if self.url == '' and (
+            not self.current_url or not xbmcgui.Dialog().yesno(
+                get_localized(32115).format(self.aspect),
+                get_localized(32116)
+            )
         ):
             return False
         if self.url is None:
