@@ -94,7 +94,10 @@ class ModifyArtwork:
 
     @cached_property
     def configured_listitems(self):
-        return [ListItem(**i).get_listitem() for i in self.sync_data]
+        return [
+            ListItem(**i).get_listitem()
+            for i in self.sync_data
+        ]
 
     def get_delete_url(self):
         return ''  # Empty string prompts option to delete
