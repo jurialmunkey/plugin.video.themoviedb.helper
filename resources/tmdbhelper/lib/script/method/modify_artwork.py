@@ -13,9 +13,11 @@ from tmdbhelper.lib.script.method.decorators import is_in_kwargs, get_tmdb_id
 
 class ModifyArtwork:
 
-    accepted_aspects = ('poster', 'fanart', 'landscape', 'clearlogo')
+    accepted_aspects = ('poster', 'fanart', 'landscape', 'clearlogo', 'thumb')
+    season = None
+    episode = None
 
-    def __init__(self, tmdb_id):
+    def __init__(self, tmdb_id, **kwargs):
         self.tmdb_id = tmdb_id
 
     @cached_property
@@ -55,17 +57,32 @@ class ModifyArtwork:
             return ''
 
     @cached_property
-    def url_routes(self):
-        url_routes = [
-            {'func': self.get_browse_url, 'name': get_localized(1024)},
-            {'func': self.get_select_url, 'name': get_localized(424)},
-            {'func': self.get_manual_url, 'name': get_localized(413)},
-        ]
+    def url_routes_browse(self):
+        return [{'func': self.get_browse_url, 'name': get_localized(1024)}]
+
+    @cached_property
+    def url_routes_select(self):
+        if not self.configured_listitems:
+            return []
+        return [{'func': self.get_select_url, 'name': get_localized(424)}]
+
+    @cached_property
+    def url_routes_manual(self):
+        return [{'func': self.get_manual_url, 'name': get_localized(413)}]
+
+    @cached_property
+    def url_routes_delete(self):
         if not self.current_url:
-            return url_routes
-        url_routes += [
-            {'func': self.get_delete_url, 'name': get_localized(1210)}
-        ]
+            return []
+        return [{'func': self.get_delete_url, 'name': get_localized(1210)}]
+
+    @cached_property
+    def url_routes(self):
+        url_routes = []
+        url_routes += self.url_routes_browse
+        url_routes += self.url_routes_select
+        url_routes += self.url_routes_manual
+        url_routes += self.url_routes_delete
         return url_routes
 
     @cached_property
@@ -84,6 +101,7 @@ class ModifyArtwork:
         'landscape': 'fanart',
         'poster': 'poster',
         'clearlogo': 'clearlogo',
+        'thumb': 'thumb',
     }
 
     factory_ftv_routes = {
@@ -128,6 +146,8 @@ class ModifyArtwork:
         return ''  # Empty string prompts option to delete
 
     def get_select_url(self):
+        if not self.configured_listitems:
+            return
         x = xbmcgui.Dialog().select(
             heading=get_localized(13511),
             list=self.configured_listitems,
@@ -219,6 +239,10 @@ class ModifyArtworkTvshow(ModifyArtwork):
 class ModifyArtworkSeason(ModifyArtwork):
     tmdb_type = 'tv'
 
+    def __init__(self, tmdb_id, season, **kwargs):
+        self.tmdb_id = tmdb_id
+        self.season = season
+
     @cached_property
     def item_id(self):
         return self.season_id
@@ -226,6 +250,11 @@ class ModifyArtworkSeason(ModifyArtwork):
 
 class ModifyArtworkEpisode(ModifyArtwork):
     tmdb_type = 'tv'
+
+    def __init__(self, tmdb_id, season, episode, **kwargs):
+        self.tmdb_id = tmdb_id
+        self.season = season
+        self.episode = episode
 
     @cached_property
     def item_id(self):
@@ -260,14 +289,14 @@ class ModifyArtworkFactory:
             )
         if self.tmdb_type == 'tv' and self.season is not None and self.episode is not None:
             return (
-                (get_localized(20364), ModifyArtworkTvshow),
-                (get_localized(20373), ModifyArtworkSeason),
                 (get_localized(20359), ModifyArtworkEpisode),
+                (get_localized(20373), ModifyArtworkSeason),
+                (get_localized(20364), ModifyArtworkTvshow),
             )
         if self.tmdb_type == 'tv' and self.season is not None:
             return (
-                (get_localized(20364), ModifyArtworkTvshow),
                 (get_localized(20373), ModifyArtworkSeason),
+                (get_localized(20364), ModifyArtworkTvshow),
             )
         if self.tmdb_type == 'tv':
             return (
@@ -293,9 +322,7 @@ class ModifyArtworkFactory:
             self.selected_modify_artwork_object
         )
         try:
-            instance = func(self.tmdb_id)
-            instance.season = self.season
-            instance.episode = self.episode
+            instance = func(self.tmdb_id, season=self.season, episode=self.episode)
         except (TypeError, KeyError, AttributeError):
             return
         x = instance.run(aspect, url)

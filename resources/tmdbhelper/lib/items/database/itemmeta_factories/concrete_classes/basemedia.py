@@ -119,6 +119,12 @@ class MediaItemArtworkRoutes:
             'parents': (None, 'tvshow', 'season'),
             'art_api': 'user',
         },
+        'user_art_thumb': {
+            'affixes': (None, ),
+            'outputs': 'thumb',
+            'parents': (None, 'tvshow', 'season'),
+            'art_api': 'user',
+        },
     }
 
     def get_art_list(self, affix=None, allow_ftv=False, allow_tmdb=False, allow_user=False, no_affix=False):
