@@ -33,8 +33,3 @@ def container(widget_id=''):
 def widget_id(window_id):
     window_id = window_id if get_condvisibility(CV_USE_LOCAL_CONTAINER) else None
     return get_property('WidgetContainer', window_id=window_id, is_type=int)
-
-
-def refresh_service_item():
-    from tmdbhelper.lib.addon.tmdate import set_timestamp
-    get_property('Service.Reload', set_property=f'{set_timestamp(0, True)}')

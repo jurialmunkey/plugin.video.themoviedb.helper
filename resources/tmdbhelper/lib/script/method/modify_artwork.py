@@ -4,8 +4,11 @@
 import xbmcgui
 from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.files.ftools import cached_property
-from tmdbhelper.lib.script.method.kodi_utils import container_refresh
+from tmdbhelper.lib.script.method.kodi_utils import container_refresh, service_refresh
 from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
+from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
+from tmdbhelper.lib.items.listitem import ListItem
+from tmdbhelper.lib.script.method.decorators import is_in_kwargs, get_tmdb_id
 
 
 class ModifyArtwork:
@@ -32,19 +35,143 @@ class ModifyArtwork:
         return f'{self.tmdb_type}.{self.tmdb_id}.{self.season}.{self.episode}'
 
     @cached_property
+    def database(self):
+        return ItemDetailsDatabase()
+
+    @cached_property
+    def current_url(self):
+        return self.get_current_url(self.aspect)
+
+    def get_current_url(self, aspect):
+        current_url = self.database.get_list_values(
+            table='user_art',
+            keys=('icon',),
+            values=(aspect, self.item_id),
+            conditions='type=? AND parent_id=? LIMIT 1'
+        )
+        try:
+            return current_url[0]['icon']
+        except (KeyError, TypeError, AttributeError, IndexError):
+            return ''
+
+    @cached_property
+    def url_routes(self):
+        url_routes = [
+            {'func': self.get_browse_url, 'name': get_localized(1024)},
+            {'func': self.get_select_url, 'name': get_localized(424)},
+            {'func': self.get_manual_url, 'name': get_localized(413)},
+        ]
+        if not self.current_url:
+            return url_routes
+        url_routes += [
+            {'func': self.get_delete_url, 'name': get_localized(1210)}
+        ]
+        return url_routes
+
+    @cached_property
     def url(self):
-        return xbmcgui.Dialog().input(f'{get_localized(32106).format(self.aspect)} ({get_localized(32105)})') or None
+        x = xbmcgui.Dialog().select(
+            heading=f'{get_localized(39123)} URL',
+            list=[i['name'] for i in self.url_routes]
+        )
+        if x == -1:
+            return
+        func = self.url_routes[x]['func']
+        return func()
+
+    @cached_property
+    def factory_art_type(self):
+        return {
+            'fanart': 'fanart',
+            'landscape': 'fanart',
+            'poster': 'poster',
+            'clearlogo': 'clearlogo',
+        }[self.aspect]
+
+    @cached_property
+    def factory_fanarttv_type(self):
+        return {
+            'fanart': 'ftv_fanart',
+            'landscape': 'ftv_landscape',
+            'poster': 'ftv_poster',
+            'clearlogo': 'ftv_clearlogo',
+        }[self.aspect]
+
+    @cached_property
+    def sync_data(self):
+        sync = BaseViewFactory(self.factory_art_type, self.tmdb_type, self.tmdb_id, self.season, self.episode)
+        data = sync.data or []
+        sync = BaseViewFactory(self.factory_fanarttv_type, self.tmdb_type, self.tmdb_id, self.season, self.episode)
+        data = data + (sync.data or [])
+        return data
+
+    @cached_property
+    def configured_listitems(self):
+        return [
+            ListItem(**i).get_listitem()
+            for i in self.sync_data
+        ]
+
+    def get_delete_url(self):
+        return ''  # Empty string prompts option to delete
+
+    def get_select_url(self):
+        x = xbmcgui.Dialog().select(
+            heading=get_localized(13511),
+            list=self.configured_listitems,
+            useDetails=True,
+        )
+        if x == -1:
+            return
+        return self.sync_data[x]['art']['thumb']
+
+    def get_browse_url(self):
+        return xbmcgui.Dialog().browseSingle(
+            type=2,
+            heading=get_localized(13511),
+            shares='files',
+            useThumbs=True,
+            mask='.jpg|.png|.gif|.bmp|.tif|.jpeg|.tga|.tiff|.webp',
+            defaultt=self.current_url,
+        ) or None
+
+    def get_manual_url(self):
+        return xbmcgui.Dialog().input(
+            f'{get_localized(32106).format(self.aspect)} ({get_localized(32105)})',
+            defaultt=self.current_url,
+        )
+
+    @cached_property
+    def artwork_aspects_listitems(self):
+        return [
+            ListItem(
+                label=i,
+                art={'icon': self.get_current_url(i) or 'DefaultAddonImages.png'}
+            ).get_listitem()
+            for i in self.accepted_aspects
+        ]
 
     @cached_property
     def aspect(self):
-        x = xbmcgui.Dialog().select(get_localized(39123), self.accepted_aspects)
+        x = xbmcgui.Dialog().select(get_localized(13511), self.artwork_aspects_listitems, useDetails=True)
         if x == -1:
-            return
+            return -1
         return self.accepted_aspects[x]
 
-    @cached_property
-    def database(self):
-        return ItemDetailsDatabase()
+    def del_item(self):
+        self.database.del_list_values(
+            table='user_art',
+            values=(self.aspect, self.item_id),
+            conditions='type=? AND parent_id=?',
+        )
+
+    def set_item(self):
+        self.database.set_list_values(
+            table='user_art',
+            keys=('type', 'icon', 'parent_id'),
+            values=(self.aspect, self.url or None, self.item_id),
+            overwrite=True
+        )
 
     def run(self, aspect=None, url=None):
         if aspect is not None:
@@ -52,16 +179,21 @@ class ModifyArtwork:
         if url is not None:
             self.url = url
         if self.aspect not in self.accepted_aspects:
-            return  # TODO: Error message ?
-        if not self.url and not xbmcgui.Dialog().yesno(get_localized(32115).format(self.aspect), get_localized(32116)):
-            return
-        self.database.set_list_values(
-            table='user_art',
-            keys=('type', 'icon', 'parent_id'),
-            values=(self.aspect, self.url, self.item_id),
-            overwrite=True
-        )
-        container_refresh()
+            return -1
+        if self.url == '' and (
+            not self.current_url or not xbmcgui.Dialog().yesno(
+                get_localized(32115).format(self.aspect),
+                get_localized(32116)
+            )
+        ):
+            return False
+        if self.url is None:
+            return False
+        if self.url == '':
+            self.del_item()
+            return True
+        self.set_item()
+        return True
 
 
 class ModifyArtworkMovie(ModifyArtwork):
@@ -88,25 +220,44 @@ class ModifyArtworkEpisode(ModifyArtwork):
         return self.episode_id
 
 
-class ModifyArtworkPerson(ModifyArtwork):
-    tmdb_type = 'person'
+class ModifyArtworkFactory:
+    modified = False
+
+    def __init__(self, tmdb_id, tmdb_type, season=None, episode=None, **kwargs):
+        self.tmdb_id = tmdb_id
+        self.tmdb_type = tmdb_type
+        self.season = season
+        self.episode = episode
+
+    @cached_property
+    def modify_artwork_object(self):
+        if self.tmdb_type == 'movie':
+            return ModifyArtworkMovie
+        if self.tmdb_type == 'tv' and self.season is not None and self.episode is not None:
+            return ModifyArtworkEpisode
+        if self.tmdb_type == 'tv' and self.season is not None:
+            return ModifyArtworkSeason
+        if self.tmdb_type == 'tv':
+            return ModifyArtworkTvshow
+
+    def run(self, aspect=None, url=None):
+        instance = self.modify_artwork_object(self.tmdb_id)
+        instance.season = self.season
+        instance.episode = self.episode
+        x = instance.run(aspect, url)
+        if x == -1 or aspect or url:
+            return
+        if x is True:
+            self.modified = True
+        return self.run()
 
 
-def modify_artwork_factory(tmdb_type, season=None, episode=None):
-    if tmdb_type == 'movie':
-        return ModifyArtworkMovie
-    if tmdb_type == 'person':
-        return ModifyArtworkPerson
-    if tmdb_type == 'tv' and season is not None and episode is not None:
-        return ModifyArtworkEpisode
-    if tmdb_type == 'tv' and season is not None:
-        return ModifyArtworkSeason
-    if tmdb_type == 'tv':
-        return ModifyArtworkTvshow
-
-
-def modify_artwork(tmdb_id, tmdb_type, season=None, episode=None, aspect=None, url=None, **kwargs):
-    instance = modify_artwork_factory(tmdb_type, season, episode)(tmdb_id)
-    instance.season = season
-    instance.episode = episode
-    instance.run(aspect, url)
+@is_in_kwargs({'tmdb_type': True})
+@get_tmdb_id
+def modify_artwork(*args, aspect=None, url=None, **kwargs):
+    modify_artwork = ModifyArtworkFactory(*args, **kwargs)
+    modify_artwork.run()
+    if not modify_artwork.modified:
+        return
+    container_refresh()
+    service_refresh()

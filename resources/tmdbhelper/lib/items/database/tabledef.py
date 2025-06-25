@@ -18,6 +18,10 @@ BASEITEM_COLUMNS = {
         'data': 'INTEGER DEFAULT 0 NOT NULL',
         'indexed': True
     },
+    'fanart_tv': {
+        'data': 'INTEGER DEFAULT 0 NOT NULL',
+        'indexed': True
+    },
 }
 
 MOVIE_COLUMNS = {
