@@ -479,18 +479,32 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
     def tmdb_id(self):
         return self.player_item.tmdb_id
 
+    def get_clearlogo(self):
+        art = self.details.get('art') or {}
+        return (
+            (
+                art.get('clearlogo')
+                or art.get('tvshow.clearlogo')
+                or get_infolabel('Player.Art(clearlogo)')
+                or get_infolabel('Player.Art(artist.clearlogo)')
+                or get_infolabel('Player.Art(tvshow.clearlogo)')
+            )
+            if get_setting('service_prefers_online_clearlogo') else
+            (
+                get_infolabel('Player.Art(clearlogo)')
+                or get_infolabel('Player.Art(artist.clearlogo)')
+                or get_infolabel('Player.Art(tvshow.clearlogo)')
+                or art.get('clearlogo')
+                or art.get('tvshow.clearlogo')
+            )
+
+        )
+
     def update_crop(self):
         if get_condvisibility("!Skin.HasSetting(TMDbHelper.EnableCrop)"):
             return
 
-        art = self.details.get('art') or {}
-
-        clearlogo = (
-            get_infolabel('Player.Art(clearlogo)')
-            or get_infolabel('Player.Art(artist.clearlogo)')
-            or get_infolabel('Player.Art(tvshow.clearlogo)')
-            or art.get('clearlogo')
-            or art.get('tvshow.clearlogo'))
+        clearlogo = self.get_clearlogo()
 
         if clearlogo != self.previous_clearlogo:
             ImageFunctions(method='crop', is_thread=False, prefix='Player', artwork=clearlogo).run()

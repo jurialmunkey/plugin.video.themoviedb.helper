@@ -688,6 +688,11 @@
                     <default>False</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="service_prefers_online_clearlogo" type="boolean" label="32129" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
             </group>
             <group id="2" label="32499">
                 <setting id="pagemulti_tmdb" type="integer" label="32500" help="">

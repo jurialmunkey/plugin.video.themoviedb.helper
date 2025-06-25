@@ -643,6 +643,11 @@ msgctxt "#32128"
 msgid "Likes"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32129"
+msgid "Override player monitor clearlogo with artwork from TMDbHelper"
+msgstr ""
+
 #: /resources/lib/container.py
 msgctxt "#32111"
 msgid "Select Items"
