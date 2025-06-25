@@ -1,10 +1,11 @@
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.fanart import FanartMediaList
-from tmdbhelper.lib.addon.consts import DATALEVEL_MIN
+from tmdbhelper.lib.addon.consts import DATALEVEL_MIN, SQLITE_TRUE
 from tmdbhelper.lib.addon.plugin import get_localized
 
 
 class FTVFanartMediaList(FanartMediaList):
     table = 'fanart_tv'
+    cached_data_base_conditions = 'parent_id=? AND type=? AND baseitem.expiry>=? AND baseitem.datalevel>=? AND baseitem.fanart_tv>=?'
     cached_data_table = 'baseitem INNER JOIN fanart_tv ON fanart_tv.parent_id = baseitem.id'
     cached_data_value_type = 'fanart'
     keys = ('icon', 'iso_language', 'likes', 'parent_id')
@@ -22,7 +23,7 @@ class FTVFanartMediaList(FanartMediaList):
 
     @property
     def cached_data_values(self):
-        return (self.item_id, self.cached_data_value_type, self.current_time, DATALEVEL_MIN)
+        return (self.item_id, self.cached_data_value_type, self.current_time, DATALEVEL_MIN, SQLITE_TRUE)
 
     def image_path_func(self, v):
         return v

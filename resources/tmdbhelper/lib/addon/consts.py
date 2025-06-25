@@ -7,9 +7,10 @@ SHORTER_EXPIRY = DAY_IN_SECONDS * 7
 TEMPDAY_EXPIRY = DAY_IN_SECONDS
 HALFDAY_EXPIRY = DAY_IN_SECONDS * 0.5
 
-DATALEVEL_OFF = 0
 DATALEVEL_MIN = 1
 DATALEVEL_MAX = 5
+SQLITE_FALSE = 0
+SQLITE_TRUE = 1
 
 TVDB_DISCLAIMER = 'Information provided by TheTVDB.com. Please consider supporting them. https://thetvdb.com/subscribe'
 
