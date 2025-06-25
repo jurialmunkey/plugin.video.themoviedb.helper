@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-06-23 14:34+0800\n"
+"PO-Revision-Date: 2025-06-25 18:03+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -622,6 +622,11 @@ msgctxt "#32108"
 msgid "Choose matching method for parameters with multiple values."
 msgstr "为具有多个值的参数选择匹配方法。"
 
+#: /resources/settings.xml
+msgctxt "#32124"
+msgid "RatingPosterDB API"
+msgstr "评分海报 API"
+
 #: /resources/lib/container.py
 msgctxt "#32109"
 msgid "Match ANY Value"
@@ -631,6 +636,21 @@ msgstr "匹配任意值"
 msgctxt "#32110"
 msgid "Match ALL Values"
 msgstr "匹配所有值"
+
+#: /resources/settings.xml
+msgctxt "#32127"
+msgid "RatingPosterDB API key"
+msgstr "评分海报 API 密钥"
+
+#: /resources/tmdbhelper/lib/items/database/baseview_factories/concrete_classes/ftv_fanart.py
+msgctxt "#32128"
+msgid "Likes"
+msgstr "顶"
+
+#: /resources/settings.xml
+msgctxt "#32129"
+msgid "Override player monitor clearlogo with artwork from TMDbHelper"
+msgstr "用 TMDbHelper 中的图像覆盖播放器监视器的透明徽标"
 
 #: /resources/lib/container.py
 msgctxt "#32111"
