@@ -19,9 +19,9 @@
     "play_episode"      : [
                             "plugin://plugin.video.abc_iview/?action=searchhistory&name={showname_url}",
                             {"label": "(?i){showname}"},
-                            {"return": "true", "season": "^{season}$", "episode": "^{episode}$"},
-                            {"label": "^Series {season}$"},
-                            {"return": "true", "season": "^{season}$", "episode": "^{episode}$"},
+                            {"return": "true", "label": "(?i).*S{season} Episode {episode}.*"},
+                            {"label": "^Season {season}$"},
+                            {"return": "true", "label": "(?i).*S{season} Episode {episode}.*"},
                             {"dialog": "true"}
                           ],
     "search_episode"    : "plugin://plugin.video.abc_iview/?action=searchhistory&name={showname_url}"
