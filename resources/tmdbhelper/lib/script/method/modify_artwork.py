@@ -79,31 +79,43 @@ class ModifyArtwork:
         func = self.url_routes[x]['func']
         return func()
 
-    @cached_property
-    def factory_art_type(self):
-        return {
-            'fanart': 'fanart',
-            'landscape': 'fanart',
-            'poster': 'poster',
-            'clearlogo': 'clearlogo',
-        }[self.aspect]
+    factory_art_routes = {
+        'fanart': 'fanart',
+        'landscape': 'fanart',
+        'poster': 'poster',
+        'clearlogo': 'clearlogo',
+    }
+
+    factory_ftv_routes = {
+        'fanart': 'ftv_fanart',
+        'landscape': 'ftv_landscape',
+        'poster': 'ftv_poster',
+        'clearlogo': 'ftv_clearlogo',
+    }
 
     @cached_property
-    def factory_fanarttv_type(self):
-        return {
-            'fanart': 'ftv_fanart',
-            'landscape': 'ftv_landscape',
-            'poster': 'ftv_poster',
-            'clearlogo': 'ftv_clearlogo',
-        }[self.aspect]
+    def factory_art_data(self):
+        return self.get_factory_data(self.factory_art_routes)
+
+    @cached_property
+    def factory_ftv_data(self):
+        return self.get_factory_data(self.factory_ftv_routes)
+
+    def get_factory_data(self, mapping):
+        try:
+            return BaseViewFactory(
+                mapping[self.aspect],
+                self.tmdb_type,
+                self.tmdb_id,
+                self.season,
+                self.episode
+            ).data or []
+        except(AttributeError, KeyError, TypeError):
+            return []
 
     @cached_property
     def sync_data(self):
-        sync = BaseViewFactory(self.factory_art_type, self.tmdb_type, self.tmdb_id, self.season, self.episode)
-        data = sync.data or []
-        sync = BaseViewFactory(self.factory_fanarttv_type, self.tmdb_type, self.tmdb_id, self.season, self.episode)
-        data = data + (sync.data or [])
-        return data
+        return self.factory_art_data + self.factory_ftv_data
 
     @cached_property
     def configured_listitems(self):
