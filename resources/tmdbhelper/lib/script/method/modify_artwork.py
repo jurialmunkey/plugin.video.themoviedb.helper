@@ -230,7 +230,7 @@ class ModifyArtworkFactory:
         self.episode = episode
 
     @cached_property
-    def modify_artwork_object(self):
+    def standard_modify_artwork_object(self):
         if self.tmdb_type == 'movie':
             return ModifyArtworkMovie
         if self.tmdb_type == 'tv' and self.season is not None and self.episode is not None:
@@ -240,10 +240,52 @@ class ModifyArtworkFactory:
         if self.tmdb_type == 'tv':
             return ModifyArtworkTvshow
 
+    @cached_property
+    def optional_modify_artwork_object(self):
+        if self.tmdb_type == 'movie':
+            return (
+                (get_localized(20338), ModifyArtworkMovie),
+            )
+        if self.tmdb_type == 'tv' and self.season is not None and self.episode is not None:
+            return (
+                (get_localized(20364), ModifyArtworkTvshow),
+                (get_localized(20373), ModifyArtworkSeason),
+                (get_localized(20359), ModifyArtworkEpisode),
+            )
+        if self.tmdb_type == 'tv' and self.season is not None:
+            return (
+                (get_localized(20364), ModifyArtworkTvshow),
+                (get_localized(20373), ModifyArtworkSeason),
+            )
+        if self.tmdb_type == 'tv':
+            return (
+                (get_localized(20364), ModifyArtworkTvshow),
+            )
+
+    @cached_property
+    def selected_modify_artwork_object(self):
+        if len(self.optional_modify_artwork_object) == 1:
+            return self.optional_modify_artwork_object[0][1]
+        x = xbmcgui.Dialog().select(
+            get_localized(13511),
+            [i[0] for i in self.optional_modify_artwork_object]
+        )
+        if x == -1:
+            return
+        return self.optional_modify_artwork_object[x][1]
+
     def run(self, aspect=None, url=None):
-        instance = self.modify_artwork_object(self.tmdb_id)
-        instance.season = self.season
-        instance.episode = self.episode
+        func = (
+            self.standard_modify_artwork_object
+            if aspect or url else
+            self.selected_modify_artwork_object
+        )
+        try:
+            instance = func(self.tmdb_id)
+            instance.season = self.season
+            instance.episode = self.episode
+        except (TypeError, KeyError, AttributeError):
+            return
         x = instance.run(aspect, url)
         if x == -1 or aspect or url:
             return
@@ -256,7 +298,7 @@ class ModifyArtworkFactory:
 @get_tmdb_id
 def modify_artwork(*args, aspect=None, url=None, **kwargs):
     modify_artwork = ModifyArtworkFactory(*args, **kwargs)
-    modify_artwork.run()
+    modify_artwork.run(aspect, url)
     if not modify_artwork.modified:
         return
     container_refresh()
