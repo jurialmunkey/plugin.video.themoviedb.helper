@@ -362,6 +362,11 @@ def import_user_art_clearlogo():
     return UserArtClearlogo
 
 
+def import_user_art_thumb():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.user_art import UserArtThumb
+    return UserArtThumb
+
+
 def import_playcount():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import PlayCount
     return PlayCount
@@ -489,6 +494,7 @@ FACTORY_ROUTES = {
     'user_art_fanart': import_user_art_fanart,
     'user_art_landscape': import_user_art_landscape,
     'user_art_clearlogo': import_user_art_clearlogo,
+    'user_art_thumb': import_user_art_thumb,
     'playcount': import_playcount,
     'watchedcount': import_watchedcount,
     'airedcount': import_airedcount,

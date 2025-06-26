@@ -55,3 +55,7 @@ class UserArtLandscape(UserArt):
 
 class UserArtClearlogo(UserArt):
     artwork_type = 'clearlogo'
+
+
+class UserArtThumb(UserArt):
+    artwork_type = 'thumb'

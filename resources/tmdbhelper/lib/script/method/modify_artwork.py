@@ -13,9 +13,11 @@ from tmdbhelper.lib.script.method.decorators import is_in_kwargs, get_tmdb_id
 
 class ModifyArtwork:
 
-    accepted_aspects = ('poster', 'fanart', 'landscape', 'clearlogo')
+    accepted_aspects = ('poster', 'fanart', 'landscape', 'clearlogo', 'thumb')
+    season = None
+    episode = None
 
-    def __init__(self, tmdb_id):
+    def __init__(self, tmdb_id, **kwargs):
         self.tmdb_id = tmdb_id
 
     @cached_property
@@ -55,17 +57,32 @@ class ModifyArtwork:
             return ''
 
     @cached_property
-    def url_routes(self):
-        url_routes = [
-            {'func': self.get_browse_url, 'name': get_localized(1024)},
-            {'func': self.get_select_url, 'name': get_localized(424)},
-            {'func': self.get_manual_url, 'name': get_localized(413)},
-        ]
+    def url_routes_browse(self):
+        return [{'func': self.get_browse_url, 'name': get_localized(1024)}]
+
+    @cached_property
+    def url_routes_select(self):
+        if not self.configured_listitems:
+            return []
+        return [{'func': self.get_select_url, 'name': get_localized(424)}]
+
+    @cached_property
+    def url_routes_manual(self):
+        return [{'func': self.get_manual_url, 'name': get_localized(413)}]
+
+    @cached_property
+    def url_routes_delete(self):
         if not self.current_url:
-            return url_routes
-        url_routes += [
-            {'func': self.get_delete_url, 'name': get_localized(1210)}
-        ]
+            return []
+        return [{'func': self.get_delete_url, 'name': get_localized(1210)}]
+
+    @cached_property
+    def url_routes(self):
+        url_routes = []
+        url_routes += self.url_routes_browse
+        url_routes += self.url_routes_select
+        url_routes += self.url_routes_manual
+        url_routes += self.url_routes_delete
         return url_routes
 
     @cached_property
@@ -79,31 +96,44 @@ class ModifyArtwork:
         func = self.url_routes[x]['func']
         return func()
 
-    @cached_property
-    def factory_art_type(self):
-        return {
-            'fanart': 'fanart',
-            'landscape': 'fanart',
-            'poster': 'poster',
-            'clearlogo': 'clearlogo',
-        }[self.aspect]
+    factory_art_routes = {
+        'fanart': 'fanart',
+        'landscape': 'fanart',
+        'poster': 'poster',
+        'clearlogo': 'clearlogo',
+        'thumb': 'thumb',
+    }
+
+    factory_ftv_routes = {
+        'fanart': 'ftv_fanart',
+        'landscape': 'ftv_landscape',
+        'poster': 'ftv_poster',
+        'clearlogo': 'ftv_clearlogo',
+    }
 
     @cached_property
-    def factory_fanarttv_type(self):
-        return {
-            'fanart': 'ftv_fanart',
-            'landscape': 'ftv_landscape',
-            'poster': 'ftv_poster',
-            'clearlogo': 'ftv_clearlogo',
-        }[self.aspect]
+    def factory_art_data(self):
+        return self.get_factory_data(self.factory_art_routes)
+
+    @cached_property
+    def factory_ftv_data(self):
+        return self.get_factory_data(self.factory_ftv_routes)
+
+    def get_factory_data(self, mapping):
+        try:
+            return BaseViewFactory(
+                mapping[self.aspect],
+                self.tmdb_type,
+                self.tmdb_id,
+                self.season,
+                self.episode
+            ).data or []
+        except(AttributeError, KeyError, TypeError):
+            return []
 
     @cached_property
     def sync_data(self):
-        sync = BaseViewFactory(self.factory_art_type, self.tmdb_type, self.tmdb_id, self.season, self.episode)
-        data = sync.data or []
-        sync = BaseViewFactory(self.factory_fanarttv_type, self.tmdb_type, self.tmdb_id, self.season, self.episode)
-        data = data + (sync.data or [])
-        return data
+        return self.factory_art_data + self.factory_ftv_data
 
     @cached_property
     def configured_listitems(self):
@@ -116,6 +146,8 @@ class ModifyArtwork:
         return ''  # Empty string prompts option to delete
 
     def get_select_url(self):
+        if not self.configured_listitems:
+            return
         x = xbmcgui.Dialog().select(
             heading=get_localized(13511),
             list=self.configured_listitems,
@@ -207,6 +239,10 @@ class ModifyArtworkTvshow(ModifyArtwork):
 class ModifyArtworkSeason(ModifyArtwork):
     tmdb_type = 'tv'
 
+    def __init__(self, tmdb_id, season, **kwargs):
+        self.tmdb_id = tmdb_id
+        self.season = season
+
     @cached_property
     def item_id(self):
         return self.season_id
@@ -214,6 +250,11 @@ class ModifyArtworkSeason(ModifyArtwork):
 
 class ModifyArtworkEpisode(ModifyArtwork):
     tmdb_type = 'tv'
+
+    def __init__(self, tmdb_id, season, episode, **kwargs):
+        self.tmdb_id = tmdb_id
+        self.season = season
+        self.episode = episode
 
     @cached_property
     def item_id(self):
@@ -230,7 +271,7 @@ class ModifyArtworkFactory:
         self.episode = episode
 
     @cached_property
-    def modify_artwork_object(self):
+    def standard_modify_artwork_object(self):
         if self.tmdb_type == 'movie':
             return ModifyArtworkMovie
         if self.tmdb_type == 'tv' and self.season is not None and self.episode is not None:
@@ -240,10 +281,50 @@ class ModifyArtworkFactory:
         if self.tmdb_type == 'tv':
             return ModifyArtworkTvshow
 
+    @cached_property
+    def optional_modify_artwork_object(self):
+        if self.tmdb_type == 'movie':
+            return (
+                (get_localized(20338), ModifyArtworkMovie),
+            )
+        if self.tmdb_type == 'tv' and self.season is not None and self.episode is not None:
+            return (
+                (get_localized(20359), ModifyArtworkEpisode),
+                (get_localized(20373), ModifyArtworkSeason),
+                (get_localized(20364), ModifyArtworkTvshow),
+            )
+        if self.tmdb_type == 'tv' and self.season is not None:
+            return (
+                (get_localized(20373), ModifyArtworkSeason),
+                (get_localized(20364), ModifyArtworkTvshow),
+            )
+        if self.tmdb_type == 'tv':
+            return (
+                (get_localized(20364), ModifyArtworkTvshow),
+            )
+
+    @cached_property
+    def selected_modify_artwork_object(self):
+        if len(self.optional_modify_artwork_object) == 1:
+            return self.optional_modify_artwork_object[0][1]
+        x = xbmcgui.Dialog().select(
+            get_localized(13511),
+            [i[0] for i in self.optional_modify_artwork_object]
+        )
+        if x == -1:
+            return
+        return self.optional_modify_artwork_object[x][1]
+
     def run(self, aspect=None, url=None):
-        instance = self.modify_artwork_object(self.tmdb_id)
-        instance.season = self.season
-        instance.episode = self.episode
+        func = (
+            self.standard_modify_artwork_object
+            if aspect or url else
+            self.selected_modify_artwork_object
+        )
+        try:
+            instance = func(self.tmdb_id, season=self.season, episode=self.episode)
+        except (TypeError, KeyError, AttributeError):
+            return
         x = instance.run(aspect, url)
         if x == -1 or aspect or url:
             return
@@ -256,7 +337,7 @@ class ModifyArtworkFactory:
 @get_tmdb_id
 def modify_artwork(*args, aspect=None, url=None, **kwargs):
     modify_artwork = ModifyArtworkFactory(*args, **kwargs)
-    modify_artwork.run()
+    modify_artwork.run(aspect, url)
     if not modify_artwork.modified:
         return
     container_refresh()

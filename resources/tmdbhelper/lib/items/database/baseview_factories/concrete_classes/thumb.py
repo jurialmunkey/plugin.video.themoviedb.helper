@@ -1,4 +1,5 @@
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.fanart import FanartMediaList
+from tmdbhelper.lib.files.ftools import cached_property
 
 
 class ThumbMediaList(FanartMediaList):
@@ -9,4 +10,6 @@ class ThumbMediaList(FanartMediaList):
 
 
 class Episode(ThumbMediaList):
-    pass
+    @cached_property
+    def item_id(self):
+        return self.get_episode_id(self.tmdb_type, self.tmdb_id, self.season, self.episode)
