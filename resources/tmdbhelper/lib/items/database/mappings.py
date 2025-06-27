@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from tmdbhelper.lib.addon.plugin import get_language
 from tmdbhelper.lib.api.mapping import _ItemMapper
 from collections import namedtuple
 
@@ -183,12 +184,12 @@ class ItemMapperMethods:
             'id': collection_id,
             'mediatype': 'set',
             'expiry': 0,
+            'language': self.language,
         }))
 
         return data
 
-    @staticmethod
-    def get_collection(collection_object, **kwargs):
+    def get_collection(self, collection_object, **kwargs):
         data = []
 
         if not collection_object:
@@ -197,7 +198,7 @@ class ItemMapperMethods:
         collection_id = f"collection.{collection_object['id']}"
 
         for i in (collection_object.get('parts') or []):
-            data.extend(ItemMapperMethods.get_media_item_data(i, 'movie'))
+            data.extend(self.get_media_item_data(i, 'movie'))
             data.append(ExtendedMap('belongs', f'movie.{i["id"]}', False, {
                 'id': f'movie.{i["id"]}',
                 'parent_id': collection_id,
@@ -214,7 +215,7 @@ class ItemMapperMethods:
         collection_id = f"collection.{self.tmdb_id}"
 
         for i in parts:
-            data.extend(ItemMapperMethods.get_media_item_data(i, 'movie'))
+            data.extend(self.get_media_item_data(i, 'movie'))
             data.append(ExtendedMap('belongs', f'movie.{i["id"]}', False, {
                 'id': f'movie.{i["id"]}',
                 'parent_id': collection_id,
@@ -255,6 +256,7 @@ class ItemMapperMethods:
                 'id': item_id,
                 'mediatype': 'person',
                 'expiry': 0,
+                'language': self.language,
             }))
 
         return data
@@ -295,12 +297,14 @@ class ItemMapperMethods:
             'id': item_id,
             'mediatype': 'episode',
             'expiry': 0,
+            'language': self.language,
         }))
 
         data.append(ExtendedMap('baseitem', season_id, False, {
             'id': season_id,
             'mediatype': 'season',
             'expiry': 0,
+            'language': self.language,
         }))
 
         if i.get('still_path'):
@@ -341,6 +345,7 @@ class ItemMapperMethods:
                     'id': item_id,
                     'mediatype': 'person',
                     'expiry': 0,
+                    'language': self.language,
                 }))
 
                 jobs = (i.get(jobkey) or []) if aggregrate else [i]
@@ -387,7 +392,7 @@ class ItemMapperMethods:
         for subkey, mapkey, config in mappings:
             credits = items.get(subkey) or []
             for i in credits:
-                data.extend(ItemMapperMethods.get_media_item_data(i, tmdb_type))
+                data.extend(self.get_media_item_data(i, tmdb_type))
 
                 credit_item = ItemMapperMethods.get_configured_item(i, **config)
                 credit_item['parent_id'] = f'{tmdb_type}.{i["id"]}'
@@ -396,8 +401,7 @@ class ItemMapperMethods:
 
         return data
 
-    @staticmethod
-    def get_media_item_data(i, tmdb_type, **additional_params):
+    def get_media_item_data(self, i, tmdb_type, **additional_params):
         data = []
 
         item_id = f'{tmdb_type}.{i["id"]}'
@@ -426,6 +430,7 @@ class ItemMapperMethods:
             'id': item_id,
             'mediatype': mediatype,
             'expiry': 0,
+            'language': self.language,
         }))
 
         for image_path, image_type, ratio_type in (
@@ -480,6 +485,7 @@ class ItemMapperMethods:
                 'id': item_id,
                 'mediatype': 'episode',
                 'expiry': 0,
+                'language': self.language,
             }))
 
         return data
@@ -516,6 +522,7 @@ class ItemMapperMethods:
                 'id': item_id,
                 'mediatype': 'season',
                 'expiry': 0,
+                'language': self.language
             }))
 
         return data
@@ -600,6 +607,7 @@ class ItemMapperMethods:
                             'id': parent_id,
                             'mediatype': 'season',
                             'expiry': 0,
+                            'language': self.language,
                         }))
 
                 data.append(ExtendedMap('fanart_tv', icon, True, item))
@@ -895,6 +903,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'vote_count': ('item', 'votes'),
             'popularity': ('item', 'popularity')
         }
+
+        self.language = get_language()
 
     def map_dict(self, item, data):
 

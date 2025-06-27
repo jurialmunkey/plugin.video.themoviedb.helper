@@ -52,6 +52,10 @@ class BaseItem(ItemDetailsDatabaseAccess):
         return SQLITE_TRUE
 
     @property
+    def language(self):
+        return self.common_apis.tmdb_api.language
+
+    @property
     def online_data_func(self):  # The function to get data e.g. get_response_json
         return self.common_apis.tmdb_api.get_response_json
 
@@ -87,14 +91,14 @@ class BaseItem(ItemDetailsDatabaseAccess):
     @property
     def cached_data_conditions(self):
         """ WHERE """
-        return 'baseitem.id=? AND baseitem.expiry>=? AND baseitem.datalevel>=? AND baseitem.fanart_tv>=?'
+        return 'baseitem.id=? AND baseitem.expiry>=? AND baseitem.datalevel>=? AND baseitem.fanart_tv>=? AND baseitem.language=?'
 
     @property
     def cached_data_values(self):
         """ WHERE condition ? ? ? ? = value, value, value, value """
         if self.cache_refresh == 'never':
-            return (self.item_id, SQLITE_FALSE, SQLITE_FALSE, SQLITE_FALSE)
-        return (self.item_id, self.current_time, self.datalevel, self.fanart_tv)
+            return (self.item_id, SQLITE_FALSE, SQLITE_FALSE, SQLITE_FALSE, self.language)
+        return (self.item_id, self.current_time, self.datalevel, self.fanart_tv, self.language)
 
     @property
     def db_table_caches(self):
@@ -155,9 +159,14 @@ class BaseItem(ItemDetailsDatabaseAccess):
                 return
             return self.get_item_meta(data)
 
-    def set_cached_data(self, item_id, mediatype, expiry, datalevel, fanart_tv, table, keys, mapped_data, delete_cascade=False):
+    def set_cached_data(self, item_id, mediatype, expiry, datalevel, fanart_tv, language, table, keys, mapped_data, delete_cascade=False):
         self.del_cached('baseitem', item_id) if delete_cascade else None
-        self.set_cached_values('baseitem', item_id, keys=('mediatype', 'expiry', 'datalevel', 'fanart_tv'), values=(mediatype, expiry, datalevel, fanart_tv))
+        self.set_cached_values(
+            table='baseitem',
+            item_id=item_id,
+            keys=('mediatype', 'expiry', 'datalevel', 'fanart_tv', 'language'),
+            values=(mediatype, expiry, datalevel, fanart_tv, language)
+        )
         self.set_cached_many(table, keys, mapped_data)
 
     def try_cached_data(self, return_data=False, return_queue=False):
@@ -171,7 +180,8 @@ class BaseItem(ItemDetailsDatabaseAccess):
         # TODO: A better queuing method
         func = self.set_cached_data
         args = (
-            self.item_id, self.mediatype, self.expiry, self.datalevel, self.fanart_tv, self.table, self.keys,
+            self.item_id, self.mediatype, self.expiry, self.datalevel,
+            self.fanart_tv, self.language, self.table, self.keys,
             self.configure_mapped_data(online_data_mapped))
         kwgs = {'delete_cascade': bool(self.cache_refresh == 'force')}
 

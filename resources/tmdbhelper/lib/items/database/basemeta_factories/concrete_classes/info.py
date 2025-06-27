@@ -159,7 +159,7 @@ class Broadcaster(Company):
 
 class Base(ItemDetailsList):
     table = 'baseitem'
-    keys = ('id', 'mediatype', 'expiry')
+    keys = ('id', 'mediatype', 'expiry', 'language')
 
 
 class Belongs(ItemDetailsList):
