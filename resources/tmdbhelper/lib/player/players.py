@@ -1,5 +1,4 @@
 import re
-from xbmc import Monitor, Player
 from xbmcgui import Dialog
 from xbmcaddon import Addon as KodiAddon
 from jurialmunkey.window import get_property
@@ -11,105 +10,7 @@ from tmdbhelper.lib.api.kodi.rpc import get_directory, KodiLibrary
 from tmdbhelper.lib.player.inputter import KeyboardInputter
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.thread import SafeThread
-
-
-class PlayerHacks():
-
-    @staticmethod
-    def wait_for_player_hack(to_start=None, timeout=5, poll=0.25, stop_after=0):
-        xbmc_monitor, xbmc_player = Monitor(), Player()
-        while (
-                not xbmc_monitor.abortRequested()
-                and timeout > 0
-                and (
-                    (to_start and (not xbmc_player.isPlaying() or (isinstance(to_start, str) and not xbmc_player.getPlayingFile().endswith(to_start))))
-                    or (not to_start and xbmc_player.isPlaying()))):
-            xbmc_monitor.waitForAbort(poll)
-            timeout -= poll
-
-        # Wait to stop file
-        if timeout > 0 and to_start and stop_after:
-            xbmc_monitor.waitForAbort(stop_after)
-            if xbmc_player.isPlaying() and xbmc_player.getPlayingFile().endswith(to_start):
-                xbmc_player.stop()
-        return timeout
-
-    @staticmethod
-    def update_listing_hack(folder_path=None, reset_focus=None):
-        """
-        Some plugins use container.update after search results to rewrite path history
-        This is a quick hack to rewrite the path back to our original path before updating
-        """
-        if not folder_path:
-            return
-        xbmc_monitor = Monitor()
-        xbmc_monitor.waitForAbort(2)
-        container_folderpath = get_infolabel("Container.FolderPath")
-        if container_folderpath == folder_path:
-            return
-        executebuiltin(f'Container.Update({folder_path},replace)')
-        if not reset_focus:
-            return
-        timeout = 20
-        while not xbmc_monitor.abortRequested() and get_infolabel("Container.FolderPath") != folder_path and timeout > 0:
-            xbmc_monitor.waitForAbort(0.25)
-            timeout -= 1
-        executebuiltin(reset_focus)
-        xbmc_monitor.waitForAbort(0.5)
-
-    @staticmethod
-    def resolve_to_dummy_hack(handle=None, stop_after=1, delay_wait=0):
-        """
-        Kodi does 5x retries to resolve url if isPlayable property is set - strm files force this property.
-        However, external plugins might not resolve directly to URL and instead might require PlayMedia.
-        Also, if external plugin endpoint is a folder we need to do ActivateWindow/Container.Update instead.
-        Passing False to setResolvedUrl doesn't work correctly and the retry is triggered anyway.
-        In these instances we use a hack to avoid the retry by first resolving to a dummy file instead.
-        """
-        # If we don't have a handle there's nothing to resolve
-        if handle is None:
-            return
-
-        # Set our dummy resolved url
-        path = f'{ADDONPATH}/resources/dummy.mp4'
-        kodi_log(['lib.player.players - attempt to resolve dummy file\n', path], 1)
-        from xbmcplugin import setResolvedUrl
-        setResolvedUrl(handle, True, ListItem(path=path).get_listitem())
-
-        # Wait till our file plays and then stop after setting duration
-        if PlayerHacks.wait_for_player_hack(to_start='dummy.mp4', stop_after=stop_after) <= 0:
-            kodi_log(['lib.player.players - resolving dummy file timeout\n', path], 1)
-            return -1
-
-        # Wait for our file to stop before continuing
-        if stop_after and PlayerHacks.wait_for_player_hack() <= 0:
-            kodi_log(['lib.player.players - stopping dummy file timeout\n', path], 1)
-            return -1
-
-        # Added delay
-        from tmdbhelper.lib.addon.dialog import BusyDialog
-        with BusyDialog(False if delay_wait < 1 else True):
-            Monitor().waitForAbort(delay_wait)
-
-        # Success
-        kodi_log(['lib.player.players -- successfully resolved dummy file\n', path], 1)
-
-    @staticmethod
-    def force_recache_kodidb_hack():
-        if not get_setting('force_recache_kodidb'):
-            return
-        from tmdbhelper.lib.script.method.maintenance import recache_kodidb
-        recache_kodidb(notification=False)
-
-    @staticmethod
-    def playmedia_rerouteplay_hack(action, listitem):
-        if get_setting('force_xbmcplayer'):
-            kodi_log([f'lib.player - playing path with xbmc.Player():\n', listitem.getPath()], 1)
-            Player().play(action, listitem)
-            return
-        kodi_log([f'lib.player - playing path with PlayMedia():\n', listitem.getPath()], 1)
-        action = f'"{action}"' if ',' in action else action
-        executebuiltin(f'PlayMedia({action},playlist_type_hint=1)')
+from tmdbhelper.lib.player.phacks import PlayerHacks
 
 
 class PlayerMethods():
@@ -428,7 +329,7 @@ class PlayerProperties():
             return self._p_dialog
 
 
-class Players(PlayerProperties, PlayerDetails, PlayerMethods, PlayerHacks):
+class Players(PlayerProperties, PlayerDetails, PlayerMethods):
 
     TMDB_TYPE_CONVERSION = {'season': 'tv', 'episode': 'tv'}
 
@@ -445,7 +346,7 @@ class Players(PlayerProperties, PlayerDetails, PlayerMethods, PlayerHacks):
         self.season = season
         self.episode = episode
 
-        self.force_recache_kodidb_hack()  # Check if user wants to force rebuilding Kodi library cache first in case of new items
+        PlayerHacks.force_recache_kodidb_hack()  # Check if user wants to force rebuilding Kodi library cache first in case of new items
         self.thread_external_ids.start()  # We thread this lookup and rejoin later as Trakt might be slow and we dont want to delay if unneeded
         self.get_playerstring()  # Get our playerstring at start because we want the details we set to match the unomdified details (TODO: Check if we do?)
 
@@ -838,7 +739,7 @@ class Players(PlayerProperties, PlayerDetails, PlayerMethods, PlayerHacks):
         if not self.next_episodes or len(self.next_episodes) < 2:
             return
 
-        self.wait_for_player_hack(to_start=True, timeout=30)
+        PlayerHacks.wait_for_player_hack(to_start=True, timeout=30)
 
         if route == 'make_upnext':
             from tmdbhelper.lib.player.putils import make_upnext
@@ -881,7 +782,7 @@ class Players(PlayerProperties, PlayerDetails, PlayerMethods, PlayerHacks):
 
     def playbrowse_folder(self, handle, action):
         if self.is_strm or not get_setting('only_resolve_strm'):
-            self.resolve_to_dummy_hack(handle, self.dummy_duration, self.dummy_delay)
+            PlayerHacks.resolve_to_dummy_hack(handle, self.dummy_duration, self.dummy_delay)
         kodi_log(['lib.player - executing action:\n', action], 1)
         executebuiltin(action)
 
@@ -896,8 +797,8 @@ class Players(PlayerProperties, PlayerDetails, PlayerMethods, PlayerHacks):
             self.playmedia_resolve(handle, listitem)
             return
         if self.is_strm or not get_setting('only_resolve_strm'):  # If we're calling external or using a .strm then we need to resolve to dummy
-            self.resolve_to_dummy_hack(handle, self.dummy_duration if get_setting('dummy_waitresolve') else 0, self.dummy_delay)
-        self.playmedia_rerouteplay_hack(action, listitem)
+            PlayerHacks.resolve_to_dummy_hack(handle, self.dummy_duration if get_setting('dummy_waitresolve') else 0, self.dummy_delay)
+        PlayerHacks.playmedia_rerouteplay_hack(action, listitem)
 
     def play(self, folder_path=None, reset_focus=None, handle=None):
         # Get some info about current container for container update hack
@@ -916,7 +817,7 @@ class Players(PlayerProperties, PlayerDetails, PlayerMethods, PlayerHacks):
         self.action_log = []
 
         # Reset folder hack
-        self.update_listing_hack(folder_path=folder_path, reset_focus=reset_focus)
+        PlayerHacks.update_listing_hack(folder_path=folder_path, reset_focus=reset_focus)
 
         # Check we have an actual path to open
         if not listitem.getPath() or listitem.getPath() == PLUGINPATH:

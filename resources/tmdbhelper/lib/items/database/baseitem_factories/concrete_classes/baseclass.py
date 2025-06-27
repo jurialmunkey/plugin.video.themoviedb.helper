@@ -33,8 +33,7 @@ class BaseItem(ItemDetailsDatabaseAccess):
 
     @cached_property
     def item_mapper(self):
-        item_mapper = ItemMapper()
-        item_mapper.tmdb_id = self.tmdb_id
+        item_mapper = ItemMapper(self.language, self.tmdb_id)
         return item_mapper
 
     @property
