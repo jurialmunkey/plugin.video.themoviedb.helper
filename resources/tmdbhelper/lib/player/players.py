@@ -11,6 +11,7 @@ from tmdbhelper.lib.player.inputter import KeyboardInputter
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.thread import SafeThread
 from tmdbhelper.lib.player.phacks import PlayerHacks
+from tmdbhelper.lib.player.select import PlayerSelect, PlayerSelectWithClearDefault
 
 
 class PlayerMethods():
@@ -333,7 +334,18 @@ class Players(PlayerProperties, PlayerDetails, PlayerMethods):
 
     TMDB_TYPE_CONVERSION = {'season': 'tv', 'episode': 'tv'}
 
-    def __init__(self, tmdb_type, tmdb_id=None, season=None, episode=None, ignore_default='', islocal=False, player=None, mode=None, **kwargs):
+    def __init__(
+        self,
+        tmdb_type,
+        tmdb_id=None,
+        season=None,
+        episode=None,
+        ignore_default='',
+        islocal=False,
+        player=None,
+        mode=None,
+        **kwargs
+    ):
 
         # Kodi launches busy dialog on home screen that needs to be told to close
         # Otherwise the busy dialog will prevent window activation for folder path
@@ -360,64 +372,10 @@ class Players(PlayerProperties, PlayerDetails, PlayerMethods):
         self.is_strm = islocal
         self.current_player = {}
 
-    def select_player(self, detailed=True, clear_player=False, header=get_localized(32042), combined=False):
+    def select_player(self, detailed=True, clear_player=False, header=None, combined=False):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
-        def _select_standard(players_list=None):
-            """ Standard selection dialog lists all player options """
-            players_list = players_list or dialog_players
-            players = [ListItem(
-                label=i.get('name'),
-                label2=i.get("plugin_name"),
-                art={'thumb': i.get('plugin_icon')}).get_listitem() for i in players_list]
-            return Dialog().select(header, players, useDetails=detailed)
-
-        def _select_options(plugin_name):
-            """ Select player options for a specific plugin_name """
-            player_options = [
-                (x, i) for x, i in enumerate(dialog_players)
-                if plugin_name in [i.get('plugin_name'), i.get('name')]]  # Need to compare name too for single special items like Play with Kodi or UpnP
-
-            x = _select_standard([i for _, i in player_options])
-            if x == -1:
-                return -1
-
-            return player_options[x][0]
-
-        def _select_combined():
-            """ Select player from combined list that merges multiple players for plugins into one entry """
-            combined_list = []
-            for i in dialog_players:
-                combined_item = {
-                    'label': i.get('name') if i['plugin_name'] == 'xbmc.core' else KodiAddon(i['plugin_name']).getAddonInfo('name'),
-                    'label2': i['plugin_name'],
-                    'art': {'thumb': i.get('plugin_icon')}}
-                if combined_item in combined_list:
-                    continue
-                combined_list.append(combined_item)
-
-            x = Dialog().select(header, [ListItem(**i).get_listitem() for i in combined_list], useDetails=detailed)
-            if x == -1:  # Cancelled
-                return -1
-
-            x = _select_options(combined_list[x]['label'] if combined_list[x]['label2'] == 'xbmc.core' else combined_list[x]['label2'])
-            if x == -1:  # Go back to player menu
-                return _select_combined()
-
-            return x
-
-        dialog_players = [] if not clear_player else [{
-            'name': get_localized(32311),
-            'plugin_name': 'plugin.video.themoviedb.helper',
-            'plugin_icon': f'{ADDONPATH}/resources/icons/other/kodi.png'}]
-        dialog_players += self.dialog_players
-
-        x = _select_combined() if combined else _select_standard()
-        if x == -1:
-            return {}
-
-        player = dialog_players[x]
-        player['idx'] = x
-        return player
+        obj = PlayerSelectWithClearDefault if clear_player else PlayerSelect
+        return obj(players=self.dialog_players, header=header or get_localized(32042), detailed=detailed).select(combined=combined)
 
     def _get_player_or_fallback(self, fallback):
         if not fallback:
