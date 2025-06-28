@@ -40,7 +40,7 @@ class ItemDetailsDatabase(Database):
         super().__init__(filename=self.cache_filename)
 
     # DB version must be max of table_version
-    database_version = 32
+    database_version = 33
 
     database_changes = {
         21: (
@@ -92,6 +92,9 @@ class ItemDetailsDatabase(Database):
         ),
         32: (
             'ALTER TABLE baseitem ADD fanart_tv INTEGER DEFAULT 0 NOT NULL',
+        ),
+        33: (
+            'ALTER TABLE baseitem ADD language TEXT',
         ),
     }
 
