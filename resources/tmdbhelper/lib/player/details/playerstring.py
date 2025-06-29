@@ -5,19 +5,20 @@ class PlayerStringMovie:
     tmdb_type = 'movie'
     tvdb_id = None
 
-    def __init__(self, tmdb_id, details):
-        self.tmdb_id = tmdb_id
-        self.details = details
+    def __init__(self, listitem):
+        self.listitem = listitem
 
-    def details_get(self, attr, key):
-        try:
-            return getattr(self.details, attr)[key]
-        except (AttributeError, KeyError, TypeError):
-            return
+    @cached_property
+    def tmdb_id(self):
+        return self.listitem.getProperty('tmdb_id') or self.listitem_infotag.getUniqueID('tmdb')
 
     @cached_property
     def imdb_id(self):
-        return self.details_get('unique_ids', 'imdb')
+        return self.listitem_infotag.getUniqueID('imdb')
+
+    @cached_property
+    def listitem_infotag(self):
+        return self.listitem.getVideoInfoTag()
 
     @cached_property
     def playerstring_meta(self):
@@ -36,6 +37,11 @@ class PlayerStringMovie:
 
     @cached_property
     def playerstring(self):
+        return self.get_playerstring()
+
+    def get_playerstring(self):
+        if not self.tmdb_id:
+            return
         from json import dumps
         return dumps(self.playerstring_meta)
 
@@ -43,32 +49,49 @@ class PlayerStringMovie:
 class PlayerStringEpisode(PlayerStringMovie):
     tmdb_type = 'episode'
 
-    def __init__(self, tmdb_id, details, season, episode):
-        self.tmdb_id = tmdb_id
-        self.details = details
-        self.season = season
-        self.episode = episode
+    @cached_property
+    def season(self):
+        return self.listitem_infotag.getSeason()
+
+    @cached_property
+    def episode(self):
+        return self.listitem_infotag.getEpisode()
+
+    @cached_property
+    def tmdb_id(self):
+        return self.listitem.getProperty('tmdb_id') or self.listitem_infotag.getUniqueID('tvshow.tmdb')
 
     @cached_property
     def imdb_id(self):
-        return self.get_details('unique_ids', 'tvshow.imdb')
+        return self.listitem_infotag.getUniqueID('tvshow.imdb')
 
     @cached_property
     def tvdb_id(self):
-        return self.get_details('unique_ids', 'tvshow.tvdb')
+        return self.listitem_infotag.getUniqueID('tvshow.tvdb')
 
-    def get_meta(self):
-        meta = super().get_meta()
+    def get_playerstring_meta(self):
+        meta = super().get_playerstring_meta()
         meta['season'] = self.season
         meta['episode'] = self.episode
         return meta
 
+    def get_playerstring(self):
+        if self.season in (None, '', 0, -1):
+            return
+        if self.episode in (None, '', 0, -1):
+            return
+        return super().get_playerstring()
 
-def make_playerstring(tmdb_type, tmdb_id, details=None, season=None, episode=None):
-    if tmdb_type in ('episode', 'tv') and season is not None and episode is not None:
-        return PlayerStringEpisode(tmdb_id, details, season, episode).playerstring
+
+def make_playerstring(listitem):
+    try:
+        tmdb_type = listitem.getProperty('tmdb_type')
+    except (KeyError, AttributeError, TypeError):
+        return
+    if tmdb_type in ('episode', 'tv'):
+        return PlayerStringEpisode(listitem).playerstring
     if tmdb_type == 'movie':
-        return PlayerStringMovie(tmdb_id, details).playerstring
+        return PlayerStringMovie(listitem).playerstring
 
 
 def read_playerstring():
