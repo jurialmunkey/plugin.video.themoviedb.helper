@@ -760,23 +760,30 @@ class Players(
             self.queue_next_episodes(route='make_playlist')
             return
 
+    @cached_property
+    def listitem(self):
+        return self.get_resolved_path()
+
+    @cached_property
+    def action(self):
+        return self.configure_action(self.listitem, self.handle)
+
     def play(self, folder_path=None, reset_focus=None, ignore_default=False):
         self.ignore_default = boolean(ignore_default)
-        self.player_hacks_update_listing_set(folder_path, reset_focus)
 
-        # Get the resolved path
-        listitem = self.get_resolved_path()
+        if not self.listitem.getPath():
+            return
+        if self.listitem.getPath() == PLUGINPATH:
+            return
 
         # Output action log
         kodi_log(self.action_log, 2)
         self.action_log = []
 
         # Reset folder hack
+        self.player_hacks_update_listing_set(folder_path, reset_focus)
         self.player_hacks_update_listing_run()
 
-        # Check we have an actual path to open
-        if not listitem.getPath() or listitem.getPath() == PLUGINPATH:
-            return
-
-        self.player_hacks_resolved_url_set(listitem, action=self.configure_action(listitem, self.handle))
+        # Play item
+        self.player_hacks_resolved_url_set(self.listitem, action=self.action)
         self.player_hacks_resolved_url_run()
