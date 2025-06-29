@@ -221,9 +221,9 @@ class PlayerDetails():
         self._next_episodes = get_next_episodes(self.tmdb_id, self.season, self.episode, self.current_player['file'])
         return self._next_episodes
 
-    def get_playerstring(self):
-        from tmdbhelper.lib.player.details import get_playerstring
-        self._playerstring = get_playerstring(self.tmdb_type, self.tmdb_id, self.season, self.episode, details=self.details)
+    def make_playerstring(self):
+        from tmdbhelper.lib.player.details.playerstring import make_playerstring
+        self._playerstring = make_playerstring(self.tmdb_type, self.tmdb_id, season=self.season, episode=self.episode, details=self.details)
         return self._playerstring
 
 
@@ -275,7 +275,7 @@ class PlayerProperties():
         try:
             return self._playerstring
         except AttributeError:
-            self._playerstring = self.get_playerstring()
+            self._playerstring = self.make_playerstring()
             return self._playerstring
 
     @property
@@ -360,7 +360,7 @@ class Players(PlayerProperties, PlayerDetails, PlayerMethods):
 
         PlayerHacks.force_recache_kodidb_hack()  # Check if user wants to force rebuilding Kodi library cache first in case of new items
         self.thread_external_ids.start()  # We thread this lookup and rejoin later as Trakt might be slow and we dont want to delay if unneeded
-        self.get_playerstring()  # Get our playerstring at start because we want the details we set to match the unomdified details (TODO: Check if we do?)
+        self.make_playerstring()  # Get our playerstring at start because we want the details we set to match the unomdified details (TODO: Check if we do?)
 
         self.default_player = get_setting('default_player_movies', 'str') if tmdb_type == 'movie' else get_setting('default_player_episodes', 'str')
         self.forced_default = f'{player} {mode or "play"}_{"movie" if tmdb_type == "movie" else "episode"}' if player else ''

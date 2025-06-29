@@ -252,19 +252,3 @@ def set_detailed_item(tmdb_type, tmdb_id, season=None, episode=None, details=Non
         item['slug'] = details.unique_ids.get('tvshow.slug')
 
     return _url_encode_item(item)
-
-
-def get_playerstring(tmdb_type, tmdb_id, season=None, episode=None, details=None):
-    from json import dumps
-    if not details:
-        return None
-    playerstring = {}
-    playerstring['tmdb_type'] = 'episode' if tmdb_type in ['episode', 'tv'] else 'movie'
-    playerstring['tmdb_id'] = tmdb_id
-    playerstring['imdb_id'] = details.unique_ids.get('imdb')
-    if tmdb_type in ['episode', 'tv']:
-        playerstring['imdb_id'] = details.unique_ids.get('tvshow.imdb')
-        playerstring['tvdb_id'] = details.unique_ids.get('tvshow.tvdb')
-        playerstring['season'] = season
-        playerstring['episode'] = episode
-    return dumps(del_empty_keys(playerstring))

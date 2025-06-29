@@ -1,5 +1,4 @@
 from xbmc import Player
-from json import loads
 from jurialmunkey.parser import boolean
 from jurialmunkey.window import get_property
 from tmdbhelper.lib.files.ftools import cached_property
@@ -16,13 +15,13 @@ class PlayerScrobbler():
         self.tvdb_id = self.playerstring.get('tvdb_id')
         self.imdb_id = self.playerstring.get('imdb_id')
         self.tmdb_id = self.playerstring.get('tmdb_id')
-        self.tmdb_type = self.get_playerstring_tmdb_type()
+        self.tmdb_type = self.playerstring_get_tmdb_type()
         self.season = int(self.playerstring.get('season') or 0)
         self.episode = int(self.playerstring.get('episode') or 0)
         self.stopped = False
         self.started = False
 
-    def get_playerstring_tmdb_type(self):
+    def playerstring_get_tmdb_type(self):
         tmdb_type = self.playerstring.get('tmdb_type')
         if tmdb_type in ('movie', ):
             return 'movie'
@@ -68,14 +67,8 @@ class PlayerScrobbler():
 
     @cached_property
     def playerstring(self):
-        return self.get_playerstring()
-
-    @staticmethod
-    def get_playerstring():
-        playerstring = get_property('PlayerInfoString')
-        if not playerstring:
-            return {}
-        return loads(playerstring)
+        from tmdbhelper.lib.player.details.playerstring import read_playerstring
+        return read_playerstring()
 
     def is_match(self, tmdb_type, tmdb_id):
         if f'{self.tmdb_id}' != f'{tmdb_id}':
