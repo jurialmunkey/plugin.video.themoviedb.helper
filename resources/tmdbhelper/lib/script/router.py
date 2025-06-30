@@ -93,7 +93,7 @@ class Script(object):
 
         # Player Configuration
         'play':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.players', 'play_external')(**kwargs),
+            lambda **kwargs: importmodule('tmdbhelper.lib.player.method.play', 'play_external')(**kwargs),
         'play_using':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.players', 'play_using')(**kwargs),
         'update_players':

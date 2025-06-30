@@ -4,15 +4,6 @@
 from tmdbhelper.lib.script.method.decorators import get_tmdb_id, map_kwargs
 
 
-@map_kwargs({'play': 'tmdb_type'})
-@get_tmdb_id
-def play_external(**kwargs):
-    from tmdbhelper.lib.addon.logger import kodi_log
-    from tmdbhelper.lib.player.players import Players
-    kodi_log(['lib.script.router - attempting to play\n', kwargs], 1)
-    Players(**kwargs).play()
-
-
 def play_using(play_using, mode='play', **kwargs):
     from tmdbhelper.lib.addon.plugin import get_infolabel
     from tmdbhelper.lib.files.futils import read_file
@@ -51,6 +42,7 @@ def play_using(play_using, mode='play', **kwargs):
         return
     kwargs['mode'] = mode
     kwargs['player'] = play_using
+    from tmdbhelper.lib.player.method.play import play_external
     play_external(**kwargs)
 
 

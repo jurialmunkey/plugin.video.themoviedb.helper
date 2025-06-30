@@ -86,7 +86,7 @@ def test_func(test_func, dialog_output=False, **kwargs):
 
     def test_func_get_next_episodes(tmdb_id, season, episode, player=None, **kwargs):
         import xbmcgui
-        from tmdbhelper.lib.player.details import get_next_episodes
+        from tmdbhelper.lib.player.details.details import get_next_episodes
         data = get_next_episodes(tmdb_id, season, episode, player)
         head = f'{(tmdb_id, season, episode)}'
         xbmcgui.Dialog().select(head, data, useDetails=True)

@@ -1,5 +1,4 @@
 from urllib.parse import unquote_plus
-from tmdbhelper.lib.addon.logger import kodi_log
 from jurialmunkey.parser import parse_paramstring, reconfigure_legacy_params
 
 
@@ -17,12 +16,8 @@ class Router():
         return {'paths': paths} if paths else {}
 
     def play_external(self):
-        from tmdbhelper.lib.player.players import Players
-        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
-        kodi_log(['lib.container.router - Attempting to play item\n', self.params], 1)
-        if not self.params.get('tmdb_id'):
-            self.params['tmdb_id'] = FindQueriesDatabase().get_tmdb_id(**self.params)
-        Players(**self.params).play(handle=self.handle if self.handle != -1 else None)
+        from tmdbhelper.lib.player.method.play import play_external
+        play_external(handle=self.handle if self.handle != -1 else None, **self.params)
 
     def get_directory(self, items_only=False, build_items=True):
         from tmdbhelper.lib.items.routes import get_container

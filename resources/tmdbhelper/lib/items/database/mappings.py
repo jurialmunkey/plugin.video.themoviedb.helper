@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from tmdbhelper.lib.addon.plugin import get_language
 from tmdbhelper.lib.api.mapping import _ItemMapper
 from collections import namedtuple
 
@@ -748,7 +747,7 @@ class BlankNoneDict(dict):
 
 
 class ItemMapper(_ItemMapper, ItemMapperMethods):
-    def __init__(self):
+    def __init__(self, language, tmdb_id):
         self.blacklist = ()
         """ Mapping dictionary
         keys:       list of tuples containing parent and child key to add value. [('parent', 'child')]
@@ -904,7 +903,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'popularity': ('item', 'popularity')
         }
 
-        self.language = get_language()
+        self.language = language
+        self.tmdb_id = tmdb_id
 
     def map_dict(self, item, data):
 
