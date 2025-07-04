@@ -130,6 +130,12 @@ def test_func(test_func, dialog_output=False, **kwargs):
         head = dbid
         return finalise(head, data)
 
+    def test_func_jrpc_directory(path, **kwargs):
+        from tmdbhelper.lib.api.kodi.rpc import get_directory
+        data = get_directory(path)
+        head = path
+        return finalise(head, data)
+
     routes = {
         'response': test_func_response,
         'trakt_response': test_func_trakt_response,
@@ -144,6 +150,7 @@ def test_func(test_func, dialog_output=False, **kwargs):
         'get_response_sync': test_func_get_response_sync,
         'write_user_art': test_func_write_user_art,
         'jrpc': test_func_jrpc,
+        'jrpc_directory': test_func_jrpc_directory,
     }
 
     return routes[test_func](**kwargs)
