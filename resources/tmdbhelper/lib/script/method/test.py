@@ -119,6 +119,17 @@ def test_func(test_func, dialog_output=False, **kwargs):
             overwrite=True
         )
 
+    def test_func_jrpc(dbid, **kwargs):
+        from tmdbhelper.lib.api.kodi.rpc import get_jsonrpc
+        method = "VideoLibrary.GetMovieDetails"
+        properties = ["streamdetails"]
+        params = {
+            "movieid": int(dbid),
+            "properties": properties}
+        data = get_jsonrpc(method, params)
+        head = dbid
+        return finalise(head, data)
+
     routes = {
         'response': test_func_response,
         'trakt_response': test_func_trakt_response,
@@ -132,6 +143,7 @@ def test_func(test_func, dialog_output=False, **kwargs):
         'sync_next_episodes': test_func_sync_next_episodes,
         'get_response_sync': test_func_get_response_sync,
         'write_user_art': test_func_write_user_art,
+        'jrpc': test_func_jrpc,
     }
 
     return routes[test_func](**kwargs)
