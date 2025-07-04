@@ -58,12 +58,12 @@ def is_excluded(item, filter_key=None, filter_value=None, filter_operator=None, 
                 if il.get(filter_key) or ip.get(filter_key):
                     _exclude = True
                     continue
-            if filter_key in il:
+            elif filter_key in il:
                 _exclude = False
                 if is_filtered(il, filter_key, fv, operator_type=filter_operator):
                     _exclude = True
                     continue
-            if filter_key in ip:
+            elif filter_key in ip:
                 _exclude = False
                 if is_filtered(ip, filter_key, fv, operator_type=filter_operator):
                     _exclude = True
@@ -78,9 +78,9 @@ def is_excluded(item, filter_key=None, filter_value=None, filter_operator=None, 
             if is_listitem and ev == 'is_empty':  # Only apply is_empty filter to end product
                 if not il.get(exclude_key) and not ip.get(exclude_key):
                     return True
-            if exclude_key in il:
+            elif exclude_key in il:
                 if is_filtered(il, exclude_key, ev, True, operator_type=exclude_operator):
                     return True
-            if exclude_key in ip:
+            elif exclude_key in ip:
                 if is_filtered(ip, exclude_key, ev, True, operator_type=exclude_operator):
                     return True
