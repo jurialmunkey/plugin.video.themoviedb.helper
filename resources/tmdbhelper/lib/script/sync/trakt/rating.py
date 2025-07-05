@@ -11,7 +11,7 @@ class ItemRating(ItemSync):
     trakt_sync_key = 'rating'
 
     def get_name_remove(self):
-        return f'{get_localized(self.localized_name_rem)} ({self.trakt_sync_value})'
+        return f'{get_localized(self.localized_name_rem)} ({self.sync_value})'
 
     @staticmethod
     def refresh_containers():

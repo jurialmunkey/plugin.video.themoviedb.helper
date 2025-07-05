@@ -31,7 +31,7 @@ class ItemWatchlist(ItemSync):
         self.trakt_syncdata.cache.del_item(table='lactivities', item_id='show.watchlist')
         self.trakt_syncdata.cache.del_item(table='lactivities', item_id='movie.watchlist')
         self.trakt_syncdata.reset_lastactivities()
-        self.get_trakt_sync_value()
+        self.get_sync_value()
 
 
 class ItemCollection(ItemSync):
@@ -47,7 +47,7 @@ class ItemCollection(ItemSync):
         self.trakt_syncdata.cache.del_item(table='lactivities', item_id='show.collection')
         self.trakt_syncdata.cache.del_item(table='lactivities', item_id='movie.collection')
         self.trakt_syncdata.reset_lastactivities()
-        self.get_trakt_sync_value()
+        self.get_sync_value()
 
 
 class ItemFavorites(ItemSync):
@@ -62,7 +62,7 @@ class ItemFavorites(ItemSync):
         self.trakt_syncdata.cache.del_item(table='lactivities', item_id='show.favorites')
         self.trakt_syncdata.cache.del_item(table='lactivities', item_id='movie.favorites')
         self.trakt_syncdata.reset_lastactivities()
-        self.get_trakt_sync_value()
+        self.get_sync_value()
 
 
 class ItemDropped(ItemSync):
