@@ -6,6 +6,8 @@ from tmdbhelper.lib.script.sync.item import ItemSync as BasicItemSync
 class ItemSync(BasicItemSync):
 
     tmdb_list_type = None
+    convert_episodes = True
+    convert_seasons = True
 
     """
     tmdb_user_api

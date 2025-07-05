@@ -60,12 +60,12 @@ class ItemUserListChoiceNew(ItemUserListChoice):
     @cached_property
     def list_public(self):
         from xbmcgui import Dialog
-        return bool(Dialog().yesno(
+        return 'true' if Dialog().yesno(
             get_localized(32137),
             get_localized(32136),
             yeslabel=get_localized(29935),
             nolabel=get_localized(32135)
-        ))
+        ) else 'false'
 
     @cached_property
     def list_id(self):
@@ -77,13 +77,14 @@ class ItemUserListChoiceNew(ItemUserListChoice):
     def post_response_data(self):
         if not self.list_name:
             return {}
-        return {
+        post_response_data = {
             'name': self.list_name,
             'description': self.list_description,
             'iso_3166_1': 'US',
             'iso_639_1': 'en',
-            'public': self.list_public,
+            'public': self.list_public
         }
+        return post_response_data
 
     @cached_property
     def post_response(self):
