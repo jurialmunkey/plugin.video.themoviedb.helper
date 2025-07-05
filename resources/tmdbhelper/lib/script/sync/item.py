@@ -15,6 +15,7 @@ class ItemSync:
     convert_episodes = False
     convert_seasons = False
     confirm_success = True
+    is_available = True
 
     def __init__(self, tmdb_type, tmdb_id, season=None, episode=None):
         self.tmdb_type = tmdb_type
@@ -34,7 +35,6 @@ class ItemSync:
         from tmdbhelper.lib.addon.logger import kodi_log
         return kodi_log
 
-
     """
     name_add
     """
@@ -45,7 +45,7 @@ class ItemSync:
 
     def get_name_add(self):
         if not self.localized_name_add:
-            return 'FIXME'
+            return 'FIXME NAME ADD'
         return get_localized(self.localized_name_add)
 
     """
@@ -58,7 +58,7 @@ class ItemSync:
 
     def get_name_remove(self):
         if not self.localized_name_rem:
-            return 'FIXME'
+            return 'FIXME NAME REM'
         return get_localized(self.localized_name_rem)
 
     """
@@ -75,7 +75,7 @@ class ItemSync:
                 return self.name_add
             return self.name_remove
         if not self.localized_name:
-            return 'FIXME'
+            return 'FIXME NAME INT'
         return get_localized(self.localized_name)
 
     """
@@ -176,6 +176,28 @@ class ItemSync:
         return '.'.join([i for i in (self.tmdb_id, self.season, self.episode) if i])
 
     """
+    status_code
+    """
+
+    @cached_property
+    def status_code(self):
+        return self.get_status_code()
+
+    def get_status_code(self):
+        return self.sync_response.status_code
+
+    """
+    status_code_message
+    """
+
+    @cached_property
+    def status_code_message(self):
+        return self.get_status_code_message()
+
+    def get_status_code_message(self):
+        return f'HTTP {self.status_code}'
+
+    """
     dialog_message
     """
 
@@ -186,10 +208,10 @@ class ItemSync:
     def get_dialog_message(self):
         if not self.sync_response:
             return
-        if self.sync_response.status_code == 420:
+        if self.status_code == 420:
             dialog_message = f'{get_localized(32296)}\n{get_localized(32531)}'
         elif not self.is_successful_sync:
-            dialog_message = f'{get_localized(32296)}\nHTTP {self.sync_response.status_code}'
+            dialog_message = f'{get_localized(32296)}\n{self.status_code_message}'
         elif self.confirm_success:
             dialog_message = get_localized(32297)
         else:
@@ -219,7 +241,7 @@ class ItemSync:
     def get_is_successful_sync(self):
         if not self.sync_response:
             return False
-        if self.sync_response.status_code not in [200, 201, 204]:
+        if self.status_code not in [200, 201, 204]:
             return False
         return True
 
@@ -267,5 +289,9 @@ class ItemSync:
         # Just check property to check sync now
         if not self.is_sync:
             pass
+
+        # Check that this type is available to sync
+        if not self.is_available:
+            return
 
         return self

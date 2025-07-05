@@ -1,4 +1,3 @@
-from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.script.sync.trakt.basic import (
     ItemWatched,
     ItemUnwatched,
@@ -32,18 +31,7 @@ class Menu(BasicMenu):
         'rating': ItemRating,
     }
 
-    """
-    trakt_api
-    """
-    @cached_property
-    def trakt_api(self):
-        return self.get_trakt_api()
 
-    def get_trakt_api(self):
-        from tmdbhelper.lib.api.trakt.api import TraktAPI
-        return TraktAPI()
-
-
-def sync_trakt_item(tmdb_type, tmdb_id, season=None, episode=None, sync_type=None):
+def sync_item(tmdb_type, tmdb_id, season=None, episode=None, sync_type=None):
     menu = Menu(tmdb_type, tmdb_id, season, episode)
     menu.select(sync_type)

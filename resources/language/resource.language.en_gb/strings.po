@@ -668,6 +668,11 @@ msgctxt "#32114"
 msgid "Enter"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32134"
+msgid "items"
+msgstr ""
+
 #: /resources/lib/container.py
 msgctxt "#32117"
 msgid "Keyword"

@@ -1,41 +1,28 @@
 from tmdbhelper.lib.api.tmdb.api import TMDbAPI, TMDb
 from tmdbhelper.lib.api.tmdb.userauthenticator import TMDbUserAuthenticator
-from tmdbhelper.lib.api.tmdb.userlistmethods import TMDbUserListMethods
-from tmdbhelper.lib.api.tmdb.useritemmethods import TMDbUserItemMethods
+from tmdbhelper.lib.files.ftools import cached_property
 # from tmdbhelper.lib.addon.logger import kodi_log
 
 
 API_URL = 'https://api.themoviedb.org'
 
 
-class TMDbUser(TMDbAPI, TMDbUserListMethods, TMDbUserItemMethods):
+class TMDbUser(TMDbAPI):
     api_url = API_URL
     api_key = ''
     api_name = 'TMDbUser'
 
-    @property
+    @cached_property
     def tmdb_api(self):
-        try:
-            return self._tmdb_api
-        except AttributeError:
-            self._tmdb_api = TMDb()
-            return self._tmdb_api
+        return TMDb()
 
-    @property
+    @cached_property
     def genres(self):
-        try:
-            return self._genres
-        except AttributeError:
-            self._genres = self.tmdb_api.genres
-            return self._genres
+        return self.tmdb_api.genres
 
-    @property
+    @cached_property
     def authenticator(self):
-        try:
-            return self._authenticator
-        except AttributeError:
-            self._authenticator = TMDbUserAuthenticator(self)
-            return self._authenticator
+        return TMDbUserAuthenticator(self)
 
     @property
     def authorised_headers(self):
