@@ -138,7 +138,7 @@ class ItemUserList(ItemSync):
     @busy_decorator
     def get_users_lists(self):
         from tmdbhelper.lib.items.directories.trakt.lists_static import ListTraktStaticOwned
-        users_lists = ListTraktStaticOwned(-1, '').get_items() or []
+        users_lists = ListTraktStaticOwned(-1, '').get_items(tmdb_type='both') or []
         users_lists.append({'label': get_localized(32299)})
         return users_lists
 
