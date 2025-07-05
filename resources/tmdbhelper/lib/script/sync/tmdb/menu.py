@@ -4,6 +4,7 @@ from tmdbhelper.lib.script.sync.tmdb.basic import (
     ItemFavorite,
 )
 from tmdbhelper.lib.script.sync.tmdb.userlist import ItemUserList
+from tmdbhelper.lib.script.sync.tmdb.rating import ItemRating
 
 
 class Menu(BasicMenu):
@@ -11,6 +12,7 @@ class Menu(BasicMenu):
         'watchlist': ItemWatchlist,
         'favorite': ItemFavorite,
         'userlist': ItemUserList,
+        'rating': ItemRating,
     }
 
 
