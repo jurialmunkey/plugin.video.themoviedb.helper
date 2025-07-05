@@ -1,6 +1,7 @@
 from tmdbhelper.lib.script.sync.trakt.item import ItemSync
 from tmdbhelper.lib.addon.plugin import get_localized
-from tmdbhelper.lib.addon.dialog import BusyDialog
+from tmdbhelper.lib.addon.dialog import busy_decorator
+from tmdbhelper.lib.files.ftools import cached_property
 from xbmcgui import Dialog
 
 
@@ -13,23 +14,34 @@ class ItemComments(ItemSync):
             return 'movie'
         return 'show'
 
-    def select_comment(self, itemlist, comments):
-        """ Get a comment from a list of comments """
-        if not itemlist:
-            Dialog().ok(get_localized(32305), get_localized(32306))
-            return -1
-        x = Dialog().select(get_localized(32305), itemlist)
-        if x == -1:
-            return -1
-        info = comments[x].get('comment')
-        name = comments[x].get('user', {}).get('name')
-        rate = comments[x].get('user_stats', {}).get('rating')
+    def view_comment(self, comment):
+        info = comment.get('comment')
+        name = comment.get('user', {}).get('name')
+        rate = comment.get('user_stats', {}).get('rating')
         info = f'{info}\n\n{get_localized(563)} {rate}/10' if rate else f'{info}'
         Dialog().textviewer(name, info)
-        return self.select_comment(itemlist, comments)
+
+    def select_comment(self):
+        """ Get a comment from a list of comments """
+        if not self.itemlist:
+            Dialog().ok(get_localized(32305), get_localized(32306))
+            return
+        x = Dialog().select(get_localized(32305), self.itemlist)
+        if x != -1:
+            self.view_comment(self.comments[x])
+            return self.select_comment()
+
+    @cached_property
+    def comments(self):
+        return self.trakt_api.get_response_json(f'{self.trakt_type}s', self.trakt_slug, 'comments', limit=50) or []
+
+    @cached_property
+    def itemlist(self):
+        return self.get_itemlist()
+
+    @busy_decorator
+    def get_itemlist(self):
+        return [i.get('comment', '').replace('\n', ' ') for i in self.comments]
 
     def sync(self):
-        with BusyDialog():
-            comments = self.trakt_api.get_response_json(f'{self.trakt_type}s', self.trakt_slug, 'comments', limit=50) or []
-            itemlist = [i.get('comment', '').replace('\n', ' ') for i in comments]
-        self.select_comment(itemlist, comments)
+        self.select_comment()

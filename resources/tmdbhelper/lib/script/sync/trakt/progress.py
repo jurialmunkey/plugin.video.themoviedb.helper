@@ -1,22 +1,16 @@
 from tmdbhelper.lib.script.sync.trakt.item import ItemSync
-from tmdbhelper.lib.addon.dialog import BusyDialog
+from tmdbhelper.lib.addon.dialog import busy_decorator
+from tmdbhelper.lib.files.ftools import cached_property
 
 
-class ItemProgressAttributes:
-    """
-    playback_id
-    """
-    @property
+class ItemProgress(ItemSync):
+    preconfigured = True
+    localized_name = 38209
+    allow_episodes = True
+
+    @cached_property
     def playback_id(self):
-        try:
-            return self._playback_id
-        except AttributeError:
-            self._playback_id = self.get_playback_id()
-            return self._playback_id
-
-    @playback_id.setter
-    def playback_id(self, value):
-        self._playback_id = value
+        return self.get_playback_id()
 
     def get_playback_id(self):
         if self.trakt_type == 'movie':
@@ -25,19 +19,10 @@ class ItemProgressAttributes:
             return
         return self.trakt_syncdata.get_episode_playprogress_id(self.tmdb_id, self.season, self.episode)
 
-
-class ItemProgress(ItemSync, ItemProgressAttributes):
-    preconfigured = True
-    localized_name = 38209
-    allow_episodes = True
-
     def get_self(self):
-        if not self.playback_id:
-            return
-        return self
+        return self if self.playback_id else None
 
+    @busy_decorator
     def get_sync_response(self):
         """ Called after user selects choice """
-        with BusyDialog():
-            data = self.trakt_api.delete_response('sync', 'playback', self.playback_id)
-        return data
+        return self.trakt_api.delete_response('sync', 'playback', self.playback_id)
