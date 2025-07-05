@@ -1,4 +1,4 @@
-from tmdbhelper.lib.script.sync.item import ItemSync
+from tmdbhelper.lib.script.sync.trakt.item import ItemSync
 from tmdbhelper.lib.addon.plugin import get_infolabel, get_localized, get_setting
 from tmdbhelper.lib.addon.dialog import BusyDialog
 from xbmcgui import Dialog

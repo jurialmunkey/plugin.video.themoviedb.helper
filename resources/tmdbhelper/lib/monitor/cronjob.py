@@ -16,12 +16,12 @@ class CronJobMonitor(SafeThread):
         self.update_monitor = parent.update_monitor
 
     def _on_startup(self):
-        self._do_delete_old_databases()
         self._do_recache_kodidb()
         self._do_trakt_authorization()
 
     def _on_poll(self):
         self._do_database_vacuum()
+        self._do_delete_old_databases()
         self._do_library_update_check()
         self._do_reset_trakt_lastactivities()
 
@@ -30,20 +30,19 @@ class CronJobMonitor(SafeThread):
         from tmdbhelper.lib.api.trakt.api import TraktAPI
         return TraktAPI()
 
-    @staticmethod
-    def _do_database_vacuum():
-        from tmdbhelper.lib.script.method.maintenance import vacuum_databases
-        vacuum_databases()
+    @cached_property
+    def database_maintenance(self):
+        from tmdbhelper.lib.script.method.maintenance import DatabaseMaintenance
+        return DatabaseMaintenance()
 
-    @staticmethod
-    def _do_delete_old_databases():
-        from tmdbhelper.lib.script.method.maintenance import clean_old_databases
-        clean_old_databases()
+    def _do_database_vacuum(self):
+        self.database_maintenance.vacuum()
 
-    @staticmethod
-    def _do_recache_kodidb():
-        from tmdbhelper.lib.script.method.maintenance import recache_kodidb
-        recache_kodidb(notification=False)
+    def _do_delete_old_databases(self):
+        self.database_maintenance.delete_legacy_folders()
+
+    def _do_recache_kodidb(self):
+        self.database_maintenance.recache_kodidb(notification=False)
 
     def _do_trakt_authorization(self):
         from jurialmunkey.parser import boolean

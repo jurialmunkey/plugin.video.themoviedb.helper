@@ -448,7 +448,8 @@ class Players(
 
         return _matches
 
-    def _player_dialog_select(self, folder, auto=False):
+    @staticmethod
+    def action_dialog_select(folder, auto=False):
         from tmdbhelper.lib.player.actions.dialog import PlayerActionDialog
         return PlayerActionDialog(folder, auto).item_tuple
 
@@ -499,7 +500,7 @@ class Players(
 
             # Special action to fallback to select dialog if match is not found directly
             if is_dialog and not next_path:
-                next_path = self._player_dialog_select(folder, auto=is_dialog.lower() == 'auto')
+                next_path = self.action_dialog_select(folder, auto=is_dialog.lower() == 'auto')
 
             # Early return flag ignores a step failure and instead continues onto trying next step
             # Check against next_path[1] also to make sure we aren't trying to play a folder

@@ -1,10 +1,10 @@
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.addon.dialog import BusyDialog
-from tmdbhelper.lib.script.sync.basic import ItemWatched, ItemUnwatched, ItemWatchlist, ItemCollection, ItemFavorites, ItemDropped
-from tmdbhelper.lib.script.sync.rating import ItemRating
-from tmdbhelper.lib.script.sync.comments import ItemComments
-from tmdbhelper.lib.script.sync.userlist import ItemUserList, ItemMDbList
-from tmdbhelper.lib.script.sync.progress import ItemProgress
+from tmdbhelper.lib.script.sync.trakt.basic import ItemWatched, ItemUnwatched, ItemWatchlist, ItemCollection, ItemFavorites, ItemDropped
+from tmdbhelper.lib.script.sync.trakt.rating import ItemRating
+from tmdbhelper.lib.script.sync.trakt.comments import ItemComments
+from tmdbhelper.lib.script.sync.trakt.userlist import ItemUserList, ItemMDbList
+from tmdbhelper.lib.script.sync.trakt.progress import ItemProgress
 from xbmcgui import Dialog
 
 
