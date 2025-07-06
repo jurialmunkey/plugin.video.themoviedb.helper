@@ -18,6 +18,7 @@ from tmdbhelper.lib.query.database.imdb_top250 import FindQueriesDatabaseIMDbTop
 from tmdbhelper.lib.query.database.trakt_id import FindQueriesDatabaseTraktID
 from tmdbhelper.lib.query.database.trakt_stats import FindQueriesDatabaseTraktStats
 from tmdbhelper.lib.query.database.identifier import FindQueriesDatabaseIdentifier
+from tmdbhelper.lib.query.database.user_ratings import FindQueriesDatabaseUserRatings
 
 
 class FindQueriesDatabase(
@@ -37,6 +38,7 @@ class FindQueriesDatabase(
     FindQueriesDatabaseTraktID,
     FindQueriesDatabaseTraktStats,
     FindQueriesDatabaseIdentifier,
+    FindQueriesDatabaseUserRatings,
 ):
     cache_filename = 'ItemQueries.db'
 
@@ -82,6 +84,7 @@ class FindQueriesDatabase(
             'trakt_id': self.trakt_id_columns,
             'trakt_stats': self.trakt_stats_columns,
             'identifier': self.identifier_columns,
+            'user_ratings': self.user_ratings_columns,
         }
 
     def __init__(self):
@@ -96,6 +99,11 @@ class FindQueriesDatabase(
     def trakt_api(self):
         from tmdbhelper.lib.api.trakt.api import TraktAPI
         return TraktAPI()
+
+    @cached_property
+    def tmdb_user_api(self):
+        from tmdbhelper.lib.api.tmdb.users import TMDbUser
+        return TMDbUser()
 
     @cached_property
     def access(self):
@@ -113,16 +121,6 @@ class FindQueriesDatabase(
 
     def set_expiry(self, item_id, expiry=DEFAULT_EXPIRY):
         self.access.set_cached('expiry', item_id, 'expiry', self.current_time + expiry)
-
-    def get_item_values(self, table, item_id, keys):
-        return self.access.get_cached_values(table, item_id, keys=keys)
-
-    def get_cached_item_values(self, table, item_id, keys, mapping_function=None):
-        data = None
-        with self.access.connection.open():
-            if not self.is_expired(f'{table}.{item_id}'):
-                data = self.get_item_values(table, item_id, keys=keys)
-        return mapping_function(data) if mapping_function else data
 
     def get_all_values(self, table, keys, values=None, conditions=None):
         return self.access.get_cached_list_values(table, keys=keys, values=values or (), conditions=conditions)

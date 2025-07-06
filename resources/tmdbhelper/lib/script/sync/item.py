@@ -36,6 +36,18 @@ class ItemSync:
         return kodi_log
 
     """
+    query_database
+    """
+
+    @cached_property
+    def query_database(self):
+        return self.get_query_database()
+
+    def get_query_database(self):
+        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+        return FindQueriesDatabase()
+
+    """
     name_add
     """
 
