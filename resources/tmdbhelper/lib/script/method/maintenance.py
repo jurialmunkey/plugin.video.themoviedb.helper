@@ -103,3 +103,6 @@ class DatabaseMaintenance:
             head = 'TMDbHelper'
             data = 'Kodi Library cached to memory'
             Dialog().ok(head, data)
+
+
+recache_kodidb = DatabaseMaintenance.recache_kodidb
