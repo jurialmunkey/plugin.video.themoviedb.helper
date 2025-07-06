@@ -82,7 +82,7 @@ def get_listitem(path):
             from jurialmunkey.modimp import importmodule
             pstr, *_ = pstr.split('&&')
             prms = parse_paramstring(pstr)
-            return importmodule(** SV_ROUTES[prms['info']])(-1, pstr, **prms).get_items(**prms)[0][1]
+            return importmodule(**SV_ROUTES[prms['info']])(-1, pstr, **prms).get_items(**prms)[0][1]
 
     except (TypeError, IndexError, KeyError, AttributeError, NameError):
         return
@@ -175,11 +175,8 @@ class _EventLoop():
         if not self._on_change_window():
             return False
 
-        # Set our base window
-        base_window = Window(self.kodi_id)
-
         # Check that base window has correct control ID and clear it out
-        control_list = base_window.getControl(CONTAINER_ID)
+        control_list = Window(self.kodi_id).getControl(CONTAINER_ID)
         if not control_list:
             kodi_log(f'SKIN ERROR!\nControl {CONTAINER_ID} unavailable in Window {self.window_id}', 1)
             return False
@@ -190,7 +187,7 @@ class _EventLoop():
             return False
 
         # Open the info dialog
-        base_window.setFocus(control_list)
+        Window(self.kodi_id).setFocus(control_list)
         executebuiltin(f'SetFocus({CONTAINER_ID},0,absolute)')
         executebuiltin('Action(Info)')
         if not window.wait_until_active(ID_VIDEOINFO, self.window_id):
