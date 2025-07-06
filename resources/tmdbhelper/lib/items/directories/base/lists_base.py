@@ -1,4 +1,4 @@
-from tmdbhelper.lib.addon.plugin import ADDON, convert_type
+from tmdbhelper.lib.addon.plugin import ADDON
 from tmdbhelper.lib.items.container import ContainerDirectory
 from tmdbhelper.lib.items.directories.base.basedir_nodes import BaseDirNode
 
@@ -146,13 +146,3 @@ class ListRelatedBaseDir(ContainerDirectory):
                 'detailed_item': {}, 'include_play': include_play,
             }
         ).build_basedir(tmdb_type)
-
-
-class ListDetails(ContainerDirectory):
-    is_detailed = True
-    is_cacheonly = False
-
-    def get_items(self, tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
-        self.kodi_db = self.get_kodi_database(tmdb_type)
-        self.container_content = convert_type(tmdb_type, output='container', season=season, episode=episode)
-        return [self.lidc.get_item(tmdb_type, tmdb_id, season, episode)]
