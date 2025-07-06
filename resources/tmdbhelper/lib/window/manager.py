@@ -4,7 +4,7 @@ from contextlib import suppress
 import jurialmunkey.window as window
 from jurialmunkey.parser import try_int, parse_paramstring, reconfigure_legacy_params
 from tmdbhelper.lib.addon.plugin import get_condvisibility, get_localized, executebuiltin
-from tmdbhelper.lib.addon.dialog import BusyDialog
+from tmdbhelper.lib.addon.dialog import BusyDialog, busy_decorator
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.thread import SafeThread
 from tmdbhelper.lib.query.database.database import FindQueriesDatabase
@@ -69,6 +69,7 @@ def configure_path(path):
     return construct_path(**prms)
 
 
+@busy_decorator
 def get_listitem(path):
     try:
 
@@ -88,15 +89,23 @@ def get_listitem(path):
         return
 
 
-def open_info(listitem, func=None, threaded=False):
+def open_info_listitem_path(listitem_path):
     executebuiltin(f'Dialog.Close(movieinformation,true)')
     executebuiltin(f'Dialog.Close(pvrguideinfo,true)')
-    func() if func else None
+    if not listitem_path:
+        return
+    listitem = get_listitem(listitem_path)
+    if not listitem:
+        return
+    Dialog().info(listitem)
+
+
+def open_info(listitem_path, threaded=False):
     if threaded:
-        t = SafeThread(target=Dialog().info, args=[listitem])
+        t = SafeThread(target=open_info_listitem_path, args=[listitem_path])
         t.start()
         return t
-    Dialog().info(listitem)
+    open_info_listitem_path(listitem_path)
 
 
 class _EventLoop():
@@ -198,10 +207,7 @@ class _EventLoop():
     def _on_change_direct(self):
 
         # Get the listitem from the item router
-        with BusyDialog():
-            listitem = get_listitem(self.added_path)
-
-        if not listitem:
+        if not get_listitem(self.added_path):
             return False
 
         # Close the info dialog and open base window before continuing
@@ -209,7 +215,7 @@ class _EventLoop():
             return False
 
         # Open the info dialog
-        open_info(listitem, threaded=True)
+        open_info(self.added_path, threaded=True)
 
         if not window.wait_until_active(ID_VIDEOINFO, self.window_id, poll=0.5):
             return False
