@@ -17,5 +17,8 @@ class Menu(BasicMenu):
 
 
 def sync_item(tmdb_type, tmdb_id, season=None, episode=None, sync_type=None):
+    from tmdbhelper.lib.api.tmdb.users import TMDbUser
+    if not TMDbUser().authenticator.authorised_access:
+        return
     menu = Menu(tmdb_type, tmdb_id, season, episode)
     menu.select(sync_type)
