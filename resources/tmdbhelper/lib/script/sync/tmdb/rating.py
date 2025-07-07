@@ -28,7 +28,7 @@ class ItemRating(ItemSync):
     @cached_property
     def input_rating(self):
         from xbmcgui import Dialog
-        x = Dialog().select(f'{self.name} (0-100%)', self.input_rating_choices, preselect=self.preselect)
+        x = Dialog().select(self.item_name, self.input_rating_choices, preselect=self.preselect)
         if x == -1:
             return
         # TMDb API requires rating to be out of 10 and only accepts .5 increments
