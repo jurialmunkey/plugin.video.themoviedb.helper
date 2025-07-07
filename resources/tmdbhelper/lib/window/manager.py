@@ -137,10 +137,15 @@ class WindowManager(EventLoop):
         return self.params.get('origin_tmdb_id')
 
     @cached_property
+    def origin_dbid(self):
+        return self.params.get('origin_dbid')
+
+    @cached_property
     def origin_path_kwgs(self):
         origin_path_kwgs = {
             'tmdb_type': self.origin_tmdb_type,
-            'tmdb_id': self.origin_tmdb_id
+            'tmdb_id': self.origin_tmdb_id,
+            'dbid': self.origin_dbid,
         }
         return {k: v for k, v in origin_path_kwgs.items() if v}
 
