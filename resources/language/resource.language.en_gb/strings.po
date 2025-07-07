@@ -668,6 +668,36 @@ msgctxt "#32114"
 msgid "Enter"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32134"
+msgid "items"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32135"
+msgid "Private"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32136"
+msgid "Do you want to make this list a public or private list?"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32137"
+msgid "Public or private list?"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32138"
+msgid "Scrobbling"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32139"
+msgid "Rate items on TMDb after watching"
+msgstr ""
+
 #: /resources/lib/container.py
 msgctxt "#32117"
 msgid "Keyword"
@@ -2422,7 +2452,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32529"
-msgid "Scrobble items played via TMDbHelper"
+msgid "Scrobble items on Trakt while watching"
 msgstr ""
 
 #: /resources/tmdbhelper/lib/script/sync.py

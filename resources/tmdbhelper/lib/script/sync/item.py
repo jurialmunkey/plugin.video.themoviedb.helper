@@ -1,139 +1,85 @@
 from tmdbhelper.lib.files.ftools import cached_property
-from tmdbhelper.lib.addon.plugin import get_localized, executebuiltin
-from tmdbhelper.lib.addon.dialog import BusyDialog
+from tmdbhelper.lib.addon.plugin import get_localized
 from xbmcgui import Dialog
 
 
-class ItemSyncCachedProperties:
+class ItemSync:
+    preconfigured = False
+    allow_movies = True
+    allow_shows = True
+    allow_seasons = False
+    allow_episodes = False
+    localized_name_add = None
+    localized_name_rem = None
+    localized_name = None
+    convert_episodes = False
+    convert_seasons = False
+    confirm_success = True
+    is_available = True
+
+    def __init__(self, tmdb_type, tmdb_id, season=None, episode=None):
+        self.tmdb_type = tmdb_type
+        self.tmdb_id = tmdb_id
+        self.season = None if self.convert_seasons else season
+        self.episode = None if self.convert_episodes else episode
+
+    """
+    kodi_log
+    """
+
     @cached_property
     def kodi_log(self):
         return self.get_kodi_log()
 
-    @cached_property
-    def trakt_api(self):
-        return self.get_trakt_api()
+    def get_kodi_log(self):
+        from tmdbhelper.lib.addon.logger import kodi_log
+        return kodi_log
+
+    """
+    query_database
+    """
 
     @cached_property
     def query_database(self):
         return self.get_query_database()
 
-    @cached_property
-    def trakt_syncdata(self):
-        return self.get_trakt_syncdata()
+    def get_query_database(self):
+        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+        return FindQueriesDatabase()
 
-    @cached_property
-    def trakt_sync_value(self):
-        return self.get_trakt_sync_value()
+    """
+    name_add
+    """
 
     @cached_property
     def name_add(self):
         return self.get_name_add()
 
+    def get_name_add(self):
+        if not self.localized_name_add:
+            return 'FIXME NAME ADD'
+        return get_localized(self.localized_name_add)
+
+    """
+    name_remove
+    """
+
     @cached_property
     def name_remove(self):
         return self.get_name_remove()
 
+    def get_name_remove(self):
+        if not self.localized_name_rem:
+            return 'FIXME NAME REM'
+        return get_localized(self.localized_name_rem)
+
+    """
+    name
+    """
+
     @cached_property
     def name(self):
         return self.get_name()
-
-    @cached_property
-    def is_sync(self):
-        return self.get_is_sync()
-
-    @cached_property
-    def remove(self):
-        return self.get_remove()
-
-    @cached_property
-    def is_allowed_type(self):
-        return self.get_is_allowed_type()
-
-    @cached_property
-    def method(self):
-        return self.get_method()
-
-    @cached_property
-    def trakt_type(self):
-        return self.get_trakt_type()
-
-    @cached_property
-    def base_trakt_type(self):
-        return self.get_base_trakt_type()
-
-    @cached_property
-    def item_id(self):
-        return self.get_item_id()
-
-    @cached_property
-    def dialog_message(self):
-        return self.get_dialog_message()
-
-    @cached_property
-    def trakt_slug(self):
-        return self.get_trakt_slug()
-
-    @cached_property
-    def sync_response(self):
-        return self.get_sync_response()
-
-    @cached_property
-    def post_response_args(self):
-        return self.get_post_response_args()
-
-    @cached_property
-    def post_response_data(self):
-        return self.get_post_response_data()
-
-    @cached_property
-    def post_response_type(self):
-        return self.get_post_response_type()
-
-    @cached_property
-    def post_response_item(self):
-        return self.get_post_response_item()
-
-    @cached_property
-    def sync_item(self):
-        return self.get_sync_item()
-
-    @cached_property
-    def is_successful_sync(self):
-        return self.get_is_successful_sync()
-
-    @cached_property
-    def dialog_header(self):
-        return self.get_dialog_header()
-
-
-class ItemSyncGetters:
-    def get_kodi_log(self):
-        from tmdbhelper.lib.addon.logger import kodi_log
-        return kodi_log
-
-    def get_trakt_api(self):
-        from tmdbhelper.lib.api.trakt.api import TraktAPI
-        return TraktAPI()
-
-    def get_query_database(self):
-        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
-        return FindQueriesDatabase()
-
-    def get_trakt_syncdata(self):
-        return self.trakt_api.trakt_syncdata
-
-    def get_trakt_sync_value(self):
-        return self.trakt_syncdata.get_value(self.tmdb_type, self.tmdb_id, self.season, self.episode, self.trakt_sync_key)
-
-    def get_name_add(self):
-        if not self.localized_name_add:
-            return 'FIXME'
-        return get_localized(self.localized_name_add)
-
-    def get_name_remove(self):
-        if not self.localized_name_rem:
-            return 'FIXME'
-        return get_localized(self.localized_name_rem)
 
     def get_name(self):
         if not self.preconfigured:
@@ -141,18 +87,49 @@ class ItemSyncGetters:
                 return self.name_add
             return self.name_remove
         if not self.localized_name:
-            return 'FIXME'
+            return 'FIXME NAME INT'
         return get_localized(self.localized_name)
 
+    """
+    is_sync
+    """
+
+    @cached_property
+    def is_sync(self):
+        return self.get_is_sync()
+
     def get_is_sync(self):
-        if self.trakt_sync_value:
-            return True
-        return False
+        return bool(self.sync_value)
+
+    """
+    sync_value
+    """
+
+    @cached_property
+    def sync_value(self):
+        return self.get_sync_value()
+
+    def get_sync_value(self):
+        raise  # Should be defined in derived class
+
+    """
+    remove
+    """
+
+    @cached_property
+    def remove(self):
+        return self.get_remove()
 
     def get_remove(self):
-        if self.is_sync:
-            return True
-        return False
+        return bool(self.is_sync)
+
+    """
+    is_allowed_type
+    """
+
+    @cached_property
+    def is_allowed_type(self):
+        return self.get_is_allowed_type()
 
     def get_is_allowed_type(self):
         if self.trakt_type == 'episode':
@@ -165,10 +142,13 @@ class ItemSyncGetters:
             return bool(self.allow_movies)
         return False
 
-    def get_method(self):
-        if not self.remove:
-            return self.trakt_sync_url
-        return f'{self.trakt_sync_url}/remove'
+    """
+    trakt_type
+    """
+
+    @cached_property
+    def trakt_type(self):
+        return self.get_trakt_type()
 
     def get_trakt_type(self):
         if self.tmdb_type == 'movie':
@@ -181,6 +161,14 @@ class ItemSyncGetters:
             return 'season'
         return 'episode'
 
+    """
+    base_trakt_type
+    """
+
+    @cached_property
+    def base_trakt_type(self):
+        return self.get_base_trakt_type()
+
     def get_base_trakt_type(self):
         if self.tmdb_type == 'movie':
             return 'movie'
@@ -188,60 +176,116 @@ class ItemSyncGetters:
             return
         return 'show'
 
+    """
+    item_id
+    """
+
+    @cached_property
+    def item_id(self):
+        return self.get_item_id()
+
     def get_item_id(self):
         return '.'.join([i for i in (self.tmdb_id, self.season, self.episode) if i])
+
+    """
+    status_code
+    """
+
+    @cached_property
+    def status_code(self):
+        return self.get_status_code()
+
+    def get_status_code(self):
+        return self.sync_response.status_code
+
+    """
+    status_code_message
+    """
+
+    @cached_property
+    def status_code_message(self):
+        return self.get_status_code_message()
+
+    def get_status_code_message(self):
+        return f'HTTP {self.status_code}'
+
+    """
+    dialog_message
+    """
+
+    @cached_property
+    def dialog_message(self):
+        return self.get_dialog_message()
 
     def get_dialog_message(self):
         if not self.sync_response:
             return
-        if self.sync_response.status_code == 420:
+        if self.status_code == 420:
             dialog_message = f'{get_localized(32296)}\n{get_localized(32531)}'
         elif not self.is_successful_sync:
-            dialog_message = f'{get_localized(32296)}\nHTTP {self.sync_response.status_code}'
-        else:
+            dialog_message = f'{get_localized(32296)}\n{self.status_code_message}'
+        elif self.confirm_success:
             dialog_message = get_localized(32297)
+        else:
+            return
         return dialog_message.format(self.dialog_header, self.tmdb_type, 'TMDb', self.item_id)
 
-    def get_trakt_slug(self):
-        return self.query_database.get_trakt_id(self.tmdb_id, 'tmdb', self.base_trakt_type, output_type='slug')
+    """
+    sync_response
+    """
+
+    @cached_property
+    def sync_response(self):
+        return self.get_sync_response()
 
     def get_sync_response(self):
         """ Called after user selects choice """
-        with BusyDialog():
-            return self.trakt_api.post_response(*self.post_response_args, postdata=self.post_response_data)
+        raise  # Should be defined in derived class
 
-    def get_post_response_args(self):
-        return ('sync', self.method, )
+    """
+    is_successful_sync
+    """
 
-    def get_post_response_data(self):
-        return {f'{self.post_response_type}': self.post_response_item}
-
-    def get_post_response_type(self):
-        if self.trakt_type == 'season':
-            return 'episodes'
-        return f'{self.trakt_type}s'
-
-    def get_post_response_item(self):
-        if isinstance(self.sync_item, list):
-            return self.sync_item
-        return [self.sync_item]
-
-    def get_sync_item(self):
-        if self.season is None:
-            return self.trakt_api.get_response_json(f'{self.base_trakt_type}s', self.trakt_slug)
-        if self.episode is None:
-            return self.trakt_api.get_response_json('shows', self.trakt_slug, 'seasons', self.season)
-        return self.trakt_api.get_response_json('shows', self.trakt_slug, 'seasons', self.season, 'episodes', self.episode)
+    @cached_property
+    def is_successful_sync(self):
+        return self.get_is_successful_sync()
 
     def get_is_successful_sync(self):
         if not self.sync_response:
             return False
-        if self.sync_response.status_code not in [200, 201, 204]:
+        if self.status_code not in [200, 201, 204]:
             return False
         return True
 
+    """
+    dialog_header
+    """
+
+    @cached_property
+    def dialog_header(self):
+        return self.get_dialog_header()
+
     def get_dialog_header(self):
         return self.name
+
+    """
+    methods
+    """
+
+    def refresh_containers(self):
+        if not self.is_successful_sync:
+            return
+        from tmdbhelper.lib.script.method.kodi_utils import container_refresh
+        container_refresh()
+
+    def display_dialog(self):
+        if not self.dialog_message:
+            return
+        Dialog().ok(self.dialog_header, self.dialog_message)
+
+    def sync(self):
+        self.display_dialog()
+        self.refresh_containers()
 
     def get_self(self):
         """ Method to see if we should return item in menu or not """
@@ -258,46 +302,8 @@ class ItemSyncGetters:
         if not self.is_sync:
             pass
 
+        # Check that this type is available to sync
+        if not self.is_available:
+            return
+
         return self
-
-
-class ItemSync(ItemSyncGetters, ItemSyncCachedProperties):
-    preconfigured = False
-    allow_movies = True
-    allow_shows = True
-    allow_seasons = False
-    allow_episodes = False
-    localized_name_add = None
-    localized_name_rem = None
-    localized_name = None
-    trakt_sync_key = None
-    trakt_sync_url = None
-    convert_episodes = False
-    convert_seasons = False
-
-    def __init__(self, tmdb_type, tmdb_id, season=None, episode=None):
-        self.tmdb_type = tmdb_type
-        self.tmdb_id = tmdb_id
-        self.season = None if self.convert_seasons else season
-        self.episode = None if self.convert_episodes else episode
-
-    def refresh_containers(self):
-        if not self.is_successful_sync:
-            return
-        from tmdbhelper.lib.script.method.kodi_utils import container_refresh
-        container_refresh()
-
-    def display_dialog(self):
-        if not self.dialog_message:
-            return
-        Dialog().ok(self.dialog_header, self.dialog_message)
-
-    def reset_lastactivities(self):
-        if not self.is_successful_sync:
-            return
-        self.trakt_syncdata.reset_lastactivities()
-
-    def sync(self):
-        self.reset_lastactivities()
-        self.display_dialog()
-        self.refresh_containers()

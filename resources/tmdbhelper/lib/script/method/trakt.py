@@ -8,8 +8,8 @@ from tmdbhelper.lib.script.method.decorators import is_in_kwargs, get_tmdb_id
 @get_tmdb_id
 def sync_trakt(tmdb_type=None, tmdb_id=None, season=None, episode=None, sync_type=None, **kwargs):
     """ Open sync trakt menu for item """
-    from tmdbhelper.lib.script.sync.menu import sync_trakt_item
-    sync_trakt_item(tmdb_type=tmdb_type, tmdb_id=tmdb_id, season=season, episode=episode, sync_type=sync_type)
+    from tmdbhelper.lib.script.sync.trakt.menu import sync_item
+    sync_item(tmdb_type=tmdb_type, tmdb_id=tmdb_id, season=season, episode=episode, sync_type=sync_type)
 
 
 @is_in_kwargs({'like_list': True})

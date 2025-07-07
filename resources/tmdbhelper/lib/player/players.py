@@ -330,12 +330,13 @@ class Players(
     PlayerHacksMixin,
 ):
 
+    default_player = None
+    tmdb_type = None
+    season = None
+    episode = None
+
     def __init__(
         self,
-        tmdb_type,
-        tmdb_id=None,
-        season=None,
-        episode=None,
         islocal=False,
         player=None,
         mode=None,
@@ -346,12 +347,7 @@ class Players(
         # Kodi launches busy dialog on home screen that needs to be told to close
         # Otherwise the busy dialog will prevent window activation for folder path
         executebuiltin('Dialog.Close(busydialog)')
-
         self.api_language = None
-        self.tmdb_type = 'tv' if tmdb_type in ('season', 'episode') else tmdb_type
-        self.tmdb_id = tmdb_id
-        self.season = season
-        self.episode = episode
         self.player = player
         self.mode = mode
         self.handle = handle
@@ -370,20 +366,6 @@ class Players(
     @cached_property
     def action_log(self):
         return []
-
-    @cached_property
-    def dummy_delay(self):
-        return try_float(get_setting('dummy_delay', 'str')) or 1.0
-
-    @cached_property
-    def dummy_duration(self):
-        return try_float(get_setting('dummy_duration', 'str')) or 1.0
-
-    @cached_property
-    def default_player(self):
-        if self.tmdb_type == 'movie':
-            return get_setting('default_player_movies', 'str')
-        return get_setting('default_player_episodes', 'str')
 
     @cached_property
     def forced_default(self):
@@ -466,66 +448,10 @@ class Players(
 
         return _matches
 
-    def _player_dialog_select(self, folder, auto=False):
-        from tmdbhelper.lib.files.futils import normalise_filesize
-        d_items = []
-        for f in folder:
-
-            # Skip items without labels as probably not worth playing
-            if not f.get('label') or f.get('label') == 'None':
-                continue
-
-            # Get the label of the item
-            label_a = f.get('label')
-            label_b_list = []
-
-            # Add year to our label if exists and not special value of 1601
-            if f.get('year') and f.get('year') != 1601:
-                label_a = f'{label_a} ({f.get("year")})'
-
-            # Add season and episode numbers to label
-            if try_int(f.get('season', 0)) > 0 and try_int(f.get('episode', 0)) > 0:
-                if f.get('filetype') == 'file':  # If file assume is an episode so add to main label
-                    label_a = f'{f["season"]}x{f["episode"]}. {label_a}'
-                else:  # If folder assume is tvshow or season so add episode count to label2
-                    label_b_list.append(f'{f["episode"]} {get_localized(20360)}')
-
-            # Add various stream details to ListItem.Label2 (aka label_b)
-            if f.get('streamdetails'):
-                sdv_list = f.get('streamdetails', {}).get('video', [{}]) or [{}]
-                sda_list = f.get('streamdetails', {}).get('audio', [{}]) or [{}]
-                sdv, sda = sdv_list[0], sda_list[0]
-                if sdv.get('width') or sdv.get('height'):
-                    label_b_list.append(f'{sdv.get("width")}x{sdv.get("width")}')
-                if sdv.get('codec'):
-                    label_b_list.append(f'{sdv.get("codec", "").upper()}')
-                if sda.get('codec'):
-                    label_b_list.append(f'{sda.get("codec", "").upper()}')
-                if sda.get('channels'):
-                    label_b_list.append(f'{sda.get("channels", "")} CH')
-                for i in sda_list:
-                    if i.get('language'):
-                        label_b_list.append(f'{i.get("language", "").upper()}')
-                if sdv.get('duration'):
-                    label_b_list.append(f'{try_int(sdv.get("duration", 0)) // 60} mins')
-            if f.get('size'):
-                label_b_list.append(f'{normalise_filesize(f.get("size", 0))}')
-            label_b = ' | '.join(label_b_list) if label_b_list else ''
-
-            # Add item to select dialog list
-            d_items.append(ListItem(label=label_a, label2=label_b, art={'thumb': f.get('thumbnail')}).get_listitem())
-
-        if not d_items:
-            return  # No items so ask user to select new player
-
-        # If autoselect enabled and only 1 item choose that otherwise ask user to choose
-        idx = 0 if auto and len(d_items) == 1 else Dialog().select(get_localized(32236), d_items, useDetails=True)
-
-        if idx == -1:
-            return  # User exited the dialog so return nothing
-
-        is_folder = False if folder[idx].get('filetype') == 'file' else True
-        return (folder[idx].get('file'), is_folder)  # Return the player
+    @staticmethod
+    def action_dialog_select(folder, auto=False):
+        from tmdbhelper.lib.player.actions.dialog import PlayerActionDialog
+        return PlayerActionDialog(folder, auto).item_tuple
 
     def _get_path_from_actions(self, actions, is_folder=True):
         """ Returns tuple of (path, is_folder) """
@@ -574,7 +500,7 @@ class Players(
 
             # Special action to fallback to select dialog if match is not found directly
             if is_dialog and not next_path:
-                next_path = self._player_dialog_select(folder, auto=is_dialog.lower() == 'auto')
+                next_path = self.action_dialog_select(folder, auto=is_dialog.lower() == 'auto')
 
             # Early return flag ignores a step failure and instead continues onto trying next step
             # Check against next_path[1] also to make sure we aren't trying to play a folder
@@ -787,3 +713,47 @@ class Players(
         # Play item
         self.player_hacks_resolved_url_set(self.listitem, action=self.action)
         self.player_hacks_resolved_url_run()
+
+
+class PlayersMovie(Players):
+    tmdb_type = 'movie'
+
+    def __init__(
+        self,
+        tmdb_id=None,
+        **kwargs
+    ):
+        self.tmdb_id = tmdb_id
+        super().__init__(**kwargs)
+
+    @cached_property
+    def default_player(self):
+        return get_setting('default_player_movies', 'str')
+
+
+class PlayersEpisode(Players):
+    tmdb_type = 'tv'
+
+    def __init__(
+        self,
+        tmdb_id=None,
+        season=None,
+        episode=None,
+        **kwargs
+    ):
+        self.tmdb_id = tmdb_id
+        self.season = season
+        self.episode = episode
+        super().__init__(**kwargs)
+
+    @cached_property
+    def default_player(self):
+        return get_setting('default_player_episodes', 'str')
+
+
+def PlayersFactory(tmdb_type, **kwargs):
+    if tmdb_type == 'movie':
+        return PlayersMovie(**kwargs)
+
+    if tmdb_type in ('tv', 'season', 'episode'):
+        return PlayersEpisode(**kwargs)

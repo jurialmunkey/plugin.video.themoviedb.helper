@@ -582,11 +582,6 @@
                     <default>true</default>
                     <control type="toggle" />
                 </setting>
-                <setting id="trakt_scrobbling" type="boolean" label="32529" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
                 <setting id="trakt_watchedindicators" type="boolean" label="32013" help="">
                     <level>0</level>
                     <default>false</default>
@@ -669,6 +664,24 @@
                         <allowempty>true</allowempty>
                     </constraints>
                     <control type="button" format="action"/>
+                </setting>
+            </group>
+            <group id="3" label="32138">
+                <setting id="tmdb_user_rate_after_watching" type="boolean" label="32139" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" operator="!is" setting="tmdb_user_token"></dependency>
+                    </dependencies>
+                </setting>
+                <setting id="trakt_scrobbling" type="boolean" label="32529" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" operator="!is" setting="trakt_token"></dependency>
+                    </dependencies>
                 </setting>
             </group>
         </category>

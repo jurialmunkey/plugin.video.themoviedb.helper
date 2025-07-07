@@ -1,6 +1,6 @@
-from tmdbhelper.lib.script.sync.item import ItemSync
+from tmdbhelper.lib.script.sync.trakt.item import ItemSync
 from tmdbhelper.lib.addon.plugin import get_localized
-from tmdbhelper.lib.addon.dialog import BusyDialog
+from tmdbhelper.lib.addon.dialog import busy_decorator
 from xbmcgui import Dialog
 
 
@@ -11,7 +11,7 @@ class ItemRating(ItemSync):
     trakt_sync_key = 'rating'
 
     def get_name_remove(self):
-        return f'{get_localized(self.localized_name_rem)} ({self.trakt_sync_value})'
+        return f'{get_localized(self.localized_name_rem)} ({self.sync_value})'
 
     @staticmethod
     def refresh_containers():
@@ -25,6 +25,10 @@ class ItemRating(ItemSync):
             return f'{get_localized(32485)} ({rating})'  # Add Rating (rating)
         return f'{get_localized(32489)} ({rating})'  # Change Rating (rating)
 
+    @busy_decorator
+    def set_rating(self, x):
+        return self.trakt_api.post_response('sync', 'ratings/remove' if x == 0 else 'ratings', postdata={f'{self.trakt_type}s': [self.sync_item]})
+
     def get_sync_response(self):
         # Ask user for rating
         try:
@@ -36,8 +40,4 @@ class ItemRating(ItemSync):
             return
 
         self.sync_item['rating'] = x
-
-        # Sync rating
-        with BusyDialog():
-            sync = self.trakt_api.post_response('sync', 'ratings/remove' if x == 0 else 'ratings', postdata={f'{self.trakt_type}s': [self.sync_item]})
-        return sync
+        return self.set_rating(x)

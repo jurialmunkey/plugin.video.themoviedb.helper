@@ -1,24 +1,19 @@
-from tmdbhelper.lib.script.sync.item import ItemSync
+from tmdbhelper.lib.script.sync.trakt.item import ItemSync
 from tmdbhelper.lib.addon.plugin import get_infolabel, get_localized, get_setting
-from tmdbhelper.lib.addon.dialog import BusyDialog
+from tmdbhelper.lib.addon.dialog import busy_decorator
+from tmdbhelper.lib.files.ftools import cached_property
 from xbmcgui import Dialog
 
 
-class ItemMDbListAttributes:
+class ItemMDbList(ItemSync):
+    preconfigured = True
+
     """
     lists
     """
-    @property
+    @cached_property
     def lists(self):
-        try:
-            return self._lists
-        except AttributeError:
-            self._lists = self.get_lists()
-            return self._lists
-
-    @lists.setter
-    def lists(self, value):
-        self._lists = value
+        return self.get_lists()
 
     def get_lists(self):
         from tmdbhelper.lib.api.mdblist.api import MDbList
@@ -30,17 +25,9 @@ class ItemMDbListAttributes:
     """
     list_id
     """
-    @property
+    @cached_property
     def list_id(self):
-        try:
-            return self._list_id
-        except AttributeError:
-            self._list_id = self.get_list_id()
-            return self._list_id
-
-    @list_id.setter
-    def list_id(self, value):
-        self._list_id = value
+        return self.get_list_id()
 
     def get_list_id(self):
         if self.remove:
@@ -57,10 +44,6 @@ class ItemMDbListAttributes:
             return
         return self.lists[x]['id']
 
-
-class ItemMDbList(ItemSync, ItemMDbListAttributes):
-    preconfigured = True
-
     """
     overrides
     """
@@ -75,60 +58,38 @@ class ItemMDbList(ItemSync, ItemMDbListAttributes):
     def get_name(self):
         return get_localized(32519) if self.remove else get_localized(32514)
 
-    def get_sync_response(self):
+    @busy_decorator
+    def modify_static_list(self):
         from tmdbhelper.lib.api.mdblist.api import MDbList
+        return MDbList().modify_static_list(
+            self.list_id,
+            media_type=self.base_trakt_type,
+            media_id=self.tmdb_id,
+            media_provider='tmdb',
+            action='remove' if self.remove else 'add'
+        )
+
+    def get_sync_response(self):
         if not self.list_id:
             return
-        with BusyDialog():
-            data = MDbList().modify_static_list(
-                self.list_id,
-                media_type=self.base_trakt_type,
-                media_id=self.tmdb_id,
-                media_provider='tmdb',
-                action='remove' if self.remove else 'add'
-            )
-        return data
+        return self.modify_static_list()
 
 
 class ItemUserList(ItemSync):
     preconfigured = True
     trakt_sync_url = 'items'
 
-    @property
+    @cached_property
     def userlist(self):
-        try:
-            return self._userlist
-        except AttributeError:
-            self._userlist = self.get_userlist()
-            return self._userlist
+        return self.get_userlist()
 
-    @userlist.setter
-    def userlist(self, value):
-        self._userlist = value
-
-    @property
+    @cached_property
     def userlist_slug(self):
-        try:
-            return self._userlist_slug
-        except AttributeError:
-            self._userlist_slug = self.get_userlist_slug()
-            return self._userlist_slug
-
-    @userlist_slug.setter
-    def userlist_slug(self, value):
-        self._userlist_slug = value
+        return self.get_userlist_slug()
 
     @property
     def userlist_user(self):
-        try:
-            return self._userlist_user
-        except AttributeError:
-            self._userlist_user = self.get_userlist_user()
-            return self._userlist_user
-
-    @userlist_user.setter
-    def userlist_user(self, value):
-        self._userlist_user = value
+        return self.get_userlist_user()
 
     """
     methods
@@ -170,24 +131,35 @@ class ItemUserList(ItemSync):
     def get_name(self):
         return get_localized(32355) if self.remove else get_localized(32298)
 
+    @cached_property
+    def users_lists(self):
+        return self.get_users_lists()
+
+    @busy_decorator
+    def get_users_lists(self):
+        from tmdbhelper.lib.items.directories.trakt.lists_static import ListTraktStaticOwned
+        users_lists = ListTraktStaticOwned(-1, '').get_items(tmdb_type='both') or []
+        users_lists.append({'label': get_localized(32299)})
+        return users_lists
+
+    @cached_property
+    def users_lists_choices(self):
+        return [i.get('label') for i in self.users_lists]
+
     def get_userlist(self):
         """ Get an existing Trakt list and returns tuple of list and user slug """
         if self.remove:
             return (
                 get_infolabel("ListItem.Property(param.list_slug)"),
                 get_infolabel("ListItem.Property(param.user_slug)"))
-        with BusyDialog():
-            from tmdbhelper.lib.items.directories.trakt.lists_static import ListTraktStaticOwned
-            list_sync = ListTraktStaticOwned(-1, '').get_items() or []
-            list_sync.append({'label': get_localized(32299)})
-        x = Dialog().contextmenu([i.get('label') for i in list_sync])
+        x = Dialog().contextmenu(self.users_lists_choices)
         if x == -1:
             return
-        if list_sync[x].get('label') == get_localized(32299):
+        if self.users_lists[x].get('label') == get_localized(32299):
             return self.add_list()
         return (
-            list_sync[x].get('params', {}).get('list_slug'),
-            list_sync[x].get('params', {}).get('user_slug'))
+            self.users_lists[x].get('params', {}).get('list_slug'),
+            self.users_lists[x].get('params', {}).get('user_slug'))
 
     def get_userlist_slug(self):
         if not self.userlist:

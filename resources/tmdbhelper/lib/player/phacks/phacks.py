@@ -25,10 +25,9 @@ class PlayerHacks():
                 xbmc_player.stop()
         return timeout
 
-
     @staticmethod
     def force_recache_kodidb_hack():
         if not get_setting('force_recache_kodidb'):
             return
-        from tmdbhelper.lib.script.method.maintenance import recache_kodidb
-        recache_kodidb(notification=False)
+        from tmdbhelper.lib.script.method.maintenance import DatabaseMaintenance
+        DatabaseMaintenance().recache_kodidb(notification=False)
