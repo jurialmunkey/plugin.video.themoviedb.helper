@@ -1,7 +1,7 @@
 from jurialmunkey.parser import boolean
 from jurialmunkey.window import get_property
 from tmdbhelper.lib.files.ftools import cached_property
-from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin
+from tmdbhelper.lib.addon.plugin import get_setting
 from tmdbhelper.lib.addon.logger import kodi_log
 
 
@@ -58,6 +58,10 @@ class PlayerScrobbler():
             return func(self, *args, **kwargs)
 
         return wrapper
+
+    @property
+    def content_id(self):
+        return f'{self.tmdb_type}.{self.tmdb_id}.{self.season}.{self.episode}'
 
     @property
     def progress(self):
@@ -119,7 +123,7 @@ class PlayerScrobbler():
     def start(self, tmdb_type, tmdb_id):
         if not self.is_match(tmdb_type, tmdb_id):
             return self.stop(tmdb_type, tmdb_id)
-        kodi_log(f'SCROBBLER: [Start] {self.tmdb_type} {self.tmdb_id} {self.season} {self.episode}', 2)
+        kodi_log(f'SCROBBLER: [Start] {self.content_id}', 2)
         self.trakt_scrobbling('start')
         self.started = True
 
@@ -127,17 +131,17 @@ class PlayerScrobbler():
     def pause(self, tmdb_type, tmdb_id):
         if not self.is_match(tmdb_type, tmdb_id):
             return self.stop(tmdb_type, tmdb_id)
-        kodi_log(f'SCROBBLER: [Pause] {self.tmdb_type} {self.tmdb_id} {self.season} {self.episode}', 2)
+        kodi_log(f'SCROBBLER: [Pause] {self.content_id}', 2)
         self.trakt_scrobbling('pause')
 
     @is_scrobbling
     def stop(self, tmdb_type, tmdb_id):
         if not self.started:
             return
-        kodi_log(f'SCROBBLER: [Stop] {self.tmdb_type} {self.tmdb_id} {self.season} {self.episode}', 2)
+        kodi_log(f'SCROBBLER: [Stop] {self.content_id}', 2)
         self.trakt_scrobbling('stop')
         self.set_kodi_watched()
-        self.set_tmdb_user_rating()
+        self.set_tmdb_ratings()
         self.update_stats()
         # TODO: Decide if we allow further scrobbling of item if restarted after stopped
         # if self.is_match(tmdb_type, tmdb_id):
@@ -153,7 +157,7 @@ class PlayerScrobbler():
         get_stats()
 
     @is_scrobbling
-    def set_tmdb_user_rating(self):
+    def set_tmdb_ratings(self):
         if not get_setting('tmdb_user_token', 'str'):
             return
         if not get_setting('tmdb_user_rate_after_watching'):
@@ -163,8 +167,11 @@ class PlayerScrobbler():
         # Only update if progress is 75% or more
         if self.progress < 75:
             return
-        kodi_log(f'SCROBBLER: [Rate] {self.tmdb_type} {self.tmdb_id} {self.season} {self.episode}', 2)
+        if self.content_id == get_property('Scrobbler.LastRated.ContentID'):
+            return
+        get_property('Scrobbler.LastRated.ContentID', set_property=self.content_id)
         from tmdbhelper.lib.script.sync.tmdb.menu import sync_item
+        kodi_log(f'SCROBBLER: [Rate] {self.content_id}', 2)
         sync_item(
             tmdb_type=self.tmdb_type,
             tmdb_id=self.tmdb_id,
@@ -190,17 +197,17 @@ class PlayerScrobbler():
                 tmdb_id=self.tmdb_id,
                 tvdb_id=self.tvdb_id)
             if not tvshowid:
-                kodi_log(f'SCROBBLER: [Kodi] No SHOW: {self.tmdb_type} {self.tmdb_id} {self.season} {self.episode}', 2)
+                kodi_log(f'SCROBBLER: [Kodi] No SHOW: {self.content_id}', 2)
                 return
             dbid = rpc.KodiLibrary('episode', tvshowid).get_info(
                 info='dbid',
                 season=self.season,
                 episode=self.episode)
             if not dbid:
-                kodi_log(f'SCROBBLER: [Kodi] No DBID: {self.tmdb_type} {self.tmdb_id} {self.season} {self.episode}', 2)
+                kodi_log(f'SCROBBLER: [Kodi] No DBID: {self.content_id}', 2)
                 return
             rpc.set_watched(dbid=dbid, dbtype='episode')
-            kodi_log(f'SCROBBLER: [Kodi] {self.tmdb_type} {self.tmdb_id} {self.season} {self.episode}', 2)
+            kodi_log(f'SCROBBLER: [Kodi] {self.content_id}', 2)
             return
 
         if self.tmdb_type == 'movie':
@@ -210,8 +217,8 @@ class PlayerScrobbler():
                 tmdb_id=self.tmdb_id,
                 tvdb_id=self.tvdb_id)
             if not dbid:
-                kodi_log(f'SCROBBLER: [Kodi] No DBID: {self.tmdb_type} {self.tmdb_id} {self.season} {self.episode}', 2)
+                kodi_log(f'SCROBBLER: [Kodi] No DBID: {self.content_id}', 2)
                 return
             rpc.set_watched(dbid=dbid, dbtype='movie')
-            kodi_log(f'SCROBBLER: [Kodi] {self.tmdb_type} {self.tmdb_id} {self.season} {self.episode}', 2)
+            kodi_log(f'SCROBBLER: [Kodi] {self.content_id}', 2)
             return

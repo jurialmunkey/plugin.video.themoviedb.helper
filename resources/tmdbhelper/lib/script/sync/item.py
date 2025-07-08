@@ -48,6 +48,42 @@ class ItemSync:
         return FindQueriesDatabase()
 
     """
+    item_details
+    """
+
+    @cached_property
+    def item_details(self):
+        return self.get_item_details()
+
+    def get_item_details(self):
+        from tmdbhelper.lib.items.database.listitem import ListItemDetails
+        return ListItemDetails().get_item(
+            self.tmdb_type,
+            self.tmdb_id,
+            self.season,
+            self.episode
+        )
+
+    """
+    item_name
+    """
+
+    @cached_property
+    def item_name(self):
+        return self.get_item_name()
+
+    def get_item_name(self):
+        try:
+            item_name = self.item_details['label']
+        except (KeyError, TypeError):
+            return
+        try:
+            item_name = f'{item_name} ({self.item_details["infolabels"]["year"]})'
+        except (KeyError, TypeError):
+            pass
+        return item_name
+
+    """
     name_add
     """
 
@@ -228,7 +264,12 @@ class ItemSync:
             dialog_message = get_localized(32297)
         else:
             return
-        return dialog_message.format(self.dialog_header, self.tmdb_type, 'TMDb', self.item_id)
+        return dialog_message.format(
+            self.dialog_header,
+            self.item_name,
+            self.tmdb_type,
+            self.item_id
+        )
 
     """
     sync_response

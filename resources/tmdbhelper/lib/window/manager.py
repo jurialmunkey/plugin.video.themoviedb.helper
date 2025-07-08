@@ -28,6 +28,12 @@ class PathConstructor:
         self.dbid = dbid
 
     @cached_property
+    def tmdb_type_path(self):
+        if self.tmdb_type in ('season', 'episode'):
+            return 'tv'
+        return self.tmdb_type
+
+    @cached_property
     def info(self):
         try:
             return self.params.get('info') or {
@@ -50,7 +56,7 @@ class PathConstructor:
 
         if self.tmdb_type and self.tmdb_id:
             base = 'plugin://plugin.video.themoviedb.helper/'
-            pstr = f'info=details&tmdb_type={self.tmdb_type}&tmdb_id={self.tmdb_id}'
+            pstr = f'info=details&tmdb_type={self.tmdb_type_path}&tmdb_id={self.tmdb_id}'
             return f'{base}?{pstr}'
 
         return ''
@@ -137,10 +143,15 @@ class WindowManager(EventLoop):
         return self.params.get('origin_tmdb_id')
 
     @cached_property
+    def origin_dbid(self):
+        return self.params.get('origin_dbid')
+
+    @cached_property
     def origin_path_kwgs(self):
         origin_path_kwgs = {
             'tmdb_type': self.origin_tmdb_type,
-            'tmdb_id': self.origin_tmdb_id
+            'tmdb_id': self.origin_tmdb_id,
+            'dbid': self.origin_dbid,
         }
         return {k: v for k, v in origin_path_kwgs.items() if v}
 
