@@ -1,11 +1,11 @@
 from xbmc import Monitor
 from xbmcgui import Dialog
 from contextlib import suppress
-import jurialmunkey.window as window
 from jurialmunkey.parser import try_int, parse_paramstring, reconfigure_legacy_params
 from tmdbhelper.lib.addon.plugin import get_localized, executebuiltin
 from tmdbhelper.lib.addon.dialog import BusyDialog
 from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+from tmdbhelper.lib.window.window_property import WindowProperty
 from tmdbhelper.lib.window.event_loop import EventLoop
 from tmdbhelper.lib.files.ftools import cached_property
 from tmdbhelper.lib.window.constants import (
@@ -65,7 +65,7 @@ class PathConstructor:
     def is_valid(self):
         if not self.path:
             return False
-        if self.path == window.get_property(PREFIX_CURRENT):  # Same path as current so skip as user double clicked
+        if self.path == WindowProperty().get_property(PREFIX_CURRENT):  # Same path as current so skip as user double clicked
             return False
         return True
 
@@ -115,18 +115,18 @@ class WindowManager(EventLoop):
         self.position = 0
         self.added_path = None
         self.current_path = None
-        window.get_property(PREFIX_COMMAND, clear_property=True)
-        window.get_property(PREFIX_CURRENT, clear_property=True)
-        window.get_property(PREFIX_POSITION, clear_property=True)
-        window.get_property(f'{PREFIX_PATH}0', clear_property=True)
-        window.get_property(f'{PREFIX_PATH}1', clear_property=True)
+        WindowProperty().del_property(PREFIX_COMMAND)
+        WindowProperty().del_property(PREFIX_CURRENT)
+        WindowProperty().del_property(PREFIX_POSITION)
+        WindowProperty().del_property(f'{PREFIX_PATH}0')
+        WindowProperty().del_property(f'{PREFIX_PATH}1')
 
     def set_properties(self, position=1, path=None):
         self.position = position
         self.added_path = path or ''
-        window.get_property(PREFIX_CURRENT, set_property=path)
-        window.get_property(f'{PREFIX_PATH}{position}', set_property=path)
-        window.get_property(PREFIX_POSITION, set_property=position)
+        WindowProperty().set_property(PREFIX_CURRENT, path)
+        WindowProperty().set_property(f'{PREFIX_PATH}{position}', path)
+        WindowProperty().set_property(PREFIX_POSITION, position)
 
     def add_origin(self):
         if self.origin_path:
@@ -161,7 +161,7 @@ class WindowManager(EventLoop):
 
     @property
     def is_running(self):
-        return bool(window.get_property(PREFIX_INSTANCE))
+        return bool(WindowProperty().get_property(PREFIX_INSTANCE))
 
     def call_auto(self):
         # Already instance running and has window open so let's exit
@@ -185,7 +185,8 @@ class WindowManager(EventLoop):
 
     def add_path_to_history(self, path_constructor):
         if path_constructor and path_constructor.is_valid:
-            window.wait_for_property(PREFIX_ADDPATH, path_constructor.path, True, poll=0.3)
+            WindowProperty().set_property(PREFIX_ADDPATH, path_constructor.path)
+            WindowProperty().wait_for_property(PREFIX_ADDPATH, path_constructor.path, poll=0.3)
             self.call_auto()
 
     def make_query(self, query, tmdb_type, separator=' / '):
@@ -209,7 +210,8 @@ class WindowManager(EventLoop):
         return self.add_path(url)
 
     def close_dialog(self):
-        window.wait_for_property(PREFIX_COMMAND, 'exit', True, poll=0.3)
+        WindowProperty().set_property(PREFIX_COMMAND, 'exit')
+        WindowProperty().wait_for_property(PREFIX_COMMAND, 'exit', poll=0.3)
         self._call_exit()
         self._on_exit()
         self.call_window()

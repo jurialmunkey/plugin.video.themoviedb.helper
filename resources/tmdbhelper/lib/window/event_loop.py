@@ -1,8 +1,8 @@
 from xbmcgui import Window
-import jurialmunkey.window as window
 from tmdbhelper.lib.addon.plugin import executebuiltin, get_condvisibility
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.files.ftools import cached_property
+from tmdbhelper.lib.window.window_property import WindowProperty
 from tmdbhelper.lib.window.direct_call_auto import DirectCallAutoInfoDialog
 from tmdbhelper.lib.window.constants import (
     ID_VIDEOINFO,
@@ -15,6 +15,7 @@ from tmdbhelper.lib.window.constants import (
 
 
 class EventLoop():
+
     def _call_exit(self, return_info=False):
         self.return_info = return_info
         self.exit = True
@@ -24,37 +25,39 @@ class EventLoop():
         self.reset_properties()
 
         # Close video info dialog
-        if window.is_visible(ID_VIDEOINFO):
-            window.close(ID_VIDEOINFO)
-            window.wait_until_active(ID_VIDEOINFO, invert=True, poll=0.1)
+        if WindowProperty(ID_VIDEOINFO).is_visible:
+            WindowProperty(ID_VIDEOINFO).close()
+            WindowProperty(ID_VIDEOINFO).wait_until_active(invert=True, poll=0.1)
 
         # Close base window
-        if window.is_visible(self.window_id):
+        if WindowProperty(self.window_id).is_visible:
             executebuiltin('Action(Back)')
-            window.wait_until_active(self.window_id, invert=True, poll=0.1)
+            WindowProperty(self.window_id).wait_until_active(invert=True, poll=0.1)
 
     def _on_add(self):
         self.position += 1
-        self.set_properties(self.position, window.get_property(PREFIX_ADDPATH))
-        window.wait_for_property(PREFIX_ADDPATH, None, True, poll=0.3)  # Clear property before continuing
+        self.set_properties(self.position, WindowProperty().get_property(PREFIX_ADDPATH))
+        WindowProperty().del_property(PREFIX_ADDPATH)  # Clear property before continuing
+        WindowProperty().wait_for_property(PREFIX_ADDPATH, poll=0.3)
 
     def _on_rem(self):
         self.position -= 1
         name = f'{PREFIX_PATH}{self.position}'
-        self.set_properties(self.position, window.get_property(name))
+        self.set_properties(self.position, WindowProperty().get_property(name))
 
     def _on_back(self):
         name = f'{PREFIX_PATH}{self.position}'
-        window.wait_for_property(name, None, True, poll=0.3)
+        WindowProperty().del_property(name)  # Clear property before continuing
+        WindowProperty().wait_for_property(name, poll=0.3)
         return self._on_rem() if self.position > 1 else self._call_exit(True)
 
     def _on_change_window(self, poll=0.3):
         # Close the info dialog first before doing anything
-        if window.is_visible(ID_VIDEOINFO):
-            window.close(ID_VIDEOINFO)
+        if WindowProperty(ID_VIDEOINFO).is_visible:
+            WindowProperty(ID_VIDEOINFO).close()
 
             # If we timeout or user forced back out of base window then we exit
-            if not window.wait_until_active(ID_VIDEOINFO, self.base_id, poll=poll, invert=True):
+            if not WindowProperty(ID_VIDEOINFO).wait_until_active(self.base_id, poll=poll, invert=True):
                 return False
 
         # NOTE: Used to check for self.position == 0 and exit here
@@ -63,8 +66,8 @@ class EventLoop():
             return True
 
         # On first run we need to open the base window
-        window.activate(self.window_id)
-        if window.wait_until_active(self.window_id, poll=poll):
+        WindowProperty(self.window_id).activate()
+        if WindowProperty(self.window_id).wait_until_active(poll=poll):
             return True
 
         # Window ID didnt open successfully
@@ -76,21 +79,23 @@ class EventLoop():
             return False
 
         # Check that base window has correct control ID and clear it out
-        control_list = Window(self.kodi_id).getControl(CONTAINER_ID)
+        _wind = Window(self.kodi_id)
+        control_list = _wind.getControl(CONTAINER_ID)
         if not control_list:
             kodi_log(f'SKIN ERROR!\nControl {CONTAINER_ID} unavailable in Window {self.window_id}', 1)
             return False
         control_list.reset()
 
         # Wait for the container to update before doing anything
-        if not window.wait_until_updated(container_id=CONTAINER_ID, instance_id=self.window_id):
+        if not WindowProperty(self.window_id).wait_until_updated(CONTAINER_ID):
             return False
 
         # Open the info dialog
-        Window(self.kodi_id).setFocus(control_list)
+        _wind = Window(self.kodi_id)
+        _wind.setFocus(control_list)
         executebuiltin(f'SetFocus({CONTAINER_ID},0,absolute)')
         executebuiltin('Action(Info)')
-        if not window.wait_until_active(ID_VIDEOINFO, self.window_id):
+        if not WindowProperty(ID_VIDEOINFO).wait_until_active(self.window_id):
             return False
 
         return True
@@ -109,9 +114,8 @@ class EventLoop():
         # Open the info dialog
         direct.open()
 
-        if not window.wait_until_active(ID_VIDEOINFO, self.window_id, poll=0.5):
+        if not WindowProperty(ID_VIDEOINFO).wait_until_active(self.window_id, poll=0.5):
             return False
-
         return True
 
     @cached_property
@@ -136,12 +140,12 @@ class EventLoop():
 
     def event_loop_action(self):
         # Path added so let's put it in the queue
-        if window.get_property(PREFIX_ADDPATH):
+        if WindowProperty().get_property(PREFIX_ADDPATH):
             self._on_add()
             return
 
         # Exit called so let's exit
-        if window.get_property(PREFIX_COMMAND) == 'exit':
+        if WindowProperty().get_property(PREFIX_COMMAND) == 'exit':
             self._call_exit()
             return
 
@@ -152,12 +156,12 @@ class EventLoop():
             return
 
         # User force quit so let's exit
-        if not window.is_visible(self.window_id):
+        if not WindowProperty(self.window_id).is_visible:
             self._call_exit()
             return
 
         # User pressed back and closed video info window
-        if not window.is_visible(ID_VIDEOINFO):
+        if not WindowProperty(ID_VIDEOINFO).is_visible:
             self._on_back()
             self.xbmc_monitor.waitForAbort(0.3)
             return
@@ -172,6 +176,7 @@ class EventLoop():
         return self._on_exit()
 
     def event_loop(self):
-        window.wait_for_property(PREFIX_INSTANCE, 'True', True, poll=0.3)
+        WindowProperty().set_property(PREFIX_INSTANCE, 'True')
+        WindowProperty().wait_for_property(PREFIX_INSTANCE, 'True', poll=0.3)
         self.event_poll()
-        window.get_property(PREFIX_INSTANCE, clear_property=True)
+        WindowProperty().del_property(PREFIX_INSTANCE)
