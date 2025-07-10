@@ -76,7 +76,8 @@ class EventLoop():
             return False
 
         # Check that base window has correct control ID and clear it out
-        control_list = Window(self.kodi_id).getControl(CONTAINER_ID)
+        _window = Window(self.kodi_id)
+        control_list = _window.getControl(CONTAINER_ID)
         if not control_list:
             kodi_log(f'SKIN ERROR!\nControl {CONTAINER_ID} unavailable in Window {self.window_id}', 1)
             return False
@@ -87,7 +88,8 @@ class EventLoop():
             return False
 
         # Open the info dialog
-        Window(self.kodi_id).setFocus(control_list)
+        _window = Window(self.kodi_id)
+        _window.setFocus(control_list)
         executebuiltin(f'SetFocus({CONTAINER_ID},0,absolute)')
         executebuiltin('Action(Info)')
         if not window.wait_until_active(ID_VIDEOINFO, self.window_id):
