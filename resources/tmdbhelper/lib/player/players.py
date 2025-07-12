@@ -378,8 +378,8 @@ class Players(
 
     @cached_property
     def players(self):
-        from tmdbhelper.lib.player.putils import get_players_from_file
-        return get_players_from_file()
+        from tmdbhelper.lib.player.files import PlayerFiles
+        return PlayerFiles().dictionary
 
     def select_player(self, detailed=True, clear_player=False, header=None, combined=False):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
