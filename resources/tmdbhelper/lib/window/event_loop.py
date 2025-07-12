@@ -133,12 +133,13 @@ class EventLoop():
         # Open the info dialog
         kodi_log(f'Window Manager [EVENTS] _on_change_direct direct.open() [ ]', 2)
         direct.open()
+        kodi_log(f'Window Manager [EVENTS] _on_change_direct direct.open() [X]', 2)
 
         if not window.wait_until_active(ID_VIDEOINFO, self.window_id, poll=0.5):
             kodi_log(f'Window Manager [EVENTS] _on_change_direct direct.open() TIMEOUT!', 2)
             return False
 
-        kodi_log(f'Window Manager [EVENTS] _on_change_direct direct.open() [X]', 2)
+        kodi_log(f'Window Manager [EVENTS] _on_change_direct direct.open() DONE!', 2)
         return True
 
     @cached_property
