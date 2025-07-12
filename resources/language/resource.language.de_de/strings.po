@@ -332,6 +332,21 @@ msgctxt "#32038"
 msgid "Get additional details from the local Kodi library database"
 msgstr "Zusätzliche Details aus der lokalen Kodi-Bibliothek laden"
 
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32067"
+msgid "Budget"
+msgstr "Budget"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32068"
+msgid "Revenue"
+msgstr "Einnahmen"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32069"
+msgid "Last Air Date"
+msgstr "Letztes Sendedatum"
+
 #: /resources/settings.xml
 msgctxt "#32042"
 msgid "Choose Action"
@@ -341,6 +356,11 @@ msgstr "Aktion wählen"
 msgctxt "#32043"
 msgid "Up Next"
 msgstr "Als Nächstes"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32072"
+msgid "Score"
+msgstr "Punktezahl"
 
 #: /resources/lib/container.py
 msgctxt "#32044"
@@ -372,6 +392,11 @@ msgctxt "#32058"
 msgid "The provided URL is either invalid or inaccesible."
 msgstr "Die angegebene URL ist entweder ungültig oder nicht zugänglich."
 
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32079"
+msgid "User"
+msgstr "Nutzer"
+
 #: /resources/lib/downloader.py
 msgctxt "#32059"
 msgid "Success!"
@@ -381,6 +406,16 @@ msgstr "Erfolg!"
 msgctxt "#32060"
 msgid "files extracted"
 msgstr "Dateien extrahiert"
+
+#: /resources/settings.xml
+msgctxt "#32082"
+msgid "Page multiplier (Other basic lists)"
+msgstr "Seitenmultiplikator (Andere Basislisten)"
+
+#: /resources/settings.xml
+msgctxt "#32083"
+msgid "Page multiplier (Database sync lists)"
+msgstr "Seitenmultiplikator (Datenbank-Synchronisationslisten)"
 
 #: /resources/lib/player.py
 msgctxt "#32061"
@@ -396,6 +431,11 @@ msgstr "Debugprotokollierung"
 msgctxt "#32070"
 msgid "Male"
 msgstr "Männlich"
+
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32087"
+msgid "Search for TMDb ID or input manually?"
+msgstr "Nach TMDb ID suchen oder manuell eingeben?"
 
 #: /resources/lib/tmdb.py
 msgctxt "#32071"
@@ -427,6 +467,11 @@ msgctxt "#32077"
 msgid "Ignore folder creation checks"
 msgstr "Überprüfung der Ordnererstellung ignorieren"
 
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32094"
+msgid "Select TMDb type"
+msgstr "TMDb-Typ auswählen"
+
 #: /resources/lib/container/basedir.py
 msgctxt "#32078"
 msgid "Still to Watch"
@@ -441,6 +486,11 @@ msgstr "Sonstiges"
 msgctxt "#32081"
 msgid "Next page item"
 msgstr "Eintrag \"Nächste Seite\" anzeigen"
+
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32098"
+msgid "Updated"
+msgstr "Aktualisiert"
 
 #: /resources/settings.xml
 msgctxt "#32084"
@@ -471,6 +521,16 @@ msgstr "Aktion auswählen"
 msgctxt "#32090"
 msgid "Content"
 msgstr "Inhalt"
+
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32105"
+msgid "leave blank to delete"
+msgstr "leer lassen zum Löschen"
+
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32106"
+msgid "Enter {} URL"
+msgstr "{} URL eingeben"
 
 #: /resources/settings.xml
 msgctxt "#32091"
@@ -512,10 +572,25 @@ msgctxt "#32100"
 msgid "Do you wish to clear the existing items or add more?"
 msgstr "Sollen die vorhandenen Elemente gelöscht oder weitere hinzufügt werden?"
 
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32115"
+msgid "Reset {} artwork to default?"
+msgstr "Artwork {} auf Standard zurücksetzen?"
+
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32116"
+msgid "Remove user artwork override and reset artwork to default artwork selection as defined in the settings."
+msgstr "Entfernt die Überschreibung der Benutzervorlage und setzt die Vorlage auf die in den Einstellungen definierte Standardvorlagenauswahl zurück."
+
 #: /resources/lib/container.py
 msgctxt "#32101"
 msgid "Clear Items"
 msgstr "Elemente löschen"
+
+#: /resources/tmdbhelper/lib/items/context.py
+msgctxt "#32118"
+msgid "Modify artwork"
+msgstr "Artwork ändern"
 
 #: /resources/lib/container.py
 msgctxt "#32102"
@@ -546,6 +621,11 @@ msgctxt "#32108"
 msgid "Choose matching method for parameters with multiple values."
 msgstr "Abgleichmethode für Parameter mit mehreren Werten wählen."
 
+#: /resources/settings.xml
+msgctxt "#32124"
+msgid "RatingPosterDB API"
+msgstr "RatingPosterDB API"
+
 #: /resources/lib/container.py
 msgctxt "#32109"
 msgid "Match ANY Value"
@@ -555,6 +635,21 @@ msgstr "Übereinstimmung mit JEDEM Wert"
 msgctxt "#32110"
 msgid "Match ALL Values"
 msgstr "Übereinstimmung mit ALLEN Werten"
+
+#: /resources/settings.xml
+msgctxt "#32127"
+msgid "RatingPosterDB API key"
+msgstr "API-Schlüssel für RatingPosterDB"
+
+#: /resources/tmdbhelper/lib/items/database/baseview_factories/concrete_classes/ftv_fanart.py
+msgctxt "#32128"
+msgid "Likes"
+msgstr "Gefällt mir"
+
+#: /resources/settings.xml
+msgctxt "#32129"
+msgid "Override player monitor clearlogo with artwork from TMDbHelper"
+msgstr "Clearlogo des Spielermonitors mit Artwork aus TMDbHelper überschreiben"
 
 #: /resources/lib/container.py
 msgctxt "#32111"
@@ -575,6 +670,36 @@ msgstr "Akzeptiert auch X Tage relativ ab heute im Format T-X oder T+X (z.B. T-1
 msgctxt "#32114"
 msgid "Enter"
 msgstr "Eingabe"
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32134"
+msgid "items"
+msgstr "Einträge"
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32135"
+msgid "Private"
+msgstr "Privat"
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32136"
+msgid "Do you want to make this list a public or private list?"
+msgstr "Soll diese Liste öffentlich oder privat sein?"
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32137"
+msgid "Public or private list?"
+msgstr "Öffentliche oder private Liste?"
+
+#: /resources/settings.xml
+msgctxt "#32138"
+msgid "Scrobbling"
+msgstr "Wiedergabeverfolgung"
+
+#: /resources/settings.xml
+msgctxt "#32139"
+msgid "Rate items on TMDb after watching"
+msgstr "Einträge auf TMDb nach dem Ansehen bewerten"
 
 #: /resources/lib/container.py
 msgctxt "#32117"
@@ -2357,8 +2482,8 @@ msgstr "Zu {} hinzufügen"
 
 #: /resources/settings.xml
 msgctxt "#32529"
-msgid "Scrobble items played via TMDbHelper"
-msgstr "Elemente, die über TMDbHelper abgespielt wurden, automatisch protokollieren (scrobbeln)"
+msgid "Scrobble items on Trakt while watching"
+msgstr "Während der Wiedergabe an Trakt senden"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32530"
@@ -2600,7 +2725,7 @@ msgstr "API-Schlüssel"
 #: /resources/settings.xml
 msgctxt "#32019"
 msgid "Fanart.tv client key"
-msgstr "Client-Schlüssel für Fanart.tv"
+msgstr "API-Schlüssel für für Fanart.tv"
 
 #: /resources/settings.xml
 msgctxt "#32021"
