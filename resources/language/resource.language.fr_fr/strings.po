@@ -180,7 +180,7 @@ msgstr "Basque (Espagne)"
 #: /resources/tmdbhelper/lib/script/method/trakt.py
 msgctxt "#32035"
 msgid "Progress"
-msgstr ""
+msgstr "Progression"
 
 #: /resources/tmdbhelper/lib/script/method/trakt.py
 msgctxt "#32036"
@@ -205,6 +205,11 @@ msgctxt "#32040"
 msgid "All seasons"
 msgstr "Toutes les saisons"
 
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32041"
+msgid "Your In-Progress TV Shows"
+msgstr "Vos séries TV en cours"
+
 msgctxt "#30026"
 msgid "French (Canada)"
 msgstr "Français (Canada)"
@@ -216,6 +221,51 @@ msgstr "Français (France)"
 msgctxt "#30028"
 msgid "Galician (Spain)"
 msgstr "Galicien (Espagne)"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32045"
+msgid "Your In-Progress Movies"
+msgstr "Vos films en cours"
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32046"
+msgid "Drop TV show"
+msgstr "Abandonner la série TV"
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32047"
+msgid "Undrop TV show"
+msgstr "Ne plus abandonner la série TV"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32048"
+msgid "Dropped TV Shows"
+msgstr "Séries TV abandonnées"
+
+#: /resources/settings.xml
+msgctxt "#32049"
+msgid "Sort order of Your Next Episodes list. By airdate sorts episodes by premiere date. By recentlywatched sorts episodes by most recently watched tvshow. By todays is recentlywatched with episodes airing today at the front. By lastweek is recentlywatched with episodes airing in the past week sorted by airdate at the front."
+msgstr "Ordre de tri de la liste 'Vos prochains épisodes'. 'Par date de diffusion' trie les épisodes par date de première. 'Par vus récemment' trie les épisodes par série TV la plus récemment regardée. 'Par aujourd'hui' correspond à 'vus récemment' avec les épisodes diffusés aujourd'hui en premier. 'Par la semaine dernière' correspond à 'vus récemment' avec les épisodes diffusés la semaine passée triés par date de diffusion en premier."
+
+#: /resources/settings.xml
+msgctxt "#32050"
+msgid "Prefer artwork in your language"
+msgstr "Préférer les illustrations dans votre langue"
+
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+msgctxt "#32051"
+msgid "Deleted cached {} items"
+msgstr "Suppression de {} éléments du cache"
+
+#: /resources/settings.xml
+msgctxt "#32052"
+msgid "Delete TMDb cached item details"
+msgstr "Supprimer les détails des éléments TMDb mis en cache"
+
+#: /resources/settings.xml
+msgctxt "#32053"
+msgid "TMDbHelper automatically performs regular cache maintenance. You should only delete the cache when instructed to troubleshoot issues. TMDbHelper relies on having cached items to perform well. Unnecessarily deleting the cache on a regular basis will degrade performance and places excessive strain on the free services providing this data."
+msgstr "TMDbHelper effectue automatiquement une maintenance régulière du cache. Vous ne devez supprimer le cache que lorsque vous y êtes invité pour résoudre des problèmes. TMDbHelper dépend des éléments mis en cache pour fonctionner correctement. La suppression inutile et régulière du cache dégradera les performances et exercera une pression excessive sur les services gratuits qui fournissent ces données."
 
 msgctxt "#30029"
 msgid "Hebrew (Israel)"
@@ -316,10 +366,45 @@ msgctxt "#32061"
 msgid "Play with"
 msgstr "Lire avec"
 
+#: /resources/tmdbhelper/lib/items/directories/lists_base.py
+msgctxt "#32062"
+msgid "Networks"
+msgstr "Diffuseurs"
+
+#: /resources/tmdbhelper/lib/api/trakt/sorting.py
+msgctxt "#32063"
+msgid "Added"
+msgstr "Ajouté"
+
+#: /resources/tmdbhelper/lib/items/directories/lists_base.py
+msgctxt "#32064"
+msgid "Related"
+msgstr "Associés"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_related.py
+msgctxt "#32065"
+msgid "Watchers"
+msgstr "Spectateurs"
+
 #: /resources/lib/context.py 
 msgctxt "#32066"
 msgid "Debug logging"
 msgstr "Journal des logs"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32067"
+msgid "Budget"
+msgstr "Budget"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32068"
+msgid "Revenue"
+msgstr "Recettes"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32069"
+msgid "Last Air Date"
+msgstr "Dernière date de diffusion"
 
 #: /resources/settings.xml
 msgctxt "#32070"
@@ -330,6 +415,11 @@ msgstr "Homme"
 msgctxt "#32071"
 msgid "Female"
 msgstr "Femme"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32072"
+msgid "Score"
+msgstr "Score"
 
 #: /resources/settings.xml
 msgctxt "#32073"
@@ -361,6 +451,11 @@ msgctxt "#32078"
 msgid "Still to Watch"
 msgstr "À visionner"
 
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32079"
+msgid "User"
+msgstr "Utilisateur"
+
 #: /resources/settings.xml
 msgctxt "#32080"
 msgid "Other"
@@ -370,6 +465,16 @@ msgstr "Autre"
 msgctxt "#32081"
 msgid "Next page item"
 msgstr "Élément "Page suivante""
+
+#: /resources/settings.xml
+msgctxt "#32082"
+msgid "Page multiplier (Other basic lists)"
+msgstr "Multiplicateur de pages (Autres listes de base)"
+
+#: /resources/settings.xml
+msgctxt "#32083"
+msgid "Page multiplier (Database sync lists)"
+msgstr "Multiplicateur de pages (listes de synchronisation de base de données)"
 
 #: /resources/settings.xml
 msgctxt "#32084"
@@ -385,6 +490,11 @@ msgstr "Aplatir les saisons"
 msgctxt "#32086"
 msgid "Auto-update library and add new/missing episodes"
 msgstr "Mise à jour automatique de la médiathèque et ajout des épisodes nouveaux/manquants"
+
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32087"
+msgid "Search for TMDb ID or input manually?"
+msgstr "Rechercher l'ID TMDb ou le saisir manuellement ?"
 
 #: /resources/settings.xml
 msgctxt "#32088"
@@ -416,6 +526,11 @@ msgctxt "#32093"
 msgid "Next episodes sort method"
 msgstr "Méthode de tri des épisodes suivants"
 
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32094"
+msgid "Select TMDb type"
+msgstr "Sélectionner le type TMDb"
+
 #: /resources/settings.xml
 msgctxt "#32095"
 msgid "Enter the code"
@@ -430,6 +545,11 @@ msgstr "Se rendre sur [B]https://trakt.tv/activate[/B]"
 msgctxt "#32097"
 msgid "Trakt Authentication"
 msgstr "Authentification Trakt"
+
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32098"
+msgid "Updated"
+msgstr "Mis à jour"
 
 #: /resources/lib/container.py
 msgctxt "#32099"
@@ -2242,7 +2362,7 @@ msgstr "Supprimer de la liste MDbList"
 #: /resources/settings.xml
 msgctxt "#32520"
 msgid "TMDb"
-msgstr ""
+msgstr "TMDb"
 
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32521"
@@ -2393,7 +2513,7 @@ msgstr "Polonais (Pologne)"
 
 msgctxt "#30048"
 msgid "Portuguese (Brazil)"
-msgstr "Portugais (Brézil)"
+msgstr "Portugais (Brésil)"
 
 msgctxt "#30049"
 msgid "Portuguese (Portugal)"
