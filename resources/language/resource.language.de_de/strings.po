@@ -2725,7 +2725,7 @@ msgstr "API-Schlüssel"
 #: /resources/settings.xml
 msgctxt "#32019"
 msgid "Fanart.tv client key"
-msgstr "API-Schlüssel für für Fanart.tv"
+msgstr "API-Schlüssel für Fanart.tv"
 
 #: /resources/settings.xml
 msgctxt "#32021"
