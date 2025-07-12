@@ -17,7 +17,7 @@ from tmdbhelper.lib.window.constants import (
     PREFIX_CURRENT,
     SV_ROUTES
 )
-# from tmdbhelper.lib.addon.logger import kodi_log
+from tmdbhelper.lib.addon.logger import kodi_log
 
 
 class PathConstructor:
@@ -120,6 +120,7 @@ class WindowManager(EventLoop):
         window.get_property(PREFIX_POSITION, clear_property=True)
         window.get_property(f'{PREFIX_PATH}0', clear_property=True)
         window.get_property(f'{PREFIX_PATH}1', clear_property=True)
+        kodi_log(f'Window Manager [ACTION] reset_properties', 2)
 
     def set_properties(self, position=1, path=None):
         self.position = position
@@ -127,12 +128,15 @@ class WindowManager(EventLoop):
         window.get_property(PREFIX_CURRENT, set_property=path)
         window.get_property(f'{PREFIX_PATH}{position}', set_property=path)
         window.get_property(PREFIX_POSITION, set_property=position)
+        kodi_log(f'Window Manager [ACTION] set_properties {position}\n{path}', 2)
 
     def add_origin(self):
-        if self.origin_path:
-            self.position += 1
-            self.set_properties(self.position, self.origin_path)
-            self.params['return'] = True
+        if not self.origin_path:
+            return
+        self.position += 1
+        self.set_properties(self.position, self.origin_path)
+        self.params['return'] = True
+        kodi_log(f'Window Manager [ACTION] add_origin {self.position}\n{self.origin_path}', 2)
 
     @cached_property
     def origin_tmdb_type(self):
@@ -164,13 +168,16 @@ class WindowManager(EventLoop):
         return bool(window.get_property(PREFIX_INSTANCE))
 
     def call_auto(self):
+        kodi_log(f'Window Manager [ACTION] call_auto', 2)
         # Already instance running and has window open so let's exit
         if self.is_running:
+            kodi_log(f'Window Manager [ACTION] call_auto running...', 2)
             return
         # Reset properties back to init
         self.reset_properties()
         # Add a return origin if available
         self.add_origin()
+        kodi_log(f'Window Manager [ACTION] call_auto event_loop', 2)
         # Start up our service to monitor the windows
         return self.event_loop()
 
@@ -184,9 +191,13 @@ class WindowManager(EventLoop):
         return self.add_path_to_history(PathConstructor(dbid=dbid, tmdb_type=tmdb_type))
 
     def add_path_to_history(self, path_constructor):
-        if path_constructor and path_constructor.is_valid:
-            window.wait_for_property(PREFIX_ADDPATH, path_constructor.path, True, poll=0.3)
-            self.call_auto()
+        kodi_log(f'Window Manager [ACTION] add_path_to_history', 2)
+        if not path_constructor or not path_constructor.is_valid:
+            return
+        kodi_log(f'Window Manager [ACTION] add_path_to_history adding {path_constructor.path}', 2)
+        window.wait_for_property(PREFIX_ADDPATH, path_constructor.path, True, poll=0.3)
+        kodi_log(f'Window Manager [ACTION] add_path_to_history added!', 2)
+        self.call_auto()
 
     def make_query(self, query, tmdb_type, separator=' / '):
         if separator and separator in query:
@@ -203,12 +214,14 @@ class WindowManager(EventLoop):
         return f'plugin://plugin.video.themoviedb.helper/?info=details&tmdb_type={tmdb_type}&tmdb_id={tmdb_id}'
 
     def add_query(self, query, tmdb_type, separator=' / '):
+        kodi_log(f'Window Manager [ACTION] add_query {query} {tmdb_type}', 2)
         url = self.make_query(query, tmdb_type, separator)
         if not url:
             return
         return self.add_path(url)
 
     def close_dialog(self):
+        kodi_log(f'Window Manager [ACTION] close_dialog', 2)
         window.wait_for_property(PREFIX_COMMAND, 'exit', True, poll=0.3)
         self._call_exit()
         self._on_exit()
@@ -229,14 +242,19 @@ class WindowManager(EventLoop):
 
     def call_window(self):
         if self.params.get('executebuiltin'):
+            kodi_log(f'Window Manager [ACTION] call_window executebuiltin\n{self.params}', 2)
             return executebuiltin(f'{self.params["executebuiltin"]}')
         if self.params.get('playmedia'):
+            kodi_log(f'Window Manager [ACTION] call_window playmedia\n{self.params}', 2)
             return executebuiltin(self.get_playmedia_builtin())
         if self.params.get('call_id'):
+            kodi_log(f'Window Manager [ACTION] call_window call_id\n{self.params}', 2)
             return executebuiltin(f'ActivateWindow({self.params["call_id"]})')
         if self.params.get('call_path'):
+            kodi_log(f'Window Manager [ACTION] call_window call_path\n{self.params}', 2)
             return executebuiltin(f'ActivateWindow(videos, {self.params["call_path"]}, return)')
         if self.params.get('call_update'):
+            kodi_log(f'Window Manager [ACTION] call_window call_update\n{self.params}', 2)
             return executebuiltin(f'Container.Update({self.params["call_update"]})')
 
     def router(self):
