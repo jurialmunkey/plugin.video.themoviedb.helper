@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2024-10-31 08:19+0000\n"
+"PO-Revision-Date: 2025-07-12 07:19+0000\n"
 "Last-Translator: Havokdan <havokdan@yahoo.com.br>\n"
 "Language-Team: Português do Brasil\n"
 "MIME-Version: 1.0\n"
@@ -431,6 +431,11 @@ msgctxt "#32070"
 msgid "Male"
 msgstr "Masculino"
 
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32087"
+msgid "Search for TMDb ID or input manually?"
+msgstr "Procurar ID TMDb ou inserir manualmente?"
+
 #: /resources/lib/tmdb.py
 msgctxt "#32071"
 msgid "Female"
@@ -461,6 +466,11 @@ msgctxt "#32077"
 msgid "Ignore folder creation checks"
 msgstr "Ignorar marcação de criação de pasta"
 
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32094"
+msgid "Select TMDb type"
+msgstr "Selecionar o tipo de TMDb"
+
 #: /resources/lib/container/basedir.py
 msgctxt "#32078"
 msgid "Still to Watch"
@@ -475,6 +485,11 @@ msgstr "Outro"
 msgctxt "#32081"
 msgid "Next page item"
 msgstr "Item da próxima página"
+
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32098"
+msgid "Updated"
+msgstr "Atualizado"
 
 #: /resources/settings.xml
 msgctxt "#32084"
@@ -506,6 +521,15 @@ msgctxt "#32090"
 msgid "Content"
 msgstr "Conteúdo"
 
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32105"
+msgid "leave blank to delete"
+msgstr "deixe em branco para excluir"
+
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32106"
+msgid "Enter {} URL"
+msgstr "Digitar URL {}"
 #: /resources/settings.xml
 msgctxt "#32091"
 msgid "Special season folders"
@@ -546,10 +570,25 @@ msgctxt "#32100"
 msgid "Do you wish to clear the existing items or add more?"
 msgstr "Deseja limpar os itens existentes ou adicionar mais?"
 
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32115"
+msgid "Reset {} artwork to default?"
+msgstr ""Redefinir arte de {} para padrão?"
+
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32116"
+msgid "Remove user artwork override and reset artwork to default artwork selection as defined in the settings."
+msgstr "Remover a substituição da arte do usuário e restaura arte para a seleção de arte padrão, conforme definido nas configurações."
+
 #: /resources/lib/container.py
 msgctxt "#32101"
 msgid "Clear Items"
 msgstr "Limpar itens"
+
+#: /resources/tmdbhelper/lib/items/context.py
+msgctxt "#32118"
+msgid "Modify artwork"
+msgstr "Modificar arte"
 
 #: /resources/lib/container.py
 msgctxt "#32102"
@@ -580,6 +619,11 @@ msgctxt "#32108"
 msgid "Choose matching method for parameters with multiple values."
 msgstr "Escolha o método de correspondência para parâmetros com vários valores."
 
+#: /resources/settings.xml
+msgctxt "#32124"
+msgid "RatingPosterDB API"
+msgstr "API do RatingPosterDB"
+
 #: /resources/lib/container.py
 msgctxt "#32109"
 msgid "Match ANY Value"
@@ -589,6 +633,21 @@ msgstr "Corresponder a QUAISQUER valor"
 msgctxt "#32110"
 msgid "Match ALL Values"
 msgstr "Corresponder a TODOS os valores"
+
+#: /resources/settings.xml
+msgctxt "#32127"
+msgid "RatingPosterDB API key"
+msgstr "Chave API do RatingPosterDB"
+
+#: /resources/tmdbhelper/lib/items/database/baseview_factories/concrete_classes/ftv_fanart.py
+msgctxt "#32128"
+msgid "Likes"
+msgstr "Curtidas"
+
+#: /resources/settings.xml
+msgctxt "#32129"
+msgid "Override player monitor clearlogo with artwork from TMDbHelper"
+msgstr "Substituir o logo limpo do monitor do player pela arte do TMDbHelper"
 
 #: /resources/lib/container.py
 msgctxt "#32111"
@@ -609,6 +668,36 @@ msgstr "Também aceita X dias relativos a partir de hoje no formato T-X ou T+X (
 msgctxt "#32114"
 msgid "Enter"
 msgstr "Enter"
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32134"
+msgid "items"
+msgstr "itens"
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32135"
+msgid "Private"
+msgstr "Privada"
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32136"
+msgid "Do you want to make this list a public or private list?"
+msgstr "Deseja fazer desta lista uma lista pública ou privada?"
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32137"
+msgid "Public or private list?"
+msgstr "Lista pública ou privada?"
+
+#: /resources/settings.xml
+msgctxt "#32138"
+msgid "Scrobbling"
+msgstr "Scrobbling"
+
+#: /resources/settings.xml
+msgctxt "#32139"
+msgid "Rate items on TMDb after watching"
+msgstr "Avaliar os itens no TMDB depois de assistir"
 
 #: /resources/lib/container.py
 msgctxt "#32117"
