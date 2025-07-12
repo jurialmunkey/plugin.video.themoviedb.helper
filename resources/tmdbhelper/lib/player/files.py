@@ -11,7 +11,7 @@ from tmdbhelper.lib.addon.consts import (
 
 class PlayerFileMetaData:
 
-    players_required_ids = (
+    lookup_required_ids = (
         '{imdb}',
         '{tvdb}',
         '{trakt}',
@@ -56,7 +56,7 @@ class PlayerFileMetaData:
     def require_id(self):
         return any((
             bool(i in self.data)
-            for i in self.players_required_ids
+            for i in self.lookup_required_ids
         ))
 
     @cached_property

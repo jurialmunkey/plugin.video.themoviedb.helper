@@ -3,9 +3,8 @@ from xbmcgui import Dialog
 from xbmcaddon import Addon as KodiAddon
 from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, format_folderpath, get_localized, get_setting, executebuiltin
-from jurialmunkey.parser import try_int, try_float, boolean
+from jurialmunkey.parser import try_int, boolean
 from tmdbhelper.lib.addon.consts import PLAYERS_PRIORITY, PLAYERS_CHOSEN_DEFAULTS_FILENAME
-from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.api.kodi.rpc import get_directory, KodiLibrary
 from tmdbhelper.lib.player.inputter import KeyboardInputter
 from tmdbhelper.lib.addon.logger import kodi_log
