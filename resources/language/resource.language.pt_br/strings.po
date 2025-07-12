@@ -2480,8 +2480,8 @@ msgstr "Adicionar a {}"
 
 #: /resources/settings.xml
 msgctxt "#32529"
-msgid "Scrobble items played via TMDbHelper"
-msgstr "Itens scrobble reproduzidos via TMDbHelper"
+msgid "Scrobble items on Trakt while watching"
+msgstr "Scrobble itens no Trakt enquanto assiste"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32530"
