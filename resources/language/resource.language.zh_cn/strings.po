@@ -625,7 +625,7 @@ msgstr "为具有多个值的参数选择匹配方法。"
 #: /resources/settings.xml
 msgctxt "#32124"
 msgid "RatingPosterDB API"
-msgstr "评分海报 API"
+msgstr "RatingPosterDB API"
 
 #: /resources/lib/container.py
 msgctxt "#32109"
@@ -640,7 +640,7 @@ msgstr "匹配所有值"
 #: /resources/settings.xml
 msgctxt "#32127"
 msgid "RatingPosterDB API key"
-msgstr "评分海报 API 密钥"
+msgstr "RatingPoster API 密钥"
 
 #: /resources/tmdbhelper/lib/items/database/baseview_factories/concrete_classes/ftv_fanart.py
 msgctxt "#32128"
