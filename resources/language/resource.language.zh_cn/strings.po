@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-07-07 15:47+0800\n"
+"PO-Revision-Date: 2025-07-12 15:47+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -236,7 +236,7 @@ msgstr "移除电视剧"
 #: /resources/tmdbhelper/lib/script/sync/basic.py
 msgctxt "#32047"
 msgid "Undrop TV show"
-msgstr "恢复关注电视剧"
+msgstr "恢复移除电视剧"
 
 #: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
 msgctxt "#32048"
@@ -546,7 +546,7 @@ msgstr "小部件"
 #: /resources/settings.xml
 msgctxt "#32093"
 msgid "Next episodes sort method"
-msgstr "下一集排序方式"
+msgstr "下一集 排序方式"
 
 #: /resources/settings.xml
 msgctxt "#32095"
@@ -819,7 +819,7 @@ msgstr "正在更新"
 #: /resources/lib/libraryupdate.py
 msgctxt "#32168"
 msgid "[B]{}[/B] by user [B]{}[/B]"
-msgstr "[B]{}[/B] by user [B]{}[/B]"
+msgstr "[B]{}[/B] 通过用户 [B]{}[/B]"
 
 #: /resources/settings.xml
 msgctxt "#32169"
@@ -1269,7 +1269,7 @@ msgstr "无类型"
 #: /resources/lib/userdiscover.py
 msgctxt "#32265"
 msgid "With Companies"
-msgstr "与公司"
+msgstr "含公司"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32266"
