@@ -2,13 +2,14 @@ from xbmcgui import Dialog, INPUT_NUMERIC
 from xbmcaddon import Addon as KodiAddon
 from tmdbhelper.lib.addon.plugin import ADDONPATH, get_localized
 from jurialmunkey.parser import try_int
-from tmdbhelper.lib.addon.dialog import BusyDialog
+from tmdbhelper.lib.addon.dialog import BusyDialog, busy_decorator
 from tmdbhelper.lib.addon.consts import PLAYERS_BASEDIR_SAVE, PLAYERS_PRIORITY
 from tmdbhelper.lib.files.futils import dumps_to_file, delete_file
 from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.player.create import CreatePlayer
-from tmdbhelper.lib.player.putils import get_players_from_file
+from tmdbhelper.lib.player.files import PlayerFiles
 from tmdbhelper.lib.player.editsteps import _EditPlayer
+from tmdbhelper.lib.files.ftools import cached_property
 from json import dumps
 from copy import deepcopy
 
@@ -173,12 +174,37 @@ class _ConfigurePlayer():
 
 
 class ConfigurePlayers():
-    def __init__(self):
-        with BusyDialog():
-            self.get_players()
 
-    @staticmethod
-    def _get_dialog_players(players):
+    @cached_property
+    def players(self):
+        return self.get_players()
+
+    def get_players(self):
+        players = {}
+        players.update(self.players_other)
+        players.update(self.players_files)
+        return players
+
+    @cached_property
+    def players_other(self):
+        return {
+            'create_player': {
+                'name': 'Create new player',
+                'icon': '-',
+                'priority': 1
+            }
+        }
+
+    @cached_property
+    def players_files(self):
+        return PlayerFiles().dictionary
+
+    @cached_property
+    def dialog_players(self):
+        return self.get_dialog_players()
+
+    @busy_decorator
+    def get_dialog_players(self):
         return [
             ListItem(
                 label=f"{'[DISABLED] ' if v.get('disabled', 'false').lower() == 'true' else ''}{v.get('name')}",
@@ -187,13 +213,8 @@ class ConfigurePlayers():
                     'thumb': v.get('icon', '').format(ADDONPATH)
                     or KodiAddon(v.get('plugin', '')).getAddonInfo('icon')}).get_listitem()
             for k, v in sorted(
-                players.items(),
+                self.players.items(),
                 key=lambda i: try_int(i[1].get('priority')) or PLAYERS_PRIORITY)]
-
-    def get_players(self):
-        self.players = {'create_player': {'name': 'Create new player', 'icon': '-', 'priority': 1}}
-        self.players.update(get_players_from_file())
-        self.dialog_players = self._get_dialog_players(self.players)
 
     def select_player(self, header=get_localized(32328)):
         x = Dialog().select(header, self.dialog_players, useDetails=True)
@@ -218,7 +239,7 @@ class ConfigurePlayers():
             return
         with BusyDialog():
             self.players[filename] = player  # Update our players dictionary
-            self.dialog_players = self._get_dialog_players(self.players)  # Update our dialog list
+            self.dialog_players = self.get_dialog_players()  # Update our dialog list
             dumps_to_file(player, PLAYERS_BASEDIR_SAVE, filename, indent=4, join_addon_data=False)  # Write out file
         return filename
 
