@@ -701,6 +701,16 @@ msgctxt "#32139"
 msgid "Rate items on TMDb after watching"
 msgstr "Einträge auf TMDb nach dem Ansehen bewerten"
 
+#: /resources/tmdbhelper/lib/player/configure.py
+msgctxt "#32140"
+msgid "Create new player"
+msgstr "Neuen Player erstellen"
+
+#: /resources/tmdbhelper/lib/player/configure.py
+msgctxt "#32141"
+msgid "Delete fallback"
+msgstr "Fallback entfernen"
+
 #: /resources/lib/container.py
 msgctxt "#32117"
 msgid "Keyword"
