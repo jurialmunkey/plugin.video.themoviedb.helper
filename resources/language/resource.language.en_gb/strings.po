@@ -698,6 +698,16 @@ msgctxt "#32139"
 msgid "Rate items on TMDb after watching"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/player/configure.py
+msgctxt "#32140"
+msgid "Create new player"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/player/configure.py
+msgctxt "#32141"
+msgid "Delete fallback"
+msgstr ""
+
 #: /resources/lib/container.py
 msgctxt "#32117"
 msgid "Keyword"
