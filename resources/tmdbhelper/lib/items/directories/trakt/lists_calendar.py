@@ -1,7 +1,7 @@
 from jurialmunkey.parser import boolean, try_int
 from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.files.ftools import cached_property
-from tmdbhelper.lib.addon.tmdate import get_datetime_today, get_timedelta, get_calendar_name
+from tmdbhelper.lib.addon.tmdate import get_datetime_today, get_timedelta, get_calendar_name, datetime_in_range
 from tmdbhelper.lib.items.directories.trakt.lists_standard import ListTraktStandardProperties
 from tmdbhelper.lib.items.directories.trakt.lists_filtered import ListTraktFiltered
 from tmdbhelper.lib.items.directories.trakt.mapper_calendar import (
@@ -123,13 +123,22 @@ class ListTraktCalendarProperties(ListTraktStandardProperties):
             return
         return UncachedMDbListLocalData(self.api_response_json, self.page, self.limit).data
 
+    def get_mapped_item_air_date_check(self, item_mapper):
+        if not item_mapper.air_date:
+            return
+        if not datetime_in_range(item_mapper.air_date, days=self.trakt_days, start_date=self.trakt_date):
+            return
+        return item_mapper.item
+
     def get_mapped_item(self, item, add_infoproperties=None):
-        return FactoryCalendarEpisodeItemMapper(item, add_infoproperties).item
+        item_mapper = FactoryCalendarEpisodeItemMapper(item, add_infoproperties)
+        return self.get_mapped_item_air_date_check(item_mapper)
 
 
 class ListTraktCalendarMovieProperties(ListTraktCalendarProperties):
     def get_mapped_item(self, item, add_infoproperties=None):
-        return FactoryCalendarMovieItemMapper(item, add_infoproperties).item
+        item_mapper = FactoryCalendarMovieItemMapper(item, add_infoproperties)
+        return self.get_mapped_item_air_date_check(item_mapper)
 
 
 class ListLocalCalendarProperties(ListTraktCalendarProperties):
