@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-07-12 15:47+0800\n"
+"PO-Revision-Date: 2025-07-15 11:58+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -701,6 +701,16 @@ msgstr "滚动"
 msgctxt "#32139"
 msgid "Rate items on TMDb after watching"
 msgstr "观看后为 TMDb 上的项目评分"
+
+#: /resources/tmdbhelper/lib/player/configure.py
+msgctxt "#32140"
+msgid "Create new player"
+msgstr "创建新播放器"
+
+#: /resources/tmdbhelper/lib/player/configure.py
+msgctxt "#32141"
+msgid "Delete fallback"
+msgstr "删除备用项"
 
 #: /resources/lib/container.py
 msgctxt "#32117"
@@ -1625,7 +1635,7 @@ msgstr ""
 #: /resources/lib/player/configure.py
 msgctxt "#32338"
 msgid "Close without Saving"
-msgstr "推出不保存"
+msgstr "关闭而不保存"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32339"
@@ -2484,8 +2494,8 @@ msgstr "添加到 {}"
 
 #: /resources/settings.xml
 msgctxt "#32529"
-msgid "Scrobble items played via TMDbHelper"
-msgstr "通过 TMDbHelper 播放的滚动项目"
+msgid "Scrobble items on Trakt while watching"
+msgstr "观看时在 Trakt 上记录播放进度"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32530"
