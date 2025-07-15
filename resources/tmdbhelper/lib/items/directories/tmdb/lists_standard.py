@@ -28,14 +28,14 @@ class UncachedItemsPage:
 
     @cached_property
     def items(self):
-        return [
+        return [j for j in [
             self.outer_class.get_mapped_item(i, add_infoproperties=(
                 ('total_pages', self.outer_class.total_pages),
                 ('total_results', self.outer_class.total_items),
                 ('rank', x),
             ))
             for x, i in enumerate(self.results, 1) if i
-        ]
+        ] if j]
 
 
 class ListStandardProperties(ListProperties):

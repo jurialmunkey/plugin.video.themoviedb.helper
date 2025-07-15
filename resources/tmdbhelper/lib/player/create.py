@@ -8,16 +8,15 @@ from tmdbhelper.lib.addon.dialog import BusyDialog
 
 
 class CreatePlayer():
-    def __init__(self):
-        self.plugin_name = ''  # Name of player file $STR_PLUGINNAME
-        self.plugin_id = ''  # plugin.video.xyz #STR_PLUGINID
-        self.search_url_movie = ''  # plugin://plugin.video.xyz?info=search $STR_PLUGINMOVIESEARCHURL
-        self.search_url_tv = ''  # plugin://plugin.video.xyz?info=search $STR_PLUGINTVSEARCHURL
-        self.search_url_movie_query = '{title_url}'
-        self.search_url_tv_query = '{showname_url}'
-        self.template = {}  # The template to use for building our plugin
-        self.template_filename = ''
-        self.filename = ''  # The filename to save the player as
+    plugin_name = ''  # Name of player file $STR_PLUGINNAME
+    plugin_id = ''  # plugin.video.xyz #STR_PLUGINID
+    search_url_movie = ''  # plugin://plugin.video.xyz?info=search $STR_PLUGINMOVIESEARCHURL
+    search_url_tv = ''  # plugin://plugin.video.xyz?info=search $STR_PLUGINTVSEARCHURL
+    search_url_movie_query = '{title_url}'
+    search_url_tv_query = '{showname_url}'
+    template = {}  # The template to use for building our plugin
+    template_filename = ''
+    filename = ''  # The filename to save the player as
 
     def reconfigure_urls(self):
         def _reconfigure_url(url_name, url):

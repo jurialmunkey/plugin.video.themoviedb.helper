@@ -6,12 +6,13 @@ from tmdbhelper.lib.addon.consts import (
     PLAYERS_BASEDIR_BUNDLED,
     PLAYERS_BASEDIR_USER,
     PLAYERS_BASEDIR_SAVE,
+    PLAYERS_PRIORITY
 )
 
 
 class PlayerFileMetaData:
 
-    lookup_required_ids = (
+    required_ids = (
         '{imdb}',
         '{tvdb}',
         '{trakt}',
@@ -46,6 +47,10 @@ class PlayerFileMetaData:
         return plugins
 
     @cached_property
+    def plugin(self):
+        return self.plugins[0]
+
+    @cached_property
     def is_enabled(self):
         return all((
             get_condvisibility(f'System.AddonIsEnabled({i})')
@@ -53,19 +58,28 @@ class PlayerFileMetaData:
         ))
 
     @cached_property
-    def require_id(self):
+    def requires_ids(self):
         return any((
             bool(i in self.data)
-            for i in self.lookup_required_ids
+            for i in self.required_ids
         ))
+
+    @cached_property
+    def priority(self):
+        try:
+            priority = int(self.meta['priority'])
+        except (KeyError, TypeError):
+            priority = None
+        return priority or PLAYERS_PRIORITY
 
     @cached_property
     def metadata(self):
         metadata = self.meta.copy()
         metadata.update({
             k: v for k, v in (
-                ('requires_ids', self.require_id),
-                ('plugin', self.plugins[0]),
+                ('requires_ids', self.requires_ids),
+                ('plugin', self.plugin),
+                ('priority', self.priority),
             ) if v
         })
         return metadata
