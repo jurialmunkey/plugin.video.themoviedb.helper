@@ -14,6 +14,9 @@ class UncachedItemsPage:
 
     @cached_property
     def results(self):
+        return self.get_results()
+
+    def get_results(self):
         try:
             results = self.response[self.outer_class.results_key]
         except (TypeError, KeyError):
@@ -28,6 +31,9 @@ class UncachedItemsPage:
 
     @cached_property
     def items(self):
+        return self.get_items()
+
+    def get_items(self):
         return [j for j in [
             self.outer_class.get_mapped_item(i, add_infoproperties=(
                 ('total_pages', self.outer_class.total_pages),
