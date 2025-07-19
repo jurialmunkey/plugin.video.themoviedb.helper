@@ -1,7 +1,7 @@
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.basemedia import MediaList
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.seasons import SeasonMediaList
 from tmdbhelper.lib.addon.consts import DATALEVEL_MAX
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 
 
 class FlatSeasonMediaListMixin:

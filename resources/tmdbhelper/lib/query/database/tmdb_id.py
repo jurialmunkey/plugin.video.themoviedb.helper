@@ -1,6 +1,6 @@
 import operator
 from tmdbhelper.lib.files.dbdata import DatabaseStatements
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 
 
 class TableID:

@@ -1,5 +1,5 @@
 from tmdbhelper.lib.api.trakt.sync.property_mixins import SyncDataParentProperties
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp, convert_timestamp, is_unaired_timestamp
 from tmdbhelper.lib.api.trakt.sync.activity import SyncLastActivities
 from tmdbhelper.lib.files.locker import mutexlock

@@ -1,5 +1,5 @@
 from tmdbhelper.lib.items.directories.trakt.mapper_basic import ItemMapper
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 
 
 class WatchersItemMapper(ItemMapper):

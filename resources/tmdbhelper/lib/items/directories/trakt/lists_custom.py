@@ -1,6 +1,6 @@
 from jurialmunkey.parser import boolean
 from tmdbhelper.lib.addon.plugin import get_setting
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.items.directories.trakt.lists_standard import (
     ListTraktStandard,
     ListTraktStandardProperties,

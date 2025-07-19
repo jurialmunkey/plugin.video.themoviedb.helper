@@ -4,7 +4,7 @@ from tmdbhelper.lib.items.directories.mdblist.lists_local import (
     UncachedMDbListLocalData,
 )
 from tmdbhelper.lib.addon.plugin import get_setting
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 
 
 class UncachedMDbListCustomData(UncachedMDbListLocalData):

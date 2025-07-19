@@ -1,5 +1,5 @@
 from tmdbhelper.lib.items.directories.base.basedir_item import BaseDirItem
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 
 
 class BaseDirItemCalendarLastFornight(BaseDirItem):

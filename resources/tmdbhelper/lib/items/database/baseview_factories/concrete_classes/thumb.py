@@ -1,5 +1,5 @@
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.fanart import FanartMediaList
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 
 
 class ThumbMediaList(FanartMediaList):

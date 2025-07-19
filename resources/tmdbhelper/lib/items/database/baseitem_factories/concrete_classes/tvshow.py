@@ -1,5 +1,5 @@
 from tmdbhelper.lib.items.database.baseitem_factories.concrete_classes.basemedia import MediaItem
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 
 
 class Tvshow(MediaItem):

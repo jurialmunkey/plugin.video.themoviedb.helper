@@ -6,7 +6,7 @@ from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.player.create import CreatePlayer
 from tmdbhelper.lib.player.files import PlayerFiles
 from tmdbhelper.lib.player.editsteps import _EditPlayer
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from collections import namedtuple
 
 

@@ -1,6 +1,6 @@
 from jurialmunkey.parser import boolean, try_int
 from tmdbhelper.lib.addon.plugin import get_localized
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.tmdate import get_datetime_today, get_timedelta, get_calendar_name, datetime_in_range
 from tmdbhelper.lib.items.directories.trakt.lists_standard import ListTraktStandardProperties
 from tmdbhelper.lib.items.directories.trakt.lists_filtered import ListTraktFiltered

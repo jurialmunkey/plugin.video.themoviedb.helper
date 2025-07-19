@@ -1,4 +1,4 @@
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.items.directories.trakt.lists_standard import (
     ListTraktStandardProperties,
     ListTraktStandard,

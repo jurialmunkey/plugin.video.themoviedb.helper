@@ -1,6 +1,6 @@
 from tmdbhelper.lib.items.database.baseitem_factories.concrete_classes.season import Season
 from tmdbhelper.lib.items.database.baseitem_factories.concrete_classes.tvshow import Tvshow
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.files.locker import mutexlock
 
 

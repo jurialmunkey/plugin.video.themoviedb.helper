@@ -4,7 +4,7 @@ from tmdbhelper.lib.items.directories.mdblist.lists_local import (
     UncachedMDbListLocalData,
 )
 from tmdbhelper.lib.items.directories.mdblist.mapper_lists import ListsMDbListItemMapper
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
 
 

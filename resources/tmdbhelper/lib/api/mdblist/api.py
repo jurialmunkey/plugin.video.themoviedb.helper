@@ -1,6 +1,6 @@
 from tmdbhelper.lib.api.request import RequestAPI
 from tmdbhelper.lib.api.api_keys.mdblist import API_KEY
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 
 
 class MDbListRatingMappingObject:

@@ -1,4 +1,4 @@
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 # from tmdbhelper.lib.player.actions.keyboard import PlayerActionPluginKeyboard
 # from tmdbhelper.lib.player.actions.validation import PlayerActionValidation
 

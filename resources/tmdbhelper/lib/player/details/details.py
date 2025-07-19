@@ -1,5 +1,5 @@
 from jurialmunkey.parser import try_int, del_empty_keys
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.api.tmdb.api import TMDb
 
 

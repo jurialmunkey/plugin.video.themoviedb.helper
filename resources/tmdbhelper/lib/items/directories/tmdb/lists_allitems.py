@@ -1,5 +1,5 @@
 from tmdbhelper.lib.items.container import ContainerDirectory
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_setting, get_localized, ADDONPATH
 from tmdbhelper.lib.api.tmdb.images import TMDbImagePath
 import xbmcvfs

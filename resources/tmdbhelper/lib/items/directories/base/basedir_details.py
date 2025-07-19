@@ -1,6 +1,6 @@
 from tmdbhelper.lib.addon.plugin import get_flatseasons_info_param
 from tmdbhelper.lib.items.directories.base.basedir_item import BaseDirItem
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 
 
 class BaseDirItemDetailsPlay(BaseDirItem):

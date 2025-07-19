@@ -1,4 +1,4 @@
-# from tmdbhelper.lib.files.ftools import cached_property
+# from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import convert_type
 from jurialmunkey.modimp import importmodule
 from jurialmunkey.parser import try_int

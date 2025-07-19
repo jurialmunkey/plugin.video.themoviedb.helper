@@ -1,5 +1,5 @@
 from jurialmunkey.parser import boolean
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.consts import NO_UNAIRED_LABEL
 from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin, get_localized
 from tmdbhelper.lib.api.contains import CommonContainerAPIs

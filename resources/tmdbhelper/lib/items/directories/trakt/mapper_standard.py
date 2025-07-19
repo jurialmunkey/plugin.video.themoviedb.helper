@@ -1,5 +1,5 @@
 from tmdbhelper.lib.items.directories.trakt.mapper_basic import ItemMapper, NullItemMapper
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 
 
 class MediaItemMapper(ItemMapper):

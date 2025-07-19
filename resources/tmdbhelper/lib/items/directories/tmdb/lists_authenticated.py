@@ -1,6 +1,6 @@
 from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties
 from tmdbhelper.lib.api.tmdb.users import TMDbUser
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 
 
 class ListAuthenticatedProperties(ListStandardProperties):

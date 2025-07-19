@@ -1,5 +1,5 @@
 from tmdbhelper.lib.api.api_keys.tmdb import USER_TOKEN, API_READ_ACCESS_TOKEN
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.logger import kodi_log
 
 

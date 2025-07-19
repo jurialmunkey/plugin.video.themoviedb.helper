@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from collections import namedtuple
 from tmdbhelper.lib.addon.thread import ParallelThread
 from tmdbhelper.lib.query.database.database import FindQueriesDatabase

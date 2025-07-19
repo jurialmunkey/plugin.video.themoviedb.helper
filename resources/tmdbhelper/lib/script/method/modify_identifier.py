@@ -3,7 +3,7 @@
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 import xbmcgui
 from tmdbhelper.lib.addon.plugin import get_localized
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.monitor.listitemtools import ListItemMonitorFunctions
 from tmdbhelper.lib.query.database.database import FindQueriesDatabase
 from tmdbhelper.lib.script.method.kodi_utils import service_refresh

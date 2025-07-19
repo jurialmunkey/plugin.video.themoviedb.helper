@@ -2,7 +2,7 @@
 # Author: jurialmunkey
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 from tmdbhelper.lib.script.method.decorators import is_in_kwargs, get_tmdb_id
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 
 
 class _RelatedLists:

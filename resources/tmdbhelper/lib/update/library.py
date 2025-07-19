@@ -1,6 +1,6 @@
 import xbmcvfs
 import tmdbhelper.lib.api.kodi.rpc as rpc
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from xbmcgui import DialogProgressBG
 from tmdbhelper.lib.addon.plugin import get_setting, get_localized, set_setting
 from jurialmunkey.parser import try_int
