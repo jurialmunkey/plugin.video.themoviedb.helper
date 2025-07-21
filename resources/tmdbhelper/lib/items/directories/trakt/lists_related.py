@@ -1,4 +1,4 @@
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.items.directories.trakt.mapper_comments import CommentsItemMapper
 from tmdbhelper.lib.items.directories.trakt.mapper_watchers import WatchersItemMapper
 from tmdbhelper.lib.items.directories.trakt.lists_standard import (

@@ -3,7 +3,7 @@ from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, L
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, convert_type, get_localized, get_setting
 from tmdbhelper.lib.files.hcache import set_search_history, get_search_history
 from tmdbhelper.lib.items.container import ContainerDirectory
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from jurialmunkey.parser import merge_two_dicts, try_int
 from urllib.parse import urlencode
 

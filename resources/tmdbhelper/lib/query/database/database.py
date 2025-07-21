@@ -1,6 +1,6 @@
 from tmdbhelper.lib.files.dbdata import Database
 from tmdbhelper.lib.files.dbfunc import DatabaseAccess
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.tmdate import set_timestamp
 from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY
 from tmdbhelper.lib.query.database.genres import FindQueriesDatabaseGenres

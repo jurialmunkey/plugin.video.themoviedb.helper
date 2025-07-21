@@ -1,5 +1,5 @@
 from tmdbhelper.lib.script.sync.tmdb.item import ItemSync
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.dialog import busy_decorator
 from tmdbhelper.lib.addon.plugin import get_localized
 

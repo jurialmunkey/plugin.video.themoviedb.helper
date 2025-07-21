@@ -2,7 +2,7 @@ from tmdbhelper.lib.addon.plugin import get_language, get_setting
 from tmdbhelper.lib.api.request import NoCacheRequestAPI
 from tmdbhelper.lib.api.tmdb.mapping import ItemMapper
 from tmdbhelper.lib.api.api_keys.tmdb import API_KEY
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 
 
 API_URL = 'https://api.themoviedb.org/3' if not get_setting('use_alternate_api_url') else 'https://api.tmdb.org/3'

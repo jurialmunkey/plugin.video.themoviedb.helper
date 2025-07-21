@@ -1,6 +1,6 @@
 from tmdbhelper.lib.items.directories.trakt.mapper_standard import EpisodeItemMapper, MovieItemMapper
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_region_date
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 
 
 class CalendarItemMapper:

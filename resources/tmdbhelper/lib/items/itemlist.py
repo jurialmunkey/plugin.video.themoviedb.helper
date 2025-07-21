@@ -1,5 +1,5 @@
 from jurialmunkey.parser import get_params
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import PLUGINPATH, convert_trakt_type, convert_type, get_setting
 from tmdbhelper.lib.items.filters import is_excluded
 from tmdbhelper.lib.items.pages import PaginatedItems

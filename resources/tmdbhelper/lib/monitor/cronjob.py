@@ -1,5 +1,5 @@
 from tmdbhelper.lib.addon.thread import SafeThread
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 
 
 CRONJOB_POLL_TIME = 600

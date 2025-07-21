@@ -1,5 +1,5 @@
 import contextlib
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.items.database.mappings import ItemMapper
 from tmdbhelper.lib.items.database.basedata import ItemDetailsDatabaseAccess
 from tmdbhelper.lib.items.database.basemeta_factories.factory import BaseMetaFactory

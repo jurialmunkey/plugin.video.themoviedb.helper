@@ -1,4 +1,4 @@
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH
 from tmdbhelper.lib.addon.consts import NODE_BASEDIR
 from tmdbhelper.lib.files.futils import get_files_in_folder, read_file

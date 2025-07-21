@@ -1,5 +1,5 @@
 from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.baseclass import ItemDetailsList
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.items.database.tabledef import (
     MOVIE_COLUMNS,
     TVSHOW_COLUMNS,

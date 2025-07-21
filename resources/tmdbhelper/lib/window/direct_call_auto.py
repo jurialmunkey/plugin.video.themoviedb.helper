@@ -1,6 +1,6 @@
 from xbmcgui import Dialog
 from tmdbhelper.lib.addon.thread import SafeThread
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.dialog import busy_decorator
 from tmdbhelper.lib.addon.plugin import executebuiltin
 from tmdbhelper.lib.window.constants import SV_ROUTES

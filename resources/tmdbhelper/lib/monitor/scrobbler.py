@@ -1,6 +1,6 @@
 from jurialmunkey.parser import boolean
 from jurialmunkey.window import get_property
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_setting
 from tmdbhelper.lib.addon.logger import kodi_log
 

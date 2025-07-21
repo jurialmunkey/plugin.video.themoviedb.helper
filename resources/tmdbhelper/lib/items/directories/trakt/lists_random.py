@@ -1,6 +1,6 @@
 import random
 from jurialmunkey.parser import try_int
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_setting, get_localized, convert_type
 from tmdbhelper.lib.items.directories.tmdb.lists_related import ListRecommendations
 from tmdbhelper.lib.items.directories.trakt.lists_sync import ListMostWatched, ListHistory

@@ -1,6 +1,6 @@
 from tmdbhelper.lib.items.directories.base.basedir_item import BaseDirItem
 from tmdbhelper.lib.addon.plugin import get_localized
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 
 
 class BaseDirItemTMDbSearch(BaseDirItem):
@@ -33,10 +33,17 @@ class BaseDirItemTMDbUpcoming(BaseDirItem):
     params = {'info': 'upcoming'}
     art_icon = 'resources/icons/themoviedb/upcoming.png'
     types = ('movie', )
+    
+class BaseDirItemTMDbTrendingDay(BaseDirItem):
+    priority = 140
+    label_localized = 32178
+    params = {'info': 'trending_day'}
+    art_icon = 'resources/icons/themoviedb/upcoming.png'
+    types = ('movie', 'tv', 'person')
 
 
 class BaseDirItemTMDbTrendingWeek(BaseDirItem):
-    priority = 140
+    priority = 150
     label_localized = 32179
     params = {'info': 'trending_week'}
     art_icon = 'resources/icons/themoviedb/upcoming.png'
@@ -44,15 +51,15 @@ class BaseDirItemTMDbTrendingWeek(BaseDirItem):
 
 
 class BaseDirItemTMDbNowPlaying(BaseDirItem):
-    priority = 150
-    label_localized = 32179
+    priority = 160
+    label_localized = 32180
     params = {'info': 'now_playing'}
     art_icon = 'resources/icons/themoviedb/intheatres.png'
     types = ('movie', )
 
 
 class BaseDirItemTMDbAiringToday(BaseDirItem):
-    priority = 160
+    priority = 170
     label_type = 'localize'
     label_localized = 32181
     types = ('tv',)
@@ -61,7 +68,7 @@ class BaseDirItemTMDbAiringToday(BaseDirItem):
 
 
 class BaseDirItemTMDbOnTheAir(BaseDirItem):
-    priority = 170
+    priority = 180
     label_type = 'localize'
     label_localized = 32182
     types = ('tv',)
@@ -70,7 +77,7 @@ class BaseDirItemTMDbOnTheAir(BaseDirItem):
 
 
 class BaseDirItemTMDbCalendarLibraryDir(BaseDirItem):
-    priority = 180
+    priority = 190
     label_type = 'localize'
     label_localized = 32183
     types = ('tv',)
@@ -79,7 +86,7 @@ class BaseDirItemTMDbCalendarLibraryDir(BaseDirItem):
 
 
 class BaseDirItemTMDbLibraryAiringNext(BaseDirItem):
-    priority = 190
+    priority = 200
     label_type = 'localize'
     label_localized = 32458
     types = ('tv',)
@@ -88,7 +95,7 @@ class BaseDirItemTMDbLibraryAiringNext(BaseDirItem):
 
 
 class BaseDirItemTMDbGenres(BaseDirItem):
-    priority = 200
+    priority = 210
     label_type = 'reversed'
     label_localized = 135
     types = ('movie', 'tv',)
@@ -97,7 +104,7 @@ class BaseDirItemTMDbGenres(BaseDirItem):
 
 
 class BaseDirItemTMDbWatchProviders(BaseDirItem):
-    priority = 210
+    priority = 220
     label_type = 'reversed'
     label_localized = 32411
     types = ('movie', 'tv',)
@@ -106,7 +113,7 @@ class BaseDirItemTMDbWatchProviders(BaseDirItem):
 
 
 class BaseDirItemTMDbRevenueMovies(BaseDirItem):
-    priority = 220
+    priority = 230
     label_localized = 32184
     types = ('movie',)
     params = {'info': 'revenue_movies'}
@@ -114,7 +121,7 @@ class BaseDirItemTMDbRevenueMovies(BaseDirItem):
 
 
 class BaseDirItemTMDbMostVoted(BaseDirItem):
-    priority = 230
+    priority = 240
     label_localized = 32185
     types = ('movie', 'tv',)
     params = {'info': 'most_voted'}
@@ -122,7 +129,7 @@ class BaseDirItemTMDbMostVoted(BaseDirItem):
 
 
 class BaseDirItemTMDbAllStudios(BaseDirItem):
-    priority = 240
+    priority = 250
     label_type = 'prefixed'
     label_localized = 20388
     types = ('movie',)
@@ -135,21 +142,21 @@ class BaseDirItemTMDbAllStudios(BaseDirItem):
 
 
 class BaseDirItemTMDbAllNetworks(BaseDirItemTMDbAllStudios):
-    priority = 250
+    priority = 260
     label_localized = 32062
     types = ('tv',)
     params = {'info': 'all_networks'}
 
 
 class BaseDirItemTMDbAllCollections(BaseDirItemTMDbAllStudios):
-    priority = 260
+    priority = 270
     label_localized = 32187
     types = ('movie',)
     params = {'info': 'all_collections'}
 
 
 class BaseDirItemTMDbAllKeywords(BaseDirItemTMDbAllStudios):
-    priority = 270
+    priority = 280
     label_localized = 21861
     types = ('movie',)
     params = {'info': 'all_keywords'}

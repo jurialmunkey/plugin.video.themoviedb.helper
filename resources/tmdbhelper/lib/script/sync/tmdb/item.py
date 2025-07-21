@@ -1,4 +1,4 @@
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.dialog import busy_decorator
 from tmdbhelper.lib.script.sync.item import ItemSync as BasicItemSync
 

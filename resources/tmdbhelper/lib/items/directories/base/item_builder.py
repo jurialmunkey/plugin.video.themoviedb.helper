@@ -1,5 +1,5 @@
 from tmdbhelper.lib.addon.plugin import convert_type, get_localized
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 
 
 class BaseDirItemBuilder:

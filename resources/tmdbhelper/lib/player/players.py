@@ -11,7 +11,7 @@ from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.thread import SafeThread
 from tmdbhelper.lib.player.phacks.phacks import PlayerHacks
 from tmdbhelper.lib.player.select import PlayerSelect, PlayerSelectWithClearDefault
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 
 
 class PlayerMethods():

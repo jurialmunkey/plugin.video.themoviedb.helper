@@ -1,7 +1,7 @@
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.seasons import SeasonMediaList
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.flatseasons import FlatSeasonMediaListMixin
 from tmdbhelper.lib.addon.plugin import get_localized, ADDONPATH
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 
 
 class AnticipatedSeasonMediaListMixin(FlatSeasonMediaListMixin):

@@ -1,6 +1,6 @@
 from jurialmunkey.parser import try_int, get_params, IterProps
 from tmdbhelper.lib.api.mapping import _ItemMapper, get_empty_item
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_mpaa_prefix, get_language, convert_type, get_localized
 from tmdbhelper.lib.addon.consts import ITER_PROPS_MAX
 

@@ -7,7 +7,7 @@ from tmdbhelper.lib.addon.plugin import get_localized, executebuiltin
 from tmdbhelper.lib.addon.dialog import BusyDialog
 from tmdbhelper.lib.query.database.database import FindQueriesDatabase
 from tmdbhelper.lib.window.event_loop import EventLoop
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.window.constants import (
     PREFIX_INSTANCE,
     PREFIX_ADDPATH,

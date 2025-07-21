@@ -9,7 +9,7 @@ from jurialmunkey.window import get_property
 from tmdbhelper.lib.query.database.database import FindQueriesDatabase
 from tmdbhelper.lib.files.hcache import set_search_history, get_search_history
 from tmdbhelper.lib.api.tmdb.api import TMDb
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from urllib.parse import urlencode
 
 

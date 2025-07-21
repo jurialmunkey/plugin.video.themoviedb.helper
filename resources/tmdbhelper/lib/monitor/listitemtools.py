@@ -6,7 +6,7 @@ from jurialmunkey.window import get_current_window
 from tmdbhelper.lib.monitor.common import CommonMonitorFunctions
 from tmdbhelper.lib.monitor.itemdetails import MonitorItemDetails
 from tmdbhelper.lib.monitor.baseitem import BaseItemSkinDefaults
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.addon.thread import SafeThread
 

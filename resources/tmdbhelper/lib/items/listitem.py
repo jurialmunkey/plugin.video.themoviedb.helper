@@ -1,5 +1,5 @@
 from xbmcgui import ListItem as KodiListItem
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from jurialmunkey.parser import try_int, merge_two_dicts, boolean
 from infotagger.listitem import ListItemInfoTag
 from tmdbhelper.lib.addon.consts import PARAM_WIDGETS_RELOAD, PARAM_WIDGETS_RELOAD_FORCED

@@ -1,5 +1,5 @@
 from tmdbhelper.lib.items.container import ContainerDefaultCacheDirectory
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import convert_type, get_localized
 from tmdbhelper.lib.items.filters import is_excluded
 from jurialmunkey.parser import try_int

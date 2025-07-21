@@ -2,7 +2,7 @@ from xbmcgui import Window
 import jurialmunkey.window as window
 from tmdbhelper.lib.addon.plugin import executebuiltin, get_condvisibility
 from tmdbhelper.lib.addon.logger import kodi_log
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.window.direct_call_auto import DirectCallAutoInfoDialog
 from tmdbhelper.lib.window.constants import (
     ID_VIDEOINFO,

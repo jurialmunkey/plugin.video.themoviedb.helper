@@ -1,5 +1,5 @@
 from json import loads
-from tmdbhelper.lib.files.ftools import cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.files.futils import get_files_in_folder, read_file
 from tmdbhelper.lib.addon.plugin import get_setting, get_condvisibility
 from tmdbhelper.lib.addon.consts import (
