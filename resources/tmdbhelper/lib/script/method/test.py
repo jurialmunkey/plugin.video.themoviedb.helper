@@ -41,6 +41,13 @@ def test_func(test_func, dialog_output=False, **kwargs):
         data = {'headers': dict(data.headers), 'request': data.json()}
         return finalise(head, data)
 
+    def test_func_trakt_auth(**kwargs):
+        from tmdbhelper.lib.api.trakt.api import TraktAPI
+        tapi = TraktAPI()
+        head = ''
+        data = {'authorization': tapi.authenticator.authorization}
+        return finalise(head, data)
+
     def test_func_mdblist_response(path, **kwargs):
         from tmdbhelper.lib.api.mdblist.api import MDbList
         head = path
@@ -151,6 +158,7 @@ def test_func(test_func, dialog_output=False, **kwargs):
         'write_user_art': test_func_write_user_art,
         'jrpc': test_func_jrpc,
         'jrpc_directory': test_func_jrpc_directory,
+        'trakt_auth': test_func_trakt_auth,
     }
 
     return routes[test_func](**kwargs)

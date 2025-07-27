@@ -45,11 +45,11 @@ class CronJobMonitor(SafeThread):
         self.database_maintenance.recache_kodidb(notification=False)
 
     def _do_trakt_authorization(self):
-        from jurialmunkey.parser import boolean
+        from jurialmunkey.parser import try_int
         from jurialmunkey.window import get_property
-        self.trakt_api.authorize(confirmation=True)
+        self.trakt_api.authorize()
         self.update_monitor.waitForAbort(1)
-        if not boolean(get_property('TraktIsAuth')):
+        if not try_int(get_property('TraktIsAuth')):
             return
         from tmdbhelper.lib.script.method.trakt import get_stats
         get_stats()
