@@ -10,8 +10,7 @@ class UncachedTraktItemsPage(UncachedItemsPage):
         self.outer_class = outer_class
         self.page = page
 
-    @cached_property
-    def results(self):
+    def get_results(self):
         try:
             results = self.response.json()
         except (TypeError, KeyError, AttributeError):

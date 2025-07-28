@@ -73,7 +73,7 @@ class RatingsDict(BaseList):
 
     @cached_property
     def trakt_ratings(self):
-        if not self.common_apis.trakt_api or not self.common_apis.trakt_api.authorization or not self.imdb_id:
+        if not self.common_apis.trakt_api or not self.common_apis.trakt_api.authenticator.is_authorized or not self.imdb_id:
             return {}
         data = self.common_apis.trakt_api.get_response_json(f'{self.trakt_type}s/{self.imdb_id}/ratings')
         if not data:

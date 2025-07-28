@@ -1,4 +1,4 @@
-from jurialmunkey.parser import boolean
+from jurialmunkey.parser import try_int
 from jurialmunkey.window import get_property
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_setting
@@ -31,11 +31,11 @@ class PlayerScrobbler():
         """ decorator to check that trakt is authorized  """
 
         def wrapper(self, *args, **kwargs):
-            if not boolean(get_property('TraktIsAuth')):
+            if not try_int(get_property('TraktIsAuth')):
                 return
             if not get_setting('trakt_scrobbling'):
                 return
-            if not self.trakt_api.authorization:
+            if not self.trakt_api.is_authorized:
                 return
             if not self.trakt_item:
                 return

@@ -8,6 +8,10 @@ get_timestamp = jurialmunkey_tmdate.get_timestamp
 set_timestamp = jurialmunkey_tmdate.set_timestamp
 
 
+def get_datetime_from_epoch(timestamp_in_seconds_from_epoch):
+    return datetime.datetime.fromtimestamp(timestamp_in_seconds_from_epoch)
+
+
 def get_datetime_combine(*args, **kwargs):
     return datetime.datetime.combine(*args, **kwargs)
 

@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 from jurialmunkey.ftools import cached_property
 from collections import namedtuple
-from tmdbhelper.lib.addon.thread import ParallelThread
-from tmdbhelper.lib.query.database.database import FindQueriesDatabase
 
 
 class ItemListSyncDataProperties:
