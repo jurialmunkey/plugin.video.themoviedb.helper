@@ -57,7 +57,7 @@ class PlayerItemCombined(PlayerItem):
         return KodiAddon(self.plugin_name).getAddonInfo('name')
 
 
-class PlayerSelect:
+class PlayerSelectStandard:
     def __init__(self, players, header=None, detailed=True):
         self.players = players
         self.header = header or get_localized(32042)
@@ -124,7 +124,7 @@ class PlayerSelect:
         return player
 
 
-class PlayerSelectWithClearDefault(PlayerSelect):
+class PlayerSelectModified(PlayerSelectStandard):
     @cached_property
     def players_list(self):
         players_list = [{
@@ -134,3 +134,14 @@ class PlayerSelectWithClearDefault(PlayerSelect):
         }]
         players_list = players_list + self.players
         return players_list
+
+
+def PlayerSelect(route, *args, **kwargs):
+    routes = {
+        'modified': PlayerSelectModified
+    }
+    default_route = PlayerSelectStandard
+    try:
+        return routes[route](*args, **kwargs)
+    except KeyError:
+        return default_route(*args, **kwargs)

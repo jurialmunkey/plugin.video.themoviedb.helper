@@ -10,7 +10,6 @@ from tmdbhelper.lib.player.inputter import KeyboardInputter
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.thread import SafeThread
 from tmdbhelper.lib.player.phacks.phacks import PlayerHacks
-from tmdbhelper.lib.player.select import PlayerSelect, PlayerSelectWithClearDefault
 from jurialmunkey.ftools import cached_property
 
 
@@ -346,9 +345,10 @@ class Players(
         # Kodi launches busy dialog on home screen that needs to be told to close
         # Otherwise the busy dialog will prevent window activation for folder path
         executebuiltin('Dialog.Close(busydialog)')
+
         self.api_language = None
-        self.player = player
-        self.mode = mode
+        self.player = player  # the player file name
+        self.mode = mode  # search or play
         self.handle = handle
 
         PlayerHacks.force_recache_kodidb_hack()  # Check if user wants to force rebuilding Kodi library cache first in case of new items
@@ -367,13 +367,9 @@ class Players(
         return []
 
     @cached_property
-    def forced_default(self):
-        if not self.player:
-            return ''
-        forced_default = f'{self.player} {self.mode or "play"}'
-        if self.tmdb_type == 'movie':
-            return f'{forced_default}_movie'
-        return f'{forced_default}_episode'
+    def player_forced(self):
+        from tmdbhelper.lib.player.player_id import PlayerId
+        return PlayerId(self.tmdb_type, self.player, self.mode).player_id
 
     @cached_property
     def players(self):
@@ -382,8 +378,13 @@ class Players(
 
     def select_player(self, detailed=True, clear_player=False, header=None, combined=False):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
-        obj = PlayerSelectWithClearDefault if clear_player else PlayerSelect
-        return obj(players=self.dialog_players, header=header or get_localized(32042), detailed=detailed).select(combined=combined)
+        from tmdbhelper.lib.player.select import PlayerSelect
+        return PlayerSelect(
+            route='modified' if clear_player else None,
+            players=self.dialog_players,
+            header=header or get_localized(32042),
+            detailed=detailed
+        ).select(combined=combined)
 
     def _get_player_or_fallback(self, fallback):
         if not fallback:
@@ -547,8 +548,8 @@ class Players(
         if not self.dialog_players:
             return
 
-        if self.forced_default:
-            return self._get_player_or_fallback(self.forced_default)
+        if self.player_forced:
+            return self._get_player_or_fallback(self.player_forced)
 
         if self.chosen_default:
             return self._get_player_or_fallback(self.chosen_default)
