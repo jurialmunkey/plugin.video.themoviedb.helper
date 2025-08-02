@@ -10,10 +10,14 @@ class PlayerIdMovie:
 
     @cached_property
     def prefix(self):
-        return f'{self.player} {self.mode}' if self.player else ''
+        if not self.player:
+            return ''
+        return f'{self.player} {self.mode}'
 
     @cached_property
     def player_id(self):
+        if not self.prefix:
+            return ''
         return f'{self.prefix}_{self.affix}'
 
 
