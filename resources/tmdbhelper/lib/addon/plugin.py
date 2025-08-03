@@ -156,3 +156,15 @@ class GlobalSettingsDict(dict):
             args = (key, )
         self[key] = func(*args)
         return self[key]
+
+
+class KeyGetter:
+
+    def __init__(self, dictionary):
+        self.dictionary = dictionary
+
+    def get_key(self, key):
+        try:
+            return self.dictionary[key]
+        except (KeyError, TypeError, IndexError):
+            return

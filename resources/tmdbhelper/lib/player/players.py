@@ -7,6 +7,7 @@ from jurialmunkey.parser import try_int, boolean
 from tmdbhelper.lib.addon.consts import PLAYERS_PRIORITY, PLAYERS_CHOSEN_DEFAULTS_FILENAME
 from tmdbhelper.lib.api.kodi.rpc import get_directory, KodiLibrary
 from tmdbhelper.lib.player.inputter import KeyboardInputter
+from tmdbhelper.lib.player.actions.resolved import ResolverPlayerSelect
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.thread import SafeThread
 from tmdbhelper.lib.player.phacks.phacks import PlayerHacks
@@ -217,7 +218,7 @@ class PlayerDetails():
 
     def get_next_episodes(self):
         from tmdbhelper.lib.player.details.details import get_next_episodes
-        self._next_episodes = get_next_episodes(self.tmdb_id, self.season, self.episode, self.current_player['file'])
+        self._next_episodes = get_next_episodes(self.tmdb_id, self.season, self.episode, self.selected.player.file)
         return self._next_episodes
 
 
@@ -328,6 +329,7 @@ class Players(
     PlayerHacksMixin,
 ):
 
+    selected = None
     default_player = None
     tmdb_type = None
     season = None
@@ -353,9 +355,7 @@ class Players(
 
         PlayerHacks.force_recache_kodidb_hack()  # Check if user wants to force rebuilding Kodi library cache first in case of new items
         self.thread_external_ids.start()  # We thread this lookup and rejoin later as Trakt might be slow and we dont want to delay if unneeded
-
         self.is_strm = islocal
-        self.current_player = {}
 
     @cached_property
     def p_dialog(self):
@@ -376,20 +376,10 @@ class Players(
         from tmdbhelper.lib.player.files import PlayerFiles
         return PlayerFiles().dictionary
 
-    @cached_property
-    def select_player_class(self):
-        from tmdbhelper.lib.player.select import PlayerSelectStandard, PlayerSelectCombined
-        return PlayerSelectCombined if get_setting('combined_players') else PlayerSelectStandard
-
-    def select_player(self, header=None, detailed=True):
-        """ Returns user selected player via dialog - detailed bool switches dialog style """
-        instance = self.select_player_class(players=self.dialog_players)
-        return instance.select(header=header, detailed=detailed)
-
     def select_default(self, header=None, detailed=True):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
-        from tmdbhelper.lib.player.select import PlayerSelectAdditionalItems
-        instance = self.select_player_class(players=self.dialog_players)
+        from tmdbhelper.lib.player.select import PlayerSelectAdditionalItems, PlayerSelectCombined
+        instance = PlayerSelectCombined(players=self.dialog_players)
         instance.additional_players = PlayerSelectAdditionalItems.clear_default_player()
         return instance.select(header=header, detailed=detailed)
 
@@ -586,55 +576,32 @@ class Players(
 
         return self._get_player_or_fallback(self.default_player)
 
+    @cached_property
+    def resolver(self):
+        resolver = ResolverPlayerSelect(self.item, dialog_players=self.dialog_players, action_log=self.action_log)
+        resolver.resolved_path_func = self._get_path_from_player  # TODO: Temp shim: move into class
+        resolver.fallback_item_func = self._get_player_or_fallback  # TODO: Temp shim: move into class
+        return resolver
+
     def _get_resolved_path(self, player=None, allow_default=False):
-        if not player and allow_default:
-            player = self.get_default_player()
-
-        # If we dont have a player from fallback then ask user to select one
-        if not player:
-            header = self.item.get('name') or get_localized(32042)
-            if self.item.get('episode') and self.item.get('title'):
-                header = f'{header} - {self.item["title"]}'
-            player = self.select_player(header=header)
-            if not player:
-                return
-
-        # Update item from external ID thread
-        self.set_external_ids(required=player.get('requires_ids', False))
-
-        # Log details
-        self.action_log += (
-            'PLAYER: ', player.get('file'), ' ', player.get('mode'), ' ', player.get('is_resolvable'), '\n',
-            'PLUGIN: ', player.get('plugin_name'), '\n')
-        self.current_player = player
+        self.resolver.update_player(self.get_default_player() if allow_default and not player else player)
+        if not self.resolver.player:
+            return
+        self.selected = self.resolver
+        self.set_external_ids(required=self.selected.player.requires_ids)  # Update item from external ID thread
 
         # Allow players to override language settings
-        # Compare against self.api_language to check if another player changed language previously
-        if player.get('api_language', None) != self.api_language:
-            self.api_language = player.get('api_language', None)
-            self.get_item_details(language=self.api_language)
-            self.set_external_ids(required=player.get('requires_ids'))
-            self.action_log += ('APILAN: ', self.api_language, '\n')
+        # # Compare against self.api_language to check if another player changed language previously
+        # if player.get('api_language', None) != self.api_language:
+        #     self.api_language = player.get('api_language', None)
+        #     self.get_item_details(language=self.api_language)
+        #     self.set_external_ids(required=player.get('requires_ids'))
+        #     self.action_log += ('APILAN: ', self.api_language, '\n')
 
         # Allow for a separate translation language to add "{de_title}" keys ("de" is iso language code)
-        self.get_language_details(player['language'], self.item.get('year')) if player.get('language') else None
+        # self.get_language_details(player['language'], self.item.get('year')) if player.get('language') else None
 
-        path = self._get_path_from_player(player)
-        if not path:
-            self.action_log += ('FAILURE!', '\n')
-            if player.get('idx') is not None:
-                del self.dialog_players[player['idx']]  # Remove out player so we don't re-ask user for it
-            fallback = self._get_player_or_fallback(player['fallback']) if player.get('fallback') else None
-            return self._get_resolved_path(fallback)
-        if path and isinstance(path, tuple):
-            self.action_log += ('SUCCESS!', '\n')
-            return {
-                'url': path[0],
-                'is_local': 'true' if player.get('is_local', False) else 'false',
-                'is_folder': 'true' if path[1] else 'false',
-                'isPlayable': 'false' if path[1] else 'true',
-                'is_resolvable': player['is_resolvable'] if player.get('is_resolvable') else 'select',
-                'player_name': player.get('name')}
+        return self.selected.item
 
     def get_resolved_path(self, return_listitem=True):
         if not self.item:
@@ -650,7 +617,7 @@ class Players(
         return path
 
     def queue_next_episodes(self, route='make_upnext'):
-        if not self.current_player or self.current_player.get('mode') != 'play_episode':
+        if not self.selected or self.selected.mode != 'play_episode':
             return
         if self.season is None or self.episode is None:
             return
@@ -683,7 +650,7 @@ class Players(
             return path
 
     def playqueue_next_episodes(self):
-        make_playlist = self.current_player.get('make_playlist')
+        make_playlist = self.selected.make_playlist
         if not make_playlist:
             return
         if make_playlist.lower() == 'upnext':

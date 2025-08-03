@@ -6,7 +6,7 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.files.locker import mutexlock
 from tmdbhelper.lib.files.futils import json_loads as data_loads
 from tmdbhelper.lib.files.futils import json_dumps as data_dumps
-from tmdbhelper.lib.addon.plugin import get_localized, get_setting, ADDONPATH
+from tmdbhelper.lib.addon.plugin import get_localized, get_setting, ADDONPATH, KeyGetter
 from tmdbhelper.lib.addon.logger import kodi_log, TimerFunc
 from tmdbhelper.lib.addon.tmdate import (
     get_datetime_now,
@@ -16,18 +16,6 @@ from tmdbhelper.lib.addon.tmdate import (
     get_timedelta,
     set_timestamp
 )
-
-
-class KeyGetter:
-
-    def __init__(self, dictionary):
-        self.dictionary = dictionary
-
-    def get_key(self, key):
-        try:
-            return self.dictionary[key]
-        except (KeyError, TypeError, IndexError):
-            return
 
 
 class TraktStoredAccessToken:
