@@ -60,17 +60,20 @@ class PlayerItemCombined(PlayerItem):
 class PlayerSelectStandard:
 
     player_uid = None
+    additional_players = []
 
     def __init__(self, players):
-        self.players = players
+        self.players = players or []
 
     @cached_property
     def players_list(self):
-        return self.players or []
+        players_list = self.additional_players + self.players
+        return players_list
 
     def players_generator(self, player_item=PlayerItem):
         return (player_item(i, x) for x, i in enumerate(self.players_list))
 
+    @property
     def players_generated_list(self):
         return [
             j for j in self.players_generator()
@@ -78,14 +81,14 @@ class PlayerSelectStandard:
         ]
 
     @staticmethod
-    def select_player(players_list, header=None, detailed=True):
+    def select_player(players_list, header=None, detailed=True, index=False):
         """ Select from a list of players """
         x = Dialog().select(
             header or get_localized(32042),
             [i.listitem for i in players_list],
             useDetails=detailed
         )
-        return -1 if x == -1 else players_list[x].posx
+        return x if index or x == -1 else players_list[x].posx
 
     def get_player(self, x):
         player = self.players_list[x]
@@ -110,22 +113,37 @@ class PlayerSelectCombined(PlayerSelectStandard):
         Select a player from the list
         """
         player = {}
+
         while not player:
-            x = self.select_player(self.players_combined_list, header=header, detailed=detailed)
+
+            x = self.select_player(
+                self.players_combined_list,
+                header=header,
+                detailed=detailed,
+                index=True
+            )
+
             if x == -1:
                 break
-            self.player_uid = self.players_combined_list[x].uid
-            player = super().select(header, detailed)
+
+            i = self.players_combined_list[x]
+            self.player_uid = i.uid
+
+            player = (
+                self.get_player(i.posx)
+                if len(self.players_generated_list) == 1 and i.plugin_name == 'xbmc.core' else
+                super().select(header, detailed)
+            )
+
         return player
 
 
-class PlayerSelectModified(PlayerSelectStandard):
-    @cached_property
-    def players_list(self):
-        players_list = [{
+class PlayerSelectAdditionalItems:
+
+    @staticmethod
+    def clear_default_player():
+        return [{
             'name': get_localized(32311),
-            'plugin_name': 'plugin.video.themoviedb.helper',
+            'plugin_name': 'xbmc.core',
             'plugin_icon': f'{ADDONPATH}/resources/icons/other/kodi.png'
         }]
-        players_list = players_list + self.players
-        return players_list

@@ -383,12 +383,15 @@ class Players(
 
     def select_player(self, header=None, detailed=True):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
-        return self.select_player_class(players=self.dialog_players).select(header=header, detailed=detailed)
+        instance = self.select_player_class(players=self.dialog_players)
+        return instance.select(header=header, detailed=detailed)
 
-    def select_default_player(self, header=None, detailed=True):
+    def select_default(self, header=None, detailed=True):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
-        from tmdbhelper.lib.player.select import PlayerSelectModified
-        return PlayerSelectModified(players=self.dialog_players).select(header=header, detailed=detailed)
+        from tmdbhelper.lib.player.select import PlayerSelectAdditionalItems
+        instance = self.select_player_class(players=self.dialog_players)
+        instance.additional_players = PlayerSelectAdditionalItems.clear_default_player()
+        return instance.select(header=header, detailed=detailed)
 
     def _get_player_or_fallback(self, fallback):
         if not fallback:
