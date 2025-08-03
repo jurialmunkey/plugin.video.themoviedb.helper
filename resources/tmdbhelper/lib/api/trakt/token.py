@@ -11,6 +11,7 @@ from tmdbhelper.lib.addon.logger import kodi_log, TimerFunc
 from tmdbhelper.lib.addon.tmdate import (
     get_datetime_now,
     get_timestamp,
+    get_time_difference,
     get_datetime_from_epoch,
     get_timedelta,
     set_timestamp
@@ -31,7 +32,7 @@ class KeyGetter:
 
 class TraktStoredAccessToken:
 
-    refreshes_allowed = 5
+    refreshes_allowed = 3
     mutex_lockname = 'TraktCheckingAuthorization'
     check_auth_url = 'https://api.trakt.tv/sync/last_activities'
     access_message = ''
@@ -121,8 +122,6 @@ class TraktStoredAccessToken:
         if not get_timestamp(self.winprop_traktisauth):
             self.access_message = '[session token expired]'
             return True
-        # if not get_timestamp(get_property('TraktRefreshTimeStamp', is_type=float) or 0):
-        #     return True
         return False
 
     def confirm_authorization(self):
@@ -165,8 +164,15 @@ class TraktStoredAccessToken:
 
     def on_overrun(self):
         self.kodi_log(f'Trakt authentication exceeded limit.\n{self.access_message}')
-        get_property('TraktRefreshTimeStamp', set_timestamp(600))  # Set a cooldown
+        get_property('TraktRefreshTimeStamp', set_timestamp(300))  # Set a cooldown
         get_property('TraktRefreshAttempts', 0)  # Reset refresh attempts
+        return
+
+    def on_backoff(self):
+        self.kodi_log((
+            f'Trakt authentication server unavailable.\n'
+            f'Next refresh attempt in {str(get_timedelta(seconds=int(get_time_difference(self.refresh_cooldown_active))))}\n'
+            f'{self.access_message}'), level=2)
         return
 
     def on_failure(self):
@@ -205,6 +211,10 @@ class TraktStoredAccessToken:
     def refresh_authorization_token(self):
         return self.authorization_check(refresh_token=self.refresh_token)
 
+    @property
+    def refresh_cooldown_active(self):
+        return get_timestamp(get_property('TraktRefreshTimeStamp', is_type=float) or 0)
+
     @mutexlock
     def get_refreshed_token(self):
         if not self.is_expired:
@@ -212,6 +222,9 @@ class TraktStoredAccessToken:
 
         if not self.refresh_token:
             return self.on_notoken()
+
+        if self.refresh_cooldown_active:
+            return self.on_backoff()
 
         if self.refresh_attempts > self.refreshes_allowed:
             return self.on_overrun()
