@@ -7,7 +7,7 @@ from jurialmunkey.parser import try_int, boolean
 from tmdbhelper.lib.addon.consts import PLAYERS_PRIORITY, PLAYERS_CHOSEN_DEFAULTS_FILENAME
 from tmdbhelper.lib.api.kodi.rpc import get_directory, KodiLibrary
 from tmdbhelper.lib.player.inputter import KeyboardInputter
-from tmdbhelper.lib.player.actions.resolved import ResolverPlayerSelect
+from tmdbhelper.lib.player.actions.resolver import ResolverPlayerSelect
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.thread import SafeThread
 from tmdbhelper.lib.player.phacks.phacks import PlayerHacks
@@ -583,7 +583,7 @@ class Players(
         resolver.fallback_item_func = self._get_player_or_fallback  # TODO: Temp shim: move into class
         return resolver
 
-    def _get_resolved_path(self, player=None, allow_default=False):
+    def get_resolved_metaitem(self, player=None, allow_default=False):
         self.resolver.update_player(self.get_default_player() if allow_default and not player else player)
         if not self.resolver.player:
             return
@@ -592,14 +592,14 @@ class Players(
 
         # Allow players to override language settings
         # # Compare against self.api_language to check if another player changed language previously
-        # if player.get('api_language', None) != self.api_language:
-        #     self.api_language = player.get('api_language', None)
-        #     self.get_item_details(language=self.api_language)
-        #     self.set_external_ids(required=player.get('requires_ids'))
-        #     self.action_log += ('APILAN: ', self.api_language, '\n')
+        if self.selected.player.api_language != self.api_language:
+            self.api_language = self.selected.player.api_language
+            self.get_item_details(language=self.api_language)
+            self.set_external_ids(required=self.selected.player.requires_ids)
+            self.action_log += ('APILAN: ', self.api_language, '\n')
 
         # Allow for a separate translation language to add "{de_title}" keys ("de" is iso language code)
-        # self.get_language_details(player['language'], self.item.get('year')) if player.get('language') else None
+        self.get_language_details(self.selected.player.language, self.selected.meta.year) if self.selected.player.language else None
 
         return self.selected.item
 
@@ -607,14 +607,14 @@ class Players(
         if not self.item:
             return
         get_property('PlayerInfoString', clear_property=True)
-        path = self._get_resolved_path(allow_default=True) or {}
-        if return_listitem:
-            self.details.params = {}
-            self.details.path = path.pop('url', None)
-            for k, v in path.items():
-                self.details.infoproperties[k] = v
-            path = self.details.get_listitem()
-        return path
+        path = self.get_resolved_metaitem(allow_default=True) or {}
+        return self.get_resolved_listitem(path) if return_listitem else path
+
+    def get_resolved_listitem(self, path):
+        self.details.params = {}
+        self.details.path = path.pop('url', None)
+        self.details.infoproperties.update(path)
+        return self.details.get_listitem()
 
     def queue_next_episodes(self, route='make_upnext'):
         if not self.selected or self.selected.mode != 'play_episode':
