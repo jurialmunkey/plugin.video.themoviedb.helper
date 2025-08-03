@@ -14,7 +14,7 @@ class PlayerItem:
 
     @cached_property
     def uid(self):
-        if self.plugin_name == 'xbmc.core':
+        if self.plugin_name in ('xbmc.core', 'plugin.video.themoviedb.helper'):
             return self.name
         return self.plugin_name
 
@@ -51,7 +51,7 @@ class PlayerItem:
 class PlayerItemCombined(PlayerItem):
     @cached_property
     def label(self):
-        if self.plugin_name == 'xbmc.core':
+        if self.plugin_name in ('xbmc.core', 'plugin.video.themoviedb.helper'):
             return self.name
         from xbmcaddon import Addon as KodiAddon
         return KodiAddon(self.plugin_name).getAddonInfo('name')
@@ -108,6 +108,18 @@ class PlayerSelectCombined(PlayerSelectStandard):
         players_combined_list = [i for i in players_combined_dict.values()]
         return players_combined_list
 
+    def select_from_group(self, group, header=None, detailed=True):
+        if len(self.players_generated_list) != 1:
+            return super().select(header, detailed)
+        if group.plugin_name != 'plugin.video.themoviedb.helper':
+            return super().select(header, detailed)
+        return self.get_player(group.posx)
+
+    def set_current_group(self, x):
+        group = self.players_combined_list[x]
+        self.player_uid = group.uid
+        return group
+
     def select(self, header=None, detailed=True):
         """
         Select a player from the list
@@ -126,14 +138,7 @@ class PlayerSelectCombined(PlayerSelectStandard):
             if x == -1:
                 break
 
-            i = self.players_combined_list[x]
-            self.player_uid = i.uid
-
-            player = (
-                self.get_player(i.posx)
-                if len(self.players_generated_list) == 1 and i.plugin_name == 'xbmc.core' else
-                super().select(header, detailed)
-            )
+            player = self.select_from_group(self.set_current_group(x))
 
         return player
 
@@ -144,6 +149,6 @@ class PlayerSelectAdditionalItems:
     def clear_default_player():
         return [{
             'name': get_localized(32311),
-            'plugin_name': 'xbmc.core',
+            'plugin_name': 'plugin.video.themoviedb.helper',
             'plugin_icon': f'{ADDONPATH}/resources/icons/other/kodi.png'
         }]
