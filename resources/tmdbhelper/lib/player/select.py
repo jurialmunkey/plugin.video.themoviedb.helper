@@ -58,10 +58,11 @@ class PlayerItemCombined(PlayerItem):
 
 
 class PlayerSelectStandard:
-    def __init__(self, players, header=None, detailed=True):
+
+    player_uid = None
+
+    def __init__(self, players):
         self.players = players
-        self.header = header or get_localized(32042)
-        self.detailed = detailed
 
     @cached_property
     def players_list(self):
@@ -70,57 +71,51 @@ class PlayerSelectStandard:
     def players_generator(self, player_item=PlayerItem):
         return (player_item(i, x) for x, i in enumerate(self.players_list))
 
+    def players_generated_list(self):
+        return [
+            j for j in self.players_generator()
+            if self.player_uid is None or j.uid == self.player_uid
+        ]
+
+    @staticmethod
+    def select_player(players_list, header=None, detailed=True):
+        """ Select from a list of players """
+        x = Dialog().select(
+            header or get_localized(32042),
+            [i.listitem for i in players_list],
+            useDetails=detailed
+        )
+        return -1 if x == -1 else players_list[x].posx
+
+    def get_player(self, x):
+        player = self.players_list[x]
+        player['idx'] = x
+        return player
+
+    def select(self, header=None, detailed=True):
+        """ Select a player from the list """
+        x = self.select_player(self.players_generated_list, header=header, detailed=detailed)
+        return {} if x == -1 else self.get_player(x)
+
+
+class PlayerSelectCombined(PlayerSelectStandard):
     @cached_property
     def players_combined_list(self):
         players_combined_dict = {j.uid: j for j in self.players_generator(PlayerItemCombined)}
         players_combined_list = [i for i in players_combined_dict.values()]
         return players_combined_list
 
-    def get_players_list_by_uid(self, uid=None):
-        return [
-            j for j in self.players_generator()
-            if uid is None or j.uid == uid
-        ]
-
-    def select_standard_player(self, uid=None):
-        """
-        Select from a list of players
-        Set a UID to only display players for a single plugin
-        """
-        player_list = self.get_players_list_by_uid(uid)
-        x = Dialog().select(
-            self.header,
-            [i.listitem for i in player_list],
-            useDetails=self.detailed
-        )
-        return -1 if x == -1 else player_list[x].posx
-
-    def select_combined_player(self):
-        """
-        Combine players from same plugin into a subfolder before selecting
-        Used to reduce overall size of player list to specific plugins
-        """
-        player_list = self.players_combined_list
-        x = Dialog().select(
-            self.header,
-            [i.listitem for i in player_list],
-            useDetails=self.detailed
-        )
-        if x == -1:
-            return -1
-        x = self.select_standard_player(player_list[x].uid)
-        return self.select_combined_player() if x == -1 else x
-
-    def select(self, combined=False):
+    def select(self, header=None, detailed=True):
         """
         Select a player from the list
-        Use combined bool to display each plugin as a separate subfolder of players
         """
-        x = self.select_combined_player() if combined else self.select_standard_player()
-        if x == -1:
-            return {}
-        player = self.players_list[x]
-        player['idx'] = x
+        player = {}
+        while not player:
+            x = self.select_player(self.players_combined_list, header=header, detailed=detailed)
+            if x == -1:
+                break
+            self.player_uid = self.players_combined_list[x].uid
+            player = super().select(header, detailed)
         return player
 
 
@@ -134,14 +129,3 @@ class PlayerSelectModified(PlayerSelectStandard):
         }]
         players_list = players_list + self.players
         return players_list
-
-
-def PlayerSelect(route, *args, **kwargs):
-    routes = {
-        'modified': PlayerSelectModified
-    }
-    default_route = PlayerSelectStandard
-    try:
-        return routes[route](*args, **kwargs)
-    except KeyError:
-        return default_route(*args, **kwargs)

@@ -376,15 +376,19 @@ class Players(
         from tmdbhelper.lib.player.files import PlayerFiles
         return PlayerFiles().dictionary
 
-    def select_player(self, detailed=True, clear_player=False, header=None, combined=False):
+    @cached_property
+    def select_player_class(self):
+        from tmdbhelper.lib.player.select import PlayerSelectStandard, PlayerSelectCombined
+        return PlayerSelectCombined if get_setting('combined_players') else PlayerSelectStandard
+
+    def select_player(self, header=None, detailed=True):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
-        from tmdbhelper.lib.player.select import PlayerSelect
-        return PlayerSelect(
-            route='modified' if clear_player else None,
-            players=self.dialog_players,
-            header=header or get_localized(32042),
-            detailed=detailed
-        ).select(combined=combined)
+        return self.select_player_class(players=self.dialog_players).select(header=header, detailed=detailed)
+
+    def select_default_player(self, header=None, detailed=True):
+        """ Returns user selected player via dialog - detailed bool switches dialog style """
+        from tmdbhelper.lib.player.select import PlayerSelectModified
+        return PlayerSelectModified(players=self.dialog_players).select(header=header, detailed=detailed)
 
     def _get_player_or_fallback(self, fallback):
         if not fallback:
@@ -588,7 +592,7 @@ class Players(
             header = self.item.get('name') or get_localized(32042)
             if self.item.get('episode') and self.item.get('title'):
                 header = f'{header} - {self.item["title"]}'
-            player = self.select_player(header=header, combined=get_setting('combined_players'))
+            player = self.select_player(header=header)
             if not player:
                 return
 
