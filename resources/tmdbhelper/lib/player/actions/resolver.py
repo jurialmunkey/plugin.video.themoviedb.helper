@@ -21,6 +21,10 @@ class ResolverItem:
         return self.meta.get_key('name')
 
     @cached_property
+    def year(self):
+        return self.meta.get_key('year')
+
+    @cached_property
     def header(self):
         header = self.name or get_localized(32042)
         header = f'{header} - {self.title}' if self.episode and self.title else header
