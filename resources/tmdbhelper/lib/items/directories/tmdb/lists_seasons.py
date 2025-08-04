@@ -12,7 +12,7 @@ class ListSeasons(ContainerDirectory):
         items = []
 
         # Up Next
-        if get_setting('seasons_upnext') and try_int(get_property('TraktIsAuth')):
+        if get_setting('seasons_upnext') and get_property('TraktIsAuth', is_type=float):
             sync = BaseViewFactory('upnextseason', 'tv', tmdb_id)
 
             try:

@@ -701,6 +701,16 @@ msgctxt "#32139"
 msgid "Rate items on TMDb after watching"
 msgstr "Einträge auf TMDb nach dem Ansehen bewerten"
 
+#: /resources/tmdbhelper/lib/player/configure.py
+msgctxt "#32140"
+msgid "Create new player"
+msgstr "Neuen Player erstellen"
+
+#: /resources/tmdbhelper/lib/player/configure.py
+msgctxt "#32141"
+msgid "Delete fallback"
+msgstr "Fallback entfernen"
+
 #: /resources/lib/container.py
 msgctxt "#32117"
 msgid "Keyword"
@@ -2725,7 +2735,7 @@ msgstr "API-Schlüssel"
 #: /resources/settings.xml
 msgctxt "#32019"
 msgid "Fanart.tv client key"
-msgstr "API-Schlüssel für für Fanart.tv"
+msgstr "API-Schlüssel für Fanart.tv"
 
 #: /resources/settings.xml
 msgctxt "#32021"

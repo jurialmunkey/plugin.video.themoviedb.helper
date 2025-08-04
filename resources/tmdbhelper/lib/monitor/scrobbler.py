@@ -1,4 +1,3 @@
-from jurialmunkey.parser import try_int
 from jurialmunkey.window import get_property
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_setting
@@ -31,7 +30,7 @@ class PlayerScrobbler():
         """ decorator to check that trakt is authorized  """
 
         def wrapper(self, *args, **kwargs):
-            if not try_int(get_property('TraktIsAuth')):
+            if not get_property('TraktIsAuth', is_type=float):
                 return
             if not get_setting('trakt_scrobbling'):
                 return

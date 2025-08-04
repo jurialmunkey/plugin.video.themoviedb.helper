@@ -70,7 +70,7 @@ def set_defaultplayer(**kwargs):
     from tmdbhelper.lib.addon.plugin import set_setting
     tmdb_type = kwargs.get('set_defaultplayer')
     setting_name = 'default_player_movies' if tmdb_type == 'movie' else 'default_player_episodes'
-    default_player = PlayersFactory(tmdb_type).select_player(detailed=True, clear_player=True)
+    default_player = PlayersFactory(tmdb_type).select_default()
     if not default_player:
         return
     if not default_player.get('file') or not default_player.get('mode'):
@@ -120,7 +120,7 @@ def set_chosenplayer(tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
             lvl = itm.setdefault('episode', {})
             itm = lvl.setdefault(f'{episode}', {})
 
-    chosen_player = PlayersFactory(tmdb_type).select_player(detailed=True, clear_player=True)
+    chosen_player = PlayersFactory(tmdb_type).select_default()
     if not chosen_player:
         return
 

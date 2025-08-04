@@ -96,6 +96,7 @@ class BaseDirItemTraktOnDeckUnWatchedMovie(BaseDirItem):
 class BaseDirItemTraktOnDeckUnWatchedTV(BaseDirItem):
     priority = 200
     label_type = 'suffixed'
+    label_localized = 32406
     types = ('tv', )
     params = {'info': 'trakt_ondeck_unwatched'}
     art_icon = 'resources/icons/trakt/inprogress.png'
