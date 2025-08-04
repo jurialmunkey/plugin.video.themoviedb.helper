@@ -1,20 +1,20 @@
-
+# XBMC Media Center language file
+# Addon Name: TheMovieDb Helper
+# Addon id: plugin.video.themoviedb.helper
+# Addon Provider: jurialmunkey
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2023-08-13 22:39+0000\n"
-"Last-Translator: psp2111-ADSLGATE / AbuKarim<>\n"
-"Language-Team: Arabic (Saudi Arabia)\n"
-"Language: ar-SA\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Loco-Source-Locale: ar_SA\n"
-"X-Generator: Loco https://localise.biz/\n"
-"X-Loco-Parser: loco_parse_po"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 msgctxt "#30000"
 msgid "Arabic (United Arab Emirates)"
@@ -24,6 +24,11 @@ msgctxt "#30001"
 msgid "Arabic (Saudi Arabia)"
 msgstr "العربية/المملكة العربية السعودية"
 
+#: /resources/tmdbhelper/lib/api/tmdb/methods/lists.py
+msgctxt "#32000"
+msgid "Unaired"
+msgstr "غير مبث"
+
 msgctxt "#30002"
 msgid "Belarusian (Belarus)"
 msgstr ""
@@ -31,6 +36,11 @@ msgstr ""
 msgctxt "#30003"
 msgid "Bulgarian (Bulgaria)"
 msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32003"
+msgid "Preferred"
+msgstr "مفضل"
 
 msgctxt "#30004"
 msgid "Bengali (Bangladesh)"
@@ -40,9 +50,24 @@ msgctxt "#30005"
 msgid "Catalan (Spain)"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32006"
+msgid "Supplement"
+msgstr "ملحق"
+
 msgctxt "#30006"
 msgid "Chamorro (Guam)"
 msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32008"
+msgid "Low"
+msgstr "منخفض"
+
+#: /resources/settings.xml
+msgctxt "#32009"
+msgid "High"
+msgstr "مرتفع"
 
 msgctxt "#30007"
 msgid "Czech (Czech Republic)"
@@ -56,9 +81,19 @@ msgctxt "#30009"
 msgid "German (Austria)"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32013"
+msgid "Get watched indicators, episode counts, and resume points"
+msgstr "احصل على مؤشرات المشاهدة وعدد الحلقات واستئناف النقاط"
+
 msgctxt "#30010"
 msgid "German (Switzerland)"
 msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32015"
+msgid "Additional season: Up next"
+msgstr "الموسم الإضافي: التالي"
 
 msgctxt "#30011"
 msgid "German (Germany)"
@@ -68,13 +103,28 @@ msgctxt "#30012"
 msgid "Greek (Greece)"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32018"
+msgid "Additional season: Anticipated"
+msgstr "موسم إضافي: متوقع"
+
 msgctxt "#30013"
 msgid "English (Australia)"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32020"
+msgid "Additional season: Specials"
+msgstr "الموسم الإضافي: العروض الخاصة"
+
 msgctxt "#30014"
 msgid "English (Canada)"
 msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32022"
+msgid "Clear sync data"
+msgstr "مسح بيانات المزامنة"
 
 msgctxt "#30015"
 msgid "English (United Kingdom)"
@@ -87,6 +137,21 @@ msgstr ""
 msgctxt "#30017"
 msgid "English (New Zealand)"
 msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32026"
+msgid "Invalidate Sync Data"
+msgstr "إبطال بيانات المزامنة"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32027"
+msgid "Successfully cleared {} sync data"
+msgstr "تم مسح بيانات المزامنة {} بنجاح"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32028"
+msgid "Ratings"
+msgstr "التقييمات"
 
 msgctxt "#30018"
 msgid "English (United States of America)"
@@ -112,6 +177,16 @@ msgctxt "#30023"
 msgid "Basque (Spain)"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32035"
+msgid "Progress"
+msgstr "تقدم"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32036"
+msgid "Dropped"
+msgstr "تم اسقاطة"
+
 msgctxt "#30024"
 msgid "Persian (Iran)"
 msgstr ""
@@ -119,6 +194,21 @@ msgstr ""
 msgctxt "#30025"
 msgid "Finnish (Finland)"
 msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32039"
+msgid "Prefer fanart.tv artwork"
+msgstr "تفضل العمل الفني fanart.tv"
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_seasons.py
+msgctxt "#32040"
+msgid "All seasons"
+msgstr "كل الفصول"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32041"
+msgid "Your In-Progress TV Shows"
+msgstr "برامجك التلفزيونية قيد التقدم"
 
 msgctxt "#30026"
 msgid "French (Canada)"
@@ -132,957 +222,1140 @@ msgctxt "#30028"
 msgid "Galician (Spain)"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32045"
+msgid "Your In-Progress Movies"
+msgstr "أفلامك قيد التقدم"
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32046"
+msgid "Drop TV show"
+msgstr "الغي برنامج تلفزيوني"
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32047"
+msgid "Undrop TV show"
+msgstr "اوقف الغاء برنامج تلفزيوني"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32048"
+msgid "Dropped TV Shows"
+msgstr "البرامج التلفزيونية التي تم الغائها"
+
+#: /resources/settings.xml
+msgctxt "#32049"
+msgid "Sort order of Your Next Episodes list. By airdate sorts episodes by premiere date. By recentlywatched sorts episodes by most recently watched tvshow. By todays is recentlywatched with episodes airing today at the front. By lastweek is recentlywatched with episodes airing in the past week sorted by airdate at the front."
+msgstr "فرز ترتيب قائمة الحلقات التالية. حسب تاريخ البث يفرز الحلقات حسب تاريخ العرض الأول. من خلال أنواع الحلقات التي تمت مشاهدتها مؤخرا من قبل البرامج التلفزيونية التي تمت مشاهدتها مؤخرا. بحلول اليوم تمت مشاهدته مؤخرا مع حلقات يتم بثها اليوم في المقدمة. بحلول الأسبوع الماضي تمت مشاهدته مؤخرا مع بث الحلقات في الأسبوع الماضي مرتبة حسب تاريخ البث في المقدمة"
+
+#: /resources/settings.xml
+msgctxt "#32050"
+msgid "Prefer artwork in your language"
+msgstr "تفضل العمل الفني بلغتك"
+
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+msgctxt "#32051"
+msgid "Deleted cached {} items"
+msgstr "حذف عناصر {} cached"
+
+#: /resources/settings.xml
+msgctxt "#32052"
+msgid "Delete TMDb cached item details"
+msgstr "حذف تفاصيل العنصر cached TMDb"
+
+#: /resources/settings.xml
+msgctxt "#32053"
+msgid "TMDbHelper automatically performs regular cache maintenance. You should only delete the cache when instructed to troubleshoot issues. TMDbHelper relies on having cached items to perform well. Unnecessarily deleting the cache on a regular basis will degrade performance and places excessive strain on the free services providing this data."
+msgstr "يقوم TMDbHelper تلقائيا بصيانة ذاكرة التخزين المؤقت المنتظمة. يجب عليك حذف ذاكرة التخزين المؤقت فقط عند توجيهك لاستكشاف الأخطاء وإصلاحها. يعتمد TMDbHelper على وجود عناصر مخبأة لأداء جيد. سيؤدي حذف ذاكرة التخزين المؤقت دون داع على أساس منتظم إلى تدهور الأداء ويضع ضغطا مفرطا على الخدمات المجانية التي توفر هذه البيانات"
+
 msgctxt "#30029"
 msgid "Hebrew (Israel)"
 msgstr ""
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32029"
 msgid "OMDb API"
 msgstr ""
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32030"
 msgid "Fanart.tv API"
 msgstr ""
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32031"
 msgid "Trakt API"
 msgstr ""
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32032"
 msgid "Download Players"
-msgstr "تنزيل المشغلات"
+msgstr "قم بتنزيل المشغلات"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32033"
 msgid "Default Players"
-msgstr "المشغل الافتراضي"
+msgstr ""
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32034"
-msgid "Get watched indicators and episode counts (slower)"
-msgstr "احصل على مؤشرات \"تمت المشاهدة\" و عدد الحلقات (أبطأ)"
+msgid "Get watched indicators and episode counts"
+msgstr "احصل على مؤشرات تمت المشاهدة وعدد الحلقات"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32037"
 msgid "Use bundled players"
-msgstr "استخدم حزمة المشغلات"
+msgstr "استخدم المشغلات المجمعين"
 
-#: resources/settings.xml
+#: /resources/tmdbhelper/lib/items/directories/lists_base.py
+msgctxt "#32062"
+msgid "Networks"
+msgstr "شبكات"
+
+#: /resources/tmdbhelper/lib/api/trakt/sorting.py
+msgctxt "#32063"
+msgid "Added"
+msgstr "مضاف"
+
+#: /resources/tmdbhelper/lib/items/directories/lists_base.py
+msgctxt "#32064"
+msgid "Related"
+msgstr "مرتبط"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_related.py
+msgctxt "#32065"
+msgid "Watchers"
+msgstr "المشاهدون"
+
+#: /resources/settings.xml
 msgctxt "#32038"
 msgid "Get additional details from the local Kodi library database"
-msgstr "احصل على تفاصيل إضافية من قاعدة بيانات مكتبة Kodi المحلية"
+msgstr "احصل على تفاصيل إضافية من قاعدة بيانات مكتبة كودي المحلية"
 
-#: resources/settings.xml
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32067"
+msgid "Budget"
+msgstr "ميزانية"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32068"
+msgid "Revenue"
+msgstr "إيراد"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32069"
+msgid "Last Air Date"
+msgstr "آخر تاريخ بث"
+
+#: /resources/settings.xml
 msgctxt "#32042"
 msgid "Choose Action"
 msgstr "اختر الإجراء"
 
-#: resources/lib/container.py
+#: /resources/lib/container.py
 msgctxt "#32043"
 msgid "Up Next"
-msgstr "الحلقة التالية"
+msgstr "التالي"
 
-#: resources/lib/container.py
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32072"
+msgid "Score"
+msgstr "النتيجة"
+
+#: /resources/lib/container.py
 msgctxt "#32044"
 msgid "Enter Search Query"
-msgstr ""
+msgstr "أدخل استعلام البحث"
 
-#: resources/lib/container.py
+#: /resources/lib/container.py
 msgctxt "#32054"
 msgid "Would you like to clear existing players first?"
-msgstr "هل ترغب في مسح المشغلات الموجودة أولاً؟"
+msgstr "هل ترغب في مسح المشغلات الحاليين أولا؟"
 
-#: resources/lib/downloader.py
+#: /resources/lib/downloader.py
 msgctxt "#32055"
 msgid "Authentication Failed."
-msgstr "المصادقة فشلت"
+msgstr "فشلت المصادقة."
 
-#: resources/lib/downloader.py
+#: /resources/lib/downloader.py
 msgctxt "#32056"
-msgid ""
-"Either the username or password were invalid. Would you like to try again?"
-msgstr "اسم المستخدم أو كلمة المرور غير صحيحة. هل تود إعادة المحاولة مجددا؟"
+msgid "Either the username or password were invalid. Would you like to try again?"
+msgstr "إما أن اسم المستخدم أو كلمة المرور غير صالحين. هل ترغب في المحاولة مرة أخرى؟"
 
-#: resources/lib/downloader.py
+#: /resources/lib/downloader.py
 msgctxt "#32057"
 msgid "Retry"
-msgstr "أعد المحاولة"
+msgstr "إعادة المحاولة"
 
-#: resources/lib/downloader.py
+#: /resources/lib/downloader.py
 msgctxt "#32058"
 msgid "The provided URL is either invalid or inaccesible."
 msgstr "عنوان URL المقدم إما غير صالح أو لا يمكن الوصول إليه."
 
-#: resources/lib/downloader.py
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32079"
+msgid "User"
+msgstr "مستخدم"
+
+#: /resources/lib/downloader.py
 msgctxt "#32059"
 msgid "Success!"
-msgstr "تم بنجاح!"
+msgstr "نجاح!"
 
-#: resources/lib/downloader.py
+#: /resources/lib/downloader.py
 msgctxt "#32060"
 msgid "files extracted"
-msgstr "ملف استخرجت"
+msgstr "الملفات استخرجت"
 
-#: resources/lib/player.py
+#: /resources/settings.xml
+msgctxt "#32082"
+msgid "Page multiplier (Other basic lists)"
+msgstr "مضاعف الصفحة (قوائم أساسية أخرى)"
+
+#: /resources/settings.xml
+msgctxt "#32083"
+msgid "Page multiplier (Database sync lists)"
+msgstr "مضاعف الصفحة (قوائم مزامنة قاعدة البيانات)"
+
+#: /resources/lib/player.py
 msgctxt "#32061"
 msgid "Play with"
-msgstr "تشغيل بواسطة"
+msgstr "استخدم المشغل"
 
-#: resources/lib/context.py
+#: /resources/lib/context.py
 msgctxt "#32066"
 msgid "Debug logging"
-msgstr ""
+msgstr "تسجيل الاخطاء"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32070"
 msgid "Male"
 msgstr "ذكر"
 
-#: resources/lib/tmdb.py
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32087"
+msgid "Search for TMDb ID or input manually?"
+msgstr "ابحث عن معرف TMDb أو الإدخال يدويا"
+
+#: /resources/lib/tmdb.py
 msgctxt "#32071"
 msgid "Female"
 msgstr "أنثى"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32073"
 msgid "Hide unaired movies"
-msgstr "إخفاء الأفلام التي لم تصدر بعد"
+msgstr "إخفاء الأفلام غير المبثة"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32074"
 msgid "Library Integration"
-msgstr "الاندماج مع المكتبة"
+msgstr "تكامل المكتبة"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32075"
 msgid "TV"
-msgstr "المسلسلات"
+msgstr ""
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32076"
 msgid "Update library after adding items"
 msgstr "تحديث المكتبة بعد إضافة العناصر"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32077"
 msgid "Ignore folder creation checks"
-msgstr "تجاهل عمليات التحقق أثناء إنشاء المجلد"
+msgstr "تجاهل فحوصات إنشاء المجلد"
 
-#: resources/lib/container/basedir.py
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32094"
+msgid "Select TMDb type"
+msgstr "حدد نوع TMDb"
+
+#: /resources/lib/container/basedir.py
 msgctxt "#32078"
 msgid "Still to Watch"
-msgstr "ما زال يتعين عليك مشاهدتها"
+msgstr "لم تشاهد للان"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32080"
 msgid "Other"
 msgstr "أخرى"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32081"
 msgid "Next page item"
-msgstr "عرض عنصر \"الصفحة التالية\""
+msgstr "عنصر الصفحة التالية"
 
-#: resources/settings.xml
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32098"
+msgid "Updated"
+msgstr "محدث"
+
+#: /resources/settings.xml
 msgctxt "#32084"
 msgid "Hide unaired episodes"
-msgstr "إخفاء الحلقات التي لم تصدر بعد"
+msgstr "إخفاء الحلقات غير المبثوثة"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32085"
 msgid "Flatten seasons"
-msgstr "تسطيح المواسم (جمع المواسم مع بعض)"
+msgstr "تسطيح الفصول"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32086"
 msgid "Auto-update library and add new/missing episodes"
-msgstr "حدث المكتبة تلقائيا وقم بإضافة الحلقات الجديدة او المفقودة"
+msgstr "تحديث المكتبة تلقائيا وإضافة حلقات جديدة/مفقودة"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32088"
 msgid "Navigation"
-msgstr "التنقل"
+msgstr "تصفح"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32089"
 msgid "Select Action"
-msgstr "الإجراء الافتراضي"
+msgstr "حدد الإجراء"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32090"
 msgid "Content"
-msgstr "المحتوى"
+msgstr "مضمون"
 
-#: resources/settings.xml
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32105"
+msgid "leave blank to delete"
+msgstr "اتركه فارغا للحذف"
+
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32106"
+msgid "Enter {} URL"
+msgstr ""
+
+#: /resources/settings.xml
 msgctxt "#32091"
 msgid "Special season folders"
-msgstr "مجلدات الموسم الخاصة"
+msgstr "مجلدات الموسم الخاص"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32092"
 msgid "Widgets"
-msgstr "الويدجيت"
+msgstr "ودجتس"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32093"
 msgid "Next episodes sort method"
 msgstr "طريقة فرز الحلقات التالية"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32095"
 msgid "Enter the code"
-msgstr "ادخل الرمز"
+msgstr "أدخل الرمز"
 
-#: resources/lib/traktapi.py
+#: /resources/lib/traktapi.py
 msgctxt "#32096"
 msgid "Go to [B]https://trakt.tv/activate[/B]"
-msgstr "اذهب الى [B]https://trakt.tv/activate[/B]"
+msgstr "اذهب إلى https://trakt.tv/activate"
 
-#: resources/lib/traktapi.py
+#: /resources/lib/traktapi.py
 msgctxt "#32097"
 msgid "Trakt Authentication"
-msgstr "مصادقة Trakt"
+msgstr "توثيق Trakt"
 
-#: resources/lib/container.py
+#: /resources/lib/container.py
 msgctxt "#32099"
 msgid "A value has already been set for this parameter"
-msgstr "تم بالفعل تعيين قيمة لهذا المعامل"
+msgstr "تم بالفعل تعيين قيمة لهذه المعلمة"
 
-#: resources/lib/container.py
+#: /resources/lib/container.py
 msgctxt "#32100"
 msgid "Do you wish to clear the existing items or add more?"
-msgstr "هل ترغب في مسح العناصر الموجودة أم إضافة المزيد؟"
+msgstr "هل ترغب في مسح العناصر الموجودة أو إضافة المزيد؟"
 
-#: resources/lib/container.py
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32115"
+msgid "Reset {} artwork to default?"
+msgstr "إعادة تعيين {} العمل الفني إلى الوضع الافتراضي؟"
+
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32116"
+msgid "Remove user artwork override and reset artwork to default artwork selection as defined in the settings."
+msgstr "قم بإزالة تجاوز العمل الفني للمستخدم وإعادة تعيين العمل الفني إلى تحديد العمل الفني الافتراضي كما هو محدد في الإعدادات."
+
+#: /resources/lib/container.py
 msgctxt "#32101"
 msgid "Clear Items"
 msgstr "مسح العناصر"
 
-#: resources/lib/container.py
+#: /resources/tmdbhelper/lib/items/context.py
+msgctxt "#32118"
+msgid "Modify artwork"
+msgstr "تعديل العمل الفني"
+
+#: /resources/lib/container.py
 msgctxt "#32102"
 msgid "Add Items"
 msgstr "إضافة عناصر"
 
-#: resources/lib/container.py
+#: /resources/lib/container.py
 msgctxt "#32103"
 msgid "No Value Added"
-msgstr "لم يتم إضافة قيمة"
+msgstr "لا قيمة مضافة"
 
-#: resources/lib/container.py
+#: /resources/lib/container.py
 msgctxt "#32104"
 msgid ""
 "TMDb ID for {} not found or none selected.\n"
 "Do you want to add another value?"
-msgstr ""
-"معرف TMDb لـ {} غير موجود أو لم يتم تحديد أي شيء.\n"
-"هل تريد إضافة قيمة أخرى؟"
+msgstr "لم يتم العثور على معرف TMDb ل {} أو لم يتم تحديده.\n" "هل تريد إضافة قيمة أخرى؟"
 
-#: resources/lib/container.py
+#: /resources/lib/container.py
 msgctxt "#32107"
 msgid "Set Match Method"
-msgstr "اختر طريقة المطابقة"
+msgstr "تعيين طريقة المطابقة"
 
-#: resources/lib/container.py
+#: /resources/lib/container.py
 msgctxt "#32108"
 msgid "Choose matching method for parameters with multiple values."
-msgstr "اختر طريقة المطابقة للمعطيات ذات القيم المتعددة."
+msgstr "اختر طريقة المطابقة للمعلمات ذات القيم المتعددة."
 
-#: resources/lib/container.py
-msgctxt "#32109"
-msgid "Match ANY Value"
-msgstr "تطابق بأي قيمة"
-
-#: resources/lib/container.py
-msgctxt "#32110"
-msgid "Match ALL Values"
-msgstr "تطابق بجميع القيم"
-
-#: resources/lib/container.py
-msgctxt "#32111"
-msgid "Select Items"
-msgstr "اختيار العناصر"
-
-#: resources/lib/container.py
-msgctxt "#32112"
-msgid "Select Genres"
-msgstr "اختر نوع التصنيف"
-
-#: resources/lib/container.py
-msgctxt "#32113"
-msgid ""
-"Also accepts X days relative from today in the format T-X or T+X (e.g. T-10 "
-"is ten days ago)"
+#: /resources/settings.xml
+msgctxt "#32124"
+msgid "RatingPosterDB API"
 msgstr ""
 
-#: resources/lib/container.py
+#: /resources/lib/container.py
+msgctxt "#32109"
+msgid "Match ANY Value"
+msgstr "تطابق أي قيمة"
+
+#: /resources/lib/container.py
+msgctxt "#32110"
+msgid "Match ALL Values"
+msgstr "تطابق جميع القيم"
+
+#: /resources/settings.xml
+msgctxt "#32127"
+msgid "RatingPosterDB API key"
+msgstr "مفتاح واجهة برمجة تطبيقات RatingPosterDB"
+
+#: /resources/tmdbhelper/lib/items/database/baseview_factories/concrete_classes/ftv_fanart.py
+msgctxt "#32128"
+msgid "Likes"
+msgstr "الاعجابات"
+
+#: /resources/settings.xml
+msgctxt "#32129"
+msgid "Override player monitor clearlogo with artwork from TMDbHelper"
+msgstr "تجاوز شاشة المشغل clearlogo مع عمل فني من TMDbHelper"
+
+#: /resources/lib/container.py
+msgctxt "#32111"
+msgid "Select Items"
+msgstr "حدد العناصر"
+
+#: /resources/lib/container.py
+msgctxt "#32112"
+msgid "Select Genres"
+msgstr "حدد الأنواع"
+
+#: /resources/lib/container.py
+msgctxt "#32113"
+msgid "Also accepts X days relative from today in the format T-X or T+X (e.g. T-10 is ten days ago)"
+msgstr "يقبل أيضا X أيام نسبية من اليوم بتنسيق T-X أو T+X (على سبيل المثال T-10 قبل عشرة أيام)"
+
+#: /resources/lib/container.py
 msgctxt "#32114"
 msgid "Enter"
 msgstr "أدخل"
 
-#: resources/lib/container.py
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32134"
+msgid "items"
+msgstr "عناصر"
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32135"
+msgid "Private"
+msgstr "خاص"
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32136"
+msgid "Do you want to make this list a public or private list?"
+msgstr "هل تريد أن تجعل هذه القائمة قائمة عامة أم خاصة؟"
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32137"
+msgid "Public or private list?"
+msgstr "قائمة عامة أم خاصة؟"
+
+#: /resources/settings.xml
+msgctxt "#32138"
+msgid "Scrobbling"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32139"
+msgid "Rate items on TMDb after watching"
+msgstr "قيم العناصر على TMDb بعد المشاهدة"
+
+#: /resources/tmdbhelper/lib/player/configure.py
+msgctxt "#32140"
+msgid "Create new player"
+msgstr "أنشئ مشغلا جديدا"
+
+#: /resources/tmdbhelper/lib/player/configure.py
+msgctxt "#32141"
+msgid "Delete fallback"
+msgstr "حذف التراجع"
+
+#: /resources/lib/container.py
 msgctxt "#32117"
 msgid "Keyword"
-msgstr "الكلمة الدالة"
+msgstr "كلمة مفتاحية"
 
-#: resources/lib/container.py
+#: /resources/lib/container.py
 msgctxt "#32119"
 msgid "Select Release Types"
-msgstr "اختر نوع الاصدار"
+msgstr "حدد أنواع الإصدارات"
 
-#: resources/lib/container.py
+#: /resources/lib/container.py
 msgctxt "#32120"
 msgid "Select Region for Release"
-msgstr "اختر منطقة إصدار العمل"
+msgstr "حدد المنطقة للإصدار"
 
-#: resources/lib/container.py
+#: /resources/lib/container.py
 msgctxt "#32121"
 msgid "Clear Search History"
 msgstr "مسح سجل البحث"
 
-#: resources/lib/context.py
+#: /resources/lib/context.py
 msgctxt "#32122"
 msgid "XBMCVFS reports unable to create path"
-msgstr "تقارير XBMCVFS غير قادرة على إنشاء المسار"
-
-#: resources/lib/context.py
-msgctxt "#32123"
-msgid ""
-"If error persists and the folders are created correctly, please disable "
-"folder path creation checking in TMDBHelper settings."
 msgstr ""
 
-#: resources/lib/context.py
+#: /resources/lib/context.py
+msgctxt "#32123"
+msgid "If error persists and the folders are created correctly, please disable folder path creation checking in TMDBHelper settings."
+msgstr "إذا استمر الخطأ وتم إنشاء المجلدات بشكل صحيح، فيرجى تعطيل التحقق من إنشاء مسار المجلد في إعدادات TMDBHelper."
+
+#: /resources/lib/context.py
 msgctxt "#32125"
 msgid "Add Trakt list to Kodi library"
-msgstr "إضافة قائمة Trakt إلى مكتبة كودي"
+msgstr " إضافة قائمة Traktإلى مكتبة Kodi الخاصة بك؟"
 
-#: resources/lib/context.py
+#: /resources/lib/context.py
 msgctxt "#32126"
 msgid "Are you sure you want to add this Trakt list to your Kodi library?"
-msgstr ""
-"هل أنت متأكد من أنك تريد إضافة قائمة Trakt هذه إلى مكتبة كودي الخاصة بك؟"
+msgstr "هل أنت متأكد من أنك تريد إضافة قائمة Trakt هذه إلى مكتبة Kodi الخاصة بك؟"
 
-#: resources/lib/context.py
+#: /resources/lib/context.py
 msgctxt "#32130"
 msgid "Auto-update library at time"
-msgstr "حدد وقت التحديث التلقائي للمكتبة"
+msgstr "تحديث تلقائي للمكتبة في الوقت المناسب"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32131"
 msgid "Auto-update library from Trakt list(s)"
-msgstr "حدث المكتبة تلقائيا من قائمة/قوائم الخاصة بـTrakt."
+msgstr "مكتبة التحديث التلقائي من قائمة (قوائم) Trakt"
 
-#: resources/lib/script.py
+#: /resources/lib/script.py
 msgctxt "#32132"
 msgid "Do you wish to update the library from the Trakt list(s) now?"
 msgstr "هل ترغب في تحديث المكتبة من قائمة (قوائم) Trakt الآن؟"
 
-#: resources/lib/script.py
+#: /resources/lib/script.py
 msgctxt "#32133"
 msgid "Select List(s)"
-msgstr "حدد القائمة (القوائم)"
+msgstr "اختر القائمة (القوائم)"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32142"
 msgid "Hide watched items"
 msgstr "إخفاء العناصر التي تمت مشاهدتها"
 
-#: resources/lib/context.py
+#: /resources/lib/context.py
 msgctxt "#32154"
 msgid "Update library now"
-msgstr "تحديث المكتبة الآن"
+msgstr "قم بتحديث المكتبة الآن"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32156"
 msgid "Next aired library calendar links to local tvshow"
-msgstr "تقويم مكتبة البث القادم مرتبط بالمسلسل المحلي"
+msgstr "روابط تقويم المكتبة التي تم بثها التالية إلى برنامج تلفزيوني محلي"
 
-#: resources/lib/context.py
+#: /resources/lib/context.py
 msgctxt "#32160"
 msgid "Adding {} - {} to library..."
-msgstr "جار الإضافة {} - {} إلى المكتبة..."
+msgstr "إضافة {} - {} إلى المكتبة..."
 
-#: resources/lib/traktapi.py
+#: /resources/lib/traktapi.py
 msgctxt "#32161"
 msgid "Do you wish to update the library with this list now?"
 msgstr "هل ترغب في تحديث المكتبة بهذه القائمة الآن؟"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32162"
 msgid "Automatically play local files"
-msgstr "تشغيل الملفات المحلية تلقائياً"
+msgstr "قم بتشغيل الملفات المحلية تلقائيا"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32163"
 msgid "Use fanart.tv for service monitor artwork"
-msgstr "استخدم fanart.tv للعمل الفني الخاص بمراقبة الخدمة"
+msgstr "استخدم fanart.tv للعمل الفني لمراقبة الخدمة"
 
-#: resources/lib/context.py
+#: /resources/lib/context.py
 msgctxt "#32164"
 msgid ""
-"Adding Trakt lists to library is limited to [B]{}[/B] TV Shows and [B]{}[/B] "
-"Movies per list.\n"
-"This limit is set to ensure that the APIs providing data for free are "
-"respected."
-msgstr ""
-"إضافة قوائم Trakt إلى المكتبة تقتصر على [B] {} [/ B] مسلسل و [B] {} [/ B] "
-"فلم في كل قائمة.\n"
-"تم تعيين هذا الحد لضمان احترام شروط موفر هذه الخدمة."
+"Adding Trakt lists to library is limited to [B]{}[/B] TV Shows and [B]{}[/B] Movies per list.\n"
+"This limit is set to ensure that the APIs providing data for free are respected."
+msgstr "تقتصر إضافة قوائم Trakt إلى المكتبة على [B]{}[/B] البرامج التلفزيونية و [B]{}[/B] الأفلام لكل قائمة.\n" "تم تعيين هذا الحد لضمان احترام واجهات برمجة التطبيقات التي توفر البيانات مجانا"
 
-#: resources/lib/context.py
+#: /resources/lib/context.py
 msgctxt "#32166"
 msgid "Adding items to library..."
-msgstr "جار إضافة العناصر الى المكتبة"
+msgstr "إضافة عناصر إلى المكتبة..."
 
-#: resources/lib/context.py
+#: /resources/lib/context.py
 msgctxt "#32167"
 msgid "Updating"
-msgstr "جار التحديث"
+msgstr "تحديث"
 
-#: resources/lib/libraryupdate.py
+#: /resources/lib/libraryupdate.py
 msgctxt "#32168"
 msgid "[B]{}[/B] by user [B]{}[/B]"
-msgstr "[B]{}[/B] بواسطة المستخدم [B]{}[/B]"
+msgstr "بواسطة المستخدم"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32169"
 msgid "Logout of Trakt account..."
-msgstr "تسجيل الخروج من حساب Trakt ..."
+msgstr "تسجيل الخروج من حساب تراكت..."
 
-#: resources/lib/libraryupdate.py
+#: /resources/lib/libraryupdate.py
 msgctxt "#32170"
-msgid ""
-"[B][COLOR=red]Warning[/COLOR][/B] This list contains [B]{}[/B] TV Shows and "
-"[B]{}[/B] Movies"
-msgstr ""
-"[B][COLOR=red]تحذير[/COLOR][/B] هذه القائمة تحتوي على [B]{}[/B] مسلسلات و [B]"
-"{}[/B] أفلام"
+msgid "[B][COLOR=red]Warning[/COLOR][/B] This list contains [B]{}[/B] TV Shows and [B]{}[/B] Movies"
+msgstr "[B][COLOR=red]تحذير[/COLOR][/B] تحتوي هذه القائمة على [B]{}[/B] برامج تلفزيونية و[B]{}[/B] أفلام"
 
-#: resources/lib/libraryupdate.py
+#: /resources/lib/libraryupdate.py
 msgctxt "#32171"
 msgid "[B][COLOR=red]Warning[/COLOR][/B] This list contains {} items"
-msgstr "[B][COLOR=red]تحذير[/COLOR][/B] هذه القائمة تحتوي على {} عناصر"
+msgstr "[B][COLOR=red]تحذير[/COLOR][/B] تحتوي هذه القائمة على {} عناصر"
 
-#: resources/lib/constants.py
+#: /resources/lib/constants.py
 msgctxt "#32172"
 msgid "People"
-msgstr "الأشخاص"
+msgstr "أشخاص"
 
-#: resources/lib/constants.py
+#: /resources/lib/constants.py
 msgctxt "#32173"
 msgid "Randomised"
 msgstr "عشوائي"
 
-#: resources/lib/constants.py
+#: /resources/lib/constants.py
 msgctxt "#32174"
 msgid "Discover"
-msgstr "استكشف"
+msgstr "اكتشف"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32175"
 msgid "Popular"
-msgstr "المشهورة"
+msgstr "مشهور"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32176"
 msgid "Top Rated"
-msgstr "الأكثر تقييماً"
+msgstr "الأعلى تقييما"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32177"
 msgid "Upcoming"
-msgstr "القادمة"
+msgstr "قادم"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32178"
 msgid "Trending Today"
-msgstr "الشائعة اليوم"
+msgstr "شائع اليوم"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32179"
 msgid "Trending This Week"
-msgstr "الشائعة هذا الأسبوع"
+msgstr "شائع هذا الأسبوع"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32180"
 msgid "In Theatres"
-msgstr "في دور العرض"
+msgstr "في المسارح"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32181"
 msgid "Airing Today"
-msgstr "تبث اليوم"
+msgstr "بث اليوم"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32182"
 msgid "Currently Airing"
-msgstr "تبث حاليا"
+msgstr "يبث حاليا"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32183"
 msgid "Next Aired Library"
-msgstr "مكتبة البث القادم"
+msgstr "المكتبة التالية التي تم بثها"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32184"
 msgid "Highest Revenue"
-msgstr "الأعلى إيرادات"
+msgstr "أعلى إيرادات"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32185"
 msgid "Most Voted"
-msgstr "الأكثر تصويتًا"
+msgstr "الأكثر تصويتا"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32186"
 msgid "All"
 msgstr "كل"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32187"
 msgid "Collections"
-msgstr "التجميعات"
+msgstr "مجموعات"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32188"
 msgid "Reviews"
-msgstr "المراجعات"
+msgstr "مراجعات"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32189"
 msgid "TV Networks"
-msgstr "شبكات التلفاز"
+msgstr "شبكات التلفزيون"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32190"
 msgid "Movie Studios"
 msgstr "استوديوهات الأفلام"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32191"
 msgid "Images"
-msgstr "الصور"
+msgstr "صور"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32192"
 msgid "Collection"
-msgstr "التجميعات"
+msgstr "مجموعة"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32193"
 msgid "Watchlist"
 msgstr "قائمة المشاهدة"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32194"
 msgid "Your Recently Watched"
-msgstr "شاهدتها مؤخرًا"
+msgstr "ما تم مشاهدته مؤخرا"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32195"
 msgid "Your Most Watched"
-msgstr "الأكثر مشاهدة من قبلك"
+msgstr "أكثر ما تشاهده"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32196"
 msgid "Your In-Progress"
-msgstr "تكملة المشاهدة"
+msgstr "قيد التقدم"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32197"
 msgid "Your Next Episodes"
-msgstr "حلقاتك التالية"
+msgstr "حلقاتك القادمة"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32198"
 msgid "Recommended For You"
-msgstr "موصى بها بالنسبة لك"
+msgstr "موصى به لك"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32199"
 msgid "Based on Recently Watched"
-msgstr "استنادًا على ما تم مشاهدته مؤخرًا"
+msgstr "استنادا إلى ما تمت مشاهدته مؤخرا"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32200"
 msgid "Based on Most Watched"
-msgstr "استنادًا على الأكثر مشاهدة"
+msgstr "استنادا إلى الأكثر مشاهدة"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32201"
 msgid "Your"
-msgstr "خاص بك: "
+msgstr "لك"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32202"
 msgid "Airing This Week"
-msgstr "تبث هذا الأسبوع"
+msgstr "بث هذا الأسبوع"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32203"
 msgid "Calendar"
 msgstr "التقويم"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32204"
 msgid "Trending"
-msgstr "الشائع"
+msgstr "شائع"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32205"
 msgid "Most Played"
-msgstr "الأكثر تشغيلاً"
+msgstr "الأكثر مشاهدة"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32206"
 msgid "Anticipated"
-msgstr "المرتقبة"
+msgstr "متوقع"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32207"
 msgid "Top 10 Box Office"
-msgstr "أفضل 10 أفلام في شباك التذاكر"
+msgstr "أفضل 10 شباك تذاكر"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32208"
 msgid "Trending Lists"
-msgstr "قوائم شائعة"
+msgstr "القوائم الشائعة"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32209"
 msgid "Popular Lists"
-msgstr "قوائم مشهورة"
+msgstr "القوائم المشهورة"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32210"
 msgid "Liked Lists"
-msgstr "قوائم معجب بها"
+msgstr "قوائم الإعجابات"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32211"
 msgid "Your Lists"
 msgstr "قوائمك"
 
-#: resources/lib/traktapi.py
+#: /resources/lib/traktapi.py
 msgctxt "#32212"
 msgid "Trakt user account logout"
-msgstr "حساب مستخدم Trakt قام بتسجيل الخروج"
+msgstr " تسجيل الخروج من حساب Trakt الخاص بك"
 
-#: resources/lib/traktapi.py
+#: /resources/lib/traktapi.py
 msgctxt "#32213"
 msgid "Do you wish to logout of your Trakt account?"
-msgstr "هل تردي تسجيل الخروج من حساب Trakt الخاص بك؟"
+msgstr "هل ترغب في تسجيل الخروج من حساب Trakt الخاص بك؟"
 
-#: resources/lib/traktapi.py
+#: /resources/lib/traktapi.py
 msgctxt "#32214"
 msgid "Trakt access token not found"
-msgstr "لم يتم العثور على رمز الدخول إلى Trakt"
+msgstr "حساب Trakt الخاص بك لم يجد له توثيق"
 
-#: resources/lib/traktapi.py
+#: /resources/lib/traktapi.py
 msgctxt "#32215"
 msgid "Logout failed!"
 msgstr "فشل تسجيل الخروج!"
 
-#: resources/lib/traktapi.py
+#: /resources/lib/traktapi.py
 msgctxt "#32216"
 msgid "Successfully logged out of Trakt user account"
 msgstr "تم تسجيل الخروج من حساب مستخدم Trakt بنجاح"
 
-#: resources/lib/script.py
+#: /resources/lib/script.py
 msgctxt "#32222"
 msgid "Manage artwork"
 msgstr "إدارة العمل الفني"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32223"
 msgid "Recommended"
 msgstr "موصى بها"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32224"
 msgid "Similar"
 msgstr "مشابه"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32225"
 msgid "Crew"
 msgstr "طاقم الإنتاج"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32226"
 msgid "Posters"
 msgstr "البوسترات"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32227"
 msgid "Cast in Movies"
 msgstr "طاقم العمل في الأفلام"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32228"
 msgid "Cast in TV Shows"
-msgstr "طاقم العمل في الأفلام"
+msgstr "طاقم العمل في المسلسلات"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32229"
 msgid "Crew in Movies"
 msgstr "طاقم الإنتاج في الأفلام"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32230"
 msgid "Crew in TV Shows"
 msgstr "طاقم الإنتاج في المسلسلات"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32231"
 msgid "Thumbs"
-msgstr ""
+msgstr "الصور المصغرة"
 
-#: resources/lib/plugin.py
+#: /resources/lib/plugin.py
 msgctxt "#32232"
 msgid "In Trakt Lists"
 msgstr "في قوائم Trakt"
 
-#: resources/lib/listitem.py
+#: /resources/lib/listitem.py
 msgctxt "#32233"
 msgid "Refresh details"
 msgstr "تحديث المعلومات"
 
-#: resources/lib/script.py
+#: /resources/lib/script.py
 msgctxt "#32235"
 msgid "Browse lists"
 msgstr "تصفح القوائم"
 
-#: resources/lib/players.py
+#: /resources/lib/players.py
 msgctxt "#32236"
 msgid "Select Item"
 msgstr "حدد عنصراً"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32237"
 msgid "Clear Discover History"
 msgstr "مسح سجل البحث"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32239"
 msgid "Match"
 msgstr "المطابقة"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32240"
 msgid "Sorting"
 msgstr "طريقة الفرز"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32241"
 msgid "Save As"
 msgstr "حفظ كـ"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32242"
 msgid "Premiere"
 msgstr "العرض الأول"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32243"
 msgid "Theatrical (limited)"
 msgstr "مسرحي (محدود)"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32244"
 msgid "Theatrical"
 msgstr "مسرحي"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32245"
 msgid "Digital"
 msgstr "رقمي"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32246"
 msgid "Physical"
-msgstr ""
+msgstr "جسدي"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32247"
 msgid "With Cast"
-msgstr "اختيار طاقم العمل"
+msgstr "مع طاقم العمل"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32248"
 msgid "With Crew"
-msgstr "اختيار طاقم الانتاج"
+msgstr "مع طاقم الانتاج"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32249"
 msgid "With People"
-msgstr "اختيار الشخصية"
+msgstr "مع الناالاشخاص"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32250"
 msgid "Primary Release Year"
 msgstr "سنة الإصدار الأساسية"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32251"
 msgid "Primary Release Date After"
 msgstr "بعد سنة الإصدار الأساسية"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32252"
 msgid "Primary Release Date Before"
 msgstr "قبل سنة الإصدار الأساسية"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32253"
 msgid "Release Date After"
 msgstr "بعد هذا التاريخ"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32254"
 msgid "Release Date Before"
 msgstr "قبل هذا التاريخ"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32255"
 msgid "Release Type"
 msgstr "نوع الإصدار"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32256"
 msgid "Release Region"
 msgstr "منطقة إصدار العمل"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32257"
 msgid "With Networks"
 msgstr "اختيار الشبكة"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32258"
 msgid "Air Date After"
 msgstr "تاريخ البث بعد"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32259"
 msgid "Air Date Before"
 msgstr "تاريخ البث قبل"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32260"
 msgid "First Air Date After"
 msgstr "تاريخ البث الأول بعد"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32261"
 msgid "First Air Date Before"
 msgstr "تاريخ البث الأول قبل"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32262"
 msgid "First Air Year"
 msgstr "سنة البث"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32263"
 msgid "With Genres"
-msgstr "اختيار تصنيف/تصنيفات"
+msgstr "مع الأنواع"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32264"
 msgid "Without Genres"
-msgstr "إلغاء تصنيف/تصنيفات"
+msgstr "بدون أنواع"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32265"
 msgid "With Companies"
 msgstr "اختيار الشركات"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32266"
 msgid "Without"
 msgstr "بدون"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32267"
 msgid "Without Keywords"
 msgstr "بدون كلمة معينة"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32268"
 msgid "With Keywords"
 msgstr "وجود كلمة معينة"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32269"
 msgid "With Original Language"
-msgstr "اختيار لغة العمل"
+msgstr "مع اللغة الأصلية"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32270"
 msgid "Vote Count ( > or = )"
 msgstr "عدد الأصوات (أكبر من أو يساوي)"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32271"
 msgid "Vote Count ( < or = )"
 msgstr "عدد الأصوات (أصغر من أو يساوي)"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32272"
 msgid "Vote Average ( > or = )"
 msgstr "متوسط التصويت (أكبر من أو يساوي)"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32273"
 msgid "Vote Average ( < or = )"
 msgstr "متوسط التصويت (أصغر من أو يساوي)"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32274"
 msgid "Runtime (Minutes) ( > or = )"
 msgstr "وقت التشغيل (بالدقائق) (أكبر من أو يساوي)"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32275"
 msgid "Runtime (Minutes) ( < or = )"
 msgstr "وقت التشغيل (بالدقائق) (أصغر من أو يساوي)"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32276"
 msgid "Search for"
 msgstr "البحث عن"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32277"
 msgid "Add Rule"
 msgstr "إضافة شرط"
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32278"
 msgid "Enter Network IDs separated with \" / \""
-msgstr ""
+msgstr "أدخل معرفات الشبكة المفصولة ب \" / \""
 
-#: resources/lib/userdiscover.py
+#: /resources/lib/userdiscover.py
 msgctxt "#32279"
 msgid "Enter Year"
 msgstr "أدخل السنة"
 
-#: resources/lib/basedir.py
+#: /resources/lib/basedir.py
 msgctxt "#32280"
 msgid "Last Fortnight"
 msgstr "آخر أسبوعين"
 
-#: resources/lib/basedir.py
+#: /resources/lib/basedir.py
 msgctxt "#32281"
 msgid "Last Week"
 msgstr "آخر أسبوع"
 
-#: resources/lib/basedir.py
+#: /resources/lib/basedir.py
 msgctxt "#32282"
 msgid "Yesterday"
 msgstr "الأمس"
@@ -1179,6 +1452,7 @@ msgstr "قوائم شائعة"
 msgctxt "#32301"
 msgid "Popular List"
 msgstr "قوائم مشهورة"
+
 
 #: resources/lib/basedir.py
 msgctxt "#32302"
@@ -1312,7 +1586,7 @@ msgstr "أدخل اسمًا جديدًا لـ {}"
 #: resources/lib/player/configure.py
 msgctxt "#32332"
 msgid "Choose resolve method for player"
-msgstr ""
+msgstr "اختر طريقة الحل للمشغل"
 
 #: resources/lib/player/configure.py
 msgctxt "#32333"
@@ -1331,7 +1605,7 @@ msgid ""
 "unmodified state on disk?\n"
 "\n"
 "[B]WARNING:[/B] This action cannot be undone."
-msgstr ""
+msgstr "هل ترغب في إعادة تعيين ملف المشغل [B]{}[/B] مرة أخرى إلى حالته الأصلية "" غير المعدلة على القرص؟ \N" "\n" "[B]تحذير:[/B] لا يمكن التراجع عن هذا الإجراء"
 
 #: resources/lib/player/configure.py
 msgctxt "#32336"
@@ -1345,7 +1619,7 @@ msgid ""
 "Do you wish to save your changes?\n"
 "\n"
 "If you close without saving, your changes will be lost."
-msgstr ""
+msgstr "تم تغيير ملف المشغل [B]{}[/B].\n" "هل ترغب في حفظ تغييراتك؟ \N" "\n" "إذا أغلقت دون حفظ، فستضيع تغييراتك."
 
 #: resources/lib/player/configure.py
 msgctxt "#32338"
@@ -1357,75 +1631,72 @@ msgctxt "#32339"
 msgid "{} playback URL resolve method"
 msgstr "{} طريقة حل عنوان URL للتشغيل"
 
-#: resources/lib/player/configure.py
+
+#: /resources/lib/player/configure.py
 msgctxt "#32340"
 msgid ""
-"Please note that setResolvedUrl is Kodi's preferred method for resolving "
-"playback URLs. The PlayMedia method should only be used if you experience "
-"difficulties using setResolvedUrl with this particular player.\n"
+"Please note that setResolvedUrl is Kodi's preferred method for resolving playback URLs. The PlayMedia method should only be used if you experience difficulties using setResolvedUrl with this particular player.\n"
 "\n"
 "Are you sure you want to set this player's resolve method to PlayMedia?"
-msgstr ""
+msgstr "يرجى ملاحظة أن setResolvedUrl هي الطريقة المفضلة ل Kodi لحل عناوين URL للتشغيل. يجب استخدام طريقة PlayMedia فقط إذا واجهت صعوبات في استخدام setResolvedUrl مع هذا المشغل بالذات.\n" "\n" "هل أنت متأكد من أنك تريد تعيين طريقة حل هذا المشغل على PlayMedia؟"
 
-#: resources/lib/player/configure.py
+#: /resources/lib/player/configure.py
 msgctxt "#32341"
 msgid "Choose fallback player method"
-msgstr ""
+msgstr "اختر طريقة المشغل الاحتياطي"
 
-#: resources/lib/player/configure.py
+#: /resources/lib/player/configure.py
 msgctxt "#32342"
 msgid "Fallbacks for {}"
-msgstr ""
+msgstr "التراجعات من أجل {}"
 
-#: resources/lib/player/configure.py
+#: /resources/lib/player/configure.py
 msgctxt "#32343"
 msgid "Choose fallback for {} {}"
-msgstr ""
+msgstr "اختر التراجع ل {} {}"
 
-#: resources/lib/player/configure.py
+#: /resources/lib/player/configure.py
 msgctxt "#32344"
 msgid "Enter New Priority for {}"
-msgstr "أدخل أولوية جديدة لـ {}"
+msgstr "أدخل أولوية جديدة ل {}"
 
-#: resources/lib/tmdb/api.py
+#: /resources/lib/tmdb/api.py
 msgctxt "#32345"
 msgid "Episode groups"
-msgstr "المجموعات"
+msgstr "مجموعات الحلقات"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32347"
 msgid "Log output of Trakt request"
-msgstr ""
+msgstr "سجل إخراج طلب Trakt"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32348"
 msgid "Log output of TMDb request"
-msgstr ""
+msgstr "سجل إخراج طلب TMDb"
 
-#: resources/lib/kodi/library.py
+#: /resources/lib/kodi/library.py
 msgctxt "#32351"
 msgid "Dummy ResolvedURL"
-msgstr ""
+msgstr "ResolvedURL وهمي"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32352"
 msgid "Dummy video duration (seconds)"
-msgstr ""
+msgstr "مدة الفيديو الوهمية (ثواني)"
 
-#: resources/lib/player/players.py
+#: /resources/lib/player/players.py
 msgctxt "#32353"
 msgid "Missing \"is_resolvable\" Flag"
-msgstr ""
+msgstr "علامة \"is_resolvable\" مفقودة"
 
-#: resources/lib/player/players.py
+#: /resources/lib/player/players.py
 msgctxt "#32354"
 msgid ""
 "Does this player resolve directly to a single playable file?\n"
 "\n"
-"Select \"Yes\" for any player that plays directly from single source. Select "
-"\"No\" for players that scrape multiple sources or otherwise do not work "
-"with the setResolvedURL method."
-msgstr ""
+"Select \"Yes\" for any player that plays directly from single source. Select \"No\" for players that scrape multiple sources or otherwise do not work with the setResolvedURL method."
+msgstr "هل يحل هذا اللاعب مباشرة إلى ملف واحد قابل للتشغيل؟ \N" "\n" "اختر \"نعم\" لأي لاعب يلعب مباشرة من مصدر واحد. حدد \"لا\" للاعبين الذين يتخلصون من مصادر متعددة أو لا يعملون مع طريقة setResolvedURL."
 
 #: resources/lib/script/sync.py
 msgctxt "#32355"
@@ -1476,12 +1747,12 @@ msgstr "هل تريد إضافة هذا العنصر إلى المكتبة ال�
 #: resources/settings.xml
 msgctxt "#32363"
 msgid "Delay after resolving (seconds)"
-msgstr ""
+msgstr "التأخير بعد الحل (ثواني)"
 
 #: resources/settings.xml
 msgctxt "#32364"
 msgid "Reroute PlayMedia to xbmc.Player()"
-msgstr ""
+msgstr "إعادة توجيه PlayMedia إلى xbmc.Player()"
 
 #: resources/lib/addon/plugin.py
 msgctxt "#32365"
@@ -1493,7 +1764,8 @@ msgctxt "#32366"
 msgid "Hide items without airdates"
 msgstr "إخفاء العناصر بدون تواريخ البث"
 
-#: resources/settings.xml
+
+#: /resources/settings.xml
 msgctxt "#32367"
 msgid "Local Information"
 msgstr "المعلومات المحلية"
@@ -1506,12 +1778,12 @@ msgstr "الحلقات التالية"
 #: resources/settings.xml
 msgctxt "#32369"
 msgid "thumbs"
-msgstr ""
+msgstr "الصور المصغرة"
 
 #: resources/settings.xml
 msgctxt "#32370"
 msgid "landscape"
-msgstr ""
+msgstr "بالعرض"
 
 #: resources/settings.xml
 msgctxt "#32371"
@@ -1521,12 +1793,12 @@ msgstr "العمل الفني المفضل للـthumbs"
 #: resources/settings.xml
 msgctxt "#32372"
 msgid "fanart"
-msgstr ""
+msgstr "اعمال فنية"
 
 #: resources/settings.xml
 msgctxt "#32373"
 msgid "Restrict to library strm"
-msgstr ""
+msgstr "يقتصر على مكتبة strm"
 
 #: resources/lib/player/players.py
 msgctxt "#32374"
@@ -1557,6 +1829,7 @@ msgstr "إخفاء قسم \"العروض الخاصة\""
 msgctxt "#32380"
 msgid "Hide Up Next"
 msgstr "إخفاء قسم \"الحلقة التالية\""
+
 
 #: resources/settings.xml
 msgctxt "#32381"
@@ -1606,7 +1879,7 @@ msgid ""
 "Use [B]Forced Update[/B] to ignore previously cached update details and "
 "recheck all items. Forced updates should only be used when cleaning and "
 "rebuilding the Kodi library."
-msgstr ""
+msgstr "استخدم [B]Quick Update[/B] للتحقق من وجود عناصر جديدة.\n" "\n" "استخدم [B]Forced Update[/B] لتجاهل تفاصيل التحديث المخزنة مؤقتا سابقا و " "إعادة فحص جميع العناصر. يجب استخدام التحديثات القسرية فقط عند تنظيف وإعادة بناء مكتبة كودي."
 
 #: resources/lib/script/router.py
 msgctxt "#32393"
@@ -1618,10 +1891,11 @@ msgctxt "#32394"
 msgid "Quick Update"
 msgstr "تحديث سريع"
 
-#: resources/settings.xml
+
+#: /resources/settings.xml
 msgctxt "#32395"
 msgid "Log timer reports for directories"
-msgstr ""
+msgstr "سجل تقارير مؤقت للدلائل"
 
 #: resources/settings.xml
 msgctxt "#32397"
@@ -1671,7 +1945,7 @@ msgstr "موقع قاعدة بيانات التخزين المؤقت"
 #: resources/settings.xml
 msgctxt "#32410"
 msgid "Max concurrent threads (0 is unlimited)"
-msgstr ""
+msgstr "الحد الأقصى للخيوط المتزامنة (0 غير محدود)"
 
 #: resources/lib/items/basedir.py
 msgctxt "#32411"
@@ -1688,39 +1962,30 @@ msgctxt "#32413"
 msgid "Next episodes checks calendar (slower but more accurate)"
 msgstr "تحقق من التقويم للحلقات التالية (أبطأ لكن أكثر دقة)"
 
-#: resources/lib/addon/consts.py
+#: /resources/lib/addon/consts.py
 msgctxt "#32414"
 msgid "Most Watched"
 msgstr "الأكثر مشاهدة"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32415"
 msgid "Combine all players for plugin into single entry"
-msgstr "جمع الخيارات المتعددة للمشغل في قسم واحد"
+msgstr "اجمع جميع المشغلات للمكون الإضافي في دخول واحد"
 
-#: resources/lib/items/basedir.py
+#: /resources/lib/items/basedir.py
 msgctxt "#32416"
 msgid "Premieres"
-msgstr "العروض الأولية"
+msgstr "العروض الأولى"
 
-#: resources/lib/script/sync.py
+#: /resources/lib/script/sync.py
 msgctxt "#32418"
-msgid ""
-"Adds text to the start of the MPAA rating. For example if set to 'Rated' a "
-"'PG' rating is displayed as 'Rated PG'. Cached items will need to be "
-"refreshed."
-msgstr ""
-"أضف نصًا قبل بداية تصنيف MPAA. على سبيل المثال إذا تم كتابة \"Rated\" ، قبل "
-"\"PG\" سوف يعرض بمسمى \"Rated PG\". تغيير هذا الخيار يحتاج إلى إعادة تحميل "
-"العناصر المخزنة مؤقتًا."
+msgid "Adds text to the start of the MPAA rating. For example if set to 'Rated' a 'PG' rating is displayed as 'Rated PG'. Cached items will need to be refreshed."
+msgstr "يضيف نصا إلى بداية تصنيف MPAA. على سبيل المثال، إذا تم تعيينه على "مصنف"، يتم عرض تصنيف "PG" على أنه "تصنيف PG". ستحتاج العناصر المخبأة إلى تحديثها."
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32419"
-msgid ""
-"The language and country settings used when looking up data from TMDb and "
-"Trakt APIs"
-msgstr ""
-"إعدادات اللغة والدولة المستخدمة عند البحث عن البيانات من TMDb و Trakt APIs"
+msgid "The language and country settings used when looking up data from TMDb and Trakt APIs"
+msgstr "إعدادات اللغة والبلد المستخدمة عند البحث عن البيانات من TMDb و Trakt APIs"
 
 #: resources/settings.xml
 msgctxt "#32420"
@@ -1752,7 +2017,7 @@ msgctxt "#32425"
 msgid ""
 "Have TMDbHelper queue all episodes in a playlist when playing an episode "
 "using this player?"
-msgstr ""
+msgstr "هل لديك TMDbHelper قائمة انتظار لجميع الحلقات في قائمة تشغيل عند تشغيل حلقة " "باستخدام هذا المشغل؟"
 
 #: resources/lib/player/configure.py
 msgctxt "#32426"
@@ -1767,12 +2032,12 @@ msgstr "استخدم المجلد الحالي كعنوان URL للبحث"
 #: resources/lib/player/configure.py
 msgctxt "#32428"
 msgid "Browse for MOVIE search url"
-msgstr ""
+msgstr "تصفح عنوان URL للبحث عن الأفلام"
 
 #: resources/lib/player/configure.py
 msgctxt "#32429"
 msgid "Browse for TVSHOW search url"
-msgstr ""
+msgstr "تصفح عنوان URL للبحث عن TVSHOW
 
 #: resources/lib/player/configure.py
 msgctxt "#32430"
@@ -1789,20 +2054,20 @@ msgctxt "#32432"
 msgid "Select template"
 msgstr "حدد النموذج"
 
-#: resources/lib/player/configure.py
+#: /resources/lib/player/configure.py
 msgctxt "#32433"
 msgid "Missing QUERYKEY in URL"
-msgstr ""
+msgstr "مفتاح الاستعلام المفقود في عنوان URL"
 
-#: resources/lib/player/configure.py
+#: /resources/lib/player/configure.py
 msgctxt "#32434"
 msgid "You must insert QUERYKEY where the search query for the URL goes"
-msgstr ""
+msgstr "يجب عليك إدراج QUERYKEY حيث يذهب استعلام البحث عن عنوان URL"
 
-#: resources/lib/player/configure.py
+#: /resources/lib/player/configure.py
 msgctxt "#32435"
 msgid "Input QUERYKEY where search query goes"
-msgstr ""
+msgstr "أدخل QUERYKEY حيث يذهب استعلام البحث"
 
 #: resources/settings.xml
 msgctxt "#32436"
@@ -1819,10 +2084,16 @@ msgctxt "#32438"
 msgid "Provider allowlist updated"
 msgstr "تم تحديث قائمة السماح بمزودين الخدمة"
 
+
+#: /resources/lib/script/method.py
+msgctxt "#32439"
+msgid "The provider allowlist has been updated."
+msgstr "تم تحديث قائمة السماح للمزود"
+
 #: resources/lib/script/method.py
 msgctxt "#32440"
 msgid "Edit steps"
-msgstr ""
+msgstr "تعديل الخطوات"
 
 #: resources/lib/player/configure.py
 msgctxt "#32441"
@@ -1842,17 +2113,17 @@ msgstr "حدد قيمة لتتناسب مع {}"
 #: resources/lib/player/configure.py
 msgctxt "#32444"
 msgid "Select rule or listitem key"
-msgstr ""
+msgstr "حدد القاعدة أو مفتاح عنصر القائمة"
 
 #: resources/lib/player/configure.py
 msgctxt "#32445"
 msgid "Edit Rules for Step {}"
-msgstr ""
+msgstr "تعديل القواعد للخطوة {}"
 
 #: resources/lib/player/configure.py
 msgctxt "#32446"
 msgid "plugin:// search URL for {}"
-msgstr ""
+msgstr "المكون الإضافي:// عنوان URL للبحث عن {}"
 
 #: resources/lib/player/configure.py
 msgctxt "#32447"
@@ -1862,22 +2133,24 @@ msgstr "الحلقة التالية فقط"
 #: resources/settings.xml
 msgctxt "#32448"
 msgid "Stop before attempting playback"
-msgstr ""
+msgstr "توقف قبل محاولة التشغيل"
 
 #: resources/settings.xml
 msgctxt "#32449"
 msgid "Ignore region release filter"
 msgstr "تجاهل فلتر إصدارات المنطقة"
 
+
+#: /resources/settings.xml
 #: resources/settings.xml
 msgctxt "#32451"
 msgid "Lowest"
-msgstr "الأقصر"
+msgstr "أدنى"
 
 #: resources/lib/api/trakt/api.py
 msgctxt "#32452"
 msgid "Highest"
-msgstr ""
+msgstr "أعلى"
 
 #: resources/lib/api/trakt/api.py
 msgctxt "#32453"
@@ -1887,7 +2160,7 @@ msgstr "الأقل مشاهدة"
 #: resources/lib/api/trakt/api.py
 msgctxt "#32454"
 msgid "Shortest"
-msgstr ""
+msgstr "أقصر"
 
 #: resources/lib/api/trakt/api.py
 msgctxt "#32455"
@@ -1922,12 +2195,12 @@ msgstr "الجوائز"
 #: resources/lib/api/tvdb/lists.py
 msgctxt "#32461"
 msgid "Winner of"
-msgstr ""
+msgstr ""الفائز ب"
 
 #: resources/lib/api/tvdb/lists.py
 msgctxt "#32462"
 msgid "Nominated for"
-msgstr ""
+msgstr "تم ترشيحه من أجل"
 
 #: resources/settings.xml
 msgctxt "#32463"
@@ -1952,7 +2225,7 @@ msgstr "عرض تنبيهات المزامنة والمصادقة عند بدء 
 #: resources/settings.xml
 msgctxt "#32469"
 msgid "Ignore articles when sorting alphabetically"
-msgstr ""
+msgstr "تجاهل المقالات عند الفرز أبجديا"
 
 #: resources/settings.xml
 msgctxt "#32470"
@@ -1972,7 +2245,7 @@ msgstr "موقع التخزين المؤقت للصور"
 #: resources/lib/api/trakt/api.py
 msgctxt "#32473"
 msgid "Collected"
-msgstr ""
+msgstr "تم جمعها"
 
 #: resources/lib/script/method.py
 msgctxt "#32474"
@@ -1994,22 +2267,23 @@ msgctxt "#32477"
 msgid "Change default player for tvshow, season, or episode"
 msgstr "تغيير المشغل الافتراضي للمسلسل أو الموسم أو الحلقة"
 
-#: resources/settings.xml
+
+#: /resources/settings.xml
 msgctxt "#32481"
 msgid "Increases the pool of recently watched items randomly selected from the seed to use for \"Because You Watched\" style recommendations."
-msgstr ""
+msgstr "يزيد من مجموعة العناصر التي تمت مشاهدتها مؤخرا التي تم اختيارها عشوائيا من البذور لاستخدامها في توصيات نمط \"لأنك شاهدت\"."
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32482"
 msgid "Random seed pool for recommendations"
 msgstr ""
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32483"
 msgid "Allow 3rd party plugin access to API key/token"
 msgstr ""
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32484"
 msgid "TVDb API"
 msgstr ""
@@ -2075,21 +2349,17 @@ msgctxt "#32496"
 msgid "Add/Remove as Custom Node"
 msgstr "إضافة/إزالة من الاختصارات"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32497"
 msgid "Container content fallback for service listitems without mediatypes"
-msgstr ""
+msgstr "تراجع محتوى الحاوية لعناصر قائمة الخدمة بدون أنواع الوسائط"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32498"
-msgid ""
-"Some plugins have poor metadata and fail to fill the item mediatype which "
-"results in the service monitor not completing an item lookup. This setting "
-"allows the service monitor to use the container content type when item "
-"mediatype is missing. Note this setting will likely result more frequent "
-"incorrect matches due to the end plugin having bad metadata."
-msgstr ""
+msgid "Some plugins have poor metadata and fail to fill the item mediatype which results in the service monitor not completing an item lookup. This setting allows the service monitor to use the container content type when item mediatype is missing. Note this setting will likely result more frequent incorrect matches due to the end plugin having bad metadata."
+msgstr "تحتوي بعض المكونات الإضافية على بيانات وصفية سيئة وتفشل في ملء نوع وسائط العنصر مما يؤدي إلى عدم إكمال مراقب الخدمة للبحث عن العنصر. يسمح هذا الإعداد لمراقب الخدمة باستخدام نوع محتوى الحاوية عندما يكون نوع وسائط العنصر مفقودا. لاحظ أن هذا الإعداد من المرجح أن يؤدي إلى تطابقات غير صحيحة أكثر تكرارا بسبب وجود بيانات تعريف سيئة للمكون الإضافي النهائي"
 
+#: /resources/settings.xml
 #: resources/settings.xml
 msgctxt "#32499"
 msgid "Page multipliers (higher is slower)"
@@ -2115,15 +2385,46 @@ msgctxt "#32503"
 msgid "Page multiplier (Library windows)"
 msgstr "قوائم المكتبة (عامل مضاعفة)"
 
+
+#: /resources/tmdbhelper/lib/script/method.py
+msgctxt "#32504"
+msgid "Add {} to node"
+msgstr ""أضف {} إلى النود"
+
+#: /resources/settings.xml
+msgctxt "#32505"
+msgid "Genre icons folder (TMDb)"
+msgstr "مجلد أيقونات النوع (TMDb)"
+
+#: /resources/settings.xml
+msgctxt "#32506"
+msgid "Provider icons folder (TMDb)"
+msgstr "مجلد أيقونات المزود (TMDb)"
+
+#: /resources/settings.xml
+msgctxt "#32507"
+msgid "Genre icon folder (Trakt)"
+msgstr "مجلد أيقونة النوع (trakt)"
+
+#: /resources/settings.xml
+msgctxt "#32508"
+msgid "Recache Kodi Library details when building players"
+msgstr "إعادة تخزين تفاصيل مكتبة كودي عند بناء المشغلات"
+
+#: /resources/settings.xml
+msgctxt "#32509"
+msgid "Use alternative TMDb API url"
+msgstr "استخدم عنوان url بديل لواجهة برمجة تطبيقات TMDb"
+
 #: /resources/settings.xml
 msgctxt "#32514"
 msgid "Add to MDbList list"
-msgstr "اضافة الى قائمة MDbList"
+msgstr "أضف إلى قائمة MDbList"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32516"
 msgid "MDbList API credentials not found."
-msgstr ""
+msgstr "لم يتم العثور على بيانات اعتماد واجهة برمجة تطبيقات MDbList."
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32517"
@@ -2139,6 +2440,86 @@ msgstr "لا تتوفر قائمة لمستخدم MDbList الحالي"
 msgctxt "#32519"
 msgid "Remove from MDbList list"
 msgstr "مسح من قائمة ال MDbList"
+
+#: /resources/settings.xml
+msgctxt "#32520"
+msgid "TMDb"
+msgstr "TMDb"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32521"
+msgid "Rated"
+msgstr "مصنف"
+
+#: /resources/settings.xml
+msgctxt "#32522"
+msgid "TMDb user options"
+msgstr "خيارات مستخدم TMDb"
+
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+msgctxt "#32523"
+msgid "Add/Remove from TMDb user list"
+msgstr "إضافة/إزالة من قائمة مستخدمي TMDb"
+
+#: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
+msgctxt "#32524"
+msgid "User lists"
+msgstr "قوائم المستخدمين"
+
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+msgctxt "#32525"
+msgid "Add/Remove from TMDb favourites"
+msgstr "dd/Remove من TMDb المفضلة"
+
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+msgctxt "#32526"
+msgid "Add/Remove from TMDb watchlist"
+msgstr "إضافة/إزالة من قائمة مراقبة TMDb"
+
+#: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
+msgctxt "#32527"
+msgid "Remove from {}"
+msgstr "إزالة من {}"
+
+#: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
+msgctxt "#32528"
+msgid "Add to {}"
+msgstr "أضف إلى {}"
+
+#: /resources/settings.xml
+msgctxt "#32529"
+msgid "Scrobble items on Trakt while watching"
+msgstr "عناصر Scrobble على Trakt أثناء المشاهدة"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32530"
+msgid "Remove rating"
+msgstr "إزالة التقييم"
+
+#: /resources/tmdbhelper/lib/script/sync/item.py
+msgctxt "#32531"
+msgid "Method only available for VIP accounts."
+msgstr "الطريقة متاحة فقط لحسابات كبار الشخصيات"
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32532"
+msgid "Force resync"
+msgstr "فرض إعادة المزامنة"
+
+#: /resources/settings.xml
+msgctxt "#32534"
+msgid "Trakt sync progress notifications"
+msgstr "إشعارات تقدم مزامنة Trakt"
+
+#: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
+msgctxt "#32535"
+msgid "Non-binary"
+msgstr "غير ثنائي"
+
+#: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
+msgctxt "#32536"
+msgid "Unspecified"
+msgstr "غير محدد"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
@@ -2292,17 +2673,17 @@ msgctxt "#30067"
 msgid "Zulu (South Africa)"
 msgstr ""
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32001"
 msgid "OMDb API key"
-msgstr "مفتاح OMDb API"
+msgstr "مفتاح واجهة برمجة التطبيقات OMDb"
 
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32002"
 msgid "Days to cache details"
-msgstr ""
+msgstr "عدد الايام لتفاصيل التخزين المؤقت"
 
-#: resources/settings.xml
+##: resources/settings.xml
 msgctxt "#32004"
 msgid "MPAA rating prefix"
 msgstr "بادئة تصنيف MPAA"
@@ -2366,13 +2747,7 @@ msgstr "حدد الإجراء الافتراضي في الإضافة"
 msgctxt "#32024"
 msgid "Default player for movies"
 msgstr "المشغل الافتراضي للأفلام"
-
-#: resources/settings.xml
+#: /resources/settings.xml
 msgctxt "#32025"
 msgid "Default player for episodes"
 msgstr "المشغل الافتراضي للحلقات"
-
-#: resources/settings.xml
-msgctxt "#32027"
-msgid "Clear default players"
-msgstr "مسح المشغلات الافتراضية"
