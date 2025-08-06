@@ -1974,7 +1974,7 @@ msgstr "使用在线观看"
 #: /resources/settings.xml
 msgctxt "#32413"
 msgid "Next episodes checks calendar (slower but more accurate)"
-msgstr "下一集节目表匹配（较慢但更准确）"
+msgstr "下一集 节目表匹配（较慢但更准确）"
 
 #: /resources/lib/addon/consts.py
 msgctxt "#32414"
