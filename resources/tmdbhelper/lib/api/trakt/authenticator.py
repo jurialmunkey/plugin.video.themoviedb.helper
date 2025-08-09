@@ -5,6 +5,7 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.api.trakt.token import KeyGetter, TraktStoredAccessToken
+from tmdbhelper.lib.files.locker import mutexlock
 
 
 class TraktAuthenticator:
@@ -19,13 +20,25 @@ class TraktAuthenticator:
     def get_key(self, dictionary, key):
         return KeyGetter(dictionary).get_key(key)
 
-    @cached_property
+    @property
     def attempted_login(self):
+        return self.attempted_login_winprop
+
+    @attempted_login.setter
+    def attempted_login(self, value):
+        self.attempted_login_winprop = get_property('TraktAttemptedLogin', f'{value}')
+
+    @cached_property
+    def attempted_login_winprop(self):
         return boolean(get_property('TraktAttemptedLogin'))
 
     @cached_property
     def authorization(self):
-        return TraktStoredAccessToken(self.trakt_api).authorization
+        return self.trakt_stored_access_token.authorization
+
+    @cached_property
+    def trakt_stored_access_token(self):
+        return TraktStoredAccessToken(self.trakt_api)
 
     @property
     def access_token(self):
@@ -34,6 +47,11 @@ class TraktAuthenticator:
     @property
     def is_authorized(self):
         return bool(self.access_token)
+
+    def authorize(self, forced=False):
+        if not self.is_authorized and forced:
+            self.ask_to_login()
+        return self.is_authorized
 
     @cached_property
     def code(self):
@@ -136,6 +154,31 @@ class TraktAuthenticator:
             self.xbmc_monitor.waitForAbort(self.interval)
 
         self.auth_dialog_close()
+
+    mutex_lockname = 'TraktAskingForLogin'
+
+    @mutexlock
+    def ask_to_login(self):
+        # We only ask once per instance to avoid spamming user with login prompts
+        if self.attempted_login:
+            return
+
+        x = Dialog().yesnocustom(
+            self.dialog_noapikey_header,
+            self.dialog_noapikey_text,
+            nolabel=get_localized(222),
+            yeslabel=get_localized(186),
+            customlabel=get_localized(13170)
+        )
+        routes = {
+            1: self.login,  # Yes (OK)
+            2: lambda: setattr(self, 'attempted_login', True)  # Custom (Never)
+        }
+
+        try:
+            return routes[x]()
+        except KeyError:
+            return
 
     def login(self):
         if not self.user_code or not self.device_code:
