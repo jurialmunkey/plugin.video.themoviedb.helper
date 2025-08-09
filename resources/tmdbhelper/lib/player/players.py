@@ -603,14 +603,12 @@ class Players(
 
         return self.selected.item
 
-    def get_resolved_path(self):
+    def get_resolved_listitem(self):
         if not self.item:
             return
         get_property('PlayerInfoString', clear_property=True)
         path = self.get_resolved_metaitem(allow_default=True) or {}
-        return self.get_resolved_listitem(path)
-
-    def get_resolved_listitem(self, path):
+        path = self.get_resolved_listitem(path)
         self.details.params = {}
         self.details.path = path.pop('url', None)
         self.details.infoproperties.update(path)
@@ -662,7 +660,7 @@ class Players(
 
     @cached_property
     def listitem(self):
-        return self.get_resolved_path()
+        return self.get_resolved_listitem()
 
     @cached_property
     def action(self):
