@@ -3,7 +3,6 @@ from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.api.request import NoCacheRequestAPI
 from tmdbhelper.lib.api.api_keys.trakt import CLIENT_ID, CLIENT_SECRET, USER_TOKEN
 from tmdbhelper.lib.api.trakt.authenticator import TraktAuthenticator
-from tmdbhelper.lib.addon.logger import kodi_log
 
 
 API_URL = 'https://api.trakt.tv/'
@@ -44,7 +43,7 @@ class TraktAPI(NoCacheRequestAPI):
 
     @property
     def headers(self):
-        return self.get_headers(self.authenticator.access_token)
+        return self.get_headers(self.access_token)
 
     def get_headers(self, access_token=None):
         headers = {}
@@ -56,6 +55,14 @@ class TraktAPI(NoCacheRequestAPI):
     def headers(self, value):
         """ Ignore base class req_api attempting to set headers """
         return
+
+    @property
+    def access_token(self):
+        if not self.authenticator.access_token:
+            return
+        if not self.authenticator.trakt_stored_access_token.has_valid_token:
+            self.refresh_authenticator()
+        return self.authenticator.access_token
 
     @cached_property
     def authenticator(self):
