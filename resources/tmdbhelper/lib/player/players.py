@@ -603,12 +603,12 @@ class Players(
 
         return self.selected.item
 
-    def get_resolved_path(self, return_listitem=True):
+    def get_resolved_path(self):
         if not self.item:
             return
         get_property('PlayerInfoString', clear_property=True)
         path = self.get_resolved_metaitem(allow_default=True) or {}
-        return self.get_resolved_listitem(path) if return_listitem else path
+        return self.get_resolved_listitem(path)
 
     def get_resolved_listitem(self, path):
         self.details.params = {}
