@@ -608,7 +608,6 @@ class Players(
             return
         get_property('PlayerInfoString', clear_property=True)
         path = self.get_resolved_metaitem(allow_default=True) or {}
-        path = self.get_resolved_listitem(path)
         self.details.params = {}
         self.details.path = path.pop('url', None)
         self.details.infoproperties.update(path)
