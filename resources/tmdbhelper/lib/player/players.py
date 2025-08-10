@@ -4,7 +4,6 @@ from xbmcaddon import Addon as KodiAddon
 from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, format_folderpath, get_localized, get_setting, executebuiltin
 from jurialmunkey.parser import try_int, boolean
-from tmdbhelper.lib.addon.consts import PLAYERS_CHOSEN_DEFAULTS_FILENAME
 from tmdbhelper.lib.api.kodi.rpc import get_directory, KodiLibrary
 from tmdbhelper.lib.player.inputter import KeyboardInputter
 from tmdbhelper.lib.player.actions.resolver import ResolverPlayerSelect
@@ -73,28 +72,6 @@ class PlayerMethods():
                 return
             return contents
         return file
-
-    def get_chosen_default(self):
-        """
-        Check if chosen item has a specific default player and return it as 'filename mode'
-        """
-        from tmdbhelper.lib.files.futils import get_json_filecache
-        cd = get_json_filecache(PLAYERS_CHOSEN_DEFAULTS_FILENAME)
-        if not cd:
-            self._chosen_default = None
-            return self._chosen_default
-        try:
-            if self.tmdb_type == 'movie':
-                cd = cd['movie'][f'{self.tmdb_id}']
-                return f"{cd['file']} {cd['mode']}"
-            cd = cd['tv'][f'{self.tmdb_id}']
-            cd = cd.get('season', {}).get(f'{self.season}') or cd
-            cd = cd.get('episode', {}).get(f'{self.episode}') or cd
-            self._chosen_default = f"{cd['file']} {cd['mode']}"
-            return self._chosen_default
-        except KeyError:
-            self._chosen_default = None
-            return self._chosen_default
 
     def get_dialog_players(self):
 
@@ -235,14 +212,6 @@ class PlayerProperties():
             return self._dialog_players
 
     @property
-    def chosen_default(self):
-        try:
-            return self._chosen_default
-        except AttributeError:
-            self._chosen_default = self.get_chosen_default()
-            return self._chosen_default
-
-    @property
     def external_ids(self):
         try:
             return self._external_ids
@@ -350,6 +319,11 @@ class Players(
             return self.details.infoproperties['providers'].split(' / ')
         except (KeyError, AttributeError):
             return
+
+    @cached_property
+    def chosen_default(self):
+        from tmdbhelper.lib.player.method.userdefault import PlayerDefaultUserChoiceGetter
+        return PlayerDefaultUserChoiceGetter(self.tmdb_type, self.tmdb_id, self.season, self.episode).info
 
     def select_default(self, header=None, detailed=True):
         """ Returns user selected player via dialog - detailed bool switches dialog style """

@@ -2,9 +2,9 @@ from xbmcgui import Dialog, DialogProgress
 from jurialmunkey.parser import boolean
 from jurialmunkey.window import get_property
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.addon.plugin import get_localized
+from tmdbhelper.lib.api.trakt.token import TraktStoredAccessToken
+from tmdbhelper.lib.addon.plugin import get_localized, KeyGetter
 from tmdbhelper.lib.addon.logger import kodi_log
-from tmdbhelper.lib.api.trakt.token import KeyGetter, TraktStoredAccessToken
 from tmdbhelper.lib.files.locker import mutexlock
 
 

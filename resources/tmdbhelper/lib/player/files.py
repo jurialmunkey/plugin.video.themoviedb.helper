@@ -126,11 +126,19 @@ class PlayerFiles:
         return basedirs
 
     @cached_property
+    def player_file_and_path_list(self):
+        player_file_metadata_list = {
+            filename: folder
+            for folder in self.basedirs
+            for filename in get_files_in_folder(folder, r'.*\.json')
+        }
+        return player_file_metadata_list
+
+    @cached_property
     def player_file_metadata_list(self):
         player_file_metadata_list = [
             PlayerFileMetaData(folder, filename, self.providers)
-            for folder in self.basedirs
-            for filename in get_files_in_folder(folder, r'.*\.json')
+            for filename, folder in self.player_file_and_path_list.items()
         ]
         return player_file_metadata_list
 
