@@ -81,25 +81,6 @@ class PlayerMethods():
             self._providers = None
         return self._providers
 
-    def get_player_priority(self, player):
-        player_provider = self.providers and player.get('provider')
-        if player_provider and player_provider in self.providers:
-            priority = self.providers.index(player_provider) + 1  # Add 1 because sorted() puts 0 index last
-            return (True, priority)
-        if player.get('is_provider', True):
-            priority = player.get('priority', PLAYERS_PRIORITY) + 100  # Increase priority baseline by 100 to prevent other players displaying above providers
-        return (False, priority)
-
-    def get_prioritised_players(self):
-
-        def _set_priority(item):
-            _, player = item
-            player['is_provider'], player['priority'] = self.get_player_priority(player)
-            return player['priority'], player.get('plugin', '\uFFFF').lower()
-
-        self._players_prioritised = sorted(self.players.items(), key=_set_priority)
-        return self._players_prioritised
-
     def get_chosen_default(self):
         """
         Check if chosen item has a specific default player and return it as 'filename mode'
@@ -223,14 +204,6 @@ class PlayerDetails():
 
 
 class PlayerProperties():
-    @property
-    def players_prioritised(self):
-        try:
-            return self._players_prioritised
-        except AttributeError:
-            self._players_prioritised = self.get_prioritised_players()
-            return self._players_prioritised
-
     @property
     def details(self):
         try:
@@ -372,9 +345,17 @@ class Players(
         return PlayerId(self.tmdb_type, self.player, self.mode).player_id
 
     @cached_property
-    def players(self):
+    def player_files(self):
         from tmdbhelper.lib.player.files import PlayerFiles
-        return PlayerFiles().dictionary
+        return PlayerFiles(self.providers)
+
+    @cached_property
+    def players(self):
+        return self.player_files.dictionary
+
+    @cached_property
+    def players_prioritised(self):
+        return self.player_files.prioritise
 
     def select_default(self, header=None, detailed=True):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
