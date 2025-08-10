@@ -69,7 +69,7 @@ class PlayerFileMetaData:
     def priority_provider(self):
         try:
             return self.providers.index(self.meta['provider']) + 1  # Add 1 to avoid 0 index for sorting
-        except (KeyError, ValueError, TypeError):
+        except (KeyError, ValueError, TypeError, AttributeError):
             return 0
 
     @cached_property

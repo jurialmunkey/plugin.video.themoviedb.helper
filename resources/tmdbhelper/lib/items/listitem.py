@@ -659,6 +659,10 @@ class _Episode(_Video):
         ])
         return params
 
+    def finalise_context_menu(self):
+        self.context_menu.append(self.context_menu_choosedefault)
+        return super().finalise_context_menu()
+
         # if (self.parent_params.get('info') == 'library_nextaired'
         #         and global_setting['nextaired_linklibrary']
         #         and self.infoproperties.get('tvshow.dbid')):
