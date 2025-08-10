@@ -82,3 +82,24 @@ class ProgressDialog(jurialmunkey_dialog.ProgressDialog):
     @staticmethod
     def kodi_log(msg, level=0):
         kodi_log(msg, level)
+
+
+class ProgressDialogPersistant(object):
+    """ ContextManager for DialogProgressBG use in with statement """
+
+    def __init__(self, *args, **kwargs):
+        self._dialog = ProgressDialog(*args, **kwargs)
+        self.closing = False
+
+    def update(self, *args, **kwargs):
+        return self._dialog.update(*args, **kwargs)
+
+    def close(self):
+        return self._dialog.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.closing or exc_type or exc_val or exc_tb:
+            self.close()

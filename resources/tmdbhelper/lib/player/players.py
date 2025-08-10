@@ -4,7 +4,7 @@ from xbmcaddon import Addon as KodiAddon
 from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, format_folderpath, get_localized, get_setting, executebuiltin
 from jurialmunkey.parser import try_int, boolean
-from tmdbhelper.lib.addon.consts import PLAYERS_PRIORITY, PLAYERS_CHOSEN_DEFAULTS_FILENAME
+from tmdbhelper.lib.addon.consts import PLAYERS_CHOSEN_DEFAULTS_FILENAME
 from tmdbhelper.lib.api.kodi.rpc import get_directory, KodiLibrary
 from tmdbhelper.lib.player.inputter import KeyboardInputter
 from tmdbhelper.lib.player.actions.resolver import ResolverPlayerSelect
@@ -73,13 +73,6 @@ class PlayerMethods():
                 return
             return contents
         return file
-
-    def get_providers(self):
-        try:
-            self._providers = self.details.infoproperties['providers'].split(' / ')
-        except (KeyError, AttributeError):
-            self._providers = None
-        return self._providers
 
     def get_chosen_default(self):
         """
@@ -209,8 +202,9 @@ class PlayerProperties():
         try:
             return self._details
         except AttributeError:
-            self.p_dialog.update(f'{get_localized(32375)}...')
-            self._details = self.get_item_details()
+            with self.p_dialog as p_dialog:
+                p_dialog.update(f'{get_localized(32375)}...')
+                self._details = self.get_item_details()
             return self._details
 
     @property
@@ -220,14 +214,6 @@ class PlayerProperties():
         except AttributeError:
             self._item = self.set_detailed_item()
             return self._item
-
-    @property
-    def providers(self):
-        try:
-            return self._providers
-        except AttributeError:
-            self._providers = self.get_providers()
-            return self._providers
 
     @property
     def next_episodes(self):
@@ -242,9 +228,10 @@ class PlayerProperties():
         try:
             return self._dialog_players
         except AttributeError:
-            self.p_dialog.update(f'{get_localized(32376)}...')
-            self._dialog_players = self.get_dialog_players()
-            self.p_dialog.close()
+            with self.p_dialog as p_dialog:
+                p_dialog.closing = True
+                p_dialog.update(f'{get_localized(32376)}...')
+                self._dialog_players = self.get_dialog_players()
             return self._dialog_players
 
     @property
@@ -332,8 +319,8 @@ class Players(
 
     @cached_property
     def p_dialog(self):
-        from tmdbhelper.lib.addon.dialog import ProgressDialog
-        return ProgressDialog('TMDbHelper', f'{get_localized(32374)}...', total=3)
+        from tmdbhelper.lib.addon.dialog import ProgressDialogPersistant
+        return ProgressDialogPersistant('TMDbHelper', f'{get_localized(32374)}...', total=3)
 
     @cached_property
     def action_log(self):
@@ -356,6 +343,13 @@ class Players(
     @cached_property
     def players_prioritised(self):
         return self.player_files.prioritise
+
+    @cached_property
+    def providers(self):
+        try:
+            return self.details.infoproperties['providers'].split(' / ')
+        except (KeyError, AttributeError):
+            return
 
     def select_default(self, header=None, detailed=True):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
