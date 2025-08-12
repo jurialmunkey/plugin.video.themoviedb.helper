@@ -25,7 +25,7 @@ class SeriesMovie(SeriesItemDetailsList):
 class SeriesStats(SeriesItemDetailsList):
     keys = (
         'ROUND(AVG(CASE WHEN rating > 0 THEN rating ELSE NULL END), 1) as rating',
-        'SUM(CASE WHEN votes > 0 THEN votes ELSE NULL END) as votes',
+        'SUM(votes) as votes',
         'COUNT(movie.tmdb_id) as numitems',
         'MAX(year) as year_last',
         'MIN(year) as year_first',
