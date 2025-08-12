@@ -24,9 +24,10 @@ class PlayerFileMetaData:
         '{epid}'
     )
 
-    def __init__(self, folder, filename):
+    def __init__(self, folder, filename, providers=None):
         self.folder = folder
         self.filename = filename
+        self.providers = providers
 
     @cached_property
     def filenameandpath(self):
@@ -65,12 +66,27 @@ class PlayerFileMetaData:
         ))
 
     @cached_property
-    def priority(self):
+    def priority_provider(self):
+        try:
+            return self.providers.index(self.meta['provider']) + 1  # Add 1 to avoid 0 index for sorting
+        except (KeyError, ValueError, TypeError, AttributeError):
+            return 0
+
+    @cached_property
+    def priority_baseline(self):
         try:
             priority = int(self.meta['priority'])
         except (KeyError, TypeError):
             priority = None
         return priority or PLAYERS_PRIORITY
+
+    @cached_property
+    def priority_standard(self):
+        return self.priority_baseline + 100  # Adjustment to put after providers
+
+    @cached_property
+    def priority(self):
+        return self.priority_provider or self.priority_standard
 
     @cached_property
     def metadata(self):
@@ -80,6 +96,7 @@ class PlayerFileMetaData:
                 ('requires_ids', self.requires_ids),
                 ('plugin', self.plugin),
                 ('priority', self.priority),
+                ('is_provider', self.priority_provider),
             ) if v
         })
         return metadata
@@ -89,6 +106,9 @@ class PlayerFiles:
 
     basedir_user = PLAYERS_BASEDIR_USER
     basedir_save = PLAYERS_BASEDIR_SAVE
+
+    def __init__(self, providers=None):
+        self.providers = providers
 
     @cached_property
     def basedir_bundled(self):
@@ -106,11 +126,19 @@ class PlayerFiles:
         return basedirs
 
     @cached_property
-    def player_file_metadata_list(self):
-        player_file_metadata_list = [
-            PlayerFileMetaData(folder, filename)
+    def player_file_and_path_list(self):
+        player_file_metadata_list = {
+            filename: folder
             for folder in self.basedirs
             for filename in get_files_in_folder(folder, r'.*\.json')
+        }
+        return player_file_metadata_list
+
+    @cached_property
+    def player_file_metadata_list(self):
+        player_file_metadata_list = [
+            PlayerFileMetaData(folder, filename, self.providers)
+            for filename, folder in self.player_file_and_path_list.items()
         ]
         return player_file_metadata_list
 
@@ -121,3 +149,11 @@ class PlayerFiles:
             for i in self.player_file_metadata_list
             if i.is_enabled
         }
+
+    @cached_property
+    def prioritise(self):
+        return [
+            (i.filename, i.metadata)
+            for i in sorted(self.player_file_metadata_list, key=lambda x: (x.priority, x.plugin))
+            if i.is_enabled
+        ]

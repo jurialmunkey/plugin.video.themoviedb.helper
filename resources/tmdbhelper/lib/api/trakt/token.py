@@ -94,6 +94,12 @@ class TraktStoredAccessToken:
         return self.expires_in_datetime.timestamp()
 
     @property
+    def has_valid_token(self):
+        if not self.expires_in_datetime:
+            return False
+        return bool(get_datetime_now() < self.expires_in_datetime)
+
+    @property
     def is_expired(self):
         if not self.access_token:
             self.access_message = '[no access_token]'
@@ -101,10 +107,7 @@ class TraktStoredAccessToken:
         if not self.refresh_token:
             self.access_message = '[no refresh_token]'
             return True
-        if not self.expires_in_datetime:
-            self.access_message = '[no expires_in]'
-            return True
-        if get_datetime_now() > self.expires_in_datetime:
+        if not self.has_valid_token:
             self.access_message = '[present token expired]'
             return True
         if not get_timestamp(self.winprop_traktisauth):

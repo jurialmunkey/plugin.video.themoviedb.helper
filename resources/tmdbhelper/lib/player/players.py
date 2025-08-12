@@ -4,7 +4,6 @@ from xbmcaddon import Addon as KodiAddon
 from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, format_folderpath, get_localized, get_setting, executebuiltin
 from jurialmunkey.parser import try_int, boolean
-from tmdbhelper.lib.addon.consts import PLAYERS_PRIORITY, PLAYERS_CHOSEN_DEFAULTS_FILENAME
 from tmdbhelper.lib.api.kodi.rpc import get_directory, KodiLibrary
 from tmdbhelper.lib.player.inputter import KeyboardInputter
 from tmdbhelper.lib.player.actions.resolver import ResolverPlayerSelect
@@ -73,54 +72,6 @@ class PlayerMethods():
                 return
             return contents
         return file
-
-    def get_providers(self):
-        try:
-            self._providers = self.details.infoproperties['providers'].split(' / ')
-        except (KeyError, AttributeError):
-            self._providers = None
-        return self._providers
-
-    def get_player_priority(self, player):
-        player_provider = self.providers and player.get('provider')
-        if player_provider and player_provider in self.providers:
-            priority = self.providers.index(player_provider) + 1  # Add 1 because sorted() puts 0 index last
-            return (True, priority)
-        if player.get('is_provider', True):
-            priority = player.get('priority', PLAYERS_PRIORITY) + 100  # Increase priority baseline by 100 to prevent other players displaying above providers
-        return (False, priority)
-
-    def get_prioritised_players(self):
-
-        def _set_priority(item):
-            _, player = item
-            player['is_provider'], player['priority'] = self.get_player_priority(player)
-            return player['priority'], player.get('plugin', '\uFFFF').lower()
-
-        self._players_prioritised = sorted(self.players.items(), key=_set_priority)
-        return self._players_prioritised
-
-    def get_chosen_default(self):
-        """
-        Check if chosen item has a specific default player and return it as 'filename mode'
-        """
-        from tmdbhelper.lib.files.futils import get_json_filecache
-        cd = get_json_filecache(PLAYERS_CHOSEN_DEFAULTS_FILENAME)
-        if not cd:
-            self._chosen_default = None
-            return self._chosen_default
-        try:
-            if self.tmdb_type == 'movie':
-                cd = cd['movie'][f'{self.tmdb_id}']
-                return f"{cd['file']} {cd['mode']}"
-            cd = cd['tv'][f'{self.tmdb_id}']
-            cd = cd.get('season', {}).get(f'{self.season}') or cd
-            cd = cd.get('episode', {}).get(f'{self.episode}') or cd
-            self._chosen_default = f"{cd['file']} {cd['mode']}"
-            return self._chosen_default
-        except KeyError:
-            self._chosen_default = None
-            return self._chosen_default
 
     def get_dialog_players(self):
 
@@ -224,20 +175,13 @@ class PlayerDetails():
 
 class PlayerProperties():
     @property
-    def players_prioritised(self):
-        try:
-            return self._players_prioritised
-        except AttributeError:
-            self._players_prioritised = self.get_prioritised_players()
-            return self._players_prioritised
-
-    @property
     def details(self):
         try:
             return self._details
         except AttributeError:
-            self.p_dialog.update(f'{get_localized(32375)}...')
-            self._details = self.get_item_details()
+            with self.p_dialog as p_dialog:
+                p_dialog.update(f'{get_localized(32375)}...')
+                self._details = self.get_item_details()
             return self._details
 
     @property
@@ -247,14 +191,6 @@ class PlayerProperties():
         except AttributeError:
             self._item = self.set_detailed_item()
             return self._item
-
-    @property
-    def providers(self):
-        try:
-            return self._providers
-        except AttributeError:
-            self._providers = self.get_providers()
-            return self._providers
 
     @property
     def next_episodes(self):
@@ -269,18 +205,11 @@ class PlayerProperties():
         try:
             return self._dialog_players
         except AttributeError:
-            self.p_dialog.update(f'{get_localized(32376)}...')
-            self._dialog_players = self.get_dialog_players()
-            self.p_dialog.close()
+            with self.p_dialog as p_dialog:
+                p_dialog.closing = True
+                p_dialog.update(f'{get_localized(32376)}...')
+                self._dialog_players = self.get_dialog_players()
             return self._dialog_players
-
-    @property
-    def chosen_default(self):
-        try:
-            return self._chosen_default
-        except AttributeError:
-            self._chosen_default = self.get_chosen_default()
-            return self._chosen_default
 
     @property
     def external_ids(self):
@@ -359,8 +288,8 @@ class Players(
 
     @cached_property
     def p_dialog(self):
-        from tmdbhelper.lib.addon.dialog import ProgressDialog
-        return ProgressDialog('TMDbHelper', f'{get_localized(32374)}...', total=3)
+        from tmdbhelper.lib.addon.dialog import ProgressDialogPersistant
+        return ProgressDialogPersistant('TMDbHelper', f'{get_localized(32374)}...', total=3)
 
     @cached_property
     def action_log(self):
@@ -372,9 +301,29 @@ class Players(
         return PlayerId(self.tmdb_type, self.player, self.mode).player_id
 
     @cached_property
-    def players(self):
+    def player_files(self):
         from tmdbhelper.lib.player.files import PlayerFiles
-        return PlayerFiles().dictionary
+        return PlayerFiles(self.providers)
+
+    @cached_property
+    def players(self):
+        return self.player_files.dictionary
+
+    @cached_property
+    def players_prioritised(self):
+        return self.player_files.prioritise
+
+    @cached_property
+    def providers(self):
+        try:
+            return self.details.infoproperties['providers'].split(' / ')
+        except (KeyError, AttributeError):
+            return
+
+    @cached_property
+    def chosen_default(self):
+        from tmdbhelper.lib.player.method.userdefault import PlayerDefaultUserChoiceGetter
+        return PlayerDefaultUserChoiceGetter(self.tmdb_type, self.tmdb_id, self.season, self.episode).info
 
     def select_default(self, header=None, detailed=True):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
@@ -603,14 +552,11 @@ class Players(
 
         return self.selected.item
 
-    def get_resolved_path(self, return_listitem=True):
+    def get_resolved_listitem(self):
         if not self.item:
             return
         get_property('PlayerInfoString', clear_property=True)
         path = self.get_resolved_metaitem(allow_default=True) or {}
-        return self.get_resolved_listitem(path) if return_listitem else path
-
-    def get_resolved_listitem(self, path):
         self.details.params = {}
         self.details.path = path.pop('url', None)
         self.details.infoproperties.update(path)
@@ -662,7 +608,7 @@ class Players(
 
     @cached_property
     def listitem(self):
-        return self.get_resolved_path()
+        return self.get_resolved_listitem()
 
     @cached_property
     def action(self):

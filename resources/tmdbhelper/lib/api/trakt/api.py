@@ -1,11 +1,8 @@
-from xbmcgui import Dialog
-from jurialmunkey.window import get_property
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.api.request import NoCacheRequestAPI
 from tmdbhelper.lib.api.api_keys.trakt import CLIENT_ID, CLIENT_SECRET, USER_TOKEN
 from tmdbhelper.lib.api.trakt.authenticator import TraktAuthenticator
-from tmdbhelper.lib.files.locker import mutexlock
 
 
 API_URL = 'https://api.trakt.tv/'
@@ -46,24 +43,33 @@ class TraktAPI(NoCacheRequestAPI):
 
     @property
     def headers(self):
-        return self.get_headers(self.authenticator.access_token)
+        return self.get_headers(self.access_token)
 
     def get_headers(self, access_token=None):
         headers = {}
         headers.update(self.headers_base)
-        headers.update(self.get_headers_authorization(access_token))
+        headers.update({'Authorization': f'Bearer {access_token}'} if access_token else {})
         return headers
-
-    def get_headers_authorization(self, access_token=None):
-        return {'Authorization': f'Bearer {access_token}'} if access_token else {}
 
     @headers.setter
     def headers(self, value):
+        """ Ignore base class req_api attempting to set headers """
         return
+
+    @property
+    def access_token(self):
+        if not self.authenticator.access_token:
+            return
+        if not self.authenticator.trakt_stored_access_token.has_valid_token:
+            self.refresh_authenticator()
+        return self.authenticator.access_token
 
     @cached_property
     def authenticator(self):
         return TraktAuthenticator(self)
+
+    def refresh_authenticator(self):
+        self.authenticator = TraktAuthenticator(self)
 
     @cached_property
     def dialog_noapikey_header(self):
@@ -106,50 +112,14 @@ class TraktAPI(NoCacheRequestAPI):
         return self.authorize(forced=True)
 
     def authorize(self, forced=False):
-        if not self.authenticator.is_authorized and (forced or self.login_if_required):
-            self.ask_to_login()
-        return self.authenticator.is_authorized
-
-    @property
-    def attempted_login(self):
-        return self.authenticator.attempted_login
-
-    @attempted_login.setter
-    def attempted_login(self, value):
-        self.authenticator.attempted_login = value
-        get_property('TraktAttemptedLogin', f'{value}')
-
-    mutex_lockname = 'TraktAskingForLogin'
-
-    @mutexlock
-    def ask_to_login(self):
-        # We only ask once per instance to avoid spamming user with login prompts
-        if self.attempted_login:
-            return
-
-        x = Dialog().yesnocustom(
-            self.dialog_noapikey_header,
-            self.dialog_noapikey_text,
-            nolabel=get_localized(222),
-            yeslabel=get_localized(186),
-            customlabel=get_localized(13170)
-        )
-        routes = {
-            1: self.login,  # Yes (OK)
-            2: lambda: setattr(self, 'attempted_login', True)  # Custom (Never)
-        }
-
-        try:
-            return routes[x]()
-        except KeyError:
-            return
+        return self.authenticator.authorize(forced or self.login_if_required)
 
     def logout(self):
-        self.authenticator = TraktAuthenticator(self)
+        self.refresh_authenticator()
         self.authenticator.logout()
 
     def login(self):
-        self.authenticator = TraktAuthenticator(self)
+        self.refresh_authenticator()
         self.authenticator.login()
 
     def delete_response(self, *args, **kwargs):
