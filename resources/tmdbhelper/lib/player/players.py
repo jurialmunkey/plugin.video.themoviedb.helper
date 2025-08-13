@@ -201,17 +201,6 @@ class PlayerProperties():
             return self._next_episodes
 
     @property
-    def dialog_players(self):
-        try:
-            return self._dialog_players
-        except AttributeError:
-            with self.p_dialog as p_dialog:
-                p_dialog.closing = True
-                p_dialog.update(f'{get_localized(32376)}...')
-                self._dialog_players = self.get_dialog_players()
-            return self._dialog_players
-
-    @property
     def external_ids(self):
         try:
             return self._external_ids
@@ -324,6 +313,13 @@ class Players(
     def chosen_default(self):
         from tmdbhelper.lib.player.method.userdefault import PlayerDefaultUserChoiceGetter
         return PlayerDefaultUserChoiceGetter(self.tmdb_type, self.tmdb_id, self.season, self.episode).info
+
+    @cached_property
+    def dialog_players(self):
+        with self.p_dialog as p_dialog:
+            p_dialog.closing = True
+            p_dialog.update(f'{get_localized(32376)}...')
+            return self.get_dialog_players()
 
     def select_default(self, header=None, detailed=True):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
