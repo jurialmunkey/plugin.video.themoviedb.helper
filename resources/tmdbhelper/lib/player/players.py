@@ -1,10 +1,9 @@
 import re
 from xbmcgui import Dialog
-from xbmcaddon import Addon as KodiAddon
 from jurialmunkey.window import get_property
-from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, format_folderpath, get_localized, get_setting, executebuiltin
+from tmdbhelper.lib.addon.plugin import PLUGINPATH, format_folderpath, get_localized, get_setting, executebuiltin
 from jurialmunkey.parser import try_int, boolean
-from tmdbhelper.lib.api.kodi.rpc import get_directory, KodiLibrary
+from tmdbhelper.lib.api.kodi.rpc import get_directory
 from tmdbhelper.lib.player.inputter import KeyboardInputter
 from tmdbhelper.lib.player.actions.resolver import ResolverPlayerSelect
 from tmdbhelper.lib.addon.logger import kodi_log
@@ -23,127 +22,18 @@ class PlayerMethods():
             self.details.set_details(details=self.external_ids, reverse=True)
         return self.set_detailed_item()
 
-    def get_local_item(self):
-        if not get_setting('default_player_kodi', 'int'):
-            return []
-        file = self.get_local_movie() if self.tmdb_type == 'movie' else self.get_local_episode()
-        if not file:
-            return []
-        return [{
-            'name': f'{get_localized(32061)} Kodi',
-            'is_folder': False,
-            'is_local': True,
-            'is_resolvable': "true",
-            'make_playlist': "true",
-            'plugin_name': 'xbmc.core',
-            'plugin_icon': f'{ADDONPATH}/resources/icons/other/kodi.png',
-            'actions': file}]
-
-    def get_local_movie(self):
-        k_db = KodiLibrary(dbtype='movie')
-        dbid = k_db.get_info(
-            'dbid', fuzzy_match=False,
-            tmdb_id=self.item.get('tmdb'),
-            imdb_id=self.item.get('imdb'))
-        if not dbid:
-            return
-        if self.details:  # Add dbid to details to update our local progress.
-            self.details.infolabels['dbid'] = dbid
-        return self.get_local_file(k_db.get_info('file', fuzzy_match=False, dbid=dbid))
-
-    def get_local_episode(self):
-        self.set_external_ids(required=True)  # Note: Don't forget about libraries that need TVDB ids from Trakt!!! Need to join ID lookup thread here!!!
-        dbid = KodiLibrary(dbtype='tvshow').get_info(
-            'dbid', fuzzy_match=False,
-            tmdb_id=self.item.get('tmdb'),
-            tvdb_id=self.item.get('tvdb'),
-            imdb_id=self.item.get('imdb'))
-        return self.get_local_file(KodiLibrary(dbtype='episode', tvshowid=dbid).get_info(
-            'file', season=self.item.get('season'), episode=self.item.get('episode')))
-
-    @staticmethod
-    def get_local_file(file):
-        if not file:
-            return
-        if file.endswith('.strm'):
-            from tmdbhelper.lib.files.futils import read_file
-            contents = read_file(file)
-            if contents.startswith('plugin://plugin.video.themoviedb.helper'):
-                return
-            return contents
-        return file
-
-    def get_dialog_players(self):
-
-        def _check_assert(keys=tuple()):
-            if not self.item:
-                return True  # No item so no need to assert values as we're only building to choose default player
-            for i in keys:
-                if i.startswith('!'):  # Inverted assert check for NOT value
-                    if self.item.get(i[1:]) and self.item.get(i[1:]) != 'None':
-                        return False  # Key has a value so player fails assert check
-                else:  # Standard assert check for value
-                    if not self.item.get(i) or self.item.get(i) == 'None':
-                        return False  # Key didn't have a value so player fails assert check
-            return True  # Player passed the assert check
-
-        dialog_play = self.get_local_item()
-        dialog_search = []
-
-        for file, player in self.players_prioritised:
-
-            if player.get('disabled', '').lower() == 'true':
-                continue  # Skip disabled players
-
-            if self.tmdb_type == 'movie':
-                if player.get('play_movie') and _check_assert(player.get('assert', {}).get('play_movie', [])):
-                    dialog_play.append(self.get_built_player(player_id=file, mode='play_movie', player=player))
-                if player.get('search_movie') and _check_assert(player.get('assert', {}).get('search_movie', [])):
-                    dialog_search.append(self.get_built_player(player_id=file, mode='search_movie', player=player))
-                continue
-
-            if self.tmdb_type == 'tv':
-                if player.get('play_episode') and _check_assert(player.get('assert', {}).get('play_episode', [])):
-                    dialog_play.append(self.get_built_player(player_id=file, mode='play_episode', player=player))
-                if player.get('search_episode') and _check_assert(player.get('assert', {}).get('search_episode', [])):
-                    dialog_search.append(self.get_built_player(player_id=file, mode='search_episode', player=player))
-                continue
-
-        return dialog_play + dialog_search
-
-    def get_built_player(self, player_id, mode, player=None):
-        player = player or self.players.get(player_id)
-        if player:
-            file = player_id
-        else:
-            for file, player in self.players_prioritised:
-                if mode not in player:
+    def get_built_player(self, file, mode):
+        meta = self.players.get(file)
+        if not meta:
+            for file, meta in self.players_prioritised:
+                if mode not in meta:
                     continue
-                if player_id in (player.get('plugin'), player.get('provider'), player.get('name')):
+                if file in (meta.get('plugin'), meta.get('provider'), meta.get('name')):
                     break
             else:
-                file = player_id
-                player = {}
-        if mode in ['play_movie', 'play_episode']:
-            name = get_localized(32061)
-            is_folder = False
-        else:
-            name = get_localized(137)
-            is_folder = True
-        return {
-            'file': file, 'mode': mode,
-            'is_folder': is_folder,
-            'is_provider': player.get('is_provider') if not is_folder else False,
-            'is_resolvable': player.get('is_resolvable'),
-            'requires_ids': player.get('requires_ids', False),
-            'make_playlist': player.get('make_playlist'),
-            'api_language': player.get('api_language'),
-            'language': player.get('language'),
-            'name': f'{name} {player.get("name")}',
-            'plugin_name': player.get('plugin'),
-            'plugin_icon': player.get('icon', '').format(ADDONPATH) or KodiAddon(player.get('plugin', '')).getAddonInfo('icon'),
-            'fallback': player.get('fallback', {}).get(mode),
-            'actions': player.get(mode)}
+                return
+        from tmdbhelper.lib.player.details.item import PlayerItemConstructed
+        return PlayerItemConstructed(file=file, item=self.item, mode=mode, meta=meta).configured_item
 
 
 class PlayerDetails():
@@ -319,7 +209,8 @@ class Players(
         with self.p_dialog as p_dialog:
             p_dialog.closing = True
             p_dialog.update(f'{get_localized(32376)}...')
-            return self.get_dialog_players()
+            from tmdbhelper.lib.player.details.dialog import PlayersDialog
+            return PlayersDialog(self.tmdb_type, item=self.item, data=self.players_prioritised).items
 
     def select_default(self, header=None, detailed=True):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
@@ -331,10 +222,10 @@ class Players(
     def _get_player_or_fallback(self, fallback):
         if not fallback:
             return
-        player_id, mode = fallback.split()
-        if not player_id or not mode:
+        file, mode = fallback.split()
+        if not file or not mode:
             return
-        player = self.get_built_player(player_id, mode)
+        player = self.get_built_player(file, mode)
         if not player:
             return
 
