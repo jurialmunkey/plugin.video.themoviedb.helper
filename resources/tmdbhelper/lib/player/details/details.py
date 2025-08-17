@@ -97,7 +97,6 @@ class PlayerDetails(dict):
         return self[key]
 
     def get_details(self, language=None):
-        from tmdbhelper.lib.player.details.details import get_item_details
         return get_item_details(
             self.tmdb_type,
             self.tmdb_id,
