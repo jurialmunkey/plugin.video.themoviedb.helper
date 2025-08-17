@@ -466,22 +466,6 @@ class Players(
             from tmdbhelper.lib.player.putils import make_playlist
             return make_playlist(self.next_episodes)
 
-    def configure_action(self, listitem, handle=None):
-        path = listitem.getPath()
-        if path.startswith('executebuiltin://'):
-            listitem.setProperty('is_folder', 'true')
-            return path.replace('executebuiltin://', '')
-        if listitem.getProperty('is_folder') == 'true':
-            return format_folderpath(path)
-        if not handle or listitem.getProperty('is_resolvable') == 'false':
-            return path
-        if listitem.getProperty('is_resolvable') == 'select' and not Dialog().yesno(
-                f'{listitem.getProperty("player_name")} - {get_localized(32353)}',
-                get_localized(32354),
-                yeslabel=f'{get_localized(107)} (setResolvedURL)',
-                nolabel=f'{get_localized(106)} (PlayMedia)'):
-            return path
-
     def playqueue_next_episodes(self):
         make_playlist = self.selected.make_playlist
         if not make_playlist:
@@ -498,8 +482,35 @@ class Players(
         return self.get_resolved_listitem()
 
     @cached_property
+    def listitem_path(self):
+        if not self.listitem:
+            return
+        return self.listitem.getPath()
+
+    @cached_property
     def action(self):
-        return self.configure_action(self.listitem, self.handle)
+        return self.get_action()
+
+    def get_action(self):
+        if not self.listitem_path:
+            return
+
+        if self.listitem_path.startswith('executebuiltin://'):
+            self.listitem.setProperty('is_folder', 'true')
+            return self.listitem_path.replace('executebuiltin://', '')
+
+        if self.listitem.getProperty('is_folder') == 'true':
+            return format_folderpath(self.listitem_path)
+
+        if not self.handle or self.listitem.getProperty('is_resolvable') == 'false':
+            return self.listitem_path
+
+        if self.listitem.getProperty('is_resolvable') == 'select' and not Dialog().yesno(
+                f'{self.listitem.getProperty("player_name")} - {get_localized(32353)}',
+                get_localized(32354),
+                yeslabel=f'{get_localized(107)} (setResolvedURL)',
+                nolabel=f'{get_localized(106)} (PlayMedia)'):
+            return self.listitem_path
 
     def play(self, folder_path=None, reset_focus=None, ignore_default=False):
         self.ignore_default = boolean(ignore_default)
