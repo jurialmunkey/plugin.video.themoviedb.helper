@@ -7,104 +7,8 @@ from tmdbhelper.lib.api.kodi.rpc import get_directory
 from tmdbhelper.lib.player.inputter import KeyboardInputter
 from tmdbhelper.lib.player.actions.resolver import ResolverPlayerSelect
 from tmdbhelper.lib.addon.logger import kodi_log
-from tmdbhelper.lib.addon.thread import SafeThread
 from tmdbhelper.lib.player.phacks.phacks import PlayerHacks
 from jurialmunkey.ftools import cached_property
-
-
-class PlayerMethods():
-    def string_format_map(self, fmt):
-        return fmt.format_map(self.item)  # NOTE: .format(**d) works in Py3.5 but not Py3.7+ so use format_map(d) instead
-
-    def set_external_ids(self, required=True):
-        if required and self.details:
-            self.thread_external_ids.join()
-            self.details.set_details(details=self.external_ids, reverse=True)
-        return self.set_detailed_item()
-
-    def get_built_player(self, file, mode):
-        meta = self.players.get(file)
-        if not meta:
-            for file, meta in self.players_prioritised:
-                if mode not in meta:
-                    continue
-                if file in (meta.get('plugin'), meta.get('provider'), meta.get('name')):
-                    break
-            else:
-                return
-        from tmdbhelper.lib.player.details.item import PlayerItemConstructed
-        return PlayerItemConstructed(file=file, item=self.item, mode=mode, meta=meta).configured_item
-
-
-class PlayerDetails():
-    def get_external_ids(self):
-        from tmdbhelper.lib.player.details.details import get_external_ids
-        self._external_ids = get_external_ids(self.tmdb_type, self.tmdb_id, season=self.season, episode=self.episode)
-        return self._external_ids
-
-    def get_item_details(self, language=None):
-        from tmdbhelper.lib.player.details.details import get_item_details
-        self._details = get_item_details(self.tmdb_type, self.tmdb_id, season=self.season, episode=self.episode, language=language)
-        return self._details
-
-    def set_detailed_item(self):
-        from tmdbhelper.lib.player.details.details import set_detailed_item
-        self._item = set_detailed_item(self.tmdb_type, self.tmdb_id, season=self.season, episode=self.episode, details=self.details) or {}
-        return self._item
-
-    def get_language_details(self, language=None, year=None):
-        from tmdbhelper.lib.player.details.details import get_language_details
-        self._item = get_language_details(self.item, self.tmdb_type, self.tmdb_id, self.season, self.episode, language=language, year=year)
-        return self._item
-
-    def get_next_episodes(self):
-        from tmdbhelper.lib.player.details.details import get_next_episodes
-        self._next_episodes = get_next_episodes(self.tmdb_id, self.season, self.episode, self.selected.player.file)
-        return self._next_episodes
-
-
-class PlayerProperties():
-    @property
-    def details(self):
-        try:
-            return self._details
-        except AttributeError:
-            with self.p_dialog as p_dialog:
-                p_dialog.update(f'{get_localized(32375)}...')
-                self._details = self.get_item_details()
-            return self._details
-
-    @property
-    def item(self):
-        try:
-            return self._item
-        except AttributeError:
-            self._item = self.set_detailed_item()
-            return self._item
-
-    @property
-    def next_episodes(self):
-        try:
-            return self._next_episodes
-        except AttributeError:
-            self._next_episodes = self.get_next_episodes()
-            return self._next_episodes
-
-    @property
-    def external_ids(self):
-        try:
-            return self._external_ids
-        except AttributeError:
-            self._external_ids = self.external_ids()
-            return self._external_ids
-
-    @property
-    def thread_external_ids(self):
-        try:
-            return self._thread_external_ids
-        except AttributeError:
-            self._thread_external_ids = SafeThread(target=self.get_external_ids)
-            return self._thread_external_ids
 
 
 class PlayerHacksMixin:
@@ -130,12 +34,7 @@ class PlayerHacksMixin:
         self.player_hacks_run(self.player_hacks_resolved_url)
 
 
-class Players(
-    PlayerProperties,
-    PlayerDetails,
-    PlayerMethods,
-    PlayerHacksMixin,
-):
+class Players(PlayerHacksMixin):
 
     selected = None
     default_player = None
@@ -156,19 +55,12 @@ class Players(
         # Otherwise the busy dialog will prevent window activation for folder path
         executebuiltin('Dialog.Close(busydialog)')
 
-        self.api_language = None
         self.player = player  # the player file name
         self.mode = mode  # search or play
         self.handle = handle
 
         PlayerHacks.force_recache_kodidb_hack()  # Check if user wants to force rebuilding Kodi library cache first in case of new items
-        self.thread_external_ids.start()  # We thread this lookup and rejoin later as Trakt might be slow and we dont want to delay if unneeded
         self.is_strm = islocal
-
-    @cached_property
-    def p_dialog(self):
-        from tmdbhelper.lib.addon.dialog import ProgressDialogPersistant
-        return ProgressDialogPersistant('TMDbHelper', f'{get_localized(32374)}...', total=3)
 
     @cached_property
     def action_log(self):
@@ -200,9 +92,43 @@ class Players(
             return
 
     @cached_property
-    def chosen_default(self):
-        from tmdbhelper.lib.player.method.userdefault import PlayerDefaultUserChoiceGetterFactory
-        return PlayerDefaultUserChoiceGetterFactory(self.tmdb_type, self.tmdb_id, self.season, self.episode).info
+    def next_episodes(self):
+        from tmdbhelper.lib.player.details.details import get_next_episodes
+        return get_next_episodes(self.tmdb_id, self.season, self.episode, self.selected.player.file)
+
+    @cached_property
+    def item_kwargs(self):
+        return {
+            'tmdb_type': self.tmdb_type,
+            'tmdb_id': self.tmdb_id,
+            'season': self.season,
+            'episode': self.episode,
+        }
+
+    @cached_property
+    def details_dictionary(self):
+        from tmdbhelper.lib.player.details.details import PlayerDetails
+        return PlayerDetails(**self.item_kwargs)
+
+    @cached_property
+    def p_dialog(self):
+        from tmdbhelper.lib.addon.dialog import ProgressDialogPersistant
+        return ProgressDialogPersistant('TMDbHelper', f'{get_localized(32374)}...', total=3)
+
+    @cached_property
+    def details(self):
+        with self.p_dialog as p_dialog:
+            p_dialog.update(f'{get_localized(32375)}...')
+            return self.details_dictionary[None]
+
+    @cached_property
+    def item(self):
+        from tmdbhelper.lib.player.details.details import set_detailed_item
+        return set_detailed_item(**self.item_kwargs, details=self.details) or {}
+
+    def get_language_details(self, language=None, year=None):
+        from tmdbhelper.lib.player.details.details import get_language_details
+        self.item = get_language_details(self.item, **self.item_kwargs, language=language, year=year)
 
     @cached_property
     def dialog_players(self):
@@ -211,6 +137,27 @@ class Players(
             p_dialog.update(f'{get_localized(32376)}...')
             from tmdbhelper.lib.player.details.dialog import PlayersDialog
             return PlayersDialog(self.tmdb_type, item=self.item, data=self.players_prioritised).items
+
+    @cached_property
+    def chosen_default(self):
+        from tmdbhelper.lib.player.method.userdefault import PlayerDefaultUserChoiceGetterFactory
+        return PlayerDefaultUserChoiceGetterFactory(**self.item_kwargs).info
+
+    def string_format_map(self, fmt):
+        return fmt.format_map(self.item)  # NOTE: .format(**d) works in Py3.5 but not Py3.7+ so use format_map(d) instead
+
+    def get_built_player(self, file, mode):
+        meta = self.players.get(file)
+        if not meta:
+            for file, meta in self.players_prioritised:
+                if mode not in meta:
+                    continue
+                if file in (meta.get('plugin'), meta.get('provider'), meta.get('name')):
+                    break
+            else:
+                return
+        from tmdbhelper.lib.player.details.item import PlayerItemConstructed
+        return PlayerItemConstructed(file=file, item=self.item, mode=mode, meta=meta).configured_item
 
     def select_default(self, header=None, detailed=True):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
@@ -424,14 +371,10 @@ class Players(
         if not self.resolver.player:
             return
         self.selected = self.resolver
-        self.set_external_ids(required=self.selected.player.requires_ids)  # Update item from external ID thread
 
         # Allow players to override language settings
-        # # Compare against self.api_language to check if another player changed language previously
-        if self.selected.player.api_language != self.api_language:
-            self.api_language = self.selected.player.api_language
-            self.get_item_details(language=self.api_language)
-            self.set_external_ids(required=self.selected.player.requires_ids)
+        if self.selected.player.api_language:
+            self.details = self.details_dictionary[self.selected.player.api_language]
             self.action_log += ('APILAN: ', self.api_language, '\n')
 
         # Allow for a separate translation language to add "{de_title}" keys ("de" is iso language code)
