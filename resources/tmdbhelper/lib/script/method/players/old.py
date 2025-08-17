@@ -1,66 +1,6 @@
 # Module: default
 # Author: jurialmunkey
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
-from tmdbhelper.lib.script.method.decorators import get_tmdb_id, map_kwargs
-
-
-def set_chosenplayer(tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
-    """
-    Prompts user to select (or clear) a default player for a single movie or tvshow
-    """
-    from xbmcgui import Dialog
-    from tmdbhelper.lib.player.players import PlayersFactory
-    from tmdbhelper.lib.addon.consts import PLAYERS_CHOSEN_DEFAULTS_FILENAME
-    from tmdbhelper.lib.files.futils import get_json_filecache, set_json_filecache
-    from tmdbhelper.lib.addon.plugin import get_localized
-
-    if tmdb_type not in ['movie', 'tv'] or not tmdb_id:
-        return
-
-    obj = get_json_filecache(PLAYERS_CHOSEN_DEFAULTS_FILENAME) or {}
-    lvl = obj
-    itm = obj.setdefault(tmdb_type, {}).setdefault(tmdb_id, {})
-    nme = kwargs.get('set_chosenplayer') or ''
-    itm['name'] = nme
-
-    # If theres a season/episode value then ask user if want to set for whole tvshow or just season/episode
-    x = 0
-    if season is not None:
-        func = Dialog()
-        opts = {'nolabel': get_localized(20364), 'yeslabel': get_localized(20373)}
-
-        if episode is not None:
-            func = func.yesnocustom
-            opts['customlabel'] = get_localized(20359)
-        else:
-            func = func.yesno
-
-        x = func(f'{tmdb_type} - {tmdb_id}', get_localized(32477), **opts)
-
-        if x == -1:
-            return
-        if x in [1, 2]:
-            lvl = itm.setdefault('season', {})
-            itm = lvl.setdefault(f'{season}', {})
-        if x == 2:
-            lvl = itm.setdefault('episode', {})
-            itm = lvl.setdefault(f'{episode}', {})
-
-    chosen_player = PlayersFactory(tmdb_type).select_default()
-    if not chosen_player:
-        return
-
-    if chosen_player.get('file') and chosen_player.get('mode'):
-        itm['file'] = chosen_player["file"]
-        itm['mode'] = chosen_player["mode"]
-        msg = get_localized(32474).format(f"{itm['file']} {itm['mode']}", nme)
-
-    else:
-        obj[tmdb_type].pop(f'{tmdb_id}')
-        msg = get_localized(32475).format(nme)
-
-    set_json_filecache(obj, PLAYERS_CHOSEN_DEFAULTS_FILENAME, 0)
-    Dialog().ok(f'{tmdb_type} - {tmdb_id}', msg)
 
 
 def play_using(play_using, mode='play', **kwargs):
@@ -135,6 +75,3 @@ def set_defaultplayer(**kwargs):
     if not default_player.get('file') or not default_player.get('mode'):
         return set_setting(setting_name, '', 'str')
     set_setting(setting_name, f'{default_player["file"]} {default_player["mode"]}', 'str')
-
-
-

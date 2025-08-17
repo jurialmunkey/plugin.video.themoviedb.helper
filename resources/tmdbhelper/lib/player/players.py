@@ -201,8 +201,8 @@ class Players(
 
     @cached_property
     def chosen_default(self):
-        from tmdbhelper.lib.player.method.userdefault import PlayerDefaultUserChoiceGetter
-        return PlayerDefaultUserChoiceGetter(self.tmdb_type, self.tmdb_id, self.season, self.episode).info
+        from tmdbhelper.lib.player.method.userdefault import PlayerDefaultUserChoiceGetterFactory
+        return PlayerDefaultUserChoiceGetterFactory(self.tmdb_type, self.tmdb_id, self.season, self.episode).info
 
     @cached_property
     def dialog_players(self):
