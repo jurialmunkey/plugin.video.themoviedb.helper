@@ -1,9 +1,6 @@
-from jurialmunkey.parser import try_int, del_empty_keys
+from jurialmunkey.parser import try_int
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.api.tmdb.api import TMDb
-
-
-EXTERNAL_ID_TYPES = ['tmdb', 'tvdb', 'imdb', 'slug', 'trakt']
 
 
 class PlayerNextEpisodes:
@@ -84,37 +81,127 @@ class PlayerNextEpisodes:
         return self.finalised_items
 
 
+class PlayerDetails(dict):
+
+    external_id_types = ('tmdb', 'tvdb', 'imdb', 'slug', 'trakt')
+
+    def __init__(self, tmdb_type, tmdb_id, season=None, episode=None):
+        self.tmdb_type = tmdb_type
+        self.tmdb_id = tmdb_id
+        self.season = season
+        self.episode = episode
+
+    def __missing__(self, key):
+        self[key] = self.get_details(key)
+        self[key].set_details(details=self.external_ids, reverse=True)
+        return self[key]
+
+    def get_details(self, language=None):
+        return get_item_details(
+            self.tmdb_type,
+            self.tmdb_id,
+            season=self.season,
+            episode=self.episode,
+            language=language
+        )
+
+    @cached_property
+    def find_queries_db(self):
+        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+        return FindQueriesDatabase()
+
+    @cached_property
+    def trakt_api(self):
+        from tmdbhelper.lib.api.trakt.api import TraktAPI
+        return TraktAPI()
+
+    @cached_property
+    def trakt_type(self):
+        return 'movie' if self.tmdb_type == 'movie' else 'show'
+
+    @cached_property
+    def trakt_slug(self):
+        return self.find_queries_db.get_trakt_id(
+            id_type='tmdb',
+            id_value=self.tmdb_id,
+            item_type=self.trakt_type,
+            output_type='slug'
+        )
+
+    @cached_property
+    def trakt_details(self):
+        if not self.trakt_slug:
+            return
+        return self.trakt_api.get_response_json(f'{self.trakt_type}s', self.trakt_slug)
+
+    @cached_property
+    def trakt_details_ids(self):
+        if not self.trakt_details:
+            return {}
+        return self.trakt_details.get('ids') or {}
+
+    @cached_property
+    def trakt_episode_details(self):
+        if not self.trakt_slug:
+            return
+        if self.season is None:
+            return
+        if self.episode is None:
+            return
+        return self.trakt_api.get_response_json(
+            'shows', self.trakt_slug,
+            'seasons', self.season,
+            'episodes', self.episode
+        )
+
+    @cached_property
+    def trakt_episode_details_ids(self):
+        if not self.trakt_episode_details:
+            return {}
+        return self.trakt_episode_details.get('ids') or {}
+
+    @property
+    def trakt_uid_generator(self):
+        return ((i, self.trakt_details_ids.get(i)) for i in self.external_id_types)
+
+    @cached_property
+    def trakt_movie_uids(self):
+        trakt_movie_uids = {k: v for k, v in self.trakt_uid_generator if k and v}
+        trakt_movie_uids['tmdb'] = self.tmdb_id
+        return trakt_movie_uids
+
+    @cached_property
+    def trakt_tvshow_uids(self):
+        trakt_tvshow_uids = {f'tvshow.{k}': v for k, v in self.trakt_uid_generator if k and v}
+        trakt_tvshow_uids['tvshow.tmdb'] = self.tmdb_id
+        return trakt_tvshow_uids
+
+    @property
+    def trakt_episode_uid_generator(self):
+        return ((i, self.trakt_episode_details_ids.get(i)) for i in self.external_id_types)
+
+    @cached_property
+    def trakt_episode_uids(self):
+        trakt_episode_uids = self.trakt_tvshow_uids
+        trakt_episode_uids.update({k: v for k, v in self.trakt_episode_uid_generator if k and v})
+        trakt_episode_uids['tmdb'] = self.tmdb_id
+        return trakt_episode_uids
+
+    @cached_property
+    def trakt_uids(self):
+        if self.trakt_type == 'movie':
+            return self.trakt_movie_uids
+        return self.trakt_episode_uids
+
+    @cached_property
+    def external_ids(self):
+        if not self.trakt_details_ids:
+            return {}
+        return {'unique_ids': self.trakt_uids}
+
+
 def get_next_episodes(tmdb_id, season, episode, player=None):
     return PlayerNextEpisodes(tmdb_id, season, episode, player).listitems
-
-
-def get_external_ids(tmdb_type, tmdb_id, season=None, episode=None):
-    from tmdbhelper.lib.api.trakt.api import TraktAPI
-    from tmdbhelper.lib.query.database.database import FindQueriesDatabase
-
-    trakt_api = TraktAPI()
-    trakt_type = 'movie' if tmdb_type == 'movie' else 'show'
-    if not tmdb_id or not trakt_type:
-        return
-
-    trakt_slug = FindQueriesDatabase().get_trakt_id(id_type='tmdb', id_value=tmdb_id, item_type=trakt_type, output_type='slug')
-    if not trakt_slug:
-        return
-
-    details = trakt_api.get_response_json(f'{trakt_type}s', trakt_slug)
-    if not details or not details.get('ids'):
-        return
-
-    if episode is not None:
-        _uids = {f'tvshow.{i}': details['ids'][i] for i in EXTERNAL_ID_TYPES if details['ids'].get(i)}
-        _episode_details_ids = trakt_api.get_response_json('shows', trakt_slug, 'seasons', season, 'episodes', episode).get('ids') or {}
-        _uids.update({f'{i}': _episode_details_ids[i] for i in EXTERNAL_ID_TYPES if _episode_details_ids.get(i)})
-        _uids['tvshow.tmdb'] = tmdb_id
-    else:
-        _uids = {i: details['ids'][i] for i in EXTERNAL_ID_TYPES if details['ids'].get(i)}
-        _uids['tmdb'] = tmdb_id
-
-    return {'unique_ids': _uids}
 
 
 def get_item_details(tmdb_type, tmdb_id, season=None, episode=None, language=None):

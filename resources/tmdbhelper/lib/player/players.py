@@ -1,220 +1,14 @@
 import re
 from xbmcgui import Dialog
-from xbmcaddon import Addon as KodiAddon
 from jurialmunkey.window import get_property
-from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, format_folderpath, get_localized, get_setting, executebuiltin
+from tmdbhelper.lib.addon.plugin import PLUGINPATH, format_folderpath, get_localized, get_setting, executebuiltin
 from jurialmunkey.parser import try_int, boolean
-from tmdbhelper.lib.api.kodi.rpc import get_directory, KodiLibrary
+from tmdbhelper.lib.api.kodi.rpc import get_directory
 from tmdbhelper.lib.player.inputter import KeyboardInputter
 from tmdbhelper.lib.player.actions.resolver import ResolverPlayerSelect
 from tmdbhelper.lib.addon.logger import kodi_log
-from tmdbhelper.lib.addon.thread import SafeThread
 from tmdbhelper.lib.player.phacks.phacks import PlayerHacks
 from jurialmunkey.ftools import cached_property
-
-
-class PlayerMethods():
-    def string_format_map(self, fmt):
-        return fmt.format_map(self.item)  # NOTE: .format(**d) works in Py3.5 but not Py3.7+ so use format_map(d) instead
-
-    def set_external_ids(self, required=True):
-        if required and self.details:
-            self.thread_external_ids.join()
-            self.details.set_details(details=self.external_ids, reverse=True)
-        return self.set_detailed_item()
-
-    def get_local_item(self):
-        if not get_setting('default_player_kodi', 'int'):
-            return []
-        file = self.get_local_movie() if self.tmdb_type == 'movie' else self.get_local_episode()
-        if not file:
-            return []
-        return [{
-            'name': f'{get_localized(32061)} Kodi',
-            'is_folder': False,
-            'is_local': True,
-            'is_resolvable': "true",
-            'make_playlist': "true",
-            'plugin_name': 'xbmc.core',
-            'plugin_icon': f'{ADDONPATH}/resources/icons/other/kodi.png',
-            'actions': file}]
-
-    def get_local_movie(self):
-        k_db = KodiLibrary(dbtype='movie')
-        dbid = k_db.get_info(
-            'dbid', fuzzy_match=False,
-            tmdb_id=self.item.get('tmdb'),
-            imdb_id=self.item.get('imdb'))
-        if not dbid:
-            return
-        if self.details:  # Add dbid to details to update our local progress.
-            self.details.infolabels['dbid'] = dbid
-        return self.get_local_file(k_db.get_info('file', fuzzy_match=False, dbid=dbid))
-
-    def get_local_episode(self):
-        self.set_external_ids(required=True)  # Note: Don't forget about libraries that need TVDB ids from Trakt!!! Need to join ID lookup thread here!!!
-        dbid = KodiLibrary(dbtype='tvshow').get_info(
-            'dbid', fuzzy_match=False,
-            tmdb_id=self.item.get('tmdb'),
-            tvdb_id=self.item.get('tvdb'),
-            imdb_id=self.item.get('imdb'))
-        return self.get_local_file(KodiLibrary(dbtype='episode', tvshowid=dbid).get_info(
-            'file', season=self.item.get('season'), episode=self.item.get('episode')))
-
-    @staticmethod
-    def get_local_file(file):
-        if not file:
-            return
-        if file.endswith('.strm'):
-            from tmdbhelper.lib.files.futils import read_file
-            contents = read_file(file)
-            if contents.startswith('plugin://plugin.video.themoviedb.helper'):
-                return
-            return contents
-        return file
-
-    def get_dialog_players(self):
-
-        def _check_assert(keys=tuple()):
-            if not self.item:
-                return True  # No item so no need to assert values as we're only building to choose default player
-            for i in keys:
-                if i.startswith('!'):  # Inverted assert check for NOT value
-                    if self.item.get(i[1:]) and self.item.get(i[1:]) != 'None':
-                        return False  # Key has a value so player fails assert check
-                else:  # Standard assert check for value
-                    if not self.item.get(i) or self.item.get(i) == 'None':
-                        return False  # Key didn't have a value so player fails assert check
-            return True  # Player passed the assert check
-
-        dialog_play = self.get_local_item()
-        dialog_search = []
-
-        for file, player in self.players_prioritised:
-
-            if player.get('disabled', '').lower() == 'true':
-                continue  # Skip disabled players
-
-            if self.tmdb_type == 'movie':
-                if player.get('play_movie') and _check_assert(player.get('assert', {}).get('play_movie', [])):
-                    dialog_play.append(self.get_built_player(player_id=file, mode='play_movie', player=player))
-                if player.get('search_movie') and _check_assert(player.get('assert', {}).get('search_movie', [])):
-                    dialog_search.append(self.get_built_player(player_id=file, mode='search_movie', player=player))
-                continue
-
-            if self.tmdb_type == 'tv':
-                if player.get('play_episode') and _check_assert(player.get('assert', {}).get('play_episode', [])):
-                    dialog_play.append(self.get_built_player(player_id=file, mode='play_episode', player=player))
-                if player.get('search_episode') and _check_assert(player.get('assert', {}).get('search_episode', [])):
-                    dialog_search.append(self.get_built_player(player_id=file, mode='search_episode', player=player))
-                continue
-
-        return dialog_play + dialog_search
-
-    def get_built_player(self, player_id, mode, player=None):
-        player = player or self.players.get(player_id)
-        if player:
-            file = player_id
-        else:
-            for file, player in self.players_prioritised:
-                if mode not in player:
-                    continue
-                if player_id in (player.get('plugin'), player.get('provider'), player.get('name')):
-                    break
-            else:
-                file = player_id
-                player = {}
-        if mode in ['play_movie', 'play_episode']:
-            name = get_localized(32061)
-            is_folder = False
-        else:
-            name = get_localized(137)
-            is_folder = True
-        return {
-            'file': file, 'mode': mode,
-            'is_folder': is_folder,
-            'is_provider': player.get('is_provider') if not is_folder else False,
-            'is_resolvable': player.get('is_resolvable'),
-            'requires_ids': player.get('requires_ids', False),
-            'make_playlist': player.get('make_playlist'),
-            'api_language': player.get('api_language'),
-            'language': player.get('language'),
-            'name': f'{name} {player.get("name")}',
-            'plugin_name': player.get('plugin'),
-            'plugin_icon': player.get('icon', '').format(ADDONPATH) or KodiAddon(player.get('plugin', '')).getAddonInfo('icon'),
-            'fallback': player.get('fallback', {}).get(mode),
-            'actions': player.get(mode)}
-
-
-class PlayerDetails():
-    def get_external_ids(self):
-        from tmdbhelper.lib.player.details.details import get_external_ids
-        self._external_ids = get_external_ids(self.tmdb_type, self.tmdb_id, season=self.season, episode=self.episode)
-        return self._external_ids
-
-    def get_item_details(self, language=None):
-        from tmdbhelper.lib.player.details.details import get_item_details
-        self._details = get_item_details(self.tmdb_type, self.tmdb_id, season=self.season, episode=self.episode, language=language)
-        return self._details
-
-    def set_detailed_item(self):
-        from tmdbhelper.lib.player.details.details import set_detailed_item
-        self._item = set_detailed_item(self.tmdb_type, self.tmdb_id, season=self.season, episode=self.episode, details=self.details) or {}
-        return self._item
-
-    def get_language_details(self, language=None, year=None):
-        from tmdbhelper.lib.player.details.details import get_language_details
-        self._item = get_language_details(self.item, self.tmdb_type, self.tmdb_id, self.season, self.episode, language=language, year=year)
-        return self._item
-
-    def get_next_episodes(self):
-        from tmdbhelper.lib.player.details.details import get_next_episodes
-        self._next_episodes = get_next_episodes(self.tmdb_id, self.season, self.episode, self.selected.player.file)
-        return self._next_episodes
-
-
-class PlayerProperties():
-    @property
-    def details(self):
-        try:
-            return self._details
-        except AttributeError:
-            with self.p_dialog as p_dialog:
-                p_dialog.update(f'{get_localized(32375)}...')
-                self._details = self.get_item_details()
-            return self._details
-
-    @property
-    def item(self):
-        try:
-            return self._item
-        except AttributeError:
-            self._item = self.set_detailed_item()
-            return self._item
-
-    @property
-    def next_episodes(self):
-        try:
-            return self._next_episodes
-        except AttributeError:
-            self._next_episodes = self.get_next_episodes()
-            return self._next_episodes
-
-    @property
-    def external_ids(self):
-        try:
-            return self._external_ids
-        except AttributeError:
-            self._external_ids = self.external_ids()
-            return self._external_ids
-
-    @property
-    def thread_external_ids(self):
-        try:
-            return self._thread_external_ids
-        except AttributeError:
-            self._thread_external_ids = SafeThread(target=self.get_external_ids)
-            return self._thread_external_ids
 
 
 class PlayerHacksMixin:
@@ -240,12 +34,7 @@ class PlayerHacksMixin:
         self.player_hacks_run(self.player_hacks_resolved_url)
 
 
-class Players(
-    PlayerProperties,
-    PlayerDetails,
-    PlayerMethods,
-    PlayerHacksMixin,
-):
+class Players(PlayerHacksMixin):
 
     selected = None
     default_player = None
@@ -266,19 +55,12 @@ class Players(
         # Otherwise the busy dialog will prevent window activation for folder path
         executebuiltin('Dialog.Close(busydialog)')
 
-        self.api_language = None
         self.player = player  # the player file name
         self.mode = mode  # search or play
         self.handle = handle
 
         PlayerHacks.force_recache_kodidb_hack()  # Check if user wants to force rebuilding Kodi library cache first in case of new items
-        self.thread_external_ids.start()  # We thread this lookup and rejoin later as Trakt might be slow and we dont want to delay if unneeded
         self.is_strm = islocal
-
-    @cached_property
-    def p_dialog(self):
-        from tmdbhelper.lib.addon.dialog import ProgressDialogPersistant
-        return ProgressDialogPersistant('TMDbHelper', f'{get_localized(32374)}...', total=3)
 
     @cached_property
     def action_log(self):
@@ -310,16 +92,72 @@ class Players(
             return
 
     @cached_property
-    def chosen_default(self):
-        from tmdbhelper.lib.player.method.userdefault import PlayerDefaultUserChoiceGetter
-        return PlayerDefaultUserChoiceGetter(self.tmdb_type, self.tmdb_id, self.season, self.episode).info
+    def next_episodes(self):
+        from tmdbhelper.lib.player.details.details import get_next_episodes
+        return get_next_episodes(self.tmdb_id, self.season, self.episode, self.selected.player.file)
+
+    @cached_property
+    def item_kwargs(self):
+        return {
+            'tmdb_type': self.tmdb_type,
+            'tmdb_id': self.tmdb_id,
+            'season': self.season,
+            'episode': self.episode,
+        }
+
+    @cached_property
+    def details_dictionary(self):
+        from tmdbhelper.lib.player.details.details import PlayerDetails
+        return PlayerDetails(**self.item_kwargs)
+
+    @cached_property
+    def p_dialog(self):
+        from tmdbhelper.lib.addon.dialog import ProgressDialogPersistant
+        return ProgressDialogPersistant('TMDbHelper', f'{get_localized(32374)}...', total=3)
+
+    @cached_property
+    def details(self):
+        with self.p_dialog as p_dialog:
+            p_dialog.update(f'{get_localized(32375)}...')
+            return self.details_dictionary[None]
+
+    @cached_property
+    def item(self):
+        from tmdbhelper.lib.player.details.details import set_detailed_item
+        return set_detailed_item(**self.item_kwargs, details=self.details) or {}
+
+    def get_language_details(self, language=None, year=None):
+        from tmdbhelper.lib.player.details.details import get_language_details
+        self.item = get_language_details(self.item, **self.item_kwargs, language=language, year=year)
 
     @cached_property
     def dialog_players(self):
         with self.p_dialog as p_dialog:
             p_dialog.closing = True
             p_dialog.update(f'{get_localized(32376)}...')
-            return self.get_dialog_players()
+            from tmdbhelper.lib.player.details.dialog import PlayersDialog
+            return PlayersDialog(self.tmdb_type, item=self.item, data=self.players_prioritised).items
+
+    @cached_property
+    def chosen_default(self):
+        from tmdbhelper.lib.player.method.userdefault import PlayerDefaultUserChoiceGetterFactory
+        return PlayerDefaultUserChoiceGetterFactory(**self.item_kwargs).info
+
+    def string_format_map(self, fmt):
+        return fmt.format_map(self.item)  # NOTE: .format(**d) works in Py3.5 but not Py3.7+ so use format_map(d) instead
+
+    def get_built_player(self, file, mode):
+        meta = self.players.get(file)
+        if not meta:
+            for file, meta in self.players_prioritised:
+                if mode not in meta:
+                    continue
+                if file in (meta.get('plugin'), meta.get('provider'), meta.get('name')):
+                    break
+            else:
+                return
+        from tmdbhelper.lib.player.details.item import PlayerItemConstructed
+        return PlayerItemConstructed(file=file, item=self.item, mode=mode, meta=meta).configured_item
 
     def select_default(self, header=None, detailed=True):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
@@ -331,10 +169,10 @@ class Players(
     def _get_player_or_fallback(self, fallback):
         if not fallback:
             return
-        player_id, mode = fallback.split()
-        if not player_id or not mode:
+        file, mode = fallback.split()
+        if not file or not mode:
             return
-        player = self.get_built_player(player_id, mode)
+        player = self.get_built_player(file, mode)
         if not player:
             return
 
@@ -533,14 +371,10 @@ class Players(
         if not self.resolver.player:
             return
         self.selected = self.resolver
-        self.set_external_ids(required=self.selected.player.requires_ids)  # Update item from external ID thread
 
         # Allow players to override language settings
-        # # Compare against self.api_language to check if another player changed language previously
-        if self.selected.player.api_language != self.api_language:
-            self.api_language = self.selected.player.api_language
-            self.get_item_details(language=self.api_language)
-            self.set_external_ids(required=self.selected.player.requires_ids)
+        if self.selected.player.api_language:
+            self.details = self.details_dictionary[self.selected.player.api_language]
             self.action_log += ('APILAN: ', self.api_language, '\n')
 
         # Allow for a separate translation language to add "{de_title}" keys ("de" is iso language code)
@@ -575,22 +409,6 @@ class Players(
             from tmdbhelper.lib.player.putils import make_playlist
             return make_playlist(self.next_episodes)
 
-    def configure_action(self, listitem, handle=None):
-        path = listitem.getPath()
-        if path.startswith('executebuiltin://'):
-            listitem.setProperty('is_folder', 'true')
-            return path.replace('executebuiltin://', '')
-        if listitem.getProperty('is_folder') == 'true':
-            return format_folderpath(path)
-        if not handle or listitem.getProperty('is_resolvable') == 'false':
-            return path
-        if listitem.getProperty('is_resolvable') == 'select' and not Dialog().yesno(
-                f'{listitem.getProperty("player_name")} - {get_localized(32353)}',
-                get_localized(32354),
-                yeslabel=f'{get_localized(107)} (setResolvedURL)',
-                nolabel=f'{get_localized(106)} (PlayMedia)'):
-            return path
-
     def playqueue_next_episodes(self):
         make_playlist = self.selected.make_playlist
         if not make_playlist:
@@ -607,8 +425,35 @@ class Players(
         return self.get_resolved_listitem()
 
     @cached_property
+    def listitem_path(self):
+        if not self.listitem:
+            return
+        return self.listitem.getPath()
+
+    @cached_property
     def action(self):
-        return self.configure_action(self.listitem, self.handle)
+        return self.get_action()
+
+    def get_action(self):
+        if not self.listitem_path:
+            return
+
+        if self.listitem_path.startswith('executebuiltin://'):
+            self.listitem.setProperty('is_folder', 'true')
+            return self.listitem_path.replace('executebuiltin://', '')
+
+        if self.listitem.getProperty('is_folder') == 'true':
+            return format_folderpath(self.listitem_path)
+
+        if not self.handle or self.listitem.getProperty('is_resolvable') == 'false':
+            return self.listitem_path
+
+        if self.listitem.getProperty('is_resolvable') == 'select' and not Dialog().yesno(
+                f'{self.listitem.getProperty("player_name")} - {get_localized(32353)}',
+                get_localized(32354),
+                yeslabel=f'{get_localized(107)} (setResolvedURL)',
+                nolabel=f'{get_localized(106)} (PlayMedia)'):
+            return self.listitem_path
 
     def play(self, folder_path=None, reset_focus=None, ignore_default=False):
         self.ignore_default = boolean(ignore_default)
