@@ -42,7 +42,10 @@ class BaseItem:
         for instance, ikey, dkey in self.infolabels_dbclist_routes:
             instance = self.return_basemeta_db(*instance)
             try:
-                infolabels[dkey] = [i[ikey] for i in instance.cached_data]
+                data = [i[ikey] for i in instance.cached_data]
+                if not data:
+                    continue
+                infolabels[dkey] = data
             except(KeyError, TypeError, IndexError, AttributeError):
                 pass
         return infolabels
@@ -51,7 +54,10 @@ class BaseItem:
         for instance, ikey, dkey in self.infolabels_dbcitem_routes:
             instance = self.return_basemeta_db(*instance)
             try:
-                infolabels[dkey] = ikey(instance.cached_data[0]) if callable(ikey) else instance.cached_data[0][ikey]
+                data = ikey(instance.cached_data[0]) if callable(ikey) else instance.cached_data[0][ikey]
+                if data is None:
+                    continue
+                infolabels[dkey] = data
             except(KeyError, TypeError, IndexError, AttributeError):
                 pass
         return infolabels
