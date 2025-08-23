@@ -511,7 +511,7 @@ class _Tvshow(_Video):
     def watchedepisodes(self):
         if not self.totalepisodes:
             return
-        return try_int(self.infoproperties.get('watchedepisodes'), fallback=None)
+        return try_int(self.infoproperties.get('watchedepisodes'), fallback=0)
 
     @property
     def unwatchedepisodes(self):
