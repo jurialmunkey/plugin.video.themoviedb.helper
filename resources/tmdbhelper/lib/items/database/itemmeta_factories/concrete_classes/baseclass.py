@@ -42,7 +42,10 @@ class BaseItem:
         for instance, ikey, dkey in self.infolabels_dbclist_routes:
             instance = self.return_basemeta_db(*instance)
             try:
-                infolabels[dkey] = [i[ikey] for i in instance.cached_data]
+                data = [i[ikey] for i in instance.cached_data]
+                if not data:
+                    continue
+                infolabels[dkey] = data
             except(KeyError, TypeError, IndexError, AttributeError):
                 pass
         return infolabels
@@ -51,7 +54,10 @@ class BaseItem:
         for instance, ikey, dkey in self.infolabels_dbcitem_routes:
             instance = self.return_basemeta_db(*instance)
             try:
-                infolabels[dkey] = ikey(instance.cached_data[0]) if callable(ikey) else instance.cached_data[0][ikey]
+                data = ikey(instance.cached_data[0]) if callable(ikey) else instance.cached_data[0][ikey]
+                if data is None:
+                    continue
+                infolabels[dkey] = data
             except(KeyError, TypeError, IndexError, AttributeError):
                 pass
         return infolabels
@@ -78,9 +84,11 @@ class BaseItem:
             instance = self.return_basemeta_db(*instance)
             for x, i in enumerate(instance.cached_data, 1):
                 for dkey, ikey in mappings.items():
-                    v = self.get_configured_item_value(i, ikey, instance)
+                    data = self.get_configured_item_value(i, ikey, instance)
+                    if data is None:
+                        continue
                     for name in propname:
-                        infoproperties[f'{name}.{x}.{dkey}'] = v
+                        infoproperties[f'{name}.{x}.{dkey}'] = data
             if joinings is None:
                 continue
             join_data = [i[joinings[1]] for i in instance.cached_data if i[joinings[1]]]
@@ -92,7 +100,10 @@ class BaseItem:
         for instance, ikey, dkey in self.infoproperties_dbcitem_routes:
             instance = self.return_basemeta_db(*instance)
             try:
-                infoproperties[dkey] = ikey(instance.cached_data[0]) if callable(ikey) else instance.cached_data[0][ikey]
+                data = ikey(instance.cached_data[0]) if callable(ikey) else instance.cached_data[0][ikey]
+                if data is None:
+                    continue
+                infoproperties[dkey] = data
             except(KeyError, TypeError, IndexError, AttributeError):
                 pass
         return infoproperties

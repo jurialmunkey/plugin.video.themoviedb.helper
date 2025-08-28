@@ -34,6 +34,66 @@ class PlayerHacksMixin:
         self.player_hacks_run(self.player_hacks_resolved_url)
 
 
+class PlayersNext:
+
+    def __init__(self, main, file, mode):
+        self.main = main  # Main Players class
+        self.file = file
+        self.mode = mode
+
+    @cached_property
+    def meta(self):
+        return self.main.players.get(self.file) if self.file and self.mode else None
+
+    @cached_property
+    def item(self):
+        return self.main.item
+
+    @cached_property
+    def constructed_player(self):
+        from tmdbhelper.lib.player.details.item import PlayerItemConstructed
+        return PlayerItemConstructed(
+            file=self.file,
+            item=self.item,
+            mode=self.mode,
+            meta=self.meta
+        ) if self.meta else None
+
+    @cached_property
+    def configured_item(self):
+        return self.constructed_player.configured_item if self.constructed_player else None
+
+    def player_check(self, player):
+        if player.get('file') != self.constructed_player.file:
+            return False
+        if player.get('mode') != self.constructed_player.mode:
+            return False
+        return True
+
+    @property
+    def generator(self):
+        return (x for x, player in enumerate(self.main.dialog_players) if self.player_check(player))
+
+    @cached_property
+    def idx(self):
+        return next(self.generator, None)
+
+    @cached_property
+    def player(self):
+        if self.configured_item is None:
+            return
+
+        if self.idx is not None:
+            self.configured_item['idx'] = self.idx
+            return self.configured_item
+
+        return PlayersNext(
+            self.main,
+            self.constructed_player.fallback_file,
+            self.constructed_player.fallback_mode,
+        ).player
+
+
 class Players(PlayerHacksMixin):
 
     selected = None
@@ -146,45 +206,12 @@ class Players(PlayerHacksMixin):
     def string_format_map(self, fmt):
         return fmt.format_map(self.item)  # NOTE: .format(**d) works in Py3.5 but not Py3.7+ so use format_map(d) instead
 
-    def get_built_player(self, file, mode):
-        meta = self.players.get(file)
-        if not meta:
-            for file, meta in self.players_prioritised:
-                if mode not in meta:
-                    continue
-                if file in (meta.get('plugin'), meta.get('provider'), meta.get('name')):
-                    break
-            else:
-                return
-        from tmdbhelper.lib.player.details.item import PlayerItemConstructed
-        return PlayerItemConstructed(file=file, item=self.item, mode=mode, meta=meta).configured_item
-
     def select_default(self, header=None, detailed=True):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
         from tmdbhelper.lib.player.select import PlayerSelectAdditionalItems, PlayerSelectCombined
         instance = PlayerSelectCombined(players=self.dialog_players)
         instance.additional_players = PlayerSelectAdditionalItems.clear_default_player()
         return instance.select(header=header, detailed=detailed)
-
-    def _get_player_or_fallback(self, fallback):
-        if not fallback:
-            return
-        file, mode = fallback.split()
-        if not file or not mode:
-            return
-        player = self.get_built_player(file, mode)
-        if not player:
-            return
-
-        # Look for the fallback player in the dialog list and return it if we have it
-        for x, i in enumerate(self.dialog_players):
-            if i == player:
-                player['idx'] = x
-                return player
-
-        # If we don't have the fallback but the fallback has a fallback then try that instead
-        if player.get('fallback'):
-            return self._get_player_or_fallback(player['fallback'])
 
     def _get_path_from_rules(self, folder, action, strict=False):
         """ Returns tuple of (path, is_folder) """
@@ -319,6 +346,10 @@ class Players(PlayerHacksMixin):
                 actions = self.string_format_map(actions)  # Format our path if a single path and not a file
             return (actions, player.get('is_folder', False))
 
+    def get_player(self, name):
+        file, mode = name.split()
+        return PlayersNext(self, file, mode).player
+
     def get_default_player(self):
         """ Returns default player """
 
@@ -329,10 +360,10 @@ class Players(PlayerHacksMixin):
             return
 
         if self.player_forced:
-            return self._get_player_or_fallback(self.player_forced)
+            return self.get_player(self.player_forced)
 
         if self.chosen_default:
-            return self._get_player_or_fallback(self.chosen_default)
+            return self.get_player(self.chosen_default)
 
         x = 0
 
@@ -357,13 +388,13 @@ class Players(PlayerHacksMixin):
         if not self.default_player:
             return
 
-        return self._get_player_or_fallback(self.default_player)
+        return self.get_player(self.default_player)
 
     @cached_property
     def resolver(self):
         resolver = ResolverPlayerSelect(self.item, dialog_players=self.dialog_players, action_log=self.action_log)
         resolver.resolved_path_func = self._get_path_from_player  # TODO: Temp shim: move into class
-        resolver.fallback_item_func = self._get_player_or_fallback  # TODO: Temp shim: move into class
+        resolver.fallback_item_func = self.get_player  # TODO: Temp shim: move into class
         return resolver
 
     def get_resolved_metaitem(self, player=None, allow_default=False):

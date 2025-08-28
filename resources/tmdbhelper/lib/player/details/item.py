@@ -103,6 +103,18 @@ class PlayerItemConstructed:
         return KeyGetter(self.meta_get('fallback')).get_key(self.mode)
 
     @cached_property
+    def fallback_split(self):
+        return self.fallback.split() if self.fallback else None
+
+    @cached_property
+    def fallback_file(self):
+        return self.fallback_split[0] if self.fallback_split else None
+
+    @cached_property
+    def fallback_mode(self):
+        return self.fallback_split[1] if self.fallback_split else None
+
+    @cached_property
     def actions(self):
         return self.meta_get(self.mode)
 
