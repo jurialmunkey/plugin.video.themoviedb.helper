@@ -7,31 +7,7 @@ from tmdbhelper.lib.api.kodi.rpc import get_directory
 from tmdbhelper.lib.player.inputter import KeyboardInputter
 from tmdbhelper.lib.player.actions.resolver import ResolverPlayerSelect
 from tmdbhelper.lib.addon.logger import kodi_log
-from tmdbhelper.lib.player.phacks.phacks import PlayerHacks
 from jurialmunkey.ftools import cached_property
-
-
-class PlayerHacksMixin:
-    @staticmethod
-    def player_hacks_run(instance):
-        try:
-            instance.run()
-        except AttributeError:
-            return
-
-    def player_hacks_update_listing_set(self, folder_path=None, reset_focus=None):
-        from tmdbhelper.lib.player.phacks.update_listing import PlayerHacksUpdateListing
-        self.player_hacks_update_listing = PlayerHacksUpdateListing(folder_path, reset_focus)
-
-    def player_hacks_update_listing_run(self):
-        self.player_hacks_run(self.player_hacks_update_listing)
-
-    def player_hacks_resolved_url_set(self, listitem, action=None):
-        from tmdbhelper.lib.player.phacks.resolved_url import PlayerHacksResolvedURL
-        self.player_hacks_resolved_url = PlayerHacksResolvedURL(listitem, action, handle=self.handle, f_strm=self.is_strm, equeue=self.playqueue_next_episodes)
-
-    def player_hacks_resolved_url_run(self):
-        self.player_hacks_run(self.player_hacks_resolved_url)
 
 
 class PlayersNext:
@@ -94,7 +70,7 @@ class PlayersNext:
         ).player
 
 
-class Players(PlayerHacksMixin):
+class Players:
 
     selected = None
     default_player = None
@@ -113,14 +89,48 @@ class Players(PlayerHacksMixin):
 
         # Kodi launches busy dialog on home screen that needs to be told to close
         # Otherwise the busy dialog will prevent window activation for folder path
-        executebuiltin('Dialog.Close(busydialog)')
+        # executebuiltin('Dialog.Close(busydialog)')
 
         self.player = player  # the player file name
         self.mode = mode  # search or play
         self.handle = handle
-
-        PlayerHacks.force_recache_kodidb_hack()  # Check if user wants to force rebuilding Kodi library cache first in case of new items
         self.is_strm = islocal
+
+    """
+    Player hacks
+    """
+
+    @staticmethod
+    def player_hacks_run(instance):
+        try:
+            instance.run()
+        except AttributeError:
+            return
+
+    def player_hacks_update_listing_set(self, folder_path=None, reset_focus=None):
+        from tmdbhelper.lib.player.phacks.update_listing import PlayerHacksUpdateListing
+        self.player_hacks_update_listing = PlayerHacksUpdateListing(folder_path, reset_focus)
+
+    def player_hacks_update_listing_run(self):
+        self.player_hacks_run(self.player_hacks_update_listing)
+
+    def player_hacks_resolved_url_set(self, listitem, action=None):
+        from tmdbhelper.lib.player.phacks.resolved_url import PlayerHacksResolvedURL
+        self.player_hacks_resolved_url = PlayerHacksResolvedURL(listitem, action, handle=self.handle, f_strm=self.is_strm, equeue=self.playqueue_next_episodes)
+
+    def player_hacks_resolved_url_run(self):
+        self.player_hacks_run(self.player_hacks_resolved_url)
+
+    def player_hacks_playback_wait_set(self, fileext=None, timeout=5):
+        from tmdbhelper.lib.player.phacks.playback_wait import PlayerHacksPlaybackWait
+        self.player_hacks_playback_wait = PlayerHacksPlaybackWait(fileext, timeout)
+
+    def player_hacks_playback_wait_run(self):
+        self.player_hacks_run(self.player_hacks_playback_wait)
+
+    """
+    Properties
+    """
 
     @cached_property
     def action_log(self):
@@ -171,15 +181,62 @@ class Players(PlayerHacksMixin):
         return PlayerDetails(**self.item_kwargs)
 
     @cached_property
+    def p_dialog_step_count(self):
+        p_dialog_step_count = sum((
+            int(self.p_dialog_step_is_enabled_recache_kodidb),
+            int(self.p_dialog_step_is_enabled_player_details),
+            int(self.p_dialog_step_is_enabled_dialog_players),
+        ))
+        return p_dialog_step_count
+
+    @cached_property
     def p_dialog(self):
         from tmdbhelper.lib.addon.dialog import ProgressDialogPersistant
-        return ProgressDialogPersistant('TMDbHelper', f'{get_localized(32374)}...', total=3)
+        return ProgressDialogPersistant('TMDbHelper', f'{get_localized(32374)}...', total=self.p_dialog_step_count)
+
+    """
+    ProgressDialog: Step 01: Recache Kodi DB
+    """
+
+    @cached_property
+    def p_dialog_step_is_enabled_recache_kodidb(self):
+        return get_setting('force_recache_kodidb')
+
+    def recache_kodidb(self):
+        if not self.p_dialog_step_is_enabled_recache_kodidb:
+            return
+        with self.p_dialog as p_dialog:
+            p_dialog.update(f'Recaching Kodi library database...')
+            from tmdbhelper.lib.script.method.maintenance import DatabaseMaintenance
+            DatabaseMaintenance().recache_kodidb(notification=False)
+
+    """
+    ProgressDialog: Step 02: Build player details
+    """
+
+    p_dialog_step_is_enabled_player_details = True
 
     @cached_property
     def details(self):
+        if not self.p_dialog_step_is_enabled_player_details:
+            return
         with self.p_dialog as p_dialog:
             p_dialog.update(f'{get_localized(32375)}...')
             return self.details_dictionary[None]
+
+    """
+    ProgressDialog: Step 03: Build dialog players
+    """
+
+    p_dialog_step_is_enabled_dialog_players = True
+
+    @cached_property
+    def dialog_players(self):
+        with self.p_dialog as p_dialog:
+            p_dialog.closing = True
+            p_dialog.update(f'{get_localized(32376)}...')
+            from tmdbhelper.lib.player.details.dialog import PlayersDialog
+            return PlayersDialog(self.tmdb_type, item=self.item, data=self.players_prioritised).items
 
     @cached_property
     def item(self):
@@ -189,14 +246,6 @@ class Players(PlayerHacksMixin):
     def get_language_details(self, language=None, year=None):
         from tmdbhelper.lib.player.details.details import get_language_details
         self.item = get_language_details(self.item, **self.item_kwargs, language=language, year=year)
-
-    @cached_property
-    def dialog_players(self):
-        with self.p_dialog as p_dialog:
-            p_dialog.closing = True
-            p_dialog.update(f'{get_localized(32376)}...')
-            from tmdbhelper.lib.player.details.dialog import PlayersDialog
-            return PlayersDialog(self.tmdb_type, item=self.item, data=self.players_prioritised).items
 
     @cached_property
     def chosen_default(self):
@@ -431,7 +480,8 @@ class Players(PlayerHacksMixin):
         if not self.next_episodes or len(self.next_episodes) < 2:
             return
 
-        PlayerHacks.wait_for_player_hack(to_start=True, timeout=30)
+        self.player_hacks_playback_wait_set(True, timeout=30)
+        self.player_hacks_playback_wait_run()
 
         if route == 'make_upnext':
             from tmdbhelper.lib.player.putils import make_upnext
