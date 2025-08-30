@@ -1,7 +1,7 @@
 import re
 from xbmcgui import Dialog
 from jurialmunkey.window import get_property
-from tmdbhelper.lib.addon.plugin import PLUGINPATH, format_folderpath, get_localized, get_setting, executebuiltin
+from tmdbhelper.lib.addon.plugin import PLUGINPATH, format_folderpath, get_localized, get_setting
 from jurialmunkey.parser import try_int, boolean
 from tmdbhelper.lib.api.kodi.rpc import get_directory
 from tmdbhelper.lib.player.inputter import KeyboardInputter
@@ -195,23 +195,7 @@ class Players:
         return ProgressDialogPersistant('TMDbHelper', f'{get_localized(32374)}...', total=self.p_dialog_step_count)
 
     """
-    ProgressDialog: Step 01: Recache Kodi DB
-    """
-
-    @cached_property
-    def p_dialog_step_is_enabled_recache_kodidb(self):
-        return get_setting('force_recache_kodidb')
-
-    def recache_kodidb(self):
-        if not self.p_dialog_step_is_enabled_recache_kodidb:
-            return
-        with self.p_dialog as p_dialog:
-            p_dialog.update(f'Recaching Kodi library database...')
-            from tmdbhelper.lib.script.method.maintenance import DatabaseMaintenance
-            DatabaseMaintenance().recache_kodidb(notification=False)
-
-    """
-    ProgressDialog: Step 02: Build player details
+    ProgressDialog: Step 01: Build player details
     """
 
     p_dialog_step_is_enabled_player_details = True
@@ -225,6 +209,22 @@ class Players:
             return self.details_dictionary[None]
 
     """
+    ProgressDialog: Step 02: Recache Kodi DB
+    """
+
+    @cached_property
+    def p_dialog_step_is_enabled_recache_kodidb(self):
+        return bool(get_setting('default_player_kodi', 'int') and get_setting('force_recache_kodidb'))
+
+    def recache_kodidb(self):
+        if not self.p_dialog_step_is_enabled_recache_kodidb:
+            return
+        with self.p_dialog as p_dialog:
+            p_dialog.update(f'{get_localized(32143)}...')
+            from tmdbhelper.lib.script.method.maintenance import DatabaseMaintenance
+            DatabaseMaintenance().recache_kodidb(notification=False)
+
+    """
     ProgressDialog: Step 03: Build dialog players
     """
 
@@ -232,6 +232,11 @@ class Players:
 
     @cached_property
     def dialog_players(self):
+        if not self.p_dialog_step_is_enabled_dialog_players:
+            return
+
+        self.recache_kodidb()
+
         with self.p_dialog as p_dialog:
             p_dialog.closing = True
             p_dialog.update(f'{get_localized(32376)}...')
