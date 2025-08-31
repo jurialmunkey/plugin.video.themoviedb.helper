@@ -261,93 +261,20 @@ class Players:
         instance.additional_players = PlayerSelectAdditionalItems.clear_default_player()
         return instance.select(header=header, detailed=detailed)
 
-    @staticmethod
-    def action_dialog_select(folder, auto=False):
-        from tmdbhelper.lib.player.actions.dialog import PlayerActionDialog
-        return PlayerActionDialog(folder, auto).item_tuple
-
-    def _get_path_from_actions(self, actions, is_folder=True):
-        """ Returns tuple of (path, is_folder) """
-        is_dialog = None
-        keyboard_input = None
-        path = (actions[0], is_folder)
-        if not is_folder:
-            return path
-        for action in actions[1:]:
-            # Start thread with keyboard inputter if needed
-            if action.get('keyboard'):
-                if action['keyboard'] in ['Up', 'Down', 'Left', 'Right', 'Select']:
-                    keyboard_input = KeyboardInputter(action=f'Input.{action.get("keyboard")}')
-                    self.action_log += ('KEYBRD: ', action['keyboard'], '\n')
-                else:
-                    text = self.string_format_map(action['keyboard'])
-                    keyboard_input = KeyboardInputter(text=text[::-1] if action.get('direction') == 'rtl' else text)
-                    self.action_log += ('KEYBRD: ', text, '\n')
-                keyboard_input.setName('keyboard_input')
-                keyboard_input.start()
-                continue  # Go to next action
-
-            # Get the next folder from the plugin
-            str_fmt_map = self.string_format_map(path[0])
-            self.action_log += ('FOLDER: ', str_fmt_map, '\n', 'ACTION: ', action, '\n')
-            folder = get_directory(str_fmt_map)
-
-            # Kill our keyboard inputter thread
-            if keyboard_input:
-                keyboard_input.exit = True
-                keyboard_input = None
-
-            # Pop special actions
-            is_return = action.pop('return', None)
-            is_dialog = action.pop('dialog', None)
-            is_strict = action.pop('strict', None)
-
-            # Get next path if there's still actions left
-            from tmdbhelper.lib.player.actions.evaluator import RuleEvaluator
-            next_path = RuleEvaluator(self.string_format_map, folder, action, is_strict).output if action else None
-
-            # Strict flag checks that we received a single item
-            if is_strict and next_path and isinstance(next_path, list):
-                if is_dialog:  # A dialog action combined with strict flag allows users to choose
-                    folder = next_path  # Set our folder to list of matches to choose in dialog
-                next_path = None  # We didn't get a next path so
-
-            # Special action to fallback to select dialog if match is not found directly
-            if is_dialog and not next_path:
-                next_path = self.action_dialog_select(folder, auto=is_dialog.lower() == 'auto')
-
-            # Early return flag ignores a step failure and instead continues onto trying next step
-            # Check against next_path[1] also to make sure we aren't trying to play a folder
-            if is_return and (not next_path or next_path[1]):
-                continue
-
-            # No next path and no special flags means that player failed
-            if not next_path:
-                return
-
-            # File is playable and user manually selected or early return flag set
-            # Useful for early exit to play episodes in flattened miniseries instead of opening season folder
-            if not next_path[1] and (is_dialog or is_return):
-                return next_path
-
-            # Set next path to path for next action
-            path = next_path
-
-        # If dialog repeat flag set then repeat action over until find playable or user cancels
-        if path and is_dialog == 'repeat':
-            return self._get_path_from_actions([path[0], {'dialog': 'repeat'}], path[1])
-
-        return path
-
     def _get_path_from_player(self, player=None):
         """ Returns tuple of (path, is_folder) """
         if not player or not isinstance(player, dict):
             return
+
         actions = player.get('actions')
+
         if not actions:
             return
+
         if isinstance(actions, list):
-            return self._get_path_from_actions(actions)
+            from tmdbhelper.lib.player.actions.pathfinder import PathFinder
+            return PathFinder(self.string_format_map, actions).path_tuple
+
         if isinstance(actions, str):
             if not player.get('is_local', False):
                 actions = self.string_format_map(actions)  # Format our path if a single path and not a file

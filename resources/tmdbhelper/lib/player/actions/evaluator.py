@@ -49,6 +49,10 @@ class RuleItemEvaluator:
         return self.meta_get('file')
 
     @cached_property
+    def name(self):
+        return self.meta_get('label')
+
+    @cached_property
     def filetype(self):
         return self.meta_get('filetype')
 
@@ -71,8 +75,8 @@ class RuleItemEvaluator:
     def is_valid(self):
         if not self.file:
             return False
-        if not self.main.action:
-            return False
+        # if not self.main.action:
+        #     return False
         return all((i.is_valid for i in self.rule_item_generator))
 
 
@@ -83,11 +87,12 @@ class RuleEvaluator:
     Strict only finds first exact match else return a list of possible matches
     """
 
-    def __init__(self, mapper, folder, action, strict=False):
+    def __init__(self, mapper, folder, action, strict=False, dialog=False):
         self.mapper = mapper
         self.folder = folder
         self.action = action
         self.strict = strict
+        self.dialog = dialog
 
     @property
     def rule_item_generator(self):
@@ -103,6 +108,11 @@ class RuleEvaluator:
     @cached_property
     def all_matches(self):
         return list(self.rule_item_generator)
+
+    def dialog_select(self, folder):
+        from tmdbhelper.lib.player.actions.dialog import PlayerActionDialog
+        dialog = PlayerActionDialog(folder, self.dialog.lower() == 'auto')
+        return dialog.item_tuple
 
     OUTPUT_EMPTY = 0
     OUTPUT_FIRST = 1
@@ -127,7 +137,21 @@ class RuleEvaluator:
         routes = {
             self.OUTPUT_EMPTY: lambda: None,
             self.OUTPUT_FIRST: lambda: self.first_match.item_tuple,
-            self.OUTPUT_ITEMS: lambda: [i.meta for i in self.all_matches],
+            self.OUTPUT_ITEMS: lambda: self.dialog_select([i.meta for i in self.all_matches]),
         }
 
         return routes[self.output_type]()
+
+    @property
+    def file_path(self):
+        try:
+            return self.output[0]
+        except TypeError:
+            return
+
+    @property
+    def is_folder(self):
+        try:
+            return self.output[1]
+        except TypeError:
+            return
