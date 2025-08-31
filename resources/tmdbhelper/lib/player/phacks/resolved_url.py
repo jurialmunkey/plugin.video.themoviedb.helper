@@ -91,6 +91,9 @@ class PlayerHacksResolvedURL:
 
     def executebuiltin_action(self):
         kodi_log(['lib.player - executing action:\n', self.action], 1)
+        # Kodi launches busy dialog on home screen that needs to be told to close
+        # Otherwise the busy dialog will prevent window activation for folder path
+        executebuiltin('Dialog.Close(busydialog, force)')
         executebuiltin(self.action)
 
     def wait_for_player_condition(self, filename=None):

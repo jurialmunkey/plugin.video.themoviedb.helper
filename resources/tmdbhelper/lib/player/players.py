@@ -1,13 +1,12 @@
-import re
 from xbmcgui import Dialog
 from jurialmunkey.window import get_property
+from jurialmunkey.parser import boolean
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import PLUGINPATH, format_folderpath, get_localized, get_setting
-from jurialmunkey.parser import try_int, boolean
 from tmdbhelper.lib.api.kodi.rpc import get_directory
 from tmdbhelper.lib.player.inputter import KeyboardInputter
 from tmdbhelper.lib.player.actions.resolver import ResolverPlayerSelect
 from tmdbhelper.lib.addon.logger import kodi_log
-from jurialmunkey.ftools import cached_property
 
 
 class PlayersNext:
@@ -86,11 +85,6 @@ class Players:
         handle=None,
         **kwargs
     ):
-
-        # Kodi launches busy dialog on home screen that needs to be told to close
-        # Otherwise the busy dialog will prevent window activation for folder path
-        # executebuiltin('Dialog.Close(busydialog)')
-
         self.player = player  # the player file name
         self.mode = mode  # search or play
         self.handle = handle
@@ -267,48 +261,6 @@ class Players:
         instance.additional_players = PlayerSelectAdditionalItems.clear_default_player()
         return instance.select(header=header, detailed=detailed)
 
-    def _get_path_from_rules(self, folder, action, strict=False):
-        """ Returns tuple of (path, is_folder) """
-        _matches = []
-        _action_log = []
-        for x, f in enumerate(folder):
-            _lastaction = ['   Itm: ', f.get('label'), '\n']
-            for k, v in action.items():  # Iterate through our key (infolabel) / value (infolabel must match) pairs of our action
-                if k == 'position':  # We're looking for an item position not an infolabel
-                    if try_int(self.string_format_map(v)) != x + 1:  # Format our position value and add one since people are dumb and don't know that arrays start at 0
-                        break  # Not the item position we want so let's go to next item in folder
-                    continue  # Continue to check other actions in step
-                itm_key_val = f'{f.get(k, "")}'  # Wrangle to string
-                _lastaction += ('   Key: ', k, ' = ', itm_key_val, '\n')
-                if not itm_key_val:
-                    _action_log += _lastaction
-                    break  # Item doesn't have key so go to next item
-                str_fmt_map = self.string_format_map(v)
-                _lastaction += ('   Fmt: ', str_fmt_map, '\n')
-                if not re.match(str_fmt_map, itm_key_val):  # Format our value and check if it regex matches the infolabel key
-                    _action_log += _lastaction
-                    break  # Item's key value doesn't match value we are looking for so let's got to next item in folder
-            else:  # Item matched our criteria so let's return it
-                if not f.get('file'):
-                    continue  # If the item doesn't have a path we should keep looking
-                _matches.append(f)
-                self.action_log += _lastaction
-                self.action_log += ('FMATCH: ', f['file'], '\n')
-                if not strict:  # Not strict match so don't bother checking rest of folder
-                    break
-
-        if not _matches:
-            self.action_log += ('STEP FAILED!', '\n') if folder and folder[0] else ('NO RESULTS!', '\n')
-            self.action_log += _action_log
-            return
-
-        if not strict or len(_matches) == 1:  # Strict match must give only one item
-            f = _matches[0]
-            is_folder = False if f.get('filetype') == 'file' else True  # Set false for files so we can play
-            return (f['file'], is_folder)  # Get ListItem.FolderPath for item and return as player
-
-        return _matches
-
     @staticmethod
     def action_dialog_select(folder, auto=False):
         from tmdbhelper.lib.player.actions.dialog import PlayerActionDialog
@@ -351,7 +303,8 @@ class Players:
             is_strict = action.pop('strict', None)
 
             # Get next path if there's still actions left
-            next_path = self._get_path_from_rules(folder, action, is_strict) if action else None
+            from tmdbhelper.lib.player.actions.evaluator import RuleEvaluator
+            next_path = RuleEvaluator(self.string_format_map, folder, action, is_strict).output if action else None
 
             # Strict flag checks that we received a single item
             if is_strict and next_path and isinstance(next_path, list):
