@@ -5,9 +5,9 @@ class CastMember(ItemDetailsList):
     table = 'castmember'
     keys = ('tmdb_id', 'role', 'ordering', 'appearances', 'parent_id')
     conflict_constraint = 'tmdb_id, role, parent_id'
-    conditions = 'parent_id=? ORDER BY IFNULL(ordering, 9999) ASC LIMIT 100'  # WHERE conditions  # TODO: Move limit to settings ???
+    conditions = 'parent_id=? GROUP BY castmember.tmdb_id ORDER BY IFNULL(ordering, 9999) ASC LIMIT 100'  # WHERE conditions  # TODO: Move limit to settings ???
     cached_data_keys = (
-        'castmember.tmdb_id', 'role', 'ordering', 'appearances',
+        'castmember.tmdb_id', 'GROUP_CONCAT(role, " / ") as role', 'ordering', 'appearances',
         'name', 'gender', 'biography', 'known_for_department',
         (
             '(    SELECT art.icon FROM art'
@@ -28,10 +28,10 @@ class CastMember(ItemDetailsList):
 class CrewMember(CastMember):
     table = 'crewmember'
     keys = ('tmdb_id', 'role', 'department', 'appearances', 'parent_id')
-    conditions = 'parent_id=? ORDER BY appearances DESC LIMIT 100'
+    conditions = 'parent_id=? GROUP BY crewmember.tmdb_id ORDER BY appearances DESC LIMIT 100'
     conflict_constraint = 'tmdb_id, role, department, parent_id'
     cached_data_keys = (
-        'crewmember.tmdb_id', 'role', 'department', 'appearances',
+        'crewmember.tmdb_id', 'GROUP_CONCAT(role, " / ") as role', 'department', 'appearances',
         'name', 'gender', 'biography', 'known_for_department',
         (
             '(    SELECT art.icon FROM art'
