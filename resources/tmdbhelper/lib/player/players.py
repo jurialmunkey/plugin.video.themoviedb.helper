@@ -3,8 +3,6 @@ from jurialmunkey.window import get_property
 from jurialmunkey.parser import boolean
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import PLUGINPATH, format_folderpath, get_localized, get_setting
-from tmdbhelper.lib.api.kodi.rpc import get_directory
-from tmdbhelper.lib.player.inputter import KeyboardInputter
 from tmdbhelper.lib.player.actions.resolver import ResolverPlayerSelect
 from tmdbhelper.lib.addon.logger import kodi_log
 
@@ -261,25 +259,6 @@ class Players:
         instance.additional_players = PlayerSelectAdditionalItems.clear_default_player()
         return instance.select(header=header, detailed=detailed)
 
-    def _get_path_from_player(self, player=None):
-        """ Returns tuple of (path, is_folder) """
-        if not player or not isinstance(player, dict):
-            return
-
-        actions = player.get('actions')
-
-        if not actions:
-            return
-
-        if isinstance(actions, list):
-            from tmdbhelper.lib.player.actions.pathfinder import PathFinder
-            return PathFinder(self.string_format_map, actions).path_tuple
-
-        if isinstance(actions, str):
-            if not player.get('is_local', False):
-                actions = self.string_format_map(actions)  # Format our path if a single path and not a file
-            return (actions, player.get('is_folder', False))
-
     def get_player(self, name):
         file, mode = name.split()
         return PlayersNext(self, file, mode).player
@@ -327,7 +306,7 @@ class Players:
     @cached_property
     def resolver(self):
         resolver = ResolverPlayerSelect(self.item, dialog_players=self.dialog_players, action_log=self.action_log)
-        resolver.resolved_path_func = self._get_path_from_player  # TODO: Temp shim: move into class
+        resolver.string_format_func = self.string_format_map  # TODO: Temp shim: move into class
         resolver.fallback_item_func = self.get_player  # TODO: Temp shim: move into class
         return resolver
 
