@@ -1,37 +1,10 @@
-import re
 from xbmcgui import Dialog
 from jurialmunkey.window import get_property
-from tmdbhelper.lib.addon.plugin import PLUGINPATH, format_folderpath, get_localized, get_setting, executebuiltin
-from jurialmunkey.parser import try_int, boolean
-from tmdbhelper.lib.api.kodi.rpc import get_directory
-from tmdbhelper.lib.player.inputter import KeyboardInputter
+from jurialmunkey.parser import boolean
+from jurialmunkey.ftools import cached_property
+from tmdbhelper.lib.addon.plugin import PLUGINPATH, format_folderpath, get_localized, get_setting
 from tmdbhelper.lib.player.actions.resolver import ResolverPlayerSelect
 from tmdbhelper.lib.addon.logger import kodi_log
-from tmdbhelper.lib.player.phacks.phacks import PlayerHacks
-from jurialmunkey.ftools import cached_property
-
-
-class PlayerHacksMixin:
-    @staticmethod
-    def player_hacks_run(instance):
-        try:
-            instance.run()
-        except AttributeError:
-            return
-
-    def player_hacks_update_listing_set(self, folder_path=None, reset_focus=None):
-        from tmdbhelper.lib.player.phacks.update_listing import PlayerHacksUpdateListing
-        self.player_hacks_update_listing = PlayerHacksUpdateListing(folder_path, reset_focus)
-
-    def player_hacks_update_listing_run(self):
-        self.player_hacks_run(self.player_hacks_update_listing)
-
-    def player_hacks_resolved_url_set(self, listitem, action=None):
-        from tmdbhelper.lib.player.phacks.resolved_url import PlayerHacksResolvedURL
-        self.player_hacks_resolved_url = PlayerHacksResolvedURL(listitem, action, handle=self.handle, f_strm=self.is_strm, equeue=self.playqueue_next_episodes)
-
-    def player_hacks_resolved_url_run(self):
-        self.player_hacks_run(self.player_hacks_resolved_url)
 
 
 class PlayersNext:
@@ -94,7 +67,7 @@ class PlayersNext:
         ).player
 
 
-class Players(PlayerHacksMixin):
+class Players:
 
     selected = None
     default_player = None
@@ -110,17 +83,46 @@ class Players(PlayerHacksMixin):
         handle=None,
         **kwargs
     ):
-
-        # Kodi launches busy dialog on home screen that needs to be told to close
-        # Otherwise the busy dialog will prevent window activation for folder path
-        executebuiltin('Dialog.Close(busydialog)')
-
         self.player = player  # the player file name
         self.mode = mode  # search or play
         self.handle = handle
-
-        PlayerHacks.force_recache_kodidb_hack()  # Check if user wants to force rebuilding Kodi library cache first in case of new items
         self.is_strm = islocal
+
+    """
+    Player hacks
+    """
+
+    @staticmethod
+    def player_hacks_run(instance):
+        try:
+            instance.run()
+        except AttributeError:
+            return
+
+    def player_hacks_update_listing_set(self, folder_path=None, reset_focus=None):
+        from tmdbhelper.lib.player.phacks.update_listing import PlayerHacksUpdateListing
+        self.player_hacks_update_listing = PlayerHacksUpdateListing(folder_path, reset_focus)
+
+    def player_hacks_update_listing_run(self):
+        self.player_hacks_run(self.player_hacks_update_listing)
+
+    def player_hacks_resolved_url_set(self, listitem, action=None):
+        from tmdbhelper.lib.player.phacks.resolved_url import PlayerHacksResolvedURL
+        self.player_hacks_resolved_url = PlayerHacksResolvedURL(listitem, action, handle=self.handle, f_strm=self.is_strm, equeue=self.playqueue_next_episodes)
+
+    def player_hacks_resolved_url_run(self):
+        self.player_hacks_run(self.player_hacks_resolved_url)
+
+    def player_hacks_playback_wait_set(self, fileext=None, timeout=5):
+        from tmdbhelper.lib.player.phacks.playback_wait import PlayerHacksPlaybackWait
+        self.player_hacks_playback_wait = PlayerHacksPlaybackWait(fileext, timeout)
+
+    def player_hacks_playback_wait_run(self):
+        self.player_hacks_run(self.player_hacks_playback_wait)
+
+    """
+    Properties
+    """
 
     @cached_property
     def action_log(self):
@@ -171,15 +173,67 @@ class Players(PlayerHacksMixin):
         return PlayerDetails(**self.item_kwargs)
 
     @cached_property
+    def p_dialog_step_count(self):
+        p_dialog_step_count = sum((
+            int(self.p_dialog_step_is_enabled_recache_kodidb),
+            int(self.p_dialog_step_is_enabled_player_details),
+            int(self.p_dialog_step_is_enabled_dialog_players),
+        ))
+        return p_dialog_step_count
+
+    @cached_property
     def p_dialog(self):
         from tmdbhelper.lib.addon.dialog import ProgressDialogPersistant
-        return ProgressDialogPersistant('TMDbHelper', f'{get_localized(32374)}...', total=3)
+        return ProgressDialogPersistant('TMDbHelper', f'{get_localized(32374)}...', total=self.p_dialog_step_count)
+
+    """
+    ProgressDialog: Step 01: Build player details
+    """
+
+    p_dialog_step_is_enabled_player_details = True
 
     @cached_property
     def details(self):
+        if not self.p_dialog_step_is_enabled_player_details:
+            return
         with self.p_dialog as p_dialog:
             p_dialog.update(f'{get_localized(32375)}...')
             return self.details_dictionary[None]
+
+    """
+    ProgressDialog: Step 02: Recache Kodi DB
+    """
+
+    @cached_property
+    def p_dialog_step_is_enabled_recache_kodidb(self):
+        return bool(get_setting('default_player_kodi', 'int') and get_setting('force_recache_kodidb'))
+
+    def recache_kodidb(self):
+        if not self.p_dialog_step_is_enabled_recache_kodidb:
+            return
+        with self.p_dialog as p_dialog:
+            p_dialog.update(f'{get_localized(32143)}...')
+            from tmdbhelper.lib.script.method.maintenance import DatabaseMaintenance
+            DatabaseMaintenance().recache_kodidb(notification=False)
+
+    """
+    ProgressDialog: Step 03: Build dialog players
+    """
+
+    p_dialog_step_is_enabled_dialog_players = True
+
+    @cached_property
+    def dialog_players(self):
+        if not self.p_dialog_step_is_enabled_dialog_players:
+            return
+
+        self.recache_kodidb()
+
+        with self.p_dialog as p_dialog:
+            p_dialog.closing = True
+            p_dialog.update(f'{get_localized(32376)}...')
+            from tmdbhelper.lib.player.details.dialog import PlayersDialog
+            return PlayersDialog(self.tmdb_type, item=self.item, data=self.players_prioritised).items
 
     @cached_property
     def item(self):
@@ -189,14 +243,6 @@ class Players(PlayerHacksMixin):
     def get_language_details(self, language=None, year=None):
         from tmdbhelper.lib.player.details.details import get_language_details
         self.item = get_language_details(self.item, **self.item_kwargs, language=language, year=year)
-
-    @cached_property
-    def dialog_players(self):
-        with self.p_dialog as p_dialog:
-            p_dialog.closing = True
-            p_dialog.update(f'{get_localized(32376)}...')
-            from tmdbhelper.lib.player.details.dialog import PlayersDialog
-            return PlayersDialog(self.tmdb_type, item=self.item, data=self.players_prioritised).items
 
     @cached_property
     def chosen_default(self):
@@ -212,139 +258,6 @@ class Players(PlayerHacksMixin):
         instance = PlayerSelectCombined(players=self.dialog_players)
         instance.additional_players = PlayerSelectAdditionalItems.clear_default_player()
         return instance.select(header=header, detailed=detailed)
-
-    def _get_path_from_rules(self, folder, action, strict=False):
-        """ Returns tuple of (path, is_folder) """
-        _matches = []
-        _action_log = []
-        for x, f in enumerate(folder):
-            _lastaction = ['   Itm: ', f.get('label'), '\n']
-            for k, v in action.items():  # Iterate through our key (infolabel) / value (infolabel must match) pairs of our action
-                if k == 'position':  # We're looking for an item position not an infolabel
-                    if try_int(self.string_format_map(v)) != x + 1:  # Format our position value and add one since people are dumb and don't know that arrays start at 0
-                        break  # Not the item position we want so let's go to next item in folder
-                    continue  # Continue to check other actions in step
-                itm_key_val = f'{f.get(k, "")}'  # Wrangle to string
-                _lastaction += ('   Key: ', k, ' = ', itm_key_val, '\n')
-                if not itm_key_val:
-                    _action_log += _lastaction
-                    break  # Item doesn't have key so go to next item
-                str_fmt_map = self.string_format_map(v)
-                _lastaction += ('   Fmt: ', str_fmt_map, '\n')
-                if not re.match(str_fmt_map, itm_key_val):  # Format our value and check if it regex matches the infolabel key
-                    _action_log += _lastaction
-                    break  # Item's key value doesn't match value we are looking for so let's got to next item in folder
-            else:  # Item matched our criteria so let's return it
-                if not f.get('file'):
-                    continue  # If the item doesn't have a path we should keep looking
-                _matches.append(f)
-                self.action_log += _lastaction
-                self.action_log += ('FMATCH: ', f['file'], '\n')
-                if not strict:  # Not strict match so don't bother checking rest of folder
-                    break
-
-        if not _matches:
-            self.action_log += ('STEP FAILED!', '\n') if folder and folder[0] else ('NO RESULTS!', '\n')
-            self.action_log += _action_log
-            return
-
-        if not strict or len(_matches) == 1:  # Strict match must give only one item
-            f = _matches[0]
-            is_folder = False if f.get('filetype') == 'file' else True  # Set false for files so we can play
-            return (f['file'], is_folder)  # Get ListItem.FolderPath for item and return as player
-
-        return _matches
-
-    @staticmethod
-    def action_dialog_select(folder, auto=False):
-        from tmdbhelper.lib.player.actions.dialog import PlayerActionDialog
-        return PlayerActionDialog(folder, auto).item_tuple
-
-    def _get_path_from_actions(self, actions, is_folder=True):
-        """ Returns tuple of (path, is_folder) """
-        is_dialog = None
-        keyboard_input = None
-        path = (actions[0], is_folder)
-        if not is_folder:
-            return path
-        for action in actions[1:]:
-            # Start thread with keyboard inputter if needed
-            if action.get('keyboard'):
-                if action['keyboard'] in ['Up', 'Down', 'Left', 'Right', 'Select']:
-                    keyboard_input = KeyboardInputter(action=f'Input.{action.get("keyboard")}')
-                    self.action_log += ('KEYBRD: ', action['keyboard'], '\n')
-                else:
-                    text = self.string_format_map(action['keyboard'])
-                    keyboard_input = KeyboardInputter(text=text[::-1] if action.get('direction') == 'rtl' else text)
-                    self.action_log += ('KEYBRD: ', text, '\n')
-                keyboard_input.setName('keyboard_input')
-                keyboard_input.start()
-                continue  # Go to next action
-
-            # Get the next folder from the plugin
-            str_fmt_map = self.string_format_map(path[0])
-            self.action_log += ('FOLDER: ', str_fmt_map, '\n', 'ACTION: ', action, '\n')
-            folder = get_directory(str_fmt_map)
-
-            # Kill our keyboard inputter thread
-            if keyboard_input:
-                keyboard_input.exit = True
-                keyboard_input = None
-
-            # Pop special actions
-            is_return = action.pop('return', None)
-            is_dialog = action.pop('dialog', None)
-            is_strict = action.pop('strict', None)
-
-            # Get next path if there's still actions left
-            next_path = self._get_path_from_rules(folder, action, is_strict) if action else None
-
-            # Strict flag checks that we received a single item
-            if is_strict and next_path and isinstance(next_path, list):
-                if is_dialog:  # A dialog action combined with strict flag allows users to choose
-                    folder = next_path  # Set our folder to list of matches to choose in dialog
-                next_path = None  # We didn't get a next path so
-
-            # Special action to fallback to select dialog if match is not found directly
-            if is_dialog and not next_path:
-                next_path = self.action_dialog_select(folder, auto=is_dialog.lower() == 'auto')
-
-            # Early return flag ignores a step failure and instead continues onto trying next step
-            # Check against next_path[1] also to make sure we aren't trying to play a folder
-            if is_return and (not next_path or next_path[1]):
-                continue
-
-            # No next path and no special flags means that player failed
-            if not next_path:
-                return
-
-            # File is playable and user manually selected or early return flag set
-            # Useful for early exit to play episodes in flattened miniseries instead of opening season folder
-            if not next_path[1] and (is_dialog or is_return):
-                return next_path
-
-            # Set next path to path for next action
-            path = next_path
-
-        # If dialog repeat flag set then repeat action over until find playable or user cancels
-        if path and is_dialog == 'repeat':
-            return self._get_path_from_actions([path[0], {'dialog': 'repeat'}], path[1])
-
-        return path
-
-    def _get_path_from_player(self, player=None):
-        """ Returns tuple of (path, is_folder) """
-        if not player or not isinstance(player, dict):
-            return
-        actions = player.get('actions')
-        if not actions:
-            return
-        if isinstance(actions, list):
-            return self._get_path_from_actions(actions)
-        if isinstance(actions, str):
-            if not player.get('is_local', False):
-                actions = self.string_format_map(actions)  # Format our path if a single path and not a file
-            return (actions, player.get('is_folder', False))
 
     def get_player(self, name):
         file, mode = name.split()
@@ -393,7 +306,7 @@ class Players(PlayerHacksMixin):
     @cached_property
     def resolver(self):
         resolver = ResolverPlayerSelect(self.item, dialog_players=self.dialog_players, action_log=self.action_log)
-        resolver.resolved_path_func = self._get_path_from_player  # TODO: Temp shim: move into class
+        resolver.string_format_func = self.string_format_map  # TODO: Temp shim: move into class
         resolver.fallback_item_func = self.get_player  # TODO: Temp shim: move into class
         return resolver
 
@@ -431,7 +344,8 @@ class Players(PlayerHacksMixin):
         if not self.next_episodes or len(self.next_episodes) < 2:
             return
 
-        PlayerHacks.wait_for_player_hack(to_start=True, timeout=30)
+        self.player_hacks_playback_wait_set(True, timeout=30)
+        self.player_hacks_playback_wait_run()
 
         if route == 'make_upnext':
             from tmdbhelper.lib.player.putils import make_upnext

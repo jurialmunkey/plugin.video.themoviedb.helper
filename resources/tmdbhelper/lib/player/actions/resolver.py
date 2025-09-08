@@ -96,7 +96,6 @@ class ResolverPlayer:
 
 class ResolverPlayerSelect:
 
-    resolved_path_func = None  # TODO: This is a temporary shim
     fallback_item_func = None
 
     def __init__(self, meta, dialog_players=None, action_log=None):
@@ -133,6 +132,25 @@ class ResolverPlayerSelect:
 
     def get_fallback_item(self):
         return self.fallback_item_func(self.player.fallback) if self.player.fallback else None
+
+    def resolved_path_func(self, player=None):
+        """ Returns tuple of (path, is_folder) """
+        if not player or not isinstance(player, dict):
+            return
+
+        actions = player.get('actions')
+
+        if not actions:
+            return
+
+        if isinstance(actions, list):
+            from tmdbhelper.lib.player.actions.pathfinder import PathFinder
+            return PathFinder(self.string_format_func, actions).path_tuple
+
+        if isinstance(actions, str):
+            if not player.get('is_local', False):
+                actions = self.string_format_func(actions)  # Format our path if a single path and not a file
+            return (actions, player.get('is_folder', False))
 
     @cached_property
     def resolved_path(self):

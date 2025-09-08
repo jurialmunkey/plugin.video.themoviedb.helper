@@ -713,6 +713,11 @@ msgctxt "#32117"
 msgid "Keyword"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/player/players.py
+msgctxt "#32143"
+msgid "Recaching Kodi library"
+msgstr ""
+
 #: /resources/lib/container.py
 msgctxt "#32119"
 msgid "Select Release Types"
