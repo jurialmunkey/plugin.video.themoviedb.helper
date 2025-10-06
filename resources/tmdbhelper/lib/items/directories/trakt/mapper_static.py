@@ -87,6 +87,14 @@ class StaticItemMapper(ItemMapper):
             ),
         ]
 
+    @cached_property
+    def item(self):
+        if not self.user_slug:  # Workaround to hide invalid entries for banned users still showing in results
+            return {}
+        if not self.list_slug:  # Workaround to hide invalid entries for banned lists still showing in results
+            return {}
+        return super().item
+
 
 class StaticLikedItemMapper(StaticItemMapper):
     def get_context_menu(self):
