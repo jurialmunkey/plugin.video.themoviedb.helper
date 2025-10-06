@@ -40,7 +40,7 @@ class TraktPlayData():
             if self._pauseplayprogress:
                 self.trakt_syncdata.sync('movie', ('playback_progress', ))
 
-        info_tvshow = ('stars_in_tvshows', 'crew_in_tvshows', 'trakt_userlist', 'trakt_calendar', 'stars_in_both', 'crew_in_both',)
+        info_tvshow = ('stars_in_tvshows', 'crew_in_tvshows', 'trakt_userlist', 'trakt_calendar', 'stars_in_both', 'crew_in_both', 'specified_episodes')
         if tmdb_type in ('tv', 'season', 'both',) or info in info_tvshow:
             if self._watchedindicators:
                 self.trakt_syncdata.sync('show', ('plays', 'watched_episodes', 'aired_episodes', ))

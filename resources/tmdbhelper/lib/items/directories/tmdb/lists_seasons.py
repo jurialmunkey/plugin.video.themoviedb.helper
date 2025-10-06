@@ -2,6 +2,7 @@ from tmdbhelper.lib.addon.plugin import convert_type, get_localized, get_setting
 from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
 from tmdbhelper.lib.items.container import ContainerDirectory, ContainerCacheOnlyDirectory
 from jurialmunkey.window import get_property
+from jurialmunkey.parser import try_int
 
 
 class ListSeasons(ContainerDirectory):
@@ -83,8 +84,8 @@ class ListSpecifiedEpisodes(ContainerDirectory):
         return {
             'infolabels': {
                 'mediatype': 'episode',
-                'season': season,
-                'episode': episode,
+                'season': try_int(season),
+                'episode': try_int(episode),
             },
             'unique_ids': {
                 'tmdb': tmdb_id,
@@ -94,8 +95,8 @@ class ListSpecifiedEpisodes(ContainerDirectory):
                 'info': 'details',
                 'tmdb_type': 'tv',
                 'tmdb_id': tmdb_id,
-                'season': season,
-                'episode': episode,
+                'season': try_int(season),
+                'episode': try_int(episode),
             }
         }
 
