@@ -2,7 +2,6 @@ from tmdbhelper.lib.addon.plugin import convert_type, get_localized, get_setting
 from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
 from tmdbhelper.lib.items.container import ContainerDirectory, ContainerCacheOnlyDirectory
 from jurialmunkey.window import get_property
-from jurialmunkey.parser import try_int
 
 
 class ListSeasons(ContainerDirectory):
@@ -75,3 +74,35 @@ class ListEpisodes(ContainerCacheOnlyDirectory):
         self.container_content = convert_type('episode', 'container')
         self.plugin_category = f'{get_localized(20373)} {season}'
         return sync.data
+
+
+class ListSpecifiedEpisodes(ContainerDirectory):
+
+    @staticmethod
+    def get_item_details(tmdb_id, season, episode):
+        return {
+            'infolabels': {
+                'mediatype': 'episode',
+                'season': season,
+                'episode': episode,
+            },
+            'unique_ids': {
+                'tmdb': tmdb_id,
+                'tvshow.tmdb': tmdb_id
+            },
+            'params': {
+                'info': 'details',
+                'tmdb_type': 'tv',
+                'tmdb_id': tmdb_id,
+                'season': season,
+                'episode': episode,
+            }
+        }
+
+    def get_items(self, tmdb_id, episodes, **kwargs):
+        self.kodi_db = self.get_kodi_database('tv')
+        self.container_content = convert_type('episode', 'container')
+        return [
+            self.get_item_details(tmdb_id, *i.split('x'))
+            for i in episodes.split('/')
+        ]
