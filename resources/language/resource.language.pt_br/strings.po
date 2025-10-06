@@ -530,6 +530,7 @@ msgstr "deixe em branco para excluir"
 msgctxt "#32106"
 msgid "Enter {} URL"
 msgstr "Digitar URL {}"
+
 #: /resources/settings.xml
 msgctxt "#32091"
 msgid "Special season folders"
@@ -713,6 +714,11 @@ msgstr "Excluir fallback"
 msgctxt "#32117"
 msgid "Keyword"
 msgstr "Palavra-chave"
+
+#: /resources/tmdbhelper/lib/player/players.py
+msgctxt "#32143"
+msgid "Recaching Kodi library"
+msgstr "Reconstrução do cache da biblioteca do Kodi"
 
 #: /resources/lib/container.py
 msgctxt "#32119"
