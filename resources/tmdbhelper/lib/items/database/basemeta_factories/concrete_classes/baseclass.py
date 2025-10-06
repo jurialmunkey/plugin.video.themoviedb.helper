@@ -59,7 +59,7 @@ class ArtworkDetailsMixin:
         return self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, values, conditions)
 
     def get_cached_data_by_null(self):
-        conditions = f'iso_language IS NULL AND {self.conditions}'
+        conditions = f'(iso_language IS NULL OR iso_language="xx") AND {self.conditions}'
         return self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, self.values, conditions)
 
     def get_cached_data(self):
