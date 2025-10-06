@@ -75,3 +75,35 @@ class ListEpisodes(ContainerCacheOnlyDirectory):
         self.container_content = convert_type('episode', 'container')
         self.plugin_category = f'{get_localized(20373)} {season}'
         return sync.data
+
+
+class ListSpecifiedEpisodes(ContainerDirectory):
+
+    @staticmethod
+    def get_item_details(tmdb_id, season, episode):
+        return {
+            'infolabels': {
+                'mediatype': 'episode',
+                'season': try_int(season),
+                'episode': try_int(episode),
+            },
+            'unique_ids': {
+                'tmdb': tmdb_id,
+                'tvshow.tmdb': tmdb_id
+            },
+            'params': {
+                'info': 'details',
+                'tmdb_type': 'tv',
+                'tmdb_id': tmdb_id,
+                'season': try_int(season),
+                'episode': try_int(episode),
+            }
+        }
+
+    def get_items(self, tmdb_id, episodes, **kwargs):
+        self.kodi_db = self.get_kodi_database('tv')
+        self.container_content = convert_type('episode', 'container')
+        return [
+            self.get_item_details(tmdb_id, *i.split('x'))
+            for i in episodes.split('/')
+        ]

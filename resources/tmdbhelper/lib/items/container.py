@@ -332,6 +332,10 @@ class ContainerDirectory(ContainerDirectoryCommon):
         return lidc
 
     def build_detailed_item(self, li):
+        if li.infoproperties.get('label_override'):
+            li.label = f"{li.infoproperties['label_override']}"
+        if li.infoproperties.get('label_affix'):
+            li.label = f"{li.infoproperties['label_affix']}. {li.label}"
         if li.infoproperties.get('plot_affix'):
             li.infolabels['plot'] = f"{li.infoproperties['plot_affix']}. {li.infolabels.get('plot')}"
         return li

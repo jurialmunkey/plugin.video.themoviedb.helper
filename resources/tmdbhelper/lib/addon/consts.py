@@ -444,6 +444,9 @@ ROUTE_TMDBID = {
     'anticipated_episodes': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_seasons',
         'import_attr': 'ListAnticipatedEpisodes'}},
+    'specified_episodes': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_seasons',
+        'import_attr': 'ListSpecifiedEpisodes'}},
     'episodes': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_seasons',
         'import_attr': 'ListEpisodes'}},
