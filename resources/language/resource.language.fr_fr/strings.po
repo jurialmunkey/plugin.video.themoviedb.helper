@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2024-05-21 10:00+0100\n"
+"PO-Revision-Date: 2025-10-07 10:00+0100\n"
 "Last-Translator: Bindou <EMAIL@ADDRESS>\n"
 "Language-Team: French\n"
 "MIME-Version: 1.0\n"
@@ -2337,7 +2337,7 @@ msgstr "Supprimer des favoris"
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32492"
 msgid "{} already exists in {}!\\nDo you wish to remove this item from the list?"
-msgstr "{} existe déjà dans {} !\nVoulez-vous supprimer cet élément de la liste ?"
+msgstr "{} existe déjà dans {} !\\nVoulez-vous supprimer cet élément de la liste ?"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32493"
