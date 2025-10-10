@@ -255,6 +255,7 @@ class Players:
     def select_default(self, header=None, detailed=True):
         """ Returns user selected player via dialog - detailed bool switches dialog style """
         from tmdbhelper.lib.player.select import PlayerSelectAdditionalItems, PlayerSelectCombined
+        self.p_dialog_step_is_enabled_player_details = False
         instance = PlayerSelectCombined(players=self.dialog_players)
         instance.additional_players = PlayerSelectAdditionalItems.clear_default_player()
         return instance.select(header=header, detailed=detailed)
