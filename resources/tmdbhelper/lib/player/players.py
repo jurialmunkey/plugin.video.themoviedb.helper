@@ -320,7 +320,7 @@ class Players:
         # Allow players to override language settings
         if self.selected.player.api_language:
             self.details = self.details_dictionary[self.selected.player.api_language]
-            self.action_log += ('APILAN: ', self.api_language, '\n')
+            self.action_log += ('APILAN: ', self.selected.player.api_language, '\n')
 
         # Allow for a separate translation language to add "{de_title}" keys ("de" is iso language code)
         self.get_language_details(self.selected.player.language, self.selected.meta.year) if self.selected.player.language else None
