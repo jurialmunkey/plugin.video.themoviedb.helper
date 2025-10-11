@@ -114,6 +114,7 @@ class Episode(Season):
             self.return_basemeta_db('person'),
             self.return_basemeta_db('castmember'),
             self.return_basemeta_db('crewmember'),
+            self.return_basemeta_db('translation'),
             self.return_basemeta_db('unique_id'),
             self.return_basemeta_db('custom'),
             self.return_basemeta_db('art'),

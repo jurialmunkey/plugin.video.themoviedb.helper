@@ -774,6 +774,32 @@ UNIQUE_ID_COLUMNS = {
     },
 }
 
+TRANSLATION_COLUMNS = {
+    'iso_country': {
+        'data': 'TEXT',
+        'unique': True,
+    },
+    'iso_language': {
+        'data': 'TEXT',
+        'unique': True,
+    },
+    'plot': {
+        'data': 'TEXT',
+    },
+    'title': {
+        'data': 'TEXT',
+    },
+    'tagline': {
+        'data': 'TEXT',
+    },
+    'parent_id': {
+        'data': 'TEXT',
+        'foreign_key': 'baseitem(id)',
+        'indexed': True,
+        'unique': True
+    },
+}
+
 SIMPLECACHE_COLUMNS = {
     'id': {
         'data': 'TEXT PRIMARY KEY',
