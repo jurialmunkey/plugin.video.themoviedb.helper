@@ -80,14 +80,6 @@ class PlayerItemConstructed:
         return self.meta_get('make_playlist')
 
     @cached_property
-    def api_language(self):
-        return self.meta_get('api_language')
-
-    @cached_property
-    def language(self):
-        return self.meta_get('language')
-
-    @cached_property
     def plugin_name(self):
         return self.meta_get('plugin') or ''
 
@@ -130,8 +122,6 @@ class PlayerItemConstructed:
             'is_resolvable': self.is_resolvable,
             'requires_ids': self.requires_ids,
             'make_playlist': self.make_playlist,
-            'api_language': self.api_language,
-            'language': self.language,
             'name': self.name,
             'plugin_name': self.plugin_name,
             'plugin_icon': self.plugin_icon,

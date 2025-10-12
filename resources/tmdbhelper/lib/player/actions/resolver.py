@@ -62,14 +62,6 @@ class ResolverPlayer:
         return self.meta.get_key('fallback')
 
     @cached_property
-    def language(self):
-        return self.meta.get_key('language')
-
-    @cached_property
-    def api_language(self):
-        return self.meta.get_key('api_language')
-
-    @cached_property
     def make_playlist(self):
         return self.meta.get_key('make_playlist')
 
