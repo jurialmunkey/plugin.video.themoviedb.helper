@@ -3,7 +3,6 @@ from json import dumps
 from urllib.parse import quote_plus, quote
 from jurialmunkey.parser import try_int
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.api.tmdb.api import TMDb
 
 
 class PlayerNextEpisodes:
