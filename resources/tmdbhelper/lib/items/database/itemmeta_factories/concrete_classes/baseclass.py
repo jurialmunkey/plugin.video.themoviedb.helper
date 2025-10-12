@@ -19,6 +19,10 @@ class BaseItem:
         return self.parent_db_cache.return_basemeta_db(*args, **kwargs)
 
     @staticmethod
+    def get_subtype_key(key, subtype=None):
+        return f"{subtype}.{key}" if subtype else key
+
+    @staticmethod
     def get_configured_item_value(i, ikey, instance):
         if ikey == 'backdrop':
             return instance.image_path_backdrop_func(i[ikey])

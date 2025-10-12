@@ -209,7 +209,7 @@ def get_item_details(tmdb_type, tmdb_id, season=None, episode=None, language=Non
     from tmdbhelper.lib.items.database.listitem import ListItemDetails
 
     lidc = ListItemDetails()
-    lidc.cache_refresh = None
+    lidc.cache_refresh = 'langs'
     lidc.extendedinfo = True
 
     details = lidc.get_item(tmdb_type, tmdb_id, season, episode)
