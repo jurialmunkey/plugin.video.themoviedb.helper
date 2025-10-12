@@ -79,6 +79,10 @@ class Translation(ItemDetailsList):
     keys = tuple(TRANSLATION_COLUMNS.keys())
     conflict_constraint = 'iso_country, iso_language, parent_id'
 
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, )
+
 
 class Country(ItemDetailsList):
     table = 'country'
