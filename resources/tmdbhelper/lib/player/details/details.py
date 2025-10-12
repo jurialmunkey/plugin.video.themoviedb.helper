@@ -252,7 +252,7 @@ class PlayerDetailedItemDictMovie(dict):
 
     def get_sanitised(self, value, method=None):
         if not isinstance(value, str):
-            return
+            return value
         try:
             return self.encoding_methods[method](value)
         except KeyError:
