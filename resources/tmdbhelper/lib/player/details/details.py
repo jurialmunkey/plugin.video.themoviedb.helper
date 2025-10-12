@@ -300,6 +300,7 @@ class PlayerDetailedItemDictMovie(dict):
 
     translation_title_affixes = ('_title', '_clearname', )
     translation_tvshowtitle_affixes = tuple()
+    translation_plot_affixes = ('_plot', )
 
     def __missing__(self, key):
 
@@ -324,6 +325,13 @@ class PlayerDetailedItemDictMovie(dict):
                 self[key] = self.details.infoproperties.get(key_langs)
                 self[key] = self[key] or self.details.infoproperties.get('tvshow.originaltitle')
                 self[key] = self[key] or self['tvshowtitle']
+                return self[key]
+
+        for k in self.translation_plot_affixes:
+            if key.endswith(k):
+                key_langs = f'{key[:-len(k)]}_plot'
+                self[key] = self.details.infoproperties.get(key_langs)
+                self[key] = self[key] or self['plot']
                 return self[key]
 
         # Encoding affixes
