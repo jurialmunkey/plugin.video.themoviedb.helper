@@ -266,9 +266,8 @@ class PlayerActionDialogFolderItem:
 
 
 class PlayerActionDialog:
-    def __init__(self, folder, auto=False):
+    def __init__(self, folder):
         self.folder = folder
-        self.auto = auto
 
     @cached_property
     def folder_items(self):
@@ -287,8 +286,6 @@ class PlayerActionDialog:
     def choice(self):
         if not self.folder_items:
             return -1
-        if self.auto and len(self.folder_items) == 1:
-            return 0
         from xbmcgui import Dialog
         return Dialog().select(get_localized(32236), self.folder_listitems, useDetails=True)
 
