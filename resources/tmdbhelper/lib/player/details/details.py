@@ -305,7 +305,7 @@ class PlayerDetailedItemDictMovie(dict):
     def __missing__(self, key):
 
         # Basic routes for details
-        with contextlib.suppress(KeyError):
+        with contextlib.suppress(KeyError, AttributeError):
             self[key] = self.routes[key]()
             self[key] = self.get_sanitised(self[key])
             return self[key]
