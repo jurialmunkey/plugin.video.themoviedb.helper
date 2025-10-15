@@ -6,7 +6,7 @@ from tmdbhelper.lib.items.database.basemeta_factories.factory import BaseMetaFac
 from tmdbhelper.lib.items.database.itemmeta_factories.factory import ItemMetaFactory
 from infotagger.listitem import _ListItemInfoTagVideo
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_days_to_air
-from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY, SHORTER_EXPIRY, DAY_IN_SECONDS, DATALEVEL_MIN, DATALEVEL_MAX, SQLITE_TRUE, SQLITE_FALSE
+from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY, SHORTER_EXPIRY, DAY_IN_SECONDS, DATALEVEL_MIN, DATALEVEL_MAX, DATALEVEL_ALL, SQLITE_TRUE, SQLITE_FALSE
 
 
 class BaseItem(ItemDetailsDatabaseAccess):
@@ -40,6 +40,8 @@ class BaseItem(ItemDetailsDatabaseAccess):
     def datalevel(self):
         if self.cache_refresh == 'basic':
             return DATALEVEL_MIN
+        if self.cache_refresh == 'langs':
+            return DATALEVEL_ALL
         return DATALEVEL_MAX
 
     @property
@@ -66,6 +68,8 @@ class BaseItem(ItemDetailsDatabaseAccess):
     def online_data_kwgs(self):
         if self.cache_refresh == 'basic':
             return {'append_to_response': self.common_apis.tmdb_api.append_to_response_movies_simple}
+        if self.cache_refresh == 'langs':
+            return {'append_to_response': self.common_apis.tmdb_api.append_to_response_movies_translation}
         return {'append_to_response': self.common_apis.tmdb_api.append_to_response}
 
     @cached_property

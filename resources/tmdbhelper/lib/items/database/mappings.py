@@ -126,6 +126,24 @@ class ItemMapperMethods:
         return data
 
     @staticmethod
+    def get_translations(items, **kwargs):
+        if not items:
+            return
+        results = items.get('translations')
+        if not results:
+            return
+        data = [
+            {
+                'iso_country': get_blanks_none(translation['iso_3166_1']),
+                'iso_language': get_blanks_none(translation['iso_639_1']),
+                'title': get_blanks_none(translation['data'].get('title') or translation['data'].get('name')),
+                'plot': get_blanks_none(translation['data'].get('overview')),
+                'tagline': get_blanks_none(translation['data'].get('tagline')),
+            } for translation in results
+        ]
+        return data
+
+    @staticmethod
     def get_certifications(items, **kwargs):
         if not items:
             return
@@ -807,6 +825,10 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'keys': [('certification', None)],
                 'func': self.get_certifications,
             }],
+            'translations': [{
+                'keys': [('translation', None)],
+                'func': self.get_translations,
+            }],
             'production_countries': [{
                 'keys': [('country', None)],
                 'func': self.split_array,
@@ -971,6 +993,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'service': (),
             'video': (),
             'unique_id': (),
+            'translation': (),
 
             # Dictionary mappings
             'custom': (),

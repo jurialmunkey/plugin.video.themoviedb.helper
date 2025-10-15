@@ -52,6 +52,8 @@ class Tvshow(MediaItem):
     def online_data_kwgs(self):
         if self.cache_refresh == 'basic':
             return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow_simple}
+        if self.cache_refresh == 'langs':
+            return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow_translation}
         return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow}
 
     def config_basemeta_db_tvshow(self, database_obj):
@@ -136,6 +138,8 @@ class Tvshow(MediaItem):
             'basemeta_db_unique_id_season': self.config_basemeta_db_season,
             'basemeta_db_custom_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_custom_season': self.config_basemeta_db_season,
+            'basemeta_db_translation_tvshow': self.config_basemeta_db_tvshow,
+            'basemeta_db_translation_season': self.config_basemeta_db_season,
         }
 
     @cached_property
@@ -149,6 +153,7 @@ class Tvshow(MediaItem):
             self.return_basemeta_db('genre'),
             self.return_basemeta_db('country'),
             self.return_basemeta_db('certification'),
+            self.return_basemeta_db('translation'),
             self.return_basemeta_db('video'),
             self.return_basemeta_db('company'),
             self.return_basemeta_db('studio'),

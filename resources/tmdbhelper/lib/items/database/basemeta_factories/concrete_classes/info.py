@@ -19,6 +19,7 @@ from tmdbhelper.lib.items.database.tabledef import (
     PROVIDER_COLUMNS,
     SERVICE_COLUMNS,
     UNIQUE_ID_COLUMNS,
+    TRANSLATION_COLUMNS,
 )
 
 
@@ -71,6 +72,16 @@ class Video(ItemDetailsList):
     @property
     def values(self):  # WHERE conditions values for ?
         return (self.parent_id, 'Trailer', self.common_apis.tmdb_api.iso_language)
+
+
+class Translation(ItemDetailsList):
+    table = 'translation'
+    keys = tuple(TRANSLATION_COLUMNS.keys())
+    conflict_constraint = 'iso_country, iso_language, parent_id'
+
+    @property
+    def values(self):  # WHERE conditions values for ?
+        return (self.item_id, )
 
 
 class Country(ItemDetailsList):

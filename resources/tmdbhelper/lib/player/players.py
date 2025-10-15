@@ -237,12 +237,8 @@ class Players:
 
     @cached_property
     def item(self):
-        from tmdbhelper.lib.player.details.details import set_detailed_item
-        return set_detailed_item(**self.item_kwargs, details=self.details) or {}
-
-    def get_language_details(self, language=None, year=None):
-        from tmdbhelper.lib.player.details.details import get_language_details
-        self.item = get_language_details(self.item, **self.item_kwargs, language=language, year=year)
+        from tmdbhelper.lib.player.details.details import PlayerDetailedItemDict
+        return PlayerDetailedItemDict(**self.item_kwargs, details=self.details)
 
     @cached_property
     def chosen_default(self):
@@ -316,15 +312,6 @@ class Players:
         if not self.resolver.player:
             return
         self.selected = self.resolver
-
-        # Allow players to override language settings
-        if self.selected.player.api_language:
-            self.details = self.details_dictionary[self.selected.player.api_language]
-            self.action_log += ('APILAN: ', self.api_language, '\n')
-
-        # Allow for a separate translation language to add "{de_title}" keys ("de" is iso language code)
-        self.get_language_details(self.selected.player.language, self.selected.meta.year) if self.selected.player.language else None
-
         return self.selected.item
 
     def get_resolved_listitem(self):

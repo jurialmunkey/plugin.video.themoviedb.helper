@@ -111,20 +111,38 @@ class RuleEvaluator:
 
     def dialog_select(self, folder):
         from tmdbhelper.lib.player.actions.dialog import PlayerActionDialog
-        dialog = PlayerActionDialog(folder, self.dialog.lower() == 'auto')
-        return dialog.item_tuple
+        return PlayerActionDialog(folder).item_tuple
 
     OUTPUT_EMPTY = 0
     OUTPUT_FIRST = 1
     OUTPUT_ITEMS = 2
 
     @cached_property
+    def is_dialog_auto(self):
+        return bool(self.dialog and self.dialog.lower() == 'auto')
+
+    @cached_property
+    def is_dialog_true(self):
+        return bool(self.dialog and self.dialog.lower() == 'true')
+
+    @cached_property
     def output_type(self):
         if not self.first_match:
             return self.OUTPUT_EMPTY
-        if not self.strict or len(self.all_matches) == 1:
+
+        if self.is_dialog_true:
+            return self.OUTPUT_ITEMS
+
+        if len(self.all_matches) == 1:
             return self.OUTPUT_FIRST
-        return self.OUTPUT_ITEMS
+
+        if self.is_dialog_auto:
+            return self.OUTPUT_ITEMS
+
+        if self.strict:
+            return self.OUTPUT_EMPTY
+
+        return self.OUTPUT_FIRST
 
     @cached_property
     def output(self):

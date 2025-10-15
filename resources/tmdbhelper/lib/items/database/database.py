@@ -28,6 +28,7 @@ from tmdbhelper.lib.items.database.tabledef import (
     FANART_TV_COLUMNS,
     USER_ART_COLUMNS,
     UNIQUE_ID_COLUMNS,
+    TRANSLATION_COLUMNS,
     SIMPLECACHE_COLUMNS,
     LACTIVITIES_COLUMNS,
 )
@@ -124,6 +125,7 @@ class ItemDetailsDatabase(Database):
     fanart_tv_columns = FANART_TV_COLUMNS
     user_art_columns = USER_ART_COLUMNS
     unique_id_columns = UNIQUE_ID_COLUMNS
+    translation_columns = TRANSLATION_COLUMNS
     simplecache_columns = SIMPLECACHE_COLUMNS
     lactivities_columns = LACTIVITIES_COLUMNS
 
@@ -156,6 +158,7 @@ class ItemDetailsDatabase(Database):
             'fanart_tv': self.fanart_tv_columns,
             'user_art': self.user_art_columns,
             'unique_id': self.unique_id_columns,
+            'translation': self.translation_columns,
             'simplecache': self.simplecache_columns,
             'lactivities': self.lactivities_columns,
         }

@@ -45,6 +45,7 @@ class Tvshow(MediaItem):
 
     def get_infoproperties_special(self, infoproperties):
         infoproperties = self.get_infoproperties_custom(infoproperties)
+        infoproperties = self.get_infoproperties_translation(infoproperties)
         try:
             infoproperties['totalseasons'] = self.get_data_value('totalseasons')
             infoproperties['totalepisodes'] = infoproperties['unwatchedepisodes'] = self.get_data_value('totalepisodes')

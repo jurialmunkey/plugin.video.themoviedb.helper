@@ -1,6 +1,8 @@
+import contextlib
+from json import dumps
+from urllib.parse import quote_plus, quote
 from jurialmunkey.parser import try_int
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.api.tmdb.api import TMDb
 
 
 class PlayerNextEpisodes:
@@ -209,7 +211,7 @@ def get_item_details(tmdb_type, tmdb_id, season=None, episode=None, language=Non
     from tmdbhelper.lib.items.database.listitem import ListItemDetails
 
     lidc = ListItemDetails()
-    lidc.cache_refresh = None
+    lidc.cache_refresh = 'langs'
     lidc.extendedinfo = True
 
     details = lidc.get_item(tmdb_type, tmdb_id, season, episode)
@@ -220,122 +222,174 @@ def get_item_details(tmdb_type, tmdb_id, season=None, episode=None, language=Non
     return ListItem(**details)
 
 
-def _get_language_details(tmdb_type, tmdb_id, season=None, episode=None, language=None):
-    affix = ''
-    if tmdb_type == 'tv':
-        if season is not None:
-            affix = f'{affix}season/{season}/'
-            if episode is not None:
-                affix = f'{affix}episode/{episode}/'
-    affix = f'{affix}translations'
-    details = TMDb().get_response_json(tmdb_type, tmdb_id, affix)
-    if not details or not details.get('translations'):
-        return
+class PlayerDetailedItemDictMovie(dict):
 
-    item = {}
-    for i in details['translations']:
-        if i.get('iso_639_1') == language:
-            item['title'] = i.get('data', {}).get('title') or i.get('data', {}).get('name')
-            item['plot'] = i.get('data', {}).get('overview')
-            return item
+    tmdb_type = 'movie'
+
+    def __init__(self, tmdb_id, details, **kwargs):
+        self.tmdb_id = tmdb_id
+        self.details = details
+
+    encoding_methods = {
+        '_+': lambda v: v.replace(',', '').replace(' ', '+'),
+        '_-': lambda v: v.replace(',', '').replace(' ', '-'),
+        '_escaped': lambda v: quote(quote(v)),
+        '_escaped+': lambda v: quote(quote_plus(v)),
+        '_url': lambda v: quote(v),
+        '_url+': lambda v: quote_plus(v),
+        '_meta': lambda v: dumps(v).replace(',', ''),
+        '_meta_+': lambda v: dumps(v).replace(',', '').replace(' ', '+'),
+        '_meta_-': lambda v: dumps(v).replace(',', '').replace(' ', '-'),
+        '_meta_escaped': lambda v: quote(quote(dumps(v))),
+        '_meta_escaped+': lambda v: quote(quote_plus(dumps(v))),
+        '_meta_url': lambda v: quote(dumps(v)),
+        '_meta_url+': lambda v: quote_plus(dumps(v)),
+    }
+
+    @cached_property
+    def encoding_affixes(self):
+        return tuple(self.encoding_methods.keys())
+
+    def get_sanitised(self, value, method=None):
+        if not isinstance(value, str):
+            return value
+        try:
+            return self.encoding_methods[method](value)
+        except KeyError:
+            return value.replace(',', '')
+
+    @cached_property
+    def routes(self):
+        return self.get_routes()
+
+    def get_routes(self):
+        return {
+            'id': lambda: self.tmdb_id,
+            'tmdb': lambda: self.tmdb_id,
+            'imdb': lambda: self.details.unique_ids.get('imdb'),
+            'tvdb': lambda: self.details.unique_ids.get('tvdb'),
+            'trakt': lambda: self.details.unique_ids.get('trakt'),
+            'slug': lambda: self.details.unique_ids.get('slug'),
+            'originaltitle': lambda: self.details.infolabels.get('originaltitle'),
+            'title': lambda: self.details.infolabels.get('title'),
+            'clearname': lambda: self.details.infolabels.get('title'),
+            'year': lambda: self.details.infolabels.get('year'),
+            'name': lambda: f'{self["title"]} ({self["year"]})',
+            'premiered': lambda: self.details.infolabels.get('premiered'),
+            'firstaired': lambda: self.details.infolabels.get('premiered'),
+            'released': lambda: self.details.infolabels.get('premiered'),
+            'plot': lambda: self.details.infolabels.get('plot'),
+            'cast': self.get_cast,
+            'actors': self.get_cast,
+            'thumbnail': lambda: self.details.art.get('thumb'),
+            'poster': lambda: self.details.art.get('poster'),
+            'fanart': lambda: self.details.art.get('fanart'),
+            'now': self.get_now,
+        }
+
+    def get_cast(self):
+        return " / ".join([i.get('name') for i in self.details.cast if i.get('name')])
+
+    def get_now(self):
+        from tmdbhelper.lib.addon.tmdate import get_datetime_now
+        return get_datetime_now().strftime('%Y%m%d%H%M%S%f')
+
+    def initialise_standard_keys(self):
+        for k in self.routes.keys():
+            self[k]
+
+    translation_title_affixes = ('_title', '_clearname', )
+    translation_tvshowtitle_affixes = tuple()
+    translation_plot_affixes = ('_plot', )
+
+    def __missing__(self, key):
+
+        # Basic routes for details
+        with contextlib.suppress(KeyError, AttributeError):
+            self[key] = self.routes[key]()
+            self[key] = self.get_sanitised(self[key])
+            return self[key]
+
+        # Translation prefixes en_ or en_US_ etc.
+        for k in self.translation_title_affixes:
+            if key.endswith(k):
+                key_langs = f'{key[:-len(k)]}_title'
+                self[key] = self.details.infoproperties.get(key_langs)
+                self[key] = self[key] or self.details.infolabels.get('originaltitle')
+                self[key] = self[key] or self['title']
+                return self[key]
+
+        for k in self.translation_tvshowtitle_affixes:
+            if key.endswith(k):
+                key_langs = f'{key[:-len(k)]}_tvshowtitle'
+                self[key] = self.details.infoproperties.get(key_langs)
+                self[key] = self[key] or self.details.infoproperties.get('tvshow.originaltitle')
+                self[key] = self[key] or self['tvshowtitle']
+                return self[key]
+
+        for k in self.translation_plot_affixes:
+            if key.endswith(k):
+                key_langs = f'{key[:-len(k)]}_plot'
+                self[key] = self.details.infoproperties.get(key_langs)
+                self[key] = self[key] or self['plot']
+                return self[key]
+
+        # Encoding affixes
+        for method in self.encoding_affixes:
+            if key.endswith(method):
+                self[key] = self[key[:-len(method)]]
+                self[key] = self.get_sanitised(self[key], method)
+                return self[key]
+
+        return '_'
 
 
-def _get_language_item(tmdb_type, tmdb_id, season=None, episode=None, language=None, year=None):
-    item = _get_language_details(tmdb_type, tmdb_id, language=language)
-    if not item:
-        return
+class PlayerDetailedItemDictEpisode(PlayerDetailedItemDictMovie):
+    tmdb_type = 'tv'
 
-    item['showname'] = item['clearname'] = item['tvshowtitle'] = item.get('title')
-    item['name'] = f'{item["title"]} ({year})' if item.get('title') and year else None
-    if season is None or episode is None:
-        return item
+    def __init__(self, tmdb_id, details, season=None, episode=None, **kwargs):
+        super().__init__(tmdb_id, details)
+        self.season = season
+        self.episode = episode
 
-    episode = _get_language_details(tmdb_type, tmdb_id, season, episode, language=language)
-    if not episode:
-        return item
+    translation_title_affixes = ('_title', )
+    translation_tvshowtitle_affixes = ('_tvshowtitle', '_showname', '_clearname')
 
-    item['title'] = episode.get('title')
-    item['plot'] = episode.get('plot') or item.get('plot')
-    item['name'] = f'{item["showname"]} S{try_int(season):02d}E{try_int(episode):02d}' if item.get('showname') else None
-    return item
+    def get_routes(self):
+        routes = super().get_routes()
+        routes.update({
+            'season': lambda: self.season,
+            'episode': lambda: self.episode,
+            'originaltitle': lambda: self.details.infoproperties.get('tvshow.originaltitle'),
+            'showname': lambda: self.details.infolabels.get('tvshowtitle'),
+            'showpremiered': lambda: self.details.infoproperties.get('tvshow.premiered'),
+            'showyear': lambda: self.details.infoproperties.get('tvshow.year'),
+            'clearname': lambda: self.details.infolabels.get('tvshowtitle'),
+            'tvshowtitle': lambda: self.details.infolabels.get('tvshowtitle'),
+            'id': lambda: self.details.unique_ids.get('tvdb'),
+            'epid': lambda: self.details.unique_ids.get('tvdb'),
+            'eptvdb': lambda: self.details.unique_ids.get('tvdb'),
+            'eptmdb': lambda: self.details.unique_ids.get('tmdb'),
+            'epimdb': lambda: self.details.unique_ids.get('imdb'),
+            'eptrakt': lambda: self.details.unique_ids.get('trakt'),
+            'epslug': lambda: self.details.unique_ids.get('slug'),
+            'tmdb': lambda: self.details.unique_ids.get('tvshow.tmdb'),
+            'imdb': lambda: self.details.unique_ids.get('tvshow.imdb'),
+            'tvdb': lambda: self.details.unique_ids.get('tvshow.tvdb'),
+            'trakt': lambda: self.details.unique_ids.get('tvshow.trakt'),
+            'slug': lambda: self.details.unique_ids.get('tvshow.slug'),
+            'name': lambda: f'{self["showname"]} S{try_int(self["season"]):02d}E{try_int(self["episode"]):02d}',
 
-
-def get_language_details(base, tmdb_type, tmdb_id, season=None, episode=None, language=None, year=None):
-    if not language:
-        return base
-    item = _get_language_item(tmdb_type, tmdb_id, season, episode, language, year)
-    if not item:
-        return base
-    item = {k: v or base.get(k) for k, v in item.items()}  # Fallback to default key in base if translation is empty
-    item = _url_encode_item(item)
-    for k, v in item.items():
-        base[f'{language}_{k}'] = v
-    return _url_encode_item(base)
-
-
-def _url_encode_item(item, base=None):
-    from tmdbhelper.lib.addon.consts import PLAYERS_URLENCODE
-    from urllib.parse import quote_plus, quote
-    from json import dumps
-    base = base or item.copy()
-    for k, v in base.items():
-        if k not in PLAYERS_URLENCODE:
-            continue
-        v = f'{v}'
-        d = {k: v, f'{k}_meta': dumps(v)}
-        for key, value in d.items():
-            item[key] = value.replace(',', '')
-            item[key + '_+'] = value.replace(',', '').replace(' ', '+')
-            item[key + '_-'] = value.replace(',', '').replace(' ', '-')
-            item[key + '_escaped'] = quote(quote(value))
-            item[key + '_escaped+'] = quote(quote_plus(value))
-            item[key + '_url'] = quote(value)
-            item[key + '_url+'] = quote_plus(value)
-    return item
+        })
+        return routes
 
 
-def set_detailed_item(tmdb_type, tmdb_id, season=None, episode=None, details=None):
-    from tmdbhelper.lib.addon.tmdate import get_datetime_now
-    from collections import defaultdict
-    if not details:
-        return
-    item = defaultdict(lambda: '_')
-    item['id'] = item['tmdb'] = tmdb_id
-    item['imdb'] = details.unique_ids.get('imdb')
-    item['tvdb'] = details.unique_ids.get('tvdb')
-    item['trakt'] = details.unique_ids.get('trakt')
-    item['slug'] = details.unique_ids.get('slug')
-    item['season'] = season
-    item['episode'] = episode
-    item['originaltitle'] = details.infoproperties.get('tvshow.originaltitle') or details.infolabels.get('originaltitle')
-    item['title'] = details.infolabels.get('tvshowtitle') or details.infolabels.get('title')
-    item['showname'] = item['clearname'] = item['tvshowtitle'] = item.get('title')
-    item['year'] = details.infolabels.get('year')
-    item['name'] = f'{item.get("title")} ({item.get("year")})'
-    item['premiered'] = item['firstaired'] = item['released'] = details.infolabels.get('premiered')
-    item['plot'] = details.infolabels.get('plot')
-    item['cast'] = item['actors'] = " / ".join([i.get('name') for i in details.cast if i.get('name')])
-    item['thumbnail'] = details.art.get('thumb')
-    item['poster'] = details.art.get('poster')
-    item['fanart'] = details.art.get('fanart')
-    item['now'] = get_datetime_now().strftime('%Y%m%d%H%M%S%f')
-
-    if tmdb_type == 'tv' and season is not None and episode is not None:
-        item['id'] = item['epid'] = item['eptvdb'] = item.get('tvdb')
-        item['title'] = details.infolabels.get('title')  # Set Episode Title
-        item['name'] = f'{item.get("showname")} S{try_int(season):02d}E{try_int(episode):02d}'
-        item['season'] = season
-        item['episode'] = episode
-        item['showpremiered'] = details.infoproperties.get('tvshow.premiered')
-        item['showyear'] = details.infoproperties.get('tvshow.year')
-        item['eptmdb'] = details.unique_ids.get('tmdb')
-        item['epimdb'] = details.unique_ids.get('imdb')
-        item['eptrakt'] = details.unique_ids.get('trakt')
-        item['epslug'] = details.unique_ids.get('slug')
-        item['tmdb'] = details.unique_ids.get('tvshow.tmdb')
-        item['imdb'] = details.unique_ids.get('tvshow.imdb')
-        item['tvdb'] = details.unique_ids.get('tvshow.tvdb')
-        item['trakt'] = details.unique_ids.get('tvshow.trakt')
-        item['slug'] = details.unique_ids.get('tvshow.slug')
-
-    return _url_encode_item(item)
+def PlayerDetailedItemDict(tmdb_type, tmdb_id, season=None, episode=None, details=None):
+    itemdict = (
+        PlayerDetailedItemDictMovie
+        if tmdb_type != 'tv' or season is None or episode is None else
+        PlayerDetailedItemDictEpisode
+    )
+    itemdict = itemdict(tmdb_id, details, season=season, episode=episode)
+    itemdict.initialise_standard_keys()
+    return itemdict

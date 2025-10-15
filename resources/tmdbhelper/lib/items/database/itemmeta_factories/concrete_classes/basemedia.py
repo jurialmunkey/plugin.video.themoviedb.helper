@@ -326,9 +326,28 @@ class MediaItem(BaseItem):
         },
     )
 
-    def get_infoproperties_custom(self, infoproperties):
-        for i in self.return_basemeta_db('custom').cached_data:
-            infoproperties[i['key']] = i['value']
+    def get_infoproperties_custom(self, infoproperties, subtype=None):
+        for i in self.return_basemeta_db('custom', subtype).cached_data:
+            infoproperties[self.get_subtype_key(i['key'], subtype)] = i['value']
+        return infoproperties
+
+    def get_infoproperties_translation(self, infoproperties, subtype=None):
+
+        generator = (
+            (
+                f"{i['iso_language']}_{subtype or ''}{k}",
+                f"{i['iso_language']}-{i['iso_country']}_{subtype or ''}{k}",
+                i[k]
+            )
+            for i in self.return_basemeta_db('translation', subtype).cached_data
+            for k in ('title', 'plot', 'tagline')
+            if i[k]
+        )
+
+        for key_language, key_combined, value in generator:
+            infoproperties[key_combined] = value
+            infoproperties[key_language] = infoproperties.get(key_language) or value
+
         return infoproperties
 
     def get_infoproperties_progress(self, infoproperties):
@@ -411,10 +430,10 @@ class MediaItem(BaseItem):
 
         return infoproperties
 
-    def get_unique_ids(self, unique_ids):
-        for i in (self.return_basemeta_db('unique_id').cached_data or ()):
-            unique_ids[i['key']] = i['value']
-        unique_ids['tmdb'] = self.parent_db_cache.tmdb_id
+    def get_unique_ids(self, unique_ids, subtype=None):
+        for i in (self.return_basemeta_db('unique_id', subtype).cached_data or ()):
+            unique_ids[self.get_subtype_key(i['key'], subtype)] = i['value']
+        unique_ids[self.get_subtype_key('tmdb', subtype)] = self.parent_db_cache.tmdb_id
         return unique_ids
 
     @cached_property

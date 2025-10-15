@@ -119,6 +119,8 @@ class TMDb(TMDbAPI):
     append_to_response_person = 'images,external_ids,movie_credits,tv_credits'
     append_to_response_movies_simple = 'images,external_ids,release_dates'
     append_to_response_tvshow_simple = 'images,external_ids,content_ratings'
+    append_to_response_movies_translation = 'credits,images,release_dates,external_ids,keywords,reviews,videos,watch/providers,translations'
+    append_to_response_tvshow_translation = 'aggregate_credits,images,content_ratings,external_ids,keywords,reviews,videos,watch/providers,translations'
     api_name = 'TMDb'
 
     @property
