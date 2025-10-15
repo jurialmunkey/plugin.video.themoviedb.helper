@@ -113,9 +113,10 @@ class RuleEvaluator:
         from tmdbhelper.lib.player.actions.dialog import PlayerActionDialog
         return PlayerActionDialog(folder).item_tuple
 
-    OUTPUT_EMPTY = 0
-    OUTPUT_FIRST = 1
-    OUTPUT_ITEMS = 2
+    OUTPUT_EMPTY = 0  # Return empty output due to conditions failing
+    OUTPUT_FIRST = 1  # Return first matching item
+    OUTPUT_MATCH = 2  # Return dialog listing matching items
+    OUTPUT_EVERY = 3  # Return dialog listing every item
 
     @cached_property
     def is_dialog_auto(self):
@@ -127,22 +128,26 @@ class RuleEvaluator:
 
     @cached_property
     def output_type(self):
-        if not self.first_match:
-            return self.OUTPUT_EMPTY
+        if self.first_match:
 
-        if self.is_dialog_true:
-            return self.OUTPUT_ITEMS
+            if self.is_dialog_true:
+                return self.OUTPUT_MATCH
 
-        if len(self.all_matches) == 1:
+            if len(self.all_matches) == 1:
+                return self.OUTPUT_FIRST
+
+            if self.is_dialog_auto:
+                return self.OUTPUT_MATCH
+
+            if self.strict:
+                return self.OUTPUT_EMPTY
+
             return self.OUTPUT_FIRST
 
-        if self.is_dialog_auto:
-            return self.OUTPUT_ITEMS
+        if self.strict and self.dialog:
+            return self.OUTPUT_EVERY
 
-        if self.strict:
-            return self.OUTPUT_EMPTY
-
-        return self.OUTPUT_FIRST
+        return self.OUTPUT_EMPTY
 
     @cached_property
     def output(self):
@@ -155,7 +160,8 @@ class RuleEvaluator:
         routes = {
             self.OUTPUT_EMPTY: lambda: None,
             self.OUTPUT_FIRST: lambda: self.first_match.item_tuple,
-            self.OUTPUT_ITEMS: lambda: self.dialog_select([i.meta for i in self.all_matches]),
+            self.OUTPUT_MATCH: lambda: self.dialog_select([i.meta for i in self.all_matches]),
+            self.OUTPUT_EVERY: lambda: self.dialog_select(self.folder),
         }
 
         return routes[self.output_type]()
