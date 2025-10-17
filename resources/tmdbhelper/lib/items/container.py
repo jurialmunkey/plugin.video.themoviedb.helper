@@ -77,6 +77,10 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         return boolean(self.params.get('detailed', False))
 
     @cached_property
+    def is_translated(self):
+        return boolean(self.params.get('translated', False))
+
+    @cached_property
     def context_additions(self):
         if self.context_additions_make_node:
             return [(get_localized(32496), 'RunScript(plugin.video.themoviedb.helper,make_node)')]
@@ -315,6 +319,8 @@ class ContainerDirectory(ContainerDirectoryCommon):
     def lidc_cache_refresh(self):
         if self.is_cacheonly:
             return 'never'
+        if self.is_translated:
+            return 'langs'
         if self.is_detailed:
             return None
         return 'basic'
@@ -326,7 +332,7 @@ class ContainerDirectory(ContainerDirectoryCommon):
         lidc.parent_params = self.parent_params
         lidc.pagination = self.pagination
         lidc.cache_refresh = self.lidc_cache_refresh
-        lidc.extendedinfo = self.is_detailed
+        lidc.extendedinfo = self.is_detailed or self.is_translated
         lidc.timer_lists = self.timer_lists
         lidc.log_timers = self.log_timers
         return lidc
