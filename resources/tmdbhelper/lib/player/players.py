@@ -248,14 +248,6 @@ class Players:
     def string_format_map(self, fmt):
         return fmt.format_map(self.item)  # NOTE: .format(**d) works in Py3.5 but not Py3.7+ so use format_map(d) instead
 
-    def select_default(self, header=None, detailed=True):
-        """ Returns user selected player via dialog - detailed bool switches dialog style """
-        from tmdbhelper.lib.player.select import PlayerSelectAdditionalItems, PlayerSelectCombined
-        self.p_dialog_step_is_enabled_player_details = False
-        instance = PlayerSelectCombined(players=self.dialog_players)
-        instance.additional_players = PlayerSelectAdditionalItems.clear_default_player()
-        return instance.select(header=header, detailed=detailed)
-
     def get_player(self, name):
         file, mode = name.split()
         return PlayersNext(self, file, mode).player

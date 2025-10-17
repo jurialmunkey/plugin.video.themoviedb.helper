@@ -27,7 +27,7 @@ class PlayersDialogMovie:
 
     @cached_property
     def items_play_local(self):
-        items_play_local = self.local_item_class(**self.item).configured_item
+        items_play_local = self.local_item_class(**self.item).configured_item if self.item else None
         return [items_play_local] if items_play_local else []
 
     @cached_property
