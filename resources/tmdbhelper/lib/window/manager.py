@@ -21,10 +21,12 @@ from tmdbhelper.lib.addon.logger import kodi_log
 
 
 class PathConstructor:
-    def __init__(self, tmdb_type=None, tmdb_id=None, dbid=None, **kwargs):
+    def __init__(self, tmdb_type=None, tmdb_id=None, season=None, episode=None, dbid=None, **kwargs):
         self.params = kwargs
         self.tmdb_type = tmdb_type
         self.tmdb_id = tmdb_id
+        self.season = season
+        self.episode = episode
         self.dbid = dbid
 
     @cached_property
@@ -32,6 +34,22 @@ class PathConstructor:
         if self.tmdb_type in ('season', 'episode'):
             return 'tv'
         return self.tmdb_type
+
+    @cached_property
+    def pstr_season(self):
+        if self.tmdb_type_path != 'tv':
+            return ''
+        if self.season is None:
+            return ''
+        return f'&season={self.season}'
+
+    @cached_property
+    def pstr_affix(self):
+        if not self.pstr_season:
+            return ''
+        if self.episode is None:
+            return self.pstr_season
+        return f'{self.pstr_season}&episode={self.episode}'
 
     @cached_property
     def info(self):
@@ -56,7 +74,7 @@ class PathConstructor:
 
         if self.tmdb_type and self.tmdb_id:
             base = 'plugin://plugin.video.themoviedb.helper/'
-            pstr = f'info=details&tmdb_type={self.tmdb_type_path}&tmdb_id={self.tmdb_id}'
+            pstr = f'info=details&tmdb_type={self.tmdb_type_path}&tmdb_id={self.tmdb_id}{self.pstr_affix}'
             return f'{base}?{pstr}'
 
         return ''
@@ -222,8 +240,8 @@ class WindowManager(EventLoop):
     def add_path(self, path):
         return self.add_path_to_history(PathConstructorFactory(path))
 
-    def add_tmdb(self, tmdb_id, tmdb_type):
-        return self.add_path_to_history(PathConstructor(tmdb_id=tmdb_id, tmdb_type=tmdb_type))
+    def add_tmdb(self, tmdb_id, tmdb_type, season=None, episode=None):
+        return self.add_path_to_history(PathConstructor(tmdb_id=tmdb_id, tmdb_type=tmdb_type, season=season, episode=episode))
 
     def add_dbid(self, dbid, tmdb_type):
         return self.add_path_to_history(PathConstructor(dbid=dbid, tmdb_type=tmdb_type))
@@ -285,7 +303,7 @@ class WindowManager(EventLoop):
         with suppress(KeyError):
             return self.add_dbid(self.params['add_dbid'], self.params['tmdb_type'])
         with suppress(KeyError):
-            return self.add_tmdb(self.params['add_tmdb'], self.params['tmdb_type'])
+            return self.add_tmdb(self.params['add_tmdb'], self.params['tmdb_type'], self.params.get('season'), self.params.get('episode'))
         with suppress(KeyError):
             return self.add_query(self.params['add_query'], self.params['tmdb_type'])
         if self.params.get('close_dialog') or self.params.get('reset_path'):
