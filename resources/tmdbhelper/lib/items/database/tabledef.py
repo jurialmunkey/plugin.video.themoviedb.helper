@@ -22,6 +22,10 @@ BASEITEM_COLUMNS = {
         'data': 'INTEGER DEFAULT 0 NOT NULL',
         'indexed': True
     },
+    'translation': {
+        'data': 'INTEGER DEFAULT 0 NOT NULL',
+        'indexed': True
+    },
     'language': {
         'data': 'TEXT',
     },
