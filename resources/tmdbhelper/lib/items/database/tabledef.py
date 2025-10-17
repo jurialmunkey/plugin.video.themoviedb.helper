@@ -685,6 +685,10 @@ ART_COLUMNS = {
         'data': 'TEXT',
         'indexed': True,
     },
+    'iso_country': {
+        'data': 'TEXT',
+        'indexed': True,
+    },
     'icon': {
         'data': 'TEXT',
         'unique': True,
