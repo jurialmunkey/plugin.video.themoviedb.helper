@@ -98,14 +98,18 @@ class PlayerDetails(dict):
         self[key].set_details(details=self.external_ids, reverse=True)
         return self[key]
 
+    @cached_property
+    def lidc(self):
+        from tmdbhelper.lib.items.database.listitem import ListItemDetails
+        lidc = ListItemDetails()
+        lidc.cache_refresh = 'langs'
+        lidc.extendedinfo = True
+        return lidc
+
     def get_details(self, language=None):
-        return get_item_details(
-            self.tmdb_type,
-            self.tmdb_id,
-            season=self.season,
-            episode=self.episode,
-            language=language
-        )
+        from tmdbhelper.lib.items.listitem import ListItem
+        details = self.lidc.get_item(self.tmdb_type, self.tmdb_id, self.season, self.episode)
+        return ListItem(**details) if details else None
 
     @cached_property
     def find_queries_db(self):
@@ -204,22 +208,6 @@ class PlayerDetails(dict):
 
 def get_next_episodes(tmdb_id, season, episode, player=None):
     return PlayerNextEpisodes(tmdb_id, season, episode, player).listitems
-
-
-def get_item_details(tmdb_type, tmdb_id, season=None, episode=None, language=None):
-    from tmdbhelper.lib.items.listitem import ListItem
-    from tmdbhelper.lib.items.database.listitem import ListItemDetails
-
-    lidc = ListItemDetails()
-    lidc.cache_refresh = 'langs'
-    lidc.extendedinfo = True
-
-    details = lidc.get_item(tmdb_type, tmdb_id, season, episode)
-
-    if not details:
-        return
-
-    return ListItem(**details)
 
 
 class PlayerDetailedItemDictMovie(dict):
