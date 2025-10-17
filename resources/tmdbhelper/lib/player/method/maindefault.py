@@ -30,15 +30,15 @@ class PlayerDefaultMainChoiceMovie:
     def choice(self):
         return self.players_select_combined.select(header=self.header, detailed=True)
 
-    @cached_property
+    @property
     def choice_file(self):
         return self.choice.get('file')
 
-    @cached_property
+    @property
     def choice_mode(self):
         return self.choice.get('mode')
 
-    @cached_property
+    @property
     def setting_value(self):
         if not self.choice_file:
             return ''
