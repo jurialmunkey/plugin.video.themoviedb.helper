@@ -54,6 +54,14 @@ class TraktAuthenticator:
         return self.is_authorized
 
     @cached_property
+    def dialog_noapikey_header(self):
+        return f'{get_localized(32007)} {self.trakt_api.req_api_name} {get_localized(32011)}'
+
+    @cached_property
+    def dialog_noapikey_text(self):
+        return get_localized(32012)
+
+    @cached_property
     def code(self):
         return self.trakt_api.get_device_code()
 
