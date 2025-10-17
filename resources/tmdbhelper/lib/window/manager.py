@@ -82,6 +82,44 @@ def PathConstructorFactory(path):
     return PathConstructor(**prms)
 
 
+class QueryConstructor:
+    def __init__(self, query, tmdb_type, separator=' / '):
+        self.query = query
+        self.tmdb_type = tmdb_type
+        self.separator = separator
+
+    @cached_property
+    def queries(self):
+        if self.separator and self.separator in self.query:
+            return self.query.split(self.separator)
+        return [self.query]
+
+    @cached_property
+    def choice(self):
+        x = Dialog().select(get_localized(32236), self.queries) if len(self.queries) > 1 else 0
+        return self.queries[x] if x != -1 else None
+
+    @cached_property
+    def tmdb_id(self):
+        if self.choice is None:
+            return
+        with BusyDialog():
+            return FindQueriesDatabase().get_tmdb_id_from_query(
+                self.tmdb_type,
+                self.choice,
+                header=f'{self.choice} ({self.tmdb_type})',
+                use_details=True,
+                auto_single=True
+
+            )
+
+    @cached_property
+    def path(self):
+        if not self.tmdb_id:
+            return Dialog().notification('TMDbHelper', get_localized(32310).format(self.choice))
+        return PathConstructor(self.tmdb_type, self.tmdb_id).path
+
+
 class WindowManager(EventLoop):
 
     position = 0
@@ -199,26 +237,10 @@ class WindowManager(EventLoop):
         kodi_log(f'Window Manager [ACTION] add_path_to_history added!', 2)
         self.call_auto()
 
-    def make_query(self, query, tmdb_type, separator=' / '):
-        if separator and separator in query:
-            split_str = query.split(separator)
-            x = Dialog().select(get_localized(32236), split_str)
-            if x == -1:
-                return
-            query = split_str[x]
-        with BusyDialog():
-            tmdb_id = FindQueriesDatabase().get_tmdb_id_from_query(tmdb_type, query, header=query, use_details=True, auto_single=True)
-        if not tmdb_id:
-            Dialog().notification('TMDbHelper', get_localized(32310).format(query))
-            return
-        return f'plugin://plugin.video.themoviedb.helper/?info=details&tmdb_type={tmdb_type}&tmdb_id={tmdb_id}'
-
     def add_query(self, query, tmdb_type, separator=' / '):
         kodi_log(f'Window Manager [ACTION] add_query {query} {tmdb_type}', 2)
-        url = self.make_query(query, tmdb_type, separator)
-        if not url:
-            return
-        return self.add_path(url)
+        path = QueryConstructor(query, tmdb_type, separator).path
+        return self.add_path(path) if path else None
 
     def close_dialog(self):
         kodi_log(f'Window Manager [ACTION] close_dialog', 2)
