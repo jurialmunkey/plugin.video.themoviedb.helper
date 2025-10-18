@@ -83,28 +83,30 @@ class PlayerNextEpisodes:
         return self.finalised_items
 
 
-class PlayerDetails(dict):
+class PlayerDetails:
 
     external_id_types = ('tmdb', 'tvdb', 'imdb', 'slug', 'trakt')
 
-    def __init__(self, tmdb_type, tmdb_id, season=None, episode=None):
+    def __init__(self, tmdb_type, tmdb_id, season=None, episode=None, translation=False):
         self.tmdb_type = tmdb_type
         self.tmdb_id = tmdb_id
         self.season = season
         self.episode = episode
-
-    def __missing__(self, key):
-        self[key] = self.get_details(key)
-        self[key].set_details(details=self.external_ids, reverse=True)
-        return self[key]
+        self.translation = translation
 
     @cached_property
     def lidc(self):
         from tmdbhelper.lib.items.database.listitem import ListItemDetails
         lidc = ListItemDetails()
-        lidc.cache_refresh = 'langs'
+        lidc.cache_refresh = 'langs' if self.translation else None
         lidc.extendedinfo = True
         return lidc
+
+    @cached_property
+    def details(self):
+        details = self.get_details()
+        details.set_details(details=self.external_ids, reverse=True)
+        return details
 
     def get_details(self, language=None):
         from tmdbhelper.lib.items.listitem import ListItem
