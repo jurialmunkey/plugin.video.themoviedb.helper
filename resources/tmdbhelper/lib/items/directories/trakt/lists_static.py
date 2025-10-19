@@ -167,6 +167,7 @@ class ListTraktStaticSearch(ListTraktStaticNoCache):
     def get_items(self, *args, query=None, **kwargs):
         from xbmcgui import Dialog
         self.list_properties.query = query or Dialog().input(get_localized(32044))
+        self.parent_params['query'] = self.list_properties.query  # For next_page configuration
         return super().get_items(*args, **kwargs)
 
 

@@ -11,6 +11,12 @@ class StaticItemMapper(ItemMapper):
         return self.list_name
 
     @cached_property
+    def list_privated(self):
+        with suppress(KeyError):
+            return bool(self.meta['list']['privacy'] != 'public')
+        return False
+
+    @cached_property
     def list_type(self):
         with suppress(KeyError):
             return self.meta['list']['type']
@@ -89,6 +95,8 @@ class StaticItemMapper(ItemMapper):
 
     @cached_property
     def item(self):
+        if self.list_privated:  # Workaround to hide private entries for private lists in results
+            return {}
         if not self.user_slug:  # Workaround to hide invalid entries for banned users still showing in results
             return {}
         if not self.list_slug:  # Workaround to hide invalid entries for banned lists still showing in results
