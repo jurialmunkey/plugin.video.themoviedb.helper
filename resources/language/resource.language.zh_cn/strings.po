@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-10-06 13:23+0800\n"
+"PO-Revision-Date: 2025-10-20 07:42+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -720,7 +720,12 @@ msgstr "关键词"
 #: /resources/tmdbhelper/lib/player/players.py
 msgctxt "#32143"
 msgid "Recaching Kodi library"
-msgstr "重新缓存 Kodi 媒体库"
+msgstr "正在重新缓存 Kodi 媒体库"
+
+#: /resources/tmdbhelper/lib/player/players.py
+msgctxt "#32144"
+msgid "Retrieving player files"
+msgstr "正在检索播放文件"
 
 #: /resources/lib/container.py
 msgctxt "#32119"
@@ -1563,7 +1568,7 @@ msgctxt "#32322"
 msgid "Select player"
 msgstr "选择播放器"
 
-#: /resources/lib/helpers/update.py
+#: /resources/lib/helpers/timedate.py
 msgctxt "#32326"
 msgid "This Month"
 msgstr "本月"
