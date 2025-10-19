@@ -22,6 +22,10 @@ BASEITEM_COLUMNS = {
         'data': 'INTEGER DEFAULT 0 NOT NULL',
         'indexed': True
     },
+    'translation': {
+        'data': 'INTEGER DEFAULT 0 NOT NULL',
+        'indexed': True
+    },
     'language': {
         'data': 'TEXT',
     },
@@ -682,6 +686,10 @@ ART_COLUMNS = {
         'data': 'INTEGER',
     },
     'iso_language': {
+        'data': 'TEXT',
+        'indexed': True,
+    },
+    'iso_country': {
         'data': 'TEXT',
         'indexed': True,
     },

@@ -304,7 +304,7 @@ class ConfigurePlayersDialogMenu:
 
     @cached_property
     def players_files(self):
-        return PlayerFiles().dictionary
+        return PlayerFiles(show_disabled=True).dictionary
 
     @cached_property
     def players_prioritised(self):

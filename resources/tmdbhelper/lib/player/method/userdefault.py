@@ -97,8 +97,8 @@ class PlayerDefaultUserChoiceSetter:
 
     @cached_property
     def player(self):
-        from tmdbhelper.lib.player.players import PlayersFactory
-        return PlayersFactory(self.tmdb_type).select_default()
+        from tmdbhelper.lib.player.method.maindefault import PlayerDefaultMainChoiceFactory
+        return PlayerDefaultMainChoiceFactory(self.tmdb_type).choice
 
     @cached_property
     def header(self):

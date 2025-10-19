@@ -41,7 +41,7 @@ class ItemDetailsDatabase(Database):
         super().__init__(filename=self.cache_filename)
 
     # DB version must be max of table_version
-    database_version = 33
+    database_version = 35
 
     database_changes = {
         21: (
@@ -96,6 +96,12 @@ class ItemDetailsDatabase(Database):
         ),
         33: (
             'ALTER TABLE baseitem ADD language TEXT',
+        ),
+        34: (
+            'ALTER TABLE art ADD iso_country TEXT',
+        ),
+        35: (
+            'ALTER TABLE baseitem ADD translation INTEGER DEFAULT 0 NOT NULL',
         ),
     }
 

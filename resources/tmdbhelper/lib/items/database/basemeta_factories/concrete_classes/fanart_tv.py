@@ -15,6 +15,11 @@ class FanartTV(ItemDetailsList):
 class FanartTVType(ArtworkDetailsMixin, FanartTV):
     conditions = 'parent_id=? AND type=? ORDER BY likes DESC LIMIT 1'  # WHERE conditions
 
+    def get_cached_data_by_language(self):
+        # Override country lookup as fanart tv only has language
+        # return self.get_cached_data_by_iso_country() or self.get_cached_data_by_iso_language()
+        return self.get_cached_data_by_iso_language()
+
     @staticmethod
     def image_path_func(v):
         return v.replace(' ', '%20')  # Ugly hack to replace unencoded spaces returned by API

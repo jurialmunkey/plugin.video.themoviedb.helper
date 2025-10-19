@@ -99,7 +99,7 @@ class Script(object):
         'update_players':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.players.old', 'update_players')(),
         'set_defaultplayer':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.players.old', 'set_defaultplayer')(**kwargs),
+            lambda **kwargs: importmodule('tmdbhelper.lib.player.method.maindefault', 'set_defaultplayer')(**kwargs),
         'set_chosenplayer':
             lambda **kwargs: importmodule('tmdbhelper.lib.player.method.userdefault', 'run')(**kwargs),
         'configure_players':

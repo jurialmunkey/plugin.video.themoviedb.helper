@@ -71,14 +71,6 @@ class TraktAPI(NoCacheRequestAPI):
     def refresh_authenticator(self):
         self.authenticator = TraktAuthenticator(self)
 
-    @cached_property
-    def dialog_noapikey_header(self):
-        return f'{get_localized(32007)} {self.req_api_name} {get_localized(32011)}'
-
-    @cached_property
-    def dialog_noapikey_text(self):
-        return get_localized(32012)
-
     def get_device_code(self):
         return self.get_api_request_json(OAUTH_DEVICE_CODE_URL, postdata={
             'client_id': self.client_id

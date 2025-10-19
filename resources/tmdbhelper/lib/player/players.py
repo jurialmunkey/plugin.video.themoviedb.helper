@@ -134,9 +134,23 @@ class Players:
         return PlayerId(self.tmdb_type, self.player, self.mode).player_id
 
     @cached_property
+    def player_files_data(self):
+        from tmdbhelper.lib.player.files import PlayerFilesData
+        return PlayerFilesData()
+
+    @cached_property
+    def player_files_unprioritised(self):
+        from tmdbhelper.lib.player.files import PlayerFiles
+        player_files_unprioritised = PlayerFiles()
+        player_files_unprioritised.player_files_data = self.player_files_data
+        return player_files_unprioritised
+
+    @cached_property
     def player_files(self):
         from tmdbhelper.lib.player.files import PlayerFiles
-        return PlayerFiles(self.providers)
+        player_files = PlayerFiles(self.providers)
+        player_files.player_files_data = self.player_files_data
+        return player_files
 
     @cached_property
     def players(self):
@@ -168,18 +182,8 @@ class Players:
         }
 
     @cached_property
-    def details_dictionary(self):
-        from tmdbhelper.lib.player.details.details import PlayerDetails
-        return PlayerDetails(**self.item_kwargs)
-
-    @cached_property
     def p_dialog_step_count(self):
-        p_dialog_step_count = sum((
-            int(self.p_dialog_step_is_enabled_recache_kodidb),
-            int(self.p_dialog_step_is_enabled_player_details),
-            int(self.p_dialog_step_is_enabled_dialog_players),
-        ))
-        return p_dialog_step_count
+        return int(self.force_recache_kodidb) + 4
 
     @cached_property
     def p_dialog(self):
@@ -187,29 +191,37 @@ class Players:
         return ProgressDialogPersistant('TMDbHelper', f'{get_localized(32374)}...', total=self.p_dialog_step_count)
 
     """
-    ProgressDialog: Step 01: Build player details
+    ProgressDialog: Step 01: Check translation flags
     """
 
-    p_dialog_step_is_enabled_player_details = True
+    @cached_property
+    def players_requires_translation(self):
+        with self.p_dialog as p_dialog:
+            p_dialog.update(f'{get_localized(32144)}...')
+            return self.player_files_unprioritised.requires_translation
+
+    """
+    ProgressDialog: Step 02: Build player details
+    """
 
     @cached_property
     def details(self):
-        if not self.p_dialog_step_is_enabled_player_details:
-            return
+        translation = self.players_requires_translation
         with self.p_dialog as p_dialog:
             p_dialog.update(f'{get_localized(32375)}...')
-            return self.details_dictionary[None]
+            from tmdbhelper.lib.player.details.details import PlayerDetails
+            return PlayerDetails(**self.item_kwargs, translation=translation).details
 
     """
-    ProgressDialog: Step 02: Recache Kodi DB
+    ProgressDialog: Step 03: Recache Kodi DB
     """
 
     @cached_property
-    def p_dialog_step_is_enabled_recache_kodidb(self):
+    def force_recache_kodidb(self):
         return bool(get_setting('default_player_kodi', 'int') and get_setting('force_recache_kodidb'))
 
     def recache_kodidb(self):
-        if not self.p_dialog_step_is_enabled_recache_kodidb:
+        if not self.force_recache_kodidb:
             return
         with self.p_dialog as p_dialog:
             p_dialog.update(f'{get_localized(32143)}...')
@@ -217,18 +229,12 @@ class Players:
             DatabaseMaintenance().recache_kodidb(notification=False)
 
     """
-    ProgressDialog: Step 03: Build dialog players
+    ProgressDialog: Step 04: Build dialog players
     """
-
-    p_dialog_step_is_enabled_dialog_players = True
 
     @cached_property
     def dialog_players(self):
-        if not self.p_dialog_step_is_enabled_dialog_players:
-            return
-
         self.recache_kodidb()
-
         with self.p_dialog as p_dialog:
             p_dialog.closing = True
             p_dialog.update(f'{get_localized(32376)}...')
@@ -247,14 +253,6 @@ class Players:
 
     def string_format_map(self, fmt):
         return fmt.format_map(self.item)  # NOTE: .format(**d) works in Py3.5 but not Py3.7+ so use format_map(d) instead
-
-    def select_default(self, header=None, detailed=True):
-        """ Returns user selected player via dialog - detailed bool switches dialog style """
-        from tmdbhelper.lib.player.select import PlayerSelectAdditionalItems, PlayerSelectCombined
-        self.p_dialog_step_is_enabled_player_details = False
-        instance = PlayerSelectCombined(players=self.dialog_players)
-        instance.additional_players = PlayerSelectAdditionalItems.clear_default_player()
-        return instance.select(header=header, detailed=detailed)
 
     def get_player(self, name):
         file, mode = name.split()

@@ -683,6 +683,7 @@ class ItemMapperMethods:
                         'aspect_ratio': ItemMapperMethods.get_aspect_ratio(artwork['aspect_ratio']),
                         'quality': int((artwork['width'] * artwork['height']) // 200000),  # Quality integer to nearest fifth of a megapixel
                         'iso_language': get_blanks_none(artwork['iso_639_1']),
+                        'iso_country': get_blanks_none(artwork['iso_3166_1']),
                         'icon': get_blanks_none(path),
                         'type': get_blanks_none(artwork_type),
                         'extension': get_blanks_none(path.split('.')[-1] if path else None),

@@ -42,6 +42,13 @@ class MonitorItemDetails(ImageManipulations):
             '!String.IsEmpty(Window.Property(TMDbHelper.EnableExtendedProperties))'
         ))
 
+    @property
+    def is_translation(self):
+        return get_condvisibility((
+            'Skin.HasSetting(TMDbHelper.EnableTranslationProperties) | '
+            '!String.IsEmpty(Window.Property(TMDbHelper.EnableTranslationProperties))'
+        ))
+
     @cached_property
     def infolabel_property_tmdb_type(self):
         return self.get_infolabel('Property(tmdb_type)')
@@ -323,7 +330,7 @@ class MonitorItemDetails(ImageManipulations):
 
     def get_lidc_item(self):
         self.parent.lidc.extendedinfo = self.is_extended
-        self.parent.lidc.cache_refresh = None
+        self.parent.lidc.cache_refresh = 'langs' if self.is_translation else None
         return self.parent.lidc.get_item(self.tmdb_type, self.tmdb_id, self.season, self.episode)
 
     def update_lidc_item(self):

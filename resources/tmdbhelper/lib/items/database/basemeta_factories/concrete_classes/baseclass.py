@@ -48,10 +48,18 @@ class ArtworkDetailsMixin:
     def image_path_func(v):
         return v
 
-    def get_cached_data_by_language(self):
+    def get_cached_data_by_iso_country(self):
+        conditions = f'iso_country=? AND {self.conditions}'
+        values = (self.common_apis.tmdb_api.iso_country, *self.values)
+        return self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, values, conditions)
+
+    def get_cached_data_by_iso_language(self):
         conditions = f'iso_language=? AND {self.conditions}'
         values = (self.common_apis.tmdb_api.iso_language, *self.values)
         return self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, values, conditions)
+
+    def get_cached_data_by_language(self):
+        return self.get_cached_data_by_iso_country() or self.get_cached_data_by_iso_language()
 
     def get_cached_data_by_english(self):
         conditions = f'iso_language=? AND {self.conditions}'
