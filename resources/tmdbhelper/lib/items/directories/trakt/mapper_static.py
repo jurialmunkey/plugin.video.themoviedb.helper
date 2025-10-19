@@ -13,7 +13,7 @@ class StaticItemMapper(ItemMapper):
     @cached_property
     def list_privated(self):
         with suppress(KeyError):
-            return bool(self.meta['list']['privacy'] == 'private')
+            return bool(self.meta['list']['privacy'] != 'public')
         return False
 
     @cached_property
