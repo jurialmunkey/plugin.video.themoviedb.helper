@@ -104,6 +104,10 @@ class ListItemMonitorFinaliser:
         return self.listitem_monitor_functions.get_property
 
     @property
+    def set_property(self):
+        return self.listitem_monitor_functions.set_property
+
+    @property
     def set_properties(self):
         return self.listitem_monitor_functions.set_properties
 
@@ -188,6 +192,10 @@ class ListItemMonitorFinaliser:
     @cached_property
     def item(self):
         item = self.listitem_monitor_functions._item
+        self.set_property('monitor.tmdb_id', item.tmdb_id)
+        self.set_property('monitor.tmdb_type', item.tmdb_type)
+        self.set_property('monitor.season', item.season)
+        self.set_property('monitor.episode', item.episode)
         item.set_additional_properties(self.baseitem_properties)
         return item
 
