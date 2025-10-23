@@ -317,18 +317,18 @@ class PlayerDetailedItemDictMovie(dict):
             return self[key]
 
         # Translation routes
-        for k in self.routes:
-            if key.endswith(f'_{k}'):
-                language, route_key = key.split('_', 1)
-                self[key] = self.routes[route_key](language=language)
-                return self[key]
+        with contextlib.suppress(KeyError, AttributeError, ValueError):
+            language, route_key = key.split('_', 1)
+            self[key] = self.routes[route_key](language=language)
+            return self[key]
 
         # Encoding affixes
         for method in self.encoding_affixes:
-            if key.endswith(method):
-                self[key] = self[key[:-len(method)]]
-                self[key] = self.get_sanitised(self[key], method)
-                return self[key]
+            if not key.endswith(method):
+                continue
+            self[key] = self[key[:-len(method)]]
+            self[key] = self.get_sanitised(self[key], method)
+            return self[key]
 
         return '_'
 
