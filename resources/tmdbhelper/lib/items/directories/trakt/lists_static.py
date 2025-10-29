@@ -26,7 +26,7 @@ class ListTraktStaticProperties(ListTraktStandardProperties):
 
     @cached_property
     def user_profile_slug(self):
-        return self.trakt_api.authenticator.user_profile_slug
+        return self.trakt_api.profile.slug
 
     def set_user_profile_slug(self, item):
         with suppress(TypeError):

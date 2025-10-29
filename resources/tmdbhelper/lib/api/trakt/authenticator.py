@@ -6,7 +6,6 @@ from tmdbhelper.lib.api.trakt.token import TraktStoredAccessToken
 from tmdbhelper.lib.addon.plugin import get_localized, KeyGetter
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.files.locker import mutexlock
-from contextlib import suppress
 
 
 class TraktAuthenticator:
@@ -95,17 +94,6 @@ class TraktAuthenticator:
         auth_dialog = DialogProgress()
         auth_dialog.create(self.auth_dialog_head, self.auth_dialog_text)
         return auth_dialog
-
-    @cached_property
-    def user_profile_meta(self):
-        if not self.is_authorized:
-            return
-        return self.trakt_api.get_response_json('users/me')
-
-    @cached_property
-    def user_profile_slug(self):
-        with suppress(KeyError, TypeError):
-            return self.user_profile_meta['ids']['slug']
 
     @property
     def auth_dialog_route(self):

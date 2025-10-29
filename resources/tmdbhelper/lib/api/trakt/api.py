@@ -1,8 +1,8 @@
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.api.request import NoCacheRequestAPI
 from tmdbhelper.lib.api.api_keys.trakt import CLIENT_ID, CLIENT_SECRET, USER_TOKEN
 from tmdbhelper.lib.api.trakt.authenticator import TraktAuthenticator
+from tmdbhelper.lib.api.trakt.profile import TraktProfile
 
 
 API_URL = 'https://api.trakt.tv/'
@@ -113,6 +113,10 @@ class TraktAPI(NoCacheRequestAPI):
     def login(self):
         self.refresh_authenticator()
         self.authenticator.login()
+
+    @cached_property
+    def profile(self):
+        return TraktProfile(self)
 
     def delete_response(self, *args, **kwargs):
         return self.get_simple_api_request(
