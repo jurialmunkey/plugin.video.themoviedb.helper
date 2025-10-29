@@ -11,10 +11,28 @@ class StaticItemMapper(ItemMapper):
         return self.list_name
 
     @cached_property
-    def list_privated(self):
+    def user_profile_slug(self):
         with suppress(KeyError):
-            return bool(self.meta['list']['privacy'] != 'public')
-        return False
+            return self.meta['user_profile_slug']
+
+    @cached_property
+    def list_owned(self):
+        if not self.user_profile_slug:
+            return False
+        return bool(self.user_profile_slug == self.user_slug)
+
+    @cached_property
+    def list_privacy(self):
+        with suppress(KeyError):
+            return self.meta['list']['privacy']
+
+    @cached_property
+    def list_privated(self):
+        if self.list_privacy == 'public':
+            return False
+        if self.list_privacy == 'private' and self.list_owned:
+            return False
+        return True
 
     @cached_property
     def list_type(self):
