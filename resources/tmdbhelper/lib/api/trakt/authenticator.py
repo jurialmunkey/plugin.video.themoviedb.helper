@@ -98,6 +98,8 @@ class TraktAuthenticator:
 
     @cached_property
     def user_profile_meta(self):
+        if not self.is_authorized:
+            return
         return self.trakt_api.get_response_json('users/me')
 
     @cached_property
