@@ -254,43 +254,59 @@ class PlayerDetailedItemDictMovie(dict):
 
     def get_routes(self):
         return {
-            'id': lambda: self.tmdb_id,
-            'tmdb': lambda: self.tmdb_id,
-            'imdb': lambda: self.details.unique_ids.get('imdb'),
-            'tvdb': lambda: self.details.unique_ids.get('tvdb'),
-            'trakt': lambda: self.details.unique_ids.get('trakt'),
-            'slug': lambda: self.details.unique_ids.get('slug'),
-            'originaltitle': lambda: self.details.infolabels.get('originaltitle'),
-            'title': lambda: self.details.infolabels.get('title'),
-            'clearname': lambda: self.details.infolabels.get('title'),
-            'year': lambda: self.details.infolabels.get('year'),
-            'name': lambda: f'{self["title"]} ({self["year"]})',
-            'premiered': lambda: self.details.infolabels.get('premiered'),
-            'firstaired': lambda: self.details.infolabels.get('premiered'),
-            'released': lambda: self.details.infolabels.get('premiered'),
-            'plot': lambda: self.details.infolabels.get('plot'),
+            'id': lambda **kwargs: self.tmdb_id,
+            'tmdb': lambda **kwargs: self.tmdb_id,
+            'imdb': lambda **kwargs: self.details.unique_ids.get('imdb'),
+            'tvdb': lambda **kwargs: self.details.unique_ids.get('tvdb'),
+            'trakt': lambda **kwargs: self.details.unique_ids.get('trakt'),
+            'slug': lambda **kwargs: self.details.unique_ids.get('slug'),
+            'originaltitle': lambda **kwargs: self.details.infolabels.get('originaltitle'),
+            'title': self.get_title,
+            'clearname': self.get_title,
+            'year': lambda **kwargs: self.details.infolabels.get('year'),
+            'name': self.get_name,
+            'premiered': lambda **kwargs: self.details.infolabels.get('premiered'),
+            'firstaired': lambda **kwargs: self.details.infolabels.get('premiered'),
+            'released': lambda **kwargs: self.details.infolabels.get('premiered'),
+            'plot': lambda **kwargs: self.details.infolabels.get('plot'),
             'cast': self.get_cast,
             'actors': self.get_cast,
-            'thumbnail': lambda: self.details.art.get('thumb'),
-            'poster': lambda: self.details.art.get('poster'),
-            'fanart': lambda: self.details.art.get('fanart'),
+            'thumbnail': lambda **kwargs: self.details.art.get('thumb'),
+            'poster': lambda **kwargs: self.details.art.get('poster'),
+            'fanart': lambda **kwargs: self.details.art.get('fanart'),
             'now': self.get_now,
         }
 
-    def get_cast(self):
+    def get_name(self, language=None, **kwargs):
+        name = self[f'{language}_title' if language else 'title']
+        name = f'{name} ({self["year"]})'
+        return name
+
+    def get_title(self, language=None, **kwargs):
+        title = self.details.infoproperties.get(f'{language}_title') if language else self.details.infolabels.get('title')
+        title = title or self.details.infolabels.get('originaltitle')
+        return (title or self['title']) if language else title
+
+    def get_tvshowtitle(self, language=None, **kwargs):
+        tvshowtitle = self.details.infoproperties.get(f'{language}_tvshowtitle') if language else self.details.infolabels.get('tvshowtitle')
+        tvshowtitle = tvshowtitle or self.details.infoproperties.get('tvshow.originaltitle')
+        return (tvshowtitle or self['tvshowtitle']) if language else tvshowtitle
+
+    def get_plot(self, language=None, **kwargs):
+        plot = self.details.infoproperties.get(f'{language}_plot') if language else self.details.infolabels.get('plot')
+        plot = plot or self['plot'] if language else None
+        return plot
+
+    def get_cast(self, **kwargs):
         return " / ".join([i.get('name') for i in self.details.cast if i.get('name')])
 
-    def get_now(self):
+    def get_now(self, **kwargs):
         from tmdbhelper.lib.addon.tmdate import get_datetime_now
         return get_datetime_now().strftime('%Y%m%d%H%M%S%f')
 
     def initialise_standard_keys(self):
         for k in self.routes.keys():
             self[k]
-
-    translation_title_affixes = ('_title', '_clearname', )
-    translation_tvshowtitle_affixes = tuple()
-    translation_plot_affixes = ('_plot', )
 
     def __missing__(self, key):
 
@@ -300,36 +316,19 @@ class PlayerDetailedItemDictMovie(dict):
             self[key] = self.get_sanitised(self[key])
             return self[key]
 
-        # Translation prefixes en_ or en_US_ etc.
-        for k in self.translation_title_affixes:
-            if key.endswith(k):
-                key_langs = f'{key[:-len(k)]}_title'
-                self[key] = self.details.infoproperties.get(key_langs)
-                self[key] = self[key] or self.details.infolabels.get('originaltitle')
-                self[key] = self[key] or self['title']
-                return self[key]
-
-        for k in self.translation_tvshowtitle_affixes:
-            if key.endswith(k):
-                key_langs = f'{key[:-len(k)]}_tvshowtitle'
-                self[key] = self.details.infoproperties.get(key_langs)
-                self[key] = self[key] or self.details.infoproperties.get('tvshow.originaltitle')
-                self[key] = self[key] or self['tvshowtitle']
-                return self[key]
-
-        for k in self.translation_plot_affixes:
-            if key.endswith(k):
-                key_langs = f'{key[:-len(k)]}_plot'
-                self[key] = self.details.infoproperties.get(key_langs)
-                self[key] = self[key] or self['plot']
-                return self[key]
+        # Translation routes
+        with contextlib.suppress(KeyError, AttributeError, ValueError):
+            language, route_key = key.split('_', 1)
+            self[key] = self.routes[route_key](language=language)
+            return self[key]
 
         # Encoding affixes
         for method in self.encoding_affixes:
-            if key.endswith(method):
-                self[key] = self[key[:-len(method)]]
-                self[key] = self.get_sanitised(self[key], method)
-                return self[key]
+            if not key.endswith(method):
+                continue
+            self[key] = self[key[:-len(method)]]
+            self[key] = self.get_sanitised(self[key], method)
+            return self[key]
 
         return '_'
 
@@ -342,36 +341,37 @@ class PlayerDetailedItemDictEpisode(PlayerDetailedItemDictMovie):
         self.season = season
         self.episode = episode
 
-    translation_title_affixes = ('_title', )
-    translation_tvshowtitle_affixes = ('_tvshowtitle', '_showname', '_clearname')
-
     def get_routes(self):
         routes = super().get_routes()
         routes.update({
-            'season': lambda: self.season,
-            'episode': lambda: self.episode,
-            'originaltitle': lambda: self.details.infoproperties.get('tvshow.originaltitle'),
-            'showname': lambda: self.details.infolabels.get('tvshowtitle'),
-            'showpremiered': lambda: self.details.infoproperties.get('tvshow.premiered'),
-            'showyear': lambda: self.details.infoproperties.get('tvshow.year'),
-            'clearname': lambda: self.details.infolabels.get('tvshowtitle'),
-            'tvshowtitle': lambda: self.details.infolabels.get('tvshowtitle'),
-            'id': lambda: self.details.unique_ids.get('tvdb'),
-            'epid': lambda: self.details.unique_ids.get('tvdb'),
-            'eptvdb': lambda: self.details.unique_ids.get('tvdb'),
-            'eptmdb': lambda: self.details.unique_ids.get('tmdb'),
-            'epimdb': lambda: self.details.unique_ids.get('imdb'),
-            'eptrakt': lambda: self.details.unique_ids.get('trakt'),
-            'epslug': lambda: self.details.unique_ids.get('slug'),
-            'tmdb': lambda: self.details.unique_ids.get('tvshow.tmdb'),
-            'imdb': lambda: self.details.unique_ids.get('tvshow.imdb'),
-            'tvdb': lambda: self.details.unique_ids.get('tvshow.tvdb'),
-            'trakt': lambda: self.details.unique_ids.get('tvshow.trakt'),
-            'slug': lambda: self.details.unique_ids.get('tvshow.slug'),
-            'name': lambda: f'{self["showname"]} S{try_int(self["season"]):02d}E{try_int(self["episode"]):02d}',
+            'season': lambda **kwargs: self.season,
+            'episode': lambda **kwargs: self.episode,
+            'originaltitle': lambda **kwargs: self.details.infoproperties.get('tvshow.originaltitle'),
+            'showpremiered': lambda **kwargs: self.details.infoproperties.get('tvshow.premiered'),
+            'showyear': lambda **kwargs: self.details.infoproperties.get('tvshow.year'),
+            'showname': self.get_tvshowtitle,
+            'clearname': self.get_tvshowtitle,
+            'tvshowtitle': self.get_tvshowtitle,
+            'id': lambda **kwargs: self.details.unique_ids.get('tvdb'),
+            'epid': lambda **kwargs: self.details.unique_ids.get('tvdb'),
+            'eptvdb': lambda **kwargs: self.details.unique_ids.get('tvdb'),
+            'eptmdb': lambda **kwargs: self.details.unique_ids.get('tmdb'),
+            'epimdb': lambda **kwargs: self.details.unique_ids.get('imdb'),
+            'eptrakt': lambda **kwargs: self.details.unique_ids.get('trakt'),
+            'epslug': lambda **kwargs: self.details.unique_ids.get('slug'),
+            'tmdb': lambda **kwargs: self.details.unique_ids.get('tvshow.tmdb'),
+            'imdb': lambda **kwargs: self.details.unique_ids.get('tvshow.imdb'),
+            'tvdb': lambda **kwargs: self.details.unique_ids.get('tvshow.tvdb'),
+            'trakt': lambda **kwargs: self.details.unique_ids.get('tvshow.trakt'),
+            'slug': lambda **kwargs: self.details.unique_ids.get('tvshow.slug'),
 
         })
         return routes
+
+    def get_name(self, language=None, **kwargs):
+        name = self[f'{language}_tvshowtitle' if language else 'tvshowtitle']
+        name = f'{name} S{try_int(self["season"]):02d}E{try_int(self["episode"]):02d}'
+        return name
 
 
 def PlayerDetailedItemDict(tmdb_type, tmdb_id, season=None, episode=None, details=None):
