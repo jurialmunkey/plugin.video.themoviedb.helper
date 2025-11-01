@@ -243,16 +243,13 @@ class Players:
 
     @cached_property
     def item(self):
-        from tmdbhelper.lib.player.details.details import PlayerDetailedItemDict
-        return PlayerDetailedItemDict(**self.item_kwargs, details=self.details)
+        from tmdbhelper.lib.player.details.details import PlayerDetailedItemDictFactory
+        return PlayerDetailedItemDictFactory(**self.item_kwargs, details=self.details)
 
     @cached_property
     def chosen_default(self):
         from tmdbhelper.lib.player.method.userdefault import PlayerDefaultUserChoiceGetterFactory
         return PlayerDefaultUserChoiceGetterFactory(**self.item_kwargs).info
-
-    def string_format_map(self, fmt):
-        return fmt.format_map(self.item)  # NOTE: .format(**d) works in Py3.5 but not Py3.7+ so use format_map(d) instead
 
     def get_player(self, name):
         file, mode = name.split()
@@ -301,7 +298,6 @@ class Players:
     @cached_property
     def resolver(self):
         resolver = ResolverPlayerSelect(self.item, dialog_players=self.dialog_players, action_log=self.action_log)
-        resolver.string_format_func = self.string_format_map  # TODO: Temp shim: move into class
         resolver.fallback_item_func = self.get_player  # TODO: Temp shim: move into class
         return resolver
 
@@ -310,7 +306,7 @@ class Players:
         if not self.resolver.player:
             return
         self.selected = self.resolver
-        return self.selected.item
+        return self.selected.resolved_item
 
     def get_resolved_listitem(self):
         if not self.item:

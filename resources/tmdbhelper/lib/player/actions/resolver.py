@@ -90,8 +90,9 @@ class ResolverPlayerSelect:
 
     fallback_item_func = None
 
-    def __init__(self, meta, dialog_players=None, action_log=None):
-        self.meta = ResolverItem(meta)
+    def __init__(self, item, dialog_players=None, action_log=None):
+        self.item = item
+        self.meta = ResolverItem(item)
         self.dialog_players = dialog_players
         self.action_log = action_log
 
@@ -137,11 +138,11 @@ class ResolverPlayerSelect:
 
         if isinstance(actions, list):
             from tmdbhelper.lib.player.actions.pathfinder import PathFinder
-            return PathFinder(self.string_format_func, actions).path_tuple
+            return PathFinder(self.item.string_format_map, actions).path_tuple
 
         if isinstance(actions, str):
             if not player.get('is_local', False):
-                actions = self.string_format_func(actions)  # Format our path if a single path and not a file
+                actions = self.item.string_format_map(actions)  # Format our path if a single path and not a file
             return (actions, player.get('is_folder', False))
 
     @cached_property
@@ -166,7 +167,9 @@ class ResolverPlayerSelect:
         return instance.select(header=header, detailed=detailed)
 
     def update_player(self, player):
-        setattr(self, 'player', ResolverPlayer(player)) if player else None
+        if not player:
+            return
+        setattr(self, 'player', ResolverPlayer(player))
 
     @cached_property
     def player(self):
@@ -174,8 +177,12 @@ class ResolverPlayerSelect:
 
     def get_player(self):
         player = self.select_player(header=self.meta.header)
-        return ResolverPlayer(player) if player else None
+        if not player:
+            return
+        return ResolverPlayer(player)
 
     @cached_property
-    def item(self):
-        return self.on_success() if self.resolved_path else None
+    def resolved_item(self):
+        if not self.resolved_path:
+            return
+        return self.on_success()
