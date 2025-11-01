@@ -7,66 +7,6 @@ from tmdbhelper.lib.player.actions.resolver import ResolverPlayerSelect
 from tmdbhelper.lib.addon.logger import kodi_log
 
 
-class PlayersNext:
-
-    def __init__(self, main, file, mode):
-        self.main = main  # Main Players class
-        self.file = file
-        self.mode = mode
-
-    @cached_property
-    def meta(self):
-        return self.main.players.get(self.file) if self.file and self.mode else None
-
-    @cached_property
-    def item(self):
-        return self.main.item
-
-    @cached_property
-    def constructed_player(self):
-        from tmdbhelper.lib.player.details.item import PlayerItemConstructed
-        return PlayerItemConstructed(
-            file=self.file,
-            item=self.item,
-            mode=self.mode,
-            meta=self.meta
-        ) if self.meta else None
-
-    @cached_property
-    def configured_item(self):
-        return self.constructed_player.configured_item if self.constructed_player else None
-
-    def player_check(self, player):
-        if player.get('file') != self.constructed_player.file:
-            return False
-        if player.get('mode') != self.constructed_player.mode:
-            return False
-        return True
-
-    @property
-    def generator(self):
-        return (x for x, player in enumerate(self.main.dialog_players) if self.player_check(player))
-
-    @cached_property
-    def idx(self):
-        return next(self.generator, None)
-
-    @cached_property
-    def player(self):
-        if self.configured_item is None:
-            return
-
-        if self.idx is not None:
-            self.configured_item['idx'] = self.idx
-            return self.configured_item
-
-        return PlayersNext(
-            self.main,
-            self.constructed_player.fallback_file,
-            self.constructed_player.fallback_mode,
-        ).player
-
-
 class Players:
 
     selected = None
@@ -252,8 +192,8 @@ class Players:
         return PlayerDefaultUserChoiceGetterFactory(**self.item_kwargs).info
 
     def get_player(self, name):
-        file, mode = name.split()
-        return PlayersNext(self, file, mode).player
+        from tmdbhelper.lib.player.fallback import PlayersFallback
+        return PlayersFallback(self, *name.split()).player
 
     def get_default_player(self):
         """ Returns default player """
@@ -301,7 +241,7 @@ class Players:
         resolver.fallback_item_func = self.get_player  # TODO: Temp shim: move into class
         return resolver
 
-    def get_resolved_metaitem(self, player=None, allow_default=False):
+    def get_resolved_item(self, player=None, allow_default=False):
         self.resolver.update_player(self.get_default_player() if allow_default and not player else player)
         if not self.resolver.player:
             return
@@ -312,7 +252,7 @@ class Players:
         if not self.item:
             return
         get_property('PlayerInfoString', clear_property=True)
-        path = self.get_resolved_metaitem(allow_default=True) or {}
+        path = self.get_resolved_item(allow_default=True) or {}
         self.details.params = {}
         self.details.path = path.pop('url', None)
         self.details.infoproperties.update(path)
