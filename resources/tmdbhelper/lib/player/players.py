@@ -1,6 +1,5 @@
 from xbmcgui import Dialog
 from jurialmunkey.window import get_property
-from jurialmunkey.parser import boolean
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import PLUGINPATH, format_folderpath, get_localized, get_setting
 from tmdbhelper.lib.player.actions.resolver import ResolverPlayerSelect
@@ -11,6 +10,7 @@ class Players:
 
     selected = None
     default_player = None
+    ignore_default = False
     tmdb_type = None
     season = None
     episode = None
@@ -67,11 +67,6 @@ class Players:
     @cached_property
     def action_log(self):
         return []
-
-    @cached_property
-    def player_forced(self):
-        from tmdbhelper.lib.player.player_id import PlayerId
-        return PlayerId(self.tmdb_type, self.player, self.mode).player_id
 
     @cached_property
     def player_files_data(self):
@@ -186,54 +181,16 @@ class Players:
         from tmdbhelper.lib.player.details.details import PlayerDetailedItemDictFactory
         return PlayerDetailedItemDictFactory(**self.item_kwargs, details=self.details)
 
-    @cached_property
-    def chosen_default(self):
-        from tmdbhelper.lib.player.method.userdefault import PlayerDefaultUserChoiceGetterFactory
-        return PlayerDefaultUserChoiceGetterFactory(**self.item_kwargs).info
-
     def get_player(self, name):
         from tmdbhelper.lib.player.fallback import PlayersFallback
-        return PlayersFallback(self, *name.split()).player
+        return PlayersFallback(self, *name.split()).player if name else None
 
-    def get_default_player(self):
-        """ Returns default player """
-
-        if self.ignore_default:
+    @cached_property
+    def players_default(self):
+        if self.ignore_default or not self.dialog_players:
             return
-
-        if not self.dialog_players:
-            return
-
-        if self.player_forced:
-            return self.get_player(self.player_forced)
-
-        if self.chosen_default:
-            return self.get_player(self.chosen_default)
-
-        x = 0
-
-        if self.dialog_players[x].get('is_local'):
-            if get_setting('default_player_kodi', 'int') == 1:
-                player = self.dialog_players[x]
-                player['idx'] = x
-                player['fallback'] = player.get('fallback') or self.default_player or ''  # Use default_player if this one fails
-                return player
-
-            if len(self.dialog_players) > 1:
-                x = 1
-
-        if self.dialog_players[x].get('is_provider'):
-            if get_setting('default_player_provider'):
-                player = self.dialog_players[x]
-                player['idx'] = x
-                player['fallback'] = player.get('fallback') or self.default_player or ''  # Use default_player if this one fails
-                return player
-
-        # No default player setting
-        if not self.default_player:
-            return
-
-        return self.get_player(self.default_player)
+        from tmdbhelper.lib.player.default import PlayersDefault
+        return PlayersDefault(self).player
 
     @cached_property
     def resolver(self):
@@ -241,8 +198,8 @@ class Players:
         resolver.fallback_item_func = self.get_player  # TODO: Temp shim: move into class
         return resolver
 
-    def get_resolved_item(self, player=None, allow_default=False):
-        self.resolver.update_player(self.get_default_player() if allow_default and not player else player)
+    def get_resolved_item(self):
+        self.resolver.update_player(self.players_default)
         if not self.resolver.player:
             return
         self.selected = self.resolver
@@ -252,7 +209,7 @@ class Players:
         if not self.item:
             return
         get_property('PlayerInfoString', clear_property=True)
-        path = self.get_resolved_item(allow_default=True) or {}
+        path = self.get_resolved_item() or {}
         self.details.params = {}
         self.details.path = path.pop('url', None)
         self.details.infoproperties.update(path)
@@ -322,9 +279,7 @@ class Players:
                 nolabel=f'{get_localized(106)} (PlayMedia)'):
             return self.listitem_path
 
-    def play(self, folder_path=None, reset_focus=None, ignore_default=False):
-        self.ignore_default = boolean(ignore_default)
-
+    def play(self, folder_path=None, reset_focus=None):
         if not self.listitem.getPath():
             return
         if self.listitem.getPath() == PLUGINPATH:

@@ -82,7 +82,10 @@ class PlayerFileMetaData:
     @cached_property
     def priority_provider(self):
         try:
-            return self.providers.index(self.meta['provider']) + 1  # Add 1 to avoid 0 index for sorting
+            priority = self.providers.index(self.meta['provider'])
+            priority += 1  # Add 1 to avoid 0 index for sorting
+            priority += self.priority_baseline / 100000  # If 2+ providers with same index we order by baseline priority at fractions
+            return priority
         except (KeyError, ValueError, TypeError, AttributeError):
             return 0
 
