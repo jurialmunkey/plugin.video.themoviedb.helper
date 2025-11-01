@@ -209,7 +209,9 @@ class Players:
         if not self.item:
             return
         get_property('PlayerInfoString', clear_property=True)
-        path = self.get_resolved_item() or {}
+        return self.get_details_listitem(self.get_resolved_item() or {})
+
+    def get_details_listitem(self, path):
         self.details.params = {}
         self.details.path = path.pop('url', None)
         self.details.infoproperties.update(path)
