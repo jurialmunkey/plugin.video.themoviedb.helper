@@ -12,6 +12,7 @@ class Player:
     tmdb_type = None
     season = None
     episode = None
+    mode_affix = 'null'
 
     def __init__(
         self,
@@ -20,9 +21,17 @@ class Player:
         mode=None,
         **kwargs
     ):
-        self.player = player  # the player file name
-        self.mode = mode  # search or play
+        self.player_file = player  # the player file name
+        self.player_mode = mode  # search or play
         self.handle = handle  # Handle from plugin callback hook
+
+    @property
+    def player_mode(self):
+        return self._player_mode
+
+    @player_mode.setter
+    def player_mode(self, value):
+        self._player_mode = f'{value}_{self.mode_affix}' if value else None
 
     """
     Init Setup Steps
@@ -138,8 +147,8 @@ class Player:
             self.tmdb_type,
             data=self.player_items,
             user=self.player_chosen,
-            file=self.player,
-            mode=self.mode,
+            file=self.player_file,
+            mode=self.player_mode,
         )
         player_default.ignore_default = self.ignore_default
         return player_default
@@ -161,6 +170,7 @@ class Player:
 
     @cached_property
     def player_current(self):
+        self.initialise_setup()
         return self.get_next_player()
 
     def get_next_player(self, fallback=None):
@@ -222,11 +232,14 @@ class Player:
         from xbmc import Monitor
         return Monitor()
 
-    def play(self):
-        self.initialise_setup()
+    @staticmethod
+    def reupdate_listing():
+        from tmdbhelper.lib.player.action.reupdate import PlayerReUpdateListing
+        PlayerReUpdateListing().run()
 
+    def play(self):
         while self.player_current and not self.xbmc_monitor.abortRequested():
-            self.play_loop()
+            self.loop()
 
         if self.player_current:
             return kodi_log(f'lib.player - Aborted!', 1)
@@ -236,26 +249,20 @@ class Player:
 
         kodi_log(f'lib.player - Success!', 1)
 
-    def play_loop(self):
+    def loop(self):
 
-        kodi_log(f'lib.player - {self.player_current.name}: Attempting to resolve...', 1)
+        kodi_log(f'lib.player - {self.player_current.name}: Resolving...', 1)
+        kodi_log(f'lib.player - {self.player_current.name}: {self.player_current.resolver.path}', 1)
 
         if not self.player_current.resolver.path:
-            kodi_log(f'lib.player - {self.player_current.name}: Failed to resolve!', 1)
             self.player_items.del_player(self.player_current)
             self.player_current = self.get_next_player(self.player_current.fallback)
             return
 
-        # self.test()
-        kodi_log(f'lib.player - {self.player_current.name}: Resolved\n{self.player_current.resolver.path} {self.player_current.resolver.is_folder}', 1)
         self.reupdate_listing()
-        self.player_current.resolver.run()
-        self.player_current = False
 
-    @staticmethod
-    def reupdate_listing():
-        from tmdbhelper.lib.player.action.reupdate import PlayerReUpdateListing
-        PlayerReUpdateListing().run()
+        if self.player_current.resolver.success:
+            self.player_current = False
 
     def test(self):
         data = [
@@ -273,6 +280,7 @@ class Player:
 
 class PlayerMovie(Player):
     tmdb_type = 'movie'
+    mode_affix = 'movie'
 
     def __init__(
         self,
@@ -285,6 +293,7 @@ class PlayerMovie(Player):
 
 class PlayerEpisode(Player):
     tmdb_type = 'tv'
+    mode_affix = 'episode'
 
     def __init__(
         self,
@@ -297,7 +306,6 @@ class PlayerEpisode(Player):
         self.season = season
         self.episode = episode
         super().__init__(**kwargs)
-
 
 def Player(tmdb_type, **kwargs):
     if tmdb_type == 'movie':

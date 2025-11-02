@@ -43,6 +43,11 @@ class PlayerWaiting:
             return True
         return False
 
+    def wait_busy(self, time):
+        from tmdbhelper.lib.addon.dialog import BusyDialog
+        with BusyDialog(False if time < 1 else True):
+            self.xbmc_monitor.waitForAbort(time)
+
     def run(self):
         poll = 0
         while (
@@ -54,17 +59,18 @@ class PlayerWaiting:
             poll += self.polling
 
         if self.timeout <= poll:
-            return
+            return False
         if not self.fileext:
-            return
+            return True
         if not self.suspend:
-            return
+            return True
 
-        self.xbmc_monitor(self.suspend)
+        self.xbmc_monitor.waitForAbort(self.suspend)
 
         if not self.is_playing:
-            return
+            return True
         if not self.playing_file.endswith(self.fileext):
-            return
+            return True
 
         self.xbmc_player.stop()
+        return True

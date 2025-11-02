@@ -55,11 +55,11 @@ class PlayerNextEpisodes:
         return True
 
     def finalise_item(self, li):
+        if self.player:
+            li.params['player'] = self.player
+            li.params['mode'] = 'play'
+            li.params['ignore_default'] = 'true'
         li.finalise()
-        if not self.player:
-            return li
-        li.params['player'] = self.player
-        li.params['mode'] = 'play'
         return li
 
     @cached_property
@@ -84,7 +84,7 @@ class PlayerNextEpisodes:
     def playlist(self):
         return PlayList(PLAYLIST_VIDEO)
 
-    def update(self, forced=False, clear=True):
+    def update(self, forced=True, clear=True):
         if not forced and self.playlist.getposition() != 0:  # If position isn't 0 then the user is already playing from the queue
             return  # We don't want to clear the existing queue so let's exit early
 

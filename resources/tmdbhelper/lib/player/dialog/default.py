@@ -11,6 +11,9 @@ class PlayerDefaultBasic:
         self.mode = mode  # Forced mode
         self.user = user  # PlayerChosenGet class
 
+        from tmdbhelper.lib.addon.logger import kodi_log
+        kodi_log(f'{self.file} {self.mode}', 1)
+
     """
     Settings
     """
