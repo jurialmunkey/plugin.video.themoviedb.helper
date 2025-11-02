@@ -723,6 +723,11 @@ msgctxt "#32144"
 msgid "Retrieving player files"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/player/dialog/player.py
+msgctxt "#32145"
+msgid "Retrieving library"
+msgstr ""
+
 #: /resources/lib/container.py
 msgctxt "#32119"
 msgid "Select Release Types"

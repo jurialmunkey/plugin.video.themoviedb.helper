@@ -93,17 +93,17 @@ class Script(object):
 
         # Player Configuration
         'play':
-            lambda **kwargs: importmodule('tmdbhelper.lib.player.method.play', 'play_external')(**kwargs),
+            lambda **kwargs: importmodule('tmdbhelper.lib.player.dialog.player', 'player_play')(**kwargs),
         'play_using':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.players.old', 'play_using')(**kwargs),
+            lambda **kwargs: importmodule('tmdbhelper.lib.player.dialog.method', 'play_using')(**kwargs),
         'update_players':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.players.old', 'update_players')(),
+            lambda **kwargs: importmodule('tmdbhelper.lib.player.dialog.method', 'update_players')(),
         'set_defaultplayer':
-            lambda **kwargs: importmodule('tmdbhelper.lib.player.method.maindefault', 'set_defaultplayer')(**kwargs),
+            lambda **kwargs: importmodule('tmdbhelper.lib.player.config.default', 'set_defaultplayer')(**kwargs),
         'set_chosenplayer':
-            lambda **kwargs: importmodule('tmdbhelper.lib.player.method.userdefault', 'run')(**kwargs),
-        'configure_players':
-            lambda **kwargs: importmodule('tmdbhelper.lib.player.configure', 'configure_players')(**kwargs),
+            lambda **kwargs: importmodule('tmdbhelper.lib.player.config.chosen', 'set_chosenplayer')(**kwargs),
+        'customise_players':
+            lambda **kwargs: importmodule('tmdbhelper.lib.player.config.customise.menu', 'customise_players')(**kwargs),
 
         # Library Integration
         'add_to_library':
