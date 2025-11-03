@@ -245,11 +245,6 @@ class Player:
         from xbmc import Monitor
         return Monitor()
 
-    @staticmethod
-    def reupdate_listing():
-        from tmdbhelper.lib.player.action.reupdate import PlayerReUpdateListing
-        PlayerReUpdateListing().run()
-
     def play(self):
         while self.player_current and not self.xbmc_monitor.abortRequested():
             self.loop()
@@ -268,27 +263,19 @@ class Player:
         kodi_log(f'lib.player - {self.player_current.name}: {self.player_current.resolver.path}', 1)
 
         if not self.player_current.resolver.path:
-            self.player_items.del_player(self.player_current)
-            self.player_current = self.get_next_player(self.player_current.fallback)
-            return
+            return self.more()
 
-        self.reupdate_listing()
+        from tmdbhelper.lib.player.action.reupdate import PlayerReUpdateListing
+        PlayerReUpdateListing().run()
 
-        if self.player_current.resolver.success:
-            self.player_current = False
+        if not self.player_current.resolver.success:
+            return self.more()
 
-    def test(self):
-        data = [
-            ('RT', self.translation),
-            ('DT', self.details),
-            ('KD', self.recached_kodidb),
-            ('PP', self.providers),
-            ('PD', self.player_current.name),
-            ('PF', self.player_current.resolver.path),
-            ('PF', self.player_current.resolver.is_folder),
-        ]
+        self.player_current = False
 
-        Dialog().textviewer('OUTPUT', '\n'.join([f'{k}: {v}' for k, v in data]))
+    def more(self):
+        self.player_items.del_player(self.player_current)
+        self.player_current = self.get_next_player(self.player_current.fallback)
 
 
 class PlayerMovie(Player):

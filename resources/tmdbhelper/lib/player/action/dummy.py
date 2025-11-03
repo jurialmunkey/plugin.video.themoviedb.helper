@@ -45,11 +45,19 @@ class PlayerDummy:
         from jurialmunkey.parser import try_float
         return try_float(get_setting('dummy_duration', 'str')) or 1.0
 
+    @cached_property
+    def is_strm(self):
+        return self.check_strm()
+
     def check_strm(self):
         if not self.resolver.is_strm and get_setting('only_resolve_strm'):
             kodi_log(['lib.player - skipped dummy no strm setting\n', self.filename], 1)
             return False
         return True
+
+    @cached_property
+    def is_handle(self):
+        return self.check_handle()
 
     def check_handle(self):
         if self.resolver.handle is None:
@@ -57,11 +65,19 @@ class PlayerDummy:
             return False
         return True
 
+    @cached_property
+    def is_action(self):
+        return self.check_action()
+
     def check_action(self):
         if not self.resolver.is_folder and not self.resolver.action:
             kodi_log(['lib.player - skipped dummy have resolvable file\n', self.filename], 1)
             return False
         return True
+
+    @cached_property
+    def is_start(self):
+        return self.check_start()
 
     def check_start(self):
         # Wait till our dummy file plays and then stop after setting duration
@@ -70,6 +86,10 @@ class PlayerDummy:
             return False
         return True
 
+    @cached_property
+    def is_stop(self):
+        return self.check_stop()
+
     def check_stop(self):
         # Wait for our file to stop before continuing
         if self.duration and not self.wait():
@@ -77,7 +97,11 @@ class PlayerDummy:
             return False
         return True
 
-    def check_success(self):
+    @cached_property
+    def is_done(self):
+        return self.check_done()
+
+    def check_done(self):
         # Wait for additional delay after stopping
         self.wait_busy()
         kodi_log(['lib.player - successfully resolved dummy file\n', self.filename], 1)
@@ -86,10 +110,10 @@ class PlayerDummy:
     @cached_property
     def success(self):
         return all(func() for func in (
-            self.check_handle,
-            self.check_action,
-            self.check_strm,
-            self.check_start,
-            self.check_stop,
-            self.check_success,
+            lambda: self.is_handle,
+            lambda: self.is_action,
+            lambda: self.is_strm,
+            lambda: self.is_start,
+            lambda: self.is_stop,
+            lambda: self.is_done,
         ))

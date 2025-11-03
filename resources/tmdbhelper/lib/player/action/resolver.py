@@ -52,39 +52,15 @@ class PlayerResolverBase:
         setResolvedUrl(self.handle, True, self.listitem)
         self.update_playerstring()
 
-    @property
-    def on_seturl(self):
-        if not self.path:
-            return False
-        if self.is_folder:
-            return False
-        if not self.listitem:
-            return False
-        return True
-
     """
     Player
     """
 
     def execute_player(self):
         from xbmc import Player
-        kodi_log(['lib.player - playing path with xbmc.Player():\n', self.action], 1)
+        kodi_log(['lib.player - playing path with xbmc.Player():\n', self.action, self.listitem.getVideoInfoTag().getTitle()], 1)
         Player().play(self.action, self.listitem)
         self.update_playerstring()
-
-    @property
-    def on_player(self):
-        if not self.path:
-            return False
-        if self.is_folder:
-            return False
-        if not self.action:
-            return False
-        if not self.listitem:
-            return False
-        if not self.dummy.success:
-            return False
-        return True
 
     """
     Action
@@ -97,20 +73,8 @@ class PlayerResolverBase:
         executebuiltin('Dialog.Close(busydialog, force)')
         executebuiltin(self.action)
 
-    @property
-    def on_action(self):
-        if not self.path:
-            return False
-        if not self.is_folder:
-            return False
-        if not self.action:
-            return False
-        if not self.dummy.success:
-            return False
-        return True
-
     """
-    Execute
+    Dummy Resolver
     """
 
     @cached_property
@@ -119,24 +83,44 @@ class PlayerResolverBase:
         return PlayerDummy(self)
 
     @cached_property
+    def is_resolvable(self):
+        if self.dummy.success:
+            return False
+        if not self.dummy.is_handle:
+            return False
+        if self.dummy.is_action:
+            return False
+        return True
+
+    """
+    Execute
+    """
+
+    @cached_property
     def success(self):
         return self.execute()
 
     def execute(self):
 
-        if self.on_action:
-            self.execute_action()
-            return True
+        if not self.path:
+            return False
 
-        if self.on_player:
-            self.execute_player()
-            return True
+        if not self.listitem:
+            return False
 
-        if self.on_seturl:
+        if self.is_resolvable:
             self.execute_seturl()
             return True
 
-        return False
+        if not self.action:
+            return False
+
+        if self.is_folder:
+            self.execute_action()
+            return True
+
+        self.execute_player()
+        return True
 
 
 class PlayerResolverNone(PlayerResolverBase):
@@ -169,6 +153,8 @@ class PlayerResolverNone(PlayerResolverBase):
         if self.is_folder:
             return format_folderpath(self.path)
         if not self.player.is_resolvable:
+            return self.path
+        if self.handle is None:
             return self.path
 
     @cached_property
