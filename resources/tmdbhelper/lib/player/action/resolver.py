@@ -22,31 +22,31 @@ class PlayerResolverBase:
         self.player = player
         self.handle = handle
 
-    next_episodes_list = None
+    next_episodes_list = False
     resolved_dummyfile = False
 
     def update_playerstring(self):
         from tmdbhelper.lib.player.action.playerstring import load_playerstring
         kodi_log(['lib.player - playerstring:\n', f'{load_playerstring(self.listitem)}'], 1)
 
-    def update_episodequeue(self):
+    def update_episodequeue(self, listitem):
         if not self.player.make_playlist:
             kodi_log(f'lib.player - Playlist: Not Enabled', 1)
             return
 
-        if not self.next_episodes_list:
-            kodi_log(f'lib.player - Playlist: No Next Episodes', 1)
+        if not self.next_episodes.listitem:
+            kodi_log(f'lib.player - Playlist: No Next Episode', 1)
             return
 
-        kodi_log(f'lib.player - Playlist: Adding {len(self.next_episodes_list)} episodes', 1)
-        self.next_episodes.update()
+        kodi_log(f'lib.player - Playlist: Adding Episodes', 1)
+        self.next_episodes.update(listitem=listitem)
 
     """
     setResolvedUrl
     """
 
     def execute_seturl(self):
-        self.update_episodequeue()
+        self.update_episodequeue(self.listitem)
         from xbmcplugin import setResolvedUrl
         kodi_log(['lib.player - resolving path to url\n', self.path], 1)
         setResolvedUrl(self.handle, True, self.listitem)
@@ -67,7 +67,6 @@ class PlayerResolverBase:
     """
 
     def execute_player(self):
-        self.update_episodequeue()
         from xbmc import Player
         kodi_log(['lib.player - playing path with xbmc.Player():\n', self.action], 1)
         Player().play(self.action, self.listitem)
@@ -179,12 +178,6 @@ class PlayerResolverNone(PlayerResolverBase):
         self.player.item.details.infoproperties['isPlayable'] = 'false' if self.is_folder else 'true'
         self.player.item.details.infoproperties['is_folder'] = 'true' if self.is_folder else 'false'
         return self.player.item.details.get_listitem()
-
-    @cached_property
-    def next_episodes_list(self):
-        if not self.player.make_playlist:
-            return
-        return self.next_episodes.listitems
 
     @cached_property
     def next_episodes(self):
