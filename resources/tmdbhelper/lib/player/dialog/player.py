@@ -103,6 +103,10 @@ class Player:
     def force_recache_kodidb(self):
         return bool(get_setting('default_player_kodi', 'int') and get_setting('force_recache_kodidb'))
 
+    @cached_property
+    def combined_players(self):
+        return get_setting('combined_players')
+
     """
     Kodi DB
     """
@@ -155,6 +159,15 @@ class Player:
 
     @cached_property
     def player_select(self):
+        if not self.combined_players:
+            return self.get_player_select_standard()
+        return self.get_player_select_combined()
+
+    def get_player_select_standard(self):
+        from tmdbhelper.lib.player.dialog.standard import PlayerSelectStandard
+        return PlayerSelectStandard(data=self.player_items)
+
+    def get_player_select_combined(self):
         from tmdbhelper.lib.player.dialog.combined import PlayerSelectCombined
         return PlayerSelectCombined(data=self.player_items)
 
