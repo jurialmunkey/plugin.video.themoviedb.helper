@@ -657,9 +657,9 @@
                         <data>RunScript(plugin.video.themoviedb.helper, update_players)</data>
                     </control>
                 </setting>
-                <setting id="configure_players" type="action" label="32329" help="">
+                <setting id="customise_players" type="action" label="32329" help="">
                     <level>0</level>
-                    <data>RunScript(plugin.video.themoviedb.helper, configure_players)</data>
+                    <data>RunScript(plugin.video.themoviedb.helper, customise_players)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>

@@ -15,9 +15,9 @@ class Router():
         paths.extend([unquote_plus(i) for i in secondary_params])
         return {'paths': paths} if paths else {}
 
-    def play_external(self):
-        from tmdbhelper.lib.player.method.play import play_external
-        play_external(handle=self.handle if self.handle != -1 else None, **self.params)
+    def player_play(self):
+        from tmdbhelper.lib.player.dialog.player import player_play
+        player_play(handle=self.handle if self.handle != -1 else None, **self.params)
 
     def get_directory(self, items_only=False, build_items=True):
         from tmdbhelper.lib.items.routes import get_container
@@ -27,5 +27,5 @@ class Router():
 
     def run(self):
         if self.params.get('info') == 'play':
-            return self.play_external()
+            return self.player_play()
         self.get_directory()

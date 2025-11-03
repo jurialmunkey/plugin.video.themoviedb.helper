@@ -68,7 +68,7 @@ class PlayerScrobbler():
 
     @cached_property
     def playerstring(self):
-        from tmdbhelper.lib.player.details.playerstring import read_playerstring
+        from tmdbhelper.lib.player.action.playerstring import read_playerstring
         return read_playerstring()
 
     def is_match(self, tmdb_type, tmdb_id):
