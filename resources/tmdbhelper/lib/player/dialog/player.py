@@ -307,6 +307,7 @@ class PlayerEpisode(Player):
         self.episode = episode
         super().__init__(**kwargs)
 
+
 def Player(tmdb_type, **kwargs):
     if tmdb_type == 'movie':
         return PlayerMovie(**kwargs)

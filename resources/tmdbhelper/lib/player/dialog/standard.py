@@ -41,9 +41,7 @@ class PlayerSelectStandard:
         return x if index or x == -1 else players_list[x].posx
 
     def get_player(self, x):
-        player = self.players_list[x]
-        player.idx = x  # PLAYER TODO: CHECK WE NEED THIS
-        return player
+        return self.players_list[x]
 
     def select(self, header=None, detailed=True):
         """ Select a player from the list """
