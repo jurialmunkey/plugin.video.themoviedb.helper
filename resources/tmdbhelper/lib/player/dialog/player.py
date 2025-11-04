@@ -8,6 +8,7 @@ class Player:
 
     selected = None
     ignore_default = False
+    allow_playlist = True
     tmdb_type = None
     season = None
     episode = None
@@ -183,23 +184,25 @@ class Player:
     @cached_property
     def player_current(self):
         self.initialise_setup()
-        return self.get_next_player()
+        return self.get_player()
 
-    def get_next_player(self, fallback=None):
+    def get_player(self, fallback=None):
         player = None
         player = self.player_default.get_player_by_info(fallback)
+        player = player or self.get_next_player_default()
+        player = player or self.player_select.select(detailed=True)
+        return self.set_resolver(player) if player else None
 
+    def get_next_player_default(self):
         try:
-            player = player or next(self.player_default.queue)
+            return next(self.player_default.queue)
         except StopIteration:
-            player = player or self.player_select.select(detailed=True)
-
-        if not player:
             return
 
+    def set_resolver(self, player):
         from tmdbhelper.lib.player.action.resolver import PlayerResolver
         player.resolver = PlayerResolver(player, handle=self.handle)
-
+        player.resolver.allow_playlist = self.allow_playlist
         return player
 
     """
@@ -274,7 +277,7 @@ class Player:
 
     def more(self):
         self.player_items.del_player(self.player_current)
-        self.player_current = self.get_next_player(self.player_current.fallback)
+        self.player_current = self.get_player(self.player_current.fallback)
 
 
 class PlayerMovie(Player):
@@ -317,9 +320,10 @@ def Player(tmdb_type, **kwargs):
 
 @map_kwargs({'play': 'tmdb_type'})
 @get_tmdb_id
-def player_play(ignore_default=False, **kwargs):
+def player_play(ignore_default=False, allow_playlist=True, **kwargs):
     from jurialmunkey.parser import boolean
     kodi_log(['player_play - attempting to play\n', kwargs], 1)
     player = Player(**kwargs)
     player.ignore_default = boolean(ignore_default)
+    player.allow_playlist = boolean(allow_playlist)
     player.play()

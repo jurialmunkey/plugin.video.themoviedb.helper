@@ -22,23 +22,27 @@ class PlayerResolverBase:
         self.player = player
         self.handle = handle
 
-    next_episodes_list = False
-    resolved_dummyfile = False
+    allow_playlist = True
 
     def update_playerstring(self):
         from tmdbhelper.lib.player.action.playerstring import load_playerstring
         kodi_log(['lib.player - playerstring:\n', f'{load_playerstring(self.listitem)}'], 1)
 
     def update_episodequeue(self, listitem):
+
+        if not self.allow_playlist:
+            kodi_log(f'lib.player - Playlist: Skipping', 1)
+            return
+
         if not self.player.make_playlist:
-            kodi_log(f'lib.player - Playlist: Not Enabled', 1)
+            kodi_log(f'lib.player - Playlist: Disabled', 1)
             return
 
         if not self.next_episodes.listitem:
-            kodi_log(f'lib.player - Playlist: No Next Episode', 1)
+            kodi_log(f'lib.player - Playlist: No Items', 1)
             return
 
-        kodi_log(f'lib.player - Playlist: Adding Episodes', 1)
+        kodi_log(f'lib.player - Playlist: Updating', 1)
         self.next_episodes.update(listitem=listitem)
 
     """
