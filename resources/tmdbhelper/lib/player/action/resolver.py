@@ -68,9 +68,6 @@ class PlayerResolverBase:
 
     def execute_action(self):
         kodi_log(['lib.player - executing action:\n', self.action], 1)
-        # Kodi launches busy dialog on home screen that needs to be told to close
-        # Otherwise the busy dialog will prevent window activation for folder path
-        executebuiltin('Dialog.Close(busydialog, force)')
         executebuiltin(self.action)
 
     """
@@ -101,6 +98,9 @@ class PlayerResolverBase:
         return self.execute()
 
     def execute(self):
+
+        # Force close any busy dialogs to avoid duplicate busy error which causes app exit
+        executebuiltin('Dialog.Close(busydialog, force)')
 
         if not self.path:
             return False
