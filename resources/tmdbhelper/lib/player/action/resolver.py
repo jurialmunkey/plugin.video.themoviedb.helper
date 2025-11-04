@@ -61,6 +61,7 @@ class PlayerResolverBase:
     """
 
     def execute_player(self):
+        self.update_episodequeue(self.listitem)
         from xbmc import Player
         kodi_log(['lib.player - playing path with xbmc.Player():\n', self.action, self.listitem.getVideoInfoTag().getTitle()], 1)
         Player().play(self.action, self.listitem)
