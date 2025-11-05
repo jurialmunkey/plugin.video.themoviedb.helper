@@ -145,3 +145,5 @@ class PlayerNextEpisodes:
 
         for x, listitem in enumerate(listitems):  # Add all our episodes in the queue
             self.playlist.add(listitem.getPath(), listitem, index=x)
+
+        return self.playlist

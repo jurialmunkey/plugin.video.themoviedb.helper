@@ -261,8 +261,10 @@ class Player:
 
     def loop(self):
 
-        kodi_log(f'lib.player - {self.player_current.name}: Resolving...', 1)
-        kodi_log(f'lib.player - {self.player_current.name}: {self.player_current.resolver.path}', 1)
+        kodi_log([
+            f'lib.player - {self.player_current.name}: Resolving...\n',
+            f'{self.player_current.file} {self.player_current.mode}\n',
+            f'{self.player_current.resolver.path}'], 1)
 
         if not self.player_current.resolver.path:
             return self.more()
