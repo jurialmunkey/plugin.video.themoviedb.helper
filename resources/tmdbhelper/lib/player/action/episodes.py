@@ -29,7 +29,8 @@ class PlayerNextEpisodes:
     @cached_property
     def all_episodes(self):
         from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
-        sync = BaseViewFactory('flatseasons', 'tv', self.tmdb_id)
+        # sync = BaseViewFactory('flatseasons', 'tv', self.tmdb_id)
+        sync = BaseViewFactory('episodes', 'tv', self.tmdb_id, season=self.season)  # Only get current season to avoid massive playlists TODO: Make optional get more than one season / all seasons?
         return sync.data
 
     @cached_property
