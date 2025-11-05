@@ -720,6 +720,16 @@ msgctxt "#32143"
 msgid "Recaching Kodi library"
 msgstr "Reconstrução do cache da biblioteca do Kodi"
 
+#: /resources/tmdbhelper/lib/player/players.py
+msgctxt "#32144"
+msgid "Retrieving player files"
+msgstr "Recuperando arquivos do player"
+
+#: /resources/tmdbhelper/lib/player/dialog/player.py
+msgctxt "#32145"
+msgid "Retrieving library"
+msgstr "Recuperando biblioteca"
+
 #: /resources/lib/container.py
 msgctxt "#32119"
 msgid "Select Release Types"
