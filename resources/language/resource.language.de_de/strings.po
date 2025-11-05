@@ -711,10 +711,25 @@ msgctxt "#32141"
 msgid "Delete fallback"
 msgstr "Fallback entfernen"
 
+#: /resources/tmdbhelper/lib/player/players.py
+msgctxt "#32143"
+msgid "Recaching Kodi library"
+msgstr "Kodi-Bibliotheks-Cache neu erstellen"
+
 #: /resources/lib/container.py
 msgctxt "#32117"
 msgid "Keyword"
 msgstr "Stichwort"
+
+#: /resources/tmdbhelper/lib/player/players.py
+msgctxt "#32144"
+msgid "Retrieving player files"
+msgstr "Abrufen von Playerdateien"
+
+#: /resources/tmdbhelper/lib/player/dialog/player.py
+msgctxt "#32145"
+msgid "Retrieving library"
+msgstr "Bibliotheksdaten werden geladen"
 
 #: /resources/lib/container.py
 msgctxt "#32119"
@@ -1816,17 +1831,17 @@ msgstr "Auf .strm Dateien in Bibliothek beschränken"
 
 #: /resources/lib/player/players.py
 msgctxt "#32374"
-msgid "Constructing Players"
-msgstr "Player werden erstellt"
+msgid "Constructing players"
+msgstr "Player wird erstellt"
 
 #: /resources/lib/player/players.py
 msgctxt "#32375"
-msgid "Retrieving Item Details"
+msgid "Retrieving item details"
 msgstr "Details werden abgerufen"
 
 #: /resources/lib/player/players.py
 msgctxt "#32376"
-msgid "Building Player Dialog"
+msgid "Building players dialog"
 msgstr "Playerdialog wird erstellt"
 
 #: /resources/lib/trakt/api.py
