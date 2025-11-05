@@ -45,7 +45,7 @@ class PathFinderAction:
 
     @cached_property
     def keyboard_inputter(self):
-        from tmdbhelper.lib.player.inputter import KeyboardInputter
+        from tmdbhelper.lib.player.action.keyboard import KeyboardInputter
         if self.keyboard in self.keyboard_directions:
             return KeyboardInputter(action=f'Input.{self.keyboard}')
         return KeyboardInputter(text=self.keyboard_text)
