@@ -1,4 +1,3 @@
-from xbmcgui import Dialog
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized, get_setting
 from tmdbhelper.lib.script.method.decorators import get_tmdb_id, map_kwargs
