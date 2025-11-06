@@ -95,10 +95,13 @@ class PlayerItemLocalEpisode(PlayerItemLocalMovie):
     kodi_dbtype = 'tvshow'
     make_playlist = True
 
-    def __init__(self, season=None, episode=None, **kwargs):
-        super().__init__(**kwargs)
-        self.season = season
-        self.episode = episode
+    @cached_property
+    def season(self):
+        return self.item.get('season')
+
+    @cached_property
+    def episode(self):
+        return self.item.get('episode')
 
     @cached_property
     def kodi_db_episodes(self):
