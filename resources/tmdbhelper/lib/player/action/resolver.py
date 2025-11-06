@@ -22,33 +22,37 @@ class PlayerResolverBase:
         self.player = player
         self.handle = handle
 
-    next_episodes_list = False
-    resolved_dummyfile = False
+    allow_playlist = True
 
     def update_playerstring(self):
         from tmdbhelper.lib.player.action.playerstring import load_playerstring
         kodi_log(['lib.player - playerstring:\n', f'{load_playerstring(self.listitem)}'], 1)
 
-    def update_episodequeue(self, listitem):
+    @cached_property
+    def playlist(self):
+
+        if not self.allow_playlist:
+            kodi_log(f'lib.player - Playlist: Skipping', 1)
+            return
+
         if not self.player.make_playlist:
-            kodi_log(f'lib.player - Playlist: Not Enabled', 1)
+            kodi_log(f'lib.player - Playlist: Disabled', 1)
             return
 
         if not self.next_episodes.listitem:
-            kodi_log(f'lib.player - Playlist: No Next Episode', 1)
+            kodi_log(f'lib.player - Playlist: No Items', 1)
             return
 
-        kodi_log(f'lib.player - Playlist: Adding Episodes', 1)
-        self.next_episodes.update(listitem=listitem)
+        kodi_log(f'lib.player - Playlist: Updating', 1)
+        return self.next_episodes.update(listitem=self.listitem)
 
     """
     setResolvedUrl
     """
 
     def execute_seturl(self):
-        self.update_episodequeue(self.listitem)
         from xbmcplugin import setResolvedUrl
-        kodi_log(['lib.player - resolving path to url\n', self.path], 1)
+        kodi_log(['lib.player - resolving path to url\n', self.path, f'\nPlaylist {bool(self.playlist)}'], 1)  # Print self.playlist to log to make sure property initialises
         setResolvedUrl(self.handle, True, self.listitem)
         self.update_playerstring()
 
@@ -58,8 +62,8 @@ class PlayerResolverBase:
 
     def execute_player(self):
         from xbmc import Player
-        kodi_log(['lib.player - playing path with xbmc.Player():\n', self.action, self.listitem.getVideoInfoTag().getTitle()], 1)
-        Player().play(self.action, self.listitem)
+        kodi_log(['lib.player - playing path with xbmc.Player():\n', self.action, f'\nPlaylist {bool(self.playlist)}'], 1)
+        Player().play(self.playlist) if self.playlist else Player().play(self.action, self.listitem)
         self.update_playerstring()
 
     """

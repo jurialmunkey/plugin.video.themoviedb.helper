@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2024-05-21 10:00+0100\n"
+"PO-Revision-Date: 2025-10-07 10:00+0100\n"
 "Last-Translator: Bindou <EMAIL@ADDRESS>\n"
 "Language-Team: French\n"
 "MIME-Version: 1.0\n"
@@ -700,10 +700,25 @@ msgctxt "#32139"
 msgid "Rate items on TMDb after watching"
 msgstr "Noter les éléments sur TMDb après le visionnage"
 
+#: /resources/tmdbhelper/lib/player/configure.py
+msgctxt "#32140"
+msgid "Create new player"
+msgstr "Créer un nouveau lecteur"
+
+#: /resources/tmdbhelper/lib/player/configure.py
+msgctxt "#32141"
+msgid "Delete fallback"
+msgstr "Supprimer la solution de secours"
+
 #: /resources/lib/container.py
 msgctxt "#32117"
 msgid "Keyword"
 msgstr "Mot-clé"
+
+#: /resources/tmdbhelper/lib/player/players.py
+msgctxt "#32143"
+msgid "Recaching Kodi library"
+msgstr "Actualisation du cache de la médiathèque Kodi"
 
 #: /resources/lib/container.py
 msgctxt "#32119"

@@ -29,7 +29,8 @@ class PlayerNextEpisodes:
     @cached_property
     def all_episodes(self):
         from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
-        sync = BaseViewFactory('flatseasons', 'tv', self.tmdb_id)
+        # sync = BaseViewFactory('flatseasons', 'tv', self.tmdb_id)
+        sync = BaseViewFactory('episodes', 'tv', self.tmdb_id, season=self.season)  # Only get current season to avoid massive playlists TODO: Make optional get more than one season / all seasons?
         return sync.data
 
     @cached_property
@@ -85,6 +86,7 @@ class PlayerNextEpisodes:
             li.params['player'] = self.player
             li.params['mode'] = 'play'
             li.params['ignore_default'] = 'true'
+            li.params['allow_playlist'] = 'false'
         li.finalise()
         return li
 
@@ -127,7 +129,7 @@ class PlayerNextEpisodes:
     def playlist(self):
         return PlayList(PLAYLIST_VIDEO)
 
-    def update(self, forced=False, single=False, clear=True, listitem=None):
+    def update(self, forced=True, single=False, clear=True, listitem=None):
         if not forced and self.playlist.getposition() != 0:  # If position isn't 0 then the user is already playing from the queue
             return  # We don't want to clear the existing queue so let's exit early
 
@@ -144,3 +146,5 @@ class PlayerNextEpisodes:
 
         for x, listitem in enumerate(listitems):  # Add all our episodes in the queue
             self.playlist.add(listitem.getPath(), listitem, index=x)
+
+        return self.playlist
