@@ -42,7 +42,7 @@ class FocusedListItemMedia:
     @cached_property
     def params(self):
         params = parse_paramstring(self.url_paramstring)
-        return params if self.params.get('info') in ('play', 'details') else {}
+        return params if params.get('info') in ('play', 'details') else {}
 
 
 class FocusedListItemMovie(FocusedListItemMedia):
