@@ -1,6 +1,5 @@
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized, get_setting
-from tmdbhelper.lib.script.method.decorators import get_tmdb_id, map_kwargs
 from tmdbhelper.lib.addon.logger import kodi_log
 
 
@@ -318,14 +317,3 @@ def Player(tmdb_type, **kwargs):
 
     if tmdb_type in ('tv', 'season', 'episode'):
         return PlayerEpisode(**kwargs)
-
-
-@map_kwargs({'play': 'tmdb_type'})
-@get_tmdb_id
-def player_play(ignore_default=False, allow_playlist=True, **kwargs):
-    from jurialmunkey.parser import boolean
-    kodi_log(['player_play - attempting to play\n', kwargs], 1)
-    player = Player(**kwargs)
-    player.ignore_default = boolean(ignore_default)
-    player.allow_playlist = boolean(allow_playlist)
-    player.play()

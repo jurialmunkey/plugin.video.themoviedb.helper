@@ -220,7 +220,3 @@ def PlayerChosenSet(tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
     }
     route = route[convert_type(tmdb_type, 'dbtype', season=season, episode=episode)]
     return route(tmdb_type=tmdb_type, tmdb_id=tmdb_id, season=season, episode=episode)
-
-
-def set_chosenplayer(set_chosenplayer, **kwargs):
-    return PlayerChosenSet(**kwargs).update()

@@ -60,7 +60,3 @@ def PlayerDefault(tmdb_type):
         'episode': PlayerDefaultEpisode,
     }
     return route[tmdb_type]()
-
-
-def set_defaultplayer(set_defaultplayer, **kwargs):
-    return PlayerDefault(set_defaultplayer).select()
