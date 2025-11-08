@@ -29,6 +29,12 @@ class LibraryCommonFunctions():
         from tmdbhelper.lib.api.kodi.rpc import get_kodi_library
         return get_kodi_library('tv', cache_refresh=True)
 
+    def get_movie_info(self, *args, **kwargs):
+        return self.kodi_db_movies.get_info(*args, **kwargs)
+
+    def get_tv_info(self, *args, **kwargs):
+        return self.kodi_db_tv.get_info(*args, **kwargs)
+
     @cached_property
     def p_dialog(self):
         if not self.busy_spinner:

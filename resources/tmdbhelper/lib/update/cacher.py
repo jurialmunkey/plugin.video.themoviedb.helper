@@ -1,23 +1,38 @@
 from tmdbhelper.lib.files.futils import get_json_filecache, set_json_filecache
 from tmdbhelper.lib.addon.tmdate import is_future_timestamp, get_todays_date
 from jurialmunkey.parser import try_int
+from jurialmunkey.ftools import cached_property
 
 
-class _TVShowCache():
+class LibraryUpdateTvshowCacher():
     """ Class used for caching tvshow library update actions
     Arguments
     tmdb_id -- tmdb_id of the tvshow
     force   -- always recache as if new
     """
 
+    cache_version = 3
+
     def __init__(self, tmdb_id, force=False):
-        self.cache_version = 3
-        self.cache_name = f'library_autoupdate_tv.{tmdb_id}'
-        self.cache_info = {} if force else get_json_filecache(self.cache_name) or {}
-        # Only use cache info if version matches
-        if not self.cache_info.get('version') or self.cache_info.get('version') != self.cache_version:
-            self.cache_info = {}
-        self.my_history = {}
+        self.tmdb_id = tmdb_id
+        self.force = force
+
+    @cached_property
+    def cache_name(self):
+        return f'library_autoupdate_tv.{self.tmdb_id}'
+
+    @cached_property
+    def cache_info(self):
+        if self.force:
+            return {}
+        cache_info = get_json_filecache(self.cache_name) or {}
+        if cache_info.get('version') != self.cache_version:
+            return {}
+        return cache_info
+
+    @cached_property
+    def my_history(self):
+        return {}
 
     def set_cache(self, cache_days=120):
         set_json_filecache(self.my_history, self.cache_name, cache_days=cache_days)
