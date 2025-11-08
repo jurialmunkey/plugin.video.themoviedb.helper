@@ -1,28 +1,62 @@
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.update.update import get_userlist
 from tmdbhelper.lib.addon.plugin import executebuiltin
 
 
 class LibraryCommonFunctions():
     busy_spinner = False
+    clean_library = False
+    auto_update = False
+    debug_logging = True
 
-    def _start(self):
-        if self.p_dialog:
-            self.p_dialog.create(self._msg_title, self._msg_start)
+    def __init__(self, busy_spinner=True):
+        self.busy_spinner = busy_spinner
 
-    def _finish(self, update=True):
-        if self.p_dialog:
-            self.p_dialog.close()
-        if self.debug_logging:
-            self._log._clean()  # Clean up old log files first
-            self._log._out()
-        if self.clean_library:
-            executebuiltin('CleanLibrary(video)')
-        if self.auto_update and update:
-            executebuiltin('UpdateLibrary(video)')
+    @cached_property
+    def _log(self):
+        from tmdbhelper.lib.update.logger import LibraryLogger
+        _log = LibraryLogger()
+        _log.log_folder = self.log_folder
+        return _log
+
+    @cached_property
+    def kodi_db_movies(self):
+        from tmdbhelper.lib.api.kodi.rpc import get_kodi_library
+        return get_kodi_library('movie', cache_refresh=True)
+
+    @cached_property
+    def kodi_db_tv(self):
+        from tmdbhelper.lib.api.kodi.rpc import get_kodi_library
+        return get_kodi_library('tv', cache_refresh=True)
+
+    @cached_property
+    def p_dialog(self):
+        if not self.busy_spinner:
+            return
+        from xbmcgui import DialogProgressBG
+        p_dialog = DialogProgressBG()
+        p_dialog.create(self._msg_title, self._msg_start)
+        return p_dialog
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self):
+        for func in (
+            func for func, cond in (
+                (lambda: self.p_dialog.close(), self.p_dialog),
+                (lambda: self._log._clean(), self.debug_logging),
+                (lambda: self._log._out(), self.debug_logging),
+                (lambda: executebuiltin('UpdateLibrary(video)'), self.auto_update),
+                (lambda: executebuiltin('ClearLibrary(video)'), self.clean_library),
+            ) if cond
+        ):
+            func()
 
     def _update(self, count, total, **kwargs):
-        if self.p_dialog:
-            self.p_dialog.update((((count + 1) * 100) // total), **kwargs)
+        if not self.p_dialog:
+            return
+        self.p_dialog.update((((count + 1) * 100) // total), **kwargs)
 
     def add_userlist(self, user_slug=None, list_slug=None, confirm=True, force=False, **kwargs):
         request = get_userlist(user_slug=user_slug, list_slug=list_slug, confirm=confirm, busy_spinner=self.busy_spinner)

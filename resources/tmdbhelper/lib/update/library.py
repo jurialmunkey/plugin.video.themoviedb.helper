@@ -1,12 +1,11 @@
 import xbmcvfs
 import tmdbhelper.lib.api.kodi.rpc as rpc
 from jurialmunkey.ftools import cached_property
-from xbmcgui import DialogProgressBG
 from tmdbhelper.lib.addon.plugin import get_setting, get_localized, set_setting
 from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.tmdate import is_unaired_timestamp, get_current_date_time
 from tmdbhelper.lib.files.futils import validify_filename, get_tmdb_id_nfo
-from tmdbhelper.lib.update.logger import _LibraryLogger
+
 from tmdbhelper.lib.update.update import BASEDIR_MOVIE, BASEDIR_TV, STRM_MOVIE, STRM_EPISODE, create_file, create_nfo, get_unique_folder
 from tmdbhelper.lib.update.cacher import _TVShowCache
 from tmdbhelper.lib.update.common import LibraryCommonFunctions
@@ -14,99 +13,103 @@ from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFac
 from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
 
 
-def add_to_library(info, busy_spinner=True, library_adder=None, finished=True, **kwargs):
-    if not info:
-        return
-    if not library_adder:
-        library_adder = LibraryAdder(busy_spinner)
-        library_adder._start()
-        if not get_setting('legacy_conversion'):
-            library_adder.legacy_conversion()
-    if info == 'movie' and kwargs.get('tmdb_id'):
-        library_adder.add_movie(**kwargs)
-    elif info == 'tv' and kwargs.get('tmdb_id'):
-        library_adder.add_tvshow(**kwargs)
-    elif info == 'trakt' and kwargs.get('list_slug'):
-        library_adder.add_userlist(**kwargs)
-    elif info == 'update':
-        library_adder.update_tvshows(**kwargs)
-    if not finished:
-        return library_adder
-    library_adder._finish()
+class LibraryLegacyConversion:
+
+    def __init__(self, folder, tmdb_id):
+        self.old_folder_name = folder
+        self.tmdb_id = tmdb_id
+
+    @cached_property
+    def sync(self):
+        sync = BaseItemFactory('tvshow')
+        sync.tmdb_id = self.tmdb_id
+        return sync
+
+    @cached_property
+    def new_folder_name(self):
+        try:
+            name = self.sync.data['infolabels']['tvshowtitle']
+            year = self.sync.data['infolabels']['premiered'][:4]
+        except (KeyError, TypeError, AttributeError):
+            return
+        if not name or not year:
+            return
+        return f'{name} ({year})'
+
+    @cached_property
+    def basedir(self):
+        return BASEDIR_TV.replace('\\', '/')
+
+    @cached_property
+    def old_folder(self):
+        return f'{self.basedir}{validify_filename(self.old_folder_name)}/'
+
+    @cached_property
+    def new_folder(self):
+        return f'{self.basedir}{validify_filename(self.new_folder_name)}/'
+
+    def rename(self):
+        if not self.old_folder_name:
+            return
+        if not self.new_folder_name:
+            return
+        if self.old_folder_name == self.new_folder_name:
+            return
+        xbmcvfs.rename(self.old_folder, self.new_folder)
 
 
 class LibraryAdder(LibraryCommonFunctions):
-    def __init__(self, busy_spinner=True):
-        self.kodi_db_movies = rpc.get_kodi_library('movie', cache_refresh=True)
-        self.kodi_db_tv = rpc.get_kodi_library('tv', cache_refresh=True)
-        self.p_dialog = DialogProgressBG() if busy_spinner else None
-        self.auto_update = get_setting('auto_update')
-        self._log = _LibraryLogger()
-        self.tv = None
-        self.hide_unaired = True
-        self.hide_nodate = True
-        self.debug_logging = True
-        self.clean_library = False
-        self._msg_start = get_localized(32166)
-        self._msg_title = 'TMDbHelper Library'
 
-    def get_tv_folder_nfos(self):
-        nfos = []
-        nfos_append = nfos.append  # For speed since we can't do a list comp easily here
-        for f in xbmcvfs.listdir(BASEDIR_TV)[0]:
-            tmdb_id = get_tmdb_id_nfo(BASEDIR_TV, f)
-            nfos_append({'tmdb_id': tmdb_id, 'folder': f}) if tmdb_id else None
-        return nfos
+    tv = None
+    hide_unaired = True
+    hide_nodate = True
 
-    def _legacy_conversion(self, folder, tmdb_id):
-        # Get details
+    log_folder = 'log_library'
+    _msg_title = 'TMDbHelper Library'
 
-        sync = BaseItemFactory('tvshow')
-        sync.tmdb_id = tmdb_id
+    @cached_property
+    def _msg_start(self):
+        return get_localized(32166)
 
-        try:
-            details_name = sync.data['infolabels']['tvshowtitle']
-            details_year = sync.data['infolabels']['premiered'][:4]
-        except (KeyError, TypeError, AttributeError):
-            return
+    @cached_property
+    def auto_update(self):
+        return get_setting('auto_update')
 
-        if not details_name or not details_year:
-            return
+    @cached_property
+    def listdir_basedir_tv(self):
+        from xbmcvfs import listdir
+        return listdir(BASEDIR_TV)[0]
 
-        # Get new name and compare to old name
-        name = f'{details_name} ({details_year})'
-        if folder == name:
-            return  # Skip if already converted
+    @cached_property
+    def listdir_basedir_tv_nfos(self):
+        return [
+            i for i in (
+                (get_tmdb_id_nfo(BASEDIR_TV, f), f)
+                for f in self.listdir_basedir_tv
+            ) if i[0] and i[1]
+        ]
 
-        # Convert name
-        basedir = BASEDIR_TV.replace('\\', '/')
-        old_folder = f'{basedir}{validify_filename(folder)}/'
-        new_folder = f'{basedir}{validify_filename(name)}/'
-        xbmcvfs.rename(old_folder, new_folder)
-
-    def legacy_conversion(self, confirm=True):
+    def convert_legacy_folders(self):
         """ Converts old style tvshow folders without years so that they have years """
-        nfos = self.get_tv_folder_nfos()
+
+        if get_setting('legacy_conversion'):
+            return
 
         # Update each show in folder
-        nfos_total = len(nfos)
-        for x, i in enumerate(nfos):
-            folder, tmdb_id = i['folder'], i['tmdb_id']
-            self._update(x, nfos_total, message=f'{get_localized(32167)} {folder}...')
-            self._legacy_conversion(folder, tmdb_id)
+        for x, (tmdb_id, folder) in enumerate(self.listdir_basedir_tv_nfos):
+            self._update(x, len(self.listdir_basedir_tv_nfos), message=f'{get_localized(32167)} {folder}...')
+            LibraryLegacyConversion(folder, tmdb_id).rename()
 
         # Mark as complete and set to clean library
         set_setting('legacy_conversion', True)
         self.clean_library = True
 
     def update_tvshows(self, force=False, **kwargs):
-        nfos = self.get_tv_folder_nfos()
 
         # Update each show in folder
-        nfos_total = len(nfos)
-        for x, i in enumerate(nfos):
-            self._update(x, nfos_total, message=f'{get_localized(32167)} {i["folder"]}...')
-            self.add_tvshow(tmdb_id=i['tmdb_id'], force=force)
+        for x, (tmdb_id, folder) in enumerate(self.listdir_basedir_tv_nfos):
+            self._update(x, len(self.listdir_basedir_tv_nfos), message=f'{get_localized(32167)} {folder}...')
+            self.add_tvshow(tmdb_id=tmdb_id, force=force)
 
         # Update last updated stamp
         set_setting('last_autoupdate', f'Last updated {get_current_date_time()}', 'str')
@@ -338,3 +341,29 @@ class _TVShow(_MixinGetDetailsKey):
             next_aired=self.details.get('next_episode_to_air', {}),
             last_aired=self.details.get('last_episode_to_air', {}),
             status=self.details.get('status'))
+
+
+def add_to_library(info, busy_spinner=True, library_adder=None, finished=True, **kwargs):
+    if not info:
+        return
+
+    if not library_adder:
+        library_adder = LibraryAdder(busy_spinner)
+        library_adder.convert_legacy_folders()
+
+    routes = {
+        'movie': library_adder.add_movie,
+        'tv': library_adder.add_tvshow,
+        'trakt': library_adder.add_userlist,
+        'update': library_adder.update_tvshows,
+    }
+
+    try:
+        routes[info](**kwargs)
+    except KeyError:
+        pass
+
+    if not finished:
+        return library_adder
+
+    library_adder.__exit__()

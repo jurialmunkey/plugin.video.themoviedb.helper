@@ -1,27 +1,20 @@
-from xbmcgui import DialogProgressBG
 from tmdbhelper.lib.update.userlist import get_monitor_userlists
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.plugin import get_localized
-from tmdbhelper.lib.api.kodi.rpc import get_kodi_library, set_tags
+from tmdbhelper.lib.api.kodi.rpc import set_tags
 from tmdbhelper.lib.update.common import LibraryCommonFunctions
-from tmdbhelper.lib.update.logger import _LibraryLogger
 from tmdbhelper.lib.update.update import create_playlist
+from jurialmunkey.ftools import cached_property
 
 
 class LibraryTagger(LibraryCommonFunctions):
-    def __init__(self, busy_spinner=True):
-        self.kodi_db_movies = get_kodi_library('movie', cache_refresh=True)
-        self.kodi_db_tv = get_kodi_library('tv', cache_refresh=True)
-        self.p_dialog = DialogProgressBG() if busy_spinner else None
-        self._log = _LibraryLogger(log_folder='log_tagger')
-        self.clean_library = False
-        self.auto_update = False
-        self.debug_logging = True
-        self._msg_start = f'{get_localized(32167)}...'
-        self._msg_title = 'TMDbHelper Tagger'
-        self._start()
-        self.update_tags()
-        self._finish()
+
+    log_folder = 'log_tagger'
+    _msg_title = 'TMDbHelper Tagger'
+
+    @cached_property
+    def _msg_start(self):
+        return f'{get_localized(32167)}...'
 
     def add_item(self, item_type, database, user_slug, list_slug, tmdb_id=None, imdb_id=None, **kwargs):
         if not tmdb_id:
@@ -56,3 +49,8 @@ class LibraryTagger(LibraryCommonFunctions):
             self.add_userlist(user_slug=user_slug, list_slug=list_slug, confirm=False)
             create_playlist('movies', user_slug, list_slug)
             create_playlist('tvshows', user_slug, list_slug)
+
+
+def library_tagger(*args, **kwargs):
+    with LibraryTagger(*args, **kwargs) as library_tagger:
+        library_tagger.update_tags()
