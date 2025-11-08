@@ -142,14 +142,6 @@ class LibraryAdder(LibraryCommonFunctions):
         self._log._add('tv', self.tv.tmdb_id, 'added strm file', season=episode.season, episode=episode.number, path=file)
 
 
-class _MixinGetDetailsKey:
-    def get_details_key(self, key, subkey='infolabels', fallback=''):
-        try:
-            return self.details[subkey][key]
-        except (KeyError, TypeError, AttributeError):
-            return fallback
-
-
 def add_to_library(info, busy_spinner=True, library_adder=None, finished=True, **kwargs):
     if not info:
         return
