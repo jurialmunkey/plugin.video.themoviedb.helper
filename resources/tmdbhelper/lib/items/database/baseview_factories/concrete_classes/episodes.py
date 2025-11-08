@@ -43,6 +43,10 @@ class EpisodeMediaList(MediaList):
     def parent_precache_tvshow(self):
         return self.get_parent_data('tvshow')
 
+    @cached_property
+    def parent_precache_season(self):
+        return self.get_parent_data('season', season=self.season)
+
     @property
     def data_cond(self):
         """ Determines if any data is returned """
@@ -50,6 +54,8 @@ class EpisodeMediaList(MediaList):
             return False
         if not self.parent_precache_tvshow:  # Do some precaching here as we need this data to join
             return False
+        if not self.parent_precache_season:  # Do some precaching here as we need this data to join
+            return
         return True
 
     def map_item_unique_ids(self, i):
