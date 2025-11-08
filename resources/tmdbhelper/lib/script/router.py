@@ -101,9 +101,9 @@ class Script(object):
         'set_defaultplayer':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.config_players', 'set_defaultplayer')(**kwargs),
         'set_chosenplayer':
-            lambda **kwargs: importmodule('tmdbhelper.lib.player.method.config_players', 'set_chosenplayer')(**kwargs),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.config_players', 'set_chosenplayer')(**kwargs),
         'customise_players':
-            lambda **kwargs: importmodule('tmdbhelper.lib.player.method.config_players', 'customise_players')(),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.config_players', 'customise_players')(),
 
         # Library Integration
         'add_to_library':
