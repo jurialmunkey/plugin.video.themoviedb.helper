@@ -127,6 +127,11 @@ def import_unique_id():
     return UniqueId
 
 
+def import_imdbnumber():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import IMDbNumber
+    return IMDbNumber
+
+
 def import_custom():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Custom
     return Custom
@@ -452,6 +457,7 @@ FACTORY_ROUTES = {
     'belongs': import_belongs,
     'collection': import_collection,
     'unique_id': import_unique_id,
+    'imdbnumber': import_imdbnumber,
     'custom': import_custom,
     'genre': import_genre,
     'country': import_country,

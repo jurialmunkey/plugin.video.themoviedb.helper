@@ -225,6 +225,7 @@ class MediaItem(BaseItem):
     infolabels_dbcitem_routes = (
         MediaItemInfoLabelItemRoutes.certification,
         MediaItemInfoLabelItemRoutes.trailer,
+        MediaItemInfoLabelItemRoutes.imdbnumber,
     )
 
     """

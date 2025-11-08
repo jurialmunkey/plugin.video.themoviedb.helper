@@ -16,6 +16,7 @@ class MediaItemInfoLabelItemRoutes:
     trailer = (('video', None), 'path', 'trailer')
     episodecount = (('airedcount', None), 'aired_episodes', 'episode')
     playcount = (('playcount', None), 'plays', 'playcount')
+    imdbnumber = (('imdbnumber', None), 'value', 'imdbnumber')
 
 
 class MediaItemInfoPropertyItemRoutes:

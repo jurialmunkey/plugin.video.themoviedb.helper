@@ -6,7 +6,7 @@ from tmdbhelper.lib.player.config.customise.item import PlayerCustomiseDialogIte
 from jurialmunkey.ftools import cached_property
 
 
-class PlayerCustomiseDialogMenu:
+class PlayerCustomiseDialogMenuMain:
 
     @cached_property
     def players(self):
@@ -57,7 +57,7 @@ class PlayerCustomiseDialogMenu:
         return self.choice
 
 
-class PlayerCustomiseDialogMenuFallbacks(PlayerCustomiseDialogMenu):
+class PlayerCustomiseDialogMenuFallbacks(PlayerCustomiseDialogMenuMain):
 
     def __init__(self, fallback=False):
         self.fallback = fallback
@@ -73,6 +73,6 @@ class PlayerCustomiseDialogMenuFallbacks(PlayerCustomiseDialogMenu):
         } if self.fallback else {}
 
 
-def customise_players(*args, **kwargs):
-    while PlayerCustomiseDialogMenu().select():
+def PlayerCustomiseDialogMenu():
+    while PlayerCustomiseDialogMenuMain().select():
         pass
