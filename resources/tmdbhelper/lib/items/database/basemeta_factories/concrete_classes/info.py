@@ -106,6 +106,10 @@ class UniqueId(ItemDetailsList):
         return (self.item_id, )
 
 
+class IMDbNumber(UniqueId):
+    conditions = 'parent_id=? AND key="imdb"'  # WHERE conditions
+
+
 class Custom(UniqueId):
     table = 'custom'
     keys = tuple(CUSTOM_COLUMNS.keys())

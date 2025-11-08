@@ -8,6 +8,7 @@ class Movie(MediaItem):
         MediaItemInfoLabelItemRoutes.certification,
         MediaItemInfoLabelItemRoutes.trailer,
         MediaItemInfoLabelItemRoutes.playcount,
+        MediaItemInfoLabelItemRoutes.imdbnumber,
     )
 
     @property

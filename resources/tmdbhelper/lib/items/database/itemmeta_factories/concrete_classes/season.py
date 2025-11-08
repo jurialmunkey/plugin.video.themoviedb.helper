@@ -6,6 +6,7 @@ class Season(MediaItem):
     infolabels_dbcitem_routes = (
         MediaItemInfoLabelItemRoutes.certification,
         MediaItemInfoLabelItemRoutes.trailer,
+        MediaItemInfoLabelItemRoutes.imdbnumber,
     )
 
     @property
