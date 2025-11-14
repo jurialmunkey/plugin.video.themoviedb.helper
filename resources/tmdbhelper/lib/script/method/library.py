@@ -49,4 +49,4 @@ def run_autoupdate(force=False, busy_dialog=False, **kwargs):
             return
         force = boolean(choice)
     from tmdbhelper.lib.update.monitor import MonitorUserLists
-    MonitorUserLists().library_autoupdate(forced=boolean(force), confirm=False)  # busy_spinner=boolean(busy_dialog)
+    MonitorUserLists().library_autoupdate(forced=boolean(force))  # busy_spinner=boolean(busy_dialog)

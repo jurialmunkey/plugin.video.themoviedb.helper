@@ -97,7 +97,18 @@ class MonitorUserLists:
     @cached_property
     def multiselect_tuples(self):
         # if get_userlist(user_slug, list_slug, confirm=50):  # TODO CHECK NOT OVER
-        return [i for i in (self.get_item_tuple_index(x) for x in self.multiselect_indices) if i]
+        return [i for i in (self.get_item_tuple_index(x) for x in self.multiselect_indices) if i and self.check_limit(*i)]
+
+    @staticmethod
+    def check_limit(list_slug, user_slug):
+        from tmdbhelper.lib.update.builder.userlist import LibraryBuilderUserList
+        library = LibraryBuilderUserList()
+        library.confirm = 50
+        library.list_slug = list_slug
+        library.user_slug = user_slug
+        if library.request and library.is_confirmed:
+            return True
+        return False
 
     def multiselect_update(self):
         list_slugs, user_slugs = zip(*self.multiselect_tuples)
@@ -113,7 +124,7 @@ class MonitorUserLists:
             return
         MonitorUserLists().library_autoupdate()
 
-    def library_autoupdate(self, forced=False, confirm=20):
+    def library_autoupdate(self, forced=False):
         # Log message
         from tmdbhelper.lib.addon.logger import kodi_log
         kodi_log(u'UPDATING LIBRARY', 1)
@@ -131,15 +142,15 @@ class MonitorUserLists:
         from tmdbhelper.lib.update.builder.userlist import LibraryBuilderUserList
         with LibraryBuilderUserList() as parent_library:
             parent_library.forced = forced
-            parent_library.confirm = confirm
+            parent_library.confirm = 0
 
             for list_slug, user_slug in self.monitored_lists:
                 library = LibraryBuilderUserList()
                 library = parent_library.get_builder(library)
-                library.confirm = confirm
+                library.confirm = 0
                 library.create(user_slug=user_slug, list_slug=list_slug)
 
             library = LibraryBuilderUpdate()
             library = parent_library.get_builder(library)
-            library.confirm = confirm
+            library.confirm = 0
             library.create()
