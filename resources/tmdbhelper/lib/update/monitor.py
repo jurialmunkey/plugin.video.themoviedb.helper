@@ -113,7 +113,7 @@ class MonitorUserLists:
             return
         MonitorUserLists().library_autoupdate()
 
-    def library_autoupdate(self, forced=False):
+    def library_autoupdate(self, forced=False, confirm=20):
         # Log message
         from tmdbhelper.lib.addon.logger import kodi_log
         kodi_log(u'UPDATING LIBRARY', 1)
@@ -131,12 +131,15 @@ class MonitorUserLists:
         from tmdbhelper.lib.update.builder.userlist import LibraryBuilderUserList
         with LibraryBuilderUserList() as parent_library:
             parent_library.forced = forced
+            parent_library.confirm = confirm
 
             for list_slug, user_slug in self.monitored_lists:
                 library = LibraryBuilderUserList()
                 library = parent_library.get_builder(library)
+                library.confirm = confirm
                 library.create(user_slug=user_slug, list_slug=list_slug)
 
             library = LibraryBuilderUpdate()
             library = parent_library.get_builder(library)
+            library.confirm = confirm
             library.create()

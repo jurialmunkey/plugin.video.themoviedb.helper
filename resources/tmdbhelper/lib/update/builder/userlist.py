@@ -64,7 +64,7 @@ class LibraryBuilderUserList(LibraryBuilder):
                 get_localized(32170).format(self.len_tvshows, self.len_movies),
                 '',
                 get_localized(32164).format(LIBRARY_ADD_LIMIT_TVSHOWS, LIBRARY_ADD_LIMIT_MOVIES)
-            ]))
+            ])) if self.confirm else None
             return False
 
         if self.confirm and self.len_all_items >= self.confirm:
