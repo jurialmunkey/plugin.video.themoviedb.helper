@@ -113,7 +113,7 @@ class Script(object):
         'library_autoupdate':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.library', 'run_autoupdate')(**kwargs),
         'monitor_userlist':
-            lambda **kwargs: importmodule('tmdbhelper.lib.update.userlist', 'monitor_userlist')(),
+            lambda **kwargs: importmodule('tmdbhelper.lib.update.monitor', 'MonitorUserLists')().multiselect_update(),
 
         # Window Management
         'add_path':

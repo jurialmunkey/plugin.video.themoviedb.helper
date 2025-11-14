@@ -1,29 +1,35 @@
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.update.items.media import LibraryMedia
-from tmdbhelper.lib.addon.plugin import get_setting
 
 
 class LibraryTvshow(LibraryMedia):
 
-    sync_type = 'tvshow'
-    basedir = get_setting('tvshows_library', 'str') or 'special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/'
+    tmdb_type = 'tv'
+    mediatype = 'tvshow'
+    base_type = 'tvshows'
+    forced = False
 
-    @cached_property
-    def tvshowtitle(self):
-        return self.infolabels.get_key('tvshowtitle')
+    strm_filename = None
+    strm_contents = None
 
     @cached_property
     def cache(self):
         from tmdbhelper.lib.update.cacher import LibraryUpdateTvshowCacher
-        return LibraryUpdateTvshowCacher(self.tmdb_id, self.force)
+        cache = LibraryUpdateTvshowCacher(self.tmdb_id)
+        cache.forced = self.forced
+        return cache
 
-    def set_next(self):
-        self.cache.create_new_cache(self.name)
-        self.cache.set_next_check(  # TODO: FIX ME
-            next_aired=self.next_aired,
-            last_aired=self.last_aired,
-            status=self.status
-        )
+    @property
+    def log_check(self):
+        log_check = self.cache.next_check
+        if not log_check:
+            self.cache.make_new_cache(self.name)
+            self.cache.set_next_check(
+                next_aired=self.next_aired,
+                last_aired=self.last_aired,
+                status=self.status)
+            return
+        return log_check
 
     """
     Sync Data
@@ -51,13 +57,16 @@ class LibraryTvshow(LibraryMedia):
             i for i in (
                 self.get_season(season)
                 for season in self.seasons_sync_data
-            ) if i.number != 0
+            ) if i.season != 0
         ]
 
     def get_season(self, sync_data):
         from tmdbhelper.lib.update.items.season import LibrarySeason
         season = LibrarySeason(self.tmdb_id)
         season.sync_data = self.key_getter(sync_data)
+        season.cache = self.cache
+        season.tvshow_id = self.tvshow_id
+        season.folders = self.folders + season.folders
         return season
 
     """
@@ -81,25 +90,10 @@ class LibraryTvshow(LibraryMedia):
     """
 
     @cached_property
-    def dbid(self):
-        from tmdbhelper.lib.api.kodi.rpc import get_kodi_library
-        return get_kodi_library('tv').get_info(
+    def tvshow_id(self):
+        return self.get_kodi_info(
             info='dbid',
             imdb_id=self.imdb_id,
             tmdb_id=self.tmdb_id,
             tvdb_id=self.tvdb_id
-        )
-
-    def get_episode_db_info(self, season, episode, info='dbid'):
-        if not self.dbid:
-            return
-        from tmdbhelper.lib.api.kodi.rpc import KodiLibrary
-        return KodiLibrary(
-            dbtype='episode',
-            tvshowid=self.dbid,
-            logging=False
-        ).get_info(
-            info=info,
-            season=season,
-            episode=episode
         )
