@@ -21,7 +21,7 @@ def add_movie_to_library(tmdb_id, force=False):
 
 
 def add_tvshow_to_library(tmdb_id, force=False):
-    from tmdbhelper.lib.update.builder.tvshow import LibraryBuilderTvshows
+    from tmdbhelper.lib.update.builder.tvshows import LibraryBuilderTvshows
     with LibraryBuilderTvshows() as library:
         library.forced = force
         library.create(tmdb_id=tmdb_id)
