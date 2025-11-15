@@ -1,6 +1,7 @@
 from tmdbhelper.lib.addon.plugin import get_setting
 from jurialmunkey.window import get_property, wait_for_property
 from tmdbhelper.lib.monitor.listitemtools import ListItemMonitorFunctions
+from tmdbhelper.lib.monitor.basemon import BaseItemMonitor
 from tmdbhelper.lib.monitor.cronjob import CronJobMonitor
 from tmdbhelper.lib.monitor.player import PlayerMonitor
 from tmdbhelper.lib.monitor.update import UpdateMonitor
@@ -21,19 +22,30 @@ class ServiceMonitor(Poller):
         self.update_monitor = UpdateMonitor()
         self.player_monitor = PlayerMonitor()
 
-        self.cron_job = CronJobMonitor(self, update_hour=get_setting('library_autoupdate_hour', 'int'))
-        self.cron_job.setName('Cron Thread')
-        self.cron_job.start()
-
-        self.images_monitor = ImagesMonitor(self)
-        self.images_monitor.setName('Image Thread')
-        self.images_monitor.start()
+        self.run_cron_job()
+        self.run_images_monitor()
+        self.run_baseitem_monitor()
 
         self.listitem_funcs = ListItemMonitorFunctions(self)
 
         get_property('ServiceStarted', 'True')
 
         self.poller()
+
+    def run_cron_job(self):
+        self.cron_job = CronJobMonitor(self, update_hour=get_setting('library_autoupdate_hour', 'int'))
+        self.cron_job.setName('Cron Thread')
+        self.cron_job.start()
+
+    def run_images_monitor(self):
+        self.images_monitor = ImagesMonitor(self)
+        self.images_monitor.setName('Image Thread')
+        self.images_monitor.start()
+
+    def run_baseitem_monitor(self):
+        self.baseitem_monitor = BaseItemMonitor(self)
+        self.baseitem_monitor.setName('BaseItem Thread')
+        self.baseitem_monitor.start()
 
     def _on_listitem(self):
         self.listitem_funcs.on_listitem()
@@ -50,7 +62,7 @@ class ServiceMonitor(Poller):
 
     def _on_context(self):
         self.listitem_funcs.on_context_listitem()
-        self._on_idle(POLL_MID_INCREMENT)
+        self._on_idle(POLL_MIN_INCREMENT)
 
     def _on_clear(self):
         """
@@ -61,8 +73,18 @@ class ServiceMonitor(Poller):
         self._on_idle(POLL_MID_INCREMENT)
 
     def _on_exit(self):
-        self.cron_job.exit = True
-        self.images_monitor.exit = True
+        try:
+            self.cron_job.exit = True
+        except AttributeError:
+            pass
+        try:
+            self.images_monitor.exit = True
+        except AttributeError:
+            pass
+        try:
+            self.baseitem_monitor.exit = True
+        except AttributeError:
+            pass
         if not self.update_monitor.abortRequested():
             get_property('ServiceStarted', clear_property=True)
             get_property('ServiceStop', clear_property=True)
