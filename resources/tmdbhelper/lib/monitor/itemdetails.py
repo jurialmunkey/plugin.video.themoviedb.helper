@@ -124,7 +124,7 @@ class MonitorItemDetails(ImageManipulations):
 
     @cached_property
     def is_container_content_lookups(self):
-        if self.parent._container != 'Container.':
+        if self.parent.container != 'Container.':
             return False
         if not get_setting('service_container_content_fallback'):
             return False

@@ -71,8 +71,9 @@ def get_tmdb_id_nfo(basedir, foldername, tmdb_type='tv'):
             tmdb_id = content.replace(f'https://www.themoviedb.org/{tmdb_type}/', '')  # Clean content to retrieve tmdb_id
             tmdb_id = tmdb_id.replace(u'&islocal=True', '')
             tmdb_id = try_int(tmdb_id)
-            if tmdb_id:
-                return f'{tmdb_id}'
+            if not tmdb_id:
+                continue
+            return f'{tmdb_id}'
 
     except Exception as exc:
         kodi_log(f'ERROR GETTING TMDBID FROM NFO:\n{exc}')

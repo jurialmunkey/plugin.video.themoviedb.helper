@@ -75,10 +75,10 @@ class Poller(WindowChecker):
         self.update_monitor.waitForAbort(wait_time)
 
     def _on_modal(self):
-        self._on_idle(POLL_MID_INCREMENT)
+        self._on_idle(POLL_MIN_INCREMENT)
 
     def _on_context(self):
-        self._on_idle(POLL_MID_INCREMENT)
+        self._on_idle(POLL_MIN_INCREMENT)
 
     def _on_scroll(self):
         self._on_idle(POLL_MIN_INCREMENT)

@@ -111,12 +111,15 @@ class ItemUserList(ItemSync):
         """ Add item to library
         Pass optional slug tuple (list, user) to check if in monitored lists
         """
-        from tmdbhelper.lib.update.userlist import get_monitor_userlists
-        from tmdbhelper.lib.update.library import add_to_library
-        if list_user_slug_tuple and list_user_slug_tuple not in get_monitor_userlists():
+
+        from tmdbhelper.lib.update.monitor import MonitorUserLists
+        if list_user_slug_tuple and list_user_slug_tuple not in MonitorUserLists().monitored_lists:
             return
+
         if confirm and not Dialog().yesno(get_localized(20444), get_localized(32362)):
             return
+
+        from tmdbhelper.lib.script.method.library import add_to_library
         add_to_library(tmdb_type, tmdb_id=tmdb_id)
 
     """

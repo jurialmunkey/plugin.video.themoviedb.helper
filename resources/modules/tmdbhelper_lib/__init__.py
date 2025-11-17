@@ -8,7 +8,7 @@ class _Finder:
         def __init__(self, addon_id=None, path_suffix=None):
             from os.path import join
             from xbmcaddon import Addon
-            
+
             self._loaded = False
             self._path = Addon(addon_id).getAddonInfo('path')
             if path_suffix:

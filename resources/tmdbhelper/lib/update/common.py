@@ -1,57 +1,87 @@
-from tmdbhelper.lib.update.update import get_userlist
-from tmdbhelper.lib.addon.plugin import executebuiltin
+from jurialmunkey.ftools import cached_property
 
 
-class LibraryCommonFunctions():
-    busy_spinner = False
+class LibraryCommon():
+    busy_spinner = True
+    clean_library = False
+    debug_logging = True
+    auto_update = False
+    forced = False
 
-    def _start(self):
-        if self.p_dialog:
-            self.p_dialog.create(self._msg_title, self._msg_start)
+    """
+    Basedir
+    """
 
-    def _finish(self, update=True):
-        if self.p_dialog:
-            self.p_dialog.close()
-        if self.debug_logging:
-            self._log._clean()  # Clean up old log files first
-            self._log._out()
-        if self.clean_library:
-            executebuiltin('CleanLibrary(video)')
-        if self.auto_update and update:
-            executebuiltin('UpdateLibrary(video)')
+    @staticmethod
+    def get_basedir(mediatype):
+        from tmdbhelper.lib.addon.plugin import get_setting
+        basedir = get_setting(f'{mediatype}_library', 'str')
+        basedir = basedir or f'special://profile/addon_data/plugin.video.themoviedb.helper/{mediatype}/'
+        return basedir
 
-    def _update(self, count, total, **kwargs):
-        if self.p_dialog:
-            self.p_dialog.update((((count + 1) * 100) // total), **kwargs)
+    @staticmethod
+    def get_listdir_basedir(basedir):
+        from xbmcvfs import listdir
+        from tmdbhelper.lib.files.futils import get_tmdb_id_nfo
+        return [
+            i for i in (
+                (get_tmdb_id_nfo(basedir, f), f)
+                for f in listdir(basedir)[0]
+            ) if i[0] and i[1]
+        ]
 
-    def add_userlist(self, user_slug=None, list_slug=None, confirm=True, force=False, **kwargs):
-        request = get_userlist(user_slug=user_slug, list_slug=list_slug, confirm=confirm, busy_spinner=self.busy_spinner)
+    """
+    Logging
+    """
 
-        if not request:
+    @cached_property
+    def logger(self):
+        from tmdbhelper.lib.update.logger import LibraryLogger
+        logger = LibraryLogger()
+        logger.location = self.log_folder
+        return logger
+
+    @cached_property
+    def dialog(self):
+        from xbmcgui import DialogProgressBG
+        dialog = DialogProgressBG()
+        dialog.create(self.dialog_top, self.dialog_txt)
+        return dialog
+
+    def dialog_msg(self, count, total, **kwargs):
+        if not self.dialog:
             return
-        i_total = len(request)
+        self.dialog.update((((count + 1) * 100) // total), **kwargs)
 
-        for x, i in enumerate(request):
-            self._update(x, i_total, message=f'Updating {i.get(i.get("type"), {}).get("title")}...')
-            self._add_userlist_item(i, force=force, user_slug=user_slug, list_slug=list_slug)
+    def __enter__(self):
+        return self
 
-    def _add_userlist_item(self, i, force=False, user_slug=None, list_slug=None):
-        i_type = i.get('type')
-        if i_type == 'movie':
-            func = self.add_movie
-        elif i_type == 'show':
-            func = self.add_tvshow
-        else:
-            return
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        from tmdbhelper.lib.addon.plugin import executebuiltin
+        for func in (
+            func for func, cond in (
+                (lambda: self.dialog.close(), self.dialog),
+                (lambda: self.logger.out(), self.debug_logging),
+                (lambda: executebuiltin('UpdateLibrary(video)'), self.auto_update),
+                (lambda: executebuiltin('ClearLibrary(video)'), self.clean_library),
+            ) if cond
+        ):
+            func()
 
-        item = i.get(i_type, {})
-        tmdb_id = item.get('ids', {}).get('tmdb')
-        imdb_id = item.get('ids', {}).get('imdb')
+    """
+    Kodi DB
+    """
+    @cached_property
+    def kodidb(self):
 
-        if not tmdb_id:
-            self._log._add(
-                'tv' if i_type == 'show' else 'movie', item.get('ids', {}).get('slug'),
-                'skipped item in Trakt user list with missing TMDb ID')
-            return
+        class KodiDBDictionary(dict):
+            def __missing__(instance, key):
+                instance[key] = self.get_kodidb(key)
+                return instance[key]
 
-        return func(tmdb_id, force=force, imdb_id=imdb_id, user_slug=user_slug, list_slug=list_slug)
+        return KodiDBDictionary()
+
+    @staticmethod
+    def get_kodidb(library):
+        from tmdbhelper.lib.api.kodi.rpc import get_kodi_library
+        return get_kodi_library(library, cache_refresh=True)

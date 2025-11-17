@@ -1,6 +1,6 @@
 from tmdbhelper.lib.monitor.images import ImageManipulations
 from tmdbhelper.lib.monitor.poller import Poller, POLL_MIN_INCREMENT
-from tmdbhelper.lib.monitor.listitemtools import ListItemInfoGetter
+from tmdbhelper.lib.monitor.listitemgetter import ListItemInfoGetter
 from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp
 from tmdbhelper.lib.addon.logger import kodi_try_except
 from tmdbhelper.lib.addon.thread import SafeThread
@@ -26,10 +26,10 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
 
     def __init__(self, parent):
         SafeThread.__init__(self)
-        self._cur_item = 0
-        self._pre_item = 1
-        self._cur_window = 0
-        self._pre_window = 1
+        self.cur_item = 0
+        self.pre_item = 1
+        self.cur_window = 0
+        self.pre_window = 1
         self._next_refresh = 0
         self._this_refresh = 0
         self.exit = False
@@ -64,6 +64,10 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
 
     def is_next_refresh(self):
         self.setup_current_item()
+
+        # Skip udating if landed on a modal because we can't get underlying details
+        if self.is_on_modal or self.is_on_context:
+            return False
 
         # Always refresh our artwork if window changed
         if not self.is_same_window(update=True):
@@ -106,7 +110,7 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         self._next_refresh = 0
         return self.get_image_manipulations(
             use_winprops=True,
-            built_artwork=self.remote_artwork.get(self._pre_item),
+            built_artwork=self.remote_artwork.get(self.pre_item),
             allow_list=self._allow_list)
 
     def _on_listitem(self):
