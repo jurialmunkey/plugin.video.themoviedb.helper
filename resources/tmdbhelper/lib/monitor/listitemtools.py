@@ -92,6 +92,10 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         if self._listcontainer == -1:
             return
 
+        # Check not on a modal or context
+        if self.service_monitor.is_on_modal or self.service_monitor.is_on_context:
+            return
+
         # Check if the item has changed before retrieving details again
         if self.is_same_item(update=True) and self.is_same_window(update=True):
             return

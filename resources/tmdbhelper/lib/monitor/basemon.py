@@ -20,6 +20,10 @@ class BaseItemMonitor(SafeThread, ListItemInfoGetter, Poller, WindowPropertySett
     def is_next_refresh(self):
         self.setup_current_item()
 
+        # Skip udating if landed on a modal because we can't get underlying details
+        if self.is_on_modal or self.is_on_context:
+            return False
+
         # Always refresh our info if window changed
         if not self.is_same_window(update=True):
             return True
