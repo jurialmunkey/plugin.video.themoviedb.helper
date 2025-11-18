@@ -20,7 +20,7 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         self.property_prefix = 'ListItem'
         self._pre_artwork_thread = None
         self.service_monitor = service_monitor  # ServiceMonitor
-        self.ratings_queue = []
+        self.ratings_queued = []
         self.ratings_thread = None
 
     # ==========

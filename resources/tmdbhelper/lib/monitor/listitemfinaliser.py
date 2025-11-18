@@ -48,8 +48,8 @@ class ListItemMonitorFinaliser:
         return self.listitem_monitor_functions.service_monitor
 
     @property
-    def ratings_queue(self):
-        return self.listitem_monitor_functions.ratings_queue
+    def ratings_queued(self):
+        return self.listitem_monitor_functions.ratings_queued
 
     @property
     def ratings_thread(self):
@@ -83,44 +83,44 @@ class ListItemMonitorFinaliser:
         self.images_monitor.remote_artwork[self.item.identifier] = self.item.artwork.copy()
         self.processed_artwork = self.images_monitor.update_artwork(forced=True) or {}
 
-    def process_artwork(self):
-        self.get_property('IsUpdatingArtwork', 'True')
-        self.artwork()
-        self.get_property('IsUpdatingArtwork', clear_property=True)
-
-    def process_ratings(self):
-        self.get_property('IsUpdatingRatings', 'True')
-        self.ratings()
-        self.get_property('IsUpdatingRatings', clear_property=True)
-
     def start_process_artwork(self):
         if not self.artwork_enabled:
             return
         if not self.item.artwork:
             return
+        self.process_artwork()
+
+    def process_artwork(self):
+        self.get_property('IsUpdatingArtwork', 'True')
         with self.mutex_lock:  # Lock to avoid race with artwork monitor
-            self.process_artwork()
+            self.artwork()
+        self.get_property('IsUpdatingArtwork', clear_property=True)
 
     def start_process_ratings(self):
         if not self.ratings_enabled:
             return
 
-        self.ratings_queue.append(self.process_ratings)
+        if len(self.ratings_queued) < 1:
+            self.ratings_queued.append(self.ratings)
+        else:
+            self.ratings_queued[0] = self.ratings
 
         if self.ratings_thread:
             return
 
-        self.ratings_thread = SafeThread(target=self.thread_process_ratings)
+        self.ratings_thread = SafeThread(target=self.process_ratings)
         self.ratings_thread.start()
 
-    def thread_process_ratings(self):
+    def process_ratings(self):
+        self.get_property('IsUpdatingRatings', 'True')
         while self.ratings_thread and not self.update_monitor.abortRequested():
             try:
-                func = self.ratings_queue.pop(0)
+                func = self.ratings_queued.pop(0)
                 func()
             except IndexError:
                 break
         self.ratings_thread = None
+        self.get_property('IsUpdatingRatings', clear_property=True)
 
     @cached_property
     def item(self):
