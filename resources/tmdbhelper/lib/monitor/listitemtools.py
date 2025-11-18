@@ -1,5 +1,5 @@
 import xbmcgui
-from tmdbhelper.lib.addon.plugin import get_infolabel, get_condvisibility, get_localized
+from tmdbhelper.lib.addon.plugin import get_condvisibility, get_localized
 from tmdbhelper.lib.addon.logger import kodi_try_except
 from tmdbhelper.lib.monitor.common import CommonMonitorFunctions
 from tmdbhelper.lib.monitor.listitemgetter import ListItemInfoGetter
@@ -20,8 +20,8 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         self.property_prefix = 'ListItem'
         self._pre_artwork_thread = None
         self.service_monitor = service_monitor  # ServiceMonitor
-        self.process_thread = []
-        self.process_mutex = False
+        self.ratings_queue = []
+        self.ratings_thread = None
 
     # ==========
     # PROPERTIES
