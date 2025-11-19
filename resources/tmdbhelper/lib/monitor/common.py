@@ -2,7 +2,6 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.logger import kodi_try_except, kodi_log
 from tmdbhelper.lib.files.futils import validate_join
 from tmdbhelper.lib.api.contains import CommonContainerAPIs
-from tmdbhelper.lib.addon.thread import ParallelThread
 from jurialmunkey.window import WindowPropertySetter
 import xbmcvfs
 import json
@@ -140,18 +139,8 @@ class CommonMonitorDetails(CommonContainerAPIs):
 
     def get_all_ratings(self, tmdb_type, tmdb_id, season=None, episode=None):
         info = {}
-
-        def get_data_func(func):
-            info.update(func(tmdb_type, tmdb_id))
-
-        funcs = (
-            self.get_detailed_ratings,
-            self.get_tvdb_awards,
-        )
-
-        with ParallelThread(funcs, get_data_func):
-            pass
-
+        info.update(self.get_detailed_ratings(tmdb_type, tmdb_id))
+        info.update(self.get_tvdb_awards(tmdb_type, tmdb_id))
         return info
 
 
