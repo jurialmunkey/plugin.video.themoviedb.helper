@@ -111,9 +111,14 @@ class MonitorUserLists:
         return False
 
     def multiselect_update(self):
-        list_slugs, user_slugs = zip(*self.multiselect_tuples)
-        list_slugs = self.separator.join(list(list_slugs))
-        user_slugs = self.separator.join(list(user_slugs))
+
+        try:
+            list_slugs, user_slugs = zip(*self.multiselect_tuples)
+            list_slugs = self.separator.join(list(list_slugs))
+            user_slugs = self.separator.join(list(user_slugs))
+        except ValueError:
+            list_slugs, user_slugs = '', ''
+
         set_setting('monitor_userlist', list_slugs, 'str')
         set_setting('monitor_userslug', user_slugs, 'str')
         self.library_update()
