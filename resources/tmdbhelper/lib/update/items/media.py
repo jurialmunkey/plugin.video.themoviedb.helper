@@ -126,8 +126,8 @@ class LibraryMedia:
 
     def get_unique_name(self, name):
         from jurialmunkey.parser import try_int
-        from tmdbhelper.lib.files.futils import get_tmdb_id_nfo
-        condition = try_int(get_tmdb_id_nfo(self.basedir, name))
+        from tmdbhelper.lib.files.futils import get_tmdb_id_nfo, validify_filename
+        condition = try_int(get_tmdb_id_nfo(self.basedir, validify_filename(name)))
         condition = bool(condition and condition != try_int(self.tmdb_id))
         return f'{name} (TMDB {self.tmdb_id})' if condition else name
 
