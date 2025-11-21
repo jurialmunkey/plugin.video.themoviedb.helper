@@ -21,7 +21,10 @@ class LibraryBuilderUserList(LibraryBuilder):
         return self.get_all_of_type('movie')
 
     def get_all_of_type(self, item_type):
-        return [i[item_type] for i in self.request if i.get('type') == item_type]
+        try:
+            return [i[item_type] for i in self.request if i.get('type') == item_type]
+        except TypeError:
+            return []
 
     """
     Limits
@@ -88,12 +91,16 @@ class LibraryBuilderUserList(LibraryBuilder):
 
     @cached_property
     def request_func(self):
-        if self.user_slug != '__api_mdblist__':
-            from tmdbhelper.lib.api.trakt.api import TraktAPI
-            return TraktAPI().get_response_json
-        if self.mdblist_apikey:
-            from tmdbhelper.lib.api.mdblist.api import MDbList
-            return MDbList().get_response
+        if self.user_slug and self.list_slug:
+
+            if self.user_slug != '__api_mdblist__':
+                from tmdbhelper.lib.api.trakt.api import TraktAPI
+                return TraktAPI().get_response_json
+
+            if self.mdblist_apikey:
+                from tmdbhelper.lib.api.mdblist.api import MDbList
+                return MDbList().get_response
+
         return lambda *args, **kwgs: None
 
     @property

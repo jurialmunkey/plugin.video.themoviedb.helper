@@ -23,6 +23,7 @@ class LibraryCommon():
     def get_listdir_basedir(basedir):
         from xbmcvfs import listdir
         from tmdbhelper.lib.files.futils import get_tmdb_id_nfo
+
         return [
             i for i in (
                 (get_tmdb_id_nfo(basedir, f), f)
