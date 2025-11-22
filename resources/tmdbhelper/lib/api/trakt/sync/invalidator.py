@@ -115,6 +115,12 @@ class SyncInvalidatorAll:
             return
         self.progress_dialog.update(message)
 
+    def progress_dialog_close(self):
+        if not self.progress_dialog:
+            return
+        self.progress_dialog.close()
+        self.progress_dialog = None
+
     @cached_property
     def database(self):
         self.progress_dialog_update('Initialise database')
@@ -157,7 +163,6 @@ class SyncInvalidatorAll:
         self.database_del_lactivities()
 
     def sync_type(self, sync_type):
-        self.progress_dialog.update(f'Syncing {sync_type} data')
         sync_list = tuple((k for k, v in self.sync_table.items() if k in self.sync_modes and sync_type in v))
         self.trakt_syncdata.sync(sync_type, sync_list)
 
@@ -169,15 +174,11 @@ class SyncInvalidatorAll:
 
     def run(self, sync=False):
         self.invalidate()
+        self.progress_dialog_close()
         self.sync() if sync else None
-        if not self.progress_dialog:
+        if not self.notification:
             return
-        self.progress_dialog.close()
-        self.progress_dialog = None
-        Dialog().ok(
-            get_localized(32026),
-            get_localized(32027).format(self.name.lower())
-        )
+        Dialog().ok('Trakt', get_localized(32146 if sync else 32027).format(self.name.lower()))
 
 
 class SyncInvalidatorWatchedProgress(SyncInvalidatorAll):
