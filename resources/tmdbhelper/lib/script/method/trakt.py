@@ -71,23 +71,23 @@ def select_sort_list(sort_methods, **kwargs):
     executebuiltin(format_folderpath(encode_url(**kwargs)))
 
 
-def invalidate_trakt_sync(invalidate_trakt_sync, notification=True, **kwargs):
+def invalidate_trakt_sync(invalidate_trakt_sync, notification=True, sync=True, **kwargs):
     from tmdbhelper.lib.api.trakt.sync.invalidator import SyncInvalidator
     sync_invalidator = SyncInvalidator(invalidate_trakt_sync)
     sync_invalidator.notification = notification
-    sync_invalidator.run()
+    sync_invalidator.run(sync=sync)
 
 
 def authenticate_trakt(**kwargs):
     from tmdbhelper.lib.api.trakt.api import TraktAPI
     TraktAPI(force=True)
-    invalidate_trakt_sync('all', notification=False)
+    invalidate_trakt_sync('all', notification=False, sync=False)
 
 
 def revoke_trakt(**kwargs):
     from tmdbhelper.lib.api.trakt.api import TraktAPI
     TraktAPI().logout()
-    invalidate_trakt_sync('all', notification=False)
+    invalidate_trakt_sync('all', notification=False, sync=False)
 
 
 def get_stats(**kwargs):
