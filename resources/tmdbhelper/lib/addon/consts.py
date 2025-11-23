@@ -71,6 +71,7 @@ PARAM_WIDGETS_RELOAD = 'reload=$INFO[Window(Home).Property(TMDbHelper.Widgets.Re
 PARAM_WIDGETS_RELOAD_FORCED = 'reload=$INFO[System.Time(hh:mm:ss)]'
 
 LASTACTIVITIES_DATA = 'TraktNewSyncLastActivities'
+LASTACTIVITIES_EXPIRY = 600
 
 UPNEXT_EPISODE_ART = {
     'thumb': lambda li: li.art.get('thumb') or '',

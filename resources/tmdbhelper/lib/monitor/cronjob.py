@@ -24,7 +24,6 @@ class CronJobMonitor(SafeThread):
         self._do_delete_old_databases()
         self._do_library_update_check()
         self._do_delete_old_log_files()
-        self._do_reset_lastactivities()
 
     @cached_property
     def trakt_api(self):
@@ -70,11 +69,6 @@ class CronJobMonitor(SafeThread):
             return
         from tmdbhelper.lib.script.method.trakt import get_stats
         get_stats()
-
-    def _do_reset_lastactivities(self):
-        from jurialmunkey.window import get_property
-        from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA
-        get_property(LASTACTIVITIES_DATA, clear_property=True)
 
     def _do_library_update(self):
         from tmdbhelper.lib.addon.plugin import executebuiltin

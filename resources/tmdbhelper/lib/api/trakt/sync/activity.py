@@ -3,11 +3,8 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.files.futils import json_loads as data_loads
 from tmdbhelper.lib.files.futils import json_dumps as data_dumps
 from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp
-from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA
+from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA, LASTACTIVITIES_EXPIRY
 from tmdbhelper.lib.files.locker import mutexlock
-
-
-LASTACTIVITIES_EXPIRY = 600
 
 
 class SyncLastActivitiesSyndDataProperties(SyncDataParentProperties):
