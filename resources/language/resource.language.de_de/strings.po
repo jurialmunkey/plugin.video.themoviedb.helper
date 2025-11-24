@@ -731,6 +731,11 @@ msgctxt "#32145"
 msgid "Retrieving library"
 msgstr "Bibliotheksdaten werden geladen"
 
+#: /resources/tmdbhelper/lib/api/trakt/sync/invalidator.py
+msgctxt "#32146"
+msgid "Successfully refreshed {} sync data"
+msgstr "Synchronisierungsdaten {} erfolgreich aufgefrischt"
+
 #: /resources/lib/container.py
 msgctxt "#32119"
 msgid "Select Release Types"
