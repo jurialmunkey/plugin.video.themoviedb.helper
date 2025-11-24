@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-05-19 17:47+0800\n"
+"PO-Revision-Date: 2025-07-15 11:58+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -199,7 +199,7 @@ msgstr "芬兰语（芬兰）"
 #: /resources/settings.xml
 msgctxt "#32039"
 msgid "Prefer fanart.tv artwork"
-msgstr "首选 fanart.tv 艺术作品"
+msgstr "首选 fanart.tv 艺术图"
 
 #: /resources/tmdbhelper/lib/items/directories/tmdb/lists_seasons.py
 msgctxt "#32040"
@@ -236,7 +236,7 @@ msgstr "移除电视剧"
 #: /resources/tmdbhelper/lib/script/sync/basic.py
 msgctxt "#32047"
 msgid "Undrop TV show"
-msgstr "恢复关注电视剧"
+msgstr "恢复移除电视剧"
 
 #: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
 msgctxt "#32048"
@@ -251,7 +251,7 @@ msgstr "排序方式：你的下一集列表。按播出日期：按剧集首播
 #: /resources/settings.xml
 msgctxt "#32050"
 msgid "Prefer artwork in your language"
-msgstr "首选使用您语言的艺术作品"
+msgstr "首选使用您语言的艺术图"
 
 #: /resources/tmdbhelper/lib/script/method/tmdb.py
 msgctxt "#32051"
@@ -307,10 +307,45 @@ msgctxt "#32037"
 msgid "Use bundled players"
 msgstr "使用内置播放器"
 
+#: /resources/tmdbhelper/lib/items/directories/lists_base.py
+msgctxt "#32062"
+msgid "Networks"
+msgstr "网络"
+
+#: /resources/tmdbhelper/lib/api/trakt/sorting.py
+msgctxt "#32063"
+msgid "Added"
+msgstr "添加"
+
+#: /resources/tmdbhelper/lib/items/directories/lists_base.py
+msgctxt "#32064"
+msgid "Related"
+msgstr "相关"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_related.py
+msgctxt "#32065"
+msgid "Watchers"
+msgstr "监视器"
+
 #: /resources/settings.xml
 msgctxt "#32038"
 msgid "Get additional details from the local Kodi library database"
 msgstr "从 Kodi 本地媒体库数据库获取扩展元数据"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32067"
+msgid "Budget"
+msgstr "票房"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32068"
+msgid "Revenue"
+msgstr "收益"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32069"
+msgid "Last Air Date"
+msgstr "最后播出日期"
 
 #: /resources/settings.xml
 msgctxt "#32042"
@@ -321,6 +356,11 @@ msgstr "选择操作"
 msgctxt "#32043"
 msgid "Up Next"
 msgstr "下一个"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32072"
+msgid "Score"
+msgstr "评分"
 
 #: /resources/lib/container.py
 msgctxt "#32044"
@@ -352,6 +392,11 @@ msgctxt "#32058"
 msgid "The provided URL is either invalid or inaccesible."
 msgstr "提供的 URL 无效或不可访问。"
 
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32079"
+msgid "User"
+msgstr "用户"
+
 #: /resources/lib/downloader.py
 msgctxt "#32059"
 msgid "Success!"
@@ -361,6 +406,16 @@ msgstr "成功！"
 msgctxt "#32060"
 msgid "files extracted"
 msgstr "提取文件"
+
+#: /resources/settings.xml
+msgctxt "#32082"
+msgid "Page multiplier (Other basic lists)"
+msgstr "页面乘数（其他基本列表）"
+
+#: /resources/settings.xml
+msgctxt "#32083"
+msgid "Page multiplier (Database sync lists)"
+msgstr "页面乘数（数据库同步列表）"
 
 #: /resources/lib/player.py
 msgctxt "#32061"
@@ -376,6 +431,11 @@ msgstr "调试记录"
 msgctxt "#32070"
 msgid "Male"
 msgstr "男"
+
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32087"
+msgid "Search for TMDb ID or input manually?"
+msgstr "搜索 TMDb ID 还是手动输入？"
 
 #: /resources/lib/tmdb.py
 msgctxt "#32071"
@@ -407,6 +467,11 @@ msgctxt "#32077"
 msgid "Ignore folder creation checks"
 msgstr "忽略文件夹检查"
 
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32094"
+msgid "Select TMDb type"
+msgstr "选择 TMDb 类型"
+
 #: /resources/lib/container/basedir.py
 msgctxt "#32078"
 msgid "Still to Watch"
@@ -421,6 +486,11 @@ msgstr "其他"
 msgctxt "#32081"
 msgid "Next page item"
 msgstr "下一页项目"
+
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32098"
+msgid "Updated"
+msgstr "已更新"
 
 #: /resources/settings.xml
 msgctxt "#32084"
@@ -453,6 +523,16 @@ msgctxt "#32090"
 msgid "Content"
 msgstr "内容"
 
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32105"
+msgid "leave blank to delete"
+msgstr "留空即删除"
+
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32106"
+msgid "Enter {} URL"
+msgstr "输入 {} URL"
+
 #: /resources/settings.xml
 msgctxt "#32091"
 msgid "Special season folders"
@@ -461,12 +541,12 @@ msgstr "剧集特别篇文件夹"
 #: /resources/settings.xml
 msgctxt "#32092"
 msgid "Widgets"
-msgstr "小组件"
+msgstr "小部件"
 
 #: /resources/settings.xml
 msgctxt "#32093"
 msgid "Next episodes sort method"
-msgstr "下一集排序方式"
+msgstr "下一集 排序方式"
 
 #: /resources/settings.xml
 msgctxt "#32095"
@@ -493,10 +573,25 @@ msgctxt "#32100"
 msgid "Do you wish to clear the existing items or add more?"
 msgstr "您希望清除现有项目还是添加更多项目？"
 
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32115"
+msgid "Reset {} artwork to default?"
+msgstr "将 {} 艺术图重置为默认值？"
+
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32116"
+msgid "Remove user artwork override and reset artwork to default artwork selection as defined in the settings."
+msgstr "删除用户艺术图覆盖，并将艺术图重置为设置中定义的默认艺术图选择。"
+
 #: /resources/lib/container.py
 msgctxt "#32101"
 msgid "Clear Items"
 msgstr "清理项目"
+
+#: /resources/tmdbhelper/lib/items/context.py
+msgctxt "#32118"
+msgid "Modify artwork"
+msgstr "修改艺术图"
 
 #: /resources/lib/container.py
 msgctxt "#32102"
@@ -527,6 +622,11 @@ msgctxt "#32108"
 msgid "Choose matching method for parameters with multiple values."
 msgstr "为具有多个值的参数选择匹配方法。"
 
+#: /resources/settings.xml
+msgctxt "#32124"
+msgid "RatingPosterDB API"
+msgstr "RatingPosterDB API"
+
 #: /resources/lib/container.py
 msgctxt "#32109"
 msgid "Match ANY Value"
@@ -536,6 +636,21 @@ msgstr "匹配任意值"
 msgctxt "#32110"
 msgid "Match ALL Values"
 msgstr "匹配所有值"
+
+#: /resources/settings.xml
+msgctxt "#32127"
+msgid "RatingPosterDB API key"
+msgstr "RatingPoster API 密钥"
+
+#: /resources/tmdbhelper/lib/items/database/baseview_factories/concrete_classes/ftv_fanart.py
+msgctxt "#32128"
+msgid "Likes"
+msgstr "顶"
+
+#: /resources/settings.xml
+msgctxt "#32129"
+msgid "Override player monitor clearlogo with artwork from TMDbHelper"
+msgstr "用 TMDbHelper 中的图像覆盖播放器监视器的透明徽标"
 
 #: /resources/lib/container.py
 msgctxt "#32111"
@@ -556,6 +671,46 @@ msgstr "距今 X 天，格式为 T-X 或 T+X（例如 T-10 是十天前）"
 msgctxt "#32114"
 msgid "Enter"
 msgstr "进入"
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32134"
+msgid "items"
+msgstr "项目"
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32135"
+msgid "Private"
+msgstr "私人"
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32136"
+msgid "Do you want to make this list a public or private list?"
+msgstr "您想将此列表设为公开列表还是私人列表？"
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32137"
+msgid "Public or private list?"
+msgstr "公开名单还是私人名单？"
+
+#: /resources/settings.xml
+msgctxt "#32138"
+msgid "Scrobbling"
+msgstr "滚动"
+
+#: /resources/settings.xml
+msgctxt "#32139"
+msgid "Rate items on TMDb after watching"
+msgstr "观看后为 TMDb 上的项目评分"
+
+#: /resources/tmdbhelper/lib/player/configure.py
+msgctxt "#32140"
+msgid "Create new player"
+msgstr "创建新播放器"
+
+#: /resources/tmdbhelper/lib/player/configure.py
+msgctxt "#32141"
+msgid "Delete fallback"
+msgstr "删除备用项"
 
 #: /resources/lib/container.py
 msgctxt "#32117"
@@ -650,7 +805,7 @@ msgstr "自动播放本地文件"
 #: /resources/settings.xml
 msgctxt "#32163"
 msgid "Use fanart.tv for service monitor artwork"
-msgstr "使用 fanart.tv 获取艺术作品"
+msgstr "使用 fanart.tv 获取艺术图"
 
 #: /resources/lib/context.py
 msgctxt "#32164"
@@ -674,7 +829,7 @@ msgstr "正在更新"
 #: /resources/lib/libraryupdate.py
 msgctxt "#32168"
 msgid "[B]{}[/B] by user [B]{}[/B]"
-msgstr "[B]{}[/B] by user [B]{}[/B]"
+msgstr "[B]{}[/B] 通过用户 [B]{}[/B]"
 
 #: /resources/settings.xml
 msgctxt "#32169"
@@ -914,12 +1069,12 @@ msgstr "注销失败！"
 #: /resources/lib/traktapi.py
 msgctxt "#32216"
 msgid "Successfully logged out of Trakt user account"
-msgstr "成功注销Trakt用户帐户"
+msgstr "成功注销 Trakt 用户帐户"
 
 #: /resources/lib/script.py
 msgctxt "#32222"
 msgid "Manage artwork"
-msgstr "管理艺术作品"
+msgstr "管理艺术图"
 
 #: /resources/lib/plugin.py
 msgctxt "#32223"
@@ -1124,7 +1279,7 @@ msgstr "无类型"
 #: /resources/lib/userdiscover.py
 msgctxt "#32265"
 msgid "With Companies"
-msgstr "与公司"
+msgstr "含公司"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32266"
@@ -1480,7 +1635,7 @@ msgstr ""
 #: /resources/lib/player/configure.py
 msgctxt "#32338"
 msgid "Close without Saving"
-msgstr "推出不保存"
+msgstr "关闭而不保存"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32339"
@@ -1648,17 +1803,17 @@ msgstr "横向展示模式"
 #: /resources/settings.xml
 msgctxt "#32371"
 msgid "Preferred artwork for thumbs"
-msgstr "首选艺术作品缩略图"
+msgstr "首选艺术图片缩略图"
 
 #: /resources/settings.xml
 msgctxt "#32372"
 msgid "fanart"
-msgstr "背景图"
+msgstr "同人画"
 
 #: /resources/settings.xml
 msgctxt "#32373"
 msgid "Restrict to library strm"
-msgstr "仅处理.strm文件"
+msgstr "仅处理 .strm 文件"
 
 #: /resources/lib/player/players.py
 msgctxt "#32374"
@@ -1849,7 +2004,7 @@ msgstr "从 TMDb 和 Trakt API 查找数据时使用的语言和国家/地区设
 #: /resources/settings.xml
 msgctxt "#32420"
 msgid "TMDb artwork quality"
-msgstr "TMDb 艺术作品质量"
+msgstr "TMDb 艺术图质量"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32421"
@@ -2339,8 +2494,8 @@ msgstr "添加到 {}"
 
 #: /resources/settings.xml
 msgctxt "#32529"
-msgid "Scrobble items played via TMDbHelper"
-msgstr "通过 TMDbHelper 播放的滚动项目"
+msgid "Scrobble items on Trakt while watching"
+msgstr "观看时在 Trakt 上记录播放进度"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32530"
@@ -2588,7 +2743,7 @@ msgstr "Fanart.tv client 密钥"
 #: /resources/settings.xml
 msgctxt "#32021"
 msgid "Use fanart.tv for plugin artwork (slower)"
-msgstr "将 fanart.tv 用于艺术作品（较慢）"
+msgstr "将 fanart.tv 用于艺术图（较慢）"
 
 #: /resources/settings.xml
 msgctxt "#32023"

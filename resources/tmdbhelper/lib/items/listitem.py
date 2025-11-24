@@ -511,7 +511,7 @@ class _Tvshow(_Video):
     def watchedepisodes(self):
         if not self.totalepisodes:
             return
-        return try_int(self.infoproperties.get('watchedepisodes'), fallback=None)
+        return try_int(self.infoproperties.get('watchedepisodes'), fallback=0)
 
     @property
     def unwatchedepisodes(self):
@@ -658,6 +658,10 @@ class _Episode(_Video):
             ('episode', self.episode)
         ])
         return params
+
+    def finalise_context_menu(self):
+        self.context_menu.append(self.context_menu_choosedefault)
+        return super().finalise_context_menu()
 
         # if (self.parent_params.get('info') == 'library_nextaired'
         #         and global_setting['nextaired_linklibrary']

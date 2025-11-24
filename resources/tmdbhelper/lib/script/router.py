@@ -43,7 +43,7 @@ class Script(object):
 
         # Context Menu
         'related_lists':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.context_menu', 'related_lists')(**kwargs),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.related_lists', 'related_lists')(**kwargs),
 
         # TMDb Utils
         'sync_tmdb':
@@ -93,17 +93,17 @@ class Script(object):
 
         # Player Configuration
         'play':
-            lambda **kwargs: importmodule('tmdbhelper.lib.player.method.play', 'play_external')(**kwargs),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.play_player', 'play_player')(**kwargs),
         'play_using':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.players', 'play_using')(**kwargs),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.play_using', 'play_using')(**kwargs),
         'update_players':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.players', 'update_players')(),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.update_players', 'update_players')(),
         'set_defaultplayer':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.players', 'set_defaultplayer')(**kwargs),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.config_players', 'set_defaultplayer')(**kwargs),
         'set_chosenplayer':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.players', 'set_chosenplayer')(**kwargs),
-        'configure_players':
-            lambda **kwargs: importmodule('tmdbhelper.lib.player.configure', 'configure_players')(**kwargs),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.config_players', 'set_chosenplayer')(**kwargs),
+        'customise_players':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.config_players', 'customise_players')(),
 
         # Library Integration
         'add_to_library':
@@ -113,7 +113,7 @@ class Script(object):
         'library_autoupdate':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.library', 'run_autoupdate')(**kwargs),
         'monitor_userlist':
-            lambda **kwargs: importmodule('tmdbhelper.lib.update.userlist', 'monitor_userlist')(),
+            lambda **kwargs: importmodule('tmdbhelper.lib.update.monitor', 'MonitorUserLists')().multiselect_update(),
 
         # Window Management
         'add_path':

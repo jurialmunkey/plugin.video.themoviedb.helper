@@ -47,6 +47,7 @@ class Episode(Season):
             base_dbc.season = self.season
             base_dbc.common_apis = self.common_apis
             base_dbc.cache = self.cache
+            base_dbc.cache_refresh = self.cache_refresh
         except (TypeError, KeyError, IndexError, ValueError):
             return
         return base_dbc.data
@@ -67,6 +68,8 @@ class Episode(Season):
     def online_data_kwgs(self):
         if self.cache_refresh == 'basic':
             return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow_simple}
+        if self.cache_refresh == 'langs':
+            return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow_translation}
         return {'append_to_response': self.common_apis.tmdb_api.append_to_response}
 
     @property
@@ -114,6 +117,7 @@ class Episode(Season):
             self.return_basemeta_db('person'),
             self.return_basemeta_db('castmember'),
             self.return_basemeta_db('crewmember'),
+            self.return_basemeta_db('translation'),
             self.return_basemeta_db('unique_id'),
             self.return_basemeta_db('custom'),
             self.return_basemeta_db('art'),

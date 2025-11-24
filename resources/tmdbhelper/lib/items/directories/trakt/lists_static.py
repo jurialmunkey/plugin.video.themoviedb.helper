@@ -11,6 +11,7 @@ from tmdbhelper.lib.items.directories.trakt.mapper_static import (
 )
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
+from contextlib import suppress
 
 
 class ListTraktStaticProperties(ListTraktStandardProperties):
@@ -23,8 +24,17 @@ class ListTraktStaticProperties(ListTraktStandardProperties):
     def url(self):
         return self.request_url.format(query=self.query)
 
+    @cached_property
+    def user_profile_slug(self):
+        return self.trakt_api.profile.slug
+
+    def set_user_profile_slug(self, item):
+        with suppress(TypeError):
+            item['user_profile_slug'] = self.user_profile_slug
+        return item
+
     def get_mapped_item(self, item, add_infoproperties=None):
-        return self.item_mapper_class(item, add_infoproperties).item
+        return self.item_mapper_class(self.set_user_profile_slug(item), add_infoproperties).item
 
     @cached_property
     def plugin_category(self):
@@ -167,6 +177,7 @@ class ListTraktStaticSearch(ListTraktStaticNoCache):
     def get_items(self, *args, query=None, **kwargs):
         from xbmcgui import Dialog
         self.list_properties.query = query or Dialog().input(get_localized(32044))
+        self.parent_params['query'] = self.list_properties.query  # For next_page configuration
         return super().get_items(*args, **kwargs)
 
 

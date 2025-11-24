@@ -4,7 +4,7 @@ from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.baseclass
 
 class Art(ItemDetailsList):
     table = 'art'
-    keys = ('aspect_ratio', 'quality', 'iso_language', 'icon', 'type', 'extension', 'rating', 'votes', 'parent_id',)
+    keys = ('aspect_ratio', 'quality', 'iso_language', 'iso_country', 'icon', 'type', 'extension', 'rating', 'votes', 'parent_id',)
     conditions = 'parent_id=? ORDER BY rating DESC'  # WHERE conditions
     conflict_constraint = 'icon, type, parent_id'
 

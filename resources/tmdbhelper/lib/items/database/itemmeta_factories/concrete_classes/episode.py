@@ -9,6 +9,7 @@ class Episode(MediaItem):
         MediaItemInfoLabelItemRoutes.certification,
         MediaItemInfoLabelItemRoutes.trailer,
         MediaItemInfoLabelItemRoutes.playcount,
+        MediaItemInfoLabelItemRoutes.imdbnumber,
     )
 
     @property
@@ -48,19 +49,20 @@ class Episode(MediaItem):
 
     def get_unique_ids(self, unique_ids):
         unique_ids = super().get_unique_ids(unique_ids)
-        for i in self.return_basemeta_db('unique_id', 'season').cached_data:
-            unique_ids[f"season.{i['key']}"] = i['value']
-        for i in self.return_basemeta_db('unique_id', 'tvshow').cached_data:
-            unique_ids[f"tvshow.{i['key']}"] = i['value']
-        unique_ids['tmdb'] = unique_ids['tvshow.tmdb'] = self.parent_db_cache.tmdb_id
+        unique_ids = super().get_unique_ids(unique_ids, 'season')
+        unique_ids = super().get_unique_ids(unique_ids, 'tvshow')
         return unique_ids
 
     def get_infoproperties_custom(self, infoproperties):
         infoproperties = super().get_infoproperties_custom(infoproperties)
-        for i in self.return_basemeta_db('custom', 'tvshow').cached_data:
-            infoproperties[f"tvshow.{i['key']}"] = i['value']
-        for i in self.return_basemeta_db('custom', 'season').cached_data:
-            infoproperties[f"season.{i['key']}"] = i['value']
+        infoproperties = super().get_infoproperties_custom(infoproperties, 'tvshow')
+        infoproperties = super().get_infoproperties_custom(infoproperties, 'season')
+        return infoproperties
+
+    def get_infoproperties_translation(self, infoproperties):
+        infoproperties = super().get_infoproperties_translation(infoproperties)
+        infoproperties = super().get_infoproperties_translation(infoproperties, 'tvshow')
+        infoproperties = super().get_infoproperties_translation(infoproperties, 'season')
         return infoproperties
 
     def get_infoproperties_episode_type(self, infoproperties):
@@ -78,6 +80,7 @@ class Episode(MediaItem):
 
     def get_infoproperties_special(self, infoproperties):
         infoproperties = self.get_infoproperties_custom(infoproperties)
+        infoproperties = self.get_infoproperties_translation(infoproperties)
         infoproperties = self.get_infoproperties_episode_type(infoproperties)
         infoproperties = self.get_infoproperties_lastplayed(infoproperties)
         infoproperties = self.get_infoproperties_progress(infoproperties)

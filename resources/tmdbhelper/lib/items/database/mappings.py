@@ -126,6 +126,24 @@ class ItemMapperMethods:
         return data
 
     @staticmethod
+    def get_translations(items, **kwargs):
+        if not items:
+            return
+        results = items.get('translations')
+        if not results:
+            return
+        data = [
+            {
+                'iso_country': get_blanks_none(translation['iso_3166_1']),
+                'iso_language': get_blanks_none(translation['iso_639_1']),
+                'title': get_blanks_none(translation['data'].get('title') or translation['data'].get('name')),
+                'plot': get_blanks_none(translation['data'].get('overview')),
+                'tagline': get_blanks_none(translation['data'].get('tagline')),
+            } for translation in results
+        ]
+        return data
+
+    @staticmethod
     def get_certifications(items, **kwargs):
         if not items:
             return
@@ -665,6 +683,7 @@ class ItemMapperMethods:
                         'aspect_ratio': ItemMapperMethods.get_aspect_ratio(artwork['aspect_ratio']),
                         'quality': int((artwork['width'] * artwork['height']) // 200000),  # Quality integer to nearest fifth of a megapixel
                         'iso_language': get_blanks_none(artwork['iso_639_1']),
+                        'iso_country': get_blanks_none(artwork['iso_3166_1']),
                         'icon': get_blanks_none(path),
                         'type': get_blanks_none(artwork_type),
                         'extension': get_blanks_none(path.split('.')[-1] if path else None),
@@ -806,6 +825,10 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'release_dates': [{
                 'keys': [('certification', None)],
                 'func': self.get_certifications,
+            }],
+            'translations': [{
+                'keys': [('translation', None)],
+                'func': self.get_translations,
             }],
             'production_countries': [{
                 'keys': [('country', None)],
@@ -971,6 +994,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'service': (),
             'video': (),
             'unique_id': (),
+            'translation': (),
 
             # Dictionary mappings
             'custom': (),

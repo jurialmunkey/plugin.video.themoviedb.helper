@@ -354,26 +354,6 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="legacy_conversion" type="boolean" help="">
-                    <level>0</level>
-                    <default>false</default>
-                    <dependencies>
-                        <dependency type="visible">
-                            <condition on="property" name="InfoBool">false</condition>
-                        </dependency>
-                    </dependencies>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="update_skinshortcuts" type="boolean" help="">
-                    <level>0</level>
-                    <default>false</default>
-                    <dependencies>
-                        <dependency type="visible">
-                            <condition on="property" name="InfoBool">false</condition>
-                        </dependency>
-                    </dependencies>
-                    <control type="toggle"/>
-                </setting>
             </group>
         </category>
         <category id="api keys" label="32017" help="">
@@ -657,9 +637,9 @@
                         <data>RunScript(plugin.video.themoviedb.helper, update_players)</data>
                     </control>
                 </setting>
-                <setting id="configure_players" type="action" label="32329" help="">
+                <setting id="customise_players" type="action" label="32329" help="">
                     <level>0</level>
-                    <data>RunScript(plugin.video.themoviedb.helper, configure_players)</data>
+                    <data>RunScript(plugin.video.themoviedb.helper, customise_players)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>

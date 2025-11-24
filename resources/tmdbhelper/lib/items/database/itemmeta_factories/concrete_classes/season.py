@@ -6,6 +6,7 @@ class Season(MediaItem):
     infolabels_dbcitem_routes = (
         MediaItemInfoLabelItemRoutes.certification,
         MediaItemInfoLabelItemRoutes.trailer,
+        MediaItemInfoLabelItemRoutes.imdbnumber,
     )
 
     @property
@@ -43,19 +44,22 @@ class Season(MediaItem):
 
     def get_infoproperties_custom(self, infoproperties):
         infoproperties = super().get_infoproperties_custom(infoproperties)
-        for i in self.return_basemeta_db('custom', 'tvshow').cached_data:
-            infoproperties[f"tvshow.{i['key']}"] = i['value']
+        infoproperties = super().get_infoproperties_custom(infoproperties, 'tvshow')
+        return infoproperties
+
+    def get_infoproperties_translation(self, infoproperties):
+        infoproperties = super().get_infoproperties_translation(infoproperties)
+        infoproperties = super().get_infoproperties_translation(infoproperties, 'tvshow')
         return infoproperties
 
     def get_unique_ids(self, unique_ids):
         unique_ids = super().get_unique_ids(unique_ids)
-        for i in self.return_basemeta_db('unique_id', 'tvshow').cached_data:
-            unique_ids[f"tvshow.{i['key']}"] = i['value']
-        unique_ids['tmdb'] = unique_ids['tvshow.tmdb'] = self.parent_db_cache.tmdb_id
+        unique_ids = super().get_unique_ids(unique_ids, 'tvshow')
         return unique_ids
 
     def get_infoproperties_special(self, infoproperties):
         infoproperties = self.get_infoproperties_custom(infoproperties)
+        infoproperties = self.get_infoproperties_translation(infoproperties)
         try:
             infoproperties['totalepisodes'] = infoproperties['unwatchedepisodes'] = self.get_data_value('totalepisodes')
         except (TypeError, KeyError, IndexError):
