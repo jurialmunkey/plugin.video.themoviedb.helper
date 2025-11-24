@@ -66,7 +66,7 @@ class Certification(ItemDetailsList):
 class Video(ItemDetailsList):
     table = 'video'
     keys = tuple(VIDEO_COLUMNS.keys())
-    conditions = 'parent_id=? AND content=? ORDER BY iso_language=?, release_date DESC LIMIT 1'  # WHERE conditions
+    conditions = 'parent_id=? AND content=? ORDER BY iso_language=? DESC, release_date DESC LIMIT 1'  # WHERE conditions
     conflict_constraint = 'path, parent_id'
 
     @property
