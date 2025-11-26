@@ -451,6 +451,11 @@ class ItemMapperMethods:
             'language': self.language,
         }))
 
+        for genre in self.get_genre_items(i.get('genre_ids') or []):
+            genre = ItemMapperMethods.get_configured_item(genre, name='name', tmdb_id='tmdb_id')
+            genre['parent_id'] = item_id
+            data.append(ExtendedMap('genre', f"{item_id}.genre.{genre['tmdb_id']}", True, genre))
+
         for image_path, image_type, ratio_type in (
             ('poster_path', 'posters', 'poster'),
             ('backdrop_path', 'backdrops', 'landscape')
@@ -767,19 +772,32 @@ class ItemMapperMethods:
 
     @cached_property
     def genres_map(self):
-        return {v: k for k, v in self.tmdb_database.genres.items()}
+        genres_map = {}
+        genres_map.update(self.tmdb_database.get_genres('movie'))
+        genres_map.update(self.tmdb_database.get_genres('tv'))
+        genres_map = {v: k for k, v in genres_map.items()}
+        return genres_map
 
-    def get_genres(self, items, **kwargs):
+    def get_genre_items(self, genre_ids):
 
-        def get_genre_item(i):
+        def get_genre_item(tmdb_id):
             try:
-                tmdb_id = i['id']
                 return {'name': self.genres_map[tmdb_id], 'tmdb_id': tmdb_id}
             except (KeyError, TypeError):
                 return
 
-        genres = [j for j in (get_genre_item(i) for i in items if i) if j]
-        return ItemMapperMethods.split_array(genres, name='name', tmdb_id='tmdb_id')
+        return [j for j in (get_genre_item(i) for i in genre_ids if i) if j]
+
+    def get_genres(self, items, **kwargs):
+
+        def get_genre_id(i):
+            try:
+                return i['id']
+            except (KeyError, TypeError):
+                return
+
+        genre_items = self.get_genre_items([j for j in (get_genre_id(i) for i in items if i) if j])
+        return ItemMapperMethods.split_array(self.get_genre_items(genre_items), name='name', tmdb_id='tmdb_id')
 
 
 class BlankNoneDict(dict):
