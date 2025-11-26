@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.api.mapping import _ItemMapper
 from collections import namedtuple
 
@@ -759,6 +760,27 @@ class ItemMapperMethods:
             'extension': path.split('.')[-1] if path else None
         })]
 
+    @property
+    def tmdb_database(self):
+        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+        return FindQueriesDatabase()
+
+    @cached_property
+    def genres_map(self):
+        return {v: k for k, v in self.tmdb_database.genres.items()}
+
+    def get_genres(self, items, **kwargs):
+
+        def get_genre_item(i):
+            try:
+                tmdb_id = i['id']
+                return {'name': self.genres_map[tmdb_id], 'tmdb_id': tmdb_id}
+            except (KeyError, TypeError):
+                return
+
+        genres = [j for j in (get_genre_item(i) for i in items if i) if j]
+        return ItemMapperMethods.split_array(genres, name='name', tmdb_id='tmdb_id')
+
 
 class BlankNoneDict(dict):
     def __missing__(self, key):
@@ -812,8 +834,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             }],
             'genres': [{
                 'keys': [('genre', None)],
-                'func': self.split_array,
-                'kwargs': {'name': 'name', 'tmdb_id': 'id'}
+                'func': self.get_genres
             }],
             'content_ratings': [{
                 'keys': [('certification', None)],
