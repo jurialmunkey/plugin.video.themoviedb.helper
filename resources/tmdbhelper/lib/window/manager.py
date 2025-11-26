@@ -15,6 +15,7 @@ from tmdbhelper.lib.window.constants import (
     PREFIX_COMMAND,
     PREFIX_POSITION,
     PREFIX_CURRENT,
+    ID_VIDEOINFO,
     SV_ROUTES
 )
 from tmdbhelper.lib.addon.logger import kodi_log
@@ -255,8 +256,8 @@ class WindowManager(EventLoop):
     def close_dialog(self):
         kodi_log(f'Window Manager [ACTION] close_dialog', 2)
         window.wait_for_property(PREFIX_COMMAND, 'exit', True, poll=0.3)
-        self._call_exit()
-        self._on_exit()
+        window.wait_until_active(self.window_id, invert=True, poll=0.1)
+        window.wait_until_active(ID_VIDEOINFO, invert=True, poll=0.1)
         self.call_window()
 
     def get_playmedia_builtin(self):
