@@ -28,8 +28,6 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         SafeThread.__init__(self)
         self.cur_item = 0
         self.pre_item = 1
-        self.cur_window = 0
-        self.pre_window = 1
         self._next_refresh = 0
         self._this_refresh = 0
         self.exit = False
@@ -68,10 +66,6 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         # Skip udating if landed on a modal because we can't get underlying details
         if self.is_on_modal or self.is_on_context:
             return False
-
-        # Always refresh our artwork if window changed
-        if not self.is_same_window(update=True):
-            return True
 
         # Always refresh our artwork if the item changed
         if not self.is_same_item(update=True):

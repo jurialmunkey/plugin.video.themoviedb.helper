@@ -10,8 +10,6 @@ class BaseItemMonitor(SafeThread, ListItemInfoGetter, Poller, WindowPropertySett
         SafeThread.__init__(self)
         self.cur_item = 0
         self.pre_item = 1
-        self.cur_window = 0
-        self.pre_window = 1
         self.exit = False
         self.update_monitor = parent.update_monitor
         self._allow_on_scroll = True  # Allow updating while scrolling
@@ -23,10 +21,6 @@ class BaseItemMonitor(SafeThread, ListItemInfoGetter, Poller, WindowPropertySett
         # Skip udating if landed on a modal because we can't get underlying details
         if self.is_on_modal or self.is_on_context:
             return False
-
-        # Always refresh our info if window changed
-        if not self.is_same_window(update=True):
-            return True
 
         # Always refresh our info if the item changed
         if not self.is_same_item(update=True):
@@ -41,9 +35,11 @@ class BaseItemMonitor(SafeThread, ListItemInfoGetter, Poller, WindowPropertySett
     def update_baseitem(self, forced=False):
         if self.get_monitor_container():
             return
+
         self.setup_current_container()
         if not forced and not self.is_next_refresh():
             return
+
         for k, v in self.baseitem_properties.items():
             self.get_property(f'ListItem.{k}', set_property=v, clear_property=(v is None))
 
