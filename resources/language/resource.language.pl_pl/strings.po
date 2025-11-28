@@ -7,13 +7,13 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-07-28 06:00+0200\n"
-"Last-Translator: 3vtv <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2025-11-24 06:00+0200\n"
+"Last-Translator: 3vtv\n"
 "Language-Team: POLISH\n"
+"Language: pl_PL\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: pl_PL\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
 msgctxt "#30000"
@@ -299,7 +299,7 @@ msgstr "Domyślne playery"
 #: /resources/settings.xml
 msgctxt "#32034"
 msgid "Get watched indicators and episode counts"
-msgstr "Pobierz statusy obejrzenia i liczniki odcinków"
+msgstr "Pobierz statusy obejrzenia i licznik odcinków"
 
 #: /resources/settings.xml
 msgctxt "#32037"
@@ -329,7 +329,7 @@ msgstr "Oglądający"
 #: /resources/settings.xml
 msgctxt "#32038"
 msgid "Get additional details from the local Kodi library database"
-msgstr "Pobierz dod. informacje z bazy danych biblioteki Kodi"
+msgstr "Pobierz dodatkowe informacje z bazy danych biblioteki Kodi"
 
 #: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
 msgctxt "#32067"
@@ -714,6 +714,26 @@ msgstr "Usuń rozwiązanie zastępcze"
 msgctxt "#32117"
 msgid "Keyword"
 msgstr "Słowo kluczowe"
+
+#: /resources/tmdbhelper/lib/player/players.py
+msgctxt "#32143"
+msgid "Recaching Kodi library"
+msgstr "Odbudowa pamięci podręcznej biblioteki Kodi"
+
+#: /resources/tmdbhelper/lib/player/players.py
+msgctxt "#32144"
+msgid "Retrieving player files"
+msgstr "Pobieranie plików playera"
+
+#: /resources/tmdbhelper/lib/player/dialog/player.py
+msgctxt "#32145"
+msgid "Retrieving library"
+msgstr "Pobieranie biblioteki"
+
+#: /resources/tmdbhelper/lib/api/trakt/sync/invalidator.py
+msgctxt "#32146"
+msgid "Successfully refreshed {} sync data"
+msgstr "Dane synchronizacji {} zostały pomyślnie odświeżone"
 
 #: /resources/lib/container.py
 msgctxt "#32119"
@@ -1813,18 +1833,18 @@ msgstr "Ogranicz do streamów biblioteki"
 
 #: /resources/lib/player/players.py
 msgctxt "#32374"
-msgid "Constructing Players"
+msgid "Constructing players"
 msgstr "Tworzę playery"
 
 #: /resources/lib/player/players.py
 msgctxt "#32375"
-msgid "Retrieving Item Details"
+msgid "Retrieving item details"
 msgstr "Pobieram informacje dla pozycji"
 
 #: /resources/lib/player/players.py
 msgctxt "#32376"
-msgid "Building Player Dialog"
-msgstr "Tworzę okno dialogowe playera"
+msgid "Building players dialog"
+msgstr "Tworzę okno dialogowe playerów"
 
 #: /resources/settings.xml
 msgctxt "#32378"
