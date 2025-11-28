@@ -363,6 +363,12 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.previous_poster = None
         self.previous_fanart = None
 
+    def on_fullscreen(self):
+        if not self.player_monitor.isPlayingVideo():
+            return
+        self.player_monitor.update_time()
+        self.player_monitor.update_artwork()
+
     def get_playingitem(self):
         # Check that video other than dummy splash video is playing
         if self.getPlayingFile() and self.getPlayingFile().endswith('dummy.mp4'):
