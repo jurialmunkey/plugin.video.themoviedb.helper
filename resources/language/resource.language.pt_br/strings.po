@@ -849,7 +849,7 @@ msgstr "[B]{}[/B] pelo usuário [B]{}[/B]"
 #: /resources/settings.xml
 msgctxt "#32169"
 msgid "Logout of Trakt account..."
-msgstr "Sair da conta Trakt...""
+msgstr "Sair da conta Trakt..."
 
 #: /resources/lib/libraryupdate.py
 msgctxt "#32170"
@@ -2268,7 +2268,7 @@ msgstr "Reprodutor padrão apagado com sucesso para {}"
 #: /resources/lib/items/listitem.py
 msgctxt "#32476"
 msgid "Choose default player"
-msgstr "Escolha o reprodutor padrão""
+msgstr "Escolha o reprodutor padrão"
 
 #: /resources/lib/script/method.py
 msgctxt "#32477"
