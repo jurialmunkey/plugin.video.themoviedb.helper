@@ -100,12 +100,19 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
 
         if not forced and not self.is_next_refresh():
             return
+
         self._this_refresh = 0
         self._next_refresh = 0
-        return self.get_image_manipulations(
+
+        update_artwork = self.get_image_manipulations(
             use_winprops=True,
             built_artwork=self.remote_artwork.get(self.pre_item),
             allow_list=self._allow_list)
+
+        for k, v in self.baseitem_properties.items():
+            self.get_property(f'ListItem.{k}', set_property=v, clear_property=(v is None))
+
+        return update_artwork
 
     def _on_listitem(self):
         self.on_listitem()

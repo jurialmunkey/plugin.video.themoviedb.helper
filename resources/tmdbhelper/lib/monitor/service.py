@@ -1,7 +1,6 @@
 from tmdbhelper.lib.addon.plugin import get_setting
 from jurialmunkey.window import get_property, wait_for_property
 from tmdbhelper.lib.monitor.listitemtools import ListItemMonitorFunctions
-from tmdbhelper.lib.monitor.basemon import BaseItemMonitor
 from tmdbhelper.lib.monitor.cronjob import CronJobMonitor
 from tmdbhelper.lib.monitor.player import PlayerMonitor
 from tmdbhelper.lib.monitor.update import UpdateMonitor
@@ -24,7 +23,6 @@ class ServiceMonitor(Poller):
 
         self.run_cron_job()
         self.run_images_monitor()
-        self.run_baseitem_monitor()
 
         self.listitem_funcs = ListItemMonitorFunctions(self)
 
@@ -42,11 +40,6 @@ class ServiceMonitor(Poller):
         self.images_monitor.setName('Image Thread')
         self.images_monitor.start()
 
-    def run_baseitem_monitor(self):
-        self.baseitem_monitor = BaseItemMonitor(self)
-        self.baseitem_monitor.setName('BaseItem Thread')
-        self.baseitem_monitor.start()
-
     def _on_listitem(self):
         self.listitem_funcs.on_listitem()
         self._on_idle(POLL_MIN_INCREMENT)
@@ -55,10 +48,9 @@ class ServiceMonitor(Poller):
         self.listitem_funcs.on_scroll()
         self._on_idle(POLL_MIN_INCREMENT)
 
-    def _on_player(self):
-        if self.player_monitor.isPlayingVideo():
-            self.player_monitor.update_time()
-            self.player_monitor.update_artwork()
+    def _on_fullscreen(self):
+        self.player_monitor.on_fullscreen()
+        self._on_idle(POLL_MID_INCREMENT)
 
     def _on_context(self):
         self.listitem_funcs.on_context_listitem()
@@ -79,10 +71,6 @@ class ServiceMonitor(Poller):
             pass
         try:
             self.images_monitor.exit = True
-        except AttributeError:
-            pass
-        try:
-            self.baseitem_monitor.exit = True
         except AttributeError:
             pass
         if not self.update_monitor.abortRequested():
