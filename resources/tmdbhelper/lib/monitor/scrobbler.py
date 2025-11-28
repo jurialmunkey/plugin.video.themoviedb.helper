@@ -108,7 +108,7 @@ class PlayerScrobbler():
     @is_scrobbling
     @is_trakt_authorized
     def trakt_scrobbling(self, method):
-        if method not in ('start', 'pause', 'stop'):
+        if method not in ('start', 'stop'):
             return
         self.trakt_item['progress'] = self.progress
         self.trakt_api.get_api_request(
@@ -122,7 +122,7 @@ class PlayerScrobbler():
     def start(self, tmdb_type, tmdb_id):
         if not self.is_match(tmdb_type, tmdb_id):
             return self.stop(tmdb_type, tmdb_id)
-        kodi_log(f'SCROBBLER: [Start] {self.content_id}', 2)
+        kodi_log(f'SCROBBLER: [Start] {self.content_id} -- {self.progress:.2f}%', 2)
         self.trakt_scrobbling('start')
         self.started = True
 
@@ -130,14 +130,14 @@ class PlayerScrobbler():
     def pause(self, tmdb_type, tmdb_id):
         if not self.is_match(tmdb_type, tmdb_id):
             return self.stop(tmdb_type, tmdb_id)
-        kodi_log(f'SCROBBLER: [Pause] {self.content_id}', 2)
-        self.trakt_scrobbling('pause')
+        kodi_log(f'SCROBBLER: [Pause] {self.content_id} -- {self.progress:.2f}%', 2)
+        self.trakt_scrobbling('stop')  # Trakt no longer supports pause method now bundled in stop method
 
     @is_scrobbling
     def stop(self, tmdb_type, tmdb_id):
         if not self.started:
             return
-        kodi_log(f'SCROBBLER: [Stop] {self.content_id}', 2)
+        kodi_log(f'SCROBBLER: [Stop] {self.content_id} -- {self.progress:.2f}%', 2)
         self.trakt_scrobbling('stop')
         self.set_kodi_watched()
         self.set_tmdb_ratings()

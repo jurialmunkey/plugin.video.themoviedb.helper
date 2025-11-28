@@ -223,20 +223,25 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
     def scrobbler_start(self):
         if not self.scrobbler:
             return
+        self.scrobbler_update()
         self.scrobbler.start(self.tmdb_type, self.tmdb_id)
 
     def scrobbler_pause(self):
         if not self.scrobbler:
             return
+        self.scrobbler_update()
         self.scrobbler.pause(self.tmdb_type, self.tmdb_id)
 
     def scrobbler_stop(self):
         if not self.scrobbler:
             return
+        self.scrobbler_update()
         self.scrobbler.stop(self.tmdb_type, self.tmdb_id)
 
-    def update_time(self):
+    def scrobbler_update(self):
         if not self.scrobbler:
+            return
+        if not self.isPlayingVideo():
             return
         self.scrobbler.update_time(self.tmdb_type, self.tmdb_id, self.getTime())
 
@@ -364,10 +369,7 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.previous_fanart = None
 
     def on_fullscreen(self):
-        if not self.player_monitor.isPlayingVideo():
-            return
-        self.player_monitor.update_time()
-        self.player_monitor.update_artwork()
+        self.scrobbler_update()
 
     def get_playingitem(self):
         # Check that video other than dummy splash video is playing
