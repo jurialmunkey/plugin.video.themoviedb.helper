@@ -93,7 +93,7 @@ class Poller(WindowChecker):
         return
 
     def _on_fullscreen(self):
-        return
+        self._on_idle(POLL_MID_INCREMENT)
 
     @property
     def is_on_fullscreen(self):
