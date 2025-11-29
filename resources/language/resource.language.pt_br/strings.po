@@ -829,7 +829,7 @@ msgctxt "#32164"
 msgid "Adding Trakt lists to library is limited to [B]{}[/B] TV Shows and [B]{}[/B] Movies per list.\n"
 "This limit is set to ensure that the APIs providing data for free are respected."
 msgstr "A adição de listas do Trakt à biblioteca é limitada a [B]{}[/B] programas de TV e [B]{}[/B] filmes por lista.\n"
-“Esse limite é definido para garantir que as APIs que fornecem dados gratuitamente sejam respeitadas."
+"Esse limite é definido para garantir que as APIs que fornecem dados gratuitamente sejam respeitadas."
 
 #: /resources/lib/context.py
 msgctxt "#32166"
