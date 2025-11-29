@@ -1,4 +1,4 @@
-from xbmc import Player
+from xbmc import Player, Monitor
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.monitor.images import ImageFunctions
 from tmdbhelper.lib.monitor.common import CommonMonitorFunctions
@@ -208,6 +208,24 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
 
     def onPlayBackResumed(self):
         self.scrobbler_start()
+
+    def onPlayBackSeek(self, *args, **kwargs):
+        self.wait_for_seek()
+        self.scrobbler_start()
+
+    def onPlayBackSeekChapter(self, *args, **kwargs):
+        self.wait_for_seek()
+        self.scrobbler_start()
+
+    def wait_for_seek(self):
+        monitor = Monitor()
+        monitor.waitForAbort(1)
+        while (
+            get_condvisibility("Player.Seeking")
+            and not monitor.abortRequested()
+        ):
+            monitor.waitForAbort(1)
+        del monitor
 
     def reset_player_item(self):
         self.player_item = PlayerItem(self)
