@@ -2747,7 +2747,32 @@ msgstr "حدد الإجراء الافتراضي في الإضافة"
 msgctxt "#32024"
 msgid "Default player for movies"
 msgstr "المشغل الافتراضي للأفلام"
+
 #: /resources/settings.xml
 msgctxt "#32025"
 msgid "Default player for episodes"
 msgstr "المشغل الافتراضي للحلقات"
+
+msgctxt "#32147"
+msgid "Gemini API"
+msgstr "مفتاح API GEMINI"
+
+#: /resources/settings.xml
+msgctxt "#32148"
+msgid "Gemini API key"
+msgstr "مفتاح API GEMINI"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_main.py
+msgctxt "#32149"
+msgid "Gemini AI"
+msgstr "الذكاء الاصطناعي Gemini "
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
+msgctxt "#32150"
+msgid "Google Gemini AI requires a developer API key to use."
+msgstr "للاستخدام يجب ادخال مفتاح API"
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
+msgctxt "#32151"
+msgid "قم بزيارة [B]{}[/B] لإنشاء مفتاحك ثم أدخله في إعدادات TMDbHelper ضمن قسم مفاتيح API."
+msgstr "قم بزيارة [B]{}[/B] "
