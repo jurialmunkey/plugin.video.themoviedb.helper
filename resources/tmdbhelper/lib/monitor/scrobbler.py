@@ -142,9 +142,6 @@ class PlayerScrobbler():
         self.set_kodi_watched()
         self.set_tmdb_ratings()
         self.update_stats()
-        # TODO: Decide if we allow further scrobbling of item if restarted after stopped
-        # if self.is_match(tmdb_type, tmdb_id):
-        #     return
         self.stopped = True
 
     @is_scrobbling
@@ -163,8 +160,8 @@ class PlayerScrobbler():
             return
         if not self.current_time:
             return
-        # Only update if progress is 75% or more
-        if self.progress < 75:
+        # Only update if progress is 80% or more
+        if self.progress < 80:
             return
         if self.content_id == get_property('Scrobbler.LastRated.ContentID'):
             return
@@ -183,8 +180,8 @@ class PlayerScrobbler():
     def set_kodi_watched(self):
         if not self.current_time:
             return
-        # Only update if progress is 75% or more
-        if self.progress < 75:
+        # Only update if progress is 80% or more
+        if self.progress < 80:
             return
 
         import tmdbhelper.lib.api.kodi.rpc as rpc
