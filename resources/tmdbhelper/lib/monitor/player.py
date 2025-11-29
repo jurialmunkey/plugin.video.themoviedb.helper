@@ -217,9 +217,9 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.wait_for_seek()
         self.scrobbler_start()
 
-    def wait_for_seek(self):
+    def wait_for_seek(self, offset=1):
         monitor = Monitor()
-        monitor.waitForAbort(1)
+        monitor.waitForAbort(offset)
         while (
             get_condvisibility("Player.Seeking")
             and not monitor.abortRequested()
@@ -433,5 +433,6 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         # Update our properties
         self.set_properties(self.details)
 
-        # Start Trakt trakt_scrobbling
+        # Start Trakt trakt_scrobbling. Wait for seek in case of resuming.
+        self.wait_for_seek(10)
         self.scrobbler_start()
