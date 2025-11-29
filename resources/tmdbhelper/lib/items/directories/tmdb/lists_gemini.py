@@ -25,12 +25,12 @@ class ListGemini(ContainerDefaultCacheDirectory):
 
     @ItemCache('ItemContainer.db')
     def get_cached_response(self):
-        return self.get_prompt()
+        return self.get_prompt_items()
 
-    def get_prompt(self):
+    def get_prompt_items(self):
         from tmdbhelper.lib.addon.dialog import BusyDialog
         with BusyDialog():
-            data = self.gemini.get_prompt(self.query)
+            data = self.gemini.get_prompt_items(self.query)
         return data
 
     def get_items(self, query=None, **kwargs):

@@ -118,6 +118,10 @@ class Gemini(RequestAPI):
         if not data:
             return
         data = self.get_json_from_candidate(data)
+        return data
+
+    def get_prompt_items(self, prompt_text):
+        data = self.get_prompt(prompt_text)
         if not data:
             return
         data = self.get_tmdb_items(data)
@@ -173,12 +177,18 @@ class Gemini(RequestAPI):
         return item
 
     def get_tmdb_items(self, data):
+
         try:
             data = data['recommendations']
         except (TypeError, KeyError):
             kodi_log(f'Gemini Recs FAILED: Unable to locate recommendations data', 1)
             return
-        return [j for j in (self.get_tmdb_item(i) for i in data) if j]
+
+        from tmdbhelper.lib.addon.thread import ParallelThread
+        with ParallelThread(data, self.get_tmdb_item) as pt:
+            items = pt.queue
+
+        return [i for i in items if i]
 
     @staticmethod
     def get_candidates(data):
