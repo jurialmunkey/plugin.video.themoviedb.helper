@@ -17,6 +17,8 @@ class PlayerScrobbler():
         self.episode = int(self.playerstring.get('episode') or 0)
         self.stopped = False
         self.started = False
+        self.syncing = False
+        self.pausing = False
 
     def playerstring_get_tmdb_type(self):
         tmdb_type = self.playerstring.get('tmdb_type')
@@ -108,7 +110,7 @@ class PlayerScrobbler():
     @is_scrobbling
     @is_trakt_authorized
     def trakt_scrobbling(self, method):
-        if method not in ('start', 'pause', 'stop'):
+        if method not in ('start', 'stop'):
             return
         self.trakt_item['progress'] = self.progress
         self.trakt_api.get_api_request(
@@ -122,30 +124,57 @@ class PlayerScrobbler():
     def start(self, tmdb_type, tmdb_id):
         if not self.is_match(tmdb_type, tmdb_id):
             return self.stop(tmdb_type, tmdb_id)
-        kodi_log(f'SCROBBLER: [Start] {self.content_id}', 2)
+        kodi_log(f'SCROBBLER: [Start] {self.content_id} -- {self.progress:.2f}%', 2)
         self.trakt_scrobbling('start')
         self.started = True
+        self.pausing = False
 
     @is_scrobbling
     def pause(self, tmdb_type, tmdb_id):
         if not self.is_match(tmdb_type, tmdb_id):
             return self.stop(tmdb_type, tmdb_id)
-        kodi_log(f'SCROBBLER: [Pause] {self.content_id}', 2)
-        self.trakt_scrobbling('pause')
+        kodi_log(f'SCROBBLER: [Pause] {self.content_id} -- {self.progress:.2f}%', 2)
+        self.trakt_scrobbling('stop') if not self.pausing else None  # Trakt no longer supports pause method now bundled in stop method
+        self.pausing = True
 
     @is_scrobbling
     def stop(self, tmdb_type, tmdb_id):
         if not self.started:
             return
-        kodi_log(f'SCROBBLER: [Stop] {self.content_id}', 2)
-        self.trakt_scrobbling('stop')
+        kodi_log(f'SCROBBLER: [Stop] {self.content_id} -- {self.progress:.2f}%', 2)
+        self.trakt_scrobbling('stop') if not self.pausing else None
         self.set_kodi_watched()
         self.set_tmdb_ratings()
         self.update_stats()
-        # TODO: Decide if we allow further scrobbling of item if restarted after stopped
-        # if self.is_match(tmdb_type, tmdb_id):
-        #     return
         self.stopped = True
+
+    @is_scrobbling
+    @is_trakt_authorized
+    def sync(self, tmdb_type, tmdb_id):
+        if self.syncing:
+            return
+        if not self.started:
+            return
+        if self.progress < 80:
+            return
+        if not self.is_match(tmdb_type, tmdb_id):
+            return
+        kodi_log(f'SCROBBLER: [Sync] {self.content_id} -- {self.progress:.2f}%', 2)
+        self.syncing = True  # We don't ever unset this flag as we only want to sync once after reaching 80%
+        self.trakt_scrobbling('start') if self.pausing else None  # If we previously paused we need to unpause before send stop scrobble to avoid 409 error
+        self.trakt_scrobbling('stop')
+        self.pausing = True
+        from tmdbhelper.lib.api.trakt.sync.invalidator import SyncInvalidator
+        sync_invalidator = SyncInvalidator('watchedprogress')
+        sync_invalidator.notification = False
+        sync_invalidator.run(sync=True)
+        if self.stopped:
+            return
+        if not self.is_match(tmdb_type, tmdb_id):  # Possibly playback stopped or switched to another item in iterim so check to avoid restarting scrobble
+            self.stopped = True
+            return
+        self.trakt_scrobbling('start')
+        self.pausing = False
 
     @is_scrobbling
     @is_trakt_authorized
@@ -163,8 +192,8 @@ class PlayerScrobbler():
             return
         if not self.current_time:
             return
-        # Only update if progress is 75% or more
-        if self.progress < 75:
+        # Only update if progress is 80% or more
+        if self.progress < 80:
             return
         if self.content_id == get_property('Scrobbler.LastRated.ContentID'):
             return
@@ -183,8 +212,8 @@ class PlayerScrobbler():
     def set_kodi_watched(self):
         if not self.current_time:
             return
-        # Only update if progress is 75% or more
-        if self.progress < 75:
+        # Only update if progress is 80% or more
+        if self.progress < 80:
             return
 
         import tmdbhelper.lib.api.kodi.rpc as rpc

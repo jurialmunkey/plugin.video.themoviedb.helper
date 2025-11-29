@@ -108,6 +108,9 @@ ROUTE_NOID = {
     'search': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_search',
         'import_attr': 'ListSearch'}},
+    'gemini': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_gemini',
+        'import_attr': 'ListGemini'}},
     'dir_discover': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_discover',
         'import_attr': 'ListDiscoverDir'}},

@@ -407,7 +407,19 @@
                     </control>
                 </setting>
             </group>
-            <group id="4" label="32030">
+            <group id="4" label="32147">
+                <setting id="gemini_apikey" type="string" label="32148" help="">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>32148</heading>
+                    </control>
+                </setting>
+            </group>
+            <group id="5" label="32030">
                 <setting id="fanarttv_clientkey" type="string" label="32019" help="">
                     <level>0</level>
                     <default/>
@@ -447,7 +459,7 @@
                     <enable>false</enable>
                 </setting>
             </group>
-            <group id="5" label="32484">
+            <group id="6" label="32484">
                 <visible>false</visible>
                 <setting id="tvdb_token" type="string" label="32011" help="">
                     <level>0</level>
@@ -472,7 +484,7 @@
                     <enable>false</enable>
                 </setting>
             </group>
-            <group id="6" label="32520">
+            <group id="7" label="32520">
                 <visible>false</visible>
                 <setting id="tmdb_user_token" type="string" label="32011" help="">
                     <level>0</level>

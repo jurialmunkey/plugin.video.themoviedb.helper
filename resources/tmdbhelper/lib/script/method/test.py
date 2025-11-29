@@ -143,6 +143,12 @@ def test_func(test_func, dialog_output=False, **kwargs):
         head = path
         return finalise(head, data)
 
+    def test_func_gemini(prompt, **kwargs):
+        from tmdbhelper.lib.api.gemini.api import Gemini
+        data = Gemini().get_prompt(prompt)
+        head = prompt
+        return finalise(head, data)
+
     routes = {
         'response': test_func_response,
         'trakt_response': test_func_trakt_response,
@@ -159,6 +165,7 @@ def test_func(test_func, dialog_output=False, **kwargs):
         'jrpc': test_func_jrpc,
         'jrpc_directory': test_func_jrpc_directory,
         'trakt_auth': test_func_trakt_auth,
+        'gemini': test_func_gemini,
     }
 
     return routes[test_func](**kwargs)

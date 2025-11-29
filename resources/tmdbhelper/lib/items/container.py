@@ -343,7 +343,7 @@ class ContainerDirectory(ContainerDirectoryCommon):
         if li.infoproperties.get('label_affix'):
             li.label = f"{li.infoproperties['label_affix']}. {li.label}"
         if li.infoproperties.get('plot_affix'):
-            li.infolabels['plot'] = f"{li.infoproperties['plot_affix']}. {li.infolabels.get('plot')}"
+            li.infolabels['plot'] = f"{li.infoproperties['plot_affix']}{li.infolabels.get('plot')}"
         return li
 
     def build_detailed_items(self, items):

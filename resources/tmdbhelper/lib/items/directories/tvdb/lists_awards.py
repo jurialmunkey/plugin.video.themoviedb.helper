@@ -29,7 +29,7 @@ class ListAwardCategory(ListListItems):
         item['infoproperties']['award_category_id'] = award_category_id
         item['infoproperties']['award_type'] = award_type
         item['infoproperties']['award_type_id'] = award_type_id
-        item['infoproperties']['plot_affix'] = f"{get_localized(32461) if i.get('isWinner') else get_localized(32462)} {award_category} {i.get('year')}"
+        item['infoproperties']['plot_affix'] = f"{get_localized(32461) if i.get('isWinner') else get_localized(32462)} {award_category} {i.get('year')}[CR]"
         return item
 
     def get_items(self, info, tvdb_id, page=1, **kwargs):

@@ -28,8 +28,6 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         SafeThread.__init__(self)
         self.cur_item = 0
         self.pre_item = 1
-        self.cur_window = 0
-        self.pre_window = 1
         self._next_refresh = 0
         self._this_refresh = 0
         self.exit = False
@@ -69,10 +67,6 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         if self.is_on_modal or self.is_on_context:
             return False
 
-        # Always refresh our artwork if window changed
-        if not self.is_same_window(update=True):
-            return True
-
         # Always refresh our artwork if the item changed
         if not self.is_same_item(update=True):
             return True
@@ -106,12 +100,19 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
 
         if not forced and not self.is_next_refresh():
             return
+
         self._this_refresh = 0
         self._next_refresh = 0
-        return self.get_image_manipulations(
+
+        update_artwork = self.get_image_manipulations(
             use_winprops=True,
             built_artwork=self.remote_artwork.get(self.pre_item),
             allow_list=self._allow_list)
+
+        for k, v in self.baseitem_properties.items():
+            self.get_property(f'ListItem.{k}', set_property=v, clear_property=(v is None))
+
+        return update_artwork
 
     def _on_listitem(self):
         self.on_listitem()

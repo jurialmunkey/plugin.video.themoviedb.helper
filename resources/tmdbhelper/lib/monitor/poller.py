@@ -92,18 +92,18 @@ class Poller(WindowChecker):
     def _on_exit(self):
         return
 
-    def _on_player(self):
-        return
-
     def _on_fullscreen(self):
-        self._on_player()
-        if self.is_current_window_xml(WINDOW_XML_INFODIALOG) or get_condvisibility(CV_FULLSCREEN_LISTITEM):
-            return self._on_listitem()
         self._on_idle(POLL_MID_INCREMENT)
 
     @property
     def is_on_fullscreen(self):
-        return self.is_current_window_xml(WINDOW_XML_FULLSCREEN)
+        if not self.is_current_window_xml(WINDOW_XML_FULLSCREEN):
+            return False
+        if self.is_current_window_xml(WINDOW_XML_INFODIALOG):
+            return False
+        if get_condvisibility(CV_FULLSCREEN_LISTITEM):
+            return False
+        return True
 
     @property
     def is_on_disabled(self):

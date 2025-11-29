@@ -80,6 +80,13 @@ class BaseDirItemMainMDbList(BaseDirItemMainMovie):
     art_icon = 'resources/icons/mdblist/mdblist.png'
 
 
+class BaseDirItemMainGemini(BaseDirItemMainMovie):
+    priority = 205
+    label_localized = 32149
+    params = {'info': 'gemini'}
+    art_icon = 'resources/icons/gemini/gemini.png'
+
+
 class BaseDirItemMain(BaseDirItemMainMovie):
     priority = 210
     label = 'Nodes'
