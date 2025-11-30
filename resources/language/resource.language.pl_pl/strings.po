@@ -735,6 +735,31 @@ msgctxt "#32146"
 msgid "Successfully refreshed {} sync data"
 msgstr "Dane synchronizacji {} zostały pomyślnie odświeżone"
 
+#: /resources/settings.xml
+msgctxt "#32147"
+msgid "Gemini API"
+msgstr "Gemini API"
+
+#: /resources/settings.xml
+msgctxt "#32148"
+msgid "Gemini API key"
+msgstr "Klucz API Gemini"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_main.py
+msgctxt "#32149"
+msgid "Gemini AI"
+msgstr "Gemini AI"
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
+msgctxt "#32150"
+msgid "Google Gemini AI requires a developer API key to use."
+msgstr "Google Gemini AI wymaga do działania klucza API dewelopera."
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
+msgctxt "#32151"
+msgid "Visit [B]{}[/B] to generate your key and then input into TMDbHelper settings under the API keys section."
+msgstr "Odwiedź [B]{}[/B], aby wygenerować swój klucz, a następnie wprowadź go w ustawieniach TMDbHelper w sekcji kluczy API."
+
 #: /resources/lib/container.py
 msgctxt "#32119"
 msgid "Select Release Types"
