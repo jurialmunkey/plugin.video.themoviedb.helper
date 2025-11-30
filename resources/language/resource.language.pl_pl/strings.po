@@ -738,12 +738,12 @@ msgstr "Dane synchronizacji {} zostały pomyślnie odświeżone"
 #: /resources/settings.xml
 msgctxt "#32147"
 msgid "Gemini API"
-msgstr "Gemini API"
+msgstr "API Gemini"
 
 #: /resources/settings.xml
 msgctxt "#32148"
 msgid "Gemini API key"
-msgstr "Klucz API Gemini"
+msgstr "Klucz API Gemini AI"
 
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_main.py
 msgctxt "#32149"
