@@ -74,6 +74,8 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'authenticate_trakt')(**kwargs),
         'revoke_trakt':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'revoke_trakt')(**kwargs),
+        'trakt_discover':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.discover.trakt', 'trakt_discover')(),
 
         # Modify Functions
         'modify_identifier':
