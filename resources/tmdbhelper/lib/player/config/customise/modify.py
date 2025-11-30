@@ -89,8 +89,8 @@ class PlayerCustomiseModifyItem:
         self.set_metadata('is_resolvable', 'false' if self.dialog_item.is_resolvable else 'true')
 
     def set_makeplaylist(self):
-        x = Dialog().yesnocustom(get_localized(32424), get_localized(32425), customlabel=get_localized(32447))
-        self.set_metadata('make_playlist', ('false', 'true', 'upnext')[x] if x != -1 else None)
+        x = Dialog().yesno(get_localized(32424), get_localized(32425))
+        self.set_metadata('make_playlist', ('false', 'true')[x] if x != -1 else None)
 
     def set_fallback(self):
         self.set_metadata('fallback', PlayerCustomiseSelectFallback(self.dialog_item).fallback)

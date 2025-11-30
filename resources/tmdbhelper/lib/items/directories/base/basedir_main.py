@@ -66,6 +66,13 @@ class BaseDirItemMainTrakt(BaseDirItemMainMovie):
     art_icon = 'resources/trakt.png'
 
 
+class BaseDirItemMainTraktDiscover(BaseDirItemMainMovie):
+    priority = 185
+    label = 'Trakt Discover'
+    params = {'info': 'dir_trakt_discover'}
+    art_icon = 'resources/trakt.png'
+
+
 class BaseDirItemMainTVDb(BaseDirItemMainMovie):
     priority = 190
     label = 'TVDb'
