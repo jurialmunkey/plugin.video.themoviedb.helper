@@ -760,6 +760,11 @@ msgctxt "#32151"
 msgid "Visit [B]{}[/B] to generate your key and then input into TMDbHelper settings under the API keys section."
 msgstr "Odwiedź [B]{}[/B], aby wygenerować swój klucz, a następnie wprowadź go w ustawieniach TMDbHelper w sekcji kluczy API."
 
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_nodes.py
+msgctxt "#32152"
+msgid "Remove node"
+msgstr "Usuń węzeł"
+
 #: /resources/lib/container.py
 msgctxt "#32119"
 msgid "Select Release Types"
@@ -2374,8 +2379,8 @@ msgstr "Usuń z Ulubionych"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32492"
-msgid "{} already exists in {}!\\nDo you wish to remove this item from the list?"
-msgstr "{} już istnieje w {}!\\nCzy chcesz usunąć tę pozycję z listy?"
+msgid "{} already exists in {}!"
+msgstr "{} już istnieje w {}!"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32493"
@@ -2394,8 +2399,8 @@ msgstr "Utwórz nowy węzeł"
 
 #: /resources/tmdbhelper/lib/items/container.py
 msgctxt "#32496"
-msgid "Add/Remove as Custom Node"
-msgstr "Dodaj/usuń jako węzeł"
+msgid "Add node"
+msgstr "Dodaj węzeł"
 
 #: /resources/settings.xml
 msgctxt "#32497"
