@@ -11,6 +11,13 @@ class ListItemInfoGetter(BaseItemInfoGetter):
     def get_cur_item(self):
         return self._item.get_identifier()
 
+    def get_cur_path(self):
+        return (
+            self._item.infolabel_folderpath
+            or self._item.infolabel_filenameandpath
+            or self._item.infolabel_path
+        )
+
     # ==================
     # COMPARISON METHODS
     # ==================
@@ -28,6 +35,13 @@ class ListItemInfoGetter(BaseItemInfoGetter):
             return self.cur_window
         if update:
             self.pre_window = self.cur_window
+
+    def is_same_base_window(self, update=True):
+        self.cur_base_window = self.get_cur_base_window()
+        if self.cur_base_window == self.pre_base_window:
+            return self.cur_base_window
+        if update:
+            self.pre_base_window = self.cur_base_window
 
     # ================
     # SETUP PROPERTIES
