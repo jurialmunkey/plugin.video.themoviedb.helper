@@ -133,7 +133,6 @@ class ListBaseDir(ContainerDirectory):
             'dir_trakt_genre': lambda: BaseDirList(trakt_genre=kwargs.get('genre')).build_basedir(kwargs.get('tmdb_type')),
             'dir_tmdb_v4': lambda: BaseDirList(tmdb_v4=True).build_basedir(),
             'dir_settings': lambda: ADDON.openSettings(),
-            'dir_trakt_discover': lambda: executebuiltin('RunScript(plugin.video.themoviedb.helper,trakt_discover)')
         }
         func = route.get(info, lambda: BaseDirList(main=True).build_basedir())
         return func()

@@ -1,4 +1,4 @@
-from tmdbhelper.lib.addon.plugin import get_localized, get_condvisibility, executebuiltin, ADDONPATH
+from tmdbhelper.lib.addon.plugin import get_localized, executebuiltin, ADDONPATH
 from jurialmunkey.ftools import cached_property
 from collections import namedtuple
 from xbmcgui import Dialog, WindowXMLDialog, ListItem, INPUT_NUMERIC
@@ -277,16 +277,23 @@ class TraktDiscoverMetaRatings(TraktDiscoverTMDbRatings):
 class TraktDiscoverBrowse(TraktDiscoverMenu):
 
     label_prefix_localized = 1024
+    file = 'Trakt Discover.json'
+    name = 'Browse'
 
-    @property
-    def command(self):
-        if get_condvisibility('Window.IsVisible(MyVideoNav.xml)'):
-            return f'Container.Update({self.main.url})'
-        return f'ActivateWindow(videos,{self.main.url},return)'
+    def save(self):
+        from tmdbhelper.lib.script.method.nodes import TMDbNode
+        make_node = TMDbNode(name=self.name, path=self.main.url)
+        make_node.notification = False
+        make_node.overwrite = True
+        make_node.file = self.file
+        make_node.add()
 
     def menu(self):
+        self.save()
+        self.main.data['path'] = self.main.url
+        self.main.data['file'] = self.file
+        self.main.data['name'] = self.name
         self.main.close()
-        executebuiltin(self.command)
 
 
 class TraktDiscoverReset(TraktDiscoverMenu):
@@ -303,6 +310,10 @@ class TraktDiscover(WindowXMLDialog):
     label = 'Trakt Discover'
     ACTION_SELECT = (7, 100, )
     ACTION_CLOSEWINDOW = (9, 10, 92, 216, 247, 257, 275, 61467, 61448,)
+
+    @cached_property
+    def data(self):
+        return {}
 
     @property
     def url(self):
@@ -385,5 +396,8 @@ class TraktDiscover(WindowXMLDialog):
 
 
 def trakt_discover():
+    trakt_discover_data = {}
     trakt_discover = TraktDiscover('DialogSelect.xml', ADDONPATH)
+    trakt_discover.data = trakt_discover_data
     trakt_discover.doModal()
+    return trakt_discover_data

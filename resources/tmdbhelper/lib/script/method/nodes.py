@@ -31,6 +31,8 @@ class TMDbNodeOptionNew:
 
 class TMDbNode:
 
+    overwrite = False
+    notification = True
     allow_listitem = True
 
     def __init__(self, name=None, icon=None, path=None):
@@ -94,23 +96,30 @@ class TMDbNode:
         }
         return meta
 
+    def notify(self, message):
+        if not self.notification:
+            return
+        Dialog().ok(self.name, message)
+
     def add(self):
         if not self.meta:
             return
 
         # Check we don't already have an item with that name in the node
         if any(bool(i['name'] == self.item['name']) for i in self.meta['list']):
-            Dialog().ok(self.name, get_localized(32492).format(self.name, self.file))
-            return
+            self.notify(get_localized(32492).format(self.name, self.file))
+            if not self.overwrite:
+                return
+            self.remove(refresh=False)
 
         # Add item to node
         self.meta['list'].append(self.item)
 
         # Save node
         dumps_to_file(self.meta, NODE_BASEDIR, self.file, join_addon_data=False)
-        Dialog().ok(self.name, get_localized(32494).format(self.name, self.file))
+        self.notify(get_localized(32494).format(self.name, self.file))
 
-    def remove(self):
+    def remove(self, refresh=True):
         if not self.meta:
             return
 
@@ -127,7 +136,10 @@ class TMDbNode:
         else:  # If there are no items left in the list then delete the whole thing
             delete_file(NODE_BASEDIR, self.file, join_addon_data=False)
 
-        Dialog().ok(self.name, get_localized(32493).format(self.name, self.file))
+        self.notify(get_localized(32493).format(self.name, self.file))
+
+        if not refresh:
+            return
 
         if self.meta['list']:
             executebuiltin('Container.Refresh')
