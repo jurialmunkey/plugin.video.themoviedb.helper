@@ -33,7 +33,9 @@ class Script(object):
     routing_table = {
         # Node Maker
         'make_node':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.make_node', 'make_node')(**kwargs),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.nodes', 'make_node')(**kwargs),
+        'remove_node':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.nodes', 'remove_node')(**kwargs),
 
         # Kodi Utils
         'split_value':

@@ -758,6 +758,11 @@ msgctxt "#32151"
 msgid "Visit [B]{}[/B] to generate your key and then input into TMDbHelper settings under the API keys section."
 msgstr ""
 
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_nodes.py
+msgctxt "#32152"
+msgid "Remove node"
+msgstr ""
+
 #: /resources/lib/container.py
 msgctxt "#32119"
 msgid "Select Release Types"
@@ -2347,7 +2352,7 @@ msgstr ""
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32492"
-msgid "{} already exists in {}!\\nDo you wish to remove this item from the list?"
+msgid "{} already exists in {}!"
 msgstr ""
 
 #: /resources/tmdbhelper/lib/script/method.py
@@ -2367,7 +2372,7 @@ msgstr ""
 
 #: /resources/tmdbhelper/lib/items/container.py
 msgctxt "#32496"
-msgid "Add/Remove as Custom Node"
+msgid "Add node"
 msgstr ""
 
 #: /resources/settings.xml
