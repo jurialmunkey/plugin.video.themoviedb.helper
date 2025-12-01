@@ -274,11 +274,14 @@ class TraktDiscoverMetaRatings(TraktDiscoverTMDbRatings):
     label_affix = 'Metacritic'
 
 
-class TraktDiscoverBrowse(TraktDiscoverMenu):
+class TraktDiscoverSave(TraktDiscoverMenu):
 
-    label_prefix_localized = 1024
+    label_prefix_localized = 190
     file = 'Trakt Discover.json'
-    name = 'Browse'
+
+    @cached_property
+    def name(self):
+        return Dialog().input(get_localized(32241))
 
     def save(self):
         from tmdbhelper.lib.script.method.nodes import TMDbNode
@@ -289,10 +292,11 @@ class TraktDiscoverBrowse(TraktDiscoverMenu):
         make_node.add()
 
     def menu(self):
-        self.save()
-        self.main.data['path'] = self.main.url
-        self.main.data['file'] = self.file
-        self.main.data['name'] = self.name
+        if self.name:
+            self.save()
+            self.main.data['path'] = self.main.url
+            self.main.data['file'] = self.file
+            self.main.data['name'] = self.name
         self.main.close()
 
 
@@ -327,7 +331,7 @@ class TraktDiscover(WindowXMLDialog):
 
     def get_routes_dict(self):
         return {
-            'browse': TraktDiscoverBrowse(self),
+            'save': TraktDiscoverSave(self),
             'list': TraktDiscoverList(self),
             'type': TraktDiscoverType(self),
             'years': TraktDiscoverYears(self),
