@@ -122,6 +122,9 @@ ROUTE_NOID = {
         'import_attr': 'ListUserDiscover'}},
     'dir_trakt_discover': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_discover',
+        'import_attr': 'ListDiscoverDir'}},
+    'trakt_discover': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_discover',
         'import_attr': 'ListDiscover'}},
     'trakt_towatch': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
