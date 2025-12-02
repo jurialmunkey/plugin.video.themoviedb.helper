@@ -90,8 +90,14 @@ class BaseDirItemMainMDbList(BaseDirItemMainMovie):
 class BaseDirItemMainGemini(BaseDirItemMainMovie):
     priority = 205
     label_localized = 32149
+    label_type = 'suffixed'
     params = {'info': 'gemini'}
     art_icon = 'resources/icons/gemini/gemini.png'
+
+    @property
+    def label_suffix(self):
+        from tmdbhelper.lib.addon.plugin import get_localized
+        return get_localized(32223)
 
 
 class BaseDirItemMain(BaseDirItemMainMovie):
