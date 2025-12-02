@@ -165,12 +165,12 @@ class Poller(WindowChecker):
                 self._on_idle(POLL_MAX_INCREMENT)
 
             # skip when modal or busy dialogs are opened (e.g. select / progress / busy etc.)
-            # elif self.is_on_modal:
-            #     self._on_modal()
+            elif self.is_on_modal:
+                self._on_modal()
 
             # manage context menu separately from other modals to pass info through
-            # elif self.is_on_context:
-            #     self._on_context()
+            elif self.is_on_context:
+                self._on_context()
 
             # skip when container scrolling
             elif self.is_on_scroll:
