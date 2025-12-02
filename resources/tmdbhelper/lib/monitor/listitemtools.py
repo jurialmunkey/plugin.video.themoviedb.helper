@@ -14,6 +14,8 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         self.pre_item = 1
         self.cur_window = 0
         self.pre_window = 1
+        self.cur_base_window = 0
+        self.pre_base_window = 1
         self._ignored_labels = ('..', get_localized(33078).lower(), get_localized(209).lower())
         self._listcontainer = None
         self._last_listitem = None
@@ -93,7 +95,11 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
             return
 
         # Check not on a modal or context
-        if self.service_monitor.is_on_modal or self.service_monitor.is_on_context:
+        # if self.service_monitor.is_on_modal or self.service_monitor.is_on_context:
+        #     return
+
+        # Check we can actually get something from underlying item
+        if self.is_same_base_window(update=True) and not self.get_cur_path():
             return
 
         # Check if the item has changed before retrieving details again

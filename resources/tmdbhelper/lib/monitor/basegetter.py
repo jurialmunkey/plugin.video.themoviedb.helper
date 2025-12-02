@@ -22,6 +22,13 @@ class BaseItemInfoGetter:
         return get_current_window()
 
     @cached_property
+    def cur_base_window(self):
+        return self.get_cur_base_window()
+
+    def get_cur_base_window(self):
+        return get_current_window(get_dialog=False)
+
+    @cached_property
     def widget_id(self):
         return self.get_widget_id()
 

@@ -155,7 +155,7 @@ class SyncInvalidatorAll:
 
     def database_del_lactivities(self):
         for item_id in self.database_lactivities_ids:
-            self.progress_dialog.update(f'Deleting last activities keys: {item_id}')
+            self.progress_dialog_update(f'Deleting last activities keys: {item_id}')
             self.database.del_item(table='lactivities', item_id=item_id)
 
     def invalidate(self):
