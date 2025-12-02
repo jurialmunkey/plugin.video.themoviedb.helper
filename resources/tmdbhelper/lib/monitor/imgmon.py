@@ -65,7 +65,6 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
     """
 
     def is_next_refresh(self):
-        self.setup_current_item()
 
         # Check we can actually get something from underlying item
         if self.is_same_base_window(update=True) and not self.get_cur_path():
@@ -93,6 +92,7 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
 
     def update_artwork(self, forced=False):
         self.setup_current_container()
+        self.setup_current_item()
 
         # Unused method is_this_refresh for checking if listitem.art() is ready as Kodi delays adding until after directory loads listitems
         # Causes more problems that it is worth to try to check so we skip this method and live with art occassionally being online instead of local
