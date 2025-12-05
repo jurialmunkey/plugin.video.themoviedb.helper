@@ -72,7 +72,11 @@ class ListItemMonitorFinaliser:
         return self.service_monitor.images_monitor
 
     def ratings(self):
+        if not self.item.is_same_item:  # Dont bother getting ratings if item changed before thread reached queued lookup
+            return
         ratings = self.item.all_ratings
+        if not self.item.is_same_item:  # Dont bother setting ratings if item changed before ratrings were retrieved
+            return
         self.set_ratings(ratings)
 
     def artwork(self):
@@ -158,8 +162,6 @@ class ListItemMonitorFinaliserContainerMethod(ListItemMonitorFinaliser):
             self.add_item_listcontainer(self.listitem)  # Add item to container
 
     def set_ratings(self, ratings):
-        if not self.item.is_same_item:
-            return
         with self.mutex_lock:
             self.listitem.setProperties(ratings)
 
@@ -188,5 +190,7 @@ class ListItemMonitorFinaliserWindowMethod(ListItemMonitorFinaliser):
 
     def initial_checks(self):
         if not self.item:
+            return False
+        if not self.item.is_same_item:  # Check that we are still on the same item after building
             return False
         return True

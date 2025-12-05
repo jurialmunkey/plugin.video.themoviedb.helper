@@ -28,6 +28,10 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         SafeThread.__init__(self)
         self.cur_item = 0
         self.pre_item = 1
+        self.cur_window = 0
+        self.pre_window = 1
+        self.cur_base_window = 0
+        self.pre_base_window = 1
         self._next_refresh = 0
         self._this_refresh = 0
         self.exit = False
@@ -61,14 +65,13 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
     """
 
     def is_next_refresh(self):
-        self.setup_current_item()
 
-        # Skip udating if landed on a modal because we can't get underlying details
-        if self.is_on_modal or self.is_on_context:
+        # Check we can actually get something from underlying item
+        if self.is_same_base_window(update=True) and not self.get_cur_path():
             return False
 
-        # Always refresh our artwork if the item changed
-        if not self.is_same_item(update=True):
+        # Check if the item has changed before retrieving details again
+        if not self.is_same_item(update=True) or not self.is_same_window(update=True):
             return True
 
         # Set refresh time if not set yet and still on same item
@@ -76,7 +79,7 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
             self._next_refresh = set_timestamp(self._next_refresh_increment)
             return False
 
-        # Refresh time expired and were still on same item so refresh for extrafanart cycling
+        # Check refresh time and refresh if it has expired
         if not get_timestamp(self._next_refresh):
             return True
 
@@ -89,6 +92,7 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
 
     def update_artwork(self, forced=False):
         self.setup_current_container()
+        self.setup_current_item()
 
         # Unused method is_this_refresh for checking if listitem.art() is ready as Kodi delays adding until after directory loads listitems
         # Causes more problems that it is worth to try to check so we skip this method and live with art occassionally being online instead of local
@@ -105,14 +109,25 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         self._next_refresh = 0
 
         update_artwork = self.get_image_manipulations(
-            use_winprops=True,
+            use_winprops=False,
             built_artwork=self.remote_artwork.get(self.pre_item),
-            allow_list=self._allow_list)
+            allow_list=self._allow_list
+        )
 
-        for k, v in self.baseitem_properties.items():
-            self.get_property(f'ListItem.{k}', set_property=v, clear_property=(v is None))
+        if not self.update_properties(update_artwork):
+            return
+
+        if not self.update_properties(self.baseitem_properties):
+            return
 
         return update_artwork
+
+    def update_properties(self, infoproperties):
+        if not self.is_same_item():
+            return False
+        for k, v in infoproperties.items():
+            self.get_property(f'ListItem.{k}', set_property=v, clear_property=(v is None))
+        return True
 
     def _on_listitem(self):
         self.on_listitem()

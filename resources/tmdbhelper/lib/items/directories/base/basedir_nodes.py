@@ -1,5 +1,5 @@
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH
+from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, get_localized
 from tmdbhelper.lib.addon.consts import NODE_BASEDIR
 from tmdbhelper.lib.files.futils import get_files_in_folder, read_file
 
@@ -55,10 +55,22 @@ class BaseDirNodeItem:
 
 
 class BaseDirNodeCustomItem:
-    def __init__(self, name=None, path=None, icon=None, **kwargs):
+    def __init__(self, name=None, path=None, icon=None, file=None, **kwargs):
         self.name = name or ''
         self.path = path or PLUGINPATH
         self.icon = icon or ''
+        self.file = file or ''
+
+    @cached_property
+    def context_menu(self):
+        if not self.file:
+            return []
+        return [
+            (
+                get_localized(32152),
+                f'RunScript(plugin.video.themoviedb.helper,remove_node,file={self.file},name={self.name})'
+            )
+        ]
 
     @cached_property
     def art(self):
@@ -73,6 +85,7 @@ class BaseDirNodeCustomItem:
             'label': self.name,
             'path': self.path,
             'art': self.art,
+            'context_menu': self.context_menu,
         }
 
 
@@ -98,7 +111,7 @@ class BaseDirNode:
     def basedir_subdir(self):
         return [
             i.item for i in (
-                BaseDirNodeCustomItem(**item)
+                BaseDirNodeCustomItem(**item, file=self.filename if self.basedir == NODE_BASEDIR else None)
                 for item in BaseDirNodeItem(
                     self.filename,
                     self.basedir

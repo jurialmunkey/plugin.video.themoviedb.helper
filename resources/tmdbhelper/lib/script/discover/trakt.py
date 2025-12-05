@@ -1,10 +1,11 @@
-from tmdbhelper.lib.addon.plugin import get_localized, get_condvisibility, executebuiltin, ADDONPATH
+from tmdbhelper.lib.addon.plugin import get_localized, ADDONPATH
 from jurialmunkey.ftools import cached_property
 from collections import namedtuple
 from xbmcgui import Dialog, WindowXMLDialog, ListItem, INPUT_NUMERIC
 
 
 ItemTuple = namedtuple("ItemTuple", "label value")
+NODE_FILENAME = 'Trakt Discover.json'
 
 
 class TraktDiscoverMenu:
@@ -165,6 +166,26 @@ class TraktDiscoverCertifications(TraktDiscoverGenres):
             return []
 
 
+class TraktDiscoverQuery(TraktDiscoverMenu):
+    key = 'query'
+    label_prefix_localized = 32153
+    label = None
+
+    @property
+    def value(self):
+        return self.label
+
+    @property
+    def paramstring(self):
+        if not self.value:
+            return
+        return f'{self.key}={self.value}'
+
+    def menu(self):
+        self.label = Dialog().input(get_localized(32044), defaultt=self.value or '')
+        self.listitem.setLabel(self.listitem_label)
+
+
 class TraktDiscoverYears(TraktDiscoverMenu):
     key = 'years'
     label_prefix_localized = 652
@@ -274,19 +295,26 @@ class TraktDiscoverMetaRatings(TraktDiscoverTMDbRatings):
     label_affix = 'Metacritic'
 
 
-class TraktDiscoverBrowse(TraktDiscoverMenu):
+class TraktDiscoverSave(TraktDiscoverMenu):
 
-    label_prefix_localized = 1024
+    label_prefix_localized = 190
 
-    @property
-    def command(self):
-        if get_condvisibility('Window.IsVisible(MyVideoNav.xml)'):
-            return f'Container.Update({self.main.url})'
-        return f'ActivateWindow(videos,{self.main.url},return)'
+    def save(self):
+        from tmdbhelper.lib.script.method.nodes import TMDbNode
+        make_node = TMDbNode(name=self.main.name, path=self.main.path, icon=self.main.icon)
+        make_node.notification = False
+        make_node.overwrite = True
+        make_node.file = self.main.file
+        make_node.add()
 
     def menu(self):
+        if self.main.name:
+            self.save()
+            self.main.data['path'] = self.main.path
+            self.main.data['file'] = self.main.file
+            self.main.data['name'] = self.main.name
+            self.main.data['icon'] = self.main.icon
         self.main.close()
-        executebuiltin(self.command)
 
 
 class TraktDiscoverReset(TraktDiscoverMenu):
@@ -298,17 +326,40 @@ class TraktDiscoverReset(TraktDiscoverMenu):
         self.main.build_menu()
 
 
-class TraktDiscover(WindowXMLDialog):
+class TraktDiscoverMain(WindowXMLDialog):
 
-    label = 'Trakt Discover'
     ACTION_SELECT = (7, 100, )
     ACTION_CLOSEWINDOW = (9, 10, 92, 216, 247, 257, 275, 61467, 61448,)
+    file = NODE_FILENAME
+
+    @cached_property
+    def label(self):
+        return f'Trakt {get_localized(32174)}'
+
+    @cached_property
+    def icon(self):
+        return f'{ADDONPATH}/resources/trakt.png'
+
+    @cached_property
+    def name(self):
+        return Dialog().input(get_localized(32241), defaultt=self.defaultt)
+
+    @cached_property
+    def data(self):
+        return {}
 
     @property
-    def url(self):
-        url = '&'.join((i.paramstring for i in self.routes if i.paramstring))
-        url = 'plugin://plugin.video.themoviedb.helper/?' + url
-        return url
+    def path(self):
+        path = '&'.join((i.paramstring for i in self.routes if i.paramstring))
+        path = 'plugin://plugin.video.themoviedb.helper/?' + path
+        return path
+
+    @property
+    def defaultt(self):
+        from tmdbhelper.lib.files.futils import validify_filename
+        defaultt = ' '.join((i.label for i in self.routes if i.label and i.paramstring))
+        defaultt = validify_filename(defaultt)
+        return ' '.join(defaultt.split())
 
     @cached_property
     def routes_dict(self):
@@ -316,9 +367,10 @@ class TraktDiscover(WindowXMLDialog):
 
     def get_routes_dict(self):
         return {
-            'browse': TraktDiscoverBrowse(self),
+            'save': TraktDiscoverSave(self),
             'list': TraktDiscoverList(self),
             'type': TraktDiscoverType(self),
+            'query': TraktDiscoverQuery(self),
             'years': TraktDiscoverYears(self),
             'genres': TraktDiscoverGenres(self),
             'certifications': TraktDiscoverCertifications(self),
@@ -384,6 +436,5 @@ class TraktDiscover(WindowXMLDialog):
         self.setFocus(self.list_control)
 
 
-def trakt_discover():
-    trakt_discover = TraktDiscover('DialogSelect.xml', ADDONPATH)
-    trakt_discover.doModal()
+def TraktDiscover():
+    return TraktDiscoverMain('DialogSelect.xml', ADDONPATH)
