@@ -1,4 +1,5 @@
-from tmdbhelper.lib.items.container import ContainerDirectory, use_item_cache
+from tmdbhelper.lib.items.container import ContainerDirectory
+from tmdbhelper.lib.items.directories.lists_default import ItemCache
 from tmdbhelper.lib.addon.plugin import convert_type, get_localized
 from tmdbhelper.lib.addon.dialog import progress_bg
 
@@ -77,7 +78,10 @@ class ListAiringNext(ContainerDirectory):
             self._get_list_items_progress_now += 1
             return item or None
 
-        with ParallelThread(seed_items, _get_nextaired_item_thread) as pt:
+        ParallelThreadLimited = ParallelThread
+        ParallelThreadLimited.thread_max = min((20, ParallelThreadLimited.thread_max or 20))
+
+        with ParallelThreadLimited(seed_items, _get_nextaired_item_thread) as pt:
             item_queue = pt.queue
 
         items = [i for i in item_queue if i]
@@ -87,7 +91,10 @@ class ListAiringNext(ContainerDirectory):
 
 class ListLibraryAiringNext(ListAiringNext):
 
-    @use_item_cache('ItemContainer.db', cache_days=0.02)  # Only cache for 30 minutes in case of library changes
+    cache_days = 0.02
+    cache_name = 'ListLibraryAiringNext'
+
+    @ItemCache('ItemContainer.db')
     def get_cache_items(self):
         from tmdbhelper.lib.api.kodi.rpc import get_kodi_library
         kodi_db = get_kodi_library('tv')
@@ -103,7 +110,10 @@ class ListLibraryAiringNext(ListAiringNext):
 
 class ListTraktAiringNext(ListAiringNext):
 
-    @use_item_cache('ItemContainer.db', cache_days=0.02)  # Only cache for 30 minutes in case of trakt changes
+    cache_days = 0.02   # Only cache for 30 minutes in case of trakt changes
+    cache_name = 'ListTraktAiringNext'
+
+    @ItemCache('ItemContainer.db')
     def get_cache_items(self):
         sd = self.trakt_api.trakt_syncdata
         sd = sd.get_all_unhidden_shows_started_getter()
