@@ -208,7 +208,7 @@ msgstr "Wszystkie Sezony"
 #: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
 msgctxt "#32041"
 msgid "Your In-Progress TV Shows"
-msgstr "Twoje w trakcie oglądania Sezony"
+msgstr "Twoje w trakcie oglądania Seriale"
 
 msgctxt "#30026"
 msgid "French (Canada)"
