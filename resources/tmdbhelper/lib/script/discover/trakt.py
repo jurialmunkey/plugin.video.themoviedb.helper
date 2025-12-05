@@ -166,6 +166,26 @@ class TraktDiscoverCertifications(TraktDiscoverGenres):
             return []
 
 
+class TraktDiscoverQuery(TraktDiscoverMenu):
+    key = 'query'
+    label_prefix_localized = 32153
+    label = None
+
+    @property
+    def value(self):
+        return self.label
+
+    @property
+    def paramstring(self):
+        if not self.value:
+            return
+        return f'{self.key}={self.value}'
+
+    def menu(self):
+        self.label = Dialog().input(get_localized(32044), defaultt=self.value or '')
+        self.listitem.setLabel(self.listitem_label)
+
+
 class TraktDiscoverYears(TraktDiscoverMenu):
     key = 'years'
     label_prefix_localized = 652
@@ -350,6 +370,7 @@ class TraktDiscoverMain(WindowXMLDialog):
             'save': TraktDiscoverSave(self),
             'list': TraktDiscoverList(self),
             'type': TraktDiscoverType(self),
+            'query': TraktDiscoverQuery(self),
             'years': TraktDiscoverYears(self),
             'genres': TraktDiscoverGenres(self),
             'certifications': TraktDiscoverCertifications(self),

@@ -145,7 +145,7 @@ def test_func(test_func, dialog_output=False, **kwargs):
 
     def test_func_gemini(prompt, **kwargs):
         from tmdbhelper.lib.api.gemini.api import Gemini
-        data = Gemini().get_prompt(prompt)
+        data = Gemini().get_prompt_text_parsed(prompt)
         head = prompt
         return finalise(head, data)
 

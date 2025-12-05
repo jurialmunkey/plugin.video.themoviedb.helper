@@ -41,16 +41,31 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
     thumb_override = 0
 
     def __init__(self, handle, paramstring, **kwargs):
-        # Log Settings
-        self.log_timers = get_setting('timer_reports')
-        self.timer_lists = {}
-
         # plugin:// params configuration
         self.handle = handle  # plugin:// handle
         self.paramstring = paramstring  # plugin://plugin.video.themoviedb.helper?paramstring
         self.params = kwargs  # paramstring dictionary
-        self.parent_params = self.params.copy()  # TODO: CLEANUP
-        self.filters = {
+        self.parent_params = kwargs.copy()  # TODO: CLEANUP
+
+    @cached_property
+    def log_timers(self):
+        return get_setting('timer_reports')
+
+    @cached_property
+    def timer_lists(self):
+        return {}
+
+    @cached_property
+    def sort_methods(self):
+        return []  # List of kwargs dictionaries [{'sortMethod': SORT_METHOD_UNSORTED}]
+
+    @cached_property
+    def property_params(self):
+        return {}
+
+    @cached_property
+    def filters(self):
+        return {
             'filter_key': self.params.get('filter_key', None),
             'filter_value': self.params.get('filter_value', None),
             'filter_operator': self.params.get('filter_operator', None),
@@ -58,9 +73,6 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
             'exclude_value': self.params.get('exclude_value', None),
             'exclude_operator': self.params.get('exclude_operator', None)
         }
-
-        self.sort_methods = []  # List of kwargs dictionaries [{'sortMethod': SORT_METHOD_UNSORTED}]
-        self.property_params = {}
 
     @cached_property
     def is_widget(self):
