@@ -396,7 +396,7 @@ msgctxt "#32079"
 msgid "User"
 msgstr "Użytkownik"
 
-#: /resources/lib/downloader.py
+#: /resoRaportyib/downloader.py
 msgctxt "#32059"
 msgid "Success!"
 msgstr "Sukces!"
@@ -788,7 +788,7 @@ msgstr "Wyczyść historię wyszukiwania"
 #: /resources/lib/context.py
 msgctxt "#32122"
 msgid "XBMCVFS reports unable to create path"
-msgstr "Raporty XBMCVFS nie mogą utworzyć ścieżki"
+msgstr "XBMCVFS zgłasza brak możliwości utworzenia ścieżki"
 
 #: /resources/lib/context.py
 msgctxt "#32123"
