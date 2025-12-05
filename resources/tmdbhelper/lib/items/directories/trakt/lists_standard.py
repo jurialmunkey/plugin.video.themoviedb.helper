@@ -1,4 +1,5 @@
-from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties, UncachedItemsPage
+from tmdbhelper.lib.items.directories.lists_default import UncachedItemsPage
+from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties
 from tmdbhelper.lib.items.directories.trakt.mapper_standard import FactoryItemMapper
 from tmdbhelper.lib.addon.plugin import get_setting
 from jurialmunkey.ftools import cached_property
@@ -6,22 +7,20 @@ from jurialmunkey.parser import try_int
 
 
 class UncachedTraktItemsPage(UncachedItemsPage):
-    def __init__(self, outer_class, page):
-        self.outer_class = outer_class
-        self.page = page
-
-    def get_results(self):
+    @cached_property
+    def response_results(self):
         try:
-            results = self.response.json()
+            return self.response.json()
         except (TypeError, KeyError, AttributeError):
-            return []
-        try:
-            self.outer_class.total_pages = try_int(self.response.headers.get('x-pagination-page-count', 0))
-            self.outer_class.total_items = try_int(self.response.headers.get('x-pagination-item-count', 0))
-        except (TypeError, KeyError):
-            self.outer_class.total_pages = 0
-            self.outer_class.total_items = 0
-        return results
+            return
+
+    @cached_property
+    def response_total_pages(self):
+        return try_int(self.response.headers.get('x-pagination-page-count', 0))
+
+    @cached_property
+    def response_total_items(self):
+        return try_int(self.response.headers.get('x-pagination-item-count', 0))
 
 
 class ListTraktStandardProperties(ListStandardProperties):

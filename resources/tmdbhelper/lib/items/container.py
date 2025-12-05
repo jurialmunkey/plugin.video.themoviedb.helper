@@ -6,29 +6,6 @@ from tmdbhelper.lib.api.contains import CommonContainerAPIs
 from tmdbhelper.lib.addon.logger import TimerList
 
 
-""" Lazyimports
-from tmdbhelper.lib.items.kodi import KodiDb
-"""
-
-
-class ItemCache:
-    def __init__(self, filename, cache_days=0.25):  # 6 hours default cache
-        from tmdbhelper.lib.files.bcache import BasicCache
-        self.cache = BasicCache(filename=filename)
-        self.cache_days = cache_days
-
-    def __call__(self, function):
-        def wrapper(instance, *args, **kwargs):
-            kwargs['cache_days'] = self.cache_days
-            kwargs['cache_name'] = f'{instance.__class__.__name__}.{function.__name__}'
-            kwargs['cache_combine_name'] = True
-            return self.cache.use_cache(function, instance, *args, **kwargs)
-        return wrapper
-
-
-use_item_cache = ItemCache
-
-
 class ContainerDirectoryCommon(CommonContainerAPIs):
     default_cacheonly = False
     update_listing = False  # endOfDirectory(updateListing=) set True to replace current path
@@ -284,13 +261,16 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         """
         return
 
+    def get_directory_items(self):
+        with TimerList(self.timer_lists, 'get_list', logging=self.log_timers):
+            return self.get_items(**self.params)
+
     def get_directory(self, items_only=False, build_items=True):
 
         with TimerList(self.timer_lists, 'total', logging=self.log_timers):
             self.trakt_playdata.pre_sync_start(**self.params)
 
-            with TimerList(self.timer_lists, 'get_list', logging=self.log_timers):
-                items = self.get_items(**self.params)
+            items = self.get_directory_items()
 
             if not items:
                 return
