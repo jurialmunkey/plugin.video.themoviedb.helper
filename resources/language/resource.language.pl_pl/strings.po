@@ -765,6 +765,11 @@ msgctxt "#32152"
 msgid "Remove node"
 msgstr "Usuń węzeł"
 
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32153"
+msgid "Query"
+msgstr "Zapytanie"
+
 #: /resources/lib/container.py
 msgctxt "#32119"
 msgid "Select Release Types"
