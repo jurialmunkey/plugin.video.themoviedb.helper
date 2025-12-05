@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-12-2 15:21+0800\n"
+"PO-Revision-Date: 2025-12-05 15:33+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -766,6 +766,11 @@ msgstr "访问 [B]{}[/B] 生成密钥，然后在 TMDbHelper 设置中的 “API
 msgctxt "#32152"
 msgid "Remove node"
 msgstr "移除节点"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32153"
+msgid "Query"
+msgstr "查询"
 
 #: /resources/lib/container.py
 msgctxt "#32119"
