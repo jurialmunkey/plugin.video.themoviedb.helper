@@ -761,6 +761,11 @@ msgctxt "#32151"
 msgid "Visit [B]{}[/B] to generate your key and then input into TMDbHelper settings under the API keys section."
 msgstr "Besuche [B]{}[/B], um einen API-Schlüssel zu erstellen, und gib diesen danach in den API-Schlüssel-Einstellungen von TMDbHelper an."
 
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32153"
+msgid "Query"
+msgstr "Abfrage"
+
 #: /resources/lib/container.py
 msgctxt "#32119"
 msgid "Select Release Types"
