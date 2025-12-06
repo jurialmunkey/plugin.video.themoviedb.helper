@@ -12,8 +12,8 @@ class ListAiringNextProperties(ListProperties):
     unconfigured_item_data = None
 
     @cached_property
-    def cache_name_tuple(self):
-        return (self.class_name, )
+    def cache_name(self):
+        return self.class_name
 
     @property
     def next_page(self):
