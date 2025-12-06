@@ -63,6 +63,9 @@ class ItemMapper:
 
     @cached_property
     def item(self):
+        return self.get_item()
+
+    def get_item(self):
         return {
             'label': self.label,
             'infolabels': self.infolabels,
