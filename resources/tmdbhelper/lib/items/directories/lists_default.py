@@ -1,7 +1,6 @@
 from tmdbhelper.lib.items.container import ContainerDefaultCacheDirectory
-from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import convert_type, get_localized
-from tmdbhelper.lib.items.filters import is_excluded
+from jurialmunkey.ftools import cached_property
 from jurialmunkey.parser import try_int
 
 
@@ -17,6 +16,60 @@ class ItemCache:
             kwargs['cache_combine_name'] = True
             return self.cache.use_cache(function, instance, *args, **kwargs)
         return wrapper
+
+
+class UncachedItemsPage:
+    def __init__(self, outer_class, page):
+        self.outer_class = outer_class
+        self.page = page
+
+    @cached_property
+    def response(self):
+        return self.outer_class.get_api_response(self.page)
+
+    @cached_property
+    def response_results(self):
+        try:
+            return self.response[self.outer_class.results_key]
+        except (TypeError, KeyError):
+            return
+
+    @cached_property
+    def response_total_pages(self):
+        return self.response['total_pages']
+
+    @cached_property
+    def response_total_items(self):
+        return self.response['total_results']
+
+    @cached_property
+    def results(self):
+        return self.get_results()
+
+    def get_results(self):
+        if not self.response_results:
+            return []
+        try:
+            self.outer_class.total_pages = self.response_total_pages
+            self.outer_class.total_items = self.response_total_items
+        except (TypeError, KeyError):
+            self.outer_class.total_pages = 0
+            self.outer_class.total_items = 0
+        return self.response_results
+
+    @cached_property
+    def items(self):
+        return self.get_items()
+
+    def get_items(self):
+        return [j for j in [
+            self.outer_class.get_mapped_item(i, add_infoproperties=(
+                ('total_pages', self.outer_class.total_pages),
+                ('total_results', self.outer_class.total_items),
+                ('rank', x),
+            ))
+            for x, i in enumerate(self.results, 1) if i
+        ] if j]
 
 
 class ListProperties:
@@ -102,6 +155,7 @@ class ListProperties:
     def filtered_items(self):
         if not self.filters:
             return self.items
+        from tmdbhelper.lib.items.filters import is_excluded
         return [
             i for i in self.items
             if not is_excluded(i, **self.filters)

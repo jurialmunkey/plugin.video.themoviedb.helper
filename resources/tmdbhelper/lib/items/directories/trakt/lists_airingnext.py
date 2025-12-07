@@ -1,121 +1,257 @@
-from tmdbhelper.lib.items.container import ContainerDirectory, use_item_cache
-from tmdbhelper.lib.addon.plugin import convert_type, get_localized
+from tmdbhelper.lib.items.directories.lists_default import ItemCache, ListProperties, ListDefault
+from tmdbhelper.lib.addon.plugin import KeyGetter, get_setting
 from tmdbhelper.lib.addon.dialog import progress_bg
+from tmdbhelper.lib.items.directories.trakt.mapper_basic import ItemMapper
+from jurialmunkey.ftools import cached_property
+from jurialmunkey.parser import try_int
 
 
-class ListAiringNext(ContainerDirectory):
+class AiringNextItemMapper(ItemMapper):
 
-    @progress_bg
-    def get_list_items(self, seed_items: list, prefix: str, reverse: bool = False, **kwargs):
-        from tmdbhelper.lib.addon.thread import ParallelThread
+    prefix = 'next_aired'
+
+    @cached_property
+    def tmdb_id(self):
+        return self.meta.get('tmdb_id')
+
+    @cached_property
+    def premiered(self):
+        return self.meta.get(f'{self.prefix}.original')
+
+    @cached_property
+    def is_future(self):
+        if not self.premiered:
+            return
         from tmdbhelper.lib.addon.tmdate import is_future_timestamp
-        from tmdbhelper.lib.api.mapping import get_empty_item
+        return is_future_timestamp(self.premiered, time_fmt="%Y-%m-%d", time_lim=10, days=-1)
+
+    def get_metadata(self, key):
+        name = f'{self.prefix}.{key}'
+        data = f'{self.meta.get(name)}'
+        return data
+
+    @cached_property
+    def title(self):
+        return self.get_metadata('name')
+
+    @cached_property
+    def episode(self):
+        return self.get_metadata('episode')
+
+    @cached_property
+    def season(self):
+        return self.get_metadata('season')
+
+    @cached_property
+    def label(self):
+        label = f'{self.title} ({self.premiered})'
+        return label
+
+    def get_infolabels(self):
+        return {
+            'mediatype': 'episode',
+            'title': self.title,
+            'episode': self.episode,
+            'season': self.season,
+            'plot': self.get_metadata('plot'),
+            'year': self.get_metadata('year'),
+            'premiered': self.premiered
+        }
+
+    def get_params(self):
+        return {
+            'info': 'details',
+            'tmdb_type': 'tv',
+            'tmdb_id': self.tmdb_id,
+            'episode': self.episode,
+            'season': self.season,
+        }
+
+    def get_unique_ids(self):
+        return {
+            'tmdb': self.tmdb_id,
+            'tvshow.tmdb': self.tmdb_id,
+        }
+
+    def get_item(self):
+        if not self.is_future:
+            return
+        return super().get_item()
+
+
+class AiringNextItemGetter:
+
+    def __init__(self, data):
+        self.data = KeyGetter(data)
+
+    @cached_property
+    def tmdb_id(self):
+        tmdb_id = self.data.get_key('tmdb_id')
+        tmdb_id = tmdb_id or self.query_database.get_tmdb_id(
+            tmdb_type='tv',
+            imdb_id=self.data.get_key('imdb_id'),
+            tvdb_id=self.data.get_key('tvdb_id'),
+            query=self.data.get_key('showtitle') or self.data.get_key('title'),
+            year=self.data.get_key('year')
+        )
+        return tmdb_id
+
+    @cached_property
+    def lidc(self):
         from tmdbhelper.lib.items.database.listitem import ListItemDetails
+        lidc = ListItemDetails()
+        lidc.extendedinfo = False
+        return lidc
 
-        self.dialog_progress_bg.update(0, message=f'Initialising')
-        self._get_list_items_progress_max = len(seed_items)
-        self._get_list_items_progress_now = 0
+    @cached_property
+    def query_database(self):
+        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+        return FindQueriesDatabase()
 
-        def _get_lidc():
-            lidc = ListItemDetails(self)
-            lidc.extendedinfo = False
-            return lidc
+    @cached_property
+    def meta(self):
+        if not self.tmdb_id:
+            return {}
+        meta = self.lidc.get_item('tv', self.tmdb_id)
+        meta = meta.get('infoproperties')
+        if not meta:
+            return {}
+        meta['tmdb_id'] = self.tmdb_id
+        return meta
 
-        def _get_lidc_data(tmdb_id):
-            data = _get_lidc().get_item('tv', tmdb_id)
-            return data.get('infoproperties') or {}
-
-        def _get_nextaired_item(tmdb_id):
-            ip = _get_lidc_data(tmdb_id)
-
-            premiered = ip.get(f'{prefix}.original')
-            if not is_future_timestamp(premiered, time_fmt="%Y-%m-%d", time_lim=10, days=-1):
-                return
-
-            try:
-                item = get_empty_item()
-                item['label'] = f"{ip.get(f'{prefix}.name')} ({premiered})"
-                item['infolabels']['mediatype'] = 'episode'
-                item['infolabels']['title'] = ip.get(f'{prefix}.name')
-                item['infolabels']['episode'] = ip.get(f'{prefix}.episode')
-                item['infolabels']['season'] = ip.get(f'{prefix}.season')
-                item['infolabels']['plot'] = ip.get(f'{prefix}.plot')
-                item['infolabels']['year'] = ip.get(f'{prefix}.year')
-                item['infolabels']['premiered'] = premiered
-                item['infoproperties']['tmdb_type'] = 'episode'
-                item['infoproperties']['tmdb_id'] = item['unique_ids']['tvshow.tmdb'] = tmdb_id
-                item['params'] = {
-                    'info': 'details',
-                    'tmdb_type': 'tv',
-                    'tmdb_id': tmdb_id,
-                    'episode': item['infolabels']['episode'],
-                    'season': item['infolabels']['season']}
-            except (TypeError, KeyError, AttributeError):
-                return
-
-            return item
-
-        def _get_nextaired_item_thread(i):
-            tmdb_id = i.get('tmdb_id') or self.query_database.get_tmdb_id(
-                tmdb_type='tv',
-                imdb_id=i.get('imdb_id'),
-                tvdb_id=i.get('tvdb_id'),
-                query=i.get('showtitle') or i.get('title'),
-                year=i.get('year')
-            )
-
-            if not tmdb_id:
-                self._get_list_items_progress_now += 1
-                return
-
-            item = _get_nextaired_item(tmdb_id)
-
-            self.dialog_progress_bg.update(
-                int((self._get_list_items_progress_now / self._get_list_items_progress_max) * 100),
-                message=f'{tmdb_id} - Checking TMDb ID')
-
-            self._get_list_items_progress_now += 1
-            return item or None
-
-        with ParallelThread(seed_items, _get_nextaired_item_thread) as pt:
-            item_queue = pt.queue
-
-        items = [i for i in item_queue if i]
-        items = sorted(items, key=lambda i: i['infolabels']['premiered'], reverse=reverse)
-        return items
+    @cached_property
+    def item(self):
+        if not self.meta:
+            return
+        return AiringNextItemMapper(self.meta, add_infoproperties=None).item
 
 
-class ListLibraryAiringNext(ListAiringNext):
+class ListAiringNextProperties(ListProperties):
+    dialog_now = 0
+    cache_days = 0.02
+    unconfigured_item_data = None
 
-    @use_item_cache('ItemContainer.db', cache_days=0.02)  # Only cache for 30 minutes in case of library changes
-    def get_cache_items(self):
-        from tmdbhelper.lib.api.kodi.rpc import get_kodi_library
-        kodi_db = get_kodi_library('tv')
-        return self.get_list_items(kodi_db.database, 'next_aired') if kodi_db and kodi_db.database else None
+    @cached_property
+    def cache_name_tuple(self):
+        return (self.class_name, )
 
-    def get_items(self, **kwargs):
-        from tmdbhelper.lib.items.pages import PaginatedItems
-        self.container_content = convert_type('episode', 'container')
-        self.plugin_category = f'{get_localized(32458)}'
-        paginated_items = PaginatedItems(self.get_cache_items(), page=kwargs.get('page', 1), limit=20)
-        return paginated_items.items + paginated_items.next_page
+    @property
+    def next_page(self):
+        return self.page + 1
 
+    @cached_property
+    def dialog_max(self):
+        return len(self.seed_items)
 
-class ListTraktAiringNext(ListAiringNext):
+    def dialog_update(self, value, message):
+        if not self.dialog_progress_bg:
+            return
+        self.dialog_progress_bg.update(value, message)
 
-    @use_item_cache('ItemContainer.db', cache_days=0.02)  # Only cache for 30 minutes in case of trakt changes
-    def get_cache_items(self):
+    def dialog_update_percentage(self, message):
+        self.dialog_update(self.dialog_percentage, message)
+        self.dialog_now += 1
+
+    @property
+    def dialog_percentage(self):
+        return int((self.dialog_now / self.dialog_max) * 100)
+
+    @cached_property
+    def seed_items(self):
+        self.dialog_update(0, message=f'Getting seed items...')
+        return self.get_seed_items()
+
+    def get_seed_items(self):
         sd = self.trakt_api.trakt_syncdata
         sd = sd.get_all_unhidden_shows_started_getter()
         try:
-            items = [{'tmdb_id': i[sd.keys.index('tmdb_id')]} for i in sd.items if i]
+            return [{'tmdb_id': i[sd.keys.index('tmdb_id')]} for i in sd.items if i]
         except Exception:
-            return
-        return self.get_list_items(items, 'next_aired') if items else None
+            return []
 
-    def get_items(self, **kwargs):
-        from tmdbhelper.lib.items.pages import PaginatedItems
-        self.container_content = convert_type('episode', 'container')
-        self.plugin_category = f'{get_localized(32459)}'
-        paginated_items = PaginatedItems(self.get_cache_items(), page=kwargs.get('page', 1), limit=20)
-        return paginated_items.items + paginated_items.next_page
+    def get_threaded_item(self, item):
+        item_mapper = AiringNextItemGetter(item)
+        self.dialog_update_percentage(f'{item_mapper.tmdb_id} - Checking TMDb ID')
+        return item_mapper.item or None
+
+    @ItemCache('ItemContainer.db')
+    def get_cached_items(self, *args, **kwargs):
+        return self.get_uncached_items(*args, **kwargs)
+
+    @progress_bg
+    def get_uncached_items(self):
+        from tmdbhelper.lib.addon.thread import ParallelThread
+        ParallelThreadLimited = ParallelThread
+        ParallelThreadLimited.thread_max = min((40, ParallelThreadLimited.thread_max or 40))
+        with ParallelThreadLimited(self.seed_items, self.get_threaded_item) as pt:
+            item_queue = pt.queue
+        return [i for i in item_queue if i]
+
+    @cached_property
+    def items(self):
+        return self.get_cached_items() or []
+
+    @cached_property
+    def pages(self):
+        return (self.count + self.limit - 1) // self.limit  # Ceiling division
+
+    @cached_property
+    def count(self):
+        return len(self.filtered_items)
+
+    @cached_property
+    def limit(self):
+        return self.pmax * 20
+
+    @cached_property
+    def item_a(self):
+        return max(((self.page - 1) * self.limit), 0)
+
+    @cached_property
+    def item_z(self):
+        return min((self.page * self.limit), self.count)
+
+    @cached_property
+    def sorted_items(self):
+        sorted_items = sorted(self.filtered_items, key=lambda i: i['infolabels']['premiered'], reverse=False)
+        return sorted_items[self.item_a:self.item_z]
+
+
+class ListLibraryAiringNextProperties(ListAiringNextProperties):
+    def get_seed_items(self):
+        if not self.kodi_db or not self.kodi_db.database:
+            return []
+        return self.kodi_db.database
+
+
+class ListTraktAiringNext(ListDefault):
+    list_properties_class = ListAiringNextProperties
+
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.localize = 32459
+        list_properties.item_type = 'episode'
+        list_properties.container_content = 'episodes'
+        list_properties.page_length = get_setting('pagemulti_trakt', 'int') or 1
+        return list_properties
+
+    def get_items(self, page=1, length=None, **kwargs):
+        self.list_properties.tmdb_type = 'tv'
+        self.list_properties.length = try_int(length)
+        self.list_properties.page = try_int(page) or 1
+        return self.get_items_finalised()
+
+
+class ListLibraryAiringNext(ListTraktAiringNext):
+    list_properties_class = ListLibraryAiringNextProperties
+
+    @cached_property
+    def kodi_db(self):  # Override internal settings for adding in library details as we always need them here
+        from tmdbhelper.lib.api.kodi.rpc import get_kodi_library
+        return get_kodi_library('tv')
+
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.localize = 32458
+        list_properties.kodi_db = self.kodi_db
+        return list_properties

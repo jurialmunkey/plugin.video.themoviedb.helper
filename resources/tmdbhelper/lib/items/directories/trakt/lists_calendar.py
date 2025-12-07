@@ -8,10 +8,8 @@ from tmdbhelper.lib.items.directories.trakt.mapper_calendar import (
     FactoryCalendarEpisodeItemMapper,
     FactoryCalendarMovieItemMapper,
 )
-from tmdbhelper.lib.items.directories.mdblist.lists_local import (
-    UncachedMDbListItemsPage,
-    UncachedMDbListLocalData,
-)
+from tmdbhelper.lib.items.directories.mdblist.lists_local import UncachedMDbListItemsPage
+from tmdbhelper.lib.items.directories.lists_local import UncachedListLocalData
 from tmdbhelper.lib.items.directories.lists_default import ItemCache
 
 
@@ -255,7 +253,7 @@ class ListTraktCalendarProperties(ListTraktStandardProperties):
     def get_api_response(self, page=1):
         if not self.api_response_json:
             return
-        return UncachedMDbListLocalData(self.api_response_json, self.page, self.limit).data
+        return UncachedListLocalData(self.api_response_json, self.page, self.limit).data
 
     def get_mapped_item_air_date_check(self, item_mapper):
         if not item_mapper.air_date:
@@ -310,7 +308,7 @@ class ListLocalCalendarProperties(ListTraktCalendarProperties):
     def get_api_response(self, page=1):
         if not self.api_response_json:
             return
-        return UncachedMDbListLocalData(self.api_response_json, self.page, self.limit).data
+        return UncachedListLocalData(self.api_response_json, self.page, self.limit).data
 
 
 class ListTraktCalendar(ListTraktFiltered):
