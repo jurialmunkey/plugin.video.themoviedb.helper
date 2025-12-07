@@ -773,9 +773,29 @@ msgctxt "#32119"
 msgid "Select Release Types"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32155"
+msgid "Airing"
+msgstr ""
+
 #: /resources/lib/container.py
 msgctxt "#32120"
 msgid "Select Region for Release"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32157"
+msgid "Decades"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32158"
+msgid "Certifications"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32159"
+msgid "Lists"
 msgstr ""
 
 #: /resources/lib/container.py

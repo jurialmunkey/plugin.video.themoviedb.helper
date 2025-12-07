@@ -17,6 +17,7 @@ class BaseDirItem:
     filters = False
     infoproperties = {}
     infolabels = {}
+    group = None
 
     item_builder = BaseDirItemBuilder
 
