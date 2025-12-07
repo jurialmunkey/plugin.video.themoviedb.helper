@@ -858,7 +858,7 @@ msgstr "Zaktualizuj bibliotekę teraz"
 #: /resources/settings.xml
 msgctxt "#32156"
 msgid "Next aired library calendar links to local tvshow"
-msgstr "Kalendarz emisji biblioteki linkuje do lokalnych seriali"
+msgstr "Kalendarz emisji biblioteki zawiera linki do lokalnych seriali"
 
 #: /resources/lib/context.py
 msgctxt "#32160"
