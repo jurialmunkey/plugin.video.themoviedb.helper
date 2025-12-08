@@ -67,7 +67,7 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
     def is_next_refresh(self):
 
         # Check we can actually get something from underlying item
-        if self.is_same_base_window(update=True) and not self.get_cur_path():
+        if self.is_same_base_window(update=True) and not self.get_cur_info():
             return False
 
         # Check if the item has changed before retrieving details again
