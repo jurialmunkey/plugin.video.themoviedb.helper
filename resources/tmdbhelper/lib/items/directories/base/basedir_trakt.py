@@ -10,6 +10,7 @@ class BaseDirItemTraktCollection(BaseDirItem):
     params = {'info': 'trakt_collection'}
     art_icon = '/resources/icons/trakt/watchlist.png'
     types = ('movie', 'tv', 'both')
+    group = 32192
 
 
 class BaseDirItemTraktFavorites(BaseDirItem):
@@ -20,6 +21,7 @@ class BaseDirItemTraktFavorites(BaseDirItem):
     params = {'info': 'trakt_favorites'}
     sorting = True
     art_icon = 'resources/icons/trakt/watchlist.png'
+    group = 1036
 
 
 class BaseDirItemTraktWatchlist(BaseDirItem):
@@ -30,6 +32,7 @@ class BaseDirItemTraktWatchlist(BaseDirItem):
     params = {'info': 'trakt_watchlist'}
     sorting = True
     art_icon = 'resources/icons/trakt/watchlist.png'
+    group = 32193
 
 
 class BaseDirItemTraktWatchListReleased(BaseDirItemTraktWatchlist):
@@ -37,6 +40,7 @@ class BaseDirItemTraktWatchListReleased(BaseDirItemTraktWatchlist):
     label_type = 'reversed'
     label_localized = 32456
     params = {'info': 'trakt_watchlist_released'}
+    group = 32193
 
 
 class BaseDirItemTraktWatchListAnticipated(BaseDirItemTraktWatchlist):
@@ -44,6 +48,7 @@ class BaseDirItemTraktWatchListAnticipated(BaseDirItemTraktWatchlist):
     label_type = 'reversed'
     label_localized = 32457
     params = {'info': 'trakt_watchlist_anticipated'}
+    group = 32193
 
 
 class BaseDirItemTraktHistory(BaseDirItem):
@@ -52,6 +57,7 @@ class BaseDirItemTraktHistory(BaseDirItem):
     types = ('movie', 'tv', 'episode', 'both', )
     params = {'info': 'trakt_history'}
     art_icon = 'resources/icons/trakt/recentlywatched.png'
+    group = 32194
 
 
 class BaseDirItemTraktMostWatched(BaseDirItem):
@@ -60,6 +66,7 @@ class BaseDirItemTraktMostWatched(BaseDirItem):
     types = ('movie', 'tv', 'episode', )
     params = {'info': 'trakt_mostwatched'}
     art_icon = 'resources/icons/trakt/mostwatched.png'
+    group = 32195
 
 
 class BaseDirItemTraktInProgress(BaseDirItem):
@@ -69,6 +76,7 @@ class BaseDirItemTraktInProgress(BaseDirItem):
     params = {'info': 'trakt_inprogress'}
     sorting = True
     art_icon = 'resources/icons/trakt/inprogress.png'
+    group = 32196
 
 
 class BaseDirItemTraktOnDeck(BaseDirItem):
@@ -78,6 +86,7 @@ class BaseDirItemTraktOnDeck(BaseDirItem):
     types = ('tv', )
     params = {'info': 'trakt_ondeck'}
     art_icon = 'resources/icons/trakt/inprogress.png'
+    group = 32196
 
 
 class BaseDirItemTraktOnDeckUnWatchedMovie(BaseDirItem):
@@ -87,6 +96,7 @@ class BaseDirItemTraktOnDeckUnWatchedMovie(BaseDirItem):
     types = ('movie', )
     params = {'info': 'trakt_ondeck_unwatched'}
     art_icon = 'resources/icons/trakt/inprogress.png'
+    group = 32196
 
     @cached_property
     def label_append(self):
@@ -100,6 +110,7 @@ class BaseDirItemTraktOnDeckUnWatchedTV(BaseDirItem):
     types = ('tv', )
     params = {'info': 'trakt_ondeck_unwatched'}
     art_icon = 'resources/icons/trakt/inprogress.png'
+    group = 32196
 
     @cached_property
     def label_suffix(self):
@@ -113,6 +124,7 @@ class BaseDirItemTraktToWatch(BaseDirItem):
     types = ('movie', 'tv', )
     params = {'info': 'trakt_towatch'}
     art_icon = 'resources/icons/trakt/watchlist.png'
+    group = 32196
 
 
 class BaseDirItemTraktNextEpisodes(BaseDirItem):
@@ -122,6 +134,7 @@ class BaseDirItemTraktNextEpisodes(BaseDirItem):
     types = ('tv', )
     params = {'info': 'trakt_nextepisodes'}
     art_icon = 'resources/icons/trakt/inprogress.png'
+    group = 32196
 
 
 class BaseDirItemTraktDropped(BaseDirItem):
@@ -131,6 +144,7 @@ class BaseDirItemTraktDropped(BaseDirItem):
     types = ('tv', )
     params = {'info': 'trakt_dropped'}
     art_icon = 'resources/icons/trakt/inprogress.png'
+    group = 32196
 
 
 class BaseDirItemTraktRecommendations(BaseDirItem):
@@ -140,6 +154,7 @@ class BaseDirItemTraktRecommendations(BaseDirItem):
     types = ('movie', 'tv', )
     params = {'info': 'trakt_recommendations'}
     art_icon = 'resources/icons/trakt/recommended.png'
+    group = 32223
 
 
 class BaseDirItemTraktBecauseYouWatched(BaseDirItem):
@@ -148,6 +163,7 @@ class BaseDirItemTraktBecauseYouWatched(BaseDirItem):
     types = ('movie', 'tv', )
     params = {'info': 'trakt_becauseyouwatched'}
     art_icon = 'resources/icons/trakt/recommended.png'
+    group = 32223
 
 
 class BaseDirItemTraktBecauseMostWatched(BaseDirItem):
@@ -156,6 +172,7 @@ class BaseDirItemTraktBecauseMostWatched(BaseDirItem):
     types = ('movie', 'tv', )
     params = {'info': 'trakt_becausemostwatched'}
     art_icon = 'resources/icons/trakt/recommended.png'
+    group = 32223
 
 
 class BaseDirItemTraktMyAiring(BaseDirItem):
@@ -163,6 +180,7 @@ class BaseDirItemTraktMyAiring(BaseDirItem):
     types = ('tv', )
     params = {'info': 'trakt_myairing'}
     art_icon = 'resources/icons/trakt/airing.png'
+    group = 32203
 
     @cached_property
     def label(self):
@@ -188,6 +206,7 @@ class BaseDirItemTraktAiringNext(BaseDirItem):
     types = ('tv', )
     params = {'info': 'trakt_airingnext'}
     art_icon = 'resources/icons/trakt/calendar.png'
+    group = 32203
 
 
 class BaseDirItemTraktCalendarDir(BaseDirItem):
@@ -195,6 +214,7 @@ class BaseDirItemTraktCalendarDir(BaseDirItem):
     types = ('tv', )
     params = {'info': 'dir_calendar_trakt'}
     art_icon = 'resources/icons/trakt/calendar.png'
+    group = 32203
 
     @cached_property
     def label(self):
@@ -217,6 +237,7 @@ class BaseDirItemTraktMovieCalendarDir(BaseDirItemTraktCalendarDir):
     priority = 291
     types = ('movie', )
     params = {'info': 'dir_calendar_movie'}
+    group = 32203
 
     @cached_property
     def label_append(self):
@@ -227,6 +248,7 @@ class BaseDirItemTraktDVDCalendarDir(BaseDirItemTraktCalendarDir):
     priority = 292
     types = ('movie', )
     params = {'info': 'dir_calendar_dvd'}
+    group = 32203
 
     @cached_property
     def label_prefix(self):
@@ -236,6 +258,7 @@ class BaseDirItemTraktDVDCalendarDir(BaseDirItemTraktCalendarDir):
 class BaseDirItemTraktCalendarPremieresDir(BaseDirItemTraktCalendarDir):
     priority = 300
     params = {'info': 'dir_calendar_trakt', 'endpoint': 'premieres'}
+    group = 32203
 
     @cached_property
     def label(self):
@@ -253,6 +276,7 @@ class BaseDirItemTraktCalendarPremieresDir(BaseDirItemTraktCalendarDir):
 class BaseDirItemTraktCalendarNewDir(BaseDirItemTraktCalendarPremieresDir):
     priority = 310
     params = {'info': 'dir_calendar_trakt', 'endpoint': 'new'}
+    group = 32203
 
     @cached_property
     def label(self):
@@ -270,6 +294,7 @@ class BaseDirItemTraktCalendarNewDir(BaseDirItemTraktCalendarPremieresDir):
 class BaseDirItemTraktCalendarAllDir(BaseDirItemTraktCalendarPremieresDir):
     priority = 320
     params = {'info': 'dir_calendar_trakt', 'user': 'false'}
+    group = 32203
 
     @cached_property
     def label(self):
@@ -287,6 +312,7 @@ class BaseDirItemTraktCalendarAllDir(BaseDirItemTraktCalendarPremieresDir):
 class BaseDirItemTraktCalendarPremieresAllDir(BaseDirItemTraktCalendarPremieresDir):
     priority = 330
     params = {'info': 'dir_calendar_trakt', 'user': 'false', 'endpoint': 'premieres'}
+    group = 32203
 
     @cached_property
     def label(self):
@@ -309,6 +335,7 @@ class BaseDirItemTraktMovieCalendarAllDir(BaseDirItemTraktCalendarDir):
     priority = 331
     types = ('movie', )
     params = {'info': 'dir_calendar_movie', 'user': 'false'}
+    group = 32203
 
     @cached_property
     def label_prefix(self):
@@ -323,6 +350,7 @@ class BaseDirItemTraktDVDCalendarAllDir(BaseDirItemTraktCalendarDir):
     priority = 332
     types = ('movie', )
     params = {'info': 'dir_calendar_dvd', 'user': 'false'}
+    group = 32203
 
     @cached_property
     def label_prefix(self):
@@ -332,6 +360,7 @@ class BaseDirItemTraktDVDCalendarAllDir(BaseDirItemTraktCalendarDir):
 class BaseDirItemTraktCalendarNewAllDir(BaseDirItemTraktCalendarPremieresAllDir):
     priority = 340
     params = {'info': 'dir_calendar_trakt', 'user': 'false', 'endpoint': 'new'}
+    group = 32203
 
     @cached_property
     def label(self):
@@ -353,6 +382,7 @@ class BaseDirItemTraktGenres(BaseDirItem):
     types = ('movie', 'tv', )
     params = {'info': 'trakt_genres'}
     art_icon = 'resources/icons/trakt/genres.png'
+    group = 135
 
 
 class BaseDirItemTraktYears(BaseDirItem):
@@ -362,6 +392,7 @@ class BaseDirItemTraktYears(BaseDirItem):
     types = ('movie', 'tv', )
     params = {'info': 'trakt_years'}
     art_icon = 'resources/icons/trakt/calendar.png'
+    group = 652
 
 
 class BaseDirItemTraktTrending(BaseDirItem):
@@ -371,6 +402,7 @@ class BaseDirItemTraktTrending(BaseDirItem):
     params = {'info': 'trakt_trending'}
     filters = True
     art_icon = 'resources/icons/trakt/trend.png'
+    group = 32204
 
 
 class BaseDirItemTraktPopular(BaseDirItem):
@@ -380,6 +412,7 @@ class BaseDirItemTraktPopular(BaseDirItem):
     params = {'info': 'trakt_popular'}
     filters = True
     art_icon = 'resources/icons/trakt/popular.png'
+    group = 32175
 
 
 class BaseDirItemTraktMostPlayed(BaseDirItem):
@@ -389,6 +422,7 @@ class BaseDirItemTraktMostPlayed(BaseDirItem):
     params = {'info': 'trakt_mostplayed'}
     filters = True
     art_icon = 'resources/icons/trakt/mostplayed.png'
+    group = 32414
 
 
 class BaseDirItemTraktMostViewers(BaseDirItem):
@@ -398,6 +432,7 @@ class BaseDirItemTraktMostViewers(BaseDirItem):
     params = {'info': 'trakt_mostviewers'}
     filters = True
     art_icon = 'resources/icons/trakt/mostplayed.png'
+    group = 32414
 
 
 class BaseDirItemTraktAntipated(BaseDirItem):
@@ -407,6 +442,7 @@ class BaseDirItemTraktAntipated(BaseDirItem):
     params = {'info': 'trakt_anticipated'}
     filters = True
     art_icon = 'resources/icons/trakt/anticipated.png'
+    group = 32206
 
 
 class BaseDirItemTraktBoxOffice(BaseDirItem):
@@ -415,6 +451,7 @@ class BaseDirItemTraktBoxOffice(BaseDirItem):
     types = ('movie', )
     params = {'info': 'trakt_boxoffice'}
     art_icon = 'resources/icons/trakt/boxoffice.png'
+    group = 32414
 
 
 class BaseDirItemTraktPopularDecade2020s(BaseDirItem):
@@ -423,6 +460,7 @@ class BaseDirItemTraktPopularDecade2020s(BaseDirItem):
     filters = True
     art_icon = 'resources/icons/trakt/calendar.png'
     trakt_decade = 2020
+    group = 32157
 
     @cached_property
     def label(self):
@@ -514,6 +552,7 @@ class BaseDirItemTraktPopularCertificationG(BaseDirItem):
     filters = True
     art_icon = 'resources/icons/trakt/popular.png'
     trakt_certifications = 'g'
+    group = 32158
 
     @cached_property
     def label(self):
@@ -570,6 +609,7 @@ class BaseDirItemTraktTrendingLists(BaseDirItem):
     types = ('both', )
     params = {'info': 'trakt_trendinglists'}
     art_icon = 'resources/icons/trakt/trendinglist.png'
+    group = 32159
 
 
 class BaseDirItemTraktPopularLists(BaseDirItem):
@@ -579,6 +619,7 @@ class BaseDirItemTraktPopularLists(BaseDirItem):
     types = ('both', )
     params = {'info': 'trakt_popularlists'}
     art_icon = 'resources/icons/trakt/popularlist.png'
+    group = 32159
 
 
 class BaseDirItemTraktLikedLists(BaseDirItem):
@@ -588,6 +629,7 @@ class BaseDirItemTraktLikedLists(BaseDirItem):
     types = ('both', )
     params = {'info': 'trakt_likedlists'}
     art_icon = 'resources/icons/trakt/likedlist.png'
+    group = 32159
 
 
 class BaseDirItemTraktMyLists(BaseDirItem):
@@ -597,6 +639,7 @@ class BaseDirItemTraktMyLists(BaseDirItem):
     types = ('both', )
     params = {'info': 'trakt_mylists'}
     art_icon = 'resources/icons/trakt/mylists.png'
+    group = 32159
 
 
 class BaseDirItemTraktSearchLists(BaseDirItem):
@@ -606,6 +649,7 @@ class BaseDirItemTraktSearchLists(BaseDirItem):
     types = ('both', )
     params = {'info': 'trakt_searchlists'}
     art_icon = 'resources/icons/trakt/mylist.png'
+    group = 32159
 
 
 def get_all_trakt_class_instances():

@@ -99,7 +99,7 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         #     return
 
         # Check we can actually get something from underlying item
-        if self.is_same_base_window(update=True) and not self.get_cur_path():
+        if self.is_same_base_window(update=True) and not self.get_cur_info():
             return
 
         # Check if the item has changed before retrieving details again

@@ -9,6 +9,13 @@ from jurialmunkey.parser import try_int
 
 class UncachedMDbListItemsPage(UncachedItemsPage):
     @cached_property
+    def response_results(self):
+        try:
+            return self.response['json']
+        except (TypeError, KeyError):
+            return
+
+    @cached_property
     def response_total_pages(self):
         return try_int(self.response['headers'].get('x-pagination-page-count', 0))
 
@@ -106,7 +113,6 @@ class ListMDbListLocal(ListStandard):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.plugin_name = 'TMDbHelper'
         list_properties.page_length = get_setting('pagemulti_trakt', 'int') or 1
-        list_properties.results_key = 'json'
         return list_properties
 
     def get_items(self, *args, paths, tmdb_type=None, **kwargs):

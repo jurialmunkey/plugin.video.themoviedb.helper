@@ -11,11 +11,18 @@ class ListItemInfoGetter(BaseItemInfoGetter):
     def get_cur_item(self):
         return self._item.get_identifier()
 
-    def get_cur_path(self):
+    def get_cur_info(self):
+        """
+        Check to see if some form of information is retrievable from item
+        Previously checked only folderpath but might be problematic for static items without one
+        Now check to see if there is a label or icon first
+        """
         return (
-            self._item.infolabel_folderpath
-            or self._item.infolabel_filenameandpath
-            or self._item.infolabel_path
+            self._item.get_infolabel('label')
+            or self._item.get_infolabel('icon')
+            or self._item.get_infolabel('folderpath')
+            or self._item.get_infolabel('filenameandpath')
+            or self._item.get_infolabel('path')
         )
 
     # ==================

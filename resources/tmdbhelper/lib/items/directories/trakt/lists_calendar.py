@@ -227,12 +227,20 @@ class ListTraktCalendarProperties(ListTraktStandardProperties):
         return plugin_category
 
     @cached_property
+    def calendar_flatten(self):
+        from tmdbhelper.lib.addon.plugin import get_setting
+        if self.tmdb_type != 'tv':
+            return False
+        if not get_setting('calendar_flatten'):
+            return False
+        return True
+
+    @cached_property
     def sorted_items(self):
         """
         Reverse items if starting in the past so that most recent are first
         """
-        from tmdbhelper.lib.addon.plugin import get_setting
-        return self.get_stacked_items() if get_setting('calendar_flatten') else self.get_unstacked_items()
+        return self.get_stacked_items() if self.calendar_flatten else self.get_unstacked_items()
 
     def get_unstacked_items(self):
         return self.filtered_items[::-1] if self.trakt_date < -1 else self.filtered_items
