@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-07-15 11:58+0800\n"
+"PO-Revision-Date: 2025-12-05 15:33+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -716,6 +716,61 @@ msgstr "删除备用项"
 msgctxt "#32117"
 msgid "Keyword"
 msgstr "关键词"
+
+#: /resources/tmdbhelper/lib/player/players.py
+msgctxt "#32143"
+msgid "Recaching Kodi library"
+msgstr "正在重新缓存 Kodi 媒体库"
+
+#: /resources/tmdbhelper/lib/player/players.py
+msgctxt "#32144"
+msgid "Retrieving player files"
+msgstr "正在检索播放文件"
+
+#: /resources/tmdbhelper/lib/player/dialog/player.py
+msgctxt "#32145"
+msgid "Retrieving library"
+msgstr "检索媒体库"
+
+#: /resources/tmdbhelper/lib/api/trakt/sync/invalidator.py
+msgctxt "#32146"
+msgid "Successfully refreshed {} sync data"
+msgstr "成功刷新 {} 同步数据"
+
+#: /resources/settings.xml
+msgctxt "#32147"
+msgid "Gemini API"
+msgstr "Gemini API"
+
+#: /resources/settings.xml
+msgctxt "#32148"
+msgid "Gemini API key"
+msgstr "Gemini API 密钥"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_main.py
+msgctxt "#32149"
+msgid "Gemini AI"
+msgstr "Gemini AI"
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
+msgctxt "#32150"
+msgid "Google Gemini AI requires a developer API key to use."
+msgstr "使用 Google Gemini AI 需要开发者 API 密钥"
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
+msgctxt "#32151"
+msgid "Visit [B]{}[/B] to generate your key and then input into TMDbHelper settings under the API keys section."
+msgstr "访问 [B]{}[/B] 生成密钥，然后在 TMDbHelper 设置中的 “API 密钥” 板块输入该密钥。"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_nodes.py
+msgctxt "#32152"
+msgid "Remove node"
+msgstr "移除节点"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32153"
+msgid "Query"
+msgstr "查询"
 
 #: /resources/lib/container.py
 msgctxt "#32119"
@@ -1558,7 +1613,7 @@ msgctxt "#32322"
 msgid "Select player"
 msgstr "选择播放器"
 
-#: /resources/lib/helpers/timedate.py
+#: /resources/lib/helpers/update.py
 msgctxt "#32326"
 msgid "This Month"
 msgstr "本月"
