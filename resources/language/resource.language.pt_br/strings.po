@@ -2798,7 +2798,7 @@ msgstr "Reprodutores"
 #: /resources/settings.xml
 msgctxt "#32016"
 msgid "Update players from URL"
-msgstr "Atualizar reprodutores do URL"
+msgstr "Atualizar reprodutores da URL"
 
 #: /resources/settings.xml
 msgctxt "#32017"
