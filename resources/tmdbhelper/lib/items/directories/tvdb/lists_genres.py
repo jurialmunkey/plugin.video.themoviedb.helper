@@ -1,30 +1,51 @@
-from tmdbhelper.lib.addon.plugin import get_localized, convert_type
-from tmdbhelper.lib.items.directories.tvdb.lists_tvdb import ListLists, ListListItems
+from tmdbhelper.lib.items.directories.tvdb.lists_awards import ListAwards
+from tmdbhelper.lib.items.directories.tvdb.lists_tvdb import ListTVDbProperties, ListTVDbMediaProperties
+from tmdbhelper.lib.items.directories.tvdb.mapper_static import TVDbStaticGenresItemMapper
+from tmdbhelper.lib.items.directories.tvdb.mapper_items import TVDbGenreItemMapper
+from tmdbhelper.lib.addon.plugin import get_setting
+from jurialmunkey.ftools import cached_property
 
 
-class ListGenres(ListLists):
-    def get_items(self, info, tmdb_type, **kwargs):
-        self.plugin_category = get_localized(135)
-        items = self._get_items('genres', 'tvdb_genre', params={'tmdb_type': tmdb_type})
-        return sorted(items, key=lambda x: x.get('label') or 0)
+class ListTVDbGenresProperties(ListTVDbProperties):
+    item_mapper_class = TVDbStaticGenresItemMapper
 
 
-class ListGenre(ListListItems):
-    def _get_item(self, i, tmdb_type, mediatype):
-        item = self.tvdb_api.mapper.get_info(i, tmdb_type=tmdb_type)
-        item['infolabels']['mediatype'] = mediatype
-        item = self._get_item_tmdb_id(item, tmdb_type)
-        return item
+class ListGenres(ListAwards):
 
-    def get_items(self, info, tvdb_id, tmdb_type, page=1, **kwargs):
-        try:
-            tvdb_type = {'movie': 'movies', 'tv': 'series'}[tmdb_type]
-        except KeyError:
-            return
-        mediatype = convert_type(tmdb_type, 'dbtype')
-        data = self.tvdb_api.get_request_lc(tvdb_type, 'filter', genre=tvdb_id, sort='score', sortType='desc')
-        if not data:
-            return
-        self.container_content = convert_type(tmdb_type, 'container')
-        self.plugin_category = get_localized(135)
-        return self._get_threaded_items(data, page, tmdb_type, mediatype)
+    list_properties_class = ListTVDbGenresProperties
+
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.localize = 135
+        list_properties.request_url = 'genres'
+        list_properties.sorting_key = lambda x: x.get('label') or 0
+        return list_properties
+
+
+class ListTVDbMixedMediaProperties(ListTVDbMediaProperties):
+    item_mapper_class = staticmethod(TVDbGenreItemMapper)
+
+    @cached_property
+    def request(self):
+        request = []
+        if self.tmdb_type in ('movie', 'both'):
+            request += self.tvdb_api.get_request_lc(self.url.format(tvdb_type='movies'), **self.request_url_kwargs)
+        if self.tmdb_type in ('tv', 'both'):
+            request += self.tvdb_api.get_request_lc(self.url.format(tvdb_type='series'), **self.request_url_kwargs)
+        return request
+
+
+class ListGenre(ListAwards):
+
+    list_properties_class = ListTVDbMixedMediaProperties
+
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.localize = 135
+        list_properties.request_url = '{{tvdb_type}}/filter'
+        list_properties.page_length = get_setting('pagemulti_trakt', 'int') or 1
+        return list_properties
+
+    def get_items(self, tvdb_id, **kwargs):
+        self.list_properties.request_url_kwargs = {'genre': tvdb_id, 'sort': 'score', 'sortType': 'desc'}
+        return super().get_items(**kwargs)

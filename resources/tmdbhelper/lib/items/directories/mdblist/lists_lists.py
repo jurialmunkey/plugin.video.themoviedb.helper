@@ -1,8 +1,6 @@
 from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard
-from tmdbhelper.lib.items.directories.mdblist.lists_local import (
-    ListMDbListLocalProperties,
-    UncachedMDbListLocalData,
-)
+from tmdbhelper.lib.items.directories.mdblist.lists_local import ListMDbListLocalProperties
+from tmdbhelper.lib.items.directories.lists_local import UncachedListLocalData
 from tmdbhelper.lib.items.directories.mdblist.mapper_lists import ListsMDbListItemMapper
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
@@ -36,7 +34,7 @@ class ListMDbListListsProperties(ListMDbListLocalProperties):
 
     def get_api_response(self, page=1):
         response = self.mdblist_api.get_response(self.url, **self.response_kwgs)
-        return UncachedMDbListLocalData(response.json(), self.page, self.limit).data
+        return UncachedListLocalData(response.json(), self.page, self.limit).data
 
     def get_mapped_item(self, item, add_infoproperties=None):
         return ListsMDbListItemMapper(item, add_infoproperties).item

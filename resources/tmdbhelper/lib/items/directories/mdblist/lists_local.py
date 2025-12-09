@@ -1,70 +1,27 @@
-from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties, UncachedItemsPage
+from tmdbhelper.lib.items.directories.lists_default import UncachedItemsPage
+from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties
 from tmdbhelper.lib.items.directories.mdblist.mapper_standard import FactoryMDbListItemMapper
+from tmdbhelper.lib.items.directories.lists_local import UncachedListLocalData
 from tmdbhelper.lib.addon.plugin import get_setting
 from jurialmunkey.ftools import cached_property
 from jurialmunkey.parser import try_int
 
 
-class UncachedMDbListLocalData:
-    def __init__(self, response, page=1, limit=20):
-        self.response = response
-        self.limit = limit
-        self.page = page
-
-    @cached_property
-    def item_count(self):
-        return len(self.response)
-
-    @cached_property
-    def page_count(self):
-        return (self.item_count + self.limit - 1) // self.limit  # Ceiling division
-
-    @cached_property
-    def item_a(self):
-        return max(((self.page - 1) * self.limit), 0)
-
-    @cached_property
-    def item_z(self):
-        return min((self.page * self.limit), self.item_count)
-
-    @cached_property
-    def json(self):
-        return self.response[self.item_a:self.item_z]
-
-    @cached_property
-    def data(self):
-        return {
-            'json': self.json,
-            'headers': {
-                'x-pagination-page-count': self.page_count,
-                'x-pagination-item-count': self.item_count,
-            }
-        } if self.response else {}
-
-
 class UncachedMDbListItemsPage(UncachedItemsPage):
-    def __init__(self, outer_class, page):
-        self.outer_class = outer_class
-        self.page = page
-
     @cached_property
-    def response_json(self):
-        return self.get_response_json()
-
-    def get_response_json(self):
+    def response_results(self):
         try:
             return self.response['json']
         except (TypeError, KeyError):
-            return []
+            return
 
-    def get_results(self):
-        try:
-            self.outer_class.total_pages = try_int(self.response['headers'].get('x-pagination-page-count', 0))
-            self.outer_class.total_items = try_int(self.response['headers'].get('x-pagination-item-count', 0))
-        except (TypeError, KeyError):
-            self.outer_class.total_pages = 0
-            self.outer_class.total_items = 0
-        return self.response_json
+    @cached_property
+    def response_total_pages(self):
+        return try_int(self.response['headers'].get('x-pagination-page-count', 0))
+
+    @cached_property
+    def response_total_items(self):
+        return try_int(self.response['headers'].get('x-pagination-item-count', 0))
 
 
 class ListMDbListLocalProperties(ListStandardProperties):
@@ -137,7 +94,7 @@ class ListMDbListLocalProperties(ListStandardProperties):
                 with xbmcvfs.File(self.filepath, 'r') as file:
                     response = json.load(file)
 
-        return UncachedMDbListLocalData(response, self.page, self.limit).data
+        return UncachedListLocalData(response, self.page, self.limit).data
 
     def get_mapped_item(self, item, add_infoproperties=None):
         return FactoryMDbListItemMapper(item, add_infoproperties).item

@@ -1,13 +1,11 @@
 from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard
-from tmdbhelper.lib.items.directories.mdblist.lists_local import (
-    ListMDbListLocalProperties,
-    UncachedMDbListLocalData,
-)
+from tmdbhelper.lib.items.directories.mdblist.lists_local import ListMDbListLocalProperties
+from tmdbhelper.lib.items.directories.lists_local import UncachedListLocalData
 from tmdbhelper.lib.addon.plugin import get_setting
 from jurialmunkey.ftools import cached_property
 
 
-class UncachedMDbListCustomData(UncachedMDbListLocalData):
+class UncachedMDbListCustomData(UncachedListLocalData):
     @cached_property
     def headers(self):
         return self.response.headers

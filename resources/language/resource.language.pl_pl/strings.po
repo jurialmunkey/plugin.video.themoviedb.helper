@@ -396,7 +396,7 @@ msgctxt "#32079"
 msgid "User"
 msgstr "Użytkownik"
 
-#: /resources/lib/downloader.py
+#: /resoRaportyib/downloader.py
 msgctxt "#32059"
 msgid "Success!"
 msgstr "Sukces!"

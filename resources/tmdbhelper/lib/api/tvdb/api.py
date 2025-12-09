@@ -30,15 +30,6 @@ class TVDb(RequestAPI):
         TVDb.api_key = api_key or self.api_key
         TVDb.user_token = user_token or self.user_token
 
-    @property
-    def mapper(self):
-        try:
-            return self._mapper
-        except AttributeError:
-            from tmdbhelper.lib.api.tvdb.mapping import ItemMapper
-            self._mapper = ItemMapper()
-            return self._mapper
-
     def set_token(self):
         self._token = self.get_token()
         self.headers = {'Authorization': f'Bearer {self._token}'}

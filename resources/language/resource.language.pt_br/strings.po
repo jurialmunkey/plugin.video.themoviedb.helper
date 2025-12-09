@@ -734,15 +734,70 @@ msgctxt "#32146"
 msgid "Successfully refreshed {} sync data"
 msgstr "Dados de sincronização do {} atualizados com êxito"
 
+#: /resources/settings.xml
+msgctxt "#32147"
+msgid "Gemini API"
+msgstr "API da Gemini"
+
+#: /resources/settings.xml
+msgctxt "#32148"
+msgid "Gemini API key"
+msgstr "Chave API da Gemini"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_main.py
+msgctxt "#32149"
+msgid "Gemini AI"
+msgstr "IA Gemini"
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
+msgctxt "#32150"
+msgid "Google Gemini AI requires a developer API key to use."
+msgstr "O Google Gemini IA requer uma chave de API do desenvolvedor para ser usado."
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
+msgctxt "#32151"
+msgid "Visit [B]{}[/B] to generate your key and then input into TMDbHelper settings under the API keys section."
+msgstr "Visite [B]{}[/B] para gerar sua chave e, em seguida, insira as configurações do TMDbHelper na seção de chaves de API."
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_nodes.py
+msgctxt "#32152"
+msgid "Remove node"
+msgstr "Remover nó"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32153"
+msgid "Query"
+msgstr "Consulta"
+
 #: /resources/lib/container.py
 msgctxt "#32119"
 msgid "Select Release Types"
 msgstr "Selecionar os Tipos de Lançamento"
 
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32155"
+msgid "Airing"
+msgstr "Exibindo"
+
 #: /resources/lib/container.py
 msgctxt "#32120"
 msgid "Select Region for Release"
 msgstr "Selecionar Região para Lançamento"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32157"
+msgid "Decades"
+msgstr "Décadas"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32158"
+msgid "Certifications"
+msgstr "Certificações"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32159"
+msgid "Lists"
+msgstr "Listas"
 
 #: /resources/lib/container.py
 msgctxt "#32121"
@@ -1438,16 +1493,20 @@ msgstr "Opções do Trakt"
 
 #: /resources/lib/script.py
 msgctxt "#32296"
-msgid "{} failed for {}!\n"
+msgid ""
+"{} failed for {}!\n"
 "{} ID {}"
-msgstr "{} falhou em {}!\n"
+msgstr ""
+"{} falhou em {}!\n"
 "{} ID {}"
 
 #: /resources/lib/script.py
 msgctxt "#32297"
-msgid "{} was successful for {}!\n"
+msgid ""
+"{} was successful for {}!\n"
 "{} ID {}"
-msgstr "{} foi bem sucedido para {}!\n"
+msgstr ""
+"{} foi bem sucedido para {}!\n"
 "{} ID {}"
 
 #: /resources/lib/syncitem.py
@@ -1616,10 +1675,12 @@ msgstr "Redefinir o reprodutor para os padrões?"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32335"
-msgid "Do you wish to reset the [B]{}[/B] player file back to its original unmodified state on disk?\n"
+msgid ""
+"Do you wish to reset the [B]{}[/B] player file back to its original unmodified state on disk?\n"
 "\n"
 "[B]WARNING:[/B] This action cannot be undone."
-msgstr "Deseja redefinir o arquivo do reprodutor [B]{}[/B] de volta ao seu estado original não modificado no disco?\n"
+msgstr ""
+"Deseja redefinir o arquivo do reprodutor [B]{}[/B] de volta ao seu estado original não modificado no disco?\n"
 "\n"
 "[B]AVISO:[/B] Esta ação não pode ser desfeita."
 
@@ -1630,11 +1691,13 @@ msgstr "Salvar suas alterações?"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32337"
-msgid "The [B]{}[/B] player file has changed.\n"
+msgid ""
+"The [B]{}[/B] player file has changed.\n"
 "Do you wish to save your changes?\n"
 "\n"
 "If you close without saving, your changes will be lost."
-msgstr "O arquivo do reprodutor [B]{}[/B] foi alterado.\n"
+msgstr ""
+"O arquivo do reprodutor [B]{}[/B] foi alterado.\n"
 "Deseja salvar suas alterações?\n"
 "\n"
 "Se você fechar sem salvar, suas alterações serão perdidas."
@@ -1651,10 +1714,12 @@ msgstr "{} método de resolução de URL de reprodução"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32340"
-msgid "Please note that setResolvedUrl is Kodi's preferred method for resolving playback URLs. The PlayMedia method should only be used if you experience difficulties using setResolvedUrl with this particular player.\n"
+msgid ""
+"Please note that setResolvedUrl is Kodi's preferred method for resolving playback URLs. The PlayMedia method should only be used if you experience difficulties using setResolvedUrl with this particular player.\n"
 "\n"
 "Are you sure you want to set this player's resolve method to PlayMedia?"
-msgstr "Observe que setResolvedUrl é o método preferido do Kodi para resolver URLs de reprodução. O método PlayMedia só deve ser usado se você tiver dificuldades ao usar setResolvedUrl com este player específico.\n"
+msgstr ""
+"Observe que setResolvedUrl é o método preferido do Kodi para resolver URLs de reprodução. O método PlayMedia só deve ser usado se você tiver dificuldades ao usar setResolvedUrl com este player específico.\n"
 "\n"
 "Tem certeza de que deseja definir o método de resolução deste reprodutor para PlayMedia?"
 
@@ -1710,10 +1775,12 @@ msgstr "Sinalizador \"is_resolvable\" ausente"
 
 #: /resources/lib/player/players.py
 msgctxt "#32354"
-msgid "Does this player resolve directly to a single playable file?\n"
+msgid ""
+"Does this player resolve directly to a single playable file?\n"
 "\n"
 "Select \"Yes\" for any player that plays directly from single source. Select \"No\" for players that scrape multiple sources or otherwise do not work with the setResolvedURL method."
-msgstr "Este reprodutor resolve diretamente para um único arquivo reproduzível?\n"
+msgstr ""
+"Este reprodutor resolve diretamente para um único arquivo reproduzível?\n"
 "\n"
 "Selecione \"Sim\" para qualquer reprodutor que reproduza diretamente de uma única fonte. Selecione \"Não\" para players que coletam múltiplas fontes ou não funcionam com o método setResolvedURL."
 
@@ -1729,10 +1796,12 @@ msgstr "Insira o novo nome da lista"
 
 #: /resources/lib/script/router.py
 msgctxt "#32357"
-msgid "Are you sure you want to delete [B]{}[/B]?\n"
+msgid ""
+"Are you sure you want to delete [B]{}[/B]?\n"
 "\n"
 "This action cannot be undone."
-msgstr "Tem certeza de que deseja excluir [B]{}[/B]?\n"
+msgstr ""
+"Tem certeza de que deseja excluir [B]{}[/B]?\n"
 "\n"
 "Esta ação não pode ser desfeita."
 
@@ -1888,10 +1957,12 @@ msgstr "Selecionar o tipo de atualização"
 
 #: /resources/lib/script/router.py
 msgctxt "#32392"
-msgid "Use [B]Quick Update[/B] to check for new items.\n"
+msgid ""
+"Use [B]Quick Update[/B] to check for new items.\n"
 "\n"
 "Use [B]Forced Update[/B] to ignore previously cached update details and recheck all items. Forced updates should only be used when cleaning and rebuilding the Kodi library."
-msgstr "Use a [B]Atualização Rápida[/B] para verificar se há novos itens.\n"
+msgstr ""
+"Use a [B]Atualização Rápida[/B] para verificar se há novos itens.\n"
 "\n"
 "Use [B]Atualização Forçada[/B] para ignorar os detalhes da atualização previamente armazenados em cache e verificar novamente todos os itens. As atualizações forçadas só devem ser usadas ao limpar e reconstruir a biblioteca Kodi."
 
@@ -2332,8 +2403,8 @@ msgstr "Remover dos favoritos"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32492"
-msgid "{} already exists in {}!\\nDo you wish to remove this item from the list?"
-msgstr "{} já existe em {}!\\nDeseja remover este item da lista?"
+msgid "{} already exists in {}!"
+msgstr "{} já existe em {}!"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32493"
@@ -2352,8 +2423,8 @@ msgstr "Criar novo nó"
 
 #: /resources/tmdbhelper/lib/items/container.py
 msgctxt "#32496"
-msgid "Add/Remove as Custom Node"
-msgstr "Adicionar/Remover como Nó Personalizado"
+msgid "Add node"
+msgstr "Adicionar nó"
 
 #: /resources/settings.xml
 msgctxt "#32497"
@@ -2581,7 +2652,7 @@ msgctxt "#30043"
 msgid "Malay (Singapore)"
 msgstr "Malaio (Cingapura)"
 
-msgctxt "#30046"
+msgctxt "#30044"
 msgid "Norwegian Bokmål (Norway)"
 msgstr "Bokmål norueguês (Noruega)"
 
@@ -2756,4 +2827,3 @@ msgstr "Reprodutor padrão para filmes"
 msgctxt "#32025"
 msgid "Default player for episodes"
 msgstr "Reprodutor padrão para episódios"
-

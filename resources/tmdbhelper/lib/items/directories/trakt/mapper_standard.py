@@ -50,7 +50,6 @@ class MediaItemMapper(ItemMapper):
             for k, v in self.meta.items()
             if k in self.infoproperties_map
         }
-        infoproperties.update({k: v for k, v in (self.add_infoproperties or ())})
         infoproperties['tmdb_type'] = self.tmdb_type
         infoproperties['tmdb_id'] = self.tmdb_id
         return infoproperties
