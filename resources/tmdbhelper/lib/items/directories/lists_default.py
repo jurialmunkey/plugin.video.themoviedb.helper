@@ -176,6 +176,54 @@ class ListProperties:
         return self.sorted_items
 
 
+class ListSliceProperties(ListProperties):
+    unconfigured_item_data = None
+
+    @cached_property
+    def cache_name(self):
+        return self.class_name
+
+    @property
+    def next_page(self):
+        return self.page + 1
+
+    def get_uncached_items(self):
+        return
+
+    @cached_property
+    def items(self):
+        return self.get_cached_items() or []
+
+    @cached_property
+    def pages(self):
+        return (self.count + self.limit - 1) // self.limit  # Ceiling division
+
+    @cached_property
+    def count(self):
+        return len(self.filtered_items)
+
+    @cached_property
+    def limit(self):
+        return self.pmax * 20
+
+    @cached_property
+    def item_a(self):
+        return max(((self.page - 1) * self.limit), 0)
+
+    @cached_property
+    def item_z(self):
+        return min((self.page * self.limit), self.count)
+
+    @cached_property
+    def sorted_items(self):
+        sorted_items = self.filtered_items
+        return sorted_items[self.item_a:self.item_z]
+
+    @cached_property
+    def container_content(self):
+        return convert_type(self.tmdb_type, 'container', items=self.sorted_items)
+
+
 class ListDefault(ContainerDefaultCacheDirectory):
 
     list_properties_class = ListProperties

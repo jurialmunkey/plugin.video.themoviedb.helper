@@ -1,64 +1,86 @@
-from tmdbhelper.lib.items.container import ContainerDirectory
+from tmdbhelper.lib.items.directories.tvdb.mapper_static import TVDbStaticItemMapper
+from tmdbhelper.lib.items.directories.tvdb.mapper_items import TVDbAwardItemMapper
+from tmdbhelper.lib.items.directories.lists_default import ListSliceProperties
+from jurialmunkey.ftools import cached_property
 
 
-class ListListItems(ContainerDirectory):
-    def _get_item_tmdb_id(self, item, tmdb_type):
-        if tmdb_type == 'tv':
-            tv_tmdb_id = self.query_database.get_tmdb_id(
-                tmdb_type=tmdb_type,
-                tvdb_id=item['unique_ids'].get('tvdb'))
-            if not tv_tmdb_id:
-                tv_tmdb_id = self.query_database.get_tmdb_id(
-                    tmdb_type=tmdb_type,
-                    query=item['infolabels'].get('originaltitle'),
-                    year=item['infolabels'].get('year'))
-            item['unique_ids']['tvshow.tmdb'] = item['unique_ids']['tmdb'] = tv_tmdb_id
-        elif tmdb_type == 'movie':
-            item['unique_ids']['tmdb'] = self.query_database.get_tmdb_id(
-                tmdb_type=tmdb_type,
-                query=item['infolabels'].get('originaltitle'),
-                year=item['infolabels'].get('year'))
-        if not item['unique_ids'].get('tmdb'):
-            return
-        item['params'] = {'info': 'details', 'tmdb_type': tmdb_type, 'tmdb_id': item['unique_ids']['tmdb']}
-        return item
+class ListTVDbProperties(ListSliceProperties):
+    item_mapper_class = TVDbStaticItemMapper
+    unconfigured_item_data = None
+    sorting_key = None
+    sorting_rev = False
 
-    def _get_threaded_items(self, data, page, *args, **kwargs):
-        from tmdbhelper.lib.items.pages import PaginatedItems
-        response = PaginatedItems(data, page=page)
-        if not response or not response.items:
-            return
-        from tmdbhelper.lib.addon.thread import ParallelThread
-        with ParallelThread(response.items, self._get_item, *args, **kwargs) as pt:
-            item_queue = pt.queue
-        items = [i for i in item_queue if i]
-        return items + response.next_page
+    @cached_property
+    def plugin_category(self):
+        plugin_category = self.request.get('name') if isinstance(self.request, dict) else None
+        plugin_category = plugin_category or self.plugin_name.format(localized=self.localized, plural=self.plural)
+        return plugin_category
 
+    @cached_property
+    def request(self):
+        return self.tvdb_api.get_request_lc(self.url, **self.request_url_kwargs)
 
-class ListLists(ContainerDirectory):
-    def _get_items(self, endpoint, param_info, key=None, params=None):
-        data = self.tvdb_api.get_request_lc(endpoint)
-        if key and data:
-            self.plugin_category = data.get('name')
-            data = data.get(key)
-        if not data:
-            return
+    @cached_property
+    def results(self):
+        return self.request[self.results_key] if self.request and self.results_key else self.request
 
-        from tmdbhelper.lib.api.mapping import get_empty_item
-        from tmdbhelper.lib.addon.consts import TVDB_DISCLAIMER
-        from tmdbhelper.lib.addon.plugin import ADDONPATH
-        tvdb_icon = f'{ADDONPATH}/resources/icons/tvdb/tvdb.png'
-
-        def _get_item(i):
-            item = get_empty_item()
-            item['label'] = i.get('name')
-            item['art']['icon'] = tvdb_icon
-            item['params'] = {'info': param_info, 'tvdb_id': i.get('id')}
-            item['infolabels']['plot'] = TVDB_DISCLAIMER
-            if params:
-                item['params'].update(params)
-            return item
-
-        items = [_get_item(i) for i in data if i.get('id')]
-
+    def get_uncached_items(self):
+        items = [i for i in [self.item_mapper_class(meta, None).item for meta in (self.results or [])] if i]
         return items
+
+    @cached_property
+    def request_url_params(self):
+        """ for formatting url path """
+        return {}
+
+    @cached_property
+    def request_url_kwargs(self):
+        """ additional kwargs to add to request """
+        return {}
+
+    @cached_property
+    def url(self):
+        return self.request_url.format(**self.request_url_params)
+
+    @cached_property
+    def sorted_items(self):
+        sorted_items = self.filtered_items
+        sorted_items = sorted(sorted_items, key=self.sorting_key, reverse=self.sorting_rev) if self.sorting_key else sorted_items
+        return sorted_items[self.item_a:self.item_z]
+
+
+class ListTVDbMediaProperties(ListTVDbProperties):
+    item_mapper_class = staticmethod(TVDbAwardItemMapper)
+    add_infoproperties = None
+
+    @cached_property
+    def cache_name(self):
+        cache_name_list = [f'{k}={v}' for k, v in self.request_url_kwargs.items()]
+        cache_name_list = sorted(cache_name_list)
+        cache_name_list = [self.class_name, self.url] + cache_name_list
+        return '_'.join(cache_name_list)
+
+    @cached_property
+    def request(self):
+        request = self.tvdb_api.get_request_lc(self.url, **self.request_url_kwargs)
+        return request
+
+    def get_uncached_items(self):
+        return self.results or []
+
+    def get_mapped_item(self, item):
+        mapped_item = self.item_mapper_class(item, self.add_infoproperties)
+        return mapped_item.item if mapped_item.tmdb_id else None
+
+    def get_mapped_items(self, sorted_items):
+        from tmdbhelper.lib.addon.thread import ParallelThread
+        with ParallelThread(sorted_items, self.get_mapped_item) as pt:
+            mapped_items = pt.queue
+        return [i for i in mapped_items if i]
+
+    @cached_property
+    def sorted_items(self):
+        sorted_items = self.filtered_items
+        sorted_items = sorted(sorted_items, key=self.sorting_key, reverse=self.sorting_rev) if self.sorting_key else sorted_items
+        sorted_items = sorted_items[self.item_a:self.item_z]
+        return self.get_mapped_items(sorted_items)
