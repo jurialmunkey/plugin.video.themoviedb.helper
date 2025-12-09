@@ -1,4 +1,4 @@
-from tmdbhelper.lib.items.directories.lists_default import ItemCache, ListProperties, ListDefault
+from tmdbhelper.lib.items.directories.lists_default import ItemCache, ListSliceProperties, ListDefault
 from tmdbhelper.lib.items.directories.trakt.mapper_airingnext import AiringNextItemGetter
 from tmdbhelper.lib.addon.plugin import get_setting, get_localized
 from tmdbhelper.lib.addon.dialog import progress_bg
@@ -6,18 +6,9 @@ from jurialmunkey.ftools import cached_property
 from jurialmunkey.parser import try_int
 
 
-class ListAiringNextProperties(ListProperties):
+class ListAiringNextProperties(ListSliceProperties):
     dialog_now = 0
     cache_days = 0.02
-    unconfigured_item_data = None
-
-    @cached_property
-    def cache_name(self):
-        return self.class_name
-
-    @property
-    def next_page(self):
-        return self.page + 1
 
     @cached_property
     def dialog_max(self):
@@ -54,10 +45,6 @@ class ListAiringNextProperties(ListProperties):
         self.dialog_update_percentage(f'{get_localized(32375)}: {item_mapper.tmdb_id}')
         return item_mapper.item or None
 
-    @ItemCache('ItemContainer.db')
-    def get_cached_items(self, *args, **kwargs):
-        return self.get_uncached_items(*args, **kwargs)
-
     @progress_bg
     def get_uncached_items(self):
         from tmdbhelper.lib.addon.thread import ParallelThread
@@ -66,30 +53,6 @@ class ListAiringNextProperties(ListProperties):
         with ParallelThreadLimited(self.seed_items, self.get_threaded_item) as pt:
             item_queue = pt.queue
         return [i for i in item_queue if i]
-
-    @cached_property
-    def items(self):
-        return self.get_cached_items() or []
-
-    @cached_property
-    def pages(self):
-        return (self.count + self.limit - 1) // self.limit  # Ceiling division
-
-    @cached_property
-    def count(self):
-        return len(self.filtered_items)
-
-    @cached_property
-    def limit(self):
-        return self.pmax * 20
-
-    @cached_property
-    def item_a(self):
-        return max(((self.page - 1) * self.limit), 0)
-
-    @cached_property
-    def item_z(self):
-        return min((self.page * self.limit), self.count)
 
     @cached_property
     def sorted_items(self):

@@ -208,7 +208,7 @@ msgstr "Wszystkie Sezony"
 #: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
 msgctxt "#32041"
 msgid "Your In-Progress TV Shows"
-msgstr "Twoje w trakcie oglądania Sezony"
+msgstr "Twoje w trakcie oglądania Seriale"
 
 msgctxt "#30026"
 msgid "French (Canada)"
@@ -396,7 +396,7 @@ msgctxt "#32079"
 msgid "User"
 msgstr "Użytkownik"
 
-#: /resources/lib/downloader.py
+#: /resoRaportyib/downloader.py
 msgctxt "#32059"
 msgid "Success!"
 msgstr "Sukces!"
@@ -738,12 +738,12 @@ msgstr "Dane synchronizacji {} zostały pomyślnie odświeżone"
 #: /resources/settings.xml
 msgctxt "#32147"
 msgid "Gemini API"
-msgstr "Gemini API"
+msgstr "API Gemini"
 
 #: /resources/settings.xml
 msgctxt "#32148"
 msgid "Gemini API key"
-msgstr "Klucz API Gemini"
+msgstr "Klucz API Gemini AI"
 
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_main.py
 msgctxt "#32149"
@@ -760,15 +760,45 @@ msgctxt "#32151"
 msgid "Visit [B]{}[/B] to generate your key and then input into TMDbHelper settings under the API keys section."
 msgstr "Odwiedź [B]{}[/B], aby wygenerować swój klucz, a następnie wprowadź go w ustawieniach TMDbHelper w sekcji kluczy API."
 
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_nodes.py
+msgctxt "#32152"
+msgid "Remove node"
+msgstr "Usuń węzeł"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32153"
+msgid "Query"
+msgstr "Zapytanie"
+
 #: /resources/lib/container.py
 msgctxt "#32119"
 msgid "Select Release Types"
 msgstr "Wybierz typy wydań"
 
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32155"
+msgid "Airing"
+msgstr "Emitowane"
+
 #: /resources/lib/container.py
 msgctxt "#32120"
 msgid "Select Region for Release"
 msgstr "Wybierz region dla wydań"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32157"
+msgid "Decades"
+msgstr "Dekady"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32158"
+msgid "Certifications"
+msgstr "Kategorie wiekowe"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32159"
+msgid "Lists"
+msgstr "Listy"
 
 #: /resources/lib/container.py
 msgctxt "#32121"
@@ -778,7 +808,7 @@ msgstr "Wyczyść historię wyszukiwania"
 #: /resources/lib/context.py
 msgctxt "#32122"
 msgid "XBMCVFS reports unable to create path"
-msgstr "Raporty XBMCVFS nie mogą utworzyć ścieżki"
+msgstr "XBMCVFS zgłasza brak możliwości utworzenia ścieżki"
 
 #: /resources/lib/context.py
 msgctxt "#32123"
@@ -828,7 +858,7 @@ msgstr "Zaktualizuj bibliotekę teraz"
 #: /resources/settings.xml
 msgctxt "#32156"
 msgid "Next aired library calendar links to local tvshow"
-msgstr "Kalendarz emisji biblioteki linkuje do lokalnych seriali"
+msgstr "Kalendarz emisji biblioteki zawiera linki do lokalnych seriali"
 
 #: /resources/lib/context.py
 msgctxt "#32160"
@@ -2374,8 +2404,8 @@ msgstr "Usuń z Ulubionych"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32492"
-msgid "{} already exists in {}!\\nDo you wish to remove this item from the list?"
-msgstr "{} już istnieje w {}!\\nCzy chcesz usunąć tę pozycję z listy?"
+msgid "{} already exists in {}!"
+msgstr "{} już istnieje w {}!"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32493"
@@ -2394,8 +2424,8 @@ msgstr "Utwórz nowy węzeł"
 
 #: /resources/tmdbhelper/lib/items/container.py
 msgctxt "#32496"
-msgid "Add/Remove as Custom Node"
-msgstr "Dodaj/usuń jako węzeł"
+msgid "Add node"
+msgstr "Dodaj węzeł"
 
 #: /resources/settings.xml
 msgctxt "#32497"

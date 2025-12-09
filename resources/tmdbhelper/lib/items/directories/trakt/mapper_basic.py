@@ -28,7 +28,9 @@ class ItemMapper:
 
     @cached_property
     def infoproperties(self):
-        return self.clean_dict(self.get_infoproperties())
+        infoproperties = self.get_infoproperties()
+        infoproperties.update({k: v for k, v in (self.add_infoproperties or ())})
+        return self.clean_dict(infoproperties)
 
     def get_infoproperties(self):
         return {}
