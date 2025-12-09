@@ -2798,7 +2798,7 @@ msgstr "Reprodutores"
 #: /resources/settings.xml
 msgctxt "#32016"
 msgid "Update players from URL"
-msgstr "Chave de cliente Fanart.tv"
+msgstr "Atualizar reprodutores do URL"
 
 #: /resources/settings.xml
 msgctxt "#32017"
