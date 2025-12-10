@@ -15,6 +15,14 @@ class DiscoverMenu:
     label_affix = None
     paramstring = None
     label = None
+    enabled = True
+    value = None
+
+    @property
+    def paramstring(self):
+        if not self.value:
+            return
+        return f'{self.key}={self.value}'
 
     @cached_property
     def listitem(self):
@@ -54,12 +62,6 @@ class DiscoverList(DiscoverMenu):
             return
         return self.route.value
 
-    @property
-    def paramstring(self):
-        if not self.value:
-            return
-        return f'{self.key}={self.value}'
-
     @cached_property
     def routes(self):
         return ()
@@ -86,12 +88,6 @@ class DiscoverQuery(DiscoverMenu):
     @property
     def value(self):
         return self.label
-
-    @property
-    def paramstring(self):
-        if not self.value:
-            return
-        return f'{self.key}={self.value}'
 
     def menu(self):
         self.label = Dialog().input(get_localized(32044), defaultt=self.value or '')
@@ -122,12 +118,6 @@ class DiscoverRuntimes(DiscoverMenu):
     @property
     def value(self):
         return self.label
-
-    @property
-    def paramstring(self):
-        if not self.value:
-            return
-        return f'{self.key}={self.value}'
 
     def menu(self):
         self.value_a = Dialog().input(f'{self.input_label} [>>]', type=INPUT_NUMERIC, defaultt=f'{self.value_a}' if self.value_a else '')
@@ -238,6 +228,7 @@ class DiscoverMain(WindowXMLDialog):
     label = ''
     icon = ''
     winprop = ''
+    base_params = ()
 
     @cached_property
     def name(self):
@@ -249,7 +240,7 @@ class DiscoverMain(WindowXMLDialog):
 
     @property
     def path(self):
-        path = '&'.join((i.paramstring for i in self.routes if i.paramstring))
+        path = '&'.join((*self.base_params, *tuple((i.paramstring for i in self.routes if i.paramstring))))
         path = 'plugin://plugin.video.themoviedb.helper/?' + path
         return path
 
@@ -272,7 +263,10 @@ class DiscoverMain(WindowXMLDialog):
 
     @property
     def routes(self):
-        return tuple(self.routes_dict.values())
+        return tuple((i for i in self.routes_dict.values() if i.enabled))
+
+    def route_index(self, class_name):
+        return next((x for x, i in enumerate(self.routes) if i.__class__.__name__ == class_name), None)
 
     @cached_property
     def trakt_api(self):
@@ -324,8 +318,9 @@ class DiscoverMain(WindowXMLDialog):
         self.getControl(8).setLabel(get_localized(13007))
         self.build_menu()
 
-    def build_menu(self):
+    def build_menu(self, select_class=None):
         self.list_control.reset()
         self.list_control.addItems([i.listitem for i in self.routes])
         self.setFocus(self.list_control)
+        self.list_control.selectItem(self.route_index(select_class) or 0) if select_class is not None else None
         self.update_winprop()
