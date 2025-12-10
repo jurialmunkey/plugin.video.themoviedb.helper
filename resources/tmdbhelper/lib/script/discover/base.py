@@ -158,17 +158,19 @@ class DiscoverYears(DiscoverRuntimes):
     def input_label(self):
         return get_localized(32279)
 
-    def select_base_value(self, *label_affixes):
+    def select_base_value(self, *label_affixes, lower_limit=0):
+        vals = tuple((i for i in self.base_values if i > lower_limit))
         head = ' '.join((self.input_label, *label_affixes))
-        opts = [f'{i}' for i in self.base_values]
+        opts = [f'{i}' for i in vals]
         indx = Dialog().select(head, opts)
-        return self.base_values[indx] if indx != -1 else None
+        return vals[indx] if indx != -1 else None
 
-    def select_value(self, *label_affixes):
-        base = self.select_base_value(self.base_label, *label_affixes)
+    def select_value(self, *label_affixes, lower_limit=0):
+        base = self.select_base_value(self.base_label, *label_affixes, lower_limit=lower_limit - 9)
         if base is None:
             return
         vals = sorted(tuple(range(base, base + self.base_range_increment)), reverse=True)
+        vals = tuple((i for i in vals if i > lower_limit))
         head = ' '.join((self.input_label, *label_affixes))
         opts = [f'{i}' for i in vals]
         indx = Dialog().select(head, opts)
@@ -176,7 +178,7 @@ class DiscoverYears(DiscoverRuntimes):
 
     def menu(self):
         self.value_a = self.select_value('[>>]')
-        self.value_z = self.select_value('[<<]') if self.value_a else None
+        self.value_z = self.select_value(f'{self.value_a}', '[<<]', lower_limit=self.value_a) if self.value_a else None
         self.listitem.setLabel(self.listitem_label)
 
 
@@ -192,8 +194,8 @@ class DiscoverRatings(DiscoverYears):
     def input_label(self):
         return f'{get_localized(32028)} (%/100)'
 
-    def select_value(self, *label_affixes):
-        return self.select_base_value(*label_affixes)
+    def select_value(self, *label_affixes, lower_limit=0):
+        return self.select_base_value(*label_affixes, lower_limit=lower_limit)
 
 
 class DiscoverSave(DiscoverMenu):
