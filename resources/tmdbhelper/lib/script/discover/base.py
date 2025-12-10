@@ -1,5 +1,6 @@
 from tmdbhelper.lib.addon.plugin import get_localized
 from jurialmunkey.ftools import cached_property
+from jurialmunkey.window import get_property
 from collections import namedtuple
 from xbmcgui import Dialog, WindowXMLDialog, ListItem, INPUT_NUMERIC
 
@@ -236,6 +237,7 @@ class DiscoverMain(WindowXMLDialog):
     file = ''
     label = ''
     icon = ''
+    winprop = ''
 
     @cached_property
     def name(self):
@@ -261,6 +263,9 @@ class DiscoverMain(WindowXMLDialog):
     @cached_property
     def routes_dict(self):
         return self.get_routes_dict()
+
+    def update_winprop(self):
+        get_property(self.winprop, set_property=self.path) if self.winprop else None
 
     def get_routes_dict(self):
         return {}
@@ -288,13 +293,24 @@ class DiscoverMain(WindowXMLDialog):
         if focus_id == 7:
             return self.close()
         if focus_id == 8:
-            return self.routes_dict['reset'].menu()
+            return self.on_reset()
         if focus_id == 5:
-            return self.routes_dict['save'].menu()
+            return self.on_save()
 
     def on_action(self):
         x = self.list_control.getSelectedPosition()
         self.routes[x].menu()
+        self.update_winprop()
+
+    def on_reset(self):
+        value = self.routes_dict['reset'].menu()
+        self.update_winprop()
+        return value
+
+    def on_save(self):
+        value = self.routes_dict['save'].menu()
+        self.update_winprop()
+        return value
 
     @property
     def list_control(self):
@@ -302,7 +318,7 @@ class DiscoverMain(WindowXMLDialog):
 
     def onInit(self):
         self.getControl(1).setLabel(self.label)
-        self.getControl(5).setLabel(get_localized(1024))
+        self.getControl(5).setLabel(get_localized(190))
         self.getControl(6).setVisible(False)
         self.getControl(7).setLabel(get_localized(15067))
         self.getControl(8).setLabel(get_localized(13007))
@@ -312,3 +328,4 @@ class DiscoverMain(WindowXMLDialog):
         self.list_control.reset()
         self.list_control.addItems([i.listitem for i in self.routes])
         self.setFocus(self.list_control)
+        self.update_winprop()

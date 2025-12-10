@@ -183,6 +183,7 @@ class TraktDiscoverReset(DiscoverReset):
 class TraktDiscoverMain(DiscoverMain):
 
     file = NODE_FILENAME
+    winprop = 'TraktDiscover.Path'
 
     @cached_property
     def label(self):
