@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-12-05 15:33+0800\n"
+"PO-Revision-Date: 2025-12-10 09:21+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -755,7 +755,7 @@ msgstr "Gemini AI"
 #: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
 msgctxt "#32150"
 msgid "Google Gemini AI requires a developer API key to use."
-msgstr "使用 Google Gemini AI 需要开发者 API 密钥"
+msgstr "使用 Google Gemini AI 需要开发者 API 密钥。"
 
 #: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
 msgctxt "#32151"
@@ -777,10 +777,30 @@ msgctxt "#32119"
 msgid "Select Release Types"
 msgstr "类型"
 
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32155"
+msgid "Airing"
+msgstr "正在播出"
+
 #: /resources/lib/container.py
 msgctxt "#32120"
 msgid "Select Region for Release"
 msgstr "区域"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32157"
+msgid "Decades"
+msgstr "年代分类"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32158"
+msgid "Certifications"
+msgstr "认证"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32159"
+msgid "Lists"
+msgstr "列表"
 
 #: /resources/lib/container.py
 msgctxt "#32121"
