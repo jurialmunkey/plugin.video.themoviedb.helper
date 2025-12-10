@@ -1,4 +1,4 @@
-from tmdbhelper.lib.script.discover.base import DiscoverList, DiscoverQuery, DiscoverYears, DiscoverSave, DiscoverReset, DiscoverMain, ItemTuple
+from tmdbhelper.lib.script.discover.base import DiscoverList, DiscoverQuery, DiscoverYears, DiscoverRatings, DiscoverRuntimes, DiscoverSave, DiscoverReset, DiscoverMain, ItemTuple
 from tmdbhelper.lib.addon.plugin import get_localized, ADDONPATH
 from jurialmunkey.ftools import cached_property
 from xbmcgui import Dialog, INPUT_NUMERIC
@@ -109,25 +109,15 @@ class TraktDiscoverYears(DiscoverYears):
     pass
 
 
-class TraktDiscoverRuntimes(DiscoverYears):
-    key = 'runtimes'
-    label_prefix_localized = 2050
-
-    @property
-    def input_label(self):
-        return get_localized(12391)
+class TraktDiscoverRuntimes(DiscoverRuntimes):
+    pass
 
 
-class TraktDiscoverRatings(DiscoverYears):
-    key = 'ratings'
-    label_prefix_localized = 32028
-
-    @property
-    def input_label(self):
-        return f'{get_localized(32028)} (%/100)'
+class TraktDiscoverRatings(DiscoverRatings):
+    pass
 
 
-class TraktDiscoverVotes(DiscoverYears):
+class TraktDiscoverVotes(DiscoverRuntimes):
     key = 'votes'
     label_prefix_localized = 205
 

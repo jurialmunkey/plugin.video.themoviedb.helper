@@ -97,11 +97,16 @@ class DiscoverQuery(DiscoverMenu):
         self.listitem.setLabel(self.listitem_label)
 
 
-class DiscoverYears(DiscoverMenu):
-    key = 'years'
-    label_prefix_localized = 652
+class DiscoverRuntimes(DiscoverMenu):
     value_a = None
     value_z = None
+
+    key = 'runtimes'
+    label_prefix_localized = 2050
+
+    @property
+    def input_label(self):
+        return get_localized(12391)
 
     @property
     def label(self):
@@ -123,14 +128,72 @@ class DiscoverYears(DiscoverMenu):
             return
         return f'{self.key}={self.value}'
 
-    @property
-    def input_label(self):
-        return get_localized(32279)
-
     def menu(self):
         self.value_a = Dialog().input(f'{self.input_label} [>>]', type=INPUT_NUMERIC, defaultt=f'{self.value_a}' if self.value_a else '')
         self.value_z = Dialog().input(f'{self.input_label} [<<]', type=INPUT_NUMERIC, defaultt=f'{self.value_z}' if self.value_z else '')
         self.listitem.setLabel(self.listitem_label)
+
+
+class DiscoverYears(DiscoverRuntimes):
+    key = 'years'
+    label_prefix_localized = 652
+
+    base_range_start = 1900
+    base_range_end = 2030
+    base_range_increment = 10
+
+    @property
+    def base_range(self):
+        return (self.base_range_start, self.base_range_end, self.base_range_increment)
+
+    @property
+    def base_values(self):
+        return sorted(tuple(range(*self.base_range)), reverse=True)
+
+    @property
+    def base_label(self):
+        return get_localized(32157)
+
+    @property
+    def input_label(self):
+        return get_localized(32279)
+
+    def select_base_value(self, *label_affixes):
+        head = ' '.join((self.input_label, *label_affixes))
+        opts = [f'{i}' for i in self.base_values]
+        indx = Dialog().select(head, opts)
+        return self.base_values[indx] if indx != -1 else None
+
+    def select_value(self, *label_affixes):
+        base = self.select_base_value(self.base_label, *label_affixes)
+        if base is None:
+            return
+        vals = sorted(tuple(range(base, base + self.base_range_increment)), reverse=True)
+        head = ' '.join((self.input_label, *label_affixes))
+        opts = [f'{i}' for i in vals]
+        indx = Dialog().select(head, opts)
+        return vals[indx] if indx != -1 else None
+
+    def menu(self):
+        self.value_a = self.select_value('[>>]')
+        self.value_z = self.select_value('[<<]') if self.value_a else None
+        self.listitem.setLabel(self.listitem_label)
+
+
+class DiscoverRatings(DiscoverYears):
+    key = 'ratings'
+    label_prefix_localized = 32028
+
+    base_range_start = 0
+    base_range_end = 101
+    base_range_increment = 5
+
+    @property
+    def input_label(self):
+        return f'{get_localized(32028)} (%/100)'
+
+    def select_value(self, *label_affixes):
+        return self.select_base_value(*label_affixes)
 
 
 class DiscoverSave(DiscoverMenu):
