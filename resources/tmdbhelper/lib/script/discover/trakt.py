@@ -1,7 +1,18 @@
-from tmdbhelper.lib.script.discover.base import DiscoverList, DiscoverQuery, DiscoverYears, DiscoverRatings, DiscoverRuntimes, DiscoverSave, DiscoverReset, DiscoverMain, ItemTuple
 from tmdbhelper.lib.addon.plugin import get_localized, ADDONPATH
 from jurialmunkey.ftools import cached_property
 from xbmcgui import Dialog, INPUT_NUMERIC
+from tmdbhelper.lib.script.discover.base import (
+    DiscoverList,
+    DiscoverMulti,
+    DiscoverQuery,
+    DiscoverYears,
+    DiscoverRatings,
+    DiscoverRuntimes,
+    DiscoverSave,
+    DiscoverReset,
+    DiscoverMain,
+    ItemTuple
+)
 
 
 NODE_FILENAME = 'Trakt Discover.json'
@@ -31,7 +42,7 @@ class TraktDiscoverType(DiscoverList):
         )
 
 
-class TraktDiscoverGenres(DiscoverList):
+class TraktDiscoverGenres(DiscoverMulti):
     idx = None
     key = 'genres'
     label_prefix_localized = 135
@@ -54,31 +65,6 @@ class TraktDiscoverGenres(DiscoverList):
     def routes(self):
         return tuple((ItemTuple(i['name'], i['slug']) for i in self.routes_items if i))
 
-    @property
-    def dialog_select(self):
-        return Dialog().multiselect
-
-    @property
-    def route(self):
-        if not self.idx:
-            return
-        return [self.routes[x] for x in self.idx]
-
-    @property
-    def label(self):
-        if not self.route:
-            return
-        return ' / '.join((i.label for i in self.route))
-
-    @property
-    def value(self):
-        if not self.route:
-            return
-        return '%2C'.join((i.value for i in self.route))
-
-    @property
-    def preselect(self):
-        return self.idx or []
 
 
 class TraktDiscoverCertifications(TraktDiscoverGenres):

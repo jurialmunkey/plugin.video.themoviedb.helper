@@ -80,6 +80,37 @@ class DiscoverList(DiscoverMenu):
         self.listitem.setLabel(self.listitem_label)
 
 
+class DiscoverMulti(DiscoverList):
+
+    separator = '%2C'
+
+    @property
+    def dialog_select(self):
+        return Dialog().multiselect
+
+    @property
+    def route(self):
+        if not self.idx:
+            return
+        return [self.routes[x] for x in self.idx]
+
+    @property
+    def label(self):
+        if not self.route:
+            return
+        return ' / '.join((i.label for i in self.route))
+
+    @property
+    def value(self):
+        if not self.route:
+            return
+        return self.separator.join((i.value for i in self.route))
+
+    @property
+    def preselect(self):
+        return self.idx or []
+
+
 class DiscoverQuery(DiscoverMenu):
     key = 'query'
     label_prefix_localized = 32153
