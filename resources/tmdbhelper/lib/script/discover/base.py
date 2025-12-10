@@ -98,17 +98,25 @@ class DiscoverMulti(DiscoverList):
     def label(self):
         if not self.route:
             return
-        return ' / '.join((i.label for i in self.route))
+        label = ' AND ' if self.separator == '%2C' else ' OR '
+        label = label.join((i.label for i in self.route))
+        return label
 
     @property
     def value(self):
         if not self.route:
             return
-        return self.separator.join((i.value for i in self.route))
+        return self.separator.join((f'{i.value}' for i in self.route))
 
     @property
     def preselect(self):
         return self.idx or []
+
+    def select_separator(self):
+        x = Dialog().select('Separator', ['AND', 'OR'])
+        if x == -1:
+            return
+        self.separator = '%7C' if x == 1 else '%2C'
 
 
 class DiscoverQuery(DiscoverMenu):

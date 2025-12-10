@@ -66,7 +66,6 @@ class TraktDiscoverGenres(DiscoverMulti):
         return tuple((ItemTuple(i['name'], i['slug']) for i in self.routes_items if i))
 
 
-
 class TraktDiscoverCertifications(TraktDiscoverGenres):
     idx = None
     key = 'certifications'
