@@ -74,6 +74,9 @@ class DiscoverList(DiscoverMenu):
     def preselect(self):
         return self.idx or -1
 
+    def load_value(self, value):
+        self.idx = next((x for x, i in enumerate(self.routes) if i.value == value))
+
     def menu(self):
         x = self.dialog_select(self.listitem_label, [i.label for i in self.routes], preselect=self.preselect)
         self.idx = x if x != -1 else self.idx
@@ -113,7 +116,7 @@ class DiscoverMulti(DiscoverList):
         return self.idx or []
 
     def select_separator(self):
-        x = Dialog().select('Separator', ['AND', 'OR'])
+        x = Dialog().select(get_localized(32107), (get_localized(32110), get_localized(32109)))
         if x == -1:
             return
         self.separator = '%7C' if x == 1 else '%2C'

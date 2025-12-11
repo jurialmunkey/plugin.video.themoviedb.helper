@@ -12,6 +12,7 @@ from tmdbhelper.lib.query.database.collections import FindQueriesDatabaseCollect
 from tmdbhelper.lib.query.database.keywords import FindQueriesDatabaseKeywords
 from tmdbhelper.lib.query.database.studios import FindQueriesDatabaseStudios
 from tmdbhelper.lib.query.database.networks import FindQueriesDatabaseNetworks
+from tmdbhelper.lib.query.database.people import FindQueriesDatabasePeople
 from tmdbhelper.lib.query.database.movies import FindQueriesDatabaseMovies
 from tmdbhelper.lib.query.database.tvshows import FindQueriesDatabaseTvshows
 from tmdbhelper.lib.query.database.imdb_top250 import FindQueriesDatabaseIMDbTop250
@@ -32,6 +33,7 @@ class FindQueriesDatabase(
     FindQueriesDatabaseKeywords,
     FindQueriesDatabaseStudios,
     FindQueriesDatabaseNetworks,
+    FindQueriesDatabasePeople,
     FindQueriesDatabaseMovies,
     FindQueriesDatabaseTvshows,
     FindQueriesDatabaseIMDbTop250,
@@ -78,6 +80,7 @@ class FindQueriesDatabase(
             'keywords': self.keywords_columns,
             'studios': self.studios_columns,
             'networks': self.networks_columns,
+            'people': self.people_columns,
             'movies': self.movies_columns,
             'tvshows': self.tvshows_columns,
             'imdb_top250': self.imdb_top250_columns,

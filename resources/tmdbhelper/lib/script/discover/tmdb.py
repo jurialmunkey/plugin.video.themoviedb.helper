@@ -1,4 +1,5 @@
 from tmdbhelper.lib.addon.plugin import get_localized, ADDONPATH
+from tmdbhelper.lib.addon.dialog import BusyDialog
 from jurialmunkey.ftools import cached_property
 from xbmcgui import Dialog, INPUT_NUMERIC
 from tmdbhelper.lib.script.discover.base import (
@@ -33,6 +34,22 @@ class TMDbDiscoverMethods:
             ItemTuple(get_localized(i['name']), i['id'])
             for i in sorted(routes, key=lambda x: x['name'])
         ))
+
+    @staticmethod
+    def get_load_value_split(value, separator):
+        import re
+        return re.split(separator, value, flags=re.IGNORECASE)
+
+    @staticmethod
+    def get_load_value_generator(value, separator, id_func):
+        return (
+            ItemTuple(id_func(tmdb_id), tmdb_id)
+            for tmdb_id in TMDbDiscoverMethods.get_load_value_split(value, separator)
+        )
+
+    @staticmethod
+    def get_load_value_separator(value):
+        return '%2C' if '%2C' in value or '%2c' in value else '%7C'
 
 
 class TMDbDiscoverSave(DiscoverSave):
@@ -78,11 +95,32 @@ class TMDbDiscoverRegion(DiscoverList):
         return TMDbDiscoverMethods.get_configured_routes(self.datalist)
 
 
-class TMDbDiscoverWithCompanies(DiscoverMenu):
+class TMDbDiscoverWithCompanies(DiscoverMulti):
     key = 'with_companies'
     label_prefix_localized = 32265
     query_tmdb_type = 'company'
     query_use_details = True
+    separator = '%7C'
+    preselect = None
+    idx = None
+
+    @cached_property
+    def tmdb_api(self):
+        from tmdbhelper.lib.api.tmdb.api import TMDb
+        return TMDb()
+
+    def get_name_from_id(self, tmdb_id):
+        try:
+            return self.tmdb_api.get_response_json(self.query_tmdb_type, tmdb_id)['name']
+        except (KeyError, TypeError):
+            return
+
+    def get_load_value_generator(self, value):
+        return TMDbDiscoverMethods.get_load_value_generator(value, self.separator, self.get_name_from_id)
+
+    def load_value(self, value):
+        self.separator = TMDbDiscoverMethods.get_load_value_separator(value)
+        self.route = [i for i in self.get_load_value_generator(value) if i[0] and i[1]]
 
     @property
     def query_header(self):
@@ -90,20 +128,57 @@ class TMDbDiscoverWithCompanies(DiscoverMenu):
 
     @property
     def query_result(self):
-        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
-        item = FindQueriesDatabase().get_tmdb_id_from_query(
-            tmdb_type=self.query_tmdb_type,
-            query=Dialog().input(self.query_header),
-            header=self.listitem_label,
-            use_details=self.query_use_details,
-            get_listitem=True
-        )
-        if not item or not item.getUniqueID('tmdb'):
-            return ItemTuple('', '')
-        return ItemTuple(item.getLabel(), item.getUniqueID('tmdb'))
+        query = Dialog().input(self.query_header)
+        if not query:
+            return
+
+        value = self.get_query(query)
+        if not value or not value.getUniqueID('tmdb'):
+            Dialog().ok(query, get_localized(32310).format(query))
+            return self.query_result
+
+        self.route.append(ItemTuple(value.getLabel(), value.getUniqueID('tmdb')))
+        return self.route[-1]
+
+    def get_query(self, query):
+        with BusyDialog():
+            from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+            return FindQueriesDatabase().get_tmdb_id_from_query(
+                tmdb_type=self.query_tmdb_type,
+                query=query,
+                header=self.listitem_label,
+                use_details=self.query_use_details,
+                get_listitem=True
+            )
+
+    @cached_property
+    def route(self):
+        return []
+
+    def select_separator(self):
+        if len(self.route) < 2:
+            return
+        super().select_separator()
+
+    def clear_route(self):
+        if len(self.route) < 1:
+            return False
+        if Dialog().yesno(
+            get_localized(32101),
+            get_localized(32100),
+            nolabel=get_localized(32101),
+            yeslabel=get_localized(32102)
+        ):
+            return False
+        self.route = []
+        return True
 
     def menu(self):
-        self.label, self.value = self.query_result
+        if self.clear_route():
+            return
+        while self.query_result and Dialog().yesno(self.listitem_label, get_localized(32165)):
+            pass
+        self.select_separator()
         self.listitem.setLabel(self.listitem_label)
 
 
@@ -119,18 +194,50 @@ class TMDbDiscoverWithoutKeywords(TMDbDiscoverWithKeywords):
     label_prefix_localized = 32267
 
 
+class TMDbDiscoverWithCast(TMDbDiscoverWithCompanies):
+    key = 'with_cast'
+    label_prefix_localized = 32247
+    query_tmdb_type = 'person'
+    query_use_details = True
+
+    @property
+    def enabled(self):
+        return bool(self.main.tmdb_type == 'movie')
+
+
+class TMDbDiscoverWithCrew(TMDbDiscoverWithCast):
+    key = 'with_crew'
+    label_prefix_localized = 32248
+
+
+class TMDbDiscoverWithPeople(TMDbDiscoverWithCast):
+    key = 'with_people'
+    label_prefix_localized = 32249
+
+
 class TMDbDiscoverWithGenres(DiscoverMulti):
     key = 'with_genres'
     label_prefix_localized = 32263
     idx = None
     separator = '%7C'
 
+    def get_load_value_index(self, tmdb_id):
+        return next((x for x, i in enumerate(self.routes) if str(i.value) == str(tmdb_id)), None)
+
+    def get_load_value_split(self, value):
+        return TMDbDiscoverMethods.get_load_value_split(value, self.separator)
+
+    def load_value(self, value):
+        self.separator = TMDbDiscoverMethods.get_load_value_separator(value)
+        self.idx = [self.get_load_value_index(i) for i in self.get_load_value_split(value) if i]
+
     @property
     def datalist(self):
-        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
-        data_list = FindQueriesDatabase().get_genres(self.main.tmdb_type) or {}
-        data_list = [{'name': k, 'id': v} for k, v in data_list.items()]
-        return data_list
+        with BusyDialog():
+            from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+            data_list = FindQueriesDatabase().get_genres(self.main.tmdb_type) or {}
+            data_list = [{'name': k, 'id': v} for k, v in data_list.items()]
+            return data_list
 
     @cached_property
     def routes(self):
@@ -189,6 +296,20 @@ class TMDbDiscoverMain(DiscoverMain):
     winprop = 'TMDbDiscover.Path'
     base_params = ('info=discover', 'with_id=True')
 
+    def load_values(self, tmdb_type='movie', **kwargs):
+        from tmdbhelper.lib.addon.logger import kodi_log
+        kodi_log(f'{kwargs}', 1)
+        self.routes_dict['tmdb_type'].load_value(tmdb_type)  # Set TMDb Type first as other values depend on it
+        for k, v in kwargs.items():
+            try:
+                value = v.replace(',', '%2C').replace('|', '%7C')  # Convert back to percent encoding for consistency
+            except AttributeError:
+                continue
+            try:
+                self.routes_dict[k].load_value(value)
+            except KeyError:
+                continue
+
     @cached_property
     def label(self):
         return f'TMDb {get_localized(32174)}'
@@ -211,6 +332,9 @@ class TMDbDiscoverMain(DiscoverMain):
             'tmdb_type': TMDbDiscoverType(self),
             'with_genres': TMDbDiscoverWithGenres(self),
             'without_genres': TMDbDiscoverWithoutGenres(self),
+            'with_cast': TMDbDiscoverWithCast(self),
+            'with_crew': TMDbDiscoverWithCrew(self),
+            'with_people': TMDbDiscoverWithPeople(self),
             'with_companies': TMDbDiscoverWithCompanies(self),
             'with_keywords': TMDbDiscoverWithKeywords(self),
             'without_keywords': TMDbDiscoverWithoutKeywords(self),

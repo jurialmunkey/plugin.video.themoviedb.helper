@@ -39,5 +39,6 @@ class ListDiscover(ListDiscoverDir):
     def get_items(self, **kwargs):
         from tmdbhelper.lib.script.discover.tmdb import TMDbDiscover
         discover = TMDbDiscover()
+        discover.load_values(**kwargs)
         discover.doModal()
-        return super().get_items(**kwargs)
+        return super().get_items()

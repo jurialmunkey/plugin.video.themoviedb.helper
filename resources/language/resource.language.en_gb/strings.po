@@ -823,6 +823,11 @@ msgctxt "#32126"
 msgid "Are you sure you want to add this Trakt list to your Kodi library?"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32165"
+msgid "Add another item?"
+msgstr ""
+
 #: /resources/lib/context.py
 msgctxt "#32130"
 msgid "Auto-update library at time"
