@@ -71,6 +71,7 @@ class DatabaseCore:
         cursor.execute("PRAGMA synchronous=NORMAL")
         cursor.execute("PRAGMA journal_mode=WAL")
         cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.execute("PRAGMA mmap_size=268435456")
         return connection
 
     def init_database(self):

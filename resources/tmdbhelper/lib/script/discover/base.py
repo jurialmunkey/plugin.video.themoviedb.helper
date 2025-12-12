@@ -1,0 +1,357 @@
+from tmdbhelper.lib.addon.plugin import get_localized
+from jurialmunkey.ftools import cached_property
+from jurialmunkey.window import get_property
+from collections import namedtuple
+from xbmcgui import Dialog, WindowXMLDialog, ListItem, INPUT_NUMERIC
+
+
+ItemTuple = namedtuple("ItemTuple", "label value")
+
+
+class DiscoverMenu:
+    def __init__(self, main):
+        self.main = main
+
+    label_affix = None
+    paramstring = None
+    label = None
+    enabled = True
+    value = None
+
+    @property
+    def paramstring(self):
+        if not self.value:
+            return
+        return f'{self.key}={self.value}'
+
+    @cached_property
+    def listitem(self):
+        return ListItem(label=self.listitem_label)
+
+    @cached_property
+    def label_prefix(self):
+        label_prefix = get_localized(self.label_prefix_localized)
+        label_prefix = f'{label_prefix} ({self.label_affix})' if self.label_affix else label_prefix
+        return label_prefix
+
+    @property
+    def listitem_label(self):
+        return f'{self.label_prefix}: {self.label}' if self.label else self.label_prefix
+
+
+class DiscoverList(DiscoverMenu):
+    idx = 0
+    key = 'info'
+    label_prefix_localized = 535
+
+    @property
+    def route(self):
+        if self.idx is None:
+            return
+        return self.routes[self.idx]
+
+    @property
+    def label(self):
+        if not self.route:
+            return
+        return self.route.label
+
+    @property
+    def value(self):
+        if not self.route:
+            return
+        return self.route.value
+
+    @cached_property
+    def routes(self):
+        return ()
+
+    @property
+    def dialog_select(self):
+        return Dialog().select
+
+    @property
+    def preselect(self):
+        return self.idx or -1
+
+    def menu(self):
+        x = self.dialog_select(self.listitem_label, [i.label for i in self.routes], preselect=self.preselect)
+        self.idx = x if x != -1 else self.idx
+        self.listitem.setLabel(self.listitem_label)
+
+
+class DiscoverMulti(DiscoverList):
+
+    separator = '%2C'
+
+    @property
+    def dialog_select(self):
+        return Dialog().multiselect
+
+    @property
+    def route(self):
+        if not self.idx:
+            return
+        return [self.routes[x] for x in self.idx]
+
+    @property
+    def label(self):
+        if not self.route:
+            return
+        return ' / '.join((i.label for i in self.route))
+
+    @property
+    def value(self):
+        if not self.route:
+            return
+        return self.separator.join((i.value for i in self.route))
+
+    @property
+    def preselect(self):
+        return self.idx or []
+
+
+class DiscoverQuery(DiscoverMenu):
+    key = 'query'
+    label_prefix_localized = 32153
+    label = None
+
+    @property
+    def value(self):
+        return self.label
+
+    def menu(self):
+        self.label = Dialog().input(get_localized(32044), defaultt=self.value or '')
+        self.listitem.setLabel(self.listitem_label)
+
+
+class DiscoverRuntimes(DiscoverMenu):
+    value_a = None
+    value_z = None
+
+    key = 'runtimes'
+    label_prefix_localized = 2050
+
+    @property
+    def input_label(self):
+        return get_localized(12391)
+
+    @property
+    def label(self):
+        if not self.value_a:
+            return
+        if not self.value_z:
+            return f'{self.value_a}'
+        if self.value_a == self.value_z:
+            return f'{self.value_a}'
+        return f'{self.value_a}-{self.value_z}'
+
+    @property
+    def value(self):
+        return self.label
+
+    def menu(self):
+        self.value_a = Dialog().input(f'{self.input_label} [>>]', type=INPUT_NUMERIC, defaultt=f'{self.value_a}' if self.value_a else '')
+        self.value_z = Dialog().input(f'{self.input_label} [<<]', type=INPUT_NUMERIC, defaultt=f'{self.value_z}' if self.value_z else '')
+        self.listitem.setLabel(self.listitem_label)
+
+
+class DiscoverYears(DiscoverRuntimes):
+    key = 'years'
+    label_prefix_localized = 652
+
+    base_range_start = 1900
+    base_range_end = 2030
+    base_range_increment = 10
+
+    @property
+    def base_range(self):
+        return (self.base_range_start, self.base_range_end, self.base_range_increment)
+
+    @property
+    def base_values(self):
+        return sorted(tuple(range(*self.base_range)), reverse=True)
+
+    @property
+    def base_label(self):
+        return get_localized(32157)
+
+    @property
+    def input_label(self):
+        return get_localized(32279)
+
+    def select_base_value(self, *label_affixes, lower_limit=0):
+        vals = tuple((i for i in self.base_values if i > lower_limit))
+        head = ' '.join((self.input_label, *label_affixes))
+        opts = [f'{i}' for i in vals]
+        indx = Dialog().select(head, opts)
+        return vals[indx] if indx != -1 else None
+
+    def select_value(self, *label_affixes, lower_limit=0):
+        base = self.select_base_value(self.base_label, *label_affixes, lower_limit=lower_limit - 9)
+        if base is None:
+            return
+        vals = sorted(tuple(range(base, base + self.base_range_increment)), reverse=True)
+        vals = tuple((i for i in vals if i > lower_limit))
+        head = ' '.join((self.input_label, *label_affixes))
+        opts = [f'{i}' for i in vals]
+        indx = Dialog().select(head, opts)
+        return vals[indx] if indx != -1 else None
+
+    def menu(self):
+        self.value_a = self.select_value('[>>]')
+        self.value_z = self.select_value(f'{self.value_a}', '[<<]', lower_limit=self.value_a) if self.value_a else None
+        self.listitem.setLabel(self.listitem_label)
+
+
+class DiscoverRatings(DiscoverYears):
+    key = 'ratings'
+    label_prefix_localized = 32028
+
+    base_range_start = 0
+    base_range_end = 101
+    base_range_increment = 5
+
+    @property
+    def input_label(self):
+        return f'{get_localized(32028)} (%/100)'
+
+    def select_value(self, *label_affixes, lower_limit=0):
+        return self.select_base_value(*label_affixes, lower_limit=lower_limit)
+
+
+class DiscoverSave(DiscoverMenu):
+
+    label_prefix_localized = 190
+
+    def save(self):
+        from tmdbhelper.lib.script.method.nodes import TMDbNode
+        make_node = TMDbNode(name=self.main.name, path=self.main.path, icon=self.main.icon)
+        make_node.notification = False
+        make_node.overwrite = True
+        make_node.file = self.main.file
+        make_node.add()
+
+    def menu(self):
+        if self.main.name:
+            self.save()
+            self.main.data['path'] = self.main.path
+            self.main.data['file'] = self.main.file
+            self.main.data['name'] = self.main.name
+            self.main.data['icon'] = self.main.icon
+        self.main.close()
+
+
+class DiscoverReset(DiscoverMenu):
+
+    label_prefix_localized = 13007
+
+    def menu(self):
+        self.main.routes_dict = self.main.get_routes_dict()
+        self.main.build_menu()
+
+
+class DiscoverMain(WindowXMLDialog):
+
+    ACTION_SELECT = (7, 100, )
+    ACTION_CLOSEWINDOW = (9, 10, 92, 216, 247, 257, 275, 61467, 61448,)
+    file = ''
+    label = ''
+    icon = ''
+    winprop = ''
+    base_params = ()
+
+    @cached_property
+    def name(self):
+        return Dialog().input(get_localized(32241), defaultt=self.defaultt)
+
+    @cached_property
+    def data(self):
+        return {}
+
+    @property
+    def path(self):
+        path = '&'.join((*self.base_params, *tuple((i.paramstring for i in self.routes if i.paramstring))))
+        path = 'plugin://plugin.video.themoviedb.helper/?' + path
+        return path
+
+    @property
+    def defaultt(self):
+        from tmdbhelper.lib.files.futils import validify_filename
+        defaultt = ' '.join((i.label for i in self.routes if i.label and i.paramstring))
+        defaultt = validify_filename(defaultt)
+        return ' '.join(defaultt.split())
+
+    @cached_property
+    def routes_dict(self):
+        return self.get_routes_dict()
+
+    def update_winprop(self):
+        get_property(self.winprop, set_property=self.path) if self.winprop else None
+
+    def get_routes_dict(self):
+        return {}
+
+    @property
+    def routes(self):
+        return tuple((i for i in self.routes_dict.values() if i.enabled))
+
+    def route_index(self, class_name):
+        return next((x for x, i in enumerate(self.routes) if i.__class__.__name__ == class_name), None)
+
+    @cached_property
+    def trakt_api(self):
+        from tmdbhelper.lib.api.trakt.api import TraktAPI
+        return TraktAPI()
+
+    def onAction(self, action):
+        action_id = action.getId()
+        if action_id in self.ACTION_CLOSEWINDOW:
+            return self.close()
+        if action_id in self.ACTION_SELECT:
+            return self.click()
+
+    def click(self):
+        focus_id = self.getFocusId()
+        if focus_id == 3:
+            return self.on_action()
+        if focus_id == 7:
+            return self.close()
+        if focus_id == 8:
+            return self.on_reset()
+        if focus_id == 5:
+            return self.on_save()
+
+    def on_action(self):
+        x = self.list_control.getSelectedPosition()
+        self.routes[x].menu()
+        self.update_winprop()
+
+    def on_reset(self):
+        value = self.routes_dict['reset'].menu()
+        self.update_winprop()
+        return value
+
+    def on_save(self):
+        value = self.routes_dict['save'].menu()
+        self.update_winprop()
+        return value
+
+    @property
+    def list_control(self):
+        return self.getControl(3)
+
+    def onInit(self):
+        self.getControl(1).setLabel(self.label)
+        self.getControl(5).setLabel(get_localized(190))
+        self.getControl(6).setVisible(False)
+        self.getControl(7).setLabel(get_localized(15067))
+        self.getControl(8).setLabel(get_localized(13007))
+        self.build_menu()
+
+    def build_menu(self, select_class=None):
+        self.list_control.reset()
+        self.list_control.addItems([i.listitem for i in self.routes])
+        self.setFocus(self.list_control)
+        self.list_control.selectItem(self.route_index(select_class) or 0) if select_class is not None else None
+        self.update_winprop()
