@@ -435,13 +435,7 @@ class TMDbDiscoverMain(DiscoverMain):
 
     def load_values(self, tmdb_type='movie', **kwargs):
         self.routes_dict['tmdb_type'].load_value(tmdb_type)  # Set TMDb Type first as other values depend on it
-        load_values = (
-            (k, v.replace(',', '%2C').replace('|', '%7C'))
-            for k, v in kwargs.items()
-            if k in self.routes_dict
-        )
-        for k, v in load_values:
-            self.routes_dict[k].load_value(v)
+        super().load_values(**kwargs)
 
     @cached_property
     def label(self):

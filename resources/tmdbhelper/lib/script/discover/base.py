@@ -51,7 +51,7 @@ class DiscoverMenu:
     def menu_rebuild(self):
         if not self.rebuild:
             return
-        self.main.build_menu(self.__class__.__name__)
+        self.main.rebuild_menu(self.__class__.__name__)
 
     @property
     def paramstring(self):
@@ -318,7 +318,7 @@ class DiscoverReset(DiscoverMenu):
 
     def menu(self):
         self.main.routes_dict = self.main.get_routes_dict()
-        self.main.build_menu()
+        self.main.rebuild_menu()
 
 
 class DiscoverMain(WindowXMLDialog):
@@ -411,23 +411,32 @@ class DiscoverMain(WindowXMLDialog):
     def list_control(self):
         return self.getControl(3)
 
-    def update_menu(self):
+    def load_values(self, **kwargs):
+        load_values = (
+            (k, v.replace(',', '%2C').replace('|', '%7C'))
+            for k, v in kwargs.items()
+            if k in self.routes_dict
+        )
+        for k, v in load_values:
+            self.routes_dict[k].load_value(v)
+
+    def rebuild_menu(self):
         for i in self.routes:
             try:
                 i.routes = i.get_routes()
             except AttributeError:
                 pass
+        self.build_menu()
 
     def onInit(self):
+        self.build_menu()
         self.getControl(1).setLabel(self.label)
         self.getControl(5).setLabel(get_localized(190))
         self.getControl(6).setVisible(False)
         self.getControl(7).setLabel(get_localized(15067))
         self.getControl(8).setLabel(get_localized(13007))
-        self.build_menu()
 
     def build_menu(self, select_class=None):
-        self.update_menu()
         self.list_control.reset()
         self.list_control.addItems([i.listitem for i in self.routes])
         self.setFocus(self.list_control)
