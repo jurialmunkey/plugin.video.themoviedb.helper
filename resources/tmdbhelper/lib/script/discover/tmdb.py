@@ -13,25 +13,36 @@ from tmdbhelper.lib.script.discover.base import (
     DiscoverSave,
     DiscoverReset,
     DiscoverMain,
-    ItemTuple
+    DiscoverItem
 )
 
 
 NODE_FILENAME = 'TMDb Discover.json'
 
 
+class DiscoverProviderItem(DiscoverItem):
+    @cached_property
+    def icon(self):
+        from tmdbhelper.lib.api.tmdb.images import TMDbImagePath
+        return TMDbImagePath().get_imagepath_origin(self.image)
+
+    @cached_property
+    def label2(self):
+        return f"ID #{self.value}"
+
+
 class TMDbDiscoverMethods:
     @staticmethod
-    def get_configured_routes(routes):
+    def get_configured_routes(routes, item_class=DiscoverItem):
         return tuple((
-            ItemTuple(i['name'], i['id'])
+            item_class(label=i['name'], value=i['id'], image=i.get('icon'))
             for i in sorted(routes, key=lambda x: x['name'])
         ))
 
     @staticmethod
-    def get_configured_localized_routes(routes):
+    def get_configured_localized_routes(routes, item_class=DiscoverItem):
         return tuple((
-            ItemTuple(get_localized(i['name']), i['id'])
+            item_class(label=get_localized(i['name']), value=i['id'], image=i.get('icon'))
             for i in sorted(routes, key=lambda x: x['name'])
         ))
 
@@ -41,9 +52,9 @@ class TMDbDiscoverMethods:
         return re.split(separator, value, flags=re.IGNORECASE)
 
     @staticmethod
-    def get_load_value_generator(value, separator, id_func):
+    def get_load_value_generator(value, separator, id_func, item_class=DiscoverItem):
         return (
-            ItemTuple(id_func(tmdb_id), tmdb_id)
+            item_class(id_func(tmdb_id), tmdb_id)
             for tmdb_id in TMDbDiscoverMethods.get_load_value_split(value, separator)
         )
 
@@ -63,32 +74,101 @@ class TMDbDiscoverReset(DiscoverReset):
 class TMDbDiscoverType(DiscoverList):
     key = 'tmdb_type'
     label_prefix_localized = 467
+    rebuild = True
 
     @cached_property
     def routes(self):
         return (
-            ItemTuple(get_localized(342), 'movie'),
-            ItemTuple(get_localized(20343), 'tv'),
+            DiscoverItem(get_localized(342), 'movie'),
+            DiscoverItem(get_localized(20343), 'tv'),
         )
 
-    def menu(self):
-        super().menu()
-        self.main.build_menu('TMDbDiscoverType')
+
+class TMDbDiscoverSortBy(DiscoverList):
+    key = 'sort_by'
+    label_prefix_localized = 32240
+    idx = None
+
+    @property
+    def datalist(self):
+        if self.main.tmdb_type == 'movie':
+            from tmdbhelper.lib.addon.consts import DISCOVER_SORTBY_MOVIES
+            return DISCOVER_SORTBY_MOVIES
+
+        if self.main.tmdb_type == 'tv':
+            from tmdbhelper.lib.addon.consts import DISCOVER_SORTBY_TV
+            return DISCOVER_SORTBY_TV
+
+    @cached_property
+    def routes(self):
+        return TMDbDiscoverMethods.get_configured_routes(self.datalist)
 
 
 class TMDbDiscoverRegion(DiscoverList):
     key = 'region'
     label_prefix_localized = 32256
     idx = None
+    rebuild = True
 
     @property
     def enabled(self):
         return bool(self.main.tmdb_type == 'movie')
 
     @property
+    def preselect(self):
+        return self.idx or next((x for x, i in enumerate(self.routes) if i.value == self.main.iso_country), -1)
+
+    @property
     def datalist(self):
         from tmdbhelper.lib.addon.consts import DISCOVER_REGIONS
         return DISCOVER_REGIONS
+
+    @cached_property
+    def routes(self):
+        return TMDbDiscoverMethods.get_configured_routes(self.datalist)
+
+
+class TMDbDiscoverCertificationCountry(TMDbDiscoverRegion):
+    key = 'certification_country'
+    label_prefix_localized = 32219
+
+    @property
+    def preselect(self):
+        return self.idx or next((x for x, i in enumerate(self.routes) if i.value == self.main.iso_country), -1)
+
+    @cached_property
+    def region_names(self):
+        from tmdbhelper.lib.addon.consts import DISCOVER_REGIONS
+        return {i['id']: i['name'] for i in DISCOVER_REGIONS}
+
+    @property
+    def datalist(self):
+        with BusyDialog():
+            from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+            datalist = FindQueriesDatabase().get_certification('movie')
+            datalist = [
+                {'id': j, 'name': self.region_names.get(j, j)}
+                for j in {i['iso_country'] for i in datalist}
+            ]
+            return datalist
+
+
+class TMDbDiscoverWatchRegion(DiscoverList):
+    key = 'watch_region'
+    label_prefix_localized = 32217
+    idx = None
+    rebuild = True
+
+    @property
+    def preselect(self):
+        return self.idx or next((x for x, i in enumerate(self.routes) if i.value == self.main.iso_country), -1)
+
+    @property
+    def datalist(self):
+        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+        datalist = FindQueriesDatabase().provider_regions
+        datalist = [{'name': f'{v} ({k})', 'id': k} for k, v in datalist.items()]
+        return datalist
 
     @cached_property
     def routes(self):
@@ -120,7 +200,7 @@ class TMDbDiscoverWithCompanies(DiscoverMulti):
 
     def load_value(self, value):
         self.separator = TMDbDiscoverMethods.get_load_value_separator(value)
-        self.route = [i for i in self.get_load_value_generator(value) if i[0] and i[1]]
+        self.route = [i for i in self.get_load_value_generator(value) if i.label and i.value]
 
     @property
     def query_header(self):
@@ -137,7 +217,7 @@ class TMDbDiscoverWithCompanies(DiscoverMulti):
             Dialog().ok(query, get_localized(32310).format(query))
             return self.query_result
 
-        self.route.append(ItemTuple(value.getLabel(), value.getUniqueID('tmdb')))
+        self.route.append(DiscoverItem(value.getLabel(), value.getUniqueID('tmdb')))
         return self.route[-1]
 
     def get_query(self, query):
@@ -155,10 +235,9 @@ class TMDbDiscoverWithCompanies(DiscoverMulti):
     def route(self):
         return []
 
-    def select_separator(self):
-        if len(self.route) < 2:
-            return
-        super().select_separator()
+    @property
+    def has_multiples(self):
+        return bool(len(self.route) > 1)
 
     def clear_route(self):
         if len(self.route) < 1:
@@ -178,7 +257,7 @@ class TMDbDiscoverWithCompanies(DiscoverMulti):
             return
         while self.query_result and Dialog().yesno(self.listitem_label, get_localized(32165)):
             pass
-        self.select_separator()
+        self.set_separator(self.get_separator())
         self.listitem.setLabel(self.listitem_label)
 
 
@@ -245,13 +324,55 @@ class TMDbDiscoverWithGenres(DiscoverMulti):
 
     def menu(self):
         super().menu()
-        self.select_separator()
+        self.set_separator(self.get_separator())
         self.listitem.setLabel(self.listitem_label)
 
 
 class TMDbDiscoverWithoutGenres(TMDbDiscoverWithGenres):
     key = 'without_genres'
     label_prefix_localized = 32264
+
+
+class TMDbDiscoverWithWatchProviders(TMDbDiscoverWithGenres):
+    key = 'with_watch_providers'
+    label_prefix_localized = 32412
+    use_details = True
+
+    @cached_property
+    def routes(self):
+        return TMDbDiscoverMethods.get_configured_routes(self.datalist, item_class=DiscoverProviderItem)
+
+    @property
+    def enabled(self):
+        return bool(self.main.watch_region)
+
+    @property
+    def datalist(self):
+        with BusyDialog():
+            from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+            data_list = FindQueriesDatabase().get_watch_providers(self.main.tmdb_type, self.main.watch_region)
+            data_list = [{'name': i['provider_name'], 'id': i['provider_id'], 'icon': i.get('logo_path')} for i in data_list]
+            return data_list
+
+
+class TMDbDiscoverWithWatchMonetizationTypes(DiscoverMulti):
+    key = 'with_watch_monetization_types'
+    label_prefix_localized = 32218
+    idx = None
+    separator = '%7C'
+
+    @property
+    def enabled(self):
+        return bool(self.main.watch_region)
+
+    @property
+    def datalist(self):
+        from tmdbhelper.lib.addon.consts import DISCOVER_WATCH_MONETIZATION_TYPES
+        return DISCOVER_WATCH_MONETIZATION_TYPES
+
+    @cached_property
+    def routes(self):
+        return TMDbDiscoverMethods.get_configured_routes(self.datalist)
 
 
 class TMDbDiscoverWithOriginalLanguage(DiscoverMulti):
@@ -278,7 +399,7 @@ class TMDbDiscoverWithReleaseType(DiscoverMulti):
 
     @property
     def enabled(self):
-        return bool(self.main.tmdb_type == 'movie')
+        return bool(self.main.tmdb_type == 'movie' and self.main.region)
 
     @property
     def datalist(self):
@@ -297,18 +418,14 @@ class TMDbDiscoverMain(DiscoverMain):
     base_params = ('info=discover', 'with_id=True')
 
     def load_values(self, tmdb_type='movie', **kwargs):
-        from tmdbhelper.lib.addon.logger import kodi_log
-        kodi_log(f'{kwargs}', 1)
         self.routes_dict['tmdb_type'].load_value(tmdb_type)  # Set TMDb Type first as other values depend on it
-        for k, v in kwargs.items():
-            try:
-                value = v.replace(',', '%2C').replace('|', '%7C')  # Convert back to percent encoding for consistency
-            except AttributeError:
-                continue
-            try:
-                self.routes_dict[k].load_value(value)
-            except KeyError:
-                continue
+        load_values = (
+            (k, v.replace(',', '%2C').replace('|', '%7C'))
+            for k, v in kwargs.items()
+            if k in self.routes_dict
+        )
+        for k, v in load_values:
+            self.routes_dict[k].load_value(v)
 
     @cached_property
     def label(self):
@@ -326,12 +443,29 @@ class TMDbDiscoverMain(DiscoverMain):
     def tmdb_type(self):
         return self.routes_dict['tmdb_type'].value
 
+    @property
+    def watch_region(self):
+        return self.routes_dict['watch_region'].value
+
+    @property
+    def region(self):
+        return self.routes_dict['region'].value
+
+    @cached_property
+    def iso_country(self):
+        from tmdbhelper.lib.api.tmdb.api import TMDb
+        return TMDb().iso_country
+
     def get_routes_dict(self):
         return {
             'save': TMDbDiscoverSave(self),
             'tmdb_type': TMDbDiscoverType(self),
+            'sort_by': TMDbDiscoverSortBy(self),
             'with_genres': TMDbDiscoverWithGenres(self),
             'without_genres': TMDbDiscoverWithoutGenres(self),
+            'watch_region': TMDbDiscoverWatchRegion(self),
+            'with_watch_providers': TMDbDiscoverWithWatchProviders(self),
+            'with_watch_monetization_types': TMDbDiscoverWithWatchMonetizationTypes(self),
             'with_cast': TMDbDiscoverWithCast(self),
             'with_crew': TMDbDiscoverWithCrew(self),
             'with_people': TMDbDiscoverWithPeople(self),
@@ -340,6 +474,7 @@ class TMDbDiscoverMain(DiscoverMain):
             'without_keywords': TMDbDiscoverWithoutKeywords(self),
             'with_original_language': TMDbDiscoverWithOriginalLanguage(self),
             'region': TMDbDiscoverRegion(self),
+            'certification_country': TMDbDiscoverCertificationCountry(self),
             'with_release_type': TMDbDiscoverWithReleaseType(self),
             'reset': TMDbDiscoverReset(self),
         }

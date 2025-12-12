@@ -15,7 +15,8 @@ from urllib.parse import urlencode
 from tmdbhelper.lib.addon.consts import (
     DISCOVER_REGIONS,
     DISCOVER_LANGUAGES,
-    DISCOVER_RELEASE_TYPES
+    DISCOVER_RELEASE_TYPES,
+    DISCOVER_SORTBY_MOVIES
 )
 
 
@@ -24,10 +25,7 @@ RELATIVE_DATES = [
     'air_date.gte', 'air_date.lte', 'first_air_date.gte', 'first_air_date.lte']
 
 
-SORTBY_MOVIES = [
-    'popularity.asc', 'popularity.desc', 'release_date.asc', 'release_date.desc', 'revenue.asc', 'revenue.desc',
-    'primary_release_date.asc', 'primary_release_date.desc', 'original_title.asc', 'original_title.desc',
-    'vote_average.asc', 'vote_average.desc', 'vote_count.asc', 'vote_count.desc']
+SORTBY_MOVIES = [i['id'] for i in DISCOVER_SORTBY_MOVIES]
 
 SORTBY_TV = [
     'vote_average.desc', 'vote_average.asc', 'first_air_date.desc', 'first_air_date.asc',

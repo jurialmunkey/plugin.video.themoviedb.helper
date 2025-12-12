@@ -1,11 +1,40 @@
 from tmdbhelper.lib.addon.plugin import get_localized
 from jurialmunkey.ftools import cached_property
 from jurialmunkey.window import get_property
-from collections import namedtuple
+# from collections import namedtuple
 from xbmcgui import Dialog, WindowXMLDialog, ListItem, INPUT_NUMERIC
 
 
-ItemTuple = namedtuple("ItemTuple", "label value")
+# DiscoverItem = namedtuple("DiscoverItem", "label value")
+
+class DiscoverItem:
+    def __init__(self, label, value, image=None):
+        self.label = label
+        self.value = value
+        self.image = image
+
+    routes = {0: 'label', 1: 'value', 2: 'image'}
+
+    def __getitem__(self, key):
+        return getattr(self, self.routes.get(key, key))
+
+    @cached_property
+    def label2(self):
+        return str(self.value)
+
+    @cached_property
+    def icon(self):
+        return self.image
+
+    @cached_property
+    def art(self):
+        return {'icon': self.icon} if self.icon else {}
+
+    @cached_property
+    def listitem(self):
+        listitem = ListItem(self.label, self.label2)
+        listitem.setArt(self.art)
+        return listitem
 
 
 class DiscoverMenu:
@@ -17,6 +46,12 @@ class DiscoverMenu:
     label = None
     enabled = True
     value = None
+    rebuild = False
+
+    def menu_rebuild(self):
+        if not self.rebuild:
+            return
+        self.main.build_menu(self.__class__.__name__)
 
     @property
     def paramstring(self):
@@ -43,6 +78,7 @@ class DiscoverList(DiscoverMenu):
     idx = 0
     key = 'info'
     label_prefix_localized = 535
+    use_details = False
 
     @property
     def route(self):
@@ -77,10 +113,17 @@ class DiscoverList(DiscoverMenu):
     def load_value(self, value):
         self.idx = next((x for x, i in enumerate(self.routes) if i.value == value))
 
+    @property
+    def menu_items(self):
+        if not self.use_details:
+            return [i.label for i in self.routes]
+        return [i.listitem for i in self.routes]
+
     def menu(self):
-        x = self.dialog_select(self.listitem_label, [i.label for i in self.routes], preselect=self.preselect)
+        x = self.dialog_select(self.listitem_label, self.menu_items, preselect=self.preselect, useDetails=self.use_details)
         self.idx = x if x != -1 else self.idx
         self.listitem.setLabel(self.listitem_label)
+        self.menu_rebuild()
 
 
 class DiscoverMulti(DiscoverList):
@@ -115,11 +158,20 @@ class DiscoverMulti(DiscoverList):
     def preselect(self):
         return self.idx or []
 
-    def select_separator(self):
+    @property
+    def has_multiples(self):
+        return bool(self.idx and len(self.idx) > 1)
+
+    def get_separator(self):
+        if not self.has_multiples:
+            return
         x = Dialog().select(get_localized(32107), (get_localized(32110), get_localized(32109)))
         if x == -1:
             return
-        self.separator = '%7C' if x == 1 else '%2C'
+        return '%7C' if x == 1 else '%2C'
+
+    def set_separator(self, value):
+        self.separator = value or self.separator
 
 
 class DiscoverQuery(DiscoverMenu):
@@ -134,6 +186,7 @@ class DiscoverQuery(DiscoverMenu):
     def menu(self):
         self.label = Dialog().input(get_localized(32044), defaultt=self.value or '')
         self.listitem.setLabel(self.listitem_label)
+        self.menu_rebuild()
 
 
 class DiscoverRuntimes(DiscoverMenu):
@@ -165,6 +218,7 @@ class DiscoverRuntimes(DiscoverMenu):
         self.value_a = Dialog().input(f'{self.input_label} [>>]', type=INPUT_NUMERIC, defaultt=f'{self.value_a}' if self.value_a else '')
         self.value_z = Dialog().input(f'{self.input_label} [<<]', type=INPUT_NUMERIC, defaultt=f'{self.value_z}' if self.value_z else '')
         self.listitem.setLabel(self.listitem_label)
+        self.menu_rebuild()
 
 
 class DiscoverYears(DiscoverRuntimes):
@@ -213,6 +267,7 @@ class DiscoverYears(DiscoverRuntimes):
         self.value_a = self.select_value('[>>]')
         self.value_z = self.select_value(f'{self.value_a}', '[<<]', lower_limit=self.value_a) if self.value_a else None
         self.listitem.setLabel(self.listitem_label)
+        self.menu_rebuild()
 
 
 class DiscoverRatings(DiscoverYears):

@@ -11,7 +11,7 @@ from tmdbhelper.lib.script.discover.base import (
     DiscoverSave,
     DiscoverReset,
     DiscoverMain,
-    ItemTuple
+    DiscoverItem
 )
 
 
@@ -22,11 +22,11 @@ class TraktDiscoverList(DiscoverList):
     @cached_property
     def routes(self):
         return (
-            ItemTuple(get_localized(32204), 'trakt_trending'),
-            ItemTuple(get_localized(32175), 'trakt_popular'),
-            ItemTuple(get_localized(32205), 'trakt_mostplayed'),
-            ItemTuple(get_localized(32414), 'trakt_mostviewers'),
-            ItemTuple(get_localized(32206), 'trakt_anticipated'),
+            DiscoverItem(get_localized(32204), 'trakt_trending'),
+            DiscoverItem(get_localized(32175), 'trakt_popular'),
+            DiscoverItem(get_localized(32205), 'trakt_mostplayed'),
+            DiscoverItem(get_localized(32414), 'trakt_mostviewers'),
+            DiscoverItem(get_localized(32206), 'trakt_anticipated'),
         )
 
 
@@ -37,8 +37,8 @@ class TraktDiscoverType(DiscoverList):
     @cached_property
     def routes(self):
         return (
-            ItemTuple(get_localized(342), 'movie'),
-            ItemTuple(get_localized(20343), 'tv'),
+            DiscoverItem(get_localized(342), 'movie'),
+            DiscoverItem(get_localized(20343), 'tv'),
         )
 
 
@@ -63,7 +63,7 @@ class TraktDiscoverGenres(DiscoverMulti):
 
     @cached_property
     def routes(self):
-        return tuple((ItemTuple(i['name'], i['slug']) for i in self.routes_items if i))
+        return tuple((DiscoverItem(i['name'], i['slug']) for i in self.routes_items if i))
 
 
 class TraktDiscoverCertifications(TraktDiscoverGenres):

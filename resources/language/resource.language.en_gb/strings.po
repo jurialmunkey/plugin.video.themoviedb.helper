@@ -1085,6 +1085,21 @@ msgctxt "#32204"
 msgid "Trending"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32217"
+msgid "With Provider Region"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32218"
+msgid "With Watch Monetization Types"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32219"
+msgid "Certification Country"
+msgstr ""
+
 #: /resources/lib/plugin.py
 msgctxt "#32205"
 msgid "Most Played"
