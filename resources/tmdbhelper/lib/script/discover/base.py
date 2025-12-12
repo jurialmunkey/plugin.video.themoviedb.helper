@@ -75,10 +75,11 @@ class DiscoverMenu:
 
 
 class DiscoverList(DiscoverMenu):
-    idx = 0
+    idx = None
     key = 'info'
     label_prefix_localized = 535
     use_details = False
+    default_idx = None
 
     @property
     def route(self):
@@ -100,6 +101,9 @@ class DiscoverList(DiscoverMenu):
 
     @cached_property
     def routes(self):
+        return self.get_routes()
+
+    def get_routes(self):
         return ()
 
     @property
@@ -108,7 +112,7 @@ class DiscoverList(DiscoverMenu):
 
     @property
     def preselect(self):
-        return self.idx or -1
+        return self.idx if self.idx is not None else -1
 
     def load_value(self, value):
         self.idx = next((x for x, i in enumerate(self.routes) if i.value == value))
@@ -121,7 +125,7 @@ class DiscoverList(DiscoverMenu):
 
     def menu(self):
         x = self.dialog_select(self.listitem_label, self.menu_items, preselect=self.preselect, useDetails=self.use_details)
-        self.idx = x if x != -1 else self.idx
+        self.idx = x if x != -1 else self.default_idx
         self.listitem.setLabel(self.listitem_label)
         self.menu_rebuild()
 
@@ -407,6 +411,13 @@ class DiscoverMain(WindowXMLDialog):
     def list_control(self):
         return self.getControl(3)
 
+    def update_menu(self):
+        for i in self.routes:
+            try:
+                i.routes = i.get_routes()
+            except AttributeError:
+                pass
+
     def onInit(self):
         self.getControl(1).setLabel(self.label)
         self.getControl(5).setLabel(get_localized(190))
@@ -416,6 +427,7 @@ class DiscoverMain(WindowXMLDialog):
         self.build_menu()
 
     def build_menu(self, select_class=None):
+        self.update_menu()
         self.list_control.reset()
         self.list_control.addItems([i.listitem for i in self.routes])
         self.setFocus(self.list_control)

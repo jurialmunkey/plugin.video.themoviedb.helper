@@ -75,9 +75,10 @@ class TMDbDiscoverType(DiscoverList):
     key = 'tmdb_type'
     label_prefix_localized = 467
     rebuild = True
+    idx = 0
+    default_idx = 0
 
-    @cached_property
-    def routes(self):
+    def get_routes(self):
         return (
             DiscoverItem(get_localized(342), 'movie'),
             DiscoverItem(get_localized(20343), 'tv'),
@@ -87,7 +88,6 @@ class TMDbDiscoverType(DiscoverList):
 class TMDbDiscoverSortBy(DiscoverList):
     key = 'sort_by'
     label_prefix_localized = 32240
-    idx = None
 
     @property
     def datalist(self):
@@ -99,15 +99,13 @@ class TMDbDiscoverSortBy(DiscoverList):
             from tmdbhelper.lib.addon.consts import DISCOVER_SORTBY_TV
             return DISCOVER_SORTBY_TV
 
-    @cached_property
-    def routes(self):
+    def get_routes(self):
         return TMDbDiscoverMethods.get_configured_routes(self.datalist)
 
 
 class TMDbDiscoverRegion(DiscoverList):
     key = 'region'
     label_prefix_localized = 32256
-    idx = None
     rebuild = True
 
     @property
@@ -123,14 +121,14 @@ class TMDbDiscoverRegion(DiscoverList):
         from tmdbhelper.lib.addon.consts import DISCOVER_REGIONS
         return DISCOVER_REGIONS
 
-    @cached_property
-    def routes(self):
+    def get_routes(self):
         return TMDbDiscoverMethods.get_configured_routes(self.datalist)
 
 
 class TMDbDiscoverCertificationCountry(TMDbDiscoverRegion):
     key = 'certification_country'
     label_prefix_localized = 32219
+    rebuild = True
 
     @property
     def preselect(self):
@@ -153,10 +151,39 @@ class TMDbDiscoverCertificationCountry(TMDbDiscoverRegion):
             return datalist
 
 
+class TMDbDiscoverCertification(TMDbDiscoverRegion):
+    key = 'certification'
+    label_prefix_localized = 32486
+
+    @property
+    def enabled(self):
+        return bool(self.main.tmdb_type == 'movie' and self.main.certification_country)
+
+    @property
+    def datalist(self):
+        with BusyDialog():
+            from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+            datalist = FindQueriesDatabase().get_certification('movie')
+            datalist = [
+                {'id': i['certification'], 'name': i['certification']}
+                for i in datalist if i['iso_country'] == self.main.certification_country
+            ]
+            return datalist
+
+
+class TMDbDiscoverCertificationGTE(TMDbDiscoverCertification):
+    key = 'certification.gte'
+    label_prefix_localized = 32488
+
+
+class TMDbDiscoverCertificationLTE(TMDbDiscoverCertification):
+    key = 'certification.lte'
+    label_prefix_localized = 32487
+
+
 class TMDbDiscoverWatchRegion(DiscoverList):
     key = 'watch_region'
     label_prefix_localized = 32217
-    idx = None
     rebuild = True
 
     @property
@@ -170,8 +197,7 @@ class TMDbDiscoverWatchRegion(DiscoverList):
         datalist = [{'name': f'{v} ({k})', 'id': k} for k, v in datalist.items()]
         return datalist
 
-    @cached_property
-    def routes(self):
+    def get_routes(self):
         return TMDbDiscoverMethods.get_configured_routes(self.datalist)
 
 
@@ -182,7 +208,6 @@ class TMDbDiscoverWithCompanies(DiscoverMulti):
     query_use_details = True
     separator = '%7C'
     preselect = None
-    idx = None
 
     @cached_property
     def tmdb_api(self):
@@ -297,7 +322,6 @@ class TMDbDiscoverWithPeople(TMDbDiscoverWithCast):
 class TMDbDiscoverWithGenres(DiscoverMulti):
     key = 'with_genres'
     label_prefix_localized = 32263
-    idx = None
     separator = '%7C'
 
     def get_load_value_index(self, tmdb_id):
@@ -318,8 +342,7 @@ class TMDbDiscoverWithGenres(DiscoverMulti):
             data_list = [{'name': k, 'id': v} for k, v in data_list.items()]
             return data_list
 
-    @cached_property
-    def routes(self):
+    def get_routes(self):
         return TMDbDiscoverMethods.get_configured_routes(self.datalist)
 
     def menu(self):
@@ -338,8 +361,7 @@ class TMDbDiscoverWithWatchProviders(TMDbDiscoverWithGenres):
     label_prefix_localized = 32412
     use_details = True
 
-    @cached_property
-    def routes(self):
+    def get_routes(self):
         return TMDbDiscoverMethods.get_configured_routes(self.datalist, item_class=DiscoverProviderItem)
 
     @property
@@ -358,7 +380,6 @@ class TMDbDiscoverWithWatchProviders(TMDbDiscoverWithGenres):
 class TMDbDiscoverWithWatchMonetizationTypes(DiscoverMulti):
     key = 'with_watch_monetization_types'
     label_prefix_localized = 32218
-    idx = None
     separator = '%7C'
 
     @property
@@ -370,15 +391,13 @@ class TMDbDiscoverWithWatchMonetizationTypes(DiscoverMulti):
         from tmdbhelper.lib.addon.consts import DISCOVER_WATCH_MONETIZATION_TYPES
         return DISCOVER_WATCH_MONETIZATION_TYPES
 
-    @cached_property
-    def routes(self):
+    def get_routes(self):
         return TMDbDiscoverMethods.get_configured_routes(self.datalist)
 
 
 class TMDbDiscoverWithOriginalLanguage(DiscoverMulti):
     key = 'with_original_language'
     label_prefix_localized = 32269
-    idx = None
     separator = '%7C'
 
     @property
@@ -386,15 +405,13 @@ class TMDbDiscoverWithOriginalLanguage(DiscoverMulti):
         from tmdbhelper.lib.addon.consts import DISCOVER_LANGUAGES
         return DISCOVER_LANGUAGES
 
-    @cached_property
-    def routes(self):
+    def get_routes(self):
         return TMDbDiscoverMethods.get_configured_routes(self.datalist)
 
 
 class TMDbDiscoverWithReleaseType(DiscoverMulti):
     key = 'with_release_type'
     label_prefix_localized = 32255
-    idx = None
     separator = '%7C'
 
     @property
@@ -406,8 +423,7 @@ class TMDbDiscoverWithReleaseType(DiscoverMulti):
         from tmdbhelper.lib.addon.consts import DISCOVER_RELEASE_TYPES
         return DISCOVER_RELEASE_TYPES
 
-    @cached_property
-    def routes(self):
+    def get_routes(self):
         return TMDbDiscoverMethods.get_configured_localized_routes(self.datalist)
 
 
@@ -451,6 +467,10 @@ class TMDbDiscoverMain(DiscoverMain):
     def region(self):
         return self.routes_dict['region'].value
 
+    @property
+    def certification_country(self):
+        return self.routes_dict['certification_country'].value
+
     @cached_property
     def iso_country(self):
         from tmdbhelper.lib.api.tmdb.api import TMDb
@@ -475,6 +495,9 @@ class TMDbDiscoverMain(DiscoverMain):
             'with_original_language': TMDbDiscoverWithOriginalLanguage(self),
             'region': TMDbDiscoverRegion(self),
             'certification_country': TMDbDiscoverCertificationCountry(self),
+            'certification': TMDbDiscoverCertification(self),
+            'certification_gte': TMDbDiscoverCertificationGTE(self),
+            'certification_lte': TMDbDiscoverCertificationLTE(self),
             'with_release_type': TMDbDiscoverWithReleaseType(self),
             'reset': TMDbDiscoverReset(self),
         }
