@@ -53,8 +53,7 @@ class ListDiscoverDir(ContainerDefaultCacheDirectory):
         container = get_container('dir_custom_node')(self.handle, paramstring, **params)
 
         items = []
-        items.append(self.item_new)
-        items.append(self.item_browse)
+        items.extend((i for i in (self.item_new, self.item_browse) if i))
         items.extend(container.get_directory(items_only=True, build_items=False) or [])
 
         return items

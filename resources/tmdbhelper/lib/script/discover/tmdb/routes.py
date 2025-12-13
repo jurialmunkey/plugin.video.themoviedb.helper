@@ -437,6 +437,57 @@ class TMDbDiscoverWithOriginalLanguage(DiscoverMulti):
         return TMDbDiscoverMethods.get_configured_routes(self.datalist)
 
 
+class TMDbDiscoverTimezone(TMDbDiscoverRegion):
+    priority = 230
+    key = 'timezone'
+    label_prefix_localized = 14080
+    timezone_region = None
+
+    @property
+    def enabled(self):
+        return bool(self.main.tmdb_type == 'tv')
+
+    @property
+    def region_preselect(self):
+        return next((x for x, i in enumerate(self.timezone_regions) if f'({self.main.iso_country})' == i['name'][-4:]), -1)
+
+    @cached_property
+    def region_names(self):
+        from tmdbhelper.lib.addon.consts import DISCOVER_REGIONS
+        return {i['id']: i['name'] for i in DISCOVER_REGIONS}
+
+    @cached_property
+    def timezone_regions(self):
+        with BusyDialog():
+            from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+            datalist = FindQueriesDatabase().get_timezones()
+            datalist = [
+                {'id': j, 'name': self.region_names.get(j, j)}
+                for j in {i['iso_country'] for i in datalist}
+            ]
+            datalist = sorted(datalist, key=lambda x: x['name'])
+        return datalist
+
+    @property
+    def datalist(self):
+        with BusyDialog():
+            from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+            datalist = FindQueriesDatabase().get_timezones(self.timezone_region)
+            datalist = [
+                {'id': i['timezone'], 'name': f"{i['timezone']} ({i['iso_country']})"}
+                for i in datalist
+            ]
+            return datalist
+
+    def menu(self):
+        x = self.dialog_select(get_localized(20026), [i['name'] for i in self.timezone_regions], preselect=self.region_preselect)
+        if x == -1:
+            return
+        self.timezone_region = self.timezone_regions[x]['id']
+        self.reset_routes()
+        super().menu()
+
+
 class TMDbDiscoverCertificationCountry(TMDbDiscoverRegion):
     priority = 230
     key = 'certification_country'
