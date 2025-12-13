@@ -606,7 +606,8 @@ msgctxt "#32104"
 msgid ""
 "TMDb ID for {} not found or none selected.\n"
 "Do you want to add another value?"
-msgstr "ID TMDb para {} não encontrado ou nenhum selecionado.\n"
+msgstr ""
+"ID TMDb para {} não encontrado ou nenhum selecionado.\n"
 "Deseja adicionar outro valor?"
 
 #: /resources/lib/container.py
@@ -823,6 +824,11 @@ msgstr "Adicionar lista Trakt à biblioteca Kodi"
 msgctxt "#32126"
 msgid "Are you sure you want to add this Trakt list to your Kodi library?"
 msgstr "Tem certeza de que deseja adicionar esta lista do Trakt à sua biblioteca Kodi?"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32165"
+msgid "Add another item?"
+msgstr "Adicionar outro item?"
 
 #: /resources/lib/context.py
 msgctxt "#32130"
@@ -1083,6 +1089,30 @@ msgctxt "#32204"
 msgid "Trending"
 msgstr "Em Alta"
 
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32217"
+msgid "With Provider Region"
+msgstr "Com Região do Provedor"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32218"
+msgid "With Watch Monetization Types"
+msgstr "Com Tipos de Monetização de Exibição"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32219"
+msgid "Certification Country"
+msgstr "País da Certificação"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb/routes.py
+msgctxt "#32220"
+msgid "With Origin Country"
+msgstr "Com o País de Origem"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32221"
+msgid "Miniseries"
+msgstr "Minisséries"
 #: /resources/lib/plugin.py
 msgctxt "#32205"
 msgid "Most Played"
@@ -1143,6 +1173,11 @@ msgctxt "#32216"
 msgid "Successfully logged out of Trakt user account"
 msgstr "Desconectado da conta de usuário do Trakt com sucesso"
 
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32234"
+msgid "Reality"
+msgstr "Realidade"
+
 #: /resources/lib/script.py
 msgctxt "#32222"
 msgid "Manage artwork"
@@ -1157,6 +1192,11 @@ msgstr "Recomendado"
 msgctxt "#32224"
 msgid "Similar"
 msgstr "Similar"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32238"
+msgid "Scripted"
+msgstr "Roteirizado"
 
 #: /resources/lib/plugin.py
 msgctxt "#32225"
@@ -1428,6 +1468,16 @@ msgctxt "#32280"
 msgid "Last Fortnight"
 msgstr "Última Quinzena"
 
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32293"
+msgid "Returning Series"
+msgstr "Séries Retornando"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32294"
+msgid "Planned"
+msgstr "Planejado"
+
 #: /resources/lib/basedir.py
 msgctxt "#32281"
 msgid "Last Week"
@@ -1487,6 +1537,16 @@ msgstr "Adicionar à minha lista"
 msgctxt "#32292"
 msgid "Remove from watchlist"
 msgstr "Remover da minha lista"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32307"
+msgid "In Production"
+msgstr "Em Produção"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32308"
+msgid "Ended"
+msgstr "Concluído"
 
 #: /resources/lib/script.py
 msgctxt "#32295"
@@ -1565,6 +1625,16 @@ msgstr "Navegar na lista ordenada"
 msgctxt "#32310"
 msgid "TMDb ID for {} not found!"
 msgstr "ID TMDb para {} não encontrado!"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32323"
+msgid "Cancelled"
+msgstr "Cancelado"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32324"
+msgid "Pilot"
+msgstr "Piloto"
 
 #: /resources/lib/player/players.py
 msgctxt "#32311"
@@ -2798,7 +2868,7 @@ msgstr "Reprodutores"
 #: /resources/settings.xml
 msgctxt "#32016"
 msgid "Update players from URL"
-msgstr "Atualizar reprodutores da URL"
+msgstr "Chave de cliente Fanart.tv"
 
 #: /resources/settings.xml
 msgctxt "#32017"
