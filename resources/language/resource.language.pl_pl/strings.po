@@ -662,8 +662,8 @@ msgstr "Wybierz gatunki"
 
 #: /resources/lib/container.py
 msgctxt "#32113"
-msgid "Also accepts X days relative from today in the format T-X or T+X (e.g. T-10 is ten days ago)"
-msgstr "Akceptuj również X dni od dzisiaj w formacie T-X lub T+X (np. T-10 to 'dziesięć dni temu')"
+msgid "msgid "Also accepts days from today as T-X or T+X (e.g. T-10 is ten days ago)""
+msgstr "Akceptuj również dni od dzisiaj jako T-X lub T+X (np. T-10 to 'dziesięć dni temu')"
 
 #: /resources/lib/container.py
 msgctxt "#32114"
@@ -1101,6 +1101,8 @@ msgstr "Z typami monetyzacji"
 msgctxt "#32219"
 msgid "Certification Country"
 msgstr "Kraj kategorii wiekowej"
+
+
 
 #: /resources/lib/plugin.py
 msgctxt "#32205"
