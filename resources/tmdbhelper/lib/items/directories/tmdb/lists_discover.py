@@ -16,7 +16,8 @@ from tmdbhelper.lib.addon.consts import (
     DISCOVER_REGIONS,
     DISCOVER_LANGUAGES,
     DISCOVER_RELEASE_TYPES,
-    DISCOVER_SORTBY_MOVIES
+    DISCOVER_SORTBY_MOVIES,
+    DISCOVER_SORTBY_TV
 )
 
 
@@ -26,11 +27,7 @@ RELATIVE_DATES = [
 
 
 SORTBY_MOVIES = [i['id'] for i in DISCOVER_SORTBY_MOVIES]
-
-SORTBY_TV = [
-    'vote_average.desc', 'vote_average.asc', 'first_air_date.desc', 'first_air_date.asc',
-    'popularity.desc', 'popularity.asc', 'vote_count.asc', 'vote_count.desc']
-
+SORTBY_TV = [i['id'] for i in DISCOVER_SORTBY_TV]
 
 ALL_METHODS = [
     'open', 'with_separator', 'sort_by', 'add_rule', 'clear', 'save', 'with_cast', 'with_crew', 'with_people',
