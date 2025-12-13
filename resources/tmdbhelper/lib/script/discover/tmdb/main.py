@@ -7,7 +7,7 @@ from tmdbhelper.lib.script.discover.tmdb.routes import get_all_route_class_insta
 
 
 NODE_FILENAME = 'TMDb Discover.json'
-WINPROP = 'TMDbDiscover.Path'
+WINPROP = 'UserDiscover.FolderPath'
 
 
 class TMDbDiscoverMain(DiscoverMain):
