@@ -112,13 +112,13 @@ ROUTE_NOID = {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_gemini',
         'import_attr': 'ListGemini'}},
     'dir_discover': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_discover',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_discodir',
         'import_attr': 'ListDiscoverDir'}},
     'discover': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_discover',
         'import_attr': 'ListDiscover'}},
     'user_discover': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_discover',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_discodir',
         'import_attr': 'ListUserDiscover'}},
     'dir_trakt_discover': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_discover',

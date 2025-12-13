@@ -1629,6 +1629,11 @@ msgctxt "#32324"
 msgid "Pilot"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_discodir.py
+msgctxt "#32325"
+msgid "Edit Filters"
+msgstr ""
+
 #: /resources/lib/player/players.py
 msgctxt "#32311"
 msgid "Clear default player"

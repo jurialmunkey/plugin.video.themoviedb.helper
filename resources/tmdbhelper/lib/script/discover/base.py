@@ -52,6 +52,10 @@ class DiscoverMenu:
             return
         return f'{self.key}={self.value}'
 
+    @property
+    def pathlabel(self):
+        return f'{self.label_prefix} {self.label}'
+
     @cached_property
     def listitem(self):
         return ListItem(label=self.listitem_label)
@@ -386,7 +390,7 @@ class DiscoverMain(WindowXMLDialog):
     @property
     def defaultt(self):
         from tmdbhelper.lib.files.futils import validify_filename
-        defaultt = ' '.join((i.label for i in self.routes if i.label and i.paramstring))
+        defaultt = ', '.join((i.pathlabel for i in self.routes if i.label and i.paramstring))
         defaultt = validify_filename(defaultt)
         return ' '.join(defaultt.split())
 
@@ -398,7 +402,7 @@ class DiscoverMain(WindowXMLDialog):
         if not self.winprop:
             return
         get_property(self.winprop, set_property=self.path)
-        get_property(f'{self.winprop}.name', set_property=self.defaultt)
+        get_property(f'{self.winprop}.name', set_property=f'{get_localized(32174)} {self.defaultt}')
         get_property(f'{self.winprop}.paramstring', set_property='&'.join((i.paramstring for i in self.routes if i.paramstring)))
         get_property(f'{self.winprop}.reload', set_property=f'{set_timestamp(0, True)}')
 
