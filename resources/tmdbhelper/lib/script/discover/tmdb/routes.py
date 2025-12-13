@@ -59,6 +59,7 @@ class TMDbDiscoverWithCompanies(DiscoverMulti):
     query_use_details = True
     separator = '%7C'
     preselect = None
+    rebuild = True
 
     @cached_property
     def tmdb_api(self):
@@ -89,12 +90,18 @@ class TMDbDiscoverWithCompanies(DiscoverMulti):
             return
 
         value = self.get_query(query)
-        if not value or not value.getUniqueID('tmdb'):
+        if not value or not self.get_query_result_value(value):
             Dialog().ok(query, get_localized(32310).format(query))
             return self.query_result
 
-        self.route.append(DiscoverItem(value.getLabel(), value.getUniqueID('tmdb')))
+        self.route.append(DiscoverItem(self.get_query_result_label(value), self.get_query_result_value(value)))
         return self.route[-1]
+
+    def get_query_result_label(self, query_item):
+        return query_item.getLabel()
+
+    def get_query_result_value(self, query_item):
+        return query_item.getUniqueID('tmdb')
 
     def get_query(self, query):
         with BusyDialog():
@@ -130,11 +137,42 @@ class TMDbDiscoverWithCompanies(DiscoverMulti):
 
     def menu(self):
         if self.clear_route():
+            self.listitem.setLabel(self.listitem_label)
             return
         while self.query_result and Dialog().yesno(self.listitem_label, get_localized(32165)):
             pass
         self.set_separator(self.get_separator())
         self.listitem.setLabel(self.listitem_label)
+
+
+class TMDbDiscoverWithNetworks(TMDbDiscoverWithCompanies):
+    priority = 35
+    key = 'with_networks'
+    label_prefix_localized = 32257
+    query_tmdb_type = 'network'
+    query_use_details = False
+    rebuild = True
+
+    @property
+    def enabled(self):
+        return bool(self.main.tmdb_type == 'tv')
+
+    def get_query_result_label(self, query_item):
+        return query_item['name']
+
+    def get_query_result_value(self, query_item):
+        return query_item['id']
+
+    def get_query(self, query):
+        with BusyDialog():
+            from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+            networks = FindQueriesDatabase().get_network(query)
+            if not networks:
+                return
+            x = Dialog().select(self.listitem_label, [f"{i['name']} - ID #{i['id']}" for i in networks]) if len(networks) > 1 else 0
+            if x == -1:
+                return
+            return {'id': networks[x]['id'], 'name': networks[x]['name']}
 
 
 class TMDbDiscoverWithKeywords(TMDbDiscoverWithCompanies):
