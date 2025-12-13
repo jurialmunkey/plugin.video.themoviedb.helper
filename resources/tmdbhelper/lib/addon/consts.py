@@ -950,6 +950,28 @@ DISCOVER_RELEASE_TYPES = (
     {'id': 6, 'name': 36037}
 )
 
+
+DISCOVER_TV_TYPES = (
+    {'id': 0, 'name': 19519},
+    {'id': 1, 'name': 29941},
+    {'id': 2, 'name': 32221},
+    {'id': 3, 'name': 32234},
+    {'id': 4, 'name': 32238},
+    {'id': 5, 'name': 19535},
+    {'id': 6, 'name': 157},
+)
+
+
+DISCOVER_TV_STATUS = (
+    {'id': 0, 'name': 32293},
+    {'id': 1, 'name': 32294},
+    {'id': 2, 'name': 32307},
+    {'id': 3, 'name': 32308},
+    {'id': 4, 'name': 32323},
+    {'id': 5, 'name': 32324},
+)
+
+
 DISCOVER_WATCH_MONETIZATION_TYPES = (
     {'id': 'flatrate', 'name': 'flatrate'},
     {'id': 'free', 'name': 'free'},

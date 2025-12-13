@@ -1105,6 +1105,11 @@ msgctxt "#32220"
 msgid "With Origin Country"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32221"
+msgid "Miniseries"
+msgstr ""
+
 #: /resources/lib/plugin.py
 msgctxt "#32205"
 msgid "Most Played"
@@ -1165,6 +1170,11 @@ msgctxt "#32216"
 msgid "Successfully logged out of Trakt user account"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32234"
+msgid "Reality"
+msgstr ""
+
 #: /resources/lib/script.py
 msgctxt "#32222"
 msgid "Manage artwork"
@@ -1178,6 +1188,11 @@ msgstr ""
 #: /resources/lib/plugin.py
 msgctxt "#32224"
 msgid "Similar"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32238"
+msgid "Scripted"
 msgstr ""
 
 #: /resources/lib/plugin.py
@@ -1450,6 +1465,16 @@ msgctxt "#32280"
 msgid "Last Fortnight"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32293"
+msgid "Returning Series"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32294"
+msgid "Planned"
+msgstr ""
+
 #: /resources/lib/basedir.py
 msgctxt "#32281"
 msgid "Last Week"
@@ -1508,6 +1533,16 @@ msgstr ""
 #: /resources/lib/script.py
 msgctxt "#32292"
 msgid "Remove from watchlist"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32307"
+msgid "In Production"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32308"
+msgid "Ended"
 msgstr ""
 
 #: /resources/lib/script.py
@@ -1582,6 +1617,16 @@ msgstr ""
 #: /resources/lib/window/manager.py
 msgctxt "#32310"
 msgid "TMDb ID for {} not found!"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32323"
+msgid "Cancelled"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32324"
+msgid "Pilot"
 msgstr ""
 
 #: /resources/lib/player/players.py

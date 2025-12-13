@@ -305,6 +305,25 @@ class TMDbDiscoverRegion(DiscoverList):
         return TMDbDiscoverMethods.get_configured_routes(self.datalist)
 
 
+class TMDbDiscoverWithType(DiscoverMulti):
+    priority = 160
+    key = 'with_type'
+    label_prefix_localized = 32255
+    separator = '%7C'
+
+    @property
+    def enabled(self):
+        return bool(self.main.tmdb_type == 'tv')
+
+    @property
+    def datalist(self):
+        from tmdbhelper.lib.addon.consts import DISCOVER_TV_TYPES
+        return DISCOVER_TV_TYPES
+
+    def get_routes(self):
+        return TMDbDiscoverMethods.get_configured_localized_routes(self.datalist, sorting=False)
+
+
 class TMDbDiscoverWithReleaseType(DiscoverMulti):
     priority = 160
     key = 'with_release_type'
@@ -329,6 +348,25 @@ class TMDbDiscoverWithReleaseType(DiscoverMulti):
         if not TMDbDiscoverMethods.menu_with_subselection(self):
             return
         super().menu()
+
+
+class TMDbDiscoverWithStatus(DiscoverMulti):
+    priority = 165
+    key = 'with_status'
+    label_prefix_localized = 126
+    separator = '%7C'
+
+    @property
+    def enabled(self):
+        return bool(self.main.tmdb_type == 'tv')
+
+    @property
+    def datalist(self):
+        from tmdbhelper.lib.addon.consts import DISCOVER_TV_STATUS
+        return DISCOVER_TV_STATUS
+
+    def get_routes(self):
+        return TMDbDiscoverMethods.get_configured_localized_routes(self.datalist, sorting=False)
 
 
 class TMDbDiscoverPrimaryReleaseYear(DiscoverYear):

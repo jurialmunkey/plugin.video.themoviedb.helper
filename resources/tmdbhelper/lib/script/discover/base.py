@@ -115,7 +115,7 @@ class DiscoverList(DiscoverMenu):
         return self.idx if self.idx is not None else -1
 
     def load_value(self, value):
-        self.idx = next((x for x, i in enumerate(self.routes) if i.value == value))
+        self.idx = next((x for x, i in enumerate(self.routes) if i.value == value), None)
 
     @property
     def menu_items(self):
