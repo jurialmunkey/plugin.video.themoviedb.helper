@@ -336,6 +336,20 @@ class TMDbDiscoverPrimaryReleaseYear(DiscoverYear):
     key = 'primary_release_year'
     label_prefix_localized = 32250
 
+    @property
+    def enabled(self):
+        return bool(self.main.tmdb_type == 'movie')
+
+
+class TMDbDiscoverFirstAirDateYear(TMDbDiscoverPrimaryReleaseYear):
+    priority = 170
+    key = 'first_air_date_year'
+    label_prefix_localized = 32262
+
+    @property
+    def enabled(self):
+        return bool(self.main.tmdb_type == 'tv')
+
 
 class TMDbDiscoverPrimaryReleaseDateGte(DiscoverQuery):
     priority = 180
@@ -343,8 +357,22 @@ class TMDbDiscoverPrimaryReleaseDateGte(DiscoverQuery):
     label_prefix_localized = 32251
 
     @property
+    def enabled(self):
+        return bool(self.main.tmdb_type == 'movie')
+
+    @property
     def query_header(self):
         return f'{get_localized(32114)} YYYY-MM-DD\n{get_localized(32113)}'
+
+
+class TMDbDiscoverFirstAirDateGte(TMDbDiscoverPrimaryReleaseDateGte):
+    priority = 180
+    key = 'first_air_date.gte'
+    label_prefix_localized = 32260
+
+    @property
+    def enabled(self):
+        return bool(self.main.tmdb_type == 'tv')
 
 
 class TMDbDiscoverPrimaryReleaseDateLte(TMDbDiscoverPrimaryReleaseDateGte):
@@ -353,16 +381,34 @@ class TMDbDiscoverPrimaryReleaseDateLte(TMDbDiscoverPrimaryReleaseDateGte):
     label_prefix_localized = 32252
 
 
+class TMDbDiscoverFirstAirDateLte(TMDbDiscoverFirstAirDateGte):
+    priority = 190
+    key = 'first_air_date.lte'
+    label_prefix_localized = 32261
+
+
 class TMDbDiscoverReleaseDateGte(TMDbDiscoverPrimaryReleaseDateGte):
     priority = 200
     key = 'release_date.gte'
     label_prefix_localized = 32253
 
 
+class TMDbDiscoverAirDateGte(TMDbDiscoverFirstAirDateGte):
+    priority = 200
+    key = 'air_date.gte'
+    label_prefix_localized = 32258
+
+
 class TMDbDiscoverReleaseDateLte(TMDbDiscoverPrimaryReleaseDateGte):
     priority = 210
     key = 'release_date.lte'
     label_prefix_localized = 32254
+
+
+class TMDbDiscoverAirDateLte(TMDbDiscoverFirstAirDateGte):
+    priority = 210
+    key = 'air_date.lte'
+    label_prefix_localized = 32259
 
 
 class TMDbDiscoverWithOriginCountry(TMDbDiscoverRegion):

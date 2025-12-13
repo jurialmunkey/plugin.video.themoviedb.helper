@@ -89,7 +89,8 @@ class FindQueriesDatabaseTable:
         data = self.tmdb_api.get_response_json(*self.request_args, **self.request_kwgs)
 
         try:
-            data = data[self.response_key] or {}
+            data = data if not self.response_key else data[self.response_key]
+            data = data or {}
         except (KeyError, AttributeError, TypeError):
             return
 

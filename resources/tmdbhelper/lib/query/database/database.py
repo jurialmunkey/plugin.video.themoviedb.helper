@@ -6,6 +6,7 @@ from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY
 from tmdbhelper.lib.query.database.genres import FindQueriesDatabaseGenres
 from tmdbhelper.lib.query.database.tmdb_id import FindQueriesDatabaseTMDbID
 from tmdbhelper.lib.query.database.certification import FindQueriesDatabaseCertification
+from tmdbhelper.lib.query.database.timezones import FindQueriesDatabaseTimezones
 from tmdbhelper.lib.query.database.provider_regions import FindQueriesDatabaseProviderRegions
 from tmdbhelper.lib.query.database.watch_providers import FindQueriesDatabaseWatchProviders
 from tmdbhelper.lib.query.database.collections import FindQueriesDatabaseCollections
@@ -27,6 +28,7 @@ class FindQueriesDatabase(
     FindQueriesDatabaseGenres,
     FindQueriesDatabaseTMDbID,
     FindQueriesDatabaseCertification,
+    FindQueriesDatabaseTimezones,
     FindQueriesDatabaseProviderRegions,
     FindQueriesDatabaseWatchProviders,
     FindQueriesDatabaseCollections,
@@ -73,6 +75,7 @@ class FindQueriesDatabase(
             'genres': self.genres_columns,
             'tmdb_id': self.tmdb_id_columns,
             'certification': self.certification_columns,
+            'timezones': self.timezones_columns,
             'provider_regions': self.provider_regions_columns,
             'watch_providers': self.watch_providers_columns,
             'watch_providers_details': self.watch_providers_details_columns,
