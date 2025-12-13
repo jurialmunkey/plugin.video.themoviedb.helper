@@ -662,7 +662,7 @@ msgstr "Wybierz gatunki"
 
 #: /resources/lib/container.py
 msgctxt "#32113"
-msgid "msgid "Also accepts days from today as T-X or T+X (e.g. T-10 is ten days ago)""
+msgid "Also accepts days from today as T-X or T+X (e.g. T-10 is ten days ago)"
 msgstr "Akceptuj również dni od dzisiaj jako T-X lub T+X (np. T-10 to 'dziesięć dni temu')"
 
 #: /resources/lib/container.py
