@@ -487,34 +487,8 @@ class TMDbDiscoverAirDateLte(TMDbDiscoverFirstAirDateGte):
     label_prefix_localized = 32259
 
 
-class TMDbDiscoverWithOriginCountry(TMDbDiscoverRegion):
-    priority = 215
-    key = 'with_origin_country'
-    label_prefix_localized = 32220
-    rebuild = False
-
-    @property
-    def preselect(self):
-        return self.idx if self.idx is not None else -1
-
-
-class TMDbDiscoverWithOriginalLanguage(DiscoverMulti):
-    priority = 220
-    key = 'with_original_language'
-    label_prefix_localized = 32269
-    separator = '%7C'
-
-    @property
-    def datalist(self):
-        from tmdbhelper.lib.addon.consts import DISCOVER_LANGUAGES
-        return DISCOVER_LANGUAGES
-
-    def get_routes(self):
-        return TMDbDiscoverMethods.get_configured_routes(self.datalist)
-
-
 class TMDbDiscoverTimezone(TMDbDiscoverRegion):
-    priority = 230
+    priority = 214
     key = 'timezone'
     label_prefix_localized = 14080
     timezone_region = None
@@ -562,6 +536,32 @@ class TMDbDiscoverTimezone(TMDbDiscoverRegion):
         self.timezone_region = self.timezone_regions[x]['id']
         self.reset_routes()
         super().menu()
+
+
+class TMDbDiscoverWithOriginCountry(TMDbDiscoverRegion):
+    priority = 218
+    key = 'with_origin_country'
+    label_prefix_localized = 32220
+    rebuild = False
+
+    @property
+    def preselect(self):
+        return self.idx if self.idx is not None else -1
+
+
+class TMDbDiscoverWithOriginalLanguage(DiscoverMulti):
+    priority = 220
+    key = 'with_original_language'
+    label_prefix_localized = 32269
+    separator = '%7C'
+
+    @property
+    def datalist(self):
+        from tmdbhelper.lib.addon.consts import DISCOVER_LANGUAGES
+        return DISCOVER_LANGUAGES
+
+    def get_routes(self):
+        return TMDbDiscoverMethods.get_configured_routes(self.datalist)
 
 
 class TMDbDiscoverCertificationCountry(TMDbDiscoverRegion):
