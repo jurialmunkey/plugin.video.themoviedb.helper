@@ -660,7 +660,7 @@ msgstr ""
 
 #: /resources/lib/container.py
 msgctxt "#32113"
-msgid "Also accepts X days relative from today in the format T-X or T+X (e.g. T-10 is ten days ago)"
+msgid "Also accepts days from today as T-X or T+X (e.g. T-10 is ten days ago)"
 msgstr ""
 
 #: /resources/lib/container.py
@@ -1098,6 +1098,11 @@ msgstr ""
 #: /resources/tmdbhelper/lib/script/discover/tmdb.py
 msgctxt "#32219"
 msgid "Certification Country"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb/routes.py
+msgctxt "#32220"
+msgid "With Origin Country"
 msgstr ""
 
 #: /resources/lib/plugin.py

@@ -1,11 +1,8 @@
 from tmdbhelper.lib.addon.plugin import get_localized
 from jurialmunkey.ftools import cached_property
 from jurialmunkey.window import get_property
-# from collections import namedtuple
 from xbmcgui import Dialog, WindowXMLDialog, ListItem, INPUT_NUMERIC
 
-
-# DiscoverItem = namedtuple("DiscoverItem", "label value")
 
 class DiscoverItem:
     def __init__(self, label, value, image=None):
@@ -48,11 +45,6 @@ class DiscoverMenu:
     value = None
     rebuild = False
 
-    def menu_rebuild(self):
-        if not self.rebuild:
-            return
-        self.main.rebuild_menu(self.__class__.__name__)
-
     @property
     def paramstring(self):
         if not self.value:
@@ -72,6 +64,11 @@ class DiscoverMenu:
     @property
     def listitem_label(self):
         return f'{self.label_prefix}: {self.label}' if self.label else self.label_prefix
+
+    def menu_rebuild(self):
+        if not self.rebuild:
+            return
+        self.main.rebuild_menu(self.__class__.__name__)
 
 
 class DiscoverList(DiscoverMenu):
@@ -105,6 +102,9 @@ class DiscoverList(DiscoverMenu):
 
     def get_routes(self):
         return ()
+
+    def reset_routes(self):
+        self.routes = self.get_routes()
 
     @property
     def dialog_select(self):
@@ -184,13 +184,25 @@ class DiscoverQuery(DiscoverMenu):
     label = None
 
     @property
+    def query_header(self):
+        return get_localized(32044)
+
+    @property
     def value(self):
         return self.label
 
+    def get_query(self):
+        return Dialog().input(self.query_header, defaultt=self.value or '')
+
     def menu(self):
-        self.label = Dialog().input(get_localized(32044), defaultt=self.value or '')
+        self.label = self.get_query()
         self.listitem.setLabel(self.listitem_label)
         self.menu_rebuild()
+
+
+class DiscoverNumeric(DiscoverQuery):
+    def get_query(self):
+        return Dialog().input(self.query_header, defaultt=self.value or '', type=INPUT_NUMERIC)
 
 
 class DiscoverRuntimes(DiscoverMenu):
@@ -219,8 +231,8 @@ class DiscoverRuntimes(DiscoverMenu):
         return self.label
 
     def menu(self):
-        self.value_a = Dialog().input(f'{self.input_label} [>>]', type=INPUT_NUMERIC, defaultt=f'{self.value_a}' if self.value_a else '')
-        self.value_z = Dialog().input(f'{self.input_label} [<<]', type=INPUT_NUMERIC, defaultt=f'{self.value_z}' if self.value_z else '')
+        self.value_a = Dialog().input(f'{self.input_label} [ > or = ]', type=INPUT_NUMERIC, defaultt=f'{self.value_a}' if self.value_a else '')
+        self.value_z = Dialog().input(f'{self.input_label} [ < or = ]', type=INPUT_NUMERIC, defaultt=f'{self.value_z}' if self.value_z else '')
         self.listitem.setLabel(self.listitem_label)
         self.menu_rebuild()
 
@@ -232,6 +244,7 @@ class DiscoverYears(DiscoverRuntimes):
     base_range_start = 1900
     base_range_end = 2030
     base_range_increment = 10
+    base_range_reverse = True
 
     @property
     def base_range(self):
@@ -239,7 +252,7 @@ class DiscoverYears(DiscoverRuntimes):
 
     @property
     def base_values(self):
-        return sorted(tuple(range(*self.base_range)), reverse=True)
+        return sorted(tuple(range(*self.base_range)), reverse=self.base_range_reverse)
 
     @property
     def base_label(self):
@@ -249,10 +262,16 @@ class DiscoverYears(DiscoverRuntimes):
     def input_label(self):
         return get_localized(32279)
 
+    @staticmethod
+    def select_options(vals):
+        return [f'{i}' for i in vals]
+
     def select_base_value(self, *label_affixes, lower_limit=0):
         vals = tuple((i for i in self.base_values if i > lower_limit))
+        if not vals:
+            return
         head = ' '.join((self.input_label, *label_affixes))
-        opts = [f'{i}' for i in vals]
+        opts = self.select_options(vals)
         indx = Dialog().select(head, opts)
         return vals[indx] if indx != -1 else None
 
@@ -260,16 +279,31 @@ class DiscoverYears(DiscoverRuntimes):
         base = self.select_base_value(self.base_label, *label_affixes, lower_limit=lower_limit - 9)
         if base is None:
             return
-        vals = sorted(tuple(range(base, base + self.base_range_increment)), reverse=True)
+        vals = sorted(tuple(range(base, base + self.base_range_increment)), reverse=self.base_range_reverse)
         vals = tuple((i for i in vals if i > lower_limit))
+        if not vals:
+            return
         head = ' '.join((self.input_label, *label_affixes))
-        opts = [f'{i}' for i in vals]
+        opts = self.select_options(vals)
         indx = Dialog().select(head, opts)
         return vals[indx] if indx != -1 else None
 
     def menu(self):
-        self.value_a = self.select_value('[>>]')
-        self.value_z = self.select_value(f'{self.value_a}', '[<<]', lower_limit=self.value_a) if self.value_a else None
+        self.value_a = self.select_value('[ > or = ]')
+        self.value_z = self.select_value(f'{self.value_a}', '[ < or = ]', lower_limit=self.value_a) if self.value_a else None
+        self.listitem.setLabel(self.listitem_label)
+        self.menu_rebuild()
+
+
+class DiscoverYear(DiscoverYears):
+    value = None
+
+    @property
+    def label(self):
+        return str(self.value) if self.value is not None else ''
+
+    def menu(self):
+        self.value = self.select_value()
         self.listitem.setLabel(self.listitem_label)
         self.menu_rebuild()
 
@@ -412,21 +446,24 @@ class DiscoverMain(WindowXMLDialog):
         return self.getControl(3)
 
     def load_values(self, **kwargs):
-        load_values = (
-            (k, v.replace(',', '%2C').replace('|', '%7C'))
-            for k, v in kwargs.items()
+        load_values = tuple((
+            (k.replace('.', '_'), v.replace(',', '%2C').replace('|', '%7C'))
+            for k, v in kwargs.items() if k and v
+        ))
+        load_values = tuple((
+            (k, v) for k, v in load_values
             if k in self.routes_dict
-        )
+        ))
         for k, v in load_values:
             self.routes_dict[k].load_value(v)
 
-    def rebuild_menu(self):
+    def rebuild_menu(self, select_class=None):
         for i in self.routes:
             try:
-                i.routes = i.get_routes()
+                i.reset_routes()
             except AttributeError:
                 pass
-        self.build_menu()
+        self.build_menu(select_class)
 
     def onInit(self):
         self.build_menu()
