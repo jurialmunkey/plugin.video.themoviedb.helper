@@ -17,6 +17,7 @@ class ListDiscoverDir(ContainerDefaultCacheDirectory):
         from tmdbhelper.lib.script.discover.trakt import NODE_FILENAME
         from tmdbhelper.lib.addon.consts import NODE_BASEDIR
         from tmdbhelper.lib.items.routes import get_container
+        from urllib.parse import urlencode
 
         params = dict(
             filename=NODE_FILENAME,
@@ -24,8 +25,7 @@ class ListDiscoverDir(ContainerDefaultCacheDirectory):
             basedir=NODE_BASEDIR
         )
 
-        paramstring = '&'.join((f'{k}={v}' for k, v in params.items()))
-        container = get_container('dir_custom_node')(self.handle, paramstring, **params)
+        container = get_container('dir_custom_node')(self.handle, urlencode(params), **params)
 
         items = []
         items.append(self.item_new)

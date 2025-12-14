@@ -424,7 +424,7 @@ class DiscoverMain(WindowXMLDialog):
     def onAction(self, action):
         action_id = action.getId()
         if action_id in self.ACTION_CLOSEWINDOW:
-            return self.close()
+            return self.on_autosave()
         if action_id in self.ACTION_SELECT:
             return self.click()
 
@@ -453,6 +453,10 @@ class DiscoverMain(WindowXMLDialog):
         value = self.routes_dict['save'].menu()
         self.update_winprop()
         return value
+
+    def on_autosave(self):
+        self.name = self.defaultt
+        return self.on_save()
 
     @property
     def list_control(self):

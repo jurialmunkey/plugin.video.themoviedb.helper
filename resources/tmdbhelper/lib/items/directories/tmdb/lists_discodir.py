@@ -89,7 +89,8 @@ class ListDiscoverDir(ContainerDefaultCacheDirectory):
 
     @cached_property
     def dir_nodes_paramstring(self):
-        return '&'.join((f'{k}={v}' for k, v in self.dir_nodes_params.items()))
+        from urllib.parse import urlencode
+        return urlencode(self.dir_nodes_params)
 
     @cached_property
     def dir_nodes(self):
@@ -101,7 +102,7 @@ class ListDiscoverDir(ContainerDefaultCacheDirectory):
         return (
             self.item_search,
             self.item_edit,
-            self.item_save,
+            # self.item_save,  # Maybe use this later for an option to disable autosave
             self.item_clear,
             self.item_delete,
         )

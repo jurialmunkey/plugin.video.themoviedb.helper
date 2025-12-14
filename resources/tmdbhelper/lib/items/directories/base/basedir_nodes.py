@@ -1,7 +1,9 @@
 from jurialmunkey.ftools import cached_property
+from jurialmunkey.parser import parse_paramstring
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, get_localized
 from tmdbhelper.lib.addon.consts import NODE_BASEDIR
 from tmdbhelper.lib.files.futils import get_files_in_folder, read_file
+from urllib.parse import urlencode
 
 
 class BaseDirNodeItem:
@@ -80,11 +82,36 @@ class BaseDirNodeCustomItem:
         }
 
     @cached_property
+    def paramstring(self):
+        try:
+            return self.path.split('?')[1]
+        except (IndexError, TypeError, AttributeError):
+            return ''
+
+    @cached_property
+    def paramstring_params(self):
+        return parse_paramstring(self.paramstring)
+
+    @cached_property
+    def paramstring_noinfo(self):
+        paramstring_noinfo = self.paramstring_params.copy()
+        paramstring_noinfo.pop('info', None)
+        return urlencode(paramstring_noinfo)
+
+    @cached_property
+    def infoproperties(self):
+        infoproperties = {f'paramstring_{k}': v for k, v in self.paramstring_params.items()}
+        infoproperties['paramstring'] = self.paramstring
+        infoproperties['paramstring_noinfo'] = self.paramstring_noinfo
+        return infoproperties
+
+    @cached_property
     def item(self):
         return {
             'label': self.name,
             'path': self.path,
             'art': self.art,
+            'infoproperties': self.infoproperties,
             'context_menu': self.context_menu,
         }
 
