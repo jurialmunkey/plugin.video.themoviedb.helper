@@ -51,9 +51,7 @@ class ListDiscoverDir(ContainerDefaultCacheDirectory):
     def item_delete(self):
         if not self.dir_nodes:
             return {}
-        params = self.get_winprop_params()
-        if not params:
-            return {}
+        params = {}
         params['info'] = 'user_discover'
         params['update_listing'] = 'true'
         params['method'] = 'delete'
@@ -61,9 +59,9 @@ class ListDiscoverDir(ContainerDefaultCacheDirectory):
 
     @property
     def item_save(self):
-        params = self.get_winprop_params()
-        if not params:
+        if not self.get_winprop_params():
             return {}
+        params = {}
         params['info'] = 'user_discover'
         params['update_listing'] = 'true'
         params['method'] = 'save'
@@ -71,9 +69,9 @@ class ListDiscoverDir(ContainerDefaultCacheDirectory):
 
     @property
     def item_clear(self):
-        params = self.get_winprop_params()
-        if not params:
+        if not self.get_winprop_params():
             return {}
+        params = {}
         params['info'] = 'user_discover'
         params['update_listing'] = 'true'
         params['method'] = 'clear'
