@@ -490,7 +490,7 @@ class TMDbDiscoverAirDateLte(TMDbDiscoverFirstAirDateGte):
 class TMDbDiscoverTimezone(TMDbDiscoverRegion):
     priority = 214
     key = 'timezone'
-    label_prefix_localized = 14080
+    label_prefix_localized = 32346
     timezone_region = None
 
     @property
