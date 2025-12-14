@@ -402,7 +402,7 @@ class DiscoverMain(WindowXMLDialog):
         if not self.winprop:
             return
         get_property(self.winprop, set_property=self.path)
-        get_property(f'{self.winprop}.name', set_property=f'{get_localized(32174)} {self.defaultt}')
+        get_property(f'{self.winprop}.name', set_property=f'{self.defaultt}')
         get_property(f'{self.winprop}.paramstring', set_property='&'.join((i.paramstring for i in self.routes if i.paramstring)))
         get_property(f'{self.winprop}.reload', set_property=f'{set_timestamp(0, True)}')
 
