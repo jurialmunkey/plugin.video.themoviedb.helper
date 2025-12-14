@@ -151,6 +151,8 @@ class Tvshow(MediaItem):
             self.return_basemeta_db('season'),
             self.return_basemeta_db('episode'),
             self.return_basemeta_db('genre'),
+            self.return_basemeta_db('languages'),
+            self.return_basemeta_db('language'),
             self.return_basemeta_db('country'),
             self.return_basemeta_db('certification'),
             self.return_basemeta_db('translation'),

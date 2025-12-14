@@ -511,6 +511,33 @@ COUNTRY_COLUMNS = {
     },
 }
 
+LANGUAGE_COLUMNS = {
+    'iso_language': {
+        'data': 'TEXT',
+        'unique': True,
+        'foreign_key': 'languages(iso_language)',
+    },
+    'parent_id': {
+        'data': 'TEXT',
+        'foreign_key': 'baseitem(id)',
+        'indexed': True,
+        'unique': True
+    },
+}
+
+LANGUAGES_COLUMNS = {
+    'name': {
+        'data': 'TEXT',
+    },
+    'english_name': {
+        'data': 'TEXT',
+    },
+    'iso_language': {
+        'data': 'TEXT PRIMARY KEY',
+        'unique': True
+    },
+}
+
 STUDIO_COLUMNS = {
     'tmdb_id': {
         'data': 'INTEGER',

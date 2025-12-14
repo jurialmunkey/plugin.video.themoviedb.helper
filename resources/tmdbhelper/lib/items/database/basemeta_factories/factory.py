@@ -142,6 +142,16 @@ def import_genre():
     return Genre
 
 
+def import_language():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Language
+    return Language
+
+
+def import_languages():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Languages
+    return Languages
+
+
 def import_country():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Country
     return Country
@@ -460,6 +470,8 @@ FACTORY_ROUTES = {
     'imdbnumber': import_imdbnumber,
     'custom': import_custom,
     'genre': import_genre,
+    'language': import_language,
+    'languages': import_languages,
     'country': import_country,
     'video': import_video,
     'certification': import_certification,

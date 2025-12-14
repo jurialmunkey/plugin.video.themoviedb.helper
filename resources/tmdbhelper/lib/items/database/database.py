@@ -14,6 +14,8 @@ from tmdbhelper.lib.items.database.tabledef import (
     CERTIFICATION_COLUMNS,
     VIDEO_COLUMNS,
     GENRE_COLUMNS,
+    LANGUAGE_COLUMNS,
+    LANGUAGES_COLUMNS,
     COUNTRY_COLUMNS,
     STUDIO_COLUMNS,
     NETWORK_COLUMNS,
@@ -117,6 +119,8 @@ class ItemDetailsDatabase(Database):
     certification_columns = CERTIFICATION_COLUMNS
     video_columns = VIDEO_COLUMNS
     genre_columns = GENRE_COLUMNS
+    language_columns = LANGUAGE_COLUMNS
+    languages_columns = LANGUAGES_COLUMNS
     country_columns = COUNTRY_COLUMNS
     studio_columns = STUDIO_COLUMNS
     network_columns = NETWORK_COLUMNS
@@ -148,6 +152,8 @@ class ItemDetailsDatabase(Database):
             'ratings': self.ratings_columns,
             'person': self.person_columns,
             'genre': self.genre_columns,
+            'language': self.language_columns,
+            'languages': self.languages_columns,
             'country': self.country_columns,
             'studio': self.studio_columns,
             'company': self.company_columns,

@@ -869,6 +869,15 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                 'keys': [('translation', None)],
                 'func': self.get_translations,
             }],
+            'spoken_languages': [{
+                'keys': [('language', None)],
+                'func': self.split_array,
+                'kwargs': {'iso_language': 'iso_639_1'}}, {
+                # ---
+                'keys': [('languages', None)],
+                'func': self.split_array,
+                'kwargs': {'iso_language': 'iso_639_1', 'name': 'name', 'english_name': 'english_name'}
+            }],
             'production_countries': [{
                 'keys': [('country', None)],
                 'func': self.split_array,
@@ -1023,6 +1032,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             # Default mappings
             'item': BlankNoneDict(),
             'genre': (),
+            'languages': (),
+            'language': (),
             'country': (),
             'company': (),
             'studio': (),
