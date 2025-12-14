@@ -342,7 +342,7 @@ class DiscoverSave(DiscoverMenu):
         make_node.notification = False
         make_node.overwrite = True
         make_node.file = self.main.file
-        make_node.add()
+        make_node.add(insert=0)
 
     def menu(self):
         if self.main.name:
