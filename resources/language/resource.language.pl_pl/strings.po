@@ -1739,6 +1739,11 @@ msgctxt "#32333"
 msgid "User Choice"
 msgstr "Wybór użytkownika"
 
+#: /resources/tmdbhelper/lib/script/discover/tmdb/routes.py
+msgctxt "#32346"
+msgid "Timezone"
+msgstr "Strefa czasowa"
+
 #: /resources/lib/player/configure.py
 msgctxt "#32334"
 msgid "Reset player to defaults?"
