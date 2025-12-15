@@ -157,6 +157,11 @@ def import_country():
     return Country
 
 
+def import_countries():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Countries
+    return Countries
+
+
 def import_video():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Video
     return Video
@@ -473,6 +478,7 @@ FACTORY_ROUTES = {
     'language': import_language,
     'languages': import_languages,
     'country': import_country,
+    'countries': import_countries,
     'video': import_video,
     'certification': import_certification,
     'translation': import_translation,

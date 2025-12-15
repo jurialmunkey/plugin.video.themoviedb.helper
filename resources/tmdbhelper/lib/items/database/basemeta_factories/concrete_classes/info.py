@@ -13,6 +13,7 @@ from tmdbhelper.lib.items.database.tabledef import (
     LANGUAGE_COLUMNS,
     LANGUAGES_COLUMNS,
     COUNTRY_COLUMNS,
+    COUNTRIES_COLUMNS,
     STUDIO_COLUMNS,
     NETWORK_COLUMNS,
     COMPANY_COLUMNS,
@@ -88,8 +89,28 @@ class Translation(ItemDetailsList):
 
 class Country(ItemDetailsList):
     table = 'country'
+    cached_data_parent_table = 'countries'
     keys = tuple(COUNTRY_COLUMNS.keys())
     conflict_constraint = 'iso_country, parent_id'
+
+    @property
+    def cached_data_keys(self):
+        cached_data_keys = ('name', 'iso_country')
+        return tuple((f'{self.cached_data_parent_table}.{k}' for k in cached_data_keys))
+
+    @property
+    def cached_data_table(self):
+        return (
+            f'{self.table} INNER JOIN {self.cached_data_parent_table} '
+            f'ON {self.cached_data_parent_table}.iso_country = {self.table}.iso_country'
+        )
+
+
+class Countries(ItemDetailsList):
+    table = 'countries'
+    keys = tuple(COUNTRIES_COLUMNS.keys())
+    conditions = 'iso_country=?'
+    conflict_constraint = 'iso_country'
 
 
 class Language(ItemDetailsList):

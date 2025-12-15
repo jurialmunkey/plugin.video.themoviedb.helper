@@ -881,7 +881,11 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'production_countries': [{
                 'keys': [('country', None)],
                 'func': self.split_array,
-                'kwargs': {'name': 'name', 'iso_country': 'iso_3166_1'}
+                'kwargs': {'iso_country': 'iso_3166_1'}}, {
+                # ---
+                'keys': [('countries', None)],
+                'func': self.split_array,
+                'kwargs': {'iso_country': 'iso_3166_1', 'name': 'name'}
             }],
             'production_companies': [{
                 'keys': [('studio', None)],
@@ -1034,6 +1038,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'genre': (),
             'languages': (),
             'language': (),
+            'countries': (),
             'country': (),
             'company': (),
             'studio': (),

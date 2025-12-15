@@ -73,6 +73,7 @@ class Movie(MediaItem):
             self.return_basemeta_db('genre'),
             self.return_basemeta_db('languages'),
             self.return_basemeta_db('language'),
+            self.return_basemeta_db('countries'),
             self.return_basemeta_db('country'),
             self.return_basemeta_db('certification'),
             self.return_basemeta_db('translation'),
