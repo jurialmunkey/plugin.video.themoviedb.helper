@@ -132,7 +132,7 @@ class BaseDirItemTMDbRevenueMovies(BaseDirItem):
     types = ('movie',)
     params = {'info': 'revenue_movies'}
     art_icon = 'resources/icons/themoviedb/default.png'
-    group = 32185
+    group = 32184
 
 
 class BaseDirItemTMDbMostVoted(BaseDirItem):
@@ -179,7 +179,7 @@ class BaseDirItemTMDbAllKeywords(BaseDirItemTMDbAllStudios):
     label_localized = 21861
     types = ('movie',)
     params = {'info': 'all_keywords'}
-    group = 135
+    group = 21861
 
 
 def get_all_tmdb_class_instances():

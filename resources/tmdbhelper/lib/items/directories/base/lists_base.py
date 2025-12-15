@@ -1,4 +1,4 @@
-from tmdbhelper.lib.addon.plugin import ADDON, get_localized
+from tmdbhelper.lib.addon.plugin import ADDON, get_localized, executebuiltin
 from tmdbhelper.lib.items.container import ContainerDirectory
 from tmdbhelper.lib.items.directories.base.basedir_nodes import BaseDirNode
 from collections import namedtuple
@@ -39,16 +39,18 @@ class BaseDirList:
 
     @staticmethod
     def set_grouped_item(i, info):
-        item = i.item.get_item(i.type, mixed_dir=False)
-        item['params'] = {'info': info, 'group': f'{i.item.group}'}
-        item['label'] = get_localized(i.item.group)
+        iobj = i['item']
+        item = iobj.item.get_item(iobj.type, mixed_dir=False)
+        if i['count'] > 1:  # Only subgroup items when more than one in group
+            item['params'] = {'info': info, 'group': f'{iobj.item.group}'}
+            item['label'] = get_localized(iobj.item.group)
         return item
 
     def get_basedir_grouped(self, item_type=None, info=None):
-        groups = {
-            i.item.group: i
-            for i in self.get_basedir(item_type)
-        }
+        groups = {}
+        for i in self.get_basedir(item_type):
+            item_group = groups.setdefault(i.item.group, {'item': i, 'count': 0})
+            item_group['count'] += 1
         return [
             self.set_grouped_item(i, info)
             for i in groups.values()
@@ -62,12 +64,14 @@ class BaseDirList:
         ]
 
     def get_basedir(self, item_type=None):
-        return [
+        basedir = [
             BaseDirItem(basedir_item, basedir_item_type)
             for basedir_item in self.basedir
+            if basedir_item.enabled
             for basedir_item_type in basedir_item.types
-            if not item_type or item_type == basedir_item_type
+            if not item_type or basedir_item_type == item_type
         ]
+        return basedir
 
     @property
     def basedir(self):
@@ -165,6 +169,7 @@ class ListBaseDir(ContainerDirectory):
             'dir_calendar_library': lambda: BaseDirList(calendar=ListBaseDir.get_library_calendar_item()).build_basedir('tv'),
             'dir_custom_node': lambda: BaseDirNode(**kwargs).build_basedir(),
             'dir_trakt_genre': lambda: BaseDirList(trakt_genre=kwargs.get('genre')).build_basedir(kwargs.get('tmdb_type')),
+            'dir_trakt_authenticate': lambda: executebuiltin('RunScript(plugin.video.themoviedb.helper,authenticate_trakt)'),
             'dir_tmdb_v4': lambda: BaseDirList(tmdb_v4=True).build_basedir(),
             'dir_settings': lambda: ADDON.openSettings(),
         }
