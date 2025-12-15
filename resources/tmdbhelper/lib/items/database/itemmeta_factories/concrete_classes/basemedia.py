@@ -245,7 +245,7 @@ class MediaItem(BaseItem):
             'instance': ('language', None),
             'mappings': {'name': 'name', 'iso_language': 'iso_language', 'english_name': 'english_name'},
             'propname': ('language', ),
-            'joinings': ('language', 'iso_language')
+            'joinings': ('language', 'english_name')
         },
         {
             'instance': ('country', None),
