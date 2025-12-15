@@ -1,12 +1,12 @@
 from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard
-from tmdbhelper.lib.items.directories.mdblist.lists_local import ListMDbListLocalProperties
+from tmdbhelper.lib.items.directories.mdblist.lists_local import ListMDbListLocalNoCacheProperties
 from tmdbhelper.lib.items.directories.lists_local import UncachedListLocalData
 from tmdbhelper.lib.items.directories.mdblist.mapper_lists import ListsMDbListItemMapper
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
 
 
-class ListMDbListListsProperties(ListMDbListLocalProperties):
+class ListMDbListListsProperties(ListMDbListLocalNoCacheProperties):
     @cached_property
     def cache_name_tuple(self):
         cache_name_tuple = [
