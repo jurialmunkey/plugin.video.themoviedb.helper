@@ -396,7 +396,7 @@ msgctxt "#32079"
 msgid "User"
 msgstr "Użytkownik"
 
-#: /resoRaportyib/downloader.py
+#: /resources/lib/downloader.py
 msgctxt "#32059"
 msgid "Success!"
 msgstr "Sukces!"
@@ -662,8 +662,8 @@ msgstr "Wybierz gatunki"
 
 #: /resources/lib/container.py
 msgctxt "#32113"
-msgid "Also accepts X days relative from today in the format T-X or T+X (e.g. T-10 is ten days ago)"
-msgstr "Akceptuj również X dni od dzisiaj w formacie T-X lub T+X (np. T-10 to 'dziesięć dni temu')"
+msgid "Also accepts days from today as T-X or T+X (e.g. T-10 is ten days ago)"
+msgstr "Akceptuj również dni od dzisiaj jako T-X lub T+X (np. T-10 to 'dziesięć dni temu')"
 
 #: /resources/lib/container.py
 msgctxt "#32114"
@@ -824,6 +824,11 @@ msgstr "Dodaj listę Trakt do biblioteki"
 msgctxt "#32126"
 msgid "Are you sure you want to add this Trakt list to your Kodi library?"
 msgstr "Czy na pewno chcesz dodać tę listę Trakt do biblioteki?"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32165"
+msgid "Add another item?"
+msgstr "Dodać kolejną pozycję?"
 
 #: /resources/settings.xml
 msgctxt "#32130"
@@ -1082,6 +1087,31 @@ msgctxt "#32204"
 msgid "Trending"
 msgstr "Na czasie"
 
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32217"
+msgid "With Provider Region"
+msgstr "Z regionem dostawcy"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32218"
+msgid "With Watch Monetization Types"
+msgstr "Z typami monetyzacji"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32219"
+msgid "Certification Country"
+msgstr "Kraj kategorii wiekowej"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb/routes.py
+msgctxt "#32220"
+msgid "With Origin Country"
+msgstr "Z krajem pochodzenia"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32221"
+msgid "Miniseries"
+msgstr "Miniserial"
+
 #: /resources/lib/plugin.py
 msgctxt "#32205"
 msgid "Most Played"
@@ -1142,6 +1172,11 @@ msgctxt "#32216"
 msgid "Successfully logged out of Trakt user account"
 msgstr "Pomyślnie wylogowano z konta użytkownika Trakt"
 
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32234"
+msgid "Reality"
+msgstr "Reality"
+
 #: /resources/lib/listitem.py
 msgctxt "#32222"
 msgid "Manage artwork"
@@ -1156,6 +1191,11 @@ msgstr "Polecane"
 msgctxt "#32224"
 msgid "Similar"
 msgstr "Podobne"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32238"
+msgid "Scripted"
+msgstr "Scenariusz"
 
 #: /resources/lib/plugin.py
 msgctxt "#32225"
@@ -1427,6 +1467,16 @@ msgctxt "#32280"
 msgid "Last Fortnight"
 msgstr "Ostatnie dwa tygodnie"
 
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32293"
+msgid "Returning Series"
+msgstr "Powracające"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32294"
+msgid "Planned"
+msgstr "Planowane"
+
 #: /resources/lib/basedir.py
 msgctxt "#32281"
 msgid "Last Week"
@@ -1486,6 +1536,16 @@ msgstr "Dodaj do Obserwowanych"
 msgctxt "#32292"
 msgid "Remove from watchlist"
 msgstr "Usuń z Obserwowanych"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32307"
+msgid "In Production"
+msgstr "W produkcji"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32308"
+msgid "Ended"
+msgstr "Zakończone"
 
 #: /resources/lib/script.py
 msgctxt "#32295"
@@ -1564,6 +1624,16 @@ msgstr "Przeglądaj posortowaną listę"
 msgctxt "#32310"
 msgid "TMDb ID for {} not found!"
 msgstr "Nie znaleziono identyfikatora ID TMDB dla {}!"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32323"
+msgid "Cancelled"
+msgstr "Skasowane"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32324"
+msgid "Pilot"
+msgstr "Pilot"
 
 #: /resources/lib/player/players.py
 msgctxt "#32311"

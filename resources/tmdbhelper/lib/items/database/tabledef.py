@@ -496,17 +496,52 @@ GENRE_COLUMNS = {
 }
 
 COUNTRY_COLUMNS = {
-    'name': {
-        'data': 'TEXT',
-    },
     'iso_country': {
         'data': 'TEXT',
-        'unique': True
+        'unique': True,
+        'foreign_key': 'countries(iso_country)',
     },
     'parent_id': {
         'data': 'TEXT',
         'foreign_key': 'baseitem(id)',
         'indexed': True,
+        'unique': True
+    },
+}
+
+COUNTRIES_COLUMNS = {
+    'name': {
+        'data': 'TEXT',
+    },
+    'iso_country': {
+        'data': 'TEXT PRIMARY KEY',
+        'unique': True
+    },
+}
+
+LANGUAGE_COLUMNS = {
+    'iso_language': {
+        'data': 'TEXT',
+        'unique': True,
+        'foreign_key': 'languages(iso_language)',
+    },
+    'parent_id': {
+        'data': 'TEXT',
+        'foreign_key': 'baseitem(id)',
+        'indexed': True,
+        'unique': True
+    },
+}
+
+LANGUAGES_COLUMNS = {
+    'name': {
+        'data': 'TEXT',
+    },
+    'english_name': {
+        'data': 'TEXT',
+    },
+    'iso_language': {
+        'data': 'TEXT PRIMARY KEY',
         'unique': True
     },
 }

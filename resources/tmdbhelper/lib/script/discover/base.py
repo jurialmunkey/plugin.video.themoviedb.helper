@@ -1,11 +1,38 @@
 from tmdbhelper.lib.addon.plugin import get_localized
+from tmdbhelper.lib.addon.tmdate import set_timestamp
 from jurialmunkey.ftools import cached_property
 from jurialmunkey.window import get_property
-from collections import namedtuple
 from xbmcgui import Dialog, WindowXMLDialog, ListItem, INPUT_NUMERIC
 
 
-ItemTuple = namedtuple("ItemTuple", "label value")
+class DiscoverItem:
+    def __init__(self, label, value, image=None):
+        self.label = label
+        self.value = value
+        self.image = image
+
+    routes = {0: 'label', 1: 'value', 2: 'image'}
+
+    def __getitem__(self, key):
+        return getattr(self, self.routes.get(key, key))
+
+    @cached_property
+    def label2(self):
+        return str(self.value)
+
+    @cached_property
+    def icon(self):
+        return self.image
+
+    @cached_property
+    def art(self):
+        return {'icon': self.icon} if self.icon else {}
+
+    @cached_property
+    def listitem(self):
+        listitem = ListItem(self.label, self.label2)
+        listitem.setArt(self.art)
+        return listitem
 
 
 class DiscoverMenu:
@@ -17,12 +44,17 @@ class DiscoverMenu:
     label = None
     enabled = True
     value = None
+    rebuild = False
 
     @property
     def paramstring(self):
         if not self.value:
             return
         return f'{self.key}={self.value}'
+
+    @property
+    def pathlabel(self):
+        return f'{self.label_prefix} {self.label}'
 
     @cached_property
     def listitem(self):
@@ -38,11 +70,18 @@ class DiscoverMenu:
     def listitem_label(self):
         return f'{self.label_prefix}: {self.label}' if self.label else self.label_prefix
 
+    def menu_rebuild(self):
+        if not self.rebuild:
+            return
+        self.main.rebuild_menu(self.__class__.__name__)
+
 
 class DiscoverList(DiscoverMenu):
-    idx = 0
+    idx = None
     key = 'info'
     label_prefix_localized = 535
+    use_details = False
+    default_idx = None
 
     @property
     def route(self):
@@ -64,7 +103,13 @@ class DiscoverList(DiscoverMenu):
 
     @cached_property
     def routes(self):
+        return self.get_routes()
+
+    def get_routes(self):
         return ()
+
+    def reset_routes(self):
+        self.routes = self.get_routes()
 
     @property
     def dialog_select(self):
@@ -72,12 +117,22 @@ class DiscoverList(DiscoverMenu):
 
     @property
     def preselect(self):
-        return self.idx or -1
+        return self.idx if self.idx is not None else -1
+
+    def load_value(self, value):
+        self.idx = next((x for x, i in enumerate(self.routes) if i.value == value), None)
+
+    @property
+    def menu_items(self):
+        if not self.use_details:
+            return [i.label for i in self.routes]
+        return [i.listitem for i in self.routes]
 
     def menu(self):
-        x = self.dialog_select(self.listitem_label, [i.label for i in self.routes], preselect=self.preselect)
-        self.idx = x if x != -1 else self.idx
+        x = self.dialog_select(self.listitem_label, self.menu_items, preselect=self.preselect, useDetails=self.use_details)
+        self.idx = x if x != -1 else self.default_idx
         self.listitem.setLabel(self.listitem_label)
+        self.menu_rebuild()
 
 
 class DiscoverMulti(DiscoverList):
@@ -98,17 +153,34 @@ class DiscoverMulti(DiscoverList):
     def label(self):
         if not self.route:
             return
-        return ' / '.join((i.label for i in self.route))
+        label = ' AND ' if self.separator == '%2C' else ' OR '
+        label = label.join((i.label for i in self.route))
+        return label
 
     @property
     def value(self):
         if not self.route:
             return
-        return self.separator.join((i.value for i in self.route))
+        return self.separator.join((f'{i.value}' for i in self.route))
 
     @property
     def preselect(self):
         return self.idx or []
+
+    @property
+    def has_multiples(self):
+        return bool(self.idx and len(self.idx) > 1)
+
+    def get_separator(self):
+        if not self.has_multiples:
+            return
+        x = Dialog().select(get_localized(32107), (get_localized(32110), get_localized(32109)))
+        if x == -1:
+            return
+        return '%7C' if x == 1 else '%2C'
+
+    def set_separator(self, value):
+        self.separator = value or self.separator
 
 
 class DiscoverQuery(DiscoverMenu):
@@ -116,13 +188,29 @@ class DiscoverQuery(DiscoverMenu):
     label_prefix_localized = 32153
     label = None
 
+    def load_value(self, value):
+        self.label = value
+
+    @property
+    def query_header(self):
+        return get_localized(32044)
+
     @property
     def value(self):
         return self.label
 
+    def get_query(self):
+        return Dialog().input(self.query_header, defaultt=self.value or '')
+
     def menu(self):
-        self.label = Dialog().input(get_localized(32044), defaultt=self.value or '')
+        self.label = self.get_query()
         self.listitem.setLabel(self.listitem_label)
+        self.menu_rebuild()
+
+
+class DiscoverNumeric(DiscoverQuery):
+    def get_query(self):
+        return Dialog().input(self.query_header, defaultt=self.value or '', type=INPUT_NUMERIC)
 
 
 class DiscoverRuntimes(DiscoverMenu):
@@ -151,9 +239,10 @@ class DiscoverRuntimes(DiscoverMenu):
         return self.label
 
     def menu(self):
-        self.value_a = Dialog().input(f'{self.input_label} [>>]', type=INPUT_NUMERIC, defaultt=f'{self.value_a}' if self.value_a else '')
-        self.value_z = Dialog().input(f'{self.input_label} [<<]', type=INPUT_NUMERIC, defaultt=f'{self.value_z}' if self.value_z else '')
+        self.value_a = Dialog().input(f'{self.input_label} [ > or = ]', type=INPUT_NUMERIC, defaultt=f'{self.value_a}' if self.value_a else '')
+        self.value_z = Dialog().input(f'{self.input_label} [ < or = ]', type=INPUT_NUMERIC, defaultt=f'{self.value_z}' if self.value_z else '')
         self.listitem.setLabel(self.listitem_label)
+        self.menu_rebuild()
 
 
 class DiscoverYears(DiscoverRuntimes):
@@ -163,6 +252,7 @@ class DiscoverYears(DiscoverRuntimes):
     base_range_start = 1900
     base_range_end = 2030
     base_range_increment = 10
+    base_range_reverse = True
 
     @property
     def base_range(self):
@@ -170,7 +260,7 @@ class DiscoverYears(DiscoverRuntimes):
 
     @property
     def base_values(self):
-        return sorted(tuple(range(*self.base_range)), reverse=True)
+        return sorted(tuple(range(*self.base_range)), reverse=self.base_range_reverse)
 
     @property
     def base_label(self):
@@ -180,10 +270,16 @@ class DiscoverYears(DiscoverRuntimes):
     def input_label(self):
         return get_localized(32279)
 
+    @staticmethod
+    def select_options(vals):
+        return [f'{i}' for i in vals]
+
     def select_base_value(self, *label_affixes, lower_limit=0):
         vals = tuple((i for i in self.base_values if i > lower_limit))
+        if not vals:
+            return
         head = ' '.join((self.input_label, *label_affixes))
-        opts = [f'{i}' for i in vals]
+        opts = self.select_options(vals)
         indx = Dialog().select(head, opts)
         return vals[indx] if indx != -1 else None
 
@@ -191,17 +287,33 @@ class DiscoverYears(DiscoverRuntimes):
         base = self.select_base_value(self.base_label, *label_affixes, lower_limit=lower_limit - 9)
         if base is None:
             return
-        vals = sorted(tuple(range(base, base + self.base_range_increment)), reverse=True)
+        vals = sorted(tuple(range(base, base + self.base_range_increment)), reverse=self.base_range_reverse)
         vals = tuple((i for i in vals if i > lower_limit))
+        if not vals:
+            return
         head = ' '.join((self.input_label, *label_affixes))
-        opts = [f'{i}' for i in vals]
+        opts = self.select_options(vals)
         indx = Dialog().select(head, opts)
         return vals[indx] if indx != -1 else None
 
     def menu(self):
-        self.value_a = self.select_value('[>>]')
-        self.value_z = self.select_value(f'{self.value_a}', '[<<]', lower_limit=self.value_a) if self.value_a else None
+        self.value_a = self.select_value('[ > or = ]')
+        self.value_z = self.select_value(f'{self.value_a}', '[ < or = ]', lower_limit=self.value_a) if self.value_a else None
         self.listitem.setLabel(self.listitem_label)
+        self.menu_rebuild()
+
+
+class DiscoverYear(DiscoverYears):
+    value = None
+
+    @property
+    def label(self):
+        return str(self.value) if self.value is not None else ''
+
+    def menu(self):
+        self.value = self.select_value()
+        self.listitem.setLabel(self.listitem_label)
+        self.menu_rebuild()
 
 
 class DiscoverRatings(DiscoverYears):
@@ -230,7 +342,7 @@ class DiscoverSave(DiscoverMenu):
         make_node.notification = False
         make_node.overwrite = True
         make_node.file = self.main.file
-        make_node.add()
+        make_node.add(insert=0)
 
     def menu(self):
         if self.main.name:
@@ -248,7 +360,7 @@ class DiscoverReset(DiscoverMenu):
 
     def menu(self):
         self.main.routes_dict = self.main.get_routes_dict()
-        self.main.build_menu()
+        self.main.rebuild_menu()
 
 
 class DiscoverMain(WindowXMLDialog):
@@ -278,7 +390,7 @@ class DiscoverMain(WindowXMLDialog):
     @property
     def defaultt(self):
         from tmdbhelper.lib.files.futils import validify_filename
-        defaultt = ' '.join((i.label for i in self.routes if i.label and i.paramstring))
+        defaultt = ', '.join((i.pathlabel for i in self.routes if i.label and i.paramstring))
         defaultt = validify_filename(defaultt)
         return ' '.join(defaultt.split())
 
@@ -287,7 +399,12 @@ class DiscoverMain(WindowXMLDialog):
         return self.get_routes_dict()
 
     def update_winprop(self):
-        get_property(self.winprop, set_property=self.path) if self.winprop else None
+        if not self.winprop:
+            return
+        get_property(self.winprop, set_property=self.path)
+        get_property(f'{self.winprop}.name', set_property=f'{self.defaultt}')
+        get_property(f'{self.winprop}.paramstring', set_property='&'.join((i.paramstring for i in self.routes if i.paramstring)))
+        get_property(f'{self.winprop}.reload', set_property=f'{set_timestamp(0, True)}')
 
     def get_routes_dict(self):
         return {}
@@ -307,7 +424,7 @@ class DiscoverMain(WindowXMLDialog):
     def onAction(self, action):
         action_id = action.getId()
         if action_id in self.ACTION_CLOSEWINDOW:
-            return self.close()
+            return self.on_autosave()
         if action_id in self.ACTION_SELECT:
             return self.click()
 
@@ -337,17 +454,41 @@ class DiscoverMain(WindowXMLDialog):
         self.update_winprop()
         return value
 
+    def on_autosave(self):
+        self.name = self.defaultt
+        return self.on_save()
+
     @property
     def list_control(self):
         return self.getControl(3)
 
+    def load_values(self, **kwargs):
+        load_values = tuple((
+            (k.replace('.', '_'), v.replace(',', '%2C').replace('|', '%7C'))
+            for k, v in kwargs.items() if k and v
+        ))
+        load_values = tuple((
+            (k, v) for k, v in load_values
+            if k in self.routes_dict
+        ))
+        for k, v in load_values:
+            self.routes_dict[k].load_value(v)
+
+    def rebuild_menu(self, select_class=None):
+        for i in self.routes:
+            try:
+                i.reset_routes()
+            except AttributeError:
+                pass
+        self.build_menu(select_class)
+
     def onInit(self):
+        self.build_menu()
         self.getControl(1).setLabel(self.label)
         self.getControl(5).setLabel(get_localized(190))
         self.getControl(6).setVisible(False)
         self.getControl(7).setLabel(get_localized(15067))
         self.getControl(8).setLabel(get_localized(13007))
-        self.build_menu()
 
     def build_menu(self, select_class=None):
         self.list_control.reset()

@@ -101,7 +101,7 @@ class TMDbNode:
             return
         Dialog().ok(self.name, message)
 
-    def add(self):
+    def add(self, insert=None):
         if not self.meta:
             return
 
@@ -113,7 +113,7 @@ class TMDbNode:
             self.remove(refresh=False)
 
         # Add item to node
-        self.meta['list'].append(self.item)
+        self.meta['list'].append(self.item) if insert is None else self.meta['list'].insert(insert, self.item)
 
         # Save node
         dumps_to_file(self.meta, NODE_BASEDIR, self.file, join_addon_data=False)

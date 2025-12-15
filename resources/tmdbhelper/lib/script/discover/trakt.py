@@ -11,7 +11,7 @@ from tmdbhelper.lib.script.discover.base import (
     DiscoverSave,
     DiscoverReset,
     DiscoverMain,
-    ItemTuple
+    DiscoverItem
 )
 
 
@@ -19,26 +19,29 @@ NODE_FILENAME = 'Trakt Discover.json'
 
 
 class TraktDiscoverList(DiscoverList):
-    @cached_property
-    def routes(self):
+    idx = 0
+    default_idx = 0
+
+    def get_routes(self):
         return (
-            ItemTuple(get_localized(32204), 'trakt_trending'),
-            ItemTuple(get_localized(32175), 'trakt_popular'),
-            ItemTuple(get_localized(32205), 'trakt_mostplayed'),
-            ItemTuple(get_localized(32414), 'trakt_mostviewers'),
-            ItemTuple(get_localized(32206), 'trakt_anticipated'),
+            DiscoverItem(get_localized(32204), 'trakt_trending'),
+            DiscoverItem(get_localized(32175), 'trakt_popular'),
+            DiscoverItem(get_localized(32205), 'trakt_mostplayed'),
+            DiscoverItem(get_localized(32414), 'trakt_mostviewers'),
+            DiscoverItem(get_localized(32206), 'trakt_anticipated'),
         )
 
 
 class TraktDiscoverType(DiscoverList):
     key = 'tmdb_type'
     label_prefix_localized = 467
+    idx = 0
+    default_idx = 0
 
-    @cached_property
-    def routes(self):
+    def get_routes(self):
         return (
-            ItemTuple(get_localized(342), 'movie'),
-            ItemTuple(get_localized(20343), 'tv'),
+            DiscoverItem(get_localized(342), 'movie'),
+            DiscoverItem(get_localized(20343), 'tv'),
         )
 
 
@@ -49,7 +52,7 @@ class TraktDiscoverGenres(DiscoverMulti):
 
     @property
     def routes_items(self):
-        if self.main.routes_dict['type'].value == 'movie':
+        if self.main.routes_dict['tmdb_type'].value == 'movie':
             return self.routes_items_movies
         return self.routes_items_shows
 
@@ -61,10 +64,8 @@ class TraktDiscoverGenres(DiscoverMulti):
     def routes_items_shows(self):
         return self.main.trakt_api.get_response_json('genres/shows')
 
-    @cached_property
-    def routes(self):
-        return tuple((ItemTuple(i['name'], i['slug']) for i in self.routes_items if i))
-
+    def get_routes(self):
+        return tuple((DiscoverItem(i['name'], i['slug']) for i in self.routes_items if i))
 
 
 class TraktDiscoverCertifications(TraktDiscoverGenres):
@@ -171,6 +172,10 @@ class TraktDiscoverMain(DiscoverMain):
     file = NODE_FILENAME
     winprop = 'TraktDiscover.Path'
 
+    def load_values(self, tmdb_type='movie', **kwargs):
+        self.routes_dict['tmdb_type'].load_value(tmdb_type)  # Set TMDb Type first as other values depend on it
+        super().load_values(**kwargs)
+
     @cached_property
     def label(self):
         return f'Trakt {get_localized(32174)}'
@@ -187,7 +192,7 @@ class TraktDiscoverMain(DiscoverMain):
         return {
             'save': TraktDiscoverSave(self),
             'list': TraktDiscoverList(self),
-            'type': TraktDiscoverType(self),
+            'tmdb_type': TraktDiscoverType(self),
             'query': TraktDiscoverQuery(self),
             'years': TraktDiscoverYears(self),
             'genres': TraktDiscoverGenres(self),

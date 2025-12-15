@@ -112,22 +112,14 @@ ROUTE_NOID = {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_gemini',
         'import_attr': 'ListGemini'}},
     'dir_discover': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_discover',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_discodir',
         'import_attr': 'ListDiscoverDir'}},
     'discover': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_discover',
         'import_attr': 'ListDiscover'}},
     'user_discover': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_discover',
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_discodir',
         'import_attr': 'ListUserDiscover'}},
-
-    'dir_tmdb_discover': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_new_discover',
-        'import_attr': 'ListDiscoverDir'}},
-    'tmdb_discover': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_new_discover',
-        'import_attr': 'ListDiscover'}},
-
     'dir_trakt_discover': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_discover',
         'import_attr': 'ListDiscoverDir'}},
@@ -948,4 +940,66 @@ DISCOVER_RELEASE_TYPES = (
     {'id': 4, 'name': 32245},
     {'id': 5, 'name': 32246},
     {'id': 6, 'name': 36037}
+)
+
+
+DISCOVER_TV_TYPES = (
+    {'id': 0, 'name': 19519},
+    {'id': 1, 'name': 29941},
+    {'id': 2, 'name': 32221},
+    {'id': 3, 'name': 32234},
+    {'id': 4, 'name': 32238},
+    {'id': 5, 'name': 19535},
+    {'id': 6, 'name': 157},
+)
+
+
+DISCOVER_TV_STATUS = (
+    {'id': 0, 'name': 32293},
+    {'id': 1, 'name': 32294},
+    {'id': 2, 'name': 32307},
+    {'id': 3, 'name': 32308},
+    {'id': 4, 'name': 32323},
+    {'id': 5, 'name': 32324},
+)
+
+
+DISCOVER_WATCH_MONETIZATION_TYPES = (
+    {'id': 'flatrate', 'name': 'flatrate'},
+    {'id': 'free', 'name': 'free'},
+    {'id': 'ads', 'name': 'ads'},
+    {'id': 'rent', 'name': 'rent'},
+    {'id': 'buy', 'name': 'buy'},
+)
+
+DISCOVER_SORTBY_MOVIES = (
+    {'id': 'original_title.asc', 'name': 'original_title.asc'},
+    {'id': 'original_title.desc', 'name': 'original_title.desc'},
+    {'id': 'popularity.asc', 'name': 'popularity.asc'},
+    {'id': 'popularity.desc', 'name': 'popularity.desc'},
+    {'id': 'revenue.asc', 'name': 'revenue.asc'},
+    {'id': 'revenue.desc', 'name': 'revenue.desc'},
+    {'id': 'primary_release_date.asc', 'name': 'primary_release_date.asc'},
+    {'id': 'primary_release_date.desc', 'name': 'primary_release_date.desc'},
+    {'id': 'title.asc', 'name': 'title.asc'},
+    {'id': 'title.desc', 'name': 'title.desc'},
+    {'id': 'vote_average.asc', 'name': 'vote_average.asc'},
+    {'id': 'vote_average.desc', 'name': 'vote_average.desc'},
+    {'id': 'vote_count.asc', 'name': 'vote_count.asc'},
+    {'id': 'vote_count.desc', 'name': 'vote_count.desc'},
+)
+
+DISCOVER_SORTBY_TV = (
+    {'id': 'first_air_date.asc', 'name': 'first_air_date.asc'},
+    {'id': 'first_air_date.desc', 'name': 'first_air_date.desc'},
+    {'id': 'name.asc', 'name': 'name.asc'},
+    {'id': 'name.desc', 'name': 'name.desc'},
+    {'id': 'original_name.asc', 'name': 'original_name.asc'},
+    {'id': 'original_name.desc', 'name': 'original_name.desc'},
+    {'id': 'popularity.asc', 'name': 'popularity.asc'},
+    {'id': 'popularity.desc', 'name': 'popularity.desc'},
+    {'id': 'vote_average.asc', 'name': 'vote_average.asc'},
+    {'id': 'vote_average.desc', 'name': 'vote_average.desc'},
+    {'id': 'vote_count.asc', 'name': 'vote_count.asc'},
+    {'id': 'vote_count.desc', 'name': 'vote_count.desc'},
 )
