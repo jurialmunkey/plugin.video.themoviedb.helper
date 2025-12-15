@@ -191,6 +191,13 @@ class TraktStoredAccessToken:
     def update_stored_authorization(self):
         self.trakt_api.user_token.value = self.winprop_traktusertoken = data_dumps(self.stored_authorization)
 
+    def delete_stored_authorization(self):
+        self.trakt_api.user_token.value = self.winprop_traktusertoken = ''
+        get_property('TraktIsAuth', clear_property=True)
+        get_property('TraktUserToken', clear_property=True)
+        get_property('TraktRefreshAttempts', clear_property=True)
+        get_property('TraktRefreshTimeStamp', clear_property=True)
+
     @property
     def winprop_traktusertoken(self):
         return data_loads(get_property('TraktUserToken')) or {}
@@ -242,4 +249,5 @@ class TraktStoredAccessToken:
             if response.status_code != 200 else
             get_localized(32216)
         )
+        self.delete_stored_authorization()
         Dialog().ok(head, text)
