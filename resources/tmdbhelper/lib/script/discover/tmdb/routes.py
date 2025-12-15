@@ -72,12 +72,9 @@ class TMDbDiscoverWithCompanies(DiscoverMulti):
         except (KeyError, TypeError):
             return
 
-    def get_load_value_generator(self, value):
-        return TMDbDiscoverMethods.get_load_value_generator(value, self.separator, self.get_name_from_id)
-
     def load_value(self, value):
-        self.separator = TMDbDiscoverMethods.get_load_value_separator(value)
-        self.route = [i for i in self.get_load_value_generator(value) if i.label and i.value]
+        self.separator = self.get_load_value_separator(value)
+        self.route = [i for i in self.get_load_value_generator(value, self.get_name_from_id) if i.label and i.value]
 
     @property
     def query_header(self):
@@ -218,16 +215,6 @@ class TMDbDiscoverWithGenres(DiscoverMulti):
     key = 'with_genres'
     label_prefix_localized = 32263
     separator = '%7C'
-
-    def get_load_value_index(self, tmdb_id):
-        return next((x for x, i in enumerate(self.routes) if str(i.value) == str(tmdb_id)), None)
-
-    def get_load_value_split(self, value):
-        return TMDbDiscoverMethods.get_load_value_split(value, self.separator)
-
-    def load_value(self, value):
-        self.separator = TMDbDiscoverMethods.get_load_value_separator(value)
-        self.idx = [self.get_load_value_index(i) for i in self.get_load_value_split(value) if i]
 
     @property
     def datalist(self):
