@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-12-10 09:21+0800\n"
+"PO-Revision-Date: 2025-12-15 09:21+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -664,8 +664,8 @@ msgstr "选择类型"
 
 #: /resources/lib/container.py
 msgctxt "#32113"
-msgid "Also accepts X days relative from today in the format T-X or T+X (e.g. T-10 is ten days ago)"
-msgstr "距今 X 天，格式为 T-X 或 T+X（例如 T-10 是十天前）"
+msgid "Also accepts days from today as T-X or T+X (e.g. T-10 is ten days ago)"
+msgstr "也可输入相对于今日的天数，格式为T-X或T+X（例如T-10表示十天前）"
 
 #: /resources/lib/container.py
 msgctxt "#32114"
@@ -826,6 +826,11 @@ msgstr "添加 Trakt 列表到 Kodi 媒体库"
 msgctxt "#32126"
 msgid "Are you sure you want to add this Trakt list to your Kodi library?"
 msgstr "你确定要将这个 Trakt 列表添加到你的 Kodi 媒体库中吗？"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32165"
+msgid "Add another item?"
+msgstr "添加另一个条目？"
 
 #: /resources/lib/context.py
 msgctxt "#32130"
@@ -1086,6 +1091,30 @@ msgctxt "#32204"
 msgid "Trending"
 msgstr "趋势"
 
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32217"
+msgid "With Provider Region"
+msgstr "按提供商地区"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32218"
+msgid "With Watch Monetization Types"
+msgstr "按观看付费类型"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32219"
+msgid "Certification Country"
+msgstr "按分级地区/国家"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb/routes.py
+msgctxt "#32220"
+msgid "With Origin Country"
+msgstr "按出品地区"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32221"
+msgid "Miniseries"
+msgstr "按迷你剧"
 #: /resources/lib/plugin.py
 msgctxt "#32205"
 msgid "Most Played"
@@ -1146,6 +1175,11 @@ msgctxt "#32216"
 msgid "Successfully logged out of Trakt user account"
 msgstr "成功注销 Trakt 用户帐户"
 
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32234"
+msgid "Reality"
+msgstr "真人秀"
+
 #: /resources/lib/script.py
 msgctxt "#32222"
 msgid "Manage artwork"
@@ -1160,6 +1194,11 @@ msgstr "建议"
 msgctxt "#32224"
 msgid "Similar"
 msgstr "类似的"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32238"
+msgid "Scripted"
+msgstr "剧本"
 
 #: /resources/lib/plugin.py
 msgctxt "#32225"
@@ -1431,6 +1470,16 @@ msgctxt "#32280"
 msgid "Last Fortnight"
 msgstr "上半个月"
 
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32293"
+msgid "Returning Series"
+msgstr "续订剧集"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32294"
+msgid "Planned"
+msgstr "筹备中"
+
 #: /resources/lib/basedir.py
 msgctxt "#32281"
 msgid "Last Week"
@@ -1490,6 +1539,16 @@ msgstr "添加到观看列表"
 msgctxt "#32292"
 msgid "Remove from watchlist"
 msgstr "从观看列表中移除"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32307"
+msgid "In Production"
+msgstr "制作中"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32308"
+msgid "Ended"
+msgstr "已完结"
 
 #: /resources/lib/script.py
 msgctxt "#32295"
@@ -1568,6 +1627,21 @@ msgstr "浏览排序列表"
 msgctxt "#32310"
 msgid "TMDb ID for {} not found!"
 msgstr "在 TMDB 未找到 {} !"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32323"
+msgid "Cancelled"
+msgstr "已取消"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32324"
+msgid "Pilot"
+msgstr "试播集"
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_discodir.py
+msgctxt "#32325"
+msgid "Edit Filters"
+msgstr "编辑筛选条件"
 
 #: /resources/lib/player/players.py
 msgctxt "#32311"
@@ -1672,6 +1746,11 @@ msgstr "为播放器选择解决方式"
 msgctxt "#32333"
 msgid "User Choice"
 msgstr "用户选择"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb/routes.py
+msgctxt "#32346"
+msgid "Timezone"
+msgstr "时区"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32334"
@@ -1892,17 +1971,17 @@ msgstr "仅处理 .strm 文件"
 
 #: /resources/lib/player/players.py
 msgctxt "#32374"
-msgid "Constructing Players"
+msgid "Constructing players"
 msgstr "初始化播放器"
 
 #: /resources/lib/player/players.py
 msgctxt "#32375"
-msgid "Retrieving Item Details"
+msgid "Retrieving item details"
 msgstr "正在检索项目详细信息"
 
 #: /resources/lib/player/players.py
 msgctxt "#32376"
-msgid "Building Player Dialog"
+msgid "Building players dialog"
 msgstr "构建播放器对话框"
 
 #: /resources/lib/trakt/api.py
