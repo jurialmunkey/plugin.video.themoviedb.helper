@@ -18,22 +18,6 @@ class TMDbDiscoverMethods:
         ))
 
     @staticmethod
-    def get_load_value_split(value, separator):
-        import re
-        return re.split(separator, value, flags=re.IGNORECASE)
-
-    @staticmethod
-    def get_load_value_generator(value, separator, id_func, item_class=DiscoverItem):
-        return (
-            item_class(id_func(tmdb_id), tmdb_id)
-            for tmdb_id in TMDbDiscoverMethods.get_load_value_split(value, separator)
-        )
-
-    @staticmethod
-    def get_load_value_separator(value):
-        return '%2C' if '%2C' in value or '%2c' in value else '%7C'
-
-    @staticmethod
     def menu_with_subselection(instance):
         for route in instance.routes_to_subselect:
             if not instance.main.routes_dict[route].value:
