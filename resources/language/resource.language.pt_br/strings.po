@@ -1636,6 +1636,11 @@ msgctxt "#32324"
 msgid "Pilot"
 msgstr "Piloto"
 
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_discodir.py
+msgctxt "#32325"
+msgid "Edit Filters"
+msgstr "Editar Filtros"
+
 #: /resources/lib/player/players.py
 msgctxt "#32311"
 msgid "Clear default player"
@@ -1739,6 +1744,11 @@ msgstr "Escolha o método de resolução para o reprodutor"
 msgctxt "#32333"
 msgid "User Choice"
 msgstr "Escolha do Usuário"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb/routes.py
+msgctxt "#32346"
+msgid "Timezone"
+msgstr "Fuso horário"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32334"
@@ -2351,7 +2361,7 @@ msgstr "Vencedor de"
 #: /resources/lib/api/tvdb/lists.py
 msgctxt "#32462"
 msgid "Nominated for"
-msgstr "Indicado para"
+msgstr "Indicado a"
 
 #: /resources/settings.xml
 msgctxt "#32463"
@@ -2868,7 +2878,7 @@ msgstr "Reprodutores"
 #: /resources/settings.xml
 msgctxt "#32016"
 msgid "Update players from URL"
-msgstr "Chave de cliente Fanart.tv"
+msgstr "Atualizar reprodutores pela URL"
 
 #: /resources/settings.xml
 msgctxt "#32017"
