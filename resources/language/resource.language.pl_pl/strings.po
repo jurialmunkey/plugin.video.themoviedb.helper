@@ -1765,6 +1765,16 @@ msgstr ""
 "\n"
 "[B]UWAGA:[/B] Tej czynności nie można cofnąć."
 
+#: /resources/settings.xml
+msgctxt "#32349"
+msgid "Use fallback English plot translations (slower)"
+msgstr "Użyj zastępczo angielskich opisów fabuły (wolniej)"
+
+#: /resources/settings.xml
+msgctxt "#32350"
+msgid "Retrieve English language plot translations to use as a fallback when primrary language translation is missing. Note that this setting will considerably increase detailed information lookup times and database disk usage."
+msgstr "Pobierz opisy fabuły w języku angielskim, aby użyć ich zastępczo w przypadku braku opisów w języku podstawowym. Pamiętaj, że to ustawienie wydłuży czas wyszukiwania informacji i zwiększy wykorzystanie dysku przez bazę danych."
+
 #: /resources/lib/player/configure.py
 msgctxt "#32336"
 msgid "Save your changes?"
