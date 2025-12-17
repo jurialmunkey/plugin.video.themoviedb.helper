@@ -1,13 +1,14 @@
 from tmdbhelper.lib.monitor.images import ImageManipulations
 from tmdbhelper.lib.monitor.poller import Poller, POLL_MIN_INCREMENT
 from tmdbhelper.lib.monitor.listitemgetter import ListItemInfoGetter
+from tmdbhelper.lib.addon.plugin import get_condvisibility
 from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp
 from tmdbhelper.lib.addon.logger import kodi_try_except
 from tmdbhelper.lib.addon.thread import SafeThread
 
 
 class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
-    _cond_on_disabled = (
+    _cond_artwork_disabled = (
         "!Skin.HasSetting(TMDbHelper.EnableCrop) + "
         "!Skin.HasSetting(TMDbHelper.EnableBlur) + "
         "!Skin.HasSetting(TMDbHelper.EnableDesaturate) + "
@@ -36,11 +37,13 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         self._this_refresh = 0
         self.exit = False
         self.update_monitor = parent.update_monitor
-        self.crop_image_cur = None
-        self.blur_image_cur = None
         self.remote_artwork = {}
         self._allow_on_scroll = True  # Allow updating while scrolling
         self._parent = parent
+
+    @property
+    def is_artwork_disabled(self):
+        return get_condvisibility(self._cond_artwork_disabled)
 
     # Unused method see update_artwork comments further below
     """
@@ -108,19 +111,24 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         self._this_refresh = 0
         self._next_refresh = 0
 
-        update_artwork = self.get_image_manipulations(
-            use_winprops=False,
-            built_artwork=self.remote_artwork.get(self.pre_item),
-            allow_list=self._allow_list
-        )
-
-        if not self.update_properties(update_artwork):
+        if not self.update_properties(self.blurcrop_properties):
             return
 
         if not self.update_properties(self.baseitem_properties):
             return
 
-        return update_artwork
+        return self.cur_blurcrop_properties
+
+    cur_blurcrop_properties = None
+
+    @property
+    def blurcrop_properties(self):
+        self.cur_blurcrop_properties = self.get_image_manipulations(
+            use_winprops=False,
+            built_artwork=self.remote_artwork.get(self.pre_item),
+            allow_list=self._allow_list
+        ) if not self.is_artwork_disabled else {}
+        return self.cur_blurcrop_properties
 
     def update_properties(self, infoproperties):
         if not self.is_same_item():
