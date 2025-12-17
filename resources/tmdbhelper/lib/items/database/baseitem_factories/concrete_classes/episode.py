@@ -48,6 +48,7 @@ class Episode(Season):
             base_dbc.common_apis = self.common_apis
             base_dbc.cache = self.cache
             base_dbc.cache_refresh = self.cache_refresh
+            base_dbc.english_fallback = self.english_fallback
         except (TypeError, KeyError, IndexError, ValueError):
             return
         return base_dbc.data
@@ -64,13 +65,7 @@ class Episode(Season):
     def online_data_args(self):
         return (self.tmdb_type, self.tmdb_id, 'season', self.season, 'episode', self.episode)
 
-    @property
-    def online_data_kwgs(self):
-        if self.cache_refresh == 'basic':
-            return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow_simple}
-        if self.cache_refresh == 'langs':
-            return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow_translation}
-        return {'append_to_response': self.common_apis.tmdb_api.append_to_response}
+    append_to_response_base = 'append_to_response_tvshow'
 
     @property
     def cached_data_table(self):

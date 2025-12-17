@@ -63,6 +63,8 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
     def is_detailed(self):
         if self.params.get('info') == 'details':
             return True
+        if self.is_translated:
+            return True
         return boolean(self.params.get('detailed', False))
 
     @cached_property
@@ -318,13 +320,18 @@ class ContainerDirectory(ContainerDirectoryCommon):
         return 'basic'
 
     @cached_property
+    def lidc_english_fallback(self):
+        return get_setting('force_english_plot_fallback')
+
+    @cached_property
     def lidc(self):
         from tmdbhelper.lib.items.database.listitem import ListItemDetails
         lidc = ListItemDetails(self)
         lidc.parent_params = self.parent_params
         lidc.pagination = self.pagination
         lidc.cache_refresh = self.lidc_cache_refresh
-        lidc.extendedinfo = self.is_detailed or self.is_translated
+        lidc.english_fallback = self.lidc_english_fallback
+        lidc.extendedinfo = self.is_detailed
         lidc.timer_lists = self.timer_lists
         lidc.log_timers = self.log_timers
         return lidc

@@ -165,11 +165,12 @@ class ListItemCacher:
             pass
         return data
 
-    def get_item(self, connection, cache_refresh=None):
+    def get_item(self, connection, cache_refresh=None, english_fallback=False):
         if not self.baseitem_db_cache:
             return
         self.baseitem_db_cache.connection = connection
         self.baseitem_db_cache.cache_refresh = cache_refresh
+        self.baseitem_db_cache.english_fallback = english_fallback
         return self.add_item_details(self.baseitem_db_cache.data)
 
     def get_cached_item(self, connection):
@@ -177,6 +178,7 @@ class ListItemCacher:
             return
         self.baseitem_db_cache.connection = connection
         self.baseitem_db_cache.cache_refresh = self.parent.cache_refresh
+        self.baseitem_db_cache.english_fallback = self.parent.english_fallback
         return self.add_item_details(self.baseitem_db_cache.get_cached_data())
 
     def try_queued_data(self):
@@ -187,6 +189,7 @@ class ListItemCacher:
             self.parent.cache_refresh if self.parent.cache_refresh in ('basic', 'langs')
             else None
         )
+        self.baseitem_db_cache.english_fallback = self.parent.english_fallback
         return self.baseitem_db_cache.try_cached_data(return_queue=True)
 
 
@@ -273,6 +276,7 @@ class ListItemThread:
 class ListItemDetails:
     pagination = False
     cache_refresh = None
+    english_fallback = False
     extendedinfo = False
     parent_params = {}
     timer_lists = {}
@@ -288,7 +292,10 @@ class ListItemDetails:
 
     def get_item(self, tmdb_type, tmdb_id, season=None, episode=None):
         return ListItemCacher(self, tmdb_type, tmdb_id, season, episode).get_item(
-            connection=self.connection, cache_refresh=self.cache_refresh)
+            connection=self.connection,
+            cache_refresh=self.cache_refresh,
+            english_fallback=self.english_fallback
+        )
 
     def configure_listitems_threaded(self, items):
         return ListItemThread(self, [ListItemConfig(self, i) for i in items]).configured_items

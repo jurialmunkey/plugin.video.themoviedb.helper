@@ -87,6 +87,10 @@ class Translation(ItemDetailsList):
         return (self.item_id, )
 
 
+class EnglishTranslation(Translation):
+    conditions = 'parent_id=? AND iso_language="en" LIMIT 1'  # WHERE conditions
+
+
 class Country(ItemDetailsList):
     table = 'country'
     cached_data_parent_table = 'countries'

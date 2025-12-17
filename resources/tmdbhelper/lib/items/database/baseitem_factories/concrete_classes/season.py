@@ -10,13 +10,7 @@ class Season(Tvshow):
     expiry_time = SHORTER_EXPIRY  # Refresh weekly in case of new episodes
     ftv_type = None
 
-    @property
-    def online_data_kwgs(self):
-        if self.cache_refresh == 'basic':
-            return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow_simple}
-        if self.cache_refresh == 'langs':
-            return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow_translation}
-        return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow}
+    append_to_response_base = 'append_to_response_tvshow'
 
     @property
     def data_cond(self):
@@ -55,6 +49,7 @@ class Season(Tvshow):
             base_dbc.common_apis = self.common_apis
             base_dbc.cache = self.cache
             base_dbc.cache_refresh = self.cache_refresh
+            base_dbc.english_fallback = self.english_fallback
         except (TypeError, KeyError, IndexError, ValueError):
             return
         return base_dbc.data

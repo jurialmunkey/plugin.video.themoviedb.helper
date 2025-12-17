@@ -49,7 +49,7 @@ class BaseList(ItemDetailsDatabaseAccess):
                 base_dbc.tmdb_type = self.tmdb_type
                 base_dbc.season = season
                 base_dbc.episode = episode
-                base_dbc.cache_refresh = cache_refresh
+                base_dbc.cache_refresh = cache_refresh  # TODO: Check if we need english_fallback here too???
                 base_dbc.common_apis = self.common_apis
                 base_dbc.connection = self.connection
                 base_dbc.cache = self.cache
