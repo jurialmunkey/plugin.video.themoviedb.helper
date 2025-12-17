@@ -23,12 +23,10 @@ class CommonMonitorDetails(CommonContainerAPIs):
 
     @cached_property
     def lidc(self):
-        from tmdbhelper.lib.addon.plugin import get_setting
         from tmdbhelper.lib.items.database.listitem import ListItemDetails
         lidc = ListItemDetails(self)
         lidc.cache_refresh = None
         lidc.extendedinfo = True
-        lidc.english_fallback = get_setting('force_english_plot_fallback')
         lidc.parent_params = {}
         return lidc
 

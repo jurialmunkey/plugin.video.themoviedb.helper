@@ -6,12 +6,11 @@ from tmdbhelper.lib.items.database.basemeta_factories.factory import BaseMetaFac
 from tmdbhelper.lib.items.database.itemmeta_factories.factory import ItemMetaFactory
 from infotagger.listitem import _ListItemInfoTagVideo
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_days_to_air
-from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY, SHORTER_EXPIRY, DAY_IN_SECONDS, DATALEVEL_MIN, DATALEVEL_MED, DATALEVEL_MOD, DATALEVEL_MAX, SQLITE_TRUE, SQLITE_FALSE
+from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY, SHORTER_EXPIRY, DAY_IN_SECONDS, DATALEVEL_MIN, DATALEVEL_MAX, SQLITE_TRUE, SQLITE_FALSE
 
 
 class BaseItem(ItemDetailsDatabaseAccess):
     cache_refresh = None  # Set to "never" for cache only, or "force" for forced refresh
-    english_fallback = False
     item_info = 'item'
     expiry_time = DEFAULT_EXPIRY
     cached_data_check_key = 'tmdb_id'
@@ -40,8 +39,8 @@ class BaseItem(ItemDetailsDatabaseAccess):
     @property
     def datalevel(self):
         if self.cache_refresh == 'basic':
-            return DATALEVEL_MED if self.english_fallback else DATALEVEL_MIN
-        return DATALEVEL_MAX if self.cache_refresh == 'langs' or self.english_fallback else DATALEVEL_MOD
+            return DATALEVEL_MIN
+        return DATALEVEL_MAX
 
     @property
     def fanart_tv(self):
@@ -69,20 +68,13 @@ class BaseItem(ItemDetailsDatabaseAccess):
     def online_data_args(self):
         return (self.tmdb_type, self.tmdb_id, )
 
-    append_to_response_base = 'append_to_response_movies'
-
-    @property
-    def append_to_response_property(self):
-        append_to_response_property = self.append_to_response_base
-        if self.cache_refresh == 'basic':
-            append_to_response_property = f'{append_to_response_property}_simple'
-        if self.cache_refresh == 'langs' or self.english_fallback:
-            append_to_response_property = f'{append_to_response_property}_translation'
-        return append_to_response_property
-
     @property
     def online_data_kwgs(self):
-        return {'append_to_response': getattr(self.common_apis.tmdb_api, self.append_to_response_property)}
+        if self.cache_refresh == 'basic':
+            return {'append_to_response': self.common_apis.tmdb_api.append_to_response_movies_simple}
+        if self.cache_refresh == 'langs':
+            return {'append_to_response': self.common_apis.tmdb_api.append_to_response_movies_translation}
+        return {'append_to_response': self.common_apis.tmdb_api.append_to_response}
 
     @cached_property
     def online_data_mapped(self):

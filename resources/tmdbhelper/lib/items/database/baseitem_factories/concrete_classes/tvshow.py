@@ -48,7 +48,13 @@ class Tvshow(MediaItem):
         cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('last_aired'))
         return tuple(cached_data_keys)
 
-    append_to_response_base = 'append_to_response_tvshow'
+    @property
+    def online_data_kwgs(self):
+        if self.cache_refresh == 'basic':
+            return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow_simple}
+        if self.cache_refresh == 'langs':
+            return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow_translation}
+        return {'append_to_response': self.common_apis.tmdb_api.append_to_response_tvshow}
 
     def config_basemeta_db_tvshow(self, database_obj):
         database_obj = self.config_basemeta_db(database_obj)

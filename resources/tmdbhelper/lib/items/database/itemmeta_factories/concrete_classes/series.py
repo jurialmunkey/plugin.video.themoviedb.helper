@@ -1,6 +1,5 @@
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseclass import BaseItem
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem
-from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseroutes import MediaItemInfoLabelItemRoutes
 
 
 class SeriesItem:
@@ -56,16 +55,16 @@ class Series(BaseItem):
     def infolabels_dbclist_routes(self):
         return (
             *super().infolabels_dbclist_routes,
-            MediaItemInfoLabelItemRoutes.series_genre,
+            (('series_genre', None), 'name', 'genre'),
         )
 
     @property
     def infolabels_dbcitem_routes(self):
         return (
             *super().infolabels_dbcitem_routes,
-            MediaItemInfoLabelItemRoutes.series_stats_rating,
-            MediaItemInfoLabelItemRoutes.series_stats_votes,
-            MediaItemInfoLabelItemRoutes.series_stats_year,
+            (('series_stats', None), 'rating', 'rating'),
+            (('series_stats', None), 'votes', 'votes'),
+            (('series_stats', None), 'year_first', 'year'),
         )
 
     @property

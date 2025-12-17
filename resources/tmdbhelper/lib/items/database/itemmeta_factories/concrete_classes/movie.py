@@ -9,7 +9,6 @@ class Movie(MediaItem):
         MediaItemInfoLabelItemRoutes.trailer,
         MediaItemInfoLabelItemRoutes.playcount,
         MediaItemInfoLabelItemRoutes.imdbnumber,
-        MediaItemInfoLabelItemRoutes.english_plot,
     )
 
     @property
@@ -25,7 +24,7 @@ class Movie(MediaItem):
     def infolabels_dbclist_routes(self):
         return (
             *super().infolabels_dbclist_routes,
-            MediaItemInfoLabelItemRoutes.studio,
+            (('studio', None), 'name', 'studio'),
         )
 
     def get_infolabels_special(self, infolabels):

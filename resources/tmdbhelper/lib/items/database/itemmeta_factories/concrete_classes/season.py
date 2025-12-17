@@ -7,7 +7,6 @@ class Season(MediaItem):
         MediaItemInfoLabelItemRoutes.certification,
         MediaItemInfoLabelItemRoutes.trailer,
         MediaItemInfoLabelItemRoutes.imdbnumber,
-        MediaItemInfoLabelItemRoutes.english_plot,
     )
 
     @property
@@ -35,7 +34,7 @@ class Season(MediaItem):
     def infolabels_dbclist_routes(self):
         return (
             *super().infolabels_dbclist_routes,
-            MediaItemInfoLabelItemRoutes.network,
+            (('network', None), 'name', 'studio'),
         )
 
     def get_infolabels_details(self):

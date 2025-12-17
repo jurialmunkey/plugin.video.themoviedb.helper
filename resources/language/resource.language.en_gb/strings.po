@@ -1754,16 +1754,6 @@ msgid ""
 "[B]WARNING:[/B] This action cannot be undone."
 msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32349"
-msgid "Use fallback English plot translations (slower)"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32350"
-msgid "Retrieve English language plot translations to use as a fallback when primrary language translation is missing. Note that this setting will considerably increase detailed information lookup times and database disk usage."
-msgstr ""
-
 #: /resources/lib/player/configure.py
 msgctxt "#32336"
 msgid "Save your changes?"

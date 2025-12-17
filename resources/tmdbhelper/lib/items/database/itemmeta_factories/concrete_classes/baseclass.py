@@ -43,25 +43,25 @@ class BaseItem:
             return
 
     def get_infolabels_dbclist(self, infolabels):
-        for instance, ikey, dkey, overwrite in self.infolabels_dbclist_routes:
+        for instance, ikey, dkey in self.infolabels_dbclist_routes:
             instance = self.return_basemeta_db(*instance)
             try:
                 data = [i[ikey] for i in instance.cached_data]
                 if not data:
                     continue
-                infolabels[dkey] = data if overwrite else infolabels.get(dkey) or data
+                infolabels[dkey] = data
             except(KeyError, TypeError, IndexError, AttributeError):
                 pass
         return infolabels
 
     def get_infolabels_dbcitem(self, infolabels):
-        for instance, ikey, dkey, overwrite in self.infolabels_dbcitem_routes:
+        for instance, ikey, dkey in self.infolabels_dbcitem_routes:
             instance = self.return_basemeta_db(*instance)
             try:
                 data = ikey(instance.cached_data[0]) if callable(ikey) else instance.cached_data[0][ikey]
                 if data is None:
                     continue
-                infolabels[dkey] = data if overwrite else infolabels.get(dkey) or data
+                infolabels[dkey] = data
             except(KeyError, TypeError, IndexError, AttributeError):
                 pass
         return infolabels
