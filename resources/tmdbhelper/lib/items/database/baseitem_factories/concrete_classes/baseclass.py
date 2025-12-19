@@ -7,6 +7,7 @@ from tmdbhelper.lib.items.database.itemmeta_factories.factory import ItemMetaFac
 from infotagger.listitem import _ListItemInfoTagVideo
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_days_to_air
 from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY, SHORTER_EXPIRY, DAY_IN_SECONDS, DATALEVEL_MIN, DATALEVEL_MAX, SQLITE_TRUE, SQLITE_FALSE
+from tmdbhelper.lib.addon.plugin import get_setting
 
 
 class BaseItem(ItemDetailsDatabaseAccess):
@@ -62,6 +63,8 @@ class BaseItem(ItemDetailsDatabaseAccess):
         if self.cache_refresh == 'force':
             return True
         if self.cache_translations:
+            return True
+        if get_setting('force_english_plot_fallback'):
             return True
         return False
 

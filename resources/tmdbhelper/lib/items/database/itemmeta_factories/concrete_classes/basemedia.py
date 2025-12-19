@@ -339,21 +339,22 @@ class MediaItem(BaseItem):
         return infoproperties
 
     def get_infoproperties_translation(self, infoproperties, subtype=None):
+        if self.extendedinfo:
 
-        generator = (
-            (
-                f"{i['iso_language']}_{subtype or ''}{k}",
-                f"{i['iso_language']}-{i['iso_country']}_{subtype or ''}{k}",
-                i[k]
+            generator = (
+                (
+                    f"{i['iso_language']}_{subtype or ''}{k}",
+                    f"{i['iso_language']}-{i['iso_country']}_{subtype or ''}{k}",
+                    i[k]
+                )
+                for i in self.return_basemeta_db('translation', subtype).cached_data
+                for k in ('title', 'plot', 'tagline')
+                if i[k]
             )
-            for i in self.return_basemeta_db('translation', subtype).cached_data
-            for k in ('title', 'plot', 'tagline')
-            if i[k]
-        )
 
-        for key_language, key_combined, value in generator:
-            infoproperties[key_combined] = value
-            infoproperties[key_language] = infoproperties.get(key_language) or value
+            for key_language, key_combined, value in generator:
+                infoproperties[key_combined] = value
+                infoproperties[key_language] = infoproperties.get(key_language) or value
 
         return infoproperties
 

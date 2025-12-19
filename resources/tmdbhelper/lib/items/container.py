@@ -67,7 +67,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
 
     @cached_property
     def is_translated(self):
-        return boolean(get_setting('force_english_plot_fallback') or self.params.get('translated', False))
+        return boolean(self.params.get('translated', False))
 
     @cached_property
     def context_additions(self):
