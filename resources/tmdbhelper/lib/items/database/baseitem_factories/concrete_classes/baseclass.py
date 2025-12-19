@@ -11,6 +11,7 @@ from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY, SHORTER_EXPIRY, DAY_IN_S
 
 class BaseItem(ItemDetailsDatabaseAccess):
     cache_refresh = None  # Set to "never" for cache only, or "force" for forced refresh
+    cache_translations = False
     item_info = 'item'
     expiry_time = DEFAULT_EXPIRY
     cached_data_check_key = 'tmdb_id'
@@ -52,9 +53,17 @@ class BaseItem(ItemDetailsDatabaseAccess):
 
     @property
     def translation(self):
-        if self.cache_refresh not in ('langs', 'force'):
-            return SQLITE_FALSE
-        return SQLITE_TRUE
+        if self.is_translation:
+            return SQLITE_TRUE
+        return SQLITE_FALSE
+
+    @property
+    def is_translation(self):
+        if self.cache_refresh == 'force':
+            return True
+        if self.cache_translations:
+            return True
+        return False
 
     @property
     def language(self):
@@ -75,7 +84,7 @@ class BaseItem(ItemDetailsDatabaseAccess):
         append_to_response_attribute = self.append_to_response_attribute_base
         if self.cache_refresh == 'basic':
             append_to_response_attribute = f'{append_to_response_attribute}_simple'
-        if self.cache_refresh in ('langs', 'force'):
+        if self.is_translation:
             append_to_response_attribute = f'{append_to_response_attribute}_translation'
         return append_to_response_attribute
 

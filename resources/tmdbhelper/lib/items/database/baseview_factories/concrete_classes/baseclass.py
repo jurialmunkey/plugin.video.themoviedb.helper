@@ -7,6 +7,7 @@ from jurialmunkey.locker import MutexPropLock
 class BaseList(ItemDetailsDatabaseAccess):
     cached_data_check_key = 'expiry'
     cache_refresh = None  # Set to "never" for cache only, or "force" for forced refresh
+    cache_translations = False
     cached_data_table = table = 'baseitem'
     cached_data_conditions = 'id=? AND expiry>=? AND datalevel>=?'
     season = None
@@ -38,7 +39,7 @@ class BaseList(ItemDetailsDatabaseAccess):
     def parent_item_data(self):
         return self.get_parent_data(self.mediatype, self.season, self.episode)
 
-    def get_parent_data(self, mediatype, season=None, episode=None, cache_refresh=None):
+    def get_parent_data(self, mediatype, season=None, episode=None, cache_refresh=None, cache_translations=False):
         from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
         lockname = '.'.join([f'{i}' for i in (self.tmdb_type, self.tmdb_id, season, episode) if i is not None])
         with MutexPropLock(f'Database.ItemDetails.{lockname}.lockfile'):
@@ -50,6 +51,7 @@ class BaseList(ItemDetailsDatabaseAccess):
                 base_dbc.season = season
                 base_dbc.episode = episode
                 base_dbc.cache_refresh = cache_refresh
+                base_dbc.cache_translations = cache_translations
                 base_dbc.common_apis = self.common_apis
                 base_dbc.connection = self.connection
                 base_dbc.cache = self.cache

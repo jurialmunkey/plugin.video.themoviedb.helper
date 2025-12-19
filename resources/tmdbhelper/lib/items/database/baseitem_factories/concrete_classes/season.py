@@ -49,6 +49,7 @@ class Season(Tvshow):
             base_dbc.common_apis = self.common_apis
             base_dbc.cache = self.cache
             base_dbc.cache_refresh = self.cache_refresh
+            base_dbc.cache_translations = self.cache_translations
         except (TypeError, KeyError, IndexError, ValueError):
             return
         return base_dbc.data
