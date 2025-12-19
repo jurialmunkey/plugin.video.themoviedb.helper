@@ -183,12 +183,14 @@ class BaseItem(ItemDetailsDatabaseAccess):
             return self.get_item_meta(data)
 
     def set_cached_data(self, item_id, mediatype, expiry, datalevel, fanart_tv, translation, language, table, keys, mapped_data, delete_cascade=False):
+        baseitem_keys = ('mediatype', 'expiry', 'datalevel', 'fanart_tv', 'language')
+        baseitem_values = (mediatype, expiry, datalevel, fanart_tv, language)
         self.del_cached('baseitem', item_id) if delete_cascade else None
         self.set_cached_values(
             table='baseitem',
             item_id=item_id,
-            keys=('mediatype', 'expiry', 'datalevel', 'fanart_tv', 'translation', 'language'),
-            values=(mediatype, expiry, datalevel, fanart_tv, translation, language)
+            keys=baseitem_keys if not translation else (*baseitem_keys, 'translation'),
+            values=baseitem_values if not translation else (*baseitem_values, translation)
         )
         self.set_cached_many(table, keys, mapped_data)
 
