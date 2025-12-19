@@ -1821,6 +1821,16 @@ msgctxt "#32348"
 msgid "Log output of TMDb request"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32349"
+msgid "Use fallback English plot translations (slower)"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32350"
+msgid "Retrieve English language plot translations to use as a fallback when primrary language translation is missing. Note that this setting will considerably increase detailed information lookup times and database disk usage."
+msgstr ""
+
 #: /resources/lib/kodi/library.py
 msgctxt "#32351"
 msgid "Dummy ResolvedURL"
