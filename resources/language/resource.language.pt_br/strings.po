@@ -1840,6 +1840,16 @@ msgctxt "#32348"
 msgid "Log output of TMDb request"
 msgstr "Saída de log da solicitação TMDb"
 
+#: /resources/settings.xml
+msgctxt "#32349"
+msgid "Use fallback English plot translations (slower)"
+msgstr "Usar traduções de enredo em inglês como plano B (mais lentas)"
+
+#: /resources/settings.xml
+msgctxt "#32350"
+msgid "Retrieve English language plot translations to use as a fallback when primrary language translation is missing. Note that this setting will considerably increase detailed information lookup times and database disk usage."
+msgstr "Recupere traduções de enredos em inglês para usar como plano B quando a tradução principal estiver faltando. Note que essa configuração aumentará consideravelmente os tempos de consulta detalhada de informações e o uso do disco do banco de dados."
+
 #: /resources/lib/kodi/library.py
 msgctxt "#32351"
 msgid "Dummy ResolvedURL"
