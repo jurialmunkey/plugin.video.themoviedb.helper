@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-12-15 14:21+0800\n"
+"PO-Revision-Date: 2025-12-19 20:08+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -665,7 +665,7 @@ msgstr "选择类型"
 #: /resources/lib/container.py
 msgctxt "#32113"
 msgid "Also accepts days from today as T-X or T+X (e.g. T-10 is ten days ago)"
-msgstr "也可输入相对于今日的天数，格式为T-X或T+X（例如T-10表示十天前）"
+msgstr "也接受以今日为基准的日期表示法，如T-X或T+X（例如T-10表示十天前）"
 
 #: /resources/lib/container.py
 msgctxt "#32114"
@@ -790,7 +790,7 @@ msgstr "区域"
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
 msgctxt "#32157"
 msgid "Decades"
-msgstr "年代分类"
+msgstr "十年"
 
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
 msgctxt "#32158"
@@ -830,7 +830,7 @@ msgstr "你确定要将这个 Trakt 列表添加到你的 Kodi 媒体库中吗�
 #: /resources/tmdbhelper/lib/script/discover/tmdb.py
 msgctxt "#32165"
 msgid "Add another item?"
-msgstr "添加另一个条目？"
+msgstr "添加另一项？"
 
 #: /resources/lib/context.py
 msgctxt "#32130"
@@ -1094,27 +1094,28 @@ msgstr "趋势"
 #: /resources/tmdbhelper/lib/script/discover/tmdb.py
 msgctxt "#32217"
 msgid "With Provider Region"
-msgstr "按提供商地区"
+msgstr "按提供商区域筛选"
 
 #: /resources/tmdbhelper/lib/script/discover/tmdb.py
 msgctxt "#32218"
 msgid "With Watch Monetization Types"
-msgstr "按观看付费类型"
+msgstr "按观看变现类型筛选"
 
 #: /resources/tmdbhelper/lib/script/discover/tmdb.py
 msgctxt "#32219"
 msgid "Certification Country"
-msgstr "按分级地区/国家"
+msgstr "认证国家"
 
 #: /resources/tmdbhelper/lib/script/discover/tmdb/routes.py
 msgctxt "#32220"
 msgid "With Origin Country"
-msgstr "按出品地区"
+msgstr "按原产国筛选"
 
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32221"
 msgid "Miniseries"
-msgstr "按迷你剧"
+msgstr "迷你剧"
+
 #: /resources/lib/plugin.py
 msgctxt "#32205"
 msgid "Most Played"
@@ -1198,7 +1199,7 @@ msgstr "类似的"
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32238"
 msgid "Scripted"
-msgstr "剧本"
+msgstr "剧本剧"
 
 #: /resources/lib/plugin.py
 msgctxt "#32225"
@@ -1473,12 +1474,12 @@ msgstr "上半个月"
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32293"
 msgid "Returning Series"
-msgstr "续订剧集"
+msgstr "回归剧集"
 
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32294"
 msgid "Planned"
-msgstr "筹备中"
+msgstr "计划中"
 
 #: /resources/lib/basedir.py
 msgctxt "#32281"
@@ -1548,7 +1549,7 @@ msgstr "制作中"
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32308"
 msgid "Ended"
-msgstr "已完结"
+msgstr "已结束"
 
 #: /resources/lib/script.py
 msgctxt "#32295"
@@ -1631,7 +1632,7 @@ msgstr "在 TMDB 未找到 {} !"
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32323"
 msgid "Cancelled"
-msgstr "已取消"
+msgstr "已终止"
 
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32324"
@@ -1845,12 +1846,12 @@ msgstr "TMDb 请求日志输出"
 #: /resources/settings.xml
 msgctxt "#32349"
 msgid "Use fallback English plot translations (slower)"
-msgstr "使用备用的英文剧情翻译版本（翻译速度较慢）"
+msgstr "使用备用英文剧情翻译（速度较慢）"
 
 #: /resources/settings.xml
 msgctxt "#32350"
 msgid "Retrieve English language plot translations to use as a fallback when primrary language translation is missing. Note that this setting will considerably increase detailed information lookup times and database disk usage."
-msgstr "在主要语言翻译结果缺失时，可以检索英文版本的剧情翻译内容作为备用方案。需要注意的是，这种设置会显著增加查找详细信息所需的时间，同时也会增加数据库的磁盘使用量。"
+msgstr "当首选语言翻译缺失时，拉取英文剧情翻译作为备用方案。请注意，此设置会显著增加详情信息的查询耗时与数据库磁盘占用。"
 
 #: /resources/lib/kodi/library.py
 msgctxt "#32351"
@@ -2262,7 +2263,7 @@ msgstr "提供程序允许列表已更新"
 
 #: /resources/lib/script/method.py
 msgctxt "#32439"
-msgid "The provider allowlist has been updated. "
+msgid "The provider allowlist has been updated."
 msgstr "提供程序列表已更新。"
 
 #: /resources/lib/player/configure.py
@@ -2497,8 +2498,8 @@ msgstr "从收藏夹移除"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32492"
-msgid "{} already exists in {}!\\nDo you wish to remove this item from the list?"
-msgstr "{} 已存在于 {} !\\n你想要从列表中删除吗?"
+msgid "{} already exists in {}!"
+msgstr "{} 已存在于 {} 中！"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32493"
@@ -2517,8 +2518,8 @@ msgstr "创建新节点"
 
 #: /resources/tmdbhelper/lib/items/container.py
 msgctxt "#32496"
-msgid "Add/Remove as Custom Node"
-msgstr "添加/删除为自定义节点"
+msgid "Add node"
+msgstr "添加节点"
 
 #: /resources/settings.xml
 msgctxt "#32497"
