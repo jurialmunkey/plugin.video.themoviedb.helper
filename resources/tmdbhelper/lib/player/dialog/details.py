@@ -16,7 +16,8 @@ class PlayerDetails:
     def lidc(self):
         from tmdbhelper.lib.items.database.listitem import ListItemDetails
         lidc = ListItemDetails()
-        lidc.cache_refresh = 'langs' if self.translation else None
+        lidc.cache_refresh = None
+        lidc.cache_translations = bool(self.translation)
         lidc.extendedinfo = True
         return lidc
 

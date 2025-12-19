@@ -113,6 +113,11 @@
                     </constraints>
                     <control type="spinner" format="string"/>
                 </setting>
+                <setting id="force_english_plot_fallback" type="boolean" label="32349" help="32350">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
             </group>
             <group id="3" label="32367">
                 <setting id="use_kodi_local_db" type="integer" label="32038" help="">

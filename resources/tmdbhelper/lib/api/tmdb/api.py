@@ -41,6 +41,8 @@ class TMDbAPI(NoCacheRequestAPI):
             (self.append_to_response_movies_simple, 'movies_simple'),
             (self.append_to_response_tvshow_translation, 'tvshow_translation'),
             (self.append_to_response_movies_translation, 'movies_translation'),
+            (self.append_to_response_tvshow_simple_translation, 'tvshow_simple_translation'),
+            (self.append_to_response_movies_simple_translation, 'movies_simple_translation'),
             (self.req_language, f'{self.iso_language}_en')
         ]
         try:
@@ -123,6 +125,8 @@ class TMDb(TMDbAPI):
     append_to_response_tvshow_simple = 'images,external_ids,content_ratings'
     append_to_response_movies_translation = 'credits,images,release_dates,external_ids,keywords,reviews,videos,watch/providers,translations'
     append_to_response_tvshow_translation = 'aggregate_credits,images,content_ratings,external_ids,keywords,reviews,videos,watch/providers,translations'
+    append_to_response_movies_simple_translation = 'images,external_ids,release_dates,translations'
+    append_to_response_tvshow_simple_translation = 'images,external_ids,content_ratings,translations'
     api_name = 'TMDb'
 
     @property
