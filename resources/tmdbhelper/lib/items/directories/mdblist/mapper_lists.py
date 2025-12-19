@@ -1,6 +1,6 @@
 from tmdbhelper.lib.items.directories.trakt.mapper_standard import MediaItemMapper
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.addon.plugin import get_localized
+from tmdbhelper.lib.addon.plugin import get_localized, ADDONPATH
 from tmdbhelper.lib.addon.consts import RUNSCRIPT
 
 
@@ -20,6 +20,14 @@ class ListsMDbListItemMapper(MediaItemMapper):
         'items': 'items',
         'likes': 'likes',
     }
+
+    @property
+    def icon(self):
+        return f'{ADDONPATH}/resources/icons/mdblist/mdblist.png'
+
+    def get_art(self):
+        art = {'icon': self.icon}
+        return art
 
     def get_infoproperties(self):
         infoproperties = super().get_infoproperties()

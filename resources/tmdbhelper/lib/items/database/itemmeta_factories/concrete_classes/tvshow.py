@@ -8,13 +8,14 @@ class Tvshow(MediaItem):
         MediaItemInfoLabelItemRoutes.trailer,
         MediaItemInfoLabelItemRoutes.episodecount,
         MediaItemInfoLabelItemRoutes.imdbnumber,
+        MediaItemInfoLabelItemRoutes.english_plot,
     )
 
     @property
     def infolabels_dbclist_routes(self):
         return (
             *super().infolabels_dbclist_routes,
-            (('network', None), 'name', 'studio'),
+            MediaItemInfoLabelItemRoutes.network,
         )
 
     infoproperties_dbcitem_routes = (

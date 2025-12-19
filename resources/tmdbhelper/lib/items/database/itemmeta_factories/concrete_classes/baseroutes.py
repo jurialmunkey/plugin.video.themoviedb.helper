@@ -17,6 +17,17 @@ class MediaItemInfoLabelItemRoutes:
     episodecount = (('airedcount', None), 'aired_episodes', 'episode')
     playcount = (('playcount', None), 'plays', 'playcount')
     imdbnumber = (('imdbnumber', None), 'value', 'imdbnumber')
+    series_stats_rating = (('series_stats', None), 'rating', 'rating')
+    series_stats_votes = (('series_stats', None), 'votes', 'votes')
+    series_stats_year = (('series_stats', None), 'year_first', 'year')
+    series_genre = (('series_genre', None), 'name', 'genre')
+    network = (('network', None), 'name', 'studio')
+    studio = (('studio', None), 'name', 'studio')
+    genre = (('genre', None), 'name', 'genre')
+    country = (('country', None), 'name', 'country')
+    director = (('director', None), 'name', 'director')
+    writer = (('writer', None), 'name', 'writer')
+    english_plot = (('english_translation', None), 'plot', 'plot')
 
 
 class MediaItemInfoPropertyItemRoutes:

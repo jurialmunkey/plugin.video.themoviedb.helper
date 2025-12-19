@@ -18,6 +18,7 @@ class BaseDirItem:
     infoproperties = {}
     infolabels = {}
     group = None
+    enabled = True
 
     item_builder = BaseDirItemBuilder
 
@@ -49,3 +50,10 @@ class BaseDirItem:
 
     def get_item(self, item_type, mixed_dir=False):
         return self.item_builder(self, item_type, mixed_dir).item
+
+
+class BaseDirItemTraktAuthorised(BaseDirItem):
+    @property
+    def enabled(self):
+        from jurialmunkey.window import get_property
+        return bool(get_property('TraktIsAuth'))

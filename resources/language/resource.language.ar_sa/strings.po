@@ -1489,6 +1489,11 @@ msgctxt "#32310"
 msgid "TMDb ID for {} not found!"
 msgstr "معرف TMDb لـ {} غير موجود!"
 
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_discodir.py
+msgctxt "#32325"
+msgid "Edit Filters"
+msgstr "تحرير الفلاتر"
+
 #: resources/lib/player/players.py
 msgctxt "#32311"
 msgid "Clear default player"
@@ -1597,6 +1602,11 @@ msgstr "اختيار المستخدم"
 msgctxt "#32334"
 msgid "Reset player to defaults?"
 msgstr "إعادة تعيين المشغل إلى الإعدادات الافتراضية؟"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb/routes.py
+msgctxt "#32346"
+msgid "Timezone"
+msgstr "المنطقة الزمنية"
 
 #: resources/lib/player/configure.py
 msgctxt "#32335"
@@ -2776,3 +2786,4 @@ msgstr "للاستخدام يجب ادخال مفتاح API"
 msgctxt "#32151"
 msgid "قم بزيارة [B]{}[/B] لإنشاء مفتاحك ثم أدخله في إعدادات TMDbHelper ضمن قسم مفاتيح API."
 msgstr "قم بزيارة [B]{}[/B] "
+
