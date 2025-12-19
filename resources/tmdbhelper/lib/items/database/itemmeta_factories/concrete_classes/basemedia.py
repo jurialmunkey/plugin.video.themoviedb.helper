@@ -216,10 +216,10 @@ class MediaItem(BaseItem):
         return MediaItemArtworkRoutes().configured_routes
 
     infolabels_dbclist_routes = (
-        (('genre', None), 'name', 'genre'),
-        (('country', None), 'name', 'country'),
-        (('director', None), 'name', 'director'),
-        (('writer', None), 'name', 'writer'),
+        MediaItemInfoLabelItemRoutes.genre,
+        MediaItemInfoLabelItemRoutes.country,
+        MediaItemInfoLabelItemRoutes.director,
+        MediaItemInfoLabelItemRoutes.writer,
     )
 
     infolabels_dbcitem_routes = (

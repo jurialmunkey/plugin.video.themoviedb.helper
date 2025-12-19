@@ -34,7 +34,7 @@ class Season(MediaItem):
     def infolabels_dbclist_routes(self):
         return (
             *super().infolabels_dbclist_routes,
-            (('network', None), 'name', 'studio'),
+            MediaItemInfoLabelItemRoutes.network,
         )
 
     def get_infolabels_details(self):

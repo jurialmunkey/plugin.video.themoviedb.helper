@@ -24,7 +24,7 @@ class Movie(MediaItem):
     def infolabels_dbclist_routes(self):
         return (
             *super().infolabels_dbclist_routes,
-            (('studio', None), 'name', 'studio'),
+            MediaItemInfoLabelItemRoutes.studio,
         )
 
     def get_infolabels_special(self, infolabels):

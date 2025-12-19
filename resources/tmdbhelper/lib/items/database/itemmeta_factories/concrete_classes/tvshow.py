@@ -14,7 +14,7 @@ class Tvshow(MediaItem):
     def infolabels_dbclist_routes(self):
         return (
             *super().infolabels_dbclist_routes,
-            (('network', None), 'name', 'studio'),
+            MediaItemInfoLabelItemRoutes.network,
         )
 
     infoproperties_dbcitem_routes = (
