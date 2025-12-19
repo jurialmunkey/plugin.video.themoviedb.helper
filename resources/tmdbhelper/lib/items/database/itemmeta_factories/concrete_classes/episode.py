@@ -10,6 +10,7 @@ class Episode(MediaItem):
         MediaItemInfoLabelItemRoutes.trailer,
         MediaItemInfoLabelItemRoutes.playcount,
         MediaItemInfoLabelItemRoutes.imdbnumber,
+        MediaItemInfoLabelItemRoutes.english_plot,
     )
 
     @property

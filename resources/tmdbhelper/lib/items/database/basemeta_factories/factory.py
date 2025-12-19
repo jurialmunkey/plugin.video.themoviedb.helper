@@ -177,6 +177,11 @@ def import_translation():
     return Translation
 
 
+def import_english_translation():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import EnglishTranslation
+    return EnglishTranslation
+
+
 def import_company():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Company
     return Company
@@ -482,6 +487,7 @@ FACTORY_ROUTES = {
     'video': import_video,
     'certification': import_certification,
     'translation': import_translation,
+    'english_translation': import_english_translation,
     'company': import_company,
     'broadcaster': import_broadcaster,
     'service': import_service,

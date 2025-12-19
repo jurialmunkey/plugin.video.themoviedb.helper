@@ -27,6 +27,7 @@ class MediaItemInfoLabelItemRoutes:
     country = (('country', None), 'name', 'country')
     director = (('director', None), 'name', 'director')
     writer = (('writer', None), 'name', 'writer')
+    english_plot = (('english_translation', None), 'plot', 'plot')
 
 
 class MediaItemInfoPropertyItemRoutes:

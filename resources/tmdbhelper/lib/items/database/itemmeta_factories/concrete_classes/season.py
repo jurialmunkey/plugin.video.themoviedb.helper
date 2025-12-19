@@ -7,6 +7,7 @@ class Season(MediaItem):
         MediaItemInfoLabelItemRoutes.certification,
         MediaItemInfoLabelItemRoutes.trailer,
         MediaItemInfoLabelItemRoutes.imdbnumber,
+        MediaItemInfoLabelItemRoutes.english_plot,
     )
 
     @property

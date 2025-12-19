@@ -8,6 +8,7 @@ class Tvshow(MediaItem):
         MediaItemInfoLabelItemRoutes.trailer,
         MediaItemInfoLabelItemRoutes.episodecount,
         MediaItemInfoLabelItemRoutes.imdbnumber,
+        MediaItemInfoLabelItemRoutes.english_plot,
     )
 
     @property
