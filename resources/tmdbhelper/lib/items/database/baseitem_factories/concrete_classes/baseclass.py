@@ -52,7 +52,7 @@ class BaseItem(ItemDetailsDatabaseAccess):
 
     @property
     def translation(self):
-        if self.cache_refresh != 'langs':
+        if self.cache_refresh not in ('langs', 'force'):
             return SQLITE_FALSE
         return SQLITE_TRUE
 
@@ -68,13 +68,20 @@ class BaseItem(ItemDetailsDatabaseAccess):
     def online_data_args(self):
         return (self.tmdb_type, self.tmdb_id, )
 
+    append_to_response_attribute_base = 'append_to_response_movies'
+
+    @property
+    def append_to_response_attribute(self):
+        append_to_response_attribute = self.append_to_response_attribute_base
+        if self.cache_refresh == 'basic':
+            append_to_response_attribute = f'{append_to_response_attribute}_simple'
+        if self.cache_refresh in ('langs', 'force'):
+            append_to_response_attribute = f'{append_to_response_attribute}_translation'
+        return append_to_response_attribute
+
     @property
     def online_data_kwgs(self):
-        if self.cache_refresh == 'basic':
-            return {'append_to_response': self.common_apis.tmdb_api.append_to_response_movies_simple}
-        if self.cache_refresh == 'langs':
-            return {'append_to_response': self.common_apis.tmdb_api.append_to_response_movies_translation}
-        return {'append_to_response': self.common_apis.tmdb_api.append_to_response}
+        return {'append_to_response': getattr(self.common_apis.tmdb_api, self.append_to_response_attribute)}
 
     @cached_property
     def online_data_mapped(self):
