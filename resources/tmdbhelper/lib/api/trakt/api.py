@@ -5,7 +5,7 @@ from tmdbhelper.lib.api.trakt.authenticator import TraktAuthenticator
 from tmdbhelper.lib.api.trakt.profile import TraktProfile
 
 
-API_URL = 'https://api.trakt.tv/'
+API_URL = 'https://api.trakt.tv'
 OAUTH_DEVICE_CODE_URL = 'https://api.trakt.tv/oauth/device/code'
 OAUTH_DEVICE_TOKEN_URL = 'https://api.trakt.tv/oauth/device/token'
 OAUTH_REVOKE_URL = 'https://api.trakt.tv/oauth/revoke'
