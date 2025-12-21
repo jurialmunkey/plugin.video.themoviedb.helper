@@ -340,7 +340,7 @@ msgstr "票房"
 #: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
 msgctxt "#32068"
 msgid "Revenue"
-msgstr "收益"
+msgstr "票房"
 
 #: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
 msgctxt "#32069"
@@ -390,7 +390,7 @@ msgstr "重试"
 #: /resources/lib/downloader.py
 msgctxt "#32058"
 msgid "The provided URL is either invalid or inaccesible."
-msgstr "提供的 URL 无效或不可访问。"
+msgstr "提供的网址无效或不可访问。"
 
 #: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
 msgctxt "#32079"
@@ -410,12 +410,12 @@ msgstr "提取文件"
 #: /resources/settings.xml
 msgctxt "#32082"
 msgid "Page multiplier (Other basic lists)"
-msgstr "页面乘数（其他基本列表）"
+msgstr "分页乘数（其他基本列表）"
 
 #: /resources/settings.xml
 msgctxt "#32083"
 msgid "Page multiplier (Database sync lists)"
-msgstr "页面乘数（数据库同步列表）"
+msgstr "分页乘数（数据库同步列表）"
 
 #: /resources/lib/player.py
 msgctxt "#32061"
@@ -531,7 +531,7 @@ msgstr "留空即删除"
 #: /resources/tmdbhelper/lib/script/method/modify_artwork.py
 msgctxt "#32106"
 msgid "Enter {} URL"
-msgstr "输入 {} URL"
+msgstr "输入 {} 网址"
 
 #: /resources/settings.xml
 msgctxt "#32091"
@@ -541,7 +541,7 @@ msgstr "剧集特别篇文件夹"
 #: /resources/settings.xml
 msgctxt "#32092"
 msgid "Widgets"
-msgstr "小部件"
+msgstr "小组件"
 
 #: /resources/settings.xml
 msgctxt "#32093"
@@ -665,7 +665,7 @@ msgstr "选择类型"
 #: /resources/lib/container.py
 msgctxt "#32113"
 msgid "Also accepts days from today as T-X or T+X (e.g. T-10 is ten days ago)"
-msgstr "也接受以今日为基准的日期表示法，如T-X或T+X（例如T-10表示十天前）"
+msgstr "也接受以今日为基准的日期表示法，如 T-X 或 T+X（例如 T-10 表示十天前）"
 
 #: /resources/lib/container.py
 msgctxt "#32114"
@@ -680,17 +680,17 @@ msgstr "项目"
 #: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
 msgctxt "#32135"
 msgid "Private"
-msgstr "私人"
+msgstr "私有"
 
 #: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
 msgctxt "#32136"
 msgid "Do you want to make this list a public or private list?"
-msgstr "您想将此列表设为公开列表还是私人列表？"
+msgstr "您想将此列表设为公开列表还是私有列表？"
 
 #: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
 msgctxt "#32137"
 msgid "Public or private list?"
-msgstr "公开名单还是私人名单？"
+msgstr "公开名单还是私有名单？"
 
 #: /resources/settings.xml
 msgctxt "#32138"
@@ -785,17 +785,17 @@ msgstr "正在播出"
 #: /resources/lib/container.py
 msgctxt "#32120"
 msgid "Select Region for Release"
-msgstr "区域"
+msgstr "选择发布区域"
 
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
 msgctxt "#32157"
 msgid "Decades"
-msgstr "十年"
+msgstr "年代"
 
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
 msgctxt "#32158"
 msgid "Certifications"
-msgstr "认证"
+msgstr "分级认证"
 
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
 msgctxt "#32159"
@@ -810,7 +810,7 @@ msgstr "清除搜索历史记录"
 #: /resources/lib/context.py
 msgctxt "#32122"
 msgid "XBMCVFS reports unable to create path"
-msgstr "XBMCVFS 报告无法创建路径"
+msgstr "XBMC 虚拟文件系统报告无法创建路径"
 
 #: /resources/lib/context.py
 msgctxt "#32123"
@@ -830,7 +830,7 @@ msgstr "你确定要将这个 Trakt 列表添加到你的 Kodi 媒体库中吗�
 #: /resources/tmdbhelper/lib/script/discover/tmdb.py
 msgctxt "#32165"
 msgid "Add another item?"
-msgstr "添加另一项？"
+msgstr "添加另一项目？"
 
 #: /resources/lib/context.py
 msgctxt "#32130"
@@ -969,7 +969,7 @@ msgstr "本周趋势"
 #: /resources/lib/plugin.py
 msgctxt "#32180"
 msgid "In Theatres"
-msgstr "在剧场"
+msgstr "院线上映中"
 
 #: /resources/lib/plugin.py
 msgctxt "#32181"
@@ -1004,7 +1004,7 @@ msgstr "所有"
 #: /resources/lib/plugin.py
 msgctxt "#32187"
 msgid "Collections"
-msgstr "集合"
+msgstr "合集"
 
 #: /resources/lib/plugin.py
 msgctxt "#32188"
@@ -1104,7 +1104,7 @@ msgstr "按观看变现类型筛选"
 #: /resources/tmdbhelper/lib/script/discover/tmdb.py
 msgctxt "#32219"
 msgid "Certification Country"
-msgstr "认证国家"
+msgstr "分级认证国家"
 
 #: /resources/tmdbhelper/lib/script/discover/tmdb/routes.py
 msgctxt "#32220"
@@ -1194,7 +1194,7 @@ msgstr "建议"
 #: /resources/lib/plugin.py
 msgctxt "#32224"
 msgid "Similar"
-msgstr "类似的"
+msgstr "类似"
 
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32238"
@@ -1657,7 +1657,7 @@ msgstr "选择列表"
 #: /resources/lib/script/router.py
 msgctxt "#32313"
 msgid "Enter URL to download players"
-msgstr "输入地址下载播放器"
+msgstr "输入网址下载播放器"
 
 #: /resources/lib/script/router.py
 msgctxt "#32314"
@@ -1665,7 +1665,7 @@ msgid ""
 "Download players from URL?\n"
 "[B]{}[/B]"
 msgstr ""
-"从该地址下载播放器?\n"
+"从该网址下载播放器?\n"
 "[B]{}[/B]"
 
 #: /resources/lib/trakt/api.py
@@ -1795,7 +1795,7 @@ msgstr "关闭而不保存"
 #: /resources/lib/player/configure.py
 msgctxt "#32339"
 msgid "{} playback URL resolve method"
-msgstr "{} 播放 URL 解析方式"
+msgstr "{} 播放网址解析方式"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32340"
@@ -1804,7 +1804,7 @@ msgid ""
 "\n"
 "Are you sure you want to set this player's resolve method to PlayMedia?"
 msgstr ""
-"请注意，setResolvedUrl 是 Kodi 解析播放 URL 的首选方法。只有当您在此特定播放器中使用 setResolvedUrl 时遇到困难时，才应使用 PlayMedia 方法。\n"
+"请注意，setResolvedUrl 是 Kodi 解析播放网址的首选方法。只有当您在此特定播放器中使用 setResolvedUrl 时遇到困难时，才应使用 PlayMedia 方法。\n"
 "\n"
 "你确定要将此播放器的解析方法设置为 PlayMedia 吗？"
 
@@ -1856,7 +1856,7 @@ msgstr "当首选语言翻译缺失时，拉取英文剧情翻译作为备用方
 #: /resources/lib/kodi/library.py
 msgctxt "#32351"
 msgid "Dummy ResolvedURL"
-msgstr "虚拟解析 URL"
+msgstr "虚拟解析网址"
 
 #: /resources/settings.xml
 msgctxt "#32352"
@@ -1877,7 +1877,7 @@ msgid ""
 msgstr ""
 "该播放器是否直接解析为单个可播放文件?\n"
 "\n"
-"对于任何直接从单一来源播放的播放器，请选择“是”。对于抓取多个来源或不使用setResolvedURL方法的玩家，请选择“否”."
+"对于任何直接从单一来源播放的播放器，请选择“是”。对于抓取多个来源或不使用 setResolvedURL 方法的玩家，请选择“否”."
 
 #: /resources/lib/script/sync.py
 msgctxt "#32355"
@@ -2084,7 +2084,7 @@ msgstr "原始"
 #: /resources/settings.xml
 msgctxt "#32398"
 msgid "Medium"
-msgstr "普通"
+msgstr "中等"
 
 #: /resources/settings.xml
 msgctxt "#32400"
@@ -2159,7 +2159,7 @@ msgstr "首映"
 #: /resources/lib/script/sync.py
 msgctxt "#32418"
 msgid "Adds text to the start of the MPAA rating. For example if set to 'Rated' a 'PG' rating is displayed as 'Rated PG'. Cached items will need to be refreshed."
-msgstr "在 MPAA 分级的开头添加文本。例如，如果设置为“分级”，则“ PG ”分级显示为“分级 PG ”。缓存的项目将需要刷新。"
+msgstr "在美国电影协会分级的开头添加文本。例如，如果设置为“分级”，则“ PG ”分级显示为“分级 PG ”。缓存的项目将需要刷新。"
 
 #: /resources/settings.xml
 msgctxt "#32419"
@@ -2204,7 +2204,7 @@ msgstr "返回上级文件夹 (..)"
 #: /resources/lib/player/configure.py
 msgctxt "#32427"
 msgid "Use current folder as search URL"
-msgstr "将此文件夹作为搜索地址"
+msgstr "将此文件夹作为搜索网址"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32428"
@@ -2214,7 +2214,7 @@ msgstr "浏览电影搜索网址"
 #: /resources/lib/player/configure.py
 msgctxt "#32429"
 msgid "Browse for TVSHOW search url"
-msgstr "剧集浏览搜索地址"
+msgstr "剧集浏览搜索网址"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32430"
@@ -2224,7 +2224,7 @@ msgstr "为播放器新建名称"
 #: /resources/lib/player/configure.py
 msgctxt "#32431"
 msgid "Use the same search URL for tvshows as movies?"
-msgstr "搜索电影和剧集使用同样地址的吗？"
+msgstr "搜索电影和剧集使用同样网址的吗？"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32432"
@@ -2234,12 +2234,12 @@ msgstr "选择模板"
 #: /resources/lib/player/configure.py
 msgctxt "#32433"
 msgid "Missing QUERYKEY in URL"
-msgstr "地址中缺少 QUERYKEY"
+msgstr "网址中缺少 QUERYKEY"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32434"
 msgid "You must insert QUERYKEY where the search query for the URL goes"
-msgstr "您必须在搜索地址时插入 QUERYKEY"
+msgstr "您必须在搜索网址时插入 QUERYKEY"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32435"
@@ -2379,7 +2379,7 @@ msgstr "提名"
 #: /resources/settings.xml
 msgctxt "#32463"
 msgid "Cache items in custom lists you own for 24 hours"
-msgstr "将您创建的自定义列表中的项目缓存24小时"
+msgstr "将您创建的自定义列表中的项目缓存 24 小时"
 
 #: /resources/settings.xml
 msgctxt "#32466"
@@ -2469,17 +2469,17 @@ msgstr "增加评分"
 #: /resources/tmdbhelper/lib/api/tmdb/discover.py
 msgctxt "#32486"
 msgid "Certification"
-msgstr "证书"
+msgstr "分级认证"
 
 #: /resources/tmdbhelper/lib/api/tmdb/discover.py
 msgctxt "#32487"
 msgid "Certification ( < or = )"
-msgstr "证书小于等于"
+msgstr "分级认证小于等于"
 
 #: /resources/tmdbhelper/lib/api/tmdb/discover.py
 msgctxt "#32488"
 msgid "Certification ( > or = )"
-msgstr "证书大于等于"
+msgstr "分级认证大于等于"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32489"
@@ -2535,27 +2535,27 @@ msgstr "部分插件的元数据质量较差，未能正确填充项目的媒体
 #: /resources/settings.xml
 msgctxt "#32499"
 msgid "Page multipliers (higher is slower)"
-msgstr "页面倍数（越高速度越慢）"
+msgstr "分页乘数（越高速度越慢）"
 
 #: /resources/settings.xml
 msgctxt "#32500"
 msgid "Page multiplier (TMDb basic lists)"
-msgstr "页面倍率（TMDb 基本列表）"
+msgstr "分页乘数（TMDb 基本列表）"
 
 #: /resources/settings.xml
 msgctxt "#32501"
 msgid "Page multiplier (Trakt basic lists)"
-msgstr "页面倍率（Trakt 基本列表）"
+msgstr "分页乘数（Trakt 基本列表）"
 
 #: /resources/settings.xml
 msgctxt "#32502"
 msgid "Page multiplier (Trakt sync lists)"
-msgstr "页面倍率（Trakt 同步列表）"
+msgstr "分页乘数（Trakt 同步列表）"
 
 #: /resources/settings.xml
 msgctxt "#32503"
 msgid "Page multiplier (Library windows)"
-msgstr "页面倍率（媒体库列表视图）"
+msgstr "分页乘数（媒体库列表视图）"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32504"
@@ -2585,7 +2585,7 @@ msgstr "在配置播放器插件时强制更新媒体库元数据缓存"
 #: /resources/settings.xml
 msgctxt "#32509"
 msgid "Use alternative TMDb API url"
-msgstr "使用备用TMDb API url"
+msgstr "使用备用 TMDb API 网址"
 
 #: /resources/settings.xml
 msgctxt "#32514"
@@ -2620,7 +2620,7 @@ msgstr "TMDb"
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32521"
 msgid "Rated"
-msgstr "已评分"
+msgstr "分级"
 
 #: /resources/settings.xml
 msgctxt "#32522"
@@ -2854,11 +2854,11 @@ msgctxt "#32002"
 msgid "Days to cache details"
 msgstr "缓存详细信息的天数"
 
-# "MPAA rating prefix" 通常指电影分级标签的前缀（例如 Rated: PG-13 中的 Rated: 部分）
+# "MPAA rating prefix" 通常指美国电影协会分级前缀（例如 Rated: PG-13 中的 Rated: 部分）
 #: /resources/settings.xml
 msgctxt "#32004"
 msgid "MPAA rating prefix"
-msgstr "MPAA 评级前缀"
+msgstr "美国电影协会分级前缀"
 
 #: /resources/settings.xml
 msgctxt "#32005"
@@ -2893,7 +2893,7 @@ msgstr "播放器"
 #: /resources/settings.xml
 msgctxt "#32016"
 msgid "Update players from URL"
-msgstr "更新播放器 URL"
+msgstr "从网址更新播放器"
 
 #: /resources/settings.xml
 msgctxt "#32017"
