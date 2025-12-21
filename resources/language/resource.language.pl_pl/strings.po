@@ -1635,6 +1635,11 @@ msgctxt "#32324"
 msgid "Pilot"
 msgstr "Pilot"
 
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_discodir.py
+msgctxt "#32325"
+msgid "Edit Filters"
+msgstr "Edytuj filtry"
+
 #: /resources/lib/player/players.py
 msgctxt "#32311"
 msgid "Clear default player"
@@ -1739,6 +1744,11 @@ msgctxt "#32333"
 msgid "User Choice"
 msgstr "Wybór użytkownika"
 
+#: /resources/tmdbhelper/lib/script/discover/tmdb/routes.py
+msgctxt "#32346"
+msgid "Timezone"
+msgstr "Strefa czasowa"
+
 #: /resources/lib/player/configure.py
 msgctxt "#32334"
 msgid "Reset player to defaults?"
@@ -1828,6 +1838,16 @@ msgstr "Wyjście dziennika żądań Trakt"
 msgctxt "#32348"
 msgid "Log output of TMDb request"
 msgstr "Wyjście dziennika żądań TMDB"
+
+#: /resources/settings.xml
+msgctxt "#32349"
+msgid "Use fallback English plot translations (slower)"
+msgstr "Użyj zastępczo angielskich opisów fabuły (wolniej)"
+
+#: /resources/settings.xml
+msgctxt "#32350"
+msgid "Retrieve English language plot translations to use as a fallback when primrary language translation is missing. Note that this setting will considerably increase detailed information lookup times and database disk usage."
+msgstr "Pobierz opisy fabuły w języku angielskim, aby użyć ich zastępczo w przypadku braku opisów w języku podstawowym. Pamiętaj, że to ustawienie wydłuży czas wyszukiwania informacji i zwiększy wykorzystanie dysku przez bazę danych."
 
 #: /resources/settings.xml
 msgctxt "#32351"
