@@ -274,7 +274,7 @@ class ItemListSyncDataNextUp(ItemListSyncData):
 
     def get_presorted_items(self):
         key_presorted = 'next_episode_aired_at' if self.sort_by == 'airdate' else 'last_watched_at'
-        return sorted(self.syncdata_getter.items, key=lambda x: x[key_presorted], reverse=True)
+        return sorted(self.syncdata_getter.items, key=lambda x: x[key_presorted] or '', reverse=True)
 
     @cached_property
     def sort_by_days(self):
