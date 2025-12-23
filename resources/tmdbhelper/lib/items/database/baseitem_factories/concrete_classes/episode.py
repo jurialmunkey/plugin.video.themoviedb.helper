@@ -7,6 +7,7 @@ from tmdbhelper.lib.files.locker import mutexlock
 class Episode(Season):
     table = 'episode'
     ftv_type = None
+    append_to_response_tmdbtype = 'episode'
 
     @property
     def data_cond(self):
@@ -64,8 +65,6 @@ class Episode(Season):
     @property
     def online_data_args(self):
         return (self.tmdb_type, self.tmdb_id, 'season', self.season, 'episode', self.episode)
-
-    append_to_response_attribute_base = 'append_to_response_tvshow'
 
     @property
     def cached_data_table(self):

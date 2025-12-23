@@ -19,6 +19,7 @@ class BaseItem(ItemDetailsDatabaseAccess):
     extendedinfo = False
     routes_basemeta_db = {}
     allowlist_infolabel_keys = _ListItemInfoTagVideo._tag_attr
+    append_to_response_tmdbtype = 'movie'
 
     @property
     def data_cond(self):
@@ -69,6 +70,14 @@ class BaseItem(ItemDetailsDatabaseAccess):
         return False
 
     @property
+    def append_to_response_extended(self):
+        return self.cache_refresh != 'basic'
+
+    @property
+    def append_to_response_language(self):
+        return self.is_translation
+
+    @property
     def language(self):
         return self.common_apis.tmdb_api.language
 
@@ -80,20 +89,13 @@ class BaseItem(ItemDetailsDatabaseAccess):
     def online_data_args(self):
         return (self.tmdb_type, self.tmdb_id, )
 
-    append_to_response_attribute_base = 'append_to_response_movies'
-
-    @property
-    def append_to_response_attribute(self):
-        append_to_response_attribute = self.append_to_response_attribute_base
-        if self.cache_refresh == 'basic':
-            append_to_response_attribute = f'{append_to_response_attribute}_simple'
-        if self.is_translation:
-            append_to_response_attribute = f'{append_to_response_attribute}_translation'
-        return append_to_response_attribute
-
     @property
     def online_data_kwgs(self):
-        return {'append_to_response': getattr(self.common_apis.tmdb_api, self.append_to_response_attribute)}
+        return {'append_to_response': self.common_apis.tmdb_api.get_append_to_response(
+            tmdbtype=self.append_to_response_tmdbtype,
+            extended=self.append_to_response_extended,
+            language=self.append_to_response_language,
+        )}
 
     @cached_property
     def online_data_mapped(self):

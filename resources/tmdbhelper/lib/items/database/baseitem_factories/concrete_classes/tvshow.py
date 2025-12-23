@@ -6,6 +6,7 @@ class Tvshow(MediaItem):
     table = 'tvshow'
     tmdb_type = 'tv'
     ftv_type = 'tv'
+    append_to_response_tmdbtype = 'tv'
 
     @property
     def cached_data_table(self):
@@ -47,8 +48,6 @@ class Tvshow(MediaItem):
         cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('next_aired'))
         cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('last_aired'))
         return tuple(cached_data_keys)
-
-    append_to_response_attribute_base = 'append_to_response_tvshow'
 
     def config_basemeta_db_tvshow(self, database_obj):
         database_obj = self.config_basemeta_db(database_obj)

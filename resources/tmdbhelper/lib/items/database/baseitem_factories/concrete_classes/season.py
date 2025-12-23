@@ -9,8 +9,7 @@ class Season(Tvshow):
     cached_data_check_key = 'tvshow_id'
     expiry_time = SHORTER_EXPIRY  # Refresh weekly in case of new episodes
     ftv_type = None
-
-    append_to_response_attribute_base = 'append_to_response_tvshow'
+    append_to_response_tmdbtype = 'season'
 
     @property
     def data_cond(self):
