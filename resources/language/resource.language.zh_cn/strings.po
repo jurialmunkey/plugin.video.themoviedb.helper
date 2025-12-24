@@ -84,7 +84,7 @@ msgstr "德语（奥地利）"
 
 #: /resources/settings.xml
 msgctxt "#32013"
-msgid "Get watched indicators, episode counts, and resume points"
+msgid "Get watched indicators, episode counts, 和 resume points"
 msgstr "获取已观看标识、剧集计数和续播点"
 
 msgctxt "#30010"
@@ -94,7 +94,7 @@ msgstr "德语（瑞士）"
 #: /resources/settings.xml
 msgctxt "#32015"
 msgid "Additional season: Up next"
-msgstr "更多季：即将显示"
+msgstr "追加季：下一个"
 
 msgctxt "#30011"
 msgid "German (Germany)"
@@ -107,7 +107,7 @@ msgstr "希腊语（希腊）"
 #: /resources/settings.xml
 msgctxt "#32018"
 msgid "Additional season: Anticipated"
-msgstr "更多季：预期"
+msgstr "追加季：待上线"
 
 msgctxt "#30013"
 msgid "English (Australia)"
@@ -116,7 +116,7 @@ msgstr "英语（澳大利亚）"
 #: /resources/settings.xml
 msgctxt "#32020"
 msgid "Additional season: Specials"
-msgstr "更多季：特别篇"
+msgstr "追加季：特别篇"
 
 msgctxt "#30014"
 msgid "English (Canada)"
@@ -315,17 +315,17 @@ msgstr "网络"
 #: /resources/tmdbhelper/lib/api/trakt/sorting.py
 msgctxt "#32063"
 msgid "Added"
-msgstr "添加"
+msgstr "已添加"
 
 #: /resources/tmdbhelper/lib/items/directories/lists_base.py
 msgctxt "#32064"
 msgid "Related"
-msgstr "相关"
+msgstr "相关内容"
 
 #: /resources/tmdbhelper/lib/items/directories/trakt/lists_related.py
 msgctxt "#32065"
 msgid "Watchers"
-msgstr "监视器"
+msgstr "追更人数"
 
 #: /resources/settings.xml
 msgctxt "#32038"
@@ -335,7 +335,7 @@ msgstr "从 Kodi 本地媒体库数据库获取扩展元数据"
 #: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
 msgctxt "#32067"
 msgid "Budget"
-msgstr "票房"
+msgstr "预算"
 
 #: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
 msgctxt "#32068"
@@ -405,7 +405,7 @@ msgstr "成功！"
 #: /resources/lib/downloader.py
 msgctxt "#32060"
 msgid "files extracted"
-msgstr "提取文件"
+msgstr "文件已提取"
 
 #: /resources/settings.xml
 msgctxt "#32082"
@@ -556,7 +556,7 @@ msgstr "输入代码"
 #: /resources/lib/traktapi.py
 msgctxt "#32096"
 msgid "Go to [B]https://trakt.tv/activate[/B]"
-msgstr "转到[B]https://trakt.tv/activate[/B]"
+msgstr "转到 [B]https://trakt.tv/activate[/B]"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32097"
@@ -650,7 +650,7 @@ msgstr "顶"
 #: /resources/settings.xml
 msgctxt "#32129"
 msgid "Override player monitor clearlogo with artwork from TMDbHelper"
-msgstr "用 TMDbHelper 中的图像覆盖播放器监视器的透明徽标"
+msgstr "用 TMDbHelper 媒体资源覆盖播放器监视器的透明徽标"
 
 #: /resources/lib/container.py
 msgctxt "#32111"
@@ -700,7 +700,7 @@ msgstr "滚动"
 #: /resources/settings.xml
 msgctxt "#32139"
 msgid "Rate items on TMDb after watching"
-msgstr "观看后为 TMDb 上的项目评分"
+msgstr "观看后在 TMDb 为条目评分"
 
 #: /resources/tmdbhelper/lib/player/configure.py
 msgctxt "#32140"
@@ -1319,37 +1319,37 @@ msgstr "含其他人员"
 #: /resources/lib/userdiscover.py
 msgctxt "#32250"
 msgid "Primary Release Year"
-msgstr "主要发布年份"
+msgstr "首映年份"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32251"
 msgid "Primary Release Date After"
-msgstr "主要发布之后"
+msgstr "首映之后"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32252"
 msgid "Primary Release Date Before"
-msgstr "主要发布之前"
+msgstr "首映发布之前"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32253"
 msgid "Release Date After"
-msgstr "发布之后"
+msgstr "上映之后"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32254"
 msgid "Release Date Before"
-msgstr "发布之前"
+msgstr "上映之前"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32255"
 msgid "Release Type"
-msgstr "发布类型"
+msgstr "上映类型"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32256"
 msgid "Release Region"
-msgstr "发布区域"
+msgstr "上映区域"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32257"
@@ -1359,12 +1359,12 @@ msgstr "使用网络"
 #: /resources/lib/userdiscover.py
 msgctxt "#32258"
 msgid "Air Date After"
-msgstr "播出之后"
+msgstr "播出后"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32259"
 msgid "Air Date Before"
-msgstr "播出之前"
+msgstr "播出前"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32260"
@@ -1866,7 +1866,7 @@ msgstr "占位视频时长（秒）"
 #: /resources/lib/player/players.py
 msgctxt "#32353"
 msgid "Missing \"is_resolvable\" Flag"
-msgstr "缺少“is_resolutible”标志"
+msgstr "缺少 “is_resolutible” 标志"
 
 #: /resources/lib/player/players.py
 msgctxt "#32354"
@@ -2304,7 +2304,7 @@ msgstr "plugin:// search URL for {}"
 #: /resources/lib/player/configure.py
 msgctxt "#32447"
 msgid "Up Next Only"
-msgstr "仅下一个"
+msgstr "仅“下一个”"
 
 #: /resources/settings.xml
 msgctxt "#32448"
@@ -2399,7 +2399,7 @@ msgstr "启动时的授权和同步通知"
 #: /resources/settings.xml
 msgctxt "#32469"
 msgid "Ignore articles when sorting alphabetically"
-msgstr "按字母顺序排序时忽略文章"
+msgstr "按字母顺序排序时忽略冠词"
 
 #: /resources/settings.xml
 msgctxt "#32470"
