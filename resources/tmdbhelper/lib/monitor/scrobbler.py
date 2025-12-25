@@ -138,7 +138,7 @@ class PlayerScrobbler():
         if not self.started or self.stopped:
             return
         kodi_log(f'SCROBBLER: [Stop] {self.content_id} -- {self.progress:.2f}%', 2)
-        self.trakt_scrobbling('stop')
+        self.trakt_scrobbling('stop') if not self.syncing else None
         self.set_kodi_watched()
         self.set_tmdb_ratings()
         self.update_stats()
@@ -149,7 +149,7 @@ class PlayerScrobbler():
     def sync(self, tmdb_type, tmdb_id):
         if self.syncing:
             return
-        if not self.started:
+        if not self.started or self.stopped:
             return
         if self.progress < 80:
             return
