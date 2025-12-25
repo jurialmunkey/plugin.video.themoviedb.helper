@@ -94,7 +94,7 @@ msgstr "德语（瑞士）"
 #: /resources/settings.xml
 msgctxt "#32015"
 msgid "Additional season: Up next"
-msgstr "追加季：下一个"
+msgstr "追加季：下个播放"
 
 msgctxt "#30011"
 msgid "German (Germany)"
@@ -355,7 +355,7 @@ msgstr "选择操作"
 #: /resources/lib/container.py
 msgctxt "#32043"
 msgid "Up Next"
-msgstr "下一个"
+msgstr "下个播放"
 
 #: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
 msgctxt "#32072"
@@ -2008,12 +2008,12 @@ msgstr "隐藏特殊"
 #: /resources/settings.xml
 msgctxt "#32380"
 msgid "Hide Up Next"
-msgstr "隐藏“下一个”"
+msgstr "隐藏“下个播放”"
 
 #: /resources/settings.xml
 msgctxt "#32381"
 msgid "Hide Up Next and Specials"
-msgstr "隐藏“下一个”和特别节目"
+msgstr "隐藏“下个播放”和特别节目"
 
 #: /resources/settings.xml
 msgctxt "#32382"
@@ -2028,7 +2028,7 @@ msgstr "隐藏剧集分组与特别节目"
 #: /resources/settings.xml
 msgctxt "#32384"
 msgid "Hide Episode Groups and Up Next"
-msgstr "隐藏剧集分组和“下一个”"
+msgstr "隐藏剧集分组和下个播放"
 
 #: /resources/settings.xml
 msgctxt "#32385"
@@ -2304,7 +2304,7 @@ msgstr "plugin:// search URL for {}"
 #: /resources/lib/player/configure.py
 msgctxt "#32447"
 msgid "Up Next Only"
-msgstr "仅“下一个”"
+msgstr "仅“下个播放”"
 
 #: /resources/settings.xml
 msgctxt "#32448"
