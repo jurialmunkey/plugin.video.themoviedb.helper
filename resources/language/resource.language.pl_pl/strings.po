@@ -1977,6 +1977,11 @@ msgid "fanart"
 msgstr "fanart"
 
 #: /resources/settings.xml
+msgctxt "#32386"
+msgid "Use online ratings in details monitor"
+msgstr "Korzystaj z ocen online w monitorze szczegółów"
+
+#: /resources/settings.xml
 msgctxt "#32373"
 msgid "Restrict to library strm"
 msgstr "Ogranicz do streamów biblioteki"
