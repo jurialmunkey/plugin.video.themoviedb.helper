@@ -1931,6 +1931,11 @@ msgctxt "#32364"
 msgid "Reroute PlayMedia to xbmc.Player()"
 msgstr "Przekieruj PlayMedia do xbmc.Player()"
 
+#: /resources/settings.xml
+msgctxt "#32377"
+msgid "Use online artwork in image monitor"
+msgstr "Użyj grafiki online w monitorze obrazów"
+
 #: /resources/lib/addon/plugin.py
 msgctxt "#32365"
 msgid "Combined"
