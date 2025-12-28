@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-12-24 14:08+0800\n"
+"PO-Revision-Date: 2025-12-28 19:15+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -1974,6 +1974,11 @@ msgstr "首选艺术图片缩略图"
 msgctxt "#32372"
 msgid "fanart"
 msgstr "同人画"
+
+#: /resources/settings.xml
+msgctxt "#32386"
+msgid "Use online ratings in details monitor"
+msgstr "在详情面板中使用在线评分"
 
 #: /resources/settings.xml
 msgctxt "#32373"
