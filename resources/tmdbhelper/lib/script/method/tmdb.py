@@ -27,6 +27,7 @@ def refresh_item(tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
         sync.season = season
         sync.episode = episode
         sync.cache_refresh = 'force'
+        sync.cache_translations = True
         sync.data
 
     with BusyDialog():

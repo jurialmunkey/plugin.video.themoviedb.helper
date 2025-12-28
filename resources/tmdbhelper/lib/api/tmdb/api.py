@@ -12,8 +12,6 @@ class TMDbAPI(NoCacheRequestAPI):
 
     api_key = API_KEY
     api_url = API_URL
-    append_to_response = ''
-    append_to_response_person = ''
     api_name = 'TMDbAPI'
 
     def __init__(
@@ -30,31 +28,6 @@ class TMDbAPI(NoCacheRequestAPI):
             req_api_key=f'api_key={api_key}')
         self.language = language
         TMDb.api_key = api_key
-
-    @property
-    def req_strip(self):
-        req_strip_add = [
-            (self.append_to_response, 'standard'),
-            (self.append_to_response_person, 'person'),
-            (self.append_to_response_tvshow, 'tvshow'),
-            (self.append_to_response_tvshow_simple, 'tvshow_simple'),
-            (self.append_to_response_movies_simple, 'movies_simple'),
-            (self.req_language, f'{self.iso_language}_en')
-        ]
-        try:
-            return self._req_strip + req_strip_add
-        except AttributeError:
-            self._req_strip = [
-                (self.req_api_url, self.req_api_name),
-                (self.req_api_key, ''),
-                ('is_xml=False', ''),
-                ('is_xml=True', '')
-            ]
-            return self._req_strip + req_strip_add
-
-    @req_strip.setter
-    def req_strip(self, value):
-        self._req_strip = value
 
     @property
     def req_language(self):
@@ -113,14 +86,37 @@ class TMDbAPI(NoCacheRequestAPI):
         return self.get_api_request_json(requrl, postdata=postdata, headers=headers, method=method)
 
 
+ATR_STANDARD = 0
+ATR_EXTENDED = 1
+ATR_LANGUAGE = 2
+
+
 class TMDb(TMDbAPI):
-    append_to_response = 'credits,images,release_dates,external_ids,keywords,reviews,videos,watch/providers'
-    append_to_response_tvshow = 'aggregate_credits,images,content_ratings,external_ids,keywords,reviews,videos,watch/providers'
-    append_to_response_person = 'images,external_ids,movie_credits,tv_credits'
-    append_to_response_movies_simple = 'images,external_ids,release_dates'
-    append_to_response_tvshow_simple = 'images,external_ids,content_ratings'
-    append_to_response_movies_translation = 'credits,images,release_dates,external_ids,keywords,reviews,videos,watch/providers,translations'
-    append_to_response_tvshow_translation = 'aggregate_credits,images,content_ratings,external_ids,keywords,reviews,videos,watch/providers,translations'
+
+    append_to_response_endpoints = {
+        'images': (ATR_STANDARD, ('person', 'movie', 'tv', 'season', 'episode', 'collection')),
+        'release_dates': (ATR_STANDARD, ('person', 'movie', )),
+        'external_ids': (ATR_STANDARD, ('person', 'movie', 'tv', 'season', 'episode', )),
+        'content_ratings': (ATR_STANDARD, ('tv', )),
+        'movie_credits': (ATR_STANDARD, ('person', )),
+        'tv_credits': (ATR_STANDARD, ('person', )),
+        'credits': (ATR_EXTENDED, ('movie', 'episode', )),
+        'keywords': (ATR_EXTENDED, ('movie', 'tv', )),
+        'reviews': (ATR_EXTENDED, ('movie', 'tv', )),
+        'videos': (ATR_EXTENDED, ('movie', 'tv', 'season', 'episode', )),
+        'watch/providers': (ATR_EXTENDED, ('movie', 'tv', 'season', )),
+        'aggregate_credits': (ATR_EXTENDED, ('tv', 'season', )),
+        'translations': (ATR_LANGUAGE, ('person', 'movie', 'tv', 'season', 'episode', 'collection')),
+    }
+
+    def get_append_to_response(self, tmdbtype, extended=False, language=False):
+        endpoints = (
+            k for k, v in self.append_to_response_endpoints.items()
+            if (v[0] == ATR_STANDARD or (extended and v[0] == ATR_EXTENDED) or (language and v[0] == ATR_LANGUAGE))
+            and tmdbtype in v[1]
+        )
+        return ','.join(endpoints)
+
     api_name = 'TMDb'
 
     @property

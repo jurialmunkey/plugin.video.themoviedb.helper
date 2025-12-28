@@ -139,6 +139,27 @@ class DiscoverMulti(DiscoverList):
 
     separator = '%2C'
 
+    @staticmethod
+    def get_load_value_separator(value):
+        return '%2C' if '%2C' in value or '%2c' in value else '%7C'
+
+    def get_load_value_split(self, value):
+        import re
+        return re.split(self.separator, value, flags=re.IGNORECASE)
+
+    def get_load_value_generator(self, value, id_func, item_class=DiscoverItem):
+        return (
+            item_class(id_func(load_value), load_value)
+            for load_value in self.get_load_value_split(value)
+        )
+
+    def get_load_value_index(self, value):
+        return next((x for x, i in enumerate(self.routes) if str(i.value) == str(value)), None)
+
+    def load_value(self, value):
+        self.separator = self.get_load_value_separator(value)
+        self.idx = [self.get_load_value_index(i) for i in self.get_load_value_split(value) if i]
+
     @property
     def dialog_select(self):
         return Dialog().multiselect

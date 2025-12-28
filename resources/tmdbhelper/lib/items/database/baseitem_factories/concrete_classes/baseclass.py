@@ -7,16 +7,19 @@ from tmdbhelper.lib.items.database.itemmeta_factories.factory import ItemMetaFac
 from infotagger.listitem import _ListItemInfoTagVideo
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_days_to_air
 from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY, SHORTER_EXPIRY, DAY_IN_SECONDS, DATALEVEL_MIN, DATALEVEL_MAX, SQLITE_TRUE, SQLITE_FALSE
+from tmdbhelper.lib.addon.plugin import get_setting
 
 
 class BaseItem(ItemDetailsDatabaseAccess):
     cache_refresh = None  # Set to "never" for cache only, or "force" for forced refresh
+    cache_translations = False
     item_info = 'item'
     expiry_time = DEFAULT_EXPIRY
     cached_data_check_key = 'tmdb_id'
     extendedinfo = False
     routes_basemeta_db = {}
     allowlist_infolabel_keys = _ListItemInfoTagVideo._tag_attr
+    append_to_response_tmdbtype = 'movie'
 
     @property
     def data_cond(self):
@@ -52,9 +55,27 @@ class BaseItem(ItemDetailsDatabaseAccess):
 
     @property
     def translation(self):
-        if self.cache_refresh != 'langs':
-            return SQLITE_FALSE
-        return SQLITE_TRUE
+        if self.is_translation:
+            return SQLITE_TRUE
+        return SQLITE_FALSE
+
+    @property
+    def is_translation(self):
+        if self.cache_refresh == 'force':
+            return True
+        if self.cache_translations:
+            return True
+        if get_setting('force_english_plot_fallback'):
+            return True
+        return False
+
+    @property
+    def append_to_response_extended(self):
+        return self.cache_refresh != 'basic'
+
+    @property
+    def append_to_response_language(self):
+        return self.is_translation
 
     @property
     def language(self):
@@ -70,11 +91,11 @@ class BaseItem(ItemDetailsDatabaseAccess):
 
     @property
     def online_data_kwgs(self):
-        if self.cache_refresh == 'basic':
-            return {'append_to_response': self.common_apis.tmdb_api.append_to_response_movies_simple}
-        if self.cache_refresh == 'langs':
-            return {'append_to_response': self.common_apis.tmdb_api.append_to_response_movies_translation}
-        return {'append_to_response': self.common_apis.tmdb_api.append_to_response}
+        return {'append_to_response': self.common_apis.tmdb_api.get_append_to_response(
+            tmdbtype=self.append_to_response_tmdbtype,
+            extended=self.append_to_response_extended,
+            language=self.append_to_response_language,
+        )}
 
     @cached_property
     def online_data_mapped(self):
@@ -167,12 +188,14 @@ class BaseItem(ItemDetailsDatabaseAccess):
             return self.get_item_meta(data)
 
     def set_cached_data(self, item_id, mediatype, expiry, datalevel, fanart_tv, translation, language, table, keys, mapped_data, delete_cascade=False):
+        baseitem_keys = ('mediatype', 'expiry', 'datalevel', 'fanart_tv', 'language')
+        baseitem_values = (mediatype, expiry, datalevel, fanart_tv, language)
         self.del_cached('baseitem', item_id) if delete_cascade else None
         self.set_cached_values(
             table='baseitem',
             item_id=item_id,
-            keys=('mediatype', 'expiry', 'datalevel', 'fanart_tv', 'translation', 'language'),
-            values=(mediatype, expiry, datalevel, fanart_tv, translation, language)
+            keys=baseitem_keys if not translation else (*baseitem_keys, 'translation'),
+            values=baseitem_values if not translation else (*baseitem_values, translation)
         )
         self.set_cached_many(table, keys, mapped_data)
 

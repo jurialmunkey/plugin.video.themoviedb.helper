@@ -1633,6 +1633,11 @@ msgctxt "#32324"
 msgid "Pilot"
 msgstr "Pilot"
 
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_discodir.py
+msgctxt "#32325"
+msgid "Edit Filters"
+msgstr "Filter bearbeiten"
+
 #: /resources/lib/player/players.py
 msgctxt "#32311"
 msgid "Clear default player"
@@ -1736,6 +1741,11 @@ msgstr "Auflösungsmethode des Players auswählen"
 msgctxt "#32333"
 msgid "User Choice"
 msgstr "Benutzerauswahl"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb/routes.py
+msgctxt "#32346"
+msgid "Timezone"
+msgstr "Zeitzone"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32334"

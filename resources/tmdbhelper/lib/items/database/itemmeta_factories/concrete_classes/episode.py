@@ -10,6 +10,7 @@ class Episode(MediaItem):
         MediaItemInfoLabelItemRoutes.trailer,
         MediaItemInfoLabelItemRoutes.playcount,
         MediaItemInfoLabelItemRoutes.imdbnumber,
+        MediaItemInfoLabelItemRoutes.english_plot,
     )
 
     @property
@@ -34,7 +35,7 @@ class Episode(MediaItem):
     def infolabels_dbclist_routes(self):
         return (
             *super().infolabels_dbclist_routes,
-            (('network', None), 'name', 'studio'),
+            MediaItemInfoLabelItemRoutes.network,
         )
 
     def get_premiered_status(self):

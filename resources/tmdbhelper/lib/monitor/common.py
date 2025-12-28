@@ -26,6 +26,7 @@ class CommonMonitorDetails(CommonContainerAPIs):
         from tmdbhelper.lib.items.database.listitem import ListItemDetails
         lidc = ListItemDetails(self)
         lidc.cache_refresh = None
+        lidc.cache_translations = False
         lidc.extendedinfo = True
         lidc.parent_params = {}
         return lidc

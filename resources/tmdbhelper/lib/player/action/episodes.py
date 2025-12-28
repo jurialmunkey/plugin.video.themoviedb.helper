@@ -16,6 +16,7 @@ class PlayerNextEpisodes:
         from tmdbhelper.lib.items.database.listitem import ListItemDetails
         lidc = ListItemDetails()
         lidc.cache_refresh = 'basic'
+        lidc.cache_translations = False
         lidc.extendedinfo = False
         return lidc
 

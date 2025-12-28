@@ -49,7 +49,8 @@ class BaseItem:
                 data = [i[ikey] for i in instance.cached_data]
                 if not data:
                     continue
-                infolabels[dkey] = data
+                if not infolabels.get(dkey):
+                    infolabels[dkey] = data
             except(KeyError, TypeError, IndexError, AttributeError):
                 pass
         return infolabels
@@ -61,7 +62,8 @@ class BaseItem:
                 data = ikey(instance.cached_data[0]) if callable(ikey) else instance.cached_data[0][ikey]
                 if data is None:
                     continue
-                infolabels[dkey] = data
+                if not infolabels.get(dkey):
+                    infolabels[dkey] = data
             except(KeyError, TypeError, IndexError, AttributeError):
                 pass
         return infolabels

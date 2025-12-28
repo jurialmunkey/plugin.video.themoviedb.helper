@@ -9,6 +9,11 @@ class BaseDirItemMDbListTopLists(BaseDirItem):
     art_icon = 'resources/icons/mdblist/mdblist.png'
     types = ('both', )
 
+    @property
+    def enabled(self):
+        from tmdbhelper.lib.addon.plugin import get_setting
+        return bool(get_setting('mdblist_apikey', 'str'))
+
 
 class BaseDirItemMDbListYourLists(BaseDirItemMDbListTopLists):
     priority = 110

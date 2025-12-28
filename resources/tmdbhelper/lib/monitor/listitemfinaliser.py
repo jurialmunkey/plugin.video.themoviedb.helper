@@ -1,4 +1,4 @@
-from tmdbhelper.lib.addon.plugin import get_condvisibility
+from tmdbhelper.lib.addon.plugin import get_condvisibility, get_setting
 from tmdbhelper.lib.addon.thread import SafeThread
 from jurialmunkey.ftools import cached_property
 
@@ -9,10 +9,14 @@ class ListItemMonitorFinaliser:
 
     @cached_property
     def ratings_enabled(self):
+        if not get_setting('use_online_ratings'):
+            return False
         return get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)")
 
     @cached_property
     def artwork_enabled(self):
+        if not get_setting('use_online_artwork'):
+            return False
         return get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)")
 
     @cached_property

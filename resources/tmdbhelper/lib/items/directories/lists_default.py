@@ -1,5 +1,5 @@
 from tmdbhelper.lib.items.container import ContainerDefaultCacheDirectory
-from tmdbhelper.lib.addon.plugin import convert_type, get_localized
+from tmdbhelper.lib.addon.plugin import convert_type, get_localized, get_language
 from jurialmunkey.ftools import cached_property
 from jurialmunkey.parser import try_int
 
@@ -91,7 +91,7 @@ class ListProperties:
 
     @cached_property
     def cache_name(self):
-        return '_'.join(map(str, self.cache_name_tuple))
+        return '_'.join(map(str, (*self.cache_name_tuple, get_language())))  # Append region/language in case of regional or language variations in lists
 
     @cached_property
     def pmax(self):
