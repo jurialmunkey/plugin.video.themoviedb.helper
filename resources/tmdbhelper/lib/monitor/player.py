@@ -177,9 +177,20 @@ class PlayerItem():
     def get_ratings(self):
         if not self.details:
             return {}
+        if not get_setting('use_online_ratings'):
+            return {}
         if get_condvisibility("Skin.HasSetting(TMDbHelper.DisableRatings)"):
             return {}
         return self._parent.get_all_ratings(self.tmdb_type, self.tmdb_id, self.season, self.episode) or {}
+
+    def get_artwork(self):
+        if not self.details:
+            return {}
+        if not get_setting('use_online_artwork'):
+            return {}
+        if get_condvisibility("Skin.HasSetting(TMDbHelper.DisableArtwork)"):
+            return {}
+        return self.artwork
 
 
 class PlayerMonitor(Player, CommonMonitorFunctions):
@@ -316,7 +327,7 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         return self.player_item.tmdb_id
 
     def get_clearlogo(self):
-        art = self.details.get('art') or {}
+        art = self.player_item.get_artwork()
         return (
             (
                 art.get('clearlogo')
@@ -350,7 +361,7 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         if get_condvisibility("!Skin.HasSetting(TMDbHelper.EnableBlur)"):
             return
 
-        art = self.details.get('art') or {}
+        art = self.player_item.get_artwork()
 
         fanart = (
             get_infolabel('Player.Art(fanart)')
