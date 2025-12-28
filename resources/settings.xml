@@ -693,6 +693,16 @@
                         <data>RunScript(plugin.video.themoviedb.helper,provider_allowlist)</data>
                     </control>
                 </setting>
+                <setting id="use_online_artwork" type="boolean" label="32377" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="use_online_ratings" type="boolean" label="32386" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="service_container_content_fallback" type="boolean" label="32497" help="32498">
                     <level>0</level>
                     <default>False</default>
@@ -701,6 +711,9 @@
                 <setting id="service_prefers_online_clearlogo" type="boolean" label="32129" help="">
                     <level>0</level>
                     <default>false</default>
+                    <dependencies>
+                        <dependency type="visible" operator="is" setting="use_online_artwork">true</dependency>
+                    </dependencies>
                     <control type="toggle"/>
                 </setting>
             </group>
