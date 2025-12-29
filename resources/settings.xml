@@ -695,7 +695,7 @@
                 </setting>
                 <setting id="use_online_artwork" type="boolean" label="32377" help="">
                     <level>0</level>
-                    <default>false</default>
+                    <default>true</default>
                     <control type="toggle"/>
                 </setting>
                 <setting id="use_online_ratings" type="boolean" label="32386" help="">

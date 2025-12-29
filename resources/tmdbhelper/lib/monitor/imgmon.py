@@ -7,6 +7,27 @@ from tmdbhelper.lib.addon.logger import kodi_try_except
 from tmdbhelper.lib.addon.thread import SafeThread
 
 
+class RemoteArtwork:
+
+    item = None
+    data = None
+
+    def __getitem__(self, item):
+        if item != self.item:
+            return {}
+        return self.data or {}
+
+    def __setitem__(self, item, data):
+        self.item = item
+        self.data = data
+
+    def get(self, item):
+        return self[item]
+
+    def set(self, item, data):
+        self[item] = data
+
+
 class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
     _cond_artwork_disabled = (
         "!Skin.HasSetting(TMDbHelper.EnableCrop) + "
@@ -37,7 +58,7 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         self._this_refresh = 0
         self.exit = False
         self.update_monitor = parent.update_monitor
-        self.remote_artwork = {}
+        self.remote_artwork = RemoteArtwork()
         self._allow_on_scroll = True  # Allow updating while scrolling
         self._parent = parent
 
