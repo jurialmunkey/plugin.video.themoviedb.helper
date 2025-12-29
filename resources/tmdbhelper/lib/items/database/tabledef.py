@@ -684,6 +684,11 @@ PROVIDER_COLUMNS = {
         'data': 'TEXT',
         'indexed': True
     },
+    'iso_country': {
+        'data': 'TEXT',
+        'indexed': True,
+        'unique': True
+    },
     'parent_id': {
         'data': 'TEXT',
         'foreign_key': 'baseitem(id)',
@@ -703,10 +708,6 @@ SERVICE_COLUMNS = {
     },
     'name': {
         'data': 'TEXT',
-    },
-    'iso_country': {
-        'data': 'TEXT',
-        'indexed': True
     },
     'logo': {
         'data': 'TEXT',
