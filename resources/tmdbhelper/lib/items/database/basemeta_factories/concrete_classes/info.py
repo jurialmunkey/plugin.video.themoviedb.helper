@@ -182,7 +182,7 @@ class Service(ItemDetailsList):
 class Provider(ItemDetailsList):
     table = 'provider'
     keys = tuple(PROVIDER_COLUMNS.keys())
-    conflict_constraint = 'tmdb_id, parent_id'
+    conflict_constraint = 'iso_country, tmdb_id, parent_id'
 
     cached_data_keys = ('provider.tmdb_id', 'availability', 'name', 'display_priority', 'iso_country', 'logo')
     cached_data_table = 'provider INNER JOIN service ON service.tmdb_id = provider.tmdb_id'

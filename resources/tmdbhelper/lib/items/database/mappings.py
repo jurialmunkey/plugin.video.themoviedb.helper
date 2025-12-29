@@ -112,7 +112,6 @@ class ItemMapperMethods:
                 for provider in datalist:
                     if service:
                         item = {
-                            'iso_country': iso,
                             'display_priority': get_blanks_none(provider.get('display_priority')),
                             'name': get_blanks_none(provider.get('provider_name')),
                             'logo': get_blanks_none(provider.get('logo_path')),
@@ -120,6 +119,7 @@ class ItemMapperMethods:
                         }
                     else:
                         item = {
+                            'iso_country': iso,
                             'availability': get_blanks_none(availability),
                             'tmdb_id': get_blanks_none(provider.get('provider_id')),
                         }

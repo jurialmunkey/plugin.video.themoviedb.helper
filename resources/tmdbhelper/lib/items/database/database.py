@@ -44,7 +44,7 @@ class ItemDetailsDatabase(Database):
         super().__init__(filename=self.cache_filename)
 
     # DB version must be max of table_version
-    database_version = 38
+    database_version = 39
 
     database_changes = {
         21: (),
@@ -67,7 +67,8 @@ class ItemDetailsDatabase(Database):
         35: (),
         36: (),
         37: (),
-        38: (
+        38: (),
+        39: (
             'DROP TABLE IF EXISTS baseitem',
             'DROP TABLE IF EXISTS belongs',
             'DROP TABLE IF EXISTS collection',
