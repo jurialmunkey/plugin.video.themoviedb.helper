@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-12-28 19:15+0800\n"
+"PO-Revision-Date: 2025-12-29 17:15+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -1934,6 +1934,11 @@ msgstr "解析完成后延迟（秒）"
 msgctxt "#32364"
 msgid "Reroute PlayMedia to xbmc.Player()"
 msgstr "将 PlayMedia 请求重定向到 xbmc.Player() 方法"
+
+#: /resources/settings.xml
+msgctxt "#32377"
+msgid "Use online artwork in image monitor"
+msgstr "图像监视器中启用在线媒体封面"
 
 #: /resources/lib/addon/plugin.py
 msgctxt "#32365"
