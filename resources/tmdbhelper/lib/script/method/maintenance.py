@@ -22,7 +22,7 @@ class DatabaseMaintenance:
     )
 
     legacy_img_cache_folders = (
-        'blur',
+        'blur', 'blur_v2',
         'crop',
         'desaturate',
         'colors'

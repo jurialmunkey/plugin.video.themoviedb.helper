@@ -23,7 +23,7 @@ ARTWORK_LOOKUP_TABLE = {
 
 # PIL causes issues (via numpy) on Linux systems using python versions higher than 3.8.5
 # Lazy import PIL to avoid using it unless user requires ImageFunctions
-ImageFilter, Image = None, None
+ImageFilter, ImageDraw, Image = None, None, None
 
 
 def lazyimport_pil(func):
@@ -47,6 +47,35 @@ def _imageopen(image):
     with xbmcvfs.File(image, 'rb') as f:
         image_bytes = f.readBytes()
     return Image.open(io.BytesIO(image_bytes))
+
+
+def _add_corners(image, radius=40, aa_factor=4):
+    global ImageDraw
+    if ImageDraw is None:
+        from PIL import ImageDraw
+
+    global Image
+    if Image is None:
+        from PIL import Image
+
+    diameter = radius * 2
+    aaresize = diameter * aa_factor
+
+    circle = Image.new('L', (aaresize, aaresize), 0)
+
+    draw = ImageDraw.Draw(circle)
+    draw.ellipse((0, 0, aaresize, aaresize), fill=255)
+
+    circle = circle.resize((diameter, diameter), Image.LANCZOS)
+
+    alpha = Image.new('L', image.size, "white")
+    w, h = image.size
+    alpha.paste(circle.crop((0, 0, radius, radius)), (0, 0))
+    alpha.paste(circle.crop((0, radius, radius, diameter)), (0, h - radius))
+    alpha.paste(circle.crop((radius, 0, diameter, radius)), (w - radius, 0))
+    alpha.paste(circle.crop((radius, radius, diameter, diameter)), (w - radius, h - radius))
+    image.putalpha(alpha)
+    return image
 
 
 def _closeimage(image, targetfile=None):
@@ -128,6 +157,7 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
     blur_size = try_int(get_infolabel('Skin.String(TMDbHelper.Blur.Size)')) or 480
     crop_size = (800, 310)
     radius = try_int(get_infolabel('Skin.String(TMDbHelper.Blur.Radius)')) or 40
+    corner = try_int(get_infolabel('Skin.String(TMDbHelper.Corner.Radius)')) or 20
 
     def __init__(self, method=None, artwork=None, is_thread=True, prefix='ListItem'):
         if is_thread:
@@ -138,7 +168,7 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
         self.save_prop = None
         if method == 'blur':
             self.func = self.blur
-            self.save_path = make_path(self.save_path.format('blur_v2'))
+            self.save_path = make_path(self.save_path.format('blur_v3'))
             self.save_prop = f'{prefix}.BlurImage'
             self.save_orig = True
         elif method == 'crop':
@@ -204,13 +234,15 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
     def blur(self, source):
         filename = f'{md5hash(source)}-{self.radius}-{self.blur_size}.jpg'
         destination = os.path.join(self.save_path, filename)
+        diffuse_destination = os.path.join(self.save_path, f'{filename}-diffuse-{self.corner}.jpg')
         try:
-            if not xbmcvfs.exists(destination):  # os.utime(destination, None)
+            if not xbmcvfs.exists(destination) or (self.corner and not xbmcvfs.exists(diffuse_destination)):  # os.utime(destination, None)
                 img, targetfile = _openimage(source, self.save_path, filename)
                 img.thumbnail((self.blur_size, self.blur_size))
                 img = img.convert('RGB')
                 img = img.filter(ImageFilter.GaussianBlur(self.radius))
                 _saveimage(img, destination)
+                _saveimage(_add_corners(img, radius=self.corner), diffuse_destination) if self.corner else None
                 _closeimage(img, targetfile)
 
             return destination
