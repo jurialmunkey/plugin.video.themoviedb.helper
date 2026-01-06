@@ -59,10 +59,9 @@ class ServiceMonitor(Poller):
     def _on_clear(self):
         """
         IF we've got properties to clear lets clear them and then jump back in the loop
-        Otherwise we should sit for a second so we aren't constantly polling
         """
         self.listitem_funcs.clear_properties()
-        self._on_idle(POLL_MID_INCREMENT)
+        self._on_idle(POLL_MIN_INCREMENT)
 
     def _on_exit(self):
         try:
