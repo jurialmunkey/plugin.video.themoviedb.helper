@@ -49,11 +49,10 @@ WINDOW_XML_INFODIALOG = (
     'MyPVRGuide.xml'
 )
 
-CV_FULLSCREEN_LISTITEM = ("Skin.HasSetting(TMDbHelper.UseLocalWidgetContainer) + !String.IsEmpty(Window.Property(TMDbHelper.WidgetContainer))")
+CV_USE_LOCAL_CONTAINER = "Skin.HasSetting(TMDbHelper.UseLocalWidgetContainer)"
 
 CV_SCROLL = "Container.Scrolling"
 
-WINDOW_PROPERTY_CONTEXT = ("ContextMenu")
 WINDOW_XML_CONTEXT = (
     "DialogContextMenu.xml",
     "DialogVideoManager.xml",
@@ -86,7 +85,7 @@ class Poller(WindowChecker):
     def _on_listitem(self):
         self._on_idle(POLL_MIN_INCREMENT)
 
-    def _on_clear(self):
+    def _on_clear(self, wait_time):
         self._on_idle(POLL_MIN_INCREMENT)
 
     def _on_exit(self):
@@ -101,7 +100,23 @@ class Poller(WindowChecker):
             return False
         if self.is_current_window_xml(WINDOW_XML_INFODIALOG):
             return False
-        if get_condvisibility(CV_FULLSCREEN_LISTITEM):
+        if self.is_on_localwidgetcontainer:
+            return False
+        return True
+
+    @property
+    def is_on_localwidgetcontainer(self):
+        if not get_condvisibility(CV_USE_LOCAL_CONTAINER):
+            return False
+        if not self.get_window_property('WidgetContainer'):
+            return False
+        return True
+
+    @property
+    def is_on_globalwidgetcontainer(self):
+        if get_condvisibility(CV_USE_LOCAL_CONTAINER):
+            return False
+        if not self.get_window_property('WidgetContainer', is_home=True):
             return False
         return True
 
@@ -125,8 +140,6 @@ class Poller(WindowChecker):
     def is_on_context(self):
         if self.is_current_window_xml(WINDOW_XML_CONTEXT):
             return True
-        if self.get_window_property(WINDOW_PROPERTY_CONTEXT):
-            return True
         return False
 
     @property
@@ -135,13 +148,14 @@ class Poller(WindowChecker):
 
     @property
     def is_on_listitem(self):
+        self.get_current_window()  # Get the current window again to make sure we can monitor
         if self.is_current_window_xml(WINDOW_XML_INFODIALOG):
             return True
         if self.is_current_window_xml(WINDOW_XML_MEDIA):
             return True
-        if self.get_window_property('WidgetContainer', is_home=True):
+        if self.is_on_localwidgetcontainer:
             return True
-        if self.get_window_property('WidgetContainer'):
+        if self.is_on_globalwidgetcontainer:
             return True
         return False
 
@@ -151,38 +165,45 @@ class Poller(WindowChecker):
 
             if self.get_window_property('ServiceStop', is_home=True):
                 self.exit = True
+                break
 
             # If we're in fullscreen video then we should update the playermonitor time
-            elif self.is_on_fullscreen:
+            if self.is_on_fullscreen:
                 self._on_fullscreen()
+                continue
 
             # Sit idle in a holding pattern if the skin doesn't need the service monitor yet
-            elif self.is_on_disabled:
-                self._on_idle(30)
+            if self.is_on_disabled:
+                self._on_idle(5)
+                continue
 
             # Sit idle in a holding pattern if screen saver is active
-            elif self.is_on_screensaver:
+            if self.is_on_screensaver:
                 self._on_idle(POLL_MAX_INCREMENT)
+                continue
 
             # skip when modal or busy dialogs are opened (e.g. select / progress / busy etc.)
-            elif self.is_on_modal:
+            if self.is_on_modal:
                 self._on_modal()
+                continue
 
             # manage context menu separately from other modals to pass info through
-            elif self.is_on_context:
+            if self.is_on_context:
                 self._on_context()
+                continue
 
             # skip when container scrolling
-            elif self.is_on_scroll:
+            if self.is_on_scroll:
                 self._on_scroll()
+                continue
 
             # media window is opened or widgetcontainer set - start listitem monitoring!
-            elif self.is_on_listitem:
+            if self.is_on_listitem:
                 self._on_listitem()
+                continue
 
-            # Otherwise just sit here and wait
-            else:
-                self._on_clear()
+            # Otherwise just sit here and wait a moment
+            self._on_idle(POLL_MIN_INCREMENT)  # self._on_clear()  Use to be clear but not sure we should
 
         # Some clean-up once service exits
         self._on_exit()
