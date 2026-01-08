@@ -797,7 +797,7 @@ class ItemMapperMethods:
                 return
 
         genre_items = self.get_genre_items([j for j in (get_genre_id(i) for i in items if i) if j])
-        return ItemMapperMethods.split_array(self.get_genre_items(genre_items), name='name', tmdb_id='tmdb_id')
+        return ItemMapperMethods.split_array(genre_items, name='name', tmdb_id='tmdb_id')
 
 
 class BlankNoneDict(dict):
@@ -1076,6 +1076,6 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
         # from tmdbhelper.lib.files.futils import dumps_to_file
         # dumps_to_file(
         #     {'data': self.data, 'item': self.item},
-        #     'log_data', f'mappings_{self.tmdb_id}_{data["name"]}.json', join_addon_data=True)
+        #     'log_data', f'mappings_{self.tmdb_id}.json', join_addon_data=True)
 
         return self.item
