@@ -49,7 +49,7 @@ def _imageopen(image):
     return Image.open(io.BytesIO(image_bytes))
 
 
-def _add_corners(image, radius=40, aa_factor=4):
+def _add_corners(image, destination, radius=40, aa_factor=4):
     global ImageDraw
     if ImageDraw is None:
         from PIL import ImageDraw
@@ -57,6 +57,8 @@ def _add_corners(image, radius=40, aa_factor=4):
     global Image
     if Image is None:
         from PIL import Image
+
+    image = image.copy()
 
     diameter = radius * 2
     aaresize = diameter * aa_factor
@@ -75,7 +77,39 @@ def _add_corners(image, radius=40, aa_factor=4):
     alpha.paste(circle.crop((radius, 0, diameter, radius)), (w - radius, 0))
     alpha.paste(circle.crop((radius, radius, diameter, diameter)), (w - radius, h - radius))
     image.putalpha(alpha)
-    return image
+
+    _saveimage(image, destination)
+    image.close()
+
+
+def _add_tile(image, destination):
+    global Image
+    if Image is None:
+        from PIL import Image
+
+    w, h = image.size
+    image_tile = Image.new('RGB', (w * 2, h * 2))
+
+    # Top Right
+    image_flip = image.copy()
+    image_tile.paste(image_flip, (w, 0))
+
+    # Top Left
+    image_flip = image_flip.transpose(Image.FLIP_LEFT_RIGHT)
+    image_tile.paste(image_flip, (0, 0))
+
+    # Bottom Left
+    image_flip = image_flip.transpose(Image.FLIP_TOP_BOTTOM)
+    image_tile.paste(image_flip, (0, h))
+
+    # Bottom Right
+    image_flip = image_flip.transpose(Image.FLIP_LEFT_RIGHT)
+    image_tile.paste(image_flip, (w, h))
+
+    _saveimage(image_tile, destination)
+
+    image_flip.close()
+    image_tile.close()
 
 
 def _closeimage(image, targetfile=None):
@@ -234,21 +268,28 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
     def blur(self, source):
         filename = f'{md5hash(source)}-{self.radius}-{self.blur_size}.jpg'
         destination = os.path.join(self.save_path, filename)
-        diffuse_destination = os.path.join(self.save_path, f'{filename}-diffuse-{self.corner}.jpg')
-        try:
-            if not xbmcvfs.exists(destination) or (self.corner and not xbmcvfs.exists(diffuse_destination)):  # os.utime(destination, None)
-                img, targetfile = _openimage(source, self.save_path, filename)
-                img.thumbnail((self.blur_size, self.blur_size))
-                img = img.convert('RGB')
-                img = img.filter(ImageFilter.GaussianBlur(self.radius))
-                _saveimage(img, destination)
-                _saveimage(_add_corners(img, radius=self.corner), diffuse_destination) if self.corner else None
-                _closeimage(img, targetfile)
+        diffuse_destination = os.path.join(self.save_path, f'{filename}-diffuse-{self.corner}.jpg') if self.corner else None
+        tile_destination = os.path.join(self.save_path, f'{filename}-tiled.jpg')
+        # try:
+        if not xbmcvfs.exists(destination) or (diffuse_destination and not xbmcvfs.exists(diffuse_destination)):  # os.utime(destination, None)
+            img, targetfile = _openimage(source, self.save_path, filename)
+            img.thumbnail((self.blur_size, self.blur_size))
+            img = img.convert('RGB')
+            img = img.filter(ImageFilter.GaussianBlur(self.radius))
+            _saveimage(img, destination)
 
-            return destination
+            if diffuse_destination:
+                _add_corners(img, diffuse_destination, radius=self.corner)
 
-        except Exception:
-            return ''
+            if tile_destination:
+                _add_tile(img, tile_destination)
+
+            _closeimage(img, targetfile)
+
+        return destination
+
+        # except Exception:
+        #     return ''
 
     @lazyimport_pil
     def desaturate(self, source):
