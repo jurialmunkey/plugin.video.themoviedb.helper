@@ -46,6 +46,8 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
     _next_refresh_increment = 10  # Reupdate idle item every ten seconds for extrafanart TODO: Allow skin to set value?
     _this_refresh_increment = 3   # How long to wait for ListItem.Art() availability check
 
+    _cond_current_window_images = "Skin.HasSetting(TMDbHelper.EnableCurrentWindowImages)"
+
     def __init__(self, parent):
         SafeThread.__init__(self)
         self.cur_item = 0
@@ -65,6 +67,10 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
     @property
     def is_artwork_disabled(self):
         return get_condvisibility(self._cond_artwork_disabled)
+
+    @property
+    def is_current_window_images(self):
+        return get_condvisibility(self._cond_current_window_images)
 
     # Unused method see update_artwork comments further below
     """
@@ -132,7 +138,7 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         self._this_refresh = 0
         self._next_refresh = 0
 
-        if not self.update_properties(self.blurcrop_properties):
+        if not self.update_properties(self.blurcrop_properties, use_current_window=self.is_current_window_images):
             return
 
         if not self.update_properties(self.baseitem_properties):
@@ -151,11 +157,15 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         ) if not self.is_artwork_disabled else {}
         return self.cur_blurcrop_properties
 
-    def update_properties(self, infoproperties):
+    def update_properties(self, infoproperties, use_current_window=False):
         if not self.is_same_item():
             return False
         for k, v in infoproperties.items():
-            self.get_property(f'ListItem.{k}', set_property=v, clear_property=(v is None))
+            if use_current_window:
+                self.get_property(f'ListItem.{k}', set_property=v, clear_property=(v is None), use_current_window=True)
+                self.get_property(f'ListItem.Current.{k}', set_property=v, clear_property=(v is None))
+            else:
+                self.get_property(f'ListItem.{k}', set_property=v, clear_property=(v is None))
         return True
 
     def _on_listitem(self):
