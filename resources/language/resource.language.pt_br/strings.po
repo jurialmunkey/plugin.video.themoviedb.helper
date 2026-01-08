@@ -1113,6 +1113,7 @@ msgstr "Com o País de Origem"
 msgctxt "#32221"
 msgid "Miniseries"
 msgstr "Minisséries"
+
 #: /resources/lib/plugin.py
 msgctxt "#32205"
 msgid "Most Played"
