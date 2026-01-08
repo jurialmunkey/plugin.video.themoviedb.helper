@@ -94,17 +94,19 @@ def _add_tile(image, destination):
     image_flip = image.copy()
     image_tile.paste(image_flip, (w, 0))
 
-    # Top Left
-    image_flip = image_flip.transpose(Image.FLIP_LEFT_RIGHT)
-    image_tile.paste(image_flip, (0, 0))
+    # Bottom Right
+    image_flip = image_flip.transpose(Image.FLIP_TOP_BOTTOM)
+    image_tile.paste(image_flip, (w, h))
 
     # Bottom Left
-    image_flip = image_flip.transpose(Image.FLIP_TOP_BOTTOM)
+    image_flip = image_flip.transpose(Image.FLIP_LEFT_RIGHT)
+    image_flip = image_flip.resize((w * 2, h), Image.BILINEAR)
+    image_flip = image_flip.crop((w, 0, w * 2, h))
     image_tile.paste(image_flip, (0, h))
 
-    # Bottom Right
-    image_flip = image_flip.transpose(Image.FLIP_LEFT_RIGHT)
-    image_tile.paste(image_flip, (w, h))
+    # Top Left
+    image_flip = image_flip.transpose(Image.FLIP_TOP_BOTTOM)
+    image_tile.paste(image_flip, (0, 0))
 
     _saveimage(image_tile, destination)
 
@@ -270,26 +272,26 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
         destination = os.path.join(self.save_path, filename)
         diffuse_destination = os.path.join(self.save_path, f'{filename}-diffuse-{self.corner}.jpg') if self.corner else None
         tile_destination = os.path.join(self.save_path, f'{filename}-tiled.jpg')
-        # try:
-        if not xbmcvfs.exists(destination) or (diffuse_destination and not xbmcvfs.exists(diffuse_destination)):  # os.utime(destination, None)
-            img, targetfile = _openimage(source, self.save_path, filename)
-            img.thumbnail((self.blur_size, self.blur_size))
-            img = img.convert('RGB')
-            img = img.filter(ImageFilter.GaussianBlur(self.radius))
-            _saveimage(img, destination)
+        try:
+            if not xbmcvfs.exists(destination) or (diffuse_destination and not xbmcvfs.exists(diffuse_destination)):  # os.utime(destination, None)
+                img, targetfile = _openimage(source, self.save_path, filename)
+                img.thumbnail((self.blur_size, self.blur_size))
+                img = img.convert('RGB')
+                img = img.filter(ImageFilter.GaussianBlur(self.radius))
+                _saveimage(img, destination)
 
-            if diffuse_destination:
-                _add_corners(img, diffuse_destination, radius=self.corner)
+                if diffuse_destination:
+                    _add_corners(img, diffuse_destination, radius=self.corner)
 
-            if tile_destination:
-                _add_tile(img, tile_destination)
+                if tile_destination:
+                    _add_tile(img, tile_destination)
 
-            _closeimage(img, targetfile)
+                _closeimage(img, targetfile)
 
-        return destination
+            return destination
 
-        # except Exception:
-        #     return ''
+        except Exception:
+            return ''
 
     @lazyimport_pil
     def desaturate(self, source):
