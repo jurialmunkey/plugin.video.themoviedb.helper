@@ -29,6 +29,15 @@ class RemoteArtwork:
 
 
 class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
+    _cond_on_disabled = (
+        "!Skin.HasSetting(TMDbHelper.Service) + "
+        "!Skin.HasSetting(TMDbHelper.EnableCrop) + "
+        "!Skin.HasSetting(TMDbHelper.EnableBlur) + "
+        "!Skin.HasSetting(TMDbHelper.EnableDesaturate) + "
+        "!Skin.HasSetting(TMDbHelper.EnableColors)")
+
+    _cond_service_disabled = "!Skin.HasSetting(TMDbHelper.Service)"
+
     _cond_artwork_disabled = (
         "!Skin.HasSetting(TMDbHelper.EnableCrop) + "
         "!Skin.HasSetting(TMDbHelper.EnableBlur) + "
@@ -67,6 +76,10 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
     @property
     def is_artwork_disabled(self):
         return get_condvisibility(self._cond_artwork_disabled)
+
+    @property
+    def is_service_disabled(self):
+        return get_condvisibility(self._cond_service_disabled)
 
     @property
     def is_current_window_images(self):
@@ -141,7 +154,7 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         if not self.update_properties(self.blurcrop_properties, use_current_window=self.is_current_window_images):
             return
 
-        if not self.update_properties(self.baseitem_properties):
+        if not self.update_properties(self.baseitem_properties if not self.is_service_disabled else {}):
             return
 
         return self.cur_blurcrop_properties
