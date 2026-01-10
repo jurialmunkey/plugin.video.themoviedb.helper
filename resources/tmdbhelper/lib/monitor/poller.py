@@ -1,4 +1,4 @@
-from tmdbhelper.lib.addon.plugin import get_condvisibility
+from tmdbhelper.lib.addon.plugin import get_condvisibility, get_infolabel
 from jurialmunkey.window import WindowChecker
 
 POLL_MIN_INCREMENT = 0.2
@@ -34,17 +34,18 @@ WINDOW_XML_MEDIA = (
     'MyPics.xml',
     'MyPlaylist.xml',
     'MyGames.xml',
+    'MyPVRChannels.xml',
+    'MyPVRGuide.xml'
 )
 
 WINDOW_XML_INFODIALOG = (
     'DialogVideoInfo.xml',
     'DialogMusicInfo.xml',
-    'DialogPVRInfo.xml',
-    'MyPVRChannels.xml',
-    'MyPVRGuide.xml'
+    'DialogPVRInfo.xml'
 )
 
 CV_USE_LOCAL_CONTAINER = "Skin.HasSetting(TMDbHelper.UseLocalWidgetContainer)"
+CV_USE_LOCAL_WINDOWIDS = "Skin.String(TMDbHelper.UseLocalWindowIDs)"
 
 CV_SCROLL = "Container.Scrolling"
 
@@ -81,8 +82,8 @@ class Poller(WindowChecker):
     def _on_listitem(self):
         self._on_idle(POLL_MIN_INCREMENT)
 
-    def _on_clear(self, wait_time):
-        self._on_idle(POLL_MIN_INCREMENT)
+    def _on_clear(self):
+        self._on_idle(POLL_MID_INCREMENT)
 
     def _on_exit(self):
         return
@@ -91,8 +92,16 @@ class Poller(WindowChecker):
         self._on_idle(POLL_MID_INCREMENT)
 
     @property
+    def localwidgetcontainer_window_ids(self):
+        try:
+            values = get_infolabel(CV_USE_LOCAL_WINDOWIDS).split('|')
+            return tuple((int(i) for i in values)) if values else tuple()
+        except AttributeError:
+            return tuple()
+
+    @property
     def is_on_fullscreen(self):
-        if not self.is_current_window_xml(WINDOW_XML_FULLSCREEN):
+        if not self.is_current_base_window_xml(WINDOW_XML_FULLSCREEN):
             return False
         if self.is_current_window_xml(WINDOW_XML_INFODIALOG):
             return False
@@ -144,10 +153,7 @@ class Poller(WindowChecker):
 
     @property
     def is_on_listitem(self):
-        self.get_current_window()  # Get the current window again to make sure we can monitor
-        if self.is_current_window_xml(WINDOW_XML_INFODIALOG):
-            return True
-        if self.is_current_window_xml(WINDOW_XML_MEDIA):
+        if self.is_on_mediawindow:
             return True
         if self.is_on_localwidgetcontainer:
             return True
@@ -155,9 +161,27 @@ class Poller(WindowChecker):
             return True
         return False
 
+    @property
+    def is_on_mediawindow(self):
+        # Get the current window again just to double check that it hasn't changed in the interim
+        self.get_current_base_window()
+        self.get_current_window()
+        if self.is_current_window_xml(WINDOW_XML_INFODIALOG):
+            return True
+        if self.is_current_base_window_xml(WINDOW_XML_MEDIA):
+            return True
+        return False
+
+    @property
+    def is_on_clear(self):
+        if self.current_base_window in self.localwidgetcontainer_window_ids:
+            return False
+        return not self.is_on_mediawindow
+
     def poller(self):
         while not self.update_monitor.abortRequested() and not self.exit:
-            self.get_current_window()  # Get the current window ID and store for this loop
+            self.get_current_base_window()
+            self.get_current_window()
 
             if self.get_window_property('ServiceStop', is_home=True):
                 self.exit = True
@@ -170,14 +194,9 @@ class Poller(WindowChecker):
 
             # Sit idle in a holding pattern if the skin doesn't need the service monitor yet
             if self.is_on_disabled:
-                if not self._cleared_property:
-                    self._on_clear()
-                    self._cleared_property = True
+                self._on_clear()
                 self._on_idle(5)
                 continue
-
-            # Service restarted so set flag back
-            self._cleared_property = False
 
             # Sit idle in a holding pattern if screen saver is active
             if self.is_on_screensaver:
@@ -202,6 +221,10 @@ class Poller(WindowChecker):
             # media window is opened or widgetcontainer set - start listitem monitoring!
             if self.is_on_listitem:
                 self._on_listitem()
+                continue
+
+            if self.is_on_clear:
+                self._on_clear()
                 continue
 
             # Otherwise just sit here and wait a moment
