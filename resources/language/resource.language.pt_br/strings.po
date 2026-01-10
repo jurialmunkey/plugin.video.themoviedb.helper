@@ -662,8 +662,8 @@ msgstr "Selecionar Gêneros"
 
 #: /resources/lib/container.py
 msgctxt "#32113"
-msgid "Also accepts X days relative from today in the format T-X or T+X (e.g. T-10 is ten days ago)"
-msgstr "Também aceita X dias relativos a partir de hoje no formato T-X ou T+X (por exemplo, T-10 é dez dias atrás)"
+msgid "Also accepts days from today as T-X or T+X (e.g. T-10 is ten days ago)"
+msgstr "Também aceita dias a partir de hoje como TX ou T+X (por exemplo, T-10 é há dez dias)"
 
 #: /resources/lib/container.py
 msgctxt "#32114"
@@ -1113,6 +1113,7 @@ msgstr "Com o País de Origem"
 msgctxt "#32221"
 msgid "Miniseries"
 msgstr "Minisséries"
+
 #: /resources/lib/plugin.py
 msgctxt "#32205"
 msgid "Most Played"
@@ -1932,6 +1933,11 @@ msgctxt "#32364"
 msgid "Reroute PlayMedia to xbmc.Player()"
 msgstr "Redirecionar PlayMedia para xbmc.Player()"
 
+#: /resources/settings.xml
+msgctxt "#32377"
+msgid "Use online artwork in image monitor"
+msgstr "Usar arte online no monitor de imagem"
+
 #: /resources/lib/addon/plugin.py
 msgctxt "#32365"
 msgid "Combined"
@@ -1971,6 +1977,11 @@ msgstr "Preferir artes para miniaturas"
 msgctxt "#32372"
 msgid "fanart"
 msgstr "fanart"
+
+#: /resources/settings.xml
+msgctxt "#32386"
+msgid "Use online ratings in details monitor"
+msgstr "Usar avaliações online no monitor de detalhes"
 
 #: /resources/settings.xml
 msgctxt "#32373"
