@@ -6,12 +6,7 @@ POLL_MID_INCREMENT = 1
 POLL_MAX_INCREMENT = 2
 
 
-CV_DISABLED = (
-    "!Skin.HasSetting(TMDbHelper.Service) + "
-    "!Skin.HasSetting(TMDbHelper.EnableCrop) + "
-    "!Skin.HasSetting(TMDbHelper.EnableBlur) + "
-    "!Skin.HasSetting(TMDbHelper.EnableDesaturate) + "
-    "!Skin.HasSetting(TMDbHelper.EnableColors)")
+CV_DISABLED = "!Skin.HasSetting(TMDbHelper.Service)"
 
 WINDOW_PROPERTY_MODAL = ("ServicePause")
 WINDOW_XML_MODAL = (

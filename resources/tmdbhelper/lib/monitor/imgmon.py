@@ -29,6 +29,13 @@ class RemoteArtwork:
 
 
 class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
+    _cond_on_disabled = (
+        "!Skin.HasSetting(TMDbHelper.Service) + "
+        "!Skin.HasSetting(TMDbHelper.EnableCrop) + "
+        "!Skin.HasSetting(TMDbHelper.EnableBlur) + "
+        "!Skin.HasSetting(TMDbHelper.EnableDesaturate) + "
+        "!Skin.HasSetting(TMDbHelper.EnableColors)")
+
     _cond_artwork_disabled = (
         "!Skin.HasSetting(TMDbHelper.EnableCrop) + "
         "!Skin.HasSetting(TMDbHelper.EnableBlur) + "
