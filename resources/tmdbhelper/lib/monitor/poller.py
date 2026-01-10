@@ -64,6 +64,7 @@ WINDOW_XML_FULLSCREEN = ('VideoFullScreen.xml', )
 
 class Poller(WindowChecker):
     _cond_on_disabled = CV_DISABLED
+    _cleared_property = False
 
     def _on_idle(self, wait_time=30):
         self.update_monitor.waitForAbort(wait_time)
@@ -169,8 +170,14 @@ class Poller(WindowChecker):
 
             # Sit idle in a holding pattern if the skin doesn't need the service monitor yet
             if self.is_on_disabled:
+                if not self._cleared_property:
+                    self._on_clear()
+                    self._cleared_property = True
                 self._on_idle(5)
                 continue
+
+            # Service restarted so set flag back
+            self._cleared_property = False
 
             # Sit idle in a holding pattern if screen saver is active
             if self.is_on_screensaver:
