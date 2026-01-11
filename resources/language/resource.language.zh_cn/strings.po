@@ -251,7 +251,7 @@ msgstr "排序方式：你的下一集列表。按播出日期：按剧集首播
 #: /resources/settings.xml
 msgctxt "#32050"
 msgid "Prefer artwork in your language"
-msgstr "首选使用您语言的艺术图"
+msgstr "首选使用你语言的艺术图"
 
 #: /resources/tmdbhelper/lib/script/method/tmdb.py
 msgctxt "#32051"
@@ -571,7 +571,7 @@ msgstr "已为此参数设置值"
 #: /resources/lib/container.py
 msgctxt "#32100"
 msgid "Do you wish to clear the existing items or add more?"
-msgstr "您希望清除现有项目还是添加更多项目？"
+msgstr "你希望清除现有项目还是添加更多项目？"
 
 #: /resources/tmdbhelper/lib/script/method/modify_artwork.py
 msgctxt "#32115"
@@ -685,7 +685,7 @@ msgstr "私有"
 #: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
 msgctxt "#32136"
 msgid "Do you want to make this list a public or private list?"
-msgstr "您想将此列表设为公开列表还是私有列表？"
+msgstr "你想将此列表设为公开列表还是私有列表？"
 
 #: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
 msgctxt "#32137"
@@ -845,7 +845,7 @@ msgstr "定时从 Trakt 列表中更新媒体库"
 #: /resources/lib/script.py
 msgctxt "#32132"
 msgid "Do you wish to update the library from the Trakt list(s) now?"
-msgstr "您想现在从 Trakt 列表中更新媒体库吗？"
+msgstr "你想现在从 Trakt 列表中更新媒体库吗？"
 
 #: /resources/lib/script.py
 msgctxt "#32133"
@@ -1039,27 +1039,27 @@ msgstr "观看列表"
 #: /resources/lib/plugin.py
 msgctxt "#32194"
 msgid "Your Recently Watched"
-msgstr "您最近观看的"
+msgstr "你最近观看的"
 
 #: /resources/lib/plugin.py
 msgctxt "#32195"
 msgid "Your Most Watched"
-msgstr "您最受关注的"
+msgstr "你最受关注的"
 
 #: /resources/lib/plugin.py
 msgctxt "#32196"
 msgid "Your In-Progress"
-msgstr "您进行中的"
+msgstr "你正在观看的"
 
 #: /resources/lib/plugin.py
 msgctxt "#32197"
 msgid "Your Next Episodes"
-msgstr "您的下一集"
+msgstr "你的下一集"
 
 #: /resources/lib/plugin.py
 msgctxt "#32198"
 msgid "Recommended For You"
-msgstr "为您推荐"
+msgstr "为你推荐"
 
 #: /resources/lib/plugin.py
 msgctxt "#32199"
@@ -1074,7 +1074,7 @@ msgstr "基于最受关注"
 #: /resources/lib/plugin.py
 msgctxt "#32201"
 msgid "Your"
-msgstr "您的"
+msgstr "你的"
 
 #: /resources/lib/plugin.py
 msgctxt "#32202"
@@ -1149,7 +1149,7 @@ msgstr "人气列表"
 #: /resources/lib/plugin.py
 msgctxt "#32211"
 msgid "Your Lists"
-msgstr "您的列表"
+msgstr "你的列表"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32212"
@@ -1159,7 +1159,7 @@ msgstr "Trakt 用户帐户注销"
 #: /resources/lib/traktapi.py
 msgctxt "#32213"
 msgid "Do you wish to logout of your Trakt account?"
-msgstr "您想注销您的 Trakt 帐户吗？"
+msgstr "你想注销你的 Trakt 帐户吗？"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32214"
@@ -1519,7 +1519,7 @@ msgstr "排序"
 #: /resources/lib/traktlists.py
 msgctxt "#32288"
 msgid "Because you watched"
-msgstr "因为您观看了"
+msgstr "因你看过"
 
 #: /resources/lib/script.py
 msgctxt "#32289"
@@ -1804,7 +1804,7 @@ msgid ""
 "\n"
 "Are you sure you want to set this player's resolve method to PlayMedia?"
 msgstr ""
-"请注意，setResolvedUrl 是 Kodi 解析播放网址的首选方法。只有当您在此特定播放器中使用 setResolvedUrl 时遇到困难时，才应使用 PlayMedia 方法。\n"
+"请注意，setResolvedUrl 是 Kodi 解析播放网址的首选方法。只有当你在此特定播放器中使用 setResolvedUrl 时遇到困难时，才应使用 PlayMedia 方法。\n"
 "\n"
 "你确定要将此播放器的解析方法设置为 PlayMedia 吗？"
 
@@ -2119,7 +2119,7 @@ msgstr "本周观看的剧集"
 #: /resources/lib/container/basedir.py
 msgctxt "#32406"
 msgid "Your In-Progress Episodes"
-msgstr "正在观看的剧集"
+msgstr "你正在观看的剧集"
 
 #: /resources/settings.xml
 msgctxt "#32407"
@@ -2249,7 +2249,7 @@ msgstr "网址中缺少 QUERYKEY"
 #: /resources/lib/player/configure.py
 msgctxt "#32434"
 msgid "You must insert QUERYKEY where the search query for the URL goes"
-msgstr "您必须在搜索网址时插入 QUERYKEY"
+msgstr "你必须在搜索网址时插入 QUERYKEY"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32435"
@@ -2389,7 +2389,7 @@ msgstr "提名"
 #: /resources/settings.xml
 msgctxt "#32463"
 msgid "Cache items in custom lists you own for 24 hours"
-msgstr "将您创建的自定义列表中的项目缓存 24 小时"
+msgstr "将你创建的自定义列表中的项目缓存 24 小时"
 
 #: /resources/settings.xml
 msgctxt "#32466"
@@ -2454,7 +2454,7 @@ msgstr "更改剧集默认播放器"
 #: /resources/settings.xml
 msgctxt "#32481"
 msgid "Increases the pool of recently watched items randomly selected from the seed to use for \"Because You Watched\" style recommendations."
-msgstr "增加从种子中随机选择的最近观看的项目池，以用于“因为你看过”风格推荐。"
+msgstr "增加从种子中随机选择的最近观看的项目池，以用于“因你看过”风格推荐。"
 
 #: /resources/settings.xml
 msgctxt "#32482"
@@ -2610,7 +2610,7 @@ msgstr "未找到 MDbList API 凭据。"
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32517"
 msgid "Add your personal MDbList API key in TMDbHelper settings."
-msgstr "在 TMDbHelper 设置中添加您个人的 MDbList API 密钥。"
+msgstr "在 TMDbHelper 设置中添加你个人的 MDbList API 密钥。"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32518"
@@ -2893,7 +2893,7 @@ msgstr "Token"
 #: /resources/lib/traktapi.py
 msgctxt "#32012"
 msgid "You must authenticate your Trakt account to use this feature."
-msgstr "您必须验证您的 Trakt 帐户才能使用此功能。"
+msgstr "你必须验证你的 Trakt 帐户才能使用此功能。"
 
 #: /resources/settings.xml
 msgctxt "#32014"
