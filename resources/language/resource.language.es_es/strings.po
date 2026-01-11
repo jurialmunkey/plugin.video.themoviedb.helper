@@ -18,11 +18,11 @@ msgstr ""
 
 msgctxt "#30000"
 msgid "Arabic (United Arab Emirates)"
-msgstr "Arabe (Emiratos Arabes Unidos)"
+msgstr "Árabe (Emiratos Árabes Unidos)"
 
 msgctxt "#30001"
 msgid "Arabic (Saudi Arabia)"
-msgstr "Arabe (Arabia Saudi)"
+msgstr "Árabe (Arabia Saudí)"
 
 #: /resources/tmdbhelper/lib/api/tmdb/methods/lists.py
 msgctxt "#32000"
@@ -44,7 +44,7 @@ msgstr "Preferido"
 
 msgctxt "#30004"
 msgid "Bengali (Bangladesh)"
-msgstr "Bengali (Bangladesh)"
+msgstr "Bengalí (Bangladesh)"
 
 msgctxt "#30005"
 msgid "Catalan (Spain)"
@@ -71,7 +71,7 @@ msgstr "Alto"
 
 msgctxt "#30007"
 msgid "Czech (Czech Republic)"
-msgstr "Checo (Republica Checa)"
+msgstr "Checo (República Checa)"
 
 msgctxt "#30008"
 msgid "Danish (Denmark)"
@@ -119,7 +119,7 @@ msgstr "Temporada adicional: Especiales"
 
 msgctxt "#30014"
 msgid "English (Canada)"
-msgstr "Inglés (Canada)"
+msgstr "Inglés (Canadá)"
 
 #: /resources/settings.xml
 msgctxt "#32022"
@@ -155,7 +155,7 @@ msgstr "Valoraciones"
 
 msgctxt "#30018"
 msgid "English (United States of America)"
-msgstr "Inglés (Estados Unidos de Amarica)"
+msgstr "Inglés (Estados Unidos de América)"
 
 msgctxt "#30019"
 msgid "Esperanto (None)"
@@ -167,7 +167,7 @@ msgstr "Español (España)"
 
 msgctxt "#30021"
 msgid "Spanish (Mexico)"
-msgstr "Español (México"
+msgstr "Español (México)"
 
 msgctxt "#30022"
 msgid "Estonian (Estonia)"
@@ -175,7 +175,7 @@ msgstr "Estonio (Estonia)"
 
 msgctxt "#30023"
 msgid "Basque (Spain)"
-msgstr "Basco (España)"
+msgstr "Vasco (España)"
 
 #: /resources/tmdbhelper/lib/script/method/trakt.py
 msgctxt "#32035"
@@ -245,7 +245,7 @@ msgstr "Series abandonadas"
 #: /resources/settings.xml
 msgctxt "#32049"
 msgid "Sort order of Your Next Episodes list. By airdate sorts episodes by premiere date. By recentlywatched sorts episodes by most recently watched tvshow. By todays is recentlywatched with episodes airing today at the front. By lastweek is recentlywatched with episodes airing in the past week sorted by airdate at the front."
-msgstr "Orden de clasificación de la lista Tus próximos episodios. 'Por fecha de emisión' ordena por estreno. 'Por visto recientemente' ordena por serie vista más recientemente. 'Por hoy' es visto recientemente con episodios que se emiten hoy al principio. 'Por semana pasada' es visto recientemente con episodios emitidos la semana pasada al principio."
+msgstr "Orden de la lista Tus próximos episodios. 'Por fecha de emisión' ordena por fecha de estreno. 'Por visto recientemente' ordena por la serie vista más recientemente. 'Por hoy' es visto recientemente con episodios que se emiten hoy al principio. 'Por semana pasada' es visto recientemente con episodios emitidos la semana pasada al principio."
 
 #: /resources/settings.xml
 msgctxt "#32050"
@@ -299,7 +299,7 @@ msgstr "Reproductores por defecto"
 #: /resources/settings.xml
 msgctxt "#32034"
 msgid "Get watched indicators and episode counts"
-msgstr "Obtener indicadores vistos y recuentos de episodios (más lento)"
+msgstr "Obtener indicadores de visto y recuento de episodios"
 
 #: /resources/settings.xml
 msgctxt "#32037"
@@ -678,7 +678,7 @@ msgstr "elementos"
 #: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
 msgctxt "#32135"
 msgid "Private"
-msgstr "Privado"
+msgstr "Privada"
 
 #: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
 msgctxt "#32136"
@@ -1097,7 +1097,7 @@ msgstr "Con región de proveedor"
 #: /resources/tmdbhelper/lib/script/discover/tmdb.py
 msgctxt "#32218"
 msgid "With Watch Monetization Types"
-msgstr "Con tipos de monetización de visualización"
+msgstr "Con tipos de monetización"
 
 #: /resources/tmdbhelper/lib/script/discover/tmdb.py
 msgctxt "#32219"
@@ -2527,7 +2527,7 @@ msgstr "Crear nuevo nodo"
 #: /resources/tmdbhelper/lib/items/container.py
 msgctxt "#32496"
 msgid "Add node"
-msgstr "Agregar/Quitar como nodo personalizado"
+msgstr "Añadir nodo"
 
 #: /resources/settings.xml
 msgctxt "#32497"
@@ -2777,11 +2777,11 @@ msgstr "Portugués (Brasil)"
 
 msgctxt "#30049"
 msgid "Portuguese (Portugal)"
-msgstr "Portugués (portugal)"
+msgstr "Portugués (Portugal)"
 
 msgctxt "#30050"
 msgid "Romanian (Romania)"
-msgstr "Rumano (Rumania)"
+msgstr "Rumano (Rumanía)"
 
 msgctxt "#30051"
 msgid "Russian (Russia)"
@@ -2789,7 +2789,7 @@ msgstr "Ruso (Rusia)"
 
 msgctxt "#30052"
 msgid "Sinhalese (Sri Lanka)"
-msgstr "Cingales (Sri Lanka)"
+msgstr "Cingalés (Sri Lanka)"
 
 msgctxt "#30053"
 msgid "Slovak (Slovakia)"
@@ -2821,11 +2821,11 @@ msgstr "Tailandés (Tailandia)"
 
 msgctxt "#30060"
 msgid "Tagalog (Philippines)"
-msgstr "Tagalo (Philippines)"
+msgstr "Tagalo (Filipinas)"
 
 msgctxt "#30061"
 msgid "Turkish (Turkey)"
-msgstr "Turco (Turquía"
+msgstr "Turco (Turquía)"
 
 msgctxt "#30062"
 msgid "Ukrainian (Ukraine)"
@@ -2837,15 +2837,15 @@ msgstr "Vietnamita (Vietnam)"
 
 msgctxt "#30064"
 msgid "Mandarin (China)"
-msgstr "Mandarin (China)"
+msgstr "Mandarín (China)"
 
 msgctxt "#30065"
 msgid "Mandarin (Hong Kong)"
-msgstr "Mandarin (Hong Kong)"
+msgstr "Mandarín (Hong Kong)"
 
 msgctxt "#30066"
 msgid "Mandarin (Taiwan)"
-msgstr "Mandarin (Taiwan)"
+msgstr "Mandarín (Taiwán)"
 
 msgctxt "#30067"
 msgid "Zulu (South Africa)"
