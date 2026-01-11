@@ -96,7 +96,7 @@ class Poller(WindowChecker):
         try:
             values = get_infolabel(CV_USE_LOCAL_WINDOWIDS).split('|')
             return tuple((int(i) for i in values)) if values else tuple()
-        except AttributeError:
+        except (AttributeError, ValueError, TypeError):
             return tuple()
 
     @property
@@ -168,15 +168,22 @@ class Poller(WindowChecker):
         self.get_current_window()
         if self.is_current_window_xml(WINDOW_XML_INFODIALOG):
             return True
-        if self.is_current_base_window_xml(WINDOW_XML_MEDIA):
+        if self.is_current_window_xml(WINDOW_XML_MEDIA):
             return True
         return False
 
     @property
     def is_on_clear(self):
+        # Get the current window again just to double check that it hasn't changed in the interim
+        self.get_current_base_window()
+        self.get_current_window()
         if self.current_base_window in self.localwidgetcontainer_window_ids:
             return False
-        return not self.is_on_mediawindow
+        if self.is_current_window_xml(WINDOW_XML_INFODIALOG):
+            return False
+        if self.is_current_base_window_xml(WINDOW_XML_MEDIA):  # We check base here as we won't clear if underlying window is open
+            return False
+        return True
 
     def poller(self):
         while not self.update_monitor.abortRequested() and not self.exit:
