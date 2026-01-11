@@ -96,7 +96,7 @@ class Poller(WindowChecker):
         try:
             values = get_infolabel(CV_USE_LOCAL_WINDOWIDS).split('|')
             return tuple((int(i) for i in values)) if values else tuple()
-        except AttributeError:
+        except (AttributeError, ValueError, TypeError):
             return tuple()
 
     @property
