@@ -60,6 +60,7 @@ class ServiceMonitor(Poller):
         """
         IF we've got properties to clear lets clear them and then jump back in the loop
         """
+        self.listitem_funcs.reset_current_item()  # Reset current item so that it will retrigger lookup on return to previous window
         self.listitem_funcs.clear_properties()
         self._on_idle(POLL_MIN_INCREMENT)
 

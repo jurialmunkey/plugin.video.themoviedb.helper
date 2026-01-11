@@ -59,12 +59,7 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
 
     def __init__(self, parent):
         SafeThread.__init__(self)
-        self.cur_item = 0
-        self.pre_item = 1
-        self.cur_window = 0
-        self.pre_window = 1
-        self.cur_base_window = 0
-        self.pre_base_window = 1
+        self.reset_current_item()
         self._next_refresh = 0
         self._this_refresh = 0
         self.exit = False
@@ -72,6 +67,15 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         self.remote_artwork = RemoteArtwork()
         self._allow_on_scroll = True  # Allow updating while scrolling
         self._parent = parent
+        self.properties = set()
+
+    def reset_current_item(self):
+        self.cur_item = 0
+        self.pre_item = 1
+        self.cur_window = 0
+        self.pre_window = 1
+        self.cur_base_window = 0
+        self.pre_base_window = 1
 
     @property
     def is_artwork_disabled(self):
@@ -176,10 +180,20 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         for k, v in infoproperties.items():
             if use_current_window:
                 self.get_property(f'ListItem.{k}', set_property=v, clear_property=(v is None), use_current_window=True)
-                self.get_property(f'ListItem.Current.{k}', set_property=v, clear_property=(v is None))
+                self.add_property(f'ListItem.Current.{k}', v)  # We only track properties set to Home, local properties are kept constant
             else:
-                self.get_property(f'ListItem.{k}', set_property=v, clear_property=(v is None))
+                self.add_property(f'ListItem.{k}', v)
         return True
+
+    def add_property(self, k, v):
+        if v is None:
+            return self.del_property(k)
+        self.get_property(k, set_property=v)
+        self.properties.add(k)
+
+    def del_property(self, k):
+        self.get_property(k, clear_property=True)
+        self.properties.discard(k)
 
     def _on_listitem(self):
         self.on_listitem()
@@ -188,6 +202,15 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
     def _on_scroll(self):
         if self._allow_on_scroll:
             return self._on_listitem()
+        self._on_idle(POLL_MIN_INCREMENT)
+
+    def _on_clear(self):
+        """
+        IF we've got properties to clear lets clear them and then jump back in the loop
+        """
+        self.reset_current_item()  # Reset current item so that it will retrigger lookup on return to previous window
+        for k in tuple(self.properties):
+            self.del_property(k)
         self._on_idle(POLL_MIN_INCREMENT)
 
     def run(self):
