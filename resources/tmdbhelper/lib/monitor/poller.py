@@ -164,7 +164,6 @@ class Poller(WindowChecker):
     @property
     def is_on_mediawindow(self):
         # Get the current window again just to double check that it hasn't changed in the interim
-        self.get_current_base_window()
         self.get_current_window()
         if self.is_current_window_xml(WINDOW_XML_INFODIALOG):
             return True
@@ -174,16 +173,19 @@ class Poller(WindowChecker):
 
     @property
     def is_on_clear(self):
-        # Get the current window again just to double check that it hasn't changed in the interim
+        # Get the current base window again just to double check that it hasn't changed in the interim
         self.get_current_base_window()
-        self.get_current_window()
         if self.current_base_window in self.localwidgetcontainer_window_ids:
             return False
-        if self.is_current_window_xml(WINDOW_XML_INFODIALOG):
+        if self.is_on_infodialog:
             return False
         if self.is_current_base_window_xml(WINDOW_XML_MEDIA):  # We check base here as we won't clear if underlying window is open
             return False
         return True
+
+    @property
+    def is_on_infodialog(self):
+        return any((get_condvisibility(f'Window.IsVisible({i})') for i in WINDOW_XML_INFODIALOG))
 
     def poller(self):
         while not self.update_monitor.abortRequested() and not self.exit:
