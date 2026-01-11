@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2025-12-29 17:15+0800\n"
+"PO-Revision-Date: 2026-01-11 20:07+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -546,7 +546,7 @@ msgstr "小组件"
 #: /resources/settings.xml
 msgctxt "#32093"
 msgid "Next episodes sort method"
-msgstr "下一集 排序方式"
+msgstr "“下一集”排序方式"
 
 #: /resources/settings.xml
 msgctxt "#32095"
@@ -959,12 +959,12 @@ msgstr "即将到来"
 #: /resources/lib/plugin.py
 msgctxt "#32178"
 msgid "Trending Today"
-msgstr "今日趋势"
+msgstr "今日最热"
 
 #: /resources/lib/plugin.py
 msgctxt "#32179"
 msgid "Trending This Week"
-msgstr "本周趋势"
+msgstr "本周最热"
 
 #: /resources/lib/plugin.py
 msgctxt "#32180"
@@ -1039,17 +1039,17 @@ msgstr "观看列表"
 #: /resources/lib/plugin.py
 msgctxt "#32194"
 msgid "Your Recently Watched"
-msgstr "你最近观看的"
+msgstr "你最近观看"
 
 #: /resources/lib/plugin.py
 msgctxt "#32195"
 msgid "Your Most Watched"
-msgstr "你最受关注的"
+msgstr "你最多观看"
 
 #: /resources/lib/plugin.py
 msgctxt "#32196"
 msgid "Your In-Progress"
-msgstr "你正在观看的"
+msgstr "你正在观看"
 
 #: /resources/lib/plugin.py
 msgctxt "#32197"
@@ -1069,7 +1069,7 @@ msgstr "基于最近观看"
 #: /resources/lib/plugin.py
 msgctxt "#32200"
 msgid "Based on Most Watched"
-msgstr "基于最受关注"
+msgstr "基于最多观看"
 
 #: /resources/lib/plugin.py
 msgctxt "#32201"
@@ -1089,7 +1089,7 @@ msgstr "节目表"
 #: /resources/lib/plugin.py
 msgctxt "#32204"
 msgid "Trending"
-msgstr "趋势"
+msgstr "热门"
 
 #: /resources/tmdbhelper/lib/script/discover/tmdb.py
 msgctxt "#32217"
@@ -1134,7 +1134,7 @@ msgstr "票房十佳"
 #: /resources/lib/plugin.py
 msgctxt "#32208"
 msgid "Trending Lists"
-msgstr "趋势列表"
+msgstr "热门列表"
 
 #: /resources/lib/plugin.py
 msgctxt "#32209"
@@ -1587,7 +1587,7 @@ msgstr "添加到新列表"
 #: /resources/lib/basedir.py
 msgctxt "#32300"
 msgid "Trending List"
-msgstr "趋势列表"
+msgstr "热门列表"
 
 #: /resources/lib/basedir.py
 msgctxt "#32301"
@@ -2655,7 +2655,7 @@ msgstr "从 TMDb 收藏夹添加/删除"
 #: /resources/tmdbhelper/lib/script/method/tmdb.py
 msgctxt "#32526"
 msgid "Add/Remove from TMDb watchlist"
-msgstr "从 TMDB 监视列表添加/删除"
+msgstr "从 TMDB 观看列表添加/删除"
 
 #: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
 msgctxt "#32527"
