@@ -147,7 +147,7 @@ msgstr "Annulla dati di sincronizzati"
 #: /resources/tmdbhelper/lib/script/method/trakt.py
 msgctxt "#32027"
 msgid "Successfully cleared {} sync data"
-msgstr "Dati sincornizzati di {} cancellati con successo"
+msgstr "Dati sincronizzati di {} cancellati con successo"
 
 #: /resources/tmdbhelper/lib/script/method/trakt.py
 msgctxt "#32028"
@@ -204,7 +204,7 @@ msgstr "Preferisci le immagini da fanart.tv"
 #: /resources/tmdbhelper/lib/items/directories/tmdb/lists_seasons.py
 msgctxt "#32040"
 msgid "All seasons"
-msgstr "Tuute le stagioni"
+msgstr "Tutte le stagioni"
 
 #: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
 msgctxt "#32041"
@@ -719,7 +719,7 @@ msgstr "Parola chiave"
 #: /resources/tmdbhelper/lib/player/players.py
 msgctxt "#32143"
 msgid "Recaching Kodi library"
-msgstr "Ricacheggiando la libreria Kodi"
+msgstr "Ricreando la cache della libreria di Kodi"
 
 #: /resources/tmdbhelper/lib/player/players.py
 msgctxt "#32144"
@@ -884,7 +884,7 @@ msgstr "Riproduci automaticamente i file locali"
 #: /resources/settings.xml
 msgctxt "#32163"
 msgid "Use fanart.tv for service monitor artwork"
-msgstr "Usa fanart.tv per gli artwork del monitor di servizio"
+msgstr "Usa fanart.tv per le immagini del monitor di servizio"
 
 #: /resources/lib/context.py
 msgctxt "#32164"
@@ -1138,7 +1138,7 @@ msgstr "Elenchi di tendenza"
 #: /resources/lib/plugin.py
 msgctxt "#32209"
 msgid "Popular Lists"
-msgstr "Elenci popolari"
+msgstr "Elenchi popolari"
 
 #: /resources/lib/plugin.py
 msgctxt "#32210"
@@ -1626,7 +1626,7 @@ msgstr "Sfoglia l'elenco ordinato"
 #: /resources/lib/window/manager.py
 msgctxt "#32310"
 msgid "TMDb ID for {} not found!"
-msgstr "ID TMDb per {} non trovato!"
+msgstr "TMDb ID per {} non trovato!"
 
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32323"
@@ -1886,7 +1886,7 @@ msgstr "Rimuovi dall'elenco utenti"
 #: /resources/lib/script/sync.py
 msgctxt "#32356"
 msgid "Enter new list name"
-msgstr "Inserisci il nuovo nome ddell'elenco"
+msgstr "Inserisci il nuovo nome dell'elenco"
 
 #: /resources/lib/script/router.py
 msgctxt "#32357"
@@ -1902,7 +1902,7 @@ msgstr ""
 #: /resources/lib/script/router.py
 msgctxt "#32358"
 msgid "Delete user list"
-msgstr "Canclella elenco utente"
+msgstr "Cancella elenco utente"
 
 #: /resources/lib/script/router.py
 msgctxt "#32359"
@@ -1987,7 +1987,7 @@ msgstr "Usa valutazioni online nel monitor dei dettagli"
 #: /resources/settings.xml
 msgctxt "#32373"
 msgid "Restrict to library strm"
-msgstr "Limita alla libreria strm"
+msgstr "Limita ai file strm della libreria"
 
 #: /resources/lib/player/players.py
 msgctxt "#32374"
@@ -1997,7 +1997,7 @@ msgstr "Costruzione lettori"
 #: /resources/lib/player/players.py
 msgctxt "#32375"
 msgid "Retrieving item details"
-msgstr "Recupero dei dettagli dell'elementi"
+msgstr "Recupero dei dettagli dell'elemento"
 
 #: /resources/lib/player/players.py
 msgctxt "#32376"
@@ -2133,7 +2133,7 @@ msgstr "Posizione database cache"
 #: /resources/settings.xml
 msgctxt "#32410"
 msgid "Max concurrent threads (0 is unlimited)"
-msgstr "Massimo thread concorrenti (0 è illimitato)"
+msgstr "Numero massimo di thread concorrenti (0 è illimitato)"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32411"
@@ -2148,7 +2148,7 @@ msgstr "Con provider di visione"
 #: /resources/settings.xml
 msgctxt "#32413"
 msgid "Next episodes checks calendar (slower but more accurate)"
-msgstr "Il calendario dei prossimi episodi controlla (più lento ma più accurato)"
+msgstr "Prossimi episodi controlla il calendario (più lento ma più accurato)"
 
 #: /resources/lib/addon/consts.py
 msgctxt "#32414"
@@ -2533,7 +2533,7 @@ msgstr "Aggiungi nodo"
 #: /resources/settings.xml
 msgctxt "#32497"
 msgid "Container content fallback for service listitems without mediatypes"
-msgstr "Fallback contenuto container per listitem dei servizi senza mediatype"
+msgstr "Fallback del contenuto del container per il servizio listitem senza mediatype"
 
 #: /resources/settings.xml
 msgctxt "#32498"
@@ -2668,7 +2668,7 @@ msgstr "Aggiungi a {}"
 #: /resources/settings.xml
 msgctxt "#32529"
 msgid "Scrobble items on Trakt while watching"
-msgstr "Scrobbla elementi su Trakt durante la visione"
+msgstr "Scrobble degli elementi su Trakt durante la visione"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32530"
@@ -2722,7 +2722,7 @@ msgstr "Giapponese (Giappone)"
 
 msgctxt "#30035"
 msgid "Georgian (Georgia)"
-msgstr "Gerogiano (Georgia)"
+msgstr "Georgiano (Georgia)"
 
 msgctxt "#30036"
 msgid "Kazakh (Kazakhstan)"
@@ -2766,7 +2766,7 @@ msgstr "Tedesco (Olanda)"
 
 msgctxt "#30046"
 msgid "Norwegian (Norway)"
-msgstr "Novegese (Norvegia)"
+msgstr "Norvegese (Norvegia)"
 
 msgctxt "#30047"
 msgid "Polish (Poland)"
