@@ -663,7 +663,7 @@ msgstr "Seleccionar Géneros"
 #: /resources/lib/container.py
 msgctxt "#32113"
 msgid "Also accepts days from today as T-X or T+X (e.g. T-10 is ten days ago)"
-msgstr "También acepta X días relativos a partir de hoy en el formato T-X o T+X (p.e, T-10 es hace diez días)"
+msgstr "También acepta días desde hoy como T-X o T+X (p. ej. T-10 es hace diez días)"
 
 #: /resources/lib/container.py
 msgctxt "#32114"
