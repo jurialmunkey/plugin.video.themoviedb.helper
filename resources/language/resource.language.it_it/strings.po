@@ -125,7 +125,7 @@ msgstr "Inglese (Canada)"
 #: /resources/settings.xml
 msgctxt "#32022"
 msgid "Clear sync data"
-msgstr "Pulisci dati sincronizzati"	
+msgstr "Pulisci dati sincronizzati"
 
 msgctxt "#30015"
 msgid "English (United Kingdom)"
@@ -152,7 +152,7 @@ msgstr "Dati sincronizzati di {} cancellati con successo"
 #: /resources/tmdbhelper/lib/script/method/trakt.py
 msgctxt "#32028"
 msgid "Ratings"
-msgstr "Valutazioni"											   
+msgstr "Valutazioni"
 
 msgctxt "#30018"
 msgid "English (United States of America)"
@@ -209,7 +209,7 @@ msgstr "Tutte le stagioni"
 #: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
 msgctxt "#32041"
 msgid "Your In-Progress TV Shows"
-msgstr "Le tue serie TV in corso"					  
+msgstr "Le tue serie TV in corso"
 
 msgctxt "#30026"
 msgid "French (Canada)"
@@ -575,7 +575,7 @@ msgstr "Vuoi cancellare gli elementi esistenti o aggiungerne altri?"
 #: /resources/tmdbhelper/lib/script/method/modify_artwork.py
 msgctxt "#32115"
 msgid "Reset {} artwork to default?"
-msgstr "Ripristinare l'immagine {} ai valori predefiniti?"
+msgstr "Ripristinare l'artwork {} ai valori predefiniti?"
 
 #: /resources/tmdbhelper/lib/script/method/modify_artwork.py
 msgctxt "#32116"
@@ -590,7 +590,7 @@ msgstr "Pulisci elementi"
 #: /resources/tmdbhelper/lib/items/context.py
 msgctxt "#32118"
 msgid "Modify artwork"
-msgstr "Modifica immagine"	 
+msgstr "Modifica artwork"
 
 #: /resources/lib/container.py
 msgctxt "#32102"
@@ -1198,7 +1198,7 @@ msgstr "Simili"
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32238"
 msgid "Scripted"
-msgstr "Sceneggiato"	 
+msgstr "Sceneggiato"
 
 #: /resources/lib/plugin.py
 msgctxt "#32225"
@@ -1478,7 +1478,7 @@ msgstr "Serie in corso"
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32294"
 msgid "Planned"
-msgstr "Pianificato"									
+msgstr "Pianificato"
 
 #: /resources/lib/basedir.py
 msgctxt "#32281"
@@ -1750,7 +1750,7 @@ msgstr "Scelta utente"
 #: /resources/tmdbhelper/lib/script/discover/tmdb/routes.py
 msgctxt "#32346"
 msgid "Timezone"
-msgstr "Fuso orario"														   
+msgstr "Fuso orario"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32334"
@@ -2698,7 +2698,7 @@ msgstr "Non binario"
 #: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
 msgctxt "#32536"
 msgid "Unspecified"
-msgstr "Non specificato"		  
+msgstr "Non specificato"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
