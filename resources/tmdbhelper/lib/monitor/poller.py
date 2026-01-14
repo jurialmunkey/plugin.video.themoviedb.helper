@@ -89,7 +89,7 @@ class Poller(WindowChecker):
         return
 
     def _on_fullscreen(self):
-        self._on_idle(POLL_MID_INCREMENT)
+        self._on_idle(POLL_MAX_INCREMENT)
 
     @property
     def localwidgetcontainer_window_ids(self):
@@ -196,7 +196,7 @@ class Poller(WindowChecker):
                 self.exit = True
                 break
 
-            # If we're in fullscreen video then we should update the playermonitor time
+            # sit idle when on fullscreen video and treat like screensaver
             if self.is_on_fullscreen:
                 self._on_fullscreen()
                 continue
