@@ -5,7 +5,7 @@ from tmdbhelper.lib.monitor.cronjob import CronJobMonitor
 from tmdbhelper.lib.monitor.player import PlayerMonitor
 from tmdbhelper.lib.monitor.update import UpdateMonitor
 from tmdbhelper.lib.monitor.imgmon import ImagesMonitor
-from tmdbhelper.lib.monitor.poller import Poller, POLL_MIN_INCREMENT, POLL_MID_INCREMENT, POLL_MAX_INCREMENT
+from tmdbhelper.lib.monitor.poller import Poller, POLL_MIN_INCREMENT, POLL_MAX_INCREMENT
 from tmdbhelper.lib.addon.thread import SafeThread
 from threading import Lock
 
