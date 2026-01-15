@@ -91,13 +91,19 @@ class Poller(WindowChecker):
     def _on_fullscreen(self):
         self._on_idle(POLL_MAX_INCREMENT)
 
+    localwidgetcontainer_default_window_ids = (
+        10000, 11101, 11102, 11103, 11104,
+        11105, 11106, 11107, 11108, 11109,
+    )
+
     @property
     def localwidgetcontainer_window_ids(self):
         try:
             values = get_infolabel(CV_USE_LOCAL_WINDOWIDS).split('|')
-            return tuple((int(i) for i in values)) if values else tuple()
+            values = tuple((int(i) for i in values)) if values else None
+            return values or self.localwidgetcontainer_default_window_ids
         except (AttributeError, ValueError, TypeError):
-            return tuple()
+            return self.localwidgetcontainer_default_window_ids
 
     @property
     def is_on_fullscreen(self):
