@@ -2,12 +2,13 @@ from jurialmunkey.window import get_property
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_setting
 from tmdbhelper.lib.addon.logger import kodi_log
+from tmdbhelper.lib.addon.tmdate import set_timestamp
 
 
 class PlayerScrobbler():
     def __init__(self, trakt_api, total_time):
         self.trakt_api = trakt_api
-        self.current_time = 0
+        self.start_time = 0
         self.total_time = total_time
         self.tvdb_id = self.playerstring.get('tvdb_id')
         self.imdb_id = self.playerstring.get('imdb_id')
@@ -64,6 +65,14 @@ class PlayerScrobbler():
         return f'{self.tmdb_type}.{self.tmdb_id}.{self.season}.{self.episode}'
 
     @property
+    def current_time(self):
+        return set_timestamp(-self.start_time)
+
+    @current_time.setter
+    def current_time(self, value):
+        self.start_time = set_timestamp(-value)
+
+    @property
     def progress(self):
         return ((self.current_time / self.total_time) * 100)
 
@@ -84,6 +93,7 @@ class PlayerScrobbler():
         if not self.is_match(tmdb_type, tmdb_id):
             return
         self.current_time = current_time
+        # kodi_log(f'SCROBBLER: [UPDATE] {self.content_id} -- {self.progress:.2f}%', 2)
 
     @cached_property
     def trakt_item(self):
@@ -122,7 +132,7 @@ class PlayerScrobbler():
     @is_scrobbling
     def start(self, tmdb_type, tmdb_id):
         if self.started or self.stopped:
-            return
+            return self.sync(tmdb_type, tmdb_id)
         if not self.is_match(tmdb_type, tmdb_id):
             return self.stop(tmdb_type, tmdb_id)
         kodi_log(f'SCROBBLER: [Start] {self.content_id} -- {self.progress:.2f}%', 2)
@@ -131,7 +141,7 @@ class PlayerScrobbler():
 
     @is_scrobbling
     def pause(self, tmdb_type, tmdb_id):
-        return  # Trakt no longer supports a pause method so just return
+        return self.sync(tmdb_type, tmdb_id)  # Trakt no longer supports a pause method so just return after checking sync
 
     @is_scrobbling
     def stop(self, tmdb_type, tmdb_id):
