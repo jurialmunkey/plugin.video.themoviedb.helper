@@ -2443,7 +2443,7 @@ msgstr "Player predefinito per {} cancellato con successo"
 #: /resources/lib/items/listitem.py
 msgctxt "#32476"
 msgid "Choose default player"
-msgstr "Seleziona player predefinito"
+msgstr "Seleziona lettore predefinito"
 
 #: /resources/lib/script/method.py
 msgctxt "#32477"
