@@ -1837,6 +1837,16 @@ msgctxt "#32348"
 msgid "Log output of TMDb request"
 msgstr "Protokollausgabe der TMDb-Anfrage"
 
+#: /resources/settings.xml
+msgctxt "#32349"
+msgid "Use fallback English plot translations (slower)"
+msgstr "Englische Fallback-Übersetzungen der Handlung verwenden (langsamer)"
+
+#: /resources/settings.xml
+msgctxt "#32350"
+msgid "Retrieve English language plot translations to use as a fallback when primrary language translation is missing. Note that this setting will considerably increase detailed information lookup times and database disk usage."
+msgstr "Englische Übersetzungen der Handlung abrufen, die als Fallback verwendet werden können, wenn die Übersetzung in der Primärsprache fehlt. Beachte, dass diese Einstellung die Suchzeiten für detaillierte Informationen und die Datenspeichernutzung erheblich erhöht."
+
 #: /resources/lib/kodi/library.py
 msgctxt "#32351"
 msgid "Dummy ResolvedURL"
@@ -1979,6 +1989,11 @@ msgctxt "#32376"
 msgid "Building players dialog"
 msgstr "Playerdialog wird erstellt"
 
+#: /resources/settings.xml
+msgctxt "#32377"
+msgid "Use online artwork in image monitor"
+msgstr "Online-Grafiken im Bildmonitor verwenden"
+
 #: /resources/lib/trakt/api.py
 msgctxt "#32378"
 msgid "Show All"
@@ -2018,6 +2033,11 @@ msgstr "Episodengruppen und Als Nächstes ausblenden"
 msgctxt "#32385"
 msgid "Hide All"
 msgstr "Alle ausblenden"
+
+#: /resources/settings.xml
+msgctxt "#32386"
+msgid "Use online ratings in details monitor"
+msgstr "Online-Bewertungen im Detailmonitor verwenden"
 
 #: /resources/settings.xml
 msgctxt "#32387"
