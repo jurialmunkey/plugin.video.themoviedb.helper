@@ -35,7 +35,10 @@ WINDOW_XML_MEDIA = (
     'MyPlaylist.xml',
     'MyGames.xml',
     'MyPVRChannels.xml',
-    'MyPVRGuide.xml'
+    'MyPVRGuide.xml',
+    'MyPVRRecordings.xml',
+    'MyPVRSearch.xml',
+    'MyPVRTimers.xml'
 )
 
 WINDOW_XML_INFODIALOG = (
