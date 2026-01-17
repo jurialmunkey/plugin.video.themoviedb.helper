@@ -1986,6 +1986,16 @@ msgctxt "#32373"
 msgid "Restrict to library strm"
 msgstr "Ogranicz do streamów biblioteki"
 
+#: /resources/settings.xml
+msgctxt "#32388"
+msgid "Retrieve genre fanart"
+msgstr "Pobierz fanart gatunku"
+
+#: /resources/settings.xml
+msgctxt "#32389"
+msgid "Retrieve provider fanart"
+msgstr "Pobierz fanart dostawcy"
+
 #: /resources/lib/player/players.py
 msgctxt "#32374"
 msgid "Constructing players"
