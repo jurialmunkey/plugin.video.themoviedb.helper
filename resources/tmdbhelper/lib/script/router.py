@@ -88,6 +88,8 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.image_functions', 'blur_image')(**kwargs),
         'image_colors':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.image_functions', 'image_colors')(**kwargs),
+        'genre_fanart':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.image_functions', 'genre_fanart')(**kwargs),
 
         # User Configuration
         'provider_allowlist':

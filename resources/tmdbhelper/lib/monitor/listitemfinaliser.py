@@ -84,7 +84,7 @@ class ListItemMonitorFinaliser:
         self.set_ratings(ratings)
 
     def artwork(self):
-        self.images_monitor.remote_artwork[self.item.identifier] = self.item.artwork.copy()
+        self.images_monitor.remote_artwork.set(self.item.identifier, self.item.artwork.copy())
         self.processed_artwork = self.images_monitor.update_artwork(forced=True) or {}
 
     def start_process_artwork(self):
