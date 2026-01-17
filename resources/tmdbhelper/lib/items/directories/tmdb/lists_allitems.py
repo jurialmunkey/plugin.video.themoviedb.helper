@@ -70,10 +70,24 @@ class ItemGenres(ItemViews):
     item_icon_default = f'{ADDONPATH}/resources/icons/themoviedb/genre.png'
     item_mediatype = 'genre'
 
-    def __init__(self, label, tmdb_id, tmdb_type):
+    def __init__(self, label, tmdb_id, tmdb_type, genre_artwork=None):
         self.label = label
         self.tmdb_id = tmdb_id
         self.tmdb_type = tmdb_type
+        self.genre_artwork = genre_artwork
+
+    @cached_property
+    def fanart(self):
+        if not self.genre_artwork:
+            return
+        return self.genre_artwork.get(f'genre.{self.tmdb_type}.{self.tmdb_id}.fanart')
+
+    @cached_property
+    def art(self):
+        art = {}
+        art.update({'icon': self.icon} if self.icon else {})
+        art.update({'fanart': self.fanart} if self.fanart else {})
+        return art
 
     @cached_property
     def params(self):
@@ -87,9 +101,20 @@ class ItemGenres(ItemViews):
 
 
 class ListGenres(ContainerDirectory):
+
+    @cached_property
+    def genre_artwork(self):
+        if not get_setting('genre_fanart'):
+            return
+        from tmdbhelper.lib.script.method.image_functions import GenreArtwork
+        return GenreArtwork().fanart
+
     def get_items(self, tmdb_type, **kwargs):
         items = self.query_database.get_genres(tmdb_type)
-        items = [ItemGenres(name, tmdb_id, tmdb_type).item for name, tmdb_id in items.items()]
+        items = [
+            ItemGenres(name, tmdb_id, tmdb_type, self.genre_artwork).item
+            for name, tmdb_id in items.items()
+        ]
         self.kodi_db = None
         self.container_content = 'genres'
         self.plugin_category = get_localized(135)  # convert_type(tmdb_type, 'plural')
@@ -309,12 +334,26 @@ class ItemProviders(ItemViews):
     item_icon_location = get_setting('provider_icon_location', 'str')
     item_mediatype = 'provider'
 
-    def __init__(self, provider_name, provider_id, tmdb_type, iso_country, logo_path, **kwargs):
+    def __init__(self, provider_name, provider_id, tmdb_type, iso_country, logo_path, provider_artwork=None, **kwargs):
         self.label = provider_name
         self.tmdb_id = provider_id
         self.tmdb_type = tmdb_type
         self.iso_country = iso_country
         self.logo_path = logo_path
+        self.provider_artwork = provider_artwork
+
+    @cached_property
+    def fanart(self):
+        if not self.provider_artwork:
+            return
+        return self.provider_artwork.get(f'provider.{self.tmdb_type}.{self.tmdb_id}.fanart')
+
+    @cached_property
+    def art(self):
+        art = {}
+        art.update({'icon': self.icon} if self.icon else {})
+        art.update({'fanart': self.fanart} if self.fanart else {})
+        return art
 
     @cached_property
     def item_icon_default(self):
@@ -333,9 +372,16 @@ class ItemProviders(ItemViews):
 
 
 class ListProviders(ContainerDirectory):
+    @cached_property
+    def provider_artwork(self):
+        if not get_setting('provider_fanart'):
+            return
+        from tmdbhelper.lib.script.method.image_functions import ProviderArtwork
+        return ProviderArtwork().fanart
+
     def get_items(self, tmdb_type, **kwargs):
         items = self.query_database.get_watch_providers(tmdb_type, self.tmdb_api.iso_country, allowlist_only=True)
-        items = [ItemProviders(**i).item for i in items]
+        items = [ItemProviders(**i, provider_artwork=self.provider_artwork).item for i in items]
         self.kodi_db = None
         self.container_content = ''
         self.plugin_category = 'JustWatch'
