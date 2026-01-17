@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2026-01-11 20:07+0800\n"
+"PO-Revision-Date: 2026-01-17 20:07+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -1989,6 +1989,16 @@ msgstr "在详情面板中使用在线评分"
 msgctxt "#32373"
 msgid "Restrict to library strm"
 msgstr "仅处理 .strm 文件"
+
+#: /resources/settings.xml
+msgctxt "#32388"
+msgid "Retrieve genre fanart"
+msgstr "获取类型同人画"
+
+#: /resources/settings.xml
+msgctxt "#32389"
+msgid "Retrieve provider fanart"
+msgstr "获取提供商同人画"
 
 #: /resources/lib/player/players.py
 msgctxt "#32374"
