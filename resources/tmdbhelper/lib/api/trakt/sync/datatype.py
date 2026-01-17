@@ -309,7 +309,7 @@ class SyncNextEpisodeItem:
         Returns a generator of all next episodes by comparing againt reset_at date and timestamps
         """
         if not self.response:
-            return
+            return iter(())
 
         return (
             self.get_next_episode_id(season['number'], episode['number'])
