@@ -273,11 +273,17 @@ class SyncNextEpisodeItem:
 
     @cached_property
     def next_episode(self):
-        return self.response.get('next_episode')
+        try:
+            return self.response['next_episode']
+        except (KeyError, TypeError, NameError):
+            return
 
     @cached_property
     def next_episode_aired_at(self):
-        return self.next_episode['first_aired']
+        try:
+            return self.next_episode['first_aired']
+        except (KeyError, TypeError, NameError):
+            return
 
     @cached_property
     def next_episode_is_unaired(self):
@@ -285,11 +291,17 @@ class SyncNextEpisodeItem:
 
     @cached_property
     def next_episode_season(self):
-        return self.next_episode['season']
+        try:
+            return self.next_episode['season']
+        except (KeyError, TypeError, NameError):
+            return
 
     @cached_property
     def next_episode_number(self):
-        return self.next_episode['number']
+        try:
+            return self.next_episode['number']
+        except (KeyError, TypeError, NameError):
+            return
 
     def get_next_episode_id(self, season, number):
         return f'tv.{self.tmdb_id}.{season}.{number}'
