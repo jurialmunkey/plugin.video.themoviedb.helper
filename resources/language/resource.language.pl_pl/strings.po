@@ -1984,7 +1984,17 @@ msgstr "Korzystaj z ocen online w monitorze szczegółów"
 #: /resources/settings.xml
 msgctxt "#32373"
 msgid "Restrict to library strm"
-msgstr "Ogranicz do streamów biblioteki"
+msgstr "Ogranicz do strumieni biblioteki"
+
+#: /resources/settings.xml
+msgctxt "#32388"
+msgid "Retrieve genre fanart"
+msgstr "Pobierz fanart gatunku"
+
+#: /resources/settings.xml
+msgctxt "#32389"
+msgid "Retrieve provider fanart"
+msgstr "Pobierz fanart dostawcy"
 
 #: /resources/lib/player/players.py
 msgctxt "#32374"
@@ -2019,7 +2029,7 @@ msgstr "Ukrywaj następne"
 #: /resources/settings.xml
 msgctxt "#32381"
 msgid "Hide Up Next and Specials"
-msgstr "Ukrywaj odcinki specjalne i następne"
+msgstr "Ukrywaj specjalne i następne"
 
 #: /resources/settings.xml
 msgctxt "#32382"
@@ -2029,7 +2039,7 @@ msgstr "Ukrywaj grupy odcinków"
 #: /resources/settings.xml
 msgctxt "#32383"
 msgid "Hide Episode Groups and Specials"
-msgstr "Ukrywaj grupy odcinków i odcinki specjalne"
+msgstr "Ukrywaj grupy odcinków i specjalne"
 
 #: /resources/settings.xml
 msgctxt "#32384"
