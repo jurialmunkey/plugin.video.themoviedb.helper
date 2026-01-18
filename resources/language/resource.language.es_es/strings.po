@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2024-06-20 20:05+0000\n"
-"PO-Revision-Date: 2024-07-14 15:40+0000\n"
-"Last-Translator: Gregorio Cuad(x722)\n"
+"PO-Revision-Date: 2026-01-13 18:33+0000\n"
+"Last-Translator: 01xKeven\n"
 "Language-Team: Spanish - GTKing Phoenix TEAM\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -18,11 +18,16 @@ msgstr ""
 
 msgctxt "#30000"
 msgid "Arabic (United Arab Emirates)"
-msgstr "Arabe (Emiratos Arabes Unidos)"
+msgstr "Árabe (Emiratos Árabes Unidos)"
 
 msgctxt "#30001"
 msgid "Arabic (Saudi Arabia)"
-msgstr "Arabe (Arabia Saudi)"
+msgstr "Árabe (Arabia Saudí)"
+
+#: /resources/tmdbhelper/lib/api/tmdb/methods/lists.py
+msgctxt "#32000"
+msgid "Unaired"
+msgstr "No emitido"
 
 msgctxt "#30002"
 msgid "Belarusian (Belarus)"
@@ -32,21 +37,41 @@ msgctxt "#30003"
 msgid "Bulgarian (Bulgaria)"
 msgstr "Búlgaro (Bulgaria)"
 
+#: /resources/settings.xml
+msgctxt "#32003"
+msgid "Preferred"
+msgstr "Preferido"
+
 msgctxt "#30004"
 msgid "Bengali (Bangladesh)"
-msgstr "Bengali (Bangladesh)"
+msgstr "Bengalí (Bangladesh)"
 
 msgctxt "#30005"
 msgid "Catalan (Spain)"
 msgstr "Catalán (España)"
 
+#: /resources/settings.xml
+msgctxt "#32006"
+msgid "Supplement"
+msgstr "Complemento"
+
 msgctxt "#30006"
 msgid "Chamorro (Guam)"
 msgstr "Chamorro (Guam)"
 
+#: /resources/settings.xml
+msgctxt "#32008"
+msgid "Low"
+msgstr "Bajo"
+
+#: /resources/settings.xml
+msgctxt "#32009"
+msgid "High"
+msgstr "Alto"
+
 msgctxt "#30007"
 msgid "Czech (Czech Republic)"
-msgstr "Checo (Republica Checa)"
+msgstr "Checo (República Checa)"
 
 msgctxt "#30008"
 msgid "Danish (Denmark)"
@@ -56,9 +81,19 @@ msgctxt "#30009"
 msgid "German (Austria)"
 msgstr "Alemán (Austria)"
 
+#: /resources/settings.xml
+msgctxt "#32013"
+msgid "Get watched indicators, episode counts, and resume points"
+msgstr "Obtener indicadores de visto, recuento de episodios y puntos de reanudación"
+
 msgctxt "#30010"
 msgid "German (Switzerland)"
 msgstr "Alemán (Suiza)"
+
+#: /resources/settings.xml
+msgctxt "#32015"
+msgid "Additional season: Up next"
+msgstr "Temporada adicional: A continuación"
 
 msgctxt "#30011"
 msgid "German (Germany)"
@@ -68,13 +103,28 @@ msgctxt "#30012"
 msgid "Greek (Greece)"
 msgstr "Griego (Grecia)"
 
+#: /resources/settings.xml
+msgctxt "#32018"
+msgid "Additional season: Anticipated"
+msgstr "Temporada adicional: Anticipada"
+
 msgctxt "#30013"
 msgid "English (Australia)"
 msgstr "Inglés (Australia)"
 
+#: /resources/settings.xml
+msgctxt "#32020"
+msgid "Additional season: Specials"
+msgstr "Temporada adicional: Especiales"
+
 msgctxt "#30014"
 msgid "English (Canada)"
-msgstr "Inglés (Canada)"
+msgstr "Inglés (Canadá)"
+
+#: /resources/settings.xml
+msgctxt "#32022"
+msgid "Clear sync data"
+msgstr "Borrar datos de sincronización"
 
 msgctxt "#30015"
 msgid "English (United Kingdom)"
@@ -88,9 +138,24 @@ msgctxt "#30017"
 msgid "English (New Zealand)"
 msgstr "Inglés (Nueva Zelanda)"
 
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32026"
+msgid "Invalidate Sync Data"
+msgstr "Invalidar datos de sincronización"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32027"
+msgid "Successfully cleared {} sync data"
+msgstr "Datos de sincronización de {} borrados con éxito"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32028"
+msgid "Ratings"
+msgstr "Valoraciones"
+
 msgctxt "#30018"
 msgid "English (United States of America)"
-msgstr "Inglés (Estados Unidos de Amarica)"
+msgstr "Inglés (Estados Unidos de América)"
 
 msgctxt "#30019"
 msgid "Esperanto (None)"
@@ -102,7 +167,7 @@ msgstr "Español (España)"
 
 msgctxt "#30021"
 msgid "Spanish (Mexico)"
-msgstr "Español (México"
+msgstr "Español (México)"
 
 msgctxt "#30022"
 msgid "Estonian (Estonia)"
@@ -110,7 +175,17 @@ msgstr "Estonio (Estonia)"
 
 msgctxt "#30023"
 msgid "Basque (Spain)"
-msgstr "Basco (España)"
+msgstr "Vasco (España)"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32035"
+msgid "Progress"
+msgstr "Progreso"
+
+#: /resources/tmdbhelper/lib/script/method/trakt.py
+msgctxt "#32036"
+msgid "Dropped"
+msgstr "Abandonada"
 
 msgctxt "#30024"
 msgid "Persian (Iran)"
@@ -119,6 +194,21 @@ msgstr "Persa (Irán)"
 msgctxt "#30025"
 msgid "Finnish (Finland)"
 msgstr "Finés (Finlandia)"
+
+#: /resources/settings.xml
+msgctxt "#32039"
+msgid "Prefer fanart.tv artwork"
+msgstr "Preferir arte de fanart.tv"
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_seasons.py
+msgctxt "#32040"
+msgid "All seasons"
+msgstr "Todas las temporadas"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32041"
+msgid "Your In-Progress TV Shows"
+msgstr "Tus series en progreso"
 
 msgctxt "#30026"
 msgid "French (Canada)"
@@ -131,6 +221,51 @@ msgstr "Francés (Francia)"
 msgctxt "#30028"
 msgid "Galician (Spain)"
 msgstr "Gallego (España)"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32045"
+msgid "Your In-Progress Movies"
+msgstr "Tus películas en progreso"
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32046"
+msgid "Drop TV show"
+msgstr "Abandonar serie"
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32047"
+msgid "Undrop TV show"
+msgstr "Retomar serie"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+msgctxt "#32048"
+msgid "Dropped TV Shows"
+msgstr "Series abandonadas"
+
+#: /resources/settings.xml
+msgctxt "#32049"
+msgid "Sort order of Your Next Episodes list. By airdate sorts episodes by premiere date. By recentlywatched sorts episodes by most recently watched tvshow. By todays is recentlywatched with episodes airing today at the front. By lastweek is recentlywatched with episodes airing in the past week sorted by airdate at the front."
+msgstr "Orden de la lista Tus próximos episodios. 'Por fecha de emisión' ordena por fecha de estreno. 'Por visto recientemente' ordena por la serie vista más recientemente. 'Por hoy' es visto recientemente con episodios que se emiten hoy al principio. 'Por semana pasada' es visto recientemente con episodios emitidos la semana pasada al principio."
+
+#: /resources/settings.xml
+msgctxt "#32050"
+msgid "Prefer artwork in your language"
+msgstr "Preferir arte en tu idioma"
+
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+msgctxt "#32051"
+msgid "Deleted cached {} items"
+msgstr "Eliminados {} elementos en caché"
+
+#: /resources/settings.xml
+msgctxt "#32052"
+msgid "Delete TMDb cached item details"
+msgstr "Borrar detalles de elementos en caché de TMDb"
+
+#: /resources/settings.xml
+msgctxt "#32053"
+msgid "TMDbHelper automatically performs regular cache maintenance. You should only delete the cache when instructed to troubleshoot issues. TMDbHelper relies on having cached items to perform well. Unnecessarily deleting the cache on a regular basis will degrade performance and places excessive strain on the free services providing this data."
+msgstr "TMDbHelper realiza automáticamente un mantenimiento regular de la caché. Solo debe borrar la caché cuando se le indique para solucionar problemas. TMDbHelper depende de tener elementos en caché para funcionar bien. Borrar la caché innecesariamente de forma regular degradará el rendimiento y ejercerá una presión excesiva sobre los servicios gratuitos que proporcionan estos datos."
 
 msgctxt "#30029"
 msgid "Hebrew (Israel)"
@@ -163,18 +298,53 @@ msgstr "Reproductores por defecto"
 
 #: /resources/settings.xml
 msgctxt "#32034"
-msgid "Get watched indicators and episode counts (slower)"
-msgstr "Obtener indicadores vistos y recuentos de episodios (más lento)"
+msgid "Get watched indicators and episode counts"
+msgstr "Obtener indicadores de visto y recuento de episodios"
 
 #: /resources/settings.xml
 msgctxt "#32037"
 msgid "Use bundled players"
 msgstr "Utilice reproductores incluidos"
 
+#: /resources/tmdbhelper/lib/items/directories/lists_base.py
+msgctxt "#32062"
+msgid "Networks"
+msgstr "Cadenas"
+
+#: /resources/tmdbhelper/lib/api/trakt/sorting.py
+msgctxt "#32063"
+msgid "Added"
+msgstr "Añadido"
+
+#: /resources/tmdbhelper/lib/items/directories/lists_base.py
+msgctxt "#32064"
+msgid "Related"
+msgstr "Relacionado"
+
+#: /resources/tmdbhelper/lib/items/directories/trakt/lists_related.py
+msgctxt "#32065"
+msgid "Watchers"
+msgstr "Espectadores"
+
 #: /resources/settings.xml
 msgctxt "#32038"
 msgid "Get additional details from the local Kodi library database"
 msgstr "Obtenga detalles adicionales de la base de datos de la biblioteca local de Kodi"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32067"
+msgid "Budget"
+msgstr "Presupuesto"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32068"
+msgid "Revenue"
+msgstr "Ingresos"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32069"
+msgid "Last Air Date"
+msgstr "Última fecha de emisión"
 
 #: /resources/settings.xml
 msgctxt "#32042"
@@ -185,6 +355,11 @@ msgstr "Elige Acción"
 msgctxt "#32043"
 msgid "Up Next"
 msgstr "Siguiente"
+
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32072"
+msgid "Score"
+msgstr "Puntuación"
 
 #: /resources/lib/container.py
 msgctxt "#32044"
@@ -216,6 +391,11 @@ msgctxt "#32058"
 msgid "The provided URL is either invalid or inaccesible."
 msgstr "La URL proporcionada no es válida o es inaccesible."
 
+#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
+msgctxt "#32079"
+msgid "User"
+msgstr "Usuario"
+
 #: /resources/lib/downloader.py
 msgctxt "#32059"
 msgid "Success!"
@@ -225,6 +405,16 @@ msgstr "¡Correcto!"
 msgctxt "#32060"
 msgid "files extracted"
 msgstr "archivos extraídos"
+
+#: /resources/settings.xml
+msgctxt "#32082"
+msgid "Page multiplier (Other basic lists)"
+msgstr "Multiplicador de página (Otras listas básicas)"
+
+#: /resources/settings.xml
+msgctxt "#32083"
+msgid "Page multiplier (Database sync lists)"
+msgstr "Multiplicador de página (Listas de sincronización de base de datos)"
 
 #: /resources/lib/player.py
 msgctxt "#32061"
@@ -240,6 +430,11 @@ msgstr "Registro de depuración"
 msgctxt "#32070"
 msgid "Male"
 msgstr "Hombre"
+
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32087"
+msgid "Search for TMDb ID or input manually?"
+msgstr "¿Buscar ID de TMDb o introducir manualmente?"
 
 #: /resources/lib/tmdb.py
 msgctxt "#32071"
@@ -271,6 +466,11 @@ msgctxt "#32077"
 msgid "Ignore folder creation checks"
 msgstr "Ignorar las comprobaciones de creación de carpetas"
 
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32094"
+msgid "Select TMDb type"
+msgstr "Seleccionar tipo TMDb"
+
 #: /resources/lib/container/basedir.py
 msgctxt "#32078"
 msgid "Still to Watch"
@@ -285,6 +485,11 @@ msgstr "Otro"
 msgctxt "#32081"
 msgid "Next page item"
 msgstr "Siguiente página de elementos"
+
+#: /resources/tmdbhelper/lib/script/method/modify_identifier.py
+msgctxt "#32098"
+msgid "Updated"
+msgstr "Actualizado"
 
 #: /resources/settings.xml
 msgctxt "#32084"
@@ -315,6 +520,16 @@ msgstr "Seleccione la acción"
 msgctxt "#32090"
 msgid "Content"
 msgstr "Contenido"
+
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32105"
+msgid "leave blank to delete"
+msgstr "dejar en blanco para borrar"
+
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32106"
+msgid "Enter {} URL"
+msgstr "Introducir URL de {}"
 
 #: /resources/settings.xml
 msgctxt "#32091"
@@ -356,10 +571,25 @@ msgctxt "#32100"
 msgid "Do you wish to clear the existing items or add more?"
 msgstr "¿Desea borrar los elementos existentes o agregar más?"
 
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32115"
+msgid "Reset {} artwork to default?"
+msgstr "¿Restablecer arte de {} a predeterminado?"
+
+#: /resources/tmdbhelper/lib/script/method/modify_artwork.py
+msgctxt "#32116"
+msgid "Remove user artwork override and reset artwork to default artwork selection as defined in the settings."
+msgstr "Eliminar la anulación de arte del usuario y restablecer el arte a la selección predeterminada definida en la configuración."
+
 #: /resources/lib/container.py
 msgctxt "#32101"
 msgid "Clear Items"
 msgstr "Borrar elementos"
+
+#: /resources/tmdbhelper/lib/items/context.py
+msgctxt "#32118"
+msgid "Modify artwork"
+msgstr "Modificar arte"
 
 #: /resources/lib/container.py
 msgctxt "#32102"
@@ -390,6 +620,11 @@ msgctxt "#32108"
 msgid "Choose matching method for parameters with multiple values."
 msgstr "Elija el método de coincidencia para parámetros con múltiples valores."
 
+#: /resources/settings.xml
+msgctxt "#32124"
+msgid "RatingPosterDB API"
+msgstr "API RatingPosterDB"
+
 #: /resources/lib/container.py
 msgctxt "#32109"
 msgid "Match ANY Value"
@@ -399,6 +634,21 @@ msgstr "Coincide con CUALQUIER valor"
 msgctxt "#32110"
 msgid "Match ALL Values"
 msgstr "Coinciden TODOS los valores"
+
+#: /resources/settings.xml
+msgctxt "#32127"
+msgid "RatingPosterDB API key"
+msgstr "Clave API RatingPosterDB"
+
+#: /resources/tmdbhelper/lib/items/database/baseview_factories/concrete_classes/ftv_fanart.py
+msgctxt "#32128"
+msgid "Likes"
+msgstr "Me gusta"
+
+#: /resources/settings.xml
+msgctxt "#32129"
+msgid "Override player monitor clearlogo with artwork from TMDbHelper"
+msgstr "Anular clearlogo del monitor del reproductor con arte de TMDbHelper"
 
 #: /resources/lib/container.py
 msgctxt "#32111"
@@ -412,28 +662,143 @@ msgstr "Seleccionar Géneros"
 
 #: /resources/lib/container.py
 msgctxt "#32113"
-msgid "Also accepts X days relative from today in the format T-X or T+X (e.g. T-10 is ten days ago)"
-msgstr "También acepta X días relativos a partir de hoy en el formato T-X o T+X (p.e, T-10 es hace diez días)"
+msgid "Also accepts days from today as T-X or T+X (e.g. T-10 is ten days ago)"
+msgstr "También acepta días desde hoy como T-X o T+X (p. ej. T-10 es hace diez días)"
 
 #: /resources/lib/container.py
 msgctxt "#32114"
 msgid "Enter"
 msgstr "Entrar"
 
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32134"
+msgid "items"
+msgstr "elementos"
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32135"
+msgid "Private"
+msgstr "Privada"
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32136"
+msgid "Do you want to make this list a public or private list?"
+msgstr "¿Quieres hacer esta lista pública o privada?"
+
+#: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
+msgctxt "#32137"
+msgid "Public or private list?"
+msgstr "¿Lista pública o privada?"
+
+#: /resources/settings.xml
+msgctxt "#32138"
+msgid "Scrobbling"
+msgstr "Scrobbling"
+
+#: /resources/settings.xml
+msgctxt "#32139"
+msgid "Rate items on TMDb after watching"
+msgstr "Puntuar elementos en TMDb después de verlos"
+
+#: /resources/tmdbhelper/lib/player/configure.py
+msgctxt "#32140"
+msgid "Create new player"
+msgstr "Crear nuevo reproductor"
+
+#: /resources/tmdbhelper/lib/player/configure.py
+msgctxt "#32141"
+msgid "Delete fallback"
+msgstr "Eliminar alternativa"
+
 #: /resources/lib/container.py
 msgctxt "#32117"
 msgid "Keyword"
 msgstr "Teclado"
+
+#: /resources/tmdbhelper/lib/player/players.py
+msgctxt "#32143"
+msgid "Recaching Kodi library"
+msgstr "Recacheando biblioteca Kodi"
+
+#: /resources/tmdbhelper/lib/player/players.py
+msgctxt "#32144"
+msgid "Retrieving player files"
+msgstr "Recuperando archivos del reproductor"
+
+#: /resources/tmdbhelper/lib/player/dialog/player.py
+msgctxt "#32145"
+msgid "Retrieving library"
+msgstr "Recuperando biblioteca"
+
+#: /resources/tmdbhelper/lib/api/trakt/sync/invalidator.py
+msgctxt "#32146"
+msgid "Successfully refreshed {} sync data"
+msgstr "Datos de sincronización de {} actualizados correctamente"
+
+#: /resources/settings.xml
+msgctxt "#32147"
+msgid "Gemini API"
+msgstr "API Gemini"
+
+#: /resources/settings.xml
+msgctxt "#32148"
+msgid "Gemini API key"
+msgstr "Clave API Gemini"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_main.py
+msgctxt "#32149"
+msgid "Gemini AI"
+msgstr "IA Gemini"
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
+msgctxt "#32150"
+msgid "Google Gemini AI requires a developer API key to use."
+msgstr "Google Gemini AI requiere una clave de desarrollador para su uso."
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
+msgctxt "#32151"
+msgid "Visit [B]{}[/B] to generate your key and then input into TMDbHelper settings under the API keys section."
+msgstr "Visita [B]{}[/B] para generar tu clave e introdúcela en la configuración de TMDbHelper bajo la sección de claves API."
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_nodes.py
+msgctxt "#32152"
+msgid "Remove node"
+msgstr "Eliminar nodo"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32153"
+msgid "Query"
+msgstr "Consulta"
 
 #: /resources/lib/container.py
 msgctxt "#32119"
 msgid "Select Release Types"
 msgstr "Seleccionar tipos de lanzamiento"
 
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32155"
+msgid "Airing"
+msgstr "Emitiendo"
+
 #: /resources/lib/container.py
 msgctxt "#32120"
 msgid "Select Region for Release"
 msgstr "Seleccionar región por lanzamiento"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32157"
+msgid "Decades"
+msgstr "Décadas"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32158"
+msgid "Certifications"
+msgstr "Certificaciones"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32159"
+msgid "Lists"
+msgstr "Listas"
 
 #: /resources/lib/container.py
 msgctxt "#32121"
@@ -459,6 +824,11 @@ msgstr "Agregar lista Trakt a la biblioteca Kodi"
 msgctxt "#32126"
 msgid "Are you sure you want to add this Trakt list to your Kodi library?"
 msgstr "¿Estás seguro de que quieres agregar esta lista de Trakt a tu biblioteca Kodi?"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32165"
+msgid "Add another item?"
+msgstr "¿Añadir otro elemento?"
 
 #: /resources/lib/context.py
 msgctxt "#32130"
@@ -719,6 +1089,31 @@ msgctxt "#32204"
 msgid "Trending"
 msgstr "Tendencias"
 
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32217"
+msgid "With Provider Region"
+msgstr "Con región de proveedor"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32218"
+msgid "With Watch Monetization Types"
+msgstr "Con tipos de monetización"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32219"
+msgid "Certification Country"
+msgstr "País de certificación"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb/routes.py
+msgctxt "#32220"
+msgid "With Origin Country"
+msgstr "Con país de origen"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32221"
+msgid "Miniseries"
+msgstr "Miniserie"
+
 #: /resources/lib/plugin.py
 msgctxt "#32205"
 msgid "Most Played"
@@ -779,6 +1174,11 @@ msgctxt "#32216"
 msgid "Successfully logged out of Trakt user account"
 msgstr "Cerró sesión satisfactoriamente en la cuenta de usuario de Trakt"
 
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32234"
+msgid "Reality"
+msgstr "Reality"
+
 #: /resources/lib/script.py
 msgctxt "#32222"
 msgid "Manage artwork"
@@ -793,6 +1193,11 @@ msgstr "Recomendada"
 msgctxt "#32224"
 msgid "Similar"
 msgstr "Similar"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32238"
+msgid "Scripted"
+msgstr "Con guion"
 
 #: /resources/lib/plugin.py
 msgctxt "#32225"
@@ -1064,6 +1469,16 @@ msgctxt "#32280"
 msgid "Last Fortnight"
 msgstr "Última Quincena"
 
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32293"
+msgid "Returning Series"
+msgstr "Serie que regresa"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32294"
+msgid "Planned"
+msgstr "Planeada"
+
 #: /resources/lib/basedir.py
 msgctxt "#32281"
 msgid "Last Week"
@@ -1123,6 +1538,16 @@ msgstr "Añadir a lista de seguimiento"
 msgctxt "#32292"
 msgid "Remove from watchlist"
 msgstr "Eliminar de la lista de seguimiento"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32307"
+msgid "In Production"
+msgstr "En producción"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32308"
+msgid "Ended"
+msgstr "Finalizada"
 
 #: /resources/lib/script.py
 msgctxt "#32295"
@@ -1201,6 +1626,21 @@ msgstr "Explorar lista ordenada"
 msgctxt "#32310"
 msgid "TMDb ID for {} not found!"
 msgstr "¡ID de TMDb para {} no encontrada!"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32323"
+msgid "Cancelled"
+msgstr "Cancelada"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32324"
+msgid "Pilot"
+msgstr "Piloto"
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_discodir.py
+msgctxt "#32325"
+msgid "Edit Filters"
+msgstr "Editar filtros"
 
 #: /resources/lib/player/players.py
 msgctxt "#32311"
@@ -1306,6 +1746,11 @@ msgctxt "#32333"
 msgid "User Choice"
 msgstr "Elección de usuario"
 
+#: /resources/tmdbhelper/lib/script/discover/tmdb/routes.py
+msgctxt "#32346"
+msgid "Timezone"
+msgstr "Zona horaria"
+
 #: /resources/lib/player/configure.py
 msgctxt "#32334"
 msgid "Reset player to defaults?"
@@ -1396,6 +1841,16 @@ msgctxt "#32348"
 msgid "Log output of TMDb request"
 msgstr "Guardar historial de consultas de TMDb"
 
+#: /resources/settings.xml
+msgctxt "#32349"
+msgid "Use fallback English plot translations (slower)"
+msgstr "Usar traducciones de sinopsis en inglés como respaldo (más lento)"
+
+#: /resources/settings.xml
+msgctxt "#32350"
+msgid "Retrieve English language plot translations to use as a fallback when primrary language translation is missing. Note that this setting will considerably increase detailed information lookup times and database disk usage."
+msgstr "Recuperar traducciones de sinopsis en inglés para usar como respaldo cuando falte la traducción del idioma principal. Tenga en cuenta que esta configuración aumentará considerablemente los tiempos de búsqueda de información detallada y el uso del disco de la base de datos."
+
 #: /resources/lib/kodi/library.py
 msgctxt "#32351"
 msgid "Dummy ResolvedURL"
@@ -1478,6 +1933,11 @@ msgctxt "#32364"
 msgid "Reroute PlayMedia to xbmc.Player()"
 msgstr "Redirigir PlayMedia a xbmc.Player()"
 
+#: /resources/settings.xml
+msgctxt "#32377"
+msgid "Use online artwork in image monitor"
+msgstr "Usar arte online en el monitor de imágenes"
+
 #: /resources/lib/addon/plugin.py
 msgctxt "#32365"
 msgid "Combined"
@@ -1519,23 +1979,28 @@ msgid "fanart"
 msgstr "fanart"
 
 #: /resources/settings.xml
+msgctxt "#32386"
+msgid "Use online ratings in details monitor"
+msgstr "Usar valoraciones online en el monitor de detalles"
+
+#: /resources/settings.xml
 msgctxt "#32373"
 msgid "Restrict to library strm"
 msgstr "Restringir a la biblioteca strm"
 
 #: /resources/lib/player/players.py
 msgctxt "#32374"
-msgid "Constructing Players"
+msgid "Constructing players"
 msgstr "Construyendo reproductores"
 
 #: /resources/lib/player/players.py
 msgctxt "#32375"
-msgid "Retrieving Item Details"
+msgid "Retrieving item details"
 msgstr "Recuperar detalles del elemento"
 
 #: /resources/lib/player/players.py
 msgctxt "#32376"
-msgid "Building Player Dialog"
+msgid "Building players dialog"
 msgstr "Construcción de la ventana de diálogo del reproductor"
 
 #: /resources/lib/trakt/api.py
@@ -1805,6 +2270,11 @@ msgid "Provider allowlist updated"
 msgstr "Lista de proveedores permitidos actualizada"
 
 #: /resources/lib/script/method.py
+msgctxt "#32439"
+msgid "The provider allowlist has been updated."
+msgstr "La lista de proveedores permitidos ha sido actualizada."
+
+#: /resources/lib/player/configure.py
 msgctxt "#32440"
 msgid "Edit steps"
 msgstr "Editar pasos"
@@ -2036,8 +2506,8 @@ msgstr "Quitar de favoritos"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32492"
-msgid "{} already exists in {}!\\nDo you wish to remove this item from the list?"
-msgstr "{} ya existe en {}!\\n¿Deseas eliminar este elemento de la lista?"
+msgid "{} already exists in {}!"
+msgstr "{} ya existe en {}!"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32493"
@@ -2056,8 +2526,8 @@ msgstr "Crear nuevo nodo"
 
 #: /resources/tmdbhelper/lib/items/container.py
 msgctxt "#32496"
-msgid "Add/Remove as Custom Node"
-msgstr "Agregar/Quitar como nodo personalizado"
+msgid "Add node"
+msgstr "Añadir nodo"
 
 #: /resources/settings.xml
 msgctxt "#32497"
@@ -2118,6 +2588,116 @@ msgstr "Carpeta de iconos de género (Trakt)"
 msgctxt "#32508"
 msgid "Recache Kodi Library details when building players"
 msgstr "Recuperar detalles de la biblioteca Kodi al crear reproductores"
+
+#: /resources/settings.xml
+msgctxt "#32509"
+msgid "Use alternative TMDb API url"
+msgstr "Usar URL alternativa de API TMDb"
+
+#: /resources/settings.xml
+msgctxt "#32514"
+msgid "Add to MDbList list"
+msgstr "Añadir a lista MDbList"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32516"
+msgid "MDbList API credentials not found."
+msgstr "Credenciales API MDbList no encontradas."
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32517"
+msgid "Add your personal MDbList API key in TMDbHelper settings."
+msgstr "Añade tu clave personal API MDbList en la configuración de TMDbHelper."
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32518"
+msgid "No static lists found for current MDbList user."
+msgstr "No se encontraron listas estáticas para el usuario actual de MDbList."
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32519"
+msgid "Remove from MDbList list"
+msgstr "Eliminar de la lista MDbList"
+
+#: /resources/settings.xml
+msgctxt "#32520"
+msgid "TMDb"
+msgstr "TMDb"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32521"
+msgid "Rated"
+msgstr "Clasificada"
+
+#: /resources/settings.xml
+msgctxt "#32522"
+msgid "TMDb user options"
+msgstr "Opciones de usuario TMDb"
+
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+msgctxt "#32523"
+msgid "Add/Remove from TMDb user list"
+msgstr "Añadir/Eliminar de lista de usuario TMDb"
+
+#: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
+msgctxt "#32524"
+msgid "User lists"
+msgstr "Listas de usuario"
+
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+msgctxt "#32525"
+msgid "Add/Remove from TMDb favourites"
+msgstr "Añadir/Eliminar de favoritos TMDb"
+
+#: /resources/tmdbhelper/lib/script/method/tmdb.py
+msgctxt "#32526"
+msgid "Add/Remove from TMDb watchlist"
+msgstr "Añadir/Eliminar de lista de seguimiento TMDb"
+
+#: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
+msgctxt "#32527"
+msgid "Remove from {}"
+msgstr "Eliminar de {}"
+
+#: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
+msgctxt "#32528"
+msgid "Add to {}"
+msgstr "Añadir a {}"
+
+#: /resources/settings.xml
+msgctxt "#32529"
+msgid "Scrobble items on Trakt while watching"
+msgstr "Scrobble elementos en Trakt mientras se ven"
+
+#: /resources/tmdbhelper/lib/script/sync.py
+msgctxt "#32530"
+msgid "Remove rating"
+msgstr "Eliminar valoración"
+
+#: /resources/tmdbhelper/lib/script/sync/item.py
+msgctxt "#32531"
+msgid "Method only available for VIP accounts."
+msgstr "Método solo disponible para cuentas VIP."
+
+#: /resources/tmdbhelper/lib/script/sync/basic.py
+msgctxt "#32532"
+msgid "Force resync"
+msgstr "Forzar resincronización"
+
+#: /resources/settings.xml
+msgctxt "#32534"
+msgid "Trakt sync progress notifications"
+msgstr "Notificaciones de progreso de sincronización de Trakt"
+
+#: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
+msgctxt "#32535"
+msgid "Non-binary"
+msgstr "No binario"
+
+#: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
+msgctxt "#32536"
+msgid "Unspecified"
+msgstr "No especificado"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
@@ -2197,11 +2777,11 @@ msgstr "Portugués (Brasil)"
 
 msgctxt "#30049"
 msgid "Portuguese (Portugal)"
-msgstr "Portugués (portugal)"
+msgstr "Portugués (Portugal)"
 
 msgctxt "#30050"
 msgid "Romanian (Romania)"
-msgstr "Rumano (Rumania)"
+msgstr "Rumano (Rumanía)"
 
 msgctxt "#30051"
 msgid "Russian (Russia)"
@@ -2209,7 +2789,7 @@ msgstr "Ruso (Rusia)"
 
 msgctxt "#30052"
 msgid "Sinhalese (Sri Lanka)"
-msgstr "Cingales (Sri Lanka)"
+msgstr "Cingalés (Sri Lanka)"
 
 msgctxt "#30053"
 msgid "Slovak (Slovakia)"
@@ -2241,11 +2821,11 @@ msgstr "Tailandés (Tailandia)"
 
 msgctxt "#30060"
 msgid "Tagalog (Philippines)"
-msgstr "Tagalo (Philippines)"
+msgstr "Tagalo (Filipinas)"
 
 msgctxt "#30061"
 msgid "Turkish (Turkey)"
-msgstr "Turco (Turquía"
+msgstr "Turco (Turquía)"
 
 msgctxt "#30062"
 msgid "Ukrainian (Ukraine)"
@@ -2257,15 +2837,15 @@ msgstr "Vietnamita (Vietnam)"
 
 msgctxt "#30064"
 msgid "Mandarin (China)"
-msgstr "Mandarin (China)"
+msgstr "Mandarín (China)"
 
 msgctxt "#30065"
 msgid "Mandarin (Hong Kong)"
-msgstr "Mandarin (Hong Kong)"
+msgstr "Mandarín (Hong Kong)"
 
 msgctxt "#30066"
 msgid "Mandarin (Taiwan)"
-msgstr "Mandarin (Taiwan)"
+msgstr "Mandarín (Taiwán)"
 
 msgctxt "#30067"
 msgid "Zulu (South Africa)"
@@ -2350,8 +2930,3 @@ msgstr "Reproductor predeterminado para películas"
 msgctxt "#32025"
 msgid "Default player for episodes"
 msgstr "Reproductor predeterminado para episodios"
-
-#: /resources/settings.xml
-msgctxt "#32027"
-msgid "Clear default players"
-msgstr "Borrar reproductores predeterminados"
