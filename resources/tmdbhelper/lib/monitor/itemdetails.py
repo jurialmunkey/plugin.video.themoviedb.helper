@@ -113,9 +113,10 @@ class MonitorItemDetails(ImageManipulations):
         return get_condvisibility((
             'Window.IsVisible(DialogPVRInfo.xml) | '
             'Window.IsVisible(MyPVRChannels.xml) | '
+            'Window.IsVisible(MyPVRGuide.xml) | '
             'Window.IsVisible(MyPVRRecordings.xml) | '
             'Window.IsVisible(MyPVRSearch.xml) | '
-            'Window.IsVisible(MyPVRGuide.xml)'
+            'Window.IsVisible(MyPVRTimers.xml)'
         ))
 
     @cached_property
