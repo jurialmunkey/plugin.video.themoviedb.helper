@@ -84,7 +84,7 @@ msgstr "德语（奥地利）"
 
 #: /resources/settings.xml
 msgctxt "#32013"
-msgid "Get watched indicators, episode counts, 和 resume points"
+msgid "Get watched indicators, episode counts, and resume points"
 msgstr "获取已观看标识、剧集计数和续播点"
 
 msgctxt "#30010"
@@ -546,7 +546,7 @@ msgstr "小组件"
 #: /resources/settings.xml
 msgctxt "#32093"
 msgid "Next episodes sort method"
-msgstr "下一集排序方式"
+msgstr "“下一集”排序方式"
 
 #: /resources/settings.xml
 msgctxt "#32095"
