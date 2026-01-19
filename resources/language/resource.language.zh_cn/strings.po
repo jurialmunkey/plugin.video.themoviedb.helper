@@ -546,7 +546,7 @@ msgstr "小组件"
 #: /resources/settings.xml
 msgctxt "#32093"
 msgid "Next episodes sort method"
-msgstr "“下一集”排序方式"
+msgstr "下一集排序方式"
 
 #: /resources/settings.xml
 msgctxt "#32095"
