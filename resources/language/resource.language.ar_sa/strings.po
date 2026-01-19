@@ -1094,12 +1094,12 @@ msgstr "مع منطقة المزود"
 #: /resources/tmdbhelper/lib/script/discover/tmdb.py
 msgctxt "#32218"
 msgid "With Watch Monetization Types"
-msgstr ""
+msgstr "مع اكثر العروض ربحا"
 
 #: /resources/tmdbhelper/lib/script/discover/tmdb.py
 msgctxt "#32219"
 msgid "Certification Country"
-msgstr ""بلد التصديق
+msgstr "بلد التصديق"
 
 #: /resources/tmdbhelper/lib/script/discover/tmdb/routes.py
 msgctxt "#32220"
