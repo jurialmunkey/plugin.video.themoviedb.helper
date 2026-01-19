@@ -15,10 +15,11 @@ class ListItemMonitorFunctions(CommonMonitorFunctions, ListItemInfoGetter):
         self._listcontainer = None
         self._last_listitem = None
         self.property_prefix = 'ListItem'
-        self._pre_artwork_thread = None
         self.service_monitor = service_monitor  # ServiceMonitor
         self.ratings_queued = []
         self.ratings_thread = None
+        self.artwork_queued = []
+        self.artwork_thread = None
 
     def reset_current_item(self):
         self.cur_item = 0

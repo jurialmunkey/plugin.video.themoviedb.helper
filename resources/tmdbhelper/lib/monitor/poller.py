@@ -35,7 +35,10 @@ WINDOW_XML_MEDIA = (
     'MyPlaylist.xml',
     'MyGames.xml',
     'MyPVRChannels.xml',
-    'MyPVRGuide.xml'
+    'MyPVRGuide.xml',
+    'MyPVRRecordings.xml',
+    'MyPVRSearch.xml',
+    'MyPVRTimers.xml'
 )
 
 WINDOW_XML_INFODIALOG = (
@@ -89,15 +92,21 @@ class Poller(WindowChecker):
         return
 
     def _on_fullscreen(self):
-        self._on_idle(POLL_MID_INCREMENT)
+        self._on_idle(POLL_MAX_INCREMENT)
+
+    localwidgetcontainer_default_window_ids = (
+        10000, 11101, 11102, 11103, 11104,
+        11105, 11106, 11107, 11108, 11109,
+    )
 
     @property
     def localwidgetcontainer_window_ids(self):
         try:
             values = get_infolabel(CV_USE_LOCAL_WINDOWIDS).split('|')
-            return tuple((int(i) for i in values)) if values else tuple()
+            values = tuple((int(i) for i in values)) if values else None
+            return values or self.localwidgetcontainer_default_window_ids
         except (AttributeError, ValueError, TypeError):
-            return tuple()
+            return self.localwidgetcontainer_default_window_ids
 
     @property
     def is_on_fullscreen(self):
@@ -196,7 +205,7 @@ class Poller(WindowChecker):
                 self.exit = True
                 break
 
-            # If we're in fullscreen video then we should update the playermonitor time
+            # sit idle when on fullscreen video and treat like screensaver
             if self.is_on_fullscreen:
                 self._on_fullscreen()
                 continue

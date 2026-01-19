@@ -273,11 +273,17 @@ class SyncNextEpisodeItem:
 
     @cached_property
     def next_episode(self):
-        return self.response.get('next_episode')
+        try:
+            return self.response['next_episode']
+        except (KeyError, TypeError, NameError):
+            return
 
     @cached_property
     def next_episode_aired_at(self):
-        return self.next_episode['first_aired']
+        try:
+            return self.next_episode['first_aired']
+        except (KeyError, TypeError, NameError):
+            return
 
     @cached_property
     def next_episode_is_unaired(self):
@@ -285,11 +291,17 @@ class SyncNextEpisodeItem:
 
     @cached_property
     def next_episode_season(self):
-        return self.next_episode['season']
+        try:
+            return self.next_episode['season']
+        except (KeyError, TypeError, NameError):
+            return
 
     @cached_property
     def next_episode_number(self):
-        return self.next_episode['number']
+        try:
+            return self.next_episode['number']
+        except (KeyError, TypeError, NameError):
+            return
 
     def get_next_episode_id(self, season, number):
         return f'tv.{self.tmdb_id}.{season}.{number}'
@@ -309,7 +321,7 @@ class SyncNextEpisodeItem:
         Returns a generator of all next episodes by comparing againt reset_at date and timestamps
         """
         if not self.response:
-            return
+            return iter(())
 
         return (
             self.get_next_episode_id(season['number'], episode['number'])
@@ -356,6 +368,84 @@ class SyncNextEpisodeItem:
         }
 
 
+class SyncAllNextEpisodesMetaItem:
+
+    dialog_progress_bg_text_fstr = '{sync.tmdb_id} {sync.trakt_slug}'
+
+    def __init__(self, main, item):
+        self.main = main
+        self.item = item
+
+    @property
+    def is_sync(self):
+        return bool(self.sync.all_next_episodes)
+
+    @property
+    def dialog_progress_bg_text(self):
+        text = self.dialog_progress_bg_text_fstr.format(sync=self.sync)
+        text = f'Sync: {text}' if self.is_sync else f'Skip: {text}'
+        return text
+
+    def update_dialog_progress(self):
+        self.main.dialog_progress_bg.increment()
+        self.main.dialog_progress_bg.set_message(self.dialog_progress_bg_text)
+
+    @cached_property
+    def sync(self):
+        return SyncNextEpisodeItem(self.main, self.item)
+
+    @cached_property
+    def data(self):
+        self.update_dialog_progress()
+        return [self.get_item(item_id) for item_id in self.sync.all_next_episodes]
+
+    def get_item(self, item_id):
+        tmdb_type, tmdb_id, season_number, episode_number = item_id.split('.')
+        return {
+            "show": {
+                "ids": {
+                    "tmdb": self.item["tmdb_id"],
+                    "slug": self.item["trakt_slug"]
+                }
+            },
+            "upnext_episode_id": item_id,
+            "type": "episode",
+            "episode": {
+                "season": season_number,
+                "number": episode_number,
+            }
+        }
+
+
+class SyncAllNextEpisodesMeta:
+
+    meta_item_getter = SyncAllNextEpisodesMetaItem
+
+    def __init__(self, main):
+        self.main = main
+
+    def get_items(self, item):
+        return self.meta_item_getter(self.main, item).data
+
+    @cached_property
+    def item_queue(self):
+        self.main.dialog_progress_bg.max_value = len(self.sd.items)
+        from tmdbhelper.lib.addon.thread import ParallelThread
+        with ParallelThread(self.sd.items, self.get_items) as pt:
+            item_queue = pt.queue
+        return item_queue
+
+    @cached_property
+    def items(self):
+        return [i for items in self.item_queue for i in items if i]
+
+    @cached_property
+    def sd(self):
+        sd = self.main.instance_syncdata.get_all_unhidden_shows_inprogress_getter()
+        sd.additional_keys = ('trakt_slug', )
+        return sd
+
+
 class SyncAllNextEpisodes(DataTypeEpisodes):
     keys = ('upnext_episode_id', )
     last_activities_key = 'watched_at'
@@ -365,52 +455,33 @@ class SyncAllNextEpisodes(DataTypeEpisodes):
     @timerlock
     def sync_func(self):
         """ Get next episodes on Trakt """
-        from tmdbhelper.lib.addon.thread import ParallelThread
         from tmdbhelper.lib.addon.logger import TimerFunc
+        with TimerFunc(
+            f'Sync: {self.__class__.__name__} get_meta {self.method} {self.item_type}',
+            inline=True,
+            log_threshold=0.001
+        ):
+            return SyncAllNextEpisodesMeta(self).items
 
-        def get_item(i, item_id):
-            tmdb_type, tmdb_id, season_number, episode_number = item_id.split('.')
-            return {
-                "show": {
-                    "ids": {
-                        "tmdb": i["tmdb_id"],
-                        "slug": i["trakt_slug"]
-                    }
-                },
-                "upnext_episode_id": item_id,
-                "type": "episode",
-                "episode": {
-                    "season": season_number,
-                    "number": episode_number,
-                }
-            }
 
-        def update_dialog_progress(sync):
-            self.dialog_progress_bg.increment()
-            self.dialog_progress_bg.set_message((
-                f'Skip: {sync.tmdb_id} {sync.trakt_slug}'
-                if not sync.all_next_episodes
-                else f'Sync: {sync.tmdb_id} {sync.trakt_slug}'
-            ))
+class SyncNextEpisodesMetaItem(SyncAllNextEpisodesMetaItem):
+    dialog_progress_bg_text_fstr = '{sync.next_episode_id}'
 
-        def get_items(i):
-            sync = SyncNextEpisodeItem(self, i)
-            update_dialog_progress(sync)
-            return [get_item(i, item_id) for item_id in sync.all_next_episodes]
+    @cached_property
+    def data(self):
+        return self.sync.next_episode_id_dictionary
 
-        def get_meta(sd):
-            self.dialog_progress_bg.max_value = len(sd.items)
-            with ParallelThread(sd.items, get_items) as pt:
-                item_queue = pt.queue
-            return [i for items in item_queue for i in items if i]
+    @property
+    def is_sync(self):
+        return bool(self.sync.next_episode_id)
 
-        def get_sd():
-            sd = self.instance_syncdata.get_all_unhidden_shows_inprogress_getter()
-            sd.additional_keys = ('trakt_slug', )
-            return sd
 
-        with TimerFunc(f'Sync: {self.__class__.__name__} get_meta {self.method} {self.item_type}', inline=True, log_threshold=0.001):
-            return get_meta(get_sd())
+class SyncNextEpisodesMeta(SyncAllNextEpisodesMeta):
+    meta_item_getter = SyncNextEpisodesMetaItem
+
+    @cached_property
+    def items(self):
+        return [i for i in self.item_queue if i]
 
 
 class SyncNextEpisodes(SyncAllNextEpisodes):
@@ -422,32 +493,11 @@ class SyncNextEpisodes(SyncAllNextEpisodes):
     @timerlock
     def sync_func(self):
         """ Get next episodes on Trakt """
-        from tmdbhelper.lib.addon.thread import ParallelThread
         from tmdbhelper.lib.addon.logger import TimerFunc
 
-        def update_dialog_progress(sync):
-            self.dialog_progress_bg.increment()
-            self.dialog_progress_bg.set_message((
-                f'Skip: {sync.next_episode_id}'
-                if not sync.next_episode_id
-                else f'Sync: {sync.next_episode_id}'
-            ))
-
-        def get_item(i):
-            sync = SyncNextEpisodeItem(self, i)
-            update_dialog_progress(sync)
-            return sync.next_episode_id_dictionary
-
-        def get_meta(sd):
-            self.dialog_progress_bg.max_value = len(sd.items)
-            with ParallelThread(sd.items, get_item) as pt:
-                item_queue = pt.queue
-            return [i for i in item_queue if i]
-
-        def get_sd():
-            sd = self.instance_syncdata.get_all_unhidden_shows_inprogress_getter()
-            sd.additional_keys = ('trakt_slug', )
-            return sd
-
-        with TimerFunc(f'Sync: {self.__class__.__name__} get_meta {self.method} {self.item_type}', inline=True, log_threshold=0.001):
-            return get_meta(get_sd())
+        with TimerFunc(
+            f'Sync: {self.__class__.__name__} get_meta {self.method} {self.item_type}',
+            inline=True,
+            log_threshold=0.001
+        ):
+            return SyncNextEpisodesMeta(self).items
