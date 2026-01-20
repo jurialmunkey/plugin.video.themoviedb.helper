@@ -54,6 +54,8 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.tmdb', 'refresh_item')(**kwargs),
         'delete_itemtype':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.tmdb', 'delete_itemtype')(**kwargs),
+        'delete_listdata':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.tmdb', 'delete_listdata')(**kwargs),
 
         # Trakt Utils
         'like_list':

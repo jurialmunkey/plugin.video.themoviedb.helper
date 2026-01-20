@@ -108,3 +108,22 @@ def delete_itemtype(mediatype=None, confirmation=True, **kwargs):
         head = get_localized(32387).format(mediatype.capitalize())
         data = get_localized(32051).format(mediatype)
         Dialog().ok(head, data)
+
+
+def delete_listdata(**kwargs):
+    from tmdbhelper.lib.addon.dialog import ProgressDialog
+    from tmdbhelper.lib.addon.logger import TimerFunc
+    from tmdbhelper.lib.files.bcache import BasicCache
+
+    with ProgressDialog(
+        title=f'{get_localized(32387).format("List")}',
+        total=2,
+        background=False,
+    ) as progress_dialog:
+        database = BasicCache(filename='ItemContainer.db').ret_cache()
+        with TimerFunc(f'Deleting list data:', inline=True):
+            statement = f'DELETE FROM simplecache'
+            progress_dialog.update(statement)
+            database._execute_sql(statement)
+            progress_dialog.update('Vacuuming database...')
+            database._execute_sql('VACUUM')
