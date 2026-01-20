@@ -116,7 +116,7 @@ class PlayerDictionaryDict(dict):
 
     def get_plot(self, language=None, **kwargs):
         plot = self.details.infoproperties.get(f'{language}_plot') if language else self.details.infolabels.get('plot')
-        return (plot or self['plot']) if language else None
+        return (plot or self['plot']) if language else plot
 
     def get_cast(self, **kwargs):
         return " / ".join([i.get('name') for i in self.details.cast if i.get('name')])
