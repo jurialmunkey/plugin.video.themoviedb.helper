@@ -260,7 +260,7 @@ msgstr "Usunięto informacje {} zapisane w pamięci podręcznej"
 #: /resources/settings.xml
 msgctxt "#32052"
 msgid "Delete TMDb cached item details"
-msgstr "Usuń informacje TMDB zapisane w pamięci podręcznej"
+msgstr "Usuń szczegóły pozycji TMDB z pamięci podręcznej"
 
 #: /resources/settings.xml
 msgctxt "#32053"
@@ -2029,7 +2029,7 @@ msgstr "Ukrywaj następne"
 #: /resources/settings.xml
 msgctxt "#32396"
 msgid "Delete TMDb cached list details"
-msgstr "Usuń szczegóły listy TMDB z pamięci podręcznej"
+msgstr "Usuń szczegóły list TMDB z pamięci podręcznej"
 
 #: /resources/settings.xml
 msgctxt "#32381"
