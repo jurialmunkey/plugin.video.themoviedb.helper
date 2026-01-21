@@ -2027,6 +2027,11 @@ msgid "Hide Up Next"
 msgstr "Ukrywaj następne"
 
 #: /resources/settings.xml
+msgctxt "#32396"
+msgid "Delete TMDb cached list details"
+msgstr "Usuń szczegóły listy TMDB z pamięci podręcznej"
+
+#: /resources/settings.xml
 msgctxt "#32381"
 msgid "Hide Up Next and Specials"
 msgstr "Ukrywaj specjalne i następne"
