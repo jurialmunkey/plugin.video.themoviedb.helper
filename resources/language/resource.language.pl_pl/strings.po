@@ -1832,12 +1832,12 @@ msgstr "Grupy odcinków"
 #: /resources/settings.xml
 msgctxt "#32347"
 msgid "Log output of Trakt request"
-msgstr "Wyjście dziennika żądań Trakt"
+msgstr "Zapisuj w dzienniku wyniki zapytań Trakt"
 
 #: /resources/settings.xml
 msgctxt "#32348"
 msgid "Log output of TMDb request"
-msgstr "Wyjście dziennika żądań TMDB"
+msgstr "Zapisuj w dzienniku wyniki zapytań TMDB"
 
 #: /resources/settings.xml
 msgctxt "#32349"
