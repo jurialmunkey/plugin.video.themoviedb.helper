@@ -250,6 +250,12 @@ class ListTraktCalendarProperties(ListTraktStandardProperties):
         return sorted_items[::-1] if self.trakt_date < -1 else sorted_items
 
     @cached_property
+    def dropped_shows(self):
+        sd = self.trakt_api.trakt_syncdata
+        sd = sd.get_all_dropped_shows_getter('show')
+        return [i['tmdb_id'] for i in sd.items if i]
+
+    @cached_property
     def api_response_json(self):
         return self.get_api_response_json()
 
@@ -263,22 +269,35 @@ class ListTraktCalendarProperties(ListTraktStandardProperties):
             return
         return UncachedListLocalData(self.api_response_json, self.page, self.limit).data
 
-    def get_mapped_item_air_date_check(self, item_mapper):
+    def get_mapped_item_air_date_is_in_range(self, item_mapper):
         if not item_mapper.air_date:
-            return
+            return False
         if not datetime_in_range(item_mapper.air_date, days=self.trakt_days, start_date=self.trakt_date):
-            return
-        return item_mapper.item
+            return False
+        return True
+
+    def get_mapped_item_is_dropped(self, item_mapper):
+        if not self.dropped_shows:
+            return False
+        if item_mapper.tmdb_id not in self.dropped_shows:
+            return False
+        return True
 
     def get_mapped_item(self, item, add_infoproperties=None):
         item_mapper = FactoryCalendarEpisodeItemMapper(item, add_infoproperties)
-        return self.get_mapped_item_air_date_check(item_mapper)
+        if self.get_mapped_item_is_dropped(item_mapper):
+            return
+        if not self.get_mapped_item_air_date_is_in_range(item_mapper):
+            return
+        return item_mapper.item
 
 
 class ListTraktCalendarMovieProperties(ListTraktCalendarProperties):
     def get_mapped_item(self, item, add_infoproperties=None):
         item_mapper = FactoryCalendarMovieItemMapper(item, add_infoproperties)
-        return self.get_mapped_item_air_date_check(item_mapper)
+        if not self.get_mapped_item_air_date_is_in_range(item_mapper):
+            return
+        return item_mapper.item
 
 
 class ListLocalCalendarProperties(ListTraktCalendarProperties):

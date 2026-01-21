@@ -6,7 +6,6 @@ class Tvshow(MediaItem):
     infolabels_dbcitem_routes = (
         MediaItemInfoLabelItemRoutes.certification,
         MediaItemInfoLabelItemRoutes.trailer,
-        MediaItemInfoLabelItemRoutes.episodecount,
         MediaItemInfoLabelItemRoutes.imdbnumber,
         MediaItemInfoLabelItemRoutes.english_plot,
     )
@@ -20,6 +19,7 @@ class Tvshow(MediaItem):
 
     infoproperties_dbcitem_routes = (
         MediaItemInfoPropertyItemRoutes.watchedcount,
+        MediaItemInfoPropertyItemRoutes.episodecount,
     )
 
     infoproperties_dbclist_routes = (
@@ -34,8 +34,6 @@ class Tvshow(MediaItem):
 
     def get_infolabels_details(self):
         infolabels = super().get_infolabels_details()
-        infolabels['season'] = self.get_data_value('totalseasons')
-        infolabels['episode'] = self.get_data_value('totalepisodes')
         return infolabels
 
     def get_infolabels_special(self, infolabels):
@@ -50,7 +48,7 @@ class Tvshow(MediaItem):
         infoproperties = self.get_infoproperties_translation(infoproperties)
         try:
             infoproperties['totalseasons'] = self.get_data_value('totalseasons')
-            infoproperties['totalepisodes'] = infoproperties['unwatchedepisodes'] = self.get_data_value('totalepisodes')
+            infoproperties['totalepisodes'] = self.get_data_value('totalepisodes')
         except (TypeError, KeyError, IndexError):
             pass
         infoproperties = self.get_infoproperties_ranks(infoproperties)

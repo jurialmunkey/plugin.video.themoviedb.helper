@@ -40,7 +40,6 @@ class Season(MediaItem):
 
     def get_infolabels_details(self):
         infolabels = super().get_infolabels_details()
-        infolabels['episode'] = self.get_data_value('totalepisodes')
         return infolabels
 
     def get_infoproperties_custom(self, infoproperties):
@@ -62,7 +61,8 @@ class Season(MediaItem):
         infoproperties = self.get_infoproperties_custom(infoproperties)
         infoproperties = self.get_infoproperties_translation(infoproperties)
         try:
-            infoproperties['totalepisodes'] = infoproperties['unwatchedepisodes'] = self.get_data_value('totalepisodes')
+            infoproperties['totalepisodes'] = self.get_data_value('totalepisodes')
+            infoproperties['airedepisodes'] = self.get_data_value('airedepisodes')
         except (TypeError, KeyError, IndexError):
             pass
         infoproperties = self.get_infoproperties_next_ep(infoproperties)

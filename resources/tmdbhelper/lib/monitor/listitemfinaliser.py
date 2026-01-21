@@ -19,10 +19,6 @@ class ListItemMonitorFinaliser:
             return False
         return get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableArtwork)")
 
-    @cached_property
-    def processed_artwork(self):
-        return {}
-
     @property
     def baseitem_properties(self):
         return self.listitem_monitor_functions.baseitem_properties
@@ -64,6 +60,18 @@ class ListItemMonitorFinaliser:
         self.listitem_monitor_functions.ratings_thread = value
 
     @property
+    def artwork_queued(self):
+        return self.listitem_monitor_functions.artwork_queued
+
+    @property
+    def artwork_thread(self):
+        return self.listitem_monitor_functions.artwork_thread
+
+    @artwork_thread.setter
+    def artwork_thread(self, value):
+        self.listitem_monitor_functions.artwork_thread = value
+
+    @property
     def update_monitor(self):
         return self.service_monitor.update_monitor
 
@@ -76,28 +84,47 @@ class ListItemMonitorFinaliser:
         return self.service_monitor.images_monitor
 
     def ratings(self):
-        if not self.item.is_same_item:  # Dont bother getting ratings if item changed before thread reached queued lookup
+        if not self.item.is_same_item:  # Dont bother getting if item changed before reached
             return
         ratings = self.item.all_ratings
-        if not self.item.is_same_item:  # Dont bother setting ratings if item changed before ratrings were retrieved
+        if not self.item.is_same_item:  # Dont bother setting if item changed before retrieved
             return
         self.set_ratings(ratings)
 
     def artwork(self):
-        self.images_monitor.remote_artwork.set(self.item.identifier, self.item.artwork.copy())
-        self.processed_artwork = self.images_monitor.update_artwork(forced=True) or {}
+        if not self.item.is_same_item:  # Dont bother getting if item changed before reached
+            return
+        artwork = self.images_monitor.update_artwork(forced=True) or {}
+        if not self.item.is_same_item:  # Dont bother setting if item changed before retrieved
+            return
+        self.set_artwork(artwork)
 
     def start_process_artwork(self):
         if not self.artwork_enabled:
             return
-        if not self.item.artwork:
+
+        self.images_monitor.remote_artwork.set(self.item.identifier, self.item.artwork.copy())
+
+        if len(self.artwork_queued) < 1:
+            self.artwork_queued.append(self.artwork)
+        else:
+            self.artwork_queued[0] = self.artwork
+
+        if self.artwork_thread:
             return
-        self.process_artwork()
+
+        self.artwork_thread = SafeThread(target=self.process_artwork)
+        self.artwork_thread.start()
 
     def process_artwork(self):
         self.get_property('IsUpdatingArtwork', 'True')
-        with self.mutex_lock:  # Lock to avoid race with artwork monitor
-            self.artwork()
+        while self.artwork_thread and not self.update_monitor.abortRequested():
+            try:
+                func = self.artwork_queued.pop(0)
+                func()
+            except IndexError:
+                break
+        self.artwork_thread = None
         self.get_property('IsUpdatingArtwork', clear_property=True)
 
     def start_process_ratings(self):
@@ -162,12 +189,15 @@ class ListItemMonitorFinaliserContainerMethod(ListItemMonitorFinaliser):
 
     def start_process_default(self):
         with self.mutex_lock:
-            self.listitem.setArt(self.processed_artwork)
             self.add_item_listcontainer(self.listitem)  # Add item to container
 
     def set_ratings(self, ratings):
         with self.mutex_lock:
             self.listitem.setProperties(ratings)
+
+    def set_artwork(self, artwork):
+        with self.mutex_lock:
+            self.listitem.setArt(artwork)
 
     def initial_checks(self):
         if not self.item:
@@ -191,6 +221,9 @@ class ListItemMonitorFinaliserWindowMethod(ListItemMonitorFinaliser):
 
     def set_ratings(self, ratings):
         self.set_ratings_properties({'ratings': ratings})
+
+    def set_artwork(self, artwork):
+        pass  # IMGMON sets to window properties when processing
 
     def initial_checks(self):
         if not self.item:

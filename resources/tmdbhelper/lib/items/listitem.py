@@ -491,41 +491,43 @@ class _Tvshow(_Video):
         For tvshows and seasons have to hardcode playcount as a 0|1 boolean
         because Kodi treats it as watched/unwatched boolean for whole show
         """
-        if not self.totalepisodes:
+        if not self.airedepisodes:
             return 0
         if not self.watchedepisodes:
             return 0
-        if self.totalepisodes > self.watchedepisodes:
+        if self.airedepisodes > self.watchedepisodes:
             return 0
         return 1
 
     @property
     def totalepisodes(self):
-        return try_int(self.infolabels.get('episode'), fallback=None)
+        return try_int(self.infoproperties.get('totalepisodes'), fallback=None)
 
     @property
     def totalseasons(self):
-        return try_int(self.infolabels.get('season'), fallback=None)
+        return try_int(self.infoproperties.get('totalseasons'), fallback=None)
 
     @property
     def watchedepisodes(self):
-        if not self.totalepisodes:
-            return
         return try_int(self.infoproperties.get('watchedepisodes'), fallback=0)
 
     @property
+    def airedepisodes(self):
+        return try_int(self.infoproperties.get('airedepisodes'), fallback=0)
+
+    @property
     def unwatchedepisodes(self):
-        if self.watchedepisodes is None:
-            return
-        return self.totalepisodes - self.watchedepisodes
+        if self.airedepisodes < self.watchedepisodes:
+            return 0
+        if not self.watchedepisodes:
+            return self.airedepisodes or self.totalepisodes
+        return self.airedepisodes - self.watchedepisodes
 
     @property
     def watchedprogress(self):
-        if not self.totalepisodes:
+        if not self.airedepisodes:
             return
-        if self.watchedepisodes is None:
-            return
-        return int(self.watchedepisodes * 100 / self.totalepisodes)
+        return int(self.watchedepisodes * 100 / self.airedepisodes)
 
     def finalise_infoproperties(self):
         super().finalise_infoproperties()
@@ -535,6 +537,12 @@ class _Tvshow(_Video):
         self.infoproperties['watchedprogress'] = self.watchedprogress
         self.infoproperties['totalseasons'] = self.totalseasons
         return self.infoproperties
+
+    def finalise_infolabels(self):
+        super().finalise_infolabels()
+        self.infolabels['season'] = self.totalseasons
+        self.infolabels['episode'] = self.totalepisodes
+        return self.infolabels
 
     def finalise_params_details(self):
         self.params['info'] = global_setting['flatseasons_info_param']
@@ -557,6 +565,11 @@ class _Season(_Tvshow):
         self.infoproperties['unwatchedepisodes'] = self.unwatchedepisodes
         self.infoproperties['watchedprogress'] = self.watchedprogress
         return self.infoproperties
+
+    def finalise_infolabels(self):
+        super(_Tvshow, self).finalise_infolabels()  # Skip TV Show additions
+        self.infolabels['episode'] = self.totalepisodes
+        return self.infolabels
 
     @property
     def ftv_id(self):

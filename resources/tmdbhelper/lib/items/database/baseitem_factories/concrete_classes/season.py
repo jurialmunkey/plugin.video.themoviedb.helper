@@ -97,9 +97,15 @@ class Season(Tvshow):
             (
                 '(    SELECT COUNT(episode.season_id) '
                 '     FROM episode WHERE episode.season_id=season.id '
-                '                    AND episode.premiered<=DATE("now")'
                 '     GROUP BY episode.season_id'
                 ') as totalepisodes'
+            ),
+            (
+                '(    SELECT COUNT(episode.season_id) '
+                '     FROM episode WHERE episode.season_id=season.id '
+                '                    AND episode.premiered<=DATE("now")'
+                '     GROUP BY episode.season_id'
+                ') as airedepisodes'
             ),
             (
                 'ifnull('
