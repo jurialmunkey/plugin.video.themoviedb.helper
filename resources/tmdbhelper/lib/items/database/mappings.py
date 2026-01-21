@@ -403,8 +403,8 @@ class ItemMapperMethods:
         data = []
 
         mappings = (
-            ('cast', 'castmember', {'ordering': 'order', 'role': 'character'}),
-            ('crew', 'crewmember', {'department': 'department', 'role': 'job'}),
+            ('cast', 'castmember', {'ordering': 'order', 'role': 'character', 'appearances': 'episode_count'}),
+            ('crew', 'crewmember', {'department': 'department', 'role': 'job', 'appearances': 'episode_count'}),
         )
 
         for subkey, mapkey, config in mappings:

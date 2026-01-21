@@ -80,9 +80,14 @@ class ItemDropped(ItemSync):
     def get_post_response_args(self):
         return ('users', self.method, )
 
+    def delete_listdata(self):
+        from tmdbhelper.lib.script.method.tmdb import delete_listdata
+        delete_listdata(patterns=('ListTraktCalendar%', 'TraktData_calendars%'))
+
     def reset_lastactivities(self):
         if not self.is_successful_sync:
             return
         self.trakt_syncdata.cache.del_item(table='lactivities', item_id='show.nextup')  # Resync data after dropping a show
         self.trakt_syncdata.cache.del_item(table='lactivities', item_id='show.watched')  # Resync data after dropping a show
         self.trakt_syncdata.reset_lastactivities()
+        self.delete_listdata()  # We also reset cached lists as calendars might drop shows
