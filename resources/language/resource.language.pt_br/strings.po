@@ -2029,6 +2029,11 @@ msgid "Hide Up Next"
 msgstr "Ocultar A Seguir"
 
 #: /resources/settings.xml
+msgctxt "#32396"
+msgid "Delete TMDb cached list details"
+msgstr "Excluir detalhes da lista em cache do TMDb"
+
+#: /resources/settings.xml
 msgctxt "#32381"
 msgid "Hide Up Next and Specials"
 msgstr "Ocultar A Seguir e Especiais"
