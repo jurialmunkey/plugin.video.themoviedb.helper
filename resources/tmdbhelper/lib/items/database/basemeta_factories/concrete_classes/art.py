@@ -21,7 +21,7 @@ class ArtType(ArtworkDetailsMixin, Art):
 
 
 class ArtPoster(ArtType):
-    conditions = 'parent_id=? AND type=? ORDER BY rating DESC LIMIT 1'  # WHERE conditions
+    conditions = 'parent_id=? AND type=? ORDER BY isdefault DESC, rating DESC LIMIT 1'  # WHERE conditions
 
     @property
     def values(self):  # WHERE conditions values for ?
@@ -30,8 +30,14 @@ class ArtPoster(ArtType):
     def image_path_func(self, v):
         return self.common_apis.tmdb_imagepath.get_imagepath_poster(v)
 
+    key_is_default = 'EXISTS (SELECT 1 FROM default_art WHERE default_art.parent_id = art.parent_id AND default_art.type = art.type AND default_art.icon = art.icon) as isdefault'
 
-class ArtProfile(ArtType):
+    @property
+    def cached_data_keys(self):
+        return self.keys + (self.key_is_default, )
+
+
+class ArtProfile(ArtPoster):
     conditions = 'parent_id=? AND type=? ORDER BY rating DESC LIMIT 1'  # WHERE conditions
 
     @property

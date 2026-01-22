@@ -127,6 +127,11 @@ class Tvshow(MediaItem):
             'basemeta_db_user_art_clearlogo_season': self.config_basemeta_db_season,
             'basemeta_db_user_art_thumb_season': self.config_basemeta_db_season,
 
+            'basemeta_db_default_art_poster_tvshow': self.config_basemeta_db_tvshow,
+            'basemeta_db_default_art_fanart_tvshow': self.config_basemeta_db_tvshow,
+            'basemeta_db_default_art_poster_season': self.config_basemeta_db_season,
+            'basemeta_db_default_art_fanart_season': self.config_basemeta_db_season,
+
             'basemeta_db_unique_id_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_unique_id_season': self.config_basemeta_db_season,
             'basemeta_db_custom_tvshow': self.config_basemeta_db_tvshow,
@@ -163,6 +168,7 @@ class Tvshow(MediaItem):
             self.return_basemeta_db('unique_id'),
             self.return_basemeta_db('custom'),
             self.return_basemeta_db('fanart_tv'),
+            self.return_basemeta_db('default_art'),
             self.return_basemeta_db('art'),
 
         )
