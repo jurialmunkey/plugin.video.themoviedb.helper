@@ -2016,6 +2016,10 @@ msgctxt "#32380"
 msgid "Hide Up Next"
 msgstr "إخفاء قسم \"الحلقة التالية\""
 
+#: /resources/settings.xml
+msgctxt "#32396"
+msgid "Delete TMDb cached list details"
+msgstr "حذف كاش تفاصيل قائمة TMDb"
 
 #: resources/settings.xml
 msgctxt "#32381"
