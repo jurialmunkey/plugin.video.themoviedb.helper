@@ -72,6 +72,7 @@ class Person(BaseItem):
             self.return_basemeta_db('custom'),
             self.return_basemeta_db('castmember'),
             self.return_basemeta_db('crewmember'),
+            self.return_basemeta_db('default_art'),
             self.return_basemeta_db('art'),
             self.return_basemeta_db('genre'),
         )

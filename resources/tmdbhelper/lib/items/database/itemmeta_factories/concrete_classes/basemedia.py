@@ -125,9 +125,21 @@ class MediaItemArtworkRoutes:
             'parents': (None, 'tvshow', 'season'),
             'art_api': 'user',
         },
+        'default_art_poster': {
+            'affixes': (None, ),
+            'outputs': 'poster',
+            'parents': (None, 'tvshow', 'season'),
+            'art_api': 'default',
+        },
+        'default_art_fanart': {
+            'affixes': (None, ),
+            'outputs': 'fanart',
+            'parents': (None, 'tvshow', 'season'),
+            'art_api': 'default',
+        },
     }
 
-    def get_art_list(self, affix=None, allow_ftv=False, allow_tmdb=False, allow_user=False, no_affix=False):
+    def get_art_list(self, affix=None, allow_ftv=False, allow_tmdb=False, allow_user=False, allow_default=False, no_affix=False):
 
         def get_art_tuple(route):
             definition = self.routes[route]
@@ -136,6 +148,8 @@ class MediaItemArtworkRoutes:
             if not allow_tmdb and definition['art_api'] == 'tmdb':
                 return
             if not allow_user and definition['art_api'] == 'user':
+                return
+            if not allow_default and definition['art_api'] == 'default':
                 return
             if no_affix and len(definition['affixes']) != 1:
                 return

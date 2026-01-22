@@ -88,6 +88,7 @@ class Movie(MediaItem):
             self.return_basemeta_db('unique_id'),
             self.return_basemeta_db('custom'),
             self.return_basemeta_db('fanart_tv'),
+            self.return_basemeta_db('default_art'),
             self.return_basemeta_db('art'),
 
         )
