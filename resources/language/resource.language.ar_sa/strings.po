@@ -62,12 +62,12 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32008"
 msgid "Low"
-msgstr "منخفض"
+msgstr "منخفضة"
 
 #: /resources/settings.xml
 msgctxt "#32009"
 msgid "High"
-msgstr "مرتفع"
+msgstr "مرتفعة"
 
 msgctxt "#30007"
 msgid "Czech (Czech Republic)"
@@ -208,7 +208,7 @@ msgstr "كل الفصول"
 #: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
 msgctxt "#32041"
 msgid "Your In-Progress TV Shows"
-msgstr "برامجك التلفزيونية قيد التقدم"
+msgstr "مسلسلاتك قيد التقدم"
 
 msgctxt "#30026"
 msgid "French (Canada)"
@@ -230,22 +230,22 @@ msgstr "أفلامك قيد التقدم"
 #: /resources/tmdbhelper/lib/script/sync/basic.py
 msgctxt "#32046"
 msgid "Drop TV show"
-msgstr "الغي برنامج تلفزيوني"
+msgstr "الغي مسلسل"
 
 #: /resources/tmdbhelper/lib/script/sync/basic.py
 msgctxt "#32047"
 msgid "Undrop TV show"
-msgstr "اوقف الغاء برنامج تلفزيوني"
+msgstr "اوقف الغاء مسلسل"
 
 #: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
 msgctxt "#32048"
 msgid "Dropped TV Shows"
-msgstr "البرامج التلفزيونية التي تم الغائها"
+msgstr "المسلسلات التي تم الغائها"
 
 #: /resources/settings.xml
 msgctxt "#32049"
 msgid "Sort order of Your Next Episodes list. By airdate sorts episodes by premiere date. By recentlywatched sorts episodes by most recently watched tvshow. By todays is recentlywatched with episodes airing today at the front. By lastweek is recentlywatched with episodes airing in the past week sorted by airdate at the front."
-msgstr "فرز ترتيب قائمة الحلقات التالية. حسب تاريخ البث يفرز الحلقات حسب تاريخ العرض الأول. من خلال أنواع الحلقات التي تمت مشاهدتها مؤخرا من قبل البرامج التلفزيونية التي تمت مشاهدتها مؤخرا. بحلول اليوم تمت مشاهدته مؤخرا مع حلقات يتم بثها اليوم في المقدمة. بحلول الأسبوع الماضي تمت مشاهدته مؤخرا مع بث الحلقات في الأسبوع الماضي مرتبة حسب تاريخ البث في المقدمة"
+msgstr "فرز ترتيب قائمة الحلقات التالية. حسب تاريخ البث يفرز الحلقات حسب تاريخ العرض الأول. من خلال أنواع الحلقات التي تمت مشاهدتها مؤخرا من قبل المسلسلات التي تمت مشاهدتها مؤخرا. بحلول اليوم تمت مشاهدته مؤخرا مع حلقات يتم بثها اليوم في المقدمة. بحلول الأسبوع الماضي تمت مشاهدته مؤخرا مع بث الحلقات في الأسبوع الماضي مرتبة حسب تاريخ البث في المقدمة"
 
 #: /resources/settings.xml
 msgctxt "#32050"
@@ -260,7 +260,7 @@ msgstr "حذف عناصر {} cached"
 #: /resources/settings.xml
 msgctxt "#32052"
 msgid "Delete TMDb cached item details"
-msgstr "حذف تفاصيل العنصر cached TMDb"
+msgstr "حذف كاش تفاصيل TMDb"
 
 #: /resources/settings.xml
 msgctxt "#32053"
@@ -305,7 +305,7 @@ msgstr "احصل على مؤشرات تمت المشاهدة وعدد الحلق
 #: /resources/settings.xml
 msgctxt "#32037"
 msgid "Use bundled players"
-msgstr "استخدم المشغلات المجمعين"
+msgstr "استخدم المشغلات مجمعين"
 
 #: /resources/tmdbhelper/lib/items/directories/lists_base.py
 msgctxt "#32062"
@@ -862,7 +862,7 @@ msgstr "قم بتحديث المكتبة الآن"
 #: /resources/settings.xml
 msgctxt "#32156"
 msgid "Next aired library calendar links to local tvshow"
-msgstr "روابط تقويم المكتبة التي تم بثها التالية إلى برنامج تلفزيوني محلي"
+msgstr "ربط العرض القادم من مسلسل الى المكتبة المحلية"
 
 #: /resources/lib/context.py
 msgctxt "#32160"
@@ -1959,7 +1959,7 @@ msgstr "بالعرض"
 #: resources/settings.xml
 msgctxt "#32371"
 msgid "Preferred artwork for thumbs"
-msgstr "العمل الفني المفضل للـthumbs"
+msgstr "العمل الفني المفضل لالصور المصغرة"
 
 #: resources/settings.xml
 msgctxt "#32372"
@@ -2160,7 +2160,7 @@ msgstr "الأكثر مشاهدة"
 #: /resources/settings.xml
 msgctxt "#32415"
 msgid "Combine all players for plugin into single entry"
-msgstr "اجمع جميع المشغلات للمكون الإضافي في دخول واحد"
+msgstr "اجمع المشغلات لاضافات الفيديو في خيار مفرد"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32416"
@@ -2874,7 +2874,7 @@ msgstr "عدد الايام لتفاصيل التخزين المؤقت"
 ##: resources/settings.xml
 msgctxt "#32004"
 msgid "MPAA rating prefix"
-msgstr "بادئة تصنيف MPAA"
+msgstr "بادئة تصنيف العمري"
 
 #: resources/settings.xml
 msgctxt "#32005"
