@@ -177,6 +177,14 @@
                     </constraints>
                     <control type="button" format="action"/>
                 </setting>
+                <setting id="delete_listdata" type="action" label="32396" help="">
+                    <level>0</level>
+                    <data>RunScript(plugin.video.themoviedb.helper, delete_listdata)</data>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="action"/>
+                </setting>
             </group>
         </category>
         <category id="widgets" label="32092" help="">

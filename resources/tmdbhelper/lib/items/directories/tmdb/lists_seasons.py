@@ -67,7 +67,9 @@ class ListAnticipatedEpisodes(ContainerCacheOnlyDirectory):
 
 
 class ListEpisodes(ContainerCacheOnlyDirectory):
-    hide_unaired = True
+    @property
+    def hide_unaired(self):
+        return get_setting('seasons_anticipated')
 
     def get_items(self, tmdb_id, season, limit=None, **kwargs):
         sync = BaseViewFactory('episodes', 'tv', tmdb_id, season=season, filters=self.filters, limit=limit)

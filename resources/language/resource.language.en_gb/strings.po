@@ -2003,6 +2003,11 @@ msgid "Hide Up Next"
 msgstr ""
 
 #: /resources/settings.xml
+msgctxt "#32396"
+msgid "Delete TMDb cached list details"
+msgstr ""
+
+#: /resources/settings.xml
 msgctxt "#32381"
 msgid "Hide Up Next and Specials"
 msgstr ""
