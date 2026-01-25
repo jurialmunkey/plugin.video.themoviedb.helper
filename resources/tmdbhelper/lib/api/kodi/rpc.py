@@ -182,6 +182,12 @@ class KodiLibrary(object):
 
         return database
 
+    def get_tmdb_ids(self):
+        """Return set of all TMDb IDs in the library for fast lookup."""
+        if not self.database:
+            return set()
+        return {str(item['tmdb_id']) for item in self.database if item.get('tmdb_id')}
+
     def _get_info(
         self, info, dbid=None, imdb_id=None, originaltitle=None, title=None, year=None,
         season=None, episode=None, fuzzy_match=False, tmdb_id=None, tvdb_id=None

@@ -84,6 +84,11 @@ class ListProperties:
     pagination = False
     is_cacheonly = True
 
+    # Library-only filtering properties
+    is_library_only = False
+    library_tmdb_ids = None
+    library_target_count = 20
+
     @cached_property
     def query_database(self):
         from tmdbhelper.lib.query.database.database import FindQueriesDatabase
@@ -242,7 +247,26 @@ class ListDefault(ContainerDefaultCacheDirectory):
         list_properties.trakt_api = self.trakt_api
         list_properties.is_cacheonly = self.is_cacheonly
         list_properties.class_name = f'{self.__class__.__name__}'
+        # Library-only filtering configuration
+        list_properties.is_library_only = getattr(self, 'is_library_only', False)
+        list_properties.library_tmdb_ids = self._get_library_tmdb_ids() if list_properties.is_library_only else None
         return list_properties
+
+    def _get_library_tmdb_ids(self):
+        """Pre-fetch library TMDb IDs for early filtering.
+
+        Note: Temporarily enables Kodi DB lookup for this request even if
+        the user has 'use_kodi_local_db' set to 0. This does NOT modify
+        the user's saved setting.
+        """
+        tmdb_type = self.params.get('tmdb_type')
+        if tmdb_type not in ('movie', 'tv'):
+            return None
+        from tmdbhelper.lib.api.kodi.rpc import get_kodi_library
+        kodi_lib = get_kodi_library(tmdb_type)
+        if not kodi_lib:
+            return None
+        return kodi_lib.get_tmdb_ids()
 
     @cached_property
     def sort_by_dbid(self):

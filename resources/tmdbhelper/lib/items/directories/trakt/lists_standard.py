@@ -5,6 +5,9 @@ from tmdbhelper.lib.addon.plugin import get_setting
 from jurialmunkey.ftools import cached_property
 from jurialmunkey.parser import try_int
 
+# Constants for library-only mode
+LIBRARY_ONLY_MAX_PAGES = 10
+
 
 class UncachedTraktItemsPage(UncachedItemsPage):
     @cached_property
@@ -67,10 +70,47 @@ class ListTraktStandardProperties(ListStandardProperties):
         return self.request_url.format(trakt_type=self.trakt_type)
 
     def get_uncached_items(self):
+        # Standard behavior when library_only is not active
+        if not self.is_library_only or not self.library_tmdb_ids:
+            return {
+                'items': self.class_pages(self, self.page).items,
+                'pages': self.total_pages,
+                'count': self.total_items,
+            }
+
+        # Library-only mode: accumulate pages until we have enough matches
+        matching_items = []
+        current_page = self.page
+        pages_fetched = 0
+
+        while pages_fetched < LIBRARY_ONLY_MAX_PAGES:
+            page_data = self.class_pages(self, current_page)
+
+            # No more pages available
+            if not page_data.items:
+                break
+            if self.total_pages and current_page > self.total_pages:
+                break
+
+            # Filter items by library TMDb IDs
+            for item in page_data.items:
+                tmdb_id = str(item.get('unique_ids', {}).get('tmdb', ''))
+                if tmdb_id and tmdb_id in self.library_tmdb_ids:
+                    matching_items.append(item)
+                    if len(matching_items) >= self.library_target_count:
+                        break
+
+            pages_fetched += 1
+            current_page += 1
+
+            # Stop if we have enough items
+            if len(matching_items) >= self.library_target_count:
+                break
+
         return {
-            'items': self.class_pages(self, self.page).items,
-            'pages': self.total_pages,
-            'count': self.total_items,
+            'items': matching_items,
+            'pages': 0,  # No pagination for library-only
+            'count': len(matching_items),
         }
 
     def get_api_response(self, page=1):

@@ -56,6 +56,18 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         return boolean(self.params.get('widget', False))
 
     @cached_property
+    def is_library_only(self):
+        """Check if library-only filtering is enabled."""
+        # URL parameter takes precedence
+        param_value = self.params.get('library_only')
+        if param_value is not None:
+            return boolean(param_value)
+        # Only apply global setting to widgets
+        if self.is_widget:
+            return get_setting('widgets_library_only')
+        return False
+
+    @cached_property
     def is_cacheonly(self):
         return boolean(self.params.get('cacheonly', self.default_cacheonly))
 
@@ -97,6 +109,8 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
             return False
         if self.is_widget and not get_setting('widgets_nextpage'):
             return False
+        if self.is_library_only:
+            return False  # Disable pagination for library-only widgets
         return True
 
     @cached_property

@@ -2685,6 +2685,16 @@ msgctxt "#32536"
 msgid "Unspecified"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32537"
+msgid "Only show library items in widgets"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32538"
+msgid "When enabled, widgets will only display items that exist in your local Kodi library."
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
