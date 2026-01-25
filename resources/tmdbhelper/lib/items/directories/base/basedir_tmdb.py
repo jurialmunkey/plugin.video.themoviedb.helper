@@ -57,6 +57,33 @@ class BaseDirItemTMDbTrendingWeek(BaseDirItem):
     group = 32204
 
 
+class BaseDirItemTMDbPopularAll(BaseDirItem):
+    priority = 111
+    label_localized = 32539
+    params = {'info': 'popular', 'tmdb_type': 'all'}
+    art_icon = 'resources/icons/themoviedb/popular.png'
+    types = ('all',)
+    group = 32175
+
+
+class BaseDirItemTMDbTrendingDayAll(BaseDirItem):
+    priority = 141
+    label_localized = 32540
+    params = {'info': 'trending_day', 'tmdb_type': 'all'}
+    art_icon = 'resources/icons/themoviedb/upcoming.png'
+    types = ('all',)
+    group = 32204
+
+
+class BaseDirItemTMDbTrendingWeekAll(BaseDirItem):
+    priority = 151
+    label_localized = 32541
+    params = {'info': 'trending_week', 'tmdb_type': 'all'}
+    art_icon = 'resources/icons/themoviedb/upcoming.png'
+    types = ('all',)
+    group = 32204
+
+
 class BaseDirItemTMDbNowPlaying(BaseDirItem):
     priority = 160
     label_localized = 32180

@@ -260,9 +260,16 @@ class ListDefault(ContainerDefaultCacheDirectory):
         the user's saved setting.
         """
         tmdb_type = self.params.get('tmdb_type')
-        if tmdb_type not in ('movie', 'tv'):
+        if tmdb_type not in ('movie', 'tv', 'all'):
             return None
         from tmdbhelper.lib.api.kodi.rpc import get_kodi_library
+        if tmdb_type == 'all':
+            # Fetch both movie and TV library IDs
+            movie_lib = get_kodi_library('movie')
+            tv_lib = get_kodi_library('tv')
+            movie_ids = movie_lib.get_tmdb_ids() if movie_lib else set()
+            tv_ids = tv_lib.get_tmdb_ids() if tv_lib else set()
+            return movie_ids | tv_ids  # Union of both sets
         kodi_lib = get_kodi_library(tmdb_type)
         if not kodi_lib:
             return None

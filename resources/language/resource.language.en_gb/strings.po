@@ -2695,6 +2695,22 @@ msgctxt "#32538"
 msgid "When enabled, widgets will only display items that exist in your local Kodi library."
 msgstr ""
 
+msgctxt "#32539"
+msgid "Popular (Movies & TV)"
+msgstr ""
+
+msgctxt "#32540"
+msgid "Trending Today (Movies & TV)"
+msgstr ""
+
+msgctxt "#32541"
+msgid "Trending This Week (Movies & TV)"
+msgstr ""
+
+msgctxt "#32542"
+msgid "Movies & TV"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

@@ -24,6 +24,13 @@ class BaseDirItemMainPerson(BaseDirItemMainMovie):
     art_icon = 'resources/icons/themoviedb/cast.png'
 
 
+class BaseDirItemMainAll(BaseDirItemMainMovie):
+    priority = 125
+    label_localized = 32542
+    params = {'info': 'dir_all'}
+    art_icon = 'resources/icons/themoviedb/default.png'
+
+
 class BaseDirItemMainMultiSearch(BaseDirItemMainMovie):
     priority = 130
     label_localized = 137
