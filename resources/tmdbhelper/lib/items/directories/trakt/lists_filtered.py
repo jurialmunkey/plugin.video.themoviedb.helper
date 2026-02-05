@@ -1,11 +1,12 @@
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.items.directories.trakt.lists_standard import (
     ListTraktStandardProperties,
+    ListTraktStandardLocalProperties,
     ListTraktStandard,
 )
 
 
-class ListTraktFilteredProperties(ListTraktStandardProperties):
+class ListTraktFilteredProperties:
     @cached_property
     def plugin_category(self):
         plugin_category = self.plugin_name.format(localized=self.localized, plural=self.plural)
@@ -13,9 +14,21 @@ class ListTraktFilteredProperties(ListTraktStandardProperties):
         return plugin_category
 
 
+class ListTraktFilteredStandardProperties(ListTraktFilteredProperties, ListTraktStandardProperties):
+    pass
+
+
+class ListTraktFilteredLocalProperties(ListTraktFilteredProperties, ListTraktStandardLocalProperties):
+    pass
+
+
 class ListTraktFiltered(ListTraktStandard):
 
-    list_properties_class = ListTraktFilteredProperties
+    @property
+    def list_properties_class(self):
+        if not self.is_localonly:
+            return ListTraktFilteredStandardProperties
+        return ListTraktFilteredLocalProperties
 
     def get_items(
         self, *args,
