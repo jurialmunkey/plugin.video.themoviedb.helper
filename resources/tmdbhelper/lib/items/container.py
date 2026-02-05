@@ -60,6 +60,10 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         return boolean(self.params.get('cacheonly', self.default_cacheonly))
 
     @cached_property
+    def is_localonly(self):
+        return boolean(self.params.get('localonly', False))
+
+    @cached_property
     def is_detailed(self):
         if self.params.get('info') == 'details':
             return True
