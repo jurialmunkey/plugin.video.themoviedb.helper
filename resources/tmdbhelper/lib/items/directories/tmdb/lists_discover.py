@@ -2,7 +2,7 @@
 from jurialmunkey.ftools import cached_property
 from jurialmunkey.parser import try_int, split_items
 from tmdbhelper.lib.addon.tmdate import get_datetime_now, get_timedelta
-from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties
+from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties, ListStandardLocalProperties
 
 
 RELATIVE_DATES = (
@@ -32,7 +32,7 @@ TRANSLATE_PARAMS = {
 }
 
 
-class ListDiscoverProperties(ListStandardProperties):
+class ListDiscoverProperties:
     @cached_property
     def url(self):
         url = self.request_url.format(tmdb_type=self.tmdb_type)
@@ -128,9 +128,21 @@ class ListDiscoverProperties(ListStandardProperties):
         return f'?{"&".join([f"{k}={v}" for k, v in self.translated_discover_params.items()])}'
 
 
+class ListDiscoverStandardProperties(ListDiscoverProperties, ListStandardProperties):
+    pass
+
+
+class ListDiscoverStandardLocalProperties(ListDiscoverProperties, ListStandardLocalProperties):
+    pass
+
+
 class ListDiscover(ListStandard):
 
-    list_properties_class = ListDiscoverProperties
+    @property
+    def list_properties_class(self):
+        if not self.is_localonly:
+            return ListDiscoverStandardProperties
+        return ListDiscoverStandardLocalProperties
 
     def get_items(self, *args, **kwargs):
         self.list_properties.discover_params = kwargs
