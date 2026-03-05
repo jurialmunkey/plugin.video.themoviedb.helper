@@ -485,7 +485,7 @@ msgstr "其他"
 #: /resources/settings.xml
 msgctxt "#32081"
 msgid "Next page item"
-msgstr "下一页项"
+msgstr "下一页项目"
 
 #: /resources/tmdbhelper/lib/script/method/modify_identifier.py
 msgctxt "#32098"
