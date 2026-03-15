@@ -331,6 +331,9 @@ class DiscoverYear(DiscoverYears):
     def label(self):
         return str(self.value) if self.value is not None else ''
 
+    def load_value(self, value):
+        self.value = int(value)
+
     def menu(self):
         self.value = self.select_value()
         self.listitem.setLabel(self.listitem_label)
