@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2026-01-28 11:37+0800\n"
+"PO-Revision-Date: 2026-03-16 10:27+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -2031,6 +2031,11 @@ msgid "Hide Up Next"
 msgstr "隐藏“下个播放”"
 
 #: /resources/settings.xml
+msgctxt "#32396"
+msgid "Delete TMDb cached list details"
+msgstr "删除 TMDb 缓存的列表详情"
+
+#: /resources/settings.xml
 msgctxt "#32381"
 msgid "Hide Up Next and Specials"
 msgstr "隐藏“下个播放”和特别节目"
@@ -2095,11 +2100,6 @@ msgstr "快速更新"
 msgctxt "#32395"
 msgid "Log timer reports for directories"
 msgstr "记录目录的计时器报告"
-
-#: /resources/settings.xml
-msgctxt "#32396"
-msgid "Delete TMDb cached list details"
-msgstr "删除 TMDb 缓存的列表详情"
 
 #: /resources/settings.xml
 msgctxt "#32397"
