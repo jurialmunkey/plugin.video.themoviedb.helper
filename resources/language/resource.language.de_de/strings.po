@@ -2020,6 +2020,11 @@ msgid "Hide Up Next"
 msgstr "Als Nächstes ausblenden"
 
 #: /resources/settings.xml
+msgctxt "#32396"
+msgid "Delete TMDb cached list details"
+msgstr "Zwischengespeicherte TMDb-Listendaten löschen"
+
+#: /resources/settings.xml
 msgctxt "#32381"
 msgid "Hide Up Next and Specials"
 msgstr "Als Nächstes und Extras ausblenden"
