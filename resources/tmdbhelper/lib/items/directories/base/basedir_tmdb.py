@@ -146,16 +146,12 @@ class BaseDirItemTMDbMostVoted(BaseDirItem):
 
 class BaseDirItemTMDbAllStudios(BaseDirItem):
     priority = 250
-    label_type = 'prefixed'
+    label_type = 'reversed'
     label_localized = 20388
     types = ('movie',)
     params = {'info': 'all_studios'}
     art_icon = 'resources/icons/themoviedb/default.png'
     group = 20388
-
-    @cached_property
-    def label_prefixed(self):
-        return get_localized(593)
 
 
 class BaseDirItemTMDbAllNetworks(BaseDirItemTMDbAllStudios):
