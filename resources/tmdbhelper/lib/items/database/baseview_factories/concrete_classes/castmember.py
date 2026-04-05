@@ -25,6 +25,7 @@ class CastMemberMediaList(MediaList):
 
     sort_direction = {
         'appearances': 'DESC',
+        'guest': 'DESC, IFNULL(ordering, 9999)',
     }
 
     @property
@@ -62,7 +63,7 @@ class CastMemberMediaList(MediaList):
             'role': i['role'],
             'character': i['role'],
             'episodes': i['appearances'],
-            'guest': 'True' if i['guest'] else None,
+            'guest': i['guest'],
             'tmdb_id': i['tmdb_id'],
             'tmdb_type': 'person',
         }
