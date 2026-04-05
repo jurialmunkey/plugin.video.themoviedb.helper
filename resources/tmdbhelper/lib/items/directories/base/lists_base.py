@@ -1,6 +1,7 @@
 from tmdbhelper.lib.addon.plugin import ADDON, get_localized, executebuiltin
 from tmdbhelper.lib.items.container import ContainerDirectory
 from tmdbhelper.lib.items.directories.base.basedir_nodes import BaseDirNode
+from jurialmunkey.ftools import cached_property
 from collections import namedtuple
 
 
@@ -152,6 +153,31 @@ class ListBaseDir(ContainerDirectory):
     @staticmethod
     def get_library_calendar_item():
         return {'info': 'library_nextaired'}
+
+    @cached_property
+    def plugin_category(self):
+        try:
+            func = {
+                'dir_movie': lambda: get_localized(342),
+                'dir_tv': lambda: get_localized(20343),
+                'dir_person': lambda: get_localized(32172),
+                'dir_tmdb': 'TheMovieDb',
+                'dir_tmdb_v4': lambda: f'TheMovieDb {get_localized(32079)}',
+                'dir_trakt': 'Trakt',
+                'dir_mdblist': 'MDbList',
+                'dir_tvdb': 'TVDb',
+                'dir_random': lambda: get_localized(590),
+            }[self.params['info']]
+        except KeyError:
+            return
+        try:
+            text = func()
+        except TypeError:
+            text = func
+        try:
+            return f'{text} {get_localized(int(self.params["group"]))}'
+        except KeyError:
+            return text
 
     def get_items(self, info=None, group=None, **kwargs):
         route = {
