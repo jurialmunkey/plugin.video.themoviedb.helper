@@ -1,6 +1,4 @@
 from tmdbhelper.lib.items.directories.base.basedir_item import BaseDirItem
-from tmdbhelper.lib.addon.plugin import get_localized
-from jurialmunkey.ftools import cached_property
 
 
 class BaseDirItemTMDbSearch(BaseDirItem):
