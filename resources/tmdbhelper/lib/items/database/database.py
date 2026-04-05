@@ -45,7 +45,7 @@ class ItemDetailsDatabase(Database):
         super().__init__(filename=self.cache_filename)
 
     # DB version must be max of table_version
-    database_version = 40
+    database_version = 42
 
     database_changes = {
         21: (),
@@ -103,7 +103,12 @@ class ItemDetailsDatabase(Database):
         ),
         40: (
             'DROP TABLE IF EXISTS ratings',
-        )
+        ),
+        41: (),
+        42: (
+            'ALTER TABLE castmember ADD guest INTEGER',
+            'CREATE INDEX IF NOT EXISTS castmember_guest_x ON castmember(guest)',
+        ),
     }
 
     baseitem_columns = BASEITEM_COLUMNS

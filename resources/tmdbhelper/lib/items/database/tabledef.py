@@ -653,6 +653,10 @@ CASTMEMBER_COLUMNS = {
         'data': 'INTEGER',
         'indexed': True
     },
+    'guest': {
+        'data': 'INTEGER',
+        'indexed': True
+    },
     'parent_id': {
         'data': 'TEXT',
         'foreign_key': 'baseitem(id)',
