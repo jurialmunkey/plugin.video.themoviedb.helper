@@ -166,6 +166,7 @@ class ListBaseDir(ContainerDirectory):
             'dir_mdblist': 'MDbList',
             'dir_tvdb': 'TVDb',
             'dir_random': lambda: get_localized(590),
+            'dir_custom_node': 'Nodes',
         }
         try:
             func = routes[self.params['info']]

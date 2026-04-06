@@ -1,7 +1,13 @@
 from tmdbhelper.lib.items.container import ContainerDefaultCacheDirectory
+from jurialmunkey.ftools import cached_property
 
 
 class ListDiscoverDir(ContainerDefaultCacheDirectory):
+
+    @cached_property
+    def plugin_category(self):
+        from tmdbhelper.lib.addon.plugin import get_localized
+        return f'Trakt {get_localized(32174)}'
 
     @property
     def item_new(self):
