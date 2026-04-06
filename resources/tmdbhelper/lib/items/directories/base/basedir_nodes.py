@@ -36,6 +36,7 @@ class BaseDirNodeItem:
         return {
             'info': 'dir_custom_node',
             'filename': self.filename,
+            'plugin_category': self.label,
             'basedir': self.basedir,
         }
 

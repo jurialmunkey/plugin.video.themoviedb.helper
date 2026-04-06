@@ -6,7 +6,7 @@ from jurialmunkey.ftools import cached_property
 class CastMemberMediaList(MediaList):
     table = 'castmember'
     cached_data_check_key = 'parent_id'
-    keys = ('GROUP_CONCAT(role, " / ") as role', 'ordering', 'appearances', 'parent_id')
+    keys = ('GROUP_CONCAT(role, " / ") as role', 'ordering', 'appearances', 'guest', 'parent_id')
     item_mediatype = 'person'
     item_tmdb_type = 'person'
 
@@ -18,12 +18,14 @@ class CastMemberMediaList(MediaList):
     filter_key_map = {
         'role': 'role',
         'appearances': 'appearances',
+        'guest': 'guest',
         'title': 'creditedperson.name',
         'gender': 'creditedperson.gender',
     }
 
     sort_direction = {
         'appearances': 'DESC',
+        'guest': 'DESC, IFNULL(ordering, 9999)',
     }
 
     @property
@@ -61,6 +63,7 @@ class CastMemberMediaList(MediaList):
             'role': i['role'],
             'character': i['role'],
             'episodes': i['appearances'],
+            'guest': i['guest'],
             'tmdb_id': i['tmdb_id'],
             'tmdb_type': 'person',
         }

@@ -317,6 +317,9 @@ RATINGS_COLUMNS = {
     'rottentomatoes_consensus': {
         'data': 'TEXT',
     },
+    'rottentomatoes_image': {
+        'data': 'TEXT',
+    },
     'metacritic_rating': {
         'data': 'INTEGER',
     },
@@ -647,6 +650,10 @@ CASTMEMBER_COLUMNS = {
         'indexed': True
     },
     'appearances': {
+        'data': 'INTEGER',
+        'indexed': True
+    },
+    'guest': {
         'data': 'INTEGER',
         'indexed': True
     },
