@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2026-03-16 10:27+0800\n"
+"PO-Revision-Date: 2026-04-11 17:04+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -1978,7 +1978,7 @@ msgstr "首选艺术图片缩略图"
 #: /resources/settings.xml
 msgctxt "#32372"
 msgid "fanart"
-msgstr "同人画"
+msgstr "背景图"
 
 #: /resources/settings.xml
 msgctxt "#32386"
@@ -1993,12 +1993,12 @@ msgstr "仅处理 .strm 文件"
 #: /resources/settings.xml
 msgctxt "#32388"
 msgid "Retrieve genre fanart"
-msgstr "获取类型同人画"
+msgstr "获取类型背景图"
 
 #: /resources/settings.xml
 msgctxt "#32389"
 msgid "Retrieve provider fanart"
-msgstr "获取提供商同人画"
+msgstr "获取提供商背景图"
 
 #: /resources/lib/player/players.py
 msgctxt "#32374"
@@ -2907,7 +2907,7 @@ msgstr "Token"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32012"
-msgid "You must authenticate your Trakt account to use this feature."
+msgid "You must authenticate your Trakt account 到 use this feature."
 msgstr "你必须验证你的 Trakt 帐户才能使用此功能。"
 
 #: /resources/settings.xml
@@ -2927,13 +2927,13 @@ msgstr "API 密钥"
 
 #: /resources/settings.xml
 msgctxt "#32019"
-msgid "Fanart.tv client key"
-msgstr "Fanart.tv client 密钥"
+msgid "Fanart。tv client key"
+msgstr "Fanart。tv client 密钥"
 
 #: /resources/settings.xml
 msgctxt "#32021"
-msgid "Use fanart.tv for plugin artwork (slower)"
-msgstr "将 fanart.tv 用于艺术图（较慢）"
+msgid "Use fanart。tv for plugin artwork (slower)"
+msgstr "将 fanart。tv 用于艺术图（较慢）"
 
 #: /resources/settings.xml
 msgctxt "#32023"
