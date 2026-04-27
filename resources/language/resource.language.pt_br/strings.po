@@ -2043,6 +2043,11 @@ msgctxt "#32382"
 msgid "Hide Episode Groups"
 msgstr "Ocultar Grupos de Episódios"
 
+#: /resources/tmdbhelper/lib/script/method/image_functions.py
+msgctxt "#32399"
+msgid "Retrieving Artwork"
+msgstr "Recuperando Arte"
+
 #: /resources/settings.xml
 msgctxt "#32383"
 msgid "Hide Episode Groups and Specials"
