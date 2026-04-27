@@ -32,6 +32,8 @@ class GenreArtwork:
         for k, v in self.fanart.items():
             get_property(k, v)
 
+    p_dialog_max = 0
+
     @cached_property
     def p_dialog(self):
         if not self.sync_notifications:
@@ -43,28 +45,31 @@ class GenreArtwork:
             logging=2
         )
 
-    @cached_property
-    def p_dialog_max(self):
-        return len(self.items_movie) + len(self.items_tv)
-
     def get_item(self, name, tmdb_id, tmdb_type):
-        item = {'name': name, 'items': self.get_directory(self.get_params(tmdb_id, tmdb_type))}
+        params = self.get_params(tmdb_id, tmdb_type)
+        item = {'name': name, 'items': self.get_directory(params)}
         self.p_dialog.update(f'{name} {tmdb_type}') if self.p_dialog else None
         return (tmdb_id, item)
 
-    def get_item_data(self, i, tmdb_type):
-        return self.get_item(*i, tmdb_type)
+    def get_item_data(self, i):
+        return self.get_item(*i)
 
     def get_data_type(self, tmdb_type):
-        data = tuple(((name, tmdb_id) for name, tmdb_id in getattr(self, f'items_{tmdb_type}').items()))
-        # from tmdbhelper.lib.addon.thread import ParallelThread
-        # with ParallelThread(data, self.get_item_data, tmdb_type) as pt:
-        #     items = pt.queue
-        items = [self.get_item_data(i, tmdb_type) for i in data]
+        data = getattr(self, f'items_{tmdb_type}')
+        data = tuple((
+            (name, tmdb_id, tmdb_type)
+            for name, tmdb_id in data.items()
+        ))
+
+        from tmdbhelper.lib.addon.thread import ParallelThread
+        with ParallelThread(data, self.get_item_data) as pt:
+            items = pt.queue
+
         return {i[0]: i[1] for i in items if i}
 
     @cached_property
     def data(self):
+        self.p_dialog_max = len(self.items_movie) + len(self.items_tv)  # Init value outside of threading to avoid sqlite object reuse
         data = {'movie': self.data_movie, 'tv': self.data_tv}
         self.p_dialog.close() if self.p_dialog else None
         return data
