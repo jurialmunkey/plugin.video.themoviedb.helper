@@ -12,6 +12,10 @@ from tmdbhelper.lib.script.discover.tmdb.main import WINPROP, NODE_FILENAME, TMD
 
 class ListDiscoverDir(ContainerDefaultCacheDirectory):
 
+    @cached_property
+    def plugin_category(self):
+        return f'TMDb {get_localized(32174)}'
+
     def get_winprop_params(self):
 
         try:

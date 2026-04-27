@@ -1988,6 +1988,16 @@ msgctxt "#32373"
 msgid "Restrict to library strm"
 msgstr "Restringir à biblioteca strm"
 
+#: /resources/settings.xml
+msgctxt "#32388"
+msgid "Retrieve genre fanart"
+msgstr "Recuperar fanart do gênero"
+
+#: /resources/settings.xml
+msgctxt "#32389"
+msgid "Retrieve provider fanart"
+msgstr "Recuperar fanart do provedor"
+
 #: /resources/lib/player/players.py
 msgctxt "#32374"
 msgid "Constructing players"
@@ -2017,6 +2027,11 @@ msgstr "Ocultar Especiais"
 msgctxt "#32380"
 msgid "Hide Up Next"
 msgstr "Ocultar A Seguir"
+
+#: /resources/settings.xml
+msgctxt "#32396"
+msgid "Delete TMDb cached list details"
+msgstr "Excluir detalhes da lista em cache do TMDb"
 
 #: /resources/settings.xml
 msgctxt "#32381"

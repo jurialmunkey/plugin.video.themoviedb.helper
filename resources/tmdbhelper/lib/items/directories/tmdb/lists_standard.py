@@ -1,5 +1,6 @@
 from tmdbhelper.lib.items.directories.lists_default import UncachedItemsPage, ListDefault, ListProperties
 from tmdbhelper.lib.addon.plugin import get_setting
+from jurialmunkey.ftools import cached_property
 
 
 class ListStandardProperties(ListProperties):
@@ -15,12 +16,16 @@ class ListStandardProperties(ListProperties):
     def get_api_response(self, page=1):
         return self.tmdb_api.get_response_json(self.url, page=page)
 
+    @cached_property
+    def final_items(self):
+        return [
+            i for xpage in range(self.page, self.next_page)
+            for i in self.class_pages(self, xpage).items
+        ]
+
     def get_uncached_items(self):
         return {
-            'items': [
-                i for xpage in range(self.page, self.next_page)
-                for i in self.class_pages(self, xpage).items
-            ],
+            'items': self.final_items,
             'pages': self.total_pages,
             'count': self.total_items,
         }
@@ -32,8 +37,83 @@ class ListStandardProperties(ListProperties):
             add_infoproperties=add_infoproperties)
 
 
+class ListStandardLocalProperties(ListStandardProperties):
+    page_limit = 8
+    item_limit = 20
+
+    @cached_property
+    def cache_name_tuple(self):
+        return (
+            'local_items',
+            self.class_name,
+            self.tmdb_type,
+            self.page,
+            self.page_limit,
+            self.item_limit,
+        )
+
+    # Possible method to get next page but need to account for item offset
+    # Might not be worthwhile as too hacky
+    # @cached_property
+    # def next_page(self):
+    #     return next(self.next_page_generator, self.page + self.page_limit + 1)
+
+    @property
+    def next_page(self):
+        return self.pages + 1  # Override next page object by making next_page out of bounds
+
+    @cached_property
+    def next_page_generator(self):
+        return (x for x in range(self.page, self.page + self.page_limit))
+
+    @cached_property
+    def kodi_db(self):
+        from tmdbhelper.lib.api.kodi.rpc import get_kodi_library
+        return get_kodi_library(self.tmdb_type)
+
+    def get_dbid(self, item):
+        if not self.kodi_db:
+            return
+        try:
+            unique_ids = item['unique_ids']
+            infolabels = item['infolabels']
+        except (KeyError, TypeError):
+            return
+        return self.kodi_db.get_info(
+            info='dbid',
+            imdb_id=unique_ids.get('imdb'),
+            tmdb_id=unique_ids.get('tmdb'),
+            tvdb_id=unique_ids.get('tvdb'),
+            originaltitle=infolabels.get('originaltitle'),
+            title=infolabels.get('title'),
+            year=infolabels.get('year')
+        )
+
+    @cached_property
+    def item_generator(self):
+        return (
+            i for xpage in self.next_page_generator
+            for i in self.class_pages(self, xpage).items
+            if i and self.get_dbid(i)
+        )
+
+    @cached_property
+    def final_items(self):
+        final_items = []
+        for x, i in enumerate(self.item_generator):
+            if x >= self.item_limit:
+                break
+            final_items.append(i)
+        return final_items
+
+
 class ListStandard(ListDefault):
-    list_properties_class = ListStandardProperties
+
+    @property
+    def list_properties_class(self):
+        if not self.is_localonly:
+            return ListStandardProperties
+        return ListStandardLocalProperties
 
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)

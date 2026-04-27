@@ -372,6 +372,26 @@ def import_art_clearlogo_null():
     return ArtClearlogoNull
 
 
+def import_default_art():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.default_art import DefaultArt
+    return DefaultArt
+
+
+def import_default_art_poster():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.default_art import DefaultArtPoster
+    return DefaultArtPoster
+
+
+def import_default_art_fanart():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.default_art import DefaultArtFanart
+    return DefaultArtFanart
+
+
+def import_default_art_profile():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.default_art import DefaultArtProfile
+    return DefaultArtProfile
+
+
 def import_user_art_poster():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.user_art import UserArtPoster
     return UserArtPoster
@@ -526,6 +546,10 @@ FACTORY_ROUTES = {
     'art_clearlogo_language': import_art_clearlogo_language,
     'art_clearlogo_english': import_art_clearlogo_english,
     'art_clearlogo_null': import_art_clearlogo_null,
+    'default_art': import_default_art,
+    'default_art_poster': import_default_art_poster,
+    'default_art_fanart': import_default_art_fanart,
+    'default_art_profile': import_default_art_profile,
     'user_art_poster': import_user_art_poster,
     'user_art_fanart': import_user_art_fanart,
     'user_art_landscape': import_user_art_landscape,

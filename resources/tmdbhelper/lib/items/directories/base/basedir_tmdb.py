@@ -1,6 +1,4 @@
 from tmdbhelper.lib.items.directories.base.basedir_item import BaseDirItem
-from tmdbhelper.lib.addon.plugin import get_localized
-from jurialmunkey.ftools import cached_property
 
 
 class BaseDirItemTMDbSearch(BaseDirItem):
@@ -146,16 +144,12 @@ class BaseDirItemTMDbMostVoted(BaseDirItem):
 
 class BaseDirItemTMDbAllStudios(BaseDirItem):
     priority = 250
-    label_type = 'prefixed'
+    label_type = 'reversed'
     label_localized = 20388
     types = ('movie',)
     params = {'info': 'all_studios'}
     art_icon = 'resources/icons/themoviedb/default.png'
     group = 20388
-
-    @cached_property
-    def label_prefixed(self):
-        return get_localized(593)
 
 
 class BaseDirItemTMDbAllNetworks(BaseDirItemTMDbAllStudios):

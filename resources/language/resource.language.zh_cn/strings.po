@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
-"POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2026-01-17 20:07+0800\n"
+"POT-Creation-Date: 2014-10-26 21:05+0000\n"
+"PO-Revision-Date: 2026-04-11 17:04+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -84,7 +84,7 @@ msgstr "德语（奥地利）"
 
 #: /resources/settings.xml
 msgctxt "#32013"
-msgid "Get watched indicators, episode counts, 和 resume points"
+msgid "Get watched indicators, episode counts, and resume points"
 msgstr "获取已观看标识、剧集计数和续播点"
 
 msgctxt "#30010"
@@ -1978,7 +1978,7 @@ msgstr "首选艺术图片缩略图"
 #: /resources/settings.xml
 msgctxt "#32372"
 msgid "fanart"
-msgstr "同人画"
+msgstr "背景图"
 
 #: /resources/settings.xml
 msgctxt "#32386"
@@ -1993,12 +1993,12 @@ msgstr "仅处理 .strm 文件"
 #: /resources/settings.xml
 msgctxt "#32388"
 msgid "Retrieve genre fanart"
-msgstr "获取类型同人画"
+msgstr "获取类型背景图"
 
 #: /resources/settings.xml
 msgctxt "#32389"
 msgid "Retrieve provider fanart"
-msgstr "获取提供商同人画"
+msgstr "获取提供商背景图"
 
 #: /resources/lib/player/players.py
 msgctxt "#32374"
@@ -2029,6 +2029,11 @@ msgstr "隐藏特殊"
 msgctxt "#32380"
 msgid "Hide Up Next"
 msgstr "隐藏“下个播放”"
+
+#: /resources/settings.xml
+msgctxt "#32396"
+msgid "Delete TMDb cached list details"
+msgstr "删除 TMDb 缓存的列表详情"
 
 #: /resources/settings.xml
 msgctxt "#32381"
@@ -2544,12 +2549,12 @@ msgstr "添加节点"
 #: /resources/settings.xml
 msgctxt "#32497"
 msgid "Container content fallback for service listitems without mediatypes"
-msgstr "为无媒体类型的服务列表项设置容器内容回退"
+msgstr "服务列表项无媒体类型时，使用容器内容作为备用"
 
 #: /resources/settings.xml
 msgctxt "#32498"
 msgid "Some plugins have poor metadata and fail to fill the item mediatype which results in the service monitor not completing an item lookup. This setting allows the service monitor to use the container content type when item mediatype is missing. Note this setting will likely result more frequent incorrect matches due to the end plugin having bad metadata."
-msgstr "部分插件的元数据质量较差，未能正确填充项目的媒体类型，导致服务监视器无法完成条目查找。此设置允许服务监视器在媒体类型缺失时，使用容器的内容类型作为回退。注意：启用此选项可能导致匹配错误率增加，因下游插件的元数据不完整或错误。"
+msgstr "部分插件的元数据质量较差，未能正确填充项目的媒体类型，导致服务监视器无法完成条目查找。此设置允许服务监视器在媒体类型缺失时，使用容器的内容类型作为备用。注意：启用此选项可能导致匹配错误率增加，因下游插件的元数据不完整或错误。"
 
 # 翻页速度倍数
 #: /resources/settings.xml
@@ -2867,7 +2872,7 @@ msgstr "祖鲁语（南非）"
 #: /resources/settings.xml
 msgctxt "#32001"
 msgid "OMDb API key"
-msgstr "OMDb API密钥"
+msgstr "OMDb API 密钥"
 
 #: /resources/settings.xml
 msgctxt "#32002"

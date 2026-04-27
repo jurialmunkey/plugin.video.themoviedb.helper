@@ -4,16 +4,16 @@
 # Addon Provider: jurialmunkey
 msgid ""
 msgstr ""
-"Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
-"POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: taiseer999\n"
+"Language-Team: L\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: en\n"
+"Language: ar\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 msgctxt "#30000"
@@ -62,12 +62,12 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32008"
 msgid "Low"
-msgstr "منخفض"
+msgstr "منخفضة"
 
 #: /resources/settings.xml
 msgctxt "#32009"
 msgid "High"
-msgstr "مرتفع"
+msgstr "مرتفعة"
 
 msgctxt "#30007"
 msgid "Czech (Czech Republic)"
@@ -195,7 +195,7 @@ msgctxt "#30025"
 msgid "Finnish (Finland)"
 msgstr ""
 
-#: /resources/settings.xml
+: /resources/settings.xml
 msgctxt "#32039"
 msgid "Prefer fanart.tv artwork"
 msgstr "تفضل العمل الفني fanart.tv"
@@ -208,7 +208,7 @@ msgstr "كل الفصول"
 #: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
 msgctxt "#32041"
 msgid "Your In-Progress TV Shows"
-msgstr "برامجك التلفزيونية قيد التقدم"
+msgstr "مسلسلاتك قيد التقدم"
 
 msgctxt "#30026"
 msgid "French (Canada)"
@@ -230,22 +230,22 @@ msgstr "أفلامك قيد التقدم"
 #: /resources/tmdbhelper/lib/script/sync/basic.py
 msgctxt "#32046"
 msgid "Drop TV show"
-msgstr "الغي برنامج تلفزيوني"
+msgstr "الغي مسلسل"
 
 #: /resources/tmdbhelper/lib/script/sync/basic.py
 msgctxt "#32047"
 msgid "Undrop TV show"
-msgstr "اوقف الغاء برنامج تلفزيوني"
+msgstr "اوقف الغاء مسلسل"
 
 #: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
 msgctxt "#32048"
 msgid "Dropped TV Shows"
-msgstr "البرامج التلفزيونية التي تم الغائها"
+msgstr "المسلسلات التي تم الغائها"
 
 #: /resources/settings.xml
 msgctxt "#32049"
 msgid "Sort order of Your Next Episodes list. By airdate sorts episodes by premiere date. By recentlywatched sorts episodes by most recently watched tvshow. By todays is recentlywatched with episodes airing today at the front. By lastweek is recentlywatched with episodes airing in the past week sorted by airdate at the front."
-msgstr "فرز ترتيب قائمة الحلقات التالية. حسب تاريخ البث يفرز الحلقات حسب تاريخ العرض الأول. من خلال أنواع الحلقات التي تمت مشاهدتها مؤخرا من قبل البرامج التلفزيونية التي تمت مشاهدتها مؤخرا. بحلول اليوم تمت مشاهدته مؤخرا مع حلقات يتم بثها اليوم في المقدمة. بحلول الأسبوع الماضي تمت مشاهدته مؤخرا مع بث الحلقات في الأسبوع الماضي مرتبة حسب تاريخ البث في المقدمة"
+msgstr "فرز ترتيب قائمة الحلقات التالية. حسب تاريخ البث يفرز الحلقات حسب تاريخ العرض الأول. من خلال أنواع الحلقات التي تمت مشاهدتها مؤخرا من قبل المسلسلات التي تمت مشاهدتها مؤخرا. بحلول اليوم تمت مشاهدته مؤخرا مع حلقات يتم بثها اليوم في المقدمة. بحلول الأسبوع الماضي تمت مشاهدته مؤخرا مع بث الحلقات في الأسبوع الماضي مرتبة حسب تاريخ البث في المقدمة"
 
 #: /resources/settings.xml
 msgctxt "#32050"
@@ -260,12 +260,13 @@ msgstr "حذف عناصر {} cached"
 #: /resources/settings.xml
 msgctxt "#32052"
 msgid "Delete TMDb cached item details"
-msgstr "حذف تفاصيل العنصر cached TMDb"
+msgstr "حذف كاش تفاصيل TMDb"
 
 #: /resources/settings.xml
 msgctxt "#32053"
 msgid "TMDbHelper automatically performs regular cache maintenance. You should only delete the cache when instructed to troubleshoot issues. TMDbHelper relies on having cached items to perform well. Unnecessarily deleting the cache on a regular basis will degrade performance and places excessive strain on the free services providing this data."
 msgstr "يقوم TMDbHelper تلقائيا بصيانة ذاكرة التخزين المؤقت المنتظمة. يجب عليك حذف ذاكرة التخزين المؤقت فقط عند توجيهك لاستكشاف الأخطاء وإصلاحها. يعتمد TMDbHelper على وجود عناصر مخبأة لأداء جيد. سيؤدي حذف ذاكرة التخزين المؤقت دون داع على أساس منتظم إلى تدهور الأداء ويضع ضغطا مفرطا على الخدمات المجانية التي توفر هذه البيانات"
+
 
 msgctxt "#30029"
 msgid "Hebrew (Israel)"
@@ -304,7 +305,7 @@ msgstr "احصل على مؤشرات تمت المشاهدة وعدد الحلق
 #: /resources/settings.xml
 msgctxt "#32037"
 msgid "Use bundled players"
-msgstr "استخدم المشغلات المجمعين"
+msgstr "استخدم المشغلات مجمعين"
 
 #: /resources/tmdbhelper/lib/items/directories/lists_base.py
 msgctxt "#32062"
@@ -713,15 +714,90 @@ msgctxt "#32117"
 msgid "Keyword"
 msgstr "كلمة مفتاحية"
 
+#: /resources/tmdbhelper/lib/player/players.py
+msgctxt "#32143"
+msgid "Recaching Kodi library"
+msgstr "إعادة الوصول إلى مكتبة كودي"
+
+#: /resources/tmdbhelper/lib/player/players.py
+msgctxt "#32144"
+msgid "Retrieving player files"
+msgstr "استرجاع ملفات المشغل"
+
+#: /resources/tmdbhelper/lib/player/dialog/player.py
+msgctxt "#32145"
+msgid "Retrieving library"
+msgstr "استرجاع المكتبة"
+
+#: /resources/tmdbhelper/lib/api/trakt/sync/invalidator.py
+msgctxt "#32146"
+msgid "Successfully refreshed {} sync data"
+msgstr "تم تحديث بيانات المزامنة {} بنجاح"
+
+#: /resources/settings.xml
+msgctxt "#32147"
+msgid "Gemini API"
+msgstr "مفتاح API GEMINI"
+
+#: /resources/settings.xml
+msgctxt "#32148"
+msgid "Gemini API key"
+msgstr "مفتاح API GEMINI"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_main.py
+msgctxt "#32149"
+msgid "Gemini AI"
+msgstr "الذكاء الاصطناعي Gemini "
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
+msgctxt "#32150"
+msgid "Google Gemini AI requires a developer API key to use."
+msgstr "للاستخدام يجب ادخال مفتاح API"
+
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
+msgctxt "#32151"
+msgid "Visit [B]{}[/B] to generate your key and then input into TMDbHelper settings under the API keys section."
+msgid "قم بزيارة [B]{}[/B] لإنشاء مفتاحك ثم أدخله في إعدادات TMDbHelper ضمن قسم مفاتيح API."
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_nodes.py
+msgctxt "#32152"
+msgid "Remove node"
+msgstr “ازالة النود”
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32153"
+msgid "Query"
+msgstr "استعلام"
+
 #: /resources/lib/container.py
 msgctxt "#32119"
 msgid "Select Release Types"
 msgstr "حدد أنواع الإصدارات"
 
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32155"
+msgid "Airing"
+msgstr "بث"
+
 #: /resources/lib/container.py
 msgctxt "#32120"
 msgid "Select Region for Release"
 msgstr "حدد المنطقة للإصدار"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32157"
+msgid "Decades"
+msgstr "عقود"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32158"
+msgid "Certifications"
+msgstr “التقيمات العمرية”
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
+msgctxt "#32159"
+msgid "Lists"
+msgstr "قوائم"
 
 #: /resources/lib/container.py
 msgctxt "#32121"
@@ -747,6 +823,11 @@ msgstr " إضافة قائمة Traktإلى مكتبة Kodi الخاصة بك؟"
 msgctxt "#32126"
 msgid "Are you sure you want to add this Trakt list to your Kodi library?"
 msgstr "هل أنت متأكد من أنك تريد إضافة قائمة Trakt هذه إلى مكتبة Kodi الخاصة بك؟"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32165"
+msgid "Add another item?"
+msgstr "إضافة عنصر آخر؟"
 
 #: /resources/lib/context.py
 msgctxt "#32130"
@@ -781,7 +862,7 @@ msgstr "قم بتحديث المكتبة الآن"
 #: /resources/settings.xml
 msgctxt "#32156"
 msgid "Next aired library calendar links to local tvshow"
-msgstr "روابط تقويم المكتبة التي تم بثها التالية إلى برنامج تلفزيوني محلي"
+msgstr "ربط العرض القادم من مسلسل الى المكتبة المحلية"
 
 #: /resources/lib/context.py
 msgctxt "#32160"
@@ -1005,6 +1086,31 @@ msgctxt "#32204"
 msgid "Trending"
 msgstr "شائع"
 
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32217"
+msgid "With Provider Region"
+msgstr "مع منطقة المزود"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32218"
+msgid "With Watch Monetization Types"
+msgstr "مع اكثر العروض ربحا"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb.py
+msgctxt "#32219"
+msgid "Certification Country"
+msgstr "بلد التقيمات العمرية"
+
+#: /resources/tmdbhelper/lib/script/discover/tmdb/routes.py
+msgctxt "#32220"
+msgid "With Origin Country"
+msgstr "مع بلد المنشأ"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32221"
+msgid "Miniseries"
+msgstr "مسلسل قصير"
+
 #: /resources/lib/plugin.py
 msgctxt "#32205"
 msgid "Most Played"
@@ -1065,6 +1171,11 @@ msgctxt "#32216"
 msgid "Successfully logged out of Trakt user account"
 msgstr "تم تسجيل الخروج من حساب مستخدم Trakt بنجاح"
 
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32234"
+msgid "Reality"
+msgstr "واقع"
+
 #: /resources/lib/script.py
 msgctxt "#32222"
 msgid "Manage artwork"
@@ -1079,6 +1190,11 @@ msgstr "موصى بها"
 msgctxt "#32224"
 msgid "Similar"
 msgstr "مشابه"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32238"
+msgid "Scripted"
+msgstr "مكتوب"
 
 #: /resources/lib/plugin.py
 msgctxt "#32225"
@@ -1350,6 +1466,16 @@ msgctxt "#32280"
 msgid "Last Fortnight"
 msgstr "آخر أسبوعين"
 
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32293"
+msgid "Returning Series"
+msgstr “جزء جديد”
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32294"
+msgid "Planned"
+msgstr "مخطط له”
+
 #: /resources/lib/basedir.py
 msgctxt "#32281"
 msgid "Last Week"
@@ -1409,6 +1535,16 @@ msgstr "إضافة إلى قائمة المشاهدة"
 msgctxt "#32292"
 msgid "Remove from watchlist"
 msgstr "إزالة من قائمة المشاهدة"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32307"
+msgid "In Production"
+msgstr "في الإنتاج"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32308"
+msgid "Ended"
+msgstr "انتهى"
 
 #: resources/lib/script.py
 msgctxt "#32295"
@@ -1488,6 +1624,16 @@ msgstr "تصفح القائمة التي تم فرزها"
 msgctxt "#32310"
 msgid "TMDb ID for {} not found!"
 msgstr "معرف TMDb لـ {} غير موجود!"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32323"
+msgid "Cancelled"
+msgstr "ألغي"
+
+#: /resources/tmdbhelper/lib/addon/consts.py
+msgctxt "#32324"
+msgid "Pilot"
+msgstr ""
 
 #: /resources/tmdbhelper/lib/items/directories/tmdb/lists_discodir.py
 msgctxt "#32325"
@@ -1598,15 +1744,15 @@ msgctxt "#32333"
 msgid "User Choice"
 msgstr "اختيار المستخدم"
 
-#: resources/lib/player/configure.py
-msgctxt "#32334"
-msgid "Reset player to defaults?"
-msgstr "إعادة تعيين المشغل إلى الإعدادات الافتراضية؟"
-
 #: /resources/tmdbhelper/lib/script/discover/tmdb/routes.py
 msgctxt "#32346"
 msgid "Timezone"
 msgstr "المنطقة الزمنية"
+
+#: resources/lib/player/configure.py
+msgctxt "#32334"
+msgid "Reset player to defaults?"
+msgstr "إعادة تعيين المشغل إلى الإعدادات الافتراضية؟"
 
 #: resources/lib/player/configure.py
 msgctxt "#32335"
@@ -1684,6 +1830,16 @@ msgstr "سجل إخراج طلب Trakt"
 msgctxt "#32348"
 msgid "Log output of TMDb request"
 msgstr "سجل إخراج طلب TMDb"
+
+#: /resources/settings.xml
+msgctxt "#32349"
+msgid "Use fallback English plot translations (slower)"
+msgstr "استخدم ترجمات الحبكة الإنجليزية الاحتياطية (أبطأ)"
+
+#: /resources/settings.xml
+msgctxt "#32350"
+msgid "Retrieve English language plot translations to use as a fallback when primrary language translation is missing. Note that this setting will considerably increase detailed information lookup times and database disk usage."
+msgstr "استرجع ترجمات حبكة اللغة الإنجليزية لاستخدامها كتراجع عندما تكون ترجمة اللغة الأولية مفقودة. لاحظ أن هذا الإعداد سيزيد بشكل كبير من أوقات البحث عن المعلومات التفصيلية واستخدام قرص قاعدة البيانات"
 
 #: /resources/lib/kodi/library.py
 msgctxt "#32351"
@@ -1764,6 +1920,11 @@ msgctxt "#32364"
 msgid "Reroute PlayMedia to xbmc.Player()"
 msgstr "إعادة توجيه PlayMedia إلى xbmc.Player()"
 
+#: /resources/settings.xml
+msgctxt "#32377"
+msgid "Use online artwork in image monitor"
+msgstr "استخدم العمل الفني عبر الإنترنت في شاشة الصور"
+
 #: resources/lib/addon/plugin.py
 msgctxt "#32365"
 msgid "Combined"
@@ -1798,17 +1959,32 @@ msgstr "بالعرض"
 #: resources/settings.xml
 msgctxt "#32371"
 msgid "Preferred artwork for thumbs"
-msgstr "العمل الفني المفضل للـthumbs"
+msgstr "العمل الفني المفضل لالصور المصغرة"
 
 #: resources/settings.xml
 msgctxt "#32372"
 msgid "fanart"
 msgstr "اعمال فنية"
 
+#: /resources/settings.xml
+msgctxt "#32386"
+msgid "Use online ratings in details monitor"
+msgstr "استخدم التقييمات عبر الإنترنت في مراقب التفاصيل"
+
 #: resources/settings.xml
 msgctxt "#32373"
 msgid "Restrict to library strm"
 msgstr "يقتصر على مكتبة strm"
+
+#: /resources/settings.xml
+msgctxt "#32388"
+msgid "Retrieve genre fanart"
+msgstr "استرجاع نوع ا”لاصناف
+
+#: /resources/settings.xml
+msgctxt "#32389"
+msgid "Retrieve provider fanart"
+msgstr "استرداد فن مقدم الخدمة"
 
 #: resources/lib/player/players.py
 msgctxt "#32374"
@@ -1840,6 +2016,10 @@ msgctxt "#32380"
 msgid "Hide Up Next"
 msgstr "إخفاء قسم \"الحلقة التالية\""
 
+#: /resources/settings.xml
+msgctxt "#32396"
+msgid "Delete TMDb cached list details"
+msgstr "حذف كاش تفاصيل قائمة TMDb"
 
 #: resources/settings.xml
 msgctxt "#32381"
@@ -1980,7 +2160,7 @@ msgstr "الأكثر مشاهدة"
 #: /resources/settings.xml
 msgctxt "#32415"
 msgid "Combine all players for plugin into single entry"
-msgstr "اجمع جميع المشغلات للمكون الإضافي في دخول واحد"
+msgstr "اجمع المشغلات لاضافات الفيديو في خيار مفرد"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32416"
@@ -2069,7 +2249,6 @@ msgctxt "#32433"
 msgid "Missing QUERYKEY in URL"
 msgstr "مفتاح الاستعلام المفقود في عنوان URL"
 
-#: /resources/lib/player/configure.py
 msgctxt "#32434"
 msgid "You must insert QUERYKEY where the search query for the URL goes"
 msgstr "يجب عليك إدراج QUERYKEY حيث يذهب استعلام البحث عن عنوان URL"
@@ -2240,7 +2419,7 @@ msgstr "تجاهل المقالات عند الفرز أبجديا"
 #: resources/settings.xml
 msgctxt "#32470"
 msgid "Trakt"
-msgstr ""
+msgstr "تراكت"
 
 #: resources/settings.xml
 msgctxt "#32471"
@@ -2328,7 +2507,6 @@ msgctxt "#32490"
 msgid "Add to favourites"
 msgstr "إضافة الى المفضلة"
 
-#: resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32491"
 msgid "Remove from favourites"
 msgstr "إزالة من المفضلة"
@@ -2696,7 +2874,7 @@ msgstr "عدد الايام لتفاصيل التخزين المؤقت"
 ##: resources/settings.xml
 msgctxt "#32004"
 msgid "MPAA rating prefix"
-msgstr "بادئة تصنيف MPAA"
+msgstr "بادئة تصنيف العمري"
 
 #: resources/settings.xml
 msgctxt "#32005"
@@ -2762,28 +2940,3 @@ msgstr "المشغل الافتراضي للأفلام"
 msgctxt "#32025"
 msgid "Default player for episodes"
 msgstr "المشغل الافتراضي للحلقات"
-
-msgctxt "#32147"
-msgid "Gemini API"
-msgstr "مفتاح API GEMINI"
-
-#: /resources/settings.xml
-msgctxt "#32148"
-msgid "Gemini API key"
-msgstr "مفتاح API GEMINI"
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_main.py
-msgctxt "#32149"
-msgid "Gemini AI"
-msgstr "الذكاء الاصطناعي Gemini "
-
-#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
-msgctxt "#32150"
-msgid "Google Gemini AI requires a developer API key to use."
-msgstr "للاستخدام يجب ادخال مفتاح API"
-
-#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
-msgctxt "#32151"
-msgid "قم بزيارة [B]{}[/B] لإنشاء مفتاحك ثم أدخله في إعدادات TMDbHelper ضمن قسم مفاتيح API."
-msgstr "قم بزيارة [B]{}[/B] "
-

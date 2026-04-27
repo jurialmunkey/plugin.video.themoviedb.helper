@@ -10,10 +10,10 @@ msgstr ""
 "PO-Revision-Date: 2026-01-13 18:33+0000\n"
 "Last-Translator: 01xKeven\n"
 "Language-Team: Spanish - GTKing Phoenix TEAM\n"
+"Language: es_ES\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: es_ES\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 msgctxt "#30000"
@@ -471,7 +471,7 @@ msgctxt "#32094"
 msgid "Select TMDb type"
 msgstr "Seleccionar tipo TMDb"
 
-#: /resources/lib/container/basedir.py
+#: /resources/lib/container.py
 msgctxt "#32078"
 msgid "Still to Watch"
 msgstr "Sin reproducir"
@@ -663,7 +663,7 @@ msgstr "Seleccionar Géneros"
 #: /resources/lib/container.py
 msgctxt "#32113"
 msgid "Also accepts days from today as T-X or T+X (e.g. T-10 is ten days ago)"
-msgstr "También acepta días desde hoy como T-X o T+X (p. ej. T-10 es hace diez días)"
+msgstr "También acepta X días relativos a partir de hoy en el formato T-X o T+X (p.e, T-10 es hace diez días)"
 
 #: /resources/lib/container.py
 msgctxt "#32114"
@@ -1988,6 +1988,16 @@ msgctxt "#32373"
 msgid "Restrict to library strm"
 msgstr "Restringir a la biblioteca strm"
 
+#: /resources/settings.xml
+msgctxt "#32388"
+msgid "Retrieve genre fanart"
+msgstr "Recuperar fanart de género"
+
+#: /resources/settings.xml
+msgctxt "#32389"
+msgid "Retrieve provider fanart"
+msgstr "Recuperar fanart del proveedor"
+
 #: /resources/lib/player/players.py
 msgctxt "#32374"
 msgid "Constructing players"
@@ -2017,6 +2027,11 @@ msgstr "Ocultar Especiales"
 msgctxt "#32380"
 msgid "Hide Up Next"
 msgstr "Ocultar proximos"
+
+#: /resources/settings.xml
+msgctxt "#32396"
+msgid "Delete TMDb cached list details"
+msgstr "Borrar detalles de listas de TMDb en caché"
 
 #: /resources/settings.xml
 msgctxt "#32381"

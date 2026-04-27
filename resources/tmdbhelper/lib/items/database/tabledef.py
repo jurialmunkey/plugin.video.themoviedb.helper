@@ -317,6 +317,9 @@ RATINGS_COLUMNS = {
     'rottentomatoes_consensus': {
         'data': 'TEXT',
     },
+    'rottentomatoes_image': {
+        'data': 'TEXT',
+    },
     'metacritic_rating': {
         'data': 'INTEGER',
     },
@@ -650,6 +653,10 @@ CASTMEMBER_COLUMNS = {
         'data': 'INTEGER',
         'indexed': True
     },
+    'guest': {
+        'data': 'INTEGER',
+        'indexed': True
+    },
     'parent_id': {
         'data': 'TEXT',
         'foreign_key': 'baseitem(id)',
@@ -787,6 +794,23 @@ FANART_TV_COLUMNS = {
 }
 
 USER_ART_COLUMNS = {
+    'type': {
+        'data': 'TEXT',
+        'unique': True,
+    },
+    'icon': {
+        'data': 'TEXT',
+    },
+    'parent_id': {
+        'data': 'TEXT',
+        'foreign_key': 'baseitem(id)',
+        'indexed': True,
+        'unique': True,
+    },
+}
+
+
+DEFAULT_ART_COLUMNS = {
     'type': {
         'data': 'TEXT',
         'unique': True,
