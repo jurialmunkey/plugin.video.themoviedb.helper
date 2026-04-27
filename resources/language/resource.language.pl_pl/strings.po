@@ -260,7 +260,7 @@ msgstr "Usunięto informacje {} zapisane w pamięci podręcznej"
 #: /resources/settings.xml
 msgctxt "#32052"
 msgid "Delete TMDb cached item details"
-msgstr "Usuń informacje TMDB zapisane w pamięci podręcznej"
+msgstr "Usuń szczegóły pozycji TMDB z pamięci podręcznej"
 
 #: /resources/settings.xml
 msgctxt "#32053"
@@ -1832,12 +1832,12 @@ msgstr "Grupy odcinków"
 #: /resources/settings.xml
 msgctxt "#32347"
 msgid "Log output of Trakt request"
-msgstr "Wyjście dziennika żądań Trakt"
+msgstr "Zapisuj w dzienniku wyniki zapytań Trakt"
 
 #: /resources/settings.xml
 msgctxt "#32348"
 msgid "Log output of TMDb request"
-msgstr "Wyjście dziennika żądań TMDB"
+msgstr "Zapisuj w dzienniku wyniki zapytań TMDB"
 
 #: /resources/settings.xml
 msgctxt "#32349"
@@ -2025,6 +2025,11 @@ msgstr "Ukrywaj specjalne"
 msgctxt "#32380"
 msgid "Hide Up Next"
 msgstr "Ukrywaj następne"
+
+#: /resources/settings.xml
+msgctxt "#32396"
+msgid "Delete TMDb cached list details"
+msgstr "Usuń szczegóły list TMDB z pamięci podręcznej"
 
 #: /resources/settings.xml
 msgctxt "#32381"
