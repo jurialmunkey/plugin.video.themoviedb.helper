@@ -39,8 +39,9 @@ class GenreArtwork:
         if not self.sync_notifications:
             return
         from tmdbhelper.lib.addon.dialog import ProgressDialog
+        from tmdbhelper.lib.addon.plugin import get_localized
         return ProgressDialog(
-            f'{self.tmdb_type.capitalize()} Artwork', 'Retrieving Artwork...',
+            f'{self.tmdb_type.capitalize()} {get_localized(39123)}', f'{get_localized(32399)}...',
             total=self.p_dialog_max,
             logging=2
         )
