@@ -1989,6 +1989,16 @@ msgctxt "#32373"
 msgid "Restrict to library strm"
 msgstr "Limita ai file strm della libreria"
 
+#: /resources/settings.xml
+msgctxt "#32388"
+msgid "Retrieve genre fanart"
+msgstr "Recupera genere fanart"
+
+#: /resources/settings.xml
+msgctxt "#32389"
+msgid "Retrieve provider fanart"
+msgstr "Recupera provider fanart"
+
 #: /resources/lib/player/players.py
 msgctxt "#32374"
 msgid "Constructing players"
@@ -2018,6 +2028,11 @@ msgstr "Nascondi speciali"
 msgctxt "#32380"
 msgid "Hide Up Next"
 msgstr "Nascondi il prossimo"
+
+#: /resources/settings.xml
+msgctxt "#32396"
+msgid "Delete TMDb cached list details"
+msgstr "Elimina i dettagli della lista TMDb in cache"
 
 #: /resources/settings.xml
 msgctxt "#32381"
