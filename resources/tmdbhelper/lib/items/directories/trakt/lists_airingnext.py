@@ -1,4 +1,4 @@
-from tmdbhelper.lib.items.directories.lists_default import ItemCache, ListSliceProperties, ListDefault
+from tmdbhelper.lib.items.directories.lists_default import ListSliceProperties, ListDefault
 from tmdbhelper.lib.items.directories.trakt.mapper_airingnext import AiringNextItemGetter
 from tmdbhelper.lib.addon.plugin import get_setting, get_localized
 from tmdbhelper.lib.addon.dialog import progress_bg
@@ -48,10 +48,13 @@ class ListAiringNextProperties(ListSliceProperties):
     @progress_bg
     def get_uncached_items(self):
         from tmdbhelper.lib.addon.thread import ParallelThread
-        ParallelThreadLimited = ParallelThread
-        ParallelThreadLimited.thread_max = min((40, ParallelThreadLimited.thread_max or 40))
+
+        class ParallelThreadLimited(ParallelThread):
+            max_thread = min((40, ParallelThread.thread_max or 40))
+
         with ParallelThreadLimited(self.seed_items, self.get_threaded_item) as pt:
             item_queue = pt.queue
+
         return [i for i in item_queue if i]
 
     @cached_property
