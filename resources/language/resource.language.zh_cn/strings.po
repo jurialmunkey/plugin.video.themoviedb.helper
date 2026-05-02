@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 21:05+0000\n"
-"PO-Revision-Date: 2026-04-11 17:04+0800\n"
+"PO-Revision-Date: 2026-04-27 15:56+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -2111,6 +2111,11 @@ msgctxt "#32398"
 msgid "Medium"
 msgstr "中等"
 
+#: /resources/tmdbhelper/lib/script/method/image_functions.py
+msgctxt "#32399"
+msgid "Retrieving Artwork"
+msgstr "正在获取艺术图"
+
 #: /resources/settings.xml
 msgctxt "#32400"
 msgid "Play local Kodi library files"
@@ -2164,7 +2169,7 @@ msgstr "使用在线观看"
 #: /resources/settings.xml
 msgctxt "#32413"
 msgid "Next episodes checks calendar (slower but more accurate)"
-msgstr "下一集节目表匹配（较慢但更准确）"
+msgstr "“下一集”节目表匹配（较慢但更准确）"
 
 #: /resources/lib/addon/consts.py
 msgctxt "#32414"
