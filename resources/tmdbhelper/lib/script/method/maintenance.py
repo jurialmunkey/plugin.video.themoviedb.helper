@@ -61,6 +61,13 @@ class DatabaseMaintenance:
     def vacuum(self, force=False):
         if not force and not self.is_next_vacuum:
             return
+        # p3i: skip vacuum while Kodi is playing — VACUUM holds the SQLite
+        # file lock and fsyncs a full DB-sized temp copy, which can stall
+        # the video pipeline thread long enough to drop frames on UHD.
+        if not force:
+            import xbmc
+            if xbmc.Player().isPlaying():
+                return
         self.set_next_vacuum()
         from tmdbhelper.lib.addon.logger import TimerFunc
         from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
