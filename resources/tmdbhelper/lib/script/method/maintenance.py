@@ -36,10 +36,12 @@ class DatabaseMaintenance:
         from tmdbhelper.lib.addon.tmdate import set_timestamp
         self.next_delete = set_timestamp(self.delete_interval)
 
+    @property
     def is_next_vacuum(self):
         from tmdbhelper.lib.addon.tmdate import get_timestamp
         return bool(not get_timestamp(self.next_vacuum))
 
+    @property
     def is_next_delete(self):
         from tmdbhelper.lib.addon.tmdate import get_timestamp
         return bool(not get_timestamp(self.next_delete))
@@ -71,7 +73,7 @@ class DatabaseMaintenance:
 
     def delete_legacy_folders(self, force=False):
         """ Once-off routine to delete old unused database versions to avoid wasting disk space """
-        if not force and not self.is_next_vacuum:
+        if not force and not self.is_next_delete:
             return
         self.set_next_delete()
         from tmdbhelper.lib.files.futils import delete_folder
