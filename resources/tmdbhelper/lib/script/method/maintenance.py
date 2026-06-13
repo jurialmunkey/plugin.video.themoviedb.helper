@@ -11,6 +11,8 @@ class DatabaseMaintenance:
     vacuum_interval = 60 * 60 * 6
     delete_interval = 60 * 60 * 24
 
+    allow_during_video_playback = False
+
     legacy_databases_folders = (
         'database',
         'database_v2',
@@ -36,13 +38,34 @@ class DatabaseMaintenance:
         from tmdbhelper.lib.addon.tmdate import set_timestamp
         self.next_delete = set_timestamp(self.delete_interval)
 
+    @property
     def is_next_vacuum(self):
         from tmdbhelper.lib.addon.tmdate import get_timestamp
         return bool(not get_timestamp(self.next_vacuum))
 
+    @property
     def is_next_delete(self):
         from tmdbhelper.lib.addon.tmdate import get_timestamp
         return bool(not get_timestamp(self.next_delete))
+
+    @property
+    def is_blocked_by_playback(self):
+        if self.allow_during_video_playback:
+            return False
+        import xbmc
+        return xbmc.Player().isPlayingVideo()
+
+    @property
+    def is_vacuum_allowed(self):
+        if self.is_blocked_by_playback:
+            return False
+        return self.is_next_vacuum
+
+    @property
+    def is_delete_allowed(self):
+        if self.is_blocked_by_playback:
+            return False
+        return self.is_next_delete
 
     @property
     def legacy_usr_cache_folders(self):
@@ -59,7 +82,7 @@ class DatabaseMaintenance:
         return get_todays_date()
 
     def vacuum(self, force=False):
-        if not force and not self.is_next_vacuum:
+        if not force and not self.is_vacuum_allowed:
             return
         self.set_next_vacuum()
         from tmdbhelper.lib.addon.logger import TimerFunc
@@ -71,7 +94,7 @@ class DatabaseMaintenance:
 
     def delete_legacy_folders(self, force=False):
         """ Once-off routine to delete old unused database versions to avoid wasting disk space """
-        if not force and not self.is_next_vacuum:
+        if not force and not self.is_delete_allowed:
             return
         self.set_next_delete()
         from tmdbhelper.lib.files.futils import delete_folder
