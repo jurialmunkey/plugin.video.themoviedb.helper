@@ -1665,8 +1665,7 @@ msgstr ""
 "[B]{}[/B]"
 
 #: /resources/lib/trakt/api.py
-msgctxt "#32315"
-msgid "Add to liked lists"
+msgctxt Retrievingsgid "Add to liked lists"
 msgstr "Dodaj do polubionych list"
 
 #: /resources/lib/trakt/api.py
@@ -2040,6 +2039,11 @@ msgstr "Ukrywaj specjalne i następne"
 msgctxt "#32382"
 msgid "Hide Episode Groups"
 msgstr "Ukrywaj grupy odcinków"
+
+#: /resources/tmdbhelper/lib/script/method/image_functions.py
+msgctxt "#32399"
+msgid "Retrieving Artwork"
+msgstr "Pobieranie grafik"
 
 #: /resources/settings.xml
 msgctxt "#32383"
