@@ -204,7 +204,7 @@ class SyncWatched(DataTypeEpisodes):
 class SyncPlayback(DataTypeEpisodes):
     keys = ('progress', 'paused_at', 'id', )
     last_activities_key = 'paused_at'
-    sync_kwgs = {'extended': 'full,progress'}
+    sync_kwgs = {'extended': 'full'}
     method = 'playback'
     key_prefix = 'playback'
 
