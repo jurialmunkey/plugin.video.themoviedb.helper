@@ -197,14 +197,14 @@ class SyncHiddenDropped(SyncHiddenProgressWatched):
 class SyncWatched(DataTypeEpisodes):
     keys = ('plays', 'last_watched_at', 'last_updated_at', 'aired_episodes', 'watched_episodes', 'reset_at', )
     last_activities_key = 'watched_at'
-    sync_kwgs = {'extended': 'full'}
+    sync_kwgs = {'extended': 'full,progress'}
     method = 'watched'
 
 
 class SyncPlayback(DataTypeEpisodes):
     keys = ('progress', 'paused_at', 'id', )
     last_activities_key = 'paused_at'
-    sync_kwgs = {'extended': 'full'}
+    sync_kwgs = {'extended': 'full,progress'}
     method = 'playback'
     key_prefix = 'playback'
 
