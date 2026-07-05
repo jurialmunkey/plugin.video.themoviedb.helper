@@ -51,17 +51,46 @@ class DataType(SyncDataParentProperties):
             return self._item_type
         raise ValueError(f'Invalid item_type {self._item_type} for {self.method}')
 
-    def get_response_sync(self, *args, **kwargs):
+    def get_response_sync_data(self, *args, **kwargs):
         path = self.trakt_api.get_request_url(*args, **kwargs)
         data = self.trakt_api.get_api_request(path, headers=self.trakt_api.headers)
-        if data is None:
+        return data
+
+    def get_response_sync(self, *args, **kwargs):
+        response = self.get_response_sync_data(*args, **kwargs)
+
+        # Check we actually get a response
+        if response is None:
             return
         try:
-            return data.json()
-        except ValueError:
+            this_data = response.json()
+        except (ValueError, AttributeError):
             return
-        except AttributeError:
-            return
+
+        # Dumb hack to deal with weird Trakt decision to paginate sync endpoints without
+        # Unclear why trakt would do this when unable to determine how deep to go from last activity
+        # TODO: future method could check if sorting by activity then check item stamps to test depth?
+        try:
+            page_count = int(response.headers['x-pagination-page-count']) + 1
+            page_start = int(response.headers['x-pagination-page']) + 1
+        except (KeyError, ValueError):
+            page_count = 0
+            page_start = 0
+
+        for x in range(page_start, page_count):
+            next_data = self.get_response_sync_data(*args, **kwargs, page=x)
+
+            # TODO: Might need some better validation here to check for timeouts autherror etc.
+            if next_data is None:
+                continue
+            try:
+                next_data = next_data.json()
+            except (ValueError, AttributeError):
+                continue
+
+            this_data.extend(next_data)
+
+        return this_data
 
     @cached_property
     def last_activities(self):
@@ -173,7 +202,7 @@ class SyncHiddenProgressWatched(DataType):
         """ Get items that are hidden on Trakt """
         from tmdbhelper.lib.addon.logger import TimerFunc
         with TimerFunc(f'Sync: {self.__class__.__name__} get_response_sync users {self.method} {self.item_type}', inline=True, log_threshold=0.001):
-            return self.get_response_sync('users', self.method, type=f'{self.item_type}s', limit=4095)
+            return self.get_response_sync('users', self.method, type=f'{self.item_type}s')
 
 
 class SyncHiddenProgressCollected(SyncHiddenProgressWatched):
