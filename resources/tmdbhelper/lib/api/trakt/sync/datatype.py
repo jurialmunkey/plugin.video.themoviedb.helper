@@ -77,18 +77,21 @@ class DataType(SyncDataParentProperties):
             page_count = 0
             page_start = 0
 
-        for x in range(page_start, page_count):
-            next_data = self.get_response_sync_data(*args, **kwargs, page=x)
-
+        def get_next_item(x):
             # TODO: Might need some better validation here to check for timeouts autherror etc.
-            if next_data is None:
-                continue
             try:
-                next_data = next_data.json()
-            except (ValueError, AttributeError):
-                continue
+                return self.get_response_sync_data(*args, **kwargs, page=x).json()
+            except (TypeError, ValueError, AttributeError):
+                return
 
-            this_data.extend(next_data)
+        from tmdbhelper.lib.addon.thread import ParallelThread
+        with ParallelThread(range(page_start, page_count), get_next_item) as pt:
+            next_data = pt.queue
+
+        for i in next_data:
+            if i is None:
+                continue
+            this_data.extend(i)
 
         return this_data
 
