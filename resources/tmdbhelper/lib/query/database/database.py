@@ -1,6 +1,6 @@
 from tmdbhelper.lib.files.dbdata import Database
 from tmdbhelper.lib.files.dbfunc import DatabaseAccess
-from jurialmunkey.ftools import cached_property
+from jurialmunkey.ftools import cached_property, threaded_cached_property
 from tmdbhelper.lib.addon.tmdate import set_timestamp
 from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY
 from tmdbhelper.lib.query.database.genres import FindQueriesDatabaseGenres
@@ -111,7 +111,7 @@ class FindQueriesDatabase(
         from tmdbhelper.lib.api.tmdb.users import TMDbUser
         return TMDbUser()
 
-    @cached_property
+    @threaded_cached_property
     def access(self):
         access = DatabaseAccess()
         access.cache = self

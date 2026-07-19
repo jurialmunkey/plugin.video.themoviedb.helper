@@ -1,37 +1,62 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from jurialmunkey.ftools import cached_property
+from jurialmunkey.ftools import threaded_cached_property
 from contextlib import contextmanager
+from threading import local
 
 
 class DatabaseConnection:
-    open_connection = None
-
     def __init__(self, cache):
         self.cache = cache
+        self._local = local()
+
+    @property
+    def open_connection(self):
+        return getattr(self._local, 'cursor', None)
+
+    @property
+    def database_connection(self):
+        return getattr(self._local, 'connection', None)
 
     def close(self):
-        if not self.open_connection:
-            return
-        self.open_connection.close()
-        self.open_connection = None
+        cursor = self.open_connection
+        connection = self.database_connection
+
+        try:
+            if cursor:
+                cursor.close()
+        finally:
+            try:
+                if connection:
+                    connection.close()
+            finally:
+                self._local.cursor = None
+                self._local.connection = None
 
     @contextmanager
     def open(self):
-        existing_connection = bool(self.open_connection)
+        existing_connection = self.open_connection
 
-        if not existing_connection:
-            self.open_connection = self.cache.get_database().cursor()
+        if existing_connection:
+            yield existing_connection
+            return
 
-        yield self.open_connection
+        connection = self.cache.get_database()
+        if not connection:
+            raise RuntimeError('Unable to open database connection')
 
-        if not existing_connection:
+        self._local.connection = connection
+        try:
+            self._local.cursor = connection.cursor()
+            with connection:
+                yield self.open_connection
+        finally:
             self.close()
 
 
 class DatabaseAccess:
 
-    @cached_property
+    @threaded_cached_property
     def connection(self):
         return DatabaseConnection(self.cache)
 

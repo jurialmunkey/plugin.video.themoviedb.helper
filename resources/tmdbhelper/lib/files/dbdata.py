@@ -3,6 +3,7 @@
 from tmdbhelper.lib.addon.logger import kodi_log, TimerFunc
 from tmdbhelper.lib.addon.plugin import get_setting, get_version
 from tmdbhelper.lib.files.futils import FileUtils
+import re
 import sqlite3
 
 
@@ -68,43 +69,58 @@ class DatabaseCore:
 
     def set_pragmas(self, connection):
         cursor = connection.cursor()
-        cursor.execute("PRAGMA synchronous=NORMAL")
-        cursor.execute("PRAGMA journal_mode=WAL")
-        cursor.execute("PRAGMA foreign_keys=ON")
-        cursor.execute("PRAGMA mmap_size=268435456")
+        try:
+            cursor.execute("PRAGMA synchronous=NORMAL")
+            cursor.execute("PRAGMA journal_mode=WAL")
+            cursor.execute("PRAGMA foreign_keys=ON")
+            cursor.execute("PRAGMA mmap_size=268435456")
+        finally:
+            cursor.close()
         return connection
 
     def init_database(self):
         # import xbmcvfs
         from jurialmunkey.locker import MutexPropLock
         with MutexPropLock(f'{self._db_file}.lockfile', kodi_log=self.kodi_log):
+            if self.database_initialized:
+                return True
             # if xbmcvfs.exists(self._db_file):
             #     self.set_database_init()
             #     return
-            database = self.create_database()
+            if not self.create_database():
+                return False
             self.set_database_init()
-        return database
+        return True
 
     def create_database(self):
+        connection = None
         try:
             with TimerFunc(f'CACHE: Initialisation {self._db_file} took:'):
                 self.kodi_log(f'CACHE: Initialising...\n{self._db_file}\n{self._sc_name}', 1)
                 connection = sqlite3.connect(self._db_file, timeout=self._db_timeout)
-                connection = self.set_pragmas(connection)
-                connection = self.create_database_execute(connection)
-            return connection
+                with connection:
+                    self.set_pragmas(connection)
+                    self.create_database_execute(connection)
+            return True
         except Exception as error:
             self.kodi_log(f'CACHE: Exception while initializing _database: {error}\n{self._sc_name}', 1)
+            return False
+        finally:
+            if connection:
+                connection.close()
 
     def get_database(self, read_only=False, log_level=1):
         timeout = self._db_read_timeout if read_only else self._db_timeout
+        connection = None
         try:
             connection = sqlite3.connect(self._db_file, timeout=timeout)
+            connection.row_factory = sqlite3.Row
+            return self.set_pragmas(connection)
         except Exception as error:
+            if connection:
+                connection.close()
             self.kodi_log(f'CACHE: ERROR while retrieving _database: {error}\n{self._sc_name}', log_level)
             return
-        connection.row_factory = sqlite3.Row
-        return self.set_pragmas(connection)
 
     def database_execute(self, connection, query, data=None):
         try:
@@ -115,23 +131,81 @@ class DatabaseCore:
             return connection.execute(query, data)
         except sqlite3.OperationalError as operational_exception:
             self.kodi_log(f'CACHE: database OPERATIONAL ERROR! -- {operational_exception}\n{self._sc_name}\n--query--\n{query}\n--data--\n{data}', 2)
+            raise
         except Exception as other_exception:
             self.kodi_log(f'CACHE: database OTHER ERROR! -- {other_exception}\n{self._sc_name}\n--query--\n{query}\n--data--\n{data}', 2)
+            raise
 
     def execute_sql(self, query, data=None, read_only=False, connection=None):
+        if connection:
+            return self.database_execute(connection, query, data=data)
+
+        database_connection = None
         try:
-            if connection:
-                return self.database_execute(connection, query, data=data)
-            with self.get_database(read_only=read_only) as connection:
-                return self.database_execute(connection, query, data=data)
+            database_connection = self.get_database(read_only=read_only)
+            if not database_connection:
+                return
+            with database_connection:
+                cursor = self.database_execute(database_connection, query, data=data)
+            if not cursor:
+                database_connection.close()
+            return cursor
         except Exception as database_exception:
+            if database_connection:
+                database_connection.close()
             self.kodi_log(f'CACHE: database GET DATABASE ERROR! -- {database_exception}\n{self._sc_name} -- read_only: {read_only}', 2)
+
+    @staticmethod
+    def close_cursor(cursor, close_connection=False):
+        if not cursor:
+            return
+        connection = cursor.connection if close_connection else None
+        try:
+            cursor.close()
+        finally:
+            if connection:
+                connection.close()
+
+    def execute_sql_and_close(self, query, data=None, read_only=False):
+        cursor = self.execute_sql(query, data=data, read_only=read_only)
+        self.close_cursor(cursor, close_connection=True)
 
     @property
     def database_tables(self):
         return {}
 
     def create_database_execute(self, connection):
+
+        def execute(cursor, query):
+            try:
+                return cursor.execute(query)
+            except Exception as error:
+                self.kodi_log(
+                    f'CACHE: Exception while initializing _database: {error}\n'
+                    f'{self._sc_name} - {query}',
+                    1)
+                raise
+
+        def migration_already_applied(cursor, query):
+            match = re.match(
+                r'^\s*ALTER\s+TABLE\s+([A-Za-z_]\w*)\s+ADD(?:\s+COLUMN)?\s+([A-Za-z_]\w*)\b',
+                query,
+                flags=re.IGNORECASE)
+            if not match:
+                return False
+            table, column = match.groups()
+            table_columns = execute(cursor, f'PRAGMA table_info("{table}")').fetchall()
+            if not table_columns:
+                current_columns = next((
+                    columns
+                    for current_table, columns in self.database_tables.items()
+                    if current_table.casefold() == table.casefold()
+                ), None)
+                return bool(current_columns) and any(
+                    current_column.casefold() == column.casefold()
+                    for current_column in current_columns
+                )
+            return any(row[1].casefold() == column.casefold() for row in table_columns)
 
         def create_column_data(columns):
             return [
@@ -156,52 +230,44 @@ class DatabaseCore:
             return ['UNIQUE ({})'.format(', '.join(keys))]
 
         cursor = connection.cursor()
-        this_database_version = cursor.execute("PRAGMA user_version").fetchone()[0]
+        try:
+            execute(cursor, "BEGIN")
+            this_database_version = execute(cursor, "PRAGMA user_version").fetchone()[0]
 
-        # OLD DATABASE SCHEME: APPLY MODIFICATIONS
-        if this_database_version and this_database_version < self.database_version:
-            for version, changes in self.database_changes.items():
-                if version <= this_database_version:
-                    continue
-                for query in changes:
-                    try:
-                        cursor.execute(query)
-                    except Exception as error:
-                        self.kodi_log(f'CACHE: Exception while initializing _database: {error}\n{self._sc_name} - {query}', 1)
+            # OLD DATABASE SCHEME: APPLY MODIFICATIONS
+            if this_database_version and this_database_version < self.database_version:
+                for version, changes in self.database_changes.items():
+                    if version <= this_database_version:
+                        continue
+                    for query in changes:
+                        if migration_already_applied(cursor, query):
+                            continue
+                        execute(cursor, query)
 
-        # CREATE TABLES IF NOT EXISTS
-        for table, columns in self.database_tables.items():
-            query = []
-            query += create_column_data(columns)
-            query += create_column_fkey(columns)
-            query += create_column_uids(columns)
-            query = 'CREATE TABLE IF NOT EXISTS {table}({query})'.format(table=table, query=', '.join(query))
-            try:
-                cursor.execute(query)
-            except Exception as error:
-                self.kodi_log(f'CACHE: Exception while initializing _database: {error}\n{self._sc_name} - {query}', 1)
+            # CREATE TABLES IF NOT EXISTS
+            for table, columns in self.database_tables.items():
+                query = []
+                query += create_column_data(columns)
+                query += create_column_fkey(columns)
+                query += create_column_uids(columns)
+                query = 'CREATE TABLE IF NOT EXISTS {table}({query})'.format(table=table, query=', '.join(query))
+                execute(cursor, query)
 
-        # CREATE INDICIES
-        for table, columns in self.database_tables.items():
-            for column, v in columns.items():
-                if not v.get('indexed'):
-                    continue
-                query = 'CREATE INDEX IF NOT EXISTS {table}_{column}_x ON {table}({column})'.format(table=table, column=column)
-                try:
-                    cursor.execute(query)
-                except Exception as error:
-                    self.kodi_log(f'CACHE: Exception while initializing _database: {error}\n{self._sc_name} - {query}', 1)
+            # CREATE INDICIES
+            for table, columns in self.database_tables.items():
+                for column, v in columns.items():
+                    if not v.get('indexed'):
+                        continue
+                    query = 'CREATE INDEX IF NOT EXISTS {table}_{column}_x ON {table}({column})'.format(table=table, column=column)
+                    execute(cursor, query)
 
-        # DO SOME DATABASE MAINTAINENCE IF DB VERSION INCREASED
-        if this_database_version < self.database_version:
-            # UPDATE DATABASE VERSION
-            try:
+            # DO SOME DATABASE MAINTENENCE IF DB VERSION INCREASED
+            if this_database_version < self.database_version:
+                # UPDATE DATABASE VERSION
                 query = f"PRAGMA user_version = {self.database_version}"
-                cursor.execute(query)
-            except Exception as error:
-                self.kodi_log(f'CACHE: Exception while initializing _database: {error}\n{self._sc_name} - {query}', 1)
-
-        return connection
+                execute(cursor, query)
+        finally:
+            cursor.close()
 
 
 class DatabaseStatements:
@@ -278,7 +344,7 @@ class DatabaseMethod:
             values,
             connection=connection)
         if not connection and cursor:
-            cursor.close()
+            self.close_cursor(cursor, close_connection=True)
 
     def get_list_values(self, table=DEFAULT_TABLE, keys=(), values=(), conditions=None, connection=None):
         cursor = self.execute_sql(
@@ -290,9 +356,11 @@ class DatabaseMethod:
         if not cursor:
             return
 
-        data = cursor.fetchall()
-        if not connection and cursor:
-            cursor.close()
+        try:
+            data = cursor.fetchall()
+        finally:
+            if not connection:
+                self.close_cursor(cursor, close_connection=True)
 
         return data
 
@@ -302,7 +370,7 @@ class DatabaseMethod:
             data=values,
             connection=connection)
         if not connection and cursor:
-            cursor.close()
+            self.close_cursor(cursor, close_connection=True)
 
     def set_or_update_null_list_values(self, table=DEFAULT_TABLE, keys=(), values=(), conflict_constraint='id', connection=None):
         if not values:
@@ -313,7 +381,7 @@ class DatabaseMethod:
             values,
             connection=connection)
         if not connection and cursor:
-            cursor.close()
+            self.close_cursor(cursor, close_connection=True)
 
     def get_values(self, table=DEFAULT_TABLE, item_id=None, keys=(), connection=None):
         cursor = self.execute_sql(
@@ -325,9 +393,11 @@ class DatabaseMethod:
         if not cursor:
             return
 
-        data = cursor.fetchone()
-        if not connection and cursor:
-            cursor.close()
+        try:
+            data = cursor.fetchone()
+        finally:
+            if not connection:
+                self.close_cursor(cursor, close_connection=True)
 
         return data
 
@@ -343,7 +413,7 @@ class DatabaseMethod:
             data=(*values, item_id, ),
             connection=connection)
         if not connection and cursor:
-            cursor.close()
+            self.close_cursor(cursor, close_connection=True)
 
     def set_many_values(self, table=DEFAULT_TABLE, keys=(), data=None, connection=None):
         """ data={item_id: ((key, value), (key, value))} """
@@ -359,7 +429,7 @@ class DatabaseMethod:
             data=[(*values, item_id, ) for item_id, values in data.items()],
             connection=connection)
         if not connection and cursor:
-            cursor.close()
+            self.close_cursor(cursor, close_connection=True)
 
     def del_column_values(self, table=DEFAULT_TABLE, keys=(), item_type=None, connection=None):
         cursor = self.execute_sql(
@@ -369,7 +439,7 @@ class DatabaseMethod:
             data=None if item_type is None else (item_type, ),
             connection=connection)
         if not connection and cursor:
-            cursor.close()
+            self.close_cursor(cursor, close_connection=True)
 
     def del_item(self, table=DEFAULT_TABLE, item_id=None, connection=None):
         cursor = self.execute_sql(
@@ -377,7 +447,7 @@ class DatabaseMethod:
             data=(item_id, ),
             connection=connection)
         if not connection and cursor:
-            cursor.close()
+            self.close_cursor(cursor, close_connection=True)
 
     def del_item_like(self, table=DEFAULT_TABLE, item_id=None, connection=None):
         cursor = self.execute_sql(
@@ -385,7 +455,7 @@ class DatabaseMethod:
             data=(item_id, ),
             connection=connection)
         if not connection and cursor:
-            cursor.close()
+            self.close_cursor(cursor, close_connection=True)
 
     def create_item(self, table=DEFAULT_TABLE, item_id=None, connection=None):
         cursor = self.execute_sql(
@@ -393,7 +463,7 @@ class DatabaseMethod:
             data=(item_id,),
             connection=connection)
         if not connection and cursor:
-            cursor.close()
+            self.close_cursor(cursor, close_connection=True)
 
     def create_many_items(self, table=DEFAULT_TABLE, item_ids=(), connection=None):
         cursor = self.execute_sql(
@@ -401,7 +471,7 @@ class DatabaseMethod:
             data=[(item_id,) for item_id in item_ids],
             connection=connection)
         if not connection and cursor:
-            cursor.close()
+            self.close_cursor(cursor, close_connection=True)
 
 
 class Database(DatabaseCore, DatabaseMethod):

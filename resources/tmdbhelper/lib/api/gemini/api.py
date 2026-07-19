@@ -2,7 +2,7 @@ from json import loads
 from tmdbhelper.lib.addon.plugin import get_setting, get_localized
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.api.request import RequestAPI
-from jurialmunkey.ftools import cached_property
+from jurialmunkey.ftools import cached_property, threaded_cached_property
 import re
 
 
@@ -166,7 +166,7 @@ class Gemini(RequestAPI):
         string = string.replace('\n', '[CR]')
         return string
 
-    @cached_property
+    @threaded_cached_property
     def database(self):
         from tmdbhelper.lib.query.database.database import FindQueriesDatabase
         return FindQueriesDatabase()

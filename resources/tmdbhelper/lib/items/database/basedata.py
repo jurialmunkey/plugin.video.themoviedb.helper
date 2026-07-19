@@ -1,4 +1,4 @@
-from jurialmunkey.ftools import cached_property
+from jurialmunkey.ftools import cached_property, threaded_cached_property
 from tmdbhelper.lib.files.dbfunc import DatabaseAccess
 from tmdbhelper.lib.addon.tmdate import set_timestamp
 from tmdbhelper.lib.api.contains import CommonContainerAPIs
@@ -18,7 +18,7 @@ class ItemDetailsDatabaseAccess(DatabaseAccess):
     def __init__(self, common_apis=None):
         self.common_apis = common_apis or CommonContainerAPIs()
 
-    @cached_property
+    @threaded_cached_property
     def cache(self):
         from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
         return ItemDetailsDatabase()

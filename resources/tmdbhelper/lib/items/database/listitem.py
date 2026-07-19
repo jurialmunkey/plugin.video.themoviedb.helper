@@ -1,6 +1,6 @@
 from tmdbhelper.lib.api.contains import CommonContainerAPIs
 from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
-from jurialmunkey.ftools import cached_property
+from jurialmunkey.ftools import cached_property, threaded_cached_property
 from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.addon.plugin import convert_type
 from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
@@ -286,7 +286,7 @@ class ListItemDetails:
         self.common_apis = common_apis or CommonContainerAPIs()
         self.cache = ItemDetailsDatabase()
 
-    @cached_property
+    @threaded_cached_property
     def connection(self):
         return DatabaseConnection(self.cache)
 

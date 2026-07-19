@@ -1,4 +1,4 @@
-from jurialmunkey.ftools import cached_property
+from jurialmunkey.ftools import cached_property, threaded_cached_property
 
 
 class CommonContainerAPIs():
@@ -50,7 +50,7 @@ class CommonContainerAPIs():
             return
         return OMDb()
 
-    @cached_property
+    @threaded_cached_property
     def query_database(self):
         from tmdbhelper.lib.query.database.database import FindQueriesDatabase
         return FindQueriesDatabase()

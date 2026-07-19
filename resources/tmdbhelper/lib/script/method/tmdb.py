@@ -96,13 +96,13 @@ def delete_itemtype(mediatype=None, confirmation=True, **kwargs):
             for i in routes[mediatype]['baseitems']:
                 statement = f'DELETE FROM baseitem WHERE mediatype="{i}"'
                 progress_dialog.update(statement)
-                database.execute_sql(statement)
+                database.execute_sql_and_close(statement)
             for i in routes[mediatype]['tables']:
                 statement = f'DELETE FROM {i}'
                 progress_dialog.update(statement)
-                database.execute_sql(statement)
+                database.execute_sql_and_close(statement)
             progress_dialog.update('Vacuuming database...')
-            database.execute_sql('VACUUM')
+            database.execute_sql_and_close('VACUUM')
 
     if confirmation:
         head = get_localized(32387).format(mediatype.capitalize())

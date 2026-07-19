@@ -9,10 +9,9 @@ from tmdbhelper.lib.files.dbdata import DatabaseStatements
 
 class SyncItemDetailsDatabase(ItemDetailsDatabase):
     def set_activity(self, item_type, method, value, expiry):
-        cursor = self.execute_sql(
+        self.execute_sql_and_close(
             DatabaseStatements.insert_or_replace('lactivities', keys=('id', 'data', 'expiry')),
             (f'{item_type}.{method}', value, expiry))
-        cursor.close() if cursor else None
 
     def get_activity(self, item_type, method, expiry=0):
         cursor = self.execute_sql(
@@ -20,8 +19,10 @@ class SyncItemDetailsDatabase(ItemDetailsDatabase):
             (f'{item_type}.{method}', expiry))
         if not cursor:
             return
-        result = cursor.fetchone()
-        cursor.close()
+        try:
+            result = cursor.fetchone()
+        finally:
+            self.close_cursor(cursor, close_connection=True)
         if not result:
             return
         return result[0]
