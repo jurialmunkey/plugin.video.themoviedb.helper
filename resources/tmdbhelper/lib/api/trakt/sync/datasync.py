@@ -315,6 +315,10 @@ class SyncDataGetterAllUnHiddenShowsInProgress:
         return True
 
     def is_inprogress_show(self, tmdb_id, aired_episodes, watched_episodes):
+        if watched_episodes is None:
+            watched_episodes = 0
+        if aired_episodes is None:
+            aired_episodes = 0
         if aired_episodes <= watched_episodes:
             if self.is_calendar_watched(tmdb_id):
                 return False
