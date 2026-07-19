@@ -2842,6 +2842,10 @@ msgctxt "#30067"
 msgid "Zulu (South Africa)"
 msgstr ""
 
+msgctxt "#30068"
+msgid "Croatian (Croatia)"
+msgstr ""
+
 #: /resources/settings.xml
 msgctxt "#32001"
 msgid "OMDb API key"
