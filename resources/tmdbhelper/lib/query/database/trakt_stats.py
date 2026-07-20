@@ -78,6 +78,7 @@ class GetTraktStatsRequest:
                 'stat': item_v,
             }
             for base_k, base_v in self.response_json.items()
+            if isinstance(base_v, dict)
             for item_k, item_v in base_v.items()
             if isinstance(item_v, int)
         ] if self.response_json else []
