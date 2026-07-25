@@ -2892,6 +2892,26 @@ msgid "You must authenticate your Trakt account to use this feature."
 msgstr ""
 
 #: /resources/settings.xml
+msgctxt "#32403"
+msgid "User Client ID"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32408"
+msgid "User Client Secret Key"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32417"
+msgid "Enter your personal Trakt Client ID or leave blank to use the default TMDbHelper credentials. Re-authenticate your Trakt account for changes to take effect."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32450"
+msgid "Enter your personal Trakt Client Secret Key or leave blank to use the default TMDbHelper credentials. Re-authenticate your Trakt account for changes to take effect."
+msgstr ""
+
+#: /resources/settings.xml
 msgctxt "#32014"
 msgid "Players"
 msgstr ""
