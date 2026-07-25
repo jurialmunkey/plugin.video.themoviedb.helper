@@ -2091,6 +2091,11 @@ msgid "Log timer reports for directories"
 msgstr "Timer-Reporte für Verzeichnisse loggen"
 
 #: /resources/settings.xml
+msgctxt "#32396"
+msgid "Delete TMDb cached list details"
+msgstr "TMDb-Listendetails aus dem Cache löschen"
+
+#: /resources/settings.xml
 msgctxt "#32397"
 msgid "Original"
 msgstr "Original"
@@ -2532,8 +2537,8 @@ msgstr "Neuen Knoten erstellen"
 
 #: /resources/tmdbhelper/lib/items/container.py
 msgctxt "#32496"
-msgid "Add/Remove as Custom Node"
-msgstr "Benutzerdefinierten Knoten hinzufügen / entfernen"
+msgid "Add node"
+msgstr "Benutzerdefinierten Knoten hinzufügen"
 
 #: /resources/settings.xml
 msgctxt "#32497"

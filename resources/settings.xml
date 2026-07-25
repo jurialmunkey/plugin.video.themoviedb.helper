@@ -86,6 +86,7 @@
                             <option label="30065">65</option>
                             <option label="30066">66</option>
                             <option label="30067">67</option>
+                            <option label="30068">68</option>
                         </options>
                     </constraints>
                     <control type="list" format="string">
@@ -686,6 +687,14 @@
                     <control type="toggle"/>
                     <dependencies>
                         <dependency type="visible" operator="!is" setting="trakt_token"></dependency>
+                    </dependencies>
+                </setting>
+                <setting id="mdblist_scrobbling" type="boolean" label="32402" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" operator="!is" setting="mdblist_apikey"></dependency>
                     </dependencies>
                 </setting>
             </group>

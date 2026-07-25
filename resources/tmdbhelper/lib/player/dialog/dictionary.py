@@ -5,24 +5,59 @@ from jurialmunkey.parser import try_int
 from jurialmunkey.ftools import cached_property
 
 
+MAPPING_FILENAME = str.maketrans({
+    '<': '',
+    '>': '',
+    ':': '',
+    '"': '',
+    '/': '',
+    '|': '',
+    '?': '',
+    '*': '',
+    '\\': '',
+})
+
+
+MAPPING_SPACEPLUS = str.maketrans({
+    ',': '',
+    ' ': '+',
+})
+
+
+MAPPING_SPACEDASH = str.maketrans({
+    ',': '',
+    ' ': '-',
+})
+
+
+MAPPING_SPACELINE = str.maketrans({
+    ',': '',
+    ' ': '_',
+})
+
+
 class PlayerDictionaryDict(dict):
 
     tmdb_type = ''
 
     encoding_methods = {
-        '_+': lambda v: v.replace(',', '').replace(' ', '+'),
-        '_-': lambda v: v.replace(',', '').replace(' ', '-'),
+        '_+': lambda v: v.translate(MAPPING_SPACEPLUS),
+        '_-': lambda v: v.translate(MAPPING_SPACEDASH),
         '_escaped': lambda v: quote(quote(v)),
         '_escaped+': lambda v: quote(quote_plus(v)),
         '_url': lambda v: quote(v),
         '_url+': lambda v: quote_plus(v),
         '_meta': lambda v: dumps(v).replace(',', ''),
-        '_meta_+': lambda v: dumps(v).replace(',', '').replace(' ', '+'),
-        '_meta_-': lambda v: dumps(v).replace(',', '').replace(' ', '-'),
+        '_meta+': lambda v: dumps(v).translate(MAPPING_SPACEPLUS),
+        '_meta-': lambda v: dumps(v).translate(MAPPING_SPACEDASH),
         '_meta_escaped': lambda v: quote(quote(dumps(v))),
         '_meta_escaped+': lambda v: quote(quote_plus(dumps(v))),
         '_meta_url': lambda v: quote(dumps(v)),
         '_meta_url+': lambda v: quote_plus(dumps(v)),
+        '_filename': lambda v: v.translate(MAPPING_FILENAME),
+        '_filename+': lambda v: v.translate(MAPPING_FILENAME).translate(MAPPING_SPACEPLUS),
+        '_filename-': lambda v: v.translate(MAPPING_FILENAME).translate(MAPPING_SPACEDASH),
+        '_filenameunderscore': lambda v: v.translate(MAPPING_FILENAME).translate(MAPPING_SPACELINE),
     }
 
     def __init__(self, tmdb_id, details, **kwargs):

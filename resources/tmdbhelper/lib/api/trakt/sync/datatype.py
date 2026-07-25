@@ -4,6 +4,9 @@ from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp, convert_ti
 from tmdbhelper.lib.api.trakt.sync.activity import SyncLastActivities
 from tmdbhelper.lib.files.locker import mutexlock
 from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY, HALFDAY_EXPIRY
+from tmdbhelper.lib.addon.thread import ParallelThread
+
+TRAKT_MAX_ITEMS_PER_PAGE = 250
 
 
 def timerlock(func):
@@ -51,17 +54,48 @@ class DataType(SyncDataParentProperties):
             return self._item_type
         raise ValueError(f'Invalid item_type {self._item_type} for {self.method}')
 
-    def get_response_sync(self, *args, **kwargs):
+    def get_response_sync_data(self, *args, **kwargs):
         path = self.trakt_api.get_request_url(*args, **kwargs)
         data = self.trakt_api.get_api_request(path, headers=self.trakt_api.headers)
-        if data is None:
+        return data
+
+    def get_response_sync(self, *args, **kwargs):
+        response = self.get_response_sync_data(*args, **kwargs)
+
+        # Check we actually get a response
+        if response is None:
             return
         try:
-            return data.json()
-        except ValueError:
+            this_data = response.json()
+        except (ValueError, AttributeError):
             return
-        except AttributeError:
-            return
+
+        # Dumb hack to deal with weird Trakt decision to paginate sync endpoints without
+        # Unclear why trakt would do this when unable to determine how deep to go from last activity
+        # TODO: future method could check if sorting by activity then check item stamps to test depth?
+        try:
+            page_count = int(response.headers['x-pagination-page-count']) + 1
+            page_start = int(response.headers['x-pagination-page']) + 1
+        except (KeyError, ValueError):
+            page_count = 0
+            page_start = 0
+
+        def get_next_item(x):
+            # TODO: Might need some better validation here to check for timeouts autherror etc.
+            try:
+                return self.get_response_sync_data(*args, **kwargs, page=x).json()
+            except (TypeError, ValueError, AttributeError):
+                return
+
+        with ParallelThread(range(page_start, page_count), get_next_item) as pt:
+            next_data = pt.queue
+
+        for i in next_data:
+            if i is None:
+                continue
+            this_data.extend(i)
+
+        return this_data
 
     @cached_property
     def last_activities(self):
@@ -102,7 +136,11 @@ class DataType(SyncDataParentProperties):
     def sync_func(self):
         from tmdbhelper.lib.addon.logger import TimerFunc
         with TimerFunc(f'Sync: {self.__class__.__name__} get_response_sync {self.method} {self.item_type}', inline=True, log_threshold=0.001):
-            return self.get_response_sync('sync', self.method, f'{self.item_type}s', **self.sync_kwgs)
+            return self.get_response_sync(
+                'sync', self.method, f'{self.item_type}s',
+                limit=TRAKT_MAX_ITEMS_PER_PAGE,
+                **self.sync_kwgs
+            )
 
     @progress_bg
     def sync_data(self, **kwargs):
@@ -173,7 +211,11 @@ class SyncHiddenProgressWatched(DataType):
         """ Get items that are hidden on Trakt """
         from tmdbhelper.lib.addon.logger import TimerFunc
         with TimerFunc(f'Sync: {self.__class__.__name__} get_response_sync users {self.method} {self.item_type}', inline=True, log_threshold=0.001):
-            return self.get_response_sync('users', self.method, type=f'{self.item_type}s', limit=4095)
+            return self.get_response_sync(
+                'users', self.method,
+                limit=TRAKT_MAX_ITEMS_PER_PAGE,
+                type=f'{self.item_type}s'
+            )
 
 
 class SyncHiddenProgressCollected(SyncHiddenProgressWatched):
@@ -197,7 +239,7 @@ class SyncHiddenDropped(SyncHiddenProgressWatched):
 class SyncWatched(DataTypeEpisodes):
     keys = ('plays', 'last_watched_at', 'last_updated_at', 'aired_episodes', 'watched_episodes', 'reset_at', )
     last_activities_key = 'watched_at'
-    sync_kwgs = {'extended': 'full'}
+    sync_kwgs = {'extended': 'full,progress'}
     method = 'watched'
 
 
@@ -335,7 +377,9 @@ class SyncNextEpisodeItem:
             return
         return self.get_response_sync(
             f'shows/{self.trakt_slug}/progress/watched',
-            extended='full')
+            extended='full',
+            limit=TRAKT_MAX_ITEMS_PER_PAGE
+        )
 
     @cached_property
     def response_seasons(self):

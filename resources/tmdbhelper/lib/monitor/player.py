@@ -433,7 +433,7 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
 
         # Update scrobbler
         self.scrobbler_stop()
-        self.scrobbler = PlayerScrobbler(trakt_api=self.trakt_api, total_time=self.getTotalTime())
+        self.scrobbler = PlayerScrobbler(total_time=self.getTotalTime(), trakt_api=self.trakt_api, mdblist_api=self.mdblist_api)
 
         # Clear properties and store the last cleared item
         self.previous_item = self.current_item

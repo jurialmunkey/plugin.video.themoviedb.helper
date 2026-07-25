@@ -1,13 +1,15 @@
 from jurialmunkey.window import get_property
 from jurialmunkey.ftools import cached_property
+from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.plugin import get_setting
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.tmdate import set_timestamp
 
 
 class PlayerScrobbler():
-    def __init__(self, trakt_api, total_time):
+    def __init__(self, total_time, trakt_api=None, mdblist_api=None):
         self.trakt_api = trakt_api
+        self.mdblist_api = mdblist_api
         self.start_time = 0
         self.total_time = total_time
         self.tvdb_id = self.playerstring.get('tvdb_id')
@@ -28,21 +30,32 @@ class PlayerScrobbler():
             return 'tv'
         return ''
 
-    def is_trakt_authorized(func):
-        """ decorator to check that trakt is authorized  """
+    @property
+    def is_trakt_authorized(self):
+        """ to check that trakt is authorized  """
+        if not self.trakt_api:
+            return False
+        if not get_property('TraktIsAuth', is_type=float):
+            return False
+        if not get_setting('trakt_scrobbling'):
+            return False
+        if not self.trakt_api.is_authorized:
+            return False
+        if not self.trakt_scrobbler_item:
+            return False
+        return True
 
-        def wrapper(self, *args, **kwargs):
-            if not get_property('TraktIsAuth', is_type=float):
-                return
-            if not get_setting('trakt_scrobbling'):
-                return
-            if not self.trakt_api.is_authorized:
-                return
-            if not self.trakt_item:
-                return
-            return func(self, *args, **kwargs)
+    @property
+    def is_mdblist_authorized(self):
+        """ to check that mdblist is authorized  """
 
-        return wrapper
+        if not self.mdblist_api:
+            return False
+        if not get_setting('mdblist_scrobbling'):
+            return False
+        if not self.trakt_scrobbler_item:
+            return False
+        return True
 
     def is_scrobbling(func):
         """ decorator to check if available item should be scrobbled """
@@ -96,11 +109,11 @@ class PlayerScrobbler():
         # kodi_log(f'SCROBBLER: [UPDATE] {self.content_id} -- {self.progress:.2f}%', 2)
 
     @cached_property
-    def trakt_item(self):
-        return self.get_trakt_item() or {}
+    def trakt_scrobbler_item(self):
+        return self.get_trakt_scrobbler_item() or {}
 
     @is_scrobbling
-    def get_trakt_item(self):
+    def get_trakt_scrobbler_item(self):
         if self.tmdb_type == 'tv':
             if not self.season or not self.episode:
                 return
@@ -116,18 +129,50 @@ class PlayerScrobbler():
                 'progress': self.progress
             }
 
+    @cached_property
+    def mdblist_scrobbler_item(self):
+        return self.get_mdblist_scrobbler_item() or {}
+
     @is_scrobbling
-    @is_trakt_authorized
-    def trakt_scrobbling(self, method):
+    def get_mdblist_scrobbler_item(self):
+        if self.tmdb_type == 'tv':
+            if not self.season or not self.episode:
+                return
+            return {
+                'show': {'ids': {'tmdb': try_int(self.tmdb_id)}, 'season': self.season, 'episode': self.episode},
+                'progress': try_int(self.progress)
+            }
+
+        if self.tmdb_type == 'movie':
+            return {
+                'movie': {'ids': {'tmdb': try_int(self.tmdb_id)}},
+                'progress': try_int(self.progress)
+            }
+
+    @is_scrobbling
+    def scrobble(self, method):
         if method not in ('start', 'stop'):
             return
-        self.trakt_item['progress'] = self.progress
-        self.trakt_api.get_api_request(
-            f'https://api.trakt.tv/scrobble/{method}',
-            postdata=self.trakt_item,
-            headers=self.trakt_api.headers,
-            method='json'
-        )
+        if self.is_trakt_authorized:
+            self.trakt_scrobbler_item['progress'] = self.progress
+            path = f'https://api.trakt.tv/scrobble/{method}'
+            data = self.trakt_api.get_api_request(
+                path,
+                postdata=self.trakt_scrobbler_item,
+                headers=self.trakt_api.headers,
+                method='json'
+            )
+            kodi_log(f'SCROBBLER: [TRAKT] [{method}] {self.content_id} -- {self.progress:.2f}%\n{self.trakt_scrobbler_item}\n{data}', 2)
+        if self.is_mdblist_authorized:
+            self.mdblist_scrobbler_item['progress'] = try_int(self.progress)
+            path = self.mdblist_api.get_request_url('scrobble', method)
+            data = self.mdblist_api.get_simple_api_request(
+                path,
+                postdata=self.mdblist_scrobbler_item,
+                headers=self.mdblist_api.headers,
+                method='json'
+            )
+            kodi_log(f'SCROBBLER: [MDBLIST] [{method}] {self.content_id} -- {self.progress:.2f}%\n{self.mdblist_scrobbler_item}\n{data}', 2)
 
     @is_scrobbling
     def start(self, tmdb_type, tmdb_id):
@@ -135,8 +180,7 @@ class PlayerScrobbler():
             return self.sync(tmdb_type, tmdb_id)
         if not self.is_match(tmdb_type, tmdb_id):
             return self.stop(tmdb_type, tmdb_id)
-        kodi_log(f'SCROBBLER: [Start] {self.content_id} -- {self.progress:.2f}%', 2)
-        self.trakt_scrobbling('start')
+        self.scrobble('start')
         self.started = True
 
     @is_scrobbling
@@ -148,14 +192,13 @@ class PlayerScrobbler():
         if not self.started or self.stopped:
             return
         kodi_log(f'SCROBBLER: [Stop] {self.content_id} -- {self.progress:.2f}%', 2)
-        self.trakt_scrobbling('stop') if not self.syncing else None
+        self.scrobble('stop') if not self.syncing else None
         self.set_kodi_watched()
         self.set_tmdb_ratings()
         self.update_stats()
         self.stopped = True
 
     @is_scrobbling
-    @is_trakt_authorized
     def sync(self, tmdb_type, tmdb_id):
         if self.syncing:
             return
@@ -165,21 +208,22 @@ class PlayerScrobbler():
             return
         if not self.is_match(tmdb_type, tmdb_id):
             return
-        kodi_log(f'SCROBBLER: [Sync] {self.content_id} -- {self.progress:.2f}%', 2)
         self.syncing = True  # We don't ever unset this flag as we only want to sync once after reaching 80%
-        self.trakt_scrobbling('stop')
-        from tmdbhelper.lib.api.trakt.sync.invalidator import SyncInvalidator
-        sync_invalidator = SyncInvalidator('watchedprogress')
-        sync_invalidator.notification = False
-        sync_invalidator.run(sync=True)
+        self.scrobble('stop')
+        if self.is_trakt_authorized:
+            kodi_log(f'SCROBBLER: [TRAKT] [Sync]', 2)
+            from tmdbhelper.lib.api.trakt.sync.invalidator import SyncInvalidator
+            sync_invalidator = SyncInvalidator('watchedprogress')
+            sync_invalidator.notification = False
+            sync_invalidator.run(sync=True)
 
     @is_scrobbling
-    @is_trakt_authorized
     def update_stats(self):
-        from tmdbhelper.lib.script.method.trakt import get_stats
-        from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA
-        get_property(LASTACTIVITIES_DATA, clear_property=True)
-        get_stats()
+        if self.is_trakt_authorized:
+            from tmdbhelper.lib.script.method.trakt import get_stats
+            from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA
+            get_property(LASTACTIVITIES_DATA, clear_property=True)
+            get_stats()
 
     @is_scrobbling
     def set_tmdb_ratings(self):
