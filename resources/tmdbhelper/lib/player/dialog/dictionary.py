@@ -30,6 +30,12 @@ MAPPING_SPACEDASH = str.maketrans({
 })
 
 
+MAPPING_SPACELINE = str.maketrans({
+    ',': '',
+    ' ': '_',
+})
+
+
 class PlayerDictionaryDict(dict):
 
     tmdb_type = ''
@@ -51,6 +57,7 @@ class PlayerDictionaryDict(dict):
         '_filename': lambda v: v.translate(MAPPING_FILENAME),
         '_filename+': lambda v: v.translate(MAPPING_FILENAME).translate(MAPPING_SPACEPLUS),
         '_filename-': lambda v: v.translate(MAPPING_FILENAME).translate(MAPPING_SPACEDASH),
+        '_filenameunderscore': lambda v: v.translate(MAPPING_FILENAME).translate(MAPPING_SPACELINE),
     }
 
     def __init__(self, tmdb_id, details, **kwargs):
