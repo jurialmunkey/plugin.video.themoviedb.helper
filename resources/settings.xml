@@ -689,6 +689,14 @@
                         <dependency type="visible" operator="!is" setting="trakt_token"></dependency>
                     </dependencies>
                 </setting>
+                <setting id="mdblist_scrobbling" type="boolean" label="32402" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" operator="!is" setting="mdblist_apikey"></dependency>
+                    </dependencies>
+                </setting>
             </group>
         </category>
         <category id="details" label="32080" help="">

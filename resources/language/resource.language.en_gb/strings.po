@@ -2033,6 +2033,11 @@ msgid "Hide Episode Groups and Up Next"
 msgstr ""
 
 #: /resources/settings.xml
+msgctxt "#32402"
+msgid "Scrobble items on MDbList while watching"
+msgstr ""
+
+#: /resources/settings.xml
 msgctxt "#32385"
 msgid "Hide All"
 msgstr ""
