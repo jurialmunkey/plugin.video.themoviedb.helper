@@ -172,7 +172,7 @@ class PlayerScrobbler():
                 headers=self.mdblist_api.headers,
                 method='json'
             )
-            kodi_log(f'SCROBBLER: [MDBLIST] [{method}] {self.content_id} -- {self.progress:.2f}%\n{path}\n{self.mdblist_scrobbler_item}\n{data}', 2)
+            kodi_log(f'SCROBBLER: [MDBLIST] [{method}] {self.content_id} -- {self.progress:.2f}%\n{self.mdblist_scrobbler_item}\n{data}', 2)
 
     @is_scrobbling
     def start(self, tmdb_type, tmdb_id):
