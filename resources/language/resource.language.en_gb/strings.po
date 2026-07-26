@@ -2038,6 +2038,11 @@ msgid "Scrobble items on MDbList while watching"
 msgstr ""
 
 #: /resources/settings.xml
+msgctxt "#32403"
+msgid "Sync"
+msgstr ""
+
+#: /resources/settings.xml
 msgctxt "#32385"
 msgid "Hide All"
 msgstr ""

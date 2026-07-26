@@ -99,9 +99,9 @@ def test_func(test_func, dialog_output=False, **kwargs):
         xbmcgui.Dialog().select(head, data, useDetails=True)
 
     def test_func_sync_next_episodes(import_attr, **kwargs):
-        from tmdbhelper.lib.api.trakt.api import TraktAPI
-        from tmdbhelper.lib.api.trakt.sync.datatype import SyncNextEpisodes
-        sync = SyncNextEpisodes(TraktAPI().trakt_syncdata, 'show')
+        from tmdbhelper.lib.sync.synctype import SyncNextEpisodes
+        from tmdbhelper.lib.sync.datasync import SyncDataFactory
+        sync = SyncNextEpisodes(SyncDataFactory(), 'show')
         func = getattr(sync, import_attr)
         head = import_attr
         data = func(**kwargs)

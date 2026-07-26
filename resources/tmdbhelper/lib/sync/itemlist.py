@@ -7,7 +7,7 @@ from collections import namedtuple
 class ItemListSyncDataProperties:
     @cached_property
     def items(self):
-        if not self.trakt_syncdata:
+        if not self.syncdata:
             return
         return self.get_items()
 
@@ -40,8 +40,9 @@ class ItemListSyncDataProperties:
         return self.get_reverse()
 
     @property
-    def trakt_syncdata(self):
-        return self.trakt_api.trakt_syncdata
+    def syncdata(self):
+        from tmdbhelper.lib.sync.datasync import SyncDataFactory
+        return SyncDataFactory(self)
 
     @cached_property
     def namedtuple_basic(self):
@@ -160,63 +161,63 @@ class ItemListSyncDataCollection(ItemListSyncData):
     """ Items in collection """
 
     def get_items(self):
-        return self.make_list(self.trakt_syncdata.get_all_collected_getter)
+        return self.make_list(self.syncdata.get_all_collected_getter)
 
 
 class ItemListSyncDataWatchlist(ItemListSyncData):
     """ Items on watchlist """
 
     def get_items(self):
-        return self.make_list(self.trakt_syncdata.get_all_watchlist_getter)
+        return self.make_list(self.syncdata.get_all_watchlist_getter)
 
 
 class ItemListSyncDataReleasedWatchlist(ItemListSyncData):
     """ Items on watchlist that have been released """
 
     def get_items(self):
-        return self.make_list(self.trakt_syncdata.get_all_released_watchlist_getter)
+        return self.make_list(self.syncdata.get_all_released_watchlist_getter)
 
 
 class ItemListSyncDataAnticipatedWatchlist(ItemListSyncData):
     """ Items on watchlist that have been released """
 
     def get_items(self):
-        return self.make_list(self.trakt_syncdata.get_all_anticipated_watchlist_getter)
+        return self.make_list(self.syncdata.get_all_anticipated_watchlist_getter)
 
 
 class ItemListSyncDataWatched(ItemListSyncData):
     """ Items that have been watched """
 
     def get_items(self):
-        return self.make_list(self.trakt_syncdata.get_all_watched_getter)
+        return self.make_list(self.syncdata.get_all_watched_getter)
 
 
 class ItemListSyncDataPlayback(ItemListSyncData):
     """ Episodes and movies partially watched with resume points """
 
     def get_items(self):
-        return self.make_list(self.trakt_syncdata.get_all_playback_getter)
+        return self.make_list(self.syncdata.get_all_playback_getter)
 
 
 class ItemListSyncDataFavorites(ItemListSyncData):
     """ Items in favourites """
 
     def get_items(self):
-        return self.make_list(self.trakt_syncdata.get_all_favorites_getter)
+        return self.make_list(self.syncdata.get_all_favorites_getter)
 
 
 class ItemListSyncDataDropped(ItemListSyncData):
     """ Items in favourites """
 
     def get_items(self):
-        return self.make_list(self.trakt_syncdata.get_all_dropped_shows_getter)
+        return self.make_list(self.syncdata.get_all_dropped_shows_getter)
 
 
 class ItemListSyncDataUnwatchedPlayback(ItemListSyncData):
     """ Episodes and movies partially watched with resume points """
 
     def get_items(self):
-        return self.make_list(self.trakt_syncdata.get_all_unwatched_playback_getter)
+        return self.make_list(self.syncdata.get_all_unwatched_playback_getter)
 
 
 class ItemListSyncDataToWatch(ItemListSyncData):
@@ -231,8 +232,8 @@ class ItemListSyncDataToWatch(ItemListSyncData):
     @cached_property
     def syncdata_getter_func(self):
         if self.item_type == 'movie':
-            return self.trakt_syncdata.get_all_unhidden_movies_towatch_getter
-        return self.trakt_syncdata.get_all_unhidden_shows_towatch_getter
+            return self.syncdata.get_all_unhidden_movies_towatch_getter
+        return self.syncdata.get_all_unhidden_shows_towatch_getter
 
     def get_syncdata_getter(self):
         sd = self.syncdata_getter_func()
@@ -251,7 +252,7 @@ class ItemListSyncDataInProgress(ItemListSyncData):
     """ Partially watched shows that are inprogress """
 
     def get_syncdata_getter(self):
-        sd = self.trakt_syncdata.get_all_unhidden_shows_inprogress_getter()
+        sd = self.syncdata.get_all_unhidden_shows_inprogress_getter()
         sd.additional_keys = self.additional_keys
         return sd
 
@@ -268,7 +269,7 @@ class ItemListSyncDataNextUp(ItemListSyncData):
     sort_method = ('last_watched_at', True, '', )
 
     def get_syncdata_getter(self):
-        sd = self.trakt_syncdata.get_all_unhidden_shows_nextepisode_getter()
+        sd = self.syncdata.get_all_unhidden_shows_nextepisode_getter()
         sd.additional_keys = ('next_episode_aired_at', *self.additional_keys)
         return sd
 
@@ -329,7 +330,7 @@ class ItemListSyncDataUpNext(ItemListSyncData):
     """ Episodes Up Next for specific tmdb_id show """
 
     def get_syncdata_getter(self):
-        sd = self.trakt_syncdata.get_unhidden_show_episodes_upnext(self.tmdb_id)
+        sd = self.syncdata.get_unhidden_show_episodes_upnext(self.tmdb_id)
         sd.additional_keys = self.additional_keys
         return sd
 

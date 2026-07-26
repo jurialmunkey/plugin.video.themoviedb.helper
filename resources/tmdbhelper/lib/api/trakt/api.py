@@ -142,13 +142,3 @@ class TraktAPI(NoCacheRequestAPI):
             return {}
         except AttributeError:
             return {}
-
-    @cached_property
-    def trakt_syncdata(self):
-        return self.get_trakt_syncdata()
-
-    def get_trakt_syncdata(self):
-        if not self.is_authorized:
-            return
-        from tmdbhelper.lib.api.trakt.sync.datasync import SyncData
-        return SyncData(self)

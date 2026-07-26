@@ -444,8 +444,9 @@ class SyncDataGetters:
 
 class SyncData(SyncDataGetters):
 
-    def __init__(self, trakt_api):
-        self.trakt_api = trakt_api  # The TraktAPI object sync called from
+    def __init__(self, trakt_api=None, mdblist_api=None):
+        self.trakt_api = trakt_api
+        self.mdblist_api = mdblist_api
 
     def delete_response(self, *args, **kwargs):
         return self.trakt_api.delete_response(*args, **kwargs)
@@ -505,3 +506,24 @@ class SyncData(SyncDataGetters):
         from jurialmunkey.modimp import importmodule
         for route in set([j for j in (self.routes.get(k) for k in keys) if j]):
             importmodule(*route)(self, item_type).sync(forced=forced)
+
+
+def SyncDataFactory(parent=None):
+    try:
+        trakt_api = parent.trakt_api
+    except AttributeError:
+        from tmdbhelper.lib.api.trakt.api import TraktAPI
+        trakt_api = TraktAPI()
+
+    try:
+        mdblist_api = parent.mdblist_api
+    except AttributeError:
+        from tmdbhelper.lib.api.mdblist.api import MDbListAPI
+        mdblist_api = MDbListAPI()
+
+    if not trakt_api and not mdblist_api:
+        return
+    if not trakt_api.is_authorized:  # TODO: Allow MDBLIST ONLY
+        return
+
+    return SyncData(trakt_api=trakt_api, mdblist_api=mdblist_api)

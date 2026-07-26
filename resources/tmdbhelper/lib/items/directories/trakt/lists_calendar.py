@@ -251,7 +251,8 @@ class ListTraktCalendarProperties(ListTraktStandardProperties):
 
     @cached_property
     def dropped_shows(self):
-        sd = self.trakt_api.trakt_syncdata
+        from tmdbhelper.lib.sync.datasync import SyncDataFactory
+        sd = SyncDataFactory(self)
         sd = sd.get_all_dropped_shows_getter('show')
         return [i['tmdb_id'] for i in sd.items if i]
 

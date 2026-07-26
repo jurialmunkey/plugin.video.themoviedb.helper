@@ -14,9 +14,13 @@ def sync_trakt(tmdb_type=None, tmdb_id=None, season=None, episode=None, sync_typ
 
 @is_in_kwargs({'like_list': True})
 def like_list(like_list=None, user_slug=None, delete=False, **kwargs):
-    from tmdbhelper.lib.api.trakt.api import TraktAPI
-    user_slug = user_slug or 'me'
-    TraktAPI().trakt_syncdata.like_userlist(user_slug=user_slug, list_slug=like_list, confirmation=True, delete=delete)
+    from tmdbhelper.lib.sync.datasync import SyncDataFactory
+    SyncDataFactory().like_userlist(
+        user_slug=user_slug or 'me',
+        list_slug=like_list,
+        confirmation=True,
+        delete=delete
+    )
     if not delete:
         return
     from tmdbhelper.lib.script.method.kodi_utils import container_refresh
@@ -71,9 +75,9 @@ def select_sort_list(sort_methods, **kwargs):
     executebuiltin(format_folderpath(encode_url(**kwargs)))
 
 
-def invalidate_trakt_sync(invalidate_trakt_sync, notification=True, sync=True, **kwargs):
-    from tmdbhelper.lib.api.trakt.sync.invalidator import SyncInvalidator
-    sync_invalidator = SyncInvalidator(invalidate_trakt_sync)
+def invalidate_sync(invalidate_sync, notification=True, sync=True, **kwargs):
+    from tmdbhelper.lib.sync.invalidator import SyncInvalidator
+    sync_invalidator = SyncInvalidator(invalidate_sync)
     sync_invalidator.notification = notification
     sync_invalidator.run(sync=sync)
 
@@ -81,13 +85,13 @@ def invalidate_trakt_sync(invalidate_trakt_sync, notification=True, sync=True, *
 def authenticate_trakt(**kwargs):
     from tmdbhelper.lib.api.trakt.api import TraktAPI
     TraktAPI(force=True)
-    invalidate_trakt_sync('all', notification=False, sync=False)
+    invalidate_sync('all', notification=False, sync=False)
 
 
 def revoke_trakt(**kwargs):
     from tmdbhelper.lib.api.trakt.api import TraktAPI
     TraktAPI().logout()
-    invalidate_trakt_sync('all', notification=False, sync=False)
+    invalidate_sync('all', notification=False, sync=False)
 
 
 def get_stats(**kwargs):

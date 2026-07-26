@@ -1,206 +1,11 @@
-from tmdbhelper.lib.api.trakt.sync.property_mixins import SyncDataParentProperties
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp, convert_timestamp, is_unaired_timestamp
-from tmdbhelper.lib.api.trakt.sync.activity import SyncLastActivities
-from tmdbhelper.lib.files.locker import mutexlock
-from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY, HALFDAY_EXPIRY
-from tmdbhelper.lib.addon.thread import ParallelThread
-
-TRAKT_MAX_ITEMS_PER_PAGE = 250
+from tmdbhelper.lib.addon.tmdate import convert_timestamp, is_unaired_timestamp
+from tmdbhelper.lib.addon.consts import HALFDAY_EXPIRY
+from tmdbhelper.lib.sync.datatype import timerlock
+from tmdbhelper.lib.sync.trakt.datatype import TraktDataType, TraktDataTypeEpisodes
 
 
-def timerlock(func):
-    def wrapper(self, *args, **kwargs):
-        interval = 3
-        propname = f'syncdecorators.timerlock.sync_data'
-        propname = f'{propname}.{self.item_type}.{self.method}'
-        if get_timestamp(self.window.get_property(propname) or 0, set_int=True):
-            return
-        self.window.get_property(propname, set_timestamp(interval, set_int=True))
-        data = func(self, *args, **kwargs)
-        return data
-    return wrapper
-
-
-def progress_bg(func):
-    def wrapper(self, *args, **kwargs):
-        from tmdbhelper.lib.addon.dialog import DialogProgressSyncBG
-        self.dialog_progress_bg = DialogProgressSyncBG()
-        self.dialog_progress_bg.heading = f'Syncing {self.item_type} {self.method}'
-        self.dialog_progress_bg.create()
-        data = func(self, *args, **kwargs)
-        self.dialog_progress_bg.close()
-        return data
-    return wrapper
-
-
-class DataType(SyncDataParentProperties):
-    sync_kwgs = {}
-    lock_name = 'sync_trakt'
-    key_prefix = None
-    expiry_time = DEFAULT_EXPIRY
-
-    def __init__(self, instance_syncdata, item_type):
-        self.instance_syncdata = instance_syncdata
-        self._item_type = item_type
-
-    @property
-    def mutex_lockname(self):
-        return f'{self.cache._db_file}.{self.lock_name}.{self.item_type}.{self.method}.lockfile'
-
-    @cached_property
-    def item_type(self):
-        if self._item_type in ('movie', 'show', 'season', 'episode'):
-            return self._item_type
-        raise ValueError(f'Invalid item_type {self._item_type} for {self.method}')
-
-    def get_response_sync_data(self, *args, **kwargs):
-        path = self.trakt_api.get_request_url(*args, **kwargs)
-        data = self.trakt_api.get_api_request(path, headers=self.trakt_api.headers)
-        return data
-
-    def get_response_sync(self, *args, **kwargs):
-        response = self.get_response_sync_data(*args, **kwargs)
-
-        # Check we actually get a response
-        if response is None:
-            return
-        try:
-            this_data = response.json()
-        except (ValueError, AttributeError):
-            return
-
-        # Dumb hack to deal with weird Trakt decision to paginate sync endpoints without
-        # Unclear why trakt would do this when unable to determine how deep to go from last activity
-        # TODO: future method could check if sorting by activity then check item stamps to test depth?
-        try:
-            page_count = int(response.headers['x-pagination-page-count']) + 1
-            page_start = int(response.headers['x-pagination-page']) + 1
-        except (KeyError, ValueError):
-            page_count = 0
-            page_start = 0
-
-        def get_next_item(x):
-            # TODO: Might need some better validation here to check for timeouts autherror etc.
-            try:
-                return self.get_response_sync_data(*args, **kwargs, page=x).json()
-            except (TypeError, ValueError, AttributeError):
-                return
-
-        with ParallelThread(range(page_start, page_count), get_next_item) as pt:
-            next_data = pt.queue
-
-        for i in next_data:
-            if i is None:
-                continue
-            this_data.extend(i)
-
-        return this_data
-
-    @cached_property
-    def last_activities(self):
-        return self.get_last_activities()
-
-    def get_last_activities(self):
-        return SyncLastActivities(self.instance_syncdata)
-
-    def store_last_activity(self):
-        self.cache.set_activity(
-            self.item_type,
-            self.method,
-            self.last_activities.json.get('all') or '2000-01-01T00:00:00.000Z',
-            set_timestamp(self.expiry_time, set_int=True)
-        )
-
-    @property
-    def last_activities_item_type(self):
-        return f'{self.item_type}s'
-
-    @property
-    def last_activities_keys(self):
-        return (self.last_activities_item_type, self.last_activities_key, )
-
-    def clear_columns(self, keys):
-        self.cache.del_column_values(keys=keys, item_type=self.item_type)
-        self.clear_child_columns(keys)
-
-    def clear_child_columns(self, keys):
-        pass
-
-    @property
-    def is_expired(self):
-        timestamp = self.cache.get_activity(self.item_type, self.method, set_timestamp(0, set_int=True))
-        return self.last_activities.is_expired(timestamp, keys=self.last_activities_keys)
-
-    @timerlock
-    def sync_func(self):
-        from tmdbhelper.lib.addon.logger import TimerFunc
-        with TimerFunc(f'Sync: {self.__class__.__name__} get_response_sync {self.method} {self.item_type}', inline=True, log_threshold=0.001):
-            return self.get_response_sync(
-                'sync', self.method, f'{self.item_type}s',
-                limit=TRAKT_MAX_ITEMS_PER_PAGE,
-                **self.sync_kwgs
-            )
-
-    @progress_bg
-    def sync_data(self, **kwargs):
-        self.dialog_progress_bg.update(20, message='Refreshing Data')
-        meta = self.sync_func()
-
-        # Failed sync returns None
-        if meta is None:
-            return False
-
-        from tmdbhelper.lib.api.trakt.sync.itemdata import SyncItem
-        item = SyncItem(self.item_type, meta, self.keys, key_prefix=self.key_prefix)
-
-        self.dialog_progress_bg.update(40, message='Cleaning Data')
-        self.clear_columns(item.base_table_keys)
-
-        # Successful sync without items returns an empty list
-        if not meta:
-            return True
-
-        self.dialog_progress_bg.update(60, message='Configuring Data')
-        data = item.data
-
-        self.dialog_progress_bg.update(80, message='Updating Data')
-        self.cache.set_many_values(keys=item.table_keys, data=data)
-
-        return True
-
-    @mutexlock
-    def sync(self, forced=False):
-        if not forced and not self.is_expired:
-            return
-        if not self.sync_data():
-            return
-        self.store_last_activity()
-
-
-class DataTypeEpisodes(DataType):
-
-    @cached_property
-    def item_type(self):
-        if self._item_type in ('show', 'season', 'episode'):
-            return 'show'
-        if self._item_type == 'movie':
-            return 'movie'
-        raise ValueError(f'Invalid item_type {self._item_type} for {self.method}')
-
-    def clear_child_columns(self, keys):
-        if self.item_type == 'show':
-            self.cache.del_column_values(keys=keys, item_type='season')
-            self.cache.del_column_values(keys=keys, item_type='episode')
-
-    @property
-    def last_activities_item_type(self):
-        if self.item_type == 'show':
-            return 'episodes'
-        return f'{self.item_type}s'
-
-
-class SyncHiddenProgressWatched(DataType):
+class SyncHiddenProgressWatched(TraktDataType):
     keys = ('hidden_at', )
     last_activities_key = 'hidden_at'
     method = 'hidden/progress_watched'
@@ -213,7 +18,6 @@ class SyncHiddenProgressWatched(DataType):
         with TimerFunc(f'Sync: {self.__class__.__name__} get_response_sync users {self.method} {self.item_type}', inline=True, log_threshold=0.001):
             return self.get_response_sync(
                 'users', self.method,
-                limit=TRAKT_MAX_ITEMS_PER_PAGE,
                 type=f'{self.item_type}s'
             )
 
@@ -236,14 +40,14 @@ class SyncHiddenDropped(SyncHiddenProgressWatched):
     key_prefix = 'dropped'
 
 
-class SyncWatched(DataTypeEpisodes):
+class SyncWatched(TraktDataTypeEpisodes):
     keys = ('plays', 'last_watched_at', 'last_updated_at', 'aired_episodes', 'watched_episodes', 'reset_at', )
     last_activities_key = 'watched_at'
     sync_kwgs = {'extended': 'full,progress'}
     method = 'watched'
 
 
-class SyncPlayback(DataTypeEpisodes):
+class SyncPlayback(TraktDataTypeEpisodes):
     keys = ('progress', 'paused_at', 'id', )
     last_activities_key = 'paused_at'
     sync_kwgs = {'extended': 'full'}
@@ -251,13 +55,13 @@ class SyncPlayback(DataTypeEpisodes):
     key_prefix = 'playback'
 
 
-class SyncRatings(DataType):
+class SyncRatings(TraktDataType):
     keys = ('rating', 'rated_at', )
     last_activities_key = 'rated_at'
     method = 'ratings'
 
 
-class SyncFavorites(DataType):
+class SyncFavorites(TraktDataType):
     keys = ('rank', 'listed_at', 'notes', )
     last_activities_key = 'favorited_at'
     sync_kwgs = {'extended': 'full'}
@@ -265,7 +69,7 @@ class SyncFavorites(DataType):
     key_prefix = 'favorites'
 
 
-class SyncWatchlist(DataType):
+class SyncWatchlist(TraktDataType):
     keys = ('rank', 'listed_at', 'notes', )
     last_activities_key = 'watchlisted_at'
     sync_kwgs = {'extended': 'full'}
@@ -273,7 +77,7 @@ class SyncWatchlist(DataType):
     key_prefix = 'watchlist'
 
 
-class SyncCollection(DataTypeEpisodes):
+class SyncCollection(TraktDataTypeEpisodes):
     keys = ('last_collected_at', 'last_updated_at', )
     last_activities_key = 'collected_at'
     method = 'collection'
@@ -378,7 +182,6 @@ class SyncNextEpisodeItem:
         return self.get_response_sync(
             f'shows/{self.trakt_slug}/progress/watched',
             extended='full',
-            limit=TRAKT_MAX_ITEMS_PER_PAGE
         )
 
     @cached_property
@@ -490,7 +293,7 @@ class SyncAllNextEpisodesMeta:
         return sd
 
 
-class SyncAllNextEpisodes(DataTypeEpisodes):
+class SyncAllNextEpisodes(TraktDataTypeEpisodes):
     keys = ('upnext_episode_id', )
     last_activities_key = 'watched_at'
     method = 'all_next_episodes'

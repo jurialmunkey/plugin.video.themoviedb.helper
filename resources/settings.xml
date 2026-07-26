@@ -523,9 +523,7 @@
                     <enable>false</enable>
                 </setting>
             </group>
-        </category>
-        <category id="accounts" label="32470" help="">
-            <group id="1" label="32031">
+            <group id="8" label="32470">
                 <setting id="trakt_token" type="string" label="32011" help="">
                     <level>0</level>
                     <default/>
@@ -588,21 +586,38 @@
                     <default>true</default>
                     <control type="toggle" />
                 </setting>
+            </group>
+        </category>
+        <category id="accounts" label="32403" help="">
+
+            <group id="1" label="39031">
+                <setting id="sync_source_watchlist" type="string" label="32193" help="">
+                    <level>0</level>
+                    <default>Trakt</default>
+                    <constraints>
+                        <options>
+                            <option>Trakt</option>
+                            <option>MDbList</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+            </group>
+            <group id="2" label="5">
                 <setting id="trakt_watchedindicators" type="boolean" label="32013" help="">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle" />
                 </setting>
-                <setting id="invalidate_trakt_sync" type="string" label="32022" help="">
+                <setting id="invalidate_sync" type="string" label="32022" help="">
                     <level>0</level>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
                     <control type="button" format="action">
-                        <data>RunScript(plugin.video.themoviedb.helper, invalidate_trakt_sync)</data>
+                        <data>RunScript(plugin.video.themoviedb.helper, invalidate_sync)</data>
                     </control>
                 </setting>
-
             </group>
         </category>
         <category id="players" label="32014" help="">

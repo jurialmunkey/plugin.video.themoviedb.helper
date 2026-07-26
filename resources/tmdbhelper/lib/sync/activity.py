@@ -1,18 +1,13 @@
-from tmdbhelper.lib.api.trakt.sync.property_mixins import SyncDataParentProperties
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.files.futils import json_loads as data_loads
 from tmdbhelper.lib.files.futils import json_dumps as data_dumps
 from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp
 from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA, LASTACTIVITIES_EXPIRY
 from tmdbhelper.lib.files.locker import mutexlock
+from tmdbhelper.lib.sync.mixins import SyncDataParentProperties
 
 
-class SyncLastActivitiesSyndDataProperties(SyncDataParentProperties):
-    def __init__(self, instance_syncdata):
-        self.instance_syncdata = instance_syncdata
-
-
-class SyncLastActivities(SyncLastActivitiesSyndDataProperties):
+class SyncLastActivities(SyncDataParentProperties):
     @property
     def mutex_lockname(self):
         return f'{self.cache._db_file}.sync_last_activities.lockfile'
