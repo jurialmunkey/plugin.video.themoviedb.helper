@@ -182,7 +182,7 @@ class TraktDiscoverMain(DiscoverMain):
 
     @cached_property
     def icon(self):
-        return f'{ADDONPATH}/resources/trakt.png'
+        return f'{ADDONPATH}/resources/icons/trakt/trakt.png'
 
     @cached_property
     def name(self):

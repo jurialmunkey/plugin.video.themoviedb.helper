@@ -658,7 +658,7 @@ class BaseDirItemTraktAuthenticate(BaseDirItem):
     label_localized = 32010
     types = ('both', )
     params = {'info': 'dir_trakt_authenticate'}
-    art_icon = 'resources/trakt.png'
+    art_icon = 'resources/icons/trakt/trakt.png'
     group = 32010
 
     @property
