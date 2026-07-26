@@ -44,11 +44,27 @@ class SyncLastActivities(SyncDataParentProperties):
     def get_json_sync(self):
         from tmdbhelper.lib.addon.logger import kodi_log
         kodi_log('Sync: last_activities', 2)
-        data = self.get_response_json('sync/last_activities')
-        if not data:
+
+        try:
+            data = self.trakt_api.get_response_json('sync/last_activities') or {}
+        except AttributeError:
+            data = {}
+
+        try:
+            mdblist_data = self.mdblist_api.get_response_json('sync/last_activities') or {}
+        except AttributeError:
+            mdblist_data = {}
+
+        if not data and not mdblist_data:
             return
+
+        from tmdbhelper.lib.sync.synctype import SYNC_SOURCE_WATCHLIST
+        if SYNC_SOURCE_WATCHLIST == 'MDbList':
+            data['watchlisted_at'] = mdblist_data.get('watchlisted_at')
+
         data['expiry'] = set_timestamp(LASTACTIVITIES_EXPIRY)
         self.window.get_property(LASTACTIVITIES_DATA, set_property=data_dumps(data))
+
         return data
 
     def is_expired(self, timestamp, keys=None):
