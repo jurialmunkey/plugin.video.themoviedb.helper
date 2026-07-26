@@ -59,6 +59,13 @@ class BaseDirItemMainTMDbv4(BaseDirItemMainMovie):
     art_icon = 'resources/icons/themoviedb/default.png'
 
 
+class BaseDirItemMainSync(BaseDirItemMainMovie):
+    priority = 175
+    label = 'List Services'
+    params = {'info': 'dir_sync'}
+    art_icon = 'resources/icons/sync/default.png'
+
+
 class BaseDirItemMainTrakt(BaseDirItemMainMovie):
     priority = 180
     label = 'Trakt'

@@ -12,6 +12,7 @@ class BaseDirList:
     def __init__(
         self,
         main=False,
+        sync=False,
         trakt=False,
         tmdb=False,
         mdblist=False,
@@ -23,6 +24,7 @@ class BaseDirList:
         details=False,
     ):
         self.main = main
+        self.sync = sync
         self.tmdb = tmdb
         self.trakt = trakt
         self.mdblist = mdblist
@@ -80,6 +82,7 @@ class BaseDirList:
         basedir += self.basedir_main
         basedir += self.basedir_random
         basedir += self.basedir_tmdb
+        basedir += self.basedir_sync
         basedir += self.basedir_trakt
         basedir += self.basedir_mdblist
         basedir += self.basedir_tvdb
@@ -103,6 +106,11 @@ class BaseDirList:
     def basedir_tmdb(self):
         from tmdbhelper.lib.items.directories.base.basedir_tmdb import get_all_tmdb_class_instances
         return [] if not self.tmdb else get_all_tmdb_class_instances()
+
+    @property
+    def basedir_sync(self):
+        from tmdbhelper.lib.items.directories.base.basedir_sync import get_all_sync_class_instances
+        return [] if not self.sync else get_all_sync_class_instances()
 
     @property
     def basedir_trakt(self):
@@ -162,6 +170,7 @@ class ListBaseDir(ContainerDirectory):
             'dir_person': lambda: get_localized(32172),
             'dir_tmdb': 'TheMovieDb',
             'dir_tmdb_v4': lambda: f'TheMovieDb {get_localized(32079)}',
+            'dir_sync': 'List Services',
             'dir_trakt': 'Trakt',
             'dir_mdblist': 'MDbList',
             'dir_tvdb': 'TVDb',
@@ -183,11 +192,12 @@ class ListBaseDir(ContainerDirectory):
 
     def get_items(self, info=None, group=None, **kwargs):
         routes = {
-            'dir_movie': lambda: BaseDirList(tmdb=True, trakt=True).build_basedir('movie', group=group),
-            'dir_tv': lambda: BaseDirList(tmdb=True, trakt=True).build_basedir('tv', group=group),
-            'dir_person': lambda: BaseDirList(tmdb=True, trakt=True).build_basedir('person', group=group),
+            'dir_movie': lambda: BaseDirList(tmdb=True, trakt=True, sync=True).build_basedir('movie', group=group),
+            'dir_tv': lambda: BaseDirList(tmdb=True, trakt=True, sync=True).build_basedir('tv', group=group),
+            'dir_person': lambda: BaseDirList(tmdb=True, trakt=True, sync=True).build_basedir('person', group=group),
             'dir_tmdb': lambda: BaseDirList(tmdb=True).build_basedir(group=group, info='dir_tmdb'),
             'dir_trakt': lambda: BaseDirList(trakt=True).build_basedir(group=group, info='dir_trakt'),
+            'dir_sync': lambda: BaseDirList(sync=True).build_basedir(group=group, info='dir_sync'),
             'dir_mdblist': lambda: BaseDirList(mdblist=True).build_basedir(group=group),
             'dir_tvdb': lambda: BaseDirList(tvdb=True).build_basedir(group=group),
             'dir_random': lambda: BaseDirList(random=True).build_basedir(),
