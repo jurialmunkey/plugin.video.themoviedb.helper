@@ -32,7 +32,7 @@ class SyncDataSetters:
 
     def like_userlist(self, user_slug=None, list_slug=None, confirmation=False, delete=False):
         from tmdbhelper.lib.addon.plugin import get_localized
-        func = self.delete_response if delete else self.post_response
+        func = self.trakt_api.delete_response if delete else self.trakt_api.post_response
         response = func('users', user_slug, 'lists', list_slug, 'like')
         if confirmation:
             from xbmcgui import Dialog
@@ -447,15 +447,6 @@ class SyncData(SyncDataGetters):
     def __init__(self, trakt_api=None, mdblist_api=None):
         self.trakt_api = trakt_api
         self.mdblist_api = mdblist_api
-
-    def delete_response(self, *args, **kwargs):
-        return self.trakt_api.delete_response(*args, **kwargs)
-
-    def post_response(self, *args, **kwargs):
-        return self.trakt_api.post_response(*args, **kwargs)
-
-    def get_response_json(self, *args, **kwargs):
-        return self.trakt_api.get_response_json(*args, **kwargs)
 
     @cached_property
     def routes(self):
