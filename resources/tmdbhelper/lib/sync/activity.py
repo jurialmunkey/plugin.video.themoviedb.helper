@@ -58,9 +58,11 @@ class SyncLastActivities(SyncDataParentProperties):
         if not data and not mdblist_data:
             return
 
-        from tmdbhelper.lib.sync.synctype import SYNC_SOURCE_WATCHLIST
-        if SYNC_SOURCE_WATCHLIST == 'MDbList':
+        from tmdbhelper.lib.addon.plugin import get_setting
+        if get_setting('sync_source_watchlist', 'str') == ' MDbList':
             data['watchlisted_at'] = mdblist_data.get('watchlisted_at')
+        if get_setting('sync_source_collection', 'str') == ' MDbList':
+            data['collected_at'] = mdblist_data.get('collected_at')
 
         data['expiry'] = set_timestamp(LASTACTIVITIES_EXPIRY)
         self.window.get_property(LASTACTIVITIES_DATA, set_property=data_dumps(data))

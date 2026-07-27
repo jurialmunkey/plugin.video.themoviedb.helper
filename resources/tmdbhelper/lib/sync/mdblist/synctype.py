@@ -12,3 +12,10 @@ class SyncWatchlist(MDbListDataType):
         return {
             'mediatype': self.item_type
         }
+
+
+class SyncCollection(MDbListDataType):
+    keys = ('last_collected_at', 'last_updated_at', )
+    last_activities_key = 'collected_at'
+    method = 'sync/collection'
+    key_prefix = 'collection'

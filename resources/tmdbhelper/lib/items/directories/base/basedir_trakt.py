@@ -3,16 +3,6 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
 
 
-class BaseDirItemTraktCollection(BaseDirItemTraktAuthorised):
-    priority = 100
-    label_localized = 32192
-    label_type = 'reversed'
-    params = {'info': 'trakt_collection'}
-    art_icon = '/resources/icons/trakt/watchlist.png'
-    types = ('movie', 'tv', 'both')
-    group = 32192
-
-
 class BaseDirItemTraktFavorites(BaseDirItemTraktAuthorised):
     priority = 110
     label_type = 'reversed'

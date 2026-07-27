@@ -11,6 +11,7 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
     notes = None
     season_number = None
     episode_number = None
+    last_updated_at = None
 
     """
     tmdb_id
@@ -20,7 +21,24 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
         return self.get_tmdb_id()
 
     def get_tmdb_id(self):
-        return self.item['ids']['tmdb']
+        try:
+            return self.item[self.item_type]['ids']['tmdb']
+        except KeyError:
+            pass
+        try:
+            return self.item['ids']['tmdb']
+        except KeyError:
+            pass
+
+    """
+    last_collected_at
+    """
+    @cached_property
+    def last_collected_at(self):
+        return self.get_last_collected_at()
+
+    def get_last_collected_at(self):
+        return self.item.get('last_collected_at') or self.item.get('collected_at')
 
     """
     listed_at

@@ -1,6 +1,16 @@
 from tmdbhelper.lib.items.directories.base.basedir_item import BaseDirItem
 
 
+class BaseDirItemCollection(BaseDirItem):
+    priority = 100
+    label_localized = 32192
+    label_type = 'reversed'
+    params = {'info': 'trakt_collection'}
+    art_icon = '/resources/icons/sync/collection.png'
+    types = ('movie', 'tv', 'both')
+    group = 32192
+
+
 class BaseDirItemWatchlist(BaseDirItem):
     priority = 120
     label_type = 'reversed'
@@ -12,7 +22,7 @@ class BaseDirItemWatchlist(BaseDirItem):
     group = 32193
 
 
-class BaseDirItemTraktWatchListReleased(BaseDirItemWatchlist):
+class BaseDirItemWatchListReleased(BaseDirItemWatchlist):
     priority = 130
     label_type = 'reversed'
     label_localized = 32456
@@ -20,7 +30,7 @@ class BaseDirItemTraktWatchListReleased(BaseDirItemWatchlist):
     group = 32193
 
 
-class BaseDirItemTraktWatchListAnticipated(BaseDirItemWatchlist):
+class BaseDirItemWatchListAnticipated(BaseDirItemWatchlist):
     priority = 140
     label_type = 'reversed'
     label_localized = 32457

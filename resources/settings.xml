@@ -602,6 +602,17 @@
                     </constraints>
                     <control type="spinner" format="string"/>
                 </setting>
+                <setting id="sync_source_collection" type="string" label="32192" help="">
+                    <level>0</level>
+                    <default>Trakt</default>
+                    <constraints>
+                        <options>
+                            <option>Trakt</option>
+                            <option>MDbList</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
             </group>
             <group id="2" label="5">
                 <setting id="trakt_watchedindicators" type="boolean" label="32013" help="">
