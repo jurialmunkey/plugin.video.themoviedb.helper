@@ -59,9 +59,9 @@ class SyncLastActivities(SyncDataParentProperties):
             return
 
         from tmdbhelper.lib.addon.plugin import get_setting
-        if get_setting('sync_source_watchlist', 'str') == ' MDbList':
+        if get_setting('sync_source_watchlist', 'str') == 'MDbList':
             data['watchlisted_at'] = mdblist_data.get('watchlisted_at')
-        if get_setting('sync_source_collection', 'str') == ' MDbList':
+        if get_setting('sync_source_collection', 'str') == 'MDbList':
             data['collected_at'] = mdblist_data.get('collected_at')
 
         data['expiry'] = set_timestamp(LASTACTIVITIES_EXPIRY)
@@ -73,15 +73,20 @@ class SyncLastActivities(SyncDataParentProperties):
         if not timestamp:
             return True
 
-        last_activity = self.json
-
-        if not last_activity:
-            return True
-
-        for k in (keys or ('all', )):
-            last_activity = last_activity.get(k) or {}
+        last_activity = self.get_last_activity_by_keys(keys)
 
         if not last_activity or last_activity > timestamp:
             return True
 
         return False
+
+    def get_last_activity_by_keys(self, keys=None):
+        last_activity = self.json
+
+        if not last_activity:
+            return
+
+        for k in (keys or ('all', )):
+            last_activity = last_activity.get(k) or {}
+
+        return last_activity
