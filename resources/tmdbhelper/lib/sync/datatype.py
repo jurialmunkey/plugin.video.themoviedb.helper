@@ -1,5 +1,5 @@
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp
+from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp, get_timestring_zulu_now
 from tmdbhelper.lib.files.locker import mutexlock
 from tmdbhelper.lib.addon.consts import DEFAULT_EXPIRY
 from tmdbhelper.lib.sync.mixins import SyncDataParentProperties
@@ -68,7 +68,7 @@ class DataType(SyncDataParentProperties):
         self.cache.set_activity(
             self.item_type,
             self.method,
-            self.last_activities.json.get('all') or '2000-01-01T00:00:00.000Z',
+            get_timestring_zulu_now(),
             set_timestamp(self.expiry_time, set_int=True)
         )
 

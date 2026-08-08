@@ -149,6 +149,12 @@ def test_func(test_func, dialog_output=False, **kwargs):
         head = prompt
         return finalise(head, data)
 
+    def test_func_clear_lactivity(**kwargs):
+        from jurialmunkey.window import get_property
+        from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA
+        get_property(LASTACTIVITIES_DATA, clear_property=True)
+        return
+
     routes = {
         'response': test_func_response,
         'trakt_response': test_func_trakt_response,
@@ -166,6 +172,7 @@ def test_func(test_func, dialog_output=False, **kwargs):
         'jrpc_directory': test_func_jrpc_directory,
         'trakt_auth': test_func_trakt_auth,
         'gemini': test_func_gemini,
+        'clear_lactivity': test_func_clear_lactivity,
     }
 
     return routes[test_func](**kwargs)

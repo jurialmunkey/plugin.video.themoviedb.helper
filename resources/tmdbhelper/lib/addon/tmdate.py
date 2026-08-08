@@ -27,7 +27,7 @@ def get_datetime_time(*args, **kwargs):
 
 
 def get_datetime_utcnow_isoformat():
-    return f'{datetime.datetime.utcnow().isoformat()}Z'
+    return f'{get_datetime_utcnow().isoformat()}Z'
 
 
 def get_datetime_now():
@@ -35,11 +35,19 @@ def get_datetime_now():
 
 
 def get_datetime_utcnow():
-    return datetime.datetime.utcnow()
+    return datetime.datetime.now(datetime.timezone.utc)
 
 
 def get_datetime_today():
     return datetime.datetime.today()
+
+
+def get_timestring_zulu(date_time):
+    return date_time.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+
+
+def get_timestring_zulu_now():
+    return get_timestring_zulu(get_datetime_utcnow())
 
 
 def get_timedelta(*args, **kwargs):

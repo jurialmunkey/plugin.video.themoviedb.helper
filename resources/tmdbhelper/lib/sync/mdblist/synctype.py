@@ -22,6 +22,4 @@ class SyncCollection(MDbListDataType):
     @property
     def sync_kwgs(self):
         sync_kwgs = {'mediatype': self.item_type}
-        if self.timestamp and self.last_activity:
-            sync_kwgs['since'] = self.last_activity
         return sync_kwgs
