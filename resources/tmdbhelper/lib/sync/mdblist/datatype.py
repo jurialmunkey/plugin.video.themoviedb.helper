@@ -42,7 +42,7 @@ class MDbListDataType(DataType):
         next_cursor = self.get_next_cursor(response)
 
         from tmdbhelper.lib.addon.logger import kodi_log
-        if next_cursor and self.is_next_required(data):
+        if next_cursor:  # and self.is_next_required(data):
             kodi_log('Sync: next_cursor required', 2)
             kwargs['cursor'] = next_cursor
             data.extend(self.get_response_sync(*args, **kwargs) or [])
@@ -50,29 +50,6 @@ class MDbListDataType(DataType):
             kodi_log('Sync: next_cursor not required', 2)
 
         return data
-
-    def is_next_required(self, data):
-        if not self.timestamp:
-            return True
-        if not self.last_activity:
-            return True
-
-        last_item_activity = self.get_last_item_activity(data)
-
-        if not last_item_activity:
-            return True
-        if last_item_activity > self.last_activity:
-            return True
-
-        return False
-
-    def get_last_item_activity(self, data):
-        if not data:
-            return
-        try:
-            return data[-1][self.last_activities_key]
-        except KeyError:
-            return
 
 
 class MDbListDataTypeEpisodes(DataTypeEpisodes, MDbListDataType):

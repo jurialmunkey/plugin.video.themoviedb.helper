@@ -137,7 +137,7 @@ class TraktAPI(NoCacheRequestAPI):
 
     def get_response_json(self, *args, **kwargs):
         try:
-            return self.get_api_request(self.get_request_url(*args, **kwargs), headers=self.headers).json()
+            return self.get_response(*args, **kwargs).json()
         except ValueError:
             return {}
         except AttributeError:

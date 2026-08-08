@@ -117,6 +117,14 @@ class MDbList(RequestAPI):
     def get_response(self, *args, **kwargs):
         return self.get_api_request(self.get_request_url(*args, **kwargs), headers=self.headers)
 
+    def get_response_json(self, *args, **kwargs):
+        try:
+            return self.get_response(*args, **kwargs).json()
+        except ValueError:
+            return {}
+        except AttributeError:
+            return {}
+
 
 def MDbListAPI():
     from tmdbhelper.lib.addon.plugin import get_setting

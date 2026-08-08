@@ -65,17 +65,21 @@ class SyncLastActivities(SyncDataParentProperties):
         if not data and not mdblist_data:
             return
 
-        # Update data with MDbList activities for relevant syncs
+        data = self.update_data_with_mdblist_activities(data, mdblist_data)
+
+        data['expiry'] = set_timestamp(LASTACTIVITIES_EXPIRY)
+        self.window.get_property(LASTACTIVITIES_DATA, set_property=data_dumps(data))
+
+        return data
+
+    @staticmethod
+    def update_data_with_mdblist_activities(data, mdblist_data):
         for setting, activity_key in MDBLIST_SETTINGS:
             if get_setting(setting, 'str') != 'MDbList':
                 continue
             activity_mdblist = mdblist_data.get(activity_key)
             for item_type in ('movies', 'shows', 'seasons', 'episodes'):
                 data.setdefault(item_type, {})[activity_key] = activity_mdblist
-
-        data['expiry'] = set_timestamp(LASTACTIVITIES_EXPIRY)
-        self.window.get_property(LASTACTIVITIES_DATA, set_property=data_dumps(data))
-
         return data
 
     def is_expired(self, timestamp, keys=None):
