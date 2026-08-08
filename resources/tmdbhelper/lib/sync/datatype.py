@@ -89,8 +89,15 @@ class DataType(SyncDataParentProperties):
 
     @property
     def is_expired(self):
-        timestamp = self.cache.get_activity(self.item_type, self.method, set_timestamp(0, set_int=True))
-        return self.last_activities.is_expired(timestamp, keys=self.last_activities_keys)
+        return self.last_activities.is_expired(self.timestamp, keys=self.last_activities_keys)
+
+    @property
+    def last_activity(self):
+        return self.last_activities.get_last_activity(self.last_activities_keys)
+
+    @property
+    def timestamp(self):
+        return self.cache.get_activity(self.item_type, self.method, set_timestamp(0, set_int=True))
 
     @property
     def sync_args(self):

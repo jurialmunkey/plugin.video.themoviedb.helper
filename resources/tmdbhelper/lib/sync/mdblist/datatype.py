@@ -18,6 +18,15 @@ class MDbListDataType(DataType):
         data = self.mdblist_api.get_api_request(path, headers=self.mdblist_api.headers)
         return data
 
+    @staticmethod
+    def get_next_cursor(response):
+        try:
+            if not response.headers['x-has-more']:
+                return
+            return response.headers['x-next-cursor']
+        except KeyError:
+            return
+
     def get_response_sync(self, *args, **kwargs):
         response = self.get_response_sync_data(*args, **kwargs)
 
@@ -25,34 +34,45 @@ class MDbListDataType(DataType):
         if response is None:
             return
         try:
-            this_data = response.json()
-        except (ValueError, AttributeError):
+            data = response.json()[f'{self.item_type}s']
+        except (ValueError, AttributeError, KeyError):
             return
 
-        # TODO: CURSOR DEPTH RETRIEVAL
-        # try:
-        #     next_cursor = response.headers['X-Next-Cursor']
-        # except KeyError:
-        #     next_cursor = None
+        # Check if we have a next_cursor and if we need the data
+        next_cursor = self.get_next_cursor(response)
 
-        # def get_next_item(x):
-        #     try:
-        #         return self.get_response_sync_data(*args, **kwargs, cursor=next_cursor).json()
-        #     except (TypeError, ValueError, AttributeError):
-        #         return
+        from tmdbhelper.lib.addon.logger import kodi_log
+        if next_cursor and self.is_next_required(data):
+            kodi_log('Sync: next_cursor required', 2)
+            kwargs['cursor'] = next_cursor
+            data.extend(self.get_response_sync(*args, **kwargs) or [])
+        else:
+            kodi_log('Sync: next_cursor not required', 2)
 
-        # for i in next_data:
-        #     if i is None:
-        #         continue
-        #     this_data.extend(i)
+        return data
 
-        # Get the corresponding item_type list
+    def is_next_required(self, data):
+        if not self.timestamp:
+            return True
+        if not self.last_activity:
+            return True
+
+        last_item_activity = self.get_last_item_activity(data)
+
+        if not last_item_activity:
+            return True
+        if last_item_activity > self.last_activity:
+            return True
+
+        return False
+
+    def get_last_item_activity(self, data):
+        if not data:
+            return
         try:
-            this_data = this_data[f'{self.item_type}s']
+            return data[-1][self.last_activities_key]
         except KeyError:
             return
-
-        return this_data
 
 
 class MDbListDataTypeEpisodes(DataTypeEpisodes, MDbListDataType):

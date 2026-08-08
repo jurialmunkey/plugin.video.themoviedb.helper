@@ -18,7 +18,7 @@ SyncNextEpisodes = trakt_synctype.SyncNextEpisodes
 
 
 def SyncWatchlistFactory():
-    if get_setting('sync_source_watchlist', 'str') == ' MDbList':
+    if get_setting('sync_source_watchlist', 'str') == 'MDbList':
         return mdblist_synctype.SyncWatchlist
     return trakt_synctype.SyncWatchlist
 
@@ -27,7 +27,7 @@ SyncWatchlist = SyncWatchlistFactory()
 
 
 def SyncCollectionFactory():
-    if get_setting('sync_source_collection', 'str') == ' MDbList':
+    if get_setting('sync_source_collection', 'str') == 'MDbList':
         return mdblist_synctype.SyncCollection
     return trakt_synctype.SyncCollection
 
