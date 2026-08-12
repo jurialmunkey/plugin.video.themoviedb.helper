@@ -25,7 +25,7 @@ class BaseDirItemMDbListWatchlist(BaseDirItemMDbListTopLists):
     params = {'info': 'mdblist_watchlist'}
     sorting = True
     item_builder = BaseDirItemMDbListBuilder
-    art_icon = 'resources/icons/sync/watchlist.png'
+    art_icon = 'resources/icons/mdblist/mdblist.png'
     types = ('movie', )
     group = 32193
 
@@ -53,7 +53,7 @@ class BaseDirItemMDbListNextEpisodes(BaseDirItemMDbListTopLists):
     label_localized = 32197
     label_suffix = '(MDbList)'
     params = {'info': 'mdblist_nextepisodes'}
-    art_icon = 'resources/icons/trakt/inprogress.png'
+    art_icon = 'resources/icons/mdblist/mdblist.png'
     types = ('tv', )
     group = 32196
 

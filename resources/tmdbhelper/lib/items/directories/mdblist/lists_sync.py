@@ -140,6 +140,10 @@ class ListMDbListNextEpisodes(ListStandard):
         list_properties.container_content = 'episodes'
         return list_properties
 
+    @cached_property
+    def thumb_override(self):
+        return get_setting('calendar_art', 'int')
+
     def get_items(self, page=1, length=None, **kwargs):
         self.list_properties.page = try_int(page) or 1
         self.list_properties.length = try_int(length)
