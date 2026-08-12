@@ -101,6 +101,8 @@ class UncachedMDbListUpNextData(UncachedMDbListCustomData):
 
 class ListMDbListNextEpisodesProperties(ListMDbListCustomProperties):
 
+    sort_by = 'airdate'
+
     @cached_property
     def limit(self):
         return min(super().limit, 100)
@@ -125,6 +127,42 @@ class ListMDbListNextEpisodesProperties(ListMDbListCustomProperties):
     def get_mapped_item(self, item, add_infoproperties=None):
         return MDbListUpNextItemMapper(item, add_infoproperties).item
 
+    @staticmethod
+    def get_airdate(item):
+        return item.get('infolabels', {}).get('premiered') or ''
+
+    @staticmethod
+    def get_last_watched_at(item):
+        return item.get('infoproperties', {}).get('last_watched_at') or ''
+
+    @cached_property
+    def sort_by_days(self):
+        return -1 if self.sort_by == 'todays' else -7
+
+    def is_recently_aired(self, item):
+        from tmdbhelper.lib.addon.tmdate import is_future_timestamp
+        airdate = self.get_airdate(item)
+        return airdate and is_future_timestamp(
+            airdate,
+            time_fmt='%Y-%m-%d',
+            time_lim=10,
+            use_today=True,
+            days=self.sort_by_days,
+        )
+
+    @cached_property
+    def sorted_items(self):
+        items = sorted(
+            self.filtered_items,
+            key=self.get_airdate if self.sort_by == 'airdate' else self.get_last_watched_at,
+            reverse=True,
+        )
+        if self.sort_by not in ('todays', 'lastweek'):
+            return items
+        recently_aired = [item for item in items if self.is_recently_aired(item)]
+        recently_aired = sorted(recently_aired, key=self.get_airdate, reverse=True)
+        return recently_aired + [item for item in items if item not in recently_aired]
+
 
 class ListMDbListNextEpisodes(ListStandard):
 
@@ -136,6 +174,7 @@ class ListMDbListNextEpisodes(ListStandard):
         list_properties.localize = 32197
         list_properties.mdblist_api = self.mdblist_api
         list_properties.page_length = get_setting('pagemulti_trakt', 'int') or 1
+        list_properties.sort_by = get_setting('trakt_nextepisodesort', 'str') or 'airdate'
         list_properties.tmdb_type = 'tv'
         list_properties.container_content = 'episodes'
         return list_properties
