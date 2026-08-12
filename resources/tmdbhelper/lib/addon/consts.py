@@ -68,7 +68,15 @@ PLAYERS_BASEDIR_TEMPLATES = 'special://home/addons/plugin.video.themoviedb.helpe
 PLAYERS_PRIORITY = 1000
 PLAYERS_CHOSEN_DEFAULTS_FILENAME = 'player_defaults'
 
-NO_UNAIRED_LABEL = ('details', 'trakt_calendar', 'library_nextaired', 'videos', 'trakt_watchlist_anticipated', 'trakt_anticipated')
+NO_UNAIRED_LABEL = (
+    'details',
+    'trakt_calendar',
+    'library_nextaired',
+    'videos',
+    'trakt_watchlist_anticipated',
+    'mdblist_watchlist_anticipated',
+    'trakt_anticipated',
+)
 
 PARAM_WIDGETS_RELOAD = 'reload=$INFO[Window(Home).Property(TMDbHelper.Widgets.Reload)]'
 PARAM_WIDGETS_RELOAD_FORCED = 'reload=$INFO[System.Time(hh:mm:ss)]'
@@ -252,6 +260,18 @@ ROUTE_NOID = {
     'mdblist_sortby': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_sorting',
         'import_attr': 'ListMDbListSortBy'}},
+    'mdblist_watchlist': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_sync',
+        'import_attr': 'ListMDbListWatchlist'}},
+    'mdblist_watchlist_released': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_sync',
+        'import_attr': 'ListMDbListWatchlistReleased'}},
+    'mdblist_watchlist_anticipated': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_sync',
+        'import_attr': 'ListMDbListWatchlistAnticipated'}},
+    'mdblist_nextepisodes': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_sync',
+        'import_attr': 'ListMDbListNextEpisodes'}},
     'mdblist_locallist': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_local',
         'import_attr': 'ListMDbListLocal'}},

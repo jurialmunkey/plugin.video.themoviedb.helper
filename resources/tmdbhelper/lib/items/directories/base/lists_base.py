@@ -192,8 +192,8 @@ class ListBaseDir(ContainerDirectory):
 
     def get_items(self, info=None, group=None, **kwargs):
         routes = {
-            'dir_movie': lambda: BaseDirList(tmdb=True, trakt=True, sync=True).build_basedir('movie', group=group),
-            'dir_tv': lambda: BaseDirList(tmdb=True, trakt=True, sync=True).build_basedir('tv', group=group),
+            'dir_movie': lambda: BaseDirList(tmdb=True, trakt=True, sync=True, mdblist=True).build_basedir('movie', group=group),
+            'dir_tv': lambda: BaseDirList(tmdb=True, trakt=True, sync=True, mdblist=True).build_basedir('tv', group=group),
             'dir_person': lambda: BaseDirList(tmdb=True, trakt=True, sync=True).build_basedir('person', group=group),
             'dir_tmdb': lambda: BaseDirList(tmdb=True).build_basedir(group=group, info='dir_tmdb'),
             'dir_trakt': lambda: BaseDirList(trakt=True).build_basedir(group=group, info='dir_trakt'),
