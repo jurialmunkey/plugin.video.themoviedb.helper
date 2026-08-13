@@ -101,6 +101,10 @@ class UncachedMDbListUpNextData(UncachedMDbListCustomData):
 
 class ListMDbListNextEpisodesProperties(ListMDbListCustomProperties):
 
+    # Up Next changes as soon as an episode is watched. Kodi refreshes home
+    # widgets after playback, so this user-specific feed must not reuse the
+    # generic six-hour list cache on the subsequent directory build.
+    cache_days = 0
     sort_by = 'airdate'
 
     @cached_property
