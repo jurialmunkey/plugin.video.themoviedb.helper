@@ -33,7 +33,8 @@ class ListAiringNextProperties(ListSliceProperties):
         return self.get_seed_items()
 
     def get_seed_items(self):
-        sd = self.trakt_api.trakt_syncdata
+        from tmdbhelper.lib.sync.datasync import SyncDataFactory
+        sd = SyncDataFactory(self)
         sd = sd.get_all_unhidden_shows_started_getter()
         try:
             return [{'tmdb_id': i[sd.keys.index('tmdb_id')]} for i in sd.items if i]

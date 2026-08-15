@@ -86,6 +86,7 @@
                             <option label="30065">65</option>
                             <option label="30066">66</option>
                             <option label="30067">67</option>
+                            <option label="30068">68</option>
                         </options>
                     </constraints>
                     <control type="list" format="string">
@@ -522,9 +523,7 @@
                     <enable>false</enable>
                 </setting>
             </group>
-        </category>
-        <category id="accounts" label="32470" help="">
-            <group id="1" label="32031">
+            <group id="8" label="32470">
                 <setting id="trakt_token" type="string" label="32011" help="">
                     <level>0</level>
                     <default/>
@@ -587,21 +586,71 @@
                     <default>true</default>
                     <control type="toggle" />
                 </setting>
+            </group>
+        </category>
+        <category id="accounts" label="32403" help="">
+
+            <group id="1" label="39031">
+                <setting id="sync_source_watchlist" type="string" label="32193" help="">
+                    <level>0</level>
+                    <default>Trakt</default>
+                    <constraints>
+                        <options>
+                            <option>Trakt</option>
+                            <option>MDbList</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="sync_source_collection" type="string" label="32192" help="">
+                    <level>0</level>
+                    <default>Trakt</default>
+                    <constraints>
+                        <options>
+                            <option>Trakt</option>
+                            <option>MDbList</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="sync_source_playback" type="string" label="14086" help="">
+                    <level>0</level>
+                    <default>Trakt</default>
+                    <constraints>
+                        <options>
+                            <option>Trakt</option>
+                            <option>MDbList</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="sync_source_upnext" type="string" label="32043" help="">
+                    <level>0</level>
+                    <default>Trakt</default>
+                    <constraints>
+                        <options>
+                            <option>Trakt</option>
+                            <option>MDbList</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+            </group>
+            <group id="2" label="5">
                 <setting id="trakt_watchedindicators" type="boolean" label="32013" help="">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle" />
                 </setting>
-                <setting id="invalidate_trakt_sync" type="string" label="32022" help="">
+                <setting id="invalidate_sync" type="string" label="32022" help="">
                     <level>0</level>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
                     <control type="button" format="action">
-                        <data>RunScript(plugin.video.themoviedb.helper, invalidate_trakt_sync)</data>
+                        <data>RunScript(plugin.video.themoviedb.helper, invalidate_sync)</data>
                     </control>
                 </setting>
-
             </group>
         </category>
         <category id="players" label="32014" help="">
@@ -686,6 +735,14 @@
                     <control type="toggle"/>
                     <dependencies>
                         <dependency type="visible" operator="!is" setting="trakt_token"></dependency>
+                    </dependencies>
+                </setting>
+                <setting id="mdblist_scrobbling" type="boolean" label="32402" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" operator="!is" setting="mdblist_apikey"></dependency>
                     </dependencies>
                 </setting>
             </group>

@@ -12,6 +12,9 @@ DATALEVEL_MAX = 5
 SQLITE_FALSE = 0
 SQLITE_TRUE = 1
 
+TRAKT_MAX_ITEMS_PER_PAGE = 250
+MDBLIST_MAX_ITEMS_PER_PAGE = 1000
+
 TVDB_DISCLAIMER = 'Information provided by TheTVDB.com. Please consider supporting them. https://thetvdb.com/subscribe'
 
 NODE_BASEDIR = 'special://profile/addon_data/plugin.video.themoviedb.helper/nodes/'
@@ -24,7 +27,7 @@ LANGUAGES = (
     'it-IT', 'ja-JP', 'ka-GE', 'kk-KZ', 'kn-IN', 'ko-KR', 'lt-LT', 'lv-LV', 'ml-IN', 'ms-MY', 'ms-SG',
     'nb-NO', 'nl-NL', 'no-NO', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'si-LK', 'sk-SK', 'sl-SI',
     'sr-RS', 'sv-SE', 'ta-IN', 'te-IN', 'th-TH', 'tl-PH', 'tr-TR', 'uk-UA', 'vi-VN', 'zh-CN', 'zh-HK',
-    'zh-TW', 'zu-ZA')
+    'zh-TW', 'zu-ZA', 'hr-HR')
 
 TMDB_PARAMS_SEASONS = {
     'info': 'details',

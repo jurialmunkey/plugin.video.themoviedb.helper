@@ -59,18 +59,25 @@ class BaseDirItemMainTMDbv4(BaseDirItemMainMovie):
     art_icon = 'resources/icons/themoviedb/default.png'
 
 
+class BaseDirItemMainSync(BaseDirItemMainMovie):
+    priority = 175
+    label_localized = 32403
+    params = {'info': 'dir_sync'}
+    art_icon = 'resources/icons/sync/default.png'
+
+
 class BaseDirItemMainTrakt(BaseDirItemMainMovie):
     priority = 180
     label = 'Trakt'
     params = {'info': 'dir_trakt'}
-    art_icon = 'resources/trakt.png'
+    art_icon = 'resources/icons/trakt/trakt.png'
 
 
 class BaseDirItemMainTraktDiscover(BaseDirItemMainMovie):
     priority = 185
     label = 'Trakt Discover'
     params = {'info': 'dir_trakt_discover'}
-    art_icon = 'resources/trakt.png'
+    art_icon = 'resources/icons/trakt/trakt.png'
 
 
 class BaseDirItemMainTVDb(BaseDirItemMainMovie):

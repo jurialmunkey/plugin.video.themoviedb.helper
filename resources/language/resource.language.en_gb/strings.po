@@ -2033,6 +2033,16 @@ msgid "Hide Episode Groups and Up Next"
 msgstr ""
 
 #: /resources/settings.xml
+msgctxt "#32402"
+msgid "Scrobble items on MDbList while watching"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32403"
+msgid "Sync"
+msgstr ""
+
+#: /resources/settings.xml
 msgctxt "#32385"
 msgid "Hide All"
 msgstr ""
@@ -2690,6 +2700,26 @@ msgctxt "#32536"
 msgid "Unspecified"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32537"
+msgid "Availability"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32538"
+msgid "My favorites"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32539"
+msgid "Streaming now"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32540"
+msgid "All digital releases"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
@@ -2840,6 +2870,10 @@ msgstr ""
 
 msgctxt "#30067"
 msgid "Zulu (South Africa)"
+msgstr ""
+
+msgctxt "#30068"
+msgid "Croatian (Croatia)"
 msgstr ""
 
 #: /resources/settings.xml

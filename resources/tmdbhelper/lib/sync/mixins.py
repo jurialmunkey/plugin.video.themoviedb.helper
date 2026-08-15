@@ -1,4 +1,7 @@
 class SyncDataParentProperties:
+    def __init__(self, instance_syncdata):
+        self.instance_syncdata = instance_syncdata
+
     @property
     def cache(self):
         return self.instance_syncdata.cache
@@ -8,9 +11,9 @@ class SyncDataParentProperties:
         return self.instance_syncdata.window
 
     @property
-    def get_response_json(self):
-        return self.instance_syncdata.get_response_json
-
-    @property
     def trakt_api(self):
         return self.instance_syncdata.trakt_api
+
+    @property
+    def mdblist_api(self):
+        return self.instance_syncdata.mdblist_api

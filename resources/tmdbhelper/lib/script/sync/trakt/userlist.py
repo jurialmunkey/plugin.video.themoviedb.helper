@@ -16,11 +16,12 @@ class ItemMDbList(ItemSync):
         return self.get_lists()
 
     def get_lists(self):
-        from tmdbhelper.lib.api.mdblist.api import MDbList
-        if not get_setting('mdblist_apikey', 'str'):
+        from tmdbhelper.lib.api.mdblist.api import MDbListAPI
+        try:
+            response = MDbListAPI().get_request('lists', 'user')
+            return [i for i in response if i and not i.get('dynamic')]
+        except AttributeError:
             return
-        response = MDbList().get_request('lists', 'user')
-        return [i for i in response if i and not i.get('dynamic')]
 
     """
     list_id
