@@ -64,6 +64,20 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
         return self.item.get('watchlist_at') or self.item.get('listed_at')
 
     """
+    helper getter for parent item
+    """
+
+    def get_data_by_key(self, key):
+        try:
+            return self.item[self.parent_item_type][key]
+        except (AttributeError, KeyError, TypeError):
+            pass
+        try:
+            return self.item[key]
+        except (AttributeError, KeyError, TypeError):
+            pass
+
+    """
     title
     """
     @cached_property
@@ -71,7 +85,7 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
         return self.get_title()
 
     def get_title(self):
-        return self.item.get('title')
+        return self.get_data_by_key('title')
 
     """
     year
@@ -81,7 +95,7 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
         return self.get_year()
 
     def get_year(self):
-        return self.item.get('release_year')
+        return self.get_data_by_key('release_year') or self.get_data_by_key('year')
 
     """
     premiered
@@ -91,7 +105,7 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
         return self.get_premiered()
 
     def get_premiered(self):
-        return self.item.get('release_date')
+        return self.get_data_by_key('release_date')
 
     """
     status
@@ -101,7 +115,7 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
         return self.get_status()
 
     def get_status(self):
-        return self.item.get('status')
+        return self.get_data_by_key('status')
 
     """
     country
@@ -111,7 +125,7 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
         return self.get_country()
 
     def get_country(self):
-        return self.item.get('country')
+        return self.get_data_by_key('country')
 
     """
     runtime
@@ -121,7 +135,7 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
         return self.get_runtime()
 
     def get_runtime(self):
-        return self.item.get('runtime')
+        return self.get_data_by_key('runtime')
 
 
 class MDbListSyncItem(SyncItem):
@@ -163,10 +177,10 @@ class MDbListSyncItem(SyncItem):
         data = {}
 
         for item in self.meta:
-            item_data = MDbListSyncItemData(item, item.get('type') or self.item_type)  # TODO: FIXME CHECK if type valid for mdblist
+            item_data = MDbListSyncItemData(item, item.get('type') or self.item_type)
 
             # Iterate through seasons data for watched type syncs where seasons/episodes presented as list
-            # sync_seasons(item_data, item)  # TODO: FIXME
+            # sync_seasons(item_data, item)  # TODO: FIXME DOES MDBLIST WORK LIKE THIS???
 
             # Set values to back to keys for database storage
             data[item_data.item_id] = [getattr(item_data, k) for k in self.keys]
