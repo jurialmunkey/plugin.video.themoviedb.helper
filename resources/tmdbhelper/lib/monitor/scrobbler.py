@@ -212,7 +212,7 @@ class PlayerScrobbler():
         self.scrobble('stop')
         if self.is_trakt_authorized:
             kodi_log(f'SCROBBLER: [TRAKT] [Sync]', 2)
-            from tmdbhelper.lib.api.trakt.sync.invalidator import SyncInvalidator
+            from tmdbhelper.lib.sync.invalidator import SyncInvalidator
             sync_invalidator = SyncInvalidator('watchedprogress')
             sync_invalidator.notification = False
             sync_invalidator.run(sync=True)

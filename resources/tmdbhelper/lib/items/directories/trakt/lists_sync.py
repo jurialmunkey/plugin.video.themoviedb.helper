@@ -1,4 +1,4 @@
-from tmdbhelper.lib.api.trakt.sync.itemlist import ItemListSyncDataFactory
+from tmdbhelper.lib.sync.itemlist import ItemListSyncDataFactory
 from tmdbhelper.lib.items.directories.lists_default import ListProperties, ListDefault
 from tmdbhelper.lib.items.itemlist import ItemListPagination
 from tmdbhelper.lib.addon.plugin import convert_type, get_setting

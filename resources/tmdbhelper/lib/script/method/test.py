@@ -99,9 +99,9 @@ def test_func(test_func, dialog_output=False, **kwargs):
         xbmcgui.Dialog().select(head, data, useDetails=True)
 
     def test_func_sync_next_episodes(import_attr, **kwargs):
-        from tmdbhelper.lib.api.trakt.api import TraktAPI
-        from tmdbhelper.lib.api.trakt.sync.datatype import SyncNextEpisodes
-        sync = SyncNextEpisodes(TraktAPI().trakt_syncdata, 'show')
+        from tmdbhelper.lib.sync.synctype import SyncNextEpisodes
+        from tmdbhelper.lib.sync.datasync import SyncDataFactory
+        sync = SyncNextEpisodes(SyncDataFactory(), 'show')
         func = getattr(sync, import_attr)
         head = import_attr
         data = func(**kwargs)
@@ -149,6 +149,12 @@ def test_func(test_func, dialog_output=False, **kwargs):
         head = prompt
         return finalise(head, data)
 
+    def test_func_clear_lactivity(**kwargs):
+        from jurialmunkey.window import get_property
+        from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA
+        get_property(LASTACTIVITIES_DATA, clear_property=True)
+        return
+
     routes = {
         'response': test_func_response,
         'trakt_response': test_func_trakt_response,
@@ -166,6 +172,7 @@ def test_func(test_func, dialog_output=False, **kwargs):
         'jrpc_directory': test_func_jrpc_directory,
         'trakt_auth': test_func_trakt_auth,
         'gemini': test_func_gemini,
+        'clear_lactivity': test_func_clear_lactivity,
     }
 
     return routes[test_func](**kwargs)

@@ -16,7 +16,7 @@ class ListDiscoverDir(ContainerDefaultCacheDirectory):
             'label': f'{get_localized(35261)}...',
             'params': {'info': 'trakt_discover'},
             'path': PLUGINPATH,
-            'art': {'icon': f'{ADDONPATH}/resources/trakt.png'}
+            'art': {'icon': f'{ADDONPATH}/resources/icons/trakt/trakt.png'}
         }
 
     def get_items(self, **kwargs):

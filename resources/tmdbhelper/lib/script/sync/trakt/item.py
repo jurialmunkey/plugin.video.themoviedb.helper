@@ -20,15 +20,16 @@ class ItemSync(BasicItemSync):
         return TraktAPI()
 
     """
-    trakt_syncdata
+    syncdata
     """
 
     @cached_property
-    def trakt_syncdata(self):
-        return self.get_trakt_syncdata()
+    def syncdata(self):
+        return self.get_syncdata()
 
-    def get_trakt_syncdata(self):
-        return self.trakt_api.trakt_syncdata
+    def get_syncdata(self):
+        from tmdbhelper.lib.sync.datasync import SyncDataFactory
+        return SyncDataFactory(self)
 
     """
     method
@@ -124,14 +125,14 @@ class ItemSync(BasicItemSync):
     def reset_lastactivities(self):
         if not self.is_successful_sync:
             return
-        self.trakt_syncdata.reset_lastactivities()
+        self.syncdata.reset_lastactivities()
 
     """
     overrides
     """
 
     def get_sync_value(self):
-        return self.trakt_syncdata.get_value(
+        return self.syncdata.get_value(
             self.tmdb_type,
             self.tmdb_id,
             self.season,

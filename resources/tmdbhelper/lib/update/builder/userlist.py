@@ -85,21 +85,24 @@ class LibraryBuilderUserList(LibraryBuilder):
     """
 
     @cached_property
-    def mdblist_apikey(self):
-        from tmdbhelper.lib.addon.plugin import get_setting
-        return get_setting('mdblist_apikey', 'str')
+    def mdblist_api(self):
+        from tmdbhelper.lib.api.mdblist.api import MDbListAPI
+        return MDbListAPI()
+
+    @cached_property
+    def trakt_api(self):
+        from tmdbhelper.lib.api.trakt.api import TraktAPI
+        return TraktAPI()
 
     @cached_property
     def request_func(self):
         if self.user_slug and self.list_slug:
 
             if self.user_slug != '__api_mdblist__':
-                from tmdbhelper.lib.api.trakt.api import TraktAPI
-                return TraktAPI().get_response_json
+                return self.trakt_api.get_response_json
 
-            if self.mdblist_apikey:
-                from tmdbhelper.lib.api.mdblist.api import MDbList
-                return MDbList().get_response
+            if self.mdblist_api:
+                return self.mdblist_api.get_response
 
         return lambda *args, **kwgs: None
 

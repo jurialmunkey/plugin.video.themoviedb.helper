@@ -2038,6 +2038,11 @@ msgid "Scrobble items on MDbList while watching"
 msgstr ""
 
 #: /resources/settings.xml
+msgctxt "#32403"
+msgid "Sync"
+msgstr ""
+
+#: /resources/settings.xml
 msgctxt "#32385"
 msgid "Hide All"
 msgstr ""
@@ -2693,6 +2698,26 @@ msgstr ""
 #: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
 msgctxt "#32536"
 msgid "Unspecified"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32537"
+msgid "Availability"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32538"
+msgid "My favorites"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32539"
+msgid "Streaming now"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32540"
+msgid "All digital releases"
 msgstr ""
 
 msgctxt "#30030"

@@ -28,9 +28,9 @@ class ItemWatchlist(ItemSync):
     def reset_lastactivities(self):
         if not self.is_successful_sync:
             return
-        self.trakt_syncdata.cache.del_item(table='lactivities', item_id='show.watchlist')
-        self.trakt_syncdata.cache.del_item(table='lactivities', item_id='movie.watchlist')
-        self.trakt_syncdata.reset_lastactivities()
+        self.syncdata.cache.del_item(table='lactivities', item_id='show.watchlist')
+        self.syncdata.cache.del_item(table='lactivities', item_id='movie.watchlist')
+        self.syncdata.reset_lastactivities()
         self.get_sync_value()
 
 
@@ -44,9 +44,9 @@ class ItemCollection(ItemSync):
     def reset_lastactivities(self):
         if not self.is_successful_sync:
             return
-        self.trakt_syncdata.cache.del_item(table='lactivities', item_id='show.collection')
-        self.trakt_syncdata.cache.del_item(table='lactivities', item_id='movie.collection')
-        self.trakt_syncdata.reset_lastactivities()
+        self.syncdata.cache.del_item(table='lactivities', item_id='show.collection')
+        self.syncdata.cache.del_item(table='lactivities', item_id='movie.collection')
+        self.syncdata.reset_lastactivities()
         self.get_sync_value()
 
 
@@ -59,9 +59,9 @@ class ItemFavorites(ItemSync):
     def reset_lastactivities(self):
         if not self.is_successful_sync:
             return
-        self.trakt_syncdata.cache.del_item(table='lactivities', item_id='show.favorites')
-        self.trakt_syncdata.cache.del_item(table='lactivities', item_id='movie.favorites')
-        self.trakt_syncdata.reset_lastactivities()
+        self.syncdata.cache.del_item(table='lactivities', item_id='show.favorites')
+        self.syncdata.cache.del_item(table='lactivities', item_id='movie.favorites')
+        self.syncdata.reset_lastactivities()
         self.get_sync_value()
 
 
@@ -87,7 +87,7 @@ class ItemDropped(ItemSync):
     def reset_lastactivities(self):
         if not self.is_successful_sync:
             return
-        self.trakt_syncdata.cache.del_item(table='lactivities', item_id='show.nextup')  # Resync data after dropping a show
-        self.trakt_syncdata.cache.del_item(table='lactivities', item_id='show.watched')  # Resync data after dropping a show
-        self.trakt_syncdata.reset_lastactivities()
+        self.syncdata.cache.del_item(table='lactivities', item_id='show.nextup')  # Resync data after dropping a show
+        self.syncdata.cache.del_item(table='lactivities', item_id='show.watched')  # Resync data after dropping a show
+        self.syncdata.reset_lastactivities()
         self.delete_listdata()  # We also reset cached lists as calendars might drop shows

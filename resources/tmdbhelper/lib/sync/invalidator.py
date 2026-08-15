@@ -4,7 +4,7 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.dialog import ProgressDialog
 from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
 from tmdbhelper.lib.addon.plugin import get_localized
-from tmdbhelper.lib.api.trakt.sync.datatype import (
+from tmdbhelper.lib.sync.synctype import (
     SyncWatched,
     SyncPlayback,
     SyncNextEpisodes,
@@ -101,8 +101,9 @@ class SyncInvalidatorAll:
         return TraktAPI()
 
     @cached_property
-    def trakt_syncdata(self):
-        return self.trakt_api.trakt_syncdata
+    def syncdata(self):
+        from tmdbhelper.lib.sync.datasync import SyncDataFactory
+        return SyncDataFactory(self)
 
     @cached_property
     def progress_dialog(self):
@@ -164,7 +165,7 @@ class SyncInvalidatorAll:
 
     def sync_type(self, sync_type):
         sync_list = tuple((k for k, v in self.sync_table.items() if k in self.sync_modes and sync_type in v))
-        self.trakt_syncdata.sync(sync_type, sync_list)
+        self.syncdata.sync(sync_type, sync_list)
 
     def sync(self):
         self.sync_type('movie')
