@@ -52,16 +52,6 @@ class BaseDirItemTraktToWatch(BaseDirItemTraktAuthorised):
     group = 32196
 
 
-class BaseDirItemTraktNextEpisodes(BaseDirItemTraktAuthorised):
-    priority = 220
-    label_type = 'localize'
-    label_localized = 32197
-    types = ('tv', )
-    params = {'info': 'trakt_nextepisodes'}
-    art_icon = 'resources/icons/trakt/inprogress.png'
-    group = 32196
-
-
 class BaseDirItemTraktDropped(BaseDirItemTraktAuthorised):
     priority = 230
     label_type = 'localize'

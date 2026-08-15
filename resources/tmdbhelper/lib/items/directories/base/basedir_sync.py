@@ -73,6 +73,16 @@ class BaseDirItemOnDeckUnWatchedMovie(BaseDirItemOnDeckMovies):
         return get_localized(16101)
 
 
+class BaseDirItemNextEpisodes(BaseDirItemOnDeckMovies):
+    priority = 220
+    label_type = 'localize'
+    label_localized = 32197
+    types = ('tv', )
+    params = {'info': 'trakt_nextepisodes'}
+    art_icon = 'resources/icons/sync/inprogress.png'
+    group = 32196
+
+
 class BaseDirItemOnDeckUnWatchedEpisodes(BaseDirItemOnDeckMovies):
     priority = 200
     label_type = 'suffixed'
