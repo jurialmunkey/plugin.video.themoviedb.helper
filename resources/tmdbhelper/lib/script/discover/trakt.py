@@ -88,6 +88,19 @@ class TraktDiscoverCertifications(TraktDiscoverGenres):
             return []
 
 
+class TraktDiscoverAvailability(DiscoverList):
+    idx = None
+    key = 'watchnow'
+    label_prefix_localized = 32537
+
+    def get_routes(self):
+        return (
+            DiscoverItem(get_localized(32538), 'favorites'),
+            DiscoverItem(get_localized(32539), 'any'),
+            DiscoverItem(get_localized(32540), 'subscriptions'),
+        )
+    
+
 class TraktDiscoverQuery(DiscoverQuery):
     pass
 
@@ -197,6 +210,7 @@ class TraktDiscoverMain(DiscoverMain):
             'years': TraktDiscoverYears(self),
             'genres': TraktDiscoverGenres(self),
             'certifications': TraktDiscoverCertifications(self),
+            'watchnow': TraktDiscoverAvailability(self),
             'runtimes': TraktDiscoverRuntimes(self),
             'ratings': TraktDiscoverRatings(self),
             'votes': TraktDiscoverVotes(self),

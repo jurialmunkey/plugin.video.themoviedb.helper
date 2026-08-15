@@ -2700,6 +2700,26 @@ msgctxt "#32536"
 msgid "Unspecified"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32537"
+msgid "Availability"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32538"
+msgid "My favorites"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32539"
+msgid "Streaming now"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32540"
+msgid "All digital releases"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
