@@ -137,6 +137,56 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
     def get_runtime(self):
         return self.get_data_by_key('runtime')
 
+    """
+    next_episode_object
+    """
+    @cached_property
+    def next_episode_object(self):
+        return self.get_next_episode_object()
+
+    def get_next_episode_object(self):
+        try:
+            return self.item['next_episode']
+        except (AttributeError, KeyError, TypeError):
+            return
+
+    """
+    next_episode_id
+    """
+    @cached_property
+    def next_episode_id(self):
+        return self.get_next_episode_id()
+
+    def get_next_episode_id(self):
+        if not self.next_episode_object:
+            return
+        e_num = self.next_episode_object['episode']
+        s_num = self.next_episode_object['season']
+        return f'tv.{self.tmdb_id}.{s_num}.{e_num}'
+
+    """
+    next_episode_aired_at
+    """
+    @cached_property
+    def next_episode_aired_at(self):
+        return self.get_next_episode_aired_at()
+
+    def get_next_episode_aired_at(self):
+        if not self.next_episode_object:
+            return
+        air_date = self.next_episode_object['air_date']
+        return f'{air_date}T00:00:00.000Z'  # No time from MDBList so set as 00:00 utc
+
+    """
+    last_watched_at
+    """
+    @cached_property
+    def last_watched_at(self):
+        return self.get_last_watched_at()
+
+    def get_last_watched_at(self):
+        return self.item.get('last_watched_at')
+
 
 class MDbListSyncItem(SyncItem):
 

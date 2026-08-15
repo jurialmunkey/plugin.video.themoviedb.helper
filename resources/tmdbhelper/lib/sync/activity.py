@@ -20,6 +20,11 @@ MDBLIST_SETTINGS = {
         'default': 'paused_at',
         'episodes': 'episode_paused_at'
     },
+    'sync_source_upnext': {
+        'default': 'watched_at',
+        'shows': 'episode_watched_at',
+        'episodes': 'episode_watched_at'
+    },
 }
 
 

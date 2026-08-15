@@ -11,9 +11,6 @@ SyncWatched = trakt_synctype.SyncWatched
 SyncRatings = trakt_synctype.SyncRatings
 SyncFavorites = trakt_synctype.SyncFavorites
 SyncAllNextEpisodes = trakt_synctype.SyncAllNextEpisodes
-SyncNextEpisodesMetaItem = trakt_synctype.SyncNextEpisodesMetaItem
-SyncNextEpisodesMeta = trakt_synctype.SyncNextEpisodesMeta
-SyncNextEpisodes = trakt_synctype.SyncNextEpisodes
 
 
 def SyncWatchlistFactory():
@@ -41,3 +38,12 @@ def SyncPlaybackFactory():
 
 
 SyncPlayback = SyncPlaybackFactory()
+
+
+def SyncNextEpisodesFactory():
+    if get_setting('sync_source_upnext', 'str') == 'MDbList':
+        return mdblist_synctype.SyncNextEpisodes
+    return trakt_synctype.SyncNextEpisodes
+
+
+SyncNextEpisodes = SyncNextEpisodesFactory()
