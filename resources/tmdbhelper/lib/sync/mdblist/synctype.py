@@ -1,4 +1,4 @@
-from tmdbhelper.lib.sync.mdblist.datatype import MDbListDataType
+from tmdbhelper.lib.sync.mdblist.datatype import MDbListDataType, MDbListDataTypeEpisodes
 
 
 class SyncWatchlist(MDbListDataType):
@@ -23,3 +23,11 @@ class SyncCollection(MDbListDataType):
     def sync_kwgs(self):
         sync_kwgs = {'mediatype': self.item_type}
         return sync_kwgs
+
+
+class SyncPlayback(MDbListDataTypeEpisodes):
+    keys = ('progress', 'paused_at', 'id', )
+    last_activities_key = 'paused_at'
+    sync_kwgs = {}
+    method = 'sync/playback'
+    key_prefix = 'playback'

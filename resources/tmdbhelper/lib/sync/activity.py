@@ -9,10 +9,18 @@ from tmdbhelper.lib.files.locker import mutexlock
 from tmdbhelper.lib.sync.mixins import SyncDataParentProperties
 
 
-MDBLIST_SETTINGS = (
-    ('sync_source_watchlist', 'watchlisted_at'),
-    ('sync_source_collection', 'collected_at'),
-)
+MDBLIST_SETTINGS = {
+    'sync_source_watchlist': {
+        'default': 'watchlisted_at'
+    },
+    'sync_source_collection': {
+        'default': 'collected_at'
+    },
+    'sync_source_playback': {
+        'default': 'paused_at',
+        'episodes': 'episode_paused_at'
+    },
+}
 
 
 class SyncLastActivities(SyncDataParentProperties):
@@ -74,12 +82,13 @@ class SyncLastActivities(SyncDataParentProperties):
 
     @staticmethod
     def update_data_with_mdblist_activities(data, mdblist_data):
-        for setting, activity_key in MDBLIST_SETTINGS:
+        for setting, keys in MDBLIST_SETTINGS.items():
             if get_setting(setting, 'str') != 'MDbList':
                 continue
-            activity_mdblist = mdblist_data.get(activity_key)
             for item_type in ('movies', 'shows', 'seasons', 'episodes'):
-                data.setdefault(item_type, {})[activity_key] = activity_mdblist
+                activity_key = keys.get('default')
+                activity_utc = mdblist_data.get(keys.get(item_type) or activity_key)
+                data.setdefault(item_type, {})[activity_key] = activity_utc
         return data
 
     def is_expired(self, timestamp, keys=None):

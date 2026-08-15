@@ -33,9 +33,14 @@ class MDbListDataType(DataType):
         # Check we actually get a response
         if response is None:
             return
+
         try:
-            data = response.json()[f'{self.item_type}s']
-        except (ValueError, AttributeError, KeyError):
+            data = response.json()
+        except AttributeError:
+            return
+        try:
+            data = data[f'{self.item_type}s'] if not isinstance(data, list) else data
+        except KeyError:
             return
 
         # Check if we have a next_cursor and if we need the data

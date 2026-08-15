@@ -170,7 +170,7 @@ class ListBaseDir(ContainerDirectory):
             'dir_person': lambda: get_localized(32172),
             'dir_tmdb': 'TheMovieDb',
             'dir_tmdb_v4': lambda: f'TheMovieDb {get_localized(32079)}',
-            'dir_sync': 'List Services',
+            'dir_sync': lambda: get_localized(32403),
             'dir_trakt': 'Trakt',
             'dir_mdblist': 'MDbList',
             'dir_tvdb': 'TVDb',

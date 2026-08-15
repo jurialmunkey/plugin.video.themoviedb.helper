@@ -9,9 +9,32 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
     # FIXME TODO
     rank = None
     notes = None
-    season_number = None
-    episode_number = None
     last_updated_at = None
+
+    """
+    season_number
+    """
+    @cached_property
+    def season_number(self):
+        return self.get_season_number()
+
+    def get_season_number(self):
+        # TODO: CHECK MDBLIST SEASON TYPES
+        # if self.item_type == 'season':
+        #     return self.item["season"]["number"]
+        if self.item_type == 'episode':
+            return self.item["episode"]["season"]
+
+    """
+    episode_number
+    """
+    @cached_property
+    def episode_number(self):
+        return self.get_episode_number()
+
+    def get_episode_number(self):
+        if self.item_type == 'episode':
+            return self.item["episode"]["number"]
 
     """
     tmdb_id
@@ -22,23 +45,13 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
 
     def get_tmdb_id(self):
         try:
-            return self.item[self.item_type]['ids']['tmdb']
+            return self.item[self.parent_item_type]['ids']['tmdb']
         except KeyError:
             pass
         try:
             return self.item['ids']['tmdb']
         except KeyError:
             pass
-
-    """
-    last_collected_at
-    """
-    @cached_property
-    def last_collected_at(self):
-        return self.get_last_collected_at()
-
-    def get_last_collected_at(self):
-        return self.item.get('last_collected_at') or self.item.get('collected_at')
 
     """
     listed_at

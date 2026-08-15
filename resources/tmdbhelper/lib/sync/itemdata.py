@@ -49,6 +49,56 @@ class SyncItemData:
             return 'show'
         return self.item_type
 
+    """
+    id
+    """
+    @cached_property
+    def id(self):
+        return self.get_id()
+
+    def get_id(self):
+        return self.item.get('id')
+
+    """
+    progress
+    """
+    @cached_property
+    def progress(self):
+        return self.get_progress()
+
+    def get_progress(self):
+        return self.item.get('progress')
+
+    """
+    last_updated_at
+    """
+    @cached_property
+    def last_updated_at(self):
+        return self.get_last_updated_at()
+
+    def get_last_updated_at(self):
+        return self.item.get('last_updated_at') or self.item.get('updated_at')
+
+    """
+    paused_at
+    """
+    @cached_property
+    def paused_at(self):
+        return self.get_paused_at()
+
+    def get_paused_at(self):
+        return self.item.get('paused_at')
+
+    """
+    last_collected_at
+    """
+    @cached_property
+    def last_collected_at(self):
+        return self.get_last_collected_at()
+
+    def get_last_collected_at(self):
+        return self.item.get('last_collected_at') or self.item.get('collected_at')
+
 
 class SyncItem:
 
