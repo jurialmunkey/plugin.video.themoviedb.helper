@@ -35,49 +35,11 @@ class BaseDirItemTraktMostWatched(BaseDirItemTraktAuthorised):
 class BaseDirItemTraktInProgress(BaseDirItemTraktAuthorised):
     priority = 170
     label_localized = 32196
-    types = ('movie', 'tv', )
+    types = ('tv', )
     params = {'info': 'trakt_inprogress'}
     sorting = True
     art_icon = 'resources/icons/trakt/inprogress.png'
     group = 32196
-
-
-class BaseDirItemTraktOnDeck(BaseDirItemTraktAuthorised):
-    priority = 180
-    label_type = 'localize'
-    label_localized = 32406
-    types = ('tv', )
-    params = {'info': 'trakt_ondeck'}
-    art_icon = 'resources/icons/trakt/inprogress.png'
-    group = 32196
-
-
-class BaseDirItemTraktOnDeckUnWatchedMovie(BaseDirItemTraktAuthorised):
-    priority = 190
-    label_type = 'appended'
-    label_localized = 32196
-    types = ('movie', )
-    params = {'info': 'trakt_ondeck_unwatched'}
-    art_icon = 'resources/icons/trakt/inprogress.png'
-    group = 32196
-
-    @cached_property
-    def label_append(self):
-        return get_localized(16101)
-
-
-class BaseDirItemTraktOnDeckUnWatchedTV(BaseDirItemTraktAuthorised):
-    priority = 200
-    label_type = 'suffixed'
-    label_localized = 32406
-    types = ('tv', )
-    params = {'info': 'trakt_ondeck_unwatched'}
-    art_icon = 'resources/icons/trakt/inprogress.png'
-    group = 32196
-
-    @cached_property
-    def label_suffix(self):
-        return f'({get_localized(16101)})'
 
 
 class BaseDirItemTraktToWatch(BaseDirItemTraktAuthorised):
