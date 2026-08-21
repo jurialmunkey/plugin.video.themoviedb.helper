@@ -71,13 +71,23 @@ class GetTraktStatsRequest:
 
     @cached_property
     def items(self):
+        if not self.response_json:
+            return []
+        return self.get_items(self.response_json)
+
+    def get_items(self, stat, name=None, base=None):
+        if isinstance(stat, int):
+            return [{
+                'name': name,
+                'type': base or 'user',
+                'stat': stat,
+            }]
         return [
-            {
-                'name': item_k,
-                'type': base_k,
-                'stat': item_v,
-            }
-            for base_k, base_v in self.response_json.items()
-            for item_k, item_v in base_v.items()
-            if isinstance(item_v, int)
-        ] if self.response_json else []
+            item
+            for item_name, item_stat in stat.items()
+            for item in self.get_items(
+                stat=item_stat,
+                name=item_name,
+                base=name if not base else f'{base}_{name}'
+            )
+        ] if isinstance(stat, dict) else []
