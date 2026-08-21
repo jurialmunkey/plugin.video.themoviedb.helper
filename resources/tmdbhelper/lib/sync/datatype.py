@@ -147,7 +147,7 @@ class DataType(SyncDataParentProperties):
         self.store_last_activity()
 
 
-class DataTypeEpisodes:
+class DataTypeEpisodesInShows:
 
     @cached_property
     def item_type(self):
@@ -167,3 +167,14 @@ class DataTypeEpisodes:
         if self.item_type == 'show':
             return 'episodes'
         return f'{self.item_type}s'
+
+
+class DataTypeEpisodesNotShows:
+
+    @cached_property
+    def item_type(self):
+        if self._item_type in ('show', 'season', 'episode'):
+            return 'episode'
+        if self._item_type == 'movie':
+            return 'movie'
+        raise ValueError(f'Invalid item_type {self._item_type} for {self.method}')

@@ -1,9 +1,13 @@
 from tmdbhelper.lib.addon.consts import MDBLIST_MAX_ITEMS_PER_PAGE
-from tmdbhelper.lib.sync.datatype import DataType, DataTypeEpisodes
+from tmdbhelper.lib.sync.datatype import DataType, DataTypeEpisodesInShows, DataTypeEpisodesNotShows
 from tmdbhelper.lib.addon.logger import kodi_log
 
 
 class MDbListDataType(DataType):
+
+    @property
+    def data_key(self):
+        return f'{self.item_type}s'
 
     @property
     def sync_args(self):
@@ -29,14 +33,10 @@ class MDbListDataType(DataType):
             return
 
     def get_data_list_by_type(self, data):
-        if isinstance(data, list):
+        if self.data_key is None:
             return data
         try:
-            return data['items']
-        except KeyError:
-            pass
-        try:
-            return data[f'{self.item_type}s']
+            return data[self.data_key]
         except KeyError:
             pass
 
@@ -69,5 +69,9 @@ class MDbListDataType(DataType):
         return data
 
 
-class MDbListDataTypeEpisodes(DataTypeEpisodes, MDbListDataType):
+class MDbListDataTypeEpisodesInShows(DataTypeEpisodesInShows, MDbListDataType):
+    pass
+
+
+class MDbListDataTypeEpisodesNotShows(DataTypeEpisodesNotShows, MDbListDataType):
     pass

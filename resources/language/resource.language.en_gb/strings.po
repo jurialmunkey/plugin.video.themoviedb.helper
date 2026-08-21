@@ -2062,6 +2062,11 @@ msgctxt "#32391"
 msgid "Select update type"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32408"
+msgid "History"
+msgstr ""
+
 #: /resources/lib/script/router.py
 msgctxt "#32392"
 msgid ""

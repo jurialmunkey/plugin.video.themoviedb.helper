@@ -7,7 +7,6 @@ SyncHiddenProgressWatched = trakt_synctype.SyncHiddenProgressWatched
 SyncHiddenProgressCollected = trakt_synctype.SyncHiddenProgressCollected
 SyncHiddenCalendar = trakt_synctype.SyncHiddenCalendar
 SyncHiddenDropped = trakt_synctype.SyncHiddenDropped
-SyncWatched = trakt_synctype.SyncWatched
 SyncRatings = trakt_synctype.SyncRatings
 SyncFavorites = trakt_synctype.SyncFavorites
 SyncAllNextEpisodes = trakt_synctype.SyncAllNextEpisodes
@@ -47,3 +46,12 @@ def SyncNextEpisodesFactory():
 
 
 SyncNextEpisodes = SyncNextEpisodesFactory()
+
+
+def SyncWatchedFactory():
+    if get_setting('sync_source_watched', 'str') == 'MDbList':
+        return mdblist_synctype.SyncWatched
+    return trakt_synctype.SyncWatched
+
+
+SyncWatched = SyncWatchedFactory()

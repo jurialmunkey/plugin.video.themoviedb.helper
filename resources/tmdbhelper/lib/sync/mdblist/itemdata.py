@@ -9,7 +9,11 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
     # FIXME TODO
     rank = None
     notes = None
+    plays = 1
     last_updated_at = None
+    aired_episodes = 0
+    watched_episodes = 0
+    reset_at = None
 
     """
     season_number
@@ -45,12 +49,8 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
 
     def get_tmdb_id(self):
         try:
-            return self.item[self.parent_item_type]['ids']['tmdb']
-        except KeyError:
-            pass
-        try:
-            return self.item['ids']['tmdb']
-        except KeyError:
+            return self.get_data_by_key('ids')['tmdb']
+        except (AttributeError, KeyError, TypeError):
             pass
 
     """
@@ -70,6 +70,10 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
     def get_data_by_key(self, key):
         try:
             return self.item[self.parent_item_type][key]
+        except (AttributeError, KeyError, TypeError):
+            pass
+        try:
+            return self.item[self.item_type][self.parent_item_type][key]
         except (AttributeError, KeyError, TypeError):
             pass
         try:
