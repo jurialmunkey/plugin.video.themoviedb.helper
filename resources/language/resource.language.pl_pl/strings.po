@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2026-01-08 06:00+0200\n"
+"PO-Revision-Date: 2026-08-15 06:00+0200\n"
 "Last-Translator: 3vtv\n"
 "Language-Team: POLISH\n"
 "Language: pl_PL\n"
@@ -2715,6 +2715,26 @@ msgstr "Niebinarna"
 msgctxt "#32536"
 msgid "Unspecified"
 msgstr "Nieokreślona"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32537"
+msgid "Availability"
+msgstr "Dostępność"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32538"
+msgid "My favorites"
+msgstr "Moje ulubione"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32539"
+msgid "Streaming now"
+msgstr "Obecnie w streamingu"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32540"
+msgid "All digital releases"
+msgstr "Wszystkie wydania cyfrowe"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
