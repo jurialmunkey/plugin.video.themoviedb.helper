@@ -6,14 +6,14 @@ body:
 - type: textarea
   attributes:
     label: Describe the bug
-    description: A clear and concise description of the bug.
+    description: A clear and concise description of the bug. Do NOT include AI diagnosis or random snippets. Describe the issue that YOU are encountering not an AI.
   validations:
     required: true
 - type: textarea
   attributes:
     label: Steps To Reproduce
     description: |
-      Steps to reproduce the behavior.
+      Steps to reproduce the behavior. Do NOT include AI diagnosis or snippets of logs. ONLY provide steps to reproduce.
       If the issue is skinning related, please provide full plugin:// path and/or the specific $INFO[] values not working.
       If the issues is user related, please provide exact steps to reproduce the issue including relevant settings.
     placeholder: |
@@ -32,13 +32,15 @@ body:
       
       Tip: You can attach files by clicking this area to highlight it and then dragging files in.
       https://kodi.wiki/view/Log_file#Log_file_location
+
+      Failure to upload a full log will result in your issue report being closed.
   validations:
     required: true
 - type: textarea
   attributes:
     label: Screenshots and Additional Info
     description: |
-      Provide any relevant additional information such as screenshots or other details here.
+      Provide any relevant additional information such as screenshots or other details here. Do NOT add AI diagnosis or other clanker halucinations. Only provide information which is relevant to reproducing or highlighting the issue.
 
       Tip: You can attach images by clicking this area to highlight it and then dragging files in.
   validations:
@@ -55,4 +57,6 @@ body:
     - label: I have described the bug and included steps to reproduce the issue
       required: true
     - label: I have uploaded my debug log.
+      required: true
+    - label: I have read the note on AI usage in reports in https://github.com/jurialmunkey/plugin.video.themoviedb.helper/issues/1856
       required: true

@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 21:05+0000\n"
-"PO-Revision-Date: 2026-04-27 15:56+0800\n"
+"PO-Revision-Date: 2026-08-15 19:00+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -2045,6 +2045,11 @@ msgctxt "#32382"
 msgid "Hide Episode Groups"
 msgstr "隐藏剧集分组"
 
+#: /resources/tmdbhelper/lib/script/method/image_functions.py
+msgctxt "#32399"
+msgid "Retrieving Artwork"
+msgstr "正在获取艺术图"
+
 #: /resources/settings.xml
 msgctxt "#32383"
 msgid "Hide Episode Groups and Specials"
@@ -2054,6 +2059,16 @@ msgstr "隐藏剧集分组与特别节目"
 msgctxt "#32384"
 msgid "Hide Episode Groups and Up Next"
 msgstr "隐藏剧集分组和下个播放"
+
+#: /resources/settings.xml
+msgctxt "#32402"
+msgid "Scrobble items on MDbList while watching"
+msgstr "观看时向 MDbList 同步播放记录"
+
+#: /resources/settings.xml
+msgctxt "#32403"
+msgid "Sync"
+msgstr "同步"
 
 #: /resources/settings.xml
 msgctxt "#32385"
@@ -2110,11 +2125,6 @@ msgstr "原始"
 msgctxt "#32398"
 msgid "Medium"
 msgstr "中等"
-
-#: /resources/tmdbhelper/lib/script/method/image_functions.py
-msgctxt "#32399"
-msgid "Retrieving Artwork"
-msgstr "正在获取艺术图"
 
 #: /resources/settings.xml
 msgctxt "#32400"
@@ -2722,6 +2732,26 @@ msgctxt "#32536"
 msgid "Unspecified"
 msgstr "未指定"
 
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32537"
+msgid "Availability"
+msgstr "可播平台"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32538"
+msgid "My favorites"
+msgstr "我的收藏"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32539"
+msgid "Streaming now"
+msgstr "正在线上播放"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32540"
+msgid "All digital releases"
+msgstr "全部数字发行影片"
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr "印地语（印度）"
@@ -2873,6 +2903,10 @@ msgstr "普通话（台湾）"
 msgctxt "#30067"
 msgid "Zulu (South Africa)"
 msgstr "祖鲁语（南非）"
+
+msgctxt "#30068"
+msgid "Croatian (Croatia)"
+msgstr "克罗地亚语（克罗地亚）"
 
 #: /resources/settings.xml
 msgctxt "#32001"

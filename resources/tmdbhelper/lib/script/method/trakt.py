@@ -123,7 +123,7 @@ def get_stats(**kwargs):
 
     def set_allstats(d, base_name, update_combined=True):
         for k, v in d.items():
-            stat_name, stat_type = k.split('_')
+            stat_name, stat_type = k.split('_', 1)
             set_property(base_name, stat_name, stat_type, v)
             set_combined(stat_name, v) if update_combined else None
 

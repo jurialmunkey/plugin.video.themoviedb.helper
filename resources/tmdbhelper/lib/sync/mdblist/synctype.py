@@ -1,4 +1,4 @@
-from tmdbhelper.lib.sync.mdblist.datatype import MDbListDataType, MDbListDataTypeEpisodes
+from tmdbhelper.lib.sync.mdblist.datatype import MDbListDataType, MDbListDataTypeEpisodesInShows, MDbListDataTypeEpisodesNotShows
 from tmdbhelper.lib.addon.consts import HALFDAY_EXPIRY
 
 
@@ -26,12 +26,15 @@ class SyncCollection(MDbListDataType):
         return sync_kwgs
 
 
-class SyncPlayback(MDbListDataTypeEpisodes):
+class SyncPlayback(MDbListDataTypeEpisodesInShows):
     keys = ('progress', 'paused_at', 'id', )
     last_activities_key = 'paused_at'
     sync_kwgs = {}
     method = 'sync/playback'
     key_prefix = 'playback'
+
+    def get_data_list_by_type(self, data):
+        return data  # Data comes as a list already
 
 
 class SyncNextEpisodes(MDbListDataType):  # TODO: Check if should be basic datatype not episodes
@@ -40,3 +43,21 @@ class SyncNextEpisodes(MDbListDataType):  # TODO: Check if should be basic datat
     method = 'upnext'
     sync_kwgs = {}
     expiry_time = HALFDAY_EXPIRY
+
+    def get_data_list_by_type(self, data):
+        try:
+            return data['items']  # API list style
+        except KeyError:
+            pass
+
+
+class SyncWatched(MDbListDataTypeEpisodesNotShows):
+    keys = ('plays', 'last_watched_at', 'last_updated_at', 'aired_episodes', 'watched_episodes', 'reset_at', )
+    last_activities_key = 'watched_at'
+    method = 'sync/watched'
+    aggregate_key = 'plays'
+
+    @property
+    def sync_kwgs(self):
+        sync_kwgs = {'mediatype': self.item_type, 'plays': 'all'}
+        return sync_kwgs

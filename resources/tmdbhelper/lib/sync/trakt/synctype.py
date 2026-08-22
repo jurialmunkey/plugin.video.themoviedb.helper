@@ -2,7 +2,7 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, is_unaired_timestamp
 from tmdbhelper.lib.addon.consts import HALFDAY_EXPIRY
 from tmdbhelper.lib.sync.datatype import timerlock
-from tmdbhelper.lib.sync.trakt.datatype import TraktDataType, TraktDataTypeEpisodes
+from tmdbhelper.lib.sync.trakt.datatype import TraktDataType, TraktDataTypeEpisodesInShows
 
 
 class SyncHiddenProgressWatched(TraktDataType):
@@ -40,14 +40,14 @@ class SyncHiddenDropped(SyncHiddenProgressWatched):
     key_prefix = 'dropped'
 
 
-class SyncWatched(TraktDataTypeEpisodes):
+class SyncWatched(TraktDataTypeEpisodesInShows):
     keys = ('plays', 'last_watched_at', 'last_updated_at', 'aired_episodes', 'watched_episodes', 'reset_at', )
     last_activities_key = 'watched_at'
     sync_kwgs = {'extended': 'full,progress'}
     method = 'watched'
 
 
-class SyncPlayback(TraktDataTypeEpisodes):
+class SyncPlayback(TraktDataTypeEpisodesInShows):
     keys = ('progress', 'paused_at', 'id', )
     last_activities_key = 'paused_at'
     sync_kwgs = {'extended': 'full'}
@@ -77,7 +77,7 @@ class SyncWatchlist(TraktDataType):
     key_prefix = 'watchlist'
 
 
-class SyncCollection(TraktDataTypeEpisodes):
+class SyncCollection(TraktDataTypeEpisodesInShows):
     keys = ('last_collected_at', 'last_updated_at', )
     last_activities_key = 'collected_at'
     method = 'collection'
@@ -293,7 +293,7 @@ class SyncAllNextEpisodesMeta:
         return sd
 
 
-class SyncAllNextEpisodes(TraktDataTypeEpisodes):
+class SyncAllNextEpisodes(TraktDataTypeEpisodesInShows):
     keys = ('upnext_episode_id', )
     last_activities_key = 'watched_at'
     method = 'all_next_episodes'
