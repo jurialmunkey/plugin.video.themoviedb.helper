@@ -32,18 +32,9 @@ class SyncPlayback(MDbListDataTypeEpisodesInShows):
     sync_kwgs = {}
     method = 'sync/playback'
     key_prefix = 'playback'
-    data_key = None  # Returned as list at base level
 
-
-class SyncWatched(MDbListDataTypeEpisodesNotShows):
-    keys = ('plays', 'last_watched_at', 'last_updated_at', 'aired_episodes', 'watched_episodes', 'reset_at', )
-    last_activities_key = 'watched_at'
-    method = 'sync/watched'
-
-    @property
-    def sync_kwgs(self):
-        sync_kwgs = {'mediatype': self.item_type}
-        return sync_kwgs
+    def get_data_list_by_type(self, data):
+        return data  # Data comes as a list already
 
 
 class SyncNextEpisodes(MDbListDataType):  # TODO: Check if should be basic datatype not episodes
@@ -52,4 +43,21 @@ class SyncNextEpisodes(MDbListDataType):  # TODO: Check if should be basic datat
     method = 'upnext'
     sync_kwgs = {}
     expiry_time = HALFDAY_EXPIRY
-    data_key = 'items'  # Uses old style API with list in items key
+
+    def get_data_list_by_type(self, data):
+        try:
+            return data['items']  # API list style
+        except KeyError:
+            pass
+
+
+class SyncWatched(MDbListDataTypeEpisodesNotShows):
+    keys = ('plays', 'last_watched_at', 'last_updated_at', 'aired_episodes', 'watched_episodes', 'reset_at', )
+    last_activities_key = 'watched_at'
+    method = 'sync/watched'
+    aggregate_key = 'plays'
+
+    @property
+    def sync_kwgs(self):
+        sync_kwgs = {'mediatype': self.item_type, 'plays': 'all'}
+        return sync_kwgs

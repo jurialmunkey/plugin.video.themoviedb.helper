@@ -5,9 +5,7 @@ from tmdbhelper.lib.addon.logger import kodi_log
 
 class MDbListDataType(DataType):
 
-    @property
-    def data_key(self):
-        return f'{self.item_type}s'
+    aggregate_key = None
 
     @property
     def sync_args(self):
@@ -33,14 +31,23 @@ class MDbListDataType(DataType):
             return
 
     def get_data_list_by_type(self, data):
-        if self.data_key is None:
-            return data
         try:
-            return data[self.data_key]
+            return data[f'{self.item_type}s']
         except KeyError:
             pass
 
-    def get_response_sync(self, *args, **kwargs):
+    def get_aggregate_key_list(self, data, key):
+        if not data or not key:
+            return data
+        items = {}
+        for i in data:
+            item_id = i[self.item_type]['ids']['tmdb']
+            item = items.setdefault(item_id, i)
+            item[key] = item.get(key, 0) + 1
+        data = [i for i in items.values()]
+        return data
+
+    def get_response_sync_list(self, *args, **kwargs):
         response = self.get_response_sync_data(*args, **kwargs)
 
         # Check we actually get a response
@@ -62,11 +69,15 @@ class MDbListDataType(DataType):
         if next_cursor:  # and self.is_next_required(data):
             kodi_log(f'Sync: next_cursor: {args} {kwargs}', 2)
             kwargs['cursor'] = next_cursor
-            data.extend(self.get_response_sync(*args, **kwargs) or [])
+            data.extend(self.get_response_sync_list(*args, **kwargs) or [])
         else:
             kodi_log(f'Sync: stop_cursor: {args} {kwargs}', 2)
 
         return data
+
+    def get_response_sync(self, *args, **kwargs):
+        data = self.get_response_sync_list(*args, **kwargs)
+        return self.get_aggregate_key_list(data, key=self.aggregate_key)
 
 
 class MDbListDataTypeEpisodesInShows(DataTypeEpisodesInShows, MDbListDataType):

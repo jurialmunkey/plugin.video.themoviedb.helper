@@ -9,7 +9,6 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
     # FIXME TODO
     rank = None
     notes = None
-    plays = 1
     last_updated_at = None
     aired_episodes = 0
     watched_episodes = 0
@@ -182,6 +181,16 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
         return f'{air_date}T00:00:00.000Z'  # No time from MDBList so set as 00:00 utc
 
     """
+    plays
+    """
+    @cached_property
+    def plays(self):
+        return self.get_plays()
+
+    def get_plays(self):
+        return self.get_data_by_key('plays')
+
+    """
     last_watched_at
     """
     @cached_property
@@ -189,7 +198,7 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
         return self.get_last_watched_at()
 
     def get_last_watched_at(self):
-        return self.item.get('last_watched_at')
+        return self.get_data_by_key('last_watched_at') or self.get_data_by_key('watched_at')
 
 
 class MDbListSyncItem(SyncItem):
@@ -232,9 +241,6 @@ class MDbListSyncItem(SyncItem):
 
         for item in self.meta:
             item_data = MDbListSyncItemData(item, item.get('type') or self.item_type)
-
-            # Iterate through seasons data for watched type syncs where seasons/episodes presented as list
-            # sync_seasons(item_data, item)  # TODO: FIXME DOES MDBLIST WORK LIKE THIS???
 
             # Set values to back to keys for database storage
             data[item_data.item_id] = [getattr(item_data, k) for k in self.keys]
