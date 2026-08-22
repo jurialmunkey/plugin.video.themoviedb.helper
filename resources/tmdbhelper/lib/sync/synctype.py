@@ -49,8 +49,8 @@ SyncNextEpisodes = SyncNextEpisodesFactory()
 
 
 def SyncWatchedFactory():
-    if get_setting('sync_source_watched', 'str') == 'MDbList':
-        return mdblist_synctype.SyncWatched
+    # if get_setting('sync_source_watched', 'str') == 'MDbList':
+    #     return mdblist_synctype.SyncWatched
     return trakt_synctype.SyncWatched
 
 
