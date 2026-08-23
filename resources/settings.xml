@@ -607,7 +607,7 @@
             </group>
 
             <group id="1" label="39031">
-                <!-- <setting id="sync_source_watched" type="string" label="32408" help="">
+                <setting id="sync_source_watched" type="string" label="32408" help="">
                     <level>0</level>
                     <default>Trakt</default>
                     <constraints>
@@ -617,7 +617,7 @@
                         </options>
                     </constraints>
                     <control type="spinner" format="string"/>
-                </setting> -->
+                </setting>
                 <setting id="sync_source_watchlist" type="string" label="32193" help="">
                     <level>0</level>
                     <default>Trakt</default>
