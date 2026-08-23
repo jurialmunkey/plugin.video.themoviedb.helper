@@ -20,7 +20,11 @@ class ItemFinaliserBasic:
 
 class ItemFinaliserMedia(ItemFinaliserBasic):
     @cached_property
-    def format_unaired_labels(self):
+    def has_unaired_formatting(self):
+        self.list_item.format_unaired_labels = self.get_unaired_formatting()
+        return self.list_item.format_unaired_labels
+
+    def get_unaired_formatting(self):
         if not self.container.format_unaired_labels:
             return False
         if self.list_item.infoproperties.get('specialseason'):
@@ -29,7 +33,7 @@ class ItemFinaliserMedia(ItemFinaliserBasic):
 
     @cached_property
     def is_visible(self):
-        if not self.format_unaired_labels:
+        if not self.has_unaired_formatting:
             return True
         if self.container.hide_unaired and self.list_item.is_unaired:
             return False
@@ -39,23 +43,33 @@ class ItemFinaliserMedia(ItemFinaliserBasic):
 
     @cached_property
     def is_excluded(self):
+        self.has_kodi_details   # Must add kodi_details first for filtering
         return is_excluded(self.list_item, is_listitem=True, **self.container.filters)
 
     @cached_property
-    def kodi_details(self):
+    def has_kodi_details(self):
+        return self.set_kodi_details(self.get_kodi_details())
+
+    def get_kodi_details(self):
         try:
             return self.container.kodi_db.get_kodi_details(self.list_item)
         except AttributeError:
             return
 
+    def set_kodi_details(self, kodi_details):
+        if not kodi_details:
+            return
+        self.list_item.set_details(details=kodi_details, reverse=self.container.kodi_db_preferred)
+        return kodi_details
+
     def get_item(self):
         if not self.is_visible:
             return
 
-        self.list_item.format_unaired_labels = self.format_unaired_labels
-        self.list_item.set_details(details=self.kodi_details, reverse=self.container.kodi_db_preferred)
+        self.has_unaired_formatting
+        self.has_kodi_details
 
-        if self.is_excluded:  # Filter out items that are excluded (done after adding Kodi details so can filter against them)
+        if self.is_excluded:
             return
 
         self.list_item.context_additions = self.container.context_additions
