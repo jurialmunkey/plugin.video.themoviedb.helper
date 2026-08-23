@@ -60,7 +60,7 @@ class MDbListDataType(DataType):
         except AttributeError:
             return
 
-        if not data or not isinstance(data, list):
+        if not isinstance(data, list):
             return
 
         # Check if we have a next_cursor and if we need the data
