@@ -55,9 +55,10 @@ class SyncWatched(MDbListDataTypeEpisodesNotShows):
     keys = ('plays', 'last_watched_at', 'last_updated_at', 'aired_episodes', 'watched_episodes', 'reset_at', )
     last_activities_key = 'watched_at'
     method = 'sync/watched'
-    aggregate_key = 'plays'
+    aggregate_key = 'plays'  # TODO: Consider more efficient way of collecting play counts
 
     @property
     def sync_kwgs(self):
-        sync_kwgs = {'mediatype': self.item_type, 'plays': 'all'}
+        sync_kwgs = {'mediatype': self.item_type}  # TODO: Consider more efficient way of collecting play counts. For now only collect most recent play.
+        # sync_kwgs = {'mediatype': self.item_type, 'plays': 'all'}
         return sync_kwgs
