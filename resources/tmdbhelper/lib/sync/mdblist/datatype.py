@@ -67,11 +67,12 @@ class MDbListDataType(DataType):
         next_cursor = self.get_next_cursor(response)
 
         if next_cursor:  # and self.is_next_required(data):
-            kodi_log(f'Sync: next_cursor: {args} {kwargs}', 2)
+            self.dialog_progress_bg.update(
+                self.dialog_progress_bg.increment(),
+                message='Retrieving next_cursor'
+            )
             kwargs['cursor'] = next_cursor
             data.extend(self.get_response_sync_list(*args, **kwargs) or [])
-        else:
-            kodi_log(f'Sync: stop_cursor: {args} {kwargs}', 2)
 
         return data
 
