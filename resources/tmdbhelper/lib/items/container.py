@@ -84,11 +84,6 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         return get_setting('contextmenu_make_node') if not self.is_widget else False
 
     @cached_property
-    def is_excluded(self):
-        from tmdbhelper.lib.items.filters import is_excluded
-        return is_excluded
-
-    @cached_property
     def trakt_playdata(self):
         from tmdbhelper.lib.items.trakt import TraktPlayData
         return TraktPlayData(
@@ -128,41 +123,14 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
     def only_unaired(self):
         return boolean(self.parent_params.get('only_unaired'))
 
+    @cached_property
+    def item_finaliser(self):
+        from tmdbhelper.lib.items.finaliser import ItemFinaliser
+        return ItemFinaliser
+
     def make_item(self, li):
-        if not li:
-            return
-
-        def finalise_next_page():
-            li.params['cacheonly'] = self.is_cacheonly
-            li.params['plugin_category'] = self.plugin_category  # Carry the plugin category to next page in plugin:// path
-            return li.finalise()
-
-        def finalise_mediaitem():
-            # Check if unaired and either apply special formatting or hide item depending on user settings
-            li.format_unaired_labels = bool(self.format_unaired_labels and not li.infoproperties.get('specialseason'))
-            if li.format_unaired_labels and self.hide_unaired and li.is_unaired:
-                return
-            if li.format_unaired_labels and self.only_unaired and not li.is_unaired:
-                return
-
-            # Add details from Kodi library
-            try:
-                li.set_details(details=self.kodi_db.get_kodi_details(li), reverse=self.kodi_db_preferred)
-            except AttributeError:
-                pass
-
-            # Filter out items that are excluded (done after adding Kodi details so can filter against them)
-            if self.is_excluded(li, is_listitem=True, **self.filters):
-                return
-
-            li.context_additions = self.context_additions
-            li.thumb_override = self.thumb_override
-            li.infoproperties_additions['widget'] = self.plugin_category
-            li.infoproperties_additions.update(self.property_params)
-
-            return li.finalise()
-
-        return finalise_next_page() if li.next_page else finalise_mediaitem()
+        ci = self.item_finaliser(self, li)
+        return ci.item if ci else None
 
     def make_items(self, items):
         make_items = [self.make_item(i) for i in items if i]
