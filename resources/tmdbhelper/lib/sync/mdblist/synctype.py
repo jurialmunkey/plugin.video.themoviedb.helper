@@ -55,7 +55,7 @@ class SyncWatched(MDbListDataTypeEpisodesNotShows):
     keys = ('plays', 'last_watched_at', 'last_updated_at', 'aired_episodes', 'watched_episodes', 'reset_at', )
     last_activities_key = 'watched_at'
     method = 'sync/watched'
-    aggregate_key = 'plays'  # TODO: Consider more efficient way of collecting play counts
+    aggregate_key = 'plays'  # TODO: Consider more efficient way of collecting play counts (currently disabled plays=all kwgs)
 
     def clear_columns(self, *args, **kwargs):
         if self.timestamp:  # Skip clearing columns if we just update
@@ -66,6 +66,6 @@ class SyncWatched(MDbListDataTypeEpisodesNotShows):
     def sync_kwgs(self):
         sync_kwgs = (
             ('mediatype', self.item_type),
-            ('since', self.timestamp),
+            ('since', self.timestamp),  # TODO: DO THIS WITH JOURNAL INSTEAD AND REMOVE ITEMS too
         )
         return {k: v for k, v in sync_kwgs if v}
