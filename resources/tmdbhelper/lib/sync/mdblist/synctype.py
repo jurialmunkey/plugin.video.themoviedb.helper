@@ -57,8 +57,15 @@ class SyncWatched(MDbListDataTypeEpisodesNotShows):
     method = 'sync/watched'
     aggregate_key = 'plays'  # TODO: Consider more efficient way of collecting play counts
 
+    def clear_columns(self, *args, **kwargs):
+        if self.timestamp:  # Skip clearing columns if we just update
+            return
+        super().clear_columns(*args, **kwargs)
+
     @property
     def sync_kwgs(self):
-        sync_kwgs = {'mediatype': self.item_type}  # TODO: Consider more efficient way of collecting play counts. For now only collect most recent play.
-        # sync_kwgs = {'mediatype': self.item_type, 'plays': 'all'}
-        return sync_kwgs
+        sync_kwgs = (
+            ('mediatype', self.item_type),
+            ('since', self.timestamp),
+        )
+        return {k: v for k, v in sync_kwgs if v}
