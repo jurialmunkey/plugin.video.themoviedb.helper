@@ -14,6 +14,7 @@ class MDbListRatingMappingObject:
         'metacriticuser': lambda v: int(v * 10),  # Convert out of /10 to 100%
         'letterboxd': lambda v: int(v * 20),  # Convert 5 stars to 100%
         'rogerebert': lambda v: int(v * 25),  # Convert 4 stars to 100%
+        'myanimelist': lambda v: int(v * 10),  # Convert out of /10 to 100%
     }
 
     def __init__(self, meta):
