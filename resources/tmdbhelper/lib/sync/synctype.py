@@ -3,55 +3,59 @@ import tmdbhelper.lib.sync.trakt.synctype as trakt_synctype
 import tmdbhelper.lib.sync.mdblist.synctype as mdblist_synctype
 
 
-SyncHiddenProgressWatched = trakt_synctype.SyncHiddenProgressWatched
-SyncHiddenProgressCollected = trakt_synctype.SyncHiddenProgressCollected
-SyncHiddenCalendar = trakt_synctype.SyncHiddenCalendar
-SyncHiddenDropped = trakt_synctype.SyncHiddenDropped
-SyncRatings = trakt_synctype.SyncRatings
-SyncFavorites = trakt_synctype.SyncFavorites
-SyncAllNextEpisodes = trakt_synctype.SyncAllNextEpisodes
+def SyncHiddenProgressWatched():
+    return trakt_synctype.SyncHiddenProgressWatched
 
 
-def SyncWatchlistFactory():
+def SyncHiddenProgressCollected():
+    return trakt_synctype.SyncHiddenProgressCollected
+
+
+def SyncHiddenCalendar():
+    return trakt_synctype.SyncHiddenCalendar
+
+
+def SyncHiddenDropped():
+    return trakt_synctype.SyncHiddenDropped
+
+
+def SyncRatings():
+    return trakt_synctype.SyncRatings
+
+
+def SyncFavorites():
+    return trakt_synctype.SyncFavorites
+
+
+def SyncAllNextEpisodes():
+    return trakt_synctype.SyncAllNextEpisodes
+
+
+def SyncWatchlist():
     if get_setting('sync_source_watchlist', 'str') == 'MDbList':
         return mdblist_synctype.SyncWatchlist
     return trakt_synctype.SyncWatchlist
 
 
-SyncWatchlist = SyncWatchlistFactory()
-
-
-def SyncCollectionFactory():
+def SyncCollection():
     if get_setting('sync_source_collection', 'str') == 'MDbList':
         return mdblist_synctype.SyncCollection
     return trakt_synctype.SyncCollection
 
 
-SyncCollection = SyncCollectionFactory()
-
-
-def SyncPlaybackFactory():
+def SyncPlayback():
     if get_setting('sync_source_playback', 'str') == 'MDbList':
         return mdblist_synctype.SyncPlayback
     return trakt_synctype.SyncPlayback
 
 
-SyncPlayback = SyncPlaybackFactory()
-
-
-def SyncNextEpisodesFactory():
+def SyncNextEpisodes():
     if get_setting('sync_source_upnext', 'str') == 'MDbList':
         return mdblist_synctype.SyncNextEpisodes
     return trakt_synctype.SyncNextEpisodes
 
 
-SyncNextEpisodes = SyncNextEpisodesFactory()
-
-
-def SyncWatchedFactory():
+def SyncWatched():
     if get_setting('sync_source_watched', 'str') == 'MDbList':
         return mdblist_synctype.SyncWatched
     return trakt_synctype.SyncWatched
-
-
-SyncWatched = SyncWatchedFactory()

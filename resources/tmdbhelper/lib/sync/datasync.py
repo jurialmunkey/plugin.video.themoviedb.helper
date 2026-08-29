@@ -496,7 +496,8 @@ class SyncData(SyncDataGetters):
     def sync(self, item_type, keys, forced=False):
         from jurialmunkey.modimp import importmodule
         for route in set([j for j in (self.routes.get(k) for k in keys) if j]):
-            importmodule(*route)(self, item_type).sync(forced=forced)
+            factory = importmodule(*route)
+            factory()(self, item_type).sync(forced=forced)
 
 
 def SyncDataFactory(parent=None):
