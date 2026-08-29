@@ -1,9 +1,9 @@
-from tmdbhelper.lib.items.directories.base.basedir_item import BaseDirItem, BaseDirItemTraktAuthorised
+from tmdbhelper.lib.items.directories.base.basedir_item import BaseDirItem, BaseDirItemAuthorised
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
 
 
-class BaseDirItemTraktFavorites(BaseDirItemTraktAuthorised):
+class BaseDirItemTraktFavorites(BaseDirItemAuthorised):
     priority = 110
     label_type = 'reversed'
     label_localized = 1036
@@ -14,16 +14,7 @@ class BaseDirItemTraktFavorites(BaseDirItemTraktAuthorised):
     group = 1036
 
 
-class BaseDirItemTraktHistory(BaseDirItemTraktAuthorised):
-    priority = 150
-    label_localized = 32194
-    types = ('movie', 'tv', 'episode', 'both', )
-    params = {'info': 'trakt_history'}
-    art_icon = 'resources/icons/trakt/recentlywatched.png'
-    group = 32194
-
-
-class BaseDirItemTraktMostWatched(BaseDirItemTraktAuthorised):
+class BaseDirItemTraktMostWatched(BaseDirItemAuthorised):
     priority = 160
     label_localized = 32195
     types = ('movie', 'tv', 'episode', )
@@ -32,7 +23,7 @@ class BaseDirItemTraktMostWatched(BaseDirItemTraktAuthorised):
     group = 32195
 
 
-class BaseDirItemTraktInProgress(BaseDirItemTraktAuthorised):
+class BaseDirItemTraktInProgress(BaseDirItemAuthorised):
     priority = 170
     label_localized = 32196
     types = ('tv', )
@@ -42,7 +33,7 @@ class BaseDirItemTraktInProgress(BaseDirItemTraktAuthorised):
     group = 32196
 
 
-class BaseDirItemTraktToWatch(BaseDirItemTraktAuthorised):
+class BaseDirItemTraktToWatch(BaseDirItemAuthorised):
     priority = 210
     label_type = 'reversed'
     label_localized = 32078
@@ -52,7 +43,7 @@ class BaseDirItemTraktToWatch(BaseDirItemTraktAuthorised):
     group = 32196
 
 
-class BaseDirItemTraktDropped(BaseDirItemTraktAuthorised):
+class BaseDirItemTraktDropped(BaseDirItemAuthorised):
     priority = 230
     label_type = 'localize'
     label_localized = 32048
@@ -62,7 +53,7 @@ class BaseDirItemTraktDropped(BaseDirItemTraktAuthorised):
     group = 32196
 
 
-class BaseDirItemTraktRecommendations(BaseDirItemTraktAuthorised):
+class BaseDirItemTraktRecommendations(BaseDirItemAuthorised):
     priority = 240
     label_type = 'reversed'
     label_localized = 32198
@@ -72,7 +63,7 @@ class BaseDirItemTraktRecommendations(BaseDirItemTraktAuthorised):
     group = 32223
 
 
-class BaseDirItemTraktBecauseYouWatched(BaseDirItemTraktAuthorised):
+class BaseDirItemTraktBecauseYouWatched(BaseDirItemAuthorised):
     priority = 250
     label_localized = 32199
     types = ('movie', 'tv', )
@@ -81,7 +72,7 @@ class BaseDirItemTraktBecauseYouWatched(BaseDirItemTraktAuthorised):
     group = 32223
 
 
-class BaseDirItemTraktBecauseMostWatched(BaseDirItemTraktAuthorised):
+class BaseDirItemTraktBecauseMostWatched(BaseDirItemAuthorised):
     priority = 260
     label_localized = 32200
     types = ('movie', 'tv', )
@@ -90,7 +81,7 @@ class BaseDirItemTraktBecauseMostWatched(BaseDirItemTraktAuthorised):
     group = 32223
 
 
-class BaseDirItemTraktMyAiring(BaseDirItemTraktAuthorised):
+class BaseDirItemTraktMyAiring(BaseDirItemAuthorised):
     priority = 270
     types = ('tv', )
     params = {'info': 'trakt_myairing'}
@@ -114,7 +105,7 @@ class BaseDirItemTraktMyAiring(BaseDirItemTraktAuthorised):
         return get_localized(32202)
 
 
-class BaseDirItemTraktAiringNext(BaseDirItemTraktAuthorised):
+class BaseDirItemTraktAiringNext(BaseDirItemAuthorised):
     priority = 280
     label_type = 'localize'
     label_localized = 32459
@@ -124,7 +115,7 @@ class BaseDirItemTraktAiringNext(BaseDirItemTraktAuthorised):
     group = 32203
 
 
-class BaseDirItemTraktCalendarDir(BaseDirItemTraktAuthorised):
+class BaseDirItemTraktCalendarDir(BaseDirItemAuthorised):
     priority = 290
     types = ('tv', )
     params = {'info': 'dir_calendar_trakt'}
@@ -537,7 +528,7 @@ class BaseDirItemTraktPopularLists(BaseDirItem):
     group = 32159
 
 
-class BaseDirItemTraktLikedLists(BaseDirItemTraktAuthorised):
+class BaseDirItemTraktLikedLists(BaseDirItemAuthorised):
     priority = 630
     label_type = 'localize'
     label_localized = 32210
@@ -547,7 +538,7 @@ class BaseDirItemTraktLikedLists(BaseDirItemTraktAuthorised):
     group = 32159
 
 
-class BaseDirItemTraktMyLists(BaseDirItemTraktAuthorised):
+class BaseDirItemTraktMyLists(BaseDirItemAuthorised):
     priority = 640
     label_type = 'localize'
     label_localized = 32211
