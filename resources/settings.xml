@@ -651,17 +651,6 @@
                     </constraints>
                     <control type="spinner" format="string"/>
                 </setting>
-                <setting id="sync_source_upnext" type="string" label="32043" help="">
-                    <level>0</level>
-                    <default>Trakt</default>
-                    <constraints>
-                        <options>
-                            <option>Trakt</option>
-                            <option>MDbList</option>
-                        </options>
-                    </constraints>
-                    <control type="spinner" format="string"/>
-                </setting>
             </group>
         </category>
         <category id="players" label="32014" help="">

@@ -28,6 +28,8 @@ def SyncFavorites():
 
 
 def SyncAllNextEpisodes():
+    if get_setting('sync_source_collection', 'str') == 'MDbList':
+        return  # TODO
     return trakt_synctype.SyncAllNextEpisodes
 
 
@@ -50,7 +52,7 @@ def SyncPlayback():
 
 
 def SyncNextEpisodes():
-    if get_setting('sync_source_upnext', 'str') == 'MDbList':
+    if get_setting('sync_source_watched', 'str') == 'MDbList':
         return mdblist_synctype.SyncNextEpisodes
     return trakt_synctype.SyncNextEpisodes
 

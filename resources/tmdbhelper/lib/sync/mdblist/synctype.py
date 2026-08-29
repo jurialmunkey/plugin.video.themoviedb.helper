@@ -52,7 +52,7 @@ class SyncNextEpisodes(MDbListDataType):  # TODO: Check if should be basic datat
 
 
 class SyncWatched(MDbListDataTypeEpisodesNotShows):
-    keys = ('plays', 'last_watched_at', 'last_updated_at', 'aired_episodes', 'watched_episodes', 'reset_at', )
+    keys = ('plays', 'last_watched_at', )  # 'last_updated_at', 'aired_episodes', 'watched_episodes', 'reset_at',
     last_activities_key = 'watched_at'
     method = 'sync/watched'
     aggregate_key = 'plays'  # TODO: Consider more efficient way of collecting play counts (currently disabled plays=all kwgs)
