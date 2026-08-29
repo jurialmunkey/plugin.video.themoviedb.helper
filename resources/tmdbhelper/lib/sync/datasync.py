@@ -515,7 +515,7 @@ def SyncDataFactory(parent=None):
 
     if not trakt_api and not mdblist_api:
         return
-    if not trakt_api.is_authorized:  # TODO: Allow MDBLIST ONLY
-        return
+    # if not trakt_api.is_authorized:  # TODO: Allow MDBLIST ONLY  # AUTHORIZED CHECK MDBLIST
+    #     return
 
     return SyncData(trakt_api=trakt_api, mdblist_api=mdblist_api)
