@@ -29,7 +29,7 @@ def SyncFavorites():
 
 def SyncAllNextEpisodes():
     if get_setting('sync_source_collection', 'str') == 'MDbList':
-        return  # TODO
+        return mdblist_synctype.SyncAllNextEpisodes
     return trakt_synctype.SyncAllNextEpisodes
 
 

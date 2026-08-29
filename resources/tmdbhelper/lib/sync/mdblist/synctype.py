@@ -37,8 +37,8 @@ class SyncPlayback(MDbListDataTypeEpisodesInShows):
         return data  # Data comes as a list already
 
 
-class SyncNextEpisodes(MDbListDataType):  # TODO: Check if should be basic datatype not episodes
-    keys = ('next_episode_id', 'next_episode_aired_at', 'last_watched_at', )
+class SyncNextEpisodes(MDbListDataType):
+    keys = ('next_episode_id', 'next_episode_aired_at', 'last_watched_at', 'aired_episodes', 'watched_episodes', )  # AIRED AND WATCHED DATA IN THIS ENDPOINT FOR MDBLIST
     last_activities_key = 'watched_at'
     method = 'upnext'
     sync_kwgs = {}
@@ -69,3 +69,14 @@ class SyncWatched(MDbListDataTypeEpisodesNotShows):
             ('since', self.timestamp),  # TODO: DO THIS WITH JOURNAL INSTEAD AND REMOVE ITEMS too
         )
         return {k: v for k, v in sync_kwgs if v}
+
+
+class SyncAllNextEpisodes(MDbListDataType):  # TODO: CURRENTLY A DUMMY TYPE DOES NOTHING
+    keys = ('upnext_episode_id', )
+    last_activities_key = 'watched_at'
+    method = 'all_next_episodes'
+    expiry_time = HALFDAY_EXPIRY
+    sync_kwgs = {}
+
+    def get_response_sync(self, *args, **kwargs):
+        return []

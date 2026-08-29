@@ -10,8 +10,6 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
     rank = None
     notes = None
     last_updated_at = None
-    aired_episodes = 0
-    watched_episodes = 0
     reset_at = None
 
     """
@@ -61,6 +59,32 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
 
     def get_listed_at(self):
         return self.item.get('watchlist_at') or self.item.get('listed_at')
+
+    """
+    watched_episodes
+    """
+    @cached_property
+    def watched_episodes(self):
+        return self.get_watched_episodes()
+
+    def get_watched_episodes(self):
+        try:
+            return self.item['progress']['watched_episode_count']
+        except (AttributeError, KeyError, TypeError):
+            pass
+
+    """
+    aired_episodes
+    """
+    @cached_property
+    def aired_episodes(self):
+        return self.get_aired_episodes()
+
+    def get_aired_episodes(self):
+        try:
+            return self.item['progress']['total_episode_count']  # TOTAL COUNT APPEARS TO BE AIRED COUNT FOR MDBLIST TODO: CHECK THIS!?!
+        except (AttributeError, KeyError, TypeError):
+            pass
 
     """
     helper getter for parent item
