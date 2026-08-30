@@ -4,14 +4,20 @@ import tmdbhelper.lib.sync.mdblist.synctype as mdblist_synctype
 
 
 def SyncHiddenProgressWatched():
+    if get_setting('sync_source_watched', 'str') == 'MDbList':
+        return mdblist_synctype.SyncHiddenProgressWatched
     return trakt_synctype.SyncHiddenProgressWatched
 
 
 def SyncHiddenProgressCollected():
+    if get_setting('sync_source_collection', 'str') == 'MDbList':
+        return mdblist_synctype.SyncHiddenProgressCollected
     return trakt_synctype.SyncHiddenProgressCollected
 
 
 def SyncHiddenCalendar():
+    if get_setting('sync_source_watched', 'str') == 'MDbList':
+        return mdblist_synctype.SyncHiddenCalendar
     return trakt_synctype.SyncHiddenCalendar
 
 

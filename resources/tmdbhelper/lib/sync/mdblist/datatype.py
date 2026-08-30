@@ -80,3 +80,8 @@ class MDbListDataTypeEpisodesToShows(MDbListDataTypeEpisodesInShows):
     def syncitem_class(self):
         from tmdbhelper.lib.sync.mdblist.itemdata import MDbListSyncItemEpisodesToShows
         return MDbListSyncItemEpisodesToShows
+
+
+class MDbListDataTypeNull(MDbListDataType):  # NullType for when no corresponding MDbList data for sync
+    def get_response_sync(self, *args, **kwargs):
+        return []
