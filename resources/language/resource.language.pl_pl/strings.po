@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2026-08-15 06:00+0200\n"
+"PO-Revision-Date: 2026-08-23 06:00+0200\n"
 "Last-Translator: 3vtv\n"
 "Language-Team: POLISH\n"
 "Language: pl_PL\n"
@@ -2074,6 +2074,11 @@ msgstr "Użyj alternatywnej nazwy pliku .nfo"
 msgctxt "#32391"
 msgid "Select update type"
 msgstr "Wybierz typ aktualizacji"
+
+#: /resources/settings.xml
+msgctxt "#32408"
+msgid "History"
+msgstr "Historia"
 
 #: /resources/lib/script/router.py
 msgctxt "#32392"
