@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.sync.itemdata import SyncItemData, SyncItem
+from tmdbhelper.lib.sync.itemdata import SyncItemData, SyncItem, SyncItemConstructor
 
 
 class TraktSyncItemData(SyncItemData):
@@ -333,6 +333,10 @@ class TraktSyncItemData(SyncItemData):
             return
 
 
+class TraktSyncItemConstructor(SyncItemConstructor):
+    item_data_class = TraktSyncItemData
+
+
 class TraktSyncItem(SyncItem):
 
     _additional_keys = (
@@ -342,59 +346,4 @@ class TraktSyncItem(SyncItem):
     )
 
     def get_data(self):
-        data = {}
-
-        def sync_episodes(season_data, season, item_data, item):
-            episodes = season.get('episodes')
-            if not episodes:
-                return
-
-            season_data.watched_episodes = 0
-            for episode in episodes:
-                episode_data = TraktSyncItemData(episode, 'episode')
-                episode_data.tmdb_id = season_data.tmdb_id
-                episode_data.season_number = season_data.season_number
-                episode_data.episode_number = episode["number"]
-
-                # Count watched_episodes
-                if episode_data.last_watched_at:
-                    if not item_data.reset_at or episode_data.last_watched_at > item_data.reset_at:  # Only count episodes watched since we (re)started watching
-                        season_data.watched_episodes += 1
-
-                # Set values to back to keys for database storage
-                data[episode_data.item_id] = [getattr(episode_data, k) for k in self.keys]
-
-        def sync_seasons(item_data, item):
-            if item_data.item_type != 'show':
-                return
-            seasons = item.get('seasons')
-            if not seasons:
-                return
-
-            item_data.watched_episodes = 0
-            for season in seasons:
-                season_data = TraktSyncItemData(season, 'season')
-                season_data.tmdb_id = item_data.tmdb_id
-                season_data.season_number = season["number"]
-
-                # Iterate through episodes data
-                sync_episodes(season_data, season, item_data, item)
-
-                # Sum watched_episodes
-                if season_data.watched_episodes:
-                    if season_data.season_number and season_data.season_number != 0:  # Exclude special seasons
-                        item_data.watched_episodes += season_data.watched_episodes
-
-                # Set values to back to keys for database storage
-                data[season_data.item_id] = [getattr(season_data, k) for k in self.keys]
-
-        for item in self.meta:
-            item_data = TraktSyncItemData(item, item.get('type') or self.item_type)
-
-            # Iterate through seasons data for watched type syncs where seasons/episodes presented as list
-            sync_seasons(item_data, item)
-
-            # Set values to back to keys for database storage
-            data[item_data.item_id] = [getattr(item_data, k) for k in self.keys]
-
-        return data
+        return TraktSyncItemConstructor(self.meta, self.keys, self.item_type).data

@@ -10,6 +10,7 @@ class BaseDirItemCollection(BaseDirItemAuthorised):
     params = {'info': 'trakt_collection'}
     art_icon = '/resources/icons/sync/collection.png'
     authorisation_setting = 'sync_source_collection'
+    sorting = True
     types = ('movie', 'tv', 'both')
     group = 32192
 
@@ -46,6 +47,7 @@ class BaseDirItemHistory(BaseDirItemAuthorised):
     priority = 150
     label_localized = 32194
     authorisation_setting = 'sync_source_watched'
+    sorting = True
     types = ('movie', 'tv', 'episode', 'both', )
     params = {'info': 'trakt_history'}
     art_icon = 'resources/icons/sync/inprogress.png'
