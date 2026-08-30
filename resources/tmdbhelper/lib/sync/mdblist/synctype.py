@@ -1,4 +1,5 @@
-from tmdbhelper.lib.sync.mdblist.datatype import MDbListDataType, MDbListDataTypeEpisodesInShows, MDbListDataTypeEpisodesNotShows
+from tmdbhelper.lib.sync.mdblist.datatype import MDbListDataType, MDbListDataTypeEpisodesInShows, MDbListDataTypeEpisodesToShows
+from tmdbhelper.lib.sync.mdblist.dataconf import ConfigureEpisodeList
 from tmdbhelper.lib.addon.consts import HALFDAY_EXPIRY
 
 
@@ -51,11 +52,20 @@ class SyncNextEpisodes(MDbListDataType):
             pass
 
 
-class SyncWatched(MDbListDataTypeEpisodesNotShows):
+class SyncWatched(MDbListDataTypeEpisodesToShows):
     keys = ('plays', 'last_watched_at', )  # 'last_updated_at', 'aired_episodes', 'watched_episodes', 'reset_at',
     last_activities_key = 'watched_at'
     method = 'sync/watched'
-    aggregate_key = 'plays'  # TODO: Consider more efficient way of collecting play counts (currently disabled plays=all kwgs)
+
+    def get_data_list_by_type(self, data):
+        try:
+            return data[f'{self.sync_kwgs_mediatype}s']
+        except KeyError:
+            return
+
+    def get_response_sync(self, *args, **kwargs):
+        data = super().get_response_sync(*args, **kwargs)
+        return ConfigureEpisodeList(data).data if data and self.sync_kwgs_mediatype == 'episode' else data
 
     def clear_columns(self, *args, **kwargs):
         if self.timestamp:  # Skip clearing columns if we just update
@@ -63,9 +73,15 @@ class SyncWatched(MDbListDataTypeEpisodesNotShows):
         super().clear_columns(*args, **kwargs)
 
     @property
+    def sync_kwgs_mediatype(self):
+        if self.item_type in ('show', 'season', 'episode'):
+            return 'episode'
+        return self.item_type
+
+    @property
     def sync_kwgs(self):
         sync_kwgs = (
-            ('mediatype', self.item_type),
+            ('mediatype', self.sync_kwgs_mediatype),
             ('since', self.timestamp),  # TODO: DO THIS WITH JOURNAL INSTEAD AND REMOVE ITEMS too
         )
         return {k: v for k, v in sync_kwgs if v}
