@@ -607,7 +607,7 @@
             </group>
 
             <group id="1" label="39031">
-                <setting id="sync_source_watched" type="string" label="32408" help="">
+                <setting id="sync_source_watched" type="string" label="32408" help="32417">
                     <level>0</level>
                     <default>Trakt</default>
                     <constraints>
@@ -618,7 +618,7 @@
                     </constraints>
                     <control type="spinner" format="string"/>
                 </setting>
-                <setting id="sync_source_watchlist" type="string" label="32193" help="">
+                <setting id="sync_source_watchlist" type="string" label="32193" help="32417">
                     <level>0</level>
                     <default>Trakt</default>
                     <constraints>
@@ -629,7 +629,7 @@
                     </constraints>
                     <control type="spinner" format="string"/>
                 </setting>
-                <setting id="sync_source_collection" type="string" label="32192" help="">
+                <setting id="sync_source_collection" type="string" label="32192" help="32417">
                     <level>0</level>
                     <default>Trakt</default>
                     <constraints>
@@ -640,7 +640,7 @@
                     </constraints>
                     <control type="spinner" format="string"/>
                 </setting>
-                <setting id="sync_source_playback" type="string" label="14086" help="">
+                <setting id="sync_source_playback" type="string" label="14086" help="32417">
                     <level>0</level>
                     <default>Trakt</default>
                     <constraints>

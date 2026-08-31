@@ -2111,6 +2111,11 @@ msgid "TMDb detailed information"
 msgstr ""
 
 #: /resources/settings.xml
+msgctxt "#32417"
+msgid "MDbList support is currently experimental"
+msgstr ""
+
+#: /resources/settings.xml
 msgctxt "#32404"
 msgid "Flatten tvshows with multiple episodes airing same day"
 msgstr ""
