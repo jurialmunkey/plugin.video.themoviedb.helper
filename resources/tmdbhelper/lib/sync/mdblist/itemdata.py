@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.sync.itemdata import SyncItemData, SyncItem, SyncItemConstructor
+from tmdbhelper.lib.sync.itemdata import SyncItemData, SyncItem
+from tmdbhelper.lib.sync.itemconf import SyncItemConstructor
 
 
 class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
