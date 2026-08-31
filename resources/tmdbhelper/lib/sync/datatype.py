@@ -149,21 +149,28 @@ class DataType(SyncDataParentProperties):
 
 class DataTypeEpisodesInShows:
 
+    tv_item_type = 'show'
+
     @cached_property
     def item_type(self):
         if self._item_type in ('show', 'season', 'episode'):
-            return 'show'
+            return self.tv_item_type
         if self._item_type == 'movie':
             return 'movie'
         raise ValueError(f'Invalid item_type {self._item_type} for {self.method}')
 
     def clear_child_columns(self, keys):
-        if self.item_type == 'show':
+        if self.item_type == self.tv_item_type:
             self.cache.del_column_values(keys=keys, item_type='season')
             self.cache.del_column_values(keys=keys, item_type='episode')
 
     @property
     def last_activities_item_type(self):
-        if self.item_type == 'show':
+        if self.item_type == self.tv_item_type:
             return 'episodes'
         return f'{self.item_type}s'
+
+
+class DataTypeShowsToEpisodes(DataTypeEpisodesInShows):
+
+    tv_item_type = 'episode'

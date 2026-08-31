@@ -2,7 +2,7 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, is_unaired_timestamp
 from tmdbhelper.lib.addon.consts import HALFDAY_EXPIRY
 from tmdbhelper.lib.sync.datatype import timerlock
-from tmdbhelper.lib.sync.trakt.datatype import TraktDataType, TraktDataTypeEpisodesInShows
+from tmdbhelper.lib.sync.trakt.datatype import TraktDataType, TraktDataTypeEpisodesInShows, TraktDataTypeShowsToEpisodes
 
 
 class SyncHiddenProgressWatched(TraktDataType):
@@ -47,7 +47,7 @@ class SyncWatched(TraktDataTypeEpisodesInShows):
     method = 'watched'
 
 
-class SyncPlayback(TraktDataTypeEpisodesInShows):
+class SyncPlayback(TraktDataTypeShowsToEpisodes):
     keys = ('progress', 'paused_at', 'id', )
     last_activities_key = 'paused_at'
     sync_kwgs = {'extended': 'full'}
