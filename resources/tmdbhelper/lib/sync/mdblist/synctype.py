@@ -88,7 +88,6 @@ class SyncWatched(MDbListDataTypeEpisodesToShows):
 
 
 class SyncAllNextEpisodes(MDbListDataTypeNull):  # TODO: CURRENTLY A DUMMY TYPE DOES NOTHING
-    keys = ('upnext_episode_id', )
     last_activities_key = 'watched_at'
     method = 'all_next_episodes'
     expiry_time = HALFDAY_EXPIRY
@@ -96,13 +95,12 @@ class SyncAllNextEpisodes(MDbListDataTypeNull):  # TODO: CURRENTLY A DUMMY TYPE 
 
 
 class SyncHiddenProgressWatched(MDbListDataTypeNull):
-    keys = ('hidden_at', )
     last_activities_key = 'hidden_at'
     method = 'hidden/progress_watched'
     key_prefix = 'progress_watched'
 
 
-class SyncHiddenProgressCollected(SyncHiddenProgressWatched):
+class SyncHiddenProgressCollected(MDbListDataTypeNull):
     last_activities_key = 'hidden_at'
     method = 'hidden/progress_collected'
     key_prefix = 'progress_collected'

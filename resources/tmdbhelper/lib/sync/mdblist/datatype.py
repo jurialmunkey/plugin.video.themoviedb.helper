@@ -83,5 +83,8 @@ class MDbListDataTypeEpisodesToShows(MDbListDataTypeEpisodesInShows):
 
 
 class MDbListDataTypeNull(MDbListDataType):  # NullType for when no corresponding MDbList data for sync
+
+    keys = tuple()
+
     def get_response_sync(self, *args, **kwargs):
         return []
