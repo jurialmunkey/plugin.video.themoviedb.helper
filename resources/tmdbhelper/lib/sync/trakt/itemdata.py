@@ -347,4 +347,7 @@ class TraktSyncItem(SyncItem):
     )
 
     def get_data(self):
-        return TraktSyncItemConstructor(self.meta, self.keys, self.item_type).data
+        data = TraktSyncItemConstructor(self.meta, self.keys, self.item_type).data
+        # from tmdbhelper.lib.addon.logger import dump_log
+        # dump_log({'keys': self.keys, 'meta': self.meta, 'data': data}, f'TraktSyncItem_{self.item_type}_{"_".join(self.keys)}')
+        return data
