@@ -45,7 +45,7 @@ class SyncItemConstructorBase:
 
     @cached_property
     def data(self):
-        data = {i.item_data.item_id: i.item_data_configured for i in self.items}
+        data = {k: v for i in self.items for k, v in i.data.items()}
         data[self.item_data.item_id] = self.item_data_configured
         return data
 
