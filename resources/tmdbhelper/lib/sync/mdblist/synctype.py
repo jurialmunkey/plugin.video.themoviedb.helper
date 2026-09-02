@@ -1,5 +1,5 @@
 from tmdbhelper.lib.sync.mdblist.datatype import MDbListDataType, MDbListDataTypeEpisodesInShows, MDbListDataTypeEpisodesToShows, MDbListDataTypeNull
-from tmdbhelper.lib.sync.mdblist.dataconf import ConfigureEpisodeList
+from tmdbhelper.lib.sync.mdblist.dataconf import configure_episode_list
 from tmdbhelper.lib.addon.consts import HALFDAY_EXPIRY
 
 
@@ -65,7 +65,7 @@ class SyncWatched(MDbListDataTypeEpisodesToShows):
 
     def get_response_sync(self, *args, **kwargs):
         data = super().get_response_sync(*args, **kwargs)
-        return ConfigureEpisodeList(data).data if data and self.sync_kwgs_mediatype == 'episode' else data
+        return configure_episode_list(data) if data and self.sync_kwgs_mediatype == 'episode' else data
 
     def clear_columns(self, *args, **kwargs):
         if self.timestamp:  # Skip clearing columns if we just update
