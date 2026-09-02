@@ -956,12 +956,12 @@ SIMPLECACHE_COLUMNS = {
     },
     'aired_episodes': {
         'data': 'INTEGER',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncWatched', ),
+        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncAiredEpisodes', ),
         'indexed': True
     },
     'watched_episodes': {
         'data': 'INTEGER',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncWatched', ),
+        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncAiredEpisodes', ),
         'indexed': True
     },
     'reset_at': {
