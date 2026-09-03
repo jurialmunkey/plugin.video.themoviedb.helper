@@ -23,16 +23,6 @@ class BaseDirItemTraktMostWatched(BaseDirItemAuthorised):
     group = 32195
 
 
-class BaseDirItemTraktInProgress(BaseDirItemAuthorised):
-    priority = 170
-    label_localized = 32196
-    types = ('tv', )
-    params = {'info': 'trakt_inprogress'}
-    sorting = True
-    art_icon = 'resources/icons/trakt/inprogress.png'
-    group = 32196
-
-
 class BaseDirItemTraktToWatch(BaseDirItemAuthorised):
     priority = 210
     label_type = 'reversed'

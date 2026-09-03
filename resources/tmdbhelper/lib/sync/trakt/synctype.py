@@ -92,13 +92,13 @@ class SyncAllNextEpisodes(TraktDataTypeEpisodesInShows):
     def sync_func(self):
         """ Get next episodes on Trakt """
         from tmdbhelper.lib.addon.logger import TimerFunc
-        from tmdbhelper.lib.sync.nextmeta import SyncAllNextEpisodesMeta
+        from tmdbhelper.lib.sync.trakt.nextmeta import TraktSyncAllNextEpisodesMeta
         with TimerFunc(
             f'Sync: {self.__class__.__name__} get_meta {self.method} {self.item_type}',
             inline=True,
             log_threshold=0.001
         ):
-            return SyncAllNextEpisodesMeta(self).items
+            return TraktSyncAllNextEpisodesMeta(self).items
 
 
 class SyncNextEpisodes(SyncAllNextEpisodes):
@@ -111,10 +111,10 @@ class SyncNextEpisodes(SyncAllNextEpisodes):
     def sync_func(self):
         """ Get next episodes on Trakt """
         from tmdbhelper.lib.addon.logger import TimerFunc
-        from tmdbhelper.lib.sync.trakt.nextmeta import SyncNextEpisodesMeta
+        from tmdbhelper.lib.sync.trakt.nextmeta import TraktSyncNextEpisodesMeta
         with TimerFunc(
             f'Sync: {self.__class__.__name__} get_meta {self.method} {self.item_type}',
             inline=True,
             log_threshold=0.001
         ):
-            return SyncNextEpisodesMeta(self).items
+            return TraktSyncNextEpisodesMeta(self).items

@@ -206,6 +206,16 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
         return f'{air_date}T00:00:00.000Z'  # No time from MDBList so set as 00:00 utc
 
     """
+    upnext_episode_id
+    """
+    @cached_property
+    def upnext_episode_id(self):
+        return self.get_upnext_episode_id()
+
+    def get_upnext_episode_id(self):
+        return self.item.get('upnext_episode_id')
+
+    """
     plays
     """
     @cached_property

@@ -1,6 +1,7 @@
 from tmdbhelper.lib.sync.mdblist.datatype import MDbListDataType, MDbListDataTypeEpisodesInShows, MDbListDataTypeEpisodesToShows, MDbListDataTypeNull
 from tmdbhelper.lib.sync.mdblist.dataconf import configure_episode_list
 from tmdbhelper.lib.addon.consts import HALFDAY_EXPIRY
+from tmdbhelper.lib.sync.datatype import timerlock
 
 
 class SyncWatchlist(MDbListDataType):
@@ -87,11 +88,24 @@ class SyncWatched(MDbListDataTypeEpisodesToShows):
         return {k: v for k, v in sync_kwgs if v}
 
 
-class SyncAllNextEpisodes(MDbListDataTypeNull):  # TODO: CURRENTLY A DUMMY TYPE DOES NOTHING
+class SyncAllNextEpisodes(MDbListDataTypeEpisodesInShows):
+    keys = ('upnext_episode_id', )
     last_activities_key = 'watched_at'
     method = 'all_next_episodes'
     expiry_time = HALFDAY_EXPIRY
     sync_kwgs = {}
+
+    @timerlock
+    def sync_func(self):
+        """ Get next episodes on Trakt """
+        from tmdbhelper.lib.addon.logger import TimerFunc
+        from tmdbhelper.lib.sync.mdblist.nextmeta import MDbListSyncAllNextEpisodesMeta
+        with TimerFunc(
+            f'Sync: {self.__class__.__name__} get_meta {self.method} {self.item_type}',
+            inline=True,
+            log_threshold=0.001
+        ):
+            return MDbListSyncAllNextEpisodesMeta(self).items
 
 
 class SyncHiddenProgressWatched(MDbListDataTypeNull):

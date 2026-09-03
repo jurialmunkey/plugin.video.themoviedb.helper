@@ -57,9 +57,8 @@ class BaseDirItemHistory(BaseDirItemAuthorised):
 class BaseDirItemOnDeckMovies(BaseDirItemAuthorised):
     priority = 170
     label_localized = 32196
-    # types = ('movie', 'tv', )
+    types = ('movie', 'tv', )
     authorisation_setting = 'sync_source_watched'
-    types = ('movie', )  # TODO: ADD TV SHOW IN PROGRESS
     params = {'info': 'trakt_inprogress'}
     sorting = True
     art_icon = 'resources/icons/sync/inprogress.png'
