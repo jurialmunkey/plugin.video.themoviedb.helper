@@ -208,11 +208,25 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
 
     def onPlayBackEnded(self):
         self.scrobbler_stop()
+        self.refresh_mdblist_watched()
         self.reset_properties()
 
     def onPlayBackStopped(self):
         self.scrobbler_stop()
+        self.refresh_mdblist_watched()
         self.reset_properties()
+
+    def refresh_mdblist_watched(self):
+        if get_setting('sync_source_watched', 'str') != 'MDbList':
+            return
+        if not get_setting('mdblist_scrobbling'):
+            return
+        from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA
+        from tmdbhelper.lib.addon.logger import kodi_log
+        from tmdbhelper.lib.addon.tmdate import set_timestamp
+        self.get_property(LASTACTIVITIES_DATA, clear_property=True)
+        self.get_property('Widgets.Reload', set_property=f'{set_timestamp(0, True)}')
+        kodi_log('Sync: invalidated MDbList watched activities after playback', 2)
 
     def onPlayBackPaused(self):
         self.scrobbler_pause()
