@@ -347,6 +347,9 @@ RATINGS_COLUMNS = {
     'mdblist_votes': {
         'data': 'INTEGER',
     },
+    'rogerebert_rating': {
+        'data': 'INTEGER',
+    },
     'myanimelist_rating': {
         'data': 'INTEGER',
     },
