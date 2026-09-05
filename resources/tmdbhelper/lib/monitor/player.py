@@ -292,6 +292,21 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.scrobbler_update()
         self.scrobbler.sync(self.tmdb_type, self.tmdb_id)
 
+    def scrobbler_heartbeat(self, force=False, background=True):
+        if not self.scrobbler or not self.isPlayingVideo():
+            return
+        if not self.scrobbler.heartbeat_due(force=force):
+            return
+        if not force and get_condvisibility("Player.Paused"):
+            return
+        self.scrobbler_update()
+        self.scrobbler.heartbeat(
+            self.tmdb_type,
+            self.tmdb_id,
+            force=force,
+            background=background,
+        )
+
     def scrobbler_update(self):
         if not self.scrobbler or not self.isPlayingVideo():
             return
@@ -421,7 +436,13 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.previous_fanart = None
 
     def on_fullscreen(self):
+        self.scrobbler_heartbeat()
         self.scrobbler_sync()
+
+    def on_service_exit(self):
+        if self.scrobbler:
+            self.scrobbler.wait_for_heartbeat()
+        self.scrobbler_heartbeat(force=True, background=False)
 
     def get_playingitem(self):
         # Check that video other than dummy splash video is playing
