@@ -37,5 +37,5 @@ class TraktSyncNextEpisodesMetaItem(TraktSyncAllNextEpisodesMetaItem, SyncAllNex
     pass
 
 
-class SyncNextEpisodesMeta(TraktSyncAllNextEpisodesMeta, SyncAllNextEpisodesMeta):
+class TraktSyncNextEpisodesMeta(TraktSyncAllNextEpisodesMeta, SyncAllNextEpisodesMeta):
     meta_item_getter = TraktSyncNextEpisodesMetaItem
