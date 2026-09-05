@@ -17,6 +17,14 @@ class MDbListRatingMappingObject:
         'myanimelist': lambda v: int(v * 10),  # Convert out of /10 to 100%
     }
 
+    rating_keywords = {
+        'certified-fresh': ('rottentomatoes_image', 'certified'),
+        'fresh': ('rottentomatoes_image', 'fresh'),
+        'rotten': ('rottentomatoes_image', 'rotten'),
+        'certified-hot': ('rottentomatoes_usermeter_image', 'hot'),
+        'metacritic-must-see': ('metacritic_image', 'mustsee'),
+    }
+
     def __init__(self, meta):
         self.meta = meta
 
@@ -79,6 +87,16 @@ class MDbListRatingMapping:
             return []
 
     @cached_property
+    def meta_keywords(self):
+        try:
+            return {
+                str(i.get('name', '')).strip()
+                for i in self.meta['keywords']
+            }
+        except (KeyError, TypeError, AttributeError):
+            return set()
+
+    @cached_property
     def ratings(self):
         ratings = {
             k: v
@@ -86,6 +104,11 @@ class MDbListRatingMapping:
             for k, v in MDbListRatingMappingObject(i).items()
         }
         ratings['mdblist_rating'] = self.meta.get('score')
+
+        for keyword, (rating_key, rating_value) in MDbListRatingMappingObject.rating_keywords.items():
+            if keyword in self.meta_keywords:
+                ratings.setdefault(rating_key, rating_value)
+
         return ratings
 
 
@@ -107,8 +130,8 @@ class MDbList(RequestAPI):
         path = self.get_request_url('lists', list_id, 'items', action)
         return self.get_api_request(path, postdata=item, method='json')
 
-    def get_details(self, media_type, media_id, media_provider='tmdb'):
-        return self.get_request_sc(media_provider, media_type, media_id)  # TODO: Add append_to_response=review ?
+    def get_details(self, media_type, media_id, media_provider='tmdb', append_to_response='keyword'):
+        return self.get_request_sc(media_provider, media_type, media_id, append_to_response=append_to_response)  # TODO: Add append_to_response=review ?
 
     def get_ratings(self, media_type, media_id, media_provider='tmdb'):
         response = self.get_details(media_type, media_id, media_provider=media_provider)

@@ -320,8 +320,14 @@ RATINGS_COLUMNS = {
     'rottentomatoes_image': {
         'data': 'TEXT',
     },
+    'rottentomatoes_usermeter_image': {
+        'data': 'TEXT',
+    },
     'metacritic_rating': {
         'data': 'INTEGER',
+    },
+    'metacritic_image': {
+        'data': 'TEXT',
     },
     'trakt_rating': {
         'data': 'INTEGER',
