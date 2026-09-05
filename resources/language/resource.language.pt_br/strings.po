@@ -2059,6 +2059,16 @@ msgid "Hide Episode Groups and Up Next"
 msgstr "Ocultar Grupos de Episódios e A Seguir"
 
 #: /resources/settings.xml
+msgctxt "#32402"
+msgid "Scrobble items on MDbList while watching"
+msgstr "Registrar itens na MDbList enquanto assiste"
+
+#: /resources/settings.xml
+msgctxt "#32403"
+msgid "Sync"
+msgstr "Sincronizar"
+
+#: /resources/settings.xml
 msgctxt "#32385"
 msgid "Hide All"
 msgstr "Ocultar Tudo"
@@ -2077,6 +2087,11 @@ msgstr "Usar nome de arquivo .nfo alternativo"
 msgctxt "#32391"
 msgid "Select update type"
 msgstr "Selecionar o tipo de atualização"
+
+#: /resources/settings.xml
+msgctxt "#32408"
+msgid "History"
+msgstr "Histórico"
 
 #: /resources/lib/script/router.py
 msgctxt "#32392"
@@ -2719,6 +2734,26 @@ msgctxt "#32536"
 msgid "Unspecified"
 msgstr "Não especificado"
 
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32537"
+msgid "Availability"
+msgstr "Disponibilidade"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32538"
+msgid "My favorites"
+msgstr "Meus favoritos"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32539"
+msgid "Streaming now"
+msgstr "Transmitindo agora"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32540"
+msgid "All digital releases"
+msgstr "Todos os lançamentos digitais"
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr "Hindi (Índia)"
@@ -2870,6 +2905,10 @@ msgstr "Mandarim (Taiwan)"
 msgctxt "#30067"
 msgid "Zulu (South Africa)"
 msgstr "Zulu (África do Sul)"
+
+msgctxt "#30068"
+msgid "Croatian (Croatia)"
+msgstr "Croata (Croácia)"
 
 #: /resources/settings.xml
 msgctxt "#32001"

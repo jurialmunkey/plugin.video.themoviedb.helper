@@ -341,6 +341,9 @@ RATINGS_COLUMNS = {
     'mdblist_votes': {
         'data': 'INTEGER',
     },
+    'myanimelist_rating': {
+        'data': 'INTEGER',
+    },
     'awards': {
         'data': 'TEXT',
     },
@@ -953,12 +956,12 @@ SIMPLECACHE_COLUMNS = {
     },
     'aired_episodes': {
         'data': 'INTEGER',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncWatched', ),
+        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncAiredEpisodes', ),
         'indexed': True
     },
     'watched_episodes': {
         'data': 'INTEGER',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncWatched', ),
+        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncAiredEpisodes', ),
         'indexed': True
     },
     'reset_at': {

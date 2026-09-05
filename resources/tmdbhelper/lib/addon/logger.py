@@ -16,6 +16,13 @@ TimerList = jurialmunkey_logger.TimerList
 TimerFunc = jurialmunkey_logger.TimerFunc
 
 
+def dump_log(json_data, file_name, log_level=2):
+    if log_level == 2 and not LOGGER._debug_logging:
+        return
+    from tmdbhelper.lib.files.futils import dumps_to_file
+    dumps_to_file(json_data, 'log_data', f'{file_name}.json', join_addon_data=True)
+
+
 def textviewer_output(message, header=''):
     from xbmcgui import Dialog
     Dialog().textviewer(header, f'{message}')

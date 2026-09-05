@@ -1,6 +1,6 @@
 from tmdbhelper.lib.addon.consts import TRAKT_MAX_ITEMS_PER_PAGE
 from tmdbhelper.lib.addon.thread import ParallelThread
-from tmdbhelper.lib.sync.datatype import DataType, DataTypeEpisodesInShows
+from tmdbhelper.lib.sync.datatype import DataType, DataTypeEpisodesInShows, DataTypeShowsToEpisodes
 
 
 class TraktDataType(DataType):
@@ -59,4 +59,8 @@ class TraktDataType(DataType):
 
 
 class TraktDataTypeEpisodesInShows(DataTypeEpisodesInShows, TraktDataType):
+    pass
+
+
+class TraktDataTypeShowsToEpisodes(DataTypeShowsToEpisodes, TraktDataType):
     pass

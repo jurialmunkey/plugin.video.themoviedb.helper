@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.sync.itemdata import SyncItemData, SyncItem
+from tmdbhelper.lib.sync.itemconf import SyncItemConstructor
 
 
 class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
@@ -10,8 +11,6 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
     rank = None
     notes = None
     last_updated_at = None
-    aired_episodes = 0
-    watched_episodes = 0
     reset_at = None
 
     """
@@ -61,6 +60,32 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
 
     def get_listed_at(self):
         return self.item.get('watchlist_at') or self.item.get('listed_at')
+
+    """
+    watched_episodes
+    """
+    @cached_property
+    def watched_episodes(self):
+        return self.get_watched_episodes()
+
+    def get_watched_episodes(self):
+        try:
+            return self.item['progress']['watched_episode_count']
+        except (AttributeError, KeyError, TypeError):
+            pass
+
+    """
+    aired_episodes
+    """
+    @cached_property
+    def aired_episodes(self):
+        return self.get_aired_episodes()
+
+    def get_aired_episodes(self):
+        try:
+            return self.item['progress']['total_episode_count']  # TOTAL COUNT APPEARS TO BE AIRED COUNT FOR MDBLIST TODO: CHECK THIS!?!
+        except (AttributeError, KeyError, TypeError):
+            pass
 
     """
     helper getter for parent item
@@ -181,6 +206,16 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
         return f'{air_date}T00:00:00.000Z'  # No time from MDBList so set as 00:00 utc
 
     """
+    upnext_episode_id
+    """
+    @cached_property
+    def upnext_episode_id(self):
+        return self.get_upnext_episode_id()
+
+    def get_upnext_episode_id(self):
+        return self.item.get('upnext_episode_id')
+
+    """
     plays
     """
     @cached_property
@@ -188,7 +223,8 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
         return self.get_plays()
 
     def get_plays(self):
-        return self.get_data_by_key('plays')
+        plays = self.get_data_by_key('plays')
+        return plays if plays is not None else 1
 
     """
     last_watched_at
@@ -199,6 +235,10 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
 
     def get_last_watched_at(self):
         return self.get_data_by_key('last_watched_at') or self.get_data_by_key('watched_at')
+
+
+class MDbListSyncItemConstructor(SyncItemConstructor):
+    item_data_class = MDbListSyncItemData
 
 
 class MDbListSyncItem(SyncItem):
@@ -246,3 +286,8 @@ class MDbListSyncItem(SyncItem):
             data[item_data.item_id] = [getattr(item_data, k) for k in self.keys]
 
         return data
+
+
+class MDbListSyncItemEpisodesToShows(MDbListSyncItem):
+    def get_data(self):
+        return MDbListSyncItemConstructor(self.meta, self.keys, self.item_type).data

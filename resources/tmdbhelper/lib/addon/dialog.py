@@ -38,6 +38,7 @@ class DialogProgressSyncBG:
 
     def increment(self, x=1):
         self.now_value += x
+        return self.now_value
 
     def update_or_create(self, progress, message, heading=None):
         if not self.dialog_progress_bg:

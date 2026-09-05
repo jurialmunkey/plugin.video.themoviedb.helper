@@ -1,22 +1,25 @@
-from tmdbhelper.lib.items.directories.base.basedir_item import BaseDirItem
+from tmdbhelper.lib.items.directories.base.basedir_item import BaseDirItemAuthorised
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
 
 
-class BaseDirItemCollection(BaseDirItem):
+class BaseDirItemCollection(BaseDirItemAuthorised):
     priority = 100
     label_localized = 32192
     label_type = 'reversed'
     params = {'info': 'trakt_collection'}
     art_icon = '/resources/icons/sync/collection.png'
+    authorisation_setting = 'sync_source_collection'
+    sorting = True
     types = ('movie', 'tv', 'both')
     group = 32192
 
 
-class BaseDirItemWatchlist(BaseDirItem):
+class BaseDirItemWatchlist(BaseDirItemAuthorised):
     priority = 120
     label_type = 'reversed'
     label_localized = 32193
+    authorisation_setting = 'sync_source_watchlist'
     types = ('movie', 'tv', 'season', 'episode', 'both', )
     params = {'info': 'trakt_watchlist'}
     sorting = True
@@ -40,11 +43,22 @@ class BaseDirItemWatchListAnticipated(BaseDirItemWatchlist):
     group = 32193
 
 
-class BaseDirItemOnDeckMovies(BaseDirItem):
+class BaseDirItemHistory(BaseDirItemAuthorised):
+    priority = 150
+    label_localized = 32194
+    authorisation_setting = 'sync_source_watched'
+    sorting = True
+    types = ('movie', 'tv', 'episode', 'both', )
+    params = {'info': 'trakt_history'}
+    art_icon = 'resources/icons/sync/inprogress.png'
+    group = 32194
+
+
+class BaseDirItemOnDeckMovies(BaseDirItemAuthorised):
     priority = 170
     label_localized = 32196
-    # types = ('movie', 'tv', )
-    types = ('movie', )  # TODO: ADD TV SHOW IN PROGRESS
+    types = ('movie', 'tv', )
+    authorisation_setting = 'sync_source_watched'
     params = {'info': 'trakt_inprogress'}
     sorting = True
     art_icon = 'resources/icons/sync/inprogress.png'

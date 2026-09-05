@@ -87,15 +87,15 @@ class DataType(SyncDataParentProperties):
     def clear_child_columns(self, keys):
         pass
 
-    @property
+    @cached_property
     def is_expired(self):
         return self.last_activities.is_expired(self.timestamp, keys=self.last_activities_keys)
 
-    @property
+    @cached_property
     def last_activity(self):
         return self.last_activities.get_last_activity(self.last_activities_keys)
 
-    @property
+    @cached_property
     def timestamp(self):
         return self.cache.get_activity(self.item_type, self.method, set_timestamp(0, set_int=True))
 
@@ -149,32 +149,28 @@ class DataType(SyncDataParentProperties):
 
 class DataTypeEpisodesInShows:
 
+    tv_item_type = 'show'
+
     @cached_property
     def item_type(self):
         if self._item_type in ('show', 'season', 'episode'):
-            return 'show'
+            return self.tv_item_type
         if self._item_type == 'movie':
             return 'movie'
         raise ValueError(f'Invalid item_type {self._item_type} for {self.method}')
 
     def clear_child_columns(self, keys):
-        if self.item_type == 'show':
+        if self.item_type == self.tv_item_type:
             self.cache.del_column_values(keys=keys, item_type='season')
             self.cache.del_column_values(keys=keys, item_type='episode')
 
     @property
     def last_activities_item_type(self):
-        if self.item_type == 'show':
+        if self.item_type == self.tv_item_type:
             return 'episodes'
         return f'{self.item_type}s'
 
 
-class DataTypeEpisodesNotShows:
+class DataTypeShowsToEpisodes(DataTypeEpisodesInShows):
 
-    @cached_property
-    def item_type(self):
-        if self._item_type in ('show', 'season', 'episode'):
-            return 'episode'
-        if self._item_type == 'movie':
-            return 'movie'
-        raise ValueError(f'Invalid item_type {self._item_type} for {self.method}')
+    tv_item_type = 'episode'
