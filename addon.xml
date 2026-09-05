@@ -9,7 +9,7 @@ provider-name="jurialmunkey">
   <import addon="script.module.pil" version="1.1.7"/>
   <import addon="script.module.addon.signals" version="0.0.6" />
   <import addon="script.module.jurialmunkey" version="0.2.35" />
-  <import addon="script.module.infotagger" version="0.0.5" />
+  <import addon="script.module.infotagger" version="0.0.9" />
   <import addon="script.module.qrcode" version="6.1.0" />
 </requires>
 <extension point="xbmc.python.pluginsource" library="resources/plugin.py">
