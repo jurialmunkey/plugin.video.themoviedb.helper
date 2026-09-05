@@ -45,7 +45,7 @@ class ItemDetailsDatabase(Database):
         super().__init__(filename=self.cache_filename)
 
     # DB version must be max of table_version
-    database_version = 44
+    database_version = 45
 
     database_changes = {
         21: (),
@@ -112,6 +112,10 @@ class ItemDetailsDatabase(Database):
         ),
          44: (
             'ALTER TABLE ratings ADD myanimelist_rating INTEGER',
+        ),
+        45: (
+            'ALTER TABLE ratings ADD metacritic_image TEXT',
+            'ALTER TABLE ratings ADD rottentomatoes_usermeter_image TEXT',
         ),
     }
 
