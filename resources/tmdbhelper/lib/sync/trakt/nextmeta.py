@@ -1,6 +1,12 @@
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.tmdate import convert_timestamp
-from tmdbhelper.lib.sync.nextmeta import SyncNextEpisodeItem, SyncAllNextEpisodesMetaItem, SyncAllNextEpisodesMeta
+from tmdbhelper.lib.sync.nextmeta import (
+    SyncNextEpisodeItem,
+    SyncAllNextEpisodesMetaItem,
+    SyncAllNextEpisodesMeta,
+    SyncNextEpisodesMetaItem,
+    SyncNextEpisodesMeta
+)
 
 
 class TraktSyncNextEpisodeItem(SyncNextEpisodeItem):
@@ -33,9 +39,10 @@ class TraktSyncAllNextEpisodesMeta(SyncAllNextEpisodesMeta):
     sd_additional_keys = ('trakt_slug', )
 
 
-class TraktSyncNextEpisodesMetaItem(TraktSyncAllNextEpisodesMetaItem, SyncAllNextEpisodesMetaItem):
-    pass
+class TraktSyncNextEpisodesMetaItem(SyncNextEpisodesMetaItem):
+    sync_item_class = TraktSyncNextEpisodeItem
 
 
-class TraktSyncNextEpisodesMeta(TraktSyncAllNextEpisodesMeta, SyncAllNextEpisodesMeta):
+class TraktSyncNextEpisodesMeta(SyncNextEpisodesMeta):
     meta_item_getter = TraktSyncNextEpisodesMetaItem
+    sd_additional_keys = ('trakt_slug', )
