@@ -77,6 +77,7 @@ class MDbListKeywordRatingMappingObject(MDbListRatingMappingObject):
         'rotten': ('rottentomatoes_image', 'rotten'),
         'certified-hot': ('rottentomatoes_usermeter_image', 'hot'),
         'metacritic-must-see': ('metacritic_image', 'mustsee'),
+        'roger-ebert-thumbs-down': ('rogerebert_image', 'thumbsdown'),
     }
 
     @cached_property

@@ -350,6 +350,9 @@ RATINGS_COLUMNS = {
     'rogerebert_rating': {
         'data': 'INTEGER',
     },
+    'rogerebert_image': {
+        'data': 'TEXT',
+    },
     'myanimelist_rating': {
         'data': 'INTEGER',
     },

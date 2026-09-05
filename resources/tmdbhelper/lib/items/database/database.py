@@ -117,6 +117,7 @@ class ItemDetailsDatabase(Database):
             'ALTER TABLE ratings ADD metacritic_image TEXT',
             'ALTER TABLE ratings ADD rottentomatoes_usermeter_image TEXT',
             'ALTER TABLE ratings ADD rogerebert_rating INTEGER',
+            'ALTER TABLE ratings ADD rogerebert_image TEXT',
         ),
     }
 
