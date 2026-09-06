@@ -7,7 +7,8 @@ class MDbListRatingMappingObject:
     rating_keys = {
         'tomatoes': 'rottentomatoes_rating',
         'tomatoesaudience': 'rottentomatoes_usermeter',
-        'popcorn': 'rottentomatoes_usermeter'}
+        'popcorn': 'rottentomatoes_usermeter',
+        'metacritic': 'metacritic_rating'}
 
     rating_func = {
         'imdb': lambda v: int(v * 10),  # Convert out of /10 to 100%

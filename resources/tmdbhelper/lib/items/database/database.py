@@ -114,6 +114,7 @@ class ItemDetailsDatabase(Database):
             'ALTER TABLE ratings ADD myanimelist_rating INTEGER',
         ),
         45: (
+            'ALTER TABLE ratings ADD metacriticuser_rating INTEGER',
             'ALTER TABLE ratings ADD metacritic_image TEXT',
             'ALTER TABLE ratings ADD rottentomatoes_usermeter_image TEXT',
             'ALTER TABLE ratings ADD rogerebert_rating INTEGER',
