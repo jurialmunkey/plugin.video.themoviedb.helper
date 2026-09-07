@@ -145,6 +145,7 @@ class RatingsDict(BaseList):
             'tmdb_rating': lambda v: f'{(v / 10):.1f}',
             'trakt_rating': lambda v: f'{(v / 10):.1f}',
             'imdb_rating': lambda v: f'{(v / 10):.1f}',
+            'metacriticuser_rating': lambda v: f'{(v / 10):.1f}',
             'letterboxd_rating': lambda v: f'{(v / 20):.1f}',  # 5 Star rating
             'rogerebert_rating': lambda v: f'{(v / 25):.1f}',  # 4 Star rating
             'myanimelist_rating': lambda v: f'{(v / 10):.1f}',

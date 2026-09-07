@@ -326,6 +326,9 @@ RATINGS_COLUMNS = {
     'metacritic_rating': {
         'data': 'INTEGER',
     },
+    'metacriticuser_rating': {
+        'data': 'INTEGER',
+    },
     'metacritic_image': {
         'data': 'TEXT',
     },
