@@ -3,7 +3,7 @@ from jurialmunkey.ftools import cached_property
 from jurialmunkey.parser import try_int, merge_two_dicts, boolean
 from infotagger.listitem import ListItemInfoTag
 from tmdbhelper.lib.addon.consts import PARAM_WIDGETS_RELOAD, PARAM_WIDGETS_RELOAD_FORCED
-from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, get_condvisibility, get_localized, encode_url, get_flatseasons_info_param, GlobalSettingsDict
+from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, get_condvisibility, get_localized, encode_url, get_flatseasons_info_param, get_setting, GlobalSettingsDict
 from tmdbhelper.lib.addon.tmdate import is_unaired_timestamp
 from jurialmunkey.window import get_property
 
@@ -491,11 +491,11 @@ class _Tvshow(_Video):
         For tvshows and seasons have to hardcode playcount as a 0|1 boolean
         because Kodi treats it as watched/unwatched boolean for whole show
         """
-        if not self.airedepisodes:
+        if not self.totalepisodes:
             return 0
         if not self.watchedepisodes:
             return 0
-        if self.airedepisodes > self.watchedepisodes:
+        if self.totalepisodes > self.watchedepisodes:
             return 0
         return 1
 
@@ -512,22 +512,18 @@ class _Tvshow(_Video):
         return try_int(self.infoproperties.get('watchedepisodes'), fallback=0)
 
     @property
-    def airedepisodes(self):
-        return try_int(self.infoproperties.get('airedepisodes'), fallback=0)
-
-    @property
     def unwatchedepisodes(self):
-        if self.airedepisodes < self.watchedepisodes:
+        if self.totalepisodes < self.watchedepisodes:
             return 0
         if not self.watchedepisodes:
-            return self.airedepisodes or self.totalepisodes
-        return self.airedepisodes - self.watchedepisodes
+            return self.totalepisodes
+        return self.totalepisodes - self.watchedepisodes
 
     @property
     def watchedprogress(self):
-        if not self.airedepisodes:
+        if not self.totalepisodes:
             return
-        return int(self.watchedepisodes * 100 / self.airedepisodes)
+        return int(self.watchedepisodes * 100 / self.totalepisodes)
 
     def finalise_infoproperties(self):
         super().finalise_infoproperties()
@@ -582,6 +578,16 @@ class _Season(_Tvshow):
     @property
     def season(self):
         return self.infolabels.get('season')
+
+    @property
+    def airedepisodes(self):
+        return try_int(self.infoproperties.get('airedepisodes'), fallback=0)
+
+    @property
+    def totalepisodes(self):
+        if self.airedepisodes and get_setting('seasons_anticipated'):
+            return self.airedepisodes
+        return super().totalepisodes
 
     def get_context_menu_choosedefault_params(self):
         params = super().get_context_menu_choosedefault_params()
