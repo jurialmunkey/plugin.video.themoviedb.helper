@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2024-06-20 20:05+0000\n"
-"PO-Revision-Date: 2026-01-13 18:33+0000\n"
+"PO-Revision-Date: 2026-09-07 01:20-0400\n"
 "Last-Translator: 01xKeven\n"
 "Language-Team: Spanish - GTKing Phoenix TEAM\n"
 "Language: es_ES\n"
@@ -471,7 +471,7 @@ msgctxt "#32094"
 msgid "Select TMDb type"
 msgstr "Seleccionar tipo TMDb"
 
-#: /resources/lib/container.py
+#: /resources/lib/container/basedir.py
 msgctxt "#32078"
 msgid "Still to Watch"
 msgstr "Sin reproducir"
@@ -2043,6 +2043,11 @@ msgctxt "#32382"
 msgid "Hide Episode Groups"
 msgstr "Ocultar grupos de episodios"
 
+#: /resources/tmdbhelper/lib/script/method/image_functions.py
+msgctxt "#32399"
+msgid "Retrieving Artwork"
+msgstr "Recuperando arte"
+
 #: /resources/settings.xml
 msgctxt "#32383"
 msgid "Hide Episode Groups and Specials"
@@ -2052,6 +2057,16 @@ msgstr "Ocultar grupos de episodios y especiales"
 msgctxt "#32384"
 msgid "Hide Episode Groups and Up Next"
 msgstr "Ocultar grupos de episodios y siguiente"
+
+#: /resources/settings.xml
+msgctxt "#32402"
+msgid "Scrobble items on MDbList while watching"
+msgstr "Scrobble elementos en MDbList mientras se ven"
+
+#: /resources/settings.xml
+msgctxt "#32403"
+msgid "Sync"
+msgstr "Sincronización"
 
 #: /resources/settings.xml
 msgctxt "#32385"
@@ -2072,6 +2087,11 @@ msgstr "Utilice un nombre de archivo .nfo alternativo"
 msgctxt "#32391"
 msgid "Select update type"
 msgstr "Seleccione el tipo de actualización"
+
+#: /resources/settings.xml
+msgctxt "#32408"
+msgid "History"
+msgstr "Historial"
 
 #: /resources/lib/script/router.py
 msgctxt "#32392"
@@ -2118,6 +2138,11 @@ msgstr "Reproducir archivos de la biblioteca local de Kodi"
 msgctxt "#32401"
 msgid "TMDb detailed information"
 msgstr "Información detallada de TMDb"
+
+#: /resources/settings.xml
+msgctxt "#32417"
+msgid "MDbList support is currently experimental"
+msgstr "La compatibilidad con MDbList es actualmente experimental"
 
 #: /resources/settings.xml
 msgctxt "#32404"
@@ -2714,6 +2739,26 @@ msgctxt "#32536"
 msgid "Unspecified"
 msgstr "No especificado"
 
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32537"
+msgid "Availability"
+msgstr "Disponibilidad"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32538"
+msgid "My favorites"
+msgstr "Mis favoritos"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32539"
+msgid "Streaming now"
+msgstr "En streaming ahora"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32540"
+msgid "All digital releases"
+msgstr "Todos los lanzamientos digitales"
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr "Hindi (India)"
@@ -2865,6 +2910,10 @@ msgstr "Mandarín (Taiwán)"
 msgctxt "#30067"
 msgid "Zulu (South Africa)"
 msgstr "Zulú (Sudáfrica)"
+
+msgctxt "#30068"
+msgid "Croatian (Croatia)"
+msgstr "Croata (Croacia)"
 
 #: /resources/settings.xml
 msgctxt "#32001"
