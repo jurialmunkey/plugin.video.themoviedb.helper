@@ -66,6 +66,10 @@ class ServiceMonitor(Poller):
 
     def _on_exit(self):
         try:
+            self.player_monitor.on_service_exit()
+        except Exception:
+            pass
+        try:
             self.cron_job.exit = True
         except AttributeError:
             pass
