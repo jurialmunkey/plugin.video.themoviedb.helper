@@ -59,8 +59,14 @@ class GetTraktStatsRequest:
 
     @cached_property
     def response_json(self):
+        from json import JSONDecodeError
         response = self.trakt_api.get_response(self.url)
-        return response.json() if response else None
+        try:
+            return response.json()
+        except AttributeError:
+            return
+        except JSONDecodeError:
+            return
 
     @cached_property
     def values(self):
