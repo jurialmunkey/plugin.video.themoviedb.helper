@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2026-08-23 06:00+0200\n"
+"PO-Revision-Date: 2026-09-05 06:00+0200\n"
 "Last-Translator: 3vtv\n"
 "Language-Team: POLISH\n"
 "Language: pl_PL\n"
@@ -2125,6 +2125,11 @@ msgstr "Odtwarzaj lokalne pliki biblioteki Kodi"
 msgctxt "#32401"
 msgid "TMDb detailed information"
 msgstr "Informacje szczegółowe TMDB"
+
+#: /resources/settings.xml
+msgctxt "#32417"
+msgid "MDbList support is currently experimental"
+msgstr "Obsługa MDbList ma obecnie charakter eksperymentalny"
 
 #: /resources/settings.xml
 msgctxt "#32404"
