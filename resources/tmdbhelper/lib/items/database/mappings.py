@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.api.mapping import _ItemMapper
+from tmdbhelper.lib.addon.consts import TMDB_ARTWORK_TYPES
 from collections import namedtuple
 
 
@@ -12,8 +13,6 @@ ExtendedMap = namedtuple("ExtendedMap", "base unique_id overwrite data")
 FTV_WITHOUT_SEASONS = 0
 FTV_TVSHOWS_SEASONS = 1
 FTV_SEASONS_SEASONS = 2
-
-TMDB_ARTWORK_TYPES = ('backdrops', 'posters', 'stills', 'logos', 'profiles', )
 
 
 def get_blanks_none(i):

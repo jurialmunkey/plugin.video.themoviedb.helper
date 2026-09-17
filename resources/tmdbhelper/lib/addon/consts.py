@@ -29,6 +29,8 @@ LANGUAGES = (
     'sr-RS', 'sv-SE', 'ta-IN', 'te-IN', 'th-TH', 'tl-PH', 'tr-TR', 'uk-UA', 'vi-VN', 'zh-CN', 'zh-HK',
     'zh-TW', 'zu-ZA', 'hr-HR')
 
+TMDB_ARTWORK_TYPES = ('backdrops', 'posters', 'stills', 'logos', 'profiles', )
+
 TMDB_PARAMS_SEASONS = {
     'info': 'details',
     'tmdb_type': 'tv',
