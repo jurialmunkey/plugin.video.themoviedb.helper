@@ -558,6 +558,12 @@ class _Season(_Tvshow):
     mediatype = 'season'
     trakt_type = 'season'
 
+    @cached_property
+    def is_unaired(self):
+        if not self.infolabels.get('premiered'):
+            return not self.airedepisodes
+        return is_unaired_timestamp(self.infolabels.get('premiered'), True)
+
     def finalise_infoproperties(self):
         super(_Tvshow, self).finalise_infoproperties()  # Skip TV Show additions
         self.infoproperties['totalepisodes'] = self.totalepisodes
