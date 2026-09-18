@@ -1,9 +1,15 @@
 from jurialmunkey.window import get_property
 from jurialmunkey.ftools import cached_property
 from jurialmunkey.parser import try_int
+from threading import RLock
+from time import monotonic
 from tmdbhelper.lib.addon.plugin import get_setting
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.tmdate import set_timestamp
+from tmdbhelper.lib.addon.thread import SafeThread
+
+
+SCROBBLE_HEARTBEAT_INTERVAL = 300
 
 
 class PlayerScrobbler():
@@ -21,6 +27,10 @@ class PlayerScrobbler():
         self.stopped = False
         self.started = False
         self.syncing = False
+        self._heartbeat_inflight = False
+        self._heartbeat_last = None
+        self._heartbeat_thread = None
+        self._scrobble_lock = RLock()
 
     def playerstring_get_tmdb_type(self):
         tmdb_type = self.playerstring.get('tmdb_type')
@@ -153,26 +163,66 @@ class PlayerScrobbler():
     def scrobble(self, method):
         if method not in ('start', 'stop'):
             return
-        if self.is_trakt_authorized:
-            self.trakt_scrobbler_item['progress'] = self.progress
-            path = f'https://api.trakt.tv/scrobble/{method}'
-            data = self.trakt_api.get_api_request(
-                path,
-                postdata=self.trakt_scrobbler_item,
-                headers=self.trakt_api.headers,
-                method='json'
-            )
-            kodi_log(f'SCROBBLER: [TRAKT] [{method}] {self.content_id} -- {self.progress:.2f}%\n{self.trakt_scrobbler_item}\n{data}', 2)
-        if self.is_mdblist_authorized:
-            self.mdblist_scrobbler_item['progress'] = try_int(self.progress)
-            path = self.mdblist_api.get_request_url('scrobble', method)
-            data = self.mdblist_api.get_simple_api_request(
-                path,
-                postdata=self.mdblist_scrobbler_item,
-                headers=self.mdblist_api.headers,
-                method='json'
-            )
-            kodi_log(f'SCROBBLER: [MDBLIST] [{method}] {self.content_id} -- {self.progress:.2f}%\n{self.mdblist_scrobbler_item}\n{data}', 2)
+        with self._scrobble_lock:
+            if self.stopped:
+                return
+            if self.is_trakt_authorized:
+                self.trakt_scrobbler_item['progress'] = self.progress
+                path = f'https://api.trakt.tv/scrobble/{method}'
+                data = self.trakt_api.get_api_request(
+                    path,
+                    postdata=self.trakt_scrobbler_item,
+                    headers=self.trakt_api.headers,
+                    method='json'
+                )
+                kodi_log(f'SCROBBLER: [TRAKT] [{method}] {self.content_id} -- {self.progress:.2f}%\n{self.trakt_scrobbler_item}\n{data}', 2)
+            if self.is_mdblist_authorized:
+                self.mdblist_scrobbler_item['progress'] = try_int(self.progress)
+                path = self.mdblist_api.get_request_url('scrobble', method)
+                data = self.mdblist_api.get_simple_api_request(
+                    path,
+                    postdata=self.mdblist_scrobbler_item,
+                    headers=self.mdblist_api.headers,
+                    method='json'
+                )
+                kodi_log(f'SCROBBLER: [MDBLIST] [{method}] {self.content_id} -- {self.progress:.2f}%\n{self.mdblist_scrobbler_item}\n{data}', 2)
+
+    def heartbeat_due(self, current_time=None, force=False):
+        if not self.started or self.stopped or self.syncing:
+            return False
+        if self._heartbeat_inflight:
+            return False
+        if force or self._heartbeat_last is None:
+            return True
+        current_time = monotonic() if current_time is None else current_time
+        return current_time - self._heartbeat_last >= SCROBBLE_HEARTBEAT_INTERVAL
+
+    def _heartbeat_worker(self):
+        try:
+            self.scrobble('start')
+        finally:
+            self._heartbeat_inflight = False
+
+    def wait_for_heartbeat(self, timeout=5):
+        if not self._heartbeat_thread or not self._heartbeat_inflight:
+            return
+        self._heartbeat_thread.join(timeout)
+
+    @is_scrobbling
+    def heartbeat(self, tmdb_type, tmdb_id, force=False, background=True):
+        if not self.is_match(tmdb_type, tmdb_id):
+            return False
+        current_time = monotonic()
+        if not self.heartbeat_due(current_time=current_time, force=force):
+            return False
+        self._heartbeat_last = current_time
+        self._heartbeat_inflight = True
+        if not background:
+            self._heartbeat_worker()
+            return True
+        self._heartbeat_thread = SafeThread(target=self._heartbeat_worker)
+        self._heartbeat_thread.start()
+        return True
 
     @is_scrobbling
     def start(self, tmdb_type, tmdb_id):
@@ -182,6 +232,7 @@ class PlayerScrobbler():
             return self.stop(tmdb_type, tmdb_id)
         self.scrobble('start')
         self.started = True
+        self._heartbeat_last = monotonic()
 
     @is_scrobbling
     def pause(self, tmdb_type, tmdb_id):
@@ -191,12 +242,15 @@ class PlayerScrobbler():
     def stop(self, tmdb_type, tmdb_id):
         if not self.started or self.stopped:
             return
-        kodi_log(f'SCROBBLER: [Stop] {self.content_id} -- {self.progress:.2f}%', 2)
-        self.scrobble('stop') if not self.syncing else None
-        self.set_kodi_watched()
-        self.set_tmdb_ratings()
-        self.update_stats()
-        self.stopped = True
+        with self._scrobble_lock:
+            if self.stopped:
+                return
+            kodi_log(f'SCROBBLER: [Stop] {self.content_id} -- {self.progress:.2f}%', 2)
+            self.scrobble('stop') if not self.syncing else None
+            self.set_kodi_watched()
+            self.set_tmdb_ratings()
+            self.update_stats()
+            self.stopped = True
 
     @is_scrobbling
     def sync(self, tmdb_type, tmdb_id):
