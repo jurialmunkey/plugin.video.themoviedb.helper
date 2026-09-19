@@ -320,8 +320,17 @@ RATINGS_COLUMNS = {
     'rottentomatoes_image': {
         'data': 'TEXT',
     },
+    'rottentomatoes_usermeter_image': {
+        'data': 'TEXT',
+    },
     'metacritic_rating': {
         'data': 'INTEGER',
+    },
+    'metacriticuser_rating': {
+        'data': 'INTEGER',
+    },
+    'metacritic_image': {
+        'data': 'TEXT',
     },
     'trakt_rating': {
         'data': 'INTEGER',
@@ -340,6 +349,12 @@ RATINGS_COLUMNS = {
     },
     'mdblist_votes': {
         'data': 'INTEGER',
+    },
+    'rogerebert_rating': {
+        'data': 'INTEGER',
+    },
+    'rogerebert_image': {
+        'data': 'TEXT',
     },
     'myanimelist_rating': {
         'data': 'INTEGER',

@@ -1,5 +1,4 @@
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.addon.tmdate import convert_timestamp
 from tmdbhelper.lib.sync.nextmeta import SyncNextEpisodeItem, SyncAllNextEpisodesMetaItem, SyncAllNextEpisodesMeta
 from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
 

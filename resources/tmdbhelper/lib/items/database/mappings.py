@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.api.mapping import _ItemMapper
+from tmdbhelper.lib.addon.consts import TMDB_ARTWORK_TYPES
 from collections import namedtuple
 
 
@@ -640,6 +641,8 @@ class ItemMapperMethods:
         data = []
 
         for artwork_type, artworks in items.items():
+            if artwork_type not in TMDB_ARTWORK_TYPES:
+                continue
             for artwork in artworks:
                 path = artwork['file_path']
                 data.append(
