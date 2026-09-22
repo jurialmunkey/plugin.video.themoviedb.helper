@@ -90,10 +90,14 @@ class RatingsDict(BaseList):
             return {}
 
     @cached_property
+    def trakt_ratings_uri(self):
+        return f'{self.trakt_type}s/{self.imdb_id}/ratings'
+
+    @cached_property
     def trakt_ratings(self):
         if not self.common_apis.trakt_api or not self.common_apis.trakt_api.authenticator.is_authorized or not self.imdb_id:
             return {}
-        data = self.common_apis.trakt_api.get_response_json(f'{self.trakt_type}s/{self.imdb_id}/ratings')
+        data = self.common_apis.trakt_api.get_response_json(self.trakt_ratings_uri)
         if not data:
             return {}
         try:
@@ -208,6 +212,7 @@ class RatingsDict(BaseList):
 class RatingsSeasonsDict(RatingsDict):
     rating_attribs = (
         'mdblist_ratings',
+        'trakt_ratings',
     )
 
     def get_mediatype(self):
@@ -217,9 +222,9 @@ class RatingsSeasonsDict(RatingsDict):
         return 'show'
 
     def get_online_data_mapped(self):
-        if self.tmdb_type != 'tv':
-            return
         if self.season is None:
+            return
+        if self.tmdb_type != 'tv':
             return
         return super().get_online_data_mapped()
 
@@ -228,28 +233,21 @@ class RatingsSeasonsDict(RatingsDict):
         return self.get_season_id(self.tmdb_type, self.tmdb_id, self.season)
 
     @cached_property
+    def trakt_ratings_uri(self):
+        return f'{self.trakt_type}s/{self.imdb_id}/seasons/{self.season}/ratings'
+
+    @cached_property
     def mdblist_ratings(self):
         if not self.common_apis.mdblist_api:
             return {}
         return self.common_apis.mdblist_api.get_season_ratings(self.trakt_type, self.tmdb_id, self.season) or {}
 
 
-class RatingsEpisodesDict(RatingsDict):
-    rating_attribs = (
-        'mdblist_ratings',
-    )
-
+class RatingsEpisodesDict(RatingsSeasonsDict):
     def get_mediatype(self):
         return 'episode'
 
-    def get_trakt_type(self):
-        return 'show'
-
     def get_online_data_mapped(self):
-        if self.tmdb_type != 'tv':
-            return
-        if self.season is None:
-            return
         if self.episode is None:
             return
         return super().get_online_data_mapped()
@@ -257,6 +255,10 @@ class RatingsEpisodesDict(RatingsDict):
     @property
     def item_id(self):
         return self.get_episode_id(self.tmdb_type, self.tmdb_id, self.season, self.episode)
+
+    @cached_property
+    def trakt_ratings_uri(self):
+        return f'{self.trakt_type}s/{self.imdb_id}/seasons/{self.season}/episodes/{self.episode}/ratings'
 
     @cached_property
     def mdblist_ratings(self):
