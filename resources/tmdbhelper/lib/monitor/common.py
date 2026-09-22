@@ -138,9 +138,36 @@ class CommonMonitorDetails(CommonContainerAPIs):
         sync.tmdb_id = tmdb_id
         return sync.data or {}
 
+    def get_season_ratings(self, tmdb_type, tmdb_id, season=None):
+        from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings import RatingsSeasonsDict
+        sync = RatingsSeasonsDict()
+        sync.common_apis.mdblist_api = self.mdblist_api
+        sync.common_apis.trakt_api = self.trakt_api
+        sync.common_apis.tmdb_api = self.tmdb_api
+        sync.common_apis.omdb_api = self.omdb_api
+        sync.tmdb_type = tmdb_type
+        sync.tmdb_id = tmdb_id
+        sync.season = season
+        return sync.data or {}
+
+    def get_episode_ratings(self, tmdb_type, tmdb_id, season=None, episode=None):
+        from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings import RatingsEpisodesDict
+        sync = RatingsEpisodesDict()
+        sync.common_apis.mdblist_api = self.mdblist_api
+        sync.common_apis.trakt_api = self.trakt_api
+        sync.common_apis.tmdb_api = self.tmdb_api
+        sync.common_apis.omdb_api = self.omdb_api
+        sync.tmdb_type = tmdb_type
+        sync.tmdb_id = tmdb_id
+        sync.season = season
+        sync.episode = episode
+        return sync.data or {}
+
     def get_all_ratings(self, tmdb_type, tmdb_id, season=None, episode=None):
         info = {}
         info.update(self.get_detailed_ratings(tmdb_type, tmdb_id))
+        info.update(self.get_season_ratings(tmdb_type, tmdb_id, season))
+        info.update(self.get_episode_ratings(tmdb_type, tmdb_id, season, episode))
         info.update(self.get_tvdb_awards(tmdb_type, tmdb_id))
         return info
 

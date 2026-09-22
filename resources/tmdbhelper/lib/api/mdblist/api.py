@@ -139,6 +139,53 @@ class MDbListRatingMapping:
         return ratings
 
 
+class MDbListSeasonRatingMapping:
+
+    season = None
+
+    def __init__(self, meta):
+        self.meta = meta
+
+    @cached_property
+    def meta_episode_ratings(self):
+        try:
+            return self.meta['episode_ratings']
+        except (KeyError, TypeError):
+            return {}
+
+    @cached_property
+    def meta_season(self):
+        try:
+            return next((d for d in self.meta_episode_ratings['seasons'] if int(d['season_number']) == int(self.season)))
+        except (KeyError, TypeError, StopIteration):
+            return {}
+
+    @cached_property
+    def ratings(self):
+        ratings = {}
+        ratings['imdb_rating'] = self.meta_season.get('avg')  # MDbList episode_ratings return IMDb scores
+        return ratings
+
+
+class MDbListEpisodeRatingMapping(MDbListSeasonRatingMapping):
+
+    episode = None
+
+    @cached_property
+    def meta_episode(self):
+        try:
+            return next((d for d in self.meta_season['episodes'] if int(d['episode_number']) == int(self.episode)))
+        except (KeyError, TypeError, StopIteration):
+            return {}
+
+    @cached_property
+    def ratings(self):
+        ratings = {}
+        ratings['imdb_rating'] = self.meta_episode.get('rating')  # MDbList episode_ratings return IMDb scores
+        ratings['imdb_votes'] = self.meta_episode.get('votes')  # MDbList episode_ratings return IMDb votes
+        return ratings
+
+
 class MDbList(RequestAPI):
 
     api_key = API_KEY
@@ -157,12 +204,25 @@ class MDbList(RequestAPI):
         path = self.get_request_url('lists', list_id, 'items', action)
         return self.get_api_request(path, postdata=item, method='json')
 
-    def get_details(self, media_type, media_id, media_provider='tmdb', append_to_response='keyword'):
+    def get_details(self, media_type, media_id, media_provider='tmdb', append_to_response='keyword,episode_ratings'):
         return self.get_request_sc(media_provider, media_type, media_id, append_to_response=append_to_response)  # TODO: Add append_to_response=review ?
 
     def get_ratings(self, media_type, media_id, media_provider='tmdb'):
         response = self.get_details(media_type, media_id, media_provider=media_provider)
         response = MDbListRatingMapping(response)
+        return response.ratings
+
+    def get_season_ratings(self, media_type, media_id, season=None, media_provider='tmdb'):
+        response = self.get_details(media_type, media_id, media_provider=media_provider)
+        response = MDbListSeasonRatingMapping(response)
+        response.season = season
+        return response.ratings
+
+    def get_episode_ratings(self, media_type, media_id, season=None, episode=None, media_provider='tmdb'):
+        response = self.get_details(media_type, media_id, media_provider=media_provider)
+        response = MDbListEpisodeRatingMapping(response)
+        response.season = season
+        response.episode = episode
         return response.ratings
 
     def get_response(self, *args, **kwargs):
