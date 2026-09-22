@@ -102,10 +102,10 @@ class RatingsDict(BaseList):
     @cached_property
     def online_data_mapped(self):
         """ function called when local cache does not have any data """
-        data = {}
 
         def get_data_attr(attr):
-            data.update(getattr(self, attr))
+            data = getattr(self, attr)
+            return data or {}
 
         attribs = (
             'omdb_ratings',
@@ -119,10 +119,10 @@ class RatingsDict(BaseList):
         self.trakt_type = self.get_trakt_type()
         self.imdb_id = self.get_imdb_id()
 
-        with ParallelThread(attribs, get_data_attr):
-            pass
+        with ParallelThread(attribs, get_data_attr) as pt:
+            items = pt.queue
 
-        return data
+        return {k: v for d in items for k, v in d.items()}
 
     def configure_mapped_data(self, data):
         def get_value(k):
