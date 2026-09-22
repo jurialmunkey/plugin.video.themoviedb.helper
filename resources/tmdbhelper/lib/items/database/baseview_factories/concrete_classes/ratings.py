@@ -2,6 +2,7 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.baseclass import BaseList
 from tmdbhelper.lib.query.database.database import FindQueriesDatabase
 from tmdbhelper.lib.addon.thread import ParallelThread
+from tmdbhelper.lib.api.trakt.ratings import map_trakt_ratings
 from jurialmunkey.parser import try_int
 
 
@@ -97,16 +98,10 @@ class RatingsDict(BaseList):
     def trakt_ratings(self):
         if not self.common_apis.trakt_api or not self.common_apis.trakt_api.authenticator.is_authorized or not self.imdb_id:
             return {}
-        data = self.common_apis.trakt_api.get_response_json(self.trakt_ratings_uri)
+        data = self.common_apis.trakt_api.get_response_json(self.trakt_ratings_uri, extended='all')
         if not data:
             return {}
-        try:
-            return {
-                'trakt_rating': int(float(data['rating']) * 10),  # Convert /10 float to /100 int
-                'trakt_votes': int(data['votes']),
-            }
-        except (KeyError, TypeError, IndexError, ValueError):
-            return {}
+        return map_trakt_ratings(data)
 
     @cached_property
     def tmdb_ratings(self):
