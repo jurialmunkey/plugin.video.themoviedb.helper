@@ -294,7 +294,8 @@ class _ListItem(object):
         return listitem
 
     def set_properties(self, listitem):
-        listitem.setProperties({k: f'{v}' for k, v in self.infoproperties.items() if v not in (None, '')})
+        clean_props = {str(k): str(v) for k, v in self.infoproperties.items() if v not in (None, '')}
+        listitem.setProperties(clean_props)
         return listitem
 
     def set_label2(self, listitem):

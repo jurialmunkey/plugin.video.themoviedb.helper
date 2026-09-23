@@ -20,8 +20,11 @@ class BaseItemSkinDefaults(dict):
 
         response = None
         with contextlib.suppress(IOError, json.JSONDecodeError):
-            with xbmcvfs.File(filepath, 'r') as file:
-                response = json.load(file)
+            file = xbmcvfs.File(filepath, 'r')
+            try:
+                response = json.loads(file.read())
+            finally:
+                file.close()
 
         if not response:
             return []
