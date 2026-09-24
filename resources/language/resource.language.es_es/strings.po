@@ -484,7 +484,7 @@ msgstr "Otro"
 #: /resources/settings.xml
 msgctxt "#32081"
 msgid "Next page item"
-msgstr "Elemento de página siguiente"
+msgstr "Mostrar «Página siguiente»"
 
 #: /resources/tmdbhelper/lib/script/method/modify_identifier.py
 msgctxt "#32098"
