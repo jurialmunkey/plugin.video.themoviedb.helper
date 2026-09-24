@@ -1435,12 +1435,12 @@ msgstr "Promedio de votos ( < o = )"
 #: /resources/lib/userdiscover.py
 msgctxt "#32274"
 msgid "Runtime (Minutes) ( > or = )"
-msgstr "Duración (minutos) ( >= )"
+msgstr "Duración (minutos) ( > o = )"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32275"
 msgid "Runtime (Minutes) ( < or = )"
-msgstr "Duración (minutos) ( <= )"
+msgstr "Duración (minutos) ( < o = )"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32276"
