@@ -1435,12 +1435,12 @@ msgstr "Promedio de votos ( < o = )"
 #: /resources/lib/userdiscover.py
 msgctxt "#32274"
 msgid "Runtime (Minutes) ( > or = )"
-msgstr "Duración (minutos)"
+msgstr "Duración (minutos) ( >= )"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32275"
 msgid "Runtime (Minutes) ( < or = )"
-msgstr "Duración (minutos)"
+msgstr "Duración (minutos) ( <= )"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32276"
@@ -2154,7 +2154,7 @@ msgstr "Episodios en progreso"
 #: /resources/settings.xml
 msgctxt "#32407"
 msgid "Get resume points (experimental) (slower)"
-msgstr "Obtener puntos de reanudación"
+msgstr "Obtener puntos de reanudación (experimental) (más lento)"
 
 #: /resources/settings.xml
 msgctxt "#32409"
@@ -2164,7 +2164,7 @@ msgstr "Ubicación de la base de datos de caché"
 #: /resources/settings.xml
 msgctxt "#32410"
 msgid "Max concurrent threads (0 is unlimited)"
-msgstr "Máximo de hilos simultáneos"
+msgstr "Máximo de hilos simultáneos (0 es ilimitado)"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32411"
@@ -2975,7 +2975,7 @@ msgstr "Utilice fanart.tv para el artwork del complemento (más lento)"
 #: /resources/settings.xml
 msgctxt "#32023"
 msgid "Default select action in addon"
-msgstr "Seleccione la acción"
+msgstr "Acción de selección predeterminada en el add-on"
 
 #: /resources/settings.xml
 msgctxt "#32024"
