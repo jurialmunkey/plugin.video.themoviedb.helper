@@ -287,7 +287,7 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         try:
             if (self.getTime() / self.getTotalTime()) < 0.8:
                 return
-        except ZeroDivisionError:
+        except (ZeroDivisionError, RuntimeError):
             return
         self.scrobbler_update()
         self.scrobbler.sync(self.tmdb_type, self.tmdb_id)
@@ -424,8 +424,17 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         self.scrobbler_sync()
 
     def get_playingitem(self):
+        # Callbacks can still arrive after playback has stopped. Kodi then raises
+        # RuntimeError from getPlayingFile(), getTotalTime(), getVideoInfoTag() etc.
+        try:
+            self._get_playingitem()
+        except RuntimeError:
+            self.reset_properties()
+
+    def _get_playingitem(self):
         # Check that video other than dummy splash video is playing
-        if self.getPlayingFile() and self.getPlayingFile().endswith('dummy.mp4'):
+        playing_file = self.getPlayingFile()
+        if playing_file and playing_file.endswith('dummy.mp4'):
             self.reset_properties()
             return
 
