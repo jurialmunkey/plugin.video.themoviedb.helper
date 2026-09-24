@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2024-06-20 20:05+0000\n"
-"PO-Revision-Date: 2026-09-07 01:20-0400\n"
+"PO-Revision-Date: 2026-09-24 16:30-0400\n"
 "Last-Translator: 01xKeven\n"
 "Language-Team: Spanish - GTKing Phoenix TEAM\n"
 "Language: es_ES\n"
@@ -84,7 +84,7 @@ msgstr "Alemán (Austria)"
 #: /resources/settings.xml
 msgctxt "#32013"
 msgid "Get watched indicators, episode counts, and resume points"
-msgstr "Obtener indicadores de visto, recuento de episodios y puntos de reanudación"
+msgstr "Obtener estado de visto, recuento de episodios y puntos de reanudación"
 
 msgctxt "#30010"
 msgid "German (Switzerland)"
@@ -274,17 +274,17 @@ msgstr "Hebreo (Israel)"
 #: /resources/settings.xml
 msgctxt "#32029"
 msgid "OMDb API"
-msgstr "API OMDb"
+msgstr "API de OMDb"
 
 #: /resources/settings.xml
 msgctxt "#32030"
 msgid "Fanart.tv API"
-msgstr "API Fanart.tv"
+msgstr "API de Fanart.tv"
 
 #: /resources/settings.xml
 msgctxt "#32031"
 msgid "Trakt API"
-msgstr "API Trakt"
+msgstr "API de Trakt"
 
 #: /resources/settings.xml
 msgctxt "#32032"
@@ -294,12 +294,12 @@ msgstr "Descargar Reproductores"
 #: /resources/settings.xml
 msgctxt "#32033"
 msgid "Default Players"
-msgstr "Reproductores por defecto"
+msgstr "Reproductores predeterminados"
 
 #: /resources/settings.xml
 msgctxt "#32034"
 msgid "Get watched indicators and episode counts"
-msgstr "Obtener indicadores de visto y recuento de episodios"
+msgstr "Obtener estado de visto y recuento de episodios"
 
 #: /resources/settings.xml
 msgctxt "#32037"
@@ -349,7 +349,7 @@ msgstr "Última fecha de emisión"
 #: /resources/settings.xml
 msgctxt "#32042"
 msgid "Choose Action"
-msgstr "Elige Acción"
+msgstr "Elegir acción"
 
 #: /resources/lib/container.py
 msgctxt "#32043"
@@ -384,7 +384,7 @@ msgstr "El nombre de usuario o la contraseña no son válidos. ¿Le gustaría vo
 #: /resources/lib/downloader.py
 msgctxt "#32057"
 msgid "Retry"
-msgstr "Repetir"
+msgstr "Reintentar"
 
 #: /resources/lib/downloader.py
 msgctxt "#32058"
@@ -399,7 +399,7 @@ msgstr "Usuario"
 #: /resources/lib/downloader.py
 msgctxt "#32059"
 msgid "Success!"
-msgstr "¡Correcto!"
+msgstr "¡Éxito!"
 
 #: /resources/lib/downloader.py
 msgctxt "#32060"
@@ -444,7 +444,7 @@ msgstr "Mujer"
 #: /resources/settings.xml
 msgctxt "#32073"
 msgid "Hide unaired movies"
-msgstr "Ocultar películas no emitidas"
+msgstr "Ocultar películas no estrenadas"
 
 #: /resources/settings.xml
 msgctxt "#32074"
@@ -474,7 +474,7 @@ msgstr "Seleccionar tipo TMDb"
 #: /resources/lib/container/basedir.py
 msgctxt "#32078"
 msgid "Still to Watch"
-msgstr "Sin reproducir"
+msgstr "Por ver"
 
 #: /resources/settings.xml
 msgctxt "#32080"
@@ -484,7 +484,7 @@ msgstr "Otro"
 #: /resources/settings.xml
 msgctxt "#32081"
 msgid "Next page item"
-msgstr "Siguiente página de elementos"
+msgstr "Mostrar «Página siguiente»"
 
 #: /resources/tmdbhelper/lib/script/method/modify_identifier.py
 msgctxt "#32098"
@@ -499,12 +499,12 @@ msgstr "Ocultar episodios no emitidos"
 #: /resources/settings.xml
 msgctxt "#32085"
 msgid "Flatten seasons"
-msgstr "Compactar capitulos"
+msgstr "Combinar temporadas"
 
 #: /resources/settings.xml
 msgctxt "#32086"
 msgid "Auto-update library and add new/missing episodes"
-msgstr "Actualizar automaticamente la biblioteca y agregar episodios nuevos/faltantes"
+msgstr "Actualizar automáticamente la biblioteca y agregar episodios nuevos/faltantes"
 
 #: /resources/settings.xml
 msgctxt "#32088"
@@ -514,7 +514,7 @@ msgstr "Navegación"
 #: /resources/settings.xml
 msgctxt "#32089"
 msgid "Select Action"
-msgstr "Seleccione la acción"
+msgstr "Elegir acción"
 
 #: /resources/settings.xml
 msgctxt "#32090"
@@ -544,7 +544,7 @@ msgstr "Widgets"
 #: /resources/settings.xml
 msgctxt "#32093"
 msgid "Next episodes sort method"
-msgstr "Método de clasificación de próximos episodios"
+msgstr "Orden de próximos episodios"
 
 #: /resources/settings.xml
 msgctxt "#32095"
@@ -599,7 +599,7 @@ msgstr "Agregar elementos"
 #: /resources/lib/container.py
 msgctxt "#32103"
 msgid "No Value Added"
-msgstr "Sin valor agregado"
+msgstr "No se añadió ningún valor"
 
 #: /resources/lib/container.py
 msgctxt "#32104"
@@ -623,22 +623,22 @@ msgstr "Elija el método de coincidencia para parámetros con múltiples valores
 #: /resources/settings.xml
 msgctxt "#32124"
 msgid "RatingPosterDB API"
-msgstr "API RatingPosterDB"
+msgstr "API de RatingPosterDB"
 
 #: /resources/lib/container.py
 msgctxt "#32109"
 msgid "Match ANY Value"
-msgstr "Coincide con CUALQUIER valor"
+msgstr "Coincidir con cualquier valor"
 
 #: /resources/lib/container.py
 msgctxt "#32110"
 msgid "Match ALL Values"
-msgstr "Coinciden TODOS los valores"
+msgstr "Coincidir con todos los valores"
 
 #: /resources/settings.xml
 msgctxt "#32127"
 msgid "RatingPosterDB API key"
-msgstr "Clave API RatingPosterDB"
+msgstr "Clave API de RatingPosterDB"
 
 #: /resources/tmdbhelper/lib/items/database/baseview_factories/concrete_classes/ftv_fanart.py
 msgctxt "#32128"
@@ -648,27 +648,27 @@ msgstr "Me gusta"
 #: /resources/settings.xml
 msgctxt "#32129"
 msgid "Override player monitor clearlogo with artwork from TMDbHelper"
-msgstr "Anular clearlogo del monitor del reproductor con arte de TMDbHelper"
+msgstr "Sustituir el clearlogo del monitor con artwork de TMDbHelper"
 
 #: /resources/lib/container.py
 msgctxt "#32111"
 msgid "Select Items"
-msgstr "Seleccionar Elementos"
+msgstr "Seleccionar elementos"
 
 #: /resources/lib/container.py
 msgctxt "#32112"
 msgid "Select Genres"
-msgstr "Seleccionar Géneros"
+msgstr "Seleccionar géneros"
 
 #: /resources/lib/container.py
 msgctxt "#32113"
 msgid "Also accepts days from today as T-X or T+X (e.g. T-10 is ten days ago)"
-msgstr "También acepta X días relativos a partir de hoy en el formato T-X o T+X (p.e, T-10 es hace diez días)"
+msgstr "También acepta X días relativos a partir de hoy en el formato T-X o T+X (p. ej., T-10 es hace diez días)"
 
 #: /resources/lib/container.py
 msgctxt "#32114"
 msgid "Enter"
-msgstr "Entrar"
+msgstr "Introducir"
 
 #: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
 msgctxt "#32134"
@@ -708,17 +708,17 @@ msgstr "Crear nuevo reproductor"
 #: /resources/tmdbhelper/lib/player/configure.py
 msgctxt "#32141"
 msgid "Delete fallback"
-msgstr "Eliminar alternativa"
+msgstr "Eliminar método alternativo"
 
 #: /resources/lib/container.py
 msgctxt "#32117"
 msgid "Keyword"
-msgstr "Teclado"
+msgstr "Palabra clave"
 
 #: /resources/tmdbhelper/lib/player/players.py
 msgctxt "#32143"
 msgid "Recaching Kodi library"
-msgstr "Recacheando biblioteca Kodi"
+msgstr "Regenerando caché de la biblioteca Kodi"
 
 #: /resources/tmdbhelper/lib/player/players.py
 msgctxt "#32144"
@@ -738,12 +738,12 @@ msgstr "Datos de sincronización de {} actualizados correctamente"
 #: /resources/settings.xml
 msgctxt "#32147"
 msgid "Gemini API"
-msgstr "API Gemini"
+msgstr "API de Gemini"
 
 #: /resources/settings.xml
 msgctxt "#32148"
 msgid "Gemini API key"
-msgstr "Clave API Gemini"
+msgstr "Clave API de Gemini"
 
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_main.py
 msgctxt "#32149"
@@ -778,12 +778,12 @@ msgstr "Seleccionar tipos de lanzamiento"
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
 msgctxt "#32155"
 msgid "Airing"
-msgstr "Emitiendo"
+msgstr "En emisión"
 
 #: /resources/lib/container.py
 msgctxt "#32120"
 msgid "Select Region for Release"
-msgstr "Seleccionar región por lanzamiento"
+msgstr "Seleccionar región para el lanzamiento"
 
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
 msgctxt "#32157"
@@ -833,7 +833,7 @@ msgstr "¿Añadir otro elemento?"
 #: /resources/lib/context.py
 msgctxt "#32130"
 msgid "Auto-update library at time"
-msgstr "Actualizar automáticamente la biblioteca ahora"
+msgstr "Hora de actualización automática"
 
 #: /resources/settings.xml
 msgctxt "#32131"
@@ -853,7 +853,7 @@ msgstr "Seleccionar lista(s)"
 #: /resources/settings.xml
 msgctxt "#32142"
 msgid "Hide watched items"
-msgstr "Ocultar elementos visionados"
+msgstr "Ocultar elementos vistos"
 
 #: /resources/lib/context.py
 msgctxt "#32154"
@@ -883,16 +883,14 @@ msgstr "Reproducir archivos locales automáticamente"
 #: /resources/settings.xml
 msgctxt "#32163"
 msgid "Use fanart.tv for service monitor artwork"
-msgstr "Utilice fanart.tv para el artwork"
+msgstr "Usar fanart.tv para el artwork del monitor de servicio"
 
 #: /resources/lib/context.py
 msgctxt "#32164"
 msgid ""
 "Adding Trakt lists to library is limited to [B]{}[/B] TV Shows and [B]{}[/B] Movies per list.\n"
 "This limit is set to ensure that the APIs providing data for free are respected."
-msgstr ""
-"Agregar listas de Trakt a la biblioteca está limitado a [B]{}[/B] programas de TV y [B]{}[/B] películas por lista.\n"
-"Este límite se establece para garantizar que se respeten las API que proporcionan datos de forma gratuita."
+msgstr "Agregar listas de Trakt a la biblioteca está limitado a [B]{}[/B] series y [B]{}[/B] películas por lista.\nEste límite se establece para garantizar que se respeten las API que proporcionan datos de forma gratuita."
 
 #: /resources/lib/context.py
 msgctxt "#32166"
@@ -927,12 +925,12 @@ msgstr "[B][COLOR=red]Advertencia[/COLOR][/B] Esta lista contiene {} elementos"
 #: /resources/lib/constants.py
 msgctxt "#32172"
 msgid "People"
-msgstr "Gente"
+msgstr "Personas"
 
 #: /resources/lib/constants.py
 msgctxt "#32173"
 msgid "Randomised"
-msgstr "Aleatorizado"
+msgstr "Aleatorio"
 
 #: /resources/lib/constants.py
 msgctxt "#32174"
@@ -972,12 +970,12 @@ msgstr "En cines"
 #: /resources/lib/plugin.py
 msgctxt "#32181"
 msgid "Airing Today"
-msgstr "Emitido hoy"
+msgstr "En emisión hoy"
 
 #: /resources/lib/plugin.py
 msgctxt "#32182"
 msgid "Currently Airing"
-msgstr "Actualmente emitido"
+msgstr "Actualmente en emisión"
 
 #: /resources/lib/plugin.py
 msgctxt "#32183"
@@ -1062,7 +1060,7 @@ msgstr "Recomendado para ti"
 #: /resources/lib/plugin.py
 msgctxt "#32199"
 msgid "Based on Recently Watched"
-msgstr "Basado en visto recientemente"
+msgstr "Basado en lo visto recientemente"
 
 #: /resources/lib/plugin.py
 msgctxt "#32200"
@@ -1077,7 +1075,7 @@ msgstr "Su"
 #: /resources/lib/plugin.py
 msgctxt "#32202"
 msgid "Airing This Week"
-msgstr "Emitido esta semana"
+msgstr "En emisión esta semana"
 
 #: /resources/lib/plugin.py
 msgctxt "#32203"
@@ -1167,12 +1165,12 @@ msgstr "Token de acceso a Trakt no encontrado"
 #: /resources/lib/traktapi.py
 msgctxt "#32215"
 msgid "Logout failed!"
-msgstr "¡Falló el cierre de sesión!"
+msgstr "¡Error al cerrar la sesión!"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32216"
 msgid "Successfully logged out of Trakt user account"
-msgstr "Cerró sesión satisfactoriamente en la cuenta de usuario de Trakt"
+msgstr "Cerró sesión correctamente en la cuenta de usuario de Trakt"
 
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32234"
@@ -1187,7 +1185,7 @@ msgstr "Administrar artwork"
 #: /resources/lib/plugin.py
 msgctxt "#32223"
 msgid "Recommended"
-msgstr "Recomendada"
+msgstr "Recomendado"
 
 #: /resources/lib/plugin.py
 msgctxt "#32224"
@@ -1262,7 +1260,7 @@ msgstr "Borrar historial de encontrados"
 #: /resources/lib/userdiscover.py
 msgctxt "#32239"
 msgid "Match"
-msgstr "Equivalentes"
+msgstr "Coincidencia"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32240"
@@ -1282,12 +1280,12 @@ msgstr "Estreno"
 #: /resources/lib/userdiscover.py
 msgctxt "#32243"
 msgid "Theatrical (limited)"
-msgstr "Teatral (limitado)"
+msgstr "En cines (limitado)"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32244"
 msgid "Theatrical"
-msgstr "Teatral"
+msgstr "En cines"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32245"
@@ -1302,17 +1300,17 @@ msgstr "Físico"
 #: /resources/lib/userdiscover.py
 msgctxt "#32247"
 msgid "With Cast"
-msgstr "Con actores"
+msgstr "Con reparto"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32248"
 msgid "With Crew"
-msgstr "Con equipo"
+msgstr "Con equipo técnico"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32249"
 msgid "With People"
-msgstr "Con gente"
+msgstr "Con personas"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32250"
@@ -1322,12 +1320,12 @@ msgstr "Año de lanzamiento principal"
 #: /resources/lib/userdiscover.py
 msgctxt "#32251"
 msgid "Primary Release Date After"
-msgstr "Fecha  después lanzamiento principal"
+msgstr "Fecha después del lanzamiento principal"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32252"
 msgid "Primary Release Date Before"
-msgstr "Fecha  antes lanzamiento principal"
+msgstr "Fecha anterior al lanzamiento principal"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32253"
@@ -1352,7 +1350,7 @@ msgstr "Región de lanzamiento"
 #: /resources/lib/userdiscover.py
 msgctxt "#32257"
 msgid "With Networks"
-msgstr "Con Redes"
+msgstr "Con cadenas"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32258"
@@ -1392,12 +1390,12 @@ msgstr "Sin géneros"
 #: /resources/lib/userdiscover.py
 msgctxt "#32265"
 msgid "With Companies"
-msgstr "Con Empresas"
+msgstr "Con productoras"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32266"
 msgid "Without"
-msgstr "Sin nada"
+msgstr "Sin"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32267"
@@ -1437,17 +1435,17 @@ msgstr "Promedio de votos ( < o = )"
 #: /resources/lib/userdiscover.py
 msgctxt "#32274"
 msgid "Runtime (Minutes) ( > or = )"
-msgstr "Tiempo de reproducción (Minutos) ( > o = )"
+msgstr "Duración (minutos) ( > o = )"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32275"
 msgid "Runtime (Minutes) ( < or = )"
-msgstr "Tiempo de reproducción (Minutos) ( < o = )"
+msgstr "Duración (minutos) ( < o = )"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32276"
 msgid "Search for"
-msgstr "Buscar por"
+msgstr "Buscar"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32277"
@@ -1467,12 +1465,12 @@ msgstr "Introduzca el año"
 #: /resources/lib/basedir.py
 msgctxt "#32280"
 msgid "Last Fortnight"
-msgstr "Última Quincena"
+msgstr "Última quincena"
 
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32293"
 msgid "Returning Series"
-msgstr "Serie que regresa"
+msgstr "En curso"
 
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32294"
@@ -1502,7 +1500,7 @@ msgstr "Esta semana"
 #: /resources/lib/basedir.py
 msgctxt "#32285"
 msgid "This Fortnight"
-msgstr "Esta Quincena"
+msgstr "Esta quincena"
 
 #: /resources/lib/_trakt_itemlists.py
 msgctxt "#32286"
@@ -1517,7 +1515,7 @@ msgstr "Ordenar por"
 #: /resources/lib/traktlists.py
 msgctxt "#32288"
 msgid "Because you watched"
-msgstr "Por ver"
+msgstr "Porque viste"
 
 #: /resources/lib/script.py
 msgctxt "#32289"
@@ -1568,9 +1566,7 @@ msgctxt "#32297"
 msgid ""
 "{} was successful for {}!\n"
 "{} ID {}"
-msgstr ""
-"¡{} fue exitoso para {}!\n"
-"{} ID {}"
+msgstr "¡{} se completó para {}!\n{} ID {}"
 
 #: /resources/lib/syncitem.py
 msgctxt "#32298"
@@ -1625,7 +1621,7 @@ msgstr "Explorar lista ordenada"
 #: /resources/lib/window/manager.py
 msgctxt "#32310"
 msgid "TMDb ID for {} not found!"
-msgstr "¡ID de TMDb para {} no encontrada!"
+msgstr "¡ID de TMDb para {} no encontrado!"
 
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32323"
@@ -1645,7 +1641,7 @@ msgstr "Editar filtros"
 #: /resources/lib/player/players.py
 msgctxt "#32311"
 msgid "Clear default player"
-msgstr "Borrar player predeterminado"
+msgstr "Borrar reproductor predeterminado"
 
 #: /resources/lib/helpers/update.py
 msgctxt "#32312"
@@ -1674,12 +1670,12 @@ msgstr "Añadir a listas de favoritos"
 #: /resources/lib/trakt/api.py
 msgctxt "#32316"
 msgid "Successfully {} list!"
-msgstr "¡{} lista exitosamente!"
+msgstr "¡Acción de «{}» completada con éxito!"
 
 #: /resources/lib/trakt/api.py
 msgctxt "#32317"
 msgid "Unable to {} list!"
-msgstr "¡No se puede {} listar!"
+msgstr "¡No se pudo completar la acción de «{}»!"
 
 #: /resources/lib/trakt/api.py
 msgctxt "#32318"
@@ -1779,11 +1775,7 @@ msgid ""
 "Do you wish to save your changes?\n"
 "\n"
 "If you close without saving, your changes will be lost."
-msgstr ""
-"El archivo del reproductor [B]{}[/B] ha cambiado.\n"
-"¿Desea guardar los cambios?\n"
-"\n"
-"Si cierras sin guardar, los cambios se perderán."
+msgstr "El archivo del reproductor [B]{}[/B] ha cambiado.\n¿Desea guardar los cambios?\n\nSi cierra sin guardar, los cambios se perderán."
 
 #: /resources/lib/player/configure.py
 msgctxt "#32338"
@@ -1793,7 +1785,7 @@ msgstr "Cerrar sin guardar"
 #: /resources/lib/player/configure.py
 msgctxt "#32339"
 msgid "{} playback URL resolve method"
-msgstr "{} método de resolución de URL de reproducción"
+msgstr "Método de resolución de URL de {}"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32340"
@@ -1819,7 +1811,7 @@ msgstr "Opciones alternativas para {}"
 #: /resources/lib/player/configure.py
 msgctxt "#32343"
 msgid "Choose fallback for {} {}"
-msgstr "Elija un respaldo para {} {}"
+msgstr "Elija reproductor alternativo para {} {}"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32344"
@@ -1834,12 +1826,12 @@ msgstr "Grupos de episodios"
 #: /resources/settings.xml
 msgctxt "#32347"
 msgid "Log output of Trakt request"
-msgstr "Guardar historial de consultas de Trakt"
+msgstr "Registrar consultas de Trakt"
 
 #: /resources/settings.xml
 msgctxt "#32348"
 msgid "Log output of TMDb request"
-msgstr "Guardar historial de consultas de TMDb"
+msgstr "Registrar consultas de TMDb"
 
 #: /resources/settings.xml
 msgctxt "#32349"
@@ -1864,7 +1856,7 @@ msgstr "Duración del vídeo ficticio (segundos)"
 #: /resources/lib/player/players.py
 msgctxt "#32353"
 msgid "Missing \"is_resolvable\" Flag"
-msgstr "El indicador \"is_resolvable\" falta"
+msgstr "Falta el indicador \"is_resolvable\""
 
 #: /resources/lib/player/players.py
 msgctxt "#32354"
@@ -1880,7 +1872,7 @@ msgstr ""
 #: /resources/lib/script/sync.py
 msgctxt "#32355"
 msgid "Remove from user list"
-msgstr "Eliminar de la lista de usuarios"
+msgstr "Eliminar de la lista del usuario"
 
 #: /resources/lib/script/sync.py
 msgctxt "#32356"
@@ -1901,7 +1893,7 @@ msgstr ""
 #: /resources/lib/script/router.py
 msgctxt "#32358"
 msgid "Delete user list"
-msgstr "Eliminar lista de usuarios"
+msgstr "Eliminar lista del usuario"
 
 #: /resources/lib/script/router.py
 msgctxt "#32359"
@@ -1956,7 +1948,7 @@ msgstr "Información local"
 #: /resources/settings.xml
 msgctxt "#32368"
 msgid "Next Aired / Next Episodes"
-msgstr "Próximos emitidos/próximos episodios"
+msgstr "Próximas emisiones / próximos episodios"
 
 #: /resources/settings.xml
 msgctxt "#32369"
@@ -1986,7 +1978,7 @@ msgstr "Usar valoraciones online en el monitor de detalles"
 #: /resources/settings.xml
 msgctxt "#32373"
 msgid "Restrict to library strm"
-msgstr "Restringir a la biblioteca strm"
+msgstr "Restringir a los strm de la biblioteca"
 
 #: /resources/settings.xml
 msgctxt "#32388"
@@ -2001,17 +1993,17 @@ msgstr "Recuperar fanart del proveedor"
 #: /resources/lib/player/players.py
 msgctxt "#32374"
 msgid "Constructing players"
-msgstr "Construyendo reproductores"
+msgstr "Creando reproductores"
 
 #: /resources/lib/player/players.py
 msgctxt "#32375"
 msgid "Retrieving item details"
-msgstr "Recuperar detalles del elemento"
+msgstr "Recuperando detalles del elemento"
 
 #: /resources/lib/player/players.py
 msgctxt "#32376"
 msgid "Building players dialog"
-msgstr "Construcción de la ventana de diálogo del reproductor"
+msgstr "Creando el diálogo de reproductores"
 
 #: /resources/lib/trakt/api.py
 msgctxt "#32378"
@@ -2021,12 +2013,12 @@ msgstr "Mostrar todo"
 #: /resources/settings.xml
 msgctxt "#32379"
 msgid "Hide Specials"
-msgstr "Ocultar Especiales"
+msgstr "Ocultar especiales"
 
 #: /resources/settings.xml
 msgctxt "#32380"
 msgid "Hide Up Next"
-msgstr "Ocultar proximos"
+msgstr "Ocultar «A continuación»"
 
 #: /resources/settings.xml
 msgctxt "#32396"
@@ -2056,7 +2048,7 @@ msgstr "Ocultar grupos de episodios y especiales"
 #: /resources/settings.xml
 msgctxt "#32384"
 msgid "Hide Episode Groups and Up Next"
-msgstr "Ocultar grupos de episodios y siguiente"
+msgstr "Ocultar grupos de episodios y «A continuación»"
 
 #: /resources/settings.xml
 msgctxt "#32402"
@@ -2076,7 +2068,7 @@ msgstr "Ocultar todo"
 #: /resources/settings.xml
 msgctxt "#32387"
 msgid "Delete {} Cache"
-msgstr "Eliminar {} caché"
+msgstr "Borrar la caché de {}"
 
 #: /resources/lib/script/router.py
 msgctxt "#32390"
@@ -2117,7 +2109,7 @@ msgstr "Actualización rápida"
 #: /resources/settings.xml
 msgctxt "#32395"
 msgid "Log timer reports for directories"
-msgstr "Informes de tiempo de registro para directorios"
+msgstr "Registrar informes de tiempos para directorios"
 
 #: /resources/settings.xml
 msgctxt "#32397"
@@ -2147,7 +2139,7 @@ msgstr "La compatibilidad con MDbList es actualmente experimental"
 #: /resources/settings.xml
 msgctxt "#32404"
 msgid "Flatten tvshows with multiple episodes airing same day"
-msgstr "Extender series con múltiples episodios que se transmiten el mismo día"
+msgstr "Agrupar episodios de una misma serie emitidos el mismo día"
 
 #: /resources/lib/addon/constants.py
 msgctxt "#32405"
@@ -2162,7 +2154,7 @@ msgstr "Episodios en progreso"
 #: /resources/settings.xml
 msgctxt "#32407"
 msgid "Get resume points (experimental) (slower)"
-msgstr "Obtener puntos de recuperación (experimental) (más lento)"
+msgstr "Obtener puntos de reanudación (experimental) (más lento)"
 
 #: /resources/settings.xml
 msgctxt "#32409"
@@ -2172,7 +2164,7 @@ msgstr "Ubicación de la base de datos de caché"
 #: /resources/settings.xml
 msgctxt "#32410"
 msgid "Max concurrent threads (0 is unlimited)"
-msgstr "Máximo de procesos simultáneos (0 es ilimitado)"
+msgstr "Máximo de hilos simultáneos (0 es ilimitado)"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32411"
@@ -2182,7 +2174,7 @@ msgstr "Proveedores"
 #: /resources/lib/api/tmdb/discover.py
 msgctxt "#32412"
 msgid "With Watch Provider"
-msgstr "Con proveedores vistos"
+msgstr "Con proveedor de streaming"
 
 #: /resources/settings.xml
 msgctxt "#32413"
@@ -2217,7 +2209,7 @@ msgstr "La configuración de idioma y país utilizada al buscar datos de las API
 #: /resources/settings.xml
 msgctxt "#32420"
 msgid "TMDb artwork quality"
-msgstr "TMDb artwork calidad"
+msgstr "Calidad de artwork de TMDb"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32421"
@@ -2227,12 +2219,12 @@ msgstr "Listas principales"
 #: /resources/settings.xml
 msgctxt "#32422"
 msgid "MDbList API"
-msgstr "MDbList API"
+msgstr "API de MDbList"
 
 #: /resources/settings.xml
 msgctxt "#32423"
 msgid "MDbList API key"
-msgstr "MDbList API key"
+msgstr "Clave API de MDbList"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32424"
@@ -2242,7 +2234,7 @@ msgstr "Hacer listas de reproducción de episodios"
 #: /resources/lib/player/configure.py
 msgctxt "#32425"
 msgid "Have TMDbHelper queue all episodes in a playlist when playing an episode using this player?"
-msgstr "¿TMDbHelper ha puesto en cola todos los episodios de una lista de reproducción cuando reproduce un episodio con este reproductor?"
+msgstr "¿Poner en cola todos los episodios de una lista de reproducción al reproducir un episodio con este reproductor?"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32426"
@@ -2257,12 +2249,12 @@ msgstr "Usar la carpeta actual como URL de búsqueda"
 #: /resources/lib/player/configure.py
 msgctxt "#32428"
 msgid "Browse for MOVIE search url"
-msgstr "Búsqueda por PELÍCULA buscar url"
+msgstr "Examinar URL de búsqueda de películas"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32429"
 msgid "Browse for TVSHOW search url"
-msgstr "Busqueda por SERIES buscar url"
+msgstr "Examinar URL de búsqueda de series"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32430"
@@ -2352,12 +2344,12 @@ msgstr "plugin:// URL de búsqueda para {}"
 #: /resources/lib/player/configure.py
 msgctxt "#32447"
 msgid "Up Next Only"
-msgstr "Sólo hasta el siguiente"
+msgstr "Solo el siguiente"
 
 #: /resources/settings.xml
 msgctxt "#32448"
 msgid "Stop before attempting playback"
-msgstr "Deténgase antes de intentar la reproducción"
+msgstr "Detener la reproducción actual antes de intentar reproducir"
 
 #: /resources/settings.xml
 msgctxt "#32449"
@@ -2367,12 +2359,12 @@ msgstr "Ignorar filtro de lanzamiento de región"
 #: /resources/settings.xml
 msgctxt "#32451"
 msgid "Lowest"
-msgstr "Más lento"
+msgstr "Más bajo"
 
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32452"
 msgid "Highest"
-msgstr "Mas rapido"
+msgstr "Más alto"
 
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32453"
@@ -2402,12 +2394,12 @@ msgstr "Lista de seguimiento (anticipada)"
 #: /resources/lib/items/basedir.py
 msgctxt "#32458"
 msgid "Airing Next Library"
-msgstr "Transmitir la próxima biblioteca"
+msgstr "Próximas emisiones en biblioteca"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32459"
 msgid "Your Episodes Airing Next"
-msgstr "Tus episodios se transmitirán a continuación"
+msgstr "Tus próximas emisiones"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32460"
@@ -2467,7 +2459,7 @@ msgstr "Ubicación de la imagen de caché"
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32473"
 msgid "Collected"
-msgstr "Recogido"
+msgstr "En la colección"
 
 #: /resources/lib/script/method.py
 msgctxt "#32474"
@@ -2492,12 +2484,12 @@ msgstr "Cambiar el reproductor predeterminado para series, temporada o episodio"
 #: /resources/settings.xml
 msgctxt "#32481"
 msgid "Increases the pool of recently watched items randomly selected from the seed to use for \"Because You Watched\" style recommendations."
-msgstr "Aumenta aleatoriamente la cantidad de elementos vistos recientemente para aumentar \"Ya vistos\" recomendaciones de estilo."
+msgstr "Aumenta la cantidad de elementos vistos recientemente de la que se elige al azar para las recomendaciones «Porque viste»."
 
 #: /resources/settings.xml
 msgctxt "#32482"
 msgid "Random seed pool for recommendations"
-msgstr "Grupo de recomendaciones aleatoria"
+msgstr "Reserva aleatoria para recomendaciones"
 
 #: /resources/settings.xml
 msgctxt "#32483"
@@ -2512,7 +2504,7 @@ msgstr "API de TVDb"
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32485"
 msgid "Add rating"
-msgstr "Agregar calificación"
+msgstr "Puntuar"
 
 #: /resources/tmdbhelper/lib/api/tmdb/discover.py
 msgctxt "#32486"
@@ -2532,7 +2524,7 @@ msgstr "Certificación ( > o = )"
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32489"
 msgid "Change rating"
-msgstr "Cambiar calificación"
+msgstr "Cambiar puntuación"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32490"
@@ -2557,7 +2549,7 @@ msgstr "Se eliminó correctamente {} de {}"
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32494"
 msgid "Successfully added {} to {}"
-msgstr "Añadida con éxito {} a {}"
+msgstr "Se añadió {} a {} correctamente"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32495"
@@ -2572,7 +2564,7 @@ msgstr "Añadir nodo"
 #: /resources/settings.xml
 msgctxt "#32497"
 msgid "Container content fallback for service listitems without mediatypes"
-msgstr "Contenido descendente para listas de servicios sin tipos de medios"
+msgstr "Contenido alternativo del contenedor para elementos de servicio sin tipos de medios"
 
 #: /resources/settings.xml
 msgctxt "#32498"
@@ -2627,7 +2619,7 @@ msgstr "Carpeta de iconos de género (Trakt)"
 #: /resources/settings.xml
 msgctxt "#32508"
 msgid "Recache Kodi Library details when building players"
-msgstr "Recuperar detalles de la biblioteca Kodi al crear reproductores"
+msgstr "Regenerar la caché de detalles de la biblioteca Kodi al crear reproductores"
 
 #: /resources/settings.xml
 msgctxt "#32509"
@@ -2637,17 +2629,17 @@ msgstr "Usar URL alternativa de API TMDb"
 #: /resources/settings.xml
 msgctxt "#32514"
 msgid "Add to MDbList list"
-msgstr "Añadir a lista MDbList"
+msgstr "Añadir a la lista MDbList"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32516"
 msgid "MDbList API credentials not found."
-msgstr "Credenciales API MDbList no encontradas."
+msgstr "Credenciales de API de MDbList no encontradas."
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32517"
 msgid "Add your personal MDbList API key in TMDbHelper settings."
-msgstr "Añade tu clave personal API MDbList en la configuración de TMDbHelper."
+msgstr "Añade tu clave personal de API de MDbList en la configuración de TMDbHelper."
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32518"
@@ -2712,7 +2704,7 @@ msgstr "Scrobble elementos en Trakt mientras se ven"
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32530"
 msgid "Remove rating"
-msgstr "Eliminar valoración"
+msgstr "Eliminar puntuación"
 
 #: /resources/tmdbhelper/lib/script/sync/item.py
 msgctxt "#32531"
@@ -2918,7 +2910,7 @@ msgstr "Croata (Croacia)"
 #: /resources/settings.xml
 msgctxt "#32001"
 msgid "OMDb API key"
-msgstr "OMDb API key"
+msgstr "Clave API de OMDb"
 
 #: /resources/settings.xml
 msgctxt "#32002"
@@ -2968,7 +2960,7 @@ msgstr "Actualizar reproductores desde URL"
 #: /resources/settings.xml
 msgctxt "#32017"
 msgid "API Keys"
-msgstr "API Claves"
+msgstr "Claves API"
 
 #: /resources/settings.xml
 msgctxt "#32019"
@@ -2983,7 +2975,7 @@ msgstr "Utilice fanart.tv para el artwork del complemento (más lento)"
 #: /resources/settings.xml
 msgctxt "#32023"
 msgid "Default select action in addon"
-msgstr "Seleccione la accion predeterminada en el complemento"
+msgstr "Acción de selección predeterminada en el add-on"
 
 #: /resources/settings.xml
 msgctxt "#32024"
