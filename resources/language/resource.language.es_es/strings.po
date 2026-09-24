@@ -84,7 +84,7 @@ msgstr "Alemán (Austria)"
 #: /resources/settings.xml
 msgctxt "#32013"
 msgid "Get watched indicators, episode counts, and resume points"
-msgstr "Obtener indicadores de visionado, recuento de episodios y puntos de reanudación"
+msgstr "Obtener estado de visto, recuento de episodios y puntos de reanudación"
 
 msgctxt "#30010"
 msgid "German (Switzerland)"
@@ -299,7 +299,7 @@ msgstr "Reproductores predeterminados"
 #: /resources/settings.xml
 msgctxt "#32034"
 msgid "Get watched indicators and episode counts"
-msgstr "Obtener indicadores de visionado y recuento de episodios"
+msgstr "Obtener estado de visto y recuento de episodios"
 
 #: /resources/settings.xml
 msgctxt "#32037"
