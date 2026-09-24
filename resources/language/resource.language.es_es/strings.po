@@ -53,7 +53,7 @@ msgstr "Catalán (España)"
 #: /resources/settings.xml
 msgctxt "#32006"
 msgid "Supplement"
-msgstr "Suplemento"
+msgstr "Complemento"
 
 msgctxt "#30006"
 msgid "Chamorro (Guam)"
@@ -1120,7 +1120,7 @@ msgstr "Más visto"
 #: /resources/lib/plugin.py
 msgctxt "#32206"
 msgid "Anticipated"
-msgstr "Anticipada"
+msgstr "Anticipado"
 
 #: /resources/lib/plugin.py
 msgctxt "#32207"
@@ -1826,12 +1826,12 @@ msgstr "Grupos de episodios"
 #: /resources/settings.xml
 msgctxt "#32347"
 msgid "Log output of Trakt request"
-msgstr "Ver registro de consultas de Trakt"
+msgstr "Registrar consultas de Trakt"
 
 #: /resources/settings.xml
 msgctxt "#32348"
 msgid "Log output of TMDb request"
-msgstr "Ver registro de consultas de TMDb"
+msgstr "Registrar consultas de TMDb"
 
 #: /resources/settings.xml
 msgctxt "#32349"
@@ -2018,7 +2018,7 @@ msgstr "Ocultar especiales"
 #: /resources/settings.xml
 msgctxt "#32380"
 msgid "Hide Up Next"
-msgstr "Ocultar A continuación"
+msgstr "Ocultar «A continuación»"
 
 #: /resources/settings.xml
 msgctxt "#32396"
@@ -2048,7 +2048,7 @@ msgstr "Ocultar grupos de episodios y especiales"
 #: /resources/settings.xml
 msgctxt "#32384"
 msgid "Hide Episode Groups and Up Next"
-msgstr "Ocultar grupos de episodios y A continuación"
+msgstr "Ocultar grupos de episodios y «A continuación»"
 
 #: /resources/settings.xml
 msgctxt "#32402"
@@ -2459,7 +2459,7 @@ msgstr "Ubicación de la imagen de caché"
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32473"
 msgid "Collected"
-msgstr "Recopilado"
+msgstr "En la colección"
 
 #: /resources/lib/script/method.py
 msgctxt "#32474"
