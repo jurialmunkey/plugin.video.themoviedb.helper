@@ -1390,7 +1390,7 @@ msgstr "Sin géneros"
 #: /resources/lib/userdiscover.py
 msgctxt "#32265"
 msgid "With Companies"
-msgstr "Con compañías"
+msgstr "Con productoras"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32266"
@@ -1470,7 +1470,7 @@ msgstr "Última quincena"
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32293"
 msgid "Returning Series"
-msgstr "Serie en curso"
+msgstr "En curso"
 
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32294"
@@ -1670,12 +1670,12 @@ msgstr "Añadir a listas de favoritos"
 #: /resources/lib/trakt/api.py
 msgctxt "#32316"
 msgid "Successfully {} list!"
-msgstr "¡Operación completada: {}!"
+msgstr "¡Acción de «{}» completada con éxito!"
 
 #: /resources/lib/trakt/api.py
 msgctxt "#32317"
 msgid "Unable to {} list!"
-msgstr "¡Operación fallida: {}!"
+msgstr "¡No se pudo completar la acción de «{}»!"
 
 #: /resources/lib/trakt/api.py
 msgctxt "#32318"
@@ -2249,12 +2249,12 @@ msgstr "Usar la carpeta actual como URL de búsqueda"
 #: /resources/lib/player/configure.py
 msgctxt "#32428"
 msgid "Browse for MOVIE search url"
-msgstr "Examinar URL de búsqueda de PELÍCULAS"
+msgstr "Examinar URL de búsqueda de películas"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32429"
 msgid "Browse for TVSHOW search url"
-msgstr "Examinar URL de búsqueda de SERIES"
+msgstr "Examinar URL de búsqueda de series"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32430"
