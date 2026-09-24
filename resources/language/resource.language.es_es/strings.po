@@ -2139,7 +2139,7 @@ msgstr "La compatibilidad con MDbList es actualmente experimental"
 #: /resources/settings.xml
 msgctxt "#32404"
 msgid "Flatten tvshows with multiple episodes airing same day"
-msgstr "Agrupar series con varios episodios emitidos el mismo día"
+msgstr "Agrupar episodios de una misma serie emitidos el mismo día"
 
 #: /resources/lib/addon/constants.py
 msgctxt "#32405"
