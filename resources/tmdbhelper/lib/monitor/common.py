@@ -126,33 +126,7 @@ class CommonMonitorDetails(CommonContainerAPIs):
         if tmdb_type == 'tv':
             return self.imdb_top250_list_tv
 
-    def get_detailed_ratings(self, tmdb_type, tmdb_id):
-        from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings import RatingsDict
-        sync = RatingsDict()
-        sync.common_apis.mdblist_api = self.mdblist_api
-        sync.common_apis.trakt_api = self.trakt_api
-        sync.common_apis.tmdb_api = self.tmdb_api
-        sync.common_apis.omdb_api = self.omdb_api
-        sync.imdb_top250_list = self.return_imdb_top250_list(tmdb_type)
-        sync.tmdb_type = tmdb_type
-        sync.tmdb_id = tmdb_id
-        return sync.data or {}
-
-    def get_season_ratings(self, tmdb_type, tmdb_id, season=None):
-        from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings import RatingsSeasonsDict
-        sync = RatingsSeasonsDict()
-        sync.common_apis.mdblist_api = self.mdblist_api
-        sync.common_apis.trakt_api = self.trakt_api
-        sync.common_apis.tmdb_api = self.tmdb_api
-        sync.common_apis.omdb_api = self.omdb_api
-        sync.tmdb_type = tmdb_type
-        sync.tmdb_id = tmdb_id
-        sync.season = season
-        return sync.data or {}
-
-    def get_episode_ratings(self, tmdb_type, tmdb_id, season=None, episode=None):
-        from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings import RatingsEpisodesDict
-        sync = RatingsEpisodesDict()
+    def configure_sync(self, sync, tmdb_type, tmdb_id, season=None, episode=None):
         sync.common_apis.mdblist_api = self.mdblist_api
         sync.common_apis.trakt_api = self.trakt_api
         sync.common_apis.tmdb_api = self.tmdb_api
@@ -161,6 +135,24 @@ class CommonMonitorDetails(CommonContainerAPIs):
         sync.tmdb_id = tmdb_id
         sync.season = season
         sync.episode = episode
+        return sync
+
+    def get_detailed_ratings(self, tmdb_type, tmdb_id):
+        from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings import RatingsDict
+        sync = RatingsDict()
+        sync = self.configure_sync(sync, tmdb_type, tmdb_id)
+        return sync.data or {}
+
+    def get_season_ratings(self, tmdb_type, tmdb_id, season=None):
+        from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings import RatingsSeasonsDict
+        sync = RatingsSeasonsDict()
+        sync = self.configure_sync(sync, tmdb_type, tmdb_id, season)
+        return sync.data or {}
+
+    def get_episode_ratings(self, tmdb_type, tmdb_id, season=None, episode=None):
+        from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings import RatingsEpisodesDict
+        sync = RatingsEpisodesDict()
+        sync = self.configure_sync(sync, tmdb_type, tmdb_id, season, episode)
         return sync.data or {}
 
     def get_all_ratings(self, tmdb_type, tmdb_id, season=None, episode=None):
