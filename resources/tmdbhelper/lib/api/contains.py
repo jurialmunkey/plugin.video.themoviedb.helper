@@ -158,10 +158,14 @@ class CommonRatingsAPIs(CommonContainerAPIs):
     def all_ratings(self):
         return self.get_all_ratings()
 
-    def get_all_ratings(self):
+    @cached_property
+    def all_ratings_no_awards(self):
+        return self.get_all_ratings(awards=False)
+
+    def get_all_ratings(self, awards=True):
         info = {}
         info.update(self.detailed_ratings)
         info.update(self.season_ratings)
         info.update(self.episode_ratings)
-        info.update(self.tvdb_awards)
+        info.update(self.tvdb_awards) if awards else None
         return info

@@ -2,7 +2,7 @@ from jurialmunkey.parser import boolean
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.consts import NO_UNAIRED_LABEL
 from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin, get_localized
-from tmdbhelper.lib.api.contains import CommonContainerAPIs
+from tmdbhelper.lib.api.contains import CommonContainerAPIs, CommonRatingsAPIs
 from tmdbhelper.lib.addon.logger import TimerList
 
 
@@ -68,6 +68,10 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         if self.params.get('info') == 'details':
             return True
         return boolean(self.params.get('detailed', False))
+
+    @cached_property
+    def is_ratings(self):
+        return boolean(self.params.get('ratings', False))
 
     @cached_property
     def is_translated(self):
@@ -300,7 +304,25 @@ class ContainerDirectory(ContainerDirectoryCommon):
         lidc.log_timers = self.log_timers
         return lidc
 
+    def build_ratings_item(self, li):
+        if not self.is_ratings:
+            return li
+        if not li.tmdb_id:
+            return li
+        if li.tmdb_type not in ('movie', 'tv'):
+            return li
+
+        ratings_api = CommonRatingsAPIs()
+        ratings_api.tmdb_type = li.tmdb_type
+        ratings_api.tmdb_id = li.tmdb_id
+        ratings_api.season = li.season
+        ratings_api.episode = li.episode
+
+        li.infoproperties.update(ratings_api.all_ratings_no_awards)
+        return li
+
     def build_detailed_item(self, li):
+        li = self.build_ratings_item(li)
         if li.infoproperties.get('label_override'):
             li.label = f"{li.infoproperties['label_override']}"
         if li.infoproperties.get('label_affix'):
