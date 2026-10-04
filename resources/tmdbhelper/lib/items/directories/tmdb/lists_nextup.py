@@ -20,6 +20,7 @@ class ListNextRecommendation(ContainerDirectory):
         def _get_next_collection():
             collection_tmdb_id = self.get_collection_tmdb_id(tmdb_id=tmdb_id)
             items = ListSeries(-1, '').get_items(tmdb_id=collection_tmdb_id, tmdb_type='collection') or []
+            items = [i for i in items if i and 'infolabels' in i]  # Skip the next page item of a long collection
             items = sorted(items, key=lambda i: i['infolabels'].get('year') or 9999)
             try:
                 iyear = next((i for i in items if try_int(i['unique_ids'].get('tmdb')) == try_int(tmdb_id)), None)
