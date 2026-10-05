@@ -1,6 +1,7 @@
 from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard
 from tmdbhelper.lib.items.directories.mdblist.lists_local import ListMDbListLocalNoCacheProperties
 from tmdbhelper.lib.items.directories.lists_local import UncachedListLocalData
+from tmdbhelper.lib.items.directories.mdblist.lists_custom import UncachedMDbListCustomData
 from tmdbhelper.lib.items.directories.mdblist.mapper_lists import ListsMDbListItemMapper
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
@@ -40,6 +41,33 @@ class ListMDbListListsProperties(ListMDbListLocalNoCacheProperties):
         return ListsMDbListItemMapper(item, add_infoproperties).item
 
 
+class UncachedMDbListLikedData(UncachedMDbListCustomData):
+    @cached_property
+    def item_count(self):
+        return self.response.json()['pagination']['total']
+
+    @cached_property
+    def json(self):
+        return self.response.json()['lists']
+
+
+class ListMDbListListsLikedProperties(ListMDbListListsProperties):
+
+    limit = 100
+
+    @cached_property
+    def offset(self):
+        return ((self.page - 1) * self.limit)
+
+    @cached_property
+    def response_kwgs(self):
+        return {'limit': self.limit, 'offset': self.offset}
+
+    def get_api_response(self, page=1):
+        response = self.mdblist_api.get_response(self.url, **self.response_kwgs)
+        return UncachedMDbListLikedData(response, self.page, self.limit).data
+
+
 class ListMDbListListsTop(ListStandard):
 
     list_properties_class = ListMDbListListsProperties
@@ -61,6 +89,18 @@ class ListMDbListListsUser(ListMDbListListsTop):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.plugin_name = 'Your Lists'
         list_properties.request_url = 'lists/user'
+        return list_properties
+
+
+class ListMDbListListsLiked(ListMDbListListsTop):
+
+    list_properties_class = ListMDbListListsLikedProperties
+
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.plugin_name = '{localized}'
+        list_properties.localize = 32210
+        list_properties.request_url = 'lists/liked'
         return list_properties
 
 

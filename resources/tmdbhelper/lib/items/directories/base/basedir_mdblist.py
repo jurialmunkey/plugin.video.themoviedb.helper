@@ -15,6 +15,12 @@ class BaseDirItemMDbListTopLists(BaseDirItem):
         return bool(get_setting('mdblist_apikey', 'str'))
 
 
+class BaseDirItemMDbListLikedLists(BaseDirItemMDbListTopLists):
+    priority = 108
+    label_localized = 32210
+    params = {'info': 'mdblist_likedlists'}
+
+
 class BaseDirItemMDbListYourLists(BaseDirItemMDbListTopLists):
     priority = 110
     label_localized = 32211
