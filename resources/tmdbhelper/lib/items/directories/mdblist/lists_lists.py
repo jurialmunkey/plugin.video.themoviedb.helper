@@ -40,6 +40,25 @@ class ListMDbListListsProperties(ListMDbListLocalNoCacheProperties):
         return ListsMDbListItemMapper(item, add_infoproperties).item
 
 
+class ListMDbListListsLikedProperties(ListMDbListListsProperties):
+
+    limit = 100
+
+    def get_api_response(self, page=1):
+        response = self.mdblist_api.get_response_json(self.url, limit=self.limit, offset=(self.page - 1) * self.limit)
+        try:
+            total = int(response['pagination']['total'])
+        except (KeyError, TypeError, ValueError):
+            total = 0
+        return {
+            'json': response.get('lists') or [],
+            'headers': {
+                'x-pagination-page-count': (total + self.limit - 1) // self.limit,
+                'x-pagination-item-count': total,
+            }
+        }
+
+
 class ListMDbListListsTop(ListStandard):
 
     list_properties_class = ListMDbListListsProperties
@@ -61,6 +80,17 @@ class ListMDbListListsUser(ListMDbListListsTop):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.plugin_name = 'Your Lists'
         list_properties.request_url = 'lists/user'
+        return list_properties
+
+
+class ListMDbListListsLiked(ListMDbListListsTop):
+
+    list_properties_class = ListMDbListListsLikedProperties
+
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.plugin_name = 'Liked Lists'
+        list_properties.request_url = 'lists/liked'
         return list_properties
 
 

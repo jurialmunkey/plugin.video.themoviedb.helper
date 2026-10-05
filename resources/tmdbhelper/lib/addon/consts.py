@@ -269,6 +269,9 @@ ROUTE_NOID = {
     'mdblist_yourlists': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
         'import_attr': 'ListMDbListListsUser'}},
+    'mdblist_likedlists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
+        'import_attr': 'ListMDbListListsLiked'}},
     'mdblist_searchlists': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
         'import_attr': 'ListMDbListListsSearch'}},
