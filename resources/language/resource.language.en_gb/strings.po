@@ -2747,6 +2747,11 @@ msgctxt "#32543"
 msgid "Curated Lists"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
+msgctxt "#32544"
+msgid "Official Lists"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

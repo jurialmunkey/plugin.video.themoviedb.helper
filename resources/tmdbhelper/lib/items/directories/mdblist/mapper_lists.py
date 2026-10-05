@@ -59,3 +59,17 @@ class ListsMDbListItemMapper(MediaItemMapper):
             'plugin_category': self.label,
         }
         return params
+
+
+class OfficialListsMDbListItemMapper(ListsMDbListItemMapper):
+
+    def __init__(self, *args, tmdb_type, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.tmdb_type = tmdb_type
+
+    def get_params(self):
+        params = super().get_params()
+        params['info'] = 'mdblist_officiallist'
+        params['list_id'] = self.meta['slug']
+        params['tmdb_type'] = self.tmdb_type
+        return params
