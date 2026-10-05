@@ -176,8 +176,8 @@ class Player:
         return PlayerChosenGet(
             tmdb_type=self.tmdb_type,
             tmdb_id=self.tmdb_id,
-            season=self.season,
-            episode=self.episode
+            season=self.details_season,
+            episode=self.details_episode
         )
 
     @cached_property
@@ -209,13 +209,27 @@ class Player:
     """
 
     @cached_property
+    def details_season(self):
+        if getattr(self, 'episode_group_virtual', None):
+            return self.tmdb_season
+
+        return self.season
+
+    @cached_property
+    def details_episode(self):
+        if getattr(self, 'episode_group_virtual', None):
+            return self.tmdb_episode
+
+        return self.episode
+
+    @cached_property
     def player_details(self):
         from tmdbhelper.lib.player.dialog.details import PlayerDetails
         return PlayerDetails(
             tmdb_type=self.tmdb_type,
             tmdb_id=self.tmdb_id,
-            season=self.season,
-            episode=self.episode,
+            season=self.details_season,
+            episode=self.details_episode,
             translation=self.translation
         )
 
@@ -303,11 +317,17 @@ class PlayerEpisode(Player):
         tmdb_id=None,
         season=None,
         episode=None,
+        tmdb_season=None,
+        tmdb_episode=None,
+        episode_group_virtual=None,
         **kwargs
     ):
         self.tmdb_id = tmdb_id
         self.season = season
         self.episode = episode
+        self.tmdb_season = tmdb_season
+        self.tmdb_episode = tmdb_episode
+        self.episode_group_virtual = episode_group_virtual
         super().__init__(**kwargs)
 
 
