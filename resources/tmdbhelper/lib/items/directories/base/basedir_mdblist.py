@@ -29,6 +29,14 @@ class BaseDirItemMDbListOfficialLists(BaseDirItemMDbListTopLists):
     types = ('movie', 'tv', )
 
 
+class BaseDirItemMDbListStreamingCharts(BaseDirItemMDbListTopLists):
+    priority = 106
+    label_localized = 32543
+    label_type = 'standard'
+    params = {'info': 'dir_mdblist_streamingcharts'}
+    types = ('movie', 'tv', )
+
+
 class BaseDirItemMDbListLikedLists(BaseDirItemMDbListTopLists):
     priority = 108
     label_localized = 32210

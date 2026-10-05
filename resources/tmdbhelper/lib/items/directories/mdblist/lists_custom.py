@@ -1,7 +1,11 @@
 from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard
 from tmdbhelper.lib.items.directories.mdblist.lists_local import ListMDbListLocalProperties
 from tmdbhelper.lib.items.directories.lists_local import UncachedListLocalData
-from tmdbhelper.lib.addon.plugin import get_setting, convert_type
+from tmdbhelper.lib.items.directories.trakt.mapper_standard import FactoryItemMapper
+from tmdbhelper.lib.items.container import ContainerDirectory
+from tmdbhelper.lib.api.mapping import get_empty_item
+from tmdbhelper.lib.addon.plugin import get_setting, get_localized, convert_type, ADDONPATH
+from jurialmunkey.parser import try_int
 from jurialmunkey.ftools import cached_property
 
 
@@ -122,3 +126,69 @@ class ListMDbListOfficial(ListMDbListCustom):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.request_url = 'lists/official/{list_id}/items'
         return list_properties
+
+
+class ListMDbListStreamingChartsProperties(ListMDbListLocalProperties):
+
+    period = 1
+
+    @cached_property
+    def cache_name_tuple(self):
+        return (self.class_name, self.tmdb_type, self.period, self.page, self.pmax)
+
+    @cached_property
+    def url(self):
+        return self.request_url.format(mediatype=convert_type(self.tmdb_type, 'trakt'))
+
+    @cached_property
+    def container_content(self):
+        return convert_type(self.tmdb_type, 'container')
+
+    def get_api_response(self, page=1):
+        response = self.mdblist_api.get_response_json(self.url, period=self.period)
+        results = [i for i in response.get('results') or [] if (i.get('ids') or {}).get('tmdb')]
+        return UncachedListLocalData(results, self.page, self.limit).data
+
+    def get_mapped_item(self, item, add_infoproperties=None):
+        return FactoryItemMapper(item, add_infoproperties, trakt_type=item.get('mediatype')).item
+
+
+class ListMDbListStreamingCharts(ListStandard):
+
+    list_properties_class = ListMDbListStreamingChartsProperties
+
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.plugin_name = '{localized}'
+        list_properties.localize = 32543
+        list_properties.request_url = 'justwatch/streaming-charts/{mediatype}'
+        list_properties.mdblist_api = self.mdblist_api
+        return list_properties
+
+    def get_items(self, *args, tmdb_type=None, period=1, **kwargs):
+        if tmdb_type not in ('movie', 'tv'):
+            return
+        self.list_properties.period = try_int(period) or 1
+        return super().get_items(*args, tmdb_type=tmdb_type, **kwargs)
+
+
+class ListMDbListStreamingChartsPeriods(ContainerDirectory):
+    periods = (
+        (1, 33006),
+        (7, 32284),
+        (30, 32326),
+    )
+
+    def get_items(self, tmdb_type=None, **kwargs):
+        if tmdb_type not in ('movie', 'tv'):
+            return
+        self.plugin_category = get_localized(32543)
+        return [self.get_period_item(tmdb_type, period, localized) for period, localized in self.periods]
+
+    @staticmethod
+    def get_period_item(tmdb_type, period, localized):
+        item = get_empty_item()
+        item['label'] = get_localized(localized)
+        item['art'] = {'icon': f'{ADDONPATH}/resources/icons/mdblist/mdblist.png'}
+        item['params'] = {'info': 'mdblist_streamingcharts', 'tmdb_type': tmdb_type, 'period': period}
+        return item

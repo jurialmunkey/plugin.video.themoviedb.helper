@@ -2738,6 +2738,10 @@ msgctxt "#32542"
 msgid "Official Lists"
 msgstr ""
 
+msgctxt "#32543"
+msgid "Streaming Charts"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

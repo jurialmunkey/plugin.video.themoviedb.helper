@@ -266,6 +266,12 @@ ROUTE_NOID = {
     'mdblist_officiallist': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_custom',
         'import_attr': 'ListMDbListOfficial'}},
+    'dir_mdblist_streamingcharts': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_custom',
+        'import_attr': 'ListMDbListStreamingChartsPeriods'}},
+    'mdblist_streamingcharts': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_custom',
+        'import_attr': 'ListMDbListStreamingCharts'}},
     'mdblist_toplists': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
         'import_attr': 'ListMDbListListsTop'}},
