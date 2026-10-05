@@ -2742,6 +2742,11 @@ msgctxt "#32542"
 msgid "Additional season: Groups"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
+msgctxt "#32543"
+msgid "Curated Lists"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
