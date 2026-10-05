@@ -1,7 +1,7 @@
 from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard
 from tmdbhelper.lib.items.directories.mdblist.lists_local import ListMDbListLocalProperties
 from tmdbhelper.lib.items.directories.lists_local import UncachedListLocalData
-from tmdbhelper.lib.addon.plugin import get_setting
+from tmdbhelper.lib.addon.plugin import get_setting, convert_type
 from jurialmunkey.ftools import cached_property
 
 
@@ -100,3 +100,25 @@ class ListMDbListCustom(ListStandard):
         self.list_properties.sort_by = sort_by
         self.list_properties.sort_how = sort_how
         return super().get_items(*args, tmdb_type=tmdb_type or 'both', **kwargs)
+
+
+class ListMDbListOfficialProperties(ListMDbListCustomProperties):
+    @cached_property
+    def response_kwgs(self):
+        response_kwgs = super().response_kwgs
+        response_kwgs['mediatype'] = convert_type(self.tmdb_type, 'trakt')
+        return response_kwgs
+
+    @cached_property
+    def container_content(self):
+        return convert_type(self.tmdb_type, 'container', items=self.items)
+
+
+class ListMDbListOfficial(ListMDbListCustom):
+
+    list_properties_class = ListMDbListOfficialProperties
+
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.request_url = 'lists/official/{list_id}/items'
+        return list_properties

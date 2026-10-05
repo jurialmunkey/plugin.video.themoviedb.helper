@@ -21,6 +21,14 @@ class BaseDirItemMDbListCuratedLists(BaseDirItemMDbListTopLists):
     params = {'info': 'mdblist_curatedlists'}
 
 
+class BaseDirItemMDbListOfficialLists(BaseDirItemMDbListTopLists):
+    priority = 104
+    label_localized = 32542
+    label_type = 'standard'
+    params = {'info': 'mdblist_officiallists'}
+    types = ('movie', 'tv', )
+
+
 class BaseDirItemMDbListLikedLists(BaseDirItemMDbListTopLists):
     priority = 108
     label_localized = 32210

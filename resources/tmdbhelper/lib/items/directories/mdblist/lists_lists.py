@@ -1,9 +1,9 @@
 from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard
 from tmdbhelper.lib.items.directories.mdblist.lists_local import ListMDbListLocalNoCacheProperties
 from tmdbhelper.lib.items.directories.lists_local import UncachedListLocalData
-from tmdbhelper.lib.items.directories.mdblist.mapper_lists import ListsMDbListItemMapper
+from tmdbhelper.lib.items.directories.mdblist.mapper_lists import ListsMDbListItemMapper, OfficialListsMDbListItemMapper
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.addon.plugin import get_localized
+from tmdbhelper.lib.addon.plugin import get_localized, convert_type
 
 
 class ListMDbListListsProperties(ListMDbListLocalNoCacheProperties):
@@ -59,6 +59,17 @@ class ListMDbListListsLikedProperties(ListMDbListListsProperties):
         }
 
 
+class ListMDbListListsOfficialProperties(ListMDbListListsProperties):
+    @cached_property
+    def response_kwgs(self):
+        return {'mediatype': convert_type(self.tmdb_type, 'trakt')}
+
+    def get_mapped_item(self, item, add_infoproperties=None):
+        mapper = OfficialListsMDbListItemMapper(item, add_infoproperties)
+        mapper.list_tmdb_type = self.tmdb_type
+        return mapper.item
+
+
 class ListMDbListListsTop(ListStandard):
 
     list_properties_class = ListMDbListListsProperties
@@ -100,6 +111,17 @@ class ListMDbListListsCurated(ListMDbListListsTop):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.plugin_name = 'Curated Lists'
         list_properties.request_url = 'lists/curated'
+        return list_properties
+
+
+class ListMDbListListsOfficial(ListMDbListListsTop):
+
+    list_properties_class = ListMDbListListsOfficialProperties
+
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.plugin_name = 'Official Lists'
+        list_properties.request_url = 'lists/official'
         return list_properties
 
 
