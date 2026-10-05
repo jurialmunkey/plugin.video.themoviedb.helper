@@ -94,6 +94,15 @@ class ListMDbListListsLiked(ListMDbListListsTop):
         return list_properties
 
 
+class ListMDbListListsCurated(ListMDbListListsTop):
+
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.plugin_name = 'Curated Lists'
+        list_properties.request_url = 'lists/curated'
+        return list_properties
+
+
 class ListMDbListListsSearch(ListMDbListListsTop):
 
     def configure_list_properties(self, list_properties):
