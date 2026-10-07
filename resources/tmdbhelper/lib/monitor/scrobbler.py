@@ -1,9 +1,13 @@
+from time import time
 from jurialmunkey.window import get_property
 from jurialmunkey.ftools import cached_property
 from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.plugin import get_setting
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.tmdate import set_timestamp
+
+
+SCROBBLE_INTERVAL = 300  # Seconds between periodic progress updates during playback
 
 
 class PlayerScrobbler():
@@ -21,6 +25,7 @@ class PlayerScrobbler():
         self.stopped = False
         self.started = False
         self.syncing = False
+        self.last_scrobble = 0
 
     def playerstring_get_tmdb_type(self):
         tmdb_type = self.playerstring.get('tmdb_type')
@@ -153,6 +158,7 @@ class PlayerScrobbler():
     def scrobble(self, method):
         if method not in ('start', 'stop'):
             return
+        self.last_scrobble = time()
         if self.is_trakt_authorized:
             self.trakt_scrobbler_item['progress'] = self.progress
             path = f'https://api.trakt.tv/scrobble/{method}'
@@ -176,8 +182,8 @@ class PlayerScrobbler():
 
     @is_scrobbling
     def start(self, tmdb_type, tmdb_id):
-        if self.started or self.stopped:
-            return self.sync(tmdb_type, tmdb_id)
+        if self.started:
+            return self.update_progress(tmdb_type, tmdb_id)
         if not self.is_match(tmdb_type, tmdb_id):
             return self.stop(tmdb_type, tmdb_id)
         self.scrobble('start')
@@ -185,7 +191,20 @@ class PlayerScrobbler():
 
     @is_scrobbling
     def pause(self, tmdb_type, tmdb_id):
-        return self.sync(tmdb_type, tmdb_id)  # Trakt no longer supports a pause method so just return after checking sync
+        return self.update_progress(tmdb_type, tmdb_id, method='stop')  # Trakt no longer supports a pause method but saves stops below 80% as paused progress
+
+    @is_scrobbling
+    def update_progress(self, tmdb_type, tmdb_id, method='start', interval=0):
+        """ Send current progress on resume, pause and seek, or periodically if an interval is given """
+        if not self.started or self.syncing:
+            return
+        if not self.is_match(tmdb_type, tmdb_id):
+            return
+        if self.progress >= 80:
+            return self.sync(tmdb_type, tmdb_id)
+        if time() - self.last_scrobble < interval:
+            return
+        self.scrobble(method)
 
     @is_scrobbling
     def stop(self, tmdb_type, tmdb_id):

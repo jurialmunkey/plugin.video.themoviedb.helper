@@ -3,7 +3,7 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.monitor.images import ImageFunctions
 from tmdbhelper.lib.monitor.common import CommonMonitorFunctions
 from tmdbhelper.lib.addon.plugin import get_condvisibility, get_infolabel, get_setting
-from tmdbhelper.lib.monitor.scrobbler import PlayerScrobbler
+from tmdbhelper.lib.monitor.scrobbler import PlayerScrobbler, SCROBBLE_INTERVAL
 
 
 class PlayerItem():
@@ -284,13 +284,10 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
     def scrobbler_sync(self):
         if not self.scrobbler or not self.isPlayingVideo():
             return
-        try:
-            if (self.getTime() / self.getTotalTime()) < 0.8:
-                return
-        except ZeroDivisionError:
+        if get_condvisibility("Player.Paused"):
             return
         self.scrobbler_update()
-        self.scrobbler.sync(self.tmdb_type, self.tmdb_id)
+        self.scrobbler.update_progress(self.tmdb_type, self.tmdb_id, interval=SCROBBLE_INTERVAL)
 
     def scrobbler_update(self):
         if not self.scrobbler or not self.isPlayingVideo():
