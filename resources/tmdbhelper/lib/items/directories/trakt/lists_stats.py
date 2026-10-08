@@ -1,5 +1,5 @@
 from tmdbhelper.lib.items.directories.lists_default import ListProperties, ListDefault
-from tmdbhelper.lib.items.directories.trakt.mapper_stats import HistoryStatsItemMapper, MonthlyHistoryStatsItemMapper
+from tmdbhelper.lib.items.directories.trakt.mapper_stats import HistoryStatsItemMapper, DailyHistoryStatsItemMapper, MonthlyHistoryStatsItemMapper
 from tmdbhelper.lib.addon.plugin import convert_type
 from tmdbhelper.lib.addon.tmdate import get_datetime_today, get_timedelta
 from tmdbhelper.lib.sync.datasync import SyncDataFactory
@@ -92,6 +92,37 @@ class ListHistoryStatsProperties(ListProperties):
         return self.filtered_items
 
 
+class ListDailyHistoryStatsProperties(ListHistoryStatsProperties):
+
+    item_mapper_class = DailyHistoryStatsItemMapper
+
+    @staticmethod
+    def get_week_key(watched_date):
+        return (watched_date[:7], (int(watched_date[8:10]) - 1) // 7 + 1, )
+
+    @cached_property
+    def week_counts(self):
+        week_counts = {}
+        for watched_date, watched_count in zip(self.watched_dates, self.watched_counts):
+            week_key = self.get_week_key(watched_date)
+            week_counts[week_key] = week_counts.get(week_key, 0) + watched_count
+        return week_counts
+
+    @cached_property
+    def month_counts(self):
+        month_counts = {}
+        for watched_date, watched_count in zip(self.watched_dates, self.watched_counts):
+            month_key = watched_date[:7]
+            month_counts[month_key] = month_counts.get(month_key, 0) + watched_count
+        return month_counts
+
+    def get_mapped_item(self, item, add_infoproperties=None):
+        watched_date = item['watched_date']
+        item['week_count'] = self.week_counts[self.get_week_key(watched_date)]
+        item['month_count'] = self.month_counts[watched_date[:7]]
+        return super().get_mapped_item(item, add_infoproperties)
+
+
 class ListMonthlyHistoryStatsProperties(ListHistoryStatsProperties):
 
     item_mapper_class = MonthlyHistoryStatsItemMapper
@@ -112,7 +143,7 @@ class ListMonthlyHistoryStatsProperties(ListHistoryStatsProperties):
 
 class ListHistoryStats(ListDefault):
 
-    list_properties_class = ListHistoryStatsProperties
+    list_properties_class = ListDailyHistoryStatsProperties
     kodi_db = None
 
     def configure_list_properties(self, list_properties):
@@ -123,7 +154,7 @@ class ListHistoryStats(ListDefault):
         return list_properties
 
     def get_items(self, tmdb_type, days=30, period='day', months=12, sort_how='desc', **kwargs):
-        self.list_properties_class = ListMonthlyHistoryStatsProperties if period == 'month' else ListHistoryStatsProperties
+        self.list_properties_class = ListMonthlyHistoryStatsProperties if period == 'month' else ListDailyHistoryStatsProperties
         self.list_properties.tmdb_type = tmdb_type
         self.list_properties.item_type = 'episode' if tmdb_type == 'tv' else convert_type(tmdb_type, 'trakt')
         self.list_properties.days = max(try_int(days) or 30, 1)

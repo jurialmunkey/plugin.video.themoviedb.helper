@@ -83,6 +83,24 @@ class HistoryStatsItemMapper(ItemMapper):
         return item
 
 
+class DailyHistoryStatsItemMapper(HistoryStatsItemMapper):
+    @cached_property
+    def week_count(self):
+        return self.meta['week_count']
+
+    @cached_property
+    def month_count(self):
+        return self.meta['month_count']
+
+    def get_infoproperties(self):
+        infoproperties = super().get_infoproperties()
+        infoproperties.update({
+            'week_count': self.week_count,
+            'month_count': self.month_count,
+        })
+        return infoproperties
+
+
 class MonthlyHistoryStatsItemMapper(HistoryStatsItemMapper):
     @cached_property
     def label(self):
