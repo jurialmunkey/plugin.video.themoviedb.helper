@@ -240,6 +240,25 @@ class SyncDataGetterWatchedHistoryStats(SyncDataGetterAllItemsWatched):
         return self.instance_syncdata.cache.get_list_values(keys=self.keys, values=self.query_values, conditions=self.clause)
 
 
+class SyncDataGetterWatchedMonthlyHistoryStats(SyncDataGetterWatchedHistoryStats):
+    months = 12
+    query_clauses = (
+        'item_type=?',
+        "DATE(last_watched_at, 'localtime') >= DATE('now', 'localtime', 'start of month', ?)",
+        "DATE(last_watched_at, 'localtime') <= DATE('now', 'localtime')",
+    )
+
+    @property
+    def query_values(self):
+        return (self.item_type, f'-{self.months - 1} months', )
+
+    def get_keys(self):
+        return (
+            "DATE(last_watched_at, 'localtime', 'start of month') AS watched_date",
+            'COUNT(*) AS watched_count',
+        )
+
+
 class SyncDataGetterAllItemsPlayback(SyncDataGetterAllItems):
     clause_keys = ('playback_progress', )
 
@@ -316,6 +335,11 @@ class SyncDataGetters:
     def get_watched_history_stats_getter(self, item_type, days):
         sd = self.get_item_type_getter(SyncDataGetterWatchedHistoryStats, item_type)
         sd.days = days
+        return sd
+
+    def get_watched_monthly_history_stats_getter(self, item_type, months):
+        sd = self.get_item_type_getter(SyncDataGetterWatchedMonthlyHistoryStats, item_type)
+        sd.months = months
         return sd
 
     def get_all_playback_getter(self, item_type):

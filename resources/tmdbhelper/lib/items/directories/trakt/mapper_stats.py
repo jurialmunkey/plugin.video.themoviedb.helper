@@ -11,7 +11,7 @@ class HistoryStatsItemMapper(ItemMapper):
 
     @cached_property
     def watched_date(self):
-        return convert_timestamp(self.label, time_fmt='%Y-%m-%d', time_lim=10)
+        return convert_timestamp(self.meta['watched_date'], time_fmt='%Y-%m-%d', time_lim=10)
 
     @cached_property
     def watched_count(self):
@@ -58,3 +58,9 @@ class HistoryStatsItemMapper(ItemMapper):
         item['label2'] = self.label2
         item['is_folder'] = False
         return item
+
+
+class MonthlyHistoryStatsItemMapper(HistoryStatsItemMapper):
+    @cached_property
+    def label(self):
+        return format_date_obj(self.watched_date, '%Y-%m')
