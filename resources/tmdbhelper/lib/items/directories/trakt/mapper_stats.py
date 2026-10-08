@@ -22,10 +22,28 @@ class HistoryStatsItemMapper(ItemMapper):
         return self.meta['total']
 
     @cached_property
+    def lowest(self):
+        return self.meta['lowest']
+
+    @cached_property
+    def highest(self):
+        return self.meta['highest']
+
+    @cached_property
+    def rank(self):
+        return self.meta['rank']
+
+    @cached_property
     def percent(self):
         if not self.total:
             return 0
         return self.watched_count * 100 // self.total
+
+    @cached_property
+    def percentile(self):
+        if not self.highest:
+            return 0
+        return self.watched_count * 100 // self.highest
 
     @cached_property
     def label2(self):
@@ -40,10 +58,15 @@ class HistoryStatsItemMapper(ItemMapper):
             'count': self.watched_count,
             'total': self.total,
             'percent': self.percent,
+            'lowest': self.lowest,
+            'highest': self.highest,
+            'rank': self.rank,
+            'percentile': self.percentile,
             'long': format_date_obj(self.watched_date, region_fmt='datelong'),
             'short': format_date_obj(self.watched_date, '%d %b'),
             'day': format_date_obj(self.watched_date, '%A'),
             'day_short': format_date_obj(self.watched_date, '%a'),
+            'day_letter': format_date_obj(self.watched_date, '%a')[:1],
             'year': format_date_obj(self.watched_date, '%Y'),
             'custom': format_date_obj(self.watched_date, get_infolabel('Skin.String(TMDbHelper.Date.Format)') or '%d %b %Y'),
             'month': format_date_obj(self.watched_date, '%B'),

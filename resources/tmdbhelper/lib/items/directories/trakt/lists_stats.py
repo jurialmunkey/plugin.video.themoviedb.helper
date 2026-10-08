@@ -12,6 +12,7 @@ class ListHistoryStatsProperties(ListProperties):
     item_mapper_class = HistoryStatsItemMapper
     item_type = None
     days = 30
+    sort_how = 'desc'
 
     @cached_property
     def sync_data(self):
@@ -29,7 +30,15 @@ class ListHistoryStatsProperties(ListProperties):
 
     @cached_property
     def total(self):
-        return sum(self.sync_data.values())
+        return sum(self.watched_counts)
+
+    @cached_property
+    def lowest(self):
+        return min(self.watched_counts, default=0)
+
+    @cached_property
+    def highest(self):
+        return max(self.watched_counts, default=0)
 
     def get_mapped_item(self, item, add_infoproperties=None):
         return self.item_mapper_class(item, add_infoproperties).item
@@ -43,15 +52,35 @@ class ListHistoryStatsProperties(ListProperties):
         ]
 
     @cached_property
+    def watched_counts(self):
+        return [self.sync_data.get(watched_date, 0) for watched_date in self.watched_dates]
+
+    @cached_property
+    def watched_ranks(self):
+        ranks = {}
+        for rank, watched_count in enumerate(sorted(self.watched_counts), 1):
+            ranks.setdefault(watched_count, rank)
+        return ranks
+
+    @cached_property
     def items(self):
         return [
             self.get_mapped_item({
                 'watched_date': watched_date,
-                'watched_count': self.sync_data.get(watched_date, 0),
+                'watched_count': watched_count,
                 'total': self.total,
+                'lowest': self.lowest,
+                'highest': self.highest,
+                'rank': self.watched_ranks[watched_count],
             })
-            for watched_date in self.watched_dates
+            for watched_date, watched_count in zip(self.watched_dates, self.watched_counts)
         ]
+
+    @cached_property
+    def sorted_items(self):
+        if self.sort_how == 'asc':
+            return self.filtered_items[::-1]
+        return self.filtered_items
 
 
 class ListMonthlyHistoryStatsProperties(ListHistoryStatsProperties):
@@ -84,10 +113,11 @@ class ListHistoryStats(ListDefault):
         list_properties.pagination = False
         return list_properties
 
-    def get_items(self, tmdb_type, days=30, period='day', months=12, **kwargs):
+    def get_items(self, tmdb_type, days=30, period='day', months=12, sort_how='desc', **kwargs):
         self.list_properties_class = ListMonthlyHistoryStatsProperties if period == 'month' else ListHistoryStatsProperties
         self.list_properties.tmdb_type = tmdb_type
         self.list_properties.item_type = 'episode' if tmdb_type == 'tv' else 'movie'
         self.list_properties.days = max(try_int(days) or 30, 1)
         self.list_properties.months = max(try_int(months) or 12, 1)
+        self.list_properties.sort_how = sort_how if sort_how in ('asc', 'desc') else 'desc'
         return self.get_items_finalised()
