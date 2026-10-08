@@ -1,5 +1,6 @@
 from tmdbhelper.lib.items.directories.lists_default import ListProperties, ListDefault
 from tmdbhelper.lib.items.directories.trakt.mapper_stats import HistoryStatsItemMapper, MonthlyHistoryStatsItemMapper
+from tmdbhelper.lib.addon.plugin import convert_type
 from tmdbhelper.lib.addon.tmdate import get_datetime_today, get_timedelta
 from tmdbhelper.lib.sync.datasync import SyncDataFactory
 from jurialmunkey.ftools import cached_property
@@ -16,17 +17,25 @@ class ListHistoryStatsProperties(ListProperties):
 
     @cached_property
     def sync_data(self):
-        return {
-            i['watched_date']: i['watched_count']
-            for i in self.sync_data_getter.items or ()
-        }
+        sync_data = {}
+        for getter in self.sync_data_getters:
+            for i in getter.items or ():
+                watched_date = i['watched_date']
+                sync_data[watched_date] = sync_data.get(watched_date, 0) + i['watched_count']
+        return sync_data
+
+    @property
+    def item_types(self):
+        if self.item_type == 'both':
+            return ('movie', 'episode', )
+        return (self.item_type, )
 
     @cached_property
-    def sync_data_getter(self):
-        return self.get_sync_data_getter()
+    def sync_data_getters(self):
+        return [self.get_sync_data_getter(item_type) for item_type in self.item_types]
 
-    def get_sync_data_getter(self):
-        return SyncDataFactory(self).get_watched_history_stats_getter(self.item_type, self.days)
+    def get_sync_data_getter(self, item_type):
+        return SyncDataFactory(self).get_watched_history_stats_getter(item_type, self.days)
 
     @cached_property
     def total(self):
@@ -88,8 +97,8 @@ class ListMonthlyHistoryStatsProperties(ListHistoryStatsProperties):
     item_mapper_class = MonthlyHistoryStatsItemMapper
     months = 12
 
-    def get_sync_data_getter(self):
-        return SyncDataFactory(self).get_watched_monthly_history_stats_getter(self.item_type, self.months)
+    def get_sync_data_getter(self, item_type):
+        return SyncDataFactory(self).get_watched_monthly_history_stats_getter(item_type, self.months)
 
     @cached_property
     def watched_dates(self):
@@ -116,7 +125,7 @@ class ListHistoryStats(ListDefault):
     def get_items(self, tmdb_type, days=30, period='day', months=12, sort_how='desc', **kwargs):
         self.list_properties_class = ListMonthlyHistoryStatsProperties if period == 'month' else ListHistoryStatsProperties
         self.list_properties.tmdb_type = tmdb_type
-        self.list_properties.item_type = 'episode' if tmdb_type == 'tv' else 'movie'
+        self.list_properties.item_type = 'episode' if tmdb_type == 'tv' else convert_type(tmdb_type, 'trakt')
         self.list_properties.days = max(try_int(days) or 30, 1)
         self.list_properties.months = max(try_int(months) or 12, 1)
         self.list_properties.sort_how = sort_how if sort_how in ('asc', 'desc') else 'desc'
