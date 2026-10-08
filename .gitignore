@@ -62,3 +62,6 @@ target/
 
 *.zip
 .DS_Store
+
+# Local agent instructions
+/AGENTS.md
