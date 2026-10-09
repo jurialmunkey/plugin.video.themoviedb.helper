@@ -5,6 +5,7 @@ from tmdbhelper.lib.items.database.tabledef import (
     BASEITEM_COLUMNS,
     MOVIE_COLUMNS,
     TVSHOW_COLUMNS,
+    EPISODE_GROUP_COLUMNS,
     SEASON_COLUMNS,
     EPISODE_COLUMNS,
     BELONGS_COLUMNS,
@@ -45,7 +46,7 @@ class ItemDetailsDatabase(Database):
         super().__init__(filename=self.cache_filename)
 
     # DB version must be max of table_version
-    database_version = 45
+    database_version = 46
 
     database_changes = {
         21: (),
@@ -120,11 +121,13 @@ class ItemDetailsDatabase(Database):
             'ALTER TABLE ratings ADD rogerebert_rating INTEGER',
             'ALTER TABLE ratings ADD rogerebert_image TEXT',
         ),
+        46: (),
     }
 
     baseitem_columns = BASEITEM_COLUMNS
     movie_columns = MOVIE_COLUMNS
     tvshow_columns = TVSHOW_COLUMNS
+    episode_groups_columns = EPISODE_GROUP_COLUMNS
     season_columns = SEASON_COLUMNS
     episode_columns = EPISODE_COLUMNS
     belongs_columns = BELONGS_COLUMNS
@@ -164,6 +167,7 @@ class ItemDetailsDatabase(Database):
             'collection': self.collection_columns,
             'movie': self.movie_columns,
             'tvshow': self.tvshow_columns,
+            'episode_groups': self.episode_groups_columns,
             'season': self.season_columns,
             'episode': self.episode_columns,
             'ratings': self.ratings_columns,

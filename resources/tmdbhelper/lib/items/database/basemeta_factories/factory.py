@@ -112,6 +112,11 @@ def import_tvshow():
     return Tvshow
 
 
+def import_episode_groups():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import EpisodeGroups
+    return EpisodeGroups
+
+
 def import_season():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Season
     return Season
@@ -492,6 +497,7 @@ FACTORY_ROUTES = {
     'base': import_base,
     'movie': import_movie,
     'tvshow': import_tvshow,
+    'episode_groups': import_episode_groups,
     'season': import_season,
     'episode': import_episode,
     'belongs': import_belongs,

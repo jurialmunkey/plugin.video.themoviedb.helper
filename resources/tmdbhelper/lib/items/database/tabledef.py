@@ -141,6 +141,27 @@ TVSHOW_COLUMNS = {
     },
 }
 
+EPISODE_GROUP_COLUMNS = {
+    'tmdb_id': {
+        'data': 'TEXT PRIMARY KEY',
+        'indexed': True
+    },
+    'tvshow_id': {
+        'data': 'TEXT',
+        'foreign_key': 'tvshow(id)',
+        'indexed': True
+    },
+    'plot': {
+        'data': 'TEXT',
+    },
+    'title': {
+        'data': 'TEXT',
+    },
+    'type': {
+        'data': 'INTEGER',
+    },
+}
+
 SEASON_COLUMNS = {
     'id': {
         'data': 'TEXT PRIMARY KEY',

@@ -841,6 +841,18 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                     'subkeys': ('results', ),
                     'name': 'rating', 'iso_country': 'iso_3166_1'}
             }],
+            'episode_groups': [{
+                'keys': [('episode_groups', None)],
+                'func': self.split_array,
+                'kwargs': {
+                    'subkeys': ('results', ),
+                    'haskeys': ('id', ),
+                    'tmdb_id': 'id',
+                    'tvshow_id': lambda i: f'tv.{self.tmdb_id}',
+                    'plot': 'description',
+                    'title': 'name',
+                    'type': 'type'}
+            }],
             'release_dates': [{
                 'keys': [('certification', None)],
                 'func': self.get_certifications,
@@ -1040,6 +1052,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'collection': (),
             'movie': (),
             'tvshow': (),
+            'episode_groups': (),
             'season': (),
             'episode': (),
             'person': (),

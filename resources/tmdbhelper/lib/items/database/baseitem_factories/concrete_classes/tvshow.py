@@ -146,6 +146,7 @@ class Tvshow(MediaItem):
         return (
             self.return_basemeta_db('base'),
             self.return_basemeta_db('belongs'),
+            self.return_basemeta_db('episode_groups'),
             self.return_basemeta_db('season'),
             self.return_basemeta_db('episode'),
             self.return_basemeta_db('genre'),
