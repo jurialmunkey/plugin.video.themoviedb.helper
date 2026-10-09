@@ -47,6 +47,10 @@ class Tvshow(MediaItem):
         )])
         cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('next_aired'))
         cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('last_aired'))
+        cached_data_keys.append((
+            '(SELECT COUNT(*) FROM episode_groups '
+            'WHERE episode_groups.tvshow_id=tvshow.id) AS episode_groups'
+        ))
         return tuple(cached_data_keys)
 
     def config_basemeta_db_tvshow(self, database_obj):

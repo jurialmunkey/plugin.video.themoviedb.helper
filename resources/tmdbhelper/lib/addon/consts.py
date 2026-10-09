@@ -456,6 +456,9 @@ ROUTE_TMDBID = {
     'seasons': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_seasons',
         'import_attr': 'ListSeasons'}},
+    'episode_groups': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_episode_groups',
+        'import_attr': 'ListEpisodeGroups'}},
     'flatseasons': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_seasons',
         'import_attr': 'ListFlatSeasons'}},
