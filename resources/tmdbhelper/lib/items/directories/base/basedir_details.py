@@ -23,6 +23,13 @@ class BaseDirItemDetailsSeasons(BaseDirItem):
     def params(self):
         return {'info': get_flatseasons_info_param()}
 
+class BaseDirItemDetailsEpisodeGroups(BaseDirItem):
+    priority = 115
+    label_type = 'localize'
+    label_localized = 32345
+    params = {'info': 'episode_groups'}
+    art_icon = 'resources/icons/themoviedb/episodes.png'
+    types = ('tv',)
 
 class BaseDirItemDetailsCollection(BaseDirItem):
     priority = 120

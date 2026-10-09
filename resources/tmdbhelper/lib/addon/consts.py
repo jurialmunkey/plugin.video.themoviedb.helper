@@ -468,6 +468,15 @@ ROUTE_TMDBID = {
     'episodes': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_seasons',
         'import_attr': 'ListEpisodes'}},
+    'episode_groups': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_episode_groups',
+        'import_attr': 'ListEpisodeGroups'}},
+    'episode_group_seasons': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_episode_groups',
+        'import_attr': 'ListEpisodeGroupSeasons'}},
+    'episode_group_episodes': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_episode_groups',
+        'import_attr': 'ListEpisodeGroupEpisodes'}},
     'next_recommendation': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_nextup',
         'import_attr': 'ListNextRecommendation'}},
