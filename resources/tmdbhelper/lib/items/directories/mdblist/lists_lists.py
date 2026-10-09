@@ -1,9 +1,9 @@
 from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard
 from tmdbhelper.lib.items.directories.mdblist.lists_local import ListMDbListLocalNoCacheProperties
 from tmdbhelper.lib.items.directories.lists_local import UncachedListLocalData
-from tmdbhelper.lib.items.directories.mdblist.mapper_lists import ListsMDbListItemMapper
+from tmdbhelper.lib.items.directories.mdblist.mapper_lists import ListsMDbListItemMapper, OfficialListsMDbListItemMapper
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.addon.plugin import get_localized
+from tmdbhelper.lib.addon.plugin import get_localized, convert_type
 
 
 class ListMDbListListsProperties(ListMDbListLocalNoCacheProperties):
@@ -40,6 +40,36 @@ class ListMDbListListsProperties(ListMDbListLocalNoCacheProperties):
         return ListsMDbListItemMapper(item, add_infoproperties).item
 
 
+class ListMDbListListsLikedProperties(ListMDbListListsProperties):
+
+    limit = 100
+
+    def get_api_response(self, page=1):
+        response = self.mdblist_api.get_response_json(self.url, limit=self.limit, offset=(self.page - 1) * self.limit)
+        try:
+            total = int(response['pagination']['total'])
+        except (KeyError, TypeError, ValueError):
+            total = 0
+        return {
+            'json': response.get('lists') or [],
+            'headers': {
+                'x-pagination-page-count': (total + self.limit - 1) // self.limit,
+                'x-pagination-item-count': total,
+            }
+        }
+
+
+class ListMDbListListsOfficialProperties(ListMDbListListsProperties):
+    @cached_property
+    def response_kwgs(self):
+        return {'mediatype': convert_type(self.tmdb_type, 'trakt')}
+
+    def get_mapped_item(self, item, add_infoproperties=None):
+        mapper = OfficialListsMDbListItemMapper(item, add_infoproperties)
+        mapper.list_tmdb_type = self.tmdb_type
+        return mapper.item
+
+
 class ListMDbListListsTop(ListStandard):
 
     list_properties_class = ListMDbListListsProperties
@@ -61,6 +91,37 @@ class ListMDbListListsUser(ListMDbListListsTop):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.plugin_name = 'Your Lists'
         list_properties.request_url = 'lists/user'
+        return list_properties
+
+
+class ListMDbListListsLiked(ListMDbListListsTop):
+
+    list_properties_class = ListMDbListListsLikedProperties
+
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.plugin_name = 'Liked Lists'
+        list_properties.request_url = 'lists/liked'
+        return list_properties
+
+
+class ListMDbListListsCurated(ListMDbListListsTop):
+
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.plugin_name = 'Curated Lists'
+        list_properties.request_url = 'lists/curated'
+        return list_properties
+
+
+class ListMDbListListsOfficial(ListMDbListListsTop):
+
+    list_properties_class = ListMDbListListsOfficialProperties
+
+    def configure_list_properties(self, list_properties):
+        list_properties = super().configure_list_properties(list_properties)
+        list_properties.plugin_name = 'Official Lists'
+        list_properties.request_url = 'lists/official'
         return list_properties
 
 

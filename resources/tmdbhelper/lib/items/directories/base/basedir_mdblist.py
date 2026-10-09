@@ -15,6 +15,34 @@ class BaseDirItemMDbListTopLists(BaseDirItem):
         return bool(get_setting('mdblist_apikey', 'str'))
 
 
+class BaseDirItemMDbListCuratedLists(BaseDirItemMDbListTopLists):
+    priority = 102
+    label_localized = 32541
+    params = {'info': 'mdblist_curatedlists'}
+
+
+class BaseDirItemMDbListOfficialLists(BaseDirItemMDbListTopLists):
+    priority = 104
+    label_localized = 32542
+    label_type = 'standard'
+    params = {'info': 'mdblist_officiallists'}
+    types = ('movie', 'tv', )
+
+
+class BaseDirItemMDbListStreamingCharts(BaseDirItemMDbListTopLists):
+    priority = 106
+    label_localized = 32543
+    label_type = 'standard'
+    params = {'info': 'dir_mdblist_streamingcharts'}
+    types = ('movie', 'tv', )
+
+
+class BaseDirItemMDbListLikedLists(BaseDirItemMDbListTopLists):
+    priority = 108
+    label_localized = 32210
+    params = {'info': 'mdblist_likedlists'}
+
+
 class BaseDirItemMDbListYourLists(BaseDirItemMDbListTopLists):
     priority = 110
     label_localized = 32211

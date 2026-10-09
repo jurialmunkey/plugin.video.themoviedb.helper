@@ -263,12 +263,30 @@ ROUTE_NOID = {
     'mdblist_userlist': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_custom',
         'import_attr': 'ListMDbListCustom'}},
+    'mdblist_officiallist': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_custom',
+        'import_attr': 'ListMDbListOfficial'}},
+    'dir_mdblist_streamingcharts': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_custom',
+        'import_attr': 'ListMDbListStreamingChartsPeriods'}},
+    'mdblist_streamingcharts': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_custom',
+        'import_attr': 'ListMDbListStreamingCharts'}},
     'mdblist_toplists': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
         'import_attr': 'ListMDbListListsTop'}},
     'mdblist_yourlists': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
         'import_attr': 'ListMDbListListsUser'}},
+    'mdblist_likedlists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
+        'import_attr': 'ListMDbListListsLiked'}},
+    'mdblist_curatedlists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
+        'import_attr': 'ListMDbListListsCurated'}},
+    'mdblist_officiallists': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
+        'import_attr': 'ListMDbListListsOfficial'}},
     'mdblist_searchlists': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
         'import_attr': 'ListMDbListListsSearch'}},
