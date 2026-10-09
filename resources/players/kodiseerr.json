@@ -1,0 +1,25 @@
+{
+    "name" : "Kodiseerr",
+    "plugin" : "plugin.video.kodiseerr",
+    "priority" : 150,
+    "is_resolvable": "true",
+    "assert": {"play_episode": ["epid"]},
+    "fallback": {"play_movie": "kodiseerr.json search_movie",
+                 "play_episode": "kodiseer.json search_episode"},
+    "play_movie" : [
+        "plugin://plugin.video.kodiseerr/?content_type=video&media_type=movie&mode=search&query={title}",
+        {"dialog": "auto"}
+     ],
+    "search_movie" : [
+        "plugin://plugin.video.kodiseerr/?content_type=video&media_type=movie&mode=search&query={title}",
+        {"dialog": "auto"}
+     ],
+    "play_episode" : [
+        "plugin://plugin.video.kodiseerr/?content_type=video&media_type=tv&mode=search&query={showname}",
+        {"dialog":"auto"}
+     ],
+     "search_episode" : [
+        "plugin://plugin.video.kodiseerr/?content_type=video&media_type=tv&mode=search&query={showname}",
+        {"dialog":"auto"}
+     ]
+}
